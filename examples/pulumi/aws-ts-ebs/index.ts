@@ -7,7 +7,7 @@ const namePrefix = 'example'
 const vpc = new awsx.ec2.Vpc(`${namePrefix}-vpc`, {
     cidrBlock: '10.0.0.0/22',
     numberOfAvailabilityZones: 3,
-    numberOfNatGateways: 1,
+    numberOfNatGateways: 2,
   });
 
 const ebsVolume = new aws.ebs.Volume(`${namePrefix}-ebs-volume`, {

@@ -41,7 +41,7 @@
                         "forceDestroy"
                     ],
                     "acl": "private",
-                    "bucket": "mybucket-40cbdd2",
+                    "bucket": "mybucket-008bb93",
                     "forceDestroy": false
                 },
                 "parent": "urn:pulumi:dev::aws-ts-ebs::pulumi:pulumi:Stack::aws-ts-ebs-dev",
@@ -129,6 +129,54 @@
         },
         {
             "op": "create",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-private-2",
+            "newState": {
+                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-private-2",
+                "custom": false,
+                "type": "awsx:x:ec2:Subnet",
+                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc::example-vpc",
+                "sequenceNumber": 1
+            },
+            "detailedDiff": null
+        },
+        {
+            "op": "create",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-public-0",
+            "newState": {
+                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-public-0",
+                "custom": false,
+                "type": "awsx:x:ec2:Subnet",
+                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc::example-vpc",
+                "sequenceNumber": 1
+            },
+            "detailedDiff": null
+        },
+        {
+            "op": "create",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:NatGateway::example-vpc-0",
+            "newState": {
+                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:NatGateway::example-vpc-0",
+                "custom": false,
+                "type": "awsx:x:ec2:NatGateway",
+                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc::example-vpc",
+                "sequenceNumber": 1
+            },
+            "detailedDiff": null
+        },
+        {
+            "op": "create",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-private-1",
+            "newState": {
+                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-private-1",
+                "custom": false,
+                "type": "awsx:x:ec2:Subnet",
+                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc::example-vpc",
+                "sequenceNumber": 1
+            },
+            "detailedDiff": null
+        },
+        {
+            "op": "create",
             "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-public-1",
             "newState": {
                 "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-public-1",
@@ -141,11 +189,47 @@
         },
         {
             "op": "create",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-private-0",
+            "newState": {
+                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-private-0",
+                "custom": false,
+                "type": "awsx:x:ec2:Subnet",
+                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc::example-vpc",
+                "sequenceNumber": 1
+            },
+            "detailedDiff": null
+        },
+        {
+            "op": "create",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:NatGateway::example-vpc-1",
+            "newState": {
+                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:NatGateway::example-vpc-1",
+                "custom": false,
+                "type": "awsx:x:ec2:NatGateway",
+                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc::example-vpc",
+                "sequenceNumber": 1
+            },
+            "detailedDiff": null
+        },
+        {
+            "op": "create",
             "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-public-2",
             "newState": {
                 "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-public-2",
                 "custom": false,
                 "type": "awsx:x:ec2:Subnet",
+                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc::example-vpc",
+                "sequenceNumber": 1
+            },
+            "detailedDiff": null
+        },
+        {
+            "op": "create",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:InternetGateway::example-vpc",
+            "newState": {
+                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:InternetGateway::example-vpc",
+                "custom": false,
+                "type": "awsx:x:ec2:InternetGateway",
                 "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc::example-vpc",
                 "sequenceNumber": 1
             },
@@ -182,78 +266,6 @@
         },
         {
             "op": "create",
-            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-public-0",
-            "newState": {
-                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-public-0",
-                "custom": false,
-                "type": "awsx:x:ec2:Subnet",
-                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc::example-vpc",
-                "sequenceNumber": 1
-            },
-            "detailedDiff": null
-        },
-        {
-            "op": "create",
-            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-private-2",
-            "newState": {
-                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-private-2",
-                "custom": false,
-                "type": "awsx:x:ec2:Subnet",
-                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc::example-vpc",
-                "sequenceNumber": 1
-            },
-            "detailedDiff": null
-        },
-        {
-            "op": "create",
-            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:InternetGateway::example-vpc",
-            "newState": {
-                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:InternetGateway::example-vpc",
-                "custom": false,
-                "type": "awsx:x:ec2:InternetGateway",
-                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc::example-vpc",
-                "sequenceNumber": 1
-            },
-            "detailedDiff": null
-        },
-        {
-            "op": "create",
-            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:NatGateway::example-vpc-0",
-            "newState": {
-                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:NatGateway::example-vpc-0",
-                "custom": false,
-                "type": "awsx:x:ec2:NatGateway",
-                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc::example-vpc",
-                "sequenceNumber": 1
-            },
-            "detailedDiff": null
-        },
-        {
-            "op": "create",
-            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-private-1",
-            "newState": {
-                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-private-1",
-                "custom": false,
-                "type": "awsx:x:ec2:Subnet",
-                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc::example-vpc",
-                "sequenceNumber": 1
-            },
-            "detailedDiff": null
-        },
-        {
-            "op": "create",
-            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-private-0",
-            "newState": {
-                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-private-0",
-                "custom": false,
-                "type": "awsx:x:ec2:Subnet",
-                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc::example-vpc",
-                "sequenceNumber": 1
-            },
-            "detailedDiff": null
-        },
-        {
-            "op": "create",
             "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:NatGateway$aws:ec2/eip:Eip::example-vpc-0",
             "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
             "newState": {
@@ -280,51 +292,25 @@
         },
         {
             "op": "create",
-            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-private-0",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:NatGateway$aws:ec2/eip:Eip::example-vpc-1",
             "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
             "newState": {
-                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-private-0",
+                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:NatGateway$aws:ec2/eip:Eip::example-vpc-1",
                 "custom": true,
-                "type": "aws:ec2/routeTable:RouteTable",
+                "type": "aws:ec2/eip:Eip",
                 "inputs": {
                     "__defaults": [],
-                    "vpcId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
+                    "tags": {
+                        "Name": "example-vpc-1",
+                        "__defaults": []
+                    },
+                    "vpc": true
                 },
-                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-private-0",
-                "dependencies": [
-                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$aws:ec2/vpc:Vpc::example-vpc"
-                ],
+                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:NatGateway::example-vpc-1",
                 "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
                 "propertyDependencies": {
-                    "vpcId": [
-                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$aws:ec2/vpc:Vpc::example-vpc"
-                    ]
-                },
-                "sequenceNumber": 1
-            },
-            "detailedDiff": null
-        },
-        {
-            "op": "create",
-            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-public-1",
-            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-            "newState": {
-                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-public-1",
-                "custom": true,
-                "type": "aws:ec2/routeTable:RouteTable",
-                "inputs": {
-                    "__defaults": [],
-                    "vpcId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
-                },
-                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-public-1",
-                "dependencies": [
-                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$aws:ec2/vpc:Vpc::example-vpc"
-                ],
-                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-                "propertyDependencies": {
-                    "vpcId": [
-                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$aws:ec2/vpc:Vpc::example-vpc"
-                    ]
+                    "tags": null,
+                    "vpc": null
                 },
                 "sequenceNumber": 1
             },
@@ -358,22 +344,51 @@
         },
         {
             "op": "create",
-            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-public-0",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-public-2",
             "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
             "newState": {
-                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-public-0",
+                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-public-2",
                 "custom": true,
-                "type": "aws:ec2/routeTable:RouteTable",
+                "type": "aws:ec2/subnet:Subnet",
                 "inputs": {
-                    "__defaults": [],
+                    "__defaults": [
+                        "enableDns64",
+                        "enableResourceNameDnsARecordOnLaunch",
+                        "enableResourceNameDnsAaaaRecordOnLaunch",
+                        "ipv6Native"
+                    ],
+                    "assignIpv6AddressOnCreation": false,
+                    "availabilityZone": "us-west-2c",
+                    "cidrBlock": "10.0.1.0/25",
+                    "enableDns64": false,
+                    "enableResourceNameDnsARecordOnLaunch": false,
+                    "enableResourceNameDnsAaaaRecordOnLaunch": false,
+                    "ipv6CidrBlock": "04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+                    "ipv6Native": false,
+                    "mapPublicIpOnLaunch": true,
+                    "tags": {
+                        "Name": "example-vpc-public-2",
+                        "__defaults": [],
+                        "type": "public"
+                    },
                     "vpcId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
                 },
-                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-public-0",
+                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-public-2",
                 "dependencies": [
                     "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$aws:ec2/vpc:Vpc::example-vpc"
                 ],
                 "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
                 "propertyDependencies": {
+                    "assignIpv6AddressOnCreation": [
+                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$aws:ec2/vpc:Vpc::example-vpc"
+                    ],
+                    "availabilityZone": null,
+                    "cidrBlock": null,
+                    "ipv6CidrBlock": [
+                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$aws:ec2/vpc:Vpc::example-vpc"
+                    ],
+                    "mapPublicIpOnLaunch": null,
+                    "tags": null,
                     "vpcId": [
                         "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$aws:ec2/vpc:Vpc::example-vpc"
                     ]
@@ -395,6 +410,113 @@
                     "vpcId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
                 },
                 "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-private-2",
+                "dependencies": [
+                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$aws:ec2/vpc:Vpc::example-vpc"
+                ],
+                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+                "propertyDependencies": {
+                    "vpcId": [
+                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$aws:ec2/vpc:Vpc::example-vpc"
+                    ]
+                },
+                "sequenceNumber": 1
+            },
+            "detailedDiff": null
+        },
+        {
+            "op": "create",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-private-0",
+            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+            "newState": {
+                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-private-0",
+                "custom": true,
+                "type": "aws:ec2/routeTable:RouteTable",
+                "inputs": {
+                    "__defaults": [],
+                    "vpcId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
+                },
+                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-private-0",
+                "dependencies": [
+                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$aws:ec2/vpc:Vpc::example-vpc"
+                ],
+                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+                "propertyDependencies": {
+                    "vpcId": [
+                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$aws:ec2/vpc:Vpc::example-vpc"
+                    ]
+                },
+                "sequenceNumber": 1
+            },
+            "detailedDiff": null
+        },
+        {
+            "op": "create",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-public-0",
+            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+            "newState": {
+                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-public-0",
+                "custom": true,
+                "type": "aws:ec2/subnet:Subnet",
+                "inputs": {
+                    "__defaults": [
+                        "enableDns64",
+                        "enableResourceNameDnsARecordOnLaunch",
+                        "enableResourceNameDnsAaaaRecordOnLaunch",
+                        "ipv6Native"
+                    ],
+                    "assignIpv6AddressOnCreation": false,
+                    "availabilityZone": "us-west-2a",
+                    "cidrBlock": "10.0.0.0/25",
+                    "enableDns64": false,
+                    "enableResourceNameDnsARecordOnLaunch": false,
+                    "enableResourceNameDnsAaaaRecordOnLaunch": false,
+                    "ipv6CidrBlock": "04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+                    "ipv6Native": false,
+                    "mapPublicIpOnLaunch": true,
+                    "tags": {
+                        "Name": "example-vpc-public-0",
+                        "__defaults": [],
+                        "type": "public"
+                    },
+                    "vpcId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
+                },
+                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-public-0",
+                "dependencies": [
+                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$aws:ec2/vpc:Vpc::example-vpc"
+                ],
+                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+                "propertyDependencies": {
+                    "assignIpv6AddressOnCreation": [
+                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$aws:ec2/vpc:Vpc::example-vpc"
+                    ],
+                    "availabilityZone": null,
+                    "cidrBlock": null,
+                    "ipv6CidrBlock": [
+                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$aws:ec2/vpc:Vpc::example-vpc"
+                    ],
+                    "mapPublicIpOnLaunch": null,
+                    "tags": null,
+                    "vpcId": [
+                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$aws:ec2/vpc:Vpc::example-vpc"
+                    ]
+                },
+                "sequenceNumber": 1
+            },
+            "detailedDiff": null
+        },
+        {
+            "op": "create",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-public-0",
+            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+            "newState": {
+                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-public-0",
+                "custom": true,
+                "type": "aws:ec2/routeTable:RouteTable",
+                "inputs": {
+                    "__defaults": [],
+                    "vpcId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
+                },
+                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-public-0",
                 "dependencies": [
                     "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$aws:ec2/vpc:Vpc::example-vpc"
                 ],
@@ -465,33 +587,14 @@
         },
         {
             "op": "create",
-            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-public-1",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-public-1",
             "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
             "newState": {
-                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-public-1",
+                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-public-1",
                 "custom": true,
-                "type": "aws:ec2/subnet:Subnet",
+                "type": "aws:ec2/routeTable:RouteTable",
                 "inputs": {
-                    "__defaults": [
-                        "enableDns64",
-                        "enableResourceNameDnsARecordOnLaunch",
-                        "enableResourceNameDnsAaaaRecordOnLaunch",
-                        "ipv6Native"
-                    ],
-                    "assignIpv6AddressOnCreation": false,
-                    "availabilityZone": "us-west-2b",
-                    "cidrBlock": "10.0.0.128/25",
-                    "enableDns64": false,
-                    "enableResourceNameDnsARecordOnLaunch": false,
-                    "enableResourceNameDnsAaaaRecordOnLaunch": false,
-                    "ipv6CidrBlock": "04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-                    "ipv6Native": false,
-                    "mapPublicIpOnLaunch": true,
-                    "tags": {
-                        "Name": "example-vpc-public-1",
-                        "__defaults": [],
-                        "type": "public"
-                    },
+                    "__defaults": [],
                     "vpcId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
                 },
                 "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-public-1",
@@ -500,16 +603,6 @@
                 ],
                 "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
                 "propertyDependencies": {
-                    "assignIpv6AddressOnCreation": [
-                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$aws:ec2/vpc:Vpc::example-vpc"
-                    ],
-                    "availabilityZone": null,
-                    "cidrBlock": null,
-                    "ipv6CidrBlock": [
-                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$aws:ec2/vpc:Vpc::example-vpc"
-                    ],
-                    "mapPublicIpOnLaunch": null,
-                    "tags": null,
                     "vpcId": [
                         "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$aws:ec2/vpc:Vpc::example-vpc"
                     ]
@@ -601,33 +694,14 @@
         },
         {
             "op": "create",
-            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-public-2",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-public-2",
             "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
             "newState": {
-                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-public-2",
+                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-public-2",
                 "custom": true,
-                "type": "aws:ec2/subnet:Subnet",
+                "type": "aws:ec2/routeTable:RouteTable",
                 "inputs": {
-                    "__defaults": [
-                        "enableDns64",
-                        "enableResourceNameDnsARecordOnLaunch",
-                        "enableResourceNameDnsAaaaRecordOnLaunch",
-                        "ipv6Native"
-                    ],
-                    "assignIpv6AddressOnCreation": false,
-                    "availabilityZone": "us-west-2c",
-                    "cidrBlock": "10.0.1.0/25",
-                    "enableDns64": false,
-                    "enableResourceNameDnsARecordOnLaunch": false,
-                    "enableResourceNameDnsAaaaRecordOnLaunch": false,
-                    "ipv6CidrBlock": "04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-                    "ipv6Native": false,
-                    "mapPublicIpOnLaunch": true,
-                    "tags": {
-                        "Name": "example-vpc-public-2",
-                        "__defaults": [],
-                        "type": "public"
-                    },
+                    "__defaults": [],
                     "vpcId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
                 },
                 "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-public-2",
@@ -636,16 +710,6 @@
                 ],
                 "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
                 "propertyDependencies": {
-                    "assignIpv6AddressOnCreation": [
-                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$aws:ec2/vpc:Vpc::example-vpc"
-                    ],
-                    "availabilityZone": null,
-                    "cidrBlock": null,
-                    "ipv6CidrBlock": [
-                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$aws:ec2/vpc:Vpc::example-vpc"
-                    ],
-                    "mapPublicIpOnLaunch": null,
-                    "tags": null,
                     "vpcId": [
                         "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$aws:ec2/vpc:Vpc::example-vpc"
                     ]
@@ -711,36 +775,10 @@
         },
         {
             "op": "create",
-            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-public-2",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-public-1",
             "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
             "newState": {
-                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-public-2",
-                "custom": true,
-                "type": "aws:ec2/routeTable:RouteTable",
-                "inputs": {
-                    "__defaults": [],
-                    "vpcId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
-                },
-                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-public-2",
-                "dependencies": [
-                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$aws:ec2/vpc:Vpc::example-vpc"
-                ],
-                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-                "propertyDependencies": {
-                    "vpcId": [
-                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$aws:ec2/vpc:Vpc::example-vpc"
-                    ]
-                },
-                "sequenceNumber": 1
-            },
-            "detailedDiff": null
-        },
-        {
-            "op": "create",
-            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-public-0",
-            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-            "newState": {
-                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-public-0",
+                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-public-1",
                 "custom": true,
                 "type": "aws:ec2/subnet:Subnet",
                 "inputs": {
@@ -751,8 +789,8 @@
                         "ipv6Native"
                     ],
                     "assignIpv6AddressOnCreation": false,
-                    "availabilityZone": "us-west-2a",
-                    "cidrBlock": "10.0.0.0/25",
+                    "availabilityZone": "us-west-2b",
+                    "cidrBlock": "10.0.0.128/25",
                     "enableDns64": false,
                     "enableResourceNameDnsARecordOnLaunch": false,
                     "enableResourceNameDnsAaaaRecordOnLaunch": false,
@@ -760,13 +798,13 @@
                     "ipv6Native": false,
                     "mapPublicIpOnLaunch": true,
                     "tags": {
-                        "Name": "example-vpc-public-0",
+                        "Name": "example-vpc-public-1",
                         "__defaults": [],
                         "type": "public"
                     },
                     "vpcId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
                 },
-                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-public-0",
+                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-public-1",
                 "dependencies": [
                     "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$aws:ec2/vpc:Vpc::example-vpc"
                 ],
@@ -792,139 +830,29 @@
         },
         {
             "op": "create",
-            "urn": "urn:pulumi:dev::aws-ts-ebs::aws:ec2/instance:Instance::example-ec2-instance",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTableAssociation:RouteTableAssociation::example-vpc-public-0",
             "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
             "newState": {
-                "urn": "urn:pulumi:dev::aws-ts-ebs::aws:ec2/instance:Instance::example-ec2-instance",
+                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTableAssociation:RouteTableAssociation::example-vpc-public-0",
                 "custom": true,
-                "type": "aws:ec2/instance:Instance",
-                "inputs": {
-                    "__defaults": [
-                        "getPasswordData",
-                        "sourceDestCheck",
-                        "userDataReplaceOnChange"
-                    ],
-                    "ami": "ami-078c065e38be7296e",
-                    "creditSpecification": {
-                        "__defaults": [],
-                        "cpuCredits": "unlimited"
-                    },
-                    "ebsBlockDevices": [
-                        {
-                            "__defaults": [
-                                "deleteOnTermination"
-                            ],
-                            "deleteOnTermination": true,
-                            "deviceName": "/dev/xvde",
-                            "volumeId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
-                        },
-                        {
-                            "__defaults": [
-                                "deleteOnTermination"
-                            ],
-                            "deleteOnTermination": true,
-                            "deviceName": "/dev/xvdf",
-                            "volumeId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
-                        }
-                    ],
-                    "getPasswordData": false,
-                    "instanceType": "t3.micro",
-                    "rootBlockDevice": {
-                        "__defaults": [
-                            "deleteOnTermination"
-                        ],
-                        "deleteOnTermination": true,
-                        "volumeSize": 40,
-                        "volumeType": "gp3"
-                    },
-                    "sourceDestCheck": true,
-                    "tags": {
-                        "Name": "HelloWorld",
-                        "__defaults": []
-                    },
-                    "userDataReplaceOnChange": false
-                },
-                "parent": "urn:pulumi:dev::aws-ts-ebs::pulumi:pulumi:Stack::aws-ts-ebs-dev",
-                "dependencies": [
-                    "urn:pulumi:dev::aws-ts-ebs::aws:ebs/volume:Volume::example-ebs-volume",
-                    "urn:pulumi:dev::aws-ts-ebs::aws:ebs/volume:Volume::example-ebs-volume-1"
-                ],
-                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-                "propertyDependencies": {
-                    "ami": null,
-                    "creditSpecification": null,
-                    "ebsBlockDevices": [
-                        "urn:pulumi:dev::aws-ts-ebs::aws:ebs/volume:Volume::example-ebs-volume",
-                        "urn:pulumi:dev::aws-ts-ebs::aws:ebs/volume:Volume::example-ebs-volume-1"
-                    ],
-                    "instanceType": null,
-                    "rootBlockDevice": null,
-                    "tags": null
-                },
-                "sequenceNumber": 1
-            },
-            "detailedDiff": null
-        },
-        {
-            "op": "create",
-            "urn": "urn:pulumi:dev::aws-ts-ebs::aws:ec2/securityGroup:SecurityGroup::example-dbAppAccessGroup",
-            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-            "newState": {
-                "urn": "urn:pulumi:dev::aws-ts-ebs::aws:ec2/securityGroup:SecurityGroup::example-dbAppAccessGroup",
-                "custom": true,
-                "type": "aws:ec2/securityGroup:SecurityGroup",
-                "inputs": {
-                    "__defaults": [
-                        "name",
-                        "revokeRulesOnDelete"
-                    ],
-                    "description": "Managed by Pulumi",
-                    "name": "example-dbAppAccessGroup-32b867a",
-                    "revokeRulesOnDelete": false,
-                    "vpcId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
-                },
-                "parent": "urn:pulumi:dev::aws-ts-ebs::pulumi:pulumi:Stack::aws-ts-ebs-dev",
-                "dependencies": [
-                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$aws:ec2/vpc:Vpc::example-vpc"
-                ],
-                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-                "propertyDependencies": {
-                    "description": null,
-                    "vpcId": [
-                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$aws:ec2/vpc:Vpc::example-vpc"
-                    ]
-                },
-                "sequenceNumber": 1
-            },
-            "detailedDiff": null
-        },
-        {
-            "op": "create",
-            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/route:Route::example-vpc-public-1-ig",
-            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-            "newState": {
-                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/route:Route::example-vpc-public-1-ig",
-                "custom": true,
-                "type": "aws:ec2/route:Route",
+                "type": "aws:ec2/routeTableAssociation:RouteTableAssociation",
                 "inputs": {
                     "__defaults": [],
-                    "destinationCidrBlock": "0.0.0.0/0",
-                    "gatewayId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-                    "routeTableId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
+                    "routeTableId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+                    "subnetId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
                 },
-                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-public-1",
+                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-public-0",
                 "dependencies": [
-                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:InternetGateway$aws:ec2/internetGateway:InternetGateway::example-vpc",
-                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-public-1"
+                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-public-0",
+                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-public-0"
                 ],
                 "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
                 "propertyDependencies": {
-                    "destinationCidrBlock": null,
-                    "gatewayId": [
-                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:InternetGateway$aws:ec2/internetGateway:InternetGateway::example-vpc"
-                    ],
                     "routeTableId": [
-                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-public-1"
+                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-public-0"
+                    ],
+                    "subnetId": [
+                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-public-0"
                     ]
                 },
                 "customTimeouts": {
@@ -962,146 +890,6 @@
                     ],
                     "routeTableId": [
                         "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-public-0"
-                    ]
-                },
-                "customTimeouts": {
-                    "create": 300,
-                    "delete": 300
-                },
-                "sequenceNumber": 1
-            },
-            "detailedDiff": null
-        },
-        {
-            "op": "create",
-            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTableAssociation:RouteTableAssociation::example-vpc-private-0",
-            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-            "newState": {
-                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTableAssociation:RouteTableAssociation::example-vpc-private-0",
-                "custom": true,
-                "type": "aws:ec2/routeTableAssociation:RouteTableAssociation",
-                "inputs": {
-                    "__defaults": [],
-                    "routeTableId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-                    "subnetId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
-                },
-                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-private-0",
-                "dependencies": [
-                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-private-0",
-                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-private-0"
-                ],
-                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-                "propertyDependencies": {
-                    "routeTableId": [
-                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-private-0"
-                    ],
-                    "subnetId": [
-                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-private-0"
-                    ]
-                },
-                "customTimeouts": {
-                    "create": 300,
-                    "delete": 300
-                },
-                "sequenceNumber": 1
-            },
-            "detailedDiff": null
-        },
-        {
-            "op": "create",
-            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTableAssociation:RouteTableAssociation::example-vpc-public-1",
-            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-            "newState": {
-                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTableAssociation:RouteTableAssociation::example-vpc-public-1",
-                "custom": true,
-                "type": "aws:ec2/routeTableAssociation:RouteTableAssociation",
-                "inputs": {
-                    "__defaults": [],
-                    "routeTableId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-                    "subnetId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
-                },
-                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-public-1",
-                "dependencies": [
-                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-public-1",
-                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-public-1"
-                ],
-                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-                "propertyDependencies": {
-                    "routeTableId": [
-                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-public-1"
-                    ],
-                    "subnetId": [
-                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-public-1"
-                    ]
-                },
-                "customTimeouts": {
-                    "create": 300,
-                    "delete": 300
-                },
-                "sequenceNumber": 1
-            },
-            "detailedDiff": null
-        },
-        {
-            "op": "create",
-            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTableAssociation:RouteTableAssociation::example-vpc-private-2",
-            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-            "newState": {
-                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTableAssociation:RouteTableAssociation::example-vpc-private-2",
-                "custom": true,
-                "type": "aws:ec2/routeTableAssociation:RouteTableAssociation",
-                "inputs": {
-                    "__defaults": [],
-                    "routeTableId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-                    "subnetId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
-                },
-                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-private-2",
-                "dependencies": [
-                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-private-2",
-                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-private-2"
-                ],
-                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-                "propertyDependencies": {
-                    "routeTableId": [
-                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-private-2"
-                    ],
-                    "subnetId": [
-                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-private-2"
-                    ]
-                },
-                "customTimeouts": {
-                    "create": 300,
-                    "delete": 300
-                },
-                "sequenceNumber": 1
-            },
-            "detailedDiff": null
-        },
-        {
-            "op": "create",
-            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTableAssociation:RouteTableAssociation::example-vpc-private-1",
-            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-            "newState": {
-                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTableAssociation:RouteTableAssociation::example-vpc-private-1",
-                "custom": true,
-                "type": "aws:ec2/routeTableAssociation:RouteTableAssociation",
-                "inputs": {
-                    "__defaults": [],
-                    "routeTableId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-                    "subnetId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
-                },
-                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-private-1",
-                "dependencies": [
-                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-private-1",
-                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-private-1"
-                ],
-                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-                "propertyDependencies": {
-                    "routeTableId": [
-                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-private-1"
-                    ],
-                    "subnetId": [
-                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-private-1"
                     ]
                 },
                 "customTimeouts": {
@@ -1186,10 +974,10 @@
         },
         {
             "op": "create",
-            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTableAssociation:RouteTableAssociation::example-vpc-public-0",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTableAssociation:RouteTableAssociation::example-vpc-private-0",
             "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
             "newState": {
-                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTableAssociation:RouteTableAssociation::example-vpc-public-0",
+                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTableAssociation:RouteTableAssociation::example-vpc-private-0",
                 "custom": true,
                 "type": "aws:ec2/routeTableAssociation:RouteTableAssociation",
                 "inputs": {
@@ -1197,23 +985,327 @@
                     "routeTableId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9",
                     "subnetId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
                 },
-                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-public-0",
+                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-private-0",
                 "dependencies": [
-                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-public-0",
-                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-public-0"
+                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-private-0",
+                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-private-0"
                 ],
                 "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
                 "propertyDependencies": {
                     "routeTableId": [
-                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-public-0"
+                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-private-0"
                     ],
                     "subnetId": [
-                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-public-0"
+                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-private-0"
                     ]
                 },
                 "customTimeouts": {
                     "create": 300,
                     "delete": 300
+                },
+                "sequenceNumber": 1
+            },
+            "detailedDiff": null
+        },
+        {
+            "op": "create",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/route:Route::example-vpc-public-1-ig",
+            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+            "newState": {
+                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/route:Route::example-vpc-public-1-ig",
+                "custom": true,
+                "type": "aws:ec2/route:Route",
+                "inputs": {
+                    "__defaults": [],
+                    "destinationCidrBlock": "0.0.0.0/0",
+                    "gatewayId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+                    "routeTableId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
+                },
+                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-public-1",
+                "dependencies": [
+                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:InternetGateway$aws:ec2/internetGateway:InternetGateway::example-vpc",
+                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-public-1"
+                ],
+                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+                "propertyDependencies": {
+                    "destinationCidrBlock": null,
+                    "gatewayId": [
+                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:InternetGateway$aws:ec2/internetGateway:InternetGateway::example-vpc"
+                    ],
+                    "routeTableId": [
+                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-public-1"
+                    ]
+                },
+                "customTimeouts": {
+                    "create": 300,
+                    "delete": 300
+                },
+                "sequenceNumber": 1
+            },
+            "detailedDiff": null
+        },
+        {
+            "op": "create",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTableAssociation:RouteTableAssociation::example-vpc-private-2",
+            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+            "newState": {
+                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTableAssociation:RouteTableAssociation::example-vpc-private-2",
+                "custom": true,
+                "type": "aws:ec2/routeTableAssociation:RouteTableAssociation",
+                "inputs": {
+                    "__defaults": [],
+                    "routeTableId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+                    "subnetId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
+                },
+                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-private-2",
+                "dependencies": [
+                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-private-2",
+                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-private-2"
+                ],
+                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+                "propertyDependencies": {
+                    "routeTableId": [
+                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-private-2"
+                    ],
+                    "subnetId": [
+                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-private-2"
+                    ]
+                },
+                "customTimeouts": {
+                    "create": 300,
+                    "delete": 300
+                },
+                "sequenceNumber": 1
+            },
+            "detailedDiff": null
+        },
+        {
+            "op": "create",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTableAssociation:RouteTableAssociation::example-vpc-private-1",
+            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+            "newState": {
+                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTableAssociation:RouteTableAssociation::example-vpc-private-1",
+                "custom": true,
+                "type": "aws:ec2/routeTableAssociation:RouteTableAssociation",
+                "inputs": {
+                    "__defaults": [],
+                    "routeTableId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+                    "subnetId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
+                },
+                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-private-1",
+                "dependencies": [
+                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-private-1",
+                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-private-1"
+                ],
+                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+                "propertyDependencies": {
+                    "routeTableId": [
+                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-private-1"
+                    ],
+                    "subnetId": [
+                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-private-1"
+                    ]
+                },
+                "customTimeouts": {
+                    "create": 300,
+                    "delete": 300
+                },
+                "sequenceNumber": 1
+            },
+            "detailedDiff": null
+        },
+        {
+            "op": "create",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTableAssociation:RouteTableAssociation::example-vpc-public-1",
+            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+            "newState": {
+                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTableAssociation:RouteTableAssociation::example-vpc-public-1",
+                "custom": true,
+                "type": "aws:ec2/routeTableAssociation:RouteTableAssociation",
+                "inputs": {
+                    "__defaults": [],
+                    "routeTableId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+                    "subnetId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
+                },
+                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-public-1",
+                "dependencies": [
+                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-public-1",
+                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-public-1"
+                ],
+                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+                "propertyDependencies": {
+                    "routeTableId": [
+                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-public-1"
+                    ],
+                    "subnetId": [
+                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-public-1"
+                    ]
+                },
+                "customTimeouts": {
+                    "create": 300,
+                    "delete": 300
+                },
+                "sequenceNumber": 1
+            },
+            "detailedDiff": null
+        },
+        {
+            "op": "create",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::aws:ec2/securityGroup:SecurityGroup::example-dbAppAccessGroup",
+            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+            "newState": {
+                "urn": "urn:pulumi:dev::aws-ts-ebs::aws:ec2/securityGroup:SecurityGroup::example-dbAppAccessGroup",
+                "custom": true,
+                "type": "aws:ec2/securityGroup:SecurityGroup",
+                "inputs": {
+                    "__defaults": [
+                        "name",
+                        "revokeRulesOnDelete"
+                    ],
+                    "description": "Managed by Pulumi",
+                    "name": "example-dbAppAccessGroup-868dc2a",
+                    "revokeRulesOnDelete": false,
+                    "vpcId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
+                },
+                "parent": "urn:pulumi:dev::aws-ts-ebs::pulumi:pulumi:Stack::aws-ts-ebs-dev",
+                "dependencies": [
+                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$aws:ec2/vpc:Vpc::example-vpc"
+                ],
+                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+                "propertyDependencies": {
+                    "description": null,
+                    "vpcId": [
+                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$aws:ec2/vpc:Vpc::example-vpc"
+                    ]
+                },
+                "sequenceNumber": 1
+            },
+            "detailedDiff": null
+        },
+        {
+            "op": "create",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:NatGateway$aws:ec2/natGateway:NatGateway::example-vpc-0",
+            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+            "newState": {
+                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:NatGateway$aws:ec2/natGateway:NatGateway::example-vpc-0",
+                "custom": true,
+                "type": "aws:ec2/natGateway:NatGateway",
+                "inputs": {
+                    "__defaults": [
+                        "connectivityType"
+                    ],
+                    "allocationId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+                    "connectivityType": "public",
+                    "subnetId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
+                },
+                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:NatGateway::example-vpc-0",
+                "dependencies": [
+                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:NatGateway$aws:ec2/eip:Eip::example-vpc-0",
+                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-public-0",
+                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTableAssociation:RouteTableAssociation::example-vpc-public-0"
+                ],
+                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+                "propertyDependencies": {
+                    "allocationId": [
+                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:NatGateway$aws:ec2/eip:Eip::example-vpc-0"
+                    ],
+                    "subnetId": [
+                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-public-0",
+                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTableAssociation:RouteTableAssociation::example-vpc-public-0"
+                    ]
+                },
+                "sequenceNumber": 1
+            },
+            "detailedDiff": null
+        },
+        {
+            "op": "create",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:NatGateway$aws:ec2/natGateway:NatGateway::example-vpc-1",
+            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+            "newState": {
+                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:NatGateway$aws:ec2/natGateway:NatGateway::example-vpc-1",
+                "custom": true,
+                "type": "aws:ec2/natGateway:NatGateway",
+                "inputs": {
+                    "__defaults": [
+                        "connectivityType"
+                    ],
+                    "allocationId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+                    "connectivityType": "public",
+                    "subnetId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
+                },
+                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:NatGateway::example-vpc-1",
+                "dependencies": [
+                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:NatGateway$aws:ec2/eip:Eip::example-vpc-1",
+                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-public-1",
+                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTableAssociation:RouteTableAssociation::example-vpc-public-1"
+                ],
+                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+                "propertyDependencies": {
+                    "allocationId": [
+                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:NatGateway$aws:ec2/eip:Eip::example-vpc-1"
+                    ],
+                    "subnetId": [
+                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-public-1",
+                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTableAssociation:RouteTableAssociation::example-vpc-public-1"
+                    ]
+                },
+                "sequenceNumber": 1
+            },
+            "detailedDiff": null
+        },
+        {
+            "op": "create",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::aws:rds/cluster:Cluster::default",
+            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+            "newState": {
+                "urn": "urn:pulumi:dev::aws-ts-ebs::aws:rds/cluster:Cluster::default",
+                "custom": true,
+                "type": "aws:rds/cluster:Cluster",
+                "inputs": {
+                    "__defaults": [
+                        "backupRetentionPeriod",
+                        "copyTagsToSnapshot",
+                        "enableGlobalWriteForwarding",
+                        "enableHttpEndpoint",
+                        "engineMode",
+                        "skipFinalSnapshot"
+                    ],
+                    "availabilityZones": [
+                        "us-west-2a",
+                        "us-west-2b",
+                        "us-west-2c"
+                    ],
+                    "backupRetentionPeriod": 1,
+                    "clusterIdentifier": "aurora-cluster-demo",
+                    "copyTagsToSnapshot": false,
+                    "databaseName": "mydb",
+                    "enableGlobalWriteForwarding": false,
+                    "enableHttpEndpoint": false,
+                    "engine": "aurora-mysql",
+                    "engineMode": "provisioned",
+                    "masterPassword": "barbut8chars",
+                    "masterUsername": "foo",
+                    "skipFinalSnapshot": false
+                },
+                "parent": "urn:pulumi:dev::aws-ts-ebs::pulumi:pulumi:Stack::aws-ts-ebs-dev",
+                "dependencies": [
+                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-private-0",
+                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-private-1",
+                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-private-2"
+                ],
+                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+                "propertyDependencies": {
+                    "availabilityZones": [
+                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-private-0",
+                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-private-1",
+                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-private-2"
+                    ],
+                    "clusterIdentifier": null,
+                    "databaseName": null,
+                    "engine": null,
+                    "masterPassword": null,
+                    "masterUsername": null
                 },
                 "sequenceNumber": 1
             },
@@ -1288,209 +1380,10 @@
         },
         {
             "op": "create",
-            "urn": "urn:pulumi:dev::aws-ts-ebs::aws:rds/cluster:Cluster::default",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/route:Route::example-vpc-private-0-nat-0",
             "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
             "newState": {
-                "urn": "urn:pulumi:dev::aws-ts-ebs::aws:rds/cluster:Cluster::default",
-                "custom": true,
-                "type": "aws:rds/cluster:Cluster",
-                "inputs": {
-                    "__defaults": [
-                        "backupRetentionPeriod",
-                        "copyTagsToSnapshot",
-                        "enableGlobalWriteForwarding",
-                        "enableHttpEndpoint",
-                        "engineMode",
-                        "skipFinalSnapshot"
-                    ],
-                    "availabilityZones": [
-                        "us-west-2a",
-                        "us-west-2b",
-                        "us-west-2c"
-                    ],
-                    "backupRetentionPeriod": 1,
-                    "clusterIdentifier": "aurora-cluster-demo",
-                    "copyTagsToSnapshot": false,
-                    "databaseName": "mydb",
-                    "enableGlobalWriteForwarding": false,
-                    "enableHttpEndpoint": false,
-                    "engine": "aurora-mysql",
-                    "engineMode": "provisioned",
-                    "masterPassword": "barbut8chars",
-                    "masterUsername": "foo",
-                    "skipFinalSnapshot": false
-                },
-                "parent": "urn:pulumi:dev::aws-ts-ebs::pulumi:pulumi:Stack::aws-ts-ebs-dev",
-                "dependencies": [
-                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-private-0",
-                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-private-1",
-                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-private-2"
-                ],
-                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-                "propertyDependencies": {
-                    "availabilityZones": [
-                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-private-0",
-                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-private-1",
-                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-private-2"
-                    ],
-                    "clusterIdentifier": null,
-                    "databaseName": null,
-                    "engine": null,
-                    "masterPassword": null,
-                    "masterUsername": null
-                },
-                "sequenceNumber": 1
-            },
-            "detailedDiff": null
-        },
-        {
-            "op": "create",
-            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:NatGateway$aws:ec2/natGateway:NatGateway::example-vpc-0",
-            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-            "newState": {
-                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:NatGateway$aws:ec2/natGateway:NatGateway::example-vpc-0",
-                "custom": true,
-                "type": "aws:ec2/natGateway:NatGateway",
-                "inputs": {
-                    "__defaults": [
-                        "connectivityType"
-                    ],
-                    "allocationId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-                    "connectivityType": "public",
-                    "subnetId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
-                },
-                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:NatGateway::example-vpc-0",
-                "dependencies": [
-                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:NatGateway$aws:ec2/eip:Eip::example-vpc-0",
-                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-public-0",
-                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTableAssociation:RouteTableAssociation::example-vpc-public-0"
-                ],
-                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-                "propertyDependencies": {
-                    "allocationId": [
-                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:NatGateway$aws:ec2/eip:Eip::example-vpc-0"
-                    ],
-                    "subnetId": [
-                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/subnet:Subnet::example-vpc-public-0",
-                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTableAssociation:RouteTableAssociation::example-vpc-public-0"
-                    ]
-                },
-                "sequenceNumber": 1
-            },
-            "detailedDiff": null
-        },
-        {
-            "op": "create",
-            "urn": "urn:pulumi:dev::aws-ts-ebs::aws:ec2/eipAssociation:EipAssociation::example-eipAssoc",
-            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-            "newState": {
-                "urn": "urn:pulumi:dev::aws-ts-ebs::aws:ec2/eipAssociation:EipAssociation::example-eipAssoc",
-                "custom": true,
-                "type": "aws:ec2/eipAssociation:EipAssociation",
-                "inputs": {
-                    "__defaults": [],
-                    "allocationId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-                    "instanceId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
-                },
-                "parent": "urn:pulumi:dev::aws-ts-ebs::pulumi:pulumi:Stack::aws-ts-ebs-dev",
-                "dependencies": [
-                    "urn:pulumi:dev::aws-ts-ebs::aws:ec2/eip:Eip::example-elastic-ip",
-                    "urn:pulumi:dev::aws-ts-ebs::aws:ec2/instance:Instance::example-ec2-instance"
-                ],
-                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-                "propertyDependencies": {
-                    "allocationId": [
-                        "urn:pulumi:dev::aws-ts-ebs::aws:ec2/eip:Eip::example-elastic-ip"
-                    ],
-                    "instanceId": [
-                        "urn:pulumi:dev::aws-ts-ebs::aws:ec2/instance:Instance::example-ec2-instance"
-                    ]
-                },
-                "sequenceNumber": 1
-            },
-            "detailedDiff": null
-        },
-        {
-            "op": "create",
-            "urn": "urn:pulumi:dev::aws-ts-ebs::aws:rds/instance:Instance::example-rds",
-            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-            "newState": {
-                "urn": "urn:pulumi:dev::aws-ts-ebs::aws:rds/instance:Instance::example-rds",
-                "custom": true,
-                "type": "aws:rds/instance:Instance",
-                "inputs": {
-                    "__defaults": [
-                        "autoMinorVersionUpgrade",
-                        "copyTagsToSnapshot",
-                        "deleteAutomatedBackups",
-                        "identifier",
-                        "performanceInsightsEnabled",
-                        "publiclyAccessible"
-                    ],
-                    "allocatedStorage": 40,
-                    "autoMinorVersionUpgrade": true,
-                    "backupRetentionPeriod": 7,
-                    "backupWindow": "00:00-01:00",
-                    "copyTagsToSnapshot": false,
-                    "dbName": "example",
-                    "dbSubnetGroupName": "example-dbAppAccessGroup-32b867a",
-                    "deleteAutomatedBackups": true,
-                    "engine": "mysql",
-                    "engineVersion": "8.0.28",
-                    "identifier": "example-rds76d0e3d",
-                    "instanceClass": "db.t3.small",
-                    "iops": 0,
-                    "maintenanceWindow": "Mon:02:00-Mon:04:00",
-                    "monitoringInterval": 0,
-                    "monitoringRoleArn": "",
-                    "optionGroupName": "",
-                    "parameterGroupName": "",
-                    "password": "example1234!",
-                    "performanceInsightsEnabled": false,
-                    "publiclyAccessible": false,
-                    "skipFinalSnapshot": true,
-                    "storageType": "gp2",
-                    "username": "dbAdmin",
-                    "vpcSecurityGroupIds": []
-                },
-                "parent": "urn:pulumi:dev::aws-ts-ebs::pulumi:pulumi:Stack::aws-ts-ebs-dev",
-                "dependencies": [
-                    "urn:pulumi:dev::aws-ts-ebs::aws:ec2/securityGroup:SecurityGroup::example-dbAppAccessGroup"
-                ],
-                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-                "propertyDependencies": {
-                    "allocatedStorage": null,
-                    "backupRetentionPeriod": null,
-                    "backupWindow": null,
-                    "dbName": null,
-                    "dbSubnetGroupName": [
-                        "urn:pulumi:dev::aws-ts-ebs::aws:ec2/securityGroup:SecurityGroup::example-dbAppAccessGroup"
-                    ],
-                    "engine": null,
-                    "engineVersion": null,
-                    "instanceClass": null,
-                    "iops": null,
-                    "maintenanceWindow": null,
-                    "monitoringInterval": null,
-                    "monitoringRoleArn": null,
-                    "optionGroupName": null,
-                    "parameterGroupName": null,
-                    "password": null,
-                    "skipFinalSnapshot": null,
-                    "storageType": null,
-                    "username": null,
-                    "vpcSecurityGroupIds": null
-                },
-                "sequenceNumber": 1
-            },
-            "detailedDiff": null
-        },
-        {
-            "op": "create",
-            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/route:Route::example-vpc-private-1-nat-1",
-            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-            "newState": {
-                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/route:Route::example-vpc-private-1-nat-1",
+                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/route:Route::example-vpc-private-0-nat-0",
                 "custom": true,
                 "type": "aws:ec2/route:Route",
                 "inputs": {
@@ -1499,10 +1392,10 @@
                     "natGatewayId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9",
                     "routeTableId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
                 },
-                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-private-1",
+                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-private-0",
                 "dependencies": [
                     "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:NatGateway$aws:ec2/natGateway:NatGateway::example-vpc-0",
-                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-private-1"
+                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-private-0"
                 ],
                 "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
                 "propertyDependencies": {
@@ -1511,7 +1404,7 @@
                         "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:NatGateway$aws:ec2/natGateway:NatGateway::example-vpc-0"
                     ],
                     "routeTableId": [
-                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-private-1"
+                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-private-0"
                     ]
                 },
                 "customTimeouts": {
@@ -1561,10 +1454,10 @@
         },
         {
             "op": "create",
-            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/route:Route::example-vpc-private-0-nat-0",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/route:Route::example-vpc-private-1-nat-1",
             "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
             "newState": {
-                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/route:Route::example-vpc-private-0-nat-0",
+                "urn": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/route:Route::example-vpc-private-1-nat-1",
                 "custom": true,
                 "type": "aws:ec2/route:Route",
                 "inputs": {
@@ -1573,24 +1466,221 @@
                     "natGatewayId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9",
                     "routeTableId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
                 },
-                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-private-0",
+                "parent": "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet::example-vpc-private-1",
                 "dependencies": [
-                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:NatGateway$aws:ec2/natGateway:NatGateway::example-vpc-0",
-                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-private-0"
+                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:NatGateway$aws:ec2/natGateway:NatGateway::example-vpc-1",
+                    "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-private-1"
                 ],
                 "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
                 "propertyDependencies": {
                     "destinationCidrBlock": null,
                     "natGatewayId": [
-                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:NatGateway$aws:ec2/natGateway:NatGateway::example-vpc-0"
+                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:NatGateway$aws:ec2/natGateway:NatGateway::example-vpc-1"
                     ],
                     "routeTableId": [
-                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-private-0"
+                        "urn:pulumi:dev::aws-ts-ebs::awsx:x:ec2:Vpc$awsx:x:ec2:Subnet$aws:ec2/routeTable:RouteTable::example-vpc-private-1"
                     ]
                 },
                 "customTimeouts": {
                     "create": 300,
                     "delete": 300
+                },
+                "sequenceNumber": 1
+            },
+            "detailedDiff": null
+        },
+        {
+            "op": "create",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::aws:ec2/instance:Instance::example-ec2-instance",
+            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+            "newState": {
+                "urn": "urn:pulumi:dev::aws-ts-ebs::aws:ec2/instance:Instance::example-ec2-instance",
+                "custom": true,
+                "type": "aws:ec2/instance:Instance",
+                "inputs": {
+                    "__defaults": [
+                        "getPasswordData",
+                        "sourceDestCheck",
+                        "userDataReplaceOnChange"
+                    ],
+                    "ami": "ami-078c065e38be7296e",
+                    "creditSpecification": {
+                        "__defaults": [],
+                        "cpuCredits": "unlimited"
+                    },
+                    "ebsBlockDevices": [
+                        {
+                            "__defaults": [
+                                "deleteOnTermination"
+                            ],
+                            "deleteOnTermination": true,
+                            "deviceName": "/dev/xvde",
+                            "volumeId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
+                        },
+                        {
+                            "__defaults": [
+                                "deleteOnTermination"
+                            ],
+                            "deleteOnTermination": true,
+                            "deviceName": "/dev/xvdf",
+                            "volumeId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
+                        }
+                    ],
+                    "getPasswordData": false,
+                    "instanceType": "t3.micro",
+                    "rootBlockDevice": {
+                        "__defaults": [
+                            "deleteOnTermination"
+                        ],
+                        "deleteOnTermination": true,
+                        "volumeSize": 40,
+                        "volumeType": "gp3"
+                    },
+                    "sourceDestCheck": true,
+                    "tags": {
+                        "Name": "HelloWorld",
+                        "__defaults": []
+                    },
+                    "userDataReplaceOnChange": false
+                },
+                "parent": "urn:pulumi:dev::aws-ts-ebs::pulumi:pulumi:Stack::aws-ts-ebs-dev",
+                "dependencies": [
+                    "urn:pulumi:dev::aws-ts-ebs::aws:ebs/volume:Volume::example-ebs-volume",
+                    "urn:pulumi:dev::aws-ts-ebs::aws:ebs/volume:Volume::example-ebs-volume-1"
+                ],
+                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+                "propertyDependencies": {
+                    "ami": null,
+                    "creditSpecification": null,
+                    "ebsBlockDevices": [
+                        "urn:pulumi:dev::aws-ts-ebs::aws:ebs/volume:Volume::example-ebs-volume",
+                        "urn:pulumi:dev::aws-ts-ebs::aws:ebs/volume:Volume::example-ebs-volume-1"
+                    ],
+                    "instanceType": null,
+                    "rootBlockDevice": null,
+                    "tags": null
+                },
+                "sequenceNumber": 1
+            },
+            "detailedDiff": null
+        },
+        {
+            "op": "create",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::aws:rds/instance:Instance::example-rds",
+            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+            "newState": {
+                "urn": "urn:pulumi:dev::aws-ts-ebs::aws:rds/instance:Instance::example-rds",
+                "custom": true,
+                "type": "aws:rds/instance:Instance",
+                "inputs": {
+                    "__defaults": [
+                        "autoMinorVersionUpgrade",
+                        "copyTagsToSnapshot",
+                        "deleteAutomatedBackups",
+                        "identifier",
+                        "performanceInsightsEnabled",
+                        "publiclyAccessible"
+                    ],
+                    "allocatedStorage": 40,
+                    "autoMinorVersionUpgrade": true,
+                    "backupRetentionPeriod": 7,
+                    "backupWindow": "00:00-01:00",
+                    "copyTagsToSnapshot": false,
+                    "dbName": "example",
+                    "dbSubnetGroupName": "example-dbAppAccessGroup-868dc2a",
+                    "deleteAutomatedBackups": true,
+                    "engine": "mysql",
+                    "engineVersion": "8.0.28",
+                    "identifier": "example-rdsf584e9e",
+                    "instanceClass": "db.t3.small",
+                    "iops": 0,
+                    "maintenanceWindow": "Mon:02:00-Mon:04:00",
+                    "monitoringInterval": 0,
+                    "monitoringRoleArn": "",
+                    "optionGroupName": "",
+                    "parameterGroupName": "",
+                    "password": "example1234!",
+                    "performanceInsightsEnabled": false,
+                    "publiclyAccessible": false,
+                    "skipFinalSnapshot": true,
+                    "storageType": "gp2",
+                    "username": "dbAdmin",
+                    "vpcSecurityGroupIds": []
+                },
+                "parent": "urn:pulumi:dev::aws-ts-ebs::pulumi:pulumi:Stack::aws-ts-ebs-dev",
+                "dependencies": [
+                    "urn:pulumi:dev::aws-ts-ebs::aws:ec2/securityGroup:SecurityGroup::example-dbAppAccessGroup"
+                ],
+                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+                "propertyDependencies": {
+                    "allocatedStorage": null,
+                    "backupRetentionPeriod": null,
+                    "backupWindow": null,
+                    "dbName": null,
+                    "dbSubnetGroupName": [
+                        "urn:pulumi:dev::aws-ts-ebs::aws:ec2/securityGroup:SecurityGroup::example-dbAppAccessGroup"
+                    ],
+                    "engine": null,
+                    "engineVersion": null,
+                    "instanceClass": null,
+                    "iops": null,
+                    "maintenanceWindow": null,
+                    "monitoringInterval": null,
+                    "monitoringRoleArn": null,
+                    "optionGroupName": null,
+                    "parameterGroupName": null,
+                    "password": null,
+                    "skipFinalSnapshot": null,
+                    "storageType": null,
+                    "username": null,
+                    "vpcSecurityGroupIds": null
+                },
+                "sequenceNumber": 1
+            },
+            "detailedDiff": null
+        },
+        {
+            "op": "create",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::aws:rds/clusterInstance:ClusterInstance::clusterInstances-0",
+            "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+            "newState": {
+                "urn": "urn:pulumi:dev::aws-ts-ebs::aws:rds/clusterInstance:ClusterInstance::clusterInstances-0",
+                "custom": true,
+                "type": "aws:rds/clusterInstance:ClusterInstance",
+                "inputs": {
+                    "__defaults": [
+                        "autoMinorVersionUpgrade",
+                        "copyTagsToSnapshot",
+                        "monitoringInterval",
+                        "promotionTier",
+                        "publiclyAccessible"
+                    ],
+                    "autoMinorVersionUpgrade": true,
+                    "clusterIdentifier": "04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+                    "copyTagsToSnapshot": false,
+                    "engine": "aurora-mysql",
+                    "engineVersion": "04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+                    "identifier": "aurora-cluster-demo-0",
+                    "instanceClass": "db.r4.large",
+                    "monitoringInterval": 0,
+                    "promotionTier": 0,
+                    "publiclyAccessible": false
+                },
+                "parent": "urn:pulumi:dev::aws-ts-ebs::pulumi:pulumi:Stack::aws-ts-ebs-dev",
+                "dependencies": [
+                    "urn:pulumi:dev::aws-ts-ebs::aws:rds/cluster:Cluster::default"
+                ],
+                "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+                "propertyDependencies": {
+                    "clusterIdentifier": [
+                        "urn:pulumi:dev::aws-ts-ebs::aws:rds/cluster:Cluster::default"
+                    ],
+                    "engine": null,
+                    "engineVersion": [
+                        "urn:pulumi:dev::aws-ts-ebs::aws:rds/cluster:Cluster::default"
+                    ],
+                    "identifier": null,
+                    "instanceClass": null
                 },
                 "sequenceNumber": 1
             },
@@ -1645,54 +1735,38 @@
         },
         {
             "op": "create",
-            "urn": "urn:pulumi:dev::aws-ts-ebs::aws:rds/clusterInstance:ClusterInstance::clusterInstances-0",
+            "urn": "urn:pulumi:dev::aws-ts-ebs::aws:ec2/eipAssociation:EipAssociation::example-eipAssoc",
             "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
             "newState": {
-                "urn": "urn:pulumi:dev::aws-ts-ebs::aws:rds/clusterInstance:ClusterInstance::clusterInstances-0",
+                "urn": "urn:pulumi:dev::aws-ts-ebs::aws:ec2/eipAssociation:EipAssociation::example-eipAssoc",
                 "custom": true,
-                "type": "aws:rds/clusterInstance:ClusterInstance",
+                "type": "aws:ec2/eipAssociation:EipAssociation",
                 "inputs": {
-                    "__defaults": [
-                        "autoMinorVersionUpgrade",
-                        "copyTagsToSnapshot",
-                        "monitoringInterval",
-                        "promotionTier",
-                        "publiclyAccessible"
-                    ],
-                    "autoMinorVersionUpgrade": true,
-                    "clusterIdentifier": "04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-                    "copyTagsToSnapshot": false,
-                    "engine": "aurora-mysql",
-                    "engineVersion": "04da6b54-80e4-46f7-96ec-b56ff0331ba9",
-                    "identifier": "aurora-cluster-demo-0",
-                    "instanceClass": "db.r4.large",
-                    "monitoringInterval": 0,
-                    "promotionTier": 0,
-                    "publiclyAccessible": false
+                    "__defaults": [],
+                    "allocationId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9",
+                    "instanceId": "04da6b54-80e4-46f7-96ec-b56ff0331ba9"
                 },
                 "parent": "urn:pulumi:dev::aws-ts-ebs::pulumi:pulumi:Stack::aws-ts-ebs-dev",
                 "dependencies": [
-                    "urn:pulumi:dev::aws-ts-ebs::aws:rds/cluster:Cluster::default"
+                    "urn:pulumi:dev::aws-ts-ebs::aws:ec2/eip:Eip::example-elastic-ip",
+                    "urn:pulumi:dev::aws-ts-ebs::aws:ec2/instance:Instance::example-ec2-instance"
                 ],
                 "provider": "urn:pulumi:dev::aws-ts-ebs::pulumi:providers:aws::default_5_4_0::04da6b54-80e4-46f7-96ec-b56ff0331ba9",
                 "propertyDependencies": {
-                    "clusterIdentifier": [
-                        "urn:pulumi:dev::aws-ts-ebs::aws:rds/cluster:Cluster::default"
+                    "allocationId": [
+                        "urn:pulumi:dev::aws-ts-ebs::aws:ec2/eip:Eip::example-elastic-ip"
                     ],
-                    "engine": null,
-                    "engineVersion": [
-                        "urn:pulumi:dev::aws-ts-ebs::aws:rds/cluster:Cluster::default"
-                    ],
-                    "identifier": null,
-                    "instanceClass": null
+                    "instanceId": [
+                        "urn:pulumi:dev::aws-ts-ebs::aws:ec2/instance:Instance::example-ec2-instance"
+                    ]
                 },
                 "sequenceNumber": 1
             },
             "detailedDiff": null
         }
     ],
-    "duration": 20243699767,
+    "duration": 53840809568,
     "changeSummary": {
-        "create": 50
+        "create": 53
     }
 }
