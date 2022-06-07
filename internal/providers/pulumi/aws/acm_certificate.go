@@ -15,7 +15,7 @@ func NewACMCertificate(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 	r := &aws.ACMCertificate{
 		Address:                 d.Address,
 		Region:                  d.Get("region").String(),
-		CertificateAuthorityARN: d.Get("certificate_authority_arn").String(),
+		CertificateAuthorityARN: d.Get("certificateAuthorityArn").String(),
 	}
 
 	r.PopulateUsage(u)

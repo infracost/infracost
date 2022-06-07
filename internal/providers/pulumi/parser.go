@@ -76,11 +76,10 @@ func (p *Parser) parsePreviewDigest(t types.PreviewDigest, usage map[string]*sch
 			continue
 		}
 		var name = step.NewState.URN.Name().String()
-		var resourceTypeArray = strings.Split(step.NewState.Type.String(), ":")
-		var midTypeArray = strings.Split(resourceTypeArray[1], "/")
-		var resourceType = resourceTypeArray[0] + "_" + midTypeArray[0] + "_" + midTypeArray[1]
+		var resourceType = deriveTfResourceTypes(step.NewState.Type.String())
 		log.Debugf("resource type: %s", resourceType)
 		var providerName = strings.Split(step.NewState.Type.String(), ":")[0]
+		// this section creates a gjson raw value for infracost to search thru.
 		var localInputs = step.NewState.Inputs
 		localInputs["urn"] = step.URN
 		localInputs["config"] = t.Config
@@ -88,15 +87,15 @@ func (p *Parser) parsePreviewDigest(t types.PreviewDigest, usage map[string]*sch
 		localInputs["propertyDependencies"] = step.NewState.PropertyDependencies
 		localInputs["region"] = parseRegion(resourceType, t.Config)
 		var inputs, _ = json.Marshal(localInputs)
-
-		tags := parseTags(resourceType, gjson.Parse(string(inputs)))
+		var rawValues = gjson.Parse(string(inputs))
+		tags := parseTags(resourceType, rawValues)
 		var usageData *schema.UsageData
 
 		if ud := usage[name]; ud != nil {
 			usageData = ud
 		}
 
-		resourceData := schema.NewResourceData(resourceType, providerName, name, tags, gjson.Parse(string(inputs)))
+		resourceData := schema.NewResourceData(resourceType, providerName, name, tags, rawValues)
 		refResources[name] = resourceData
 		if r := p.createResource(resourceData, usageData); r != nil {
 			if step.Op == "same" {
@@ -498,4 +497,21 @@ func parseKnownModuleRefs(resData map[string]*schema.ResourceData, conf gjson.Re
 		},
 	}
 	log.Debugf("known refs %s", knownRefs)
+}
+
+// This function takes the string type from pulumi and converts it to the terraform type
+// a good bit of the infracost internals are dependent on the tf naming, it was easier to convert.
+func deriveTfResourceTypes(resourceType string) string {
+	var resourceTypeArray = strings.Split(resourceType, ":")
+	var midTypeArray = strings.Split(resourceTypeArray[1], "/")
+	var _resourceType = resourceTypeArray[0] + "_" + midTypeArray[0] + "_" + midTypeArray[1]
+	tfResourceTypes := map[string]string{
+		"aws_ec2_eip": "aws_eip",
+	}
+	knownResourceType := tfResourceTypes[_resourceType]
+	if knownResourceType == "" {
+		return _resourceType
+	} else {
+		return knownResourceType
+	}
 }
