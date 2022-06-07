@@ -11,7 +11,8 @@ import (
 
 func getInstanceRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name: "aws:ec2/instance:Instance",
+		//Name: "aws:ec2/instance:Instance",
+		Name: "aws_ec2_instance",
 		Notes: []string{
 			"Costs associated with marketplace AMIs are not supported.",
 			"For non-standard Linux AMIs such as Windows and RHEL, the operating system should be specified in usage file.",
@@ -20,7 +21,7 @@ func getInstanceRegistryItem() *schema.RegistryItem {
 		},
 		RFunc: NewInstance,
 		ReferenceAttributes: []string{
-			"ebsBlockDevice.#.volumeId",
+			"ebsBlockDevices.#.volumeId",
 			"launchTemplate.#.id",
 			"launchTemplate.#.name",
 		},

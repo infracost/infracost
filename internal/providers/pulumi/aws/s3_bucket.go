@@ -8,7 +8,7 @@ import (
 
 func getS3BucketRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name: "aws:s3/bucket:Bucket",
+		Name: "aws_s3_bucket",
 		Notes: []string{
 			"S3 replication time control data transfer, and batch operations are not supported by Terraform.",
 		},

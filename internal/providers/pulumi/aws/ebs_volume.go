@@ -9,7 +9,8 @@ import (
 
 func getEBSVolumeRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws:ebs/volume:Volume",
+		//Name:  "aws:ebs/volume:Volume",
+		Name:  "aws_ebs_volume",
 		RFunc: NewEBSVolume,
 	}
 }

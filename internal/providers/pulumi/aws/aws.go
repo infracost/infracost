@@ -4,6 +4,7 @@ import (
 	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
+	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
 
@@ -41,8 +42,13 @@ func GetResourceRegion(resourceType string, v gjson.Result) string {
 
 func ParseTags(resourceType string, v gjson.Result) map[string]string {
 	tags := make(map[string]string)
+
 	for k, v := range v.Get("tags").Map() {
+		if k == "__defaults" {
+			continue
+		}
 		tags[k] = v.String()
 	}
+	log.Debugf("tags %s", tags)
 	return tags
 }

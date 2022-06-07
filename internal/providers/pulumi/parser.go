@@ -76,7 +76,10 @@ func (p *Parser) parsePreviewDigest(t types.PreviewDigest, usage map[string]*sch
 			continue
 		}
 		var name = step.NewState.URN.Name().String()
-		var resourceType = step.NewState.Type.String()
+		var resourceTypeArray = strings.Split(step.NewState.Type.String(), ":")
+		var midTypeArray = strings.Split(resourceTypeArray[1], "/")
+		var resourceType = resourceTypeArray[0] + "_" + midTypeArray[0] + "_" + midTypeArray[1]
+		log.Debugf("resource type: %s", resourceType)
 		var providerName = strings.Split(step.NewState.Type.String(), ":")[0]
 		var localInputs = step.NewState.Inputs
 		localInputs["urn"] = step.URN
@@ -129,7 +132,7 @@ func isAwsChina(d *schema.ResourceData) bool {
 }
 
 func getSpecialContext(d *schema.ResourceData) map[string]interface{} {
-	providerPrefix := strings.Split(d.Type, ":")[0]
+	providerPrefix := strings.Split(d.Type, "_")[0]
 
 	switch providerPrefix {
 	case "aws":
@@ -142,7 +145,7 @@ func getSpecialContext(d *schema.ResourceData) map[string]interface{} {
 
 func parseTags(resourceType string, v gjson.Result) map[string]string {
 
-	providerPrefix := strings.Split(resourceType, ":")[0]
+	providerPrefix := strings.Split(resourceType, "_")[0]
 
 	switch providerPrefix {
 	case "aws":
@@ -151,69 +154,6 @@ func parseTags(resourceType string, v gjson.Result) map[string]string {
 		log.Debugf("Unsupported provider %s", providerPrefix)
 		return map[string]string{}
 	}
-}
-
-func providerRegion(addr string, providerConf gjson.Result, vars gjson.Result, resourceType string, resConf gjson.Result) string {
-	var region string
-
-	providerKey := parseProviderKey(resConf)
-	if providerKey != "" {
-		region = parseRegion(providerConf, vars, providerKey)
-		// Note: if the provider is passed to a module using a different alias
-		// then there's no way to detect this so we just have to fallback to
-		// the default provider
-	}
-
-	if region == "" {
-		// Try to get the provider key from the first part of the resource
-		providerPrefix := strings.Split(resourceType, "_")[0]
-		region = parseRegion(providerConf, vars, providerPrefix)
-
-		if region == "" {
-
-			switch providerPrefix {
-			case "aws":
-				region = aws.DefaultProviderRegion
-			}
-
-			// Don't show this log for azurerm users since they have a different method of looking up the region.
-			// A lot of Azure resources get their region from their referenced azurerm_resource_group resource
-			if region != "" && providerPrefix != "azurerm" {
-				log.Debugf("Falling back to default region (%s) for %s", region, addr)
-			}
-		}
-	}
-
-	return region
-}
-
-func parseProviderKey(resConf gjson.Result) string {
-	v := resConf.Get("provider_config_key").String()
-	p := strings.Split(v, ":")
-
-	return p[len(p)-1]
-}
-
-func parseRegion(providerConf gjson.Result, vars gjson.Result, providerKey string) string {
-	// Try to get constant value
-	region := providerConf.Get(fmt.Sprintf("%s.expressions.region.constant_value", gjsonEscape(providerKey))).String()
-	if region == "" {
-		// Try to get reference
-		refName := providerConf.Get(fmt.Sprintf("%s.expressions.region.references.0", gjsonEscape(providerKey))).String()
-		splitRef := strings.Split(refName, ".")
-
-		if splitRef[0] == "var" {
-			// Get the region from variables
-			varName := strings.Join(splitRef[1:], ".")
-			varContent := vars.Get(fmt.Sprintf("%s.value", varName))
-
-			if !varContent.IsObject() && !varContent.IsArray() {
-				region = varContent.String()
-			}
-		}
-	}
-
-	return region
 }
 
 func (p *Parser) loadInfracostProviderUsageData(u map[string]*schema.UsageData, resData map[string]*schema.ResourceData) {
@@ -313,13 +253,15 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf g
 func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, conf gjson.Result, d *schema.ResourceData, attr string, registryMap *ResourceRegistryMap) bool {
 	// Check if there's a reference in the conf
 	resConf := getConfJSON(conf, d.Address)
-	exps := resConf.Get("expressions").Get(attr)
-	lookupStr := "references"
+	log.Debugf("resConf %s %s", d.Address, attr)
+	exps := resConf.Get(attr)
+	lookupStr := "dependencies"
 	if exps.IsArray() {
-		lookupStr = "#.references"
+		lookupStr = "#.dependencies"
 	}
 
 	refResults := exps.Get(lookupStr).Array()
+	log.Debugf("Dependencies %s", refResults)
 	refs := make([]string, 0, len(refResults))
 
 	for _, refR := range refResults {
