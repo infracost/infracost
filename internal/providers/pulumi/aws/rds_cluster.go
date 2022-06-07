@@ -17,8 +17,9 @@ func NewRDSCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 		Address:               d.Address,
 		Region:                d.Get("region").String(),
 		Engine:                d.GetStringOrDefault("engine", "aurora"),
-		BackupRetentionPeriod: d.GetInt64OrDefault("backup_retention_period", 1),
-		EngineMode:            d.GetStringOrDefault("engine_mode", "provisioned"),
+		BackupRetentionPeriod: d.GetInt64OrDefault("backupRetentionPeriod", 1),
+		EngineMode:            d.GetStringOrDefault("engineMode", "provisioned"),
+		StorageGB:             floatPtr(d.GetFloat64OrDefault("allocatedStorage", 0)),
 	}
 
 	r.PopulateUsage(u)

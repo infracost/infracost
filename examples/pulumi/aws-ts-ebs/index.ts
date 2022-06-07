@@ -95,3 +95,40 @@ const rdsInstance = new aws.rds.Instance(`${namePrefix}-rds`, {
     skipFinalSnapshot: true,
     vpcSecurityGroupIds: [],
 }, );
+
+var azs = pulumi.output(vpc.privateSubnets).apply((subnets) => subnets.map((s) => s.subnet.availabilityZone))
+
+const rdsCluster = new aws.rds.Cluster(`${namePrefix}-rds-cluster`, {
+    availabilityZones: azs,
+    backupRetentionPeriod: 5,
+    clusterIdentifier: "aurora-cluster-demo",
+    databaseName: "mydb",
+    engine: "aurora-mysql",
+    engineVersion: "5.7.mysql_aurora.2.03.2",
+    masterPassword: "example1234!",
+    masterUsername: "foo",
+    preferredBackupWindow: "07:00-09:00",
+    dbClusterInstanceClass: "db.r6gd.xlarge",
+    iops: 1000,
+    allocatedStorage: 1000
+});
+
+const _default = new aws.rds.Cluster("default", {
+    clusterIdentifier: "aurora-cluster-demo",
+    availabilityZones: azs,
+    databaseName: "mydb",
+    masterUsername: "foo",
+    masterPassword: "barbut8chars",
+    engine: "aurora-mysql"
+});
+const clusterInstances: aws.rds.ClusterInstance[] = [];
+for (const range = {value: 0}; range.value < 2; range.value++) {
+    clusterInstances.push(new aws.rds.ClusterInstance(`clusterInstances-${range.value}`, {
+        identifier: `aurora-cluster-demo-${range.value}`,
+        clusterIdentifier: _default.id,
+        instanceClass: "db.r4.large",
+        //engine: _default.engine,
+        engine: "aurora-mysql",
+        engineVersion: _default.engineVersion,
+    }));
+}

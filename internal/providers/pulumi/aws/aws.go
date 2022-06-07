@@ -55,9 +55,10 @@ func ParseTags(resourceType string, v gjson.Result) map[string]string {
 
 func GetAWSResourceTypes() map[string]string {
 	resourceTypes := map[string]string{
-		"aws_ec2_eip":        "aws_eip",
-		"aws_ec2_natgateway": "aws_nat_gateway",
-		"aws_rds_instance":   "aws_db_instance",
+		"aws_ec2_eip":             "aws_eip",
+		"aws_ec2_natgateway":      "aws_nat_gateway",
+		"aws_rds_instance":        "aws_db_instance",
+		"aws_rds_clusterinstance": "aws_rds_cluster_instance",
 	}
 	return resourceTypes
 }
