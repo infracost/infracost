@@ -113,22 +113,82 @@ const rdsCluster = new aws.rds.Cluster(`${namePrefix}-rds-cluster`, {
     allocatedStorage: 1000
 });
 
-const _default = new aws.rds.Cluster("default", {
-    clusterIdentifier: "aurora-cluster-demo",
-    availabilityZones: azs,
-    databaseName: "mydb",
-    masterUsername: "foo",
-    masterPassword: "barbut8chars",
-    engine: "aurora-mysql"
-});
 const clusterInstances: aws.rds.ClusterInstance[] = [];
 for (const range = {value: 0}; range.value < 2; range.value++) {
-    clusterInstances.push(new aws.rds.ClusterInstance(`clusterInstances-${range.value}`, {
+    clusterInstances.push(new aws.rds.ClusterInstance(`${namePrefix}-rds-clusterInstances-${range.value}`, {
         identifier: `aurora-cluster-demo-${range.value}`,
-        clusterIdentifier: _default.id,
+        clusterIdentifier: rdsCluster.id,
         instanceClass: "db.r4.large",
-        //engine: _default.engine,
         engine: "aurora-mysql",
-        engineVersion: _default.engineVersion,
+        engineVersion: rdsCluster.engineVersion,
     }));
 }
+
+const exampleRole = new aws.iam.Role(`${namePrefix}-iam-role`, {assumeRolePolicy: `{
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Effect": "Allow",
+        "Principal": {
+          "Service": "eks.amazonaws.com"
+        },
+        "Action": "sts:AssumeRole"
+      }
+    ]
+  }
+  `});
+  const example_AmazonEKSClusterPolicy = new aws.iam.RolePolicyAttachment(`${namePrefix}-AmazonEKSClusterPolicy`, {
+      policyArn: "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy",
+      role: exampleRole.name,
+  });
+  // Optionally, enable Security Groups for Pods
+  // Reference: https://docs.aws.amazon.com/eks/latest/userguide/security-groups-for-pods.html
+  const example_AmazonEKSVPCResourceController = new aws.iam.RolePolicyAttachment(`${namePrefix}AmazonEKSVPCResourceController`, {
+      policyArn: "arn:aws:iam::aws:policy/AmazonEKSVPCResourceController",
+      role: exampleRole.name,
+  });
+
+const eksCluster = new aws.eks.Cluster(`${namePrefix}-eks-cluster`, {
+    roleArn: exampleRole.arn,
+    vpcConfig: {
+        subnetIds: vpc.privateSubnetIds,
+    },
+}, {
+    dependsOn: [
+        example_AmazonEKSClusterPolicy,
+        example_AmazonEKSVPCResourceController,
+    ],
+});
+
+const example_AmazonEKSWorkerNodePolicy = new aws.iam.RolePolicyAttachment("example-AmazonEKSWorkerNodePolicy", {
+    policyArn: "arn:aws:iam::aws:policy/AmazonEKSWorkerNodePolicy",
+    role: exampleRole.name,
+});
+const example_AmazonEKS_CNI_Policy = new aws.iam.RolePolicyAttachment("example-AmazonEKSCNIPolicy", {
+    policyArn: "arn:aws:iam::aws:policy/AmazonEKS_CNI_Policy",
+    role: exampleRole.name,
+});
+const example_AmazonEC2ContainerRegistryReadOnly = new aws.iam.RolePolicyAttachment("example-AmazonEC2ContainerRegistryReadOnly", {
+    policyArn: "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly",
+    role: exampleRole.name,
+});
+
+const eksNodeGroup = new aws.eks.NodeGroup("example", {
+    clusterName: eksCluster.name,
+    nodeRoleArn: exampleRole.arn,
+    subnetIds: vpc.privateSubnetIds,
+    scalingConfig: {
+        desiredSize: 1,
+        maxSize: 1,
+        minSize: 1,
+    },
+    updateConfig: {
+        maxUnavailable: 2,
+    },
+}, {
+    dependsOn: [
+        example_AmazonEKSWorkerNodePolicy,
+        example_AmazonEKS_CNI_Policy,
+        example_AmazonEC2ContainerRegistryReadOnly,
+    ],
+});

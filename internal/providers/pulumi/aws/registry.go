@@ -254,6 +254,7 @@ var FreeResources = []string{
 	"aws_iam_role",
 	"aws_iam_role_policy",
 	"aws_iam_role_policy_attachment",
+	"aws_iam_rolepolicyattachment",
 	"aws_iam_saml_provider",
 	"aws_iam_server_certificate",
 	"aws_iam_server_certificate",
