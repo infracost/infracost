@@ -401,6 +401,7 @@ var FreeResources = []string{
 	"aws_egress_only_internet_gateway",
 	"aws_flow_log",
 	"aws_internet_gateway",
+	"aws_ec2_internetgateway",
 	"aws_main_route_table_association",
 	"aws_network_acl",
 	"aws_network_acl_rule",
@@ -408,12 +409,18 @@ var FreeResources = []string{
 	"aws_network_interface_attachment",
 	"aws_network_interface_sg_attachment",
 	"aws_route",
+	"aws_ec2_route",
 	"aws_route_table",
+	"aws_ec2_routetable",
 	"aws_route_table_association",
+	"aws_ec2_routetableassociation",
 	"aws_security_group",
+	"aws_ec2_securitygroup",
 	"aws_security_group_rule",
 	"aws_subnet",
+	"aws_ec2_subnet",
 	"aws_vpc",
+	"aws_ec2_vpc",
 	"aws_vpc_dhcp_options",
 	"aws_vpc_dhcp_options_association",
 	"aws_vpc_endpoint_connection_notification",
@@ -429,6 +436,9 @@ var FreeResources = []string{
 	"aws_vpn_gateway",
 	"aws_vpn_gateway_attachment",
 	"aws_vpn_gateway_route_propagation",
+
+	// EIP Association
+	"aws_ec2_eipassociation",
 
 	// Hashicorp
 	"null_resource",

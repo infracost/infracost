@@ -57,6 +57,7 @@ func GetAWSResourceTypes() map[string]string {
 	resourceTypes := map[string]string{
 		"aws_ec2_eip":        "aws_eip",
 		"aws_ec2_natgateway": "aws_nat_gateway",
+		"aws_rds_instance":   "aws_db_instance",
 	}
 	return resourceTypes
 }

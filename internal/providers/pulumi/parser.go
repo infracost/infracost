@@ -78,6 +78,9 @@ func (p *Parser) parsePreviewDigest(t types.PreviewDigest, usage map[string]*sch
 		var name = step.NewState.URN.Name().String()
 		var resourceType = deriveTfResourceTypes(step.NewState.Type.String())
 		log.Debugf("resource type: %s", resourceType)
+		if resourceType == "awsx" {
+			continue
+		}
 		var providerName = strings.Split(step.NewState.Type.String(), ":")[0]
 		// this section creates a gjson raw value for infracost to search thru.
 		var localInputs = step.NewState.Inputs
@@ -503,18 +506,19 @@ func parseKnownModuleRefs(resData map[string]*schema.ResourceData, conf gjson.Re
 // a good bit of the infracost internals are dependent on the tf naming, it was easier to convert.
 func deriveTfResourceTypes(resourceType string) string {
 	var resourceTypeArray = strings.Split(resourceType, ":")
-	var midTypeArray = strings.Split(resourceTypeArray[1], "/")
-	var _resourceType = strings.ToLower(resourceTypeArray[0] + "_" + midTypeArray[0] + "_" + midTypeArray[1])
 	providerPrefix := strings.ToLower(resourceTypeArray[0])
 	var tfResourceTypes map[string]string
 	switch providerPrefix {
 	case "aws":
 		tfResourceTypes = aws.GetAWSResourceTypes()
+	case "awsx":
+		return "awsx"
 	default:
 		log.Debugf("Unsupported provider %s", providerPrefix)
 		tfResourceTypes = map[string]string{}
 	}
-
+	var midTypeArray = strings.Split(resourceTypeArray[1], "/")
+	var _resourceType = strings.ToLower(resourceTypeArray[0] + "_" + midTypeArray[0] + "_" + midTypeArray[1])
 	knownResourceType := tfResourceTypes[_resourceType]
 	if knownResourceType == "" {
 		return _resourceType
