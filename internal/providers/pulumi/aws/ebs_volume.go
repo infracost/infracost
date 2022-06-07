@@ -21,11 +21,11 @@ func NewEBSVolume(d *schema.ResourceData, u *schema.UsageData) *schema.Resource 
 	if d.Get("size").Type != gjson.Null {
 		size = intPtr(d.Get("size").Int())
 	}
-	var region = d.Get("config.aws:region")
+	var region = d.Get("region").String()
 	log.Debugf("region %s", region)
 	a := &aws.EBSVolume{
 		Address:    d.Address,
-		Region:     region.String(),
+		Region:     d.Get("region").String(),
 		Type:       d.Get("type").String(),
 		IOPS:       d.Get("iops").Int(),
 		Throughput: d.Get("throughput").Int(),

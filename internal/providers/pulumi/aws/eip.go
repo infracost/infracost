@@ -26,10 +26,10 @@ func NewEIP(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	if !d.IsEmpty("customerOwnedIpv4Pool") || !d.IsEmpty("instance") || !d.IsEmpty("networkInterface") {
 		allocated = true
 	}
-	var region = d.Get("config.aws:region")
+
 	r := &aws.EIP{
 		Address:   d.Address,
-		Region:    region.String(),
+		Region:    d.Get("region").String(),
 		Allocated: allocated,
 	}
 

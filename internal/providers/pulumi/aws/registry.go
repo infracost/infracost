@@ -9,7 +9,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	// GetAPIGatewayStageRegistryItem(),
 	// GetAPIGatewayv2ApiRegistryItem(),
 	// GetAutoscalingGroupRegistryItem(),
-	// GetACMCertificate(),
+	getACMCertificate(),
 	// GetACMPCACertificateAuthorityRegistryItem(),
 	// GetCloudfrontDistributionRegistryItem(),
 	// GetCloudwatchDashboardRegistryItem(),

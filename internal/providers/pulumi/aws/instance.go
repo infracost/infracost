@@ -29,7 +29,7 @@ func getInstanceRegistryItem() *schema.RegistryItem {
 }
 
 func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	var region = d.Get("config.aws:region")
+
 	log.Debugf("resources %s", d)
 	purchaseOption := "on_demand"
 	if d.Get("spot_price").String() != "" {
@@ -58,7 +58,7 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 		for _, data := range ref.Get("ebsBlockDevices").Array() {
 			deviceName := data.Get("deviceName").String()
 			ebsBlockDevice := &aws.EBSVolume{
-				Region: region.String(),
+				Region: data.Get("region").String(),
 				Type:   data.Get("ebs.0.volume_type").String(),
 				IOPS:   data.Get("ebs.0.iops").Int(),
 			}
@@ -80,7 +80,7 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 
 	a := &aws.Instance{
 		Address:          d.Address,
-		Region:           region.String(),
+		Region:           d.Get("region").String(),
 		Tenancy:          tenancy,
 		PurchaseOption:   purchaseOption,
 		AMI:              ami,
@@ -92,7 +92,7 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 
 	a.RootBlockDevice = &aws.EBSVolume{
 		Address: "root_block_device",
-		Region:  region.String(),
+		Region:  d.Get("region").String(),
 		Type:    d.Get("rootBlockDevice.volumeType").String(),
 		IOPS:    d.Get("rootBlockDevice.iops").Int(),
 	}
@@ -139,7 +139,7 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 
 		ebsBlockDevice := &aws.EBSVolume{
 			Address: fmt.Sprintf("ebs_block_device[%d]", i),
-			Region:  region.String(),
+			Region:  d.Get("region").String(),
 			Type:    volumeType,
 			Size:    volumeSize,
 			IOPS:    iops,

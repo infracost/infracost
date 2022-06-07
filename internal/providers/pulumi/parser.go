@@ -86,6 +86,7 @@ func (p *Parser) parsePreviewDigest(t types.PreviewDigest, usage map[string]*sch
 		localInputs["config"] = t.Config
 		localInputs["dependencies"] = step.NewState.Dependencies
 		localInputs["propertyDependencies"] = step.NewState.PropertyDependencies
+		localInputs["region"] = parseRegion(resourceType, t.Config)
 		var inputs, _ = json.Marshal(localInputs)
 
 		tags := parseTags(resourceType, gjson.Parse(string(inputs)))
@@ -153,6 +154,23 @@ func parseTags(resourceType string, v gjson.Result) map[string]string {
 	default:
 		log.Debugf("Unsupported provider %s", providerPrefix)
 		return map[string]string{}
+	}
+}
+
+func parseRegion(resourceType string, v map[string]string) string {
+	var region string
+	providerPrefix := strings.Split(resourceType, "_")[0]
+
+	switch providerPrefix {
+	case "aws":
+		region = v["aws:region"]
+		if region == "" {
+			region = aws.DefaultProviderRegion
+		}
+		return region
+	default:
+		log.Debugf("Unsupported provider %s", providerPrefix)
+		return ""
 	}
 }
 
