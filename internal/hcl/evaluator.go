@@ -515,9 +515,8 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 	if e.moduleMetadata != nil {
 		// if we have module metadata we can parse all the modules as they'll be cached locally!
 		for _, module := range e.moduleMetadata.Modules {
-			reg := "registry.terraform.io/" + source
 			key := modReplace.ReplaceAllString(b.FullName(), "")
-			if (module.Source == source && module.Key == key) || (module.Source == reg && module.Key == key) {
+			if module.Key == key {
 				modulePath = filepath.Clean(filepath.Join(e.module.RootPath, module.Dir))
 				break
 			}
