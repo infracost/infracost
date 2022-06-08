@@ -612,7 +612,19 @@ func decodeDependencyBlocks(filename string, terragruntOptions *tgoptions.Terrag
 		return nil, err
 	}
 
+	var deps terragruntDependency
+	decodeDiagnostics := gohcl.DecodeBody(file.Body, evalContext, &deps)
+	if decodeDiagnostics != nil && decodeDiagnostics.HasErrors() {
+		return nil, decodeDiagnostics
+	}
+
 	depmap := make(map[string]tgconfig.Dependency)
+	keymap := make(map[string]struct{})
+	for _, dep := range deps.Dependencies {
+		depmap[getCleanedTargetConfigPath(dep.ConfigPath, filename)] = dep
+		keymap[dep.Name] = struct{}{}
+	}
+
 	if trackInclude != nil {
 		for _, includeConfig := range trackInclude.CurrentList {
 			includeConfig := includeConfig
@@ -625,20 +637,14 @@ func decodeDependencyBlocks(filename string, terragruntOptions *tgoptions.Terrag
 				}
 
 				for _, dep := range incl {
+					if _, includedInParent := keymap[dep.Name]; includedInParent {
+						continue
+					}
+
 					depmap[getCleanedTargetConfigPath(dep.ConfigPath, filename)] = dep
 				}
 			}
 		}
-	}
-
-	var deps terragruntDependency
-	decodeDiagnostics := gohcl.DecodeBody(file.Body, evalContext, &deps)
-	if decodeDiagnostics != nil && decodeDiagnostics.HasErrors() {
-		return nil, decodeDiagnostics
-	}
-
-	for _, dep := range deps.Dependencies {
-		depmap[getCleanedTargetConfigPath(dep.ConfigPath, filename)] = dep
 	}
 
 	return depmap, nil
