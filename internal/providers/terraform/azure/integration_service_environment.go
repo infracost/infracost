@@ -57,7 +57,7 @@ func IntegrationBaseServiceEnvironmentCostComponent(name, region, productName st
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr(productName)},
 				{Key: "skuName", Value: strPtr("Base")},
-				{Key: "meterName", Value: strPtr("Base Units")},
+				{Key: "meterName", Value: strPtr("Base Unit")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

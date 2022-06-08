@@ -3,9 +3,10 @@ package azure
 import (
 	"fmt"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 // MySQLFlexibleServer struct represents Azure MySQL Flexible Server resource.
@@ -170,7 +171,7 @@ func (r *MySQLFlexibleServer) backupCostComponent() *schema.CostComponent {
 			ProductFamily: strPtr("Databases"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("Azure Database for MySQL Flexible Server Backup Storage")},
-				{Key: "meterName", Value: strPtr("Backup Storage Data Stored")},
+				{Key: "meterName", Value: strPtr("Backup Storage LRS Data Stored")},
 			},
 		},
 	}

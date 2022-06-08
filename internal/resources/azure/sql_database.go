@@ -341,7 +341,7 @@ func (r *SQLDatabase) longTermRetentionMSSQLCostComponent() *schema.CostComponen
 		ProductFilter: r.productFilter([]*schema.AttributeFilter{
 			{Key: "productName", Value: strPtr("SQL Database - LTR Backup Storage")},
 			{Key: "skuName", Value: strPtr("Backup RA-GRS")},
-			{Key: "meterName", Value: strPtr("RA-GRS Data Stored")},
+			{Key: "meterName", ValueRegex: strPtr("/RA-GRS Data Stored/i")},
 		}),
 		PriceFilter: priceFilterConsumption,
 	}
