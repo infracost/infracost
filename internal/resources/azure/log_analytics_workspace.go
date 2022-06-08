@@ -237,7 +237,7 @@ func (r *LogAnalyticsWorkspace) logDataIngestion(name string, monthlyData *float
 			ProductFamily: strPtr(governanceProductFamily),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "skuName", Value: strPtr(skuFilterPAYG)},
-				{Key: "meterName", Value: strPtr("Data Ingestion")},
+				{Key: "meterName", ValueRegex: strPtr("/Data Ingestion/i")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -265,7 +265,7 @@ func (r *LogAnalyticsWorkspace) logDataRetention() *schema.CostComponent {
 			ProductFamily: strPtr(governanceProductFamily),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "skuName", Value: strPtr(skuFilterPAYG)},
-				{Key: "meterName", Value: strPtr("Data Retention")},
+				{Key: "meterName", ValueRegex: strPtr("/Data Retention/i")},
 			},
 		},
 		PriceFilter: priceFilterConsumption,
