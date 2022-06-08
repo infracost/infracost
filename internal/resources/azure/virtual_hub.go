@@ -84,7 +84,7 @@ func (v VirtualHub) dataProcessed() *schema.CostComponent {
 			ProductFamily: strPtr("Networking"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "skuName", Value: v.hubTypeFilter()},
-				{Key: "meterName", Value: strPtr("Data Processed")},
+				{Key: "meterName", Value: v.hubTypeDataFilter()},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -106,7 +106,7 @@ func (v VirtualHub) deploymentHours() *schema.CostComponent {
 			ProductFamily: strPtr("Networking"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "skuName", Value: v.hubTypeFilter()},
-				{Key: "meterName", Value: v.hubTypeFilter()},
+				{Key: "meterName", Value: v.hubTypeUnitFilter()},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -117,4 +117,12 @@ func (v VirtualHub) deploymentHours() *schema.CostComponent {
 
 func (v VirtualHub) hubTypeFilter() *string {
 	return strPtr(fmt.Sprintf("%s Hub", v.SKU))
+}
+
+func (v VirtualHub) hubTypeUnitFilter() *string {
+	return strPtr(fmt.Sprintf("%s Hub Unit", v.SKU))
+}
+
+func (v VirtualHub) hubTypeDataFilter() *string {
+	return strPtr(fmt.Sprintf("%s Hub Data Processed", v.SKU))
 }
