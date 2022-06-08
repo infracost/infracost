@@ -72,7 +72,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	// GetSNSTopicSubscriptionRegistryItem(),
 	// GetSQSQueueRegistryItem(),
 	getNewEKSNodeGroupItem(),
-	getNewEKSFargateProfileItem(),
+	//getNewEKSFargateProfileItem(),
 	getNewEKSClusterItem(),
 	// GetNewKMSKeyRegistryItem(),
 	// GetNewKMSExternalKeyRegistryItem(),

@@ -185,6 +185,7 @@ const eksNodeGroup = new aws.eks.NodeGroup("example", {
     updateConfig: {
         maxUnavailable: 2,
     },
+    instanceTypes: ["t3.large"]
 }, {
     dependsOn: [
         example_AmazonEKSWorkerNodePolicy,
