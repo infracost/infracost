@@ -18,7 +18,7 @@ type AuthClient struct {
 
 // Login opens a browser with authentication URL and starts a HTTP server to
 // wait for a callback request.
-func (a AuthClient) Login() (string, error) {
+func (a AuthClient) Login(contextVals map[string]interface{}) (string, error) {
 	state := uuid.NewString()
 
 	listener, err := net.Listen("tcp", "localhost:0")
@@ -30,6 +30,8 @@ func (a AuthClient) Login() (string, error) {
 	q := url.Values{}
 	q.Set("cli_port", fmt.Sprint(port))
 	q.Set("cli_state", state)
+	q.Set("cli_version", fmt.Sprintf("%v", contextVals["version"]))
+	q.Set("os", fmt.Sprintf("%v", contextVals["os"]))
 	q.Set("utm_source", "cli")
 
 	startURL := fmt.Sprintf("%s/login?%s", a.Host, q.Encode())
