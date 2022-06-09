@@ -4,9 +4,15 @@ USAGE
   infracost auth login [flags]
 
 EXAMPLES
-  Login:
+  Get a free API key, or log in to your existing account:
 
       infracost auth login
+
+      You can also log in at https://dashboard.infracost.io
+
+  Manually set the API key that your CLI should use. The API key can be retrieved from your account:
+
+      infracost configure set api_key MY_API_KEY
 
 FLAGS
   -h, --help   help for login

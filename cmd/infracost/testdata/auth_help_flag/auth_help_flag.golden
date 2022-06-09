@@ -1,17 +1,23 @@
-Get a free API key, or login to your existing account
+Get a free API key, or log in to your existing account
 
 USAGE
   infracost auth [flags]
   infracost auth [command]
 
 EXAMPLES
-  Get a free API key, or login to your existing account:
+  Get a free API key, or log in to your existing account:
 
       infracost auth login
+
+      You can also log in at https://dashboard.infracost.io
 
   Manually set the API key that your CLI should use. The API key can be retrieved from your account:
 
       infracost configure set api_key MY_API_KEY
+
+  Regenerate your API key:
+
+      Log in at https://dashboard.infracost.io > select your organization > Settings
 
 AVAILABLE COMMANDS
   login       Authenticate the CLI with your Infracost account
