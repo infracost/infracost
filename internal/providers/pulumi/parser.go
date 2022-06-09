@@ -3,7 +3,6 @@ package pulumi
 import (
 	"encoding/json"
 	"fmt"
-	"regexp"
 	"strings"
 
 	"github.com/infracost/infracost/internal/config"
@@ -76,7 +75,7 @@ func (p *Parser) parsePreviewDigest(t types.PreviewDigest, usage map[string]*sch
 		}
 		var name = step.NewState.URN.Name().String()
 		var resourceType = deriveTfResourceTypes(step.NewState.Type.String())
-		log.Debugf("resource type: %s", resourceType)
+		//log.Debugf("resource type: %s", resourceType)
 		if resourceType == "awsx" {
 			continue
 		}
@@ -205,7 +204,6 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf g
 		// check for any "default" ids declared by the provider for this resource
 		if f := registryMap.GetDefaultRefIDFunc(d.Type); f != nil {
 			for _, defaultID := range f(d) {
-				log.Debugf("defaultId %s", defaultID)
 				if _, ok := idMap[defaultID]; !ok {
 					idMap[defaultID] = []*schema.ResourceData{}
 				}
@@ -232,26 +230,17 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf g
 			refAttrs = registryMap.GetReferenceAttributes(d.Type)
 		}
 		for _, attr := range refAttrs {
-			//found := p.parseConfReferences(resData, conf, d, attr, registryMap, idMap)
-
-			//if found {
-			//continue
-			//}
-
 			// Get any values for the fields and check if they map to IDs or ARNs of any resources
-			log.Debugf("above the loop %s", fmt.Sprintf(`%s`, attr))
-			for i, refExists := range d.RawValues.Get(fmt.Sprintf(`%s`, attr)).Array() {
-				log.Debugf("i %s, attr %s, refVal %s", i, fmt.Sprintf(`newState.inputs.%s`, attr), refExists)
-				//if refVal.String() == "" {
-				//	continue
-				//}
+			// Replaced refExists with _ as we only need to know the attribute exists
+			for i, _ := range d.RawValues.Get(fmt.Sprintf(`%s`, attr)).Array() {
+				//log.Debugf("i %s, attr %s, refVal %s", i, fmt.Sprintf(`newState.inputs.%s`, attr), refExists)
 				attrFirst := strings.Split(attr, ".")[0]
 				searchString := fmt.Sprintf(`propertyDependencies.%s`, attrFirst)
-				log.Debugf("searchString %s", searchString)
+				//log.Debugf("searchString %s", searchString)
 				refVal := d.RawValues.Get(searchString).Array()[i]
 				// Check ID map
 				idRefs, ok := idMap[refVal.String()]
-				log.Debugf("idRefs %s, ok %s", idRefs, ok)
+				//log.Debugf("idRefs %s, ok %s", idRefs, ok)
 				if ok {
 
 					for _, ref := range idRefs {
@@ -262,66 +251,6 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf g
 			}
 		}
 	}
-}
-
-func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, conf gjson.Result, d *schema.ResourceData, attr string, registryMap *ResourceRegistryMap, idMap map[string][]*schema.ResourceData) bool {
-	// Check if there's a reference in the conf
-	//This one gets the resource
-	resConf := getConfJSON(conf, d.RawValues.Get("urn").String())
-	// We get the matching input values mapped to dependencies ex: newState.inputs.ebsBlockDevices.#.volumeId"
-	log.Debugf(fmt.Sprintf(`newState.inputs.%s`, attr))
-	exps := resConf.Get(fmt.Sprintf(`newState.inputs.%s`, attr))
-	log.Debugf("exps %s", exps)
-	// if there are any responses iterate dependencies
-	if exps.Type != gjson.Null {
-		refResults := resConf.Get("newState.dependencies").Array()
-		log.Debugf("Dependencies %s", refResults)
-		refs := make([]string, 0, len(refResults))
-
-		for _, refR := range refResults {
-			if refR.Type == gjson.JSON {
-				arr := refR.Array()
-				for _, r := range arr {
-					refs = append(refs, r.String())
-				}
-				continue
-			}
-
-			refs = append(refs, refR.String())
-		}
-		log.Debugf("refs %s", refs)
-		found := false
-
-		for _, ref := range refs {
-
-			var refData *schema.ResourceData
-
-			idRefs := idMap[ref]
-			for i := range idRefs {
-				log.Debugf("idref %s", i)
-			}
-			m := d.Address
-			refAddr := fmt.Sprintf("%s%s", m, ref)
-			// see if there's a resource that's an exact match on the address
-			refData, ok := resData[m]
-			log.Debugf("refData %s, refaddr %s, ok %s", refData, refAddr, ok)
-
-			if ok {
-				found = true
-				reverseRefAttrs := registryMap.GetReferenceAttributes(refData.Type)
-				d.AddReference(attr, refData, reverseRefAttrs)
-			}
-		}
-
-		return found
-	} else {
-		return false
-	}
-}
-
-func getConfJSON(conf gjson.Result, addr string) gjson.Result {
-	c := conf.Get(fmt.Sprintf(`steps.#(newState.urn=="%s")`, addr))
-	return c
 }
 
 func convertToUsageAttributes(j gjson.Result) map[string]gjson.Result {
@@ -342,78 +271,6 @@ func isInfracostResource(res *schema.ResourceData) bool {
 	}
 
 	return false
-}
-
-func addressKey(addr string) string {
-	r := regexp.MustCompile(`\["([^"]+)"\]`)
-	m := r.FindStringSubmatch(addr)
-
-	if len(m) > 0 {
-		return m[1]
-	}
-
-	return ""
-}
-
-// splitAddress splits the address by `.`, but ignores any `.`s quoted in the array part of the address
-func splitAddress(addr string) []string {
-	quoted := false
-	return strings.FieldsFunc(addr, func(r rune) bool {
-		if r == '"' {
-			quoted = !quoted
-		}
-		return !quoted && r == '.'
-	})
-}
-
-func containsString(a []string, s string) bool {
-	for _, i := range a {
-		if i == s {
-			return true
-		}
-	}
-
-	return false
-}
-
-func gjsonEscape(s string) string {
-	s = strings.ReplaceAll(s, ".", `\.`)
-	s = strings.ReplaceAll(s, "*", `\*`)
-	s = strings.ReplaceAll(s, "?", `\?`)
-
-	return s
-}
-
-// Parses known modules to create references for specific resources in that module
-// This is useful if the module uses a `dynamic` block which means the references aren't defined in the plan JSON
-// See https://github.com/hashicorp/terraform/issues/28346 for more info
-func parseKnownModuleRefs(resData map[string]*schema.ResourceData, conf gjson.Result) {
-	knownRefs := []struct {
-		SourceAddrSuffix string
-		DestAddrSuffix   string
-		Attribute        string
-		ModuleSource     string
-	}{
-		{
-			SourceAddrSuffix: "aws_autoscaling_group.workers_launch_template",
-			DestAddrSuffix:   "aws_launch_template.workers_launch_template",
-			Attribute:        "launch_template",
-			ModuleSource:     "terraform-aws-modules/eks/aws",
-		},
-		{
-			SourceAddrSuffix: "aws_autoscaling_group.this",
-			DestAddrSuffix:   "aws_launch_template.this",
-			Attribute:        "launch_template",
-			ModuleSource:     "terraform-aws-modules/autoscaling/aws",
-		},
-		{
-			SourceAddrSuffix: "aws_autoscaling_group.this",
-			DestAddrSuffix:   "aws_launch_configuration.this",
-			Attribute:        "launch_configuration",
-			ModuleSource:     "terraform-aws-modules/autoscaling/aws",
-		},
-	}
-	log.Debugf("known refs %s", knownRefs)
 }
 
 // This function takes the string type from pulumi and converts it to the terraform type
