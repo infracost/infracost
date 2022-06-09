@@ -52,7 +52,14 @@ func (a AuthClient) startCallbackServer(listener net.Listener, generatedState st
 	apiKey := ""
 
 	err := http.Serve(listener, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Origin", a.Host)
+		w.Header().Set("Access-Control-Allow-Methods", "GET")
+		w.Header().Set("Access-Control-Allow-Headers", "Sentry-Trace")
+
+		if r.Method == "OPTIONS" {
+			return
+		}
+
 		defer listener.Close()
 
 		query := r.URL.Query()
@@ -61,7 +68,7 @@ func (a AuthClient) startCallbackServer(listener net.Listener, generatedState st
 
 		if apiKey == "" || state != generatedState {
 			w.WriteHeader(400)
-			return
+			apiKey = ""
 		}
 	}))
 
