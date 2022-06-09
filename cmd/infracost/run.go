@@ -478,14 +478,18 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 			r.cmd.PrintErrln()
 
 			if e := unwrapped(err); errors.Is(e, apiclient.ErrInvalidAPIKey) {
-				return nil, fmt.Errorf("%v\n%s %s %s %s %s\n%s",
+				return nil, fmt.Errorf("%v\n%s %s %s %s %s\n%s %s.\n%s %s %s",
 					e.Error(),
 					"Please check your",
 					ui.PrimaryString(config.CredentialsFilePath()),
 					"file or",
 					ui.PrimaryString("INFRACOST_API_KEY"),
 					"environment variable.",
-					"If you continue having issues please email hello@infracost.io",
+					"If you recently regenerated your API key, you can retrieve it from",
+					ui.PrimaryString(r.runCtx.Config.DashboardEndpoint),
+					"See",
+					ui.PrimaryString("https://infracost.io/support"),
+					"if you continue having issues.",
 				)
 			}
 
