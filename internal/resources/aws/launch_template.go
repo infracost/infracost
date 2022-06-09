@@ -103,14 +103,14 @@ func (a *LaunchTemplate) BuildResource() *schema.Resource {
 	if spotCount > 0 {
 		instance.PurchaseOption = "spot"
 		c := instance.computeCostComponent()
-		c.HourlyQuantity = decimalPtr(c.HourlyQuantity.Mul(decimal.NewFromInt(spotCount)))
+		c.MonthlyQuantity = decimalPtr(c.MonthlyQuantity.Mul(decimal.NewFromInt(spotCount)))
 		r.CostComponents = append([]*schema.CostComponent{c}, r.CostComponents...)
 	}
 
 	if onDemandCount > 0 {
 		instance.PurchaseOption = "on_demand"
 		c := instance.computeCostComponent()
-		c.HourlyQuantity = decimalPtr(c.HourlyQuantity.Mul(decimal.NewFromInt(onDemandCount)))
+		c.MonthlyQuantity = decimalPtr(c.MonthlyQuantity.Mul(decimal.NewFromInt(onDemandCount)))
 		r.CostComponents = append([]*schema.CostComponent{c}, r.CostComponents...)
 	}
 

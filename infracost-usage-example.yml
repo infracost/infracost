@@ -232,6 +232,7 @@ resource_usage:
     reserved_instance_payment_option: all_upfront # Payment option for Reserved Instances, can be: no_upfront, partial_upfront, all_upfront.
     monthly_cpu_credit_hrs: 350 # Number of hours in the month where the instance is expected to burst. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
     vcpu_count: 2 # Number of the vCPUs for the instance type. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
+    monthly_hours: 450 # Monthly number of hours the instance ran for.
 
   aws_fsx_windows_file_system.my_system:
     backup_storage_gb: 10000 # Total storage used for backups in GB.
