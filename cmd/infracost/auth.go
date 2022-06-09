@@ -12,9 +12,9 @@ import (
 func authCmd(ctx *config.RunContext) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "auth",
-		Short: "Get a free API key, or login to your existing account",
-		Long:  "Get a free API key, or login to your existing account",
-		Example: fmt.Sprintf(`  Get a free API key, or login to your existing account:
+		Short: "Get a free API key, or log in to your existing account",
+		Long:  "Get a free API key, or log in to your existing account",
+		Example: fmt.Sprintf(`  Get a free API key, or log in to your existing account:
 
       infracost auth login
 
@@ -44,7 +44,7 @@ func authLoginCmd(ctx *config.RunContext) *cobra.Command {
 		Use:   "login",
 		Short: "Authenticate the CLI with your Infracost account",
 		Long:  "Authenticate the CLI with your Infracost account",
-		Example: fmt.Sprintf(`  Get a free API key, or login to your existing account:
+		Example: fmt.Sprintf(`  Get a free API key, or log in to your existing account:
 
       infracost auth login
 
@@ -55,7 +55,7 @@ func authLoginCmd(ctx *config.RunContext) *cobra.Command {
       infracost configure set api_key MY_API_KEY`, ctx.Config.DashboardEndpoint),
 		ValidArgs: []string{"--", "-"},
 		RunE: func(cmd *cobra.Command, _ []string) error {
-			cmd.Println("We're redirecting you to our login page, please complete that,\nand return here to continue using Infracost.")
+			cmd.Println("We're redirecting you to our log in page, please complete that,\nand return here to continue using Infracost.")
 
 			auth := apiclient.AuthClient{Host: ctx.Config.DashboardEndpoint}
 			apiKey, err := auth.Login(ctx.ContextValues())
