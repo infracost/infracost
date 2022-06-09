@@ -10,16 +10,16 @@ func getEBSSnapshotCopyRegistryItem() *schema.RegistryItem {
 		Name:  "aws_ebs_snapshot_copy",
 		RFunc: NewEBSSnapshotCopy,
 		ReferenceAttributes: []string{
-			"volumeId",
-			"sourceSnapshotId",
+			"volume_id",
+			"source_snapshot_id",
 		},
 	}
 }
 func NewEBSSnapshotCopy(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	r := &aws.EBSSnapshotCopy{Address: d.Address, Region: d.Get("region").String()}
-	sourceSnapshotRefs := d.References("sourceSnapshotId")
+	sourceSnapshotRefs := d.References("source_snapshot_id")
 	if len(sourceSnapshotRefs) > 0 {
-		volumeRefs := sourceSnapshotRefs[0].References("volumeId")
+		volumeRefs := sourceSnapshotRefs[0].References("volume_id")
 		if len(volumeRefs) > 0 {
 			if volumeRefs[0].Get("size").Exists() {
 				r.SizeGB = floatPtr(volumeRefs[0].Get("size").Float())

@@ -53,6 +53,7 @@ func GetAWSResourceTypes() map[string]string {
 		"aws_rds_instance":        "aws_db_instance",
 		"aws_rds_clusterinstance": "aws_rds_cluster_instance",
 		"aws_eks_nodegroup":       "aws_eks_node_group",
+		"aws_ebs_snapshotcopy":    "aws_ebs_snapshot_copy",
 	}
 	return resourceTypes
 }
