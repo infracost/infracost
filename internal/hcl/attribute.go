@@ -13,7 +13,8 @@ import (
 )
 
 var (
-	missingAttributeDiagnostic = "Unsupported attribute"
+	missingAttributeDiagnostic   = "Unsupported attribute"
+	valueIsNonIterableDiagnostic = "Iteration over non-iterable value"
 )
 
 // Attribute provides a wrapper struct around hcl.Attribute it provides
@@ -73,25 +74,43 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 	var diag hcl.Diagnostics
 	ctyVal, diag = attr.HCLAttr.Expr.Value(attr.Ctx.Inner())
 	if diag.HasErrors() {
+		mockedVal := cty.StringVal(uuid.NewString())
 		if retry > 2 {
-			return cty.StringVal(uuid.NewString())
+			return mockedVal
 		}
 
+		ctx := attr.Ctx.Inner()
 		for _, d := range diag {
+			badVariables := d.Expression.Variables()
+
 			// if the diagnostic summary indicates that we were the attribute we attempted to fetch is unsupported
-			// this is likely from an Terraform attribute that is built from the provider. We then try and build
+			// this is likely from a Terraform attribute that is built from the provider. We then try and build
 			// a mocked attribute so that the module evaluation isn't harmed.
-			var unsupportedErrFound bool
+			var shouldRetry bool
 			if d.Summary == missingAttributeDiagnostic {
-				unsupportedErrFound = true
-				ctx := attr.Ctx.Inner()
-				for _, traversal := range d.Expression.Variables() {
-					traverseVarAndSetCtx(ctx, traversal)
+				shouldRetry = true
+				for _, traversal := range badVariables {
+					traverseVarAndSetCtx(ctx, traversal, mockedVal)
+				}
+			}
+
+			if d.Summary == valueIsNonIterableDiagnostic {
+				shouldRetry = true
+				for _, traversal := range badVariables {
+					// let's first try and find the actual value for this bad variable.
+					// If it has an actual value let's use that to pass into the list.
+					val, _ := traversal.TraverseAbs(ctx)
+					if val == cty.NilVal {
+						val = mockedVal
+					}
+
+					list := cty.ListVal([]cty.Value{val})
+					traverseVarAndSetCtx(ctx, traversal, list)
 				}
 			}
 
 			// now that we've built a mocked attribute on the global context let's try and retrieve the value once again.
-			if unsupportedErrFound {
+			if shouldRetry {
 				return attr.value(retry + 1)
 			}
 		}
@@ -120,7 +139,7 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 //
 // Once we've found the missing attribute we set a mocked value and return. This value should now be available for
 // the entire context evaluation as ctx is share across all blocks.
-func traverseVarAndSetCtx(ctx *hcl.EvalContext, traversal hcl.Traversal) {
+func traverseVarAndSetCtx(ctx *hcl.EvalContext, traversal hcl.Traversal, mock cty.Value) {
 	var rootName string
 	for _, traverser := range traversal {
 		if r, ok := traverser.(hcl.TraverseRoot); ok {
@@ -143,36 +162,36 @@ func traverseVarAndSetCtx(ctx *hcl.EvalContext, traversal hcl.Traversal) {
 		ob = make(map[string]cty.Value)
 	}
 
-	ob = buildObject(traversal, ob, 0)
+	ob = buildObject(traversal, ob, mock, 0)
 	ctx.Variables[rootName] = cty.ObjectVal(ob)
 }
 
 // buildObject builds an attribute map from the traversal. It fills any missing attributes that are
 // defined by the traversal.
-func buildObject(traversal hcl.Traversal, ob map[string]cty.Value, i int) map[string]cty.Value {
+func buildObject(traversal hcl.Traversal, ob map[string]cty.Value, mock cty.Value, i int) map[string]cty.Value {
 	if i > len(traversal)-1 {
 		return ob
 	}
 
 	traverser := traversal[i]
 	if v, ok := traverser.(hcl.TraverseAttr); ok {
+		if len(traversal)-1 == i {
+			ob[v.Name] = mock
+			return ob
+		}
+
 		if _, exists := ob[v.Name]; exists {
-			val := buildObject(traversal, ob[v.Name].AsValueMap(), i+1)
+			val := buildObject(traversal, ob[v.Name].AsValueMap(), mock, i+1)
 			ob[v.Name] = cty.ObjectVal(val)
 			return ob
 		}
 
-		if len(traversal)-1 == i {
-			ob[v.Name] = cty.StringVal(uuid.NewString())
-			return ob
-		}
-
-		val := buildObject(traversal, make(map[string]cty.Value), i+1)
+		val := buildObject(traversal, make(map[string]cty.Value), mock, i+1)
 		ob[v.Name] = cty.ObjectVal(val)
 		return ob
 	}
 
-	return buildObject(traversal, ob, i+1)
+	return buildObject(traversal, ob, mock, i+1)
 }
 
 // findCorrectCtx uses name to find the correct context to target. findCorrectCtx returns the first

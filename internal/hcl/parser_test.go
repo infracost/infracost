@@ -182,6 +182,62 @@ output "loadbalancer"  {
 
 }
 
+func Test_UnsupportedAttributesList(t *testing.T) {
+	path := createTestFile("test.tf", `
+
+resource "with_unsupported_attr" "test" {
+	name = "mittens"
+	special = true
+	my_number = 4
+}
+
+locals {
+	names = "astring"
+}
+
+output "exp" {
+  value = {
+    for name in local.names :
+      name => with_unsupported_attr.test.does_not_exist
+  }
+}
+
+output "exp2" {
+  value = {
+    for name in local.nothing :
+      name => with_unsupported_attr.test.does_not_exist
+  }
+}
+`)
+
+	parser := newParser(filepath.Dir(path))
+	module, err := parser.ParseDirectory()
+	require.NoError(t, err)
+
+	blocks := module.Blocks
+
+	output := blocks.Matching(BlockMatcher{Label: "exp", Type: "output"})
+	require.NotNil(t, output)
+	attr := output.GetAttribute("value")
+	mockedObj := attr.Value()
+	require.True(t, mockedObj.Type().IsObjectType())
+	asMap := mockedObj.AsValueMap()
+	assert.Len(t, asMap, 1)
+	assertUUID(t, asMap["astring"].AsString())
+
+	output = blocks.Matching(BlockMatcher{Label: "exp2", Type: "output"})
+	require.NotNil(t, output)
+	attr = output.GetAttribute("value")
+	mockedObj = attr.Value()
+	require.True(t, mockedObj.Type().IsObjectType())
+	asMap = mockedObj.AsValueMap()
+	assert.Len(t, asMap, 1)
+	for k, v := range asMap {
+		assertUUID(t, k)
+		assertUUID(t, v.AsString())
+	}
+}
+
 func assertUUID(t *testing.T, val string) {
 	t.Helper()
 

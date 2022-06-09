@@ -61,6 +61,16 @@ locals {
   }
 }
 
+variable "dnsnames" {
+  default = ["one", "two"]
+}
+
+output "certificates" {
+  value = {
+  for name in var.dnsnames :
+  name => aws_instance.web_app.this_attr_does_not_exist
+  }
+}
 
 output "instance_types" {
   value = {
