@@ -18,6 +18,7 @@ type ResourceData struct {
 	CFResource    cloudformation.Resource
 	UsageData     *UsageData
 	Metadata      map[string]gjson.Result
+	pulumiUrn     string
 }
 
 func NewResourceData(resourceType string, providerName string, address string, tags map[string]string, rawValues gjson.Result) *ResourceData {
@@ -29,6 +30,7 @@ func NewResourceData(resourceType string, providerName string, address string, t
 		RawValues:     rawValues,
 		referencesMap: make(map[string][]*ResourceData),
 		CFResource:    nil,
+		pulumiUrn:     "",
 	}
 }
 
@@ -41,6 +43,20 @@ func NewCFResourceData(resourceType string, providerName string, address string,
 		RawValues:     gjson.Result{},
 		referencesMap: make(map[string][]*ResourceData),
 		CFResource:    cfResource,
+		pulumiUrn:     "",
+	}
+}
+
+func NewPulumiResourceData(resourceType string, providerName string, address string, tags map[string]string, rawValues gjson.Result, pulumiURN string) *ResourceData {
+	return &ResourceData{
+		Type:          resourceType,
+		ProviderName:  providerName,
+		Address:       address,
+		Tags:          tags,
+		RawValues:     rawValues,
+		referencesMap: make(map[string][]*ResourceData),
+		CFResource:    nil,
+		pulumiUrn:     pulumiURN,
 	}
 }
 

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"regexp"
-	"strconv"
 	"strings"
 
 	"github.com/infracost/infracost/internal/config"
@@ -98,7 +97,7 @@ func (p *Parser) parsePreviewDigest(t types.PreviewDigest, usage map[string]*sch
 			usageData = ud
 		}
 
-		resourceData := schema.NewResourceData(resourceType, providerName, name, tags, rawValues)
+		resourceData := schema.NewPulumiResourceData(resourceType, providerName, name, tags, rawValues, string(step.URN))
 		refResources[name] = resourceData
 		if r := p.createResource(resourceData, usageData); r != nil {
 			if step.Op == "same" {
@@ -194,14 +193,6 @@ func (p *Parser) loadInfracostProviderUsageData(u map[string]*schema.UsageData, 
 	}
 }
 
-func (p *Parser) stripDataResources(resData map[string]*schema.ResourceData) {
-	for addr, d := range resData {
-		if strings.HasPrefix(addressResourcePart(d.Address), "data.") {
-			delete(resData, addr)
-		}
-	}
-}
-
 func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf gjson.Result) {
 	registryMap := GetResourceRegistryMap()
 
@@ -213,13 +204,13 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf g
 		// check for any "default" ids declared by the provider for this resource
 		if f := registryMap.GetDefaultRefIDFunc(d.Type); f != nil {
 			for _, defaultID := range f(d) {
+				log.Debugf("defaultId %s", defaultID)
 				if _, ok := idMap[defaultID]; !ok {
 					idMap[defaultID] = []*schema.ResourceData{}
 				}
 				idMap[defaultID] = append(idMap[defaultID], d)
 			}
 		}
-
 		// check for any "custom" ids specified by the resource and add them.
 		if f := registryMap.GetCustomRefIDFunc(d.Type); f != nil {
 			for _, customID := range f(d) {
@@ -232,32 +223,31 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf g
 
 	}
 
-	//parseKnownModuleRefs(resData, conf)
-
 	for _, d := range resData {
 		var refAttrs []string
-
 		if isInfracostResource(d) {
 			refAttrs = []string{"resources"}
 		} else {
 			refAttrs = registryMap.GetReferenceAttributes(d.Type)
 		}
-
 		for _, attr := range refAttrs {
 			found := p.parseConfReferences(resData, conf, d, attr, registryMap)
 
 			if found {
-				continue
+				//continue
 			}
 
 			// Get any values for the fields and check if they map to IDs or ARNs of any resources
-			for _, refVal := range d.Get(attr).Array() {
+
+			for _, refVal := range d.Get(fmt.Sprintf(`newState.inputs.%s`, attr)).Array() {
+				log.Debugf("attr %s, refVal %s", fmt.Sprintf(`newState.inputs.%s`, attr), refVal)
 				if refVal.String() == "" {
 					continue
 				}
 
 				// Check ID map
 				idRefs, ok := idMap[refVal.String()]
+				log.Debugf("idRefs %s", idRefs)
 				if ok {
 
 					for _, ref := range idRefs {
@@ -272,82 +262,58 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf g
 
 func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, conf gjson.Result, d *schema.ResourceData, attr string, registryMap *ResourceRegistryMap) bool {
 	// Check if there's a reference in the conf
-	resConf := getConfJSON(conf, d.Address)
-	log.Debugf("resConf %s %s", d.Address, attr)
-	exps := resConf.Get(attr)
-	lookupStr := "dependencies"
-	if exps.IsArray() {
-		lookupStr = "#.dependencies"
-	}
+	//This one gets the resource
+	resConf := getConfJSON(conf, d.RawValues.Get("urn").String())
+	// We get the matching input values mapped to dependencies ex: newState.inputs.ebsBlockDevices.#.volumeId"
+	log.Debugf(fmt.Sprintf(`newState.inputs.%s`, attr))
+	exps := resConf.Get(fmt.Sprintf(`newState.inputs.%s`, attr))
+	log.Debugf("exps %s", exps)
+	// if there are any responses iterate dependencies
+	if exps.Type != gjson.Null {
+		refResults := resConf.Get("newState.dependencies").Array()
+		log.Debugf("Dependencies %s", refResults)
+		refs := make([]string, 0, len(refResults))
 
-	refResults := exps.Get(lookupStr).Array()
-	log.Debugf("Dependencies %s", refResults)
-	refs := make([]string, 0, len(refResults))
-
-	for _, refR := range refResults {
-		if refR.Type == gjson.JSON {
-			arr := refR.Array()
-			for _, r := range arr {
-				refs = append(refs, r.String())
-			}
-			continue
-		}
-
-		refs = append(refs, refR.String())
-	}
-
-	found := false
-
-	for _, ref := range refs {
-		if ref == "count.index" || ref == "each.key" || strings.HasPrefix(ref, "var.") {
-			continue
-		}
-
-		var refData *schema.ResourceData
-
-		m := addressModulePart(d.Address)
-		refAddr := fmt.Sprintf("%s%s", m, ref)
-
-		// see if there's a resource that's an exact match on the address
-		refData, ok := resData[refAddr]
-
-		// if there's a count ref value then try with the array index of the count ref
-		if !ok {
-			if containsString(refs, "count.index") {
-				a := fmt.Sprintf("%s[%d]", refAddr, addressCountIndex(d.Address))
-				refData, ok = resData[a]
-
-				if ok {
-					log.Debugf("reference specifies a count: using resource %s for %s.%s", a, d.Address, attr)
+		for _, refR := range refResults {
+			if refR.Type == gjson.JSON {
+				arr := refR.Array()
+				for _, r := range arr {
+					refs = append(refs, r.String())
 				}
-			} else if containsString(refs, "each.key") {
-				a := fmt.Sprintf("%s[\"%s\"]", refAddr, addressKey(d.Address))
-				refData, ok = resData[a]
-
-				if ok {
-					log.Debugf("reference specifies a key: using resource %s for %s.%s", a, d.Address, attr)
-				}
+				continue
 			}
-		}
 
-		// if still not found, see if there's a matching resource with an [0] array part
-		if !ok {
-			a := fmt.Sprintf("%s[0]", refAddr)
-			refData, ok = resData[a]
+			refs = append(refs, refR.String())
+		}
+		log.Debugf("refs %s", refs)
+		found := false
+
+		for _, ref := range refs {
+
+			var refData *schema.ResourceData
+
+			m := d.Address
+			refAddr := fmt.Sprintf("%s%s", m, ref)
+			// see if there's a resource that's an exact match on the address
+			refData, ok := resData[m]
+			log.Debugf("resData %s, refaddr %s, ok %s", refData, refAddr, ok)
 
 			if ok {
-				log.Debugf("reference does not specify a count: using resource %s for for %s.%s", a, d.Address, attr)
+				found = true
+				reverseRefAttrs := registryMap.GetReferenceAttributes(refData.Type)
+				d.AddReference(attr, refData, reverseRefAttrs)
 			}
 		}
 
-		if ok {
-			found = true
-			reverseRefAttrs := registryMap.GetReferenceAttributes(refData.Type)
-			d.AddReference(attr, refData, reverseRefAttrs)
-		}
+		return found
+	} else {
+		return false
 	}
+}
 
-	return found
+func getConfJSON(conf gjson.Result, addr string) gjson.Result {
+	c := conf.Get(fmt.Sprintf(`steps.#(newState.urn=="%s")`, addr))
+	return c
 }
 
 func convertToUsageAttributes(j gjson.Result) map[string]gjson.Result {
@@ -360,14 +326,6 @@ func convertToUsageAttributes(j gjson.Result) map[string]gjson.Result {
 	return a
 }
 
-func getConfJSON(conf gjson.Result, addr string) gjson.Result {
-	return conf
-}
-
-func getModuleConfJSON(conf gjson.Result, names []string) gjson.Result {
-	return conf
-}
-
 func isInfracostResource(res *schema.ResourceData) bool {
 	for _, p := range infracostProviderNames {
 		if res.ProviderName == p {
@@ -376,51 +334,6 @@ func isInfracostResource(res *schema.ResourceData) bool {
 	}
 
 	return false
-}
-
-// addressResourcePart parses a resource addr and returns resource suffix (without the module prefix).
-// For example: `module.name1.module.name2.resource` will return `name2.resource`.
-func addressResourcePart(addr string) string {
-	p := splitAddress(addr)
-
-	if len(p) >= 3 && p[len(p)-3] == "data" {
-		return strings.Join(p[len(p)-3:], ":")
-	}
-
-	return strings.Join(p[len(p)-2:], ":")
-}
-
-// addressModulePart parses a resource addr and returns module prefix.
-// For example: `module.name1.module.name2.resource` will return `module.name1.module.name2.`.
-func addressModulePart(addr string) string {
-	ap := splitAddress(addr)
-
-	var mp []string
-
-	if len(ap) >= 3 && ap[len(ap)-3] == "data" {
-		mp = ap[:len(ap)-3]
-	} else {
-		mp = ap[:len(ap)-2]
-	}
-
-	if len(mp) == 0 {
-		return ""
-	}
-
-	return fmt.Sprintf("%s.", strings.Join(mp, "."))
-}
-
-func addressCountIndex(addr string) int {
-	r := regexp.MustCompile(`\[(\d+)\]`)
-	m := r.FindStringSubmatch(addr)
-
-	if len(m) > 0 {
-		i, _ := strconv.Atoi(m[1]) // TODO: unhandled error
-
-		return i
-	}
-
-	return -1
 }
 
 func addressKey(addr string) string {
@@ -432,13 +345,6 @@ func addressKey(addr string) string {
 	}
 
 	return ""
-}
-
-func removeAddressArrayPart(addr string) string {
-	r := regexp.MustCompile(`([^\[]+)`)
-	m := r.FindStringSubmatch(addressResourcePart(addr))
-
-	return m[1]
 }
 
 // splitAddress splits the address by `.`, but ignores any `.`s quoted in the array part of the address

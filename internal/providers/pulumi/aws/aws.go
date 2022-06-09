@@ -11,14 +11,7 @@ import (
 var DefaultProviderRegion = "us-east-1"
 
 func GetDefaultRefIDFunc(d *schema.ResourceData) []string {
-
-	defaultRefs := []string{d.Get("urn").String()}
-
-	arnAttr := "urn"
-	if d.Get(arnAttr).Exists() {
-		defaultRefs = append(defaultRefs, d.Get(arnAttr).String())
-	}
-
+	defaultRefs := []string{d.RawValues.Get("urn").String()}
 	return defaultRefs
 }
 

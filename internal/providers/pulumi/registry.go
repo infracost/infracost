@@ -57,18 +57,7 @@ func createFreeResources(l []string, defaultRefsFunc schema.ReferenceIDFunc) []*
 	return freeResources
 }
 func GetDefaultRefIDFunc(d *schema.ResourceData) []string {
-
-	defaultRefs := []string{d.Get("id").String()}
-
-	arnAttr, ok := arnAttributeMap[d.Type]
-	if !ok {
-		arnAttr = "arn"
-	}
-
-	if d.Get(arnAttr).Exists() {
-		defaultRefs = append(defaultRefs, d.Get(arnAttr).String())
-	}
-
+	defaultRefs := []string{d.Get("urn").String()}
 	return defaultRefs
 }
 
