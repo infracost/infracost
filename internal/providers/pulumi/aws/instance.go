@@ -100,6 +100,7 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	if d.Get("rootBlockDevice.volumeSize").Type != gjson.Null {
 		a.RootBlockDevice.Size = intPtr(d.Get("rootBlockDevice.volumeSize").Int())
 	}
+	// Parsing Block Device References
 	// the # is a gjson directive meaning that its entering an array.
 	ebsBlockDeviceRef := d.References("ebsBlockDevices.#.volumeId")
 

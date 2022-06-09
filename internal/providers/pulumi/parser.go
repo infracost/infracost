@@ -99,6 +99,9 @@ func (p *Parser) parsePreviewDigest(t types.PreviewDigest, usage map[string]*sch
 
 		resourceData := schema.NewPulumiResourceData(resourceType, providerName, name, tags, rawValues, string(step.URN))
 		refResources[name] = resourceData
+		// You have to load this in the loop so it will find the resources.
+		p.parseReferences(refResources, rawValues)
+		p.loadInfracostProviderUsageData(usage, refResources)
 		if r := p.createResource(resourceData, usageData); r != nil {
 			if step.Op == "same" {
 				pastResources = append(resources, r)
@@ -107,8 +110,6 @@ func (p *Parser) parsePreviewDigest(t types.PreviewDigest, usage map[string]*sch
 			}
 		}
 	}
-	p.parseReferences(refResources, rawValues)
-	p.loadInfracostProviderUsageData(usage, refResources)
 	return pastResources, resources, nil
 }
 

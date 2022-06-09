@@ -2,15 +2,15 @@ import * as pulumi from "@pulumi/pulumi";
 import * as aws from "@pulumi/aws";
 import * as awsx from "@pulumi/awsx";
 
-//const bucket = new aws.s3.Bucket("mybucket");
+const bucket = new aws.s3.Bucket("mybucket");
 const namePrefix = 'example'
-/**
+
 const vpc = new awsx.ec2.Vpc(`${namePrefix}-vpc`, {
     cidrBlock: '10.0.0.0/22',
     numberOfAvailabilityZones: 3,
     numberOfNatGateways: 2,
   });
-*/
+
 const ebsVolume = new aws.ebs.Volume(`${namePrefix}-ebs-volume`, {
     availabilityZone: "us-west-2a",
     size: 40,
@@ -41,11 +41,11 @@ const ubuntu = aws.ec2.getAmi({
     ],
     owners: ["099720109477"],
 });
-/**
+
 const eip = new aws.ec2.Eip(`${namePrefix}-elastic-ip`, {
     vpc: true,
 });
-*/
+
 const web = new aws.ec2.Instance(`${namePrefix}-ec2-instance`, {
     ami: ubuntu.then(ubuntu => ubuntu.id),
     instanceType: "t3.micro",
@@ -64,7 +64,7 @@ const web = new aws.ec2.Instance(`${namePrefix}-ec2-instance`, {
         { deviceName: '/dev/xvdf', volumeId: ebsVolume1.id}
     ]
 });
-/**
+
 const eipAssoc = new aws.ec2.EipAssociation(`${namePrefix}-eipAssoc`, {
     instanceId: web.id,
     allocationId: eip.id,
@@ -194,4 +194,3 @@ const eksNodeGroup = new aws.eks.NodeGroup("example", {
         example_AmazonEC2ContainerRegistryReadOnly,
     ],
 });
-*/

@@ -10,3 +10,4 @@
 6. `Step.Op` determines whether the resource currently exists or not.
 7. To keep the existing names in all of the registryItems we use a function `deriveTfResourceTypes` which derives the library name from the pulumi name.
 8. If it is a free resource do not add it to the function above, just duplicate the name in `(aws|azure|google)/registry.go` in type: `FreeResources`
+9. For an understanding of how references work checkout `// Parsing Block Device References` in `aws/instance.go`
