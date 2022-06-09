@@ -57,7 +57,7 @@ func createFreeResources(l []string, defaultRefsFunc schema.ReferenceIDFunc) []*
 	return freeResources
 }
 func GetDefaultRefIDFunc(d *schema.ResourceData) []string {
-	defaultRefs := []string{d.Get("urn").String()}
+	defaultRefs := []string{d.RawValues.Get("urn").String()}
 	return defaultRefs
 }
 

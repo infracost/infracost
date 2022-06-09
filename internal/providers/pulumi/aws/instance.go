@@ -101,11 +101,13 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 		a.RootBlockDevice.Size = intPtr(d.Get("rootBlockDevice.volumeSize").Int())
 	}
 	// the # is a gjson directive meaning that its entering an array.
-	ebsBlockDeviceRef := d.References("ebsBlockDevice.#.volumeId")
+	ebsBlockDeviceRef := d.References("ebsBlockDevices.#.volumeId")
 
 	for i, data := range d.Get("ebsBlockDevices").Array() {
 		deviceName := data.Get("deviceName").String()
-
+		volString := fmt.Sprintf(`propertyDependencies.ebsBlockDevices.%d`, i)
+		deviceInPropertyDependencies := d.RawValues.Get(volString)
+		log.Debugf("volString: %s, dIPD %s", volString, deviceInPropertyDependencies)
 		ltDevice := ltEBSBlockDevices[deviceName]
 		if ltDevice == nil {
 			ltDevice = &aws.EBSVolume{}
@@ -114,7 +116,13 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 		// Check if there's a reference for this EBS volume
 		// If there is then we shouldn't add as a subresource since
 		// the cost will be added against the volume resource.
-		if len(ebsBlockDeviceRef) > i && ebsBlockDeviceRef[i].Get("id").String() == data.Get("volumeId").String() {
+		if len(ebsBlockDeviceRef) > i {
+			log.Debugf("len %s, refUrn %s, dIPDstr %s", len(ebsBlockDeviceRef), ebsBlockDeviceRef[i], deviceInPropertyDependencies.String())
+		} else {
+			log.Debugf("len not met")
+		}
+		if len(ebsBlockDeviceRef) > i && ebsBlockDeviceRef[i].RawValues.Get("urn").String() == deviceInPropertyDependencies.String() {
+			log.Debugf("Found in block devide ref, deleting")
 			delete(ltEBSBlockDevices, deviceName)
 
 			continue

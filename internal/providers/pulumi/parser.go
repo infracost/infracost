@@ -231,23 +231,26 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf g
 			refAttrs = registryMap.GetReferenceAttributes(d.Type)
 		}
 		for _, attr := range refAttrs {
-			found := p.parseConfReferences(resData, conf, d, attr, registryMap)
+			//found := p.parseConfReferences(resData, conf, d, attr, registryMap, idMap)
 
-			if found {
-				//continue
-			}
+			//if found {
+			//continue
+			//}
 
 			// Get any values for the fields and check if they map to IDs or ARNs of any resources
-
-			for _, refVal := range d.Get(fmt.Sprintf(`newState.inputs.%s`, attr)).Array() {
-				log.Debugf("attr %s, refVal %s", fmt.Sprintf(`newState.inputs.%s`, attr), refVal)
-				if refVal.String() == "" {
-					continue
-				}
-
+			log.Debugf("above the loop %s", fmt.Sprintf(`%s`, attr))
+			for i, refExists := range d.RawValues.Get(fmt.Sprintf(`%s`, attr)).Array() {
+				log.Debugf("i %s, attr %s, refVal %s", i, fmt.Sprintf(`newState.inputs.%s`, attr), refExists)
+				//if refVal.String() == "" {
+				//	continue
+				//}
+				attrFirst := strings.Split(attr, ".")[0]
+				searchString := fmt.Sprintf(`propertyDependencies.%s`, attrFirst)
+				log.Debugf("searchString %s", searchString)
+				refVal := d.RawValues.Get(searchString).Array()[i]
 				// Check ID map
 				idRefs, ok := idMap[refVal.String()]
-				log.Debugf("idRefs %s", idRefs)
+				log.Debugf("idRefs %s, ok %s", idRefs, ok)
 				if ok {
 
 					for _, ref := range idRefs {
@@ -260,7 +263,7 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf g
 	}
 }
 
-func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, conf gjson.Result, d *schema.ResourceData, attr string, registryMap *ResourceRegistryMap) bool {
+func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, conf gjson.Result, d *schema.ResourceData, attr string, registryMap *ResourceRegistryMap, idMap map[string][]*schema.ResourceData) bool {
 	// Check if there's a reference in the conf
 	//This one gets the resource
 	resConf := getConfJSON(conf, d.RawValues.Get("urn").String())
@@ -292,11 +295,15 @@ func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, co
 
 			var refData *schema.ResourceData
 
+			idRefs := idMap[ref]
+			for i := range idRefs {
+				log.Debugf("idref %s", i)
+			}
 			m := d.Address
 			refAddr := fmt.Sprintf("%s%s", m, ref)
 			// see if there's a resource that's an exact match on the address
 			refData, ok := resData[m]
-			log.Debugf("resData %s, refaddr %s, ok %s", refData, refAddr, ok)
+			log.Debugf("refData %s, refaddr %s, ok %s", refData, refAddr, ok)
 
 			if ok {
 				found = true

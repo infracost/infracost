@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 
 	"github.com/awslabs/goformation/v4/cloudformation"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/tidwall/gjson"
 )
@@ -120,11 +121,14 @@ func (d *ResourceData) References(keys ...string) []*ResourceData {
 }
 
 func (d *ResourceData) AddReference(key string, reference *ResourceData, reverseRefAttrs []string) {
+	log.Debugf("key %s, reference %s", key, reference)
 	if _, ok := d.referencesMap[key]; !ok {
 		d.referencesMap[key] = make([]*ResourceData, 0)
+		log.Debugf("inside %s", d.referencesMap)
 	}
-	d.referencesMap[key] = append(d.referencesMap[key], reference)
 
+	d.referencesMap[key] = append(d.referencesMap[key], reference)
+	log.Debugf("outside %s", d.referencesMap)
 	// add any reverse references
 	reverseRefKey := d.Type + "." + key
 	for _, attr := range reverseRefAttrs {
