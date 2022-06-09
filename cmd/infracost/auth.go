@@ -14,13 +14,19 @@ func authCmd(ctx *config.RunContext) *cobra.Command {
 		Use:   "auth",
 		Short: "Get a free API key, or login to your existing account",
 		Long:  "Get a free API key, or login to your existing account",
-		Example: `  Get a free API key, or login to your existing account:
+		Example: fmt.Sprintf(`  Get a free API key, or login to your existing account:
 
       infracost auth login
 
+      You can also log in at %v
+
   Manually set the API key that your CLI should use. The API key can be retrieved from your account:
 
-      infracost configure set api_key MY_API_KEY`,
+      infracost configure set api_key MY_API_KEY
+
+  Regenerate your API key:
+
+      Log in at %v > select your organization > Settings`, ctx.Config.DashboardEndpoint, ctx.Config.DashboardEndpoint),
 		ValidArgs: []string{"--", "-"},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			return cmd.Help()
@@ -38,9 +44,15 @@ func authLoginCmd(ctx *config.RunContext) *cobra.Command {
 		Use:   "login",
 		Short: "Authenticate the CLI with your Infracost account",
 		Long:  "Authenticate the CLI with your Infracost account",
-		Example: `  Login:
+		Example: fmt.Sprintf(`  Get a free API key, or login to your existing account:
 
-      infracost auth login`,
+      infracost auth login
+
+      You can also log in at %v
+
+  Manually set the API key that your CLI should use. The API key can be retrieved from your account:
+
+      infracost configure set api_key MY_API_KEY`, ctx.Config.DashboardEndpoint),
 		ValidArgs: []string{"--", "-"},
 		RunE: func(cmd *cobra.Command, _ []string) error {
 			cmd.Println("We're redirecting you to our login page, please complete that,\nand return here to continue using Infracost.")
