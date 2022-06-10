@@ -10,6 +10,8 @@ import (
 	"github.com/google/uuid"
 	"github.com/pkg/browser"
 	"github.com/pkg/errors"
+
+	"github.com/infracost/infracost/internal/ui"
 )
 
 // AuthClient represents a client for Infracost's authentication process.
@@ -98,7 +100,7 @@ func (a AuthClient) startCallbackServer(listener net.Listener, generatedState st
 	}
 
 	if apiKey == "" {
-		return "", errors.New("Unable to receive API key")
+		return "", fmt.Errorf("Authentication failed. Please check your API token on %s", ui.LinkString("https://infracost.io"))
 	}
 
 	return apiKey, nil
