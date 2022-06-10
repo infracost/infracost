@@ -59,9 +59,14 @@ func authLoginCmd(ctx *config.RunContext) *cobra.Command {
 			cmd.Println("We're redirecting you to our log in page, please complete that,\nand return here to continue using Infracost.")
 
 			auth := apiclient.AuthClient{Host: ctx.Config.DashboardEndpoint}
-			apiKey, err := auth.Login(ctx.ContextValues())
+			apiKey, info, err := auth.Login(ctx.ContextValues())
 			if err != nil {
 				return err
+			}
+
+			if info != "" {
+				cmd.Println(info)
+				return nil
 			}
 
 			ctx.Config.Credentials.APIKey = apiKey
