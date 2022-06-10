@@ -60,7 +60,6 @@ func authLoginCmd(ctx *config.RunContext) *cobra.Command {
 			auth := apiclient.AuthClient{Host: ctx.Config.DashboardEndpoint}
 			apiKey, err := auth.Login(ctx.ContextValues())
 			if err != nil {
-				cmd.Println(err)
 				return err
 			}
 
