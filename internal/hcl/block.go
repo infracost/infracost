@@ -238,11 +238,13 @@ type Block struct {
 	childBlocks Blocks
 	// verbose determines whether the block uses verbose debug logging.
 	verbose  bool
+	newMock  func(attr *Attribute) cty.Value
 	Filename string
 }
 
 // BlockBuilder handles generating new Blocks as part of the parsing and evaluation process.
 type BlockBuilder struct {
+	MockFunc      func(a *Attribute) cty.Value
 	SetAttributes []SetAttributesFunc
 }
 
@@ -270,6 +272,7 @@ func (b BlockBuilder) NewBlock(filename string, hclBlock *hcl.Block, ctx *Contex
 			moduleBlock: moduleBlock,
 			childBlocks: children,
 			verbose:     isLoggingVerbose,
+			newMock:     b.MockFunc,
 		}
 	}
 
@@ -285,6 +288,7 @@ func (b BlockBuilder) NewBlock(filename string, hclBlock *hcl.Block, ctx *Contex
 			moduleBlock: moduleBlock,
 			childBlocks: children,
 			verbose:     isLoggingVerbose,
+			newMock:     b.MockFunc,
 		}
 	}
 
@@ -298,6 +302,7 @@ func (b BlockBuilder) NewBlock(filename string, hclBlock *hcl.Block, ctx *Contex
 		moduleBlock: moduleBlock,
 		childBlocks: children,
 		verbose:     isLoggingVerbose,
+		newMock:     b.MockFunc,
 	}
 }
 
@@ -640,7 +645,7 @@ func (b *Block) GetAttributes() []*Attribute {
 	}
 
 	for _, attr := range b.getHCLAttributes() {
-		results = append(results, &Attribute{HCLAttr: attr, Ctx: b.context, Verbose: b.verbose})
+		results = append(results, &Attribute{newMock: b.newMock, HCLAttr: attr, Ctx: b.context, Verbose: b.verbose})
 	}
 
 	return results

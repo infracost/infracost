@@ -41,6 +41,8 @@ type Attribute struct {
 	Ctx *Context
 	// Verbose defines if the attribute should log verbose diagnostics messages to debug.
 	Verbose bool
+	// newMock generates a mock value for the attribute if it's value is missing.
+	newMock func(attr *Attribute) cty.Value
 }
 
 // IsIterable returns if the attribute can be ranged over.
@@ -75,13 +77,23 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 	ctyVal, diag = attr.HCLAttr.Expr.Value(attr.Ctx.Inner())
 	if diag.HasErrors() {
 		mockedVal := cty.StringVal(uuid.NewString())
+		if attr.newMock != nil {
+			mockedVal = attr.newMock(attr)
+		}
+
 		if retry > 2 {
 			return mockedVal
 		}
 
 		ctx := attr.Ctx.Inner()
 		for _, d := range diag {
+			// attempt to get only the variables that need to be mocked from the diags.
+			// Failing that let's try and get the top level variables from the attribute
+			// and only set ones that are nil to be mocked.
 			badVariables := d.Expression.Variables()
+			if badVariables == nil {
+				badVariables = attr.findBadVariablesFromExpression(attr.HCLAttr.Expr)
+			}
 
 			// if the diagnostic summary indicates that we were the attribute we attempted to fetch is unsupported
 			// this is likely from a Terraform attribute that is built from the provider. We then try and build
@@ -174,14 +186,30 @@ func buildObject(traversal hcl.Traversal, ob map[string]cty.Value, mock cty.Valu
 	}
 
 	traverser := traversal[i]
+
 	if v, ok := traverser.(hcl.TraverseAttr); ok {
 		if len(traversal)-1 == i {
 			ob[v.Name] = mock
 			return ob
 		}
 
-		if _, exists := ob[v.Name]; exists {
-			val := buildObject(traversal, ob[v.Name].AsValueMap(), mock, i+1)
+		if vv, exists := ob[v.Name]; exists {
+			sourceTy := vv.Type()
+			isList := sourceTy.IsTupleType() || sourceTy.IsListType() || sourceTy.IsSetType()
+			if isList {
+				items := make([]cty.Value, vv.LengthInt())
+				it := vv.ElementIterator()
+				for it.Next() {
+					key, sourceItem := it.Element()
+					val := buildObject(traversal, sourceItem.AsValueMap(), mock, i+1)
+					i, _ := key.AsBigFloat().Int64()
+					items[i] = cty.ObjectVal(val)
+				}
+				ob[v.Name] = cty.TupleVal(items)
+				return ob
+			}
+
+			val := buildObject(traversal, vv.AsValueMap(), mock, i+1)
 			ob[v.Name] = cty.ObjectVal(val)
 			return ob
 		}
@@ -388,4 +416,82 @@ func (attr *Attribute) referencesFromExpression(expression hcl.Expression) []*Re
 		}
 	}
 	return refs
+}
+
+// findBadVariablesFromExpression attempts to find the variables that are missing by calling the underlying expressions
+// and checking if they have any missing attributes diagnostics. findBadVariablesFromExpression is a fallback method
+// as normally Diagnostics return the variables we need. However, in cases where the expressions are complex (e.g.
+// a splat expression within a function call) the Diagnostics will only have variable information from the last expression.
+// Meaning that in many cases they won't actually contain the problem variables and calling diag.Variables() will return nil.
+func (attr *Attribute) findBadVariablesFromExpression(expression hcl.Expression) []hcl.Traversal {
+	var badVars []hcl.Traversal
+	switch t := expression.(type) {
+	case *hclsyntax.FunctionCallExpr:
+		for _, arg := range t.Args {
+			badVars = append(badVars, attr.findBadVariablesFromExpression(arg)...)
+		}
+	case *hclsyntax.ConditionalExpr:
+		badVars = append(badVars, attr.findBadVariables(t.TrueResult.Variables())...)
+		badVars = append(badVars, attr.findBadVariables(t.FalseResult.Variables())...)
+		badVars = append(badVars, attr.findBadVariables(t.Condition.Variables())...)
+	case *hclsyntax.TemplateWrapExpr:
+		badVars = attr.findBadVariablesFromExpression(t.Wrapped)
+	case *hclsyntax.TemplateExpr:
+		for _, part := range t.Parts {
+			badVars = append(badVars, attr.findBadVariablesFromExpression(part)...)
+		}
+	case *hclsyntax.RelativeTraversalExpr:
+		switch s := t.Source.(type) {
+		case *hclsyntax.IndexExpr:
+			badVars = append(badVars, attr.findBadVariables(s.Collection.Variables())...)
+		default:
+			badVars = append(badVars, attr.findBadVariables(t.Source.Variables())...)
+		}
+	case *hclsyntax.IndexExpr:
+		badVars = append(badVars, attr.findBadVariables(t.Collection.Variables())...)
+	case *hclsyntax.SplatExpr:
+		_, diag := t.Value(attr.Ctx.Inner())
+		if isAttrMissing(diag) {
+			baseVars := t.Variables()
+
+			if rt, ok := t.Each.(*hclsyntax.RelativeTraversalExpr); ok {
+				for i, baseVar := range baseVars {
+					baseVars[i] = append(baseVar, rt.Traversal...)
+				}
+
+				badVars = append(badVars, baseVars...)
+			}
+		}
+	default:
+		badVars = append(badVars, attr.findBadVariables(t.Variables())...)
+	}
+
+	return badVars
+}
+
+func (attr *Attribute) findBadVariables(traversals []hcl.Traversal) []hcl.Traversal {
+	var badVars []hcl.Traversal
+
+	for _, traversal := range traversals {
+		if traversal.IsRelative() {
+			continue
+		}
+
+		_, diag := traversal.TraverseAbs(attr.Ctx.Inner())
+		if isAttrMissing(diag) {
+			badVars = append(badVars, traversal)
+		}
+	}
+
+	return badVars
+}
+
+func isAttrMissing(diag hcl.Diagnostics) bool {
+	for _, d := range diag {
+		if d.Summary == missingAttributeDiagnostic {
+			return true
+		}
+	}
+
+	return false
 }

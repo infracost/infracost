@@ -238,6 +238,76 @@ output "exp2" {
 	}
 }
 
+func Test_UnsupportedAttributesSplatOperator(t *testing.T) {
+	path := createTestFile("test.tf", `
+
+variable "enabled" {
+	default = true
+}
+
+resource "with_unsupported_attr" "test" {
+	count = 4
+
+	name = "mittens"
+	special = true
+	my_number = 4
+}
+
+resource "other_resource" "test" {
+	task_definition = "${join("", with_unsupported_attr.test.*.family)}:${join("", with_unsupported_attr.test.*.revision)}"
+}
+
+`)
+
+	parser := newParser(filepath.Dir(path))
+	module, err := parser.ParseDirectory()
+	require.NoError(t, err)
+
+	blocks := module.Blocks
+
+	output := blocks.Matching(BlockMatcher{Label: "other_resource.test", Type: "resource"})
+	require.NotNil(t, output)
+	attr := output.GetAttribute("task_definition")
+	mockedVal := attr.Value()
+	log.Println(mockedVal)
+}
+
+func Test_UnsupportedAttributesIndex(t *testing.T) {
+	path := createTestFile("test.tf", `
+
+variable "enabled" {
+	default = true
+}
+
+resource "with_unsupported_attr" "test" {
+	count = 4
+
+	name = "mittens"
+	special = true
+	my_number = 4
+}
+
+resource "other_resource" "test" {
+	task_definition = "${join("", [with_unsupported_attr.test[2].family])}:${with_unsupported_attr.test[1].family}"
+}
+
+`)
+
+	parser := newParser(filepath.Dir(path))
+	module, err := parser.ParseDirectory()
+	require.NoError(t, err)
+
+	blocks := module.Blocks
+
+	output := blocks.Matching(BlockMatcher{Label: "other_resource.test", Type: "resource"})
+	require.NotNil(t, output)
+	attr := output.GetAttribute("task_definition")
+	mockedVal := attr.Value()
+	for _, v := range strings.Split(mockedVal.AsString(), ":") {
+		assertUUID(t, v)
+	}
+}
+
 func assertUUID(t *testing.T, val string) {
 	t.Helper()
 
