@@ -5,10 +5,13 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/pkg/browser"
 	"github.com/pkg/errors"
+
+	"github.com/infracost/infracost/internal/ui"
 )
 
 // AuthClient represents a client for Infracost's authentication process.
@@ -52,17 +55,35 @@ func (a AuthClient) Login(contextVals map[string]interface{}) (string, error) {
 
 func (a AuthClient) startCallbackServer(listener net.Listener, generatedState string) (string, error) {
 	apiKey := ""
+	shutdown := make(chan struct{}, 1)
+
+	go func() {
+		defer close(shutdown)
+
+		for {
+			select {
+			case <-shutdown:
+				listener.Close()
+				return
+			case <-time.After(time.Minute * 5):
+				listener.Close()
+				return
+			}
+		}
+	}()
 
 	err := http.Serve(listener, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", a.Host)
 		w.Header().Set("Access-Control-Allow-Methods", "GET")
 		w.Header().Set("Access-Control-Allow-Headers", "Sentry-Trace")
 
-		if r.Method == "OPTIONS" {
+		if r.Method == http.MethodOptions {
 			return
 		}
 
-		defer listener.Close()
+		defer func() {
+			shutdown <- struct{}{}
+		}()
 
 		query := r.URL.Query()
 		state := query.Get("cli_state")
@@ -79,7 +100,7 @@ func (a AuthClient) startCallbackServer(listener net.Listener, generatedState st
 	}
 
 	if apiKey == "" {
-		return "", errors.New("Unable to receive API key")
+		return "", fmt.Errorf("Authentication failed. Please check your API token on %s", ui.LinkString("https://infracost.io"))
 	}
 
 	return apiKey, nil
