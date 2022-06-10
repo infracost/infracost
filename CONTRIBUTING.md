@@ -37,6 +37,7 @@ This guide assumes you are familiar with Terraform, if not you can take an hour 
 ### Install
 
 Assuming you have already [installed go](https://golang.org/doc/install), install the go dependencies
+
 ```sh
 make deps
 ```
@@ -44,6 +45,7 @@ make deps
 ### Run
 
 Run the code:
+
 ```sh
 make run ARGS="breakdown --path examples/terraform --usage-file=examples/terraform/infracost-usage.yml"
 ```
@@ -55,12 +57,15 @@ This will use your existing Infracost API key; register for a [free API key](htt
 #### Unit tests
 
 To run only the unit tests:
+
 ```sh
 make test
 ```
 
 #### Integration tests
+
 You should run tests with the `-v` flag and warn log level so you can see and fix any warnings:
+
 ```sh
 INFRACOST_LOG_LEVEL=warn go test -v -cover ./internal/providers/terraform/aws/ebs_volume_test.go
 
@@ -68,6 +73,7 @@ time="2021-04-05T15:24:16Z" level=warning msg="Multiple prices found for aws_ebs
 ```
 
 To run all the tests for a specific cloud vendor:
+
 ```sh
 make test_aws
 make test_google
@@ -75,11 +81,13 @@ make test_azure
 ```
 
 To run all the tests, you can use:
+
 ```sh
 make test_all
 ```
 
 Test golden files may be updated for all test or for a specific cloud vendor:
+
 ```sh
 make test_update
 make test_update_aws
@@ -96,13 +104,16 @@ make build
 ## Adding new resources
 
 Checkout **[our dedicated guide](contributing/add_new_resource_guide.md)** to add resources!
+Checkout **[Pulumi Contributing](contributing/pulumi.md)** also to add Pulumi resources!
 
 ### Azure credentials
 
 Working on Azure resources requires Azure creds as the Azure Terraform provider requires real credentials to be able to run `terraform plan`. This means you must have Azure credentials for running the Infracost commands and integration tests for Azure. We recommend creating read-only Azure credentials for this purpose. If you have an Azure subscription, you can do this by running the `az` command line:
+
   ```sh
   az ad sp create-for-rbac --name http://InfracostReadOnly --role Reader --scope=/subscriptions/<SUBSCRIPTION ID> --years=10
   ```
+
   If you do not have an Azure subscription, then please ask on the contributors channel on the Infracost Slack and we can provide you with credentials.
 
   To run the Azure integration tests in the GitHub action in pull requests, these credentials also need to be added to your fork's secrets. To do this:
@@ -113,9 +124,9 @@ Working on Azure resources requires Azure creds as the Azure Terraform provider 
 ### Querying the GraphQL API
 
 1. Use a browser extension like [modheader](https://bewisse.com/modheader/help/) to allow you to specify additional headers in your browser.
-2. Go to https://pricing.api.infracost.io/graphql
+2. Go to <https://pricing.api.infracost.io/graphql>
 3. Set your `X-API-Key` using the browser extension
-4. Run GraphQL queries to find the correct products. Examples can be found here: https://github.com/infracost/cloud-pricing-api/tree/master/examples/queries
+4. Run GraphQL queries to find the correct products. Examples can be found here: <https://github.com/infracost/cloud-pricing-api/tree/master/examples/queries>
 
 The GraphQL pricing API limits the number of results returned to 1000, which can limit its usefulness for exploring the data. AWS use many acronyms so be sure to search for those too, e.g. "ES" returns "AmazonES" for ElasticSearch.
 
