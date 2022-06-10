@@ -21,12 +21,12 @@ type AuthClient struct {
 
 // Login opens a browser with authentication URL and starts a HTTP server to
 // wait for a callback request.
-func (a AuthClient) Login(contextVals map[string]interface{}) (string, error) {
+func (a AuthClient) Login(contextVals map[string]interface{}) (string, string, error) {
 	state := uuid.NewString()
 
 	listener, err := net.Listen("tcp", "localhost:0")
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 	port := listener.Addr().(*net.TCPAddr).Port
 
@@ -45,16 +45,17 @@ func (a AuthClient) Login(contextVals map[string]interface{}) (string, error) {
 
 	_ = browser.OpenURL(startURL)
 
-	apiKey, err := a.startCallbackServer(listener, state)
+	apiKey, info, err := a.startCallbackServer(listener, state)
 	if err != nil {
-		return "", err
+		return "", "", err
 	}
 
-	return apiKey, nil
+	return apiKey, info, nil
 }
 
-func (a AuthClient) startCallbackServer(listener net.Listener, generatedState string) (string, error) {
+func (a AuthClient) startCallbackServer(listener net.Listener, generatedState string) (string, string, error) {
 	apiKey := ""
+	infoMsg := ""
 	shutdown := make(chan struct{}, 1)
 
 	go func() {
@@ -88,6 +89,12 @@ func (a AuthClient) startCallbackServer(listener net.Listener, generatedState st
 		query := r.URL.Query()
 		state := query.Get("cli_state")
 		apiKey = query.Get("api_key")
+		infoMsg = query.Get("info")
+
+		if infoMsg != "" {
+			w.WriteHeader(200)
+			return
+		}
 
 		if apiKey == "" || state != generatedState {
 			w.WriteHeader(400)
@@ -96,12 +103,16 @@ func (a AuthClient) startCallbackServer(listener net.Listener, generatedState st
 	}))
 
 	if !errors.Is(err, net.ErrClosed) {
-		return "", err
+		return "", "", err
+	}
+
+	if infoMsg != "" {
+		return "", infoMsg, nil
 	}
 
 	if apiKey == "" {
-		return "", fmt.Errorf("Authentication failed. Please check your API token on %s", ui.LinkString("https://infracost.io"))
+		return "", "", fmt.Errorf("Authentication failed. Please check your API token on %s", ui.LinkString("https://infracost.io"))
 	}
 
-	return apiKey, nil
+	return apiKey, "", nil
 }
