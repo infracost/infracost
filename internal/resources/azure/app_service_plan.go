@@ -25,8 +25,7 @@ func (r *AppServicePlan) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *AppServicePlan) BuildResource() *schema.Resource {
-	sku := r.SKUSize
-	skuRefactor := ""
+	sku := ""
 	os := "windows"
 	var capacity int64 = 1
 	if r.SKUCapacity > 0 {
@@ -42,32 +41,32 @@ func (r *AppServicePlan) BuildResource() *schema.Resource {
 		}
 	}
 
-	switch strings.ToLower(sku[2:]) {
+	switch strings.ToLower(r.SKUSize[2:]) {
 	case "v1":
-		skuRefactor = sku[:2]
+		sku = r.SKUSize[:2]
 		productName = "Premium Plan"
 	case "v2":
-		skuRefactor = sku[:2] + " " + sku[2:]
+		sku = r.SKUSize[:2] + " " + r.SKUSize[2:]
 		productName = "Premium v2 Plan"
 	case "v3":
-		skuRefactor = sku[:2] + " " + sku[2:]
+		sku = r.SKUSize[:2] + " " + r.SKUSize[2:]
 		productName = "Premium v3 Plan"
 	}
 
-	switch strings.ToLower(sku[:2]) {
+	switch strings.ToLower(r.SKUSize[:2]) {
 	case "pc":
-		skuRefactor = "PC" + sku[2:]
+		sku = "PC" + r.SKUSize[2:]
 		productName = "Premium Windows Container Plan"
 	case "y1":
-		skuRefactor = "Shared"
+		sku = "Shared"
 		productName = "Shared Plan"
 	}
 
-	switch strings.ToLower(sku[:1]) {
+	switch strings.ToLower(r.SKUSize[:1]) {
 	case "s":
-		skuRefactor = "S" + sku[1:]
+		sku = "S" + r.SKUSize[1:]
 	case "b":
-		skuRefactor = "B" + sku[1:]
+		sku = "B" + r.SKUSize[1:]
 		productName = "Basic Plan"
 	}
 
@@ -81,13 +80,10 @@ func (r *AppServicePlan) BuildResource() *schema.Resource {
 		productName += " - Linux"
 	}
 
-	costComponents := make([]*schema.CostComponent, 0)
-
-	costComponents = append(costComponents, r.appServicePlanCostComponent(fmt.Sprintf("Instance usage (%s)", sku), productName, skuRefactor, capacity))
-
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: AppServicePlanUsageSchema,
+		CostComponents: []*schema.CostComponent{r.appServicePlanCostComponent(fmt.Sprintf("Instance usage (%s)", r.SKUSize), productName, sku, capacity)},
+		UsageSchema:    AppServicePlanUsageSchema,
 	}
 }
 

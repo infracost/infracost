@@ -14,9 +14,9 @@ type DatabricksWorkspace struct {
 	Address                        string
 	Region                         string
 	SKU                            string
-	MonthlyAllPurposeComputeDbuHrs *int64 `infracost_usage:"monthly_all_purpose_compute_dbu_hrs"`
-	MonthlyJobsComputeDbuHrs       *int64 `infracost_usage:"monthly_jobs_compute_dbu_hrs"`
-	MonthlyJobsLightComputeDbuHrs  *int64 `infracost_usage:"monthly_jobs_light_compute_dbu_hrs"`
+	MonthlyAllPurposeComputeDBUHrs *int64 `infracost_usage:"monthly_all_purpose_compute_dbu_hrs"`
+	MonthlyJobsComputeDBUHrs       *int64 `infracost_usage:"monthly_jobs_compute_dbu_hrs"`
+	MonthlyJobsLightComputeDBUHrs  *int64 `infracost_usage:"monthly_jobs_light_compute_dbu_hrs"`
 }
 
 var DatabricksWorkspaceUsageSchema = []*schema.UsageItem{{Key: "monthly_all_purpose_compute_dbu_hrs", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_jobs_compute_dbu_hrs", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_jobs_light_compute_dbu_hrs", ValueType: schema.Int64, DefaultValue: 0}}
@@ -40,8 +40,8 @@ func (r *DatabricksWorkspace) BuildResource() *schema.Resource {
 
 	var allPurpose, jobs, jobsLight *decimal.Decimal
 
-	if r.MonthlyAllPurposeComputeDbuHrs != nil {
-		allPurpose = decimalPtr(decimal.NewFromInt(*r.MonthlyAllPurposeComputeDbuHrs))
+	if r.MonthlyAllPurposeComputeDBUHrs != nil {
+		allPurpose = decimalPtr(decimal.NewFromInt(*r.MonthlyAllPurposeComputeDBUHrs))
 	}
 	costComponents = append(costComponents, r.databricksCostComponent(
 		"All-purpose compute DBUs",
@@ -49,8 +49,8 @@ func (r *DatabricksWorkspace) BuildResource() *schema.Resource {
 		allPurpose,
 	))
 
-	if r.MonthlyJobsComputeDbuHrs != nil {
-		jobs = decimalPtr(decimal.NewFromInt(*r.MonthlyJobsComputeDbuHrs))
+	if r.MonthlyJobsComputeDBUHrs != nil {
+		jobs = decimalPtr(decimal.NewFromInt(*r.MonthlyJobsComputeDBUHrs))
 	}
 	costComponents = append(costComponents, r.databricksCostComponent(
 		"Jobs compute DBUs",
@@ -58,8 +58,8 @@ func (r *DatabricksWorkspace) BuildResource() *schema.Resource {
 		jobs,
 	))
 
-	if r.MonthlyJobsLightComputeDbuHrs != nil {
-		jobsLight = decimalPtr(decimal.NewFromInt(*r.MonthlyJobsLightComputeDbuHrs))
+	if r.MonthlyJobsLightComputeDBUHrs != nil {
+		jobsLight = decimalPtr(decimal.NewFromInt(*r.MonthlyJobsLightComputeDBUHrs))
 	}
 	costComponents = append(costComponents, r.databricksCostComponent(
 		"Jobs light compute DBUs",

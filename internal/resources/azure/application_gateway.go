@@ -3,6 +3,7 @@ package azure
 import (
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
+	log "github.com/sirupsen/logrus"
 
 	"fmt"
 	"strings"
@@ -27,79 +28,109 @@ func (r *ApplicationGateway) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *ApplicationGateway) BuildResource() *schema.Resource {
-	var monthlyDataProcessedGb, monthlyCapacityUnits *decimal.Decimal
-	var sku, tier string
+	var sku string
 	costComponents := make([]*schema.CostComponent, 0)
-	tierLimits := []int{10240, 30720}
 
 	skuNameParts := strings.Split(r.SKUName, "_")
+	if len(skuNameParts) < 2 {
+		log.Warnf("skipping %s as its sku is not supported", r.Address)
+
+		return &schema.Resource{
+			Name:      r.Address,
+			IsSkipped: true,
+		}
+	}
 	if len(skuNameParts[1]) != 0 {
 		sku = strings.ToLower(skuNameParts[1])
 	}
-	if sku != "v2" {
-		if strings.ToLower(skuNameParts[0]) == "standard" {
-			tier = "basic"
-		} else {
-			tier = "WAF"
-		}
-		costComponents = append(costComponents, r.gatewayCostComponent(fmt.Sprintf("Gateway usage (%s, %s)", tier, sku), tier, sku))
-
-		if r.MonthlyDataProcessedGB != nil {
-			monthlyDataProcessedGb = decimalPtr(decimal.NewFromFloat(*r.MonthlyDataProcessedGB))
-			result := usage.CalculateTierBuckets(*monthlyDataProcessedGb, tierLimits)
-
-			if sku == "small" {
-				if result[0].GreaterThan(decimal.Zero) {
-					costComponents = append(costComponents, r.dataProcessingCostComponent("Data processing (0-10TB)", sku, "0", &result[0]))
-				}
-				if result[1].GreaterThan(decimal.Zero) {
-					costComponents = append(costComponents, r.dataProcessingCostComponent("Data processing (10-40TB)", sku, "0", &result[1]))
-				}
-				if result[2].GreaterThan(decimal.Zero) {
-					costComponents = append(costComponents, r.dataProcessingCostComponent("Data processing (over 40TB)", sku, "0", &result[2]))
-				}
-			}
-
-			if sku == "medium" {
-				if result[1].GreaterThan(decimal.Zero) {
-					costComponents = append(costComponents, r.dataProcessingCostComponent("Data processing (10-40TB)", sku, "10240", &result[1]))
-				}
-				if result[2].GreaterThan(decimal.Zero) {
-					costComponents = append(costComponents, r.dataProcessingCostComponent("Data processing (over 40TB)", sku, "10240", &result[2]))
-				}
-			}
-
-			if sku == "large" {
-				if result[2].GreaterThan(decimal.Zero) {
-					costComponents = append(costComponents, r.dataProcessingCostComponent("Data processing (over 40TB)", sku, "40960", &result[2]))
-				}
-			}
-
-		} else {
-			var unknown *decimal.Decimal
-			costComponents = append(costComponents, r.dataProcessingCostComponent("Data processing (0-10TB)", sku, "0", unknown))
-		}
-	}
-	if r.MonthlyV2CapacityUnits != nil {
-		monthlyCapacityUnits = decimalPtr(decimal.NewFromInt(*r.MonthlyV2CapacityUnits))
-	}
 	if sku == "v2" {
-		if strings.ToLower(skuNameParts[0]) == "standard" {
-			tier = "basic v2"
-			costComponents = append(costComponents, r.fixedForV2CostComponent(fmt.Sprintf("Gateway usage (%s)", tier), "standard v2"))
-			costComponents = append(costComponents, r.capacityUnitsCostComponent("basic", "standard v2", monthlyCapacityUnits))
-		} else {
-			tier = "WAF v2"
-			costComponents = append(costComponents, r.fixedForV2CostComponent(fmt.Sprintf("Gateway usage (%s)", tier), tier))
-			costComponents = append(costComponents, r.capacityUnitsCostComponent("WAF", tier, monthlyCapacityUnits))
-		}
-
+		costComponents = append(costComponents, r.v2CostComponents(skuNameParts)...)
+	} else {
+		costComponents = append(costComponents, r.v1CostComponents(sku, skuNameParts)...)
 	}
 
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents, UsageSchema: ApplicationGatewayUsageSchema,
 	}
+}
+
+func (r *ApplicationGateway) v1CostComponents(sku string, skuNameParts []string) []*schema.CostComponent {
+	costComponents := make([]*schema.CostComponent, 0)
+	var monthlyDataProcessedGB *decimal.Decimal
+	var tier string
+	tierLimits := []int{10240, 30720}
+
+	if len(skuNameParts[1]) != 0 {
+		sku = strings.ToLower(skuNameParts[1])
+	}
+
+	if strings.ToLower(skuNameParts[0]) == "standard" {
+		tier = "basic"
+	} else {
+		tier = "WAF"
+	}
+	costComponents = append(costComponents, r.gatewayCostComponent(fmt.Sprintf("Gateway usage (%s, %s)", tier, sku), tier, sku))
+
+	if r.MonthlyDataProcessedGB != nil {
+		monthlyDataProcessedGB = decimalPtr(decimal.NewFromFloat(*r.MonthlyDataProcessedGB))
+		result := usage.CalculateTierBuckets(*monthlyDataProcessedGB, tierLimits)
+
+		if sku == "small" {
+			if len(result) >= 1 && result[0].GreaterThan(decimal.Zero) {
+				costComponents = append(costComponents, r.dataProcessingCostComponent("Data processing (0-10TB)", sku, "0", &result[0]))
+			}
+			if len(result) >= 2 && result[1].GreaterThan(decimal.Zero) {
+				costComponents = append(costComponents, r.dataProcessingCostComponent("Data processing (10-40TB)", sku, "0", &result[1]))
+			}
+			if len(result) >= 3 && result[2].GreaterThan(decimal.Zero) {
+				costComponents = append(costComponents, r.dataProcessingCostComponent("Data processing (over 40TB)", sku, "0", &result[2]))
+			}
+		}
+
+		if sku == "medium" {
+			if len(result) >= 2 && result[1].GreaterThan(decimal.Zero) {
+				costComponents = append(costComponents, r.dataProcessingCostComponent("Data processing (10-40TB)", sku, "10240", &result[1]))
+			}
+			if len(result) >= 3 && result[2].GreaterThan(decimal.Zero) {
+				costComponents = append(costComponents, r.dataProcessingCostComponent("Data processing (over 40TB)", sku, "10240", &result[2]))
+			}
+		}
+
+		if sku == "large" {
+			if len(result) >= 3 && result[2].GreaterThan(decimal.Zero) {
+				costComponents = append(costComponents, r.dataProcessingCostComponent("Data processing (over 40TB)", sku, "40960", &result[2]))
+			}
+		}
+
+	} else {
+		var unknown *decimal.Decimal
+		costComponents = append(costComponents, r.dataProcessingCostComponent("Data processing (0-10TB)", sku, "0", unknown))
+	}
+
+	return costComponents
+}
+
+func (r *ApplicationGateway) v2CostComponents(skuNameParts []string) []*schema.CostComponent {
+	costComponents := make([]*schema.CostComponent, 0)
+	var tier string
+	var monthlyCapacityUnits *decimal.Decimal
+
+	if r.MonthlyV2CapacityUnits != nil {
+		monthlyCapacityUnits = decimalPtr(decimal.NewFromInt(*r.MonthlyV2CapacityUnits))
+	}
+
+	if strings.ToLower(skuNameParts[0]) == "standard" {
+		tier = "basic v2"
+		costComponents = append(costComponents, r.fixedForV2CostComponent(fmt.Sprintf("Gateway usage (%s)", tier), "standard v2"))
+		costComponents = append(costComponents, r.capacityUnitsCostComponent("basic", "standard v2", monthlyCapacityUnits))
+	} else {
+		tier = "WAF v2"
+		costComponents = append(costComponents, r.fixedForV2CostComponent(fmt.Sprintf("Gateway usage (%s)", tier), tier))
+		costComponents = append(costComponents, r.capacityUnitsCostComponent("WAF", tier, monthlyCapacityUnits))
+	}
+
+	return costComponents
 }
 
 func (r *ApplicationGateway) gatewayCostComponent(name, tier, sku string) *schema.CostComponent {

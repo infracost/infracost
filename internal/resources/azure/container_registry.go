@@ -25,10 +25,9 @@ func (r *ContainerRegistry) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *ContainerRegistry) BuildResource() *schema.Resource {
-	region := r.Region
 
 	var locationsCount int
-	var storageGb, includedStorage, monthlyBuildVCPU *decimal.Decimal
+	var storageGB, includedStorage, monthlyBuildVCPU *decimal.Decimal
 	var overStorage decimal.Decimal
 
 	sku := "Classic"
@@ -57,27 +56,27 @@ func (r *ContainerRegistry) BuildResource() *schema.Resource {
 		if locationsCount == 1 {
 			suffix = fmt.Sprintf("%d location", locationsCount)
 		}
-		costComponents = append(costComponents, ContainerRegistryGeolocationCostComponent(fmt.Sprintf("Geo replication (%s)", suffix), region, sku, locationsCount))
+		costComponents = append(costComponents, r.containerRegistryGeolocationCostComponent(fmt.Sprintf("Geo replication (%s)", suffix), sku))
 	}
 
-	costComponents = append(costComponents, ContainerRegistryCostComponent(fmt.Sprintf("Registry usage (%s)", sku), region, sku))
+	costComponents = append(costComponents, r.containerRegistryCostComponent(fmt.Sprintf("Registry usage (%s)", sku), sku))
 
 	if r.StorageGB != nil {
-		storageGb = decimalPtr(decimal.NewFromFloat(*r.StorageGB))
-		if storageGb.GreaterThan(*includedStorage) {
-			overStorage = storageGb.Sub(*includedStorage)
-			storageGb = &overStorage
-			costComponents = append(costComponents, ContainerRegistryStorageCostComponent(fmt.Sprintf("Storage (over %sGB)", includedStorage), region, sku, storageGb))
+		storageGB = decimalPtr(decimal.NewFromFloat(*r.StorageGB))
+		if storageGB.GreaterThan(*includedStorage) {
+			overStorage = storageGB.Sub(*includedStorage)
+			storageGB = &overStorage
+			costComponents = append(costComponents, r.containerRegistryStorageCostComponent(fmt.Sprintf("Storage (over %sGB)", includedStorage), sku, storageGB))
 		}
 	} else {
-		costComponents = append(costComponents, ContainerRegistryStorageCostComponent(fmt.Sprintf("Storage (over %sGB)", includedStorage), region, sku, storageGb))
+		costComponents = append(costComponents, r.containerRegistryStorageCostComponent(fmt.Sprintf("Storage (over %sGB)", includedStorage), sku, storageGB))
 	}
 
 	if r.MonthlyBuildVCPUHrs != nil {
 		monthlyBuildVCPU = decimalPtr(decimal.NewFromFloat(*r.MonthlyBuildVCPUHrs * 3600))
 	}
 
-	costComponents = append(costComponents, ContainerRegistryCPUCostComponent("Build vCPU", region, sku, monthlyBuildVCPU))
+	costComponents = append(costComponents, r.containerRegistryCPUCostComponent("Build vCPU", sku, monthlyBuildVCPU))
 
 	return &schema.Resource{
 		Name:           r.Address,
@@ -85,7 +84,7 @@ func (r *ContainerRegistry) BuildResource() *schema.Resource {
 	}
 }
 
-func ContainerRegistryCostComponent(name, region, sku string) *schema.CostComponent {
+func (r *ContainerRegistry) containerRegistryCostComponent(name, sku string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            "days",
@@ -93,7 +92,7 @@ func ContainerRegistryCostComponent(name, region, sku string) *schema.CostCompon
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(30)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(region),
+			Region:        strPtr(r.Region),
 			Service:       strPtr("Container Registry"),
 			ProductFamily: strPtr("Containers"),
 			AttributeFilters: []*schema.AttributeFilter{
@@ -107,15 +106,15 @@ func ContainerRegistryCostComponent(name, region, sku string) *schema.CostCompon
 		},
 	}
 }
-func ContainerRegistryGeolocationCostComponent(name, region, sku string, locationsCount int) *schema.CostComponent {
+func (r *ContainerRegistry) containerRegistryGeolocationCostComponent(name, sku string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            "days",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(30 * int64(locationsCount))),
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(30 * int64(r.GeoReplicationLocations))),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(region),
+			Region:        strPtr(r.Region),
 			Service:       strPtr("Container Registry"),
 			ProductFamily: strPtr("Containers"),
 			AttributeFilters: []*schema.AttributeFilter{
@@ -129,7 +128,7 @@ func ContainerRegistryGeolocationCostComponent(name, region, sku string, locatio
 		},
 	}
 }
-func ContainerRegistryStorageCostComponent(name, region, sku string, storage *decimal.Decimal) *schema.CostComponent {
+func (r *ContainerRegistry) containerRegistryStorageCostComponent(name, sku string, storage *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 
 		Name:            name,
@@ -138,7 +137,7 @@ func ContainerRegistryStorageCostComponent(name, region, sku string, storage *de
 		MonthlyQuantity: storage,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(region),
+			Region:        strPtr(r.Region),
 			Service:       strPtr("Container Registry"),
 			ProductFamily: strPtr("Containers"),
 			AttributeFilters: []*schema.AttributeFilter{
@@ -152,7 +151,7 @@ func ContainerRegistryStorageCostComponent(name, region, sku string, storage *de
 		},
 	}
 }
-func ContainerRegistryCPUCostComponent(name, region, sku string, monthlyBuildVCPU *decimal.Decimal) *schema.CostComponent {
+func (r *ContainerRegistry) containerRegistryCPUCostComponent(name, sku string, monthlyBuildVCPU *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 
 		Name:            name,
@@ -161,7 +160,7 @@ func ContainerRegistryCPUCostComponent(name, region, sku string, monthlyBuildVCP
 		MonthlyQuantity: monthlyBuildVCPU,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(region),
+			Region:        strPtr(r.Region),
 			Service:       strPtr("Container Registry"),
 			ProductFamily: strPtr("Containers"),
 			AttributeFilters: []*schema.AttributeFilter{
