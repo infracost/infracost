@@ -9,20 +9,8 @@ provider "aws" {
   secret_key                  = "mock_secret_key"
 }
 
-resource "aws_globalaccelerator_accelerator" "fixed_fee" {
-  name            = "TestFixedFee"
+resource "aws_globalaccelerator_accelerator" "example" {
+  name            = "Example"
   ip_address_type = "IPV4"
   enabled         = true
-}
-
-resource "aws_globalaccelerator_accelerator" "dt_premium_usage" {
-  name            = "TestUsage"
-  ip_address_type = "IPV4"
-  enabled         = true
-}
-
-resource "aws_globalaccelerator_accelerator" "disabled" {
-  name            = "TestDisabled"
-  ip_address_type = "IPV4"
-  enabled         = false
 }

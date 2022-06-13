@@ -14,13 +14,10 @@ func getGlobalAcceleratorRegistryItem() *schema.RegistryItem {
 
 func newGlobalAccelerator(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	name := d.Get("name").String()
-	ipAddressType := d.Get("ip_address_type").String()
-	enabled := d.Get("enabled").Bool()
 
 	r := &aws.GlobalAccelerator{
-		Name:          name,
-		IPAddressType: ipAddressType,
-		Enabled:       enabled,
+		Name:    name,
+		Address: d.Address,
 	}
 	r.PopulateUsage(u)
 

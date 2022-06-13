@@ -1,9 +1,9 @@
 version: 0.1
 resource_usage:
-  aws_globalaccelerator_accelerator.dt_premium_usage:
-    monthly_inbound_data_transfer_gb:
-      from_europe_to_north_america: 2000
-      from_asia_pacific_to_north_america: 2000
-    monthly_outbound_data_transfer_gb:
-      from_north_america_to_europe: 5000
-      from_north_america_to_asia_pacific: 1000
+#  aws_globalaccelerator_accelerator.dt_premium_usage:
+#    monthly_inbound_data_transfer_gb:
+#      from_europe_to_north_america: 2000
+#      from_asia_pacific_to_north_america: 2000
+#    monthly_outbound_data_transfer_gb:
+#      from_north_america_to_europe: 5000
+#      from_north_america_to_asia_pacific: 1000
