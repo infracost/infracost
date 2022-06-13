@@ -19,6 +19,7 @@ type Configuration struct {
 	DisableHCLParsing     *bool  `yaml:"disable_hcl_parsing,omitempty"`
 	TLSInsecureSkipVerify *bool  `yaml:"tls_insecure_skip_verify,omitempty"`
 	TLSCACertFile         string `yaml:"tls_ca_cert_file,omitempty"`
+	DisableVersionCheck   *bool  `yaml:"disable_version_check,omitempty"`
 }
 
 func loadConfiguration(cfg *Config) error {
@@ -56,6 +57,10 @@ func loadConfiguration(cfg *Config) error {
 
 	if cfg.TLSCACertFile == "" {
 		cfg.TLSCACertFile = cfg.Configuration.TLSCACertFile
+	}
+
+	if cfg.Configuration.DisableVersionCheck != nil {
+		cfg.DisableVersionCheck = *cfg.Configuration.DisableVersionCheck
 	}
 
 	return nil

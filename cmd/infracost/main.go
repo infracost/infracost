@@ -59,14 +59,18 @@ func Run(modifyCtx func(*config.RunContext), args *[]string) {
 			handleUnexpectedErr(ctx, withStack)
 		}
 
-		handleUpdateMessage(updateMessageChan)
+		if ctx.Config.DisableVersionCheck != true {
+			handleUpdateMessage(updateMessageChan)
+		}
 
 		if appErr != nil || unexpectedErr != nil {
 			ctx.Exit(1)
 		}
 	}()
 
-	startUpdateCheck(ctx, updateMessageChan)
+	if ctx.Config.DisableVersionCheck != true {
+		startUpdateCheck(ctx, updateMessageChan)
+	}
 
 	rootCmd := newRootCmd(ctx)
 	if args != nil {

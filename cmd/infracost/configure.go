@@ -20,6 +20,7 @@ var supportedConfigureKeys = map[string]struct{}{
 	"disable_hcl":              {},
 	"tls_insecure_skip_verify": {},
 	"tls_ca_cert_file":         {},
+	"disable_version_check":    {},
 }
 
 func configureCmd(ctx *config.RunContext) *cobra.Command {
@@ -126,6 +127,14 @@ func configureSetCmd(ctx *config.RunContext) *cobra.Command {
 				}
 
 				ctx.Config.Configuration.EnableDashboard = &b
+				saveConfiguration = true
+			case "disable_version_check":
+				b, err := strconv.ParseBool(value)
+				if err != nil {
+					return errors.New("Invalid value, must be true or false")
+				}
+
+				ctx.Config.Configuration.DisableVersionCheck = &b
 				saveConfiguration = true
 			}
 
@@ -250,7 +259,14 @@ func configureGetCmd(ctx *config.RunContext) *cobra.Command {
 				} else {
 					value = strconv.FormatBool(*ctx.Config.Configuration.EnableDashboard)
 				}
-			}
+
+			 case "disable_version_check":
+				if ctx.Config.Configuration.DisableVersionCheck == nil {
+                                        value = ""
+                                } else {
+                                        value = strconv.FormatBool(*ctx.Config.Configuration.DisableVersionCheck)
+                                }
+                        }
 
 			if value != "" {
 				fmt.Println(value)
@@ -278,6 +294,7 @@ Supported settings:
   - enable_dashboard: enable the Infracost dashboard
   - tls_insecure_skip_verify: skip TLS certificate checks for a self-hosted Cloud Pricing API
   - tls_ca_cert_file: verify certificate of a self-hosted Cloud Pricing API using this CA certificate
+  - disable_version_check: disable Infracost version check at startup
 `
 
 	return fmt.Sprintf("%s.\n%s", description, settings)

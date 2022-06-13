@@ -68,6 +68,7 @@ type Config struct {
 	DashboardEndpoint         string `yaml:"dashboard_endpoint,omitempty" envconfig:"INFRACOST_DASHBOARD_ENDPOINT"`
 	EnableDashboard           bool   `yaml:"enable_dashboard,omitempty" envconfig:"INFRACOST_ENABLE_DASHBOARD"`
 	DisableHCLParsing         bool   `yaml:"disable_hcl_parsing,omitempty" envconfig:"INFRACOST_DISABLE_HCL_PARSING"`
+	DisableVersionCheck       bool   `yaml:"disable_version_check" envconfig:"INFRACOST_DISABLE_VERSION_CHECK"`
 
 	TLSInsecureSkipVerify *bool  `envconfig:"INFRACOST_TLS_INSECURE_SKIP_VERIFY"`
 	TLSCACertFile         string `envconfig:"INFRACOST_TLS_CA_CERT_FILE"`
@@ -108,6 +109,7 @@ func DefaultConfig() *Config {
 		DashboardAPIEndpoint:      "https://dashboard.api.infracost.io",
 		DashboardEndpoint:         "https://dashboard.infracost.io",
 		EnableDashboard:           false,
+		DisableVersionCheck:       false,
 
 		Projects: []*Project{{}},
 
