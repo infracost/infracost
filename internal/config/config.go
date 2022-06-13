@@ -20,12 +20,14 @@ type Project struct {
 	// Path to the Terraform directory or JSON/plan file.
 	// A path can be repeated with different parameters, e.g. for multiple workspaces.
 	Path string `yaml:"path,omitempty" ignored:"true"`
-	// TerraformParseHCL will run a project by parsing hcl files the given Path rather than using a plan.json or terraform binary.
-	TerraformParseHCL bool `yaml:"hcl_only,omitempty"`
-	// TerraformVarFiles is the number of var files that are needed to run an TerraformParseHCL run
+	// ExcludePaths defines a list of directories that the provider should ignore.
+	ExcludePaths []string `yaml:"exclude_paths,omitempty"`
+	// TerraformVarFiles is any var files that are to be used with the project.
 	TerraformVarFiles []string `yaml:"terraform_var_files"`
-	// TerraformVars is a slice of input vars that is used to run an TerraformParseHCL run
-	TerraformVars []string `json:"terraform_vars"`
+	// TerraformVars is a slice of input vars that are to be used with the project.
+	TerraformVars map[string]string `yaml:"terraform_vars"`
+	// TerraformForceCLI will run a project by calling out to the terraform/terragrunt binary to generate a plan JSON file.
+	TerraformForceCLI bool `yaml:"terraform_force_cli,omitempty"`
 	// TerraformPlanFlags are flags to pass to terraform plan with Terraform directory paths
 	TerraformPlanFlags string `yaml:"terraform_plan_flags,omitempty" ignored:"true"`
 	// TerraformInitFlags are flags to pass to terraform init
@@ -63,6 +65,7 @@ type Config struct {
 	PricingAPIEndpoint        string `yaml:"pricing_api_endpoint,omitempty" envconfig:"INFRACOST_PRICING_API_ENDPOINT"`
 	DefaultPricingAPIEndpoint string `yaml:"default_pricing_api_endpoint,omitempty" envconfig:"INFRACOST_DEFAULT_PRICING_API_ENDPOINT"`
 	DashboardAPIEndpoint      string `yaml:"dashboard_api_endpoint,omitempty" envconfig:"INFRACOST_DASHBOARD_API_ENDPOINT"`
+	DashboardEndpoint         string `yaml:"dashboard_endpoint,omitempty" envconfig:"INFRACOST_DASHBOARD_ENDPOINT"`
 	EnableDashboard           bool   `yaml:"enable_dashboard,omitempty" envconfig:"INFRACOST_ENABLE_DASHBOARD"`
 	DisableHCLParsing         bool   `yaml:"disable_hcl_parsing,omitempty" envconfig:"INFRACOST_DISABLE_HCL_PARSING"`
 
@@ -103,6 +106,7 @@ func DefaultConfig() *Config {
 		DefaultPricingAPIEndpoint: "https://pricing.api.infracost.io",
 		PricingAPIEndpoint:        "",
 		DashboardAPIEndpoint:      "https://dashboard.api.infracost.io",
+		DashboardEndpoint:         "https://dashboard.infracost.io",
 		EnableDashboard:           false,
 
 		Projects: []*Project{{}},

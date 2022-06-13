@@ -1,0 +1,10 @@
+version: 0.1
+
+projects:
+  - path: ./testdata/breakdown_terraform_directory_with_default_var_files
+    terraform_var_files:
+      - input.tfvars
+    terraform_vars:
+      block2_ebs_volume_size: 2000
+    env:
+      TF_VAR_block2_volume_type: "io1"

@@ -7,10 +7,13 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
+
+type ContextEnv struct{}
 
 type SyncResult struct {
 	ResourceCount    int
@@ -51,7 +54,7 @@ func (s *SyncResult) ProjectContext() map[string]interface{} {
 	return r
 }
 
-func SyncUsageData(usageFile *UsageFile, projects []*schema.Project) (*SyncResult, error) {
+func SyncUsageData(projectCtx *config.ProjectContext, usageFile *UsageFile, projects []*schema.Project) (*SyncResult, error) {
 	referenceFile, err := LoadReferenceFile()
 	if err != nil {
 		return nil, err
@@ -64,7 +67,7 @@ func SyncUsageData(usageFile *UsageFile, projects []*schema.Project) (*SyncResul
 		resources = append(resources, project.Resources...)
 	}
 
-	syncResult := syncResourceUsages(usageFile, resources, referenceFile)
+	syncResult := syncResourceUsages(projectCtx, usageFile, resources, referenceFile)
 
 	return syncResult, nil
 }
@@ -74,7 +77,7 @@ type syncResourceResult struct {
 	sr *SyncResult
 }
 
-func syncResourceUsages(usageFile *UsageFile, resources []*schema.Resource, referenceFile *ReferenceFile) *SyncResult {
+func syncResourceUsages(projectCtx *config.ProjectContext, usageFile *UsageFile, resources []*schema.Resource, referenceFile *ReferenceFile) *SyncResult {
 	syncResult := &SyncResult{
 		EstimationErrors: make(map[string]error),
 	}
@@ -112,7 +115,7 @@ func syncResourceUsages(usageFile *UsageFile, resources []*schema.Resource, refe
 	for i := 0; i < numWorkers; i++ {
 		go func(jobs <-chan *schema.Resource, results chan<- syncResourceResult) {
 			for r := range jobs {
-				ru, sr := syncResource(r, referenceFile, existingResourceUsagesMap)
+				ru, sr := syncResource(projectCtx, r, referenceFile, existingResourceUsagesMap)
 				results <- syncResourceResult{ru, sr}
 			}
 		}(jobs, results)
@@ -174,7 +177,7 @@ func syncWildCardResource(wildCardResources map[string]bool, resource *schema.Re
 	return resourceUsage
 }
 
-func syncResource(resource *schema.Resource, referenceFile *ReferenceFile, existingResourceUsagesMap map[string]*ResourceUsage) (*ResourceUsage, *SyncResult) {
+func syncResource(projectCtx *config.ProjectContext, resource *schema.Resource, referenceFile *ReferenceFile, existingResourceUsagesMap map[string]*ResourceUsage) (*ResourceUsage, *SyncResult) {
 	syncResult := &SyncResult{
 		EstimationErrors: make(map[string]error),
 	}
@@ -208,7 +211,9 @@ func syncResource(resource *schema.Resource, referenceFile *ReferenceFile, exist
 		syncResult.EstimationCount++
 
 		resourceUsageMap := resourceUsage.Map()
-		err := resource.EstimateUsage(context.TODO(), resourceUsageMap)
+
+		ctx := context.WithValue(context.Background(), ContextEnv{}, projectCtx.ProjectConfig.Env)
+		err := resource.EstimateUsage(ctx, resourceUsageMap)
 		if err != nil {
 			syncResult.EstimationErrors[resource.Name] = err
 			log.Warnf("Error estimating usage for resource %s: %v", resource.Name, err)

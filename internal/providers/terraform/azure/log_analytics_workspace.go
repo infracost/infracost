@@ -5,13 +5,27 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
+var sentinelDataConnectorRefs = []string{
+	"azurerm_sentinel_data_connector_aws_cloud_trail.log_analytics_workspace_id",
+	"azurerm_sentinel_data_connector_azure_active_directory.log_analytics_workspace_id",
+	"azurerm_sentinel_data_connector_azure_advanced_threat_protection.log_analytics_workspace_id",
+	"azurerm_sentinel_data_connector_azure_security_center.log_analytics_workspace_id",
+	"azurerm_sentinel_data_connector_microsoft_cloud_app_security.log_analytics_workspace_id",
+	"azurerm_sentinel_data_connector_microsoft_defender_advanced_threat_protection.log_analytics_workspace_id",
+	"azurerm_sentinel_data_connector_office_365.log_analytics_workspace_id",
+	"azurerm_sentinel_data_connector_threat_intelligence.log_analytics_workspace_id",
+}
+
 func getAzureRMLogAnalyticsWorkspaceRegistryItem() *schema.RegistryItem {
+	refs := []string{
+		"resource_group_name",
+		"azurerm_log_analytics_solution.workspace_resource_id",
+	}
+
 	return &schema.RegistryItem{
-		Name:  "azurerm_log_analytics_workspace",
-		RFunc: newLogAnalyticsWorkspace,
-		ReferenceAttributes: []string{
-			"resource_group_name",
-		},
+		Name:                "azurerm_log_analytics_workspace",
+		RFunc:               newLogAnalyticsWorkspace,
+		ReferenceAttributes: append(refs, sentinelDataConnectorRefs...),
 	}
 }
 
@@ -21,6 +35,8 @@ func newLogAnalyticsWorkspace(d *schema.ResourceData, u *schema.UsageData) *sche
 	if !d.IsEmpty("sku") {
 		sku = d.Get("sku").String()
 	}
+
+	sentinelEnabled := logAnalyticsWorkspaceDetectSentinel(d)
 
 	capacity := d.Get("reservation_capacity_in_gb_per_day").Int()
 	// Deprecated and removed in v3
@@ -36,8 +52,24 @@ func newLogAnalyticsWorkspace(d *schema.ResourceData, u *schema.UsageData) *sche
 		SKU:                           sku,
 		ReservationCapacityInGBPerDay: capacity,
 		RetentionInDays:               d.Get("retention_in_days").Int(),
+		SentinelEnabled:               sentinelEnabled,
 	}
 	r.PopulateUsage(u)
 
 	return r.BuildResource()
+}
+
+func logAnalyticsWorkspaceDetectSentinel(d *schema.ResourceData) bool {
+	for _, ref := range sentinelDataConnectorRefs {
+		if len(d.References(ref)) > 0 {
+			return true
+		}
+	}
+
+	logSolutionRefs := d.References("azurerm_log_analytics_solution.workspace_resource_id")
+	if len(logSolutionRefs) > 0 {
+		return logAnalyticsWorkspaceDetectSentinel(logSolutionRefs[0])
+	}
+
+	return false
 }

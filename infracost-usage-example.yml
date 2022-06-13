@@ -95,6 +95,8 @@ resource_usage:
     additional_backup_storage_gb: 1000  # Amount of backup storage used that is in excess of 100% of the storage size for all databases in GB.
     monthly_standard_io_requests: 10000 # Monthly number of input/output requests for database.
     monthly_additional_performance_insights_requests: 10000 # Monthly Performance Insights API requests above the 1000000 requests included in the free tier.
+    reserved_instance_term: 1_year                          # Term for Reserved Instances, can be: 1_year, 3_year.
+    reserved_instance_payment_option: partial_upfront       # Payment option for Reserved Instances, can be: no_upfront (only for 1_year term), partial_upfront, all_upfront.
 
   aws_directory_service_directory.my_directory:
     additional_domain_controllers: 3 # The number of domain controllers in the directory service provisioned in addition to the minimum 2 controllers
@@ -182,9 +184,13 @@ resource_usage:
     
   aws_elasticache_cluster.my_redis_snapshot:
     snapshot_storage_size_gb: 10000 # Size of Redis snapshots in GB.
+    reserved_instance_term: 1_year                          # Term for Reserved Instances, can be: 1_year, 3_year.
+    reserved_instance_payment_option: partial_upfront       # Payment option for Reserved Instances. Can be: no_upfront, partial_upfront, all_upfront for standard offering class. Can be: heavy_utilization, medium_utilization, light utilization for legacy offering class.
 
   aws_elasticache_replication_group.my_redis_replication_snapshot:
     snapshot_storage_size_gb: 10000 # Size of Redis snapshots in GB.
+    reserved_instance_term: 1_year                          # Term for Reserved Instances, can be: 1_year, 3_year.
+    reserved_instance_payment_option: partial_upfront       # Payment option for Reserved Instances. Can be: no_upfront, partial_upfront, all_upfront for standard offering class. Can be: heavy_utilization, medium_utilization, light utilization for legacy offering class.
 
   aws_elb.my_elb:
     monthly_data_processed_gb: 10000 # Monthly data processed by a Classic Load Balancer in GB.
@@ -280,6 +286,8 @@ resource_usage:
     monthly_cpu_credit_hrs: 24   # Number of hours in a month, where you expect to burst the baseline credit balance of a "t3" instance type.
     vcpu_count: 2 # # (DEPRECATED this is now calculated automatically) Number of virtual CPUs allocated to your "t3" instance type. Currently instances with 2 vCPUs are available.
     monthly_additional_performance_insights_requests: 10000 # Monthly Performance Insights API requests above the 1000000 requests included in the free tier.
+    reserved_instance_term: 1_year                          # Term for Reserved Instances, can be: 1_year, 3_year.
+    reserved_instance_payment_option: partial_upfront       # Payment option for Reserved Instances, can be: no_upfront (only for 1_year term), partial_upfront, all_upfront.
 
   aws_redshift_cluster.with_usage:
     managed_storage_gb: 10000
@@ -584,9 +592,6 @@ resource_usage:
       china: 50            # China excluding Hong Kong.
       australia: 250       # Australia.
 
-  google_compute_address.my_address:
-    address_type: standard_vm # IP address being used, can be: standard_vm, preemptible_vm, unused.
-
   google_compute_external_vpn_gateway.my_compute_external_vpn_gateway:
     monthly_egress_data_transfer_gb:  # Monthly data transfer from VPN gateway to the following, in GB:
       worldwide: 12500                # Worldwide excluding China, Australia but including Hong Kong.
@@ -615,9 +620,6 @@ resource_usage:
 
   google_compute_forwarding_rule.my_forwarding:
     monthly_ingress_data_gb: 100
-
-  google_compute_global_address.my_address:
-    address_type: standard_vm # IP address being used, can be: standard_vm, preemptible_vm, unused.
 
   google_compute_global_forwarding_rule.my_global_forwarding:
     monthly_ingress_data_gb: 100
@@ -916,6 +918,7 @@ resource_usage:
     monthly_log_data_ingestion_gb: 20            # Monthly log data ingested by the workspace in GB (only used for Pay-as-you-go workspaces).
     monthly_additional_log_data_retention_gb: 30 # Monthly additional GB of data retained past the free allowance.
     monthly_log_data_export_gb: 40               # Monthly data in GB exported from the workspace.
+    monthly_sentinel_data_ingestion_gb: 40       # Monthly data in GB exported from Microsoft Sentinel, this only applies when it is enabled.
 
   azurerm_frontdoor_firewall_policy.my_frontdoor_firewall_policy:
     monthly_custom_rule_requests: 11000     # Monthly number of custom rule requests

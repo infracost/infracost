@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 func GetAzureRMCosmosdbCassandraKeyspaceRegistryItem() *schema.RegistryItem {
@@ -310,7 +311,7 @@ func backupStorageCosmosCostComponents(account *schema.ResourceData, u *schema.U
 	if u != nil && u.Get("monthly_restored_data_gb").Exists() {
 		pitr = decimalPtr(decimal.NewFromInt(u.Get("monthly_restored_data_gb").Int()))
 	}
-	meterName = "Data Restore"
+	meterName = "Backup Data Restore"
 	skuName = "Backup"
 	productName = "Azure Cosmos DB - PITR"
 
@@ -362,7 +363,7 @@ func backupCosmosCostComponent(name, location, skuName, productName, meterName s
 			Service:       strPtr("Azure Cosmos DB"),
 			ProductFamily: strPtr("Databases"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "meterName", Value: strPtr(meterName)},
+				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/%s/i", meterName))},
 				{Key: "skuName", Value: strPtr(skuName)},
 				{Key: "productName", Value: strPtr(productName)},
 			},

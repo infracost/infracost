@@ -75,6 +75,7 @@ jobs:
           push: true
 
   update-homebrew-formula:
+    if: ${{ !contains(github.ref, '-alpha') && !contains(github.ref, '-beta') }}
     name: Update Homebrew formula
     needs: build
     runs-on: ubuntu-latest
@@ -85,6 +86,7 @@ jobs:
           formula: infracost
 
   update-download-redirects:
+    if: ${{ !contains(github.ref, '-alpha') && !contains(github.ref, '-beta') }}
     name: Upload Download Redirects
     needs: build
     uses: ./.github/workflows/update-download-redirects.yml
@@ -96,6 +98,7 @@ jobs:
       AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
   update-fig-autocomplete-spec:
+    if: ${{ !contains(github.ref, '-alpha') && !contains(github.ref, '-beta') }}
     name: Update Fig autocomplete spec
     runs-on: ubuntu-latest
     steps:
@@ -108,7 +111,7 @@ jobs:
           make build
           ./build/infracost fig-autocomplete > fig-spec.ts
       - name: Create Autocomplete PR
-        uses: withfig/publish-to-fig-autocomplete@v1
+        uses: withfig/push-to-fig-autocomplete-action@v1
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           autocomplete-spec-name: infracost

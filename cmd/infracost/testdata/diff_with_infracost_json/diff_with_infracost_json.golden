@@ -1,4 +1,4 @@
-Project: infracost/infracost/cmd/infracost/testdata/output_with_compare_to
+Project: infracost/infracost/cmd/infracost/testdata/diff_with_infracost_json
 
 ~ aws_instance.web_app
   +$561 ($743 → $1,303)
@@ -25,7 +25,7 @@ Project: infracost/infracost/cmd/infracost/testdata/output_with_compare_to
         - Provisioned IOPS
           -$52.00
 
-Monthly cost change for infracost/infracost/cmd/infracost/testdata/output_with_compare_to
+Monthly cost change for infracost/infracost/cmd/infracost/testdata/diff_with_infracost_json
 Amount:  -$743 ($2,046 → $1,303)
 Percent: -36%
 

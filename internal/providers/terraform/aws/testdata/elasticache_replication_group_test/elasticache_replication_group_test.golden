@@ -13,6 +13,9 @@
  aws_elasticache_replication_group.cluster-deprecated-attribs                                                     
  └─ ElastiCache (on-demand, cache.m4.large)                                11,680  hours                $1,822.08 
                                                                                                                   
+ aws_elasticache_replication_group.cluster_reserved                                                               
+ └─ ElastiCache (reserved, cache.m6g.12xlarge)                              2,190  hours                    $0.00 
+                                                                                                                  
  aws_elasticache_replication_group.non-cluster                                                                    
  └─ ElastiCache (on-demand, cache.r5.4xlarge)                               2,190  hours                $3,775.56 
                                                                                                                   
@@ -25,5 +28,5 @@
                                                                                                                   
  OVERALL TOTAL                                                                                         $29,006.55 
 ──────────────────────────────────
-10 cloud resources were detected:
-∙ 10 were estimated, 7 of which include usage-based costs, see https://infracost.io/usage-file
+11 cloud resources were detected:
+∙ 11 were estimated, 8 of which include usage-based costs, see https://infracost.io/usage-file

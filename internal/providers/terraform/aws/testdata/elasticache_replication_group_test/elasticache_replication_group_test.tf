@@ -113,3 +113,13 @@ resource "aws_appautoscaling_target" "autoscale_node_groups_usage" {
   scalable_dimension = "elasticache:replication-group:NodeGroups"
   service_namespace  = "elasticache"
 }
+
+resource "aws_elasticache_replication_group" "cluster_reserved" {
+  replication_group_description = "This Replication Group"
+  replication_group_id          = "tf-rep-group-2"
+
+  engine = "redis"
+
+  node_type             = "cache.m6g.12xlarge"
+  number_cache_clusters = 3
+}

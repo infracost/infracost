@@ -1,10 +1,11 @@
 package azure
 
 import (
-	"github.com/infracost/infracost/internal/schema"
-	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
+
+	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/usage"
 )
 
 func GetAzureRMPrivateEndpointRegistryItem() *schema.RegistryItem {
@@ -23,7 +24,7 @@ func NewAzureRMPrivateEndpoint(d *schema.ResourceData, u *schema.UsageData) *sch
 	region = convertRegion(region)
 
 	costComponents := make([]*schema.CostComponent, 0)
-	costComponents = append(costComponents, privateEndpointCostComponent(region, "Private endpoint", "Private Endpoint"))
+	costComponents = append(costComponents, privateEndpointCostComponent(region, "Private endpoint", "Standard Private Endpoint"))
 
 	if u != nil && u.Get("monthly_inbound_data_processed_gb").Type != gjson.Null {
 		inbound := decimal.NewFromInt(u.Get("monthly_inbound_data_processed_gb").Int())
@@ -32,18 +33,18 @@ func NewAzureRMPrivateEndpoint(d *schema.ResourceData, u *schema.UsageData) *sch
 		inboundQuantities := usage.CalculateTierBuckets(inbound, inboundTiers)
 
 		if len(inboundQuantities) > 0 {
-			costComponents = append(costComponents, privateEndpointDataCostComponent(region, "Inbound data processed (first 1PB)", "Data Processed - Ingress", "0", &inboundQuantities[0]))
+			costComponents = append(costComponents, privateEndpointDataCostComponent(region, "Inbound data processed (first 1PB)", "Standard Data Processed - Ingress", "0", &inboundQuantities[0]))
 		}
 
 		if len(inboundQuantities) > 1 && inboundQuantities[1].GreaterThan(decimal.Zero) {
-			costComponents = append(costComponents, privateEndpointDataCostComponent(region, "Inbound data processed (next 4PB)", "Data Processed - Ingress", "1000000", &inboundQuantities[1]))
+			costComponents = append(costComponents, privateEndpointDataCostComponent(region, "Inbound data processed (next 4PB)", "Standard Data Processed - Ingress", "1000000", &inboundQuantities[1]))
 		}
 
 		if len(inboundQuantities) > 2 && inboundQuantities[2].GreaterThan(decimal.Zero) {
-			costComponents = append(costComponents, privateEndpointDataCostComponent(region, "Inbound data processed (over 5PB)", "Data Processed - Ingress", "5000000", &inboundQuantities[2]))
+			costComponents = append(costComponents, privateEndpointDataCostComponent(region, "Inbound data processed (over 5PB)", "Standard Data Processed - Ingress", "5000000", &inboundQuantities[2]))
 		}
 	} else {
-		costComponents = append(costComponents, privateEndpointDataCostComponent(region, "Inbound data processed (first 1PB)", "Data Processed - Ingress", "0", nil))
+		costComponents = append(costComponents, privateEndpointDataCostComponent(region, "Inbound data processed (first 1PB)", "Standard Data Processed - Ingress", "0", nil))
 	}
 
 	if u != nil && u.Get("monthly_outbound_data_processed_gb").Type != gjson.Null {
@@ -53,18 +54,18 @@ func NewAzureRMPrivateEndpoint(d *schema.ResourceData, u *schema.UsageData) *sch
 		outboundQuantities := usage.CalculateTierBuckets(outbound, outboundTiers)
 
 		if len(outboundQuantities) > 0 {
-			costComponents = append(costComponents, privateEndpointDataCostComponent(region, "Outbound data processed (first 1PB)", "Data Processed - Egress", "0", &outboundQuantities[0]))
+			costComponents = append(costComponents, privateEndpointDataCostComponent(region, "Outbound data processed (first 1PB)", "Standard Data Processed - Egress", "0", &outboundQuantities[0]))
 		}
 
 		if len(outboundQuantities) > 1 && outboundQuantities[1].GreaterThan(decimal.Zero) {
-			costComponents = append(costComponents, privateEndpointDataCostComponent(region, "Outbound data processed (next 4PB)", "Data Processed - Egress", "1000000", &outboundQuantities[1]))
+			costComponents = append(costComponents, privateEndpointDataCostComponent(region, "Outbound data processed (next 4PB)", "Standard Data Processed - Egress", "1000000", &outboundQuantities[1]))
 		}
 
 		if len(outboundQuantities) > 2 && outboundQuantities[2].GreaterThan(decimal.Zero) {
-			costComponents = append(costComponents, privateEndpointDataCostComponent(region, "Outbound data processed (over 5PB)", "Data Processed - Egress", "5000000", &outboundQuantities[2]))
+			costComponents = append(costComponents, privateEndpointDataCostComponent(region, "Outbound data processed (over 5PB)", "Standard Data Processed - Egress", "5000000", &outboundQuantities[2]))
 		}
 	} else {
-		costComponents = append(costComponents, privateEndpointDataCostComponent(region, "Outbound data processed (first 1PB)", "Data Processed - Egress", "0", nil))
+		costComponents = append(costComponents, privateEndpointDataCostComponent(region, "Outbound data processed (first 1PB)", "Standard Data Processed - Egress", "0", nil))
 	}
 
 	return &schema.Resource{

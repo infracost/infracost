@@ -12,7 +12,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getComputeExternalVPNGatewayRegistryItem(),
 	getComputeForwardingRuleRegistryItem(),
 	getComputeGlobalAddressRegistryItem(),
-	GetComputeGlobalForwardingRuleRegistryItem(),
+	getComputeGlobalForwardingRuleRegistryItem(),
 	getComputeHAVPNGatewayRegistryItem(),
 	getComputeImageRegistryItem(),
 	getComputeInstanceGroupManagerRegistryItem(),
@@ -51,8 +51,10 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getSecretManagerSecretRegistryItem(),
 	getSecretManagerSecretVersionRegistryItem(),
 	getServiceNetworkingConnectionRegistryItem(),
-	GetSQLInstanceRegistryItem(),
+	getSQLDatabaseInstanceRegistryItem(),
 	getStorageBucketRegistryItem(),
+	getComputePerInstanceConfigRegistryItem(),
+	getComputeRegionPerInstanceConfigRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -114,7 +116,6 @@ var FreeResources = []string{
 	"google_compute_region_disk_iam_policy",
 	"google_compute_region_health_check",
 	"google_compute_region_network_endpoint_group",
-	"google_compute_region_per_instance_config",
 	"google_compute_region_url_map",
 	"google_compute_route",
 	"google_compute_router",

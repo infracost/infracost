@@ -86,13 +86,15 @@ func newRootCmd(ctx *config.RunContext) *cobra.Command {
 %s
   Quick start: https://infracost.io/docs
   Add cost estimates to your pull requests: https://infracost.io/cicd`, ui.BoldString("DOCS")),
-		Example: `  Show cost diff from Terraform directory, using any required flags:
+		Example: `  Show cost diff from Terraform directory:
 
-      infracost diff --path /path/to/code --terraform-plan-flags "-var-file=my.tfvars"
+      infracost breakdown --path /code --format json --out-file infracost-base.json
+      # Make Terraform code changes
+      infracost diff --path /code --compare-to infracost-base.json
 
-  Show full cost breakdown from Terraform directory, using any required flags:
+  Show cost breakdown from Terraform directory:
 
-      infracost breakdown --path /path/to/code --terraform-plan-flags "-var-file=my.tfvars"`,
+      infracost breakdown --path /code --terraform-var-file my.tfvars`,
 		SilenceErrors: true,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			cmd.SilenceUsage = true
@@ -109,6 +111,7 @@ func newRootCmd(ctx *config.RunContext) *cobra.Command {
 	rootCmd.PersistentFlags().Bool("no-color", false, "Turn off colored output")
 	rootCmd.PersistentFlags().String("log-level", "", "Log level (trace, debug, info, warn, error, fatal)")
 
+	rootCmd.AddCommand(authCmd(ctx))
 	rootCmd.AddCommand(registerCmd(ctx))
 	rootCmd.AddCommand(configureCmd(ctx))
 	rootCmd.AddCommand(diffCmd(ctx))
@@ -185,7 +188,7 @@ func handleCLIError(ctx *config.RunContext, cliErr error) {
 		ui.PrintError(ctx.ErrWriter, cliErr.Error())
 	}
 
-	err := apiclient.ReportCLIError(ctx, cliErr)
+	err := apiclient.ReportCLIError(ctx, cliErr, true)
 	if err != nil {
 		log.Warnf("Error reporting CLI error: %s", err)
 	}
@@ -194,7 +197,7 @@ func handleCLIError(ctx *config.RunContext, cliErr error) {
 func handleUnexpectedErr(ctx *config.RunContext, err error) {
 	ui.PrintUnexpectedErrorStack(ctx.ErrWriter, err)
 
-	err = apiclient.ReportCLIError(ctx, err)
+	err = apiclient.ReportCLIError(ctx, err, false)
 	if err != nil {
 		log.Warnf("Error reporting unexpected error: %s", err)
 	}
@@ -215,6 +218,9 @@ func handleUpdateMessage(updateMessageChan chan *update.Info) {
 }
 
 func loadGlobalFlags(ctx *config.RunContext, cmd *cobra.Command) error {
+	if ctx.IsCIRun() {
+		ctx.Config.NoColor = true
+	}
 	if cmd.Flags().Changed("no-color") {
 		ctx.Config.NoColor, _ = cmd.Flags().GetBool("no-color")
 	}

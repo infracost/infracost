@@ -2,9 +2,10 @@ package aws
 
 import (
 	"fmt"
+	"math"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"math"
 
 	"github.com/shopspring/decimal"
 )
@@ -148,19 +149,41 @@ func (r *SNSTopic) macOSNotificationsCostComponent(subscriptions, requests *int6
 }
 
 // smsNotificationsCostComponent returns a cost component for SMS notification costs.
-func (r *SNSTopic) smsNotificationsCostComponent(subscriptions, requests *int64, customPrice *float64) *schema.CostComponent {
-	c := r.notificationsCostComponent(
-		"SMS notifications (over 100)",
-		"100 notifications",
-		100,
-		"DeliveryAttempts-SMS",
-		100,
-		subscriptions,
-		requests,
-	)
+func (r *SNSTopic) smsNotificationsCostComponent(subscriptions, requests *int64) *schema.CostComponent {
+	var multiplier int64 = 100
 
-	if customPrice != nil {
-		c.SetCustomPrice(decimalPtr(decimal.NewFromFloat(*customPrice)))
+	q := r.calculateQuantity(subscriptions, requests, multiplier)
+	region := r.Region
+
+	// Pricing is available only for these regions. Default usage price is the
+	// same as for us-east-1, thus if region is not supported use us-east-1 in
+	// attribute filter.
+	availableRegions := []string{"us-east-1", "me-south-1", "eu-west-3"}
+	if !stringInSlice(availableRegions, region) {
+		region = availableRegions[0]
+	}
+
+	c := &schema.CostComponent{
+		Name:            "SMS notifications (over 100)",
+		Unit:            "100 notifications",
+		UnitMultiplier:  decimal.NewFromInt(multiplier),
+		MonthlyQuantity: q,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(region),
+			Service:       strPtr("AmazonSNS"),
+			ProductFamily: strPtr("Message Delivery"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", ValueRegex: regexPtr("DeliveryAttempts-SMS$")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			StartUsageAmount: strPtr(fmt.Sprintf("%d", 100)),
+		},
+	}
+
+	if r.SMSNotificationPrice != nil {
+		c.SetCustomPrice(decimalPtr(decimal.NewFromFloat(*r.SMSNotificationPrice)))
 	}
 
 	return c
@@ -194,7 +217,7 @@ func (r *SNSTopic) BuildResource() *schema.Resource {
 		r.kinesisNotificationsCostComponent(r.KinesisSubscriptions, requests),
 		r.mobilePushNotificationsCostComponent(r.MobilePushSubscriptions, requests),
 		r.macOSNotificationsCostComponent(r.MacOSSubscriptions, requests),
-		r.smsNotificationsCostComponent(r.SMSSubscriptions, requests, r.SMSNotificationPrice),
+		r.smsNotificationsCostComponent(r.SMSSubscriptions, requests),
 	}
 
 	return &schema.Resource{
@@ -209,13 +232,13 @@ func (r *SNSTopic) calculateRequests(requestSize float64, monthlyRequests int64)
 	return &i
 }
 
-// notificationsCostComponent returns a cost component corresponding to the supplied parameters.
-func (r *SNSTopic) notificationsCostComponent(name, unit string, multiplier int64, usageType string, startUsageAmount int64, subscribers, requests *int64) *schema.CostComponent {
+func (r *SNSTopic) calculateQuantity(subscribers *int64, requests *int64, startUsageAmount int64) *decimal.Decimal {
 	// Decide on whether quantity is >0, 0, or nil.
 	// If both subscribers and requests are set, multiply them to get the total number of notifications.
 	// If at least one of them is 0, set quantity to 0 so we don't show 'Monthly cost depends on usage...'
 	// Otherwise, leave quantity nil so we show 'Monthly cost depends on usage...'
 	var q *decimal.Decimal
+
 	if subscribers != nil && requests != nil {
 		totalNotifications := *subscribers * *requests
 		if totalNotifications > startUsageAmount {
@@ -226,6 +249,13 @@ func (r *SNSTopic) notificationsCostComponent(name, unit string, multiplier int6
 	} else if (subscribers != nil && *subscribers == 0) || (requests != nil && *requests == 0) {
 		q = &decimal.Zero
 	}
+
+	return q
+}
+
+// notificationsCostComponent returns a cost component corresponding to the supplied parameters.
+func (r *SNSTopic) notificationsCostComponent(name, unit string, multiplier int64, usageType string, startUsageAmount int64, subscribers, requests *int64) *schema.CostComponent {
+	q := r.calculateQuantity(subscribers, requests, startUsageAmount)
 
 	return &schema.CostComponent{
 		Name:            name,
@@ -238,7 +268,7 @@ func (r *SNSTopic) notificationsCostComponent(name, unit string, multiplier int6
 			Service:       strPtr("AmazonSNS"),
 			ProductFamily: strPtr("Message Delivery"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", Value: &usageType},
+				{Key: "usagetype", ValueRegex: regexPtr(fmt.Sprintf("%s$", usageType))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -295,7 +325,7 @@ func (r *SNSFIFOTopic) publishAPIRequestsCostComponent(requests *int64) *schema.
 			Service:       strPtr("AmazonSNS"),
 			ProductFamily: strPtr(""),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", Value: strPtr("F-Request-Tier1")},
+				{Key: "usagetype", ValueRegex: regexPtr("F-Request-Tier1$")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -322,7 +352,7 @@ func (r *SNSFIFOTopic) publishAPIPayloadCostComponent(requests *int64, requestSi
 			Service:       strPtr("AmazonSNS"),
 			ProductFamily: strPtr(""),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", Value: strPtr("F-Ingress-Tier1")},
+				{Key: "usagetype", ValueRegex: regexPtr("F-Ingress-Tier1$")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -351,7 +381,7 @@ func (r *SNSFIFOTopic) notificationsCostComponent(subscriptions int64, requests 
 			Service:       strPtr("AmazonSNS"),
 			ProductFamily: strPtr(""),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", Value: strPtr("F-DA-SQS")},
+				{Key: "usagetype", ValueRegex: regexPtr("F-DA-SQS$")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -380,7 +410,7 @@ func (r *SNSFIFOTopic) notificationPayloadCostComponent(subscriptions int64, req
 			Service:       strPtr("AmazonSNS"),
 			ProductFamily: strPtr(""),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", Value: strPtr("F-Egress-SQS")},
+				{Key: "usagetype", ValueRegex: regexPtr("F-Egress-SQS$")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

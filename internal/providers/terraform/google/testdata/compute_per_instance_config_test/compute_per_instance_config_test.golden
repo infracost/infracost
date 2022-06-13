@@ -1,0 +1,14 @@
+
+ Name                                                 Monthly Qty  Unit   Monthly Cost 
+                                                                                       
+ google_compute_instance_group_manager.default                                         
+ ├─ Instance usage (Linux/UNIX, on-demand, f1-micro)          730  hours         $3.88 
+ └─ SSD provisioned storage (pd-ssd)                          375  GB           $63.75 
+                                                                                       
+ OVERALL TOTAL                                                                  $67.63 
+──────────────────────────────────
+3 cloud resources were detected:
+∙ 1 was estimated
+∙ 2 were free:
+  ∙ 1 x google_compute_instance_template
+  ∙ 1 x google_compute_per_instance_config

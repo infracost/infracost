@@ -89,6 +89,14 @@ func stringInSlice(slice []string, s string) bool {
 	return false
 }
 
+func sliceOfKeysFromMap[K comparable, V any](m map[K]V) []K {
+	keys := make([]K, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+	return keys
+}
+
 // RegionMapping is a helpful conversion map that changes
 // aws region name to the name commonly used in pricing filters.
 var RegionMapping = map[string]string{
@@ -661,4 +669,58 @@ var InstanceTypeToVCPU = map[string]int64{
 	"z1d.large":        2,
 	"z1d.metal":        48,
 	"z1d.xlarge":       4,
+}
+
+var reservedTermsMapping = map[string]string{
+	"1_year": "1yr",
+	"3_year": "3yr",
+}
+
+var reservedPaymentOptionMapping = map[string]string{
+	"no_upfront":      "No Upfront",
+	"partial_upfront": "Partial Upfront",
+	"all_upfront":     "All Upfront",
+}
+
+var elasticacheReservedNodeCacheLegacyOfferings = map[string]string{
+	"heavy_utilization":  "Heavy Utilization",
+	"medium_utilization": "Medium Utilization",
+	"light_utilization":  "Light Utilization",
+}
+
+var elasticacheReservedNodeLegacyTypes = []string{"t2", "m3", "m4", "r3", "r4"}
+
+type rdsReservationResolver struct {
+	term          string
+	paymentOption string
+}
+
+// PriceFilter implementation for rdsReservationResolver
+// Allowed values for ReservedInstanceTerm: ["1_year", "3_year"]
+// Allowed values for ReservedInstancePaymentOption: ["all_upfront", "partial_upfront", "no_upfront"]
+// Corner case: When ReservedInstanceTerm is 3_year the only allowed ReservedInstancePaymentOption are ["all_upfront", "partial_upfront"]
+func (r rdsReservationResolver) PriceFilter() (*schema.PriceFilter, error) {
+	purchaseOptionLabel := "reserved"
+	def := &schema.PriceFilter{
+		PurchaseOption: strPtr(purchaseOptionLabel),
+	}
+	termLength := reservedTermsMapping[r.term]
+	purchaseOption := reservedPaymentOptionMapping[r.paymentOption]
+	validTerms := sliceOfKeysFromMap(reservedTermsMapping)
+	if !stringInSlice(validTerms, r.term) {
+		return def, fmt.Errorf("Invalid reserved_instance_term, ignoring reserved options. Expected: %s. Got: %s", strings.Join(validTerms, ", "), r.term)
+	}
+	validOptions := sliceOfKeysFromMap(reservedPaymentOptionMapping)
+	if r.term == "3_year" {
+		validOptions = []string{"partial_upfront", "all_upfront"}
+	}
+	if !stringInSlice(validOptions, r.paymentOption) {
+		return def, fmt.Errorf("Invalid reserved_instance_payment_option, ignoring reserved options. Expected: %s. Got: %s", strings.Join(validOptions, ", "), r.paymentOption)
+	}
+	return &schema.PriceFilter{
+		PurchaseOption:     strPtr(purchaseOptionLabel),
+		StartUsageAmount:   strPtr("0"),
+		TermLength:         strPtr(termLength),
+		TermPurchaseOption: strPtr(purchaseOption),
+	}, nil
 }

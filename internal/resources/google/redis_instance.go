@@ -57,10 +57,10 @@ func (r *RedisInstance) BuildResource() *schema.Resource {
 		Name: r.Address,
 		CostComponents: []*schema.CostComponent{
 			{
-				Name:            name,
-				Unit:            "GB",
-				UnitMultiplier:  decimal.NewFromInt(1),
-				MonthlyQuantity: decimalPtr(decimal.NewFromFloat(memorySize)),
+				Name:           name,
+				Unit:           "GB",
+				UnitMultiplier: schema.HourToMonthUnitMultiplier,
+				HourlyQuantity: decimalPtr(decimal.NewFromFloat(memorySize)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),
 					Region:        strPtr(r.Region),

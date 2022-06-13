@@ -3,6 +3,7 @@ package aws
 import (
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/usage"
 )
 
 // ElasticBeanstalkEnvironment struct represents AWS Elastic Beanstalk environments.
@@ -29,27 +30,27 @@ type ElasticBeanstalkEnvironment struct {
 var ElasticBeanstalkEnvironmentUsageSchema = []*schema.UsageItem{
 	{
 		Key:          "cloudwatch",
-		DefaultValue: CloudwatchLogGroupUsageSchema,
+		DefaultValue: &usage.ResourceUsage{Name: "cloudwatch", Items: CloudwatchLogGroupUsageSchema},
 		ValueType:    schema.SubResourceUsage,
 	},
 	{
 		Key:          "lb",
-		DefaultValue: LBUsageSchema,
+		DefaultValue: &usage.ResourceUsage{Name: "lb", Items: LBUsageSchema},
 		ValueType:    schema.SubResourceUsage,
 	},
 	{
 		Key:          "elb",
-		DefaultValue: ELBUsageSchema,
+		DefaultValue: &usage.ResourceUsage{Name: "elb", Items: ELBUsageSchema},
 		ValueType:    schema.SubResourceUsage,
 	},
 	{
 		Key:          "db",
-		DefaultValue: DBInstanceUsageSchema,
+		DefaultValue: &usage.ResourceUsage{Name: "db", Items: DBInstanceUsageSchema},
 		ValueType:    schema.SubResourceUsage,
 	},
 	{
 		Key:          "ec2",
-		DefaultValue: LaunchConfigurationUsageSchema,
+		DefaultValue: &usage.ResourceUsage{Name: "ec2", Items: LaunchConfigurationUsageSchema},
 		ValueType:    schema.SubResourceUsage,
 	},
 }

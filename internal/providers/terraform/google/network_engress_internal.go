@@ -56,7 +56,7 @@ func networkEgress(region string, u *schema.UsageData, resourceName, prefixName 
 				Region:     strPtr("global"),
 				Service:    strPtr("Cloud Storage"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "description", Value: strPtr("Inter-region GCP Storage egress within EU")},
+					{Key: "description", Value: strPtr("Networking Traffic Egress GCP Inter Region within Europe")},
 				},
 			},
 		})

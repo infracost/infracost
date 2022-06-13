@@ -22,7 +22,7 @@ func TestDiffTerraformPlanJSON(t *testing.T) {
 }
 
 func TestDiffTerraformDirectory(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"diff", "--path", "../../examples/terraform"}, nil)
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"diff", "--path", "../../examples/terraform", "--terraform-force-cli"}, nil)
 }
 
 func TestDiffTerraformShowSkipped(t *testing.T) {
@@ -61,7 +61,42 @@ func TestDiffWithCompareTo(t *testing.T) {
 			"--compare-to",
 			path.Join(dir, "prior.json"),
 		}, &GoldenFileOptions{
-			RunHCL: true,
+			RunTerraformCLI: true,
+		})
+}
+
+func TestDiffWithCompareToFormatJSON(t *testing.T) {
+	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"diff",
+			"--path",
+			dir,
+			"--compare-to",
+			path.Join(dir, "prior.json"),
+			"--format",
+			"json",
+		}, &GoldenFileOptions{
+			RunTerraformCLI: true,
+		},
+	)
+}
+
+func TestDiffWithInfracostJSON(t *testing.T) {
+	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"diff",
+			"--path",
+			path.Join(dir, "current.json"),
+			"--compare-to",
+			path.Join(dir, "prior.json"),
+		}, &GoldenFileOptions{
+			RunTerraformCLI: true,
 		})
 }
 
@@ -90,7 +125,7 @@ projects:
 			"--compare-to",
 			path.Join(dir, "prior.json"),
 		}, &GoldenFileOptions{
-			RunHCL: true,
+			RunTerraformCLI: true,
 		})
 }
 
@@ -117,8 +152,16 @@ projects:
 			"--compare-to",
 			path.Join(dir, "prior.json"),
 		}, &GoldenFileOptions{
-			RunHCL: true,
+			RunTerraformCLI: true,
 		})
+}
+
+func TestDiffCompareToError(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"diff", "--path", "../../examples/terraform"}, nil)
+}
+
+func TestDiffCompareToErrorTerragrunt(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"diff", "--path", "../../examples/terragrunt"}, nil)
 }
 
 func TestDiffTerraformUsageFile(t *testing.T) {
@@ -126,11 +169,11 @@ func TestDiffTerraformUsageFile(t *testing.T) {
 }
 
 func TestDiffTerragrunt(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"diff", "--path", "../../examples/terragrunt"}, nil)
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"diff", "--path", "../../examples/terragrunt", "--terraform-force-cli"}, nil)
 }
 
 func TestDiffTerragruntNested(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"diff", "--path", "../../examples"}, nil)
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"diff", "--path", "../../examples", "--terraform-force-cli"}, nil)
 }
 
 func TestDiffWithTarget(t *testing.T) {

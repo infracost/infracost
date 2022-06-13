@@ -1,9 +1,10 @@
 package azure
 
 import (
-	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 func GetAzureRMAppNATGatewayRegistryItem() *schema.RegistryItem {
@@ -49,7 +50,7 @@ func NATGatewayCostComponent(name, region string) *schema.CostComponent {
 			Service:       strPtr("NAT Gateway"),
 			ProductFamily: strPtr("Networking"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "meterName", Value: strPtr("Gateway")},
+				{Key: "meterName", Value: strPtr("Standard Gateway")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -70,7 +71,7 @@ func DataProcessedCostComponent(name, region string, monthlyDataProcessedGb *dec
 			Service:       strPtr("NAT Gateway"),
 			ProductFamily: strPtr("Networking"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "meterName", Value: strPtr("Data Processed")},
+				{Key: "meterName", Value: strPtr("Standard Data Processed")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

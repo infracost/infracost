@@ -5,28 +5,28 @@
 </p>
 <p align="center">
 <a href="https://www.infracost.io/docs/"><img alt="Docs" src="https://img.shields.io/badge/docs-get%20started-brightgreen"/></a>
-<img alt="Docker pulls" src="https://img.shields.io/docker/pulls/infracost/infracost"/>
+<img alt="Docker pulls" src="https://img.shields.io/docker/pulls/infracost/infracost?style=plastic"/>
 <a href="https://www.infracost.io/community-chat"><img alt="Community Slack channel" src="https://img.shields.io/badge/chat-slack-%234a154b"/></a>
 <a href="https://twitter.com/intent/tweet?text=Get%20cost%20estimates%20for%20Terraform%20in%20pull%20requests!&url=https://www.infracost.io&hashtags=cloud,cost,terraform"><img alt="tweet" src="https://img.shields.io/twitter/url/http/shields.io.svg?style=social"/></a>
 </p>
 
 ## Get started
 
-Follow our [**quick start guide**](https://www.infracost.io/docs/#quick-start) to get started with the CLI 🚀
+Follow our [**quick start guide**](https://www.infracost.io/docs/#quick-start) to get started 🚀
 
-Infracost has many [CI/CD integrations](https://www.infracost.io/docs/integrations/cicd/) so you can easily post cost estimates in pull requests. This provides your team with a safety net as people can discuss costs as part of the workflow.
+Infracost also has many CI/CD integrations so you can easily post cost estimates in pull requests. This provides your team with a safety net as people can discuss costs as part of the workflow.
 
 #### Post cost estimates in pull requests
 
 <img src=".github/assets/github_actions_screenshot.png" alt="Infracost in GitHub Actions" width=700 />
 
-#### Show `diff` of monthly costs between current and planned state in CLI
-
-<img src=".github/assets/diff_screenshot.png" alt="Infracost diff command" width=600 />
-
-#### Show `breakdown` of costs in CLI
+#### Output of `infracost breakdown`
 
 <img src=".github/assets/breakdown_screenshot.png" alt="Infracost breakdown command" width=600 />
+
+#### `infracost diff` shows diff of monthly costs between current and planned state
+
+<img src=".github/assets/diff_screenshot.png" alt="Infracost diff command" width=600 />
 
 ## Supported clouds and resources
 
@@ -36,7 +36,7 @@ Infracost can also estimate [usage-based resources](https://www.infracost.io/doc
 
 ## Community and contributing
 
-Join our [community Slack channel](https://www.infracost.io/community-chat) to learn more about cost estimation, Infracost, and to connect with other users and contributors. Our next community call is on [13 April 2022](https://github.com/infracost/infracost/issues/1549).
+Join our [community Slack channel](https://www.infracost.io/community-chat) to learn more about cost estimation, Infracost, and to connect with other users and contributors. Checkout the [pinned issues](https://github.com/infracost/infracost/issues) for our next community call or [our YouTube](https://www.youtube.com/playlist?list=PLZHI9QofNPJQS9Hz0P5zfsl0AC03llbMY) for previous calls.
 
 We ❤️ contributions big or small. For development details, see the [contributing](CONTRIBUTING.md) guide. For major changes, including CLI interface changes, please open an issue first to discuss what you would like to change.
 

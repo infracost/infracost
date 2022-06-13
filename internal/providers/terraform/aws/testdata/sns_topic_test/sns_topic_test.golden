@@ -5,6 +5,10 @@
  ├─ FIFO Publish API requests                            Monthly cost depends on usage: $0.30 per 1M requests          
  └─ FIFO Publish API payload                             Monthly cost depends on usage: $0.017 per GB                  
                                                                                                                        
+ aws_sns_topic.sns_fifo_topic_another_region                                                                           
+ ├─ FIFO Publish API requests                            Monthly cost depends on usage: $0.33 per 1M requests          
+ └─ FIFO Publish API payload                             Monthly cost depends on usage: $0.0187 per GB                 
+                                                                                                                       
  aws_sns_topic.sns_fifo_topic_withSubscriptions                                                                        
  ├─ FIFO Publish API requests                            Monthly cost depends on usage: $0.30 per 1M requests          
  ├─ FIFO Publish API payload                             Monthly cost depends on usage: $0.017 per GB                  
@@ -22,6 +26,15 @@
  └─ FIFO notification payload                                            384  GB                                 $0.38 
                                                                                                                        
  aws_sns_topic.sns_topic                                                                                               
+ ├─ API requests (over 1M)                               Monthly cost depends on usage: $0.50 per 1M requests          
+ ├─ HTTP/HTTPS notifications (over 100k)                 Monthly cost depends on usage: $0.06 per 100k notifications   
+ ├─ Email/Email-JSON notifications (over 1k)             Monthly cost depends on usage: $2.00 per 100k notifications   
+ ├─ Kinesis Firehose notifications                       Monthly cost depends on usage: $0.19 per 1M notifications     
+ ├─ Mobile Push notifications                            Monthly cost depends on usage: $0.50 per 1M notifications     
+ ├─ MacOS notifications                                  Monthly cost depends on usage: $0.50 per 1M notifications     
+ └─ SMS notifications (over 100)                         Monthly cost depends on usage: $0.75 per 100 notifications    
+                                                                                                                       
+ aws_sns_topic.sns_topic_another_region                                                                                
  ├─ API requests (over 1M)                               Monthly cost depends on usage: $0.50 per 1M requests          
  ├─ HTTP/HTTPS notifications (over 100k)                 Monthly cost depends on usage: $0.06 per 100k notifications   
  ├─ Email/Email-JSON notifications (over 1k)             Monthly cost depends on usage: $2.00 per 100k notifications   
@@ -52,7 +65,7 @@
                                                                                                                        
  OVERALL TOTAL                                                                                                  $34.13 
 ──────────────────────────────────
-16 cloud resources were detected:
-∙ 11 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+18 cloud resources were detected:
+∙ 13 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 5 were free:
   ∙ 5 x aws_sns_topic_subscription

@@ -5,6 +5,7 @@ import (
 
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
+	"github.com/tidwall/gjson"
 )
 
 var HourToMonthUnitMultiplier = decimal.NewFromInt(730)
@@ -25,6 +26,7 @@ type Resource struct {
 	UsageSchema       []*UsageItem
 	EstimateUsage     EstimateFunc
 	EstimationSummary map[string]bool
+	Metadata          map[string]gjson.Result
 }
 
 func CalculateCosts(project *Project) {

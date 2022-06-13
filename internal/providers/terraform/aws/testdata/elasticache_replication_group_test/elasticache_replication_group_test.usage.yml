@@ -2,3 +2,7 @@ version: 0.1
 resource_usage:
   aws_appautoscaling_target.autoscale_node_groups_usage:
     capacity: 10
+  aws_elasticache_replication_group.cluster_reserved:
+    capacity: 10
+    reserved_instance_term: 3_year
+    reserved_instance_payment_option: all_upfront

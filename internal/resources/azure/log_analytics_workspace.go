@@ -76,10 +76,12 @@ type LogAnalyticsWorkspace struct {
 
 	ReservationCapacityInGBPerDay int64
 	RetentionInDays               int64
+	SentinelEnabled               bool
 
 	MonthlyLogDataIngestionGB           *float64 `infracost_usage:"monthly_log_data_ingestion_gb"`
 	MonthlyAdditionalLogDataRetentionGB *float64 `infracost_usage:"monthly_additional_log_data_retention_gb"`
 	MonthlyLogDataExportGB              *float64 `infracost_usage:"monthly_log_data_export_gb"`
+	MonthlySentinelDataIngestionGB      *float64 `infracost_usage:"monthly_sentinel_data_ingestion_gb"`
 }
 
 // LogAnalyticsWorkspaceUsageSchema defines a list which represents the usage schema of LogAnalyticsWorkspace.
@@ -99,6 +101,11 @@ var LogAnalyticsWorkspaceUsageSchema = []*schema.UsageItem{
 		DefaultValue: 0,
 		ValueType:    schema.Float64,
 	},
+	{
+		Key:          "monthly_sentinel_data_ingestion_gb",
+		DefaultValue: 0,
+		ValueType:    schema.Float64,
+	},
 }
 
 // PopulateUsage parses the u schema.UsageData into the LogAnalyticsWorkspace.
@@ -108,7 +115,7 @@ func (r *LogAnalyticsWorkspace) PopulateUsage(u *schema.UsageData) {
 }
 
 // BuildResource builds a schema.Resource from a valid LogAnalyticsWorkspace struct.
-// The returned schema.Resource can have 3 potential schema.CostComponent associated with it:
+// The returned schema.Resource can have 4 potential schema.CostComponent associated with it:
 //
 //		1. Log data ingestion, which can be either:
 //			a) Pay-as-you-go, which is only valid for a sku of PerGB2018 and uses a usage param
@@ -116,6 +123,7 @@ func (r *LogAnalyticsWorkspace) PopulateUsage(u *schema.UsageData) {
 //		2. Log retention, which is free up to 31 days. Data retained beyond these no-charge periods
 //		   will be charged for each GB of data retained for a month (pro-rated daily).
 //		3. Data export, which is billed per monthly GB exported and is defined from a usage param.
+//		4. Sentinel data ingestion if Sentinel usage is detected.
 //
 // Outside the above rules - if the workspace has sku of Free we return as a free resource & if the workspace sku
 // is in a list of unsupported skus then we mark as skipped with a warning.
@@ -142,11 +150,19 @@ func (r *LogAnalyticsWorkspace) BuildResource() *schema.Resource {
 	var costComponents []*schema.CostComponent
 
 	if r.SKU == skuPerGB2018 {
-		costComponents = append(costComponents, r.logDataIngestion())
+		costComponents = append(costComponents, r.logDataIngestion("Log data ingestion", r.MonthlyLogDataIngestionGB))
+
+		if r.SentinelEnabled {
+			costComponents = append(costComponents, r.logDataIngestion("Sentinel data ingestion", r.MonthlySentinelDataIngestionGB))
+		}
 	}
 
 	if r.SKU == skuCapacityReservation && r.ReservationCapacityInGBPerDay > 0 {
-		costComponents = append(costComponents, r.logDataIngestionFromCapacityReservation())
+		costComponents = append(costComponents, r.logDataIngestionFromCapacityReservation("Log data ingestion"))
+
+		if r.SentinelEnabled {
+			costComponents = append(costComponents, r.logDataIngestionFromCapacityReservation("Sentinel data ingestion"))
+		}
 	}
 
 	if r.RetentionInDays > logRetentionFreeTierLimit {
@@ -162,7 +178,7 @@ func (r *LogAnalyticsWorkspace) BuildResource() *schema.Resource {
 	}
 }
 
-func (r *LogAnalyticsWorkspace) logDataIngestionFromCapacityReservation() *schema.CostComponent {
+func (r *LogAnalyticsWorkspace) logDataIngestionFromCapacityReservation(name string) *schema.CostComponent {
 	selectedTier := r.ReservationCapacityInGBPerDay
 
 	// if the user has set a reservation capacity tier that doesn't exist (or is a legacy tier) we need
@@ -185,7 +201,7 @@ func (r *LogAnalyticsWorkspace) logDataIngestionFromCapacityReservation() *schem
 	}
 
 	return &schema.CostComponent{
-		Name:            "Log data ingestion",
+		Name:            name,
 		Unit:            fmt.Sprintf("%d GB (per day)", selectedTier),
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: decimalPtr(decimal.NewFromFloat(30)),
@@ -203,14 +219,14 @@ func (r *LogAnalyticsWorkspace) logDataIngestionFromCapacityReservation() *schem
 	}
 }
 
-func (r *LogAnalyticsWorkspace) logDataIngestion() *schema.CostComponent {
+func (r *LogAnalyticsWorkspace) logDataIngestion(name string, monthlyData *float64) *schema.CostComponent {
 	var quantity *decimal.Decimal
-	if r.MonthlyLogDataIngestionGB != nil {
-		quantity = decimalPtr(decimal.NewFromFloat(*r.MonthlyLogDataIngestionGB))
+	if monthlyData != nil {
+		quantity = decimalPtr(decimal.NewFromFloat(*monthlyData))
 	}
 
 	return &schema.CostComponent{
-		Name:            "Log data ingestion",
+		Name:            name,
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: quantity,
@@ -221,7 +237,7 @@ func (r *LogAnalyticsWorkspace) logDataIngestion() *schema.CostComponent {
 			ProductFamily: strPtr(governanceProductFamily),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "skuName", Value: strPtr(skuFilterPAYG)},
-				{Key: "meterName", Value: strPtr("Data Ingestion")},
+				{Key: "meterName", ValueRegex: strPtr("/Data Ingestion/i")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -249,7 +265,7 @@ func (r *LogAnalyticsWorkspace) logDataRetention() *schema.CostComponent {
 			ProductFamily: strPtr(governanceProductFamily),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "skuName", Value: strPtr(skuFilterPAYG)},
-				{Key: "meterName", Value: strPtr("Data Retention")},
+				{Key: "meterName", ValueRegex: strPtr("/Data Retention/i")},
 			},
 		},
 		PriceFilter: priceFilterConsumption,

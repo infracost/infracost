@@ -41,7 +41,50 @@ func TestBreakdownTerraformPlanJSON(t *testing.T) {
 }
 
 func TestBreakdownTerraformDirectory(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terraform"}, &GoldenFileOptions{RunHCL: true})
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terraform"}, &GoldenFileOptions{RunTerraformCLI: true})
+}
+
+func TestBreakdownMultiProjectAutodetect(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", dir,
+		}, nil,
+	)
+}
+
+func TestBreakdownMultiProjectSkipPaths(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", dir,
+			"--exclude-path", "glob/*/shown",
+			"--exclude-path", "ignored",
+		}, nil,
+	)
+}
+
+func TestBreakdownMultiProjectSkipPathsRootLevel(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", dir,
+			"--exclude-path", "dev",
+			"--exclude-path", "prod",
+		}, nil,
+	)
 }
 
 func TestBreakdownTerraformDirectoryWithDefaultVarFiles(t *testing.T) {
@@ -55,8 +98,9 @@ func TestBreakdownTerraformDirectoryWithDefaultVarFiles(t *testing.T) {
 				"breakdown",
 				"--path", dir,
 				"--terraform-plan-flags", "-var-file=input.tfvars -var=block2_ebs_volume_size=2000 -var block2_volume_type=io1",
+				"--terraform-force-cli",
 			},
-			&GoldenFileOptions{RunHCL: true},
+			nil,
 		)
 	})
 
@@ -71,14 +115,44 @@ func TestBreakdownTerraformDirectoryWithDefaultVarFiles(t *testing.T) {
 				"--terraform-var", "block2_ebs_volume_size=2000",
 				"--terraform-var", "block2_volume_type=io1",
 			},
-			&GoldenFileOptions{OnlyRunHCL: true},
+			nil,
 		)
 	})
+
+	t.Run("with hcl TF_VAR env variables", func(t *testing.T) {
+		GoldenFileCommandTest(
+			t,
+			testName,
+			[]string{
+				"breakdown",
+				"--path", dir,
+				"--terraform-var-file", "input.tfvars",
+			},
+			&GoldenFileOptions{
+				Env: map[string]string{
+					"TF_VAR_block2_ebs_volume_size": "2000",
+					"TF_VAR_block2_volume_type":     "io1",
+				},
+			},
+		)
+	})
+
+	// t.Run("with hcl TF_VAR env variables in config file", func(t *testing.T) {
+	//	GoldenFileCommandTest(
+	//		t,
+	//		testName,
+	//		[]string{
+	//			"breakdown",
+	//			"--config-file", path.Join(dir, "infracost-config.yml"),
+	//		},
+	//		nil,
+	//	)
+	// })
 }
 
 func TestBreakdownTerraformDirectoryWithRecursiveModules(t *testing.T) {
 	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", dir}, &GoldenFileOptions{RunHCL: true})
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", dir}, &GoldenFileOptions{RunTerraformCLI: true})
 }
 
 func TestBreakdownTerraformFieldsAll(t *testing.T) {
@@ -162,9 +236,7 @@ func TestBreakdownInvalidPath(t *testing.T) {
 }
 
 func TestBreakdownPlanError(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../..//examples/terraform", "--terraform-plan-flags", "-var-file=invalid"}, nil, func(ctx *config.RunContext) {
-		ctx.Config.DisableHCLParsing = true
-	})
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../..//examples/terraform", "--terraform-plan-flags", "-var-file=invalid", "--terraform-force-cli"}, &GoldenFileOptions{CaptureLogs: true})
 }
 
 func TestBreakdownTerragrunt(t *testing.T) {
@@ -178,15 +250,41 @@ func TestBreakdownTerragruntWithDashboardEnabled(t *testing.T) {
 }
 
 func TestBreakdownTerragruntHCLSingle(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terragrunt/prod", "--terraform-parse-hcl"}, nil)
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terragrunt/prod"}, nil)
 }
 
 func TestBreakdownTerragruntHCLMulti(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terragrunt", "--terraform-parse-hcl"}, nil)
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terragrunt"}, nil)
+}
+
+func TestBreakdownTerragruntHCLDepsOutput(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())}, nil)
+}
+
+func TestBreakdownTerragruntSkipPaths(t *testing.T) {
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+			"--exclude-path", "glob/*/ignored",
+			"--exclude-path", "ignored",
+		},
+		nil,
+	)
+}
+
+func TestBreakdownTerragruntHCLDepsOutputInclude(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()+"/dev")}, nil)
+}
+
+func TestBreakdownTerragruntHCLDepsOutputSingleProject(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()+"/dev")}, nil)
 }
 
 func TestBreakdownTerragruntHCLMultiNoSource(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/breakdown_terragrunt_hclmulti_no_source/example", "--terraform-parse-hcl"}, nil)
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/breakdown_terragrunt_hclmulti_no_source/example"}, nil)
 }
 
 func TestBreakdownTerragruntNested(t *testing.T) {
@@ -237,8 +335,5 @@ func TestBreakdownInitFlagsError(t *testing.T) {
 			"-plugin-dir=does/not/exist",
 		},
 		nil,
-		func(ctx *config.RunContext) {
-			ctx.Config.DisableHCLParsing = true
-		},
 	)
 }

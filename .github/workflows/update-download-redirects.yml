@@ -11,18 +11,6 @@ on:
         required: true
       AWS_SECRET_ACCESS_KEY:
         required: true
-  workflow_dispatch:
-    inputs:
-      version:
-        required: true
-        type: string
-    secrets:
-      AMPLIFY_APP_ID:
-        required: true
-      AWS_ACCESS_KEY_ID:
-        required: true
-      AWS_SECRET_ACCESS_KEY:
-        required: true
 jobs:
   update:
     name: Update Download Redirects

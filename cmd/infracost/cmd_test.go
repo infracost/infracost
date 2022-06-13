@@ -27,10 +27,11 @@ type GoldenFileOptions = struct {
 	Currency    string
 	CaptureLogs bool
 	IsJSON      bool
-	// RunHCL sets the cmd test to also run the cmd with --terraform-parse-hcl set
-	RunHCL bool
-	// OnlyRunHCL sets the cmd test to only run cmd with --terraform-parse-hcl set and ignore the Terraform binary.
-	OnlyRunHCL bool
+	Env         map[string]string
+	// RunTerraformCLI sets the cmd test to also run the cmd with --terraform-force-cli set
+	RunTerraformCLI bool
+	// OnlyRunTerraformCLI sets the cmd test to only run cmd with --terraform-force-cli set and ignores the HCL parsing.
+	OnlyRunTerraformCLI bool
 }
 
 func DefaultOptions() *GoldenFileOptions {
@@ -42,20 +43,19 @@ func DefaultOptions() *GoldenFileOptions {
 }
 
 func GoldenFileCommandTest(t *testing.T, testName string, args []string, testOptions *GoldenFileOptions, ctxOptions ...func(ctx *config.RunContext)) {
-	if testOptions != nil && (testOptions.RunHCL || testOptions.OnlyRunHCL) {
+	if testOptions == nil || !testOptions.OnlyRunTerraformCLI {
 		t.Run("HCL", func(t *testing.T) {
-			hclArgs := make([]string, len(args)+2)
-			copy(hclArgs, args)
-			hclArgs[len(args)] = "--terraform-parse-hcl"
-			hclArgs[len(args)+1] = "true"
-
-			goldenFileCommandTest(t, testName, hclArgs, testOptions, true, ctxOptions...)
+			goldenFileCommandTest(t, testName, args, testOptions, true, ctxOptions...)
 		})
 	}
 
-	if testOptions == nil || !testOptions.OnlyRunHCL {
-		t.Run("Terraform CLI", func(t *testing.T) {
-			goldenFileCommandTest(t, testName, args, testOptions, false, ctxOptions...)
+	if testOptions != nil && (testOptions.RunTerraformCLI || testOptions.OnlyRunTerraformCLI) {
+		t.Run("CLI", func(t *testing.T) {
+			tfCLIArgs := make([]string, len(args)+2)
+			copy(tfCLIArgs, args)
+			tfCLIArgs[len(args)] = "--terraform-force-cli"
+			tfCLIArgs[len(args)+1] = "true"
+			goldenFileCommandTest(t, testName, tfCLIArgs, testOptions, false, ctxOptions...)
 		})
 	}
 }
@@ -66,6 +66,12 @@ func goldenFileCommandTest(t *testing.T, testName string, args []string, testOpt
 	if testOptions == nil {
 		testOptions = DefaultOptions()
 	}
+
+	for k, v := range testOptions.Env {
+		os.Setenv(k, v)
+		defer os.Unsetenv(k)
+	}
+
 	// Fix the VCS repo URL so the golden files don't fail on forks
 	os.Setenv("INFRACOST_VCS_REPOSITORY_URL", "https://github.com/infracost/infracost")
 	os.Setenv("INFRACOST_VCS_PULL_REQUEST_URL", "NOT_APPLICABLE")

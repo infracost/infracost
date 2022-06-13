@@ -2,6 +2,11 @@ include {
   path = find_in_parent_folders()
 }
 
+dependency "dev" {
+  config_path = "../dev"
+  # skip_outputs = true
+}
+
 //terraform {
 //  source = "..//modules/example"
 //}

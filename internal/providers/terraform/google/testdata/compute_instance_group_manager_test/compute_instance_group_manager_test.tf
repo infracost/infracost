@@ -20,6 +20,13 @@ resource "google_compute_instance_template" "appserver" {
     disk_size_gb = "375"
   }
 
+  disk {
+    interface    = "NVME"
+    type         = "SCRATCH"
+    disk_type    = "local-ssd"
+    disk_size_gb = "375"
+  }
+
   guest_accelerator {
     type  = "nvidia-tesla-k80"
     count = 2

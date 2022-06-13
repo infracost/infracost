@@ -1,0 +1,21 @@
+
+ Name                                                                                                  Monthly Qty  Unit            Monthly Cost 
+                                                                                                                                                 
+ azurerm_log_analytics_workspace.sentinel_data_connector_microsoft_cloud_app_security                                                            
+ ├─ Log data ingestion                                                                               Monthly cost depends on usage: $2.99 per GB 
+ ├─ Sentinel data ingestion                                                                          Monthly cost depends on usage: $2.99 per GB 
+ └─ Log data export                                                                                  Monthly cost depends on usage: $0.13 per GB 
+                                                                                                                                                 
+ azurerm_log_analytics_workspace.sentinel_data_connector_microsoft_cloud_app_security_with_solution                                              
+ ├─ Log data ingestion                                                                               Monthly cost depends on usage: $2.99 per GB 
+ ├─ Sentinel data ingestion                                                                          Monthly cost depends on usage: $2.99 per GB 
+ └─ Log data export                                                                                  Monthly cost depends on usage: $0.13 per GB 
+                                                                                                                                                 
+ OVERALL TOTAL                                                                                                                             $0.00 
+──────────────────────────────────
+6 cloud resources were detected:
+∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 4 were free:
+  ∙ 2 x azurerm_sentinel_data_connector_microsoft_cloud_app_security
+  ∙ 1 x azurerm_log_analytics_solution
+  ∙ 1 x azurerm_resource_group
