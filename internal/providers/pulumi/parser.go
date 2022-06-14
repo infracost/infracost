@@ -103,7 +103,7 @@ func (p *Parser) parsePreviewDigest(t types.PreviewDigest, usage map[string]*sch
 		p.loadInfracostProviderUsageData(usage, refResources)
 		if r := p.createResource(resourceData, usageData); r != nil {
 			if step.Op == "same" {
-				pastResources = append(resources, r)
+				pastResources = append(pastResources, r)
 			} else if step.Op == "create" {
 				resources = append(resources, r)
 			}
@@ -216,7 +216,7 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf g
 		for _, attr := range refAttrs {
 			// Get any values for the fields and check if they map to IDs or ARNs of any resources
 			// Replaced refExists with _ as we only need to know the attribute exists
-			for i, refExists := range d.RawValues.Get(fmt.Sprintf(`%s`, attr)).Array() {
+			for i, refExists := range d.RawValues.Get(attr).Array() {
 				// log.Debugf("i %s, attr %s, refVal %s", i, fmt.Sprintf(`newState.inputs.%s`, attr), refExists)
 				log.Debugf("Searching for %s", refExists)
 				attrFirst := strings.Split(attr, ".")[0]

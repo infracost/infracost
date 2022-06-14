@@ -30,7 +30,6 @@ func getInstanceRegistryItem() *schema.RegistryItem {
 
 func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 
-	log.Debugf("resources %s", d)
 	purchaseOption := "on_demand"
 	if d.Get("spot_price").String() != "" {
 		purchaseOption = "spot"
