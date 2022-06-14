@@ -76,7 +76,7 @@ func (a AuthClient) startCallbackServer(listener net.Listener, generatedState st
 	}()
 
 	go func() {
-		http.Serve(listener, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_ = http.Serve(listener, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 			if r.Method == http.MethodOptions {
 				return
 			}
