@@ -76,7 +76,7 @@ func (a AuthClient) startCallbackServer(listener net.Listener, generatedState st
 	err := http.Serve(listener, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Access-Control-Allow-Origin", a.Host)
 		w.Header().Set("Access-Control-Allow-Methods", "GET")
-		w.Header().Set("Access-Control-Allow-Headers", "Sentry-Trace")
+		w.Header().Set("Access-Control-Allow-Headers", "*")
 
 		if r.Method == http.MethodOptions {
 			return
