@@ -49,7 +49,7 @@ type hclRunDiff struct {
 }
 
 func addRunFlags(cmd *cobra.Command) {
-	cmd.Flags().StringSlice("terraform-var-file", nil, "Load variable files, similar to Terraform's -var-file flag.")
+	cmd.Flags().StringSlice("terraform-var-file", nil, "Load variable files, similar to Terraform's -var-file flag. Provided files must be relative to the --path flag.")
 	cmd.Flags().StringSlice("terraform-var", nil, "Set value for an input variable, similar to Terraform's -var flag.")
 	cmd.Flags().StringP("path", "p", "", "Path to the Terraform directory or JSON/plan file")
 
@@ -364,6 +364,13 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 	}
 
 	ctx.SetContextValue("projectType", provider.Type())
+
+	projectTypes := []interface{}{}
+	if t, ok := ctx.RunContext.ContextValues()["projectTypes"]; ok {
+		projectTypes = t.([]interface{})
+	}
+	projectTypes = append(projectTypes, provider.Type())
+	ctx.RunContext.SetContextValue("projectTypes", projectTypes)
 
 	if r.cmd.Name() == "diff" && provider.Type() == "terraform_state_json" {
 		m := "Cannot use Terraform state JSON with the infracost diff command.\n\n"

@@ -410,7 +410,7 @@ func createTerraformProject(t *testing.T, tfProject TerraformProject) string {
 		err := copyInitCacheToPath(initCache, tmpDir)
 		require.NoError(t, err)
 	} else {
-		t.Log(fmt.Sprintf("Couldn't copy terraform init cache from %s", initCache))
+		t.Logf("Couldn't copy terraform init cache from %s", initCache)
 	}
 
 	tfdir, err := CreateTerraformProject(tmpDir, tfProject)
