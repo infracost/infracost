@@ -407,8 +407,9 @@ func loadVarFile(filename string) (map[string]cty.Value, error) {
 	_, err := os.Stat(filename)
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
-			return nil, fmt.Errorf("Passed var file does not exist: %s", filename)
+			return nil, fmt.Errorf("Passed var file does not exist: %s. Make sure you are passing the var file path relative to the --path flag.", filename)
 		}
+
 		return nil, fmt.Errorf("Could not stat var file: %s", err)
 	}
 
