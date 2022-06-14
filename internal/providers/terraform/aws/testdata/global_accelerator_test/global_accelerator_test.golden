@@ -1,10 +1,10 @@
 
- Name                                         Monthly Qty  Unit   Monthly Cost 
-                                                                               
- Example                                                                       
- └─ AWS Global Accelerator Example Fixed Fee          730  hours        $18.25 
-                                                                               
- OVERALL TOTAL                                                          $18.25 
+ Name          Monthly Qty  Unit   Monthly Cost 
+                                                
+ Example                                        
+ └─ Fixed Fee          730  hours        $18.25 
+                                                
+ OVERALL TOTAL                           $18.25 
 ──────────────────────────────────
 1 cloud resource was detected:
 ∙ 1 was estimated

@@ -1,7 +1,6 @@
 package aws
 
 import (
-	"fmt"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 )
@@ -18,7 +17,7 @@ type GlobalAccelerator struct {
 func (r *GlobalAccelerator) BuildResource() *schema.Resource {
 	var costComponents []*schema.CostComponent
 	costComponent := &schema.CostComponent{
-		Name:           fmt.Sprintf("AWS Global Accelerator %s Fixed Fee", r.Name),
+		Name:           "Fixed Fee",
 		Unit:           "hours",
 		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
