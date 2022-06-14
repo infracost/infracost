@@ -8,7 +8,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zclconf/go-cty/cty"
@@ -148,11 +147,11 @@ output "loadbalancer"  {
 	require.NotNil(t, label)
 	mockedVal := label.GetAttribute("value").Value()
 	require.Equal(t, cty.String, mockedVal.Type())
-	assertUUID(t, mockedVal.AsString())
+	assert.Equal(t, "value-mock", mockedVal.AsString())
 
 	mockedVarObj := label.GetAttribute("value_nested").Value()
 	require.Equal(t, cty.String, mockedVarObj.Type())
-	assertUUID(t, mockedVarObj.AsString())
+	assert.Equal(t, "value_nested-mock", mockedVarObj.AsString())
 
 	output := blocks.Matching(BlockMatcher{Label: "exp", Type: "output"})
 	require.NotNil(t, output)
@@ -173,9 +172,9 @@ output "loadbalancer"  {
 		pieces := strings.Split(k, ":")
 		require.Len(t, pieces, 2)
 
-		assertUUID(t, pieces[0])
-		assertUUID(t, pieces[1])
-		assertUUID(t, v.AsString())
+		assert.Equal(t, "value-mock", pieces[0])
+		assert.Equal(t, "value-mock", pieces[1])
+		assert.Equal(t, "value-mock", v.AsString())
 	}
 
 	require.Len(t, keys, 1)
@@ -223,7 +222,7 @@ output "exp2" {
 	require.True(t, mockedObj.Type().IsObjectType())
 	asMap := mockedObj.AsValueMap()
 	assert.Len(t, asMap, 1)
-	assertUUID(t, asMap["astring"].AsString())
+	assert.Equal(t, "value-mock", asMap["astring"].AsString())
 
 	output = blocks.Matching(BlockMatcher{Label: "exp2", Type: "output"})
 	require.NotNil(t, output)
@@ -233,35 +232,25 @@ output "exp2" {
 	asMap = mockedObj.AsValueMap()
 	assert.Len(t, asMap, 1)
 	for k, v := range asMap {
-		assertUUID(t, k)
-		assertUUID(t, v.AsString())
+		assert.Equal(t, "value-mock", k)
+		assert.Equal(t, "value-mock", v.AsString())
 	}
 }
 
-func Test_UnsupportedAttributesList(t *testing.T) {
+func Test_UnsupportedAttributesInForeachIf(t *testing.T) {
 	path := createTestFile("test.tf", `
 
-resource "with_unsupported_attr" "test" {
-	name = "mittens"
-	special = true
-	my_number = 4
+data "google_compute_instance" "default" {
+  count = 1
+  name = "primary-application-server"
+  zone = "us-central1-a"
 }
 
-locals {
-	names = "astring"
-}
-
-output "exp" {
+output "instances" {
   value = {
-    for name in local.names :
-      name => with_unsupported_attr.test.does_not_exist
-  }
-}
-
-output "exp2" {
-  value = {
-    for name in local.nothing :
-      name => with_unsupported_attr.test.does_not_exist
+    for instance in data.google_compute_instance.default :
+    instance.name => instance.network_interface[0].network_ip
+    if instance.network_interface[0].network_ip != null
   }
 }
 `)
@@ -272,26 +261,15 @@ output "exp2" {
 
 	blocks := module.Blocks
 
-	output := blocks.Matching(BlockMatcher{Label: "exp", Type: "output"})
+	output := blocks.Matching(BlockMatcher{Label: "instances", Type: "output"})
 	require.NotNil(t, output)
 	attr := output.GetAttribute("value")
 	mockedObj := attr.Value()
 	require.True(t, mockedObj.Type().IsObjectType())
+
 	asMap := mockedObj.AsValueMap()
 	assert.Len(t, asMap, 1)
-	assertUUID(t, asMap["astring"].AsString())
-
-	output = blocks.Matching(BlockMatcher{Label: "exp2", Type: "output"})
-	require.NotNil(t, output)
-	attr = output.GetAttribute("value")
-	mockedObj = attr.Value()
-	require.True(t, mockedObj.Type().IsObjectType())
-	asMap = mockedObj.AsValueMap()
-	assert.Len(t, asMap, 1)
-	for k, v := range asMap {
-		assertUUID(t, k)
-		assertUUID(t, v.AsString())
-	}
+	assert.Equal(t, "value-mock", asMap["primary-application-server"].AsString())
 }
 
 func Test_UnsupportedAttributesSplatOperator(t *testing.T) {
@@ -331,7 +309,49 @@ resource "other_resource" "test" {
 	assert.Len(t, pieces, 8)
 
 	for _, piece := range pieces {
-		assertUUID(t, piece)
+		assert.Equal(t, "task_definition-mock", piece)
+	}
+}
+
+func Test_UnsupportedSplat(t *testing.T) {
+	path := createTestFile("test.tf", `
+
+data "mydata" "default" {
+  zone = "us-central1-a"
+}
+
+resource "aws_subnet" "private" {
+	count = data.mydata.default.enabled != null ? 2 : 0 
+	cidr_block = "10.0.1.0/24"
+}
+
+output "private_subnets_cidr_blocks" {
+  description = "List of cidr_blocks of private subnets"
+  value       = aws_subnet.private.*.cidr_block
+}
+
+output "attr_not_exists" {
+  description = "List of cidr_blocks of private subnets"
+  value       = aws_subnet.private.*.test
+}
+
+`)
+
+	parser := newParser(filepath.Dir(path))
+	module, err := parser.ParseDirectory()
+	require.NoError(t, err)
+
+	blocks := module.Blocks
+
+	output := blocks.Matching(BlockMatcher{Label: "private_subnets_cidr_blocks", Type: "output"})
+	require.NotNil(t, output)
+	attr := output.GetAttribute("value")
+	mockedVal := attr.Value()
+	require.True(t, mockedVal.Type().IsTupleType())
+	list := mockedVal.AsValueSlice()
+	assert.Len(t, list, 2)
+	for _, value := range list {
+		assert.Equal(t, "10.0.1.0/24", value.AsString())
 	}
 }
 
@@ -367,15 +387,8 @@ resource "other_resource" "test" {
 	attr := output.GetAttribute("task_definition")
 	mockedVal := attr.Value()
 	for _, v := range strings.Split(mockedVal.AsString(), ":") {
-		assertUUID(t, v)
+		assert.Equal(t, "task_definition-mock", v)
 	}
-}
-
-func assertUUID(t *testing.T, val string) {
-	t.Helper()
-
-	_, err := uuid.Parse(val)
-	assert.NoError(t, err)
 }
 
 func Test_UnsupportedAttributesMap(t *testing.T) {
@@ -433,8 +446,8 @@ output "serviceendpoint_principals" {
 	_, ok = asMap["prod"]
 	assert.True(t, ok)
 
-	assertUUID(t, asMap["dev"].AsString())
-	assertUUID(t, asMap["prod"].AsString())
+	assert.Equal(t, "value-mock", asMap["dev"].AsString())
+	assert.Equal(t, "value-mock", asMap["prod"].AsString())
 }
 
 func Test_Modules(t *testing.T) {

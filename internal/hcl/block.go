@@ -460,6 +460,14 @@ func (b *Block) IsCountExpanded() bool {
 	return b.expanded
 }
 
+func (b Block) ShouldExpand() bool {
+	if b.IsCountExpanded() {
+		return false
+	}
+
+	return b.Type() == "resource" || b.Type() == "module" || b.Type() == "data"
+}
+
 // SetContext sets the Block.context to the provided ctx. This ctx is also set on the child Blocks as
 // a child Context. Meaning that it can be used in traversal evaluation when looking up Context variables.
 func (b *Block) SetContext(ctx *Context) {

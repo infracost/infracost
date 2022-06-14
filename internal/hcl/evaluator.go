@@ -319,15 +319,16 @@ func (e *Evaluator) expandBlockCounts(blocks Blocks) Blocks {
 	var countFiltered Blocks
 	for _, block := range blocks {
 		countAttr := block.GetAttribute("count")
-		if countAttr == nil || block.IsCountExpanded() || (block.Type() != "resource" && block.Type() != "module") {
+		if countAttr == nil || !block.ShouldExpand() {
 			countFiltered = append(countFiltered, block)
 			continue
 		}
 
 		count := 1
-		if !countAttr.Value().IsNull() && countAttr.Value().IsKnown() {
-			if countAttr.Value().Type() == cty.Number {
-				f, _ := countAttr.Value().AsBigFloat().Float64()
+		value := countAttr.Value()
+		if !value.IsNull() && value.IsKnown() {
+			if value.Type() == cty.Number {
+				f, _ := value.AsBigFloat().Float64()
 				count = int(f)
 			}
 		}
@@ -535,7 +536,7 @@ func expandCountBlockToValue(b *Block, existingValues map[string]cty.Value) cty.
 	}
 
 	elements = append(elements, b.Values())
-	return cty.ListVal(elements)
+	return cty.TupleVal(elements)
 }
 
 func expandedEachBlockToValue(b *Block, existingValues map[string]cty.Value) cty.Value {
