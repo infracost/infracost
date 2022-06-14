@@ -25,8 +25,14 @@ import (
 )
 
 var (
-	errorNoVarValue = errors.New("no value found")
-	modReplace      = regexp.MustCompile(`module\.`)
+	errorNoVarValue     = errors.New("no value found")
+	modReplace          = regexp.MustCompile(`module\.`)
+	validBlocksToExpand = map[string]struct{}{
+		"resource": {},
+		"module":   {},
+		"dynamic":  {},
+		"data":     {},
+	}
 )
 
 const maxContextIterations = 32
@@ -274,7 +280,7 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 	var forEachFiltered Blocks
 	for _, block := range blocks {
 		forEachAttr := block.GetAttribute("for_each")
-		if forEachAttr == nil || block.IsCountExpanded() || (block.Type() != "resource" && block.Type() != "module" && block.Type() != "dynamic") {
+		if forEachAttr == nil || block.IsCountExpanded() || !shouldExpandBlock(block) {
 			forEachFiltered = append(forEachFiltered, block)
 			continue
 		}
@@ -302,6 +308,11 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 	}
 
 	return forEachFiltered
+}
+
+func shouldExpandBlock(block *Block) bool {
+	_, isValidType := validBlocksToExpand[block.Type()]
+	return isValidType
 }
 
 func (e *Evaluator) expandBlockCounts(blocks Blocks) Blocks {
@@ -461,30 +472,89 @@ func (e *Evaluator) getValuesByBlockType(blockType string) cty.Value {
 			if b.Label() == "" {
 				continue
 			}
+
 			values[b.Label()] = b.Values()
 		case "resource", "data":
 			if len(b.Labels()) < 2 {
 				continue
 			}
 
-			blockMap, ok := values[b.Labels()[0]]
-			if !ok {
-				values[b.Labels()[0]] = cty.ObjectVal(make(map[string]cty.Value))
-				blockMap = values[b.Labels()[0]]
-			}
-
-			valueMap := blockMap.AsValueMap()
-			if valueMap == nil {
-				valueMap = make(map[string]cty.Value)
-			}
-
-			valueMap[b.Labels()[1]] = b.Values()
-			values[b.Labels()[0]] = cty.ObjectVal(valueMap)
+			values[b.Labels()[0]] = e.evaluateResource(b, values)
 		}
 
 	}
 
 	return cty.ObjectVal(values)
+}
+
+func (e *Evaluator) evaluateResource(b *Block, values map[string]cty.Value) cty.Value {
+	labels := b.Labels()
+
+	blockMap, ok := values[labels[0]]
+	if !ok {
+		values[labels[0]] = cty.ObjectVal(make(map[string]cty.Value))
+		blockMap = values[labels[0]]
+	}
+
+	valueMap := blockMap.AsValueMap()
+	if valueMap == nil {
+		valueMap = make(map[string]cty.Value)
+	}
+
+	if e := b.Key(); e != nil {
+		valueMap[stripCount(labels[1])] = expandedEachBlockToValue(b, valueMap)
+		return cty.ObjectVal(valueMap)
+	}
+
+	if e := b.Index(); e != nil {
+		valueMap[stripCount(labels[1])] = expandCountBlockToValue(b, valueMap)
+		return cty.ObjectVal(valueMap)
+	}
+
+	valueMap[b.Labels()[1]] = b.Values()
+	return cty.ObjectVal(valueMap)
+}
+
+func expandCountBlockToValue(b *Block, existingValues map[string]cty.Value) cty.Value {
+	k := b.Index()
+	if k == nil {
+		return cty.NilVal
+	}
+
+	vals := existingValues[stripCount(b.Labels()[1])]
+	sourceTy := vals.Type()
+	isList := sourceTy.IsTupleType() || sourceTy.IsListType() || sourceTy.IsSetType()
+
+	var elements []cty.Value
+	if isList {
+		it := vals.ElementIterator()
+		for it.Next() {
+			_, v := it.Element()
+			elements = append(elements, v)
+		}
+	}
+
+	elements = append(elements, b.Values())
+	return cty.ListVal(elements)
+}
+
+func expandedEachBlockToValue(b *Block, existingValues map[string]cty.Value) cty.Value {
+	k := b.Key()
+	if k == nil {
+		return cty.NilVal
+	}
+
+	ob := make(map[string]cty.Value)
+
+	eachMap := existingValues[stripCount(b.Labels()[1])]
+	if eachMap != cty.NilVal {
+		for e, v := range eachMap.AsValueMap() {
+			ob[e] = v
+		}
+	}
+
+	ob[*k] = b.Values()
+	return cty.ObjectVal(ob)
 }
 
 // loadModule takes in a module "x" {} block and loads resources etc. into e.moduleBlocks.

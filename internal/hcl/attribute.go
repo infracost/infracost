@@ -87,19 +87,16 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 
 		ctx := attr.Ctx.Inner()
 		for _, d := range diag {
-			// attempt to get only the variables that need to be mocked from the diags.
-			// Failing that let's try and get the top level variables from the attribute
-			// and only set ones that are nil to be mocked.
-			badVariables := d.Expression.Variables()
-			if badVariables == nil {
-				badVariables = attr.findBadVariablesFromExpression(attr.HCLAttr.Expr)
-			}
-
 			// if the diagnostic summary indicates that we were the attribute we attempted to fetch is unsupported
 			// this is likely from a Terraform attribute that is built from the provider. We then try and build
 			// a mocked attribute so that the module evaluation isn't harmed.
 			var shouldRetry bool
 			if d.Summary == missingAttributeDiagnostic {
+				badVariables := attr.findBadVariablesFromExpression(attr.HCLAttr.Expr)
+				if badVariables == nil {
+					badVariables = d.Expression.Variables()
+				}
+
 				shouldRetry = true
 				for _, traversal := range badVariables {
 					traverseVarAndSetCtx(ctx, traversal, mockedVal)
@@ -107,6 +104,7 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 			}
 
 			if d.Summary == valueIsNonIterableDiagnostic {
+				badVariables := d.Expression.Variables()
 				shouldRetry = true
 				for _, traversal := range badVariables {
 					// let's first try and find the actual value for this bad variable.
@@ -187,8 +185,31 @@ func buildObject(traversal hcl.Traversal, ob map[string]cty.Value, mock cty.Valu
 
 	traverser := traversal[i]
 
+	// traverse splat is a special holding type which means we want to traverse all the attributes on the map.
+	if _, ok := traverser.(hcl.TraverseSplat); ok {
+		for k, v := range ob {
+			if v.Type().IsObjectType() {
+				valueMap := v.AsValueMap()
+				ob[k] = cty.ObjectVal(buildObject(traversal, valueMap, mock, i+1))
+				continue
+			}
+
+			ob[k] = v
+		}
+
+		return ob
+	}
+
 	if v, ok := traverser.(hcl.TraverseAttr); ok {
 		if len(traversal)-1 == i {
+			// if the attribute already exists, and we're not setting a list value
+			// then we should return here. It's most likely that we weren't able to
+			// get the full variable calls for the context, so resetting the value could
+			// be harmful.
+			if _, exists := ob[v.Name]; exists && mock.Type() == cty.String {
+				return ob
+			}
+
 			ob[v.Name] = mock
 			return ob
 		}
@@ -426,16 +447,23 @@ func (attr *Attribute) referencesFromExpression(expression hcl.Expression) []*Re
 func (attr *Attribute) findBadVariablesFromExpression(expression hcl.Expression) []hcl.Traversal {
 	var badVars []hcl.Traversal
 	switch t := expression.(type) {
+	case *hclsyntax.ForExpr:
+		badVars = append(badVars, attr.findBadVariablesFromExpression(t.CollExpr)...)
+		if t.CondExpr != nil {
+			badVars = append(badVars, attr.findBadVariablesFromExpression(t.CondExpr)...)
+		}
+
+		badVars = append(badVars, attr.findBadVariablesFromExpression(t.ValExpr)...)
 	case *hclsyntax.FunctionCallExpr:
 		for _, arg := range t.Args {
 			badVars = append(badVars, attr.findBadVariablesFromExpression(arg)...)
 		}
 	case *hclsyntax.ConditionalExpr:
-		badVars = append(badVars, attr.findBadVariables(t.TrueResult.Variables())...)
-		badVars = append(badVars, attr.findBadVariables(t.FalseResult.Variables())...)
-		badVars = append(badVars, attr.findBadVariables(t.Condition.Variables())...)
+		badVars = append(badVars, attr.findBadVariablesFromExpression(t.TrueResult)...)
+		badVars = append(badVars, attr.findBadVariablesFromExpression(t.FalseResult)...)
+		badVars = append(badVars, attr.findBadVariablesFromExpression(t.Condition)...)
 	case *hclsyntax.TemplateWrapExpr:
-		badVars = attr.findBadVariablesFromExpression(t.Wrapped)
+		badVars = append(badVars, attr.findBadVariablesFromExpression(t.Wrapped)...)
 	case *hclsyntax.TemplateExpr:
 		for _, part := range t.Parts {
 			badVars = append(badVars, attr.findBadVariablesFromExpression(part)...)
@@ -443,9 +471,31 @@ func (attr *Attribute) findBadVariablesFromExpression(expression hcl.Expression)
 	case *hclsyntax.RelativeTraversalExpr:
 		switch s := t.Source.(type) {
 		case *hclsyntax.IndexExpr:
+			ctx := attr.Ctx.Inner()
+			val, diags := s.Collection.Value(ctx)
+			if isAttrMissing(diags) {
+				badVars = append(badVars, attr.findBadVariables(s.Collection.Variables())...)
+				return badVars
+			}
+
+			it := val.ElementIterator()
+			for it.Next() {
+				_, v := it.Element()
+
+				_, d := t.Traversal.TraverseRel(v)
+				if isAttrMissing(d) {
+					traversal := s.Collection.Variables()[0]
+					traversal = append(traversal, hcl.TraverseSplat{})
+					traversal = append(traversal, t.Traversal...)
+					badVars = append(badVars, traversal)
+					return badVars
+				}
+				break
+			}
+
 			badVars = append(badVars, attr.findBadVariables(s.Collection.Variables())...)
 		default:
-			badVars = append(badVars, attr.findBadVariables(t.Source.Variables())...)
+			badVars = append(badVars, attr.findBadVariablesFromExpression(t.Source)...)
 		}
 	case *hclsyntax.IndexExpr:
 		badVars = append(badVars, attr.findBadVariables(t.Collection.Variables())...)

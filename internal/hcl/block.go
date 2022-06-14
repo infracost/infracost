@@ -826,6 +826,18 @@ func (b *Block) Index() *int64 {
 	return nil
 }
 
+// Key returns the foreach key of the block using the name label.
+// Key returns nil if the block has no each key.
+func (b *Block) Key() *string {
+	m := foreachRegex.FindStringSubmatch(b.NameLabel())
+
+	if len(m) > 0 {
+		return &m[1]
+	}
+
+	return nil
+}
+
 func (b *Block) Label() string {
 	return strings.Join(b.hclBlock.Labels, ".")
 }

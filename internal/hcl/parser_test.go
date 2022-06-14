@@ -238,6 +238,62 @@ output "exp2" {
 	}
 }
 
+func Test_UnsupportedAttributesList(t *testing.T) {
+	path := createTestFile("test.tf", `
+
+resource "with_unsupported_attr" "test" {
+	name = "mittens"
+	special = true
+	my_number = 4
+}
+
+locals {
+	names = "astring"
+}
+
+output "exp" {
+  value = {
+    for name in local.names :
+      name => with_unsupported_attr.test.does_not_exist
+  }
+}
+
+output "exp2" {
+  value = {
+    for name in local.nothing :
+      name => with_unsupported_attr.test.does_not_exist
+  }
+}
+`)
+
+	parser := newParser(filepath.Dir(path))
+	module, err := parser.ParseDirectory()
+	require.NoError(t, err)
+
+	blocks := module.Blocks
+
+	output := blocks.Matching(BlockMatcher{Label: "exp", Type: "output"})
+	require.NotNil(t, output)
+	attr := output.GetAttribute("value")
+	mockedObj := attr.Value()
+	require.True(t, mockedObj.Type().IsObjectType())
+	asMap := mockedObj.AsValueMap()
+	assert.Len(t, asMap, 1)
+	assertUUID(t, asMap["astring"].AsString())
+
+	output = blocks.Matching(BlockMatcher{Label: "exp2", Type: "output"})
+	require.NotNil(t, output)
+	attr = output.GetAttribute("value")
+	mockedObj = attr.Value()
+	require.True(t, mockedObj.Type().IsObjectType())
+	asMap = mockedObj.AsValueMap()
+	assert.Len(t, asMap, 1)
+	for k, v := range asMap {
+		assertUUID(t, k)
+		assertUUID(t, v.AsString())
+	}
+}
+
 func Test_UnsupportedAttributesSplatOperator(t *testing.T) {
 	path := createTestFile("test.tf", `
 
@@ -254,7 +310,7 @@ resource "with_unsupported_attr" "test" {
 }
 
 resource "other_resource" "test" {
-	task_definition = "${join("", with_unsupported_attr.test.*.family)}:${join("", with_unsupported_attr.test.*.revision)}"
+	task_definition = "${join("|", with_unsupported_attr.test.*.family)}:${join("|", with_unsupported_attr.test.*.revision)}"
 }
 
 `)
@@ -269,7 +325,14 @@ resource "other_resource" "test" {
 	require.NotNil(t, output)
 	attr := output.GetAttribute("task_definition")
 	mockedVal := attr.Value()
-	log.Println(mockedVal)
+	str := mockedVal.AsString()
+	assert.Contains(t, str, ":")
+	pieces := strings.Split(strings.ReplaceAll(str, ":", "|"), "|")
+	assert.Len(t, pieces, 8)
+
+	for _, piece := range pieces {
+		assertUUID(t, piece)
+	}
 }
 
 func Test_UnsupportedAttributesIndex(t *testing.T) {
@@ -313,6 +376,65 @@ func assertUUID(t *testing.T, val string) {
 
 	_, err := uuid.Parse(val)
 	assert.NoError(t, err)
+}
+
+func Test_UnsupportedAttributesMap(t *testing.T) {
+	path := createTestFile("test.tf", `
+
+variable "service_connections" {
+  type = map(object({
+    name              = string
+    subscription_id   = string
+    subscription_name = string
+  }))
+  nullable    = false
+  default = {
+    dev = {
+		name = "dev"
+		subscription_id = "test"
+		subscription_name = "testname"
+	}
+    prod = {
+		name = "prod"
+		subscription_id = "test2"
+		subscription_name = "test2name"
+	}
+  }
+}
+
+data "azuread_service_principal" "serviceendpoints" {
+  for_each = var.service_connections
+
+  display_name = "display-${each.value.subscription_id}"
+}
+
+output "serviceendpoint_principals" {
+  value       = { for k, v in var.service_connections : k => data.azuread_service_principal.serviceendpoints[k].object_id }
+}
+
+`)
+
+	parser := newParser(filepath.Dir(path))
+	module, err := parser.ParseDirectory()
+	require.NoError(t, err)
+
+	blocks := module.Blocks
+
+	output := blocks.Matching(BlockMatcher{Label: "azuread_service_principal", Type: "output"})
+	require.NotNil(t, output)
+	attr := output.GetAttribute("value")
+	mockedObj := attr.Value()
+	require.True(t, mockedObj.Type().IsObjectType())
+	asMap := mockedObj.AsValueMap()
+	require.Len(t, asMap, 2)
+
+	_, ok := asMap["dev"]
+	assert.True(t, ok)
+	_, ok = asMap["prod"]
+	assert.True(t, ok)
+
+	assertUUID(t, asMap["dev"].AsString())
+	assertUUID(t, asMap["prod"].AsString())
 }
 
 func Test_Modules(t *testing.T) {
