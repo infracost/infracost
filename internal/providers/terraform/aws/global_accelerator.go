@@ -19,7 +19,6 @@ func newGlobalAccelerator(d *schema.ResourceData, u *schema.UsageData) *schema.R
 		Name:    name,
 		Address: d.Address,
 	}
-	r.PopulateUsage(u)
 
 	return r.BuildResource()
 }

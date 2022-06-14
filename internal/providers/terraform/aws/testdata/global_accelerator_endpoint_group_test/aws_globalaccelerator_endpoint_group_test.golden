@@ -1,0 +1,5 @@
+# Run:
+#
+# ARGS="--run TestGlobalacceleratorEndpointGroup -v -update" make test_aws
+#
+# to update this file with golden file outputs.

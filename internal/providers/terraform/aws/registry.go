@@ -104,6 +104,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getTransferServerRegistryItem(),
 	getNetworkfirewallFirewallRegistryItem(),
 	getGlobalAcceleratorRegistryItem(),
+	getGlobalacceleratorEndpointGroupRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -244,6 +245,9 @@ var FreeResources = []string{
 	"aws_elasticache_parameter_group",
 	"aws_elasticache_security_group",
 	"aws_elasticache_subnet_group",
+
+	// "AWS Global Accelerator Listener
+	"aws_globalaccelerator_listener",
 
 	// AWS Glue
 	"aws_glue_catalog_table",
