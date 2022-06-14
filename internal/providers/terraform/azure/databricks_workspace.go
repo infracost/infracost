@@ -2,10 +2,11 @@ package azure
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 func GetAzureRMDatabricksWorkspaceRegistryItem() *schema.RegistryItem {
@@ -20,7 +21,7 @@ func NewAzureRMDatabricksWorkspace(d *schema.ResourceData, u *schema.UsageData) 
 
 	var costComponents []*schema.CostComponent
 
-	sku := strings.Title(d.Get("sku").String())
+	sku := cases.Title(language.English).String(d.Get("sku").String())
 
 	if sku == "Trial" {
 		return &schema.Resource{

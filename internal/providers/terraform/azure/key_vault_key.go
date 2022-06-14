@@ -8,6 +8,8 @@ import (
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 func GetAzureRMKeyVaultKeyRegistryItem() *schema.RegistryItem {
@@ -26,7 +28,7 @@ func NewAzureRMKeyVaultKey(d *schema.ResourceData, u *schema.UsageData) *schema.
 	var skuName, keyType, keySize, meterName string
 	keyVault := d.References("key_vault_id")
 	if len(keyVault) > 0 {
-		skuName = strings.Title(keyVault[0].Get("sku_name").String())
+		skuName = cases.Title(language.English).String(keyVault[0].Get("sku_name").String())
 	} else {
 		log.Warnf("Skipping resource %s. Could not find its 'sku_name' property on key_vault_id.", d.Address)
 		return nil
