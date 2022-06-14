@@ -187,7 +187,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 				err.Error(),
 				fmt.Sprintf("For a list of known issues and workarounds, see: %s", ui.LinkString("https://infracost.io/docs/features/terragrunt/")),
 			),
-			"Error parsing the Terragrunt code using the Terragrunt library",
+			fmt.Sprintf("Error parsing the Terragrunt code using the Terragrunt library: %s", err),
 		)
 	}
 	p.outputs = map[string]cty.Value{}
