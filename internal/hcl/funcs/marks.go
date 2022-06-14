@@ -1,9 +1,9 @@
 package funcs
 
 import (
-	"strings"
-
 	"github.com/zclconf/go-cty/cty"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 // valueMarks allow creating strictly typed values for use as cty.Value marks.
@@ -12,7 +12,7 @@ import (
 type valueMark string
 
 func (m valueMark) GoString() string {
-	return "marks." + strings.Title(string(m))
+	return "marks." + cases.Title(language.English).String(string(m))
 }
 
 // Has returns true if and only if the cty.Value has the given mark.
