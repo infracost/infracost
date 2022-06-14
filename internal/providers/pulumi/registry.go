@@ -61,19 +61,6 @@ func GetDefaultRefIDFunc(d *schema.ResourceData) []string {
 	return defaultRefs
 }
 
-var arnAttributeMap = map[string]string{
-	"aws_cloudwatch_dashboard":     "dashboard_arn",
-	"aws_db_snapshot":              "db_snapshot_arn",
-	"aws_db_cluster_snapshot":      "db_cluster_snapshot_arn",
-	"aws_ecs_service":              "id",
-	"aws_neptune_cluster_snapshot": "db_cluster_snapshot_arn",
-	"aws_docdb_cluster_snapshot":   "db_cluster_snapshot_arn",
-	"aws_dms_certificate":          "certificate_arn",
-	"aws_dms_endpoint":             "endpoint_arn",
-	"aws_dms_replication_instance": "replication_instance_arn",
-	"aws_dms_replication_task":     "replication_task_arn",
-}
-
 func (r *ResourceRegistryMap) GetReferenceAttributes(resourceDataType string) []string {
 	var refAttrs []string
 	item, ok := (*r)[resourceDataType]

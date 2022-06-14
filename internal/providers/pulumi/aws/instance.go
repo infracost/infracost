@@ -108,7 +108,7 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 		deviceName := data.Get("deviceName").String()
 		volString := fmt.Sprintf(`propertyDependencies.ebsBlockDevices.%d`, i)
 		deviceInPropertyDependencies := d.RawValues.Get(volString)
-		//log.Debugf("volString: %s, dIPD %s", volString, deviceInPropertyDependencies)
+		// log.Debugf("volString: %s, dIPD %s", volString, deviceInPropertyDependencies)
 		ltDevice := ltEBSBlockDevices[deviceName]
 		if ltDevice == nil {
 			ltDevice = &aws.EBSVolume{}
@@ -119,7 +119,7 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 		// the cost will be added against the volume resource.
 
 		if len(ebsBlockDeviceRef) > i && ebsBlockDeviceRef[i].RawValues.Get("urn").String() == deviceInPropertyDependencies.String() {
-			log.Debugf("Found in block devide ref, deleting")
+			log.Debugf("Found in block divide ref, deleting")
 			delete(ltEBSBlockDevices, deviceName)
 
 			continue

@@ -75,7 +75,7 @@ func (p *Parser) parsePreviewDigest(t types.PreviewDigest, usage map[string]*sch
 		}
 		var name = step.NewState.URN.Name().String()
 		var resourceType = deriveTfResourceTypes(step.NewState.Type.String())
-		//log.Debugf("resource type: %s", resourceType)
+		// log.Debugf("resource type: %s", resourceType)
 		if resourceType == "awsx" {
 			continue
 		}
@@ -127,22 +127,6 @@ func (p *Parser) loadUsageFileResources(u map[string]*schema.UsageData) []*schem
 	}
 
 	return resources
-}
-
-func isAwsChina(d *schema.ResourceData) bool {
-	return strings.HasPrefix(d.Type, "aws_") && strings.HasPrefix(d.Get("region").String(), "cn-")
-}
-
-func getSpecialContext(d *schema.ResourceData) map[string]interface{} {
-	providerPrefix := strings.Split(d.Type, "_")[0]
-
-	switch providerPrefix {
-	case "aws":
-		return aws.GetSpecialContext(d)
-	default:
-		log.Debugf("Unsupported provider %s", providerPrefix)
-		return map[string]interface{}{}
-	}
 }
 
 func parseTags(resourceType string, v gjson.Result) map[string]string {
@@ -232,15 +216,16 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf g
 		for _, attr := range refAttrs {
 			// Get any values for the fields and check if they map to IDs or ARNs of any resources
 			// Replaced refExists with _ as we only need to know the attribute exists
-			for i, _ := range d.RawValues.Get(fmt.Sprintf(`%s`, attr)).Array() {
-				//log.Debugf("i %s, attr %s, refVal %s", i, fmt.Sprintf(`newState.inputs.%s`, attr), refExists)
+			for i, refExists := range d.RawValues.Get(fmt.Sprintf(`%s`, attr)).Array() {
+				// log.Debugf("i %s, attr %s, refVal %s", i, fmt.Sprintf(`newState.inputs.%s`, attr), refExists)
+				log.Debugf("Searching for %s", refExists)
 				attrFirst := strings.Split(attr, ".")[0]
 				searchString := fmt.Sprintf(`propertyDependencies.%s`, attrFirst)
-				//log.Debugf("searchString %s", searchString)
+				// log.Debugf("searchString %s", searchString)
 				refVal := d.RawValues.Get(searchString).Array()[i]
 				// Check ID map
 				idRefs, ok := idMap[refVal.String()]
-				//log.Debugf("idRefs %s, ok %s", idRefs, ok)
+				// log.Debugf("idRefs %s, ok %s", idRefs, ok)
 				if ok {
 
 					for _, ref := range idRefs {
