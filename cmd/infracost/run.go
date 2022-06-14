@@ -365,6 +365,13 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 
 	ctx.SetContextValue("projectType", provider.Type())
 
+	projectTypes := []interface{}{}
+	if t, ok := ctx.RunContext.ContextValues()["projectTypes"]; ok {
+		projectTypes = t.([]interface{})
+	}
+	projectTypes = append(projectTypes, provider.Type())
+	ctx.RunContext.SetContextValue("projectTypes", projectTypes)
+
 	if r.cmd.Name() == "diff" && provider.Type() == "terraform_state_json" {
 		m := "Cannot use Terraform state JSON with the infracost diff command.\n\n"
 		m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
