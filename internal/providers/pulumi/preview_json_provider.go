@@ -26,7 +26,7 @@ func NewPreviewJSONProvider(ctx *config.ProjectContext, includePastResources boo
 }
 
 func (p *PreviewJSONProvider) Type() string {
-	return "pulumi"
+	return "pulumi_preview_json"
 }
 
 func (p *PreviewJSONProvider) DisplayType() string {
