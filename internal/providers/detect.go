@@ -92,7 +92,7 @@ func Detect(ctx *config.ProjectContext, includePastResources bool) (schema.Provi
 		return terraform.NewStateJSONProvider(ctx, includePastResources), nil
 	case "cloudformation":
 		return cloudformation.NewTemplateProvider(ctx, includePastResources), nil
-	case "pulumi":
+	case "pulumi_preview_json":
 		return pulumi.NewPreviewJSONProvider(ctx, includePastResources), nil
 	}
 
