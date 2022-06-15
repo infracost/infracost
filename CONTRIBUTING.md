@@ -104,7 +104,7 @@ make build
 ## Adding new resources
 
 Checkout **[our dedicated guide](contributing/add_new_resource_guide.md)** to add resources!
-Checkout **[Pulumi Contributing](contributing/pulumi.md)** also to add Pulumi resources!
+If you're adding a resource for Pulumi, in addition to the above, also checkout the **[Pulumi contributing notes](contributing/pulumi.md)**.
 
 ### Azure credentials
 
