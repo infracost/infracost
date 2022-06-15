@@ -65,4 +65,12 @@ COPY --from=builder /usr/bin/terraform* /usr/bin/
 COPY --from=builder /usr/bin/terragrunt /usr/bin/
 COPY --from=builder /app/build/infracost /usr/bin/
 
+RUN addgroup --gid 1000 infracost; \
+  adduser infracost --uid 1000 -G infracost -H -D -s /sbin/nologin; \
+  mkdir -p /infracost; \
+  chown infracost:infracost /infracost
+
+USER infracost
+WORKDIR /infracost
+
 ENTRYPOINT [ "infracost" ]
