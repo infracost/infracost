@@ -1,4 +1,4 @@
-# Contributing to the pulumi provider
+# Pulumi contribution notes
 
 ## notes
 
