@@ -30,7 +30,7 @@ func (p *PreviewJSONProvider) Type() string {
 }
 
 func (p *PreviewJSONProvider) DisplayType() string {
-	return "Pulumi"
+	return "Pulumi preview JSON file"
 }
 
 func (p *PreviewJSONProvider) AddMetadata(metadata *schema.ProjectMetadata) {
@@ -40,14 +40,14 @@ func (p *PreviewJSONProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 func (p *PreviewJSONProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
 	b, err := os.ReadFile(p.Path)
 	if err != nil {
-		return []*schema.Project{}, errors.Wrap(err, "Error reading Pulumi Preview JSON file")
+		return []*schema.Project{}, errors.Wrap(err, "Error reading Pulumi preview JSON file")
 	}
 	var jsonPreviewDigest types.PreviewDigest
 	err = json.Unmarshal(b, &jsonPreviewDigest)
 	gjsonResult := gjson.ParseBytes(b)
 
 	if err != nil {
-		return []*schema.Project{}, errors.Wrap(err, "Error reading Pulumi Preview JSON file")
+		return []*schema.Project{}, errors.Wrap(err, "Error reading Pulumi preview JSON file")
 	}
 
 	metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
@@ -59,7 +59,7 @@ func (p *PreviewJSONProvider) LoadResources(usage map[string]*schema.UsageData) 
 	parser := NewParser(p.ctx)
 	pastResources, resources, err := parser.parsePreviewDigest(jsonPreviewDigest, usage, gjsonResult)
 	if err != nil {
-		return []*schema.Project{project}, errors.Wrap(err, "Error parsing Pulumi Preview JSON file")
+		return []*schema.Project{project}, errors.Wrap(err, "Error parsing Pulumi preview JSON file")
 	}
 
 	project.PastResources = pastResources
