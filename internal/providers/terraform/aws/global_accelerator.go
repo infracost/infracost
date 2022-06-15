@@ -13,10 +13,8 @@ func getGlobalAcceleratorRegistryItem() *schema.RegistryItem {
 }
 
 func newGlobalAccelerator(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	name := d.Get("name").String()
 
 	r := &aws.GlobalAccelerator{
-		Name:    name,
 		Address: d.Address,
 	}
 
