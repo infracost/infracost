@@ -146,7 +146,7 @@ func DetectProjectType(path string, forceCLI bool) string {
 	}
 
 	if isPulumiPreviewJSON(path) {
-		return "pulumi"
+		return "pulumi_preview_json"
 	}
 
 	if forceCLI {
