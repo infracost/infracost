@@ -231,7 +231,7 @@ func (r *GlobalacceleratorEndpointGroup) buildRegionSubresource(regionData *glob
 		Name: regionData.awsGroupedName,
 		CostComponents: []*schema.CostComponent{
 			{
-				Name:            fmt.Sprintf("%sbound data transfer", trafficDirection),
+				Name:            fmt.Sprintf("%sbound DT-premium fee", trafficDirection),
 				Unit:            "GB",
 				UnitMultiplier:  decimal.NewFromInt(1),
 				MonthlyQuantity: decimalPtr(decimal.NewFromFloat(floatVal(quantity))),

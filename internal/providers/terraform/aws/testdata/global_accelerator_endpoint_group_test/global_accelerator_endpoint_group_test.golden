@@ -3,29 +3,29 @@
                                                                                   
  aws_globalaccelerator_endpoint_group.eu_west_1                                   
  ├─ US, Mexico, Canada                                                            
- │  └─ Inbound data transfer                      12,340,000  GB      $185,100.00 
+ │  └─ Inbound DT-premium fee                     12,340,000  GB      $185,100.00 
  ├─ Europe                                                                        
- │  └─ Inbound data transfer                      22,340,000  GB      $335,100.00 
+ │  └─ Inbound DT-premium fee                     22,340,000  GB      $335,100.00 
  ├─ South Africa, Kenya                                                           
- │  └─ Inbound data transfer                      32,340,000  GB    $2,166,780.00 
+ │  └─ Inbound DT-premium fee                     32,340,000  GB    $2,166,780.00 
  ├─ South America                                                                 
- │  └─ Inbound data transfer                      42,340,000  GB    $1,820,620.00 
+ │  └─ Inbound DT-premium fee                     42,340,000  GB    $1,820,620.00 
  ├─ South Korea                                                                   
- │  └─ Inbound data transfer                      52,340,000  GB    $1,831,900.00 
+ │  └─ Inbound DT-premium fee                     52,340,000  GB    $1,831,900.00 
  ├─ Middle East                                                                   
- │  └─ Inbound data transfer                      52,340,000  GB    $1,831,900.00 
+ │  └─ Inbound DT-premium fee                     52,340,000  GB    $1,831,900.00 
  ├─ Australia, New Zealand                                                        
- │  └─ Inbound data transfer                      62,340,000  GB    $6,545,700.00 
+ │  └─ Inbound DT-premium fee                     62,340,000  GB    $6,545,700.00 
  ├─ Asia Pacific                                                                  
- │  └─ Inbound data transfer                      62,340,000  GB    $2,680,620.00 
+ │  └─ Inbound DT-premium fee                     62,340,000  GB    $2,680,620.00 
  └─ India, Indonesia, Philippines, Thailand                                       
-    └─ Inbound data transfer                      72,340,000  GB    $2,387,220.00 
+    └─ Inbound DT-premium fee                     72,340,000  GB    $2,387,220.00 
                                                                                   
  aws_globalaccelerator_endpoint_group.us_east_1                                   
  ├─ Europe                                                                        
- │  └─ Outbound data transfer                          5,000  GB           $75.00 
+ │  └─ Outbound DT-premium fee                         5,000  GB           $75.00 
  └─ Asia Pacific                                                                  
-    └─ Outbound data transfer                          1,000  GB           $35.00 
+    └─ Outbound DT-premium fee                         1,000  GB           $35.00 
                                                                                   
  OVERALL TOTAL                                                     $19,785,050.00 
 ──────────────────────────────────

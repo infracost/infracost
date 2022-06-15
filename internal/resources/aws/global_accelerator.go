@@ -10,14 +10,13 @@ import (
 // Resource information: https://aws.amazon.com/global-accelerator
 // Pricing information: https://aws.amazon.com/global-accelerator/pricing/
 type GlobalAccelerator struct {
-	Name    string
 	Address string
 }
 
 func (r *GlobalAccelerator) BuildResource() *schema.Resource {
 	var costComponents []*schema.CostComponent
 	costComponent := &schema.CostComponent{
-		Name:           "Fixed Fee",
+		Name:           "Fixed fee",
 		Unit:           "hours",
 		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
@@ -32,7 +31,7 @@ func (r *GlobalAccelerator) BuildResource() *schema.Resource {
 	costComponent.SetCustomPrice(decimalPtr(decimal.NewFromFloat(0.025)))
 	costComponents = append(costComponents, costComponent)
 	return &schema.Resource{
-		Name:           r.Name,
+		Name:           r.Address,
 		CostComponents: costComponents,
 	}
 }
