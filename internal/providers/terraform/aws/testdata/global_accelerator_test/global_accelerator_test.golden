@@ -2,7 +2,7 @@
  Name                                       Monthly Qty  Unit   Monthly Cost 
                                                                              
  aws_globalaccelerator_accelerator.example                                   
- └─ Fixed Fee                                       730  hours        $18.25 
+ └─ Fixed fee                                       730  hours        $18.25 
                                                                              
  OVERALL TOTAL                                                        $18.25 
 ──────────────────────────────────
