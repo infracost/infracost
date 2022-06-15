@@ -10,6 +10,7 @@ import (
 
 	"github.com/shopspring/decimal"
 
+	"github.com/infracost/infracost/internal/providers/pulumi"
 	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
@@ -561,7 +562,7 @@ func BuildSummary(resources []*schema.Resource, opts SummaryOptions) (*Summary, 
 	}
 
 	for _, r := range resources {
-		if !opts.IncludeUnsupportedProviders && !terraform.HasSupportedProvider(r.ResourceType) {
+		if !opts.IncludeUnsupportedProviders && !terraform.HasSupportedProvider(r.ResourceType) && !pulumi.HasSupportedProvider(r.ResourceType) {
 			continue
 		}
 

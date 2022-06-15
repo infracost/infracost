@@ -7,6 +7,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 
 	"github.com/infracost/infracost/internal/providers/pulumi/aws"
+	"github.com/infracost/infracost/internal/providers/pulumi/types"
 )
 
 type ResourceRegistryMap map[string]*schema.RegistryItem
@@ -29,6 +30,10 @@ func GetResourceRegistryMap() *ResourceRegistryMap {
 			resourceRegistryMap[registryItem.Name] = registryItem
 			resourceRegistryMap[registryItem.Name].DefaultRefIDFunc = GetDefaultRefIDFunc
 		}
+		for _, registryItem := range createFreeResources(types.PulumiFreeResources, GetDefaultRefIDFunc) {
+			resourceRegistryMap[registryItem.Name] = registryItem
+			resourceRegistryMap[registryItem.Name].DefaultRefIDFunc = GetDefaultRefIDFunc
+		}
 	})
 
 	return &resourceRegistryMap
@@ -41,7 +46,11 @@ func GetUsageOnlyResources() []string {
 }
 
 func HasSupportedProvider(rType string) bool {
-	return strings.HasPrefix(rType, "aws_") || strings.HasPrefix(rType, "google_") || strings.HasPrefix(rType, "azurerm_")
+	return strings.HasPrefix(rType, "aws_") ||
+		strings.HasPrefix(rType, "google_") ||
+		strings.HasPrefix(rType, "azurerm_") ||
+		strings.HasPrefix(rType, "pulumi_") ||
+		strings.HasPrefix(rType, "kubernetes_")
 }
 
 func createFreeResources(l []string, defaultRefsFunc schema.ReferenceIDFunc) []*schema.RegistryItem {

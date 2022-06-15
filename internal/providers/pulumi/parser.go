@@ -13,7 +13,6 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-// These show differently in the plan JSON for Terraform 0.12 and 0.13.
 var infracostProviderNames = []string{"infracost", "registry.terraform.io/infracost/infracost"}
 
 type Parser struct {
@@ -76,7 +75,7 @@ func (p *Parser) parsePreviewDigest(t types.PreviewDigest, usage map[string]*sch
 		var name = step.NewState.URN.Name().String()
 		var resourceType = deriveTfResourceTypes(step.NewState.Type.String())
 		// log.Debugf("resource type: %s", resourceType)
-		if resourceType == "awsx" {
+		if resourceType == "awsx" || resourceType == "unknown" {
 			continue
 		}
 		var providerName = strings.Split(step.NewState.Type.String(), ":")[0]
@@ -130,9 +129,7 @@ func (p *Parser) loadUsageFileResources(u map[string]*schema.UsageData) []*schem
 }
 
 func parseTags(resourceType string, v gjson.Result) map[string]string {
-
 	providerPrefix := strings.Split(resourceType, "_")[0]
-
 	switch providerPrefix {
 	case "aws":
 		return aws.ParseTags(resourceType, v)
@@ -145,7 +142,6 @@ func parseTags(resourceType string, v gjson.Result) map[string]string {
 func parseRegion(resourceType string, v map[string]string) string {
 	var region string
 	providerPrefix := strings.Split(resourceType, "_")[0]
-
 	switch providerPrefix {
 	case "aws":
 		region = v["aws:region"]
@@ -269,9 +265,14 @@ func deriveTfResourceTypes(resourceType string) string {
 		tfResourceTypes = aws.GetAWSResourceTypes()
 	case "awsx":
 		return "awsx"
+	case "pulumi":
+		return strings.ToLower(strings.Join(resourceTypeArray, "_"))
+	case "kubernetes":
+		log.Debugf("supported kubernetes provider %s", providerPrefix)
+		return strings.ToLower(strings.ReplaceAll(strings.Join(resourceTypeArray, "_"), "/", "_"))
 	default:
 		log.Debugf("Unsupported provider %s", providerPrefix)
-		tfResourceTypes = map[string]string{}
+		return "unknown"
 	}
 	var midTypeArray = strings.Split(resourceTypeArray[1], "/")
 	var _resourceType = strings.ToLower(resourceTypeArray[0] + "_" + midTypeArray[0] + "_" + midTypeArray[1])
