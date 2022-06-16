@@ -1,0 +1,28 @@
+version: 0.1
+resource_usage:
+  aws_globalaccelerator_endpoint_group.eu_west_1:
+    monthly_inbound_data_transfer_gb:
+      us: 12340000 # United States, Mexico, Canada
+      europe: 22340000 # Europe
+      south_africa: 32340000 # South Africa, Kenya
+      south_america: 42340000 # South America
+      south_korea: 52340000 # South Korea
+      australia: 62340000 # Australia, New Zealand
+      asia_pacific: 62340000 # Asia Pacific
+      india: 72340000 # India, Indonesia, Philippines, Thailand
+    monthly_outbound_data_transfer_gb:
+      us: 1234 # United States, Mexico, Canada
+      europe: 2234 # Europe
+      south_africa: 3234 # South Africa, Kenya
+      south_america: 4234 # South America
+      south_korea: 5234 # South Korea
+      australia: 6234 # Australia, New Zealand
+      asia_pacific: 6234 # Asia Pacific
+      india: 7234 # India, Indonesia, Philippines, Thailand
+  aws_globalaccelerator_endpoint_group.us_east_1:
+    monthly_inbound_data_transfer_gb:
+      europe: 2000
+      asia_pacific: 2000
+    monthly_outbound_data_transfer_gb:
+      europe: 5000
+      asia_pacific: 1000

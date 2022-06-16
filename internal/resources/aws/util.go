@@ -47,6 +47,13 @@ func intVal(i *int64) int64 {
 	return *i
 }
 
+func floatVal(i *float64) float64 {
+	if i == nil {
+		return 0
+	}
+	return *i
+}
+
 func decimalPtr(d decimal.Decimal) *decimal.Decimal {
 	return &d
 }
