@@ -100,13 +100,40 @@
     "ProjectMetadata": {
       "required": [
         "path",
-        "type"
+        "infracostCommand",
+        "type",
+        "branch",
+        "commit",
+        "commitAuthor",
+        "commitTimestamp",
+        "CommitMessage"
       ],
       "properties": {
         "path": {
           "type": "string"
         },
+        "infracostCommand": {
+          "type": "string"
+        },
         "type": {
+          "type": "string"
+        },
+        "terraformWorkspace": {
+          "type": "string"
+        },
+        "branch": {
+          "type": "string"
+        },
+        "commit": {
+          "type": "string"
+        },
+        "commitAuthor": {
+          "type": "string"
+        },
+        "commitTimestamp": {
+          "type": "integer"
+        },
+        "CommitMessage": {
           "type": "string"
         },
         "vcsRepoUrl": {
@@ -115,10 +142,22 @@
         "vcsSubPath": {
           "type": "string"
         },
+        "vcsProvider": {
+          "type": "string"
+        },
+        "vcsBaseBranch": {
+          "type": "string"
+        },
+        "vcsPullRequestTitle": {
+          "type": "string"
+        },
         "vcsPullRequestUrl": {
           "type": "string"
         },
-        "terraformWorkspace": {
+        "vcsPullRequestAuthor": {
+          "type": "string"
+        },
+        "vcsPipelineRunId": {
           "type": "string"
         }
       },
