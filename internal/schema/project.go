@@ -15,10 +15,11 @@ import (
 )
 
 type ProjectMetadata struct {
-	Path               string `json:"path"`
-	InfracostCommand   string `json:"infracostCommand"`
-	Type               string `json:"type"`
-	TerraformWorkspace string `json:"terraformWorkspace,omitempty"`
+	Path                string `json:"path"`
+	InfracostCommand    string `json:"infracostCommand"`
+	Type                string `json:"type"`
+	TerraformModulePath string `json:"terraformModulePath,omitempty"`
+	TerraformWorkspace  string `json:"terraformWorkspace,omitempty"`
 
 	Branch            string    `json:"branch"`
 	Commit            string    `json:"commit"`
@@ -36,6 +37,14 @@ type ProjectMetadata struct {
 	VCSPullRequestAuthor string `json:"vcsPullRequestAuthor,omitempty"`
 	VCSPipelineRunID     string `json:"vcsPipelineRunId,omitempty"`
 	VCSPullRequestID     string `json:"vcsPullRequestID,omitempty"`
+}
+
+func (m *ProjectMetadata) WorkspaceLabel() string {
+	if m.TerraformWorkspace == "default" {
+		return ""
+	}
+
+	return m.TerraformWorkspace
 }
 
 // Projects is a slice of Project that is ordered alphabetically by project name.
@@ -90,11 +99,14 @@ func AllProjectResources(projects []*Project) []*Resource {
 	return resources
 }
 
-func GenerateProjectName(metadata *ProjectMetadata, dashboardEnabled bool) string {
+func GenerateProjectName(metadata *ProjectMetadata, projectName string, dashboardEnabled bool) string {
 	var n string
 
-	// If the VCS repo is set, create the name from that
-	if metadata.VCSRepoURL != "" {
+	// If there is a user defined project name, use it.
+	if projectName != "" {
+		n = projectName
+		// If the VCS repo is set, create the name from that
+	} else if metadata.VCSRepoURL != "" {
 		n = nameFromRepoURL(metadata.VCSRepoURL)
 
 		if metadata.VCSSubPath != "" {
@@ -111,10 +123,6 @@ func GenerateProjectName(metadata *ProjectMetadata, dashboardEnabled bool) strin
 		n = fmt.Sprintf("project_%s", shortHash(absPath, 8))
 	} else {
 		n = metadata.Path
-	}
-
-	if metadata.TerraformWorkspace != "" && metadata.TerraformWorkspace != "default" {
-		n += fmt.Sprintf(" (%s)", metadata.TerraformWorkspace)
 	}
 
 	return n

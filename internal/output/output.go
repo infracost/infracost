@@ -108,17 +108,6 @@ func convertCostComponents(outComponents []CostComponent) []*schema.CostComponen
 
 type Projects []Project
 
-// ToMap returns the project list as a lookup map, which can be used to find the same project across multiple runs.
-func (projects Projects) ToMap() map[string]Project {
-	m := make(map[string]Project)
-
-	for _, p := range projects {
-		m[p.Name] = p
-	}
-
-	return m
-}
-
 var exampleProjectsRegex = regexp.MustCompile(`^infracost\/(infracost\/examples|example-terraform)\/`)
 
 func (r *Root) ExampleProjectName() string {
@@ -135,11 +124,25 @@ func (r *Root) ExampleProjectName() string {
 	return r.Projects[0].Name
 }
 
-func (p *Project) Label(dashboardEnabled bool) string {
-	if !dashboardEnabled {
+func (p *Project) Label() string {
+	return p.Name
+}
+
+// LabelWithMetadata
+func (p *Project) LabelWithMetadata() string {
+	metadataInfo := []string{}
+	if p.Metadata.TerraformModulePath != "" {
+		metadataInfo = append(metadataInfo, "Module path: "+p.Metadata.TerraformModulePath)
+	}
+	if p.Metadata.WorkspaceLabel() != "" {
+		metadataInfo = append(metadataInfo, "Workspace: "+p.Metadata.WorkspaceLabel())
+	}
+
+	if len(metadataInfo) == 0 {
 		return p.Name
 	}
-	return fmt.Sprintf("%s (%s)", p.Name, p.Metadata.Path)
+
+	return fmt.Sprintf("%s (%s)", p.Name, strings.Join(metadataInfo, ", "))
 }
 
 type Breakdown struct {

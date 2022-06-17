@@ -71,7 +71,13 @@ func (p *TerragruntHCLProvider) DisplayType() string {
 }
 
 func (p *TerragruntHCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
-	// no op
+	modulePath, err := filepath.Rel(p.ctx.ProjectConfig.Path, metadata.Path)
+	if err == nil && modulePath != "" && modulePath != "." {
+		log.Debugf("Calculated relative terraformModulePath for %s from %s", p.ctx.ProjectConfig.Path, metadata.Path)
+		metadata.TerraformModulePath = modulePath
+	}
+
+	metadata.TerraformWorkspace = p.ctx.ProjectConfig.TerraformWorkspace
 }
 
 type terragruntWorkingDirInfo struct {
@@ -104,10 +110,18 @@ func (p *TerragruntHCLProvider) LoadResources(usage map[string]*schema.UsageData
 		}
 
 		for _, project := range projects {
-			project.Metadata = config.DetectProjectMetadata(di.configDir)
+			projectPath := di.configDir
+			// attempt to convert project path to be relative to the top level provider path
+			if absPath, err := filepath.Abs(p.ctx.ProjectConfig.Path); err == nil {
+				if relProjectPath, err := filepath.Rel(absPath, projectPath); err == nil {
+					projectPath = filepath.Join(p.ctx.ProjectConfig.Path, relProjectPath)
+				}
+			}
+
+			project.Metadata = config.DetectProjectMetadata(projectPath)
 			project.Metadata.Type = p.Type()
 			p.AddMetadata(project.Metadata)
-			project.Name = schema.GenerateProjectName(project.Metadata, p.ctx.RunContext.Config.IsCloudEnabled())
+			project.Name = schema.GenerateProjectName(project.Metadata, p.ctx.ProjectConfig.Name, p.ctx.RunContext.Config.IsCloudEnabled())
 			allProjects = append(allProjects, project)
 		}
 	}

@@ -56,6 +56,8 @@ func addRunFlags(cmd *cobra.Command) {
 	cmd.Flags().String("config-file", "", "Path to Infracost config file. Cannot be used with path, terraform* or usage-file flags")
 	cmd.Flags().String("usage-file", "", "Path to Infracost usage file that specifies values for usage-based resources")
 
+	cmd.Flags().String("project-name", "", "Name of project in the output.  Defaults to the VCS path.")
+
 	cmd.Flags().Bool("terraform-force-cli", false, "Generate the Terraform plan JSON using the Terraform CLI. This may require cloud credentials.")
 	cmd.Flags().String("terraform-plan-flags", "", "Flags to pass to 'terraform plan'. Applicable with --terraform-force-cli")
 	cmd.Flags().String("terraform-init-flags", "", "Flags to pass to 'terraform init'. Applicable with --terraform-force-cli")
@@ -701,6 +703,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 
 	hasProjectFlags := (hasPathFlag ||
 		cmd.Flags().Changed("usage-file") ||
+		cmd.Flags().Changed("project-name") ||
 		cmd.Flags().Changed("terraform-plan-flags") ||
 		cmd.Flags().Changed("terraform-var-file") ||
 		cmd.Flags().Changed("terraform-var") ||
@@ -723,6 +726,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 		tfVars, _ := cmd.Flags().GetStringSlice("terraform-var")
 		projectCfg.TerraformVars = tfVarsToMap(tfVars)
 		projectCfg.UsageFile, _ = cmd.Flags().GetString("usage-file")
+		projectCfg.Name, _ = cmd.Flags().GetString("project-name")
 		projectCfg.TerraformForceCLI, _ = cmd.Flags().GetBool("terraform-force-cli")
 		projectCfg.TerraformPlanFlags, _ = cmd.Flags().GetString("terraform-plan-flags")
 		projectCfg.TerraformInitFlags, _ = cmd.Flags().GetString("terraform-init-flags")

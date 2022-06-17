@@ -69,7 +69,11 @@ func (p *TerragruntProvider) DisplayType() string {
 }
 
 func (p *TerragruntProvider) AddMetadata(metadata *schema.ProjectMetadata) {
-	// no op
+	modulePath, err := filepath.Rel(p.ctx.ProjectConfig.Path, metadata.Path)
+	if err == nil && modulePath != "" && modulePath != "." {
+		log.Debugf("Calculated relative terraformModulePath for %s from %s", p.ctx.ProjectConfig.Path, metadata.Path)
+		metadata.TerraformModulePath = modulePath
+	}
 }
 
 func (p *TerragruntProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
@@ -102,10 +106,18 @@ func (p *TerragruntProvider) LoadResources(usage map[string]*schema.UsageData) (
 	})
 	defer spinner.Fail()
 	for i, projectDir := range projectDirs {
-		metadata := config.DetectProjectMetadata(projectDir.ConfigDir)
+		projectPath := projectDir.ConfigDir
+		// attempt to convert project path to be relative to the top level provider path
+		if absPath, err := filepath.Abs(p.ctx.ProjectConfig.Path); err == nil {
+			if relProjectPath, err := filepath.Rel(absPath, projectPath); err == nil {
+				projectPath = filepath.Join(p.ctx.ProjectConfig.Path, relProjectPath)
+			}
+		}
+
+		metadata := config.DetectProjectMetadata(projectPath)
 		metadata.Type = p.Type()
 		p.AddMetadata(metadata)
-		name := schema.GenerateProjectName(metadata, p.ctx.RunContext.Config.IsCloudEnabled())
+		name := schema.GenerateProjectName(metadata, p.ctx.ProjectConfig.Name, p.ctx.RunContext.Config.EnableDashboard)
 
 		project := schema.NewProject(name, metadata)
 
