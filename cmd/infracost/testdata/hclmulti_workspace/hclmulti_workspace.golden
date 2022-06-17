@@ -1,4 +1,5 @@
-Project: infracost/infracost/cmd/infracost/testdata/hclmulti_workspace (blue)
+Project: infracost/infracost/cmd/infracost/testdata/hclmulti_workspace
+Workspace: blue
 
  Name                                                           Monthly Qty  Unit                        Monthly Cost 
                                                                                                                       
@@ -17,7 +18,8 @@ Project: infracost/infracost/cmd/infracost/testdata/hclmulti_workspace (blue)
  Project total                                                                                                $742.64 
 
 ──────────────────────────────────
-Project: infracost/infracost/cmd/infracost/testdata/hclmulti_workspace (yellow)
+Project: infracost/infracost/cmd/infracost/testdata/hclmulti_workspace
+Workspace: yellow
 
  Name                                                           Monthly Qty  Unit                        Monthly Cost 
                                                                                                                       

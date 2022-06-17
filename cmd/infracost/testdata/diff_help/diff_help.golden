@@ -25,6 +25,7 @@ FLAGS
       --no-cache                     Don't attempt to cache Terraform plans
       --out-file string              Save output to a file
   -p, --path string                  Path to the Terraform directory or JSON/plan file
+      --project-name string          Name of project in the output.  Defaults to the VCS path.
       --show-skipped                 List unsupported and free resources
       --sync-usage-file              Sync usage-file with missing resources, needs usage-file too (experimental)
       --terraform-var strings        Set value for an input variable, similar to Terraform's -var flag.

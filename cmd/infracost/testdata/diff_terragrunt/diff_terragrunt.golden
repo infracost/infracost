@@ -1,4 +1,5 @@
 Project: infracost/infracost/examples/terragrunt/dev
+Module path: dev
 
 + aws_instance.web_app
   +$51.97
@@ -30,11 +31,12 @@ Project: infracost/infracost/examples/terragrunt/dev
       Monthly cost depends on usage
         +$0.0000166667 per GB-seconds
 
-Monthly cost change for infracost/infracost/examples/terragrunt/dev
+Monthly cost change for infracost/infracost/examples/terragrunt/dev (Module path: dev)
 Amount:  +$51.97 ($0.00 → $51.97)
 
 ──────────────────────────────────
 Project: infracost/infracost/examples/terragrunt/prod
+Module path: prod
 
 + aws_instance.web_app
   +$748
@@ -66,7 +68,7 @@ Project: infracost/infracost/examples/terragrunt/prod
       Monthly cost depends on usage
         +$0.0000166667 per GB-seconds
 
-Monthly cost change for infracost/infracost/examples/terragrunt/prod
+Monthly cost change for infracost/infracost/examples/terragrunt/prod (Module path: prod)
 Amount:  +$748 ($0.00 → $748)
 
 ──────────────────────────────────
