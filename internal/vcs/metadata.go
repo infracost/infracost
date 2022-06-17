@@ -20,6 +20,18 @@ var (
 		"GITHUB_ACTIONS": getGithubMetadata,
 		"GITLAB_CI":      getGitlabMetadata,
 	}
+
+	StubMetadata = Metadata{
+		Branch: Branch{
+			Name: "stub-branch",
+		},
+		Commit: Commit{
+			SHA:       "stub-sha",
+			Author:    "stub-author",
+			Timestamp: 12345,
+			Message:   "stub-message",
+		},
+	}
 )
 
 // GetMetadataFunc defines a function that fetches data for a given vcs implementation.
@@ -29,6 +41,10 @@ type GetMetadataFunc func() (Metadata, error)
 // a GetMetadataFunc for the environment using env variables to determine the CI system. If GetMetadata
 // cannot determine the CI system it falls back to getting the metadata from the local git filesystem.
 func GetMetadata() (Metadata, error) {
+	if isTest() {
+		return StubMetadata, nil
+	}
+
 	for e, f := range envToProviderMap {
 		_, ok := os.LookupEnv(e)
 		if ok {
@@ -37,6 +53,10 @@ func GetMetadata() (Metadata, error) {
 	}
 
 	return getLocalGitMetadata()
+}
+
+func isTest() bool {
+	return os.Getenv("INFRACOST_ENV") == "test" || strings.HasSuffix(os.Args[0], ".test")
 }
 
 func getGitlabMetadata() (Metadata, error) {
@@ -154,7 +174,7 @@ func getGithubMetadata() (Metadata, error) {
 }
 
 func getLocalGitMetadata() (Metadata, error) {
-	r, err := git.PlainOpen(".")
+	r, err := git.PlainOpenWithOptions(".", &git.PlainOpenOptions{DetectDotGit: true})
 	if err != nil {
 		return Metadata{}, fmt.Errorf("could not open git directory to fetch metadata %w", err)
 	}
