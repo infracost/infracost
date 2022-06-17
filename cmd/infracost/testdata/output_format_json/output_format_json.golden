@@ -13,7 +13,7 @@
         "commit": "1234",
         "commitAuthor": "hugo",
         "commitTimestamp": 657123,
-        "CommitMessage": "mymessage",
+        "commitMessage": "mymessage",
         "vcsRepoUrl": "git@github.com:infracost/infracost.git",
         "vcsSubPath": "cmd/infracost/testdata"
       },
@@ -516,13 +516,13 @@
       "name": "infracost/infracost/cmd/infracost/testdata/azure_firewall_plan.json",
       "metadata": {
         "path": "./cmd/infracost/testdata/azure_firewall_plan.json",
-        "infracostCommand": "",
+        "infracostCommand": "breakdown",
         "type": "terraform_plan_json",
-        "branch": "",
-        "commit": "",
-        "commitAuthor": "",
-        "commitTimestamp": 0,
-        "CommitMessage": "",
+        "branch": "test",
+        "commit": "1234",
+        "commitAuthor": "hugo",
+        "commitTimestamp": 657123,
+        "commitMessage": "mymessage",
         "vcsRepoUrl": "https://github.com/infracost/infracost.git",
         "vcsSubPath": "cmd/infracost/testdata/azure_firewall_plan.json"
       },

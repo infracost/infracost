@@ -23,7 +23,7 @@ type ProjectMetadata struct {
 	Commit          string `json:"commit"`
 	CommitAuthor    string `json:"commitAuthor"`
 	CommitTimestamp int64  `json:"commitTimestamp"`
-	CommitMessage   string `json:"CommitMessage"`
+	CommitMessage   string `json:"commitMessage"`
 
 	VCSRepoURL           string `json:"vcsRepoUrl,omitempty"`
 	VCSSubPath           string `json:"vcsSubPath,omitempty"`

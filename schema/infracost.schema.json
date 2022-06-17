@@ -106,7 +106,7 @@
         "commit",
         "commitAuthor",
         "commitTimestamp",
-        "CommitMessage"
+        "commitMessage"
       ],
       "properties": {
         "path": {
@@ -133,7 +133,7 @@
         "commitTimestamp": {
           "type": "integer"
         },
-        "CommitMessage": {
+        "commitMessage": {
           "type": "string"
         },
         "vcsRepoUrl": {
