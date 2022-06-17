@@ -70,6 +70,17 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 		return nil, errors.Wrap(err, "Failed to generate diff")
 	}
 
+	var hasModulePath, hasWorkspace bool
+
+	for _, p := range out.Projects {
+		if p.Metadata.TerraformModulePath != "" {
+			hasModulePath = true
+		}
+		if p.Metadata.WorkspaceLabel() != "" {
+			hasWorkspace = true
+		}
+	}
+
 	var buf bytes.Buffer
 	bufw := bufio.NewWriter(&buf)
 
@@ -92,8 +103,35 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 			}
 			return true
 		},
-		"projectLabel": func(p Project) string {
-			return p.Label(opts.DashboardEnabled)
+		"metadataHeaders": func() []string {
+			headers := []string{}
+			if hasModulePath {
+				headers = append(headers, "Module path")
+			}
+			if hasWorkspace {
+				headers = append(headers, "Workspace")
+			}
+			return headers
+		},
+		"metadataFields": func(p Project) []string {
+			fields := []string{}
+			if hasModulePath {
+				fields = append(fields, p.Metadata.TerraformModulePath)
+			}
+			if hasWorkspace {
+				fields = append(fields, p.Metadata.WorkspaceLabel())
+			}
+			return fields
+		},
+		"metadataPlaceholders": func() []string {
+			headers := []string{}
+			if hasModulePath {
+				headers = append(headers, "")
+			}
+			if hasWorkspace {
+				headers = append(headers, "")
+			}
+			return headers
 		},
 		"truncateMiddle": truncateMiddle,
 	})

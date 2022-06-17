@@ -226,6 +226,12 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
 {{define "projectBlock"}}
   {{$fields := .Options.Fields}}
   <p class="project-name">Project: {{.Project | projectLabel}}</p>
+  {{- if .Project | projectModulePath }}
+  <p class="project-name">Module path: {{.Project | projectModulePath}}</p> 	
+  {{- end }}
+  {{- if .Project | projectWorkspace }}
+  <p class="project-name">Workspace: {{.Project | projectWorkspace}}</p> 	
+  {{- end }}
   <table class="breakdown">
     <thead>
       {{template "tableHeaders" dict "Fields" $fields}}
@@ -292,6 +298,9 @@ var CommentMarkdownWithHTMLTemplate = `
 {{- define "summaryRow"}}
     <tr>
       <td>{{ truncateMiddle .Name 64 "..." }}</td>
+  {{- range .MetadataFields }}
+      <td>{{ truncateMiddle . 64 "..." }}</td>
+  {{- end }}
       <td align="right">{{ formatCost .PastCost }}</td>
       <td align="right">{{ formatCost .Cost }}</td>
       <td>{{ formatCostChange .PastCost .Cost }}</td>
@@ -302,6 +311,9 @@ var CommentMarkdownWithHTMLTemplate = `
   <thead>
     <td>Project</td>
     <td>Previous</td>
+{{- range metadataHeaders }}
+    <td>{{ . }}</td>
+{{- end }}
     <td>New</td>
     <td>Diff</td>
   </thead>
@@ -309,10 +321,10 @@ var CommentMarkdownWithHTMLTemplate = `
   <tbody>
   {{- range .Root.Projects }}
     {{- if hasDiff . }}
-      {{- template "summaryRow" dict "Name" .Name "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
+      {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
     {{- end }}
   {{- end }}
-  {{- template "summaryRow" dict "Name" "All projects" "PastCost" .Root.PastTotalMonthlyCost "Cost" .Root.TotalMonthlyCost  }}
+  {{- template "summaryRow" dict "Name" "All projects" "MetadataFields" (metadataPlaceholders) "PastCost" .Root.PastTotalMonthlyCost "Cost" .Root.TotalMonthlyCost  }}
   </tbody>
 </table>
 
@@ -326,7 +338,7 @@ var CommentMarkdownWithHTMLTemplate = `
 {{- else }}
   <tbody>
   {{- range .Root.Projects }}
-    {{- template "summaryRow" dict "Name" .Name "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
+    {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields)  "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
   {{- end }}
   </tbody>
 </table>
@@ -381,8 +393,8 @@ var CommentMarkdownTemplate = `
 {{- end }}
 ## Infracost estimate: **{{ formatCostChangeSentence .Root.Currency .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost false }}**
 
-| **Project** | **Previous** | **New** | **Diff** |
-| ----------- | -----------: | ------: | -------- |
+| **Project**{{- range metadataHeaders }} | **{{ . }}** {{- end }} | **Previous** | **New** | **Diff** |
+| -----------{{- range metadataHeaders }} | ----------: {{- end }} | -----------: | ------: | -------- |
 
 {{- if gt (len .Root.Projects) 1  }}
   {{- range .Root.Projects }}

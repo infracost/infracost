@@ -56,7 +56,7 @@ func slackProjectSummaryBlock(project Project, currency string) []*slack.TextBlo
 		diffCost = project.Diff.TotalMonthlyCost
 	}
 
-	return slackSummaryBlock(truncateMiddle(project.Name, 42, "..."), currency, cost, pastCost, diffCost)
+	return slackSummaryBlock(truncateMiddle(project.Label(), 42, "..."), currency, cost, pastCost, diffCost)
 }
 
 func slackAllProjectsSummaryBlock(out Root, currency string) []*slack.TextBlockObject {
