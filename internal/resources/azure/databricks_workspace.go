@@ -5,9 +5,10 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 
 	"fmt"
-	"strings"
 
 	"github.com/shopspring/decimal"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 type DatabricksWorkspace struct {
@@ -28,7 +29,7 @@ func (r *DatabricksWorkspace) PopulateUsage(u *schema.UsageData) {
 func (r *DatabricksWorkspace) BuildResource() *schema.Resource {
 	var costComponents []*schema.CostComponent
 
-	sku := strings.Title(r.SKU)
+	sku := cases.Title(language.English).String(r.SKU)
 
 	if sku == "Trial" {
 		return &schema.Resource{
