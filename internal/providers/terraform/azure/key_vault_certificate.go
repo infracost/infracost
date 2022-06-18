@@ -1,11 +1,11 @@
 package azure
 
 import (
-	"strings"
-
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 func GetAzureRMKeyVaultCertificateRegistryItem() *schema.RegistryItem {
@@ -26,7 +26,7 @@ func NewAzureRMKeyVaultCertificate(d *schema.ResourceData, u *schema.UsageData) 
 	var skuName string
 	keyVault := d.References("key_vault_id")
 	if len(keyVault) > 0 {
-		skuName = strings.Title(keyVault[0].Get("sku_name").String())
+		skuName = cases.Title(language.English).String(keyVault[0].Get("sku_name").String())
 	} else {
 		log.Warnf("Skipping resource %s. Could not find its 'key_vault_id.sku_name' property.", d.Address)
 		return nil

@@ -1,0 +1,10 @@
+
+ Name                                       Monthly Qty  Unit   Monthly Cost 
+                                                                             
+ aws_globalaccelerator_accelerator.example                                   
+ └─ Fixed fee                                       730  hours        $18.25 
+                                                                             
+ OVERALL TOTAL                                                        $18.25 
+──────────────────────────────────
+1 cloud resource was detected:
+∙ 1 was estimated

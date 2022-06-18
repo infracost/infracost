@@ -9,7 +9,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/pkg/browser"
-	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/infracost/infracost/internal/ui"
 )
@@ -17,6 +17,12 @@ import (
 // AuthClient represents a client for Infracost's authentication process.
 type AuthClient struct {
 	Host string
+}
+
+type callbackServerResp struct {
+	err     error
+	apiKey  string
+	infoMsg string
 }
 
 // Login opens a browser with authentication URL and starts a HTTP server to
@@ -54,65 +60,68 @@ func (a AuthClient) Login(contextVals map[string]interface{}) (string, string, e
 }
 
 func (a AuthClient) startCallbackServer(listener net.Listener, generatedState string) (string, string, error) {
-	apiKey := ""
-	infoMsg := ""
-	shutdown := make(chan struct{}, 1)
+	shutdown := make(chan callbackServerResp, 1)
 
 	go func() {
 		defer close(shutdown)
 
 		for {
 			select {
-			case <-shutdown:
-				listener.Close()
-				return
 			case <-time.After(time.Minute * 5):
+				shutdown <- callbackServerResp{err: fmt.Errorf("timeout")}
 				listener.Close()
 				return
 			}
 		}
 	}()
 
-	err := http.Serve(listener, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", a.Host)
-		w.Header().Set("Access-Control-Allow-Methods", "GET")
-		w.Header().Set("Access-Control-Allow-Headers", "Sentry-Trace")
+	go func() {
+		_ = http.Serve(listener, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if r.Method == http.MethodOptions {
+				return
+			}
 
-		if r.Method == http.MethodOptions {
-			return
-		}
+			query := r.URL.Query()
+			state := query.Get("cli_state")
+			apiKey := query.Get("api_key")
+			infoMsg := query.Get("info")
+			redirectTo := query.Get("redirect_to")
 
-		defer func() {
-			shutdown <- struct{}{}
-		}()
+			if state != generatedState {
+				log.Debug("Invalid state received")
+				w.WriteHeader(400)
+				return
+			}
 
-		query := r.URL.Query()
-		state := query.Get("cli_state")
-		apiKey = query.Get("api_key")
-		infoMsg = query.Get("info")
+			u, err := url.Parse(redirectTo)
+			if err != nil {
+				log.Debug("Unable to parse redirect_to URL")
+				w.WriteHeader(400)
+				return
+			}
 
-		if infoMsg != "" {
-			w.WriteHeader(200)
-			return
-		}
+			origin := fmt.Sprintf("%s://%s", u.Scheme, u.Host)
+			if origin != a.Host {
+				log.Debug("Invalid redirect_to URL")
+				w.WriteHeader(400)
+				return
+			}
 
-		if apiKey == "" || state != generatedState {
-			w.WriteHeader(400)
-			apiKey = ""
-		}
-	}))
+			http.Redirect(w, r, redirectTo, http.StatusTemporaryRedirect)
+			time.Sleep(3 * time.Second) // Sleep for a few seconds to make sure the redirect happens
+			shutdown <- callbackServerResp{apiKey: apiKey, infoMsg: infoMsg}
+		}))
+	}()
 
-	if !errors.Is(err, net.ErrClosed) {
-		return "", "", err
+	resp := <-shutdown
+
+	if resp.infoMsg != "" {
+		return "", resp.infoMsg, nil
 	}
 
-	if infoMsg != "" {
-		return "", infoMsg, nil
-	}
-
-	if apiKey == "" {
+	if resp.apiKey == "" || resp.err != nil {
 		return "", "", fmt.Errorf("Authentication failed. Please check your API token on %s", ui.LinkString("https://infracost.io"))
 	}
 
-	return apiKey, "", nil
+	return resp.apiKey, "", nil
 }

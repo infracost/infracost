@@ -4,6 +4,8 @@ import (
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 
 	"fmt"
 	"strings"
@@ -96,7 +98,7 @@ func (r *ElastiCacheCluster) elastiCacheCostComponent(autoscaling bool) *schema.
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "instanceType", Value: strPtr(r.NodeType)},
 				{Key: "locationType", Value: strPtr("AWS Region")},
-				{Key: "cacheEngine", Value: strPtr(strings.Title(r.Engine))},
+				{Key: "cacheEngine", Value: strPtr(cases.Title(language.English).String(r.Engine))},
 			},
 		},
 		PriceFilter: priceFilter,

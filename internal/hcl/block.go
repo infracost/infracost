@@ -110,15 +110,11 @@ func (blocks Blocks) ModuleBlocks() Blocks {
 	justModules := blocks.OfType("module")
 	toSort := make(referencedBlocks, len(justModules))
 
-	for i, block := range justModules {
-		toSort[i] = block
-	}
+	copy(toSort, justModules)
 
 	sort.Sort(toSort)
 
-	for i, block := range toSort {
-		justModules[i] = block
-	}
+	copy(justModules, toSort)
 
 	return justModules
 }
