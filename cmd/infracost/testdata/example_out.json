@@ -11,7 +11,7 @@
         "commit": "1234",
         "commitAuthorName": "hugo",
         "commitAuthorEmail": "hugo@test.com",
-        "commitTimestamp": 657123,
+        "commitTimestamp": "2021-10-11T22:41:00.144866-04:00",
         "CommitMessage": "mymessage",
         "type": "terraform_dir",
         "vcsRepoUrl": "git@github.com:infracost/infracost.git",

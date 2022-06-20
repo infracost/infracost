@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
@@ -29,7 +30,7 @@ var (
 			SHA:         "stub-sha",
 			AuthorName:  "stub-author",
 			AuthorEmail: "stub@stub.com",
-			Timestamp:   12345,
+			Time:        time.Time{},
 			Message:     "stub-message",
 		},
 	}
@@ -202,7 +203,7 @@ func commitToMetadata(commit *object.Commit) Commit {
 		SHA:         commit.Hash.String(),
 		AuthorName:  commit.Author.Name,
 		AuthorEmail: commit.Author.Email,
-		Timestamp:   commit.Author.When.Unix(),
+		Time:        commit.Author.When,
 		Message:     commit.Message,
 	}
 }
@@ -213,7 +214,7 @@ type Commit struct {
 	SHA         string
 	AuthorName  string
 	AuthorEmail string
-	Timestamp   int64
+	Time        time.Time
 	Message     string
 }
 

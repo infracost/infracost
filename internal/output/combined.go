@@ -229,7 +229,7 @@ func Combine(inputs []ReportInput) (Root, error) {
 	combined.PastTotalMonthlyCost = pastTotalMonthlyCost
 	combined.DiffTotalHourlyCost = diffTotalHourlyCost
 	combined.DiffTotalMonthlyCost = diffTotalMonthlyCost
-	combined.TimeGenerated = time.Now()
+	combined.TimeGenerated = time.Now().UTC()
 	combined.Summary = MergeSummaries(summaries)
 
 	return combined, nil

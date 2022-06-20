@@ -102,7 +102,7 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, projectContexts []*c
 		"run": runInput{
 			ProjectResults: projectResultInputs,
 			Currency:       out.Currency,
-			TimeGenerated:  out.TimeGenerated,
+			TimeGenerated:  out.TimeGenerated.UTC(),
 			Metadata:       ctx.ContextValues(),
 		},
 	}
