@@ -62,7 +62,7 @@ func isTest() bool {
 func getGitlabMetadata() (Metadata, error) {
 	m, err := getLocalGitMetadata()
 	if err != nil {
-		return m, fmt.Errorf("github metdata error, could not fetch initial metadata from local git %w", err)
+		return m, fmt.Errorf("GitLab metadata error, could not fetch initial metadata from local git %w", err)
 	}
 
 	if m.Branch.Name == "HEAD" {
@@ -71,7 +71,7 @@ func getGitlabMetadata() (Metadata, error) {
 
 	m.Pipeline = &Pipeline{ID: os.Getenv("CI_JOB_ID")}
 	m.PullRequest = &PullRequest{
-		VCSProvider:  "gitlab-ci",
+		VCSProvider:  "gitlab",
 		Title:        os.Getenv("CI_MERGE_REQUEST_TITLE"),
 		Author:       os.Getenv("CI_COMMIT_AUTHOR"),
 		SourceBranch: os.Getenv("CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"),
@@ -85,12 +85,12 @@ func getGitlabMetadata() (Metadata, error) {
 func getGithubMetadata() (Metadata, error) {
 	event, err := os.ReadFile(os.Getenv("GITHUB_EVENT_PATH"))
 	if err != nil {
-		return Metadata{}, fmt.Errorf("could not read the github event file %w", err)
+		return Metadata{}, fmt.Errorf("could not read the GitHub event file %w", err)
 	}
 
 	m, err := getLocalGitMetadata()
 	if err != nil {
-		return m, fmt.Errorf("github metdata error, could not fetch initial metadata from local git %w", err)
+		return m, fmt.Errorf("GitHub metadata error, could not fetch initial metadata from local git %w", err)
 	}
 
 	// if the branch name is HEAD this means that we're using a merge commit and need
@@ -110,12 +110,12 @@ func getGithubMetadata() (Metadata, error) {
 		val := strings.TrimSpace(strings.ReplaceAll(auth, "AUTHORIZATION: basic", ""))
 		b, err := base64.URLEncoding.DecodeString(val)
 		if err != nil {
-			return Metadata{}, fmt.Errorf("github basic auth credentials were malformed, could not decode %w", err)
+			return Metadata{}, fmt.Errorf("GitHub basic auth credentials were malformed, could not decode %w", err)
 		}
 
 		pieces := strings.Split(string(b), ":")
 		if len(pieces) != 2 {
-			return Metadata{}, fmt.Errorf("github basic auth credentials were malformed invalid auth components %+v", pieces)
+			return Metadata{}, fmt.Errorf("GitHub basic auth credentials were malformed, invalid auth components %+v", pieces)
 		}
 
 		headRef := gjson.GetBytes(event, "pull_request.head.ref").String()
@@ -128,7 +128,7 @@ func getGithubMetadata() (Metadata, error) {
 		if err == nil {
 			r, err = git.PlainOpen(clonePath)
 			if err != nil {
-				return Metadata{}, fmt.Errorf("could open previously cloned path %w", err)
+				return Metadata{}, fmt.Errorf("could not open previously cloned path %w", err)
 			}
 		} else {
 			r, err = git.PlainClone(clonePath, false, &git.CloneOptions{
@@ -142,18 +142,18 @@ func getGithubMetadata() (Metadata, error) {
 				Depth:        1,
 			})
 			if err != nil {
-				return Metadata{}, fmt.Errorf("could not shallow clone github repo to fetchcommit information %w", err)
+				return Metadata{}, fmt.Errorf("could not shallow clone GitHub repo to fetch commit information %w", err)
 			}
 		}
 
 		head, err := r.Head()
 		if err != nil {
-			return Metadata{}, fmt.Errorf("could not determine head from cloned github branch %w", err)
+			return Metadata{}, fmt.Errorf("could not determine head from cloned GitHub branch %w", err)
 		}
 
 		commit, err := r.CommitObject(head.Hash())
 		if err != nil {
-			return Metadata{}, fmt.Errorf("could not read head commit from cloned github repo %w", err)
+			return Metadata{}, fmt.Errorf("could not read head commit from cloned GitHub repo %w", err)
 		}
 
 		m.Commit = commitToMetadata(commit)
@@ -229,7 +229,7 @@ type PullRequest struct {
 }
 
 // Pipeline holds information about a specific run for a CI system.
-// This is used to aggregate or Infracost metadata across commands used in the same pipeline.
+// This is used to aggregate Infracost metadata across commands used in the same pipeline.
 type Pipeline struct {
 	ID string
 }
