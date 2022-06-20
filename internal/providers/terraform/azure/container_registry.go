@@ -15,7 +15,7 @@ func NewContainerRegistry(d *schema.ResourceData, u *schema.UsageData) *schema.R
 	r := &azure.ContainerRegistry{
 		Address:                 d.Address,
 		Region:                  lookupRegion(d, []string{}),
-		GeoReplicationLocations: len(d.Get("georeplication_locations").Array()),
+		GeoReplicationLocations: len(d.Get("georeplications").Array()),
 		SKU:                     d.Get("sku").String(),
 	}
 	r.PopulateUsage(u)
