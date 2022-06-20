@@ -1,4 +1,5 @@
 Project: my first project
+Module path: ../../../../examples/terraform
 
 ~ aws_instance.web_app
   -$561 ($1,303 → $743)
@@ -6,12 +7,13 @@ Project: my first project
     ~ Instance usage (Linux/UNIX, on-demand, m5.8xlarge → m5.4xlarge)
       -$561 ($1,121 → $561)
 
-Monthly cost change for my first project
+Monthly cost change for my first project (Module path: ../../../../examples/terraform)
 Amount:  -$561 ($1,303 → $743)
 Percent: -43%
 
 ──────────────────────────────────
 Project: my first project again
+Module path: ../../../../examples/terraform
 
 ~ aws_instance.web_app
   -$561 ($1,303 → $743)
@@ -19,13 +21,13 @@ Project: my first project again
     ~ Instance usage (Linux/UNIX, on-demand, m5.8xlarge → m5.4xlarge)
       -$561 ($1,121 → $561)
 
-Monthly cost change for my first project again
+Monthly cost change for my first project again (Module path: ../../../../examples/terraform)
 Amount:  -$561 ($1,303 → $743)
 Percent: -43%
 
 ──────────────────────────────────
 Project: my terragrunt multi project
-Module path: prod
+Module path: ../../../../examples/terragrunt/prod
 
 ~ aws_instance.web_app
   -$561 ($1,308 → $748)
@@ -33,12 +35,13 @@ Module path: prod
     ~ Instance usage (Linux/UNIX, on-demand, m5.8xlarge → m5.4xlarge)
       -$561 ($1,121 → $561)
 
-Monthly cost change for my terragrunt multi project (Module path: prod)
+Monthly cost change for my terragrunt multi project (Module path: ../../../../examples/terragrunt/prod)
 Amount:  -$561 ($1,308 → $748)
 Percent: -43%
 
 ──────────────────────────────────
 Project: my terragrunt prod project
+Module path: ../../../../examples/terragrunt/prod
 
 ~ aws_instance.web_app
   -$561 ($1,308 → $748)
@@ -46,13 +49,13 @@ Project: my terragrunt prod project
     ~ Instance usage (Linux/UNIX, on-demand, m5.8xlarge → m5.4xlarge)
       -$561 ($1,121 → $561)
 
-Monthly cost change for my terragrunt prod project
+Monthly cost change for my terragrunt prod project (Module path: ../../../../examples/terragrunt/prod)
 Amount:  -$561 ($1,308 → $748)
 Percent: -43%
 
 ──────────────────────────────────
 Project: my terragrunt workspace
-Module path: prod
+Module path: ../../../../examples/terragrunt/prod
 Workspace: ws2
 
 ~ aws_instance.web_app
@@ -61,12 +64,13 @@ Workspace: ws2
     ~ Instance usage (Linux/UNIX, on-demand, m5.8xlarge → m5.4xlarge)
       -$561 ($1,121 → $561)
 
-Monthly cost change for my terragrunt workspace (Module path: prod, Workspace: ws2)
+Monthly cost change for my terragrunt workspace (Module path: ../../../../examples/terragrunt/prod, Workspace: ws2)
 Amount:  -$561 ($1,308 → $748)
 Percent: -43%
 
 ──────────────────────────────────
 Project: my workspace project
+Module path: ../../../../examples/terraform
 Workspace: ws1
 
 ~ aws_instance.web_app
@@ -75,13 +79,13 @@ Workspace: ws1
     ~ Instance usage (Linux/UNIX, on-demand, m5.8xlarge → m5.4xlarge)
       -$561 ($1,121 → $561)
 
-Monthly cost change for my workspace project (Workspace: ws1)
+Monthly cost change for my workspace project (Module path: ../../../../examples/terraform, Workspace: ws1)
 Amount:  -$561 ($1,303 → $743)
 Percent: -43%
 
 ──────────────────────────────────
 
-The following projects have no cost estimate changes: my terragrunt dev project, my terragrunt multi project (Module path: dev), my terragrunt workspace (Module path: dev, Workspace: ws2)
+The following projects have no cost estimate changes: my terragrunt dev project (Module path: ../../../../examples/terragrunt/dev), my terragrunt multi project (Module path: ../../../../examples/terragrunt/dev), my terragrunt workspace (Module path: ../../../../examples/terragrunt/dev, Workspace: ws2)
 Run the following command to see their breakdown: infracost breakdown --path=/path/to/code
 
 ──────────────────────────────────

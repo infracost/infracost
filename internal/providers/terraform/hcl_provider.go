@@ -147,9 +147,14 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 func (p *HCLProvider) Type() string        { return "terraform_dir" }
 func (p *HCLProvider) DisplayType() string { return "Terraform directory" }
 func (p *HCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
-	modulePath, err := filepath.Rel(p.ctx.ProjectConfig.Path, metadata.Path)
+	basePath := p.ctx.ProjectConfig.Path
+	if p.ctx.RunContext.Config.ConfigFilePath != "" {
+		basePath = filepath.Dir(p.ctx.RunContext.Config.ConfigFilePath)
+	}
+
+	modulePath, err := filepath.Rel(basePath, metadata.Path)
 	if err == nil && modulePath != "" && modulePath != "." {
-		log.Debugf("Calculated relative terraformModulePath for %s from %s", p.ctx.ProjectConfig.Path, metadata.Path)
+		log.Debugf("Calculated relative terraformModulePath for %s from %s", basePath, metadata.Path)
 		metadata.TerraformModulePath = modulePath
 	}
 

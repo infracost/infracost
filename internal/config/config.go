@@ -84,6 +84,8 @@ type Config struct {
 	Fields        []string   `yaml:"fields,omitempty" ignored:"true"`
 	CompareTo     string
 
+	ConfigFilePath string
+
 	NoCache bool `yaml:"fields,omitempty" ignored:"true"`
 
 	SkipErrLine bool

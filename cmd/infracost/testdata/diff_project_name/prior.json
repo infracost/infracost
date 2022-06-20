@@ -6,7 +6,15 @@
       "name": "my first project",
       "metadata": {
         "path": "../../examples/terraform",
+        "infracostCommand": "breakdown",
         "type": "terraform_dir",
+        "terraformModulePath": "../../../../examples/terraform",
+        "branch": "feat/add_project_name",
+        "commit": "5347655a3b4e81d0471b7fe1d0891952dbd3b4e7",
+        "commitAuthorName": "tim775",
+        "commitAuthorEmail": "52185+tim775@users.noreply.github.com",
+        "commitTimestamp": 1655755403,
+        "commitMessage": "fix: Update --config-file flag conflict error to include --project-name\n",
         "vcsRepoUrl": "git@github.com:infracost/infracost.git",
         "vcsSubPath": "examples/terraform"
       },
@@ -233,7 +241,15 @@
       "name": "my first project again",
       "metadata": {
         "path": "../../examples/terraform",
+        "infracostCommand": "breakdown",
         "type": "terraform_dir",
+        "terraformModulePath": "../../../../examples/terraform",
+        "branch": "feat/add_project_name",
+        "commit": "5347655a3b4e81d0471b7fe1d0891952dbd3b4e7",
+        "commitAuthorName": "tim775",
+        "commitAuthorEmail": "52185+tim775@users.noreply.github.com",
+        "commitTimestamp": 1655755403,
+        "commitMessage": "fix: Update --config-file flag conflict error to include --project-name\n",
         "vcsRepoUrl": "git@github.com:infracost/infracost.git",
         "vcsSubPath": "examples/terraform"
       },
@@ -460,10 +476,17 @@
       "name": "my terragrunt multi project",
       "metadata": {
         "path": "../../examples/terragrunt/dev",
+        "infracostCommand": "breakdown",
         "type": "terragrunt_dir",
+        "terraformModulePath": "../../../../examples/terragrunt/dev",
+        "branch": "feat/add_project_name",
+        "commit": "5347655a3b4e81d0471b7fe1d0891952dbd3b4e7",
+        "commitAuthorName": "tim775",
+        "commitAuthorEmail": "52185+tim775@users.noreply.github.com",
+        "commitTimestamp": 1655755403,
+        "commitMessage": "fix: Update --config-file flag conflict error to include --project-name\n",
         "vcsRepoUrl": "git@github.com:infracost/infracost.git",
-        "vcsSubPath": "examples/terragrunt/dev",
-        "terraformModulePath": "dev"
+        "vcsSubPath": "examples/terragrunt/dev"
       },
       "pastBreakdown": {
         "resources": [],
@@ -688,10 +711,17 @@
       "name": "my terragrunt multi project",
       "metadata": {
         "path": "../../examples/terragrunt/prod",
+        "infracostCommand": "breakdown",
         "type": "terragrunt_dir",
+        "terraformModulePath": "../../../../examples/terragrunt/prod",
+        "branch": "feat/add_project_name",
+        "commit": "5347655a3b4e81d0471b7fe1d0891952dbd3b4e7",
+        "commitAuthorName": "tim775",
+        "commitAuthorEmail": "52185+tim775@users.noreply.github.com",
+        "commitTimestamp": 1655755403,
+        "commitMessage": "fix: Update --config-file flag conflict error to include --project-name\n",
         "vcsRepoUrl": "git@github.com:infracost/infracost.git",
-        "vcsSubPath": "examples/terragrunt/prod",
-        "terraformModulePath": "prod"
+        "vcsSubPath": "examples/terragrunt/prod"
       },
       "pastBreakdown": {
         "resources": [],
@@ -916,7 +946,15 @@
       "name": "my terragrunt prod project",
       "metadata": {
         "path": "../../examples/terragrunt/prod",
+        "infracostCommand": "breakdown",
         "type": "terragrunt_dir",
+        "terraformModulePath": "../../../../examples/terragrunt/prod",
+        "branch": "feat/add_project_name",
+        "commit": "5347655a3b4e81d0471b7fe1d0891952dbd3b4e7",
+        "commitAuthorName": "tim775",
+        "commitAuthorEmail": "52185+tim775@users.noreply.github.com",
+        "commitTimestamp": 1655755403,
+        "commitMessage": "fix: Update --config-file flag conflict error to include --project-name\n",
         "vcsRepoUrl": "git@github.com:infracost/infracost.git",
         "vcsSubPath": "examples/terragrunt/prod"
       },
@@ -1143,7 +1181,15 @@
       "name": "my terragrunt dev project",
       "metadata": {
         "path": "../../examples/terragrunt/dev",
+        "infracostCommand": "breakdown",
         "type": "terragrunt_dir",
+        "terraformModulePath": "../../../../examples/terragrunt/dev",
+        "branch": "feat/add_project_name",
+        "commit": "5347655a3b4e81d0471b7fe1d0891952dbd3b4e7",
+        "commitAuthorName": "tim775",
+        "commitAuthorEmail": "52185+tim775@users.noreply.github.com",
+        "commitTimestamp": 1655755403,
+        "commitMessage": "fix: Update --config-file flag conflict error to include --project-name\n",
         "vcsRepoUrl": "git@github.com:infracost/infracost.git",
         "vcsSubPath": "examples/terragrunt/dev"
       },
@@ -1370,10 +1416,18 @@
       "name": "my workspace project",
       "metadata": {
         "path": "../../examples/terraform",
+        "infracostCommand": "breakdown",
         "type": "terraform_dir",
+        "terraformModulePath": "../../../../examples/terraform",
+        "terraformWorkspace": "ws1",
+        "branch": "feat/add_project_name",
+        "commit": "5347655a3b4e81d0471b7fe1d0891952dbd3b4e7",
+        "commitAuthorName": "tim775",
+        "commitAuthorEmail": "52185+tim775@users.noreply.github.com",
+        "commitTimestamp": 1655755403,
+        "commitMessage": "fix: Update --config-file flag conflict error to include --project-name\n",
         "vcsRepoUrl": "git@github.com:infracost/infracost.git",
-        "vcsSubPath": "examples/terraform",
-        "terraformWorkspace": "ws1"
+        "vcsSubPath": "examples/terraform"
       },
       "pastBreakdown": {
         "resources": [],
@@ -1598,11 +1652,18 @@
       "name": "my terragrunt workspace",
       "metadata": {
         "path": "../../examples/terragrunt/dev",
+        "infracostCommand": "breakdown",
         "type": "terragrunt_dir",
+        "terraformModulePath": "../../../../examples/terragrunt/dev",
+        "terraformWorkspace": "ws2",
+        "branch": "feat/add_project_name",
+        "commit": "5347655a3b4e81d0471b7fe1d0891952dbd3b4e7",
+        "commitAuthorName": "tim775",
+        "commitAuthorEmail": "52185+tim775@users.noreply.github.com",
+        "commitTimestamp": 1655755403,
+        "commitMessage": "fix: Update --config-file flag conflict error to include --project-name\n",
         "vcsRepoUrl": "git@github.com:infracost/infracost.git",
-        "vcsSubPath": "examples/terragrunt/dev",
-        "terraformModulePath": "dev",
-        "terraformWorkspace": "ws2"
+        "vcsSubPath": "examples/terragrunt/dev"
       },
       "pastBreakdown": {
         "resources": [],
@@ -1827,11 +1888,18 @@
       "name": "my terragrunt workspace",
       "metadata": {
         "path": "../../examples/terragrunt/prod",
+        "infracostCommand": "breakdown",
         "type": "terragrunt_dir",
+        "terraformModulePath": "../../../../examples/terragrunt/prod",
+        "terraformWorkspace": "ws2",
+        "branch": "feat/add_project_name",
+        "commit": "5347655a3b4e81d0471b7fe1d0891952dbd3b4e7",
+        "commitAuthorName": "tim775",
+        "commitAuthorEmail": "52185+tim775@users.noreply.github.com",
+        "commitTimestamp": 1655755403,
+        "commitMessage": "fix: Update --config-file flag conflict error to include --project-name\n",
         "vcsRepoUrl": "git@github.com:infracost/infracost.git",
-        "vcsSubPath": "examples/terragrunt/prod",
-        "terraformModulePath": "prod",
-        "terraformWorkspace": "ws2"
+        "vcsSubPath": "examples/terragrunt/prod"
       },
       "pastBreakdown": {
         "resources": [],
@@ -2059,7 +2127,7 @@
   "pastTotalMonthlyCost": "0",
   "diffTotalHourlyCost": "10.9460054794520547585",
   "diffTotalMonthlyCost": "7990.584",
-  "timeGenerated": "2022-06-20T10:30:21.104475-04:00",
+  "timeGenerated": "2022-06-20T17:04:31.285481-04:00",
   "summary": {
     "totalDetectedResources": 18,
     "totalSupportedResources": 18,

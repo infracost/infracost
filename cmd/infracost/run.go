@@ -746,6 +746,8 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 			return err
 		}
 
+		cfg.ConfigFilePath = cfgFilePath
+
 		if forceCLI, _ := cmd.Flags().GetBool("terraform-force-cli"); forceCLI {
 			for _, p := range cfg.Projects {
 				p.TerraformForceCLI = true

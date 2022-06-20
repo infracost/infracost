@@ -71,9 +71,14 @@ func (p *TerragruntHCLProvider) DisplayType() string {
 }
 
 func (p *TerragruntHCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
-	modulePath, err := filepath.Rel(p.ctx.ProjectConfig.Path, metadata.Path)
+	basePath := p.ctx.ProjectConfig.Path
+	if p.ctx.RunContext.Config.ConfigFilePath != "" {
+		basePath = filepath.Dir(p.ctx.RunContext.Config.ConfigFilePath)
+	}
+
+	modulePath, err := filepath.Rel(basePath, metadata.Path)
 	if err == nil && modulePath != "" && modulePath != "." {
-		log.Debugf("Calculated relative terraformModulePath for %s from %s", p.ctx.ProjectConfig.Path, metadata.Path)
+		log.Debugf("Calculated relative terraformModulePath for %s from %s", basePath, metadata.Path)
 		metadata.TerraformModulePath = modulePath
 	}
 
