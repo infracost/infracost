@@ -86,7 +86,7 @@ func DetectProjectMetadata(path string) *schema.ProjectMetadata {
 
 	vcsRepoURL = stripVCSRepoPassword(vcsRepoURL)
 
-	meta, err := vcs.GetMetadata()
+	meta, err := vcs.GetMetadata(path)
 	if err != nil {
 		log.Debugf("failed to fetch vcs metadata %s", err)
 	}

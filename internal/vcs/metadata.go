@@ -35,12 +35,12 @@ var (
 )
 
 // GetMetadataFunc defines a function that fetches data for a given vcs implementation.
-type GetMetadataFunc func() (Metadata, error)
+type GetMetadataFunc func(path string) (Metadata, error)
 
 // GetMetadata fetches vcs metadata for the given environment. GetMetadata will attempt to try and find
 // a GetMetadataFunc for the environment using env variables to determine the CI system. If GetMetadata
 // cannot determine the CI system it falls back to getting the metadata from the local git filesystem.
-func GetMetadata() (Metadata, error) {
+func GetMetadata(path string) (Metadata, error) {
 	if isTest() {
 		return StubMetadata, nil
 	}
@@ -48,19 +48,19 @@ func GetMetadata() (Metadata, error) {
 	for e, f := range envToProviderMap {
 		_, ok := os.LookupEnv(e)
 		if ok {
-			return f()
+			return f(path)
 		}
 	}
 
-	return getLocalGitMetadata()
+	return getLocalGitMetadata(path)
 }
 
 func isTest() bool {
 	return os.Getenv("INFRACOST_ENV") == "test" || strings.HasSuffix(os.Args[0], ".test")
 }
 
-func getGitlabMetadata() (Metadata, error) {
-	m, err := getLocalGitMetadata()
+func getGitlabMetadata(path string) (Metadata, error) {
+	m, err := getLocalGitMetadata(path)
 	if err != nil {
 		return m, fmt.Errorf("GitLab metadata error, could not fetch initial metadata from local git %w", err)
 	}
@@ -82,13 +82,13 @@ func getGitlabMetadata() (Metadata, error) {
 	return m, nil
 }
 
-func getGithubMetadata() (Metadata, error) {
+func getGithubMetadata(path string) (Metadata, error) {
 	event, err := os.ReadFile(os.Getenv("GITHUB_EVENT_PATH"))
 	if err != nil {
 		return Metadata{}, fmt.Errorf("could not read the GitHub event file %w", err)
 	}
 
-	m, err := getLocalGitMetadata()
+	m, err := getLocalGitMetadata(path)
 	if err != nil {
 		return m, fmt.Errorf("GitHub metadata error, could not fetch initial metadata from local git %w", err)
 	}
@@ -96,7 +96,7 @@ func getGithubMetadata() (Metadata, error) {
 	// if the branch name is HEAD this means that we're using a merge commit and need
 	// to fetch the actual commit.
 	if m.Branch.Name == "HEAD" {
-		r, err := git.PlainOpen(".")
+		r, err := git.PlainOpenWithOptions(path, &git.PlainOpenOptions{DetectDotGit: true})
 		if err != nil {
 			return Metadata{}, fmt.Errorf("could not open git directory to fetch metadata %w", err)
 		}
@@ -173,8 +173,8 @@ func getGithubMetadata() (Metadata, error) {
 	return m, nil
 }
 
-func getLocalGitMetadata() (Metadata, error) {
-	r, err := git.PlainOpenWithOptions(".", &git.PlainOpenOptions{DetectDotGit: true})
+func getLocalGitMetadata(path string) (Metadata, error) {
+	r, err := git.PlainOpenWithOptions(path, &git.PlainOpenOptions{DetectDotGit: true})
 	if err != nil {
 		return Metadata{}, fmt.Errorf("could not open git directory to fetch metadata %w", err)
 	}
