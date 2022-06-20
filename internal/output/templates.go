@@ -310,10 +310,10 @@ var CommentMarkdownWithHTMLTemplate = `
 <table>
   <thead>
     <td>Project</td>
-    <td>Previous</td>
 {{- range metadataHeaders }}
     <td>{{ . }}</td>
 {{- end }}
+    <td>Previous</td>
     <td>New</td>
     <td>Diff</td>
   </thead>
