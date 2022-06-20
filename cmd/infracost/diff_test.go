@@ -49,6 +49,26 @@ func TestDiffTerraformOutFile(t *testing.T) {
 // 	GoldenFileCommandTest(t, testdataName, []string{"diff", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/example_usage.yml", "--sync-usage-file"}, nil)
 // }
 
+func TestDiffProjectName(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	GoldenFileCommandTest(t, testName,
+		[]string{
+			"diff",
+			"--config-file", path.Join("./testdata", testName, "infracost-config.yml"),
+			"--compare-to", path.Join("./testdata", testName, "prior.json"),
+		}, nil)
+}
+
+func TestDiffProjectNameNoChange(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	GoldenFileCommandTest(t, testName,
+		[]string{
+			"diff",
+			"--config-file", path.Join("./testdata", testName, "infracost-config.yml"),
+			"--compare-to", path.Join("./testdata", testName, "prior.json"),
+		}, nil)
+}
+
 func TestDiffWithCompareTo(t *testing.T) {
 	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
 	GoldenFileCommandTest(

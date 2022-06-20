@@ -20,6 +20,17 @@ func TestBreakdownFormatHTML(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--format", "html", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/example_usage.yml"}, nil)
 }
 
+func TestBreakdownFormatHTMLProjectName(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--format", "html",
+			"--project-name", "my-custom-project-name",
+			"--path", "../../examples/terragrunt",
+			"--terraform-workspace", "testworkspace",
+		}, nil)
+}
+
 func TestBreakdownFormatJSON(t *testing.T) {
 	opts := DefaultOptions()
 	opts.IsJSON = true

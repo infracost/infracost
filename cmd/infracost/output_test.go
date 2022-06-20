@@ -2,6 +2,7 @@ package main_test
 
 import (
 	"io/ioutil"
+	"path"
 	"path/filepath"
 	"testing"
 
@@ -24,8 +25,38 @@ func TestOutputFormatJSON(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--format", "json", "--path", "./testdata/example_out.json", "--path", "./testdata/azure_firewall_out.json"}, opts)
 }
 
+func TestOutputFormatBitbucketCommentWithProjectNames(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	GoldenFileCommandTest(t, testName,
+		[]string{
+			"output",
+			"--format", "bitbucket-comment",
+			"--path", path.Join("./testdata", testName, "infracost.json"),
+		}, nil)
+}
+
 func TestOutputFormatGitHubComment(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--format", "github-comment", "--path", "./testdata/example_out.json", "--path", "./testdata/terraform_v0.14_breakdown.json", "--path", "./testdata/terraform_v0.14_nochange_breakdown.json"}, nil)
+}
+
+func TestOutputFormatGitHubCommentWithProjectNames(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	GoldenFileCommandTest(t, testName,
+		[]string{
+			"output",
+			"--format", "github-comment",
+			"--path", path.Join("./testdata", testName, "infracost.json"),
+		}, nil)
+}
+
+func TestOutputFormatGitHubCommentWithProjectNamesWithMetadata(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	GoldenFileCommandTest(t, testName,
+		[]string{
+			"output",
+			"--format", "github-comment",
+			"--path", path.Join("./testdata", testName, "infracost.json"),
+		}, nil)
 }
 
 func TestOutputFormatGitHubCommentMultipleSkipped(t *testing.T) {
