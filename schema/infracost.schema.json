@@ -135,7 +135,8 @@
           "type": "string"
         },
         "commitTimestamp": {
-          "type": "integer"
+          "type": "string",
+          "format": "date-time"
         },
         "commitMessage": {
           "type": "string"
