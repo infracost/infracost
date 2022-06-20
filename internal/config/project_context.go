@@ -11,6 +11,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/vcs"
 )
 
 type ProjectContexter interface {
@@ -85,13 +86,37 @@ func DetectProjectMetadata(path string) *schema.ProjectMetadata {
 
 	vcsRepoURL = stripVCSRepoPassword(vcsRepoURL)
 
-	return &schema.ProjectMetadata{
+	meta, err := vcs.GetMetadata(path)
+	if err != nil {
+		log.Debugf("failed to fetch vcs metadata %s", err)
+	}
+
+	pm := &schema.ProjectMetadata{
 		Path:               path,
+		TerraformWorkspace: terraformWorkspace,
+		Branch:             meta.Branch.Name,
+		Commit:             meta.Commit.SHA,
+		CommitAuthorEmail:  meta.Commit.AuthorEmail,
+		CommitAuthorName:   meta.Commit.AuthorName,
+		CommitTimestamp:    meta.Commit.Timestamp,
+		CommitMessage:      meta.Commit.Message,
 		VCSRepoURL:         vcsRepoURL,
 		VCSSubPath:         vcsSubPath,
 		VCSPullRequestURL:  vcsPullRequestURL,
-		TerraformWorkspace: terraformWorkspace,
 	}
+
+	if meta.PullRequest != nil {
+		pm.VCSProvider = meta.PullRequest.VCSProvider
+		pm.VCSBaseBranch = meta.PullRequest.BaseBranch
+		pm.VCSPullRequestTitle = meta.PullRequest.Title
+		pm.VCSPullRequestAuthor = meta.PullRequest.Author
+	}
+
+	if meta.Pipeline != nil {
+		pm.VCSPipelineRunID = meta.Pipeline.ID
+	}
+
+	return pm
 }
 
 func gitRepo(path string) string {

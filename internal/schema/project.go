@@ -15,11 +15,25 @@ import (
 
 type ProjectMetadata struct {
 	Path               string `json:"path"`
+	InfracostCommand   string `json:"infracostCommand"`
 	Type               string `json:"type"`
-	VCSRepoURL         string `json:"vcsRepoUrl,omitempty"`
-	VCSSubPath         string `json:"vcsSubPath,omitempty"`
-	VCSPullRequestURL  string `json:"vcsPullRequestUrl,omitempty"`
 	TerraformWorkspace string `json:"terraformWorkspace,omitempty"`
+
+	Branch            string `json:"branch"`
+	Commit            string `json:"commit"`
+	CommitAuthorName  string `json:"commitAuthorName"`
+	CommitAuthorEmail string `json:"commitAuthorEmail"`
+	CommitTimestamp   int64  `json:"commitTimestamp"`
+	CommitMessage     string `json:"commitMessage"`
+
+	VCSRepoURL           string `json:"vcsRepoUrl,omitempty"`
+	VCSSubPath           string `json:"vcsSubPath,omitempty"`
+	VCSProvider          string `json:"vcsProvider,omitempty"`
+	VCSBaseBranch        string `json:"vcsBaseBranch,omitempty"`
+	VCSPullRequestTitle  string `json:"vcsPullRequestTitle,omitempty"`
+	VCSPullRequestURL    string `json:"vcsPullRequestUrl,omitempty"`
+	VCSPullRequestAuthor string `json:"vcsPullRequestAuthor,omitempty"`
+	VCSPipelineRunID     string `json:"vcsPipelineRunId,omitempty"`
 }
 
 // Projects is a slice of Project that is ordered alphabetically by project name.

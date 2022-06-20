@@ -125,6 +125,10 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		go formatHCLProjects(wg, runCtx, hclProjects, hclR)
 	}
 
+	for _, project := range projects {
+		project.Metadata.InfracostCommand = cmd.Name()
+	}
+
 	r, err := output.ToOutputFormat(projects)
 	if err != nil {
 		return err
