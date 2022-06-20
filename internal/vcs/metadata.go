@@ -26,10 +26,11 @@ var (
 			Name: "stub-branch",
 		},
 		Commit: Commit{
-			SHA:       "stub-sha",
-			Author:    "stub-author",
-			Timestamp: 12345,
-			Message:   "stub-message",
+			SHA:         "stub-sha",
+			AuthorName:  "stub-author",
+			AuthorEmail: "stub@stub.com",
+			Timestamp:   12345,
+			Message:     "stub-message",
 		},
 	}
 )
@@ -198,20 +199,22 @@ func getLocalGitMetadata(path string) (Metadata, error) {
 
 func commitToMetadata(commit *object.Commit) Commit {
 	return Commit{
-		SHA:       commit.Hash.String(),
-		Author:    fmt.Sprintf("%s (%s)", commit.Author.Name, commit.Author.Email),
-		Timestamp: commit.Author.When.Unix(),
-		Message:   commit.Message,
+		SHA:         commit.Hash.String(),
+		AuthorName:  commit.Author.Name,
+		AuthorEmail: commit.Author.Email,
+		Timestamp:   commit.Author.When.Unix(),
+		Message:     commit.Message,
 	}
 }
 
 // Commit defines information for a given commit. This information is normally populated from the
 // local vcs environment. Attributes can be overwritten by CI specific properties and variables.
 type Commit struct {
-	SHA       string
-	Author    string
-	Timestamp int64
-	Message   string
+	SHA         string
+	AuthorName  string
+	AuthorEmail string
+	Timestamp   int64
+	Message     string
 }
 
 type Branch struct {

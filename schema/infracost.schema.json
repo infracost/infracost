@@ -104,7 +104,8 @@
         "type",
         "branch",
         "commit",
-        "commitAuthor",
+        "commitAuthorName",
+        "commitAuthorEmail",
         "commitTimestamp",
         "commitMessage"
       ],
@@ -127,7 +128,10 @@
         "commit": {
           "type": "string"
         },
-        "commitAuthor": {
+        "commitAuthorName": {
+          "type": "string"
+        },
+        "commitAuthorEmail": {
           "type": "string"
         },
         "commitTimestamp": {
