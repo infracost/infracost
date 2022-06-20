@@ -120,7 +120,7 @@ func getGithubMetadata(path string) (Metadata, error) {
 		}
 
 		headRef := gjson.GetBytes(event, "pull_request.head.ref").String()
-		clonePath := fmt.Sprintf("/tmp/%s", headRef)
+		clonePath := fmt.Sprintf("/tmp/infracost-%s-%s", gjson.GetBytes(event, "repository.name").String(), headRef)
 
 		// if the clone path already exists then let's just do a plain open. We might hit this
 		// if the user is running multiple Infracost commands on the head commit. We don't want
