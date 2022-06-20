@@ -108,6 +108,30 @@ func OptionWithInputVars(vars map[string]string) Option {
 	}
 }
 
+// OptionWithRawCtyInput sets the input variables for the parser using a cty.Value.
+// OptionWithRawCtyInput expects that this input is a ObjectValue that can be transformed to a map.
+func OptionWithRawCtyInput(input cty.Value) Option {
+	defer func() {
+		err := recover()
+		if err != nil {
+			log.Debugf("recovering from panic using raw input cty value %s", err)
+		}
+	}()
+
+	asMap := input.AsValueMap()
+
+	return func(p *Parser) {
+		if p.inputVars == nil {
+			p.inputVars = asMap
+			return
+		}
+
+		for k, v := range asMap {
+			p.inputVars[k] = v
+		}
+	}
+}
+
 // OptionWithRemoteVarLoader accepts Terraform Cloud/Enterprise host and token
 // values to load remote execution variables.
 func OptionWithRemoteVarLoader(host, token, localWorkspace string) Option {

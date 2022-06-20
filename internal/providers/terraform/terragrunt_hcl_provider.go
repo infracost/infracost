@@ -1,6 +1,7 @@
 package terraform
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -25,6 +26,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
+	ctyJson "github.com/zclconf/go-cty/cty/json"
 
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
@@ -324,11 +326,17 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 	pconfig.Path = info.workingDir
 	pconfig.TerraformVars = p.initTerraformVars(pconfig.TerraformVars, terragruntConfig.Inputs)
 
+	inputs, err := convertToCtyWithJson(terragruntConfig.Inputs)
+	if err != nil {
+		log.Debugf("Failed to build Terragrunt inputs for: %s err: %s", info.workingDir, err)
+	}
+
 	h, err := NewHCLProvider(
 		config.NewProjectContext(p.ctx.RunContext, &pconfig),
 		&HCLProviderConfig{CacheParsingModules: true},
 		hcl.OptionWithSpinner(p.ctx.RunContext.NewSpinner),
 		hcl.OptionWithWarningFunc(p.ctx.RunContext.NewWarningWriter()),
+		hcl.OptionWithRawCtyInput(inputs),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("could not create provider for Terragrunt generated dir %w", err)
@@ -345,6 +353,18 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 
 	info.provider = h
 	return info, nil
+}
+
+func convertToCtyWithJson(val interface{}) (cty.Value, error) {
+	jsonBytes, err := json.Marshal(val)
+	if err != nil {
+		return cty.NilVal, fmt.Errorf("could not marshal terragrunt inputs %w", err)
+	}
+	var ctyJsonVal ctyJson.SimpleJSONValue
+	if err := ctyJsonVal.UnmarshalJSON(jsonBytes); err != nil {
+		return cty.NilVal, fmt.Errorf("could not unmarshall terragrunt inputs %w", err)
+	}
+	return ctyJsonVal.Value, nil
 }
 
 // fetchDependencyOutputs returns the Terraform outputs from the dependencies of Terragrunt file provided in the opts input.
