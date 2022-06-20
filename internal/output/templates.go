@@ -338,7 +338,7 @@ var CommentMarkdownWithHTMLTemplate = `
 {{- else }}
   <tbody>
   {{- range .Root.Projects }}
-    {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields)  "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
+    {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
   {{- end }}
   </tbody>
 </table>
@@ -386,10 +386,10 @@ This comment will be replaced when the cost estimate changes
 
 var CommentMarkdownTemplate = `
 {{- define "summaryRow"}}
-| {{ truncateMiddle .Name 64 "..." }} | {{ formatCost .PastCost }} | {{ formatCost .Cost }} | {{ formatCostChange .PastCost .Cost }} |
+| {{ truncateMiddle .Name 64 "..." }}{{- range .MetadataFields }} | {{ . }} {{- end }} | {{ formatCost .PastCost }} | {{ formatCost .Cost }} | {{ formatCostChange .PastCost .Cost }} |
 {{- end }}
 {{- define "totalRow"}}
-| **{{ truncateMiddle .Name 64 "..." }}** | **{{ formatCost .PastCost }}** | **{{ formatCost .Cost }}** | **{{ formatCostChange .PastCost .Cost }}** |
+| **{{ truncateMiddle .Name 64 "..." }}**{{- range metadataHeaders }} | {{- end }} | **{{ formatCost .PastCost }}** | **{{ formatCost .Cost }}** | **{{ formatCostChange .PastCost .Cost }}** |
 {{- end }}
 ## Infracost estimate: **{{ formatCostChangeSentence .Root.Currency .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost false }}**
 
@@ -399,7 +399,7 @@ var CommentMarkdownTemplate = `
 {{- if gt (len .Root.Projects) 1  }}
   {{- range .Root.Projects }}
     {{- if hasDiff . }}
-      {{- template "summaryRow" dict "Name" .Name "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
+      {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
     {{- end }}
   {{- end }}
   {{- template "totalRow" dict "Name" "All projects" "PastCost" .Root.PastTotalMonthlyCost "Cost" .Root.TotalMonthlyCost  }}
@@ -413,7 +413,7 @@ var CommentMarkdownTemplate = `
   {{- end }}
 {{- else }}
   {{- range .Root.Projects }}
-    {{- template "summaryRow" dict "Name" .Name "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
+    {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
   {{- end }}
 {{- end }}
 
