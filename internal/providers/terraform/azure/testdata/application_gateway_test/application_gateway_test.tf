@@ -55,6 +55,7 @@ resource "azurerm_application_gateway" "standard" {
 
   request_routing_rule {
     name                       = local.request_routing_rule_name
+    priority                   = 1
     rule_type                  = "Basic"
     http_listener_name         = local.listener_name
     backend_address_pool_name  = local.backend_address_pool_name
@@ -109,6 +110,7 @@ resource "azurerm_application_gateway" "waf" {
 
   request_routing_rule {
     name                       = local.request_routing_rule_name
+    priority                   = 1
     rule_type                  = "Basic"
     http_listener_name         = local.listener_name
     backend_address_pool_name  = local.backend_address_pool_name
@@ -163,6 +165,7 @@ resource "azurerm_application_gateway" "wafV2" {
 
   request_routing_rule {
     name                       = local.request_routing_rule_name
+    priority                   = 1
     rule_type                  = "Basic"
     http_listener_name         = local.listener_name
     backend_address_pool_name  = local.backend_address_pool_name
@@ -217,6 +220,7 @@ resource "azurerm_application_gateway" "withoutUsage" {
 
   request_routing_rule {
     name                       = local.request_routing_rule_name
+    priority                   = 1
     rule_type                  = "Basic"
     http_listener_name         = local.listener_name
     backend_address_pool_name  = local.backend_address_pool_name
