@@ -43,4 +43,12 @@ ENV INFRACOST_CI_IMAGE=true
 ENV INFRACOST_SKIP_UPDATE_CHECK='true'
 ENV INFRACOST_LOG_LEVEL=info
 
+RUN addgroup --gid 1000 infracost; \
+  adduser infracost --uid 1000 -G infracost -H -D -s /sbin/nologin; \
+  mkdir -p /infracost; \
+  chown infracost:infracost /infracost
+
+USER infracost
+WORKDIR /infracost
+
 ENTRYPOINT ["infracost"]
