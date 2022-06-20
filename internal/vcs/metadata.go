@@ -71,7 +71,7 @@ func getGitlabMetadata(path string) (Metadata, error) {
 		m.Branch.Name = os.Getenv("CI_MERGE_REQUEST_SOURCE_BRANCH_NAME")
 	}
 
-	m.Pipeline = &Pipeline{ID: os.Getenv("CI_JOB_ID")}
+	m.Pipeline = &Pipeline{ID: os.Getenv("CI_PIPELINE_ID")}
 	m.PullRequest = &PullRequest{
 		VCSProvider:  "gitlab",
 		Title:        os.Getenv("CI_MERGE_REQUEST_TITLE"),
