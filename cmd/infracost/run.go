@@ -713,7 +713,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 
 	if hasConfigFile && hasProjectFlags {
 		m := "--config-file flag cannot be used with the following flags: "
-		m += "--path, --terraform-*, --usage-file"
+		m += "--path, --project-name, --terraform-*, --usage-file"
 		ui.PrintUsage(cmd)
 		return errors.New(m)
 	}
