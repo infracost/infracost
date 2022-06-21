@@ -204,7 +204,7 @@ func commitToMetadata(commit *object.Commit) Commit {
 		AuthorName:  commit.Author.Name,
 		AuthorEmail: commit.Author.Email,
 		Time:        commit.Author.When,
-		Message:     strings.TrimRight(commit.Message, "\n"),
+		Message:     strings.TrimRight(commit.Message, "\n\r "),
 	}
 }
 
