@@ -133,7 +133,7 @@ func configureSetCmd(ctx *config.RunContext) *cobra.Command {
 				}
 
 				if b && ctx.Config.IsSelfHosted() {
-					return errors.New("Infracost cloud is part of Infracost's hosted services. Contact hello@infracost.io for help")
+					return errors.New("Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help")
 				}
 
 				ctx.Config.Configuration.EnableCloud = &b
