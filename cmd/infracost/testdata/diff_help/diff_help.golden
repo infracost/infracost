@@ -28,8 +28,8 @@ FLAGS
       --project-name string          Name of project in the output. Defaults to path or git repo name
       --show-skipped                 List unsupported and free resources
       --sync-usage-file              Sync usage-file with missing resources, needs usage-file too (experimental)
-      --terraform-var strings        Set value for an input variable, similar to Terraform's -var flag.
-      --terraform-var-file strings   Load variable files, similar to Terraform's -var-file flag. Provided files must be relative to the --path flag.
+      --terraform-var strings        Set value for an input variable, similar to Terraform's -var flag
+      --terraform-var-file strings   Load variable files, similar to Terraform's -var-file flag. Provided files must be relative to the --path flag
       --terraform-workspace string   Terraform workspace to use. Applicable when path is a Terraform directory
       --usage-file string            Path to Infracost usage file that specifies values for usage-based resources
 
