@@ -124,11 +124,13 @@ func (r *Root) ExampleProjectName() string {
 	return r.Projects[0].Name
 }
 
+// Label returns the display name of the project
 func (p *Project) Label() string {
 	return p.Name
 }
 
-// LabelWithMetadata
+// LabelWithMetadata returns the display name of the project appended with any distinguishing
+// metadata (Module path or Workspace)
 func (p *Project) LabelWithMetadata() string {
 	metadataInfo := []string{}
 	if p.Metadata.TerraformModulePath != "" {
