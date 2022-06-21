@@ -1,4 +1,5 @@
-Project: infracost/infracost/examples/terragrunt/dev REPLACED_PROJECT_PATH
+Project: infracost/infracost/examples/terragrunt/dev
+Module path: dev
 
  Name                                                         Monthly Qty  Unit                        Monthly Cost 
                                                                                                                     
@@ -17,7 +18,8 @@ Project: infracost/infracost/examples/terragrunt/dev REPLACED_PROJECT_PATH
  Project total                                                                                               $51.97 
 
 ──────────────────────────────────
-Project: infracost/infracost/examples/terragrunt/prod REPLACED_PROJECT_PATH
+Project: infracost/infracost/examples/terragrunt/prod
+Module path: prod
 
  Name                                                           Monthly Qty  Unit                        Monthly Cost 
                                                                                                                       

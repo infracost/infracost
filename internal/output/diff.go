@@ -29,7 +29,7 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 
 		// Check whether there is any diff or not
 		if len(project.Diff.Resources) == 0 {
-			noDiffProjects = append(noDiffProjects, project.Label(opts.DashboardEnabled))
+			noDiffProjects = append(noDiffProjects, project.LabelWithMetadata())
 			continue
 		}
 
@@ -37,10 +37,26 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 			s += "──────────────────────────────────\n"
 		}
 
-		s += fmt.Sprintf("%s %s\n\n",
+		s += fmt.Sprintf("%s %s\n",
 			ui.BoldString("Project:"),
-			project.Label(opts.DashboardEnabled),
+			project.Label(),
 		)
+
+		if project.Metadata.TerraformModulePath != "" {
+			s += fmt.Sprintf("%s %s\n",
+				ui.BoldString("Module path:"),
+				project.Metadata.TerraformModulePath,
+			)
+		}
+
+		if project.Metadata.WorkspaceLabel() != "" {
+			s += fmt.Sprintf("%s %s\n",
+				ui.BoldString("Workspace:"),
+				project.Metadata.WorkspaceLabel(),
+			)
+		}
+
+		s += "\n"
 
 		for _, diffResource := range project.Diff.Resources {
 			oldResource := findResourceByName(project.PastBreakdown.Resources, diffResource.Name)
@@ -62,7 +78,7 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 
 		s += fmt.Sprintf("%s %s\nAmount:  %s %s",
 			ui.BoldString("Monthly cost change for"),
-			ui.BoldString(project.Label(opts.DashboardEnabled)),
+			ui.BoldString(project.LabelWithMetadata()),
 			formatTitleWithCurrency(formatCostChange(out.Currency, project.Diff.TotalMonthlyCost), out.Currency),
 			ui.FaintStringf("(%s → %s)", formatCost(out.Currency, oldCost), formatCost(out.Currency, newCost)),
 		)

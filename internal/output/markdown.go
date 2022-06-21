@@ -3,6 +3,7 @@ package output
 import (
 	"bufio"
 	"bytes"
+	"sort"
 	"text/template"
 
 	"github.com/infracost/infracost/internal/ui"
@@ -64,11 +65,49 @@ func formatCostChangeSentence(currency string, pastCost, cost *decimal.Decimal, 
 	return "monthly cost will increase by " + formatMarkdownCostChange(currency, pastCost, cost, true) + " " + up
 }
 
+func calculateMetadataToDisplay(projects []Project) (hasModulePath bool, hasWorkspace bool) {
+	// we only want to show metadata fields if they can help distinguish projects with the same name
+
+	// copy so we can sort without side effects
+	sprojects := make([]Project, len(projects))
+	copy(sprojects, projects)
+	sort.Slice(sprojects, func(i, j int) bool {
+		if sprojects[i].Name != sprojects[j].Name {
+			return sprojects[i].Name < sprojects[j].Name
+		}
+
+		if sprojects[i].Metadata.TerraformModulePath != sprojects[j].Metadata.TerraformModulePath {
+			return sprojects[i].Metadata.TerraformModulePath < sprojects[j].Metadata.TerraformModulePath
+		}
+
+		return sprojects[i].Metadata.WorkspaceLabel() < sprojects[j].Metadata.WorkspaceLabel()
+	})
+
+	// check if any projects that have the same name have different path or workspace
+	for i, p := range sprojects {
+		if i > 0 { // we compare vs the previous item, so skip index 0
+			prev := sprojects[i-1]
+			if p.Name == prev.Name {
+				if p.Metadata.TerraformModulePath != prev.Metadata.TerraformModulePath {
+					hasModulePath = true
+				}
+				if p.Metadata.WorkspaceLabel() != prev.Metadata.WorkspaceLabel() {
+					hasWorkspace = true
+				}
+			}
+		}
+	}
+
+	return hasModulePath, hasWorkspace
+}
+
 func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, error) {
 	diff, err := ToDiff(out, opts)
 	if err != nil {
 		return nil, errors.Wrap(err, "Failed to generate diff")
 	}
+
+	hasModulePath, hasWorkspace := calculateMetadataToDisplay(out.Projects)
 
 	var buf bytes.Buffer
 	bufw := bufio.NewWriter(&buf)
@@ -92,8 +131,35 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 			}
 			return true
 		},
-		"projectLabel": func(p Project) string {
-			return p.Label(opts.DashboardEnabled)
+		"metadataHeaders": func() []string {
+			headers := []string{}
+			if hasModulePath {
+				headers = append(headers, "Module path")
+			}
+			if hasWorkspace {
+				headers = append(headers, "Workspace")
+			}
+			return headers
+		},
+		"metadataFields": func(p Project) []string {
+			fields := []string{}
+			if hasModulePath {
+				fields = append(fields, p.Metadata.TerraformModulePath)
+			}
+			if hasWorkspace {
+				fields = append(fields, p.Metadata.WorkspaceLabel())
+			}
+			return fields
+		},
+		"metadataPlaceholders": func() []string {
+			placeholders := []string{}
+			if hasModulePath {
+				placeholders = append(placeholders, "")
+			}
+			if hasWorkspace {
+				placeholders = append(placeholders, "")
+			}
+			return placeholders
 		},
 		"truncateMiddle": truncateMiddle,
 	})

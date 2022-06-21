@@ -1,4 +1,5 @@
-Project: infracost/infracost/examples/terraform (prod)
+Project: infracost/infracost/examples/terraform
+Workspace: prod
 
  Name                                                           Monthly Qty  Unit                        Monthly Cost 
                                                                                                                       

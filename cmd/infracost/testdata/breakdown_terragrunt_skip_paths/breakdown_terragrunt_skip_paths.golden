@@ -1,4 +1,5 @@
 Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_skip_paths/glob/test/shown
+Module path: glob/test/shown
 
  Name                                                         Monthly Qty  Unit                        Monthly Cost 
                                                                                                                     
@@ -18,6 +19,7 @@ Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_skip_pa
 
 ──────────────────────────────────
 Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_skip_paths/glob/test2/shown
+Module path: glob/test2/shown
 
  Name                                                         Monthly Qty  Unit                        Monthly Cost 
                                                                                                                     
@@ -37,6 +39,7 @@ Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_skip_pa
 
 ──────────────────────────────────
 Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_skip_paths/shown
+Module path: shown
 
  Name                                                         Monthly Qty  Unit                        Monthly Cost 
                                                                                                                     

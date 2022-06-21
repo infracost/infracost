@@ -1,4 +1,5 @@
 Project: infracost/infracost/examples/terragrunt/dev
+Module path: terragrunt/dev
 
  Name                                                         Monthly Qty  Unit                        Monthly Cost 
                                                                                                                     
@@ -18,6 +19,7 @@ Project: infracost/infracost/examples/terragrunt/dev
 
 ──────────────────────────────────
 Project: infracost/infracost/examples/terragrunt/prod
+Module path: terragrunt/prod
 
  Name                                                           Monthly Qty  Unit                        Monthly Cost 
                                                                                                                       

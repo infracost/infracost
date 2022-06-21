@@ -1,4 +1,5 @@
 Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_hcldeps_output/dev
+Module path: dev
 
  Name                                                         Monthly Qty  Unit                        Monthly Cost 
                                                                                                                     
@@ -18,6 +19,7 @@ Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_hcldeps
 
 ──────────────────────────────────
 Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_hcldeps_output/prod
+Module path: prod
 
  Name                                                           Monthly Qty  Unit                        Monthly Cost 
                                                                                                                       
@@ -37,6 +39,7 @@ Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_hcldeps
 
 ──────────────────────────────────
 Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_hcldeps_output/prod2
+Module path: prod2
 
  Name                                                           Monthly Qty  Unit                        Monthly Cost 
                                                                                                                       

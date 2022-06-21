@@ -1,0 +1,129 @@
+
+💰 Infracost estimate: **monthly cost will decrease by $2,242 (-43%) 📉**
+<table>
+  <thead>
+    <td>Project</td>
+    <td>Previous</td>
+    <td>New</td>
+    <td>Diff</td>
+  </thead>
+  <tbody>
+    <tr>
+      <td>my first project</td>
+      <td align="right">$1,303</td>
+      <td align="right">$743</td>
+      <td>-$560.64 (-43%)</td>
+    </tr>
+    <tr>
+      <td>my first project again</td>
+      <td align="right">$1,303</td>
+      <td align="right">$743</td>
+      <td>-$560.64 (-43%)</td>
+    </tr>
+    <tr>
+      <td>my terragrunt dev project</td>
+      <td align="right">$51.09</td>
+      <td align="right">$51.97</td>
+      <td>+$0.88 (+2%)</td>
+    </tr>
+    <tr>
+      <td>my terragrunt prod project</td>
+      <td align="right">$1,308</td>
+      <td align="right">$748</td>
+      <td>-$560.64 (-43%)</td>
+    </tr>
+    <tr>
+      <td>my workspace project</td>
+      <td align="right">$1,303</td>
+      <td align="right">$743</td>
+      <td>-$560.64 (-43%)</td>
+    </tr>
+    <tr>
+      <td>All projects</td>
+      <td align="right">$5,269</td>
+      <td align="right">$3,028</td>
+      <td>-$2,241.68 (-43%)</td>
+    </tr>
+  </tbody>
+</table>
+
+<details>
+<summary><strong>Infracost output</strong></summary>
+
+```
+Project: my first project
+
+~ aws_instance.web_app
+  -$561 ($1,303 → $743)
+
+    ~ Instance usage (Linux/UNIX, on-demand, m5.8xlarge → m5.4xlarge)
+      -$561 ($1,121 → $561)
+
+Monthly cost change for my first project
+Amount:  -$561 ($1,303 → $743)
+Percent: -43%
+
+──────────────────────────────────
+Project: my first project again
+
+~ aws_instance.web_app
+  -$561 ($1,303 → $743)
+
+    ~ Instance usage (Linux/UNIX, on-demand, m5.8xlarge → m5.4xlarge)
+      -$561 ($1,121 → $561)
+
+Monthly cost change for my first project again
+Amount:  -$561 ($1,303 → $743)
+Percent: -43%
+
+──────────────────────────────────
+Project: my terragrunt dev project
+
+~ aws_instance.web_app
+  +$0.88 ($51.09 → $51.97)
+
+    ~ Instance usage (Linux/UNIX, on-demand, t3.micro → t2.micro)
+      +$0.88 ($7.59 → $8.47)
+
+    - CPU credits
+      $0.00
+
+Monthly cost change for my terragrunt dev project
+Amount:  +$0.88 ($51.09 → $51.97)
+Percent: +2%
+
+──────────────────────────────────
+Project: my terragrunt prod project
+
+~ aws_instance.web_app
+  -$561 ($1,308 → $748)
+
+    ~ Instance usage (Linux/UNIX, on-demand, m5.8xlarge → m5.4xlarge)
+      -$561 ($1,121 → $561)
+
+Monthly cost change for my terragrunt prod project
+Amount:  -$561 ($1,308 → $748)
+Percent: -43%
+
+──────────────────────────────────
+Project: my workspace project
+Workspace: ws1
+
+~ aws_instance.web_app
+  -$561 ($1,303 → $743)
+
+    ~ Instance usage (Linux/UNIX, on-demand, m5.8xlarge → m5.4xlarge)
+      -$561 ($1,121 → $561)
+
+Monthly cost change for my workspace project (Workspace: ws1)
+Amount:  -$561 ($1,303 → $743)
+Percent: -43%
+
+──────────────────────────────────
+Key: ~ changed, + added, - removed
+
+10 cloud resources were detected:
+∙ 10 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+```
+</details>
+

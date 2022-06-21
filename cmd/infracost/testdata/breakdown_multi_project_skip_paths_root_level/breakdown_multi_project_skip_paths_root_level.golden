@@ -1,4 +1,5 @@
 Project: infracost/infracost/cmd/infracost/testdata/breakdown_multi_project_skip_paths_root_level/shown
+Module path: shown
 
  Name                                                   Monthly Qty  Unit   Monthly Cost 
                                                                                          

@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strings"
 
@@ -15,6 +16,8 @@ import (
 	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type HCLProvider struct {
@@ -144,6 +147,17 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 func (p *HCLProvider) Type() string        { return "terraform_dir" }
 func (p *HCLProvider) DisplayType() string { return "Terraform directory" }
 func (p *HCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
+	basePath := p.ctx.ProjectConfig.Path
+	if p.ctx.RunContext.Config.ConfigFilePath != "" {
+		basePath = filepath.Dir(p.ctx.RunContext.Config.ConfigFilePath)
+	}
+
+	modulePath, err := filepath.Rel(basePath, metadata.Path)
+	if err == nil && modulePath != "" && modulePath != "." {
+		log.Debugf("Calculated relative terraformModulePath for %s from %s", basePath, metadata.Path)
+		metadata.TerraformModulePath = modulePath
+	}
+
 	metadata.TerraformWorkspace = p.ctx.ProjectConfig.TerraformWorkspace
 }
 
@@ -173,7 +187,7 @@ func (p *HCLProvider) parseResources(path string, j []byte, usage map[string]*sc
 	metadata := config.DetectProjectMetadata(path)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
-	name := schema.GenerateProjectName(metadata, p.ctx.RunContext.Config.IsCloudEnabled())
+	name := schema.GenerateProjectName(metadata, p.ctx.ProjectConfig.Name, p.ctx.RunContext.Config.IsCloudEnabled())
 
 	project := schema.NewProject(name, metadata)
 
