@@ -52,7 +52,6 @@ func TestConfigFileInvalidPathErrors(t *testing.T) {
 }
 
 func TestFlagErrorsTerraformWorkspaceFlagAndEnv(t *testing.T) {
-	os.Setenv("", "dev")
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
 		[]string{
 			"breakdown",
