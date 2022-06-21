@@ -221,6 +221,10 @@ func (c *Config) IsSelfHosted() bool {
 	return c.PricingAPIEndpoint != "" && c.PricingAPIEndpoint != c.DefaultPricingAPIEndpoint
 }
 
+func (c *Config) IsCloudEnabled() bool {
+	return c.EnableCloud || c.EnableDashboard
+}
+
 func IsTest() bool {
 	return os.Getenv("INFRACOST_ENV") == "test" || strings.HasSuffix(os.Args[0], ".test")
 }

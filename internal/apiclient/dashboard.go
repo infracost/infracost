@@ -51,7 +51,7 @@ func NewDashboardAPIClient(ctx *config.RunContext) *DashboardAPIClient {
 			apiKey:   ctx.Config.APIKey,
 			uuid:     ctx.UUID(),
 		},
-		shouldStoreRun: (ctx.Config.EnableDashboard || ctx.Config.EnableCloud) && !ctx.Config.IsSelfHosted(),
+		shouldStoreRun: ctx.Config.IsCloudEnabled() && !ctx.Config.IsSelfHosted(),
 	}
 }
 
