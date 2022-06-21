@@ -152,14 +152,14 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 			return fields
 		},
 		"metadataPlaceholders": func() []string {
-			headers := []string{}
+			placeholders := []string{}
 			if hasModulePath {
-				headers = append(headers, "")
+				placeholders = append(placeholders, "")
 			}
 			if hasWorkspace {
-				headers = append(headers, "")
+				placeholders = append(placeholders, "")
 			}
-			return headers
+			return placeholders
 		},
 		"truncateMiddle": truncateMiddle,
 	})
