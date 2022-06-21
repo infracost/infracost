@@ -119,6 +119,9 @@
         "type": {
           "type": "string"
         },
+        "terraformModulePath": {
+          "type": "string"
+        },
         "terraformWorkspace": {
           "type": "string"
         },
