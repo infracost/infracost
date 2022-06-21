@@ -74,6 +74,7 @@ func getGitlabMetadata(path string) (Metadata, error) {
 	m.Pipeline = &Pipeline{ID: os.Getenv("CI_PIPELINE_ID")}
 	m.PullRequest = &PullRequest{
 		VCSProvider:  "gitlab",
+		ID:           os.Getenv("CI_MERGE_REQUEST_IID"),
 		Title:        os.Getenv("CI_MERGE_REQUEST_TITLE"),
 		Author:       os.Getenv("CI_COMMIT_AUTHOR"),
 		SourceBranch: os.Getenv("CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"),
@@ -165,6 +166,7 @@ func getGithubMetadata(path string) (Metadata, error) {
 	m.Pipeline = &Pipeline{ID: os.Getenv("GITHUB_RUN_ID")}
 	m.PullRequest = &PullRequest{
 		VCSProvider:  "github",
+		ID:           gjson.GetBytes(event, "pull_request.number").String(),
 		Title:        gjson.GetBytes(event, "pull_request.title").String(),
 		Author:       gjson.GetBytes(event, "pull_request.user.login").String(),
 		SourceBranch: gjson.GetBytes(event, "pull_request.head.ref").String(),
@@ -224,6 +226,7 @@ type Branch struct {
 
 // PullRequest defines information that is unique to a pull request or merge request in a CI system.
 type PullRequest struct {
+	ID           string
 	VCSProvider  string
 	Title        string
 	Author       string

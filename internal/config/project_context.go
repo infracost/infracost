@@ -107,6 +107,7 @@ func DetectProjectMetadata(path string) *schema.ProjectMetadata {
 
 	if meta.PullRequest != nil {
 		pm.VCSProvider = meta.PullRequest.VCSProvider
+		pm.VCSPullRequestID = meta.PullRequest.ID
 		pm.VCSBaseBranch = meta.PullRequest.BaseBranch
 		pm.VCSPullRequestTitle = meta.PullRequest.Title
 		pm.VCSPullRequestAuthor = meta.PullRequest.Author
