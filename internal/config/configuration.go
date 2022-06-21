@@ -19,6 +19,7 @@ type Configuration struct {
 	DisableHCLParsing     *bool  `yaml:"disable_hcl_parsing,omitempty"`
 	TLSInsecureSkipVerify *bool  `yaml:"tls_insecure_skip_verify,omitempty"`
 	TLSCACertFile         string `yaml:"tls_ca_cert_file,omitempty"`
+	EnableCloud           *bool  `yaml:"enable_cloud"`
 }
 
 func loadConfiguration(cfg *Config) error {
@@ -44,6 +45,10 @@ func loadConfiguration(cfg *Config) error {
 
 	if cfg.Configuration.EnableDashboard != nil {
 		cfg.EnableDashboard = *cfg.Configuration.EnableDashboard
+	}
+
+	if cfg.Configuration.EnableCloud != nil {
+		cfg.EnableCloud = *cfg.Configuration.EnableCloud
 	}
 
 	if cfg.Configuration.DisableHCLParsing != nil {
