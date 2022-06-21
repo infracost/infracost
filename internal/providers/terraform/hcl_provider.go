@@ -6,8 +6,11 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 
+	// import as logg as golangci-lint is unhappy otherwise
+	logg "github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 	ctyJson "github.com/zclconf/go-cty/cty/json"
 
@@ -468,9 +471,19 @@ func countReferences(block *hcl.Block) *countExpression {
 		}
 
 		v := attribute.Value()
-		i, _ := v.AsBigFloat().Int64()
-		exp.ConstantValue = &i
+		ty := v.Type()
+		var i int64
+		switch ty {
+		case cty.Number:
+			i, _ = v.AsBigFloat().Int64()
+		case cty.String:
+			s := v.AsString()
+			i, _ = strconv.ParseInt(s, 10, 64)
+		default:
+			logg.Debugf("unsupported go cty type %s expected either Number or String for count expression, using 0", ty)
+		}
 
+		exp.ConstantValue = &i
 		return &exp
 	}
 

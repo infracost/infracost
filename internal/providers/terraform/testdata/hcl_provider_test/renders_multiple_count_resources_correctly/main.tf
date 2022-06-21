@@ -10,6 +10,10 @@ resource "aws_eip" "test" {
   count = 2
 }
 
+resource "aws_eip" "constant_string" {
+  count = "1"
+}
+
 module "autos" {
   source = "./modules/autoscaling"
 
