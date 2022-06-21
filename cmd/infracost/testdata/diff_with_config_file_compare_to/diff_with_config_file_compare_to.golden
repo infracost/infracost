@@ -1,4 +1,5 @@
 Project: infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to/dev
+Module path: dev
 
 ~ aws_instance.web_app
   -$210 ($462 → $252)
@@ -6,12 +7,13 @@ Project: infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compar
     ~ Instance usage (Linux/UNIX, on-demand, m5.2xlarge → m5.large)
       -$210 ($280 → $70.08)
 
-Monthly cost change for infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to/dev
+Monthly cost change for infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to/dev (Module path: dev)
 Amount:  -$210 ($462 → $252)
 Percent: -45%
 
 ──────────────────────────────────
 Project: infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to/prod
+Module path: prod
 
 ~ aws_instance.web_app
   +$561 ($743 → $1,303)
@@ -19,7 +21,7 @@ Project: infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compar
     ~ Instance usage (Linux/UNIX, on-demand, m5.4xlarge → m5.8xlarge)
       +$561 ($561 → $1,121)
 
-Monthly cost change for infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to/prod
+Monthly cost change for infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to/prod (Module path: prod)
 Amount:  +$561 ($743 → $1,303)
 Percent: +75%
 
