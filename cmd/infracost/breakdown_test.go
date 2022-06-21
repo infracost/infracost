@@ -281,6 +281,9 @@ func TestBreakdownTerragruntGetEnv(t *testing.T) {
 		os.Unsetenv("CUSTOM_OS_VAR_PROD")
 	}()
 
+}
+
+func TestBreakdownTerragruntHCLDepsOutputMocked(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())}, nil)
 }
 
