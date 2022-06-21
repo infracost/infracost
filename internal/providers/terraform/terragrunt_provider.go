@@ -79,6 +79,8 @@ func (p *TerragruntProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 		log.Debugf("Calculated relative terraformModulePath for %s from %s", basePath, metadata.Path)
 		metadata.TerraformModulePath = modulePath
 	}
+
+	metadata.TerraformWorkspace = p.ctx.ProjectConfig.TerraformWorkspace
 }
 
 func (p *TerragruntProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
