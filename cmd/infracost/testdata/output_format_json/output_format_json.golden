@@ -6,7 +6,7 @@
       "name": "infracost/infracost/cmd/infracost/testdata",
       "metadata": {
         "path": "./cmd/infracost/testdata/",
-        "infracostCommand": "breakdown",
+        "infracostCommand": "output",
         "type": "terraform_dir",
         "terraformWorkspace": "default",
         "branch": "test",
@@ -517,7 +517,7 @@
       "name": "infracost/infracost/cmd/infracost/testdata/azure_firewall_plan.json",
       "metadata": {
         "path": "./cmd/infracost/testdata/azure_firewall_plan.json",
-        "infracostCommand": "breakdown",
+        "infracostCommand": "output",
         "type": "terraform_plan_json",
         "branch": "test",
         "commit": "1234",
