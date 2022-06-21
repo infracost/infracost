@@ -93,3 +93,8 @@ resource "azurerm_mssql_database" "premium6" {
   server_id = azurerm_sql_server.example.id
   sku_name  = "P6"
 }
+
+resource "azurerm_mssql_database" "blank_sku" {
+  name      = "acctest-db-e"
+  server_id = azurerm_sql_server.example.id
+}
