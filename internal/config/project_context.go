@@ -22,7 +22,7 @@ type ProjectContext struct {
 	RunContext    *RunContext
 	ProjectConfig *Project
 	contextVals   map[string]interface{}
-	mu            *sync.Mutex
+	mu            *sync.RWMutex
 
 	UsingCache bool
 	CacheErr   string
@@ -33,7 +33,7 @@ func NewProjectContext(runCtx *RunContext, projectCfg *Project) *ProjectContext 
 		RunContext:    runCtx,
 		ProjectConfig: projectCfg,
 		contextVals:   map[string]interface{}{},
-		mu:            &sync.Mutex{},
+		mu:            &sync.RWMutex{},
 	}
 }
 
@@ -52,6 +52,8 @@ func (c *ProjectContext) SetContextValue(key string, value interface{}) {
 }
 
 func (c *ProjectContext) ContextValues() map[string]interface{} {
+	c.mu.RLock()
+	defer c.mu.RUnlock()
 	return c.contextVals
 }
 
