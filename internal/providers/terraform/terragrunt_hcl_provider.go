@@ -48,6 +48,7 @@ type TerragruntHCLProvider struct {
 	outputs              map[string]cty.Value
 	stack                *tgconfigstack.Stack
 	excludedPaths        []string
+	env                  map[string]string
 }
 
 // NewTerragruntHCLProvider creates a new provider intialized with the configured project path (usually the terragrunt
@@ -59,7 +60,22 @@ func NewTerragruntHCLProvider(ctx *config.ProjectContext, includePastResources b
 		includePastResources: includePastResources,
 		outputs:              map[string]cty.Value{},
 		excludedPaths:        ctx.ProjectConfig.ExcludePaths,
+		env:                  parseEnvironmentVariables(os.Environ()),
 	}
+}
+
+func parseEnvironmentVariables(environment []string) map[string]string {
+	environmentMap := make(map[string]string)
+
+	for i := 0; i < len(environment); i++ {
+		variableSplit := strings.SplitN(environment[i], "=", 2)
+
+		if len(variableSplit) == 2 {
+			environmentMap[strings.TrimSpace(variableSplit[0])] = variableSplit[1]
+		}
+	}
+
+	return environmentMap
 }
 
 func (p *TerragruntHCLProvider) Type() string {
@@ -168,6 +184,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 		ExcludeDirs:                p.excludedPaths,
 		DownloadDir:                terragruntDownloadDir,
 		TerraformCliArgs:           []string{tgcli.CMD_TERRAGRUNT_INFO},
+		Env:                        p.env,
 		IgnoreExternalDependencies: true,
 		RunTerragrunt: func(terragruntOptions *tgoptions.TerragruntOptions) (err error) {
 			defer func() {

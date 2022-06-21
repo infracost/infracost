@@ -2,6 +2,7 @@ package main_test
 
 import (
 	"io/ioutil"
+	"os"
 	"path"
 	"path/filepath"
 	"testing"
@@ -269,6 +270,17 @@ func TestBreakdownTerragruntHCLMulti(t *testing.T) {
 }
 
 func TestBreakdownTerragruntHCLDepsOutput(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())}, nil)
+}
+
+func TestBreakdownTerragruntGetEnv(t *testing.T) {
+	os.Setenv("CUSTOM_OS_VAR", "test")
+	os.Setenv("CUSTOM_OS_VAR_PROD", "test-prod")
+	defer func() {
+		os.Unsetenv("CUSTOM_OS_VAR")
+		os.Unsetenv("CUSTOM_OS_VAR_PROD")
+	}()
+
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())}, nil)
 }
 
