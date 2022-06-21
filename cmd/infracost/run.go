@@ -56,7 +56,7 @@ func addRunFlags(cmd *cobra.Command) {
 	cmd.Flags().String("config-file", "", "Path to Infracost config file. Cannot be used with path, terraform* or usage-file flags")
 	cmd.Flags().String("usage-file", "", "Path to Infracost usage file that specifies values for usage-based resources")
 
-	cmd.Flags().String("project-name", "", "Name of project in the output.  Defaults to the VCS path.")
+	cmd.Flags().String("project-name", "", "Name of project in the output. Defaults to path or git repo name")
 
 	cmd.Flags().Bool("terraform-force-cli", false, "Generate the Terraform plan JSON using the Terraform CLI. This may require cloud credentials.")
 	cmd.Flags().String("terraform-plan-flags", "", "Flags to pass to 'terraform plan'. Applicable with --terraform-force-cli")
