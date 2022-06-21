@@ -67,6 +67,9 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 			ui.PrintWarning(cmd.ErrOrStderr(), "The dashboard is part of Infracost's hosted services. Contact hello@infracost.io for help.")
 		}
 
+		for _, p := range combined.Projects {
+			p.Metadata.InfracostCommand = "comment"
+		}
 		combined.RunID, combined.ShareURL = shareCombinedRun(ctx, combined, inputs)
 	}
 
