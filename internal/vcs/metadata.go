@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
@@ -29,7 +30,7 @@ var (
 			SHA:         "stub-sha",
 			AuthorName:  "stub-author",
 			AuthorEmail: "stub@stub.com",
-			Timestamp:   12345,
+			Time:        time.Time{},
 			Message:     "stub-message",
 		},
 	}
@@ -70,7 +71,7 @@ func getGitlabMetadata(path string) (Metadata, error) {
 		m.Branch.Name = os.Getenv("CI_MERGE_REQUEST_SOURCE_BRANCH_NAME")
 	}
 
-	m.Pipeline = &Pipeline{ID: os.Getenv("CI_JOB_ID")}
+	m.Pipeline = &Pipeline{ID: os.Getenv("CI_PIPELINE_ID")}
 	m.PullRequest = &PullRequest{
 		VCSProvider:  "gitlab",
 		Title:        os.Getenv("CI_MERGE_REQUEST_TITLE"),
@@ -202,8 +203,8 @@ func commitToMetadata(commit *object.Commit) Commit {
 		SHA:         commit.Hash.String(),
 		AuthorName:  commit.Author.Name,
 		AuthorEmail: commit.Author.Email,
-		Timestamp:   commit.Author.When.Unix(),
-		Message:     commit.Message,
+		Time:        commit.Author.When,
+		Message:     strings.TrimRight(commit.Message, "\n\r "),
 	}
 }
 
@@ -213,7 +214,7 @@ type Commit struct {
 	SHA         string
 	AuthorName  string
 	AuthorEmail string
-	Timestamp   int64
+	Time        time.Time
 	Message     string
 }
 

@@ -98,7 +98,7 @@ func DetectProjectMetadata(path string) *schema.ProjectMetadata {
 		Commit:             meta.Commit.SHA,
 		CommitAuthorEmail:  meta.Commit.AuthorEmail,
 		CommitAuthorName:   meta.Commit.AuthorName,
-		CommitTimestamp:    meta.Commit.Timestamp,
+		CommitTimestamp:    meta.Commit.Time.UTC(),
 		CommitMessage:      meta.Commit.Message,
 		VCSRepoURL:         vcsRepoURL,
 		VCSSubPath:         vcsSubPath,

@@ -415,7 +415,7 @@ func ToOutputFormat(projects []*schema.Project) (Root, error) {
 		PastTotalMonthlyCost: pastTotalMonthlyCost,
 		DiffTotalHourlyCost:  diffTotalHourlyCost,
 		DiffTotalMonthlyCost: diffTotalMonthlyCost,
-		TimeGenerated:        time.Now(),
+		TimeGenerated:        time.Now().UTC(),
 		Summary:              MergeSummaries(summaries),
 		FullSummary:          MergeSummaries(fullSummaries),
 	}

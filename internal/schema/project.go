@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 )
@@ -19,12 +20,12 @@ type ProjectMetadata struct {
 	Type               string `json:"type"`
 	TerraformWorkspace string `json:"terraformWorkspace,omitempty"`
 
-	Branch            string `json:"branch"`
-	Commit            string `json:"commit"`
-	CommitAuthorName  string `json:"commitAuthorName"`
-	CommitAuthorEmail string `json:"commitAuthorEmail"`
-	CommitTimestamp   int64  `json:"commitTimestamp"`
-	CommitMessage     string `json:"commitMessage"`
+	Branch            string    `json:"branch"`
+	Commit            string    `json:"commit"`
+	CommitAuthorName  string    `json:"commitAuthorName"`
+	CommitAuthorEmail string    `json:"commitAuthorEmail"`
+	CommitTimestamp   time.Time `json:"commitTimestamp"`
+	CommitMessage     string    `json:"commitMessage"`
 
 	VCSRepoURL           string `json:"vcsRepoUrl,omitempty"`
 	VCSSubPath           string `json:"vcsSubPath,omitempty"`

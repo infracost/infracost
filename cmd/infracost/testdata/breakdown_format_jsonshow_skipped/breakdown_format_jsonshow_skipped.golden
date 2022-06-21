@@ -12,7 +12,7 @@
         "commit": "stub-sha",
         "commitAuthorName": "stub-author",
         "commitAuthorEmail": "stub@stub.com",
-        "commitTimestamp": 12345,
+        "commitTimestamp": "REPLACED_TIME",
         "commitMessage": "stub-message",
         "vcsRepoUrl": "https://github.com/infracost/infracost",
         "vcsSubPath": "cmd/infracost/testdata/example_plan.json",
