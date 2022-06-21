@@ -394,7 +394,7 @@ var CommentMarkdownTemplate = `
 ## Infracost estimate: **{{ formatCostChangeSentence .Root.Currency .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost false }}**
 
 | **Project**{{- range metadataHeaders }} | **{{ . }}** {{- end }} | **Previous** | **New** | **Diff** |
-| -----------{{- range metadataHeaders }} | ----------: {{- end }} | -----------: | ------: | -------- |
+| -----------{{- range metadataHeaders }} | ---------- {{- end }} | -----------: | ------: | -------- |
 
 {{- if gt (len .Root.Projects) 1  }}
   {{- range .Root.Projects }}
