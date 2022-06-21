@@ -2,7 +2,7 @@
 ## Infracost estimate: **monthly cost will decrease by $3,364 (-42%) ↓**
 
 | **Project** | **Module path** | **Previous** | **New** | **Diff** |
-| ----------- | ----------: | -----------: | ------: | -------- |
+| ----------- | ---------- | -----------: | ------: | -------- |
 | my first project |  | $1,303 | $743 | -$560.64 (-43%) |
 | my first project again |  | $1,303 | $743 | -$560.64 (-43%) |
 | my terragrunt multi project | prod | $1,308 | $748 | -$560.64 (-43%) |

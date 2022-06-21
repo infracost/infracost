@@ -13,7 +13,7 @@
         "commit": "5347655a3b4e81d0471b7fe1d0891952dbd3b4e7",
         "commitAuthorName": "tim775",
         "commitAuthorEmail": "52185+tim775@users.noreply.github.com",
-        "commitTimestamp": 1655755403,
+        "commitTimestamp": "2021-08-27T12:58:42.803571Z",
         "commitMessage": "fix: Update --config-file flag conflict error to include --project-name\n",
         "vcsRepoUrl": "git@github.com:infracost/infracost.git",
         "vcsSubPath": "examples/terraform"
@@ -248,7 +248,7 @@
         "commit": "5347655a3b4e81d0471b7fe1d0891952dbd3b4e7",
         "commitAuthorName": "tim775",
         "commitAuthorEmail": "52185+tim775@users.noreply.github.com",
-        "commitTimestamp": 1655755403,
+        "commitTimestamp": "2021-08-27T12:58:42.803571Z",
         "commitMessage": "fix: Update --config-file flag conflict error to include --project-name\n",
         "vcsRepoUrl": "git@github.com:infracost/infracost.git",
         "vcsSubPath": "examples/terraform"
@@ -483,7 +483,7 @@
         "commit": "5347655a3b4e81d0471b7fe1d0891952dbd3b4e7",
         "commitAuthorName": "tim775",
         "commitAuthorEmail": "52185+tim775@users.noreply.github.com",
-        "commitTimestamp": 1655755403,
+        "commitTimestamp": "2021-08-27T12:58:42.803571Z",
         "commitMessage": "fix: Update --config-file flag conflict error to include --project-name\n",
         "vcsRepoUrl": "git@github.com:infracost/infracost.git",
         "vcsSubPath": "examples/terragrunt/dev"
@@ -718,7 +718,7 @@
         "commit": "5347655a3b4e81d0471b7fe1d0891952dbd3b4e7",
         "commitAuthorName": "tim775",
         "commitAuthorEmail": "52185+tim775@users.noreply.github.com",
-        "commitTimestamp": 1655755403,
+        "commitTimestamp": "2021-08-27T12:58:42.803571Z",
         "commitMessage": "fix: Update --config-file flag conflict error to include --project-name\n",
         "vcsRepoUrl": "git@github.com:infracost/infracost.git",
         "vcsSubPath": "examples/terragrunt/prod"
@@ -953,7 +953,7 @@
         "commit": "5347655a3b4e81d0471b7fe1d0891952dbd3b4e7",
         "commitAuthorName": "tim775",
         "commitAuthorEmail": "52185+tim775@users.noreply.github.com",
-        "commitTimestamp": 1655755403,
+        "commitTimestamp": "2021-08-27T12:58:42.803571Z",
         "commitMessage": "fix: Update --config-file flag conflict error to include --project-name\n",
         "vcsRepoUrl": "git@github.com:infracost/infracost.git",
         "vcsSubPath": "examples/terragrunt/prod"
@@ -1188,7 +1188,7 @@
         "commit": "5347655a3b4e81d0471b7fe1d0891952dbd3b4e7",
         "commitAuthorName": "tim775",
         "commitAuthorEmail": "52185+tim775@users.noreply.github.com",
-        "commitTimestamp": 1655755403,
+        "commitTimestamp": "2021-08-27T12:58:42.803571Z",
         "commitMessage": "fix: Update --config-file flag conflict error to include --project-name\n",
         "vcsRepoUrl": "git@github.com:infracost/infracost.git",
         "vcsSubPath": "examples/terragrunt/dev"
@@ -1424,7 +1424,7 @@
         "commit": "5347655a3b4e81d0471b7fe1d0891952dbd3b4e7",
         "commitAuthorName": "tim775",
         "commitAuthorEmail": "52185+tim775@users.noreply.github.com",
-        "commitTimestamp": 1655755403,
+        "commitTimestamp": "2021-08-27T12:58:42.803571Z",
         "commitMessage": "fix: Update --config-file flag conflict error to include --project-name\n",
         "vcsRepoUrl": "git@github.com:infracost/infracost.git",
         "vcsSubPath": "examples/terraform"
@@ -1660,7 +1660,7 @@
         "commit": "5347655a3b4e81d0471b7fe1d0891952dbd3b4e7",
         "commitAuthorName": "tim775",
         "commitAuthorEmail": "52185+tim775@users.noreply.github.com",
-        "commitTimestamp": 1655755403,
+        "commitTimestamp": "2021-08-27T12:58:42.803571Z",
         "commitMessage": "fix: Update --config-file flag conflict error to include --project-name\n",
         "vcsRepoUrl": "git@github.com:infracost/infracost.git",
         "vcsSubPath": "examples/terragrunt/dev"
@@ -1896,7 +1896,7 @@
         "commit": "5347655a3b4e81d0471b7fe1d0891952dbd3b4e7",
         "commitAuthorName": "tim775",
         "commitAuthorEmail": "52185+tim775@users.noreply.github.com",
-        "commitTimestamp": 1655755403,
+        "commitTimestamp": "2021-08-27T12:58:42.803571Z",
         "commitMessage": "fix: Update --config-file flag conflict error to include --project-name\n",
         "vcsRepoUrl": "git@github.com:infracost/infracost.git",
         "vcsSubPath": "examples/terragrunt/prod"
