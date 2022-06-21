@@ -17,6 +17,7 @@ var supportedConfigureKeys = map[string]struct{}{
 	"currency":                 {},
 	"pricing_api_endpoint":     {},
 	"enable_dashboard":         {},
+	"enable_cloud":             {},
 	"disable_hcl":              {},
 	"tls_insecure_skip_verify": {},
 	"tls_ca_cert_file":         {},
@@ -54,10 +55,7 @@ func configureSetCmd(ctx *config.RunContext) *cobra.Command {
   Set your preferred currency code (ISO 4217):
 
       infracost	configure set currency EUR
-
-  Set Infracost dashboard support option:
-
-      infracost	configure set enable_dashboard true`,
+`,
 		Args: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 2 {
 				return errors.New("Too many arguments")
@@ -127,6 +125,19 @@ func configureSetCmd(ctx *config.RunContext) *cobra.Command {
 
 				ctx.Config.Configuration.EnableDashboard = &b
 				saveConfiguration = true
+			case "enable_cloud":
+				b, err := strconv.ParseBool(value)
+
+				if err != nil {
+					return errors.New("Invalid value, must be true or false")
+				}
+
+				if b && ctx.Config.IsSelfHosted() {
+					return errors.New("Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help")
+				}
+
+				ctx.Config.Configuration.EnableCloud = &b
+				saveConfiguration = true
 			}
 
 			if saveCredentials {
@@ -166,10 +177,7 @@ func configureGetCmd(ctx *config.RunContext) *cobra.Command {
   Get your preferred currency:
 
       infracost	configure get currency
-
-  Get Infracost dashboard support option:
-
-      infracost	configure get enable_dashboard`,
+`,
 		Args: func(cmd *cobra.Command, args []string) error {
 			if len(args) > 1 {
 				return errors.New("Too many arguments")
@@ -249,6 +257,12 @@ func configureGetCmd(ctx *config.RunContext) *cobra.Command {
 					value = ""
 				} else {
 					value = strconv.FormatBool(*ctx.Config.Configuration.EnableDashboard)
+				}
+			case "enable_cloud":
+				if ctx.Config.Configuration.EnableCloud == nil {
+					value = ""
+				} else {
+					value = strconv.FormatBool(*ctx.Config.Configuration.EnableCloud)
 				}
 			}
 

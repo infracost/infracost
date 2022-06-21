@@ -173,7 +173,7 @@ func (p *HCLProvider) parseResources(path string, j []byte, usage map[string]*sc
 	metadata := config.DetectProjectMetadata(path)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
-	name := schema.GenerateProjectName(metadata, p.ctx.RunContext.Config.EnableDashboard)
+	name := schema.GenerateProjectName(metadata, p.ctx.RunContext.Config.IsCloudEnabled())
 
 	project := schema.NewProject(name, metadata)
 

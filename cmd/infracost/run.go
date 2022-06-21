@@ -90,8 +90,8 @@ func (p *panicError) Error() string {
 }
 
 func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
-	if runCtx.Config.IsSelfHosted() && runCtx.Config.EnableDashboard {
-		ui.PrintWarning(cmd.ErrOrStderr(), "The dashboard is part of Infracost's hosted services. Contact hello@infracost.io for help.")
+	if runCtx.Config.IsSelfHosted() && runCtx.Config.IsCloudEnabled() {
+		ui.PrintWarning(cmd.ErrOrStderr(), "Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
 	}
 
 	pr, err := newParallelRunner(cmd, runCtx)
@@ -160,7 +160,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	}
 
 	b, err := output.FormatOutput(format, r, output.Options{
-		DashboardEnabled: runCtx.Config.EnableDashboard,
+		DashboardEnabled: runCtx.Config.IsCloudEnabled(),
 		ShowSkipped:      runCtx.Config.ShowSkipped,
 		NoColor:          runCtx.Config.NoColor,
 		Fields:           runCtx.Config.Fields,

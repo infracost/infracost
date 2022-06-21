@@ -67,6 +67,7 @@ type Config struct {
 	DashboardAPIEndpoint      string `yaml:"dashboard_api_endpoint,omitempty" envconfig:"INFRACOST_DASHBOARD_API_ENDPOINT"`
 	DashboardEndpoint         string `yaml:"dashboard_endpoint,omitempty" envconfig:"INFRACOST_DASHBOARD_ENDPOINT"`
 	EnableDashboard           bool   `yaml:"enable_dashboard,omitempty" envconfig:"INFRACOST_ENABLE_DASHBOARD"`
+	EnableCloud               bool   `yaml:"enable_cloud,omitempty" envconfig:"INFRACOST_ENABLE_CLOUD"`
 	DisableHCLParsing         bool   `yaml:"disable_hcl_parsing,omitempty" envconfig:"INFRACOST_DISABLE_HCL_PARSING"`
 
 	TLSInsecureSkipVerify *bool  `envconfig:"INFRACOST_TLS_INSECURE_SKIP_VERIFY"`
@@ -218,6 +219,10 @@ func (c *Config) IsLogging() bool {
 
 func (c *Config) IsSelfHosted() bool {
 	return c.PricingAPIEndpoint != "" && c.PricingAPIEndpoint != c.DefaultPricingAPIEndpoint
+}
+
+func (c *Config) IsCloudEnabled() bool {
+	return c.EnableCloud || c.EnableDashboard
 }
 
 func IsTest() bool {
