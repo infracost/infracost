@@ -110,11 +110,12 @@ func OptionWithInputVars(vars map[string]string) Option {
 
 // OptionWithRawCtyInput sets the input variables for the parser using a cty.Value.
 // OptionWithRawCtyInput expects that this input is a ObjectValue that can be transformed to a map.
-func OptionWithRawCtyInput(input cty.Value) Option {
+func OptionWithRawCtyInput(input cty.Value) (op Option) {
 	defer func() {
 		err := recover()
 		if err != nil {
 			log.Debugf("recovering from panic using raw input cty value %s", err)
+			op = func(p *Parser) {}
 		}
 	}()
 
