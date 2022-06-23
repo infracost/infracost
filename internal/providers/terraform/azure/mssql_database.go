@@ -43,6 +43,10 @@ func (d dtuMapping) usesDTUUnits(sku string) bool {
 		return true
 	}
 
+	if sanitized == "" {
+		return false
+	}
+
 	return d[sanitized[0:1]]
 }
 
@@ -59,7 +63,7 @@ func getAzureRMMSSQLDatabaseRegistryItem() *schema.RegistryItem {
 func newAzureRMMSSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{"server_id"})
 
-	sku := d.GetStringOrDefault("sku_name", "")
+	sku := d.GetStringOrDefault("sku_name", "GP_S_Gen5_2")
 
 	var maxSize *float64
 	if !d.IsEmpty("max_size_gb") {
