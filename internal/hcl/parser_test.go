@@ -565,6 +565,45 @@ output "mod_result" {
 	assert.Equal(t, "ok", childValAttr.Value().AsString())
 }
 
+func TestOptionWithRawCtyInput(t *testing.T) {
+	type args struct {
+		input cty.Value
+	}
+	tests := []struct {
+		name string
+		args args
+		want map[string]cty.Value
+	}{
+		{
+			name: "test panic returns empty Option",
+			args: args{
+				input: cty.NilVal,
+			},
+			want: map[string]cty.Value{},
+		},
+		{
+			name: "sets input vars from cty object",
+			args: args{
+				input: cty.ObjectVal(map[string]cty.Value{
+					"test": cty.StringVal("val"),
+				}),
+			},
+			want: map[string]cty.Value{
+				"test": cty.StringVal("val"),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p := Parser{inputVars: map[string]cty.Value{}}
+			option := OptionWithRawCtyInput(tt.args.input)
+			option(&p)
+
+			assert.Equalf(t, tt.want, p.inputVars, "OptionWithRawCtyInput(%v)", tt.args.input)
+		})
+	}
+}
+
 func createTestFile(filename, contents string) string {
 	dir, err := ioutil.TempDir(os.TempDir(), "infracost")
 	if err != nil {
