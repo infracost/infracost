@@ -45,6 +45,24 @@
             ],
             "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf"
           }
+        },
+        {
+          "address": "aws_eip.constant_string[0]",
+          "mode": "managed",
+          "type": "aws_eip",
+          "name": "constant_string",
+          "index": 0,
+          "schema_version": 0,
+          "values": {},
+          "infracost_metadata": {
+            "calls": [
+              {
+                "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf",
+                "blockName": "aws_eip.constant_string"
+              }
+            ],
+            "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf"
+          }
         }
       ],
       "child_modules": [
@@ -260,6 +278,20 @@
       }
     },
     {
+      "address": "aws_eip.constant_string[0]",
+      "mode": "managed",
+      "type": "aws_eip",
+      "name": "constant_string",
+      "index": 0,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {}
+      }
+    },
+    {
       "address": "module.autos.aws_autoscaling_group.test[0]",
       "module_address": "module.autos",
       "mode": "managed",
@@ -408,6 +440,17 @@
           "schema_version": 0,
           "count_expression": {
             "constant_value": 2
+          }
+        },
+        {
+          "address": "aws_eip.constant_string",
+          "mode": "managed",
+          "type": "aws_eip",
+          "name": "constant_string",
+          "provider_config_key": "aws",
+          "schema_version": 0,
+          "count_expression": {
+            "constant_value": 1
           }
         }
       ],
