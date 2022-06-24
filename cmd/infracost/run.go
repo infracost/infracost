@@ -148,7 +148,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	r.Currency = runCtx.Config.Currency
 
 	dashboardClient := apiclient.NewDashboardAPIClient(runCtx)
-	result, err := dashboardClient.AddRun(runCtx, projectContexts, r)
+	result, err := dashboardClient.AddRun(runCtx, r)
 	if err != nil {
 		log.Errorf("Error reporting run: %s", err)
 	}
