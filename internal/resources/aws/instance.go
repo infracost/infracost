@@ -181,9 +181,9 @@ func (a *Instance) computeCostComponent() *schema.CostComponent {
 	}
 
 	return &schema.CostComponent{
-		Name:           fmt.Sprintf("Instance usage (%s, %s, %s)", osLabel, purchaseOptionLabel, a.InstanceType),
-		Unit:           "hours",
-		UnitMultiplier: decimal.NewFromInt(1),
+		Name:            fmt.Sprintf("Instance usage (%s, %s, %s)", osLabel, purchaseOptionLabel, a.InstanceType),
+		Unit:            "hours",
+		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: decimalPtr(qty),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -204,11 +204,27 @@ func (a *Instance) computeCostComponent() *schema.CostComponent {
 }
 
 func (a *Instance) ebsOptimizedCostComponent() *schema.CostComponent {
+	/**
+	 * EBS Optimized instances are billed hourly whenever the attached instance is live.
+	 *
+	 * From the EBS-opimized instance docs:
+	 *    > For Current Generation Instance types, EBS-optimization is enabled by default
+	 *    > at no additional cost. For Previous Generation Instances types, EBS-optimization
+	 *    > prices are on the Previous Generation Pricing Page.
+	 *    >
+	 *    > The hourly price for EBS-optimized instances is in addition to the hourly usage fee
+	 *    > for supported instance types.
+	 */
+	qty := decimal.NewFromInt(730)
+	if a.MonthlyHours != nil {
+		qty = decimal.NewFromInt(*a.MonthlyHours)
+	}
+
 	return &schema.CostComponent{
 		Name:                 "EBS-optimized usage",
 		Unit:                 "hours",
 		UnitMultiplier:       decimal.NewFromInt(1),
-		HourlyQuantity:       decimalPtr(decimal.NewFromInt(1)),
+		MonthlyQuantity:      decimalPtr(qty),
 		IgnoreIfMissingPrice: true,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
@@ -224,10 +240,24 @@ func (a *Instance) ebsOptimizedCostComponent() *schema.CostComponent {
 }
 
 func (a *Instance) detailedMonitoringCostComponent() *schema.CostComponent {
+	/**
+	 * Detailed monitoring is billed hourly whenever the attached instance is live.
+	 *
+	 * From the detailed monitoring docs:
+	 *    > As with all custom metrics, EC2 Detailed Monitoring is prorated by the hour and
+	 *    > metered only when the instance sends metrics to CloudWatch.
+	 */
+	maxQty := decimal.NewFromInt(730)
+	qty := maxQty.Copy()
+	if a.MonthlyHours != nil {
+		qty = decimal.NewFromInt(*a.MonthlyHours)
+	}
+	monthlyMultiplier := maxQty.Div(qty)
+
 	return &schema.CostComponent{
 		Name:                 "EC2 detailed monitoring",
 		Unit:                 "metrics",
-		UnitMultiplier:       decimal.NewFromInt(1),
+		UnitMultiplier:       monthlyMultiplier,
 		MonthlyQuantity:      decimalPtr(decimal.NewFromInt(int64(defaultEC2InstanceMetricCount))),
 		IgnoreIfMissingPrice: true,
 		ProductFilter: &schema.ProductFilter{
@@ -243,11 +273,23 @@ func (a *Instance) detailedMonitoringCostComponent() *schema.CostComponent {
 }
 
 func (a *Instance) elasticInferenceAcceleratorCostComponent() *schema.CostComponent {
+	/**
+	 * Elastic inference accelerators are billed hourly whenever the attached instance is live.
+	 *
+	 * From the elastic inference accelerator  docs:
+	 *    > With Amazon Elastic Inference, you pay only for the accelerator hours you use.
+	 *    > There are no upfront costs or minimum fees.
+	 */
+	qty := decimal.NewFromInt(730)
+	if a.MonthlyHours != nil {
+		qty = decimal.NewFromInt(*a.MonthlyHours)
+	}
+
 	return &schema.CostComponent{
-		Name:           fmt.Sprintf("Inference accelerator (%s)", strVal(a.ElasticInferenceAcceleratorType)),
-		Unit:           "hours",
-		UnitMultiplier: decimal.NewFromInt(1),
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+		Name:            fmt.Sprintf("Inference accelerator (%s)", strVal(a.ElasticInferenceAcceleratorType)),
+		Unit:            "hours",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: decimalPtr(qty),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Region:        strPtr(a.Region),
