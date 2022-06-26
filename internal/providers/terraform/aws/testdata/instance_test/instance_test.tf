@@ -241,3 +241,33 @@ resource "aws_instance" "instance_withMonthlyHours" {
   ami           = "fake_ami"
   instance_type = "t3.medium"
 }
+
+resource "aws_instance" "instance_ebsOptimized_withMonthlyHours" {
+  ami           = "fake_ami"
+  instance_type = "r3.xlarge"
+  ebs_optimized = true
+}
+
+resource "aws_instance" "instance_detailedMonitoring_withMonthlyHours" {
+  ami           = "fake_ami"
+  instance_type = "m3.large"
+  monitoring    = true
+}
+
+resource "aws_instance" "instance_elasticInferenceAccel_withMonthlyHours" {
+  ami           = "fake_ami"
+  instance_type = "m3.large"
+
+  elastic_inference_accelerator {
+    type = "eia1.medium"
+  }
+}
+
+resource "aws_instance" "instance_elasticInferenceAccel" {
+  ami           = "fake_ami"
+  instance_type = "m3.large"
+
+  elastic_inference_accelerator {
+    type = "eia1.medium"
+  }
+}

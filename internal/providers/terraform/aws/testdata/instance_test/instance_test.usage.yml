@@ -82,3 +82,12 @@ resource_usage:
 
   aws_instance.instance_withMonthlyHours:
     monthly_hours: 100
+
+  aws_instance.instance_ebsOptimized_withMonthlyHours:
+    monthly_hours: 100
+
+  aws_instance.instance_detailedMonitoring_withMonthlyHours:
+    monthly_hours: 100
+
+  aws_instance.instance_elasticInferenceAccel_withMonthlyHours:
+    monthly_hours: 100

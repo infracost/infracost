@@ -240,24 +240,10 @@ func (a *Instance) ebsOptimizedCostComponent() *schema.CostComponent {
 }
 
 func (a *Instance) detailedMonitoringCostComponent() *schema.CostComponent {
-	/**
-	 * Detailed monitoring is billed hourly whenever the attached instance is live.
-	 *
-	 * From the detailed monitoring docs:
-	 *    > As with all custom metrics, EC2 Detailed Monitoring is prorated by the hour and
-	 *    > metered only when the instance sends metrics to CloudWatch.
-	 */
-	maxQty := decimal.NewFromInt(730)
-	qty := maxQty.Copy()
-	if a.MonthlyHours != nil {
-		qty = decimal.NewFromInt(*a.MonthlyHours)
-	}
-	monthlyMultiplier := maxQty.Div(qty)
-
 	return &schema.CostComponent{
 		Name:                 "EC2 detailed monitoring",
 		Unit:                 "metrics",
-		UnitMultiplier:       monthlyMultiplier,
+		UnitMultiplier:       decimal.NewFromInt(1),
 		MonthlyQuantity:      decimalPtr(decimal.NewFromInt(int64(defaultEC2InstanceMetricCount))),
 		IgnoreIfMissingPrice: true,
 		ProductFilter: &schema.ProductFilter{
