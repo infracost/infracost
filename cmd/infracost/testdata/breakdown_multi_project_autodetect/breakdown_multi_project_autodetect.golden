@@ -1,4 +1,5 @@
 Project: infracost/infracost/cmd/infracost/testdata/breakdown_multi_project_autodetect/dev
+Module path: dev
 
  Name                                                   Monthly Qty  Unit   Monthly Cost 
                                                                                          
@@ -14,6 +15,7 @@ Project: infracost/infracost/cmd/infracost/testdata/breakdown_multi_project_auto
 
 ──────────────────────────────────
 Project: infracost/infracost/cmd/infracost/testdata/breakdown_multi_project_autodetect/prod
+Module path: prod
 
  Name                                                   Monthly Qty  Unit   Monthly Cost 
                                                                                          

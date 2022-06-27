@@ -16,9 +16,9 @@ import (
 	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/providers/cloudformation"
 	"github.com/infracost/infracost/internal/providers/pulumi"
-	"github.com/infracost/infracost/internal/providers/pulumi/types"
 	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/display"
 )
 
 // ValidationError represents an error that is raised because provider conditions are not met.
@@ -260,14 +260,14 @@ func isPulumiPreviewJSON(path string) bool {
 		return false
 	}
 
-	var jsonFormat types.PreviewDigest
+	var jsonFormat display.PreviewDigest
 
 	err = json.Unmarshal(b, &jsonFormat)
 	if err != nil {
 		return false
 	}
 
-	return jsonFormat.ChangeSummary.HasChanges()
+	return true
 }
 
 // goformation lib is not threadsafe, so we run this check synchronously

@@ -1,0 +1,3 @@
+%{ for key,value in ingresses ~}
+key ${key} value ${value}
+%{ endfor ~}

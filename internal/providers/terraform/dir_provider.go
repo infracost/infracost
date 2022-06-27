@@ -111,6 +111,17 @@ func (p *DirProvider) checks() error {
 }
 
 func (p *DirProvider) AddMetadata(metadata *schema.ProjectMetadata) {
+	basePath := p.ctx.ProjectConfig.Path
+	if p.ctx.RunContext.Config.ConfigFilePath != "" {
+		basePath = filepath.Dir(p.ctx.RunContext.Config.ConfigFilePath)
+	}
+
+	modulePath, err := filepath.Rel(basePath, metadata.Path)
+	if err == nil && modulePath != "" && modulePath != "." {
+		log.Debugf("Calculated relative terraformModulePath for %s from %s", basePath, metadata.Path)
+		metadata.TerraformModulePath = modulePath
+	}
+
 	terraformWorkspace := p.Workspace
 
 	if terraformWorkspace == "" {
@@ -161,7 +172,7 @@ func (p *DirProvider) LoadResources(usage map[string]*schema.UsageData) ([]*sche
 		metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
 		metadata.Type = p.Type()
 		p.AddMetadata(metadata)
-		name := schema.GenerateProjectName(metadata, p.ctx.RunContext.Config.EnableDashboard)
+		name := schema.GenerateProjectName(metadata, p.ctx.ProjectConfig.Name, p.ctx.RunContext.Config.IsCloudEnabled())
 
 		project := schema.NewProject(name, metadata)
 

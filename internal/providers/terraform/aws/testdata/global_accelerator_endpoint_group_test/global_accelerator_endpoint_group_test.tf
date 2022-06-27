@@ -9,12 +9,12 @@ provider "aws" {
   secret_key                  = "mock_secret_key"
 }
 
- resource "aws_globalaccelerator_endpoint_group" "eu_west_1" {
-   listener_arn = ""
-   endpoint_group_region = "eu-west-1"
- }
+resource "aws_globalaccelerator_endpoint_group" "eu_west_1" {
+  listener_arn          = ""
+  endpoint_group_region = "eu-west-1"
+}
 
 resource "aws_globalaccelerator_endpoint_group" "us_east_1" {
-  listener_arn = ""
+  listener_arn          = ""
   endpoint_group_region = "us-west-1"
 }

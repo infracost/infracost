@@ -107,11 +107,11 @@ func LoadPaths(paths []string) ([]ReportInput, error) {
 func CompareTo(current, prior Root) (Root, error) {
 	priorProjects := make(map[string]*schema.Project)
 	for _, p := range prior.Projects {
-		if _, ok := priorProjects[p.Name]; ok {
-			return Root{}, fmt.Errorf("Invalid --compare-to Infracost JSON, found duplicate project name %s", p.Name)
+		if _, ok := priorProjects[p.LabelWithMetadata()]; ok {
+			return Root{}, fmt.Errorf("Invalid --compare-to Infracost JSON, found duplicate project name %s", p.LabelWithMetadata())
 		}
 
-		priorProjects[p.Name] = p.ToSchemaProject()
+		priorProjects[p.LabelWithMetadata()] = p.ToSchemaProject()
 	}
 
 	var schemaProjects schema.Projects
@@ -121,10 +121,10 @@ func CompareTo(current, prior Root) (Root, error) {
 		scp.PastResources = nil
 		scp.HasDiff = true
 
-		if v, ok := priorProjects[p.Name]; ok {
+		if v, ok := priorProjects[p.LabelWithMetadata()]; ok {
 			scp.PastResources = v.Resources
 			scp.Diff = schema.CalculateDiff(scp.PastResources, scp.Resources)
-			delete(priorProjects, p.Name)
+			delete(priorProjects, p.LabelWithMetadata())
 		}
 
 		schemaProjects = append(schemaProjects, scp)
@@ -229,7 +229,7 @@ func Combine(inputs []ReportInput) (Root, error) {
 	combined.PastTotalMonthlyCost = pastTotalMonthlyCost
 	combined.DiffTotalHourlyCost = diffTotalHourlyCost
 	combined.DiffTotalMonthlyCost = diffTotalMonthlyCost
-	combined.TimeGenerated = time.Now()
+	combined.TimeGenerated = time.Now().UTC()
 	combined.Summary = MergeSummaries(summaries)
 
 	return combined, nil

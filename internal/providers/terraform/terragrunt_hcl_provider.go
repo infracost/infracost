@@ -1,6 +1,7 @@
 package terraform
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -25,6 +26,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
+	ctyJson "github.com/zclconf/go-cty/cty/json"
 
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
@@ -48,6 +50,7 @@ type TerragruntHCLProvider struct {
 	outputs              map[string]cty.Value
 	stack                *tgconfigstack.Stack
 	excludedPaths        []string
+	env                  map[string]string
 }
 
 // NewTerragruntHCLProvider creates a new provider intialized with the configured project path (usually the terragrunt
@@ -59,7 +62,22 @@ func NewTerragruntHCLProvider(ctx *config.ProjectContext, includePastResources b
 		includePastResources: includePastResources,
 		outputs:              map[string]cty.Value{},
 		excludedPaths:        ctx.ProjectConfig.ExcludePaths,
+		env:                  parseEnvironmentVariables(os.Environ()),
 	}
+}
+
+func parseEnvironmentVariables(environment []string) map[string]string {
+	environmentMap := make(map[string]string)
+
+	for i := 0; i < len(environment); i++ {
+		variableSplit := strings.SplitN(environment[i], "=", 2)
+
+		if len(variableSplit) == 2 {
+			environmentMap[strings.TrimSpace(variableSplit[0])] = variableSplit[1]
+		}
+	}
+
+	return environmentMap
 }
 
 func (p *TerragruntHCLProvider) Type() string {
@@ -71,7 +89,18 @@ func (p *TerragruntHCLProvider) DisplayType() string {
 }
 
 func (p *TerragruntHCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
-	// no op
+	basePath := p.ctx.ProjectConfig.Path
+	if p.ctx.RunContext.Config.ConfigFilePath != "" {
+		basePath = filepath.Dir(p.ctx.RunContext.Config.ConfigFilePath)
+	}
+
+	modulePath, err := filepath.Rel(basePath, metadata.Path)
+	if err == nil && modulePath != "" && modulePath != "." {
+		log.Debugf("Calculated relative terraformModulePath for %s from %s", basePath, metadata.Path)
+		metadata.TerraformModulePath = modulePath
+	}
+
+	metadata.TerraformWorkspace = p.ctx.ProjectConfig.TerraformWorkspace
 }
 
 type terragruntWorkingDirInfo struct {
@@ -104,10 +133,18 @@ func (p *TerragruntHCLProvider) LoadResources(usage map[string]*schema.UsageData
 		}
 
 		for _, project := range projects {
-			project.Metadata = config.DetectProjectMetadata(di.configDir)
+			projectPath := di.configDir
+			// attempt to convert project path to be relative to the top level provider path
+			if absPath, err := filepath.Abs(p.ctx.ProjectConfig.Path); err == nil {
+				if relProjectPath, err := filepath.Rel(absPath, projectPath); err == nil {
+					projectPath = filepath.Join(p.ctx.ProjectConfig.Path, relProjectPath)
+				}
+			}
+
+			project.Metadata = config.DetectProjectMetadata(projectPath)
 			project.Metadata.Type = p.Type()
 			p.AddMetadata(project.Metadata)
-			project.Name = schema.GenerateProjectName(project.Metadata, p.ctx.RunContext.Config.EnableDashboard)
+			project.Name = schema.GenerateProjectName(project.Metadata, p.ctx.ProjectConfig.Name, p.ctx.RunContext.Config.IsCloudEnabled())
 			allProjects = append(allProjects, project)
 		}
 	}
@@ -149,6 +186,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 		ExcludeDirs:                p.excludedPaths,
 		DownloadDir:                terragruntDownloadDir,
 		TerraformCliArgs:           []string{tgcli.CMD_TERRAGRUNT_INFO},
+		Env:                        p.env,
 		IgnoreExternalDependencies: true,
 		RunTerragrunt: func(terragruntOptions *tgoptions.TerragruntOptions) (err error) {
 			defer func() {
@@ -187,7 +225,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 				err.Error(),
 				fmt.Sprintf("For a list of known issues and workarounds, see: %s", ui.LinkString("https://infracost.io/docs/features/terragrunt/")),
 			),
-			"Error parsing the Terragrunt code using the Terragrunt library",
+			fmt.Sprintf("Error parsing the Terragrunt code using the Terragrunt library: %s", err),
 		)
 	}
 	p.outputs = map[string]cty.Value{}
@@ -288,11 +326,17 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 	pconfig.Path = info.workingDir
 	pconfig.TerraformVars = p.initTerraformVars(pconfig.TerraformVars, terragruntConfig.Inputs)
 
+	inputs, err := convertToCtyWithJson(terragruntConfig.Inputs)
+	if err != nil {
+		log.Debugf("Failed to build Terragrunt inputs for: %s err: %s", info.workingDir, err)
+	}
+
 	h, err := NewHCLProvider(
 		config.NewProjectContext(p.ctx.RunContext, &pconfig),
 		&HCLProviderConfig{CacheParsingModules: true},
 		hcl.OptionWithSpinner(p.ctx.RunContext.NewSpinner),
 		hcl.OptionWithWarningFunc(p.ctx.RunContext.NewWarningWriter()),
+		hcl.OptionWithRawCtyInput(inputs),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("could not create provider for Terragrunt generated dir %w", err)
@@ -309,6 +353,18 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 
 	info.provider = h
 	return info, nil
+}
+
+func convertToCtyWithJson(val interface{}) (cty.Value, error) {
+	jsonBytes, err := json.Marshal(val)
+	if err != nil {
+		return cty.NilVal, fmt.Errorf("could not marshal terragrunt inputs %w", err)
+	}
+	var ctyJsonVal ctyJson.SimpleJSONValue
+	if err := ctyJsonVal.UnmarshalJSON(jsonBytes); err != nil {
+		return cty.NilVal, fmt.Errorf("could not unmarshall terragrunt inputs %w", err)
+	}
+	return ctyJsonVal.Value, nil
 }
 
 // fetchDependencyOutputs returns the Terraform outputs from the dependencies of Terragrunt file provided in the opts input.

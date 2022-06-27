@@ -2,6 +2,7 @@ package main_test
 
 import (
 	"io/ioutil"
+	"os"
 	"path"
 	"path/filepath"
 	"testing"
@@ -18,6 +19,17 @@ func TestBreakdownHelp(t *testing.T) {
 
 func TestBreakdownFormatHTML(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--format", "html", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/example_usage.yml"}, nil)
+}
+
+func TestBreakdownFormatHTMLProjectName(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--format", "html",
+			"--project-name", "my-custom-project-name",
+			"--path", "../../examples/terragrunt",
+			"--terraform-workspace", "testworkspace",
+		}, nil)
 }
 
 func TestBreakdownFormatJSON(t *testing.T) {
@@ -258,6 +270,20 @@ func TestBreakdownTerragruntHCLMulti(t *testing.T) {
 }
 
 func TestBreakdownTerragruntHCLDepsOutput(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())}, nil)
+}
+
+func TestBreakdownTerragruntGetEnv(t *testing.T) {
+	os.Setenv("CUSTOM_OS_VAR", "test")
+	os.Setenv("CUSTOM_OS_VAR_PROD", "test-prod")
+	defer func() {
+		os.Unsetenv("CUSTOM_OS_VAR")
+		os.Unsetenv("CUSTOM_OS_VAR_PROD")
+	}()
+
+}
+
+func TestBreakdownTerragruntHCLDepsOutputMocked(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())}, nil)
 }
 

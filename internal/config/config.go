@@ -22,6 +22,8 @@ type Project struct {
 	Path string `yaml:"path,omitempty" ignored:"true"`
 	// ExcludePaths defines a list of directories that the provider should ignore.
 	ExcludePaths []string `yaml:"exclude_paths,omitempty"`
+	// Name is a user defined name for the project
+	Name string `yaml:"name,omitempty"`
 	// TerraformVarFiles is any var files that are to be used with the project.
 	TerraformVarFiles []string `yaml:"terraform_var_files"`
 	// TerraformVars is a slice of input vars that are to be used with the project.
@@ -67,6 +69,7 @@ type Config struct {
 	DashboardAPIEndpoint      string `yaml:"dashboard_api_endpoint,omitempty" envconfig:"INFRACOST_DASHBOARD_API_ENDPOINT"`
 	DashboardEndpoint         string `yaml:"dashboard_endpoint,omitempty" envconfig:"INFRACOST_DASHBOARD_ENDPOINT"`
 	EnableDashboard           bool   `yaml:"enable_dashboard,omitempty" envconfig:"INFRACOST_ENABLE_DASHBOARD"`
+	EnableCloud               bool   `yaml:"enable_cloud,omitempty" envconfig:"INFRACOST_ENABLE_CLOUD"`
 	DisableHCLParsing         bool   `yaml:"disable_hcl_parsing,omitempty" envconfig:"INFRACOST_DISABLE_HCL_PARSING"`
 
 	TLSInsecureSkipVerify *bool  `envconfig:"INFRACOST_TLS_INSECURE_SKIP_VERIFY"`
@@ -80,6 +83,8 @@ type Config struct {
 	SyncUsageFile bool       `yaml:"sync_usage_file,omitempty" ignored:"true"`
 	Fields        []string   `yaml:"fields,omitempty" ignored:"true"`
 	CompareTo     string
+
+	ConfigFilePath string
 
 	NoCache bool `yaml:"fields,omitempty" ignored:"true"`
 
@@ -218,6 +223,10 @@ func (c *Config) IsLogging() bool {
 
 func (c *Config) IsSelfHosted() bool {
 	return c.PricingAPIEndpoint != "" && c.PricingAPIEndpoint != c.DefaultPricingAPIEndpoint
+}
+
+func (c *Config) IsCloudEnabled() bool {
+	return c.EnableCloud || c.EnableDashboard
 }
 
 func IsTest() bool {

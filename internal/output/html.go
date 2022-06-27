@@ -47,7 +47,13 @@ func ToHTML(out Root, opts Options) ([]byte, error) {
 		"formatTitleWithCurrency": func(title string) string { return formatTitleWithCurrency(title, out.Currency) },
 		"formatQuantity":          formatQuantity,
 		"projectLabel": func(p Project) string {
-			return p.Label(opts.DashboardEnabled)
+			return p.Label()
+		},
+		"projectModulePath": func(p Project) string {
+			return p.Metadata.TerraformModulePath
+		},
+		"projectWorkspace": func(p Project) string {
+			return p.Metadata.WorkspaceLabel()
 		},
 	})
 	tmpl, err := tmpl.Parse(HTMLTemplate)

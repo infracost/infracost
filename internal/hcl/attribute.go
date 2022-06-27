@@ -8,7 +8,13 @@ import (
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/zclconf/go-cty/cty"
+	"github.com/zclconf/go-cty/cty/convert"
 	"github.com/zclconf/go-cty/cty/gocty"
+)
+
+var (
+	missingAttributeDiagnostic   = "Unsupported attribute"
+	valueIsNonIterableDiagnostic = "Iteration over non-iterable value"
 )
 
 // Attribute provides a wrapper struct around hcl.Attribute it provides
@@ -35,6 +41,8 @@ type Attribute struct {
 	Ctx *Context
 	// Verbose defines if the attribute should log verbose diagnostics messages to debug.
 	Verbose bool
+	// newMock generates a mock value for the attribute if it's value is missing.
+	newMock func(attr *Attribute) cty.Value
 }
 
 // IsIterable returns if the attribute can be ranged over.
@@ -49,11 +57,15 @@ func (attr *Attribute) IsIterable() bool {
 // Value returns the Attribute with the underlying hcl.Expression of the hcl.Attribute evaluated with
 // the Attribute Context. This returns a cty.Value with the values filled from any variables or references
 // that the Context carries.
-func (attr *Attribute) Value() (ctyVal cty.Value) {
+func (attr *Attribute) Value() cty.Value {
 	if attr == nil {
 		return cty.NilVal
 	}
 
+	return attr.value(0)
+}
+
+func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 	defer func() {
 		if err := recover(); err != nil {
 			log.Debugf("could not evaluate value for attr: %s err: %s\n%s", attr.Name(), err, debug.Stack())
@@ -64,6 +76,55 @@ func (attr *Attribute) Value() (ctyVal cty.Value) {
 	var diag hcl.Diagnostics
 	ctyVal, diag = attr.HCLAttr.Expr.Value(attr.Ctx.Inner())
 	if diag.HasErrors() {
+		mockedVal := cty.StringVal(fmt.Sprintf("%s-mock", attr.Name()))
+		if attr.newMock != nil {
+			mockedVal = attr.newMock(attr)
+		}
+
+		if retry > 2 {
+			return mockedVal
+		}
+
+		ctx := attr.Ctx.Inner()
+		for _, d := range diag {
+			// if the diagnostic summary indicates that we were the attribute we attempted to fetch is unsupported
+			// this is likely from a Terraform attribute that is built from the provider. We then try and build
+			// a mocked attribute so that the module evaluation isn't harmed.
+			var shouldRetry bool
+			if d.Summary == missingAttributeDiagnostic {
+				badVariables := attr.findBadVariablesFromExpression(attr.HCLAttr.Expr)
+				if badVariables == nil {
+					badVariables = d.Expression.Variables()
+				}
+
+				shouldRetry = true
+				for _, traversal := range badVariables {
+					traverseVarAndSetCtx(ctx, traversal, mockedVal)
+				}
+			}
+
+			if d.Summary == valueIsNonIterableDiagnostic {
+				badVariables := d.Expression.Variables()
+				shouldRetry = true
+				for _, traversal := range badVariables {
+					// let's first try and find the actual value for this bad variable.
+					// If it has an actual value let's use that to pass into the list.
+					val, _ := traversal.TraverseAbs(ctx)
+					if val == cty.NilVal {
+						val = mockedVal
+					}
+
+					list := cty.TupleVal([]cty.Value{val})
+					traverseVarAndSetCtx(ctx, traversal, list)
+				}
+			}
+
+			// now that we've built a mocked attribute on the global context let's try and retrieve the value once again.
+			if shouldRetry {
+				return attr.value(retry + 1)
+			}
+		}
+
 		if attr.Verbose {
 			log.Debugf("error diagnostic return from evaluating %s err: %s", attr.HCLAttr.Name, diag.Error())
 		}
@@ -74,6 +135,156 @@ func (attr *Attribute) Value() (ctyVal cty.Value) {
 	}
 
 	return ctyVal
+}
+
+// traverseVarAndSetCtx uses the hcl traversal to build a mocked attribute on the evaluation context.
+// hcl Traversals from missing are normally provided in the following manner:
+//
+// 1. The root traversal or TraverseRoot fetches the top level reference for the block. We use this traversal to
+//    determine which ctx we use. We loop through the list of EvaluationContext until we find an entry matching the
+//    reference. If there is none, we exit, this shouldn't happen and is likely an indicator of a bug.
+// 2. The remaining attribute traversals or TraverseAttr. These use the value fetched from the context by the TraverseRoot
+//    to find the value of the attribute the expression is trying to evaluate. In our case this is the attribute that
+//    we need to populate with a mocked value.
+//
+// Once we've found the missing attribute we set a mocked value and return. This value should now be available for
+// the entire context evaluation as ctx is share across all blocks.
+func traverseVarAndSetCtx(ctx *hcl.EvalContext, traversal hcl.Traversal, mock cty.Value) {
+	var rootName string
+	for _, traverser := range traversal {
+		if r, ok := traverser.(hcl.TraverseRoot); ok {
+			rootName = r.Name
+			break
+		}
+	}
+
+	if rootName == "" {
+		return
+	}
+
+	ctx = findCorrectCtx(ctx, rootName)
+	if ctx == nil {
+		return
+	}
+
+	ob := ctx.Variables[rootName].AsValueMap()
+	if ob == nil {
+		ob = make(map[string]cty.Value)
+	}
+
+	ob = buildObject(traversal, ob, mock, 0)
+	ctx.Variables[rootName] = cty.ObjectVal(ob)
+}
+
+// buildObject builds an attribute map from the traversal. It fills any missing attributes that are
+// defined by the traversal.
+func buildObject(traversal hcl.Traversal, ob map[string]cty.Value, mock cty.Value, i int) map[string]cty.Value {
+	if i > len(traversal)-1 {
+		return ob
+	}
+
+	traverser := traversal[i]
+
+	// traverse splat is a special holding type which means we want to traverse all the attributes on the map.
+	if _, ok := traverser.(hcl.TraverseSplat); ok {
+		for k, v := range ob {
+			if v.Type().IsObjectType() {
+				valueMap := v.AsValueMap()
+				ob[k] = cty.ObjectVal(buildObject(traversal, valueMap, mock, i+1))
+				continue
+			}
+
+			ob[k] = v
+		}
+
+		return ob
+	}
+
+	if index, ok := traverser.(hcl.TraverseIndex); ok {
+		kc, err := convert.Convert(index.Key, cty.String)
+		if err != nil {
+			kc = cty.StringVal("0")
+		}
+
+		k := kc.AsString()
+
+		if vv, exists := ob[k]; exists {
+			val := buildObject(traversal, vv.AsValueMap(), mock, i+1)
+			ob[k] = cty.ObjectVal(val)
+			return ob
+		}
+
+		val := buildObject(traversal, make(map[string]cty.Value), mock, i+1)
+		ob[k] = cty.ObjectVal(val)
+		return ob
+	}
+
+	if v, ok := traverser.(hcl.TraverseAttr); ok {
+		if len(traversal)-1 == i {
+			// if the attribute already exists, and we're not setting a list value
+			// then we should return here. It's most likely that we weren't able to
+			// get the full variable calls for the context, so resetting the value could
+			// be harmful.
+			if _, exists := ob[v.Name]; exists && mock.Type() == cty.String {
+				return ob
+			}
+
+			ob[v.Name] = mock
+			return ob
+		}
+
+		if vv, exists := ob[v.Name]; exists {
+			if isList(vv) {
+				items := make([]cty.Value, vv.LengthInt())
+				it := vv.ElementIterator()
+				for it.Next() {
+					key, sourceItem := it.Element()
+					val := buildObject(traversal, sourceItem.AsValueMap(), mock, i+1)
+					i, _ := key.AsBigFloat().Int64()
+					items[i] = cty.ObjectVal(val)
+				}
+				ob[v.Name] = cty.TupleVal(items)
+				return ob
+			}
+
+			next := traversal[i+1]
+			if _, ok := next.(hcl.TraverseIndex); ok {
+				if !isList(vv) {
+					vv = cty.TupleVal([]cty.Value{vv})
+				}
+			}
+
+			val := buildObject(traversal, vv.AsValueMap(), mock, i+1)
+			ob[v.Name] = cty.ObjectVal(val)
+			return ob
+		}
+
+		val := buildObject(traversal, make(map[string]cty.Value), mock, i+1)
+		ob[v.Name] = cty.ObjectVal(val)
+		return ob
+	}
+
+	return buildObject(traversal, ob, mock, i+1)
+}
+
+// findCorrectCtx uses name to find the correct context to target. findCorrectCtx returns the first
+// context that contains an instance of name. If no entries of name are found findCorrectCtx returns nil.
+func findCorrectCtx(ctx *hcl.EvalContext, name string) *hcl.EvalContext {
+	thisCtx := ctx
+	for thisCtx != nil {
+		if thisCtx.Variables == nil {
+			thisCtx = thisCtx.Parent()
+			continue
+		}
+		_, exists := thisCtx.Variables[name]
+		if exists {
+			return thisCtx
+		}
+
+		thisCtx = thisCtx.Parent()
+	}
+
+	return thisCtx
 }
 
 // Name is a helper method to return the underlying hcl.Attribute Name
@@ -250,4 +461,204 @@ func (attr *Attribute) referencesFromExpression(expression hcl.Expression) []*Re
 		}
 	}
 	return refs
+}
+
+// findBadVariablesFromExpression attempts to find the variables that are missing by calling the underlying expressions
+// and checking if they have any missing attributes diagnostics. findBadVariablesFromExpression is a fallback method
+// as normally Diagnostics return the variables we need. However, in cases where the expressions are complex (e.g.
+// a splat expression within a function call) the Diagnostics will only have variable information from the last expression.
+// Meaning that in many cases they won't actually contain the problem variables and calling diag.Variables() will return nil.
+func (attr *Attribute) findBadVariablesFromExpression(expression hcl.Expression) []hcl.Traversal {
+	var badVars []hcl.Traversal
+	ctx := attr.Ctx.Inner()
+	switch t := expression.(type) {
+	case *hclsyntax.ForExpr:
+		// if there are bad vars in the collection we need to evaluate these first
+		badVars = append(badVars, attr.findBadVariablesFromExpression(t.CollExpr)...)
+		if badVars != nil {
+			return badVars
+		}
+
+		collVal, _ := t.CollExpr.Value(ctx)
+		if !isList(collVal) {
+			collVal = cty.TupleVal([]cty.Value{collVal})
+		}
+		it := collVal.ElementIterator()
+
+		for it.Next() {
+			k, v := it.Element()
+			childCtx := ctx.NewChild()
+			childCtx.Variables = map[string]cty.Value{}
+			if t.KeyVar != "" {
+				childCtx.Variables[t.KeyVar] = k
+			}
+			childCtx.Variables[t.ValVar] = v
+
+			if t.CondExpr != nil {
+				_, diags := t.CondExpr.Value(childCtx)
+				if isAttrMissing(diags) {
+					trav := findBadTraversal(childCtx, t.CondExpr)
+
+					if trav.RootName() == t.ValVar {
+						abs, _ := hcl.AbsTraversalForExpr(t.CollExpr)
+						rels := toRelativeTraversal(trav)
+						traversal := hcl.TraversalJoin(abs, rels)
+						badVars = append(badVars, traversal)
+
+						return badVars
+					}
+				}
+
+			}
+		}
+
+		if t.CondExpr != nil {
+			badVars = append(badVars, attr.findBadVariablesFromExpression(t.CondExpr)...)
+		}
+
+		badVars = append(badVars, attr.findBadVariablesFromExpression(t.ValExpr)...)
+		return badVars
+	case *hclsyntax.FunctionCallExpr:
+		for _, arg := range t.Args {
+			badVars = append(badVars, attr.findBadVariablesFromExpression(arg)...)
+		}
+
+		return badVars
+	case *hclsyntax.ConditionalExpr:
+		badVars = append(badVars, attr.findBadVariablesFromExpression(t.TrueResult)...)
+		badVars = append(badVars, attr.findBadVariablesFromExpression(t.FalseResult)...)
+		badVars = append(badVars, attr.findBadVariablesFromExpression(t.Condition)...)
+		return badVars
+	case *hclsyntax.TemplateWrapExpr:
+		return attr.findBadVariablesFromExpression(t.Wrapped)
+	case *hclsyntax.TemplateExpr:
+		for _, part := range t.Parts {
+			badVars = append(badVars, attr.findBadVariablesFromExpression(part)...)
+		}
+
+		return badVars
+	case *hclsyntax.RelativeTraversalExpr:
+		switch s := t.Source.(type) {
+		case *hclsyntax.IndexExpr:
+			ctx := attr.Ctx.Inner()
+			val, diags := s.Collection.Value(ctx)
+			if isAttrMissing(diags) {
+				return attr.findBadVariables(s.Collection.Variables())
+			}
+
+			it := val.ElementIterator()
+			for it.Next() {
+				_, v := it.Element()
+
+				_, d := t.Traversal.TraverseRel(v)
+				if isAttrMissing(d) {
+					traversal := s.Collection.Variables()[0]
+					traversal = append(traversal, hcl.TraverseSplat{})
+					traversal = append(traversal, t.Traversal...)
+					badVars = append(badVars, traversal)
+					return badVars
+				}
+
+				break
+			}
+
+			return attr.findBadVariables(s.Collection.Variables())
+		default:
+			return attr.findBadVariablesFromExpression(t.Source)
+		}
+	case *hclsyntax.IndexExpr:
+		return attr.findBadVariables(t.Collection.Variables())
+	case *hclsyntax.SplatExpr:
+		_, diag := t.Value(attr.Ctx.Inner())
+		if isAttrMissing(diag) {
+			baseVars := t.Variables()
+
+			if rt, ok := t.Each.(*hclsyntax.RelativeTraversalExpr); ok {
+				for i, baseVar := range baseVars {
+					baseVars[i] = append(baseVar, rt.Traversal...)
+				}
+
+				badVars = append(badVars, baseVars...)
+				return badVars
+			}
+		}
+	}
+
+	return attr.findBadVariables(expression.Variables())
+}
+
+func findBadTraversal(ctx *hcl.EvalContext, expression hcl.Expression) hcl.Traversal {
+	switch t := expression.(type) {
+	case *hclsyntax.ConditionalExpr:
+		if b := findBadTraversal(ctx, t.TrueResult); b != nil {
+			return b
+		}
+		if b := findBadTraversal(ctx, t.FalseResult); b != nil {
+			return b
+		}
+		if b := findBadTraversal(ctx, t.Condition); b != nil {
+			return b
+		}
+	case *hclsyntax.BinaryOpExpr:
+		if b := findBadTraversal(ctx, t.LHS); b != nil {
+			return b
+		}
+		if b := findBadTraversal(ctx, t.RHS); b != nil {
+			return b
+		}
+	}
+
+	_, diag := expression.Value(ctx)
+	if isAttrMissing(diag) {
+		trav, _ := hcl.AbsTraversalForExpr(expression)
+		return trav
+	}
+
+	return nil
+}
+
+func (attr *Attribute) findBadVariables(traversals []hcl.Traversal) []hcl.Traversal {
+	var badVars []hcl.Traversal
+
+	for _, traversal := range traversals {
+		if traversal.IsRelative() {
+			continue
+		}
+
+		_, diag := traversal.TraverseAbs(attr.Ctx.Inner())
+		if isAttrMissing(diag) {
+			badVars = append(badVars, traversal)
+		}
+	}
+
+	return badVars
+}
+
+func isAttrMissing(diag hcl.Diagnostics) bool {
+	for _, d := range diag {
+		if d.Summary == missingAttributeDiagnostic {
+			return true
+		}
+	}
+
+	return false
+}
+
+func isList(v cty.Value) bool {
+	sourceTy := v.Type()
+
+	return sourceTy.IsTupleType() || sourceTy.IsListType() || sourceTy.IsSetType()
+}
+
+func toRelativeTraversal(traversal hcl.Traversal) hcl.Traversal {
+	var ret hcl.Traversal
+	for _, traverser := range traversal {
+		if _, ok := traverser.(hcl.TraverseRoot); ok {
+			continue
+		}
+
+		ret = append(ret, traverser)
+	}
+
+	return ret
 }

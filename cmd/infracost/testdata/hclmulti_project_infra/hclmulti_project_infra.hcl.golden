@@ -1,4 +1,5 @@
 Project: infracost/infracost/cmd/infracost/testdata/hclmulti_project_infra/dev
+Module path: dev
 
  Name                                                            Monthly Qty  Unit                    Monthly Cost 
                                                                                                                    
@@ -52,6 +53,7 @@ Project: infracost/infracost/cmd/infracost/testdata/hclmulti_project_infra/dev
 
 ──────────────────────────────────
 Project: infracost/infracost/cmd/infracost/testdata/hclmulti_project_infra/prod
+Module path: prod
 
  Name                                                            Monthly Qty  Unit                    Monthly Cost 
                                                                                                                    

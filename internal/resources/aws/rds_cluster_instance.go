@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/infracost/infracost/internal/resources"
-	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/infracost/infracost/internal/resources"
+	"github.com/infracost/infracost/internal/schema"
 )
 
 type RDSClusterInstance struct {
@@ -116,14 +117,11 @@ func (r *RDSClusterInstance) BuildResource() *schema.Resource {
 }
 
 func (r *RDSClusterInstance) databaseEngineValue() string {
-	switch r.Engine {
-	case "aurora", "aurora-mysql", "":
-		return "Aurora MySQL"
-	case "aurora-postgresql":
+	if r.Engine == "aurora-postgresql" {
 		return "Aurora PostgreSQL"
 	}
 
-	return ""
+	return "Aurora MySQL"
 }
 
 func (r *RDSClusterInstance) cpuCreditsCostComponent(databaseEngine, instanceFamily string, vCPUCount decimal.Decimal) *schema.CostComponent {

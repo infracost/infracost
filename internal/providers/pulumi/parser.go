@@ -7,8 +7,8 @@ import (
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/providers/pulumi/aws"
-	"github.com/infracost/infracost/internal/providers/pulumi/types"
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/display"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
@@ -59,7 +59,7 @@ func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *sc
 	}
 }
 
-func (p *Parser) parsePreviewDigest(t types.PreviewDigest, usage map[string]*schema.UsageData, rawValues gjson.Result) ([]*schema.Resource, []*schema.Resource, error) {
+func (p *Parser) parsePreviewDigest(t display.PreviewDigest, usage map[string]*schema.UsageData, rawValues gjson.Result) ([]*schema.Resource, []*schema.Resource, error) {
 	baseResources := p.loadUsageFileResources(usage)
 
 	var resources []*schema.Resource

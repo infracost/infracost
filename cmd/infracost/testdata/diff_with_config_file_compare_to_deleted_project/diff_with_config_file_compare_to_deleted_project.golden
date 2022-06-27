@@ -1,4 +1,5 @@
 Project: infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to_deleted_project/dev
+Module path: dev
 
 - aws_instance.web_app
   -$462
@@ -19,11 +20,12 @@ Project: infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compar
         - Provisioned IOPS
           -$52.00
 
-Monthly cost change for infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to_deleted_project/dev
+Monthly cost change for infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to_deleted_project/dev (Module path: dev)
 Amount:  -$462 ($462 → $0.00)
 
 ──────────────────────────────────
 Project: infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to_deleted_project/prod
+Module path: prod
 
 ~ aws_instance.web_app
   +$561 ($743 → $1,303)
@@ -31,7 +33,7 @@ Project: infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compar
     ~ Instance usage (Linux/UNIX, on-demand, m5.4xlarge → m5.8xlarge)
       +$561 ($561 → $1,121)
 
-Monthly cost change for infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to_deleted_project/prod
+Monthly cost change for infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to_deleted_project/prod (Module path: prod)
 Amount:  +$561 ($743 → $1,303)
 Percent: +75%
 

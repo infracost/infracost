@@ -14,7 +14,7 @@ import (
 
 type DashboardAPIClient struct {
 	APIClient
-	dashboardEnabled bool
+	shouldStoreRun bool
 }
 
 type CreateAPIKeyResponse struct {
@@ -51,7 +51,7 @@ func NewDashboardAPIClient(ctx *config.RunContext) *DashboardAPIClient {
 			apiKey:   ctx.Config.APIKey,
 			uuid:     ctx.UUID(),
 		},
-		dashboardEnabled: ctx.Config.EnableDashboard && !ctx.Config.IsSelfHosted(),
+		shouldStoreRun: ctx.Config.IsCloudEnabled() && !ctx.Config.IsSelfHosted(),
 	}
 }
 
@@ -80,8 +80,8 @@ func (c *DashboardAPIClient) CreateAPIKey(name string, email string, contextVals
 func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, projectContexts []*config.ProjectContext, out output.Root) (AddRunResponse, error) {
 	response := AddRunResponse{}
 
-	if !c.dashboardEnabled {
-		log.Debug("Skipping sending project results to your dashboard since it is not enabled. Run 'infracost configure set enable_dashboard true' to enable it.")
+	if !c.shouldStoreRun {
+		log.Debug("Skipping sending project results since it is disabled.")
 		return response, nil
 	}
 
@@ -102,7 +102,7 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, projectContexts []*c
 		"run": runInput{
 			ProjectResults: projectResultInputs,
 			Currency:       out.Currency,
-			TimeGenerated:  out.TimeGenerated,
+			TimeGenerated:  out.TimeGenerated.UTC(),
 			Metadata:       ctx.ContextValues(),
 		},
 	}

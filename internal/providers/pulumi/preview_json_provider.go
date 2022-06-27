@@ -5,9 +5,9 @@ import (
 	"os"
 
 	"github.com/infracost/infracost/internal/config"
-	"github.com/infracost/infracost/internal/providers/pulumi/types"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/pkg/errors"
+	"github.com/pulumi/pulumi/sdk/v3/go/common/display"
 	"github.com/tidwall/gjson"
 )
 
@@ -42,7 +42,7 @@ func (p *PreviewJSONProvider) LoadResources(usage map[string]*schema.UsageData) 
 	if err != nil {
 		return []*schema.Project{}, errors.Wrap(err, "Error reading Pulumi preview JSON file")
 	}
-	var jsonPreviewDigest types.PreviewDigest
+	var jsonPreviewDigest display.PreviewDigest
 	err = json.Unmarshal(b, &jsonPreviewDigest)
 	gjsonResult := gjson.ParseBytes(b)
 
@@ -53,7 +53,7 @@ func (p *PreviewJSONProvider) LoadResources(usage map[string]*schema.UsageData) 
 	metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
-	name := schema.GenerateProjectName(metadata, p.ctx.RunContext.Config.EnableDashboard)
+	name := schema.GenerateProjectName(metadata, p.ctx.ProjectConfig.Name, p.ctx.RunContext.Config.IsCloudEnabled())
 
 	project := schema.NewProject(name, metadata)
 	parser := NewParser(p.ctx)

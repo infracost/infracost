@@ -94,6 +94,9 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 				return err
 			}
 			combined.IsCIRun = ctx.IsCIRun()
+			for _, p := range combined.Projects {
+				p.Metadata.InfracostCommand = "output"
+			}
 
 			includeAllFields := "all"
 			validFields := []string{"price", "monthlyQuantity", "unit", "hourlyCost", "monthlyCost"}
@@ -119,7 +122,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			}
 
 			opts := output.Options{
-				DashboardEnabled: ctx.Config.EnableDashboard,
+				DashboardEnabled: ctx.Config.IsCloudEnabled(),
 				NoColor:          ctx.Config.NoColor,
 				Fields:           fields,
 			}
@@ -131,9 +134,9 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 				ui.PrintWarning(cmd.ErrOrStderr(), "fields is only supported for table and html output formats")
 			}
 
-			if ctx.Config.EnableDashboard {
+			if ctx.Config.IsCloudEnabled() {
 				if ctx.Config.IsSelfHosted() {
-					ui.PrintWarning(cmd.ErrOrStderr(), "The dashboard is part of Infracost's hosted services. Contact hello@infracost.io for help.")
+					ui.PrintWarning(cmd.ErrOrStderr(), "Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
 				}
 
 				combined.RunID, combined.ShareURL = shareCombinedRun(ctx, combined, inputs)

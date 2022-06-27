@@ -6,7 +6,14 @@
       "name": "infracost/infracost/cmd/infracost/testdata/example_plan.json",
       "metadata": {
         "path": "./testdata/example_plan.json",
+        "infracostCommand": "breakdown",
         "type": "terraform_plan_json",
+        "branch": "stub-branch",
+        "commit": "stub-sha",
+        "commitAuthorName": "stub-author",
+        "commitAuthorEmail": "stub@stub.com",
+        "commitTimestamp": "REPLACED_TIME",
+        "commitMessage": "stub-message",
         "vcsRepoUrl": "https://github.com/infracost/infracost",
         "vcsSubPath": "cmd/infracost/testdata/example_plan.json",
         "vcsPullRequestUrl": "NOT_APPLICABLE"

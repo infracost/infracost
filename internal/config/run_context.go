@@ -8,6 +8,7 @@ import (
 	"os"
 	"runtime"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/google/uuid"
@@ -23,6 +24,7 @@ type RunContext struct {
 	Config      *Config
 	State       *State
 	contextVals map[string]interface{}
+	mu          *sync.RWMutex
 	StartTime   int64
 
 	OutWriter io.Writer
@@ -48,6 +50,7 @@ func NewRunContextFromEnv(rootCtx context.Context) (*RunContext, error) {
 		Config:      cfg,
 		State:       state,
 		contextVals: map[string]interface{}{},
+		mu:          &sync.RWMutex{},
 		StartTime:   time.Now().Unix(),
 	}
 
@@ -61,6 +64,7 @@ func EmptyRunContext() *RunContext {
 		Config:      &Config{},
 		State:       &State{},
 		contextVals: map[string]interface{}{},
+		mu:          &sync.RWMutex{},
 		StartTime:   time.Now().Unix(),
 		OutWriter:   os.Stdout,
 		ErrWriter:   os.Stderr,
@@ -100,10 +104,14 @@ func (r *RunContext) UUID() uuid.UUID {
 }
 
 func (r *RunContext) SetContextValue(key string, value interface{}) {
+	r.mu.Lock()
 	r.contextVals[key] = value
+	r.mu.Unlock()
 }
 
 func (r *RunContext) ContextValues() map[string]interface{} {
+	r.mu.RLock()
+	defer r.mu.RUnlock()
 	return r.contextVals
 }
 

@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -100,6 +101,353 @@ data "cats_cat" "the-cats-mother" {
 	assert.Equal(t, "the-cats-mother", dataBlocks[0].NameLabel())
 
 	assert.Equal(t, "boots", dataBlocks[0].GetAttribute("name").Value().AsString())
+}
+
+func Test_UnsupportedAttributes(t *testing.T) {
+	path := createTestFile("test.tf", `
+
+resource "with_unsupported_attr" "test" {
+	name = "mittens"
+	special = true
+	my_number = 4
+}
+
+resource "with_unsupported_attr" "test2" {
+	name = "mittens"
+	special = true
+}
+
+locals {
+	value = with_unsupported_attr.test.does_not_exist
+	value_nested = with_unsupported_attr.test.a_block.attr
+	names = ["test1", "test3"]
+}
+
+output "exp" {
+  value = {
+    for name in local.names :
+      name => with_unsupported_attr.test.does_not_exist
+  }
+}
+
+output "loadbalancer"  {
+    value = {
+		"${var.env_dnsname}:${var.app_dnsname}" : with_unsupported_attr.test.ip_address
+    }
+}
+`)
+
+	parser := newParser(filepath.Dir(path))
+	module, err := parser.ParseDirectory()
+	require.NoError(t, err)
+
+	blocks := module.Blocks
+
+	label := blocks.Matching(BlockMatcher{Type: "locals"})
+	require.NotNil(t, label)
+	mockedVal := label.GetAttribute("value").Value()
+	require.Equal(t, cty.String, mockedVal.Type())
+	assert.Equal(t, "value-mock", mockedVal.AsString())
+
+	mockedVarObj := label.GetAttribute("value_nested").Value()
+	require.Equal(t, cty.String, mockedVarObj.Type())
+	assert.Equal(t, "value_nested-mock", mockedVarObj.AsString())
+
+	output := blocks.Matching(BlockMatcher{Label: "exp", Type: "output"})
+	require.NotNil(t, output)
+	mockedObj := output.GetAttribute("value").Value()
+	require.True(t, mockedObj.Type().IsObjectType())
+
+	vm := mockedObj.AsValueMap()
+	assert.Len(t, vm, 2)
+	assert.Equal(t, mockedVal, vm["test1"])
+	assert.Equal(t, mockedVal, vm["test3"])
+
+	output2 := blocks.Matching(BlockMatcher{Label: "loadbalancer", Type: "output"})
+	objectWithKeys := output2.GetAttribute("value").Value()
+	require.True(t, objectWithKeys.Type().IsObjectType())
+	keys := []string{}
+	for k, v := range objectWithKeys.AsValueMap() {
+		keys = append(keys, k)
+		pieces := strings.Split(k, ":")
+		require.Len(t, pieces, 2)
+
+		assert.Equal(t, "value-mock", pieces[0])
+		assert.Equal(t, "value-mock", pieces[1])
+		assert.Equal(t, "value-mock", v.AsString())
+	}
+
+	require.Len(t, keys, 1)
+
+}
+
+func Test_UnsupportedAttributesList(t *testing.T) {
+	path := createTestFile("test.tf", `
+
+resource "with_unsupported_attr" "test" {
+	name = "mittens"
+	special = true
+	my_number = 4
+}
+
+locals {
+	names = "astring"
+}
+
+output "exp" {
+  value = {
+    for name in local.names :
+      name => with_unsupported_attr.test.does_not_exist
+  }
+}
+
+output "exp2" {
+  value = {
+    for name in local.nothing :
+      name => with_unsupported_attr.test.does_not_exist
+  }
+}
+`)
+
+	parser := newParser(filepath.Dir(path))
+	module, err := parser.ParseDirectory()
+	require.NoError(t, err)
+
+	blocks := module.Blocks
+
+	output := blocks.Matching(BlockMatcher{Label: "exp", Type: "output"})
+	require.NotNil(t, output)
+	attr := output.GetAttribute("value")
+	mockedObj := attr.Value()
+	require.True(t, mockedObj.Type().IsObjectType())
+	asMap := mockedObj.AsValueMap()
+	assert.Len(t, asMap, 1)
+	assert.Equal(t, "value-mock", asMap["astring"].AsString())
+
+	output = blocks.Matching(BlockMatcher{Label: "exp2", Type: "output"})
+	require.NotNil(t, output)
+	attr = output.GetAttribute("value")
+	mockedObj = attr.Value()
+	require.True(t, mockedObj.Type().IsObjectType())
+	asMap = mockedObj.AsValueMap()
+	assert.Len(t, asMap, 1)
+	for k, v := range asMap {
+		assert.Equal(t, "value-mock", k)
+		assert.Equal(t, "value-mock", v.AsString())
+	}
+}
+
+func Test_UnsupportedAttributesInForeachIf(t *testing.T) {
+	path := createTestFile("test.tf", `
+
+data "google_compute_instance" "default" {
+  count = 1
+  name = "primary-application-server"
+  zone = "us-central1-a"
+}
+
+output "instances" {
+  value = {
+    for instance in data.google_compute_instance.default :
+    instance.name => instance.network_interface[0].network_ip
+    if instance.network_interface[0].network_ip != null
+  }
+}
+`)
+
+	parser := newParser(filepath.Dir(path))
+	module, err := parser.ParseDirectory()
+	require.NoError(t, err)
+
+	blocks := module.Blocks
+
+	output := blocks.Matching(BlockMatcher{Label: "instances", Type: "output"})
+	require.NotNil(t, output)
+	attr := output.GetAttribute("value")
+	mockedObj := attr.Value()
+	require.True(t, mockedObj.Type().IsObjectType())
+
+	asMap := mockedObj.AsValueMap()
+	assert.Len(t, asMap, 1)
+	assert.Equal(t, "value-mock", asMap["primary-application-server"].AsString())
+}
+
+func Test_UnsupportedAttributesSplatOperator(t *testing.T) {
+	path := createTestFile("test.tf", `
+
+variable "enabled" {
+	default = true
+}
+
+resource "with_unsupported_attr" "test" {
+	count = 4
+
+	name = "mittens"
+	special = true
+	my_number = 4
+}
+
+resource "other_resource" "test" {
+	task_definition = "${join("|", with_unsupported_attr.test.*.family)}:${join("|", with_unsupported_attr.test.*.revision)}"
+}
+
+`)
+
+	parser := newParser(filepath.Dir(path))
+	module, err := parser.ParseDirectory()
+	require.NoError(t, err)
+
+	blocks := module.Blocks
+
+	output := blocks.Matching(BlockMatcher{Label: "other_resource.test", Type: "resource"})
+	require.NotNil(t, output)
+	attr := output.GetAttribute("task_definition")
+	mockedVal := attr.Value()
+	str := mockedVal.AsString()
+	assert.Contains(t, str, ":")
+	pieces := strings.Split(strings.ReplaceAll(str, ":", "|"), "|")
+	assert.Len(t, pieces, 8)
+
+	for _, piece := range pieces {
+		assert.Equal(t, "task_definition-mock", piece)
+	}
+}
+
+func Test_UnsupportedSplat(t *testing.T) {
+	path := createTestFile("test.tf", `
+
+data "mydata" "default" {
+  zone = "us-central1-a"
+}
+
+resource "aws_subnet" "private" {
+	count = data.mydata.default.enabled != null ? 2 : 0 
+	cidr_block = "10.0.1.0/24"
+}
+
+output "private_subnets_cidr_blocks" {
+  description = "List of cidr_blocks of private subnets"
+  value       = aws_subnet.private.*.cidr_block
+}
+
+output "attr_not_exists" {
+  description = "List of cidr_blocks of private subnets"
+  value       = aws_subnet.private.*.test
+}
+
+`)
+
+	parser := newParser(filepath.Dir(path))
+	module, err := parser.ParseDirectory()
+	require.NoError(t, err)
+
+	blocks := module.Blocks
+
+	output := blocks.Matching(BlockMatcher{Label: "private_subnets_cidr_blocks", Type: "output"})
+	require.NotNil(t, output)
+	attr := output.GetAttribute("value")
+	mockedVal := attr.Value()
+	require.True(t, mockedVal.Type().IsTupleType())
+	list := mockedVal.AsValueSlice()
+	assert.Len(t, list, 2)
+	for _, value := range list {
+		assert.Equal(t, "10.0.1.0/24", value.AsString())
+	}
+}
+
+func Test_UnsupportedAttributesIndex(t *testing.T) {
+	path := createTestFile("test.tf", `
+
+variable "enabled" {
+	default = true
+}
+
+resource "with_unsupported_attr" "test" {
+	count = 4
+
+	name = "mittens"
+	special = true
+	my_number = 4
+}
+
+resource "other_resource" "test" {
+	task_definition = "${join("", [with_unsupported_attr.test[2].family])}:${with_unsupported_attr.test[1].family}"
+}
+
+`)
+
+	parser := newParser(filepath.Dir(path))
+	module, err := parser.ParseDirectory()
+	require.NoError(t, err)
+
+	blocks := module.Blocks
+
+	output := blocks.Matching(BlockMatcher{Label: "other_resource.test", Type: "resource"})
+	require.NotNil(t, output)
+	attr := output.GetAttribute("task_definition")
+	mockedVal := attr.Value()
+	for _, v := range strings.Split(mockedVal.AsString(), ":") {
+		assert.Equal(t, "task_definition-mock", v)
+	}
+}
+
+func Test_UnsupportedAttributesMap(t *testing.T) {
+	path := createTestFile("test.tf", `
+
+variable "service_connections" {
+  type = map(object({
+    name              = string
+    subscription_id   = string
+    subscription_name = string
+  }))
+  nullable    = false
+  default = {
+    dev = {
+		name = "dev"
+		subscription_id = "test"
+		subscription_name = "testname"
+	}
+    prod = {
+		name = "prod"
+		subscription_id = "test2"
+		subscription_name = "test2name"
+	}
+  }
+}
+
+data "azuread_service_principal" "serviceendpoints" {
+  for_each = var.service_connections
+
+  display_name = "display-${each.value.subscription_id}"
+}
+
+output "serviceendpoint_principals" {
+  value       = { for k, v in var.service_connections : k => data.azuread_service_principal.serviceendpoints[k].object_id }
+}
+
+`)
+
+	parser := newParser(filepath.Dir(path))
+	module, err := parser.ParseDirectory()
+	require.NoError(t, err)
+
+	blocks := module.Blocks
+
+	output := blocks.Matching(BlockMatcher{Label: "azuread_service_principal", Type: "output"})
+	require.NotNil(t, output)
+	attr := output.GetAttribute("value")
+	mockedObj := attr.Value()
+	require.True(t, mockedObj.Type().IsObjectType())
+	asMap := mockedObj.AsValueMap()
+	require.Len(t, asMap, 2)
+
+	_, ok := asMap["dev"]
+	assert.True(t, ok)
+	_, ok = asMap["prod"]
+	assert.True(t, ok)
+
+	assert.Equal(t, "value-mock", asMap["dev"].AsString())
+	assert.Equal(t, "value-mock", asMap["prod"].AsString())
 }
 
 func Test_Modules(t *testing.T) {
@@ -215,6 +563,45 @@ output "mod_result" {
 	require.NotNil(t, childValAttr)
 	require.Equal(t, cty.String, childValAttr.Value().Type())
 	assert.Equal(t, "ok", childValAttr.Value().AsString())
+}
+
+func TestOptionWithRawCtyInput(t *testing.T) {
+	type args struct {
+		input cty.Value
+	}
+	tests := []struct {
+		name string
+		args args
+		want map[string]cty.Value
+	}{
+		{
+			name: "test panic returns empty Option",
+			args: args{
+				input: cty.NilVal,
+			},
+			want: map[string]cty.Value{},
+		},
+		{
+			name: "sets input vars from cty object",
+			args: args{
+				input: cty.ObjectVal(map[string]cty.Value{
+					"test": cty.StringVal("val"),
+				}),
+			},
+			want: map[string]cty.Value{
+				"test": cty.StringVal("val"),
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			p := Parser{inputVars: map[string]cty.Value{}}
+			option := OptionWithRawCtyInput(tt.args.input)
+			option(&p)
+
+			assert.Equalf(t, tt.want, p.inputVars, "OptionWithRawCtyInput(%v)", tt.args.input)
+		})
+	}
 }
 
 func createTestFile(filename, contents string) string {

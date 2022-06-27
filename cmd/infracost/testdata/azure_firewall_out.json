@@ -1,1 +1,347 @@
-{"version":"0.2","projects":[{"name":"infracost/infracost/cmd/infracost/testdata/azure_firewall_plan.json","metadata":{"path":"./cmd/infracost/testdata/azure_firewall_plan.json","type":"terraform_plan_json","vcsRepoUrl":"https://github.com/infracost/infracost.git","vcsSubPath":"cmd/infracost/testdata/azure_firewall_plan.json"},"pastBreakdown":{"resources":[],"totalHourlyCost":"0","totalMonthlyCost":"0"},"breakdown":{"resources":[{"name":"azurerm_firewall.non_usage","metadata":{},"hourlyCost":"1.25","monthlyCost":"912.5","costComponents":[{"name":"Deployment (Standard)","unit":"hours","hourlyQuantity":"1","monthlyQuantity":"730","price":"1.25","hourlyCost":"1.25","monthlyCost":"912.5"},{"name":"Data processed","unit":"GB","hourlyQuantity":null,"monthlyQuantity":null,"price":"0.016","hourlyCost":null,"monthlyCost":null}]},{"name":"azurerm_firewall.premium","metadata":{},"hourlyCost":"0.875","monthlyCost":"638.75","costComponents":[{"name":"Deployment (Premium)","unit":"hours","hourlyQuantity":"1","monthlyQuantity":"730","price":"0.875","hourlyCost":"0.875","monthlyCost":"638.75"},{"name":"Data processed","unit":"GB","hourlyQuantity":null,"monthlyQuantity":null,"price":"0.008","hourlyCost":null,"monthlyCost":null}]},{"name":"azurerm_firewall.premium_virtual_hub","metadata":{},"hourlyCost":"0.875","monthlyCost":"638.75","costComponents":[{"name":"Deployment (Premium Secured Virtual Hub)","unit":"hours","hourlyQuantity":"1","monthlyQuantity":"730","price":"0.875","hourlyCost":"0.875","monthlyCost":"638.75"},{"name":"Data processed","unit":"GB","hourlyQuantity":null,"monthlyQuantity":null,"price":"0.008","hourlyCost":null,"monthlyCost":null}]},{"name":"azurerm_firewall.standard","metadata":{},"hourlyCost":"1.25","monthlyCost":"912.5","costComponents":[{"name":"Deployment (Standard)","unit":"hours","hourlyQuantity":"1","monthlyQuantity":"730","price":"1.25","hourlyCost":"1.25","monthlyCost":"912.5"},{"name":"Data processed","unit":"GB","hourlyQuantity":null,"monthlyQuantity":null,"price":"0.016","hourlyCost":null,"monthlyCost":null}]},{"name":"azurerm_firewall.standard_virtual_hub","metadata":{},"hourlyCost":"1.25","monthlyCost":"912.5","costComponents":[{"name":"Deployment (Secured Virtual Hub)","unit":"hours","hourlyQuantity":"1","monthlyQuantity":"730","price":"1.25","hourlyCost":"1.25","monthlyCost":"912.5"},{"name":"Data processed","unit":"GB","hourlyQuantity":null,"monthlyQuantity":null,"price":"0.016","hourlyCost":null,"monthlyCost":null}]},{"name":"azurerm_public_ip.example","metadata":{},"hourlyCost":"0.005","monthlyCost":"3.65","costComponents":[{"name":"IP address (static)","unit":"hours","hourlyQuantity":"1","monthlyQuantity":"730","price":"0.005","hourlyCost":"0.005","monthlyCost":"3.65"}]}],"totalHourlyCost":"5.505","totalMonthlyCost":"4018.65"},"diff":{"resources":[{"name":"azurerm_firewall.non_usage","metadata":{},"hourlyCost":"1.25","monthlyCost":"912.5","costComponents":[{"name":"Deployment (Standard)","unit":"hours","hourlyQuantity":"1","monthlyQuantity":"730","price":"1.25","hourlyCost":"1.25","monthlyCost":"912.5"},{"name":"Data processed","unit":"GB","hourlyQuantity":"0","monthlyQuantity":"0","price":"0.016","hourlyCost":"0","monthlyCost":"0"}]},{"name":"azurerm_firewall.premium","metadata":{},"hourlyCost":"0.875","monthlyCost":"638.75","costComponents":[{"name":"Deployment (Premium)","unit":"hours","hourlyQuantity":"1","monthlyQuantity":"730","price":"0.875","hourlyCost":"0.875","monthlyCost":"638.75"},{"name":"Data processed","unit":"GB","hourlyQuantity":"0","monthlyQuantity":"0","price":"0.008","hourlyCost":"0","monthlyCost":"0"}]},{"name":"azurerm_firewall.premium_virtual_hub","metadata":{},"hourlyCost":"0.875","monthlyCost":"638.75","costComponents":[{"name":"Deployment (Premium Secured Virtual Hub)","unit":"hours","hourlyQuantity":"1","monthlyQuantity":"730","price":"0.875","hourlyCost":"0.875","monthlyCost":"638.75"},{"name":"Data processed","unit":"GB","hourlyQuantity":"0","monthlyQuantity":"0","price":"0.008","hourlyCost":"0","monthlyCost":"0"}]},{"name":"azurerm_firewall.standard","metadata":{},"hourlyCost":"1.25","monthlyCost":"912.5","costComponents":[{"name":"Deployment (Standard)","unit":"hours","hourlyQuantity":"1","monthlyQuantity":"730","price":"1.25","hourlyCost":"1.25","monthlyCost":"912.5"},{"name":"Data processed","unit":"GB","hourlyQuantity":"0","monthlyQuantity":"0","price":"0.016","hourlyCost":"0","monthlyCost":"0"}]},{"name":"azurerm_firewall.standard_virtual_hub","metadata":{},"hourlyCost":"1.25","monthlyCost":"912.5","costComponents":[{"name":"Deployment (Secured Virtual Hub)","unit":"hours","hourlyQuantity":"1","monthlyQuantity":"730","price":"1.25","hourlyCost":"1.25","monthlyCost":"912.5"},{"name":"Data processed","unit":"GB","hourlyQuantity":"0","monthlyQuantity":"0","price":"0.016","hourlyCost":"0","monthlyCost":"0"}]},{"name":"azurerm_public_ip.example","metadata":{},"hourlyCost":"0.005","monthlyCost":"3.65","costComponents":[{"name":"IP address (static)","unit":"hours","hourlyQuantity":"1","monthlyQuantity":"730","price":"0.005","hourlyCost":"0.005","monthlyCost":"3.65"}]}],"totalHourlyCost":"5.505","totalMonthlyCost":"4018.65"},"summary":{"unsupportedResourceCounts":{"azurerm_virtual_hub":1,"azurerm_virtual_wan":1}}}],"totalHourlyCost":"5.505","totalMonthlyCost":"4018.65","timeGenerated":"2021-08-27T12:58:42.803571-04:00","summary":{"unsupportedResourceCounts":{"azurerm_virtual_hub":1,"azurerm_virtual_wan":1}}}
+{
+  "version": "0.2",
+  "projects": [
+    {
+      "name": "infracost/infracost/cmd/infracost/testdata/azure_firewall_plan.json",
+      "metadata": {
+        "infracostCommand": "breakdown",
+        "branch": "test",
+        "commit": "1234",
+        "commitAuthorName": "hugo",
+        "commitAuthorEmail": "hugo@test.com",
+        "commitTimestamp": "2021-10-11T22:41:00.144866-04:00",
+        "commitMessage": "mymessage",
+        "path": "./cmd/infracost/testdata/azure_firewall_plan.json",
+        "type": "terraform_plan_json",
+        "vcsRepoUrl": "https://github.com/infracost/infracost.git",
+        "vcsSubPath": "cmd/infracost/testdata/azure_firewall_plan.json"
+      },
+      "pastBreakdown": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
+      },
+      "breakdown": {
+        "resources": [
+          {
+            "name": "azurerm_firewall.non_usage",
+            "metadata": {},
+            "hourlyCost": "1.25",
+            "monthlyCost": "912.5",
+            "costComponents": [
+              {
+                "name": "Deployment (Standard)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "1.25",
+                "hourlyCost": "1.25",
+                "monthlyCost": "912.5"
+              },
+              {
+                "name": "Data processed",
+                "unit": "GB",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.016",
+                "hourlyCost": null,
+                "monthlyCost": null
+              }
+            ]
+          },
+          {
+            "name": "azurerm_firewall.premium",
+            "metadata": {},
+            "hourlyCost": "0.875",
+            "monthlyCost": "638.75",
+            "costComponents": [
+              {
+                "name": "Deployment (Premium)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.875",
+                "hourlyCost": "0.875",
+                "monthlyCost": "638.75"
+              },
+              {
+                "name": "Data processed",
+                "unit": "GB",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.008",
+                "hourlyCost": null,
+                "monthlyCost": null
+              }
+            ]
+          },
+          {
+            "name": "azurerm_firewall.premium_virtual_hub",
+            "metadata": {},
+            "hourlyCost": "0.875",
+            "monthlyCost": "638.75",
+            "costComponents": [
+              {
+                "name": "Deployment (Premium Secured Virtual Hub)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.875",
+                "hourlyCost": "0.875",
+                "monthlyCost": "638.75"
+              },
+              {
+                "name": "Data processed",
+                "unit": "GB",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.008",
+                "hourlyCost": null,
+                "monthlyCost": null
+              }
+            ]
+          },
+          {
+            "name": "azurerm_firewall.standard",
+            "metadata": {},
+            "hourlyCost": "1.25",
+            "monthlyCost": "912.5",
+            "costComponents": [
+              {
+                "name": "Deployment (Standard)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "1.25",
+                "hourlyCost": "1.25",
+                "monthlyCost": "912.5"
+              },
+              {
+                "name": "Data processed",
+                "unit": "GB",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.016",
+                "hourlyCost": null,
+                "monthlyCost": null
+              }
+            ]
+          },
+          {
+            "name": "azurerm_firewall.standard_virtual_hub",
+            "metadata": {},
+            "hourlyCost": "1.25",
+            "monthlyCost": "912.5",
+            "costComponents": [
+              {
+                "name": "Deployment (Secured Virtual Hub)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "1.25",
+                "hourlyCost": "1.25",
+                "monthlyCost": "912.5"
+              },
+              {
+                "name": "Data processed",
+                "unit": "GB",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.016",
+                "hourlyCost": null,
+                "monthlyCost": null
+              }
+            ]
+          },
+          {
+            "name": "azurerm_public_ip.example",
+            "metadata": {},
+            "hourlyCost": "0.005",
+            "monthlyCost": "3.65",
+            "costComponents": [
+              {
+                "name": "IP address (static)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.005",
+                "hourlyCost": "0.005",
+                "monthlyCost": "3.65"
+              }
+            ]
+          }
+        ],
+        "totalHourlyCost": "5.505",
+        "totalMonthlyCost": "4018.65"
+      },
+      "diff": {
+        "resources": [
+          {
+            "name": "azurerm_firewall.non_usage",
+            "metadata": {},
+            "hourlyCost": "1.25",
+            "monthlyCost": "912.5",
+            "costComponents": [
+              {
+                "name": "Deployment (Standard)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "1.25",
+                "hourlyCost": "1.25",
+                "monthlyCost": "912.5"
+              },
+              {
+                "name": "Data processed",
+                "unit": "GB",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.016",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ]
+          },
+          {
+            "name": "azurerm_firewall.premium",
+            "metadata": {},
+            "hourlyCost": "0.875",
+            "monthlyCost": "638.75",
+            "costComponents": [
+              {
+                "name": "Deployment (Premium)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.875",
+                "hourlyCost": "0.875",
+                "monthlyCost": "638.75"
+              },
+              {
+                "name": "Data processed",
+                "unit": "GB",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.008",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ]
+          },
+          {
+            "name": "azurerm_firewall.premium_virtual_hub",
+            "metadata": {},
+            "hourlyCost": "0.875",
+            "monthlyCost": "638.75",
+            "costComponents": [
+              {
+                "name": "Deployment (Premium Secured Virtual Hub)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.875",
+                "hourlyCost": "0.875",
+                "monthlyCost": "638.75"
+              },
+              {
+                "name": "Data processed",
+                "unit": "GB",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.008",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ]
+          },
+          {
+            "name": "azurerm_firewall.standard",
+            "metadata": {},
+            "hourlyCost": "1.25",
+            "monthlyCost": "912.5",
+            "costComponents": [
+              {
+                "name": "Deployment (Standard)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "1.25",
+                "hourlyCost": "1.25",
+                "monthlyCost": "912.5"
+              },
+              {
+                "name": "Data processed",
+                "unit": "GB",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.016",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ]
+          },
+          {
+            "name": "azurerm_firewall.standard_virtual_hub",
+            "metadata": {},
+            "hourlyCost": "1.25",
+            "monthlyCost": "912.5",
+            "costComponents": [
+              {
+                "name": "Deployment (Secured Virtual Hub)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "1.25",
+                "hourlyCost": "1.25",
+                "monthlyCost": "912.5"
+              },
+              {
+                "name": "Data processed",
+                "unit": "GB",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.016",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ]
+          },
+          {
+            "name": "azurerm_public_ip.example",
+            "metadata": {},
+            "hourlyCost": "0.005",
+            "monthlyCost": "3.65",
+            "costComponents": [
+              {
+                "name": "IP address (static)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.005",
+                "hourlyCost": "0.005",
+                "monthlyCost": "3.65"
+              }
+            ]
+          }
+        ],
+        "totalHourlyCost": "5.505",
+        "totalMonthlyCost": "4018.65"
+      },
+      "summary": {
+        "unsupportedResourceCounts": {
+          "azurerm_virtual_hub": 1,
+          "azurerm_virtual_wan": 1
+        }
+      }
+    }
+  ],
+  "totalHourlyCost": "5.505",
+  "totalMonthlyCost": "4018.65",
+  "timeGenerated": "2021-08-27T12:58:42.803571-04:00",
+  "summary": {
+    "unsupportedResourceCounts": {
+      "azurerm_virtual_hub": 1,
+      "azurerm_virtual_wan": 1
+    }
+  }
+}

@@ -1,0 +1,111 @@
+
+## Infracost estimate: **monthly cost will decrease by $3,364 (-42%) ↓**
+
+| **Project** | **Module path** | **Previous** | **New** | **Diff** |
+| ----------- | ---------- | -----------: | ------: | -------- |
+| my first project |  | $1,303 | $743 | -$560.64 (-43%) |
+| my first project again |  | $1,303 | $743 | -$560.64 (-43%) |
+| my terragrunt multi project | prod | $1,308 | $748 | -$560.64 (-43%) |
+| my terragrunt prod project |  | $1,308 | $748 | -$560.64 (-43%) |
+| my terragrunt workspace | prod | $1,308 | $748 | -$560.64 (-43%) |
+| my workspace project |  | $1,303 | $743 | -$560.64 (-43%) |
+| **All projects** | | **$7,991** | **$4,627** | **-$3,363.84 (-42%)** |
+
+3 projects have no cost estimate changes.
+
+**Infracost output:**
+
+```
+Project: my first project
+
+~ aws_instance.web_app
+  -$561 ($1,303 → $743)
+
+    ~ Instance usage (Linux/UNIX, on-demand, m5.8xlarge → m5.4xlarge)
+      -$561 ($1,121 → $561)
+
+Monthly cost change for my first project
+Amount:  -$561 ($1,303 → $743)
+Percent: -43%
+
+──────────────────────────────────
+Project: my first project again
+
+~ aws_instance.web_app
+  -$561 ($1,303 → $743)
+
+    ~ Instance usage (Linux/UNIX, on-demand, m5.8xlarge → m5.4xlarge)
+      -$561 ($1,121 → $561)
+
+Monthly cost change for my first project again
+Amount:  -$561 ($1,303 → $743)
+Percent: -43%
+
+──────────────────────────────────
+Project: my terragrunt multi project
+Module path: prod
+
+~ aws_instance.web_app
+  -$561 ($1,308 → $748)
+
+    ~ Instance usage (Linux/UNIX, on-demand, m5.8xlarge → m5.4xlarge)
+      -$561 ($1,121 → $561)
+
+Monthly cost change for my terragrunt multi project (Module path: prod)
+Amount:  -$561 ($1,308 → $748)
+Percent: -43%
+
+──────────────────────────────────
+Project: my terragrunt prod project
+
+~ aws_instance.web_app
+  -$561 ($1,308 → $748)
+
+    ~ Instance usage (Linux/UNIX, on-demand, m5.8xlarge → m5.4xlarge)
+      -$561 ($1,121 → $561)
+
+Monthly cost change for my terragrunt prod project
+Amount:  -$561 ($1,308 → $748)
+Percent: -43%
+
+──────────────────────────────────
+Project: my terragrunt workspace
+Module path: prod
+Workspace: ws2
+
+~ aws_instance.web_app
+  -$561 ($1,308 → $748)
+
+    ~ Instance usage (Linux/UNIX, on-demand, m5.8xlarge → m5.4xlarge)
+      -$561 ($1,121 → $561)
+
+Monthly cost change for my terragrunt workspace (Module path: prod, Workspace: ws2)
+Amount:  -$561 ($1,308 → $748)
+Percent: -43%
+
+──────────────────────────────────
+Project: my workspace project
+Workspace: ws1
+
+~ aws_instance.web_app
+  -$561 ($1,303 → $743)
+
+    ~ Instance usage (Linux/UNIX, on-demand, m5.8xlarge → m5.4xlarge)
+      -$561 ($1,121 → $561)
+
+Monthly cost change for my workspace project (Workspace: ws1)
+Amount:  -$561 ($1,303 → $743)
+Percent: -43%
+
+──────────────────────────────────
+
+The following projects have no cost estimate changes: my terragrunt dev project, my terragrunt multi project (Module path: dev), my terragrunt workspace (Module path: dev, Workspace: ws2)
+Run the following command to see their breakdown: infracost breakdown --path=/path/to/code
+
+──────────────────────────────────
+Key: ~ changed, + added, - removed
+
+18 cloud resources were detected:
+∙ 18 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+```
+
