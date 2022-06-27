@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	stdLog "log"
 	"os"
 	"runtime/debug"
 
@@ -19,6 +20,12 @@ import (
 	"github.com/infracost/infracost/internal/update"
 	"github.com/infracost/infracost/internal/version"
 )
+
+func init() {
+	// set the stdlib default logger to flush to discard, this is done as a number of
+	// Terraform libs use the std logger directly, which impacts Infracost output.
+	stdLog.SetOutput(ioutil.Discard)
+}
 
 func main() {
 	Run(nil, nil)

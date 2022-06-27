@@ -49,19 +49,14 @@ func LoaderWithSpinner(f ui.SpinnerFunc) LoaderOption {
 	}
 }
 
-func LoaderWithCredentialsSource(credentialsSource *CredentialsSource) LoaderOption {
-	return func(l *ModuleLoader) {
-		l.credentialsSource = credentialsSource
-	}
-}
-
 // NewModuleLoader constructs a new module loader
-func NewModuleLoader(path string, opts ...LoaderOption) *ModuleLoader {
+func NewModuleLoader(path string, credentialsSource *CredentialsSource, opts ...LoaderOption) *ModuleLoader {
 	fetcher := NewPackageFetcher()
+	d := NewDisco(credentialsSource)
 
 	m := &ModuleLoader{
 		Path:           path,
-		cache:          NewCache(),
+		cache:          NewCache(d),
 		packageFetcher: fetcher,
 	}
 
@@ -69,7 +64,7 @@ func NewModuleLoader(path string, opts ...LoaderOption) *ModuleLoader {
 		opt(m)
 	}
 
-	m.registryLoader = NewRegistryLoader(fetcher, m.credentialsSource)
+	m.registryLoader = NewRegistryLoader(fetcher, d)
 
 	return m
 }
@@ -232,7 +227,7 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 	lookupResult, err := m.registryLoader.lookupModule(moduleAddr, moduleCall.Version)
 	if err == nil {
 		log.Debugf("Downloading module %s from registry URL %s", key, lookupResult.DownloadURL)
-		err = m.registryLoader.downloadModule(lookupResult.DownloadURL, dest, lookupResult.Token)
+		err = m.registryLoader.downloadModule(lookupResult.DownloadURL, dest, lookupResult.Credentials)
 		if err != nil {
 			return nil, err
 		}

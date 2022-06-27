@@ -17,12 +17,14 @@ import (
 // with how terraform init works.
 type Cache struct {
 	keyMap map[string]*ManifestModule
+	disco  Disco
 }
 
-// NewCacheFromManifest creates a new cache from a module manifest
-func NewCache() *Cache {
+// NewCache creates a new cache from a module manifest
+func NewCache(disco Disco) *Cache {
 	return &Cache{
 		keyMap: make(map[string]*ManifestModule),
+		disco:  disco,
 	}
 }
 
@@ -40,7 +42,6 @@ func (c *Cache) loadFromManifest(manifest *Manifest) {
 // source and version are compatible with the module in the cache.
 func (c *Cache) lookupModule(key string, moduleCall *tfconfig.ModuleCall) (*ManifestModule, error) {
 	manifestModule, ok := c.keyMap[key]
-
 	if !ok {
 		return nil, errors.New("not in cache")
 	}
@@ -57,23 +58,40 @@ func (c *Cache) lookupModule(key string, moduleCall *tfconfig.ModuleCall) (*Mani
 		}
 	}
 
-	if manifestModule.Source != moduleCall.Source && (registrySource == "" || manifestModule.Source != registrySource) {
-		return nil, errors.New("source has changed")
+	if manifestModule.Source == moduleCall.Source {
+		return checkVersion(moduleCall, manifestModule)
 	}
 
+	if manifestModule.Source == registrySource {
+		return checkVersion(moduleCall, manifestModule)
+	}
+
+	url, err := c.disco.ModuleLocation(moduleCall.Source)
+	if err != nil {
+		return nil, fmt.Errorf("could not fetch module location from source %w", err)
+	}
+
+	if manifestModule.Source == url.Location {
+		return checkVersion(moduleCall, manifestModule)
+	}
+
+	return nil, errors.New("source has changed")
+}
+
+func checkVersion(moduleCall *tfconfig.ModuleCall, manifestModule *ManifestModule) (*ManifestModule, error) {
 	if moduleCall.Version != "" && manifestModule.Version != "" {
 		constraints, err := goversion.NewConstraint(moduleCall.Version)
 		if err != nil {
-			return nil, fmt.Errorf("invalid version constraint: %w", err)
+			return manifestModule, fmt.Errorf("invalid version constraint: %w", err)
 		}
 
 		version, err := goversion.NewVersion(manifestModule.Version)
 		if err != nil {
-			return nil, fmt.Errorf("invalid version: %w", err)
+			return manifestModule, fmt.Errorf("invalid version: %w", err)
 		}
 
 		if !constraints.Check(version) {
-			return nil, errors.New("version constraint doesn't match")
+			return manifestModule, errors.New("version constraint doesn't match")
 		}
 	}
 

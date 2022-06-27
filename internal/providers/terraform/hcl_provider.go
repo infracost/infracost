@@ -16,6 +16,7 @@ import (
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/hcl"
+	"github.com/infracost/infracost/internal/hcl/modules"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
 )
@@ -125,25 +126,20 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 
 	options = append(options, opts...)
 
-	host, token, remErr := findRemoteHostAndToken(ctx)
+	defaultHost, token, remErr := findRemoteHostAndToken(ctx)
 	localWorkspace := ctx.ProjectConfig.TerraformWorkspace
 	if remErr == nil {
-		options = append(options, hcl.OptionWithRemoteVarLoader(host, token, localWorkspace))
-	}
+		options = append(options, hcl.OptionWithRemoteVarLoader(defaultHost, token, localWorkspace))
 
-	findTokenForHost := func(host string) (string, error) {
-		defaultHost, defaultToken, err := findRemoteHostAndToken(ctx)
-		if err != nil {
-			return "", err
+		findTokenForHost := func(host string) string {
+			if host == defaultHost {
+				return token
+			}
+
+			return findCloudToken(host)
 		}
-
-		if host == defaultHost {
-			return defaultToken, nil
-		}
-
-		return findCloudToken(host), nil
+		options = append(options, hcl.OptionWithCredentialsSource(modules.NewCredentialsSource(findTokenForHost)))
 	}
-	options = append(options, hcl.OptionWithCredentialsSource(findTokenForHost))
 
 	parsers, err := hcl.LoadParsers(ctx.ProjectConfig.Path, ctx.ProjectConfig.ExcludePaths, options...)
 	if err != nil {
