@@ -71,28 +71,6 @@ func varsFromPlanFlags(planFlags string) (vars, error) {
 	}, nil
 }
 
-func findRemoteHostAndToken(ctx *config.ProjectContext) (string, string, error) {
-	token := ctx.ProjectConfig.TerraformCloudToken
-
-	if token == "" && !checkCloudConfigSet() {
-		return "", "", ErrMissingCloudToken
-	}
-
-	host := ctx.ProjectConfig.TerraformCloudHost
-	if host == "" {
-		host = "app.terraform.io"
-	}
-
-	if token == "" {
-		token = findCloudToken(host)
-	}
-	if token == "" {
-		return "", "", ErrMissingCloudToken
-	}
-
-	return host, token, nil
-}
-
 // NewHCLProvider returns a HCLProvider with a hcl.Parser initialised using the config.ProjectContext.
 // It will use input flags from either the terraform-plan-flags or top level var and var-file flags to
 // set input vars and files on the underlying hcl.Parser.
@@ -126,20 +104,19 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 
 	options = append(options, opts...)
 
-	defaultHost, token, remErr := findRemoteHostAndToken(ctx)
+	credsSource, err := modules.NewCredentialsSource(modules.BaseCredentialSet{
+		TerraformCloudToken: ctx.ProjectConfig.TerraformCloudToken,
+		TerraformCloudHost:  ctx.ProjectConfig.TerraformCloudHost,
+	})
 	localWorkspace := ctx.ProjectConfig.TerraformWorkspace
-	if remErr == nil {
-		options = append(options, hcl.OptionWithRemoteVarLoader(defaultHost, token, localWorkspace))
-
-		findTokenForHost := func(host string) string {
-			if host == defaultHost {
-				return token
-			}
-
-			return findCloudToken(host)
-		}
-		options = append(options, hcl.OptionWithCredentialsSource(modules.NewCredentialsSource(findTokenForHost)))
+	if err == nil {
+		options = append(options, hcl.OptionWithRemoteVarLoader(
+			credsSource.BaseCredentialSet.TerraformCloudHost,
+			credsSource.BaseCredentialSet.TerraformCloudToken,
+			localWorkspace),
+		)
 	}
+	options = append(options, hcl.OptionWithCredentialsSource(credsSource))
 
 	parsers, err := hcl.LoadParsers(ctx.ProjectConfig.Path, ctx.ProjectConfig.ExcludePaths, options...)
 	if err != nil {

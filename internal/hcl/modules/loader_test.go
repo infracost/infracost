@@ -15,7 +15,7 @@ func testLoaderE2E(t *testing.T, path string, expectedModules []*ManifestModule,
 		assert.NoError(t, err)
 	}
 
-	moduleLoader := NewModuleLoader(path)
+	moduleLoader := NewModuleLoader(path, &CredentialsSource{})
 
 	manifest, err := moduleLoader.Load()
 	if !assert.NoError(t, err) {
