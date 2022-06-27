@@ -189,11 +189,6 @@ func shareCombinedRun(ctx *config.RunContext, combined output.Root, inputs []out
 		return result.RunID, result.ShareURL
 	}
 
-	projectContexts := make([]*config.ProjectContext, len(combined.Projects))
-	for i := range combined.Projects {
-		projectContexts[i] = config.EmptyProjectContext()
-	}
-
 	combinedRunIds := []string{}
 	for _, input := range inputs {
 		if id := input.Root.RunID; id != "" {
@@ -203,7 +198,7 @@ func shareCombinedRun(ctx *config.RunContext, combined output.Root, inputs []out
 	ctx.SetContextValue("runIds", combinedRunIds)
 
 	dashboardClient := apiclient.NewDashboardAPIClient(ctx)
-	result, err := dashboardClient.AddRun(ctx, projectContexts, combined)
+	result, err := dashboardClient.AddRun(ctx, combined)
 	if err != nil {
 		log.Errorf("Error reporting run: %s", err)
 	}
