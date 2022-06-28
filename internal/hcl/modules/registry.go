@@ -69,7 +69,7 @@ func (d Disco) ModuleLocation(source string) (RegistryURL, error) {
 
 	r := RegistryURL{
 		Location:  fmt.Sprintf("%s%s/%s/%s", serviceURL.String(), namespace, moduleName, target),
-		RawSource: fmt.Sprintf("%s/%s/%s/%s", host, namespace, moduleName, target),
+		RawSource: source,
 	}
 
 	c, err := d.disco.CredentialsForHost(svchost.Hostname(host))
