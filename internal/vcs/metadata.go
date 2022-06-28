@@ -29,7 +29,7 @@ var (
 		},
 	}
 
-	Fetcher = newFetcher()
+	MetadataFetcher = newMetadataFetcher()
 )
 
 type keyMutex struct {
@@ -44,23 +44,26 @@ func (m *keyMutex) Lock(key string) func() {
 	return func() { mtx.Unlock() }
 }
 
-// fetcher is an object designed to find metadata for different systems.
+// metadataFetcher is an object designed to find metadata for different systems.
 // It is designed to be safe for parallelism. So interactions across branches and for different commits
 // will not affect other goroutines.
-type fetcher struct {
+type metadataFetcher struct {
 	mu *keyMutex
 }
 
-func newFetcher() *fetcher {
-	return &fetcher{
+func newMetadataFetcher() *metadataFetcher {
+	return &metadataFetcher{
 		mu: &keyMutex{},
 	}
 }
 
-// Get fetches vcs metadata for the given environment. Get will attempt to try and find
-// a GetMetadataFunc for the environment using env variables to determine the CI system. If Get
-// cannot determine the CI system it falls back to getting the metadata from the local git filesystem.
-func (f *fetcher) Get(path string) (Metadata, error) {
+// Get fetches vcs metadata for the given environment.
+// It takes a path argument which should point to the filesystem directory for that should
+// be used as the VCS project. This is normally the path to the `.git` directory. If no `.git`
+// directory is found in path, Get will traverse parent directories to try and determine VCS metadata.
+//
+// Get also supplements base VCS metadata with CI specific data if it can be found.
+func (f *metadataFetcher) Get(path string) (Metadata, error) {
 	if isTest() {
 		return StubMetadata, nil
 	}
@@ -82,7 +85,7 @@ func isTest() bool {
 	return os.Getenv("INFRACOST_ENV") == "test" || strings.HasSuffix(os.Args[0], ".test")
 }
 
-func (f *fetcher) getGitlabMetadata(path string) (Metadata, error) {
+func (f *metadataFetcher) getGitlabMetadata(path string) (Metadata, error) {
 	m, err := f.getLocalGitMetadata(path)
 	if err != nil {
 		return m, fmt.Errorf("GitLab metadata error, could not fetch initial metadata from local git %w", err)
@@ -106,7 +109,7 @@ func (f *fetcher) getGitlabMetadata(path string) (Metadata, error) {
 	return m, nil
 }
 
-func (f *fetcher) getGithubMetadata(path string) (Metadata, error) {
+func (f *metadataFetcher) getGithubMetadata(path string) (Metadata, error) {
 	event, err := os.ReadFile(os.Getenv("GITHUB_EVENT_PATH"))
 	if err != nil {
 		return Metadata{}, fmt.Errorf("could not read the GitHub event file %w", err)
@@ -203,7 +206,7 @@ func (f *fetcher) getGithubMetadata(path string) (Metadata, error) {
 	return m, nil
 }
 
-func (f *fetcher) getLocalGitMetadata(path string) (Metadata, error) {
+func (f *metadataFetcher) getLocalGitMetadata(path string) (Metadata, error) {
 	r, err := git.PlainOpenWithOptions(path, &git.PlainOpenOptions{DetectDotGit: true})
 	if err != nil {
 		return Metadata{}, fmt.Errorf("could not open git directory to fetch metadata %w", err)
