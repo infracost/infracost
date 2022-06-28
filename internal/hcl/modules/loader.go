@@ -243,9 +243,6 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 	log.Debugf("Module %s not recognized as registry module, treating as remote module: %s", key, err.Error())
 	log.Debugf("Downloading module %s from remote %s", key, moduleCall.Source)
 
-	fmt.Println("DEBUG")
-	fmt.Println(m.Path)
-	fmt.Println(m.downloadDir())
 	err = m.packageFetcher.fetch(moduleAddr, dest)
 	if err != nil {
 		return nil, err
