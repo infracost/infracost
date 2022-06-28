@@ -109,6 +109,19 @@ projects:
 			err := os.WriteFile(path, tt.contents, os.ModePerm)
 			require.NoError(t, err)
 
+			// we need to remove INFRACOST_TERRAFORM_CLOUD_TOKEN value for these tests.
+			// as CI uses INFRACOST_TERRAFORM_CLOUD_TOKEN for private registry tests. This means the expected value
+			// will be inconsistent and show "***".
+			key := "INFRACOST_TERRAFORM_CLOUD_TOKEN"
+			v := os.Getenv(key)
+			os.Unsetenv(key)
+
+			if v != "" {
+				defer func() {
+					os.Setenv(key, v)
+				}()
+			}
+
 			err = c.LoadFromConfigFile(path)
 
 			require.Equal(t, tt.error, err)

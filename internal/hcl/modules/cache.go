@@ -6,6 +6,7 @@ import (
 
 	goversion "github.com/hashicorp/go-version"
 	"github.com/hashicorp/terraform-config-inspect/tfconfig"
+	log "github.com/sirupsen/logrus"
 )
 
 // Cache is a cache of modules that can be used to lookup modules to check if they've already been loaded.
@@ -68,7 +69,7 @@ func (c *Cache) lookupModule(key string, moduleCall *tfconfig.ModuleCall) (*Mani
 
 	url, err := c.disco.ModuleLocation(moduleCall.Source)
 	if err != nil {
-		return nil, fmt.Errorf("could not fetch module location from source %w", err)
+		log.Debugf("could not fetch module location from source err: %s. Proceeding as if source has changed.", err)
 	}
 
 	if manifestModule.Source == url.Location {
@@ -82,16 +83,16 @@ func checkVersion(moduleCall *tfconfig.ModuleCall, manifestModule *ManifestModul
 	if moduleCall.Version != "" && manifestModule.Version != "" {
 		constraints, err := goversion.NewConstraint(moduleCall.Version)
 		if err != nil {
-			return manifestModule, fmt.Errorf("invalid version constraint: %w", err)
+			return nil, fmt.Errorf("invalid version constraint: %w", err)
 		}
 
 		version, err := goversion.NewVersion(manifestModule.Version)
 		if err != nil {
-			return manifestModule, fmt.Errorf("invalid version: %w", err)
+			return nil, fmt.Errorf("invalid version: %w", err)
 		}
 
 		if !constraints.Check(version) {
-			return manifestModule, errors.New("version constraint doesn't match")
+			return nil, errors.New("version constraint doesn't match")
 		}
 	}
 
