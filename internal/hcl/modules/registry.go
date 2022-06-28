@@ -33,6 +33,7 @@ type RegistryLookupResult struct {
 // RegistryURL contains given URL information for a module source. This can be used to build http requests to
 // download the module or check versions of the module.
 type RegistryURL struct {
+	RawSource   string
 	Location    string
 	Credentials auth.HostCredentials
 }
@@ -66,16 +67,18 @@ func (d Disco) ModuleLocation(source string) (RegistryURL, error) {
 		return RegistryURL{}, fmt.Errorf("unable to discover registry service using host %s %w", host, err)
 	}
 
-	moduleLocation := fmt.Sprintf("%s%s/%s/%s", serviceURL.String(), namespace, moduleName, target)
+	r := RegistryURL{
+		Location:  fmt.Sprintf("%s%s/%s/%s", serviceURL.String(), namespace, moduleName, target),
+		RawSource: fmt.Sprintf("%s/%s/%s/%s", host, namespace, moduleName, target),
+	}
 
 	c, err := d.disco.CredentialsForHost(svchost.Hostname(host))
 	if err != nil {
-		return RegistryURL{
-			Location: moduleLocation,
-		}, fmt.Errorf("unable to retrieve credentials for registry host %s %w", host, err)
+		return r, fmt.Errorf("unable to retrieve credentials for registry host %s %w", host, err)
 	}
 
-	return RegistryURL{Location: moduleLocation, Credentials: c}, nil
+	r.Credentials = c
+	return r, nil
 }
 
 // RegistryLoader is a loader that can lookup modules from a Terraform Registry and download them to the given destination
@@ -120,7 +123,7 @@ func (r *RegistryLoader) lookupModule(moduleAddr string, versionConstraints stri
 	}
 
 	return &RegistryLookupResult{
-		Source:      moduleURL.Location,
+		Source:      moduleURL.RawSource,
 		Version:     matchingVersion,
 		DownloadURL: fmt.Sprintf("%s/%s/download", moduleURL.Location, matchingVersion),
 		Credentials: moduleURL.Credentials,
