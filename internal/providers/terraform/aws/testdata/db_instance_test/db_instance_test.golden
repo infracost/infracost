@@ -106,6 +106,10 @@
  ├─ Database instance (on-demand, Single-AZ, db.t3.large)                 730  hours                         $99.28 
  └─ Storage (general purpose SSD, gp2)                                     20  GB                             $2.30 
                                                                                                                     
+ aws_db_instance.oracle-ee-cdb                                                                                      
+ ├─ Database instance (on-demand, Single-AZ, db.t3.large)                 730  hours                         $99.28 
+ └─ Storage (general purpose SSD, gp2)                                     20  GB                             $2.30 
+                                                                                                                    
  aws_db_instance.oracle-se                                                                                          
  ├─ Database instance (on-demand, Single-AZ, db.t3.large)                 730  hours                         $99.28 
  ├─ Storage (general purpose SSD, gp2)                                     20  GB                             $2.30 
@@ -121,6 +125,11 @@
  └─ Storage (general purpose SSD, gp2)                                     20  GB                             $2.30 
                                                                                                                     
  aws_db_instance.oracle-se2                                                                                         
+ ├─ Database instance (on-demand, Single-AZ, db.t3.large)                 730  hours                        $219.00 
+ ├─ Storage (general purpose SSD, gp2)                                     20  GB                             $2.30 
+ └─ Additional backup storage                                           1,000  GB                            $95.00 
+                                                                                                                    
+ aws_db_instance.oracle-se2-cdb                                                                                     
  ├─ Database instance (on-demand, Single-AZ, db.t3.large)                 730  hours                        $219.00 
  ├─ Storage (general purpose SSD, gp2)                                     20  GB                             $2.30 
  └─ Additional backup storage                                           1,000  GB                            $95.00 
@@ -164,7 +173,7 @@
  ├─ Storage (general purpose SSD, gp2)                                     20  GB                             $2.30 
  └─ Additional backup storage                                           1,000  GB                            $95.00 
                                                                                                                     
- OVERALL TOTAL                                                                                            $7,123.35 
+ OVERALL TOTAL                                                                                            $7,541.23 
 ──────────────────────────────────
-35 cloud resources were detected:
-∙ 35 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+37 cloud resources were detected:
+∙ 37 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
