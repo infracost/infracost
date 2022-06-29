@@ -151,6 +151,12 @@ func OptionWithRemoteVarLoader(host, token, localWorkspace string) Option {
 	}
 }
 
+func OptionWithCredentialsSource(source *modules.CredentialsSource) Option {
+	return func(p *Parser) {
+		p.credentialsSource = source
+	}
+}
+
 func OptionWithBlockBuilder(blockBuilder BlockBuilder) Option {
 	return func(p *Parser) {
 		p.blockBuilder = blockBuilder
@@ -189,6 +195,7 @@ type Parser struct {
 	newSpinner            ui.SpinnerFunc
 	writeWarning          ui.WriteWarningFunc
 	remoteVariablesLoader *RemoteVariablesLoader
+	credentialsSource     *modules.CredentialsSource
 }
 
 // LoadParsers inits a list of Parser with the provided option and initialPath. LoadParsers locates Terraform files
@@ -247,7 +254,7 @@ func newParser(initialPath string, options ...Option) *Parser {
 		loaderOpts = append(loaderOpts, modules.LoaderWithSpinner(p.newSpinner))
 	}
 
-	p.moduleLoader = modules.NewModuleLoader(initialPath, loaderOpts...)
+	p.moduleLoader = modules.NewModuleLoader(initialPath, p.credentialsSource, loaderOpts...)
 
 	return p
 }

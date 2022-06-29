@@ -1,0 +1,41 @@
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_with_private_terraform_registry_module
+
+ Name                                                 Monthly Qty  Unit     Monthly Cost 
+                                                                                         
+ module.ec2_cluster.aws_instance.this[0]                                                 
+ ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)          730  hours           $8.47 
+ ├─ EC2 detailed monitoring                                     7  metrics         $2.10 
+ └─ root_block_device                                                                    
+    └─ Storage (general purpose SSD, gp2)                       8  GB              $0.80 
+                                                                                         
+ module.ec2_cluster.aws_instance.this[1]                                                 
+ ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)          730  hours           $8.47 
+ ├─ EC2 detailed monitoring                                     7  metrics         $2.10 
+ └─ root_block_device                                                                    
+    └─ Storage (general purpose SSD, gp2)                       8  GB              $0.80 
+                                                                                         
+ module.ec2_cluster.aws_instance.this[2]                                                 
+ ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)          730  hours           $8.47 
+ ├─ EC2 detailed monitoring                                     7  metrics         $2.10 
+ └─ root_block_device                                                                    
+    └─ Storage (general purpose SSD, gp2)                       8  GB              $0.80 
+                                                                                         
+ module.ec2_cluster.aws_instance.this[3]                                                 
+ ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)          730  hours           $8.47 
+ ├─ EC2 detailed monitoring                                     7  metrics         $2.10 
+ └─ root_block_device                                                                    
+    └─ Storage (general purpose SSD, gp2)                       8  GB              $0.80 
+                                                                                         
+ module.ec2_cluster.aws_instance.this[4]                                                 
+ ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)          730  hours           $8.47 
+ ├─ EC2 detailed monitoring                                     7  metrics         $2.10 
+ └─ root_block_device                                                                    
+    └─ Storage (general purpose SSD, gp2)                       8  GB              $0.80 
+                                                                                         
+ OVERALL TOTAL                                                                    $56.84 
+──────────────────────────────────
+5 cloud resources were detected:
+∙ 5 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+
+Err:
+
