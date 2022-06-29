@@ -3,6 +3,8 @@ package aws
 import (
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 
 	"fmt"
 	"strings"
@@ -46,7 +48,7 @@ func (r *RDSCluster) PopulateUsage(u *schema.UsageData) {
 func (r *RDSCluster) BuildResource() *schema.Resource {
 	costComponents := make([]*schema.CostComponent, 0)
 
-	databaseEngineMode := strings.Title(r.EngineMode)
+	databaseEngineMode := cases.Title(language.English).String(r.EngineMode)
 	if databaseEngineMode == "" {
 		databaseEngineMode = "provisioned"
 	}

@@ -1,0 +1,33 @@
+
+ Name                                            Monthly Qty  Unit   Monthly Cost 
+                                                                                  
+ aws_globalaccelerator_endpoint_group.eu_west_1                                   
+ ├─ US, Mexico, Canada                                                            
+ │  └─ Inbound DT-premium fee                     12,340,000  GB      $185,100.00 
+ ├─ Europe                                                                        
+ │  └─ Inbound DT-premium fee                     22,340,000  GB      $335,100.00 
+ ├─ South Africa, Kenya                                                           
+ │  └─ Inbound DT-premium fee                     32,340,000  GB    $2,166,780.00 
+ ├─ South America                                                                 
+ │  └─ Inbound DT-premium fee                     42,340,000  GB    $1,820,620.00 
+ ├─ South Korea                                                                   
+ │  └─ Inbound DT-premium fee                     52,340,000  GB    $1,831,900.00 
+ ├─ Middle East                                                                   
+ │  └─ Inbound DT-premium fee                     52,340,000  GB    $1,831,900.00 
+ ├─ Australia, New Zealand                                                        
+ │  └─ Inbound DT-premium fee                     62,340,000  GB    $6,545,700.00 
+ ├─ Asia Pacific                                                                  
+ │  └─ Inbound DT-premium fee                     62,340,000  GB    $2,680,620.00 
+ └─ India, Indonesia, Philippines, Thailand                                       
+    └─ Inbound DT-premium fee                     72,340,000  GB    $2,387,220.00 
+                                                                                  
+ aws_globalaccelerator_endpoint_group.us_east_1                                   
+ ├─ Europe                                                                        
+ │  └─ Outbound DT-premium fee                         5,000  GB           $75.00 
+ └─ Asia Pacific                                                                  
+    └─ Outbound DT-premium fee                         1,000  GB           $35.00 
+                                                                                  
+ OVERALL TOTAL                                                     $19,785,050.00 
+──────────────────────────────────
+2 cloud resources were detected:
+∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

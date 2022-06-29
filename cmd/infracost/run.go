@@ -49,17 +49,21 @@ type hclRunDiff struct {
 }
 
 func addRunFlags(cmd *cobra.Command) {
-	cmd.Flags().StringSlice("terraform-var-file", nil, "Load variable files, similar to Terraform's -var-file flag.")
-	cmd.Flags().StringSlice("terraform-var", nil, "Set value for an input variable, similar to Terraform's -var flag.")
+	cmd.Flags().StringSlice("terraform-var-file", nil, "Load variable files, similar to Terraform's -var-file flag. Provided files must be relative to the --path flag")
+	cmd.Flags().StringSlice("terraform-var", nil, "Set value for an input variable, similar to Terraform's -var flag")
 	cmd.Flags().StringP("path", "p", "", "Path to the Terraform directory or JSON/plan file")
 
 	cmd.Flags().String("config-file", "", "Path to Infracost config file. Cannot be used with path, terraform* or usage-file flags")
 	cmd.Flags().String("usage-file", "", "Path to Infracost usage file that specifies values for usage-based resources")
 
-	cmd.Flags().Bool("terraform-force-cli", false, "Generate the Terraform plan JSON using the Terraform CLI. This may require cloud credentials.")
+	cmd.Flags().String("project-name", "", "Name of project in the output. Defaults to path or git repo name")
+
+	cmd.Flags().Bool("terraform-force-cli", false, "Generate the Terraform plan JSON using the Terraform CLI. This may require cloud credentials")
 	cmd.Flags().String("terraform-plan-flags", "", "Flags to pass to 'terraform plan'. Applicable with --terraform-force-cli")
 	cmd.Flags().String("terraform-init-flags", "", "Flags to pass to 'terraform init'. Applicable with --terraform-force-cli")
 	cmd.Flags().String("terraform-workspace", "", "Terraform workspace to use. Applicable when path is a Terraform directory")
+
+	cmd.Flags().StringSlice("exclude-path", nil, "Paths of directories to exclude, glob patterns need quotes")
 
 	cmd.Flags().Bool("no-cache", false, "Don't attempt to cache Terraform plans")
 
@@ -88,8 +92,8 @@ func (p *panicError) Error() string {
 }
 
 func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
-	if runCtx.Config.IsSelfHosted() && runCtx.Config.EnableDashboard {
-		ui.PrintWarning(cmd.ErrOrStderr(), "The dashboard is part of Infracost's hosted services. Contact hello@infracost.io for help.")
+	if runCtx.Config.IsSelfHosted() && runCtx.Config.IsCloudEnabled() {
+		ui.PrintWarning(cmd.ErrOrStderr(), "Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
 	}
 
 	pr, err := newParallelRunner(cmd, runCtx)
@@ -123,6 +127,10 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		go formatHCLProjects(wg, runCtx, hclProjects, hclR)
 	}
 
+	for _, project := range projects {
+		project.Metadata.InfracostCommand = cmd.Name()
+	}
+
 	r, err := output.ToOutputFormat(projects)
 	if err != nil {
 		return err
@@ -154,7 +162,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	}
 
 	b, err := output.FormatOutput(format, r, output.Options{
-		DashboardEnabled: runCtx.Config.EnableDashboard,
+		DashboardEnabled: runCtx.Config.IsCloudEnabled(),
 		ShowSkipped:      runCtx.Config.ShowSkipped,
 		NoColor:          runCtx.Config.NoColor,
 		Fields:           runCtx.Config.Fields,
@@ -198,7 +206,7 @@ func formatHCLProjects(wg *sync.WaitGroup, ctx *config.RunContext, hclProjects [
 		wg.Done()
 
 		if err != nil {
-			err = apiclient.ReportCLIError(ctx, fmt.Errorf("hcl-runtime-error: formatting hcl projects %s\n%s", err, debug.Stack()))
+			err = apiclient.ReportCLIError(ctx, fmt.Errorf("hcl-runtime-error: formatting hcl projects %s\n%s", err, debug.Stack()), false)
 			if err != nil {
 				log.Debugf("error reporting unexpected hcl runtime error: %s", err)
 			}
@@ -363,6 +371,13 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 
 	ctx.SetContextValue("projectType", provider.Type())
 
+	projectTypes := []interface{}{}
+	if t, ok := ctx.RunContext.ContextValues()["projectTypes"]; ok {
+		projectTypes = t.([]interface{})
+	}
+	projectTypes = append(projectTypes, provider.Type())
+	ctx.RunContext.SetContextValue("projectTypes", projectTypes)
+
 	if r.cmd.Name() == "diff" && provider.Type() == "terraform_state_json" {
 		m := "Cannot use Terraform state JSON with the infracost diff command.\n\n"
 		m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
@@ -476,14 +491,18 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 			r.cmd.PrintErrln()
 
 			if e := unwrapped(err); errors.Is(e, apiclient.ErrInvalidAPIKey) {
-				return nil, fmt.Errorf("%v\n%s %s %s %s %s\n%s",
+				return nil, fmt.Errorf("%v\n%s %s %s %s %s\n%s %s.\n%s %s %s",
 					e.Error(),
 					"Please check your",
 					ui.PrimaryString(config.CredentialsFilePath()),
 					"file or",
 					ui.PrimaryString("INFRACOST_API_KEY"),
 					"environment variable.",
-					"If you continue having issues please email hello@infracost.io",
+					"If you recently regenerated your API key, you can retrieve it from",
+					ui.PrimaryString(r.runCtx.Config.DashboardEndpoint),
+					"See",
+					ui.PrimaryString("https://infracost.io/support"),
+					"if you continue having issues.",
 				)
 			}
 
@@ -523,7 +542,7 @@ func (r *parallelRunner) runHCLProvider(wg *sync.WaitGroup, ctx *config.ProjectC
 
 		if err != nil {
 			log.Debugf("recovered from hcl provider panic %s", err)
-			err = apiclient.ReportCLIError(r.runCtx, fmt.Errorf("hcl-runtime-error: loading resources %s\n%s", err, debug.Stack()))
+			err = apiclient.ReportCLIError(r.runCtx, fmt.Errorf("hcl-runtime-error: loading resources %s\n%s", err, debug.Stack()), false)
 			if err != nil {
 				log.Debugf("error reporting unexpected hcl runtime error: %s", err)
 			}
@@ -684,6 +703,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 
 	hasProjectFlags := (hasPathFlag ||
 		cmd.Flags().Changed("usage-file") ||
+		cmd.Flags().Changed("project-name") ||
 		cmd.Flags().Changed("terraform-plan-flags") ||
 		cmd.Flags().Changed("terraform-var-file") ||
 		cmd.Flags().Changed("terraform-var") ||
@@ -693,7 +713,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 
 	if hasConfigFile && hasProjectFlags {
 		m := "--config-file flag cannot be used with the following flags: "
-		m += "--path, --terraform-*, --usage-file"
+		m += "--path, --project-name, --terraform-*, --usage-file"
 		ui.PrintUsage(cmd)
 		return errors.New(m)
 	}
@@ -706,10 +726,12 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 		tfVars, _ := cmd.Flags().GetStringSlice("terraform-var")
 		projectCfg.TerraformVars = tfVarsToMap(tfVars)
 		projectCfg.UsageFile, _ = cmd.Flags().GetString("usage-file")
+		projectCfg.Name, _ = cmd.Flags().GetString("project-name")
 		projectCfg.TerraformForceCLI, _ = cmd.Flags().GetBool("terraform-force-cli")
 		projectCfg.TerraformPlanFlags, _ = cmd.Flags().GetString("terraform-plan-flags")
 		projectCfg.TerraformInitFlags, _ = cmd.Flags().GetString("terraform-init-flags")
 		projectCfg.TerraformUseState, _ = cmd.Flags().GetBool("terraform-use-state")
+		projectCfg.ExcludePaths, _ = cmd.Flags().GetStringSlice("exclude-path")
 
 		if cmd.Flags().Changed("terraform-workspace") {
 			projectCfg.TerraformWorkspace, _ = cmd.Flags().GetString("terraform-workspace")
@@ -723,6 +745,8 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 		if err != nil {
 			return err
 		}
+
+		cfg.ConfigFilePath = cfgFilePath
 
 		if forceCLI, _ := cmd.Flags().GetBool("terraform-force-cli"); forceCLI {
 			for _, p := range cfg.Projects {

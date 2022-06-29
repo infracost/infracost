@@ -110,15 +110,11 @@ func (blocks Blocks) ModuleBlocks() Blocks {
 	justModules := blocks.OfType("module")
 	toSort := make(referencedBlocks, len(justModules))
 
-	for i, block := range justModules {
-		toSort[i] = block
-	}
+	copy(toSort, justModules)
 
 	sort.Sort(toSort)
 
-	for i, block := range toSort {
-		justModules[i] = block
-	}
+	copy(justModules, toSort)
 
 	return justModules
 }
@@ -140,8 +136,36 @@ func (blocks Blocks) OfType(t string) Blocks {
 	return results
 }
 
+// BlockMatcher defines a struct that can be used to filter a list of blocks to a single Block.
+type BlockMatcher struct {
+	Type  string
+	Label string
+}
+
+// Matching returns a single block filtered from the given pattern.
+// If more than one Block is filtered by the pattern, Matching returns the first Block found.
+func (blocks Blocks) Matching(pattern BlockMatcher) *Block {
+	search := blocks
+
+	if pattern.Type != "" {
+		search = blocks.OfType(pattern.Type)
+	}
+
+	for _, block := range search {
+		if pattern.Label == block.Label() {
+			return block
+		}
+	}
+
+	if len(search) > 0 {
+		return search[0]
+	}
+
+	return nil
+}
+
 // Outputs returns a map of all the evaluated outputs from the list of Blocks.
-func (blocks Blocks) Outputs() cty.Value {
+func (blocks Blocks) Outputs(suppressNil bool) cty.Value {
 	data := make(map[string]cty.Value)
 
 	for _, block := range blocks.OfType("output") {
@@ -150,14 +174,17 @@ func (blocks Blocks) Outputs() cty.Value {
 			continue
 		}
 
-		// resolve the attribute value. This will evaluate any expressions that
-		// the attribute uses and try and return the final value. If the end
-		// value can't be resolved we set it as a blank string. This is
-		// safe to use for callers and won't cause panics when marshalling
-		// the returned cty.Value.
 		value := attr.Value()
-		if value == cty.NilVal {
-			value = cty.StringVal("")
+
+		if suppressNil {
+			// resolve the attribute value. This will evaluate any expressions that
+			// the attribute uses and try and return the final value. If the end
+			// value can't be resolved we set it as a blank string. This is
+			// safe to use for callers and won't cause panics when marshalling
+			// the returned cty.Value.
+			if value == cty.NilVal {
+				value = cty.StringVal("")
+			}
 		}
 
 		data[block.Label()] = value
@@ -211,11 +238,13 @@ type Block struct {
 	childBlocks Blocks
 	// verbose determines whether the block uses verbose debug logging.
 	verbose  bool
+	newMock  func(attr *Attribute) cty.Value
 	Filename string
 }
 
 // BlockBuilder handles generating new Blocks as part of the parsing and evaluation process.
 type BlockBuilder struct {
+	MockFunc      func(a *Attribute) cty.Value
 	SetAttributes []SetAttributesFunc
 }
 
@@ -243,6 +272,7 @@ func (b BlockBuilder) NewBlock(filename string, hclBlock *hcl.Block, ctx *Contex
 			moduleBlock: moduleBlock,
 			childBlocks: children,
 			verbose:     isLoggingVerbose,
+			newMock:     b.MockFunc,
 		}
 	}
 
@@ -258,6 +288,7 @@ func (b BlockBuilder) NewBlock(filename string, hclBlock *hcl.Block, ctx *Contex
 			moduleBlock: moduleBlock,
 			childBlocks: children,
 			verbose:     isLoggingVerbose,
+			newMock:     b.MockFunc,
 		}
 	}
 
@@ -271,6 +302,7 @@ func (b BlockBuilder) NewBlock(filename string, hclBlock *hcl.Block, ctx *Contex
 		moduleBlock: moduleBlock,
 		childBlocks: children,
 		verbose:     isLoggingVerbose,
+		newMock:     b.MockFunc,
 	}
 }
 
@@ -426,6 +458,14 @@ func (b *Block) InjectBlock(block *Block, name string) {
 // IsCountExpanded returns if the Block has been expanded as part of a for_each or count evaluation.
 func (b *Block) IsCountExpanded() bool {
 	return b.expanded
+}
+
+func (b Block) ShouldExpand() bool {
+	if b.IsCountExpanded() {
+		return false
+	}
+
+	return b.Type() == "resource" || b.Type() == "module" || b.Type() == "data"
 }
 
 // SetContext sets the Block.context to the provided ctx. This ctx is also set on the child Blocks as
@@ -613,7 +653,7 @@ func (b *Block) GetAttributes() []*Attribute {
 	}
 
 	for _, attr := range b.getHCLAttributes() {
-		results = append(results, &Attribute{HCLAttr: attr, Ctx: b.context, Verbose: b.verbose})
+		results = append(results, &Attribute{newMock: b.newMock, HCLAttr: attr, Ctx: b.context, Verbose: b.verbose})
 	}
 
 	return results
@@ -789,6 +829,18 @@ func (b *Block) Index() *int64 {
 		i, _ := strconv.ParseInt(m[1], 10, 64)
 
 		return &i
+	}
+
+	return nil
+}
+
+// Key returns the foreach key of the block using the name label.
+// Key returns nil if the block has no each key.
+func (b *Block) Key() *string {
+	m := foreachRegex.FindStringSubmatch(b.NameLabel())
+
+	if len(m) > 0 {
+		return &m[1]
 	}
 
 	return nil

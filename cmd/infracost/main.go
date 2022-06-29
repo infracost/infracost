@@ -111,6 +111,7 @@ func newRootCmd(ctx *config.RunContext) *cobra.Command {
 	rootCmd.PersistentFlags().Bool("no-color", false, "Turn off colored output")
 	rootCmd.PersistentFlags().String("log-level", "", "Log level (trace, debug, info, warn, error, fatal)")
 
+	rootCmd.AddCommand(authCmd(ctx))
 	rootCmd.AddCommand(registerCmd(ctx))
 	rootCmd.AddCommand(configureCmd(ctx))
 	rootCmd.AddCommand(diffCmd(ctx))
@@ -187,7 +188,7 @@ func handleCLIError(ctx *config.RunContext, cliErr error) {
 		ui.PrintError(ctx.ErrWriter, cliErr.Error())
 	}
 
-	err := apiclient.ReportCLIError(ctx, cliErr)
+	err := apiclient.ReportCLIError(ctx, cliErr, true)
 	if err != nil {
 		log.Warnf("Error reporting CLI error: %s", err)
 	}
@@ -196,7 +197,7 @@ func handleCLIError(ctx *config.RunContext, cliErr error) {
 func handleUnexpectedErr(ctx *config.RunContext, err error) {
 	ui.PrintUnexpectedErrorStack(ctx.ErrWriter, err)
 
-	err = apiclient.ReportCLIError(ctx, err)
+	err = apiclient.ReportCLIError(ctx, err, false)
 	if err != nil {
 		log.Warnf("Error reporting unexpected error: %s", err)
 	}
@@ -234,6 +235,7 @@ func loadGlobalFlags(ctx *config.RunContext, cmd *cobra.Command) error {
 	}
 
 	ctx.SetContextValue("dashboardEnabled", ctx.Config.EnableDashboard)
+	ctx.SetContextValue("cloudEnabled", ctx.Config.EnableCloud)
 	ctx.SetContextValue("isDefaultPricingAPIEndpoint", ctx.Config.PricingAPIEndpoint == ctx.Config.DefaultPricingAPIEndpoint)
 
 	flagNames := make([]string, 0)

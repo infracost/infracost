@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/infracost/infracost/internal/resources"
-	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/infracost/infracost/internal/resources"
+	"github.com/infracost/infracost/internal/schema"
 )
 
 type RDSClusterInstance struct {
@@ -44,25 +45,17 @@ func (r *RDSClusterInstance) BuildResource() *schema.Resource {
 		PurchaseOption: strPtr("on_demand"),
 	}
 
+	var err error
 	if r.ReservedInstanceTerm != nil {
-		resolver := reservedInstanceResolver{
+		resolver := &rdsReservationResolver{
 			term:          strVal(r.ReservedInstanceTerm),
 			paymentOption: strVal(r.ReservedInstancePaymentOption),
-			dbInstance:    true,
 		}
-		valid, err := resolver.Validate()
-		if err != "" {
-			log.Warnf(err)
+		priceFilter, err = resolver.PriceFilter()
+		if err != nil {
+			log.Warnf(err.Error())
 		}
-		if valid {
-			purchaseOptionLabel = "reserved"
-			priceFilter = &schema.PriceFilter{
-				PurchaseOption:     strPtr("reserved"),
-				StartUsageAmount:   strPtr("0"),
-				TermLength:         strPtr(resolver.Term()),
-				TermPurchaseOption: strPtr(resolver.PaymentOption()),
-			}
-		}
+		purchaseOptionLabel = "reserved"
 	}
 
 	costComponents := []*schema.CostComponent{
@@ -124,14 +117,11 @@ func (r *RDSClusterInstance) BuildResource() *schema.Resource {
 }
 
 func (r *RDSClusterInstance) databaseEngineValue() string {
-	switch r.Engine {
-	case "aurora", "aurora-mysql", "":
-		return "Aurora MySQL"
-	case "aurora-postgresql":
+	if r.Engine == "aurora-postgresql" {
 		return "Aurora PostgreSQL"
 	}
 
-	return ""
+	return "Aurora MySQL"
 }
 
 func (r *RDSClusterInstance) cpuCreditsCostComponent(databaseEngine, instanceFamily string, vCPUCount decimal.Decimal) *schema.CostComponent {

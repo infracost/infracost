@@ -30,10 +30,26 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 			s += "──────────────────────────────────\n"
 		}
 
-		s += fmt.Sprintf("%s %s\n\n",
+		s += fmt.Sprintf("%s %s\n",
 			ui.BoldString("Project:"),
-			project.Label(opts.DashboardEnabled),
+			project.Label(),
 		)
+
+		if project.Metadata.TerraformModulePath != "" {
+			s += fmt.Sprintf("%s %s\n",
+				ui.BoldString("Module path:"),
+				project.Metadata.TerraformModulePath,
+			)
+		}
+
+		if project.Metadata.WorkspaceLabel() != "" {
+			s += fmt.Sprintf("%s %s\n",
+				ui.BoldString("Workspace:"),
+				project.Metadata.WorkspaceLabel(),
+			)
+		}
+
+		s += "\n"
 
 		tableOut := tableForBreakdown(out.Currency, *project.Breakdown, opts.Fields, includeProjectTotals)
 

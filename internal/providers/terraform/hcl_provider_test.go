@@ -159,8 +159,14 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 
 			parsers, err := hcl.LoadParsers(
 				testPath,
+				[]string{},
 				hcl.OptionWithBlockBuilder(
-					hcl.BlockBuilder{SetAttributes: []hcl.SetAttributesFunc{setMockAttributes(tt.attrs)}},
+					hcl.BlockBuilder{
+						MockFunc: func(a *hcl.Attribute) cty.Value {
+							return cty.StringVal(fmt.Sprintf("mocked-%s", a.Name()))
+						},
+						SetAttributes: []hcl.SetAttributesFunc{setMockAttributes(tt.attrs)},
+					},
 				),
 			)
 			require.NoError(t, err)

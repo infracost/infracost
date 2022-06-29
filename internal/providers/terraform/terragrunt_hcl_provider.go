@@ -1,9 +1,11 @@
 package terraform
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime/debug"
 	"sort"
 	"strings"
 	"time"
@@ -23,6 +25,8 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
+	"github.com/zclconf/go-cty/cty/gocty"
+	ctyJson "github.com/zclconf/go-cty/cty/json"
 
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
@@ -31,12 +35,22 @@ import (
 	"github.com/infracost/infracost/internal/ui"
 )
 
+type panicError struct {
+	msg string
+}
+
+func (p panicError) Error() string {
+	return p.msg
+}
+
 type TerragruntHCLProvider struct {
 	ctx                  *config.ProjectContext
 	Path                 string
 	includePastResources bool
 	outputs              map[string]cty.Value
 	stack                *tgconfigstack.Stack
+	excludedPaths        []string
+	env                  map[string]string
 }
 
 // NewTerragruntHCLProvider creates a new provider intialized with the configured project path (usually the terragrunt
@@ -47,7 +61,23 @@ func NewTerragruntHCLProvider(ctx *config.ProjectContext, includePastResources b
 		Path:                 ctx.ProjectConfig.Path,
 		includePastResources: includePastResources,
 		outputs:              map[string]cty.Value{},
+		excludedPaths:        ctx.ProjectConfig.ExcludePaths,
+		env:                  parseEnvironmentVariables(os.Environ()),
 	}
+}
+
+func parseEnvironmentVariables(environment []string) map[string]string {
+	environmentMap := make(map[string]string)
+
+	for i := 0; i < len(environment); i++ {
+		variableSplit := strings.SplitN(environment[i], "=", 2)
+
+		if len(variableSplit) == 2 {
+			environmentMap[strings.TrimSpace(variableSplit[0])] = variableSplit[1]
+		}
+	}
+
+	return environmentMap
 }
 
 func (p *TerragruntHCLProvider) Type() string {
@@ -59,7 +89,18 @@ func (p *TerragruntHCLProvider) DisplayType() string {
 }
 
 func (p *TerragruntHCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
-	// no op
+	basePath := p.ctx.ProjectConfig.Path
+	if p.ctx.RunContext.Config.ConfigFilePath != "" {
+		basePath = filepath.Dir(p.ctx.RunContext.Config.ConfigFilePath)
+	}
+
+	modulePath, err := filepath.Rel(basePath, metadata.Path)
+	if err == nil && modulePath != "" && modulePath != "." {
+		log.Debugf("Calculated relative terraformModulePath for %s from %s", basePath, metadata.Path)
+		metadata.TerraformModulePath = modulePath
+	}
+
+	metadata.TerraformWorkspace = p.ctx.ProjectConfig.TerraformWorkspace
 }
 
 type terragruntWorkingDirInfo struct {
@@ -92,10 +133,18 @@ func (p *TerragruntHCLProvider) LoadResources(usage map[string]*schema.UsageData
 		}
 
 		for _, project := range projects {
-			project.Metadata = config.DetectProjectMetadata(di.configDir)
+			projectPath := di.configDir
+			// attempt to convert project path to be relative to the top level provider path
+			if absPath, err := filepath.Abs(p.ctx.ProjectConfig.Path); err == nil {
+				if relProjectPath, err := filepath.Rel(absPath, projectPath); err == nil {
+					projectPath = filepath.Join(p.ctx.ProjectConfig.Path, relProjectPath)
+				}
+			}
+
+			project.Metadata = config.DetectProjectMetadata(projectPath)
 			project.Metadata.Type = p.Type()
 			p.AddMetadata(project.Metadata)
-			project.Name = schema.GenerateProjectName(project.Metadata, p.ctx.RunContext.Config.EnableDashboard)
+			project.Name = schema.GenerateProjectName(project.Metadata, p.ctx.ProjectConfig.Name, p.ctx.RunContext.Config.IsCloudEnabled())
 			allProjects = append(allProjects, project)
 		}
 	}
@@ -134,15 +183,25 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 		ErrWriter:                  tgLog.WriterLevel(log.DebugLevel),
 		MaxFoldersToCheck:          tgoptions.DEFAULT_MAX_FOLDERS_TO_CHECK,
 		WorkingDir:                 p.Path,
+		ExcludeDirs:                p.excludedPaths,
 		DownloadDir:                terragruntDownloadDir,
 		TerraformCliArgs:           []string{tgcli.CMD_TERRAGRUNT_INFO},
+		Env:                        p.env,
 		IgnoreExternalDependencies: true,
-		RunTerragrunt: func(terragruntOptions *tgoptions.TerragruntOptions) error {
+		RunTerragrunt: func(terragruntOptions *tgoptions.TerragruntOptions) (err error) {
+			defer func() {
+				unexpectedErr := recover()
+				if unexpectedErr != nil {
+					err = panicError{msg: fmt.Sprintf("%s\n%s", unexpectedErr, debug.Stack())}
+				}
+			}()
+
 			workingDirInfo, err := p.runTerragrunt(terragruntOptions)
 			if workingDirInfo != nil {
 				workingDirsToEstimate = append(workingDirsToEstimate, workingDirInfo)
 			}
-			return err
+
+			return
 		},
 		Parallelism: 1,
 	}
@@ -155,14 +214,18 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 
 	err = s.Run(terragruntOptions)
 	if err != nil {
+		if errors.As(err, &panicError{}) {
+			panic(err)
+		}
+
 		return nil, clierror.NewSanitizedError(
 			errors.Errorf(
 				"%s\n%v%s",
 				"Failed to parse the Terragrunt code using the Terragrunt library:",
 				err.Error(),
-				fmt.Sprintf("Try setting --path to a Terraform plan JSON file. See %s for how to generate this.", ui.LinkString("https://infracost.io/troubleshoot")),
+				fmt.Sprintf("For a list of known issues and workarounds, see: %s", ui.LinkString("https://infracost.io/docs/features/terragrunt/")),
 			),
-			"Error parsing the Terragrunt code using the Terragrunt library",
+			fmt.Sprintf("Error parsing the Terragrunt code using the Terragrunt library: %s", err),
 		)
 	}
 	p.outputs = map[string]cty.Value{}
@@ -263,11 +326,17 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 	pconfig.Path = info.workingDir
 	pconfig.TerraformVars = p.initTerraformVars(pconfig.TerraformVars, terragruntConfig.Inputs)
 
+	inputs, err := convertToCtyWithJson(terragruntConfig.Inputs)
+	if err != nil {
+		log.Debugf("Failed to build Terragrunt inputs for: %s err: %s", info.workingDir, err)
+	}
+
 	h, err := NewHCLProvider(
 		config.NewProjectContext(p.ctx.RunContext, &pconfig),
 		&HCLProviderConfig{CacheParsingModules: true},
 		hcl.OptionWithSpinner(p.ctx.RunContext.NewSpinner),
 		hcl.OptionWithWarningFunc(p.ctx.RunContext.NewWarningWriter()),
+		hcl.OptionWithRawCtyInput(inputs),
 	)
 	if err != nil {
 		return nil, fmt.Errorf("could not create provider for Terragrunt generated dir %w", err)
@@ -279,17 +348,31 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 	}
 
 	for _, mod := range mods {
-		p.outputs[opts.TerragruntConfigPath] = mod.Blocks.Outputs()
+		p.outputs[opts.TerragruntConfigPath] = mod.Blocks.Outputs(true)
 	}
 
 	info.provider = h
 	return info, nil
 }
 
+func convertToCtyWithJson(val interface{}) (cty.Value, error) {
+	jsonBytes, err := json.Marshal(val)
+	if err != nil {
+		return cty.NilVal, fmt.Errorf("could not marshal terragrunt inputs %w", err)
+	}
+	var ctyJsonVal ctyJson.SimpleJSONValue
+	if err := ctyJsonVal.UnmarshalJSON(jsonBytes); err != nil {
+		return cty.NilVal, fmt.Errorf("could not unmarshall terragrunt inputs %w", err)
+	}
+	return ctyJsonVal.Value, nil
+}
+
 // fetchDependencyOutputs returns the Terraform outputs from the dependencies of Terragrunt file provided in the opts input.
 func (p *TerragruntHCLProvider) fetchDependencyOutputs(opts *tgoptions.TerragruntOptions) (cty.Value, error) {
 	outputs := cty.MapVal(map[string]cty.Value{
-		"mock": cty.StringVal("val"),
+		"outputs": cty.ObjectVal(map[string]cty.Value{
+			"mock": cty.StringVal("val"),
+		}),
 	})
 
 	if p.stack != nil {
@@ -301,23 +384,52 @@ func (p *TerragruntHCLProvider) fetchDependencyOutputs(opts *tgoptions.Terragrun
 		}
 
 		if mod != nil && len(mod.Dependencies) > 0 {
-			blocks, err := decodeDependencyBlocks(mod.TerragruntOptions.TerragruntConfigPath, opts, nil)
+			blocks, err := decodeDependencyBlocks(mod.TerragruntOptions.TerragruntConfigPath, opts, nil, nil)
 			if err != nil {
 				return cty.Value{}, fmt.Errorf("could not parse dependency blocks for Terragrunt file %s %w", mod.TerragruntOptions.TerragruntConfigPath, err)
 			}
 
 			out := map[string]cty.Value{}
 			for dir, dep := range blocks {
+				value, evaluated := p.outputs[dir]
+				if !evaluated {
+					_, err := p.runTerragrunt(opts.Clone(dir))
+					if err != nil {
+						return outputs, fmt.Errorf("could not evaluate dependency %s at dir %s err: %w", dep.Name, dir, err)
+					}
+
+					value = p.outputs[dir]
+				}
+
 				out[dep.Name] = cty.MapVal(map[string]cty.Value{
-					"outputs": p.outputs[dir],
+					"outputs": value,
 				})
 			}
 
-			outputs = cty.MapVal(out)
+			if len(out) > 0 {
+				encoded, err := gocty.ToCtyValue(out, generateTypeFromValuesMap(out))
+				if err == nil {
+					return encoded, nil
+				}
+
+				log.Warnf("could not transform output blocks to cty type err: %s, using dummy output type", err)
+			}
 		}
 	}
 
 	return outputs, nil
+}
+
+// generateTypeFromValuesMap takes a values map and returns an object type that has the same number of fields, but
+// bound to each type of the underlying evaluated expression. This is the only way the HCL decoder will be happy, as
+// object type is the only map type that allows different types for each attribute (cty.Map requires all attributes to
+// have the same type.
+func generateTypeFromValuesMap(valMap map[string]cty.Value) cty.Type {
+	outType := map[string]cty.Type{}
+	for k, v := range valMap {
+		outType[k] = v.Type()
+	}
+	return cty.Object(outType)
 }
 
 // 1. Download the given source URL, which should use Terraform's module source syntax, into a temporary folder
@@ -533,12 +645,16 @@ type terragruntDependency struct {
 
 // decodeDependencyBlocks parses the file at filename and returns a map containing all the hcl blocks with the "dependency" label.
 // The map is keyed by the full path of the config_path attribute specified in the dependency block.
-func decodeDependencyBlocks(filename string, terragruntOptions *tgoptions.TerragruntOptions, dependencyOutputs *cty.Value) (map[string]tgconfig.Dependency, error) {
+func decodeDependencyBlocks(filename string, terragruntOptions *tgoptions.TerragruntOptions, dependencyOutputs *cty.Value, include *tgconfig.IncludeConfig) (map[string]tgconfig.Dependency, error) {
 	parser := hclparse.NewParser()
-	file, _ := parser.ParseHCLFile(filename)
-	localsAsCty, trackInclude, err := tgconfig.DecodeBaseBlocks(terragruntOptions, parser, file, filename, nil, nil)
+	file, diags := parser.ParseHCLFile(filename)
+	if diags != nil && diags.HasErrors() {
+		return nil, fmt.Errorf("could not parse hcl file %s to decode dependency blocks %w", filename, diags)
+	}
+
+	localsAsCty, trackInclude, err := tgconfig.DecodeBaseBlocks(terragruntOptions, parser, file, filename, include, nil)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("could not parse base hcl blocks %w", err)
 	}
 
 	contextExtensions := tgconfig.EvalContextExtensions{
@@ -559,8 +675,32 @@ func decodeDependencyBlocks(filename string, terragruntOptions *tgoptions.Terrag
 	}
 
 	depmap := make(map[string]tgconfig.Dependency)
+	keymap := make(map[string]struct{})
 	for _, dep := range deps.Dependencies {
 		depmap[getCleanedTargetConfigPath(dep.ConfigPath, filename)] = dep
+		keymap[dep.Name] = struct{}{}
+	}
+
+	if trackInclude != nil {
+		for _, includeConfig := range trackInclude.CurrentList {
+			includeConfig := includeConfig
+			strategy, _ := includeConfig.GetMergeStrategy()
+			if strategy != tgconfig.NoMerge {
+				rawPath := getCleanedTargetConfigPath(includeConfig.Path, filename)
+				incl, err := decodeDependencyBlocks(rawPath, terragruntOptions, dependencyOutputs, &includeConfig)
+				if err != nil {
+					return nil, fmt.Errorf("could not decode dependency blocks for included config '%s' path: %s %w", includeConfig.Name, includeConfig.Path, err)
+				}
+
+				for _, dep := range incl {
+					if _, includedInParent := keymap[dep.Name]; includedInParent {
+						continue
+					}
+
+					depmap[getCleanedTargetConfigPath(dep.ConfigPath, filename)] = dep
+				}
+			}
+		}
 	}
 
 	return depmap, nil

@@ -184,12 +184,36 @@ resource_usage:
     
   aws_elasticache_cluster.my_redis_snapshot:
     snapshot_storage_size_gb: 10000 # Size of Redis snapshots in GB.
+    reserved_instance_term: 1_year                          # Term for Reserved Instances, can be: 1_year, 3_year.
+    reserved_instance_payment_option: partial_upfront       # Payment option for Reserved Instances. Can be: no_upfront, partial_upfront, all_upfront for standard offering class. Can be: heavy_utilization, medium_utilization, light utilization for legacy offering class.
 
   aws_elasticache_replication_group.my_redis_replication_snapshot:
     snapshot_storage_size_gb: 10000 # Size of Redis snapshots in GB.
+    reserved_instance_term: 1_year                          # Term for Reserved Instances, can be: 1_year, 3_year.
+    reserved_instance_payment_option: partial_upfront       # Payment option for Reserved Instances. Can be: no_upfront, partial_upfront, all_upfront for standard offering class. Can be: heavy_utilization, medium_utilization, light utilization for legacy offering class.
 
   aws_elb.my_elb:
     monthly_data_processed_gb: 10000 # Monthly data processed by a Classic Load Balancer in GB.
+
+  aws_globalaccelerator_endpoint_group.my_endpoint_group:
+    monthly_inbound_data_transfer_gb:
+      us: 12340000 # United States, Mexico, Canada
+      europe: 22340000 # Europe
+      south_africa: 32340000 # South Africa, Kenya
+      south_america: 42340000 # South America
+      south_korea: 52340000 # South Korea
+      australia: 62340000 # Australia, New Zealand
+      asia_pacific: 62340000 # Asia Pacific
+      india: 72340000 # India, Indonesia, Philippines, Thailand
+    monthly_outbound_data_transfer_gb:
+      us: 1234 # United States, Mexico, Canada
+      europe: 2234 # Europe
+      south_africa: 3234 # South Africa, Kenya
+      south_america: 4234 # South America
+      south_korea: 5234 # South Korea
+      australia: 6234 # Australia, New Zealand
+      asia_pacific: 6234 # Asia Pacific
+      india: 7234 # India, Indonesia, Philippines, Thailand
 
   aws_glue_catalog_database.my_db:
     monthly_objects: 100000  # Monthly number of objects stored above the free one million object storage limit.

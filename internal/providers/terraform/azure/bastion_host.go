@@ -3,9 +3,10 @@ package azure
 import (
 	"fmt"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
-	"github.com/shopspring/decimal"
 )
 
 func GetAzureRMBastionHostRegistryItem() *schema.RegistryItem {
@@ -32,7 +33,7 @@ func NewAzureRMBastionHost(d *schema.ResourceData, u *schema.UsageData) *schema.
 				ProductFamily: strPtr("Networking"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "skuName", Value: strPtr(productType)},
-					{Key: "meterName", Value: strPtr(productType)},
+					{Key: "meterName", Value: strPtr(fmt.Sprintf("%s Gateway", productType))},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
@@ -104,7 +105,7 @@ func outboundDataTransferSingleComponent(name, region, productType, startUsage s
 			ProductFamily: strPtr("Networking"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "skuName", Value: strPtr(productType)},
-				{Key: "meterName", Value: strPtr("Data Transfer Out")},
+				{Key: "meterName", Value: strPtr(fmt.Sprintf("%s Data Transfer Out", productType))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

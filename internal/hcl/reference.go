@@ -62,6 +62,10 @@ func (r *Reference) SetKey(key cty.Value) {
 		return
 	}
 
+	if key.IsNull() {
+		return
+	}
+
 	switch key.Type() {
 	case cty.Number:
 		f := key.AsBigFloat()

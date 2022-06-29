@@ -57,7 +57,7 @@
                 "id": "svc-1",
                 "launch_type": "FARGATE",
                 "name": "ecs_service_module_1",
-                "task_definition": null
+                "task_definition": "ecs_task_module_1:mocked-task_definition"
               },
               "infracost_metadata": {
                 "calls": [
@@ -133,7 +133,7 @@
                     "id": "svc-2",
                     "launch_type": "FARGATE",
                     "name": "ecs_service_module_2",
-                    "task_definition": null
+                    "task_definition": "ecs_task_module_2:mocked-task_definition"
                   },
                   "infracost_metadata": {
                     "calls": [
@@ -211,7 +211,7 @@
           "id": "svc-1",
           "launch_type": "FARGATE",
           "name": "ecs_service_module_1",
-          "task_definition": null
+          "task_definition": "ecs_task_module_1:mocked-task_definition"
         }
       }
     },
@@ -264,7 +264,7 @@
           "id": "svc-2",
           "launch_type": "FARGATE",
           "name": "ecs_service_module_2",
-          "task_definition": null
+          "task_definition": "ecs_task_module_2:mocked-task_definition"
         }
       }
     }

@@ -5,9 +5,13 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 
+	// import as logg as golangci-lint is unhappy otherwise
+	logg "github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 	ctyJson "github.com/zclconf/go-cty/cty/json"
 
@@ -15,6 +19,8 @@ import (
 	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
+
+	log "github.com/sirupsen/logrus"
 )
 
 type HCLProvider struct {
@@ -128,7 +134,7 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 		options = append(options, hcl.OptionWithRemoteVarLoader(host, token, localWorkspace))
 	}
 
-	parsers, err := hcl.LoadParsers(ctx.ProjectConfig.Path, options...)
+	parsers, err := hcl.LoadParsers(ctx.ProjectConfig.Path, ctx.ProjectConfig.ExcludePaths, options...)
 	if err != nil {
 		return nil, err
 	}
@@ -144,6 +150,17 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 func (p *HCLProvider) Type() string        { return "terraform_dir" }
 func (p *HCLProvider) DisplayType() string { return "Terraform directory" }
 func (p *HCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
+	basePath := p.ctx.ProjectConfig.Path
+	if p.ctx.RunContext.Config.ConfigFilePath != "" {
+		basePath = filepath.Dir(p.ctx.RunContext.Config.ConfigFilePath)
+	}
+
+	modulePath, err := filepath.Rel(basePath, metadata.Path)
+	if err == nil && modulePath != "" && modulePath != "." {
+		log.Debugf("Calculated relative terraformModulePath for %s from %s", basePath, metadata.Path)
+		metadata.TerraformModulePath = modulePath
+	}
+
 	metadata.TerraformWorkspace = p.ctx.ProjectConfig.TerraformWorkspace
 }
 
@@ -173,7 +190,7 @@ func (p *HCLProvider) parseResources(path string, j []byte, usage map[string]*sc
 	metadata := config.DetectProjectMetadata(path)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
-	name := schema.GenerateProjectName(metadata, p.ctx.RunContext.Config.EnableDashboard)
+	name := schema.GenerateProjectName(metadata, p.ctx.ProjectConfig.Name, p.ctx.RunContext.Config.IsCloudEnabled())
 
 	project := schema.NewProject(name, metadata)
 
@@ -468,9 +485,19 @@ func countReferences(block *hcl.Block) *countExpression {
 		}
 
 		v := attribute.Value()
-		i, _ := v.AsBigFloat().Int64()
-		exp.ConstantValue = &i
+		ty := v.Type()
+		var i int64
+		switch ty {
+		case cty.Number:
+			i, _ = v.AsBigFloat().Int64()
+		case cty.String:
+			s := v.AsString()
+			i, _ = strconv.ParseInt(s, 10, 64)
+		default:
+			logg.Debugf("unsupported go cty type %s expected either Number or String for count expression, using 0", ty)
+		}
 
+		exp.ConstantValue = &i
 		return &exp
 	}
 

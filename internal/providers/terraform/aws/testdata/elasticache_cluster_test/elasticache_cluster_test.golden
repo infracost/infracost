@@ -1,21 +1,30 @@
 
- Name                                               Monthly Qty  Unit              Monthly Cost 
-                                                                                                
- aws_elasticache_cluster.memcached                                                              
- └─ ElastiCache (on-demand, cache.m4.large)               1,460  hours                  $227.76 
-                                                                                                
- aws_elasticache_cluster.redis                                                                  
- └─ ElastiCache (on-demand, cache.m6g.12xlarge)             730  hours                $2,596.61 
-                                                                                                
- aws_elasticache_cluster.redis_snapshot                                                         
- ├─ ElastiCache (on-demand, cache.m6g.12xlarge)             730  hours                $2,596.61 
- └─ Backup storage                               Monthly cost depends on usage: $0.085 per GB   
-                                                                                                
- aws_elasticache_cluster.redis_snapshot_usage                                                   
- ├─ ElastiCache (on-demand, cache.m6g.12xlarge)             730  hours                $2,596.61 
- └─ Backup storage                                       10,000  GB                     $850.00 
-                                                                                                
- OVERALL TOTAL                                                                        $8,867.59 
+ Name                                                           Monthly Qty  Unit              Monthly Cost 
+                                                                                                            
+ aws_elasticache_cluster.memcached                                                                          
+ └─ ElastiCache (on-demand, cache.m4.large)                           1,460  hours                  $227.76 
+                                                                                                            
+ aws_elasticache_cluster.redis                                                                              
+ └─ ElastiCache (on-demand, cache.m6g.12xlarge)                         730  hours                $2,596.61 
+                                                                                                            
+ aws_elasticache_cluster.redis_reserved_1yr_all_upfront                                                     
+ └─ ElastiCache (reserved, cache.m6g.12xlarge)                          730  hours                    $0.00 
+                                                                                                            
+ aws_elasticache_cluster.redis_reserved_1yr_no_upfront                                                      
+ └─ ElastiCache (reserved, cache.m6g.12xlarge)                          730  hours                $1,772.44 
+                                                                                                            
+ aws_elasticache_cluster.redis_reserved_1yr_partial_upfront                                                 
+ └─ ElastiCache (reserved, cache.m6g.12xlarge)                          730  hours                  $843.88 
+                                                                                                            
+ aws_elasticache_cluster.redis_snapshot                                                                     
+ ├─ ElastiCache (on-demand, cache.m6g.12xlarge)                         730  hours                $2,596.61 
+ └─ Backup storage                                           Monthly cost depends on usage: $0.085 per GB   
+                                                                                                            
+ aws_elasticache_cluster.redis_snapshot_usage                                                               
+ ├─ ElastiCache (on-demand, cache.m6g.12xlarge)                         730  hours                $2,596.61 
+ └─ Backup storage                                                   10,000  GB                     $850.00 
+                                                                                                            
+ OVERALL TOTAL                                                                                   $11,483.91 
 ──────────────────────────────────
-4 cloud resources were detected:
-∙ 4 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+7 cloud resources were detected:
+∙ 7 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

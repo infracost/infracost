@@ -15,7 +15,7 @@ import (
 // too many things, but it's a start.
 var pathRegex = regexp.MustCompile(`(\w+:)?[\.~\w]*[\/\\]+([^\s:'\"\]]+)|([\w+-]\.\w{2,})`)
 
-func ReportCLIError(ctx *config.RunContext, cliErr error) error {
+func ReportCLIError(ctx *config.RunContext, cliErr error, replacePath bool) error {
 	errMsg := ui.StripColor(cliErr.Error())
 	var sanitizedErr *clierror.SanitizedError
 
@@ -23,7 +23,9 @@ func ReportCLIError(ctx *config.RunContext, cliErr error) error {
 		errMsg = ui.StripColor(sanitizedErr.SanitizedError())
 	}
 
-	errMsg = pathRegex.ReplaceAllString(errMsg, "REPLACED_PATH")
+	if replacePath {
+		errMsg = pathRegex.ReplaceAllString(errMsg, "REPLACED_PATH")
+	}
 
 	d := ctx.EventEnv()
 	d["error"] = errMsg

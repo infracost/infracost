@@ -17,7 +17,10 @@ type Module struct {
 	Name   string
 	Source string
 
-	Blocks     Blocks
+	Blocks Blocks
+	// RawBlocks are the Blocks that were built when the module was loaded from the filesystem.
+	// These are safe to pass to the child module calls as they are yet to be expanded.
+	RawBlocks  Blocks
 	RootPath   string
 	ModulePath string
 

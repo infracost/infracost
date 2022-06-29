@@ -6,12 +6,15 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"regexp"
 	"strings"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/ext/tryfunc"
+	"github.com/hashicorp/hcl/v2/hclsyntax"
 	yaml "github.com/zclconf/go-cty-yaml"
 	"github.com/zclconf/go-cty/cty"
+	"github.com/zclconf/go-cty/cty/convert"
 	"github.com/zclconf/go-cty/cty/function"
 	"github.com/zclconf/go-cty/cty/function/stdlib"
 	"github.com/zclconf/go-cty/cty/gocty"
@@ -22,7 +25,14 @@ import (
 )
 
 var (
-	errorNoVarValue = errors.New("no value found")
+	errorNoVarValue     = errors.New("no value found")
+	modReplace          = regexp.MustCompile(`module\.`)
+	validBlocksToExpand = map[string]struct{}{
+		"resource": {},
+		"module":   {},
+		"dynamic":  {},
+		"data":     {},
+	}
 )
 
 const maxContextIterations = 32
@@ -45,7 +55,7 @@ type Evaluator struct {
 	// Terraform or Infracost init.
 	moduleMetadata *modules.Manifest
 	// visitedModules is a lookup map to hold information by the Evaluator of modules that it has already evaluated.
-	visitedModules map[string]struct{}
+	visitedModules map[string]map[string]cty.Value
 	// module defines the input and module path for the Evaluator. It is the root module of the config.
 	module Module
 	// workingDir is the current directory the evaluator is running within. This is used to set Context information on
@@ -66,7 +76,7 @@ func NewEvaluator(
 	workingDir string,
 	inputVars map[string]cty.Value,
 	moduleMetadata *modules.Manifest,
-	visitedModules map[string]struct{},
+	visitedModules map[string]map[string]cty.Value,
 	workspace string,
 	blockBuilder BlockBuilder,
 	spinFunc ui.SpinnerFunc,
@@ -76,7 +86,7 @@ func NewEvaluator(
 	}, nil)
 
 	if visitedModules == nil {
-		visitedModules = make(map[string]struct{})
+		visitedModules = make(map[string]map[string]cty.Value)
 	}
 
 	// set the global evaluation parameters.
@@ -197,18 +207,22 @@ func (e *Evaluator) evaluateStep(i int) {
 // to run on the child Module Blocks. It passes the Evaluator the top level module Attributes as input variables.
 func (e *Evaluator) evaluateModules() {
 	for _, moduleCall := range e.moduleCalls {
-		if _, ok := e.visitedModules[moduleCall.Definition.FullName()]; ok {
-			continue
+		fullName := moduleCall.Definition.FullName()
+		vars := moduleCall.Definition.Values().AsValueMap()
+		if oldVars, ok := e.visitedModules[fullName]; ok {
+			if reflect.DeepEqual(vars, oldVars) {
+				continue
+			}
 		}
 
-		e.visitedModules[moduleCall.Definition.FullName()] = struct{}{}
+		e.visitedModules[fullName] = vars
 
-		vars := moduleCall.Definition.Values().AsValueMap()
 		moduleEvaluator := NewEvaluator(
 			Module{
-				Name:       moduleCall.Definition.FullName(),
+				Name:       fullName,
 				Source:     moduleCall.Module.Source,
-				Blocks:     moduleCall.Module.Blocks,
+				Blocks:     moduleCall.Module.RawBlocks,
+				RawBlocks:  moduleCall.Module.RawBlocks,
 				RootPath:   e.module.RootPath,
 				ModulePath: moduleCall.Path,
 				Modules:    nil,
@@ -224,13 +238,14 @@ func (e *Evaluator) evaluateModules() {
 		)
 
 		moduleCall.Module, _ = moduleEvaluator.Run()
-		e.ctx.Set(moduleEvaluator.exportOutputs(), "module", moduleCall.Name)
+		outputs := moduleEvaluator.exportOutputs()
+		e.ctx.Set(outputs, "module", moduleCall.Name)
 	}
 }
 
 // exportOutputs exports module outputs so that it can be used in Context evaluation.
 func (e *Evaluator) exportOutputs() cty.Value {
-	return e.module.Blocks.Outputs()
+	return e.module.Blocks.Outputs(false)
 }
 
 func (e *Evaluator) expandBlocks(blocks Blocks) Blocks {
@@ -265,7 +280,7 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 	var forEachFiltered Blocks
 	for _, block := range blocks {
 		forEachAttr := block.GetAttribute("for_each")
-		if forEachAttr == nil || block.IsCountExpanded() || (block.Type() != "resource" && block.Type() != "module" && block.Type() != "dynamic") {
+		if forEachAttr == nil || block.IsCountExpanded() || !shouldExpandBlock(block) {
 			forEachFiltered = append(forEachFiltered, block)
 			continue
 		}
@@ -295,19 +310,25 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 	return forEachFiltered
 }
 
+func shouldExpandBlock(block *Block) bool {
+	_, isValidType := validBlocksToExpand[block.Type()]
+	return isValidType
+}
+
 func (e *Evaluator) expandBlockCounts(blocks Blocks) Blocks {
 	var countFiltered Blocks
 	for _, block := range blocks {
 		countAttr := block.GetAttribute("count")
-		if countAttr == nil || block.IsCountExpanded() || (block.Type() != "resource" && block.Type() != "module") {
+		if countAttr == nil || !block.ShouldExpand() {
 			countFiltered = append(countFiltered, block)
 			continue
 		}
 
 		count := 1
-		if !countAttr.Value().IsNull() && countAttr.Value().IsKnown() {
-			if countAttr.Value().Type() == cty.Number {
-				f, _ := countAttr.Value().AsBigFloat().Float64()
+		value := countAttr.Value()
+		if !value.IsNull() && value.IsKnown() {
+			if value.Type() == cty.Number {
+				f, _ := value.AsBigFloat().Float64()
 				count = int(f)
 			}
 		}
@@ -364,15 +385,54 @@ func (e *Evaluator) evaluateVariable(b *Block) (cty.Value, error) {
 		return cty.NilVal, fmt.Errorf("cannot resolve variable with no attributes")
 	}
 
+	attribute := attributes["type"]
 	if override, exists := e.inputVars[b.Label()]; exists {
-		return override, nil
+		return convertType(override, attribute), nil
 	}
 
 	if def, exists := attributes["default"]; exists {
 		return def.Value(), nil
 	}
 
-	return cty.NilVal, errorNoVarValue
+	return convertType(cty.NilVal, attribute), errorNoVarValue
+}
+
+func convertType(val cty.Value, attribute *Attribute) cty.Value {
+	if attribute == nil {
+		return val
+	}
+
+	var t string
+	switch v := attribute.HCLAttr.Expr.(type) {
+	case *hclsyntax.ScopeTraversalExpr:
+		t = v.Traversal.RootName()
+	case *hclsyntax.LiteralValueExpr:
+		t = attribute.Value().AsString()
+	}
+
+	switch t {
+	case "string":
+		return valueToType(val, cty.String)
+	case "number":
+		return valueToType(val, cty.Number)
+	case "bool":
+		return valueToType(val, cty.Bool)
+	}
+
+	return val
+}
+
+func valueToType(val cty.Value, want cty.Type) cty.Value {
+	if val == cty.NilVal {
+		return val
+	}
+
+	newVal, err := convert.Convert(val, want)
+	if err != nil {
+		return val
+	}
+
+	return newVal
 }
 
 func (e *Evaluator) evaluateOutput(b *Block) (cty.Value, error) {
@@ -413,30 +473,89 @@ func (e *Evaluator) getValuesByBlockType(blockType string) cty.Value {
 			if b.Label() == "" {
 				continue
 			}
+
 			values[b.Label()] = b.Values()
 		case "resource", "data":
 			if len(b.Labels()) < 2 {
 				continue
 			}
 
-			blockMap, ok := values[b.Labels()[0]]
-			if !ok {
-				values[b.Labels()[0]] = cty.ObjectVal(make(map[string]cty.Value))
-				blockMap = values[b.Labels()[0]]
-			}
-
-			valueMap := blockMap.AsValueMap()
-			if valueMap == nil {
-				valueMap = make(map[string]cty.Value)
-			}
-
-			valueMap[b.Labels()[1]] = b.Values()
-			values[b.Labels()[0]] = cty.ObjectVal(valueMap)
+			values[b.Labels()[0]] = e.evaluateResource(b, values)
 		}
 
 	}
 
 	return cty.ObjectVal(values)
+}
+
+func (e *Evaluator) evaluateResource(b *Block, values map[string]cty.Value) cty.Value {
+	labels := b.Labels()
+
+	blockMap, ok := values[labels[0]]
+	if !ok {
+		values[labels[0]] = cty.ObjectVal(make(map[string]cty.Value))
+		blockMap = values[labels[0]]
+	}
+
+	valueMap := blockMap.AsValueMap()
+	if valueMap == nil {
+		valueMap = make(map[string]cty.Value)
+	}
+
+	if e := b.Key(); e != nil {
+		valueMap[stripCount(labels[1])] = expandedEachBlockToValue(b, valueMap)
+		return cty.ObjectVal(valueMap)
+	}
+
+	if e := b.Index(); e != nil {
+		valueMap[stripCount(labels[1])] = expandCountBlockToValue(b, valueMap)
+		return cty.ObjectVal(valueMap)
+	}
+
+	valueMap[b.Labels()[1]] = b.Values()
+	return cty.ObjectVal(valueMap)
+}
+
+func expandCountBlockToValue(b *Block, existingValues map[string]cty.Value) cty.Value {
+	k := b.Index()
+	if k == nil {
+		return cty.NilVal
+	}
+
+	vals := existingValues[stripCount(b.Labels()[1])]
+	sourceTy := vals.Type()
+	isList := sourceTy.IsTupleType() || sourceTy.IsListType() || sourceTy.IsSetType()
+
+	var elements []cty.Value
+	if isList {
+		it := vals.ElementIterator()
+		for it.Next() {
+			_, v := it.Element()
+			elements = append(elements, v)
+		}
+	}
+
+	elements = append(elements, b.Values())
+	return cty.TupleVal(elements)
+}
+
+func expandedEachBlockToValue(b *Block, existingValues map[string]cty.Value) cty.Value {
+	k := b.Key()
+	if k == nil {
+		return cty.NilVal
+	}
+
+	ob := make(map[string]cty.Value)
+
+	eachMap := existingValues[stripCount(b.Labels()[1])]
+	if eachMap != cty.NilVal {
+		for e, v := range eachMap.AsValueMap() {
+			ob[e] = v
+		}
+	}
+
+	ob[*k] = b.Values()
+	return cty.ObjectVal(ob)
 }
 
 // loadModule takes in a module "x" {} block and loads resources etc. into e.moduleBlocks.
@@ -453,6 +572,7 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 			sourceVal := attr.Value()
 			if sourceVal.Type() == cty.String {
 				source = sourceVal.AsString()
+				break
 			}
 		}
 	}
@@ -466,8 +586,8 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 	if e.moduleMetadata != nil {
 		// if we have module metadata we can parse all the modules as they'll be cached locally!
 		for _, module := range e.moduleMetadata.Modules {
-			reg := "registry.terraform.io/" + source
-			if module.Source == source || module.Source == reg {
+			key := modReplace.ReplaceAllString(b.FullName(), "")
+			if module.Key == key {
 				modulePath = filepath.Clean(filepath.Join(e.module.RootPath, module.Dir))
 				break
 			}
@@ -498,6 +618,7 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 			Name:       b.TypeLabel(),
 			Source:     source,
 			Blocks:     blocks,
+			RawBlocks:  blocks,
 			RootPath:   e.module.RootPath,
 			ModulePath: modulePath,
 			Parent:     &e.module,
