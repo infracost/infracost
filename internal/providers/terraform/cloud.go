@@ -8,7 +8,7 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/infracost/infracost/internal/hcl/modules"
+	"github.com/infracost/infracost/internal/credentials"
 )
 
 func cloudAPI(host string, path string, token string) ([]byte, error) {
@@ -29,7 +29,7 @@ func cloudAPI(host string, path string, token string) ([]byte, error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode == 401 {
-		return []byte{}, modules.ErrInvalidCloudToken
+		return []byte{}, credentials.ErrInvalidCloudToken
 	} else if resp.StatusCode != 200 {
 		return []byte{}, errors.Errorf("invalid response from Terraform remote: %s", resp.Status)
 	}

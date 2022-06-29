@@ -104,15 +104,15 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 
 	options = append(options, opts...)
 
-	credsSource, err := modules.NewCredentialsSource(modules.BaseCredentialSet{
-		TerraformCloudToken: ctx.ProjectConfig.TerraformCloudToken,
-		TerraformCloudHost:  ctx.ProjectConfig.TerraformCloudHost,
+	credsSource, err := modules.NewTerraformCredentialsSource(modules.BaseCredentialSet{
+		Token: ctx.ProjectConfig.TerraformCloudToken,
+		Host:  ctx.ProjectConfig.TerraformCloudHost,
 	})
 	localWorkspace := ctx.ProjectConfig.TerraformWorkspace
 	if err == nil {
 		options = append(options, hcl.OptionWithRemoteVarLoader(
-			credsSource.BaseCredentialSet.TerraformCloudHost,
-			credsSource.BaseCredentialSet.TerraformCloudToken,
+			credsSource.BaseCredentialSet.Host,
+			credsSource.BaseCredentialSet.Token,
 			localWorkspace),
 		)
 	}
