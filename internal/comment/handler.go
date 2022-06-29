@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"github.com/fatih/color"
-	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"sort"
 )
@@ -272,7 +271,7 @@ func (h *CommentHandler) newPlatformError(err error) error {
 		return nil
 	}
 
-	return errors.Errorf("%s\n%v\n\n%s",
+	return fmt.Errorf("%s\n%w\n\n%s",
 		"The pull request comment was generated successfully but could not be posted:",
 		err,
 		"See https://infracost.io/docs/troubleshooting/#5-posting-comments for help.")
