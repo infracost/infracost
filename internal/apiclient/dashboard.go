@@ -41,7 +41,6 @@ type projectResultInput struct {
 	Breakdown       *output.Breakdown       `json:"breakdown"`
 	Diff            *output.Breakdown       `json:"diff"`
 	Summary         *output.Summary         `json:"summary"`
-	Metadata        map[string]interface{}  `json:"metadata"`
 }
 
 func NewDashboardAPIClient(ctx *config.RunContext) *DashboardAPIClient {
@@ -77,7 +76,7 @@ func (c *DashboardAPIClient) CreateAPIKey(name string, email string, contextVals
 	return r, nil
 }
 
-func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, projectContexts []*config.ProjectContext, out output.Root) (AddRunResponse, error) {
+func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (AddRunResponse, error) {
 	response := AddRunResponse{}
 
 	if !c.shouldStoreRun {
@@ -94,7 +93,6 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, projectContexts []*c
 			Breakdown:       project.Breakdown,
 			Diff:            project.Diff,
 			Summary:         project.Summary,
-			Metadata:        projectContexts[i].ContextValues(),
 		}
 	}
 

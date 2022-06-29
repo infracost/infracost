@@ -31,11 +31,12 @@ var (
 // .infracost/terraform_modules directory. We could implement a global cache in the future, but for now have decided
 // to go with the same approach as Terraform.
 type ModuleLoader struct {
-	Path           string
-	cache          *Cache
-	packageFetcher *PackageFetcher
-	registryLoader *RegistryLoader
-	newSpinner     ui.SpinnerFunc
+	Path              string
+	cache             *Cache
+	packageFetcher    *PackageFetcher
+	credentialsSource *CredentialsSource
+	registryLoader    *RegistryLoader
+	newSpinner        ui.SpinnerFunc
 }
 
 // LoaderOption defines a function that can set properties on an ModuleLoader.
@@ -49,19 +50,21 @@ func LoaderWithSpinner(f ui.SpinnerFunc) LoaderOption {
 }
 
 // NewModuleLoader constructs a new module loader
-func NewModuleLoader(path string, opts ...LoaderOption) *ModuleLoader {
+func NewModuleLoader(path string, credentialsSource *CredentialsSource, opts ...LoaderOption) *ModuleLoader {
 	fetcher := NewPackageFetcher()
+	d := NewDisco(credentialsSource)
 
 	m := &ModuleLoader{
 		Path:           path,
-		cache:          NewCache(),
+		cache:          NewCache(d),
 		packageFetcher: fetcher,
-		registryLoader: NewRegistryLoader(fetcher),
 	}
 
 	for _, opt := range opts {
 		opt(m)
 	}
+
+	m.registryLoader = NewRegistryLoader(fetcher, d)
 
 	return m
 }
@@ -224,7 +227,7 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 	lookupResult, err := m.registryLoader.lookupModule(moduleAddr, moduleCall.Version)
 	if err == nil {
 		log.Debugf("Downloading module %s from registry URL %s", key, lookupResult.DownloadURL)
-		err = m.registryLoader.downloadModule(lookupResult.DownloadURL, dest)
+		err = m.registryLoader.downloadModule(lookupResult.DownloadURL, dest, lookupResult.Credentials)
 		if err != nil {
 			return nil, err
 		}
@@ -239,6 +242,7 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 
 	log.Debugf("Module %s not recognized as registry module, treating as remote module: %s", key, err.Error())
 	log.Debugf("Downloading module %s from remote %s", key, moduleCall.Source)
+
 	err = m.packageFetcher.fetch(moduleAddr, dest)
 	if err != nil {
 		return nil, err

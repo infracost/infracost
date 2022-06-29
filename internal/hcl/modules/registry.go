@@ -11,6 +11,9 @@ import (
 	"strings"
 
 	goversion "github.com/hashicorp/go-version"
+	svchost "github.com/hashicorp/terraform-svchost"
+	"github.com/hashicorp/terraform-svchost/auth"
+	"github.com/hashicorp/terraform-svchost/disco"
 )
 
 var defaultRegistryHost = "registry.terraform.io"
@@ -24,17 +27,71 @@ type RegistryLookupResult struct {
 	Source      string
 	Version     string
 	DownloadURL string
+	Credentials auth.HostCredentials
+}
+
+// RegistryURL contains given URL information for a module source. This can be used to build http requests to
+// download the module or check versions of the module.
+type RegistryURL struct {
+	RawSource   string
+	Location    string
+	Credentials auth.HostCredentials
+}
+
+// Disco allows discovery on given hostnames. It tries to resolve a module source based on a set of
+// discovery rules. It caches the results by hostname to avoid repeated requests for the same information.
+// Therefore, it is advisable to use Disco per project and pass it to all required clients.
+type Disco struct {
+	disco *disco.Disco
+}
+
+// NewDisco returns a Disco with the provided credentialsSource initialising the underlying Terraform Disco.
+// If Credentials are nil then all registry requests will be unauthed.
+func NewDisco(credentialsSource auth.CredentialsSource) Disco {
+	return Disco{disco: disco.NewWithCredentialsSource(credentialsSource)}
+}
+
+// ModuleLocation performs a discovery lookup for the given source and returns a RegistryURL with the real
+// url of the module source and any required Credential information.
+func (d Disco) ModuleLocation(source string) (RegistryURL, error) {
+	// So we expect them to only have 3 or 4 parts depending on if they explicitly specify the registry
+	parts := strings.Split(source, "/")
+	if len(parts) != 4 {
+		return RegistryURL{}, fmt.Errorf("registry module source %s is not in the correct format", source)
+	}
+
+	host, namespace, moduleName, target := parts[0], parts[1], parts[2], parts[3]
+
+	serviceURL, err := d.disco.DiscoverServiceURL(svchost.Hostname(host), "modules.v1")
+	if err != nil {
+		return RegistryURL{}, fmt.Errorf("unable to discover registry service using host %s %w", host, err)
+	}
+
+	r := RegistryURL{
+		Location:  fmt.Sprintf("%s%s/%s/%s", serviceURL.String(), namespace, moduleName, target),
+		RawSource: source,
+	}
+
+	c, err := d.disco.CredentialsForHost(svchost.Hostname(host))
+	if err != nil {
+		return r, fmt.Errorf("unable to retrieve credentials for registry host %s %w", host, err)
+	}
+
+	r.Credentials = c
+	return r, nil
 }
 
 // RegistryLoader is a loader that can lookup modules from a Terraform Registry and download them to the given destination
 type RegistryLoader struct {
 	packageFetcher *PackageFetcher
+	disco          Disco
 }
 
 // NewRegistryLoader constructs a registry loader
-func NewRegistryLoader(packageFetcher *PackageFetcher) *RegistryLoader {
+func NewRegistryLoader(packageFetcher *PackageFetcher, disco Disco) *RegistryLoader {
 	return &RegistryLoader{
 		packageFetcher: packageFetcher,
+		disco:          disco,
 	}
 }
 
@@ -46,18 +103,10 @@ func (r *RegistryLoader) lookupModule(moduleAddr string, versionConstraints stri
 		return nil, err
 	}
 
-	// Modules are in the format (registry)/namspace/module/target
-	// So we expect them to only have 3 or 4 parts depending on if they explicitly specify the registry
-	parts := strings.Split(registrySource, "/")
-	if len(parts) != 4 {
-		return nil, errors.New("Registry module source is not in the correct format")
+	moduleURL, err := r.disco.ModuleLocation(registrySource)
+	if err != nil {
+		return nil, fmt.Errorf("could not fetch registry module location %w", err)
 	}
-
-	host, namespace, moduleName, target := parts[0], parts[1], parts[2], parts[3]
-
-	// By this stage we are more confident that the module source is a valid registry module
-	// We now need to check the registry to see if the module exists and if it has a version
-	moduleURL := fmt.Sprintf("https://%s/v1/modules/%s/%s/%s", host, namespace, moduleName, target)
 
 	versions, err := r.fetchModuleVersions(moduleURL)
 	if err != nil {
@@ -74,16 +123,20 @@ func (r *RegistryLoader) lookupModule(moduleAddr string, versionConstraints stri
 	}
 
 	return &RegistryLookupResult{
-		Source:      fmt.Sprintf("%s/%s/%s/%s", host, namespace, moduleName, target),
+		Source:      moduleURL.RawSource,
 		Version:     matchingVersion,
-		DownloadURL: fmt.Sprintf("%s/%s/download", moduleURL, matchingVersion),
+		DownloadURL: fmt.Sprintf("%s/%s/download", moduleURL.Location, matchingVersion),
+		Credentials: moduleURL.Credentials,
 	}, nil
 }
 
 // fetchModuleVersions fetches the list of versions from the registry endpoint for the given module URL
-func (r *RegistryLoader) fetchModuleVersions(moduleURL string) ([]string, error) {
+func (r *RegistryLoader) fetchModuleVersions(moduleURL RegistryURL) ([]string, error) {
 	httpClient := &http.Client{}
-	resp, err := httpClient.Get(moduleURL + "/versions")
+	req, _ := http.NewRequest("GET", moduleURL.Location+"/versions", nil)
+	moduleURL.Credentials.PrepareRequest(req)
+	resp, err := httpClient.Do(req)
+
 	if err != nil {
 		return nil, fmt.Errorf("Failed to fetch registry module versions: %w", err)
 	}
@@ -126,9 +179,12 @@ func (r *RegistryLoader) fetchModuleVersions(moduleURL string) ([]string, error)
 
 // downloadModule downloads the module to the loader's destination
 // It first calls the download URL to get the X-Terraform-Get header which contains a source we can use with go-getter to download the module
-func (r *RegistryLoader) downloadModule(downloadURL string, dest string) error {
+func (r *RegistryLoader) downloadModule(downloadURL string, dest string, credentials auth.HostCredentials) error {
 	httpClient := &http.Client{}
-	resp, err := httpClient.Get(downloadURL)
+	req, _ := http.NewRequest("GET", downloadURL, nil)
+	credentials.PrepareRequest(req)
+	resp, err := httpClient.Do(req)
+
 	if err != nil {
 		return fmt.Errorf("Failed to download registry module: %w", err)
 	}

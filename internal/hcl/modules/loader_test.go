@@ -7,6 +7,8 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+
+	"github.com/infracost/infracost/internal/credentials"
 )
 
 func testLoaderE2E(t *testing.T, path string, expectedModules []*ManifestModule, cleanup bool) {
@@ -15,7 +17,7 @@ func testLoaderE2E(t *testing.T, path string, expectedModules []*ManifestModule,
 		assert.NoError(t, err)
 	}
 
-	moduleLoader := NewModuleLoader(path)
+	moduleLoader := NewModuleLoader(path, &CredentialsSource{FetchToken: credentials.FindTerraformCloudToken})
 
 	manifest, err := moduleLoader.Load()
 	if !assert.NoError(t, err) {
