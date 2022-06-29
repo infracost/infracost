@@ -144,8 +144,8 @@ func (r *RemoteVariablesLoader) Load(blocks Blocks) (map[string]cty.Value, error
 		return vars, nil
 	}
 
-	if workspaceResponse.Data.Attributes.ExecutionMode != "remote" {
-		log.Debugf("Terraform workspace %s does not use remote execution, skipping downloading remote variables", config.workspace)
+	if workspaceResponse.Data.Attributes.ExecutionMode == "local" {
+		log.Debugf("Terraform workspace %s does use local execution, skipping downloading remote variables", config.workspace)
 		return vars, nil
 	}
 
