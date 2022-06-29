@@ -1,0 +1,17 @@
+
+ Name                             Monthly Qty  Unit              Monthly Cost 
+                                                                              
+ ibm_is_instance.testInstance                                                 
+ └─ Instance profile (2x4)     Monthly cost depends on usage: $0.00 per hours 
+                                                                              
+ OVERALL TOTAL                                                          $0.00 
+──────────────────────────────────
+4 cloud resources were detected:
+∙ 1 was estimated
+∙ 3 are not supported yet, see https://infracost.io/requested-resources:
+  ∙ 1 x ibm_is_ssh_key
+  ∙ 1 x ibm_is_subnet
+  ∙ 1 x ibm_is_vpc
+Logs:
+
+level=warning msg="No products found for ibm_is_instance.testInstance Instance profile (2x4), using 0.00"

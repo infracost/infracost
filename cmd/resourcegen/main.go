@@ -27,6 +27,7 @@ var (
 		"aws":    {},
 		"azure":  {},
 		"google": {},
+		"ibm":    {},
 	}
 
 	embedPathExp  = regexp.MustCompile(`^embed/`)
@@ -37,7 +38,7 @@ var (
 
 func main() {
 	var c config
-	flag.StringVar(&c.CloudProvider, "cloud-provider", "aws", "Cloud provider to create resource for, one of [aws, azure, google]")
+	flag.StringVar(&c.CloudProvider, "cloud-provider", "aws", "Cloud provider to create resource for, one of [aws, azure, google, ibm]")
 	flag.StringVar(&c.Filename, "resource-name", "", "The resource name to generate, use underscores between names, e.g. autoscaling_group (required)")
 	flag.BoolVar(&c.WithHelp, "with-help", false, "Generate your resources with doc blocks and examples to help you get started. Useful for understanding how to add a resource")
 	flag.Parse()
@@ -52,7 +53,7 @@ func main() {
 	}
 
 	if _, ok := allowedProviders[c.CloudProvider]; !ok {
-		exitWithErr(fmt.Errorf("[%s] is an invalid provider, please use one of [aws, azure, google]", c.CloudProvider))
+		exitWithErr(fmt.Errorf("[%s] is an invalid provider, please use one of [aws, azure, google, ibm]", c.CloudProvider))
 	}
 
 	c.Filename = strings.ToLower(c.Filename)
@@ -113,6 +114,8 @@ func (c config) ResourceURL() string {
 		return "https://azure.microsoft.com"
 	case "google":
 		return "https://cloud.google.com"
+	case "ibm":
+		return "https://cloud.ibm.com"
 	}
 
 	return "https://example.com"
