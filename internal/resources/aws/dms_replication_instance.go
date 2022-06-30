@@ -25,9 +25,20 @@ func (r *DMSReplicationInstance) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *DMSReplicationInstance) BuildResource() *schema.Resource {
+	instanceTypeParts := strings.Split(r.ReplicationInstanceClass, ".")
+	if len(instanceTypeParts) < 3 {
+		return &schema.Resource{
+			Name:      r.Address,
+			NoPrice:   true,
+			IsSkipped: true,
+		}
+	}
+	instanceType := strings.Join(instanceTypeParts[1:], ".")
+	instanceFamily := instanceTypeParts[1]
+
 	costComponents := make([]*schema.CostComponent, 0)
-	costComponents = append(costComponents, r.instanceCostComponent())
-	costComponents = append(costComponents, r.storageCostComponent())
+	costComponents = append(costComponents, r.instanceCostComponent(instanceType))
+	costComponents = append(costComponents, r.storageCostComponent(instanceFamily))
 
 	return &schema.Resource{
 		Name:           r.Address,
@@ -35,19 +46,8 @@ func (r *DMSReplicationInstance) BuildResource() *schema.Resource {
 		UsageSchema:    DMSReplicationInstanceUsageSchema,
 	}
 }
-func (r *DMSReplicationInstance) getInstanceType() string {
-	rawInstanceType := strings.Split(r.ReplicationInstanceClass, ".")
-	instanceType := strings.Join(rawInstanceType[1:], ".")
-	return instanceType
-}
 
-func (r *DMSReplicationInstance) getInstanceFamily() string {
-	rawInstanceType := strings.Split(r.ReplicationInstanceClass, ".")
-	return rawInstanceType[1]
-}
-
-func (r *DMSReplicationInstance) instanceCostComponent() *schema.CostComponent {
-	instanceType := r.getInstanceType()
+func (r *DMSReplicationInstance) instanceCostComponent(instanceType string) *schema.CostComponent {
 	availabilityZone := "Single"
 	if r.MultiAZ {
 		availabilityZone = "Multiple"
@@ -70,8 +70,7 @@ func (r *DMSReplicationInstance) instanceCostComponent() *schema.CostComponent {
 	}
 }
 
-func (r *DMSReplicationInstance) storageCostComponent() *schema.CostComponent {
-	instanceFamily := r.getInstanceFamily()
+func (r *DMSReplicationInstance) storageCostComponent(instanceFamily string) *schema.CostComponent {
 	availabilityZone := "Single"
 	if r.MultiAZ {
 		availabilityZone = "Multiple"
