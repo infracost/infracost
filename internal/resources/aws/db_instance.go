@@ -66,7 +66,7 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 		databaseEngine = "Aurora MySQL"
 	case "aurora-postgresql":
 		databaseEngine = "Aurora PostgreSQL"
-	case "oracle-se", "oracle-se1", "oracle-se2", "oracle-ee":
+	case "oracle-se", "oracle-se1", "oracle-se2", "oracle-se2-cdb", "oracle-ee", "oracle-ee-cdb":
 		databaseEngine = "Oracle"
 	case "sqlserver-ex", "sqlserver-web", "sqlserver-se", "sqlserver-ee":
 		databaseEngine = "SQL Server"
@@ -78,9 +78,9 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 		databaseEdition = "Standard"
 	case "oracle-se1":
 		databaseEdition = "Standard One"
-	case "oracle-se2":
+	case "oracle-se2", "oracle-se2-cdb":
 		databaseEdition = "Standard Two"
-	case "oracle-ee", "sqlserver-ee":
+	case "oracle-ee", "oracle-ee-cdb", "sqlserver-ee":
 		databaseEdition = "Enterprise"
 	case "sqlserver-ex":
 		databaseEdition = "Express"
@@ -90,7 +90,7 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 
 	var licenseModel string
 	engineVal := strings.ToLower(r.Engine)
-	if engineVal == "oracle-se1" || engineVal == "oracle-se2" || strings.HasPrefix(engineVal, "sqlserver-") {
+	if engineVal == "oracle-se1" || engineVal == "oracle-se2" || engineVal == "oracle-se2-cdb" || strings.HasPrefix(engineVal, "sqlserver-") {
 		licenseModel = "License included"
 	}
 	if strings.ToLower(r.LicenseModel) == "bring-your-own-license" {
