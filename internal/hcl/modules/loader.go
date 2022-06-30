@@ -31,12 +31,11 @@ var (
 // .infracost/terraform_modules directory. We could implement a global cache in the future, but for now have decided
 // to go with the same approach as Terraform.
 type ModuleLoader struct {
-	Path              string
-	cache             *Cache
-	packageFetcher    *PackageFetcher
-	credentialsSource *CredentialsSource
-	registryLoader    *RegistryLoader
-	newSpinner        ui.SpinnerFunc
+	Path           string
+	cache          *Cache
+	packageFetcher *PackageFetcher
+	registryLoader *RegistryLoader
+	newSpinner     ui.SpinnerFunc
 }
 
 // LoaderOption defines a function that can set properties on an ModuleLoader.
@@ -226,15 +225,14 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 
 	lookupResult, err := m.registryLoader.lookupModule(moduleAddr, moduleCall.Version)
 	if err == nil {
-		log.Debugf("Downloading module %s from registry URL %s", key, lookupResult.DownloadURL)
-		err = m.registryLoader.downloadModule(lookupResult.DownloadURL, dest, lookupResult.Credentials)
+		err = m.registryLoader.downloadModule(lookupResult, dest)
 		if err != nil {
 			return nil, err
 		}
 
 		// The moduleCall.Source might not have the registry hostname if it is using the default registry
 		// so we set the source here to the lookup result's source which always includes the registry hostname.
-		manifestModule.Source = joinModuleSubDir(lookupResult.Source, submodulePath)
+		manifestModule.Source = joinModuleSubDir(lookupResult.ModuleURL.RawSource, submodulePath)
 
 		manifestModule.Version = lookupResult.Version
 		return manifestModule, nil

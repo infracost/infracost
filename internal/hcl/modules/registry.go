@@ -14,6 +14,7 @@ import (
 	svchost "github.com/hashicorp/terraform-svchost"
 	"github.com/hashicorp/terraform-svchost/auth"
 	"github.com/hashicorp/terraform-svchost/disco"
+	log "github.com/sirupsen/logrus"
 )
 
 var defaultRegistryHost = "registry.terraform.io"
@@ -21,19 +22,21 @@ var defaultRegistryHost = "registry.terraform.io"
 // validRegistryName is a regexp that matches valid registry identifier for namespaces, module names and targets
 var validRegistryName = regexp.MustCompile("^[0-9A-Za-z-_]+$")
 
+// The service ID used by Terraform Registry for discovering the module URLs
+var moduleServiceID = "modules.v1"
+
 // RegistryLookupResult is returned when looking up the module to check if it exists in the registry
 // and has a matching version
 type RegistryLookupResult struct {
-	Source      string
-	Version     string
-	DownloadURL string
-	Credentials auth.HostCredentials
+	ModuleURL RegistryURL
+	Version   string
 }
 
 // RegistryURL contains given URL information for a module source. This can be used to build http requests to
 // download the module or check versions of the module.
 type RegistryURL struct {
 	RawSource   string
+	Host        string
 	Location    string
 	Credentials auth.HostCredentials
 }
@@ -62,12 +65,13 @@ func (d Disco) ModuleLocation(source string) (RegistryURL, error) {
 
 	host, namespace, moduleName, target := parts[0], parts[1], parts[2], parts[3]
 
-	serviceURL, err := d.disco.DiscoverServiceURL(svchost.Hostname(host), "modules.v1")
+	serviceURL, err := d.disco.DiscoverServiceURL(svchost.Hostname(host), moduleServiceID)
 	if err != nil {
 		return RegistryURL{}, fmt.Errorf("unable to discover registry service using host %s %w", host, err)
 	}
 
 	r := RegistryURL{
+		Host:      host,
 		Location:  fmt.Sprintf("%s%s/%s/%s", serviceURL.String(), namespace, moduleName, target),
 		RawSource: source,
 	}
@@ -79,6 +83,53 @@ func (d Disco) ModuleLocation(source string) (RegistryURL, error) {
 
 	r.Credentials = c
 	return r, nil
+}
+
+func (d Disco) DownloadLocation(moduleURL RegistryURL, version string) (string, error) {
+	serviceURL, err := d.disco.DiscoverServiceURL(svchost.Hostname(moduleURL.Host), moduleServiceID)
+	if err != nil {
+		return "", fmt.Errorf("unable to discover registry service using host %s %w", moduleURL.Host, err)
+	}
+
+	var u *url.URL
+	if version == "" {
+		u, err = url.Parse(fmt.Sprintf("%s/download", moduleURL.Location))
+	} else {
+		u, err = url.Parse(fmt.Sprintf("%s/%s/download", moduleURL.Location, version))
+	}
+	if err != nil {
+		return "", err
+	}
+
+	downloadURL := serviceURL.ResolveReference(u)
+
+	log.Debugf("Looking up download URL for module %s from registry URL %s", moduleURL.RawSource, downloadURL)
+
+	httpClient := &http.Client{}
+	req, _ := http.NewRequest("GET", downloadURL.String(), nil)
+	moduleURL.Credentials.PrepareRequest(req)
+	resp, err := httpClient.Do(req)
+
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	location := resp.Header.Get("X-Terraform-Get")
+	if location == "" {
+		return "", errors.New("download URL has no X-Terraform-Get header")
+	}
+
+	if strings.HasPrefix(location, "/") || strings.HasPrefix(location, "./") || strings.HasPrefix(location, "../") {
+		locationURL, err := url.Parse(location)
+		if err != nil {
+			return "", err
+		}
+		locationURL = serviceURL.ResolveReference(locationURL)
+		location = locationURL.String()
+	}
+
+	return location, nil
 }
 
 // RegistryLoader is a loader that can lookup modules from a Terraform Registry and download them to the given destination
@@ -123,10 +174,8 @@ func (r *RegistryLoader) lookupModule(moduleAddr string, versionConstraints stri
 	}
 
 	return &RegistryLookupResult{
-		Source:      moduleURL.RawSource,
-		Version:     matchingVersion,
-		DownloadURL: fmt.Sprintf("%s/%s/download", moduleURL.Location, matchingVersion),
-		Credentials: moduleURL.Credentials,
+		ModuleURL: moduleURL,
+		Version:   matchingVersion,
 	}, nil
 }
 
@@ -179,23 +228,15 @@ func (r *RegistryLoader) fetchModuleVersions(moduleURL RegistryURL) ([]string, e
 
 // downloadModule downloads the module to the loader's destination
 // It first calls the download URL to get the X-Terraform-Get header which contains a source we can use with go-getter to download the module
-func (r *RegistryLoader) downloadModule(downloadURL string, dest string, credentials auth.HostCredentials) error {
-	httpClient := &http.Client{}
-	req, _ := http.NewRequest("GET", downloadURL, nil)
-	credentials.PrepareRequest(req)
-	resp, err := httpClient.Do(req)
-
+func (r *RegistryLoader) downloadModule(lookupResult *RegistryLookupResult, dest string) error {
+	downloadURL, err := r.disco.DownloadLocation(lookupResult.ModuleURL, lookupResult.Version)
 	if err != nil {
 		return fmt.Errorf("Failed to download registry module: %w", err)
 	}
-	defer resp.Body.Close()
+	// Deliberately not logging the download URL since it contains a token
+	log.Debugf("Downloading module %s", lookupResult.ModuleURL.RawSource)
 
-	source := resp.Header.Get("X-Terraform-Get")
-	if source == "" {
-		return errors.New("download URL has no X-Terraform-Get header")
-	}
-
-	return r.packageFetcher.fetch(source, dest)
+	return r.packageFetcher.fetch(downloadURL, dest)
 }
 
 // findLatestMatchingVersion returns the latest version from a list of versions that matches the given constraint.
