@@ -104,7 +104,7 @@ func (d Disco) DownloadLocation(moduleURL RegistryURL, version string) (string, 
 
 	downloadURL := serviceURL.ResolveReference(u)
 
-	log.Debugf("Looking up download URL for module %s from registry URL %s", moduleURL.RawSource, downloadURL)
+	log.Debugf("Looking up download URL for module %s from registry URL %s", moduleURL.RawSource, downloadURL.String())
 
 	httpClient := &http.Client{
 		Timeout: time.Second * 30,
@@ -124,6 +124,8 @@ func (d Disco) DownloadLocation(moduleURL RegistryURL, version string) (string, 
 	}
 
 	if strings.HasPrefix(location, "/") || strings.HasPrefix(location, "./") || strings.HasPrefix(location, "../") {
+		log.Debugf("Detected relative path for location returned by download URL %s", downloadURL.String())
+
 		locationURL, err := url.Parse(location)
 		if err != nil {
 			return "", fmt.Errorf("error parsing location URL: %w", err)
