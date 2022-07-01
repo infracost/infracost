@@ -7,7 +7,7 @@ require (
 	github.com/Masterminds/semver v1.5.0 // indirect
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/Rhymond/go-money v1.0.7
-	github.com/aws/aws-sdk-go-v2 v1.16.4
+	github.com/aws/aws-sdk-go-v2 v1.16.6
 	github.com/aws/aws-sdk-go-v2/config v1.15.4
 	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.23.2
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.18.3
@@ -48,7 +48,7 @@ require (
 )
 
 require (
-	github.com/aws/aws-sdk-go-v2/service/eks v1.20.6
+	github.com/aws/aws-sdk-go-v2/service/eks v1.21.3
 	github.com/hashicorp/terraform-config-inspect v0.0.0-20210625153042-09f34846faab
 	golang.org/x/sys v0.0.0-20220517195934-5e4e11fc645e // indirect
 )
@@ -57,7 +57,7 @@ require (
 	github.com/agext/levenshtein v1.2.3 // indirect
 	github.com/aws/aws-sdk-go-v2/credentials v1.12.0 // indirect
 	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.12.4 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.11 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.13 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.11 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.9.1 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.7.5 // indirect
@@ -65,7 +65,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.13.4 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sso v1.11.4 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.16.4 // indirect
-	github.com/aws/smithy-go v1.11.2 // indirect
+	github.com/aws/smithy-go v1.12.0 // indirect
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/hashicorp/hcl v1.0.1-vault // indirect
@@ -91,7 +91,7 @@ require (
 
 require (
 	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.1 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.5 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.7 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
 )
