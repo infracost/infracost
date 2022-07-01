@@ -227,7 +227,7 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 	if err == nil {
 		err = m.registryLoader.downloadModule(lookupResult, dest)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("Failed to download registry module %s: %w", key, err)
 		}
 
 		// The moduleCall.Source might not have the registry hostname if it is using the default registry
@@ -243,7 +243,7 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 
 	err = m.packageFetcher.fetch(moduleAddr, dest)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("Failed to download remote module %s: %w", key, err)
 	}
 
 	return manifestModule, nil

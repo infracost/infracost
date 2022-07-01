@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"regexp"
 	"strings"
+	"time"
 
 	goversion "github.com/hashicorp/go-version"
 	svchost "github.com/hashicorp/terraform-svchost"
@@ -98,32 +99,34 @@ func (d Disco) DownloadLocation(moduleURL RegistryURL, version string) (string, 
 		u, err = url.Parse(fmt.Sprintf("%s/%s/download", moduleURL.Location, version))
 	}
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("error constructing download URL: %w", err)
 	}
 
 	downloadURL := serviceURL.ResolveReference(u)
 
 	log.Debugf("Looking up download URL for module %s from registry URL %s", moduleURL.RawSource, downloadURL)
 
-	httpClient := &http.Client{}
+	httpClient := &http.Client{
+		Timeout: time.Second * 30,
+	}
 	req, _ := http.NewRequest("GET", downloadURL.String(), nil)
 	moduleURL.Credentials.PrepareRequest(req)
 	resp, err := httpClient.Do(req)
 
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("error fetching download URL '%s': %w", downloadURL.String(), err)
 	}
 	defer resp.Body.Close()
 
 	location := resp.Header.Get("X-Terraform-Get")
 	if location == "" {
-		return "", errors.New("download URL has no X-Terraform-Get header")
+		return "", fmt.Errorf("download URL has no X-Terraform-Get header")
 	}
 
 	if strings.HasPrefix(location, "/") || strings.HasPrefix(location, "./") || strings.HasPrefix(location, "../") {
 		locationURL, err := url.Parse(location)
 		if err != nil {
-			return "", err
+			return "", fmt.Errorf("error parsing location URL: %w", err)
 		}
 		locationURL = serviceURL.ResolveReference(locationURL)
 		location = locationURL.String()
@@ -231,7 +234,7 @@ func (r *RegistryLoader) fetchModuleVersions(moduleURL RegistryURL) ([]string, e
 func (r *RegistryLoader) downloadModule(lookupResult *RegistryLookupResult, dest string) error {
 	downloadURL, err := r.disco.DownloadLocation(lookupResult.ModuleURL, lookupResult.Version)
 	if err != nil {
-		return fmt.Errorf("Failed to download registry module: %w", err)
+		return fmt.Errorf("could not find download location: %w", err)
 	}
 	// Deliberately not logging the download URL since it contains a token
 	log.Debugf("Downloading module %s", lookupResult.ModuleURL.RawSource)
