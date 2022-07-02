@@ -18,6 +18,6 @@ resource "azurerm_mssql_server" "blank_location" {
 
 resource "azurerm_mssql_database" "blank_server_location" {
   name      = "acctest-db-e"
-  sku_name = "S3"
+  sku_name  = "S3"
   server_id = azurerm_mssql_server.blank_location.id
 }

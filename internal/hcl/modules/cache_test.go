@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-config-inspect/tfconfig"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -39,7 +40,7 @@ func TestLookupModule(t *testing.T) {
 	}
 	cache := &Cache{
 		keyMap: keyMap,
-		disco:  NewDisco(nil),
+		disco:  NewDisco(nil, logrus.NewEntry(logrus.New())),
 	}
 
 	tests := []struct {

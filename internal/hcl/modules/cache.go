@@ -6,7 +6,7 @@ import (
 
 	goversion "github.com/hashicorp/go-version"
 	"github.com/hashicorp/terraform-config-inspect/tfconfig"
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 )
 
 // Cache is a cache of modules that can be used to lookup modules to check if they've already been loaded.
@@ -19,13 +19,15 @@ import (
 type Cache struct {
 	keyMap map[string]*ManifestModule
 	disco  Disco
+	logger *logrus.Entry
 }
 
 // NewCache creates a new cache from a module manifest
-func NewCache(disco Disco) *Cache {
+func NewCache(disco Disco, logger *logrus.Entry) *Cache {
 	return &Cache{
 		keyMap: make(map[string]*ManifestModule),
 		disco:  disco,
+		logger: logger,
 	}
 }
 
@@ -69,7 +71,7 @@ func (c *Cache) lookupModule(key string, moduleCall *tfconfig.ModuleCall) (*Mani
 
 	url, _, err := c.disco.ModuleLocation(moduleCall.Source)
 	if err != nil {
-		log.Debugf("could not fetch module location from source err: %s. Proceeding as if source has changed.", err)
+		c.logger.WithError(err).Debugf("could not fetch module location from source. Proceeding as if source has changed.")
 	}
 
 	if manifestModule.Source == url.Location {

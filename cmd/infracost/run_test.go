@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/shopspring/decimal"
+	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 
 	main "github.com/infracost/infracost/cmd/infracost"
@@ -403,7 +404,7 @@ func TestAddHCLEnvVars(t *testing.T) {
 }
 
 func newProjectContextWithCtx(m map[string]interface{}) *config.ProjectContext {
-	ctx := config.NewProjectContext(nil, nil)
+	ctx := config.NewProjectContext(nil, nil, log.Fields{})
 
 	for k, v := range m {
 		ctx.SetContextValue(k, v)

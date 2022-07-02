@@ -9,7 +9,8 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
-	"github.com/sirupsen/logrus"
+
+	"github.com/infracost/infracost/internal/logging"
 )
 
 // Project defines a specific terraform project config. This can be used
@@ -59,6 +60,7 @@ type Config struct {
 
 	Version         string `yaml:"version,omitempty" ignored:"true"`
 	LogLevel        string `yaml:"log_level,omitempty" envconfig:"INFRACOST_LOG_LEVEL"`
+	DebugReport     bool   `ignored:"true"`
 	NoColor         bool   `yaml:"no_color,omitempty" envconfig:"INFRACOST_NO_COLOR"`
 	SkipUpdateCheck bool   `yaml:"skip_update_check,omitempty" envconfig:"INFRACOST_SKIP_UPDATE_CHECK"`
 	Parallelism     *int   `envconfig:"INFRACOST_PARALLELISM"`
@@ -95,8 +97,46 @@ type Config struct {
 
 	// for testing
 	EventsDisabled       bool
-	LogWriter            io.Writer
-	LogDisableTimestamps bool
+	logWriter            io.Writer
+	logDisableTimestamps bool
+}
+
+func (c Config) WriteLevel() string {
+	return c.LogLevel
+}
+
+func (c Config) LogPrettyPrint() bool {
+	return c.DebugReport
+}
+
+func (c Config) LogFields() map[string]interface{} {
+	f := map[string]interface{}{
+		"enable_cloud_comment": c.EnableCloudForComment,
+		"currency":             c.Currency,
+		"sync_usage":           c.SyncUsageFile,
+	}
+
+	if c.EnableCloud != nil {
+		f["enable_cloud_os"] = *c.EnableCloud
+	}
+
+	return f
+}
+
+func (c Config) SetLogDisableTimestamps(v bool) {
+	c.logDisableTimestamps = v
+}
+
+func (c Config) LogDisableTimestamps() bool {
+	return c.logDisableTimestamps
+}
+
+func (c Config) SetLogWriter(w io.Writer) {
+	c.logWriter = w
+}
+
+func (c Config) LogWriter() io.Writer {
+	return c.logWriter
 }
 
 func init() {
@@ -149,7 +189,7 @@ func (c *Config) LoadFromEnv() error {
 		return err
 	}
 
-	err = c.ConfigureLogger()
+	err = logging.ConfigureBaseLogger(c)
 	if err != nil {
 		return err
 	}
@@ -179,43 +219,6 @@ func (c *Config) loadEnvVars() error {
 			return err
 		}
 	}
-
-	return nil
-}
-
-func (c *Config) ConfigureLogger() error {
-	logrus.SetFormatter(&logrus.TextFormatter{
-		FullTimestamp:    true,
-		DisableTimestamp: c.LogDisableTimestamps,
-		DisableColors:    true,
-		SortingFunc: func(keys []string) {
-			// Put message at the end
-			for i, key := range keys {
-				if key == "msg" && i != len(keys)-1 {
-					keys[i], keys[len(keys)-1] = keys[len(keys)-1], keys[i]
-					break
-				}
-			}
-		},
-	})
-
-	if c.LogLevel == "" {
-		logrus.SetOutput(io.Discard)
-		return nil
-	}
-
-	if c.LogWriter != nil {
-		logrus.SetOutput(c.LogWriter)
-	} else {
-		logrus.SetOutput(os.Stderr)
-	}
-
-	level, err := logrus.ParseLevel(c.LogLevel)
-	if err != nil {
-		return err
-	}
-
-	logrus.SetLevel(level)
 
 	return nil
 }

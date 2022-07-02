@@ -24,6 +24,7 @@ import (
 type HCLProvider struct {
 	parsers        []*hcl.Parser
 	planJSONParser *Parser
+	logger         *log.Entry
 
 	schema      *PlanSchema
 	providerKey string
@@ -118,7 +119,8 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 	}
 	options = append(options, hcl.OptionWithCredentialsSource(credsSource))
 
-	parsers, err := hcl.LoadParsers(ctx.ProjectConfig.Path, ctx.ProjectConfig.ExcludePaths, options...)
+	logger := ctx.Logger().WithFields(log.Fields{"provider": "terraform_dir"})
+	parsers, err := hcl.LoadParsers(ctx.ProjectConfig.Path, ctx.ProjectConfig.ExcludePaths, logger, options...)
 	if err != nil {
 		return nil, err
 	}
@@ -128,6 +130,7 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 		planJSONParser: NewParser(ctx, false),
 		ctx:            ctx,
 		config:         *config,
+		logger:         logger,
 	}, err
 }
 
@@ -141,7 +144,7 @@ func (p *HCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 
 	modulePath, err := filepath.Rel(basePath, metadata.Path)
 	if err == nil && modulePath != "" && modulePath != "." {
-		log.Debugf("Calculated relative terraformModulePath for %s from %s", basePath, metadata.Path)
+		p.logger.Debugf("calculated relative terraformModulePath for %s from %s", basePath, metadata.Path)
 		metadata.TerraformModulePath = modulePath
 	}
 
@@ -398,7 +401,7 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 			Name:              stripCount(block.NameLabel()),
 			ProviderConfigKey: block.ModuleName() + ":" + block.Provider(),
 			Expressions:       blockToReferences(block),
-			CountExpression:   countReferences(block),
+			CountExpression:   p.countReferences(block),
 		}
 	} else {
 		configuration = ResourceData{
@@ -408,7 +411,7 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 			Name:              stripCount(block.NameLabel()),
 			ProviderConfigKey: providerConfigKey,
 			Expressions:       blockToReferences(block),
-			CountExpression:   countReferences(block),
+			CountExpression:   p.countReferences(block),
 		}
 	}
 
@@ -447,7 +450,7 @@ func (p *HCLProvider) marshalProviderBlock(block *hcl.Block) string {
 	return name
 }
 
-func countReferences(block *hcl.Block) *countExpression {
+func (p *HCLProvider) countReferences(block *hcl.Block) *countExpression {
 	for _, attribute := range block.GetAttributes() {
 		name := attribute.Name()
 		if name != "count" {
@@ -478,7 +481,7 @@ func countReferences(block *hcl.Block) *countExpression {
 			s := v.AsString()
 			i, _ = strconv.ParseInt(s, 10, 64)
 		default:
-			log.Debugf("unsupported go cty type %s expected either Number or String for count expression, using 0", ty)
+			p.logger.Debugf("unsupported go cty type %s expected either Number or String for count expression, using 0", ty)
 		}
 
 		exp.ConstantValue = &i
