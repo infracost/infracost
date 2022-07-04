@@ -121,6 +121,6 @@ Key: ~ changed, + added, - removed
   ∙ 2 x aws_iam_role_policy_attachment
 ```
 
-Is this comment useful? [Yes](https://www.infracost.io/feedback/submit/?value=yes), [No](https://www.infracost.io/feedback/submit/?value=no)
+Is this comment useful? [Yes](https://www.infracost.io/feedback/submit/?value=yes), [No](https://www.infracost.io/feedback/submit/?value=no), [Other](https://www.infracost.io/feedback/submit/?value=other)
 
 Comment not posted to Bitbucket (--dry-run was specified)

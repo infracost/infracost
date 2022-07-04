@@ -227,10 +227,10 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
   {{$fields := .Options.Fields}}
   <p class="project-name">Project: {{.Project | projectLabel}}</p>
   {{- if .Project | projectModulePath }}
-  <p class="project-name">Module path: {{.Project | projectModulePath}}</p> 	
+  <p class="project-name">Module path: {{.Project | projectModulePath}}</p>
   {{- end }}
   {{- if .Project | projectWorkspace }}
-  <p class="project-name">Workspace: {{.Project | projectWorkspace}}</p> 	
+  <p class="project-name">Workspace: {{.Project | projectWorkspace}}</p>
   {{- end }}
   <table class="breakdown">
     <thead>
@@ -379,7 +379,7 @@ This comment will be replaced when the cost estimate changes
 {{- if .MarkdownOptions.IncludeFeedbackLink }}
 
 <sub>
-  Is this comment useful? <a href="https://www.infracost.io/feedback/submit/?value=yes" rel="noopener noreferrer" target="_blank">Yes</a>, <a href="https://www.infracost.io/feedback/submit/?value=no" rel="noopener noreferrer" target="_blank">No</a>
+  Is this comment useful? <a href="https://www.infracost.io/feedback/submit/?value=yes" rel="noopener noreferrer" target="_blank">Yes</a>, <a href="https://www.infracost.io/feedback/submit/?value=no" rel="noopener noreferrer" target="_blank">No</a>, <a href="https://www.infracost.io/feedback/submit/?value=other" rel="noopener noreferrer" target="_blank">Other</a>
 </sub>
 {{- end}}
 `
@@ -450,6 +450,6 @@ This comment will be replaced when the cost estimate changes
 {{- end }}
 {{- if .MarkdownOptions.IncludeFeedbackLink }}
 
-Is this comment useful? [Yes](https://www.infracost.io/feedback/submit/?value=yes), [No](https://www.infracost.io/feedback/submit/?value=no)
+Is this comment useful? [Yes](https://www.infracost.io/feedback/submit/?value=yes), [No](https://www.infracost.io/feedback/submit/?value=no), [Other](https://www.infracost.io/feedback/submit/?value=other)
 {{- end }}
 `
