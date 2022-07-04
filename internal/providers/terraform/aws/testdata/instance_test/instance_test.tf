@@ -253,21 +253,3 @@ resource "aws_instance" "instance_detailedMonitoring_withMonthlyHours" {
   instance_type = "m3.large"
   monitoring    = true
 }
-
-resource "aws_instance" "instance_elasticInferenceAccel_withMonthlyHours" {
-  ami           = "fake_ami"
-  instance_type = "m3.large"
-
-  elastic_inference_accelerator {
-    type = "eia1.medium"
-  }
-}
-
-resource "aws_instance" "instance_elasticInferenceAccel" {
-  ami           = "fake_ami"
-  instance_type = "m3.large"
-
-  elastic_inference_accelerator {
-    type = "eia1.medium"
-  }
-}
