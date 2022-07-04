@@ -365,6 +365,10 @@ func TestBreakdownInitFlagsError(t *testing.T) {
 }
 
 func TestBreakdownWithPrivateTerraformRegistryModule(t *testing.T) {
+	if _, ok := os.LookupEnv("INFRACOST_TERRAFORM_CLOUD_TOKEN"); !ok {
+		t.Skip("Skipping because INFRACOST_TERRAFORM_CLOUD_TOKEN is not set and external contributors won't have this.")
+	}
+
 	GoldenFileCommandTest(
 		t,
 		testutil.CalcGoldenFileTestdataDirName(),
