@@ -49,8 +49,11 @@ func NewAzureRMVirtualMachine(d *schema.ResourceData, u *schema.UsageData) *sche
 	}
 
 	subResources := []*schema.Resource{}
-	diskData := d.Get("storage_os_disk").Array()[0]
-	subResources = append(subResources, legacyOSDiskSubResource(region, diskData, storageOperations))
+
+	if len(d.Get("storage_os_disk").Array()) > 0 {
+		diskData := d.Get("storage_os_disk").Array()[0]
+		subResources = append(subResources, legacyOSDiskSubResource(region, diskData, storageOperations))
+	}
 
 	storages := d.Get("storage_data_disk").Array()
 	if u != nil {
