@@ -180,7 +180,7 @@ func guestAcceleratorCostComponent(region string, purchaseOption string, guestAc
 		Name:                fmt.Sprintf("%s (%s)", name, purchaseOptionLabel(purchaseOption)),
 		Unit:                "hours",
 		UnitMultiplier:      decimal.NewFromInt(1),
-		MonthlyQuantity:      decimalPtr(qty),
+		MonthlyQuantity:     decimalPtr(qty),
 		MonthlyDiscountPerc: sustainedUseDiscount,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("gcp"),
