@@ -648,6 +648,9 @@ resource_usage:
   google_compute_image.my_image:
     storage_gb: 1000 # Total size of image storage in GB.
 
+  google_compute_instance.my_instance:
+    monthly_hours: 450 # Monthly number of hours the instance ran for.
+
   google_compute_machine_image.my_machine_image:
     storage_gb: 1000 # Total size of machine image storage in GB.
 
