@@ -24,7 +24,12 @@ func NewAzureRMWindowsVirtualMachine(d *schema.ResourceData, u *schema.UsageData
 	instanceType := d.Get("size").String()
 	licenseType := d.Get("license_type").String()
 
-	costComponents := []*schema.CostComponent{windowsVirtualMachineCostComponent(region, instanceType, licenseType)}
+	var monthlyHours *int64 = nil
+	if u != nil {
+		monthlyHours = u.GetInt("monthly_hours")
+	}
+
+	costComponents := []*schema.CostComponent{windowsVirtualMachineCostComponent(region, instanceType, licenseType, monthlyHours)}
 
 	if d.Get("additional_capabilities.0.ultra_ssd_enabled").Bool() {
 		costComponents = append(costComponents, ultraSSDReservationCostComponent(region))
@@ -44,7 +49,7 @@ func NewAzureRMWindowsVirtualMachine(d *schema.ResourceData, u *schema.UsageData
 	}
 }
 
-func windowsVirtualMachineCostComponent(region string, instanceType string, licenseType string) *schema.CostComponent {
+func windowsVirtualMachineCostComponent(region string, instanceType string, licenseType string, monthlyHours *int64) *schema.CostComponent {
 	purchaseOption := "Consumption"
 	purchaseOptionLabel := "pay as you go"
 
@@ -61,11 +66,16 @@ func windowsVirtualMachineCostComponent(region string, instanceType string, lice
 		purchaseOptionLabel = "hybrid benefit"
 	}
 
+	qty := decimal.NewFromInt(730)
+	if monthlyHours != nil {
+		qty = decimal.NewFromInt(*monthlyHours)
+	}
+
 	return &schema.CostComponent{
-		Name:           fmt.Sprintf("Instance usage (%s, %s)", purchaseOptionLabel, instanceType),
-		Unit:           "hours",
-		UnitMultiplier: decimal.NewFromInt(1),
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+		Name:            fmt.Sprintf("Instance usage (%s, %s)", purchaseOptionLabel, instanceType),
+		Unit:            "hours",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: decimalPtr(qty),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        strPtr(region),

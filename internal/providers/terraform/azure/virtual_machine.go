@@ -32,13 +32,19 @@ func NewAzureRMVirtualMachine(d *schema.ResourceData, u *schema.UsageData) *sche
 		os = "Windows"
 	}
 
-	if strings.ToLower(os) == "windows" {
-		licenseType := d.Get("license_type").String()
-		costComponents = append(costComponents, windowsVirtualMachineCostComponent(region, instanceType, licenseType))
-	} else {
-		costComponents = append(costComponents, linuxVirtualMachineCostComponent(region, instanceType))
+	var monthlyHours *int64 = nil
+	if u != nil {
+		monthlyHours = u.GetInt("monthly_hours")
 	}
 
+	if strings.ToLower(os) == "windows" {
+		licenseType := d.Get("license_type").String()
+		costComponents = append(costComponents, windowsVirtualMachineCostComponent(region, instanceType, licenseType, monthlyHours))
+	} else {
+		costComponents = append(costComponents, linuxVirtualMachineCostComponent(region, instanceType, monthlyHours))
+	}
+
+	// TODO: is this always assuming ultrassdreservation cost?
 	costComponents = append(costComponents, ultraSSDReservationCostComponent(region))
 
 	var storageOperations *decimal.Decimal

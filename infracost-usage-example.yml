@@ -966,6 +966,7 @@ resource_usage:
     monthly_data_processed_gb: 100000 # Monthly data processed by the firewall in GB.
 
   azurerm_linux_virtual_machine.my_linux_vm:
+    monthly_hours: 450 # Monthly number of hours the instance ran for.
     os_disk:
       monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB.
 
@@ -1104,12 +1105,14 @@ resource_usage:
       monthly_disk_operations: 100000 # Monthly number of disk operations (writes, reads, deletes) using a unit size of 256KiB per additional disk.
 
   azurerm_virtual_machine.my_vm:
+    monthly_hours: 450 # Monthly number of hours the instance ran for.
     storage_os_disk:
       monthly_disk_operations: 100000 # Monthly number of main disk operations (writes, reads, deletes) using a unit size of 256KiB.
     storage_data_disk:
       monthly_disk_operations: 100000 # Monthly number of disk operations (writes, reads, deletes) using a unit size of 256KiB per additional disk.
 
   azurerm_windows_virtual_machine.my_windows_vm:
+    monthly_hours: 450 # Monthly number of hours the instance ran for.
     os_disk:
       monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB.
 
