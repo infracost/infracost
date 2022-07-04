@@ -133,7 +133,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 				ui.PrintWarning(cmd.ErrOrStderr(), "fields is only supported for table and html output formats")
 			}
 
-			if ctx.Config.IsCloudEnabled() {
+			if ctx.IsCloudEnabled() {
 				if ctx.Config.IsSelfHosted() {
 					ui.PrintWarning(cmd.ErrOrStderr(), "Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
 				}

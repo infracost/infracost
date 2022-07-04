@@ -167,6 +167,10 @@ func (r *RunContext) IsCIRun() bool {
 	return r.contextVals["ciPlatform"] != "" && !IsTest()
 }
 
+func (r *RunContext) IsCloudEnabled() bool {
+	return (r.Config.EnableCloud != nil && *r.Config.EnableCloud) || r.Config.EnableDashboard
+}
+
 func baseVersion(v string) string {
 	return strings.SplitN(v, "+", 2)[0]
 }

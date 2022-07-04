@@ -92,7 +92,7 @@ func (p *panicError) Error() string {
 }
 
 func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
-	if runCtx.Config.IsSelfHosted() && runCtx.Config.IsCloudEnabled() {
+	if runCtx.Config.IsSelfHosted() && runCtx.IsCloudEnabled() {
 		ui.PrintWarning(cmd.ErrOrStderr(), "Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
 	}
 
