@@ -86,10 +86,9 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 	}
 
 	opts := output.Options{
-		DashboardEnabled: ctx.Config.IsCloudEnabled(),
-		NoColor:          ctx.Config.NoColor,
-		ShowSkipped:      true,
-		PolicyChecks:     policyChecks,
+		NoColor:      ctx.Config.NoColor,
+		ShowSkipped:  true,
+		PolicyChecks: policyChecks,
 	}
 
 	b, err := output.ToMarkdown(combined, opts, mdOpts)

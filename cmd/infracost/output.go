@@ -122,9 +122,8 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			}
 
 			opts := output.Options{
-				DashboardEnabled: ctx.Config.IsCloudEnabled(),
-				NoColor:          ctx.Config.NoColor,
-				Fields:           fields,
+				NoColor: ctx.Config.NoColor,
+				Fields:  fields,
 			}
 			opts.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
 
