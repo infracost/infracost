@@ -88,6 +88,8 @@ func goldenFileCommandTest(t *testing.T, testName string, args []string, testOpt
 	}
 
 	main.Run(func(c *config.RunContext) {
+		enableCloud := false
+		c.Config.EnableCloud = &enableCloud
 		c.Config.EventsDisabled = true
 		c.Config.Currency = currency
 		c.Config.NoColor = true
