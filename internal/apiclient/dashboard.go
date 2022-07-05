@@ -27,6 +27,10 @@ type AddRunResponse struct {
 	ShareURL string `json:"shareUrl"`
 }
 
+type QueryOrgSettingsResponse struct {
+	CloudEnabled bool `json:"cloudEnabled"`
+}
+
 type runInput struct {
 	ProjectResults []projectResultInput   `json:"projectResults"`
 	Currency       string                 `json:"currency"`
@@ -126,6 +130,32 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (Ad
 
 		response.RunID = results[0].Get("data.addRun.id").String()
 		response.ShareURL = results[0].Get("data.addRun.shareUrl").String()
+	}
+	return response, nil
+}
+
+func (c *DashboardAPIClient) QueryOrgSettings() (QueryOrgSettingsResponse, error) {
+	response := QueryOrgSettingsResponse{}
+
+	q := `
+		query OrgSettings {
+        	orgSettings {
+            	cloudEnabled
+        	}
+    	}
+	`
+	results, err := c.doQueries([]GraphQLQuery{{q, map[string]interface{}{}}})
+	if err != nil {
+		return response, err
+	}
+
+	if len(results) > 0 {
+
+		if results[0].Get("errors").Exists() {
+			return response, errors.New(results[0].Get("errors").String())
+		}
+
+		response.CloudEnabled = results[0].Get("data.orgSettings.cloudEnabled").Bool()
 	}
 	return response, nil
 }

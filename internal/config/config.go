@@ -77,6 +77,9 @@ type Config struct {
 
 	Currency string `envconfig:"INFRACOST_CURRENCY"`
 
+	// Org settings
+	EnableCloudForComment bool
+
 	Projects      []*Project `yaml:"projects" ignored:"true"`
 	Format        string     `yaml:"format,omitempty" ignored:"true"`
 	ShowSkipped   bool       `yaml:"show_skipped,omitempty" ignored:"true"`

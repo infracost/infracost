@@ -27,6 +27,8 @@ type RunContext struct {
 	mu          *sync.RWMutex
 	StartTime   int64
 
+	isCommentCmd bool
+
 	OutWriter io.Writer
 	ErrWriter io.Writer
 	Exit      func(code int)
@@ -167,7 +169,17 @@ func (r *RunContext) IsCIRun() bool {
 	return r.contextVals["ciPlatform"] != "" && !IsTest()
 }
 
+// SetIsInfracostComment identifies that the primary command being run is `infracost comment`
+func (r *RunContext) SetIsInfracostComment() {
+	r.isCommentCmd = true
+}
+
 func (r *RunContext) IsCloudEnabled() bool {
+	if r.isCommentCmd && r.Config.EnableCloudForComment {
+		log.Debugf("IsCloudEnabled is true for comment with org level setting enabled.")
+		return true
+	}
+
 	return (r.Config.EnableCloud != nil && *r.Config.EnableCloud) || r.Config.EnableDashboard
 }
 

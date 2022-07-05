@@ -75,6 +75,8 @@ func Run(modifyCtx func(*config.RunContext), args *[]string) {
 
 	startUpdateCheck(ctx, updateMessageChan)
 
+	loadOrgSettings(ctx)
+
 	rootCmd := newRootCmd(ctx)
 	if args != nil {
 		rootCmd.SetArgs(*args)
@@ -106,7 +108,9 @@ func newRootCmd(ctx *config.RunContext) *cobra.Command {
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			cmd.SilenceUsage = true
 			ctx.SetContextValue("command", cmd.Name())
-
+			if cmd.Name() == "comment" || (cmd.Parent() != nil && cmd.Parent().Name() == "comment") {
+				ctx.SetIsInfracostComment()
+			}
 			return loadGlobalFlags(ctx, cmd)
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -177,6 +181,24 @@ func startUpdateCheck(ctx *config.RunContext, c chan *update.Info) {
 		c <- updateInfo
 		close(c)
 	}()
+}
+
+func loadOrgSettings(ctx *config.RunContext) {
+	if ctx.Config.IsSelfHosted() || (ctx.Config.EnableCloud != nil && !*ctx.Config.EnableCloud) {
+		return
+	}
+
+	dashboardClient := apiclient.NewDashboardAPIClient(ctx)
+	result, err := dashboardClient.QueryOrgSettings()
+	if err != nil {
+		log.Debugf("Error loading org settings: %s", err)
+		// ignore the error so the command can continue without failing
+		return
+	}
+
+	log.Debugf("Loaded org settings: %+v", result)
+
+	ctx.Config.EnableCloudForComment = result.CloudEnabled
 }
 
 func checkAPIKey(apiKey string, apiEndpoint string, defaultEndpoint string) error {
