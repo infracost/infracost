@@ -379,7 +379,8 @@ This comment will be replaced when the cost estimate changes
 {{- if .MarkdownOptions.IncludeFeedbackLink }}
 
 <sub>
-  Is this comment useful? <a href="https://www.infracost.io/feedback/submit/?value=yes" rel="noopener noreferrer" target="_blank">Yes</a>, <a href="https://www.infracost.io/feedback/submit/?value=no" rel="noopener noreferrer" target="_blank">No</a>, <a href="https://www.infracost.io/feedback/submit/?value=other" rel="noopener noreferrer" target="_blank">Other</a>
+  {{- $feedbackURL := (print .Options.DashboardEndpoint "/feedback/redirect?runId=" .Root.RunID) }}
+  Is this comment useful? <a href="{{ $feedbackURL }}&value=yes" rel="noopener noreferrer" target="_blank">Yes</a>, <a href="{{ $feedbackURL }}&value=no" rel="noopener noreferrer" target="_blank">No</a>, <a href="{{ $feedbackURL }}&value=other" rel="noopener noreferrer" target="_blank">Other</a>
 </sub>
 {{- end}}
 `
@@ -450,6 +451,7 @@ This comment will be replaced when the cost estimate changes
 {{- end }}
 {{- if .MarkdownOptions.IncludeFeedbackLink }}
 
-Is this comment useful? [Yes](https://www.infracost.io/feedback/submit/?value=yes), [No](https://www.infracost.io/feedback/submit/?value=no), [Other](https://www.infracost.io/feedback/submit/?value=other)
+{{- $feedbackURL := (print .Options.DashboardEndpoint "/feedback/redirect?runId=" .Root.RunID) }}
+Is this comment useful? [Yes]({{ $feedbackURL }}&value=yes), [No]({{ $feedbackURL }}&value=no), [Other]({{ $feedbackURL }}&value=other)
 {{- end }}
 `

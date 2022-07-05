@@ -162,9 +162,10 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	}
 
 	b, err := output.FormatOutput(format, r, output.Options{
-		ShowSkipped: runCtx.Config.ShowSkipped,
-		NoColor:     runCtx.Config.NoColor,
-		Fields:      runCtx.Config.Fields,
+		DashboardEndpoint: runCtx.Config.DashboardEndpoint,
+		ShowSkipped:       runCtx.Config.ShowSkipped,
+		NoColor:           runCtx.Config.NoColor,
+		Fields:            runCtx.Config.Fields,
 	})
 	if err != nil {
 		return err
