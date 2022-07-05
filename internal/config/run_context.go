@@ -174,6 +174,10 @@ func (r *RunContext) SetIsInfracostComment() {
 	r.isCommentCmd = true
 }
 
+func (r *RunContext) IsInfracostComment() bool {
+	return r.isCommentCmd
+}
+
 func (r *RunContext) IsCloudEnabled() bool {
 	if r.isCommentCmd && r.Config.EnableCloudForComment {
 		log.Debugf("IsCloudEnabled is true for comment with org level setting enabled.")
