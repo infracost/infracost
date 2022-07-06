@@ -122,9 +122,8 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			}
 
 			opts := output.Options{
-				DashboardEnabled: ctx.Config.IsCloudEnabled(),
-				NoColor:          ctx.Config.NoColor,
-				Fields:           fields,
+				NoColor: ctx.Config.NoColor,
+				Fields:  fields,
 			}
 			opts.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
 
@@ -134,7 +133,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 				ui.PrintWarning(cmd.ErrOrStderr(), "fields is only supported for table and html output formats")
 			}
 
-			if ctx.Config.IsCloudEnabled() {
+			if ctx.IsCloudEnabled() {
 				if ctx.Config.IsSelfHosted() {
 					ui.PrintWarning(cmd.ErrOrStderr(), "Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
 				}

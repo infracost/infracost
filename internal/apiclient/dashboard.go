@@ -2,6 +2,7 @@ package apiclient
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/pkg/errors"
@@ -27,6 +28,10 @@ type AddRunResponse struct {
 	ShareURL string `json:"shareUrl"`
 }
 
+type QueryCLISettingsResponse struct {
+	CloudEnabled bool `json:"cloudEnabled"`
+}
+
 type runInput struct {
 	ProjectResults []projectResultInput   `json:"projectResults"`
 	Currency       string                 `json:"currency"`
@@ -50,7 +55,7 @@ func NewDashboardAPIClient(ctx *config.RunContext) *DashboardAPIClient {
 			apiKey:   ctx.Config.APIKey,
 			uuid:     ctx.UUID(),
 		},
-		shouldStoreRun: ctx.Config.IsCloudEnabled() && !ctx.Config.IsSelfHosted(),
+		shouldStoreRun: ctx.IsCloudEnabled() && !ctx.Config.IsSelfHosted(),
 	}
 }
 
@@ -96,12 +101,23 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (Ad
 		}
 	}
 
+	ctxValues := ctx.ContextValues()
+	if ctx.IsInfracostComment() {
+		// Clone the map to cleanup up the "command" key to show "comment".  It is
+		// currently set to the sub comment (e.g. "github")
+		ctxValues = make(map[string]interface{}, len(ctxValues))
+		for k, v := range ctx.ContextValues() {
+			ctxValues[k] = v
+		}
+		ctxValues["command"] = "comment"
+	}
+
 	v := map[string]interface{}{
 		"run": runInput{
 			ProjectResults: projectResultInputs,
 			Currency:       out.Currency,
 			TimeGenerated:  out.TimeGenerated.UTC(),
-			Metadata:       ctx.ContextValues(),
+			Metadata:       ctxValues,
 		},
 	}
 
@@ -126,6 +142,31 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (Ad
 
 		response.RunID = results[0].Get("data.addRun.id").String()
 		response.ShareURL = results[0].Get("data.addRun.shareUrl").String()
+	}
+	return response, nil
+}
+
+func (c *DashboardAPIClient) QueryCLISettings() (QueryCLISettingsResponse, error) {
+	response := QueryCLISettingsResponse{}
+
+	q := `
+		query CLISettings {
+        	cliSettings {
+            	cloudEnabled
+        	}
+    	}
+	`
+	results, err := c.doQueries([]GraphQLQuery{{q, map[string]interface{}{}}})
+	if err != nil {
+		return response, fmt.Errorf("query failed when requesting org settings %w", err)
+	}
+
+	if len(results) > 0 {
+		if results[0].Get("errors").Exists() {
+			return response, fmt.Errorf("query failed when requesting org settings, received graphql error: %s", results[0].Get("errors").String())
+		}
+
+		response.CloudEnabled = results[0].Get("data.cliSettings.cloudEnabled").Bool()
 	}
 	return response, nil
 }
