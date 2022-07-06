@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  ibm_container_vpc_worker_pool.test_vpc_worker_pool:
+    monthly_instance_hours: 730

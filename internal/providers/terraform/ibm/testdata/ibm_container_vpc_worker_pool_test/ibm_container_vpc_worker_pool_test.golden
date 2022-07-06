@@ -1,0 +1,10 @@
+
+ Name                                                                                        Monthly Qty  Unit   Monthly Cost 
+                                                                                                                              
+ ibm_container_vpc_worker_pool.test_vpc_worker_pool                                                                           
+ └─ VPC Container Workpool flavor: (bx2.4x16) region: (us-south) workers X zones: (2) x (1)          730  hours       $188.47 
+                                                                                                                              
+ OVERALL TOTAL                                                                                                        $188.47 
+──────────────────────────────────
+1 cloud resource was detected:
+∙ 1 was estimated
