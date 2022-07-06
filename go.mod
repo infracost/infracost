@@ -9,7 +9,7 @@ require (
 	github.com/Rhymond/go-money v1.0.7
 	github.com/aws/aws-sdk-go-v2 v1.16.7
 	github.com/aws/aws-sdk-go-v2/config v1.15.4
-	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.23.2
+	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.23.5
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.18.3
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.15.5
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.37.0
