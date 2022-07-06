@@ -75,7 +75,7 @@ func Run(modifyCtx func(*config.RunContext), args *[]string) {
 
 	startUpdateCheck(ctx, updateMessageChan)
 
-	loadOrgSettings(ctx)
+	loadCloudSettings(ctx)
 
 	rootCmd := newRootCmd(ctx)
 	if args != nil {
@@ -183,19 +183,19 @@ func startUpdateCheck(ctx *config.RunContext, c chan *update.Info) {
 	}()
 }
 
-func loadOrgSettings(ctx *config.RunContext) {
+func loadCloudSettings(ctx *config.RunContext) {
 	if ctx.Config.IsSelfHosted() || (ctx.Config.EnableCloud != nil && !*ctx.Config.EnableCloud) {
 		return
 	}
 
 	dashboardClient := apiclient.NewDashboardAPIClient(ctx)
-	result, err := dashboardClient.QueryOrgSettings()
+	result, err := dashboardClient.QueryCLISettings()
 	if err != nil {
-		log.WithError(err).Debug("Failed to loading org settings")
+		log.WithError(err).Debug("Failed to load settings from Infracost Cloud ")
 		// ignore the error so the command can continue without failing
 		return
 	}
-	log.WithFields(log.Fields{"result": result}).Debug("Successfully loaded org settings")
+	log.WithFields(log.Fields{"result": fmt.Sprintf("%+v", result)}).Debug("Successfully loaded settings from Infracost Cloud")
 
 	ctx.Config.EnableCloudForComment = result.CloudEnabled
 }

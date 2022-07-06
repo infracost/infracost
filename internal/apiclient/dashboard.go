@@ -28,7 +28,7 @@ type AddRunResponse struct {
 	ShareURL string `json:"shareUrl"`
 }
 
-type QueryOrgSettingsResponse struct {
+type QueryCLISettingsResponse struct {
 	CloudEnabled bool `json:"cloudEnabled"`
 }
 
@@ -146,12 +146,12 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (Ad
 	return response, nil
 }
 
-func (c *DashboardAPIClient) QueryOrgSettings() (QueryOrgSettingsResponse, error) {
-	response := QueryOrgSettingsResponse{}
+func (c *DashboardAPIClient) QueryCLISettings() (QueryCLISettingsResponse, error) {
+	response := QueryCLISettingsResponse{}
 
 	q := `
-		query OrgSettings {
-        	orgSettings {
+		query CLISettings {
+        	cliSettings {
             	cloudEnabled
         	}
     	}
@@ -166,7 +166,7 @@ func (c *DashboardAPIClient) QueryOrgSettings() (QueryOrgSettingsResponse, error
 			return response, fmt.Errorf("query failed when requesting org settings, received graphql error: %s", results[0].Get("errors").String())
 		}
 
-		response.CloudEnabled = results[0].Get("data.orgSettings.cloudEnabled").Bool()
+		response.CloudEnabled = results[0].Get("data.cliSettings.cloudEnabled").Bool()
 	}
 	return response, nil
 }
