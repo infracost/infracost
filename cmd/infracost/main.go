@@ -191,12 +191,11 @@ func loadOrgSettings(ctx *config.RunContext) {
 	dashboardClient := apiclient.NewDashboardAPIClient(ctx)
 	result, err := dashboardClient.QueryOrgSettings()
 	if err != nil {
-		log.Debugf("Error loading org settings: %s", err)
+		log.WithError(err).Debug("Failed to loading org settings")
 		// ignore the error so the command can continue without failing
 		return
 	}
-
-	log.Debugf("Loaded org settings: %+v", result)
+	log.WithFields(log.Fields{"result": result}).Debug("Successfully loaded org settings")
 
 	ctx.Config.EnableCloudForComment = result.CloudEnabled
 }

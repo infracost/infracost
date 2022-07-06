@@ -2,6 +2,7 @@ package apiclient
 
 import (
 	"encoding/json"
+	"fmt"
 	"time"
 
 	"github.com/pkg/errors"
@@ -157,13 +158,12 @@ func (c *DashboardAPIClient) QueryOrgSettings() (QueryOrgSettingsResponse, error
 	`
 	results, err := c.doQueries([]GraphQLQuery{{q, map[string]interface{}{}}})
 	if err != nil {
-		return response, err
+		return response, fmt.Errorf("query failed when requesting org settings %w", err)
 	}
 
 	if len(results) > 0 {
-
 		if results[0].Get("errors").Exists() {
-			return response, errors.New(results[0].Get("errors").String())
+			return response, fmt.Errorf("query failed when requesting org settings, received graphql error: %s", results[0].Get("errors").String())
 		}
 
 		response.CloudEnabled = results[0].Get("data.orgSettings.cloudEnabled").Bool()
