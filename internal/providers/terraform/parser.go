@@ -15,6 +15,7 @@ import (
 	"github.com/infracost/infracost/internal/providers/terraform/aws"
 	"github.com/infracost/infracost/internal/providers/terraform/azure"
 	"github.com/infracost/infracost/internal/providers/terraform/google"
+	"github.com/infracost/infracost/internal/providers/terraform/ibm"
 	"github.com/infracost/infracost/internal/schema"
 )
 
@@ -281,6 +282,8 @@ func getSpecialContext(d *schema.ResourceData) map[string]interface{} {
 		return azure.GetSpecialContext(d)
 	case "google":
 		return google.GetSpecialContext(d)
+	case "ibm":
+		return ibm.GetSpecialContext(d)
 	default:
 		log.Debugf("Unsupported provider %s", providerPrefix)
 		return map[string]interface{}{}
@@ -298,6 +301,8 @@ func parseTags(resourceType string, v gjson.Result) map[string]string {
 		return azure.ParseTags(resourceType, v)
 	case "google":
 		return google.ParseTags(resourceType, v)
+	case "ibm":
+		return ibm.ParseTags(resourceType, v)
 	default:
 		log.Debugf("Unsupported provider %s", providerPrefix)
 		return map[string]string{}
@@ -315,6 +320,8 @@ func resourceRegion(resourceType string, v gjson.Result) string {
 		return azure.GetResourceRegion(resourceType, v)
 	case "google":
 		return google.GetResourceRegion(resourceType, v)
+	case "ibm":
+		return ibm.GetResourceRegion(resourceType, v)
 	default:
 		log.Debugf("Unsupported provider %s", providerPrefix)
 		return ""
@@ -346,6 +353,8 @@ func providerRegion(addr string, providerConf gjson.Result, vars gjson.Result, r
 				region = azure.DefaultProviderRegion
 			case "google":
 				region = google.DefaultProviderRegion
+			case "ibm":
+				region = ibm.DefaultProviderRegion
 			}
 
 			// Don't show this log for azurerm users since they have a different method of looking up the region.

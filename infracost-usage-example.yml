@@ -1123,3 +1123,9 @@ resource_usage:
   azurerm_virtual_network_gateway.Basic:
     p2s_connection: 150 # Total number of p2s tunnels.
     monthly_data_transfer_gb: 1 # Monthly data transfer in GB.
+
+  ibm_is_instance.is_instance:
+      monthly_instance_hours: 730 # Monthly number of hours an instance runs
+
+  ibm_is_vpc.testVpc:
+      monthly_data_egressed_gb: 5 # Monthly traffic leaving the VPC in GB
