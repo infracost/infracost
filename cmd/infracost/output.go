@@ -200,7 +200,7 @@ func shareCombinedRun(ctx *config.RunContext, combined output.Root, inputs []out
 	result, err := dashboardClient.AddRun(ctx, combined)
 	if err != nil {
 		log.Debugf("Error reporting run: %s", err)
-		log.Warnf("Failed to upload to Infracost Cloud.")
+		log.Warnf("Failed to upload to Infracost Cloud")
 	}
 
 	return result.RunID, result.ShareURL
