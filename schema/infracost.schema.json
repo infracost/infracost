@@ -168,7 +168,7 @@
         "vcsPipelineRunId": {
           "type": "string"
         },
-        "vcsPullRequestID": {
+        "vcsPullRequestId": {
           "type": "string"
         }
       },

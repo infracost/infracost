@@ -36,7 +36,7 @@ type ProjectMetadata struct {
 	VCSPullRequestURL    string `json:"vcsPullRequestUrl,omitempty"`
 	VCSPullRequestAuthor string `json:"vcsPullRequestAuthor,omitempty"`
 	VCSPipelineRunID     string `json:"vcsPipelineRunId,omitempty"`
-	VCSPullRequestID     string `json:"vcsPullRequestID,omitempty"`
+	VCSPullRequestID     string `json:"vcsPullRequestId,omitempty"`
 }
 
 func (m *ProjectMetadata) WorkspaceLabel() string {

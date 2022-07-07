@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/go-git/go-git/v5"
@@ -15,13 +16,6 @@ import (
 )
 
 var (
-	// envToProviderMap specifies unique env vars that determine the CI system being used and maps
-	// them to the corresponding function to find vcs metadata.
-	envToProviderMap = map[string]GetMetadataFunc{
-		"GITHUB_ACTIONS": getGithubMetadata,
-		"GITLAB_CI":      getGitlabMetadata,
-	}
-
 	StubMetadata = Metadata{
 		Branch: Branch{
 			Name: "stub-branch",
@@ -34,35 +28,65 @@ var (
 			Message:     "stub-message",
 		},
 	}
+
+	MetadataFetcher = newMetadataFetcher()
 )
 
-// GetMetadataFunc defines a function that fetches data for a given vcs implementation.
-type GetMetadataFunc func(path string) (Metadata, error)
+type keyMutex struct {
+	mutexes sync.Map // Zero value is empty and ready for use
+}
 
-// GetMetadata fetches vcs metadata for the given environment. GetMetadata will attempt to try and find
-// a GetMetadataFunc for the environment using env variables to determine the CI system. If GetMetadata
-// cannot determine the CI system it falls back to getting the metadata from the local git filesystem.
-func GetMetadata(path string) (Metadata, error) {
+func (m *keyMutex) Lock(key string) func() {
+	value, _ := m.mutexes.LoadOrStore(key, &sync.Mutex{})
+	mtx := value.(*sync.Mutex)
+	mtx.Lock()
+
+	return func() { mtx.Unlock() }
+}
+
+// metadataFetcher is an object designed to find metadata for different systems.
+// It is designed to be safe for parallelism. So interactions across branches and for different commits
+// will not affect other goroutines.
+type metadataFetcher struct {
+	mu *keyMutex
+}
+
+func newMetadataFetcher() *metadataFetcher {
+	return &metadataFetcher{
+		mu: &keyMutex{},
+	}
+}
+
+// Get fetches vcs metadata for the given environment.
+// It takes a path argument which should point to the filesystem directory for that should
+// be used as the VCS project. This is normally the path to the `.git` directory. If no `.git`
+// directory is found in path, Get will traverse parent directories to try and determine VCS metadata.
+//
+// Get also supplements base VCS metadata with CI specific data if it can be found.
+func (f *metadataFetcher) Get(path string) (Metadata, error) {
 	if isTest() {
 		return StubMetadata, nil
 	}
 
-	for e, f := range envToProviderMap {
-		_, ok := os.LookupEnv(e)
-		if ok {
-			return f(path)
-		}
+	_, ok := os.LookupEnv("GITHUB_ACTIONS")
+	if ok {
+		return f.getGithubMetadata(path)
 	}
 
-	return getLocalGitMetadata(path)
+	_, ok = os.LookupEnv("GITLAB_CI")
+	if ok {
+		return f.getGitlabMetadata(path)
+	}
+
+	return f.getLocalGitMetadata(path)
 }
 
 func isTest() bool {
 	return os.Getenv("INFRACOST_ENV") == "test" || strings.HasSuffix(os.Args[0], ".test")
 }
 
-func getGitlabMetadata(path string) (Metadata, error) {
-	m, err := getLocalGitMetadata(path)
+func (f *metadataFetcher) getGitlabMetadata(path string) (Metadata, error) {
+	m, err := f.getLocalGitMetadata(path)
 	if err != nil {
 		return m, fmt.Errorf("GitLab metadata error, could not fetch initial metadata from local git %w", err)
 	}
@@ -85,13 +109,13 @@ func getGitlabMetadata(path string) (Metadata, error) {
 	return m, nil
 }
 
-func getGithubMetadata(path string) (Metadata, error) {
+func (f *metadataFetcher) getGithubMetadata(path string) (Metadata, error) {
 	event, err := os.ReadFile(os.Getenv("GITHUB_EVENT_PATH"))
 	if err != nil {
 		return Metadata{}, fmt.Errorf("could not read the GitHub event file %w", err)
 	}
 
-	m, err := getLocalGitMetadata(path)
+	m, err := f.getLocalGitMetadata(path)
 	if err != nil {
 		return m, fmt.Errorf("GitHub metadata error, could not fetch initial metadata from local git %w", err)
 	}
@@ -123,12 +147,15 @@ func getGithubMetadata(path string) (Metadata, error) {
 
 		headRef := gjson.GetBytes(event, "pull_request.head.ref").String()
 		clonePath := fmt.Sprintf("/tmp/infracost-%s-%s", gjson.GetBytes(event, "repository.name").String(), headRef)
+		unlock := f.mu.Lock(clonePath)
 
 		// if the clone path already exists then let's just do a plain open. We might hit this
 		// if the user is running multiple Infracost commands on the head commit. We don't want
 		// to clone each time.
 		_, err = os.Stat(clonePath)
 		if err == nil {
+			unlock()
+
 			r, err = git.PlainOpen(clonePath)
 			if err != nil {
 				return Metadata{}, fmt.Errorf("could not open previously cloned path %w", err)
@@ -144,6 +171,8 @@ func getGithubMetadata(path string) (Metadata, error) {
 				SingleBranch: true,
 				Depth:        1,
 			})
+			unlock()
+
 			if err != nil {
 				return Metadata{}, fmt.Errorf("could not shallow clone GitHub repo to fetch commit information %w", err)
 			}
@@ -177,7 +206,7 @@ func getGithubMetadata(path string) (Metadata, error) {
 	return m, nil
 }
 
-func getLocalGitMetadata(path string) (Metadata, error) {
+func (f *metadataFetcher) getLocalGitMetadata(path string) (Metadata, error) {
 	r, err := git.PlainOpenWithOptions(path, &git.PlainOpenOptions{DetectDotGit: true})
 	if err != nil {
 		return Metadata{}, fmt.Errorf("could not open git directory to fetch metadata %w", err)

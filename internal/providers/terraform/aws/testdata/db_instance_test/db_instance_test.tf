@@ -101,8 +101,16 @@ resource "aws_db_instance" "oracle-se2" {
   engine         = "oracle-se2"
   instance_class = "db.t3.large"
 }
+resource "aws_db_instance" "oracle-se2-cdb" {
+  engine         = "oracle-se2-cdb"
+  instance_class = "db.t3.large"
+}
 resource "aws_db_instance" "oracle-ee" {
   engine         = "oracle-ee"
+  instance_class = "db.t3.large"
+}
+resource "aws_db_instance" "oracle-ee-cdb" {
+  engine         = "oracle-ee-cdb"
   instance_class = "db.t3.large"
 }
 resource "aws_db_instance" "sqlserver-ex" {

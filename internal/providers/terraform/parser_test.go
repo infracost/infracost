@@ -411,7 +411,7 @@ func TestParseJSONResources(t *testing.T) {
 	conf := parsed.Get("configuration.root_module")
 	vars := parsed.Get("variables")
 
-	p := NewParser(config.EmptyProjectContext(), true)
+	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}), true)
 
 	actual := p.parseJSONResources(false, nil, usage, parsed, providerConf, conf, vars)
 
@@ -479,7 +479,7 @@ func TestCreateResource(t *testing.T) {
 		},
 	}
 
-	p := NewParser(config.EmptyProjectContext(), true)
+	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}), true)
 
 	for _, test := range tests {
 		actual := p.createResource(test.data, nil)
@@ -658,7 +658,7 @@ func TestParseResourceData(t *testing.T) {
 		"module.module1.aws_nat_gateway.nat2": "eu-west-2",
 	}
 
-	p := NewParser(config.EmptyProjectContext(), true)
+	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}), true)
 	actual := p.parseResourceData(false, providerConf, planVals, conf, vars)
 
 	for k, v := range actual {
@@ -727,7 +727,7 @@ func TestParseReferences_plan(t *testing.T) {
 		}`,
 	}
 
-	p := NewParser(config.EmptyProjectContext(), true)
+	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}), true)
 	p.parseReferences(resData, conf)
 
 	assert.Equal(t, []*schema.ResourceData{vol1}, resData["aws_ebs_snapshot.snapshot1"].References("volume_id"))
@@ -767,7 +767,7 @@ func TestParseReferences_state(t *testing.T) {
 
 	conf := gjson.Result{}
 
-	p := NewParser(config.EmptyProjectContext(), true)
+	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}), true)
 	p.parseReferences(resData, conf)
 
 	assert.Equal(t, []*schema.ResourceData{vol1}, resData["aws_ebs_snapshot.snapshot1"].References("volume_id"))

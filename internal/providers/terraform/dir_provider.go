@@ -18,6 +18,7 @@ import (
 
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/credentials"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
 
@@ -172,7 +173,7 @@ func (p *DirProvider) LoadResources(usage map[string]*schema.UsageData) ([]*sche
 		metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
 		metadata.Type = p.Type()
 		p.AddMetadata(metadata)
-		name := schema.GenerateProjectName(metadata, p.ctx.ProjectConfig.Name, p.ctx.RunContext.Config.IsCloudEnabled())
+		name := schema.GenerateProjectName(metadata, p.ctx.ProjectConfig.Name, p.ctx.RunContext.IsCloudEnabled())
 
 		project := schema.NewProject(name, metadata)
 
@@ -403,8 +404,8 @@ func (p *DirProvider) runInit(opts *CmdOptions, spinner *ui.Spinner) error {
 }
 
 func (p *DirProvider) runRemotePlan(opts *CmdOptions, args []string) ([]byte, error) {
-	if p.TerraformCloudToken == "" && !checkCloudConfigSet() {
-		return []byte{}, ErrMissingCloudToken
+	if p.TerraformCloudToken == "" && !credentials.CheckCloudConfigSet() {
+		return []byte{}, credentials.ErrMissingCloudToken
 	}
 
 	stdout, err := Cmd(opts, args...)
@@ -428,10 +429,10 @@ func (p *DirProvider) runRemotePlan(opts *CmdOptions, args []string) ([]byte, er
 
 	token := p.TerraformCloudToken
 	if token == "" {
-		token = findCloudToken(host)
+		token = credentials.FindTerraformCloudToken(host)
 	}
 	if token == "" {
-		return []byte{}, ErrMissingCloudToken
+		return []byte{}, credentials.ErrMissingCloudToken
 	}
 
 	body, err := cloudAPI(host, fmt.Sprintf("/api/v2/runs/%s/plan", runID), token)
@@ -532,7 +533,7 @@ func (p *DirProvider) buildTerraformErr(err error, isInit bool) error {
 		msg += "\n\nYou have two options:\n"
 		msg += "1. Run `terraform workspace select your_workspace` first or set the TF_WORKSPACE environment variable.\n\n"
 		msg += fmt.Sprintf("2. Set --path to a Terraform plan JSON file. See %s for how to generate this.", ui.LinkString("https://infracost.io/troubleshoot"))
-	} else if errors.Is(err, ErrMissingCloudToken) || errors.Is(err, ErrInvalidCloudToken) || strings.HasPrefix(stderr, "Error: Required token could not be found") {
+	} else if errors.Is(err, credentials.ErrMissingCloudToken) || errors.Is(err, credentials.ErrInvalidCloudToken) || strings.HasPrefix(stderr, "Error: Required token could not be found") {
 		msg += "\n\nYou have two options:\n"
 		msg += "1. Run `terraform login` or set the INFRACOST_TERRAFORM_CLOUD_TOKEN environment variable.'\n\n"
 		msg += fmt.Sprintf("2. Set --path to a Terraform plan JSON file. See %s for how to generate this.", ui.LinkString("https://infracost.io/troubleshoot"))

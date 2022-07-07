@@ -20,6 +20,8 @@ resource_usage:
     additional_backup_storage_gb: 1000
   aws_db_instance.oracle-se2:
     additional_backup_storage_gb: 1000
+  aws_db_instance.oracle-se2-cdb:
+    additional_backup_storage_gb: 1000
   aws_db_instance.sqlserver-ex:
     additional_backup_storage_gb: 1000
   aws_db_instance.sqlserver-web:
