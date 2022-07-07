@@ -123,7 +123,8 @@ func TestBreakdownTerraformDirectoryWithDefaultVarFiles(t *testing.T) {
 			[]string{
 				"breakdown",
 				"--path", dir,
-				"--terraform-var-file", "input.tfvars",
+				"--terraform-var-file", "hcl.tfvars",
+				"--terraform-var-file", "hcl.tfvars.json",
 				"--terraform-var", "block2_ebs_volume_size=2000",
 				"--terraform-var", "block2_volume_type=io1",
 			},
