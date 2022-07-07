@@ -13,13 +13,19 @@ func getIbmContainerVpcWorkerPoolRegistryItem() *schema.RegistryItem {
 }
 
 func newIbmContainerVpcWorkerPool(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	var asd = d.Get("entitlement").String()
+	entitlement := false
+	if asd != "" {
+		entitlement = true
+	}
+
 	r := &ibm.IbmContainerVpcWorkerPool{
 		Address:     d.Address,
 		Region:      d.Get("region").String(),
 		Flavor:      d.Get("flavor").String(),
 		WorkerCount: d.Get("worker_count").Int(),
 		ZoneCount:   int64(len(d.Get("zones").Array())),
-		Entitlement: d.Get("entitlement").Bool(),
+		Entitlement: entitlement,
 	}
 	r.PopulateUsage(u)
 
