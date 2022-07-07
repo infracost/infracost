@@ -1482,8 +1482,8 @@ github.com/vmihailenco/tagparser v0.1.1/go.mod h1:OeAg3pn3UbLjkWt+rN9oFYB6u/cQgq
 github.com/vmware/govmomi v0.20.3/go.mod h1:URlwyTFZX72RmxtxuaFL2Uj3fD1JTvZdx59bHWk6aFU=
 github.com/willf/bitset v1.1.11-0.20200630133818-d5bec3311243/go.mod h1:RjeCKbqT1RxIR/KWY6phxZiaY1IyutSBfGjNPySAYV4=
 github.com/willf/bitset v1.1.11/go.mod h1:83CECat5yLh5zVOf4P1ErAgKA5UDvKtgyUABdr3+MjI=
-github.com/withfig/autocomplete-tools/packages/cobra v1.1.3 h1:toi+jQYY7SG/DRYZxP2U2VkFeCY+6FYLXEr8QR8VXzY=
-github.com/withfig/autocomplete-tools/packages/cobra v1.1.3/go.mod h1:RoXh7+7qknOXL65uTzdzE1mPxqcPwS7FLCE9K5GfmKo=
+github.com/withfig/autocomplete-tools/packages/cobra v1.2.0 h1:MzD3XeOOSO3mAjOPpF07jFteSKZxsRHvlIcAR9RQzKM=
+github.com/withfig/autocomplete-tools/packages/cobra v1.2.0/go.mod h1:RoXh7+7qknOXL65uTzdzE1mPxqcPwS7FLCE9K5GfmKo=
 github.com/xanzy/ssh-agent v0.2.1/go.mod h1:mLlQY/MoOhWBj+gOGMQkOeiEvkx+8pJSI+0Bx9h2kr4=
 github.com/xanzy/ssh-agent v0.3.0 h1:wUMzuKtKilRgBAD1sUb8gOwwRr2FGoBVumcjoOACClI=
 github.com/xanzy/ssh-agent v0.3.0/go.mod h1:3s9xbODqPuuhK9JV1R321M/FlMZSBvE5aY6eAcqrDh0=
