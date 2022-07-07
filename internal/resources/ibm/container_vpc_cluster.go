@@ -9,13 +9,18 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// ContainerVpcCluster struct represents <TODO: cloud service short description>.
+// ContainerVpcWorkerPool struct represents an IBM Gen2 VPC worker pool, IKS(Kubernetes) or ROKS(OpenShift), depending upon flavor.
+// IKS
+// Catalog: https://cloud.ibm.com/kubernetes/catalog/create - at infrastructure select VPC
+// Pricing: https://cloud.ibm.com/kubernetes/catalog/about/#pricing
+// Docs: https://cloud.ibm.com/docs/containers?topic=containers-getting-started
 //
-// <TODO: Add any important information about the resource and links to the
-// pricing pages or documentation that might be useful to developers in the future, e.g:>
+// ROKS
+// Catalog: https://cloud.ibm.com/kubernetes/catalog/create?platformType=openshift - at infrastructure select VPC
+// Pricing: https://cloud.ibm.com/kubernetes/catalog/about?platformType=openshift#pricing
+// Docs: https://cloud.ibm.com/docs/openshift?topic=openshift-getting-started
 //
-// Resource information: https://cloud.ibm.com/<PATH/TO/RESOURCE>/
-// Pricing information: https://cloud.ibm.com/<PATH/TO/PRICING>/
+// VPC Gen2 Flavors: https://cloud.ibm.com/docs/containers?topic=containers-vpc-gen2-flavors
 type ContainerVpcCluster struct {
 	Name                 string
 	VpcId                string
