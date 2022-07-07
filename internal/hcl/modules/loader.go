@@ -224,7 +224,11 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 	manifestModule.Dir = path.Clean(filepath.Join(moduleDownloadDir, submodulePath))
 
 	lookupResult, err := m.registryLoader.lookupModule(moduleAddr, moduleCall.Version)
-	if err == nil {
+	if err != nil {
+		return nil, fmt.Errorf("error looking up registry module %s: %w", key, err)
+	}
+
+	if lookupResult.OK {
 		err = m.registryLoader.downloadModule(lookupResult, dest)
 		if err != nil {
 			return nil, fmt.Errorf("Failed to download registry module %s: %w", key, err)
@@ -238,7 +242,7 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 		return manifestModule, nil
 	}
 
-	log.Debugf("Module %s not recognized as registry module, treating as remote module: %s", key, err.Error())
+	log.Debugf("Detected %s as remote module", key)
 	log.Debugf("Downloading module %s from remote %s", key, moduleCall.Source)
 
 	err = m.packageFetcher.fetch(moduleAddr, dest)

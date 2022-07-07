@@ -67,7 +67,7 @@ func (c *Cache) lookupModule(key string, moduleCall *tfconfig.ModuleCall) (*Mani
 		return checkVersion(moduleCall, manifestModule)
 	}
 
-	url, err := c.disco.ModuleLocation(moduleCall.Source)
+	url, _, err := c.disco.ModuleLocation(moduleCall.Source)
 	if err != nil {
 		log.Debugf("could not fetch module location from source err: %s. Proceeding as if source has changed.", err)
 	}

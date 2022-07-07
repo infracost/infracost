@@ -29,6 +29,7 @@ var moduleServiceID = "modules.v1"
 // RegistryLookupResult is returned when looking up the module to check if it exists in the registry
 // and has a matching version
 type RegistryLookupResult struct {
+	OK        bool
 	ModuleURL RegistryURL
 	Version   string
 }
@@ -56,19 +57,20 @@ func NewDisco(credentialsSource auth.CredentialsSource) Disco {
 }
 
 // ModuleLocation performs a discovery lookup for the given source and returns a RegistryURL with the real
-// url of the module source and any required Credential information.
-func (d Disco) ModuleLocation(source string) (RegistryURL, error) {
+// url of the module source and any required Credential information. It returns false if the module location
+// is not recognised as a registry module.
+func (d Disco) ModuleLocation(source string) (RegistryURL, bool, error) {
 	// So we expect them to only have 3 or 4 parts depending on if they explicitly specify the registry
 	parts := strings.Split(source, "/")
 	if len(parts) != 4 {
-		return RegistryURL{}, fmt.Errorf("registry module source %s is not in the correct format", source)
+		return RegistryURL{}, false, fmt.Errorf("registry module source %s is not in the correct format", source)
 	}
 
 	host, namespace, moduleName, target := parts[0], parts[1], parts[2], parts[3]
 
 	serviceURL, err := d.disco.DiscoverServiceURL(svchost.Hostname(host), moduleServiceID)
 	if err != nil {
-		return RegistryURL{}, fmt.Errorf("unable to discover registry service using host %s %w", host, err)
+		return RegistryURL{}, false, fmt.Errorf("unable to discover registry service using host %s %w", host, err)
 	}
 
 	r := RegistryURL{
@@ -79,11 +81,11 @@ func (d Disco) ModuleLocation(source string) (RegistryURL, error) {
 
 	c, err := d.disco.CredentialsForHost(svchost.Hostname(host))
 	if err != nil {
-		return r, fmt.Errorf("unable to retrieve credentials for registry host %s %w", host, err)
+		return r, true, fmt.Errorf("unable to retrieve credentials for registry host %s %w", host, err)
 	}
 
 	r.Credentials = c
-	return r, nil
+	return r, true, nil
 }
 
 func (d Disco) DownloadLocation(moduleURL RegistryURL, version string) (string, error) {
@@ -156,12 +158,23 @@ func NewRegistryLoader(packageFetcher *PackageFetcher, disco Disco) *RegistryLoa
 func (r *RegistryLoader) lookupModule(moduleAddr string, versionConstraints string) (*RegistryLookupResult, error) {
 	registrySource, err := normalizeRegistrySource(moduleAddr)
 	if err != nil {
-		return nil, err
+		log.Debugf("module '%s' not detected as registry module: %s", moduleAddr, err)
+		return &RegistryLookupResult{
+			OK: false,
+		}, nil
 	}
 
-	moduleURL, err := r.disco.ModuleLocation(registrySource)
+	moduleURL, ok, err := r.disco.ModuleLocation(registrySource)
+	if !ok {
+		if err != nil {
+			log.Debugf("module '%s' not detected as registry module: %s", moduleAddr, err)
+		}
+		return &RegistryLookupResult{
+			OK: false,
+		}, nil
+	}
 	if err != nil {
-		return nil, fmt.Errorf("could not fetch registry module location %w", err)
+		return nil, fmt.Errorf("failed to load remote module from given source %s and version constraints %s %w", moduleAddr, versionConstraints, err)
 	}
 
 	versions, err := r.fetchModuleVersions(moduleURL)
@@ -179,6 +192,7 @@ func (r *RegistryLoader) lookupModule(moduleAddr string, versionConstraints stri
 	}
 
 	return &RegistryLookupResult{
+		OK:        true,
 		ModuleURL: moduleURL,
 		Version:   matchingVersion,
 	}, nil
