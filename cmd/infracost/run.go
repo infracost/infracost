@@ -150,7 +150,8 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	dashboardClient := apiclient.NewDashboardAPIClient(runCtx)
 	result, err := dashboardClient.AddRun(runCtx, r)
 	if err != nil {
-		log.Errorf("Error reporting run: %s", err)
+		log.Debugf("Error reporting run: %s", err)
+		log.Warnf("Failed to upload to Infracost Cloud.")
 	}
 
 	r.RunID, r.ShareURL = result.RunID, result.ShareURL
