@@ -174,7 +174,7 @@ func (r *RegistryLoader) lookupModule(moduleAddr string, versionConstraints stri
 		}, nil
 	}
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to load remote module from given source %s and version constraints %s %w", moduleAddr, versionConstraints, err)
 	}
 
 	versions, err := r.fetchModuleVersions(moduleURL)
