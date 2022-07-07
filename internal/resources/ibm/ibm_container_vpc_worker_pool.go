@@ -56,16 +56,21 @@ func (r *IbmContainerVpcWorkerPool) BuildResource() *schema.Resource {
 			Key: "ocpIncluded", Value: strPtr(""),
 		})
 	}
-	var quantity *decimal.Decimal
-	if r.MonthlyInstanceHours != nil {
-		quantity = decimalPtr(decimal.NewFromFloat(*r.MonthlyInstanceHours))
+	WorkerCount := int64(1)
+	if r.WorkerCount != 0 {
+		WorkerCount = r.WorkerCount
 	}
+	ZoneCount := int64(1)
+	if r.ZoneCount != 0 {
+		ZoneCount = r.ZoneCount
+	}
+	hourlyQuantity := WorkerCount * ZoneCount
+
 	costComponents := []*schema.CostComponent{{
-		Name:            fmt.Sprintf("VPC Container Workpool flavor: (%s) region: (%s) workers X zones: (%d) x (%d)", r.Flavor, r.Region, r.WorkerCount, r.ZoneCount),
-		Unit:            "hours",
-		UnitMultiplier:  decimal.NewFromInt(1),
-		HourlyQuantity:  decimalPtr(decimal.NewFromInt(1 * r.WorkerCount * r.ZoneCount)),
-		MonthlyQuantity: quantity,
+		Name:           fmt.Sprintf("VPC Container Workpool flavor: (%s) region: (%s) workers x zones: (%d) x (%d)", r.Flavor, r.Region, r.WorkerCount, r.ZoneCount),
+		Unit:           "hours",
+		UnitMultiplier: decimal.NewFromInt(1),
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(hourlyQuantity)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:       strPtr("ibm"),
 			Region:           strPtr(r.Region),

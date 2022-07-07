@@ -1129,3 +1129,6 @@ resource_usage:
 
   ibm_is_vpc.testVpc:
       monthly_data_egressed_gb: 5 # Monthly traffic leaving the VPC in GB
+
+  ibm_container_vpc_worker_pol.test_vpc_worker_pool:
+      monthly_data_egressed_gb: 730 # Monthly number of hours a worker pool runs
