@@ -16,10 +16,14 @@ import (
 type IbmIsVpc struct {
 	Address string
 	Region  string
+
+	GigabyteTransmittedOutbounds *float64 `infracost_usage:"gigabyte_transmitted_outbounds"`
 }
 
 // IbmIsVpcUsageSchema defines a list which represents the usage schema of IbmIsVpc.
-var IbmIsVpcUsageSchema = []*schema.UsageItem{}
+var IbmIsVpcUsageSchema = []*schema.UsageItem{
+	{Key: "gigabyte_transmitted_outbounds", DefaultValue: 0, ValueType: schema.Float64},
+}
 
 // PopulateUsage parses the u schema.UsageData into the IbmIsVpc.
 // It uses the `infracost_usage` struct tags to populate data into the IbmIsVpc.
@@ -29,16 +33,19 @@ func (r *IbmIsVpc) PopulateUsage(u *schema.UsageData) {
 
 // @TODO: add/find a '$0' entry in pricing db to allow zero dollar cost components to show up in breakdown
 func (r *IbmIsVpc) vpcCostComponent() *schema.CostComponent {
+	var quantity *decimal.Decimal
+	if r.GigabyteTransmittedOutbounds != nil {
+		quantity = decimalPtr(decimal.NewFromFloat(*r.GigabyteTransmittedOutbounds))
+	}
 	return &schema.CostComponent{
-		Name:            fmt.Sprintf("VPC %s", r.Region),
-		Unit:            "Instance",
+		Name:            fmt.Sprintf("VPC egress %s", r.Region),
+		Unit:            "Gigabyte",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		HourlyQuantity:  decimalPtr(decimal.NewFromInt(1)),
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("ibm"),
 			Region:     strPtr(r.Region),
-			Service:    strPtr("free"),
+			Service:    strPtr("is.vpc"),
 		},
 	}
 }

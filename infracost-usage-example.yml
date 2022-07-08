@@ -1128,7 +1128,7 @@ resource_usage:
     monthly_instance_hours: 730 # Monthly number of hours an instance runs
 
   ibm_is_vpc.testVpc:
-    monthly_data_egressed_gb: 5 # Monthly traffic leaving the VPC in GB
+    gigabyte_transmitted_outbounds: 5 # Monthly traffic leaving the VPC in GB
 
   ibm_container_vpc_worker_pool.cluster_pool:
     monthly_instance_hours: 730

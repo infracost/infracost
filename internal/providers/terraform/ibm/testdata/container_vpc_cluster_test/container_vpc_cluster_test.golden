@@ -1,15 +1,14 @@
 
- Name                                                                                        Monthly Qty  Unit      Monthly Cost 
-                                                                                                                                 
- ibm_is_vpc.vpc1                                                                                                                 
- └─ VPC us-south                                                                                       1  Instance         $0.00 
-                                                                                                                                 
- mycluster                                                                                                                       
- └─ VPC Container Workpool flavor: (bx2.4x16) region: (us-south) workers x zones: (3) x (1)        2,190  hours          $565.42 
-                                                                                                                                 
- OVERALL TOTAL                                                                                                           $565.42 
+ Name                                                                                        Monthly Qty  Unit   Monthly Cost 
+                                                                                                                              
+ mycluster                                                                                                                    
+ └─ VPC Container Workpool flavor: (bx2.4x16) region: (us-south) workers x zones: (3) x (1)        2,190  hours       $565.42 
+                                                                                                                              
+ OVERALL TOTAL                                                                                                        $565.42 
 ──────────────────────────────────
 4 cloud resources were detected:
-∙ 2 were estimated, 1 of which usage-based costs, see https://infracost.io/usage-file
+∙ 1 was estimated
 ∙ 2 were free:
   ∙ 2 x ibm_is_subnet
+∙ 1 is not supported yet, see https://infracost.io/requested-resources:
+  ∙ 1 x ibm_is_vpc
