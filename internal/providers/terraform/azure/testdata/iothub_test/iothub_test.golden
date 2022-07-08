@@ -1,0 +1,15 @@
+
+ Name                         Monthly Qty  Unit           Monthly Cost 
+                                                                       
+ azurerm_iothub.example                                                
+ └─ Instance (on-demand, F1)            1  month                 $0.00 
+                                                                       
+ azurerm_iothub_dps.example                                            
+ └─ Instance (on-demand, S1)           20  1k operations         $2.00 
+                                                                       
+ OVERALL TOTAL                                                   $2.00 
+──────────────────────────────────
+3 cloud resources were detected:
+∙ 2 were estimated
+∙ 1 was free:
+  ∙ 1 x azurerm_resource_group
