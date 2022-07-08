@@ -1,10 +1,11 @@
 
- Name                                                                                        Monthly Qty  Unit   Monthly Cost 
-                                                                                                                              
- mycluster                                                                                                                    
- └─ VPC Container Workpool flavor: (bx2.4x16) region: (us-south) workers x zones: (3) x (1)        2,190  hours       $565.42 
-                                                                                                                              
- OVERALL TOTAL                                                                                                        $565.42 
+ Name                                                                                              Monthly Qty  Unit   Monthly Cost 
+                                                                                                                                    
+ mycluster                                                                                                                          
+ ├─ VPC Container Work Zone flavor: (bx2.4x16) region: (us-south) name: (us-south-1) x(3) workers        2,190  hours       $565.42 
+ └─ VPC Container Work Zone flavor: (bx2.4x16) region: (us-south) name: (us-south-2) x(3) workers        2,190  hours       $565.42 
+                                                                                                                                    
+ OVERALL TOTAL                                                                                                            $1,130.83 
 ──────────────────────────────────
 4 cloud resources were detected:
 ∙ 1 was estimated

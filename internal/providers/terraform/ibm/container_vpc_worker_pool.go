@@ -24,14 +24,17 @@ func newContainerVpcWorkerPool(d *schema.ResourceData, u *schema.UsageData) *sch
 	if entitlement_str != "" {
 		entitlement = true
 	}
-
+	zones := make([]ibm.Zone, 0)
+	for _, a := range d.Get("zones").Array() {
+		zones = append(zones, ibm.Zone{Name: a.Get("name").String()})
+	}
 	r := &ibm.ContainerVpcWorkerPool{
 		Address:     d.Address,
 		Region:      d.Get("region").String(),
 		KubeVersion: kubeVersion,
 		Flavor:      d.Get("flavor").String(),
 		WorkerCount: d.Get("worker_count").Int(),
-		ZoneCount:   int64(len(d.Get("zones").Array())),
+		Zones:       zones,
 		Entitlement: entitlement,
 	}
 	r.PopulateUsage(u)

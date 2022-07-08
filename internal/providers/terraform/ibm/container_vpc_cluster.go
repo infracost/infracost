@@ -18,6 +18,10 @@ func newContainerVpcCluster(d *schema.ResourceData, u *schema.UsageData) *schema
 	if entitlement_str != "" {
 		entitlement = true
 	}
+	zones := make([]ibm.Zone, 0)
+	for _, a := range d.Get("zones").Array() {
+		zones = append(zones, ibm.Zone{Name: a.Get("name").String()})
+	}
 	r := &ibm.ContainerVpcCluster{
 		Name:        d.Get("name").String(),
 		VpcId:       d.Get("vpc_id").String(),
@@ -25,7 +29,7 @@ func newContainerVpcCluster(d *schema.ResourceData, u *schema.UsageData) *schema
 		Flavor:      d.Get("flavor").String(),
 		WorkerCount: d.Get("worker_count").Int(),
 		Region:      d.Get("region").String(),
-		ZoneCount:   int64(len(d.Get("zones").Array())),
+		Zones:       zones,
 		Entitlement: entitlement,
 	}
 	r.PopulateUsage(u)

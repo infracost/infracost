@@ -27,7 +27,7 @@ type ContainerVpcWorkerPool struct {
 	KubeVersion          string
 	Flavor               string
 	WorkerCount          int64
-	ZoneCount            int64
+	Zones                []Zone
 	Entitlement          bool
 	MonthlyInstanceHours *float64 `infracost_usage:"monthly_instance_hours"`
 }
@@ -50,7 +50,7 @@ func (r *ContainerVpcWorkerPool) BuildResource() *schema.Resource {
 	isOpenshift := strings.HasSuffix(strings.ToLower(r.KubeVersion), "openshift")
 	operatingSystem := "UBUNTU"
 	if isOpenshift {
-		operatingSystem = "RHEL"
+		operatingSystem = "REDHAT"
 	}
 	var attributeFilters = []*schema.AttributeFilter{
 		{Key: "provider", Value: strPtr("vpc-gen2")},
@@ -69,28 +69,35 @@ func (r *ContainerVpcWorkerPool) BuildResource() *schema.Resource {
 			Key: "ocpIncluded", Value: strPtr(""),
 		})
 	}
-	WorkerCount := int64(1)
+	WorkerCount := decimalPtr(decimal.NewFromInt(1))
 	if r.WorkerCount != 0 {
-		WorkerCount = r.WorkerCount
+		WorkerCount = decimalPtr(decimal.NewFromInt(r.WorkerCount))
 	}
-	ZoneCount := int64(1)
-	if r.ZoneCount != 0 {
-		ZoneCount = r.ZoneCount
-	}
-	hourlyQuantity := WorkerCount * ZoneCount
 
-	costComponents := []*schema.CostComponent{{
-		Name:           fmt.Sprintf("VPC Container Workpool flavor: (%s) region: (%s) workers x zones: (%d) x (%d)", r.Flavor, r.Region, r.WorkerCount, r.ZoneCount),
-		Unit:           "hours",
-		UnitMultiplier: decimal.NewFromInt(1),
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(hourlyQuantity)),
-		ProductFilter: &schema.ProductFilter{
-			VendorName:       strPtr("ibm"),
-			Region:           strPtr(r.Region),
-			Service:          strPtr("containers-kubernetes"),
-			AttributeFilters: attributeFilters,
-		},
-	}}
+	var instanceHours *decimal.Decimal
+	if r.MonthlyInstanceHours != nil {
+		instanceHours = decimalPtr(decimal.NewFromFloat(*r.MonthlyInstanceHours))
+	}
+
+	quantity := WorkerCount.Mul(*instanceHours)
+
+	costComponents := []*schema.CostComponent{}
+
+	for _, zone := range r.Zones {
+		zoneCostComponent := &schema.CostComponent{
+			Name:            fmt.Sprintf("VPC Container Work Zone flavor: (%s) region: (%s) name: (%s) x(%d) workers", r.Flavor, r.Region, zone.Name, r.WorkerCount),
+			Unit:            "hours",
+			UnitMultiplier:  decimal.NewFromInt(1),
+			MonthlyQuantity: decimalPtr(quantity),
+			ProductFilter: &schema.ProductFilter{
+				VendorName:       strPtr("ibm"),
+				Region:           strPtr("us-south"),
+				Service:          strPtr("containers-kubernetes"),
+				AttributeFilters: attributeFilters,
+			},
+		}
+		costComponents = append(costComponents, zoneCostComponent)
+	}
 
 	return &schema.Resource{
 		Name:           r.Address,
