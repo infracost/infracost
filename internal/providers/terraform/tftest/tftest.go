@@ -208,6 +208,10 @@ func GoldenFileResourceTestsWithOpts(t *testing.T, testName string, options *Gol
 	})
 }
 
+func GoldenFileHCLResourceTestsWithOpts(t *testing.T, testName string, options *GoldenFileOptions) {
+	goldenFileResourceTestWithOpts(t, "hcl", testName, options)
+}
+
 func goldenFileResourceTestWithOpts(t *testing.T, pName string, testName string, options *GoldenFileOptions) {
 	t.Helper()
 
