@@ -75,8 +75,6 @@ func Run(modifyCtx func(*config.RunContext), args *[]string) {
 
 	startUpdateCheck(ctx, updateMessageChan)
 
-	loadCloudSettings(ctx)
-
 	rootCmd := newRootCmd(ctx)
 	if args != nil {
 		rootCmd.SetArgs(*args)
@@ -111,7 +109,12 @@ func newRootCmd(ctx *config.RunContext) *cobra.Command {
 			if cmd.Name() == "comment" || (cmd.Parent() != nil && cmd.Parent().Name() == "comment") {
 				ctx.SetIsInfracostComment()
 			}
-			return loadGlobalFlags(ctx, cmd)
+			err := loadGlobalFlags(ctx, cmd)
+			if err != nil {
+				return err
+			}
+			loadCloudSettings(ctx)
+			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Show the help
