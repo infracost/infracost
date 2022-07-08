@@ -138,7 +138,7 @@ Key: ~ changed, + added, - removed
 This comment will be updated when the cost estimate changes.
 
 <sub>
-  Is this comment useful? <a href="https://www.infracost.io/feedback/submit/?value=yes" rel="noopener noreferrer" target="_blank">Yes</a>, <a href="https://www.infracost.io/feedback/submit/?value=no" rel="noopener noreferrer" target="_blank">No</a>
+  Is this comment useful? <a href="https://dashboard.infracost.io/feedback/redirect?runId=&value=yes" rel="noopener noreferrer" target="_blank">Yes</a>, <a href="https://dashboard.infracost.io/feedback/redirect?runId=&value=no" rel="noopener noreferrer" target="_blank">No</a>, <a href="https://dashboard.infracost.io/feedback/redirect?runId=&value=other" rel="noopener noreferrer" target="_blank">Other</a>
 </sub>
 
 Comment not posted to GitLab (--dry-run was specified)

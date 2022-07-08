@@ -8,12 +8,12 @@ require (
 	github.com/Masterminds/sprig v2.22.0+incompatible
 	github.com/Rhymond/go-money v1.0.7
 	github.com/aws/aws-sdk-go-v2 v1.16.7
-	github.com/aws/aws-sdk-go-v2/config v1.15.4
+	github.com/aws/aws-sdk-go-v2/config v1.15.13
 	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.23.5
-	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.18.3
+	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.18.6
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.15.9
-	github.com/aws/aws-sdk-go-v2/service/ec2 v1.37.0
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.26.7
+	github.com/aws/aws-sdk-go-v2/service/ec2 v1.47.2
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.27.1
 	github.com/awslabs/goformation/v4 v4.19.5
 	github.com/briandowns/spinner v1.15.0
 	github.com/dave/dst v0.27.0
@@ -55,21 +55,21 @@ require (
 
 require (
 	github.com/agext/levenshtein v1.2.3 // indirect
-	github.com/aws/aws-sdk-go-v2/credentials v1.12.0 // indirect
-	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.12.4 // indirect
+	github.com/aws/aws-sdk-go-v2/credentials v1.12.8 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.12.8 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.14 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.11 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.15 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.9.3 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.7.8 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.4 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.13.4 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sso v1.11.4 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sts v1.16.4 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.8 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.13.8 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.11.11 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sts v1.16.9 // indirect
 	github.com/aws/smithy-go v1.12.0 // indirect
 	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/hashicorp/hcl v1.0.1-vault // indirect
-	github.com/hashicorp/hcl/v2 v2.12.0
+	github.com/hashicorp/hcl/v2 v2.13.0
 	github.com/imdario/mergo v0.3.12 // indirect
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
@@ -90,7 +90,7 @@ require (
 )
 
 require (
-	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.1 // indirect
+	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.4.3 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.4.8 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
 	golang.org/x/sync v0.0.0-20220601150217-0de741cfad7f
@@ -106,7 +106,7 @@ require (
 	github.com/pulumi/pulumi/sdk/v3 v3.35.2-0.20220627140806-a5687d16a9d9
 	github.com/shurcooL/githubv4 v0.0.0-20220115235240-a14260e6f8a2
 	github.com/shurcooL/graphql v0.0.0-20200928012149-18c5c3165e3a
-	github.com/withfig/autocomplete-tools/packages/cobra v1.1.3
+	github.com/withfig/autocomplete-tools/packages/cobra v1.2.0
 	golang.org/x/oauth2 v0.0.0-20211104180415-d3ed0bb246c8
 )
 
@@ -128,8 +128,8 @@ require (
 	github.com/acomagu/bufpipe v1.0.3 // indirect
 	github.com/aead/chacha20 v0.0.0-20180709150244-8b13a72661da // indirect
 	github.com/agnivade/levenshtein v1.0.1 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/v4a v1.0.1 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.1.5 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/v4a v1.0.5 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.1.9 // indirect
 	github.com/blang/semver v3.5.1+incompatible // indirect
 	github.com/cheggaaa/pb v1.0.27 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.1 // indirect
