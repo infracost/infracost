@@ -79,7 +79,7 @@ func (r *ContainerVpcCluster) BuildResource() *schema.Resource {
 		WorkerCount = decimalPtr(decimal.NewFromInt(r.WorkerCount))
 	}
 
-	var instanceHours *decimal.Decimal
+	instanceHours := decimalPtr(decimal.NewFromInt(1))
 	if r.MonthlyInstanceHours != nil {
 		instanceHours = decimalPtr(decimal.NewFromFloat(*r.MonthlyInstanceHours))
 	}
