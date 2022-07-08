@@ -134,6 +134,13 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (Ad
 		return response, err
 	}
 
+	successMsg := "Estimate uploaded to Infracost Cloud"
+	if ctx.Config.IsLogging() {
+		log.Info(successMsg)
+	} else {
+		fmt.Fprintf(ctx.ErrWriter, "%s\n", successMsg)
+	}
+
 	if len(results) > 0 {
 
 		if results[0].Get("errors").Exists() {
