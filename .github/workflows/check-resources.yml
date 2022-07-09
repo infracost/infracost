@@ -1,3 +1,5 @@
+name: check-resources
+
 on:
   schedule:
     - cron: "0 8 * * *" # every day at 8am
@@ -7,9 +9,9 @@ jobs:
     name: Check resources
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Go 1.x
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
           go-version: 1.18
       - name: Configure AWS Credentials
