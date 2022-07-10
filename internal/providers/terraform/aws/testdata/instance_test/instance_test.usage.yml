@@ -81,10 +81,10 @@ resource_usage:
     vcpu_count: 2
 
   aws_instance.instance_withMonthlyHours:
-    monthly_hours: 100
+    monthly_hrs: 100
 
   aws_instance.instance_ebsOptimized_withMonthlyHours:
-    monthly_hours: 100
+    monthly_hrs: 100
 
   aws_instance.instance_detailedMonitoring_withMonthlyHours:
-    monthly_hours: 100
+    monthly_hrs: 100

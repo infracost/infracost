@@ -34,7 +34,7 @@ func NewAzureRMVirtualMachine(d *schema.ResourceData, u *schema.UsageData) *sche
 
 	var monthlyHours *int64 = nil
 	if u != nil {
-		monthlyHours = u.GetInt("monthly_hours")
+		monthlyHours = u.GetInt("monthly_hrs")
 	}
 
 	if strings.ToLower(os) == "windows" {

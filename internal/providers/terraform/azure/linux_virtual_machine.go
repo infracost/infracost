@@ -27,7 +27,7 @@ func NewAzureRMLinuxVirtualMachine(d *schema.ResourceData, u *schema.UsageData) 
 
 	var monthlyHours *int64 = nil
 	if u != nil {
-		monthlyHours = u.GetInt("monthly_hours")
+		monthlyHours = u.GetInt("monthly_hrs")
 	}
 
 	costComponents := []*schema.CostComponent{linuxVirtualMachineCostComponent(region, instanceType, monthlyHours)}

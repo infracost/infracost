@@ -39,7 +39,7 @@ type Instance struct {
 	ReservedInstancePaymentOption *string `infracost_usage:"reserved_instance_payment_option"`
 	MonthlyCPUCreditHours         *int64  `infracost_usage:"monthly_cpu_credit_hrs"`
 	VCPUCount                     *int64  `infracost_usage:"vcpu_count"`
-	MonthlyHours                  *int64  `infracost_usage:"monthly_hours"`
+	MonthlyHours                  *int64  `infracost_usage:"monthly_hrs"`
 }
 
 var InstanceUsageSchema = []*schema.UsageItem{
@@ -49,7 +49,7 @@ var InstanceUsageSchema = []*schema.UsageItem{
 	{Key: "reserved_instance_payment_option", DefaultValue: "", ValueType: schema.String},
 	{Key: "monthly_cpu_credit_hrs", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "vcpu_count", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_hours", DefaultValue: 730, ValueType: schema.Int64},
+	{Key: "monthly_hrs", DefaultValue: 730, ValueType: schema.Int64},
 }
 
 func (a *Instance) PopulateUsage(u *schema.UsageData) {

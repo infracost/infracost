@@ -19,12 +19,12 @@ type ComputeInstance struct {
 	ScratchDisks      int
 	GuestAccelerators []*ComputeGuestAccelerator
 
-	MonthlyHours *int64 `infracost_usage:"monthly_hours"`
+	MonthlyHours *int64 `infracost_usage:"monthly_hrs"`
 }
 
 // ComputeInstanceUsageSchema defines a list which represents the usage schema of ComputeInstance.
 var ComputeInstanceUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_hours", DefaultValue: 730, ValueType: schema.Int64},
+	{Key: "monthly_hrs", DefaultValue: 730, ValueType: schema.Int64},
 }
 
 // PopulateUsage parses the u schema.UsageData into the ComputeInstance.

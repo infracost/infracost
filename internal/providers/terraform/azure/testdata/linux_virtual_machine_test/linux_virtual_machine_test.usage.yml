@@ -4,4 +4,4 @@ resource_usage:
     os_disk:
       monthly_disk_operations: 20000
   azurerm_linux_virtual_machine.basic_b1_withMonthlyHours:
-    monthly_hours: 100
+    monthly_hrs: 100
