@@ -33,13 +33,13 @@ type Instance struct {
 	EBSBlockDevices                 []*EBSVolume
 
 	// "usage" args
-	OperatingSystem               *string `infracost_usage:"operating_system"`
-	ReservedInstanceType          *string `infracost_usage:"reserved_instance_type"`
-	ReservedInstanceTerm          *string `infracost_usage:"reserved_instance_term"`
-	ReservedInstancePaymentOption *string `infracost_usage:"reserved_instance_payment_option"`
-	MonthlyCPUCreditHours         *int64  `infracost_usage:"monthly_cpu_credit_hrs"`
-	VCPUCount                     *int64  `infracost_usage:"vcpu_count"`
-	MonthlyHours                  *int64  `infracost_usage:"monthly_hrs"`
+	OperatingSystem               *string  `infracost_usage:"operating_system"`
+	ReservedInstanceType          *string  `infracost_usage:"reserved_instance_type"`
+	ReservedInstanceTerm          *string  `infracost_usage:"reserved_instance_term"`
+	ReservedInstancePaymentOption *string  `infracost_usage:"reserved_instance_payment_option"`
+	MonthlyCPUCreditHours         *int64   `infracost_usage:"monthly_cpu_credit_hrs"`
+	VCPUCount                     *int64   `infracost_usage:"vcpu_count"`
+	MonthlyHours                  *float64 `infracost_usage:"monthly_hrs"`
 }
 
 var InstanceUsageSchema = []*schema.UsageItem{
@@ -49,7 +49,7 @@ var InstanceUsageSchema = []*schema.UsageItem{
 	{Key: "reserved_instance_payment_option", DefaultValue: "", ValueType: schema.String},
 	{Key: "monthly_cpu_credit_hrs", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "vcpu_count", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_hrs", DefaultValue: 730, ValueType: schema.Int64},
+	{Key: "monthly_hrs", DefaultValue: 730, ValueType: schema.Float64},
 }
 
 func (a *Instance) PopulateUsage(u *schema.UsageData) {
@@ -175,9 +175,9 @@ func (a *Instance) computeCostComponent() *schema.CostComponent {
 		purchaseOptionLabel = "reserved"
 	}
 
-	qty := decimal.NewFromInt(730)
+	qty := decimal.NewFromFloat(730)
 	if a.MonthlyHours != nil {
-		qty = decimal.NewFromInt(*a.MonthlyHours)
+		qty = decimal.NewFromFloat(*a.MonthlyHours)
 	}
 
 	return &schema.CostComponent{
@@ -215,9 +215,9 @@ func (a *Instance) ebsOptimizedCostComponent() *schema.CostComponent {
 	 *    > The hourly price for EBS-optimized instances is in addition to the hourly usage fee
 	 *    > for supported instance types.
 	 */
-	qty := decimal.NewFromInt(730)
+	qty := decimal.NewFromFloat(730)
 	if a.MonthlyHours != nil {
-		qty = decimal.NewFromInt(*a.MonthlyHours)
+		qty = decimal.NewFromFloat(*a.MonthlyHours)
 	}
 
 	return &schema.CostComponent{
@@ -266,9 +266,9 @@ func (a *Instance) elasticInferenceAcceleratorCostComponent() *schema.CostCompon
 	 *    > With Amazon Elastic Inference, you pay only for the accelerator hours you use.
 	 *    > There are no upfront costs or minimum fees.
 	 */
-	qty := decimal.NewFromInt(730)
+	qty := decimal.NewFromFloat(730)
 	if a.MonthlyHours != nil {
-		qty = decimal.NewFromInt(*a.MonthlyHours)
+		qty = decimal.NewFromFloat(*a.MonthlyHours)
 	}
 
 	return &schema.CostComponent{

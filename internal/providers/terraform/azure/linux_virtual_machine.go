@@ -25,9 +25,9 @@ func NewAzureRMLinuxVirtualMachine(d *schema.ResourceData, u *schema.UsageData) 
 
 	instanceType := d.Get("size").String()
 
-	var monthlyHours *int64 = nil
+	var monthlyHours *float64 = nil
 	if u != nil {
-		monthlyHours = u.GetInt("monthly_hrs")
+		monthlyHours = u.GetFloat("monthly_hrs")
 	}
 
 	costComponents := []*schema.CostComponent{linuxVirtualMachineCostComponent(region, instanceType, monthlyHours)}
@@ -50,7 +50,7 @@ func NewAzureRMLinuxVirtualMachine(d *schema.ResourceData, u *schema.UsageData) 
 	}
 }
 
-func linuxVirtualMachineCostComponent(region string, instanceType string, monthlyHours *int64) *schema.CostComponent {
+func linuxVirtualMachineCostComponent(region string, instanceType string, monthlyHours *float64) *schema.CostComponent {
 	purchaseOption := "Consumption"
 	purchaseOptionLabel := "pay as you go"
 
@@ -61,9 +61,9 @@ func linuxVirtualMachineCostComponent(region string, instanceType string, monthl
 		instanceType = fmt.Sprintf("Standard_%s", instanceType)
 	}
 
-	qty := decimal.NewFromInt(730)
+	qty := decimal.NewFromFloat(730)
 	if monthlyHours != nil {
-		qty = decimal.NewFromInt(*monthlyHours)
+		qty = decimal.NewFromFloat(*monthlyHours)
 	}
 
 	return &schema.CostComponent{

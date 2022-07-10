@@ -24,9 +24,9 @@ func NewAzureRMWindowsVirtualMachine(d *schema.ResourceData, u *schema.UsageData
 	instanceType := d.Get("size").String()
 	licenseType := d.Get("license_type").String()
 
-	var monthlyHours *int64 = nil
+	var monthlyHours *float64 = nil
 	if u != nil {
-		monthlyHours = u.GetInt("monthly_hrs")
+		monthlyHours = u.GetFloat("monthly_hrs")
 	}
 
 	costComponents := []*schema.CostComponent{windowsVirtualMachineCostComponent(region, instanceType, licenseType, monthlyHours)}
@@ -49,7 +49,7 @@ func NewAzureRMWindowsVirtualMachine(d *schema.ResourceData, u *schema.UsageData
 	}
 }
 
-func windowsVirtualMachineCostComponent(region string, instanceType string, licenseType string, monthlyHours *int64) *schema.CostComponent {
+func windowsVirtualMachineCostComponent(region string, instanceType string, licenseType string, monthlyHours *float64) *schema.CostComponent {
 	purchaseOption := "Consumption"
 	purchaseOptionLabel := "pay as you go"
 
@@ -66,9 +66,9 @@ func windowsVirtualMachineCostComponent(region string, instanceType string, lice
 		purchaseOptionLabel = "hybrid benefit"
 	}
 
-	qty := decimal.NewFromInt(730)
+	qty := decimal.NewFromFloat(730)
 	if monthlyHours != nil {
-		qty = decimal.NewFromInt(*monthlyHours)
+		qty = decimal.NewFromFloat(*monthlyHours)
 	}
 
 	return &schema.CostComponent{
