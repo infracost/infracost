@@ -35,7 +35,7 @@ func (r *IoTHub) BuildResource() *schema.Resource {
 		CostComponents: r.costComponents(),
 	}
 
-	if r.Operations != nil {
+	if r.Operations == nil {
 		schema.MultiplyQuantities(t, decimal.NewFromInt(r.Capacity))
 	}
 
