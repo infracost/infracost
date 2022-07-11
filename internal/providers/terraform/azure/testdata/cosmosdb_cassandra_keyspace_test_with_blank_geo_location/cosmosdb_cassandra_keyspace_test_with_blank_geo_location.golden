@@ -1,0 +1,16 @@
+
+ Name                                                              Monthly Qty  Unit                  Monthly Cost 
+                                                                                                                   
+ azurerm_cosmosdb_cassandra_keyspace.with_blank_geo_location                                                       
+ ├─ Provisioned throughput (autoscale, East US)               Monthly cost depends on usage: $11.68 per RU/s x 100 
+ ├─ Transactional storage (East US)                           Monthly cost depends on usage: $0.25 per GB          
+ ├─ Periodic backup (East US)                                 Monthly cost depends on usage: $0.12 per GB          
+ └─ Restored data                                             Monthly cost depends on usage: $0.15 per GB          
+                                                                                                                   
+ OVERALL TOTAL                                                                                               $0.00 
+──────────────────────────────────
+3 cloud resources were detected:
+∙ 1 was estimated, it includes usage-based costs, see https://infracost.io/usage-file
+∙ 2 were free:
+  ∙ 1 x azurerm_cosmosdb_account
+  ∙ 1 x azurerm_resource_group

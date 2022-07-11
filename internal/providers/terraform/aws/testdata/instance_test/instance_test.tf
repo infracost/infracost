@@ -236,3 +236,20 @@ resource "aws_instance" "instance_withLaunchTemplateOverride" {
     volume_size = 20
   }
 }
+
+resource "aws_instance" "instance_withMonthlyHours" {
+  ami           = "fake_ami"
+  instance_type = "t3.medium"
+}
+
+resource "aws_instance" "instance_ebsOptimized_withMonthlyHours" {
+  ami           = "fake_ami"
+  instance_type = "r3.xlarge"
+  ebs_optimized = true
+}
+
+resource "aws_instance" "instance_detailedMonitoring_withMonthlyHours" {
+  ami           = "fake_ami"
+  instance_type = "m3.large"
+  monitoring    = true
+}

@@ -32,13 +32,19 @@ func NewAzureRMVirtualMachine(d *schema.ResourceData, u *schema.UsageData) *sche
 		os = "Windows"
 	}
 
-	if strings.ToLower(os) == "windows" {
-		licenseType := d.Get("license_type").String()
-		costComponents = append(costComponents, windowsVirtualMachineCostComponent(region, instanceType, licenseType))
-	} else {
-		costComponents = append(costComponents, linuxVirtualMachineCostComponent(region, instanceType))
+	var monthlyHours *float64 = nil
+	if u != nil {
+		monthlyHours = u.GetFloat("monthly_hrs")
 	}
 
+	if strings.ToLower(os) == "windows" {
+		licenseType := d.Get("license_type").String()
+		costComponents = append(costComponents, windowsVirtualMachineCostComponent(region, instanceType, licenseType, monthlyHours))
+	} else {
+		costComponents = append(costComponents, linuxVirtualMachineCostComponent(region, instanceType, monthlyHours))
+	}
+
+	// TODO: is this always assuming ultrassdreservation cost?
 	costComponents = append(costComponents, ultraSSDReservationCostComponent(region))
 
 	var storageOperations *decimal.Decimal
@@ -49,8 +55,11 @@ func NewAzureRMVirtualMachine(d *schema.ResourceData, u *schema.UsageData) *sche
 	}
 
 	subResources := []*schema.Resource{}
-	diskData := d.Get("storage_os_disk").Array()[0]
-	subResources = append(subResources, legacyOSDiskSubResource(region, diskData, storageOperations))
+
+	if len(d.Get("storage_os_disk").Array()) > 0 {
+		diskData := d.Get("storage_os_disk").Array()[0]
+		subResources = append(subResources, legacyOSDiskSubResource(region, diskData, storageOperations))
+	}
 
 	storages := d.Get("storage_data_disk").Array()
 	if u != nil {

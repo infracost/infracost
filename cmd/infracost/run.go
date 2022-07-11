@@ -92,7 +92,7 @@ func (p *panicError) Error() string {
 }
 
 func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
-	if runCtx.Config.IsSelfHosted() && runCtx.Config.IsCloudEnabled() {
+	if runCtx.Config.IsSelfHosted() && runCtx.IsCloudEnabled() {
 		ui.PrintWarning(cmd.ErrOrStderr(), "Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
 	}
 
@@ -148,9 +148,9 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	r.Currency = runCtx.Config.Currency
 
 	dashboardClient := apiclient.NewDashboardAPIClient(runCtx)
-	result, err := dashboardClient.AddRun(runCtx, projectContexts, r)
+	result, err := dashboardClient.AddRun(runCtx, r)
 	if err != nil {
-		log.Errorf("Error reporting run: %s", err)
+		log.WithError(err).Error("Failed to upload to Infracost Cloud")
 	}
 
 	r.RunID, r.ShareURL = result.RunID, result.ShareURL
@@ -162,10 +162,10 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	}
 
 	b, err := output.FormatOutput(format, r, output.Options{
-		DashboardEnabled: runCtx.Config.IsCloudEnabled(),
-		ShowSkipped:      runCtx.Config.ShowSkipped,
-		NoColor:          runCtx.Config.NoColor,
-		Fields:           runCtx.Config.Fields,
+		DashboardEndpoint: runCtx.Config.DashboardEndpoint,
+		ShowSkipped:       runCtx.Config.ShowSkipped,
+		NoColor:           runCtx.Config.NoColor,
+		Fields:            runCtx.Config.Fields,
 	})
 	if err != nil {
 		return err

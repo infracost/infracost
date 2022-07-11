@@ -1,0 +1,6 @@
+version: 0.1
+resource_usage:
+  google_compute_instance.with_hours:
+    monthly_hrs: 100
+  google_compute_instance.gpu_with_hours:
+    monthly_hrs: 100

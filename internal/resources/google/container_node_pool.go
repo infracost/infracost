@@ -44,7 +44,7 @@ func (r *ContainerNodePool) BuildResource() *schema.Resource {
 	poolSize := int64(1)
 
 	costComponents := []*schema.CostComponent{
-		computeCostComponent(r.Region, r.NodeConfig.MachineType, r.NodeConfig.PurchaseOption, poolSize),
+		computeCostComponent(r.Region, r.NodeConfig.MachineType, r.NodeConfig.PurchaseOption, poolSize, nil),
 		computeDiskCostComponent(r.Region, r.NodeConfig.DiskType, r.NodeConfig.DiskSize, poolSize),
 	}
 
@@ -53,7 +53,7 @@ func (r *ContainerNodePool) BuildResource() *schema.Resource {
 	}
 
 	for _, guestAccel := range r.NodeConfig.GuestAccelerators {
-		costComponents = append(costComponents, guestAcceleratorCostComponent(r.Region, r.NodeConfig.PurchaseOption, guestAccel.Type, guestAccel.Count, poolSize))
+		costComponents = append(costComponents, guestAcceleratorCostComponent(r.Region, r.NodeConfig.PurchaseOption, guestAccel.Type, guestAccel.Count, poolSize, nil))
 	}
 
 	resource := &schema.Resource{

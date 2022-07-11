@@ -37,14 +37,6 @@ func NewProjectContext(runCtx *RunContext, projectCfg *Project) *ProjectContext 
 	}
 }
 
-func EmptyProjectContext() *ProjectContext {
-	return &ProjectContext{
-		RunContext:    EmptyRunContext(),
-		ProjectConfig: &Project{},
-		contextVals:   map[string]interface{}{},
-	}
-}
-
 func (c *ProjectContext) SetContextValue(key string, value interface{}) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -88,7 +80,7 @@ func DetectProjectMetadata(path string) *schema.ProjectMetadata {
 
 	vcsRepoURL = stripVCSRepoPassword(vcsRepoURL)
 
-	meta, err := vcs.GetMetadata(path)
+	meta, err := vcs.MetadataFetcher.Get(path)
 	if err != nil {
 		log.Debugf("failed to fetch vcs metadata %s", err)
 	}

@@ -62,7 +62,7 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 	combined.IsCIRun = ctx.IsCIRun()
 
 	dryRun, _ := cmd.Flags().GetBool("dry-run")
-	if ctx.Config.IsCloudEnabled() && !dryRun {
+	if ctx.IsCloudEnabled() && !dryRun {
 		if ctx.Config.IsSelfHosted() {
 			ui.PrintWarning(cmd.ErrOrStderr(), "Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
 		}
@@ -86,10 +86,10 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 	}
 
 	opts := output.Options{
-		DashboardEnabled: ctx.Config.IsCloudEnabled(),
-		NoColor:          ctx.Config.NoColor,
-		ShowSkipped:      true,
-		PolicyChecks:     policyChecks,
+		DashboardEndpoint: ctx.Config.DashboardEndpoint,
+		NoColor:           ctx.Config.NoColor,
+		ShowSkipped:       true,
+		PolicyChecks:      policyChecks,
 	}
 
 	b, err := output.ToMarkdown(combined, opts, mdOpts)
