@@ -32,7 +32,7 @@ resource "azurerm_iothub_dps" "example" {
 
   sku {
     name     = "S1"
-    capacity = 2
+    capacity = 1
   }
 
   tags = {

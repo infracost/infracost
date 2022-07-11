@@ -17,6 +17,7 @@ type IoTHub struct {
 	Region   string
 	Sku      string
 	Capacity int64
+	DPS      bool
 
 	Operations *int64 `infracost_usage:"monthly_operations"`
 }
@@ -32,10 +33,11 @@ var OperationsUsageSchema = []*schema.UsageItem{
 func (r *IoTHub) BuildResource() *schema.Resource {
 	t := &schema.Resource{
 		Name:           r.Address,
+		UsageSchema:    OperationsUsageSchema,
 		CostComponents: r.costComponents(),
 	}
 
-	if r.Operations == nil {
+	if !r.DPS {
 		schema.MultiplyQuantities(t, decimal.NewFromInt(r.Capacity))
 	}
 
@@ -43,10 +45,9 @@ func (r *IoTHub) BuildResource() *schema.Resource {
 }
 
 func (r *IoTHub) costComponents() []*schema.CostComponent {
-	if r.Operations != nil {
+	if r.DPS {
 		return r.iotHubDPSCostComponent()
 	}
-
 	return r.iotHubCostComponent()
 }
 
