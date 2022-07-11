@@ -82,7 +82,7 @@ func NewEvaluator(
 	spinFunc ui.SpinnerFunc,
 ) *Evaluator {
 	ctx := NewContext(&hcl.EvalContext{
-		Functions: expFunctions(module.ModulePath),
+		Functions: expFunctions(module.RootPath),
 	}, nil)
 
 	if visitedModules == nil {
