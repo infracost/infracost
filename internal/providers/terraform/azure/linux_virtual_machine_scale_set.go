@@ -18,7 +18,7 @@ func NewAzureRMLinuxVirtualMachineScaleSet(d *schema.ResourceData, u *schema.Usa
 
 	instanceType := d.Get("sku").String()
 
-	costComponents := []*schema.CostComponent{linuxVirtualMachineCostComponent(region, instanceType)}
+	costComponents := []*schema.CostComponent{linuxVirtualMachineCostComponent(region, instanceType, nil)}
 	subResources := make([]*schema.Resource, 0)
 
 	if d.Get("additional_capabilities.0.ultra_ssd_enabled").Bool() {

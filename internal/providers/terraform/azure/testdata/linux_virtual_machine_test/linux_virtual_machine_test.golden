@@ -13,6 +13,12 @@
     ├─ Storage (S4)                                                         1  months                           $1.54 
     └─ Disk operations                                     Monthly cost depends on usage: $0.0005 per 10k operations  
                                                                                                                       
+ azurerm_linux_virtual_machine.basic_b1_withMonthlyHours                                                              
+ ├─ Instance usage (pay as you go, Standard_B1s)                          100  hours                            $1.04 
+ └─ os_disk                                                                                                           
+    ├─ Storage (S4)                                                         1  months                           $1.54 
+    └─ Disk operations                                     Monthly cost depends on usage: $0.0005 per 10k operations  
+                                                                                                                      
  azurerm_linux_virtual_machine.standard_a2_ultra_enabled                                                              
  ├─ Instance usage (pay as you go, Standard_A2_v2)                        730  hours                           $66.43 
  ├─ Ultra disk reservation (if unattached)                 Monthly cost depends on usage: $4.38 per vCPU              
@@ -31,7 +37,7 @@
  └─ os_disk                                                                                                           
     └─ Storage (P4)                                                         1  months                           $5.28 
                                                                                                                       
- OVERALL TOTAL                                                                                                $357.95 
+ OVERALL TOTAL                                                                                                $360.52 
 ──────────────────────────────────
-5 cloud resources were detected:
-∙ 5 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+6 cloud resources were detected:
+∙ 6 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

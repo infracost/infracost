@@ -42,7 +42,7 @@ func aksClusterNodePool(name, region string, n gjson.Result, nodeCount decimal.D
 		Name: name,
 	}
 	instanceType := n.Get("vm_size").String()
-	costComponents = append(costComponents, linuxVirtualMachineCostComponent(region, instanceType))
+	costComponents = append(costComponents, linuxVirtualMachineCostComponent(region, instanceType, nil))
 	mainResource.CostComponents = costComponents
 	schema.MultiplyQuantities(mainResource, nodeCount)
 
