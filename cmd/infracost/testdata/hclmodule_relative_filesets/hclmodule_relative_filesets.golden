@@ -1,0 +1,16 @@
+Project: infracost/infracost/cmd/infracost/testdata/hclmodule_relative_filesets
+
+ Name                                        Monthly Qty  Unit  Monthly Cost 
+                                                                             
+ module.ecs_service.aws_ecs_service.service                                  
+ ├─ Per GB per hour                                  0.5  GB           $1.62 
+ └─ Per vCPU per hour                               0.25  CPU          $7.39 
+                                                                             
+ OVERALL TOTAL                                                         $9.01 
+──────────────────────────────────
+2 cloud resources were detected:
+∙ 1 was estimated
+∙ 1 was free, rerun with --show-skipped to see details
+
+Err:
+
