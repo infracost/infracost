@@ -23,13 +23,13 @@ func newIoTHub(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{})
 
 	sku := d.Get("sku.0.name").String()
-	count := d.Get("sku.0.capacity").Int()
+	capacity := d.Get("sku.0.capacity").Int()
 
 	r := &azure.IoTHub{
 		Address:  d.Address,
 		Region:   region,
 		Sku:      sku,
-		Capacity: count,
+		Capacity: capacity,
 	}
 
 	r.PopulateUsage(u)
