@@ -9,6 +9,7 @@ import (
 
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
+	"github.com/sirupsen/logrus"
 
 	"github.com/infracost/infracost/internal/logging"
 )
@@ -99,44 +100,7 @@ type Config struct {
 	EventsDisabled       bool
 	logWriter            io.Writer
 	logDisableTimestamps bool
-}
-
-func (c Config) WriteLevel() string {
-	return c.LogLevel
-}
-
-func (c Config) LogPrettyPrint() bool {
-	return c.DebugReport
-}
-
-func (c Config) LogFields() map[string]interface{} {
-	f := map[string]interface{}{
-		"enable_cloud_comment": c.EnableCloudForComment,
-		"currency":             c.Currency,
-		"sync_usage":           c.SyncUsageFile,
-	}
-
-	if c.EnableCloud != nil {
-		f["enable_cloud_os"] = *c.EnableCloud
-	}
-
-	return f
-}
-
-func (c Config) SetLogDisableTimestamps(v bool) {
-	c.logDisableTimestamps = v
-}
-
-func (c Config) LogDisableTimestamps() bool {
-	return c.logDisableTimestamps
-}
-
-func (c Config) SetLogWriter(w io.Writer) {
-	c.logWriter = w
-}
-
-func (c Config) LogWriter() io.Writer {
-	return c.logWriter
+	disableReportCaller  bool
 }
 
 func init() {
@@ -181,6 +145,56 @@ func (c *Config) LoadFromConfigFile(path string) error {
 	}
 
 	return nil
+}
+
+func (c *Config) DisableReportCaller() {
+	c.disableReportCaller = true
+}
+
+func (c *Config) ReportCaller() bool {
+	return !c.disableReportCaller
+}
+
+func (c *Config) WriteLevel() string {
+	if c.DebugReport {
+		return logrus.DebugLevel.String()
+	}
+
+	return c.LogLevel
+}
+
+func (c *Config) LogPrettyPrint() bool {
+	return c.DebugReport
+}
+
+func (c *Config) LogFields() map[string]interface{} {
+	f := map[string]interface{}{
+		"enable_cloud_comment": c.EnableCloudForComment,
+		"currency":             c.Currency,
+		"sync_usage":           c.SyncUsageFile,
+	}
+
+	if c.EnableCloud != nil {
+		f["enable_cloud_os"] = *c.EnableCloud
+	}
+
+	return f
+}
+
+func (c *Config) SetLogDisableTimestamps(v bool) {
+	c.logDisableTimestamps = v
+}
+
+func (c *Config) LogDisableTimestamps() bool {
+	return c.logDisableTimestamps
+}
+
+func (c *Config) SetLogWriter(w io.Writer) {
+	c.logWriter = w
+}
+
+func (c *Config) LogWriter() io.Writer {
+	return c.logWriter
 }
 
 func (c *Config) LoadFromEnv() error {

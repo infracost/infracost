@@ -17,6 +17,7 @@ type Config interface {
 	LogDisableTimestamps() bool
 	LogPrettyPrint() bool
 	LogFields() map[string]interface{}
+	ReportCaller() bool
 }
 
 func defaultLogger() *l {
@@ -36,7 +37,7 @@ func ConfigureBaseLogger(c Config) error {
 		PrettyPrint:      c.LogPrettyPrint(),
 	})
 
-	log.SetReportCaller(true)
+	log.SetReportCaller(c.ReportCaller())
 
 	setOutput(c, log)
 
