@@ -19,7 +19,7 @@ func NewAzureRMWindowsVirtualMachineScaleSet(d *schema.ResourceData, u *schema.U
 	instanceType := d.Get("sku").String()
 	licenseType := d.Get("license_type").String()
 
-	costComponents := []*schema.CostComponent{windowsVirtualMachineCostComponent(region, instanceType, licenseType)}
+	costComponents := []*schema.CostComponent{windowsVirtualMachineCostComponent(region, instanceType, licenseType, nil)}
 
 	if d.Get("additional_capabilities.0.ultra_ssd_enabled").Bool() {
 		costComponents = append(costComponents, ultraSSDReservationCostComponent(region))

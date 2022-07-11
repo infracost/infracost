@@ -105,7 +105,6 @@ resource "google_compute_instance" "preemptible_local_ssd" {
   }
 }
 
-
 resource "google_compute_instance" "gpu" {
   name         = "gpu"
   machine_type = "n1-standard-16"
@@ -145,6 +144,43 @@ resource "google_compute_instance" "preemptible_gpu" {
 
   scheduling {
     preemptible = true
+  }
+
+  network_interface {
+    network = "default"
+  }
+}
+
+resource "google_compute_instance" "with_hours" {
+  name         = "standard"
+  machine_type = "f1-micro"
+  zone         = "us-central1-a"
+
+  boot_disk {
+    initialize_params {
+      image = "centos-cloud/centos-7"
+    }
+  }
+
+  network_interface {
+    network = "default"
+  }
+}
+
+resource "google_compute_instance" "gpu_with_hours" {
+  name         = "gpu"
+  machine_type = "n1-standard-16"
+  zone         = "us-central1-a"
+
+  boot_disk {
+    initialize_params {
+      image = "centos-cloud/centos-7"
+    }
+  }
+
+  guest_accelerator {
+    type  = "nvidia-tesla-k80"
+    count = 4
   }
 
   network_interface {

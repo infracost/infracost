@@ -45,7 +45,7 @@ func NewAzureRMVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageDat
 	}
 
 	if strings.ToLower(os) == "linux" {
-		costComponents = append(costComponents, linuxVirtualMachineCostComponent(region, instanceType))
+		costComponents = append(costComponents, linuxVirtualMachineCostComponent(region, instanceType, nil))
 	}
 
 	if strings.ToLower(os) == "windows" {
@@ -53,7 +53,7 @@ func NewAzureRMVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageDat
 		if d.Get("license_type").Type != gjson.Null {
 			licenseType = d.Get("license_type").String()
 		}
-		costComponents = append(costComponents, windowsVirtualMachineCostComponent(region, instanceType, licenseType))
+		costComponents = append(costComponents, windowsVirtualMachineCostComponent(region, instanceType, licenseType, nil))
 	}
 
 	r := &schema.Resource{

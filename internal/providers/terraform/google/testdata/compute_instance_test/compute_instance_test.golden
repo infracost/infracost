@@ -6,6 +6,11 @@
  ├─ Standard provisioned storage (pd-standard)                         10  GB            $0.40 
  └─ NVIDIA Tesla K80 (on-demand)                                    2,920  hours       $919.80 
                                                                                                
+ google_compute_instance.gpu_with_hours                                                        
+ ├─ Instance usage (Linux/UNIX, on-demand, n1-standard-16)            100  hours        $53.20 
+ ├─ Standard provisioned storage (pd-standard)                         10  GB            $0.40 
+ └─ NVIDIA Tesla K80 (on-demand)                                      400  hours       $126.00 
+                                                                                               
  google_compute_instance.local_ssd                                                             
  ├─ Instance usage (Linux/UNIX, on-demand, f1-micro)                  730  hours         $3.88 
  ├─ Standard provisioned storage (pd-standard)                         10  GB            $0.40 
@@ -33,7 +38,11 @@
  ├─ Instance usage (Linux/UNIX, on-demand, f1-micro)                  730  hours         $3.88 
  └─ Standard provisioned storage (pd-standard)                         10  GB            $0.40 
                                                                                                
- OVERALL TOTAL                                                                       $1,638.42 
+ google_compute_instance.with_hours                                                            
+ ├─ Instance usage (Linux/UNIX, on-demand, f1-micro)                  100  hours         $0.53 
+ └─ Standard provisioned storage (pd-standard)                         10  GB            $0.40 
+                                                                                               
+ OVERALL TOTAL                                                                       $1,818.95 
 ──────────────────────────────────
-7 cloud resources were detected:
-∙ 7 were estimated
+9 cloud resources were detected:
+∙ 9 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

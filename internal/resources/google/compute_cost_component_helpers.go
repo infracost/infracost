@@ -25,7 +25,7 @@ type ContainerNodeConfig struct {
 }
 
 // computeCostComponent returns a cost component for Compute instance usage.
-func computeCostComponent(region, machineType string, purchaseOption string, instanceCount int64) *schema.CostComponent {
+func computeCostComponent(region, machineType string, purchaseOption string, instanceCount int64, monthlyHours *float64) *schema.CostComponent {
 	sustainedUseDiscount := 0.0
 	if strings.ToLower(purchaseOption) == "on_demand" {
 		switch strings.ToLower(strings.Split(machineType, "-")[0]) {
@@ -36,11 +36,16 @@ func computeCostComponent(region, machineType string, purchaseOption string, ins
 		}
 	}
 
+	qty := decimal.NewFromFloat(730)
+	if monthlyHours != nil {
+		qty = decimal.NewFromFloat(*monthlyHours)
+	}
+
 	return &schema.CostComponent{
 		Name:                fmt.Sprintf("Instance usage (Linux/UNIX, %s, %s)", purchaseOptionLabel(purchaseOption), machineType),
 		Unit:                "hours",
 		UnitMultiplier:      decimal.NewFromInt(1),
-		HourlyQuantity:      decimalPtr(decimal.NewFromInt(instanceCount)),
+		MonthlyQuantity:     decimalPtr(qty.Mul(decimal.NewFromInt(instanceCount))),
 		MonthlyDiscountPerc: sustainedUseDiscount,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("gcp"),
@@ -126,7 +131,7 @@ func computeDiskCostComponent(region string, diskType string, diskSize float64, 
 
 // guestAcceleratorCostComponent returns a cost component for Guest Accelerator
 // usage for Compute resources.
-func guestAcceleratorCostComponent(region string, purchaseOption string, guestAcceleratorType string, guestAcceleratorCount int64, instanceCount int64) *schema.CostComponent {
+func guestAcceleratorCostComponent(region string, purchaseOption string, guestAcceleratorType string, guestAcceleratorCount int64, instanceCount int64, monthlyHours *float64) *schema.CostComponent {
 	var (
 		name       string
 		descPrefix string
@@ -165,11 +170,17 @@ func guestAcceleratorCostComponent(region string, purchaseOption string, guestAc
 		sustainedUseDiscount = 0.3
 	}
 
+	qty := decimal.NewFromFloat(730)
+	if monthlyHours != nil {
+		qty = decimal.NewFromFloat(*monthlyHours)
+	}
+	qty = qty.Mul(count)
+
 	return &schema.CostComponent{
 		Name:                fmt.Sprintf("%s (%s)", name, purchaseOptionLabel(purchaseOption)),
 		Unit:                "hours",
 		UnitMultiplier:      decimal.NewFromInt(1),
-		HourlyQuantity:      decimalPtr(count),
+		MonthlyQuantity:     decimalPtr(qty),
 		MonthlyDiscountPerc: sustainedUseDiscount,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("gcp"),
