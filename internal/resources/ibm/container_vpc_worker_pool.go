@@ -58,7 +58,7 @@ func (r *ContainerVpcWorkerPool) BuildResource() *schema.Resource {
 		{Key: "serverType", Value: strPtr("virtual")},
 		{Key: "isolation", Value: strPtr("public")},
 		{Key: "catalogRegion", Value: strPtr(r.Region)},
-		{Key: "operatingSystem", Value: strPtr(operatingSystem)},
+		{Key: "operatingSystem", ValueRegex: strPtr(fmt.Sprintf("/%s/i", operatingSystem))},
 	}
 	if r.Entitlement {
 		attributeFilters = append(attributeFilters, &schema.AttributeFilter{
