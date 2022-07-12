@@ -2,6 +2,7 @@ package azure
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/shopspring/decimal"
 
@@ -44,4 +45,14 @@ func contains(a []string, x string) bool {
 
 func regexPtr(regex string) *string {
 	return strPtr(fmt.Sprintf("/%s/i", regex))
+}
+
+func convertRegion(region string) string {
+	if strings.Contains(strings.ToLower(region), "usgov") {
+		return "US Gov"
+	} else if strings.Contains(strings.ToLower(region), "china") {
+		return "Сhina"
+	} else {
+		return "Global"
+	}
 }
