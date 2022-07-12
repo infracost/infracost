@@ -46,7 +46,7 @@ func Detect(ctx *config.ProjectContext, includePastResources bool) (schema.Provi
 	path := ctx.ProjectConfig.Path
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return nil, fmt.Errorf("no such file or directory %s", path)
+		return nil, fmt.Errorf("No such file or directory %s", path)
 	}
 
 	forceCLI := ctx.ProjectConfig.TerraformForceCLI

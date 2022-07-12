@@ -1,6 +1,7 @@
 package modules
 
 import (
+	"io"
 	"testing"
 
 	"github.com/hashicorp/terraform-config-inspect/tfconfig"
@@ -38,9 +39,15 @@ func TestLookupModule(t *testing.T) {
 			Dir:    ".infracost/module-b/submodule/path",
 		},
 	}
+
+	l := logrus.New()
+	l.SetOutput(io.Discard)
+	logger := logrus.NewEntry(l)
+	
 	cache := &Cache{
 		keyMap: keyMap,
 		disco:  NewDisco(nil, logrus.NewEntry(logrus.New())),
+		logger: logger,
 	}
 
 	tests := []struct {
