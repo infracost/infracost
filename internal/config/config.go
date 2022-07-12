@@ -154,7 +154,9 @@ func (c *Config) DisableReportCaller() {
 
 // ReportCaller returns if the log entry writes the filename to the log line.
 func (c *Config) ReportCaller() bool {
-	return !c.disableReportCaller
+	level := c.WriteLevel()
+
+	return level == "debug" && !c.disableReportCaller
 }
 
 // WriteLevel is the log level that the Logger writes to LogWriter.
@@ -166,24 +168,23 @@ func (c *Config) WriteLevel() string {
 	return c.LogLevel
 }
 
-// LogPrettyPrint sets if the log entry is JSON pretty printed to the writer.
-func (c *Config) LogPrettyPrint() bool {
-	return c.DebugReport
-}
-
 // LogFields sets the meta fields that are added to any log line entries.
 func (c *Config) LogFields() map[string]interface{} {
-	f := map[string]interface{}{
-		"enable_cloud_comment": c.EnableCloudForComment,
-		"currency":             c.Currency,
-		"sync_usage":           c.SyncUsageFile,
+	if c.WriteLevel() == "debug" {
+		f := map[string]interface{}{
+			"enable_cloud_comment": c.EnableCloudForComment,
+			"currency":             c.Currency,
+			"sync_usage":           c.SyncUsageFile,
+		}
+
+		if c.EnableCloud != nil {
+			f["enable_cloud_os"] = *c.EnableCloud
+		}
+
+		return f
 	}
 
-	if c.EnableCloud != nil {
-		f["enable_cloud_os"] = *c.EnableCloud
-	}
-
-	return f
+	return nil
 }
 
 // SetLogDisableTimestamps sets if logs should contain the timestamp the line is written at.
@@ -191,9 +192,29 @@ func (c *Config) SetLogDisableTimestamps(v bool) {
 	c.logDisableTimestamps = v
 }
 
-// LogDisableTimestamps sets if the log entry contains the timestamp the line is written at.
-func (c *Config) LogDisableTimestamps() bool {
-	return c.logDisableTimestamps
+// LogFormatter returns the log formatting to be used by a Logger.
+func (c *Config) LogFormatter() logrus.Formatter {
+	if c.DebugReport {
+		return &logrus.JSONFormatter{
+			DisableTimestamp: c.logDisableTimestamps,
+			PrettyPrint:      true,
+		}
+	}
+
+	return &logrus.TextFormatter{
+		FullTimestamp:    true,
+		DisableTimestamp: c.logDisableTimestamps,
+		DisableColors:    true,
+		SortingFunc: func(keys []string) {
+			// Put message at the end
+			for i, key := range keys {
+				if key == "msg" && i != len(keys)-1 {
+					keys[i], keys[len(keys)-1] = keys[len(keys)-1], keys[i]
+					break
+				}
+			}
+		},
+	}
 }
 
 // SetLogWriter sets the io.Writer that the logs should be piped to.

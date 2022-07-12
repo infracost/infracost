@@ -32,14 +32,12 @@ type Config interface {
 	LogWriter() io.Writer
 	// WriteLevel is the log level that the Logger writes to LogWriter.
 	WriteLevel() string
-	// LogDisableTimestamps sets if the log entry contains the timestamp the line is written at.
-	LogDisableTimestamps() bool
-	// LogPrettyPrint sets if the log entry is JSON pretty printed to the writer.
-	LogPrettyPrint() bool
 	// LogFields sets the meta fields that are added to any log line entries.
 	LogFields() map[string]interface{}
 	// ReportCaller sets whether the log entry writes the filename to the log line.
 	ReportCaller() bool
+	// LogFormatter returns the log formatting to be used by a Logger.
+	LogFormatter() logrus.Formatter
 }
 
 type l struct {
@@ -49,9 +47,6 @@ type l struct {
 func defaultLogger() *l {
 	log := logrus.StandardLogger()
 
-	log.SetFormatter(&logrus.JSONFormatter{})
-	log.SetReportCaller(true)
-
 	return &l{Entry: logrus.NewEntry(log)}
 }
 
@@ -59,10 +54,9 @@ func defaultLogger() *l {
 func ConfigureBaseLogger(c Config) error {
 	log := logrus.StandardLogger()
 
-	log.SetFormatter(&logrus.JSONFormatter{
-		DisableTimestamp: c.LogDisableTimestamps(),
-		PrettyPrint:      c.LogPrettyPrint(),
-	})
+	if c.LogFormatter() != nil {
+		log.SetFormatter(c.LogFormatter())
+	}
 
 	log.SetReportCaller(c.ReportCaller())
 
