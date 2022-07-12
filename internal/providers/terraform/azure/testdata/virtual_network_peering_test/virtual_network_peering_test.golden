@@ -2,33 +2,33 @@
  Name                                                        Monthly Qty  Unit              Monthly Cost 
                                                                                                          
  azurerm_virtual_network_peering.inter_zonal                                                             
- ├─ Ingress data processed (Zone 2)                       Monthly cost depends on usage: $0.09 per GB    
- └─ Egress data processed (Zone 1)                        Monthly cost depends on usage: $0.035 per GB   
+ ├─ Egress data processed (Zone 1)                        Monthly cost depends on usage: $0.035 per GB   
+ └─ Ingress data processed (Zone 2)                       Monthly cost depends on usage: $0.09 per GB    
                                                                                                          
  azurerm_virtual_network_peering.inter_zonal_with_usage                                                  
- ├─ Ingress data processed (Zone 2)                                1,000  GB                      $90.00 
- └─ Egress data processed (Zone 1)                                 1,000  GB                      $35.00 
+ ├─ Egress data processed (Zone 1)                                 1,000  GB                      $35.00 
+ └─ Ingress data processed (Zone 2)                                1,000  GB                      $90.00 
                                                                                                          
  azurerm_virtual_network_peering.intra_region                                                            
- ├─ Ingress data processed (Global)                       Monthly cost depends on usage: $0.01 per GB    
- └─ Egress data processed (Global)                        Monthly cost depends on usage: $0.01 per GB    
+ ├─ Egress data processed (Global)                        Monthly cost depends on usage: $0.01 per GB    
+ └─ Ingress data processed (Global)                       Monthly cost depends on usage: $0.01 per GB    
                                                                                                          
  azurerm_virtual_network_peering.intra_region_with_usage                                                 
- ├─ Ingress data processed (Global)                                1,000  GB                      $10.00 
- └─ Egress data processed (Global)                                 1,000  GB                      $10.00 
+ ├─ Egress data processed (Global)                                 1,000  GB                      $10.00 
+ └─ Ingress data processed (Global)                                1,000  GB                      $10.00 
                                                                                                          
  azurerm_virtual_network_peering.intra_zonal                                                             
- ├─ Ingress data processed (Zone 1)                       Monthly cost depends on usage: $0.035 per GB   
- └─ Egress data processed (Zone 1)                        Monthly cost depends on usage: $0.035 per GB   
+ ├─ Egress data processed (Zone 1)                        Monthly cost depends on usage: $0.035 per GB   
+ └─ Ingress data processed (Zone 1)                       Monthly cost depends on usage: $0.035 per GB   
                                                                                                          
  azurerm_virtual_network_peering.intra_zonal_with_usage                                                  
- ├─ Ingress data processed (Zone 1)                                1,000  GB                      $35.00 
- └─ Egress data processed (Zone 1)                                 1,000  GB                      $35.00 
+ ├─ Egress data processed (Zone 1)                                 1,000  GB                      $35.00 
+ └─ Ingress data processed (Zone 1)                                1,000  GB                      $35.00 
                                                                                                          
  OVERALL TOTAL                                                                                   $215.00 
 ──────────────────────────────────
 13 cloud resources were detected:
-∙ 6 were estimated
+∙ 6 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 7 were free:
   ∙ 4 x azurerm_virtual_network
   ∙ 3 x azurerm_resource_group
