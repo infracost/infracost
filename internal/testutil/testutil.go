@@ -208,7 +208,7 @@ func ConfigureTestToFailOnLogs(t *testing.T, runCtx *config.RunContext) {
 	runCtx.Config.SetLogDisableTimestamps(true)
 	runCtx.Config.SetLogWriter(io.MultiWriter(os.Stderr, ErrorOnAnyWriter{t}))
 	runCtx.Config.DisableReportCaller()
-	
+
 	err := logging.ConfigureBaseLogger(runCtx.Config)
 	require.Nil(t, err)
 }

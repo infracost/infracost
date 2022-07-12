@@ -147,14 +147,17 @@ func (c *Config) LoadFromConfigFile(path string) error {
 	return nil
 }
 
+// DisableReportCaller sets whether the log entry writes the filename to the log line.
 func (c *Config) DisableReportCaller() {
 	c.disableReportCaller = true
 }
 
+// ReportCaller returns if the log entry writes the filename to the log line.
 func (c *Config) ReportCaller() bool {
 	return !c.disableReportCaller
 }
 
+// WriteLevel is the log level that the Logger writes to LogWriter.
 func (c *Config) WriteLevel() string {
 	if c.DebugReport {
 		return logrus.DebugLevel.String()
@@ -163,10 +166,12 @@ func (c *Config) WriteLevel() string {
 	return c.LogLevel
 }
 
+// LogPrettyPrint sets if the log entry is JSON pretty printed to the writer.
 func (c *Config) LogPrettyPrint() bool {
 	return c.DebugReport
 }
 
+// LogFields sets the meta fields that are added to any log line entries.
 func (c *Config) LogFields() map[string]interface{} {
 	f := map[string]interface{}{
 		"enable_cloud_comment": c.EnableCloudForComment,
@@ -181,18 +186,23 @@ func (c *Config) LogFields() map[string]interface{} {
 	return f
 }
 
+// SetLogDisableTimestamps sets if logs should contain the timestamp the line is written at.
 func (c *Config) SetLogDisableTimestamps(v bool) {
 	c.logDisableTimestamps = v
 }
 
+// LogDisableTimestamps sets if the log entry contains the timestamp the line is written at.
 func (c *Config) LogDisableTimestamps() bool {
 	return c.logDisableTimestamps
 }
 
+// SetLogWriter sets the io.Writer that the logs should be piped to.
 func (c *Config) SetLogWriter(w io.Writer) {
 	c.logWriter = w
 }
 
+// LogWriter returns the writer the Logger should use to write logs to.
+// In most cases this should be stderr, but it can also be a file.
 func (c *Config) LogWriter() io.Writer {
 	return c.logWriter
 }
