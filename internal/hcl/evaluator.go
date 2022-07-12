@@ -104,7 +104,7 @@ func NewEvaluator(
 	ctx.SetByDot(cty.StringVal(workspace), "terraform.workspace")
 	ctx.SetByDot(cty.StringVal(module.RootPath), "path.root")
 	ctx.SetByDot(cty.StringVal(modulePath), "path.module")
-	ctx.SetByDot(cty.StringVal(workingDir), "path.cwd")
+	ctx.SetByDot(cty.StringVal(filepath.Join(workingDir, module.RootPath)), "path.cwd")
 
 	for _, b := range module.Blocks {
 		b.SetContext(ctx.NewChild())
@@ -117,6 +117,7 @@ func NewEvaluator(
 		moduleMetadata: moduleMetadata,
 		visitedModules: visitedModules,
 		workspace:      workspace,
+		workingDir:     workingDir,
 		blockBuilder:   blockBuilder,
 		newSpinner:     spinFunc,
 	}

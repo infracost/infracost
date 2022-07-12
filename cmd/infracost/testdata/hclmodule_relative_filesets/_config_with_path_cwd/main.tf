@@ -3,7 +3,7 @@ variable "base_object" {
 }
 
 locals {
-  loaded_files = [for v in ["config2.base.json"] : jsondecode(file("${path.module}/${v}"))]
+  loaded_files = [for v in ["config3.base.json"] : jsondecode(file("${path.cwd}/_config_with_path_cwd/${v}"))]
 }
 
 output "result" {
