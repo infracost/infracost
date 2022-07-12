@@ -14,4 +14,4 @@
   ∙ 1 x azurerm_mssql_server
 Logs:
 
-level=warning msg="Using eastus for resource azurerm_mssql_database.blank_server_location as its 'location' property could not be found."
+{"level":"warning","msg":"Using eastus for resource azurerm_mssql_database.blank_server_location as its 'location' property could not be found."}
