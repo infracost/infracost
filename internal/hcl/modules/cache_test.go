@@ -43,7 +43,7 @@ func TestLookupModule(t *testing.T) {
 	l := logrus.New()
 	l.SetOutput(io.Discard)
 	logger := logrus.NewEntry(l)
-	
+
 	cache := &Cache{
 		keyMap: keyMap,
 		disco:  NewDisco(nil, logrus.NewEntry(logrus.New())),
