@@ -100,7 +100,7 @@ func (h *CommentHandler) matchingComments(ctx context.Context) ([]Comment, error
 
 	matchingComments, err := h.PlatformHandler.CallFindMatchingComments(ctx, h.Tag)
 	if err != nil {
-		return nil, err
+		return nil, h.newPlatformError(err)
 	}
 
 	if len(matchingComments) == 1 {
@@ -149,14 +149,14 @@ func (h *CommentHandler) UpdateComment(ctx context.Context, body string) error {
 
 		err := h.PlatformHandler.CallUpdateComment(ctx, latestMatchingComment, bodyWithTag)
 		if err != nil {
-			return err
+			return h.newPlatformError(err)
 		}
 	} else {
 		log.Info("Creating new comment")
 
 		comment, err := h.PlatformHandler.CallCreateComment(ctx, bodyWithTag)
 		if err != nil {
-			return err
+			return h.newPlatformError(err)
 		}
 
 		log.Infof("Created new comment %s", color.HiBlueString(comment.Ref()))
@@ -173,7 +173,7 @@ func (h *CommentHandler) NewComment(ctx context.Context, body string) error {
 
 	comment, err := h.PlatformHandler.CallCreateComment(ctx, bodyWithTag)
 	if err != nil {
-		return err
+		return h.newPlatformError(err)
 	}
 
 	log.Infof("Created new comment: %s", color.HiBlueString(comment.Ref()))
@@ -224,7 +224,7 @@ func (h *CommentHandler) hideComments(ctx context.Context, comments []Comment) e
 		log.Infof("Hiding comment %s", color.HiBlueString(comment.Ref()))
 		err := h.PlatformHandler.CallHideComment(ctx, comment)
 		if err != nil {
-			return err
+			return h.newPlatformError(err)
 		}
 	}
 
@@ -258,9 +258,21 @@ func (h *CommentHandler) deleteComments(ctx context.Context, comments []Comment)
 		log.Infof("Deleting comment %s", color.HiBlueString(comment.Ref()))
 		err := h.PlatformHandler.CallDeleteComment(ctx, comment)
 		if err != nil {
-			return err
+			return h.newPlatformError(err)
 		}
 	}
 
 	return nil
+}
+
+// newPlatformError wraps a platform error with multi-line formatting and a link to the docs
+func (h *CommentHandler) newPlatformError(err error) error {
+	if err == nil {
+		return nil
+	}
+
+	return fmt.Errorf("%s\n%w\n\n%s",
+		"The pull request comment was generated successfully but could not be posted:",
+		err,
+		"See https://infracost.io/docs/troubleshooting/#5-posting-comments for help.")
 }

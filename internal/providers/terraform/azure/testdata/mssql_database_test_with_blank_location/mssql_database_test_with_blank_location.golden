@@ -1,0 +1,17 @@
+
+ Name                                            Monthly Qty  Unit            Monthly Cost 
+                                                                                           
+ azurerm_mssql_database.blank_server_location                                              
+ ├─ Compute (S3)                                          30  days                 $145.16 
+ ├─ Extra data storage                         Monthly cost depends on usage: $0.17 per GB 
+ └─ Long-term retention                        Monthly cost depends on usage: $0.05 per GB 
+                                                                                           
+ OVERALL TOTAL                                                                     $145.16 
+──────────────────────────────────
+2 cloud resources were detected:
+∙ 1 was estimated, it includes usage-based costs, see https://infracost.io/usage-file
+∙ 1 is not supported yet, see https://infracost.io/requested-resources:
+  ∙ 1 x azurerm_mssql_server
+Logs:
+
+level=warning msg="Using eastus for resource azurerm_mssql_database.blank_server_location as its 'location' property could not be found."

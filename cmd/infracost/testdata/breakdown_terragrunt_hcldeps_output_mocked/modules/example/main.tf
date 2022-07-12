@@ -67,8 +67,8 @@ variable "dnsnames" {
 
 output "certificates" {
   value = {
-  for name in var.dnsnames :
-  name => aws_instance.web_app.this_attr_does_not_exist
+    for name in var.dnsnames :
+    name => aws_instance.web_app.this_attr_does_not_exist
   }
 }
 

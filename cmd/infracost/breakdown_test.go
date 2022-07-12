@@ -123,7 +123,8 @@ func TestBreakdownTerraformDirectoryWithDefaultVarFiles(t *testing.T) {
 			[]string{
 				"breakdown",
 				"--path", dir,
-				"--terraform-var-file", "input.tfvars",
+				"--terraform-var-file", "hcl.tfvars",
+				"--terraform-var-file", "hcl.tfvars.json",
 				"--terraform-var", "block2_ebs_volume_size=2000",
 				"--terraform-var", "block2_volume_type=io1",
 			},
@@ -359,6 +360,23 @@ func TestBreakdownInitFlagsError(t *testing.T) {
 			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
 			"--terraform-init-flags",
 			"-plugin-dir=does/not/exist",
+		},
+		nil,
+	)
+}
+
+func TestBreakdownWithPrivateTerraformRegistryModule(t *testing.T) {
+	if _, ok := os.LookupEnv("INFRACOST_TERRAFORM_CLOUD_TOKEN"); !ok {
+		t.Skip("Skipping because INFRACOST_TERRAFORM_CLOUD_TOKEN is not set and external contributors won't have this.")
+	}
+
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path",
+			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
 		},
 		nil,
 	)

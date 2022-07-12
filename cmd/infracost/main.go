@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	stdLog "log"
 	"os"
 	"runtime/debug"
 
@@ -19,6 +20,12 @@ import (
 	"github.com/infracost/infracost/internal/update"
 	"github.com/infracost/infracost/internal/version"
 )
+
+func init() {
+	// set the stdlib default logger to flush to discard, this is done as a number of
+	// Terraform libs use the std logger directly, which impacts Infracost output.
+	stdLog.SetOutput(ioutil.Discard)
+}
 
 func main() {
 	Run(nil, nil)
@@ -99,8 +106,15 @@ func newRootCmd(ctx *config.RunContext) *cobra.Command {
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			cmd.SilenceUsage = true
 			ctx.SetContextValue("command", cmd.Name())
-
-			return loadGlobalFlags(ctx, cmd)
+			if cmd.Name() == "comment" || (cmd.Parent() != nil && cmd.Parent().Name() == "comment") {
+				ctx.SetIsInfracostComment()
+			}
+			err := loadGlobalFlags(ctx, cmd)
+			if err != nil {
+				return err
+			}
+			loadCloudSettings(ctx)
+			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
 			// Show the help
@@ -172,6 +186,23 @@ func startUpdateCheck(ctx *config.RunContext, c chan *update.Info) {
 	}()
 }
 
+func loadCloudSettings(ctx *config.RunContext) {
+	if ctx.Config.IsSelfHosted() || (ctx.Config.EnableCloud != nil && !*ctx.Config.EnableCloud) {
+		return
+	}
+
+	dashboardClient := apiclient.NewDashboardAPIClient(ctx)
+	result, err := dashboardClient.QueryCLISettings()
+	if err != nil {
+		log.WithError(err).Debug("Failed to load settings from Infracost Cloud ")
+		// ignore the error so the command can continue without failing
+		return
+	}
+	log.WithFields(log.Fields{"result": fmt.Sprintf("%+v", result)}).Debug("Successfully loaded settings from Infracost Cloud")
+
+	ctx.Config.EnableCloudForComment = result.CloudEnabled
+}
+
 func checkAPIKey(apiKey string, apiEndpoint string, defaultEndpoint string) error {
 	if apiEndpoint == defaultEndpoint && apiKey == "" {
 		return fmt.Errorf(
@@ -235,7 +266,9 @@ func loadGlobalFlags(ctx *config.RunContext, cmd *cobra.Command) error {
 	}
 
 	ctx.SetContextValue("dashboardEnabled", ctx.Config.EnableDashboard)
-	ctx.SetContextValue("cloudEnabled", ctx.Config.EnableCloud)
+	if ctx.Config.EnableCloud != nil {
+		ctx.SetContextValue("cloudEnabled", ctx.Config.EnableCloud)
+	}
 	ctx.SetContextValue("isDefaultPricingAPIEndpoint", ctx.Config.PricingAPIEndpoint == ctx.Config.DefaultPricingAPIEndpoint)
 
 	flagNames := make([]string, 0)

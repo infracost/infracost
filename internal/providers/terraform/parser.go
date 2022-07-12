@@ -394,6 +394,10 @@ func parseRegion(providerConf gjson.Result, vars gjson.Result, providerKey strin
 		}
 	}
 
+	if strings.Contains(region, "mock") {
+		return ""
+	}
+
 	return region
 }
 

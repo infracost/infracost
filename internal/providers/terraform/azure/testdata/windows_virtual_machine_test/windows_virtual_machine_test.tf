@@ -167,3 +167,29 @@ resource "azurerm_windows_virtual_machine" "Standard_E16-8as_v4" {
     version   = "fake"
   }
 }
+
+resource "azurerm_windows_virtual_machine" "basic_a2_withMonthlyHours" {
+  name                = "basic_a2"
+  resource_group_name = "fake_resource_group"
+  location            = "eastus"
+
+  size           = "Basic_A2"
+  admin_username = "fakeuser"
+  admin_password = "fakepass"
+
+  network_interface_ids = [
+    "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/testrg/providers/Microsoft.Network/networkInterfaces/fakenic",
+  ]
+
+  os_disk {
+    caching              = "ReadWrite"
+    storage_account_type = "Standard_LRS"
+  }
+
+  source_image_reference {
+    publisher = "MicrosoftWindowsServer"
+    offer     = "WindowsServer"
+    sku       = "2016-Datacenter"
+    version   = "latest"
+  }
+}

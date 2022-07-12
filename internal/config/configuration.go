@@ -48,7 +48,7 @@ func loadConfiguration(cfg *Config) error {
 	}
 
 	if cfg.Configuration.EnableCloud != nil {
-		cfg.EnableCloud = *cfg.Configuration.EnableCloud
+		cfg.EnableCloud = cfg.Configuration.EnableCloud
 	}
 
 	if cfg.Configuration.DisableHCLParsing != nil {

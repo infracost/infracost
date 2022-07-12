@@ -10,17 +10,15 @@ import (
 	"strconv"
 	"strings"
 
-	// import as logg as golangci-lint is unhappy otherwise
-	logg "github.com/sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 	ctyJson "github.com/zclconf/go-cty/cty/json"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/hcl"
+	"github.com/infracost/infracost/internal/hcl/modules"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
-
-	log "github.com/sirupsen/logrus"
 )
 
 type HCLProvider struct {
@@ -73,28 +71,6 @@ func varsFromPlanFlags(planFlags string) (vars, error) {
 	}, nil
 }
 
-func findRemoteHostAndToken(ctx *config.ProjectContext) (string, string, error) {
-	token := ctx.ProjectConfig.TerraformCloudToken
-
-	if token == "" && !checkCloudConfigSet() {
-		return "", "", ErrMissingCloudToken
-	}
-
-	host := ctx.ProjectConfig.TerraformCloudHost
-	if host == "" {
-		host = "app.terraform.io"
-	}
-
-	if token == "" {
-		token = findCloudToken(host)
-	}
-	if token == "" {
-		return "", "", ErrMissingCloudToken
-	}
-
-	return host, token, nil
-}
-
 // NewHCLProvider returns a HCLProvider with a hcl.Parser initialised using the config.ProjectContext.
 // It will use input flags from either the terraform-plan-flags or top level var and var-file flags to
 // set input vars and files on the underlying hcl.Parser.
@@ -128,11 +104,19 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 
 	options = append(options, opts...)
 
-	host, token, remErr := findRemoteHostAndToken(ctx)
+	credsSource, err := modules.NewTerraformCredentialsSource(modules.BaseCredentialSet{
+		Token: ctx.ProjectConfig.TerraformCloudToken,
+		Host:  ctx.ProjectConfig.TerraformCloudHost,
+	})
 	localWorkspace := ctx.ProjectConfig.TerraformWorkspace
-	if remErr == nil {
-		options = append(options, hcl.OptionWithRemoteVarLoader(host, token, localWorkspace))
+	if err == nil {
+		options = append(options, hcl.OptionWithRemoteVarLoader(
+			credsSource.BaseCredentialSet.Host,
+			credsSource.BaseCredentialSet.Token,
+			localWorkspace),
+		)
 	}
+	options = append(options, hcl.OptionWithCredentialsSource(credsSource))
 
 	parsers, err := hcl.LoadParsers(ctx.ProjectConfig.Path, ctx.ProjectConfig.ExcludePaths, options...)
 	if err != nil {
@@ -190,7 +174,7 @@ func (p *HCLProvider) parseResources(path string, j []byte, usage map[string]*sc
 	metadata := config.DetectProjectMetadata(path)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
-	name := schema.GenerateProjectName(metadata, p.ctx.ProjectConfig.Name, p.ctx.RunContext.Config.IsCloudEnabled())
+	name := schema.GenerateProjectName(metadata, p.ctx.ProjectConfig.Name, p.ctx.RunContext.IsCloudEnabled())
 
 	project := schema.NewProject(name, metadata)
 
@@ -494,7 +478,7 @@ func countReferences(block *hcl.Block) *countExpression {
 			s := v.AsString()
 			i, _ = strconv.ParseInt(s, 10, 64)
 		default:
-			logg.Debugf("unsupported go cty type %s expected either Number or String for count expression, using 0", ty)
+			log.Debugf("unsupported go cty type %s expected either Number or String for count expression, using 0", ty)
 		}
 
 		exp.ConstantValue = &i

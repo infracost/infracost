@@ -122,9 +122,9 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			}
 
 			opts := output.Options{
-				DashboardEnabled: ctx.Config.IsCloudEnabled(),
-				NoColor:          ctx.Config.NoColor,
-				Fields:           fields,
+				DashboardEndpoint: ctx.Config.DashboardEndpoint,
+				NoColor:           ctx.Config.NoColor,
+				Fields:            fields,
 			}
 			opts.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
 
@@ -134,7 +134,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 				ui.PrintWarning(cmd.ErrOrStderr(), "fields is only supported for table and html output formats")
 			}
 
-			if ctx.Config.IsCloudEnabled() {
+			if ctx.IsCloudEnabled() {
 				if ctx.Config.IsSelfHosted() {
 					ui.PrintWarning(cmd.ErrOrStderr(), "Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
 				}
@@ -189,11 +189,6 @@ func shareCombinedRun(ctx *config.RunContext, combined output.Root, inputs []out
 		return result.RunID, result.ShareURL
 	}
 
-	projectContexts := make([]*config.ProjectContext, len(combined.Projects))
-	for i := range combined.Projects {
-		projectContexts[i] = config.EmptyProjectContext()
-	}
-
 	combinedRunIds := []string{}
 	for _, input := range inputs {
 		if id := input.Root.RunID; id != "" {
@@ -203,9 +198,9 @@ func shareCombinedRun(ctx *config.RunContext, combined output.Root, inputs []out
 	ctx.SetContextValue("runIds", combinedRunIds)
 
 	dashboardClient := apiclient.NewDashboardAPIClient(ctx)
-	result, err := dashboardClient.AddRun(ctx, projectContexts, combined)
+	result, err := dashboardClient.AddRun(ctx, combined)
 	if err != nil {
-		log.Errorf("Error reporting run: %s", err)
+		log.WithError(err).Error("Failed to upload to Infracost Cloud")
 	}
 
 	return result.RunID, result.ShareURL

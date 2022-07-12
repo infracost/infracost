@@ -232,6 +232,7 @@ resource_usage:
     reserved_instance_payment_option: all_upfront # Payment option for Reserved Instances, can be: no_upfront, partial_upfront, all_upfront.
     monthly_cpu_credit_hrs: 350 # Number of hours in the month where the instance is expected to burst. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
     vcpu_count: 2 # Number of the vCPUs for the instance type. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
+    monthly_hrs: 450 # Monthly number of hours the instance ran for.
 
   aws_fsx_windows_file_system.my_system:
     backup_storage_gb: 10000 # Total storage used for backups in GB.
@@ -647,6 +648,9 @@ resource_usage:
   google_compute_image.my_image:
     storage_gb: 1000 # Total size of image storage in GB.
 
+  google_compute_instance.my_instance:
+    monthly_hrs: 450 # Monthly number of hours the instance ran for.
+
   google_compute_machine_image.my_machine_image:
     storage_gb: 1000 # Total size of machine image storage in GB.
 
@@ -965,6 +969,7 @@ resource_usage:
     monthly_data_processed_gb: 100000 # Monthly data processed by the firewall in GB.
 
   azurerm_linux_virtual_machine.my_linux_vm:
+    monthly_hrs: 450 # Monthly number of hours the instance ran for.
     os_disk:
       monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB.
 
@@ -1103,12 +1108,14 @@ resource_usage:
       monthly_disk_operations: 100000 # Monthly number of disk operations (writes, reads, deletes) using a unit size of 256KiB per additional disk.
 
   azurerm_virtual_machine.my_vm:
+    monthly_hrs: 450 # Monthly number of hours the instance ran for.
     storage_os_disk:
       monthly_disk_operations: 100000 # Monthly number of main disk operations (writes, reads, deletes) using a unit size of 256KiB.
     storage_data_disk:
       monthly_disk_operations: 100000 # Monthly number of disk operations (writes, reads, deletes) using a unit size of 256KiB per additional disk.
 
   azurerm_windows_virtual_machine.my_windows_vm:
+    monthly_hrs: 450 # Monthly number of hours the instance ran for.
     os_disk:
       monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB.
 

@@ -207,12 +207,12 @@ type SummaryOptions struct {
 }
 
 type Options struct {
-	DashboardEnabled bool
-	NoColor          bool
-	ShowSkipped      bool
-	Fields           []string
-	IncludeHTML      bool
-	PolicyChecks     PolicyCheck
+	DashboardEndpoint string
+	NoColor           bool
+	ShowSkipped       bool
+	Fields            []string
+	IncludeHTML       bool
+	PolicyChecks      PolicyCheck
 }
 
 // PolicyCheck holds information if a given run has any policy checks enabled.

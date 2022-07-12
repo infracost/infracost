@@ -47,6 +47,22 @@ func cosmosDBCostComponents(d *schema.ResourceData, u *schema.UsageData, account
 	region := lookupRegion(account, []string{"account_name", "resource_group_name"})
 	geoLocations := account.Get("geo_location").Array()
 
+	// The geo_location attribute is a required attribute however it can be an empty list because of
+	// expressions evaluating as nil, e.g. using a data block. If the geoLocations variable is empty
+	// we set it as a sane default which is using the location from the parent region.
+	if len(geoLocations) == 0 {
+		log.WithFields(log.Fields{
+			"resource": d.Address,
+		}).Debugf("empty set of geo_location attributes provided using fallback region %s", region)
+
+		geoLocations = []gjson.Result{
+			gjson.Parse(fmt.Sprintf(`{
+    "location": %q,
+    "failover_priority": 1
+  }`, region)),
+		}
+	}
+
 	costComponents := []*schema.CostComponent{}
 
 	model := Provisioned

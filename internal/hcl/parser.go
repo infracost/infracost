@@ -10,7 +10,6 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclparse"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 
@@ -151,6 +150,12 @@ func OptionWithRemoteVarLoader(host, token, localWorkspace string) Option {
 	}
 }
 
+func OptionWithCredentialsSource(source *modules.CredentialsSource) Option {
+	return func(p *Parser) {
+		p.credentialsSource = source
+	}
+}
+
 func OptionWithBlockBuilder(blockBuilder BlockBuilder) Option {
 	return func(p *Parser) {
 		p.blockBuilder = blockBuilder
@@ -189,6 +194,7 @@ type Parser struct {
 	newSpinner            ui.SpinnerFunc
 	writeWarning          ui.WriteWarningFunc
 	remoteVariablesLoader *RemoteVariablesLoader
+	credentialsSource     *modules.CredentialsSource
 }
 
 // LoadParsers inits a list of Parser with the provided option and initialPath. LoadParsers locates Terraform files
@@ -247,7 +253,7 @@ func newParser(initialPath string, options ...Option) *Parser {
 		loaderOpts = append(loaderOpts, modules.LoaderWithSpinner(p.newSpinner))
 	}
 
-	p.moduleLoader = modules.NewModuleLoader(initialPath, loaderOpts...)
+	p.moduleLoader = modules.NewModuleLoader(initialPath, p.credentialsSource, loaderOpts...)
 
 	return p
 }
@@ -435,23 +441,39 @@ func loadVarFile(filename string) (map[string]cty.Value, error) {
 			return nil, fmt.Errorf("Passed var file does not exist: %s. Make sure you are passing the var file path relative to the --path flag.", filename)
 		}
 
-		return nil, fmt.Errorf("Could not stat var file: %s", err)
+		return nil, fmt.Errorf("could not stat provided var file: %w", err)
 	}
 
-	log.Debugf("loading tfvars-file [%s]", filename)
-	src, err := os.ReadFile(filename)
-	if err != nil {
-		return nil, fmt.Errorf("Could not read var file file %s %w", filename, err)
+	var parseFunc func(filename string) (*hcl.File, hcl.Diagnostics)
+
+	hclParser := hclparse.NewParser()
+
+	parseFunc = hclParser.ParseHCLFile
+	if strings.HasSuffix(filename, ".json") {
+		parseFunc = hclParser.ParseJSONFile
 	}
 
-	variableFile, _ := hclsyntax.ParseConfig(src, filename, hcl.Pos{Line: 1, Column: 1})
+	variableFile, diags := parseFunc(filename)
+	if diags.HasErrors() {
+		log.WithError(errors.New(diags.Error())).Debugf("could not parse supplied var file %s", filename)
+
+		return inputVars, nil
+	}
+
 	attrs, _ := variableFile.Body.JustAttributes()
 
+	fields := make(logrus.Fields, len(attrs))
 	for _, attr := range attrs {
-		log.Debugf("Setting '%s' from tfvars file at %s", attr.Name, filename)
-		inputVars[attr.Name], _ = attr.Expr.Value(&hcl.EvalContext{})
+		value, diag := attr.Expr.Value(&hcl.EvalContext{})
+		if diag.HasErrors() {
+			log.WithError(errors.New(diag.Error())).Debugf("problem evaluating input var %s", attr.Name)
+		}
+
+		inputVars[attr.Name] = value
+		fields[attr.Name] = value
 	}
 
+	log.WithFields(fields).Debugf("adding input vars from file %s", filename)
 	return inputVars, nil
 }
 
