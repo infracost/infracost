@@ -224,9 +224,9 @@
   ∙ 6 x azurerm_storage_account
 Logs:
 
-{"level":"warning","msg":"Skipping resource azurerm_storage_account.bb_Premium_unsupported_access_tier. BlockBlobStorage Premium doesn't support RA-GZRS redundancy"}
-{"level":"warning","msg":"Skipping resource azurerm_storage_account.bb_Standard_unsupported_access_tier. BlockBlobStorage Standard doesn't support RA-GZRS redundancy"}
-{"level":"warning","msg":"Skipping resource azurerm_storage_account.file_premium_unsupported_access_tier. FileStorage Premium doesn't support GZRS redundancy"}
-{"level":"warning","msg":"Skipping resource azurerm_storage_account.file_unsupported_access_tier. FileStorage Standard doesn't support GZRS redundancy"}
-{"level":"warning","msg":"Skipping resource azurerm_storage_account.unsupported. Infracost only supports StorageV2, BlockBlobStorage and FileStorage account kinds"}
-{"level":"warning","msg":"Skipping resource azurerm_storage_account.v2_premium_unsupported_access_tier. StorageV2 Premium doesn't support GZRS redundancy"}
+level=warning msg="Skipping resource azurerm_storage_account.bb_Premium_unsupported_access_tier. BlockBlobStorage Premium doesn't support RA-GZRS redundancy"
+level=warning msg="Skipping resource azurerm_storage_account.bb_Standard_unsupported_access_tier. BlockBlobStorage Standard doesn't support RA-GZRS redundancy"
+level=warning msg="Skipping resource azurerm_storage_account.file_premium_unsupported_access_tier. FileStorage Premium doesn't support GZRS redundancy"
+level=warning msg="Skipping resource azurerm_storage_account.file_unsupported_access_tier. FileStorage Standard doesn't support GZRS redundancy"
+level=warning msg="Skipping resource azurerm_storage_account.unsupported. Infracost only supports StorageV2, BlockBlobStorage and FileStorage account kinds"
+level=warning msg="Skipping resource azurerm_storage_account.v2_premium_unsupported_access_tier. StorageV2 Premium doesn't support GZRS redundancy"

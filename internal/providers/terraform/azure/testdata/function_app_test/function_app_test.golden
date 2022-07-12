@@ -58,4 +58,4 @@
   ∙ 1 x azurerm_function_app
 Logs:
 
-{"level":"warning","msg":"Skipping resource azurerm_function_app.functionAppNoAvailableServicePlan. Could not find a way to get its cost components from the resource or usage file."}
+level=warning msg="Skipping resource azurerm_function_app.functionAppNoAvailableServicePlan. Could not find a way to get its cost components from the resource or usage file."
