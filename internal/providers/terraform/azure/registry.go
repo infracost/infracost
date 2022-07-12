@@ -118,6 +118,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getSentinelDataConnectorMicrosoftDefenderAdvancedThreatProtectionRegistryItem(),
 	getSentinelDataConnectorOffice365RegistryItem(),
 	getSentinelDataConnectorThreatIntelligenceRegistryItem(),
+	getVirtualNetworkPeeringRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
