@@ -19,3 +19,13 @@ module "configs" {
     "config.base.json"
   ]
 }
+
+module "ecs_service_with_path_module" {
+  source      = "./_ecs"
+  task_cpu    = module.configs_with_path_module.result["ECS_TASK_CPU"]
+  task_memory = module.configs_with_path_module.result["ECS_TASK_RAM"]
+}
+
+module "configs_with_path_module" {
+  source    = "./_config_with_path_module"
+}

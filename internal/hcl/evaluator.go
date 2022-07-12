@@ -3,6 +3,7 @@ package hcl
 import (
 	"errors"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -89,10 +90,20 @@ func NewEvaluator(
 		visitedModules = make(map[string]map[string]cty.Value)
 	}
 
+	modulePath, err := filepath.Rel(module.RootPath, module.ModulePath)
+	if err != nil {
+		log.WithError(err).WithFields(logrus.Fields{
+			"rootPath":   module.RootPath,
+			"modulePath": module.ModulePath,
+		}).Debug("Could not calculate relative path.module")
+
+		modulePath = module.ModulePath
+	}
+
 	// set the global evaluation parameters.
 	ctx.SetByDot(cty.StringVal(workspace), "terraform.workspace")
 	ctx.SetByDot(cty.StringVal(module.RootPath), "path.root")
-	ctx.SetByDot(cty.StringVal(module.ModulePath), "path.module")
+	ctx.SetByDot(cty.StringVal(modulePath), "path.module")
 	ctx.SetByDot(cty.StringVal(workingDir), "path.cwd")
 
 	for _, b := range module.Blocks {
