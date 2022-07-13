@@ -81,16 +81,6 @@ func addRunFlags(cmd *cobra.Command) {
 	_ = cmd.Flags().MarkHidden("terraform-init-flags")
 }
 
-// panicError is used to collect goroutine panics into an error interface so
-// that we can do type assertion on err checking.
-type panicError struct {
-	msg string
-}
-
-func (p *panicError) Error() string {
-	return p.msg
-}
-
 func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	if runCtx.Config.IsSelfHosted() && runCtx.IsCloudEnabled() {
 		ui.PrintWarning(cmd.ErrOrStderr(), "Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
@@ -301,7 +291,7 @@ func (r *parallelRunner) run() ([]projectResult, error) {
 			defer func() {
 				e := recover()
 				if e != nil {
-					err = &panicError{msg: fmt.Sprintf("%s\n%s", e, debug.Stack())}
+					err = clierror.NewPanicError(fmt.Errorf("%s", e), debug.Stack())
 				}
 			}()
 
@@ -366,7 +356,7 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 		m := fmt.Sprintf("%s\n\n", err)
 		m += fmt.Sprintf("Try setting --path to a Terraform plan JSON file. See %s for how to generate this.", ui.LinkString("https://infracost.io/troubleshoot"))
 
-		return nil, clierror.NewSanitizedError(errors.New(m), "Could not detect path type")
+		return nil, clierror.NewCLIError(errors.New(m), "Could not detect path type")
 	}
 
 	ctx.SetContextValue("projectType", provider.Type())
@@ -382,7 +372,7 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 		m := "Cannot use Terraform state JSON with the infracost diff command.\n\n"
 		m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
 		m += " - Terraform plan JSON file\n - Terraform/Terragrunt directory\n - Terraform plan file"
-		return nil, clierror.NewSanitizedError(errors.New(m), "Cannot use Terraform state JSON with the infracost diff command")
+		return nil, clierror.NewCLIError(errors.New(m), "Cannot use Terraform state JSON with the infracost diff command")
 	}
 
 	m := fmt.Sprintf("Detected %s at %s", provider.DisplayType(), ui.DisplayPath(ctx.ProjectConfig.Path))
