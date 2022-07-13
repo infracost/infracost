@@ -1,0 +1,4 @@
+{
+  "ECS_TASK_CPU": 256,
+  "ECS_TASK_RAM": 512
+}
