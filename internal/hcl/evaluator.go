@@ -3,6 +3,7 @@ package hcl
 import (
 	"errors"
 	"fmt"
+	"github.com/sirupsen/logrus"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -85,18 +86,28 @@ func NewEvaluator(
 	logger *logrus.Entry,
 ) *Evaluator {
 	ctx := NewContext(&hcl.EvalContext{
-		Functions: expFunctions(module.ModulePath),
+		Functions: expFunctions(module.RootPath),
 	}, nil, logger)
 
 	if visitedModules == nil {
 		visitedModules = make(map[string]map[string]cty.Value)
 	}
 
+	modulePath, err := filepath.Rel(module.RootPath, module.ModulePath)
+	if err != nil {
+		log.WithError(err).WithFields(logrus.Fields{
+			"rootPath":   module.RootPath,
+			"modulePath": module.ModulePath,
+		}).Debug("Could not calculate relative path.module")
+
+		modulePath = module.ModulePath
+	}
+
 	// set the global evaluation parameters.
 	ctx.SetByDot(cty.StringVal(workspace), "terraform.workspace")
 	ctx.SetByDot(cty.StringVal(module.RootPath), "path.root")
-	ctx.SetByDot(cty.StringVal(module.ModulePath), "path.module")
-	ctx.SetByDot(cty.StringVal(workingDir), "path.cwd")
+	ctx.SetByDot(cty.StringVal(modulePath), "path.module")
+	ctx.SetByDot(cty.StringVal(filepath.Join(workingDir, module.RootPath)), "path.cwd")
 
 	for _, b := range module.Blocks {
 		b.SetContext(ctx.NewChild())
@@ -120,6 +131,7 @@ func NewEvaluator(
 		moduleMetadata: moduleMetadata,
 		visitedModules: visitedModules,
 		workspace:      workspace,
+		workingDir:     workingDir,
 		blockBuilder:   blockBuilder,
 		newSpinner:     spinFunc,
 		logger:         l,

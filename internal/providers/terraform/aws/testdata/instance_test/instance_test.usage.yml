@@ -79,3 +79,12 @@ resource_usage:
   aws_instance.instance_withLaunchTemplateOverride:
     monthly_cpu_credit_hrs: 730
     vcpu_count: 2
+
+  aws_instance.instance_withMonthlyHours:
+    monthly_hrs: 100
+
+  aws_instance.instance_ebsOptimized_withMonthlyHours:
+    monthly_hrs: 100
+
+  aws_instance.instance_detailedMonitoring_withMonthlyHours:
+    monthly_hrs: 100

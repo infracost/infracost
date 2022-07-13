@@ -18,10 +18,14 @@ type ComputeInstance struct {
 	BootDiskType      string
 	ScratchDisks      int
 	GuestAccelerators []*ComputeGuestAccelerator
+
+	MonthlyHours *float64 `infracost_usage:"monthly_hrs"`
 }
 
 // ComputeInstanceUsageSchema defines a list which represents the usage schema of ComputeInstance.
-var ComputeInstanceUsageSchema = []*schema.UsageItem{}
+var ComputeInstanceUsageSchema = []*schema.UsageItem{
+	{Key: "monthly_hrs", DefaultValue: 730, ValueType: schema.Float64},
+}
 
 // PopulateUsage parses the u schema.UsageData into the ComputeInstance.
 // It uses the `infracost_usage` struct tags to populate data into the ComputeInstance.
@@ -34,7 +38,7 @@ func (r *ComputeInstance) PopulateUsage(u *schema.UsageData) {
 // See providers folder for more information.
 func (r *ComputeInstance) BuildResource() *schema.Resource {
 	costComponents := []*schema.CostComponent{
-		computeCostComponent(r.Region, r.MachineType, r.PurchaseOption, r.Size),
+		computeCostComponent(r.Region, r.MachineType, r.PurchaseOption, r.Size, r.MonthlyHours),
 	}
 
 	if r.HasBootDisk {
@@ -46,7 +50,7 @@ func (r *ComputeInstance) BuildResource() *schema.Resource {
 	}
 
 	for _, guestAccel := range r.GuestAccelerators {
-		costComponents = append(costComponents, guestAcceleratorCostComponent(r.Region, r.PurchaseOption, guestAccel.Type, guestAccel.Count, r.Size))
+		costComponents = append(costComponents, guestAcceleratorCostComponent(r.Region, r.PurchaseOption, guestAccel.Type, guestAccel.Count, r.Size, r.MonthlyHours))
 	}
 
 	return &schema.Resource{

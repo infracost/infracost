@@ -64,6 +64,7 @@ version: 0.1
     # reserved_instance_payment_option: "" # Payment option for Reserved Instances, can be: no_upfront, partial_upfront, all_upfront.
     # monthly_cpu_credit_hrs: 0 # Number of hours in the month where the instance is expected to burst. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
     # vcpu_count: 0 # Number of the vCPUs for the instance type. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
+    # monthly_hrs: 730.0 # Monthly number of hours the instance ran for.
   # aws_s3_bucket.no_usage:
     # object_tags: 0 # Total object tags. Only for AWS provider V3.
     # standard:

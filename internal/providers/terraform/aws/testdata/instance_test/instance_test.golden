@@ -1,166 +1,183 @@
 
- Name                                                       Monthly Qty  Unit                  Monthly Cost 
-                                                                                                            
- aws_instance.cnvr_1yr_all_upfront                                                                          
- ├─ Instance usage (Linux/UNIX, reserved, t3.medium)                730  hours                        $0.00 
- └─ root_block_device                                                                                       
-    └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
-                                                                                                            
- aws_instance.cnvr_1yr_no_upfront                                                                           
- ├─ Instance usage (Linux/UNIX, reserved, t3.medium)                730  hours                       $21.90 
- └─ root_block_device                                                                                       
-    └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
-                                                                                                            
- aws_instance.cnvr_1yr_partial_upfront                                                                      
- ├─ Instance usage (Linux/UNIX, reserved, t3.medium)                730  hours                       $10.44 
- └─ root_block_device                                                                                       
-    └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
-                                                                                                            
- aws_instance.cnvr_3yr_all_upfront                                                                          
- ├─ Instance usage (Linux/UNIX, reserved, t3.medium)                730  hours                        $0.00 
- └─ root_block_device                                                                                       
-    └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
-                                                                                                            
- aws_instance.cnvr_3yr_no_upfront                                                                           
- ├─ Instance usage (Linux/UNIX, reserved, t3.medium)                730  hours                       $15.04 
- └─ root_block_device                                                                                       
-    └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
-                                                                                                            
- aws_instance.cnvr_3yr_partial_upfront                                                                      
- ├─ Instance usage (Linux/UNIX, reserved, t3.medium)                730  hours                        $7.01 
- └─ root_block_device                                                                                       
-    └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
-                                                                                                            
- aws_instance.instance1                                                                                     
- ├─ Instance usage (Linux/UNIX, on-demand, m3.medium)               730  hours                       $48.91 
- ├─ root_block_device                                                                                       
- │  └─ Storage (general purpose SSD, gp2)                            10  GB                           $1.00 
- ├─ ebs_block_device[0]                                                                                     
- │  └─ Storage (general purpose SSD, gp2)                            10  GB                           $1.00 
- ├─ ebs_block_device[1]                                                                                     
- │  ├─ Storage (magnetic)                                            20  GB                           $1.00 
- │  └─ I/O requests                                    Monthly cost depends on usage: $0.05 per 1M request  
- ├─ ebs_block_device[2]                                                                                     
- │  └─ Storage (cold HDD, sc1)                                       30  GB                           $0.45 
- ├─ ebs_block_device[3]                                                                                     
- │  ├─ Storage (provisioned IOPS SSD, io1)                           40  GB                           $5.00 
- │  └─ Provisioned IOPS                                           1,000  IOPS                        $65.00 
- └─ ebs_block_device[4]                                                                                     
-    └─ Storage (general purpose SSD, gp3)                            20  GB                           $1.60 
-                                                                                                            
- aws_instance.instance1_detailedMonitoring                                                                  
- ├─ Instance usage (Linux/UNIX, on-demand, m3.large)                730  hours                       $97.09 
- ├─ EC2 detailed monitoring                                           7  metrics                      $2.10 
- └─ root_block_device                                                                                       
-    └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
-                                                                                                            
- aws_instance.instance1_ebsOptimized                                                                        
- ├─ Instance usage (Linux/UNIX, on-demand, m3.large)                730  hours                       $97.09 
- └─ root_block_device                                                                                       
-    └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
-                                                                                                            
- aws_instance.instance2_ebsOptimized                                                                        
- ├─ Instance usage (Linux/UNIX, on-demand, r3.xlarge)               730  hours                      $243.09 
- ├─ EBS-optimized usage                                             730  hours                       $14.60 
- └─ root_block_device                                                                                       
-    └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
-                                                                                                            
- aws_instance.instance_withLaunchTemplateById                                                               
- ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)               730  hours                       $32.19 
- ├─ EC2 detailed monitoring                                           7  metrics                      $2.10 
- ├─ CPU credits                                                   1,460  vCPU-hours                  $73.00 
- ├─ root_block_device                                                                                       
- │  └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
- ├─ ebs_block_device[0]                                                                                     
- │  ├─ Storage (provisioned IOPS SSD, io1)                           20  GB                           $2.50 
- │  └─ Provisioned IOPS                                             200  IOPS                        $13.00 
- └─ ebs_block_device[1]                                                                                     
-    ├─ Storage (provisioned IOPS SSD, io1)                           10  GB                           $1.25 
-    └─ Provisioned IOPS                                             100  IOPS                         $6.50 
-                                                                                                            
- aws_instance.instance_withLaunchTemplateByName                                                             
- ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)               730  hours                       $32.19 
- ├─ EC2 detailed monitoring                                           7  metrics                      $2.10 
- ├─ root_block_device                                                                                       
- │  └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
- └─ ebs_block_device[0]                                                                                     
-    ├─ Storage (provisioned IOPS SSD, io1)                           10  GB                           $1.25 
-    └─ Provisioned IOPS                                             100  IOPS                         $6.50 
-                                                                                                            
- aws_instance.instance_withLaunchTemplateOverride                                                           
- ├─ Instance usage (Linux/UNIX, on-demand, t3.large)                730  hours                       $60.74 
- ├─ root_block_device                                                                                       
- │  └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
- └─ ebs_block_device[0]                                                                                     
-    ├─ Storage (provisioned IOPS SSD, io1)                           20  GB                           $2.50 
-    └─ Provisioned IOPS                                             100  IOPS                         $6.50 
-                                                                                                            
- aws_instance.std_1yr_all_upfront                                                                           
- ├─ Instance usage (Linux/UNIX, reserved, t3.medium)                730  hours                        $0.00 
- └─ root_block_device                                                                                       
-    └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
-                                                                                                            
- aws_instance.std_1yr_no_upfront                                                                            
- ├─ Instance usage (Linux/UNIX, reserved, t3.medium)                730  hours                       $19.05 
- └─ root_block_device                                                                                       
-    └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
-                                                                                                            
- aws_instance.std_1yr_partial_upfront                                                                       
- ├─ Instance usage (Linux/UNIX, reserved, t3.medium)                730  hours                        $9.05 
- └─ root_block_device                                                                                       
-    └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
-                                                                                                            
- aws_instance.std_3yr_all_upfront                                                                           
- ├─ Instance usage (Linux/UNIX, reserved, t3.medium)                730  hours                        $0.00 
- └─ root_block_device                                                                                       
-    └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
-                                                                                                            
- aws_instance.std_3yr_no_upfront                                                                            
- ├─ Instance usage (Linux/UNIX, reserved, t3.medium)                730  hours                       $13.14 
- └─ root_block_device                                                                                       
-    └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
-                                                                                                            
- aws_instance.std_3yr_partial_upfront                                                                       
- ├─ Instance usage (Linux/UNIX, reserved, t3.medium)                730  hours                        $6.06 
- └─ root_block_device                                                                                       
-    └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
-                                                                                                            
- aws_instance.t2_default_cpuCredits                                                                         
- ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)               730  hours                       $33.87 
- └─ root_block_device                                                                                       
-    └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
-                                                                                                            
- aws_instance.t2_standard_cpuCredits                                                                        
- ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)               730  hours                       $33.87 
- └─ root_block_device                                                                                       
-    └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
-                                                                                                            
- aws_instance.t2_unlimited_cpuCredits                                                                       
- ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)               730  hours                       $33.87 
- ├─ CPU credits                                                     600  vCPU-hours                  $30.00 
- └─ root_block_device                                                                                       
-    └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
-                                                                                                            
- aws_instance.t3_default_cpuCredits                                                                         
- ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)               730  hours                       $30.37 
- └─ root_block_device                                                                                       
-    └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
-                                                                                                            
- aws_instance.t3_standard_cpuCredits                                                                        
- ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)               730  hours                       $30.37 
- └─ root_block_device                                                                                       
-    └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
-                                                                                                            
- aws_instance.t3_unlimited_cpuCredits                                                                       
- ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)               730  hours                       $30.37 
- ├─ CPU credits                                                   1,460  vCPU-hours                  $73.00 
- └─ root_block_device                                                                                       
-    └─ Storage (general purpose SSD, gp2)                             8  GB                           $0.80 
-                                                                                                            
- OVERALL TOTAL                                                                                    $1,236.86 
+ Name                                                            Monthly Qty  Unit                  Monthly Cost 
+                                                                                                                 
+ aws_instance.cnvr_1yr_all_upfront                                                                               
+ ├─ Instance usage (Linux/UNIX, reserved, t3.medium)                     730  hours                        $0.00 
+ └─ root_block_device                                                                                            
+    └─ Storage (general purpose SSD, gp2)                                  8  GB                           $0.80 
+                                                                                                                 
+ aws_instance.cnvr_1yr_no_upfront                                                                                
+ ├─ Instance usage (Linux/UNIX, reserved, t3.medium)                     730  hours                       $21.90 
+ └─ root_block_device                                                                                            
+    └─ Storage (general purpose SSD, gp2)                                  8  GB                           $0.80 
+                                                                                                                 
+ aws_instance.cnvr_1yr_partial_upfront                                                                           
+ ├─ Instance usage (Linux/UNIX, reserved, t3.medium)                     730  hours                       $10.44 
+ └─ root_block_device                                                                                            
+    └─ Storage (general purpose SSD, gp2)                                  8  GB                           $0.80 
+                                                                                                                 
+ aws_instance.cnvr_3yr_all_upfront                                                                               
+ ├─ Instance usage (Linux/UNIX, reserved, t3.medium)                     730  hours                        $0.00 
+ └─ root_block_device                                                                                            
+    └─ Storage (general purpose SSD, gp2)                                  8  GB                           $0.80 
+                                                                                                                 
+ aws_instance.cnvr_3yr_no_upfront                                                                                
+ ├─ Instance usage (Linux/UNIX, reserved, t3.medium)                     730  hours                       $15.04 
+ └─ root_block_device                                                                                            
+    └─ Storage (general purpose SSD, gp2)                                  8  GB                           $0.80 
+                                                                                                                 
+ aws_instance.cnvr_3yr_partial_upfront                                                                           
+ ├─ Instance usage (Linux/UNIX, reserved, t3.medium)                     730  hours                        $7.01 
+ └─ root_block_device                                                                                            
+    └─ Storage (general purpose SSD, gp2)                                  8  GB                           $0.80 
+                                                                                                                 
+ aws_instance.instance1                                                                                          
+ ├─ Instance usage (Linux/UNIX, on-demand, m3.medium)                    730  hours                       $48.91 
+ ├─ root_block_device                                                                                            
+ │  └─ Storage (general purpose SSD, gp2)                                 10  GB                           $1.00 
+ ├─ ebs_block_device[0]                                                                                          
+ │  └─ Storage (general purpose SSD, gp2)                                 10  GB                           $1.00 
+ ├─ ebs_block_device[1]                                                                                          
+ │  ├─ Storage (magnetic)                                                 20  GB                           $1.00 
+ │  └─ I/O requests                                         Monthly cost depends on usage: $0.05 per 1M request  
+ ├─ ebs_block_device[2]                                                                                          
+ │  └─ Storage (cold HDD, sc1)                                            30  GB                           $0.45 
+ ├─ ebs_block_device[3]                                                                                          
+ │  ├─ Storage (provisioned IOPS SSD, io1)                                40  GB                           $5.00 
+ │  └─ Provisioned IOPS                                                1,000  IOPS                        $65.00 
+ └─ ebs_block_device[4]                                                                                          
+    └─ Storage (general purpose SSD, gp3)                                 20  GB                           $1.60 
+                                                                                                                 
+ aws_instance.instance1_detailedMonitoring                                                                       
+ ├─ Instance usage (Linux/UNIX, on-demand, m3.large)                     730  hours                       $97.09 
+ ├─ EC2 detailed monitoring                                                7  metrics                      $2.10 
+ └─ root_block_device                                                                                            
+    └─ Storage (general purpose SSD, gp2)                                  8  GB                           $0.80 
+                                                                                                                 
+ aws_instance.instance1_ebsOptimized                                                                             
+ ├─ Instance usage (Linux/UNIX, on-demand, m3.large)                     730  hours                       $97.09 
+ └─ root_block_device                                                                                            
+    └─ Storage (general purpose SSD, gp2)                                  8  GB                           $0.80 
+                                                                                                                 
+ aws_instance.instance2_ebsOptimized                                                                             
+ ├─ Instance usage (Linux/UNIX, on-demand, r3.xlarge)                    730  hours                      $243.09 
+ ├─ EBS-optimized usage                                                  730  hours                       $14.60 
+ └─ root_block_device                                                                                            
+    └─ Storage (general purpose SSD, gp2)                                  8  GB                           $0.80 
+                                                                                                                 
+ aws_instance.instance_detailedMonitoring_withMonthlyHours                                                       
+ ├─ Instance usage (Linux/UNIX, on-demand, m3.large)                     100  hours                       $13.30 
+ ├─ EC2 detailed monitoring                                                7  metrics                      $2.10 
+ └─ root_block_device                                                                                            
+    └─ Storage (general purpose SSD, gp2)                                  8  GB                           $0.80 
+                                                                                                                 
+ aws_instance.instance_ebsOptimized_withMonthlyHours                                                             
+ ├─ Instance usage (Linux/UNIX, on-demand, r3.xlarge)                    100  hours                       $33.30 
+ ├─ EBS-optimized usage                                                  100  hours                        $2.00 
+ └─ root_block_device                                                                                            
+    └─ Storage (general purpose SSD, gp2)                                  8  GB                           $0.80 
+                                                                                                                 
+ aws_instance.instance_withLaunchTemplateById                                                                    
+ ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)                    730  hours                       $32.19 
+ ├─ EC2 detailed monitoring                                                7  metrics                      $2.10 
+ ├─ CPU credits                                                        1,460  vCPU-hours                  $73.00 
+ ├─ root_block_device                                                                                            
+ │  └─ Storage (general purpose SSD, gp2)                                  8  GB                           $0.80 
+ ├─ ebs_block_device[0]                                                                                          
+ │  ├─ Storage (provisioned IOPS SSD, io1)                                20  GB                           $2.50 
+ │  └─ Provisioned IOPS                                                  200  IOPS                        $13.00 
+ └─ ebs_block_device[1]                                                                                          
+    ├─ Storage (provisioned IOPS SSD, io1)                                10  GB                           $1.25 
+    └─ Provisioned IOPS                                                  100  IOPS                         $6.50 
+                                                                                                                 
+ aws_instance.instance_withLaunchTemplateByName                                                                  
+ ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)                    730  hours                       $32.19 
+ ├─ EC2 detailed monitoring                                                7  metrics                      $2.10 
+ ├─ root_block_device                                                                                            
+ │  └─ Storage (general purpose SSD, gp2)                                  8  GB                           $0.80 
+ └─ ebs_block_device[0]                                                                                          
+    ├─ Storage (provisioned IOPS SSD, io1)                                10  GB                           $1.25 
+    └─ Provisioned IOPS                                                  100  IOPS                         $6.50 
+                                                                                                                 
+ aws_instance.instance_withLaunchTemplateOverride                                                                
+ ├─ Instance usage (Linux/UNIX, on-demand, t3.large)                     730  hours                       $60.74 
+ ├─ root_block_device                                                                                            
+ │  └─ Storage (general purpose SSD, gp2)                                  8  GB                           $0.80 
+ └─ ebs_block_device[0]                                                                                          
+    ├─ Storage (provisioned IOPS SSD, io1)                                20  GB                           $2.50 
+    └─ Provisioned IOPS                                                  100  IOPS                         $6.50 
+                                                                                                                 
+ aws_instance.instance_withMonthlyHours                                                                          
+ ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)                    100  hours                        $4.16 
+ └─ root_block_device                                                                                            
+    └─ Storage (general purpose SSD, gp2)                                  8  GB                           $0.80 
+                                                                                                                 
+ aws_instance.std_1yr_all_upfront                                                                                
+ ├─ Instance usage (Linux/UNIX, reserved, t3.medium)                     730  hours                        $0.00 
+ └─ root_block_device                                                                                            
+    └─ Storage (general purpose SSD, gp2)                                  8  GB                           $0.80 
+                                                                                                                 
+ aws_instance.std_1yr_no_upfront                                                                                 
+ ├─ Instance usage (Linux/UNIX, reserved, t3.medium)                     730  hours                       $19.05 
+ └─ root_block_device                                                                                            
+    └─ Storage (general purpose SSD, gp2)                                  8  GB                           $0.80 
+                                                                                                                 
+ aws_instance.std_1yr_partial_upfront                                                                            
+ ├─ Instance usage (Linux/UNIX, reserved, t3.medium)                     730  hours                        $9.05 
+ └─ root_block_device                                                                                            
+    └─ Storage (general purpose SSD, gp2)                                  8  GB                           $0.80 
+                                                                                                                 
+ aws_instance.std_3yr_all_upfront                                                                                
+ ├─ Instance usage (Linux/UNIX, reserved, t3.medium)                     730  hours                        $0.00 
+ └─ root_block_device                                                                                            
+    └─ Storage (general purpose SSD, gp2)                                  8  GB                           $0.80 
+                                                                                                                 
+ aws_instance.std_3yr_no_upfront                                                                                 
+ ├─ Instance usage (Linux/UNIX, reserved, t3.medium)                     730  hours                       $13.14 
+ └─ root_block_device                                                                                            
+    └─ Storage (general purpose SSD, gp2)                                  8  GB                           $0.80 
+                                                                                                                 
+ aws_instance.std_3yr_partial_upfront                                                                            
+ ├─ Instance usage (Linux/UNIX, reserved, t3.medium)                     730  hours                        $6.06 
+ └─ root_block_device                                                                                            
+    └─ Storage (general purpose SSD, gp2)                                  8  GB                           $0.80 
+                                                                                                                 
+ aws_instance.t2_default_cpuCredits                                                                              
+ ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)                    730  hours                       $33.87 
+ └─ root_block_device                                                                                            
+    └─ Storage (general purpose SSD, gp2)                                  8  GB                           $0.80 
+                                                                                                                 
+ aws_instance.t2_standard_cpuCredits                                                                             
+ ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)                    730  hours                       $33.87 
+ └─ root_block_device                                                                                            
+    └─ Storage (general purpose SSD, gp2)                                  8  GB                           $0.80 
+                                                                                                                 
+ aws_instance.t2_unlimited_cpuCredits                                                                            
+ ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)                    730  hours                       $33.87 
+ ├─ CPU credits                                                          600  vCPU-hours                  $30.00 
+ └─ root_block_device                                                                                            
+    └─ Storage (general purpose SSD, gp2)                                  8  GB                           $0.80 
+                                                                                                                 
+ aws_instance.t3_default_cpuCredits                                                                              
+ ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)                    730  hours                       $30.37 
+ └─ root_block_device                                                                                            
+    └─ Storage (general purpose SSD, gp2)                                  8  GB                           $0.80 
+                                                                                                                 
+ aws_instance.t3_standard_cpuCredits                                                                             
+ ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)                    730  hours                       $30.37 
+ └─ root_block_device                                                                                            
+    └─ Storage (general purpose SSD, gp2)                                  8  GB                           $0.80 
+                                                                                                                 
+ aws_instance.t3_unlimited_cpuCredits                                                                            
+ ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)                    730  hours                       $30.37 
+ ├─ CPU credits                                                        1,460  vCPU-hours                  $73.00 
+ └─ root_block_device                                                                                            
+    └─ Storage (general purpose SSD, gp2)                                  8  GB                           $0.80 
+                                                                                                                 
+ OVERALL TOTAL                                                                                         $1,294.12 
 ──────────────────────────────────
-27 cloud resources were detected:
-∙ 25 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+30 cloud resources were detected:
+∙ 28 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 1 was free:
   ∙ 1 x aws_launch_template
 ∙ 1 is not supported yet, see https://infracost.io/requested-resources:
