@@ -98,7 +98,7 @@ func (p *PlanProvider) generatePlanJSON() ([]byte, error) {
 				"and then run Infracost with",
 				ui.PrimaryString("--path=plan.json"),
 			)
-			return []byte{}, clierror.NewSanitizedError(errors.New(m), "Could not detect Terraform directory for plan file")
+			return []byte{}, clierror.NewCLIError(errors.New(m), "Could not detect Terraform directory for plan file")
 		}
 	}
 

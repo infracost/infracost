@@ -15,6 +15,7 @@ import (
 	"github.com/spf13/pflag"
 
 	"github.com/infracost/infracost/internal/apiclient"
+	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/infracost/infracost/internal/update"
@@ -53,7 +54,7 @@ func Run(modifyCtx func(*config.RunContext), args *[]string) {
 
 	defer func() {
 		if appErr != nil {
-			if v, ok := appErr.(*panicError); ok {
+			if v, ok := appErr.(*clierror.PanicError); ok {
 				handleUnexpectedErr(ctx, v)
 			} else {
 				handleCLIError(ctx, appErr)
@@ -62,8 +63,8 @@ func Run(modifyCtx func(*config.RunContext), args *[]string) {
 
 		unexpectedErr := recover()
 		if unexpectedErr != nil {
-			withStack := fmt.Errorf("%s\n%s", unexpectedErr, debug.Stack())
-			handleUnexpectedErr(ctx, withStack)
+			panicErr := clierror.NewPanicError(fmt.Errorf("%s", unexpectedErr), debug.Stack())
+			handleUnexpectedErr(ctx, panicErr)
 		}
 
 		handleUpdateMessage(updateMessageChan)

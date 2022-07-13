@@ -218,7 +218,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 			panic(err)
 		}
 
-		return nil, clierror.NewSanitizedError(
+		return nil, clierror.NewCLIError(
 			errors.Errorf(
 				"%s\n%v%s",
 				"Failed to parse the Terragrunt code using the Terragrunt library:",
