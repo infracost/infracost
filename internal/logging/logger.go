@@ -74,7 +74,7 @@ func ConfigureBaseLogger(c Config) error {
 	log.SetLevel(level)
 	entry := logrus.NewEntry(log)
 	fields := c.LogFields()
-	if fields != nil && len(fields) != 0 {
+	if len(fields) != 0 {
 		entry = log.WithFields(fields)
 	}
 

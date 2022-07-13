@@ -94,7 +94,7 @@ func NewEvaluator(
 
 	modulePath, err := filepath.Rel(module.RootPath, module.ModulePath)
 	if err != nil {
-		log.WithError(err).WithFields(logrus.Fields{
+		logrus.WithError(err).WithFields(logrus.Fields{
 			"rootPath":   module.RootPath,
 			"modulePath": module.ModulePath,
 		}).Debug("Could not calculate relative path.module")
