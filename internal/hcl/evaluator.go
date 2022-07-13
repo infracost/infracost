@@ -3,7 +3,6 @@ package hcl
 import (
 	"errors"
 	"fmt"
-	"github.com/sirupsen/logrus"
 	"os"
 	"path/filepath"
 	"reflect"
