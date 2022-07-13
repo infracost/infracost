@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  azurerm_iothub_dps.dps_withUsage:
+    monthly_operations: 10000
