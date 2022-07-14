@@ -1,8 +1,6 @@
 package azure
 
 import (
-	"fmt"
-
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
@@ -50,7 +48,7 @@ func (r *VirtualNetworkPeering) egressDataProcessedCostComponent() *schema.CostC
 			Name:            "Outbound data transfer",
 			Unit:            "GB",
 			UnitMultiplier:  decimal.NewFromInt(1),
-			MonthlyQuantity: floatPtrToDecimalPtr(r.DataProcessedGB),
+			MonthlyQuantity: floatPtrToDecimalPtr(r.MonthlyDataTransferGB),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("azure"),
 				Region:        strPtr("Global"),
@@ -67,10 +65,10 @@ func (r *VirtualNetworkPeering) egressDataProcessedCostComponent() *schema.CostC
 	}
 
 	return &schema.CostComponent{
-		Name:            fmt.Sprintf("Egress data processed (%s)", r.SourceZone),
+		Name:            "Outbound data transfer",
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: floatPtrToDecimalPtr(r.DataProcessedGB),
+		MonthlyQuantity: floatPtrToDecimalPtr(r.MonthlyDataTransferGB),
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("azure"),
 			Region:     strPtr(r.SourceZone),
@@ -93,7 +91,7 @@ func (r *VirtualNetworkPeering) ingressDataProcessedCostComponent() *schema.Cost
 			Name:            "Inbound data transfer",
 			Unit:            "GB",
 			UnitMultiplier:  decimal.NewFromInt(1),
-			MonthlyQuantity: floatPtrToDecimalPtr(r.DataProcessedGB),
+			MonthlyQuantity: floatPtrToDecimalPtr(r.MonthlyDataTransferGB),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("azure"),
 				Region:        strPtr("Global"),
@@ -110,18 +108,18 @@ func (r *VirtualNetworkPeering) ingressDataProcessedCostComponent() *schema.Cost
 	}
 
 	return &schema.CostComponent{
-		Name:            fmt.Sprintf("Ingress data processed (%s)", r.DestinationZone),
+		Name:            "Inbound data transfer",
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: floatPtrToDecimalPtr(r.DataProcessedGB),
+		MonthlyQuantity: floatPtrToDecimalPtr(r.MonthlyDataTransferGB),
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("azure"),
 			Region:     strPtr(r.DestinationZone),
 			Service:    strPtr("VPN Gateway"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "serviceFamily", ValueRegex: strPtr(fmt.Sprintf("/%s/i", "Networking"))},
-				{Key: "productName", ValueRegex: strPtr(fmt.Sprintf("/%s/i", "VPN Gateway Bandwidth"))},
-				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/%s/i", "Inter-Virtual Network Data Transfer Out"))},
+				{Key: "serviceFamily", ValueRegex: regexPtr("Networking")},
+				{Key: "productName", ValueRegex: regexPtr("VPN Gateway Bandwidth")},
+				{Key: "meterName", ValueRegex: regexPtr("Inter-Virtual Network Data Transfer Out")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
