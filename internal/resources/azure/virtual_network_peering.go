@@ -47,7 +47,7 @@ func (r *VirtualNetworkPeering) BuildResource() *schema.Resource {
 func (r *VirtualNetworkPeering) egressDataProcessedCostComponent() *schema.CostComponent {
 	if r.DestinationRegion == r.SourceRegion {
 		return &schema.CostComponent{
-			Name:            "Egress data processed (Global)",
+			Name:            "Outbound data transfer",
 			Unit:            "GB",
 			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: floatPtrToDecimalPtr(r.DataProcessedGB),
