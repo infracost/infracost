@@ -33,8 +33,8 @@ func (r *VirtualNetworkPeering) PopulateUsage(u *schema.UsageData) {
 
 func (r *VirtualNetworkPeering) BuildResource() *schema.Resource {
 	costComponents := []*schema.CostComponent{
-		r.egressDataProcessedCostComponent(),
 		r.ingressDataProcessedCostComponent(),
+		r.egressDataProcessedCostComponent(),
 	}
 
 	return &schema.Resource{
