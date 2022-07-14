@@ -26,8 +26,8 @@ func newVirtualNetworkPeering(d *schema.ResourceData, u *schema.UsageData) *sche
 
 	r := &azure.VirtualNetworkPeering{
 		Address:           d.Address,
-		DestinationRegion: sourceRegion,
-		SourceRegion:      destinationRegion,
+		DestinationRegion: destinationRegion,
+		SourceRegion:      sourceRegion,
 		DestinationZone:   destinationZone,
 		SourceZone:        sourceZone,
 	}
