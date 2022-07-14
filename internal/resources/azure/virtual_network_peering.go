@@ -76,9 +76,9 @@ func (r *VirtualNetworkPeering) egressDataProcessedCostComponent() *schema.CostC
 			Region:     strPtr(r.SourceZone),
 			Service:    strPtr("VPN Gateway"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "serviceFamily", ValueRegex: strPtr(fmt.Sprintf("/%s/i", "Networking"))},
-				{Key: "productName", ValueRegex: strPtr(fmt.Sprintf("/%s/i", "VPN Gateway Bandwidth"))},
-				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/%s/i", "Inter-Virtual Network Data Transfer Out"))},
+				{Key: "serviceFamily", ValueRegex: regexPtr("Networking")},
+				{Key: "productName", ValueRegex: regexPtr("VPN Gateway Bandwidth")},
+				{Key: "meterName", ValueRegex: regexPtr("Inter-Virtual Network Data Transfer Out")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
