@@ -1,0 +1,22 @@
+
+ Name                                       Monthly Qty  Unit                    Monthly Cost 
+                                                                                              
+ azurerm_iothub.iothub_multiple                                                               
+ └─ IoT Hub                                           4  units                        $100.00 
+                                                                                              
+ azurerm_iothub.iothub_single                                                                 
+ └─ IoT Hub                                           1  units                         $25.00 
+                                                                                              
+ azurerm_iothub_dps.dps_withUsage                                                             
+ └─ Device provisioning                              10  1k operations                  $1.00 
+                                                                                              
+ azurerm_iothub_dps.dps_withoutUsage                                                          
+ └─ Device provisioning               Monthly cost depends on usage: $0.10 per 1k operations  
+                                                                                              
+ OVERALL TOTAL                                                                        $126.00 
+──────────────────────────────────
+6 cloud resources were detected:
+∙ 4 were estimated, 2 of which include usage-based costs, see https://infracost.io/usage-file
+∙ 2 were free:
+  ∙ 1 x azurerm_iothub
+  ∙ 1 x azurerm_resource_group

@@ -118,6 +118,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getSentinelDataConnectorMicrosoftDefenderAdvancedThreatProtectionRegistryItem(),
 	getSentinelDataConnectorOffice365RegistryItem(),
 	getSentinelDataConnectorThreatIntelligenceRegistryItem(),
+	getIoTHubRegistryItem(),
+	getIoTHubDPSRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -298,6 +300,13 @@ var FreeResources = []string{
 	"azurerm_key_vault_certificate_data",
 	"azurerm_key_vault_certificate_issuer",
 	"azurerm_key_vault_secret",
+
+	// Azure IoT
+	"azurerm_iothub_certificate",
+	"azurerm_iothub_consumer_group",
+	"azurerm_iothub_dps_certificate",
+	"azurerm_iothub_dps_shared_access_policy",
+	"azurerm_iothub_shared_access_policy",
 
 	// Azure Lighthouse (Delegated Resoure Management)
 	"azurerm_lighthouse_definition",

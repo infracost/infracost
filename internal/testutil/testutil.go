@@ -18,6 +18,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
 )
 
@@ -204,19 +205,22 @@ func (e ErrorOnAnyWriter) Write(data []byte) (n int, err error) {
 
 func ConfigureTestToFailOnLogs(t *testing.T, runCtx *config.RunContext) {
 	runCtx.Config.LogLevel = "warn"
-	runCtx.Config.LogDisableTimestamps = true
-	runCtx.Config.LogWriter = io.MultiWriter(os.Stderr, ErrorOnAnyWriter{t})
-	err := runCtx.Config.ConfigureLogger()
+	runCtx.Config.SetLogDisableTimestamps(true)
+	runCtx.Config.SetLogWriter(io.MultiWriter(os.Stderr, ErrorOnAnyWriter{t}))
+	runCtx.Config.DisableReportCaller()
+
+	err := logging.ConfigureBaseLogger(runCtx.Config)
 	require.Nil(t, err)
 }
 
 func ConfigureTestToCaptureLogs(t *testing.T, runCtx *config.RunContext) *bytes.Buffer {
 	logBuf := bytes.NewBuffer([]byte{})
 	runCtx.Config.LogLevel = "warn"
-	runCtx.Config.LogDisableTimestamps = true
-	runCtx.Config.LogWriter = io.MultiWriter(os.Stderr, logBuf)
+	runCtx.Config.SetLogDisableTimestamps(true)
+	runCtx.Config.SetLogWriter(io.MultiWriter(os.Stderr, logBuf))
+	runCtx.Config.DisableReportCaller()
 
-	err := runCtx.Config.ConfigureLogger()
+	err := logging.ConfigureBaseLogger(runCtx.Config)
 	require.Nil(t, err)
 	return logBuf
 }

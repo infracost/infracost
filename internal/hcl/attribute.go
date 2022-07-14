@@ -7,6 +7,7 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/convert"
 	"github.com/zclconf/go-cty/cty/gocty"
@@ -41,6 +42,7 @@ type Attribute struct {
 	Ctx *Context
 	// Verbose defines if the attribute should log verbose diagnostics messages to debug.
 	Verbose bool
+	Logger  *logrus.Entry
 	// newMock generates a mock value for the attribute if it's value is missing.
 	newMock func(attr *Attribute) cty.Value
 }
@@ -62,13 +64,14 @@ func (attr *Attribute) Value() cty.Value {
 		return cty.NilVal
 	}
 
+	attr.Logger.Debug("fetching attribute value")
 	return attr.value(0)
 }
 
 func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 	defer func() {
 		if err := recover(); err != nil {
-			log.Debugf("could not evaluate value for attr: %s err: %s\n%s", attr.Name(), err, debug.Stack())
+			attr.Logger.Debugf("could not evaluate value for attr: %s err: %s\n%s", attr.Name(), err, debug.Stack())
 			ctyVal = cty.NilVal
 		}
 	}()
@@ -126,7 +129,7 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 		}
 
 		if attr.Verbose {
-			log.Debugf("error diagnostic return from evaluating %s err: %s", attr.HCLAttr.Name, diag.Error())
+			attr.Logger.Debugf("error diagnostic return from evaluating %s err: %s", attr.HCLAttr.Name, diag.Error())
 		}
 	}
 
@@ -306,7 +309,7 @@ func (attr *Attribute) Equals(val interface{}) bool {
 	if attr.Value().Type() == cty.Number {
 		checkNumber, err := gocty.ToCtyValue(val, cty.Number)
 		if err != nil {
-			log.Debugf("Error converting number for equality check. %s", err)
+			attr.Logger.Debugf("Error converting number for equality check. %s", err)
 			return false
 		}
 		return attr.Value().RawEquals(checkNumber)
@@ -315,7 +318,7 @@ func (attr *Attribute) Equals(val interface{}) bool {
 	return false
 }
 
-func createDotReferenceFromTraversal(traversals ...hcl.Traversal) (*Reference, error) {
+func (attr *Attribute) createDotReferenceFromTraversal(traversals ...hcl.Traversal) (*Reference, error) {
 	var refParts []string
 
 	for _, x := range traversals {
@@ -326,25 +329,27 @@ func createDotReferenceFromTraversal(traversals ...hcl.Traversal) (*Reference, e
 			case hcl.TraverseAttr:
 				refParts = append(refParts, part.Name)
 			case hcl.TraverseIndex:
-				refParts[len(refParts)-1] = fmt.Sprintf("%s[%s]", refParts[len(refParts)-1], getIndexValue(part))
+				refParts[len(refParts)-1] = fmt.Sprintf("%s[%s]", refParts[len(refParts)-1], attr.getIndexValue(part))
 			}
 		}
 	}
 	return newReference(refParts)
 }
 
-func getIndexValue(part hcl.TraverseIndex) string {
+func (attr *Attribute) getIndexValue(part hcl.TraverseIndex) string {
 	switch part.Key.Type() {
 	case cty.String:
 		return fmt.Sprintf("%q", part.Key.AsString())
 	case cty.Number:
 		var intVal int
 		if err := gocty.FromCtyValue(part.Key, &intVal); err != nil {
-			log.Warn("could not unpack the int, returning 0")
+			attr.Logger.WithError(err).Warn("could not unpack int from block index attr, returning 0")
 			return "0"
 		}
+
 		return fmt.Sprintf("%d", intVal)
 	default:
+		attr.Logger.Debugf("could not get index value for unsupported cty type %s, returning 0", part.Key.Type())
 		return "0"
 	}
 }
@@ -412,54 +417,57 @@ func (attr *Attribute) referencesFromExpression(expression hcl.Expression) []*Re
 			refs = append(refs, attr.referencesFromExpression(arg)...)
 		}
 	case *hclsyntax.ConditionalExpr:
-		if ref, err := createDotReferenceFromTraversal(t.TrueResult.Variables()...); err == nil {
+		if ref, err := attr.createDotReferenceFromTraversal(t.TrueResult.Variables()...); err == nil {
 			refs = append(refs, ref)
 		}
-		if ref, err := createDotReferenceFromTraversal(t.FalseResult.Variables()...); err == nil {
+		if ref, err := attr.createDotReferenceFromTraversal(t.FalseResult.Variables()...); err == nil {
 			refs = append(refs, ref)
 		}
-		if ref, err := createDotReferenceFromTraversal(t.Condition.Variables()...); err == nil {
+		if ref, err := attr.createDotReferenceFromTraversal(t.Condition.Variables()...); err == nil {
 			refs = append(refs, ref)
 		}
 	case *hclsyntax.ScopeTraversalExpr:
-		if ref, err := createDotReferenceFromTraversal(t.Variables()...); err == nil {
+		if ref, err := attr.createDotReferenceFromTraversal(t.Variables()...); err == nil {
 			refs = append(refs, ref)
 		}
 	case *hclsyntax.TemplateWrapExpr:
 		refs = attr.referencesFromExpression(t.Wrapped)
 	case *hclsyntax.TemplateExpr:
 		for _, part := range t.Parts {
-			ref, err := createDotReferenceFromTraversal(part.Variables()...)
+			ref, err := attr.createDotReferenceFromTraversal(part.Variables()...)
 			if err != nil {
 				continue
 			}
 			refs = append(refs, ref)
 		}
 	case *hclsyntax.TupleConsExpr:
-		ref, err := createDotReferenceFromTraversal(t.Variables()...)
+		ref, err := attr.createDotReferenceFromTraversal(t.Variables()...)
 		if err == nil {
 			refs = append(refs, ref)
 		}
 	case *hclsyntax.RelativeTraversalExpr:
 		switch s := t.Source.(type) {
 		case *hclsyntax.IndexExpr:
-			if collectionRef, err := createDotReferenceFromTraversal(s.Collection.Variables()...); err == nil {
+			if collectionRef, err := attr.createDotReferenceFromTraversal(s.Collection.Variables()...); err == nil {
 				key, _ := s.Key.Value(attr.Ctx.Inner())
 				collectionRef.SetKey(key)
 				refs = append(refs, collectionRef, countRef)
 			}
 		default:
-			if ref, err := createDotReferenceFromTraversal(t.Source.Variables()...); err == nil {
+			if ref, err := attr.createDotReferenceFromTraversal(t.Source.Variables()...); err == nil {
 				refs = append(refs, ref)
 			}
 		}
 	case *hclsyntax.IndexExpr:
-		if collectionRef, err := createDotReferenceFromTraversal(t.Collection.Variables()...); err == nil {
+		if collectionRef, err := attr.createDotReferenceFromTraversal(t.Collection.Variables()...); err == nil {
 			key, _ := t.Key.Value(attr.Ctx.Inner())
 			collectionRef.SetKey(key)
 			refs = append(refs, collectionRef, countRef)
 		}
+	default:
+		attr.Logger.Debugf("could not create references for expression type: %s", t)
 	}
+
 	return refs
 }
 

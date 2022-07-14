@@ -8,19 +8,21 @@ import (
 
 	getter "github.com/hashicorp/go-getter"
 	"github.com/otiai10/copy"
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 )
 
 // PackageFetcher downloads modules from a remote source to the given destination
 // This supports all the non-local and non-Terraform registry sources listed here: https://www.terraform.io/language/modules/sources
 type PackageFetcher struct {
-	cache map[string]string
+	cache  map[string]string
+	logger *logrus.Entry
 }
 
 // NewPackageFetcher constructs a new package fetcher
-func NewPackageFetcher() *PackageFetcher {
+func NewPackageFetcher(logger *logrus.Entry) *PackageFetcher {
 	return &PackageFetcher{
-		cache: make(map[string]string),
+		cache:  make(map[string]string),
+		logger: logger,
 	}
 }
 
@@ -28,11 +30,11 @@ func NewPackageFetcher() *PackageFetcher {
 // See: https://github.com/hashicorp/go-getter
 func (r *PackageFetcher) fetch(moduleAddr string, dest string) error {
 	if prevDest, ok := r.cache[moduleAddr]; ok {
-		log.Debugf("Module %s already downloaded, copying from '%s' to '%s'", moduleAddr, prevDest, dest)
+		r.logger.Debugf("module %s already downloaded, copying from '%s' to '%s'", moduleAddr, prevDest, dest)
 
 		err := os.Mkdir(dest, os.ModePerm)
 		if err != nil {
-			return fmt.Errorf("Failed to create directory '%s': %w", dest, err)
+			return fmt.Errorf("failed to create directory '%s': %w", dest, err)
 		}
 
 		// Skip dotfiles and create new symlinks to be consistent with what Terraform init does
@@ -47,11 +49,17 @@ func (r *PackageFetcher) fetch(moduleAddr string, dest string) error {
 
 		err = copy.Copy(prevDest, dest, opt)
 		if err != nil {
-			return fmt.Errorf("Failed to copy module from '%s' to '%s': %w", prevDest, dest, err)
+			return fmt.Errorf("failed to copy module from '%s' to '%s': %w", prevDest, dest, err)
 		}
 
 		return nil
 	}
+	var cached []string
+	for k := range r.cache {
+		cached = append(cached, k)
+	}
+
+	r.logger.WithFields(logrus.Fields{"cached_module_addresses": cached}).Debugf("module %s does not exist in cache, proceeding to download", moduleAddr)
 
 	decompressors := map[string]getter.Decompressor{}
 	for k, decompressor := range getter.Decompressors {
@@ -75,5 +83,10 @@ func (r *PackageFetcher) fetch(moduleAddr string, dest string) error {
 
 	r.cache[moduleAddr] = dest
 
-	return client.Get()
+	err := client.Get()
+	if err != nil {
+		return fmt.Errorf("could not download module %s to cache %w", moduleAddr, err)
+	}
+
+	return nil
 }
