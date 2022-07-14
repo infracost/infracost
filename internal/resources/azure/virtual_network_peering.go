@@ -20,7 +20,7 @@ type VirtualNetworkPeering struct {
 	SourceZone        string
 	DestinationZone   string
 
-	DataProcessedGB *float64 `infracost_usage:"data_processed_gb"`
+	MonthlyDataTransferGB *float64 `infracost_usage:"monthly_data_transfer_gb"`
 }
 
 var VirtualNetworkPeeringUsageSchema = []*schema.UsageItem{
