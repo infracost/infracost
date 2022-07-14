@@ -90,7 +90,7 @@ func (r *VirtualNetworkPeering) egressDataProcessedCostComponent() *schema.CostC
 func (r *VirtualNetworkPeering) ingressDataProcessedCostComponent() *schema.CostComponent {
 	if r.DestinationRegion == r.SourceRegion {
 		return &schema.CostComponent{
-			Name:            "Ingress data processed (Global)",
+			Name:            "Inbound data transfer",
 			Unit:            "GB",
 			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: floatPtrToDecimalPtr(r.DataProcessedGB),
