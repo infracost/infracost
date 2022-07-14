@@ -71,7 +71,7 @@ func (attr *Attribute) Value() cty.Value {
 func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 	defer func() {
 		if err := recover(); err != nil {
-			attr.Logger.Debugf("could not evaluate value for attr: %s err: %s\n%s", attr.Name(), err, debug.Stack())
+			attr.Logger.Debugf("could not evaluate value for attr: %s. This is most likely an issue in the underlying hcl/go-cty libraries and can be ignored, but we log the stacktrace for debugging purposes. Err: %s\n%s", attr.Name(), err, debug.Stack())
 			ctyVal = cty.NilVal
 		}
 	}()
