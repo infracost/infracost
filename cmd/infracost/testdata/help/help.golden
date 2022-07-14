@@ -30,6 +30,7 @@ AVAILABLE COMMANDS
   register         Register for a free Infracost API key
 
 FLAGS
+      --debug-report       Generate a debug report file which can be sent to Infracost team
   -h, --help               help for infracost
       --log-level string   Log level (trace, debug, info, warn, error, fatal)
       --no-color           Turn off colored output
