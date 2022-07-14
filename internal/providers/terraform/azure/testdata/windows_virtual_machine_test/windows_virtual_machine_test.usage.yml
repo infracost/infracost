@@ -3,3 +3,5 @@ resource_usage:
   azurerm_windows_virtual_machine.standard_a2_v2_custom_disk:
     os_disk:
       monthly_disk_operations: 20000
+  azurerm_windows_virtual_machine.basic_a2_withMonthlyHours:
+    monthly_hrs: 100

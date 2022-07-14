@@ -10,6 +10,8 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
+
+	"github.com/infracost/infracost/internal/logging"
 )
 
 // Project defines a specific terraform project config. This can be used
@@ -59,6 +61,7 @@ type Config struct {
 
 	Version         string `yaml:"version,omitempty" ignored:"true"`
 	LogLevel        string `yaml:"log_level,omitempty" envconfig:"INFRACOST_LOG_LEVEL"`
+	DebugReport     bool   `ignored:"true"`
 	NoColor         bool   `yaml:"no_color,omitempty" envconfig:"INFRACOST_NO_COLOR"`
 	SkipUpdateCheck bool   `yaml:"skip_update_check,omitempty" envconfig:"INFRACOST_SKIP_UPDATE_CHECK"`
 	Parallelism     *int   `envconfig:"INFRACOST_PARALLELISM"`
@@ -95,8 +98,9 @@ type Config struct {
 
 	// for testing
 	EventsDisabled       bool
-	LogWriter            io.Writer
-	LogDisableTimestamps bool
+	logWriter            io.Writer
+	logDisableTimestamps bool
+	disableReportCaller  bool
 }
 
 func init() {
@@ -143,13 +147,94 @@ func (c *Config) LoadFromConfigFile(path string) error {
 	return nil
 }
 
+// DisableReportCaller sets whether the log entry writes the filename to the log line.
+func (c *Config) DisableReportCaller() {
+	c.disableReportCaller = true
+}
+
+// ReportCaller returns if the log entry writes the filename to the log line.
+func (c *Config) ReportCaller() bool {
+	level := c.WriteLevel()
+
+	return level == "debug" && !c.disableReportCaller
+}
+
+// WriteLevel is the log level that the Logger writes to LogWriter.
+func (c *Config) WriteLevel() string {
+	if c.DebugReport {
+		return logrus.DebugLevel.String()
+	}
+
+	return c.LogLevel
+}
+
+// LogFields sets the meta fields that are added to any log line entries.
+func (c *Config) LogFields() map[string]interface{} {
+	if c.WriteLevel() == "debug" {
+		f := map[string]interface{}{
+			"enable_cloud_comment": c.EnableCloudForComment,
+			"currency":             c.Currency,
+			"sync_usage":           c.SyncUsageFile,
+		}
+
+		if c.EnableCloud != nil {
+			f["enable_cloud_os"] = *c.EnableCloud
+		}
+
+		return f
+	}
+
+	return nil
+}
+
+// SetLogDisableTimestamps sets if logs should contain the timestamp the line is written at.
+func (c *Config) SetLogDisableTimestamps(v bool) {
+	c.logDisableTimestamps = v
+}
+
+// LogFormatter returns the log formatting to be used by a Logger.
+func (c *Config) LogFormatter() logrus.Formatter {
+	if c.DebugReport {
+		return &logrus.JSONFormatter{
+			DisableTimestamp: c.logDisableTimestamps,
+			PrettyPrint:      true,
+		}
+	}
+
+	return &logrus.TextFormatter{
+		FullTimestamp:    true,
+		DisableTimestamp: c.logDisableTimestamps,
+		DisableColors:    true,
+		SortingFunc: func(keys []string) {
+			// Put message at the end
+			for i, key := range keys {
+				if key == "msg" && i != len(keys)-1 {
+					keys[i], keys[len(keys)-1] = keys[len(keys)-1], keys[i]
+					break
+				}
+			}
+		},
+	}
+}
+
+// SetLogWriter sets the io.Writer that the logs should be piped to.
+func (c *Config) SetLogWriter(w io.Writer) {
+	c.logWriter = w
+}
+
+// LogWriter returns the writer the Logger should use to write logs to.
+// In most cases this should be stderr, but it can also be a file.
+func (c *Config) LogWriter() io.Writer {
+	return c.logWriter
+}
+
 func (c *Config) LoadFromEnv() error {
 	err := c.loadEnvVars()
 	if err != nil {
 		return err
 	}
 
-	err = c.ConfigureLogger()
+	err = logging.ConfigureBaseLogger(c)
 	if err != nil {
 		return err
 	}
@@ -179,43 +264,6 @@ func (c *Config) loadEnvVars() error {
 			return err
 		}
 	}
-
-	return nil
-}
-
-func (c *Config) ConfigureLogger() error {
-	logrus.SetFormatter(&logrus.TextFormatter{
-		FullTimestamp:    true,
-		DisableTimestamp: c.LogDisableTimestamps,
-		DisableColors:    true,
-		SortingFunc: func(keys []string) {
-			// Put message at the end
-			for i, key := range keys {
-				if key == "msg" && i != len(keys)-1 {
-					keys[i], keys[len(keys)-1] = keys[len(keys)-1], keys[i]
-					break
-				}
-			}
-		},
-	})
-
-	if c.LogLevel == "" {
-		logrus.SetOutput(io.Discard)
-		return nil
-	}
-
-	if c.LogWriter != nil {
-		logrus.SetOutput(c.LogWriter)
-	} else {
-		logrus.SetOutput(os.Stderr)
-	}
-
-	level, err := logrus.ParseLevel(c.LogLevel)
-	if err != nil {
-		return err
-	}
-
-	logrus.SetLevel(level)
 
 	return nil
 }

@@ -190,7 +190,7 @@ build_msg () {
       msg+="\n$update_msg\n\n"
     fi
     msg+="<sub>\n"
-    msg+="  Is this comment useful? <a href=\"https://www.infracost.io/feedback/submit/?value=yes\" rel=\"noopener noreferrer\" target=\"_blank\">Yes</a>, <a href=\"https://www.infracost.io/feedback/submit/?value=no\" rel=\"noopener noreferrer\" target=\"_blank\">No</a>\n"
+    msg+="  Is this comment useful? <a href=\"https://dashboard.infracost.io/feedback/redirect?value=yes\" rel=\"noopener noreferrer\" target=\"_blank\">Yes</a>, <a href=\"https://dashboard.infracost.io/feedback/redirect?value=no\" rel=\"noopener noreferrer\" target=\"_blank\">No</a>, <a href=\"https://dashboard.infracost.io/feedback/redirect?value=other\" rel=\"noopener noreferrer\" target=\"_blank\">Other</a>\n"
     msg+="</sub>\n"
   fi
 

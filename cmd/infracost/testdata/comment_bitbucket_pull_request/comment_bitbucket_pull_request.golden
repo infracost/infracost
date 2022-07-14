@@ -122,7 +122,6 @@ Key: ~ changed, + added, - removed
 ```
 
 This comment will be updated when the cost estimate changes.
-
-Is this comment useful? [Yes](https://www.infracost.io/feedback/submit/?value=yes), [No](https://www.infracost.io/feedback/submit/?value=no)
+Is this comment useful? [Yes](https://dashboard.infracost.io/feedback/redirect?runId=&value=yes), [No](https://dashboard.infracost.io/feedback/redirect?runId=&value=no), [Other](https://dashboard.infracost.io/feedback/redirect?runId=&value=other)
 
 Comment not posted to Bitbucket (--dry-run was specified)

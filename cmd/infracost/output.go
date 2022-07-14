@@ -122,8 +122,9 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			}
 
 			opts := output.Options{
-				NoColor: ctx.Config.NoColor,
-				Fields:  fields,
+				DashboardEndpoint: ctx.Config.DashboardEndpoint,
+				NoColor:           ctx.Config.NoColor,
+				Fields:            fields,
 			}
 			opts.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
 
@@ -199,7 +200,7 @@ func shareCombinedRun(ctx *config.RunContext, combined output.Root, inputs []out
 	dashboardClient := apiclient.NewDashboardAPIClient(ctx)
 	result, err := dashboardClient.AddRun(ctx, combined)
 	if err != nil {
-		log.Errorf("Error reporting run: %s", err)
+		log.WithError(err).Error("Failed to upload to Infracost Cloud")
 	}
 
 	return result.RunID, result.ShareURL

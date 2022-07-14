@@ -5,3 +5,7 @@ resource_usage:
       monthly_disk_operations: 1000000
     storage_data_disk:
       monthly_disk_operations: 2000000
+  azurerm_virtual_machine.linux_withMonthlyHours:
+    monthly_hrs: 100
+  azurerm_virtual_machine.windows_withMonthlyHours:
+    monthly_hrs: 100

@@ -20,6 +20,8 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
 
+	"github.com/infracost/infracost/internal/logging"
+
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
@@ -81,16 +83,6 @@ func addRunFlags(cmd *cobra.Command) {
 	_ = cmd.Flags().MarkHidden("terraform-init-flags")
 }
 
-// panicError is used to collect goroutine panics into an error interface so
-// that we can do type assertion on err checking.
-type panicError struct {
-	msg string
-}
-
-func (p *panicError) Error() string {
-	return p.msg
-}
-
 func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	if runCtx.Config.IsSelfHosted() && runCtx.IsCloudEnabled() {
 		ui.PrintWarning(cmd.ErrOrStderr(), "Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
@@ -150,7 +142,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	dashboardClient := apiclient.NewDashboardAPIClient(runCtx)
 	result, err := dashboardClient.AddRun(runCtx, r)
 	if err != nil {
-		log.Errorf("Error reporting run: %s", err)
+		log.WithError(err).Error("Failed to upload to Infracost Cloud")
 	}
 
 	r.RunID, r.ShareURL = result.RunID, result.ShareURL
@@ -162,9 +154,10 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	}
 
 	b, err := output.FormatOutput(format, r, output.Options{
-		ShowSkipped: runCtx.Config.ShowSkipped,
-		NoColor:     runCtx.Config.NoColor,
-		Fields:      runCtx.Config.Fields,
+		DashboardEndpoint: runCtx.Config.DashboardEndpoint,
+		ShowSkipped:       runCtx.Config.ShowSkipped,
+		NoColor:           runCtx.Config.NoColor,
+		Fields:            runCtx.Config.Fields,
 	})
 	if err != nil {
 		return err
@@ -270,7 +263,7 @@ func newParallelRunner(cmd *cobra.Command, runCtx *config.RunContext) (*parallel
 		}
 
 		runCtx.Config.LogLevel = "info"
-		err := runCtx.Config.ConfigureLogger()
+		err := logging.ConfigureBaseLogger(runCtx.Config)
 		if err != nil {
 			return nil, err
 		}
@@ -292,6 +285,7 @@ func (r *parallelRunner) run() ([]projectResult, error) {
 
 	errGroup, _ := errgroup.WithContext(context.Background())
 	for i := 0; i < r.parallelism; i++ {
+		i := i
 		errGroup.Go(func() (err error) {
 			// defer a function to recover from any panics spawned by child goroutines.
 			// This is done as recover works only in the same goroutine that it is called.
@@ -300,12 +294,14 @@ func (r *parallelRunner) run() ([]projectResult, error) {
 			defer func() {
 				e := recover()
 				if e != nil {
-					err = &panicError{msg: fmt.Sprintf("%s\n%s", e, debug.Stack())}
+					err = clierror.NewPanicError(fmt.Errorf("%s", e), debug.Stack())
 				}
 			}()
 
 			for job := range jobs {
-				ctx := config.NewProjectContext(r.runCtx, job.projectCfg)
+				ctx := config.NewProjectContext(r.runCtx, job.projectCfg, log.Fields{
+					"routine": i,
+				})
 				configProjects, err := r.runProjectConfig(ctx)
 				if err != nil {
 					return err
@@ -365,7 +361,7 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 		m := fmt.Sprintf("%s\n\n", err)
 		m += fmt.Sprintf("Try setting --path to a Terraform plan JSON file. See %s for how to generate this.", ui.LinkString("https://infracost.io/troubleshoot"))
 
-		return nil, clierror.NewSanitizedError(errors.New(m), "Could not detect path type")
+		return nil, clierror.NewCLIError(errors.New(m), "Could not detect path type")
 	}
 
 	ctx.SetContextValue("projectType", provider.Type())
@@ -381,7 +377,7 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 		m := "Cannot use Terraform state JSON with the infracost diff command.\n\n"
 		m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
 		m += " - Terraform plan JSON file\n - Terraform/Terragrunt directory\n - Terraform plan file"
-		return nil, clierror.NewSanitizedError(errors.New(m), "Cannot use Terraform state JSON with the infracost diff command")
+		return nil, clierror.NewCLIError(errors.New(m), "Cannot use Terraform state JSON with the infracost diff command")
 	}
 
 	m := fmt.Sprintf("Detected %s at %s", provider.DisplayType(), ui.DisplayPath(ctx.ProjectConfig.Path))

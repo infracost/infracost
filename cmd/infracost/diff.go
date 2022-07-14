@@ -5,11 +5,11 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/providers"
 	"github.com/infracost/infracost/internal/ui"
@@ -98,9 +98,10 @@ func runCompare(cmd *cobra.Command, ctx *config.RunContext, current output.Root)
 
 	format, _ := cmd.Flags().GetString("format")
 	b, err := output.FormatOutput(strings.ToLower(format), combined, output.Options{
-		ShowSkipped: ctx.Config.ShowSkipped,
-		NoColor:     ctx.Config.NoColor,
-		Fields:      ctx.Config.Fields,
+		DashboardEndpoint: ctx.Config.DashboardEndpoint,
+		ShowSkipped:       ctx.Config.ShowSkipped,
+		NoColor:           ctx.Config.NoColor,
+		Fields:            ctx.Config.Fields,
 	})
 	if err != nil {
 		return err
@@ -109,7 +110,7 @@ func runCompare(cmd *cobra.Command, ctx *config.RunContext, current output.Root)
 	pricingClient := apiclient.NewPricingAPIClient(ctx)
 	err = pricingClient.AddEvent("infracost-run", ctx.EventEnv())
 	if err != nil {
-		log.Errorf("Error reporting event: %s", err)
+		logging.Logger.WithError(err).Error("could not report infracost-run event")
 	}
 
 	if outFile, _ := cmd.Flags().GetString("out-file"); outFile != "" {

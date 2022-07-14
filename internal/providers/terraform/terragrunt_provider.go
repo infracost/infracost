@@ -167,7 +167,7 @@ func (p *TerragruntProvider) getProjectDirs() ([]terragruntProjectDirs, error) {
 		err = p.buildTerraformErr(err, false)
 
 		msg := "terragrunt run-all terragrunt-info failed"
-		return []terragruntProjectDirs{}, clierror.NewSanitizedError(fmt.Errorf("%s: %s", msg, err), msg)
+		return []terragruntProjectDirs{}, clierror.NewCLIError(fmt.Errorf("%s: %s", msg, err), msg)
 	}
 
 	var jsons [][]byte

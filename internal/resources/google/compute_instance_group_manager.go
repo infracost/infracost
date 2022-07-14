@@ -33,7 +33,7 @@ func (r *ComputeInstanceGroupManager) PopulateUsage(u *schema.UsageData) {
 // See providers folder for more information.
 func (r *ComputeInstanceGroupManager) BuildResource() *schema.Resource {
 	costComponents := []*schema.CostComponent{
-		computeCostComponent(r.Region, r.MachineType, r.PurchaseOption, r.TargetSize),
+		computeCostComponent(r.Region, r.MachineType, r.PurchaseOption, r.TargetSize, nil),
 	}
 
 	for _, disk := range r.Disks {
@@ -45,7 +45,7 @@ func (r *ComputeInstanceGroupManager) BuildResource() *schema.Resource {
 	}
 
 	for _, guestAccel := range r.GuestAccelerators {
-		costComponents = append(costComponents, guestAcceleratorCostComponent(r.Region, r.PurchaseOption, guestAccel.Type, guestAccel.Count, r.TargetSize))
+		costComponents = append(costComponents, guestAcceleratorCostComponent(r.Region, r.PurchaseOption, guestAccel.Type, guestAccel.Count, r.TargetSize, nil))
 	}
 
 	return &schema.Resource{
