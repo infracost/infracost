@@ -1007,7 +1007,7 @@ resource_usage:
     monthly_data_processed_gb: 10 # Monthly data processed by the NAT Gateway in GB.
 
   azurerm_virtual_network_peering.my_peering:
-    data_processed_gb: 100 # Data processed by the VNET peering in GB.
+    monthly_data_transfer_gb: 100 # Monthly inbound/outbound data transferred by the VNET peering in GB.
 
   azurerm_point_to_site_vpn_gateway.my_point_to_site_gateway:
     monthly_p2s_connections_hrs: 2000 # Monthly connection hours to the point to site gateway
