@@ -1,6 +1,8 @@
 package azure
 
 import (
+	"strings"
+
 	"github.com/infracost/infracost/internal/resources/azure"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -21,8 +23,8 @@ func newVirtualNetworkPeering(d *schema.ResourceData, u *schema.UsageData) *sche
 	sourceRegion := lookupRegion(d, []string{"virtual_network_name"})
 	destinationRegion := lookupRegion(d, []string{"remote_virtual_network_id"})
 
-	sourceZone := regionToZone(sourceRegion)
-	destinationZone := regionToZone(destinationRegion)
+	sourceZone := virtualNetworkPeeringConvertRegion(sourceRegion)
+	destinationZone := virtualNetworkPeeringConvertRegion(destinationRegion)
 
 	r := &azure.VirtualNetworkPeering{
 		Address:           d.Address,
@@ -34,4 +36,20 @@ func newVirtualNetworkPeering(d *schema.ResourceData, u *schema.UsageData) *sche
 	r.PopulateUsage(u)
 
 	return r.BuildResource()
+}
+
+func virtualNetworkPeeringConvertRegion(region string) string {
+	zone := regionToZone(region)
+
+	if strings.HasPrefix(strings.ToLower(region), "usgov") {
+		zone = "US Gov Zone 1"
+	}
+	if strings.HasPrefix(strings.ToLower(region), "germany") {
+		zone = "DE Zone 1"
+	}
+	if strings.HasPrefix(strings.ToLower(region), "china") {
+		zone = "CN Zone 1"
+	}
+
+	return zone
 }

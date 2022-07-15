@@ -22,7 +22,7 @@ type VirtualNetworkPeering struct {
 }
 
 var VirtualNetworkPeeringUsageSchema = []*schema.UsageItem{
-	{Key: "data_processed_gb", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "monthly_data_transfer_gb", DefaultValue: 0, ValueType: schema.Float64},
 }
 
 func (r *VirtualNetworkPeering) PopulateUsage(u *schema.UsageData) {
