@@ -56,6 +56,34 @@ func (attr *Attribute) IsIterable() bool {
 	return attr.Value().Type().IsCollectionType() || attr.Value().Type().IsObjectType() || attr.Value().Type().IsMapType() || attr.Value().Type().IsListType() || attr.Value().Type().IsSetType() || attr.Value().Type().IsTupleType()
 }
 
+// AsInt returns the Attribute value as a int64. If the cty.Value is not a type
+// that can be converted to integer, this method returns 0.
+func (attr *Attribute) AsInt() int64 {
+	v := attr.Value()
+
+	var i int64
+	err := gocty.FromCtyValue(v, &i)
+	if err != nil {
+		attr.Logger.WithError(err).Debug("could not return attribute value as int64")
+	}
+
+	return i
+}
+
+// AsString returns the Attribute value as a string. If the cty.Value is not a type
+// that can be converted to string, this method returns an empty string.
+func (attr *Attribute) AsString() string {
+	v := attr.Value()
+
+	var s string
+	err := gocty.FromCtyValue(v, &s)
+	if err != nil {
+		attr.Logger.WithError(err).Debug("could not return attribute value as string")
+	}
+
+	return s
+}
+
 // Value returns the Attribute with the underlying hcl.Expression of the hcl.Attribute evaluated with
 // the Attribute Context. This returns a cty.Value with the values filled from any variables or references
 // that the Context carries.

@@ -364,10 +364,7 @@ func (e *Evaluator) expandBlockCounts(blocks Blocks) Blocks {
 		count := 1
 		value := countAttr.Value()
 		if !value.IsNull() && value.IsKnown() {
-			if value.Type() == cty.Number {
-				f, _ := value.AsBigFloat().Float64()
-				count = int(f)
-			}
+			count = int(countAttr.AsInt())
 		}
 
 		e.logger.Debugf("expanding block %s because a count attribute of value %d was found", block.LocalName(), count)
@@ -445,7 +442,7 @@ func convertType(val cty.Value, attribute *Attribute) cty.Value {
 	case *hclsyntax.ScopeTraversalExpr:
 		t = v.Traversal.RootName()
 	case *hclsyntax.LiteralValueExpr:
-		t = attribute.Value().AsString()
+		t = attribute.AsString()
 	}
 
 	switch t {
@@ -619,11 +616,8 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 	attrs := b.AttributesAsMap()
 	for _, attr := range attrs {
 		if attr.Name() == "source" {
-			sourceVal := attr.Value()
-			if sourceVal.Type() == cty.String {
-				source = sourceVal.AsString()
-				break
-			}
+			source = attr.AsString()
+			break
 		}
 	}
 
