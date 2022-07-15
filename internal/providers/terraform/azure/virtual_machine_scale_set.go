@@ -64,14 +64,16 @@ func NewAzureRMVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageDat
 
 	schema.MultiplyQuantities(r, capacity)
 
-	diskData := d.Get("storage_profile_os_disk").Array()[0]
 	var storageOperations *decimal.Decimal
-	if u != nil {
-		if v, ok := u.Get("storage_profile_os_disk").Map()["monthly_disk_operations"]; ok {
-			storageOperations = decimalPtr(decimal.NewFromInt(v.Int()))
+	if len(d.Get("storage_profile_os_disk").Array()) > 0 {
+		diskData := d.Get("storage_profile_os_disk").Array()[0]
+		if u != nil {
+			if v, ok := u.Get("storage_profile_os_disk").Map()["monthly_disk_operations"]; ok {
+				storageOperations = decimalPtr(decimal.NewFromInt(v.Int()))
+			}
 		}
+		r.SubResources = append(r.SubResources, legacyOSDiskSubResource(region, diskData, storageOperations))
 	}
-	r.SubResources = append(r.SubResources, legacyOSDiskSubResource(region, diskData, storageOperations))
 
 	if u != nil {
 		if v, ok := u.Get("storage_profile_data_disk").Map()["monthly_disk_operations"]; ok {
