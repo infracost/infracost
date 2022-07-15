@@ -399,7 +399,7 @@ type SetAttributesFunc func(moduleBlock *Block, block *hcl.Block)
 // on the block.
 func SetUUIDAttributes(moduleBlock *Block, block *hcl.Block) {
 	if body, ok := block.Body.(*hclsyntax.Body); ok {
-		if block.Type == "resource" || block.Type == "data" {
+		if (block.Type == "resource" || block.Type == "data") && body.Attributes != nil {
 			_, withCount := body.Attributes["count"]
 			if _, ok := body.Attributes["id"]; !ok {
 				body.Attributes["id"] = newUniqueAttribute("id", withCount)
