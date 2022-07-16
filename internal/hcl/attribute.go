@@ -183,10 +183,6 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 		}
 	}
 
-	if !ctyVal.IsKnown() {
-		return cty.NilVal
-	}
-
 	return ctyVal
 }
 
