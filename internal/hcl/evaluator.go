@@ -3,6 +3,7 @@ package hcl
 import (
 	"errors"
 	"fmt"
+	"math"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -364,7 +365,10 @@ func (e *Evaluator) expandBlockCounts(blocks Blocks) Blocks {
 		count := 1
 		value := countAttr.Value()
 		if !value.IsNull() && value.IsKnown() {
-			count = int(countAttr.AsInt())
+			v := countAttr.AsInt()
+			if v <= math.MaxInt32 {
+				count = int(v)
+			}
 		}
 
 		e.logger.Debugf("expanding block %s because a count attribute of value %d was found", block.LocalName(), count)
