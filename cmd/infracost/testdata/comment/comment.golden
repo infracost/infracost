@@ -27,6 +27,7 @@ FLAGS
   -h, --help   help for comment
 
 GLOBAL FLAGS
+      --debug-report       Generate a debug report file which can be sent to Infracost team
       --log-level string   Log level (trace, debug, info, warn, error, fatal)
       --no-color           Turn off colored output
 

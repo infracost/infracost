@@ -300,12 +300,9 @@ func loadResources(t *testing.T, pName string, tfProject TerraformProject, runCt
 	if pName == "hcl" {
 		provider = newHCLProvider(t, runCtx, tfdir)
 	} else {
-		provider = terraform.NewDirProvider(config.NewProjectContext(
-			runCtx,
-			&config.Project{
-				Path: tfdir,
-			},
-		), false)
+		provider = terraform.NewDirProvider(config.NewProjectContext(runCtx, &config.Project{
+			Path: tfdir,
+		}, log.Fields{}), false)
 	}
 
 	projects, err := provider.LoadResources(usageData)
@@ -352,10 +349,7 @@ func goldenFileSyncTest(t *testing.T, pName, testName string) {
 		},
 	}
 
-	projectCtx := config.NewProjectContext(
-		runCtx,
-		&config.Project{},
-	)
+	projectCtx := config.NewProjectContext(runCtx, &config.Project{}, log.Fields{})
 
 	usageFilePath := filepath.Join("testdata", testName, testName+"_existing_usage.yml")
 	projects := loadResources(t, pName, tfProject, runCtx, map[string]*schema.UsageData{})
@@ -392,12 +386,9 @@ func CreateTerraformProject(tmpDir string, tfProject TerraformProject) (string, 
 func newHCLProvider(t *testing.T, runCtx *config.RunContext, tfdir string) *terraform.HCLProvider {
 	t.Helper()
 
-	projectCtx := config.NewProjectContext(
-		runCtx,
-		&config.Project{
-			Path: tfdir,
-		},
-	)
+	projectCtx := config.NewProjectContext(runCtx, &config.Project{
+		Path: tfdir,
+	}, log.Fields{})
 
 	provider, err := terraform.NewHCLProvider(projectCtx, &terraform.HCLProviderConfig{SuppressLogging: true})
 	require.NoError(t, err)

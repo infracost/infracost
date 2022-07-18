@@ -20,6 +20,8 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
 
+	"github.com/infracost/infracost/internal/logging"
+
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
@@ -261,7 +263,7 @@ func newParallelRunner(cmd *cobra.Command, runCtx *config.RunContext) (*parallel
 		}
 
 		runCtx.Config.LogLevel = "info"
-		err := runCtx.Config.ConfigureLogger()
+		err := logging.ConfigureBaseLogger(runCtx.Config)
 		if err != nil {
 			return nil, err
 		}
@@ -283,6 +285,7 @@ func (r *parallelRunner) run() ([]projectResult, error) {
 
 	errGroup, _ := errgroup.WithContext(context.Background())
 	for i := 0; i < r.parallelism; i++ {
+		i := i
 		errGroup.Go(func() (err error) {
 			// defer a function to recover from any panics spawned by child goroutines.
 			// This is done as recover works only in the same goroutine that it is called.
@@ -296,7 +299,9 @@ func (r *parallelRunner) run() ([]projectResult, error) {
 			}()
 
 			for job := range jobs {
-				ctx := config.NewProjectContext(r.runCtx, job.projectCfg)
+				ctx := config.NewProjectContext(r.runCtx, job.projectCfg, log.Fields{
+					"routine": i,
+				})
 				configProjects, err := r.runProjectConfig(ctx)
 				if err != nil {
 					return err
