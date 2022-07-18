@@ -1,9 +1,14 @@
 
- Name  Monthly Qty  Unit  Monthly Cost 
-                                       
- OVERALL TOTAL                   $0.00 
+ Name                                               Monthly Qty  Unit      Monthly Cost 
+                                                                                        
+ ibm_is_vpc.testVpc                                                                     
+ ├─ VPC instance                                              1  Instance         $0.00 
+ └─ VPC egress us-south 0 - 9995 GB                       9,995  GB             $869.57 
+ └─ VPC egress us-south 9995 - 49995 GB                  40,000  GB           $3,320.00 
+ └─ VPC egress us-south 49995 - 149995 GB                   105  GB               $7.35 
+ └─ VPC egress us-south 149995 - 99999999999999 GB            0  GB               $0.00 
+                                                                                        
+ OVERALL TOTAL                                                                $4,196.92 
 ──────────────────────────────────
 1 cloud resource was detected:
-∙ 0 were estimated
-∙ 1 is not supported yet, see https://infracost.io/requested-resources:
-  ∙ 1 x ibm_is_vpc
+∙ 1 was estimated, it includes usage-based costs, see https://infracost.io/usage-file

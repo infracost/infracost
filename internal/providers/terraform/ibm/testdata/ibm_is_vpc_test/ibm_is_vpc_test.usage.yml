@@ -1,4 +1,4 @@
 version: 0.1
 resource_usage:
   ibm_is_vpc.testVpc:
-    gigabyte_transmitted_outbounds: 5
+    gigabyte_transmitted_outbounds: 50100

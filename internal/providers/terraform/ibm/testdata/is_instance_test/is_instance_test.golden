@@ -1,15 +1,20 @@
 
- Name                                             Monthly Qty  Unit   Monthly Cost 
-                                                                                   
- ibm_is_instance.testInstance                                                      
- └─ Instance usage (cx2.2x4, public, us-south-1)          730  hours        $81.43 
-                                                                                   
- OVERALL TOTAL                                                              $81.43 
+ Name                                               Monthly Qty  Unit      Monthly Cost 
+                                                                                        
+ ibm_is_instance.testInstance                                                           
+ └─ Instance usage (cx2.2x4, public, us-south-1)            730  hours           $81.43 
+                                                                                        
+ ibm_is_vpc.testVpc                                                                     
+ ├─ VPC instance                                              1  Instance         $0.00 
+ └─ VPC egress us-south 0 - 9995 GB                           -  GB                   - 
+ └─ VPC egress us-south 9995 - 49995 GB                       -  GB                   - 
+ └─ VPC egress us-south 49995 - 149995 GB                     -  GB                   - 
+ └─ VPC egress us-south 149995 - 99999999999999 GB            -  GB                   - 
+                                                                                        
+ OVERALL TOTAL                                                                   $81.43 
 ──────────────────────────────────
 4 cloud resources were detected:
-∙ 1 was estimated, it includes usage-based costs, see https://infracost.io/usage-file
+∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 2 were free:
   ∙ 1 x ibm_is_ssh_key
   ∙ 1 x ibm_is_subnet
-∙ 1 is not supported yet, see https://infracost.io/requested-resources:
-  ∙ 1 x ibm_is_vpc

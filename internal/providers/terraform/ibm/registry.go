@@ -4,14 +4,13 @@ import "github.com/infracost/infracost/internal/schema"
 
 var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getIsInstanceRegistryItem(),
-	// getIbmIsVpcRegistryItem(),
+	getIbmIsVpcRegistryItem(),
 	getContainerVpcWorkerPoolRegistryItem(),
 	getContainerVpcClusterRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
 var FreeResources = []string{
-	// IBM Account
 	"ibm_resource_group",
 	"ibm_iam_authorization_policy",
 	"ibm_is_vpc_address_prefix",
