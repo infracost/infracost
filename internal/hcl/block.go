@@ -569,13 +569,7 @@ func (b *Block) ModuleSource() string {
 		return ""
 	}
 
-	value := attr.Value()
-
-	if value.Type() != cty.String {
-		return ""
-	}
-
-	return value.AsString()
+	return attr.AsString()
 }
 
 // Provider returns the provider by first checking if it is explicitly set as an attribute, if it is not
@@ -588,16 +582,16 @@ func (b *Block) Provider() string {
 
 	attr := b.GetAttribute("provider")
 	if attr != nil {
-		value := attr.Value()
+		value := attr.AsString()
 		r, err := attr.Reference()
 		if err == nil {
 			// An explicit provider is provided so use that
 			return r.String()
 		}
 
-		if value.Type() == cty.String {
+		if value != "" {
 			// An explicit provider is provided so use that
-			return value.AsString()
+			return value
 		}
 	}
 
