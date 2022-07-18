@@ -3,6 +3,7 @@ package hcl
 import (
 	"fmt"
 	"runtime/debug"
+	"strconv"
 	"strings"
 
 	"github.com/hashicorp/hcl/v2"
@@ -60,6 +61,15 @@ func (attr *Attribute) IsIterable() bool {
 // that can be converted to integer, this method returns 0.
 func (attr *Attribute) AsInt() int64 {
 	v := attr.Value()
+	if v.Type() == cty.String {
+		s := attr.AsString()
+		i, err := strconv.ParseInt(s, 10, 64)
+		if err != nil {
+			attr.Logger.WithError(err).Debugf("could not return attribute string value %s as int64", s)
+		}
+
+		return i
+	}
 
 	var i int64
 	err := gocty.FromCtyValue(v, &i)
@@ -74,6 +84,10 @@ func (attr *Attribute) AsInt() int64 {
 // that can be converted to string, this method returns an empty string.
 func (attr *Attribute) AsString() string {
 	v := attr.Value()
+	if v.Type() == cty.Number {
+		i := attr.AsInt()
+		return fmt.Sprintf("%d", i)
+	}
 
 	var s string
 	err := gocty.FromCtyValue(v, &s)
