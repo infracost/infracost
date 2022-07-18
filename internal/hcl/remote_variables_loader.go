@@ -317,21 +317,16 @@ func (r *RemoteVariablesLoader) getBackendOrganizationWorkspace(blocks Blocks) (
 }
 
 func getAttribute(block *Block, name string) string {
-	result := ""
-
 	if block == nil {
-		return result
+		return ""
 	}
 
 	attr := block.GetAttribute(name)
 	if attr != nil {
-		val := attr.Value()
-		if !val.IsNull() {
-			result = val.AsString()
-		}
+		return attr.AsString()
 	}
 
-	return result
+	return ""
 }
 
 func getVarValue(variable tfcVar) cty.Value {
