@@ -60,6 +60,10 @@ func (attr *Attribute) IsIterable() bool {
 // AsInt returns the Attribute value as a int64. If the cty.Value is not a type
 // that can be converted to integer, this method returns 0.
 func (attr *Attribute) AsInt() int64 {
+	if attr == nil {
+		return 0
+	}
+
 	v := attr.Value()
 	if v.Type() == cty.String {
 		s := attr.AsString()
@@ -83,6 +87,10 @@ func (attr *Attribute) AsInt() int64 {
 // AsString returns the Attribute value as a string. If the cty.Value is not a type
 // that can be converted to string, this method returns an empty string.
 func (attr *Attribute) AsString() string {
+	if attr == nil {
+		return ""
+	}
+
 	v := attr.Value()
 	if v.Type() == cty.Number {
 		i := attr.AsInt()
@@ -426,6 +434,7 @@ func (attr *Attribute) Reference() (*Reference, error) {
 	if attr == nil {
 		return nil, fmt.Errorf("attribute is nil")
 	}
+
 	refs := attr.AllReferences()
 	if len(refs) == 0 {
 		return nil, fmt.Errorf("no references for attribute")
