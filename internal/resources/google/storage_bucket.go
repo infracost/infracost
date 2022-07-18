@@ -167,7 +167,7 @@ func operationsCostComponents(storageClass string, monthlyClassAOperations, mont
 				Service:    strPtr("Cloud Storage"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "resourceGroup", Value: strPtr(storageClassResourceGroupMap[storageClass])},
-					{Key: "description", ValueRegex: strPtr("/Class A/")},
+					{Key: "description", ValueRegex: regexPtr("^(?:(?!Tagging).)* Class A")},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
@@ -184,7 +184,7 @@ func operationsCostComponents(storageClass string, monthlyClassAOperations, mont
 				Service:    strPtr("Cloud Storage"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "resourceGroup", Value: strPtr(storageClassResourceGroupMap[storageClass])},
-					{Key: "description", ValueRegex: strPtr("/Class B/")},
+					{Key: "description", ValueRegex: regexPtr("^(?:(?!Tagging).)* Class B")},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
