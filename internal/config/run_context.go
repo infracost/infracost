@@ -179,12 +179,18 @@ func (r *RunContext) IsInfracostComment() bool {
 }
 
 func (r *RunContext) IsCloudEnabled() bool {
-	if r.isCommentCmd && r.Config.EnableCloudForComment {
-		log.Debug("IsCloudEnabled is true for comment with org level setting enabled.")
+	if r.Config.EnableCloud != nil {
+		log.WithFields(log.Fields{"is_cloud_enabled": *r.Config.EnableCloud}).Debug("IsCloudEnabled explicitly set through Config.EnabledCloud")
+		return *r.Config.EnableCloud
+	}
+
+	if r.Config.EnableCloudForOrganization {
+		log.Debug("IsCloudEnabled is true with org level setting enabled.")
 		return true
 	}
 
-	return (r.Config.EnableCloud != nil && *r.Config.EnableCloud) || r.Config.EnableDashboard
+	log.WithFields(log.Fields{"is_cloud_enabled": r.Config.EnableDashboard}).Debug("IsCloudEnabled inferred from Config.EnabledDashboard")
+	return r.Config.EnableDashboard
 }
 
 func baseVersion(v string) string {

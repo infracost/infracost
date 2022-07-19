@@ -81,7 +81,7 @@ type Config struct {
 	Currency string `envconfig:"INFRACOST_CURRENCY"`
 
 	// Org settings
-	EnableCloudForComment bool
+	EnableCloudForOrganization bool
 
 	Projects      []*Project `yaml:"projects" ignored:"true"`
 	Format        string     `yaml:"format,omitempty" ignored:"true"`
@@ -172,9 +172,9 @@ func (c *Config) WriteLevel() string {
 func (c *Config) LogFields() map[string]interface{} {
 	if c.WriteLevel() == "debug" {
 		f := map[string]interface{}{
-			"enable_cloud_comment": c.EnableCloudForComment,
-			"currency":             c.Currency,
-			"sync_usage":           c.SyncUsageFile,
+			"enable_cloud_org": c.EnableCloudForOrganization,
+			"currency":         c.Currency,
+			"sync_usage":       c.SyncUsageFile,
 		}
 
 		if c.EnableCloud != nil {
