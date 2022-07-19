@@ -184,11 +184,6 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 }
 
 func shareCombinedRun(ctx *config.RunContext, combined output.Root, inputs []output.ReportInput) (string, string) {
-	if len(inputs) == 1 && inputs[0].Root.RunID != "" {
-		result := inputs[0].Root
-		return result.RunID, result.ShareURL
-	}
-
 	combinedRunIds := []string{}
 	for _, input := range inputs {
 		if id := input.Root.RunID; id != "" {
