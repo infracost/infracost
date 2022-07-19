@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -8,6 +9,7 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/go-git/go-git/v5"
 	"github.com/sirupsen/logrus"
 
 	"github.com/infracost/infracost/internal/logging"
@@ -171,23 +173,24 @@ func gitSubPath(path string) string {
 		return ""
 	}
 
+	if subPath == "." {
+		return ""
+	}
+
 	return subPath
 }
 
 func gitToplevel(path string) (string, error) {
-	cmd := exec.Command("git", "rev-parse", "--show-toplevel")
-
-	if isDir(path) {
-		cmd.Dir = path
-	} else {
-		cmd.Dir = filepath.Dir(path)
-	}
-
-	out, err := cmd.Output()
+	r, err := git.PlainOpenWithOptions(path, &git.PlainOpenOptions{DetectDotGit: true})
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to detect a git directory in path %s of any of its parent dirs %w", path, err)
 	}
-	return strings.Split(string(out), "\n")[0], nil
+	wt, err := r.Worktree()
+	if err != nil {
+		return "", fmt.Errorf("failed to return worktree for path %s %w", path, err)
+	}
+
+	return wt.Filesystem.Root(), nil
 }
 
 func stripVCSRepoPassword(repoURL string) string {
