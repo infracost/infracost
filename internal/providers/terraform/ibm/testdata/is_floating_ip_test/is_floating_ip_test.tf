@@ -1,14 +1,14 @@
 terraform {
   required_providers {
     ibm = {
-      source = "IBM-Cloud/ibm"
+      source  = "IBM-Cloud/ibm"
       version = "~> 1.12.0"
     }
   }
 }
 
 provider "ibm" {
-    region = "us-south"
+  region = "us-south"
 }
 
 resource "ibm_is_vpc" "testVpc" {
@@ -16,13 +16,15 @@ resource "ibm_is_vpc" "testVpc" {
 }
 
 resource "ibm_is_image" "testImage" {
-  name = "test-image"
+  name             = "test-image"
+  href             = "cos://us-south/buckettesttest/livecd.ubuntu-cpc.azure.vhd"
+  operating_system = "ubuntu-16-04-amd64"
 }
 
 resource "ibm_is_subnet" "testIsSubnet" {
-  name            = "test-is-subnet"
-  vpc             = ibm_is_vpc.testVpc.id
-  zone            = "us-south-1"
+  name = "test-is-subnet"
+  vpc  = ibm_is_vpc.testVpc.id
+  zone = "us-south-1"
 }
 
 resource "ibm_is_ssh_key" "testIsShhKey" {
@@ -36,7 +38,7 @@ resource "ibm_is_instance" "testInstance" {
   profile = "bc1-2x8"
 
   primary_network_interface {
-    subnet     = ibm_is_subnet.testIsSubnet.id
+    subnet = ibm_is_subnet.testIsSubnet.id
   }
 
   vpc  = ibm_is_vpc.testVpc.id
