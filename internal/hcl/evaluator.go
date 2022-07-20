@@ -28,7 +28,7 @@ import (
 
 var (
 	errorNoVarValue     = errors.New("no value found")
-	modReplace          = regexp.MustCompile(`module\.`)
+	modReplace          = regexp.MustCompile(`module\.|\[.*\]`)
 	validBlocksToExpand = map[string]struct{}{
 		"resource": {},
 		"module":   {},
