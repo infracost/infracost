@@ -40,6 +40,9 @@ func (r *IsFloatingIp) isFloatingIpCostComponent() *schema.CostComponent {
 			Region:        strPtr(r.Region),
 			Service:       strPtr("is.floating-ip"),
 			ProductFamily: strPtr("service"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "planName", Value: strPtr("default-nextgen")},
+			},
 		},
 	}
 }
