@@ -275,6 +275,8 @@ func FormatOutput(format string, r Root, opts Options) ([]byte, error) {
 		b, err = ToMarkdown(r, opts, MarkdownOptions{})
 	case "bitbucket-comment":
 		b, err = ToMarkdown(r, opts, MarkdownOptions{BasicSyntax: true})
+	case "bitbucket-comment-summary":
+		b, err = ToMarkdown(r, opts, MarkdownOptions{BasicSyntax: true, OmitDetails: true})
 	case "slack-message":
 		b, err = ToSlackMessage(r, opts)
 	default:
