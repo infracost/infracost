@@ -35,7 +35,7 @@ resource "ibm_is_ssh_key" "testIsShhKey" {
 resource "ibm_is_instance" "testInstance" {
   name    = "test-is-instance"
   image   = ibm_is_image.testImage.id
-  profile = "bc1-2x8"
+  profile = "bx2-2x8"
 
   primary_network_interface {
     subnet = ibm_is_subnet.testIsSubnet.id
