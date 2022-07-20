@@ -409,7 +409,7 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 
 	if ctx.ProjectConfig.UsageFile != "" {
 		var err error
-		usageFile, err = usage.LoadUsageFile(ctx.ProjectConfig.UsageFile)
+		usageFile, err = usage.LoadUsageFile(ctx.ProjectConfig.UsageFile, r.runCtx.Config.SyncUsageFile)
 		if err != nil {
 			return nil, err
 		}
@@ -592,7 +592,7 @@ func (r *parallelRunner) generateUsageFile(ctx *config.ProjectContext, provider 
 		return errors.Wrap(err, "Error creating usage file")
 	}
 
-	usageFile, err = usage.LoadUsageFile(usageFilePath)
+	usageFile, err = usage.LoadUsageFile(usageFilePath, true)
 	if err != nil {
 		return errors.Wrap(err, "Error loading usage file")
 	}

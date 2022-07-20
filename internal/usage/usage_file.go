@@ -42,9 +42,13 @@ func CreateUsageFile(path string) error {
 	return nil
 }
 
-func LoadUsageFile(path string) (*UsageFile, error) {
+func LoadUsageFile(path string, syncUsageFile bool) (*UsageFile, error) {
 	blankUsage := NewBlankUsageFile()
 	if _, err := os.Stat(path); os.IsNotExist(err) {
+		if !syncUsageFile {
+			return nil, fmt.Errorf("config file does not exist at %s", path)
+		}
+
 		log.Debug("Specified usage file does not exist. Using a blank file")
 
 		return blankUsage, nil
