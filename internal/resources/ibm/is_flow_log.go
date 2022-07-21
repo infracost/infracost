@@ -16,12 +16,15 @@ import (
 // Resource information: https://cloud.ibm.com/<PATH/TO/RESOURCE>/
 // Pricing information: https://cloud.ibm.com/<PATH/TO/PRICING>/
 type IsFlowLog struct {
-	Address string
-	Region  string
+	Address       string
+	Region        string
+	TransmittedGB *int64 `infracost_usage:"transmitted_gb"`
 }
 
 // IsFlowLogUsageSchema defines a list which represents the usage schema of IsFlowLog.
-var IsFlowLogUsageSchema = []*schema.UsageItem{}
+var IsFlowLogUsageSchema = []*schema.UsageItem{
+	{Key: "transmitted_gb", DefaultValue: 0, ValueType: schema.Float64},
+}
 
 // PopulateUsage parses the u schema.UsageData into the IsFlowLog.
 // It uses the `infracost_usage` struct tags to populate data into the IsFlowLog.
