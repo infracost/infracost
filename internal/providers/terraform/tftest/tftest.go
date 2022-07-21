@@ -247,7 +247,7 @@ func goldenFileResourceTestWithOpts(t *testing.T, pName string, testName string,
 	usageFilePath := filepath.Join("testdata", testName, testName+".usage.yml")
 	if _, err := os.Stat(usageFilePath); err == nil || !os.IsNotExist(err) {
 		// usage file exists, load the data
-		usageFile, err := usage.LoadUsageFile(usageFilePath)
+		usageFile, err := usage.LoadUsageFile(usageFilePath, runCtx.Config.SyncUsageFile)
 		require.NoError(t, err)
 		usageData = usageFile.ToUsageDataMap()
 	}
@@ -363,7 +363,7 @@ func goldenFileSyncTest(t *testing.T, pName, testName string) {
 
 func RunSyncUsage(t *testing.T, projectCtx *config.ProjectContext, projects []*schema.Project, usageFilePath string) []byte {
 	t.Helper()
-	usageFile, err := usage.LoadUsageFile(usageFilePath)
+	usageFile, err := usage.LoadUsageFile(usageFilePath, projectCtx.RunContext.Config.SyncUsageFile)
 	require.NoError(t, err)
 
 	_, err = usage.SyncUsageData(projectCtx, usageFile, projects)

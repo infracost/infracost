@@ -592,7 +592,7 @@ func (r *parallelRunner) generateUsageFile(ctx *config.ProjectContext, provider 
 		return errors.Wrap(err, "Error creating usage file")
 	}
 
-	usageFile, err = usage.LoadUsageFile(usageFilePath, true)
+	usageFile, err = usage.LoadUsageFile(usageFilePath, ctx.RunContext.Config.SyncUsageFile)
 	if err != nil {
 		return errors.Wrap(err, "Error loading usage file")
 	}
