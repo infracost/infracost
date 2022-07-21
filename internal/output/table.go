@@ -224,7 +224,7 @@ func buildCostComponentRows(t table.Writer, currency string, costComponents []Co
 		label := fmt.Sprintf("%s %s", ui.FaintString(labelPrefix), c.Name)
 
 		if len(c.TierData) > 0 {
-			for index, _ := range c.TierData {
+			for index := range c.TierData {
 				var tableRow table.Row
 				label := fmt.Sprintf("%s %s", ui.FaintString(labelPrefix), c.TierData[index].Name)
 				tableRow = append(tableRow, label)
