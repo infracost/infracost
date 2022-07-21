@@ -32,12 +32,50 @@ func (r *IsFlowLog) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
+func (r *IsFlowLog) isFlowLogCostComponent() *schema.CostComponent {
+
+	freeRegions := []string{"us-east", "us-south", "eu-de", "eu-gb", "jp-tok"}
+
+	planType := "Paid"
+
+	if contains(freeRegions, r.Region) {
+		planType = "Free"
+	}
+
+	var quantity *decimal.Decimal
+	if r.TransmittedGB != nil {
+		quantity = decimalPtr(decimal.NewFromInt(*r.TransmittedGB))
+	}
+
+	return &schema.CostComponent{
+		Name:            fmt.Sprintf("Flow Log Collector %s", r.Region),
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: quantity,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("ibm"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("is.flow-log-collector"),
+			ProductFamily: strPtr("service"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "planName", Value: strPtr("flow-log-standard-paid-plan")},
+				{Key: "planType", Value: strPtr(planType)},
+				{Key: "region", Value: strPtr(r.Region)},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			Unit:           strPtr("GIGABYTE_TRANSMITTEDS"),
+			PurchaseOption: strPtr("1"),
+		},
+	}
+}
+
 // BuildResource builds a schema.Resource from a valid IsFlowLog struct.
 // This method is called after the resource is initialised by an IaC provider.
 // See providers folder for more information.
 func (r *IsFlowLog) BuildResource() *schema.Resource {
 	costComponents := []*schema.CostComponent{
-		// TODO: add cost components
+		r.isFlowLogCostComponent(),
 	}
 
 	return &schema.Resource{
