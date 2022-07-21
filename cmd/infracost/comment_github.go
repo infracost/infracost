@@ -5,12 +5,12 @@ import (
 	"strconv"
 	"strings"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/comment"
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/ui"
 )
@@ -101,7 +101,7 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 				pricingClient := apiclient.NewPricingAPIClient(ctx)
 				err = pricingClient.AddEvent("infracost-comment", ctx.EventEnv())
 				if err != nil {
-					log.Errorf("Error reporting event: %s", err)
+					logging.Logger.WithError(err).Error("could not report infracost-comment event")
 				}
 
 				cmd.Println("Comment posted to GitHub")

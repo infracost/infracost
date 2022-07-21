@@ -51,11 +51,16 @@ type TerragruntHCLProvider struct {
 	stack                *tgconfigstack.Stack
 	excludedPaths        []string
 	env                  map[string]string
+	logger               *log.Entry
 }
 
 // NewTerragruntHCLProvider creates a new provider intialized with the configured project path (usually the terragrunt
 // root directory).
 func NewTerragruntHCLProvider(ctx *config.ProjectContext, includePastResources bool) schema.Provider {
+	logger := ctx.Logger().WithFields(log.Fields{
+		"provider": "terragrunt_dir",
+	})
+
 	return &TerragruntHCLProvider{
 		ctx:                  ctx,
 		Path:                 ctx.ProjectConfig.Path,
@@ -63,6 +68,7 @@ func NewTerragruntHCLProvider(ctx *config.ProjectContext, includePastResources b
 		outputs:              map[string]cty.Value{},
 		excludedPaths:        ctx.ProjectConfig.ExcludePaths,
 		env:                  parseEnvironmentVariables(os.Environ()),
+		logger:               logger,
 	}
 }
 
@@ -96,7 +102,7 @@ func (p *TerragruntHCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 
 	modulePath, err := filepath.Rel(basePath, metadata.Path)
 	if err == nil && modulePath != "" && modulePath != "." {
-		log.Debugf("Calculated relative terraformModulePath for %s from %s", basePath, metadata.Path)
+		p.logger.Debugf("Calculated relative terraformModulePath for %s from %s", basePath, metadata.Path)
 		metadata.TerraformModulePath = modulePath
 	}
 
@@ -125,7 +131,7 @@ func (p *TerragruntHCLProvider) LoadResources(usage map[string]*schema.UsageData
 	})
 
 	for _, di := range dirs {
-		log.Debugf("Found terragrunt HCL working dir: %v", di.workingDir)
+		p.logger.Debugf("Found terragrunt HCL working dir: %v", di.workingDir)
 
 		projects, err := di.provider.LoadResources(usage)
 		if err != nil {
@@ -174,7 +180,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 
 	var workingDirsToEstimate []*terragruntWorkingDirInfo
 
-	tgLog := log.StandardLogger().WithField("library", "terragrunt")
+	tgLog := p.logger.WithFields(log.Fields{"library": "terragrunt"})
 
 	terragruntOptions := &tgoptions.TerragruntOptions{
 		TerragruntConfigPath:       terragruntConfigPath,
@@ -218,7 +224,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 			panic(err)
 		}
 
-		return nil, clierror.NewSanitizedError(
+		return nil, clierror.NewCLIError(
 			errors.Errorf(
 				"%s\n%v%s",
 				"Failed to parse the Terragrunt code using the Terragrunt library:",
@@ -328,11 +334,14 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 
 	inputs, err := convertToCtyWithJson(terragruntConfig.Inputs)
 	if err != nil {
-		log.Debugf("Failed to build Terragrunt inputs for: %s err: %s", info.workingDir, err)
+		p.logger.Debugf("Failed to build Terragrunt inputs for: %s err: %s", info.workingDir, err)
 	}
 
+	fields := p.logger.Data
+	fields["parent_provider"] = "terragrunt_dir"
+
 	h, err := NewHCLProvider(
-		config.NewProjectContext(p.ctx.RunContext, &pconfig),
+		config.NewProjectContext(p.ctx.RunContext, &pconfig, fields),
 		&HCLProviderConfig{CacheParsingModules: true},
 		hcl.OptionWithSpinner(p.ctx.RunContext.NewSpinner),
 		hcl.OptionWithWarningFunc(p.ctx.RunContext.NewWarningWriter()),
@@ -412,7 +421,7 @@ func (p *TerragruntHCLProvider) fetchDependencyOutputs(opts *tgoptions.Terragrun
 					return encoded, nil
 				}
 
-				log.Warnf("could not transform output blocks to cty type err: %s, using dummy output type", err)
+				p.logger.WithError(err).Warn("could not transform output blocks to cty type, using dummy output type")
 			}
 		}
 	}

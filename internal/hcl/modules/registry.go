@@ -15,7 +15,7 @@ import (
 	svchost "github.com/hashicorp/terraform-svchost"
 	"github.com/hashicorp/terraform-svchost/auth"
 	"github.com/hashicorp/terraform-svchost/disco"
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 )
 
 var defaultRegistryHost = "registry.terraform.io"
@@ -47,13 +47,14 @@ type RegistryURL struct {
 // discovery rules. It caches the results by hostname to avoid repeated requests for the same information.
 // Therefore, it is advisable to use Disco per project and pass it to all required clients.
 type Disco struct {
-	disco *disco.Disco
+	disco  *disco.Disco
+	logger *logrus.Entry
 }
 
 // NewDisco returns a Disco with the provided credentialsSource initialising the underlying Terraform Disco.
 // If Credentials are nil then all registry requests will be unauthed.
-func NewDisco(credentialsSource auth.CredentialsSource) Disco {
-	return Disco{disco: disco.NewWithCredentialsSource(credentialsSource)}
+func NewDisco(credentialsSource auth.CredentialsSource, logger *logrus.Entry) Disco {
+	return Disco{disco: disco.NewWithCredentialsSource(credentialsSource), logger: logger}
 }
 
 // ModuleLocation performs a discovery lookup for the given source and returns a RegistryURL with the real
@@ -106,7 +107,7 @@ func (d Disco) DownloadLocation(moduleURL RegistryURL, version string) (string, 
 
 	downloadURL := serviceURL.ResolveReference(u)
 
-	log.Debugf("Looking up download URL for module %s from registry URL %s", moduleURL.RawSource, downloadURL.String())
+	d.logger.Debugf("Looking up download URL for module %s from registry URL %s", moduleURL.RawSource, downloadURL.String())
 
 	httpClient := &http.Client{
 		Timeout: time.Second * 30,
@@ -126,7 +127,7 @@ func (d Disco) DownloadLocation(moduleURL RegistryURL, version string) (string, 
 	}
 
 	if strings.HasPrefix(location, "/") || strings.HasPrefix(location, "./") || strings.HasPrefix(location, "../") {
-		log.Debugf("Detected relative path for location returned by download URL %s", downloadURL.String())
+		d.logger.Debugf("Detected relative path for location returned by download URL %s", downloadURL.String())
 
 		locationURL, err := url.Parse(location)
 		if err != nil {
@@ -143,13 +144,15 @@ func (d Disco) DownloadLocation(moduleURL RegistryURL, version string) (string, 
 type RegistryLoader struct {
 	packageFetcher *PackageFetcher
 	disco          Disco
+	logger         *logrus.Entry
 }
 
 // NewRegistryLoader constructs a registry loader
-func NewRegistryLoader(packageFetcher *PackageFetcher, disco Disco) *RegistryLoader {
+func NewRegistryLoader(packageFetcher *PackageFetcher, disco Disco, logger *logrus.Entry) *RegistryLoader {
 	return &RegistryLoader{
 		packageFetcher: packageFetcher,
 		disco:          disco,
+		logger:         logger,
 	}
 }
 
@@ -158,7 +161,7 @@ func NewRegistryLoader(packageFetcher *PackageFetcher, disco Disco) *RegistryLoa
 func (r *RegistryLoader) lookupModule(moduleAddr string, versionConstraints string) (*RegistryLookupResult, error) {
 	registrySource, err := normalizeRegistrySource(moduleAddr)
 	if err != nil {
-		log.Debugf("module '%s' not detected as registry module: %s", moduleAddr, err)
+		r.logger.WithError(err).Debugf("module '%s' not detected as registry module", moduleAddr)
 		return &RegistryLookupResult{
 			OK: false,
 		}, nil
@@ -167,7 +170,7 @@ func (r *RegistryLoader) lookupModule(moduleAddr string, versionConstraints stri
 	moduleURL, ok, err := r.disco.ModuleLocation(registrySource)
 	if !ok {
 		if err != nil {
-			log.Debugf("module '%s' not detected as registry module: %s", moduleAddr, err)
+			r.logger.WithError(err).Debugf("module '%s' not detected as registry module", moduleAddr)
 		}
 		return &RegistryLookupResult{
 			OK: false,
@@ -253,7 +256,7 @@ func (r *RegistryLoader) downloadModule(lookupResult *RegistryLookupResult, dest
 		return fmt.Errorf("could not find download location: %w", err)
 	}
 	// Deliberately not logging the download URL since it contains a token
-	log.Debugf("Downloading module %s", lookupResult.ModuleURL.RawSource)
+	r.logger.Debugf("Downloading module %s", lookupResult.ModuleURL.RawSource)
 
 	return r.packageFetcher.fetch(downloadURL, dest)
 }

@@ -968,6 +968,9 @@ resource_usage:
   azurerm_firewall.my_firewall:
     monthly_data_processed_gb: 100000 # Monthly data processed by the firewall in GB.
 
+  azurerm_iothub_dps.my_iothub_dps:
+    monthly_operations: 10000 # Monthly number of device provisioning operations
+
   azurerm_linux_virtual_machine.my_linux_vm:
     monthly_hrs: 450 # Monthly number of hours the instance ran for.
     os_disk:
