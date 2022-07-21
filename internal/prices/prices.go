@@ -156,7 +156,7 @@ func setCostComponentPrice(ctx *config.RunContext, currency string, r *schema.Re
 	} else {
 		// Both volume and tier pricing will have "tiers"
 		// For volume pricing we have to select to appropriate tier
-		// For tiered pricing we have to sum all tiears based on quantity
+		// For tiered pricing we have to sum all tiers based on quantity
 		priceTiers := make([]schema.PriceTier, len(prices))
 		for i, price := range prices {
 			p, err := decimal.NewFromString(price.Get(currency).String())
