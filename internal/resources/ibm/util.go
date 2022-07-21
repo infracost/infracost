@@ -17,3 +17,12 @@ func regexPtr(regex string) *string {
 func decimalPtr(d decimal.Decimal) *decimal.Decimal {
 	return &d
 }
+
+func contains(elems []string, v string) bool {
+	for _, s := range elems {
+		if v == s {
+			return true
+		}
+	}
+	return false
+}
