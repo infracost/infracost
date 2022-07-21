@@ -42,16 +42,16 @@ func (r *IsFlowLog) isFlowLogCostComponent() *schema.CostComponent {
 		planType = "Free"
 	}
 
-	var quantity *decimal.Decimal
+	var q *decimal.Decimal
 	if r.TransmittedGB != nil {
-		quantity = decimalPtr(decimal.NewFromInt(*r.TransmittedGB))
+		q = decimalPtr(decimal.NewFromInt(*r.TransmittedGB))
 	}
 
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("Flow Log Collector %s", r.Region),
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: quantity,
+		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
