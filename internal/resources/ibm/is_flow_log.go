@@ -1,8 +1,11 @@
 package ibm
 
 import (
+	"fmt"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/shopspring/decimal"
 )
 
 // IsFlowLog struct represents <TODO: cloud service short description>.
