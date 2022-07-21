@@ -18,8 +18,7 @@ type IsFlowLog struct {
 }
 
 // IsFlowLogUsageSchema defines a list which represents the usage schema of IsFlowLog.
-var IsFlowLogUsageSchema = []*schema.UsageItem{
-}
+var IsFlowLogUsageSchema = []*schema.UsageItem{}
 
 // PopulateUsage parses the u schema.UsageData into the IsFlowLog.
 // It uses the `infracost_usage` struct tags to populate data into the IsFlowLog.
@@ -41,4 +40,3 @@ func (r *IsFlowLog) BuildResource() *schema.Resource {
 		CostComponents: costComponents,
 	}
 }
-
