@@ -145,10 +145,13 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (Ad
 
 		cloudRun := results[0].Get("data.addRun")
 
-		successMsg := fmt.Sprintf(
-			"Estimate uploaded to organization '%s' in Infracost Cloud",
-			cloudRun.Get("organization.name").String(),
-		)
+		orgName := cloudRun.Get("organization.name").String()
+		orgMsg := ""
+		if orgName != "" {
+			orgMsg = fmt.Sprintf("organization '%s' in ", orgName)
+		}
+		successMsg := fmt.Sprintf("Estimate uploaded to %sInfracost Cloud", orgMsg)
+
 		if ctx.Config.IsLogging() {
 			log.Info(successMsg)
 		} else {
