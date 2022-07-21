@@ -30,6 +30,16 @@ func TestAttribute_AsInt(t *testing.T) {
 			value: cty.StringVal("66"),
 			want:  66,
 		},
+		{
+			name:  "cty null to int",
+			value: cty.NullVal(cty.Number),
+			want:  0,
+		},
+		{
+			name:  "cty nil to int",
+			value: cty.NilVal,
+			want:  0,
+		},
 	}
 
 	for _, tt := range tests {
@@ -68,6 +78,16 @@ func TestAttribute_AsString(t *testing.T) {
 			name:  "cty int to string",
 			value: cty.NumberIntVal(1),
 			want:  "1",
+		},
+		{
+			name:  "cty null to string",
+			value: cty.NullVal(cty.String),
+			want:  "",
+		},
+		{
+			name:  "cty nil to string",
+			value: cty.NilVal,
+			want:  "",
 		},
 	}
 

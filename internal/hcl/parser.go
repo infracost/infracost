@@ -12,6 +12,7 @@ import (
 	"github.com/hashicorp/hcl/v2/hclparse"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
+	"github.com/zclconf/go-cty/cty/gocty"
 
 	"github.com/infracost/infracost/internal/extclient"
 	"github.com/infracost/infracost/internal/hcl/modules"
@@ -664,7 +665,15 @@ func (p *projectLocator) walkPaths(fullPath string, level int) []string {
 				if src, ok := a["source"]; ok {
 					val, _ := src.Expr.Value(nil)
 					if val.Type() == cty.String {
-						realPath := filepath.Join(fullPath, val.AsString())
+						var realPath string
+						err := gocty.FromCtyValue(val, &realPath)
+						if err != nil {
+							p.logger.WithError(err).WithFields(logrus.Fields{
+								"module": strings.Join(module.Labels, "."),
+							}).Debug("could not read source value of module as string")
+							continue
+						}
+
 						p.moduleCalls[realPath] = struct{}{}
 					}
 				}

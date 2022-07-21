@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"strconv"
 	"strings"
 
 	log "github.com/sirupsen/logrus"
@@ -469,19 +468,7 @@ func (p *HCLProvider) countReferences(block *hcl.Block) *countExpression {
 			return &exp
 		}
 
-		v := attribute.Value()
-		ty := v.Type()
-		var i int64
-		switch ty {
-		case cty.Number:
-			i, _ = v.AsBigFloat().Int64()
-		case cty.String:
-			s := v.AsString()
-			i, _ = strconv.ParseInt(s, 10, 64)
-		default:
-			p.logger.Debugf("unsupported go cty type %s expected either Number or String for count expression, using 0", ty)
-		}
-
+		i := attribute.AsInt()
 		exp.ConstantValue = &i
 		return &exp
 	}
