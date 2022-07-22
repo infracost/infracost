@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/infracost/infracost/internal/logging"
 	"io"
 	"os"
 	"runtime"
@@ -180,16 +181,16 @@ func (r *RunContext) IsInfracostComment() bool {
 
 func (r *RunContext) IsCloudEnabled() bool {
 	if r.Config.EnableCloud != nil {
-		log.WithFields(log.Fields{"is_cloud_enabled": *r.Config.EnableCloud}).Debug("IsCloudEnabled explicitly set through Config.EnabledCloud")
+		logging.Logger.WithFields(log.Fields{"is_cloud_enabled": *r.Config.EnableCloud}).Debug("IsCloudEnabled explicitly set through Config.EnabledCloud")
 		return *r.Config.EnableCloud
 	}
 
 	if r.Config.EnableCloudForOrganization {
-		log.Debug("IsCloudEnabled is true with org level setting enabled.")
+		logging.Logger.Debug("IsCloudEnabled is true with org level setting enabled.")
 		return true
 	}
 
-	log.WithFields(log.Fields{"is_cloud_enabled": r.Config.EnableDashboard}).Debug("IsCloudEnabled inferred from Config.EnabledDashboard")
+	logging.Logger.WithFields(log.Fields{"is_cloud_enabled": r.Config.EnableDashboard}).Debug("IsCloudEnabled inferred from Config.EnabledDashboard")
 	return r.Config.EnableDashboard
 }
 
