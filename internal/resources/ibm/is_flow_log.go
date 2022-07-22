@@ -61,7 +61,7 @@ func (r *IsFlowLog) isFlowLogCostComponent() *schema.CostComponent {
 		endUsageAmount = "9999999999"
 	}
 
-	q := decimalPtr(decimal.NewFromInt(t))
+	q := decimalPtr(decimal.NewFromInt(t).Div(decimal.NewFromInt(10)))
 
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("Flow Log Collector %s", r.Region),
