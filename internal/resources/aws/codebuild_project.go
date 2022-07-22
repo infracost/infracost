@@ -2,11 +2,10 @@ package aws
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-
-	"strings"
 
 	"github.com/shopspring/decimal"
 )
@@ -61,17 +60,26 @@ func (r *CodeBuildProject) nameLabel() string {
 	switch r.EnvironmentType {
 	case "WINDOWS_SERVER_2019_CONTAINER":
 		name = "Windows ("
-		name += strings.Replace(strings.ToLower(strings.SplitAfter(r.ComputeType, "BUILD_")[1]), "_", ".", 1) + ")"
+		name += r.computeType()
 	case "ARM_CONTAINER":
 		name = "Linux (arm1.large)"
 	case "LINUX_GPU_CONTAINER":
 		name = "Linux (gpu1.large)"
 	default:
 		name = "Linux ("
-		name += strings.Replace(strings.ToLower(strings.SplitAfter(r.ComputeType, "BUILD_")[1]), "_", ".", 1) + ")"
+		name += r.computeType()
 	}
 
 	return name
+}
+
+func (r *CodeBuildProject) computeType() string {
+	pieces := strings.SplitAfter(r.ComputeType, "BUILD_")
+	if len(pieces) < 2 {
+		return ""
+	}
+
+	return strings.Replace(strings.ToLower(pieces[1]), "_", ".", 1) + ")"
 }
 
 func (r *CodeBuildProject) mapEnvironmentType() string {
