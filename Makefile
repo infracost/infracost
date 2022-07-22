@@ -66,7 +66,7 @@ test_all:
 # Run unit tests and shared integration tests
 test_shared_int:
 	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) \
-		$(shell go list ./... | grep -v ./internal/providers/terraform/aws | grep -v ./internal/providers/terraform/google | grep -v ./internal/providers/terraform/azure) \
+		$(shell go list ./... | grep -v ./internal/providers/terraform/aws | grep -v ./internal/providers/terraform/google | grep -v ./internal/providers/terraform/azure | grep -v ./internal/providers/terraform/ibm) \
 		$(or $(ARGS), -v -cover)
 
 test_cmd:

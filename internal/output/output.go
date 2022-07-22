@@ -161,7 +161,7 @@ type CostComponent struct {
 	Price           decimal.Decimal    `json:"price"`
 	HourlyCost      *decimal.Decimal   `json:"hourlyCost"`
 	MonthlyCost     *decimal.Decimal   `json:"monthlyCost"`
-	TierData        []schema.PriceTier `json:"tiers"`
+	TierData        []schema.PriceTier `json:"tiers,omitempty"`
 }
 
 type Resource struct {
