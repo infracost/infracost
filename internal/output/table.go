@@ -223,7 +223,25 @@ func buildCostComponentRows(t table.Writer, currency string, costComponents []Co
 
 		label := fmt.Sprintf("%s %s", ui.FaintString(labelPrefix), c.Name)
 
-		if c.MonthlyCost == nil {
+		if len(c.TierData) > 0 {
+			for index := range c.TierData {
+				var tableRow table.Row
+				label := fmt.Sprintf("%s %s", ui.FaintString(labelPrefix), c.TierData[index].Name)
+				tableRow = append(tableRow, label)
+
+				if contains(fields, "monthlyQuantity") {
+					tableRow = append(tableRow, formatQuantity(c.TierData[index].MonthlyQuantity))
+				}
+				if contains(fields, "unit") {
+					tableRow = append(tableRow, c.Unit)
+				}
+				if contains(fields, "monthlyCost") {
+					tableRow = append(tableRow, formatCost2DP(currency, c.TierData[index].MonthlyCost))
+				}
+
+				t.AppendRow(tableRow)
+			}
+		} else if c.MonthlyCost == nil {
 			price := fmt.Sprintf("Monthly cost depends on usage: %s per %s",
 				formatPrice(currency, c.Price),
 				c.Unit,

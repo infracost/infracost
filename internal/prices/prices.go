@@ -1,6 +1,7 @@
 package prices
 
 import (
+	"fmt"
 	"runtime"
 
 	"github.com/infracost/infracost/internal/apiclient"
@@ -141,21 +142,44 @@ func setCostComponentPrice(ctx *config.RunContext, currency string, r *schema.Re
 	}
 
 	prices := productsWithPrices[0].Get("prices").Array()
-	if len(prices) > 1 {
-		log.Warnf("Multiple prices found for %s %s, using the first price", r.Name, c.Name)
-		setResourceWarningEvent(ctx, r, "Multiple prices found")
-	}
 
-	var err error
-	p, err = decimal.NewFromString(prices[0].Get(currency).String())
-	if err != nil {
-		log.Warnf("Error converting price to '%v' (using 0.00)  '%v': %s", currency, prices[0].Get(currency).String(), err.Error())
-		setResourceWarningEvent(ctx, r, "Error converting price")
-		c.SetPrice(decimal.Zero)
-		return
+	if len(prices) == 1 {
+		var err error
+		p, err = decimal.NewFromString(prices[0].Get(currency).String())
+		if err != nil {
+			log.Warnf("Error converting price to '%v' (using 0.00)  '%v': %s", currency, prices[0].Get(currency).String(), err.Error())
+			setResourceWarningEvent(ctx, r, "Error converting price")
+			c.SetPrice(decimal.Zero)
+			return
+		}
+		c.SetPrice(p)
+	} else {
+		// Both volume and tier pricing will have "tiers"
+		// For volume pricing we have to select to appropriate tier
+		// For tiered pricing we have to sum all tiers based on quantity
+		priceTiers := make([]schema.PriceTier, len(prices))
+		for i, price := range prices {
+			p, err := decimal.NewFromString(price.Get(currency).String())
+			if err != nil {
+				log.Warnf("Error converting price to '%v' (using 0.00)  '%v': %s", currency, price.Get(currency).String(), err.Error())
+			}
+			s, err := decimal.NewFromString(price.Get("startUsageAmount").String())
+			if err != nil {
+				log.Warnf("Error converting startUsageAmount to '%v' (using 0.00)  '%v': %s", currency, price.Get("startUsageAmount").String(), err.Error())
+			}
+			e, err := decimal.NewFromString(price.Get("endUsageAmount").String())
+			if err != nil {
+				log.Warnf("Error converting endUsageAmount to '%v' (using 0.00)  '%v': %s", currency, price.Get("endUsageAmount").String(), err.Error())
+			}
+			priceTiers[i] = schema.PriceTier{
+				Name:             fmt.Sprintf("%s %s - %s %s", c.Name, s, e, c.Unit),
+				Price:            p,
+				StartUsageAmount: s,
+				EndUsageAmount:   e,
+			}
+		}
+		c.SetPriceTiers(priceTiers)
 	}
-
-	c.SetPrice(p)
 	c.SetPriceHash(prices[0].Get("priceHash").String())
 }
 

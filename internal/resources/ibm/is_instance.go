@@ -68,7 +68,6 @@ func (r *IsInstance) instanceRunTimeCostComponent() *schema.CostComponent {
 		Name:            fmt.Sprintf("Instance usage (%s, %s, %s)", r.Profile, instanceGetIsolation(r.IsDedicated), r.Zone),
 		Unit:            "hours",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		HourlyQuantity:  decimalPtr(decimal.NewFromInt(1)),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName: strPtr("ibm"),

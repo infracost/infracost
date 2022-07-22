@@ -154,13 +154,14 @@ type Breakdown struct {
 }
 
 type CostComponent struct {
-	Name            string           `json:"name"`
-	Unit            string           `json:"unit"`
-	HourlyQuantity  *decimal.Decimal `json:"hourlyQuantity"`
-	MonthlyQuantity *decimal.Decimal `json:"monthlyQuantity"`
-	Price           decimal.Decimal  `json:"price"`
-	HourlyCost      *decimal.Decimal `json:"hourlyCost"`
-	MonthlyCost     *decimal.Decimal `json:"monthlyCost"`
+	Name            string             `json:"name"`
+	Unit            string             `json:"unit"`
+	HourlyQuantity  *decimal.Decimal   `json:"hourlyQuantity"`
+	MonthlyQuantity *decimal.Decimal   `json:"monthlyQuantity"`
+	Price           decimal.Decimal    `json:"price"`
+	HourlyCost      *decimal.Decimal   `json:"hourlyCost"`
+	MonthlyCost     *decimal.Decimal   `json:"monthlyCost"`
+	TierData        []schema.PriceTier `json:"tiers,omitempty"`
 }
 
 type Resource struct {
@@ -285,6 +286,7 @@ func outputResource(r *schema.Resource) Resource {
 			Price:           c.UnitMultiplierPrice(),
 			HourlyCost:      c.HourlyCost,
 			MonthlyCost:     c.MonthlyCost,
+			TierData:        c.PriceTiers(),
 		})
 	}
 
