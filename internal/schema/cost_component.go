@@ -71,7 +71,7 @@ func (c *CostComponent) CalculateCosts() {
 				if tier.MonthlyQuantity.GreaterThan(decimal.NewFromInt(0)) {
 					tier.MonthlyCost = decimalPtr(tier.Price.Mul(*tier.MonthlyQuantity))
 					discountMul := decimal.NewFromFloat(1.0 - c.MonthlyDiscountPerc)
-					tier.MonthlyCost = decimalPtr((*tier.MonthlyCost).Mul(discountMul))
+					tier.MonthlyCost = decimalPtr(tier.MonthlyCost.Mul(discountMul))
 				}
 			}
 			c.priceTiers[i] = tier
