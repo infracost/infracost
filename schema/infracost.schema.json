@@ -57,6 +57,53 @@
         },
         "monthlyCost": {
           "type": ["string", "null"]
+        },
+        "tiers": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/PriceTier"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "PriceTier": {
+      "required": [
+        "Name",
+        "Price",
+        "StartUsageAmount",
+        "EndUsageAmount",
+        "HourlyQuantity",
+        "MonthlyQuantity",
+        "MonthlyCost",
+        "HourlyCost"
+      ],
+      "properties": {
+        "Name": {
+          "type": "string"
+        },
+        "Price": {
+          "type": ["string", "null"]
+        },
+        "StartUsageAmount": {
+          "type": ["string", "null"]
+        },
+        "EndUsageAmount": {
+          "type": ["string", "null"]
+        },
+        "HourlyQuantity": {
+          "type": ["string", "null"]
+        },
+        "MonthlyQuantity": {
+          "type": ["string", "null"]
+        },
+        "MonthlyCost": {
+          "type": ["string", "null"]
+        },
+        "HourlyCost": {
+          "type": ["string", "null"]
         }
       },
       "additionalProperties": false,
