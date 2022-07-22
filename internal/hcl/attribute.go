@@ -3,6 +3,7 @@ package hcl
 import (
 	"fmt"
 	"runtime/debug"
+	"strconv"
 	"strings"
 
 	"github.com/hashicorp/hcl/v2"
@@ -56,6 +57,55 @@ func (attr *Attribute) IsIterable() bool {
 	return attr.Value().Type().IsCollectionType() || attr.Value().Type().IsObjectType() || attr.Value().Type().IsMapType() || attr.Value().Type().IsListType() || attr.Value().Type().IsSetType() || attr.Value().Type().IsTupleType()
 }
 
+// AsInt returns the Attribute value as a int64. If the cty.Value is not a type
+// that can be converted to integer, this method returns 0.
+func (attr *Attribute) AsInt() int64 {
+	if attr == nil {
+		return 0
+	}
+
+	v := attr.Value()
+	if v.Type() == cty.String {
+		s := attr.AsString()
+		i, err := strconv.ParseInt(s, 10, 64)
+		if err != nil {
+			attr.Logger.WithError(err).Debugf("could not return attribute string value %s as int64", s)
+		}
+
+		return i
+	}
+
+	var i int64
+	err := gocty.FromCtyValue(v, &i)
+	if err != nil {
+		attr.Logger.WithError(err).Debug("could not return attribute value as int64")
+	}
+
+	return i
+}
+
+// AsString returns the Attribute value as a string. If the cty.Value is not a type
+// that can be converted to string, this method returns an empty string.
+func (attr *Attribute) AsString() string {
+	if attr == nil {
+		return ""
+	}
+
+	v := attr.Value()
+	if v.Type() == cty.Number {
+		i := attr.AsInt()
+		return fmt.Sprintf("%d", i)
+	}
+
+	var s string
+	err := gocty.FromCtyValue(v, &s)
+	if err != nil {
+		attr.Logger.WithError(err).Debug("could not return attribute value as string")
+	}
+
+	return s
+}
+
 // Value returns the Attribute with the underlying hcl.Expression of the hcl.Attribute evaluated with
 // the Attribute Context. This returns a cty.Value with the values filled from any variables or references
 // that the Context carries.
@@ -71,7 +121,7 @@ func (attr *Attribute) Value() cty.Value {
 func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 	defer func() {
 		if err := recover(); err != nil {
-			attr.Logger.Debugf("could not evaluate value for attr: %s err: %s\n%s", attr.Name(), err, debug.Stack())
+			attr.Logger.Debugf("could not evaluate value for attr: %s. This is most likely an issue in the underlying hcl/go-cty libraries and can be ignored, but we log the stacktrace for debugging purposes. Err: %s\n%s", attr.Name(), err, debug.Stack())
 			ctyVal = cty.NilVal
 		}
 	}()
@@ -131,10 +181,6 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 		if attr.Verbose {
 			attr.Logger.Debugf("error diagnostic return from evaluating %s err: %s", attr.HCLAttr.Name, diag.Error())
 		}
-	}
-
-	if !ctyVal.IsKnown() {
-		return cty.NilVal
 	}
 
 	return ctyVal
@@ -384,6 +430,7 @@ func (attr *Attribute) Reference() (*Reference, error) {
 	if attr == nil {
 		return nil, fmt.Errorf("attribute is nil")
 	}
+
 	refs := attr.AllReferences()
 	if len(refs) == 0 {
 		return nil, fmt.Errorf("no references for attribute")

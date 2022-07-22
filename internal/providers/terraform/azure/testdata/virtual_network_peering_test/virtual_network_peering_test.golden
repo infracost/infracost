@@ -1,0 +1,34 @@
+
+ Name                                                        Monthly Qty  Unit              Monthly Cost 
+                                                                                                         
+ azurerm_virtual_network_peering.inter_zonal                                                             
+ ├─ Inbound data transfer                                 Monthly cost depends on usage: $0.09 per GB    
+ └─ Outbound data transfer                                Monthly cost depends on usage: $0.035 per GB   
+                                                                                                         
+ azurerm_virtual_network_peering.inter_zonal_with_usage                                                  
+ ├─ Inbound data transfer                                          1,000  GB                      $90.00 
+ └─ Outbound data transfer                                         1,000  GB                      $35.00 
+                                                                                                         
+ azurerm_virtual_network_peering.intra_region                                                            
+ ├─ Inbound data transfer                                 Monthly cost depends on usage: $0.01 per GB    
+ └─ Outbound data transfer                                Monthly cost depends on usage: $0.01 per GB    
+                                                                                                         
+ azurerm_virtual_network_peering.intra_region_with_usage                                                 
+ ├─ Inbound data transfer                                          1,000  GB                      $10.00 
+ └─ Outbound data transfer                                         1,000  GB                      $10.00 
+                                                                                                         
+ azurerm_virtual_network_peering.intra_zonal                                                             
+ ├─ Inbound data transfer                                 Monthly cost depends on usage: $0.035 per GB   
+ └─ Outbound data transfer                                Monthly cost depends on usage: $0.035 per GB   
+                                                                                                         
+ azurerm_virtual_network_peering.intra_zonal_with_usage                                                  
+ ├─ Inbound data transfer                                          1,000  GB                      $35.00 
+ └─ Outbound data transfer                                         1,000  GB                      $35.00 
+                                                                                                         
+ OVERALL TOTAL                                                                                   $215.00 
+──────────────────────────────────
+13 cloud resources were detected:
+∙ 6 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 7 were free:
+  ∙ 4 x azurerm_virtual_network
+  ∙ 3 x azurerm_resource_group
