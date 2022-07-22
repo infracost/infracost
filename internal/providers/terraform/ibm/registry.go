@@ -5,7 +5,8 @@ import "github.com/infracost/infracost/internal/schema"
 var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getIsInstanceRegistryItem(),
 	getIbmIsVpcRegistryItem(),
-	getIbmContainerVpcWorkerPoolRegistryItem(),
+	getContainerVpcWorkerPoolRegistryItem(),
+	getContainerVpcClusterRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
