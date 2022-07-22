@@ -42,10 +42,26 @@ func (r *IsFlowLog) isFlowLogCostComponent() *schema.CostComponent {
 		planType = "Free"
 	}
 
-	var q *decimal.Decimal
-	if r.TransmittedGB != nil {
-		q = decimalPtr(decimal.NewFromInt(*r.TransmittedGB))
+	t := *r.TransmittedGB
+
+	startUsageAmount := "0"
+	endUsageAmount := "10000"
+
+	if t > 10000 && t <= 30000 {
+		startUsageAmount = "10000"
+		endUsageAmount = "30000"
+	} else if t > 30000 && t <= 50000 {
+		startUsageAmount = "30000"
+		endUsageAmount = "50000"
+	} else if t > 50000 && t <= 72000 {
+		startUsageAmount = "50000"
+		endUsageAmount = "72000"
+	} else if t > 72000 {
+		startUsageAmount = "72000"
+		endUsageAmount = "9999999999"
 	}
+
+	q := decimalPtr(decimal.NewFromInt(t))
 
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("Flow Log Collector %s", r.Region),
@@ -64,8 +80,10 @@ func (r *IsFlowLog) isFlowLogCostComponent() *schema.CostComponent {
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
-			Unit:           strPtr("GIGABYTE_TRANSMITTEDS"),
-			PurchaseOption: strPtr("1"),
+			Unit:             strPtr("GIGABYTE_TRANSMITTEDS"),
+			PurchaseOption:   strPtr("1"),
+			StartUsageAmount: strPtr(startUsageAmount),
+			EndUsageAmount:   strPtr(endUsageAmount),
 		},
 	}
 }
