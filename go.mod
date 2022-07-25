@@ -27,7 +27,6 @@ require (
 	github.com/json-iterator/go v1.1.12
 	github.com/kballard/go-shellquote v0.0.0-20180428030007-95032a82bc51
 	github.com/kelseyhightower/envconfig v1.4.0
-	github.com/manifoldco/promptui v0.9.0
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
@@ -66,7 +65,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sso v1.11.11 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.16.9 // indirect
 	github.com/aws/smithy-go v1.12.0 // indirect
-	github.com/chzyer/readline v0.0.0-20180603132655-2972be24d48e // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/hashicorp/hcl v1.0.1-vault // indirect
 	github.com/hashicorp/hcl/v2 v2.13.0
@@ -98,6 +96,7 @@ require (
 
 require (
 	github.com/alecthomas/jsonschema v0.0.0-20211209230136-e2b41affa5c1
+	github.com/go-git/go-billy/v5 v5.3.1
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/google/go-github/v41 v41.0.0
 	github.com/gruntwork-io/terragrunt v0.36.9
@@ -136,7 +135,6 @@ require (
 	github.com/emirpasic/gods v1.12.0 // indirect
 	github.com/go-errors/errors v1.0.2-0.20180813162953-d98b870cc4e0 // indirect
 	github.com/go-git/gcfg v1.5.0 // indirect
-	github.com/go-git/go-billy/v5 v5.3.1 // indirect
 	github.com/golang-jwt/jwt/v4 v4.2.0 // indirect
 	github.com/golang/groupcache v0.0.0-20210331224755-41bb18bfe9da // indirect
 	github.com/golang/snappy v0.0.4 // indirect
@@ -195,7 +193,7 @@ require (
 	github.com/iancoleman/orderedmap v0.2.0 // indirect
 	github.com/klauspost/compress v1.13.6 // indirect
 	github.com/mitchellh/go-testing-interface v1.14.1 // indirect
-	github.com/open-policy-agent/opa v0.42.0
+	github.com/open-policy-agent/opa v0.42.2
 	github.com/otiai10/copy v1.7.0
 	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0 // indirect
 	github.com/ulikunitz/xz v0.5.10 // indirect
