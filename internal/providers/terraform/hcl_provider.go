@@ -375,7 +375,7 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 	}
 
 	jsonValues := marshalAttributeValues(block.Type(), block.Values())
-	marshalBlock(block, jsonValues)
+	p.marshalBlock(block, jsonValues)
 
 	changes.Change.After = jsonValues
 	planned.Values = jsonValues
@@ -530,7 +530,7 @@ func blockToReferences(block *hcl.Block) map[string]interface{} {
 	return expressionValues
 }
 
-func marshalBlock(block *hcl.Block, jsonValues map[string]interface{}) {
+func (p *HCLProvider) marshalBlock(block *hcl.Block, jsonValues map[string]interface{}) {
 	for _, b := range block.Children() {
 		key := b.Type()
 		if key == "dynamic" || key == "depends_on" {
@@ -539,10 +539,19 @@ func marshalBlock(block *hcl.Block, jsonValues map[string]interface{}) {
 
 		childValues := marshalAttributeValues(key, b.Values())
 		if len(b.Children()) > 0 {
-			marshalBlock(b, childValues)
+			p.marshalBlock(b, childValues)
 		}
 
 		if v, ok := jsonValues[key]; ok {
+			if _, ok := v.(json.RawMessage); ok {
+				p.logger.WithFields(log.Fields{
+					"parent_block": block.LocalName(),
+					"child_block":  b.LocalName(),
+				}).Debugf("skipping attribute '%s' that has also been declared as a child block", key)
+
+				continue
+			}
+
 			jsonValues[key] = append(v.([]interface{}), childValues)
 			continue
 		}
