@@ -248,7 +248,7 @@ func loadCloudSettings(ctx *config.RunContext) {
 	}
 	logging.Logger.WithFields(log.Fields{"result": fmt.Sprintf("%+v", result)}).Debug("Successfully loaded settings from Infracost Cloud")
 
-	ctx.Config.EnableCloudForComment = result.CloudEnabled
+	ctx.Config.EnableCloudForOrganization = result.CloudEnabled
 }
 
 func checkAPIKey(apiKey string, apiEndpoint string, defaultEndpoint string) error {
