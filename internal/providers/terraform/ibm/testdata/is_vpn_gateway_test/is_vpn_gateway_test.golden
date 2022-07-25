@@ -1,0 +1,20 @@
+
+ Name                                               Monthly Qty  Unit      Monthly Cost 
+                                                                                        
+ ibm_is_vpc.testVpc                                                                     
+ ├─ VPC instance                                              1  Instance         $0.00 
+ └─ VPC egress us-south 0 - 9995 GB                           -  GB                   - 
+ └─ VPC egress us-south 9995 - 49995 GB                       -  GB                   - 
+ └─ VPC egress us-south 49995 - 149995 GB                     -  GB                   - 
+ └─ VPC egress us-south 149995 - 99999999999999 GB            -  GB                   - 
+                                                                                        
+ ibm_is_vpn_gateway.testVpcVpn                                                          
+ ├─ VPN connection hours us-south                           730  Hours           $29.20 
+ └─ VPN instance hours us-south                             730  Hours           $32.85 
+                                                                                        
+ OVERALL TOTAL                                                                   $62.05 
+──────────────────────────────────
+3 cloud resources were detected:
+∙ 2 were estimated, 1 of which usage-based costs, see https://infracost.io/usage-file
+∙ 1 was free:
+  ∙ 1 x ibm_is_subnet

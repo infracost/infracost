@@ -1137,6 +1137,9 @@ resource_usage:
     p2s_connection: 150 # Total number of p2s tunnels.
     monthly_data_transfer_gb: 1 # Monthly data transfer in GB.
 
+  #
+  # Terraform IBM Cloud resources
+  #
   ibm_is_instance.is_instance:
     monthly_instance_hours: 730 # Monthly number of hours an instance runs
 
@@ -1148,3 +1151,7 @@ resource_usage:
 
   ibm_container_vpc_cluster.cluster:
     monthly_instance_hours: 730
+
+  ibm_is_vpn_gateway.testVpcVpn:
+    connection_hours: 730
+    instance_hours: 730
