@@ -70,7 +70,7 @@ func (d Disco) ModuleLocation(source string) (RegistryURL, bool, error) {
 	host, namespace, moduleName, target := parts[0], parts[1], parts[2], parts[3]
 	hostname, err := svchost.ForComparison(host)
 	if err != nil {
-		return RegistryURL{}, false, fmt.Errorf("unable to use user provided module host %s as a Hostname for credential discovery %w", host, err)
+		return RegistryURL{}, false, fmt.Errorf("unable to use user-provided module host %s as a Hostname for credential discovery: %w", host, err)
 	}
 
 	serviceURL, err := d.disco.DiscoverServiceURL(hostname, moduleServiceID)
@@ -96,7 +96,7 @@ func (d Disco) ModuleLocation(source string) (RegistryURL, bool, error) {
 func (d Disco) DownloadLocation(moduleURL RegistryURL, version string) (string, error) {
 	hostname, err := svchost.ForComparison(moduleURL.Host)
 	if err != nil {
-		return "", fmt.Errorf("unable to use module URL %s as a Hostname to dicsover service URL %w", moduleURL, err)
+		return "", fmt.Errorf("unable to use module URL %s as a Hostname to discover service URL: %w", moduleURL, err)
 	}
 
 	serviceURL, err := d.disco.DiscoverServiceURL(hostname, moduleServiceID)
