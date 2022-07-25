@@ -56,30 +56,26 @@ func (r *CodeBuildProject) BuildResource() *schema.Resource {
 }
 
 func (r *CodeBuildProject) nameLabel() string {
-	name := ""
 	switch r.EnvironmentType {
 	case "WINDOWS_SERVER_2019_CONTAINER":
-		name = "Windows ("
-		name += r.computeType()
+		return r.osWithComputeTypeLabel("Windows")
 	case "ARM_CONTAINER":
-		name = "Linux (arm1.large)"
+		return "Linux (arm1.large)"
 	case "LINUX_GPU_CONTAINER":
-		name = "Linux (gpu1.large)"
+		return "Linux (gpu1.large)"
 	default:
-		name = "Linux ("
-		name += r.computeType()
+		return r.osWithComputeTypeLabel("Linux")
 	}
-
-	return name
 }
 
-func (r *CodeBuildProject) computeType() string {
+func (r *CodeBuildProject) osWithComputeTypeLabel(os string) string {
 	pieces := strings.SplitAfter(r.ComputeType, "BUILD_")
 	if len(pieces) < 2 {
-		return ""
+		return os
 	}
 
-	return strings.Replace(strings.ToLower(pieces[1]), "_", ".", 1) + ")"
+	computeType := strings.Replace(strings.ToLower(pieces[1]), "_", ".", 1)
+	return fmt.Sprintf("%s (%s)", os, computeType)
 }
 
 func (r *CodeBuildProject) mapEnvironmentType() string {
