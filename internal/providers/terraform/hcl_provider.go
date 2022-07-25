@@ -547,7 +547,7 @@ func (p *HCLProvider) marshalBlock(block *hcl.Block, jsonValues map[string]inter
 				p.logger.WithFields(log.Fields{
 					"parent_block": block.LocalName(),
 					"child_block":  b.LocalName(),
-				}).Debugf("skipping attribute: %s that has also been declared as a child block", key)
+				}).Debugf("skipping attribute '%s' that has also been declared as a child block", key)
 
 				continue
 			}
