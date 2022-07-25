@@ -32,8 +32,10 @@ func (r *CodeBuildProject) BuildResource() *schema.Resource {
 		monthlyBuildMinutes = decimalPtr(decimal.NewFromInt(*r.MonthlyBuildMins))
 	}
 
+	computeType := r.mapComputeType()
 	return &schema.Resource{
-		Name: r.Address,
+		Name:      r.Address,
+		IsSkipped: computeType == "",
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            r.nameLabel(),
@@ -46,7 +48,7 @@ func (r *CodeBuildProject) BuildResource() *schema.Resource {
 					Service:       strPtr("CodeBuild"),
 					ProductFamily: strPtr("Compute"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s:%s/", r.mapEnvironmentType(), r.mapComputeType()))},
+						{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s:%s/", r.mapEnvironmentType(), computeType))},
 					},
 				},
 			},
