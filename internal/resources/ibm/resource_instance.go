@@ -27,7 +27,8 @@ type ResourceInstance struct {
 	SecretsManager_Instance      *int64 `infracost_usage:"secretsmanager_instance"`
 	SecretsManager_ActiveSecrets *int64 `infracost_usage:"secretsmanager_active_secrets"`
 	// App ID
-	// Catalog link https://cloud.ibm.com/catalog/services/app-id
+	// Catalog https://cloud.ibm.com/catalog/services/app-id
+	// Pricing https://cloud.ibm.com/docs/appid?topic=appid-pricing
 	AppID_Authentications         *int64 `infracost_usage:"appid_authentications"`
 	AppID_Users                   *int64 `infracost_usage:"appid_users"`
 	AppID_AdvancedAuthentications *int64 `infracost_usage:"appid_advanced_authentications"`
