@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  ibm_resource_instance:
+    kms_items_per_month: 30
