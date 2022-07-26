@@ -1,0 +1,8 @@
+version: 0.1
+resource_usage:
+  azurerm_virtual_network_peering.intra_region_with_usage:
+    monthly_data_transfer_gb: 1000
+  azurerm_virtual_network_peering.intra_zonal_with_usage:
+    monthly_data_transfer_gb: 1000
+  azurerm_virtual_network_peering.inter_zonal_with_usage:
+    monthly_data_transfer_gb: 1000

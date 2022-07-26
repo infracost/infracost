@@ -3,6 +3,7 @@ package hcl
 import (
 	"errors"
 	"fmt"
+	"math"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -27,7 +28,7 @@ import (
 
 var (
 	errorNoVarValue     = errors.New("no value found")
-	modReplace          = regexp.MustCompile(`module\.`)
+	modReplace          = regexp.MustCompile(`module\.|\[.*\]`)
 	validBlocksToExpand = map[string]struct{}{
 		"resource": {},
 		"module":   {},
@@ -364,9 +365,9 @@ func (e *Evaluator) expandBlockCounts(blocks Blocks) Blocks {
 		count := 1
 		value := countAttr.Value()
 		if !value.IsNull() && value.IsKnown() {
-			if value.Type() == cty.Number {
-				f, _ := value.AsBigFloat().Float64()
-				count = int(f)
+			v := countAttr.AsInt()
+			if v <= math.MaxInt32 {
+				count = int(v)
 			}
 		}
 
@@ -445,7 +446,7 @@ func convertType(val cty.Value, attribute *Attribute) cty.Value {
 	case *hclsyntax.ScopeTraversalExpr:
 		t = v.Traversal.RootName()
 	case *hclsyntax.LiteralValueExpr:
-		t = attribute.Value().AsString()
+		t = attribute.AsString()
 	}
 
 	switch t {
@@ -619,11 +620,8 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 	attrs := b.AttributesAsMap()
 	for _, attr := range attrs {
 		if attr.Name() == "source" {
-			sourceVal := attr.Value()
-			if sourceVal.Type() == cty.String {
-				source = sourceVal.AsString()
-				break
-			}
+			source = attr.AsString()
+			break
 		}
 	}
 

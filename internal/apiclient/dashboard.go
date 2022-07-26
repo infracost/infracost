@@ -126,6 +126,10 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (Ad
 			addRun(run: $run) {
 				id
 				shareUrl
+				organization {
+					id
+					name
+				}
 			}
 		}
 	`
@@ -134,21 +138,28 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (Ad
 		return response, err
 	}
 
-	successMsg := "Estimate uploaded to Infracost Cloud"
-	if ctx.Config.IsLogging() {
-		log.Info(successMsg)
-	} else {
-		fmt.Fprintf(ctx.ErrWriter, "%s\n", successMsg)
-	}
-
 	if len(results) > 0 {
-
 		if results[0].Get("errors").Exists() {
 			return response, errors.New(results[0].Get("errors").String())
 		}
 
-		response.RunID = results[0].Get("data.addRun.id").String()
-		response.ShareURL = results[0].Get("data.addRun.shareUrl").String()
+		cloudRun := results[0].Get("data.addRun")
+
+		orgName := cloudRun.Get("organization.name").String()
+		orgMsg := ""
+		if orgName != "" {
+			orgMsg = fmt.Sprintf("organization '%s' in ", orgName)
+		}
+		successMsg := fmt.Sprintf("Estimate uploaded to %sInfracost Cloud", orgMsg)
+
+		if ctx.Config.IsLogging() {
+			log.Info(successMsg)
+		} else {
+			fmt.Fprintf(ctx.ErrWriter, "%s\n", successMsg)
+		}
+
+		response.RunID = cloudRun.Get("id").String()
+		response.ShareURL = cloudRun.Get("shareUrl").String()
 	}
 	return response, nil
 }

@@ -359,6 +359,59 @@ __infracost_handle_word()
     __infracost_handle_word
 }
 
+_infracost_auth_login()
+{
+    last_command="infracost_auth_login"
+
+    command_aliases=()
+
+    commands=()
+
+    flags=()
+    two_word_flags=()
+    local_nonpersistent_flags=()
+    flags_with_completion=()
+    flags_completion=()
+
+    flags+=("--debug-report")
+    flags+=("--log-level=")
+    two_word_flags+=("--log-level")
+    flags+=("--no-color")
+
+    must_have_one_flag=()
+    must_have_one_noun=()
+    must_have_one_noun+=("-")
+    must_have_one_noun+=("--")
+    noun_aliases=()
+}
+
+_infracost_auth()
+{
+    last_command="infracost_auth"
+
+    command_aliases=()
+
+    commands=()
+    commands+=("login")
+
+    flags=()
+    two_word_flags=()
+    local_nonpersistent_flags=()
+    flags_with_completion=()
+    flags_completion=()
+
+    flags+=("--debug-report")
+    flags+=("--log-level=")
+    two_word_flags+=("--log-level")
+    flags+=("--no-color")
+
+    must_have_one_flag=()
+    must_have_one_noun=()
+    must_have_one_noun+=("-")
+    must_have_one_noun+=("--")
+    noun_aliases=()
+}
+
 _infracost_breakdown()
 {
     last_command="infracost_breakdown"
@@ -550,6 +603,8 @@ _infracost_comment_bitbucket()
     local_nonpersistent_flags+=("--commit=")
     flags+=("--dry-run")
     local_nonpersistent_flags+=("--dry-run")
+    flags+=("--exclude-cli-output")
+    local_nonpersistent_flags+=("--exclude-cli-output")
     flags+=("--path=")
     two_word_flags+=("--path")
     flags_with_completion+=("--path")
@@ -1052,30 +1107,6 @@ _infracost_output()
     noun_aliases=()
 }
 
-_infracost_register()
-{
-    last_command="infracost_register"
-
-    command_aliases=()
-
-    commands=()
-
-    flags=()
-    two_word_flags=()
-    local_nonpersistent_flags=()
-    flags_with_completion=()
-    flags_completion=()
-
-    flags+=("--debug-report")
-    flags+=("--log-level=")
-    two_word_flags+=("--log-level")
-    flags+=("--no-color")
-
-    must_have_one_flag=()
-    must_have_one_noun=()
-    noun_aliases=()
-}
-
 _infracost_root_command()
 {
     last_command="infracost"
@@ -1083,6 +1114,7 @@ _infracost_root_command()
     command_aliases=()
 
     commands=()
+    commands+=("auth")
     commands+=("breakdown")
     commands+=("comment")
     commands+=("completion")
@@ -1090,7 +1122,6 @@ _infracost_root_command()
     commands+=("diff")
     commands+=("help")
     commands+=("output")
-    commands+=("register")
 
     flags=()
     two_word_flags=()
