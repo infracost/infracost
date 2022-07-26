@@ -8,6 +8,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getContainerVpcWorkerPoolRegistryItem(),
 	getContainerVpcClusterRegistryItem(),
 	getIsVpnGatewayRegistryItem(),
+	getTgGatewayRegistryItem(),
 }
 
 // FreeResources grouped alphabetically

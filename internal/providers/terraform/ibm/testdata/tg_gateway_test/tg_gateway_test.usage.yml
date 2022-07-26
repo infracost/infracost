@@ -1,0 +1,5 @@
+version: 0.1
+resource_usage:
+  ibm_tg_gateway.new_tg_gw:
+    data_transfer_global: 2500
+    connection: 25  
