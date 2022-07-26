@@ -1,13 +1,17 @@
 
- Name                                         Monthly Qty  Unit  Monthly Cost 
-                                                                              
- ibm_resource_instance.resource_instance_kms                                  
- ├─ Items free allowance (first 20 Items)              20  Item         $0.00 
- └─ Items (first 1000 Item)                            10  Item         $7.50 
- └─ Items (next 9000 Item)                              0  Item         $0.00 
- └─ Items (over 10000 Item)                             0  Item         $0.00 
-                                                                              
- OVERALL TOTAL                                                          $7.50 
+ Name                                                     Monthly Qty  Unit      Monthly Cost 
+                                                                                              
+ ibm_resource_instance.resource_instance_kms                                                  
+ ├─ Items free allowance (first 20 Items)                          20  Item             $0.00 
+ └─ Items (first 1000 Item)                                       280  Item           $210.00 
+ └─ Items (next 9000 Item)                                          0  Item             $0.00 
+ └─ Items (over 10000 Item)                                         0  Item             $0.00 
+                                                                                              
+ ibm_resource_instance.resource_instance_secrets_manager                                      
+ ├─ Instance                                                        1  Instance       $299.00 
+ └─ Active Secrets                                                400  Secrets         $80.00 
+                                                                                              
+ OVERALL TOTAL                                                                        $589.00 
 ──────────────────────────────────
-1 cloud resource was detected:
-∙ 1 was estimated
+2 cloud resources were detected:
+∙ 2 were estimated
