@@ -24,6 +24,7 @@ var FreeResources = []string{
 	"ibm_is_security_group_rule",
 	"ibm_is_ssh_key",
 	"ibm_is_subnet",
+	"ibm_is_subnet_reserved_ip",
 	"ibm_is_virtual_endpoint_gateway_ip",
 	"ibm_is_vpc_address_prefix",
 	"ibm_kms_key",
