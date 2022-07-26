@@ -11,7 +11,7 @@ provider "ibm" {
     region = "us-south"
 }
 
-resource "ibm_resource_instance" "resource_instance" {
+resource "ibm_resource_instance" "resource_instance_kms" {
   name              = "test"
   service           = "kms"
   plan              = "tiered-pricing"
