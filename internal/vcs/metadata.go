@@ -2,8 +2,11 @@ package vcs
 
 import (
 	"encoding/base64"
+	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
+	"regexp"
 	"strings"
 	"sync"
 	"time"
@@ -11,8 +14,10 @@ import (
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
-	"github.com/go-git/go-git/v5/plumbing/transport/http"
+	githttp "github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/tidwall/gjson"
+
+	"github.com/infracost/infracost/internal/logging"
 )
 
 var (
@@ -48,12 +53,14 @@ func (m *keyMutex) Lock(key string) func() {
 // It is designed to be safe for parallelism. So interactions across branches and for different commits
 // will not affect other goroutines.
 type metadataFetcher struct {
-	mu *keyMutex
+	mu     *keyMutex
+	client *http.Client
 }
 
 func newMetadataFetcher() *metadataFetcher {
 	return &metadataFetcher{
-		mu: &keyMutex{},
+		mu:     &keyMutex{},
+		client: &http.Client{Timeout: time.Second * 5},
 	}
 }
 
@@ -65,20 +72,40 @@ func newMetadataFetcher() *metadataFetcher {
 // Get also supplements base VCS metadata with CI specific data if it can be found.
 func (f *metadataFetcher) Get(path string) (Metadata, error) {
 	if isTest() {
+		logging.Logger.Debug("detected Infracost is running in test most returning stub metadata for vcs system call")
 		return StubMetadata, nil
 	}
 
-	_, ok := os.LookupEnv("GITHUB_ACTIONS")
+	_, ok := lookupEnv("GITHUB_ACTIONS")
 	if ok {
+		logging.Logger.Debug("fetching GitHub action vcs metadata")
 		return f.getGithubMetadata(path)
 	}
 
-	_, ok = os.LookupEnv("GITLAB_CI")
+	_, ok = lookupEnv("GITLAB_CI")
 	if ok {
+		logging.Logger.Debug("fetching Gitlab CI vcs metadata")
 		return f.getGitlabMetadata(path)
 	}
 
+	v, ok := lookupEnv("BUILD_REPOSITORY_PROVIDER")
+	if ok {
+		if v == "github" {
+			logging.Logger.Debug("fetching Github vcs metadata from Azure DevOps pipeline")
+			return f.getAzureReposGithubMetadata(path)
+		}
+
+		logging.Logger.Debug("fetching Azure Repos vcs metadata")
+		return f.getAzureReposMetadata(path)
+	}
+
+	logging.Logger.Debug("could not detect a specific CI system, fetching local Git metadata")
 	return f.getLocalGitMetadata(path)
+}
+
+func lookupEnv(name string) (string, bool) {
+	v, ok := os.LookupEnv(name)
+	return strings.TrimSpace(strings.ToLower(v)), ok
 }
 
 func isTest() bool {
@@ -123,6 +150,8 @@ func (f *metadataFetcher) getGithubMetadata(path string) (Metadata, error) {
 	// if the branch name is HEAD this means that we're using a merge commit and need
 	// to fetch the actual commit.
 	if m.Branch.Name == "HEAD" {
+		logging.Logger.Debug("detected merge commit as branch name is HEAD, fetching author commit")
+
 		r, err := git.PlainOpenWithOptions(path, &git.PlainOpenOptions{DetectDotGit: true})
 		if err != nil {
 			return Metadata{}, fmt.Errorf("could not open git directory to fetch metadata %w", err)
@@ -154,6 +183,7 @@ func (f *metadataFetcher) getGithubMetadata(path string) (Metadata, error) {
 		// to clone each time.
 		_, err = os.Stat(clonePath)
 		if err == nil {
+			logging.Logger.Debugf("clone directory '%s' is not empty, opening exising directory", clonePath)
 			unlock()
 
 			r, err = git.PlainOpen(clonePath)
@@ -161,10 +191,11 @@ func (f *metadataFetcher) getGithubMetadata(path string) (Metadata, error) {
 				return Metadata{}, fmt.Errorf("could not open previously cloned path %w", err)
 			}
 		} else {
+			logging.Logger.Debugf("cloning auhor commit into '%s'", clonePath)
 			r, err = git.PlainClone(clonePath, false, &git.CloneOptions{
 				URL:           gjson.GetBytes(event, "repository.clone_url").String(),
 				ReferenceName: plumbing.NewBranchReferenceName(headRef),
-				Auth: &http.BasicAuth{
+				Auth: &githttp.BasicAuth{
 					Username: pieces[0],
 					Password: pieces[1],
 				},
@@ -229,6 +260,156 @@ func (f *metadataFetcher) getLocalGitMetadata(path string) (Metadata, error) {
 	}, nil
 }
 
+var (
+	mergeCommitRegxp = regexp.MustCompile(`(?i)^merge\s([\d\w]+)\sinto\s[\d\w]+`)
+)
+
+func (f *metadataFetcher) getAzureReposMetadata(path string) (Metadata, error) {
+	m, err := f.getLocalGitMetadata(path)
+	if err != nil {
+		return m, fmt.Errorf("AzureRepos metadata error, could not fetch initial metadata from local git %w", err)
+	}
+
+	if m.Branch.Name == "HEAD" {
+		err := f.transformAzureDevOpsMergeCommit(path, &m)
+		if err != nil {
+			logging.Logger.WithError(err).Debug("could not transform Azure DevOps merge commit continuing with provided PR values")
+		}
+	}
+
+	res := f.getAzureRepoPRInfo()
+
+	m.Pipeline = &Pipeline{ID: os.Getenv("BUILD_BUILDID")}
+	pullID := os.Getenv("SYSTEM_PULLREQUEST_PULLREQUESTID")
+	m.PullRequest = &PullRequest{
+		ID:           pullID,
+		VCSProvider:  "azure_devops_tfsgit",
+		Title:        res.Title,
+		Author:       res.CreatedBy.UniqueName,
+		SourceBranch: strings.TrimLeft(os.Getenv("SYSTEM_PULLREQUEST_SOURCEBRANCH"), "refs/heads/"),
+		BaseBranch:   strings.TrimLeft(os.Getenv("SYSTEM_PULLREQUEST_TARGETBRANCH"), "refs/heads/"),
+		URL:          fmt.Sprintf("%s/pullrequest/%s", os.Getenv("SYSTEM_PULLREQUEST_SOURCEREPOSITORYURI"), pullID),
+	}
+	return m, nil
+}
+
+func (f *metadataFetcher) transformAzureDevOpsMergeCommit(path string, m *Metadata) error {
+	matches := mergeCommitRegxp.FindStringSubmatch(m.Commit.Message)
+	if len(matches) <= 1 {
+		return fmt.Errorf("could not parse commit hash from Azure DevOps merge commit message %s", m.Commit.Message)
+	}
+
+	commit, err := f.fetchCommit(path, matches[1])
+	if err != nil {
+		return fmt.Errorf("failed to find non merge commit for Azure DevOps repo %w", err)
+	}
+
+	m.Commit = commit
+	m.Branch.Name = strings.TrimLeft(os.Getenv("SYSTEM_PULLREQUEST_SOURCEBRANCH"), "refs/heads/")
+
+	return nil
+}
+
+func (f *metadataFetcher) fetchCommit(path string, hash string) (Commit, error) {
+	r, err := git.PlainOpenWithOptions(path, &git.PlainOpenOptions{DetectDotGit: true})
+	if err != nil {
+		return Commit{}, fmt.Errorf("could not open git directory to fetch commit %s %w", hash, err)
+	}
+
+	c, err := r.CommitObject(plumbing.NewHash(hash))
+	if err != nil {
+		return Commit{}, fmt.Errorf("failed to fetch commit %s %w", hash, err)
+	}
+
+	return commitToMetadata(c), nil
+}
+
+type azurePullRequestResponse struct {
+	Repository struct {
+		Id      string `json:"id"`
+		Name    string `json:"name"`
+		Url     string `json:"url"`
+		Project struct {
+			Id          string `json:"id"`
+			Name        string `json:"name"`
+			Description string `json:"description"`
+			Url         string `json:"url"`
+			State       string `json:"state"`
+			Revision    int    `json:"revision"`
+		} `json:"project"`
+		RemoteUrl string `json:"remoteUrl"`
+	} `json:"repository"`
+	PullRequestId int    `json:"pullRequestId"`
+	CodeReviewId  int    `json:"codeReviewId"`
+	Status        string `json:"status"`
+	CreatedBy     struct {
+		Id          string `json:"id"`
+		DisplayName string `json:"displayName"`
+		UniqueName  string `json:"uniqueName"`
+		Url         string `json:"url"`
+		ImageUrl    string `json:"imageUrl"`
+	} `json:"createdBy"`
+	CreationDate  time.Time `json:"creationDate"`
+	Title         string    `json:"title"`
+	Description   string    `json:"description"`
+	SourceRefName string    `json:"sourceRefName"`
+	TargetRefName string    `json:"targetRefName"`
+	MergeStatus   string    `json:"mergeStatus"`
+	MergeId       string    `json:"mergeId"`
+}
+
+func (f *metadataFetcher) getAzureRepoPRInfo() azurePullRequestResponse {
+	var out azurePullRequestResponse
+	apiURL := fmt.Sprintf("%s_apis/git/repositories/%s/pullRequests/%s", os.Getenv("SYSTEM_COLLECTIONURI"), os.Getenv("BUILD_REPOSITORY_ID"), os.Getenv("SYSTEM_PULLREQUEST_PULLREQUESTID"))
+	req, _ := http.NewRequest(http.MethodGet, apiURL, nil)
+	req.SetBasicAuth("azdo", os.Getenv("SYSTEM_ACCESSTOKEN"))
+
+	res, err := f.client.Do(req)
+	if err != nil {
+		logging.Logger.WithError(err).Debugf("could not fetch Azure DevOps pull request information using URL '%s'", apiURL)
+		return out
+	}
+
+	err = json.NewDecoder(res.Body).Decode(&out)
+	if err != nil {
+		logging.Logger.WithError(err).Debug("could not decode reponse body from Azure DevOps pull request API call")
+	}
+
+	return out
+}
+
+// getAzureReposGithubMetadata returns the git metadata for a repository hosted on GitHub, but using
+// Azure DevOps Pipelines as a build agent.
+//
+// We are unable to fetch pull request title and author for repositories using the GitHub <> Azure DevOps
+// setup. The relevant information is not provided in the pipeline, and there is no GitHub access token
+// provided to fetch this information from the GitHub API.
+func (f *metadataFetcher) getAzureReposGithubMetadata(path string) (Metadata, error) {
+	m, err := f.getLocalGitMetadata(path)
+	if err != nil {
+		return m, fmt.Errorf("AzureRepos metadata error, could not fetch initial metadata from local git %w", err)
+	}
+
+	if m.Branch.Name == "HEAD" {
+		err := f.transformAzureDevOpsMergeCommit(path, &m)
+		if err != nil {
+			logging.Logger.WithError(err).Debug("could not transform Azure DevOps merge commit continuing with provided PR values")
+		}
+	}
+
+	m.Pipeline = &Pipeline{ID: os.Getenv("BUILD_BUILDID")}
+	pullNumber := os.Getenv("SYSTEM_PULLREQUEST_PULLREQUESTNUMBER")
+	m.PullRequest = &PullRequest{
+		ID:           pullNumber,
+		VCSProvider:  "azure_devops_github",
+		SourceBranch: strings.TrimLeft(os.Getenv("SYSTEM_PULLREQUEST_SOURCEBRANCH"), "refs/heads/"),
+		BaseBranch:   strings.TrimLeft(os.Getenv("SYSTEM_PULLREQUEST_TARGETBRANCH"), "refs/heads/"),
+		URL:          fmt.Sprintf("%s/pulls/%s", os.Getenv("SYSTEM_PULLREQUEST_SOURCEREPOSITORYURI"), pullNumber),
+	}
+
+	return m, nil
+}
+
 func commitToMetadata(commit *object.Commit) Commit {
 	return Commit{
 		SHA:         commit.Hash.String(),
@@ -277,4 +458,8 @@ type Metadata struct {
 	Commit      Commit
 	PullRequest *PullRequest
 	Pipeline    *Pipeline
+}
+
+func isMergeCommit(message string) bool {
+	return strings.Contains(strings.ToLower(message), "merge")
 }
