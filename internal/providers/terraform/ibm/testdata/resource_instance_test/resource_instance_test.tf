@@ -26,3 +26,11 @@ resource "ibm_resource_instance" "resource_instance_secrets_manager" {
   location          = "us-south"
   resource_group_id = "default"
 }
+
+resource "ibm_resource_instance" "resource_instance_appid" {
+  name              = "test"
+  service           = "appid"
+  plan              = "graduated-tier"
+  location          = "us-south"
+  resource_group_id = "default"
+}
