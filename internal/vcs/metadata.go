@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"regexp"
@@ -15,6 +16,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	githttp "github.com/go-git/go-git/v5/plumbing/transport/http"
+	"github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 
 	"github.com/infracost/infracost/internal/logging"
@@ -293,37 +295,6 @@ func (f *metadataFetcher) getAzureReposMetadata(path string) (Metadata, error) {
 	return m, nil
 }
 
-func (f *metadataFetcher) transformAzureDevOpsMergeCommit(path string, m *Metadata) error {
-	matches := mergeCommitRegxp.FindStringSubmatch(m.Commit.Message)
-	if len(matches) <= 1 {
-		return fmt.Errorf("could not parse commit hash from Azure DevOps merge commit message %s", m.Commit.Message)
-	}
-
-	commit, err := f.fetchCommit(path, matches[1])
-	if err != nil {
-		return fmt.Errorf("failed to find non merge commit for Azure DevOps repo %w", err)
-	}
-
-	m.Commit = commit
-	m.Branch.Name = strings.TrimLeft(os.Getenv("SYSTEM_PULLREQUEST_SOURCEBRANCH"), "refs/heads/")
-
-	return nil
-}
-
-func (f *metadataFetcher) fetchCommit(path string, hash string) (Commit, error) {
-	r, err := git.PlainOpenWithOptions(path, &git.PlainOpenOptions{DetectDotGit: true})
-	if err != nil {
-		return Commit{}, fmt.Errorf("could not open git directory to fetch commit %s %w", hash, err)
-	}
-
-	c, err := r.CommitObject(plumbing.NewHash(hash))
-	if err != nil {
-		return Commit{}, fmt.Errorf("failed to fetch commit %s %w", hash, err)
-	}
-
-	return commitToMetadata(c), nil
-}
-
 type azurePullRequestResponse struct {
 	Repository struct {
 		Id      string `json:"id"`
@@ -358,11 +329,20 @@ type azurePullRequestResponse struct {
 	MergeId       string    `json:"mergeId"`
 }
 
+// getAzureRepoPRInfo attempts to get the azurePullRequestResponse using Azure DevOps Pipeline variables.
+// This method is expected to often fail as Azure DevOps requires users to explicitly pass System.AccessToken as
+// an env var on the job step.
 func (f *metadataFetcher) getAzureRepoPRInfo() azurePullRequestResponse {
 	var out azurePullRequestResponse
+	systemAccessToken := strings.TrimSpace(os.Getenv("SYSTEM_ACCESSTOKEN"))
+	if systemAccessToken == "" {
+		logging.Logger.Debug("skipping fetching pr title and author, the required pipeline variable System.AccessToken was not provided as an env var named SYSTEM_ACCESSTOKEN")
+		return out
+	}
+
 	apiURL := fmt.Sprintf("%s_apis/git/repositories/%s/pullRequests/%s", os.Getenv("SYSTEM_COLLECTIONURI"), os.Getenv("BUILD_REPOSITORY_ID"), os.Getenv("SYSTEM_PULLREQUEST_PULLREQUESTID"))
 	req, _ := http.NewRequest(http.MethodGet, apiURL, nil)
-	req.SetBasicAuth("azdo", os.Getenv("SYSTEM_ACCESSTOKEN"))
+	req.SetBasicAuth("azdo", systemAccessToken)
 
 	res, err := f.client.Do(req)
 	if err != nil {
@@ -370,9 +350,18 @@ func (f *metadataFetcher) getAzureRepoPRInfo() azurePullRequestResponse {
 		return out
 	}
 
+	if res.StatusCode != http.StatusOK {
+		b, _ := io.ReadAll(res.Body)
+		logging.Logger.WithFields(logrus.Fields{
+			"status_code": res.StatusCode,
+			"response":    string(b),
+		}).Debugf("received non 200 status code from Azure DevOps pull request API call to: '%s'", apiURL)
+		return out
+	}
+
 	err = json.NewDecoder(res.Body).Decode(&out)
 	if err != nil {
-		logging.Logger.WithError(err).Debug("could not decode reponse body from Azure DevOps pull request API call")
+		logging.Logger.WithError(err).Debugf("could not decode reponse body from Azure DevOps pull request API call to '%s'", apiURL)
 	}
 
 	return out
@@ -408,6 +397,74 @@ func (f *metadataFetcher) getAzureReposGithubMetadata(path string) (Metadata, er
 	}
 
 	return m, nil
+}
+
+func (f *metadataFetcher) transformAzureDevOpsMergeCommit(path string, m *Metadata) error {
+	m.Branch.Name = strings.TrimLeft(os.Getenv("SYSTEM_PULLREQUEST_SOURCEBRANCH"), "refs/heads/")
+
+	matches := mergeCommitRegxp.FindStringSubmatch(m.Commit.Message)
+	if len(matches) <= 1 {
+		logging.Logger.Debugf("could not find reference to PR commit in merge commit message '%s' using git log strategy", m.Commit.Message)
+
+		commit, err := f.shiftCommit(path)
+		if err != nil {
+			return fmt.Errorf("failed to find find PR commit after merge commit using git log strategy %w", err)
+		}
+
+		m.Commit = commit
+		return nil
+	}
+
+	commit, err := f.fetchCommit(path, matches[1])
+	if err != nil {
+		return fmt.Errorf("failed to find non merge commit for Azure DevOps repo %w", err)
+	}
+
+	m.Commit = commit
+
+	return nil
+}
+
+func (f *metadataFetcher) fetchCommit(path string, hash string) (Commit, error) {
+	r, err := git.PlainOpenWithOptions(path, &git.PlainOpenOptions{DetectDotGit: true})
+	if err != nil {
+		return Commit{}, fmt.Errorf("could not open git directory to fetch commit %s %w", hash, err)
+	}
+
+	c, err := r.CommitObject(plumbing.NewHash(hash))
+	if err != nil {
+		return Commit{}, fmt.Errorf("failed to fetch commit %s %w", hash, err)
+	}
+
+	return commitToMetadata(c), nil
+}
+
+func (f *metadataFetcher) shiftCommit(path string) (Commit, error) {
+	r, err := git.PlainOpenWithOptions(path, &git.PlainOpenOptions{DetectDotGit: true})
+	if err != nil {
+		return Commit{}, fmt.Errorf("could not open git directory to get git log %w", err)
+	}
+
+	itr, err := r.Log(&git.LogOptions{
+		Order: git.LogOrderCommitterTime,
+		All:   true,
+	})
+	if err != nil {
+		return Commit{}, fmt.Errorf("failed to return an git log iterator %w", err)
+	}
+
+	for {
+		c, err := itr.Next()
+		if err != nil {
+			return Commit{}, fmt.Errorf("could not get non merge commit from the git log %w", err)
+		}
+
+		if !isMergeCommit(c.Message) {
+			return commitToMetadata(c), nil
+		}
+
+		logging.Logger.Debugf("ignoring commit with msg '%s'", c.Message)
+	}
 }
 
 func commitToMetadata(commit *object.Commit) Commit {
