@@ -6,6 +6,11 @@
  ├─ Per vCPU per hour                                1  CPU          $29.55 
  └─ Inference accelerator (eia2.medium)            730  hours        $87.60 
                                                                             
+ aws_ecs_service.ecs_fargate11_family                                       
+ ├─ Per GB per hour                                  2  GB            $6.49 
+ ├─ Per vCPU per hour                                1  CPU          $29.55 
+ └─ Inference accelerator (eia2.medium)            730  hours        $87.60 
+                                                                            
  aws_ecs_service.ecs_fargate2                                               
  ├─ Per GB per hour                                  4  GB           $12.98 
  ├─ Per vCPU per hour                                2  CPU          $59.10 
@@ -36,10 +41,10 @@
  ├─ Per vCPU per hour                                2  CPU          $59.10 
  └─ Inference accelerator (eia2.medium)          1,460  hours       $175.20 
                                                                             
- OVERALL TOTAL                                                    $2,225.52 
+ OVERALL TOTAL                                                    $2,349.16 
 ──────────────────────────────────
-19 cloud resources were detected:
-∙ 7 were estimated
+20 cloud resources were detected:
+∙ 8 were estimated
 ∙ 12 were free:
   ∙ 6 x aws_ecs_cluster
   ∙ 3 x aws_ecs_cluster_capacity_providers

@@ -62,6 +62,13 @@ resource "aws_ecs_service" "ecs_fargate1" {
   desired_count   = 1
 }
 
+resource "aws_ecs_service" "ecs_fargate11_family" {
+  name            = "ecs_fargate1_family"
+  launch_type     = "FARGATE"
+  task_definition = aws_ecs_task_definition.ecs_task.family
+  desired_count   = 1
+}
+
 resource "aws_ecs_cluster" "ecs2" {
   name = "ecs2"
   default_capacity_provider_strategy {
