@@ -107,7 +107,7 @@ func DetectProjectMetadata(path string) *schema.ProjectMetadata {
 		logging.Logger.WithError(err).Debugf("failed to fetch vcs metadata for path %s", path)
 	}
 
-	if vcsPullRequestURL == "" {
+	if vcsPullRequestURL == "" && meta.PullRequest != nil {
 		vcsPullRequestURL = meta.PullRequest.URL
 	}
 

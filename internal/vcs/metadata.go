@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"net/url"
 	"os"
 	"regexp"
 	"strings"
@@ -37,6 +38,9 @@ var (
 	}
 
 	MetadataFetcher = newMetadataFetcher()
+
+	scpSyntax        = regexp.MustCompile(`^([a-zA-Z0-9-._~]+@)?([a-zA-Z0-9._-]+):([a-zA-Z0-9./._-]+)(?:\?||$)(.*)$`)
+	mergeCommitRegxp = regexp.MustCompile(`(?i)^merge\s([\d\w]+)\sinto\s[\d\w]+`)
 )
 
 type keyMutex struct {
@@ -113,8 +117,25 @@ func (f *metadataFetcher) Get(path string) (Metadata, error) {
 		return f.getCircleCIMetadata(path)
 	}
 
+	ok = lookupEnvPrefix("ATLANTIS_")
+	if ok {
+		logging.Logger.Debug("fetching Atlantis vcs metadata")
+		return f.getAtlantisMetadata(path)
+	}
+
 	logging.Logger.Debug("could not detect a specific CI system, fetching local Git metadata")
 	return f.getLocalGitMetadata(path)
+}
+
+func lookupEnvPrefix(name string) bool {
+	for _, k := range os.Environ() {
+		if strings.HasPrefix(k, name) {
+			logging.Logger.Debugf("os env '%s' matched prefix '%s'", k, name)
+			return true
+		}
+	}
+
+	return false
 }
 
 func lookupEnv(name string) (string, bool) {
@@ -256,7 +277,6 @@ func (f *metadataFetcher) getLocalGitMetadata(path string) (Metadata, error) {
 	if err != nil {
 		return Metadata{}, fmt.Errorf("could not open git directory to fetch metadata %w", err)
 	}
-
 	head, err := r.Head()
 	if err != nil {
 		return Metadata{}, fmt.Errorf("could not determine head from local git directory %w", err)
@@ -268,15 +288,26 @@ func (f *metadataFetcher) getLocalGitMetadata(path string) (Metadata, error) {
 		return Metadata{}, fmt.Errorf("could not read head commit %w", err)
 	}
 
+	var remote string
+	rms, err := r.Remotes()
+	if err != nil {
+		logging.Logger.WithError(err).Debug("failed to ls remotes")
+	}
+
+	for _, rem := range rms {
+		urls := rem.Config().URLs
+		if len(urls) > 0 {
+			remote = urls[0]
+			break
+		}
+	}
+
 	return Metadata{
+		Remote: urlStringToRemote(remote),
 		Branch: Branch{Name: branch},
 		Commit: commitToMetadata(commit),
 	}, nil
 }
-
-var (
-	mergeCommitRegxp = regexp.MustCompile(`(?i)^merge\s([\d\w]+)\sinto\s[\d\w]+`)
-)
 
 func (f *metadataFetcher) getAzureReposMetadata(path string) (Metadata, error) {
 	m, err := f.getLocalGitMetadata(path)
@@ -528,6 +559,57 @@ func (f *metadataFetcher) getCircleCIMetadata(path string) (Metadata, error) {
 	return m, nil
 }
 
+func (f *metadataFetcher) getAtlantisMetadata(path string) (Metadata, error) {
+	m, err := f.getLocalGitMetadata(path)
+	if err != nil {
+		return m, fmt.Errorf("atlantis metadata error, could not fetch initial metadata from local git %w", err)
+	}
+
+	// Atlantis doesn't expose any unique identifiers that we can use to distinguish a pipeline run.
+	m.Pipeline = &Pipeline{ID: ""}
+
+	m.PullRequest = &PullRequest{
+		VCSProvider:  "atlantis",
+		ID:           os.Getenv("PULL_NUM"),
+		Author:       os.Getenv("PULL_AUTHOR"),
+		SourceBranch: os.Getenv("HEAD_BRANCH_NAME"),
+		BaseBranch:   os.Getenv("BASE_BRANCH_NAME"),
+		// Atlantis doesn't provide any indication of which VCS system triggers a build.
+		// So we build the URL using the remote that the local git config points to.
+		URL: getAtlantisPullRequestURL(m.Remote),
+
+		// We're unable to fetch title without calling the GitHub, Bitbucket or Gitlab API respectively.
+		// This could be possible using the Atlantis Repo tokens, but it has been left out for now.
+		Title: "",
+	}
+
+	return m, nil
+}
+
+func getAtlantisPullRequestURL(remote Remote) string {
+	owner := os.Getenv("BASE_REPO_OWNER")
+	project := os.Getenv("BASE_REPO_NAME")
+	pullNumber := os.Getenv("PULL_NUM")
+
+	if strings.Contains(remote.Host, "github") {
+		return fmt.Sprintf("https://github.com/%s/%s/pull/%s", owner, project, pullNumber)
+	}
+
+	if strings.Contains(remote.Host, "gitlab") {
+		return fmt.Sprintf("https://gitlab.com/%s/%s/-/merge_requests/%s", owner, project, pullNumber)
+	}
+
+	if strings.Contains(remote.Host, "azure") {
+		return fmt.Sprintf("https://dev.azure.com/%s/base/_git/%s/pullrequest/%s", owner, project, pullNumber)
+	}
+
+	if strings.Contains(remote.Host, "bitbucket") {
+		return fmt.Sprintf("https://bitbucket.org/%s/%s/pull-requests/%s", owner, project, pullNumber)
+	}
+
+	return ""
+}
+
 func commitToMetadata(commit *object.Commit) Commit {
 	return Commit{
 		SHA:         commit.Hash.String(),
@@ -569,9 +651,16 @@ type Pipeline struct {
 	ID string
 }
 
+// Remote holds information about the upstream repository that the git project uses.
+type Remote struct {
+	Host string
+	URL  string
+}
+
 // Metadata holds a snapshot of information for a given environment and vcs system.
 // PullRequest and Pipeline properties are only populated if running in a CI system.
 type Metadata struct {
+	Remote      Remote
 	Branch      Branch
 	Commit      Commit
 	PullRequest *PullRequest
@@ -580,4 +669,37 @@ type Metadata struct {
 
 func isMergeCommit(message string) bool {
 	return strings.Contains(strings.ToLower(message), "merge")
+}
+
+func urlStringToRemote(remote string) Remote {
+	if remote == "" {
+		return Remote{}
+	}
+
+	u, err := url.Parse(remote)
+	if err == nil {
+		return Remote{
+			Host: u.Host,
+			URL:  remote,
+		}
+	}
+
+	logging.Logger.WithError(err).Debugf("parsing remote '%s' as SCP string", remote)
+
+	match := scpSyntax.FindAllStringSubmatch(remote, -1)
+	if len(match) == 0 {
+		logging.Logger.Debug("remote did not match SCP regexp")
+		return Remote{}
+	}
+
+	m := match[0]
+	if len(m) < 4 {
+		logging.Logger.Debug("SCP remote was malformed")
+		return Remote{}
+	}
+
+	return Remote{
+		Host: m[2],
+		URL:  fmt.Sprintf("https://%s/%s", m[2], m[3]),
+	}
 }
