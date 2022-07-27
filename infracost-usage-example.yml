@@ -1140,11 +1140,14 @@ resource_usage:
   ibm_is_instance.is_instance:
     monthly_instance_hours: 730 # Monthly number of hours an instance runs
 
-  ibm_is_vpc.testVpc:
+  ibm_is_vpc.is_vpc:
     gigabyte_transmitted_outbounds: 5 # Monthly traffic leaving the VPC in GB
 
   ibm_container_vpc_worker_pool.cluster_pool:
-    monthly_instance_hours: 730
+    monthly_instance_hours: 730 # Monthly number of hours an instance runs
 
   ibm_container_vpc_cluster.cluster:
-    monthly_instance_hours: 730
+    monthly_instance_hours: 730 # Monthly number of hours an instance runs
+
+  ibm_is_volume.custom_volume:
+    monthly_hours: 730 # Monthly number of hours a volume is live
