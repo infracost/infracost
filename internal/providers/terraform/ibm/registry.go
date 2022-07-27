@@ -7,6 +7,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getIbmIsVpcRegistryItem(),
 	getContainerVpcWorkerPoolRegistryItem(),
 	getContainerVpcClusterRegistryItem(),
+	getResourceInstanceRegistryItem(),
 	getIsVolumeRegistryItem(),
 	getIsVpnGatewayRegistryItem(),
 	getTgGatewayRegistryItem(),
