@@ -1,0 +1,8 @@
+version: 0.1
+resource_usage:
+  ibm_is_volume.custom_volume:
+    monthly_hours: 730
+  ibm_is_volume.general_purpose_volume:
+    monthly_hours: 730
+  ibm_is_volume.general_purpose_5iops:
+    monthly_hours: 730

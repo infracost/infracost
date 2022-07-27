@@ -1,0 +1,17 @@
+
+ Name                                  Monthly Qty  Unit  Monthly Cost 
+                                                                       
+ ibm_is_volume.custom_volume                                           
+ ├─ Gigabyte Hours                         146,000  GB          $20.00 
+ └─ IOPS Hours                             730,000  IOPS        $70.08 
+                                                                       
+ ibm_is_volume.general_purpose_5iops                                   
+ └─ Gigabyte Hours                         292,000  GB          $56.06 
+                                                                       
+ ibm_is_volume.general_purpose_volume                                  
+ └─ Gigabyte Hours                         146,000  GB          $16.06 
+                                                                       
+ OVERALL TOTAL                                                 $162.21 
+──────────────────────────────────
+3 cloud resources were detected:
+∙ 3 were estimated
