@@ -11,12 +11,13 @@ import (
 // IbmIsVpc struct represents an instance of IBM's Virtual Private Cloud
 //
 //
-// Resource information: https://registry.terraform.io/providers/IBM-Cloud/ibm/latest/docs/resources/is_vpc
-// Pricing information: https://www.ibm.com/ca-en/cloud/vpc/pricing/
+// Resource information: https://cloud.ibm.com/docs/vpc?topic=vpc-getting-started
+// Pricing information: https://www.ibm.com/cloud/vpc/pricing
 type IbmIsVpc struct {
-	Address                      string
-	Region                       string
-	Classic                      bool
+	Address string
+	Region  string
+	Classic bool
+
 	GigabyteTransmittedOutbounds *float64 `infracost_usage:"gigabyte_transmitted_outbounds"`
 }
 
