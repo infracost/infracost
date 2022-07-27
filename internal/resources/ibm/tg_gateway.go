@@ -37,9 +37,9 @@ func (r *TgGateway) connectionFreeCostComponent() *schema.CostComponent {
 	var q *decimal.Decimal
 	if r.Connection != nil {
 		q = decimalPtr(decimal.NewFromInt(*r.Connection))
-	}
-	if q.GreaterThan(decimal.NewFromInt(10)) {
-		q = decimalPtr(decimal.NewFromInt(10))
+		if q.GreaterThan(decimal.NewFromInt(10)) {
+			q = decimalPtr(decimal.NewFromInt(10))
+		}
 	}
 	component := schema.CostComponent{
 		Name:            "Connections Free allowance (first 10 Connection)",
@@ -61,11 +61,11 @@ func (r *TgGateway) connectionCostComponent() *schema.CostComponent {
 	var q *decimal.Decimal
 	if r.Connection != nil {
 		q = decimalPtr(decimal.NewFromInt(*r.Connection))
-	}
-	if q.LessThanOrEqual(decimal.NewFromInt(10)) {
-		q = decimalPtr(decimal.NewFromInt(0))
-	} else {
-		q = decimalPtr(q.Sub(decimal.NewFromInt(10)))
+		if q.LessThanOrEqual(decimal.NewFromInt(10)) {
+			q = decimalPtr(decimal.NewFromInt(0))
+		} else {
+			q = decimalPtr(q.Sub(decimal.NewFromInt(10)))
+		}
 	}
 	return &schema.CostComponent{
 		Name:            "Connections",

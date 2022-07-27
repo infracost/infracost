@@ -11,12 +11,13 @@ import (
 // IbmIsVpc struct represents an instance of IBM's Virtual Private Cloud
 //
 //
-// Resource information: https://registry.terraform.io/providers/IBM-Cloud/ibm/latest/docs/resources/is_vpc
-// Pricing information: https://www.ibm.com/ca-en/cloud/vpc/pricing/
+// Resource information: https://cloud.ibm.com/docs/vpc?topic=vpc-getting-started
+// Pricing information: https://www.ibm.com/cloud/vpc/pricing
 type IbmIsVpc struct {
-	Address                      string
-	Region                       string
-	Classic                      bool
+	Address string
+	Region  string
+	Classic bool
+
 	GigabyteTransmittedOutbounds *float64 `infracost_usage:"gigabyte_transmitted_outbounds"`
 }
 
@@ -31,26 +32,41 @@ func (r *IbmIsVpc) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
+func (r *IbmIsVpc) vpcEgressFreeCostComponent() *schema.CostComponent {
+	var quantity *decimal.Decimal
+	if r.GigabyteTransmittedOutbounds != nil {
+		quantity = decimalPtr(decimal.NewFromFloat(*r.GigabyteTransmittedOutbounds))
+		if quantity.GreaterThan(decimal.NewFromInt(5)) {
+			quantity = decimalPtr(decimal.NewFromInt(5))
+		}
+	}
+	costComponent := schema.CostComponent{
+		Name:            fmt.Sprintf("VPC egress free allowance (first 5GB)"),
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: quantity,
+		ProductFilter: &schema.ProductFilter{
+			VendorName: strPtr("ibm"),
+			Region:     strPtr(r.Region),
+			Service:    strPtr("is.vpc"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "planName", ValueRegex: strPtr(fmt.Sprintf("/%s/i", "nextgen-egress"))},
+			},
+		},
+	}
+	costComponent.SetCustomPrice(decimalPtr(decimal.NewFromInt(0)))
+	return &costComponent
+}
+
 func (r *IbmIsVpc) vpcEgressCostComponent() *schema.CostComponent {
 	var quantity *decimal.Decimal
 	if r.GigabyteTransmittedOutbounds != nil {
 		quantity = decimalPtr(decimal.NewFromFloat(*r.GigabyteTransmittedOutbounds))
-	}
-	attributeFilters := []*schema.AttributeFilter{}
-	if r.Classic {
-		attributeFilters = append(attributeFilters,
-			&schema.AttributeFilter{
-				Key:        "planName",
-				ValueRegex: strPtr(fmt.Sprintf("/%s/i", "-vpc-egress-data-transfer")),
-			},
-		)
-	} else {
-		attributeFilters = append(attributeFilters,
-			&schema.AttributeFilter{
-				Key:        "planName",
-				ValueRegex: strPtr(fmt.Sprintf("/%s/i", "nextgen-egress")),
-			},
-		)
+		if quantity.LessThanOrEqual(decimal.NewFromInt(5)) {
+			quantity = decimalPtr(decimal.NewFromInt(0))
+		} else {
+			quantity = decimalPtr(quantity.Sub(decimal.NewFromInt(5)))
+		}
 	}
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("VPC egress %s", r.Region),
@@ -58,10 +74,12 @@ func (r *IbmIsVpc) vpcEgressCostComponent() *schema.CostComponent {
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
-			VendorName:       strPtr("ibm"),
-			Region:           strPtr(r.Region),
-			Service:          strPtr("is.vpc"),
-			AttributeFilters: attributeFilters,
+			VendorName: strPtr("ibm"),
+			Region:     strPtr(r.Region),
+			Service:    strPtr("is.vpc"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "planName", ValueRegex: strPtr(fmt.Sprintf("/%s/i", "nextgen-egress"))},
+			},
 		},
 	}
 }
@@ -88,6 +106,7 @@ func (r *IbmIsVpc) BuildResource() *schema.Resource {
 	vpcCostComponent.SetCustomPrice(decimalPtr(decimal.NewFromInt(0)))
 	costComponents := []*schema.CostComponent{
 		vpcCostComponent,
+		r.vpcEgressFreeCostComponent(),
 		r.vpcEgressCostComponent(),
 	}
 
