@@ -107,6 +107,10 @@ func DetectProjectMetadata(path string) *schema.ProjectMetadata {
 		logging.Logger.WithError(err).Debugf("failed to fetch vcs metadata for path %s", path)
 	}
 
+	if vcsPullRequestURL == "" {
+		vcsPullRequestURL = meta.PullRequest.URL
+	}
+
 	pm := &schema.ProjectMetadata{
 		Path:               path,
 		TerraformWorkspace: terraformWorkspace,
