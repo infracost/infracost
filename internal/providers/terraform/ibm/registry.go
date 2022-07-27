@@ -28,6 +28,7 @@ var FreeResources = []string{
 	"ibm_is_subnet_reserved_ip",
 	"ibm_is_virtual_endpoint_gateway_ip",
 	"ibm_is_vpc_address_prefix",
+	"ibm_is_vpn_gateway_connection",
 	"ibm_kms_key",
 	"ibm_kms_key_rings",
 	"ibm_resource_group",
