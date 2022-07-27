@@ -23,9 +23,9 @@ type Project struct {
 	// A path can be repeated with different parameters, e.g. for multiple workspaces.
 	Path string `yaml:"path,omitempty" ignored:"true"`
 	// ExcludePaths defines a list of directories that the provider should ignore.
-	ExcludePaths []string `yaml:"exclude_paths,omitempty"`
+	ExcludePaths []string `yaml:"exclude_paths,omitempty" ignored:"true"`
 	// Name is a user defined name for the project
-	Name string `yaml:"name,omitempty"`
+	Name string `yaml:"name,omitempty" ignored:"true"`
 	// TerraformVarFiles is any var files that are to be used with the project.
 	TerraformVarFiles []string `yaml:"terraform_var_files"`
 	// TerraformVars is a slice of input vars that are to be used with the project.
