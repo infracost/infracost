@@ -9,7 +9,7 @@ func getECSTaskDefinitionRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:    "aws_ecs_task_definition",
 		NoPrice: true,
-		Notes:   []string{"Free resource 2."},
+		Notes:   []string{"Free resource."},
 		CustomRefIDFunc: func(d *schema.ResourceData) []string {
 			refs := []string{d.Get("arn").String()}
 
