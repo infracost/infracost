@@ -107,6 +107,12 @@ func (f *metadataFetcher) Get(path string) (Metadata, error) {
 		return f.getBitbucketMetadata(path)
 	}
 
+	_, ok = lookupEnv("CIRCLECI")
+	if ok {
+		logging.Logger.Debug("fetching Github vcs metadata from Circle CI")
+		return f.getCircleCIMetadata(path)
+	}
+
 	logging.Logger.Debug("could not detect a specific CI system, fetching local Git metadata")
 	return f.getLocalGitMetadata(path)
 }
@@ -492,6 +498,30 @@ func (f *metadataFetcher) getBitbucketMetadata(path string) (Metadata, error) {
 		SourceBranch: os.Getenv("BITBUCKET_BRANCH"),
 		BaseBranch:   os.Getenv("BITBUCKET_PR_DESTINATION_BRANCH"),
 		URL:          fmt.Sprintf("%s/pull-requests/%s", os.Getenv("BITBUCKET_GIT_HTTP_ORIGIN"), os.Getenv("BITBUCKET_PR_ID")),
+	}
+
+	return m, nil
+}
+
+func (f *metadataFetcher) getCircleCIMetadata(path string) (Metadata, error) {
+	m, err := f.getLocalGitMetadata(path)
+	if err != nil {
+		return m, fmt.Errorf("circle CI metadata error, could not fetch initial metadata from local git %w", err)
+	}
+
+	m.Pipeline = &Pipeline{ID: os.Getenv("CIRCLE_WORKFLOW_ID")}
+	m.PullRequest = &PullRequest{
+		VCSProvider:  "circleci",
+		ID:           os.Getenv("CIRCLE_PR_NUMBER"),
+		SourceBranch: os.Getenv("CIRCLE_BRANCH"),
+		URL:          os.Getenv("CIRCLE_PULL_REQUEST"),
+
+		// we're unable to fetch these without calling the GitHub, Bitbucket or Gitlab API respectively.
+		// Calling the API requires authentication with variables that we don't have access to in the pipeline.
+		// e.g. a token or username, password for basic auth.
+		Title:      "",
+		Author:     "",
+		BaseBranch: "",
 	}
 
 	return m, nil
