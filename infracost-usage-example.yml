@@ -1155,3 +1155,9 @@ resource_usage:
   ibm_is_vpn_gateway.testVpcVpn:
     connection_hours: 730 # Monthly number of connection hours
     instance_hours: 730 # Monthly number of instance hours
+
+  ibm_tg_gateway.tg_gateway:
+    data_transfer_local: 2500 # Monthly local traffic through the gateway in GB
+    data_transfer_global: 2500 # Monthly global traffic through the gateway in GB
+    connection: 25 # Monthly number of connections to the gateway
+
