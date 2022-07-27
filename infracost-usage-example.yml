@@ -1148,3 +1148,25 @@ resource_usage:
 
   ibm_container_vpc_cluster.cluster:
     monthly_instance_hours: 730
+
+  #
+  # Key Protect
+  #
+  ibm_resource_instance.resource_instance_kms: 
+    kms_items_per_month: 300 # Number of managed keys
+
+  #
+  # Secrets Manager
+  #
+  ibm_resource_instance.resource_instance_secrets_manager:
+    secretsmanager_instance: 1 # Number of instances of secrets manager
+    secretsmanager_active_secrets: 400 # Number of active secrets
+
+  #
+  # App ID
+  #
+  ibm_resource_instance.resource_instance_appid:
+    appid_authentications: 15000 # Number of simple authentications in a month
+    appid_users: 1000 # Number of users in a month
+    appid_advanced_authentications: 20000 # Number of advanced authentications in a month
+    
