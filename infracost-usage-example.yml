@@ -1153,5 +1153,5 @@ resource_usage:
     monthly_instance_hours: 730
 
   ibm_is_vpn_gateway.testVpcVpn:
-    connection_hours: 730
-    instance_hours: 730
+    connection_hours: 730 # Monthly number of connection hours
+    instance_hours: 730 # Monthly number of instance hours
