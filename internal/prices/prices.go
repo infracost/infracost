@@ -159,23 +159,31 @@ func setCostComponentPrice(ctx *config.RunContext, currency string, r *schema.Re
 		// For tiered pricing we have to sum all tiers based on quantity
 		priceTiers := make([]schema.PriceTier, len(prices))
 		for i, price := range prices {
-			p, err := decimal.NewFromString(price.Get(currency).String())
+			parsedPrice, err := decimal.NewFromString(price.Get(currency).String())
 			if err != nil {
 				log.Warnf("Error converting price to '%v' (using 0.00)  '%v': %s", currency, price.Get(currency).String(), err.Error())
 			}
-			s, err := decimal.NewFromString(price.Get("startUsageAmount").String())
+			start, err := decimal.NewFromString(price.Get("startUsageAmount").String())
 			if err != nil {
 				log.Warnf("Error converting startUsageAmount to '%v' (using 0.00)  '%v': %s", currency, price.Get("startUsageAmount").String(), err.Error())
 			}
-			e, err := decimal.NewFromString(price.Get("endUsageAmount").String())
+			end, err := decimal.NewFromString(price.Get("endUsageAmount").String())
 			if err != nil {
 				log.Warnf("Error converting endUsageAmount to '%v' (using 0.00)  '%v': %s", currency, price.Get("endUsageAmount").String(), err.Error())
 			}
+			var name string
+			if i == 0 {
+				name = fmt.Sprintf("%s (first %s %s)", c.Name, end, c.Unit)
+			} else if i == len(prices)-1 {
+				name = fmt.Sprintf("%s (over %s %s)", c.Name, start, c.Unit)
+			} else {
+				name = fmt.Sprintf("%s (next %s %s)", c.Name, end.Sub(start), c.Unit)
+			}
 			priceTiers[i] = schema.PriceTier{
-				Name:             fmt.Sprintf("%s %s - %s %s", c.Name, s, e, c.Unit),
-				Price:            p,
-				StartUsageAmount: s,
-				EndUsageAmount:   e,
+				Name:             name,
+				Price:            parsedPrice,
+				StartUsageAmount: start,
+				EndUsageAmount:   end,
 			}
 		}
 		c.SetPriceTiers(priceTiers)
