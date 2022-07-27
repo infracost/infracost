@@ -101,6 +101,12 @@ func (f *metadataFetcher) Get(path string) (Metadata, error) {
 		return f.getAzureReposMetadata(path)
 	}
 
+	_, ok = lookupEnv("BITBUCKET_COMMIT")
+	if ok {
+		logging.Logger.Debug("fetching Github vcs metadata from Bitbucket pipeline")
+		return f.getBitbucketMetadata(path)
+	}
+
 	logging.Logger.Debug("could not detect a specific CI system, fetching local Git metadata")
 	return f.getLocalGitMetadata(path)
 }
@@ -465,6 +471,30 @@ func (f *metadataFetcher) shiftCommit(path string) (Commit, error) {
 
 		logging.Logger.Debugf("ignoring commit with msg '%s'", c.Message)
 	}
+}
+
+func (f *metadataFetcher) getBitbucketMetadata(path string) (Metadata, error) {
+	m, err := f.getLocalGitMetadata(path)
+	if err != nil {
+		return m, fmt.Errorf("BitBucket metadata error, could not fetch initial metadata from local git %w", err)
+	}
+
+	m.Pipeline = &Pipeline{ID: os.Getenv("BITBUCKET_BUILD_NUMBER")}
+	m.PullRequest = &PullRequest{
+		VCSProvider: "bitbucket",
+		ID:          os.Getenv("BITBUCKET_PR_ID"),
+		// we're unable to fetch these without calling the Bitbucket API endpoint:
+		// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/
+		// However, calling the API requires authentication with variables that we don't
+		// have access to in the pipeline (e.g. username, password for basic auth).
+		Title:        "",
+		Author:       "",
+		SourceBranch: os.Getenv("BITBUCKET_BRANCH"),
+		BaseBranch:   os.Getenv("BITBUCKET_PR_DESTINATION_BRANCH"),
+		URL:          fmt.Sprintf("%s/pull-requests/%s", os.Getenv("BITBUCKET_GIT_HTTP_ORIGIN"), os.Getenv("BITBUCKET_PR_ID")),
+	}
+
+	return m, nil
 }
 
 func commitToMetadata(commit *object.Commit) Commit {
