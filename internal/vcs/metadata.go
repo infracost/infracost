@@ -218,7 +218,7 @@ func (f *metadataFetcher) getGithubMetadata(path string) (Metadata, error) {
 		// to clone each time.
 		_, err = os.Stat(clonePath)
 		if err == nil {
-			logging.Logger.Debugf("clone directory '%s' is not empty, opening exising directory", clonePath)
+			logging.Logger.Debugf("clone directory '%s' is not empty, opening existing directory", clonePath)
 			unlock()
 
 			r, err = git.PlainOpen(clonePath)
@@ -404,7 +404,7 @@ func (f *metadataFetcher) getAzureRepoPRInfo() azurePullRequestResponse {
 
 	err = json.NewDecoder(res.Body).Decode(&out)
 	if err != nil {
-		logging.Logger.WithError(err).Debugf("could not decode reponse body from Azure DevOps pull request API call to '%s'", apiURL)
+		logging.Logger.WithError(err).Debugf("could not decode response body from Azure DevOps pull request API call to '%s'", apiURL)
 	}
 
 	return out
