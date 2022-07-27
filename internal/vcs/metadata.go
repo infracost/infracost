@@ -487,17 +487,18 @@ func (f *metadataFetcher) getBitbucketMetadata(path string) (Metadata, error) {
 
 	m.Pipeline = &Pipeline{ID: os.Getenv("BITBUCKET_BUILD_NUMBER")}
 	m.PullRequest = &PullRequest{
-		VCSProvider: "bitbucket",
-		ID:          os.Getenv("BITBUCKET_PR_ID"),
+		VCSProvider:  "bitbucket",
+		ID:           os.Getenv("BITBUCKET_PR_ID"),
+		SourceBranch: os.Getenv("BITBUCKET_BRANCH"),
+		BaseBranch:   os.Getenv("BITBUCKET_PR_DESTINATION_BRANCH"),
+		URL:          fmt.Sprintf("%s/pull-requests/%s", os.Getenv("BITBUCKET_GIT_HTTP_ORIGIN"), os.Getenv("BITBUCKET_PR_ID")),
+
 		// we're unable to fetch these without calling the Bitbucket API endpoint:
 		// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/
 		// However, calling the API requires authentication with variables that we don't
 		// have access to in the pipeline (e.g. username, password for basic auth).
-		Title:        "",
-		Author:       "",
-		SourceBranch: os.Getenv("BITBUCKET_BRANCH"),
-		BaseBranch:   os.Getenv("BITBUCKET_PR_DESTINATION_BRANCH"),
-		URL:          fmt.Sprintf("%s/pull-requests/%s", os.Getenv("BITBUCKET_GIT_HTTP_ORIGIN"), os.Getenv("BITBUCKET_PR_ID")),
+		Title:  "",
+		Author: "",
 	}
 
 	return m, nil
