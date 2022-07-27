@@ -1148,3 +1148,7 @@ resource_usage:
 
   ibm_container_vpc_cluster.cluster:
     monthly_instance_hours: 730
+
+  ibm_tg_gateway.tg_gateway:
+    data_transfer_global: 2500 # Monthly traffic through the gateway in GB
+    connection: 25 # Monthly number of connections to the gateway
