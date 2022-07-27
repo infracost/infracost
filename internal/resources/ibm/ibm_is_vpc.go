@@ -36,9 +36,9 @@ func (r *IbmIsVpc) vpcEgressFreeCostComponent() *schema.CostComponent {
 	var quantity *decimal.Decimal
 	if r.GigabyteTransmittedOutbounds != nil {
 		quantity = decimalPtr(decimal.NewFromFloat(*r.GigabyteTransmittedOutbounds))
-	}
-	if quantity.GreaterThan(decimal.NewFromInt(5)) {
-		quantity = decimalPtr(decimal.NewFromInt(5))
+		if quantity.GreaterThan(decimal.NewFromInt(5)) {
+			quantity = decimalPtr(decimal.NewFromInt(5))
+		}
 	}
 	costComponent := schema.CostComponent{
 		Name:            fmt.Sprintf("VPC egress free allowance (first 5GB)"),
@@ -62,11 +62,11 @@ func (r *IbmIsVpc) vpcEgressCostComponent() *schema.CostComponent {
 	var quantity *decimal.Decimal
 	if r.GigabyteTransmittedOutbounds != nil {
 		quantity = decimalPtr(decimal.NewFromFloat(*r.GigabyteTransmittedOutbounds))
-	}
-	if quantity.LessThanOrEqual(decimal.NewFromInt(5)) {
-		quantity = decimalPtr(decimal.NewFromInt(0))
-	} else {
-		quantity = decimalPtr(quantity.Sub(decimal.NewFromInt(5)))
+		if quantity.LessThanOrEqual(decimal.NewFromInt(5)) {
+			quantity = decimalPtr(decimal.NewFromInt(0))
+		} else {
+			quantity = decimalPtr(quantity.Sub(decimal.NewFromInt(5)))
+		}
 	}
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("VPC egress %s", r.Region),
