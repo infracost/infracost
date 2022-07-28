@@ -32,36 +32,47 @@ func (r *IsFlowLog) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
+func (r *IsFlowLog) isFlowLogFreeCostComponent() *schema.CostComponent {
+	var q *decimal.Decimal
+	if r.TransmittedGB != nil {
+		q = decimalPtr(decimal.NewFromInt(*r.TransmittedGB))
+		if q.GreaterThan(decimal.NewFromInt(5)) {
+			q = decimalPtr(decimal.NewFromInt(5))
+		}
+	}
+	costComponent := schema.CostComponent{
+		Name:            fmt.Sprintf("Flow Log Collector %s - free allowance (first 5GB)", r.Region),
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: q,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("ibm"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("is.flow-log-collector"),
+			ProductFamily: strPtr("service"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "planName", Value: strPtr("flow-log-standard-paid-plan")},
+				{Key: "region", Value: strPtr(r.Region)},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			Unit: strPtr("GIGABYTE_TRANSMITTEDS"),
+		},
+	}
+	costComponent.SetCustomPrice(decimalPtr(decimal.NewFromInt(0)))
+	return &costComponent
+}
+
 func (r *IsFlowLog) isFlowLogCostComponent() *schema.CostComponent {
-
-	freeRegions := []string{"us-east", "us-south", "eu-de", "eu-gb", "jp-tok"}
-
-	planType := "Paid"
-
-	if contains(freeRegions, r.Region) {
-		planType = "Free"
+	var q *decimal.Decimal
+	if r.TransmittedGB != nil {
+		q = decimalPtr(decimal.NewFromInt(*r.TransmittedGB))
+		if q.LessThanOrEqual(decimal.NewFromInt(5)) {
+			q = decimalPtr(decimal.NewFromInt(0))
+		} else {
+			q = decimalPtr(q.Sub(decimal.NewFromInt(5)))
+		}
 	}
-
-	t := *r.TransmittedGB
-
-	startUsageAmount := "0"
-	endUsageAmount := "10000"
-
-	if t > 10000 && t <= 30000 {
-		startUsageAmount = "10000"
-		endUsageAmount = "30000"
-	} else if t > 30000 && t <= 50000 {
-		startUsageAmount = "30000"
-		endUsageAmount = "50000"
-	} else if t > 50000 && t <= 72000 {
-		startUsageAmount = "50000"
-		endUsageAmount = "72000"
-	} else if t > 72000 {
-		startUsageAmount = "72000"
-		endUsageAmount = "9999999999"
-	}
-
-	q := decimalPtr(decimal.NewFromInt(t).Div(decimal.NewFromInt(10)))
 
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("Flow Log Collector %s", r.Region),
@@ -75,15 +86,11 @@ func (r *IsFlowLog) isFlowLogCostComponent() *schema.CostComponent {
 			ProductFamily: strPtr("service"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "planName", Value: strPtr("flow-log-standard-paid-plan")},
-				{Key: "planType", Value: strPtr(planType)},
 				{Key: "region", Value: strPtr(r.Region)},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
-			Unit:             strPtr("GIGABYTE_TRANSMITTEDS"),
-			PurchaseOption:   strPtr("1"),
-			StartUsageAmount: strPtr(startUsageAmount),
-			EndUsageAmount:   strPtr(endUsageAmount),
+			Unit: strPtr("GIGABYTE_TRANSMITTEDS"),
 		},
 	}
 }
@@ -93,6 +100,7 @@ func (r *IsFlowLog) isFlowLogCostComponent() *schema.CostComponent {
 // See providers folder for more information.
 func (r *IsFlowLog) BuildResource() *schema.Resource {
 	costComponents := []*schema.CostComponent{
+		r.isFlowLogFreeCostComponent(),
 		r.isFlowLogCostComponent(),
 	}
 
