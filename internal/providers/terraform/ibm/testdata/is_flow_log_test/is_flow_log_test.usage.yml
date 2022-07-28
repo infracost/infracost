@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  ibm_is_flow_log.testFlowLog:
+    transmitted_gb: 30000

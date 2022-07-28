@@ -8,13 +8,11 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// IsVolume struct represents <TODO: cloud service short description>.
+// IsVolume struct represents a block storage attached to VPC
 //
-// <TODO: Add any important information about the resource and links to the
-// pricing pages or documentation that might be useful to developers in the future, e.g:>
-//
-// Resource information: https://cloud.ibm.com/<PATH/TO/RESOURCE>/
-// Pricing information: https://cloud.ibm.com/<PATH/TO/PRICING>/
+// Catalog link: https://cloud.ibm.com/vpc-ext/provision/storage
+// Resource information: https://cloud.ibm.com/docs/vpc?topic=vpc-creating-block-storage&interface=ui
+// Pricing information: https://www.ibm.com/cloud/vpc/pricing
 type IsVolume struct {
 	Address  string
 	Region   string
