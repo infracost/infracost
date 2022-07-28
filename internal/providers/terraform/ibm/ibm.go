@@ -48,10 +48,12 @@ var globalCatalogServiceId = map[string]catalogMetadata{
 	"ibm_is_vpc":                    {"is.vpc", []string{"ibm_is_flow_log"}},
 	"ibm_container_vpc_cluster":     {"containers-kubernetes", []string{}},
 	"ibm_container_vpc_worker_pool": {"containers-kubernetes", []string{}},
-	"ibm_is_instance":               {"is.instance", []string{"ibm_is_ssh_key"}},
+	"ibm_is_instance":               {"is.instance", []string{"ibm_is_ssh_key", "ibm_is_floating_ip"}},
 	"ibm_is_volume":                 {"is.volume", []string{}},
 	"ibm_is_vpn_gateway":            {"is.vpn", []string{}},
 	"ibm_tg_gateway":                {"transit.gateway", []string{}},
+	"ibm_is_floating_ip":            {"is.floating-ip", []string{}},
+	"ibm_is_flow_log":               {"is.flow-log-collector", []string{}},
 }
 
 func SetCatalogMetadata(d *schema.ResourceData, resourceType string) {
