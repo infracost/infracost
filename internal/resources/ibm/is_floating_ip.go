@@ -8,13 +8,10 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// IsFloatingIp struct represents <TODO: cloud service short description>.
+// IsFloatingIp struct represents: A floating IP instance inside a VPC
 //
-// <TODO: Add any important information about the resource and links to the
-// pricing pages or documentation that might be useful to developers in the future, e.g:>
-//
-// Resource information: https://cloud.ibm.com/<PATH/TO/RESOURCE>/
-// Pricing information: https://cloud.ibm.com/<PATH/TO/PRICING>/
+// Resource information: https://cloud.ibm.com/docs/vpc?topic=vpc-creating-vpc-resources-with-cli-and-api&interface=cli#create-floating-ip-address-cli
+// Pricing information: https://www.ibm.com/cloud/vpc/pricing
 type IsFloatingIp struct {
 	Address string
 	Region  string
