@@ -70,7 +70,7 @@ func newMetadataFetcher() *metadataFetcher {
 	}
 }
 
-// Get fetches vcs metadata for the given environment.
+// Get fetches VCS metadata for the given environment.
 // It takes a path argument which should point to the filesystem directory for that should
 // be used as the VCS project. This is normally the path to the `.git` directory. If no `.git`
 // directory is found in path, Get will traverse parent directories to try and determine VCS metadata.
@@ -78,48 +78,48 @@ func newMetadataFetcher() *metadataFetcher {
 // Get also supplements base VCS metadata with CI specific data if it can be found.
 func (f *metadataFetcher) Get(path string) (Metadata, error) {
 	if isTest() {
-		logging.Logger.Debug("detected Infracost is running in test most returning stub metadata for vcs system call")
+		logging.Logger.Debug("returning stub metadata as Infracost is running in test mode")
 		return StubMetadata, nil
 	}
 
 	_, ok := lookupEnv("GITHUB_ACTIONS")
 	if ok {
-		logging.Logger.Debug("fetching GitHub action vcs metadata")
+		logging.Logger.Debug("fetching GitHub action VCS metadata")
 		return f.getGithubMetadata(path)
 	}
 
 	_, ok = lookupEnv("GITLAB_CI")
 	if ok {
-		logging.Logger.Debug("fetching Gitlab CI vcs metadata")
+		logging.Logger.Debug("fetching Gitlab CI VCS metadata")
 		return f.getGitlabMetadata(path)
 	}
 
 	v, ok := lookupEnv("BUILD_REPOSITORY_PROVIDER")
 	if ok {
 		if v == "github" {
-			logging.Logger.Debug("fetching Github vcs metadata from Azure DevOps pipeline")
+			logging.Logger.Debug("fetching Github VCS metadata from Azure DevOps pipeline")
 			return f.getAzureReposGithubMetadata(path)
 		}
 
-		logging.Logger.Debug("fetching Azure Repos vcs metadata")
+		logging.Logger.Debug("fetching Azure Repos VCS metadata")
 		return f.getAzureReposMetadata(path)
 	}
 
 	_, ok = lookupEnv("BITBUCKET_COMMIT")
 	if ok {
-		logging.Logger.Debug("fetching Github vcs metadata from Bitbucket pipeline")
+		logging.Logger.Debug("fetching Github VCS metadata from Bitbucket pipeline")
 		return f.getBitbucketMetadata(path)
 	}
 
 	_, ok = lookupEnv("CIRCLECI")
 	if ok {
-		logging.Logger.Debug("fetching Github vcs metadata from Circle CI")
+		logging.Logger.Debug("fetching Github VCS metadata from Circle CI")
 		return f.getCircleCIMetadata(path)
 	}
 
 	ok = lookupEnvPrefix("ATLANTIS_")
 	if ok {
-		logging.Logger.Debug("fetching Atlantis vcs metadata")
+		logging.Logger.Debug("fetching Atlantis VCS metadata")
 		return f.getAtlantisMetadata(path)
 	}
 
@@ -410,12 +410,6 @@ func (f *metadataFetcher) getAzureRepoPRInfo() azurePullRequestResponse {
 	return out
 }
 
-// getAzureReposGithubMetadata returns the git metadata for a repository hosted on GitHub, but using
-// Azure DevOps Pipelines as a build agent.
-//
-// We are unable to fetch pull request title and author for repositories using the GitHub <> Azure DevOps
-// setup. The relevant information is not provided in the pipeline, and there is no GitHub access token
-// provided to fetch this information from the GitHub API.
 func (f *metadataFetcher) getAzureReposGithubMetadata(path string) (Metadata, error) {
 	m, err := f.getLocalGitMetadata(path)
 	if err != nil {
@@ -437,11 +431,21 @@ func (f *metadataFetcher) getAzureReposGithubMetadata(path string) (Metadata, er
 		SourceBranch: strings.TrimLeft(os.Getenv("SYSTEM_PULLREQUEST_SOURCEBRANCH"), "refs/heads/"),
 		BaseBranch:   strings.TrimLeft(os.Getenv("SYSTEM_PULLREQUEST_TARGETBRANCH"), "refs/heads/"),
 		URL:          fmt.Sprintf("%s/pulls/%s", os.Getenv("SYSTEM_PULLREQUEST_SOURCEREPOSITORYURI"), pullNumber),
+
+		// We are unable to fetch pull request title and author for repositories using the GitHub <> Azure DevOps
+		// setup. The relevant information is not provided in the pipeline, and there is no GitHub access token
+		// provided to fetch this information from the GitHub API.
+		Title:  "",
+		Author: "",
 	}
 
 	return m, nil
 }
 
+// transformAzureDevOpsMergeCommit sets the first non merge Commit that metadataFetcher can find on
+// Metadata m. transformAzureDevOpsMergeCommit fetches a specific commit sha if it iss referenced
+// in the original Commit of Metadata m. Otherwise, transformAzureDevOpsMergeCommit returns the first commit
+// on a git log call that doesn't appear to be a Merge commit.
 func (f *metadataFetcher) transformAzureDevOpsMergeCommit(path string, m *Metadata) error {
 	m.Branch.Name = strings.TrimLeft(os.Getenv("SYSTEM_PULLREQUEST_SOURCEBRANCH"), "refs/heads/")
 
@@ -621,7 +625,7 @@ func commitToMetadata(commit *object.Commit) Commit {
 }
 
 // Commit defines information for a given commit. This information is normally populated from the
-// local vcs environment. Attributes can be overwritten by CI specific properties and variables.
+// local VCS environment. Attributes can be overwritten by CI specific properties and variables.
 type Commit struct {
 	SHA         string
 	AuthorName  string
@@ -657,7 +661,7 @@ type Remote struct {
 	URL  string
 }
 
-// Metadata holds a snapshot of information for a given environment and vcs system.
+// Metadata holds a snapshot of information for a given environment and VCS system.
 // PullRequest and Pipeline properties are only populated if running in a CI system.
 type Metadata struct {
 	Remote      Remote
@@ -671,6 +675,8 @@ func isMergeCommit(message string) bool {
 	return strings.Contains(strings.ToLower(message), "merge")
 }
 
+// urlStringToRemote returns the provided string as a Remote struct, with the host extracted from the URL.
+// urlStringToRemote is designed to work with both HTTPS and SCP remote url strings.
 func urlStringToRemote(remote string) Remote {
 	if remote == "" {
 		return Remote{}
