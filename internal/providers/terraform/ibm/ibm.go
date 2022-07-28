@@ -54,7 +54,7 @@ func SetCatalogMetadata(d *schema.ResourceData, serviceId string, childResources
 	} else {
 		properties = gjson.Result{
 			Type: gjson.JSON,
-			Raw:  fmt.Sprintf(`{"serviceId": %s}`, serviceId),
+			Raw:  fmt.Sprintf(`{"serviceId": "%s"}`, serviceId),
 		}
 	}
 
