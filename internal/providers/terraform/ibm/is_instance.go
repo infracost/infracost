@@ -31,7 +31,7 @@ func newIsInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	dedicatedHostGroup := strings.TrimSpace(d.Get("dedicated_host_group").String())
 	isDedicated := !((dedicatedHost == "") && (dedicatedHostGroup == ""))
 
-	SetCatalogMetadata(d, "is.instance", []string{"ibm_is_ssh_key"})
+	SetCatalogMetadata(d, d.Type)
 
 	r := &ibm.IsInstance{
 		Address:          d.Address,

@@ -37,9 +37,34 @@ func ParseTags(resourceType string, v gjson.Result) map[string]string {
 	return tags
 }
 
-func SetCatalogMetadata(d *schema.ResourceData, serviceId string, childResources []string) {
+type catalogMetadata struct {
+	serviceId      string
+	childResources []string
+}
+
+// Map between terraform type and global catalog id. For ibm_resource_instance, the service
+// field already matches the global catalog id, so they do not need to be mapped. eg: "kms"
+var globalCatalogServiceId = map[string]catalogMetadata{
+	"ibm_is_vpc":                    {"is.vpc", []string{"ibm_is_flow_log"}},
+	"ibm_container_vpc_cluster":     {"containers-kubernetes", []string{}},
+	"ibm_container_vpc_worker_pool": {"containers-kubernetes", []string{}},
+	"ibm_is_instance":               {"is.instance", []string{"ibm_is_ssh_key"}},
+	"ibm_is_volume":                 {"is.volume", []string{}},
+	"ibm_is_vpn_gateway":            {"is.vpn", []string{}},
+	"ibm_tg_gateway":                {"transit.gateway", []string{}},
+}
+
+func SetCatalogMetadata(d *schema.ResourceData, resourceType string) {
 	metadata := make(map[string]gjson.Result)
 	var properties gjson.Result
+	var serviceId string = resourceType
+	var childResources []string
+
+	catalogEntry, isPresent := globalCatalogServiceId[resourceType]
+	if isPresent {
+		serviceId = catalogEntry.serviceId
+		childResources = catalogEntry.childResources
+	}
 
 	if len(childResources) > 0 {
 		childResourcesString, err := json.Marshal(childResources)

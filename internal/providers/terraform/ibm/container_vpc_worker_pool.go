@@ -38,7 +38,7 @@ func newContainerVpcWorkerPool(d *schema.ResourceData, u *schema.UsageData) *sch
 		Entitlement: entitlement,
 	}
 	r.PopulateUsage(u)
-	SetCatalogMetadata(d, "containers-kubernetes", []string{})
+	SetCatalogMetadata(d, d.Type)
 
 	return r.BuildResource()
 }

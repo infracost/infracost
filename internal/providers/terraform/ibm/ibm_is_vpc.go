@@ -20,7 +20,7 @@ func newIbmIsVpc(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 		Classic: d.GetBoolOrDefault("classic_access", false),
 	}
 	r.PopulateUsage(u)
-	SetCatalogMetadata(d, "is.vpc", []string{"ibm_is_flow_log"})
+	SetCatalogMetadata(d, d.Type)
 
 	return r.BuildResource()
 }

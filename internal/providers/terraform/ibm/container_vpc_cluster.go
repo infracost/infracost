@@ -33,7 +33,7 @@ func newContainerVpcCluster(d *schema.ResourceData, u *schema.UsageData) *schema
 		Entitlement: entitlement,
 	}
 	r.PopulateUsage(u)
-	SetCatalogMetadata(d, "containers-kubernetes", []string{})
+	SetCatalogMetadata(d, d.Type)
 
 	return r.BuildResource()
 }
