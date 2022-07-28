@@ -72,7 +72,15 @@ func (c *CostComponent) UnitMultiplierHourlyQuantity() *decimal.Decimal {
 	if c.HourlyQuantity == nil {
 		return nil
 	}
-	m := c.HourlyQuantity.Div(c.UnitMultiplier)
+
+	var m decimal.Decimal
+
+	if c.UnitMultiplier.IsZero() {
+		m = decimal.Zero
+	} else {
+		m = c.HourlyQuantity.Div(c.UnitMultiplier)
+	}
+
 	return &m
 }
 
@@ -80,6 +88,14 @@ func (c *CostComponent) UnitMultiplierMonthlyQuantity() *decimal.Decimal {
 	if c.MonthlyQuantity == nil {
 		return nil
 	}
-	m := c.MonthlyQuantity.Div(c.UnitMultiplier)
+
+	var m decimal.Decimal
+
+	if c.UnitMultiplier.IsZero() {
+		m = decimal.Zero
+	} else {
+		m = c.MonthlyQuantity.Div(c.UnitMultiplier)
+	}
+
 	return &m
 }
