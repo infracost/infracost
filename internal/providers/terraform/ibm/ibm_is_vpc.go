@@ -18,6 +18,7 @@ func newIbmIsVpc(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	r := &ibm.IbmIsVpc{
 		Address: d.Address,
 		Region:  region,
+		Classic: d.GetBoolOrDefault("classic_access", false),
 	}
 	r.PopulateUsage(u)
 

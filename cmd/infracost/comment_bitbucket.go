@@ -38,10 +38,12 @@ func commentBitbucketCmd(ctx *config.RunContext) *cobra.Command {
 			serverURL, _ := cmd.Flags().GetString("bitbucket-server-url")
 			token, _ := cmd.Flags().GetString("bitbucket-token")
 			tag, _ := cmd.Flags().GetString("tag")
+			omitDetails, _ := cmd.Flags().GetBool("exclude-cli-output")
 			extra := comment.BitbucketExtra{
-				ServerURL: serverURL,
-				Token:     token,
-				Tag:       tag,
+				ServerURL:   serverURL,
+				Token:       token,
+				Tag:         tag,
+				OmitDetails: omitDetails,
 			}
 
 			commit, _ := cmd.Flags().GetString("commit")
@@ -81,6 +83,7 @@ func commentBitbucketCmd(ctx *config.RunContext) *cobra.Command {
 				WillUpdate:          prNumber != 0 && behavior == "update",
 				WillReplace:         prNumber != 0 && behavior == "delete-and-new",
 				IncludeFeedbackLink: true,
+				OmitDetails:         extra.OmitDetails,
 				BasicSyntax:         true,
 			})
 			var policyFailure output.PolicyCheckFailures
@@ -137,6 +140,7 @@ func commentBitbucketCmd(ctx *config.RunContext) *cobra.Command {
 	cmd.Flags().Var(&prNumber, "pull-request", "Pull request number to post comment on")
 	cmd.Flags().String("repo", "", "Repository in format workspace/repo")
 	_ = cmd.MarkFlagRequired("repo")
+	cmd.Flags().Bool("exclude-cli-output", false, "Exclude CLI output so comment has just the summary table")
 	cmd.Flags().String("tag", "", "Customize special text used to detect comments posted by Infracost (placed at the bottom of a comment)")
 	cmd.Flags().Bool("dry-run", false, "Generate comment without actually posting to Bitbucket")
 

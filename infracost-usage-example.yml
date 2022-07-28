@@ -1014,6 +1014,9 @@ resource_usage:
   azurerm_nat_gateway.my_gateway:
     monthly_data_processed_gb: 10 # Monthly data processed by the NAT Gateway in GB.
 
+  azurerm_virtual_network_peering.my_peering:
+    monthly_data_transfer_gb: 100 # Monthly inbound/outbound data transferred by the VNET peering in GB.
+
   azurerm_point_to_site_vpn_gateway.my_point_to_site_gateway:
     monthly_p2s_connections_hrs: 2000 # Monthly connection hours to the point to site gateway
 
@@ -1134,11 +1137,51 @@ resource_usage:
     p2s_connection: 150 # Total number of p2s tunnels.
     monthly_data_transfer_gb: 1 # Monthly data transfer in GB.
 
+  #
+  # Terraform IBM Cloud resources
+  #
   ibm_is_instance.is_instance:
-      monthly_instance_hours: 730 # Monthly number of hours an instance runs
+    monthly_instance_hours: 730 # Monthly number of hours an instance runs
 
-  ibm_is_vpc.testVpc:
-      monthly_data_egressed_gb: 5 # Monthly traffic leaving the VPC in GB
+  ibm_is_vpc.is_vpc:
+    gigabyte_transmitted_outbounds: 5 # Monthly traffic leaving the VPC in GB
 
-  ibm_container_vpc_worker_pol.test_vpc_worker_pool:
-      monthly_data_egressed_gb: 730 # Monthly number of hours a worker pool runs
+  ibm_container_vpc_worker_pool.cluster_pool:
+    monthly_instance_hours: 730 # Monthly number of hours an instance runs
+
+  ibm_container_vpc_cluster.cluster:
+    monthly_instance_hours: 730 # Monthly number of hours an instance runs
+
+  ibm_is_volume.custom_volume:
+    monthly_hours: 730 # Monthly number of hours a volume is live
+    monthly_instance_hours: 730
+
+  #
+  # Key Protect
+  #
+  ibm_resource_instance.resource_instance_kms: 
+    kms_items_per_month: 300 # Number of managed keys
+
+  #
+  # Secrets Manager
+  #
+  ibm_resource_instance.resource_instance_secrets_manager:
+    secretsmanager_instance: 1 # Number of instances of secrets manager
+    secretsmanager_active_secrets: 400 # Number of active secrets
+
+  #
+  # App ID
+  #
+  ibm_resource_instance.resource_instance_appid:
+    appid_authentications: 15000 # Number of simple authentications in a month
+    appid_users: 1000 # Number of users in a month
+    appid_advanced_authentications: 20000 # Number of advanced authentications in a month
+    
+  ibm_tg_gateway.tg_gateway:
+    data_transfer_local: 2500 # Monthly local traffic through the gateway in GB
+    data_transfer_global: 2500 # Monthly global traffic through the gateway in GB
+    connection: 25 # Monthly number of connections to the gateway
+
+  ibm_is_vpn_gateway.testVpcVpn:
+    connection_hours: 730 # Monthly number of connection hours
+    instance_hours: 730 # Monthly number of instance hours

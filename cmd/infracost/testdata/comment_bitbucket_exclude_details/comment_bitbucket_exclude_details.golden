@@ -1,0 +1,11 @@
+
+## Infracost estimate: **monthly cost will increase by $40.56 (+100%) ↑**
+
+| **Project** | **Previous** | **New** | **Diff** |
+| ----------- | -----------: | ------: | -------- |
+| infracost/infracost/cmd/infraco...data/terraform_v0.14_plan.json | $40.56 | $81.12 | +$40.56 (+100%) |
+
+This comment will be updated when the cost estimate changes.
+Is this comment useful? [Yes](https://dashboard.infracost.io/feedback/redirect?runId=&value=yes), [No](https://dashboard.infracost.io/feedback/redirect?runId=&value=no), [Other](https://dashboard.infracost.io/feedback/redirect?runId=&value=other)
+
+Comment not posted to Bitbucket (--dry-run was specified)

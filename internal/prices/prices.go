@@ -1,6 +1,7 @@
 package prices
 
 import (
+	"fmt"
 	"runtime"
 
 	"github.com/infracost/infracost/internal/apiclient"
@@ -141,21 +142,52 @@ func setCostComponentPrice(ctx *config.RunContext, currency string, r *schema.Re
 	}
 
 	prices := productsWithPrices[0].Get("prices").Array()
-	if len(prices) > 1 {
-		log.Warnf("Multiple prices found for %s %s, using the first price", r.Name, c.Name)
-		setResourceWarningEvent(ctx, r, "Multiple prices found")
-	}
 
-	var err error
-	p, err = decimal.NewFromString(prices[0].Get(currency).String())
-	if err != nil {
-		log.Warnf("Error converting price to '%v' (using 0.00)  '%v': %s", currency, prices[0].Get(currency).String(), err.Error())
-		setResourceWarningEvent(ctx, r, "Error converting price")
-		c.SetPrice(decimal.Zero)
-		return
+	if len(prices) == 1 {
+		var err error
+		p, err = decimal.NewFromString(prices[0].Get(currency).String())
+		if err != nil {
+			log.Warnf("Error converting price to '%v' (using 0.00)  '%v': %s", currency, prices[0].Get(currency).String(), err.Error())
+			setResourceWarningEvent(ctx, r, "Error converting price")
+			c.SetPrice(decimal.Zero)
+			return
+		}
+		c.SetPrice(p)
+	} else {
+		// Both volume and tier pricing will have "tiers"
+		// For volume pricing we have to select to appropriate tier
+		// For tiered pricing we have to sum all tiers based on quantity
+		priceTiers := make([]schema.PriceTier, len(prices))
+		for i, price := range prices {
+			parsedPrice, err := decimal.NewFromString(price.Get(currency).String())
+			if err != nil {
+				log.Warnf("Error converting price to '%v' (using 0.00)  '%v': %s", currency, price.Get(currency).String(), err.Error())
+			}
+			start, err := decimal.NewFromString(price.Get("startUsageAmount").String())
+			if err != nil {
+				log.Warnf("Error converting startUsageAmount to '%v' (using 0.00)  '%v': %s", currency, price.Get("startUsageAmount").String(), err.Error())
+			}
+			end, err := decimal.NewFromString(price.Get("endUsageAmount").String())
+			if err != nil {
+				log.Warnf("Error converting endUsageAmount to '%v' (using 0.00)  '%v': %s", currency, price.Get("endUsageAmount").String(), err.Error())
+			}
+			var name string
+			if i == 0 {
+				name = fmt.Sprintf("%s (first %s %s)", c.Name, end, c.Unit)
+			} else if i == len(prices)-1 {
+				name = fmt.Sprintf("%s (over %s %s)", c.Name, start, c.Unit)
+			} else {
+				name = fmt.Sprintf("%s (next %s %s)", c.Name, end.Sub(start), c.Unit)
+			}
+			priceTiers[i] = schema.PriceTier{
+				Name:             name,
+				Price:            parsedPrice,
+				StartUsageAmount: start,
+				EndUsageAmount:   end,
+			}
+		}
+		c.SetPriceTiers(priceTiers)
 	}
-
-	c.SetPrice(p)
 	c.SetPriceHash(prices[0].Get("priceHash").String())
 }
 

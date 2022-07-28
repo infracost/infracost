@@ -1,4 +1,4 @@
 version: 0.1
 resource_usage:
   ibm_is_vpc.testVpc:
-      monthly_data_egressed_gb: 5
+    gigabyte_transmitted_outbounds: 50100
