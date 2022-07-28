@@ -19,6 +19,7 @@ func newIsVpnGateway(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 		Region:  region,
 	}
 	r.PopulateUsage(u)
+	SetCatalogMetadata(d, "is.vpn", []string{})
 
 	return r.BuildResource()
 }

@@ -21,6 +21,7 @@ func newResourceInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 		Parameters: d.RawValues,
 	}
 	r.PopulateUsage(u)
+	SetCatalogMetadata(d, d.Get("service").String(), []string{})
 
 	return r.BuildResource()
 }
