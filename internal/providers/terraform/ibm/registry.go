@@ -6,6 +6,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getIsInstanceRegistryItem(),
 	getIbmIsVpcRegistryItem(),
 	getIsFloatingIpRegistryItem(),
+	getIsFlowLogRegistryItem(),
 	getContainerVpcWorkerPoolRegistryItem(),
 	getContainerVpcClusterRegistryItem(),
 	getResourceInstanceRegistryItem(),

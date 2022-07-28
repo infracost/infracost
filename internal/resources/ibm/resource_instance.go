@@ -56,9 +56,9 @@ func KMSFreeCostComponent(r *ResourceInstance) *schema.CostComponent {
 	var q *decimal.Decimal
 	if r.KMS_ItemsPerMonth != nil {
 		q = decimalPtr(decimal.NewFromInt(*r.KMS_ItemsPerMonth))
-	}
-	if q.GreaterThan(decimal.NewFromInt(20)) {
-		q = decimalPtr(decimal.NewFromInt(20))
+		if q.GreaterThan(decimal.NewFromInt(20)) {
+			q = decimalPtr(decimal.NewFromInt(20))
+		}
 	}
 	costComponent := schema.CostComponent{
 		Name:            fmt.Sprintf("Items free allowance (first 20 Items)"),
@@ -79,11 +79,11 @@ func KMSTierCostComponents(r *ResourceInstance) *schema.CostComponent {
 	var q *decimal.Decimal
 	if r.KMS_ItemsPerMonth != nil {
 		q = decimalPtr(decimal.NewFromInt(*r.KMS_ItemsPerMonth))
-	}
-	if q.LessThanOrEqual(decimal.NewFromInt(20)) {
-		q = decimalPtr(decimal.NewFromInt(0))
-	} else {
-		q = decimalPtr(q.Sub(decimal.NewFromInt(20)))
+		if q.LessThanOrEqual(decimal.NewFromInt(20)) {
+			q = decimalPtr(decimal.NewFromInt(0))
+		} else {
+			q = decimalPtr(q.Sub(decimal.NewFromInt(20)))
+		}
 	}
 	costComponent := schema.CostComponent{
 		Name:            fmt.Sprintf("Items"),
