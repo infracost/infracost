@@ -97,7 +97,7 @@ func (f *metadataFetcher) Get(path string) (Metadata, error) {
 	v, ok := lookupEnv("BUILD_REPOSITORY_PROVIDER")
 	if ok {
 		if v == "github" {
-			logging.Logger.Debug("fetching Github VCS metadata from Azure DevOps pipeline")
+			logging.Logger.Debug("fetching GitHub VCS metadata from Azure DevOps pipeline")
 			return f.getAzureReposGithubMetadata(path)
 		}
 
@@ -107,13 +107,13 @@ func (f *metadataFetcher) Get(path string) (Metadata, error) {
 
 	_, ok = lookupEnv("BITBUCKET_COMMIT")
 	if ok {
-		logging.Logger.Debug("fetching Github VCS metadata from Bitbucket pipeline")
+		logging.Logger.Debug("fetching GitHub VCS metadata from Bitbucket pipeline")
 		return f.getBitbucketMetadata(path)
 	}
 
 	_, ok = lookupEnv("CIRCLECI")
 	if ok {
-		logging.Logger.Debug("fetching Github VCS metadata from Circle CI")
+		logging.Logger.Debug("fetching GitHub VCS metadata from Circle CI")
 		return f.getCircleCIMetadata(path)
 	}
 
@@ -312,17 +312,17 @@ func (f *metadataFetcher) getLocalGitMetadata(path string) (Metadata, error) {
 func (f *metadataFetcher) getAzureReposMetadata(path string) (Metadata, error) {
 	m, err := f.getLocalGitMetadata(path)
 	if err != nil {
-		return m, fmt.Errorf("AzureRepos metadata error, could not fetch initial metadata from local git %w", err)
+		return m, fmt.Errorf("Azure Repos metadata error, could not fetch initial metadata from local git %w", err)
 	}
 
-	if m.Branch.Name == "HEAD" {
+	if strings.ToLower(m.Branch.Name) == "head" {
 		err := f.transformAzureDevOpsMergeCommit(path, &m)
 		if err != nil {
 			logging.Logger.WithError(err).Debug("could not transform Azure DevOps merge commit continuing with provided PR values")
 		}
 	}
 
-	res := f.getAzureRepoPRInfo()
+	res := f.getAzureReposPRInfo()
 
 	m.Pipeline = &Pipeline{ID: os.Getenv("BUILD_BUILDID")}
 	pullID := os.Getenv("SYSTEM_PULLREQUEST_PULLREQUESTID")
@@ -375,7 +375,7 @@ type azurePullRequestResponse struct {
 // getAzureRepoPRInfo attempts to get the azurePullRequestResponse using Azure DevOps Pipeline variables.
 // This method is expected to often fail as Azure DevOps requires users to explicitly pass System.AccessToken as
 // an env var on the job step.
-func (f *metadataFetcher) getAzureRepoPRInfo() azurePullRequestResponse {
+func (f *metadataFetcher) getAzureReposPRInfo() azurePullRequestResponse {
 	var out azurePullRequestResponse
 	systemAccessToken := strings.TrimSpace(os.Getenv("SYSTEM_ACCESSTOKEN"))
 	if systemAccessToken == "" {
@@ -413,10 +413,10 @@ func (f *metadataFetcher) getAzureRepoPRInfo() azurePullRequestResponse {
 func (f *metadataFetcher) getAzureReposGithubMetadata(path string) (Metadata, error) {
 	m, err := f.getLocalGitMetadata(path)
 	if err != nil {
-		return m, fmt.Errorf("AzureRepos metadata error, could not fetch initial metadata from local git %w", err)
+		return m, fmt.Errorf("Azure Repos metadata error, could not fetch initial metadata from local git %w", err)
 	}
 
-	if m.Branch.Name == "HEAD" {
+	if strings.ToLower(m.Branch.Name) == "head" {
 		err := f.transformAzureDevOpsMergeCommit(path, &m)
 		if err != nil {
 			logging.Logger.WithError(err).Debug("could not transform Azure DevOps merge commit continuing with provided PR values")
@@ -443,7 +443,7 @@ func (f *metadataFetcher) getAzureReposGithubMetadata(path string) (Metadata, er
 }
 
 // transformAzureDevOpsMergeCommit sets the first non merge Commit that metadataFetcher can find on
-// Metadata m. transformAzureDevOpsMergeCommit fetches a specific commit sha if it iss referenced
+// Metadata m. transformAzureDevOpsMergeCommit fetches a specific commit sha if it is referenced
 // in the original Commit of Metadata m. Otherwise, transformAzureDevOpsMergeCommit returns the first commit
 // on a git log call that doesn't appear to be a Merge commit.
 func (f *metadataFetcher) transformAzureDevOpsMergeCommit(path string, m *Metadata) error {
