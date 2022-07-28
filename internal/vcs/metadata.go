@@ -41,6 +41,7 @@ var (
 
 	scpSyntax        = regexp.MustCompile(`^([a-zA-Z0-9-._~]+@)?([a-zA-Z0-9._-]+):([a-zA-Z0-9./._-]+)(?:\?||$)(.*)$`)
 	mergeCommitRegxp = regexp.MustCompile(`(?i)^merge\s([\d\w]+)\sinto\s[\d\w]+`)
+	startsWithMerge  = regexp.MustCompile(`(?i)^merge`)
 )
 
 type keyMutex struct {
@@ -672,7 +673,7 @@ type Metadata struct {
 }
 
 func isMergeCommit(message string) bool {
-	return strings.Contains(strings.ToLower(message), "merge")
+	return startsWithMerge.MatchString(message)
 }
 
 // urlStringToRemote returns the provided string as a Remote struct, with the host extracted from the URL.
