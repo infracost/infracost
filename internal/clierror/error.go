@@ -120,7 +120,7 @@ func processStack(rawStack []byte) ([]byte, error) {
 			_, err := fmt.Fprintf(w,
 				"   %-*s %s()\n",
 				srcLen,
-				fmt.Sprintf("%s:%d", line.ImportPath, line.Line),
+				fmt.Sprintf("%s:%d", line.RelSrcPath, line.Line),
 				line.Func.Name)
 			if err != nil {
 				return []byte{}, err
