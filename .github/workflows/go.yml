@@ -12,7 +12,7 @@ jobs:
     name: Build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Go 1.x
         uses: actions/setup-go@v2
         with:
@@ -61,7 +61,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Go 1.x
         uses: actions/setup-go@v2
         with:
@@ -78,7 +78,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Go 1.x
         uses: actions/setup-go@v2
         with:
@@ -95,7 +95,7 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
       - name: Set up Go 1.x
         uses: actions/setup-go@v2
         with:
