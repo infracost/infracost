@@ -120,6 +120,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getSentinelDataConnectorThreatIntelligenceRegistryItem(),
 	getIoTHubRegistryItem(),
 	getIoTHubDPSRegistryItem(),
+	getVirtualNetworkPeeringRegistryItem(),
 }
 
 // FreeResources grouped alphabetically

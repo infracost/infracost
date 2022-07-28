@@ -1,0 +1,33 @@
+
+ Name                                                     Monthly Qty  Unit             Monthly Cost 
+                                                                                                     
+ ibm_resource_instance.resource_instance_appid                                                       
+ ├─ Users (first 1 Users)                                           1  Users                   $0.00 
+ ├─ Users (next 9 Users)                                            9  Users                   $0.02 
+ ├─ Users (next 90 Users)                                          90  Users                   $0.14 
+ ├─ Users (next 900 Users)                                        900  Users                   $1.26 
+ ├─ Users (next 4000 Users)                                         0  Users                   $0.00 
+ ├─ Users (over 5000 Users)                                         0  Users                   $0.00 
+ ├─ Authentications (first 1 Authentications)                       1  Authentications         $0.00 
+ ├─ Authentications (next 9 Authentications)                        9  Authentications         $0.03 
+ ├─ Authentications (next 90 Authentications)                      90  Authentications         $0.28 
+ ├─ Authentications (next 900 Authentications)                    900  Authentications         $2.08 
+ ├─ Authentications (next 4000 Authentications)                 4,000  Authentications         $6.16 
+ ├─ Authentications (over 5000 Authentications)                10,000  Authentications         $7.70 
+ └─ Advanced Authentications (first 10 Authentications)            10  Authentications         $0.20 
+ └─ Advanced Authentications (over 10 Authentications)         19,990  Authentications       $199.90 
+                                                                                                     
+ ibm_resource_instance.resource_instance_kms                                                         
+ ├─ Items free allowance (first 20 Items)                          20  Item                    $0.00 
+ └─ Items (first 1000 Item)                                       280  Item                  $210.00 
+ └─ Items (next 9000 Item)                                          0  Item                    $0.00 
+ └─ Items (over 10000 Item)                                         0  Item                    $0.00 
+                                                                                                     
+ ibm_resource_instance.resource_instance_secrets_manager                                             
+ ├─ Instance                                                        1  Instance              $299.00 
+ └─ Active Secrets                                                400  Secrets                $80.00 
+                                                                                                     
+ OVERALL TOTAL                                                                               $806.78 
+──────────────────────────────────
+3 cloud resources were detected:
+∙ 3 were estimated

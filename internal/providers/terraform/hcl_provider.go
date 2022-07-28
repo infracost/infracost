@@ -12,11 +12,13 @@ import (
 
 	log "github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
+	"github.com/zclconf/go-cty/cty/gocty"
 	ctyJson "github.com/zclconf/go-cty/cty/json"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/hcl/modules"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
 )
@@ -381,14 +383,14 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 	providerConfigKey := p.providerKey
 	providerAttr := block.GetAttribute("provider")
 	if providerAttr != nil {
-		value := providerAttr.Value()
 		r, err := providerAttr.Reference()
 		if err == nil {
 			providerConfigKey = r.String()
 		}
 
-		if err != nil && value.Type() == cty.String {
-			providerConfigKey = value.AsString()
+		value := providerAttr.AsString()
+		if err != nil && value != "" {
+			providerConfigKey = value
 		}
 	}
 
@@ -425,14 +427,10 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 func (p *HCLProvider) marshalProviderBlock(block *hcl.Block) string {
 	name := block.TypeLabel()
 	if a := block.GetAttribute("alias"); a != nil {
-		name = name + "." + a.Value().AsString()
+		name = name + "." + a.AsString()
 	}
 
-	region := ""
-	value := block.GetAttribute("region").Value()
-	if value != cty.NilVal {
-		region = value.AsString()
-	}
+	region := block.GetAttribute("region").AsString()
 
 	p.schema.Configuration.ProviderConfig[name] = ProviderConfig{
 		Name: name,
@@ -563,7 +561,12 @@ func marshalAttributeValues(blockType string, value cty.Value) map[string]interf
 	for it.Next() {
 		k, v := it.Element()
 		vJSON, _ := ctyJson.Marshal(v, v.Type())
-		key := k.AsString()
+		var key string
+		err := gocty.FromCtyValue(k, &key)
+		if err != nil {
+			logging.Logger.WithError(err).Debugf("could not convert block map key to string ignoring entry")
+			continue
+		}
 
 		if (blockType == "resource" || blockType == "module") && key == "count" {
 			continue

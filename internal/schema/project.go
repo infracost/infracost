@@ -6,6 +6,7 @@ import (
 	"crypto/md5" // nolint:gosec
 	"encoding/base32"
 	"fmt"
+	"net/url"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -100,39 +101,46 @@ func AllProjectResources(projects []*Project) []*Resource {
 }
 
 func GenerateProjectName(metadata *ProjectMetadata, projectName string, dashboardEnabled bool) string {
-	var n string
-
 	// If there is a user defined project name, use it.
 	if projectName != "" {
-		n = projectName
-		// If the VCS repo is set, create the name from that
-	} else if metadata.VCSRepoURL != "" {
-		n = nameFromRepoURL(metadata.VCSRepoURL)
+		return projectName
+	}
+
+	// If the VCS repo is set, create the name from that
+	if metadata.VCSRepoURL != "" {
+		n := nameFromRepoURL(metadata.VCSRepoURL)
 
 		if metadata.VCSSubPath != "" {
 			n += "/" + metadata.VCSSubPath
 		}
-		// If not then use a hash of the absolute filepath to the project
-	} else if dashboardEnabled {
+
+		return n
+	}
+
+	// If not then use a hash of the absolute filepath to the project
+	if dashboardEnabled {
 		absPath, err := filepath.Abs(metadata.Path)
 		if err != nil {
 			log.Debugf("Could not get absolute path for %s", metadata.Path)
 			absPath = metadata.Path
 		}
 
-		n = fmt.Sprintf("project_%s", shortHash(absPath, 8))
-	} else {
-		n = metadata.Path
+		return fmt.Sprintf("project_%s", shortHash(absPath, 8))
 	}
 
-	return n
+	return metadata.Path
 }
 
 // Parses the "org/repo" from the git URL if possible.
 // Otherwise it just returns the URL.
-func nameFromRepoURL(url string) string {
+func nameFromRepoURL(rawURL string) string {
+	escaped, err := url.QueryUnescape(rawURL)
+	if err == nil {
+		rawURL = escaped
+	}
+
 	r := regexp.MustCompile(`(?:\w+@|http(?:s)?:\/\/)(?:.*@)?([^:\/]+)[:\/]([^\.]+)`)
-	m := r.FindStringSubmatch(url)
+	m := r.FindStringSubmatch(rawURL)
 
 	if len(m) > 2 {
 		var n = m[2]
@@ -144,7 +152,7 @@ func nameFromRepoURL(url string) string {
 		return n
 	}
 
-	return url
+	return rawURL
 }
 
 func parseAzureDevOpsRepoPath(path string) string {
