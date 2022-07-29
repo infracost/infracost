@@ -1,6 +1,7 @@
 package azure
 
 import (
+<<<<<<< HEAD
 	"regexp"
 	"strings"
 
@@ -8,18 +9,22 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
 
+=======
+	"github.com/infracost/infracost/internal/resources/azure"
+>>>>>>> eb7adbfa... refactor(azure): migrate more resources
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func GetAzureRMKubernetesClusterNodePoolRegistryItem() *schema.RegistryItem {
+func getAzureKubernetesClusterNodePoolRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_kubernetes_cluster_node_pool",
-		RFunc: NewAzureRMKubernetesClusterNodePool,
+		RFunc: NewKubernetesClusterNodePool,
 		ReferenceAttributes: []string{
 			"kubernetes_cluster_id",
 		},
 	}
 }
+<<<<<<< HEAD
 
 func NewAzureRMKubernetesClusterNodePool(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := lookupRegion(d, []string{"kubernetes_cluster_id"})
@@ -119,6 +124,19 @@ func aksOSDiskSubResource(region string, diskSize int, instanceType string) *sch
 		Name:           "os_disk",
 		CostComponents: costComponent,
 	}
+=======
+func NewKubernetesClusterNodePool(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	r := &azure.KubernetesClusterNodePool{
+		Address:      d.Address,
+		Region:       lookupRegion(d, []string{"kubernetes_cluster_id"}),
+		VMSize:       d.Get("vm_size").String(),
+		OSDiskType:   d.Get("os_disk_type").String(),
+		OSDiskSizeGB: d.Get("os_disk_size_gb").Int(),
+		NodeCount:    d.Get("node_count").Int(),
+	}
+	r.PopulateUsage(u)
+	return r.BuildResource()
+>>>>>>> eb7adbfa... refactor(azure): migrate more resources
 }
 
 func aksGetStorageType(instanceType string) string {

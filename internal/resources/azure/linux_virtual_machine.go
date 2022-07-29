@@ -3,6 +3,7 @@ package azure
 import (
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/usage"
 
 	"fmt"
 	"strings"
@@ -15,10 +16,19 @@ type LinuxVirtualMachine struct {
 	Region          string
 	Size            string
 	UltraSSDEnabled bool
-	MonthlyHrs      *float64 `infracost_usage:"monthly_hrs"`
+	OSDiskData      *ManagedDiskData
+	OSDisk          *OSDiskUsage `infracost_usage:"os_disk"`
+	MonthlyHrs      *float64     `infracost_usage:"monthly_hrs"`
 }
 
-var LinuxVirtualMachineUsageSchema = []*schema.UsageItem{{Key: "monthly_hrs", ValueType: schema.Float64, DefaultValue: 0}}
+var LinuxVirtualMachineUsageSchema = []*schema.UsageItem{
+	{Key: "montly_hrs", ValueType: schema.Float64, DefaultValue: 0},
+	{
+		Key:          "os_disk",
+		ValueType:    schema.SubResourceUsage,
+		DefaultValue: &usage.ResourceUsage{Name: "os_disk", Items: OSDiskUsageSchema},
+	},
+}
 
 func (r *LinuxVirtualMachine) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -35,8 +45,13 @@ func (r *LinuxVirtualMachine) BuildResource() *schema.Resource {
 
 	subResources := make([]*schema.Resource, 0)
 
-	osDisk := osDiskSubResource(r.Region)
-	if osDisk != nil {
+	var monthlyDiskOperations *decimal.Decimal
+	if r.OSDisk.MonthlyDiskOperations != nil {
+		monthlyDiskOperations = decimalPtr(decimal.NewFromInt(*r.OSDisk.MonthlyDiskOperations))
+	}
+
+	if r.OSDiskData != nil {
+		osDisk := osDiskSubResource(r.Region, r.OSDiskData.DiskType, r.OSDiskData.DiskSizeGB, r.OSDiskData.DiskIOPSReadWrite, r.OSDiskData.DiskMBPSReadWrite, monthlyDiskOperations)
 		subResources = append(subResources, osDisk)
 	}
 
