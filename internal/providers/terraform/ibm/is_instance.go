@@ -3,7 +3,6 @@ package ibm
 import (
 	"github.com/infracost/infracost/internal/resources/ibm"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/tidwall/gjson"
 
 	"strings"
 )
@@ -32,18 +31,7 @@ func newIsInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	dedicatedHostGroup := strings.TrimSpace(d.Get("dedicated_host_group").String())
 	isDedicated := !((dedicatedHost == "") && (dedicatedHostGroup == ""))
 
-	metadata := make(map[string]gjson.Result)
-
-	properties := gjson.Result{
-		Type: gjson.JSON,
-		Raw: `{
-			"serviceId": "is.instance",
-			"childResources": ["ibm_is_ssh_key"]
-		}`,
-	}
-
-	metadata["catalog"] = properties
-	d.Metadata = metadata
+	SetCatalogMetadata(d, d.Type)
 
 	r := &ibm.IsInstance{
 		Address:          d.Address,

@@ -3,7 +3,6 @@ package ibm
 import (
 	"github.com/infracost/infracost/internal/resources/ibm"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/tidwall/gjson"
 )
 
 func getIbmIsVpcRegistryItem() *schema.RegistryItem {
@@ -21,18 +20,7 @@ func newIbmIsVpc(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 		Classic: d.GetBoolOrDefault("classic_access", false),
 	}
 	r.PopulateUsage(u)
-
-	metadata := make(map[string]gjson.Result)
-	properties := gjson.Result{
-		Type: gjson.JSON,
-		Raw: `{
-			"serviceId": "is.vpc",
-			"childResources": ["ibm_is_flow_log"]
-		}`,
-	}
-
-	metadata["catalog"] = properties
-	d.Metadata = metadata
+	SetCatalogMetadata(d, d.Type)
 
 	return r.BuildResource()
 }

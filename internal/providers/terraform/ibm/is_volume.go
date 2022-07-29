@@ -26,6 +26,7 @@ func newIsVolume(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 		Capacity: capacity,
 	}
 	r.PopulateUsage(u)
+	SetCatalogMetadata(d, d.Type)
 
 	return r.BuildResource()
 }

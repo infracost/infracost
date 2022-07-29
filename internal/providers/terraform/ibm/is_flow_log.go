@@ -19,6 +19,7 @@ func newIsFlowLog(d *schema.ResourceData, u *schema.UsageData) *schema.Resource 
 		Region:  region,
 	}
 	r.PopulateUsage(u)
+	SetCatalogMetadata(d, d.Type)
 
 	return r.BuildResource()
 }

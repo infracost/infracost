@@ -1,6 +1,9 @@
 package ibm
 
 import (
+	"encoding/json"
+	"fmt"
+
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/tidwall/gjson"
 )
@@ -32,4 +35,56 @@ func ParseTags(resourceType string, v gjson.Result) map[string]string {
 		tags[k] = v.String()
 	}
 	return tags
+}
+
+type catalogMetadata struct {
+	serviceId      string
+	childResources []string
+}
+
+// Map between terraform type and global catalog id. For ibm_resource_instance, the service
+// field already matches the global catalog id, so they do not need to be mapped. eg: "kms"
+var globalCatalogServiceId = map[string]catalogMetadata{
+	"ibm_is_vpc":                    {"is.vpc", []string{"ibm_is_flow_log"}},
+	"ibm_container_vpc_cluster":     {"containers-kubernetes", []string{}},
+	"ibm_container_vpc_worker_pool": {"containers-kubernetes", []string{}},
+	"ibm_is_instance":               {"is.instance", []string{"ibm_is_ssh_key", "ibm_is_floating_ip"}},
+	"ibm_is_volume":                 {"is.volume", []string{}},
+	"ibm_is_vpn_gateway":            {"is.vpn", []string{}},
+	"ibm_tg_gateway":                {"transit.gateway", []string{}},
+	"ibm_is_floating_ip":            {"is.floating-ip", []string{}},
+	"ibm_is_flow_log":               {"is.flow-log-collector", []string{}},
+}
+
+func SetCatalogMetadata(d *schema.ResourceData, resourceType string) {
+	metadata := make(map[string]gjson.Result)
+	var properties gjson.Result
+	var serviceId string = resourceType
+	var childResources []string
+
+	catalogEntry, isPresent := globalCatalogServiceId[resourceType]
+	if isPresent {
+		serviceId = catalogEntry.serviceId
+		childResources = catalogEntry.childResources
+	}
+
+	if len(childResources) > 0 {
+		childResourcesString, err := json.Marshal(childResources)
+		if err != nil {
+			childResourcesString = []byte("[]")
+		}
+
+		properties = gjson.Result{
+			Type: gjson.JSON,
+			Raw:  fmt.Sprintf(`{"serviceId": "%s" , "childResources": %s}`, serviceId, childResourcesString),
+		}
+	} else {
+		properties = gjson.Result{
+			Type: gjson.JSON,
+			Raw:  fmt.Sprintf(`{"serviceId": "%s"}`, serviceId),
+		}
+	}
+
+	metadata["catalog"] = properties
+	d.Metadata = metadata
 }

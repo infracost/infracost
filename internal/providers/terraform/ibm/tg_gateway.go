@@ -20,6 +20,7 @@ func newTgGateway(d *schema.ResourceData, u *schema.UsageData) *schema.Resource 
 		GlobalRouting: d.Get("global").Bool(),
 	}
 	r.PopulateUsage(u)
+	SetCatalogMetadata(d, d.Type)
 
 	return r.BuildResource()
 }
