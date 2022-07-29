@@ -93,7 +93,7 @@ func (r *KubernetesCluster) BuildResource() *schema.Resource {
 	}
 
 	subResources = []*schema.Resource{
-		aksClusterNodePool("default_node_pool", region, r.DefaultNodePoolOSDiskType, r.DefaultNodePoolVMSize, r.DefaultNodePoolOSDiskSizeGB, nodeCount),
+		aksClusterNodePool("default_node_pool", region, r.DefaultNodePoolVMSize, r.DefaultNodePoolOSDiskType, r.DefaultNodePoolOSDiskSizeGB, nodeCount),
 	}
 
 	if strings.ToLower(r.NetworkProfileLoadBalancerSKU) == "standard" {

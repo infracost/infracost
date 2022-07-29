@@ -1,49 +1,37 @@
 package azure
 
 import (
+	"github.com/infracost/infracost/internal/resources/azure"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
 )
 
-func GetAzureRMWindowsVirtualMachineScaleSetRegistryItem() *schema.RegistryItem {
+func getAzureWindowsVirtualMachineScaleSetRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_windows_virtual_machine_scale_set",
-		RFunc: NewAzureRMWindowsVirtualMachineScaleSet,
+		RFunc: NewWindowsVirtualMachineScaleSet,
 	}
 }
-
-func NewAzureRMWindowsVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := lookupRegion(d, []string{})
-
-	instanceType := d.Get("sku").String()
-	licenseType := d.Get("license_type").String()
-
-	costComponents := []*schema.CostComponent{windowsVirtualMachineCostComponent(region, instanceType, licenseType, nil)}
-
-	if d.Get("additional_capabilities.0.ultra_ssd_enabled").Bool() {
-		costComponents = append(costComponents, ultraSSDReservationCostComponent(region))
+func NewWindowsVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	r := &azure.WindowsVirtualMachineScaleSet{
+		Address:                               d.Address,
+		Region:                                lookupRegion(d, []string{}),
+		SKU:                                   d.Get("sku").String(),
+		LicenseType:                           d.Get("license_type").String(),
+		AdditionalCapabilitiesUltraSSDEnabled: d.Get("additional_capabilities.0.ultra_ssd_enabled").Bool(),
 	}
-
-	subResources := make([]*schema.Resource, 0)
-
-	osDisk := osDiskSubResource(region, d, u)
-	if osDisk != nil {
-		subResources = append(subResources, osDisk)
+	if len(d.Get("os_disk").Array()) > 0 {
+		diskData := d.Get("os_disk").Array()[0]
+		r.OSDiskData = &azure.ManagedDiskData{
+			DiskType:          diskData.Get("managed_disk_type").String(),
+			DiskSizeGB:        diskData.Get("disk_size_gb").Int(),
+			DiskIOPSReadWrite: diskData.Get("disk_iops_read_write").Int(),
+			DiskMBPSReadWrite: diskData.Get("disk_mbps_read_write").Int(),
+		}
 	}
-
-	instanceCount := decimal.NewFromInt(d.Get("instances").Int())
-	if u != nil && u.Get("instances").Type != gjson.Null {
-		instanceCount = decimal.NewFromInt(u.Get("instances").Int())
+	r.PopulateUsage(u)
+	if u.Get("instances").Type == gjson.Null || u.Get("instances").Int() == 0 {
+		r.Instances = intPtr(d.Get("instances").Int())
 	}
-
-	r := &schema.Resource{
-		Name:           d.Address,
-		CostComponents: costComponents,
-		SubResources:   subResources,
-	}
-
-	schema.MultiplyQuantities(r, instanceCount)
-
-	return r
+	return r.BuildResource()
 }
