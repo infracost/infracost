@@ -12,8 +12,8 @@ func Test_buildAzureAPIURL(t *testing.T) {
 		want    string
 	}{
 		{
-			repoURL: "https://SG-GDI-CTO-PublicCloud@dev.azure.com/SG-GDI-CTO-PublicCloud/CloudSolutions%20Playground/_git/CloudSolutions%20Playground",
-			want:    "https://dev.azure.com/SG-GDI-CTO-PublicCloud/CloudSolutions%20Playground/_apis/git/repositories/CloudSolutions%20Playground/",
+			repoURL: "https://infracost-user@dev.azure.com/infracost/my%20project/_git/my%20repo",
+			want:    "https://dev.azure.com/infracost/my%20project/_apis/git/repositories/my%20repo/",
 		},
 	}
 	for _, tt := range tests {
