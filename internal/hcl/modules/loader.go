@@ -10,7 +10,7 @@ import (
 
 	getter "github.com/hashicorp/go-getter"
 	"github.com/hashicorp/terraform-config-inspect/tfconfig"
-	log "github.com/sirupsen/logrus"
+	"github.com/sirupsen/logrus"
 
 	"github.com/infracost/infracost/internal/ui"
 )
@@ -36,6 +36,7 @@ type ModuleLoader struct {
 	packageFetcher *PackageFetcher
 	registryLoader *RegistryLoader
 	newSpinner     ui.SpinnerFunc
+	logger         *logrus.Entry
 }
 
 // LoaderOption defines a function that can set properties on an ModuleLoader.
@@ -49,21 +50,22 @@ func LoaderWithSpinner(f ui.SpinnerFunc) LoaderOption {
 }
 
 // NewModuleLoader constructs a new module loader
-func NewModuleLoader(path string, credentialsSource *CredentialsSource, opts ...LoaderOption) *ModuleLoader {
-	fetcher := NewPackageFetcher()
-	d := NewDisco(credentialsSource)
+func NewModuleLoader(path string, credentialsSource *CredentialsSource, logger *logrus.Entry, opts ...LoaderOption) *ModuleLoader {
+	fetcher := NewPackageFetcher(logger)
+	d := NewDisco(credentialsSource, logger)
 
 	m := &ModuleLoader{
 		Path:           path,
-		cache:          NewCache(d),
+		cache:          NewCache(d, logger),
 		packageFetcher: fetcher,
+		logger:         logger,
 	}
 
 	for _, opt := range opts {
 		opt(m)
 	}
 
-	m.registryLoader = NewRegistryLoader(fetcher, d)
+	m.registryLoader = NewRegistryLoader(fetcher, d, logger)
 
 	return m
 }
@@ -96,7 +98,7 @@ func (m *ModuleLoader) Load() (*Manifest, error) {
 
 	_, err := os.Stat(m.manifestFilePath())
 	if errors.Is(err, os.ErrNotExist) {
-		log.Debugf("No existing module manifest file found")
+		m.logger.Debug("No existing module manifest file found")
 
 		_, err = os.Stat(m.tfManifestFilePath())
 		if err == nil {
@@ -105,14 +107,14 @@ func (m *ModuleLoader) Load() (*Manifest, error) {
 				return manifest, nil
 			}
 
-			log.Debugf("Error reading terraform module manifest: %s", err)
+			m.logger.WithError(err).Debug("error reading terraform module manifest")
 		}
 	} else if err != nil {
-		log.Debugf("Error checking for existing module manifest: %s", err)
+		m.logger.WithError(err).Debug("error checking for existing module manifest")
 	} else {
 		manifest, err = readManifest(m.manifestFilePath())
 		if err != nil {
-			log.Debugf("Error reading module manifest: %s", err)
+			m.logger.WithError(err).Debug("could not read module manifest")
 		}
 	}
 
@@ -127,7 +129,7 @@ func (m *ModuleLoader) Load() (*Manifest, error) {
 
 	err = writeManifest(manifest, m.manifestFilePath())
 	if err != nil {
-		log.Debugf("Error writing module manifest: %s", err)
+		m.logger.WithError(err).Debug("error writing module manifest")
 	}
 
 	return manifest, nil
@@ -172,7 +174,7 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 
 	manifestModule, err := m.cache.lookupModule(key, moduleCall)
 	if err == nil {
-		log.Debugf("Module %s already loaded", key)
+		m.logger.Debugf("module %s already loaded", key)
 
 		// Test if we can actually load the module. If not, then we should try re-loading it.
 		// This can happen if the directory the module was downloaded to has been deleted and moved
@@ -182,9 +184,9 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 			return manifestModule, err
 		}
 
-		log.Debugf("Module %s cannot be loaded, re-loading: %s", key, diags.Err())
+		m.logger.Debugf("module %s cannot be loaded, re-loading: %s", key, diags.Err())
 	} else {
-		log.Debugf("Module %s needs loading: %s", key, err.Error())
+		m.logger.Debugf("module %s needs loading: %s", key, err.Error())
 	}
 
 	manifestModule = &ManifestModule{
@@ -198,7 +200,7 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 			return nil, err
 		}
 
-		log.Debugf("Loading local module %s from %s", key, dir)
+		m.logger.Debugf("loading local module %s from %s", key, dir)
 		manifestModule.Dir = path.Clean(dir)
 		return manifestModule, nil
 	}
@@ -231,7 +233,7 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 	if lookupResult.OK {
 		err = m.registryLoader.downloadModule(lookupResult, dest)
 		if err != nil {
-			return nil, fmt.Errorf("Failed to download registry module %s: %w", key, err)
+			return nil, fmt.Errorf("failed to download registry module %s: %w", key, err)
 		}
 
 		// The moduleCall.Source might not have the registry hostname if it is using the default registry
@@ -242,12 +244,12 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 		return manifestModule, nil
 	}
 
-	log.Debugf("Detected %s as remote module", key)
-	log.Debugf("Downloading module %s from remote %s", key, moduleCall.Source)
+	m.logger.Debugf("Detected %s as remote module", key)
+	m.logger.Debugf("Downloading module %s from remote %s", key, moduleCall.Source)
 
 	err = m.packageFetcher.fetch(moduleAddr, dest)
 	if err != nil {
-		return nil, fmt.Errorf("Failed to download remote module %s: %w", key, err)
+		return nil, fmt.Errorf("failed to download remote module %s: %w", key, err)
 	}
 
 	return manifestModule, nil
@@ -265,7 +267,7 @@ func (m *ModuleLoader) isLocalModule(moduleCall *tfconfig.ModuleCall) bool {
 func splitModuleSubDir(moduleSource string) (string, string, error) {
 	moduleAddr, submodulePath := getter.SourceDirSubdir(moduleSource)
 	if strings.HasPrefix(submodulePath, "../") {
-		return "", "", fmt.Errorf("Invalid submodule path '%s'", submodulePath)
+		return "", "", fmt.Errorf("invalid submodule path '%s'", submodulePath)
 	}
 
 	return moduleAddr, submodulePath, nil

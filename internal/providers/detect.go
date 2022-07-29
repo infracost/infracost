@@ -9,10 +9,10 @@ import (
 	"sync"
 
 	"github.com/awslabs/goformation/v4"
-	log "github.com/sirupsen/logrus"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/hcl"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/providers/cloudformation"
 	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/schema"
@@ -91,7 +91,7 @@ func Detect(ctx *config.ProjectContext, includePastResources bool) (schema.Provi
 		return cloudformation.NewTemplateProvider(ctx, includePastResources), nil
 	}
 
-	return nil, fmt.Errorf("Could not detect path type for '%s'", path)
+	return nil, fmt.Errorf("could not detect path type for '%s'", path)
 }
 
 func validateProjectForHCL(ctx *config.ProjectContext, path string) error {
@@ -160,7 +160,7 @@ func isTerraformPlanJSON(path string) bool {
 
 	b, hasWrapper := terraform.StripSetupTerraformWrapper(b)
 	if hasWrapper {
-		log.Infof("Stripped wrapper output from %s (to make it a valid JSON file) since setup-terraform GitHub Action was used without terraform_wrapper: false", path)
+		logging.Logger.Infof("Stripped wrapper output from %s (to make it a valid JSON file) since setup-terraform GitHub Action was used without terraform_wrapper: false", path)
 	}
 
 	err = json.Unmarshal(b, &jsonFormat)
@@ -184,7 +184,7 @@ func isTerraformStateJSON(path string) bool {
 
 	b, hasWrapper := terraform.StripSetupTerraformWrapper(b)
 	if hasWrapper {
-		log.Debugf("Stripped setup-terraform wrapper output from %s", path)
+		logging.Logger.Debugf("Stripped setup-terraform wrapper output from %s", path)
 	}
 
 	err = json.Unmarshal(b, &jsonFormat)

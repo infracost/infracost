@@ -1,6 +1,7 @@
 package hcl
 
 import (
+	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -8,6 +9,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zclconf/go-cty/cty"
@@ -45,7 +47,7 @@ data "cats_cat" "the-cats-mother" {
 
 `)
 
-	parsers, err := LoadParsers(filepath.Dir(path), []string{}, OptionStopOnHCLError())
+	parsers, err := LoadParsers(filepath.Dir(path), []string{}, newDiscardLogger(), OptionStopOnHCLError())
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -137,7 +139,7 @@ output "loadbalancer"  {
 }
 `)
 
-	parser := newParser(filepath.Dir(path))
+	parser := newParser(filepath.Dir(path), newDiscardLogger())
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -209,7 +211,7 @@ output "exp2" {
 }
 `)
 
-	parser := newParser(filepath.Dir(path))
+	parser := newParser(filepath.Dir(path), newDiscardLogger())
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -255,7 +257,7 @@ output "instances" {
 }
 `)
 
-	parser := newParser(filepath.Dir(path))
+	parser := newParser(filepath.Dir(path), newDiscardLogger())
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -293,7 +295,7 @@ resource "other_resource" "test" {
 
 `)
 
-	parser := newParser(filepath.Dir(path))
+	parser := newParser(filepath.Dir(path), newDiscardLogger())
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -337,7 +339,7 @@ output "attr_not_exists" {
 
 `)
 
-	parser := newParser(filepath.Dir(path))
+	parser := newParser(filepath.Dir(path), newDiscardLogger())
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -376,7 +378,7 @@ resource "other_resource" "test" {
 
 `)
 
-	parser := newParser(filepath.Dir(path))
+	parser := newParser(filepath.Dir(path), newDiscardLogger())
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -427,7 +429,7 @@ output "serviceendpoint_principals" {
 
 `)
 
-	parser := newParser(filepath.Dir(path))
+	parser := newParser(filepath.Dir(path), newDiscardLogger())
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -474,7 +476,7 @@ output "mod_result" {
 		"module",
 	)
 
-	parsers, err := LoadParsers(path, []string{}, OptionStopOnHCLError())
+	parsers, err := LoadParsers(path, []string{}, newDiscardLogger(), OptionStopOnHCLError())
 	require.NoError(t, err)
 	rootModule, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -532,7 +534,7 @@ output "mod_result" {
 		"",
 	)
 
-	parsers, err := LoadParsers(path, []string{}, OptionStopOnHCLError())
+	parsers, err := LoadParsers(path, []string{}, newDiscardLogger(), OptionStopOnHCLError())
 	require.NoError(t, err)
 	rootModule, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -647,4 +649,10 @@ func createTestFileWithModule(contents string, moduleContents string, moduleName
 	}
 
 	return rootPath
+}
+
+func newDiscardLogger() *logrus.Entry {
+	l := logrus.New()
+	l.SetOutput(io.Discard)
+	return l.WithFields(logrus.Fields{})
 }

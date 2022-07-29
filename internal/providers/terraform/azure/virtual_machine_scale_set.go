@@ -51,6 +51,7 @@ func NewVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageData) *sch
 		for _, s := range d.Get("storage_profile_os_disk").Array() {
 			if s.Get("managed_disk_type").Type == gjson.Null {
 				continue
+
 			}
 			r.StorageProfileOSDisksData = append(r.StorageProfileOSDisksData, &azure.ManagedDiskData{
 				DiskType:          s.Get("managed_disk_type").String(),
