@@ -1,6 +1,7 @@
 package config
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -8,8 +9,10 @@ import (
 	"strings"
 	"sync"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/go-git/go-git/v5"
+	"github.com/sirupsen/logrus"
 
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/vcs"
 )
@@ -21,6 +24,7 @@ type ProjectContexter interface {
 type ProjectContext struct {
 	RunContext    *RunContext
 	ProjectConfig *Project
+	logger        *logrus.Entry
 	contextVals   map[string]interface{}
 	mu            *sync.RWMutex
 
@@ -28,12 +32,30 @@ type ProjectContext struct {
 	CacheErr   string
 }
 
-func NewProjectContext(runCtx *RunContext, projectCfg *Project) *ProjectContext {
+func NewProjectContext(runCtx *RunContext, projectCfg *Project, fields logrus.Fields) *ProjectContext {
+	contextLogger := logging.Logger.WithFields(fields)
+
 	return &ProjectContext{
 		RunContext:    runCtx,
 		ProjectConfig: projectCfg,
+		logger:        contextLogger,
 		contextVals:   map[string]interface{}{},
 		mu:            &sync.RWMutex{},
+	}
+}
+
+func (p *ProjectContext) Logger() *logrus.Entry {
+	if p.logger == nil {
+		return logging.Logger.WithFields(p.logFields())
+	}
+
+	return p.logger.WithFields(p.logFields())
+}
+
+func (p *ProjectContext) logFields() logrus.Fields {
+	return logrus.Fields{
+		"project_name": p.ProjectConfig.Name,
+		"project_path": p.ProjectConfig.Path,
 	}
 }
 
@@ -82,7 +104,11 @@ func DetectProjectMetadata(path string) *schema.ProjectMetadata {
 
 	meta, err := vcs.MetadataFetcher.Get(path)
 	if err != nil {
-		log.Debugf("failed to fetch vcs metadata %s", err)
+		logging.Logger.WithError(err).Debugf("failed to fetch vcs metadata for path %s", path)
+	}
+
+	if vcsPullRequestURL == "" && meta.PullRequest != nil {
+		vcsPullRequestURL = meta.PullRequest.URL
 	}
 
 	pm := &schema.ProjectMetadata{
@@ -115,7 +141,7 @@ func DetectProjectMetadata(path string) *schema.ProjectMetadata {
 }
 
 func gitRepo(path string) string {
-	log.Debugf("Checking if %s is a git repo", path)
+	logging.Logger.Debugf("Checking if %s is a git repo", path)
 	cmd := exec.Command("git", "ls-remote", "--get-url")
 
 	if isDir(path) {
@@ -126,7 +152,7 @@ func gitRepo(path string) string {
 
 	out, err := cmd.Output()
 	if err != nil {
-		log.Debugf("Could not detect a git repo at %s", path)
+		logging.Logger.WithError(err).Debugf("could not detect a git repo at %s", path)
 		return ""
 	}
 	return strings.Split(string(out), "\n")[0]
@@ -135,19 +161,23 @@ func gitRepo(path string) string {
 func gitSubPath(path string) string {
 	topLevel, err := gitToplevel(path)
 	if err != nil {
-		log.Debugf("Could not get git top level directory for %s", path)
+		logging.Logger.WithError(err).Debugf("Could not get git top level directory for %s", path)
 		return ""
 	}
 
 	absPath, err := filepath.Abs(path)
 	if err != nil {
-		log.Debugf("Could not get absolute path for %s", path)
+		logging.Logger.WithError(err).Debugf("Could not get absolute path for %s", path)
 		return ""
 	}
 
 	subPath, err := filepath.Rel(topLevel, absPath)
 	if err != nil {
-		log.Debugf("Could not get relative path for %s from %s", absPath, topLevel)
+		logging.Logger.WithError(err).Debugf("Could not get relative path for %s from %s", absPath, topLevel)
+		return ""
+	}
+
+	if subPath == "." {
 		return ""
 	}
 
@@ -155,19 +185,16 @@ func gitSubPath(path string) string {
 }
 
 func gitToplevel(path string) (string, error) {
-	cmd := exec.Command("git", "rev-parse", "--show-toplevel")
-
-	if isDir(path) {
-		cmd.Dir = path
-	} else {
-		cmd.Dir = filepath.Dir(path)
-	}
-
-	out, err := cmd.Output()
+	r, err := git.PlainOpenWithOptions(path, &git.PlainOpenOptions{DetectDotGit: true})
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("failed to detect a git directory in path %s of any of its parent dirs %w", path, err)
 	}
-	return strings.Split(string(out), "\n")[0], nil
+	wt, err := r.Worktree()
+	if err != nil {
+		return "", fmt.Errorf("failed to return worktree for path %s %w", path, err)
+	}
+
+	return wt.Filesystem.Root(), nil
 }
 
 func stripVCSRepoPassword(repoURL string) string {

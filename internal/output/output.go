@@ -250,6 +250,7 @@ type MarkdownOptions struct {
 	WillUpdate          bool
 	WillReplace         bool
 	IncludeFeedbackLink bool
+	OmitDetails         bool
 	BasicSyntax         bool
 }
 

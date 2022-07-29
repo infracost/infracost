@@ -33,7 +33,7 @@ func Load(p string) (Root, error) {
 	var out Root
 	_, err := os.Stat(p)
 	if errors.Is(err, os.ErrNotExist) {
-		return out, errors.New("Infracost JSON file does not exist")
+		return out, errors.New("Infracost JSON file does not exist, generate it by running the following command then try again:\ninfracost breakdown --path /code --format json --out-file infracost-base.json")
 	}
 
 	data, err := os.ReadFile(p)
@@ -43,7 +43,7 @@ func Load(p string) (Root, error) {
 
 	err = json.Unmarshal(data, &out)
 	if err != nil {
-		return out, fmt.Errorf("invalid Infracost JSON file %w", err)
+		return out, fmt.Errorf("invalid Infracost JSON file %w, generate it by running the following command then try again:\ninfracost breakdown --path /code --format json --out-file infracost-base.json", err)
 	}
 
 	if !checkOutputVersion(out.Version) {
@@ -275,6 +275,8 @@ func FormatOutput(format string, r Root, opts Options) ([]byte, error) {
 		b, err = ToMarkdown(r, opts, MarkdownOptions{})
 	case "bitbucket-comment":
 		b, err = ToMarkdown(r, opts, MarkdownOptions{BasicSyntax: true})
+	case "bitbucket-comment-summary":
+		b, err = ToMarkdown(r, opts, MarkdownOptions{BasicSyntax: true, OmitDetails: true})
 	case "slack-message":
 		b, err = ToSlackMessage(r, opts)
 	default:

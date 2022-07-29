@@ -1,11 +1,4 @@
-Register for a free Infracost API key
 
-USAGE
-  infracost register [flags]
+Err:
+Warning: this command has been changed to infracost auth login, which does the same thing - showing information for that command.
 
-FLAGS
-  -h, --help   help for register
-
-GLOBAL FLAGS
-      --log-level string   Log level (trace, debug, info, warn, error, fatal)
-      --no-color           Turn off colored output

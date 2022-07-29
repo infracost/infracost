@@ -1,9 +1,11 @@
 package hcl
 
 import (
+	"io"
 	"testing"
 
 	"github.com/hashicorp/hcl/v2"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
@@ -11,7 +13,7 @@ import (
 
 func Test_ContextVariables(t *testing.T) {
 	underlying := &hcl.EvalContext{}
-	ctx := NewContext(underlying, nil)
+	ctx := NewContext(underlying, nil, newTestLogger())
 
 	val, err := gocty.ToCtyValue("hello", cty.String)
 	if err != nil {
@@ -36,7 +38,7 @@ func Test_ContextVariablesPreservation(t *testing.T) {
 			"another": str,
 		}),
 	})
-	ctx := NewContext(underlying, nil)
+	ctx := NewContext(underlying, nil, newTestLogger())
 
 	val, err := gocty.ToCtyValue("hello", cty.String)
 	if err != nil {
@@ -63,7 +65,7 @@ func Test_ContextVariablesPreservationByDot(t *testing.T) {
 			"another": str,
 		}),
 	})
-	ctx := NewContext(underlying, nil)
+	ctx := NewContext(underlying, nil, newTestLogger())
 
 	val, err := gocty.ToCtyValue("hello", cty.String)
 	if err != nil {
@@ -81,7 +83,8 @@ func Test_ContextSetThenImmediateGet(t *testing.T) {
 
 	underlying := &hcl.EvalContext{}
 
-	ctx := NewContext(underlying, nil)
+	entry := newTestLogger()
+	ctx := NewContext(underlying, nil, entry)
 
 	ctx.Set(cty.ObjectVal(map[string]cty.Value{
 		"mod_result": cty.StringVal("ok"),
@@ -91,11 +94,19 @@ func Test_ContextSetThenImmediateGet(t *testing.T) {
 	assert.Equal(t, "ok", val.AsString())
 }
 
+func newTestLogger() *logrus.Entry {
+	logger := logrus.New()
+	logger.SetOutput(io.Discard)
+	entry := logrus.NewEntry(logger)
+
+	return entry
+}
+
 func Test_ContextSetThenImmediateGetWithChild(t *testing.T) {
 
 	underlying := &hcl.EvalContext{}
 
-	ctx := NewContext(underlying, nil)
+	ctx := NewContext(underlying, nil, newTestLogger())
 
 	childCtx := ctx.NewChild()
 

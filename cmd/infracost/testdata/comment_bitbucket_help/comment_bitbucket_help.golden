@@ -21,6 +21,7 @@ FLAGS
       --bitbucket-token string        Bitbucket access token. Use 'username:app-password' for Bitbucket Cloud and HTTP access token for Bitbucket Server
       --commit string                 Commit SHA to post comment on, mutually exclusive with pull-request. Not available when bitbucket-server-url is set
       --dry-run                       Generate comment without actually posting to Bitbucket
+      --exclude-cli-output            Exclude CLI output so comment has just the summary table
   -h, --help                          help for bitbucket
   -p, --path stringArray              Path to Infracost JSON files, glob patterns need quotes
       --policy-path stringArray       Path to Infracost policy files, glob patterns need quotes (experimental)
@@ -29,5 +30,6 @@ FLAGS
       --tag string                    Customize special text used to detect comments posted by Infracost (placed at the bottom of a comment)
 
 GLOBAL FLAGS
+      --debug-report       Generate a debug report file which can be sent to Infracost team
       --log-level string   Log level (trace, debug, info, warn, error, fatal)
       --no-color           Turn off colored output

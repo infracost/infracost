@@ -20,6 +20,7 @@ EXAMPLES
       infracost breakdown --path /code --terraform-var-file my.tfvars
 
 AVAILABLE COMMANDS
+  auth             Get a free API key, or log in to your existing account
   breakdown        Show breakdown of costs
   comment          Post an Infracost comment to GitHub, GitLab, Azure Repos or Bitbucket
   completion       Generate shell completion script
@@ -27,9 +28,9 @@ AVAILABLE COMMANDS
   diff             Show diff of monthly costs between current and planned state
   help             Help about any command
   output           Combine and output Infracost JSON files in different formats
-  register         Register for a free Infracost API key
 
 FLAGS
+      --debug-report       Generate a debug report file which can be sent to Infracost team
   -h, --help               help for infracost
       --log-level string   Log level (trace, debug, info, warn, error, fatal)
       --no-color           Turn off colored output
