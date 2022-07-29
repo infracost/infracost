@@ -42,6 +42,7 @@ var (
 	scpSyntax        = regexp.MustCompile(`^([a-zA-Z0-9-._~]+@)?([a-zA-Z0-9._-]+):([a-zA-Z0-9./._-]+)(?:\?||$)(.*)$`)
 	mergeCommitRegxp = regexp.MustCompile(`(?i)^merge\s([\d\w]+)\sinto\s[\d\w]+`)
 	startsWithMerge  = regexp.MustCompile(`(?i)^merge`)
+	versionRegxp     = regexp.MustCompile(`^v\d/`)
 )
 
 type keyMutex struct {
@@ -597,19 +598,19 @@ func getAtlantisPullRequestURL(remote Remote) string {
 	pullNumber := os.Getenv("PULL_NUM")
 
 	if strings.Contains(remote.Host, "github") {
-		return fmt.Sprintf("https://github.com/%s/%s/pull/%s", owner, project, pullNumber)
+		return fmt.Sprintf("https://%s/%s/%s/pull/%s", remote.Host, owner, project, pullNumber)
 	}
 
 	if strings.Contains(remote.Host, "gitlab") {
-		return fmt.Sprintf("https://gitlab.com/%s/%s/-/merge_requests/%s", owner, project, pullNumber)
+		return fmt.Sprintf("https://%s/%s/%s/-/merge_requests/%s", remote.Host, owner, project, pullNumber)
 	}
 
 	if strings.Contains(remote.Host, "azure") {
-		return fmt.Sprintf("https://dev.azure.com/%s/base/_git/%s/pullrequest/%s", owner, project, pullNumber)
+		return fmt.Sprintf("https://%s/%s/base/_git/%s/pullrequest/%s", remote.Host, owner, project, pullNumber)
 	}
 
 	if strings.Contains(remote.Host, "bitbucket") {
-		return fmt.Sprintf("https://bitbucket.org/%s/%s/pull-requests/%s", owner, project, pullNumber)
+		return fmt.Sprintf("https://%s/%s/%s/pull-requests/%s", remote.Host, owner, project, pullNumber)
 	}
 
 	return ""
@@ -687,7 +688,7 @@ func urlStringToRemote(remote string) Remote {
 	if err == nil {
 		return Remote{
 			Host: u.Host,
-			URL:  remote,
+			URL:  fmt.Sprintf("https://%s%s", u.Host, u.Path),
 		}
 	}
 
@@ -705,8 +706,20 @@ func urlStringToRemote(remote string) Remote {
 		return Remote{}
 	}
 
+	host := m[2]
+	path := m[3]
+
+	if strings.Contains(host, "azure") {
+		host = strings.TrimLeft(m[2], "ssh.")
+		path = versionRegxp.ReplaceAllString(path, "")
+		pieces := strings.Split(path, "/")
+		if len(pieces) == 3 {
+			path = strings.Join([]string{pieces[0], pieces[1], "_git", pieces[2]}, "/")
+		}
+	}
+
 	return Remote{
-		Host: m[2],
-		URL:  fmt.Sprintf("https://%s/%s", m[2], m[3]),
+		Host: host,
+		URL:  fmt.Sprintf("https://%s/%s", host, path),
 	}
 }
