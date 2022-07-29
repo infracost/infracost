@@ -43,7 +43,7 @@ func (r *ApplicationGateway) BuildResource() *schema.Resource {
 	}
 
 	if sku == "v2" {
-		costComponents = append(costComponents, r.v2CostComponents(skuNameParts, tier)...)
+		costComponents = append(costComponents, r.v2CostComponents(skuNameParts)...)
 	} else {
 		costComponents = append(costComponents, r.v1CostComponents(tier, sku)...)
 	}
@@ -100,12 +100,13 @@ func (r *ApplicationGateway) v1CostComponents(tier, sku string) []*schema.CostCo
 	return costComponents
 }
 
-func (r *ApplicationGateway) v2CostComponents(skuNameParts []string, tier string) []*schema.CostComponent {
+func (r *ApplicationGateway) v2CostComponents(skuNameParts []string) []*schema.CostComponent {
 	var monthlyCapacityUnits *decimal.Decimal
 	costComponents := make([]*schema.CostComponent, 0)
 	if r.MonthlyV2CapacityUnits != nil {
 		monthlyCapacityUnits = decimalPtr(decimal.NewFromInt(*r.MonthlyV2CapacityUnits))
 	}
+	var tier string
 	if strings.ToLower(skuNameParts[0]) == "standard" {
 		tier = "basic v2"
 		costComponents = append(costComponents, r.fixedForV2CostComponent(fmt.Sprintf("Gateway usage (%s)", tier), "standard v2"))
