@@ -103,6 +103,7 @@ func (r *ApplicationGateway) v1CostComponents(tier, sku string) []*schema.CostCo
 func (r *ApplicationGateway) v2CostComponents(skuNameParts []string) []*schema.CostComponent {
 	var monthlyCapacityUnits *decimal.Decimal
 	costComponents := make([]*schema.CostComponent, 0)
+
 	if r.MonthlyV2CapacityUnits != nil {
 		monthlyCapacityUnits = decimalPtr(decimal.NewFromInt(*r.MonthlyV2CapacityUnits))
 	}
