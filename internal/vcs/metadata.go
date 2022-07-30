@@ -602,9 +602,9 @@ func (f *metadataFetcher) getAtlantisMetadata(path string) (Metadata, error) {
 // We cannot rely on any local git information we run this process in the Infracost Cloud. All OS variables are populated
 // by the Infracost Cloud run task worker, which passes them as environment flags when running the Infracost CLI.
 func (f *metadataFetcher) getTFCMetadata(path string) (Metadata, error) {
-	remote := urlStringToRemote(os.Getenv("TFC_VCS_URL"))
+	remote := urlStringToRemote(os.Getenv("INFRACOST_VCS_REPOSITORY_URL"))
 
-	runCreatedAt := os.Getenv("TFC_RUN_CREATED_AT")
+	runCreatedAt := os.Getenv("INFRACOST_VCS_COMMIT_CREATED_AT")
 	parsedCreatedAt, err := time.Parse(time.RFC3339, runCreatedAt)
 	if err != nil {
 		logging.Logger.WithError(err).Debugf("could not parse TFC run created time '%s'", runCreatedAt)
@@ -613,18 +613,18 @@ func (f *metadataFetcher) getTFCMetadata(path string) (Metadata, error) {
 	// pullURL is only populated if the run task is triggered by a VCS webhook event. If the run task has been
 	// triggered by a manual build in Terraform Cloud then TFC_PULL_URL will be blank. This includes builds that
 	// have been originally triggered by a VCS webhook event and then rerun by a user.
-	pullURL := os.Getenv("TFC_PULL_URL")
+	pullURL := os.Getenv("INFRACOST_VCS_PULL_REQUEST_URL")
 	return Metadata{
 		Remote: remote,
 		Branch: Branch{
-			Name: os.Getenv("TFC_VCS_BRANCH"),
+			Name: os.Getenv("INFRACOST_VCS_SOURCE_BRANCH"),
 		},
 		Commit: Commit{
-			SHA:  getLastURLPart(os.Getenv("TFC_VCS_COMMIT_URL")),
+			SHA:  getLastURLPart(os.Getenv("INFRACOST_VCS_COMMIT_URL")),
 			Time: parsedCreatedAt,
 			// we use the TFC_RUN_MESSAGE as the commit message even though this is the PR title.
 			// This is consistent with what TFC show, i.e. a commit hash and then a PR title.
-			Message: os.Getenv("TFC_RUN_MESSAGE"),
+			Message: os.Getenv("INFRACOST_VCS_PULL_REQUEST_TITLE"),
 
 			// TFC does not provide us an information on the original VCS author. The only referenced
 			// users are TFC users if the run has been triggered by the UI. We leave these fields blank in
@@ -635,9 +635,9 @@ func (f *metadataFetcher) getTFCMetadata(path string) (Metadata, error) {
 		PullRequest: &PullRequest{
 			ID:           getLastURLPart(pullURL),
 			VCSProvider:  vcsProviderFromHost(remote.Host),
-			SourceBranch: os.Getenv("TFC_VCS_BRANCH"),
+			SourceBranch: os.Getenv("INFRACOST_VCS_SOURCE_BRANCH"),
 			URL:          pullURL,
-			Title:        os.Getenv("TFC_RUN_MESSAGE"),
+			Title:        os.Getenv("INFRACOST_VCS_PULL_REQUEST_TITLE"),
 
 			// TFC does not provide us information on the following fields in the event data that's sent
 			// through from the run task.
