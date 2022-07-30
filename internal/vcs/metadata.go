@@ -125,6 +125,12 @@ func (f *metadataFetcher) Get(path string) (Metadata, error) {
 		return f.getAtlantisMetadata(path)
 	}
 
+	_, ok = lookupEnv("TFC_RUN_ID")
+	if ok {
+		logging.Logger.Debug("fetching TFC run task metadata")
+		return f.getTFCMetadata(path)
+	}
+
 	logging.Logger.Debug("could not detect a specific CI system, fetching local Git metadata")
 	return f.getLocalGitMetadata(path)
 }
@@ -590,6 +596,79 @@ func (f *metadataFetcher) getAtlantisMetadata(path string) (Metadata, error) {
 	}
 
 	return m, nil
+}
+
+// getTFCMetadata returns Metadata built from a TFC request: https://www.terraform.io/cloud-docs/api-docs/run-tasks/run-tasks-integration#request-body
+// We cannot rely on any local git information we run this process in the Infracost Cloud. All OS variables are populated
+// by the Infracost Cloud run task worker, which passes them as environment flags when running the Infracost CLI.
+func (f *metadataFetcher) getTFCMetadata(path string) (Metadata, error) {
+	remote := urlStringToRemote(os.Getenv("INFRACOST_VCS_REPOSITORY_URL"))
+
+	runCreatedAt := os.Getenv("INFRACOST_VCS_COMMIT_CREATED_AT")
+	parsedCreatedAt, err := time.Parse(time.RFC3339, runCreatedAt)
+	if err != nil {
+		logging.Logger.WithError(err).Debugf("could not parse TFC run created time '%s'", runCreatedAt)
+	}
+
+	// pullURL is only populated if the run task is triggered by a VCS webhook event. If the run task has been
+	// triggered by a manual build in Terraform Cloud then TFC_PULL_URL will be blank. This includes builds that
+	// have been originally triggered by a VCS webhook event and then rerun by a user.
+	pullURL := os.Getenv("INFRACOST_VCS_PULL_REQUEST_URL")
+	return Metadata{
+		Remote: remote,
+		Branch: Branch{
+			Name: os.Getenv("INFRACOST_VCS_SOURCE_BRANCH"),
+		},
+		Commit: Commit{
+			SHA:  getLastURLPart(os.Getenv("INFRACOST_VCS_COMMIT_URL")),
+			Time: parsedCreatedAt,
+			// we use the TFC_RUN_MESSAGE as the commit message even though this is the PR title.
+			// This is consistent with what TFC show, i.e. a commit hash and then a PR title.
+			Message: os.Getenv("INFRACOST_VCS_PULL_REQUEST_TITLE"),
+
+			// TFC does not provide us an information on the original VCS author. The only referenced
+			// users are TFC users if the run has been triggered by the UI. We leave these fields blank in
+			// order to avoid confusion.
+			AuthorName:  "",
+			AuthorEmail: "",
+		},
+		PullRequest: &PullRequest{
+			ID:           getLastURLPart(pullURL),
+			VCSProvider:  vcsProviderFromHost(remote.Host),
+			SourceBranch: os.Getenv("INFRACOST_VCS_SOURCE_BRANCH"),
+			URL:          pullURL,
+			Title:        os.Getenv("INFRACOST_VCS_PULL_REQUEST_TITLE"),
+
+			// TFC does not provide us information on the following fields in the event data that's sent
+			// through from the run task.
+			Author:     "",
+			BaseBranch: "",
+		},
+		Pipeline: &Pipeline{ID: os.Getenv("TFC_RUN_ID")},
+	}, nil
+}
+
+func vcsProviderFromHost(host string) string {
+	pieces := strings.Split(host, ".")
+	if len(pieces) == 2 {
+		return pieces[0]
+	}
+
+	if len(pieces) > 2 {
+		return pieces[len(pieces)-2]
+	}
+
+	return host
+}
+
+func getLastURLPart(urlString string) string {
+	pieces := strings.Split(urlString, "/")
+
+	if len(pieces) == 0 {
+		return urlString
+	}
+
+	return pieces[len(pieces)-1]
 }
 
 func getAtlantisPullRequestURL(remote Remote) string {
