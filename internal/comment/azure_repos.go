@@ -7,7 +7,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
-
 	"net/http"
 	"net/url"
 	"strconv"
@@ -104,21 +103,20 @@ func newAzureReposAPIClient(ctx context.Context, token string) (*http.Client, er
 
 // buildAPIURL converts repo URL to repo's API URL.
 func buildAzureAPIURL(repoURL string) (string, error) {
-	urlParts := strings.Split(repoURL, "_git/")
-
-	if len(urlParts) != 2 {
-		return "", fmt.Errorf("Invalid repo URL format %s. Expected https://dev.azure.com/org/project/_git/repo/", repoURL)
+	apiURL, err := url.Parse(repoURL)
+	if err != nil {
+		return "", fmt.Errorf("error parsing repo URL %w", err)
 	}
 
-	apiURL, err := url.Parse(urlParts[0])
-	if err != nil {
-		return "", errors.Wrap(err, "Error parsing repo URL")
+	urlParts := strings.Split(apiURL.Path, "_git/")
+	if len(urlParts) != 2 {
+		return "", fmt.Errorf("Invalid repo URL format %s. Expected https://dev.azure.com/org/project/_git/repo/", repoURL)
 	}
 
 	// The URL can contain `org@` username part. If it's present in the API URL,
 	// requests may result with 401 status even with the provided token.
 	apiURL.User = nil
-	apiURL.Path += fmt.Sprintf("_apis/git/repositories/%s", urlParts[1])
+	apiURL.Path = fmt.Sprintf("%s_apis/git/repositories/%s", urlParts[0], urlParts[1])
 	if !strings.HasSuffix(apiURL.Path, "/") {
 		apiURL.Path += "/"
 	}
