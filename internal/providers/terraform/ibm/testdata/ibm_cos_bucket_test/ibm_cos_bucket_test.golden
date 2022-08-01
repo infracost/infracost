@@ -1,0 +1,17 @@
+
+ Name                                        Monthly Qty  Unit           Monthly Cost 
+                                                                                      
+ ibm_cos_bucket.standard-us-south                                                     
+ ├─ Monthly Average Capacity                      10,000  GB                  $220.00 
+ ├─ Class A requests                              10,000  1k API calls          $0.05 
+ ├─ Class B requests                              10,000  10k API calls         $0.00 
+ └─ Public Standard Egress (first 50000 GB)        1,000  GB                   $90.00 
+ └─ Public Standard Egress (next 100000 GB)            0  GB                    $0.00 
+ └─ Public Standard Egress (over 150000 GB)            0  GB                    $0.00 
+                                                                                      
+ OVERALL TOTAL                                                                $310.05 
+──────────────────────────────────
+3 cloud resources were detected:
+∙ 2 were estimated, 1 of which usage-based costs, see https://infracost.io/usage-file
+∙ 1 was free:
+  ∙ 1 x ibm_resource_group
