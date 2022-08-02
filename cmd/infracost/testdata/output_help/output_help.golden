@@ -35,12 +35,13 @@ EXAMPLES
 FLAGS
       --fields strings     Comma separated list of output fields: all,price,monthlyQuantity,unit,hourlyCost,monthlyCost.
                            Supported by table and html output formats (default [monthlyQuantity,unit,monthlyCost])
-      --format string      Output format: json, diff, table, html, github-comment, gitlab-comment, azure-repos-comment, bitbucket-comment, slack-message (default "table")
+      --format string      Output format: json, diff, table, html, github-comment, gitlab-comment, azure-repos-comment, bitbucket-comment, bitbucket-comment-summary, slack-message (default "table")
   -h, --help               help for output
   -o, --out-file string    Save output to a file, helpful with format flag
   -p, --path stringArray   Path to Infracost JSON files, glob patterns need quotes
       --show-skipped       List unsupported and free resources
 
 GLOBAL FLAGS
+      --debug-report       Generate a debug report file which can be sent to Infracost team
       --log-level string   Log level (trace, debug, info, warn, error, fatal)
       --no-color           Turn off colored output

@@ -40,3 +40,6 @@ scripts/price_explorer/index.json
 
 # Generated docs
 docs/generated/
+
+# Infracost generated files
+infracost-debug-report.json

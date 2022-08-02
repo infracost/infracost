@@ -35,15 +35,14 @@ FLAGS
       --usage-file string            Path to Infracost usage file that specifies values for usage-based resources
 
 GLOBAL FLAGS
+      --debug-report       Generate a debug report file which can be sent to Infracost team
       --log-level string   Log level (trace, debug, info, warn, error, fatal)
       --no-color           Turn off colored output
 
 Error: No path specified
 
 Use the --path flag to specify the path to one of the following:
- - Terraform plan JSON file
  - Terraform/Terragrunt directory
- - Terraform plan file
- - Terraform state JSON file
+ - Terraform plan JSON file, see https://infracost.io/troubleshoot for how to generate this.
 
 Alternatively, use --config-file to process multiple projects, see https://infracost.io/config-file

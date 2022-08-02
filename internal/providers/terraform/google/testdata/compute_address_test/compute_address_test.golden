@@ -31,6 +31,6 @@
  OVERALL TOTAL                                                                        $37.80 
 ──────────────────────────────────
 11 cloud resources were detected:
-∙ 8 were estimated
+∙ 8 were estimated, 3 of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 3 were free:
   ∙ 3 x google_compute_address

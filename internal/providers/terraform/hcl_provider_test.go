@@ -3,6 +3,7 @@ package terraform
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"path"
 	"strings"
 	"testing"
@@ -10,6 +11,7 @@ import (
 
 	hcl2 "github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zclconf/go-cty/cty"
@@ -151,21 +153,34 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "does not panic on double attribute definition",
+			attrs: map[string]map[string]string{
+				"aws_eip.invalid_eip": {
+					"id":  "eip",
+					"arn": "eip-arn",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			pathName := strings.ReplaceAll(strings.ToLower(tt.name), " ", "_")
 			testPath := path.Join("testdata/hcl_provider_test", pathName)
 
+			logger := logrus.New()
+			logger.SetOutput(io.Discard)
 			parsers, err := hcl.LoadParsers(
 				testPath,
 				[]string{},
+				logrus.NewEntry(logger),
 				hcl.OptionWithBlockBuilder(
 					hcl.BlockBuilder{
 						MockFunc: func(a *hcl.Attribute) cty.Value {
 							return cty.StringVal(fmt.Sprintf("mocked-%s", a.Name()))
 						},
 						SetAttributes: []hcl.SetAttributesFunc{setMockAttributes(tt.attrs)},
+						Logger:        logrus.NewEntry(logger),
 					},
 				),
 			)
@@ -173,6 +188,7 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 
 			p := HCLProvider{
 				parsers: parsers,
+				logger:  logrus.NewEntry(logger),
 			}
 			got, err := p.LoadPlanJSONs()
 			require.NoError(t, err)

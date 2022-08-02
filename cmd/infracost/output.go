@@ -23,17 +23,19 @@ var (
 		"gitlab-comment",
 		"azure-repos-comment",
 		"bitbucket-comment",
+		"bitbucket-comment-summary",
 		"slack-message",
 	}
 
 	validCompareToFormats = map[string]bool{
-		"diff":                true,
-		"json":                true,
-		"github-comment":      true,
-		"gitlab-comment":      true,
-		"azure-repos-comment": true,
-		"bitbucket-comment":   true,
-		"slack-message":       true,
+		"diff":                      true,
+		"json":                      true,
+		"github-comment":            true,
+		"gitlab-comment":            true,
+		"azure-repos-comment":       true,
+		"bitbucket-comment":         true,
+		"bitbucket-comment-summary": true,
+		"slack-message":             true,
 	}
 )
 
@@ -169,7 +171,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 	cmd.Flags().StringArrayP("path", "p", []string{}, "Path to Infracost JSON files, glob patterns need quotes")
 	cmd.Flags().StringP("out-file", "o", "", "Save output to a file, helpful with format flag")
 
-	cmd.Flags().String("format", "table", "Output format: json, diff, table, html, github-comment, gitlab-comment, azure-repos-comment, bitbucket-comment, slack-message")
+	cmd.Flags().String("format", "table", "Output format: json, diff, table, html, github-comment, gitlab-comment, azure-repos-comment, bitbucket-comment, bitbucket-comment-summary, slack-message")
 	cmd.Flags().Bool("show-skipped", false, "List unsupported and free resources")
 	cmd.Flags().StringSlice("fields", []string{"monthlyQuantity", "unit", "monthlyCost"}, "Comma separated list of output fields: all,price,monthlyQuantity,unit,hourlyCost,monthlyCost.\nSupported by table and html output formats")
 
@@ -184,11 +186,6 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 }
 
 func shareCombinedRun(ctx *config.RunContext, combined output.Root, inputs []output.ReportInput) (string, string) {
-	if len(inputs) == 1 && inputs[0].Root.RunID != "" {
-		result := inputs[0].Root
-		return result.RunID, result.ShareURL
-	}
-
 	combinedRunIds := []string{}
 	for _, input := range inputs {
 		if id := input.Root.RunID; id != "" {

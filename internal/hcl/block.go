@@ -11,6 +11,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 )
@@ -240,18 +241,20 @@ type Block struct {
 	verbose  bool
 	newMock  func(attr *Attribute) cty.Value
 	Filename string
+	logger   *logrus.Entry
 }
 
 // BlockBuilder handles generating new Blocks as part of the parsing and evaluation process.
 type BlockBuilder struct {
 	MockFunc      func(a *Attribute) cty.Value
 	SetAttributes []SetAttributesFunc
+	Logger        *logrus.Entry
 }
 
 // NewBlock returns a Block with Context and child Blocks initialised.
 func (b BlockBuilder) NewBlock(filename string, hclBlock *hcl.Block, ctx *Context, moduleBlock *Block) *Block {
 	if ctx == nil {
-		ctx = NewContext(&hcl.EvalContext{}, nil)
+		ctx = NewContext(&hcl.EvalContext{}, nil, b.Logger)
 	}
 
 	isLoggingVerbose := strings.TrimSpace(os.Getenv("INFRACOST_HCL_DEBUG_VERBOSE")) == "true"
@@ -265,7 +268,7 @@ func (b BlockBuilder) NewBlock(filename string, hclBlock *hcl.Block, ctx *Contex
 			f(moduleBlock, hclBlock)
 		}
 
-		return &Block{
+		block := &Block{
 			Filename:    filename,
 			context:     ctx,
 			hclBlock:    hclBlock,
@@ -274,15 +277,18 @@ func (b BlockBuilder) NewBlock(filename string, hclBlock *hcl.Block, ctx *Contex
 			verbose:     isLoggingVerbose,
 			newMock:     b.MockFunc,
 		}
+		block.setLogger(b.Logger)
+
+		return block
 	}
 
 	// if we can't get a *hclsyntax.Body from this block let's try and parse blocks from the root level schema.
 	// This might be because the *hcl.Block represents a whole file contents.
 	content, _, diag := hclBlock.Body.PartialContent(terraformSchemaV012)
 	if diag != nil && diag.HasErrors() {
-		log.Debugf("error loading partial content from hcl file %s", diag.Error())
+		b.Logger.Debugf("error loading partial content from hcl file %s", diag.Error())
 
-		return &Block{
+		block := &Block{
 			context:     ctx,
 			hclBlock:    hclBlock,
 			moduleBlock: moduleBlock,
@@ -290,13 +296,16 @@ func (b BlockBuilder) NewBlock(filename string, hclBlock *hcl.Block, ctx *Contex
 			verbose:     isLoggingVerbose,
 			newMock:     b.MockFunc,
 		}
+		block.setLogger(b.Logger)
+
+		return block
 	}
 
 	for _, hb := range content.Blocks {
 		children = append(children, b.NewBlock(filename, hb, ctx, moduleBlock))
 	}
 
-	return &Block{
+	block := &Block{
 		context:     ctx,
 		hclBlock:    hclBlock,
 		moduleBlock: moduleBlock,
@@ -304,6 +313,9 @@ func (b BlockBuilder) NewBlock(filename string, hclBlock *hcl.Block, ctx *Contex
 		verbose:     isLoggingVerbose,
 		newMock:     b.MockFunc,
 	}
+
+	block.setLogger(b.Logger)
+	return block
 }
 
 // CloneBlock creates a duplicate of the block and sets the returned Block's Context to include the
@@ -313,7 +325,7 @@ func (b BlockBuilder) CloneBlock(block *Block, index cty.Value) *Block {
 	if block.context != nil {
 		childCtx = block.context.NewChild()
 	} else {
-		childCtx = NewContext(&hcl.EvalContext{}, nil)
+		childCtx = NewContext(&hcl.EvalContext{}, nil, b.Logger)
 	}
 
 	cloneHCL := *block.hclBlock
@@ -333,7 +345,7 @@ func (b BlockBuilder) CloneBlock(block *Block, index cty.Value) *Block {
 			case cty.String:
 				labels[position] = fmt.Sprintf("%s[%q]", clone.hclBlock.Labels[position], index.AsString())
 			default:
-				log.Debugf("Invalid key type in iterable: %#v", index.Type())
+				b.Logger.Debugf("Invalid key type in iterable: %#v", index.Type())
 				labels[position] = fmt.Sprintf("%s[%#v]", clone.hclBlock.Labels[position], index)
 			}
 		} else {
@@ -353,12 +365,12 @@ func (b BlockBuilder) CloneBlock(block *Block, index cty.Value) *Block {
 // BuildModuleBlocks loads all the Blocks for the module at the given path
 func (b BlockBuilder) BuildModuleBlocks(block *Block, modulePath string) (Blocks, error) {
 	var blocks Blocks
-	moduleFiles, err := loadDirectory(modulePath, true)
+	moduleFiles, err := loadDirectory(b.Logger, modulePath, true)
 	if err != nil {
 		return blocks, fmt.Errorf("failed to load module %s: %w", block.Label(), err)
 	}
 
-	moduleCtx := NewContext(&hcl.EvalContext{}, nil)
+	moduleCtx := NewContext(&hcl.EvalContext{}, nil, b.Logger)
 	for _, file := range moduleFiles {
 		fileBlocks, err := loadBlocksFromFile(file, nil)
 		if err != nil {
@@ -366,7 +378,7 @@ func (b BlockBuilder) BuildModuleBlocks(block *Block, modulePath string) (Blocks
 		}
 
 		if len(fileBlocks) > 0 {
-			log.Debugf("Added %d blocks from %s...", len(fileBlocks), fileBlocks[0].DefRange.Filename)
+			b.Logger.Debugf("Added %d blocks from %s...", len(fileBlocks), fileBlocks[0].DefRange.Filename)
 		}
 
 		for _, fileBlock := range fileBlocks {
@@ -387,7 +399,7 @@ type SetAttributesFunc func(moduleBlock *Block, block *hcl.Block)
 // on the block.
 func SetUUIDAttributes(moduleBlock *Block, block *hcl.Block) {
 	if body, ok := block.Body.(*hclsyntax.Body); ok {
-		if block.Type == "resource" || block.Type == "data" {
+		if (block.Type == "resource" || block.Type == "data") && body.Attributes != nil {
 			_, withCount := body.Attributes["count"]
 			if _, ok := body.Attributes["id"]; !ok {
 				body.Attributes["id"] = newUniqueAttribute("id", withCount)
@@ -492,6 +504,14 @@ type ModuleMetadata struct {
 	BlockName string `json:"blockName"`
 }
 
+func (b *Block) setLogger(logger *logrus.Entry) {
+	blockLogger := logger.WithFields(logrus.Fields{
+		"block_name": b.FullName(),
+	})
+
+	b.logger = blockLogger
+}
+
 // CallDetails returns the tree of module calls that were used to create this resource. Each step of the tree
 // contains a full file path and block name that were used to create the resource.
 //
@@ -549,13 +569,7 @@ func (b *Block) ModuleSource() string {
 		return ""
 	}
 
-	value := attr.Value()
-
-	if value.Type() != cty.String {
-		return ""
-	}
-
-	return value.AsString()
+	return attr.AsString()
 }
 
 // Provider returns the provider by first checking if it is explicitly set as an attribute, if it is not
@@ -568,16 +582,16 @@ func (b *Block) Provider() string {
 
 	attr := b.GetAttribute("provider")
 	if attr != nil {
-		value := attr.Value()
+		value := attr.AsString()
 		r, err := attr.Reference()
 		if err == nil {
 			// An explicit provider is provided so use that
 			return r.String()
 		}
 
-		if value.Type() == cty.String {
+		if value != "" {
 			// An explicit provider is provided so use that
-			return value.AsString()
+			return value
 		}
 	}
 
@@ -653,7 +667,15 @@ func (b *Block) GetAttributes() []*Attribute {
 	}
 
 	for _, attr := range b.getHCLAttributes() {
-		results = append(results, &Attribute{newMock: b.newMock, HCLAttr: attr, Ctx: b.context, Verbose: b.verbose})
+		results = append(results, &Attribute{
+			newMock: b.newMock,
+			HCLAttr: attr,
+			Ctx:     b.context,
+			Verbose: b.verbose,
+			Logger: b.logger.WithFields(logrus.Fields{
+				"attribute_name": attr.Name,
+			}),
+		})
 	}
 
 	return results

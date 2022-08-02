@@ -45,7 +45,7 @@ func NewAzureRMVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageDat
 	}
 
 	if strings.ToLower(os) == "linux" {
-		costComponents = append(costComponents, linuxVirtualMachineCostComponent(region, instanceType))
+		costComponents = append(costComponents, linuxVirtualMachineCostComponent(region, instanceType, nil))
 	}
 
 	if strings.ToLower(os) == "windows" {
@@ -53,7 +53,7 @@ func NewAzureRMVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageDat
 		if d.Get("license_type").Type != gjson.Null {
 			licenseType = d.Get("license_type").String()
 		}
-		costComponents = append(costComponents, windowsVirtualMachineCostComponent(region, instanceType, licenseType))
+		costComponents = append(costComponents, windowsVirtualMachineCostComponent(region, instanceType, licenseType, nil))
 	}
 
 	r := &schema.Resource{
@@ -64,14 +64,16 @@ func NewAzureRMVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageDat
 
 	schema.MultiplyQuantities(r, capacity)
 
-	diskData := d.Get("storage_profile_os_disk").Array()[0]
 	var storageOperations *decimal.Decimal
-	if u != nil {
-		if v, ok := u.Get("storage_profile_os_disk").Map()["monthly_disk_operations"]; ok {
-			storageOperations = decimalPtr(decimal.NewFromInt(v.Int()))
+	if len(d.Get("storage_profile_os_disk").Array()) > 0 {
+		diskData := d.Get("storage_profile_os_disk").Array()[0]
+		if u != nil {
+			if v, ok := u.Get("storage_profile_os_disk").Map()["monthly_disk_operations"]; ok {
+				storageOperations = decimalPtr(decimal.NewFromInt(v.Int()))
+			}
 		}
+		r.SubResources = append(r.SubResources, legacyOSDiskSubResource(region, diskData, storageOperations))
 	}
-	r.SubResources = append(r.SubResources, legacyOSDiskSubResource(region, diskData, storageOperations))
 
 	if u != nil {
 		if v, ok := u.Get("storage_profile_data_disk").Map()["monthly_disk_operations"]; ok {

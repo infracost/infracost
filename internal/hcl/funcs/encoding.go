@@ -5,13 +5,14 @@ import (
 	"compress/gzip"
 	"encoding/base64"
 	"fmt"
-	"log"
 	"net/url"
 	"unicode/utf8"
 
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/function"
 	"golang.org/x/text/encoding/ianaindex"
+
+	"github.com/infracost/infracost/internal/logging"
 )
 
 // Base64DecodeFunc constructs a function that decodes a string containing a base64 sequence.
@@ -30,7 +31,7 @@ var Base64DecodeFunc = function.New(&function.Spec{
 			return cty.UnknownVal(cty.String), fmt.Errorf("failed to decode base64 data '%s'", s)
 		}
 		if !utf8.Valid([]byte(sDec)) {
-			log.Printf("[DEBUG] the result of decoding the provided string is not valid UTF-8: %s", sDec)
+			logging.Logger.Debugf("the result of decoding the provided string is not valid UTF-8: %s", sDec)
 			return cty.UnknownVal(cty.String), fmt.Errorf("the result of decoding the provided string is not valid UTF-8")
 		}
 		return cty.StringVal(string(sDec)), nil

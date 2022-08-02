@@ -1,0 +1,4 @@
+{
+  "ECS_TASK_CPU": "4 vCPU",
+  "ECS_TASK_RAM": "4 GB"
+}

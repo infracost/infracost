@@ -66,6 +66,8 @@ type BitbucketExtra struct {
 	// ServerURL is the URL of the Bitbucket server. This can be set to a custom URL if
 	// using Bitbucket Server/Data Center. If not set, the default Bitbucket server URL will be used.
 	ServerURL string
+	// OmitDetails is used to specify a format that excludes details output.
+	OmitDetails bool
 	// Tag is used to identify the Infracost comment.
 	Tag string
 	// Token is the Bitbucket access token.

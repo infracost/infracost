@@ -20,6 +20,8 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
 
+	"github.com/infracost/infracost/internal/logging"
+
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
@@ -79,16 +81,6 @@ func addRunFlags(cmd *cobra.Command) {
 	// These are deprecated and will show a warning if used without --terraform-force-cli
 	_ = cmd.Flags().MarkHidden("terraform-plan-flags")
 	_ = cmd.Flags().MarkHidden("terraform-init-flags")
-}
-
-// panicError is used to collect goroutine panics into an error interface so
-// that we can do type assertion on err checking.
-type panicError struct {
-	msg string
-}
-
-func (p *panicError) Error() string {
-	return p.msg
 }
 
 func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
@@ -271,7 +263,7 @@ func newParallelRunner(cmd *cobra.Command, runCtx *config.RunContext) (*parallel
 		}
 
 		runCtx.Config.LogLevel = "info"
-		err := runCtx.Config.ConfigureLogger()
+		err := logging.ConfigureBaseLogger(runCtx.Config)
 		if err != nil {
 			return nil, err
 		}
@@ -293,6 +285,7 @@ func (r *parallelRunner) run() ([]projectResult, error) {
 
 	errGroup, _ := errgroup.WithContext(context.Background())
 	for i := 0; i < r.parallelism; i++ {
+		i := i
 		errGroup.Go(func() (err error) {
 			// defer a function to recover from any panics spawned by child goroutines.
 			// This is done as recover works only in the same goroutine that it is called.
@@ -301,12 +294,14 @@ func (r *parallelRunner) run() ([]projectResult, error) {
 			defer func() {
 				e := recover()
 				if e != nil {
-					err = &panicError{msg: fmt.Sprintf("%s\n%s", e, debug.Stack())}
+					err = clierror.NewPanicError(fmt.Errorf("%s", e), debug.Stack())
 				}
 			}()
 
 			for job := range jobs {
-				ctx := config.NewProjectContext(r.runCtx, job.projectCfg)
+				ctx := config.NewProjectContext(r.runCtx, job.projectCfg, log.Fields{
+					"routine": i,
+				})
 				configProjects, err := r.runProjectConfig(ctx)
 				if err != nil {
 					return err
@@ -366,7 +361,7 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 		m := fmt.Sprintf("%s\n\n", err)
 		m += fmt.Sprintf("Try setting --path to a Terraform plan JSON file. See %s for how to generate this.", ui.LinkString("https://infracost.io/troubleshoot"))
 
-		return nil, clierror.NewSanitizedError(errors.New(m), "Could not detect path type")
+		return nil, clierror.NewCLIError(errors.New(m), "Could not detect path type")
 	}
 
 	ctx.SetContextValue("projectType", provider.Type())
@@ -381,8 +376,8 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 	if r.cmd.Name() == "diff" && provider.Type() == "terraform_state_json" {
 		m := "Cannot use Terraform state JSON with the infracost diff command.\n\n"
 		m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
-		m += " - Terraform plan JSON file\n - Terraform/Terragrunt directory\n - Terraform plan file"
-		return nil, clierror.NewSanitizedError(errors.New(m), "Cannot use Terraform state JSON with the infracost diff command")
+		m += fmt.Sprintf(" - Terraform/Terragrunt directory\n - Terraform plan JSON file, see %s for how to generate this.", ui.SecondaryLinkString("https://infracost.io/troubleshoot"))
+		return nil, clierror.NewCLIError(errors.New(m), "Cannot use Terraform state JSON with the infracost diff command")
 	}
 
 	m := fmt.Sprintf("Detected %s at %s", provider.DisplayType(), ui.DisplayPath(ctx.ProjectConfig.Path))
@@ -694,8 +689,8 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 
 	if cmd.Name() != "infracost" && !hasPathFlag && !hasConfigFile {
 		m := fmt.Sprintf("No path specified\n\nUse the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
-		m += " - Terraform plan JSON file\n - Terraform/Terragrunt directory\n - Terraform plan file\n - Terraform state JSON file"
-		m += "\n\nAlternatively, use --config-file to process multiple projects, see " + ui.SecondaryLinkString("https://infracost.io/config-file")
+		m += fmt.Sprintf(" - Terraform/Terragrunt directory\n - Terraform plan JSON file, see %s for how to generate this.", ui.SecondaryLinkString("https://infracost.io/troubleshoot"))
+		m += fmt.Sprintf("\n\nAlternatively, use --config-file to process multiple projects, see %s", ui.SecondaryLinkString("https://infracost.io/config-file"))
 
 		ui.PrintUsage(cmd)
 		return errors.New(m)

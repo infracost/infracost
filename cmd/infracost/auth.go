@@ -11,10 +11,9 @@ import (
 
 func authCmd(ctx *config.RunContext) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:    "auth",
-		Short:  "Get a free API key, or log in to your existing account",
-		Long:   "Get a free API key, or log in to your existing account",
-		Hidden: true,
+		Use:   "auth",
+		Short: "Get a free API key, or log in to your existing account",
+		Long:  "Get a free API key, or log in to your existing account",
 		Example: fmt.Sprintf(`  Get a free API key, or log in to your existing account:
 
       infracost auth login

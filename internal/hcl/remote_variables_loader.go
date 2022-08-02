@@ -7,6 +7,7 @@ import (
 	"sort"
 
 	"github.com/pkg/errors"
+	log "github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 
 	"github.com/infracost/infracost/internal/extclient"
@@ -18,6 +19,7 @@ type RemoteVariablesLoader struct {
 	client         *extclient.AuthedAPIClient
 	localWorkspace string
 	newSpinner     ui.SpinnerFunc
+	logger         *log.Entry
 }
 
 // RemoteVariablesLoaderOption defines a function that can set properties on an RemoteVariablesLoader.
@@ -82,7 +84,7 @@ func RemoteVariablesLoaderWithSpinner(f ui.SpinnerFunc) RemoteVariablesLoaderOpt
 }
 
 // NewRemoteVariablesLoader constructs a new loader for fetching remote variables.
-func NewRemoteVariablesLoader(client *extclient.AuthedAPIClient, localWorkspace string, opts ...RemoteVariablesLoaderOption) *RemoteVariablesLoader {
+func NewRemoteVariablesLoader(client *extclient.AuthedAPIClient, localWorkspace string, logger *log.Entry, opts ...RemoteVariablesLoaderOption) *RemoteVariablesLoader {
 	if localWorkspace == "" {
 		localWorkspace = os.Getenv("TF_WORKSPACE")
 	}
@@ -90,6 +92,7 @@ func NewRemoteVariablesLoader(client *extclient.AuthedAPIClient, localWorkspace 
 	r := &RemoteVariablesLoader{
 		client:         client,
 		localWorkspace: localWorkspace,
+		logger:         logger,
 	}
 
 	for _, opt := range opts {
@@ -134,18 +137,18 @@ func (r *RemoteVariablesLoader) Load(blocks Blocks) (map[string]cty.Value, error
 	endpoint := fmt.Sprintf("/api/v2/organizations/%s/workspaces/%s", config.organization, config.workspace)
 	body, err := r.client.Get(endpoint)
 	if err != nil {
-		log.Warnf("could not request Terraform workspace: %s for organization: %s error: %s", config.workspace, config.organization, err)
+		r.logger.WithError(err).Warnf("could not request Terraform workspace: %s for organization: %s", config.workspace, config.organization)
 		return vars, nil
 	}
 
 	var workspaceResponse tfcWorkspaceResponse
 	if json.Unmarshal(body, &workspaceResponse) != nil {
-		log.Warnf("malformed Terraform API response using workspace: %s organization: %s error: %s", config.workspace, config.organization, err)
+		r.logger.WithError(err).Warnf("malformed Terraform API response using workspace: %s organization: %s", config.workspace, config.organization)
 		return vars, nil
 	}
 
 	if workspaceResponse.Data.Attributes.ExecutionMode == "local" {
-		log.Debugf("Terraform workspace %s does use local execution, skipping downloading remote variables", config.workspace)
+		r.logger.Debugf("Terraform workspace %s does use local execution, skipping downloading remote variables", config.workspace)
 		return vars, nil
 	}
 
@@ -314,21 +317,16 @@ func (r *RemoteVariablesLoader) getBackendOrganizationWorkspace(blocks Blocks) (
 }
 
 func getAttribute(block *Block, name string) string {
-	result := ""
-
 	if block == nil {
-		return result
+		return ""
 	}
 
 	attr := block.GetAttribute(name)
 	if attr != nil {
-		val := attr.Value()
-		if !val.IsNull() {
-			result = val.AsString()
-		}
+		return attr.AsString()
 	}
 
-	return result
+	return ""
 }
 
 func getVarValue(variable tfcVar) cty.Value {

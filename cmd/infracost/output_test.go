@@ -35,6 +35,10 @@ func TestOutputFormatBitbucketCommentWithProjectNames(t *testing.T) {
 		}, nil)
 }
 
+func TestOutputFormatBitbucketCommentSummary(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--format", "bitbucket-comment-summary", "--path", "./testdata/terraform_v0.14_nochange_breakdown.json"}, nil)
+}
+
 func TestOutputFormatGitHubComment(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--format", "github-comment", "--path", "./testdata/example_out.json", "--path", "./testdata/terraform_v0.14_breakdown.json", "--path", "./testdata/terraform_v0.14_nochange_breakdown.json"}, nil)
 }
