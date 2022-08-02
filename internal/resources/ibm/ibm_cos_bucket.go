@@ -73,7 +73,7 @@ func (r *IbmCosBucket) MonthlyAverageCapacityCostComponent() *schema.CostCompone
 			AttributeFilters: []*schema.AttributeFilter{},
 		},
 		PriceFilter: &schema.PriceFilter{
-			Unit: strPtr("ARCHIVE_RESTORE"),
+			Unit: strPtr("FLEX_MAX_CAP"),
 		},
 	}
 }
