@@ -6,10 +6,6 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-const regionLocation string = "region_location"
-const singleSiteLocation string = "single_site_location"
-const crossRegionLocation string = "cross_region_location"
-
 func getIbmCosBucketRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:                "ibm_cos_bucket",
@@ -19,6 +15,10 @@ func getIbmCosBucketRegistryItem() *schema.RegistryItem {
 }
 
 func getLocation(d *schema.ResourceData) (string, string) {
+	const regionLocation string = "region_location"
+	const singleSiteLocation string = "single_site_location"
+	const crossRegionLocation string = "cross_region_location"
+
 	if d.Get(regionLocation).Type != gjson.Null {
 		return d.Get(regionLocation).String(), regionLocation
 	}
