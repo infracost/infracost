@@ -249,6 +249,7 @@ var ciMap = ciEnvMap{
 		"TDDIUM":               "tddium",
 		"GREENHOUSE":           "greenhouse",
 		"CIRRUS_CI":            "cirrusci",
+		"TS_ENV":               "terraspace",
 	},
 	prefixes: map[string]string{
 		"ATLANTIS_":  "atlantis",
@@ -256,6 +257,8 @@ var ciMap = ciEnvMap{
 		"CONCOURSE_": "concourse",
 		"SPACELIFT_": "spacelift",
 		"HARNESS_":   "harness",
+		"TERRATEAM_": "terrateam",
+		"KEPTN_":     "keptn",
 	},
 }
 
