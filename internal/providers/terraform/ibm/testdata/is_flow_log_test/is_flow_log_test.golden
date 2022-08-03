@@ -23,10 +23,9 @@
  OVERALL TOTAL                                                                                     $2,999.50 
 ──────────────────────────────────
 8 cloud resources were detected:
-∙ 4 were estimated, 3 of which include usage-based costs, see https://infracost.io/usage-file
+∙ 5 were estimated, 3 of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 2 were free:
   ∙ 1 x ibm_is_ssh_key
   ∙ 1 x ibm_is_subnet
-∙ 2 are not supported yet, see https://infracost.io/requested-resources:
-  ∙ 1 x ibm_cos_bucket
+∙ 1 is not supported yet, see https://infracost.io/requested-resources:
   ∙ 1 x ibm_is_image
