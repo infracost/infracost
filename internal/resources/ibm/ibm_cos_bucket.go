@@ -12,10 +12,11 @@ import (
 // Pricing information: https://cloud.ibm.com/objectstorage/create#pricing
 
 type IbmCosBucket struct {
-	Address      string
-	Region       string
-	Location     string
-	StorageClass string
+	Address            string
+	Region             string
+	Location           string
+	LocationIdentifier string
+	StorageClass       string
 
 	MonthlyAverageCapacity *float64 `infracost_usage:"monthly_average_capacity"`
 	PublicStandardEgress   *float64 `infracost_usage:"public_standard_egress"`
@@ -353,9 +354,9 @@ func (r *IbmCosBucket) BuildResource() *schema.Resource {
 
 	costComponents := []*schema.CostComponent{}
 
-	if r.StorageClass == "archive" && r.Location == "region_location" {
+	if r.StorageClass == "archive" && r.LocationIdentifier == "region_location" {
 		costComponents = append(costComponents, r.ArchiveCapacityCostComponent(), r.ArchiveRestoreCostComponent())
-	} else if r.StorageClass == "aspera" && r.Location == "region_location" || r.Location == "cross_region_location" {
+	} else if r.StorageClass == "aspera" && r.LocationIdentifier == "region_location" || r.LocationIdentifier == "cross_region_location" {
 		costComponents = append(costComponents, r.AsperaEgressCostComponent(), r.AsperaIngressCostComponent())
 	} else {
 		costComponents = append(
