@@ -164,7 +164,7 @@ func (r *IbmCosBucket) PublicStandardEgressCostComponent() *schema.CostComponent
 
 	var q *decimal.Decimal
 
-	if r.ClassBRequestCount != nil {
+	if r.PublicStandardEgress != nil {
 		q = decimalPtr(decimal.NewFromInt(int64(*r.PublicStandardEgress)))
 	}
 
