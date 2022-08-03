@@ -237,7 +237,7 @@ func (r *IbmCosBucket) AsperaEgressCostComponent() *schema.CostComponent {
 
 	var q *decimal.Decimal
 
-	if r.AsperaIngress != nil {
+	if r.AsperaEgress != nil {
 		q = decimalPtr(decimal.NewFromInt(int64(*r.AsperaEgress)))
 	}
 
