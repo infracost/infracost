@@ -351,17 +351,12 @@ func (r *IbmCosBucket) MonthlyDataRetrievalCostComponent() *schema.CostComponent
 // This method is called after the resource is initialised by an IaC provider.
 // See providers folder for more information.
 func (r *IbmCosBucket) BuildResource() *schema.Resource {
-
 	costComponents := []*schema.CostComponent{}
 
-	if r.LocationIdentifier == "region_location" {
-		if r.ArchiveCapacity != nil || r.ArchiveRestore != nil {
-			costComponents = append(costComponents, r.ArchiveCapacityCostComponent(), r.ArchiveRestoreCostComponent())
-		}
-	} else if r.LocationIdentifier == "region_location" || r.LocationIdentifier == "cross_region_location" {
-		if r.AsperaEgress != nil || r.AsperaIngress != nil {
-			costComponents = append(costComponents, r.AsperaEgressCostComponent(), r.AsperaIngressCostComponent())
-		}
+	if r.LocationIdentifier == "region_location" && (r.ArchiveCapacity != nil || r.ArchiveRestore != nil) {
+		costComponents = append(costComponents, r.ArchiveCapacityCostComponent(), r.ArchiveRestoreCostComponent())
+	} else if (r.LocationIdentifier == "region_location" || r.LocationIdentifier == "cross_region_location") && (r.AsperaEgress != nil || r.AsperaIngress != nil) {
+		costComponents = append(costComponents, r.AsperaEgressCostComponent(), r.AsperaIngressCostComponent())
 	} else {
 		costComponents = append(
 			costComponents,
