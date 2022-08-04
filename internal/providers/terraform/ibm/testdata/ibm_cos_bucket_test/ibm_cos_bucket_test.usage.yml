@@ -17,3 +17,8 @@ resource_usage:
   ibm_cos_bucket.archive-us-south:
     archive_capacity: 1000
     archive_restore: 1000
+  ibm_cos_bucket.standard-ams03:
+     # monthly_average_capacity: 1000
+    public_standard_egress: 1000
+    class_a_request_count: 10000
+    class_b_request_count: 10000

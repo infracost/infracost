@@ -49,3 +49,10 @@ resource "ibm_cos_bucket" "archive-us-south" {
   storage_class        = "standard"
   region_location      = "us-south"
 }
+
+resource "ibm_cos_bucket" "standard-ams03" {
+  bucket_name          = "standard-bucket-at-ams03"
+  resource_instance_id = ibm_resource_instance.cos_instance.id
+  storage_class        = "standard"
+  single_site_location      = "ams03"
+}
