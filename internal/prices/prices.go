@@ -3,6 +3,7 @@ package prices
 import (
 	"fmt"
 	"runtime"
+	"sort"
 
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/config"
@@ -186,6 +187,11 @@ func setCostComponentPrice(ctx *config.RunContext, currency string, r *schema.Re
 				EndUsageAmount:   end,
 			}
 		}
+		sort.SliceStable(priceTiers, func(i, j int) bool {
+			startI := priceTiers[i].StartUsageAmount
+			startJ := priceTiers[j].StartUsageAmount
+			return startI.LessThan(startJ)
+		})
 		c.SetPriceTiers(priceTiers)
 	}
 	c.SetPriceHash(prices[0].Get("priceHash").String())
