@@ -39,11 +39,6 @@ var IbmCosBucketUsageSchema = []*schema.UsageItem{
 	{Key: "class_a_request_count", ValueType: schema.Int64, DefaultValue: 0},
 	{Key: "class_b_request_count", ValueType: schema.Int64, DefaultValue: 0},
 	{Key: "monthly_data_retrieval", ValueType: schema.Int64, DefaultValue: 0},
-	{
-		Key:          "monthly_egress_data_transfer_gb",
-		ValueType:    schema.SubResourceUsage,
-		DefaultValue: 0,
-	},
 }
 
 // PopulateUsage parses the u schema.UsageData into the IbmCosBucket.
