@@ -21,13 +21,13 @@ func (r *DNSZone) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *DNSZone) BuildResource() *schema.Resource {
-	region := r.Region
 
-	if strings.HasPrefix(strings.ToLower(region), "usgov") {
+	var region string
+	if strings.HasPrefix(strings.ToLower(r.Region), "usgov") {
 		region = "US Gov Zone 1"
-	} else if strings.HasPrefix(strings.ToLower(region), "germany") {
+	} else if strings.HasPrefix(strings.ToLower(r.Region), "germany") {
 		region = "DE Zone 1"
-	} else if strings.HasPrefix(strings.ToLower(region), "china") {
+	} else if strings.HasPrefix(strings.ToLower(r.Region), "china") {
 		region = "Zone 1 (China)"
 	} else {
 		region = "Zone 1"
@@ -41,6 +41,7 @@ func (r *DNSZone) BuildResource() *schema.Resource {
 		CostComponents: costComponents, UsageSchema: DNSZoneUsageSchema,
 	}
 }
+
 func hostedPublicZoneCostComponent(region string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "Hosted zone",
