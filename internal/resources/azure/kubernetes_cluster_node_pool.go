@@ -27,7 +27,6 @@ func (r *KubernetesClusterNodePool) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *KubernetesClusterNodePool) BuildResource() *schema.Resource {
-	region := r.Region
 
 	nodeCount := decimal.NewFromInt(1)
 	if r.NodeCount != 0 {
@@ -37,7 +36,7 @@ func (r *KubernetesClusterNodePool) BuildResource() *schema.Resource {
 		nodeCount = decimal.NewFromInt(*r.Nodes)
 	}
 
-	return aksClusterNodePool(r.Address, region, r.VMSize, r.OSDiskType, r.OSDiskSizeGB, nodeCount)
+	return aksClusterNodePool(r.Address, r.Region, r.VMSize, r.OSDiskType, r.OSDiskSizeGB, nodeCount)
 }
 
 func aksClusterNodePool(name, region, instanceType, osDiskType string, osDiskSizeGB int64, nodeCount decimal.Decimal) *schema.Resource {
