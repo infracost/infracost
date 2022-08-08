@@ -118,7 +118,11 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 			localWorkspace),
 		)
 	}
-	options = append(options, hcl.OptionWithCredentialsSource(credsSource))
+
+	options = append(options,
+		hcl.OptionWithTerraformWorkspace(localWorkspace),
+		hcl.OptionWithCredentialsSource(credsSource),
+	)
 
 	logger := ctx.Logger().WithFields(log.Fields{"provider": "terraform_dir"})
 	parsers, err := hcl.LoadParsers(ctx.ProjectConfig.Path, ctx.ProjectConfig.ExcludePaths, logger, options...)
