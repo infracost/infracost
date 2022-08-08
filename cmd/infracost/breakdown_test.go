@@ -382,3 +382,18 @@ func TestBreakdownWithPrivateTerraformRegistryModule(t *testing.T) {
 		nil,
 	)
 }
+
+func TestBreakdownWithWorkspace(t *testing.T) {
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path",
+			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+			"--terraform-workspace",
+			"prod",
+		},
+		nil,
+	)
+}
