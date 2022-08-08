@@ -1188,22 +1188,12 @@ resource_usage:
   #
   # Cloud Object Storage
   #
-  ibm_cos_bucket.standard-us-south:
+  ibm_cos_bucket:
     public_standard_egress: 1000
     class_a_request_count: 10000
     class_b_request_count: 10000
-  ibm_cos_bucket.smart-us-south:
-    public_standard_egress: 1000
     monthly_data_retrieval: 1000
-    class_a_request_count: 10000
-    class_b_request_count: 10000
-  ibm_cos_bucket.aspera-us:
     aspera_ingress: 1000
     aspera_egress: 1000
-  ibm_cos_bucket.archive-us-south:
     archive_capacity: 1000
     archive_restore: 1000
-  ibm_cos_bucket.standard-ams03:
-    public_standard_egress: 1000
-    class_a_request_count: 10000
-    class_b_request_count: 10000
