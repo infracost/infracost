@@ -1189,11 +1189,11 @@ resource_usage:
   # Cloud Object Storage
   #
   ibm_cos_bucket:
-    public_standard_egress: 1000
-    class_a_request_count: 10000
-    class_b_request_count: 10000
-    monthly_data_retrieval: 1000
-    aspera_ingress: 1000
-    aspera_egress: 1000
-    archive_capacity: 1000
-    archive_restore: 1000
+    public_standard_egress: 1000 # Amount of data downloaded in GB
+    class_a_request_count: 10000 # Monthly number of Class A requests
+    class_b_request_count: 10000 # Monthly number of Class B requests
+    monthly_data_retrieval: 1000 # Amount of data retrieved in GB
+    aspera_ingress: 1000 # Amount of data uploaded with Aspera in GB
+    aspera_egress: 1000 # Amount of data downloaded with Aspera in GB
+    archive_capacity: 1000 # Amount of your estimated storage in GB
+    archive_restore: 1000 # Amount of data restored from its archived state in GB
