@@ -32,7 +32,7 @@ jobs:
           terragrunt --version
 
       - name: Test (unit and shared integration)
-        run: make ARGS="-update -v -cover" test_shared_int
+        run: make test_shared_int
         env:
           INFRACOST_API_KEY: "00000000000000000000000000000000"
           INFRACOST_LOG_LEVEL: info
