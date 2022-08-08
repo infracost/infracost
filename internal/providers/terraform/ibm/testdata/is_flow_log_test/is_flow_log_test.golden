@@ -1,6 +1,12 @@
 
  Name                                                            Monthly Qty  Unit              Monthly Cost 
                                                                                                              
+ ibm_cos_bucket.testCosBucket                                                                                
+ ├─ Monthly Average Capacity                                          10,000  GB                       $0.00 
+ ├─ Class A requests                                                  10,000  1k API calls             $0.00 
+ ├─ Class B requests                                                  10,000  10k API calls            $0.00 
+ └─ Public Standard Egress                                             1,000  GB                       $0.00 
+                                                                                                             
  ibm_is_flow_log.testFlowLog                                                                                 
  ├─ Flow Log Collector us-south - free allowance (first 5GB)               5  GB                       $0.00 
  └─ Flow Log Collector us-south (first 10000 GB)                      10,000  GB                   $1,000.00 

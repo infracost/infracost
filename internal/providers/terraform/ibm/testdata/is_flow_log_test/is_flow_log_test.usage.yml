@@ -1,4 +1,9 @@
 version: 0.1
 resource_usage:
+  ibm_cos_bucket.testCosBucket:
+    monthly_average_capacity: 10000
+    public_standard_egress: 1000
+    class_a_request_count: 10000
+    class_b_request_count: 10000
   ibm_is_flow_log.testFlowLog:
     transmitted_gb: 30000
