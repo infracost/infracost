@@ -1,7 +1,7 @@
 version: 0.1
 resource_usage:
   ibm_resource_instance.resource_instance_kms:
-    kms_items_per_month: 300
+    kms_key_versions: 300
   ibm_resource_instance.resource_instance_secrets_manager:
     secretsmanager_instance: 1
     secretsmanager_active_secrets: 400

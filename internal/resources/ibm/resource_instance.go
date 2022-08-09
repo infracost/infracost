@@ -21,7 +21,8 @@ type ResourceInstance struct {
 
 	// KMS
 	// Catalog Link: https://cloud.ibm.com/catalog/services/key-protect
-	KMS_ItemsPerMonth *int64 `infracost_usage:"kms_items_per_month"`
+	// Pricing Link: https://cloud.ibm.com/docs/key-protect?topic=key-protect-pricing-plan&interface=ui
+	KMS_KeyVersions *int64 `infracost_usage:"kms_key_versions"`
 	// Secrets Manager
 	// Catalog link: https://cloud.ibm.com/catalog/services/secrets-manager
 	SecretsManager_Instance      *int64 `infracost_usage:"secretsmanager_instance"`
@@ -36,7 +37,7 @@ type ResourceInstance struct {
 
 // ResourceInstanceUsageSchema defines a list which represents the usage schema of ResourceInstance.
 var ResourceInstanceUsageSchema = []*schema.UsageItem{
-	{Key: "kms_items_per_month", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "kms_key_versions", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "secretsmanager_instance", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "secretsmanager_active_secrets", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "appid_authentications", DefaultValue: 0, ValueType: schema.Int64},
@@ -52,17 +53,17 @@ func (r *ResourceInstance) PopulateUsage(u *schema.UsageData) {
 
 type ResourceCostComponentsFunc func(*ResourceInstance) []*schema.CostComponent
 
-func KMSFreeCostComponent(r *ResourceInstance) *schema.CostComponent {
+func KMSKeyVersionsFreeCostComponent(r *ResourceInstance) *schema.CostComponent {
 	var q *decimal.Decimal
-	if r.KMS_ItemsPerMonth != nil {
-		q = decimalPtr(decimal.NewFromInt(*r.KMS_ItemsPerMonth))
-		if q.GreaterThan(decimal.NewFromInt(20)) {
-			q = decimalPtr(decimal.NewFromInt(20))
+	if r.KMS_KeyVersions != nil {
+		q = decimalPtr(decimal.NewFromInt(*r.KMS_KeyVersions))
+		if q.GreaterThan(decimal.NewFromInt(5)) {
+			q = decimalPtr(decimal.NewFromInt(5))
 		}
 	}
 	costComponent := schema.CostComponent{
-		Name:            fmt.Sprintf("Items free allowance (first 20 Items)"),
-		Unit:            "Item",
+		Name:            fmt.Sprintf("Key versions free allowance (first 5 Key Versions)"),
+		Unit:            "Key Versions",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
@@ -75,19 +76,19 @@ func KMSFreeCostComponent(r *ResourceInstance) *schema.CostComponent {
 	return &costComponent
 }
 
-func KMSTierCostComponents(r *ResourceInstance) *schema.CostComponent {
+func KMSKeyVersionCostComponents(r *ResourceInstance) *schema.CostComponent {
 	var q *decimal.Decimal
-	if r.KMS_ItemsPerMonth != nil {
-		q = decimalPtr(decimal.NewFromInt(*r.KMS_ItemsPerMonth))
-		if q.LessThanOrEqual(decimal.NewFromInt(20)) {
+	if r.KMS_KeyVersions != nil {
+		q = decimalPtr(decimal.NewFromInt(*r.KMS_KeyVersions))
+		if q.LessThanOrEqual(decimal.NewFromInt(5)) {
 			q = decimalPtr(decimal.NewFromInt(0))
 		} else {
-			q = decimalPtr(q.Sub(decimal.NewFromInt(20)))
+			q = decimalPtr(q.Sub(decimal.NewFromInt(5)))
 		}
 	}
 	costComponent := schema.CostComponent{
-		Name:            fmt.Sprintf("Items"),
-		Unit:            "Item",
+		Name:            fmt.Sprintf("Key versions"),
+		Unit:            "Key Versions",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
@@ -104,8 +105,8 @@ func KMSTierCostComponents(r *ResourceInstance) *schema.CostComponent {
 
 func GetKMSCostComponents(r *ResourceInstance) []*schema.CostComponent {
 	return []*schema.CostComponent{
-		KMSFreeCostComponent(r),
-		KMSTierCostComponents(r),
+		KMSKeyVersionsFreeCostComponent(r),
+		KMSKeyVersionCostComponents(r),
 	}
 }
 
