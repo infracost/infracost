@@ -2,7 +2,9 @@ package prices
 
 import (
 	"fmt"
+	"math"
 	"runtime"
+	"sort"
 
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/config"
@@ -169,7 +171,11 @@ func setCostComponentPrice(ctx *config.RunContext, currency string, r *schema.Re
 			}
 			end, err := decimal.NewFromString(price.Get("endUsageAmount").String())
 			if err != nil {
-				log.Warnf("Error converting endUsageAmount to '%v' (using 0.00)  '%v': %s", currency, price.Get("endUsageAmount").String(), err.Error())
+				if price.Get("endUsageAmount").String() == "Inf" {
+					end = decimal.NewFromInt(math.MaxInt64)
+				} else {
+					log.Warnf("Error converting endUsageAmount to '%v' (using 0.00)  '%v': %s", currency, price.Get("endUsageAmount").String(), err.Error())
+				}
 			}
 			var name string
 			if i == 0 {
@@ -186,6 +192,11 @@ func setCostComponentPrice(ctx *config.RunContext, currency string, r *schema.Re
 				EndUsageAmount:   end,
 			}
 		}
+		sort.SliceStable(priceTiers, func(i, j int) bool {
+			startI := priceTiers[i].StartUsageAmount
+			startJ := priceTiers[j].StartUsageAmount
+			return startI.LessThan(startJ)
+		})
 		c.SetPriceTiers(priceTiers)
 	}
 	c.SetPriceHash(prices[0].Get("priceHash").String())
