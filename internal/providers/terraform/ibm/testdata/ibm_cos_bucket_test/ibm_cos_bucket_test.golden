@@ -12,6 +12,6 @@
  OVERALL TOTAL                                                                $310.05 
 ──────────────────────────────────
 3 cloud resources were detected:
-∙ 2 were estimated, 1 of which usage-based costs, see https://infracost.io/usage-file
+∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 1 was free:
   ∙ 1 x ibm_resource_group
