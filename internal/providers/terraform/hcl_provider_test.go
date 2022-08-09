@@ -153,6 +153,15 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "does not panic on double attribute definition",
+			attrs: map[string]map[string]string{
+				"aws_eip.invalid_eip": {
+					"id":  "eip",
+					"arn": "eip-arn",
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

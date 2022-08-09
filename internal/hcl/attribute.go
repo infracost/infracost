@@ -3,7 +3,6 @@ package hcl
 import (
 	"fmt"
 	"runtime/debug"
-	"strconv"
 	"strings"
 
 	"github.com/hashicorp/hcl/v2"
@@ -65,14 +64,17 @@ func (attr *Attribute) AsInt() int64 {
 	}
 
 	v := attr.Value()
-	if v.Type() == cty.String {
-		s := attr.AsString()
-		i, err := strconv.ParseInt(s, 10, 64)
-		if err != nil {
-			attr.Logger.WithError(err).Debugf("could not return attribute string value %s as int64", s)
-		}
+	if v.IsNull() {
+		return 0
+	}
 
-		return i
+	if v.Type() != cty.Number {
+		var err error
+		v, err = convert.Convert(v, cty.Number)
+		if err != nil {
+			attr.Logger.WithError(err).Debugf("could not return attribute value of type %s as cty.Number", v.Type())
+			return 0
+		}
 	}
 
 	var i int64
@@ -92,9 +94,17 @@ func (attr *Attribute) AsString() string {
 	}
 
 	v := attr.Value()
-	if v.Type() == cty.Number {
-		i := attr.AsInt()
-		return fmt.Sprintf("%d", i)
+	if v.IsNull() {
+		return ""
+	}
+
+	if v.Type() != cty.String {
+		var err error
+		v, err = convert.Convert(v, cty.String)
+		if err != nil {
+			attr.Logger.WithError(err).Debugf("could not return attribute value of type %s as cty.String", v.Type())
+			return ""
+		}
 	}
 
 	var s string

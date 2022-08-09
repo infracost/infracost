@@ -1,3 +1,5 @@
+name: Update Download Redirects
+
 on:
   workflow_call:
     inputs:
@@ -13,14 +15,13 @@ on:
         required: true
 jobs:
   update:
-    name: Update Download Redirects
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
           node-version: 14
       - run: npm install semver
-      - uses: actions/github-script@v5
+      - uses: actions/github-script@v6
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -82,6 +83,3 @@ jobs:
                 `Error running aws amplify get-app: ${returnCode}`
               );
             }
-
-
-
