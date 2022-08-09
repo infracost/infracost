@@ -1160,7 +1160,7 @@ resource_usage:
   # Key Protect
   #
   ibm_resource_instance.resource_instance_kms: 
-    kms_items_per_month: 300 # Number of managed keys
+    kms_key_versions: 300 # Number of key versions managed per month
 
   #
   # Secrets Manager

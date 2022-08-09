@@ -18,16 +18,14 @@
  └─ Advanced Authentications (over 10 Authentications)         19,990  Authentications       $199.90 
                                                                                                      
  ibm_resource_instance.resource_instance_kms                                                         
- ├─ Items free allowance (first 20 Items)                          20  Item                    $0.00 
- └─ Items (first 1000 Item)                                       280  Item                  $210.00 
- └─ Items (next 9000 Item)                                          0  Item                    $0.00 
- └─ Items (over 10000 Item)                                         0  Item                    $0.00 
+ ├─ Key versions free allowance (first 5 Key Versions)              5  Key Versions            $0.00 
+ └─ Key versions                                                  295  Key Versions          $295.00 
                                                                                                      
  ibm_resource_instance.resource_instance_secrets_manager                                             
  ├─ Instance                                                        1  Instance              $299.00 
  └─ Active Secrets                                                400  Secrets                $80.00 
                                                                                                      
- OVERALL TOTAL                                                                               $806.78 
+ OVERALL TOTAL                                                                               $891.78 
 ──────────────────────────────────
 3 cloud resources were detected:
 ∙ 3 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
