@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"github.com/infracost/infracost/internal/logging"
 	"io"
 	"os"
 	"runtime"
@@ -179,12 +180,18 @@ func (r *RunContext) IsInfracostComment() bool {
 }
 
 func (r *RunContext) IsCloudEnabled() bool {
-	if r.isCommentCmd && r.Config.EnableCloudForComment {
-		log.Debug("IsCloudEnabled is true for comment with org level setting enabled.")
+	if r.Config.EnableCloud != nil {
+		logging.Logger.WithFields(log.Fields{"is_cloud_enabled": *r.Config.EnableCloud}).Debug("IsCloudEnabled explicitly set through Config.EnabledCloud")
+		return *r.Config.EnableCloud
+	}
+
+	if r.Config.EnableCloudForOrganization {
+		logging.Logger.Debug("IsCloudEnabled is true with org level setting enabled.")
 		return true
 	}
 
-	return (r.Config.EnableCloud != nil && *r.Config.EnableCloud) || r.Config.EnableDashboard
+	logging.Logger.WithFields(log.Fields{"is_cloud_enabled": r.Config.EnableDashboard}).Debug("IsCloudEnabled inferred from Config.EnabledDashboard")
+	return r.Config.EnableDashboard
 }
 
 func baseVersion(v string) string {
@@ -242,6 +249,7 @@ var ciMap = ciEnvMap{
 		"TDDIUM":               "tddium",
 		"GREENHOUSE":           "greenhouse",
 		"CIRRUS_CI":            "cirrusci",
+		"TS_ENV":               "terraspace",
 	},
 	prefixes: map[string]string{
 		"ATLANTIS_":  "atlantis",
@@ -249,6 +257,8 @@ var ciMap = ciEnvMap{
 		"CONCOURSE_": "concourse",
 		"SPACELIFT_": "spacelift",
 		"HARNESS_":   "harness",
+		"TERRATEAM_": "terrateam",
+		"KEPTN_":     "keptn",
 	},
 }
 

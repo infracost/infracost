@@ -68,8 +68,12 @@ func (d Disco) ModuleLocation(source string) (RegistryURL, bool, error) {
 	}
 
 	host, namespace, moduleName, target := parts[0], parts[1], parts[2], parts[3]
+	hostname, err := svchost.ForComparison(host)
+	if err != nil {
+		return RegistryURL{}, false, fmt.Errorf("unable to use user-provided module host %s as a Hostname for credential discovery: %w", host, err)
+	}
 
-	serviceURL, err := d.disco.DiscoverServiceURL(svchost.Hostname(host), moduleServiceID)
+	serviceURL, err := d.disco.DiscoverServiceURL(hostname, moduleServiceID)
 	if err != nil {
 		return RegistryURL{}, false, fmt.Errorf("unable to discover registry service using host %s %w", host, err)
 	}
@@ -80,7 +84,7 @@ func (d Disco) ModuleLocation(source string) (RegistryURL, bool, error) {
 		RawSource: source,
 	}
 
-	c, err := d.disco.CredentialsForHost(svchost.Hostname(host))
+	c, err := d.disco.CredentialsForHost(hostname)
 	if err != nil {
 		return r, true, fmt.Errorf("unable to retrieve credentials for registry host %s %w", host, err)
 	}
@@ -90,7 +94,12 @@ func (d Disco) ModuleLocation(source string) (RegistryURL, bool, error) {
 }
 
 func (d Disco) DownloadLocation(moduleURL RegistryURL, version string) (string, error) {
-	serviceURL, err := d.disco.DiscoverServiceURL(svchost.Hostname(moduleURL.Host), moduleServiceID)
+	hostname, err := svchost.ForComparison(moduleURL.Host)
+	if err != nil {
+		return "", fmt.Errorf("unable to use module URL %s as a Hostname to discover service URL: %w", moduleURL, err)
+	}
+
+	serviceURL, err := d.disco.DiscoverServiceURL(hostname, moduleServiceID)
 	if err != nil {
 		return "", fmt.Errorf("unable to discover registry service using host %s %w", moduleURL.Host, err)
 	}
