@@ -95,6 +95,9 @@ func (a *LambdaFunction) BuildResource() *schema.Resource {
 						{Key: "usagetype", ValueRegex: strPtr("/GB-Second/")},
 					},
 				},
+				PriceFilter: &schema.PriceFilter{
+					StartUsageAmount: strPtr("0"),
+				},
 			},
 		},
 		EstimateUsage: estimate,

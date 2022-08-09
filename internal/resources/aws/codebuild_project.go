@@ -2,11 +2,10 @@ package aws
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-
-	"strings"
 
 	"github.com/shopspring/decimal"
 )
@@ -33,8 +32,10 @@ func (r *CodeBuildProject) BuildResource() *schema.Resource {
 		monthlyBuildMinutes = decimalPtr(decimal.NewFromInt(*r.MonthlyBuildMins))
 	}
 
+	computeType := r.mapComputeType()
 	return &schema.Resource{
-		Name: r.Address,
+		Name:      r.Address,
+		IsSkipped: computeType == "",
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            r.nameLabel(),
@@ -47,7 +48,7 @@ func (r *CodeBuildProject) BuildResource() *schema.Resource {
 					Service:       strPtr("CodeBuild"),
 					ProductFamily: strPtr("Compute"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s:%s/", r.mapEnvironmentType(), r.mapComputeType()))},
+						{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s:%s/", r.mapEnvironmentType(), computeType))},
 					},
 				},
 			},
@@ -57,21 +58,26 @@ func (r *CodeBuildProject) BuildResource() *schema.Resource {
 }
 
 func (r *CodeBuildProject) nameLabel() string {
-	name := ""
 	switch r.EnvironmentType {
 	case "WINDOWS_SERVER_2019_CONTAINER":
-		name = "Windows ("
-		name += strings.Replace(strings.ToLower(strings.SplitAfter(r.ComputeType, "BUILD_")[1]), "_", ".", 1) + ")"
+		return r.osWithComputeTypeLabel("Windows")
 	case "ARM_CONTAINER":
-		name = "Linux (arm1.large)"
+		return "Linux (arm1.large)"
 	case "LINUX_GPU_CONTAINER":
-		name = "Linux (gpu1.large)"
+		return "Linux (gpu1.large)"
 	default:
-		name = "Linux ("
-		name += strings.Replace(strings.ToLower(strings.SplitAfter(r.ComputeType, "BUILD_")[1]), "_", ".", 1) + ")"
+		return r.osWithComputeTypeLabel("Linux")
+	}
+}
+
+func (r *CodeBuildProject) osWithComputeTypeLabel(os string) string {
+	pieces := strings.SplitAfter(r.ComputeType, "BUILD_")
+	if len(pieces) < 2 {
+		return os
 	}
 
-	return name
+	computeType := strings.Replace(strings.ToLower(pieces[1]), "_", ".", 1)
+	return fmt.Sprintf("%s (%s)", os, computeType)
 }
 
 func (r *CodeBuildProject) mapEnvironmentType() string {

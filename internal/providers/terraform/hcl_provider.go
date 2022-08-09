@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"strconv"
 	"strings"
 
 	log "github.com/sirupsen/logrus"
@@ -119,7 +118,11 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 			localWorkspace),
 		)
 	}
-	options = append(options, hcl.OptionWithCredentialsSource(credsSource))
+
+	options = append(options,
+		hcl.OptionWithTerraformWorkspace(localWorkspace),
+		hcl.OptionWithCredentialsSource(credsSource),
+	)
 
 	logger := ctx.Logger().WithFields(log.Fields{"provider": "terraform_dir"})
 	parsers, err := hcl.LoadParsers(ctx.ProjectConfig.Path, ctx.ProjectConfig.ExcludePaths, logger, options...)
@@ -375,7 +378,7 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 	}
 
 	jsonValues := marshalAttributeValues(block.Type(), block.Values())
-	marshalBlock(block, jsonValues)
+	p.marshalBlock(block, jsonValues)
 
 	changes.Change.After = jsonValues
 	planned.Values = jsonValues
@@ -469,19 +472,7 @@ func (p *HCLProvider) countReferences(block *hcl.Block) *countExpression {
 			return &exp
 		}
 
-		v := attribute.Value()
-		ty := v.Type()
-		var i int64
-		switch ty {
-		case cty.Number:
-			i, _ = v.AsBigFloat().Int64()
-		case cty.String:
-			s := v.AsString()
-			i, _ = strconv.ParseInt(s, 10, 64)
-		default:
-			p.logger.Debugf("unsupported go cty type %s expected either Number or String for count expression, using 0", ty)
-		}
-
+		i := attribute.AsInt()
 		exp.ConstantValue = &i
 		return &exp
 	}
@@ -530,7 +521,7 @@ func blockToReferences(block *hcl.Block) map[string]interface{} {
 	return expressionValues
 }
 
-func marshalBlock(block *hcl.Block, jsonValues map[string]interface{}) {
+func (p *HCLProvider) marshalBlock(block *hcl.Block, jsonValues map[string]interface{}) {
 	for _, b := range block.Children() {
 		key := b.Type()
 		if key == "dynamic" || key == "depends_on" {
@@ -539,10 +530,19 @@ func marshalBlock(block *hcl.Block, jsonValues map[string]interface{}) {
 
 		childValues := marshalAttributeValues(key, b.Values())
 		if len(b.Children()) > 0 {
-			marshalBlock(b, childValues)
+			p.marshalBlock(b, childValues)
 		}
 
 		if v, ok := jsonValues[key]; ok {
+			if _, ok := v.(json.RawMessage); ok {
+				p.logger.WithFields(log.Fields{
+					"parent_block": block.LocalName(),
+					"child_block":  b.LocalName(),
+				}).Debugf("skipping attribute '%s' that has also been declared as a child block", key)
+
+				continue
+			}
+
 			jsonValues[key] = append(v.([]interface{}), childValues)
 			continue
 		}
