@@ -1,10 +1,11 @@
 package aws
 
 import (
-	"github.com/tidwall/gjson"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/tidwall/gjson"
 
 	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
@@ -19,16 +20,23 @@ func getECSServiceRegistryItem() *schema.RegistryItem {
 }
 
 func NewECSService(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	var taskDefinition *schema.ResourceData
-
 	memoryGB := float64(0)
 	vcpu := float64(0)
 	inferenceAcceleratorDeviceType := ""
 
-	taskDefinitionRefs := d.References("task_definition")
-	if len(taskDefinitionRefs) > 0 {
-		taskDefinition = taskDefinitionRefs[0]
+	var taskDefinition *schema.ResourceData
+	// Since we are matching on 'family' as well as 'arn', check the resource type
+	// just in case the reference matches other resources as well. We should probably specify the
+	// expected resource types when we are building the references, but we don;t just now so
+	// this check should be sufficient.
+	for _, ref := range d.References("task_definition") {
+		if ref.Type == "aws_ecs_task_definition" {
+			taskDefinition = ref
+			break
+		}
+	}
 
+	if taskDefinition != nil {
 		memoryGB = parseVCPUMemoryString(taskDefinition.Get("memory").String())
 		vcpu = parseVCPUMemoryString(taskDefinition.Get("cpu").String())
 		inferenceAcceleratorDeviceType = taskDefinition.Get("inference_accelerator.0.device_type").String()

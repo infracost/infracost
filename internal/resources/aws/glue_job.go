@@ -45,13 +45,13 @@ func (r *GlueJob) BuildResource() *schema.Resource {
 	}
 
 	suffix := "DPUs"
-	if r.DPUs <= 1 {
+	if r.DPUs == 1 {
 		suffix = "DPU"
 	}
 
 	unit := fmt.Sprintf("hours (%d %s)", int(r.DPUs), suffix)
 
-	if r.DPUs < 1 {
+	if r.DPUs > 0 && r.DPUs < 1 {
 		unit = fmt.Sprintf("hours (%.4f %s)", r.DPUs, suffix)
 	}
 

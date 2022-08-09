@@ -1185,3 +1185,15 @@ resource_usage:
   ibm_is_vpn_gateway.testVpcVpn:
     connection_hours: 730 # Monthly number of connection hours
     instance_hours: 730 # Monthly number of instance hours
+  #
+  # Cloud Object Storage
+  #
+  ibm_cos_bucket:
+    public_standard_egress: 1000 # Amount of data downloaded in GB
+    class_a_request_count: 10000 # Monthly number of Class A requests
+    class_b_request_count: 10000 # Monthly number of Class B requests
+    monthly_data_retrieval: 1000 # Amount of data retrieved in GB
+    aspera_ingress: 1000 # Amount of data uploaded with Aspera in GB
+    aspera_egress: 1000 # Amount of data downloaded with Aspera in GB
+    archive_capacity: 1000 # Amount of your estimated storage in GB
+    archive_restore: 1000 # Amount of data restored from its archived state in GB

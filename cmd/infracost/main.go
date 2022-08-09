@@ -248,14 +248,14 @@ func loadCloudSettings(ctx *config.RunContext) {
 	}
 	logging.Logger.WithFields(log.Fields{"result": fmt.Sprintf("%+v", result)}).Debug("Successfully loaded settings from Infracost Cloud")
 
-	ctx.Config.EnableCloudForComment = result.CloudEnabled
+	ctx.Config.EnableCloudForOrganization = result.CloudEnabled
 }
 
 func checkAPIKey(apiKey string, apiEndpoint string, defaultEndpoint string) error {
 	if apiEndpoint == defaultEndpoint && apiKey == "" {
 		return fmt.Errorf(
 			"No INFRACOST_API_KEY environment variable is set.\nWe run a free Cloud Pricing API, to get an API key run %s",
-			ui.PrimaryString("infracost register"),
+			ui.PrimaryString("infracost auth login"),
 		)
 	}
 

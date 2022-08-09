@@ -42,10 +42,10 @@ func TestGenerateProjectName(t *testing.T) {
 			name: "azure repo url should show org/project/repo with spaces",
 			args: args{
 				metadata: &ProjectMetadata{
-					VCSRepoURL: "https://SG-GDI-CTO-PublicCloud@dev.azure.com/SG-GDI-CTO-PublicCloud/CloudSolutions%20Playground/_git/CloudSolutions%20Playground",
+					VCSRepoURL: "https://infracost-user@dev.azure.com/infracost/my%20project/_git/my%20repo",
 				},
 			},
-			want: "SG-GDI-CTO-PublicCloud/CloudSolutions Playground/CloudSolutions Playground",
+			want: "infracost/my project/my repo",
 		},
 		{
 			name: "github repo https url",
