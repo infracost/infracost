@@ -12,10 +12,11 @@ import (
 // Pricing information: https://cloud.ibm.com/objectstorage/create#pricing
 
 type IbmCosBucket struct {
-	Address      string
-	Region       string
-	Location     string
-	StorageClass string
+	Address            string
+	Region             string
+	Location           string
+	LocationIdentifier string
+	StorageClass       string
 
 	MonthlyAverageCapacity *float64 `infracost_usage:"monthly_average_capacity"`
 	PublicStandardEgress   *float64 `infracost_usage:"public_standard_egress"`
@@ -48,7 +49,12 @@ func (r *IbmCosBucket) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *IbmCosBucket) MonthlyAverageCapacityCostComponent() *schema.CostComponent {
-	q := decimalPtr(decimal.NewFromInt(int64(*r.MonthlyAverageCapacity)))
+
+	var q *decimal.Decimal
+
+	if r.MonthlyAverageCapacity != nil {
+		q = decimalPtr(decimal.NewFromInt(int64(*r.MonthlyAverageCapacity)))
+	}
 
 	return &schema.CostComponent{
 		Name:            "Monthly Average Capacity",
@@ -63,14 +69,18 @@ func (r *IbmCosBucket) MonthlyAverageCapacityCostComponent() *schema.CostCompone
 			AttributeFilters: []*schema.AttributeFilter{},
 		},
 		PriceFilter: &schema.PriceFilter{
-			Unit: strPtr("ARCHIVE_RESTORE"),
+			Unit: strPtr("FLEX_MAX_CAP"),
 		},
 	}
 }
 
 func (r *IbmCosBucket) ClassARequestCountCostComponent() *schema.CostComponent {
 
-	q := decimalPtr(decimal.NewFromInt(*r.ClassARequestCount))
+	var q *decimal.Decimal
+
+	if r.ClassARequestCount != nil {
+		q = decimalPtr(decimal.NewFromInt(*r.ClassARequestCount))
+	}
 
 	s := r.StorageClass
 	u := "FLEX_CLASS_A_CALLS"
@@ -106,7 +116,11 @@ func (r *IbmCosBucket) ClassARequestCountCostComponent() *schema.CostComponent {
 
 func (r *IbmCosBucket) ClassBRequestCountCostComponent() *schema.CostComponent {
 
-	q := decimalPtr(decimal.NewFromInt(*r.ClassBRequestCount))
+	var q *decimal.Decimal
+
+	if r.ClassBRequestCount != nil {
+		q = decimalPtr(decimal.NewFromInt(*r.ClassBRequestCount))
+	}
 
 	u := "FLEX_CLASS_B_CALLS"
 
@@ -143,7 +157,11 @@ func (r *IbmCosBucket) ClassBRequestCountCostComponent() *schema.CostComponent {
 
 func (r *IbmCosBucket) PublicStandardEgressCostComponent() *schema.CostComponent {
 
-	q := decimalPtr(decimal.NewFromInt(int64(*r.PublicStandardEgress)))
+	var q *decimal.Decimal
+
+	if r.PublicStandardEgress != nil {
+		q = decimalPtr(decimal.NewFromInt(int64(*r.PublicStandardEgress)))
+	}
 
 	// using bandwidth for egress
 	// https://github.ibm.com/ibmcloud/estimator/blob/f9dfa477c27bbf7570d296816bdc07b706646572/__tests__/client/fixtures/callback-estimate.json#L41
@@ -181,7 +199,11 @@ func (r *IbmCosBucket) PublicStandardEgressCostComponent() *schema.CostComponent
 
 func (r *IbmCosBucket) AsperaIngressCostComponent() *schema.CostComponent {
 
-	q := decimalPtr(decimal.NewFromInt(int64(*r.AsperaIngress)))
+	var q *decimal.Decimal
+
+	if r.AsperaIngress != nil {
+		q = decimalPtr(decimal.NewFromInt(int64(*r.AsperaIngress)))
+	}
 
 	costComponent := schema.CostComponent{
 		Name:            "Aspera Ingress Free",
@@ -208,7 +230,11 @@ func (r *IbmCosBucket) AsperaIngressCostComponent() *schema.CostComponent {
 
 func (r *IbmCosBucket) AsperaEgressCostComponent() *schema.CostComponent {
 
-	q := decimalPtr(decimal.NewFromInt(int64(*r.AsperaEgress)))
+	var q *decimal.Decimal
+
+	if r.AsperaEgress != nil {
+		q = decimalPtr(decimal.NewFromInt(int64(*r.AsperaEgress)))
+	}
 
 	return &schema.CostComponent{
 		Name:            "Aspera Egress",
@@ -230,7 +256,11 @@ func (r *IbmCosBucket) AsperaEgressCostComponent() *schema.CostComponent {
 
 func (r *IbmCosBucket) ArchiveCapacityCostComponent() *schema.CostComponent {
 
-	q := decimalPtr(decimal.NewFromInt(int64(*r.ArchiveCapacity)))
+	var q *decimal.Decimal
+
+	if r.ArchiveCapacity != nil {
+		q = decimalPtr(decimal.NewFromInt(int64(*r.ArchiveCapacity)))
+	}
 
 	return &schema.CostComponent{
 		Name:            "Archive Capacity",
@@ -252,7 +282,11 @@ func (r *IbmCosBucket) ArchiveCapacityCostComponent() *schema.CostComponent {
 
 func (r *IbmCosBucket) ArchiveRestoreCostComponent() *schema.CostComponent {
 
-	q := decimalPtr(decimal.NewFromInt(int64(*r.ArchiveRestore)))
+	var q *decimal.Decimal
+
+	if r.ArchiveRestore != nil {
+		q = decimalPtr(decimal.NewFromInt(int64(*r.ArchiveRestore)))
+	}
 
 	return &schema.CostComponent{
 		Name:            "Archive Restore",
@@ -274,7 +308,11 @@ func (r *IbmCosBucket) ArchiveRestoreCostComponent() *schema.CostComponent {
 
 func (r *IbmCosBucket) MonthlyDataRetrievalCostComponent() *schema.CostComponent {
 
-	q := decimalPtr(decimal.NewFromInt(int64(*r.MonthlyDataRetrieval)))
+	var q *decimal.Decimal
+
+	if r.MonthlyDataRetrieval != nil {
+		q = decimalPtr(decimal.NewFromInt(int64(*r.MonthlyDataRetrieval)))
+	}
 
 	retrieval := "FLEX_RETRIEVAL"
 
@@ -308,44 +346,23 @@ func (r *IbmCosBucket) MonthlyDataRetrievalCostComponent() *schema.CostComponent
 // This method is called after the resource is initialised by an IaC provider.
 // See providers folder for more information.
 func (r *IbmCosBucket) BuildResource() *schema.Resource {
-
 	costComponents := []*schema.CostComponent{}
 
-	if r.StorageClass == "archive" && r.Location == "region_location" {
-		if r.ArchiveCapacity != nil {
-			costComponents = append(costComponents, r.ArchiveCapacityCostComponent())
-		}
-		if r.ArchiveRestore != nil {
-			costComponents = append(costComponents, r.ArchiveRestoreCostComponent())
-		}
-	} else if r.StorageClass == "aspera" && r.Location == "region_location" || r.Location == "cross_region_location" {
-		if r.AsperaEgress != nil {
-			costComponents = append(costComponents, r.AsperaEgressCostComponent())
-		}
-		if r.AsperaIngress != nil {
-			costComponents = append(costComponents, r.AsperaIngressCostComponent())
-		}
+	if r.LocationIdentifier == "region_location" && (r.ArchiveCapacity != nil || r.ArchiveRestore != nil) {
+		costComponents = append(costComponents, r.ArchiveCapacityCostComponent(), r.ArchiveRestoreCostComponent())
+	} else if (r.LocationIdentifier == "region_location" || r.LocationIdentifier == "cross_region_location") && (r.AsperaEgress != nil || r.AsperaIngress != nil) {
+		costComponents = append(costComponents, r.AsperaEgressCostComponent(), r.AsperaIngressCostComponent())
 	} else {
-		if r.MonthlyAverageCapacity != nil {
-			costComponents = append(costComponents, r.MonthlyAverageCapacityCostComponent())
-		}
-
-		if r.ClassARequestCount != nil {
-			costComponents = append(costComponents, r.ClassARequestCountCostComponent())
-		}
-
-		if r.ClassBRequestCount != nil {
-			costComponents = append(costComponents, r.ClassBRequestCountCostComponent())
-		}
-
-		if r.PublicStandardEgress != nil {
-			costComponents = append(costComponents, r.PublicStandardEgressCostComponent())
-		}
+		costComponents = append(
+			costComponents,
+			r.MonthlyAverageCapacityCostComponent(),
+			r.ClassARequestCountCostComponent(),
+			r.ClassBRequestCountCostComponent(),
+			r.PublicStandardEgressCostComponent(),
+		)
 
 		if r.StorageClass == "vault" || r.StorageClass == "cold" || r.StorageClass == "smart" {
-			if r.MonthlyDataRetrieval != nil {
-				costComponents = append(costComponents, r.MonthlyDataRetrievalCostComponent())
-			}
+			costComponents = append(costComponents, r.MonthlyDataRetrievalCostComponent())
 		}
 	}
 

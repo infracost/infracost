@@ -1,17 +1,44 @@
 
- Name                                        Monthly Qty  Unit           Monthly Cost 
-                                                                                      
- ibm_cos_bucket.standard-us-south                                                     
- ├─ Monthly Average Capacity                      10,000  GB                  $220.00 
- ├─ Class A requests                              10,000  1k API calls          $0.05 
- ├─ Class B requests                              10,000  10k API calls         $0.00 
- └─ Public Standard Egress (first 50000 GB)        1,000  GB                   $90.00 
- └─ Public Standard Egress (next 100000 GB)            0  GB                    $0.00 
- └─ Public Standard Egress (over 150000 GB)            0  GB                    $0.00 
-                                                                                      
- OVERALL TOTAL                                                                $310.05 
+ Name                                           Monthly Qty  Unit              Monthly Cost 
+                                                                                            
+ ibm_cos_bucket.archive-us-south                                                            
+ ├─ Archive Capacity                                  1,000  GB                       $2.00 
+ └─ Archive Restore                                   1,000  GB                      $22.00 
+                                                                                            
+ ibm_cos_bucket.aspera-us                                                                   
+ ├─ Aspera Egress (first 50000 GB)                    1,000  GB                      $80.00 
+ ├─ Aspera Egress (next 100000 GB)                        0  GB                       $0.00 
+ ├─ Aspera Egress (over 150000 GB)                        0  GB                       $0.00 
+ └─ Aspera Ingress Free                               1,000  GB                       $0.00 
+                                                                                            
+ ibm_cos_bucket.smart-us-south                                                              
+ ├─ Monthly Average Capacity                 Monthly cost depends on usage: $0.0293 per GB  
+ ├─ Class A requests                                 10,000  1k API calls             $0.05 
+ ├─ Class B requests                                 10,000  10k API calls            $0.01 
+ ├─ Public Standard Egress (first 50000 GB)           1,000  GB                     $140.00 
+ ├─ Public Standard Egress (next 100000 GB)               0  GB                       $0.00 
+ ├─ Public Standard Egress (over 150000 GB)               0  GB                       $0.00 
+ └─ Data Retrieval                                    1,000  GB                      $29.00 
+                                                                                            
+ ibm_cos_bucket.standard-ams03                                                              
+ ├─ Monthly Average Capacity                 Monthly cost depends on usage: $0.0293 per GB  
+ ├─ Class A requests                                 10,000  1k API calls             $0.05 
+ ├─ Class B requests                                 10,000  10k API calls            $0.00 
+ └─ Public Standard Egress (first 50000 GB)           1,000  GB                      $90.00 
+ └─ Public Standard Egress (next 100000 GB)               0  GB                       $0.00 
+ └─ Public Standard Egress (over 150000 GB)               0  GB                       $0.00 
+                                                                                            
+ ibm_cos_bucket.standard-us-south                                                           
+ ├─ Monthly Average Capacity                 Monthly cost depends on usage: $0.0293 per GB  
+ ├─ Class A requests                                 10,000  1k API calls             $0.05 
+ ├─ Class B requests                                 10,000  10k API calls            $0.00 
+ └─ Public Standard Egress (first 50000 GB)           1,000  GB                      $90.00 
+ └─ Public Standard Egress (next 100000 GB)               0  GB                       $0.00 
+ └─ Public Standard Egress (over 150000 GB)               0  GB                       $0.00 
+                                                                                            
+ OVERALL TOTAL                                                                      $453.16 
 ──────────────────────────────────
-3 cloud resources were detected:
-∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+7 cloud resources were detected:
+∙ 6 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 1 was free:
   ∙ 1 x ibm_resource_group
