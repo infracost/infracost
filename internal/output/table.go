@@ -225,21 +225,35 @@ func buildCostComponentRows(t table.Writer, currency string, costComponents []Co
 
 		if len(c.TierData) > 0 {
 			for index := range c.TierData {
-				var tableRow table.Row
 				label := fmt.Sprintf("%s %s", ui.FaintString(labelPrefix), c.TierData[index].Name)
-				tableRow = append(tableRow, label)
+				if c.TierData[index].MonthlyCost == nil {
+					price := fmt.Sprintf("Monthly cost depends on usage: %s per %s",
+						formatPrice(currency, c.TierData[index].Price),
+						c.Unit,
+					)
 
-				if contains(fields, "monthlyQuantity") {
-					tableRow = append(tableRow, formatQuantity(c.TierData[index].MonthlyQuantity))
-				}
-				if contains(fields, "unit") {
-					tableRow = append(tableRow, c.Unit)
-				}
-				if contains(fields, "monthlyCost") {
-					tableRow = append(tableRow, formatCost2DP(currency, c.TierData[index].MonthlyCost))
-				}
+					t.AppendRow(table.Row{
+						label,
+						price,
+						price,
+						price,
+					}, table.RowConfig{AutoMerge: true, AlignAutoMerge: text.AlignLeft})
+				} else {
+					var tableRow table.Row
+					tableRow = append(tableRow, label)
 
-				t.AppendRow(tableRow)
+					if contains(fields, "monthlyQuantity") {
+						tableRow = append(tableRow, formatQuantity(c.TierData[index].MonthlyQuantity))
+					}
+					if contains(fields, "unit") {
+						tableRow = append(tableRow, c.Unit)
+					}
+					if contains(fields, "monthlyCost") {
+						tableRow = append(tableRow, formatCost2DP(currency, c.TierData[index].MonthlyCost))
+					}
+
+					t.AppendRow(tableRow)
+				}
 			}
 		} else if c.MonthlyCost == nil {
 			price := fmt.Sprintf("Monthly cost depends on usage: %s per %s",
