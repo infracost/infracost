@@ -1,0 +1,26 @@
+
+ Name                                    Monthly Qty  Unit            Monthly Cost 
+                                                                                   
+ Cloudant - Dedicated-Hardware                                                     
+ └─ Dedicated Hardware                             1  instance           $5,000.00 
+                                                                                   
+ Cloudant - Lite                                                                   
+ └─ Lite Cloudant                                  1  instance               $0.00 
+                                                                                   
+ Cloudant - Standard                                                               
+ ├─ Monthly Reads                                100  reads/second          $25.00 
+ ├─ Monthly Writes                                50  writes/second         $25.00 
+ ├─ Monthly Global Queries                         5  queries/second        $25.00 
+ └─ Free Estimated Storage (first 20GB)           20  GB                     $0.00 
+                                                                                   
+ Cloudant - Standard                                                               
+ ├─ Monthly Reads                                100  reads/second          $25.00 
+ ├─ Monthly Writes                                50  writes/second         $25.00 
+ ├─ Monthly Global Queries                         5  queries/second        $25.00 
+ ├─ Free Estimated Storage (first 20GB)           20  GB                     $0.00 
+ └─ Estimated Storage                             20  GB                    $20.00 
+                                                                                   
+ OVERALL TOTAL                                                           $5,170.00 
+──────────────────────────────────
+4 cloud resources were detected:
+∙ 4 were estimated
