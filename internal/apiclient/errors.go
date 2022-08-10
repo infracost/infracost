@@ -14,6 +14,10 @@ import (
 var pathRegex = regexp.MustCompile(`(\w+:)?[\.~\w]*[\/\\]+([^\s:'\"\]]+)|([\w+-]\.\w{2,})`)
 
 func ReportCLIError(ctx *config.RunContext, cliErr error, replacePath bool) error {
+	if ctx.Config.IsSelfHosted() {
+		return nil
+	}
+
 	errMsg := ui.StripColor(cliErr.Error())
 	stacktrace := ""
 
