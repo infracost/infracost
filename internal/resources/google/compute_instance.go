@@ -50,7 +50,9 @@ func (r *ComputeInstance) BuildResource() *schema.Resource {
 	}
 
 	for _, guestAccel := range r.GuestAccelerators {
-		costComponents = append(costComponents, guestAcceleratorCostComponent(r.Region, r.PurchaseOption, guestAccel.Type, guestAccel.Count, r.Size, r.MonthlyHours))
+		if component := guestAcceleratorCostComponent(r.Region, r.PurchaseOption, guestAccel.Type, guestAccel.Count, r.Size, r.MonthlyHours); component != nil {
+			costComponents = append(costComponents, component)
+		}
 	}
 
 	return &schema.Resource{
