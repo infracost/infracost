@@ -10,34 +10,16 @@ import (
 	"path/filepath"
 	"regexp"
 	"strings"
-	"time"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/infracost/infracost/internal/logging"
 )
 
 type ProjectMetadata struct {
 	Path                string `json:"path"`
-	InfracostCommand    string `json:"infracostCommand"`
 	Type                string `json:"type"`
 	TerraformModulePath string `json:"terraformModulePath,omitempty"`
 	TerraformWorkspace  string `json:"terraformWorkspace,omitempty"`
-
-	Branch            string    `json:"branch"`
-	Commit            string    `json:"commit"`
-	CommitAuthorName  string    `json:"commitAuthorName"`
-	CommitAuthorEmail string    `json:"commitAuthorEmail"`
-	CommitTimestamp   time.Time `json:"commitTimestamp"`
-	CommitMessage     string    `json:"commitMessage"`
-
-	VCSRepoURL           string `json:"vcsRepoUrl,omitempty"`
-	VCSSubPath           string `json:"vcsSubPath,omitempty"`
-	VCSProvider          string `json:"vcsProvider,omitempty"`
-	VCSBaseBranch        string `json:"vcsBaseBranch,omitempty"`
-	VCSPullRequestTitle  string `json:"vcsPullRequestTitle,omitempty"`
-	VCSPullRequestURL    string `json:"vcsPullRequestUrl,omitempty"`
-	VCSPullRequestAuthor string `json:"vcsPullRequestAuthor,omitempty"`
-	VCSPipelineRunID     string `json:"vcsPipelineRunId,omitempty"`
-	VCSPullRequestID     string `json:"vcsPullRequestId,omitempty"`
+	VCSSubPath          string `json:"vcsSubPath,omitempty"`
 }
 
 func (m *ProjectMetadata) WorkspaceLabel() string {
@@ -46,6 +28,32 @@ func (m *ProjectMetadata) WorkspaceLabel() string {
 	}
 
 	return m.TerraformWorkspace
+}
+
+func (m *ProjectMetadata) GenerateProjectName(repoURL string, dashboardEnabled bool) string {
+	// If the VCS repo is set, create the name from that
+	if repoURL != "" {
+		n := nameFromRepoURL(repoURL)
+
+		if m.VCSSubPath != "" {
+			n += "/" + m.VCSSubPath
+		}
+
+		return n
+	}
+
+	// If not then use a hash of the absolute filepath to the project
+	if dashboardEnabled {
+		absPath, err := filepath.Abs(m.Path)
+		if err != nil {
+			logging.Logger.Debugf("Could not get absolute path for %s", m.Path)
+			absPath = m.Path
+		}
+
+		return fmt.Sprintf("project_%s", shortHash(absPath, 8))
+	}
+
+	return m.Path
 }
 
 // Projects is a slice of Project that is ordered alphabetically by project name.
@@ -98,37 +106,6 @@ func AllProjectResources(projects []*Project) []*Resource {
 	}
 
 	return resources
-}
-
-func GenerateProjectName(metadata *ProjectMetadata, projectName string, dashboardEnabled bool) string {
-	// If there is a user defined project name, use it.
-	if projectName != "" {
-		return projectName
-	}
-
-	// If the VCS repo is set, create the name from that
-	if metadata.VCSRepoURL != "" {
-		n := nameFromRepoURL(metadata.VCSRepoURL)
-
-		if metadata.VCSSubPath != "" {
-			n += "/" + metadata.VCSSubPath
-		}
-
-		return n
-	}
-
-	// If not then use a hash of the absolute filepath to the project
-	if dashboardEnabled {
-		absPath, err := filepath.Abs(metadata.Path)
-		if err != nil {
-			log.Debugf("Could not get absolute path for %s", metadata.Path)
-			absPath = metadata.Path
-		}
-
-		return fmt.Sprintf("project_%s", shortHash(absPath, 8))
-	}
-
-	return metadata.Path
 }
 
 // Parses the "org/repo" from the git URL if possible.

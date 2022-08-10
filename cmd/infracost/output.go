@@ -96,9 +96,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 				return err
 			}
 			combined.IsCIRun = ctx.IsCIRun()
-			for _, p := range combined.Projects {
-				p.Metadata.InfracostCommand = "output"
-			}
+			combined.Metadata.InfracostCommand = "output"
 
 			includeAllFields := "all"
 			validFields := []string{"price", "monthlyQuantity", "unit", "hourlyCost", "monthlyCost"}

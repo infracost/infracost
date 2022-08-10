@@ -6,11 +6,11 @@ import (
 	"sort"
 	"text/template"
 
-	"github.com/infracost/infracost/internal/ui"
+	"github.com/Masterminds/sprig"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 
-	"github.com/Masterminds/sprig"
+	"github.com/infracost/infracost/internal/ui"
 )
 
 func formatMarkdownCostChange(currency string, pastCost, cost *decimal.Decimal, skipPlusMinus bool) string {

@@ -21,6 +21,7 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/infracost/infracost/internal/logging"
+	"github.com/infracost/infracost/internal/vcs"
 
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/clierror"
@@ -88,6 +89,13 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		ui.PrintWarning(cmd.ErrOrStderr(), "Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
 	}
 
+	repoPath := runCtx.Config.RepoPath()
+	metadata, err := vcs.MetadataFetcher.Get(repoPath)
+	if err != nil {
+		logging.Logger.WithError(err).Debugf("failed to fetch vcs metadata for path %s", repoPath)
+	}
+	runCtx.VCSMetadata = metadata
+
 	pr, err := newParallelRunner(cmd, runCtx)
 	if err != nil {
 		return err
@@ -119,10 +127,6 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		go formatHCLProjects(wg, runCtx, hclProjects, hclR)
 	}
 
-	for _, project := range projects {
-		project.Metadata.InfracostCommand = cmd.Name()
-	}
-
 	r, err := output.ToOutputFormat(projects)
 	if err != nil {
 		return err
@@ -138,6 +142,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	wg.Wait()
 	r.IsCIRun = runCtx.IsCIRun()
 	r.Currency = runCtx.Config.Currency
+	r.Metadata = output.NewMetadata(runCtx)
 
 	dashboardClient := apiclient.NewDashboardAPIClient(runCtx)
 	result, err := dashboardClient.AddRun(runCtx, r)
@@ -716,7 +721,10 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	projectCfg := cfg.Projects[0]
 
 	if hasProjectFlags {
-		projectCfg.Path, _ = cmd.Flags().GetString("path")
+		rootPath, _ := cmd.Flags().GetString("path")
+		cfg.RootPath = rootPath
+		projectCfg.Path = rootPath
+
 		projectCfg.TerraformVarFiles, _ = cmd.Flags().GetStringSlice("terraform-var-file")
 		tfVars, _ := cmd.Flags().GetStringSlice("terraform-var")
 		projectCfg.TerraformVars = tfVarsToMap(tfVars)

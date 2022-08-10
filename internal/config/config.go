@@ -90,6 +90,10 @@ type Config struct {
 	Fields        []string   `yaml:"fields,omitempty" ignored:"true"`
 	CompareTo     string
 
+	// Base configuration settings
+	// RootPath defines the raw value of the `--path` flag provided by the user
+	RootPath string
+	// ConfigFilePath defines the raw value of the `--config-file` flag provided by the user
 	ConfigFilePath string
 
 	NoCache bool `yaml:"fields,omitempty" ignored:"true"`
@@ -128,6 +132,15 @@ func DefaultConfig() *Config {
 
 		EventsDisabled: IsTest(),
 	}
+}
+
+// RepoPath returns the filepath to either the config-file location or initial path provided by the user.
+func (c *Config) RepoPath() string {
+	if c.ConfigFilePath != "" {
+		return c.ConfigFilePath
+	}
+
+	return c.RootPath
 }
 
 func (c *Config) LoadFromConfigFile(path string) error {

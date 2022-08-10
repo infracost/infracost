@@ -3,10 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
-	"os/exec"
 	"path/filepath"
-	"regexp"
-	"strings"
 	"sync"
 
 	"github.com/go-git/go-git/v5"
@@ -14,7 +11,6 @@ import (
 
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/infracost/infracost/internal/vcs"
 )
 
 type ProjectContexter interface {
@@ -79,83 +75,18 @@ func (c *ProjectContext) SetFrom(d ProjectContexter) {
 }
 
 func DetectProjectMetadata(path string) *schema.ProjectMetadata {
-	vcsRepoURL := os.Getenv("INFRACOST_VCS_REPOSITORY_URL")
 	vcsSubPath := os.Getenv("INFRACOST_VCS_SUB_PATH")
-	vcsPullRequestURL := os.Getenv("INFRACOST_VCS_PULL_REQUEST_URL")
 	terraformWorkspace := os.Getenv("INFRACOST_TERRAFORM_WORKSPACE")
 
-	if vcsRepoURL == "" {
-		vcsRepoURL = ciVCSRepo()
-	}
-
-	if vcsRepoURL == "" {
-		vcsRepoURL = gitRepo(path)
-	}
-
-	if vcsRepoURL != "" && vcsSubPath == "" {
+	if vcsSubPath == "" {
 		vcsSubPath = gitSubPath(path)
 	}
 
-	if vcsPullRequestURL == "" {
-		vcsPullRequestURL = ciVCSPullRequestURL()
-	}
-
-	vcsRepoURL = stripVCSRepoPassword(vcsRepoURL)
-
-	meta, err := vcs.MetadataFetcher.Get(path)
-	if err != nil {
-		logging.Logger.WithError(err).Debugf("failed to fetch vcs metadata for path %s", path)
-	}
-
-	if vcsPullRequestURL == "" && meta.PullRequest != nil {
-		vcsPullRequestURL = meta.PullRequest.URL
-	}
-
-	pm := &schema.ProjectMetadata{
+	return &schema.ProjectMetadata{
 		Path:               path,
 		TerraformWorkspace: terraformWorkspace,
-		Branch:             meta.Branch.Name,
-		Commit:             meta.Commit.SHA,
-		CommitAuthorEmail:  meta.Commit.AuthorEmail,
-		CommitAuthorName:   meta.Commit.AuthorName,
-		CommitTimestamp:    meta.Commit.Time.UTC(),
-		CommitMessage:      meta.Commit.Message,
-		VCSRepoURL:         vcsRepoURL,
 		VCSSubPath:         vcsSubPath,
-		VCSPullRequestURL:  vcsPullRequestURL,
 	}
-
-	if meta.PullRequest != nil {
-		pm.VCSProvider = meta.PullRequest.VCSProvider
-		pm.VCSPullRequestID = meta.PullRequest.ID
-		pm.VCSBaseBranch = meta.PullRequest.BaseBranch
-		pm.VCSPullRequestTitle = meta.PullRequest.Title
-		pm.VCSPullRequestAuthor = meta.PullRequest.Author
-	}
-
-	if meta.Pipeline != nil {
-		pm.VCSPipelineRunID = meta.Pipeline.ID
-	}
-
-	return pm
-}
-
-func gitRepo(path string) string {
-	logging.Logger.Debugf("Checking if %s is a git repo", path)
-	cmd := exec.Command("git", "ls-remote", "--get-url")
-
-	if isDir(path) {
-		cmd.Dir = path
-	} else {
-		cmd.Dir = filepath.Dir(path)
-	}
-
-	out, err := cmd.Output()
-	if err != nil {
-		logging.Logger.WithError(err).Debugf("could not detect a git repo at %s", path)
-		return ""
-	}
-	return strings.Split(string(out), "\n")[0]
 }
 
 func gitSubPath(path string) string {
@@ -195,9 +126,4 @@ func gitToplevel(path string) (string, error) {
 	}
 
 	return wt.Filesystem.Root(), nil
-}
-
-func stripVCSRepoPassword(repoURL string) string {
-	r := regexp.MustCompile(`.*:([^@]*)@`)
-	return r.ReplaceAllString(repoURL, "")
 }

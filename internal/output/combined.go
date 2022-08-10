@@ -14,6 +14,7 @@ import (
 	"github.com/shopspring/decimal"
 	"golang.org/x/mod/semver"
 
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
 )
 
@@ -164,7 +165,8 @@ func Combine(inputs []ReportInput) (Root, error) {
 	summaries := make([]*Summary, 0, len(inputs))
 	currency := ""
 
-	for _, input := range inputs {
+	var metadata Metadata
+	for i, input := range inputs {
 		var err error
 		currency, err = checkCurrency(currency, input.Root.Currency)
 		if err != nil {
@@ -218,6 +220,16 @@ func Combine(inputs []ReportInput) (Root, error) {
 
 			diffTotalHourlyCost = decimalPtr(diffTotalHourlyCost.Add(*input.Root.DiffTotalHourlyCost))
 		}
+
+		if i != 0 && metadata.VCSRepoURL != input.Root.Metadata.VCSRepoURL {
+			logging.Logger.Warnf(
+				"combining Infracost JSON for different VCS repositories '%s' & '%s' this is likely to result in unexpected outputs",
+				metadata.VCSRepoURL,
+				input.Root.Metadata.VCSRepoURL,
+			)
+		}
+
+		metadata = input.Root.Metadata
 	}
 
 	combined.Version = outputVersion
@@ -231,6 +243,7 @@ func Combine(inputs []ReportInput) (Root, error) {
 	combined.DiffTotalMonthlyCost = diffTotalMonthlyCost
 	combined.TimeGenerated = time.Now().UTC()
 	combined.Summary = MergeSummaries(summaries)
+	combined.Metadata = metadata
 
 	return combined, nil
 }
