@@ -4,9 +4,10 @@ import (
 	"regexp"
 	"strings"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/infracost/infracost/internal/resources/azure"
 	"github.com/infracost/infracost/internal/schema"
-	log "github.com/sirupsen/logrus"
 )
 
 func getAzureRMPostgreSQLFlexibleServerRegistryItem() *schema.RegistryItem {
@@ -17,7 +18,7 @@ func getAzureRMPostgreSQLFlexibleServerRegistryItem() *schema.RegistryItem {
 }
 
 func newPostgreSQLFlexibleServer(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := d.Get("location").String()
+	region := lookupRegion(d, []string{})
 	sku := d.Get("sku_name").String()
 	storage := d.Get("storage_mb").Int()
 
