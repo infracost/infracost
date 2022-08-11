@@ -213,6 +213,7 @@ type Options struct {
 	Fields            []string
 	IncludeHTML       bool
 	PolicyChecks      PolicyCheck
+	diffMsg           string
 }
 
 // PolicyCheck holds information if a given run has any policy checks enabled.
@@ -252,6 +253,7 @@ type MarkdownOptions struct {
 	IncludeFeedbackLink bool
 	OmitDetails         bool
 	BasicSyntax         bool
+	MaxMessageSize      int
 }
 
 func outputBreakdown(resources []*schema.Resource) *Breakdown {

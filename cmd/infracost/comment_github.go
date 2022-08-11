@@ -81,6 +81,7 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 				WillUpdate:          prNumber != 0 && behavior == "update",
 				WillReplace:         prNumber != 0 && behavior == "delete-and-new",
 				IncludeFeedbackLink: true,
+				MaxMessageSize:      output.GitHubMaxMessageSize,
 			})
 			var policyFailure output.PolicyCheckFailures
 			if err != nil {
