@@ -18,8 +18,9 @@ import (
 )
 
 var (
-	minOutputVersion = "0.2"
-	maxOutputVersion = "0.2"
+	minOutputVersion     = "0.2"
+	maxOutputVersion     = "0.2"
+	GitHubMaxMessageSize = 262144
 )
 
 type ReportInput struct {
@@ -271,7 +272,9 @@ func FormatOutput(format string, r Root, opts Options) ([]byte, error) {
 		b, err = ToHTML(r, opts)
 	case "diff":
 		b, err = ToDiff(r, opts)
-	case "github-comment", "gitlab-comment", "azure-repos-comment":
+	case "github-comment":
+		b, err = ToMarkdown(r, opts, MarkdownOptions{MaxMessageSize: GitHubMaxMessageSize})
+	case "gitlab-comment", "azure-repos-comment":
 		b, err = ToMarkdown(r, opts, MarkdownOptions{})
 	case "bitbucket-comment":
 		b, err = ToMarkdown(r, opts, MarkdownOptions{BasicSyntax: true})
