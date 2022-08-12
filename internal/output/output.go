@@ -20,6 +20,7 @@ var outputVersion = "0.2"
 
 type Root struct {
 	Version              string           `json:"version"`
+	Metadata             Metadata         `json:"metadata"`
 	RunID                string           `json:"runId,omitempty"`
 	ShareURL             string           `json:"shareUrl,omitempty"`
 	Currency             string           `json:"currency"`

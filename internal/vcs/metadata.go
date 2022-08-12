@@ -25,6 +25,7 @@ import (
 
 var (
 	StubMetadata = Metadata{
+		Remote: urlStringToRemote("https://github.com/infracost/infracost"),
 		Branch: Branch{
 			Name: "stub-branch",
 		},
@@ -43,7 +44,23 @@ var (
 	mergeCommitRegxp = regexp.MustCompile(`(?i)^merge\s([\d\w]+)\sinto\s[\d\w]+`)
 	startsWithMerge  = regexp.MustCompile(`(?i)^merge`)
 	versionRegxp     = regexp.MustCompile(`^v\d/`)
+
+	repoOverrideURL = strings.TrimSpace(os.Getenv("INFRACOST_VCS_REPOSITORY_URL"))
+	prOverrideURL   = strings.TrimSpace(os.Getenv("INFRACOST_VCS_PULL_REQUEST_URL"))
+	defaultMetadata = buildDefaultMetadata()
 )
+
+func buildDefaultMetadata() Metadata {
+	m := Metadata{
+		Remote: urlStringToRemote(repoOverrideURL),
+	}
+
+	if prOverrideURL != "" {
+		m.PullRequest = &PullRequest{URL: prOverrideURL}
+	}
+
+	return m
+}
 
 type keyMutex struct {
 	mutexes sync.Map // Zero value is empty and ready for use
@@ -76,8 +93,9 @@ func newMetadataFetcher() *metadataFetcher {
 // It takes a path argument which should point to the filesystem directory for that should
 // be used as the VCS project. This is normally the path to the `.git` directory. If no `.git`
 // directory is found in path, Get will traverse parent directories to try and determine VCS metadata.
-//
 // Get also supplements base VCS metadata with CI specific data if it can be found.
+//
+// When Get encounters an error fetching metadata it will return a default that contains basic Metadata information.
 func (f *metadataFetcher) Get(path string) (Metadata, error) {
 	if isTest() {
 		logging.Logger.Debug("returning stub metadata as Infracost is running in test mode")
@@ -165,6 +183,7 @@ func (f *metadataFetcher) getGitlabMetadata(path string) (Metadata, error) {
 		m.Branch.Name = os.Getenv("CI_MERGE_REQUEST_SOURCE_BRANCH_NAME")
 	}
 
+	m.Remote = urlStringToRemote(getENVRemoteURL("CI_PROJECT_URL"))
 	m.Pipeline = &Pipeline{ID: os.Getenv("CI_PIPELINE_ID")}
 	m.PullRequest = &PullRequest{
 		VCSProvider:  "gitlab",
@@ -173,7 +192,7 @@ func (f *metadataFetcher) getGitlabMetadata(path string) (Metadata, error) {
 		Author:       os.Getenv("CI_COMMIT_AUTHOR"),
 		SourceBranch: os.Getenv("CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"),
 		BaseBranch:   os.Getenv("CI_MERGE_REQUEST_TARGET_BRANCH_NAME"),
-		URL:          os.Getenv("CI_MERGE_REQUEST_PROJECT_URL") + "/-/merge_requests/" + os.Getenv("CI_MERGE_REQUEST_IID"),
+		URL:          prURL(os.Getenv("CI_PROJECT_URL") + "/merge_requests/" + os.Getenv("CI_MERGE_REQUEST_IID")),
 	}
 
 	return m, nil
@@ -182,7 +201,7 @@ func (f *metadataFetcher) getGitlabMetadata(path string) (Metadata, error) {
 func (f *metadataFetcher) getGithubMetadata(path string) (Metadata, error) {
 	event, err := os.ReadFile(os.Getenv("GITHUB_EVENT_PATH"))
 	if err != nil {
-		return Metadata{}, fmt.Errorf("could not read the GitHub event file %w", err)
+		return defaultMetadata, fmt.Errorf("could not read the GitHub event file %w", err)
 	}
 
 	m, err := f.getLocalGitMetadata(path)
@@ -197,24 +216,24 @@ func (f *metadataFetcher) getGithubMetadata(path string) (Metadata, error) {
 
 		r, err := git.PlainOpenWithOptions(path, &git.PlainOpenOptions{DetectDotGit: true})
 		if err != nil {
-			return Metadata{}, fmt.Errorf("could not open git directory to fetch metadata %w", err)
+			return defaultMetadata, fmt.Errorf("could not open git directory to fetch metadata %w", err)
 		}
 
 		cnf, err := r.Config()
 		if err != nil {
-			return Metadata{}, fmt.Errorf("error opening the .git/config folder in github %w", err)
+			return defaultMetadata, fmt.Errorf("error opening the .git/config folder in github %w", err)
 		}
 
 		auth := cnf.Raw.Section("http").Subsection("https://github.com/").Options.Get("extraheader")
 		val := strings.TrimSpace(strings.ReplaceAll(auth, "AUTHORIZATION: basic", ""))
 		b, err := base64.URLEncoding.DecodeString(val)
 		if err != nil {
-			return Metadata{}, fmt.Errorf("GitHub basic auth credentials were malformed, could not decode %w", err)
+			return defaultMetadata, fmt.Errorf("GitHub basic auth credentials were malformed, could not decode %w", err)
 		}
 
 		pieces := strings.Split(string(b), ":")
 		if len(pieces) != 2 {
-			return Metadata{}, fmt.Errorf("GitHub basic auth credentials were malformed, invalid auth components %+v", pieces)
+			return defaultMetadata, fmt.Errorf("GitHub basic auth credentials were malformed, invalid auth components %+v", pieces)
 		}
 
 		headRef := gjson.GetBytes(event, "pull_request.head.ref").String()
@@ -231,7 +250,7 @@ func (f *metadataFetcher) getGithubMetadata(path string) (Metadata, error) {
 
 			r, err = git.PlainOpen(clonePath)
 			if err != nil {
-				return Metadata{}, fmt.Errorf("could not open previously cloned path %w", err)
+				return defaultMetadata, fmt.Errorf("could not open previously cloned path %w", err)
 			}
 		} else {
 			logging.Logger.Debugf("cloning auhor commit into '%s'", clonePath)
@@ -248,24 +267,30 @@ func (f *metadataFetcher) getGithubMetadata(path string) (Metadata, error) {
 			unlock()
 
 			if err != nil {
-				return Metadata{}, fmt.Errorf("could not shallow clone GitHub repo to fetch commit information %w", err)
+				return defaultMetadata, fmt.Errorf("could not shallow clone GitHub repo to fetch commit information %w", err)
 			}
 		}
 
 		head, err := r.Head()
 		if err != nil {
-			return Metadata{}, fmt.Errorf("could not determine head from cloned GitHub branch %w", err)
+			return defaultMetadata, fmt.Errorf("could not determine head from cloned GitHub branch %w", err)
 		}
 
 		commit, err := r.CommitObject(head.Hash())
 		if err != nil {
-			return Metadata{}, fmt.Errorf("could not read head commit from cloned GitHub repo %w", err)
+			return defaultMetadata, fmt.Errorf("could not read head commit from cloned GitHub repo %w", err)
 		}
 
 		m.Commit = commitToMetadata(commit)
 		m.Branch.Name = gjson.GetBytes(event, "pull_request.head.ref").String()
 	}
 
+	remote := gjson.GetBytes(event, "repository.html_url").String()
+	if repoOverrideURL != "" {
+		remote = repoOverrideURL
+	}
+
+	m.Remote = urlStringToRemote(remote)
 	m.Pipeline = &Pipeline{ID: os.Getenv("GITHUB_RUN_ID")}
 	m.PullRequest = &PullRequest{
 		VCSProvider:  "github",
@@ -274,7 +299,7 @@ func (f *metadataFetcher) getGithubMetadata(path string) (Metadata, error) {
 		Author:       gjson.GetBytes(event, "pull_request.user.login").String(),
 		SourceBranch: gjson.GetBytes(event, "pull_request.head.ref").String(),
 		BaseBranch:   gjson.GetBytes(event, "pull_request.base.ref").String(),
-		URL:          gjson.GetBytes(event, "pull_request._links.html.href").String(),
+		URL:          prURL(gjson.GetBytes(event, "pull_request._links.html.href").String()),
 	}
 
 	return m, nil
@@ -283,31 +308,34 @@ func (f *metadataFetcher) getGithubMetadata(path string) (Metadata, error) {
 func (f *metadataFetcher) getLocalGitMetadata(path string) (Metadata, error) {
 	r, err := git.PlainOpenWithOptions(path, &git.PlainOpenOptions{DetectDotGit: true})
 	if err != nil {
-		return Metadata{}, fmt.Errorf("could not open git directory to fetch metadata %w", err)
+		return defaultMetadata, fmt.Errorf("could not open git directory to fetch metadata %w", err)
 	}
 	head, err := r.Head()
 	if err != nil {
-		return Metadata{}, fmt.Errorf("could not determine head from local git directory %w", err)
+		return defaultMetadata, fmt.Errorf("could not determine head from local git directory %w", err)
 	}
 
 	branch := head.Name().Short()
 	commit, err := r.CommitObject(head.Hash())
 	if err != nil {
-		return Metadata{}, fmt.Errorf("could not read head commit %w", err)
+		return defaultMetadata, fmt.Errorf("could not read head commit %w", err)
 	}
 
 	var remote string
-	rms, err := r.Remotes()
+	rem, err := r.Remote("origin")
 	if err != nil {
 		logging.Logger.WithError(err).Debug("failed to ls remotes")
 	}
 
-	for _, rem := range rms {
+	if rem != nil {
 		urls := rem.Config().URLs
 		if len(urls) > 0 {
 			remote = urls[0]
-			break
 		}
+	}
+
+	if remote == "" {
+		remote = repoOverrideURL
 	}
 
 	return Metadata{
@@ -332,6 +360,7 @@ func (f *metadataFetcher) getAzureReposMetadata(path string) (Metadata, error) {
 
 	res := f.getAzureReposPRInfo()
 
+	m.Remote = urlStringToRemote(getENVRemoteURL("BUILD_REPOSITORY_URI"))
 	m.Pipeline = &Pipeline{ID: os.Getenv("BUILD_BUILDID")}
 	pullID := os.Getenv("SYSTEM_PULLREQUEST_PULLREQUESTID")
 	m.PullRequest = &PullRequest{
@@ -341,7 +370,7 @@ func (f *metadataFetcher) getAzureReposMetadata(path string) (Metadata, error) {
 		Author:       res.CreatedBy.UniqueName,
 		SourceBranch: strings.TrimLeft(os.Getenv("SYSTEM_PULLREQUEST_SOURCEBRANCH"), "refs/heads/"),
 		BaseBranch:   strings.TrimLeft(os.Getenv("SYSTEM_PULLREQUEST_TARGETBRANCH"), "refs/heads/"),
-		URL:          fmt.Sprintf("%s/pullrequest/%s", os.Getenv("SYSTEM_PULLREQUEST_SOURCEREPOSITORYURI"), pullID),
+		URL:          prURL(fmt.Sprintf("%s/pullrequest/%s", os.Getenv("SYSTEM_PULLREQUEST_SOURCEREPOSITORYURI"), pullID)),
 	}
 	return m, nil
 }
@@ -431,6 +460,7 @@ func (f *metadataFetcher) getAzureReposGithubMetadata(path string) (Metadata, er
 		}
 	}
 
+	m.Remote = urlStringToRemote(getENVRemoteURL("BUILD_REPOSITORY_URI"))
 	m.Pipeline = &Pipeline{ID: os.Getenv("BUILD_BUILDID")}
 	pullNumber := os.Getenv("SYSTEM_PULLREQUEST_PULLREQUESTNUMBER")
 	m.PullRequest = &PullRequest{
@@ -438,7 +468,7 @@ func (f *metadataFetcher) getAzureReposGithubMetadata(path string) (Metadata, er
 		VCSProvider:  "azure_devops_github",
 		SourceBranch: strings.TrimLeft(os.Getenv("SYSTEM_PULLREQUEST_SOURCEBRANCH"), "refs/heads/"),
 		BaseBranch:   strings.TrimLeft(os.Getenv("SYSTEM_PULLREQUEST_TARGETBRANCH"), "refs/heads/"),
-		URL:          fmt.Sprintf("%s/pulls/%s", os.Getenv("SYSTEM_PULLREQUEST_SOURCEREPOSITORYURI"), pullNumber),
+		URL:          prURL(fmt.Sprintf("%s/pulls/%s", os.Getenv("SYSTEM_PULLREQUEST_SOURCEREPOSITORYURI"), pullNumber)),
 
 		// We are unable to fetch pull request title and author for repositories using the GitHub <> Azure DevOps
 		// setup. The relevant information is not provided in the pipeline, and there is no GitHub access token
@@ -528,13 +558,14 @@ func (f *metadataFetcher) getBitbucketMetadata(path string) (Metadata, error) {
 		return m, fmt.Errorf("BitBucket metadata error, could not fetch initial metadata from local git %w", err)
 	}
 
+	m.Remote = urlStringToRemote(os.Getenv("BITBUCKET_GIT_HTTP_ORIGIN"))
 	m.Pipeline = &Pipeline{ID: os.Getenv("BITBUCKET_BUILD_NUMBER")}
 	m.PullRequest = &PullRequest{
 		VCSProvider:  "bitbucket",
 		ID:           os.Getenv("BITBUCKET_PR_ID"),
 		SourceBranch: os.Getenv("BITBUCKET_BRANCH"),
 		BaseBranch:   os.Getenv("BITBUCKET_PR_DESTINATION_BRANCH"),
-		URL:          fmt.Sprintf("%s/pull-requests/%s", os.Getenv("BITBUCKET_GIT_HTTP_ORIGIN"), os.Getenv("BITBUCKET_PR_ID")),
+		URL:          prURL(fmt.Sprintf("%s/pull-requests/%s", os.Getenv("BITBUCKET_GIT_HTTP_ORIGIN"), os.Getenv("BITBUCKET_PR_ID"))),
 
 		// we're unable to fetch these without calling the Bitbucket API endpoint:
 		// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/
@@ -553,12 +584,13 @@ func (f *metadataFetcher) getCircleCIMetadata(path string) (Metadata, error) {
 		return m, fmt.Errorf("circle CI metadata error, could not fetch initial metadata from local git %w", err)
 	}
 
+	m.Remote = urlStringToRemote(getENVRemoteURL("CIRCLE_REPOSITORY_URL"))
 	m.Pipeline = &Pipeline{ID: os.Getenv("CIRCLE_WORKFLOW_ID")}
 	m.PullRequest = &PullRequest{
 		VCSProvider:  "circleci",
 		ID:           os.Getenv("CIRCLE_PR_NUMBER"),
 		SourceBranch: os.Getenv("CIRCLE_BRANCH"),
-		URL:          os.Getenv("CIRCLE_PULL_REQUEST"),
+		URL:          prURL(os.Getenv("CIRCLE_PULL_REQUEST")),
 
 		// we're unable to fetch these without calling the GitHub, Bitbucket or Gitlab API respectively.
 		// Calling the API requires authentication with variables that we don't have access to in the pipeline.
@@ -602,7 +634,7 @@ func (f *metadataFetcher) getAtlantisMetadata(path string) (Metadata, error) {
 // We cannot rely on any local git information we run this process in the Infracost Cloud. All OS variables are populated
 // by the Infracost Cloud run task worker, which passes them as environment flags when running the Infracost CLI.
 func (f *metadataFetcher) getTFCMetadata(path string) (Metadata, error) {
-	remote := urlStringToRemote(os.Getenv("INFRACOST_VCS_REPOSITORY_URL"))
+	remote := urlStringToRemote(repoOverrideURL)
 
 	runCreatedAt := os.Getenv("INFRACOST_VCS_COMMIT_CREATED_AT")
 	parsedCreatedAt, err := time.Parse(time.RFC3339, runCreatedAt)
@@ -672,6 +704,10 @@ func getLastURLPart(urlString string) string {
 }
 
 func getAtlantisPullRequestURL(remote Remote) string {
+	if prOverrideURL != "" {
+		return prOverrideURL
+	}
+
 	owner := os.Getenv("BASE_REPO_OWNER")
 	project := os.Getenv("BASE_REPO_NAME")
 	pullNumber := os.Getenv("PULL_NUM")
@@ -801,4 +837,20 @@ func urlStringToRemote(remote string) Remote {
 		Host: host,
 		URL:  fmt.Sprintf("https://%s/%s", host, path),
 	}
+}
+
+func prURL(url string) string {
+	if prOverrideURL != "" {
+		return prOverrideURL
+	}
+
+	return url
+}
+
+func getENVRemoteURL(key string) string {
+	if repoOverrideURL != "" {
+		return repoOverrideURL
+	}
+
+	return os.Getenv(key)
 }

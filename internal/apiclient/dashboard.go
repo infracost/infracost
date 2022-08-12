@@ -102,6 +102,20 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (Ad
 	}
 
 	ctxValues := ctx.ContextValues()
+
+	var metadata map[string]interface{}
+	b, err := json.Marshal(out.Metadata)
+	if err != nil {
+		return response, fmt.Errorf("dashboard client failed to marshal output metadata %w", err)
+	}
+
+	err = json.Unmarshal(b, &metadata)
+	if err != nil {
+		return response, fmt.Errorf("dashboard client failed to unmarshal output metadata %w", err)
+	}
+
+	ctxValues["repoMetadata"] = metadata
+
 	if ctx.IsInfracostComment() {
 		// Clone the map to cleanup up the "command" key to show "comment".  It is
 		// currently set to the sub comment (e.g. "github")

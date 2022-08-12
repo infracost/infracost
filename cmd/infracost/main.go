@@ -118,6 +118,7 @@ func newRootCmd(ctx *config.RunContext) *cobra.Command {
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			cmd.SilenceUsage = true
 			ctx.SetContextValue("command", cmd.Name())
+			ctx.CMD = cmd.Name()
 			if cmd.Name() == "comment" || (cmd.Parent() != nil && cmd.Parent().Name() == "comment") {
 				ctx.SetIsInfracostComment()
 			}
