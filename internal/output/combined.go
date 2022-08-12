@@ -14,7 +14,7 @@ import (
 	"github.com/shopspring/decimal"
 	"golang.org/x/mod/semver"
 
-	"github.com/infracost/infracost/internal/logging"
+	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/schema"
 )
 
@@ -166,6 +166,8 @@ func Combine(inputs []ReportInput) (Root, error) {
 	currency := ""
 
 	var metadata Metadata
+	var invalidMetadata bool
+	builder := strings.Builder{}
 	for i, input := range inputs {
 		var err error
 		currency, err = checkCurrency(currency, input.Root.Currency)
@@ -222,14 +224,11 @@ func Combine(inputs []ReportInput) (Root, error) {
 		}
 
 		if i != 0 && metadata.VCSRepoURL != input.Root.Metadata.VCSRepoURL {
-			logging.Logger.Warnf(
-				"combining Infracost JSON for different VCS repositories '%s' & '%s' this is likely to result in unexpected outputs",
-				metadata.VCSRepoURL,
-				input.Root.Metadata.VCSRepoURL,
-			)
+			invalidMetadata = true
 		}
 
 		metadata = input.Root.Metadata
+		builder.WriteString(fmt.Sprintf("%q, ", input.Root.Metadata.VCSRepoURL))
 	}
 
 	combined.Version = outputVersion
@@ -244,6 +243,14 @@ func Combine(inputs []ReportInput) (Root, error) {
 	combined.TimeGenerated = time.Now().UTC()
 	combined.Summary = MergeSummaries(summaries)
 	combined.Metadata = metadata
+
+	if invalidMetadata {
+		return combined, clierror.NewWarningF(
+			"combining Infracost JSON for different VCS repositories %s. Using %s as the top-level repository in the outputted JSON",
+			strings.TrimRight(builder.String(), ", "),
+			metadata.VCSRepoURL,
+		)
+	}
 
 	return combined, nil
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -8,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/infracost/infracost/internal/apiclient"
+	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/ui"
@@ -92,7 +94,11 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			}
 
 			combined, err := output.Combine(inputs)
-			if err != nil {
+			if errors.As(err, &clierror.WarningError{}) {
+				if format == "json" {
+					ui.PrintWarningf(cmd.ErrOrStderr(), err.Error())
+				}
+			} else if err != nil {
 				return err
 			}
 			combined.IsCIRun = ctx.IsCIRun()
