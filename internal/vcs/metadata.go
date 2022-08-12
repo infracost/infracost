@@ -322,16 +322,15 @@ func (f *metadataFetcher) getLocalGitMetadata(path string) (Metadata, error) {
 	}
 
 	var remote string
-	rms, err := r.Remotes()
+	rem, err := r.Remote("origin")
 	if err != nil {
 		logging.Logger.WithError(err).Debug("failed to ls remotes")
 	}
 
-	for _, rem := range rms {
+	if rem != nil {
 		urls := rem.Config().URLs
 		if len(urls) > 0 {
 			remote = urls[0]
-			break
 		}
 	}
 
