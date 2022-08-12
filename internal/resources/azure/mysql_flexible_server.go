@@ -170,7 +170,7 @@ func (r *MySQLFlexibleServer) backupCostComponent() *schema.CostComponent {
 			Service:       strPtr("Azure Database for MySQL"),
 			ProductFamily: strPtr("Databases"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", Value: strPtr("Azure Database for MySQL Flexible Server Backup Storage")},
+				{Key: "productName", Value: strPtr("Az DB for MySQL Flex Svr Backup Storage")},
 				{Key: "meterName", Value: strPtr("Backup Storage LRS Data Stored")},
 			},
 		},
