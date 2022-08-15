@@ -349,7 +349,7 @@ var CommentMarkdownWithHTMLTemplate = `
 <details>
 <summary><strong>Infracost output</strong></summary>
 
-` + "```" /* can't escape backticks */ + `
+` + "```diff" /* can't escape backticks */ + `
 {{ .DiffOutput }}
 ` + "```" /* can't escape backticks */ + `
 </details>
@@ -425,7 +425,7 @@ var CommentMarkdownTemplate = `
 
 **Infracost output:**
 
-` + "```" /* can't escape backticks */ + `
+` + "```diff" /* can't escape backticks */ + `
 {{ .DiffOutput }}
 ` + "```" /* can't escape backticks */ + `
 {{- end }}
