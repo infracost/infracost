@@ -338,10 +338,16 @@ func (f *metadataFetcher) getLocalGitMetadata(path string) (Metadata, error) {
 		remote = repoOverrideURL
 	}
 
+	var pullRequest *PullRequest
+	if prOverrideURL != "" {
+		pullRequest = &PullRequest{URL: prOverrideURL}
+	}
+
 	return Metadata{
-		Remote: urlStringToRemote(remote),
-		Branch: Branch{Name: branch},
-		Commit: commitToMetadata(commit),
+		Remote:      urlStringToRemote(remote),
+		Branch:      Branch{Name: branch},
+		Commit:      commitToMetadata(commit),
+		PullRequest: pullRequest,
 	}, nil
 }
 
