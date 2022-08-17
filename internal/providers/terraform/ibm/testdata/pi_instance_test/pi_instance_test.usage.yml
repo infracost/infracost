@@ -1,2 +1,5 @@
 version: 0.1
 resource_usage:
+  ibm_pi_instance.test-instance:
+    monthly_instance_hours: 730
+    storage: 20
