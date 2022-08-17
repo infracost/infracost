@@ -19,6 +19,7 @@ func newPiInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	processorMode := d.Get("pi_proc_type").String()
 	cpus := d.Get("pi_processors").Float()
 	memory := d.Get("pi_memory").Float()
+	operatingSystem := d.Get("pi_image_id").String()
 
 	refs := d.References("pi_storage_type")
 
@@ -28,13 +29,14 @@ func newPiInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	}
 
 	r := &ibm.PiInstance{
-		Address:       d.Address,
-		Region:        region,
-		SystemType:    systemType,
-		ProcessorMode: processorMode,
-		Cpus:          cpus,
-		Memory:        memory,
-		StorageType:   storageType,
+		Address:         d.Address,
+		Region:          region,
+		SystemType:      systemType,
+		ProcessorMode:   processorMode,
+		Cpus:            cpus,
+		Memory:          memory,
+		StorageType:     storageType,
+		OperatingSystem: operatingSystem,
 	}
 	r.PopulateUsage(u)
 
