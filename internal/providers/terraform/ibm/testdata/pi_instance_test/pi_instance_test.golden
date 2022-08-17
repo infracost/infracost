@@ -1,5 +1,15 @@
-# Run:
-#
-# ARGS="--run TestPiInstance -v -update" make test_ibm
-#
-# to update this file with golden file outputs.
+
+ Name                           Monthly Qty  Unit        Monthly Cost 
+                                                                      
+ ibm_pi_instance.test-instance                                        
+ ├─ Cores                             182.5  Core Hours        $22.06 
+ ├─ Memory                            2,920  GB Hours          $33.29 
+ └─ Storage - tier1                  14,600  GB Hours           $4.00 
+                                                                      
+ OVERALL TOTAL                                                 $59.35 
+──────────────────────────────────
+3 cloud resources were detected:
+∙ 1 was estimated
+∙ 2 are not supported yet, see https://infracost.io/requested-resources:
+  ∙ 1 x ibm_pi_image
+  ∙ 1 x ibm_pi_key
