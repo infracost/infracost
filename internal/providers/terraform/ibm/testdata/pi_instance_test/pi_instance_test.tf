@@ -30,7 +30,7 @@ resource "ibm_pi_key" "key" {
 
 resource "ibm_pi_instance" "test-instance" {
   pi_memory            = "4"
-  pi_processors        = "2"
+  pi_processors        = "0.25"
   pi_instance_name     = "test-vm"
   pi_proc_type         = "shared"
   pi_image_id          = ibm_pi_image.powerimages.id
@@ -39,6 +39,7 @@ resource "ibm_pi_instance" "test-instance" {
   pi_cloud_instance_id = "51e1879c-bcbe-4ee1-a008-49cdba0eaf60"
   pi_pin_policy        = "none"
   pi_health_status     = "WARNING"
+  pi_storage_type  = ibm_pi_image.powerimages.pi_image_storage_type
   pi_network {
     network_id = "test-id"
   }
