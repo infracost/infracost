@@ -16,22 +16,21 @@ import (
 // Resource information: https://cloud.ibm.com/<PATH/TO/RESOURCE>/
 // Pricing information: https://cloud.ibm.com/<PATH/TO/PRICING>/
 type PiInstance struct {
-	Address       string
-	Region        string
-	ProcessorMode string
-	SystemType    string
-	StorageType   string
-	Memory        float64
-	Cpus          float64
+	Address         string
+	Region          string
+	ProcessorMode   string
+	SystemType      string
+	StorageType     string
+	OperatingSystem string
+	Memory          float64
+	Cpus            float64
 
-	Storage              *float64 `infracost_usage:"storage"`
-	MonthlyInstanceHours *float64 `infracost_usage:"monthly_instance_hours"`
+	Storage *float64 `infracost_usage:"storage"`
 }
 
 // PiInstanceUsageSchema defines a list which represents the usage schema of PiInstance.
 var PiInstanceUsageSchema = []*schema.UsageItem{
 	{Key: "storage", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "monthly_instance_hours", DefaultValue: 0, ValueType: schema.Float64},
 }
 
 // PopulateUsage parses the u schema.UsageData into the PiInstance.
@@ -57,13 +56,33 @@ func (r *PiInstance) BuildResource() *schema.Resource {
 	}
 }
 
-func (r *PiInstance) piInstanceCoresCostComponent() *schema.CostComponent {
+func (r *PiInstance) piInstanceOperatingSystemCostComponent() *schema.CostComponent {
 
-	var q *decimal.Decimal
+	unit := "AIX_SMALL_APPLICATION_INSTANCE_HOURS"
 
-	if r.MonthlyInstanceHours != nil {
-		q = decimalPtr(decimal.NewFromFloat(r.Cpus * (*r.MonthlyInstanceHours)))
+	return &schema.CostComponent{
+		Name:            "Operating System",
+		Unit:            "Instance",
+		UnitMultiplier:  schema.HourToMonthUnitMultiplier,
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("ibm"),
+			Region:        strPtr(r.Region),
+			ProductFamily: strPtr("service"),
+			Service:       strPtr("power-iaas"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "planName", Value: strPtr("power-virtual-server-group")},
+				{Key: "planType", Value: strPtr("Paid")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			Unit: strPtr(unit),
+		},
 	}
+}
+
+func (r *PiInstance) piInstanceCoresCostComponent() *schema.CostComponent {
+	q := decimalPtr(decimal.NewFromFloat(r.Cpus))
 
 	const s922 string = "s922"
 	const e980 string = "e980"
@@ -98,10 +117,10 @@ func (r *PiInstance) piInstanceCoresCostComponent() *schema.CostComponent {
 	}
 
 	return &schema.CostComponent{
-		Name:            "Cores",
-		Unit:            "Core Hours",
-		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: q,
+		Name:           "Cores",
+		Unit:           "Core",
+		UnitMultiplier: schema.HourToMonthUnitMultiplier,
+		HourlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
@@ -119,20 +138,15 @@ func (r *PiInstance) piInstanceCoresCostComponent() *schema.CostComponent {
 }
 
 func (r *PiInstance) piInstanceMemoryCostComponent() *schema.CostComponent {
-
-	var q *decimal.Decimal
-
-	if r.MonthlyInstanceHours != nil {
-		q = decimalPtr(decimal.NewFromFloat(r.Memory * (*r.MonthlyInstanceHours)))
-	}
+	q := decimalPtr(decimal.NewFromFloat(r.Memory))
 
 	unit := "MS_GIGABYTE_HOURS"
 
 	return &schema.CostComponent{
-		Name:            "Memory",
-		Unit:            "GB Hours",
-		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: q,
+		Name:           "Memory",
+		Unit:           "GB",
+		UnitMultiplier: schema.HourToMonthUnitMultiplier,
+		HourlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
@@ -154,7 +168,7 @@ func (r *PiInstance) piInstanceStorageCostComponent() *schema.CostComponent {
 	var q *decimal.Decimal
 
 	if r.Storage != nil {
-		q = decimalPtr(decimal.NewFromFloat((*r.Storage) * (*r.MonthlyInstanceHours)))
+		q = decimalPtr(decimal.NewFromFloat(*r.Storage))
 	}
 
 	unit := ""
@@ -166,10 +180,10 @@ func (r *PiInstance) piInstanceStorageCostComponent() *schema.CostComponent {
 	}
 
 	return &schema.CostComponent{
-		Name:            fmt.Sprintf("Storage - %s", r.StorageType),
-		Unit:            "GB Hours",
-		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: q,
+		Name:           fmt.Sprintf("Storage - %s", r.StorageType),
+		Unit:           "GB",
+		UnitMultiplier: schema.HourToMonthUnitMultiplier,
+		HourlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
