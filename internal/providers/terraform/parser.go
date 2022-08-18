@@ -11,6 +11,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 
+	address_parser "github.com/hashicorp/go-terraform-address"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/providers/terraform/aws"
 	"github.com/infracost/infracost/internal/providers/terraform/azure"
@@ -113,15 +114,6 @@ func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.Res
 // populateUsageData finds the UsageData for each ResourceData and sets the ResourceData.UsageData field
 // in case it is needed when processing a reference attribute
 func (p *Parser) populateUsageData(resData map[string]*schema.ResourceData, usage map[string]*schema.UsageData) {
-	wildCardUsage := make(map[string]*schema.UsageData, len(usage))
-	for key, val := range usage {
-		if strings.HasSuffix(key, "*") {
-			lastIndexOfWildcard := strings.LastIndex(key, "*")
-			if lastIndexOfWildcard > 0 {
-				wildCardUsage[key[0:lastIndexOfWildcard]] = val
-			}
-		}
-	}
 	for _, d := range resData {
 		if ud := usage[d.Address]; ud != nil {
 			d.UsageData = ud
@@ -133,10 +125,14 @@ func (p *Parser) populateUsageData(resData map[string]*schema.ResourceData, usag
 			}
 		}
 		if d.UsageData == nil {
-			for key, val := range wildCardUsage {
-				if strings.HasPrefix(d.Address, key) {
-					d.UsageData = val
-				}
+			// Look and default to resource_type level data
+			parsed_address, err := address_parser.NewAddress(d.Address)
+			if err != nil {
+				continue
+			}
+			val, ok := usage[parsed_address.ResourceSpec.Type]
+			if ok {
+				d.UsageData = val
 			}
 		}
 	}
