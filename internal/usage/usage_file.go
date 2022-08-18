@@ -144,8 +144,8 @@ See https://infracost.io/usage-file/ for docs`,
 	for _, node := range u.RawResourceTypeUsage.Content {
 		if isNodeMarkedAsCommented(node) {
 			node.HeadComment = `##
-	## The following usage values are all commented-out, you can uncomment resource types and customize as needed.
-	##`
+## The following usage values are all commented-out, you can uncomment resource types and customize as needed.
+##`
 			break
 		}
 	}
