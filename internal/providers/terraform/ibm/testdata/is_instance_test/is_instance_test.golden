@@ -1,21 +1,26 @@
 
- Name                                                Monthly Qty  Unit              Monthly Cost 
-                                                                                                 
- ibm_is_instance.testInstance                                                                    
- └─ Instance usage (cx2.2x4, public, us-south-1)             730  hours                   $81.43 
-                                                                                                 
- ibm_is_vpc.testVpc                                                                              
- ├─ VPC instance                                               1  Instance                 $0.00 
- ├─ VPC egress free allowance (first 5GB)         Monthly cost depends on usage: $0.00 per GB    
- └─ VPC egress us-south (first 9995 GB)           Monthly cost depends on usage: $0.087 per GB   
- └─ VPC egress us-south (next 40000 GB)           Monthly cost depends on usage: $0.083 per GB   
- └─ VPC egress us-south (next 100000 GB)          Monthly cost depends on usage: $0.07 per GB    
- └─ VPC egress us-south (over 149995 GB)          Monthly cost depends on usage: $0.05 per GB    
-                                                                                                 
- OVERALL TOTAL                                                                            $81.43 
+ Name                                              Monthly Qty  Unit                        Monthly Cost 
+                                                                                                         
+ ibm_is_instance.testInstance                                                                            
+ ├─ CPU hours (2 CPUs, us-south-1)                       1,460  CPU hours                         $38.70 
+ └─ Memory hours (4 GB, us-south-1)                      2,920  Memory hours                      $12.33 
+                                                                                                         
+ ibm_is_instance.testInstanceWithoutUsage                                                                
+ ├─ CPU hours (2 CPUs, us-south-1)         Monthly cost depends on usage: $0.0265079365 per CPU hours    
+ └─ Memory hours (4 GB, us-south-1)        Monthly cost depends on usage: $0.0042222222 per Memory hours 
+                                                                                                         
+ ibm_is_vpc.testVpc                                                                                      
+ ├─ VPC instance                                             1  Instance                           $0.00 
+ ├─ VPC egress free allowance (first 5GB)  Monthly cost depends on usage: $0.00 per GB                   
+ └─ VPC egress us-south (first 9995 GB)    Monthly cost depends on usage: $0.087 per GB                  
+ └─ VPC egress us-south (next 40000 GB)    Monthly cost depends on usage: $0.083 per GB                  
+ └─ VPC egress us-south (next 100000 GB)   Monthly cost depends on usage: $0.07 per GB                   
+ └─ VPC egress us-south (over 149995 GB)   Monthly cost depends on usage: $0.05 per GB                   
+                                                                                                         
+ OVERALL TOTAL                                                                                    $51.03 
 ──────────────────────────────────
-4 cloud resources were detected:
-∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+5 cloud resources were detected:
+∙ 3 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 2 were free:
   ∙ 1 x ibm_is_ssh_key
   ∙ 1 x ibm_is_subnet
