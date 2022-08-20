@@ -1,9 +1,10 @@
 package google
 
 import (
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 // ContainerNodePool struct represents Container Cluster's Node Pool resource.
@@ -53,7 +54,9 @@ func (r *ContainerNodePool) BuildResource() *schema.Resource {
 	}
 
 	for _, guestAccel := range r.NodeConfig.GuestAccelerators {
-		costComponents = append(costComponents, guestAcceleratorCostComponent(r.Region, r.NodeConfig.PurchaseOption, guestAccel.Type, guestAccel.Count, poolSize, nil))
+		if component := guestAcceleratorCostComponent(r.Region, r.NodeConfig.PurchaseOption, guestAccel.Type, guestAccel.Count, poolSize, nil); component != nil {
+			costComponents = append(costComponents, component)
+		}
 	}
 
 	resource := &schema.Resource{

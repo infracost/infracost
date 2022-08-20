@@ -108,7 +108,12 @@ func (a AuthClient) startCallbackServer(listener net.Listener, generatedState st
 			}
 
 			http.Redirect(w, r, redirectTo, http.StatusTemporaryRedirect)
-			time.Sleep(3 * time.Second) // Sleep for a few seconds to make sure the redirect happens
+			// Flush the response, otherwise the HTTP redirect response doesn't always get sent
+			// before the server shuts down.
+			flusher, ok := w.(http.Flusher)
+			if ok {
+				flusher.Flush()
+			}
 			shutdown <- callbackServerResp{apiKey: apiKey, infoMsg: infoMsg}
 		}))
 	}()

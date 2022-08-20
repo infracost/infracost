@@ -259,6 +259,7 @@ func TestBreakdownTerragrunt(t *testing.T) {
 func TestBreakdownTerragruntWithDashboardEnabled(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terragrunt"}, nil, func(c *config.RunContext) {
 		c.Config.EnableDashboard = true
+		c.Config.EnableCloud = nil
 	})
 }
 
@@ -366,7 +367,7 @@ func TestBreakdownInitFlagsError(t *testing.T) {
 }
 
 func TestBreakdownWithPrivateTerraformRegistryModule(t *testing.T) {
-	if _, ok := os.LookupEnv("INFRACOST_TERRAFORM_CLOUD_TOKEN"); !ok {
+	if os.Getenv("INFRACOST_TERRAFORM_CLOUD_TOKEN") == "" {
 		t.Skip("Skipping because INFRACOST_TERRAFORM_CLOUD_TOKEN is not set and external contributors won't have this.")
 	}
 
@@ -377,6 +378,21 @@ func TestBreakdownWithPrivateTerraformRegistryModule(t *testing.T) {
 			"breakdown",
 			"--path",
 			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+		},
+		nil,
+	)
+}
+
+func TestBreakdownWithWorkspace(t *testing.T) {
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path",
+			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+			"--terraform-workspace",
+			"prod",
 		},
 		nil,
 	)

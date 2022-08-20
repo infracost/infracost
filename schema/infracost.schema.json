@@ -62,6 +62,67 @@
       "additionalProperties": false,
       "type": "object"
     },
+    "Metadata": {
+      "required": [
+        "infracostCommand",
+        "branch",
+        "commit",
+        "commitAuthorName",
+        "commitAuthorEmail",
+        "commitTimestamp",
+        "commitMessage"
+      ],
+      "properties": {
+        "infracostCommand": {
+          "type": "string"
+        },
+        "branch": {
+          "type": "string"
+        },
+        "commit": {
+          "type": "string"
+        },
+        "commitAuthorName": {
+          "type": "string"
+        },
+        "commitAuthorEmail": {
+          "type": "string"
+        },
+        "commitTimestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "commitMessage": {
+          "type": "string"
+        },
+        "vcsRepoUrl": {
+          "type": "string"
+        },
+        "vcsProvider": {
+          "type": "string"
+        },
+        "vcsBaseBranch": {
+          "type": "string"
+        },
+        "vcsPullRequestTitle": {
+          "type": "string"
+        },
+        "vcsPullRequestUrl": {
+          "type": "string"
+        },
+        "vcsPullRequestAuthor": {
+          "type": "string"
+        },
+        "vcsPipelineRunId": {
+          "type": "string"
+        },
+        "vcsPullRequestId": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
     "Project": {
       "required": [
         "name",
@@ -100,20 +161,10 @@
     "ProjectMetadata": {
       "required": [
         "path",
-        "infracostCommand",
-        "type",
-        "branch",
-        "commit",
-        "commitAuthorName",
-        "commitAuthorEmail",
-        "commitTimestamp",
-        "commitMessage"
+        "type"
       ],
       "properties": {
         "path": {
-          "type": "string"
-        },
-        "infracostCommand": {
           "type": "string"
         },
         "type": {
@@ -125,50 +176,7 @@
         "terraformWorkspace": {
           "type": "string"
         },
-        "branch": {
-          "type": "string"
-        },
-        "commit": {
-          "type": "string"
-        },
-        "commitAuthorName": {
-          "type": "string"
-        },
-        "commitAuthorEmail": {
-          "type": "string"
-        },
-        "commitTimestamp": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "commitMessage": {
-          "type": "string"
-        },
-        "vcsRepoUrl": {
-          "type": "string"
-        },
         "vcsSubPath": {
-          "type": "string"
-        },
-        "vcsProvider": {
-          "type": "string"
-        },
-        "vcsBaseBranch": {
-          "type": "string"
-        },
-        "vcsPullRequestTitle": {
-          "type": "string"
-        },
-        "vcsPullRequestUrl": {
-          "type": "string"
-        },
-        "vcsPullRequestAuthor": {
-          "type": "string"
-        },
-        "vcsPipelineRunId": {
-          "type": "string"
-        },
-        "vcsPullRequestId": {
           "type": "string"
         }
       },
@@ -228,6 +236,7 @@
     "Root": {
       "required": [
         "version",
+        "metadata",
         "currency",
         "projects",
         "totalHourlyCost",
@@ -242,6 +251,10 @@
       "properties": {
         "version": {
           "type": "string"
+        },
+        "metadata": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/Metadata"
         },
         "runId": {
           "type": "string"

@@ -12,6 +12,7 @@ import (
 	"github.com/hashicorp/hcl/v2/hclparse"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
+	"github.com/zclconf/go-cty/cty/gocty"
 
 	"github.com/infracost/infracost/internal/extclient"
 	"github.com/infracost/infracost/internal/hcl/modules"
@@ -20,7 +21,8 @@ import (
 )
 
 var (
-	maxTfProjectSearchLevel = 5
+	maxTfProjectSearchLevel       = 5
+	defaultTerraformWorkspaceName = "default"
 )
 
 type Option func(p *Parser)
@@ -160,6 +162,24 @@ func OptionWithBlockBuilder(blockBuilder BlockBuilder) Option {
 	}
 }
 
+// OptionWithTerraformWorkspace informs the Parser to use the provided name as the workspace for context evaluation.
+// The Parser exposes this workspace in the evaluation context under the variable named `terraform.workspace`.
+// This is commonly used by users to specify different capacity/configuration in their Terraform, e.g:
+//
+//		terraform.workspace == "prod" ? "m5.8xlarge" : "m5.4xlarge"
+func OptionWithTerraformWorkspace(name string) Option {
+	name = strings.TrimSpace(name)
+	return func(p *Parser) {
+		if name != "" {
+			if p.logger != nil {
+				p.logger.Debugf("setting HCL parser to use user provided Terraform workspace: '%s'", name)
+			}
+
+			p.workspaceName = name
+		}
+	}
+}
+
 // OptionWithSpinner sets a SpinnerFunc onto the Parser. With this option enabled
 // the Parser will send progress to the Spinner. This is disabled by default as
 // we run the Parser concurrently underneath DirProvider and don't want to mess with its output.
@@ -221,7 +241,7 @@ func newParser(initialPath string, logger *logrus.Entry, options ...Option) *Par
 
 	p := &Parser{
 		initialPath:   initialPath,
-		workspaceName: "default",
+		workspaceName: defaultTerraformWorkspaceName,
 		blockBuilder:  BlockBuilder{SetAttributes: []SetAttributesFunc{SetUUIDAttributes}, Logger: logger},
 		logger:        parserLogger,
 	}
@@ -664,7 +684,15 @@ func (p *projectLocator) walkPaths(fullPath string, level int) []string {
 				if src, ok := a["source"]; ok {
 					val, _ := src.Expr.Value(nil)
 					if val.Type() == cty.String {
-						realPath := filepath.Join(fullPath, val.AsString())
+						var realPath string
+						err := gocty.FromCtyValue(val, &realPath)
+						if err != nil {
+							p.logger.WithError(err).WithFields(logrus.Fields{
+								"module": strings.Join(module.Labels, "."),
+							}).Debug("could not read source value of module as string")
+							continue
+						}
+
 						p.moduleCalls[realPath] = struct{}{}
 					}
 				}

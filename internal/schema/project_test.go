@@ -30,7 +30,7 @@ func TestNameFromRepoURL(t *testing.T) {
 func TestGenerateProjectName(t *testing.T) {
 	type args struct {
 		metadata         *ProjectMetadata
-		projectName      string
+		repoURL          string
 		dashboardEnabled bool
 	}
 	tests := []struct {
@@ -41,70 +41,63 @@ func TestGenerateProjectName(t *testing.T) {
 		{
 			name: "azure repo url should show org/project/repo with spaces",
 			args: args{
-				metadata: &ProjectMetadata{
-					VCSRepoURL: "https://SG-GDI-CTO-PublicCloud@dev.azure.com/SG-GDI-CTO-PublicCloud/CloudSolutions%20Playground/_git/CloudSolutions%20Playground",
-				},
+				metadata: &ProjectMetadata{},
+				repoURL:  "https://infracost-user@dev.azure.com/infracost/my%20project/_git/my%20repo",
 			},
-			want: "SG-GDI-CTO-PublicCloud/CloudSolutions Playground/CloudSolutions Playground",
+			want: "infracost/my project/my repo",
 		},
 		{
 			name: "github repo https url",
 			args: args{
-				metadata: &ProjectMetadata{
-					VCSRepoURL: "https://github.com/infracost/infracost.git",
-				},
+				metadata: &ProjectMetadata{},
+				repoURL:  "https://github.com/infracost/infracost.git",
 			},
 			want: "infracost/infracost",
 		},
 		{
 			name: "github repo ssh url",
 			args: args{
-				metadata: &ProjectMetadata{
-					VCSRepoURL: "git@github.com:infracost/infracost.git",
-				},
+				metadata: &ProjectMetadata{},
+				repoURL:  "git@github.com:infracost/infracost.git",
 			},
 			want: "infracost/infracost",
 		},
 		{
 			name: "gitlab repo https url",
 			args: args{
-				metadata: &ProjectMetadata{
-					VCSRepoURL: "https://gitlab.com/infracost/infracost-gitlab-ci.git",
-				},
+				metadata: &ProjectMetadata{},
+				repoURL:  "https://gitlab.com/infracost/infracost-gitlab-ci.git",
 			},
 			want: "infracost/infracost-gitlab-ci",
 		},
 		{
 			name: "gitlab repo ssh url",
 			args: args{
-				metadata: &ProjectMetadata{
-					VCSRepoURL: "git@gitlab.com:infracost/infracost-gitlab-ci.git",
-				},
+				metadata: &ProjectMetadata{},
+				repoURL:  "git@gitlab.com:infracost/infracost-gitlab-ci.git",
 			},
 			want: "infracost/infracost-gitlab-ci",
 		},
 		{
 			name: "bitbucket repo https url",
 			args: args{
-				metadata: &ProjectMetadata{
-					VCSRepoURL: "https://hugorutinfracost@bitbucket.org/infracost/infracost-bitbucket-pipeline.git",
-				},
+				metadata: &ProjectMetadata{},
+				repoURL:  "https://hugorutinfracost@bitbucket.org/infracost/infracost-bitbucket-pipeline.git",
 			},
 			want: "infracost/infracost-bitbucket-pipeline",
 		},
 		{
 			name: "bitbucket repo ssh url",
 			args: args{
-				metadata: &ProjectMetadata{
-					VCSRepoURL: "git@bitbucket.org:infracost/infracost-bitbucket-pipeline.git",
-				},
+				metadata: &ProjectMetadata{},
+				repoURL:  "git@bitbucket.org:infracost/infracost-bitbucket-pipeline.git",
 			},
 			want: "infracost/infracost-bitbucket-pipeline",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equalf(t, tt.want, GenerateProjectName(tt.args.metadata, tt.args.projectName, tt.args.dashboardEnabled), "GenerateProjectName(%v, %v, %v)", tt.args.metadata, tt.args.projectName, tt.args.dashboardEnabled)
+			assert.Equalf(t, tt.want, tt.args.metadata.GenerateProjectName(tt.args.repoURL, tt.args.dashboardEnabled), "GenerateProjectName(%v, %v)", tt.args.repoURL, tt.args.dashboardEnabled)
 		})
 	}
 }
