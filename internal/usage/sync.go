@@ -83,9 +83,16 @@ func syncResourceUsages(projectCtx *config.ProjectContext, usageFile *UsageFile,
 	}
 
 	existingResourceUsagesMap := resourceUsagesMap(usageFile.ResourceUsages)
+	existingResourceTypeUsagesMap := resourceUsagesMap(usageFile.ResourceTypeUsages)
+
 	resourceUsages := make([]*ResourceUsage, 0, len(resources))
 
 	// Track the existing order so we can keep these at the top
+	existingTypeOrder := make([]string, 0, len(usageFile.ResourceTypeUsages))
+	for _, resourceUsage := range usageFile.ResourceTypeUsages {
+		existingTypeOrder = append(existingTypeOrder, resourceUsage.Name)
+	}
+
 	existingOrder := make([]string, 0, len(usageFile.ResourceUsages))
 	for _, resourceUsage := range usageFile.ResourceUsages {
 		existingOrder = append(existingOrder, resourceUsage.Name)
@@ -100,7 +107,6 @@ func syncResourceUsages(projectCtx *config.ProjectContext, usageFile *UsageFile,
 	}
 
 	resourceTypeUsages := make([]*ResourceUsage, 0, len(resources))
-	existingResourceTypeUsagesMap := resourceUsagesMap(usageFile.ResourceTypeUsages)
 
 	resourceTypeSet := make(map[string]*schema.Resource)
 
@@ -114,6 +120,8 @@ func syncResourceUsages(projectCtx *config.ProjectContext, usageFile *UsageFile,
 			resourceTypeUsages = append(resourceTypeUsages, ru)
 		}
 	}
+
+	sortResourceUsages(resourceTypeUsages, existingTypeOrder)
 
 	usageFile.ResourceTypeUsages = resourceTypeUsages
 
