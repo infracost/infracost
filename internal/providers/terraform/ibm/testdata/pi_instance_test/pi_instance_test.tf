@@ -14,7 +14,7 @@ provider "ibm" {
 }
 
 resource "ibm_pi_image" "powerimages" {
-  pi_image_name        = "test_image"
+  pi_image_name        = "7200-05-03"
   pi_cloud_instance_id = "51e1879c-bcbe-4ee1-a008-49cdba0eaf60"
   pi_image_bucket_name = "images-public-bucket"
   pi_image_bucket_access = "public"
