@@ -61,10 +61,10 @@ func (r *PiInstance) piInstanceOperatingSystemCostComponent() *schema.CostCompon
 	unit := "AIX_SMALL_APPLICATION_INSTANCE_HOURS"
 
 	return &schema.CostComponent{
-		Name:            "Operating System",
-		Unit:            "Instance",
-		UnitMultiplier:  schema.HourToMonthUnitMultiplier,
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+		Name:           "Operating System",
+		Unit:           "Instance",
+		UnitMultiplier: schema.HourToMonthUnitMultiplier,
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
