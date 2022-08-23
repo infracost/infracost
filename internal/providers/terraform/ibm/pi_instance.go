@@ -7,6 +7,14 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
+// Operating System
+const (
+	AIX int64 = iota
+	IBMI
+	RHEL
+	SLES
+)
+
 func getPiInstanceRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:                "ibm_pi_instance",
@@ -15,26 +23,32 @@ func getPiInstanceRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func identifyOperatingSystem(imageName string) string {
-	splittedImageName := strings.Split(imageName, "-")[0]
+func identifyOperatingSystem(imageName string) int64 {
+	splittedImageName := strings.Split(imageName, "-")
 
-	if splittedImageName == "7100" || splittedImageName == "7200" || splittedImageName == "7300" {
-		return "aix"
+	if len(splittedImageName) == 0 {
+		return -1
 	}
 
-	if splittedImageName == "IBMi" {
-		return "ibmi"
+	truncatedImageName := splittedImageName[0]
+
+	if truncatedImageName == "7100" || truncatedImageName == "7200" || truncatedImageName == "7300" {
+		return AIX
 	}
 
-	if splittedImageName == "CentOS" || splittedImageName == "Linux" || splittedImageName == "RHEL8" {
-		return "rhel"
+	if truncatedImageName == "IBMi" {
+		return IBMI
 	}
 
-	if splittedImageName == "SLES15" {
-		return "sles"
+	if truncatedImageName == "CentOS" || truncatedImageName == "Linux" || truncatedImageName == "RHEL8" {
+		return RHEL
 	}
 
-	return ""
+	if truncatedImageName == "SLES15" {
+		return SLES
+	}
+
+	return -1
 }
 
 func newPiInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
