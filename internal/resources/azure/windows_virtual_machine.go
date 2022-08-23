@@ -89,7 +89,7 @@ func windowsVirtualMachineCostComponent(region string, instanceType string, lice
 		purchaseOptionLabel = "hybrid benefit"
 	}
 
-	qty := decimal.NewFromFloat(730)
+	qty := schema.HourToMonthUnitMultiplier
 	if monthlyHours != nil {
 		qty = decimal.NewFromFloat(*monthlyHours)
 	}
