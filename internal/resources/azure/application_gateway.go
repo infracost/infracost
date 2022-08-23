@@ -108,7 +108,7 @@ func (r *ApplicationGateway) v2CostComponents(skuNameParts []string) []*schema.C
 		monthlyCapacityUnits = decimalPtr(decimal.NewFromInt(*r.MonthlyV2CapacityUnits))
 	}
 	var tier string
-	if strings.ToLower(skuNameParts[0]) == "standard" {
+	if len(skuNameParts) > 0 && strings.ToLower(skuNameParts[0]) == "standard" {
 		tier = "basic v2"
 		costComponents = append(costComponents, r.fixedForV2CostComponent(fmt.Sprintf("Gateway usage (%s)", tier), "standard v2"))
 		costComponents = append(costComponents, r.capacityUnitsCostComponent("basic", "standard v2", monthlyCapacityUnits))

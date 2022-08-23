@@ -7,7 +7,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getActiveDirectoryDomainServiceRegistryItem(),
 	getActiveDirectoryDomainServiceReplicaSetRegistryItem(),
 	getAPIManagementRegistryItem(),
-	getAzureApplicationGatewayRegistryItem(),
+	getApplicationGatewayRegistryItem(),
 	getAppServiceEnvironmentRegistryItem(),
 	GetAzureRMAppIntegrationServiceEnvironmentRegistryItem(),
 	GetAzureRMAppFunctionRegistryItem(),
