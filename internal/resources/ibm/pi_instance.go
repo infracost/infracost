@@ -15,18 +15,31 @@ import (
 //
 // Resource information: https://cloud.ibm.com/<PATH/TO/RESOURCE>/
 // Pricing information: https://cloud.ibm.com/<PATH/TO/PRICING>/
+
 type PiInstance struct {
 	Address         string
 	Region          string
 	ProcessorMode   string
 	SystemType      string
 	StorageType     string
-	OperatingSystem string
+	OperatingSystem int64
 	Memory          float64
 	Cpus            float64
 
 	Storage *float64 `infracost_usage:"storage"`
 }
+
+// Operating System
+const (
+	AIX int64 = iota
+	IBMI
+	RHEL
+	SLES
+)
+
+const s922 string = "s922"
+const e980 string = "e980"
+const e1080 string = "e1080"
 
 // PiInstanceUsageSchema defines a list which represents the usage schema of PiInstance.
 var PiInstanceUsageSchema = []*schema.UsageItem{
@@ -47,6 +60,7 @@ func (r *PiInstance) BuildResource() *schema.Resource {
 		r.piInstanceCoresCostComponent(),
 		r.piInstanceMemoryCostComponent(),
 		r.piInstanceStorageCostComponent(),
+		r.piInstanceOperatingSystemCostComponent(),
 	}
 
 	return &schema.Resource{
@@ -57,8 +71,23 @@ func (r *PiInstance) BuildResource() *schema.Resource {
 }
 
 func (r *PiInstance) piInstanceOperatingSystemCostComponent() *schema.CostComponent {
+	unit := ""
 
-	unit := "AIX_SMALL_APPLICATION_INSTANCE_HOURS"
+	if r.OperatingSystem == AIX {
+		if r.SystemType == s922 {
+			unit = "AIX_SMALL_APPLICATION_INSTANCE_HOURS"
+		} else if r.SystemType == e980 || r.SystemType == e1080 {
+			unit = "AIX_MEDIUM_APPLICATION_INSTANCE_HOURS"
+		}
+	} else if r.OperatingSystem == IBMI {
+		if r.SystemType == s922 {
+			unit = ""
+		}
+	} else if r.OperatingSystem == RHEL {
+		unit = ""
+	} else if r.OperatingSystem == SLES {
+		unit = ""
+	}
 
 	return &schema.CostComponent{
 		Name:           "Operating System",
@@ -83,10 +112,6 @@ func (r *PiInstance) piInstanceOperatingSystemCostComponent() *schema.CostCompon
 
 func (r *PiInstance) piInstanceCoresCostComponent() *schema.CostComponent {
 	q := decimalPtr(decimal.NewFromFloat(r.Cpus))
-
-	const s922 string = "s922"
-	const e980 string = "e980"
-	const e1080 string = "e1080"
 
 	unit := ""
 
