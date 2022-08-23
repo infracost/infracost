@@ -5,7 +5,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func getAzureApplicationGatewayRegistryItem() *schema.RegistryItem {
+func getApplicationGatewayRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_application_gateway",
 		RFunc: NewApplicationGateway,
