@@ -73,7 +73,7 @@ func linuxVirtualMachineCostComponent(region string, instanceType string, monthl
 		instanceType = fmt.Sprintf("Standard_%s", instanceType)
 	}
 
-	qty := decimal.NewFromFloat(730)
+	qty := schema.HourToMonthUnitMultiplier
 	if monthlyHours != nil {
 		qty = decimal.NewFromFloat(*monthlyHours)
 	}
