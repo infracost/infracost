@@ -32,17 +32,25 @@ func getLocation(d *schema.ResourceData) (string, string) {
 }
 
 func newIbmCosBucket(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	l, i := getLocation(d)
+	location, locationIdentifier := getLocation(d)
+	storage_class := d.Get("storage_class").String()
 
 	r := &ibm.IbmCosBucket{
 		Address:            d.Address,
 		Region:             d.Get("region").String(),
-		Location:           l,
-		LocationIdentifier: i,
-		StorageClass:       d.Get("storage_class").String(),
+		Location:           location,
+		LocationIdentifier: locationIdentifier,
+		StorageClass:       storage_class,
 	}
 
 	r.PopulateUsage(u)
+
+	configuration := make(map[string]any)
+	configuration["location"] = location
+	configuration["locationIdentifier"] = locationIdentifier
+	configuration["locationIdentifier"] = storage_class
+
+	SetCatalogMetadata(d, d.Type, configuration)
 
 	return r.BuildResource()
 }

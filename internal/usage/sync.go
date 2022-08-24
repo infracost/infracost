@@ -83,9 +83,16 @@ func syncResourceUsages(projectCtx *config.ProjectContext, usageFile *UsageFile,
 	}
 
 	existingResourceUsagesMap := resourceUsagesMap(usageFile.ResourceUsages)
+	existingResourceTypeUsagesMap := resourceUsagesMap(usageFile.ResourceTypeUsages)
+
 	resourceUsages := make([]*ResourceUsage, 0, len(resources))
 
 	// Track the existing order so we can keep these at the top
+	existingTypeOrder := make([]string, 0, len(usageFile.ResourceTypeUsages))
+	for _, resourceUsage := range usageFile.ResourceTypeUsages {
+		existingTypeOrder = append(existingTypeOrder, resourceUsage.Name)
+	}
+
 	existingOrder := make([]string, 0, len(usageFile.ResourceUsages))
 	for _, resourceUsage := range usageFile.ResourceUsages {
 		existingOrder = append(existingOrder, resourceUsage.Name)
@@ -98,6 +105,25 @@ func syncResourceUsages(projectCtx *config.ProjectContext, usageFile *UsageFile,
 			resourceUsages = append(resourceUsages, ru)
 		}
 	}
+
+	resourceTypeUsages := make([]*ResourceUsage, 0, len(resources))
+
+	resourceTypeSet := make(map[string]*schema.Resource)
+
+	for _, resource := range resources {
+		resourceTypeSet[resource.ResourceType] = resource
+	}
+
+	for _, resource := range resourceTypeSet {
+		ru := syncResourceType(projectCtx, resource, referenceFile, existingResourceTypeUsagesMap)
+		if ru != nil {
+			resourceTypeUsages = append(resourceTypeUsages, ru)
+		}
+	}
+
+	sortResourceUsages(resourceTypeUsages, existingTypeOrder)
+
+	usageFile.ResourceTypeUsages = resourceTypeUsages
 
 	numWorkers := 4
 	numCPU := runtime.NumCPU()
@@ -172,6 +198,34 @@ func syncWildCardResource(wildCardResources map[string]bool, resource *schema.Re
 				replaceResourceUsages(resourceUsage, existingResourceUsage, ReplaceResourceUsagesOpts{})
 			}
 		}
+	}
+
+	return resourceUsage
+}
+
+func syncResourceType(projectCtx *config.ProjectContext, resource *schema.Resource, referenceFile *ReferenceFile, existingResourceUsagesMap map[string]*ResourceUsage) *ResourceUsage {
+	resourceUsage := &ResourceUsage{
+		Name: resource.ResourceType,
+	}
+
+	// Merge the usage schema from the reference usage file
+	refResourceUsage := referenceFile.FindMatchingResourceTypeUsage(resource.ResourceType)
+	if refResourceUsage != nil {
+		replaceResourceUsages(resourceUsage, refResourceUsage, ReplaceResourceUsagesOpts{})
+	}
+
+	// Merge the usage schema from the resource struct
+	// We want to override the value type from the usage schema since we can't always tell from the YAML
+	// what the value type should be, e.g. user might add an int value for a float attribute.
+	replaceResourceUsages(resourceUsage, &ResourceUsage{
+		Name:  resource.Name,
+		Items: resource.UsageSchema,
+	}, ReplaceResourceUsagesOpts{OverrideValueType: true})
+
+	// Merge any existing resource usage
+	existingResourceUsage := existingResourceUsagesMap[resource.Name]
+	if existingResourceUsage != nil {
+		replaceResourceUsages(resourceUsage, existingResourceUsage, ReplaceResourceUsagesOpts{})
 	}
 
 	return resourceUsage
