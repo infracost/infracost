@@ -257,8 +257,8 @@ func (f *metadataFetcher) Get(path string) (m Metadata, err error) {
 		return StubMetadata, nil
 	}
 
-	_, ok := lookupEnv("GITHUB_ACTIONS")
-	if ok {
+	v, ok := lookupEnv("GITHUB_ACTIONS")
+	if ok && v != "" {
 		logging.Logger.Debug("fetching GitHub action VCS metadata")
 		return f.getGithubMetadata(path)
 	}
@@ -269,7 +269,7 @@ func (f *metadataFetcher) Get(path string) (m Metadata, err error) {
 		return f.getGitlabMetadata(path)
 	}
 
-	v, ok := lookupEnv("BUILD_REPOSITORY_PROVIDER")
+	v, ok = lookupEnv("BUILD_REPOSITORY_PROVIDER")
 	if ok {
 		if v == "github" {
 			logging.Logger.Debug("fetching GitHub VCS metadata from Azure DevOps pipeline")
