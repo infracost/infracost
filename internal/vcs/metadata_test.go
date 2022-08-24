@@ -65,6 +65,7 @@ func Test_urlStringToRemote(t *testing.T) {
 func Test_metadataFetcher_GetLocalMetadata(t *testing.T) {
 	tmp := t.TempDir()
 	obj := createLocalRepoWithCommit(t, tmp)
+	t.Setenv("GITHUB_ACTIONS", "")
 
 	test := false
 	m := metadataFetcher{
