@@ -54,6 +54,7 @@ var globalCatalogServiceId = map[string]catalogMetadata{
 	"ibm_tg_gateway":                {"transit.gateway", []string{}},
 	"ibm_is_floating_ip":            {"is.floating-ip", []string{}},
 	"ibm_is_flow_log":               {"is.flow-log-collector", []string{}},
+	"ibm_pi_instance":               {"power-iaas", []string{}},
 }
 
 func SetCatalogMetadata(d *schema.ResourceData, resourceType string) {
