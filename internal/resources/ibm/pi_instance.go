@@ -77,7 +77,11 @@ func (r *PiInstance) BuildResource() *schema.Resource {
 	if r.OperatingSystem == AIX {
 		costComponents = append(costComponents, r.piInstanceAIXOperatingSystemCostComponent())
 	} else if r.OperatingSystem == IBMI {
-		costComponents = append(costComponents, r.piInstanceIBMiLPPPOperatingSystemCostComponent(), r.piInstanceIBMiOSOperatingSystemCostComponent())
+		costComponents = append(costComponents,
+			r.piInstanceIBMiLPPPOperatingSystemCostComponent(),
+			r.piInstanceIBMiOSOperatingSystemCostComponent(),
+		)
+		// costComponents = append(costComponents, r.piInstanceIBMiOperatingSystemServiceExtensionCostComponent())
 	}
 
 	return &schema.Resource{
@@ -178,6 +182,31 @@ func (r *PiInstance) piInstanceIBMiOSOperatingSystemCostComponent() *schema.Cost
 		},
 	}
 }
+
+// figure out how to distinguish between ibmi - ibmi7.1 - ibmi7.2
+// func (r *PiInstance) piInstanceIBMiOperatingSystemServiceExtensionCostComponent() *schema.CostComponent {
+// 	unit := "IBM_I_OS_PTEN_SRVC_EXT_PER_PROC_CORE_HR"
+
+// 	return &schema.CostComponent{
+// 		Name:           "Operating System IBMi Service Extension",
+// 		Unit:           "Core",
+// 		UnitMultiplier: schema.HourToMonthUnitMultiplier,
+// 		HourlyQuantity: decimalPtr(decimal.NewFromFloat(r.Cpus)),
+// 		ProductFilter: &schema.ProductFilter{
+// 			VendorName:    strPtr("ibm"),
+// 			Region:        strPtr(r.Region),
+// 			ProductFamily: strPtr("service"),
+// 			Service:       strPtr("power-iaas"),
+// 			AttributeFilters: []*schema.AttributeFilter{
+// 				{Key: "planName", Value: strPtr("power-virtual-server-group")},
+// 				{Key: "planType", Value: strPtr("Paid")},
+// 			},
+// 		},
+// 		PriceFilter: &schema.PriceFilter{
+// 			Unit: strPtr(unit),
+// 		},
+// 	}
+// }
 
 func (r *PiInstance) piInstanceCloudStorageSolutionCostComponent() *schema.CostComponent {
 	var cloudStorageSolutionAmount int64
