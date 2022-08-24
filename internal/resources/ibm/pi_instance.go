@@ -28,6 +28,7 @@ type PiInstance struct {
 
 	Storage              *float64 `infracost_usage:"storage"`
 	CloudStorageSolution *int64   `infracost_usage:"cloud_storage_solution"`
+	HighAvailability     *int64   `infracost_usage:"high_availability"`
 }
 
 // Operating System
@@ -46,6 +47,7 @@ const e1080 string = "e1080"
 var PiInstanceUsageSchema = []*schema.UsageItem{
 	{Key: "storage", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "cloud_storage_solution", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "high_availability", DefaultValue: 0, ValueType: schema.Int64},
 }
 
 // PopulateUsage parses the u schema.UsageData into the PiInstance.
@@ -63,6 +65,7 @@ func (r *PiInstance) BuildResource() *schema.Resource {
 		r.piInstanceMemoryCostComponent(),
 		r.piInstanceStorageCostComponent(),
 		r.piInstanceCloudStorageSolutionCostComponent(),
+		r.piInstanceHighAvailabilityCostComponent(),
 	}
 
 	if r.OperatingSystem == AIX {
@@ -184,6 +187,36 @@ func (r *PiInstance) piInstanceCloudStorageSolutionCostComponent() *schema.CostC
 		Unit:           "Core",
 		UnitMultiplier: schema.HourToMonthUnitMultiplier,
 		HourlyQuantity: decimalPtr(decimal.NewFromFloat(r.Cpus * float64(cloudStorageSolutionAmount))),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("ibm"),
+			Region:        strPtr(r.Region),
+			ProductFamily: strPtr("service"),
+			Service:       strPtr("power-iaas"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "planName", Value: strPtr("power-virtual-server-group")},
+				{Key: "planType", Value: strPtr("Paid")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			Unit: strPtr(unit),
+		},
+	}
+}
+
+func (r *PiInstance) piInstanceHighAvailabilityCostComponent() *schema.CostComponent {
+	var highAvailabilityAmount int64
+
+	if r.HighAvailability != nil {
+		highAvailabilityAmount = int64(*r.HighAvailability)
+	}
+
+	unit := "IBMIHA_PTEN_APPLICATION_INSTANCES"
+
+	return &schema.CostComponent{
+		Name:           "High Availability",
+		Unit:           "Core",
+		UnitMultiplier: schema.HourToMonthUnitMultiplier,
+		HourlyQuantity: decimalPtr(decimal.NewFromFloat(r.Cpus * float64(highAvailabilityAmount))),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),

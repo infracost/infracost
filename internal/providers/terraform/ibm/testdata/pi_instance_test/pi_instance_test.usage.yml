@@ -3,3 +3,4 @@ resource_usage:
   ibm_pi_instance.test-instance:
     storage: 20
     cloud_storage_solution: 1
+    high_availability: 1
