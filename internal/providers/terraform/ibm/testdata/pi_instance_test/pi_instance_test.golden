@@ -1,13 +1,16 @@
 
- Name                           Monthly Qty  Unit      Monthly Cost 
-                                                                    
- ibm_pi_instance.test-instance                                      
- ├─ Cores                              0.25  Core            $22.06 
- ├─ Memory                                4  GB              $33.29 
- ├─ Storage - tier1                      20  GB               $4.00 
- └─ Operating System                      1  Instance        $28.98 
-                                                                    
- OVERALL TOTAL                                               $88.33 
+ Name                           Monthly Qty  Unit  Monthly Cost 
+                                                                
+ ibm_pi_instance.test-instance                                  
+ ├─ Cores                              0.25  Core        $22.06 
+ ├─ Memory                                4  GB          $33.29 
+ ├─ Storage - tier1                      20  GB           $4.00 
+ ├─ Cloud Storage Solution             0.25  Core        $17.50 
+ ├─ High Availability                  0.25  Core        $38.76 
+ ├─ Operating System IBMi LPP          0.25  Core        $99.99 
+ └─ Operating System IBMi OS           0.25  Core       $250.01 
+                                                                
+ OVERALL TOTAL                                          $465.62 
 ──────────────────────────────────
 3 cloud resources were detected:
 ∙ 1 was estimated
