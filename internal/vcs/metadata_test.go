@@ -98,9 +98,10 @@ func Test_metadataFetcher_GetLocalMetadata(t *testing.T) {
 
 func Test_metadataFetcher_GetLocalMetadataMergesWithEnv(t *testing.T) {
 	tmp := t.TempDir()
-	t.Logf("temp dir %s", tmp)
 	obj := createLocalRepoWithCommit(t, tmp)
 	providedName := "test provided name"
+
+	t.Setenv("GITHUB_ACTIONS", "")
 	t.Setenv("INFRACOST_VCS_COMMIT_AUTHOR_NAME", providedName)
 
 	pullID := "1234"
