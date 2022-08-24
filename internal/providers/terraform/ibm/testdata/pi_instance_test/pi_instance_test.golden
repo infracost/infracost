@@ -7,10 +7,11 @@
  ├─ Storage - tier1                      20  GB           $4.00 
  ├─ Cloud Storage Solution             0.25  Core        $17.50 
  ├─ High Availability                  0.25  Core        $38.76 
+ ├─ IBM DB2 Web Query                  0.25  Core       $265.76 
  ├─ Operating System IBMi LPP          0.25  Core        $99.99 
  └─ Operating System IBMi OS           0.25  Core       $250.01 
                                                                 
- OVERALL TOTAL                                          $465.62 
+ OVERALL TOTAL                                          $731.37 
 ──────────────────────────────────
 3 cloud resources were detected:
 ∙ 1 was estimated
