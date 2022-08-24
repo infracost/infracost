@@ -97,7 +97,7 @@ require (
 require (
 	github.com/alecthomas/jsonschema v0.0.0-20211209230136-e2b41affa5c1
 	github.com/go-git/go-billy/v5 v5.3.1
-	github.com/go-git/go-git/v5 v5.4.2
+	github.com/go-git/go-git/v5 v5.4.3-0.20220529141257-bc1f419cebcf
 	github.com/google/go-github/v41 v41.0.0
 	github.com/gruntwork-io/terragrunt v0.36.9
 	github.com/hashicorp/terraform-svchost v0.0.0-20200729002733-f050f53b9734
@@ -160,7 +160,7 @@ require (
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/urfave/cli v1.22.3 // indirect
 	github.com/vektah/gqlparser/v2 v2.4.6 // indirect
-	github.com/xanzy/ssh-agent v0.3.0 // indirect
+	github.com/xanzy/ssh-agent v0.3.1 // indirect
 	go.mozilla.org/gopgagent v0.0.0-20170926210634-4d7ea76ff71a // indirect
 	go.mozilla.org/sops/v3 v3.7.2 // indirect
 	golang.org/x/term v0.0.0-20210927222741-03fcf44c2211 // indirect
