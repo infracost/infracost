@@ -26,10 +26,11 @@ type PiInstance struct {
 	Memory          float64
 	Cpus            float64
 
-	Storage              *float64 `infracost_usage:"storage"`
-	CloudStorageSolution *int64   `infracost_usage:"cloud_storage_solution"`
-	HighAvailability     *int64   `infracost_usage:"high_availability"`
-	DB2WebQuery          *int64   `infracost_usage:"db2_web_query"`
+	Storage                   *float64 `infracost_usage:"storage"`
+	CloudStorageSolution      *int64   `infracost_usage:"cloud_storage_solution"`
+	HighAvailability          *int64   `infracost_usage:"high_availability"`
+	DB2WebQuery               *int64   `infracost_usage:"db2_web_query"`
+	RationalDevStudioLicences *int64   `infracost_usage:"rational_dev_studio_licenses"`
 }
 
 // Operating System
@@ -50,6 +51,7 @@ var PiInstanceUsageSchema = []*schema.UsageItem{
 	{Key: "cloud_storage_solution", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "high_availability", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "db2_web_query", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "rational_dev_studio_licenses", DefaultValue: 0, ValueType: schema.Int64},
 }
 
 // PopulateUsage parses the u schema.UsageData into the PiInstance.
@@ -69,6 +71,7 @@ func (r *PiInstance) BuildResource() *schema.Resource {
 		r.piInstanceCloudStorageSolutionCostComponent(),
 		r.piInstanceHighAvailabilityCostComponent(),
 		r.piInstanceDB2WebQueryCostComponent(),
+		r.piInstanceRationalDevStudioLicensesCostComponent(),
 	}
 
 	if r.OperatingSystem == AIX {
@@ -250,6 +253,36 @@ func (r *PiInstance) piInstanceDB2WebQueryCostComponent() *schema.CostComponent 
 		Unit:           "Core",
 		UnitMultiplier: schema.HourToMonthUnitMultiplier,
 		HourlyQuantity: decimalPtr(decimal.NewFromFloat(r.Cpus * float64(db2WebQueryAmount))),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("ibm"),
+			Region:        strPtr(r.Region),
+			ProductFamily: strPtr("service"),
+			Service:       strPtr("power-iaas"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "planName", Value: strPtr("power-virtual-server-group")},
+				{Key: "planType", Value: strPtr("Paid")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			Unit: strPtr(unit),
+		},
+	}
+}
+
+func (r *PiInstance) piInstanceRationalDevStudioLicensesCostComponent() *schema.CostComponent {
+	var RationalDevStudioLicencesAmount int64
+
+	if r.RationalDevStudioLicences != nil {
+		RationalDevStudioLicencesAmount = int64(*r.RationalDevStudioLicences)
+	}
+
+	unit := "IBMIRDS_APPLICATION_INSTANCES"
+
+	return &schema.CostComponent{
+		Name:           "Rational Dev Studio",
+		Unit:           "Instance",
+		UnitMultiplier: schema.HourToMonthUnitMultiplier,
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(RationalDevStudioLicencesAmount)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
