@@ -14,13 +14,19 @@ func getTgGatewayRegistryItem() *schema.RegistryItem {
 
 func newTgGateway(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
+	globalRouting := d.Get("global").Bool()
 	r := &ibm.TgGateway{
 		Address:       d.Address,
 		Region:        region,
-		GlobalRouting: d.Get("global").Bool(),
+		GlobalRouting: globalRouting,
 	}
 	r.PopulateUsage(u)
-	SetCatalogMetadata(d, d.Type)
+
+	configuration := make(map[string]any)
+	configuration["region"] = region
+	configuration["globalRouting"] = globalRouting
+
+	SetCatalogMetadata(d, d.Type, configuration)
 
 	return r.BuildResource()
 }

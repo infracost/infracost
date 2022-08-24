@@ -13,15 +13,25 @@ func getResourceInstanceRegistryItem() *schema.RegistryItem {
 }
 
 func newResourceInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	plan := d.Get("plan").String()
+	location := d.Get("location").String()
+	service := d.Get("service").String()
+
 	r := &ibm.ResourceInstance{
 		Address:    d.Address,
-		Service:    d.Get("service").String(),
-		Plan:       d.Get("plan").String(),
-		Location:   d.Get("location").String(),
+		Service:    service,
+		Plan:       plan,
+		Location:   location,
 		Parameters: d.RawValues,
 	}
 	r.PopulateUsage(u)
-	SetCatalogMetadata(d, d.Get("service").String())
+
+	configuration := make(map[string]any)
+	configuration["service"] = service
+	configuration["plan"] = plan
+	configuration["location"] = location
+
+	SetCatalogMetadata(d, service, configuration)
 
 	return r.BuildResource()
 }

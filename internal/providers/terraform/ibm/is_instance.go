@@ -25,8 +25,6 @@ func newIsInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	dedicatedHostGroup := strings.TrimSpace(d.Get("dedicated_host_group").String())
 	isDedicated := !((dedicatedHost == "") && (dedicatedHostGroup == ""))
 
-	SetCatalogMetadata(d, d.Type)
-
 	r := &ibm.IsInstance{
 		Address:       d.Address,
 		Region:        region,
@@ -36,6 +34,13 @@ func newIsInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 		IsDedicated:   isDedicated,
 	}
 	r.PopulateUsage(u)
+
+	configuration := make(map[string]any)
+	configuration["region"] = region
+	configuration["profile"] = profile
+	configuration["on_dedicated_host"] = isDedicated
+
+	SetCatalogMetadata(d, d.Type, configuration)
 
 	return r.BuildResource()
 }

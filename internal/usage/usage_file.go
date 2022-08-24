@@ -19,6 +19,10 @@ const maxUsageFileVersion = "0.1"
 
 type UsageFile struct { // nolint:revive
 	Version string `yaml:"version"`
+	// We represent resource type usage in using a YAML node so we have control over the comments
+	RawResourceTypeUsage yamlv3.Node `yaml:"resource_type_usage"`
+	// The raw usage is then parsed into this struct
+	ResourceTypeUsages []*ResourceUsage `yaml:"-"`
 	// We represent resource usage in using a YAML node so we have control over the comments
 	RawResourceUsage yamlv3.Node `yaml:"resource_usage"`
 	// The raw usage is then parsed into this struct
@@ -66,6 +70,9 @@ func LoadUsageFile(path string) (*UsageFile, error) {
 func NewBlankUsageFile() *UsageFile {
 	usageFile := &UsageFile{
 		Version: maxUsageFileVersion,
+		RawResourceTypeUsage: yamlv3.Node{
+			Kind: yamlv3.MappingNode,
+		},
 		RawResourceUsage: yamlv3.Node{
 			Kind: yamlv3.MappingNode,
 		},
@@ -105,11 +112,16 @@ the cost of usage-based resource, such as AWS S3 or Lambda.
 See https://infracost.io/usage-file/ for docs`,
 	}
 
+	resourceTypeUsagesKeyNode := &yamlv3.Node{
+		Kind:  yamlv3.ScalarNode,
+		Value: "resource_type_usage",
+	}
 	resourceUsagesKeyNode := &yamlv3.Node{
 		Kind:  yamlv3.ScalarNode,
 		Value: "resource_usage",
 	}
 	if allCommented {
+		markNodeAsComment(resourceTypeUsagesKeyNode)
 		markNodeAsComment(resourceUsagesKeyNode)
 	}
 
@@ -122,9 +134,21 @@ See https://infracost.io/usage-file/ for docs`,
 			Kind:  yamlv3.ScalarNode,
 			Value: u.Version,
 		},
+		resourceTypeUsagesKeyNode,
+		&u.RawResourceTypeUsage,
 		resourceUsagesKeyNode,
 		&u.RawResourceUsage,
 	)
+
+	// Add a comment to the first commented-out resource
+	for _, node := range u.RawResourceTypeUsage.Content {
+		if isNodeMarkedAsCommented(node) {
+			node.HeadComment = `##
+## The following usage values are all commented-out, you can uncomment resource types and customize as needed.
+##`
+			break
+		}
+	}
 
 	// Add a comment to the first commented-out resource
 	for _, node := range u.RawResourceUsage.Content {
@@ -158,6 +182,10 @@ func (u *UsageFile) ToUsageDataMap() map[string]*schema.UsageData {
 		m[resourceUsage.Name] = schema.NewUsageData(resourceUsage.Name, schema.ParseAttributes(resourceUsage.Map()))
 	}
 
+	for _, resourceUsage := range u.ResourceTypeUsages {
+		m[resourceUsage.Name] = schema.NewUsageData(resourceUsage.Name, schema.ParseAttributes(resourceUsage.Map()))
+	}
+
 	return m
 }
 
@@ -182,6 +210,20 @@ func (u *UsageFile) InvalidKeys() ([]string, error) {
 
 	for _, resourceUsage := range u.ResourceUsages {
 		refResourceUsage := refFile.FindMatchingResourceUsage(resourceUsage.Name)
+		if refResourceUsage == nil {
+			continue
+		}
+		refItemMap := refResourceUsage.Map()
+
+		// Iterate over provided keys and check if they are
+		// present in the reference usage file
+		for _, item := range resourceUsage.Items {
+			invalidKeys = append(invalidKeys, findInvalidKeys(item, refItemMap)...)
+		}
+	}
+
+	for _, resourceUsage := range u.ResourceTypeUsages {
+		refResourceUsage := refFile.FindMatchingResourceTypeUsage(resourceUsage.Name)
 		if refResourceUsage == nil {
 			continue
 		}
@@ -237,12 +279,17 @@ func (u *UsageFile) parseResourceUsages() error {
 	if err != nil {
 		return errors.Wrapf(err, "Error parsing usage file")
 	}
-
+	u.ResourceTypeUsages, err = ResourceUsagesFromYAML(u.RawResourceTypeUsage)
+	if err != nil {
+		return errors.Wrapf(err, "Error parsing usage file")
+	}
 	return nil
 }
 
 func (u *UsageFile) dumpResourceUsages() bool {
 	var allCommented bool
+	var allTypesCommented bool
+	u.RawResourceTypeUsage, allTypesCommented = ResourceUsagesToYAML(u.ResourceTypeUsages)
 	u.RawResourceUsage, allCommented = ResourceUsagesToYAML(u.ResourceUsages)
-	return allCommented
+	return allTypesCommented && allCommented
 }

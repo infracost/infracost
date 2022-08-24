@@ -14,13 +14,17 @@ func getIbmIsVpcRegistryItem() *schema.RegistryItem {
 
 func newIbmIsVpc(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
+
 	r := &ibm.IbmIsVpc{
 		Address: d.Address,
 		Region:  region,
-		Classic: d.GetBoolOrDefault("classic_access", false),
 	}
 	r.PopulateUsage(u)
-	SetCatalogMetadata(d, d.Type)
+
+	configuration := make(map[string]any)
+	configuration["region"] = region
+
+	SetCatalogMetadata(d, d.Type, configuration)
 
 	return r.BuildResource()
 }
