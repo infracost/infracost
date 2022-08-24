@@ -448,6 +448,15 @@ func (f *metadataFetcher) getGithubMetadata(path string) (Metadata, error) {
 }
 
 func (f *metadataFetcher) getLocalGitMetadata(path string) (Metadata, error) {
+	fmt.Printf("path: %s\n", path)
+	files, err := os.ReadDir(path)
+	if err != nil {
+		fmt.Printf("errror: %s", err)
+	}
+	for _, f := range files {
+		fmt.Println(f.Name())
+	}
+
 	r, err := git.PlainOpenWithOptions(path, &git.PlainOpenOptions{DetectDotGit: true})
 	if err != nil {
 		return Metadata{}, fmt.Errorf("could not open git directory to fetch metadata %w", err)
