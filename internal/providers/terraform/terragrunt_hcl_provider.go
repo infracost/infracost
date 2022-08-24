@@ -10,7 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gruntwork-io/terragrunt/aws_helper"
 	tgcli "github.com/gruntwork-io/terragrunt/cli"
 	"github.com/gruntwork-io/terragrunt/cli/tfsource"
 	tgconfig "github.com/gruntwork-io/terragrunt/config"
@@ -273,17 +272,6 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 			opts.TerragruntConfigPath,
 		)
 		return nil, nil
-	}
-
-	// We merge the OriginalIAMRoleOptions into the one from the config, because the CLI passed IAMRoleOptions has
-	// precedence.
-	opts.IAMRoleOptions = tgoptions.MergeIAMRoleOptions(
-		terragruntConfig.GetIAMRoleOptions(),
-		opts.OriginalIAMRoleOptions,
-	)
-
-	if err := aws_helper.AssumeRoleAndUpdateEnvIfNecessary(opts); err != nil {
-		return nil, err
 	}
 
 	// get the default download dir
