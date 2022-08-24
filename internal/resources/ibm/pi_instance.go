@@ -60,7 +60,12 @@ func (r *PiInstance) BuildResource() *schema.Resource {
 		r.piInstanceCoresCostComponent(),
 		r.piInstanceMemoryCostComponent(),
 		r.piInstanceStorageCostComponent(),
-		r.piInstanceOperatingSystemCostComponent(),
+	}
+
+	if r.OperatingSystem == AIX {
+		costComponents = append(costComponents, r.piInstanceAIXOperatingSystemCostComponent())
+	} else if r.OperatingSystem == IBMI {
+		costComponents = append(costComponents, r.piInstanceIBMiLPPPOperatingSystemCostComponent(), r.piInstanceIBMiOSOperatingSystemCostComponent())
 	}
 
 	return &schema.Resource{
@@ -70,7 +75,7 @@ func (r *PiInstance) BuildResource() *schema.Resource {
 	}
 }
 
-func (r *PiInstance) piInstanceOperatingSystemCostComponent() *schema.CostComponent {
+func (r *PiInstance) piInstanceAIXOperatingSystemCostComponent() *schema.CostComponent {
 	unit := ""
 
 	if r.OperatingSystem == AIX {
@@ -79,14 +84,6 @@ func (r *PiInstance) piInstanceOperatingSystemCostComponent() *schema.CostCompon
 		} else if r.SystemType == e980 || r.SystemType == e1080 {
 			unit = "AIX_MEDIUM_APPLICATION_INSTANCE_HOURS"
 		}
-	} else if r.OperatingSystem == IBMI {
-		if r.SystemType == s922 {
-			unit = ""
-		}
-	} else if r.OperatingSystem == RHEL {
-		unit = ""
-	} else if r.OperatingSystem == SLES {
-		unit = ""
 	}
 
 	return &schema.CostComponent{
@@ -94,6 +91,66 @@ func (r *PiInstance) piInstanceOperatingSystemCostComponent() *schema.CostCompon
 		Unit:           "Instance",
 		UnitMultiplier: schema.HourToMonthUnitMultiplier,
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("ibm"),
+			Region:        strPtr(r.Region),
+			ProductFamily: strPtr("service"),
+			Service:       strPtr("power-iaas"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "planName", Value: strPtr("power-virtual-server-group")},
+				{Key: "planType", Value: strPtr("Paid")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			Unit: strPtr(unit),
+		},
+	}
+}
+
+func (r *PiInstance) piInstanceIBMiLPPPOperatingSystemCostComponent() *schema.CostComponent {
+	unit := ""
+
+	if r.OperatingSystem == IBMI {
+		if r.SystemType == s922 {
+			unit = "IBMI_LPP_PTEN_APPLICATION_INSTANCE_HOURS"
+		}
+	}
+
+	return &schema.CostComponent{
+		Name:           "Operating System IBMi LPP",
+		Unit:           "Core",
+		UnitMultiplier: schema.HourToMonthUnitMultiplier,
+		HourlyQuantity: decimalPtr(decimal.NewFromFloat(r.Cpus)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("ibm"),
+			Region:        strPtr(r.Region),
+			ProductFamily: strPtr("service"),
+			Service:       strPtr("power-iaas"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "planName", Value: strPtr("power-virtual-server-group")},
+				{Key: "planType", Value: strPtr("Paid")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			Unit: strPtr(unit),
+		},
+	}
+}
+
+func (r *PiInstance) piInstanceIBMiOSOperatingSystemCostComponent() *schema.CostComponent {
+	unit := ""
+
+	if r.OperatingSystem == IBMI {
+		if r.SystemType == s922 {
+			unit = "IBMI_OS_PTEN_APPLICATION_INSTANCE_HOURS"
+		}
+	}
+
+	return &schema.CostComponent{
+		Name:           "Operating System IBMi OS",
+		Unit:           "Core",
+		UnitMultiplier: schema.HourToMonthUnitMultiplier,
+		HourlyQuantity: decimalPtr(decimal.NewFromFloat(r.Cpus)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
