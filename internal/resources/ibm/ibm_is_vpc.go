@@ -16,7 +16,6 @@ import (
 type IbmIsVpc struct {
 	Address string
 	Region  string
-	Classic bool
 
 	GigabyteTransmittedOutbounds *float64 `infracost_usage:"gigabyte_transmitted_outbounds"`
 }

@@ -40,23 +40,25 @@ func ParseTags(resourceType string, v gjson.Result) map[string]string {
 type catalogMetadata struct {
 	serviceId      string
 	childResources []string
+	configuration  map[string]any
 }
 
 // Map between terraform type and global catalog id. For ibm_resource_instance, the service
 // field already matches the global catalog id, so they do not need to be mapped. eg: "kms"
 var globalCatalogServiceId = map[string]catalogMetadata{
-	"ibm_is_vpc":                    {"is.vpc", []string{"ibm_is_flow_log"}},
-	"ibm_container_vpc_cluster":     {"containers-kubernetes", []string{}},
-	"ibm_container_vpc_worker_pool": {"containers-kubernetes", []string{}},
-	"ibm_is_instance":               {"is.instance", []string{"ibm_is_ssh_key", "ibm_is_floating_ip"}},
-	"ibm_is_volume":                 {"is.volume", []string{}},
-	"ibm_is_vpn_gateway":            {"is.vpn", []string{}},
-	"ibm_tg_gateway":                {"transit.gateway", []string{}},
-	"ibm_is_floating_ip":            {"is.floating-ip", []string{}},
-	"ibm_is_flow_log":               {"is.flow-log-collector", []string{}},
+	"ibm_is_vpc":                    {"is.vpc", []string{"ibm_is_flow_log"}, nil},
+	"ibm_container_vpc_cluster":     {"containers-kubernetes", []string{}, nil},
+	"ibm_container_vpc_worker_pool": {"containers-kubernetes", []string{}, nil},
+	"ibm_is_instance":               {"is.instance", []string{"ibm_is_ssh_key", "ibm_is_floating_ip"}, nil},
+	"ibm_is_volume":                 {"is.volume", []string{}, nil},
+	"ibm_is_vpn_gateway":            {"is.vpn", []string{}, nil},
+	"ibm_tg_gateway":                {"transit.gateway", []string{}, nil},
+	"ibm_is_floating_ip":            {"is.floating-ip", []string{}, nil},
+	"ibm_is_flow_log":               {"is.flow-log-collector", []string{}, nil},
+	"ibm_cloudant":                  {"cloudantnosqldb", []string{}, nil},
 }
 
-func SetCatalogMetadata(d *schema.ResourceData, resourceType string) {
+func SetCatalogMetadata(d *schema.ResourceData, resourceType string, config map[string]any) {
 	metadata := make(map[string]gjson.Result)
 	var properties gjson.Result
 	var serviceId string = resourceType
@@ -68,6 +70,11 @@ func SetCatalogMetadata(d *schema.ResourceData, resourceType string) {
 		childResources = catalogEntry.childResources
 	}
 
+	configString, err := json.Marshal(config)
+	if err != nil {
+		configString = []byte("{}")
+	}
+
 	if len(childResources) > 0 {
 		childResourcesString, err := json.Marshal(childResources)
 		if err != nil {
@@ -76,12 +83,12 @@ func SetCatalogMetadata(d *schema.ResourceData, resourceType string) {
 
 		properties = gjson.Result{
 			Type: gjson.JSON,
-			Raw:  fmt.Sprintf(`{"serviceId": "%s" , "childResources": %s}`, serviceId, childResourcesString),
+			Raw:  fmt.Sprintf(`{"serviceId": "%s" , "childResources": %s, "configuration": %s}`, serviceId, childResourcesString, configString),
 		}
 	} else {
 		properties = gjson.Result{
 			Type: gjson.JSON,
-			Raw:  fmt.Sprintf(`{"serviceId": "%s"}`, serviceId),
+			Raw:  fmt.Sprintf(`{"serviceId": "%s", "configuration": %s}`, serviceId, configString),
 		}
 	}
 

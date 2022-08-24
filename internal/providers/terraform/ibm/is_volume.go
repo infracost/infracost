@@ -15,18 +15,28 @@ func getIsVolumeRegistryItem() *schema.RegistryItem {
 func newIsVolume(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
 	capacity := d.Get("capacity").Int()
+	profile := d.Get("profile").String()
+	iops := d.Get("iops").Int()
+
 	if capacity == 0 {
 		capacity = 100
 	}
 	r := &ibm.IsVolume{
 		Address:  d.Address,
 		Region:   region,
-		Profile:  d.Get("profile").String(),
-		IOPS:     d.Get("iops").Int(),
+		Profile:  profile,
+		IOPS:     iops,
 		Capacity: capacity,
 	}
 	r.PopulateUsage(u)
-	SetCatalogMetadata(d, d.Type)
+
+	configuration := make(map[string]any)
+	configuration["region"] = region
+	configuration["profile"] = profile
+	configuration["capacity"] = capacity
+	configuration["iops"] = iops
+
+	SetCatalogMetadata(d, d.Type, configuration)
 
 	return r.BuildResource()
 }

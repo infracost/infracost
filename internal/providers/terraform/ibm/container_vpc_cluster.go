@@ -22,18 +22,33 @@ func newContainerVpcCluster(d *schema.ResourceData, u *schema.UsageData) *schema
 	for _, a := range d.Get("zones").Array() {
 		zones = append(zones, ibm.Zone{Name: a.Get("name").String()})
 	}
+
+	region := d.Get("region").String()
+	kubeVersion := d.Get("kube_version").String()
+	flavor := d.Get("flavor").String()
+	workerCount := d.Get("worker_count").Int()
+
 	r := &ibm.ContainerVpcCluster{
 		Name:        d.Get("name").String(),
 		VpcId:       d.Get("vpc_id").String(),
-		KubeVersion: d.Get("kube_version").String(),
-		Flavor:      d.Get("flavor").String(),
-		WorkerCount: d.Get("worker_count").Int(),
-		Region:      d.Get("region").String(),
+		Region:      region,
+		Flavor:      flavor,
+		KubeVersion: kubeVersion,
+		WorkerCount: workerCount,
 		Zones:       zones,
 		Entitlement: entitlement,
 	}
 	r.PopulateUsage(u)
-	SetCatalogMetadata(d, d.Type)
+
+	configuration := make(map[string]any)
+	configuration["region"] = region
+	configuration["flavor"] = flavor
+	configuration["kube_version"] = kubeVersion
+	configuration["worker_count"] = workerCount
+	configuration["zones_count"] = len(zones)
+	configuration["ocp_entitlement"] = entitlement
+
+	SetCatalogMetadata(d, d.Type, configuration)
 
 	return r.BuildResource()
 }

@@ -26,5 +26,12 @@ func newCloudant(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	}
 	r.PopulateUsage(u)
 
+	configuration := make(map[string]any)
+	configuration["region"] = region
+	configuration["plan"] = p
+	configuration["capacity"] = c
+
+	SetCatalogMetadata(d, d.Type, configuration)
+
 	return r.BuildResource()
 }
