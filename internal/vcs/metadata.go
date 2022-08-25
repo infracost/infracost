@@ -195,7 +195,14 @@ func envToTime(key string) time.Time {
 		return time.Time{}
 	}
 
-	return time.Unix(i, 0).UTC()
+	t := time.Unix(i, 0)
+	// if the year is below these values then the date is considered invalid and will throw a
+	// json marshall error. In this situation we just return a zero time.
+	if y := t.Year(); y < 0 || y >= 10000 {
+		return time.Time{}
+	}
+
+	return t.UTC()
 }
 
 type keyMutex struct {

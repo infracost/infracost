@@ -1,6 +1,7 @@
 package vcs
 
 import (
+	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
@@ -199,6 +200,9 @@ func Test_metadataFetcher_GetReturnsUserDefinedEnvs(t *testing.T) {
 	}
 
 	actual, _ := m.Get(t.TempDir())
+
+	_, err := json.Marshal(actual)
+	assert.NoError(t, err)
 
 	assert.Equal(t, Metadata{
 		Remote: Remote{
