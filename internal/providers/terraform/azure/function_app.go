@@ -108,7 +108,7 @@ func AppFunctionPremiumCPUCostComponent(skuSize string, instances decimal.Decima
 			Service:       strPtr("Functions"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "meterName", Value: strPtr("vCPU Duration")},
+				{Key: "meterName", ValueRegex: regexPtr("vCPU Duration$")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -129,7 +129,7 @@ func AppFunctionPremiumMemoryCostComponent(skuSize string, instances decimal.Dec
 			Service:       strPtr("Functions"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "meterName", Value: strPtr("Memory Duration")},
+				{Key: "meterName", ValueRegex: regexPtr("Memory Duration$")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -150,7 +150,7 @@ func AppFunctionConsumptionExecutionTimeCostComponent(gbSeconds *decimal.Decimal
 			Service:       strPtr("Functions"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "meterName", Value: strPtr("Execution Time")},
+				{Key: "meterName", ValueRegex: regexPtr("Execution Time$")},
 				{Key: "skuName", Value: strPtr("Standard")},
 			},
 		},
@@ -178,7 +178,7 @@ func AppFunctionConsumptionExecutionsCostComponent(executions *decimal.Decimal, 
 			Service:       strPtr("Functions"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "meterName", Value: strPtr("Total Executions")},
+				{Key: "meterName", ValueRegex: regexPtr("Total Executions$")},
 				{Key: "skuName", Value: strPtr("Standard")},
 			},
 		},
