@@ -54,10 +54,10 @@ func linuxVirtualMachineCostComponent(region string, instanceType string, monthl
 	purchaseOption := "Consumption"
 	purchaseOptionLabel := "pay as you go"
 	productNameRe := "/Virtual Machines .* Series$/"
-	
-	if strings.HasPrefix(strings.ToLower(instanceType), "basic_") {
+
+	if strings.HasPrefix(instanceType, "Basic_") {
 		productNameRe = "/Virtual Machines .* Series Basic$/"
-	} else if !strings.HasPrefix(strings.ToLower(instanceType), "standard_") {
+	} else if !strings.HasPrefix(instanceType, "Standard_") {
 		instanceType = fmt.Sprintf("Standard_%s", instanceType)
 	}
 
