@@ -95,7 +95,7 @@
         "commitMessage": {
           "type": "string"
         },
-        "vcsRepoUrl": {
+        "vcsRepositoryUrl": {
           "type": "string"
         },
         "vcsProvider": {

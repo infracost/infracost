@@ -17,7 +17,7 @@ type Metadata struct {
 	CommitTimestamp   time.Time `json:"commitTimestamp"`
 	CommitMessage     string    `json:"commitMessage"`
 
-	VCSRepoURL           string `json:"vcsRepoUrl,omitempty"`
+	VCSRepositoryURL     string `json:"vcsRepositoryUrl,omitempty"`
 	VCSProvider          string `json:"vcsProvider,omitempty"`
 	VCSBaseBranch        string `json:"vcsBaseBranch,omitempty"`
 	VCSPullRequestTitle  string `json:"vcsPullRequestTitle,omitempty"`
@@ -37,7 +37,7 @@ func NewMetadata(ctx *config.RunContext) Metadata {
 		CommitAuthorName:  ctx.VCSMetadata.Commit.AuthorName,
 		CommitTimestamp:   ctx.VCSMetadata.Commit.Time.UTC(),
 		CommitMessage:     ctx.VCSMetadata.Commit.Message,
-		VCSRepoURL:        ctx.VCSMetadata.Remote.URL,
+		VCSRepositoryURL:  ctx.VCSMetadata.Remote.URL,
 	}
 
 	if ctx.VCSMetadata.PullRequest != nil {

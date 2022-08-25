@@ -9,7 +9,7 @@
     "commitAuthorEmail": "hugo@test.com",
     "commitTimestamp": "2021-10-11T22:41:00.144866-04:00",
     "commitMessage": "mymessage",
-    "vcsRepoUrl": "https://github.com/infracost/infracost.git"
+    "vcsRepositoryUrl": "https://github.com/infracost/infracost.git"
   },
   "projects": [
     {

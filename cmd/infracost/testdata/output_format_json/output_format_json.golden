@@ -8,7 +8,7 @@
     "commitAuthorEmail": "hugo@test.com",
     "commitTimestamp": "REPLACED_TIME",
     "commitMessage": "mymessage",
-    "vcsRepoUrl": "https://github.com/infracost/infracost.git"
+    "vcsRepositoryUrl": "https://github.com/infracost/infracost.git"
   },
   "currency": "USD",
   "projects": [
