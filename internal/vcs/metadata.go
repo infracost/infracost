@@ -60,7 +60,7 @@ func buildEnvProvidedMetadata() Metadata {
 	m := Metadata{
 		Remote: remote,
 		Branch: Branch{
-			Name: getEnv("INFRACOST_VCS_BRANCH"),
+			Name: getEnv("INFRACOST_BRANCH"),
 		},
 		Commit:      buildDefaultCommit(),
 		PullRequest: buildDefaultPR(),
@@ -175,11 +175,11 @@ func keysSet(keys ...string) bool {
 
 func buildDefaultCommit() Commit {
 	return Commit{
-		SHA:         getEnv("INFRACOST_VCS_COMMIT"),
-		AuthorName:  getEnv("INFRACOST_VCS_COMMIT_AUTHOR_NAME"),
-		AuthorEmail: getEnv("INFRACOST_VCS_COMMIT_AUTHOR_EMAIL"),
-		Time:        envToTime("INFRACOST_VCS_COMMIT_TIMESTAMP"),
-		Message:     getEnv("INFRACOST_VCS_COMMIT_MESSAGE"),
+		SHA:         getEnv("INFRACOST_COMMIT"),
+		AuthorName:  getEnv("INFRACOST_COMMIT_AUTHOR_NAME"),
+		AuthorEmail: getEnv("INFRACOST_COMMIT_AUTHOR_EMAIL"),
+		Time:        envToTime("INFRACOST_COMMIT_TIMESTAMP"),
+		Message:     getEnv("INFRACOST_COMMIT_MESSAGE"),
 	}
 }
 
