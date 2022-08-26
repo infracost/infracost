@@ -168,6 +168,8 @@ func (r *PiInstance) piInstanceIBMiLPPPOperatingSystemCostComponent() *schema.Co
 	if r.OperatingSystem == IBMI {
 		if r.SystemType == s922 {
 			unit = "IBMI_LPP_PTEN_APPLICATION_INSTANCE_HOURS"
+		} else if r.SystemType == e980 {
+			unit = "IBMI_LPP_PTHIRTY_APPLICATION_INSTANCE_HOURS"
 		}
 	}
 
@@ -198,6 +200,8 @@ func (r *PiInstance) piInstanceIBMiOSOperatingSystemCostComponent() *schema.Cost
 	if r.OperatingSystem == IBMI {
 		if r.SystemType == s922 {
 			unit = "IBMI_OS_PTEN_APPLICATION_INSTANCE_HOURS"
+		} else if r.SystemType == e980 {
+			unit = "IBMI_OS_PTHIRTY_APPLICATION_INSTANCE_HOURS"
 		}
 	}
 
@@ -224,6 +228,10 @@ func (r *PiInstance) piInstanceIBMiOSOperatingSystemCostComponent() *schema.Cost
 
 func (r *PiInstance) piInstanceIBMiOperatingSystemServiceExtensionCostComponent() *schema.CostComponent {
 	unit := "IBM_I_OS_PTEN_SRVC_EXT_PER_PROC_CORE_HR"
+
+	if r.SystemType == e980 {
+		unit = "IBM_I_SERVICE_EXTENSION_PER_CORE_HOUR"
+	}
 
 	return &schema.CostComponent{
 		Name:           "Operating System IBMi Service Extension",
