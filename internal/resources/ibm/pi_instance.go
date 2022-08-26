@@ -509,6 +509,10 @@ func (r *PiInstance) piInstanceMemoryCostComponent() *schema.CostComponent {
 
 	unit := "MS_GIGABYTE_HOURS"
 
+	if r.OperatingSystem == SLES {
+		unit = "MEMHANA_APPLICATION_INSTANCE_HOURS"
+	}
+
 	return &schema.CostComponent{
 		Name:           "Memory",
 		Unit:           "GB",
