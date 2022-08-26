@@ -357,7 +357,7 @@ func (r *PiInstance) piInstanceHighAvailabilityCostComponent() *schema.CostCompo
 		highAvailabilityAmount = int64(*r.HighAvailability)
 	}
 
-	unit := "IBMIHA_PTEN_APPLICATION_INSTANCES"
+	unit := "IBMIHA_PTHIRTY_APPLICATION_INSTANCES"
 
 	return &schema.CostComponent{
 		Name:           "High Availability",
