@@ -96,7 +96,7 @@ func (r *PiInstance) BuildResource() *schema.Resource {
 			costComponents = append(costComponents, r.piInstanceIBMiOperatingSystemServiceExtensionCostComponent())
 		}
 	} else if r.OperatingSystem == SLES {
-		costComponents = append(costComponents, r.piInstanceMemoryProfileCostComponent(), r.piInstanceCoresProfileCostComponent())
+		costComponents = append(costComponents, r.piInstanceMemoryHanaProfileCostComponent(), r.piInstanceCoresHanaProfileCostComponent())
 	}
 
 	return &schema.Resource{
@@ -246,7 +246,7 @@ func (r *PiInstance) piInstanceIBMiOperatingSystemServiceExtensionCostComponent(
 	}
 }
 
-func (r *PiInstance) piInstanceMemoryProfileCostComponent() *schema.CostComponent {
+func (r *PiInstance) piInstanceMemoryHanaProfileCostComponent() *schema.CostComponent {
 	var memoryAmount int64
 
 	if r.Profile != nil {
@@ -283,7 +283,7 @@ func (r *PiInstance) piInstanceMemoryProfileCostComponent() *schema.CostComponen
 	}
 }
 
-func (r *PiInstance) piInstanceCoresProfileCostComponent() *schema.CostComponent {
+func (r *PiInstance) piInstanceCoresHanaProfileCostComponent() *schema.CostComponent {
 	var coresAmount int64
 
 	if r.Profile != nil {
