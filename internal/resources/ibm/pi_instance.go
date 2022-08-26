@@ -2,6 +2,8 @@ package ibm
 
 import (
 	"fmt"
+	"strconv"
+	"strings"
 
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
@@ -17,20 +19,23 @@ import (
 // Pricing information: https://cloud.ibm.com/<PATH/TO/PRICING>/
 
 type PiInstance struct {
-	Address         string
-	Region          string
-	ProcessorMode   string
-	SystemType      string
-	StorageType     string
-	OperatingSystem int64
-	Memory          float64
-	Cpus            float64
+	Address                string
+	Region                 string
+	ProcessorMode          string
+	SystemType             string
+	StorageType            string
+	OperatingSystem        int64
+	Memory                 float64
+	Cpus                   float64
+	LegacyIBMiImageVersion bool
 
 	Storage                   *float64 `infracost_usage:"storage"`
 	CloudStorageSolution      *int64   `infracost_usage:"cloud_storage_solution"`
 	HighAvailability          *int64   `infracost_usage:"high_availability"`
 	DB2WebQuery               *int64   `infracost_usage:"db2_web_query"`
 	RationalDevStudioLicences *int64   `infracost_usage:"rational_dev_studio_licenses"`
+	Profile                   *string  `infracost_usage:"profile"`
+	Epic                      *int64   `infracost_usage:"epic"`
 }
 
 // Operating System
@@ -52,6 +57,8 @@ var PiInstanceUsageSchema = []*schema.UsageItem{
 	{Key: "high_availability", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "db2_web_query", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "rational_dev_studio_licenses", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "profile", DefaultValue: "", ValueType: schema.String},
+	{Key: "epic", DefaultValue: 0, ValueType: schema.Int64},
 }
 
 // PopulateUsage parses the u schema.UsageData into the PiInstance.
@@ -68,10 +75,6 @@ func (r *PiInstance) BuildResource() *schema.Resource {
 		r.piInstanceCoresCostComponent(),
 		r.piInstanceMemoryCostComponent(),
 		r.piInstanceStorageCostComponent(),
-		r.piInstanceCloudStorageSolutionCostComponent(),
-		r.piInstanceHighAvailabilityCostComponent(),
-		r.piInstanceDB2WebQueryCostComponent(),
-		r.piInstanceRationalDevStudioLicensesCostComponent(),
 	}
 
 	if r.OperatingSystem == AIX {
@@ -80,8 +83,16 @@ func (r *PiInstance) BuildResource() *schema.Resource {
 		costComponents = append(costComponents,
 			r.piInstanceIBMiLPPPOperatingSystemCostComponent(),
 			r.piInstanceIBMiOSOperatingSystemCostComponent(),
+			r.piInstanceCloudStorageSolutionCostComponent(),
+			r.piInstanceHighAvailabilityCostComponent(),
+			r.piInstanceDB2WebQueryCostComponent(),
+			r.piInstanceRationalDevStudioLicensesCostComponent(),
 		)
-		// costComponents = append(costComponents, r.piInstanceIBMiOperatingSystemServiceExtensionCostComponent())
+		if r.LegacyIBMiImageVersion {
+			costComponents = append(costComponents, r.piInstanceIBMiOperatingSystemServiceExtensionCostComponent())
+		}
+	} else if r.OperatingSystem == SLES {
+		costComponents = append(costComponents, r.piInstanceMemoryProfileCostComponent(), r.piInstanceCoresProfileCostComponent())
 	}
 
 	return &schema.Resource{
@@ -183,30 +194,103 @@ func (r *PiInstance) piInstanceIBMiOSOperatingSystemCostComponent() *schema.Cost
 	}
 }
 
-// figure out how to distinguish between ibmi - ibmi7.1 - ibmi7.2
-// func (r *PiInstance) piInstanceIBMiOperatingSystemServiceExtensionCostComponent() *schema.CostComponent {
-// 	unit := "IBM_I_OS_PTEN_SRVC_EXT_PER_PROC_CORE_HR"
+func (r *PiInstance) piInstanceIBMiOperatingSystemServiceExtensionCostComponent() *schema.CostComponent {
+	unit := "IBM_I_OS_PTEN_SRVC_EXT_PER_PROC_CORE_HR"
 
-// 	return &schema.CostComponent{
-// 		Name:           "Operating System IBMi Service Extension",
-// 		Unit:           "Core",
-// 		UnitMultiplier: schema.HourToMonthUnitMultiplier,
-// 		HourlyQuantity: decimalPtr(decimal.NewFromFloat(r.Cpus)),
-// 		ProductFilter: &schema.ProductFilter{
-// 			VendorName:    strPtr("ibm"),
-// 			Region:        strPtr(r.Region),
-// 			ProductFamily: strPtr("service"),
-// 			Service:       strPtr("power-iaas"),
-// 			AttributeFilters: []*schema.AttributeFilter{
-// 				{Key: "planName", Value: strPtr("power-virtual-server-group")},
-// 				{Key: "planType", Value: strPtr("Paid")},
-// 			},
-// 		},
-// 		PriceFilter: &schema.PriceFilter{
-// 			Unit: strPtr(unit),
-// 		},
-// 	}
-// }
+	return &schema.CostComponent{
+		Name:           "Operating System IBMi Service Extension",
+		Unit:           "Core",
+		UnitMultiplier: schema.HourToMonthUnitMultiplier,
+		HourlyQuantity: decimalPtr(decimal.NewFromFloat(r.Cpus)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("ibm"),
+			Region:        strPtr(r.Region),
+			ProductFamily: strPtr("service"),
+			Service:       strPtr("power-iaas"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "planName", Value: strPtr("power-virtual-server-group")},
+				{Key: "planType", Value: strPtr("Paid")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			Unit: strPtr(unit),
+		},
+	}
+}
+
+func (r *PiInstance) piInstanceMemoryProfileCostComponent() *schema.CostComponent {
+	var memoryAmount int64
+
+	if r.Profile != nil {
+		coresAndMemory := strings.Split(*r.Profile, "-")[1]
+		memoryString := strings.Split(coresAndMemory, "x")[1]
+		memory, err := strconv.Atoi(memoryString)
+		if err != nil {
+			memoryAmount = 0
+		} else {
+			memoryAmount = int64(memory)
+		}
+	}
+
+	unit := "MEMHANA_APPLICATION_INSTANCE_HOURS"
+
+	return &schema.CostComponent{
+		Name:           "Linux HANA Memory",
+		Unit:           "Memory",
+		UnitMultiplier: schema.HourToMonthUnitMultiplier,
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(memoryAmount)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("ibm"),
+			Region:        strPtr(r.Region),
+			ProductFamily: strPtr("service"),
+			Service:       strPtr("power-iaas"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "planName", Value: strPtr("power-virtual-server-group")},
+				{Key: "planType", Value: strPtr("Paid")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			Unit: strPtr(unit),
+		},
+	}
+}
+
+func (r *PiInstance) piInstanceCoresProfileCostComponent() *schema.CostComponent {
+	var coresAmount int64
+
+	if r.Profile != nil {
+		coresAndMemory := strings.Split(*r.Profile, "-")[1]
+		coresString := strings.Split(coresAndMemory, "x")[0]
+		cores, err := strconv.Atoi(coresString)
+		if err != nil {
+			coresAmount = 0
+		} else {
+			coresAmount = int64(cores)
+		}
+	}
+
+	unit := "COREHANA_APPLICATION_INSTANCE_HOURS"
+
+	return &schema.CostComponent{
+		Name:           "Linux HANA Cores",
+		Unit:           "Core",
+		UnitMultiplier: schema.HourToMonthUnitMultiplier,
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(coresAmount)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("ibm"),
+			Region:        strPtr(r.Region),
+			ProductFamily: strPtr("service"),
+			Service:       strPtr("power-iaas"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "planName", Value: strPtr("power-virtual-server-group")},
+				{Key: "planType", Value: strPtr("Paid")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			Unit: strPtr(unit),
+		},
+	}
+}
 
 func (r *PiInstance) piInstanceCloudStorageSolutionCostComponent() *schema.CostComponent {
 	var cloudStorageSolutionAmount int64
@@ -345,7 +429,11 @@ func (r *PiInstance) piInstanceCoresCostComponent() *schema.CostComponent {
 		if r.SystemType == s922 {
 			unit = "SOD_VIRTUAL_PROCESSOR_CORE_HOURS"
 		} else if r.SystemType == e980 {
-			unit = "EDD_VIRTUAL_PROCESSOR_CORE_HOURS"
+			if r.Epic != nil && *r.Epic == 1 {
+				unit = "ESS_VIRTUAL_PROCESSOR_CORE_HOURS"
+			} else {
+				unit = "EDD_VIRTUAL_PROCESSOR_CORE_HOURS"
+			}
 		} else if r.SystemType == e1080 {
 			unit = "PTEN_EDD_VIRTUAL_PROCESSOR_CORE_HRS"
 		}
