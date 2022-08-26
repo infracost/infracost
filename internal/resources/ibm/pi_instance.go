@@ -109,8 +109,20 @@ func (r *PiInstance) BuildResource() *schema.Resource {
 func (r *PiInstance) piInstanceLinuxOperatingSystemCostComponent() *schema.CostComponent {
 
 	c := schema.CostComponent{
-		Name: "Linux Operating System",
-		Unit: "Instance",
+		Name:            "Linux Operating System",
+		Unit:            "Instance",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("ibm"),
+			Region:        strPtr(r.Region),
+			ProductFamily: strPtr("service"),
+			Service:       strPtr("power-iaas"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "planName", Value: strPtr("power-virtual-server-group")},
+				{Key: "planType", Value: strPtr("Paid")},
+			},
+		},
 	}
 
 	c.SetCustomPrice(decimalPtr(decimal.NewFromInt(0)))
