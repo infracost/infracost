@@ -77,6 +77,10 @@ func (r *PiInstance) BuildResource() *schema.Resource {
 		r.piInstanceStorageCostComponent(),
 	}
 
+	if r.OperatingSystem != AIX && r.OperatingSystem != IBMI {
+		costComponents = append(costComponents, r.piInstanceLinuxOperatingSystemCostComponent())
+	}
+
 	if r.OperatingSystem == AIX {
 		costComponents = append(costComponents, r.piInstanceAIXOperatingSystemCostComponent())
 	} else if r.OperatingSystem == IBMI {
@@ -100,6 +104,18 @@ func (r *PiInstance) BuildResource() *schema.Resource {
 		UsageSchema:    PiInstanceUsageSchema,
 		CostComponents: costComponents,
 	}
+}
+
+func (r *PiInstance) piInstanceLinuxOperatingSystemCostComponent() *schema.CostComponent {
+
+	c := schema.CostComponent{
+		Name: "Linux Operating System",
+		Unit: "Instance",
+	}
+
+	c.SetCustomPrice(decimalPtr(decimal.NewFromInt(0)))
+
+	return &c
 }
 
 func (r *PiInstance) piInstanceAIXOperatingSystemCostComponent() *schema.CostComponent {
