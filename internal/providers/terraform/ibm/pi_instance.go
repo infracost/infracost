@@ -51,6 +51,22 @@ func identifyOperatingSystem(imageName string) int64 {
 	return -1
 }
 
+func isIBMiVersionLegacy(imageName string) bool {
+	splittedImageName := strings.Split(imageName, "-")
+
+	if len(splittedImageName) == 0 {
+		return false
+	}
+
+	version := splittedImageName[1]
+
+	if version == "71" || version == "72" {
+		return true
+	}
+
+	return false
+}
+
 func newPiInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	refs := d.References("pi_image_id")
 
@@ -67,16 +83,18 @@ func newPiInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	memory := d.Get("pi_memory").Float()
 	storageType := d.Get("pi_storage_type").String()
 	os := identifyOperatingSystem(imageName)
+	isLegacyIBMiImageVersion := isIBMiVersionLegacy(imageName)
 
 	r := &ibm.PiInstance{
-		Address:         d.Address,
-		Region:          region,
-		SystemType:      systemType,
-		ProcessorMode:   processorMode,
-		Cpus:            cpus,
-		Memory:          memory,
-		StorageType:     storageType,
-		OperatingSystem: os,
+		Address:                d.Address,
+		Region:                 region,
+		SystemType:             systemType,
+		ProcessorMode:          processorMode,
+		Cpus:                   cpus,
+		Memory:                 memory,
+		StorageType:            storageType,
+		OperatingSystem:        os,
+		LegacyIBMiImageVersion: isLegacyIBMiImageVersion,
 	}
 	r.PopulateUsage(u)
 
