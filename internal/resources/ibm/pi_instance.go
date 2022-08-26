@@ -415,6 +415,8 @@ func (r *PiInstance) piInstanceRationalDevStudioLicensesCostComponent() *schema.
 func (r *PiInstance) piInstanceCoresCostComponent() *schema.CostComponent {
 	q := decimalPtr(decimal.NewFromFloat(r.Cpus))
 
+	epicEnabled := r.Epic != nil && *r.Epic == 1
+
 	unit := ""
 
 	if r.ProcessorMode == "shared" {
@@ -429,7 +431,7 @@ func (r *PiInstance) piInstanceCoresCostComponent() *schema.CostComponent {
 		if r.SystemType == s922 {
 			unit = "SOD_VIRTUAL_PROCESSOR_CORE_HOURS"
 		} else if r.SystemType == e980 {
-			if r.Epic != nil && *r.Epic == 1 {
+			if epicEnabled {
 				unit = "ESS_VIRTUAL_PROCESSOR_CORE_HOURS"
 			} else {
 				unit = "EDD_VIRTUAL_PROCESSOR_CORE_HOURS"
@@ -447,8 +449,14 @@ func (r *PiInstance) piInstanceCoresCostComponent() *schema.CostComponent {
 		}
 	}
 
+	name := "Cores"
+
+	if epicEnabled {
+		name = "Cores - Epic enabled"
+	}
+
 	return &schema.CostComponent{
-		Name:           "Cores",
+		Name:           name,
 		Unit:           "Core",
 		UnitMultiplier: schema.HourToMonthUnitMultiplier,
 		HourlyQuantity: q,
