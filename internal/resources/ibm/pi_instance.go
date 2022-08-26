@@ -95,7 +95,7 @@ func (r *PiInstance) BuildResource() *schema.Resource {
 		if r.LegacyIBMiImageVersion {
 			costComponents = append(costComponents, r.piInstanceIBMiOperatingSystemServiceExtensionCostComponent())
 		}
-	} else if r.OperatingSystem == SLES {
+	} else if r.OperatingSystem == SLES && r.Profile != nil {
 		costComponents = append(costComponents, r.piInstanceMemoryHanaProfileCostComponent(), r.piInstanceCoresHanaProfileCostComponent())
 	}
 
