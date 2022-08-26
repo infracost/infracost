@@ -462,7 +462,11 @@ func (r *PiInstance) piInstanceCoresCostComponent() *schema.CostComponent {
 			if epicEnabled {
 				unit = "ESS_VIRTUAL_PROCESSOR_CORE_HOURS"
 			} else {
-				unit = "EDD_VIRTUAL_PROCESSOR_CORE_HOURS"
+				if r.OperatingSystem == SLES && r.Profile == nil {
+					unit = "COREHANA_APPLICATION_INSTANCE_HOURS"
+				} else {
+					unit = "EDD_VIRTUAL_PROCESSOR_CORE_HOURS"
+				}
 			}
 		} else if r.SystemType == e1080 {
 			unit = "PTEN_EDD_VIRTUAL_PROCESSOR_CORE_HRS"
