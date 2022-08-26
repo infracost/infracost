@@ -131,9 +131,9 @@ func (r *PiInstance) piInstanceAIXOperatingSystemCostComponent() *schema.CostCom
 
 	return &schema.CostComponent{
 		Name:           "Operating System",
-		Unit:           "Instance",
+		Unit:           "Cores",
 		UnitMultiplier: schema.HourToMonthUnitMultiplier,
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+		HourlyQuantity: decimalPtr(decimal.NewFromFloat(r.Cpus)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
