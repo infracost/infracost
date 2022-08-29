@@ -369,18 +369,18 @@ func (r *PiInstance) piInstanceCoresHanaProfileCostComponent() *schema.CostCompo
 }
 
 func (r *PiInstance) piInstanceCloudStorageSolutionCostComponent() *schema.CostComponent {
-	var cloudStorageSolutionAmount int64
+	var cloudStorageSolutionAmount float64
 	var q *decimal.Decimal
 
 	if r.CloudStorageSolution != nil {
-		cloudStorageSolutionAmount = int64(*r.CloudStorageSolution)
+		cloudStorageSolutionAmount = float64(*r.CloudStorageSolution)
 	}
 
 	unit := "IBMI_CSS_APPLICATION_INSTANCE_HOURS"
 
 	if r.MonthlyInstanceHours != nil && r.CloudStorageSolution != nil {
 		hours := *r.MonthlyInstanceHours
-		q = decimalPtr(decimal.NewFromFloat(r.Cpus * float64(cloudStorageSolutionAmount) * hours))
+		q = decimalPtr(decimal.NewFromFloat(r.Cpus * cloudStorageSolutionAmount * hours))
 	}
 
 	return &schema.CostComponent{
@@ -405,17 +405,17 @@ func (r *PiInstance) piInstanceCloudStorageSolutionCostComponent() *schema.CostC
 }
 
 func (r *PiInstance) piInstanceHighAvailabilityCostComponent() *schema.CostComponent {
-	var highAvailabilityAmount int64
+	var highAvailabilityAmount float64
 
 	var q *decimal.Decimal
 
 	if r.HighAvailability != nil {
-		highAvailabilityAmount = int64(*r.HighAvailability)
+		highAvailabilityAmount = float64(*r.HighAvailability)
 	}
 
 	if r.MonthlyInstanceHours != nil {
 		hours := *r.MonthlyInstanceHours
-		q = decimalPtr(decimal.NewFromFloat(r.Cpus * float64(highAvailabilityAmount) * hours))
+		q = decimalPtr(decimal.NewFromFloat(r.Cpus * highAvailabilityAmount * hours))
 	}
 
 	unit := "IBMIHA_PTHIRTY_APPLICATION_INSTANCES"
@@ -442,18 +442,18 @@ func (r *PiInstance) piInstanceHighAvailabilityCostComponent() *schema.CostCompo
 }
 
 func (r *PiInstance) piInstanceDB2WebQueryCostComponent() *schema.CostComponent {
-	var db2WebQueryAmount int64
+	var db2WebQueryAmount float64
 	var q *decimal.Decimal
 
 	if r.DB2WebQuery != nil {
-		db2WebQueryAmount = int64(*r.DB2WebQuery)
+		db2WebQueryAmount = float64(*r.DB2WebQuery)
 	}
 
 	unit := "IBMI_DBIIWQ_APPLICATION_INSTANCE_HOURS"
 
 	if r.MonthlyInstanceHours != nil {
 		hours := *r.MonthlyInstanceHours
-		q = decimalPtr(decimal.NewFromFloat(r.Cpus * float64(db2WebQueryAmount) * hours))
+		q = decimalPtr(decimal.NewFromFloat(r.Cpus * db2WebQueryAmount * hours))
 	}
 
 	return &schema.CostComponent{
@@ -478,18 +478,18 @@ func (r *PiInstance) piInstanceDB2WebQueryCostComponent() *schema.CostComponent 
 }
 
 func (r *PiInstance) piInstanceRationalDevStudioLicensesCostComponent() *schema.CostComponent {
-	var RationalDevStudioLicencesAmount int64
+	var RationalDevStudioLicencesAmount float64
 	var q *decimal.Decimal
 
 	if r.RationalDevStudioLicences != nil {
-		RationalDevStudioLicencesAmount = int64(*r.RationalDevStudioLicences)
+		RationalDevStudioLicencesAmount = float64(*r.RationalDevStudioLicences)
 	}
 
 	unit := "IBMIRDS_APPLICATION_INSTANCES"
 
 	if r.MonthlyInstanceHours != nil {
 		hours := *r.MonthlyInstanceHours
-		q = decimalPtr(decimal.NewFromFloat(float64(RationalDevStudioLicencesAmount) * hours))
+		q = decimalPtr(decimal.NewFromFloat(RationalDevStudioLicencesAmount * hours))
 	}
 
 	return &schema.CostComponent{
