@@ -436,13 +436,13 @@ func (r *PiInstance) piInstanceDB2WebQueryCostComponent() *schema.CostComponent 
 	var db2WebQueryAmount float64
 	var q *decimal.Decimal
 
-	unit := "IBMI_DBIIWQ_APPLICATION_INSTANCE_HOURS"
-
 	if r.MonthlyInstanceHours != nil && r.DB2WebQuery != nil {
 		db2WebQueryAmount = float64(*r.DB2WebQuery)
 		hours := *r.MonthlyInstanceHours
 		q = decimalPtr(decimal.NewFromFloat(r.Cpus * db2WebQueryAmount * hours))
 	}
+
+	unit := "IBMI_DBIIWQ_APPLICATION_INSTANCE_HOURS"
 
 	return &schema.CostComponent{
 		Name:            "IBM DB2 Web Query",
@@ -469,13 +469,13 @@ func (r *PiInstance) piInstanceRationalDevStudioLicensesCostComponent() *schema.
 	var rationalDevStudioLicencesAmount float64
 	var q *decimal.Decimal
 
-	unit := "IBMIRDS_APPLICATION_INSTANCES"
-
 	if r.MonthlyInstanceHours != nil && r.RationalDevStudioLicences != nil {
 		rationalDevStudioLicencesAmount = float64(*r.RationalDevStudioLicences)
 		hours := *r.MonthlyInstanceHours
 		q = decimalPtr(decimal.NewFromFloat(rationalDevStudioLicencesAmount * hours))
 	}
+
+	unit := "IBMIRDS_APPLICATION_INSTANCES"
 
 	return &schema.CostComponent{
 		Name:            "Rational Dev Studio",
