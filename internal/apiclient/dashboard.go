@@ -15,7 +15,6 @@ import (
 
 type DashboardAPIClient struct {
 	APIClient
-	shouldStoreRun bool
 }
 
 type CreateAPIKeyResponse struct {
@@ -55,7 +54,6 @@ func NewDashboardAPIClient(ctx *config.RunContext) *DashboardAPIClient {
 			apiKey:   ctx.Config.APIKey,
 			uuid:     ctx.UUID(),
 		},
-		shouldStoreRun: ctx.IsCloudEnabled() && !ctx.Config.IsSelfHosted(),
 	}
 }
 
@@ -83,11 +81,6 @@ func (c *DashboardAPIClient) CreateAPIKey(name string, email string, contextVals
 
 func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (AddRunResponse, error) {
 	response := AddRunResponse{}
-
-	if !c.shouldStoreRun {
-		log.Debug("Skipping sending project results since it is disabled.")
-		return response, nil
-	}
 
 	projectResultInputs := make([]projectResultInput, len(out.Projects))
 	for i, project := range out.Projects {

@@ -1,0 +1,4 @@
+
+Err:
+Error: could not load input file ./testdata/doesnotexist.json err: Infracost JSON file does not exist, generate it by running the following command then try again:
+infracost breakdown --path /code --format json --out-file infracost-base.json
