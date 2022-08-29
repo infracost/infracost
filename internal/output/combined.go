@@ -224,12 +224,12 @@ func Combine(inputs []ReportInput) (Root, error) {
 			diffTotalHourlyCost = decimalPtr(diffTotalHourlyCost.Add(*input.Root.DiffTotalHourlyCost))
 		}
 
-		if i != 0 && metadata.VCSRepoURL != input.Root.Metadata.VCSRepoURL {
+		if i != 0 && metadata.VCSRepositoryURL != input.Root.Metadata.VCSRepositoryURL {
 			invalidMetadata = true
 		}
 
 		metadata = input.Root.Metadata
-		builder.WriteString(fmt.Sprintf("%q, ", input.Root.Metadata.VCSRepoURL))
+		builder.WriteString(fmt.Sprintf("%q, ", input.Root.Metadata.VCSRepositoryURL))
 	}
 
 	combined.Version = outputVersion
@@ -249,7 +249,7 @@ func Combine(inputs []ReportInput) (Root, error) {
 		return combined, clierror.NewWarningF(
 			"combining Infracost JSON for different VCS repositories %s. Using %s as the top-level repository in the outputted JSON",
 			strings.TrimRight(builder.String(), ", "),
-			metadata.VCSRepoURL,
+			metadata.VCSRepositoryURL,
 		)
 	}
 

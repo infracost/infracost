@@ -10,14 +10,14 @@ import (
 type Metadata struct {
 	InfracostCommand string `json:"infracostCommand"`
 
-	Branch            string    `json:"branch"`
-	Commit            string    `json:"commit"`
-	CommitAuthorName  string    `json:"commitAuthorName"`
-	CommitAuthorEmail string    `json:"commitAuthorEmail"`
-	CommitTimestamp   time.Time `json:"commitTimestamp"`
-	CommitMessage     string    `json:"commitMessage"`
+	Branch            string    `json:"vcsBranch"`
+	CommitSHA         string    `json:"vcsCommitSha"`
+	CommitAuthorName  string    `json:"vcsCommitAuthorName"`
+	CommitAuthorEmail string    `json:"vcsCommitAuthorEmail"`
+	CommitTimestamp   time.Time `json:"vcsCommitTimestamp"`
+	CommitMessage     string    `json:"vcsCommitMessage"`
 
-	VCSRepoURL           string `json:"vcsRepoUrl,omitempty"`
+	VCSRepositoryURL     string `json:"vcsRepositoryUrl,omitempty"`
 	VCSProvider          string `json:"vcsProvider,omitempty"`
 	VCSBaseBranch        string `json:"vcsBaseBranch,omitempty"`
 	VCSPullRequestTitle  string `json:"vcsPullRequestTitle,omitempty"`
@@ -32,12 +32,12 @@ func NewMetadata(ctx *config.RunContext) Metadata {
 	m := Metadata{
 		InfracostCommand:  ctx.CMD,
 		Branch:            ctx.VCSMetadata.Branch.Name,
-		Commit:            ctx.VCSMetadata.Commit.SHA,
+		CommitSHA:         ctx.VCSMetadata.Commit.SHA,
 		CommitAuthorEmail: ctx.VCSMetadata.Commit.AuthorEmail,
 		CommitAuthorName:  ctx.VCSMetadata.Commit.AuthorName,
 		CommitTimestamp:   ctx.VCSMetadata.Commit.Time.UTC(),
 		CommitMessage:     ctx.VCSMetadata.Commit.Message,
-		VCSRepoURL:        ctx.VCSMetadata.Remote.URL,
+		VCSRepositoryURL:  ctx.VCSMetadata.Remote.URL,
 	}
 
 	if ctx.VCSMetadata.PullRequest != nil {
