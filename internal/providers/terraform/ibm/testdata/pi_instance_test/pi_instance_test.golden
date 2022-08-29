@@ -2,29 +2,29 @@
  Name                                            Monthly Qty  Unit      Monthly Cost 
                                                                                      
  ibm_pi_instance.aix-shared-s922-instance                                            
- ├─ Storage - tier1                                       20  GB               $4.00 
- ├─ Cores                                                  1  Core            $88.26 
- ├─ Memory                                                 1  GB               $8.32 
- └─ Operating System                                       1  Cores           $28.98 
+ ├─ Storage - tier1                                   14,600  GB               $4.00 
+ ├─ Cores                                                730  Core            $88.26 
+ ├─ Memory                                               730  GB               $8.32 
+ └─ Operating System                                     730  Cores           $28.98 
                                                                                      
  ibm_pi_instance.hana-dedicated-e980-instance                                        
- ├─ Storage - tier1                                       20  GB               $4.00 
- ├─ Linux HANA Memory                                    128  Memory         $288.08 
- ├─ Linux HANA Cores                                       4  Core         $1,279.54 
+ ├─ Storage - tier1                                   14,600  GB               $4.00 
+ ├─ Linux HANA Memory                                 93,440  Memory         $288.08 
+ ├─ Linux HANA Cores                                   2,920  Core         $1,279.54 
  └─ Linux Operating System                                 1  Instance         $0.00 
                                                                                      
  ibm_pi_instance.ibmi-dedicated-e980-instance                                        
- ├─ Storage - tier1                                       20  GB               $4.00 
- ├─ Cores                                                  1  Core         $1,235.67 
- ├─ Memory                                                 1  GB               $8.32 
- ├─ Operating System IBMi LPP                              1  Core           $880.02 
- ├─ Operating System IBMi OS                               1  Core         $2,200.00 
- └─ Operating System IBMi Service Extension                1  Core           $817.02 
+ ├─ Storage - tier1                                   14,600  GB               $4.00 
+ ├─ Cores                                                730  Core         $1,235.67 
+ ├─ Memory                                               730  GB               $8.32 
+ ├─ Operating System IBMi LPP                            730  Core           $880.02 
+ ├─ Operating System IBMi OS                             730  Core         $2,200.00 
+ └─ Operating System IBMi Service Extension              730  Core           $817.02 
                                                                                      
  ibm_pi_instance.netweaver-shared-s922-instance                                      
- ├─ Storage - tier1                                       20  GB               $4.00 
- ├─ Cores                                                  1  Core            $88.26 
- ├─ Memory                                                 1  GB               $8.32 
+ ├─ Storage - tier1                                   14,600  GB               $4.00 
+ ├─ Cores                                                730  Core            $88.26 
+ ├─ Memory                                               730  GB               $8.32 
  └─ Linux Operating System                                 1  Instance         $0.00 
                                                                                      
  OVERALL TOTAL                                                             $6,946.79 
