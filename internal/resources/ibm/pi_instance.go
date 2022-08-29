@@ -330,16 +330,14 @@ func (r *PiInstance) piInstanceMemoryHanaProfileCostComponent() *schema.CostComp
 }
 
 func (r *PiInstance) piInstanceCoresHanaProfileCostComponent() *schema.CostComponent {
-	var coresAmount int64
+	var coresAmount float64
 
 	if r.Profile != nil {
 		coresAndMemory := strings.Split(*r.Profile, "-")[1]
 		coresString := strings.Split(coresAndMemory, "x")[0]
 		cores, err := strconv.Atoi(coresString)
-		if err != nil {
-			coresAmount = 0
-		} else {
-			coresAmount = int64(cores)
+		if err == nil {
+			coresAmount = float64(cores)
 		}
 	}
 
@@ -347,7 +345,7 @@ func (r *PiInstance) piInstanceCoresHanaProfileCostComponent() *schema.CostCompo
 
 	if r.MonthlyInstanceHours != nil {
 		hours := *r.MonthlyInstanceHours
-		q = decimalPtr(decimal.NewFromFloat(float64(coresAmount) * hours))
+		q = decimalPtr(decimal.NewFromFloat(coresAmount * hours))
 	}
 
 	unit := "COREHANA_APPLICATION_INSTANCE_HOURS"
