@@ -179,12 +179,10 @@ func (r *PiInstance) piInstanceIBMiLPPPOperatingSystemCostComponent() *schema.Co
 
 	unit := ""
 
-	if r.OperatingSystem == IBMI {
-		if r.SystemType == s922 {
-			unit = "IBMI_LPP_PTEN_APPLICATION_INSTANCE_HOURS"
-		} else if r.SystemType == e980 {
-			unit = "IBMI_LPP_PTHIRTY_APPLICATION_INSTANCE_HOURS"
-		}
+	if r.SystemType == s922 {
+		unit = "IBMI_LPP_PTEN_APPLICATION_INSTANCE_HOURS"
+	} else if r.SystemType == e980 {
+		unit = "IBMI_LPP_PTHIRTY_APPLICATION_INSTANCE_HOURS"
 	}
 
 	return &schema.CostComponent{
@@ -218,12 +216,10 @@ func (r *PiInstance) piInstanceIBMiOSOperatingSystemCostComponent() *schema.Cost
 
 	unit := ""
 
-	if r.OperatingSystem == IBMI {
-		if r.SystemType == s922 {
-			unit = "IBMI_OS_PTEN_APPLICATION_INSTANCE_HOURS"
-		} else if r.SystemType == e980 {
-			unit = "IBMI_OS_PTHIRTY_APPLICATION_INSTANCE_HOURS"
-		}
+	if r.SystemType == s922 {
+		unit = "IBMI_OS_PTEN_APPLICATION_INSTANCE_HOURS"
+	} else if r.SystemType == e980 {
+		unit = "IBMI_OS_PTHIRTY_APPLICATION_INSTANCE_HOURS"
 	}
 
 	return &schema.CostComponent{
