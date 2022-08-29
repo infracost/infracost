@@ -1,30 +1,36 @@
 
- Name                                          Monthly Qty  Unit      Monthly Cost 
-                                                                                   
- ibm_pi_instance.aix-shared-s922-instance                                          
- ├─ Storage - tier1                                     20  GB               $4.00 
- ├─ Cores                                                1  Core            $88.26 
- ├─ Memory                                               1  GB               $8.32 
- └─ Operating System                                     1  Cores           $28.98 
-                                                                                   
- ibm_pi_instance.hana-dedicated-e980-instance                                      
- ├─ Storage - tier1                                     20  GB               $4.00 
- ├─ Linux Operating System                               1  Instance         $0.00 
- ├─ Linux HANA Memory                                  128  Memory         $288.08 
- └─ Linux HANA Cores                                     4  Core         $1,279.54 
-                                                                                   
- ibm_pi_instance.ibmi-dedicated-e980-instance                                      
- ├─ Storage - tier1                                     20  GB               $4.00 
- ├─ Cores                                                1  Core         $1,235.67 
- ├─ Memory                                               1  GB               $8.32 
- ├─ Operating System IBMi LPP                            1  Core           $880.02 
- ├─ Operating System IBMi OS                             1  Core         $2,200.00 
- └─ Operating System IBMi Service Extension              1  Core           $817.02 
-                                                                                   
- OVERALL TOTAL                                                           $6,846.21 
+ Name                                            Monthly Qty  Unit      Monthly Cost 
+                                                                                     
+ ibm_pi_instance.aix-shared-s922-instance                                            
+ ├─ Storage - tier1                                       20  GB               $4.00 
+ ├─ Cores                                                  1  Core            $88.26 
+ ├─ Memory                                                 1  GB               $8.32 
+ └─ Operating System                                       1  Cores           $28.98 
+                                                                                     
+ ibm_pi_instance.hana-dedicated-e980-instance                                        
+ ├─ Storage - tier1                                       20  GB               $4.00 
+ ├─ Linux HANA Memory                                    128  Memory         $288.08 
+ ├─ Linux HANA Cores                                       4  Core         $1,279.54 
+ └─ Linux Operating System                                 1  Instance         $0.00 
+                                                                                     
+ ibm_pi_instance.ibmi-dedicated-e980-instance                                        
+ ├─ Storage - tier1                                       20  GB               $4.00 
+ ├─ Cores                                                  1  Core         $1,235.67 
+ ├─ Memory                                                 1  GB               $8.32 
+ ├─ Operating System IBMi LPP                              1  Core           $880.02 
+ ├─ Operating System IBMi OS                               1  Core         $2,200.00 
+ └─ Operating System IBMi Service Extension                1  Core           $817.02 
+                                                                                     
+ ibm_pi_instance.netweaver-shared-s922-instance                                      
+ ├─ Storage - tier1                                       20  GB               $4.00 
+ ├─ Cores                                                  1  Core            $88.26 
+ ├─ Memory                                                 1  GB               $8.32 
+ └─ Linux Operating System                                 1  Instance         $0.00 
+                                                                                     
+ OVERALL TOTAL                                                             $6,946.79 
 ──────────────────────────────────
-7 cloud resources were detected:
-∙ 3 were estimated
-∙ 4 are not supported yet, see https://infracost.io/requested-resources:
-  ∙ 3 x ibm_pi_image
+9 cloud resources were detected:
+∙ 4 were estimated
+∙ 5 are not supported yet, see https://infracost.io/requested-resources:
+  ∙ 4 x ibm_pi_image
   ∙ 1 x ibm_pi_key
