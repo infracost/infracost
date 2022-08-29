@@ -231,3 +231,26 @@ func Test_metadataFetcher_Get_ReturnsUserDefinedEnvs(t *testing.T) {
 		Pipeline: &Pipeline{ID: "INFRACOST_VCS_PIPELINE_RUN_ID_VALUE"},
 	}, actual)
 }
+
+func Test_metadataFetcher_Get_ReturnsPRIDFromURL(t *testing.T) {
+	t.Setenv("INFRACOST_VCS_PULL_REQUEST_URL", "https://github.com/infracost/test-repo/pull/1979")
+
+	test := false
+	m := metadataFetcher{
+		mu:     &keyMutex{},
+		client: &http.Client{Timeout: time.Second * 5},
+		test:   &test,
+	}
+
+	actual, _ := m.Get(t.TempDir())
+
+	_, err := json.Marshal(actual)
+	assert.NoError(t, err)
+
+	assert.Equal(t, Metadata{
+		PullRequest: &PullRequest{
+			ID:  "1979",
+			URL: "https://github.com/infracost/test-repo/pull/1979",
+		},
+	}, actual)
+}

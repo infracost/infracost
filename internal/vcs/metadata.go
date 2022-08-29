@@ -152,15 +152,30 @@ func buildDefaultPR() *PullRequest {
 		provider = ""
 	}
 
+	prURL := getEnv("INFRACOST_VCS_PULL_REQUEST_URL")
+	prID := getEnv("INFRACOST_VCS_PULL_REQUEST_ID")
+	if prURL != "" && prID == "" {
+		prID = getLastURLPart(prURL)
+	}
+
 	return &PullRequest{
-		ID:           getEnv("INFRACOST_VCS_PULL_REQUEST_ID"),
+		ID:           prID,
 		VCSProvider:  provider,
 		Title:        getEnv("INFRACOST_VCS_PULL_REQUEST_TITLE"),
 		Author:       getEnv("INFRACOST_VCS_PULL_REQUEST_AUTHOR"),
 		SourceBranch: getEnv("INFRACOST_VCS_BRANCH"),
 		BaseBranch:   getEnv("INFRACOST_VCS_BASE_BRANCH"),
-		URL:          getEnv("INFRACOST_VCS_PULL_REQUEST_URL"),
+		URL:          prURL,
 	}
+}
+
+func getLastURLPart(url string) string {
+	pieces := strings.Split(url, "/")
+	if len(pieces) == 0 {
+		return url
+	}
+
+	return pieces[len(pieces)-1]
 }
 
 func keysSet(keys ...string) bool {
