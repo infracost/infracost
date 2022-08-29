@@ -288,16 +288,14 @@ func (r *PiInstance) piInstanceIBMiOperatingSystemServiceExtensionCostComponent(
 
 func (r *PiInstance) piInstanceMemoryHanaProfileCostComponent() *schema.CostComponent {
 
-	var memoryAmount int64
+	var memoryAmount float64
 
 	if r.Profile != nil {
 		coresAndMemory := strings.Split(*r.Profile, "-")[1]
 		memoryString := strings.Split(coresAndMemory, "x")[1]
 		memory, err := strconv.Atoi(memoryString)
-		if err != nil {
-			memoryAmount = 0
-		} else {
-			memoryAmount = int64(memory)
+		if err == nil {
+			memoryAmount = float64(memory)
 		}
 	}
 
@@ -305,7 +303,7 @@ func (r *PiInstance) piInstanceMemoryHanaProfileCostComponent() *schema.CostComp
 
 	if r.MonthlyInstanceHours != nil {
 		hours := *r.MonthlyInstanceHours
-		q = decimalPtr(decimal.NewFromFloat(float64(memoryAmount) * hours))
+		q = decimalPtr(decimal.NewFromFloat(memoryAmount * hours))
 	}
 
 	unit := "MEMHANA_APPLICATION_INSTANCE_HOURS"
