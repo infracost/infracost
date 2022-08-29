@@ -23,6 +23,14 @@ func getPiInstanceRegistryItem() *schema.RegistryItem {
 	}
 }
 
+func isNetweaverImage(imageName string) bool {
+	if len(imageName) == 0 {
+		return false
+	}
+
+	return strings.Contains(imageName, "NETWEAVER")
+}
+
 func identifyOperatingSystem(imageName string) int64 {
 	splittedImageName := strings.Split(imageName, "-")
 
@@ -84,6 +92,7 @@ func newPiInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	storageType := d.Get("pi_storage_type").String()
 	os := identifyOperatingSystem(imageName)
 	isLegacyIBMiImageVersion := isIBMiVersionLegacy(imageName)
+	isNetweaverImage := isNetweaverImage(imageName)
 
 	r := &ibm.PiInstance{
 		Address:                d.Address,
@@ -95,6 +104,7 @@ func newPiInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 		StorageType:            storageType,
 		OperatingSystem:        os,
 		LegacyIBMiImageVersion: isLegacyIBMiImageVersion,
+		NetweaverImage:         isNetweaverImage,
 	}
 	r.PopulateUsage(u)
 
