@@ -4,7 +4,7 @@
   "metadata": {
     "infracostCommand": "breakdown",
     "vcsBranch": "test",
-    "vcsCommit": "1234",
+    "vcsCommitSha": "1234",
     "vcsCommitAuthorName": "hugo",
     "vcsCommitAuthorEmail": "hugo@test.com",
     "vcsCommitTimestamp": "2021-10-11T22:41:00.144866-04:00",

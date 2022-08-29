@@ -3,7 +3,7 @@
   "metadata": {
     "infracostCommand": "output",
     "vcsBranch": "test",
-    "vcsCommit": "1234",
+    "vcsCommitSha": "1234",
     "vcsCommitAuthorName": "hugo",
     "vcsCommitAuthorEmail": "hugo@test.com",
     "vcsCommitTimestamp": "REPLACED_TIME",
