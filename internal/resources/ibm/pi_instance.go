@@ -110,7 +110,6 @@ func (r *PiInstance) BuildResource() *schema.Resource {
 }
 
 func (r *PiInstance) piInstanceLinuxOperatingSystemCostComponent() *schema.CostComponent {
-
 	c := schema.CostComponent{
 		Name:            "Linux Operating System",
 		Unit:            "Instance",
@@ -134,7 +133,6 @@ func (r *PiInstance) piInstanceLinuxOperatingSystemCostComponent() *schema.CostC
 }
 
 func (r *PiInstance) piInstanceAIXOperatingSystemCostComponent() *schema.CostComponent {
-
 	var q *decimal.Decimal
 
 	if r.MonthlyInstanceHours != nil {
@@ -287,7 +285,6 @@ func (r *PiInstance) piInstanceIBMiOperatingSystemServiceExtensionCostComponent(
 }
 
 func (r *PiInstance) piInstanceMemoryHanaProfileCostComponent() *schema.CostComponent {
-
 	var memoryAmount float64
 
 	if r.Profile != nil {
@@ -517,7 +514,6 @@ func (r *PiInstance) piInstanceRationalDevStudioLicensesCostComponent() *schema.
 }
 
 func (r *PiInstance) piInstanceCoresCostComponent() *schema.CostComponent {
-
 	var q *decimal.Decimal
 
 	if r.MonthlyInstanceHours != nil {
@@ -626,7 +622,6 @@ func (r *PiInstance) piInstanceMemoryCostComponent() *schema.CostComponent {
 }
 
 func (r *PiInstance) piInstanceStorageCostComponent() *schema.CostComponent {
-
 	var q *decimal.Decimal
 
 	if r.Storage != nil && r.MonthlyInstanceHours != nil {
