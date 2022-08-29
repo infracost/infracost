@@ -1,4 +1,8 @@
-Upload an Infracost JSON file to Infracost Cloud. This is useful if you do not use `infracost comment` and instead want to define run metadata, such as pull request URL or title, and upload the results manually.
+Upload an Infracost JSON file to Infracost Cloud. This is useful if you
+do not use 'infracost comment' and instead want to define run metadata,
+such as pull request URL or title, and upload the results manually.
+
+See https://infracost.io/docs/features/cli_commands/#upload-runs
 
 USAGE
   infracost upload [flags]
