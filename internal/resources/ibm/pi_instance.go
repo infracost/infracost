@@ -10,13 +10,14 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// PiInstance struct represents <TODO: cloud service short description>.
+// PiInstance struct represents a Virtual Power Systems instance
 //
 // <TODO: Add any important information about the resource and links to the
 // pricing pages or documentation that might be useful to developers in the future, e.g:>
 //
-// Resource information: https://cloud.ibm.com/<PATH/TO/RESOURCE>/
-// Pricing information: https://cloud.ibm.com/<PATH/TO/PRICING>/
+// Resource information: https://www.ibm.com/products/power-virtual-server
+// Pricing information: https://cloud.ibm.com/catalog/services/power-systems-virtual-server
+// Detailed pricing information: https://cloud.ibm.com/docs/power-iaas?topic=power-iaas-pricing-virtual-server
 
 type PiInstance struct {
 	Address                string
