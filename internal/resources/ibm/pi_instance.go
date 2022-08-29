@@ -26,6 +26,7 @@ type PiInstance struct {
 	Memory                 float64
 	Cpus                   float64
 	LegacyIBMiImageVersion bool
+	NetweaverImage         bool
 
 	Storage                   *float64 `infracost_usage:"storage"`
 	CloudStorageSolution      *int64   `infracost_usage:"cloud_storage_solution"`
@@ -73,7 +74,9 @@ func (r *PiInstance) BuildResource() *schema.Resource {
 		r.piInstanceStorageCostComponent(),
 	}
 
-	if r.OperatingSystem != SLES && r.Profile == nil {
+	if r.Profile != nil {
+		costComponents = append(costComponents, r.piInstanceMemoryHanaProfileCostComponent(), r.piInstanceCoresHanaProfileCostComponent())
+	} else {
 		costComponents = append(costComponents, r.piInstanceCoresCostComponent(), r.piInstanceMemoryCostComponent())
 	}
 
@@ -95,8 +98,6 @@ func (r *PiInstance) BuildResource() *schema.Resource {
 		if r.LegacyIBMiImageVersion {
 			costComponents = append(costComponents, r.piInstanceIBMiOperatingSystemServiceExtensionCostComponent())
 		}
-	} else if r.OperatingSystem == SLES && r.Profile != nil {
-		costComponents = append(costComponents, r.piInstanceMemoryHanaProfileCostComponent(), r.piInstanceCoresHanaProfileCostComponent())
 	}
 
 	return &schema.Resource{
@@ -521,7 +522,7 @@ func (r *PiInstance) piInstanceMemoryCostComponent() *schema.CostComponent {
 
 	unit := "MS_GIGABYTE_HOURS"
 
-	if r.OperatingSystem == SLES {
+	if r.OperatingSystem == SLES && !r.NetweaverImage {
 		unit = "MEMHANA_APPLICATION_INSTANCE_HOURS"
 	}
 
