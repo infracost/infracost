@@ -2,13 +2,13 @@
   "version": "0.2",
   "metadata": {
     "infracostCommand": "output",
-    "branch": "test",
-    "commit": "1234",
-    "commitAuthorName": "hugo",
-    "commitAuthorEmail": "hugo@test.com",
-    "commitTimestamp": "REPLACED_TIME",
-    "commitMessage": "mymessage",
-    "vcsRepoUrl": "https://github.com/infracost/infracost.git"
+    "vcsBranch": "test",
+    "vcsCommitSha": "1234",
+    "vcsCommitAuthorName": "hugo",
+    "vcsCommitAuthorEmail": "hugo@test.com",
+    "vcsCommitTimestamp": "REPLACED_TIME",
+    "vcsCommitMessage": "mymessage",
+    "vcsRepositoryUrl": "https://github.com/infracost/infracost.git"
   },
   "currency": "USD",
   "projects": [
