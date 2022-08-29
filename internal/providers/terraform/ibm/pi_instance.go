@@ -107,5 +107,10 @@ func newPiInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	}
 	r.PopulateUsage(u)
 
+	configuration := make(map[string]any)
+	configuration["region"] = region
+
+	SetCatalogMetadata(d, d.Type, configuration)
+
 	return r.BuildResource()
 }
