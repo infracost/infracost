@@ -1,0 +1,4 @@
+Share this cost estimate:  http://localhost:3000/share/1234
+
+Logs:
+level=info msg="Estimate uploaded to organization 'tim' in Infracost Cloud"
