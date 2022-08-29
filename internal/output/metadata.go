@@ -10,12 +10,12 @@ import (
 type Metadata struct {
 	InfracostCommand string `json:"infracostCommand"`
 
-	Branch            string    `json:"branch"`
-	Commit            string    `json:"commit"`
-	CommitAuthorName  string    `json:"commitAuthorName"`
-	CommitAuthorEmail string    `json:"commitAuthorEmail"`
-	CommitTimestamp   time.Time `json:"commitTimestamp"`
-	CommitMessage     string    `json:"commitMessage"`
+	Branch            string    `json:"vcsBranch"`
+	Commit            string    `json:"vcsCommit"`
+	CommitAuthorName  string    `json:"vcsCommitAuthorName"`
+	CommitAuthorEmail string    `json:"vcsCommitAuthorEmail"`
+	CommitTimestamp   time.Time `json:"vcsCommitTimestamp"`
+	CommitMessage     string    `json:"vcsCommitMessage"`
 
 	VCSRepositoryURL     string `json:"vcsRepositoryUrl,omitempty"`
 	VCSProvider          string `json:"vcsProvider,omitempty"`

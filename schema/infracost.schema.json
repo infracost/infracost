@@ -65,34 +65,34 @@
     "Metadata": {
       "required": [
         "infracostCommand",
-        "branch",
-        "commit",
-        "commitAuthorName",
-        "commitAuthorEmail",
-        "commitTimestamp",
-        "commitMessage"
+        "vcsBranch",
+        "vcsCommit",
+        "vcsCommitAuthorName",
+        "vcsCommitAuthorEmail",
+        "vcsCommitTimestamp",
+        "vcsCommitMessage"
       ],
       "properties": {
         "infracostCommand": {
           "type": "string"
         },
-        "branch": {
+        "vcsBranch": {
           "type": "string"
         },
-        "commit": {
+        "vcsCommit": {
           "type": "string"
         },
-        "commitAuthorName": {
+        "vcsCommitAuthorName": {
           "type": "string"
         },
-        "commitAuthorEmail": {
+        "vcsCommitAuthorEmail": {
           "type": "string"
         },
-        "commitTimestamp": {
+        "vcsCommitTimestamp": {
           "type": "string",
           "format": "date-time"
         },
-        "commitMessage": {
+        "vcsCommitMessage": {
           "type": "string"
         },
         "vcsRepositoryUrl": {
