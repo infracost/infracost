@@ -840,6 +840,8 @@ func checkRunConfig(warningWriter io.Writer, cfg *config.Config) error {
 
 func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectContext, r output.Root, projects []*schema.Project, hclR *output.Root, hclProjects []*schema.Project) map[string]interface{} {
 	env := runCtx.EventEnvWithProjectContexts(projectContexts)
+
+	env["runId"] = r.RunID
 	env["projectCount"] = len(projectContexts)
 	env["runSeconds"] = time.Now().Unix() - runCtx.StartTime
 	env["currency"] = runCtx.Config.Currency
