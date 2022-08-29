@@ -2,8 +2,8 @@ package main
 
 import (
 	"fmt"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/ui"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
 	"github.com/infracost/infracost/internal/apiclient"
@@ -54,7 +54,7 @@ func uploadCmd(ctx *config.RunContext) *cobra.Command {
 			pricingClient := apiclient.NewPricingAPIClient(ctx)
 			err = pricingClient.AddEvent("infracost-upload", ctx.EventEnv())
 			if err != nil {
-				log.Errorf("Error reporting event: %s", err)
+				logging.Logger.WithError(err).Warn("could not report `infracost-upload` event")
 			}
 
 			return nil
