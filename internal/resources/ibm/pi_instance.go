@@ -142,12 +142,10 @@ func (r *PiInstance) piInstanceAIXOperatingSystemCostComponent() *schema.CostCom
 
 	unit := ""
 
-	if r.OperatingSystem == AIX {
-		if r.SystemType == s922 {
-			unit = "AIX_SMALL_APPLICATION_INSTANCE_HOURS"
-		} else if r.SystemType == e980 || r.SystemType == e1080 {
-			unit = "AIX_MEDIUM_APPLICATION_INSTANCE_HOURS"
-		}
+	if r.SystemType == s922 {
+		unit = "AIX_SMALL_APPLICATION_INSTANCE_HOURS"
+	} else if r.SystemType == e980 || r.SystemType == e1080 {
+		unit = "AIX_MEDIUM_APPLICATION_INSTANCE_HOURS"
 	}
 
 	return &schema.CostComponent{
