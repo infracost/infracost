@@ -70,9 +70,11 @@ func (r *PiInstance) PopulateUsage(u *schema.UsageData) {
 // See providers folder for more information.
 func (r *PiInstance) BuildResource() *schema.Resource {
 	costComponents := []*schema.CostComponent{
-		r.piInstanceCoresCostComponent(),
-		r.piInstanceMemoryCostComponent(),
 		r.piInstanceStorageCostComponent(),
+	}
+
+	if r.OperatingSystem != SLES && r.Profile == nil {
+		costComponents = append(costComponents, r.piInstanceCoresCostComponent(), r.piInstanceMemoryCostComponent())
 	}
 
 	if r.OperatingSystem != AIX && r.OperatingSystem != IBMI {
