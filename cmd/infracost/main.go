@@ -324,9 +324,7 @@ func loadGlobalFlags(ctx *config.RunContext, cmd *cobra.Command) error {
 	}
 
 	ctx.SetContextValue("dashboardEnabled", ctx.Config.EnableDashboard)
-	if ctx.Config.EnableCloud != nil {
-		ctx.SetContextValue("cloudEnabled", ctx.Config.EnableCloud)
-	}
+	ctx.SetContextValue("cloudEnabled", ctx.IsCloudEnabled())
 	ctx.SetContextValue("isDefaultPricingAPIEndpoint", ctx.Config.PricingAPIEndpoint == ctx.Config.DefaultPricingAPIEndpoint)
 
 	flagNames := make([]string, 0)
