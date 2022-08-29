@@ -68,10 +68,10 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 	if ctx.IsCloudEnabled() && !dryRun {
 		if ctx.Config.IsSelfHosted() {
 			ui.PrintWarning(cmd.ErrOrStderr(), "Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
+		} else {
+			combined.Metadata.InfracostCommand = "comment"
+			combined.RunID, combined.ShareURL = shareCombinedRun(ctx, combined, inputs)
 		}
-
-		combined.Metadata.InfracostCommand = "comment"
-		combined.RunID, combined.ShareURL = shareCombinedRun(ctx, combined, inputs)
 	}
 
 	var policyChecks output.PolicyCheck

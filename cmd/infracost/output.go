@@ -143,9 +143,9 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			if ctx.IsCloudEnabled() {
 				if ctx.Config.IsSelfHosted() {
 					ui.PrintWarning(cmd.ErrOrStderr(), "Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
+				} else {
+					combined.RunID, combined.ShareURL = shareCombinedRun(ctx, combined, inputs)
 				}
-
-				combined.RunID, combined.ShareURL = shareCombinedRun(ctx, combined, inputs)
 			}
 
 			b, err := output.FormatOutput(format, combined, opts)
