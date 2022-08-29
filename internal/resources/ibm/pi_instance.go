@@ -28,6 +28,7 @@ type PiInstance struct {
 	LegacyIBMiImageVersion bool
 	NetweaverImage         bool
 
+	MonthlyInstanceHours      *float64 `infracost_usage:"monthly_instance_hours"`
 	Storage                   *float64 `infracost_usage:"storage"`
 	CloudStorageSolution      *int64   `infracost_usage:"cloud_storage_solution"`
 	HighAvailability          *int64   `infracost_usage:"high_availability"`
@@ -51,6 +52,7 @@ const e1080 string = "e1080"
 
 // PiInstanceUsageSchema defines a list which represents the usage schema of PiInstance.
 var PiInstanceUsageSchema = []*schema.UsageItem{
+	{Key: "monthly_instance_hours", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "storage", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "cloud_storage_solution", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "high_availability", DefaultValue: 0, ValueType: schema.Int64},
@@ -132,6 +134,14 @@ func (r *PiInstance) piInstanceLinuxOperatingSystemCostComponent() *schema.CostC
 }
 
 func (r *PiInstance) piInstanceAIXOperatingSystemCostComponent() *schema.CostComponent {
+
+	var q *decimal.Decimal
+
+	if r.MonthlyInstanceHours != nil {
+		hours := *r.MonthlyInstanceHours
+		q = decimalPtr(decimal.NewFromFloat(r.Cpus * hours))
+	}
+
 	unit := ""
 
 	if r.OperatingSystem == AIX {
@@ -143,10 +153,10 @@ func (r *PiInstance) piInstanceAIXOperatingSystemCostComponent() *schema.CostCom
 	}
 
 	return &schema.CostComponent{
-		Name:           "Operating System",
-		Unit:           "Cores",
-		UnitMultiplier: schema.HourToMonthUnitMultiplier,
-		HourlyQuantity: decimalPtr(decimal.NewFromFloat(r.Cpus)),
+		Name:            "Operating System",
+		Unit:            "Cores",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
@@ -164,6 +174,13 @@ func (r *PiInstance) piInstanceAIXOperatingSystemCostComponent() *schema.CostCom
 }
 
 func (r *PiInstance) piInstanceIBMiLPPPOperatingSystemCostComponent() *schema.CostComponent {
+	var q *decimal.Decimal
+
+	if r.MonthlyInstanceHours != nil {
+		hours := *r.MonthlyInstanceHours
+		q = decimalPtr(decimal.NewFromFloat(r.Cpus * hours))
+	}
+
 	unit := ""
 
 	if r.OperatingSystem == IBMI {
@@ -175,10 +192,10 @@ func (r *PiInstance) piInstanceIBMiLPPPOperatingSystemCostComponent() *schema.Co
 	}
 
 	return &schema.CostComponent{
-		Name:           "Operating System IBMi LPP",
-		Unit:           "Core",
-		UnitMultiplier: schema.HourToMonthUnitMultiplier,
-		HourlyQuantity: decimalPtr(decimal.NewFromFloat(r.Cpus)),
+		Name:            "Operating System IBMi LPP",
+		Unit:            "Core",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
@@ -196,6 +213,13 @@ func (r *PiInstance) piInstanceIBMiLPPPOperatingSystemCostComponent() *schema.Co
 }
 
 func (r *PiInstance) piInstanceIBMiOSOperatingSystemCostComponent() *schema.CostComponent {
+	var q *decimal.Decimal
+
+	if r.MonthlyInstanceHours != nil {
+		hours := *r.MonthlyInstanceHours
+		q = decimalPtr(decimal.NewFromFloat(r.Cpus * hours))
+	}
+
 	unit := ""
 
 	if r.OperatingSystem == IBMI {
@@ -207,10 +231,10 @@ func (r *PiInstance) piInstanceIBMiOSOperatingSystemCostComponent() *schema.Cost
 	}
 
 	return &schema.CostComponent{
-		Name:           "Operating System IBMi OS",
-		Unit:           "Core",
-		UnitMultiplier: schema.HourToMonthUnitMultiplier,
-		HourlyQuantity: decimalPtr(decimal.NewFromFloat(r.Cpus)),
+		Name:            "Operating System IBMi OS",
+		Unit:            "Core",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
@@ -228,6 +252,13 @@ func (r *PiInstance) piInstanceIBMiOSOperatingSystemCostComponent() *schema.Cost
 }
 
 func (r *PiInstance) piInstanceIBMiOperatingSystemServiceExtensionCostComponent() *schema.CostComponent {
+	var q *decimal.Decimal
+
+	if r.MonthlyInstanceHours != nil {
+		hours := *r.MonthlyInstanceHours
+		q = decimalPtr(decimal.NewFromFloat(r.Cpus * hours))
+	}
+
 	unit := "IBM_I_OS_PTEN_SRVC_EXT_PER_PROC_CORE_HR"
 
 	if r.SystemType == e980 {
@@ -235,10 +266,10 @@ func (r *PiInstance) piInstanceIBMiOperatingSystemServiceExtensionCostComponent(
 	}
 
 	return &schema.CostComponent{
-		Name:           "Operating System IBMi Service Extension",
-		Unit:           "Core",
-		UnitMultiplier: schema.HourToMonthUnitMultiplier,
-		HourlyQuantity: decimalPtr(decimal.NewFromFloat(r.Cpus)),
+		Name:            "Operating System IBMi Service Extension",
+		Unit:            "Core",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
@@ -256,6 +287,7 @@ func (r *PiInstance) piInstanceIBMiOperatingSystemServiceExtensionCostComponent(
 }
 
 func (r *PiInstance) piInstanceMemoryHanaProfileCostComponent() *schema.CostComponent {
+
 	var memoryAmount int64
 
 	if r.Profile != nil {
@@ -269,13 +301,20 @@ func (r *PiInstance) piInstanceMemoryHanaProfileCostComponent() *schema.CostComp
 		}
 	}
 
+	var q *decimal.Decimal
+
+	if r.MonthlyInstanceHours != nil {
+		hours := *r.MonthlyInstanceHours
+		q = decimalPtr(decimal.NewFromFloat(float64(memoryAmount) * hours))
+	}
+
 	unit := "MEMHANA_APPLICATION_INSTANCE_HOURS"
 
 	return &schema.CostComponent{
-		Name:           "Linux HANA Memory",
-		Unit:           "Memory",
-		UnitMultiplier: schema.HourToMonthUnitMultiplier,
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(memoryAmount)),
+		Name:            "Linux HANA Memory",
+		Unit:            "Memory",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
@@ -306,13 +345,20 @@ func (r *PiInstance) piInstanceCoresHanaProfileCostComponent() *schema.CostCompo
 		}
 	}
 
+	var q *decimal.Decimal
+
+	if r.MonthlyInstanceHours != nil {
+		hours := *r.MonthlyInstanceHours
+		q = decimalPtr(decimal.NewFromFloat(float64(coresAmount) * hours))
+	}
+
 	unit := "COREHANA_APPLICATION_INSTANCE_HOURS"
 
 	return &schema.CostComponent{
-		Name:           "Linux HANA Cores",
-		Unit:           "Core",
-		UnitMultiplier: schema.HourToMonthUnitMultiplier,
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(coresAmount)),
+		Name:            "Linux HANA Cores",
+		Unit:            "Core",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
@@ -331,6 +377,7 @@ func (r *PiInstance) piInstanceCoresHanaProfileCostComponent() *schema.CostCompo
 
 func (r *PiInstance) piInstanceCloudStorageSolutionCostComponent() *schema.CostComponent {
 	var cloudStorageSolutionAmount int64
+	var q *decimal.Decimal
 
 	if r.CloudStorageSolution != nil {
 		cloudStorageSolutionAmount = int64(*r.CloudStorageSolution)
@@ -338,11 +385,16 @@ func (r *PiInstance) piInstanceCloudStorageSolutionCostComponent() *schema.CostC
 
 	unit := "IBMI_CSS_APPLICATION_INSTANCE_HOURS"
 
+	if r.MonthlyInstanceHours != nil && r.CloudStorageSolution != nil {
+		hours := *r.MonthlyInstanceHours
+		q = decimalPtr(decimal.NewFromFloat(r.Cpus * float64(cloudStorageSolutionAmount) * hours))
+	}
+
 	return &schema.CostComponent{
-		Name:           "Cloud Storage Solution",
-		Unit:           "Core",
-		UnitMultiplier: schema.HourToMonthUnitMultiplier,
-		HourlyQuantity: decimalPtr(decimal.NewFromFloat(r.Cpus * float64(cloudStorageSolutionAmount))),
+		Name:            "Cloud Storage Solution",
+		Unit:            "Core",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
@@ -362,17 +414,24 @@ func (r *PiInstance) piInstanceCloudStorageSolutionCostComponent() *schema.CostC
 func (r *PiInstance) piInstanceHighAvailabilityCostComponent() *schema.CostComponent {
 	var highAvailabilityAmount int64
 
+	var q *decimal.Decimal
+
 	if r.HighAvailability != nil {
 		highAvailabilityAmount = int64(*r.HighAvailability)
+	}
+
+	if r.MonthlyInstanceHours != nil {
+		hours := *r.MonthlyInstanceHours
+		q = decimalPtr(decimal.NewFromFloat(r.Cpus * float64(highAvailabilityAmount) * hours))
 	}
 
 	unit := "IBMIHA_PTHIRTY_APPLICATION_INSTANCES"
 
 	return &schema.CostComponent{
-		Name:           "High Availability",
-		Unit:           "Core",
-		UnitMultiplier: schema.HourToMonthUnitMultiplier,
-		HourlyQuantity: decimalPtr(decimal.NewFromFloat(r.Cpus * float64(highAvailabilityAmount))),
+		Name:            "High Availability",
+		Unit:            "Core",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
@@ -391,6 +450,7 @@ func (r *PiInstance) piInstanceHighAvailabilityCostComponent() *schema.CostCompo
 
 func (r *PiInstance) piInstanceDB2WebQueryCostComponent() *schema.CostComponent {
 	var db2WebQueryAmount int64
+	var q *decimal.Decimal
 
 	if r.DB2WebQuery != nil {
 		db2WebQueryAmount = int64(*r.DB2WebQuery)
@@ -398,11 +458,16 @@ func (r *PiInstance) piInstanceDB2WebQueryCostComponent() *schema.CostComponent 
 
 	unit := "IBMI_DBIIWQ_APPLICATION_INSTANCE_HOURS"
 
+	if r.MonthlyInstanceHours != nil {
+		hours := *r.MonthlyInstanceHours
+		q = decimalPtr(decimal.NewFromFloat(r.Cpus * float64(db2WebQueryAmount) * hours))
+	}
+
 	return &schema.CostComponent{
-		Name:           "IBM DB2 Web Query",
-		Unit:           "Core",
-		UnitMultiplier: schema.HourToMonthUnitMultiplier,
-		HourlyQuantity: decimalPtr(decimal.NewFromFloat(r.Cpus * float64(db2WebQueryAmount))),
+		Name:            "IBM DB2 Web Query",
+		Unit:            "Core",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
@@ -421,6 +486,7 @@ func (r *PiInstance) piInstanceDB2WebQueryCostComponent() *schema.CostComponent 
 
 func (r *PiInstance) piInstanceRationalDevStudioLicensesCostComponent() *schema.CostComponent {
 	var RationalDevStudioLicencesAmount int64
+	var q *decimal.Decimal
 
 	if r.RationalDevStudioLicences != nil {
 		RationalDevStudioLicencesAmount = int64(*r.RationalDevStudioLicences)
@@ -428,11 +494,16 @@ func (r *PiInstance) piInstanceRationalDevStudioLicensesCostComponent() *schema.
 
 	unit := "IBMIRDS_APPLICATION_INSTANCES"
 
+	if r.MonthlyInstanceHours != nil {
+		hours := *r.MonthlyInstanceHours
+		q = decimalPtr(decimal.NewFromFloat(float64(RationalDevStudioLicencesAmount) * hours))
+	}
+
 	return &schema.CostComponent{
-		Name:           "Rational Dev Studio",
-		Unit:           "Instance",
-		UnitMultiplier: schema.HourToMonthUnitMultiplier,
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(RationalDevStudioLicencesAmount)),
+		Name:            "Rational Dev Studio",
+		Unit:            "Instance",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
@@ -450,7 +521,13 @@ func (r *PiInstance) piInstanceRationalDevStudioLicensesCostComponent() *schema.
 }
 
 func (r *PiInstance) piInstanceCoresCostComponent() *schema.CostComponent {
-	q := decimalPtr(decimal.NewFromFloat(r.Cpus))
+
+	var q *decimal.Decimal
+
+	if r.MonthlyInstanceHours != nil {
+		hours := *r.MonthlyInstanceHours
+		q = decimalPtr(decimal.NewFromFloat(r.Cpus * hours))
+	}
 
 	epicEnabled := r.Epic != nil && *r.Epic == 1
 
@@ -497,10 +574,10 @@ func (r *PiInstance) piInstanceCoresCostComponent() *schema.CostComponent {
 	}
 
 	return &schema.CostComponent{
-		Name:           name,
-		Unit:           "Core",
-		UnitMultiplier: schema.HourToMonthUnitMultiplier,
-		HourlyQuantity: q,
+		Name:            name,
+		Unit:            "Core",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
@@ -518,7 +595,12 @@ func (r *PiInstance) piInstanceCoresCostComponent() *schema.CostComponent {
 }
 
 func (r *PiInstance) piInstanceMemoryCostComponent() *schema.CostComponent {
-	q := decimalPtr(decimal.NewFromFloat(r.Memory))
+	var q *decimal.Decimal
+
+	if r.MonthlyInstanceHours != nil {
+		hours := *r.MonthlyInstanceHours
+		q = decimalPtr(decimal.NewFromFloat(r.Memory * hours))
+	}
 
 	unit := "MS_GIGABYTE_HOURS"
 
@@ -527,10 +609,10 @@ func (r *PiInstance) piInstanceMemoryCostComponent() *schema.CostComponent {
 	}
 
 	return &schema.CostComponent{
-		Name:           "Memory",
-		Unit:           "GB",
-		UnitMultiplier: schema.HourToMonthUnitMultiplier,
-		HourlyQuantity: q,
+		Name:            "Memory",
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
@@ -551,8 +633,9 @@ func (r *PiInstance) piInstanceStorageCostComponent() *schema.CostComponent {
 
 	var q *decimal.Decimal
 
-	if r.Storage != nil {
-		q = decimalPtr(decimal.NewFromFloat(*r.Storage))
+	if r.Storage != nil && r.MonthlyInstanceHours != nil {
+		hours := *r.MonthlyInstanceHours
+		q = decimalPtr(decimal.NewFromFloat(*r.Storage * hours))
 	}
 
 	unit := ""
@@ -564,10 +647,10 @@ func (r *PiInstance) piInstanceStorageCostComponent() *schema.CostComponent {
 	}
 
 	return &schema.CostComponent{
-		Name:           fmt.Sprintf("Storage - %s", r.StorageType),
-		Unit:           "GB",
-		UnitMultiplier: schema.HourToMonthUnitMultiplier,
-		HourlyQuantity: q,
+		Name:            fmt.Sprintf("Storage - %s", r.StorageType),
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("ibm"),
 			Region:        strPtr(r.Region),
