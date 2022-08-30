@@ -15,14 +15,18 @@ func uploadCmd(ctx *config.RunContext) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "upload",
 		Short: "Upload an Infracost JSON file to Infracost Cloud",
-		Long:  "Upload an Infracost JSON file to Infracost Cloud. This is useful if you do not use `infracost comment` and instead want to define run metadata, such as pull request URL or title, and upload the results manually.",
+		Long: `Upload an Infracost JSON file to Infracost Cloud. This is useful if you
+do not use 'infracost comment' and instead want to define run metadata,
+such as pull request URL or title, and upload the results manually.
+
+See https://infracost.io/docs/features/cli_commands/#upload-runs`,
 		Example: `  Upload an Infracost JSON file:
       export INFRACOST_VCS_PULL_REQUEST_URL=http://github.com/myorg...
       export INFRACOST_VCS_PULL_REQUEST_TITLE="My PR title"
       # ... other env vars here
-      
+
       infracost diff --path plan.json --format json --out-file infracost.json
-      
+
       infracost upload --path infracost.json`,
 		ValidArgs: []string{"--", "-"},
 		RunE: func(cmd *cobra.Command, args []string) error {
