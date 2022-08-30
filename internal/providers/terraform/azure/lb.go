@@ -5,7 +5,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func getAzureLoadBalancerRegistryItem() *schema.RegistryItem {
+func getLoadBalancerRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_lb",
 		RFunc: NewLB,

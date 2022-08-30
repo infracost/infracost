@@ -5,7 +5,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func getAzureLinuxVirtualMachineScaleSetRegistryItem() *schema.RegistryItem {
+func getLinuxVirtualMachineScaleSetRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_linux_virtual_machine_scale_set",
 		RFunc: NewLinuxVirtualMachineScaleSet,

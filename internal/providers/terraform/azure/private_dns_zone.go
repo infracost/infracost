@@ -5,7 +5,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func getAzureDNSPrivateZoneRegistryItem() *schema.RegistryItem {
+func getDNSPrivateZoneRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_private_dns_zone",
 		RFunc: NewPrivateDNSZone,

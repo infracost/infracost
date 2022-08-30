@@ -5,7 +5,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func getAzureKubernetesClusterNodePoolRegistryItem() *schema.RegistryItem {
+func getKubernetesClusterNodePoolRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_kubernetes_cluster_node_pool",
 		RFunc: NewKubernetesClusterNodePool,
