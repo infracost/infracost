@@ -109,6 +109,11 @@ func newPiInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 
 	configuration := make(map[string]any)
 	configuration["region"] = region
+	configuration["systemType"] = systemType
+	configuration["processorMode"] = processorMode
+	configuration["cpus"] = cpus
+	configuration["memory"] = memory
+	configuration["storageType"] = storageType
 
 	SetCatalogMetadata(d, d.Type, configuration)
 
