@@ -127,3 +127,20 @@ resource "ibm_pi_instance" "netweaver-shared-s922-instance" {
   }
 }
 
+resource "ibm_pi_instance" "netweaver-shared-s922-no-usage-specified-instance" {
+  pi_memory            = "1"
+  pi_processors        = "1"
+  pi_instance_name     = "netweaver-shared-s922"
+  pi_proc_type         = "shared"
+  pi_image_id          = ibm_pi_image.netweaver_image.id
+  pi_key_pair_name     = ibm_pi_key.key.key_id
+  pi_sys_type          = "s922"
+  pi_cloud_instance_id = "51e1879c-bcbe-4ee1-a008-49cdba0eaf60"
+  pi_pin_policy        = "none"
+  pi_health_status     = "WARNING"
+  pi_storage_type  = ibm_pi_image.ibmi_image.pi_image_storage_type
+  pi_network {
+    network_id = "test-id"
+  }
+}
+
