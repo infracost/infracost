@@ -134,7 +134,7 @@ func Test_metadataFetcher_GetLocalMetadataMergesWithEnv(t *testing.T) {
 			Time:        obj.Author.When,
 			Message:     obj.Message,
 		},
-		PullRequest: &PullRequest{ID: pullID},
+		PullRequest: &PullRequest{ID: pullID, VCSProvider: "github"},
 		Pipeline:    nil,
 	}, actual)
 }
