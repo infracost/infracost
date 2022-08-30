@@ -4,6 +4,9 @@
  ibm_container_vpc_worker_pool.cluster_pool                                                                                            
  └─ VPC Container Work Zone flavor: (bx2.2x8) region: (us-south) name: (us-south-2) x(3) workers         2,190  hours          $272.84 
                                                                                                                                        
+ ibm_container_vpc_worker_pool.cluster_pool_without_usage                                                                              
+ └─ VPC Container Work Zone flavor: (bx2.2x8) region: (us-south) name: (us-south-2) x(3) workers             3  hours            $0.37 
+                                                                                                                                       
  ibm_is_vpc.vpc1                                                                                                                       
  ├─ VPC instance                                                                                             1  Instance         $0.00 
  ├─ VPC egress free allowance (first 5GB)                                                                    5  GB               $0.00 
@@ -15,9 +18,9 @@
  mycluster                                                                                                                             
  └─ VPC Container Work Zone flavor: (bx2.4x16) region: (us-south) name: (us-south-1) x(3) workers        2,190  hours          $565.42 
                                                                                                                                        
- OVERALL TOTAL                                                                                                               $5,034.82 
+ OVERALL TOTAL                                                                                                               $5,035.19 
 ──────────────────────────────────
-5 cloud resources were detected:
-∙ 3 were estimated, 2 of which include usage-based costs, see https://infracost.io/usage-file
+6 cloud resources were detected:
+∙ 4 were estimated, 3 of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 2 were free:
   ∙ 2 x ibm_is_subnet

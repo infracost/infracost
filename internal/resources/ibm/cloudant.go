@@ -17,6 +17,7 @@ import (
 // Pricing information: https://cloud.ibm.com/catalog/services/cloudant
 type Cloudant struct {
 	Address  string
+	Name     string
 	Region   string
 	Plan     string
 	Capacity string
@@ -130,7 +131,7 @@ func (r *Cloudant) cloudantReadsCostComponent() *schema.CostComponent {
 	monthlyReads := c * 100
 
 	return &schema.CostComponent{
-		Name:            "Monthly Reads",
+		Name:            fmt.Sprintf("Reads (capacity: %s)", r.Capacity),
 		Unit:            "reads/second",
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(int64(monthlyReads))),
 		UnitMultiplier:  decimal.NewFromInt(1),
@@ -152,7 +153,7 @@ func (r *Cloudant) cloudantWritesCostComponent() *schema.CostComponent {
 	monthlyWrites := c * 50
 
 	return &schema.CostComponent{
-		Name:            "Monthly Writes",
+		Name:            fmt.Sprintf("Writes (capacity: %s)", r.Capacity),
 		Unit:            "writes/second",
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(int64(monthlyWrites))),
 		UnitMultiplier:  decimal.NewFromInt(1),
@@ -174,7 +175,7 @@ func (r *Cloudant) cloudantGlobalQueriesCostComponent() *schema.CostComponent {
 	monthlyGlobalQueries := c * 5
 
 	return &schema.CostComponent{
-		Name:            "Monthly Global Queries",
+		Name:            fmt.Sprintf("Global Queries (capacity: %s)", r.Capacity),
 		Unit:            "queries/second",
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(int64(monthlyGlobalQueries))),
 		UnitMultiplier:  decimal.NewFromInt(1),
@@ -234,7 +235,7 @@ func (r *Cloudant) BuildResource() *schema.Resource {
 	planName := cases.Title(language.Und).String(r.Plan)
 
 	return &schema.Resource{
-		Name:           fmt.Sprintf("Cloudant - %s", planName),
+		Name:           fmt.Sprintf("Cloudant - %s - %s", r.Name, planName),
 		UsageSchema:    CloudantUsageSchema,
 		CostComponents: costComponents,
 	}

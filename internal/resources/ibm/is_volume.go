@@ -21,12 +21,12 @@ type IsVolume struct {
 	// Only for custom profile
 	IOPS int64
 
-	MonthlyHours *float64 `infracost_usage:"monthly_hours"`
+	MonthlyInstanceHours *float64 `infracost_usage:"monthly_instance_hours"`
 }
 
 // IsVolumeUsageSchema defines a list which represents the usage schema of IsVolume.
 var IsVolumeUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_hours", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "monthly_instance_hours", DefaultValue: 0, ValueType: schema.Float64},
 }
 
 // PopulateUsage parses the u schema.UsageData into the IsVolume.
@@ -37,13 +37,13 @@ func (r *IsVolume) PopulateUsage(u *schema.UsageData) {
 
 func (r *IsVolume) CustomCostComponenets() []*schema.CostComponent {
 	var gigabyteHoursQ *decimal.Decimal
-	if r.MonthlyHours != nil {
-		gigabyteHoursQ = decimalPtr(decimal.NewFromFloat(*r.MonthlyHours))
+	if r.MonthlyInstanceHours != nil {
+		gigabyteHoursQ = decimalPtr(decimal.NewFromFloat(*r.MonthlyInstanceHours))
 		gigabyteHoursQ = decimalPtr(gigabyteHoursQ.Mul(decimal.NewFromInt(r.Capacity)))
 	}
 	var iopsHoursQ *decimal.Decimal
-	if r.MonthlyHours != nil {
-		iopsHoursQ = decimalPtr(decimal.NewFromFloat(*r.MonthlyHours))
+	if r.MonthlyInstanceHours != nil {
+		iopsHoursQ = decimalPtr(decimal.NewFromFloat(*r.MonthlyInstanceHours))
 		iopsHoursQ = decimalPtr(iopsHoursQ.Mul(decimal.NewFromInt(r.IOPS)))
 	}
 	return []*schema.CostComponent{
@@ -88,8 +88,8 @@ func (r *IsVolume) CustomCostComponenets() []*schema.CostComponent {
 
 func (r *IsVolume) PlannedCostComponenets() []*schema.CostComponent {
 	var q *decimal.Decimal
-	if r.MonthlyHours != nil {
-		q = decimalPtr(decimal.NewFromFloat(*r.MonthlyHours))
+	if r.MonthlyInstanceHours != nil {
+		q = decimalPtr(decimal.NewFromFloat(*r.MonthlyInstanceHours))
 		q = decimalPtr(q.Mul(decimal.NewFromInt(r.Capacity)))
 	}
 	return []*schema.CostComponent{
