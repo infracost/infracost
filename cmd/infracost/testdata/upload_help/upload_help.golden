@@ -12,9 +12,9 @@ EXAMPLES
       export INFRACOST_VCS_PULL_REQUEST_URL=http://github.com/myorg...
       export INFRACOST_VCS_PULL_REQUEST_TITLE="My PR title"
       # ... other env vars here
-      
+
       infracost diff --path plan.json --format json --out-file infracost.json
-      
+
       infracost upload --path infracost.json
 
 FLAGS
