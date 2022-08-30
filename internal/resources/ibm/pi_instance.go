@@ -150,7 +150,7 @@ func (r *PiInstance) piInstanceAIXOperatingSystemCostComponent() *schema.CostCom
 
 	return &schema.CostComponent{
 		Name:            "Operating System",
-		Unit:            "Cores",
+		Unit:            "Core hours",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
@@ -187,7 +187,7 @@ func (r *PiInstance) piInstanceIBMiLPPPOperatingSystemCostComponent() *schema.Co
 
 	return &schema.CostComponent{
 		Name:            "Operating System IBMi LPP",
-		Unit:            "Core",
+		Unit:            "Core hours",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
@@ -224,7 +224,7 @@ func (r *PiInstance) piInstanceIBMiOSOperatingSystemCostComponent() *schema.Cost
 
 	return &schema.CostComponent{
 		Name:            "Operating System IBMi OS",
-		Unit:            "Core",
+		Unit:            "Core hours",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
@@ -259,7 +259,7 @@ func (r *PiInstance) piInstanceIBMiOperatingSystemServiceExtensionCostComponent(
 
 	return &schema.CostComponent{
 		Name:            "Operating System IBMi Service Extension",
-		Unit:            "Core",
+		Unit:            "Core hours",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
@@ -301,7 +301,7 @@ func (r *PiInstance) piInstanceMemoryHanaProfileCostComponent() *schema.CostComp
 
 	return &schema.CostComponent{
 		Name:            "Linux HANA Memory",
-		Unit:            "Memory",
+		Unit:            "Memory hours",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
@@ -343,7 +343,7 @@ func (r *PiInstance) piInstanceCoresHanaProfileCostComponent() *schema.CostCompo
 
 	return &schema.CostComponent{
 		Name:            "Linux HANA Cores",
-		Unit:            "Core",
+		Unit:            "Core hours",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
@@ -379,7 +379,7 @@ func (r *PiInstance) piInstanceCloudStorageSolutionCostComponent() *schema.CostC
 
 	return &schema.CostComponent{
 		Name:            "Cloud Storage Solution",
-		Unit:            "Core",
+		Unit:            "Core hours",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
@@ -413,7 +413,7 @@ func (r *PiInstance) piInstanceHighAvailabilityCostComponent() *schema.CostCompo
 
 	return &schema.CostComponent{
 		Name:            "High Availability",
-		Unit:            "Core",
+		Unit:            "Core hours",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
@@ -446,7 +446,7 @@ func (r *PiInstance) piInstanceDB2WebQueryCostComponent() *schema.CostComponent 
 
 	return &schema.CostComponent{
 		Name:            "IBM DB2 Web Query",
-		Unit:            "Core",
+		Unit:            "Core hours",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
@@ -479,7 +479,7 @@ func (r *PiInstance) piInstanceRationalDevStudioLicensesCostComponent() *schema.
 
 	return &schema.CostComponent{
 		Name:            "Rational Dev Studio",
-		Unit:            "Instance",
+		Unit:            "Instance hours",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
@@ -552,7 +552,7 @@ func (r *PiInstance) piInstanceCoresCostComponent() *schema.CostComponent {
 
 	return &schema.CostComponent{
 		Name:            name,
-		Unit:            "Core",
+		Unit:            "Core hours",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
@@ -587,7 +587,7 @@ func (r *PiInstance) piInstanceMemoryCostComponent() *schema.CostComponent {
 
 	return &schema.CostComponent{
 		Name:            "Memory",
-		Unit:            "GB",
+		Unit:            "GB hours",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
@@ -624,7 +624,7 @@ func (r *PiInstance) piInstanceStorageCostComponent() *schema.CostComponent {
 
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("Storage - %s", r.StorageType),
-		Unit:            "GB",
+		Unit:            "GB hours",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
