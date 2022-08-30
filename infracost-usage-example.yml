@@ -1179,6 +1179,17 @@ resource_usage:
     connection_hours: 730 # Monthly number of connection hours
     instance_hours: 730 # Monthly number of instance hours
 
+  # 
+  # Power Systems Virtual Server
+  # 
+  ibm_pi_instance:
+    monthly_instance_hours: 730
+    storage: 20
+    cloud_storage_solution: 0
+    high_availability: 0
+    db2_web_query: 0
+    rational_dev_studio_licenses: 0
+
   #
   # Key Protect
   #
