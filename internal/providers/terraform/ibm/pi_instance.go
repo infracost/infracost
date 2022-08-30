@@ -7,14 +7,6 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-// Operating System
-const (
-	AIX int64 = iota
-	IBMI
-	RHEL
-	SLES
-)
-
 func getPiInstanceRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:                "ibm_pi_instance",
@@ -33,19 +25,19 @@ func identifyOperatingSystem(imageName string) int64 {
 	truncatedImageName := splittedImageName[0]
 
 	if truncatedImageName == "7100" || truncatedImageName == "7200" || truncatedImageName == "7300" {
-		return AIX
+		return ibm.AIX
 	}
 
 	if truncatedImageName == "IBMi" {
-		return IBMI
+		return ibm.IBMI
 	}
 
 	if truncatedImageName == "CentOS" || truncatedImageName == "Linux" || truncatedImageName == "RHEL8" {
-		return RHEL
+		return ibm.RHEL
 	}
 
 	if truncatedImageName == "SLES15" {
-		return SLES
+		return ibm.SLES
 	}
 
 	return -1
