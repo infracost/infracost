@@ -13,9 +13,13 @@
  ├─ VPC Container Work Zone flavor: (bx2.4x16) region: (us-south) name: (us-south-1) x(3) workers        2,190  hours          $565.42 
  └─ VPC Container Work Zone flavor: (bx2.4x16) region: (us-south) name: (us-south-2) x(3) workers        2,190  hours          $565.42 
                                                                                                                                        
- OVERALL TOTAL                                                                                                               $5,327.40 
+ mycluster-without-usage                                                                                                               
+ ├─ VPC Container Work Zone flavor: (bx2.4x16) region: (us-south) name: (us-south-1) x(3) workers            3  hours            $0.77 
+ └─ VPC Container Work Zone flavor: (bx2.4x16) region: (us-south) name: (us-south-2) x(3) workers            3  hours            $0.77 
+                                                                                                                                       
+ OVERALL TOTAL                                                                                                               $5,328.95 
 ──────────────────────────────────
-4 cloud resources were detected:
-∙ 2 were estimated, 1 of which usage-based costs, see https://infracost.io/usage-file
+5 cloud resources were detected:
+∙ 3 were estimated, 1 of which usage-based costs, see https://infracost.io/usage-file
 ∙ 2 were free:
   ∙ 2 x ibm_is_subnet

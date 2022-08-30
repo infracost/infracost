@@ -32,3 +32,10 @@ resource "ibm_is_volume" "general_purpose_5iops" {
   zone           = "us-south-1"
   capacity       = 400
 }
+
+resource "ibm_is_volume" "general_purpose_volume2" {
+  name           = "example-volume"
+  profile        = "general-purpose"
+  zone           = "us-south-1"
+  capacity       = 200
+}

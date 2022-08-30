@@ -1,21 +1,25 @@
 
- Name                                         Monthly Qty  Unit              Monthly Cost 
-                                                                                          
- ibm_is_vpc.testVpc                                                                       
- ├─ VPC instance                                        1  Instance                 $0.00 
- ├─ VPC egress free allowance (first 5GB)  Monthly cost depends on usage: $0.00 per GB    
- └─ VPC egress us-south (first 9995 GB)    Monthly cost depends on usage: $0.087 per GB   
- └─ VPC egress us-south (next 40000 GB)    Monthly cost depends on usage: $0.083 per GB   
- └─ VPC egress us-south (next 100000 GB)   Monthly cost depends on usage: $0.07 per GB    
- └─ VPC egress us-south (over 149995 GB)   Monthly cost depends on usage: $0.05 per GB    
-                                                                                          
- ibm_is_vpn_gateway.testVpcVpn                                                            
- ├─ VPN connection hours us-south                     730  Hours                   $29.20 
- └─ VPN instance hours us-south                       730  Hours                   $32.85 
-                                                                                          
- OVERALL TOTAL                                                                     $62.05 
+ Name                                               Monthly Qty  Unit                Monthly Cost 
+                                                                                                  
+ ibm_is_vpc.test_vpc                                                                              
+ ├─ VPC instance                                              1  Instance                   $0.00 
+ ├─ VPC egress free allowance (first 5GB)       Monthly cost depends on usage: $0.00 per GB       
+ └─ VPC egress us-south (first 9995 GB)         Monthly cost depends on usage: $0.087 per GB      
+ └─ VPC egress us-south (next 40000 GB)         Monthly cost depends on usage: $0.083 per GB      
+ └─ VPC egress us-south (next 100000 GB)        Monthly cost depends on usage: $0.07 per GB       
+ └─ VPC egress us-south (over 149995 GB)        Monthly cost depends on usage: $0.05 per GB       
+                                                                                                  
+ ibm_is_vpn_gateway.test_vpc_vpn                                                                  
+ ├─ VPN connection hours us-south                           730  Hours                     $29.20 
+ └─ VPN instance hours us-south                             730  Hours                     $32.85 
+                                                                                                  
+ ibm_is_vpn_gateway.test_vpc_vpn_without_usage                                                    
+ ├─ VPN connection hours us-south               Monthly cost depends on usage: $0.04 per Hours    
+ └─ VPN instance hours us-south                 Monthly cost depends on usage: $0.045 per Hours   
+                                                                                                  
+ OVERALL TOTAL                                                                             $62.05 
 ──────────────────────────────────
-3 cloud resources were detected:
-∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
-∙ 1 was free:
-  ∙ 1 x ibm_is_subnet
+5 cloud resources were detected:
+∙ 3 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 2 were free:
+  ∙ 2 x ibm_is_subnet

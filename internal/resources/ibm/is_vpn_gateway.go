@@ -17,14 +17,14 @@ type IsVpnGateway struct {
 	Address string
 	Region  string
 
-	ConnectionHours *float64 `infracost_usage:"connection_hours"`
-	InstanceHours   *float64 `infracost_usage:"instance_hours"`
+	MonthlyConnectionHours *float64 `infracost_usage:"monthly_connection_hours"`
+	MonthlyInstanceHours   *float64 `infracost_usage:"monthly_instance_hours"`
 }
 
 // IsVpnGatewayUsageSchema defines a list which represents the usage schema of IsVpnGateway.
 var IsVpnGatewayUsageSchema = []*schema.UsageItem{
-	{Key: "connection_hours", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "instance_hours", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "monthly_connection_hours", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "monthly_instance_hours", DefaultValue: 0, ValueType: schema.Float64},
 }
 
 // PopulateUsage parses the u schema.UsageData into the IsVpnGateway.
@@ -35,8 +35,8 @@ func (r *IsVpnGateway) PopulateUsage(u *schema.UsageData) {
 
 func (r *IsVpnGateway) connectionHoursCostComponent() *schema.CostComponent {
 	var quantity *decimal.Decimal
-	if r.ConnectionHours != nil {
-		quantity = decimalPtr(decimal.NewFromFloat(*r.ConnectionHours))
+	if r.MonthlyConnectionHours != nil {
+		quantity = decimalPtr(decimal.NewFromFloat(*r.MonthlyConnectionHours))
 	}
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("VPN connection hours %s", r.Region),
@@ -59,8 +59,8 @@ func (r *IsVpnGateway) connectionHoursCostComponent() *schema.CostComponent {
 
 func (r *IsVpnGateway) instanceHoursCostComponent() *schema.CostComponent {
 	var quantity *decimal.Decimal
-	if r.InstanceHours != nil {
-		quantity = decimalPtr(decimal.NewFromFloat(*r.InstanceHours))
+	if r.MonthlyInstanceHours != nil {
+		quantity = decimalPtr(decimal.NewFromFloat(*r.MonthlyInstanceHours))
 	}
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("VPN instance hours %s", r.Region),

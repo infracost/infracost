@@ -15,6 +15,14 @@
  └─ Flow Log Collector us-south (next 22000 GB)                                 0  GB                                 $0.00 
  └─ Flow Log Collector us-south (over 72000 GB)                                 0  GB                                 $0.00 
                                                                                                                             
+ ibm_is_flow_log.testFlowLogWithoutUsage                                                                                    
+ ├─ Flow Log Collector us-south - free allowance (first 5GB)  Monthly cost depends on usage: $0.00 per GB                   
+ └─ Flow Log Collector us-south (first 10000 GB)              Monthly cost depends on usage: $0.10 per GB                   
+ └─ Flow Log Collector us-south (next 20000 GB)               Monthly cost depends on usage: $0.10 per GB                   
+ └─ Flow Log Collector us-south (next 20000 GB)               Monthly cost depends on usage: $0.10 per GB                   
+ └─ Flow Log Collector us-south (next 22000 GB)               Monthly cost depends on usage: $0.10 per GB                   
+ └─ Flow Log Collector us-south (over 72000 GB)               Monthly cost depends on usage: $0.10 per GB                   
+                                                                                                                            
  ibm_is_instance.testIsInstance                                                                                             
  ├─ CPU hours (2 CPUs, us-south-1)                            Monthly cost depends on usage: $0.0265079365 per CPU hours    
  └─ Memory hours (8 GB, us-south-1)                           Monthly cost depends on usage: $0.0042222222 per Memory hours 
@@ -29,8 +37,8 @@
                                                                                                                             
  OVERALL TOTAL                                                                                                    $2,999.50 
 ──────────────────────────────────
-8 cloud resources were detected:
-∙ 5 were estimated, 4 of which include usage-based costs, see https://infracost.io/usage-file
+9 cloud resources were detected:
+∙ 6 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 2 were free:
   ∙ 1 x ibm_is_ssh_key
   ∙ 1 x ibm_is_subnet

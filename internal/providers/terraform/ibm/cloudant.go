@@ -17,9 +17,11 @@ func newCloudant(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 
 	p := d.Get("plan").String()
 	c := d.Get("capacity").String()
+	n := d.Get("name").String()
 
 	r := &ibm.Cloudant{
 		Address:  d.Address,
+		Name:     n,
 		Region:   region,
 		Plan:     p,
 		Capacity: c,

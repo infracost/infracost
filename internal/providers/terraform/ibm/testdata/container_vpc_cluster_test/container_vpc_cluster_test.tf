@@ -45,3 +45,19 @@ resource "ibm_container_vpc_cluster" "cluster" {
     name      = "us-south-2"
   }
 }
+
+resource "ibm_container_vpc_cluster" "cluster_without_usage" {
+  name              = "mycluster-without-usage"
+  vpc_id            = ibm_is_vpc.vpc1.id
+  flavor            = "bx2.4x16"
+  worker_count      = 3
+  kube_version      = "1.17.5"
+  zones {
+    subnet_id = ibm_is_subnet.subnet1.id
+    name      = "us-south-1"
+  }
+  zones {
+    subnet_id = ibm_is_subnet.subnet1.id
+    name      = "us-south-2"
+  }
+}
