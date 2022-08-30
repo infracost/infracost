@@ -1176,8 +1176,8 @@ resource_usage:
     gigabyte_transmitted_outbounds: 5 # Monthly traffic leaving the VPC in GB
 
   ibm_is_vpn_gateway.testVpcVpn:
-    connection_hours: 730 # Monthly number of connection hours
-    instance_hours: 730 # Monthly number of instance hours
+    monthly_connection_hours: 730 # Monthly number of connection hours
+    monthly_instance_hours: 730 # Monthly number of instance hours
 
   # 
   # Power Systems Virtual Server
