@@ -1,15 +1,23 @@
 
- Name                                      Monthly Qty  Unit      Monthly Cost 
-                                                                               
- ibm_is_vpc.testVpc                                                            
- ├─ VPC instance                                     1  Instance         $0.00 
- ├─ VPC egress free allowance (first 5GB)            5  GB               $0.00 
- └─ VPC egress us-south (first 9995 GB)          9,995  GB             $869.57 
- └─ VPC egress us-south (next 40000 GB)         40,000  GB           $3,320.00 
- └─ VPC egress us-south (next 100000 GB)           100  GB               $7.00 
- └─ VPC egress us-south (over 149995 GB)             0  GB               $0.00 
-                                                                               
- OVERALL TOTAL                                                       $4,196.57 
+ Name                                         Monthly Qty  Unit              Monthly Cost 
+                                                                                          
+ ibm_is_vpc.testVpc                                                                       
+ ├─ VPC instance                                        1  Instance                 $0.00 
+ ├─ VPC egress free allowance (first 5GB)               5  GB                       $0.00 
+ └─ VPC egress us-south (first 9995 GB)             9,995  GB                     $869.57 
+ └─ VPC egress us-south (next 40000 GB)            40,000  GB                   $3,320.00 
+ └─ VPC egress us-south (next 100000 GB)              100  GB                       $7.00 
+ └─ VPC egress us-south (over 149995 GB)                0  GB                       $0.00 
+                                                                                          
+ ibm_is_vpc.test_vpc_without_usage                                                        
+ ├─ VPC instance                                        1  Instance                 $0.00 
+ ├─ VPC egress free allowance (first 5GB)  Monthly cost depends on usage: $0.00 per GB    
+ └─ VPC egress us-south (first 9995 GB)    Monthly cost depends on usage: $0.087 per GB   
+ └─ VPC egress us-south (next 40000 GB)    Monthly cost depends on usage: $0.083 per GB   
+ └─ VPC egress us-south (next 100000 GB)   Monthly cost depends on usage: $0.07 per GB    
+ └─ VPC egress us-south (over 149995 GB)   Monthly cost depends on usage: $0.05 per GB    
+                                                                                          
+ OVERALL TOTAL                                                                  $4,196.57 
 ──────────────────────────────────
-1 cloud resource was detected:
-∙ 1 was estimated, it includes usage-based costs, see https://infracost.io/usage-file
+2 cloud resources were detected:
+∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

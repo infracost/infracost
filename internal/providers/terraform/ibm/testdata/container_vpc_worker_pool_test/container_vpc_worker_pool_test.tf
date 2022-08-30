@@ -53,3 +53,15 @@ resource "ibm_container_vpc_worker_pool" "cluster_pool" {
     subnet_id = ibm_is_subnet.subnet2.id
   }
 }
+
+resource "ibm_container_vpc_worker_pool" "cluster_pool_without_usage" {
+  cluster           = ibm_container_vpc_cluster.cluster.id
+  worker_pool_name  = "mywp"
+  flavor            = "bx2.2x8"
+  vpc_id            = ibm_is_vpc.vpc1.id
+  worker_count      = 3
+  zones {
+    name      = "us-south-2"
+    subnet_id = ibm_is_subnet.subnet2.id
+  }
+}

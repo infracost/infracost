@@ -33,6 +33,28 @@ resource "ibm_cloudant" "standard_cloudant" {
   }
 }
 
+resource "ibm_cloudant" "standard_cloudant_without_usage" {
+  name     = "standard-cloudant-without-usage"
+  location = "us-south"
+  plan     = "standard"
+
+  legacy_credentials  = true
+  include_data_events = false
+  capacity            = 1
+  enable_cors         = true
+
+  cors_config {
+    allow_credentials = false
+    origins           = ["https://example.com"]
+  }
+
+  timeouts {
+    create = "15m"
+    update = "15m"
+    delete = "15m"
+  }
+}
+
 resource "ibm_cloudant" "standard_exceeded_storage" {
   name     = "standard-exceeded-storage"
   location = "us-south"

@@ -70,3 +70,10 @@ resource "ibm_is_flow_log" "testFlowLog" {
   storage_bucket = ibm_cos_bucket.testCosBucket.bucket_name
 }
 
+resource "ibm_is_flow_log" "testFlowLogWithoutUsage" {
+  depends_on     = [ibm_cos_bucket.testCosBucket]
+  name           = "test-instance-flow-log"
+  target         = ibm_is_instance.testIsInstance.id
+  active         = true
+  storage_bucket = ibm_cos_bucket.testCosBucket.bucket_name
+}
