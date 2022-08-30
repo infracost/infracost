@@ -647,6 +647,13 @@ func (attr *Attribute) findBadVariablesFromExpression(expression hcl.Expression)
 				return badVars
 			}
 		}
+	case *hclsyntax.ObjectConsExpr:
+		for _, item := range t.Items {
+			badVars = append(badVars, attr.findBadVariablesFromExpression(item.KeyExpr)...)
+			badVars = append(badVars, attr.findBadVariablesFromExpression(item.ValueExpr)...)
+		}
+
+		return badVars
 	}
 
 	return attr.findBadVariables(expression.Variables())

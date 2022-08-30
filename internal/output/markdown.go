@@ -5,12 +5,13 @@ import (
 	"bytes"
 	"sort"
 	"text/template"
+	"unicode/utf8"
 
-	"github.com/infracost/infracost/internal/ui"
+	"github.com/Masterminds/sprig"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 
-	"github.com/Masterminds/sprig"
+	"github.com/infracost/infracost/internal/ui"
 )
 
 func formatMarkdownCostChange(currency string, pastCost, cost *decimal.Decimal, skipPlusMinus bool) string {
@@ -102,9 +103,17 @@ func calculateMetadataToDisplay(projects []Project) (hasModulePath bool, hasWork
 }
 
 func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, error) {
-	diff, err := ToDiff(out, opts)
-	if err != nil {
-		return nil, errors.Wrap(err, "Failed to generate diff")
+	var diffMsg string
+
+	if opts.diffMsg != "" {
+		diffMsg = opts.diffMsg
+	} else {
+		diff, err := ToDiff(out, opts)
+		if err != nil {
+			return nil, errors.Wrap(err, "Failed to generate diff")
+		}
+
+		diffMsg = ui.StripColor(string(diff))
 	}
 
 	hasModulePath, hasWorkspace := calculateMetadataToDisplay(out.Projects)
@@ -168,7 +177,7 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 	if markdownOpts.BasicSyntax {
 		t = CommentMarkdownTemplate
 	}
-	tmpl, err = tmpl.Parse(t)
+	tmpl, err := tmpl.Parse(t)
 	if err != nil {
 		return []byte{}, err
 	}
@@ -189,7 +198,7 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 	}{
 		out,
 		skippedProjectCount,
-		ui.StripColor(string(diff)),
+		diffMsg,
 		opts,
 		markdownOpts})
 	if err != nil {
@@ -197,5 +206,16 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 	}
 
 	bufw.Flush()
-	return buf.Bytes(), nil
+	msg := buf.Bytes()
+
+	msgLength := utf8.RuneCount(msg)
+	if markdownOpts.MaxMessageSize > 0 && msgLength > markdownOpts.MaxMessageSize {
+		truncateLength := msgLength - markdownOpts.MaxMessageSize
+		newLength := utf8.RuneCountInString(diffMsg) - truncateLength - 1000
+
+		opts.diffMsg = truncateMiddle(diffMsg, newLength, "\n\n...(truncated due to message size limit)...\n\n")
+		return ToMarkdown(out, opts, markdownOpts)
+	}
+
+	return msg, nil
 }

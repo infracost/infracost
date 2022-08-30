@@ -2,11 +2,12 @@ package aws
 
 import (
 	"fmt"
+	"strings"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
-	"strings"
 )
 
 // GlobalacceleratorEndpointGroup struct represents a Global Accelerator endpoint group
@@ -68,6 +69,7 @@ var regionCodeMapping = map[string]string{
 	"ap-southeast-2":  "AP",
 	"ap-southeast-3":  "AP",
 	"ap-south-1":      "AP",
+	"me-central-1":    "ME",
 	"me-south-1":      "ME",
 	"sa-east-1":       "SA",
 	"af-south-1":      "ZA",

@@ -15,6 +15,7 @@ func getAzureLinuxVirtualMachineRegistryItem() *schema.RegistryItem {
 		},
 	}
 }
+
 func NewAzureLinuxVirtualMachine(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	r := &azure.LinuxVirtualMachine{
 		Address:         d.Address,

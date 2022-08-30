@@ -124,7 +124,10 @@ func (p *TerragruntProvider) LoadResources(usage map[string]*schema.UsageData) (
 		metadata := config.DetectProjectMetadata(projectPath)
 		metadata.Type = p.Type()
 		p.AddMetadata(metadata)
-		name := schema.GenerateProjectName(metadata, p.ctx.ProjectConfig.Name, p.ctx.RunContext.Config.EnableDashboard)
+		name := p.ctx.ProjectConfig.Name
+		if name == "" {
+			name = metadata.GenerateProjectName(p.ctx.RunContext.VCSMetadata.Remote.URL, p.ctx.RunContext.IsCloudEnabled())
+		}
 
 		project := schema.NewProject(name, metadata)
 

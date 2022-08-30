@@ -319,6 +319,10 @@ func TestBreakdownTerragruntNested(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples"}, nil)
 }
 
+func TestBreakdownTerragruntIAMRoles(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())}, nil)
+}
+
 func TestInstanceWithAttachmentBeforeDeploy(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/instance_with_attachment_before_deploy.json"}, nil)
 }
@@ -378,6 +382,21 @@ func TestBreakdownWithPrivateTerraformRegistryModule(t *testing.T) {
 			"breakdown",
 			"--path",
 			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+		},
+		nil,
+	)
+}
+
+func TestBreakdownWithWorkspace(t *testing.T) {
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path",
+			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+			"--terraform-workspace",
+			"prod",
 		},
 		nil,
 	)

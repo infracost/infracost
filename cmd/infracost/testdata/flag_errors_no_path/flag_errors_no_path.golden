@@ -42,9 +42,7 @@ GLOBAL FLAGS
 Error: No path specified
 
 Use the --path flag to specify the path to one of the following:
- - Terraform plan JSON file
  - Terraform/Terragrunt directory
- - Terraform plan file
- - Terraform state JSON file
+ - Terraform plan JSON file, see https://infracost.io/troubleshoot for how to generate this.
 
 Alternatively, use --config-file to process multiple projects, see https://infracost.io/config-file

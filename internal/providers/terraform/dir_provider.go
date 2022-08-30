@@ -173,7 +173,10 @@ func (p *DirProvider) LoadResources(usage map[string]*schema.UsageData) ([]*sche
 		metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
 		metadata.Type = p.Type()
 		p.AddMetadata(metadata)
-		name := schema.GenerateProjectName(metadata, p.ctx.ProjectConfig.Name, p.ctx.RunContext.IsCloudEnabled())
+		name := p.ctx.ProjectConfig.Name
+		if name == "" {
+			name = metadata.GenerateProjectName(p.ctx.RunContext.VCSMetadata.Remote.URL, p.ctx.RunContext.IsCloudEnabled())
+		}
 
 		project := schema.NewProject(name, metadata)
 

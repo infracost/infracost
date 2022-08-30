@@ -7,7 +7,7 @@
       "metadata": {
         "path": ".",
         "type": "terraform_plan_json",
-        "vcsRepoUrl": "git@github.com:infracost/infracost.git",
+        "vcsRepositoryUrl": "git@github.com:infracost/infracost.git",
         "vcsSubPath": "cmd/infracost/testdata/diff_with_infracost_json"
       },
       "pastBreakdown": {

@@ -7,7 +7,7 @@
       "metadata": {
         "path": "dev",
         "type": "terraform_dir",
-        "vcsRepoUrl": "git@github.com:infracost/infracost.git",
+        "vcsRepositoryUrl": "git@github.com:infracost/infracost.git",
         "vcsSubPath": "cmd/infracost/testdata/diff_with_config_file_compare_to/dev",
         "terraformModulePath": "dev",
         "terraformWorkspace": "default"
@@ -168,7 +168,7 @@
       "metadata": {
         "path": "prod",
         "type": "terraform_dir",
-        "vcsRepoUrl": "git@github.com:infracost/infracost.git",
+        "vcsRepositoryUrl": "git@github.com:infracost/infracost.git",
         "vcsSubPath": "cmd/infracost/testdata/diff_with_config_file_compare_to/prod",
         "terraformModulePath": "prod",
         "terraformWorkspace": "default"

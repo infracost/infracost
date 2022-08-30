@@ -45,7 +45,9 @@ func (r *ComputeRegionInstanceGroupManager) BuildResource() *schema.Resource {
 	}
 
 	for _, guestAccel := range r.GuestAccelerators {
-		costComponents = append(costComponents, guestAcceleratorCostComponent(r.Region, r.PurchaseOption, guestAccel.Type, guestAccel.Count, r.TargetSize, nil))
+		if component := guestAcceleratorCostComponent(r.Region, r.PurchaseOption, guestAccel.Type, guestAccel.Count, r.TargetSize, nil); component != nil {
+			costComponents = append(costComponents, component)
+		}
 	}
 
 	return &schema.Resource{

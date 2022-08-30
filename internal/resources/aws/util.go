@@ -2,11 +2,12 @@ package aws
 
 import (
 	"fmt"
-	"github.com/shopspring/decimal"
 	"math"
 	"reflect"
 	"regexp"
 	"strings"
+
+	"github.com/shopspring/decimal"
 
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -131,6 +132,7 @@ var RegionMapping = map[string]string{
 	"ap-southeast-2":  "Asia Pacific (Sydney)",
 	"ap-southeast-3":  "Asia Pacific (Jakarta)",
 	"ap-south-1":      "Asia Pacific (Mumbai)",
+	"me-central-1":    "Middle East (UAE)",
 	"me-south-1":      "Middle East (Bahrain)",
 	"sa-east-1":       "South America (Sao Paulo)",
 	"af-south-1":      "Africa (Cape Town)",

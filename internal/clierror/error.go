@@ -150,3 +150,24 @@ func processStack(rawStack []byte) ([]byte, error) {
 
 	return buf.Bytes(), nil
 }
+
+// WarningError is an error that adhears to the error interface but is used to convey
+// a non-critical path in the application code. WarningError messages should be considered
+// safe to display to the user.
+type WarningError struct {
+	warning string
+}
+
+// NewWarning returns a new WarningError using warning as the error string.
+func NewWarning(warning string) WarningError {
+	return WarningError{warning: warning}
+}
+
+// NewWarningF returns a new WarningError using the warning as a formatted string.
+func NewWarningF(warning string, args ...any) WarningError {
+	return WarningError{warning: fmt.Sprintf(warning, args...)}
+}
+
+func (w WarningError) Error() string {
+	return w.warning
+}

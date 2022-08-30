@@ -118,6 +118,7 @@ func newRootCmd(ctx *config.RunContext) *cobra.Command {
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			cmd.SilenceUsage = true
 			ctx.SetContextValue("command", cmd.Name())
+			ctx.CMD = cmd.Name()
 			if cmd.Name() == "comment" || (cmd.Parent() != nil && cmd.Parent().Name() == "comment") {
 				ctx.SetIsInfracostComment()
 			}
@@ -179,6 +180,7 @@ func newRootCmd(ctx *config.RunContext) *cobra.Command {
 	rootCmd.AddCommand(diffCmd(ctx))
 	rootCmd.AddCommand(breakdownCmd(ctx))
 	rootCmd.AddCommand(outputCmd(ctx))
+	rootCmd.AddCommand(uploadCmd(ctx))
 	rootCmd.AddCommand(commentCmd(ctx))
 	rootCmd.AddCommand(completionCmd())
 	rootCmd.AddCommand(figAutocompleteCmd())
@@ -255,7 +257,7 @@ func checkAPIKey(apiKey string, apiEndpoint string, defaultEndpoint string) erro
 	if apiEndpoint == defaultEndpoint && apiKey == "" {
 		return fmt.Errorf(
 			"No INFRACOST_API_KEY environment variable is set.\nWe run a free Cloud Pricing API, to get an API key run %s",
-			ui.PrimaryString("infracost register"),
+			ui.PrimaryString("infracost auth login"),
 		)
 	}
 
@@ -322,9 +324,7 @@ func loadGlobalFlags(ctx *config.RunContext, cmd *cobra.Command) error {
 	}
 
 	ctx.SetContextValue("dashboardEnabled", ctx.Config.EnableDashboard)
-	if ctx.Config.EnableCloud != nil {
-		ctx.SetContextValue("cloudEnabled", ctx.Config.EnableCloud)
-	}
+	ctx.SetContextValue("cloudEnabled", ctx.IsCloudEnabled())
 	ctx.SetContextValue("isDefaultPricingAPIEndpoint", ctx.Config.PricingAPIEndpoint == ctx.Config.DefaultPricingAPIEndpoint)
 
 	flagNames := make([]string, 0)

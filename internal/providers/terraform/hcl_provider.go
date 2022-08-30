@@ -118,7 +118,11 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 			localWorkspace),
 		)
 	}
-	options = append(options, hcl.OptionWithCredentialsSource(credsSource))
+
+	options = append(options,
+		hcl.OptionWithTerraformWorkspace(localWorkspace),
+		hcl.OptionWithCredentialsSource(credsSource),
+	)
 
 	logger := ctx.Logger().WithFields(log.Fields{"provider": "terraform_dir"})
 	parsers, err := hcl.LoadParsers(ctx.ProjectConfig.Path, ctx.ProjectConfig.ExcludePaths, logger, options...)
@@ -178,7 +182,10 @@ func (p *HCLProvider) parseResources(path string, j []byte, usage map[string]*sc
 	metadata := config.DetectProjectMetadata(path)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
-	name := schema.GenerateProjectName(metadata, p.ctx.ProjectConfig.Name, p.ctx.RunContext.IsCloudEnabled())
+	name := p.ctx.ProjectConfig.Name
+	if name == "" {
+		name = metadata.GenerateProjectName(p.ctx.RunContext.VCSMetadata.Remote.URL, p.ctx.RunContext.IsCloudEnabled())
+	}
 
 	project := schema.NewProject(name, metadata)
 

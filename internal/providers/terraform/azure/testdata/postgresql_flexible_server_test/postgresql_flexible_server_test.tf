@@ -42,3 +42,10 @@ resource "azurerm_postgresql_flexible_server" "non_usage_gp" {
 
   sku_name = "GP_Standard_D16s_v3"
 }
+
+resource "azurerm_postgresql_flexible_server" "readable_location_set" {
+  name                = "readable-location"
+  resource_group_name = "anything"
+  location            = "East US"
+  sku_name            = "B_Standard_B1ms"
+}
