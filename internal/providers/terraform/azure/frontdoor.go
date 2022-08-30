@@ -10,7 +10,7 @@ import (
 )
 
 // getAzureRMFrontdoorRegistryItem returns a registry item for the resource
-func getAzureRMFrontdoorRegistryItem() *schema.RegistryItem {
+func getRMFrontdoorRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_frontdoor",
 		RFunc: newFrontdoor,

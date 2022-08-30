@@ -5,7 +5,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func getAzureVirtualMachineRegistryItem() *schema.RegistryItem {
+func getVirtualMachineRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_virtual_machine",
 		RFunc: NewVirtualMachine,

@@ -50,7 +50,7 @@ func (d dtuMapping) usesDTUUnits(sku string) bool {
 	return d[sanitized[0:1]]
 }
 
-func getAzureRMMSSQLDatabaseRegistryItem() *schema.RegistryItem {
+func getRMMSSQLDatabaseRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_mssql_database",
 		RFunc: newAzureRMMSSQLDatabase,

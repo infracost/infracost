@@ -5,7 +5,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func getAzureBastionHostRegistryItem() *schema.RegistryItem {
+func getBastionHostRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_bastion_host",
 		RFunc: NewBastionHost,

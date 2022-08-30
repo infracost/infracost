@@ -5,7 +5,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func getAzureManagedDiskRegistryItem() *schema.RegistryItem {
+func getManagedDiskRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_managed_disk",
 		RFunc: NewManagedDisk,

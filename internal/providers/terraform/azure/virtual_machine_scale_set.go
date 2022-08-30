@@ -8,7 +8,7 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-func getAzureVirtualMachineScaleSetRegistryItem() *schema.RegistryItem {
+func getVirtualMachineScaleSetRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_virtual_machine_scale_set",
 		RFunc: NewVirtualMachineScaleSet,
