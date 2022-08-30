@@ -108,6 +108,10 @@ func mergeEnvProvidedMetadata(m Metadata) Metadata {
 		}
 	}
 
+	if m.PullRequest != nil && m.PullRequest.VCSProvider == "" {
+		m.PullRequest.VCSProvider = vcsProviderFromHost(m.Remote.Host)
+	}
+
 	if envMeta.Pipeline.ID != "" {
 		m.Pipeline = &Pipeline{
 			ID: envMeta.Pipeline.ID,
