@@ -34,6 +34,19 @@ func getLocation(d *schema.ResourceData) (string, string) {
 func newIbmCosBucket(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	location, locationIdentifier := getLocation(d)
 	storage_class := d.Get("storage_class").String()
+	archive_rule := d.Get("archive_rule")
+	archive_enabled := false
+	archive_type := ""
+	if archive_rule.IsArray() {
+		archive_rule_array := archive_rule.Array()
+		for _, rule := range archive_rule_array {
+			enabled := rule.Get("enable").Bool()
+			if enabled {
+				archive_enabled = true
+				archive_type = rule.Get("type").String()
+			}
+		}
+	}
 
 	r := &ibm.IbmCosBucket{
 		Address:            d.Address,
@@ -41,6 +54,8 @@ func newIbmCosBucket(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 		Location:           location,
 		LocationIdentifier: locationIdentifier,
 		StorageClass:       storage_class,
+		Archive:            archive_enabled,
+		ArchiveType:        archive_type,
 	}
 
 	r.PopulateUsage(u)
@@ -48,7 +63,11 @@ func newIbmCosBucket(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 	configuration := make(map[string]any)
 	configuration["location"] = location
 	configuration["locationIdentifier"] = locationIdentifier
-	configuration["locationIdentifier"] = storage_class
+	configuration["storage_class"] = storage_class
+	configuration["archive_enabled"] = archive_enabled
+	if archive_enabled {
+		configuration["archive_type"] = archive_type
+	}
 
 	SetCatalogMetadata(d, d.Type, configuration)
 

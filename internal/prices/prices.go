@@ -177,16 +177,8 @@ func setCostComponentPrice(ctx *config.RunContext, currency string, r *schema.Re
 					log.Warnf("Error converting endUsageAmount to '%v' (using 0.00)  '%v': %s", currency, price.Get("endUsageAmount").String(), err.Error())
 				}
 			}
-			var name string
-			if i == 0 {
-				name = fmt.Sprintf("%s (first %s %s)", c.Name, end, c.Unit)
-			} else if i == len(prices)-1 {
-				name = fmt.Sprintf("%s (over %s %s)", c.Name, start, c.Unit)
-			} else {
-				name = fmt.Sprintf("%s (next %s %s)", c.Name, end.Sub(start), c.Unit)
-			}
+
 			priceTiers[i] = schema.PriceTier{
-				Name:             name,
 				Price:            parsedPrice,
 				StartUsageAmount: start,
 				EndUsageAmount:   end,
@@ -197,6 +189,17 @@ func setCostComponentPrice(ctx *config.RunContext, currency string, r *schema.Re
 			startJ := priceTiers[j].StartUsageAmount
 			return startI.LessThan(startJ)
 		})
+		for i, tier := range priceTiers {
+			var name string
+			if i == 0 {
+				name = fmt.Sprintf("%s (first %s %s)", c.Name, tier.EndUsageAmount, c.Unit)
+			} else if i == len(prices)-1 {
+				name = fmt.Sprintf("%s (over %s %s)", c.Name, tier.StartUsageAmount, c.Unit)
+			} else {
+				name = fmt.Sprintf("%s (next %s %s)", c.Name, tier.EndUsageAmount.Sub(tier.StartUsageAmount), c.Unit)
+			}
+			priceTiers[i].Name = name
+		}
 		c.SetPriceTiers(priceTiers)
 	}
 	c.SetPriceHash(prices[0].Get("priceHash").String())

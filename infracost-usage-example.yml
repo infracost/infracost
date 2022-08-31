@@ -1148,8 +1148,10 @@ resource_usage:
     storage: 20 # Estimated storage used by the cloudant instance
 
   ibm_cos_bucket:
-    archive_capacity: 1000 # Amount of your estimated storage in GB
+    archive_capacity: 1000 # Amount of your estimated archive storage in GB
     archive_restore: 1000 # Amount of data restored from its archived state in GB
+    accelerated_archive_capacity: 1000 # Amount of your estimated archive storage in GB
+    accelerated_archive_restore: 1000 # Amount of data restored from its archived state in GB
     aspera_ingress: 1000 # Amount of data uploaded with Aspera in GB
     aspera_egress: 1000 # Amount of data downloaded with Aspera in GB
     class_a_request_count: 10000 # Monthly number of Class A requests

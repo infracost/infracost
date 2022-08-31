@@ -1,12 +1,12 @@
 version: 0.1
 resource_usage:
   ibm_cos_bucket.standard-us-south:
-    # monthly_average_capacity: 1000
+    monthly_average_capacity: 1000
     public_standard_egress: 1000
     class_a_request_count: 10000
     class_b_request_count: 10000
   ibm_cos_bucket.smart-us-south:
-    # monthly_average_capacity: 1000
+    monthly_average_capacity: 1000
     public_standard_egress: 1000
     monthly_data_retrieval: 1000
     class_a_request_count: 10000
@@ -18,7 +18,7 @@ resource_usage:
     archive_capacity: 1000
     archive_restore: 1000
   ibm_cos_bucket.standard-ams03:
-     # monthly_average_capacity: 1000
+    monthly_average_capacity: 1000
     public_standard_egress: 1000
     class_a_request_count: 10000
     class_b_request_count: 10000

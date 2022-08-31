@@ -2,7 +2,7 @@ terraform {
   required_providers {
     ibm = {
       source  = "IBM-Cloud/ibm"
-      version = "~> 1.12.0"
+      version = "~> 1.40.0"
     }
   }
 }
@@ -22,6 +22,7 @@ resource "ibm_resource_instance" "cos_instance" {
   plan              = "standard"
   location          = "us-south"
 }
+
 resource "ibm_cos_bucket" "standard-us-south" {
   bucket_name          = "standard-bucket-at-us-south"
   resource_instance_id = ibm_resource_instance.cos_instance.id
@@ -43,11 +44,37 @@ resource "ibm_cos_bucket" "aspera-us" {
   cross_region_location = "us"
 }
 
+resource "ibm_cos_bucket" "standard-ap" {
+  bucket_name           = "aspera-bucket-at-us"
+  resource_instance_id  = ibm_resource_instance.cos_instance.id
+  storage_class         = "standard"
+  cross_region_location = "ap"
+}
+
 resource "ibm_cos_bucket" "archive-us-south" {
   bucket_name          = "archive-bucket-at-us-south"
   resource_instance_id = ibm_resource_instance.cos_instance.id
   storage_class        = "standard"
   region_location      = "us-south"
+  archive_rule {
+    rule_id = "a-bucket-arch-rule"
+    enable  = true
+    days    = 0
+    type    = "GLACIER"
+  }
+}
+
+resource "ibm_cos_bucket" "accelerated-archive-us-south" {
+  bucket_name          = "accelerated-archive-bucket-at-us-south"
+  resource_instance_id = ibm_resource_instance.cos_instance.id
+  storage_class        = "standard"
+  region_location      = "us-south"
+  archive_rule {
+    rule_id = "a-bucket-arch-rule"
+    enable  = true
+    days    = 0
+    type    = "ACCELERATED"
+  }
 }
 
 resource "ibm_cos_bucket" "standard-ams03" {
