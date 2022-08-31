@@ -10,7 +10,6 @@ terraform {
 provider "ibm" {
   region           = "us-south"
   zone             = "dal12"
-  ibmcloud_api_key = "AXrURglaTG9MApQXfqmSoME0dkcBAyv1v9Hw5vljab8y"
 }
 
 resource "ibm_pi_image" "aix_image" {
