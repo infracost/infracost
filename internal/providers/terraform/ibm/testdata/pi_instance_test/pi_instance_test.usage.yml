@@ -1,0 +1,37 @@
+version: 0.1
+resource_usage:
+  ibm_pi_instance.aix-shared-s922-instance:
+      monthly_instance_hours: 730
+      storage: 20
+      cloud_storage_solution: 0
+      high_availability: 0
+      db2_web_query: 0
+      rational_dev_studio_licenses: 0
+  ibm_pi_instance.ibmi-dedicated-e980-instance:
+      monthly_instance_hours: 730
+      storage: 20
+      cloud_storage_solution: 0
+      high_availability: 0
+      db2_web_query: 0
+      rational_dev_studio_licenses: 0
+  ibm_pi_instance.hana-dedicated-e980-instance:
+      monthly_instance_hours: 730
+      storage: 20
+      cloud_storage_solution: 1
+      high_availability: 1
+      db2_web_query: 1
+      rational_dev_studio_licenses: 1
+      profile: ush1-4x128
+  ibm_pi_instance.netweaver-shared-s922-instance:
+      monthly_instance_hours: 730
+      storage: 20
+      cloud_storage_solution: 0
+      high_availability: 0
+      db2_web_query: 0
+      rational_dev_studio_licenses: 0
+  ibm_pi_instance.netweaver-shared-s922-no-usage-specified-instance:
+      storage: 20
+      cloud_storage_solution: 0
+      high_availability: 0
+      db2_web_query: 0
+      rational_dev_studio_licenses: 0

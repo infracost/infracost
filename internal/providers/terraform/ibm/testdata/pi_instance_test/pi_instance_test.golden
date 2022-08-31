@@ -1,0 +1,42 @@
+
+ Name                                                                     Monthly Qty  Unit                    Monthly Cost 
+                                                                                                                            
+ ibm_pi_instance.aix-shared-s922-instance                                                                                   
+ ├─ Storage - tier1                                                            14,600  GB hours                       $4.00 
+ ├─ Cores                                                                         730  Core hours                    $88.26 
+ ├─ Memory                                                                        730  GB hours                       $8.32 
+ └─ Operating System                                                              730  Core hours                    $28.98 
+                                                                                                                            
+ ibm_pi_instance.hana-dedicated-e980-instance                                                                               
+ ├─ Storage - tier1                                                            14,600  GB hours                       $4.00 
+ ├─ Linux HANA Memory                                                          93,440  Memory hours                 $288.08 
+ ├─ Linux HANA Cores                                                            2,920  Core hours                 $1,279.54 
+ └─ Linux Operating System                                                          1  Instance                       $0.00 
+                                                                                                                            
+ ibm_pi_instance.ibmi-dedicated-e980-instance                                                                               
+ ├─ Storage - tier1                                                            14,600  GB hours                       $4.00 
+ ├─ Cores                                                                         730  Core hours                 $1,235.67 
+ ├─ Memory                                                                        730  GB hours                       $8.32 
+ ├─ Operating System IBMi LPP                                                     730  Core hours                   $880.02 
+ ├─ Operating System IBMi OS                                                      730  Core hours                 $2,200.00 
+ └─ Operating System IBMi Service Extension                                       730  Core hours                   $817.02 
+                                                                                                                            
+ ibm_pi_instance.netweaver-shared-s922-instance                                                                             
+ ├─ Storage - tier1                                                            14,600  GB hours                       $4.00 
+ ├─ Cores                                                                         730  Core hours                    $88.26 
+ ├─ Memory                                                                        730  GB hours                       $8.32 
+ └─ Linux Operating System                                                          1  Instance                       $0.00 
+                                                                                                                            
+ ibm_pi_instance.netweaver-shared-s922-no-usage-specified-instance                                                          
+ ├─ Storage - tier1                                                 Monthly cost depends on usage: $0.000274 per GB hours   
+ ├─ Cores                                                           Monthly cost depends on usage: $0.12 per Core hours     
+ ├─ Memory                                                          Monthly cost depends on usage: $0.0114 per GB hours     
+ └─ Linux Operating System                                                          1  Instance                       $0.00 
+                                                                                                                            
+ OVERALL TOTAL                                                                                                    $6,946.79 
+──────────────────────────────────
+10 cloud resources were detected:
+∙ 5 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 5 are not supported yet, see https://infracost.io/requested-resources:
+  ∙ 4 x ibm_pi_image
+  ∙ 1 x ibm_pi_key

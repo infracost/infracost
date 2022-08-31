@@ -15,6 +15,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getIsVpnGatewayRegistryItem(),
 	getTgGatewayRegistryItem(),
 	getCloudantRegistryItem(),
+	getPiInstanceRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
