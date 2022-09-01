@@ -116,17 +116,33 @@ func nameFromRepoURL(rawURL string) string {
 		rawURL = escaped
 	}
 
-	r := regexp.MustCompile(`(?:\w+@|http(?:s)?:\/\/)(?:.*@)?([^:\/]+)[:\/]([^\.]+)`)
-	m := r.FindStringSubmatch(rawURL)
+	// Removes schema and/or credentials
+	r := regexp.MustCompile(`^.*@|http(?:s)?:\/\/`)
+	rawURL = r.ReplaceAllString(rawURL, "")
 
-	if len(m) > 2 {
-		var n = m[2]
+	// Removes extension if present
+	r = regexp.MustCompile(`\.git$`)
+	rawURL = r.ReplaceAllString(rawURL, "")
 
-		if m[1] == "dev.azure.com" || m[1] == "ssh.dev.azure.com" {
-			n = parseAzureDevOpsRepoPath(m[2])
+	// Removes port if present
+	r = regexp.MustCompile(`:\d+/`)
+	rawURL = r.ReplaceAllString(rawURL, ":")
+
+	// Delimits domain from repo name with `:`
+	if !strings.Contains(rawURL, ":") {
+		rawURL = strings.Replace(rawURL, "/", ":", 1)
+	}
+
+	parts := strings.Split(rawURL, ":")
+
+	if len(parts) == 2 {
+		if parts[0] == "dev.azure.com" || parts[0] == "ssh.dev.azure.com" {
+			name := parseAzureDevOpsRepoPath(parts[1])
+
+			return name
 		}
 
-		return n
+		return parts[1]
 	}
 
 	return rawURL

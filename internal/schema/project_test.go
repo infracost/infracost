@@ -55,6 +55,22 @@ func TestGenerateProjectName(t *testing.T) {
 			want: "infracost/infracost",
 		},
 		{
+			name: "github repo without '.git' extension",
+			args: args{
+				metadata: &ProjectMetadata{},
+				repoURL:  "https://github.com/infracost/infracost",
+			},
+			want: "infracost/infracost",
+		},
+		{
+			name: "github repo with domain in repo name",
+			args: args{
+				metadata: &ProjectMetadata{},
+				repoURL:  "https://github.com/infracost.io/infracost.git",
+			},
+			want: "infracost.io/infracost",
+		},
+		{
 			name: "github repo ssh url",
 			args: args{
 				metadata: &ProjectMetadata{},
@@ -93,6 +109,14 @@ func TestGenerateProjectName(t *testing.T) {
 				repoURL:  "git@bitbucket.org:infracost/infracost-bitbucket-pipeline.git",
 			},
 			want: "infracost/infracost-bitbucket-pipeline",
+		},
+		{
+			name: "bitbucket repo ssh url with port",
+			args: args{
+				metadata: &ProjectMetadata{},
+				repoURL:  "git@bitbucket.org:8888/~test.infracost.io/infracost-bitbucket-pipeline.git",
+			},
+			want: "~test.infracost.io/infracost-bitbucket-pipeline",
 		},
 	}
 	for _, tt := range tests {
