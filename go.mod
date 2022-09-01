@@ -99,7 +99,7 @@ require (
 	github.com/go-git/go-billy/v5 v5.3.1
 	github.com/go-git/go-git/v5 v5.4.3-0.20220529141257-bc1f419cebcf
 	github.com/google/go-github/v41 v41.0.0
-	github.com/gruntwork-io/terragrunt v0.36.9
+	github.com/gruntwork-io/terragrunt v0.38.9
 	github.com/hashicorp/terraform-svchost v0.0.0-20200729002733-f050f53b9734
 	github.com/maruel/panicparse/v2 v2.3.0
 	github.com/pkg/browser v0.0.0-20201207095918-0426ae3fba23
