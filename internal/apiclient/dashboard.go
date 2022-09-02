@@ -57,28 +57,6 @@ func NewDashboardAPIClient(ctx *config.RunContext) *DashboardAPIClient {
 	}
 }
 
-func (c *DashboardAPIClient) CreateAPIKey(name string, email string, contextVals map[string]interface{}) (CreateAPIKeyResponse, error) {
-	d := map[string]interface{}{
-		"name":        name,
-		"email":       email,
-		"os":          contextVals["os"],
-		"version":     contextVals["version"],
-		"fullVersion": contextVals["fullVersion"],
-	}
-	respBody, err := c.doRequest("POST", "/apiKeys?source=cli-register", d)
-	if err != nil {
-		return CreateAPIKeyResponse{}, err
-	}
-
-	var r CreateAPIKeyResponse
-	err = json.Unmarshal(respBody, &r)
-	if err != nil {
-		return r, errors.Wrap(err, "Invalid response from API")
-	}
-
-	return r, nil
-}
-
 func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (AddRunResponse, error) {
 	response := AddRunResponse{}
 
