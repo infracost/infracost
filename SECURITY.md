@@ -14,5 +14,6 @@ We release patches for security vulnerabilities as soon as they are found and fi
 
 | Version | Supported  |
 |---------|------------|
+| 0.10.x  | ✅          |
 | 0.9.x   | ✅          |
 | < 0.9.0 | ❌          |
