@@ -151,7 +151,7 @@ func (p *TerragruntHCLProvider) LoadResources(usage map[string]*schema.UsageData
 			p.AddMetadata(project.Metadata)
 			name := p.ctx.ProjectConfig.Name
 			if name == "" {
-				name = project.Metadata.GenerateProjectName(p.ctx.RunContext.VCSMetadata.Remote.URL, p.ctx.RunContext.IsCloudEnabled())
+				name = project.Metadata.GenerateProjectName(&p.ctx.RunContext.VCSMetadata.Remote, p.ctx.RunContext.IsCloudEnabled())
 			}
 
 			project.Name = name

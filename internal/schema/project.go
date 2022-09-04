@@ -6,12 +6,11 @@ import (
 	"crypto/md5" // nolint:gosec
 	"encoding/base32"
 	"fmt"
-	"net/url"
 	"path/filepath"
-	"regexp"
 	"strings"
 
 	"github.com/infracost/infracost/internal/logging"
+	"github.com/infracost/infracost/internal/vcs"
 )
 
 type ProjectMetadata struct {
@@ -30,16 +29,16 @@ func (m *ProjectMetadata) WorkspaceLabel() string {
 	return m.TerraformWorkspace
 }
 
-func (m *ProjectMetadata) GenerateProjectName(repoURL string, dashboardEnabled bool) string {
-	// If the VCS repo is set, create the name from that
-	if repoURL != "" {
-		n := nameFromRepoURL(repoURL)
+func (m *ProjectMetadata) GenerateProjectName(remote *vcs.Remote, dashboardEnabled bool) string {
+	// If the VCS repo is set, use its name
+	if remote != nil && remote.Name != "" {
+		name := remote.Name
 
 		if m.VCSSubPath != "" {
-			n += "/" + m.VCSSubPath
+			name += "/" + m.VCSSubPath
 		}
 
-		return n
+		return name
 	}
 
 	// If not then use a hash of the absolute filepath to the project
@@ -106,64 +105,6 @@ func AllProjectResources(projects []*Project) []*Resource {
 	}
 
 	return resources
-}
-
-// Parses the "org/repo" from the git URL if possible.
-// Otherwise it just returns the URL.
-func nameFromRepoURL(rawURL string) string {
-	escaped, err := url.QueryUnescape(rawURL)
-	if err == nil {
-		rawURL = escaped
-	}
-
-	// Removes schema and/or credentials
-	r := regexp.MustCompile(`^.*@|http(?:s)?:\/\/`)
-	rawURL = r.ReplaceAllString(rawURL, "")
-
-	// Removes extension if present
-	r = regexp.MustCompile(`\.git$`)
-	rawURL = r.ReplaceAllString(rawURL, "")
-
-	// Removes port if present
-	r = regexp.MustCompile(`:\d+/`)
-	rawURL = r.ReplaceAllString(rawURL, ":")
-
-	// Delimits domain from repo name with `:`
-	if !strings.Contains(rawURL, ":") {
-		rawURL = strings.Replace(rawURL, "/", ":", 1)
-	}
-
-	parts := strings.Split(rawURL, ":")
-
-	if len(parts) == 2 {
-		if parts[0] == "dev.azure.com" || parts[0] == "ssh.dev.azure.com" {
-			name := parseAzureDevOpsRepoPath(parts[1])
-
-			return name
-		}
-
-		return parts[1]
-	}
-
-	return rawURL
-}
-
-func parseAzureDevOpsRepoPath(path string) string {
-	r := regexp.MustCompile(`(?:(.+)(?:\/(.+)\/_git\/)(.+))`)
-	m := r.FindStringSubmatch(path)
-
-	if len(m) > 3 {
-		return fmt.Sprintf("%s/%s/%s", m[1], m[2], m[3])
-	}
-
-	r = regexp.MustCompile(`(?:(?:v3\/)(.+)(?:\/(.+)\/)(.+))`)
-	m = r.FindStringSubmatch(path)
-
-	if len(m) > 3 {
-		return fmt.Sprintf("%s/%s/%s", m[1], m[2], m[3])
-	}
-
-	return path
 }
 
 // Returns a lowercase truncated hash of length l

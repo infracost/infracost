@@ -874,6 +874,7 @@ type Pipeline struct {
 // Remote holds information about the upstream repository that the git project uses.
 type Remote struct {
 	Host string
+	Name string
 	URL  string
 }
 
@@ -901,7 +902,8 @@ func urlStringToRemote(remote string) Remote {
 	u, err := url.Parse(remote)
 	if err == nil {
 		return Remote{
-			Host: u.Host,
+			Host: u.Hostname(),
+			Name: generateRepoName(u.Host, u.Path),
 			URL:  fmt.Sprintf("https://%s%s", u.Host, u.Path),
 		}
 	}
@@ -921,7 +923,14 @@ func urlStringToRemote(remote string) Remote {
 	}
 
 	host := m[2]
-	path := m[3]
+	path := strings.TrimSuffix(m[3], "/")
+	port := ""
+
+	// Check if m[3] is port
+	if _, err := strconv.ParseInt(path, 10, 64); err == nil {
+		port = ":" + path
+		path = m[4]
+	}
 
 	if strings.Contains(host, "azure") {
 		host = strings.TrimLeft(m[2], "ssh.")
@@ -934,6 +943,20 @@ func urlStringToRemote(remote string) Remote {
 
 	return Remote{
 		Host: host,
-		URL:  fmt.Sprintf("https://%s/%s", host, path),
+		Name: generateRepoName(host, path),
+		URL:  fmt.Sprintf("https://%s%s/%s", host, port, path),
 	}
+}
+
+// generateRepoName returns a repo name generated from the remote URL's path.
+// Host is used for Azure cloud detection as it requires additional formatting.
+func generateRepoName(host, path string) string {
+	name := strings.TrimPrefix(path, "/")
+	name = strings.TrimSuffix(name, ".git")
+
+	if strings.Contains(strings.ToLower(host), "azure") {
+		name = strings.ReplaceAll(name, "/_git", "")
+	}
+
+	return name
 }
