@@ -6,12 +6,11 @@ import (
 	"crypto/md5" // nolint:gosec
 	"encoding/base32"
 	"fmt"
-	"net/url"
 	"path/filepath"
-	"regexp"
 	"strings"
 
 	"github.com/infracost/infracost/internal/logging"
+	"github.com/infracost/infracost/internal/vcs"
 )
 
 type ProjectMetadata struct {
@@ -30,16 +29,16 @@ func (m *ProjectMetadata) WorkspaceLabel() string {
 	return m.TerraformWorkspace
 }
 
-func (m *ProjectMetadata) GenerateProjectName(repoURL string, dashboardEnabled bool) string {
-	// If the VCS repo is set, create the name from that
-	if repoURL != "" {
-		n := nameFromRepoURL(repoURL)
+func (m *ProjectMetadata) GenerateProjectName(remote vcs.Remote, dashboardEnabled bool) string {
+	// If the VCS repo is set, use its name
+	if remote.Name != "" {
+		name := remote.Name
 
 		if m.VCSSubPath != "" {
-			n += "/" + m.VCSSubPath
+			name += "/" + m.VCSSubPath
 		}
 
-		return n
+		return name
 	}
 
 	// If not then use a hash of the absolute filepath to the project
@@ -106,48 +105,6 @@ func AllProjectResources(projects []*Project) []*Resource {
 	}
 
 	return resources
-}
-
-// Parses the "org/repo" from the git URL if possible.
-// Otherwise it just returns the URL.
-func nameFromRepoURL(rawURL string) string {
-	escaped, err := url.QueryUnescape(rawURL)
-	if err == nil {
-		rawURL = escaped
-	}
-
-	r := regexp.MustCompile(`(?:\w+@|http(?:s)?:\/\/)(?:.*@)?([^:\/]+)[:\/]([^\.]+)`)
-	m := r.FindStringSubmatch(rawURL)
-
-	if len(m) > 2 {
-		var n = m[2]
-
-		if m[1] == "dev.azure.com" || m[1] == "ssh.dev.azure.com" {
-			n = parseAzureDevOpsRepoPath(m[2])
-		}
-
-		return n
-	}
-
-	return rawURL
-}
-
-func parseAzureDevOpsRepoPath(path string) string {
-	r := regexp.MustCompile(`(?:(.+)(?:\/(.+)\/_git\/)(.+))`)
-	m := r.FindStringSubmatch(path)
-
-	if len(m) > 3 {
-		return fmt.Sprintf("%s/%s/%s", m[1], m[2], m[3])
-	}
-
-	r = regexp.MustCompile(`(?:(?:v3\/)(.+)(?:\/(.+)\/)(.+))`)
-	m = r.FindStringSubmatch(path)
-
-	if len(m) > 3 {
-		return fmt.Sprintf("%s/%s/%s", m[1], m[2], m[3])
-	}
-
-	return path
 }
 
 // Returns a lowercase truncated hash of length l
