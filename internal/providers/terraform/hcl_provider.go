@@ -184,7 +184,7 @@ func (p *HCLProvider) parseResources(path string, j []byte, usage map[string]*sc
 	p.AddMetadata(metadata)
 	name := p.ctx.ProjectConfig.Name
 	if name == "" {
-		name = metadata.GenerateProjectName(p.ctx.RunContext.VCSMetadata.Remote.URL, p.ctx.RunContext.IsCloudEnabled())
+		name = metadata.GenerateProjectName(p.ctx.RunContext.VCSMetadata.Remote, p.ctx.RunContext.IsCloudEnabled())
 	}
 
 	project := schema.NewProject(name, metadata)
