@@ -11,7 +11,7 @@ import (
 func TestGenerateProjectName(t *testing.T) {
 	type args struct {
 		metadata         *ProjectMetadata
-		remote           *vcs.Remote
+		remote           vcs.Remote
 		dashboardEnabled bool
 	}
 	tests := []struct {
@@ -23,7 +23,7 @@ func TestGenerateProjectName(t *testing.T) {
 			name: "repo with remote metadata",
 			args: args{
 				metadata: &ProjectMetadata{Path: "path/to/repo/test-repo"},
-				remote:   &vcs.Remote{Name: "infracost/remote-repo"},
+				remote:   vcs.Remote{Name: "infracost/remote-repo"},
 			},
 			want: "infracost/remote-repo",
 		},
@@ -31,7 +31,7 @@ func TestGenerateProjectName(t *testing.T) {
 			name: "repo with remote metadata and VCS subpath",
 			args: args{
 				metadata: &ProjectMetadata{Path: "path/to/repo/test-repo", VCSSubPath: "sub/path"},
-				remote:   &vcs.Remote{Name: "infracost/remote-repo"},
+				remote:   vcs.Remote{Name: "infracost/remote-repo"},
 			},
 			want: "infracost/remote-repo/sub/path",
 		},
@@ -39,15 +39,7 @@ func TestGenerateProjectName(t *testing.T) {
 			name: "repo without empty remote data",
 			args: args{
 				metadata: &ProjectMetadata{Path: "path/to/repo/test-repo"},
-				remote:   &vcs.Remote{},
-			},
-			want: "path/to/repo/test-repo",
-		},
-		{
-			name: "repo without missing remote data",
-			args: args{
-				metadata: &ProjectMetadata{Path: "path/to/repo/test-repo"},
-				remote:   nil,
+				remote:   vcs.Remote{},
 			},
 			want: "path/to/repo/test-repo",
 		},
@@ -68,7 +60,7 @@ func TestGenerateProjectName(t *testing.T) {
 	t.Run("repo without remote metadata, Infracost Cloud is enabled", func(t *testing.T) {
 		testArgs := args{
 			metadata:         &ProjectMetadata{Path: "path/to/repo/test-repo"},
-			remote:           &vcs.Remote{},
+			remote:           vcs.Remote{},
 			dashboardEnabled: true,
 		}
 

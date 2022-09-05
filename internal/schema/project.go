@@ -29,9 +29,9 @@ func (m *ProjectMetadata) WorkspaceLabel() string {
 	return m.TerraformWorkspace
 }
 
-func (m *ProjectMetadata) GenerateProjectName(remote *vcs.Remote, dashboardEnabled bool) string {
+func (m *ProjectMetadata) GenerateProjectName(remote vcs.Remote, dashboardEnabled bool) string {
 	// If the VCS repo is set, use its name
-	if remote != nil && remote.Name != "" {
+	if remote.Name != "" {
 		name := remote.Name
 
 		if m.VCSSubPath != "" {
