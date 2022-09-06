@@ -1,4 +1,10 @@
 version: 0.1
 resource_usage:
-  ibm_is_instance.testInstance:
-      monthly_instance_hours: 730
+  ibm_is_instance.testBalancedInstance:
+    monthly_instance_hours: 730
+  ibm_is_instance.testComputeInstance:
+    monthly_instance_hours: 730
+  ibm_is_instance.testGpuInstance:
+    monthly_instance_hours: 730
+  ibm_is_instance.testIbmZInstance:
+    monthly_instance_hours: 730
