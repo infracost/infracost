@@ -952,8 +952,8 @@ github.com/hashicorp/hcl v1.0.1-vault h1:UiJeEzCWAYdVaJr8Xo4lBkTozlW1+1yxVUnpbS1
 github.com/hashicorp/hcl v1.0.1-vault/go.mod h1:E5yfLk+7swimpb2L/Alb/PJmXilQ/rhwaUYs4T20WEQ=
 github.com/hashicorp/hcl/v2 v2.0.0/go.mod h1:oVVDG71tEinNGYCxinCYadcmKU9bglqW9pV3txagJ90=
 github.com/hashicorp/hcl/v2 v2.10.0/go.mod h1:FwWsfWEjyV/CMj8s/gqAuiviY72rJ1/oayI9WftqcKg=
-github.com/hashicorp/hcl/v2 v2.13.0 h1:0Apadu1w6M11dyGFxWnmhhcMjkbAiKCv7G1r/2QgCNc=
-github.com/hashicorp/hcl/v2 v2.13.0/go.mod h1:e4z5nxYlWNPdDSNYX+ph14EvWYMFm3eP0zIUqPc2jr0=
+github.com/hashicorp/hcl/v2 v2.14.0 h1:jX6+Q38Ly9zaAJlAjnFVyeNSNCKKW8D0wvyg7vij5Wc=
+github.com/hashicorp/hcl/v2 v2.14.0/go.mod h1:e4z5nxYlWNPdDSNYX+ph14EvWYMFm3eP0zIUqPc2jr0=
 github.com/hashicorp/jsonapi v0.0.0-20210420151930-edf82c9774bf/go.mod h1:Yog5+CPEM3c99L1CL2CFCYoSzgWm5vTU58idbRUaLik=
 github.com/hashicorp/memberlist v0.1.0/go.mod h1:ncdBp14cuox2iFOq3kDiquKU6fqsTBc3W6JvZwjxxsE=
 github.com/hashicorp/serf v0.0.0-20160124182025-e4ec8cc423bb/go.mod h1:h/Ru6tmZazX7WO/GDmwdpS975F019L4t5ng5IgwbNrE=
