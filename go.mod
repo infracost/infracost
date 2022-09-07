@@ -37,7 +37,7 @@ require (
 	github.com/spf13/cobra v1.5.0
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.0
-	github.com/tidwall/gjson v1.14.1
+	github.com/tidwall/gjson v1.14.3
 	github.com/zclconf/go-cty v1.10.0
 	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d
 	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3
