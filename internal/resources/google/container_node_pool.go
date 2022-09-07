@@ -46,16 +46,14 @@ func (r *ContainerNodePool) BuildResource() *schema.Resource {
 
 	poolSize := int64(1)
 
-	var costComponent *schema.CostComponent
-	if strings.Contains(r.NodeConfig.MachineType, "custom") {
-		costComponent = customComputeCostComponent(r.Region, r.NodeConfig.MachineType, r.NodeConfig.PurchaseOption, poolSize, nil)
-	} else {
-		costComponent = computeCostComponent(r.Region, r.NodeConfig.MachineType, r.NodeConfig.PurchaseOption, poolSize, nil)
+	costComponents := []*schema.CostComponent{
+		computeDiskCostComponent(r.Region, r.NodeConfig.DiskType, r.NodeConfig.DiskSize, poolSize),
 	}
 
-	costComponents := []*schema.CostComponent{
-		costComponent,
-		computeDiskCostComponent(r.Region, r.NodeConfig.DiskType, r.NodeConfig.DiskSize, poolSize),
+	if strings.Contains(r.NodeConfig.MachineType, "custom") {
+		costComponents = append(costComponents, customComputeCostComponents(r.Region, r.NodeConfig.MachineType, r.NodeConfig.PurchaseOption, poolSize, nil)...)
+	} else {
+		costComponents = append(costComponents, computeCostComponent(r.Region, r.NodeConfig.MachineType, r.NodeConfig.PurchaseOption, poolSize, nil))
 	}
 
 	if r.NodeConfig.LocalSSDCount > 0 {

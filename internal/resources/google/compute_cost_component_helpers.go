@@ -65,7 +65,7 @@ func computeCostComponent(region, machineType string, purchaseOption string, ins
 }
 
 // customComputeCostComponent returns a cost component for custom Compute instance usage.
-func customComputeCostComponent(region, machineType string, purchaseOption string, instanceCount int64, monthlyHours *float64) *schema.CostComponent {
+func customComputeCostComponents(region, machineType string, purchaseOption string, instanceCount int64, monthlyHours *float64) []*schema.CostComponent {
 	sustainedUseDiscount := 0.0
 	if strings.ToLower(purchaseOption) == "on_demand" {
 		switch strings.ToLower(strings.Split(machineType, "-")[0]) {
@@ -81,8 +81,8 @@ func customComputeCostComponent(region, machineType string, purchaseOption strin
 		qty = decimal.NewFromFloat(*monthlyHours)
 	}
 
-	return &schema.CostComponent{
-		Name:                fmt.Sprintf("Instance usage (Linux/UNIX, %s, %s)", purchaseOptionLabel(purchaseOption), machineType),
+	cpuCostComponent := &schema.CostComponent{
+		Name:                fmt.Sprintf("Custom Instance CPU usage (Linux/UNIX, %s, %s)", purchaseOptionLabel(purchaseOption), machineType),
 		Unit:                "hours",
 		UnitMultiplier:      decimal.NewFromInt(1),
 		MonthlyQuantity:     decimalPtr(qty.Mul(decimal.NewFromInt(instanceCount))),
@@ -93,12 +93,37 @@ func customComputeCostComponent(region, machineType string, purchaseOption strin
 			Service:       strPtr("Compute Engine"),
 			ProductFamily: strPtr("Compute Instance"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "machineType", ValueRegex: regexPtr(fmt.Sprintf("^%s$", machineType))},
+				{Key: "description", ValueRegex: regexPtr("^Custom Instance Core.*$")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr(purchaseOption),
 		},
+	}
+
+	ramCostComponent := &schema.CostComponent{
+		Name:                fmt.Sprintf("Custom Instance RAM usage (Linux/UNIX, %s, %s)", purchaseOptionLabel(purchaseOption), machineType),
+		Unit:                "hours",
+		UnitMultiplier:      decimal.NewFromInt(1),
+		MonthlyQuantity:     decimalPtr(qty.Mul(decimal.NewFromInt(instanceCount))),
+		MonthlyDiscountPerc: sustainedUseDiscount,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("gcp"),
+			Region:        strPtr(region),
+			Service:       strPtr("Compute Engine"),
+			ProductFamily: strPtr("Compute Instance"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "description", ValueRegex: regexPtr("^Custom Instance Ram.*$")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr(purchaseOption),
+		},
+	}
+
+	return []*schema.CostComponent{
+		cpuCostComponent,
+		ramCostComponent,
 	}
 }
 
