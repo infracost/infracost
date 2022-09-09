@@ -1144,10 +1144,10 @@ resource_usage:
   #
   # Terraform IBM Cloud resources
   #
-  ibm_cloudant:
+  ibm_cloudant.cloudant:
     storage: 20 # Estimated storage used by the cloudant instance
 
-  ibm_cos_bucket:
+  ibm_cos_bucket.bucket:
     archive_capacity: 1000 # Amount of your estimated archive storage in GB
     archive_restore: 1000 # Amount of data restored from its archived state in GB
     accelerated_archive_capacity: 1000 # Amount of your estimated archive storage in GB
@@ -1156,13 +1156,14 @@ resource_usage:
     aspera_egress: 1000 # Amount of data downloaded with Aspera in GB
     class_a_request_count: 10000 # Monthly number of Class A requests
     class_b_request_count: 10000 # Monthly number of Class B requests
+    monthly_average_capacity: 1000 # Average amount of data stored in GB
     monthly_data_retrieval: 1000 # Amount of data retrieved in GB
     public_standard_egress: 1000 # Amount of data downloaded in GB
 
-  ibm_container_vpc_worker_pool.cluster_pool:
+  bm_container_vpc_cluster.cluster:
     monthly_instance_hours: 730 # Monthly number of hours an instance runs
 
-  ibm_container_vpc_cluster.cluster:
+  ibm_container_vpc_worker_pool.cluster_pool:
     monthly_instance_hours: 730 # Monthly number of hours an instance runs
 
   ibm_is_flow_log.flow_log_instance:
@@ -1177,37 +1178,25 @@ resource_usage:
   ibm_is_vpc.is_vpc:
     gigabyte_transmitted_outbounds: 5 # Monthly traffic leaving the VPC in GB
 
-  ibm_is_vpn_gateway.testVpcVpn:
+  ibm_is_vpn_gateway.test_vpc_vpn:
     monthly_connection_hours: 730 # Monthly number of connection hours
     monthly_instance_hours: 730 # Monthly number of instance hours
 
-  # 
-  # Power Systems Virtual Server
-  # 
-  ibm_pi_instance:
-    monthly_instance_hours: 730
-    storage: 20
-    cloud_storage_solution: 0
-    high_availability: 0
-    db2_web_query: 0
-    rational_dev_studio_licenses: 0
+  ibm_pi_instance.is_instance:
+    cloud_storage_solution: 0 # Cloud storage solution attachment, 0=false, 1=true, only valid for IBM i
+    db2_web_query: 0 # DB2 Web Query, 0=false, 1=true, only valid for IBM i
+    high_availability: 0 # High availability configuration, 0=false, 1=true, only valid for IBM i
+    monthly_instance_hours: 730 # Monthly number of instance hours
+    storage: 20 # GBs of storage associated with the instance
+    rational_dev_studio_licenses: 0 # Number IBM Rational Dev Studio Licenses, only valid for IBM i
 
-  #
-  # Key Protect
-  #
   ibm_resource_instance.resource_instance_kms: 
     kms_key_versions: 300 # Number of key versions managed per month
 
-  #
-  # Secrets Manager
-  #
   ibm_resource_instance.resource_instance_secrets_manager:
     secretsmanager_active_secrets: 400 # Number of active secrets
     secretsmanager_instance: 1 # Number of instances of secrets manager
 
-  #
-  # App ID
-  #
   ibm_resource_instance.resource_instance_appid:
     appid_advanced_authentications: 20000 # Number of advanced authentications in a month
     appid_authentications: 15000 # Number of simple authentications in a month
