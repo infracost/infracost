@@ -57,6 +57,7 @@ var globalCatalogServiceId = map[string]catalogMetadata{
 	"ibm_is_flow_log":               {"is.flow-log-collector", []string{}, nil},
 	"ibm_cloudant":                  {"cloudantnosqldb", []string{}, nil},
 	"ibm_pi_instance":               {"power-iaas", []string{}, nil},
+	"ibm_cos_bucket":                {"standard-bucket", []string{}, nil},
 }
 
 func SetCatalogMetadata(d *schema.ResourceData, resourceType string, config map[string]any) {
