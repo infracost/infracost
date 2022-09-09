@@ -1159,7 +1159,6 @@ resource_usage:
     monthly_average_capacity: 1000 # Average amount of data stored in GB
     monthly_data_retrieval: 1000 # Amount of data retrieved in GB
     public_standard_egress: 1000 # Amount of data downloaded in GB
-    monthly_average_capacity: 1000 # Average amount of data stored in GB
 
   bm_container_vpc_cluster.cluster:
     monthly_instance_hours: 730 # Monthly number of hours an instance runs
