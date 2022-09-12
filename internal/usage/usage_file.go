@@ -181,6 +181,7 @@ func (u *UsageFile) ToUsageDataMap() map[string]*schema.UsageData {
 	typeMap := make(map[string]*ResourceUsage)
 	for _, resourceUsage := range u.ResourceTypeUsages {
 		typeMap[resourceUsage.Name] = resourceUsage
+		m[resourceUsage.Name] = schema.NewUsageData(resourceUsage.Name, schema.ParseAttributes(resourceUsage.Map()))
 	}
 
 	for _, resourceUsage := range u.ResourceUsages {
