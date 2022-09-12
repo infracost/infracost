@@ -337,7 +337,6 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 		config.NewProjectContext(p.ctx.RunContext, &pconfig, fields),
 		&HCLProviderConfig{CacheParsingModules: true},
 		hcl.OptionWithSpinner(p.ctx.RunContext.NewSpinner),
-		hcl.OptionWithWarningFunc(p.ctx.RunContext.NewWarningWriter()),
 		hcl.OptionWithRawCtyInput(inputs),
 	)
 	if err != nil {
