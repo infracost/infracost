@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strings"
 
+	address_parser "github.com/hashicorp/go-terraform-address"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -20,7 +21,7 @@ const maxUsageFileVersion = "0.1"
 type UsageFile struct { // nolint:revive
 	Version string `yaml:"version"`
 	// We represent resource type usage in using a YAML node so we have control over the comments
-	RawResourceTypeUsage yamlv3.Node `yaml:"resource_type_usage"`
+	RawResourceTypeUsage yamlv3.Node `yaml:"resource_type_default_usage"`
 	// The raw usage is then parsed into this struct
 	ResourceTypeUsages []*ResourceUsage `yaml:"-"`
 	// We represent resource usage in using a YAML node so we have control over the comments
@@ -114,7 +115,7 @@ See https://infracost.io/usage-file/ for docs`,
 
 	resourceTypeUsagesKeyNode := &yamlv3.Node{
 		Kind:  yamlv3.ScalarNode,
-		Value: "resource_type_usage",
+		Value: "resource_type_default_usage",
 	}
 	resourceUsagesKeyNode := &yamlv3.Node{
 		Kind:  yamlv3.ScalarNode,
@@ -177,15 +178,22 @@ See https://infracost.io/usage-file/ for docs`,
 
 func (u *UsageFile) ToUsageDataMap() map[string]*schema.UsageData {
 	m := make(map[string]*schema.UsageData)
+	typeMap := make(map[string]*ResourceUsage)
+	for _, resourceUsage := range u.ResourceTypeUsages {
+		typeMap[resourceUsage.Name] = resourceUsage
+	}
 
 	for _, resourceUsage := range u.ResourceUsages {
+		parsed_address, err := address_parser.NewAddress(resourceUsage.Name)
+		if err != nil {
+			log.Warn(err)
+		} else {
+			if typeResourceUsage, has := typeMap[parsed_address.ResourceSpec.Type]; has {
+				resourceUsage.MergeResourceUsage(typeResourceUsage)
+			}
+		}
 		m[resourceUsage.Name] = schema.NewUsageData(resourceUsage.Name, schema.ParseAttributes(resourceUsage.Map()))
 	}
-
-	for _, resourceUsage := range u.ResourceTypeUsages {
-		m[resourceUsage.Name] = schema.NewUsageData(resourceUsage.Name, schema.ParseAttributes(resourceUsage.Map()))
-	}
-
 	return m
 }
 

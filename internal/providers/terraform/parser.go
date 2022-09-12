@@ -11,7 +11,6 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 
-	address_parser "github.com/hashicorp/go-terraform-address"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/providers/terraform/aws"
 	"github.com/infracost/infracost/internal/providers/terraform/azure"
@@ -122,17 +121,6 @@ func (p *Parser) populateUsageData(resData map[string]*schema.ResourceData, usag
 
 			if arrayUsageData := usage[fmt.Sprintf("%s[*]", d.Address[:lastIndexOfOpenBracket])]; arrayUsageData != nil {
 				d.UsageData = arrayUsageData
-			}
-		}
-		if d.UsageData == nil {
-			// Look and default to resource_type level data
-			parsed_address, err := address_parser.NewAddress(d.Address)
-			if err != nil {
-				continue
-			}
-			val, ok := usage[parsed_address.ResourceSpec.Type]
-			if ok {
-				d.UsageData = val
 			}
 		}
 	}
