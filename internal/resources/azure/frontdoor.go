@@ -163,7 +163,7 @@ func (r *Frontdoor) frontendHostsCostComponents() []*schema.CostComponent {
 		Unit:            "hosts",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(int64(billedHostsQuantity))),
-		ProductFilter:   r.buildProductFilter("Custom Domains"),
+		ProductFilter:   r.buildProductFilter("Custom Domain"),
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
@@ -311,9 +311,9 @@ func (r *Frontdoor) buildProductFilter(meterName string) *schema.ProductFilter {
 		Service:       strPtr("Azure Front Door Service"),
 		ProductFamily: strPtr("Networking"),
 		AttributeFilters: []*schema.AttributeFilter{
-			{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", "Standard"))},
-			{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", meterName))},
-			{Key: "productName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", "Azure Front Door Service"))},
+			{Key: "skuName", Value: strPtr("Standard")},
+			{Key: "meterName", ValueRegex: regexPtr(fmt.Sprintf("%s$", meterName))},
+			{Key: "productName", Value: strPtr("Azure Front Door Service")},
 		},
 	}
 }

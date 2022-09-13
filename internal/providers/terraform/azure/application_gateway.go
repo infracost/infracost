@@ -111,8 +111,8 @@ func gatewayCostComponent(name, region, tier, sku string, capacity int64) *schem
 			Service:       strPtr("Application Gateway"),
 			ProductFamily: strPtr("Networking"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", ValueRegex: strPtr(fmt.Sprintf("/%s Application Gateway/i", tier))},
-				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/%s Gateway/i", sku))},
+				{Key: "productName", ValueRegex: regexPtr(fmt.Sprintf("%s Application Gateway$", tier))},
+				{Key: "meterName", ValueRegex: regexPtr(fmt.Sprintf("%s Gateway$", sku))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -132,7 +132,7 @@ func dataProcessingCostComponent(name, region, sku, startUsage string, capacity 
 			Service:       strPtr("Application Gateway"),
 			ProductFamily: strPtr("Networking"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/%s Data Processed/i", sku))},
+				{Key: "meterName", ValueRegex: regexPtr(fmt.Sprintf("%s Data Processed", sku))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -153,8 +153,8 @@ func capacityUnitsCostComponent(name, region, tier string, capacity *decimal.Dec
 			Service:       strPtr("Application Gateway"),
 			ProductFamily: strPtr("Networking"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "meterName", Value: strPtr("Capacity Units")},
-				{Key: "productName", ValueRegex: strPtr(fmt.Sprintf("/Application Gateway %s/i", tier))},
+				{Key: "productName", ValueRegex: regexPtr(fmt.Sprintf("Application Gateway %s$", tier))},
+				{Key: "meterName", ValueRegex: regexPtr("Capacity Units$")},
 			},
 		},
 
@@ -176,8 +176,8 @@ func fixedForV2CostComponent(name, region, tier string, capacity int64) *schema.
 			Service:       strPtr("Application Gateway"),
 			ProductFamily: strPtr("Networking"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", ValueRegex: strPtr(fmt.Sprintf("/Application Gateway %s/i", tier))},
-				{Key: "meterName", Value: strPtr("Fixed Cost")},
+				{Key: "productName", ValueRegex: regexPtr(fmt.Sprintf("Application Gateway %s$", tier))},
+				{Key: "meterName", ValueRegex: regexPtr("Fixed Cost$")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

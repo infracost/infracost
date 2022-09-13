@@ -212,7 +212,7 @@ func (r *LogAnalyticsWorkspace) logDataIngestionFromCapacityReservation(name str
 			ProductFamily: strPtr(governanceProductFamily),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "skuName", Value: strPtr(fmt.Sprintf("%d GB Commitment Tier", selectedTier))},
-				{Key: "meterName", Value: strPtr(fmt.Sprintf("%d GB Commitment Tier", selectedTier))},
+				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("^%d GB Commitment Tier", selectedTier))},
 			},
 		},
 		PriceFilter: priceFilterConsumption,
@@ -237,7 +237,7 @@ func (r *LogAnalyticsWorkspace) logDataIngestion(name string, monthlyData *float
 			ProductFamily: strPtr(governanceProductFamily),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "skuName", Value: strPtr(skuFilterPAYG)},
-				{Key: "meterName", ValueRegex: strPtr("/Data Ingestion/i")},
+				{Key: "meterName", ValueRegex: regexPtr("Data Ingestion$")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -265,7 +265,7 @@ func (r *LogAnalyticsWorkspace) logDataRetention() *schema.CostComponent {
 			ProductFamily: strPtr(governanceProductFamily),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "skuName", Value: strPtr(skuFilterPAYG)},
-				{Key: "meterName", ValueRegex: strPtr("/Data Retention/i")},
+				{Key: "meterName", ValueRegex: regexPtr("Data Retention$")},
 			},
 		},
 		PriceFilter: priceFilterConsumption,
@@ -290,7 +290,7 @@ func (r *LogAnalyticsWorkspace) logDataExport() *schema.CostComponent {
 			ProductFamily: strPtr(governanceProductFamily),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "skuName", Value: strPtr("Log Analytics data export")},
-				{Key: "meterName", Value: strPtr("Data Exported")},
+				{Key: "meterName", ValueRegex: regexPtr("Data Exported$")},
 			},
 		},
 		PriceFilter: priceFilterConsumption,

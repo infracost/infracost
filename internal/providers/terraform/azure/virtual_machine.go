@@ -99,7 +99,7 @@ func ultraSSDReservationCostComponent(region string) *schema.CostComponent {
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("Ultra Disks")},
 				{Key: "skuName", Value: strPtr("Ultra LRS")},
-				{Key: "meterName", Value: strPtr("Reservation per vCPU Provisioned")},
+				{Key: "meterName", ValueRegex: regexPtr("Reservation per vCPU Provisioned$")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
