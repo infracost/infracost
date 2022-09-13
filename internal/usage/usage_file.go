@@ -144,7 +144,8 @@ See https://infracost.io/usage-file/ for docs`,
 	for _, node := range u.RawResourceTypeUsage.Content {
 		if isNodeMarkedAsCommented(node) {
 			node.HeadComment = `##
-## The following usage values are all commented-out, you can uncomment resource types and customize as needed.
+## The following usage values apply to each resource of the given type, which is useful when you want to define defaults.
+## All values are commented-out, you can uncomment resource types and customize as needed.
 ##`
 			break
 		}
@@ -154,7 +155,8 @@ See https://infracost.io/usage-file/ for docs`,
 	for _, node := range u.RawResourceUsage.Content {
 		if isNodeMarkedAsCommented(node) {
 			node.HeadComment = `##
-## The following usage values are all commented-out, you can uncomment resources and customize as needed.
+## The following usage values apply to individual resources and override any value defined in the resource_type_default_usage section.
+## All values are commented-out, you can uncomment resources and customize as needed.
 ##`
 			break
 		}

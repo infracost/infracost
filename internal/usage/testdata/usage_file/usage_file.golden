@@ -5,7 +5,8 @@
 version: 0.1
 resource_type_default_usage:
   ##
-  ## The following usage values are all commented-out, you can uncomment resource types and customize as needed.
+  ## The following usage values apply to each resource of the given type, which is useful when you want to define defaults.
+  ## All values are commented-out, you can uncomment resource types and customize as needed.
   ##
   # aws_instance:
     # operating_system: linux
@@ -95,7 +96,8 @@ resource_usage:
     # vcpu_count: 0 # Number of the vCPUs for the instance type. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
     # monthly_hrs: 730.0 # Monthly number of hours the instance ran for.
   ##
-  ## The following usage values are all commented-out, you can uncomment resources and customize as needed.
+  ## The following usage values apply to individual resources and override any value defined in the resource_type_default_usage section.
+  ## All values are commented-out, you can uncomment resources and customize as needed.
   ##
   # aws_instance.instance_counted[1]:
     # operating_system: linux # Override the operating system of the instance, can be: linux, windows, suse, rhel.
