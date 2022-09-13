@@ -95,11 +95,13 @@ func eventHubsIngressCostComponent(region, sku string, quantity *decimal.Decimal
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
-			VendorName: strPtr("azure"),
-			Region:     strPtr(region),
-			Service:    strPtr("Event Hubs"),
+			VendorName:    strPtr("azure"),
+			Region:        strPtr(region),
+			Service:       strPtr("Event Hubs"),
+			ProductFamily: strPtr("Internet of Things"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/%s Ingress Events/i", sku))},
+				{Key: "skuName", ValueRegex: regexPtr(fmt.Sprintf("^%s$", sku))},
+				{Key: "meterName", ValueRegex: regexPtr("Ingress Events$")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -117,12 +119,13 @@ func eventHubsThroughPutCostComponent(region, sku, meterName string, capacity de
 		UnitMultiplier: schema.HourToMonthUnitMultiplier,
 		HourlyQuantity: decimalPtr(capacity),
 		ProductFilter: &schema.ProductFilter{
-			VendorName: strPtr("azure"),
-			Region:     strPtr(region),
-			Service:    strPtr("Event Hubs"),
+			VendorName:    strPtr("azure"),
+			Region:        strPtr(region),
+			Service:       strPtr("Event Hubs"),
+			ProductFamily: strPtr("Internet of Things"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/%s/i", sku))},
-				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/%s/i", meterName))},
+				{Key: "skuName", ValueRegex: regexPtr(fmt.Sprintf("^%s$", sku))},
+				{Key: "meterName", ValueRegex: regexPtr(fmt.Sprintf("%s$", meterName))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -142,8 +145,8 @@ func eventHubsCaptureCostComponent(region, sku string, quantity decimal.Decimal)
 			Region:     strPtr(region),
 			Service:    strPtr("Event Hubs"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/%s/i", sku))},
-				{Key: "meterName", Value: strPtr("Capture")},
+				{Key: "skuName", ValueRegex: regexPtr(fmt.Sprintf("^%s$", sku))},
+				{Key: "meterName", ValueRegex: regexPtr("Capture$")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -163,8 +166,8 @@ func eventHubsExtensionRetentionCostComponent(region, sku string, retention *dec
 			Region:     strPtr(region),
 			Service:    strPtr("Event Hubs"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "skuName", Value: strPtr(sku)},
-				{Key: "meterName", Value: strPtr("Extended Retention")},
+				{Key: "skuName", ValueRegex: regexPtr(fmt.Sprintf("^%s$", sku))},
+				{Key: "meterName", ValueRegex: regexPtr("Extended Retention$")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

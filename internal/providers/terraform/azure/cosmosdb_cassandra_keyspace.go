@@ -327,7 +327,7 @@ func backupStorageCosmosCostComponents(account *schema.ResourceData, u *schema.U
 	if u != nil && u.Get("monthly_restored_data_gb").Exists() {
 		pitr = decimalPtr(decimal.NewFromInt(u.Get("monthly_restored_data_gb").Int()))
 	}
-	meterName = "Backup Data Restore"
+	meterName = "Data Restore"
 	skuName = "Backup"
 	productName = "Azure Cosmos DB - PITR"
 
@@ -355,7 +355,7 @@ func storageCosmosCostComponent(name, location, skuName, productName string, qua
 			Service:       strPtr("Azure Cosmos DB"),
 			ProductFamily: strPtr("Databases"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "meterName", Value: strPtr("Data Stored")},
+				{Key: "meterName", ValueRegex: regexPtr("Data Stored$")},
 				{Key: "skuName", Value: strPtr(skuName)},
 				{Key: "productName", Value: strPtr(productName)},
 			},
@@ -379,7 +379,7 @@ func backupCosmosCostComponent(name, location, skuName, productName, meterName s
 			Service:       strPtr("Azure Cosmos DB"),
 			ProductFamily: strPtr("Databases"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/%s/i", meterName))},
+				{Key: "meterName", ValueRegex: regexPtr(meterName)},
 				{Key: "skuName", Value: strPtr(skuName)},
 				{Key: "productName", Value: strPtr(productName)},
 			},
@@ -402,7 +402,7 @@ func operationsCosmosCostComponent(name, location, meterName string, quantities 
 			Service:       strPtr("Azure Cosmos DB"),
 			ProductFamily: strPtr("Databases"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "meterName", Value: strPtr(meterName)},
+				{Key: "meterName", ValueRegex: regexPtr(fmt.Sprintf("%s$", meterName))},
 				{Key: "skuName", Value: strPtr("Standard")},
 				{Key: "productName", Value: strPtr("Azure Cosmos DB Analytics Storage")},
 			},
