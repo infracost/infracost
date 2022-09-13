@@ -7,7 +7,6 @@ import (
 	"sort"
 	"strings"
 
-	address_parser "github.com/hashicorp/go-terraform-address"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -185,11 +184,9 @@ func (u *UsageFile) ToUsageDataMap() map[string]*schema.UsageData {
 	}
 
 	for _, resourceUsage := range u.ResourceUsages {
-		parsed_address, err := address_parser.NewAddress(resourceUsage.Name)
-		if err != nil {
-			log.Warn(err)
-		} else {
-			if typeResourceUsage, has := typeMap[parsed_address.ResourceSpec.Type]; has {
+		resourceType := strings.Split(resourceUsage.Name, ".")[0]
+		if resourceType != "" {
+			if typeResourceUsage, has := typeMap[resourceType]; has {
 				resourceUsage.MergeResourceUsage(typeResourceUsage)
 			}
 		}
