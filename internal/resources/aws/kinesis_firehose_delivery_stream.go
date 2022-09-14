@@ -76,6 +76,7 @@ func (r *KinesisFirehoseDeliveryStream) dataIngestedCostComponent(tier, startUsa
 			ProductFamily: strPtr("Kinesis Firehose"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "group", Value: strPtr("Event-by-Event Processing")},
+				{Key: "sourcetype", Value: strPtr("")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
