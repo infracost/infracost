@@ -52,8 +52,8 @@ func (a *S3IntelligentTieringStorageClass) BuildResource() *schema.Resource {
 		CostComponents: []*schema.CostComponent{
 			s3StorageCostComponent("Storage (frequent access)", "AmazonS3", a.Region, "TimedStorage-INT-FA-ByteHrs", a.FrequentAccessStorageGB),
 			s3StorageCostComponent("Storage (infrequent access)", "AmazonS3", a.Region, "TimedStorage-INT-IA-ByteHrs", a.InfrequentAccessStorageGB),
-			s3StorageVolumeTypeCostComponent("Storage (archive access)", "AmazonS3", a.Region, "TimedStorage-INT-AA-ByteHrs", "IntelligentTieringArchiveStorage", a.FrequentAccessStorageGB),
-			s3StorageVolumeTypeCostComponent("Storage (deep archive access)", "AmazonS3", a.Region, "TimedStorage-INT-DAA-ByteHrs", "IntelligentTieringDeepArchiveStorage", a.InfrequentAccessStorageGB),
+			s3StorageVolumeTypeCostComponent("Storage (archive access)", "AmazonS3", a.Region, "TimedStorage-INT-AA-ByteHrs", "IntelligentTieringArchiveAccess", a.FrequentAccessStorageGB),
+			s3StorageVolumeTypeCostComponent("Storage (deep archive access)", "AmazonS3", a.Region, "TimedStorage-INT-DAA-ByteHrs", "IntelligentTieringDeepArchiveAccess", a.InfrequentAccessStorageGB),
 			s3MonitoringCostComponent(a.Region, a.MonitoredObjects),
 			s3ApiCostComponent("PUT, COPY, POST, LIST requests", "AmazonS3", a.Region, "Requests-INT-Tier1", a.MonthlyTier1Requests),
 			s3ApiCostComponent("GET, SELECT, and all other requests", "AmazonS3", a.Region, "Requests-INT-Tier2", a.MonthlyTier2Requests),
