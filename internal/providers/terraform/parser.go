@@ -115,24 +115,26 @@ func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.Res
 // in case it is needed when processing a reference attribute
 func (p *Parser) populateUsageData(resData map[string]*schema.ResourceData, usage map[string]*schema.UsageData) {
 	for _, d := range resData {
+		// Look and default to resource_type level data
+		parsed_address, err := address_parser.NewAddress(d.Address)
+		if err == nil {
+			val, ok := usage[parsed_address.ResourceSpec.Type]
+			if ok {
+				d.UsageData = val
+			}
+		}
+
 		if ud := usage[d.Address]; ud != nil {
-			d.UsageData = ud
+			if d.UsageData != nil {
+				schema.MergeAttributes(d.UsageData, ud)
+			} else {
+				d.UsageData = ud
+			}
 		} else if strings.HasSuffix(d.Address, "]") {
 			lastIndexOfOpenBracket := strings.LastIndex(d.Address, "[")
 
 			if arrayUsageData := usage[fmt.Sprintf("%s[*]", d.Address[:lastIndexOfOpenBracket])]; arrayUsageData != nil {
 				d.UsageData = arrayUsageData
-			}
-		}
-		if d.UsageData == nil {
-			// Look and default to resource_type level data
-			parsed_address, err := address_parser.NewAddress(d.Address)
-			if err != nil {
-				continue
-			}
-			val, ok := usage[parsed_address.ResourceSpec.Type]
-			if ok {
-				d.UsageData = val
 			}
 		}
 	}

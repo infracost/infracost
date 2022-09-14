@@ -102,7 +102,7 @@ func LoadUsageFileFromString(s string) (*UsageFile, error) {
 }
 
 func (u *UsageFile) WriteToPath(path string) error {
-	allCommented := u.dumpResourceUsages()
+	allResourceTypesCommented, allResourcesCommented := u.dumpResourceUsages()
 
 	root := &yamlv3.Node{
 		Kind: yamlv3.MappingNode,
@@ -120,8 +120,11 @@ See https://infracost.io/usage-file/ for docs`,
 		Kind:  yamlv3.ScalarNode,
 		Value: "resource_usage",
 	}
-	if allCommented {
+
+	if allResourceTypesCommented {
 		markNodeAsComment(resourceTypeUsagesKeyNode)
+	}
+	if allResourcesCommented {
 		markNodeAsComment(resourceUsagesKeyNode)
 	}
 
@@ -179,21 +182,15 @@ See https://infracost.io/usage-file/ for docs`,
 
 func (u *UsageFile) ToUsageDataMap() map[string]*schema.UsageData {
 	m := make(map[string]*schema.UsageData)
-	typeMap := make(map[string]*ResourceUsage)
+
 	for _, resourceUsage := range u.ResourceTypeUsages {
-		typeMap[resourceUsage.Name] = resourceUsage
 		m[resourceUsage.Name] = schema.NewUsageData(resourceUsage.Name, schema.ParseAttributes(resourceUsage.Map()))
 	}
 
 	for _, resourceUsage := range u.ResourceUsages {
-		resourceType := strings.Split(resourceUsage.Name, ".")[0]
-		if resourceType != "" {
-			if typeResourceUsage, has := typeMap[resourceType]; has {
-				resourceUsage.MergeResourceUsage(typeResourceUsage)
-			}
-		}
 		m[resourceUsage.Name] = schema.NewUsageData(resourceUsage.Name, schema.ParseAttributes(resourceUsage.Map()))
 	}
+
 	return m
 }
 
@@ -294,10 +291,10 @@ func (u *UsageFile) parseResourceUsages() error {
 	return nil
 }
 
-func (u *UsageFile) dumpResourceUsages() bool {
-	var allCommented bool
-	var allTypesCommented bool
-	u.RawResourceTypeUsage, allTypesCommented = ResourceUsagesToYAML(u.ResourceTypeUsages)
-	u.RawResourceUsage, allCommented = ResourceUsagesToYAML(u.ResourceUsages)
-	return allTypesCommented && allCommented
+func (u *UsageFile) dumpResourceUsages() (bool, bool) {
+	var allResourceTypesCommented bool
+	var allResourcesCommented bool
+	u.RawResourceTypeUsage, allResourceTypesCommented = ResourceUsagesToYAML(u.ResourceTypeUsages)
+	u.RawResourceUsage, allResourcesCommented = ResourceUsagesToYAML(u.ResourceUsages)
+	return allResourceTypesCommented, allResourcesCommented
 }

@@ -1,9 +1,11 @@
 package schema
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
+	"github.com/imdario/mergo"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/tidwall/gjson"
 )
@@ -148,4 +150,34 @@ func ParseAttributes(i interface{}) map[string]gjson.Result {
 	}
 
 	return a
+}
+
+func MergeAttributes(dst *UsageData, src *UsageData) {
+	for key, srcAttr := range src.Attributes {
+		if _, has := dst.Attributes[key]; has {
+			switch srcAttr.Type {
+			case gjson.Null:
+				fallthrough
+			case gjson.True:
+				fallthrough
+			case gjson.False:
+				fallthrough
+			case gjson.Number:
+				fallthrough
+			case gjson.String:
+				// Should be safe to override
+				dst.Attributes[key] = srcAttr
+			case gjson.JSON:
+				var destJson map[string]interface{}
+				var srcJson map[string]interface{}
+				json.Unmarshal([]byte(dst.Attributes[key].Raw), &destJson)
+				json.Unmarshal([]byte(srcAttr.Raw), &srcJson)
+				mergo.Map(&destJson, srcJson)
+				src, _ := json.Marshal(destJson)
+				dst.Attributes[key] = gjson.Parse(string(src))
+			}
+		} else {
+			dst.Attributes[key] = srcAttr
+		}
+	}
 }

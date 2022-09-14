@@ -65,9 +65,15 @@ func (u *ReferenceFile) FindMatchingResourceUsage(name string) *ResourceUsage {
 	return nil
 }
 
-func (u *ReferenceFile) FindMatchingResourceTypeUsage(name string) *ResourceUsage {
+func (u *ReferenceFile) FindMatchingResourceTypeUsage(resourceType string) *ResourceUsage {
 	for _, resourceUsage := range u.ResourceTypeUsages {
-		if resourceUsage.Name == name {
+		if resourceUsage.Name == resourceType {
+			return resourceUsage
+		}
+	}
+	for _, resourceUsage := range u.ResourceUsages {
+		referenceResourceType := strings.Split(resourceUsage.Name, ".")[0]
+		if referenceResourceType == resourceType {
 			return resourceUsage
 		}
 	}
