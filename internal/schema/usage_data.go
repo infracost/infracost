@@ -1,10 +1,13 @@
 package schema
 
 import (
+	"encoding/json"
 	"fmt"
 	"strings"
 
+	"github.com/imdario/mergo"
 	jsoniter "github.com/json-iterator/go"
+	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
 
@@ -148,4 +151,51 @@ func ParseAttributes(i interface{}) map[string]gjson.Result {
 	}
 
 	return a
+}
+
+func MergeAttributes(dst *UsageData, src *UsageData) {
+	for key, srcAttr := range src.Attributes {
+		if _, has := dst.Attributes[key]; has {
+			switch srcAttr.Type {
+			case gjson.Null:
+				fallthrough
+			case gjson.True:
+				fallthrough
+			case gjson.False:
+				fallthrough
+			case gjson.Number:
+				fallthrough
+			case gjson.String:
+				// Should be safe to override
+				dst.Attributes[key] = srcAttr
+			case gjson.JSON:
+				var err error
+				var destJson map[string]interface{}
+				var srcJson map[string]interface{}
+				err = json.Unmarshal([]byte(dst.Attributes[key].Raw), &destJson)
+				if err != nil {
+					log.Errorf("Error merging attribute '%s': %v", key, err)
+					break
+				}
+				err = json.Unmarshal([]byte(srcAttr.Raw), &srcJson)
+				if err != nil {
+					log.Errorf("Error merging attribute '%s': %v", key, err)
+					break
+				}
+				err = mergo.Map(&destJson, srcJson)
+				if err != nil {
+					log.Errorf("Error merging attribute '%s': %v", key, err)
+					break
+				}
+				src, err := json.Marshal(destJson)
+				if err != nil {
+					log.Errorf("Error merging attribute '%s': %v", key, err)
+					break
+				}
+				dst.Attributes[key] = gjson.Parse(string(src))
+			}
+		} else {
+			dst.Attributes[key] = srcAttr
+		}
+	}
 }
