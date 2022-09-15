@@ -67,19 +67,10 @@ func NewMissingVarsWarning(vars []string) Warning {
 }
 
 func joinQuotes(elems []string) string {
-	switch len(elems) {
-	case 0:
-		return ""
-	case 1:
-		return fmt.Sprintf("%q", elems[0])
+	quoted := make([]string, len(elems))
+	for i, elem := range elems {
+		quoted[i] = fmt.Sprintf("%q", elem)
 	}
 
-	var b strings.Builder
-	b.WriteString(fmt.Sprintf("%q", elems[0]))
-	for _, s := range elems[1:] {
-		b.WriteString(", ")
-		b.WriteString(fmt.Sprintf("%q", s))
-	}
-
-	return b.String()
+	return strings.Join(quoted, ", ")
 }
