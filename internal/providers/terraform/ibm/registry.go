@@ -16,6 +16,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getTgGatewayRegistryItem(),
 	getCloudantRegistryItem(),
 	getPiInstanceRegistryItem(),
+	getIsLbRegistryItem(),
+	getIsPublicGatewayRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -28,6 +30,9 @@ var FreeResources = []string{
 	"ibm_iam_access_group_policy",
 	"ibm_iam_account_settings",
 	"ibm_iam_authorization_policy",
+	"ibm_is_lb_listener",
+	"ibm_is_lb_pool",
+	"ibm_is_lb_pool_member",
 	"ibm_is_network_acl",
 	"ibm_is_security_group",
 	"ibm_is_security_group_rule",

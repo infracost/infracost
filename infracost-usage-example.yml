@@ -1169,6 +1169,10 @@ resource_usage:
   ibm_is_flow_log.flow_log_instance:
     transmitted_gb: 30000 # Data transmitted to the instance
 
+  ibm_is_lb:
+    monthly_instance_hours: 730 # Monthly number of hours an instance runs
+    gigabyte_processed: 1000 # Monthly gigabytes of data processed by the load balancer 
+
   ibm_is_instance.is_instance:
     monthly_instance_hours: 730 # Monthly number of hours an instance runs
 

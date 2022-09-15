@@ -28,7 +28,7 @@ func (r *IsFloatingIp) PopulateUsage(u *schema.UsageData) {
 
 func (r *IsFloatingIp) isFloatingIpCostComponent() *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:            fmt.Sprintf("Floating Ip %s", r.Region),
+		Name:            fmt.Sprintf("Floating IP %s", r.Region),
 		Unit:            "Instance",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),

@@ -2,7 +2,7 @@
  Name                                              Monthly Qty  Unit                        Monthly Cost 
                                                                                                          
  ibm_is_floating_ip.testFloatingIp                                                                       
- └─ Floating Ip us-south                                     1  Instance                           $1.00 
+ └─ Floating IP us-south                                     1  Instance                           $1.00 
                                                                                                          
  ibm_is_instance.testInstance                                                                            
  ├─ CPU hours (2 CPUs, us-south-1)         Monthly cost depends on usage: $0.0265079365 per CPU hours    

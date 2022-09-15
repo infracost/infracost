@@ -58,6 +58,8 @@ var globalCatalogServiceId = map[string]catalogMetadata{
 	"ibm_cloudant":                  {"cloudantnosqldb", []string{}, nil},
 	"ibm_pi_instance":               {"power-iaas", []string{}, nil},
 	"ibm_cos_bucket":                {"standard-bucket", []string{}, nil},
+	"ibm_is_lb":                     {"is.load-balancer", []string{}, nil},
+	"ibm_is_public_gateway":         {"is.public-gateway", []string{"ibm_is_floating_ip"}, nil},
 }
 
 func SetCatalogMetadata(d *schema.ResourceData, resourceType string, config map[string]any) {

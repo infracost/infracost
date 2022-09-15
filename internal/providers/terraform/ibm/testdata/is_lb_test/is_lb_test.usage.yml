@@ -1,0 +1,8 @@
+version: 0.1
+resource_usage:
+  ibm_is_lb.network_lb:
+    monthly_instance_hours: 730
+    gigabyte_processed: 1000
+  ibm_is_lb.application_lb:
+    monthly_instance_hours: 730
+    gigabyte_processed: 1000
