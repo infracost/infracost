@@ -174,22 +174,22 @@ func MergeAttributes(dst *UsageData, src *UsageData) {
 				var srcJson map[string]interface{}
 				err = json.Unmarshal([]byte(dst.Attributes[key].Raw), &destJson)
 				if err != nil {
-					log.Error(err)
+					log.Errorf("Error merging attribute '%s': %v", key, err)
 					break
 				}
 				err = json.Unmarshal([]byte(srcAttr.Raw), &srcJson)
 				if err != nil {
-					log.Error(err)
+					log.Errorf("Error merging attribute '%s': %v", key, err)
 					break
 				}
 				err = mergo.Map(&destJson, srcJson)
 				if err != nil {
-					log.Error(err)
+					log.Errorf("Error merging attribute '%s': %v", key, err)
 					break
 				}
 				src, err := json.Marshal(destJson)
 				if err != nil {
-					log.Error(err)
+					log.Errorf("Error merging attribute '%s': %v", key, err)
 					break
 				}
 				dst.Attributes[key] = gjson.Parse(string(src))
