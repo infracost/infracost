@@ -7,6 +7,7 @@ import (
 
 	"github.com/imdario/mergo"
 	jsoniter "github.com/json-iterator/go"
+	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
 
@@ -168,12 +169,29 @@ func MergeAttributes(dst *UsageData, src *UsageData) {
 				// Should be safe to override
 				dst.Attributes[key] = srcAttr
 			case gjson.JSON:
+				var err error
 				var destJson map[string]interface{}
 				var srcJson map[string]interface{}
-				json.Unmarshal([]byte(dst.Attributes[key].Raw), &destJson)
-				json.Unmarshal([]byte(srcAttr.Raw), &srcJson)
-				mergo.Map(&destJson, srcJson)
-				src, _ := json.Marshal(destJson)
+				err = json.Unmarshal([]byte(dst.Attributes[key].Raw), &destJson)
+				if err != nil {
+					log.Error(err)
+					break
+				}
+				err = json.Unmarshal([]byte(srcAttr.Raw), &srcJson)
+				if err != nil {
+					log.Error(err)
+					break
+				}
+				err = mergo.Map(&destJson, srcJson)
+				if err != nil {
+					log.Error(err)
+					break
+				}
+				src, err := json.Marshal(destJson)
+				if err != nil {
+					log.Error(err)
+					break
+				}
 				dst.Attributes[key] = gjson.Parse(string(src))
 			}
 		} else {
