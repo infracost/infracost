@@ -83,7 +83,7 @@ func (r *IsLb) gigabyteProcessedCostComponent() *schema.CostComponent {
 	}
 
 	return &schema.CostComponent{
-		Name:            fmt.Sprintf("Instance hours (%s , %s)", r.Region, r.Profile),
+		Name:            fmt.Sprintf("Data processed (%s , %s)", r.Region, r.Profile),
 		Unit:            "GB months",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: quantity,

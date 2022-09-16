@@ -3,15 +3,15 @@
                                                                                                         
  ibm_is_lb.application_lb                                                                               
  ├─ Instance hours (us-south, application)                  730  Instance hours                  $20.44 
- └─ Instance hours (us-south , application)               1,000  GB months                        $8.00 
+ └─ Data processed (us-south , application)               1,000  GB months                        $8.00 
                                                                                                         
  ibm_is_lb.application_lb_without_usage                                                                 
  ├─ Instance hours (us-south, application)   Monthly cost depends on usage: $0.028 per Instance hours   
- └─ Instance hours (us-south , application)  Monthly cost depends on usage: $0.008 per GB months        
+ └─ Data processed (us-south , application)  Monthly cost depends on usage: $0.008 per GB months        
                                                                                                         
  ibm_is_lb.network_lb                                                                                   
  ├─ Instance hours (us-south, network)                      730  Instance hours                  $18.25 
- └─ Instance hours (us-south , network)                   1,000  GB months                        $6.00 
+ └─ Data processed (us-south , network)                   1,000  GB months                        $6.00 
                                                                                                         
  ibm_is_vpc.test_vpc                                                                                    
  ├─ VPC instance                                              1  Instance                         $0.00 
@@ -24,6 +24,6 @@
  OVERALL TOTAL                                                                                   $52.69 
 ──────────────────────────────────
 5 cloud resources were detected:
-∙ 4 were estimated, 1 of which usage-based costs, see https://infracost.io/usage-file
+∙ 4 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 1 was free:
   ∙ 1 x ibm_is_subnet
