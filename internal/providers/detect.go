@@ -60,7 +60,6 @@ func Detect(ctx *config.ProjectContext, includePastResources bool) (schema.Provi
 			ctx,
 			nil,
 			hcl.OptionWithSpinner(ctx.RunContext.NewSpinner),
-			hcl.OptionWithWarningFunc(ctx.RunContext.NewWarningWriter()),
 		)
 
 		if providerErr != nil {

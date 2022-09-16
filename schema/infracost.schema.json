@@ -178,6 +178,13 @@
         },
         "vcsSubPath": {
           "type": "string"
+        },
+        "warnings": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/Warning"
+          },
+          "type": "array"
         }
       },
       "additionalProperties": false,
@@ -394,6 +401,26 @@
             }
           },
           "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "Warning": {
+      "required": [
+        "code",
+        "message",
+        "data"
+      ],
+      "properties": {
+        "code": {
+          "type": "integer"
+        },
+        "message": {
+          "type": "string"
+        },
+        "data": {
+          "additionalProperties": true
         }
       },
       "additionalProperties": false,

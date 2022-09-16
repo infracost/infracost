@@ -149,7 +149,7 @@ func (e *Evaluator) MissingVars() []string {
 	for _, block := range blocks {
 		_, v := e.evaluateVariable(block)
 		if v == errorNoVarValue {
-			missing = append(missing, fmt.Sprintf("'variable.%s'", block.Label()))
+			missing = append(missing, fmt.Sprintf("variable.%s", block.Label()))
 		}
 	}
 
@@ -187,11 +187,18 @@ func (e *Evaluator) Run() (*Module, error) {
 }
 
 func (e *Evaluator) collectModules() *Module {
+	root := e.module
 	for _, definition := range e.moduleCalls {
-		e.module.Modules = append(e.module.Modules, definition.Module)
+		root.Modules = append(root.Modules, definition.Module)
 	}
 
-	return &e.module
+	if v := e.MissingVars(); len(v) > 0 {
+		root.Warnings = []Warning{
+			NewMissingVarsWarning(v),
+		}
+	}
+
+	return &root
 }
 
 // evaluate runs a context evaluation loop until the context values are unchanged. We run this in a loop

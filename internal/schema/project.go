@@ -13,12 +13,20 @@ import (
 	"github.com/infracost/infracost/internal/vcs"
 )
 
+// Warning holds information about non-critical errors that occurred when evaluating a project.
+type Warning struct {
+	Code    int         `json:"code"`
+	Message string      `json:"message"`
+	Data    interface{} `json:"data"`
+}
+
 type ProjectMetadata struct {
-	Path                string `json:"path"`
-	Type                string `json:"type"`
-	TerraformModulePath string `json:"terraformModulePath,omitempty"`
-	TerraformWorkspace  string `json:"terraformWorkspace,omitempty"`
-	VCSSubPath          string `json:"vcsSubPath,omitempty"`
+	Path                string    `json:"path"`
+	Type                string    `json:"type"`
+	TerraformModulePath string    `json:"terraformModulePath,omitempty"`
+	TerraformWorkspace  string    `json:"terraformWorkspace,omitempty"`
+	VCSSubPath          string    `json:"vcsSubPath,omitempty"`
+	Warnings            []Warning `json:"warnings,omitempty"`
 }
 
 func (m *ProjectMetadata) WorkspaceLabel() string {
