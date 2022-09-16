@@ -75,8 +75,9 @@ func addAttrs(attrs map[string]string, body *hclsyntax.Body) {
 
 func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 	tests := []struct {
-		name  string
-		attrs map[string]map[string]string
+		name     string
+		attrs    map[string]map[string]string
+		warnings []hcl.WarningCode
 	}{
 		{
 			name: "structures module expressions correctly with count",
@@ -162,6 +163,16 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "populates warnings on missing vars",
+			attrs: map[string]map[string]string{
+				"aws_eip.eip": {
+					"id":  "eip",
+					"arn": "eip-arn",
+				},
+			},
+			warnings: []hcl.WarningCode{hcl.WarningMissingVars},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -201,8 +212,17 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 			require.NoError(t, err)
 
 			expected := exp.String()
-			actual := string(got[0].json)
+			root := got[0]
+			actual := string(root.json)
 			assert.JSONEq(t, expected, actual)
+
+			codes := make([]hcl.WarningCode, len(root.module.Warnings))
+			for i, w := range root.module.Warnings {
+				codes[i] = w.Code
+			}
+
+			assert.Len(t, codes, len(tt.warnings), "unexpected warning length")
+			assert.ElementsMatch(t, codes, tt.warnings)
 		})
 	}
 }

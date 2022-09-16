@@ -189,15 +189,6 @@ func OptionWithSpinner(f ui.SpinnerFunc) Option {
 	}
 }
 
-// OptionWithWarningFunc will set the Parser writeWarning to the provided f.
-// This is disabled by default as we run the Parser concurrently underneath a
-// DirProvider and don't want to mess with its output.
-func OptionWithWarningFunc(f ui.WriteWarningFunc) Option {
-	return func(p *Parser) {
-		p.writeWarning = f
-	}
-}
-
 // Parser is a tool for parsing terraform templates at a given file system location.
 type Parser struct {
 	initialPath           string
@@ -210,7 +201,6 @@ type Parser struct {
 	moduleLoader          *modules.ModuleLoader
 	blockBuilder          BlockBuilder
 	newSpinner            ui.SpinnerFunc
-	writeWarning          ui.WriteWarningFunc
 	remoteVariablesLoader *RemoteVariablesLoader
 	credentialsSource     *modules.CredentialsSource
 	logger                *logrus.Entry
@@ -348,18 +338,6 @@ func (p *Parser) ParseDirectory() (*Module, error) {
 		p.newSpinner,
 		p.logger,
 	)
-
-	if v := evaluator.MissingVars(); len(v) > 0 {
-		if p.writeWarning != nil {
-			p.writeWarning(
-				fmt.Sprintf(
-					"Input values were not provided for following Terraform variables: %s. %s",
-					strings.TrimRight(strings.Join(v, ", "), ", "),
-					"Use --terraform-var-file or --terraform-var to specify them.",
-				),
-			)
-		}
-	}
 
 	root, err := evaluator.Run()
 	if err != nil {
