@@ -5,15 +5,18 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 	"time"
 
+	"github.com/Rhymond/go-money"
 	"github.com/mitchellh/go-homedir"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 	"golang.org/x/mod/semver"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -284,6 +287,8 @@ func checkOutputVersion(v string) bool {
 func FormatOutput(format string, r Root, opts Options) ([]byte, error) {
 	var b []byte
 	var err error
+	
+	addCurrencyFormatIfPreferred()
 
 	switch format {
 	case "json":
@@ -311,4 +316,37 @@ func FormatOutput(format string, r Root, opts Options) ([]byte, error) {
 	}
 
 	return b, nil
+}
+
+func addCurrencyFormatIfPreferred() {
+	INFRACOST_CURRENCY_FORMAT := os.Getenv("INFRACOST_CURRENCY_FORMAT")
+	if INFRACOST_CURRENCY_FORMAT == "" {
+		return
+	}
+
+	rgx := regexp.MustCompile(`^(.{3}): (.*)1(,|\.)234(,|\.)?([0-9]*)?(.*)$`)
+	m := rgx.FindStringSubmatch(INFRACOST_CURRENCY_FORMAT)
+	
+	if len(m) == 0 {
+		log.Warningf("Invalid currency format: %s", INFRACOST_CURRENCY_FORMAT)
+		return
+	}
+
+	currency := m[1]
+	
+	graphemeWithSpace := m[2]
+	grapheme := strings.TrimSpace(graphemeWithSpace)
+	template := "$" + strings.Repeat(" ", len(graphemeWithSpace)-len(grapheme)) + "1"
+
+	if graphemeWithSpace == "" {
+		graphemeWithSpace = m[6]
+		grapheme = strings.TrimSpace(graphemeWithSpace)
+		template = "1" + strings.Repeat(" ", len(graphemeWithSpace)-len(grapheme)) + "$"
+	}
+	
+	thousand := m[3]
+	decimal := m[4]
+	fraction := len(m[5])
+
+	money.AddCurrency(currency, grapheme, template, decimal, thousand, fraction)
 }

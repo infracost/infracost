@@ -27,43 +27,10 @@ func formatCost(currency string, d *decimal.Decimal) string {
 		return "-"
 	}
 
-	if os.Getenv("INFRACOST_CURRENCY_FORMAT") != ""{
-        return customFormatCost(d)
-    }
-
 	if d.GreaterThanOrEqual(decimal.NewFromInt(int64(roundCostsAbove))) {
 		return formatWholeDecimalCurrency(currency, *d)
 	}
 	return formatRoundedDecimalCurrency(currency, *d)
-}
-
-func customFormatCost(d *decimal.Decimal) string {
-    INFRACOST_CURRENCY_FORMAT := os.Getenv("INFRACOST_CURRENCY_FORMAT");
-    rgx := regexp.MustCompile(`^(.*)1(,|\.)234(,|\.)?([0-9]*)?(.*)$`)
-    m := rgx.FindStringSubmatch(INFRACOST_CURRENCY_FORMAT)
-    if len(m) == 0 {
-        return "invalid custom format"
-    }
-
-    graphemeWithSpace := m[1];
-    grapheme := strings.TrimSpace(graphemeWithSpace);
-    template := "$" + strings.Repeat(" ", len(graphemeWithSpace)-len(grapheme)) + "1"
-
-    if m[1] == "" {
-        graphemeWithSpace = m[5];
-        grapheme = strings.TrimSpace(graphemeWithSpace);
-        template = "1" + strings.Repeat(" ", len(graphemeWithSpace)-len(grapheme)) + "$"
-    }
-
-    thousand := m[2]
-    decimal := m[3]
-    fraction := len(m[4])
-
-    money.AddCurrency("INFRACOST_CURRENCY_FORMAT", grapheme, template, decimal, thousand, fraction)
-    formatter := money.GetCurrency("INFRACOST_CURRENCY_FORMAT").Formatter()
-    scaledInt := decimalToScaledInt(*d, formatter.Fraction, formatter.Fraction)
-    formatter.Fraction = scaledInt.FractionLength
-    return formatter.Format(scaledInt.Number)
 }
 
 func formatCost2DP(currency string, d *decimal.Decimal) string {

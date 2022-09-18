@@ -1,10 +1,11 @@
 package output
 
 import (
+	"testing"
+
 	"github.com/google/go-cmp/cmp"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
-	"testing"
 )
 
 func TestFormatCost(t *testing.T) {
@@ -81,36 +82,38 @@ func TestFormatCost2DP(t *testing.T) {
 	}
 }
 
-func TestCustomFormatCost(t *testing.T) {
+func TestCurrencyFormatCost(t *testing.T) {
 	tests := map[string]struct {
 		format   string
 		val      string
 		expected string
 	}{
-		"rounds large USD":            {format: "$1,234.567890", val: "1234.56789", expected: "$1,234.567890"},
-		"rounds large USD with space": {format: "1.234,567890 $", val: "1234.56789", expected: "1.234,567890 $"},
-		"rounds small USD":            {format: "$1,234.56", val: "1.234567", expected: "$1.23"},
-		"rounds really small USD":     {format: "$1,234.56", val: "0.01234567890123456789", expected: "$0.01"},
-		"rounds large PAB":            {format: "B/.1,234", val: "1234.567", expected: "B/.1,235"},
-		"rounds small PAB":            {format: "B/.1,234.56", val: "1.234567", expected: "B/.1.23"},
-		"rounds really small PAB":     {format: "B/.1,234.56", val: "0.01234567890123456789", expected: "B/.0.01"},
-		"rounds small BSD":            {format: "$1,234.56", val: "1.234567", expected: "$1.23"},
-		"rounds really small BSD":     {format: "$1,234.56", val: "0.01234567890123456789", expected: "$0.01"},
-		"handles nil":                 {format: "$1,234.56", val: "", expected: "-"},
-		"handles invalid format":      {format: "$1,23.56,7", val: "1.234567", expected: "invalid custom format"},
+		"rounds large USD":                               {format: "USD: $1,234.567890", val: "1234.56789", expected: "$1,235"},
+		"rounds large USD with space":                    {format: "USD: 1.234,567890 $", val: "1234.56789", expected: "1.235 $"},
+		"rounds small USD":                               {format: "USD: $1,234.56", val: "1.234567", expected: "$1.23"},
+		"rounds really small USD":                        {format: "USD: $1,234.56", val: "0.01234567890123456789", expected: "$0.01"},
+		"rounds large PAB":                               {format: "PAB: B/.1,234", val: "1234.567", expected: "B/.1,235"},
+		"rounds small PAB":                               {format: "PAB: B/.1,234.56", val: "1.234567", expected: "B/.1.23"},
+		"rounds really small PAB":                        {format: "PAB: B/.1,234.56", val: "0.01234567890123456789", expected: "B/.0.01"},
+		"rounds small BSD":                               {format: "BSD: $1,234.56", val: "1.234567", expected: "$1.23"},
+		"rounds really small BSD":                        {format: "BSD: $1,234.56", val: "0.01234567890123456789", expected: "$0.01"},
+		"handles nil":                                    {format: "USD: $1,234.56", val: "", expected: "-"},
+		"handles invalid format with the default format": {format: "USD: $1,23.56,7", val: "1.234567", expected: "$1.23"},
 	}
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-		    t.Setenv("INFRACOST_CURRENCY_FORMAT", tc.format)
-		 	var val *decimal.Decimal
+			t.Setenv("INFRACOST_CURRENCY_FORMAT", tc.format)
+			addCurrencyFormatIfPreferred()
+			var val *decimal.Decimal
 			if tc.val != "" {
 				parsed, err := decimal.NewFromString(tc.val)
 				require.NoError(t, err)
 				val = &parsed
 			}
 
-			got := formatCost("", val)
+			currency := tc.format[0:3]
+			got := formatCost(currency, val)
 
 			diff := cmp.Diff(tc.expected, got)
 			if diff != "" {
