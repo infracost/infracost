@@ -1,19 +1,19 @@
 version: 2
 updates:
-  # Maintain dependencies for GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "daily"
-    commit-message:
-      prefix: "gha:"
-
+      interval: monthly
+    reviewers:
+      - infracost/engineering
+    labels:
+      - dependencies
   - package-ecosystem: gomod
     directory: "/"
     schedule:
       interval: monthly
     open-pull-requests-limit: 10
-    assignees:
-      - aliscott
+    reviewers:
+      - infracost/engineering
     labels:
       - dependencies
