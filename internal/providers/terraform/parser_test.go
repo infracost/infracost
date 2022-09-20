@@ -415,7 +415,7 @@ func TestParseJSONResources(t *testing.T) {
 	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, log.Fields{}), true)
 
 	builders := p.parseJSONResources(false, nil, usage, parsed, providerConf, conf, vars)
-	actual := make([]*schema.Resource, 0, len(builders))
+	actual := make([]*schema.Resource, len(builders))
 	for i, b := range builders {
 		actual[i] = b.Build(nil)
 	}
