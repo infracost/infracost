@@ -37,7 +37,7 @@ func NewMetadata(ctx *config.RunContext) Metadata {
 		CommitAuthorName:  ctx.VCSMetadata.Commit.AuthorName,
 		CommitTimestamp:   ctx.VCSMetadata.Commit.Time.UTC(),
 		CommitMessage:     ctx.VCSMetadata.Commit.Message,
-		VCSRepositoryURL:  ctx.VCSMetadata.Remote.URL,
+		VCSRepositoryURL:  ctx.VCSRepositoryURL(),
 	}
 
 	if ctx.VCSMetadata.PullRequest != nil {

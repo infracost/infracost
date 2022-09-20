@@ -73,12 +73,14 @@ func (p Projects) Less(i, j int) bool { return p[i].Name < p[j].Name }
 // Project contains the existing, planned state of
 // resources and the diff between them.
 type Project struct {
-	Name          string
-	Metadata      *ProjectMetadata
-	PastResources []*Resource
-	Resources     []*Resource
-	Diff          []*Resource
-	HasDiff       bool
+	Name                 string
+	Metadata             *ProjectMetadata
+	PastResourceBuilders []*ResourceBuilder
+	ResourceBuilders     []*ResourceBuilder
+	PastResources        []*Resource
+	Resources            []*Resource
+	Diff                 []*Resource
+	HasDiff              bool
 }
 
 func NewProject(name string, metadata *ProjectMetadata) *Project {

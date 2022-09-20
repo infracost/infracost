@@ -308,6 +308,16 @@ func loadResources(t *testing.T, pName string, tfProject TerraformProject, runCt
 	projects, err := provider.LoadResources(usageData)
 	require.NoError(t, err)
 
+	for _, project := range projects {
+		for _, builder := range project.ResourceBuilders {
+			project.Resources = append(project.Resources, builder.Build(nil))
+		}
+
+		for _, builder := range project.PastResourceBuilders {
+			project.PastResources = append(project.PastResources, builder.Build(nil))
+		}
+	}
+
 	return projects
 }
 

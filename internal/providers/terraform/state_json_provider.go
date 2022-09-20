@@ -60,13 +60,13 @@ func (p *StateJSONProvider) LoadResources(usage map[string]*schema.UsageData) ([
 	project := schema.NewProject(name, metadata)
 	parser := NewParser(p.ctx, p.includePastResources)
 
-	pastResources, resources, err := parser.parseJSON(j, usage)
+	pastResourceBuilders, resourceBuilders, err := parser.parseJSON(j, usage)
 	if err != nil {
 		return []*schema.Project{project}, errors.Wrap(err, "Error parsing Terraform state JSON file")
 	}
 
-	project.PastResources = pastResources
-	project.Resources = resources
+	project.PastResourceBuilders = pastResourceBuilders
+	project.ResourceBuilders = resourceBuilders
 
 	spinner.Success()
 	return []*schema.Project{project}, nil
