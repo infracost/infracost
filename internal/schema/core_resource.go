@@ -23,7 +23,7 @@ type ResourceBuilder struct {
 	// a Resource.
 	CoreResource CoreResource
 
-	// Resource field is provided for backward compatibilty with provider resource builders
+	// Resource field is provided for backward compatibility with provider resource builders
 	// that have not yet been converted to build CoreResource's
 	Resource *Resource
 }
