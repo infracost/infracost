@@ -309,11 +309,11 @@ func loadResources(t *testing.T, pName string, tfProject TerraformProject, runCt
 	require.NoError(t, err)
 
 	for _, project := range projects {
-		for _, builder := range project.ResourceBuilders {
+		for _, builder := range project.PartialResources {
 			project.Resources = append(project.Resources, builder.Build(nil))
 		}
 
-		for _, builder := range project.PastResourceBuilders {
+		for _, builder := range project.PartialPastResources {
 			project.PastResources = append(project.PastResources, builder.Build(nil))
 		}
 	}

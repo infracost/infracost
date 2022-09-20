@@ -118,12 +118,12 @@ func FetchUsageData(ctx *config.RunContext, project *schema.Project) (map[string
 
 	// gather all the CoreResource
 	coreResources := make(map[string]schema.CoreResource)
-	for _, rb := range project.ResourceBuilders {
+	for _, rb := range project.PartialResources {
 		if rb.CoreResource != nil {
 			coreResources[rb.ResourceData.Address] = rb.CoreResource
 		}
 	}
-	for _, rb := range project.PastResourceBuilders {
+	for _, rb := range project.PartialPastResources {
 		if rb.CoreResource != nil {
 			coreResources[rb.ResourceData.Address] = rb.CoreResource
 		}

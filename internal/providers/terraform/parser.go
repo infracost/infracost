@@ -35,7 +35,7 @@ func NewParser(ctx *config.ProjectContext, includePastResources bool) *Parser {
 	}
 }
 
-func (p *Parser) createResourceBuilder(d *schema.ResourceData, u *schema.UsageData) *schema.ResourceBuilder {
+func (p *Parser) createPartialResource(d *schema.ResourceData, u *schema.UsageData) *schema.PartialResource {
 	registryMap := GetResourceRegistryMap()
 
 	for cKey, cValue := range getSpecialContext(d) {
@@ -44,7 +44,7 @@ func (p *Parser) createResourceBuilder(d *schema.ResourceData, u *schema.UsageDa
 
 	if registryItem, ok := (*registryMap)[d.Type]; ok {
 		if registryItem.NoPrice {
-			return &schema.ResourceBuilder{
+			return &schema.PartialResource{
 				ResourceData: d,
 				Resource: &schema.Resource{
 					Name:        d.Address,
@@ -62,7 +62,7 @@ func (p *Parser) createResourceBuilder(d *schema.ResourceData, u *schema.UsageDa
 		if registryItem.CoreRFunc != nil {
 			coreRes := registryItem.CoreRFunc(d)
 			if coreRes != nil {
-				return &schema.ResourceBuilder{ResourceData: d, CoreResource: coreRes}
+				return &schema.PartialResource{ResourceData: d, CoreResource: coreRes}
 			}
 		} else {
 			res := registryItem.RFunc(d, u)
@@ -71,12 +71,12 @@ func (p *Parser) createResourceBuilder(d *schema.ResourceData, u *schema.UsageDa
 					res.EstimationSummary = u.CalcEstimationSummary()
 				}
 
-				return &schema.ResourceBuilder{ResourceData: d, Resource: res}
+				return &schema.PartialResource{ResourceData: d, Resource: res}
 			}
 		}
 	}
 
-	return &schema.ResourceBuilder{
+	return &schema.PartialResource{
 		ResourceData: d,
 		Resource: &schema.Resource{
 			Name:        d.Address,
@@ -86,8 +86,8 @@ func (p *Parser) createResourceBuilder(d *schema.ResourceData, u *schema.UsageDa
 	}
 }
 
-func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.ResourceBuilder, usage map[string]*schema.UsageData, parsed, providerConf, conf, vars gjson.Result) []*schema.ResourceBuilder {
-	var resources []*schema.ResourceBuilder
+func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.PartialResource, usage map[string]*schema.UsageData, parsed, providerConf, conf, vars gjson.Result) []*schema.PartialResource {
+	var resources []*schema.PartialResource
 	resources = append(resources, baseResources...)
 	var vals gjson.Result
 
@@ -111,7 +111,7 @@ func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.Res
 	p.populateUsageData(resData, usage)
 
 	for _, d := range resData {
-		if r := p.createResourceBuilder(d, d.UsageData); r != nil {
+		if r := p.createPartialResource(d, d.UsageData); r != nil {
 			resources = append(resources, r)
 		}
 	}
@@ -148,7 +148,7 @@ func (p *Parser) populateUsageData(resData map[string]*schema.ResourceData, usag
 	}
 }
 
-func (p *Parser) parseJSON(j []byte, usage map[string]*schema.UsageData) ([]*schema.ResourceBuilder, []*schema.ResourceBuilder, error) {
+func (p *Parser) parseJSON(j []byte, usage map[string]*schema.UsageData) ([]*schema.PartialResource, []*schema.PartialResource, error) {
 	baseResources := p.loadUsageFileResources(usage)
 
 	j, _ = StripSetupTerraformWrapper(j)
@@ -190,8 +190,8 @@ func StripSetupTerraformWrapper(b []byte) ([]byte, bool) {
 	return stripped, len(stripped) != len(b)
 }
 
-func (p *Parser) loadUsageFileResources(u map[string]*schema.UsageData) []*schema.ResourceBuilder {
-	resources := make([]*schema.ResourceBuilder, 0)
+func (p *Parser) loadUsageFileResources(u map[string]*schema.UsageData) []*schema.PartialResource {
+	resources := make([]*schema.PartialResource, 0)
 
 	for k, v := range u {
 		for _, t := range GetUsageOnlyResources() {
@@ -200,7 +200,7 @@ func (p *Parser) loadUsageFileResources(u map[string]*schema.UsageData) []*schem
 				// set the usage data as a field on the resource data in case it is needed when
 				// processing reference attributes.
 				d.UsageData = v
-				if r := p.createResourceBuilder(d, v); r != nil {
+				if r := p.createPartialResource(d, v); r != nil {
 					resources = append(resources, r)
 				}
 			}
@@ -215,7 +215,7 @@ func (p *Parser) loadUsageFileResources(u map[string]*schema.UsageData) []*schem
 // is run with `-target` then all resources still appear in prior_state but not
 // in planned_values. This makes sure we remove any non-target resources from
 // the past resources so that we only show resources matching the target.
-func stripNonTargetResources(pastResources []*schema.ResourceBuilder, resources []*schema.ResourceBuilder, resourceChanges []gjson.Result) []*schema.ResourceBuilder {
+func stripNonTargetResources(pastResources []*schema.PartialResource, resources []*schema.PartialResource, resourceChanges []gjson.Result) []*schema.PartialResource {
 	resourceAddrMap := make(map[string]bool, len(resources))
 	for _, resource := range resources {
 		resourceAddrMap[resource.ResourceData.Address] = true
@@ -226,7 +226,7 @@ func stripNonTargetResources(pastResources []*schema.ResourceBuilder, resources 
 		diffAddrMap[change.Get("address").String()] = true
 	}
 
-	var filteredResources []*schema.ResourceBuilder
+	var filteredResources []*schema.PartialResource
 	for _, resource := range pastResources {
 		_, rOk := resourceAddrMap[resource.ResourceData.Address]
 		_, dOk := diffAddrMap[resource.ResourceData.Address]

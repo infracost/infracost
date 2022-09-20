@@ -181,13 +181,13 @@ func (p *HCLProvider) LoadResources(usage map[string]*schema.UsageData) ([]*sche
 func (p *HCLProvider) parseResources(parsed hclProject, usage map[string]*schema.UsageData) (*schema.Project, error) {
 	project := p.newProject(parsed)
 
-	pastResourceBuilders, resourceBuilders, err := p.planJSONParser.parseJSON(parsed.json, usage)
+	partialPastResources, partialResources, err := p.planJSONParser.parseJSON(parsed.json, usage)
 	if err != nil {
 		return project, fmt.Errorf("Error parsing Terraform plan JSON file %w", err)
 	}
 
-	project.PastResourceBuilders = pastResourceBuilders
-	project.ResourceBuilders = resourceBuilders
+	project.PartialPastResources = partialPastResources
+	project.PartialResources = partialResources
 
 	return project, nil
 }

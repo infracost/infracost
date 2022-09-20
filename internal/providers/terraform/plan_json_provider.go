@@ -70,13 +70,13 @@ func (p *PlanJSONProvider) LoadResourcesFromSrc(usage map[string]*schema.UsageDa
 	project := schema.NewProject(name, metadata)
 	parser := NewParser(p.ctx, p.includePastResources)
 
-	pastResourceBuilders, resourceBuilders, err := parser.parseJSON(j, usage)
+	partialPastResources, partialResources, err := parser.parseJSON(j, usage)
 	if err != nil {
 		return project, fmt.Errorf("Error parsing Terraform plan JSON file %w", err)
 	}
 
-	project.PastResourceBuilders = pastResourceBuilders
-	project.ResourceBuilders = resourceBuilders
+	project.PartialPastResources = partialPastResources
+	project.PartialResources = partialResources
 
 	if spinner != nil {
 		spinner.Success()

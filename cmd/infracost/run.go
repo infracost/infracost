@@ -552,14 +552,14 @@ func (r *parallelRunner) buildResources(projects []*schema.Project) {
 	for _, project := range projects {
 		usageMap := projectPtrToUsageMap[project]
 
-		for _, builder := range project.ResourceBuilders {
-			u := usageMap[builder.ResourceData.Address]
-			project.Resources = append(project.Resources, builder.Build(u))
+		for _, partial := range project.PartialResources {
+			u := usageMap[partial.ResourceData.Address]
+			project.Resources = append(project.Resources, schema.BuildResource(partial, u))
 		}
 
-		for _, builder := range project.PastResourceBuilders {
-			u := usageMap[builder.ResourceData.Address]
-			project.PastResources = append(project.PastResources, builder.Build(u))
+		for _, partial := range project.PartialPastResources {
+			u := usageMap[partial.ResourceData.Address]
+			project.PastResources = append(project.PastResources, schema.BuildResource(partial, u))
 		}
 	}
 }

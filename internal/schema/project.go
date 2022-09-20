@@ -75,8 +75,8 @@ func (p Projects) Less(i, j int) bool { return p[i].Name < p[j].Name }
 type Project struct {
 	Name                 string
 	Metadata             *ProjectMetadata
-	PastResourceBuilders []*ResourceBuilder
-	ResourceBuilders     []*ResourceBuilder
+	PartialPastResources []*PartialResource
+	PartialResources     []*PartialResource
 	PastResources        []*Resource
 	Resources            []*Resource
 	Diff                 []*Resource
