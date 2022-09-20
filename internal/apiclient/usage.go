@@ -3,12 +3,11 @@ package apiclient
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/json"
 	"github.com/tidwall/gjson"
 	"io/ioutil"
 
 	"github.com/infracost/infracost/internal/config"
-	"github.com/infracost/infracost/internal/schema"
-
 	"github.com/infracost/infracost/internal/logging"
 )
 
@@ -77,10 +76,10 @@ func NewUsageAPIClient(ctx *config.RunContext) *UsageAPIClient {
 
 // ListActualCosts queries the Infracost Cloud Usage API to retrieve any cloud provider
 // reported costs associated with the resource.
-func (c *UsageAPIClient) ListActualCosts(repoURL, projectID string, r *schema.Resource) ([]ActualCostResult, error) {
-	query := c.buildActualCostsQuery(repoURL, projectID, r)
+func (c *UsageAPIClient) ListActualCosts(vars ActualCostsQueryVariables) ([]ActualCostResult, error) {
+	query := c.buildActualCostsQuery(vars)
 
-	logging.Logger.Debugf("Getting actual costs from %s for %s", c.endpoint, r.Name)
+	logging.Logger.Debugf("Getting actual costs from %s for %s", c.endpoint, vars.Address)
 
 	var actualCosts []ActualCostResult
 
@@ -105,12 +104,15 @@ func (c *UsageAPIClient) ListActualCosts(repoURL, projectID string, r *schema.Re
 	return actualCosts, nil
 }
 
-func (c *UsageAPIClient) buildActualCostsQuery(repoURL, projectID string, r *schema.Resource) GraphQLQuery {
-	v := map[string]interface{}{}
-	v["repoUrl"] = repoURL
-	v["project"] = projectID
-	v["address"] = r.Name
-	v["currency"] = c.Currency
+type ActualCostsQueryVariables struct {
+	RepoURL  string `json:"repoUrl"`
+	Project  string `json:"project"`
+	Address  string `json:"address"`
+	Currency string `json:"currency"`
+}
+
+func (c *UsageAPIClient) buildActualCostsQuery(vars ActualCostsQueryVariables) GraphQLQuery {
+	v := interfaceToMap(vars)
 
 	query := `
 		query($repoUrl: String!, $project: String!, $address: String!, $currency: String!) {
@@ -132,10 +134,10 @@ func (c *UsageAPIClient) buildActualCostsQuery(repoURL, projectID string, r *sch
 
 // ListUsageQuantities queries the Infracost Cloud Usage API to retrieve usage estimates
 // derived from cloud provider reported usage and costs.
-func (c *UsageAPIClient) ListUsageQuantities(repoURL, projectID, resourceType, address string, usageKeys []string) (map[string]gjson.Result, error) {
-	query := c.buildUsageQuantitiesQuery(repoURL, projectID, resourceType, address, usageKeys)
+func (c *UsageAPIClient) ListUsageQuantities(vars UsageQuantitiesQueryVariables) (map[string]gjson.Result, error) {
+	query := c.buildUsageQuantitiesQuery(vars)
 
-	logging.Logger.Debugf("Getting usage quantities from %s for %s %s %v", c.endpoint, resourceType, address, usageKeys)
+	logging.Logger.Debugf("Getting usage quantities from %s for %s %s %v", c.endpoint, vars.ResourceType, vars.Address, vars.UsageKeys)
 
 	attribs := make(map[string]gjson.Result)
 
@@ -154,13 +156,16 @@ func (c *UsageAPIClient) ListUsageQuantities(repoURL, projectID, resourceType, a
 	return attribs, nil
 }
 
-func (c *UsageAPIClient) buildUsageQuantitiesQuery(repoURL, projectID, resourceType, address string, usageKeys []string) GraphQLQuery {
-	v := map[string]interface{}{}
-	v["repoUrl"] = repoURL
-	v["project"] = projectID
-	v["resourceType"] = resourceType
-	v["address"] = address
-	v["usageKeys"] = usageKeys
+type UsageQuantitiesQueryVariables struct {
+	RepoURL      string   `json:"repoUrl"`
+	Project      string   `json:"project"`
+	ResourceType string   `json:"resourceType"`
+	Address      string   `json:"address"`
+	UsageKeys    []string `json:"usageKeys"`
+}
+
+func (c *UsageAPIClient) buildUsageQuantitiesQuery(vars UsageQuantitiesQueryVariables) GraphQLQuery {
+	v := interfaceToMap(vars)
 
 	query := `
 		query($repoUrl: String!, $project: String!, $resourceType: String!, $address: String!, $usageKeys: [String!]!) {
@@ -173,4 +178,11 @@ func (c *UsageAPIClient) buildUsageQuantitiesQuery(repoURL, projectID, resourceT
 	`
 
 	return GraphQLQuery{query, v}
+}
+
+func interfaceToMap(in interface{}) map[string]interface{} {
+	out := map[string]interface{}{}
+	b, _ := json.Marshal(in)
+	_ = json.Unmarshal(b, &out)
+	return out
 }

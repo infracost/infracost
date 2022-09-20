@@ -69,7 +69,14 @@ func popResourceActualCosts(ctx *config.RunContext, c *apiclient.UsageAPIClient,
 	if r.IsSkipped {
 		return nil
 	}
-	results, err := c.ListActualCosts(ctx.VCSRepositoryURL(), project.Name, r)
+
+	vars := apiclient.ActualCostsQueryVariables{
+		RepoURL:  ctx.VCSRepositoryURL(),
+		Project:  project.Name,
+		Address:  r.Name,
+		Currency: c.Currency,
+	}
+	results, err := c.ListActualCosts(vars)
 
 	if err != nil {
 		return err
@@ -132,7 +139,15 @@ func FetchUsageData(ctx *config.RunContext, project *schema.Project) (map[string
 		}
 
 		if len(usageKeys) > 0 {
-			attributes, err := c.ListUsageQuantities(ctx.VCSRepositoryURL(), project.Name, cr.CoreType(), address, usageKeys)
+			vars := apiclient.UsageQuantitiesQueryVariables{
+				RepoURL:      ctx.VCSRepositoryURL(),
+				Project:      project.Name,
+				ResourceType: cr.CoreType(),
+				Address:      address,
+				UsageKeys:    usageKeys,
+			}
+
+			attributes, err := c.ListUsageQuantities(vars)
 			if err != nil {
 				return nil, err
 			}
