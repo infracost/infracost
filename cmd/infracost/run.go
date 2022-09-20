@@ -488,7 +488,7 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 		NoColor:       r.runCtx.Config.NoColor,
 		Indent:        "  ",
 	}
-	spinner := ui.NewSpinner("Searching 3 million+ prices to calculate costs", spinnerOpts)
+	spinner := ui.NewSpinner("Retrieving cloud prices to calculate costs", spinnerOpts)
 	defer spinner.Fail()
 
 	for _, project := range projects {
@@ -596,7 +596,7 @@ func (r *parallelRunner) populateActualCosts(projects []*schema.Project) {
 			NoColor:       r.runCtx.Config.NoColor,
 			Indent:        "  ",
 		}
-		spinner := ui.NewSpinner("Retrieving actual costs for 3 resources from Infracost Cloud", spinnerOpts)
+		spinner := ui.NewSpinner("Retrieving actual costs from Infracost Cloud", spinnerOpts)
 		defer spinner.Fail()
 
 		for _, project := range projects {
