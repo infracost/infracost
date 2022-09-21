@@ -174,6 +174,7 @@ func tableForBreakdown(currency string, breakdown Breakdown, fields []string, in
 
 		buildCostComponentRows(t, currency, filteredComponents, "", len(r.SubResources) > 0, fields)
 		buildSubResourceRows(t, currency, filteredSubResources, "", fields)
+		buildActualCostRows(t, currency, r.ActualCosts, "", fields)
 
 		t.AppendRow(table.Row{""})
 	}
@@ -211,6 +212,7 @@ func buildSubResourceRows(t table.Writer, currency string, subresources []Resour
 
 		buildCostComponentRows(t, currency, filteredComponents, nextPrefix, len(r.SubResources) > 0, fields)
 		buildSubResourceRows(t, currency, filteredSubResources, nextPrefix, fields)
+		buildActualCostRows(t, currency, r.ActualCosts, nextPrefix, fields)
 	}
 }
 
@@ -259,6 +261,33 @@ func buildCostComponentRows(t table.Writer, currency string, costComponents []Co
 			t.AppendRow(tableRow)
 		}
 	}
+}
+
+func buildActualCostRows(t table.Writer, currency string, ac *ActualCosts, prefix string, fields []string) {
+	if ac == nil {
+		return
+	}
+
+	labelPrefix := ui.FaintString(prefix + "└─")
+
+	var dateRange string
+	if !ac.StartTimestamp.IsZero() && !ac.EndTimestamp.IsZero() {
+		endFmt := "Jan 2"
+		if ac.StartTimestamp.Month() == ac.EndTimestamp.Month() {
+			endFmt = "2"
+		}
+		dateRange = fmt.Sprintf(" %s-%s", ac.StartTimestamp.Format("Jan 2"), ac.EndTimestamp.Format(endFmt))
+	}
+	var resourceID string
+	if ac.ResourceID != "" {
+		resourceID = fmt.Sprintf(" (%s)", ac.ResourceID)
+	}
+
+	t.AppendRow(
+		table.Row{fmt.Sprintf("%s Actual costs%s%s", labelPrefix, dateRange, resourceID)},
+		table.RowConfig{AutoMerge: true},
+	)
+	buildCostComponentRows(t, currency, ac.CostComponents, prefix+"   ", false, fields)
 }
 
 func filterZeroValComponents(costComponents []CostComponent, resourceName string) []CostComponent {
