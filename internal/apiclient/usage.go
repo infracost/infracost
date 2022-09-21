@@ -96,6 +96,10 @@ func (c *UsageAPIClient) ListActualCosts(vars ActualCostsQueryVariables) (*Actua
 		return nil, err
 	}
 
+	if len(results) == 0 {
+		return nil, nil
+	}
+
 	result := results[0]
 	acr := &ActualCostsResult{
 		Address:        result.Get("data.actualCosts.address").String(),

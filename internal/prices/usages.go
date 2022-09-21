@@ -76,8 +76,7 @@ func popResourceActualCosts(ctx *config.RunContext, c *apiclient.UsageAPIClient,
 		Currency: c.Currency,
 	}
 	actualCost, err := c.ListActualCosts(vars)
-
-	if err != nil {
+	if actualCost == nil || err != nil {
 		return err
 	}
 
