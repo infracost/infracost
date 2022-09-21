@@ -34,13 +34,7 @@ func BuildResource(partial *PartialResource, fetchedUsage *UsageData) *Resource 
 	var res *Resource
 	if partial.CoreResource != nil {
 		u := partial.ResourceData.UsageData
-		if fetchedUsage != nil {
-			if u == nil {
-				u = fetchedUsage
-			} else {
-				u = u.Merge(fetchedUsage)
-			}
-		}
+		u = u.Merge(fetchedUsage)
 
 		partial.CoreResource.PopulateUsage(u)
 		res = partial.CoreResource.BuildResource()

@@ -26,6 +26,13 @@ func NewUsageData(address string, attributes map[string]gjson.Result) *UsageData
 
 // Merge returns a new UsageData which is the result of adding all keys from other that do not already exists in the usage data
 func (u *UsageData) Merge(other *UsageData) *UsageData {
+	if u == nil {
+		if other != nil {
+			return other.Merge(u) // this will return a new copy of other
+		}
+		return nil // both are nil
+	}
+
 	newU := &UsageData{
 		Address:    u.Address,
 		Attributes: make(map[string]gjson.Result, len(u.Attributes)),
@@ -35,9 +42,11 @@ func (u *UsageData) Merge(other *UsageData) *UsageData {
 		newU.Attributes[k] = v
 	}
 
-	for k, v := range other.Attributes {
-		if _, ok := newU.Attributes[k]; !ok {
-			newU.Attributes[k] = v
+	if other != nil {
+		for k, v := range other.Attributes {
+			if _, ok := newU.Attributes[k]; !ok {
+				newU.Attributes[k] = v
+			}
 		}
 	}
 
