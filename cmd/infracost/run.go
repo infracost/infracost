@@ -565,12 +565,30 @@ func (r *parallelRunner) buildResources(projects []*schema.Project) {
 }
 
 func (r *parallelRunner) fetchProjectUsage(projects []*schema.Project) map[*schema.Project]map[string]*schema.UsageData {
+	coreResourceCount := 0
+	for _, project := range projects {
+		for _, partial := range project.PartialResources {
+			if partial.CoreResource != nil {
+				coreResourceCount++
+			}
+		}
+	}
+
+	if coreResourceCount == 0 {
+		return nil
+	}
+
+	resourceStr := fmt.Sprintf("%d resource", coreResourceCount)
+	if coreResourceCount > 1 {
+		resourceStr += "s"
+	}
+
 	spinnerOpts := ui.SpinnerOptions{
 		EnableLogging: r.runCtx.Config.IsLogging(),
 		NoColor:       r.runCtx.Config.NoColor,
 		Indent:        "  ",
 	}
-	spinner := ui.NewSpinner("Retrieving usage from Infracost Cloud", spinnerOpts)
+	spinner := ui.NewSpinner(fmt.Sprintf("Retrieving usage estimates for %s from Infracost Cloud", resourceStr), spinnerOpts)
 	defer spinner.Fail()
 
 	projectPtrToUsageMap := make(map[*schema.Project]map[string]*schema.UsageData, len(projects))
@@ -579,6 +597,7 @@ func (r *parallelRunner) fetchProjectUsage(projects []*schema.Project) map[*sche
 		usageMap, err := prices.FetchUsageData(r.runCtx, project)
 		if err != nil {
 			logging.Logger.WithError(err).Debugf("failed to retrieve usage data for project %s", project.Name)
+			return nil
 		}
 
 		projectPtrToUsageMap[project] = usageMap
@@ -601,8 +620,8 @@ func (r *parallelRunner) populateActualCosts(projects []*schema.Project) {
 
 		for _, project := range projects {
 			if err := prices.PopulateActualCosts(r.runCtx, project); err != nil {
-				spinner.Fail()
 				logging.Logger.WithError(err).Debugf("failed to retrieve actual costs for project %s", project.Name)
+				return
 			}
 		}
 
