@@ -7,6 +7,7 @@ type RegistryItem struct {
 	Name                string
 	Notes               []string
 	RFunc               ResourceFunc
+	CoreRFunc           CoreResourceFunc
 	ReferenceAttributes []string
 	CustomRefIDFunc     ReferenceIDFunc
 	DefaultRefIDFunc    ReferenceIDFunc

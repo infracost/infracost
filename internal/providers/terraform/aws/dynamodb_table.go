@@ -15,7 +15,7 @@ func getDynamoDBTableRegistryItem() *schema.RegistryItem {
 		// this is a reverse reference, it depends on the aws_appautoscaling_target RegistryItem
 		// defining "resource_id" as a ReferenceAttribute
 		ReferenceAttributes: []string{"aws_appautoscaling_target.resource_id"},
-		RFunc:               NewDynamoDBTableResource,
+		CoreRFunc:           NewDynamoDBTableResource,
 		CustomRefIDFunc: func(d *schema.ResourceData) []string {
 			// returns a table name that will match the custom format used by aws_appautoscaling_target.resource_id
 			name := d.Get("name").String()
@@ -27,7 +27,7 @@ func getDynamoDBTableRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewDynamoDBTableResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewDynamoDBTableResource(d *schema.ResourceData) schema.CoreResource {
 	replicaRegions := []string{}
 	if d.Get("replica").Exists() {
 		for _, data := range d.Get("replica").Array() {
@@ -50,7 +50,5 @@ func NewDynamoDBTableResource(d *schema.ResourceData, u *schema.UsageData) *sche
 		ReplicaRegions:       replicaRegions,
 		AppAutoscalingTarget: targets,
 	}
-	a.PopulateUsage(u)
-
-	return a.BuildResource()
+	return a
 }

@@ -34,14 +34,20 @@ type DynamoDBTable struct {
 	MonthlyStreamsReadRequestUnits *int64 `infracost_usage:"monthly_streams_read_request_units"`
 }
 
-var DynamoDBTableUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_write_request_units", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_read_request_units", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "storage_gb", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "pitr_backup_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "on_demand_backup_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_data_restored_gb", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_streams_read_request_units", DefaultValue: 0, ValueType: schema.Int64},
+func (a *DynamoDBTable) CoreType() string {
+	return "DynamoDBTable"
+}
+
+func (a *DynamoDBTable) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_write_request_units", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "monthly_read_request_units", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "storage_gb", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "pitr_backup_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "on_demand_backup_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "monthly_data_restored_gb", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "monthly_streams_read_request_units", DefaultValue: 0, ValueType: schema.Int64},
+	}
 }
 
 func (a *DynamoDBTable) PopulateUsage(u *schema.UsageData) {
@@ -130,7 +136,7 @@ func (a *DynamoDBTable) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           a.Address,
-		UsageSchema:    DynamoDBTableUsageSchema,
+		UsageSchema:    a.UsageSchema(),
 		EstimateUsage:  estimate,
 		CostComponents: costComponents,
 		SubResources:   subResources,
