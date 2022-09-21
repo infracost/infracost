@@ -101,6 +101,10 @@ func (r *RunContext) UUID() uuid.UUID {
 	return r.uuid
 }
 
+func (c *RunContext) VCSRepositoryURL() string {
+	return c.VCSMetadata.Remote.URL
+}
+
 func (r *RunContext) SetContextValue(key string, value interface{}) {
 	r.mu.Lock()
 	r.contextVals[key] = value
