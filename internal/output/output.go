@@ -109,6 +109,10 @@ func convertCostComponents(outComponents []CostComponent) []*schema.CostComponen
 }
 
 func convertActualCosts(ac *ActualCosts) *schema.ActualCosts {
+	if ac == nil {
+		return nil
+	}
+
 	return &schema.ActualCosts{
 		ResourceID:     ac.ResourceID,
 		StartTimestamp: ac.StartTimestamp,
