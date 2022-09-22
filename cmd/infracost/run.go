@@ -21,6 +21,7 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"github.com/infracost/infracost/internal/logging"
+	"github.com/infracost/infracost/internal/vcs"
 
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/clierror"
@@ -88,6 +89,13 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		ui.PrintWarning(cmd.ErrOrStderr(), "Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
 	}
 
+	repoPath := runCtx.Config.RepoPath()
+	metadata, err := vcs.MetadataFetcher.Get(repoPath)
+	if err != nil {
+		logging.Logger.WithError(err).Debugf("failed to fetch vcs metadata for path %s", repoPath)
+	}
+	runCtx.VCSMetadata = metadata
+
 	pr, err := newParallelRunner(cmd, runCtx)
 	if err != nil {
 		return err
@@ -119,10 +127,6 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		go formatHCLProjects(wg, runCtx, hclProjects, hclR)
 	}
 
-	for _, project := range projects {
-		project.Metadata.InfracostCommand = cmd.Name()
-	}
-
 	r, err := output.ToOutputFormat(projects)
 	if err != nil {
 		return err
@@ -138,14 +142,19 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	wg.Wait()
 	r.IsCIRun = runCtx.IsCIRun()
 	r.Currency = runCtx.Config.Currency
+	r.Metadata = output.NewMetadata(runCtx)
 
-	dashboardClient := apiclient.NewDashboardAPIClient(runCtx)
-	result, err := dashboardClient.AddRun(runCtx, r)
-	if err != nil {
-		log.WithError(err).Error("Failed to upload to Infracost Cloud")
+	if runCtx.IsCloudEnabled() {
+		dashboardClient := apiclient.NewDashboardAPIClient(runCtx)
+		result, err := dashboardClient.AddRun(runCtx, r)
+		if err != nil {
+			log.WithError(err).Error("Failed to upload to Infracost Cloud")
+		}
+
+		r.RunID, r.ShareURL = result.RunID, result.ShareURL
+	} else {
+		log.Debug("Skipping sending project results since Infracost Cloud is not enabled.")
 	}
-
-	r.RunID, r.ShareURL = result.RunID, result.ShareURL
 
 	format := strings.ToLower(runCtx.Config.Format)
 	isCompareRun := runCtx.Config.CompareTo != ""
@@ -472,6 +481,8 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 		return nil, err
 	}
 
+	r.buildResources(projects)
+
 	spinnerOpts := ui.SpinnerOptions{
 		EnableLogging: r.runCtx.Config.IsLogging(),
 		NoColor:       r.runCtx.Config.NoColor,
@@ -507,7 +518,6 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 
 			return nil, err
 		}
-
 		schema.CalculateCosts(project)
 
 		project.CalculateDiff()
@@ -521,6 +531,9 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 	wg.Wait()
 
 	spinner.Success()
+
+	r.populateActualCosts(projects)
+
 	out.projects = projects
 
 	if !r.runCtx.Config.IsLogging() && !r.runCtx.Config.SkipErrLine {
@@ -528,6 +541,92 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 	}
 
 	return out, nil
+}
+
+func (r *parallelRunner) buildResources(projects []*schema.Project) {
+	var projectPtrToUsageMap map[*schema.Project]map[string]*schema.UsageData
+	if r.runCtx.Config.UsageAPIEndpoint != "" {
+		projectPtrToUsageMap = r.fetchProjectUsage(projects)
+	}
+
+	for _, project := range projects {
+		usageMap := projectPtrToUsageMap[project]
+
+		for _, partial := range project.PartialResources {
+			u := usageMap[partial.ResourceData.Address]
+			project.Resources = append(project.Resources, schema.BuildResource(partial, u))
+		}
+
+		for _, partial := range project.PartialPastResources {
+			u := usageMap[partial.ResourceData.Address]
+			project.PastResources = append(project.PastResources, schema.BuildResource(partial, u))
+		}
+	}
+}
+
+func (r *parallelRunner) fetchProjectUsage(projects []*schema.Project) map[*schema.Project]map[string]*schema.UsageData {
+	coreResourceCount := 0
+	for _, project := range projects {
+		for _, partial := range project.PartialResources {
+			if partial.CoreResource != nil {
+				coreResourceCount++
+			}
+		}
+	}
+
+	if coreResourceCount == 0 {
+		return nil
+	}
+
+	resourceStr := fmt.Sprintf("%d resource", coreResourceCount)
+	if coreResourceCount > 1 {
+		resourceStr += "s"
+	}
+
+	spinnerOpts := ui.SpinnerOptions{
+		EnableLogging: r.runCtx.Config.IsLogging(),
+		NoColor:       r.runCtx.Config.NoColor,
+		Indent:        "  ",
+	}
+	spinner := ui.NewSpinner(fmt.Sprintf("Retrieving usage estimates for %s from Infracost Cloud", resourceStr), spinnerOpts)
+	defer spinner.Fail()
+
+	projectPtrToUsageMap := make(map[*schema.Project]map[string]*schema.UsageData, len(projects))
+
+	for _, project := range projects {
+		usageMap, err := prices.FetchUsageData(r.runCtx, project)
+		if err != nil {
+			logging.Logger.WithError(err).Debugf("failed to retrieve usage data for project %s", project.Name)
+			return nil
+		}
+
+		projectPtrToUsageMap[project] = usageMap
+	}
+
+	spinner.Success()
+
+	return projectPtrToUsageMap
+}
+
+func (r *parallelRunner) populateActualCosts(projects []*schema.Project) {
+	if r.runCtx.Config.UsageAPIEndpoint != "" {
+		spinnerOpts := ui.SpinnerOptions{
+			EnableLogging: r.runCtx.Config.IsLogging(),
+			NoColor:       r.runCtx.Config.NoColor,
+			Indent:        "  ",
+		}
+		spinner := ui.NewSpinner("Retrieving actual costs from Infracost Cloud", spinnerOpts)
+		defer spinner.Fail()
+
+		for _, project := range projects {
+			if err := prices.PopulateActualCosts(r.runCtx, project); err != nil {
+				logging.Logger.WithError(err).Debugf("failed to retrieve actual costs for project %s", project.Name)
+				return
+			}
+		}
+
+		spinner.Success()
+	}
 }
 
 func (r *parallelRunner) runHCLProvider(wg *sync.WaitGroup, ctx *config.ProjectContext, usageFile *usage.UsageFile, out *projectOutput) {
@@ -567,6 +666,11 @@ func (r *parallelRunner) runHCLProvider(wg *sync.WaitGroup, ctx *config.ProjectC
 			log.Debugf("Error populating prices for HCL project: %s", err)
 			return
 		}
+		err = prices.PopulateActualCosts(r.runCtx, project)
+		if err != nil {
+			log.Debugf("Error populating usages for HCL project: %s", err)
+			return
+		}
 
 		schema.CalculateCosts(project)
 		project.CalculateDiff()
@@ -602,6 +706,8 @@ func (r *parallelRunner) generateUsageFile(ctx *config.ProjectContext, provider 
 	if err != nil {
 		return errors.Wrap(err, "Error loading resources")
 	}
+
+	r.buildResources(providerProjects)
 
 	spinnerOpts := ui.SpinnerOptions{
 		EnableLogging: r.runCtx.Config.IsLogging(),
@@ -716,7 +822,10 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	projectCfg := cfg.Projects[0]
 
 	if hasProjectFlags {
-		projectCfg.Path, _ = cmd.Flags().GetString("path")
+		rootPath, _ := cmd.Flags().GetString("path")
+		cfg.RootPath = rootPath
+		projectCfg.Path = rootPath
+
 		projectCfg.TerraformVarFiles, _ = cmd.Flags().GetStringSlice("terraform-var-file")
 		tfVars, _ := cmd.Flags().GetStringSlice("terraform-var")
 		projectCfg.TerraformVars = tfVarsToMap(tfVars)
@@ -832,6 +941,8 @@ func checkRunConfig(warningWriter io.Writer, cfg *config.Config) error {
 
 func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectContext, r output.Root, projects []*schema.Project, hclR *output.Root, hclProjects []*schema.Project) map[string]interface{} {
 	env := runCtx.EventEnvWithProjectContexts(projectContexts)
+
+	env["runId"] = r.RunID
 	env["projectCount"] = len(projectContexts)
 	env["runSeconds"] = time.Now().Unix() - runCtx.StartTime
 	env["currency"] = runCtx.Config.Currency

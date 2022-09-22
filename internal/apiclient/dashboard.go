@@ -15,7 +15,6 @@ import (
 
 type DashboardAPIClient struct {
 	APIClient
-	shouldStoreRun bool
 }
 
 type CreateAPIKeyResponse struct {
@@ -55,39 +54,11 @@ func NewDashboardAPIClient(ctx *config.RunContext) *DashboardAPIClient {
 			apiKey:   ctx.Config.APIKey,
 			uuid:     ctx.UUID(),
 		},
-		shouldStoreRun: ctx.IsCloudEnabled() && !ctx.Config.IsSelfHosted(),
 	}
-}
-
-func (c *DashboardAPIClient) CreateAPIKey(name string, email string, contextVals map[string]interface{}) (CreateAPIKeyResponse, error) {
-	d := map[string]interface{}{
-		"name":        name,
-		"email":       email,
-		"os":          contextVals["os"],
-		"version":     contextVals["version"],
-		"fullVersion": contextVals["fullVersion"],
-	}
-	respBody, err := c.doRequest("POST", "/apiKeys?source=cli-register", d)
-	if err != nil {
-		return CreateAPIKeyResponse{}, err
-	}
-
-	var r CreateAPIKeyResponse
-	err = json.Unmarshal(respBody, &r)
-	if err != nil {
-		return r, errors.Wrap(err, "Invalid response from API")
-	}
-
-	return r, nil
 }
 
 func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (AddRunResponse, error) {
 	response := AddRunResponse{}
-
-	if !c.shouldStoreRun {
-		log.Debug("Skipping sending project results since it is disabled.")
-		return response, nil
-	}
 
 	projectResultInputs := make([]projectResultInput, len(out.Projects))
 	for i, project := range out.Projects {
@@ -102,6 +73,20 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (Ad
 	}
 
 	ctxValues := ctx.ContextValues()
+
+	var metadata map[string]interface{}
+	b, err := json.Marshal(out.Metadata)
+	if err != nil {
+		return response, fmt.Errorf("dashboard client failed to marshal output metadata %w", err)
+	}
+
+	err = json.Unmarshal(b, &metadata)
+	if err != nil {
+		return response, fmt.Errorf("dashboard client failed to unmarshal output metadata %w", err)
+	}
+
+	ctxValues["repoMetadata"] = metadata
+
 	if ctx.IsInfracostComment() {
 		// Clone the map to cleanup up the "command" key to show "comment".  It is
 		// currently set to the sub comment (e.g. "github")

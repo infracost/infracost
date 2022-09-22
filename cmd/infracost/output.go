@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 
@@ -8,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/infracost/infracost/internal/apiclient"
+	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/ui"
@@ -92,13 +94,15 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			}
 
 			combined, err := output.Combine(inputs)
-			if err != nil {
+			if errors.As(err, &clierror.WarningError{}) {
+				if format == "json" {
+					ui.PrintWarningf(cmd.ErrOrStderr(), err.Error())
+				}
+			} else if err != nil {
 				return err
 			}
 			combined.IsCIRun = ctx.IsCIRun()
-			for _, p := range combined.Projects {
-				p.Metadata.InfracostCommand = "output"
-			}
+			combined.Metadata.InfracostCommand = "output"
 
 			includeAllFields := "all"
 			validFields := []string{"price", "monthlyQuantity", "unit", "hourlyCost", "monthlyCost"}
@@ -139,9 +143,9 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			if ctx.IsCloudEnabled() {
 				if ctx.Config.IsSelfHosted() {
 					ui.PrintWarning(cmd.ErrOrStderr(), "Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
+				} else {
+					combined.RunID, combined.ShareURL = shareCombinedRun(ctx, combined, inputs)
 				}
-
-				combined.RunID, combined.ShareURL = shareCombinedRun(ctx, combined, inputs)
 			}
 
 			b, err := output.FormatOutput(format, combined, opts)

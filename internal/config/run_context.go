@@ -2,15 +2,16 @@ package config
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"github.com/infracost/infracost/internal/logging"
 	"io"
 	"os"
 	"runtime"
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/infracost/infracost/internal/logging"
+	"github.com/infracost/infracost/internal/vcs"
 
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
@@ -24,6 +25,8 @@ type RunContext struct {
 	uuid        uuid.UUID
 	Config      *Config
 	State       *State
+	VCSMetadata vcs.Metadata
+	CMD         string
 	contextVals map[string]interface{}
 	mu          *sync.RWMutex
 	StartTime   int64
@@ -79,14 +82,6 @@ var (
 	outputIndent = "  "
 )
 
-// NewWarningWriter returns a function that can be used to write a message to the RunContext.ErrWriter.
-// This can be useful to pass to functions or structs that don't use a full RunContext.
-func (r *RunContext) NewWarningWriter() ui.WriteWarningFunc {
-	return func(msg string) {
-		fmt.Fprintf(r.ErrWriter, "%s%s %s\n", outputIndent, ui.WarningString("Warning:"), msg)
-	}
-}
-
 // NewSpinner returns an ui.Spinner built from the RunContext.
 func (r *RunContext) NewSpinner(msg string) *ui.Spinner {
 	return ui.NewSpinner(msg, ui.SpinnerOptions{
@@ -104,6 +99,10 @@ func (r *RunContext) Context() context.Context {
 // UUID returns the underlying run uuid. This can be used to globally identify the run context.
 func (r *RunContext) UUID() uuid.UUID {
 	return r.uuid
+}
+
+func (c *RunContext) VCSRepositoryURL() string {
+	return c.VCSMetadata.Remote.URL
 }
 
 func (r *RunContext) SetContextValue(key string, value interface{}) {
@@ -281,50 +280,5 @@ func ciPlatform() string {
 		return "ci"
 	}
 
-	return ""
-}
-
-func ciVCSRepo() string {
-	if IsEnvPresent("GITHUB_REPOSITORY") {
-		serverURL := os.Getenv("GITHUB_SERVER_URL")
-		if serverURL == "" {
-			serverURL = "https://github.com"
-		}
-		return fmt.Sprintf("%s/%s", serverURL, os.Getenv("GITHUB_REPOSITORY"))
-	} else if IsEnvPresent("CI_PROJECT_URL") {
-		return os.Getenv("CI_PROJECT_URL")
-	} else if IsEnvPresent("BUILD_REPOSITORY_URI") {
-		return os.Getenv("BUILD_REPOSITORY_URI")
-	} else if IsEnvPresent("BITBUCKET_GIT_HTTP_ORIGIN") {
-		return os.Getenv("BITBUCKET_GIT_HTTP_ORIGIN")
-	} else if IsEnvPresent("CIRCLE_REPOSITORY_URL") {
-		return os.Getenv("CIRCLE_REPOSITORY_URL")
-	}
-
-	return ""
-}
-
-func ciVCSPullRequestURL() string {
-	if IsEnvPresent("GITHUB_EVENT_PATH") && os.Getenv("GITHUB_EVENT_NAME") == "pull_request" {
-		b, err := os.ReadFile(os.Getenv("GITHUB_EVENT_PATH"))
-		if err != nil {
-			log.Debugf("Error reading GITHUB_EVENT_PATH file: %v", err)
-		}
-
-		var event struct {
-			PullRequest struct {
-				HTMLURL string `json:"html_url"`
-			} `json:"pull_request"`
-		}
-
-		err = json.Unmarshal(b, &event)
-		if err != nil {
-			log.Debugf("Error reading GITHUB_EVENT_PATH JSON: %v", err)
-		}
-
-		return event.PullRequest.HTMLURL
-	} else if IsEnvPresent("CI_PROJECT_URL") && IsEnvPresent("CI_MERGE_REQUEST_IID") {
-		return fmt.Sprintf("%s/merge_requests/%s", os.Getenv("CI_PROJECT_URL"), os.Getenv("CI_MERGE_REQUEST_IID"))
-	}
 	return ""
 }

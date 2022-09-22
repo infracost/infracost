@@ -28,6 +28,7 @@ AVAILABLE COMMANDS
   diff             Show diff of monthly costs between current and planned state
   help             Help about any command
   output           Combine and output Infracost JSON files in different formats
+  upload           Upload an Infracost JSON file to Infracost Cloud
 
 FLAGS
       --debug-report       Generate a debug report file which can be sent to Infracost team

@@ -149,7 +149,7 @@ func (e *Evaluator) MissingVars() []string {
 	for _, block := range blocks {
 		_, v := e.evaluateVariable(block)
 		if v == errorNoVarValue {
-			missing = append(missing, fmt.Sprintf("'variable.%s'", block.Label()))
+			missing = append(missing, fmt.Sprintf("variable.%s", block.Label()))
 		}
 	}
 
@@ -187,11 +187,18 @@ func (e *Evaluator) Run() (*Module, error) {
 }
 
 func (e *Evaluator) collectModules() *Module {
+	root := e.module
 	for _, definition := range e.moduleCalls {
-		e.module.Modules = append(e.module.Modules, definition.Module)
+		root.Modules = append(root.Modules, definition.Module)
 	}
 
-	return &e.module
+	if v := e.MissingVars(); len(v) > 0 {
+		root.Warnings = []Warning{
+			NewMissingVarsWarning(v),
+		}
+	}
+
+	return &root
 }
 
 // evaluate runs a context evaluation loop until the context values are unchanged. We run this in a loop
@@ -556,7 +563,7 @@ func (e *Evaluator) evaluateResource(b *Block, values map[string]cty.Value) cty.
 
 	if k := b.Key(); k != nil {
 		e.logger.Debugf("expanding block %s to be available for for_each key %s", b.FullName(), *k)
-		valueMap[stripCount(labels[1])] = expandedEachBlockToValue(b, valueMap)
+		valueMap[stripCount(labels[1])] = e.expandedEachBlockToValue(b, valueMap)
 		return cty.ObjectVal(valueMap)
 	}
 
@@ -593,7 +600,7 @@ func expandCountBlockToValue(b *Block, existingValues map[string]cty.Value) cty.
 	return cty.TupleVal(elements)
 }
 
-func expandedEachBlockToValue(b *Block, existingValues map[string]cty.Value) cty.Value {
+func (e *Evaluator) expandedEachBlockToValue(b *Block, existingValues map[string]cty.Value) cty.Value {
 	k := b.Key()
 	if k == nil {
 		return cty.NilVal
@@ -601,10 +608,20 @@ func expandedEachBlockToValue(b *Block, existingValues map[string]cty.Value) cty
 
 	ob := make(map[string]cty.Value)
 
-	eachMap := existingValues[stripCount(b.Labels()[1])]
+	name := b.Labels()[1]
+	eachMap := existingValues[stripCount(name)]
 	if eachMap != cty.NilVal {
-		for e, v := range eachMap.AsValueMap() {
-			ob[e] = v
+		if !eachMap.Type().IsObjectType() && !eachMap.Type().IsMapType() {
+			e.logger.WithFields(logrus.Fields{
+				"block": b.Label(),
+			}).Debugf("skipping unexpected cty value type '%s' for existing for_each context value", eachMap.GoString())
+
+			ob[*k] = b.Values()
+			return cty.ObjectVal(ob)
+		}
+
+		for ek, v := range eachMap.AsValueMap() {
+			ob[ek] = v
 		}
 	}
 

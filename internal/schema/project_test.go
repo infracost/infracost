@@ -1,36 +1,17 @@
 package schema
 
 import (
+	"strings"
 	"testing"
 
+	"github.com/infracost/infracost/internal/vcs"
 	"github.com/stretchr/testify/assert"
 )
-
-func TestNameFromRepoURL(t *testing.T) {
-	tests := []struct {
-		repoURL string
-		name    string
-	}{
-		{"git@github.com:org/repo.git", "org/repo"},
-		{"https://github.com/org/repo.git", "org/repo"},
-		{"git@gitlab.com:org/repo.git", "org/repo"},
-		{"https://gitlab.com/org/repo.git", "org/repo"},
-		{"git@bitbucket.org:org/repo.git", "org/repo"},
-		{"https://user@bitbucket.org/org/repo.git", "org/repo"},
-		{"https://user@dev.azure.com/org/project/_git/repo", "org/project/repo"},
-		{"git@ssh.dev.azure.com:v3/org/project/repo", "org/project/repo"},
-	}
-
-	for _, test := range tests {
-		actual := nameFromRepoURL(test.repoURL)
-		assert.Equal(t, test.name, actual)
-	}
-}
 
 func TestGenerateProjectName(t *testing.T) {
 	type args struct {
 		metadata         *ProjectMetadata
-		projectName      string
+		remote           vcs.Remote
 		dashboardEnabled bool
 	}
 	tests := []struct {
@@ -39,72 +20,52 @@ func TestGenerateProjectName(t *testing.T) {
 		want string
 	}{
 		{
-			name: "azure repo url should show org/project/repo with spaces",
+			name: "repo with remote metadata",
 			args: args{
-				metadata: &ProjectMetadata{
-					VCSRepoURL: "https://infracost-user@dev.azure.com/infracost/my%20project/_git/my%20repo",
-				},
+				metadata: &ProjectMetadata{Path: "path/to/repo/test-repo"},
+				remote:   vcs.Remote{Name: "infracost/remote-repo"},
 			},
-			want: "infracost/my project/my repo",
+			want: "infracost/remote-repo",
 		},
 		{
-			name: "github repo https url",
+			name: "repo with remote metadata and VCS subpath",
 			args: args{
-				metadata: &ProjectMetadata{
-					VCSRepoURL: "https://github.com/infracost/infracost.git",
-				},
+				metadata: &ProjectMetadata{Path: "path/to/repo/test-repo", VCSSubPath: "sub/path"},
+				remote:   vcs.Remote{Name: "infracost/remote-repo"},
 			},
-			want: "infracost/infracost",
+			want: "infracost/remote-repo/sub/path",
 		},
 		{
-			name: "github repo ssh url",
+			name: "repo without empty remote data",
 			args: args{
-				metadata: &ProjectMetadata{
-					VCSRepoURL: "git@github.com:infracost/infracost.git",
-				},
+				metadata: &ProjectMetadata{Path: "path/to/repo/test-repo"},
+				remote:   vcs.Remote{},
 			},
-			want: "infracost/infracost",
-		},
-		{
-			name: "gitlab repo https url",
-			args: args{
-				metadata: &ProjectMetadata{
-					VCSRepoURL: "https://gitlab.com/infracost/infracost-gitlab-ci.git",
-				},
-			},
-			want: "infracost/infracost-gitlab-ci",
-		},
-		{
-			name: "gitlab repo ssh url",
-			args: args{
-				metadata: &ProjectMetadata{
-					VCSRepoURL: "git@gitlab.com:infracost/infracost-gitlab-ci.git",
-				},
-			},
-			want: "infracost/infracost-gitlab-ci",
-		},
-		{
-			name: "bitbucket repo https url",
-			args: args{
-				metadata: &ProjectMetadata{
-					VCSRepoURL: "https://hugorutinfracost@bitbucket.org/infracost/infracost-bitbucket-pipeline.git",
-				},
-			},
-			want: "infracost/infracost-bitbucket-pipeline",
-		},
-		{
-			name: "bitbucket repo ssh url",
-			args: args{
-				metadata: &ProjectMetadata{
-					VCSRepoURL: "git@bitbucket.org:infracost/infracost-bitbucket-pipeline.git",
-				},
-			},
-			want: "infracost/infracost-bitbucket-pipeline",
+			want: "path/to/repo/test-repo",
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			assert.Equalf(t, tt.want, GenerateProjectName(tt.args.metadata, tt.args.projectName, tt.args.dashboardEnabled), "GenerateProjectName(%v, %v, %v)", tt.args.metadata, tt.args.projectName, tt.args.dashboardEnabled)
+			assert.Equalf(
+				t,
+				tt.want,
+				tt.args.metadata.GenerateProjectName(tt.args.remote, tt.args.dashboardEnabled),
+				"GenerateProjectName(%v, %v)",
+				tt.args.remote,
+				tt.args.dashboardEnabled,
+			)
 		})
 	}
+
+	t.Run("repo without remote metadata, Infracost Cloud is enabled", func(t *testing.T) {
+		testArgs := args{
+			metadata:         &ProjectMetadata{Path: "path/to/repo/test-repo"},
+			remote:           vcs.Remote{},
+			dashboardEnabled: true,
+		}
+
+		result := testArgs.metadata.GenerateProjectName(testArgs.remote, testArgs.dashboardEnabled)
+		assert.Len(t, result, len("project_xxxxxxxx"))
+		assert.True(t, strings.HasPrefix(result, "project_"))
+	})
 }

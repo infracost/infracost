@@ -167,7 +167,7 @@ func (p *HCLProvider) LoadResources(usage map[string]*schema.UsageData) ([]*sche
 
 	var projects = make([]*schema.Project, len(jsons))
 	for i, j := range jsons {
-		project, err := p.parseResources(j.path, j.json, usage)
+		project, err := p.parseResources(j, usage)
 		if err != nil {
 			return nil, err
 		}
@@ -178,28 +178,52 @@ func (p *HCLProvider) LoadResources(usage map[string]*schema.UsageData) ([]*sche
 	return projects, nil
 }
 
-func (p *HCLProvider) parseResources(path string, j []byte, usage map[string]*schema.UsageData) (*schema.Project, error) {
-	metadata := config.DetectProjectMetadata(path)
-	metadata.Type = p.Type()
-	p.AddMetadata(metadata)
-	name := schema.GenerateProjectName(metadata, p.ctx.ProjectConfig.Name, p.ctx.RunContext.IsCloudEnabled())
+func (p *HCLProvider) parseResources(parsed hclProject, usage map[string]*schema.UsageData) (*schema.Project, error) {
+	project := p.newProject(parsed)
 
-	project := schema.NewProject(name, metadata)
-
-	pastResources, resources, err := p.planJSONParser.parseJSON(j, usage)
+	partialPastResources, partialResources, err := p.planJSONParser.parseJSON(parsed.json, usage)
 	if err != nil {
 		return project, fmt.Errorf("Error parsing Terraform plan JSON file %w", err)
 	}
 
-	project.PastResources = pastResources
-	project.Resources = resources
+	project.PartialPastResources = partialPastResources
+	project.PartialResources = partialResources
 
 	return project, nil
 }
 
+func (p *HCLProvider) newProject(parsed hclProject) *schema.Project {
+	metadata := config.DetectProjectMetadata(parsed.module.RootPath)
+	metadata.Type = p.Type()
+	p.AddMetadata(metadata)
+
+	if len(parsed.module.Warnings) > 0 {
+		warnings := make([]schema.Warning, len(parsed.module.Warnings))
+
+		for i, warning := range parsed.module.Warnings {
+			warnings[i] = schema.Warning{
+				Code:    int(warning.Code),
+				Message: warning.Title,
+				Data:    warning.Data,
+			}
+
+			ui.PrintWarning(p.ctx.RunContext.ErrWriter, warning.FriendlyMessage)
+		}
+
+		metadata.Warnings = warnings
+	}
+
+	name := p.ctx.ProjectConfig.Name
+	if name == "" {
+		name = metadata.GenerateProjectName(p.ctx.RunContext.VCSMetadata.Remote, p.ctx.RunContext.IsCloudEnabled())
+	}
+
+	return schema.NewProject(name, metadata)
+}
+
 type hclProject struct {
-	path string
-	json []byte
+	json   []byte
+	module *hcl.Module
 }
 
 // LoadPlanJSONs parses the found directories and return the blocks in Terraform plan JSON format.
@@ -216,7 +240,10 @@ func (p *HCLProvider) LoadPlanJSONs() ([]hclProject, error) {
 			return nil, err
 		}
 
-		jsons[i] = hclProject{json: b, path: module.RootPath}
+		jsons[i] = hclProject{
+			json:   b,
+			module: module,
+		}
 	}
 
 	return jsons, nil

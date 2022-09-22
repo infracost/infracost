@@ -3,16 +3,17 @@
 # `infracost breakdown --usage-file infracost-usage.yml [other flags]`
 # See https://infracost.io/usage-file/ for docs
 version: 0.1
-resource_type_usage:
+resource_type_default_usage:
+  aws_cloudwatch_log_group:
+    # storage_gb: 0.0 # Total data stored by CloudWatch logs in GB.
+    monthly_data_ingested_gb: 1000.0 # Monthly data ingested by CloudWatch logs in GB.
+    # monthly_data_scanned_gb: 0.0 # Monthly data scanned by CloudWatch logs insights in GB.
   ##
-  ## The following usage values are all commented-out, you can uncomment resource types and customize as needed.
+  ## The following usage values apply to each resource of the given type, which is useful when you want to define defaults.
+  ## All values are commented-out, you can uncomment resource types and customize as needed.
   ##
-  # aws_cloudwatch_log_group:
-    # monthly_data_ingested_gb: 0.0
-    # storage_gb: 0.0
-    # monthly_data_scanned_gb: 0.0
   # aws_nat_gateway:
-    # monthly_data_processed_gb: 0.0
+    # monthly_data_processed_gb: 0.0 # Monthly data processed by the NAT Gateway in GB.
 resource_usage:
   aws_nat_gateway.example_count[*]:
     monthly_data_processed_gb: 2.0 # Monthly data processed by the NAT Gateway in GB.
@@ -29,7 +30,8 @@ resource_usage:
     # monthly_data_ingested_gb: 0.0 # Monthly data ingested by CloudWatch logs in GB.
     # monthly_data_scanned_gb: 0.0 # Monthly data scanned by CloudWatch logs insights in GB.
   ##
-  ## The following usage values are all commented-out, you can uncomment resources and customize as needed.
+  ## The following usage values apply to individual resources and override any value defined in the resource_type_default_usage section.
+  ## All values are commented-out, you can uncomment resources and customize as needed.
   ##
   # aws_nat_gateway.example_each["media"]:
     # monthly_data_processed_gb: 0.0 # Monthly data processed by the NAT Gateway in GB.

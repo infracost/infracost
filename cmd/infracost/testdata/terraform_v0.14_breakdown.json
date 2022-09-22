@@ -1,13 +1,22 @@
 {
   "version": "0.2",
   "currency": "USD",
+  "metadata": {
+    "infracostCommand": "breakdown",
+    "vcsBranch": "test",
+    "vcsCommitSha": "1234",
+    "vcsCommitAuthorName": "hugo",
+    "vcsCommitAuthorEmail": "hugo@test.com",
+    "vcsCommitTimestamp": "2021-10-11T22:41:00.144866-04:00",
+    "vcsCommitMessage": "mymessage",
+    "vcsRepositoryUrl": "https://github.com/infracost/infracost.git"
+  },
   "projects": [
     {
       "name": "infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json",
       "metadata": {
         "path": "./cmd/infracost/testdata/terraform_v0.14_plan.json",
         "type": "terraform_plan_json",
-        "vcsRepoUrl": "git@github.com:infracost/infracost.git",
         "vcsSubPath": "cmd/infracost/testdata/terraform_v0.14_plan.json"
       },
       "pastBreakdown": {

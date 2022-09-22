@@ -173,21 +173,24 @@ func (p *DirProvider) LoadResources(usage map[string]*schema.UsageData) ([]*sche
 		metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
 		metadata.Type = p.Type()
 		p.AddMetadata(metadata)
-		name := schema.GenerateProjectName(metadata, p.ctx.ProjectConfig.Name, p.ctx.RunContext.IsCloudEnabled())
+		name := p.ctx.ProjectConfig.Name
+		if name == "" {
+			name = metadata.GenerateProjectName(p.ctx.RunContext.VCSMetadata.Remote, p.ctx.RunContext.IsCloudEnabled())
+		}
 
 		project := schema.NewProject(name, metadata)
 
 		parser := NewParser(p.ctx, p.includePastResources)
-		pastResources, resources, err := parser.parseJSON(j, usage)
+		pastpartialResources, partialResources, err := parser.parseJSON(j, usage)
 		if err != nil {
 			return projects, errors.Wrap(err, "Error parsing Terraform JSON")
 		}
 
 		project.HasDiff = !p.UseState
 		if project.HasDiff {
-			project.PastResources = pastResources
+			project.PartialPastResources = pastpartialResources
 		}
-		project.Resources = resources
+		project.PartialResources = partialResources
 
 		projects = append(projects, project)
 	}

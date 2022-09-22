@@ -774,7 +774,14 @@ func (b *Block) Reference() *Reference {
 	}
 
 	parts = append(parts, b.Labels()...)
-	ref, _ := newReference(parts)
+	ref, err := newReference(parts)
+	if err != nil {
+		b.logger.WithError(err).Debugf(
+			"returning empty block reference because we encountered an error generating a new reference",
+		)
+		return &Reference{}
+	}
+
 	return ref
 }
 

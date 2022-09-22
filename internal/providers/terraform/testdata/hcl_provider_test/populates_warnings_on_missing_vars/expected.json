@@ -1,0 +1,74 @@
+{
+  "format_version": "1.0",
+  "terraform_version": "1.1.0",
+  "planned_values": {
+    "root_module": {
+      "resources": [
+        {
+          "address": "aws_eip.eip",
+          "mode": "managed",
+          "type": "aws_eip",
+          "name": "eip",
+          "schema_version": 0,
+          "values": {
+            "arn": "eip-arn",
+            "id": "eip",
+            "network_interface": "test"
+          },
+          "infracost_metadata": {
+            "calls": [
+              {
+                "filename": "testdata/hcl_provider_test/populates_warnings_on_missing_vars/main.tf",
+                "blockName": "aws_eip.eip"
+              }
+            ],
+            "filename": "testdata/hcl_provider_test/populates_warnings_on_missing_vars/main.tf"
+          }
+        }
+      ]
+    }
+  },
+  "resource_changes": [
+    {
+      "address": "aws_eip.eip",
+      "mode": "managed",
+      "type": "aws_eip",
+      "name": "eip",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "arn": "eip-arn",
+          "id": "eip",
+          "network_interface": "test"
+        }
+      }
+    }
+  ],
+  "configuration": {
+    "provider_config": {
+      "aws": {
+        "name": "aws",
+        "expressions": {
+          "region": {
+            "constant_value": "us-east-1"
+          }
+        }
+      }
+    },
+    "root_module": {
+      "resources": [
+        {
+          "address": "aws_eip.eip",
+          "mode": "managed",
+          "type": "aws_eip",
+          "name": "eip",
+          "provider_config_key": "aws",
+          "schema_version": 0
+        }
+      ]
+    }
+  }
+}

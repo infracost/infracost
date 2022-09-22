@@ -124,21 +124,24 @@ func (p *TerragruntProvider) LoadResources(usage map[string]*schema.UsageData) (
 		metadata := config.DetectProjectMetadata(projectPath)
 		metadata.Type = p.Type()
 		p.AddMetadata(metadata)
-		name := schema.GenerateProjectName(metadata, p.ctx.ProjectConfig.Name, p.ctx.RunContext.Config.EnableDashboard)
+		name := p.ctx.ProjectConfig.Name
+		if name == "" {
+			name = metadata.GenerateProjectName(p.ctx.RunContext.VCSMetadata.Remote, p.ctx.RunContext.IsCloudEnabled())
+		}
 
 		project := schema.NewProject(name, metadata)
 
 		parser := NewParser(p.ctx, p.includePastResources)
-		pastResources, resources, err := parser.parseJSON(outs[i], usage)
+		partialPastResources, partialResources, err := parser.parseJSON(outs[i], usage)
 		if err != nil {
 			return projects, errors.Wrap(err, "Error parsing Terraform JSON")
 		}
 
 		project.HasDiff = !p.UseState
 		if project.HasDiff {
-			project.PastResources = pastResources
+			project.PartialPastResources = partialPastResources
 		}
-		project.Resources = resources
+		project.PartialResources = partialResources
 
 		projects = append(projects, project)
 	}

@@ -1,21 +1,23 @@
 {
   "version": "0.2",
+  "metadata": {
+    "infracostCommand": "output",
+    "vcsBranch": "test",
+    "vcsCommitSha": "1234",
+    "vcsCommitAuthorName": "hugo",
+    "vcsCommitAuthorEmail": "hugo@test.com",
+    "vcsCommitTimestamp": "REPLACED_TIME",
+    "vcsCommitMessage": "mymessage",
+    "vcsRepositoryUrl": "https://github.com/infracost/infracost.git"
+  },
   "currency": "USD",
   "projects": [
     {
       "name": "infracost/infracost/cmd/infracost/testdata",
       "metadata": {
         "path": "./cmd/infracost/testdata/",
-        "infracostCommand": "output",
         "type": "terraform_dir",
         "terraformWorkspace": "default",
-        "branch": "test",
-        "commit": "1234",
-        "commitAuthorName": "hugo",
-        "commitAuthorEmail": "hugo@test.com",
-        "commitTimestamp": "REPLACED_TIME",
-        "commitMessage": "mymessage",
-        "vcsRepoUrl": "git@github.com:infracost/infracost.git",
         "vcsSubPath": "cmd/infracost/testdata"
       },
       "pastBreakdown": {
@@ -517,15 +519,7 @@
       "name": "infracost/infracost/cmd/infracost/testdata/azure_firewall_plan.json",
       "metadata": {
         "path": "./cmd/infracost/testdata/azure_firewall_plan.json",
-        "infracostCommand": "output",
         "type": "terraform_plan_json",
-        "branch": "test",
-        "commit": "1234",
-        "commitAuthorName": "hugo",
-        "commitAuthorEmail": "hugo@test.com",
-        "commitTimestamp": "REPLACED_TIME",
-        "commitMessage": "mymessage",
-        "vcsRepoUrl": "https://github.com/infracost/infracost.git",
         "vcsSubPath": "cmd/infracost/testdata/azure_firewall_plan.json"
       },
       "pastBreakdown": {

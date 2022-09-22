@@ -3,80 +3,131 @@
 # `infracost breakdown --usage-file infracost-usage.yml [other flags]`
 # See https://infracost.io/usage-file/ for docs
 version: 0.1
-resource_type_usage:
+# resource_type_default_usage:
   ##
-  ## The following usage values are all commented-out, you can uncomment resource types and customize as needed.
+  ## The following usage values apply to each resource of the given type, which is useful when you want to define defaults.
+  ## All values are commented-out, you can uncomment resource types and customize as needed.
   ##
+  # aws_cloudfront_distribution:
+    # monthly_data_transfer_to_internet_gb:
+      # us: 0 # United States, Mexico, Canada
+      # europe: 0 # Europe, Israel
+      # south_africa: 0 # South Africa, Kenya, Middle East
+      # south_america: 0 # South America
+      # japan: 0 # Japan
+      # australia: 0 # Australia, New Zealand
+      # asia_pacific: 0 # Hong Kong, Philippines, Singapore, South Korea, Taiwan, Thailand
+      # india: 0 # India
+    # monthly_data_transfer_to_origin_gb:
+      # us: 0 # United States, Mexico, Canada
+      # europe: 0 # Europe, Israel
+      # south_africa: 0 # South Africa, Kenya, Middle East
+      # south_america: 0 # South America
+      # japan: 0 # Japan
+      # australia: 0 # Australia, New Zealand
+      # asia_pacific: 0 # Hong Kong, Philippines, Singapore, South Korea, Taiwan, Thailand
+      # india: 0 # India
+    # monthly_http_requests:
+      # us: 0 # United States, Mexico, Canada
+      # europe: 0 # Europe, Israel
+      # south_africa: 0 # South Africa, Kenya, Middle East
+      # south_america: 0 # South America
+      # japan: 0 # Japan
+      # australia: 0 # Australia, New Zealand
+      # asia_pacific: 0 # Hong Kong, Philippines, Singapore, South Korea, Taiwan, Thailand
+      # india: 0 # India
+    # monthly_https_requests:
+      # us: 0 # United States, Mexico, Canada
+      # europe: 0 # Europe, Israel
+      # south_africa: 0 # South Africa, Kenya, Middle East
+      # south_america: 0 # South America
+      # japan: 0 # Japan
+      # australia: 0 # Australia, New Zealand
+      # asia_pacific: 0 # Hong Kong, Philippines, Singapore, South Korea, Taiwan, Thailand
+      # india: 0 # India
+    # monthly_shield_requests:
+      # us: 0 # United States
+      # europe: 0 # Europe
+      # south_america: 0 # South America
+      # japan: 0 # Japan
+      # australia: 0 # Australia
+      # singapore: 0 # Singapore
+      # south_korea: 0 # South Korea
+      # india: 0 # India
+    # monthly_invalidation_requests: 0 # Monthly number of invalidation requests.
+    # monthly_encryption_requests: 0 # Monthly number of field level encryption requests.
+    # monthly_log_lines: 0 # Monthly number of real-time log lines.
+    # custom_ssl_certificates: 0 # Number of dedicated IP custom SSL certificates.
   # aws_instance:
-    # operating_system: linux
-    # reserved_instance_type: ""
-    # reserved_instance_term: ""
-    # reserved_instance_payment_option: ""
-    # monthly_cpu_credit_hrs: 0
-    # vcpu_count: 0
-    # monthly_hrs: 730.0
+    # operating_system: linux # Override the operating system of the instance, can be: linux, windows, suse, rhel.
+    # reserved_instance_type: "" # Offering class for Reserved Instances, can be: convertible, standard.
+    # reserved_instance_term: "" # Term for Reserved Instances, can be: 1_year, 3_year.
+    # reserved_instance_payment_option: "" # Payment option for Reserved Instances, can be: no_upfront, partial_upfront, all_upfront.
+    # monthly_cpu_credit_hrs: 0 # Number of hours in the month where the instance is expected to burst. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
+    # vcpu_count: 0 # Number of the vCPUs for the instance type. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
+    # monthly_hrs: 730.0 # Monthly number of hours the instance ran for.
   # aws_s3_bucket:
-    # object_tags: 0
+    # object_tags: 0 # Total object tags. Only for AWS provider V3.
     # standard:
-      # storage_gb: 0.0
-      # monthly_tier_1_requests: 0
-      # monthly_tier_2_requests: 0
-      # monthly_select_data_scanned_gb: 0.0
-      # monthly_select_data_returned_gb: 0.0
+      # storage_gb: 0.0 # Total storage in GB.
+      # monthly_tier_1_requests: 0 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
+      # monthly_tier_2_requests: 0 # Monthly GET, SELECT, and all other requests (Tier 2).
+      # monthly_select_data_scanned_gb: 0.0 # Monthly data scanned by S3 Select in GB.
+      # monthly_select_data_returned_gb: 0.0 # Monthly data returned by S3 Select in GB.
     # intelligent_tiering:
-      # frequent_access_storage_gb: 0.0
-      # infrequent_access_storage_gb: 0.0
+      # frequent_access_storage_gb: 0.0 # Total storage for Frequent Access Tier in GB.
+      # infrequent_access_storage_gb: 0.0 # Total storage for Infrequent Access Tier in GB.
+      # monitored_objects: 0 # Total objects monitored by the Intelligent Tiering.
+      # monthly_tier_1_requests: 0 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
+      # monthly_tier_2_requests: 0 # Monthly GET, SELECT, and all other requests (Tier 2).
+      # monthly_lifecycle_transition_requests: 0 # Monthly Lifecycle Transition requests.
+      # monthly_select_data_scanned_gb: 0.0 # Monthly data scanned by S3 Select in GB.
+      # monthly_select_data_returned_gb: 0.0 # Monthly data returned by S3 Select in GB.
+      # early_delete_gb: 0.0 # If an archive is deleted within 1 months of being uploaded, you will be charged an early deletion fee per GB.
       # archive_access_storage_gb: 0.0
       # deep_archive_access_storage_gb: 0.0
-      # monitored_objects: 0
-      # monthly_tier_1_requests: 0
-      # monthly_tier_2_requests: 0
-      # monthly_lifecycle_transition_requests: 0
-      # monthly_select_data_scanned_gb: 0.0
-      # monthly_select_data_returned_gb: 0.0
-      # early_delete_gb: 0.0
     # standard_infrequent_access:
-      # storage_gb: 0.0
-      # monthly_tier_1_requests: 0
-      # monthly_tier_2_requests: 0
-      # monthly_lifecycle_transition_requests: 0
-      # monthly_data_retrieval_gb: 0.0
-      # monthly_select_data_scanned_gb: 0.0
-      # monthly_select_data_returned_gb: 0.0
+      # storage_gb: 0.0 # Total storage in GB.
+      # monthly_tier_1_requests: 0 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
+      # monthly_tier_2_requests: 0 # Monthly GET, SELECT, and all other requests (Tier 2).
+      # monthly_lifecycle_transition_requests: 0 # Monthly Lifecycle Transition requests.
+      # monthly_data_retrieval_gb: 0.0 # Monthly data retrievals in GB
+      # monthly_select_data_scanned_gb: 0.0 # Monthly data scanned by S3 Select in GB.
+      # monthly_select_data_returned_gb: 0.0 # Monthly data returned by S3 Select in GB.
     # one_zone_infrequent_access:
-      # storage_gb: 0.0
-      # monthly_tier_1_requests: 0
-      # monthly_tier_2_requests: 0
-      # monthly_lifecycle_transition_requests: 0
-      # monthly_data_retrieval_gb: 0.0
-      # monthly_select_data_scanned_gb: 0.0
-      # monthly_select_data_returned_gb: 0.0
+      # storage_gb: 0.0 # Total storage in GB.
+      # monthly_tier_1_requests: 0 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
+      # monthly_tier_2_requests: 0 # Monthly GET, SELECT, and all other requests (Tier 2).
+      # monthly_lifecycle_transition_requests: 0 # Monthly Lifecycle Transition requests.
+      # monthly_data_retrieval_gb: 0.0 # Monthly data retrievals in GB
+      # monthly_select_data_scanned_gb: 0.0 # Monthly data scanned by S3 Select in GB.
+      # monthly_select_data_returned_gb: 0.0 # Monthly data returned by S3 Select in GB.
     # glacier_flexible_retrieval:
-      # storage_gb: 0
-      # monthly_tier_1_requests: 0
-      # monthly_tier_2_requests: 0
-      # monthly_lifecycle_transition_requests: 0
-      # monthly_standard_data_retrieval_requests: 0
-      # monthly_standard_data_retrieval_gb: 0.0
-      # monthly_standard_select_data_scanned_gb: 0.0
-      # monthly_standard_select_data_returned_gb: 0.0
-      # monthly_expedited_data_retrieval_requests: 0
-      # monthly_expedited_data_retrieval_gb: 0.0
-      # monthly_expedited_select_data_scanned_gb: 0.0
-      # monthly_expedited_select_data_returned_gb: 0.0
-      # monthly_bulk_select_data_scanned_gb: 0.0
-      # monthly_bulk_select_data_returned_gb: 0.0
-      # early_delete_gb: 0.0
+      # storage_gb: 0 # Total storage in GB.
+      # monthly_tier_1_requests: 0 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
+      # monthly_tier_2_requests: 0 # Monthly GET, SELECT, and all other requests (Tier 2).
+      # monthly_lifecycle_transition_requests: 0 # Monthly Lifecycle Transition requests.
+      # monthly_standard_select_data_scanned_gb: 0.0 # Monthly data scanned by S3 Select in GB (for standard level of S3 Glacier).
+      # monthly_standard_select_data_returned_gb: 0.0 # Monthly data returned by S3 Select in GB (for standard level of S3 Glacier).
+      # monthly_bulk_select_data_scanned_gb: 0.0 # Monthly data scanned by S3 Select in GB (for bulk level of S3 Glacier)
+      # monthly_bulk_select_data_returned_gb: 0.0 # Monthly data returned by S3 Select in GB (for bulk level of S3 Glacier)
+      # monthly_expedited_select_data_scanned_gb: 0.0 # Monthly data scanned by S3 Select in GB (for expedited level of S3 Glacier)
+      # monthly_expedited_select_data_returned_gb: 0.0 # Monthly data returned by S3 Select in GB (for expedited level of S3 Glacier)
+      # monthly_standard_data_retrieval_requests: 0 # Monthly data Retrieval requests (for standard level of S3 Glacier).
+      # monthly_expedited_data_retrieval_requests: 0 # Monthly data Retrieval requests (for expedited level of S3 Glacier).
+      # monthly_standard_data_retrieval_gb: 0.0 # Monthly data retrievals in GB (for standard level of S3 Glacier).
+      # monthly_expedited_data_retrieval_gb: 0.0 # Monthly data retrievals in GB (for expedited level of S3 Glacier).
+      # early_delete_gb: 0.0 # If an archive is deleted within 3 months of being uploaded, you will be charged an early deletion fee per GB.
     # glacier_deep_archive:
-      # storage_gb: 0.0
-      # monthly_tier_1_requests: 0
-      # monthly_tier_2_requests: 0
-      # monthly_lifecycle_transition_requests: 0
-      # monthly_standard_data_retrieval_requests: 0
-      # monthly_standard_data_retrieval_gb: 0.0
-      # monthly_bulk_data_retrieval_requests: 0
-      # monthly_bulk_data_retrieval_gb: 0.0
-      # early_delete_gb: 0.0
+      # storage_gb: 0.0 # Total storage in GB.
+      # monthly_tier_1_requests: 0 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
+      # monthly_tier_2_requests: 0 # Monthly GET, SELECT, and all other requests (Tier 2).
+      # monthly_lifecycle_transition_requests: 0 # Monthly Lifecycle Transition requests.
+      # monthly_standard_data_retrieval_requests: 0 # Monthly data Retrieval requests (for standard level of S3 Glacier).
+      # monthly_bulk_data_retrieval_requests: 0 # Monthly data Retrieval requests (for bulk level of S3 Glacier).
+      # monthly_standard_data_retrieval_gb: 0.0 # Monthly data retrievals in GB (for standard level of S3 Glacier).
+      # monthly_bulk_data_retrieval_gb: 0.0 # Monthly data retrievals in GB (for bulk level of S3 Glacier).
+      # early_delete_gb: 0.0 # If an archive is deleted within 6 months of being uploaded, you will be charged an early deletion fee per GB.
 resource_usage:
   aws_instance.instance_counted[*]:
     operating_system: windows # Override the operating system of the instance, can be: linux, windows, suse, rhel.
@@ -95,7 +146,8 @@ resource_usage:
     # vcpu_count: 0 # Number of the vCPUs for the instance type. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
     # monthly_hrs: 730.0 # Monthly number of hours the instance ran for.
   ##
-  ## The following usage values are all commented-out, you can uncomment resources and customize as needed.
+  ## The following usage values apply to individual resources and override any value defined in the resource_type_default_usage section.
+  ## All values are commented-out, you can uncomment resources and customize as needed.
   ##
   # aws_instance.instance_counted[1]:
     # operating_system: linux # Override the operating system of the instance, can be: linux, windows, suse, rhel.
