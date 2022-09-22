@@ -45,6 +45,12 @@ var ResourceInstanceUsageSchema = []*schema.UsageItem{
 	{Key: "appid_advanced_authentications", DefaultValue: 0, ValueType: schema.Int64},
 }
 
+var ResourceInstanceCostMap map[string]ResourceCostComponentsFunc = map[string]ResourceCostComponentsFunc{
+	"kms":             GetKMSCostComponents,
+	"secrets-manager": GetSecretsManagerCostComponents,
+	"appid":           GetAppIDCostComponents,
+}
+
 // PopulateUsage parses the u schema.UsageData into the ResourceInstance.
 // It uses the `infracost_usage` struct tags to populate data into the ResourceInstance.
 func (r *ResourceInstance) PopulateUsage(u *schema.UsageData) {
@@ -274,14 +280,9 @@ func GetAppIDCostComponents(r *ResourceInstance) []*schema.CostComponent {
 // This method is called after the resource is initialised by an IaC provider.
 // See providers folder for more information.
 func (r *ResourceInstance) BuildResource() *schema.Resource {
-	resourceCostMap := make(map[string]ResourceCostComponentsFunc)
-	resourceCostMap["kms"] = GetKMSCostComponents
-	resourceCostMap["secrets-manager"] = GetSecretsManagerCostComponents
-	resourceCostMap["appid"] = GetAppIDCostComponents
+	costComponentsFunc, ok := ResourceInstanceCostMap[r.Service]
 
-	costComponentsFunc, ok := resourceCostMap[r.Service]
-
-	if ok == false {
+	if !ok {
 		return &schema.Resource{
 			Name:        r.Address,
 			UsageSchema: ResourceInstanceUsageSchema,
