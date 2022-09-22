@@ -69,46 +69,6 @@
       "additionalProperties": false,
       "type": "object"
     },
-    "PriceTier": {
-      "required": [
-        "Name",
-        "Price",
-        "StartUsageAmount",
-        "EndUsageAmount",
-        "HourlyQuantity",
-        "MonthlyQuantity",
-        "MonthlyCost",
-        "HourlyCost"
-      ],
-      "properties": {
-        "Name": {
-          "type": "string"
-        },
-        "Price": {
-          "type": ["string", "null"]
-        },
-        "StartUsageAmount": {
-          "type": ["string", "null"]
-        },
-        "EndUsageAmount": {
-          "type": ["string", "null"]
-        },
-        "HourlyQuantity": {
-          "type": ["string", "null"]
-        },
-        "MonthlyQuantity": {
-          "type": ["string", "null"]
-        },
-        "MonthlyCost": {
-          "type": ["string", "null"]
-        },
-        "HourlyCost": {
-          "type": ["string", "null"]
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    },
     "Metadata": {
       "required": [
         "infracostCommand",
@@ -165,6 +125,46 @@
         },
         "vcsPullRequestId": {
           "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "PriceTier": {
+      "required": [
+        "Name",
+        "Price",
+        "StartUsageAmount",
+        "EndUsageAmount",
+        "HourlyQuantity",
+        "MonthlyQuantity",
+        "MonthlyCost",
+        "HourlyCost"
+      ],
+      "properties": {
+        "Name": {
+          "type": "string"
+        },
+        "Price": {
+          "type": ["string", "null"]
+        },
+        "StartUsageAmount": {
+          "type": ["string", "null"]
+        },
+        "EndUsageAmount": {
+          "type": ["string", "null"]
+        },
+        "HourlyQuantity": {
+          "type": ["string", "null"]
+        },
+        "MonthlyQuantity": {
+          "type": ["string", "null"]
+        },
+        "MonthlyCost": {
+          "type": ["string", "null"]
+        },
+        "HourlyCost": {
+          "type": ["string", "null"]
         }
       },
       "additionalProperties": false,
