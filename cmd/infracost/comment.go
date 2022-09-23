@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -10,8 +11,7 @@ import (
 	"github.com/open-policy-agent/opa/rego"
 	"github.com/spf13/cobra"
 
-	"github.com/pkg/errors"
-
+	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/ui"
@@ -56,21 +56,22 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 	}
 
 	combined, err := output.Combine(inputs)
-	if err != nil {
+	if errors.As(err, &clierror.WarningError{}) {
+		ui.PrintWarningf(cmd.ErrOrStderr(), err.Error())
+	} else if err != nil {
 		return nil, err
 	}
+
 	combined.IsCIRun = ctx.IsCIRun()
 
 	dryRun, _ := cmd.Flags().GetBool("dry-run")
 	if ctx.IsCloudEnabled() && !dryRun {
 		if ctx.Config.IsSelfHosted() {
 			ui.PrintWarning(cmd.ErrOrStderr(), "Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
+		} else {
+			combined.Metadata.InfracostCommand = "comment"
+			combined.RunID, combined.ShareURL = shareCombinedRun(ctx, combined, inputs)
 		}
-
-		for _, p := range combined.Projects {
-			p.Metadata.InfracostCommand = "comment"
-		}
-		combined.RunID, combined.ShareURL = shareCombinedRun(ctx, combined, inputs)
 	}
 
 	var policyChecks output.PolicyCheck

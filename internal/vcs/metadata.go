@@ -9,6 +9,7 @@ import (
 	"net/url"
 	"os"
 	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -25,6 +26,7 @@ import (
 
 var (
 	StubMetadata = Metadata{
+		Remote: urlStringToRemote("https://github.com/infracost/infracost"),
 		Branch: Branch{
 			Name: "stub-branch",
 		},
@@ -43,7 +45,184 @@ var (
 	mergeCommitRegxp = regexp.MustCompile(`(?i)^merge\s([\d\w]+)\sinto\s[\d\w]+`)
 	startsWithMerge  = regexp.MustCompile(`(?i)^merge`)
 	versionRegxp     = regexp.MustCompile(`^v\d/`)
+
+	allowedProviders = map[string]struct{}{
+		"github": {}, "gitlab": {}, "azure_repos": {}, "bitbucket": {},
+	}
 )
+
+func getEnv(key string) string {
+	return strings.TrimSpace(os.Getenv(key))
+}
+
+func buildEnvProvidedMetadata() Metadata {
+	remote := urlStringToRemote(getEnv("INFRACOST_VCS_REPOSITORY_URL"))
+	m := Metadata{
+		Remote: remote,
+		Branch: Branch{
+			Name: getEnv("INFRACOST_VCS_BRANCH"),
+		},
+		Commit:      buildDefaultCommit(),
+		PullRequest: buildDefaultPR(),
+		Pipeline:    &Pipeline{ID: getEnv("INFRACOST_VCS_PIPELINE_RUN_ID")},
+	}
+
+	if m.PullRequest != nil && m.PullRequest.VCSProvider == "" {
+		m.PullRequest.VCSProvider = vcsProviderFromHost(remote.Host)
+	}
+
+	return m
+}
+
+func mergeEnvProvidedMetadata(m Metadata) Metadata {
+	envMeta := buildEnvProvidedMetadata()
+	if envMeta.Remote.Host != "" {
+		m.Remote = envMeta.Remote
+	}
+
+	m.Branch = Branch{
+		Name: useEnvValueOrParsedString(envMeta.Branch.Name, m.Branch.Name),
+	}
+
+	m.Commit = Commit{
+		SHA:         useEnvValueOrParsedString(envMeta.Commit.SHA, m.Commit.SHA),
+		AuthorName:  useEnvValueOrParsedString(envMeta.Commit.AuthorName, m.Commit.AuthorName),
+		AuthorEmail: useEnvValueOrParsedString(envMeta.Commit.AuthorEmail, m.Commit.AuthorEmail),
+		Time:        useEnvValueOrParsedTime(envMeta.Commit.Time, m.Commit.Time),
+		Message:     useEnvValueOrParsedString(envMeta.Commit.Message, m.Commit.Message),
+	}
+
+	if envMeta.PullRequest != nil {
+		if m.PullRequest == nil {
+			m.PullRequest = envMeta.PullRequest
+		} else {
+			m.PullRequest = &PullRequest{
+				ID:           useEnvValueOrParsedString(envMeta.PullRequest.ID, m.PullRequest.ID),
+				VCSProvider:  useEnvValueOrParsedString(envMeta.PullRequest.VCSProvider, m.PullRequest.VCSProvider),
+				Title:        useEnvValueOrParsedString(envMeta.PullRequest.Title, m.PullRequest.Title),
+				Author:       useEnvValueOrParsedString(envMeta.PullRequest.Author, m.PullRequest.Author),
+				SourceBranch: useEnvValueOrParsedString(envMeta.PullRequest.SourceBranch, m.PullRequest.SourceBranch),
+				BaseBranch:   useEnvValueOrParsedString(envMeta.PullRequest.BaseBranch, m.PullRequest.BaseBranch),
+				URL:          useEnvValueOrParsedString(envMeta.PullRequest.URL, m.PullRequest.URL),
+			}
+		}
+	}
+
+	if m.PullRequest != nil && m.PullRequest.VCSProvider == "" {
+		m.PullRequest.VCSProvider = vcsProviderFromHost(m.Remote.Host)
+	}
+
+	if envMeta.Pipeline.ID != "" {
+		m.Pipeline = &Pipeline{
+			ID: envMeta.Pipeline.ID,
+		}
+	}
+
+	return m
+}
+
+func useEnvValueOrParsedTime(envVal time.Time, parsedVal time.Time) time.Time {
+	if !envVal.IsZero() {
+		return envVal
+	}
+
+	return parsedVal
+}
+
+func useEnvValueOrParsedString(envVal string, parsedVal string) string {
+	if envVal != "" {
+		return envVal
+	}
+
+	return parsedVal
+}
+
+func buildDefaultPR() *PullRequest {
+	if !keysSet(
+		"INFRACOST_VCS_PULL_REQUEST_ID",
+		"INFRACOST_VCS_PROVIDER",
+		"INFRACOST_VCS_PULL_REQUEST_TITLE",
+		"INFRACOST_VCS_PULL_REQUEST_AUTHOR",
+		"INFRACOST_VCS_BRANCH",
+		"INFRACOST_VCS_BASE_BRANCH",
+		"INFRACOST_VCS_PULL_REQUEST_URL",
+	) {
+		return nil
+	}
+
+	provider := strings.ToLower(getEnv("INFRACOST_VCS_PROVIDER"))
+	if _, ok := allowedProviders[provider]; !ok && provider != "" {
+		logging.Logger.Warnf("provided value for INFRACOST_VCS_PROVIDER '%s' is not valid. Setting vcsProvider to an empty string", provider)
+		provider = ""
+	}
+
+	prURL := getEnv("INFRACOST_VCS_PULL_REQUEST_URL")
+	prID := getEnv("INFRACOST_VCS_PULL_REQUEST_ID")
+	if prURL != "" && prID == "" {
+		prID = getLastURLPart(prURL)
+	}
+
+	return &PullRequest{
+		ID:           prID,
+		VCSProvider:  provider,
+		Title:        getEnv("INFRACOST_VCS_PULL_REQUEST_TITLE"),
+		Author:       getEnv("INFRACOST_VCS_PULL_REQUEST_AUTHOR"),
+		SourceBranch: getEnv("INFRACOST_VCS_BRANCH"),
+		BaseBranch:   getEnv("INFRACOST_VCS_BASE_BRANCH"),
+		URL:          prURL,
+	}
+}
+
+func getLastURLPart(url string) string {
+	pieces := strings.Split(url, "/")
+	if len(pieces) == 0 {
+		return url
+	}
+
+	return pieces[len(pieces)-1]
+}
+
+func keysSet(keys ...string) bool {
+	for _, key := range keys {
+		if getEnv(key) != "" {
+			return true
+		}
+	}
+
+	return false
+}
+
+func buildDefaultCommit() Commit {
+	return Commit{
+		SHA:         getEnv("INFRACOST_VCS_COMMIT_SHA"),
+		AuthorName:  getEnv("INFRACOST_VCS_COMMIT_AUTHOR_NAME"),
+		AuthorEmail: getEnv("INFRACOST_VCS_COMMIT_AUTHOR_EMAIL"),
+		Time:        envToTime("INFRACOST_VCS_COMMIT_TIMESTAMP"),
+		Message:     getEnv("INFRACOST_VCS_COMMIT_MESSAGE"),
+	}
+}
+
+func envToTime(key string) time.Time {
+	env := getEnv(key)
+	if env == "" {
+		return time.Time{}
+	}
+
+	i, err := strconv.ParseInt(env, 10, 64)
+	if err != nil {
+		logging.Logger.WithError(err).Debugf("could not parse 'INFRACOST_COMMIT_TIMESTAMP' value '%s' as int64 timestamp", env)
+		return time.Time{}
+	}
+
+	t := time.Unix(i, 0)
+	// if the year is below these values then the date is considered invalid and will throw a
+	// json marshall error. In this situation we just return a zero time.
+	if y := t.Year(); y < 0 || y >= 10000 {
+		return time.Time{}
+	}
+
+	return t.UTC()
+}
 
 type keyMutex struct {
 	mutexes sync.Map // Zero value is empty and ready for use
@@ -63,6 +242,7 @@ func (m *keyMutex) Lock(key string) func() {
 type metadataFetcher struct {
 	mu     *keyMutex
 	client *http.Client
+	test   *bool
 }
 
 func newMetadataFetcher() *metadataFetcher {
@@ -72,20 +252,39 @@ func newMetadataFetcher() *metadataFetcher {
 	}
 }
 
+func (f *metadataFetcher) isTest() bool {
+	if f.test != nil {
+		return *f.test
+	}
+
+	return getEnv("INFRACOST_ENV") == "test" || strings.HasSuffix(os.Args[0], ".test")
+}
+
 // Get fetches VCS metadata for the given environment.
 // It takes a path argument which should point to the filesystem directory for that should
 // be used as the VCS project. This is normally the path to the `.git` directory. If no `.git`
 // directory is found in path, Get will traverse parent directories to try and determine VCS metadata.
-//
 // Get also supplements base VCS metadata with CI specific data if it can be found.
-func (f *metadataFetcher) Get(path string) (Metadata, error) {
-	if isTest() {
+//
+// When Get encounters an error fetching metadata it will return a default that contains basic Metadata information.
+func (f *metadataFetcher) Get(path string) (m Metadata, err error) {
+	defer func() {
+		if f.isTest() {
+			return
+		}
+
+		// let's now merge any user provide metadata from environment variables.
+		// User provided values will always override the parsed metadata.
+		m = mergeEnvProvidedMetadata(m)
+	}()
+
+	if f.isTest() {
 		logging.Logger.Debug("returning stub metadata as Infracost is running in test mode")
 		return StubMetadata, nil
 	}
 
-	_, ok := lookupEnv("GITHUB_ACTIONS")
-	if ok {
+	v, ok := lookupEnv("GITHUB_ACTIONS")
+	if ok && v != "" {
 		logging.Logger.Debug("fetching GitHub action VCS metadata")
 		return f.getGithubMetadata(path)
 	}
@@ -96,7 +295,7 @@ func (f *metadataFetcher) Get(path string) (Metadata, error) {
 		return f.getGitlabMetadata(path)
 	}
 
-	v, ok := lookupEnv("BUILD_REPOSITORY_PROVIDER")
+	v, ok = lookupEnv("BUILD_REPOSITORY_PROVIDER")
 	if ok {
 		if v == "github" {
 			logging.Logger.Debug("fetching GitHub VCS metadata from Azure DevOps pipeline")
@@ -125,12 +324,6 @@ func (f *metadataFetcher) Get(path string) (Metadata, error) {
 		return f.getAtlantisMetadata(path)
 	}
 
-	_, ok = lookupEnv("TFC_RUN_ID")
-	if ok {
-		logging.Logger.Debug("fetching TFC run task metadata")
-		return f.getTFCMetadata(path)
-	}
-
 	logging.Logger.Debug("could not detect a specific CI system, fetching local Git metadata")
 	return f.getLocalGitMetadata(path)
 }
@@ -151,10 +344,6 @@ func lookupEnv(name string) (string, bool) {
 	return strings.TrimSpace(strings.ToLower(v)), ok
 }
 
-func isTest() bool {
-	return os.Getenv("INFRACOST_ENV") == "test" || strings.HasSuffix(os.Args[0], ".test")
-}
-
 func (f *metadataFetcher) getGitlabMetadata(path string) (Metadata, error) {
 	m, err := f.getLocalGitMetadata(path)
 	if err != nil {
@@ -162,25 +351,26 @@ func (f *metadataFetcher) getGitlabMetadata(path string) (Metadata, error) {
 	}
 
 	if m.Branch.Name == "HEAD" {
-		m.Branch.Name = os.Getenv("CI_MERGE_REQUEST_SOURCE_BRANCH_NAME")
+		m.Branch.Name = getEnv("CI_MERGE_REQUEST_SOURCE_BRANCH_NAME")
 	}
 
-	m.Pipeline = &Pipeline{ID: os.Getenv("CI_PIPELINE_ID")}
+	m.Remote = urlStringToRemote(getEnv("CI_PROJECT_URL"))
+	m.Pipeline = &Pipeline{ID: getEnv("CI_PIPELINE_ID")}
 	m.PullRequest = &PullRequest{
 		VCSProvider:  "gitlab",
-		ID:           os.Getenv("CI_MERGE_REQUEST_IID"),
-		Title:        os.Getenv("CI_MERGE_REQUEST_TITLE"),
-		Author:       os.Getenv("CI_COMMIT_AUTHOR"),
-		SourceBranch: os.Getenv("CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"),
-		BaseBranch:   os.Getenv("CI_MERGE_REQUEST_TARGET_BRANCH_NAME"),
-		URL:          os.Getenv("CI_MERGE_REQUEST_PROJECT_URL") + "/-/merge_requests/" + os.Getenv("CI_MERGE_REQUEST_IID"),
+		ID:           getEnv("CI_MERGE_REQUEST_IID"),
+		Title:        getEnv("CI_MERGE_REQUEST_TITLE"),
+		Author:       getEnv("CI_COMMIT_AUTHOR"),
+		SourceBranch: getEnv("CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"),
+		BaseBranch:   getEnv("CI_MERGE_REQUEST_TARGET_BRANCH_NAME"),
+		URL:          getEnv("CI_PROJECT_URL") + "/merge_requests/" + getEnv("CI_MERGE_REQUEST_IID"),
 	}
 
 	return m, nil
 }
 
 func (f *metadataFetcher) getGithubMetadata(path string) (Metadata, error) {
-	event, err := os.ReadFile(os.Getenv("GITHUB_EVENT_PATH"))
+	event, err := os.ReadFile(getEnv("GITHUB_EVENT_PATH"))
 	if err != nil {
 		return Metadata{}, fmt.Errorf("could not read the GitHub event file %w", err)
 	}
@@ -266,7 +456,10 @@ func (f *metadataFetcher) getGithubMetadata(path string) (Metadata, error) {
 		m.Branch.Name = gjson.GetBytes(event, "pull_request.head.ref").String()
 	}
 
-	m.Pipeline = &Pipeline{ID: os.Getenv("GITHUB_RUN_ID")}
+	remote := gjson.GetBytes(event, "repository.html_url").String()
+
+	m.Remote = urlStringToRemote(remote)
+	m.Pipeline = &Pipeline{ID: getEnv("GITHUB_RUN_ID")}
 	m.PullRequest = &PullRequest{
 		VCSProvider:  "github",
 		ID:           gjson.GetBytes(event, "pull_request.number").String(),
@@ -297,16 +490,15 @@ func (f *metadataFetcher) getLocalGitMetadata(path string) (Metadata, error) {
 	}
 
 	var remote string
-	rms, err := r.Remotes()
+	rem, err := r.Remote("origin")
 	if err != nil {
 		logging.Logger.WithError(err).Debug("failed to ls remotes")
 	}
 
-	for _, rem := range rms {
+	if rem != nil {
 		urls := rem.Config().URLs
 		if len(urls) > 0 {
 			remote = urls[0]
-			break
 		}
 	}
 
@@ -332,16 +524,17 @@ func (f *metadataFetcher) getAzureReposMetadata(path string) (Metadata, error) {
 
 	res := f.getAzureReposPRInfo()
 
-	m.Pipeline = &Pipeline{ID: os.Getenv("BUILD_BUILDID")}
-	pullID := os.Getenv("SYSTEM_PULLREQUEST_PULLREQUESTID")
+	m.Remote = urlStringToRemote(os.Getenv("BUILD_REPOSITORY_URI"))
+	m.Pipeline = &Pipeline{ID: getEnv("BUILD_BUILDID")}
+	pullID := getEnv("SYSTEM_PULLREQUEST_PULLREQUESTID")
 	m.PullRequest = &PullRequest{
 		ID:           pullID,
 		VCSProvider:  "azure_devops_tfsgit",
 		Title:        res.Title,
 		Author:       res.CreatedBy.UniqueName,
-		SourceBranch: strings.TrimLeft(os.Getenv("SYSTEM_PULLREQUEST_SOURCEBRANCH"), "refs/heads/"),
-		BaseBranch:   strings.TrimLeft(os.Getenv("SYSTEM_PULLREQUEST_TARGETBRANCH"), "refs/heads/"),
-		URL:          fmt.Sprintf("%s/pullrequest/%s", os.Getenv("SYSTEM_PULLREQUEST_SOURCEREPOSITORYURI"), pullID),
+		SourceBranch: strings.TrimLeft(getEnv("SYSTEM_PULLREQUEST_SOURCEBRANCH"), "refs/heads/"),
+		BaseBranch:   strings.TrimLeft(getEnv("SYSTEM_PULLREQUEST_TARGETBRANCH"), "refs/heads/"),
+		URL:          fmt.Sprintf("%s/pullrequest/%s", getEnv("SYSTEM_PULLREQUEST_SOURCEREPOSITORYURI"), pullID),
 	}
 	return m, nil
 }
@@ -385,13 +578,13 @@ type azurePullRequestResponse struct {
 // an env var on the job step.
 func (f *metadataFetcher) getAzureReposPRInfo() azurePullRequestResponse {
 	var out azurePullRequestResponse
-	systemAccessToken := strings.TrimSpace(os.Getenv("SYSTEM_ACCESSTOKEN"))
+	systemAccessToken := strings.TrimSpace(getEnv("SYSTEM_ACCESSTOKEN"))
 	if systemAccessToken == "" {
 		logging.Logger.Debug("skipping fetching pr title and author, the required pipeline variable System.AccessToken was not provided as an env var named SYSTEM_ACCESSTOKEN")
 		return out
 	}
 
-	apiURL := fmt.Sprintf("%s_apis/git/repositories/%s/pullRequests/%s", os.Getenv("SYSTEM_COLLECTIONURI"), os.Getenv("BUILD_REPOSITORY_ID"), os.Getenv("SYSTEM_PULLREQUEST_PULLREQUESTID"))
+	apiURL := fmt.Sprintf("%s_apis/git/repositories/%s/pullRequests/%s", getEnv("SYSTEM_COLLECTIONURI"), getEnv("BUILD_REPOSITORY_ID"), getEnv("SYSTEM_PULLREQUEST_PULLREQUESTID"))
 	req, _ := http.NewRequest(http.MethodGet, apiURL, nil)
 	req.SetBasicAuth("azdo", systemAccessToken)
 
@@ -431,14 +624,15 @@ func (f *metadataFetcher) getAzureReposGithubMetadata(path string) (Metadata, er
 		}
 	}
 
-	m.Pipeline = &Pipeline{ID: os.Getenv("BUILD_BUILDID")}
-	pullNumber := os.Getenv("SYSTEM_PULLREQUEST_PULLREQUESTNUMBER")
+	m.Remote = urlStringToRemote(os.Getenv("BUILD_REPOSITORY_URI"))
+	m.Pipeline = &Pipeline{ID: getEnv("BUILD_BUILDID")}
+	pullNumber := getEnv("SYSTEM_PULLREQUEST_PULLREQUESTNUMBER")
 	m.PullRequest = &PullRequest{
 		ID:           pullNumber,
 		VCSProvider:  "azure_devops_github",
-		SourceBranch: strings.TrimLeft(os.Getenv("SYSTEM_PULLREQUEST_SOURCEBRANCH"), "refs/heads/"),
-		BaseBranch:   strings.TrimLeft(os.Getenv("SYSTEM_PULLREQUEST_TARGETBRANCH"), "refs/heads/"),
-		URL:          fmt.Sprintf("%s/pulls/%s", os.Getenv("SYSTEM_PULLREQUEST_SOURCEREPOSITORYURI"), pullNumber),
+		SourceBranch: strings.TrimLeft(getEnv("SYSTEM_PULLREQUEST_SOURCEBRANCH"), "refs/heads/"),
+		BaseBranch:   strings.TrimLeft(getEnv("SYSTEM_PULLREQUEST_TARGETBRANCH"), "refs/heads/"),
+		URL:          fmt.Sprintf("%s/pulls/%s", getEnv("SYSTEM_PULLREQUEST_SOURCEREPOSITORYURI"), pullNumber),
 
 		// We are unable to fetch pull request title and author for repositories using the GitHub <> Azure DevOps
 		// setup. The relevant information is not provided in the pipeline, and there is no GitHub access token
@@ -455,7 +649,7 @@ func (f *metadataFetcher) getAzureReposGithubMetadata(path string) (Metadata, er
 // in the original Commit of Metadata m. Otherwise, transformAzureDevOpsMergeCommit returns the first commit
 // on a git log call that doesn't appear to be a Merge commit.
 func (f *metadataFetcher) transformAzureDevOpsMergeCommit(path string, m *Metadata) error {
-	m.Branch.Name = strings.TrimLeft(os.Getenv("SYSTEM_PULLREQUEST_SOURCEBRANCH"), "refs/heads/")
+	m.Branch.Name = strings.TrimLeft(getEnv("SYSTEM_PULLREQUEST_SOURCEBRANCH"), "refs/heads/")
 
 	matches := mergeCommitRegxp.FindStringSubmatch(m.Commit.Message)
 	if len(matches) <= 1 {
@@ -528,13 +722,14 @@ func (f *metadataFetcher) getBitbucketMetadata(path string) (Metadata, error) {
 		return m, fmt.Errorf("BitBucket metadata error, could not fetch initial metadata from local git %w", err)
 	}
 
-	m.Pipeline = &Pipeline{ID: os.Getenv("BITBUCKET_BUILD_NUMBER")}
+	m.Remote = urlStringToRemote(getEnv("BITBUCKET_GIT_HTTP_ORIGIN"))
+	m.Pipeline = &Pipeline{ID: getEnv("BITBUCKET_BUILD_NUMBER")}
 	m.PullRequest = &PullRequest{
 		VCSProvider:  "bitbucket",
-		ID:           os.Getenv("BITBUCKET_PR_ID"),
-		SourceBranch: os.Getenv("BITBUCKET_BRANCH"),
-		BaseBranch:   os.Getenv("BITBUCKET_PR_DESTINATION_BRANCH"),
-		URL:          fmt.Sprintf("%s/pull-requests/%s", os.Getenv("BITBUCKET_GIT_HTTP_ORIGIN"), os.Getenv("BITBUCKET_PR_ID")),
+		ID:           getEnv("BITBUCKET_PR_ID"),
+		SourceBranch: getEnv("BITBUCKET_BRANCH"),
+		BaseBranch:   getEnv("BITBUCKET_PR_DESTINATION_BRANCH"),
+		URL:          fmt.Sprintf("%s/pull-requests/%s", getEnv("BITBUCKET_GIT_HTTP_ORIGIN"), getEnv("BITBUCKET_PR_ID")),
 
 		// we're unable to fetch these without calling the Bitbucket API endpoint:
 		// https://developer.atlassian.com/cloud/bitbucket/rest/api-group-pullrequests/
@@ -553,12 +748,13 @@ func (f *metadataFetcher) getCircleCIMetadata(path string) (Metadata, error) {
 		return m, fmt.Errorf("circle CI metadata error, could not fetch initial metadata from local git %w", err)
 	}
 
-	m.Pipeline = &Pipeline{ID: os.Getenv("CIRCLE_WORKFLOW_ID")}
+	m.Remote = urlStringToRemote(getEnv("CIRCLE_REPOSITORY_URL"))
+	m.Pipeline = &Pipeline{ID: getEnv("CIRCLE_WORKFLOW_ID")}
 	m.PullRequest = &PullRequest{
-		VCSProvider:  "circleci",
-		ID:           os.Getenv("CIRCLE_PR_NUMBER"),
-		SourceBranch: os.Getenv("CIRCLE_BRANCH"),
-		URL:          os.Getenv("CIRCLE_PULL_REQUEST"),
+		VCSProvider:  vcsProviderFromHost(m.Remote.Host),
+		ID:           getEnv("CIRCLE_PR_NUMBER"),
+		SourceBranch: getEnv("CIRCLE_BRANCH"),
+		URL:          getEnv("CIRCLE_PULL_REQUEST"),
 
 		// we're unable to fetch these without calling the GitHub, Bitbucket or Gitlab API respectively.
 		// Calling the API requires authentication with variables that we don't have access to in the pipeline.
@@ -581,11 +777,10 @@ func (f *metadataFetcher) getAtlantisMetadata(path string) (Metadata, error) {
 	m.Pipeline = &Pipeline{ID: ""}
 
 	m.PullRequest = &PullRequest{
-		VCSProvider:  "atlantis",
-		ID:           os.Getenv("PULL_NUM"),
-		Author:       os.Getenv("PULL_AUTHOR"),
-		SourceBranch: os.Getenv("HEAD_BRANCH_NAME"),
-		BaseBranch:   os.Getenv("BASE_BRANCH_NAME"),
+		ID:           getEnv("PULL_NUM"),
+		Author:       getEnv("PULL_AUTHOR"),
+		SourceBranch: getEnv("HEAD_BRANCH_NAME"),
+		BaseBranch:   getEnv("BASE_BRANCH_NAME"),
 		// Atlantis doesn't provide any indication of which VCS system triggers a build.
 		// So we build the URL using the remote that the local git config points to.
 		URL: getAtlantisPullRequestURL(m.Remote),
@@ -596,56 +791,6 @@ func (f *metadataFetcher) getAtlantisMetadata(path string) (Metadata, error) {
 	}
 
 	return m, nil
-}
-
-// getTFCMetadata returns Metadata built from a TFC request: https://www.terraform.io/cloud-docs/api-docs/run-tasks/run-tasks-integration#request-body
-// We cannot rely on any local git information we run this process in the Infracost Cloud. All OS variables are populated
-// by the Infracost Cloud run task worker, which passes them as environment flags when running the Infracost CLI.
-func (f *metadataFetcher) getTFCMetadata(path string) (Metadata, error) {
-	remote := urlStringToRemote(os.Getenv("INFRACOST_VCS_REPOSITORY_URL"))
-
-	runCreatedAt := os.Getenv("INFRACOST_VCS_COMMIT_CREATED_AT")
-	parsedCreatedAt, err := time.Parse(time.RFC3339, runCreatedAt)
-	if err != nil {
-		logging.Logger.WithError(err).Debugf("could not parse TFC run created time '%s'", runCreatedAt)
-	}
-
-	// pullURL is only populated if the run task is triggered by a VCS webhook event. If the run task has been
-	// triggered by a manual build in Terraform Cloud then TFC_PULL_URL will be blank. This includes builds that
-	// have been originally triggered by a VCS webhook event and then rerun by a user.
-	pullURL := os.Getenv("INFRACOST_VCS_PULL_REQUEST_URL")
-	return Metadata{
-		Remote: remote,
-		Branch: Branch{
-			Name: os.Getenv("INFRACOST_VCS_SOURCE_BRANCH"),
-		},
-		Commit: Commit{
-			SHA:  getLastURLPart(os.Getenv("INFRACOST_VCS_COMMIT_URL")),
-			Time: parsedCreatedAt,
-			// we use the TFC_RUN_MESSAGE as the commit message even though this is the PR title.
-			// This is consistent with what TFC show, i.e. a commit hash and then a PR title.
-			Message: os.Getenv("INFRACOST_VCS_PULL_REQUEST_TITLE"),
-
-			// TFC does not provide us an information on the original VCS author. The only referenced
-			// users are TFC users if the run has been triggered by the UI. We leave these fields blank in
-			// order to avoid confusion.
-			AuthorName:  "",
-			AuthorEmail: "",
-		},
-		PullRequest: &PullRequest{
-			ID:           getLastURLPart(pullURL),
-			VCSProvider:  vcsProviderFromHost(remote.Host),
-			SourceBranch: os.Getenv("INFRACOST_VCS_SOURCE_BRANCH"),
-			URL:          pullURL,
-			Title:        os.Getenv("INFRACOST_VCS_PULL_REQUEST_TITLE"),
-
-			// TFC does not provide us information on the following fields in the event data that's sent
-			// through from the run task.
-			Author:     "",
-			BaseBranch: "",
-		},
-		Pipeline: &Pipeline{ID: os.Getenv("TFC_RUN_ID")},
-	}, nil
 }
 
 func vcsProviderFromHost(host string) string {
@@ -661,20 +806,10 @@ func vcsProviderFromHost(host string) string {
 	return host
 }
 
-func getLastURLPart(urlString string) string {
-	pieces := strings.Split(urlString, "/")
-
-	if len(pieces) == 0 {
-		return urlString
-	}
-
-	return pieces[len(pieces)-1]
-}
-
 func getAtlantisPullRequestURL(remote Remote) string {
-	owner := os.Getenv("BASE_REPO_OWNER")
-	project := os.Getenv("BASE_REPO_NAME")
-	pullNumber := os.Getenv("PULL_NUM")
+	owner := getEnv("BASE_REPO_OWNER")
+	project := getEnv("BASE_REPO_NAME")
+	pullNumber := getEnv("PULL_NUM")
 
 	if strings.Contains(remote.Host, "github") {
 		return fmt.Sprintf("https://%s/%s/%s/pull/%s", remote.Host, owner, project, pullNumber)
@@ -739,6 +874,7 @@ type Pipeline struct {
 // Remote holds information about the upstream repository that the git project uses.
 type Remote struct {
 	Host string
+	Name string
 	URL  string
 }
 
@@ -766,7 +902,8 @@ func urlStringToRemote(remote string) Remote {
 	u, err := url.Parse(remote)
 	if err == nil {
 		return Remote{
-			Host: u.Host,
+			Host: u.Hostname(),
+			Name: generateRepoName(u.Host, u.Path),
 			URL:  fmt.Sprintf("https://%s%s", u.Host, u.Path),
 		}
 	}
@@ -786,7 +923,14 @@ func urlStringToRemote(remote string) Remote {
 	}
 
 	host := m[2]
-	path := m[3]
+	path := strings.TrimSuffix(m[3], "/")
+	port := ""
+
+	// Check if m[3] is port
+	if _, err := strconv.ParseInt(path, 10, 64); err == nil {
+		port = ":" + path
+		path = m[4]
+	}
 
 	if strings.Contains(host, "azure") {
 		host = strings.TrimLeft(m[2], "ssh.")
@@ -799,6 +943,20 @@ func urlStringToRemote(remote string) Remote {
 
 	return Remote{
 		Host: host,
-		URL:  fmt.Sprintf("https://%s/%s", host, path),
+		Name: generateRepoName(host, path),
+		URL:  fmt.Sprintf("https://%s%s/%s", host, port, path),
 	}
+}
+
+// generateRepoName returns a repo name generated from the remote URL's path.
+// Host is used for Azure cloud detection as it requires additional formatting.
+func generateRepoName(host, path string) string {
+	name := strings.TrimPrefix(path, "/")
+	name = strings.TrimSuffix(name, ".git")
+
+	if strings.Contains(strings.ToLower(host), "azure") {
+		name = strings.ReplaceAll(name, "/_git", "")
+	}
+
+	return name
 }

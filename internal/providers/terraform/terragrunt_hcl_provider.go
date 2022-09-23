@@ -10,7 +10,6 @@ import (
 	"strings"
 	"time"
 
-	"github.com/gruntwork-io/terragrunt/aws_helper"
 	tgcli "github.com/gruntwork-io/terragrunt/cli"
 	"github.com/gruntwork-io/terragrunt/cli/tfsource"
 	tgconfig "github.com/gruntwork-io/terragrunt/config"
@@ -150,7 +149,12 @@ func (p *TerragruntHCLProvider) LoadResources(usage map[string]*schema.UsageData
 			project.Metadata = config.DetectProjectMetadata(projectPath)
 			project.Metadata.Type = p.Type()
 			p.AddMetadata(project.Metadata)
-			project.Name = schema.GenerateProjectName(project.Metadata, p.ctx.ProjectConfig.Name, p.ctx.RunContext.IsCloudEnabled())
+			name := p.ctx.ProjectConfig.Name
+			if name == "" {
+				name = project.Metadata.GenerateProjectName(p.ctx.RunContext.VCSMetadata.Remote, p.ctx.RunContext.IsCloudEnabled())
+			}
+
+			project.Name = name
 			allProjects = append(allProjects, project)
 		}
 	}
@@ -270,17 +274,6 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 		return nil, nil
 	}
 
-	// We merge the OriginalIAMRoleOptions into the one from the config, because the CLI passed IAMRoleOptions has
-	// precedence.
-	opts.IAMRoleOptions = tgoptions.MergeIAMRoleOptions(
-		terragruntConfig.GetIAMRoleOptions(),
-		opts.OriginalIAMRoleOptions,
-	)
-
-	if err := aws_helper.AssumeRoleAndUpdateEnvIfNecessary(opts); err != nil {
-		return nil, err
-	}
-
 	// get the default download dir
 	_, defaultDownloadDir, err := tgoptions.DefaultWorkingAndDownloadDirs(opts.TerragruntConfigPath)
 	if err != nil {
@@ -344,7 +337,6 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 		config.NewProjectContext(p.ctx.RunContext, &pconfig, fields),
 		&HCLProviderConfig{CacheParsingModules: true},
 		hcl.OptionWithSpinner(p.ctx.RunContext.NewSpinner),
-		hcl.OptionWithWarningFunc(p.ctx.RunContext.NewWarningWriter()),
 		hcl.OptionWithRawCtyInput(inputs),
 	)
 	if err != nil {

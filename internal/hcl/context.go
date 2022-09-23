@@ -122,7 +122,7 @@ func mergeObjects(a cty.Value, b cty.Value) cty.Value {
 		old, exists := output[key]
 
 		if exists && isValidCtyObject(val) && isValidCtyObject(old) {
-			output[key] = mergeObjects(val, old)
+			output[key] = mergeObjects(old, val)
 			continue
 		}
 

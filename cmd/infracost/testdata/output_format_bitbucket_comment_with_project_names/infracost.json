@@ -7,7 +7,7 @@
       "metadata": {
         "path": "../../examples/terraform",
         "type": "terraform_dir",
-        "vcsRepoUrl": "git@github.com:infracost/infracost.git",
+        "vcsRepositoryUrl": "git@github.com:infracost/infracost.git",
         "vcsSubPath": "examples/terraform"
       },
       "pastBreakdown": {
@@ -236,7 +236,7 @@
       "metadata": {
         "path": "../../examples/terraform",
         "type": "terraform_dir",
-        "vcsRepoUrl": "git@github.com:infracost/infracost.git",
+        "vcsRepositoryUrl": "git@github.com:infracost/infracost.git",
         "vcsSubPath": "examples/terraform"
       },
       "pastBreakdown": {
@@ -465,7 +465,7 @@
       "metadata": {
         "path": "../../examples/terragrunt/dev",
         "type": "terragrunt_dir",
-        "vcsRepoUrl": "git@github.com:infracost/infracost.git",
+        "vcsRepositoryUrl": "git@github.com:infracost/infracost.git",
         "vcsSubPath": "examples/terragrunt/dev"
       },
       "pastBreakdown": {
@@ -676,7 +676,7 @@
       "metadata": {
         "path": "../../examples/terragrunt/dev",
         "type": "terragrunt_dir",
-        "vcsRepoUrl": "git@github.com:infracost/infracost.git",
+        "vcsRepositoryUrl": "git@github.com:infracost/infracost.git",
         "vcsSubPath": "examples/terragrunt/dev",
         "terraformModulePath": "dev"
       },
@@ -888,7 +888,7 @@
       "metadata": {
         "path": "../../examples/terragrunt/prod",
         "type": "terragrunt_dir",
-        "vcsRepoUrl": "git@github.com:infracost/infracost.git",
+        "vcsRepositoryUrl": "git@github.com:infracost/infracost.git",
         "vcsSubPath": "examples/terragrunt/prod",
         "terraformModulePath": "prod"
       },
@@ -1118,7 +1118,7 @@
       "metadata": {
         "path": "../../examples/terragrunt/prod",
         "type": "terragrunt_dir",
-        "vcsRepoUrl": "git@github.com:infracost/infracost.git",
+        "vcsRepositoryUrl": "git@github.com:infracost/infracost.git",
         "vcsSubPath": "examples/terragrunt/prod"
       },
       "pastBreakdown": {
@@ -1347,7 +1347,7 @@
       "metadata": {
         "path": "../../examples/terragrunt/dev",
         "type": "terragrunt_dir",
-        "vcsRepoUrl": "git@github.com:infracost/infracost.git",
+        "vcsRepositoryUrl": "git@github.com:infracost/infracost.git",
         "vcsSubPath": "examples/terragrunt/dev",
         "terraformModulePath": "dev",
         "terraformWorkspace": "ws2"
@@ -1560,7 +1560,7 @@
       "metadata": {
         "path": "../../examples/terragrunt/prod",
         "type": "terragrunt_dir",
-        "vcsRepoUrl": "git@github.com:infracost/infracost.git",
+        "vcsRepositoryUrl": "git@github.com:infracost/infracost.git",
         "vcsSubPath": "examples/terragrunt/prod",
         "terraformModulePath": "prod",
         "terraformWorkspace": "ws2"
@@ -1791,7 +1791,7 @@
       "metadata": {
         "path": "../../examples/terraform",
         "type": "terraform_dir",
-        "vcsRepoUrl": "git@github.com:infracost/infracost.git",
+        "vcsRepositoryUrl": "git@github.com:infracost/infracost.git",
         "vcsSubPath": "examples/terraform",
         "terraformWorkspace": "ws1"
       },

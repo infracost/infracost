@@ -323,7 +323,7 @@ data "mydata" "default" {
 }
 
 resource "aws_subnet" "private" {
-	count = data.mydata.default.enabled != null ? 2 : 0 
+	count = data.mydata.default.enabled != null ? 2 : 0
 	cidr_block = "10.0.1.0/24"
 }
 
@@ -565,6 +565,43 @@ output "mod_result" {
 	require.NotNil(t, childValAttr)
 	require.Equal(t, cty.String, childValAttr.Value().Type())
 	assert.Equal(t, "ok", childValAttr.Value().AsString())
+}
+
+func Test_LocalsObjectType(t *testing.T) {
+	path := createTestFile("test.tf", `
+data "aws_ami" "my_ami" {
+  count = 1
+}
+
+locals {
+  defaults = {
+    platform = "linux"
+    ami = data.aws_ami.my_ami.*.name[0]
+  }
+}
+
+resource "aws_instance" "my_instance" {
+	platform = local.defaults.platform
+  ami = local.defaults.ami
+}
+`)
+
+	parser := newParser(filepath.Dir(path), newDiscardLogger())
+	module, err := parser.ParseDirectory()
+	require.NoError(t, err)
+
+	blocks := module.Blocks
+
+	resource := blocks.Matching(BlockMatcher{Label: "test", Type: "resource"})
+	require.NotNil(t, resource)
+
+	platformAttr := resource.GetAttribute("platform")
+	require.NotNil(t, platformAttr)
+	assert.Equal(t, "linux", platformAttr.Value().AsString())
+
+	amiAttr := resource.GetAttribute("ami")
+	require.NotNil(t, amiAttr)
+	assert.Equal(t, "defaults-mock", amiAttr.Value().AsString())
 }
 
 func TestOptionWithRawCtyInput(t *testing.T) {

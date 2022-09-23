@@ -38,6 +38,21 @@ func TestBreakdownFormatJSON(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--format", "json", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/example_usage.yml"}, opts)
 }
 
+func TestBreakdownFormatJsonWithWarnings(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testName,
+		[]string{
+			"breakdown",
+			"--format", "json",
+			"--path", dir,
+		},
+		DefaultOptions(),
+	)
+}
+
 func TestBreakdownFormatJSONShowSkipped(t *testing.T) {
 	opts := DefaultOptions()
 	opts.IsJSON = true
@@ -317,6 +332,10 @@ func TestBreakdownTerragruntHCLMultiNoSource(t *testing.T) {
 
 func TestBreakdownTerragruntNested(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples"}, nil)
+}
+
+func TestBreakdownTerragruntIAMRoles(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())}, nil)
 }
 
 func TestInstanceWithAttachmentBeforeDeploy(t *testing.T) {

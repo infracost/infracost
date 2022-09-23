@@ -69,6 +69,67 @@
       "additionalProperties": false,
       "type": "object"
     },
+    "Metadata": {
+      "required": [
+        "infracostCommand",
+        "vcsBranch",
+        "vcsCommitSha",
+        "vcsCommitAuthorName",
+        "vcsCommitAuthorEmail",
+        "vcsCommitTimestamp",
+        "vcsCommitMessage"
+      ],
+      "properties": {
+        "infracostCommand": {
+          "type": "string"
+        },
+        "vcsBranch": {
+          "type": "string"
+        },
+        "vcsCommitSha": {
+          "type": "string"
+        },
+        "vcsCommitAuthorName": {
+          "type": "string"
+        },
+        "vcsCommitAuthorEmail": {
+          "type": "string"
+        },
+        "vcsCommitTimestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "vcsCommitMessage": {
+          "type": "string"
+        },
+        "vcsRepositoryUrl": {
+          "type": "string"
+        },
+        "vcsProvider": {
+          "type": "string"
+        },
+        "vcsBaseBranch": {
+          "type": "string"
+        },
+        "vcsPullRequestTitle": {
+          "type": "string"
+        },
+        "vcsPullRequestUrl": {
+          "type": "string"
+        },
+        "vcsPullRequestAuthor": {
+          "type": "string"
+        },
+        "vcsPipelineRunId": {
+          "type": "string"
+        },
+        "vcsPullRequestId": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
     "PriceTier": {
       "required": [
         "Name",
@@ -147,20 +208,10 @@
     "ProjectMetadata": {
       "required": [
         "path",
-        "infracostCommand",
-        "type",
-        "branch",
-        "commit",
-        "commitAuthorName",
-        "commitAuthorEmail",
-        "commitTimestamp",
-        "commitMessage"
+        "type"
       ],
       "properties": {
         "path": {
-          "type": "string"
-        },
-        "infracostCommand": {
           "type": "string"
         },
         "type": {
@@ -172,51 +223,15 @@
         "terraformWorkspace": {
           "type": "string"
         },
-        "branch": {
-          "type": "string"
-        },
-        "commit": {
-          "type": "string"
-        },
-        "commitAuthorName": {
-          "type": "string"
-        },
-        "commitAuthorEmail": {
-          "type": "string"
-        },
-        "commitTimestamp": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "commitMessage": {
-          "type": "string"
-        },
-        "vcsRepoUrl": {
-          "type": "string"
-        },
         "vcsSubPath": {
           "type": "string"
         },
-        "vcsProvider": {
-          "type": "string"
-        },
-        "vcsBaseBranch": {
-          "type": "string"
-        },
-        "vcsPullRequestTitle": {
-          "type": "string"
-        },
-        "vcsPullRequestUrl": {
-          "type": "string"
-        },
-        "vcsPullRequestAuthor": {
-          "type": "string"
-        },
-        "vcsPipelineRunId": {
-          "type": "string"
-        },
-        "vcsPullRequestId": {
-          "type": "string"
+        "warnings": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/Warning"
+          },
+          "type": "array"
         }
       },
       "additionalProperties": false,
@@ -275,6 +290,7 @@
     "Root": {
       "required": [
         "version",
+        "metadata",
         "currency",
         "projects",
         "totalHourlyCost",
@@ -289,6 +305,10 @@
       "properties": {
         "version": {
           "type": "string"
+        },
+        "metadata": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/Metadata"
         },
         "runId": {
           "type": "string"
@@ -428,6 +448,26 @@
             }
           },
           "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "Warning": {
+      "required": [
+        "code",
+        "message",
+        "data"
+      ],
+      "properties": {
+        "code": {
+          "type": "integer"
+        },
+        "message": {
+          "type": "string"
+        },
+        "data": {
+          "additionalProperties": true
         }
       },
       "additionalProperties": false,

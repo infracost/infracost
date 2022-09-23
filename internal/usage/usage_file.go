@@ -20,7 +20,7 @@ const maxUsageFileVersion = "0.1"
 type UsageFile struct { // nolint:revive
 	Version string `yaml:"version"`
 	// We represent resource type usage in using a YAML node so we have control over the comments
-	RawResourceTypeUsage yamlv3.Node `yaml:"resource_type_usage"`
+	RawResourceTypeUsage yamlv3.Node `yaml:"resource_type_default_usage"`
 	// The raw usage is then parsed into this struct
 	ResourceTypeUsages []*ResourceUsage `yaml:"-"`
 	// We represent resource usage in using a YAML node so we have control over the comments
@@ -102,7 +102,7 @@ func LoadUsageFileFromString(s string) (*UsageFile, error) {
 }
 
 func (u *UsageFile) WriteToPath(path string) error {
-	allCommented := u.dumpResourceUsages()
+	allResourceTypesCommented, allResourcesCommented := u.dumpResourceUsages()
 
 	root := &yamlv3.Node{
 		Kind: yamlv3.MappingNode,
@@ -114,14 +114,17 @@ See https://infracost.io/usage-file/ for docs`,
 
 	resourceTypeUsagesKeyNode := &yamlv3.Node{
 		Kind:  yamlv3.ScalarNode,
-		Value: "resource_type_usage",
+		Value: "resource_type_default_usage",
 	}
 	resourceUsagesKeyNode := &yamlv3.Node{
 		Kind:  yamlv3.ScalarNode,
 		Value: "resource_usage",
 	}
-	if allCommented {
+
+	if allResourceTypesCommented {
 		markNodeAsComment(resourceTypeUsagesKeyNode)
+	}
+	if allResourcesCommented {
 		markNodeAsComment(resourceUsagesKeyNode)
 	}
 
@@ -144,7 +147,8 @@ See https://infracost.io/usage-file/ for docs`,
 	for _, node := range u.RawResourceTypeUsage.Content {
 		if isNodeMarkedAsCommented(node) {
 			node.HeadComment = `##
-## The following usage values are all commented-out, you can uncomment resource types and customize as needed.
+## The following usage values apply to each resource of the given type, which is useful when you want to define defaults.
+## All values are commented-out, you can uncomment resource types and customize as needed.
 ##`
 			break
 		}
@@ -154,7 +158,8 @@ See https://infracost.io/usage-file/ for docs`,
 	for _, node := range u.RawResourceUsage.Content {
 		if isNodeMarkedAsCommented(node) {
 			node.HeadComment = `##
-## The following usage values are all commented-out, you can uncomment resources and customize as needed.
+## The following usage values apply to individual resources and override any value defined in the resource_type_default_usage section.
+## All values are commented-out, you can uncomment resources and customize as needed.
 ##`
 			break
 		}
@@ -177,6 +182,10 @@ See https://infracost.io/usage-file/ for docs`,
 
 func (u *UsageFile) ToUsageDataMap() map[string]*schema.UsageData {
 	m := make(map[string]*schema.UsageData)
+
+	for _, resourceUsage := range u.ResourceTypeUsages {
+		m[resourceUsage.Name] = schema.NewUsageData(resourceUsage.Name, schema.ParseAttributes(resourceUsage.Map()))
+	}
 
 	for _, resourceUsage := range u.ResourceUsages {
 		m[resourceUsage.Name] = schema.NewUsageData(resourceUsage.Name, schema.ParseAttributes(resourceUsage.Map()))
@@ -286,10 +295,10 @@ func (u *UsageFile) parseResourceUsages() error {
 	return nil
 }
 
-func (u *UsageFile) dumpResourceUsages() bool {
-	var allCommented bool
-	var allTypesCommented bool
-	u.RawResourceTypeUsage, allTypesCommented = ResourceUsagesToYAML(u.ResourceTypeUsages)
-	u.RawResourceUsage, allCommented = ResourceUsagesToYAML(u.ResourceUsages)
-	return allTypesCommented && allCommented
+func (u *UsageFile) dumpResourceUsages() (bool, bool) {
+	var allResourceTypesCommented bool
+	var allResourcesCommented bool
+	u.RawResourceTypeUsage, allResourceTypesCommented = ResourceUsagesToYAML(u.ResourceTypeUsages)
+	u.RawResourceUsage, allResourcesCommented = ResourceUsagesToYAML(u.ResourceUsages)
+	return allResourceTypesCommented, allResourcesCommented
 }

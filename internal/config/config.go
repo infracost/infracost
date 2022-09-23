@@ -71,6 +71,7 @@ type Config struct {
 	DefaultPricingAPIEndpoint string `yaml:"default_pricing_api_endpoint,omitempty" envconfig:"DEFAULT_PRICING_API_ENDPOINT"`
 	DashboardAPIEndpoint      string `yaml:"dashboard_api_endpoint,omitempty" envconfig:"DASHBOARD_API_ENDPOINT"`
 	DashboardEndpoint         string `yaml:"dashboard_endpoint,omitempty" envconfig:"DASHBOARD_ENDPOINT"`
+	UsageAPIEndpoint          string `yaml:"usage_api_endpoint,omitempty" envconfig:"USAGE_API_ENDPOINT"`
 	EnableDashboard           bool   `yaml:"enable_dashboard,omitempty" envconfig:"ENABLE_DASHBOARD"`
 	EnableCloud               *bool  `yaml:"enable_cloud,omitempty" envconfig:"ENABLE_CLOUD"`
 	DisableHCLParsing         bool   `yaml:"disable_hcl_parsing,omitempty" envconfig:"DISABLE_HCL_PARSING"`
@@ -90,6 +91,10 @@ type Config struct {
 	Fields        []string   `yaml:"fields,omitempty" ignored:"true"`
 	CompareTo     string
 
+	// Base configuration settings
+	// RootPath defines the raw value of the `--path` flag provided by the user
+	RootPath string
+	// ConfigFilePath defines the raw value of the `--config-file` flag provided by the user
 	ConfigFilePath string
 
 	NoCache bool `yaml:"fields,omitempty" ignored:"true"`
@@ -128,6 +133,15 @@ func DefaultConfig() *Config {
 
 		EventsDisabled: IsTest(),
 	}
+}
+
+// RepoPath returns the filepath to either the config-file location or initial path provided by the user.
+func (c *Config) RepoPath() string {
+	if c.ConfigFilePath != "" {
+		return c.ConfigFilePath
+	}
+
+	return c.RootPath
 }
 
 func (c *Config) LoadFromConfigFile(path string) error {

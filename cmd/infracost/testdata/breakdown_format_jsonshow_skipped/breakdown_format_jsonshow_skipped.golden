@@ -1,22 +1,23 @@
 {
   "version": "0.2",
+  "metadata": {
+    "infracostCommand": "breakdown",
+    "vcsBranch": "stub-branch",
+    "vcsCommitSha": "stub-sha",
+    "vcsCommitAuthorName": "stub-author",
+    "vcsCommitAuthorEmail": "stub@stub.com",
+    "vcsCommitTimestamp": "REPLACED_TIME",
+    "vcsCommitMessage": "stub-message",
+    "vcsRepositoryUrl": "https://github.com/infracost/infracost"
+  },
   "currency": "USD",
   "projects": [
     {
       "name": "infracost/infracost/cmd/infracost/testdata/example_plan.json",
       "metadata": {
         "path": "./testdata/example_plan.json",
-        "infracostCommand": "breakdown",
         "type": "terraform_plan_json",
-        "branch": "stub-branch",
-        "commit": "stub-sha",
-        "commitAuthorName": "stub-author",
-        "commitAuthorEmail": "stub@stub.com",
-        "commitTimestamp": "REPLACED_TIME",
-        "commitMessage": "stub-message",
-        "vcsRepoUrl": "https://github.com/infracost/infracost",
-        "vcsSubPath": "cmd/infracost/testdata/example_plan.json",
-        "vcsPullRequestUrl": "NOT_APPLICABLE"
+        "vcsSubPath": "cmd/infracost/testdata/example_plan.json"
       },
       "pastBreakdown": {
         "resources": [],

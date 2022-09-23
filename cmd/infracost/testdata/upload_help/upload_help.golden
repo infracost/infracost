@@ -1,0 +1,27 @@
+Upload an Infracost JSON file to Infracost Cloud. This is useful if you
+do not use 'infracost comment' and instead want to define run metadata,
+such as pull request URL or title, and upload the results manually.
+
+See https://infracost.io/docs/features/cli_commands/#upload-runs
+
+USAGE
+  infracost upload [flags]
+
+EXAMPLES
+  Upload an Infracost JSON file:
+      export INFRACOST_VCS_PULL_REQUEST_URL=http://github.com/myorg...
+      export INFRACOST_VCS_PULL_REQUEST_TITLE="My PR title"
+      # ... other env vars here
+
+      infracost diff --path plan.json --format json --out-file infracost.json
+
+      infracost upload --path infracost.json
+
+FLAGS
+  -h, --help          help for upload
+      --path string   Path to Infracost JSON file. (default "p")
+
+GLOBAL FLAGS
+      --debug-report       Generate a debug report file which can be sent to Infracost team
+      --log-level string   Log level (trace, debug, info, warn, error, fatal)
+      --no-color           Turn off colored output

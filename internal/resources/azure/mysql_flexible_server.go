@@ -65,8 +65,20 @@ func (r *MySQLFlexibleServer) BuildResource() *schema.Resource {
 func (r *MySQLFlexibleServer) computeCostComponent() *schema.CostComponent {
 	attrs := getFlexibleServerFilterAttributes(r.Tier, r.InstanceType, r.InstanceVersion)
 
-	// Eds series has two spaces in CPAPI hence '\s+'
-	productNameRegex := fmt.Sprintf("^Azure Database for MySQL Flexible Server %s\\s+%s", attrs.TierName, attrs.Series)
+	// MySQL Flexible Server uses "Business Critical" for the Memory Optimized instances
+	tierName := attrs.TierName
+	if tierName == "Memory Optimized" {
+		tierName = "Business Critical"
+	}
+
+	// We've seen two spaces in the data in the past hence '\s+'
+	seriesSuffix := fmt.Sprintf("\\s+%s Series", attrs.Series)
+	// This seems to be a special case where the series doesn't appear in the product name
+	if tierName == "Business Critical" && attrs.Series == "Edsv4" {
+		seriesSuffix = ""
+	}
+
+	productNameRegex := fmt.Sprintf("^Azure Database for MySQL Flexible Server %s%s Compute$", tierName, seriesSuffix)
 
 	return &schema.CostComponent{
 		Name:           fmt.Sprintf("Compute (%s)", r.SKU),
@@ -109,7 +121,7 @@ func (r *MySQLFlexibleServer) storageCostComponent() *schema.CostComponent {
 			Service:       strPtr("Azure Database for MySQL"),
 			ProductFamily: strPtr("Databases"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", Value: strPtr("Azure Database for MySQL Flexible Server Storage")},
+				{Key: "productName", Value: strPtr("Az Database for MySQL Flexible Server Storage")},
 				{Key: "meterName", Value: strPtr("Storage Data Stored")},
 			},
 		},
@@ -145,7 +157,7 @@ func (r *MySQLFlexibleServer) iopsCostComponent() *schema.CostComponent {
 			Service:       strPtr("Azure Database for MySQL"),
 			ProductFamily: strPtr("Databases"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", Value: strPtr("Azure Database for MySQL Flexible Server Storage")},
+				{Key: "productName", Value: strPtr("Az Database for MySQL Flexible Server Storage")},
 				{Key: "skuName", Value: strPtr("Additional IOPS")},
 			},
 		},
@@ -170,7 +182,7 @@ func (r *MySQLFlexibleServer) backupCostComponent() *schema.CostComponent {
 			Service:       strPtr("Azure Database for MySQL"),
 			ProductFamily: strPtr("Databases"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", Value: strPtr("Azure Database for MySQL Flexible Server Backup Storage")},
+				{Key: "productName", Value: strPtr("Az DB for MySQL Flex Svr Backup Storage")},
 				{Key: "meterName", Value: strPtr("Backup Storage LRS Data Stored")},
 			},
 		},

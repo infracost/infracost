@@ -218,12 +218,12 @@ func syncResourceType(projectCtx *config.ProjectContext, resource *schema.Resour
 	// We want to override the value type from the usage schema since we can't always tell from the YAML
 	// what the value type should be, e.g. user might add an int value for a float attribute.
 	replaceResourceUsages(resourceUsage, &ResourceUsage{
-		Name:  resource.Name,
+		Name:  resourceUsage.Name,
 		Items: resource.UsageSchema,
 	}, ReplaceResourceUsagesOpts{OverrideValueType: true})
 
 	// Merge any existing resource usage
-	existingResourceUsage := existingResourceUsagesMap[resource.Name]
+	existingResourceUsage := existingResourceUsagesMap[resource.ResourceType]
 	if existingResourceUsage != nil {
 		replaceResourceUsages(resourceUsage, existingResourceUsage, ReplaceResourceUsagesOpts{})
 	}

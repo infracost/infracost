@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
+
+	"github.com/infracost/infracost/internal/logging"
+	"github.com/infracost/infracost/internal/schema"
 )
 
 // ComputeGuestAccelerator defines Guest Accelerator setup for Compute resources.
@@ -129,8 +131,8 @@ func computeDiskCostComponent(region string, diskType string, diskSize float64, 
 	}
 }
 
-// guestAcceleratorCostComponent returns a cost component for Guest Accelerator
-// usage for Compute resources.
+// guestAcceleratorCostComponent returns a cost component for Guest Accelerator usage for Compute resources.
+// Callers should be aware guestAcceleratorCostComponent returns nil if the provided guestAcceleratorType is not supported.
 func guestAcceleratorCostComponent(region string, purchaseOption string, guestAcceleratorType string, guestAcceleratorCount int64, instanceCount int64, monthlyHours *float64) *schema.CostComponent {
 	var (
 		name       string
@@ -153,7 +155,11 @@ func guestAcceleratorCostComponent(region string, purchaseOption string, guestAc
 	case "nvidia-tesla-k80":
 		name = "NVIDIA Tesla K80"
 		descPrefix = "Nvidia Tesla K80 GPU"
+	case "nvidia-tesla-a100":
+		name = "NVIDIA Tesla A100"
+		descPrefix = "Nvidia Tesla A100 GPU"
 	default:
+		logging.Logger.Debugf("skipping cost component because guest_accelerator.type '%s' is not supported", guestAcceleratorType)
 		return nil
 	}
 

@@ -20,6 +20,7 @@ var outputVersion = "0.2"
 
 type Root struct {
 	Version              string           `json:"version"`
+	Metadata             Metadata         `json:"metadata"`
 	RunID                string           `json:"runId,omitempty"`
 	ShareURL             string           `json:"shareUrl,omitempty"`
 	Currency             string           `json:"currency"`
@@ -214,6 +215,7 @@ type Options struct {
 	Fields            []string
 	IncludeHTML       bool
 	PolicyChecks      PolicyCheck
+	diffMsg           string
 }
 
 // PolicyCheck holds information if a given run has any policy checks enabled.
@@ -253,6 +255,7 @@ type MarkdownOptions struct {
 	IncludeFeedbackLink bool
 	OmitDetails         bool
 	BasicSyntax         bool
+	MaxMessageSize      int
 }
 
 func outputBreakdown(resources []*schema.Resource) *Breakdown {
