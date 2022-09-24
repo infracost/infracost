@@ -3,9 +3,6 @@ package output
 import (
 	"fmt"
 	"math"
-	"os"
-	"regexp"
-	"strings"
 
 	"github.com/Rhymond/go-money"
 	"github.com/dustin/go-humanize"
