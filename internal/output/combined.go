@@ -325,7 +325,7 @@ func addCurrencyFormat(currencyFormat string) {
 	m := rgx.FindStringSubmatch(currencyFormat)
 
 	if len(m) == 0 {
-		log.Warningf("Invalid currency format: %s", INFRACOST_CURRENCY_FORMAT)
+		log.Warningf("Invalid currency format: %s", currencyFormat)
 		return
 	}
 
