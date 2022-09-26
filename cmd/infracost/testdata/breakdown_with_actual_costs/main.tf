@@ -7,7 +7,7 @@ provider "aws" {
 }
 
 resource "aws_dynamodb_table" "usage" {
-  name         = "${prod}-usage"
+  name         = "usage"
   billing_mode = "PAY_PER_REQUEST"
   hash_key     = "usageValue"
 
