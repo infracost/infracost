@@ -78,8 +78,8 @@ type Config struct {
 	TLSInsecureSkipVerify *bool  `envconfig:"TLS_INSECURE_SKIP_VERIFY"`
 	TLSCACertFile         string `envconfig:"TLS_CA_CERT_FILE"`
 
-	Currency                string `envconfig:"CURRENCY"`
-	InfracostCurrencyFormat string `envconfig:"INFRACOST_CURRENCY_FORMAT"`
+	Currency       string `envconfig:"CURRENCY"`
+	CurrencyFormat string `envconfig:"CURRENCY_FORMAT"`
 
 	// Org settings
 	EnableCloudForOrganization bool

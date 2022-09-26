@@ -103,8 +103,7 @@ func TestCurrencyFormatCost(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			t.Setenv("INFRACOST_CURRENCY_FORMAT", tc.format)
-			addCurrencyFormatIfPreferred()
+			addCurrencyFormat(tc.format)
 			var val *decimal.Decimal
 			if tc.val != "" {
 				parsed, err := decimal.NewFromString(tc.val)

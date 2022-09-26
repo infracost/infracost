@@ -288,7 +288,9 @@ func FormatOutput(format string, r Root, opts Options) ([]byte, error) {
 	var b []byte
 	var err error
 
-	addCurrencyFormatIfPreferred()
+	if opts.CurrencyFormat != "" {
+		addCurrencyFormat(opts.CurrencyFormat)
+	}
 
 	switch format {
 	case "json":
@@ -318,14 +320,9 @@ func FormatOutput(format string, r Root, opts Options) ([]byte, error) {
 	return b, nil
 }
 
-func addCurrencyFormatIfPreferred() {
-	INFRACOST_CURRENCY_FORMAT := os.Getenv("INFRACOST_CURRENCY_FORMAT")
-	if INFRACOST_CURRENCY_FORMAT == "" {
-		return
-	}
-
+func addCurrencyFormat(currencyFormat string) {
 	rgx := regexp.MustCompile(`^(.{3}): (.*)1(,|\.)234(,|\.)?([0-9]*)?(.*)$`)
-	m := rgx.FindStringSubmatch(INFRACOST_CURRENCY_FORMAT)
+	m := rgx.FindStringSubmatch(currencyFormat)
 
 	if len(m) == 0 {
 		log.Warningf("Invalid currency format: %s", INFRACOST_CURRENCY_FORMAT)
