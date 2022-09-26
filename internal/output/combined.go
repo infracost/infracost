@@ -16,9 +16,9 @@ import (
 	"github.com/shopspring/decimal"
 	"golang.org/x/mod/semver"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/schema"
+	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -287,7 +287,7 @@ func checkOutputVersion(v string) bool {
 func FormatOutput(format string, r Root, opts Options) ([]byte, error) {
 	var b []byte
 	var err error
-	
+
 	addCurrencyFormatIfPreferred()
 
 	switch format {
@@ -326,14 +326,14 @@ func addCurrencyFormatIfPreferred() {
 
 	rgx := regexp.MustCompile(`^(.{3}): (.*)1(,|\.)234(,|\.)?([0-9]*)?(.*)$`)
 	m := rgx.FindStringSubmatch(INFRACOST_CURRENCY_FORMAT)
-	
+
 	if len(m) == 0 {
 		log.Warningf("Invalid currency format: %s", INFRACOST_CURRENCY_FORMAT)
 		return
 	}
 
 	currency := m[1]
-	
+
 	graphemeWithSpace := m[2]
 	grapheme := strings.TrimSpace(graphemeWithSpace)
 	template := "$" + strings.Repeat(" ", len(graphemeWithSpace)-len(grapheme)) + "1"
@@ -343,7 +343,7 @@ func addCurrencyFormatIfPreferred() {
 		grapheme = strings.TrimSpace(graphemeWithSpace)
 		template = "1" + strings.Repeat(" ", len(graphemeWithSpace)-len(grapheme)) + "$"
 	}
-	
+
 	thousand := m[3]
 	decimal := m[4]
 	fraction := len(m[5])
