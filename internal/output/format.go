@@ -23,6 +23,7 @@ func formatCost(currency string, d *decimal.Decimal) string {
 	if d == nil {
 		return "-"
 	}
+
 	if d.GreaterThanOrEqual(decimal.NewFromInt(int64(roundCostsAbove))) {
 		return formatWholeDecimalCurrency(currency, *d)
 	}
