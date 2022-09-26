@@ -131,6 +131,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 				DashboardEndpoint: ctx.Config.DashboardEndpoint,
 				NoColor:           ctx.Config.NoColor,
 				Fields:            fields,
+				CurrencyFormat:    ctx.Config.CurrencyFormat,
 			}
 			opts.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
 

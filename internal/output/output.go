@@ -238,6 +238,7 @@ type Options struct {
 	IncludeHTML       bool
 	PolicyChecks      PolicyCheck
 	diffMsg           string
+	CurrencyFormat    string
 }
 
 // PolicyCheck holds information if a given run has any policy checks enabled.

@@ -167,6 +167,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		ShowSkipped:       runCtx.Config.ShowSkipped,
 		NoColor:           runCtx.Config.NoColor,
 		Fields:            runCtx.Config.Fields,
+		CurrencyFormat:    runCtx.Config.CurrencyFormat,
 	})
 	if err != nil {
 		return err
