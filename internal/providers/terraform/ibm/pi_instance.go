@@ -74,6 +74,7 @@ func newPiInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	cpus := d.Get("pi_processors").Float()
 	memory := d.Get("pi_memory").Float()
 	storageType := d.Get("pi_storage_type").String()
+	profile := d.Get("pi_sap_profile_id").String()
 
 	var os int64 = -1
 	var isLegacyIBMiImageVersion bool
@@ -94,6 +95,7 @@ func newPiInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 		Memory:                 memory,
 		StorageType:            storageType,
 		OperatingSystem:        os,
+		Profile:                profile,
 		LegacyIBMiImageVersion: isLegacyIBMiImageVersion,
 		NetweaverImage:         netweaverImage,
 	}
@@ -106,6 +108,7 @@ func newPiInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	configuration["cpus"] = cpus
 	configuration["memory"] = memory
 	configuration["storageType"] = storageType
+	configuration["profile"] = profile
 
 	SetCatalogMetadata(d, d.Type, configuration)
 

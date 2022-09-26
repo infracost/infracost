@@ -27,6 +27,7 @@ type PiInstance struct {
 	Cpus                   float64
 	LegacyIBMiImageVersion bool
 	NetweaverImage         bool
+	Profile                string
 
 	MonthlyInstanceHours      *float64 `infracost_usage:"monthly_instance_hours"`
 	Storage                   *float64 `infracost_usage:"storage"`
@@ -34,7 +35,6 @@ type PiInstance struct {
 	HighAvailability          *int64   `infracost_usage:"high_availability"`
 	DB2WebQuery               *int64   `infracost_usage:"db2_web_query"`
 	RationalDevStudioLicences *int64   `infracost_usage:"rational_dev_studio_licenses"`
-	Profile                   *string  `infracost_usage:"profile"`
 	Epic                      *int64   `infracost_usage:"epic"`
 }
 
@@ -58,7 +58,6 @@ var PiInstanceUsageSchema = []*schema.UsageItem{
 	{Key: "high_availability", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "db2_web_query", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "rational_dev_studio_licenses", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "profile", DefaultValue: "", ValueType: schema.String},
 	{Key: "epic", DefaultValue: 0, ValueType: schema.Int64},
 }
 
@@ -76,7 +75,7 @@ func (r *PiInstance) BuildResource() *schema.Resource {
 		r.piInstanceStorageCostComponent(),
 	}
 
-	if r.Profile != nil {
+	if r.Profile != "" {
 		costComponents = append(costComponents, r.piInstanceMemoryHanaProfileCostComponent(), r.piInstanceCoresHanaProfileCostComponent())
 	} else {
 		costComponents = append(costComponents, r.piInstanceCoresCostComponent(), r.piInstanceMemoryCostComponent())
@@ -281,8 +280,8 @@ func (r *PiInstance) piInstanceIBMiOperatingSystemServiceExtensionCostComponent(
 func (r *PiInstance) piInstanceMemoryHanaProfileCostComponent() *schema.CostComponent {
 	var memoryAmount float64
 
-	if r.Profile != nil {
-		coresAndMemory := strings.Split(*r.Profile, "-")[1]
+	if r.Profile != "" {
+		coresAndMemory := strings.Split(r.Profile, "-")[1]
 		memoryString := strings.Split(coresAndMemory, "x")[1]
 		memory, err := strconv.Atoi(memoryString)
 		if err == nil {
@@ -323,8 +322,8 @@ func (r *PiInstance) piInstanceMemoryHanaProfileCostComponent() *schema.CostComp
 func (r *PiInstance) piInstanceCoresHanaProfileCostComponent() *schema.CostComponent {
 	var coresAmount float64
 
-	if r.Profile != nil {
-		coresAndMemory := strings.Split(*r.Profile, "-")[1]
+	if r.Profile != "" {
+		coresAndMemory := strings.Split(r.Profile, "-")[1]
 		coresString := strings.Split(coresAndMemory, "x")[0]
 		cores, err := strconv.Atoi(coresString)
 		if err == nil {
@@ -525,7 +524,7 @@ func (r *PiInstance) piInstanceCoresCostComponent() *schema.CostComponent {
 			if epicEnabled {
 				unit = "ESS_VIRTUAL_PROCESSOR_CORE_HOURS"
 			} else {
-				if r.OperatingSystem == SLES && r.Profile == nil {
+				if r.OperatingSystem == SLES && r.Profile != "" {
 					unit = "COREHANA_APPLICATION_INSTANCE_HOURS"
 				} else {
 					unit = "EDD_VIRTUAL_PROCESSOR_CORE_HOURS"

@@ -8,48 +8,48 @@ terraform {
 }
 
 provider "ibm" {
-  region           = "us-south"
-  zone             = "dal12"
+  region = "us-south"
+  zone   = "dal12"
 }
 
 resource "ibm_pi_image" "aix_image" {
-  pi_image_name        = "7200-05-03"
-  pi_cloud_instance_id = "51e1879c-bcbe-4ee1-a008-49cdba0eaf60"
-  pi_image_bucket_name = "images-public-bucket"
-  pi_image_bucket_access = "public"
-  pi_image_bucket_region = "us-south"
+  pi_image_name             = "7200-05-03"
+  pi_cloud_instance_id      = "51e1879c-bcbe-4ee1-a008-49cdba0eaf60"
+  pi_image_bucket_name      = "images-public-bucket"
+  pi_image_bucket_access    = "public"
+  pi_image_bucket_region    = "us-south"
   pi_image_bucket_file_name = "rhcos-48-07222021.ova.gz"
-  pi_image_storage_type = "tier1"
+  pi_image_storage_type     = "tier1"
 }
 
 resource "ibm_pi_image" "ibmi_image" {
-  pi_image_name        = "IBMi-71-11-2924-4"
-  pi_cloud_instance_id = "51e1879c-bcbe-4ee1-a008-49cdba0eaf60"
-  pi_image_bucket_name = "images-public-bucket"
-  pi_image_bucket_access = "public"
-  pi_image_bucket_region = "us-south"
+  pi_image_name             = "IBMi-71-11-2924-4"
+  pi_cloud_instance_id      = "51e1879c-bcbe-4ee1-a008-49cdba0eaf60"
+  pi_image_bucket_name      = "images-public-bucket"
+  pi_image_bucket_access    = "public"
+  pi_image_bucket_region    = "us-south"
   pi_image_bucket_file_name = "rhcos-48-07222021.ova.gz"
-  pi_image_storage_type = "tier1"
+  pi_image_storage_type     = "tier1"
 }
 
 resource "ibm_pi_image" "hana_image" {
-  pi_image_name        = "SLES15-SP2-SAP"
-  pi_cloud_instance_id = "51e1879c-bcbe-4ee1-a008-49cdba0eaf60"
-  pi_image_bucket_name = "images-public-bucket"
-  pi_image_bucket_access = "public"
-  pi_image_bucket_region = "us-south"
+  pi_image_name             = "SLES15-SP2-SAP"
+  pi_cloud_instance_id      = "51e1879c-bcbe-4ee1-a008-49cdba0eaf60"
+  pi_image_bucket_name      = "images-public-bucket"
+  pi_image_bucket_access    = "public"
+  pi_image_bucket_region    = "us-south"
   pi_image_bucket_file_name = "rhcos-48-07222021.ova.gz"
-  pi_image_storage_type = "tier1"
+  pi_image_storage_type     = "tier1"
 }
 
 resource "ibm_pi_image" "netweaver_image" {
-  pi_image_name        = "SLES15-SP2-SAP-NETWEAVER"
-  pi_cloud_instance_id = "51e1879c-bcbe-4ee1-a008-49cdba0eaf60"
-  pi_image_bucket_name = "images-public-bucket"
-  pi_image_bucket_access = "public"
-  pi_image_bucket_region = "us-south"
+  pi_image_name             = "SLES15-SP2-SAP-NETWEAVER"
+  pi_cloud_instance_id      = "51e1879c-bcbe-4ee1-a008-49cdba0eaf60"
+  pi_image_bucket_name      = "images-public-bucket"
+  pi_image_bucket_access    = "public"
+  pi_image_bucket_region    = "us-south"
   pi_image_bucket_file_name = "rhcos-48-07222021.ova.gz"
-  pi_image_storage_type = "tier1"
+  pi_image_storage_type     = "tier1"
 }
 
 resource "ibm_pi_key" "key" {
@@ -69,7 +69,7 @@ resource "ibm_pi_instance" "aix-shared-s922-instance" {
   pi_cloud_instance_id = "51e1879c-bcbe-4ee1-a008-49cdba0eaf60"
   pi_pin_policy        = "none"
   pi_health_status     = "WARNING"
-  pi_storage_type  = ibm_pi_image.aix_image.pi_image_storage_type
+  pi_storage_type      = ibm_pi_image.aix_image.pi_image_storage_type
   pi_network {
     network_id = "test-id"
   }
@@ -86,7 +86,7 @@ resource "ibm_pi_instance" "ibmi-dedicated-e980-instance" {
   pi_cloud_instance_id = "51e1879c-bcbe-4ee1-a008-49cdba0eaf60"
   pi_pin_policy        = "none"
   pi_health_status     = "WARNING"
-  pi_storage_type  = ibm_pi_image.ibmi_image.pi_image_storage_type
+  pi_storage_type      = ibm_pi_image.ibmi_image.pi_image_storage_type
   pi_network {
     network_id = "test-id"
   }
@@ -103,7 +103,8 @@ resource "ibm_pi_instance" "hana-dedicated-e980-instance" {
   pi_cloud_instance_id = "51e1879c-bcbe-4ee1-a008-49cdba0eaf60"
   pi_pin_policy        = "none"
   pi_health_status     = "WARNING"
-  pi_storage_type  = ibm_pi_image.ibmi_image.pi_image_storage_type
+  pi_storage_type      = ibm_pi_image.ibmi_image.pi_image_storage_type
+  pi_sap_profile_id    = "ush1-4x128"
   pi_network {
     network_id = "test-id"
   }
@@ -120,7 +121,7 @@ resource "ibm_pi_instance" "netweaver-shared-s922-instance" {
   pi_cloud_instance_id = "51e1879c-bcbe-4ee1-a008-49cdba0eaf60"
   pi_pin_policy        = "none"
   pi_health_status     = "WARNING"
-  pi_storage_type  = ibm_pi_image.ibmi_image.pi_image_storage_type
+  pi_storage_type      = ibm_pi_image.ibmi_image.pi_image_storage_type
   pi_network {
     network_id = "test-id"
   }
@@ -137,7 +138,7 @@ resource "ibm_pi_instance" "netweaver-shared-s922-no-usage-specified-instance" {
   pi_cloud_instance_id = "51e1879c-bcbe-4ee1-a008-49cdba0eaf60"
   pi_pin_policy        = "none"
   pi_health_status     = "WARNING"
-  pi_storage_type  = ibm_pi_image.ibmi_image.pi_image_storage_type
+  pi_storage_type      = ibm_pi_image.ibmi_image.pi_image_storage_type
   pi_network {
     network_id = "test-id"
   }
