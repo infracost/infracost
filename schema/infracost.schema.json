@@ -2,6 +2,34 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "$ref": "#/definitions/Root",
   "definitions": {
+    "ActualCosts": {
+      "required": [
+        "resourceId",
+        "startTimestamp",
+        "endTimestamp"
+      ],
+      "properties": {
+        "resourceId": {
+          "type": "string"
+        },
+        "startTimestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endTimestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "costComponents": {
+          "items": {
+            "$ref": "#/definitions/CostComponent"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
     "Breakdown": {
       "required": [
         "resources",
@@ -230,6 +258,10 @@
           },
           "type": "array"
         },
+        "actualCosts": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/ActualCosts"
+        },
         "subresources": {
           "items": {
             "$ref": "#/definitions/Subresource"
@@ -347,6 +379,10 @@
             "$ref": "#/definitions/CostComponent"
           },
           "type": "array"
+        },
+        "actualCosts": {
+          "$schema": "http://json-schema.org/draft-04/schema#",
+          "$ref": "#/definitions/ActualCosts"
         },
         "subresources": {
           "items": {

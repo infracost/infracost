@@ -1,12 +1,11 @@
 package prices
 
 import (
-	"github.com/shopspring/decimal"
-	"runtime"
-
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/shopspring/decimal"
+	"runtime"
 )
 
 // PopulateActualCosts fetches cloud provider reported costs from the Infracost
@@ -76,13 +75,19 @@ func popResourceActualCosts(ctx *config.RunContext, c *apiclient.UsageAPIClient,
 		Address:  r.Name,
 		Currency: c.Currency,
 	}
-	results, err := c.ListActualCosts(vars)
-
-	if err != nil {
+	actualCost, err := c.ListActualCosts(vars)
+	if actualCost == nil || err != nil {
 		return err
 	}
 
-	for _, actual := range results {
+	actualCosts := &schema.ActualCosts{
+		ResourceID:     actualCost.ResourceID,
+		StartTimestamp: actualCost.StartTimestamp.UTC(),
+		EndTimestamp:   actualCost.EndTimestamp.UTC(),
+		CostComponents: make([]*schema.CostComponent, 0, len(actualCost.CostComponents)),
+	}
+
+	for _, actual := range actualCost.CostComponents {
 		monthlyCost, err := decimal.NewFromString(actual.MonthlyCost)
 		if err != nil {
 			break
@@ -106,8 +111,13 @@ func popResourceActualCosts(ctx *config.RunContext, c *apiclient.UsageAPIClient,
 		}
 		cc.SetPrice(price)
 
-		r.CostComponents = append(r.CostComponents, cc)
+		actualCosts.CostComponents = append(actualCosts.CostComponents, cc)
 	}
+
+	if len(actualCosts.CostComponents) > 0 {
+		r.ActualCosts = actualCosts
+	}
+
 	return nil
 }
 
