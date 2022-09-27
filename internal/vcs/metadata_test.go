@@ -23,35 +23,53 @@ func Test_urlStringToRemote(t *testing.T) {
 	}{
 		{"git@github.com:org/repo.git", Remote{
 			Host: "github.com",
+			Name: "org/repo",
 			URL:  "https://github.com/org/repo.git",
 		}},
 		{"https://github.com/org/repo.git", Remote{
 			Host: "github.com",
+			Name: "org/repo",
 			URL:  "https://github.com/org/repo.git",
 		}},
 		{"git@gitlab.com:org/repo.git", Remote{
 			Host: "gitlab.com",
+			Name: "org/repo",
 			URL:  "https://gitlab.com/org/repo.git",
 		}},
 		{"https://gitlab.com/org/repo.git", Remote{
 			Host: "gitlab.com",
+			Name: "org/repo",
 			URL:  "https://gitlab.com/org/repo.git",
 		}},
 		{"git@bitbucket.org:org/repo.git", Remote{
 			Host: "bitbucket.org",
+			Name: "org/repo",
 			URL:  "https://bitbucket.org/org/repo.git",
 		}},
 		{"https://user@bitbucket.org/org/repo.git", Remote{
 			Host: "bitbucket.org",
+			Name: "org/repo",
 			URL:  "https://bitbucket.org/org/repo.git",
 		}},
 		{"https://user@dev.azure.com/org/project/_git/repo", Remote{
 			Host: "dev.azure.com",
+			Name: "org/project/repo",
 			URL:  "https://dev.azure.com/org/project/_git/repo",
 		}},
 		{"git@ssh.dev.azure.com:v3/org/project/repo", Remote{
 			Host: "dev.azure.com",
+			Name: "org/project/repo",
 			URL:  "https://dev.azure.com/org/project/_git/repo",
+		}},
+		{"https://user@bitbucket.custom.org:8888/custom.org/repo", Remote{
+			Host: "bitbucket.custom.org",
+			Name: "custom.org/repo",
+			URL:  "https://bitbucket.custom.org:8888/custom.org/repo",
+		}},
+		{"git@bitbucket.org:8888/~test.infracost.io/infracost-bitbucket-pipeline.git", Remote{
+			Host: "bitbucket.org",
+			Name: "~test.infracost.io/infracost-bitbucket-pipeline",
+			URL:  "https://bitbucket.org:8888/~test.infracost.io/infracost-bitbucket-pipeline.git",
 		}},
 	}
 	for _, tt := range tests {
@@ -81,6 +99,7 @@ func Test_metadataFetcher_GetLocalMetadata(t *testing.T) {
 	assert.Equal(t, Metadata{
 		Remote: Remote{
 			Host: "github.com",
+			Name: "git-fixtures/basic",
 			URL:  "https://github.com/git-fixtures/basic.git",
 		},
 		Branch: Branch{
@@ -122,6 +141,7 @@ func Test_metadataFetcher_GetLocalMetadataMergesWithEnv(t *testing.T) {
 	assert.Equal(t, Metadata{
 		Remote: Remote{
 			Host: "github.com",
+			Name: "git-fixtures/basic",
 			URL:  "https://github.com/git-fixtures/basic.git",
 		},
 		Branch: Branch{
@@ -207,6 +227,7 @@ func Test_metadataFetcher_Get_ReturnsUserDefinedEnvs(t *testing.T) {
 	assert.Equal(t, Metadata{
 		Remote: Remote{
 			Host: "github.com",
+			Name: "infracost/test-repo",
 			URL:  "https://github.com/infracost/test-repo.git",
 		},
 		Branch: Branch{

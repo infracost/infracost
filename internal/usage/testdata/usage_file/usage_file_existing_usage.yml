@@ -5,7 +5,8 @@ resource_usage:
   aws_instance.instance_counted[0]:
     operating_system: linux # Override the operating system of the instance, can be: linux, windows, suse, rhel.
   ##
-  ## The following usage values are all commented-out, you can uncomment resources and customize as needed.
+  ## The following usage values apply to individual resources and override any value defined in the resource_type_default_usage section.
+  ## All values are commented-out, you can uncomment resources and customize as needed.
   ##
   aws_instance.with_usage:
     operating_system: windows

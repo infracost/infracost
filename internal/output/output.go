@@ -76,6 +76,7 @@ func convertOutputResources(outResources []Resource) []*schema.Resource {
 		resources[i] = &schema.Resource{
 			Name:           resource.Name,
 			CostComponents: convertCostComponents(resource.CostComponents),
+			ActualCosts:    convertActualCosts(resource.ActualCosts),
 			SubResources:   convertOutputResources(resource.SubResources),
 			HourlyCost:     resource.HourlyCost,
 			MonthlyCost:    resource.MonthlyCost,
@@ -105,6 +106,19 @@ func convertCostComponents(outComponents []CostComponent) []*schema.CostComponen
 	}
 
 	return components
+}
+
+func convertActualCosts(ac *ActualCosts) *schema.ActualCosts {
+	if ac == nil {
+		return nil
+	}
+
+	return &schema.ActualCosts{
+		ResourceID:     ac.ResourceID,
+		StartTimestamp: ac.StartTimestamp,
+		EndTimestamp:   ac.EndTimestamp,
+		CostComponents: convertCostComponents(ac.CostComponents),
+	}
 }
 
 type Projects []Project
@@ -164,6 +178,13 @@ type CostComponent struct {
 	MonthlyCost     *decimal.Decimal `json:"monthlyCost"`
 }
 
+type ActualCosts struct {
+	ResourceID     string          `json:"resourceId"`
+	StartTimestamp time.Time       `json:"startTimestamp"`
+	EndTimestamp   time.Time       `json:"endTimestamp"`
+	CostComponents []CostComponent `json:"costComponents,omitempty"`
+}
+
 type Resource struct {
 	Name           string                 `json:"name"`
 	Tags           map[string]string      `json:"tags,omitempty"`
@@ -171,6 +192,7 @@ type Resource struct {
 	HourlyCost     *decimal.Decimal       `json:"hourlyCost"`
 	MonthlyCost    *decimal.Decimal       `json:"monthlyCost"`
 	CostComponents []CostComponent        `json:"costComponents,omitempty"`
+	ActualCosts    *ActualCosts           `json:"actualCosts,omitempty"`
 	SubResources   []Resource             `json:"subresources,omitempty"`
 }
 
@@ -280,18 +302,9 @@ func outputBreakdown(resources []*schema.Resource) *Breakdown {
 }
 
 func outputResource(r *schema.Resource) Resource {
-	comps := make([]CostComponent, 0, len(r.CostComponents))
-	for _, c := range r.CostComponents {
-		comps = append(comps, CostComponent{
-			Name:            c.Name,
-			Unit:            c.Unit,
-			HourlyQuantity:  c.UnitMultiplierHourlyQuantity(),
-			MonthlyQuantity: c.UnitMultiplierMonthlyQuantity(),
-			Price:           c.UnitMultiplierPrice(),
-			HourlyCost:      c.HourlyCost,
-			MonthlyCost:     c.MonthlyCost,
-		})
-	}
+	comps := outputCostComponents(r.CostComponents)
+
+	actualCosts := outputActualCosts(r.ActualCosts)
 
 	subresources := make([]Resource, 0, len(r.SubResources))
 	for _, s := range r.SubResources {
@@ -312,7 +325,37 @@ func outputResource(r *schema.Resource) Resource {
 		HourlyCost:     r.HourlyCost,
 		MonthlyCost:    r.MonthlyCost,
 		CostComponents: comps,
+		ActualCosts:    actualCosts,
 		SubResources:   subresources,
+	}
+}
+
+func outputCostComponents(costComponents []*schema.CostComponent) []CostComponent {
+	comps := make([]CostComponent, 0, len(costComponents))
+	for _, c := range costComponents {
+		comps = append(comps, CostComponent{
+			Name:            c.Name,
+			Unit:            c.Unit,
+			HourlyQuantity:  c.UnitMultiplierHourlyQuantity(),
+			MonthlyQuantity: c.UnitMultiplierMonthlyQuantity(),
+			Price:           c.UnitMultiplierPrice(),
+			HourlyCost:      c.HourlyCost,
+			MonthlyCost:     c.MonthlyCost,
+		})
+	}
+	return comps
+}
+
+func outputActualCosts(ac *schema.ActualCosts) *ActualCosts {
+	if ac == nil {
+		return nil
+	}
+
+	return &ActualCosts{
+		ResourceID:     ac.ResourceID,
+		StartTimestamp: ac.StartTimestamp,
+		EndTimestamp:   ac.EndTimestamp,
+		CostComponents: outputCostComponents(ac.CostComponents),
 	}
 }
 
