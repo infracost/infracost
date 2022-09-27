@@ -13,6 +13,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/version"
 )
 
@@ -54,6 +55,8 @@ func (c *APIClient) doQueries(queries []GraphQLQuery) ([]gjson.Result, error) {
 }
 
 func (c *APIClient) doRequest(method string, path string, d interface{}) ([]byte, error) {
+	logging.Logger.Debugf("'%s' request to '%s' using trace_id: '%s'", method, path, c.uuid.String())
+
 	reqBody, err := json.Marshal(d)
 	if err != nil {
 		return []byte{}, errors.Wrap(err, "Error generating request body")
