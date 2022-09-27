@@ -39,6 +39,11 @@ func (u *ReferenceFile) SetDefaultValues() {
 			setUsageItemDefaultValues(item)
 		}
 	}
+	for _, resourceUsage := range u.ResourceTypeUsages {
+		for _, item := range resourceUsage.Items {
+			setUsageItemDefaultValues(item)
+		}
+	}
 }
 
 // FindMatchingResourceUsage returns the matching resource usage for the given resource name
@@ -54,6 +59,21 @@ func (u *ReferenceFile) FindMatchingResourceUsage(name string) *ResourceUsage {
 	for _, resourceUsage := range u.ResourceUsages {
 		resourceType := strings.Split(resourceUsage.Name, ".")[0]
 		if resourceType == wantResourceType {
+			return resourceUsage
+		}
+	}
+	return nil
+}
+
+func (u *ReferenceFile) FindMatchingResourceTypeUsage(resourceType string) *ResourceUsage {
+	for _, resourceUsage := range u.ResourceTypeUsages {
+		if resourceUsage.Name == resourceType {
+			return resourceUsage
+		}
+	}
+	for _, resourceUsage := range u.ResourceUsages {
+		referenceResourceType := strings.Split(resourceUsage.Name, ".")[0]
+		if referenceResourceType == resourceType {
 			return resourceUsage
 		}
 	}

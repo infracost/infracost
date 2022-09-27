@@ -82,14 +82,6 @@ var (
 	outputIndent = "  "
 )
 
-// NewWarningWriter returns a function that can be used to write a message to the RunContext.ErrWriter.
-// This can be useful to pass to functions or structs that don't use a full RunContext.
-func (r *RunContext) NewWarningWriter() ui.WriteWarningFunc {
-	return func(msg string) {
-		fmt.Fprintf(r.ErrWriter, "%s%s %s\n", outputIndent, ui.WarningString("Warning:"), msg)
-	}
-}
-
 // NewSpinner returns an ui.Spinner built from the RunContext.
 func (r *RunContext) NewSpinner(msg string) *ui.Spinner {
 	return ui.NewSpinner(msg, ui.SpinnerOptions{
@@ -107,6 +99,10 @@ func (r *RunContext) Context() context.Context {
 // UUID returns the underlying run uuid. This can be used to globally identify the run context.
 func (r *RunContext) UUID() uuid.UUID {
 	return r.uuid
+}
+
+func (c *RunContext) VCSRepositoryURL() string {
+	return c.VCSMetadata.Remote.URL
 }
 
 func (r *RunContext) SetContextValue(key string, value interface{}) {

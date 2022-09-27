@@ -9,10 +9,6 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-type CoreResource interface {
-	PopulateUsage(u *schema.UsageData)
-}
-
 // Dummy variables for type checking
 var intPtr *int64
 var floatPtr *float64
