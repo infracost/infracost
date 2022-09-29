@@ -10,7 +10,6 @@ import (
 
 // IbmIsVpc struct represents an instance of IBM's Virtual Private Cloud
 //
-//
 // Resource information: https://cloud.ibm.com/docs/vpc?topic=vpc-getting-started
 // Pricing information: https://www.ibm.com/cloud/vpc/pricing
 type IbmIsVpc struct {
@@ -40,7 +39,7 @@ func (r *IbmIsVpc) vpcEgressFreeCostComponent() *schema.CostComponent {
 		}
 	}
 	costComponent := schema.CostComponent{
-		Name:            fmt.Sprintf("VPC egress free allowance (first 5GB)"),
+		Name:            "VPC egress free allowance (first 5GB)",
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: quantity,
@@ -85,7 +84,7 @@ func (r *IbmIsVpc) vpcEgressCostComponent() *schema.CostComponent {
 
 func (r *IbmIsVpc) vpcInstanceCostComponent() *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:            fmt.Sprintf("VPC instance"),
+		Name:            "VPC instance",
 		Unit:            "Instance",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
