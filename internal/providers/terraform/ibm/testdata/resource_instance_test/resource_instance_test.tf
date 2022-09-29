@@ -34,3 +34,11 @@ resource "ibm_resource_instance" "resource_instance_appid" {
   location          = "us-south"
   resource_group_id = "default"
 }
+
+resource "ibm_resource_instance" "resource_instance_power_iaas" {
+  name              = "test"
+  service           = "power-iaas"
+  plan              = "power-virtual-server-group"
+  location          = "us-south"
+  resource_group_id = "default"
+}

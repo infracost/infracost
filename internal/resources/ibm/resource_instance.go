@@ -13,6 +13,7 @@ import (
 //
 // This terraform resource is opaque and can handle a number of services, provided with the right parameters
 type ResourceInstance struct {
+	Name       string
 	Address    string
 	Service    string
 	Plan       string
@@ -49,6 +50,7 @@ var ResourceInstanceCostMap map[string]ResourceCostComponentsFunc = map[string]R
 	"kms":             GetKMSCostComponents,
 	"secrets-manager": GetSecretsManagerCostComponents,
 	"appid":           GetAppIDCostComponents,
+	"power-iaas":      GetPowerCostComponents,
 }
 
 // PopulateUsage parses the u schema.UsageData into the ResourceInstance.
@@ -180,6 +182,21 @@ func GetSecretsManagerCostComponents(r *ResourceInstance) []*schema.CostComponen
 		return []*schema.CostComponent{
 			&costComponent,
 		}
+	}
+}
+
+func GetPowerCostComponents(r *ResourceInstance) []*schema.CostComponent {
+	q := decimalPtr(decimal.NewFromInt(1))
+
+	costComponent := schema.CostComponent{
+		Name:            r.Name,
+		Unit:            "Instance",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: q,
+	}
+	costComponent.SetCustomPrice(decimalPtr(decimal.NewFromInt(0)))
+	return []*schema.CostComponent{
+		&costComponent,
 	}
 }
 

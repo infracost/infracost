@@ -33,10 +33,15 @@
  ├─ Memory                                                          Monthly cost depends on usage: $0.0114 per GB hours     
  └─ Linux Operating System                                                          1  Instance                       $0.00 
                                                                                                                             
+ ibm_resource_instance.powervs_service                                                                                      
+ └─ Power instance                                                                  1  Instance                       $0.00 
+                                                                                                                            
  OVERALL TOTAL                                                                                                    $6,946.79 
 ──────────────────────────────────
-10 cloud resources were detected:
-∙ 5 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+12 cloud resources were detected:
+∙ 6 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 1 was free:
+  ∙ 1 x ibm_resource_group
 ∙ 5 are not supported yet, see https://infracost.io/requested-resources:
   ∙ 4 x ibm_pi_image
   ∙ 1 x ibm_pi_key

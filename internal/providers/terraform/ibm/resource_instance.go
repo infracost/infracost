@@ -16,8 +16,10 @@ func newResourceInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	plan := d.Get("plan").String()
 	location := d.Get("location").String()
 	service := d.Get("service").String()
+	name := d.Get("name").String()
 
 	r := &ibm.ResourceInstance{
+		Name:       name,
 		Address:    d.Address,
 		Service:    service,
 		Plan:       plan,
