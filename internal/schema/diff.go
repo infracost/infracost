@@ -178,6 +178,7 @@ func diffCostComponents(past *CostComponent, current *CostComponent) (bool, *Cos
 	}
 
 	changed := false
+
 	diff := &CostComponent{
 		Name:                 diffName(current.Name, past.Name),
 		Unit:                 baseCostComponent.Unit,
@@ -193,6 +194,48 @@ func diffCostComponents(past *CostComponent, current *CostComponent) (bool, *Cos
 		price:               *diffDecimals(&current.price, &past.price),
 		HourlyCost:          diffDecimals(current.HourlyCost, past.HourlyCost),
 		MonthlyCost:         diffDecimals(current.MonthlyCost, past.MonthlyCost),
+	}
+
+	// There are 3 cases with priceTiers:
+	// - Tier parameters changed - diff for every field
+	// - Tiered -> not tiered - should be already handled by the code above
+	// - Not tiered -> tiered
+	if current.priceTiers != nil && len(current.priceTiers) > 0 {
+		if past.priceTiers != nil && len(past.priceTiers) > 0 {
+			tiersLen := len(current.priceTiers)
+			if len(past.priceTiers) > tiersLen {
+				tiersLen = len(past.priceTiers)
+			}
+			diff.priceTiers = make([]PriceTier, tiersLen)
+			for i := 0; i < tiersLen; i++ {
+				if len(current.priceTiers) > i && len(past.priceTiers) > i {
+					diff.priceTiers[i] = PriceTier{
+						Name:             diffName(current.Name, past.Name),
+						Price:            *diffDecimals(&current.priceTiers[i].Price, &past.priceTiers[i].Price),
+						StartUsageAmount: *diffDecimals(&current.priceTiers[i].StartUsageAmount, &past.priceTiers[i].StartUsageAmount),
+						EndUsageAmount:   *diffDecimals(&current.priceTiers[i].EndUsageAmount, &past.priceTiers[i].EndUsageAmount),
+						HourlyQuantity:   diffDecimals(current.priceTiers[i].HourlyQuantity, past.priceTiers[i].HourlyQuantity),
+						MonthlyQuantity:  diffDecimals(current.priceTiers[i].MonthlyQuantity, past.priceTiers[i].MonthlyQuantity),
+						MonthlyCost:      diffDecimals(current.priceTiers[i].MonthlyCost, past.priceTiers[i].MonthlyCost),
+						HourlyCost:       diffDecimals(current.priceTiers[i].HourlyCost, past.priceTiers[i].HourlyCost),
+					}
+					if !diff.priceTiers[i].HourlyQuantity.IsZero() || !diff.priceTiers[i].MonthlyQuantity.IsZero() ||
+						!diff.priceTiers[i].Price.IsZero() || !diff.priceTiers[i].HourlyCost.IsZero() ||
+						!diff.priceTiers[i].MonthlyCost.IsZero() {
+						changed = true
+					}
+				} else if len(current.priceTiers) >= i {
+					diff.priceTiers[i] = current.priceTiers[i]
+					changed = true
+				} else if len(past.priceTiers) >= i {
+					diff.priceTiers[i] = past.priceTiers[i]
+					changed = true
+				}
+			}
+		} else {
+			diff.priceTiers = current.priceTiers
+			changed = true
+		}
 	}
 	if !diff.HourlyQuantity.IsZero() || !diff.MonthlyQuantity.IsZero() ||
 		diff.MonthlyDiscountPerc != 0 || !diff.price.IsZero() ||

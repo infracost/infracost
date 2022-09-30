@@ -42,10 +42,8 @@ type CostComponent struct {
 }
 
 func (c *CostComponent) CalculateCosts() {
-	c.fillQuantities()
 	if c.priceTiers != nil {
 		for i, tier := range c.priceTiers {
-			tier.fillQuantities()
 			if c.HourlyQuantity != nil {
 				tier.HourlyQuantity = decimalPtr(decimal.NewFromInt(0))
 				tier.HourlyCost = decimalPtr(decimal.NewFromInt(0))
@@ -53,10 +51,6 @@ func (c *CostComponent) CalculateCosts() {
 					tier.HourlyQuantity = decimalPtr(c.HourlyQuantity.Sub(tier.StartUsageAmount))
 				} else if tier.EndUsageAmount.GreaterThan(decimal.NewFromInt(0)) && tier.EndUsageAmount.LessThan(*c.HourlyQuantity) {
 					tier.HourlyQuantity = decimalPtr(tier.EndUsageAmount.Sub(tier.StartUsageAmount))
-				}
-
-				if tier.HourlyQuantity.GreaterThan(decimal.NewFromInt(0)) {
-					tier.HourlyCost = decimalPtr(tier.Price.Mul(*tier.HourlyQuantity))
 				}
 			}
 			if c.MonthlyQuantity != nil {
@@ -67,12 +61,16 @@ func (c *CostComponent) CalculateCosts() {
 				} else if tier.EndUsageAmount.GreaterThan(decimal.NewFromInt(0)) && tier.EndUsageAmount.LessThan(*c.MonthlyQuantity) {
 					tier.MonthlyQuantity = decimalPtr(tier.EndUsageAmount.Sub(tier.StartUsageAmount))
 				}
+			}
 
-				if tier.MonthlyQuantity.GreaterThan(decimal.NewFromInt(0)) {
-					tier.MonthlyCost = decimalPtr(tier.Price.Mul(*tier.MonthlyQuantity))
-					discountMul := decimal.NewFromFloat(1.0 - c.MonthlyDiscountPerc)
-					tier.MonthlyCost = decimalPtr(tier.MonthlyCost.Mul(discountMul))
-				}
+			tier.fillQuantities()
+
+			if tier.HourlyQuantity != nil {
+				tier.HourlyCost = decimalPtr(tier.Price.Mul(*tier.HourlyQuantity))
+			}
+			if tier.MonthlyQuantity != nil {
+				discountMul := decimal.NewFromFloat(1.0 - c.MonthlyDiscountPerc)
+				tier.MonthlyCost = decimalPtr(tier.Price.Mul(*tier.MonthlyQuantity).Mul(discountMul))
 			}
 			c.priceTiers[i] = tier
 		}
@@ -95,6 +93,7 @@ func (c *CostComponent) CalculateCosts() {
 			}
 		}
 	} else {
+		c.fillQuantities()
 		if c.HourlyQuantity != nil {
 			c.HourlyCost = decimalPtr(c.price.Mul(*c.HourlyQuantity))
 		}
