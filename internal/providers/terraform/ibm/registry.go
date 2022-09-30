@@ -47,6 +47,7 @@ var FreeResources = []string{
 	"ibm_kms_key_rings",
 	"ibm_pi_dhcp",
 	"ibm_pi_network",
+	"ibm_pi_network_port",
 	"ibm_pi_placement_group",
 	"ibm_resource_group",
 	"ibm_resource_key",
