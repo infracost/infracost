@@ -125,7 +125,6 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 
 	allProjectsSkipped := len(out.Projects) == skippedProjectCount
 
-
 	hasModulePath, hasWorkspace := calculateMetadataToDisplay(out.Projects)
 
 	var buf bytes.Buffer
