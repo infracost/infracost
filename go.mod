@@ -11,7 +11,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/config v1.15.14
 	github.com/aws/aws-sdk-go-v2/service/autoscaling v1.23.16
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.21.4
-	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.16.4
+	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.17.1
 	github.com/aws/aws-sdk-go-v2/service/ec2 v1.54.4
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.27.11
 	github.com/awslabs/goformation/v4 v4.19.5
@@ -59,7 +59,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/internal/configsources v1.1.23 // indirect
 	github.com/aws/aws-sdk-go-v2/internal/ini v1.3.15 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.9.9 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.7.15 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.7.17 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.9.17 // indirect
 	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.13.17 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sso v1.11.12 // indirect
