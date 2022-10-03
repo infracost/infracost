@@ -17,6 +17,8 @@
   </tbody>
 </table>
 
+2 projects have no cost estimate changes.
+
 <details>
 <summary><strong>Infracost output</strong></summary>
 
@@ -30,3 +32,4 @@ Run the following command to see their breakdown: infracost breakdown --path=/pa
 
 ```
 </details>
+
