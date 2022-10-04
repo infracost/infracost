@@ -146,17 +146,6 @@ func (p *Parser) populateUsageData(resData map[string]*schema.ResourceData, usag
 				d.UsageData = arrayUsageData
 			}
 		}
-		if d.UsageData == nil {
-			// Look and default to resource_type level data
-			parsed_address, err := address_parser.NewAddress(d.Address)
-			if err != nil {
-				continue
-			}
-			val, ok := usage[parsed_address.ResourceSpec.Type]
-			if ok {
-				d.UsageData = val
-			}
-		}
 	}
 }
 

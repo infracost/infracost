@@ -191,10 +191,6 @@ func (u *UsageFile) ToUsageDataMap() map[string]*schema.UsageData {
 		m[resourceUsage.Name] = schema.NewUsageData(resourceUsage.Name, schema.ParseAttributes(resourceUsage.Map()))
 	}
 
-	for _, resourceUsage := range u.ResourceTypeUsages {
-		m[resourceUsage.Name] = schema.NewUsageData(resourceUsage.Name, schema.ParseAttributes(resourceUsage.Map()))
-	}
-
 	return m
 }
 
