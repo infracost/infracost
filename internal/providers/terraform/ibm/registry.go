@@ -50,6 +50,7 @@ var FreeResources = []string{
 	"ibm_pi_console_language",
 	"ibm_pi_dhcp",
 	"ibm_pi_ike_policy",
+	"ibm_pi_image",
 	"ibm_pi_instance_action",
 	"ibm_pi_ipsec_policy",
 	"ibm_pi_key",
