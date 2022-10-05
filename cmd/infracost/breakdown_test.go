@@ -481,3 +481,16 @@ func TestBreakdownWithActualCosts(t *testing.T) {
 		},
 	)
 }
+
+func TestBreakdownWithNestedForeach(t *testing.T) {
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path",
+			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+		},
+		nil,
+	)
+}

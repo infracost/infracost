@@ -139,8 +139,9 @@ func (blocks Blocks) OfType(t string) Blocks {
 
 // BlockMatcher defines a struct that can be used to filter a list of blocks to a single Block.
 type BlockMatcher struct {
-	Type  string
-	Label string
+	Type       string
+	Label      string
+	StripCount bool
 }
 
 // Matching returns a single block filtered from the given pattern.
@@ -153,7 +154,12 @@ func (blocks Blocks) Matching(pattern BlockMatcher) *Block {
 	}
 
 	for _, block := range search {
-		if pattern.Label == block.Label() {
+		label := block.Label()
+		if pattern.StripCount {
+			label = stripCount(label)
+		}
+
+		if pattern.Label == label {
 			return block
 		}
 	}
@@ -470,6 +476,40 @@ func (b *Block) InjectBlock(block *Block, name string) {
 // IsCountExpanded returns if the Block has been expanded as part of a for_each or count evaluation.
 func (b *Block) IsCountExpanded() bool {
 	return b.expanded
+}
+
+// IsForEachReferencedExpanded checks if the block referenced under the for_each has already been expanded.
+// This is used to check is we can safely expand this block, expanding block prematurely can lead to
+// output inconsistencies. It is advised to always check if that the block has any references that are yet
+// to be expanded before expanding itself.
+func (b *Block) IsForEachReferencedExpanded(moduleBlocks Blocks) bool {
+	attr := b.GetAttribute("for_each")
+	if attr == nil {
+		return true
+	}
+
+	r, err := attr.Reference()
+	if err != nil || r == nil {
+		return true
+	}
+
+	blockType := r.blockType.Name()
+	if _, ok := validBlocksToExpand[blockType]; !ok {
+		return true
+	}
+
+	label := r.String()
+	referenced := moduleBlocks.Matching(BlockMatcher{
+		Type:       blockType,
+		Label:      label,
+		StripCount: true,
+	})
+
+	if referenced == nil {
+		return true
+	}
+
+	return referenced.IsCountExpanded()
 }
 
 func (b Block) ShouldExpand() bool {
