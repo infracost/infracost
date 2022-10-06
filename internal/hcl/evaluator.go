@@ -172,13 +172,13 @@ func (e *Evaluator) Run() (*Module, error) {
 	e.evaluate(lastContext)
 
 	// let's load the modules now we have our top level context.
-	e.moduleCalls = e.loadModules()
+	e.moduleCalls = e.loadModules(lastContext)
 	e.logger.Debug("evaluating context after loading modules")
 	e.evaluate(lastContext)
 
 	// expand out resources and modules via count and evaluate again so that we can include
 	// any module outputs and or count references.
-	e.module.Blocks = e.expandBlocks(e.module.Blocks)
+	e.module.Blocks = e.expandBlocks(e.module.Blocks, lastContext)
 	e.logger.Debug("evaluating context after expanding blocks")
 	e.evaluate(lastContext)
 
@@ -293,8 +293,27 @@ func (e *Evaluator) exportOutputs() cty.Value {
 	return e.module.Blocks.Outputs(false)
 }
 
-func (e *Evaluator) expandBlocks(blocks Blocks) Blocks {
-	return e.expandDynamicBlocks(e.expandBlockForEaches(e.expandBlockCounts(blocks))...)
+func (e *Evaluator) expandBlocks(blocks Blocks, lastContext hcl.EvalContext) Blocks {
+	expanded := blocks
+
+	for i := 0; i < maxContextIterations; i++ {
+		expanded = e.expandBlockForEaches(e.expandBlockCounts(expanded))
+
+		if reflect.DeepEqual(lastContext.Variables, e.ctx.Inner().Variables) {
+			e.logger.Debug("evaluated outputs are the same as prior evaluation, exiting and returning expanded block")
+			break
+		}
+
+		if len(e.ctx.Inner().Variables) != len(lastContext.Variables) {
+			lastContext.Variables = make(map[string]cty.Value, len(e.ctx.Inner().Variables))
+		}
+
+		for k, v := range e.ctx.Inner().Variables {
+			lastContext.Variables[k] = v
+		}
+	}
+
+	return e.expandDynamicBlocks(expanded...)
 }
 
 func (e *Evaluator) expandDynamicBlocks(blocks ...*Block) Blocks {
@@ -323,24 +342,82 @@ func (e *Evaluator) expandDynamicBlock(b *Block) {
 	}
 }
 
+// expandBlockForEaches expands the block for_each attributes. Every block that is expanded has it's value
+// reset in the context map. The original value of the block is replaced with the expanded values.
+// This is required as otherwise we'll have the original attributes polluting the expanded values.
+// Leaving the original attributes is problematic as any resources referencing the expanded block will
+// iterate over those as well. So the context map will get overwritten as follows:
+//
+// value of:
+//
+//		test.test
+//			id: test
+//			arn: test-arn
+//
+// that gets expanded should be:
+//
+//	   test.test
+//			a:
+//			  id: test
+//			  arn: test-arn
+//			b:
+//			  id: test
+//			  arn: test-arn
+//
+// and not:
+//
+//	   test.test
+//			id: test
+//			arn: test-arn
+//			a:
+//			  id: test
+//			...
+//
+// which means that blocks written like:
+//
+//		resource "aws_eip" "nat_gateway" {
+//  		for_each   = test.test
+//			...
+//		}
+//
+// will expand correctly to: aws_eip.nat_gateway[a], aws_eip.nat_gateway[b]. Rather than aws_eip.nat_gateway[id], aws_eip.nat_gateway[a] ...
 func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
-	var forEachFiltered Blocks
+	var expanded Blocks
 	for _, block := range blocks {
 		forEachAttr := block.GetAttribute("for_each")
-		if forEachAttr == nil || block.IsCountExpanded() || !shouldExpandBlock(block) {
-			forEachFiltered = append(forEachFiltered, block)
+
+		if forEachAttr == nil || block.IsCountExpanded() || !block.IsForEachReferencedExpanded(blocks) || !shouldExpandBlock(block) {
+			expanded = append(expanded, block)
 			continue
 		}
 
 		e.logger.Debugf("expanding block %s because a for_each attribute was found", block.LocalName())
 
-		if !forEachAttr.Value().IsNull() && forEachAttr.Value().IsKnown() && forEachAttr.IsIterable() {
-			forEachAttr.Value().ForEachElement(func(key cty.Value, val cty.Value) bool {
+		value := forEachAttr.Value()
+		if !value.IsNull() && value.IsKnown() && forEachAttr.IsIterable() {
+			srcValue := e.getSourceValue(block)
+
+			typeLabel := block.TypeLabel()
+			nameLabel := block.NameLabel()
+			if block.Type() == "module" {
+				typeLabel = block.Type()
+				nameLabel = block.TypeLabel()
+			}
+
+			e.ctx.Set(cty.ObjectVal(make(map[string]cty.Value)), typeLabel, nameLabel)
+
+			value.ForEachElement(func(key cty.Value, val cty.Value) bool {
 				clone := e.blockBuilder.CloneBlock(block, key)
 
 				ctx := clone.Context()
 
-				e.copyVariables(block, clone)
+				var keyStr string
+				err := gocty.FromCtyValue(key, &keyStr)
+				if err != nil {
+					e.logger.WithError(err).Debugf("could not marshal gocty key %s to string", key)
+				}
+
+				e.ctx.Set(srcValue, typeLabel, nameLabel, keyStr)
 
 				ctx.SetByDot(key, "each.key")
 				ctx.SetByDot(val, "each.value")
@@ -348,14 +425,14 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 				ctx.Set(key, block.TypeLabel(), "key")
 				ctx.Set(val, block.TypeLabel(), "value")
 
-				forEachFiltered = append(forEachFiltered, clone)
+				expanded = append(expanded, clone)
 
 				return false
 			})
 		}
 	}
 
-	return forEachFiltered
+	return expanded
 }
 
 func shouldExpandBlock(block *Block) bool {
@@ -398,30 +475,28 @@ func (e *Evaluator) expandBlockCounts(blocks Blocks) Blocks {
 	return countFiltered
 }
 
-func (e *Evaluator) copyVariables(from, to *Block) {
+func (e *Evaluator) getSourceValue(from *Block) cty.Value {
 	var fromBase string
 	var fromRel string
-	var toRel string
 
 	switch from.Type() {
 	case "resource":
 		fromBase = from.TypeLabel()
 		fromRel = from.NameLabel()
-		toRel = to.NameLabel()
 	case "module":
 		fromBase = from.Type()
 		fromRel = from.TypeLabel()
-		toRel = to.TypeLabel()
 	default:
-		return
+		return cty.ObjectVal(make(map[string]cty.Value))
 	}
 
 	srcValue := e.ctx.Root().Get(fromBase, fromRel)
 	if srcValue == cty.NilVal {
 		e.logger.Debugf("error trying to copyVariable from the source of '%s.%s'", fromBase, fromRel)
-		return
+		return cty.ObjectVal(make(map[string]cty.Value))
 	}
-	e.ctx.Root().Set(srcValue, fromBase, toRel)
+
+	return srcValue
 }
 
 func (e *Evaluator) evaluateVariable(b *Block) (cty.Value, error) {
@@ -702,12 +777,12 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 }
 
 // loadModules reads all module blocks and loads the underlying modules, adding blocks to moduleCalls.
-func (e *Evaluator) loadModules() []*ModuleCall {
+func (e *Evaluator) loadModules(lastContext hcl.EvalContext) []*ModuleCall {
 	e.logger.Debug("loading module calls")
 	var moduleDefinitions []*ModuleCall
 
 	// TODO: if a module uses a count that depends on a module output, then the block expansion might be incorrect.
-	expanded := e.expandBlocks(e.module.Blocks.ModuleBlocks())
+	expanded := e.expandBlocks(e.module.Blocks.ModuleBlocks(), lastContext)
 
 	for _, moduleBlock := range expanded {
 		if moduleBlock.Label() == "" {
