@@ -91,9 +91,9 @@ func customComputeCostComponents(region, machineType string, purchaseOption stri
 			VendorName:    strPtr("gcp"),
 			Region:        strPtr(region),
 			Service:       strPtr("Compute Engine"),
-			ProductFamily: strPtr("Compute Instance"),
+			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "description", ValueRegex: regexPtr("^Custom Instance Core.*$")},
+				{Key: "description", ValueRegex: regexPtr("Custom Instance Core.*")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -111,9 +111,9 @@ func customComputeCostComponents(region, machineType string, purchaseOption stri
 			VendorName:    strPtr("gcp"),
 			Region:        strPtr(region),
 			Service:       strPtr("Compute Engine"),
-			ProductFamily: strPtr("Compute Instance"),
+			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "description", ValueRegex: regexPtr("^Custom Instance Ram.*$")},
+				{Key: "description", ValueRegex: regexPtr("Custom Instance Ram.*")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
