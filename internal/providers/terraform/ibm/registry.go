@@ -87,6 +87,16 @@ var FreeResources = []string{
 	"ibm_pi_vpn_connection",
 	"ibm_resource_group",
 	"ibm_resource_key",
+	"ibm_scc_account_settings",
+	"ibm_scc_posture_collector",
+	"ibm_scc_posture_credential",
+	"ibm_scc_posture_profile_import",
+	"ibm_scc_posture_scan_initiate_validation",
+	"ibm_scc_posture_scope",
+	"ibm_scc_rule",
+	"ibm_scc_rule_attachment",
+	"ibm_scc_template",
+	"ibm_scc_template_attachment",
 	"ibm_tg_connection",
 }
 
