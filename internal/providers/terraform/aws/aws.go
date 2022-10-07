@@ -38,6 +38,19 @@ func GetDefaultRefIDFunc(d *schema.ResourceData) []string {
 	return defaultRefs
 }
 
+func DefaultCloudResourceIDFunc(d *schema.ResourceData) []string {
+	arnAttr, ok := arnAttributeMap[d.Type]
+	if !ok {
+		arnAttr = "arn"
+	}
+
+	arn := d.Get(arnAttr).String()
+	if strings.HasPrefix(arn, "arn:aws:") && !strings.HasPrefix(arn, "arn:aws:hcl") {
+		return []string{arn}
+	}
+	return []string{}
+}
+
 func GetSpecialContext(d *schema.ResourceData) map[string]interface{} {
 
 	specialContexts := make(map[string]interface{})

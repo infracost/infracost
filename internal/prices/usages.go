@@ -171,3 +171,32 @@ func FetchUsageData(ctx *config.RunContext, project *schema.Project) (map[string
 
 	return usageMap, nil
 }
+
+// UploadCloudResourceIDs sends the project scoped cloud resource ids to the Usage API, so they can be used
+// to provide usage estimates.
+func UploadCloudResourceIDs(ctx *config.RunContext, project *schema.Project) error {
+	c := apiclient.NewUsageAPIClient(ctx)
+
+	var resourceIDs []apiclient.ResourceIDAddress
+	for _, partial := range project.AllPartialResources() {
+		for _, resourceID := range partial.CloudResourceIds {
+			resourceIDs = append(resourceIDs, apiclient.ResourceIDAddress{
+				Address:    partial.ResourceData.Address,
+				ResourceID: resourceID},
+			)
+		}
+	}
+
+	vars := apiclient.CloudResourceIDVariables{
+		RepoURL:             ctx.VCSRepositoryURL(),
+		Project:             project.Name,
+		ResourceIDAddresses: resourceIDs,
+	}
+
+	err := c.UploadCloudResourceIDs(vars)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
