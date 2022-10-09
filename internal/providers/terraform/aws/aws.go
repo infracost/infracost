@@ -39,6 +39,13 @@ func GetDefaultRefIDFunc(d *schema.ResourceData) []string {
 }
 
 func DefaultCloudResourceIDFunc(d *schema.ResourceData) []string {
+	var ids []string
+
+	id := d.Get("id").String()
+	if id != "" && id != "none" && !strings.HasPrefix(id, "hcl-") {
+		ids = append(ids, id)
+	}
+
 	arnAttr, ok := arnAttributeMap[d.Type]
 	if !ok {
 		arnAttr = "arn"
@@ -46,9 +53,10 @@ func DefaultCloudResourceIDFunc(d *schema.ResourceData) []string {
 
 	arn := d.Get(arnAttr).String()
 	if strings.HasPrefix(arn, "arn:aws:") && !strings.HasPrefix(arn, "arn:aws:hcl") {
-		return []string{arn}
+		ids = append(ids, arn)
 	}
-	return []string{}
+
+	return ids
 }
 
 func GetSpecialContext(d *schema.ResourceData) map[string]interface{} {
