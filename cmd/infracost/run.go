@@ -552,6 +552,8 @@ func (r *parallelRunner) uploadCloudResourceIDs(projects []*schema.Project) erro
 		return nil
 	}
 
+	r.runCtx.SetContextValue("uploadedResourceIds", true)
+
 	spinnerOpts := ui.SpinnerOptions{
 		EnableLogging: r.runCtx.Config.IsLogging(),
 		NoColor:       r.runCtx.Config.NoColor,
@@ -639,7 +641,7 @@ func (r *parallelRunner) fetchProjectUsage(projects []*schema.Project) map[*sche
 			logging.Logger.WithError(err).Debugf("failed to retrieve usage data for project %s", project.Name)
 			return nil
 		}
-
+		r.runCtx.SetContextValue("fetchedUsageData", true)
 		projectPtrToUsageMap[project] = usageMap
 	}
 
