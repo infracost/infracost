@@ -576,7 +576,7 @@ func (r *parallelRunner) uploadCloudResourceIDs(projects []*schema.Project) erro
 func (r *parallelRunner) hasCloudResourceIDToUpload(projects []*schema.Project) bool {
 	for _, project := range projects {
 		for _, partial := range project.AllPartialResources() {
-			if len(partial.CloudResourceIds) > 0 {
+			if len(partial.CloudResourceIDs) > 0 {
 				return true
 			}
 		}

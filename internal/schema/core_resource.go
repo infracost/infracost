@@ -27,9 +27,9 @@ type PartialResource struct {
 	// that have not yet been converted to build CoreResource's
 	Resource *Resource
 
-	// CloudResourceIds are collected during parsing in case they need to be uploaded to the
+	// CloudResourceIDs are collected during parsing in case they need to be uploaded to the
 	// Cloud Usage API to be used in the usage estimate calculations.
-	CloudResourceIds []string
+	CloudResourceIDs []string
 }
 
 // BuildResource create a new Resource from the CoreResource, or (for backward compatibility) returns

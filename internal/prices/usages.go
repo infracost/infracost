@@ -179,7 +179,7 @@ func UploadCloudResourceIDs(ctx *config.RunContext, project *schema.Project) err
 
 	var resourceIDs []apiclient.ResourceIDAddress
 	for _, partial := range project.AllPartialResources() {
-		for _, resourceID := range partial.CloudResourceIds {
+		for _, resourceID := range partial.CloudResourceIDs {
 			resourceIDs = append(resourceIDs, apiclient.ResourceIDAddress{
 				Address:    partial.ResourceData.Address,
 				ResourceID: resourceID},
