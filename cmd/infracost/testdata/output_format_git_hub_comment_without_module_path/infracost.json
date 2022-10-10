@@ -658,7 +658,7 @@
       }
     },
     {
-      "name": "nochange_plan",
+      "name": "has_change_plan",
       "metadata": {
         "path": "./cmd/infracost/testdata/terraform_v0.14_plan.json",
         "type": "terraform_plan_json",
@@ -1291,7 +1291,53 @@
         "totalMonthlyCost": "40.561"
       },
       "diff": {
-        "resources": [],
+        "resources": [
+          {
+            "name": "aws_instance.instance_2",
+            "metadata": {},
+            "hourlyCost": "0.0062958904109589",
+            "monthlyCost": "4.596",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, t3.nano)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.0052",
+                "hourlyCost": "0.0052",
+                "monthlyCost": "3.796"
+              },
+              {
+                "name": "CPU credits",
+                "unit": "vCPU-hours",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.05",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.0010958904109589",
+                "monthlyCost": "0.8",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.010958904109589",
+                    "monthlyQuantity": "8",
+                    "price": "0.1",
+                    "hourlyCost": "0.0010958904109589",
+                    "monthlyCost": "0.8"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
         "totalHourlyCost": "0",
         "totalMonthlyCost": "0"
       },
