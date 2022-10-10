@@ -13,7 +13,7 @@
   },
   "projects": [
     {
-      "name": "nochange_plan",
+      "name": "same_name_plan",
       "metadata": {
         "path": "./cmd/infracost/testdata/terraform_v0.14_plan.json",
         "type": "terraform_plan_json",
@@ -658,7 +658,7 @@
       }
     },
     {
-      "name": "has_change_plan",
+      "name": "same_name_plan",
       "metadata": {
         "path": "./cmd/infracost/testdata/terraform_v0.14_plan.json",
         "type": "terraform_plan_json",
