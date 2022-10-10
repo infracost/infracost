@@ -52,6 +52,7 @@ func (p *Parser) createPartialResource(d *schema.ResourceData, u *schema.UsageDa
 					NoPrice:     true,
 					SkipMessage: "Free resource.",
 				},
+				CloudResourceIDs: registryItem.CloudResourceIDFunc(d),
 			}
 		}
 
@@ -62,7 +63,7 @@ func (p *Parser) createPartialResource(d *schema.ResourceData, u *schema.UsageDa
 		if registryItem.CoreRFunc != nil {
 			coreRes := registryItem.CoreRFunc(d)
 			if coreRes != nil {
-				return &schema.PartialResource{ResourceData: d, CoreResource: coreRes}
+				return &schema.PartialResource{ResourceData: d, CoreResource: coreRes, CloudResourceIDs: registryItem.CloudResourceIDFunc(d)}
 			}
 		} else {
 			res := registryItem.RFunc(d, u)
@@ -71,7 +72,7 @@ func (p *Parser) createPartialResource(d *schema.ResourceData, u *schema.UsageDa
 					res.EstimationSummary = u.CalcEstimationSummary()
 				}
 
-				return &schema.PartialResource{ResourceData: d, Resource: res}
+				return &schema.PartialResource{ResourceData: d, Resource: res, CloudResourceIDs: registryItem.CloudResourceIDFunc(d)}
 			}
 		}
 	}

@@ -419,12 +419,13 @@ func SetUUIDAttributes(moduleBlock *Block, block *hcl.Block) {
 }
 
 func newUniqueAttribute(name string, withCount bool) *hclsyntax.Attribute {
+	// prefix ids with hcl- so they can be identified as fake
 	var exp hclsyntax.Expression = &hclsyntax.LiteralValueExpr{
-		Val: cty.StringVal(uuid.NewString()),
+		Val: cty.StringVal("hcl-" + uuid.NewString()),
 	}
 
 	if withCount {
-		e, diags := hclsyntax.ParseExpression([]byte(`"`+uuid.NewString()+`-${count.index}"`), name, hcl.Pos{})
+		e, diags := hclsyntax.ParseExpression([]byte(`"hcl-`+uuid.NewString()+`-${count.index}"`), name, hcl.Pos{})
 		if !diags.HasErrors() {
 			exp = e
 		}

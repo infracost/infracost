@@ -24,26 +24,35 @@ func GetResourceRegistryMap() *ResourceRegistryMap {
 
 		// Merge all resource registries
 		for _, registryItem := range aws.ResourceRegistry {
+			if registryItem.CloudResourceIDFunc == nil {
+				registryItem.CloudResourceIDFunc = aws.DefaultCloudResourceIDFunc
+			}
 			resourceRegistryMap[registryItem.Name] = registryItem
 			resourceRegistryMap[registryItem.Name].DefaultRefIDFunc = aws.GetDefaultRefIDFunc
 		}
-		for _, registryItem := range createFreeResources(aws.FreeResources, aws.GetDefaultRefIDFunc) {
+		for _, registryItem := range createFreeResources(aws.FreeResources, aws.GetDefaultRefIDFunc, aws.DefaultCloudResourceIDFunc) {
 			resourceRegistryMap[registryItem.Name] = registryItem
 		}
 
 		for _, registryItem := range azure.ResourceRegistry {
+			if registryItem.CloudResourceIDFunc == nil {
+				registryItem.CloudResourceIDFunc = azure.DefaultCloudResourceIDFunc
+			}
 			resourceRegistryMap[registryItem.Name] = registryItem
 			resourceRegistryMap[registryItem.Name].DefaultRefIDFunc = azure.GetDefaultRefIDFunc
 		}
-		for _, registryItem := range createFreeResources(azure.FreeResources, azure.GetDefaultRefIDFunc) {
+		for _, registryItem := range createFreeResources(azure.FreeResources, azure.GetDefaultRefIDFunc, azure.DefaultCloudResourceIDFunc) {
 			resourceRegistryMap[registryItem.Name] = registryItem
 		}
 
 		for _, registryItem := range google.ResourceRegistry {
+			if registryItem.CloudResourceIDFunc == nil {
+				registryItem.CloudResourceIDFunc = google.DefaultCloudResourceIDFunc
+			}
 			resourceRegistryMap[registryItem.Name] = registryItem
 			resourceRegistryMap[registryItem.Name].DefaultRefIDFunc = google.GetDefaultRefIDFunc
 		}
-		for _, registryItem := range createFreeResources(google.FreeResources, google.GetDefaultRefIDFunc) {
+		for _, registryItem := range createFreeResources(google.FreeResources, google.GetDefaultRefIDFunc, google.DefaultCloudResourceIDFunc) {
 			resourceRegistryMap[registryItem.Name] = registryItem
 		}
 	})
@@ -88,14 +97,15 @@ func HasSupportedProvider(rType string) bool {
 	return strings.HasPrefix(rType, "aws_") || strings.HasPrefix(rType, "google_") || strings.HasPrefix(rType, "azurerm_")
 }
 
-func createFreeResources(l []string, defaultRefsFunc schema.ReferenceIDFunc) []*schema.RegistryItem {
+func createFreeResources(l []string, defaultRefsFunc schema.ReferenceIDFunc, resourceIdFunc schema.CloudResourceIDFunc) []*schema.RegistryItem {
 	freeResources := make([]*schema.RegistryItem, 0)
 	for _, resourceName := range l {
 		freeResources = append(freeResources, &schema.RegistryItem{
-			Name:             resourceName,
-			NoPrice:          true,
-			Notes:            []string{"Free resource."},
-			DefaultRefIDFunc: defaultRefsFunc,
+			Name:                resourceName,
+			NoPrice:             true,
+			Notes:               []string{"Free resource."},
+			DefaultRefIDFunc:    defaultRefsFunc,
+			CloudResourceIDFunc: resourceIdFunc,
 		})
 	}
 	return freeResources

@@ -26,9 +26,13 @@ type PartialResource struct {
 	// Resource field is provided for backward compatibility with provider resource builders
 	// that have not yet been converted to build CoreResource's
 	Resource *Resource
+
+	// CloudResourceIDs are collected during parsing in case they need to be uploaded to the
+	// Cloud Usage API to be used in the usage estimate calculations.
+	CloudResourceIDs []string
 }
 
-// Build create a new Resource from the CoreResource, or (for backward compatibility) returns
+// BuildResource create a new Resource from the CoreResource, or (for backward compatibility) returns
 // a previously built Resource
 func BuildResource(partial *PartialResource, fetchedUsage *UsageData) *Resource {
 	var res *Resource
