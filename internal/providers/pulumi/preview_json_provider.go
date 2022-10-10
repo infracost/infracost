@@ -53,7 +53,7 @@ func (p *PreviewJSONProvider) LoadResources(usage map[string]*schema.UsageData) 
 	metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
-	name := schema.GenerateProjectName(metadata, p.ctx.ProjectConfig.Name, p.ctx.RunContext.IsCloudEnabled())
+	name := metadata.GenerateProjectName(p.ctx.RunContext.VCSMetadata.Remote, p.ctx.RunContext.IsCloudEnabled())
 
 	project := schema.NewProject(name, metadata)
 	parser := NewParser(p.ctx)
