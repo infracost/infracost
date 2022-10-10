@@ -16,7 +16,7 @@ jobs:
       - name: Set up Go 1.x
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: 1.19
 
       - name: Run golangci-lint
         uses: golangci/golangci-lint-action@v2.5.2
@@ -65,7 +65,7 @@ jobs:
       - name: Set up Go 1.x
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: 1.19
 
       - name: Test (AWS)
         run: make test_aws
@@ -82,7 +82,7 @@ jobs:
       - name: Set up Go 1.x
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: 1.19
 
       - name: Test (Google)
         run: make test_google
@@ -99,7 +99,7 @@ jobs:
       - name: Set up Go 1.x
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: 1.19
 
       - name: Test (Azure)
         run: make test_azure
