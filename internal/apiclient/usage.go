@@ -186,19 +186,25 @@ func (c *UsageAPIClient) ListUsageQuantities(vars UsageQuantitiesQueryVariables)
 }
 
 type UsageQuantitiesQueryVariables struct {
-	RepoURL      string   `json:"repoUrl"`
-	Project      string   `json:"project"`
-	ResourceType string   `json:"resourceType"`
-	Address      string   `json:"address"`
-	UsageKeys    []string `json:"usageKeys"`
+	RepoURL      string       `json:"repoUrl"`
+	Project      string       `json:"project"`
+	ResourceType string       `json:"resourceType"`
+	Address      string       `json:"address"`
+	UsageKeys    []string     `json:"usageKeys"`
+	UsageParams  []UsageParam `json:"usageParams"`
+}
+
+type UsageParam struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
 }
 
 func (c *UsageAPIClient) buildUsageQuantitiesQuery(vars UsageQuantitiesQueryVariables) GraphQLQuery {
 	v := interfaceToMap(vars)
 
 	query := `
-		query($repoUrl: String!, $project: String!, $resourceType: String!, $address: String!, $usageKeys: [String!]!) {
-			usageQuantities(repoUrl: $repoUrl, project: $project, resourceType: $resourceType, address: $address, usageKeys: $usageKeys) {
+		query($repoUrl: String!, $project: String!, $resourceType: String!, $address: String!, $usageKeys: [String!]!, $usageParams: [UsageParamInput!]) {
+			usageQuantities(repoUrl: $repoUrl, project: $project, resourceType: $resourceType, address: $address, usageKeys: $usageKeys, usageParams: $usageParams) {
     			address
 				usageKey
 				monthlyQuantity

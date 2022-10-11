@@ -128,12 +128,7 @@ func FetchUsageData(ctx *config.RunContext, project *schema.Project) (map[string
 
 	// gather all the CoreResource
 	coreResources := make(map[string]schema.CoreResource)
-	for _, rb := range project.PartialResources {
-		if rb.CoreResource != nil {
-			coreResources[rb.ResourceData.Address] = rb.CoreResource
-		}
-	}
-	for _, rb := range project.PartialPastResources {
+	for _, rb := range project.AllPartialResources() {
 		if rb.CoreResource != nil {
 			coreResources[rb.ResourceData.Address] = rb.CoreResource
 		}
@@ -149,12 +144,20 @@ func FetchUsageData(ctx *config.RunContext, project *schema.Project) (map[string
 		}
 
 		if len(usageKeys) > 0 {
+			var usageParams []apiclient.UsageParam
+			if crWithUsageParams, ok := cr.(schema.CoreResourceWithUsageParams); ok {
+				for k, v := range crWithUsageParams.UsageEstimationParams() {
+					usageParams = append(usageParams, apiclient.UsageParam{Key: k, Value: v})
+				}
+			}
+
 			vars := apiclient.UsageQuantitiesQueryVariables{
 				RepoURL:      ctx.VCSRepositoryURL(),
 				Project:      project.Name,
 				ResourceType: cr.CoreType(),
 				Address:      address,
 				UsageKeys:    usageKeys,
+				UsageParams:  usageParams,
 			}
 
 			attributes, err := c.ListUsageQuantities(vars)
