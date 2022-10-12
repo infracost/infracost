@@ -8,13 +8,13 @@ import (
 
 func getLambdaFunctionRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_lambda_function",
-		Notes: []string{"Provisioned concurrency is not yet supported."},
-		RFunc: NewLambdaFunction,
+		Name:      "aws_lambda_function",
+		Notes:     []string{"Provisioned concurrency is not yet supported."},
+		CoreRFunc: NewLambdaFunction,
 	}
 }
 
-func NewLambdaFunction(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewLambdaFunction(d *schema.ResourceData) schema.CoreResource {
 	region := d.Get("region").String()
 	name := d.Get("function_name").String()
 	memorySize := int64(128)
@@ -22,13 +22,10 @@ func NewLambdaFunction(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 		memorySize = d.Get("memory_size").Int()
 	}
 
-	a := &aws.LambdaFunction{
+	return &aws.LambdaFunction{
 		Address:    d.Address,
 		Region:     region,
 		Name:       name,
 		MemorySize: memorySize,
 	}
-	a.PopulateUsage(u)
-
-	return a.BuildResource()
 }

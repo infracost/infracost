@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"fmt"
+	"github.com/infracost/infracost/internal/schema"
 	"github.com/tidwall/gjson"
 	"io/ioutil"
 	"time"
@@ -186,19 +187,20 @@ func (c *UsageAPIClient) ListUsageQuantities(vars UsageQuantitiesQueryVariables)
 }
 
 type UsageQuantitiesQueryVariables struct {
-	RepoURL      string   `json:"repoUrl"`
-	Project      string   `json:"project"`
-	ResourceType string   `json:"resourceType"`
-	Address      string   `json:"address"`
-	UsageKeys    []string `json:"usageKeys"`
+	RepoURL      string              `json:"repoUrl"`
+	Project      string              `json:"project"`
+	ResourceType string              `json:"resourceType"`
+	Address      string              `json:"address"`
+	UsageKeys    []string            `json:"usageKeys"`
+	UsageParams  []schema.UsageParam `json:"usageParams"`
 }
 
 func (c *UsageAPIClient) buildUsageQuantitiesQuery(vars UsageQuantitiesQueryVariables) GraphQLQuery {
 	v := interfaceToMap(vars)
 
 	query := `
-		query($repoUrl: String!, $project: String!, $resourceType: String!, $address: String!, $usageKeys: [String!]!) {
-			usageQuantities(repoUrl: $repoUrl, project: $project, resourceType: $resourceType, address: $address, usageKeys: $usageKeys) {
+		query($repoUrl: String!, $project: String!, $resourceType: String!, $address: String!, $usageKeys: [String!]!, $usageParams: [UsageParamInput!]) {
+			usageQuantities(repoUrl: $repoUrl, project: $project, resourceType: $resourceType, address: $address, usageKeys: $usageKeys, usageParams: $usageParams) {
     			address
 				usageKey
 				monthlyQuantity
