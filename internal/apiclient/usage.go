@@ -5,6 +5,7 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"fmt"
+	"github.com/infracost/infracost/internal/schema"
 	"github.com/tidwall/gjson"
 	"io/ioutil"
 	"time"
@@ -186,17 +187,12 @@ func (c *UsageAPIClient) ListUsageQuantities(vars UsageQuantitiesQueryVariables)
 }
 
 type UsageQuantitiesQueryVariables struct {
-	RepoURL      string       `json:"repoUrl"`
-	Project      string       `json:"project"`
-	ResourceType string       `json:"resourceType"`
-	Address      string       `json:"address"`
-	UsageKeys    []string     `json:"usageKeys"`
-	UsageParams  []UsageParam `json:"usageParams"`
-}
-
-type UsageParam struct {
-	Key   string `json:"key"`
-	Value string `json:"value"`
+	RepoURL      string              `json:"repoUrl"`
+	Project      string              `json:"project"`
+	ResourceType string              `json:"resourceType"`
+	Address      string              `json:"address"`
+	UsageKeys    []string            `json:"usageKeys"`
+	UsageParams  []schema.UsageParam `json:"usageParams"`
 }
 
 func (c *UsageAPIClient) buildUsageQuantitiesQuery(vars UsageQuantitiesQueryVariables) GraphQLQuery {

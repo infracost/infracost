@@ -11,11 +11,16 @@ type CoreResource interface {
 	BuildResource() *Resource
 }
 
+type UsageParam struct {
+	Key   string `json:"key"`
+	Value string `json:"value"`
+}
+
 // CoreResourceWithUsageParams is a CoreResource that sends additional
 // parameters (e.g. Lambda memory size) to the Usage API when estimating usage.
 type CoreResourceWithUsageParams interface {
 	CoreResource
-	UsageEstimationParams() map[string]string
+	UsageEstimationParams() []UsageParam
 }
 
 // PartialResource is used to collect all information required to construct a

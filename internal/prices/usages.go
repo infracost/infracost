@@ -144,11 +144,9 @@ func FetchUsageData(ctx *config.RunContext, project *schema.Project) (map[string
 		}
 
 		if len(usageKeys) > 0 {
-			var usageParams []apiclient.UsageParam
+			var usageParams []schema.UsageParam
 			if crWithUsageParams, ok := cr.(schema.CoreResourceWithUsageParams); ok {
-				for k, v := range crWithUsageParams.UsageEstimationParams() {
-					usageParams = append(usageParams, apiclient.UsageParam{Key: k, Value: v})
-				}
+				usageParams = crWithUsageParams.UsageEstimationParams()
 			}
 
 			vars := apiclient.UsageQuantitiesQueryVariables{

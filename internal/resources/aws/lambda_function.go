@@ -31,9 +31,9 @@ func (a *LambdaFunction) UsageSchema() []*schema.UsageItem {
 	}
 }
 
-func (a *LambdaFunction) UsageEstimationParams() map[string]string {
-	return map[string]string{
-		"memory_size_gb": decimal.NewFromInt(a.MemorySize).Div(decimal.NewFromInt(1024)).String(),
+func (a *LambdaFunction) UsageEstimationParams() []schema.UsageParam {
+	return []schema.UsageParam{
+		{Key: "memory_size_gb", Value: decimal.NewFromInt(a.MemorySize).Div(decimal.NewFromInt(1024)).String()},
 	}
 }
 
