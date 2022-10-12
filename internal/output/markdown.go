@@ -87,6 +87,10 @@ func calculateMetadataToDisplay(projects []Project) (hasModulePath bool, hasWork
 	// check if any projects that have the same name have different path or workspace
 	for i, p := range sprojects {
 		if i > 0 { // we compare vs the previous item, so skip index 0
+			if p.Diff == nil || len(p.Diff.Resources) == 0 { // ignore the projects that are skipped
+				continue
+			}
+
 			prev := sprojects[i-1]
 			if p.Name == prev.Name {
 				if p.Metadata.TerraformModulePath != prev.Metadata.TerraformModulePath {
@@ -116,15 +120,6 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 		diffMsg = ui.StripColor(string(diff))
 	}
 
-	skippedProjectCount := 0
-	for _, p := range out.Projects {
-		if p.Diff == nil || len(p.Diff.Resources) == 0 {
-			skippedProjectCount++
-		}
-	}
-
-	allProjectsSkipped := len(out.Projects) == skippedProjectCount
-
 	hasModulePath, hasWorkspace := calculateMetadataToDisplay(out.Projects)
 
 	var buf bytes.Buffer
@@ -151,9 +146,6 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 		},
 		"metadataHeaders": func() []string {
 			headers := []string{}
-			if allProjectsSkipped {
-				return headers
-			}
 			if hasModulePath {
 				headers = append(headers, "Module path")
 			}
@@ -164,9 +156,6 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 		},
 		"metadataFields": func(p Project) []string {
 			fields := []string{}
-			if allProjectsSkipped {
-				return fields
-			}
 			if hasModulePath {
 				fields = append(fields, p.Metadata.TerraformModulePath)
 			}
@@ -177,9 +166,6 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 		},
 		"metadataPlaceholders": func() []string {
 			placeholders := []string{}
-			if allProjectsSkipped {
-				return placeholders
-			}
 			if hasModulePath {
 				placeholders = append(placeholders, "")
 			}
@@ -198,6 +184,13 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 	tmpl, err := tmpl.Parse(t)
 	if err != nil {
 		return []byte{}, err
+	}
+
+	skippedProjectCount := 0
+	for _, p := range out.Projects {
+		if p.Diff == nil || len(p.Diff.Resources) == 0 {
+			skippedProjectCount++
+		}
 	}
 
 	err = tmpl.Execute(bufw, struct {
