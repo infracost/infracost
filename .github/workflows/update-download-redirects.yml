@@ -17,11 +17,11 @@ jobs:
   update:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-node@v3
+      - uses: actions/setup-node@8c91899e586c5b171469028077307d293428b516
         with:
           node-version: 14
       - run: npm install semver
-      - uses: actions/github-script@v6
+      - uses: actions/github-script@100527700e8b29ca817ac0e0dfbfc5e8ff38edda
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
