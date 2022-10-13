@@ -69,9 +69,14 @@ func formatCostChangeSentence(currency string, pastCost, cost *decimal.Decimal, 
 func calculateMetadataToDisplay(projects []Project) (hasModulePath bool, hasWorkspace bool) {
 	// we only want to show metadata fields if they can help distinguish projects with the same name
 
-	// copy so we can sort without side effects
-	sprojects := make([]Project, len(projects))
-	copy(sprojects, projects)
+	sprojects := make([]Project, 0)
+	for _, p := range projects {
+		if p.Diff == nil || len(p.Diff.Resources) == 0 { // ignore the projects that are skipped
+			continue
+		}
+		sprojects = append(sprojects, p)
+	}
+
 	sort.Slice(sprojects, func(i, j int) bool {
 		if sprojects[i].Name != sprojects[j].Name {
 			return sprojects[i].Name < sprojects[j].Name
@@ -87,10 +92,6 @@ func calculateMetadataToDisplay(projects []Project) (hasModulePath bool, hasWork
 	// check if any projects that have the same name have different path or workspace
 	for i, p := range sprojects {
 		if i > 0 { // we compare vs the previous item, so skip index 0
-			if p.Diff == nil || len(p.Diff.Resources) == 0 { // ignore the projects that are skipped
-				continue
-			}
-
 			prev := sprojects[i-1]
 			if p.Name == prev.Name {
 				if p.Metadata.TerraformModulePath != prev.Metadata.TerraformModulePath {
