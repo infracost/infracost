@@ -134,6 +134,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 				CurrencyFormat:    ctx.Config.CurrencyFormat,
 			}
 			opts.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
+			opts.ShowOptions, _ = cmd.Flags().GetString("show-options")
 
 			validFieldsFormats := []string{"table", "html"}
 
@@ -176,6 +177,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 	cmd.Flags().StringArrayP("path", "p", []string{}, "Path to Infracost JSON files, glob patterns need quotes")
 	cmd.Flags().StringP("out-file", "o", "", "Save output to a file, helpful with format flag")
 
+	cmd.Flags().String("show-options", "", "Show projects with no diff")
 	cmd.Flags().String("format", "table", "Output format: json, diff, table, html, github-comment, gitlab-comment, azure-repos-comment, bitbucket-comment, bitbucket-comment-summary, slack-message")
 	cmd.Flags().Bool("show-skipped", false, "List unsupported and free resources")
 	cmd.Flags().StringSlice("fields", []string{"monthlyQuantity", "unit", "monthlyCost"}, "Comma separated list of output fields: all,price,monthlyQuantity,unit,hourlyCost,monthlyCost.\nSupported by table and html output formats")

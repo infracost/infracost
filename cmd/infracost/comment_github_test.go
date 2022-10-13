@@ -3,13 +3,14 @@ package main_test
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/infracost/infracost/internal/config"
-	"github.com/infracost/infracost/internal/logging"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/logging"
 
 	"github.com/infracost/infracost/internal/testutil"
 )
@@ -27,6 +28,12 @@ func TestCommentGitHubPullRequest(t *testing.T) {
 func TestCommentGitHubCommit(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
 		[]string{"comment", "github", "--github-token", "abc", "--repo", "test/test", "--commit", "5", "--path", "./testdata/terraform_v0.14_breakdown.json", "--dry-run"},
+		nil)
+}
+
+func TestCommentGitHubShowAllProjects(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
+		[]string{"comment", "github", "--github-token", "abc", "--repo", "test/test", "--commit", "5", "--show-options", "all-projects", "--path", "./testdata/terraform_v0.14_breakdown.json", "--path", "./testdata/terraform_v0.14_nochange_breakdown.json", "--dry-run"},
 		nil)
 }
 

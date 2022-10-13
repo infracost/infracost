@@ -1,4 +1,4 @@
 
 Err:
-Warning: this command has been changed to infracost auth login, which does the same thing - showing information for that command.
+[33mWarning:[0m this command has been changed to [96minfracost auth login[0m, which does the same thing - showing information for that command.
 

@@ -232,6 +232,7 @@ type Options struct {
 	DashboardEndpoint string
 	NoColor           bool
 	ShowSkipped       bool
+	ShowOptions       string
 	Fields            []string
 	IncludeHTML       bool
 	PolicyChecks      PolicyCheck
