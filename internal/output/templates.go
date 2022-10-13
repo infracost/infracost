@@ -320,7 +320,7 @@ var CommentMarkdownWithHTMLTemplate = `
 {{- if gt (len .Root.Projects) 1  }}
   <tbody>
   {{- range .Root.Projects }}
-    {{- if hasDiff . }}
+    {{- if showProject . }}
       {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
     {{- end }}
   {{- end }}
@@ -416,7 +416,7 @@ var CommentMarkdownTemplate = `
 
 {{- if gt (len .Root.Projects) 1  }}
   {{- range .Root.Projects }}
-    {{- if hasDiff . }}
+    {{- if showProject . }}
       {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
     {{- end }}
   {{- end }}

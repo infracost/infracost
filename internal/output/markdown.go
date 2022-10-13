@@ -139,11 +139,14 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 			return formatMarkdownCostChange(out.Currency, pastCost, cost, false)
 		},
 		"formatCostChangeSentence": formatCostChangeSentence,
-		"hasDiff": func(p Project) bool {
-			if p.Diff == nil || len(p.Diff.Resources) == 0 {
+		"showProject": func(p Project) bool {
+			if opts.ShowOptions == "all-projects" {
+				return true
+			}
+			if p.Diff == nil || len(p.Diff.Resources) == 0 { // has no Diff
 				return false
 			}
-			return true
+			return true // has Diff
 		},
 		"metadataHeaders": func() []string {
 			headers := []string{}
