@@ -50,14 +50,14 @@ func (r *Cloudtrail) PopulateUsage(u *schema.UsageData) {
 // It returns Cloudtrail as a schema.Resource with 3 main cost components. All cost components are defined as "events".
 // All cost components are charged per 100k events delivered/analyzed.
 //
-// 1. Additional Management events delivered to S3, charged at $2.00 per 100k management events delivered.
-// 	  Management events are normally priced as free, however if a user specifies an additional replication of events
-// 	  this is charged. We only show this cost therefore if Cloudtrail.IncludeManagementEvents is set. This is set at
-//	  a per IAC basis.
-// 2. Data events delivered to S3, charged at $0.10 per 100k events delivered.
-// 3. CloudTrail Insights, charged at $0.35 per 100k events analyzed. This again is configured optionally on a Cloudtrail
-//    instance. Hence, we only include the cost component if Cloudtrail.IncludeInsightEvents. This is set at
-//    a per IAC basis.
+//  1. Additional Management events delivered to S3, charged at $2.00 per 100k management events delivered.
+//     Management events are normally priced as free, however if a user specifies an additional replication of events
+//     this is charged. We only show this cost therefore if Cloudtrail.IncludeManagementEvents is set. This is set at
+//     a per IAC basis.
+//  2. Data events delivered to S3, charged at $0.10 per 100k events delivered.
+//  3. CloudTrail Insights, charged at $0.35 per 100k events analyzed. This again is configured optionally on a Cloudtrail
+//     instance. Hence, we only include the cost component if Cloudtrail.IncludeInsightEvents. This is set at
+//     a per IAC basis.
 //
 // This method is called after the resource is initialised by an IaC provider. See providers folder for more information.
 func (r *Cloudtrail) BuildResource() *schema.Resource {

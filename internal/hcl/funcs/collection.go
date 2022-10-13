@@ -638,7 +638,7 @@ var MapFunc = function.New(&function.Spec{
 // Length returns the number of elements in the given collection or number of
 // Unicode characters in the given string.
 func Length(collection cty.Value) (cty.Value, error) {
-	if cty.String.Equals(collection.Type()) && collection.IsKnown() && !collection.IsMarked() && strings.HasSuffix(collection.AsString(), "-mock"){
+	if cty.String.Equals(collection.Type()) && collection.IsKnown() && !collection.IsMarked() && strings.HasSuffix(collection.AsString(), "-mock") {
 		return cty.NumberIntVal(1), nil
 	}
 
