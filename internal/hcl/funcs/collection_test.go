@@ -170,6 +170,10 @@ func TestLength(t *testing.T) {
 			}),
 			cty.NumberIntVal(3),
 		},
+		{
+			cty.StringVal("availability_zone-mock"),
+			cty.NumberIntVal(1),
+		},
 	}
 
 	for _, test := range tests {
