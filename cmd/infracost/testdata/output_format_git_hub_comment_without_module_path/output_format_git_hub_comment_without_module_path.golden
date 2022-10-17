@@ -44,15 +44,15 @@ Project: same_name_plan
         +$0.05 per vCPU-hours
 
     + root_block_device
-
+    
         + Storage (general purpose SSD, gp2)
           Monthly cost depends on usage
             +$0.10 per GB
 
 Monthly cost change for same_name_plan
 Amount:  $0.00 ($40.56 → $40.56)
-Percent: 0%!
-(MISSING)+
+Percent: 0%
+
 ──────────────────────────────────
 
 The following projects have no cost estimate changes: same_name_plan (Module path: dev)
