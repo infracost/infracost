@@ -91,6 +91,15 @@ func NewProject(name string, metadata *ProjectMetadata) *Project {
 	}
 }
 
+// NameWithWorkspace returns the proect Name appended with the paranenthized workspace name
+// from Metadata if one exists.
+func (p *Project) NameWithWorkspace() string {
+	if p.Metadata.WorkspaceLabel() == "" {
+		return p.Name
+	}
+	return fmt.Sprintf("%s (%s)", p.Name, p.Metadata.WorkspaceLabel())
+}
+
 // AllResources returns a pointer list of all resources of the state.
 func (p *Project) AllResources() []*Resource {
 	var resources []*Resource

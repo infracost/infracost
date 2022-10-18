@@ -70,10 +70,10 @@ func popResourceActualCosts(ctx *config.RunContext, c *apiclient.UsageAPIClient,
 	}
 
 	vars := apiclient.ActualCostsQueryVariables{
-		RepoURL:  ctx.VCSRepositoryURL(),
-		Project:  project.Name,
-		Address:  r.Name,
-		Currency: c.Currency,
+		RepoURL:              ctx.VCSRepositoryURL(),
+		ProjectWithWorkspace: project.NameWithWorkspace(),
+		Address:              r.Name,
+		Currency:             c.Currency,
 	}
 	actualCost, err := c.ListActualCosts(vars)
 	if actualCost == nil || err != nil {
@@ -150,12 +150,12 @@ func FetchUsageData(ctx *config.RunContext, project *schema.Project) (map[string
 			}
 
 			vars := apiclient.UsageQuantitiesQueryVariables{
-				RepoURL:      ctx.VCSRepositoryURL(),
-				Project:      project.Name,
-				ResourceType: cr.CoreType(),
-				Address:      address,
-				UsageKeys:    usageKeys,
-				UsageParams:  usageParams,
+				RepoURL:              ctx.VCSRepositoryURL(),
+				ProjectWithWorkspace: project.NameWithWorkspace(),
+				ResourceType:         cr.CoreType(),
+				Address:              address,
+				UsageKeys:            usageKeys,
+				UsageParams:          usageParams,
 			}
 
 			attributes, err := c.ListUsageQuantities(vars)
@@ -189,9 +189,9 @@ func UploadCloudResourceIDs(ctx *config.RunContext, project *schema.Project) err
 	}
 
 	vars := apiclient.CloudResourceIDVariables{
-		RepoURL:             ctx.VCSRepositoryURL(),
-		Project:             project.Name,
-		ResourceIDAddresses: resourceIDs,
+		RepoURL:              ctx.VCSRepositoryURL(),
+		ProjectWithWorkspace: project.NameWithWorkspace(),
+		ResourceIDAddresses:  resourceIDs,
 	}
 
 	err := c.UploadCloudResourceIDs(vars)

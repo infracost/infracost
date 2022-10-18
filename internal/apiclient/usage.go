@@ -128,10 +128,10 @@ func (c *UsageAPIClient) ListActualCosts(vars ActualCostsQueryVariables) (*Actua
 }
 
 type ActualCostsQueryVariables struct {
-	RepoURL  string `json:"repoUrl"`
-	Project  string `json:"project"`
-	Address  string `json:"address"`
-	Currency string `json:"currency"`
+	RepoURL              string `json:"repoUrl"`
+	ProjectWithWorkspace string `json:"project"`
+	Address              string `json:"address"`
+	Currency             string `json:"currency"`
 }
 
 func (c *UsageAPIClient) buildActualCostsQuery(vars ActualCostsQueryVariables) GraphQLQuery {
@@ -187,12 +187,12 @@ func (c *UsageAPIClient) ListUsageQuantities(vars UsageQuantitiesQueryVariables)
 }
 
 type UsageQuantitiesQueryVariables struct {
-	RepoURL      string              `json:"repoUrl"`
-	Project      string              `json:"project"`
-	ResourceType string              `json:"resourceType"`
-	Address      string              `json:"address"`
-	UsageKeys    []string            `json:"usageKeys"`
-	UsageParams  []schema.UsageParam `json:"usageParams"`
+	RepoURL              string              `json:"repoUrl"`
+	ProjectWithWorkspace string              `json:"project"`
+	ResourceType         string              `json:"resourceType"`
+	Address              string              `json:"address"`
+	UsageKeys            []string            `json:"usageKeys"`
+	UsageParams          []schema.UsageParam `json:"usageParams"`
 }
 
 func (c *UsageAPIClient) buildUsageQuantitiesQuery(vars UsageQuantitiesQueryVariables) GraphQLQuery {
@@ -212,9 +212,9 @@ func (c *UsageAPIClient) buildUsageQuantitiesQuery(vars UsageQuantitiesQueryVari
 }
 
 type CloudResourceIDVariables struct {
-	RepoURL             string              `json:"repoUrl"`
-	Project             string              `json:"project"`
-	ResourceIDAddresses []ResourceIDAddress `json:"addressResourceIds"`
+	RepoURL              string              `json:"repoUrl"`
+	ProjectWithWorkspace string              `json:"project"`
+	ResourceIDAddresses  []ResourceIDAddress `json:"addressResourceIds"`
 }
 
 type ResourceIDAddress struct {
@@ -226,7 +226,7 @@ type ResourceIDAddress struct {
 // used to calculate usage estimates.
 func (c *UsageAPIClient) UploadCloudResourceIDs(vars CloudResourceIDVariables) error {
 	if len(vars.ResourceIDAddresses) == 0 {
-		logging.Logger.Debugf("No cloud resource IDs to upload for %s %s", vars.RepoURL, vars.Project)
+		logging.Logger.Debugf("No cloud resource IDs to upload for %s %s", vars.RepoURL, vars.ProjectWithWorkspace)
 		return nil
 	}
 
@@ -241,7 +241,7 @@ func (c *UsageAPIClient) UploadCloudResourceIDs(vars CloudResourceIDVariables) e
 		Variables: interfaceToMap(vars),
 	}
 
-	logging.Logger.Debugf("Uploading cloud resource IDs to %s for %s %s", c.endpoint, vars.RepoURL, vars.Project)
+	logging.Logger.Debugf("Uploading cloud resource IDs to %s for %s %s", c.endpoint, vars.RepoURL, vars.ProjectWithWorkspace)
 
 	results, err := c.doQueries([]GraphQLQuery{query})
 	if err != nil {
@@ -252,7 +252,7 @@ func (c *UsageAPIClient) UploadCloudResourceIDs(vars CloudResourceIDVariables) e
 
 	newCount := results[0].Get("data.addAddressResourceIds.newCount").Int()
 
-	logging.Logger.WithField("newCount", newCount).Debugf("Uploaded cloud resource IDs to %s for %s %s", c.endpoint, vars.RepoURL, vars.Project)
+	logging.Logger.WithField("newCount", newCount).Debugf("Uploaded cloud resource IDs to %s for %s %s", c.endpoint, vars.RepoURL, vars.ProjectWithWorkspace)
 
 	return nil
 }
