@@ -2,11 +2,10 @@ package aws
 
 import (
 	"context"
-	"math"
-
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage/aws"
+	"math"
 
 	"github.com/shopspring/decimal"
 )
@@ -21,9 +20,21 @@ type LambdaFunction struct {
 	MonthlyRequests   *int64 `infracost_usage:"monthly_requests"`
 }
 
-var LambdaFunctionUsageSchema = []*schema.UsageItem{
-	{Key: "request_duration_ms", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_requests", DefaultValue: 0, ValueType: schema.Int64},
+func (a *LambdaFunction) CoreType() string {
+	return "LambdaFunction"
+}
+
+func (a *LambdaFunction) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "request_duration_ms", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "monthly_requests", DefaultValue: 0, ValueType: schema.Int64},
+	}
+}
+
+func (a *LambdaFunction) UsageEstimationParams() []schema.UsageParam {
+	return []schema.UsageParam{
+		{Key: "memory_size_gb", Value: decimal.NewFromInt(a.MemorySize).Div(decimal.NewFromInt(1024)).String()},
+	}
 }
 
 func (a *LambdaFunction) PopulateUsage(u *schema.UsageData) {
@@ -62,7 +73,7 @@ func (a *LambdaFunction) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:        a.Address,
-		UsageSchema: LambdaFunctionUsageSchema,
+		UsageSchema: a.UsageSchema(),
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            "Requests",

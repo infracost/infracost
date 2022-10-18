@@ -482,6 +482,8 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 		return nil, err
 	}
 
+	_ = r.uploadCloudResourceIDs(projects)
+
 	r.buildResources(projects)
 
 	spinnerOpts := ui.SpinnerOptions{
@@ -533,7 +535,8 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 
 	spinner.Success()
 
-	r.populateActualCosts(projects)
+	// Disabled for now
+	// r.populateActualCosts(projects)
 
 	out.projects = projects
 
@@ -542,6 +545,44 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 	}
 
 	return out, nil
+}
+
+func (r *parallelRunner) uploadCloudResourceIDs(projects []*schema.Project) error {
+	if r.runCtx.Config.UsageAPIEndpoint == "" || !r.hasCloudResourceIDToUpload(projects) {
+		return nil
+	}
+
+	r.runCtx.SetContextValue("uploadedResourceIds", true)
+
+	spinnerOpts := ui.SpinnerOptions{
+		EnableLogging: r.runCtx.Config.IsLogging(),
+		NoColor:       r.runCtx.Config.NoColor,
+		Indent:        "  ",
+	}
+	spinner := ui.NewSpinner("Sending resource IDs to Infracost Cloud for usage estimates", spinnerOpts)
+	defer spinner.Fail()
+
+	for _, project := range projects {
+		if err := prices.UploadCloudResourceIDs(r.runCtx, project); err != nil {
+			logging.Logger.WithError(err).Debugf("failed to upload resource IDs for project %s", project.Name)
+			return err
+		}
+	}
+
+	spinner.Success()
+	return nil
+}
+
+func (r *parallelRunner) hasCloudResourceIDToUpload(projects []*schema.Project) bool {
+	for _, project := range projects {
+		for _, partial := range project.AllPartialResources() {
+			if len(partial.CloudResourceIDs) > 0 {
+				return true
+			}
+		}
+	}
+
+	return false
 }
 
 func (r *parallelRunner) buildResources(projects []*schema.Project) {
@@ -600,7 +641,7 @@ func (r *parallelRunner) fetchProjectUsage(projects []*schema.Project) map[*sche
 			logging.Logger.WithError(err).Debugf("failed to retrieve usage data for project %s", project.Name)
 			return nil
 		}
-
+		r.runCtx.SetContextValue("fetchedUsageData", true)
 		projectPtrToUsageMap[project] = usageMap
 	}
 
@@ -609,26 +650,26 @@ func (r *parallelRunner) fetchProjectUsage(projects []*schema.Project) map[*sche
 	return projectPtrToUsageMap
 }
 
-func (r *parallelRunner) populateActualCosts(projects []*schema.Project) {
-	if r.runCtx.Config.UsageAPIEndpoint != "" {
-		spinnerOpts := ui.SpinnerOptions{
-			EnableLogging: r.runCtx.Config.IsLogging(),
-			NoColor:       r.runCtx.Config.NoColor,
-			Indent:        "  ",
-		}
-		spinner := ui.NewSpinner("Retrieving actual costs from Infracost Cloud", spinnerOpts)
-		defer spinner.Fail()
-
-		for _, project := range projects {
-			if err := prices.PopulateActualCosts(r.runCtx, project); err != nil {
-				logging.Logger.WithError(err).Debugf("failed to retrieve actual costs for project %s", project.Name)
-				return
-			}
-		}
-
-		spinner.Success()
-	}
-}
+// func (r *parallelRunner) populateActualCosts(projects []*schema.Project) {
+//	if r.runCtx.Config.UsageAPIEndpoint != "" {
+//		spinnerOpts := ui.SpinnerOptions{
+//			EnableLogging: r.runCtx.Config.IsLogging(),
+//			NoColor:       r.runCtx.Config.NoColor,
+//			Indent:        "  ",
+//		}
+//		spinner := ui.NewSpinner("Retrieving actual costs from Infracost Cloud", spinnerOpts)
+//		defer spinner.Fail()
+//
+//		for _, project := range projects {
+//			if err := prices.PopulateActualCosts(r.runCtx, project); err != nil {
+//				logging.Logger.WithError(err).Debugf("failed to retrieve actual costs for project %s", project.Name)
+//				return
+//			}
+//		}
+//
+//		spinner.Success()
+//	}
+// }
 
 func (r *parallelRunner) runHCLProvider(wg *sync.WaitGroup, ctx *config.ProjectContext, usageFile *usage.UsageFile, out *projectOutput) {
 	defer func() {

@@ -53,7 +53,7 @@ func (r *FSxWindowsFileSystem) storageTypeValue() string {
 		return "HDD"
 	}
 
-	return "SDD"
+	return "SSD"
 }
 
 func (r *FSxWindowsFileSystem) throughputCapacityCostComponent() *schema.CostComponent {
@@ -93,6 +93,7 @@ func (r *FSxWindowsFileSystem) storageCapacityCostComponent() *schema.CostCompon
 			ProductFamily: strPtr("Storage"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "deploymentOption", Value: strPtr(deploymentOption)},
+				{Key: "fileSystemType", Value: strPtr("Windows")},
 				{Key: "storageType", Value: strPtr(storageType)},
 			},
 		},

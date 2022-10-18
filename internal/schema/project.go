@@ -99,6 +99,14 @@ func (p *Project) AllResources() []*Resource {
 	return resources
 }
 
+// AllPartialResources returns a pointer list of the current and past partial resources
+func (p *Project) AllPartialResources() []*PartialResource {
+	var resources []*PartialResource
+	resources = append(resources, p.PartialPastResources...)
+	resources = append(resources, p.PartialResources...)
+	return resources
+}
+
 // CalculateDiff calculates the diff of past and current resources
 func (p *Project) CalculateDiff() {
 	if p.HasDiff {

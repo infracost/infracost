@@ -1,0 +1,10 @@
+version: 0.1
+
+projects:
+  - path: "../../examples/terraform"
+    name: "my first project"
+  - path: "../../examples/terraform"
+    name: "my first project again"
+  - path: "../../examples/terragrunt"
+    name: "my terragrunt workspace"
+    terraform_workspace: "ws2"

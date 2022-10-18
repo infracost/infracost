@@ -262,6 +262,10 @@ var ciMap = ciEnvMap{
 }
 
 func ciPlatform() string {
+	if os.Getenv("INFRACOST_CI_PLATFORM") != "" {
+		return os.Getenv("INFRACOST_CI_PLATFORM")
+	}
+
 	for env, name := range ciMap.vars {
 		if IsEnvPresent(env) {
 			return name

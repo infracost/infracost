@@ -1,0 +1,1363 @@
+{
+  "version": "0.2",
+  "currency": "USD",
+  "metadata": {
+    "infracostCommand": "breakdown",
+    "vcsBranch": "test",
+    "vcsCommitSha": "1234",
+    "vcsCommitAuthorName": "hugo",
+    "vcsCommitAuthorEmail": "hugo@test.com",
+    "vcsCommitTimestamp": "2021-10-11T22:41:00.144866-04:00",
+    "vcsCommitMessage": "mymessage",
+    "vcsRepositoryUrl": "https://github.com/infracost/infracost.git"
+  },
+  "projects": [
+    {
+      "name": "same_name_plan",
+      "metadata": {
+        "path": "./cmd/infracost/testdata/terraform_v0.14_plan.json",
+        "type": "terraform_plan_json",
+        "vcsSubPath": "cmd/infracost/testdata/terraform_v0.14_plan.json",
+        "terraformModulePath": "dev"
+      },
+      "pastBreakdown": {
+        "resources": [
+          {
+            "name": "aws_instance.instance_1",
+            "metadata": {},
+            "hourlyCost": "0.0062958904109589",
+            "monthlyCost": "4.596",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, t3.nano)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.0052",
+                "hourlyCost": "0.0052",
+                "monthlyCost": "3.796"
+              },
+              {
+                "name": "CPU credits",
+                "unit": "vCPU-hours",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.05",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.0010958904109589",
+                "monthlyCost": "0.8",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.010958904109589",
+                    "monthlyQuantity": "8",
+                    "price": "0.1",
+                    "hourlyCost": "0.0010958904109589",
+                    "monthlyCost": "0.8"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "aws_instance.instance_counted[0]",
+            "metadata": {},
+            "hourlyCost": "0.0062958904109589",
+            "monthlyCost": "4.596",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, t3.nano)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.0052",
+                "hourlyCost": "0.0052",
+                "monthlyCost": "3.796"
+              },
+              {
+                "name": "CPU credits",
+                "unit": "vCPU-hours",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.05",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.0010958904109589",
+                "monthlyCost": "0.8",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.010958904109589",
+                    "monthlyQuantity": "8",
+                    "price": "0.1",
+                    "hourlyCost": "0.0010958904109589",
+                    "monthlyCost": "0.8"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "aws_instance.instance_named[\"test.1\"]",
+            "tags": {
+              "Name": "test.1"
+            },
+            "metadata": {},
+            "hourlyCost": "0.0062958904109589",
+            "monthlyCost": "4.596",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, t3.nano)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.0052",
+                "hourlyCost": "0.0052",
+                "monthlyCost": "3.796"
+              },
+              {
+                "name": "CPU credits",
+                "unit": "vCPU-hours",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.05",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.0010958904109589",
+                "monthlyCost": "0.8",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.010958904109589",
+                    "monthlyQuantity": "8",
+                    "price": "0.1",
+                    "hourlyCost": "0.0010958904109589",
+                    "monthlyCost": "0.8"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "module.db.module.db_1.module.db_instance.aws_db_instance.this[0]",
+            "tags": {
+              "Environment": "dev",
+              "Name": "demodb",
+              "Owner": "user2"
+            },
+            "metadata": {},
+            "hourlyCost": "0.017787671232876718",
+            "monthlyCost": "12.985",
+            "costComponents": [
+              {
+                "name": "Database instance (on-demand, Single-AZ, db.t3.micro)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.017",
+                "hourlyCost": "0.017",
+                "monthlyCost": "12.41"
+              },
+              {
+                "name": "Storage (general purpose SSD, gp2)",
+                "unit": "GB",
+                "hourlyQuantity": "0.0068493150684932",
+                "monthlyQuantity": "5",
+                "price": "0.115",
+                "hourlyCost": "0.000787671232876718",
+                "monthlyCost": "0.575"
+              }
+            ]
+          },
+          {
+            "name": "module.instances.aws_instance.module_instance_1",
+            "metadata": {},
+            "hourlyCost": "0.0062958904109589",
+            "monthlyCost": "4.596",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, t3.nano)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.0052",
+                "hourlyCost": "0.0052",
+                "monthlyCost": "3.796"
+              },
+              {
+                "name": "CPU credits",
+                "unit": "vCPU-hours",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.05",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.0010958904109589",
+                "monthlyCost": "0.8",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.010958904109589",
+                    "monthlyQuantity": "8",
+                    "price": "0.1",
+                    "hourlyCost": "0.0010958904109589",
+                    "monthlyCost": "0.8"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "module.instances.aws_instance.module_instance_counted[0]",
+            "metadata": {},
+            "hourlyCost": "0.0062958904109589",
+            "monthlyCost": "4.596",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, t3.nano)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.0052",
+                "hourlyCost": "0.0052",
+                "monthlyCost": "3.796"
+              },
+              {
+                "name": "CPU credits",
+                "unit": "vCPU-hours",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.05",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.0010958904109589",
+                "monthlyCost": "0.8",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.010958904109589",
+                    "monthlyQuantity": "8",
+                    "price": "0.1",
+                    "hourlyCost": "0.0010958904109589",
+                    "monthlyCost": "0.8"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "module.instances.aws_instance.module_instance_named[\"test.1\"]",
+            "tags": {
+              "Name": "test.1"
+            },
+            "metadata": {},
+            "hourlyCost": "0.0062958904109589",
+            "monthlyCost": "4.596",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, t3.nano)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.0052",
+                "hourlyCost": "0.0052",
+                "monthlyCost": "3.796"
+              },
+              {
+                "name": "CPU credits",
+                "unit": "vCPU-hours",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.05",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.0010958904109589",
+                "monthlyCost": "0.8",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.010958904109589",
+                    "monthlyQuantity": "8",
+                    "price": "0.1",
+                    "hourlyCost": "0.0010958904109589",
+                    "monthlyCost": "0.8"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "totalHourlyCost": "0.055563013698630118",
+        "totalMonthlyCost": "40.561"
+      },
+      "breakdown": {
+        "resources": [
+          {
+            "name": "aws_instance.instance_1",
+            "metadata": {},
+            "hourlyCost": "0.0062958904109589",
+            "monthlyCost": "4.596",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, t3.nano)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.0052",
+                "hourlyCost": "0.0052",
+                "monthlyCost": "3.796"
+              },
+              {
+                "name": "CPU credits",
+                "unit": "vCPU-hours",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.05",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.0010958904109589",
+                "monthlyCost": "0.8",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.010958904109589",
+                    "monthlyQuantity": "8",
+                    "price": "0.1",
+                    "hourlyCost": "0.0010958904109589",
+                    "monthlyCost": "0.8"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "aws_instance.instance_counted[0]",
+            "metadata": {},
+            "hourlyCost": "0.0062958904109589",
+            "monthlyCost": "4.596",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, t3.nano)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.0052",
+                "hourlyCost": "0.0052",
+                "monthlyCost": "3.796"
+              },
+              {
+                "name": "CPU credits",
+                "unit": "vCPU-hours",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.05",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.0010958904109589",
+                "monthlyCost": "0.8",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.010958904109589",
+                    "monthlyQuantity": "8",
+                    "price": "0.1",
+                    "hourlyCost": "0.0010958904109589",
+                    "monthlyCost": "0.8"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "aws_instance.instance_named[\"test.1\"]",
+            "tags": {
+              "Name": "test.1"
+            },
+            "metadata": {},
+            "hourlyCost": "0.0062958904109589",
+            "monthlyCost": "4.596",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, t3.nano)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.0052",
+                "hourlyCost": "0.0052",
+                "monthlyCost": "3.796"
+              },
+              {
+                "name": "CPU credits",
+                "unit": "vCPU-hours",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.05",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.0010958904109589",
+                "monthlyCost": "0.8",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.010958904109589",
+                    "monthlyQuantity": "8",
+                    "price": "0.1",
+                    "hourlyCost": "0.0010958904109589",
+                    "monthlyCost": "0.8"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "module.db.module.db_1.module.db_instance.aws_db_instance.this[0]",
+            "tags": {
+              "Environment": "dev",
+              "Name": "demodb",
+              "Owner": "user2"
+            },
+            "metadata": {},
+            "hourlyCost": "0.017787671232876718",
+            "monthlyCost": "12.985",
+            "costComponents": [
+              {
+                "name": "Database instance (on-demand, Single-AZ, db.t3.micro)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.017",
+                "hourlyCost": "0.017",
+                "monthlyCost": "12.41"
+              },
+              {
+                "name": "Storage (general purpose SSD, gp2)",
+                "unit": "GB",
+                "hourlyQuantity": "0.0068493150684932",
+                "monthlyQuantity": "5",
+                "price": "0.115",
+                "hourlyCost": "0.000787671232876718",
+                "monthlyCost": "0.575"
+              }
+            ]
+          },
+          {
+            "name": "module.instances.aws_instance.module_instance_1",
+            "metadata": {},
+            "hourlyCost": "0.0062958904109589",
+            "monthlyCost": "4.596",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, t3.nano)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.0052",
+                "hourlyCost": "0.0052",
+                "monthlyCost": "3.796"
+              },
+              {
+                "name": "CPU credits",
+                "unit": "vCPU-hours",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.05",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.0010958904109589",
+                "monthlyCost": "0.8",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.010958904109589",
+                    "monthlyQuantity": "8",
+                    "price": "0.1",
+                    "hourlyCost": "0.0010958904109589",
+                    "monthlyCost": "0.8"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "module.instances.aws_instance.module_instance_counted[0]",
+            "metadata": {},
+            "hourlyCost": "0.0062958904109589",
+            "monthlyCost": "4.596",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, t3.nano)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.0052",
+                "hourlyCost": "0.0052",
+                "monthlyCost": "3.796"
+              },
+              {
+                "name": "CPU credits",
+                "unit": "vCPU-hours",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.05",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.0010958904109589",
+                "monthlyCost": "0.8",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.010958904109589",
+                    "monthlyQuantity": "8",
+                    "price": "0.1",
+                    "hourlyCost": "0.0010958904109589",
+                    "monthlyCost": "0.8"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "module.instances.aws_instance.module_instance_named[\"test.1\"]",
+            "tags": {
+              "Name": "test.1"
+            },
+            "metadata": {},
+            "hourlyCost": "0.0062958904109589",
+            "monthlyCost": "4.596",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, t3.nano)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.0052",
+                "hourlyCost": "0.0052",
+                "monthlyCost": "3.796"
+              },
+              {
+                "name": "CPU credits",
+                "unit": "vCPU-hours",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.05",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.0010958904109589",
+                "monthlyCost": "0.8",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.010958904109589",
+                    "monthlyQuantity": "8",
+                    "price": "0.1",
+                    "hourlyCost": "0.0010958904109589",
+                    "monthlyCost": "0.8"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "totalHourlyCost": "0.055563013698630118",
+        "totalMonthlyCost": "40.561"
+      },
+      "diff": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
+      },
+      "summary": {
+        "unsupportedResourceCounts": {
+          "aws_db_option_group": 1
+        }
+      }
+    },
+    {
+      "name": "same_name_plan",
+      "metadata": {
+        "path": "./cmd/infracost/testdata/terraform_v0.14_plan.json",
+        "type": "terraform_plan_json",
+        "vcsSubPath": "cmd/infracost/testdata/terraform_v0.14_plan.json"
+      },
+      "pastBreakdown": {
+        "resources": [
+          {
+            "name": "aws_instance.instance_1",
+            "metadata": {},
+            "hourlyCost": "0.0062958904109589",
+            "monthlyCost": "4.596",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, t3.nano)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.0052",
+                "hourlyCost": "0.0052",
+                "monthlyCost": "3.796"
+              },
+              {
+                "name": "CPU credits",
+                "unit": "vCPU-hours",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.05",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.0010958904109589",
+                "monthlyCost": "0.8",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.010958904109589",
+                    "monthlyQuantity": "8",
+                    "price": "0.1",
+                    "hourlyCost": "0.0010958904109589",
+                    "monthlyCost": "0.8"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "aws_instance.instance_counted[0]",
+            "metadata": {},
+            "hourlyCost": "0.0062958904109589",
+            "monthlyCost": "4.596",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, t3.nano)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.0052",
+                "hourlyCost": "0.0052",
+                "monthlyCost": "3.796"
+              },
+              {
+                "name": "CPU credits",
+                "unit": "vCPU-hours",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.05",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.0010958904109589",
+                "monthlyCost": "0.8",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.010958904109589",
+                    "monthlyQuantity": "8",
+                    "price": "0.1",
+                    "hourlyCost": "0.0010958904109589",
+                    "monthlyCost": "0.8"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "aws_instance.instance_named[\"test.1\"]",
+            "tags": {
+              "Name": "test.1"
+            },
+            "metadata": {},
+            "hourlyCost": "0.0062958904109589",
+            "monthlyCost": "4.596",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, t3.nano)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.0052",
+                "hourlyCost": "0.0052",
+                "monthlyCost": "3.796"
+              },
+              {
+                "name": "CPU credits",
+                "unit": "vCPU-hours",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.05",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.0010958904109589",
+                "monthlyCost": "0.8",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.010958904109589",
+                    "monthlyQuantity": "8",
+                    "price": "0.1",
+                    "hourlyCost": "0.0010958904109589",
+                    "monthlyCost": "0.8"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "module.db.module.db_1.module.db_instance.aws_db_instance.this[0]",
+            "tags": {
+              "Environment": "dev",
+              "Name": "demodb",
+              "Owner": "user2"
+            },
+            "metadata": {},
+            "hourlyCost": "0.017787671232876718",
+            "monthlyCost": "12.985",
+            "costComponents": [
+              {
+                "name": "Database instance (on-demand, Single-AZ, db.t3.micro)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.017",
+                "hourlyCost": "0.017",
+                "monthlyCost": "12.41"
+              },
+              {
+                "name": "Storage (general purpose SSD, gp2)",
+                "unit": "GB",
+                "hourlyQuantity": "0.0068493150684932",
+                "monthlyQuantity": "5",
+                "price": "0.115",
+                "hourlyCost": "0.000787671232876718",
+                "monthlyCost": "0.575"
+              }
+            ]
+          },
+          {
+            "name": "module.instances.aws_instance.module_instance_1",
+            "metadata": {},
+            "hourlyCost": "0.0062958904109589",
+            "monthlyCost": "4.596",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, t3.nano)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.0052",
+                "hourlyCost": "0.0052",
+                "monthlyCost": "3.796"
+              },
+              {
+                "name": "CPU credits",
+                "unit": "vCPU-hours",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.05",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.0010958904109589",
+                "monthlyCost": "0.8",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.010958904109589",
+                    "monthlyQuantity": "8",
+                    "price": "0.1",
+                    "hourlyCost": "0.0010958904109589",
+                    "monthlyCost": "0.8"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "module.instances.aws_instance.module_instance_counted[0]",
+            "metadata": {},
+            "hourlyCost": "0.0062958904109589",
+            "monthlyCost": "4.596",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, t3.nano)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.0052",
+                "hourlyCost": "0.0052",
+                "monthlyCost": "3.796"
+              },
+              {
+                "name": "CPU credits",
+                "unit": "vCPU-hours",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.05",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.0010958904109589",
+                "monthlyCost": "0.8",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.010958904109589",
+                    "monthlyQuantity": "8",
+                    "price": "0.1",
+                    "hourlyCost": "0.0010958904109589",
+                    "monthlyCost": "0.8"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "module.instances.aws_instance.module_instance_named[\"test.1\"]",
+            "tags": {
+              "Name": "test.1"
+            },
+            "metadata": {},
+            "hourlyCost": "0.0062958904109589",
+            "monthlyCost": "4.596",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, t3.nano)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.0052",
+                "hourlyCost": "0.0052",
+                "monthlyCost": "3.796"
+              },
+              {
+                "name": "CPU credits",
+                "unit": "vCPU-hours",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.05",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.0010958904109589",
+                "monthlyCost": "0.8",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.010958904109589",
+                    "monthlyQuantity": "8",
+                    "price": "0.1",
+                    "hourlyCost": "0.0010958904109589",
+                    "monthlyCost": "0.8"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "totalHourlyCost": "0.055563013698630118",
+        "totalMonthlyCost": "40.561"
+      },
+      "breakdown": {
+        "resources": [
+          {
+            "name": "aws_instance.instance_1",
+            "metadata": {},
+            "hourlyCost": "0.0062958904109589",
+            "monthlyCost": "4.596",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, t3.nano)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.0052",
+                "hourlyCost": "0.0052",
+                "monthlyCost": "3.796"
+              },
+              {
+                "name": "CPU credits",
+                "unit": "vCPU-hours",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.05",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.0010958904109589",
+                "monthlyCost": "0.8",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.010958904109589",
+                    "monthlyQuantity": "8",
+                    "price": "0.1",
+                    "hourlyCost": "0.0010958904109589",
+                    "monthlyCost": "0.8"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "aws_instance.instance_counted[0]",
+            "metadata": {},
+            "hourlyCost": "0.0062958904109589",
+            "monthlyCost": "4.596",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, t3.nano)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.0052",
+                "hourlyCost": "0.0052",
+                "monthlyCost": "3.796"
+              },
+              {
+                "name": "CPU credits",
+                "unit": "vCPU-hours",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.05",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.0010958904109589",
+                "monthlyCost": "0.8",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.010958904109589",
+                    "monthlyQuantity": "8",
+                    "price": "0.1",
+                    "hourlyCost": "0.0010958904109589",
+                    "monthlyCost": "0.8"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "aws_instance.instance_named[\"test.1\"]",
+            "tags": {
+              "Name": "test.1"
+            },
+            "metadata": {},
+            "hourlyCost": "0.0062958904109589",
+            "monthlyCost": "4.596",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, t3.nano)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.0052",
+                "hourlyCost": "0.0052",
+                "monthlyCost": "3.796"
+              },
+              {
+                "name": "CPU credits",
+                "unit": "vCPU-hours",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.05",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.0010958904109589",
+                "monthlyCost": "0.8",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.010958904109589",
+                    "monthlyQuantity": "8",
+                    "price": "0.1",
+                    "hourlyCost": "0.0010958904109589",
+                    "monthlyCost": "0.8"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "module.db.module.db_1.module.db_instance.aws_db_instance.this[0]",
+            "tags": {
+              "Environment": "dev",
+              "Name": "demodb",
+              "Owner": "user2"
+            },
+            "metadata": {},
+            "hourlyCost": "0.017787671232876718",
+            "monthlyCost": "12.985",
+            "costComponents": [
+              {
+                "name": "Database instance (on-demand, Single-AZ, db.t3.micro)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.017",
+                "hourlyCost": "0.017",
+                "monthlyCost": "12.41"
+              },
+              {
+                "name": "Storage (general purpose SSD, gp2)",
+                "unit": "GB",
+                "hourlyQuantity": "0.0068493150684932",
+                "monthlyQuantity": "5",
+                "price": "0.115",
+                "hourlyCost": "0.000787671232876718",
+                "monthlyCost": "0.575"
+              }
+            ]
+          },
+          {
+            "name": "module.instances.aws_instance.module_instance_1",
+            "metadata": {},
+            "hourlyCost": "0.0062958904109589",
+            "monthlyCost": "4.596",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, t3.nano)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.0052",
+                "hourlyCost": "0.0052",
+                "monthlyCost": "3.796"
+              },
+              {
+                "name": "CPU credits",
+                "unit": "vCPU-hours",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.05",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.0010958904109589",
+                "monthlyCost": "0.8",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.010958904109589",
+                    "monthlyQuantity": "8",
+                    "price": "0.1",
+                    "hourlyCost": "0.0010958904109589",
+                    "monthlyCost": "0.8"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "module.instances.aws_instance.module_instance_counted[0]",
+            "metadata": {},
+            "hourlyCost": "0.0062958904109589",
+            "monthlyCost": "4.596",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, t3.nano)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.0052",
+                "hourlyCost": "0.0052",
+                "monthlyCost": "3.796"
+              },
+              {
+                "name": "CPU credits",
+                "unit": "vCPU-hours",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.05",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.0010958904109589",
+                "monthlyCost": "0.8",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.010958904109589",
+                    "monthlyQuantity": "8",
+                    "price": "0.1",
+                    "hourlyCost": "0.0010958904109589",
+                    "monthlyCost": "0.8"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "module.instances.aws_instance.module_instance_named[\"test.1\"]",
+            "tags": {
+              "Name": "test.1"
+            },
+            "metadata": {},
+            "hourlyCost": "0.0062958904109589",
+            "monthlyCost": "4.596",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, t3.nano)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.0052",
+                "hourlyCost": "0.0052",
+                "monthlyCost": "3.796"
+              },
+              {
+                "name": "CPU credits",
+                "unit": "vCPU-hours",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.05",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.0010958904109589",
+                "monthlyCost": "0.8",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.010958904109589",
+                    "monthlyQuantity": "8",
+                    "price": "0.1",
+                    "hourlyCost": "0.0010958904109589",
+                    "monthlyCost": "0.8"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "totalHourlyCost": "0.055563013698630118",
+        "totalMonthlyCost": "40.561"
+      },
+      "diff": {
+        "resources": [
+          {
+            "name": "aws_instance.instance_2",
+            "metadata": {},
+            "hourlyCost": "0.0062958904109589",
+            "monthlyCost": "4.596",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, t3.nano)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.0052",
+                "hourlyCost": "0.0052",
+                "monthlyCost": "3.796"
+              },
+              {
+                "name": "CPU credits",
+                "unit": "vCPU-hours",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.05",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.0010958904109589",
+                "monthlyCost": "0.8",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.010958904109589",
+                    "monthlyQuantity": "8",
+                    "price": "0.1",
+                    "hourlyCost": "0.0010958904109589",
+                    "monthlyCost": "0.8"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
+      },
+      "summary": {
+        "unsupportedResourceCounts": {
+          "aws_db_option_group": 1
+        }
+      }
+    }
+  ],
+  "totalHourlyCost": "0.055563013698630118",
+  "totalMonthlyCost": "40.561",
+  "pastTotalHourlyCost": "0.055563013698630118",
+  "pastTotalMonthlyCost": "40.561",
+  "diffTotalHourlyCost": "0",
+  "diffTotalMonthlyCost": "0",
+  "timeGenerated": "2021-11-09T10:06:29.212343-05:00",
+  "summary": {
+    "unsupportedResourceCounts": {
+      "aws_db_option_group": 1
+    }
+  }
+}
