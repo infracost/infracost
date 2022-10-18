@@ -128,12 +128,7 @@ func FetchUsageData(ctx *config.RunContext, project *schema.Project) (map[string
 
 	// gather all the CoreResource
 	coreResources := make(map[string]schema.CoreResource)
-	for _, rb := range project.PartialResources {
-		if rb.CoreResource != nil {
-			coreResources[rb.ResourceData.Address] = rb.CoreResource
-		}
-	}
-	for _, rb := range project.PartialPastResources {
+	for _, rb := range project.AllPartialResources() {
 		if rb.CoreResource != nil {
 			coreResources[rb.ResourceData.Address] = rb.CoreResource
 		}
@@ -149,12 +144,18 @@ func FetchUsageData(ctx *config.RunContext, project *schema.Project) (map[string
 		}
 
 		if len(usageKeys) > 0 {
+			var usageParams []schema.UsageParam
+			if crWithUsageParams, ok := cr.(schema.CoreResourceWithUsageParams); ok {
+				usageParams = crWithUsageParams.UsageEstimationParams()
+			}
+
 			vars := apiclient.UsageQuantitiesQueryVariables{
 				RepoURL:      ctx.VCSRepositoryURL(),
 				Project:      project.Name,
 				ResourceType: cr.CoreType(),
 				Address:      address,
 				UsageKeys:    usageKeys,
+				UsageParams:  usageParams,
 			}
 
 			attributes, err := c.ListUsageQuantities(vars)
@@ -170,4 +171,33 @@ func FetchUsageData(ctx *config.RunContext, project *schema.Project) (map[string
 	}
 
 	return usageMap, nil
+}
+
+// UploadCloudResourceIDs sends the project scoped cloud resource ids to the Usage API, so they can be used
+// to provide usage estimates.
+func UploadCloudResourceIDs(ctx *config.RunContext, project *schema.Project) error {
+	c := apiclient.NewUsageAPIClient(ctx)
+
+	var resourceIDs []apiclient.ResourceIDAddress
+	for _, partial := range project.AllPartialResources() {
+		for _, resourceID := range partial.CloudResourceIDs {
+			resourceIDs = append(resourceIDs, apiclient.ResourceIDAddress{
+				Address:    partial.ResourceData.Address,
+				ResourceID: resourceID},
+			)
+		}
+	}
+
+	vars := apiclient.CloudResourceIDVariables{
+		RepoURL:             ctx.VCSRepositoryURL(),
+		Project:             project.Name,
+		ResourceIDAddresses: resourceIDs,
+	}
+
+	err := c.UploadCloudResourceIDs(vars)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

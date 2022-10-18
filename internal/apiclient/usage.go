@@ -4,6 +4,8 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/json"
+	"fmt"
+	"github.com/infracost/infracost/internal/schema"
 	"github.com/tidwall/gjson"
 	"io/ioutil"
 	"time"
@@ -94,6 +96,8 @@ func (c *UsageAPIClient) ListActualCosts(vars ActualCostsQueryVariables) (*Actua
 	results, err := c.doQueries([]GraphQLQuery{query})
 	if err != nil {
 		return nil, err
+	} else if len(results) > 0 && results[0].Get("errors").Exists() {
+		return nil, fmt.Errorf("graphql error: %s", results[0].Get("errors").String())
 	}
 
 	if len(results) == 0 {
@@ -168,6 +172,8 @@ func (c *UsageAPIClient) ListUsageQuantities(vars UsageQuantitiesQueryVariables)
 	results, err := c.doQueries([]GraphQLQuery{query})
 	if err != nil {
 		return nil, err
+	} else if len(results) > 0 && results[0].Get("errors").Exists() {
+		return nil, fmt.Errorf("graphql error: %s", results[0].Get("errors").String())
 	}
 
 	for _, result := range results {
@@ -181,19 +187,20 @@ func (c *UsageAPIClient) ListUsageQuantities(vars UsageQuantitiesQueryVariables)
 }
 
 type UsageQuantitiesQueryVariables struct {
-	RepoURL      string   `json:"repoUrl"`
-	Project      string   `json:"project"`
-	ResourceType string   `json:"resourceType"`
-	Address      string   `json:"address"`
-	UsageKeys    []string `json:"usageKeys"`
+	RepoURL      string              `json:"repoUrl"`
+	Project      string              `json:"project"`
+	ResourceType string              `json:"resourceType"`
+	Address      string              `json:"address"`
+	UsageKeys    []string            `json:"usageKeys"`
+	UsageParams  []schema.UsageParam `json:"usageParams"`
 }
 
 func (c *UsageAPIClient) buildUsageQuantitiesQuery(vars UsageQuantitiesQueryVariables) GraphQLQuery {
 	v := interfaceToMap(vars)
 
 	query := `
-		query($repoUrl: String!, $project: String!, $resourceType: String!, $address: String!, $usageKeys: [String!]!) {
-			usageQuantities(repoUrl: $repoUrl, project: $project, resourceType: $resourceType, address: $address, usageKeys: $usageKeys) {
+		query($repoUrl: String!, $project: String!, $resourceType: String!, $address: String!, $usageKeys: [String!]!, $usageParams: [UsageParamInput!]) {
+			usageQuantities(repoUrl: $repoUrl, project: $project, resourceType: $resourceType, address: $address, usageKeys: $usageKeys, usageParams: $usageParams) {
     			address
 				usageKey
 				monthlyQuantity
@@ -202,6 +209,52 @@ func (c *UsageAPIClient) buildUsageQuantitiesQuery(vars UsageQuantitiesQueryVari
 	`
 
 	return GraphQLQuery{query, v}
+}
+
+type CloudResourceIDVariables struct {
+	RepoURL             string              `json:"repoUrl"`
+	Project             string              `json:"project"`
+	ResourceIDAddresses []ResourceIDAddress `json:"addressResourceIds"`
+}
+
+type ResourceIDAddress struct {
+	Address    string `json:"address"`
+	ResourceID string `json:"resourceId"`
+}
+
+// UploadCloudResourceIDs uploads cloud resource IDs to the Infracost Cloud Usage API, so they may be
+// used to calculate usage estimates.
+func (c *UsageAPIClient) UploadCloudResourceIDs(vars CloudResourceIDVariables) error {
+	if len(vars.ResourceIDAddresses) == 0 {
+		logging.Logger.Debugf("No cloud resource IDs to upload for %s %s", vars.RepoURL, vars.Project)
+		return nil
+	}
+
+	query := GraphQLQuery{
+		Query: `
+			mutation($repoUrl: String!, $project: String!, $addressResourceIds: [AddressResourceIdInput!]!) {
+				addAddressResourceIds(repoUrl: $repoUrl, project: $project, addressResourceIds: $addressResourceIds) {
+					newCount
+				} 
+			}
+		`,
+		Variables: interfaceToMap(vars),
+	}
+
+	logging.Logger.Debugf("Uploading cloud resource IDs to %s for %s %s", c.endpoint, vars.RepoURL, vars.Project)
+
+	results, err := c.doQueries([]GraphQLQuery{query})
+	if err != nil {
+		return err
+	} else if len(results) > 0 && results[0].Get("errors").Exists() {
+		return fmt.Errorf("graphql error: %s", results[0].Get("errors").String())
+	}
+
+	newCount := results[0].Get("data.addAddressResourceIds.newCount").Int()
+
+	logging.Logger.WithField("newCount", newCount).Debugf("Uploaded cloud resource IDs to %s for %s %s", c.endpoint, vars.RepoURL, vars.Project)
+
+	return nil
 }
 
 func interfaceToMap(in interface{}) map[string]interface{} {

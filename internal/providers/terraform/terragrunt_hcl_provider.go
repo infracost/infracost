@@ -649,7 +649,13 @@ type terragruntDependency struct {
 // The map is keyed by the full path of the config_path attribute specified in the dependency block.
 func decodeDependencyBlocks(filename string, terragruntOptions *tgoptions.TerragruntOptions, dependencyOutputs *cty.Value, include *tgconfig.IncludeConfig) (map[string]tgconfig.Dependency, error) {
 	parser := hclparse.NewParser()
-	file, diags := parser.ParseHCLFile(filename)
+
+	parseFunc := parser.ParseHCLFile
+	if strings.HasSuffix(filename, ".json") {
+		parseFunc = parser.ParseJSONFile
+	}
+
+	file, diags := parseFunc(filename)
 	if diags != nil && diags.HasErrors() {
 		return nil, fmt.Errorf("could not parse hcl file %s to decode dependency blocks %w", filename, diags)
 	}
