@@ -8,6 +8,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/tidwall/gjson"
 	"io/ioutil"
+	"strings"
 	"time"
 
 	"github.com/infracost/infracost/internal/config"
@@ -167,8 +168,6 @@ func (c *UsageAPIClient) ListUsageQuantities(vars UsageQuantitiesQueryVariables)
 
 	logging.Logger.Debugf("Getting usage quantities from %s for %s %s %v", c.endpoint, vars.ResourceType, vars.Address, vars.UsageKeys)
 
-	attribs := make(map[string]gjson.Result)
-
 	results, err := c.doQueries([]GraphQLQuery{query})
 	if err != nil {
 		return nil, err
@@ -176,14 +175,62 @@ func (c *UsageAPIClient) ListUsageQuantities(vars UsageQuantitiesQueryVariables)
 		return nil, fmt.Errorf("graphql error: %s", results[0].Get("errors").String())
 	}
 
+	attribs := make(map[string]interface{})
 	for _, result := range results {
 		for _, q := range result.Get("data.usageQuantities").Array() {
 			usageKey := q.Get("usageKey").String()
-			attribs[usageKey] = q.Get("monthlyQuantity")
+			unflattenUsageKey(attribs, usageKey, q.Get("monthlyQuantity").String())
 		}
 	}
 
-	return attribs, nil
+	// now that we have converted the attribs to account for any flattened keys, convert the
+	// structure to json so we can return it as the gjson.Result required by for UsageData.Attributes
+	attribsJson, err := json.Marshal(attribs)
+	if err != nil {
+		return nil, err
+	}
+
+	return gjson.ParseBytes(attribsJson).Map(), nil
+}
+
+// unflattenUsageKey converts a "." separated usage key returned from the Usage API to the
+// nested structure used by the usage-file.
+//
+// Nested usage keys are returned from the usage API in a graphQL-friendly flattened format
+// with "." as a key separator. For example s3 standard usage is retrieved as:
+// [
+//   { "usageKey": "standard.storage_gb", "monthlyQuantity": "123" },
+//   { "usageKey": "standard.monthly_tier_1_requests", "monthlyQuantity": "456" },
+//   ...
+// ]
+//
+// When converted to a nested format needed for for UsageData.Attributes, the keys would be:
+// {
+//    "standard": {
+//      "storage_gb: "123",
+//      "monthly_tier_1_requests": "456",
+//      ...
+//    },
+//    ...
+// }
+func unflattenUsageKey(attribs map[string]interface{}, usageKey string, value string) {
+	split := strings.SplitN(usageKey, ".", 2)
+	if len(split) <= 1 {
+		attribs[usageKey] = value
+		return
+	}
+
+	var childAttribs map[string]interface{}
+	if val, ok := attribs[split[0]]; ok {
+		childAttribs = val.(map[string]interface{})
+	} else {
+		// sub attrib map doesn't already exist so add it to the parent
+		childAttribs = make(map[string]interface{})
+		attribs[split[0]] = childAttribs
+	}
+
+	// populate the value in the childMap (recursively, in case there are multiple ".")
+	unflattenUsageKey(childAttribs, split[1], value)
 }
 
 type UsageQuantitiesQueryVariables struct {
