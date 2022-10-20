@@ -272,11 +272,16 @@ func buildActualCostRows(t table.Writer, currency string, ac *ActualCosts, prefi
 
 	var dateRange string
 	if !ac.StartTimestamp.IsZero() && !ac.EndTimestamp.IsZero() {
+		// We want to display the range as "days" which means "inclusive", so subtract
+		// 1 nano second from the exclusive endTimestamp.  This means the (exclusive) timestamp
+		// range "2020/10/10 00:00:00Z-2020/10/20 00:00:00Z" will be displayed as the (inclusive)
+		// day range "2020/10/10 - 2020/10/19".
+		endDay := ac.EndTimestamp.Add(-1)
 		endFmt := "Jan 2"
-		if ac.StartTimestamp.Month() == ac.EndTimestamp.Month() {
+		if ac.StartTimestamp.Month() == endDay.Month() {
 			endFmt = "2"
 		}
-		dateRange = fmt.Sprintf(" %s-%s", ac.StartTimestamp.Format("Jan 2"), ac.EndTimestamp.Format(endFmt))
+		dateRange = fmt.Sprintf(" %s-%s", ac.StartTimestamp.Format("Jan 2"), endDay.Format(endFmt))
 	}
 	var resourceID string
 	if ac.ResourceID != "" {
