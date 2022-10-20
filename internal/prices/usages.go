@@ -4,6 +4,7 @@ import (
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
 	"runtime"
 )
@@ -138,10 +139,7 @@ func FetchUsageData(ctx *config.RunContext, project *schema.Project) (map[string
 	// look up the usage for each core resource.
 	for address, cr := range coreResources {
 		// TODO: add concurrency
-		usageKeys := make([]string, len(cr.UsageSchema()))
-		for i, usageItem := range cr.UsageSchema() {
-			usageKeys[i] = usageItem.Key
-		}
+		usageKeys := flattenUsageKeys(cr.UsageSchema())
 
 		if len(usageKeys) > 0 {
 			var usageParams []schema.UsageParam
@@ -200,4 +198,21 @@ func UploadCloudResourceIDs(ctx *config.RunContext, project *schema.Project) err
 	}
 
 	return nil
+}
+
+func flattenUsageKeys(usageSchema []*schema.UsageItem) []string {
+	usageKeys := make([]string, len(usageSchema))
+	for i, usageItem := range usageSchema {
+		if usageItem.ValueType == schema.SubResourceUsage {
+			ru := usageItem.DefaultValue.(*usage.ResourceUsage)
+			// recursively flatten any nested keys, then add them to the current list
+			for _, nestedKey := range flattenUsageKeys(ru.Items) {
+				usageKeys[i] = usageItem.Key + "." + nestedKey
+			}
+		} else {
+			usageKeys[i] = usageItem.Key
+		}
+	}
+
+	return usageKeys
 }

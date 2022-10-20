@@ -12,11 +12,11 @@ func getS3BucketRegistryItem() *schema.RegistryItem {
 		Notes: []string{
 			"S3 replication time control data transfer, and batch operations are not supported by Terraform.",
 		},
-		RFunc: NewS3BucketResource,
+		CoreRFunc: NewS3BucketResource,
 	}
 }
 
-func NewS3BucketResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewS3BucketResource(d *schema.ResourceData) schema.CoreResource {
 	storageClassNames := map[string]string{
 		"STANDARD":            "standard",
 		"INTELLIGENT_TIERING": "intelligent_tiering",
@@ -72,7 +72,6 @@ func NewS3BucketResource(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 		ObjectTagsEnabled:       objTagsEnabled,
 		LifecycleStorageClasses: lifecycleStorageClasses,
 	}
-	a.PopulateUsage(u)
 
-	return a.BuildResource()
+	return a
 }
