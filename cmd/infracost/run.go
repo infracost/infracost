@@ -535,8 +535,9 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 
 	spinner.Success()
 
-	// Disabled for now
-	// r.populateActualCosts(projects)
+	if r.runCtx.Config.UsageActualCosts {
+		r.populateActualCosts(projects)
+	}
 
 	out.projects = projects
 
@@ -650,26 +651,26 @@ func (r *parallelRunner) fetchProjectUsage(projects []*schema.Project) map[*sche
 	return projectPtrToUsageMap
 }
 
-// func (r *parallelRunner) populateActualCosts(projects []*schema.Project) {
-//	if r.runCtx.Config.UsageAPIEndpoint != "" {
-//		spinnerOpts := ui.SpinnerOptions{
-//			EnableLogging: r.runCtx.Config.IsLogging(),
-//			NoColor:       r.runCtx.Config.NoColor,
-//			Indent:        "  ",
-//		}
-//		spinner := ui.NewSpinner("Retrieving actual costs from Infracost Cloud", spinnerOpts)
-//		defer spinner.Fail()
-//
-//		for _, project := range projects {
-//			if err := prices.PopulateActualCosts(r.runCtx, project); err != nil {
-//				logging.Logger.WithError(err).Debugf("failed to retrieve actual costs for project %s", project.Name)
-//				return
-//			}
-//		}
-//
-//		spinner.Success()
-//	}
-// }
+func (r *parallelRunner) populateActualCosts(projects []*schema.Project) {
+	if r.runCtx.Config.UsageAPIEndpoint != "" {
+		spinnerOpts := ui.SpinnerOptions{
+			EnableLogging: r.runCtx.Config.IsLogging(),
+			NoColor:       r.runCtx.Config.NoColor,
+			Indent:        "  ",
+		}
+		spinner := ui.NewSpinner("Retrieving actual costs from Infracost Cloud", spinnerOpts)
+		defer spinner.Fail()
+
+		for _, project := range projects {
+			if err := prices.PopulateActualCosts(r.runCtx, project); err != nil {
+				logging.Logger.WithError(err).Debugf("failed to retrieve actual costs for project %s", project.Name)
+				return
+			}
+		}
+
+		spinner.Success()
+	}
+}
 
 func (r *parallelRunner) runHCLProvider(wg *sync.WaitGroup, ctx *config.ProjectContext, usageFile *usage.UsageFile, out *projectOutput) {
 	defer func() {
