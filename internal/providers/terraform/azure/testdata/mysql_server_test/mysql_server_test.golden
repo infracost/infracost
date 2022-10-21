@@ -39,4 +39,3 @@ level=warning msg="'Multiple products found' are safe to ignore for 'Compute (GP
 level=warning msg="'Multiple products found' are safe to ignore for 'Compute (GP_Gen5_4)' due to limitations in the Azure API."
 level=warning msg="'Multiple products found' are safe to ignore for 'Compute (MO_Gen5_16)' due to limitations in the Azure API."
 level=warning msg="'Multiple products found' are safe to ignore for 'Compute (MO_Gen5_16)' due to limitations in the Azure API."
-level=warning msg="Multiple products with prices found for azurerm_mysql_server.basic_2core Compute (B_Gen5_2), using the first product"
