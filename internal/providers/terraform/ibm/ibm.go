@@ -52,14 +52,15 @@ var globalCatalogServiceId = map[string]catalogMetadata{
 	"ibm_is_instance":               {"is.instance", []string{"ibm_is_ssh_key", "ibm_is_floating_ip"}, nil},
 	"ibm_is_volume":                 {"is.volume", []string{}, nil},
 	"ibm_is_vpn_gateway":            {"is.vpn", []string{}, nil},
-	"ibm_tg_gateway":                {"transit.gateway", []string{}, nil},
+	"ibm_tg_gateway":                {"f38a4da0-c353-11e9-83b6-a36a57a97a06", []string{}, nil},
 	"ibm_is_floating_ip":            {"is.floating-ip", []string{}, nil},
 	"ibm_is_flow_log":               {"is.flow-log-collector", []string{}, nil},
-	"ibm_cloudant":                  {"cloudantnosqldb", []string{}, nil},
-	"ibm_pi_instance":               {"power-iaas", []string{}, nil},
-	"ibm_cos_bucket":                {"standard-bucket", []string{}, nil},
+	"ibm_cloudant":                  {"cloudant", []string{}, nil},
+	"ibm_pi_instance":               {"abd259f0-9990-11e8-acc8-b9f54a8f1661", []string{}, nil},
+	"ibm_cos_bucket":                {"744bfc56-d12c-4866-88d5-dac9139e0e5d:standard-bucket", []string{}, nil},
 	"ibm_is_lb":                     {"is.load-balancer", []string{}, nil},
 	"ibm_is_public_gateway":         {"is.public-gateway", []string{"ibm_is_floating_ip"}, nil},
+	"kms":                           {"ee41347f-b18e-4ca6-bf80-b5467c63f9a6", []string{}, nil},
 }
 
 func SetCatalogMetadata(d *schema.ResourceData, resourceType string, config map[string]any) {
