@@ -20,18 +20,16 @@ func newIsInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	region := d.Get("region").String()
 	profile := d.Get("profile").String()
 	zone := d.Get("zone").String()
-	truncatedZone := strings.Join(strings.Split(zone, "-")[0:2], "-") // the last part of the zone is dropped (eg: us-south-1 -> us-south)
 	dedicatedHost := strings.TrimSpace(d.Get("dedicated_host").String())
 	dedicatedHostGroup := strings.TrimSpace(d.Get("dedicated_host_group").String())
 	isDedicated := !((dedicatedHost == "") && (dedicatedHostGroup == ""))
 
 	r := &ibm.IsInstance{
-		Address:       d.Address,
-		Region:        region,
-		Profile:       profile,
-		Zone:          zone,
-		TruncatedZone: truncatedZone,
-		IsDedicated:   isDedicated,
+		Address:     d.Address,
+		Region:      region,
+		Profile:     profile,
+		Zone:        zone,
+		IsDedicated: isDedicated,
 	}
 	r.PopulateUsage(u)
 

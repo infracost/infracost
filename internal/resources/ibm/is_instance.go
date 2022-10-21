@@ -19,7 +19,6 @@ type IsInstance struct {
 	Region               string
 	Profile              string // should be values from CLI 'ibmcloud is instance-profiles'
 	Zone                 string
-	TruncatedZone        string // should be the same as region, but with the last number removed (eg: us-south-1 -> us-south)
 	IsDedicated          bool   // will be true if a dedicated_host or dedicated_host_group is specified
 	MonthlyInstanceHours *int64 `infracost_usage:"monthly_instance_hours"`
 }
