@@ -6,12 +6,18 @@
  ├─ SSD storage                                            300  GB                    $27.00 
  └─ Backup storage                               Monthly cost depends on usage: $0.05 per GB 
                                                                                              
+ aws_fsx_openzfs_file_system.my_iops_system_ssd                                              
+ ├─ Throughput capacity                                  1,024  MBps                 $266.24 
+ ├─ Provisioned IOPS                                       100  IOPS                   $0.60 
+ ├─ SSD storage                                            300  GB                    $27.00 
+ └─ Backup storage                               Monthly cost depends on usage: $0.05 per GB 
+                                                                                             
  aws_fsx_openzfs_file_system.my_system_ssd                                                   
  ├─ Throughput capacity                                  1,024  MBps                 $266.24 
  ├─ SSD storage                                            300  GB                    $27.00 
  └─ Backup storage                                      10,000  GB                   $500.00 
                                                                                              
- OVERALL TOTAL                                                                     $1,086.48 
+ OVERALL TOTAL                                                                     $1,380.32 
 ──────────────────────────────────
-2 cloud resources were detected:
-∙ 2 were estimated
+3 cloud resources were detected:
+∙ 3 were estimated

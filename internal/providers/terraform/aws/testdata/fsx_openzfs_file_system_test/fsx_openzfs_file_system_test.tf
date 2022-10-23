@@ -24,3 +24,15 @@ resource "aws_fsx_openzfs_file_system" "my_file_system_ssd" {
   deployment_type     = "SINGLE_AZ_1"
   storage_type        = "SSD"
 }
+
+resource "aws_fsx_openzfs_file_system" "my_iops_system_ssd" {
+  storage_capacity    = 300
+  subnet_ids          = ["fake"]
+  throughput_capacity = 1024
+  deployment_type     = "SINGLE_AZ_1"
+  storage_type        = "SSD"
+  disk_iops_configuration {
+    mode = "USER_PROVISIONED"
+    iops = 1000
+  }
+}

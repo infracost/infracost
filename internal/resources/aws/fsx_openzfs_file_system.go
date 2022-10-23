@@ -1,6 +1,8 @@
 package aws
 
 import (
+	"math"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 
@@ -11,6 +13,7 @@ type FSxOpenZFSFileSystem struct {
 	Address            string
 	StorageType        string
 	ThroughputCapacity int64
+	ProvisionedIOPS    int64
 	StorageCapacityGB  int64
 	Region             string
 	DeploymentType     string
@@ -30,6 +33,7 @@ func (r *FSxOpenZFSFileSystem) BuildResource() *schema.Resource {
 		Name: r.Address,
 		CostComponents: []*schema.CostComponent{
 			r.throughputCapacityCostComponent(),
+			r.provisionedIOPSCapacityCostComponent(),
 			r.storageCapacityCostComponent(),
 			r.backupGBCostComponent(),
 		},
@@ -48,6 +52,27 @@ func (r *FSxOpenZFSFileSystem) throughputCapacityCostComponent() *schema.CostCom
 			Region:        strPtr(r.Region),
 			Service:       strPtr("AmazonFSx"),
 			ProductFamily: strPtr("Provisioned Throughput"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "deploymentOption", Value: strPtr("Single-AZ")},
+				{Key: "fileSystemType", Value: strPtr("OpenZFS")},
+			},
+		},
+	}
+}
+
+func (r *FSxOpenZFSFileSystem) provisionedIOPSCapacityCostComponent() *schema.CostComponent {
+	var provisionedIOPS = decimalPtr(decimal.NewFromFloat(math.Max(0, float64(r.ProvisionedIOPS-(3*r.StorageCapacityGB)))))
+
+	return &schema.CostComponent{
+		Name:            "Provisioned IOPS",
+		Unit:            "IOPS",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: provisionedIOPS,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("AmazonFSx"),
+			ProductFamily: strPtr("Provisioned IOPS"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "deploymentOption", Value: strPtr("Single-AZ")},
 				{Key: "fileSystemType", Value: strPtr("OpenZFS")},
