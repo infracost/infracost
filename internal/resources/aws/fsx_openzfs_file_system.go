@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/infracost/infracost/internal/resources"
@@ -17,6 +18,7 @@ type FSxOpenZFSFileSystem struct {
 	StorageCapacityGB  int64
 	Region             string
 	DeploymentType     string
+	DataCompression    string
 	BackupStorageGB    *float64 `infracost_usage:"backup_storage_gb"`
 }
 
@@ -82,11 +84,18 @@ func (r *FSxOpenZFSFileSystem) provisionedIOPSCapacityCostComponent() *schema.Co
 }
 
 func (r *FSxOpenZFSFileSystem) storageCapacityCostComponent() *schema.CostComponent {
+	var storageCapacity *decimal.Decimal = decimalPtr(decimal.NewFromInt(r.StorageCapacityGB))
+	var compressionEnabled = ""
+	if r.DataCompression != "" && r.DataCompression != "NONE" {
+		compressionEnabled = fmt.Sprintf(" (%s compression enabled)", r.DataCompression)
+		storageCapacity = decimalPtr(decimal.NewFromInt(r.StorageCapacityGB / 2))
+	}
+
 	return &schema.CostComponent{
-		Name:            "SSD storage",
+		Name:            fmt.Sprintf("SSD storage%s", compressionEnabled),
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(r.StorageCapacityGB)),
+		MonthlyQuantity: storageCapacity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Region:        strPtr(r.Region),

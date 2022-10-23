@@ -23,6 +23,9 @@ resource "aws_fsx_openzfs_file_system" "my_file_system_ssd" {
   throughput_capacity = 1024
   deployment_type     = "SINGLE_AZ_1"
   storage_type        = "SSD"
+  root_volume_configuration {
+    data_compression_type = "LZ4"
+  }
 }
 
 resource "aws_fsx_openzfs_file_system" "my_iops_system_ssd" {

@@ -21,6 +21,7 @@ func NewFSxOpenZFSFileSystem(d *schema.ResourceData, u *schema.UsageData) *schem
 		ThroughputCapacity: d.Get("throughput_capacity").Int(),
 		StorageCapacityGB:  d.Get("storage_capacity").Int(),
 		ProvisionedIOPS:    d.Get("disk_iops_configuration.0.iops").Int(),
+		DataCompression:    d.Get("root_volume_configuration.0.data_compression_type").String(),
 	}
 
 	r.PopulateUsage(u)

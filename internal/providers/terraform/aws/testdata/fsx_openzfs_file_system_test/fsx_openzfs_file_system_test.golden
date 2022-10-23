@@ -3,7 +3,7 @@
                                                                                              
  aws_fsx_openzfs_file_system.my_file_system_ssd                                              
  ├─ Throughput capacity                                  1,024  MBps                 $266.24 
- ├─ SSD storage                                            300  GB                    $27.00 
+ ├─ SSD storage (LZ4 compression enabled)                  150  GB                    $13.50 
  └─ Backup storage                               Monthly cost depends on usage: $0.05 per GB 
                                                                                              
  aws_fsx_openzfs_file_system.my_iops_system_ssd                                              
@@ -17,7 +17,7 @@
  ├─ SSD storage                                            300  GB                    $27.00 
  └─ Backup storage                                      10,000  GB                   $500.00 
                                                                                              
- OVERALL TOTAL                                                                     $1,380.32 
+ OVERALL TOTAL                                                                     $1,366.82 
 ──────────────────────────────────
 3 cloud resources were detected:
 ∙ 3 were estimated
