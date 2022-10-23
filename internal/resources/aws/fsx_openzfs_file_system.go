@@ -11,15 +11,16 @@ import (
 )
 
 type FSxOpenZFSFileSystem struct {
-	Address            string
-	StorageType        string
-	ThroughputCapacity int64
-	ProvisionedIOPS    int64
-	StorageCapacityGB  int64
-	Region             string
-	DeploymentType     string
-	DataCompression    string
-	BackupStorageGB    *float64 `infracost_usage:"backup_storage_gb"`
+	Address             string
+	StorageType         string
+	ThroughputCapacity  int64
+	ProvisionedIOPS     int64
+	ProvisionedIOPSMode string
+	StorageCapacityGB   int64
+	Region              string
+	DeploymentType      string
+	DataCompression     string
+	BackupStorageGB     *float64 `infracost_usage:"backup_storage_gb"`
 }
 
 var FSxOpenZFSFileSystemUsageSchema = []*schema.UsageItem{
@@ -63,8 +64,10 @@ func (r *FSxOpenZFSFileSystem) throughputCapacityCostComponent() *schema.CostCom
 }
 
 func (r *FSxOpenZFSFileSystem) provisionedIOPSCapacityCostComponent() *schema.CostComponent {
-	var provisionedIOPS = decimalPtr(decimal.NewFromFloat(math.Max(0, float64(r.ProvisionedIOPS-(3*r.StorageCapacityGB)))))
-
+	var provisionedIOPS = decimalPtr(decimal.NewFromInt(0))
+	if r.ProvisionedIOPSMode == "USER_PROVISIONED" {
+		provisionedIOPS = decimalPtr(decimal.NewFromFloat(math.Max(0, float64(r.ProvisionedIOPS-(3*r.StorageCapacityGB)))))
+	}
 	return &schema.CostComponent{
 		Name:            "Provisioned IOPS",
 		Unit:            "IOPS",
@@ -84,7 +87,7 @@ func (r *FSxOpenZFSFileSystem) provisionedIOPSCapacityCostComponent() *schema.Co
 }
 
 func (r *FSxOpenZFSFileSystem) storageCapacityCostComponent() *schema.CostComponent {
-	var storageCapacity *decimal.Decimal = decimalPtr(decimal.NewFromInt(r.StorageCapacityGB))
+	var storageCapacity = decimalPtr(decimal.NewFromInt(r.StorageCapacityGB))
 	var compressionEnabled = ""
 	if r.DataCompression != "" && r.DataCompression != "NONE" {
 		compressionEnabled = fmt.Sprintf(" (%s compression enabled)", r.DataCompression)
