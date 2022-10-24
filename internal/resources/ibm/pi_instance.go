@@ -109,8 +109,13 @@ func (r *PiInstance) BuildResource() *schema.Resource {
 }
 
 func (r *PiInstance) piInstanceLinuxOperatingSystemCostComponent() *schema.CostComponent {
+	n := "Linux Operating System"
+
+	if r.Profile != "" {
+		n = "SAP"
+	}
 	c := schema.CostComponent{
-		Name:            "Linux Operating System",
+		Name:            n,
 		Unit:            "Instance",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
