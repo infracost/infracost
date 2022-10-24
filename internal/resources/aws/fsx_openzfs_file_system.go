@@ -90,7 +90,7 @@ func (r *FSxOpenZFSFileSystem) provisionedIOPSCapacityCostComponent() *schema.Co
 func (r *FSxOpenZFSFileSystem) storageCapacityCostComponent() *schema.CostComponent {
 	var storageCapacity *decimal.Decimal
 	var compressionEnabled = ""
-	var compressionSavings = int64(0)
+	var compressionSavings int64
 	if r.DataCompression != "" && r.DataCompression != "NONE" {
 		if r.CompressionSavings != nil {
 			compressionSavings = *r.CompressionSavings
