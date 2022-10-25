@@ -97,7 +97,7 @@ func (r *FSxOpenZFSFileSystem) storageCapacityCostComponent() *schema.CostCompon
 		} else {
 			compressionSavingsPercent = int64(50)
 		}
-		compressionEnabled = fmt.Sprintf(" (%s compression, %d percent)", r.DataCompression, compressionSavingsPercent)
+		compressionEnabled = fmt.Sprintf(" (%s compression, %d%%)", r.DataCompression, compressionSavingsPercent)
 		storageCapacity = decimalPtr(decimal.NewFromInt(int64(math.Round(float64(r.StorageCapacityGB) * float64((1 - float64(compressionSavingsPercent)/float64(100)))))))
 	} else {
 		storageCapacity = decimalPtr(decimal.NewFromInt(r.StorageCapacityGB))

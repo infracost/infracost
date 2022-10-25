@@ -3,12 +3,12 @@
                                                                                                            
  aws_fsx_openzfs_file_system.my_compressed_default_system_ssd                                              
  ├─ Throughput capacity                                                1,024  MBps                 $266.24 
- ├─ SSD storage (LZ4 compression, 50 percent)                            150  GB                    $13.50 
+ ├─ SSD storage (LZ4 compression, 50%)                                   150  GB                    $13.50 
  └─ Backup storage                                             Monthly cost depends on usage: $0.05 per GB 
                                                                                                            
  aws_fsx_openzfs_file_system.my_compressed_system_ssd                                                      
  ├─ Throughput capacity                                                1,024  MBps                 $266.24 
- ├─ SSD storage (LZ4 compression, 40 percent)                            180  GB                    $16.20 
+ ├─ SSD storage (LZ4 compression, 40%)                                   180  GB                    $16.20 
  └─ Backup storage                                             Monthly cost depends on usage: $0.05 per GB 
                                                                                                            
  aws_fsx_openzfs_file_system.my_iops_system_ssd                                                            
