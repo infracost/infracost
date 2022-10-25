@@ -11,7 +11,7 @@
  ├─ Storage - tier1                                                            14,600  GB hours                       $4.00 
  ├─ Linux HANA Memory                                                          93,440  Memory hours                 $288.08 
  ├─ Linux HANA Cores                                                            2,920  Core hours                 $1,279.54 
- └─ Linux Operating System                                                          1  Instance                       $0.00 
+ └─ SAP                                                                             1  Instance                       $0.00 
                                                                                                                             
  ibm_pi_instance.ibmi-dedicated-e980-instance                                                                               
  ├─ Storage - tier1                                                            14,600  GB hours                       $4.00 

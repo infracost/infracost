@@ -154,7 +154,11 @@ func setCostComponentPrice(ctx *config.RunContext, currency string, r *schema.Re
 			c.SetPrice(decimal.Zero)
 			return
 		}
-		c.SetPrice(p)
+		if c.CustomPriceMultiplier() != nil {
+			c.SetPrice(p.Mul(*c.CustomPriceMultiplier()))
+		} else {
+			c.SetPrice(p)
+		}
 	} else {
 		// Both volume and tier pricing will have "tiers"
 		// For volume pricing we have to select to appropriate tier
@@ -162,6 +166,9 @@ func setCostComponentPrice(ctx *config.RunContext, currency string, r *schema.Re
 		priceTiers := make([]schema.PriceTier, len(prices))
 		for i, price := range prices {
 			parsedPrice, err := decimal.NewFromString(price.Get(currency).String())
+			if c.CustomPriceMultiplier() != nil {
+				parsedPrice = parsedPrice.Mul(*c.CustomPriceMultiplier())
+			}
 			if err != nil {
 				log.Warnf("Error converting price to '%v' (using 0.00)  '%v': %s", currency, price.Get(currency).String(), err.Error())
 			}

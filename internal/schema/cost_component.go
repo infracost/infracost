@@ -24,21 +24,22 @@ func (t *PriceTier) fillQuantities() {
 }
 
 type CostComponent struct {
-	Name                 string
-	Unit                 string
-	UnitMultiplier       decimal.Decimal
-	IgnoreIfMissingPrice bool
-	ProductFilter        *ProductFilter
-	PriceFilter          *PriceFilter
-	HourlyQuantity       *decimal.Decimal
-	MonthlyQuantity      *decimal.Decimal
-	MonthlyDiscountPerc  float64
-	price                decimal.Decimal
-	priceTiers           []PriceTier
-	customPrice          *decimal.Decimal
-	priceHash            string
-	HourlyCost           *decimal.Decimal
-	MonthlyCost          *decimal.Decimal
+	Name                  string
+	Unit                  string
+	UnitMultiplier        decimal.Decimal
+	IgnoreIfMissingPrice  bool
+	ProductFilter         *ProductFilter
+	PriceFilter           *PriceFilter
+	HourlyQuantity        *decimal.Decimal
+	MonthlyQuantity       *decimal.Decimal
+	MonthlyDiscountPerc   float64
+	price                 decimal.Decimal
+	priceTiers            []PriceTier
+	customPrice           *decimal.Decimal
+	customPriceMultiplier *decimal.Decimal
+	priceHash             string
+	HourlyCost            *decimal.Decimal
+	MonthlyCost           *decimal.Decimal
 }
 
 func (c *CostComponent) CalculateCosts() {
@@ -126,6 +127,14 @@ func (c *CostComponent) SetPrice(price decimal.Decimal) {
 
 func (c *CostComponent) Price() decimal.Decimal {
 	return c.price
+}
+
+func (c *CostComponent) SetCustomPriceMultiplier(customPriceMultiplier *decimal.Decimal) {
+	c.customPriceMultiplier = customPriceMultiplier
+}
+
+func (c *CostComponent) CustomPriceMultiplier() *decimal.Decimal {
+	return c.customPriceMultiplier
 }
 
 func (c *CostComponent) SetPriceHash(priceHash string) {

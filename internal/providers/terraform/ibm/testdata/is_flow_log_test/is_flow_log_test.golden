@@ -27,8 +27,8 @@
  └─ Flow Log Collector us-south (over 72000 GB)               Monthly cost depends on usage: $0.10 per GB                   
                                                                                                                             
  ibm_is_instance.testIsInstance                                                                                             
- ├─ CPU hours (2 CPUs, us-south-1)                            Monthly cost depends on usage: $0.0265079365 per CPU hours    
- └─ Memory hours (8 GB, us-south-1)                           Monthly cost depends on usage: $0.0042222222 per Memory hours 
+ ├─ CPU hours (2 CPUs, us-south-1)                            Monthly cost depends on usage: $0.0239116112 per CPU hours    
+ └─ Memory hours (8 GB, us-south-1)                           Monthly cost depends on usage: $0.0048500766 per Memory hours 
                                                                                                                             
  ibm_is_vpc.testVpc                                                                                                         
  ├─ VPC instance                                                                1  Instance                           $0.00 

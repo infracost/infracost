@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
@@ -95,6 +96,62 @@ type CatalogInstance struct {
 	Id       string   `json:"id"`
 	Kind     string   `json:"kind"`
 	Metadata Metadata `json:"metadata"`
+}
+
+type ProfileMultipliers struct {
+	Cpu    decimal.Decimal
+	Memory decimal.Decimal
+}
+
+var multipliers = map[string]ProfileMultipliers{
+	"bx2": {
+		Cpu:    decimal.NewFromFloat(0.902054794596651),
+		Memory: decimal.NewFromFloat(1.14870234843351),
+	},
+	"bx2d": {
+		Cpu:    decimal.NewFromFloat(0.902054794596651),
+		Memory: decimal.NewFromFloat(1.14870234843351),
+	},
+	"cx2": {
+		Cpu:    decimal.NewFromFloat(0.902054794596651),
+		Memory: decimal.NewFromFloat(1.70926497079),
+	},
+	"cx2d": {
+		Cpu:    decimal.NewFromFloat(0.902054794596651),
+		Memory: decimal.NewFromFloat(1.70926497079),
+	},
+	"gx2": {
+		Cpu:    decimal.NewFromFloat(0.963755342547062),
+		Memory: decimal.NewFromFloat(0.902054794596651),
+	},
+	"mx2": {
+		Cpu:    decimal.NewFromFloat(0.963755342547062),
+		Memory: decimal.NewFromFloat(0.902054794596651),
+	},
+	"mx2d": {
+		Cpu:    decimal.NewFromFloat(0.963755342547062),
+		Memory: decimal.NewFromFloat(0.902054794596651),
+	},
+	"ux2d": {
+		Cpu:    decimal.NewFromFloat(2.40343479472332),
+		Memory: decimal.NewFromFloat(0.902054794596651),
+	},
+	"vx2d": {
+		Cpu:    decimal.NewFromFloat(1.39565917819994),
+		Memory: decimal.NewFromFloat(0.902054794596651),
+	},
+}
+
+func getProfileMultiplier(profile string) ProfileMultipliers {
+	splitProfile := strings.Split(profile, "-")
+	multiplier := ProfileMultipliers{Cpu: decimal.NewFromInt(1), Memory: decimal.NewFromInt(1)}
+	if splitProfile[0] != "" {
+		val, ok := multipliers[splitProfile[0]]
+		if ok {
+			multiplier = val
+		}
+	}
+	return multiplier
 }
 
 func getProfileFromCatalog(profile string) (CatalogInstance, error) {
@@ -191,7 +248,7 @@ func (r *IsInstance) gpuCostComponent(arch ArchType, gpuType string, gpuCount in
 	}
 }
 
-func (r *IsInstance) memoryCostComponent(arch ArchType, memory int64) *schema.CostComponent {
+func (r *IsInstance) memoryCostComponent(arch ArchType, memory int64, multiplier decimal.Decimal) *schema.CostComponent {
 	var quantity *decimal.Decimal
 
 	if r.MonthlyInstanceHours != nil {
@@ -201,7 +258,7 @@ func (r *IsInstance) memoryCostComponent(arch ArchType, memory int64) *schema.Co
 
 	var unit = "MEMORY_HOURS"
 
-	return &schema.CostComponent{
+	component := &schema.CostComponent{
 		Name:            fmt.Sprintf("Memory hours (%d GB, %s)", memory, r.Zone),
 		Unit:            "Memory hours",
 		UnitMultiplier:  decimal.NewFromInt(1),
@@ -218,9 +275,11 @@ func (r *IsInstance) memoryCostComponent(arch ArchType, memory int64) *schema.Co
 			Unit: strPtr(unit),
 		},
 	}
+	component.SetCustomPriceMultiplier(decimalPtr(multiplier))
+	return component
 }
 
-func (r *IsInstance) cpuCostComponent(arch ArchType, cpu int64) *schema.CostComponent {
+func (r *IsInstance) cpuCostComponent(arch ArchType, cpu int64, multiplier decimal.Decimal) *schema.CostComponent {
 	var quantity *decimal.Decimal
 
 	if r.MonthlyInstanceHours != nil {
@@ -230,7 +289,7 @@ func (r *IsInstance) cpuCostComponent(arch ArchType, cpu int64) *schema.CostComp
 
 	var unit string = "VCPU_HOURS"
 
-	return &schema.CostComponent{
+	component := &schema.CostComponent{
 		Name:            fmt.Sprintf("CPU hours (%d CPUs, %s)", cpu, r.Zone),
 		Unit:            "CPU hours",
 		UnitMultiplier:  decimal.NewFromInt(1),
@@ -247,6 +306,8 @@ func (r *IsInstance) cpuCostComponent(arch ArchType, cpu int64) *schema.CostComp
 			Unit: strPtr(unit),
 		},
 	}
+	component.SetCustomPriceMultiplier(decimalPtr(multiplier))
+	return component
 }
 
 func (r *IsInstance) onDedicatedHostCostComponent(cores int64, memory int64) *schema.CostComponent {
@@ -277,6 +338,7 @@ func (r *IsInstance) BuildResource() *schema.Resource {
 	var costComponents []*schema.CostComponent
 
 	gcProfile, err := getProfileFromCatalog(r.Profile)
+	multiplier := getProfileMultiplier(r.Profile)
 
 	if err == nil {
 		// If the VSI instance runs on a dedicated host, the customer is charged for the dedicated host usages
@@ -284,8 +346,8 @@ func (r *IsInstance) BuildResource() *schema.Resource {
 			costComponents = append(costComponents, r.onDedicatedHostCostComponent(gcProfile.Metadata.Other.Profile.DefaultConfig.CPU, gcProfile.Metadata.Other.Profile.DefaultConfig.RAM))
 		} else {
 			arch := parseArch(gcProfile.Metadata.Other.Profile.DefaultConfig.VcpuArchitecture)
-			costComponents = append(costComponents, r.cpuCostComponent(arch, gcProfile.Metadata.Other.Profile.DefaultConfig.CPU))
-			costComponents = append(costComponents, r.memoryCostComponent(arch, gcProfile.Metadata.Other.Profile.DefaultConfig.RAM))
+			costComponents = append(costComponents, r.cpuCostComponent(arch, gcProfile.Metadata.Other.Profile.DefaultConfig.CPU, multiplier.Cpu))
+			costComponents = append(costComponents, r.memoryCostComponent(arch, gcProfile.Metadata.Other.Profile.DefaultConfig.RAM, multiplier.Memory))
 			if gcProfile.Metadata.Other.Profile.DefaultConfig.GPUModel != "" {
 				costComponents = append(costComponents, r.gpuCostComponent(arch, gcProfile.Metadata.Other.Profile.DefaultConfig.GPUModel, gcProfile.Metadata.Other.Profile.DefaultConfig.GPUCount))
 			}
