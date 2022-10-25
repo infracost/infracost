@@ -117,9 +117,9 @@ func (r *SQLDatabase) dtuPurchaseCostComponents() []*schema.CostComponent {
 			// This is not the same as the 730h/month value we use elsewhere but it looks more understandable than seeing `30.4166` in the output
 			MonthlyQuantity: decimalPtr(decimal.NewFromInt(30)),
 			ProductFilter: r.productFilter([]*schema.AttributeFilter{
-				{Key: "productName", ValueRegex: strPtr("/^SQL Database Single/i")},
-				{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", skuName))},
-				{Key: "meterName", ValueRegex: regexPtr("DTUs$")},
+				{Key: "productName", ValueRegex: regexPtr("^SQL Database Single")},
+				{Key: "skuName", ValueRegex: regexPtr(fmt.Sprintf("^%s$", skuName))},
+				{Key: "meterName", ValueRegex: regexPtr("DTU(s)?$")},
 			}),
 			PriceFilter: priceFilterConsumption,
 		},
@@ -322,7 +322,7 @@ func (r *SQLDatabase) mssqlStorageComponent() *schema.CostComponent {
 		ProductFilter: r.productFilter([]*schema.AttributeFilter{
 			{Key: "productName", ValueRegex: strPtr(productNameRegex)},
 			{Key: "skuName", Value: strPtr(skuName)},
-			{Key: "meterName", ValueRegex: strPtr("/^Data Stored/")},
+			{Key: "meterName", ValueRegex: regexPtr("Data Stored$")},
 		}),
 	}
 }

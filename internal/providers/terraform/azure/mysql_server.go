@@ -48,7 +48,10 @@ func NewAzureRMMySQLServer(d *schema.ResourceData, u *schema.UsageData) *schema.
 	productNameRegex := fmt.Sprintf("/%s - Compute %s/", tierName, family)
 	skuName := fmt.Sprintf("%s vCore", cores)
 
-	costComponents = append(costComponents, databaseComputeInstance(region, fmt.Sprintf("Compute (%s)", sku), serviceName, productNameRegex, skuName))
+	name := fmt.Sprintf("Compute (%s)", sku)
+	log.Warnf("'Multiple products found' are safe to ignore for '%s' due to limitations in the Azure API.", name)
+
+	costComponents = append(costComponents, databaseComputeInstance(region, name, serviceName, productNameRegex, skuName))
 
 	storageGB := d.Get("storage_mb").Int() / 1024
 

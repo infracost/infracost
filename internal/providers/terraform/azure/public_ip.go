@@ -30,7 +30,7 @@ func NewAzureRMPublicIP(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 
 	switch sku {
 	case "Basic":
-		meterName = allocationMethod + " Public IP"
+		meterName = "Basic IPv4 " + allocationMethod + " Public IP"
 	case "Standard":
 		meterName = "Standard IPv4 " + allocationMethod + " Public IP"
 	}
