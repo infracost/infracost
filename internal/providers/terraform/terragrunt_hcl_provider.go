@@ -248,10 +248,10 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 // in a Terragrunt project. Folders that have outputs that are used by other folders are evaluated first.
 //
 // runTerragrunt will
-//  1. build a valid Terraform run env from the opts provided.
-//  2. download source modules that are required for the project.
-//  3. we then evaluate the Terraform project built by Terragrunt storing any outputs so that we can use
-//     these for further runTerragrunt calls that use the dependency outputs.
+//		1. build a valid Terraform run env from the opts provided.
+//		2. download source modules that are required for the project.
+// 		3. we then evaluate the Terraform project built by Terragrunt storing any outputs so that we can use
+//			these for further runTerragrunt calls that use the dependency outputs.
 func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions) (*terragruntWorkingDirInfo, error) {
 	outputs, err := p.fetchDependencyOutputs(opts)
 	if err != nil {
@@ -551,10 +551,9 @@ func (p *TerragruntHCLProvider) downloadSource(terraformSource *tfsource.Terrafo
 }
 
 // updateGetters returns the customized go-getter interfaces that Terragrunt relies on. Specifically:
-//   - Local file path getter is updated to copy the files instead of creating symlinks, which is what go-getter defaults
-//     to.
-//   - Include the customized getter for fetching sources from the Terraform Registry.
-//
+// - Local file path getter is updated to copy the files instead of creating symlinks, which is what go-getter defaults
+//   to.
+// - Include the customized getter for fetching sources from the Terraform Registry.
 // This creates a closure that returns a function so that we have access to the terragrunt configuration, which is
 // necessary for customizing the behavior of the file getter.
 // Copied from github.com/gruntwork-io/terragrunt

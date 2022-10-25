@@ -16,7 +16,7 @@ const (
 
 // SQLManagedInstance struct represents an azure Sql Managed Instance.
 //
-// # SQLManagedInstance currently only Gen5 database instance
+// SQLManagedInstance currently only Gen5 database instance
 //
 // More resource information here: https://azure.microsoft.com/en-gb/products/azure-sql/managed-instance/
 // Pricing information here: https://azure.microsoft.com/en-gb/pricing/details/azure-sql-managed-instance/single/

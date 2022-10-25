@@ -166,7 +166,7 @@ func OptionWithBlockBuilder(blockBuilder BlockBuilder) Option {
 // The Parser exposes this workspace in the evaluation context under the variable named `terraform.workspace`.
 // This is commonly used by users to specify different capacity/configuration in their Terraform, e.g:
 //
-//	terraform.workspace == "prod" ? "m5.8xlarge" : "m5.4xlarge"
+//		terraform.workspace == "prod" ? "m5.8xlarge" : "m5.4xlarge"
 func OptionWithTerraformWorkspace(name string) Option {
 	name = strings.TrimSpace(name)
 	return func(p *Parser) {
