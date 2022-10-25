@@ -64,7 +64,7 @@ func dataProcessedCostComponent(region string, quantity *decimal.Decimal) *schem
 			ProductFamily: strPtr("Networking"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "skuName", Value: strPtr("Standard")},
-				{Key: "meterName", Value: strPtr("Data Processed")},
+				{Key: "meterName", ValueRegex: regexPtr("Data Processed$")},
 			},
 		},
 	}

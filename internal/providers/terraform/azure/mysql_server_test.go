@@ -7,10 +7,11 @@ import (
 )
 
 func TestMySQLServer_usage(t *testing.T) {
-	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
 
-	tftest.GoldenFileResourceTests(t, "mysql_server_test")
+	opts := tftest.DefaultGoldenFileOptions()
+	opts.CaptureLogs = true
+	tftest.GoldenFileResourceTestsWithOpts(t, "mysql_server_test", opts)
 }

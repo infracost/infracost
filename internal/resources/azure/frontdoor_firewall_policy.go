@@ -62,7 +62,7 @@ func (r *FrontdoorFirewallPolicy) policyCostComponents() []*schema.CostComponent
 			Unit:            "months",
 			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
-			ProductFilter:   r.buildProductFilter("Policies"),
+			ProductFilter:   r.buildProductFilter("Policy"),
 			PriceFilter: &schema.PriceFilter{
 				PurchaseOption: strPtr("Consumption"),
 			},
@@ -79,7 +79,7 @@ func (r *FrontdoorFirewallPolicy) customRulesCostComponents() []*schema.CostComp
 			Unit:            "rules",
 			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: decimalPtr(decimal.NewFromInt(int64(r.CustomRules))),
-			ProductFilter:   r.buildProductFilter("Rules"),
+			ProductFilter:   r.buildProductFilter("Rule"),
 			PriceFilter: &schema.PriceFilter{
 				PurchaseOption: strPtr("Consumption"),
 			},
@@ -113,7 +113,7 @@ func (r *FrontdoorFirewallPolicy) managedRulesetsCostComponents() []*schema.Cost
 			Unit:            "rulesets",
 			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: decimalPtr(decimal.NewFromInt(int64(r.ManagedRulesets))),
-			ProductFilter:   r.buildProductFilter("Default Rulesets"),
+			ProductFilter:   r.buildProductFilter("Default Ruleset"),
 			PriceFilter: &schema.PriceFilter{
 				PurchaseOption: strPtr("Consumption"),
 			},
@@ -130,7 +130,7 @@ func (r *FrontdoorFirewallPolicy) managedRulesetRequestsCostComponents() []*sche
 			Unit:            "1M requests",
 			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: r.monthlyRequestsQuantity(r.MonthlyManagedRulesetRequests),
-			ProductFilter:   r.buildProductFilter("Default Requests"),
+			ProductFilter:   r.buildProductFilter("Default Request"),
 			PriceFilter: &schema.PriceFilter{
 				PurchaseOption: strPtr("Consumption"),
 			},
@@ -149,9 +149,9 @@ func (r *FrontdoorFirewallPolicy) buildProductFilter(meterName string) *schema.P
 		Service:       strPtr("Azure Front Door Service"),
 		ProductFamily: strPtr("Networking"),
 		AttributeFilters: []*schema.AttributeFilter{
-			{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", "Standard"))},
-			{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", meterName))},
-			{Key: "productName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", "Azure Front Door Service"))},
+			{Key: "skuName", Value: strPtr("Standard")},
+			{Key: "meterName", ValueRegex: regexPtr(fmt.Sprintf("%s$", meterName))},
+			{Key: "productName", Value: strPtr("Azure Front Door Service")},
 		},
 	}
 }

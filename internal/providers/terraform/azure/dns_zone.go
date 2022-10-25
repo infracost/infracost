@@ -51,7 +51,7 @@ func hostedPublicZoneCostComponent(region string) *schema.CostComponent {
 			Service:       strPtr("Azure DNS"),
 			ProductFamily: strPtr("Networking"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "meterName", Value: strPtr("Public Zones")},
+				{Key: "meterName", ValueRegex: regexPtr("Public Zone(s)?")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
