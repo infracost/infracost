@@ -9,3 +9,11 @@ resource_usage:
     appid_authentications: 15000
     appid_users: 1000
     appid_advanced_authentications: 20000
+  ibm_resource_instance.resource_instance_appconnect_ent:
+    appconnect_gigabyte_transmitted_outbounds: 10
+    appconnect_thousand_runs: 10
+    appconnect_vcpu_hours: 10
+  ibm_resource_instance.resource_instance_appconnect_pro:
+    appconnect_gigabyte_transmitted_outbounds: 10
+    appconnect_thousand_runs: 10
+    appconnect_vcpu_hours: 10

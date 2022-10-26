@@ -42,3 +42,24 @@ resource "ibm_resource_instance" "resource_instance_power_iaas" {
   location          = "us-south"
   resource_group_id = "default"
 }
+
+resource "ibm_resource_instance" "resource_instance_appconnect_ent" {
+  name              = "appconnect-ent"
+  service           = "appconnect"
+  plan              = "appconnectplanenterprise"
+  location          = "us-south"
+}
+
+resource "ibm_resource_instance" "resource_instance_appconnect_pro" {
+  name              = "appconnect-pro"
+  service           = "appconnect"
+  plan              = "appconnectplanprofessional"
+  location          = "us-south"
+}
+
+resource "ibm_resource_instance" "resource_instance_appconnect_lite" {
+  name              = "appconnect-lite"
+  service           = "appconnect"
+  plan              = "lite"
+  location          = "us-south"
+}

@@ -1201,6 +1201,9 @@ resource_usage:
     appid_advanced_authentications: 20000 # Number of advanced authentications in a month
     appid_authentications: 15000 # Number of simple authentications in a month
     appid_users: 1000 # Number of users in a month
+    appconnect_gigabyte_transmitted_outbounds: 10 # Gigabytes transmitted outbounds
+    appconnect_thousand_runs: 10 # The number of flow runs, in thousands
+    appconnect_vcpu_hours: 10 # The number of VCPU hours used in a month
     
   ibm_tg_gateway.tg_gateway:
     connection: 25 # Monthly number of connections to the gateway

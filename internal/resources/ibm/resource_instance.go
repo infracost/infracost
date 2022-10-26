@@ -34,6 +34,12 @@ type ResourceInstance struct {
 	AppID_Authentications         *int64 `infracost_usage:"appid_authentications"`
 	AppID_Users                   *int64 `infracost_usage:"appid_users"`
 	AppID_AdvancedAuthentications *int64 `infracost_usage:"appid_advanced_authentications"`
+	// App Connect
+	// Catalog https://cloud.ibm.com/catalog/services/app-connect
+	// Pricing https://www.ibm.com/products/app-connect/pricing
+	AppConnect_GigabyteTransmittedOutbounds *float64 `infracost_usage:"appconnect_gigabyte_transmitted_outbounds"`
+	AppConnect_ThousandRuns                 *float64 `infracost_usage:"appconnect_thousand_runs"`
+	AppConnect_VCPUHours                    *float64 `infracost_usage:"appconnect_vcpu_hours"`
 }
 
 // ResourceInstanceUsageSchema defines a list which represents the usage schema of ResourceInstance.
@@ -44,12 +50,16 @@ var ResourceInstanceUsageSchema = []*schema.UsageItem{
 	{Key: "appid_authentications", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "appid_users", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "appid_advanced_authentications", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "appconnect_gigabyte_transmitted_outbounds", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "appconnect_thousand_runs", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "appconnect_vcpu_hours", DefaultValue: 0, ValueType: schema.Float64},
 }
 
 var ResourceInstanceCostMap map[string]ResourceCostComponentsFunc = map[string]ResourceCostComponentsFunc{
 	"kms":             GetKMSCostComponents,
 	"secrets-manager": GetSecretsManagerCostComponents,
 	"appid":           GetAppIDCostComponents,
+	"appconnect":      GetAppConnectCostComponents,
 	"power-iaas":      GetPowerCostComponents,
 }
 
@@ -176,7 +186,9 @@ func GetSecretsManagerCostComponents(r *ResourceInstance) []*schema.CostComponen
 		}
 	} else {
 		costComponent := schema.CostComponent{
-			Name: fmt.Sprintf("Plan: %s", r.Plan),
+			Name:            fmt.Sprintf("Plan: %s", r.Plan),
+			UnitMultiplier:  decimal.NewFromInt(1),
+			MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		}
 		costComponent.SetCustomPrice(decimalPtr(decimal.NewFromInt(0)))
 		return []*schema.CostComponent{
@@ -284,7 +296,116 @@ func GetAppIDCostComponents(r *ResourceInstance) []*schema.CostComponent {
 		}
 	} else {
 		costComponent := schema.CostComponent{
-			Name: fmt.Sprintf("Plan: %s", r.Plan),
+			Name:            fmt.Sprintf("Plan: %s", r.Plan),
+			UnitMultiplier:  decimal.NewFromInt(1),
+			MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+		}
+		costComponent.SetCustomPrice(decimalPtr(decimal.NewFromInt(0)))
+		return []*schema.CostComponent{
+			&costComponent,
+		}
+	}
+}
+
+func AppConnectFlowsRunsCostComponent(r *ResourceInstance) *schema.CostComponent {
+	var q *decimal.Decimal
+	if r.AppConnect_ThousandRuns != nil {
+		q = decimalPtr(decimal.NewFromFloat(*r.AppConnect_ThousandRuns))
+	}
+	return &schema.CostComponent{
+		Name:            "Flow runs",
+		Unit:            "1k runs",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: q,
+		ProductFilter: &schema.ProductFilter{
+			VendorName: strPtr("ibm"),
+			Region:     strPtr(r.Location),
+			Service:    &r.Service,
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "planName", Value: &r.Plan},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			Unit: strPtr("ITEMS_PER_MONTH"),
+		},
+	}
+}
+
+func AppConnectEgressCostComponent(r *ResourceInstance) *schema.CostComponent {
+	var q *decimal.Decimal
+	if r.AppConnect_GigabyteTransmittedOutbounds != nil {
+		q = decimalPtr(decimal.NewFromFloat(*r.AppConnect_GigabyteTransmittedOutbounds))
+	}
+	return &schema.CostComponent{
+		Name:            "Gigabytes transmitted outbounds",
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: q,
+		ProductFilter: &schema.ProductFilter{
+			VendorName: strPtr("ibm"),
+			Region:     strPtr(r.Location),
+			Service:    &r.Service,
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "planName", Value: &r.Plan},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			Unit: strPtr("GIGABYTE_TRANSMITTED_OUTBOUND"),
+		},
+	}
+}
+
+func AppConnectCpuCostComponent(r *ResourceInstance) *schema.CostComponent {
+	var q *decimal.Decimal
+	if r.AppConnect_VCPUHours != nil {
+		q = decimalPtr(decimal.NewFromFloat(*r.AppConnect_VCPUHours))
+	}
+	return &schema.CostComponent{
+		Name:            "VCPU",
+		Unit:            "VCPU hours",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: q,
+		ProductFilter: &schema.ProductFilter{
+			VendorName: strPtr("ibm"),
+			Region:     strPtr(r.Location),
+			Service:    &r.Service,
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "planName", Value: &r.Plan},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			Unit: strPtr("VIRTUAL_PROCESSOR_CORE_HOURS"),
+		},
+	}
+}
+
+func GetAppConnectCostComponents(r *ResourceInstance) []*schema.CostComponent {
+	if r.Plan == "appconnectplanprofessional" {
+		return []*schema.CostComponent{
+			AppConnectFlowsRunsCostComponent(r),
+			AppConnectEgressCostComponent(r),
+		}
+	} else if r.Plan == "appconnectplanenterprise" {
+		return []*schema.CostComponent{
+			AppConnectFlowsRunsCostComponent(r),
+			AppConnectEgressCostComponent(r),
+			AppConnectCpuCostComponent(r),
+		}
+	} else if r.Plan == "lite" {
+		costComponent := schema.CostComponent{
+			Name:            "Lite plan",
+			UnitMultiplier:  decimal.NewFromInt(1),
+			MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+		}
+		costComponent.SetCustomPrice(decimalPtr(decimal.NewFromInt(0)))
+		return []*schema.CostComponent{
+			&costComponent,
+		}
+	} else {
+		costComponent := schema.CostComponent{
+			Name:            fmt.Sprintf("Plan %s with customized pricing", r.Plan),
+			UnitMultiplier:  decimal.NewFromInt(1),
+			MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		}
 		costComponent.SetCustomPrice(decimalPtr(decimal.NewFromInt(0)))
 		return []*schema.CostComponent{

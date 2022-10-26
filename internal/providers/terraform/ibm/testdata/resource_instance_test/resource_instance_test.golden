@@ -1,6 +1,18 @@
 
  Name                                                     Monthly Qty  Unit             Monthly Cost 
                                                                                                      
+ ibm_resource_instance.resource_instance_appconnect_ent                                              
+ ├─ Flow runs                                                      10  1k runs               $400.00 
+ ├─ Gigabytes transmitted outbounds                                10  GB                    $200.00 
+ └─ VCPU                                                           10  VCPU hours             $42.50 
+                                                                                                     
+ ibm_resource_instance.resource_instance_appconnect_lite                                             
+ └─ Lite plan                                                       1                          $0.00 
+                                                                                                     
+ ibm_resource_instance.resource_instance_appconnect_pro                                              
+ ├─ Flow runs                                                      10  1k runs               $400.00 
+ └─ Gigabytes transmitted outbounds                                10  GB                    $200.00 
+                                                                                                     
  ibm_resource_instance.resource_instance_appid                                                       
  ├─ Users (first 1 Users)                                           1  Users                   $0.00 
  ├─ Users (next 9 Users)                                            9  Users                   $0.02 
@@ -28,7 +40,7 @@
  ├─ Instance                                                        1  Instance              $299.00 
  └─ Active Secrets                                                400  Secrets                $80.00 
                                                                                                      
- OVERALL TOTAL                                                                               $891.78 
+ OVERALL TOTAL                                                                             $2,134.28 
 ──────────────────────────────────
-4 cloud resources were detected:
-∙ 4 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+7 cloud resources were detected:
+∙ 7 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
