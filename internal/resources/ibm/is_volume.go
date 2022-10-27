@@ -48,8 +48,8 @@ func (r *IsVolume) CustomCostComponenets() []*schema.CostComponent {
 	}
 	return []*schema.CostComponent{
 		{
-			Name:            "Gigabyte Hours",
-			Unit:            "GB",
+			Name:            fmt.Sprintf("Gigabyte Hours (%d GB)", r.Capacity),
+			Unit:            "GB Hours",
 			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: gigabyteHoursQ,
 			ProductFilter: &schema.ProductFilter{
@@ -66,7 +66,7 @@ func (r *IsVolume) CustomCostComponenets() []*schema.CostComponent {
 			},
 		},
 		{
-			Name:            "IOPS Hours",
+			Name:            fmt.Sprintf("IOPS Hours (%d IOPS)", r.IOPS),
 			Unit:            "IOPS",
 			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: iopsHoursQ,
@@ -94,8 +94,8 @@ func (r *IsVolume) PlannedCostComponenets() []*schema.CostComponent {
 	}
 	return []*schema.CostComponent{
 		{
-			Name:            "Gigabyte Hours",
-			Unit:            "GB",
+			Name:            fmt.Sprintf("Gigabyte Hours (%d GB)", r.Capacity),
+			Unit:            "GB Hours",
 			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: q,
 			ProductFilter: &schema.ProductFilter{

@@ -15,13 +15,18 @@ import (
 // IsInstance struct represents an IBM virtual server instance.
 //
 // Pricing information: https://cloud.ibm.com/kubernetes/catalog/about
+
 type IsInstance struct {
-	Address              string
-	Region               string
-	Profile              string // should be values from CLI 'ibmcloud is instance-profiles'
-	Zone                 string
-	IsDedicated          bool   // will be true if a dedicated_host or dedicated_host_group is specified
-	MonthlyInstanceHours *int64 `infracost_usage:"monthly_instance_hours"`
+	Address     string
+	Region      string
+	Profile     string // should be values from CLI 'ibmcloud is instance-profiles'
+	Zone        string
+	IsDedicated bool // will be true if a dedicated_host or dedicated_host_group is specified
+	BootVolume  []struct {
+		Name string
+		Size int64
+	}
+	MonthlyInstanceHours *float64 `infracost_usage:"monthly_instance_hours"`
 }
 
 var IsInstanceUsageSchema = []*schema.UsageItem{
@@ -186,7 +191,7 @@ func (r *IsInstance) storageCostComponent(arch ArchType, size int64, count int64
 	var quantity *decimal.Decimal
 
 	if r.MonthlyInstanceHours != nil {
-		quantity = decimalPtr(decimal.NewFromInt(*r.MonthlyInstanceHours))
+		quantity = decimalPtr(decimal.NewFromFloat(*r.MonthlyInstanceHours))
 		quantity = decimalPtr(quantity.Mul(decimal.NewFromInt(size * count)))
 	}
 
@@ -218,7 +223,7 @@ func (r *IsInstance) gpuCostComponent(arch ArchType, gpuType string, gpuCount in
 	var quantity *decimal.Decimal
 
 	if r.MonthlyInstanceHours != nil {
-		quantity = decimalPtr(decimal.NewFromInt(*r.MonthlyInstanceHours))
+		quantity = decimalPtr(decimal.NewFromFloat(*r.MonthlyInstanceHours))
 		quantity = decimalPtr(quantity.Mul(decimal.NewFromInt(gpuCount)))
 	}
 
@@ -252,7 +257,7 @@ func (r *IsInstance) memoryCostComponent(arch ArchType, memory int64, multiplier
 	var quantity *decimal.Decimal
 
 	if r.MonthlyInstanceHours != nil {
-		quantity = decimalPtr(decimal.NewFromInt(*r.MonthlyInstanceHours))
+		quantity = decimalPtr(decimal.NewFromFloat(*r.MonthlyInstanceHours))
 		quantity = decimalPtr(quantity.Mul(decimal.NewFromInt(memory)))
 	}
 
@@ -279,11 +284,40 @@ func (r *IsInstance) memoryCostComponent(arch ArchType, memory int64, multiplier
 	return component
 }
 
+func (r *IsInstance) bootVolumeCostComponent() []*schema.CostComponent {
+	costComponents := []*schema.CostComponent{}
+	for _, volume := range r.BootVolume {
+		var q *decimal.Decimal
+		if r.MonthlyInstanceHours != nil {
+			q = decimalPtr(decimal.NewFromFloat(*r.MonthlyInstanceHours))
+			q = decimalPtr(q.Mul(decimal.NewFromInt(volume.Size)))
+		}
+
+		component := &schema.CostComponent{
+			Name:            fmt.Sprintf("Boot volume (%s, %d GB)", volume.Name, volume.Size),
+			Unit:            "GB Hours",
+			UnitMultiplier:  decimal.NewFromInt(1),
+			MonthlyQuantity: q,
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("ibm"),
+				ProductFamily: strPtr("service"),
+				Service:       strPtr("is.volume"),
+				Region:        strPtr(r.Region),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "planName", ValueRegex: regexPtr(("gen2-volume-general-purpose"))},
+				},
+			},
+		}
+		costComponents = append(costComponents, component)
+	}
+	return costComponents
+}
+
 func (r *IsInstance) cpuCostComponent(arch ArchType, cpu int64, multiplier decimal.Decimal) *schema.CostComponent {
 	var quantity *decimal.Decimal
 
 	if r.MonthlyInstanceHours != nil {
-		quantity = decimalPtr(decimal.NewFromInt(*r.MonthlyInstanceHours))
+		quantity = decimalPtr(decimal.NewFromFloat(*r.MonthlyInstanceHours))
 		quantity = decimalPtr(quantity.Mul(decimal.NewFromInt(cpu)))
 	}
 
@@ -314,7 +348,7 @@ func (r *IsInstance) onDedicatedHostCostComponent(cores int64, memory int64) *sc
 	var quantity *decimal.Decimal
 
 	if r.MonthlyInstanceHours != nil {
-		quantity = decimalPtr(decimal.NewFromInt(*r.MonthlyInstanceHours))
+		quantity = decimalPtr(decimal.NewFromFloat(*r.MonthlyInstanceHours))
 	}
 	costCompoment := &schema.CostComponent{
 		Name:            fmt.Sprintf("Host Hours (%d vCPUs, %d GB, %s)", cores, memory, r.Zone),
@@ -348,6 +382,7 @@ func (r *IsInstance) BuildResource() *schema.Resource {
 			arch := parseArch(gcProfile.Metadata.Other.Profile.DefaultConfig.VcpuArchitecture)
 			costComponents = append(costComponents, r.cpuCostComponent(arch, gcProfile.Metadata.Other.Profile.DefaultConfig.CPU, multiplier.Cpu))
 			costComponents = append(costComponents, r.memoryCostComponent(arch, gcProfile.Metadata.Other.Profile.DefaultConfig.RAM, multiplier.Memory))
+			costComponents = append(costComponents, r.bootVolumeCostComponent()...)
 			if gcProfile.Metadata.Other.Profile.DefaultConfig.GPUModel != "" {
 				costComponents = append(costComponents, r.gpuCostComponent(arch, gcProfile.Metadata.Other.Profile.DefaultConfig.GPUModel, gcProfile.Metadata.Other.Profile.DefaultConfig.GPUCount))
 			}

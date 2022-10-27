@@ -122,3 +122,28 @@ resource "ibm_is_instance" "testInstanceWithoutUsage" {
   zone = "us-east-1"
   keys = [ibm_is_ssh_key.testSshKey.id]
 }
+
+
+resource "ibm_is_instance" "testBalancedInstanceWithBootVolume" {
+  name    = "test-instance-6"
+  image   = "r006-f137ea64-0d27-4d81-afe0-353fd0557e81"
+  profile = "bx2-8x32"
+
+  primary_network_interface {
+    subnet = ibm_is_subnet.testSubnet.id
+  }
+
+  network_interfaces {
+    name   = "eth1"
+    subnet = ibm_is_subnet.testSubnet.id
+  }
+
+  vpc  = ibm_is_vpc.testVpc.id
+  zone = "us-east-1"
+  keys = [ibm_is_ssh_key.testSshKey.id]
+
+  boot_volume {
+    name = "boot-volume-label"
+    size = 150
+  }
+}
