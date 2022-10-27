@@ -20,7 +20,7 @@ type FSxOpenZFSFileSystem struct {
 	Region                    string
 	DeploymentType            string
 	DataCompression           string
-	CompressionSavingsPercent *int64   `infracost_usage:"compression_savings_percent"`
+	CompressionSavingsPercent *float64 `infracost_usage:"compression_savings_percent"`
 	BackupStorageGB           *float64 `infracost_usage:"backup_storage_gb"`
 }
 
@@ -90,15 +90,15 @@ func (r *FSxOpenZFSFileSystem) provisionedIOPSCapacityCostComponent() *schema.Co
 func (r *FSxOpenZFSFileSystem) storageCapacityCostComponent() *schema.CostComponent {
 	var storageCapacity *decimal.Decimal
 	var compressionEnabled = ""
-	var compressionSavingsPercent int64
+	var compressionSavingsPercent float64
 	if r.DataCompression != "" && r.DataCompression != "NONE" {
 		if r.CompressionSavingsPercent != nil {
 			compressionSavingsPercent = *r.CompressionSavingsPercent
 		} else {
-			compressionSavingsPercent = int64(50)
+			compressionSavingsPercent = 50
 		}
-		compressionEnabled = fmt.Sprintf(" (%s compression, %d%%)", r.DataCompression, compressionSavingsPercent)
-		storageCapacity = decimalPtr(decimal.NewFromInt(int64(math.Round(float64(r.StorageCapacityGB) * float64((1 - float64(compressionSavingsPercent)/float64(100)))))))
+		compressionEnabled = fmt.Sprintf(" (%s compression, %.0f%%)", r.DataCompression, compressionSavingsPercent)
+		storageCapacity = decimalPtr(decimal.NewFromFloat(math.Ceil(float64(r.StorageCapacityGB) * (1 - compressionSavingsPercent/100))))
 	} else {
 		storageCapacity = decimalPtr(decimal.NewFromInt(r.StorageCapacityGB))
 	}
