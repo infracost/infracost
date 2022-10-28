@@ -852,8 +852,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 		cmd.Flags().Changed("terraform-var-file") ||
 		cmd.Flags().Changed("terraform-var") ||
 		cmd.Flags().Changed("terraform-init-flags") ||
-		cmd.Flags().Changed("terraform-workspace") ||
-		cmd.Flags().Changed("terraform-use-state"))
+		cmd.Flags().Changed("terraform-workspace"))
 
 	if hasConfigFile && hasProjectFlags {
 		m := "--config-file flag cannot be used with the following flags: "
@@ -898,6 +897,11 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 		if forceCLI, _ := cmd.Flags().GetBool("terraform-force-cli"); forceCLI {
 			for _, p := range cfg.Projects {
 				p.TerraformForceCLI = true
+			}
+		}
+		if useState, _ := cmd.Flags().GetBool("terraform-use-state"); useState {
+			for _, p := range cfg.Projects {
+				p.TerraformUseState = true
 			}
 		}
 	}
