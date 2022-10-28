@@ -15,6 +15,7 @@ resource "azurerm_storage_account" "unsupported" {
   account_kind             = "BlobStorage"
   account_tier             = "Premium"
   account_replication_type = "ZRS"
+  min_tls_version          = "TLS1_2" 
 }
 
 resource "azurerm_storage_account" "bb_Premium_unsupported_access_tier" {
@@ -24,6 +25,7 @@ resource "azurerm_storage_account" "bb_Premium_unsupported_access_tier" {
   account_kind             = "BlockBlobStorage"
   account_tier             = "Premium"
   account_replication_type = "RAGZRS"
+  min_tls_version          = "TLS1_2" 
 }
 
 resource "azurerm_storage_account" "bb_Premium_ZRS" {
@@ -33,6 +35,7 @@ resource "azurerm_storage_account" "bb_Premium_ZRS" {
   account_kind             = "BlockBlobStorage"
   account_tier             = "Premium"
   account_replication_type = "ZRS"
+  min_tls_version          = "TLS1_2" 
 }
 
 resource "azurerm_storage_account" "bb_Premium_LRS" {
@@ -42,6 +45,7 @@ resource "azurerm_storage_account" "bb_Premium_LRS" {
   account_kind             = "BlockBlobStorage"
   account_tier             = "Premium"
   account_replication_type = "LRS"
+  min_tls_version          = "TLS1_2" 
 }
 
 resource "azurerm_storage_account" "bb_Standard_unsupported_access_tier" {
@@ -51,6 +55,7 @@ resource "azurerm_storage_account" "bb_Standard_unsupported_access_tier" {
   account_kind             = "BlockBlobStorage"
   account_tier             = "Standard"
   account_replication_type = "RAGZRS"
+  min_tls_version          = "TLS1_2" 
 }
 
 resource "azurerm_storage_account" "bb_Standard_LRS_Hot" {
@@ -60,6 +65,7 @@ resource "azurerm_storage_account" "bb_Standard_LRS_Hot" {
   account_kind             = "BlockBlobStorage"
   account_tier             = "Standard"
   account_replication_type = "LRS"
+  min_tls_version          = "TLS1_2" 
 }
 
 resource "azurerm_storage_account" "bb_Standard_LRS_Cool" {
@@ -70,6 +76,7 @@ resource "azurerm_storage_account" "bb_Standard_LRS_Cool" {
   account_tier             = "Standard"
   account_replication_type = "LRS"
   access_tier              = "Cool"
+  min_tls_version          = "TLS1_2" 
 }
 
 resource "azurerm_storage_account" "bb_Standard_GRS_Hot" {
@@ -79,6 +86,7 @@ resource "azurerm_storage_account" "bb_Standard_GRS_Hot" {
   account_kind             = "BlockBlobStorage"
   account_tier             = "Standard"
   account_replication_type = "GRS"
+  min_tls_version          = "TLS1_2" 
 }
 
 resource "azurerm_storage_account" "bb_Standard_GRS_Cool" {
@@ -89,6 +97,7 @@ resource "azurerm_storage_account" "bb_Standard_GRS_Cool" {
   account_tier             = "Standard"
   account_replication_type = "GRS"
   access_tier              = "Cool"
+  min_tls_version          = "TLS1_2" 
 }
 
 resource "azurerm_storage_account" "bb_Standard_RAGRS_Hot" {
@@ -98,6 +107,7 @@ resource "azurerm_storage_account" "bb_Standard_RAGRS_Hot" {
   account_kind             = "BlockBlobStorage"
   account_tier             = "Standard"
   account_replication_type = "RAGRS"
+  min_tls_version          = "TLS1_2" 
 }
 
 resource "azurerm_storage_account" "bb_Standard_RAGRS_Cool" {
@@ -108,6 +118,7 @@ resource "azurerm_storage_account" "bb_Standard_RAGRS_Cool" {
   account_tier             = "Standard"
   account_replication_type = "RAGRS"
   access_tier              = "Cool"
+  min_tls_version          = "TLS1_2" 
 }
 
 resource "azurerm_storage_account" "bb_without_usage_file" {
@@ -118,6 +129,7 @@ resource "azurerm_storage_account" "bb_without_usage_file" {
   account_tier             = "Standard"
   account_replication_type = "RAGRS"
   access_tier              = "Cool"
+  min_tls_version          = "TLS1_2" 
 }
 
 resource "azurerm_storage_account" "file_without_usage_file" {
@@ -128,6 +140,7 @@ resource "azurerm_storage_account" "file_without_usage_file" {
   account_tier             = "Standard"
   account_replication_type = "LRS"
   access_tier              = "Cool"
+  min_tls_version          = "TLS1_2" 
 }
 
 resource "azurerm_storage_account" "file_unsupported_access_tier" {
@@ -138,6 +151,7 @@ resource "azurerm_storage_account" "file_unsupported_access_tier" {
   account_tier             = "Standard"
   account_replication_type = "GZRS"
   access_tier              = "Cool"
+  min_tls_version          = "TLS1_2" 
 }
 
 resource "azurerm_storage_account" "file_cool_lrs" {
@@ -148,6 +162,7 @@ resource "azurerm_storage_account" "file_cool_lrs" {
   account_tier             = "Standard"
   account_replication_type = "LRS"
   access_tier              = "Cool"
+  min_tls_version          = "TLS1_2" 
 }
 
 resource "azurerm_storage_account" "file_hot_lrs" {
@@ -158,6 +173,7 @@ resource "azurerm_storage_account" "file_hot_lrs" {
   account_tier             = "Standard"
   account_replication_type = "LRS"
   access_tier              = "Hot"
+  min_tls_version          = "TLS1_2" 
 }
 
 resource "azurerm_storage_account" "file_cool_grs" {
@@ -168,6 +184,7 @@ resource "azurerm_storage_account" "file_cool_grs" {
   account_tier             = "Standard"
   account_replication_type = "GRS"
   access_tier              = "Cool"
+  min_tls_version          = "TLS1_2" 
 }
 
 resource "azurerm_storage_account" "file_hot_grs" {
@@ -178,6 +195,7 @@ resource "azurerm_storage_account" "file_hot_grs" {
   account_tier             = "Standard"
   account_replication_type = "GRS"
   access_tier              = "Hot"
+  min_tls_version          = "TLS1_2" 
 }
 
 resource "azurerm_storage_account" "file_premium_unsupported_access_tier" {
@@ -187,6 +205,7 @@ resource "azurerm_storage_account" "file_premium_unsupported_access_tier" {
   account_kind             = "FileStorage"
   account_tier             = "Premium"
   account_replication_type = "GZRS"
+  min_tls_version          = "TLS1_2" 
 }
 
 resource "azurerm_storage_account" "file_premium_lrs" {
@@ -196,6 +215,7 @@ resource "azurerm_storage_account" "file_premium_lrs" {
   account_kind             = "FileStorage"
   account_tier             = "Premium"
   account_replication_type = "LRS"
+  min_tls_version          = "TLS1_2" 
 }
 
 resource "azurerm_storage_account" "file_premium_zrs" {
@@ -205,6 +225,7 @@ resource "azurerm_storage_account" "file_premium_zrs" {
   account_kind             = "FileStorage"
   account_tier             = "Premium"
   account_replication_type = "ZRS"
+  min_tls_version          = "TLS1_2" 
 }
 
 resource "azurerm_storage_account" "v2_without_usage" {
@@ -216,6 +237,7 @@ resource "azurerm_storage_account" "v2_without_usage" {
   account_replication_type = "LRS"
   access_tier              = "Hot"
   nfsv3_enabled            = true
+  min_tls_version          = "TLS1_2" 
 }
 
 resource "azurerm_storage_account" "v2_cool_lrs" {
@@ -226,6 +248,7 @@ resource "azurerm_storage_account" "v2_cool_lrs" {
   account_tier             = "Standard"
   account_replication_type = "LRS"
   access_tier              = "Cool"
+  min_tls_version          = "TLS1_2" 
 }
 
 resource "azurerm_storage_account" "v2_cool_lrs_nfsv3" {
@@ -237,6 +260,7 @@ resource "azurerm_storage_account" "v2_cool_lrs_nfsv3" {
   account_replication_type = "LRS"
   access_tier              = "Cool"
   nfsv3_enabled            = true
+  min_tls_version          = "TLS1_2" 
 }
 
 # Temporarily disabled due to duplication issue in Azure StorageV2 pricing
@@ -260,6 +284,7 @@ resource "azurerm_storage_account" "v2_hot_lrs_nfsv3" {
   account_replication_type = "LRS"
   access_tier              = "Hot"
   nfsv3_enabled            = true
+  min_tls_version          = "TLS1_2" 
 }
 
 resource "azurerm_storage_account" "v2_cool_gzrs" {
@@ -270,6 +295,7 @@ resource "azurerm_storage_account" "v2_cool_gzrs" {
   account_tier             = "Standard"
   account_replication_type = "GZRS"
   access_tier              = "Cool"
+  min_tls_version          = "TLS1_2" 
 }
 
 resource "azurerm_storage_account" "v2_hot_gzrs" {
@@ -280,6 +306,7 @@ resource "azurerm_storage_account" "v2_hot_gzrs" {
   account_tier             = "Standard"
   account_replication_type = "GZRS"
   access_tier              = "Hot"
+  min_tls_version          = "TLS1_2" 
 }
 
 resource "azurerm_storage_account" "v2_cool_ragzrs" {
@@ -290,6 +317,7 @@ resource "azurerm_storage_account" "v2_cool_ragzrs" {
   account_tier             = "Standard"
   account_replication_type = "RAGZRS"
   access_tier              = "Cool"
+  min_tls_version          = "TLS1_2" 
 }
 
 resource "azurerm_storage_account" "v2_hot_ragzrs" {
@@ -300,6 +328,7 @@ resource "azurerm_storage_account" "v2_hot_ragzrs" {
   account_tier             = "Standard"
   account_replication_type = "RAGZRS"
   access_tier              = "Hot"
+  min_tls_version          = "TLS1_2" 
 }
 
 resource "azurerm_storage_account" "v2_premium_unsupported_access_tier" {
@@ -309,6 +338,7 @@ resource "azurerm_storage_account" "v2_premium_unsupported_access_tier" {
   account_kind             = "StorageV2"
   account_tier             = "Premium"
   account_replication_type = "GZRS"
+  min_tls_version          = "TLS1_2" 
 }
 
 resource "azurerm_storage_account" "v2_premium_lrs" {
@@ -318,6 +348,7 @@ resource "azurerm_storage_account" "v2_premium_lrs" {
   account_kind             = "StorageV2"
   account_tier             = "Premium"
   account_replication_type = "LRS"
+  min_tls_version          = "TLS1_2" 
 }
 
 resource "azurerm_storage_account" "v2_premium_lrs_nfsv3" {
@@ -328,4 +359,5 @@ resource "azurerm_storage_account" "v2_premium_lrs_nfsv3" {
   account_tier             = "Premium"
   account_replication_type = "LRS"
   nfsv3_enabled            = true
+  min_tls_version          = "TLS1_2" 
 }
