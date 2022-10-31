@@ -593,19 +593,7 @@ func (r *parallelRunner) buildResources(projects []*schema.Project) {
 		projectPtrToUsageMap = r.fetchProjectUsage(projects)
 	}
 
-	for _, project := range projects {
-		usageMap := projectPtrToUsageMap[project]
-
-		for _, partial := range project.PartialResources {
-			u := usageMap[partial.ResourceData.Address]
-			project.Resources = append(project.Resources, schema.BuildResource(partial, u))
-		}
-
-		for _, partial := range project.PartialPastResources {
-			u := usageMap[partial.ResourceData.Address]
-			project.PastResources = append(project.PastResources, schema.BuildResource(partial, u))
-		}
-	}
+	schema.BuildResources(projects, projectPtrToUsageMap)
 }
 
 func (r *parallelRunner) fetchProjectUsage(projects []*schema.Project) map[*schema.Project]map[string]*schema.UsageData {

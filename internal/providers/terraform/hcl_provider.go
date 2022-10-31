@@ -183,10 +183,10 @@ func (p *HCLProvider) LoadResources(usage map[string]*schema.UsageData) ([]*sche
 	return projects, nil
 }
 
-func (p *HCLProvider) parseResources(parsed hclProject, usage map[string]*schema.UsageData) (*schema.Project, error) {
+func (p *HCLProvider) parseResources(parsed HclProject, usage map[string]*schema.UsageData) (*schema.Project, error) {
 	project := p.newProject(parsed)
 
-	partialPastResources, partialResources, err := p.planJSONParser.parseJSON(parsed.json, usage)
+	partialPastResources, partialResources, err := p.planJSONParser.parseJSON(parsed.JSON, usage)
 	if err != nil {
 		return project, fmt.Errorf("Error parsing Terraform plan JSON file %w", err)
 	}
@@ -197,15 +197,15 @@ func (p *HCLProvider) parseResources(parsed hclProject, usage map[string]*schema
 	return project, nil
 }
 
-func (p *HCLProvider) newProject(parsed hclProject) *schema.Project {
-	metadata := config.DetectProjectMetadata(parsed.module.RootPath)
+func (p *HCLProvider) newProject(parsed HclProject) *schema.Project {
+	metadata := config.DetectProjectMetadata(parsed.Module.RootPath)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
 
-	if len(parsed.module.Warnings) > 0 {
-		warnings := make([]schema.Warning, len(parsed.module.Warnings))
+	if len(parsed.Module.Warnings) > 0 {
+		warnings := make([]schema.Warning, len(parsed.Module.Warnings))
 
-		for i, warning := range parsed.module.Warnings {
+		for i, warning := range parsed.Module.Warnings {
 			warnings[i] = schema.Warning{
 				Code:    int(warning.Code),
 				Message: warning.Title,
@@ -226,14 +226,14 @@ func (p *HCLProvider) newProject(parsed hclProject) *schema.Project {
 	return schema.NewProject(name, metadata)
 }
 
-type hclProject struct {
-	json   []byte
-	module *hcl.Module
+type HclProject struct {
+	JSON   []byte
+	Module *hcl.Module
 }
 
 // LoadPlanJSONs parses the found directories and return the blocks in Terraform plan JSON format.
-func (p *HCLProvider) LoadPlanJSONs() ([]hclProject, error) {
-	var jsons = make([]hclProject, len(p.parsers))
+func (p *HCLProvider) LoadPlanJSONs() ([]HclProject, error) {
+	var jsons = make([]HclProject, len(p.parsers))
 	modules, err := p.Modules()
 	if err != nil {
 		return nil, err
@@ -245,9 +245,9 @@ func (p *HCLProvider) LoadPlanJSONs() ([]hclProject, error) {
 			return nil, err
 		}
 
-		jsons[i] = hclProject{
-			json:   b,
-			module: module,
+		jsons[i] = HclProject{
+			JSON:   b,
+			Module: module,
 		}
 	}
 

@@ -5,11 +5,13 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"fmt"
-	"github.com/infracost/infracost/internal/schema"
-	"github.com/tidwall/gjson"
 	"io/ioutil"
 	"strings"
 	"time"
+
+	"github.com/tidwall/gjson"
+
+	"github.com/infracost/infracost/internal/schema"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/logging"

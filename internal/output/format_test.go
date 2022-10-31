@@ -1,8 +1,9 @@
 package output
 
 import (
-	"github.com/Rhymond/go-money"
 	"testing"
+
+	"github.com/Rhymond/go-money"
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/shopspring/decimal"
@@ -73,7 +74,7 @@ func TestFormatCost2DP(t *testing.T) {
 				val = &parsed
 			}
 
-			got := formatCost2DP(tc.currency, val)
+			got := Format2DP(tc.currency, val)
 
 			diff := cmp.Diff(tc.expected, got)
 			if diff != "" {

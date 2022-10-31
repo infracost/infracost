@@ -30,7 +30,7 @@ func formatCost(currency string, d *decimal.Decimal) string {
 	return formatRoundedDecimalCurrency(currency, *d)
 }
 
-func formatCost2DP(currency string, d *decimal.Decimal) string {
+func Format2DP(currency string, d *decimal.Decimal) string {
 	if d == nil {
 		return "-"
 	}
