@@ -54,6 +54,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getElastiCacheReplicationGroupItem(),
 	getElasticsearchDomainRegistryItem(),
 	getELBRegistryItem(),
+	getFSxOpenZFSFSRegistryItem(),
 	getFSxWindowsFSRegistryItem(),
 	getGlueCatalogDatabaseRegistryItem(),
 	getGlueCrawlerRegistryItem(),
