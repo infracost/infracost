@@ -18,7 +18,7 @@ func getInstanceRegistryItem() *schema.RegistryItem {
 			"EC2 detailed monitoring assumes the standard 7 metrics and the lowest tier of prices for CloudWatch.",
 			"If a root volume is not specified then an 8Gi gp2 volume is assumed.",
 		},
-		RFunc: NewInstance,
+		CoreRFunc: NewInstance,
 		ReferenceAttributes: []string{
 			"ebs_block_device.#.volume_id",
 			"launch_template.#.id",
@@ -27,7 +27,7 @@ func getInstanceRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewInstance(d *schema.ResourceData) schema.CoreResource {
 	region := d.Get("region").String()
 
 	purchaseOption := "on_demand"
@@ -157,8 +157,5 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 		blockDevicesCount++
 	}
 
-	a.PopulateUsage(u)
-
-	return a.BuildResource()
-
+	return a
 }

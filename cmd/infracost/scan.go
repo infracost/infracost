@@ -8,13 +8,16 @@ import (
 	"net/http"
 	"strings"
 	"text/tabwriter"
+	"time"
 
+	"github.com/imdario/mergo"
+	jsoniter "github.com/json-iterator/go"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/tidwall/gjson"
-	"github.com/tidwall/sjson"
 
+	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/output"
@@ -120,7 +123,9 @@ func (s ScanCommand) run(runCtx *config.RunContext) error {
 		}
 	}
 
-	client := http.Client{}
+	pricingClient := apiclient.NewPricingAPIClient(runCtx)
+	client := http.Client{Timeout: 5 * time.Second}
+
 	for _, j := range jsons {
 		buf := bytes.NewBuffer(j.HCL.JSON)
 		req, err := http.NewRequest(http.MethodPost, "http://localhost:8081/recommend", buf)
@@ -139,93 +144,92 @@ func (s ScanCommand) run(runCtx *config.RunContext) error {
 			continue
 		}
 
+		var recMap = make(map[string][]Suggestion)
+		for _, suggestion := range result.Result {
+			if v, ok := recMap[suggestion.ResourceType]; ok {
+				recMap[suggestion.ResourceType] = append(v, suggestion)
+				continue
+			}
+
+			recMap[suggestion.ResourceType] = []Suggestion{suggestion}
+		}
+
 		masterProject, err := j.JSONProvider.LoadResourcesFromSrc(map[string]*schema.UsageData{}, j.HCL.JSON, nil)
 		if err != nil {
 			return err
 		}
-		schema.BuildResources([]*schema.Project{masterProject}, nil)
-		if err := prices.PopulatePrices(runCtx, masterProject); err != nil {
-			return err
-		}
-		schema.CalculateCosts(masterProject)
 
-		parsed := gjson.ParseBytes(j.HCL.JSON)
-		resourceMap := make(map[string]resourceData)
-		getResourceData("planned_values.root_module", resourceMap, parsed.Get("planned_values.root_module"))
-
-		for _, resource := range masterProject.Resources {
-			v := resourceMap[resource.Name]
-			resourceMap[resource.Name] = resourceData{
-				result:   v.result,
-				resource: resource,
-				setKey:   v.setKey,
-			}
-		}
-
-		var maxLen int
 		var lines []string
-		for _, res := range result.Result {
-			cost := "?"
-
-			if !res.NoCost {
-				resourceResult := resourceMap[res.Address].result.String()
-				value := resourceMap[res.Address].resource
-				setKey := resourceMap[res.Address].setKey
-
-				childJSON := parsed.String()
-				resourceResult, err := sjson.Set(resourceResult, "values."+res.Attribute, res.Suggested)
-				if err != nil {
-					return err
-				}
-				childJSON, _ = sjson.SetRaw(childJSON, setKey, resourceResult)
-
-				projectWithSuggestion, err := j.JSONProvider.LoadResourcesFromSrc(map[string]*schema.UsageData{}, []byte(childJSON), nil)
-				if err != nil {
-					return err
-				}
-				schema.BuildResources([]*schema.Project{projectWithSuggestion}, nil)
-				if err := prices.PopulatePrices(runCtx, projectWithSuggestion); err != nil {
-					return err
-				}
-				schema.CalculateCosts(projectWithSuggestion)
-
-				var suggested *schema.Resource
-				for _, r := range projectWithSuggestion.Resources {
-					if r.Name == value.Name {
-						suggested = r
-						break
+		var maxLen int
+		for _, resource := range masterProject.PartialResources {
+			coreResource := resource.CoreResource
+			if coreResource != nil {
+				if suggestions, ok := recMap[coreResource.CoreType()]; ok {
+					// TODO: fetch usage and populate resource
+					coreResource.PopulateUsage(nil)
+					initialSchema, err := jsoniter.Marshal(coreResource)
+					if err != nil {
+						return err
 					}
+
+					initalResource := coreResource.BuildResource()
+					err = prices.GetPrices(runCtx, pricingClient, initalResource)
+					if err != nil {
+						return err
+					}
+					initalResource.CalculateCosts()
+
+					for _, suggestion := range suggestions {
+						if suggestion.NoCost {
+							line := fmt.Sprintf(
+								"%s\t%s\t%s\t%s",
+								suggestion.Address,
+								suggestion.Reason,
+								suggestion.Suggested,
+								"?",
+							)
+							if len(line) > maxLen {
+								maxLen = len(line)
+							}
+							lines = append(lines, line)
+							continue
+						}
+
+						suggestedAttributes := suggestion.ResourceAttributes
+						err = mergeSuggestionWithResource(initialSchema, suggestedAttributes, coreResource)
+						if err != nil {
+							return err
+						}
+
+						schemaResource := coreResource.BuildResource()
+						err = prices.GetPrices(runCtx, pricingClient, schemaResource)
+						if err != nil {
+							return err
+						}
+						schemaResource.CalculateCosts()
+
+						diff := decimal.Zero
+						if schemaResource.MonthlyCost != nil {
+							diff = initalResource.MonthlyCost.Sub(*schemaResource.MonthlyCost)
+						}
+
+						cost := output.Format2DP(runCtx.Config.Currency, &diff)
+						line := fmt.Sprintf(
+							"%s\t%s\t%s\t%s",
+							suggestion.Address,
+							suggestion.Reason,
+							suggestion.Suggested,
+							cost,
+						)
+
+						if len(line) > maxLen {
+							maxLen = len(line)
+						}
+						lines = append(lines, line)
+					}
+
 				}
-
-				if suggested == nil {
-					continue
-				}
-
-				diff := decimal.Zero
-				if value.MonthlyCost != nil {
-					diff = value.MonthlyCost.Sub(*suggested.MonthlyCost)
-				}
-
-				cost = output.Format2DP(runCtx.Config.Currency, &diff)
 			}
-
-			suggestion := fmt.Sprintf("%q -> %q", res.Current, res.Suggested)
-			if strings.Contains(res.Suggested, "+") {
-				suggestion = res.Suggested
-			}
-
-			line := fmt.Sprintf(
-				"%s\t%s\t%s\t%s\t%s",
-				res.Address,
-				res.Attribute,
-				res.Reason,
-				suggestion,
-				cost,
-			)
-			if len(line) > maxLen {
-				maxLen = len(line)
-			}
-			lines = append(lines, line)
 		}
 
 		fmt.Fprintln(s.cmd.ErrOrStderr())
@@ -234,29 +238,39 @@ func (s ScanCommand) run(runCtx *config.RunContext) error {
 		fmt.Fprintln(s.cmd.ErrOrStderr())
 
 		w := tabwriter.NewWriter(s.cmd.ErrOrStderr(), 0, 0, 5, ' ', tabwriter.TabIndent)
-		fmt.Fprintln(w, "address\tattribute\treason\tsuggestion\tcost saving")
-		fmt.Fprintln(w, "-------\t---------\t------\t----------\t-----------")
+		fmt.Fprintln(w, "address\treason\tsuggestion\tcost saving")
+		fmt.Fprintln(w, "-------\t------\t----------\t-----------")
 		for _, line := range lines {
 			fmt.Fprintln(w, line)
 		}
 		w.Flush()
 	}
+
 	return nil
 }
 
-func getResourceData(parentKey string, resourceMap map[string]resourceData, module gjson.Result) {
-	resources := module.Get("resources")
-	for i, resource := range resources.Array() {
-		resourceMap[resource.Get("address").String()] = resourceData{
-			result: resource,
-			setKey: fmt.Sprintf("%s.resources.%d", parentKey, i),
-		}
+func mergeSuggestionWithResource(schema []byte, suggestedSchema []byte, resource schema.CoreResource) error {
+	var initialAttributes map[string]interface{}
+	jsoniter.Unmarshal(schema, &initialAttributes)
+
+	var suggestedAttributes map[string]interface{}
+	jsoniter.Unmarshal(suggestedSchema, &suggestedAttributes)
+
+	err := mergo.Merge(&initialAttributes, suggestedAttributes, mergo.WithOverride, mergo.WithSliceDeepCopy)
+	if err != nil {
+		return err
 	}
 
-	modules := module.Get("child_modules").Array()
-	for i, module := range modules {
-		getResourceData(fmt.Sprintf("%s.child_modules.%d", parentKey, i), resourceMap, module)
+	nb, err := jsoniter.Marshal(initialAttributes)
+	if err != nil {
+		return err
 	}
+	err = json.Unmarshal(nb, &resource)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func scanCommand(ctx *config.RunContext) *cobra.Command {
@@ -297,10 +311,10 @@ type RecommendDecisionResponse struct {
 }
 
 type Suggestion struct {
-	Address   string `json:"address"`
-	Attribute string `json:"attribute"`
-	Current   string `json:"current"`
-	Suggested string `json:"suggested"`
-	Reason    string `json:"reason"`
-	NoCost    bool   `json:"no_cost"`
+	ResourceType       string          `json:"resourceType"`
+	ResourceAttributes json.RawMessage `json:"resourceAttributes"`
+	Address            string          `json:"address"`
+	Reason             string          `json:"reason"`
+	Suggested          string          `json:"suggested"`
+	NoCost             bool            `json:"no_cost"`
 }
