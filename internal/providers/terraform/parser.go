@@ -267,8 +267,13 @@ func (p *Parser) parseResourceData(isState bool, providerConf, planVals gjson.Re
 
 		resConf := getConfJSON(conf, addr)
 
-		// Try getting the region from the ARN
-		region := resourceRegion(t, v)
+		// Override the region when requested
+		region := overrideRegion(addr, t, p.ctx.RunContext.Config)
+
+		// If not overridden try getting the region from the ARN
+		if region == "" {
+			region = resourceRegion(t, v)
+		}
 
 		// Otherwise use region from the provider conf
 		if region == "" {
@@ -325,6 +330,28 @@ func parseTags(resourceType string, v gjson.Result) map[string]string {
 		log.Debugf("Unsupported provider %s", providerPrefix)
 		return map[string]string{}
 	}
+}
+
+func overrideRegion(addr string, resourceType string, config *config.Config) string {
+	region := ""
+	providerPrefix := strings.Split(resourceType, "_")[0]
+
+	switch providerPrefix {
+	case "aws":
+		region = config.AWSOverrideRegion
+	case "azurerm":
+		region = config.AzureOverrideRegion
+	case "google":
+		region = config.GoogleOverrideRegion
+	default:
+		log.Debugf("Unsupported provider %s", providerPrefix)
+	}
+
+	if region != "" {
+		log.Debugf("Overriding region (%s) for %s", region, addr)
+	}
+
+	return region
 }
 
 func resourceRegion(resourceType string, v gjson.Result) string {
