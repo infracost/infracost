@@ -218,7 +218,7 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 		msgRuneLength := utf8.RuneCount(msg)
 		// truncation relies on rune length
 		q := float64(msgRuneLength) / float64(msgByteLength)
-		truncateLength := msgRuneLength - int(q * float64(markdownOpts.MaxMessageSize))
+		truncateLength := msgRuneLength - int(q*float64(markdownOpts.MaxMessageSize))
 		newLength := utf8.RuneCountInString(diffMsg) - truncateLength - 1000
 
 		opts.diffMsg = truncateMiddle(diffMsg, newLength, "\n\n...(truncated due to message size limit)...\n\n")
