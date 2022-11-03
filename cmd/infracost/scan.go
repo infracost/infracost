@@ -15,7 +15,6 @@ import (
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
-	"github.com/tidwall/gjson"
 
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/config"
@@ -92,12 +91,6 @@ type projectJSON struct {
 	JSONProvider *terraform.PlanJSONProvider
 }
 
-type resourceData struct {
-	result   gjson.Result
-	resource *schema.Resource
-	setKey   string
-}
-
 func (s ScanCommand) run(runCtx *config.RunContext) error {
 	err := s.loadRunFlags(runCtx.Config)
 	if err != nil {
@@ -160,7 +153,6 @@ func (s ScanCommand) run(runCtx *config.RunContext) error {
 		}
 
 		var lines []string
-		var maxLen int
 		for _, resource := range masterProject.PartialResources {
 			coreResource := resource.CoreResource
 			if coreResource != nil {
@@ -180,6 +172,10 @@ func (s ScanCommand) run(runCtx *config.RunContext) error {
 					initalResource.CalculateCosts()
 
 					for _, suggestion := range suggestions {
+						if suggestion.Address != initalResource.Name {
+							continue
+						}
+
 						if suggestion.NoCost {
 							line := fmt.Sprintf(
 								"%s\t%s\t%s\t%s",
@@ -188,9 +184,6 @@ func (s ScanCommand) run(runCtx *config.RunContext) error {
 								suggestion.Suggested,
 								"?",
 							)
-							if len(line) > maxLen {
-								maxLen = len(line)
-							}
 							lines = append(lines, line)
 							continue
 						}
@@ -222,9 +215,6 @@ func (s ScanCommand) run(runCtx *config.RunContext) error {
 							cost,
 						)
 
-						if len(line) > maxLen {
-							maxLen = len(line)
-						}
 						lines = append(lines, line)
 					}
 
@@ -234,7 +224,7 @@ func (s ScanCommand) run(runCtx *config.RunContext) error {
 
 		fmt.Fprintln(s.cmd.ErrOrStderr())
 		fmt.Fprintln(s.cmd.ErrOrStderr(), j.HCL.Module.ModulePath)
-		fmt.Fprintln(s.cmd.ErrOrStderr(), strings.Repeat("-", maxLen+12))
+		fmt.Fprintln(s.cmd.ErrOrStderr(), strings.Repeat("-", len(j.HCL.Module.ModulePath)))
 		fmt.Fprintln(s.cmd.ErrOrStderr())
 
 		w := tabwriter.NewWriter(s.cmd.ErrOrStderr(), 0, 0, 5, ' ', tabwriter.TabIndent)
