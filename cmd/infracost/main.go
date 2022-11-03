@@ -182,6 +182,7 @@ func newRootCmd(ctx *config.RunContext) *cobra.Command {
 	rootCmd.AddCommand(outputCmd(ctx))
 	rootCmd.AddCommand(uploadCmd(ctx))
 	rootCmd.AddCommand(commentCmd(ctx))
+	rootCmd.AddCommand(initCommand(ctx))
 	rootCmd.AddCommand(completionCmd())
 	rootCmd.AddCommand(figAutocompleteCmd())
 

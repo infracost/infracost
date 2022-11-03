@@ -1,15 +1,20 @@
 package config
 
 import (
+	_ "embed"
 	"fmt"
 	"os"
+	"path/filepath"
 	"reflect"
 	"sort"
 	"strings"
+	"text/template"
 
 	"github.com/pkg/errors"
 	"golang.org/x/mod/semver"
 	"gopkg.in/yaml.v2"
+
+	"github.com/infracost/infracost/internal/logging"
 )
 
 const (
@@ -20,6 +25,9 @@ const (
 var (
 	ErrorInvalidConfigFile = errors.New("parsing config file failed check file syntax")
 	ErrorNilProjects       = errors.New("no projects specified in config file, please specify at least one project, see https://infracost.io/config-file for file specification")
+
+	//go:embed templates/infracost.yml.tmpl
+	configFileTemplate string
 )
 
 // YamlError is a custom error type that allows setting multiple
@@ -54,25 +62,25 @@ func (y *YamlError) isValid() bool {
 // YamlError.Error supports multiple nesting and can construct heavily indented output if needed.
 // e.g.
 //
-// 		&YamlError{
-//			base: "top message",
-//			errors: []error{
-//				errors.New("top error 1"),
-//				&YamlError{
-//					base: "child message",
-//					errors: []error{
-//						errors.New("child error 1"),
-//					},
+//	&YamlError{
+//		base: "top message",
+//		errors: []error{
+//			errors.New("top error 1"),
+//			&YamlError{
+//				base: "child message",
+//				errors: []error{
+//					errors.New("child error 1"),
 //				},
 //			},
-//		}
+//		},
+//	}
 //
 // would output a string like so:
 //
-//		top message:
-//			top error 1
-//			child message:
-//				child error 1
+//	top message:
+//		top error 1
+//		child message:
+//			child error 1
 //
 // This can be useful for ui error messages where you need to highlight issues
 // with specific fields/entries.
@@ -111,6 +119,42 @@ func (y *YamlError) Error() string {
 type fileSpec struct {
 	Version  string     `yaml:"version"`
 	Projects []*Project `yaml:"projects" ignored:"true"`
+}
+
+// CreateConfigFile creates a config file located at root with the provided paths as projects.
+func CreateConfigFile(root string, paths []string, overwrite bool) {
+	var projects = make([]*Project, len(paths))
+	for i, path := range paths {
+		projects[i] = &Project{Path: path}
+	}
+
+	fSpec := fileSpec{Projects: projects, Version: maxConfigFileVersion}
+	t, _ := template.New("infracost.yml").Parse(configFileTemplate)
+
+	loc := filepath.Join(root, "infracost.yml")
+	f, err := os.Create(loc)
+	if err != nil && !errors.Is(err, os.ErrExist) {
+		logging.Logger.WithError(err).Errorf("could not create infracost.yml at path: %s", loc)
+		return
+	}
+
+	if errors.Is(err, os.ErrExist) && !overwrite {
+		logging.Logger.Debugf("skipping creating config file infracost.yml as it already exists under: %s", loc)
+		return
+	}
+
+	if errors.Is(err, os.ErrExist) && overwrite {
+		f, err = os.OpenFile(loc, os.O_RDWR|os.O_CREATE|os.O_TRUNC, 0755)
+		if err != nil {
+			logging.Logger.WithError(err).Errorf("could not open infracost.yml at path: %s", loc)
+			return
+		}
+	}
+
+	err = t.Execute(f, fSpec)
+	if err != nil {
+		logging.Logger.WithError(err).Error("failed to write config file body")
+	}
 }
 
 // UnmarshalYAML implements the yaml.v2.Unmarshaller interface. Marshalls the

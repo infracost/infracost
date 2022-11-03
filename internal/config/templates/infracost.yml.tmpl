@@ -1,0 +1,14 @@
+version: {{ .Version }}
+
+# ---------------------------------------------------------------------------------------------------------------------------
+# This Infracost config file specifies how Infracost should be run in each of your Terraform projects.
+# You can find more information about configuration fields with examples here: https://www.infracost.io/docs/features/config_file/
+# ---------------------------------------------------------------------------------------------------------------------------
+
+projects:
+{{range  .Projects}}
+  - path: {{ .Path }}
+    name: {{ .Path }}
+{{end}}
+
+
