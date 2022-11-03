@@ -83,6 +83,10 @@ type Config struct {
 	Currency       string `envconfig:"CURRENCY"`
 	CurrencyFormat string `envconfig:"CURRENCY_FORMAT"`
 
+	AWSOverrideRegion    string `envconfig:"AWS_OVERRIDE_REGION"`
+	AzureOverrideRegion  string `envconfig:"AZURE_OVERRIDE_REGION"`
+	GoogleOverrideRegion string `envconfig:"GOOGLE_OVERRIDE_REGION"`
+
 	// Org settings
 	EnableCloudForOrganization bool
 
