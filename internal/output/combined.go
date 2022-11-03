@@ -24,7 +24,7 @@ import (
 var (
 	minOutputVersion     = "0.2"
 	maxOutputVersion     = "0.2"
-	GitHubMaxMessageSize = 262144
+	GitHubMaxMessageSize = 262144 // bytes
 )
 
 type ReportInput struct {
