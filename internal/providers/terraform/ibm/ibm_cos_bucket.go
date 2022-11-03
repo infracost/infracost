@@ -48,6 +48,14 @@ func newIbmCosBucket(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 		}
 	}
 
+	var plan string
+	cosResourceRef := d.References("resource_instance_id")
+
+	if len(cosResourceRef) > 0 {
+		cosResource := cosResourceRef[0]
+		plan = cosResource.Get("plan").String()
+	}
+
 	r := &ibm.IbmCosBucket{
 		Address:            d.Address,
 		Region:             d.Get("region").String(),
@@ -56,11 +64,13 @@ func newIbmCosBucket(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 		StorageClass:       storage_class,
 		Archive:            archive_enabled,
 		ArchiveType:        archive_type,
+		Plan:               plan,
 	}
 
 	r.PopulateUsage(u)
 
 	configuration := make(map[string]any)
+	configuration["plan"] = plan
 	configuration["location"] = location
 	configuration["locationIdentifier"] = locationIdentifier
 	configuration["storage_class"] = storage_class

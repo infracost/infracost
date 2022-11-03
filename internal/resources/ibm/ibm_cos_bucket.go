@@ -21,6 +21,7 @@ type IbmCosBucket struct {
 	StorageClass       string
 	Archive            bool
 	ArchiveType        string
+	Plan               string
 
 	MonthlyAverageCapacity     *float64 `infracost_usage:"monthly_average_capacity"`
 	PublicStandardEgress       *float64 `infracost_usage:"public_standard_egress"`
@@ -415,32 +416,47 @@ func (r *IbmCosBucket) MonthlyDataRetrievalCostComponent() *schema.CostComponent
 	}
 }
 
+func (r *IbmCosBucket) LitePlanCostComponent() *schema.CostComponent {
+	costComponent := schema.CostComponent{
+		Name:            "Lite Plan Bucket",
+		Unit:            "Instance",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+	}
+	costComponent.SetCustomPrice(decimalPtr(decimal.NewFromInt(0)))
+	return &costComponent
+}
+
 // BuildResource builds a schema.Resource from a valid IbmCosBucket struct.
 // This method is called after the resource is initialised by an IaC provider.
 // See providers folder for more information.
 func (r *IbmCosBucket) BuildResource() *schema.Resource {
 	costComponents := []*schema.CostComponent{}
 
-	if r.LocationIdentifier == "region_location" && r.Archive {
-		if strings.ToLower(r.ArchiveType) == "glacier" {
-			costComponents = append(costComponents, r.ArchiveCapacityCostComponent(), r.ArchiveRestoreCostComponent())
-		} else if strings.ToLower(r.ArchiveType) == "accelerated" {
-			costComponents = append(costComponents, r.AcceleratedArchiveCapacityCostComponent(), r.AcceleratedArchiveRestoreCostComponent())
+	if r.Plan == "lite" {
+		costComponents = append(costComponents, r.LitePlanCostComponent())
+	} else if r.Plan == "standard" {
+		if r.LocationIdentifier == "region_location" && r.Archive {
+			if strings.ToLower(r.ArchiveType) == "glacier" {
+				costComponents = append(costComponents, r.ArchiveCapacityCostComponent(), r.ArchiveRestoreCostComponent())
+			} else if strings.ToLower(r.ArchiveType) == "accelerated" {
+				costComponents = append(costComponents, r.AcceleratedArchiveCapacityCostComponent(), r.AcceleratedArchiveRestoreCostComponent())
+			}
+		} else if (r.LocationIdentifier == "region_location" || r.LocationIdentifier == "cross_region_location") && (r.AsperaEgress != nil || r.AsperaIngress != nil) {
+			costComponents = append(costComponents, r.AsperaEgressCostComponent(), r.AsperaIngressCostComponent())
 		}
-	} else if (r.LocationIdentifier == "region_location" || r.LocationIdentifier == "cross_region_location") && (r.AsperaEgress != nil || r.AsperaIngress != nil) {
-		costComponents = append(costComponents, r.AsperaEgressCostComponent(), r.AsperaIngressCostComponent())
-	}
 
-	costComponents = append(
-		costComponents,
-		r.MonthlyAverageCapacityCostComponent(),
-		r.ClassARequestCountCostComponent(),
-		r.ClassBRequestCountCostComponent(),
-		r.PublicStandardEgressCostComponent(),
-	)
+		costComponents = append(
+			costComponents,
+			r.MonthlyAverageCapacityCostComponent(),
+			r.ClassARequestCountCostComponent(),
+			r.ClassBRequestCountCostComponent(),
+			r.PublicStandardEgressCostComponent(),
+		)
 
-	if r.StorageClass == "vault" || r.StorageClass == "cold" {
-		costComponents = append(costComponents, r.MonthlyDataRetrievalCostComponent())
+		if r.StorageClass == "vault" || r.StorageClass == "cold" {
+			costComponents = append(costComponents, r.MonthlyDataRetrievalCostComponent())
+		}
 	}
 
 	return &schema.Resource{

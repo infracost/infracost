@@ -36,6 +36,9 @@
  └─ Public Standard Egress (next 100000 GB)       Monthly cost depends on usage: $0.07 per GB             
  └─ Public Standard Egress (over 150000 GB)       Monthly cost depends on usage: $0.05 per GB             
                                                                                                           
+ ibm_cos_bucket.lite-us-south                                                                             
+ └─ Lite Plan Bucket                                              1  Instance                       $0.00 
+                                                                                                          
  ibm_cos_bucket.smart-us-south                                                                            
  ├─ Monthly Average Capacity (first 499999 GB)                1,000  GB                            $21.00 
  ├─ Monthly Average Capacity (next 999500000 GB)                  0  GB                             $0.00 
@@ -75,7 +78,7 @@
                                                                                                           
  OVERALL TOTAL                                                                                    $716.69 
 ──────────────────────────────────
-9 cloud resources were detected:
-∙ 8 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+11 cloud resources were detected:
+∙ 10 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 1 was free:
   ∙ 1 x ibm_resource_group
