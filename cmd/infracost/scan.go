@@ -6,19 +6,17 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"strings"
-	"text/tabwriter"
 	"time"
 
 	"github.com/imdario/mergo"
 	jsoniter "github.com/json-iterator/go"
+	"github.com/pterm/pterm"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/config"
-	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/prices"
 	"github.com/infracost/infracost/internal/providers/terraform"
@@ -98,9 +96,10 @@ func (s ScanCommand) run(runCtx *config.RunContext) error {
 	}
 
 	var jsons []projectJSON
+	spinner, _ := pterm.DefaultSpinner.Start("Detecting Terraform Projects...")
 	for _, project := range runCtx.Config.Projects {
 		projectCtx := config.NewProjectContext(runCtx, project, log.Fields{})
-		hclProvider, err := terraform.NewHCLProvider(projectCtx, nil, hcl.OptionWithSpinner(projectCtx.RunContext.NewSpinner))
+		hclProvider, err := terraform.NewHCLProvider(projectCtx, &terraform.HCLProviderConfig{SuppressLogging: true})
 		if err != nil {
 			return err
 		}
@@ -118,8 +117,11 @@ func (s ScanCommand) run(runCtx *config.RunContext) error {
 
 	pricingClient := apiclient.NewPricingAPIClient(runCtx)
 	client := http.Client{Timeout: 5 * time.Second}
+	spinner.Success()
 
 	for _, j := range jsons {
+		spinner, _ = pterm.DefaultSpinner.Start(fmt.Sprintf("Scanning project %s for cost optimizations...", j.HCL.Module.ModulePath))
+
 		buf := bytes.NewBuffer(j.HCL.JSON)
 		req, err := http.NewRequest(http.MethodPost, "http://localhost:8081/recommend", buf)
 		if err != nil {
@@ -152,7 +154,10 @@ func (s ScanCommand) run(runCtx *config.RunContext) error {
 			return err
 		}
 
-		var lines []string
+		rows := pterm.TableData{
+			{"Address", "Reason", "Suggestion", "Cost Saving"},
+		}
+
 		for _, resource := range masterProject.PartialResources {
 			coreResource := resource.CoreResource
 			if coreResource != nil {
@@ -177,14 +182,12 @@ func (s ScanCommand) run(runCtx *config.RunContext) error {
 						}
 
 						if suggestion.NoCost {
-							line := fmt.Sprintf(
-								"%s\t%s\t%s\t%s",
+							rows = append(rows, []string{
 								suggestion.Address,
 								suggestion.Reason,
 								suggestion.Suggested,
 								"?",
-							)
-							lines = append(lines, line)
+							})
 							continue
 						}
 
@@ -207,33 +210,21 @@ func (s ScanCommand) run(runCtx *config.RunContext) error {
 						}
 
 						cost := output.Format2DP(runCtx.Config.Currency, &diff)
-						line := fmt.Sprintf(
-							"%s\t%s\t%s\t%s",
+
+						rows = append(rows, []string{
 							suggestion.Address,
 							suggestion.Reason,
 							suggestion.Suggested,
 							cost,
-						)
-
-						lines = append(lines, line)
+						})
 					}
 
 				}
 			}
 		}
 
-		fmt.Fprintln(s.cmd.ErrOrStderr())
-		fmt.Fprintln(s.cmd.ErrOrStderr(), j.HCL.Module.ModulePath)
-		fmt.Fprintln(s.cmd.ErrOrStderr(), strings.Repeat("-", len(j.HCL.Module.ModulePath)))
-		fmt.Fprintln(s.cmd.ErrOrStderr())
-
-		w := tabwriter.NewWriter(s.cmd.ErrOrStderr(), 0, 0, 5, ' ', tabwriter.TabIndent)
-		fmt.Fprintln(w, "address\treason\tsuggestion\tcost saving")
-		fmt.Fprintln(w, "-------\t------\t----------\t-----------")
-		for _, line := range lines {
-			fmt.Fprintln(w, line)
-		}
-		w.Flush()
+		spinner.Success()
+		pterm.DefaultBox.WithTitle(j.HCL.Module.ModulePath).Println(pterm.DefaultTable.WithHasHeader().WithData(rows).Srender())
 	}
 
 	return nil
