@@ -1,26 +1,18 @@
 package main
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"net/http"
-	"time"
 
-	"github.com/imdario/mergo"
-	jsoniter "github.com/json-iterator/go"
 	"github.com/pterm/pterm"
-	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 
-	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/output"
-	"github.com/infracost/infracost/internal/prices"
-	"github.com/infracost/infracost/internal/providers/terraform"
-	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/scan"
 	"github.com/infracost/infracost/internal/ui"
 )
 
@@ -84,171 +76,41 @@ func (s ScanCommand) loadRunFlags(cfg *config.Config) error {
 	return nil
 }
 
-type projectJSON struct {
-	HCL          terraform.HclProject
-	JSONProvider *terraform.PlanJSONProvider
-}
-
 func (s ScanCommand) run(runCtx *config.RunContext) error {
 	err := s.loadRunFlags(runCtx.Config)
 	if err != nil {
 		return err
 	}
 
-	var jsons []projectJSON
-	spinner, _ := pterm.DefaultSpinner.Start("Detecting Terraform Projects...")
-	for _, project := range runCtx.Config.Projects {
-		projectCtx := config.NewProjectContext(runCtx, project, log.Fields{})
-		hclProvider, err := terraform.NewHCLProvider(projectCtx, &terraform.HCLProviderConfig{SuppressLogging: true})
-		if err != nil {
-			return err
-		}
+	spinnerOpts := ui.SpinnerOptions{
+		EnableLogging: runCtx.Config.IsLogging(),
+		NoColor:       runCtx.Config.NoColor,
+		Indent:        "  ",
+	}
+	spinner := ui.NewSpinner("Scanning projects for cost optimizations...", spinnerOpts)
+	defer spinner.Fail()
 
-		projectJsons, err := hclProvider.LoadPlanJSONs()
-		if err != nil {
-			return err
-		}
-
-		planJsonProvider := terraform.NewPlanJSONProvider(projectCtx, false)
-		for _, j := range projectJsons {
-			jsons = append(jsons, projectJSON{HCL: j, JSONProvider: planJsonProvider})
-		}
+	scanner := scan.NewScanner(runCtx, logging.Logger.WithFields(log.Fields{}))
+	projectSuggestions, err := scanner.Scan()
+	if err != nil {
+		return err
 	}
 
-	pricingClient := apiclient.NewPricingAPIClient(runCtx)
-	client := http.Client{Timeout: 5 * time.Second}
 	spinner.Success()
 
-	for _, j := range jsons {
-		spinner, _ = pterm.DefaultSpinner.Start(fmt.Sprintf("Scanning project %s for cost optimizations...", j.HCL.Module.ModulePath))
-
-		buf := bytes.NewBuffer(j.HCL.JSON)
-		req, err := http.NewRequest(http.MethodPost, "http://localhost:8081/recommend", buf)
-		if err != nil {
-			return err
-		}
-
-		res, err := client.Do(req)
-		if err != nil {
-			return err
-		}
-		var result RecommendDecisionResponse
-		json.NewDecoder(res.Body).Decode(&result)
-
-		if len(result.Result) == 0 {
-			continue
-		}
-
-		var recMap = make(map[string][]Suggestion)
-		for _, suggestion := range result.Result {
-			if v, ok := recMap[suggestion.ResourceType]; ok {
-				recMap[suggestion.ResourceType] = append(v, suggestion)
-				continue
+	for _, projectSuggestion := range projectSuggestions {
+		rows := make([][]string, len(projectSuggestion.Suggestions)+1)
+		rows[0] = []string{"Address", "Title", "Cost Saving"}
+		for i, suggestion := range projectSuggestion.Suggestions {
+			cost := "?"
+			if suggestion.Cost != nil {
+				cost = output.Format2DP(runCtx.Config.Currency, suggestion.Cost)
 			}
 
-			recMap[suggestion.ResourceType] = []Suggestion{suggestion}
+			rows[i+1] = []string{suggestion.Address, suggestion.Title, cost}
 		}
 
-		masterProject, err := j.JSONProvider.LoadResourcesFromSrc(map[string]*schema.UsageData{}, j.HCL.JSON, nil)
-		if err != nil {
-			return err
-		}
-
-		rows := pterm.TableData{
-			{"Address", "Reason", "Suggestion", "Cost Saving"},
-		}
-
-		for _, resource := range masterProject.PartialResources {
-			coreResource := resource.CoreResource
-			if coreResource != nil {
-				if suggestions, ok := recMap[coreResource.CoreType()]; ok {
-					// TODO: fetch usage and populate resource
-					coreResource.PopulateUsage(nil)
-					initialSchema, err := jsoniter.Marshal(coreResource)
-					if err != nil {
-						return err
-					}
-
-					initalResource := coreResource.BuildResource()
-					err = prices.GetPrices(runCtx, pricingClient, initalResource)
-					if err != nil {
-						return err
-					}
-					initalResource.CalculateCosts()
-
-					for _, suggestion := range suggestions {
-						if suggestion.Address != initalResource.Name {
-							continue
-						}
-
-						if suggestion.NoCost {
-							rows = append(rows, []string{
-								suggestion.Address,
-								suggestion.Reason,
-								suggestion.Suggested,
-								"?",
-							})
-							continue
-						}
-
-						suggestedAttributes := suggestion.ResourceAttributes
-						err = mergeSuggestionWithResource(initialSchema, suggestedAttributes, coreResource)
-						if err != nil {
-							return err
-						}
-
-						schemaResource := coreResource.BuildResource()
-						err = prices.GetPrices(runCtx, pricingClient, schemaResource)
-						if err != nil {
-							return err
-						}
-						schemaResource.CalculateCosts()
-
-						diff := decimal.Zero
-						if schemaResource.MonthlyCost != nil {
-							diff = initalResource.MonthlyCost.Sub(*schemaResource.MonthlyCost)
-						}
-
-						cost := output.Format2DP(runCtx.Config.Currency, &diff)
-
-						rows = append(rows, []string{
-							suggestion.Address,
-							suggestion.Reason,
-							suggestion.Suggested,
-							cost,
-						})
-					}
-
-				}
-			}
-		}
-
-		spinner.Success()
-		pterm.DefaultBox.WithTitle(j.HCL.Module.ModulePath).Println(pterm.DefaultTable.WithHasHeader().WithData(rows).Srender())
-	}
-
-	return nil
-}
-
-func mergeSuggestionWithResource(schema []byte, suggestedSchema []byte, resource schema.CoreResource) error {
-	var initialAttributes map[string]interface{}
-	jsoniter.Unmarshal(schema, &initialAttributes)
-
-	var suggestedAttributes map[string]interface{}
-	jsoniter.Unmarshal(suggestedSchema, &suggestedAttributes)
-
-	err := mergo.Merge(&initialAttributes, suggestedAttributes, mergo.WithOverride, mergo.WithSliceDeepCopy)
-	if err != nil {
-		return err
-	}
-
-	nb, err := jsoniter.Marshal(initialAttributes)
-	if err != nil {
-		return err
-	}
-	err = json.Unmarshal(nb, &resource)
-	if err != nil {
-		return err
+		pterm.DefaultBox.WithTitle(projectSuggestion.Path).Println(pterm.DefaultTable.WithHasHeader().WithData(rows).Srender())
 	}
 
 	return nil
@@ -292,10 +154,12 @@ type RecommendDecisionResponse struct {
 }
 
 type Suggestion struct {
+	ID                 string          `json:"id"`
+	Title              string          `json:"title"`
+	Description        string          `json:"description"`
 	ResourceType       string          `json:"resourceType"`
 	ResourceAttributes json.RawMessage `json:"resourceAttributes"`
 	Address            string          `json:"address"`
-	Reason             string          `json:"reason"`
 	Suggested          string          `json:"suggested"`
 	NoCost             bool            `json:"no_cost"`
 }
