@@ -1,10 +1,10 @@
 package scan
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"sort"
 	"time"
 
 	"github.com/imdario/mergo"
@@ -20,22 +20,24 @@ import (
 )
 
 type Scanner struct {
-	client           *http.Client
-	pricingAPIClient *apiclient.PricingAPIClient
-	logger           *log.Entry
-	ctx              *config.RunContext
+	client                  *http.Client
+	pricingAPIClient        *apiclient.PricingAPIClient
+	recommendationAPIClient apiclient.RecommendationClient
+	logger                  *log.Entry
+	ctx                     *config.RunContext
 }
 
 func NewScanner(ctx *config.RunContext, logger *log.Entry) Scanner {
 	return Scanner{
-		client:           &http.Client{Timeout: time.Second * 5},
-		pricingAPIClient: apiclient.NewPricingAPIClient(ctx),
-		logger:           logger,
-		ctx:              ctx,
+		client:                  &http.Client{Timeout: time.Second * 5},
+		pricingAPIClient:        apiclient.NewPricingAPIClient(ctx),
+		recommendationAPIClient: apiclient.NewRecommendationClient(ctx.Config, logger),
+		logger:                  logger,
+		ctx:                     ctx,
 	}
 }
 
-func (s Scanner) Scan() ([]ProjectSuggestion, error) {
+func (s Scanner) ScanPaths() ([]ProjectSuggestion, error) {
 	jsons, err := s.readProjectDirs()
 	if err != nil {
 		return nil, err
@@ -58,30 +60,30 @@ func (s Scanner) Scan() ([]ProjectSuggestion, error) {
 func (s Scanner) scanProject(j projectJSON) (ProjectSuggestion, error) {
 	ps := ProjectSuggestion{Path: j.HCL.Module.ModulePath}
 
-	buf := bytes.NewBuffer(j.HCL.JSON)
-	req, err := http.NewRequest(http.MethodPost, "http://localhost:8081/recommend", buf)
+	apiSuggestions, err := s.recommendationAPIClient.GetSuggestions(j.HCL.JSON)
 	if err != nil {
-		return ps, fmt.Errorf("failed to build request to suggestions API %w", err)
-	}
-
-	res, err := s.client.Do(req)
-	if err != nil {
-		return ps, fmt.Errorf("failed to make request to suggestions API %w", err)
-	}
-	var result RecommendDecisionResponse
-	json.NewDecoder(res.Body).Decode(&result)
-	if len(result.Result) == 0 {
-		return ps, nil
+		return ps, fmt.Errorf("failed to get suggestions %w", err)
 	}
 
 	var recMap = make(map[string][]Suggestion)
-	for _, suggestion := range result.Result {
-		if v, ok := recMap[suggestion.ResourceType]; ok {
-			recMap[suggestion.ResourceType] = append(v, suggestion)
+	for _, apiSuggestion := range apiSuggestions {
+		suggestion := Suggestion{
+			ID:                 apiSuggestion.ID,
+			Title:              apiSuggestion.Title,
+			Description:        apiSuggestion.Description,
+			ResourceType:       apiSuggestion.ResourceType,
+			ResourceAttributes: apiSuggestion.ResourceAttributes,
+			Address:            apiSuggestion.Address,
+			Suggested:          apiSuggestion.Suggested,
+			NoCost:             apiSuggestion.NoCost,
+		}
+
+		if v, ok := recMap[apiSuggestion.ResourceType]; ok {
+			recMap[apiSuggestion.ResourceType] = append(v, suggestion)
 			continue
 		}
 
-		recMap[suggestion.ResourceType] = []Suggestion{suggestion}
+		recMap[apiSuggestion.ResourceType] = []Suggestion{suggestion}
 	}
 
 	masterProject, err := j.JSONProvider.LoadResourcesFromSrc(map[string]*schema.UsageData{}, j.HCL.JSON, nil)
@@ -91,7 +93,7 @@ func (s Scanner) scanProject(j projectJSON) (ProjectSuggestion, error) {
 
 	ps.Name = masterProject.Name
 
-	var costedSuggestions []Suggestion
+	var costedSuggestions Suggestions
 	for _, resource := range masterProject.PartialResources {
 		coreResource := resource.CoreResource
 		if coreResource == nil {
@@ -163,6 +165,7 @@ func (s Scanner) scanProject(j projectJSON) (ProjectSuggestion, error) {
 		}
 	}
 
+	sort.Sort(costedSuggestions)
 	ps.Suggestions = costedSuggestions
 	return ps, nil
 }
@@ -220,10 +223,6 @@ type projectJSON struct {
 	JSONProvider *terraform.PlanJSONProvider
 }
 
-type RecommendDecisionResponse struct {
-	Result []Suggestion `json:"result"`
-}
-
 type Suggestion struct {
 	ID                 string           `json:"id"`
 	Title              string           `json:"title"`
@@ -236,8 +235,41 @@ type Suggestion struct {
 	Cost               *decimal.Decimal `json:"cost"`
 }
 
+type Suggestions []Suggestion
+
+func (s Suggestions) Len() int {
+	return len(s)
+}
+
+func (s Suggestions) Less(i, j int) bool {
+	iSug := s[i]
+	jSug := s[j]
+
+	if iSug.Cost == nil && jSug.Cost == nil {
+		return iSug.Address < jSug.Address
+	}
+
+	if iSug.Cost == nil {
+		return false
+	}
+
+	if jSug.Cost == nil {
+		return true
+	}
+
+	if iSug.Cost.Equal(*jSug.Cost) {
+		return iSug.Address < jSug.Address
+	}
+
+	return iSug.Cost.GreaterThan(*jSug.Cost)
+}
+
+func (s Suggestions) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
 type ProjectSuggestion struct {
-	Path        string       `json:"path"`
-	Name        string       `json:"name"`
-	Suggestions []Suggestion `json:"suggestions"`
+	Path        string      `json:"path"`
+	Name        string      `json:"name"`
+	Suggestions Suggestions `json:"suggestions"`
 }

@@ -75,6 +75,7 @@ type Config struct {
 	DashboardEndpoint         string `yaml:"dashboard_endpoint,omitempty" envconfig:"DASHBOARD_ENDPOINT"`
 	UsageAPIEndpoint          string `yaml:"usage_api_endpoint,omitempty" envconfig:"USAGE_API_ENDPOINT"`
 	UsageActualCosts          bool   `yaml:"usage_actual_costs,omitempty" envconfig:"USAGE_ACTUAL_COSTS"`
+	RecommendationAPIEndpoint string `yaml:"recommendation_api_endpoint" envconfig:"RECOMMENDATION_API_ENDPOINT"`
 	EnableDashboard           bool   `yaml:"enable_dashboard,omitempty" envconfig:"ENABLE_DASHBOARD"`
 	EnableCloud               *bool  `yaml:"enable_cloud,omitempty" envconfig:"ENABLE_CLOUD"`
 	DisableHCLParsing         bool   `yaml:"disable_hcl_parsing,omitempty" envconfig:"DISABLE_HCL_PARSING"`

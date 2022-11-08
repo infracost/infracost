@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 
@@ -91,7 +90,7 @@ func (s ScanCommand) run(runCtx *config.RunContext) error {
 	defer spinner.Fail()
 
 	scanner := scan.NewScanner(runCtx, logging.Logger.WithFields(log.Fields{}))
-	projectSuggestions, err := scanner.Scan()
+	projectSuggestions, err := scanner.ScanPaths()
 	if err != nil {
 		return err
 	}
@@ -147,19 +146,4 @@ func scanCommand(ctx *config.RunContext) *cobra.Command {
 	cmd.Flags().StringVar(&scan.UsageFile, "usage-file", "", "Path to Infracost usage file that specifies values for usage-based resources")
 
 	return cmd
-}
-
-type RecommendDecisionResponse struct {
-	Result []Suggestion `json:"result"`
-}
-
-type Suggestion struct {
-	ID                 string          `json:"id"`
-	Title              string          `json:"title"`
-	Description        string          `json:"description"`
-	ResourceType       string          `json:"resourceType"`
-	ResourceAttributes json.RawMessage `json:"resourceAttributes"`
-	Address            string          `json:"address"`
-	Suggested          string          `json:"suggested"`
-	NoCost             bool            `json:"no_cost"`
 }
