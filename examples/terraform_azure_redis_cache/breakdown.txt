@@ -1,0 +1,12 @@
+Project: infracost/infracost/examples/terraform_azure_redis_cache
+
+ Name                                  Monthly Qty  Unit   Monthly Cost 
+                                                                        
+ azurerm_redis_cache.main                                               
+ └─ Cache usage (Premium_P1, 4 nodes)        2,920  hours     $1,620.60 
+                                                                        
+ OVERALL TOTAL                                                $1,620.60 
+──────────────────────────────────
+4 cloud resources were detected:
+∙ 1 was estimated
+∙ 3 were free, rerun with --show-skipped to see details

@@ -1,0 +1,19 @@
+{
+  "variable": {
+    "name": {
+      "type": "any"
+    },
+    "region": {
+      "type": "any"
+    },
+    "tags": {
+      "type": "any"
+    },
+    "cluster": {
+      "type": "any"
+    },
+    "redis": {
+      "type": "any"
+    }
+  }
+}
