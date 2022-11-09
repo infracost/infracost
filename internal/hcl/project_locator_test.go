@@ -36,7 +36,22 @@ func TestProjectLocator_FindRootModules_WithMultiProject_ExcludeDirs(t *testing.
 
 func TestProjectLocator_FindRootModules_WithMultiProjectWithoutProviderBlocks(t *testing.T) {
 	pl := NewProjectLocator(newDiscardLogger(), &ProjectLocatorConfig{
-		UseAllSubDirs: true,
+		UseAllPaths: true,
+	})
+	mods := pl.FindRootModules("./testdata/project_locator/multi_project_without_provider_blocks")
+
+	require.Len(t, mods, 3)
+	assert.Contains(t, mods, "testdata/project_locator/multi_project_without_provider_blocks/dev")
+	assert.Contains(t, mods, "testdata/project_locator/multi_project_without_provider_blocks/prod")
+	assert.Contains(t, mods, "testdata/project_locator/multi_project_without_provider_blocks/modules/example")
+}
+
+func TestProjectLocator_FindRootModules_WithMultiProjectWithoutProviderBlocks_ExludePaths(t *testing.T) {
+	pl := NewProjectLocator(newDiscardLogger(), &ProjectLocatorConfig{
+		UseAllPaths: true,
+		ExcludedSubDirs: []string{
+			"modules/**",
+		},
 	})
 	mods := pl.FindRootModules("./testdata/project_locator/multi_project_without_provider_blocks")
 
