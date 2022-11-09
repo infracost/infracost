@@ -31,6 +31,26 @@ func getLocation(d *schema.ResourceData) (string, string) {
 	return "", ""
 }
 
+func getPlan(d *schema.ResourceData, storageClass string) string {
+	// default to the standard plan
+	var plan string = "standard"
+
+	// There is only one storage class (Active) available for the One Rate plan.
+	if storageClass == "onerate_active" {
+		plan = "cos-one-rate-plan"
+	}
+	// if the reference to the parent resource (the cos instance) can
+	// be resolved, then use the plan set in the parent
+	cosResourceRef := d.References("resource_instance_id")
+
+	if len(cosResourceRef) > 0 {
+		cosResource := cosResourceRef[0]
+		plan = cosResource.Get("plan").String()
+	}
+
+	return plan
+}
+
 func newIbmCosBucket(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	location, locationIdentifier := getLocation(d)
 	storage_class := d.Get("storage_class").String()
@@ -48,13 +68,7 @@ func newIbmCosBucket(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 		}
 	}
 
-	var plan string
-	cosResourceRef := d.References("resource_instance_id")
-
-	if len(cosResourceRef) > 0 {
-		cosResource := cosResourceRef[0]
-		plan = cosResource.Get("plan").String()
-	}
+	plan := getPlan(d, storage_class)
 
 	r := &ibm.IbmCosBucket{
 		Address:            d.Address,
