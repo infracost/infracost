@@ -671,7 +671,8 @@ func (p *projectLocator) walkPaths(fullPath string, level int) []string {
 							continue
 						}
 
-						p.moduleCalls[realPath] = struct{}{}
+						mp := filepath.Join(fullPath, realPath)
+						p.moduleCalls[mp] = struct{}{}
 					}
 				}
 			}
