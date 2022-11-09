@@ -47,7 +47,7 @@ data "cats_cat" "the-cats-mother" {
 
 `)
 
-	parsers, err := LoadParsers(filepath.Dir(path), []string{}, newDiscardLogger(), OptionStopOnHCLError())
+	parsers, err := LoadParsers(filepath.Dir(path), nil, newDiscardLogger(), OptionStopOnHCLError())
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -476,7 +476,7 @@ output "mod_result" {
 		"module",
 	)
 
-	parsers, err := LoadParsers(path, []string{}, newDiscardLogger(), OptionStopOnHCLError())
+	parsers, err := LoadParsers(path, nil, newDiscardLogger(), OptionStopOnHCLError())
 	require.NoError(t, err)
 	rootModule, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -534,7 +534,7 @@ output "mod_result" {
 		"",
 	)
 
-	parsers, err := LoadParsers(path, []string{}, newDiscardLogger(), OptionStopOnHCLError())
+	parsers, err := LoadParsers(path, nil, newDiscardLogger(), OptionStopOnHCLError())
 	require.NoError(t, err)
 	rootModule, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -728,7 +728,7 @@ resource "test_resource_two" "test" {
 }
 `)
 
-	parsers, err := LoadParsers(filepath.Dir(path), []string{}, newDiscardLogger(), OptionStopOnHCLError())
+	parsers, err := LoadParsers(filepath.Dir(path), nil, newDiscardLogger(), OptionStopOnHCLError())
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -788,7 +788,7 @@ output "mod_result" {
 		"",
 	)
 
-	parsers, err := LoadParsers(path, []string{}, newDiscardLogger(), OptionStopOnHCLError())
+	parsers, err := LoadParsers(path, nil, newDiscardLogger(), OptionStopOnHCLError())
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)

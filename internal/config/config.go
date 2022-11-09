@@ -24,6 +24,8 @@ type Project struct {
 	Path string `yaml:"path,omitempty" ignored:"true"`
 	// ExcludePaths defines a list of directories that the provider should ignore.
 	ExcludePaths []string `yaml:"exclude_paths,omitempty" ignored:"true"`
+	// IncludeAllSubDirs tells auto-detection to ignore provider blocks and just use all folders with valid Terraform files.
+	IncludeAllSubDirs bool `yaml:"include_all_sub_dirs,omitempty" ignored:"true"`
 	// Name is a user defined name for the project
 	Name string `yaml:"name,omitempty" ignored:"true"`
 	// TerraformVarFiles is any var files that are to be used with the project.
