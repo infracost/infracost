@@ -1160,7 +1160,7 @@ resource_usage:
     monthly_data_retrieval: 1000 # Amount of data retrieved in GB
     public_standard_egress: 1000 # Amount of data downloaded in GB
 
-  bm_container_vpc_cluster.cluster:
+  ibm_container_vpc_cluster.cluster:
     monthly_instance_hours: 730 # Monthly number of hours an instance runs
 
   ibm_container_vpc_worker_pool.cluster_pool:
@@ -1169,7 +1169,7 @@ resource_usage:
   ibm_is_flow_log.flow_log_instance:
     transmitted_gb: 30000 # Data transmitted to the instance
 
-  ibm_is_lb:
+  ibm_is_lb.lb:
     monthly_instance_hours: 730 # Monthly number of hours an instance runs
     gigabyte_processed: 1000 # Monthly gigabytes of data processed by the load balancer 
 
