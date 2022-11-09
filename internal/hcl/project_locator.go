@@ -15,10 +15,10 @@ import (
 // ProjectLocator finds Terraform projects for given paths.
 // It naively excludes folders that are imported as modules in other projects.
 type ProjectLocator struct {
-	moduleCalls   map[string]struct{}
-	excludedDirs  []string
-	useAllSubDirs bool
-	logger        *logrus.Entry
+	moduleCalls  map[string]struct{}
+	excludedDirs []string
+	useAllPaths  bool
+	logger       *logrus.Entry
 
 	basePath string
 }
@@ -26,17 +26,17 @@ type ProjectLocator struct {
 // ProjectLocatorConfig provides configuration options on how the locator functions.
 type ProjectLocatorConfig struct {
 	ExcludedSubDirs []string
-	UseAllSubDirs   bool
+	UseAllPaths     bool
 }
 
 // NewProjectLocator returns safely initialized ProjectLocator.
 func NewProjectLocator(logger *logrus.Entry, config *ProjectLocatorConfig) *ProjectLocator {
 	if config != nil {
 		return &ProjectLocator{
-			moduleCalls:   make(map[string]struct{}),
-			excludedDirs:  config.ExcludedSubDirs,
-			logger:        logger,
-			useAllSubDirs: config.UseAllSubDirs,
+			moduleCalls:  make(map[string]struct{}),
+			excludedDirs: config.ExcludedSubDirs,
+			logger:       logger,
+			useAllPaths:  config.UseAllPaths,
 		}
 	}
 
@@ -163,6 +163,10 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) []string {
 		return []string{fullPath}
 	}
 
+	if p.useAllPaths && len(files) > 0 {
+		return []string{fullPath}
+	}
+
 	for _, file := range files {
 		body, content, diags := file.Body.PartialContent(justProviderBlocks)
 		if diags != nil && diags.HasErrors() {
@@ -170,7 +174,7 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) []string {
 			continue
 		}
 
-		if len(body.Blocks) == 0 && !p.useAllSubDirs {
+		if len(body.Blocks) == 0 {
 			continue
 		}
 
