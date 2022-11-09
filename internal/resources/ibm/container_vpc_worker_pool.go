@@ -50,7 +50,7 @@ func (r *ContainerVpcWorkerPool) BuildResource() *schema.Resource {
 	isOpenshift := strings.HasSuffix(strings.ToLower(r.KubeVersion), "openshift")
 	operatingSystem := "UBUNTU"
 	if isOpenshift {
-		operatingSystem = "REDHAT"
+		operatingSystem = "RHEL"
 	}
 	var attributeFilters = []*schema.AttributeFilter{
 		{Key: "provider", Value: strPtr("vpc-gen2")},
