@@ -199,6 +199,7 @@ func Test_metadataFetcher_Get_ReturnsUserDefinedEnvs(t *testing.T) {
 	t.Setenv("INFRACOST_VCS_PROVIDER", "github")
 	t.Setenv("INFRACOST_VCS_PULL_REQUEST_TITLE", "INFRACOST_VCS_PULL_REQUEST_TITLE_VALUE")
 	t.Setenv("INFRACOST_VCS_PULL_REQUEST_AUTHOR", "INFRACOST_VCS_PULL_REQUEST_AUTHOR_VALUE")
+	t.Setenv("INFRACOST_VCS_PULL_REQUEST_LABELS", "INFRACOST_VCS_PULL_REQUEST_LABELS_VALUE_1, INFRACOST_VCS_PULL_REQUEST_LABELS_VALUE_2")
 	t.Setenv("INFRACOST_VCS_BRANCH", "INFRACOST_BRANCH_VALUE")
 	t.Setenv("INFRACOST_VCS_BASE_BRANCH", "INFRACOST_VCS_BASE_BRANCH_VALUE")
 	t.Setenv("INFRACOST_VCS_PULL_REQUEST_URL", "https://github.com/infracost/test-repo/pull/1979")
@@ -245,6 +246,7 @@ func Test_metadataFetcher_Get_ReturnsUserDefinedEnvs(t *testing.T) {
 			VCSProvider:  "github",
 			Title:        "INFRACOST_VCS_PULL_REQUEST_TITLE_VALUE",
 			Author:       "INFRACOST_VCS_PULL_REQUEST_AUTHOR_VALUE",
+			Labels:       []string{"INFRACOST_VCS_PULL_REQUEST_LABELS_VALUE_1", "INFRACOST_VCS_PULL_REQUEST_LABELS_VALUE_2"},
 			SourceBranch: "INFRACOST_BRANCH_VALUE",
 			BaseBranch:   "INFRACOST_VCS_BASE_BRANCH_VALUE",
 			URL:          "https://github.com/infracost/test-repo/pull/1979",

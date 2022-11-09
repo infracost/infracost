@@ -141,6 +141,12 @@
         "vcsPullRequestAuthor": {
           "type": "string"
         },
+        "vcsPullRequestLabels": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
         "vcsPipelineRunId": {
           "type": "string"
         },
