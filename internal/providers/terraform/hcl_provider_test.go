@@ -183,7 +183,7 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 			logger.SetOutput(io.Discard)
 			parsers, err := hcl.LoadParsers(
 				testPath,
-				[]string{},
+				nil,
 				logrus.NewEntry(logger),
 				hcl.OptionWithBlockBuilder(
 					hcl.BlockBuilder{

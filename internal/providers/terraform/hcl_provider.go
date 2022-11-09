@@ -125,7 +125,12 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 	)
 
 	logger := ctx.Logger().WithFields(log.Fields{"provider": "terraform_dir"})
-	parsers, err := hcl.LoadParsers(ctx.ProjectConfig.Path, ctx.ProjectConfig.ExcludePaths, logger, options...)
+	parsers, err := hcl.LoadParsers(
+		ctx.ProjectConfig.Path,
+		&hcl.ProjectLocatorConfig{ExcludedSubDirs: ctx.ProjectConfig.ExcludePaths, UseAllSubDirs: ctx.ProjectConfig.IncludeAllSubDirs},
+		logger,
+		options...,
+	)
 	if err != nil {
 		return nil, err
 	}
