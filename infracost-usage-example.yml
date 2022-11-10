@@ -1154,8 +1154,8 @@ resource_usage:
     accelerated_archive_restore: 1000 # Amount of data restored from its archived state in GB
     aspera_ingress: 1000 # Amount of data uploaded with Aspera in GB
     aspera_egress: 1000 # Amount of data downloaded with Aspera in GB
-    class_a_request_count: 10000 # Monthly number of Class A requests
-    class_b_request_count: 10000 # Monthly number of Class B requests
+    class_a_request_count: 10 # Monthly number of Class A requests, 1k
+    class_b_request_count: 10 # Monthly number of Class B requests 10k
     monthly_average_capacity: 1000 # Average amount of data stored in GB
     monthly_data_retrieval: 1000 # Amount of data retrieved in GB
     public_standard_egress: 1000 # Amount of data downloaded in GB

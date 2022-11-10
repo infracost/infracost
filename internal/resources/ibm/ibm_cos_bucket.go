@@ -15,7 +15,6 @@ import (
 
 type IbmCosBucket struct {
 	Address            string
-	Region             string
 	Location           string
 	LocationIdentifier string
 	StorageClass       string
@@ -31,9 +30,9 @@ type IbmCosBucket struct {
 	ArchiveRestore             *float64 `infracost_usage:"archive_restore"`
 	AcceleratedArchiveCapacity *float64 `infracost_usage:"accelerated_archive_capacity"`
 	AcceleratedArchiveRestore  *float64 `infracost_usage:"accelerated_archive_restore"`
+	MonthlyDataRetrieval       *float64 `infracost_usage:"monthly_data_retrieval"`
 	ClassARequestCount         *int64   `infracost_usage:"class_a_request_count"`
 	ClassBRequestCount         *int64   `infracost_usage:"class_b_request_count"`
-	MonthlyDataRetrieval       *float64 `infracost_usage:"monthly_data_retrieval"`
 }
 
 // IbmCosBucketUsageSchema defines a list which represents the usage schema of IbmCosBucket.
@@ -51,24 +50,41 @@ var IbmCosBucketUsageSchema = []*schema.UsageItem{
 	{Key: "monthly_data_retrieval", ValueType: schema.Int64, DefaultValue: 0},
 }
 
+var oneRateMapping = map[string]string{
+	"us-south": "na",
+	"us-east":  "na",
+	"ca-tor":   "na",
+	"mon01":    "na",
+	"sjc04":    "na",
+	"eu-gb":    "eu",
+	"eu-de":    "eu",
+	"ams03":    "eu",
+	"mil01":    "eu",
+	"par01":    "eu",
+	"br-sao":   "sa",
+	"au-syd":   "ap",
+	"jp-osa":   "ap",
+	"jp-tok":   "ap",
+	"che01":    "ap",
+	"sng01":    "ap",
+}
+
 // PopulateUsage parses the u schema.UsageData into the IbmCosBucket.
 // It uses the `infracost_usage` struct tags to populate data into the IbmCosBucket.
 func (r *IbmCosBucket) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *IbmCosBucket) MonthlyAverageCapacityCostComponent() *schema.CostComponent {
-
+func (r *IbmCosBucket) StandardMonthlyAverageCapacityCostComponent() *schema.CostComponent {
 	var q *decimal.Decimal
 
 	if r.MonthlyAverageCapacity != nil {
-		q = decimalPtr(decimal.NewFromInt(int64(*r.MonthlyAverageCapacity)))
+		q = decimalPtr(decimal.NewFromFloat((*r.MonthlyAverageCapacity)))
 	}
 
-	s := r.StorageClass
 	u := ""
 
-	switch s {
+	switch r.StorageClass {
 	case "vault":
 		u = "STORAGE_VAULT"
 	case "standard":
@@ -80,16 +96,20 @@ func (r *IbmCosBucket) MonthlyAverageCapacityCostComponent() *schema.CostCompone
 	}
 
 	return &schema.CostComponent{
-		Name:            "Monthly Average Capacity",
+		Name:            "Storage Capacity",
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
-			VendorName:       strPtr("ibm"),
-			Region:           strPtr(r.Location),
-			Service:          strPtr(("cloud-object-storage")),
-			ProductFamily:    strPtr("iaas"),
-			AttributeFilters: []*schema.AttributeFilter{},
+			VendorName:    strPtr("ibm"),
+			Region:        strPtr(r.Location),
+			Service:       strPtr(("cloud-object-storage")),
+			ProductFamily: strPtr("iaas"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{
+					Key: "planName", Value: strPtr(r.Plan),
+				},
+			},
 		},
 		PriceFilter: &schema.PriceFilter{
 			Unit: strPtr(u),
@@ -97,18 +117,16 @@ func (r *IbmCosBucket) MonthlyAverageCapacityCostComponent() *schema.CostCompone
 	}
 }
 
-func (r *IbmCosBucket) ClassARequestCountCostComponent() *schema.CostComponent {
-
+func (r *IbmCosBucket) StandardClassARequestCountCostComponent() *schema.CostComponent {
 	var q *decimal.Decimal
 
 	if r.ClassARequestCount != nil {
 		q = decimalPtr(decimal.NewFromInt(*r.ClassARequestCount))
 	}
 
-	s := r.StorageClass
 	u := ""
 
-	switch s {
+	switch r.StorageClass {
 	case "vault":
 		u = "CLASSA_VAULT"
 	case "standard":
@@ -125,11 +143,15 @@ func (r *IbmCosBucket) ClassARequestCountCostComponent() *schema.CostComponent {
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
-			VendorName:       strPtr("ibm"),
-			Region:           strPtr(r.Location),
-			Service:          strPtr(("cloud-object-storage")),
-			ProductFamily:    strPtr("iaas"),
-			AttributeFilters: []*schema.AttributeFilter{},
+			VendorName:    strPtr("ibm"),
+			Region:        strPtr(r.Location),
+			Service:       strPtr(("cloud-object-storage")),
+			ProductFamily: strPtr("iaas"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{
+					Key: "planName", Value: strPtr(r.Plan),
+				},
+			},
 		},
 		PriceFilter: &schema.PriceFilter{
 			Unit: strPtr(u),
@@ -137,18 +159,16 @@ func (r *IbmCosBucket) ClassARequestCountCostComponent() *schema.CostComponent {
 	}
 }
 
-func (r *IbmCosBucket) ClassBRequestCountCostComponent() *schema.CostComponent {
-
+func (r *IbmCosBucket) StandardClassBRequestCountCostComponent() *schema.CostComponent {
 	var q *decimal.Decimal
 
 	if r.ClassBRequestCount != nil {
 		q = decimalPtr(decimal.NewFromInt(*r.ClassBRequestCount))
 	}
 
-	s := r.StorageClass
 	u := ""
 
-	switch s {
+	switch r.StorageClass {
 	case "vault":
 		u = "CLASSB_VAULT"
 	case "standard":
@@ -162,14 +182,18 @@ func (r *IbmCosBucket) ClassBRequestCountCostComponent() *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "Class B requests",
 		Unit:            "10k API calls",
-		UnitMultiplier:  decimal.NewFromInt(1),
+		UnitMultiplier:  decimal.NewFromFloat(1),
 		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
-			VendorName:       strPtr("ibm"),
-			Region:           strPtr(r.Location),
-			Service:          strPtr(("cloud-object-storage")),
-			ProductFamily:    strPtr("iaas"),
-			AttributeFilters: []*schema.AttributeFilter{},
+			VendorName:    strPtr("ibm"),
+			Region:        strPtr(r.Location),
+			Service:       strPtr(("cloud-object-storage")),
+			ProductFamily: strPtr("iaas"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{
+					Key: "planName", Value: strPtr(r.Plan),
+				},
+			},
 		},
 		PriceFilter: &schema.PriceFilter{
 			Unit: strPtr(u),
@@ -177,20 +201,18 @@ func (r *IbmCosBucket) ClassBRequestCountCostComponent() *schema.CostComponent {
 	}
 }
 
-func (r *IbmCosBucket) PublicStandardEgressCostComponent() *schema.CostComponent {
-
+func (r *IbmCosBucket) StandardEgressCostComponent() *schema.CostComponent {
 	var q *decimal.Decimal
 
 	if r.PublicStandardEgress != nil {
-		q = decimalPtr(decimal.NewFromInt(int64(*r.PublicStandardEgress)))
+		q = decimalPtr(decimal.NewFromFloat(*r.PublicStandardEgress))
 	}
 
 	// using bandwidth for egress
 	// https://github.ibm.com/ibmcloud/estimator/blob/f9dfa477c27bbf7570d296816bdc07b706646572/__tests__/client/fixtures/callback-estimate.json#L41
-	s := r.StorageClass
 	u := ""
 
-	switch s {
+	switch r.StorageClass {
 	case "vault":
 		u = "BANDWIDTH_VAULT"
 	case "standard":
@@ -207,11 +229,15 @@ func (r *IbmCosBucket) PublicStandardEgressCostComponent() *schema.CostComponent
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
-			VendorName:       strPtr("ibm"),
-			Region:           strPtr(r.Location),
-			Service:          strPtr(("cloud-object-storage")),
-			ProductFamily:    strPtr("iaas"),
-			AttributeFilters: []*schema.AttributeFilter{},
+			VendorName:    strPtr("ibm"),
+			Region:        strPtr(r.Location),
+			Service:       strPtr(("cloud-object-storage")),
+			ProductFamily: strPtr("iaas"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{
+					Key: "planName", Value: strPtr(r.Plan),
+				},
+			},
 		},
 		PriceFilter: &schema.PriceFilter{
 			Unit: strPtr(u),
@@ -220,7 +246,6 @@ func (r *IbmCosBucket) PublicStandardEgressCostComponent() *schema.CostComponent
 }
 
 func (r *IbmCosBucket) AsperaIngressCostComponent() *schema.CostComponent {
-
 	var q *decimal.Decimal
 
 	if r.AsperaIngress != nil {
@@ -233,11 +258,15 @@ func (r *IbmCosBucket) AsperaIngressCostComponent() *schema.CostComponent {
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
-			VendorName:       strPtr("ibm"),
-			Region:           strPtr(r.Location),
-			Service:          strPtr(("cloud-object-storage")),
-			ProductFamily:    strPtr("iaas"),
-			AttributeFilters: []*schema.AttributeFilter{},
+			VendorName:    strPtr("ibm"),
+			Region:        strPtr(r.Location),
+			Service:       strPtr(("cloud-object-storage")),
+			ProductFamily: strPtr("iaas"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{
+					Key: "planName", Value: strPtr("standard"),
+				},
+			},
 		},
 		PriceFilter: &schema.PriceFilter{
 			Unit: strPtr("ASPERA_INGRESS"),
@@ -251,7 +280,6 @@ func (r *IbmCosBucket) AsperaIngressCostComponent() *schema.CostComponent {
 }
 
 func (r *IbmCosBucket) AsperaEgressCostComponent() *schema.CostComponent {
-
 	var q *decimal.Decimal
 
 	if r.AsperaEgress != nil {
@@ -264,11 +292,15 @@ func (r *IbmCosBucket) AsperaEgressCostComponent() *schema.CostComponent {
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
-			VendorName:       strPtr("ibm"),
-			Region:           strPtr(r.Location),
-			Service:          strPtr(("cloud-object-storage")),
-			ProductFamily:    strPtr("iaas"),
-			AttributeFilters: []*schema.AttributeFilter{},
+			VendorName:    strPtr("ibm"),
+			Region:        strPtr(r.Location),
+			Service:       strPtr(("cloud-object-storage")),
+			ProductFamily: strPtr("iaas"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{
+					Key: "planName", Value: strPtr("standard"),
+				},
+			},
 		},
 		PriceFilter: &schema.PriceFilter{
 			Unit: strPtr("ASPERA_EGRESS"),
@@ -277,11 +309,19 @@ func (r *IbmCosBucket) AsperaEgressCostComponent() *schema.CostComponent {
 }
 
 func (r *IbmCosBucket) ArchiveCapacityCostComponent() *schema.CostComponent {
-
 	var q *decimal.Decimal
 
 	if r.ArchiveCapacity != nil {
 		q = decimalPtr(decimal.NewFromInt(int64(*r.ArchiveCapacity)))
+	}
+
+	var region string
+
+	switch r.Plan {
+	case "standard":
+		region = r.Location
+	case "cos-one-rate-plan":
+		region = oneRateMapping[r.Location]
 	}
 
 	return &schema.CostComponent{
@@ -290,11 +330,15 @@ func (r *IbmCosBucket) ArchiveCapacityCostComponent() *schema.CostComponent {
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
-			VendorName:       strPtr("ibm"),
-			Region:           strPtr(r.Location),
-			Service:          strPtr(("cloud-object-storage")),
-			ProductFamily:    strPtr("iaas"),
-			AttributeFilters: []*schema.AttributeFilter{},
+			VendorName:    strPtr("ibm"),
+			Region:        strPtr(region),
+			Service:       strPtr(("cloud-object-storage")),
+			ProductFamily: strPtr("iaas"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{
+					Key: "planName", Value: strPtr(r.Plan),
+				},
+			},
 		},
 		PriceFilter: &schema.PriceFilter{
 			Unit: strPtr("ARCHIVE_STORAGE"),
@@ -303,11 +347,19 @@ func (r *IbmCosBucket) ArchiveCapacityCostComponent() *schema.CostComponent {
 }
 
 func (r *IbmCosBucket) ArchiveRestoreCostComponent() *schema.CostComponent {
-
 	var q *decimal.Decimal
 
 	if r.ArchiveRestore != nil {
 		q = decimalPtr(decimal.NewFromInt(int64(*r.ArchiveRestore)))
+	}
+
+	var region string
+
+	switch r.Plan {
+	case "standard":
+		region = r.Location
+	case "cos-one-rate-plan":
+		region = oneRateMapping[r.Location]
 	}
 
 	return &schema.CostComponent{
@@ -316,11 +368,15 @@ func (r *IbmCosBucket) ArchiveRestoreCostComponent() *schema.CostComponent {
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
-			VendorName:       strPtr("ibm"),
-			Region:           strPtr(r.Location),
-			Service:          strPtr(("cloud-object-storage")),
-			ProductFamily:    strPtr("iaas"),
-			AttributeFilters: []*schema.AttributeFilter{},
+			VendorName:    strPtr("ibm"),
+			Region:        strPtr(region),
+			Service:       strPtr(("cloud-object-storage")),
+			ProductFamily: strPtr("iaas"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{
+					Key: "planName", Value: strPtr(r.Plan),
+				},
+			},
 		},
 		PriceFilter: &schema.PriceFilter{
 			Unit: strPtr("ARCHIVE_RESTORE"),
@@ -329,11 +385,19 @@ func (r *IbmCosBucket) ArchiveRestoreCostComponent() *schema.CostComponent {
 }
 
 func (r *IbmCosBucket) AcceleratedArchiveCapacityCostComponent() *schema.CostComponent {
-
 	var q *decimal.Decimal
 
 	if r.ArchiveCapacity != nil {
 		q = decimalPtr(decimal.NewFromInt(int64(*r.ArchiveCapacity)))
+	}
+
+	var region string
+
+	switch r.Plan {
+	case "standard":
+		region = r.Location
+	case "cos-one-rate-plan":
+		region = oneRateMapping[r.Location]
 	}
 
 	return &schema.CostComponent{
@@ -342,11 +406,15 @@ func (r *IbmCosBucket) AcceleratedArchiveCapacityCostComponent() *schema.CostCom
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
-			VendorName:       strPtr("ibm"),
-			Region:           strPtr(r.Location),
-			Service:          strPtr(("cloud-object-storage")),
-			ProductFamily:    strPtr("iaas"),
-			AttributeFilters: []*schema.AttributeFilter{},
+			VendorName:    strPtr("ibm"),
+			Region:        strPtr(region),
+			Service:       strPtr(("cloud-object-storage")),
+			ProductFamily: strPtr("iaas"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{
+					Key: "planName", Value: strPtr(r.Plan),
+				},
+			},
 		},
 		PriceFilter: &schema.PriceFilter{
 			Unit: strPtr("ACCELERATEDARCHIVE_STORAGE"),
@@ -355,11 +423,19 @@ func (r *IbmCosBucket) AcceleratedArchiveCapacityCostComponent() *schema.CostCom
 }
 
 func (r *IbmCosBucket) AcceleratedArchiveRestoreCostComponent() *schema.CostComponent {
-
 	var q *decimal.Decimal
 
 	if r.ArchiveRestore != nil {
 		q = decimalPtr(decimal.NewFromInt(int64(*r.ArchiveRestore)))
+	}
+
+	var region string
+
+	switch r.Plan {
+	case "standard":
+		region = r.Location
+	case "cos-one-rate-plan":
+		region = oneRateMapping[r.Location]
 	}
 
 	return &schema.CostComponent{
@@ -368,11 +444,15 @@ func (r *IbmCosBucket) AcceleratedArchiveRestoreCostComponent() *schema.CostComp
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
-			VendorName:       strPtr("ibm"),
-			Region:           strPtr(r.Location),
-			Service:          strPtr(("cloud-object-storage")),
-			ProductFamily:    strPtr("iaas"),
-			AttributeFilters: []*schema.AttributeFilter{},
+			VendorName:    strPtr("ibm"),
+			Region:        strPtr(region),
+			Service:       strPtr(("cloud-object-storage")),
+			ProductFamily: strPtr("iaas"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{
+					Key: "planName", Value: strPtr(r.Plan),
+				},
+			},
 		},
 		PriceFilter: &schema.PriceFilter{
 			Unit: strPtr("ACCELERATEDARCHIVE_RESTORE"),
@@ -381,7 +461,6 @@ func (r *IbmCosBucket) AcceleratedArchiveRestoreCostComponent() *schema.CostComp
 }
 
 func (r *IbmCosBucket) MonthlyDataRetrievalCostComponent() *schema.CostComponent {
-
 	var q *decimal.Decimal
 
 	if r.MonthlyDataRetrieval != nil {
@@ -390,11 +469,10 @@ func (r *IbmCosBucket) MonthlyDataRetrievalCostComponent() *schema.CostComponent
 
 	u := ""
 
-	if r.StorageClass == "cold" {
+	switch r.StorageClass {
+	case "cold":
 		u = "RETRIEVAL_COLD"
-	}
-
-	if r.StorageClass == "vault" {
+	case "vault":
 		u = "RETRIEVAL_VAULT"
 	}
 
@@ -404,16 +482,249 @@ func (r *IbmCosBucket) MonthlyDataRetrievalCostComponent() *schema.CostComponent
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: q,
 		ProductFilter: &schema.ProductFilter{
-			VendorName:       strPtr("ibm"),
-			Region:           strPtr(r.Location),
-			Service:          strPtr(("cloud-object-storage")),
-			ProductFamily:    strPtr("iaas"),
-			AttributeFilters: []*schema.AttributeFilter{},
+			VendorName:    strPtr("ibm"),
+			Region:        strPtr(r.Location),
+			Service:       strPtr(("cloud-object-storage")),
+			ProductFamily: strPtr("iaas"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{
+					Key: "planName", Value: strPtr(r.Plan),
+				},
+			},
 		},
 		PriceFilter: &schema.PriceFilter{
 			Unit: strPtr(u),
 		},
 	}
+}
+
+func (r *IbmCosBucket) OneRateMonthlyAverageCapacityCostComponent() *schema.CostComponent {
+	var q *decimal.Decimal
+
+	if r.MonthlyAverageCapacity != nil {
+		q = decimalPtr(decimal.NewFromFloat((*r.MonthlyAverageCapacity)))
+	}
+
+	return &schema.CostComponent{
+		Name:            "Storage Capacity",
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: q,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("ibm"),
+			Region:        strPtr(oneRateMapping[r.Location]),
+			Service:       strPtr(("cloud-object-storage")),
+			ProductFamily: strPtr("iaas"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{
+					Key: "planName", Value: strPtr(r.Plan),
+				},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			Unit: strPtr("STORAGE_ACTIVE"),
+		},
+	}
+}
+
+func (r *IbmCosBucket) OneRateClassARequestCountCostComponent() []*schema.CostComponent {
+	var freeQuantity *decimal.Decimal
+	var pricedQuantity *decimal.Decimal
+
+	if r.ClassARequestCount != nil && r.MonthlyAverageCapacity != nil {
+		lowerBound := decimal.NewFromFloat(*r.MonthlyAverageCapacity).Mul(decimal.NewFromInt(100))
+		requestCount := decimal.NewFromInt(*r.ClassARequestCount).Mul(decimal.NewFromInt(1000))
+		q := decimalPtr(decimal.NewFromInt(*r.ClassARequestCount))
+		if requestCount.LessThanOrEqual(lowerBound) {
+			freeQuantity = q
+			pricedQuantity = decimalPtr(decimal.NewFromInt(0))
+		} else {
+			freeQuantity = decimalPtr(lowerBound.Div(decimal.NewFromInt(1000)))
+			pricedQuantity = decimalPtr(q.Sub(*freeQuantity))
+		}
+	}
+
+	var costComponents []*schema.CostComponent
+
+	freeCostComponent := &schema.CostComponent{
+		Name:            "Free Class A requests",
+		Unit:            "1k API calls",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: freeQuantity,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("ibm"),
+			Region:        strPtr(oneRateMapping[r.Location]),
+			Service:       strPtr(("cloud-object-storage")),
+			ProductFamily: strPtr("iaas"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{
+					Key: "planName", Value: strPtr(r.Plan),
+				},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			Unit: strPtr("CLASSA_ACTIVE"),
+		},
+	}
+	freeCostComponent.SetCustomPrice(decimalPtr(decimal.NewFromInt(0)))
+	costComponents = append(costComponents, freeCostComponent)
+
+	pricedCostComponent := &schema.CostComponent{
+		Name:            "Class A requests",
+		Unit:            "1k API calls",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: pricedQuantity,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("ibm"),
+			Region:        strPtr(oneRateMapping[r.Location]),
+			Service:       strPtr(("cloud-object-storage")),
+			ProductFamily: strPtr("iaas"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{
+					Key: "planName", Value: strPtr(r.Plan),
+				},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			Unit: strPtr("CLASSA_ACTIVE"),
+		},
+	}
+	costComponents = append(costComponents, pricedCostComponent)
+
+	return costComponents
+}
+
+func (r *IbmCosBucket) OneRateClassBRequestCountCostComponent() []*schema.CostComponent {
+	var freeQuantity *decimal.Decimal
+	var pricedQuantity *decimal.Decimal
+
+	if r.ClassBRequestCount != nil && r.MonthlyAverageCapacity != nil {
+		lowerBound := decimal.NewFromFloat(*r.MonthlyAverageCapacity).Mul(decimal.NewFromInt(100))
+		requestCount := decimal.NewFromInt(*r.ClassBRequestCount).Mul(decimal.NewFromInt(10000))
+		q := decimalPtr(decimal.NewFromInt(*r.ClassBRequestCount))
+		if requestCount.LessThanOrEqual(lowerBound) {
+			freeQuantity = q
+			pricedQuantity = decimalPtr(decimal.NewFromInt(0))
+		} else {
+			freeQuantity = decimalPtr(lowerBound.Div(decimal.NewFromInt(10000)))
+			pricedQuantity = decimalPtr(q.Sub(*freeQuantity))
+		}
+	}
+
+	var costComponents []*schema.CostComponent
+
+	freeCostComponent := &schema.CostComponent{
+		Name:            "Free Class B requests",
+		Unit:            "10k API calls",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: freeQuantity,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("ibm"),
+			Region:        strPtr(oneRateMapping[r.Location]),
+			Service:       strPtr(("cloud-object-storage")),
+			ProductFamily: strPtr("iaas"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{
+					Key: "planName", Value: strPtr(r.Plan),
+				},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			Unit: strPtr("CLASSB_ACTIVE"),
+		},
+	}
+	freeCostComponent.SetCustomPrice(decimalPtr(decimal.NewFromInt(0)))
+	costComponents = append(costComponents, freeCostComponent)
+
+	pricedCostComponent := &schema.CostComponent{
+		Name:            "Class B requests",
+		Unit:            "10k API calls",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: pricedQuantity,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("ibm"),
+			Region:        strPtr(oneRateMapping[r.Location]),
+			Service:       strPtr(("cloud-object-storage")),
+			ProductFamily: strPtr("iaas"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{
+					Key: "planName", Value: strPtr(r.Plan),
+				},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			Unit: strPtr("CLASSB_ACTIVE"),
+		},
+	}
+	costComponents = append(costComponents, pricedCostComponent)
+
+	return costComponents
+}
+
+func (r *IbmCosBucket) OneRateEgressCostComponent() []*schema.CostComponent {
+	var freeQuantity *decimal.Decimal
+	var pricedQuantity *decimal.Decimal
+
+	if r.PublicStandardEgress != nil && r.MonthlyAverageCapacity != nil {
+		lowerBound := decimal.NewFromFloat(*r.MonthlyAverageCapacity)
+		q := decimalPtr(decimal.NewFromFloat(*r.PublicStandardEgress))
+		if q.LessThanOrEqual(lowerBound) {
+			freeQuantity = q
+			pricedQuantity = decimalPtr(decimal.NewFromInt(0))
+		} else {
+			freeQuantity = decimalPtr(lowerBound)
+			pricedQuantity = decimalPtr(q.Sub(lowerBound))
+		}
+	}
+
+	var costComponents []*schema.CostComponent
+
+	freeCostComponent := &schema.CostComponent{
+		Name:            "Free Public Egress",
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: freeQuantity,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("ibm"),
+			Region:        strPtr(oneRateMapping[r.Location]),
+			Service:       strPtr(("cloud-object-storage")),
+			ProductFamily: strPtr("iaas"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{
+					Key: "planName", Value: strPtr(r.Plan),
+				},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			Unit: strPtr("CLASSB_ACTIVE"),
+		},
+	}
+	freeCostComponent.SetCustomPrice(decimalPtr(decimal.NewFromInt(0)))
+	costComponents = append(costComponents, freeCostComponent)
+
+	pricedCostComponent := &schema.CostComponent{
+		Name:            "Public Egress",
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: pricedQuantity,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("ibm"),
+			Region:        strPtr(oneRateMapping[r.Location]),
+			Service:       strPtr(("cloud-object-storage")),
+			ProductFamily: strPtr("iaas"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{
+					Key: "planName", Value: strPtr(r.Plan),
+				},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			Unit: strPtr("BANDWIDTH_ACTIVE"),
+		},
+	}
+	costComponents = append(costComponents, pricedCostComponent)
+
+	return costComponents
 }
 
 func (r *IbmCosBucket) LitePlanCostComponent() *schema.CostComponent {
@@ -448,14 +759,37 @@ func (r *IbmCosBucket) BuildResource() *schema.Resource {
 
 		costComponents = append(
 			costComponents,
-			r.MonthlyAverageCapacityCostComponent(),
-			r.ClassARequestCountCostComponent(),
-			r.ClassBRequestCountCostComponent(),
-			r.PublicStandardEgressCostComponent(),
+			r.StandardMonthlyAverageCapacityCostComponent(),
+			r.StandardClassARequestCountCostComponent(),
+			r.StandardClassBRequestCountCostComponent(),
+			r.StandardEgressCostComponent(),
 		)
 
 		if r.StorageClass == "vault" || r.StorageClass == "cold" {
 			costComponents = append(costComponents, r.MonthlyDataRetrievalCostComponent())
+		}
+	} else if r.Plan == "cos-one-rate-plan" {
+		costComponents = append(costComponents, r.OneRateMonthlyAverageCapacityCostComponent())
+		costComponents = append(
+			costComponents,
+			r.OneRateClassARequestCountCostComponent()...,
+		)
+		costComponents = append(
+			costComponents,
+			r.OneRateClassBRequestCountCostComponent()...,
+		)
+		costComponents = append(
+			costComponents,
+			r.OneRateEgressCostComponent()...,
+		)
+		if r.LocationIdentifier == "region_location" && r.Archive {
+			if strings.ToLower(r.ArchiveType) == "glacier" {
+				costComponents = append(costComponents, r.ArchiveCapacityCostComponent(), r.ArchiveRestoreCostComponent())
+			} else if strings.ToLower(r.ArchiveType) == "accelerated" {
+				costComponents = append(costComponents, r.AcceleratedArchiveCapacityCostComponent(), r.AcceleratedArchiveRestoreCostComponent())
+			}
+		} else if (r.LocationIdentifier == "region_location" || r.LocationIdentifier == "cross_region_location") && (r.AsperaEgress != nil || r.AsperaIngress != nil) {
+			costComponents = append(costComponents, r.AsperaEgressCostComponent(), r.AsperaIngressCostComponent())
 		}
 	}
 

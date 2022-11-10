@@ -2,7 +2,7 @@ terraform {
   required_providers {
     ibm = {
       source  = "IBM-Cloud/ibm"
-      version = "~> 1.40.0"
+      version = "1.47.0"
     }
   }
 }
@@ -96,5 +96,27 @@ resource "ibm_cos_bucket" "lite-us-south" {
   bucket_name          = "standard-bucket-at-us-south"
   resource_instance_id = ibm_resource_instance.cos-lite-instance.id
   storage_class        = "standard"
+  region_location      = "us-south"
+}
+
+resource "ibm_resource_instance" "cos-one-rate-instance" {
+  name              = "cos-instance"
+  resource_group_id = ibm_resource_group.cos_group.id
+  service           = "cloud-object-storage"
+  plan              = "cos-one-rate-plan"
+  location          = "global"
+}
+
+resource "ibm_cos_bucket" "one-rate-us-south" {
+  bucket_name          = "active-bucket-at-us-south"
+  resource_instance_id = ibm_resource_instance.cos-one-rate-instance.id
+  storage_class        = "onerate_active"
+  region_location      = "us-south"
+}
+
+resource "ibm_cos_bucket" "one-rate-us-south-usage" {
+  bucket_name          = "active-bucket-at-us-south-usage"
+  resource_instance_id = ibm_resource_instance.cos-one-rate-instance.id
+  storage_class        = "onerate_active"
   region_location      = "us-south"
 }

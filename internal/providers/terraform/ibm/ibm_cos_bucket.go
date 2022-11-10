@@ -72,7 +72,6 @@ func newIbmCosBucket(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 
 	r := &ibm.IbmCosBucket{
 		Address:            d.Address,
-		Region:             d.Get("region").String(),
 		Location:           location,
 		LocationIdentifier: locationIdentifier,
 		StorageClass:       storage_class,
