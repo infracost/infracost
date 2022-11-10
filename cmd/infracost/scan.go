@@ -16,7 +16,7 @@ import (
 	"github.com/infracost/infracost/internal/ui"
 )
 
-type ScanCommand struct {
+type scanCmd struct {
 	TerraformVarFiles  []string
 	TerraformVars      []string
 	TerraformWorkspace string
@@ -28,14 +28,14 @@ type ScanCommand struct {
 	cmd *cobra.Command
 }
 
-func (s ScanCommand) printUsage() {
+func (s scanCmd) printUsage() {
 	ui.PrintUsage(s.cmd)
 }
-func (s ScanCommand) hasProjectFlags() bool {
+func (s scanCmd) hasProjectFlags() bool {
 	return s.Path != "" || len(s.TerraformVars) > 0 || len(s.TerraformVarFiles) > 0 || s.TerraformWorkspace != ""
 }
 
-func (s ScanCommand) loadRunFlags(cfg *config.Config) error {
+func (s scanCmd) loadRunFlags(cfg *config.Config) error {
 	if s.Path == "" && s.ConfigFile == "" {
 		m := fmt.Sprintf("No path specified\n\nUse the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
 		m += fmt.Sprintf(" - Terraform/Terragrunt directory\n - Terraform plan JSON file, see %s for how to generate this.", ui.SecondaryLinkString("https://infracost.io/troubleshoot"))
@@ -76,7 +76,7 @@ func (s ScanCommand) loadRunFlags(cfg *config.Config) error {
 	return nil
 }
 
-func (s ScanCommand) run(runCtx *config.RunContext) error {
+func (s scanCmd) run(runCtx *config.RunContext) error {
 	err := s.loadRunFlags(runCtx.Config)
 	if err != nil {
 		return err
@@ -135,7 +135,7 @@ func (s ScanCommand) run(runCtx *config.RunContext) error {
 }
 
 func scanCommand(ctx *config.RunContext) *cobra.Command {
-	var scan ScanCommand
+	var scan scanCmd
 
 	cmd := &cobra.Command{
 		Use:    "scan",
