@@ -5,7 +5,7 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"strings"
 	"time"
 
@@ -57,7 +57,7 @@ func NewUsageAPIClient(ctx *config.RunContext) *UsageAPIClient {
 			rootCAs = x509.NewCertPool()
 		}
 
-		caCerts, err := ioutil.ReadFile(ctx.Config.TLSCACertFile)
+		caCerts, err := os.ReadFile(ctx.Config.TLSCACertFile)
 		if err != nil {
 			logging.Logger.WithError(err).Errorf("Error reading CA cert file %s", ctx.Config.TLSCACertFile)
 		} else {

@@ -22,7 +22,7 @@ import (
 func TestTerraformPlanScanner_ScanPlan(t *testing.T) {
 	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.URL.Path == "/recommend" {
-			w.Write([]byte(`
+			_, _ = w.Write([]byte(`
 			{
 				"result": [
 					{
