@@ -71,7 +71,7 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 		s += "\n"
 	}
 
-	totalOut := Format2DP(out.Currency, out.TotalMonthlyCost)
+	totalOut := FormatCost2DP(out.Currency, out.TotalMonthlyCost)
 
 	overallTitle := formatTitleWithCurrency(" OVERALL TOTAL", out.Currency)
 	s += fmt.Sprintf("%s%s",
@@ -186,7 +186,7 @@ func tableForBreakdown(currency string, breakdown Breakdown, fields []string, in
 		for q := 0; q < numOfFields; q++ {
 			totalCostRow = append(totalCostRow, "")
 		}
-		totalCostRow = append(totalCostRow, Format2DP(currency, breakdown.TotalMonthlyCost))
+		totalCostRow = append(totalCostRow, FormatCost2DP(currency, breakdown.TotalMonthlyCost))
 		t.AppendRow(totalCostRow)
 	}
 
@@ -252,10 +252,10 @@ func buildCostComponentRows(t table.Writer, currency string, costComponents []Co
 				tableRow = append(tableRow, c.Unit)
 			}
 			if contains(fields, "hourlyCost") {
-				tableRow = append(tableRow, Format2DP(currency, c.HourlyCost))
+				tableRow = append(tableRow, FormatCost2DP(currency, c.HourlyCost))
 			}
 			if contains(fields, "monthlyCost") {
-				tableRow = append(tableRow, Format2DP(currency, c.MonthlyCost))
+				tableRow = append(tableRow, FormatCost2DP(currency, c.MonthlyCost))
 			}
 
 			t.AppendRow(tableRow)

@@ -11,10 +11,9 @@ import (
 
 	"github.com/tidwall/gjson"
 
-	"github.com/infracost/infracost/internal/schema"
-
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/logging"
+	"github.com/infracost/infracost/internal/schema"
 )
 
 type UsageAPIClient struct {
@@ -201,20 +200,23 @@ func (c *UsageAPIClient) ListUsageQuantities(vars UsageQuantitiesQueryVariables)
 // Nested usage keys are returned from the usage API in a graphQL-friendly flattened format
 // with "." as a key separator. For example s3 standard usage is retrieved as:
 // [
-//   { "usageKey": "standard.storage_gb", "monthlyQuantity": "123" },
-//   { "usageKey": "standard.monthly_tier_1_requests", "monthlyQuantity": "456" },
-//   ...
+//
+//	{ "usageKey": "standard.storage_gb", "monthlyQuantity": "123" },
+//	{ "usageKey": "standard.monthly_tier_1_requests", "monthlyQuantity": "456" },
+//	...
+//
 // ]
 //
 // When converted to a nested format needed for for UsageData.Attributes, the keys would be:
-// {
-//    "standard": {
-//      "storage_gb: "123",
-//      "monthly_tier_1_requests": "456",
-//      ...
-//    },
-//    ...
-// }
+//
+//	{
+//	   "standard": {
+//	     "storage_gb: "123",
+//	     "monthly_tier_1_requests": "456",
+//	     ...
+//	   },
+//	   ...
+//	}
 func unflattenUsageKey(attribs map[string]interface{}, usageKey string, value string) {
 	split := strings.SplitN(usageKey, ".", 2)
 	if len(split) <= 1 {

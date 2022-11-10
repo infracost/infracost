@@ -122,7 +122,7 @@ func (s scanCmd) run(runCtx *config.RunContext) error {
 		for i, suggestion := range project.Metadata.Recommendations {
 			cost := "?"
 			if suggestion.Cost != nil {
-				cost = output.Format2DP(runCtx.Config.Currency, suggestion.Cost)
+				cost = output.FormatCost2DP(runCtx.Config.Currency, suggestion.Cost)
 			}
 
 			rows[i+1] = []string{suggestion.Address, suggestion.Title, cost}

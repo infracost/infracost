@@ -74,7 +74,7 @@ func TestFormatCost2DP(t *testing.T) {
 				val = &parsed
 			}
 
-			got := Format2DP(tc.currency, val)
+			got := FormatCost2DP(tc.currency, val)
 
 			diff := cmp.Diff(tc.expected, got)
 			if diff != "" {
