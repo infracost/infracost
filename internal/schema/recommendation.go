@@ -6,27 +6,27 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type Suggestion struct {
+type Recommendation struct {
 	ID                 string           `json:"id"`
 	Title              string           `json:"title"`
 	Description        string           `json:"description"`
-	ResourceType       string           `json:"resourceType"`
-	ResourceAttributes json.RawMessage  `json:"resourceAttributes"`
+	ResourceType       string           `json:"resource_type"`
+	ResourceAttributes json.RawMessage  `json:"resource_attributes"`
 	Address            string           `json:"address"`
 	Suggested          string           `json:"suggested"`
 	NoCost             bool             `json:"no_cost"`
 	Cost               *decimal.Decimal `json:"cost"`
 }
 
-type Suggestions []Suggestion
+type Recommendations []Recommendation
 
-func (s Suggestions) Len() int {
-	return len(s)
+func (r Recommendations) Len() int {
+	return len(r)
 }
 
-func (s Suggestions) Less(i, j int) bool {
-	iSug := s[i]
-	jSug := s[j]
+func (r Recommendations) Less(i, j int) bool {
+	iSug := r[i]
+	jSug := r[j]
 
 	if iSug.Cost == nil && jSug.Cost == nil {
 		return iSug.Address < jSug.Address
@@ -47,6 +47,6 @@ func (s Suggestions) Less(i, j int) bool {
 	return iSug.Cost.GreaterThan(*jSug.Cost)
 }
 
-func (s Suggestions) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
+func (r Recommendations) Swap(i, j int) {
+	r[i], r[j] = r[j], r[i]
 }

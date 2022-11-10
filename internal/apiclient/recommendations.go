@@ -12,6 +12,8 @@ import (
 	"github.com/infracost/infracost/internal/config"
 )
 
+// RecommendationClient wraps the base http.Client with common handling patterns for the
+// Infracost Cloud recommendations API.
 type RecommendationClient struct {
 	client  *http.Client
 	baseURL string
@@ -19,6 +21,7 @@ type RecommendationClient struct {
 	logger  *logrus.Entry
 }
 
+// NewRecommendationClient returns safely initialised RecommendationClient.
 func NewRecommendationClient(config *config.Config, logger *logrus.Entry) RecommendationClient {
 	return RecommendationClient{
 		client:  &http.Client{Timeout: time.Second * 5},
@@ -28,7 +31,8 @@ func NewRecommendationClient(config *config.Config, logger *logrus.Entry) Recomm
 	}
 }
 
-func (r RecommendationClient) GetSuggestions(plan []byte) ([]Suggestion, error) {
+// GetRecommendations fetches cost optimization recommendations from Infracost Cloud.
+func (r RecommendationClient) GetRecommendations(plan []byte) ([]Recommendation, error) {
 	buf := bytes.NewBuffer(plan)
 
 	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/recommend", r.baseURL), buf)
@@ -40,6 +44,7 @@ func (r RecommendationClient) GetSuggestions(plan []byte) ([]Suggestion, error) 
 	if err != nil {
 		return nil, fmt.Errorf("failed to make request to suggestions API %w", err)
 	}
+	defer res.Body.Close()
 
 	var result RecommendDecisionResponse
 	err = json.NewDecoder(res.Body).Decode(&result)
@@ -56,15 +61,15 @@ func (r RecommendationClient) GetSuggestions(plan []byte) ([]Suggestion, error) 
 }
 
 type RecommendDecisionResponse struct {
-	Result []Suggestion `json:"result"`
+	Result []Recommendation `json:"result"`
 }
 
-type Suggestion struct {
+type Recommendation struct {
 	ID                 string          `json:"id"`
 	Title              string          `json:"title"`
 	Description        string          `json:"description"`
-	ResourceType       string          `json:"resourceType"`
-	ResourceAttributes json.RawMessage `json:"resourceAttributes"`
+	ResourceType       string          `json:"resource_type"`
+	ResourceAttributes json.RawMessage `json:"resource_attributes"`
 	Address            string          `json:"address"`
 	Suggested          string          `json:"suggested"`
 	NoCost             bool            `json:"no_cost"`

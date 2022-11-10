@@ -112,14 +112,14 @@ func (s ScanCommand) run(runCtx *config.RunContext) error {
 	spinner.Success()
 
 	for _, project := range projects {
-		if len(project.Metadata.Suggestions) == 0 {
+		if len(project.Metadata.Recommendations) == 0 {
 			pterm.DefaultBox.WithTitle(project.Name).Println(pterm.Green("No cost optimizations found."))
 			continue
 		}
 
-		rows := make([][]string, len(project.Metadata.Suggestions)+1)
+		rows := make([][]string, len(project.Metadata.Recommendations)+1)
 		rows[0] = []string{"Address", "Title", "Cost Saving"}
-		for i, suggestion := range project.Metadata.Suggestions {
+		for i, suggestion := range project.Metadata.Recommendations {
 			cost := "?"
 			if suggestion.Cost != nil {
 				cost = output.Format2DP(runCtx.Config.Currency, suggestion.Cost)
