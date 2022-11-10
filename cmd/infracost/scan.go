@@ -11,7 +11,8 @@ import (
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/output"
-	"github.com/infracost/infracost/internal/scan"
+	"github.com/infracost/infracost/internal/providers/terraform"
+	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
 )
 
@@ -89,18 +90,36 @@ func (s ScanCommand) run(runCtx *config.RunContext) error {
 	spinner := ui.NewSpinner("Scanning projects for cost optimizations...", spinnerOpts)
 	defer spinner.Fail()
 
-	scanner := scan.NewScanner(runCtx, logging.Logger.WithFields(log.Fields{}))
-	projectSuggestions, err := scanner.ScanPaths()
-	if err != nil {
-		return err
+	var projects []*schema.Project
+	for _, project := range runCtx.Config.Projects {
+		projectCtx := config.NewProjectContext(runCtx, project, log.Fields{})
+		hclProvider, err := terraform.NewHCLProvider(projectCtx, &terraform.HCLProviderConfig{SuppressLogging: true})
+		if err != nil {
+			logging.Logger.WithError(err).Errorf("failed to load a provider for path %s", project.Path)
+			continue
+		}
+
+		// TODO load usage
+		hclProjects, err := hclProvider.LoadResources(map[string]*schema.UsageData{})
+		if err != nil {
+			logging.Logger.WithError(err).Errorf("failed to load Terraform projects for path %s", project.Path)
+			continue
+		}
+
+		projects = append(projects, hclProjects...)
 	}
 
 	spinner.Success()
 
-	for _, projectSuggestion := range projectSuggestions {
-		rows := make([][]string, len(projectSuggestion.Suggestions)+1)
+	for _, project := range projects {
+		if len(project.Metadata.Suggestions) == 0 {
+			pterm.DefaultBox.WithTitle(project.Name).Println(pterm.Green("No cost optimizations found."))
+			continue
+		}
+
+		rows := make([][]string, len(project.Metadata.Suggestions)+1)
 		rows[0] = []string{"Address", "Title", "Cost Saving"}
-		for i, suggestion := range projectSuggestion.Suggestions {
+		for i, suggestion := range project.Metadata.Suggestions {
 			cost := "?"
 			if suggestion.Cost != nil {
 				cost = output.Format2DP(runCtx.Config.Currency, suggestion.Cost)
@@ -109,7 +128,7 @@ func (s ScanCommand) run(runCtx *config.RunContext) error {
 			rows[i+1] = []string{suggestion.Address, suggestion.Title, cost}
 		}
 
-		pterm.DefaultBox.WithTitle(projectSuggestion.Path).Println(pterm.DefaultTable.WithHasHeader().WithData(rows).Srender())
+		pterm.DefaultBox.WithTitle(project.Name).Println(pterm.DefaultTable.WithHasHeader().WithData(rows).Srender())
 	}
 
 	return nil

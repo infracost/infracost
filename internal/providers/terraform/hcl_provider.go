@@ -18,11 +18,14 @@ import (
 	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/hcl/modules"
 	"github.com/infracost/infracost/internal/logging"
+	"github.com/infracost/infracost/internal/prices"
+	"github.com/infracost/infracost/internal/scan"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
 )
 
 type HCLProvider struct {
+	scanner        *scan.TerraformPlanScanner
 	parsers        []*hcl.Parser
 	planJSONParser *Parser
 	logger         *log.Entry
@@ -134,8 +137,13 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 	if err != nil {
 		return nil, err
 	}
+	var scanner *scan.TerraformPlanScanner
+	if ctx.RunContext.Config.RecommendationAPIEndpoint != "" {
+		scanner = scan.NewTerraformPlanScanner(ctx.RunContext, ctx.Logger(), prices.GetPrices)
+	}
 
 	return &HCLProvider{
+		scanner:        scanner,
 		parsers:        parsers,
 		planJSONParser: NewParser(ctx, false),
 		ctx:            ctx,
@@ -177,13 +185,19 @@ func (p *HCLProvider) LoadResources(usage map[string]*schema.UsageData) ([]*sche
 			return nil, err
 		}
 
+		if p.scanner != nil {
+			err := p.scanner.ScanPlan(project, j.JSON)
+			if err != nil {
+				p.logger.WithError(err).Debugf("failed to scan Terraform project %s", project.Name)
+			}
+		}
 		projects[i] = project
 	}
 
 	return projects, nil
 }
 
-func (p *HCLProvider) parseResources(parsed HclProject, usage map[string]*schema.UsageData) (*schema.Project, error) {
+func (p *HCLProvider) parseResources(parsed HCLProject, usage map[string]*schema.UsageData) (*schema.Project, error) {
 	project := p.newProject(parsed)
 
 	partialPastResources, partialResources, err := p.planJSONParser.parseJSON(parsed.JSON, usage)
@@ -197,7 +211,7 @@ func (p *HCLProvider) parseResources(parsed HclProject, usage map[string]*schema
 	return project, nil
 }
 
-func (p *HCLProvider) newProject(parsed HclProject) *schema.Project {
+func (p *HCLProvider) newProject(parsed HCLProject) *schema.Project {
 	metadata := config.DetectProjectMetadata(parsed.Module.RootPath)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
@@ -226,14 +240,14 @@ func (p *HCLProvider) newProject(parsed HclProject) *schema.Project {
 	return schema.NewProject(name, metadata)
 }
 
-type HclProject struct {
+type HCLProject struct {
 	JSON   []byte
 	Module *hcl.Module
 }
 
 // LoadPlanJSONs parses the found directories and return the blocks in Terraform plan JSON format.
-func (p *HCLProvider) LoadPlanJSONs() ([]HclProject, error) {
-	var jsons = make([]HclProject, len(p.parsers))
+func (p *HCLProvider) LoadPlanJSONs() ([]HCLProject, error) {
+	var jsons = make([]HCLProject, len(p.parsers))
 	modules, err := p.Modules()
 	if err != nil {
 		return nil, err
@@ -245,7 +259,7 @@ func (p *HCLProvider) LoadPlanJSONs() ([]HclProject, error) {
 			return nil, err
 		}
 
-		jsons[i] = HclProject{
+		jsons[i] = HCLProject{
 			JSON:   b,
 			Module: module,
 		}

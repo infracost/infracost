@@ -14,60 +14,40 @@ import (
 
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/config"
-	"github.com/infracost/infracost/internal/prices"
-	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/schema"
 )
 
-type Scanner struct {
+type GetPricesFunc func(ctx *config.RunContext, c *apiclient.PricingAPIClient, r *schema.Resource) error
+
+type TerraformPlanScanner struct {
 	client                  *http.Client
 	pricingAPIClient        *apiclient.PricingAPIClient
 	recommendationAPIClient apiclient.RecommendationClient
 	logger                  *log.Entry
 	ctx                     *config.RunContext
+	getPrices               GetPricesFunc
 }
 
-func NewScanner(ctx *config.RunContext, logger *log.Entry) Scanner {
-	return Scanner{
+func NewTerraformPlanScanner(ctx *config.RunContext, logger *log.Entry, getPrices GetPricesFunc) *TerraformPlanScanner {
+	return &TerraformPlanScanner{
 		client:                  &http.Client{Timeout: time.Second * 5},
 		pricingAPIClient:        apiclient.NewPricingAPIClient(ctx),
 		recommendationAPIClient: apiclient.NewRecommendationClient(ctx.Config, logger),
 		logger:                  logger,
 		ctx:                     ctx,
+		getPrices:               getPrices,
 	}
 }
 
-func (s Scanner) ScanPaths() ([]ProjectSuggestion, error) {
-	jsons, err := s.readProjectDirs()
+func (s *TerraformPlanScanner) ScanPlan(project *schema.Project, projectPlan []byte) error {
+	apiSuggestions, err := s.recommendationAPIClient.GetSuggestions(projectPlan)
 	if err != nil {
-		return nil, err
+		return fmt.Errorf("failed to get suggestions %w", err)
 	}
 
-	var suggestions []ProjectSuggestion
-	for _, j := range jsons {
-		p, err := s.scanProject(j)
-		if err != nil {
-			s.logger.WithError(err).Errorf("failed to scan project %s", j.HCL.Module.ModulePath)
-			continue
-		}
-
-		suggestions = append(suggestions, p)
-	}
-
-	return suggestions, nil
-}
-
-func (s Scanner) scanProject(j projectJSON) (ProjectSuggestion, error) {
-	ps := ProjectSuggestion{Path: j.HCL.Module.ModulePath}
-
-	apiSuggestions, err := s.recommendationAPIClient.GetSuggestions(j.HCL.JSON)
-	if err != nil {
-		return ps, fmt.Errorf("failed to get suggestions %w", err)
-	}
-
-	var recMap = make(map[string][]Suggestion)
+	var recMap = make(map[string]schema.Suggestions)
 	for _, apiSuggestion := range apiSuggestions {
-		suggestion := Suggestion{
+		suggestion := schema.Suggestion{
 			ID:                 apiSuggestion.ID,
 			Title:              apiSuggestion.Title,
 			Description:        apiSuggestion.Description,
@@ -83,18 +63,11 @@ func (s Scanner) scanProject(j projectJSON) (ProjectSuggestion, error) {
 			continue
 		}
 
-		recMap[apiSuggestion.ResourceType] = []Suggestion{suggestion}
+		recMap[apiSuggestion.ResourceType] = schema.Suggestions{suggestion}
 	}
 
-	masterProject, err := j.JSONProvider.LoadResourcesFromSrc(map[string]*schema.UsageData{}, j.HCL.JSON, nil)
-	if err != nil {
-		return ps, fmt.Errorf("could not load resources for project scan %w", err)
-	}
-
-	ps.Name = masterProject.Name
-
-	var costedSuggestions Suggestions
-	for _, resource := range masterProject.PartialResources {
+	var costedSuggestions schema.Suggestions
+	for _, resource := range project.PartialResources {
 		coreResource := resource.CoreResource
 		if coreResource == nil {
 			continue
@@ -113,7 +86,7 @@ func (s Scanner) scanProject(j projectJSON) (ProjectSuggestion, error) {
 		}
 
 		initialResource := coreResource.BuildResource()
-		err = prices.GetPrices(s.ctx, s.pricingAPIClient, initialResource)
+		err = s.getPrices(s.ctx, s.pricingAPIClient, initialResource)
 		if err != nil {
 			s.logger.WithError(err).Error("could not fetch prices for initial resource")
 			continue
@@ -139,7 +112,7 @@ func (s Scanner) scanProject(j projectJSON) (ProjectSuggestion, error) {
 			}
 
 			schemaResource := coreResource.BuildResource()
-			err = prices.GetPrices(s.ctx, s.pricingAPIClient, schemaResource)
+			err = s.getPrices(s.ctx, s.pricingAPIClient, schemaResource)
 			if err != nil {
 				s.logger.WithError(err).Errorf("could not fetch prices for costed resource type: %s", coreResource.CoreType())
 				continue
@@ -151,7 +124,7 @@ func (s Scanner) scanProject(j projectJSON) (ProjectSuggestion, error) {
 				diff = initialResource.MonthlyCost.Sub(*schemaResource.MonthlyCost)
 			}
 
-			costedSuggestions = append(costedSuggestions, Suggestion{
+			costedSuggestions = append(costedSuggestions, schema.Suggestion{
 				ID:                 suggestion.ID,
 				Title:              suggestion.Title,
 				Description:        suggestion.Description,
@@ -166,32 +139,13 @@ func (s Scanner) scanProject(j projectJSON) (ProjectSuggestion, error) {
 	}
 
 	sort.Sort(costedSuggestions)
-	ps.Suggestions = costedSuggestions
-	return ps, nil
-}
-
-func (s Scanner) readProjectDirs() ([]projectJSON, error) {
-	var jsons []projectJSON
-
-	for _, project := range s.ctx.Config.Projects {
-		projectCtx := config.NewProjectContext(s.ctx, project, log.Fields{})
-		hclProvider, err := terraform.NewHCLProvider(projectCtx, &terraform.HCLProviderConfig{SuppressLogging: true})
-		if err != nil {
-			return nil, err
-		}
-
-		projectJsons, err := hclProvider.LoadPlanJSONs()
-		if err != nil {
-			return nil, err
-		}
-
-		planJsonProvider := terraform.NewPlanJSONProvider(projectCtx, false)
-		for _, j := range projectJsons {
-			jsons = append(jsons, projectJSON{HCL: j, JSONProvider: planJsonProvider})
-		}
+	if project.Metadata == nil {
+		project.Metadata = &schema.ProjectMetadata{}
 	}
 
-	return jsons, nil
+	project.Metadata.Suggestions = costedSuggestions
+
+	return nil
 }
 
 func mergeSuggestionWithResource(schema []byte, suggestedSchema []byte, resource schema.CoreResource) error {
@@ -216,60 +170,4 @@ func mergeSuggestionWithResource(schema []byte, suggestedSchema []byte, resource
 	}
 
 	return nil
-}
-
-type projectJSON struct {
-	HCL          terraform.HclProject
-	JSONProvider *terraform.PlanJSONProvider
-}
-
-type Suggestion struct {
-	ID                 string           `json:"id"`
-	Title              string           `json:"title"`
-	Description        string           `json:"description"`
-	ResourceType       string           `json:"resourceType"`
-	ResourceAttributes json.RawMessage  `json:"resourceAttributes"`
-	Address            string           `json:"address"`
-	Suggested          string           `json:"suggested"`
-	NoCost             bool             `json:"no_cost"`
-	Cost               *decimal.Decimal `json:"cost"`
-}
-
-type Suggestions []Suggestion
-
-func (s Suggestions) Len() int {
-	return len(s)
-}
-
-func (s Suggestions) Less(i, j int) bool {
-	iSug := s[i]
-	jSug := s[j]
-
-	if iSug.Cost == nil && jSug.Cost == nil {
-		return iSug.Address < jSug.Address
-	}
-
-	if iSug.Cost == nil {
-		return false
-	}
-
-	if jSug.Cost == nil {
-		return true
-	}
-
-	if iSug.Cost.Equal(*jSug.Cost) {
-		return iSug.Address < jSug.Address
-	}
-
-	return iSug.Cost.GreaterThan(*jSug.Cost)
-}
-
-func (s Suggestions) Swap(i, j int) {
-	s[i], s[j] = s[j], s[i]
-}
-
-type ProjectSuggestion struct {
-	Path        string      `json:"path"`
-	Name        string      `json:"name"`
-	Suggestions Suggestions `json:"suggestions"`
 }

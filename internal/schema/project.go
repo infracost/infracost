@@ -21,12 +21,13 @@ type Warning struct {
 }
 
 type ProjectMetadata struct {
-	Path                string    `json:"path"`
-	Type                string    `json:"type"`
-	TerraformModulePath string    `json:"terraformModulePath,omitempty"`
-	TerraformWorkspace  string    `json:"terraformWorkspace,omitempty"`
-	VCSSubPath          string    `json:"vcsSubPath,omitempty"`
-	Warnings            []Warning `json:"warnings,omitempty"`
+	Path                string      `json:"path"`
+	Type                string      `json:"type"`
+	TerraformModulePath string      `json:"terraformModulePath,omitempty"`
+	TerraformWorkspace  string      `json:"terraformWorkspace,omitempty"`
+	VCSSubPath          string      `json:"vcsSubPath,omitempty"`
+	Warnings            []Warning   `json:"warnings,omitempty"`
+	Suggestions         Suggestions `json:"suggestions,omitempty"`
 }
 
 func (m *ProjectMetadata) WorkspaceLabel() string {
