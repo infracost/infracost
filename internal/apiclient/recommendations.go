@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -37,23 +38,29 @@ func (r RecommendationClient) GetRecommendations(plan []byte) ([]Recommendation,
 
 	req, err := http.NewRequest(http.MethodPost, fmt.Sprintf("%s/recommend", r.baseURL), buf)
 	if err != nil {
-		return nil, fmt.Errorf("failed to build request to suggestions API %w", err)
+		return nil, fmt.Errorf("failed to build request to recommendations API %w", err)
 	}
+	req.Header.Set("X-Api-Key", r.apiKey)
 
 	res, err := r.client.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("failed to make request to suggestions API %w", err)
+		return nil, fmt.Errorf("failed to make request to recommendations API %w", err)
 	}
 	defer res.Body.Close()
+
+	if res.StatusCode != http.StatusOK {
+		b, _ := io.ReadAll(res.Body)
+		return nil, fmt.Errorf("received non 200 status code from recommendations API %s", b)
+	}
 
 	var result RecommendDecisionResponse
 	err = json.NewDecoder(res.Body).Decode(&result)
 	if err != nil {
-		return nil, fmt.Errorf("failed to decode respoinse from suggestions API %w", err)
+		return nil, fmt.Errorf("failed to decode respoinse from recommendations API %w", err)
 	}
 
 	if len(result.Result) == 0 {
-		r.logger.Debug("request to suggestions API returned nil results")
+		r.logger.Debug("request to recommendations API returned nil results")
 		return nil, nil
 	}
 
