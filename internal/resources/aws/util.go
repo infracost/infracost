@@ -119,6 +119,7 @@ var RegionMapping = map[string]string{
 	"cn-north-1":      "China (Beijing)",
 	"cn-northwest-1":  "China (Ningxia)",
 	"eu-central-1":    "EU (Frankfurt)",
+	"eu-central-2":    "EU (Zurich)",
 	"eu-west-1":       "EU (Ireland)",
 	"eu-west-2":       "EU (London)",
 	"eu-south-1":      "EU (Milan)",
