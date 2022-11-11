@@ -26,3 +26,7 @@
 ∙ 2 were free:
   ∙ 1 x aws_waf_ipset
   ∙ 1 x aws_waf_rule
+Logs:
+
+level=warning msg="Multiple prices found for aws_waf_web_acl.my_waf Requests, using the first price"
+level=warning msg="Multiple prices found for aws_waf_web_acl.withoutUsage Requests, using the first price"
