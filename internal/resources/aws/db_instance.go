@@ -222,6 +222,7 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 				ProductFamily: strPtr("Provisioned IOPS"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "deploymentOption", Value: strPtr(deploymentOption)},
+					{Key: "groupDescription", Value: strPtr("RDS Provisioned IOPS")},
 					{Key: "databaseEngine", Value: strPtr("Any")},
 				},
 			},
