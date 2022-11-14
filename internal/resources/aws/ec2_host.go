@@ -43,13 +43,6 @@ func (r *Ec2Host) BuildResource() *schema.Resource {
 
 	var err error
 	if r.ReservedInstanceTerm != nil {
-		// There's differences within the pricing API, the Values have no space.
-		reservedPaymentOptionMapping = map[string]string{
-			"no_upfront":      "NoUpfront",
-			"partial_upfront": "PartialUpfront",
-			"all_upfront":     "AllUpfront",
-		}
-
 		resolver := &ec2HostReservationResolver{
 			term:          strVal(r.ReservedInstanceTerm),
 			paymentOption: strVal(r.ReservedInstancePaymentOption),
@@ -118,7 +111,7 @@ func (r ec2HostReservationResolver) PriceFilter() (*schema.PriceFilter, error) {
 		PurchaseOption: strPtr(purchaseOptionLabel),
 	}
 	termLength := reservedTermsMapping[r.term]
-	purchaseOption := reservedPaymentOptionMapping[r.paymentOption]
+	purchaseOption := reservedHostPaymentOptionMapping[r.paymentOption]
 	validTerms := sliceOfKeysFromMap(reservedTermsMapping)
 	if !stringInSlice(validTerms, r.term) {
 		return def, fmt.Errorf("Invalid reserved_instance_term, ignoring reserved options. Expected: %s. Got: %s", strings.Join(validTerms, ", "), r.term)
