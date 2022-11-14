@@ -1,0 +1,20 @@
+version: 0.1
+resource_usage:
+  aws_ec2_host.host-1yr-no-upfront:
+    reserved_instance_term: 1_year
+    reserved_instance_payment_option: no_upfront
+  aws_ec2_host.host-1yr-partial-upfront:
+    reserved_instance_term: 1_year
+    reserved_instance_payment_option: partial_upfront
+  aws_ec2_host.host-1yr-all-upfront:
+    reserved_instance_term: 1_year
+    reserved_instance_payment_option: all_upfront
+  aws_ec2_host.host-3yr-no-upfront:
+    reserved_instance_term: 3_year
+    reserved_instance_payment_option: no_upfront
+  aws_ec2_host.host-3yr-partial-upfront:
+    reserved_instance_term: 3_year
+    reserved_instance_payment_option: partial_upfront
+  aws_ec2_host.host-3yr-all-upfront:
+    reserved_instance_term: 3_year
+    reserved_instance_payment_option: all_upfront
