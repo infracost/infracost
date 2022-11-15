@@ -692,6 +692,13 @@ var reservedPaymentOptionMapping = map[string]string{
 	"all_upfront":     "All Upfront",
 }
 
+// There's differences within the pricing API, the Values have no space.
+var reservedHostPaymentOptionMapping = map[string]string{
+	"no_upfront":      "NoUpfront",
+	"partial_upfront": "PartialUpfront",
+	"all_upfront":     "AllUpfront",
+}
+
 var elasticacheReservedNodeCacheLegacyOfferings = map[string]string{
 	"heavy_utilization":  "Heavy Utilization",
 	"medium_utilization": "Medium Utilization",

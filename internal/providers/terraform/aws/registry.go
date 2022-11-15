@@ -107,6 +107,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getNetworkfirewallFirewallRegistryItem(),
 	getGlobalAcceleratorRegistryItem(),
 	getGlobalacceleratorEndpointGroupRegistryItem(),
+	getEC2HostRegistryItem(),
 }
 
 // FreeResources grouped alphabetically

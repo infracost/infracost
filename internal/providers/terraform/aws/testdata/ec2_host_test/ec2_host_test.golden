@@ -1,0 +1,31 @@
+
+ Name                                     Monthly Qty  Unit   Monthly Cost 
+                                                                           
+ aws_ec2_host.ec2_host                                                     
+ └─ EC2 Dedicated Host (on-demand, c5)            730  hours     $2,457.18 
+                                                                           
+ aws_ec2_host.host-1yr-all-upfront                                         
+ └─ EC2 Dedicated Host (reserved, m5d)            730  hours         $0.00 
+                                                                           
+ aws_ec2_host.host-1yr-no-upfront                                          
+ └─ EC2 Dedicated Host (reserved, m5)             730  hours     $2,330.89 
+                                                                           
+ aws_ec2_host.host-1yr-partial-upfront                                     
+ └─ EC2 Dedicated Host (reserved, c5)             730  hours       $737.30 
+                                                                           
+ aws_ec2_host.host-3yr-all-upfront                                         
+ └─ EC2 Dedicated Host (reserved, m5d)            730  hours         $0.00 
+                                                                           
+ aws_ec2_host.host-3yr-no-upfront                                          
+ └─ EC2 Dedicated Host (reserved, m5)             730  hours     $1,598.70 
+                                                                           
+ aws_ec2_host.host-3yr-partial-upfront                                     
+ └─ EC2 Dedicated Host (reserved, c5)             730  hours       $476.69 
+                                                                           
+ aws_ec2_host.mac                                                          
+ └─ EC2 Dedicated Host (on-demand, mac1)          730  hours       $790.59 
+                                                                           
+ OVERALL TOTAL                                                   $8,391.35 
+──────────────────────────────────
+8 cloud resources were detected:
+∙ 8 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
