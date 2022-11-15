@@ -146,9 +146,9 @@ resource_usage:
   aws_ebs_volume.my_standard_volume:
     monthly_standard_io_requests: 10000000 # Monthly I/O requests for standard volume (Magnetic storage).
   
-  aws_ec2_host.host_1yr_partial_upfront:
-    reserved_instance_term: 1_year
-    reserved_instance_payment_option: partial_upfront
+  aws_ec2_host.my_host:
+    reserved_instance_term: 1_year # Term for Reserved Instances, can be: 1_year, 3_year.
+    reserved_instance_payment_option: partial_upfront # Payment option for Reserved Instances, can be: no_upfront, partial_upfront, all_upfront.
 
   aws_ec2_transit_gateway_vpc_attachment.my_vpc_attachment:
     monthly_data_processed_gb: 100 # Monthly data processed by the EC2 transit gateway attachment(s) in GB.

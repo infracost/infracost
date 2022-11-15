@@ -11,13 +11,13 @@ import (
 )
 
 // Ec2Host defines an AWS EC2 dedicated host. It suppports multiple instance families & allows
-// you to run workloads on a pyhsical server dedicated for your use. You can use on-demand or
+// you to run workloads on a physical server dedicated for your use. You can use on-demand or
 // reservation pricing.
 //
 // See more resource information here: https://aws.amazon.com/ec2/dedicated-hosts/
 //
 // See the pricing information here: https://aws.amazon.com/ec2/dedicated-hosts/pricing/
-type Ec2Host struct {
+type EC2Host struct {
 	Address                       string
 	Region                        string
 	InstanceType                  string
@@ -26,16 +26,16 @@ type Ec2Host struct {
 	ReservedInstancePaymentOption *string `infracost_usage:"reserved_instance_payment_option"`
 }
 
-var Ec2HostUsageSchema = []*schema.UsageItem{
+var EC2HostUsageSchema = []*schema.UsageItem{
 	{Key: "reserved_instance_term", DefaultValue: "", ValueType: schema.String},
 	{Key: "reserved_instance_payment_option", DefaultValue: "", ValueType: schema.String},
 }
 
-func (r *Ec2Host) PopulateUsage(u *schema.UsageData) {
+func (r *EC2Host) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *Ec2Host) BuildResource() *schema.Resource {
+func (r *EC2Host) BuildResource() *schema.Resource {
 	purchaseOptionLabel := "on-demand"
 	priceFilter := &schema.PriceFilter{
 		PurchaseOption: strPtr("on_demand"),
@@ -60,7 +60,10 @@ func (r *Ec2Host) BuildResource() *schema.Resource {
 	instanceFamily := r.InstanceFamily
 
 	if r.InstanceType != "" {
-		instanceFamily = strings.Split(r.InstanceType, ".")[0]
+		split := strings.Split(r.InstanceType, ".")
+		if len(split) > 0 {
+			instanceFamily = split[0]
+		}
 	}
 
 	hostPurchaseType := "HostUsage"
@@ -92,7 +95,7 @@ func (r *Ec2Host) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    Ec2HostUsageSchema,
+		UsageSchema:    EC2HostUsageSchema,
 		CostComponents: costComponents,
 	}
 }

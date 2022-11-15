@@ -6,7 +6,7 @@ import (
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
 )
 
-func TestEc2Host(t *testing.T) {
+func TestEC2Host(t *testing.T) {
 	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")

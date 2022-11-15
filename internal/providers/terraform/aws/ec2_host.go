@@ -5,16 +5,16 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func getEc2HostRegistryItem() *schema.RegistryItem {
+func getEC2HostRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_ec2_host",
-		RFunc: newEc2Host,
+		RFunc: newEC2Host,
 	}
 }
 
-func newEc2Host(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newEC2Host(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
-	r := &aws.Ec2Host{
+	r := &aws.EC2Host{
 		Address:        d.Address,
 		Region:         region,
 		InstanceType:   d.Get("instance_type").String(),
