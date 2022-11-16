@@ -31,7 +31,7 @@ resource "aws_lambda_function" "lambda_withUsage512Mem" {
   memory_size   = 512
 }
 
-resource "aws_lambda_function" "lambda_duration_lessThan6B" {
+resource "aws_lambda_function" "lambda_duration_6B" {
   function_name = "lambda_function_name"
   role          = "arn:aws:lambda:us-east-1:account-id:resource-id"
   handler       = "exports.test"

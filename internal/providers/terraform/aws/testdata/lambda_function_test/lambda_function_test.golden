@@ -1,34 +1,34 @@
 
- Name                                                    Monthly Qty  Unit                        Monthly Cost 
-                                                                                                               
- aws_lambda_function.lambda                                                                                    
- ├─ GB-Seconds (first 6B)                        Monthly cost depends on usage: $0.0000166667 per GB-Seconds   
- └─ Requests                                     Monthly cost depends on usage: $0.20 per 1M requests          
-                                                                                                               
- aws_lambda_function.lambda_duration_15B                                                                       
- ├─ GB-Seconds (first 6B)                              6,000,000,000  GB-Seconds                   $100,000.20 
- ├─ GB-Seconds (next 9B)                               9,000,000,000  GB-Seconds                   $135,000.00 
- ├─ GB-Seconds (over 15B)                              9,576,000,000  GB-Seconds                   $127,680.64 
- └─ Requests                                                   6,000  1M requests                    $1,200.00 
-                                                                                                               
- aws_lambda_function.lambda_duration_9B                                                                        
- ├─ GB-Seconds (first 6B)                              6,000,000,000  GB-Seconds                   $100,000.20 
- ├─ GB-Seconds (next 9B)                                 144,000,000  GB-Seconds                     $2,160.00 
- └─ Requests                                                   6,000  1M requests                    $1,200.00 
-                                                                                                               
- aws_lambda_function.lambda_duration_lessThan6B                                                                
- ├─ GB-Seconds (first 6B)                        Monthly cost depends on usage: $0.0000166667 per GB-Seconds   
- └─ Requests                                     Monthly cost depends on usage: $0.20 per 1M requests          
-                                                                                                               
- aws_lambda_function.lambda_withUsage                                                                          
- ├─ GB-Seconds (first 6B)                                      4,375  GB-Seconds                         $0.07 
- └─ Requests                                                     0.1  1M requests                        $0.02 
-                                                                                                               
- aws_lambda_function.lambda_withUsage512Mem                                                                    
- ├─ GB-Seconds (first 6B)                                     17,500  GB-Seconds                         $0.29 
- └─ Requests                                                     0.1  1M requests                        $0.02 
-                                                                                                               
- OVERALL TOTAL                                                                                     $467,241.44 
+ Name                                                Monthly Qty  Unit                        Monthly Cost 
+                                                                                                           
+ aws_lambda_function.lambda                                                                                
+ ├─ GB-Seconds (first 6B)                    Monthly cost depends on usage: $0.0000166667 per GB-Seconds   
+ └─ Requests                                 Monthly cost depends on usage: $0.20 per 1M requests          
+                                                                                                           
+ aws_lambda_function.lambda_duration_15B                                                                   
+ ├─ GB-Seconds (first 6B)                          6,000,000,000  GB-Seconds                   $100,000.20 
+ ├─ GB-Seconds (next 9B)                           9,000,000,000  GB-Seconds                   $135,000.00 
+ ├─ GB-Seconds (over 15B)                          9,576,000,000  GB-Seconds                   $127,680.64 
+ └─ Requests                                               6,000  1M requests                    $1,200.00 
+                                                                                                           
+ aws_lambda_function.lambda_duration_6B                                                                    
+ ├─ GB-Seconds (first 6B)                          3,072,000,000  GB-Seconds                    $51,200.10 
+ └─ Requests                                               6,000  1M requests                    $1,200.00 
+                                                                                                           
+ aws_lambda_function.lambda_duration_9B                                                                    
+ ├─ GB-Seconds (first 6B)                          6,000,000,000  GB-Seconds                   $100,000.20 
+ ├─ GB-Seconds (next 9B)                             144,000,000  GB-Seconds                     $2,160.00 
+ └─ Requests                                               6,000  1M requests                    $1,200.00 
+                                                                                                           
+ aws_lambda_function.lambda_withUsage                                                                      
+ ├─ GB-Seconds (first 6B)                                  4,375  GB-Seconds                         $0.07 
+ └─ Requests                                                 0.1  1M requests                        $0.02 
+                                                                                                           
+ aws_lambda_function.lambda_withUsage512Mem                                                                
+ ├─ GB-Seconds (first 6B)                                 17,500  GB-Seconds                         $0.29 
+ └─ Requests                                                 0.1  1M requests                        $0.02 
+                                                                                                           
+ OVERALL TOTAL                                                                                 $519,641.55 
 ──────────────────────────────────
 6 cloud resources were detected:
 ∙ 6 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
