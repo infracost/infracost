@@ -62,18 +62,18 @@ func (a *LambdaFunction) BuildResource() *schema.Resource {
 		gbRequestTiers := []int{6000000000, 9000000000, 15000000000}
 		gbSecondQuantities := usage.CalculateTierBuckets(*gbSeconds, gbRequestTiers)
 
-		costComponents = append(costComponents, a.durationCostComponent("GB-Seconds (first 6B)", "0", &gbSecondQuantities[0]))
+		costComponents = append(costComponents, a.durationCostComponent("Duration (first 6b)", "0", &gbSecondQuantities[0]))
 
 		if gbSecondQuantities[1].GreaterThan(decimal.NewFromInt(0)) {
-			costComponents = append(costComponents, a.durationCostComponent("GB-Seconds (next 9B)", "6000000000", &gbSecondQuantities[1]))
+			costComponents = append(costComponents, a.durationCostComponent("Duration (next 9B)", "6000000000", &gbSecondQuantities[1]))
 		}
 
 		if gbSecondQuantities[2].GreaterThanOrEqual(decimal.NewFromInt(0)) {
-			costComponents = append(costComponents, a.durationCostComponent("GB-Seconds (over 15B)", "15000000000", &gbSecondQuantities[2]))
+			costComponents = append(costComponents, a.durationCostComponent("Duration (over 15B)", "15000000000", &gbSecondQuantities[2]))
 		}
 
 	} else {
-		costComponents = append(costComponents, a.durationCostComponent("GB-Seconds (first 6B)", "0", gbSeconds))
+		costComponents = append(costComponents, a.durationCostComponent("Duration", "0", gbSeconds))
 	}
 
 	estimate := func(ctx context.Context, values map[string]interface{}) error {
