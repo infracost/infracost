@@ -49,3 +49,11 @@ resource "azurerm_kubernetes_cluster_node_pool" "usage_basic_A2" {
   kubernetes_cluster_id = azurerm_kubernetes_cluster.example.id
   vm_size               = "Basic_A2"
 }
+
+resource "azurerm_kubernetes_cluster_node_pool" "with_min_count" {
+  name                  = "internal"
+  kubernetes_cluster_id = azurerm_kubernetes_cluster.example.id
+  vm_size               = "Standard_DS2_v2"
+  min_count             = 2
+  os_disk_type          = "Ephemeral"
+}
