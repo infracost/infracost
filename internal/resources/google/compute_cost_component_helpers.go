@@ -2,6 +2,8 @@ package google
 
 import (
 	"fmt"
+	"regexp"
+	"strconv"
 	"strings"
 
 	"github.com/shopspring/decimal"
@@ -67,13 +69,29 @@ func computeCostComponent(region, machineType string, purchaseOption string, ins
 // customComputeCostComponent returns a cost component for custom Compute instance usage.
 func customComputeCostComponents(region, machineType string, purchaseOption string, instanceCount int64, monthlyHours *float64) []*schema.CostComponent {
 	sustainedUseDiscount := 0.0
+	fixPurchaseOption := "preemptible"
 	if strings.ToLower(purchaseOption) == "on_demand" {
+		fixPurchaseOption = "OnDemand"
 		switch strings.ToLower(strings.Split(machineType, "-")[0]) {
 		case "c2", "n2", "n2d":
 			sustainedUseDiscount = 0.2
 		case "n1", "f1", "g1", "m1":
 			sustainedUseDiscount = 0.3
 		}
+	}
+
+	var re = regexp.MustCompile(`(\D.+)-(\d+)-(\d.+)`)
+	strCPUAmount := re.ReplaceAllString(machineType, "$2")
+	strRAMAmount := re.ReplaceAllString(machineType, "$3")
+
+	numberOfCores, err := strconv.ParseInt(strCPUAmount, 10, 64)
+	if err != nil {
+		return []*schema.CostComponent{}
+	}
+
+	mbOfRAM, err := strconv.ParseInt(strRAMAmount, 10, 64)
+	if err != nil {
+		return []*schema.CostComponent{}
 	}
 
 	qty := decimal.NewFromFloat(730)
@@ -84,8 +102,8 @@ func customComputeCostComponents(region, machineType string, purchaseOption stri
 	cpuCostComponent := &schema.CostComponent{
 		Name:                fmt.Sprintf("Custom Instance CPU usage (Linux/UNIX, %s, %s)", purchaseOptionLabel(purchaseOption), machineType),
 		Unit:                "hours",
-		UnitMultiplier:      decimal.NewFromInt(1),
-		MonthlyQuantity:     decimalPtr(qty.Mul(decimal.NewFromInt(instanceCount))),
+		UnitMultiplier:      decimal.NewFromInt(numberOfCores),
+		MonthlyQuantity:     decimalPtr(qty.Mul(decimal.NewFromInt(instanceCount * numberOfCores))),
 		MonthlyDiscountPerc: sustainedUseDiscount,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("gcp"),
@@ -97,14 +115,14 @@ func customComputeCostComponents(region, machineType string, purchaseOption stri
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
-			PurchaseOption: strPtr(purchaseOption),
+			PurchaseOption: strPtr(fixPurchaseOption),
 		},
 	}
 
 	ramCostComponent := &schema.CostComponent{
 		Name:                fmt.Sprintf("Custom Instance RAM usage (Linux/UNIX, %s, %s)", purchaseOptionLabel(purchaseOption), machineType),
-		Unit:                "hours",
-		UnitMultiplier:      decimal.NewFromInt(1),
+		Unit:                "gibibyte hour",
+		UnitMultiplier:      decimal.NewFromInt(mbOfRAM / 1024),
 		MonthlyQuantity:     decimalPtr(qty.Mul(decimal.NewFromInt(instanceCount))),
 		MonthlyDiscountPerc: sustainedUseDiscount,
 		ProductFilter: &schema.ProductFilter{
@@ -117,7 +135,7 @@ func customComputeCostComponents(region, machineType string, purchaseOption stri
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
-			PurchaseOption: strPtr(purchaseOption),
+			PurchaseOption: strPtr(fixPurchaseOption),
 		},
 	}
 
