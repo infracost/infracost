@@ -125,7 +125,7 @@ func calculateGBSeconds(memorySize decimal.Decimal, averageRequestDuration decim
 func (a *LambdaFunction) durationCostComponent(displayName string, useageTier string, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            displayName,
-		Unit:            "GB-Seconds",
+		Unit:            "GB-seconds",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: quantity,
 		ProductFilter: &schema.ProductFilter{
