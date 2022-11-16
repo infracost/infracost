@@ -55,6 +55,24 @@ func (a *LambdaFunction) BuildResource() *schema.Resource {
 	var gbSeconds *decimal.Decimal
 	var costComponents []*schema.CostComponent
 
+	costComponents = append(costComponents, &schema.CostComponent{
+		Name:            "Requests",
+		Unit:            "1M requests",
+		UnitMultiplier:  decimal.NewFromInt(1000000),
+		MonthlyQuantity: monthlyRequests,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(a.Region),
+			Service:       strPtr("AWSLambda"),
+			ProductFamily: strPtr("Serverless"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "group", Value: strPtr("AWS-Lambda-Requests")},
+				{Key: "usagetype", ValueRegex: strPtr("/Request/")},
+			},
+		},
+	},
+	)
+
 	if a.MonthlyRequests != nil {
 		monthlyRequests = decimalPtr(decimal.NewFromInt(*a.MonthlyRequests))
 		gbSeconds = decimalPtr(calculateGBSeconds(memorySize, averageRequestDuration, *monthlyRequests))
@@ -89,24 +107,6 @@ func (a *LambdaFunction) BuildResource() *schema.Resource {
 		values["request_duration_ms"] = int64(math.Round(dur))
 		return nil
 	}
-
-	costComponents = append(costComponents, &schema.CostComponent{
-		Name:            "Requests",
-		Unit:            "1M requests",
-		UnitMultiplier:  decimal.NewFromInt(1000000),
-		MonthlyQuantity: monthlyRequests,
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("aws"),
-			Region:        strPtr(a.Region),
-			Service:       strPtr("AWSLambda"),
-			ProductFamily: strPtr("Serverless"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "group", Value: strPtr("AWS-Lambda-Requests")},
-				{Key: "usagetype", ValueRegex: strPtr("/Request/")},
-			},
-		},
-	},
-	)
 
 	return &schema.Resource{
 		Name:           a.Address,
