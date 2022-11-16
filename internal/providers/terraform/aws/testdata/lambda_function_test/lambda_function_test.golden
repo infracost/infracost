@@ -3,7 +3,7 @@
                                                                                                            
  aws_lambda_function.lambda                                                                                
  ├─ Requests                                 Monthly cost depends on usage: $0.20 per 1M requests          
- └─ Duration                                 Monthly cost depends on usage: $0.0000166667 per GB-seconds   
+ └─ Duration (first) 6b                      Monthly cost depends on usage: $0.0000166667 per GB-seconds   
                                                                                                            
  aws_lambda_function.lambda_duration_15B                                                                   
  ├─ Requests                                 Monthly cost depends on usage: $0.20 per 1M requests          
