@@ -1,7 +1,7 @@
 package aws
 
 import (
-	"github.com/awslabs/goformation/v4/cloudformation/tags"
+	"github.com/awslabs/goformation/v7/cloudformation/tags"
 )
 
 func mapTags(cfTags []tags.Tag) map[string]string {

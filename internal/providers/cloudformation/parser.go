@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/awslabs/goformation/v4/cloudformation"
+	"github.com/awslabs/goformation/v7/cloudformation"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
