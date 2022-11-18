@@ -1,6 +1,8 @@
 package ibm
 
 import (
+	"regexp"
+
 	"github.com/infracost/infracost/internal/resources/ibm"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -52,7 +54,12 @@ func newContainerVpcWorkerPool(d *schema.ResourceData, u *schema.UsageData) *sch
 	configuration["zones_count"] = len(zones)
 	configuration["ocp_entitlement"] = entitlement
 
-	SetCatalogMetadata(d, d.Type, configuration)
+	resourceType := d.Type
+	isRoks, _ := regexp.MatchString("(?i)openshift", kubeVersion)
+	if isRoks {
+		resourceType = "roks"
+	}
+	SetCatalogMetadata(d, resourceType, configuration)
 
 	return r.BuildResource()
 }
