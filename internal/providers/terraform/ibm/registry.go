@@ -68,6 +68,7 @@ var FreeResources = []string{
 	"ibm_is_vpn_gateway_connection",
 	"ibm_kms_key",
 	"ibm_kms_key_rings",
+	"ibm_kms_key_policies",
 	"ibm_pi_capture",
 	"ibm_pi_cloud_connection",
 	"ibm_pi_cloud_connection_network_attach",
