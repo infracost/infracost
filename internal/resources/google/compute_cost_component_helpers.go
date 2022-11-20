@@ -69,7 +69,7 @@ func computeCostComponent(region, machineType string, purchaseOption string, ins
 // customComputeCostComponent returns a cost component for custom Compute instance usage.
 func customComputeCostComponents(region, machineType string, purchaseOption string, instanceCount int64, monthlyHours *float64) []*schema.CostComponent {
 	sustainedUseDiscount := 0.0
-	fixPurchaseOption := "preemptible"
+	fixPurchaseOption := "Preemptible"
 	if strings.ToLower(purchaseOption) == "on_demand" {
 		fixPurchaseOption = "OnDemand"
 		switch strings.ToLower(strings.Split(machineType, "-")[0]) {
@@ -81,8 +81,20 @@ func customComputeCostComponents(region, machineType string, purchaseOption stri
 	}
 
 	var re = regexp.MustCompile(`(\D.+)-(\d+)-(\d.+)`)
+	firstTypeInfo := re.ReplaceAllString(machineType, "$1")
 	strCPUAmount := re.ReplaceAllString(machineType, "$2")
 	strRAMAmount := re.ReplaceAllString(machineType, "$3")
+
+	instanceType := ""
+	if firstTypeInfo != "custom" {
+		instanceType = strings.ToUpper(strings.Split(firstTypeInfo, "-")[0])
+	}
+
+	ext := ""
+	if strings.Contains(strRAMAmount, "ext") {
+		ext = "Extended"
+		strRAMAmount = strings.Split(strRAMAmount, "-")[0]
+	}
 
 	numberOfCores, err := strconv.ParseInt(strCPUAmount, 10, 64)
 	if err != nil {
@@ -111,7 +123,7 @@ func customComputeCostComponents(region, machineType string, purchaseOption stri
 			Service:       strPtr("Compute Engine"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "description", ValueRegex: regexPtr("Custom Instance Core.*")},
+				{Key: "description", ValueRegex: regexPtr(fmt.Sprintf("%s.*Custom Instance Core.*", instanceType))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -131,7 +143,7 @@ func customComputeCostComponents(region, machineType string, purchaseOption stri
 			Service:       strPtr("Compute Engine"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "description", ValueRegex: regexPtr("Custom Instance Ram.*")},
+				{Key: "description", ValueRegex: regexPtr(fmt.Sprintf("%s.*Custom.*%s.*Ram.*", instanceType, ext))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
