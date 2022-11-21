@@ -123,6 +123,7 @@ var RegionMapping = map[string]string{
 	"eu-west-1":       "EU (Ireland)",
 	"eu-west-2":       "EU (London)",
 	"eu-south-1":      "EU (Milan)",
+	"eu-south-2":      "EU (Spain)",
 	"eu-west-3":       "EU (Paris)",
 	"eu-north-1":      "EU (Stockholm)",
 	"ap-east-1":       "Asia Pacific (Hong Kong)",
