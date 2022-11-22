@@ -1,6 +1,8 @@
 package google
 
 import (
+	"strings"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -37,8 +39,12 @@ func (r *ComputeInstance) PopulateUsage(u *schema.UsageData) {
 // This method is called after the resource is initialised by an IaC provider.
 // See providers folder for more information.
 func (r *ComputeInstance) BuildResource() *schema.Resource {
-	costComponents := []*schema.CostComponent{
-		computeCostComponent(r.Region, r.MachineType, r.PurchaseOption, r.Size, r.MonthlyHours),
+	costComponents := []*schema.CostComponent{}
+
+	if strings.Contains(r.MachineType, "custom") {
+		costComponents = append(costComponents, customComputeCostComponents(r.Region, r.MachineType, r.PurchaseOption, r.Size, nil)...)
+	} else {
+		costComponents = append(costComponents, computeCostComponent(r.Region, r.MachineType, r.PurchaseOption, r.Size, r.MonthlyHours))
 	}
 
 	if r.HasBootDisk {

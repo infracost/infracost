@@ -1,8 +1,6 @@
 package google
 
 import (
-	"strings"
-
 	"github.com/infracost/infracost/internal/resources/google"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/tidwall/gjson"
@@ -26,9 +24,6 @@ func getComputeInstanceRegistryItem() *schema.RegistryItem {
 
 func newComputeInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	machineType := d.Get("machine_type").String()
-	if strings.HasPrefix(machineType, "custom-") {
-		return nil
-	}
 
 	region := d.Get("region").String()
 	size := int64(1)
