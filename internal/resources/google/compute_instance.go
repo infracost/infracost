@@ -42,7 +42,7 @@ func (r *ComputeInstance) BuildResource() *schema.Resource {
 	costComponents := []*schema.CostComponent{}
 
 	if strings.Contains(r.MachineType, "custom") {
-		costComponents = append(costComponents, customComputeCostComponents(r.Region, r.MachineType, r.PurchaseOption, r.Size, nil)...)
+		costComponents = append(costComponents, customComputeCostComponents(r.Region, r.MachineType, r.PurchaseOption, r.Size, r.MonthlyHours)...)
 	} else {
 		costComponents = append(costComponents, computeCostComponent(r.Region, r.MachineType, r.PurchaseOption, r.Size, r.MonthlyHours))
 	}
