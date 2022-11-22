@@ -80,7 +80,7 @@ func (a *LambdaFunction) BuildResource() *schema.Resource {
 		gbRequestTiers := []int{6000000000, 9000000000, 15000000000}
 		gbSecondQuantities := usage.CalculateTierBuckets(*gbSeconds, gbRequestTiers)
 
-		costComponents = append(costComponents, a.durationCostComponent("Duration (first 6b)", "0", &gbSecondQuantities[0]))
+		costComponents = append(costComponents, a.durationCostComponent("Duration (first 6B)", "0", &gbSecondQuantities[0]))
 
 		if gbSecondQuantities[1].GreaterThan(decimal.NewFromInt(0)) {
 			costComponents = append(costComponents, a.durationCostComponent("Duration (next 9B)", "6000000000", &gbSecondQuantities[1]))
@@ -91,7 +91,7 @@ func (a *LambdaFunction) BuildResource() *schema.Resource {
 		}
 
 	} else {
-		costComponents = append(costComponents, a.durationCostComponent("Duration (first) 6b", "0", gbSeconds))
+		costComponents = append(costComponents, a.durationCostComponent("Duration (first) 6B", "0", gbSeconds))
 	}
 
 	estimate := func(ctx context.Context, values map[string]interface{}) error {
@@ -122,7 +122,7 @@ func calculateGBSeconds(memorySize decimal.Decimal, averageRequestDuration decim
 	return monthlyRequests.Mul(gb).Mul(seconds)
 }
 
-func (a *LambdaFunction) durationCostComponent(displayName string, useageTier string, quantity *decimal.Decimal) *schema.CostComponent {
+func (a *LambdaFunction) durationCostComponent(displayName string, usageTier string, quantity *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            displayName,
 		Unit:            "GB-seconds",
@@ -139,7 +139,7 @@ func (a *LambdaFunction) durationCostComponent(displayName string, useageTier st
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
-			StartUsageAmount: strPtr(useageTier),
+			StartUsageAmount: strPtr(usageTier),
 		},
 	}
 }
