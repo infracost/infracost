@@ -13,7 +13,7 @@ Workspace: blue
                                                                                                                       
  aws_lambda_function.hello_world                                                                                      
  ├─ Requests                                            Monthly cost depends on usage: $0.20 per 1M requests          
- └─ Duration                                            Monthly cost depends on usage: $0.0000166667 per GB-seconds   
+ └─ Duration (first 6B)                                 Monthly cost depends on usage: $0.0000166667 per GB-seconds   
                                                                                                                       
  Project total                                                                                                $742.64 
 
@@ -33,7 +33,7 @@ Workspace: yellow
                                                                                                                       
  aws_lambda_function.hello_world                                                                                      
  ├─ Requests                                            Monthly cost depends on usage: $0.20 per 1M requests          
- └─ Duration                                            Monthly cost depends on usage: $0.0000166667 per GB-seconds   
+ └─ Duration (first 6B)                                 Monthly cost depends on usage: $0.0000166667 per GB-seconds   
                                                                                                                       
  Project total                                                                                                $742.64 
 

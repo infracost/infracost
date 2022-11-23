@@ -1,28 +1,31 @@
 Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
 
- Name                                                           Price  Hourly Cost 
-                                                                                   
- aws_instance.web_app                                                              
- ├─ Instance usage (Linux/UNIX, on-demand, m5.4xlarge)          $0.77        $0.77 
- ├─ root_block_device                                                              
- │  └─ Storage (general purpose SSD, gp2)                       $0.10        $0.01 
- └─ ebs_block_device[0]                                                            
-    ├─ Storage (provisioned IOPS SSD, io1)                      $0.13        $0.17 
-    └─ Provisioned IOPS                                        $0.065        $0.07 
-                                                                                   
- aws_instance.zero_cost_instance                                                   
- ├─ Instance usage (Linux/UNIX, reserved, m5.4xlarge)           $0.00        $0.00 
- ├─ root_block_device                                                              
- │  └─ Storage (general purpose SSD, gp2)                       $0.10        $0.01 
- └─ ebs_block_device[0]                                                            
-    ├─ Storage (provisioned IOPS SSD, io1)                      $0.13        $0.17 
-    └─ Provisioned IOPS                                        $0.065        $0.07 
-                                                                                   
- aws_lambda_function.hello_world                                                   
- ├─ Requests                                                    $0.20        $0.03 
- └─ Duration                                            $0.0000166667        $0.57 
-                                                                                   
- OVERALL TOTAL                                                           $1,361.31 
+ Name                                                              Price       Hourly Cost                   
+                                                                                                             
+ aws_instance.web_app                                                                                        
+ ├─ Instance usage (Linux/UNIX, on-demand, m5.4xlarge)             $0.77             $0.77                   
+ ├─ root_block_device                                                                                        
+ │  └─ Storage (general purpose SSD, gp2)                          $0.10             $0.01                   
+ └─ ebs_block_device[0]                                                                                      
+    ├─ Storage (provisioned IOPS SSD, io1)                         $0.13             $0.17                   
+    └─ Provisioned IOPS                                           $0.065             $0.07                   
+                                                                                                             
+ aws_instance.zero_cost_instance                                                                             
+ ├─ Instance usage (Linux/UNIX, reserved, m5.4xlarge)              $0.00             $0.00                   
+ ├─ root_block_device                                                                                        
+ │  └─ Storage (general purpose SSD, gp2)                          $0.10             $0.01                   
+ └─ ebs_block_device[0]                                                                                      
+    ├─ Storage (provisioned IOPS SSD, io1)                         $0.13             $0.17                   
+    └─ Provisioned IOPS                                           $0.065             $0.07                   
+                                                                                                             
+ aws_lambda_function.hello_world                                                                             
+ ├─ Requests                                            Monthly cost depends on usage: $0.20 per 1M requests 
+ └─ Duration (first 6B)                                    $0.0000166667             $0.57                   
+                                                                                                             
+ aws_lambda_function.zero_cost_lambda                                                                        
+ └─ Requests                                            Monthly cost depends on usage: $0.20 per 1M requests 
+                                                                                                             
+ OVERALL TOTAL                                                                                     $1,341.31 
 ──────────────────────────────────
 5 cloud resources were detected:
 ∙ 5 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

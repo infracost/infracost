@@ -563,17 +563,7 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
       Requests
     </td>
     
-      
-        <td class="monthly-quantity">100</td>
-      
-      
-        <td class="unit">1M requests</td>
-      
-      
-      
-      
-        <td class="monthly-cost">$20.00</td>
-      
+      <td colspan="3" class="usage-cost">Cost depends on usage: $0.20 per 1M requests</td>
     
   </tr>
 
@@ -583,7 +573,7 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
     <td class="name">
       
       <span class="arrow">&#8627;</span>
-      Duration
+      Duration (first 6B)
     </td>
     
       
@@ -606,6 +596,43 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
       
         
   
+  <tr class="resource top-level">
+    <td class="name">
+      
+      
+      aws_lambda_function.zero_cost_lambda
+    </td>
+    
+  
+    <td class="monthly-quantity"></td>
+  
+  
+    <td class="unit"></td>
+  
+  
+  
+  
+    <td class="monthly-cost"></td>
+  
+
+  </tr>
+  
+  
+  
+    
+  <tr class="cost-component">
+    <td class="name">
+      
+      <span class="arrow">&#8627;</span>
+      Requests
+    </td>
+    
+      <td colspan="3" class="usage-cost">Cost depends on usage: $0.20 per 1M requests</td>
+    
+  </tr>
+
+  
+  
 
       
         
@@ -614,7 +641,7 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
       
       <tr class="total">
         <td class="name" colspan="3">Project total</td>
-        <td class="monthly-cost">$1,361.31</td>
+        <td class="monthly-cost">$1,341.31</td>
       </tr>
     </tbody>
   </table>
@@ -625,7 +652,7 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
       <tbody>
         <tr class="total">
           <td class="name" colspan="3">Overall total</td>
-          <td class="monthly-cost">$1,361.31</td>
+          <td class="monthly-cost">$1,341.31</td>
         </tr>
       </tbody>
     </table>

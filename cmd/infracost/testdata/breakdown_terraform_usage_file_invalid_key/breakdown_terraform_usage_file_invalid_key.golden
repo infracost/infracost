@@ -19,12 +19,12 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
     └─ Provisioned IOPS                                                 800  IOPS                              $52.00 
                                                                                                                       
  aws_lambda_function.hello_world                                                                                      
- ├─ Requests                                                            100  1M requests                       $20.00 
- └─ Duration                                                     25,000,000  GB-seconds                       $416.67 
+ ├─ Requests                                            Monthly cost depends on usage: $0.20 per 1M requests          
+ └─ Duration (first 6B)                                          25,000,000  GB-seconds                       $416.67 
                                                                                                                       
  aws_lambda_function.zero_cost_lambda                                                                                 
  ├─ Requests                                            Monthly cost depends on usage: $0.20 per 1M requests          
- └─ Duration                                            Monthly cost depends on usage: $0.0000166667 per GB-seconds   
+ └─ Duration (first 6B)                                 Monthly cost depends on usage: $0.0000166667 per GB-seconds   
                                                                                                                       
  aws_s3_bucket.usage                                                                                                  
  └─ Standard                                                                                                          
@@ -34,7 +34,7 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
     ├─ Select data scanned                              Monthly cost depends on usage: $0.002 per GB                  
     └─ Select data returned                             Monthly cost depends on usage: $0.0007 per GB                 
                                                                                                                       
- OVERALL TOTAL                                                                                              $1,921.95 
+ OVERALL TOTAL                                                                                              $1,901.95 
 ──────────────────────────────────
 5 cloud resources were detected:
 ∙ 5 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
