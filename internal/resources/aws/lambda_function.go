@@ -91,7 +91,7 @@ func (a *LambdaFunction) BuildResource() *schema.Resource {
 		}
 
 	} else {
-		costComponents = append(costComponents, a.durationCostComponent("Duration (first) 6B", "0", gbSeconds))
+		costComponents = append(costComponents, a.durationCostComponent("Duration (first 6B)", "0", gbSeconds))
 	}
 
 	estimate := func(ctx context.Context, values map[string]interface{}) error {
