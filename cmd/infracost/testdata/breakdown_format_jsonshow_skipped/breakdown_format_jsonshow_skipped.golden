@@ -166,7 +166,7 @@
                 "monthlyCost": null
               },
               {
-                "name": "Duration (first 6b)",
+                "name": "Duration (first 6B)",
                 "unit": "GB-seconds",
                 "hourlyQuantity": "34246.5753424657534247",
                 "monthlyQuantity": "25000000",
@@ -201,7 +201,7 @@
                 "monthlyCost": null
               },
               {
-                "name": "Duration (first 6b)",
+                "name": "Duration (first 6B)",
                 "unit": "GB-seconds",
                 "hourlyQuantity": "0",
                 "monthlyQuantity": "0",
@@ -427,7 +427,7 @@
                 "monthlyCost": "0"
               },
               {
-                "name": "Duration (first 6b)",
+                "name": "Duration (first 6B)",
                 "unit": "GB-seconds",
                 "hourlyQuantity": "34246.5753424657534247",
                 "monthlyQuantity": "25000000",
@@ -462,7 +462,7 @@
                 "monthlyCost": "0"
               },
               {
-                "name": "Duration (first 6b)",
+                "name": "Duration (first 6B)",
                 "unit": "GB-seconds",
                 "hourlyQuantity": "0",
                 "monthlyQuantity": "0",
