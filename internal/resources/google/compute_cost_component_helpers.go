@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/shopspring/decimal"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
@@ -81,13 +82,13 @@ func customComputeCostComponents(region, machineType string, purchaseOption stri
 	}
 
 	var re = regexp.MustCompile(`(\D.+)-(\d+)-(\d.+)`)
-	firstTypeInfo := re.ReplaceAllString(machineType, "$1")
+	firstMachineTypeInfo := re.ReplaceAllString(machineType, "$1")
 	strCPUAmount := re.ReplaceAllString(machineType, "$2")
 	strRAMAmount := re.ReplaceAllString(machineType, "$3")
 
 	instanceType := ""
-	if firstTypeInfo != "custom" {
-		instanceType = strings.ToUpper(strings.Split(firstTypeInfo, "-")[0])
+	if firstMachineTypeInfo != "custom" {
+		instanceType = strings.ToUpper(strings.Split(firstMachineTypeInfo, "-")[0])
 	}
 
 	ext := ""
@@ -98,12 +99,14 @@ func customComputeCostComponents(region, machineType string, purchaseOption stri
 
 	numberOfCores, err := strconv.ParseInt(strCPUAmount, 10, 64)
 	if err != nil {
-		return []*schema.CostComponent{}
+		log.Warnf("Could not parse the custom number of Cores for %s", machineType)
+		return nil
 	}
 
 	mbOfRAM, err := strconv.ParseInt(strRAMAmount, 10, 64)
 	if err != nil {
-		return []*schema.CostComponent{}
+		log.Warnf("Could not parse the custom amount of Ram for %s", machineType)
+		return nil
 	}
 
 	qty := decimal.NewFromFloat(730)
