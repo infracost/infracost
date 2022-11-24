@@ -105,7 +105,7 @@ func customComputeCostComponents(region, machineType string, purchaseOption stri
 
 	mbOfRAM, err := strconv.ParseInt(strRAMAmount, 10, 64)
 	if err != nil {
-		log.Warnf("Could not parse the custom amount of Ram for %s", machineType)
+		log.Warnf("Could not parse the custom amount of RAM for %s", machineType)
 		return nil
 	}
 
