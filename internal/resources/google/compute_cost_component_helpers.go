@@ -109,7 +109,7 @@ func customComputeCostComponents(region, machineType string, purchaseOption stri
 		return nil
 	}
 
-	qty := decimal.NewFromFloat(730)
+	qty := decimal.NewFromFloat(schema.HourToMonthUnitMultiplier)
 	if monthlyHours != nil {
 		qty = decimal.NewFromFloat(*monthlyHours)
 	}
