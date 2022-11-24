@@ -135,7 +135,7 @@ func customComputeCostComponents(region, machineType string, purchaseOption stri
 	}
 
 	ramCostComponent := &schema.CostComponent{
-		Name:                fmt.Sprintf("Custom Instance RAM usage (Linux/UNIX, %s, %s)", purchaseOptionLabel(purchaseOption), machineType),
+		Name:                fmt.Sprintf("Custom Instance RAM (Linux/UNIX, %s, %s)", purchaseOptionLabel(purchaseOption), machineType),
 		Unit:                "gibibyte hour",
 		UnitMultiplier:      decimal.NewFromInt(mbOfRAM / 1024),
 		MonthlyQuantity:     decimalPtr(qty.Mul(decimal.NewFromInt(instanceCount * mbOfRAM / 1024))),
