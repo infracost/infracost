@@ -115,7 +115,7 @@ func customComputeCostComponents(region, machineType string, purchaseOption stri
 	}
 
 	cpuCostComponent := &schema.CostComponent{
-		Name:                fmt.Sprintf("Custom Instance CPU usage (Linux/UNIX, %s, %s)", purchaseOptionLabel(purchaseOption), machineType),
+		Name:                fmt.Sprintf("Custom instance CPU (Linux/UNIX, %s, %s)", purchaseOptionLabel(purchaseOption), machineType),
 		Unit:                "hours",
 		UnitMultiplier:      decimal.NewFromInt(numberOfCores),
 		MonthlyQuantity:     decimalPtr(qty.Mul(decimal.NewFromInt(instanceCount * numberOfCores))),
