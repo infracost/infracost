@@ -74,7 +74,8 @@ func aksClusterNodePool(name, region string, n gjson.Result, nodeCount decimal.D
 }
 
 func aksOSDiskSubResource(region string, diskSize int) *schema.Resource {
-	diskType := "Premium_LRS"
+	diskType := "Premium"
+	storageReplicationType := "LRS"
 
 	diskName := mapDiskName(diskType, diskSize)
 	if diskName == "" {
@@ -88,7 +89,7 @@ func aksOSDiskSubResource(region string, diskSize int) *schema.Resource {
 		return nil
 	}
 
-	costComponent := []*schema.CostComponent{storageCostComponent(region, diskName, productName)}
+	costComponent := []*schema.CostComponent{storageCostComponent(region, diskName, storageReplicationType, productName)}
 
 	return &schema.Resource{
 		Name:           "os_disk",
