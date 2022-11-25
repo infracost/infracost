@@ -126,7 +126,7 @@ func customComputeCostComponents(region, machineType string, purchaseOption stri
 			Service:       strPtr("Compute Engine"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "description", ValueRegex: regexPtr(fmt.Sprintf("%s.*Custom Instance Core.*", instanceType))},
+				{Key: "description", ValueRegex: regexPtr(fmt.Sprintf("^%s Custom Instance Core", instanceType))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
