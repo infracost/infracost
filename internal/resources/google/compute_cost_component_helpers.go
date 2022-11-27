@@ -119,7 +119,6 @@ func customComputeCostComponents(region, machineType string, purchaseOption stri
 	if monthlyHours != nil {
 		qty = decimal.NewFromFloat(*monthlyHours)
 	}
-
 	cpuCostComponent := &schema.CostComponent{
 		Name:                fmt.Sprintf("Custom instance CPU (Linux/UNIX, %s, %s)", purchaseOptionLabel(purchaseOption), machineType),
 		Unit:                "hours",
@@ -152,7 +151,7 @@ func customComputeCostComponents(region, machineType string, purchaseOption stri
 			Service:       strPtr("Compute Engine"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "description", ValueRegex: regexPtr(fmt.Sprintf("^%sCustom%sInstance Ram", instanceType, ext))},
+				{Key: "description", ValueRegex: regexPtr(fmt.Sprintf("^%s%sCustom%sInstance Ram", purchaseOptionPrefix, instanceType, ext))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
