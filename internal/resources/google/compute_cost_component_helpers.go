@@ -70,7 +70,7 @@ func computeCostComponent(region, machineType string, purchaseOption string, ins
 // customComputeCostComponent returns a cost component for custom Compute instance usage.
 func customComputeCostComponents(region, machineType string, purchaseOption string, instanceCount int64, monthlyHours *float64) []*schema.CostComponent {
 	sustainedUseDiscount := 0.0
-	fixPurchaseOption := "Preemptible"
+	fixPurchaseOption := ""
 	if strings.ToLower(purchaseOption) == "on_demand" {
 		fixPurchaseOption = "OnDemand"
 		switch strings.ToLower(strings.Split(machineType, "-")[0]) {
@@ -81,6 +81,12 @@ func customComputeCostComponents(region, machineType string, purchaseOption stri
 		}
 	}
 
+	purchaseOptionPrefix := ""
+	if purchaseOption == "preemptible" {
+		purchaseOptionPrefix = "Spot Preemptible "
+		fixPurchaseOption = "Preemptible"
+	}
+
 	var re = regexp.MustCompile(`(\D.+)-(\d+)-(\d.+)`)
 	firstMachineTypeInfo := re.ReplaceAllString(machineType, "$1")
 	strCPUAmount := re.ReplaceAllString(machineType, "$2")
@@ -88,12 +94,12 @@ func customComputeCostComponents(region, machineType string, purchaseOption stri
 
 	instanceType := ""
 	if firstMachineTypeInfo != "custom" {
-		instanceType = strings.ToUpper(strings.Split(firstMachineTypeInfo, "-")[0])
+		instanceType = strings.ToUpper(strings.Split(firstMachineTypeInfo, "-")[0]) + " "
 	}
 
-	ext := ""
+	ext := " "
 	if strings.Contains(strRAMAmount, "ext") {
-		ext = "Extended"
+		ext = " Extended "
 		strRAMAmount = strings.Split(strRAMAmount, "-")[0]
 	}
 
@@ -126,7 +132,7 @@ func customComputeCostComponents(region, machineType string, purchaseOption stri
 			Service:       strPtr("Compute Engine"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "description", ValueRegex: regexPtr(fmt.Sprintf("^%s Custom Instance Core", instanceType))},
+				{Key: "description", ValueRegex: regexPtr(fmt.Sprintf("^%s%sCustom Instance Core", purchaseOptionPrefix, instanceType))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -146,7 +152,7 @@ func customComputeCostComponents(region, machineType string, purchaseOption stri
 			Service:       strPtr("Compute Engine"),
 			ProductFamily: strPtr("Compute"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "description", ValueRegex: regexPtr(fmt.Sprintf("%s.*Custom.*%s.*Ram.*", instanceType, ext))},
+				{Key: "description", ValueRegex: regexPtr(fmt.Sprintf("^%sCustom%sInstance Ram", instanceType, ext))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
