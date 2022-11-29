@@ -1,0 +1,8 @@
+Comment posted to GitHub
+
+Logs:
+level=info msg="Estimate uploaded to Infracost Cloud"
+level=info msg="1 guardrail checked"
+level=info msg="Creating new comment"
+level=warning msg=">\\n\\t\\t\\t<summary><strong>✅ Guardrail checks passed</strong></summary>\\n\\t\\t</"
+level=info msg="Created new comment: "
