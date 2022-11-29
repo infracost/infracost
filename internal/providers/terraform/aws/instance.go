@@ -21,6 +21,7 @@ func getInstanceRegistryItem() *schema.RegistryItem {
 		RFunc: NewInstance,
 		ReferenceAttributes: []string{
 			"ebs_block_device.#.volume_id",
+			"host_id",
 			"launch_template.#.id",
 			"launch_template.#.name",
 		},
@@ -76,6 +77,7 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	monitoring = d.GetBoolOrDefault("monitoring", monitoring)
 	cpuCredits = d.GetStringOrDefault("credit_specification.0.cpu_credits", cpuCredits)
 	tenancy = d.GetStringOrDefault("tenancy", tenancy)
+	hasHost := len(d.References("host_id")) > 0
 
 	a := &aws.Instance{
 		Address:          d.Address,
@@ -87,6 +89,7 @@ func NewInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 		EBSOptimized:     ebsOptimized,
 		EnableMonitoring: monitoring,
 		CPUCredits:       cpuCredits,
+		HasHost:          hasHost,
 	}
 
 	a.RootBlockDevice = &aws.EBSVolume{

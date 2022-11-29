@@ -26,6 +26,7 @@ type Instance struct {
 	EBSOptimized     bool
 	EnableMonitoring bool
 	CPUCredits       string
+	HasHost          bool
 
 	// "optional" args, that may be empty depending on the resource config
 	ElasticInferenceAcceleratorType *string
@@ -58,8 +59,12 @@ func (a *Instance) PopulateUsage(u *schema.UsageData) {
 
 func (a *Instance) BuildResource() *schema.Resource {
 	if strings.ToLower(a.Tenancy) == "host" {
-		log.Warnf("Skipping resource %s. Infracost currently does not support host tenancy for AWS EC2 instances", a.Address)
-		return nil
+		if a.HasHost {
+			a.Tenancy = "Host"
+		} else {
+			log.Warnf("Skipping resource %s. Infracost currently does not support host tenancy for AWS EC2 instances without Host ID set up", a.Address)
+			return nil
+		}
 	} else if strings.ToLower(a.Tenancy) == "dedicated" {
 		a.Tenancy = "Dedicated"
 	} else {
@@ -89,7 +94,9 @@ func (a *Instance) BuildResource() *schema.Resource {
 		subResources = append(subResources, ebs.BuildResource())
 	}
 
-	costComponents = append(costComponents, a.computeCostComponent())
+	if !a.HasHost {
+		costComponents = append(costComponents, a.computeCostComponent())
+	}
 
 	if a.EBSOptimized {
 		costComponents = append(costComponents, a.ebsOptimizedCostComponent())
