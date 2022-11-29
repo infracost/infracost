@@ -20,58 +20,58 @@ import (
 type GetPricesFunc func(ctx *config.RunContext, c *apiclient.PricingAPIClient, r *schema.Resource) error
 
 // TerraformPlanScanner scans a plan for Infracost Cloud cost optimizations. These optimizations are provided by the
-// recommendations API and the scanner links any suggestions to raw resources. It attempts to find cost estimates for any
-// recommendations that are found.
+// policy API and the scanner links any suggestions to raw resources. It attempts to find cost estimates for any
+// policies that are found.
 type TerraformPlanScanner struct {
-	pricingAPIClient        *apiclient.PricingAPIClient
-	recommendationAPIClient apiclient.RecommendationClient
-	logger                  *log.Entry
-	ctx                     *config.RunContext
-	getPrices               GetPricesFunc
+	pricingAPIClient *apiclient.PricingAPIClient
+	policyAPIClient  apiclient.PolicyClient
+	logger           *log.Entry
+	ctx              *config.RunContext
+	getPrices        GetPricesFunc
 }
 
 // NewTerraformPlanScanner returns an initialised TerraformPlanScanner.
 func NewTerraformPlanScanner(ctx *config.RunContext, logger *log.Entry, getPrices GetPricesFunc) *TerraformPlanScanner {
 	return &TerraformPlanScanner{
-		pricingAPIClient:        apiclient.NewPricingAPIClient(ctx),
-		recommendationAPIClient: apiclient.NewRecommendationClient(ctx.Config, logger),
-		logger:                  logger,
-		ctx:                     ctx,
-		getPrices:               getPrices,
+		pricingAPIClient: apiclient.NewPricingAPIClient(ctx),
+		policyAPIClient:  apiclient.NewPolicyClient(ctx.Config, logger),
+		logger:           logger,
+		ctx:              ctx,
+		getPrices:        getPrices,
 	}
 }
 
-// ScanPlan scans the provided projectPlan for the project, if any Recommendations are found for the plan
+// ScanPlan scans the provided projectPlan for the project, if any Policies are found for the plan
 // the Scanner will attempt to fetch costs for the suggestion and given resource. These suggestions will only
 // be provided for resources that are marked as a schema.CoreResource.
 func (s *TerraformPlanScanner) ScanPlan(project *schema.Project, projectPlan []byte) error {
-	apiRecommendations, err := s.recommendationAPIClient.GetRecommendations(projectPlan)
+	apiPolicies, err := s.policyAPIClient.GetPolicies(projectPlan)
 	if err != nil {
 		return fmt.Errorf("failed to get suggestions %w", err)
 	}
 
-	var recMap = make(map[string]schema.Recommendations)
-	for _, apiRecommendation := range apiRecommendations {
-		recommendation := schema.Recommendation{
-			ID:                 apiRecommendation.ID,
-			Title:              apiRecommendation.Title,
-			Description:        apiRecommendation.Description,
-			ResourceType:       apiRecommendation.ResourceType,
-			ResourceAttributes: apiRecommendation.ResourceAttributes,
-			Address:            apiRecommendation.Address,
-			Suggested:          apiRecommendation.Suggested,
-			NoCost:             apiRecommendation.NoCost,
+	var recMap = make(map[string]schema.Policies)
+	for _, apiPolicy := range apiPolicies {
+		policy := schema.Policy{
+			ID:                 apiPolicy.ID,
+			Title:              apiPolicy.Title,
+			Description:        apiPolicy.Description,
+			ResourceType:       apiPolicy.ResourceType,
+			ResourceAttributes: apiPolicy.ResourceAttributes,
+			Address:            apiPolicy.Address,
+			Suggested:          apiPolicy.Suggested,
+			NoCost:             apiPolicy.NoCost,
 		}
 
-		if v, ok := recMap[apiRecommendation.ResourceType]; ok {
-			recMap[apiRecommendation.ResourceType] = append(v, recommendation)
+		if v, ok := recMap[apiPolicy.ResourceType]; ok {
+			recMap[apiPolicy.ResourceType] = append(v, policy)
 			continue
 		}
 
-		recMap[apiRecommendation.ResourceType] = schema.Recommendations{recommendation}
+		recMap[apiPolicy.ResourceType] = schema.Policies{policy}
 	}
 
-	var costedRecommendations schema.Recommendations
+	var costedPolicies schema.Policies
 	for _, resource := range project.PartialResources {
 		coreResource := resource.CoreResource
 		if coreResource == nil {
@@ -82,59 +82,57 @@ func (s *TerraformPlanScanner) ScanPlan(project *schema.Project, projectPlan []b
 			continue
 		}
 
-		// TODO: fetch usage and populate resource
-		coreResource.PopulateUsage(nil)
 		baselineSchema, err := jsoniter.Marshal(coreResource)
 		if err != nil {
-			s.logger.WithError(err).Debug("could not marshal initial schema for recommendation resource")
+			s.logger.WithError(err).Debug("could not marshal initial schema for policy resource")
 			continue
 		}
 
-		baselineResource, err := s.buildResource(coreResource)
+		baselineResource, err := s.buildResource(coreResource, resource.ResourceData.UsageData)
 		if err != nil {
 			s.logger.WithError(err).Debug("could not fetch prices for initial resource")
 			continue
 		}
 
-		for _, recommendation := range recMap[coreResource.CoreType()] {
-			if recommendation.Address != baselineResource.Name {
+		for _, policy := range recMap[coreResource.CoreType()] {
+			if policy.Address != baselineResource.Name {
 				continue
 			}
 
-			costedRecommendation, err := s.costSuggestion(coreResource, baselineSchema, baselineResource, recommendation)
+			costedPolicy, err := s.costSuggestion(coreResource, baselineSchema, baselineResource, resource.ResourceData.UsageData, policy)
 			if err != nil {
-				s.logger.WithError(err).Debugf("failed to cost recommendation for resource %s", baselineResource.Name)
+				s.logger.WithError(err).Debugf("failed to cost policy for resource %s", baselineResource.Name)
 				continue
 			}
 
-			costedRecommendations = append(costedRecommendations, costedRecommendation)
+			costedPolicies = append(costedPolicies, costedPolicy)
 		}
 	}
 
-	sort.Sort(costedRecommendations)
+	sort.Sort(costedPolicies)
 	if project.Metadata == nil {
 		project.Metadata = &schema.ProjectMetadata{}
 	}
 
-	project.Metadata.Recommendations = costedRecommendations
+	project.Metadata.Policies = costedPolicies
 
 	return nil
 }
 
-func (s *TerraformPlanScanner) costSuggestion(coreResource schema.CoreResource, baselineSchema []byte, baselineResource *schema.Resource, recommendation schema.Recommendation) (schema.Recommendation, error) {
-	if recommendation.NoCost {
-		return recommendation, nil
+func (s *TerraformPlanScanner) costSuggestion(coreResource schema.CoreResource, baselineSchema []byte, baselineResource *schema.Resource, usage *schema.UsageData, policy schema.Policy) (schema.Policy, error) {
+	if policy.NoCost {
+		return policy, nil
 	}
 
-	suggestedAttributes := recommendation.ResourceAttributes
+	suggestedAttributes := policy.ResourceAttributes
 	err := mergeSuggestionWithResource(baselineSchema, suggestedAttributes, coreResource)
 	if err != nil {
-		return recommendation, fmt.Errorf("could not merge costed resource from scan with baseline resource type: %s", coreResource.CoreType())
+		return policy, fmt.Errorf("could not merge costed resource from scan with baseline resource type: %s", coreResource.CoreType())
 	}
 
-	schemaResource, err := s.buildResource(coreResource)
+	schemaResource, err := s.buildResource(coreResource, usage)
 	if err != nil {
-		return recommendation, fmt.Errorf("could not fetch prices for costed resource type: %s", coreResource.CoreType())
+		return policy, fmt.Errorf("could not fetch prices for costed resource type: %s", coreResource.CoreType())
 	}
 
 	diff := decimal.Zero
@@ -142,26 +140,27 @@ func (s *TerraformPlanScanner) costSuggestion(coreResource schema.CoreResource, 
 		diff = baselineResource.MonthlyCost.Sub(*schemaResource.MonthlyCost)
 	}
 
-	return schema.Recommendation{
-		ID:                 recommendation.ID,
-		Title:              recommendation.Title,
-		Description:        recommendation.Description,
-		ResourceType:       recommendation.ResourceType,
-		ResourceAttributes: recommendation.ResourceAttributes,
-		Address:            recommendation.Address,
-		Suggested:          recommendation.Suggested,
-		NoCost:             recommendation.NoCost,
+	return schema.Policy{
+		ID:                 policy.ID,
+		Title:              policy.Title,
+		Description:        policy.Description,
+		ResourceType:       policy.ResourceType,
+		ResourceAttributes: policy.ResourceAttributes,
+		Address:            policy.Address,
+		Suggested:          policy.Suggested,
+		NoCost:             policy.NoCost,
 		Cost:               &diff,
 	}, nil
 }
 
-func (s *TerraformPlanScanner) buildResource(coreResource schema.CoreResource) (*schema.Resource, error) {
+func (s *TerraformPlanScanner) buildResource(coreResource schema.CoreResource, usage *schema.UsageData) (*schema.Resource, error) {
+	coreResource.PopulateUsage(usage)
 	r := coreResource.BuildResource()
+
 	err := s.getPrices(s.ctx, s.pricingAPIClient, r)
 	if err != nil {
 		return nil, fmt.Errorf("could not fetch prices for core resource %s %w", coreResource.CoreType(), err)
 	}
-
 	r.CalculateCosts()
 
 	return r, nil

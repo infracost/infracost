@@ -14,6 +14,7 @@ import (
 	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
+	"github.com/infracost/infracost/internal/usage"
 )
 
 type scanCmd struct {
@@ -90,6 +91,17 @@ func (s scanCmd) run(runCtx *config.RunContext) error {
 	spinner := ui.NewSpinner("Scanning projects for cost optimizations...", spinnerOpts)
 	defer spinner.Fail()
 
+	usageData := make(map[string]*schema.UsageData)
+
+	if s.UsageFile != "" {
+		usageFile, err := usage.LoadUsageFile(s.UsageFile)
+		if err != nil {
+			return err
+		}
+
+		usageData = usageFile.ToUsageDataMap()
+	}
+
 	var projects []*schema.Project
 	for _, project := range runCtx.Config.Projects {
 		projectCtx := config.NewProjectContext(runCtx, project, log.Fields{})
@@ -99,8 +111,7 @@ func (s scanCmd) run(runCtx *config.RunContext) error {
 			continue
 		}
 
-		// TODO load usage
-		hclProjects, err := hclProvider.LoadResources(map[string]*schema.UsageData{})
+		hclProjects, err := hclProvider.LoadResources(usageData)
 		if err != nil {
 			logging.Logger.WithError(err).Errorf("failed to load Terraform projects for path %s", project.Path)
 			continue
@@ -112,14 +123,14 @@ func (s scanCmd) run(runCtx *config.RunContext) error {
 	spinner.Success()
 
 	for _, project := range projects {
-		if len(project.Metadata.Recommendations) == 0 {
+		if len(project.Metadata.Policies) == 0 {
 			pterm.DefaultBox.WithTitle(project.Name).Println(pterm.Green("No cost optimizations found."))
 			continue
 		}
 
-		rows := make([][]string, len(project.Metadata.Recommendations)+1)
+		rows := make([][]string, len(project.Metadata.Policies)+1)
 		rows[0] = []string{"Address", "Title", "Cost Saving"}
-		for i, suggestion := range project.Metadata.Recommendations {
+		for i, suggestion := range project.Metadata.Policies {
 			cost := "?"
 			if suggestion.Cost != nil {
 				cost = output.FormatCost2DP(runCtx.Config.Currency, suggestion.Cost)
@@ -139,8 +150,8 @@ func scanCommand(ctx *config.RunContext) *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:    "scan",
-		Short:  "Scan your Terraform projects for cost optimisations",
-		Long:   "Scan your Terraform projects for cost optimisations",
+		Short:  "Scan your Terraform projects for cost optimizations",
+		Long:   "Scan your Terraform projects for cost optimizations",
 		Hidden: true,
 		Example: `
       infracost scan --path /code --terraform-var-file my.tfvars

@@ -138,7 +138,7 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 		return nil, err
 	}
 	var scanner *scan.TerraformPlanScanner
-	if ctx.RunContext.Config.RecommendationAPIEndpoint != "" {
+	if ctx.RunContext.Config.PolicyAPIEndpoint != "" {
 		scanner = scan.NewTerraformPlanScanner(ctx.RunContext, ctx.Logger(), prices.GetPrices)
 	}
 

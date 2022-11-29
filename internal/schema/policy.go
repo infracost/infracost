@@ -6,7 +6,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type Recommendation struct {
+type Policy struct {
 	ID                 string           `json:"id"`
 	Title              string           `json:"title"`
 	Description        string           `json:"description"`
@@ -18,13 +18,13 @@ type Recommendation struct {
 	Cost               *decimal.Decimal `json:"cost"`
 }
 
-type Recommendations []Recommendation
+type Policies []Policy
 
-func (r Recommendations) Len() int {
+func (r Policies) Len() int {
 	return len(r)
 }
 
-func (r Recommendations) Less(i, j int) bool {
+func (r Policies) Less(i, j int) bool {
 	iSug := r[i]
 	jSug := r[j]
 
@@ -47,6 +47,6 @@ func (r Recommendations) Less(i, j int) bool {
 	return iSug.Cost.GreaterThan(*jSug.Cost)
 }
 
-func (r Recommendations) Swap(i, j int) {
+func (r Policies) Swap(i, j int) {
 	r[i], r[j] = r[j], r[i]
 }

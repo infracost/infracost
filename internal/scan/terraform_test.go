@@ -21,7 +21,7 @@ import (
 
 func TestTerraformPlanScanner_ScanPlan(t *testing.T) {
 	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.URL.Path == "/recommend" {
+		if r.URL.Path == "/policy" {
 			_, _ = w.Write([]byte(`
 			{
 				"result": [
@@ -48,7 +48,7 @@ func TestTerraformPlanScanner_ScanPlan(t *testing.T) {
 
 	runCtx := &config.RunContext{
 		Config: &config.Config{
-			RecommendationAPIEndpoint: s.URL,
+			PolicyAPIEndpoint: s.URL,
 		},
 	}
 
@@ -95,8 +95,8 @@ func TestTerraformPlanScanner_ScanPlan(t *testing.T) {
 	err = ps.ScanPlan(project, plans[0].JSON)
 	require.NoError(t, err)
 
-	assert.Len(t, project.Metadata.Recommendations, 1)
-	b, err := json.Marshal(project.Metadata.Recommendations[0])
+	assert.Len(t, project.Metadata.Policies, 1)
+	b, err := json.Marshal(project.Metadata.Policies[0])
 	str := string(b)
 
 	require.NoError(t, err)
