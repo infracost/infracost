@@ -191,7 +191,7 @@ func mergeSuggestionWithResource(schema []byte, suggestedSchema []byte, resource
 
 	err = json.Unmarshal(nb, &resource)
 	if err != nil {
-		return fmt.Errorf("failed to unmarshall attributes with suggestions")
+		return fmt.Errorf("failed to unmarshal attributes with suggestions")
 	}
 
 	return nil
