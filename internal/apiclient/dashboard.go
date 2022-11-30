@@ -180,7 +180,7 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (Ad
 				fmt.Fprintf(ctx.ErrWriter, "%s\n", guardrailsMsg)
 			}
 			for _, f := range allGuardrailFailures {
-				failureMsg := fmt.Sprintf(`guardrail check failed: %v`, f)
+				failureMsg := fmt.Sprintf(`guardrail check failed: %s`, f)
 				if ctx.Config.IsLogging() {
 					log.Info(failureMsg)
 				} else {
