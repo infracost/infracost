@@ -173,7 +173,7 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (Ad
 			if response.GuardrailCheck.TotalChecked > 1 {
 				guardrailStr = "guardrails"
 			}
-			guardrailsMsg := fmt.Sprintf(`%v %s checked`, response.GuardrailCheck.TotalChecked, guardrailStr)
+			guardrailsMsg := fmt.Sprintf(`%d %s checked`, response.GuardrailCheck.TotalChecked, guardrailStr)
 			if ctx.Config.IsLogging() {
 				log.Info(guardrailsMsg)
 			} else {
