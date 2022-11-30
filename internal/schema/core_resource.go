@@ -66,3 +66,19 @@ func BuildResource(partial *PartialResource, fetchedUsage *UsageData) *Resource 
 
 	return res
 }
+
+func BuildResources(projects []*Project, projectPtrToUsageMap map[*Project]map[string]*UsageData) {
+	for _, project := range projects {
+		usageMap := projectPtrToUsageMap[project]
+
+		for _, partial := range project.PartialResources {
+			u := usageMap[partial.ResourceData.Address]
+			project.Resources = append(project.Resources, BuildResource(partial, u))
+		}
+
+		for _, partial := range project.PartialPastResources {
+			u := usageMap[partial.ResourceData.Address]
+			project.PastResources = append(project.PastResources, BuildResource(partial, u))
+		}
+	}
+}

@@ -11,8 +11,8 @@ var defaultEKSInstanceType = "t3.medium"
 
 func getNewEKSNodeGroupItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_eks_node_group",
-		RFunc: NewEKSNodeGroup,
+		Name:      "aws_eks_node_group",
+		CoreRFunc: NewEKSNodeGroup,
 		ReferenceAttributes: []string{
 			"launch_template.0.id",
 			"launch_template.0.name",
@@ -20,7 +20,7 @@ func getNewEKSNodeGroupItem() *schema.RegistryItem {
 	}
 }
 
-func NewEKSNodeGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewEKSNodeGroup(d *schema.ResourceData) schema.CoreResource {
 	region := d.Get("region").String()
 
 	instanceCount := d.Get("scaling_config.0.desired_size").Int()
@@ -67,7 +67,7 @@ func NewEKSNodeGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 			data.Set("instance_type", defaultEKSInstanceType)
 		}
 
-		a.LaunchTemplate = newLaunchTemplate(data, u, region, instanceCount, int64(0), onDemandPercentageAboveBaseCount)
+		a.LaunchTemplate = newLaunchTemplate(data, region, instanceCount, int64(0), onDemandPercentageAboveBaseCount)
 	} else {
 		if instanceType == "" {
 			instanceType = defaultEKSInstanceType
@@ -77,7 +77,5 @@ func NewEKSNodeGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 		a.PurchaseOption = strings.ToLower(d.Get("capacity_type").String())
 	}
 
-	a.PopulateUsage(u)
-
-	return a.BuildResource()
+	return a
 }

@@ -213,11 +213,11 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 
 			expected := exp.String()
 			root := got[0]
-			actual := string(root.json)
+			actual := string(root.JSON)
 			assert.JSONEq(t, expected, actual)
 
-			codes := make([]hcl.WarningCode, len(root.module.Warnings))
-			for i, w := range root.module.Warnings {
+			codes := make([]hcl.WarningCode, len(root.Module.Warnings))
+			for i, w := range root.Module.Warnings {
 				codes[i] = w.Code
 			}
 

@@ -10,7 +10,6 @@ import (
 
 	"github.com/shopspring/decimal"
 
-	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/infracost/infracost/internal/usage"
@@ -591,6 +590,10 @@ func formatCounts(countMap *map[string]int) string {
 	return msg
 }
 
+func hasSupportedTerraformProvider(rType string) bool {
+	return strings.HasPrefix(rType, "aws_") || strings.HasPrefix(rType, "google_") || strings.HasPrefix(rType, "azurerm_")
+}
+
 func BuildSummary(resources []*schema.Resource, opts SummaryOptions) (*Summary, error) {
 	s := &Summary{}
 
@@ -614,7 +617,7 @@ func BuildSummary(resources []*schema.Resource, opts SummaryOptions) (*Summary, 
 	}
 
 	for _, r := range resources {
-		if !opts.IncludeUnsupportedProviders && !terraform.HasSupportedProvider(r.ResourceType) {
+		if !opts.IncludeUnsupportedProviders && !hasSupportedTerraformProvider(r.ResourceType) {
 			continue
 		}
 

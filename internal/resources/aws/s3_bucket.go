@@ -4,12 +4,13 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/shopspring/decimal"
+	log "github.com/sirupsen/logrus"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
 	"github.com/infracost/infracost/internal/usage/aws"
-	"github.com/shopspring/decimal"
-	log "github.com/sirupsen/logrus"
 )
 
 type S3Bucket struct {

@@ -7,8 +7,9 @@ import (
 	"html/template"
 	"strings"
 
-	"github.com/infracost/infracost/internal/ui"
 	"github.com/shopspring/decimal"
+
+	"github.com/infracost/infracost/internal/ui"
 
 	"github.com/Masterminds/sprig"
 
@@ -42,7 +43,7 @@ func ToHTML(out Root, opts Options) ([]byte, error) {
 		},
 		"filterZeroValComponents": filterZeroValComponents,
 		"filterZeroValResources":  filterZeroValResources,
-		"formatCost2DP":           func(d *decimal.Decimal) string { return formatCost2DP(out.Currency, d) },
+		"formatCost2DP":           func(d *decimal.Decimal) string { return FormatCost2DP(out.Currency, d) },
 		"formatPrice":             func(d decimal.Decimal) string { return formatPrice(out.Currency, d) },
 		"formatTitleWithCurrency": func(title string) string { return formatTitleWithCurrency(title, out.Currency) },
 		"formatQuantity":          formatQuantity,

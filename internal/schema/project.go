@@ -27,6 +27,7 @@ type ProjectMetadata struct {
 	TerraformWorkspace  string    `json:"terraformWorkspace,omitempty"`
 	VCSSubPath          string    `json:"vcsSubPath,omitempty"`
 	Warnings            []Warning `json:"warnings,omitempty"`
+	Policies            Policies  `json:"policies,omitempty"`
 }
 
 func (m *ProjectMetadata) WorkspaceLabel() string {

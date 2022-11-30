@@ -4,10 +4,11 @@ import (
 	"context"
 	"math"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage/aws"
-	"github.com/shopspring/decimal"
 )
 
 type EKSNodeGroup struct {
@@ -33,6 +34,14 @@ type EKSNodeGroup struct {
 	ReservedInstancePaymentOption *string `infracost_usage:"reserved_instance_payment_option"`
 	MonthlyCPUCreditHours         *int64  `infracost_usage:"monthly_cpu_credit_hrs"`
 	VCPUCount                     *int64  `infracost_usage:"vcpu_count"`
+}
+
+func (a *EKSNodeGroup) CoreType() string {
+	return "EKSNodeGroup"
+}
+
+func (a *EKSNodeGroup) UsageSchema() []*schema.UsageItem {
+	return EKSNodeGroupUsageSchema
 }
 
 var EKSNodeGroupUsageSchema = append([]*schema.UsageItem{
