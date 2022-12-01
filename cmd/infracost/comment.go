@@ -64,13 +64,14 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 
 	combined.IsCIRun = ctx.IsCIRun()
 
+	var guardrailCheck output.GuardrailCheck
 	dryRun, _ := cmd.Flags().GetBool("dry-run")
 	if ctx.IsCloudEnabled() && !dryRun {
 		if ctx.Config.IsSelfHosted() {
 			ui.PrintWarning(cmd.ErrOrStderr(), "Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
 		} else {
 			combined.Metadata.InfracostCommand = "comment"
-			combined.RunID, combined.ShareURL = shareCombinedRun(ctx, combined, inputs)
+			combined.RunID, combined.ShareURL, guardrailCheck = shareCombinedRun(ctx, combined, inputs)
 		}
 	}
 
@@ -91,6 +92,7 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 		NoColor:           ctx.Config.NoColor,
 		ShowSkipped:       true,
 		PolicyChecks:      policyChecks,
+		GuardrailCheck:    guardrailCheck,
 	}
 
 	b, err := output.ToMarkdown(combined, opts, mdOpts)
@@ -100,6 +102,9 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 
 	if policyChecks.HasFailed() {
 		return b, policyChecks.Failures
+	}
+	if len(guardrailCheck.BlockingFailures) > 0 {
+		return b, guardrailCheck.BlockingFailures
 	}
 
 	return b, nil
