@@ -56,7 +56,6 @@ func computeCostComponents(region, machineType string, purchaseOption string, in
 	}
 
 	if !strings.Contains(machineType, "custom") {
-
 		return []*schema.CostComponent{
 			{
 				Name:                fmt.Sprintf("Instance usage (Linux/UNIX, %s, %s)", purchaseOptionLabel(purchaseOption), machineType),
