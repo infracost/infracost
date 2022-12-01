@@ -78,7 +78,7 @@ func computeCostComponents(region, machineType string, purchaseOption string, in
 		}
 	} else {
 		// GCP Custom Instances
-		var re = regexp.MustCompile(`(\D.+)-(\d+)-(\d.+)`)
+		re := regexp.MustCompile(`(\D.+)-(\d+)-(\d.+)`)
 		firstMachineTypeInfo := re.ReplaceAllString(machineType, "$1")
 		strCPUAmount := re.ReplaceAllString(machineType, "$2")
 		strRAMAmount := re.ReplaceAllString(machineType, "$3")
