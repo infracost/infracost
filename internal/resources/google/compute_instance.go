@@ -1,8 +1,6 @@
 package google
 
 import (
-	"strings"
-
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -41,11 +39,7 @@ func (r *ComputeInstance) PopulateUsage(u *schema.UsageData) {
 func (r *ComputeInstance) BuildResource() *schema.Resource {
 	costComponents := []*schema.CostComponent{}
 
-	if strings.Contains(r.MachineType, "custom") {
-		costComponents = append(costComponents, customComputeCostComponents(r.Region, r.MachineType, r.PurchaseOption, r.Size, r.MonthlyHours)...)
-	} else {
-		costComponents = append(costComponents, computeCostComponent(r.Region, r.MachineType, r.PurchaseOption, r.Size, r.MonthlyHours))
-	}
+	costComponents = append(costComponents, computeCostComponents(r.Region, r.MachineType, r.PurchaseOption, r.Size, r.MonthlyHours)...)
 
 	if r.HasBootDisk {
 		costComponents = append(costComponents, bootDiskCostComponent(r.Region, r.BootDiskSize, r.BootDiskType))

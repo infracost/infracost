@@ -1,8 +1,6 @@
 package google
 
 import (
-	"strings"
-
 	"github.com/shopspring/decimal"
 
 	"github.com/infracost/infracost/internal/resources"
@@ -50,11 +48,7 @@ func (r *ContainerNodePool) BuildResource() *schema.Resource {
 		computeDiskCostComponent(r.Region, r.NodeConfig.DiskType, r.NodeConfig.DiskSize, poolSize),
 	}
 
-	if strings.Contains(r.NodeConfig.MachineType, "custom") {
-		costComponents = append(costComponents, customComputeCostComponents(r.Region, r.NodeConfig.MachineType, r.NodeConfig.PurchaseOption, poolSize, nil)...)
-	} else {
-		costComponents = append(costComponents, computeCostComponent(r.Region, r.NodeConfig.MachineType, r.NodeConfig.PurchaseOption, poolSize, nil))
-	}
+	costComponents = append(costComponents, computeCostComponents(r.Region, r.NodeConfig.MachineType, r.NodeConfig.PurchaseOption, poolSize, nil)...)
 
 	if r.NodeConfig.LocalSSDCount > 0 {
 		costComponents = append(costComponents, scratchDiskCostComponent(r.Region, r.NodeConfig.PurchaseOption, int(r.NodeConfig.LocalSSDCount)))
