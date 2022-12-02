@@ -1,13 +1,14 @@
 package google
 
 import (
+	"errors"
 	"fmt"
+	"math"
 	"regexp"
 	"strconv"
 	"strings"
 
 	"github.com/shopspring/decimal"
-	log "github.com/sirupsen/logrus"
 
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
@@ -30,7 +31,11 @@ type ContainerNodeConfig struct {
 }
 
 // computeCostComponent returns a cost component for Compute instance usage.
-func computeCostComponents(region, machineType string, purchaseOption string, instanceCount int64, monthlyHours *float64) []*schema.CostComponent {
+func computeCostComponents(region, machineType string, purchaseOption string, instanceCount int64, monthlyHours *float64) ([]*schema.CostComponent, error) {
+	if strings.HasPrefix(strings.ToLower(machineType), "e2-custom") {
+		return nil, errors.New("Infracost currently does not support E2 custom instances")
+	}
+
 	sustainedUseDiscount := 0.0
 	fixPurchaseOption := ""
 
@@ -39,7 +44,7 @@ func computeCostComponents(region, machineType string, purchaseOption string, in
 		switch strings.ToLower(strings.Split(machineType, "-")[0]) {
 		case "c2", "n2", "n2d":
 			sustainedUseDiscount = 0.2
-		case "n1", "f1", "g1", "m1":
+		case "custom", "n1", "f1", "g1", "m1":
 			sustainedUseDiscount = 0.3
 		}
 	}
@@ -50,10 +55,11 @@ func computeCostComponents(region, machineType string, purchaseOption string, in
 		fixPurchaseOption = "Preemptible"
 	}
 
-	qty := decimal.NewFromFloat(schema.HourToMonthUnitMultiplier.InexactFloat64())
+	qty := schema.HourToMonthUnitMultiplier
 	if monthlyHours != nil {
 		qty = decimal.NewFromFloat(*monthlyHours)
 	}
+	qty = qty.Mul(decimal.NewFromInt(instanceCount))
 
 	if !strings.Contains(machineType, "custom") {
 		return []*schema.CostComponent{
@@ -61,7 +67,7 @@ func computeCostComponents(region, machineType string, purchaseOption string, in
 				Name:                fmt.Sprintf("Instance usage (Linux/UNIX, %s, %s)", purchaseOptionLabel(purchaseOption), machineType),
 				Unit:                "hours",
 				UnitMultiplier:      decimal.NewFromInt(1),
-				MonthlyQuantity:     decimalPtr(qty.Mul(decimal.NewFromInt(instanceCount))),
+				MonthlyQuantity:     decimalPtr(qty),
 				MonthlyDiscountPerc: sustainedUseDiscount,
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),
@@ -75,42 +81,65 @@ func computeCostComponents(region, machineType string, purchaseOption string, in
 				PriceFilter: &schema.PriceFilter{
 					PurchaseOption: strPtr(purchaseOption),
 				}},
-		}
+		}, nil
 	} else {
 		// GCP Custom Instances
 		re := regexp.MustCompile(`(\D.+)-(\d+)-(\d.+)`)
-		firstMachineTypeInfo := re.ReplaceAllString(machineType, "$1")
+		machineTypePrefix := re.ReplaceAllString(machineType, "$1")
 		strCPUAmount := re.ReplaceAllString(machineType, "$2")
 		strRAMAmount := re.ReplaceAllString(machineType, "$3")
 
-		instanceType := ""
-		if firstMachineTypeInfo != "custom" {
-			instanceType = strings.ToUpper(strings.Split(firstMachineTypeInfo, "-")[0]) + " "
-		}
-
-		ext := " "
+		extended := false
 		if strings.Contains(strRAMAmount, "ext") {
-			ext = " Extended "
+			extended = true
 			strRAMAmount = strings.Split(strRAMAmount, "-")[0]
 		}
 
-		numberOfCores, err := strconv.ParseInt(strCPUAmount, 10, 64)
-		if err != nil {
-			log.Warnf("Could not parse the custom number of Cores for %s", machineType)
-			return nil
+		instanceType := "N1"
+		instanceTypePrefix := "Custom"
+
+		if machineTypePrefix != "custom" {
+			instanceType = strings.ToUpper(strings.Split(machineTypePrefix, "-")[0])
+
+			if strings.HasSuffix(instanceType, "D") {
+				instanceTypePrefix = fmt.Sprintf("%s AMD Custom", instanceType)
+			} else if instanceType != "N1" {
+				instanceTypePrefix = fmt.Sprintf("%s Custom", instanceType)
+			}
 		}
 
-		mbOfRAM, err := strconv.ParseInt(strRAMAmount, 10, 64)
+		cores, err := strconv.ParseInt(strCPUAmount, 10, 64)
 		if err != nil {
-			log.Warnf("Could not parse the custom amount of RAM for %s", machineType)
-			return nil
+			return nil, fmt.Errorf("Could not parse the custom number of cores for %s", machineType)
 		}
 
-		cpuCostComponent := &schema.CostComponent{
-			Name:                fmt.Sprintf("Custom instance CPU (Linux/UNIX, %s, %s)", purchaseOptionLabel(purchaseOption), machineType),
+		memMB, err := strconv.ParseInt(strRAMAmount, 10, 64)
+		if err != nil {
+			return nil, fmt.Errorf("Could not parse the custom amount of RAM for %s", machineType)
+		}
+		memGB := float64(memMB) / 1024.0
+
+		maxMemRatio := 8.0
+		if instanceType == "N1" {
+			maxMemRatio = 6.5
+		}
+
+		extendedMemGB := 0.0
+		if extended {
+			maxMemGB := float64(cores) * maxMemRatio
+			extendedMemGB = math.Max(memGB-maxMemGB, 0)
+			if extendedMemGB > 0.0 {
+				memGB = maxMemGB
+			}
+		}
+
+		costComponents := make([]*schema.CostComponent, 0)
+
+		costComponents = append(costComponents, &schema.CostComponent{
+			Name:                fmt.Sprintf("Custom instance CPU (Linux/UNIX, %s, %s %d vCPUs)", purchaseOptionLabel(purchaseOption), instanceType, cores),
 			Unit:                "hours",
-			UnitMultiplier:      decimal.NewFromInt(numberOfCores),
-			MonthlyQuantity:     decimalPtr(qty.Mul(decimal.NewFromInt(instanceCount * numberOfCores))),
+			UnitMultiplier:      decimal.NewFromInt(cores),
+			MonthlyQuantity:     decimalPtr(qty.Mul(decimal.NewFromInt(cores))),
 			MonthlyDiscountPerc: sustainedUseDiscount,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("gcp"),
@@ -118,19 +147,19 @@ func computeCostComponents(region, machineType string, purchaseOption string, in
 				Service:       strPtr("Compute Engine"),
 				ProductFamily: strPtr("Compute"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "description", ValueRegex: regexPtr(fmt.Sprintf("^%s%sCustom Instance Core", purchaseOptionPrefix, instanceType))},
+					{Key: "description", ValueRegex: regexPtr(fmt.Sprintf("^%s%s Instance Core", purchaseOptionPrefix, instanceTypePrefix))},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
 				PurchaseOption: strPtr(fixPurchaseOption),
 			},
-		}
+		})
 
-		ramCostComponent := &schema.CostComponent{
-			Name:                fmt.Sprintf("Custom Instance RAM (Linux/UNIX, %s, %s)", purchaseOptionLabel(purchaseOption), machineType),
-			Unit:                "gibibyte hour",
-			UnitMultiplier:      decimal.NewFromInt(mbOfRAM / 1024),
-			MonthlyQuantity:     decimalPtr(qty.Mul(decimal.NewFromInt(instanceCount * mbOfRAM / 1024))),
+		costComponents = append(costComponents, &schema.CostComponent{
+			Name:                fmt.Sprintf("Custom Instance RAM (Linux/UNIX, %s, %s %s GB)", purchaseOptionLabel(purchaseOption), instanceType, strconv.FormatFloat(memGB, 'f', -1, 64)),
+			Unit:                "hours",
+			UnitMultiplier:      decimal.NewFromFloat(memGB),
+			MonthlyQuantity:     decimalPtr(qty.Mul(decimal.NewFromFloat(memGB))),
 			MonthlyDiscountPerc: sustainedUseDiscount,
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("gcp"),
@@ -138,18 +167,37 @@ func computeCostComponents(region, machineType string, purchaseOption string, in
 				Service:       strPtr("Compute Engine"),
 				ProductFamily: strPtr("Compute"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "description", ValueRegex: regexPtr(fmt.Sprintf("^%s%sCustom%sInstance Ram", purchaseOptionPrefix, instanceType, ext))},
+					{Key: "description", ValueRegex: regexPtr(fmt.Sprintf("^%s%s Instance Ram", purchaseOptionPrefix, instanceTypePrefix))},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
 				PurchaseOption: strPtr(fixPurchaseOption),
 			},
+		})
+
+		if extendedMemGB > 0.0 {
+			costComponents = append(costComponents, &schema.CostComponent{
+				Name:                fmt.Sprintf("Custom Instance Extended RAM (Linux/UNIX, %s, %s %s GB)", purchaseOptionLabel(purchaseOption), instanceType, strconv.FormatFloat(extendedMemGB, 'f', -1, 64)),
+				Unit:                "hours",
+				UnitMultiplier:      decimal.NewFromFloat(extendedMemGB),
+				MonthlyQuantity:     decimalPtr(qty.Mul(decimal.NewFromFloat(extendedMemGB))),
+				MonthlyDiscountPerc: sustainedUseDiscount,
+				ProductFilter: &schema.ProductFilter{
+					VendorName:    strPtr("gcp"),
+					Region:        strPtr(region),
+					Service:       strPtr("Compute Engine"),
+					ProductFamily: strPtr("Compute"),
+					AttributeFilters: []*schema.AttributeFilter{
+						{Key: "description", ValueRegex: regexPtr(fmt.Sprintf("^%s%s Extended Instance Ram", purchaseOptionPrefix, instanceTypePrefix))},
+					},
+				},
+				PriceFilter: &schema.PriceFilter{
+					PurchaseOption: strPtr(fixPurchaseOption),
+				},
+			})
 		}
 
-		return []*schema.CostComponent{
-			cpuCostComponent,
-			ramCostComponent,
-		}
+		return costComponents, nil
 	}
 
 }
