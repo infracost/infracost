@@ -149,6 +149,7 @@ func (r *EFSFileSystem) requestsCostComponent(name, accessType string, requestsG
 			ProductFamily: strPtr("Storage"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "accessType", Value: strPtr(accessType)},
+				{Key: "storageClass", Value: strPtr("Infrequent Access")},
 			},
 		},
 	}
