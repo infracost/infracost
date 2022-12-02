@@ -187,3 +187,125 @@ resource "google_compute_instance" "gpu_with_hours" {
     network = "default"
   }
 }
+
+resource "google_compute_instance" "custom" {
+  name         = "custom"
+  machine_type = "custom-6-20480"
+  zone         = "us-central1-a"
+
+  boot_disk {
+    initialize_params {
+      image = "centos-cloud/centos-7"
+    }
+  }
+
+  network_interface {
+    network = "default"
+  }
+}
+
+resource "google_compute_instance" "custom_preemptible" {
+  name         = "custom_preemptible"
+  machine_type = "custom-6-20480"
+  zone         = "us-central1-a"
+
+  boot_disk {
+    initialize_params {
+      image = "centos-cloud/centos-7"
+    }
+  }
+
+  scheduling {
+    preemptible = true
+  }
+
+  network_interface {
+    network = "default"
+  }
+}
+
+resource "google_compute_instance" "custom_n1" {
+  name         = "custom_n1"
+  machine_type = "n1-custom-6-20480"
+  zone         = "us-central1-a"
+
+  boot_disk {
+    initialize_params {
+      image = "centos-cloud/centos-7"
+    }
+  }
+
+  network_interface {
+    network = "default"
+  }
+}
+
+resource "google_compute_instance" "custom_n2" {
+  name         = "custom_n2"
+  machine_type = "n2-custom-6-20480"
+  zone         = "us-central1-a"
+
+  boot_disk {
+    initialize_params {
+      image = "centos-cloud/centos-7"
+    }
+  }
+
+  network_interface {
+    network = "default"
+  }
+}
+
+
+resource "google_compute_instance" "custom_n2d" {
+  name         = "custom_n2d"
+  machine_type = "n2d-custom-6-20480"
+  zone         = "us-central1-a"
+
+  boot_disk {
+    initialize_params {
+      image = "centos-cloud/centos-7"
+    }
+  }
+
+  scheduling {
+    preemptible = true
+  }
+
+  network_interface {
+    network = "default"
+  }
+}
+
+resource "google_compute_instance" "custom_ext" {
+  name         = "custom_ext"
+  machine_type = "custom-2-15360-ext"
+  zone         = "us-central1-a"
+
+  boot_disk {
+    initialize_params {
+      image = "centos-cloud/centos-7"
+    }
+  }
+
+  network_interface {
+    network = "default"
+  }
+}
+
+// Not supported yet
+resource "google_compute_instance" "e2_custom" {
+  name         = "e2_custom"
+  machine_type = "e2-custom-2-15360"
+  zone         = "us-central1-a"
+
+  boot_disk {
+    initialize_params {
+      image = "centos-cloud/centos-7"
+    }
+  }
+
+  network_interface {
+    network = "default"
+  }
+}
