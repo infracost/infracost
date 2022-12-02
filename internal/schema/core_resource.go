@@ -58,12 +58,17 @@ func BuildResource(partial *PartialResource, fetchedUsage *UsageData) *Resource 
 		res = partial.Resource
 	}
 
-	if res != nil {
-		res.ResourceType = partial.ResourceData.Type
-		res.Tags = partial.ResourceData.Tags
-		res.Metadata = partial.ResourceData.Metadata
+	if res == nil {
+		return &Resource{
+			Name:        partial.ResourceData.Address,
+			IsSkipped:   true,
+			SkipMessage: "This resource is not currently supported",
+		}
 	}
 
+	res.ResourceType = partial.ResourceData.Type
+	res.Tags = partial.ResourceData.Tags
+	res.Metadata = partial.ResourceData.Metadata
 	return res
 }
 
