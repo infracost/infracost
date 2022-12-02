@@ -37,9 +37,7 @@ func (r *ComputeInstance) PopulateUsage(u *schema.UsageData) {
 // This method is called after the resource is initialised by an IaC provider.
 // See providers folder for more information.
 func (r *ComputeInstance) BuildResource() *schema.Resource {
-	costComponents := []*schema.CostComponent{
-		computeCostComponent(r.Region, r.MachineType, r.PurchaseOption, r.Size, r.MonthlyHours),
-	}
+	costComponents := computeCostComponents(r.Region, r.MachineType, r.PurchaseOption, r.Size, r.MonthlyHours)
 
 	if r.HasBootDisk {
 		costComponents = append(costComponents, bootDiskCostComponent(r.Region, r.BootDiskSize, r.BootDiskType))

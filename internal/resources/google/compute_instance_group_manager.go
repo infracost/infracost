@@ -32,10 +32,7 @@ func (r *ComputeInstanceGroupManager) PopulateUsage(u *schema.UsageData) {
 // This method is called after the resource is initialised by an IaC provider.
 // See providers folder for more information.
 func (r *ComputeInstanceGroupManager) BuildResource() *schema.Resource {
-	costComponents := []*schema.CostComponent{
-		computeCostComponent(r.Region, r.MachineType, r.PurchaseOption, r.TargetSize, nil),
-	}
-
+	costComponents := computeCostComponents(r.Region, r.MachineType, r.PurchaseOption, r.TargetSize, nil)
 	for _, disk := range r.Disks {
 		costComponents = append(costComponents, computeDiskCostComponent(r.Region, disk.Type, disk.Size, r.TargetSize))
 	}
