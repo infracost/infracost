@@ -38,7 +38,7 @@ require (
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.8.1
 	github.com/tidwall/gjson v1.14.3
-	github.com/zclconf/go-cty v1.12.0
+	github.com/zclconf/go-cty v1.12.1
 	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d
 	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4
 	gopkg.in/go-playground/assert.v1 v1.2.1
@@ -67,7 +67,7 @@ require (
 	github.com/aws/smithy-go v1.13.4 // indirect
 	github.com/davecgh/go-spew v1.1.1 // indirect
 	github.com/hashicorp/hcl v1.0.1-vault // indirect
-	github.com/hashicorp/hcl/v2 v2.14.1
+	github.com/hashicorp/hcl/v2 v2.15.0
 	github.com/imdario/mergo v0.3.13
 	github.com/inconshreveable/mousetrap v1.0.1 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
