@@ -232,7 +232,7 @@ type Options struct {
 	DashboardEndpoint string
 	NoColor           bool
 	ShowSkipped       bool
-	ShowOptions       string
+	ShowAllProjects   bool
 	Fields            []string
 	IncludeHTML       bool
 	PolicyChecks      PolicyCheck

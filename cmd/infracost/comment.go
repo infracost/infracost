@@ -42,7 +42,7 @@ func commentCmd(ctx *config.RunContext) *cobra.Command {
 	cmds := []*cobra.Command{commentGitHubCmd(ctx), commentGitLabCmd(ctx), commentAzureReposCmd(ctx), commentBitbucketCmd(ctx)}
 	for _, subCmd := range cmds {
 		subCmd.Flags().StringArray("policy-path", nil, "Path to Infracost policy files, glob patterns need quotes (experimental)")
-		subCmd.Flags().String("show-options", "", "Show projects with no diff")
+		subCmd.Flags().Bool("show-all-projects", false, "Show all projects in the table of the comment output")
 	}
 
 	cmd.AddCommand(cmds...)
@@ -95,7 +95,7 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 		PolicyChecks:      policyChecks,
 		GuardrailCheck:    guardrailCheck,
 	}
-	opts.ShowOptions, _ = cmd.Flags().GetString("show-options")
+	opts.ShowAllProjects, _ = cmd.Flags().GetBool("show-all-projects")
 
 	b, err := output.ToMarkdown(combined, opts, mdOpts)
 	if err != nil {
