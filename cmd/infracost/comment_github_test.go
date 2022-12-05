@@ -33,7 +33,7 @@ func TestCommentGitHubCommit(t *testing.T) {
 
 func TestCommentGitHubShowAllProjects(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
-		[]string{"comment", "github", "--github-token", "abc", "--repo", "test/test", "--commit", "5", "--show-options", "all-projects", "--path", "./testdata/terraform_v0.14_breakdown.json", "--path", "./testdata/terraform_v0.14_nochange_breakdown.json", "--dry-run"},
+		[]string{"comment", "github", "--github-token", "abc", "--repo", "test/test", "--commit", "5", "--show-all-projects", "--path", "./testdata/terraform_v0.14_breakdown.json", "--path", "./testdata/terraform_v0.14_nochange_breakdown.json", "--dry-run"},
 		nil)
 }
 

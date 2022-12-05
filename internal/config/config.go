@@ -93,13 +93,13 @@ type Config struct {
 	// Org settings
 	EnableCloudForOrganization bool
 
-	Projects      []*Project `yaml:"projects" ignored:"true"`
-	Format        string     `yaml:"format,omitempty" ignored:"true"`
-	ShowOptions   string     `yaml:"show_options,omitempty" ignored:"true"`
-	ShowSkipped   bool       `yaml:"show_skipped,omitempty" ignored:"true"`
-	SyncUsageFile bool       `yaml:"sync_usage_file,omitempty" ignored:"true"`
-	Fields        []string   `yaml:"fields,omitempty" ignored:"true"`
-	CompareTo     string
+	Projects        []*Project `yaml:"projects" ignored:"true"`
+	Format          string     `yaml:"format,omitempty" ignored:"true"`
+	ShowAllProjects bool       `yaml:"show_all_projects,omitempty" ignored:"true"`
+	ShowSkipped     bool       `yaml:"show_skipped,omitempty" ignored:"true"`
+	SyncUsageFile   bool       `yaml:"sync_usage_file,omitempty" ignored:"true"`
+	Fields          []string   `yaml:"fields,omitempty" ignored:"true"`
+	CompareTo       string
 
 	// Base configuration settings
 	// RootPath defines the raw value of the `--path` flag provided by the user
