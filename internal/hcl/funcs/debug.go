@@ -31,8 +31,11 @@ import (
 var PrintArgs = function.New(&function.Spec{
 	Params: []function.Parameter{
 		{
-			Name: "path",
-			Type: cty.String,
+			Name:             "v",
+			Type:             cty.DynamicPseudoType,
+			AllowNull:        true,
+			AllowMarked:      true,
+			AllowDynamicType: true,
 		},
 	},
 	Type: func(args []cty.Value) (cty.Type, error) {
@@ -68,8 +71,11 @@ func LogArgs(logger *logrus.Entry) function.Function {
 	return function.New(&function.Spec{
 		Params: []function.Parameter{
 			{
-				Name: "path",
-				Type: cty.String,
+				Name:             "v",
+				Type:             cty.DynamicPseudoType,
+				AllowNull:        true,
+				AllowMarked:      true,
+				AllowDynamicType: true,
 			},
 		},
 		Type: func(args []cty.Value) (cty.Type, error) {
