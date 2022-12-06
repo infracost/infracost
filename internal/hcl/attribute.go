@@ -23,14 +23,14 @@ var (
 //
 // Attributes are key/value pairs that are part of a Block. For example take the following Block:
 //
-//		resource "aws_instance" "t3_standard" {
-//		  	ami           = "fake_ami"
-//  		instance_type = "t3.medium"
+//			resource "aws_instance" "t3_standard" {
+//			  	ami           = "fake_ami"
+//	 		instance_type = "t3.medium"
 //
-//  		credit_specification {
-//    			cpu_credits = "standard"
-//  		}
-//		}
+//	 		credit_specification {
+//	   			cpu_credits = "standard"
+//	 		}
+//			}
 //
 // "ami" & "instance_type" are the Attributes of this Block, "credit_specification" is a child Block
 // see Block.Children for more info.
@@ -199,12 +199,12 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 // traverseVarAndSetCtx uses the hcl traversal to build a mocked attribute on the evaluation context.
 // hcl Traversals from missing are normally provided in the following manner:
 //
-// 1. The root traversal or TraverseRoot fetches the top level reference for the block. We use this traversal to
-//    determine which ctx we use. We loop through the list of EvaluationContext until we find an entry matching the
-//    reference. If there is none, we exit, this shouldn't happen and is likely an indicator of a bug.
-// 2. The remaining attribute traversals or TraverseAttr. These use the value fetched from the context by the TraverseRoot
-//    to find the value of the attribute the expression is trying to evaluate. In our case this is the attribute that
-//    we need to populate with a mocked value.
+//  1. The root traversal or TraverseRoot fetches the top level reference for the block. We use this traversal to
+//     determine which ctx we use. We loop through the list of EvaluationContext until we find an entry matching the
+//     reference. If there is none, we exit, this shouldn't happen and is likely an indicator of a bug.
+//  2. The remaining attribute traversals or TraverseAttr. These use the value fetched from the context by the TraverseRoot
+//     to find the value of the attribute the expression is trying to evaluate. In our case this is the attribute that
+//     we need to populate with a mocked value.
 //
 // Once we've found the missing attribute we set a mocked value and return. This value should now be available for
 // the entire context evaluation as ctx is share across all blocks.
@@ -414,25 +414,25 @@ func (attr *Attribute) getIndexValue(part hcl.TraverseIndex) string {
 // referenced block. Reference achieves this by traversing the Attribute Expression in order to find the
 // parent block. E.g. with the following HCL
 //
-// 		resource "aws_launch_template" "foo2" {
-// 			name = "foo2"
-// 		}
+//	resource "aws_launch_template" "foo2" {
+//		name = "foo2"
+//	}
 //
-//		resource "some_resource" "example_with_launch_template_3" {
-//			...
-//			name    = aws_launch_template.foo2.name
-//		}
+//	resource "some_resource" "example_with_launch_template_3" {
+//		...
+//		name    = aws_launch_template.foo2.name
+//	}
 //
 // The Attribute some_resource.name would have a reference of
 //
-//		Reference {
-//			blockType: Type{
-//				name:                  "resource",
-//				removeTypeInReference: true,
-//			}
-//			typeLabel: "aws_launch_template"
-//			nameLabel: "foo2"
+//	Reference {
+//		blockType: Type{
+//			name:                  "resource",
+//			removeTypeInReference: true,
 //		}
+//		typeLabel: "aws_launch_template"
+//		nameLabel: "foo2"
+//	}
 //
 // Reference is used to build up a Terraform JSON configuration file that holds information about the expressions
 // and their parents. Infracost uses these references in resource evaluation to lookup connecting resource information.

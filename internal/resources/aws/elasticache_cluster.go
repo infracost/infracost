@@ -150,7 +150,8 @@ func (r elasticacheReservationResolver) isElasticacheReservedNodeLegacyOffering(
 // Allowed values for ReservedInstancePaymentOption: ["heavy_utilization", "medium_utilization", "light_utilization"] for legacy reservation nodes
 // Legacy reservation nodes: "t2", "m3", "m4", "r3", "r4". (See elasticacheReservedNodeLegacyTypes in util.go)
 // Corner Case: In the case of legacy reservation cache nodes unfortunately, for a specified node type, the allowed ReservedInstancePaymentOption may differ in different regions.
-//				Because of this, in the case of a legacy reservation, a warning is raised to the user.
+//
+//	Because of this, in the case of a legacy reservation, a warning is raised to the user.
 func (r elasticacheReservationResolver) PriceFilter() (*schema.PriceFilter, error) {
 	purchaseOptionLabel := "reserved"
 	def := &schema.PriceFilter{
