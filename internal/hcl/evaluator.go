@@ -12,6 +12,7 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/ext/tryfunc"
+	"github.com/hashicorp/hcl/v2/ext/typeexpr"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/sirupsen/logrus"
 	yaml "github.com/zclconf/go-cty-yaml"
@@ -509,16 +510,25 @@ func (e *Evaluator) evaluateVariable(b *Block) (cty.Value, error) {
 		return cty.NilVal, fmt.Errorf("cannot resolve variable with no attributes")
 	}
 
-	attribute := attributes["type"]
+	attrType := attributes["type"]
 	if override, exists := e.inputVars[b.Label()]; exists {
-		return convertType(override, attribute), nil
+		return convertType(override, attrType), nil
 	}
 
 	if def, exists := attributes["default"]; exists {
-		return def.Value(), nil
+		if attrType == nil {
+			return def.Value(), nil
+		}
+
+		ty, diag := typeexpr.TypeConstraint(attrType.HCLAttr.Expr)
+		if diag.HasErrors() {
+			e.logger.WithError(diag).Debugf("error trying to convert variable %s to type %s", b.Label(), attrType.AsString())
+			return def.Value(), nil
+		}
+		return convert.Convert(def.Value(), ty)
 	}
 
-	return convertType(cty.NilVal, attribute), errorNoVarValue
+	return convertType(cty.NilVal, attrType), errorNoVarValue
 }
 
 func convertType(val cty.Value, attribute *Attribute) cty.Value {
