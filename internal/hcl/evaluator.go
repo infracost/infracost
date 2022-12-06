@@ -275,7 +275,7 @@ func (e *Evaluator) evaluateModules() {
 			e.workingDir,
 			vars,
 			e.moduleMetadata,
-			e.visitedModules,
+			map[string]map[string]cty.Value{},
 			e.workspace,
 			e.blockBuilder,
 			nil,
@@ -350,19 +350,19 @@ func (e *Evaluator) expandDynamicBlock(b *Block) {
 //
 // value of:
 //
-//		test.test
-//			id: test
-//			arn: test-arn
+//	test.test
+//		id: test
+//		arn: test-arn
 //
 // that gets expanded should be:
 //
-//	   test.test
-//			a:
-//			  id: test
-//			  arn: test-arn
-//			b:
-//			  id: test
-//			  arn: test-arn
+//	test.test
+//		a:
+//		  id: test
+//		  arn: test-arn
+//		b:
+//		  id: test
+//		  arn: test-arn
 //
 // and not:
 //
@@ -375,10 +375,10 @@ func (e *Evaluator) expandDynamicBlock(b *Block) {
 //
 // which means that blocks written like:
 //
-//		resource "aws_eip" "nat_gateway" {
-//  		for_each   = test.test
+//	resource "aws_eip" "nat_gateway" {
+//		for_each   = test.test
 //			...
-//		}
+//	}
 //
 // will expand correctly to: aws_eip.nat_gateway[a], aws_eip.nat_gateway[b]. Rather than aws_eip.nat_gateway[id], aws_eip.nat_gateway[a] ...
 func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
