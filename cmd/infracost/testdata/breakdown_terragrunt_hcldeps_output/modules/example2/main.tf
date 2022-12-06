@@ -51,6 +51,50 @@ output "block_iops" {
   value = 600
 }
 
+output "obj" {
+  value = {}
+}
+
+output "list" {
+  value = []
+}
+
+output "list_simple" {
+  value = []
+}
+
+output "list_existing" {
+  value = [{"foo": "bar"}]
+}
+
+output "list_simple_existing" {
+  value = ["foo"]
+}
+
+output "map" {
+  value = tomap({})
+}
+
+output "map_existing" {
+  value = tomap({ "foo" : "bar" })
+}
+
+output "map_simple" {
+  value = tomap({})
+}
+
+output "improper_mock" {
+  value = "invalid-mock-of-a-complex-type"
+}
+
+output "improper_mock2" {
+  value = "invalid-mock-of-a-complex-type"
+}
+
+output "improper_mock3" {
+  value = "invalid-mock-of-a-complex-type"
+}
+
 output "test_object_type" {
   value = aws_instance.web_app
 }
