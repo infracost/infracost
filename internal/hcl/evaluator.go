@@ -41,7 +41,7 @@ var (
 	}
 )
 
-const maxContextIterations = 32
+const maxContextIterations = 120
 
 // Evaluator provides a set of given Blocks with contextual information.
 // Evaluator is an important step in retrieving Block values that can be used in the
@@ -207,7 +207,9 @@ func (e *Evaluator) collectModules() *Module {
 // been evaluated and the context variables should remain unchanged. In reality 90% of cases will require
 // 2 loops, however other complex modules will take > 2.
 func (e *Evaluator) evaluate(lastContext hcl.EvalContext) {
-	for i := 0; i < maxContextIterations; i++ {
+	var i int
+
+	for i = 0; i < maxContextIterations; i++ {
 		e.evaluateStep(i)
 
 		if reflect.DeepEqual(lastContext.Variables, e.ctx.Inner().Variables) {
@@ -223,6 +225,11 @@ func (e *Evaluator) evaluate(lastContext hcl.EvalContext) {
 			lastContext.Variables[k] = v
 		}
 	}
+
+	if i == maxContextIterations {
+		e.logger.Warnf("hit max context iterations evaluating module %s", e.module.Name)
+	}
+
 }
 
 // evaluateStep gets the values for all the Block types in the current Module that affect Context.
@@ -297,7 +304,8 @@ func (e *Evaluator) exportOutputs() cty.Value {
 func (e *Evaluator) expandBlocks(blocks Blocks, lastContext hcl.EvalContext) Blocks {
 	expanded := blocks
 
-	for i := 0; i < maxContextIterations; i++ {
+	var i int
+	for i = 0; i < maxContextIterations; i++ {
 		expanded = e.expandBlockForEaches(e.expandBlockCounts(expanded))
 
 		if reflect.DeepEqual(lastContext.Variables, e.ctx.Inner().Variables) {
@@ -312,6 +320,10 @@ func (e *Evaluator) expandBlocks(blocks Blocks, lastContext hcl.EvalContext) Blo
 		for k, v := range e.ctx.Inner().Variables {
 			lastContext.Variables[k] = v
 		}
+	}
+
+	if i == maxContextIterations {
+		e.logger.Warnf("hit max context iterations expanding blocks in module %s", e.module.Name)
 	}
 
 	return e.expandDynamicBlocks(expanded...)
