@@ -89,7 +89,7 @@ func NewEvaluator(
 	logger *logrus.Entry,
 ) *Evaluator {
 	ctx := NewContext(&hcl.EvalContext{
-		Functions: expFunctions(module.RootPath),
+		Functions: expFunctions(module.RootPath, logger),
 	}, nil, logger)
 
 	if visitedModules == nil {
@@ -803,7 +803,7 @@ func (e *Evaluator) loadModules(lastContext hcl.EvalContext) []*ModuleCall {
 
 // expFunctions returns the set of functions that should be used to when evaluating
 // expressions in the receiving scope.
-func expFunctions(baseDir string) map[string]function.Function {
+func expFunctions(baseDir string, logger *logrus.Entry) map[string]function.Function {
 	return map[string]function.Function{
 		"abs":              stdlib.AbsoluteFunc,
 		"abspath":          funcs.AbsPathFunc,
@@ -865,6 +865,8 @@ func expFunctions(baseDir string) map[string]function.Function {
 		"min":              stdlib.MinFunc,
 		"parseint":         stdlib.ParseIntFunc,
 		"pathexpand":       funcs.PathExpandFunc,
+		"infracostlog":     funcs.LogArgs(logger),
+		"infracostprint":   funcs.PrintArgs,
 		"pow":              stdlib.PowFunc,
 		"range":            stdlib.RangeFunc,
 		"regex":            stdlib.RegexFunc,
