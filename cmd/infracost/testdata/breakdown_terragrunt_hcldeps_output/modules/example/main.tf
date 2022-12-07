@@ -24,7 +24,7 @@ variable "hello_world_function_memory_size" {
 }
 
 variable "test_input" {
-  type        = object({})
+  type = object({})
 }
 
 resource "aws_instance" "web_app" {

@@ -53,8 +53,10 @@ type Project struct {
 	// UsageFile is the full path to usage file that specifies values for usage-based resources
 	UsageFile string `yaml:"usage_file,omitempty" ignored:"true"`
 	// TerraformUseState sets if the users wants to use the terraform state for infracost ops.
-	TerraformUseState bool              `yaml:"terraform_use_state,omitempty" ignored:"true"`
-	Env               map[string]string `yaml:"env,omitempty" ignored:"true"`
+	TerraformUseState bool `yaml:"terraform_use_state,omitempty" ignored:"true"`
+	// TerragruntSourceMap is a map of source URL to local path for Terragrunt projects.
+	TerragruntSourceMap string            `yaml:"terragrunt_source_map,omitempty" envconfig:"TERRAGRUNT_SOURCE_MAP"`
+	Env                 map[string]string `yaml:"env,omitempty" ignored:"true"`
 }
 
 type Config struct {

@@ -52,6 +52,7 @@ type TerragruntHCLProvider struct {
 	outputs              map[string]cty.Value
 	stack                *tgconfigstack.Stack
 	excludedPaths        []string
+	sourceMap            map[string]string
 	env                  map[string]string
 	logger               *log.Entry
 }
@@ -63,12 +64,18 @@ func NewTerragruntHCLProvider(ctx *config.ProjectContext, includePastResources b
 		"provider": "terragrunt_dir",
 	})
 
+	sourceMap, err := parseMultiStringKeyValue(ctx.ProjectConfig.TerragruntSourceMap)
+	if err != nil {
+		logger.WithError(err).Debugf("failed to parse terragrunt source map: %s", sourceMap)
+	}
+
 	return &TerragruntHCLProvider{
 		ctx:                  ctx,
 		Path:                 ctx.ProjectConfig.Path,
 		includePastResources: includePastResources,
 		outputs:              map[string]cty.Value{},
 		excludedPaths:        ctx.ProjectConfig.ExcludePaths,
+		sourceMap:            sourceMap,
 		env:                  parseEnvironmentVariables(os.Environ()),
 		logger:               logger,
 	}
@@ -201,6 +208,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 		TerraformCliArgs:           []string{tgcli.CMD_TERRAGRUNT_INFO},
 		Env:                        p.env,
 		IgnoreExternalDependencies: true,
+		SourceMap:                  p.sourceMap,
 		RunTerragrunt: func(terragruntOptions *tgoptions.TerragruntOptions) (err error) {
 			defer func() {
 				unexpectedErr := recover()
@@ -905,4 +913,12 @@ func getCleanedTargetConfigPath(configPath string, workingPath string) string {
 		targetConfig = tgconfig.GetDefaultConfigPath(targetConfig)
 	}
 	return util.CleanPath(targetConfig)
+}
+
+func parseMultiStringKeyValue(val string) (map[string]string, error) {
+	if val == "" {
+		return map[string]string{}, nil
+	}
+	mappingsAsList := strings.Split(val, ",")
+	return util.KeyValuePairStringListToMap(mappingsAsList)
 }
