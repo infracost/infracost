@@ -274,8 +274,12 @@ func buildObject(traversal hcl.Traversal, value cty.Value, mock cty.Value, i int
 			return cty.ObjectVal(valueMap)
 		}
 
-		val := buildObject(traversal, cty.ObjectVal(make(map[string]cty.Value)), mock, i+1)
-		valueMap[k] = val
+		if len(traversal)-1 == i {
+			valueMap[k] = mock
+		} else {
+			valueMap[k] = buildObject(traversal, cty.ObjectVal(make(map[string]cty.Value)), mock, i+1)
+		}
+
 		return cty.ObjectVal(valueMap)
 	}
 
