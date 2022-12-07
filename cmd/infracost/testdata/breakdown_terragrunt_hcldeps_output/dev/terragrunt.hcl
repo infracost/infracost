@@ -43,6 +43,10 @@ inputs = {
     input20 = dependency.test2.outputs.list_simple_existing[1]
     input21 = dependency.test2.outputs.list_existing[1].foo
     input22 = dependency.test2.outputs.map_existing["bar"]
+    input23 = dependency.test2.outputs.bad
+    input24 = dependency.test2.outputs.bad_list[0]
+    input24 = dependency.test2.outputs.good_list_bad_prop[0].id
+    input24 = dependency.test2.outputs.bad_map["test"]
   }
 
   hello_world_function_memory_size = 512

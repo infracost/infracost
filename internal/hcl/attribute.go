@@ -121,7 +121,7 @@ func (attr *Attribute) AsString() string {
 // that the Context carries.
 func (attr *Attribute) Value() cty.Value {
 	if attr == nil {
-		return cty.NilVal
+		return cty.DynamicVal
 	}
 
 	attr.Logger.Debug("fetching attribute value")
@@ -132,7 +132,6 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 	defer func() {
 		if err := recover(); err != nil {
 			attr.Logger.Debugf("could not evaluate value for attr: %s. This is most likely an issue in the underlying hcl/go-cty libraries and can be ignored, but we log the stacktrace for debugging purposes. Err: %s\n%s", attr.Name(), err, debug.Stack())
-			ctyVal = cty.NilVal
 		}
 	}()
 
@@ -240,6 +239,10 @@ func traverseVarAndSetCtx(ctx *hcl.EvalContext, traversal hcl.Traversal, mock ct
 func buildObject(traversal hcl.Traversal, ob map[string]cty.Value, mock cty.Value, i int) map[string]cty.Value {
 	if i > len(traversal)-1 {
 		return ob
+	}
+
+	if ob == nil {
+		ob = make(map[string]cty.Value)
 	}
 
 	traverser := traversal[i]

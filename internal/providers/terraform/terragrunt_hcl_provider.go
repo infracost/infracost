@@ -449,7 +449,7 @@ func mergeObjectWithDependencyMap(valueMap map[string]cty.Value, pieces []string
 	}
 
 	if len(pieces) == 1 {
-		if _, ok := valueMap[key]; ok {
+		if v, ok := valueMap[key]; ok && v.IsKnown() {
 			return valueMap
 		}
 
@@ -472,17 +472,27 @@ func mergeObjectWithDependencyMap(valueMap map[string]cty.Value, pieces []string
 }
 
 func mergeListWithDependencyMap(valueMap map[string]cty.Value, pieces []string, key string, index int) map[string]cty.Value {
+	indexVal := cty.NumberIntVal(int64(index))
+
 	if len(pieces) == 1 {
 		if v, ok := valueMap[key]; ok && (v.Type().IsListType() || v.Type().IsTupleType()) {
-			m := v.Type().GoString()
-			log.Println(m)
-			if v.HasIndex(cty.NumberIntVal(int64(index))).True() {
+			// if we have the index already in the dependency output, and it is known use the existing value.
+			// If the value is unknown we need to override it wil a mock as Terragrunt will explode when they
+			// try and marshal the cty values to JSON.
+			if v.HasIndex(indexVal).True() && v.Index(indexVal).IsKnown() {
 				return valueMap
 			}
 
 			existing := v.AsValueSlice()
 			vals := make([]cty.Value, index+1)
-			copy(vals, existing)
+			for i, value := range existing {
+				if value.IsKnown() {
+					vals[i] = value
+					continue
+				}
+
+				vals[i] = cty.StringVal(fmt.Sprintf("%s-%d-mock", key, i))
+			}
 
 			for i := len(existing); i <= index; i++ {
 				vals[i] = cty.StringVal(fmt.Sprintf("%s-%d-mock", key, i))
@@ -501,17 +511,29 @@ func mergeListWithDependencyMap(valueMap map[string]cty.Value, pieces []string, 
 		return valueMap
 	}
 
+	mockValue := cty.ObjectVal(mergeObjectWithDependencyMap(map[string]cty.Value{}, pieces[1:]))
+
 	if v, ok := valueMap[key]; ok && (v.Type().IsListType() || v.Type().IsTupleType()) {
-		if v.HasIndex(cty.NumberIntVal(int64(index))).True() {
+		// if we have the index already in the dependency output, and it is known use the existing value.
+		// If the value is unknown we need to override it wil a mock as Terragrunt will explode when they
+		// try and marshal the cty values to JSON.
+		if v.HasIndex(indexVal).True() && v.Index(indexVal).IsKnown() {
 			return valueMap
 		}
 
 		existing := v.AsValueSlice()
 		vals := make([]cty.Value, index+1)
-		copy(vals, existing)
+		for i, value := range existing {
+			if value.IsKnown() {
+				vals[i] = value
+				continue
+			}
+
+			vals[i] = mockValue
+		}
 
 		for i := len(existing); i <= index; i++ {
-			vals[i] = cty.ObjectVal(mergeObjectWithDependencyMap(map[string]cty.Value{}, pieces[1:]))
+			vals[i] = mockValue
 		}
 
 		valueMap[key] = cty.TupleVal(vals)
@@ -520,7 +542,7 @@ func mergeListWithDependencyMap(valueMap map[string]cty.Value, pieces []string, 
 
 	vals := make([]cty.Value, index+1)
 	for i := 0; i <= index; i++ {
-		vals[i] = cty.ObjectVal(mergeObjectWithDependencyMap(map[string]cty.Value{}, pieces[1:]))
+		vals[i] = mockValue
 	}
 
 	valueMap[key] = cty.ListVal(vals)
