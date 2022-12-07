@@ -1,12 +1,15 @@
 package terraform
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"runtime/debug"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -253,10 +256,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 //  3. we then evaluate the Terraform project built by Terragrunt storing any outputs so that we can use
 //     these for further runTerragrunt calls that use the dependency outputs.
 func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions) (*terragruntWorkingDirInfo, error) {
-	outputs, err := p.fetchDependencyOutputs(opts)
-	if err != nil {
-		return nil, err
-	}
+	outputs := p.fetchDependencyOutputs(opts)
 
 	terragruntConfig, err := tgconfig.ParseConfigFile(opts.TerragruntConfigPath, opts, nil, &outputs)
 	if err != nil {
@@ -368,8 +368,189 @@ func convertToCtyWithJson(val interface{}) (cty.Value, error) {
 	return ctyJsonVal.Value, nil
 }
 
-// fetchDependencyOutputs returns the Terraform outputs from the dependencies of Terragrunt file provided in the opts input.
-func (p *TerragruntHCLProvider) fetchDependencyOutputs(opts *tgoptions.TerragruntOptions) (cty.Value, error) {
+var (
+	depRegexp   = regexp.MustCompile(`dependency\.[\w.\[\]"]+`)
+	indexRegexp = regexp.MustCompile(`(\w+)\[(\d+)]`)
+	mapRegexp   = regexp.MustCompile(`(\w+)\["([\w\d]+)"]`)
+)
+
+func (p *TerragruntHCLProvider) fetchDependencyOutputs(opts *tgoptions.TerragruntOptions) cty.Value {
+	moduleOutputs, err := p.fetchModuleOutputs(opts)
+	if err != nil {
+		p.logger.WithError(err).Debug("failed to fetch real module outputs, defaulting to mocked outputs from file regexp")
+	}
+
+	file, err := os.Open(opts.TerragruntConfigPath)
+	if err != nil {
+		p.logger.WithError(err).Debug("could not open Terragrunt file for dependency regexps")
+		return moduleOutputs
+	}
+
+	var matches []string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		// skip any commented out lines
+		if strings.HasPrefix(line, "#") {
+			continue
+		}
+
+		match := depRegexp.FindString(line)
+		if match != "" {
+			matches = append(matches, match)
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		p.logger.WithError(err).Debug("error scanning Terragrunt file lines matching whole file with regexp")
+
+		b, err := os.ReadFile(opts.TerragruntConfigPath)
+		if err != nil {
+			p.logger.WithError(err).Debug("could not read Terragrunt file for dependency regxps")
+		}
+
+		matches = depRegexp.FindAllString(string(b), -1)
+	}
+
+	if len(matches) == 0 {
+		return moduleOutputs
+	}
+
+	valueMap := moduleOutputs.AsValueMap()
+
+	for _, match := range matches {
+		pieces := strings.Split(match, ".")
+		valueMap = mergeObjectWithDependencyMap(valueMap, pieces[1:])
+	}
+
+	return cty.ObjectVal(valueMap)
+}
+
+func mergeObjectWithDependencyMap(valueMap map[string]cty.Value, pieces []string) map[string]cty.Value {
+	if valueMap == nil {
+		valueMap = make(map[string]cty.Value)
+	}
+
+	if len(pieces) == 0 {
+		return valueMap
+	}
+
+	key := pieces[0]
+	indexKeys := indexRegexp.FindStringSubmatch(key)
+	if len(indexKeys) != 0 {
+		index, _ := strconv.Atoi(indexKeys[2])
+		return mergeListWithDependencyMap(valueMap, pieces, indexKeys[1], index)
+	}
+
+	mapKeys := mapRegexp.FindStringSubmatch(key)
+	if len(mapKeys) != 0 {
+		key = mapKeys[1]
+		pieces = append([]string{pieces[0], mapKeys[2]}, pieces[1:]...)
+	}
+
+	if len(pieces) == 1 {
+		if v, ok := valueMap[key]; ok && v.IsKnown() {
+			return valueMap
+		}
+
+		valueMap[key] = cty.StringVal(fmt.Sprintf("%s-mock", key))
+		return valueMap
+	}
+
+	if v, ok := valueMap[key]; ok {
+		if v.CanIterateElements() {
+			valueMap[key] = cty.ObjectVal(mergeObjectWithDependencyMap(v.AsValueMap(), pieces[1:]))
+			return valueMap
+		}
+
+		valueMap[key] = cty.ObjectVal(mergeObjectWithDependencyMap(make(map[string]cty.Value), pieces[1:]))
+		return valueMap
+	}
+
+	valueMap[key] = cty.ObjectVal(mergeObjectWithDependencyMap(make(map[string]cty.Value), pieces[1:]))
+	return valueMap
+}
+
+func mergeListWithDependencyMap(valueMap map[string]cty.Value, pieces []string, key string, index int) map[string]cty.Value {
+	indexVal := cty.NumberIntVal(int64(index))
+
+	if len(pieces) == 1 {
+		if v, ok := valueMap[key]; ok && (v.Type().IsListType() || v.Type().IsTupleType()) {
+			// if we have the index already in the dependency output, and it is known use the existing value.
+			// If the value is unknown we need to override it wil a mock as Terragrunt will explode when they
+			// try and marshal the cty values to JSON.
+			if v.HasIndex(indexVal).True() && v.Index(indexVal).IsKnown() {
+				return valueMap
+			}
+
+			existing := v.AsValueSlice()
+			vals := make([]cty.Value, index+1)
+			for i, value := range existing {
+				if value.IsKnown() {
+					vals[i] = value
+					continue
+				}
+
+				vals[i] = cty.StringVal(fmt.Sprintf("%s-%d-mock", key, i))
+			}
+
+			for i := len(existing); i <= index; i++ {
+				vals[i] = cty.StringVal(fmt.Sprintf("%s-%d-mock", key, i))
+			}
+
+			valueMap[key] = cty.TupleVal(vals)
+			return valueMap
+		}
+
+		vals := make([]cty.Value, index+1)
+		for i := 0; i <= index; i++ {
+			vals[i] = cty.StringVal(fmt.Sprintf("%s-%d-mock", key, i))
+		}
+
+		valueMap[key] = cty.ListVal(vals)
+		return valueMap
+	}
+
+	mockValue := cty.ObjectVal(mergeObjectWithDependencyMap(map[string]cty.Value{}, pieces[1:]))
+
+	if v, ok := valueMap[key]; ok && (v.Type().IsListType() || v.Type().IsTupleType()) {
+		// if we have the index already in the dependency output, and it is known use the existing value.
+		// If the value is unknown we need to override it wil a mock as Terragrunt will explode when they
+		// try and marshal the cty values to JSON.
+		if v.HasIndex(indexVal).True() && v.Index(indexVal).IsKnown() {
+			return valueMap
+		}
+
+		existing := v.AsValueSlice()
+		vals := make([]cty.Value, index+1)
+		for i, value := range existing {
+			if value.IsKnown() {
+				vals[i] = value
+				continue
+			}
+
+			vals[i] = mockValue
+		}
+
+		for i := len(existing); i <= index; i++ {
+			vals[i] = mockValue
+		}
+
+		valueMap[key] = cty.TupleVal(vals)
+		return valueMap
+	}
+
+	vals := make([]cty.Value, index+1)
+	for i := 0; i <= index; i++ {
+		vals[i] = mockValue
+	}
+
+	valueMap[key] = cty.ListVal(vals)
+	return valueMap
+}
+
+// fetchModuleOutputs returns the Terraform outputs from the dependencies of Terragrunt file provided in the opts input.
+func (p *TerragruntHCLProvider) fetchModuleOutputs(opts *tgoptions.TerragruntOptions) (cty.Value, error) {
 	outputs := cty.MapVal(map[string]cty.Value{
 		"outputs": cty.ObjectVal(map[string]cty.Value{
 			"mock": cty.StringVal("val"),

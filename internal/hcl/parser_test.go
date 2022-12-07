@@ -452,6 +452,62 @@ output "serviceendpoint_principals" {
 	assert.Equal(t, "value-mock", asMap["prod"].AsString())
 }
 
+func Test_UnsupportedAttributesLocalIndex(t *testing.T) {
+	path := createTestFile("test.tf", `
+variable "test" {}
+
+locals {
+  val = format("%s", var.test.id[0])
+}
+
+output "val" {
+  value = local.val
+}
+
+`)
+
+	parser := newParser(filepath.Dir(path), newDiscardLogger())
+	module, err := parser.ParseDirectory()
+	require.NoError(t, err)
+
+	blocks := module.Blocks
+
+	output := blocks.Matching(BlockMatcher{Label: "val", Type: "output"})
+	require.NotNil(t, output)
+	attr := output.GetAttribute("value")
+	value := attr.Value()
+	require.True(t, value.Type().IsPrimitiveType(), "value is not primitive type but %s", value.Type().GoString())
+	assert.Equal(t, "val-mock", value.AsString())
+}
+
+func Test_UnsupportedAttributesMapIndex(t *testing.T) {
+	path := createTestFile("test.tf", `
+variable "test" {}
+
+locals {
+  val = format("%s", var.test.id["foo"])
+}
+
+output "val" {
+  value = local.val
+}
+
+`)
+
+	parser := newParser(filepath.Dir(path), newDiscardLogger())
+	module, err := parser.ParseDirectory()
+	require.NoError(t, err)
+
+	blocks := module.Blocks
+
+	output := blocks.Matching(BlockMatcher{Label: "val", Type: "output"})
+	require.NotNil(t, output)
+	attr := output.GetAttribute("value")
+	value := attr.Value()
+	require.True(t, value.Type().IsPrimitiveType(), "value is not primitive type but %s", value.Type().GoString())
+	assert.Equal(t, "val-mock", value.AsString())
+}
+
 func Test_Modules(t *testing.T) {
 
 	path := createTestFileWithModule(`
