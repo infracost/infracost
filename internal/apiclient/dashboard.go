@@ -184,7 +184,7 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (Ad
 				if ctx.Config.IsLogging() {
 					log.Info(failureMsg)
 				} else {
-					fmt.Fprintf(ctx.ErrWriter, "%s\n", guardrailsMsg)
+					fmt.Fprintf(ctx.ErrWriter, " - %s\n", failureMsg)
 				}
 			}
 		}

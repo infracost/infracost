@@ -359,14 +359,14 @@ var CommentMarkdownWithHTMLTemplate = `
 		<details>
 			<summary><strong>❌ Policy checks failed</strong></summary>
 				{{ range $v, $f := .Options.PolicyChecks.Failures}}
-> {{ $f }}
+> - {{ $f }}
 				{{- end}}
 		</details>
 	{{ else }}
 		<details>
 			<summary><strong>✅ Policy checks passed</strong></summary>
 			{{ range $v, $f := .Options.PolicyChecks.Passed}}
-> {{ $f }}
+> - {{ $f }}
 			{{- end}}
 		</details>
 	{{- end }}
@@ -376,7 +376,7 @@ var CommentMarkdownWithHTMLTemplate = `
 		<details>
 			<summary><strong>❌ Guardrail checks failed</strong></summary>
 				{{ range $v, $f := .Options.GuardrailCheck.CommentableFailures}}
-> {{ $f }}
+> - {{ $f }}
 				{{- end}}
 		</details>
 	{{ else }}
