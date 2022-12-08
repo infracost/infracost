@@ -1,0 +1,13 @@
+
+ Name                                             Monthly Qty  Unit   Monthly Cost 
+                                                                                   
+ aws_spot_instance_request.spot_instance_1                                         
+ └─ Instance usage (Linux/UNIX, spot, m3.medium)          730  hours         $4.89 
+                                                                                   
+ aws_spot_instance_request.spot_instance_2                                         
+ └─ Instance usage (Linux/UNIX, spot, m3.large)           730  hours        $22.85 
+                                                                                   
+ OVERALL TOTAL                                                              $27.74 
+──────────────────────────────────
+2 cloud resources were detected:
+∙ 2 were estimated
