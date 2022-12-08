@@ -266,7 +266,7 @@ func (p PolicyCheckFailures) Error() string {
 	out := bytes.NewBuffer([]byte("Policy check failed:\n\n"))
 
 	for _, e := range p {
-		out.WriteString(e + "\n")
+		out.WriteString(" - " + e + "\n")
 	}
 
 	return out.String()
@@ -301,7 +301,7 @@ func (g GuardrailFailures) Error() string {
 	out := bytes.NewBuffer([]byte("Guardrail check failed:\n\n"))
 
 	for _, e := range g {
-		out.WriteString(e + "\n")
+		out.WriteString(" - " + e + "\n")
 	}
 
 	return out.String()
