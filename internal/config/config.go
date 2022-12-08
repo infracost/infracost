@@ -24,6 +24,8 @@ type Project struct {
 	Path string `yaml:"path,omitempty" ignored:"true"`
 	// ExcludePaths defines a list of directories that the provider should ignore.
 	ExcludePaths []string `yaml:"exclude_paths,omitempty" ignored:"true"`
+	// IncludeAllPaths tells autodetect to use all folders with valid project files.
+	IncludeAllPaths bool `yaml:"include_all_paths,omitempty" ignored:"true"`
 	// Name is a user defined name for the project
 	Name string `yaml:"name,omitempty" ignored:"true"`
 	// TerraformVarFiles is any var files that are to be used with the project.
@@ -72,6 +74,8 @@ type Config struct {
 	DashboardAPIEndpoint      string `yaml:"dashboard_api_endpoint,omitempty" envconfig:"DASHBOARD_API_ENDPOINT"`
 	DashboardEndpoint         string `yaml:"dashboard_endpoint,omitempty" envconfig:"DASHBOARD_ENDPOINT"`
 	UsageAPIEndpoint          string `yaml:"usage_api_endpoint,omitempty" envconfig:"USAGE_API_ENDPOINT"`
+	UsageActualCosts          bool   `yaml:"usage_actual_costs,omitempty" envconfig:"USAGE_ACTUAL_COSTS"`
+	PolicyAPIEndpoint         string `yaml:"policy_api_endpoint" envconfig:"POLICY_API_ENDPOINT"`
 	EnableDashboard           bool   `yaml:"enable_dashboard,omitempty" envconfig:"ENABLE_DASHBOARD"`
 	EnableCloud               *bool  `yaml:"enable_cloud,omitempty" envconfig:"ENABLE_CLOUD"`
 	DisableHCLParsing         bool   `yaml:"disable_hcl_parsing,omitempty" envconfig:"DISABLE_HCL_PARSING"`
@@ -82,15 +86,20 @@ type Config struct {
 	Currency       string `envconfig:"CURRENCY"`
 	CurrencyFormat string `envconfig:"CURRENCY_FORMAT"`
 
+	AWSOverrideRegion    string `envconfig:"AWS_OVERRIDE_REGION"`
+	AzureOverrideRegion  string `envconfig:"AZURE_OVERRIDE_REGION"`
+	GoogleOverrideRegion string `envconfig:"GOOGLE_OVERRIDE_REGION"`
+
 	// Org settings
 	EnableCloudForOrganization bool
 
-	Projects      []*Project `yaml:"projects" ignored:"true"`
-	Format        string     `yaml:"format,omitempty" ignored:"true"`
-	ShowSkipped   bool       `yaml:"show_skipped,omitempty" ignored:"true"`
-	SyncUsageFile bool       `yaml:"sync_usage_file,omitempty" ignored:"true"`
-	Fields        []string   `yaml:"fields,omitempty" ignored:"true"`
-	CompareTo     string
+	Projects        []*Project `yaml:"projects" ignored:"true"`
+	Format          string     `yaml:"format,omitempty" ignored:"true"`
+	ShowAllProjects bool       `yaml:"show_all_projects,omitempty" ignored:"true"`
+	ShowSkipped     bool       `yaml:"show_skipped,omitempty" ignored:"true"`
+	SyncUsageFile   bool       `yaml:"sync_usage_file,omitempty" ignored:"true"`
+	Fields          []string   `yaml:"fields,omitempty" ignored:"true"`
+	CompareTo       string
 
 	// Base configuration settings
 	// RootPath defines the raw value of the `--path` flag provided by the user

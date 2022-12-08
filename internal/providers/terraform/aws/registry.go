@@ -54,6 +54,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getElastiCacheReplicationGroupItem(),
 	getElasticsearchDomainRegistryItem(),
 	getELBRegistryItem(),
+	getFSxOpenZFSFSRegistryItem(),
 	getFSxWindowsFSRegistryItem(),
 	getGlueCatalogDatabaseRegistryItem(),
 	getGlueCrawlerRegistryItem(),
@@ -106,6 +107,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getNetworkfirewallFirewallRegistryItem(),
 	getGlobalAcceleratorRegistryItem(),
 	getGlobalacceleratorEndpointGroupRegistryItem(),
+	getEC2HostRegistryItem(),
 }
 
 // FreeResources grouped alphabetically

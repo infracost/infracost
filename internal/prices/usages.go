@@ -1,11 +1,14 @@
 package prices
 
 import (
+	"runtime"
+
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
-	"runtime"
+	"github.com/infracost/infracost/internal/usage"
 )
 
 // PopulateActualCosts fetches cloud provider reported costs from the Infracost
@@ -70,10 +73,10 @@ func popResourceActualCosts(ctx *config.RunContext, c *apiclient.UsageAPIClient,
 	}
 
 	vars := apiclient.ActualCostsQueryVariables{
-		RepoURL:  ctx.VCSRepositoryURL(),
-		Project:  project.Name,
-		Address:  r.Name,
-		Currency: c.Currency,
+		RepoURL:              ctx.VCSRepositoryURL(),
+		ProjectWithWorkspace: project.NameWithWorkspace(),
+		Address:              r.Name,
+		Currency:             c.Currency,
 	}
 	actualCost, err := c.ListActualCosts(vars)
 	if actualCost == nil || err != nil {
@@ -128,12 +131,7 @@ func FetchUsageData(ctx *config.RunContext, project *schema.Project) (map[string
 
 	// gather all the CoreResource
 	coreResources := make(map[string]schema.CoreResource)
-	for _, rb := range project.PartialResources {
-		if rb.CoreResource != nil {
-			coreResources[rb.ResourceData.Address] = rb.CoreResource
-		}
-	}
-	for _, rb := range project.PartialPastResources {
+	for _, rb := range project.AllPartialResources() {
 		if rb.CoreResource != nil {
 			coreResources[rb.ResourceData.Address] = rb.CoreResource
 		}
@@ -143,18 +141,21 @@ func FetchUsageData(ctx *config.RunContext, project *schema.Project) (map[string
 	// look up the usage for each core resource.
 	for address, cr := range coreResources {
 		// TODO: add concurrency
-		usageKeys := make([]string, len(cr.UsageSchema()))
-		for i, usageItem := range cr.UsageSchema() {
-			usageKeys[i] = usageItem.Key
-		}
+		usageKeys := flattenUsageKeys(cr.UsageSchema())
 
 		if len(usageKeys) > 0 {
+			var usageParams []schema.UsageParam
+			if crWithUsageParams, ok := cr.(schema.CoreResourceWithUsageParams); ok {
+				usageParams = crWithUsageParams.UsageEstimationParams()
+			}
+
 			vars := apiclient.UsageQuantitiesQueryVariables{
-				RepoURL:      ctx.VCSRepositoryURL(),
-				Project:      project.Name,
-				ResourceType: cr.CoreType(),
-				Address:      address,
-				UsageKeys:    usageKeys,
+				RepoURL:              ctx.VCSRepositoryURL(),
+				ProjectWithWorkspace: project.NameWithWorkspace(),
+				ResourceType:         cr.CoreType(),
+				Address:              address,
+				UsageKeys:            usageKeys,
+				UsageParams:          usageParams,
 			}
 
 			attributes, err := c.ListUsageQuantities(vars)
@@ -170,4 +171,50 @@ func FetchUsageData(ctx *config.RunContext, project *schema.Project) (map[string
 	}
 
 	return usageMap, nil
+}
+
+// UploadCloudResourceIDs sends the project scoped cloud resource ids to the Usage API, so they can be used
+// to provide usage estimates.
+func UploadCloudResourceIDs(ctx *config.RunContext, project *schema.Project) error {
+	c := apiclient.NewUsageAPIClient(ctx)
+
+	var resourceIDs []apiclient.ResourceIDAddress
+	for _, partial := range project.AllPartialResources() {
+		for _, resourceID := range partial.CloudResourceIDs {
+			resourceIDs = append(resourceIDs, apiclient.ResourceIDAddress{
+				Address:    partial.ResourceData.Address,
+				ResourceID: resourceID},
+			)
+		}
+	}
+
+	vars := apiclient.CloudResourceIDVariables{
+		RepoURL:              ctx.VCSRepositoryURL(),
+		ProjectWithWorkspace: project.NameWithWorkspace(),
+		ResourceIDAddresses:  resourceIDs,
+	}
+
+	err := c.UploadCloudResourceIDs(vars)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func flattenUsageKeys(usageSchema []*schema.UsageItem) []string {
+	usageKeys := make([]string, len(usageSchema))
+	for i, usageItem := range usageSchema {
+		if usageItem.ValueType == schema.SubResourceUsage {
+			ru := usageItem.DefaultValue.(*usage.ResourceUsage)
+			// recursively flatten any nested keys, then add them to the current list
+			for _, nestedKey := range flattenUsageKeys(ru.Items) {
+				usageKeys[i] = usageItem.Key + "." + nestedKey
+			}
+		} else {
+			usageKeys[i] = usageItem.Key
+		}
+	}
+
+	return usageKeys
 }

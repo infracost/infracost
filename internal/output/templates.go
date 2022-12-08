@@ -320,7 +320,7 @@ var CommentMarkdownWithHTMLTemplate = `
 {{- if gt (len .Root.Projects) 1  }}
   <tbody>
   {{- range .Root.Projects }}
-    {{- if hasDiff . }}
+    {{- if showProject . }}
       {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
     {{- end }}
   {{- end }}
@@ -371,6 +371,20 @@ var CommentMarkdownWithHTMLTemplate = `
 		</details>
 	{{- end }}
 {{- end }}
+{{- if .Options.GuardrailCheck.Comment }}
+	{{- if gt (len .Options.GuardrailCheck.CommentableFailures) 0 }}
+		<details>
+			<summary><strong>❌ Guardrail checks failed</strong></summary>
+				{{ range $v, $f := .Options.GuardrailCheck.CommentableFailures}}
+> {{ $f }}
+				{{- end}}
+		</details>
+	{{ else }}
+		<details>
+			<summary><strong>✅ Guardrail checks passed</strong></summary>
+		</details>
+	{{- end }}
+{{- end }}
 {{- if .MarkdownOptions.WillUpdate }}
 
 This comment will be updated when the cost estimate changes.
@@ -402,7 +416,7 @@ var CommentMarkdownTemplate = `
 
 {{- if gt (len .Root.Projects) 1  }}
   {{- range .Root.Projects }}
-    {{- if hasDiff . }}
+    {{- if showProject . }}
       {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
     {{- end }}
   {{- end }}

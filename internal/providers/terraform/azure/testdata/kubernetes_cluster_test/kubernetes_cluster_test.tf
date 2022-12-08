@@ -44,6 +44,25 @@ resource "azurerm_kubernetes_cluster" "paid_D2SV2_3nc_128gb" {
   }
 }
 
+resource "azurerm_kubernetes_cluster" "min_count" {
+  name                = "example-aks1"
+  location            = "eastus"
+  resource_group_name = azurerm_resource_group.example.name
+  dns_prefix          = "exampleaks1"
+  sku_tier            = "Paid"
+
+  default_node_pool {
+    name            = "default"
+    min_count       = 3
+    vm_size         = "Standard_DS2_v2"
+    os_disk_size_gb = 128
+  }
+
+  identity {
+    type = "SystemAssigned"
+  }
+}
+
 resource "azurerm_kubernetes_cluster" "paid_5nc_32gb" {
   name                = "example-aks1"
   location            = "eastus"

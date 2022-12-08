@@ -139,8 +139,9 @@ func (blocks Blocks) OfType(t string) Blocks {
 
 // BlockMatcher defines a struct that can be used to filter a list of blocks to a single Block.
 type BlockMatcher struct {
-	Type  string
-	Label string
+	Type       string
+	Label      string
+	StripCount bool
 }
 
 // Matching returns a single block filtered from the given pattern.
@@ -153,7 +154,12 @@ func (blocks Blocks) Matching(pattern BlockMatcher) *Block {
 	}
 
 	for _, block := range search {
-		if pattern.Label == block.Label() {
+		label := block.Label()
+		if pattern.StripCount {
+			label = stripCount(label)
+		}
+
+		if pattern.Label == label {
 			return block
 		}
 	}
@@ -203,22 +209,22 @@ func (blocks Blocks) Outputs(suppressNil bool) cty.Value {
 //
 // e.g. a type resource block could look like this in HCL:
 //
-// 		resource "aws_lb" "lb1" {
-//   		load_balancer_type = "application"
-// 		}
+//			resource "aws_lb" "lb1" {
+//	  		load_balancer_type = "application"
+//			}
 //
 // A Block can also have a set number of child Blocks, these child Blocks in turn can also have children.
 // Blocks are recursive. The following example is represents a resource Block with child Blocks:
 //
-//		resource "aws_instance" "t3_standard_cpuCredits" {
-//		  	ami           = "fake_ami"
-//  		instance_type = "t3.medium"
+//			resource "aws_instance" "t3_standard_cpuCredits" {
+//			  	ami           = "fake_ami"
+//	 		instance_type = "t3.medium"
 //
-//			# child Block starts here
-//  		credit_specification {
-//    			cpu_credits = "standard"
-//  		}
-//		}
+//				# child Block starts here
+//	 		credit_specification {
+//	   			cpu_credits = "standard"
+//	 		}
+//			}
 //
 // See Attribute for more info about how the values of Blocks are evaluated with their Context and returned.
 type Block struct {
@@ -413,12 +419,13 @@ func SetUUIDAttributes(moduleBlock *Block, block *hcl.Block) {
 }
 
 func newUniqueAttribute(name string, withCount bool) *hclsyntax.Attribute {
+	// prefix ids with hcl- so they can be identified as fake
 	var exp hclsyntax.Expression = &hclsyntax.LiteralValueExpr{
-		Val: cty.StringVal(uuid.NewString()),
+		Val: cty.StringVal("hcl-" + uuid.NewString()),
 	}
 
 	if withCount {
-		e, diags := hclsyntax.ParseExpression([]byte(`"`+uuid.NewString()+`-${count.index}"`), name, hcl.Pos{})
+		e, diags := hclsyntax.ParseExpression([]byte(`"hcl-`+uuid.NewString()+`-${count.index}"`), name, hcl.Pos{})
 		if !diags.HasErrors() {
 			exp = e
 		}
@@ -470,6 +477,40 @@ func (b *Block) InjectBlock(block *Block, name string) {
 // IsCountExpanded returns if the Block has been expanded as part of a for_each or count evaluation.
 func (b *Block) IsCountExpanded() bool {
 	return b.expanded
+}
+
+// IsForEachReferencedExpanded checks if the block referenced under the for_each has already been expanded.
+// This is used to check is we can safely expand this block, expanding block prematurely can lead to
+// output inconsistencies. It is advised to always check if that the block has any references that are yet
+// to be expanded before expanding itself.
+func (b *Block) IsForEachReferencedExpanded(moduleBlocks Blocks) bool {
+	attr := b.GetAttribute("for_each")
+	if attr == nil {
+		return true
+	}
+
+	r, err := attr.Reference()
+	if err != nil || r == nil {
+		return true
+	}
+
+	blockType := r.blockType.Name()
+	if _, ok := validBlocksToExpand[blockType]; !ok {
+		return true
+	}
+
+	label := r.String()
+	referenced := moduleBlocks.Matching(BlockMatcher{
+		Type:       blockType,
+		Label:      label,
+		StripCount: true,
+	})
+
+	if referenced == nil {
+		return true
+	}
+
+	return referenced.IsCountExpanded()
 }
 
 func (b Block) ShouldExpand() bool {
@@ -606,18 +647,18 @@ func (b *Block) Provider() string {
 // GetChildBlock returns the first child Block that has the name provided. e.g:
 // If the current Block looks like such:
 //
-//		resource "aws_instance" "t3_standard_cpuCredits" {
-//		  	ami           = "fake_ami"
-//  		instance_type = "t3.medium"
+//			resource "aws_instance" "t3_standard_cpuCredits" {
+//			  	ami           = "fake_ami"
+//	 		instance_type = "t3.medium"
 //
-//  		credit_specification {
-//    			cpu_credits = "standard"
-//  		}
+//	 		credit_specification {
+//	   			cpu_credits = "standard"
+//	 		}
 //
-//			ebs_block_device {
-//				device_name = "xvdj"
+//				ebs_block_device {
+//					device_name = "xvdj"
+//				}
 //			}
-//		}
 //
 // Then "credit_specification" &  "ebs_block_device" would be valid names that could be used to retrieve child Blocks.
 func (b *Block) GetChildBlock(name string) *Block {
@@ -650,14 +691,14 @@ func (b *Block) Children() Blocks {
 // GetAttributes returns a list of Attribute for this Block. Attributes are key value specification on a given
 // Block. For example take the following hcl:
 //
-//		resource "aws_instance" "t3_standard_cpuCredits" {
-//		  	ami           = "fake_ami"
-//  		instance_type = "t3.medium"
+//			resource "aws_instance" "t3_standard_cpuCredits" {
+//			  	ami           = "fake_ami"
+//	 		instance_type = "t3.medium"
 //
-//  		credit_specification {
-//    			cpu_credits = "standard"
-//  		}
-//		}
+//	 		credit_specification {
+//	   			cpu_credits = "standard"
+//	 		}
+//			}
 //
 // ami & instance_type are the Attributes of this Block and credit_specification is a child Block.
 func (b *Block) GetAttributes() []*Attribute {
@@ -684,14 +725,14 @@ func (b *Block) GetAttributes() []*Attribute {
 // GetAttribute returns the given attribute with the provided name. It will return nil if the attribute is not found.
 // If we take the following Block example:
 //
-//		resource "aws_instance" "t3_standard_cpuCredits" {
-//		  	ami           = "fake_ami"
-//  		instance_type = "t3.medium"
+//			resource "aws_instance" "t3_standard_cpuCredits" {
+//			  	ami           = "fake_ami"
+//	 		instance_type = "t3.medium"
 //
-//  		credit_specification {
-//    			cpu_credits = "standard"
-//  		}
-//		}
+//	 		credit_specification {
+//	   			cpu_credits = "standard"
+//	 		}
+//			}
 //
 // ami & instance_type are both valid Attribute names that can be used to lookup Block Attributes.
 func (b *Block) GetAttribute(name string) *Attribute {
@@ -745,14 +786,14 @@ func (b *Block) getHCLAttributes() hcl.Attributes {
 // Values returns the Block as a cty.Value with all the Attributes evaluated with the Block Context.
 // This means that any variables or references will be replaced by their actual value. For example:
 //
-//		variable "instance_type" {
-//			default = "t3.medium"
-//		}
+//			variable "instance_type" {
+//				default = "t3.medium"
+//			}
 //
-//		resource "aws_instance" "t3_standard_cpucredits" {
-//		  	ami           = "fake_ami"
-//  		instance_type = var.instance_type
-//		}
+//			resource "aws_instance" "t3_standard_cpucredits" {
+//			  	ami           = "fake_ami"
+//	 		instance_type = var.instance_type
+//			}
 //
 // Would evaluate to a cty.Value of type Object with the instance_type Attribute holding the value "t3.medium".
 func (b *Block) Values() cty.Value {
@@ -795,10 +836,10 @@ func (b *Block) LocalName() string {
 //
 // The following resource residing in a module named "web_app":
 //
-//		resource "aws_instance" "t3_standard" {
-//		  	ami           = "fake_ami"
-//  		instance_type = var.instance_type
-//		}
+//			resource "aws_instance" "t3_standard" {
+//			  	ami           = "fake_ami"
+//	 		instance_type = var.instance_type
+//			}
 //
 // Would have its FullName as module.web_app.aws_instance.t3_standard
 // FullName is what Terraform uses in its JSON output file.

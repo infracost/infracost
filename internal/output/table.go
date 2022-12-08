@@ -71,7 +71,7 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 		s += "\n"
 	}
 
-	totalOut := formatCost2DP(out.Currency, out.TotalMonthlyCost)
+	totalOut := FormatCost2DP(out.Currency, out.TotalMonthlyCost)
 
 	overallTitle := formatTitleWithCurrency(" OVERALL TOTAL", out.Currency)
 	s += fmt.Sprintf("%s%s",
@@ -186,7 +186,7 @@ func tableForBreakdown(currency string, breakdown Breakdown, fields []string, in
 		for q := 0; q < numOfFields; q++ {
 			totalCostRow = append(totalCostRow, "")
 		}
-		totalCostRow = append(totalCostRow, formatCost2DP(currency, breakdown.TotalMonthlyCost))
+		totalCostRow = append(totalCostRow, FormatCost2DP(currency, breakdown.TotalMonthlyCost))
 		t.AppendRow(totalCostRow)
 	}
 
@@ -252,10 +252,10 @@ func buildCostComponentRows(t table.Writer, currency string, costComponents []Co
 				tableRow = append(tableRow, c.Unit)
 			}
 			if contains(fields, "hourlyCost") {
-				tableRow = append(tableRow, formatCost2DP(currency, c.HourlyCost))
+				tableRow = append(tableRow, FormatCost2DP(currency, c.HourlyCost))
 			}
 			if contains(fields, "monthlyCost") {
-				tableRow = append(tableRow, formatCost2DP(currency, c.MonthlyCost))
+				tableRow = append(tableRow, FormatCost2DP(currency, c.MonthlyCost))
 			}
 
 			t.AppendRow(tableRow)
@@ -272,11 +272,16 @@ func buildActualCostRows(t table.Writer, currency string, ac *ActualCosts, prefi
 
 	var dateRange string
 	if !ac.StartTimestamp.IsZero() && !ac.EndTimestamp.IsZero() {
+		// We want to display the range as "days" which means "inclusive", so subtract
+		// 1 nano second from the exclusive endTimestamp.  This means the (exclusive) timestamp
+		// range "2020/10/10 00:00:00Z-2020/10/20 00:00:00Z" will be displayed as the (inclusive)
+		// day range "2020/10/10 - 2020/10/19".
+		endDay := ac.EndTimestamp.Add(-1)
 		endFmt := "Jan 2"
-		if ac.StartTimestamp.Month() == ac.EndTimestamp.Month() {
+		if ac.StartTimestamp.Month() == endDay.Month() {
 			endFmt = "2"
 		}
-		dateRange = fmt.Sprintf(" %s-%s", ac.StartTimestamp.Format("Jan 2"), ac.EndTimestamp.Format(endFmt))
+		dateRange = fmt.Sprintf(" %s-%s", ac.StartTimestamp.Format("Jan 2"), endDay.Format(endFmt))
 	}
 	var resourceID string
 	if ac.ResourceID != "" {

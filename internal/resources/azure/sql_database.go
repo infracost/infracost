@@ -61,25 +61,25 @@ func (r *SQLDatabase) PopulateUsage(u *schema.UsageData) {
 //
 // SQLDatabase splits pricing into two different models. DTU & vCores.
 //
-//		Database Transaction Unit (DTU) is made a performance metric representing a mixture of performance metrics
-// 		in azure sql. Some include: CPU, I/O, Memory. DTU is used as Azure tries to simplify billing by using a single metric.
+//	Database Transaction Unit (DTU) is made a performance metric representing a mixture of performance metrics
+//	in azure sql. Some include: CPU, I/O, Memory. DTU is used as Azure tries to simplify billing by using a single metric.
 //
-//		Virtual Core (vCore) pricing is designed to translate from on premise hardware metrics (cores) into the cloud
-//		sql instance. vCore is designed to allow users to better estimate their resource limits, e.g. RAM.
+//	Virtual Core (vCore) pricing is designed to translate from on premise hardware metrics (cores) into the cloud
+//	sql instance. vCore is designed to allow users to better estimate their resource limits, e.g. RAM.
 //
 // SQL databases that follow a DTU pricing model have the following costs associated with them:
 //
-//		1. Costs based on the number of DTUs that the sql database has
-//		2. Extra backup data costs - this is configured using SQLDatabase.ExtraDataStorageGB
-//		3. Long term data backup costs - this is configured using SQLDatabase.LongTermRetentionStorageGB
+//  1. Costs based on the number of DTUs that the sql database has
+//  2. Extra backup data costs - this is configured using SQLDatabase.ExtraDataStorageGB
+//  3. Long term data backup costs - this is configured using SQLDatabase.LongTermRetentionStorageGB
 //
 // SQL databases that follow a vCore pricing model have the following costs associated with them:
 //
-//		1. Costs based on the number of vCores the resource has
-//		2. Extra pricing if any database read replicas have been provisioned
-//		3. Additional charge for sql server licencing based on vCores amount
-//		4. Charges for storage used
-//		5. Charges for long term data backup - this is configured using SQLDatabase.LongTermRetentionStorageGB
+//  1. Costs based on the number of vCores the resource has
+//  2. Extra pricing if any database read replicas have been provisioned
+//  3. Additional charge for sql server licencing based on vCores amount
+//  4. Charges for storage used
+//  5. Charges for long term data backup - this is configured using SQLDatabase.LongTermRetentionStorageGB
 //
 // This method is called after the resource is initialized by an IaC provider. SQLDatabase is used by both mssql_database
 // and sql_database terraform resources to build a sql database costing.
@@ -117,9 +117,9 @@ func (r *SQLDatabase) dtuPurchaseCostComponents() []*schema.CostComponent {
 			// This is not the same as the 730h/month value we use elsewhere but it looks more understandable than seeing `30.4166` in the output
 			MonthlyQuantity: decimalPtr(decimal.NewFromInt(30)),
 			ProductFilter: r.productFilter([]*schema.AttributeFilter{
-				{Key: "productName", ValueRegex: strPtr("/^SQL Database Single/i")},
-				{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", skuName))},
-				{Key: "meterName", ValueRegex: regexPtr("DTUs$")},
+				{Key: "productName", ValueRegex: regexPtr("^SQL Database Single")},
+				{Key: "skuName", ValueRegex: regexPtr(fmt.Sprintf("^%s$", skuName))},
+				{Key: "meterName", ValueRegex: regexPtr("DTU(s)?$")},
 			}),
 			PriceFilter: priceFilterConsumption,
 		},
@@ -322,7 +322,7 @@ func (r *SQLDatabase) mssqlStorageComponent() *schema.CostComponent {
 		ProductFilter: r.productFilter([]*schema.AttributeFilter{
 			{Key: "productName", ValueRegex: strPtr(productNameRegex)},
 			{Key: "skuName", Value: strPtr(skuName)},
-			{Key: "meterName", ValueRegex: strPtr("/^Data Stored/")},
+			{Key: "meterName", ValueRegex: regexPtr("Data Stored$")},
 		}),
 	}
 }

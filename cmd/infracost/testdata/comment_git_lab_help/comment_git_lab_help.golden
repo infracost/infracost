@@ -26,6 +26,7 @@ FLAGS
   -p, --path stringArray           Path to Infracost JSON files, glob patterns need quotes
       --policy-path stringArray    Path to Infracost policy files, glob patterns need quotes (experimental)
       --repo string                Repository in format owner/repo
+      --show-all-projects          Show all projects in the table of the comment output
       --tag string                 Customize hidden markdown tag used to detect comments posted by Infracost
 
 GLOBAL FLAGS

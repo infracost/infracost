@@ -8,13 +8,11 @@ import (
 	"strings"
 	"time"
 
-	"github.com/shopspring/decimal"
-
 	"github.com/infracost/infracost/internal/providers/pulumi"
-	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/infracost/infracost/internal/usage"
+	"github.com/shopspring/decimal"
 )
 
 var outputVersion = "0.2"
@@ -234,9 +232,11 @@ type Options struct {
 	DashboardEndpoint string
 	NoColor           bool
 	ShowSkipped       bool
+	ShowAllProjects   bool
 	Fields            []string
 	IncludeHTML       bool
 	PolicyChecks      PolicyCheck
+	GuardrailCheck    GuardrailCheck
 	diffMsg           string
 	CurrencyFormat    string
 }
@@ -266,6 +266,41 @@ func (p PolicyCheckFailures) Error() string {
 	out := bytes.NewBuffer([]byte("Policy check failed:\n\n"))
 
 	for _, e := range p {
+		out.WriteString(e + "\n")
+	}
+
+	return out.String()
+}
+
+// GuardrailCheck holds information if a given run has applicable guardrail checks.
+// This struct is used to create guardrail outputs.
+type GuardrailCheck struct {
+	// TotalChecked is the total number of guardrails checked
+	TotalChecked int64
+
+	// Comment indicates that the guardrail status should be reported in the PR
+	// comment (either as a success or as a failure depending on CommentableFailures).
+	Comment bool
+	// CommentableFailures are the failures that should be listed in the PR comment
+	CommentableFailures GuardrailFailures
+
+	// BlockingFailures is the list of failures causing the CLI to return with a
+	// failing (non-zero) error code
+	BlockingFailures GuardrailFailures
+}
+
+// GuardrailFailures defines a list of guardrail failures that were returned from infracost cloud.
+type GuardrailFailures []string
+
+// Error implements the Error interface returning the failures as a single message that can be used in stderr.
+func (g GuardrailFailures) Error() string {
+	if len(g) == 0 {
+		return ""
+	}
+
+	out := bytes.NewBuffer([]byte("Guardrail check failed:\n\n"))
+
+	for _, e := range g {
 		out.WriteString(e + "\n")
 	}
 
@@ -592,6 +627,10 @@ func formatCounts(countMap *map[string]int) string {
 	return msg
 }
 
+func hasSupportedTerraformProvider(rType string) bool {
+	return strings.HasPrefix(rType, "aws_") || strings.HasPrefix(rType, "google_") || strings.HasPrefix(rType, "azurerm_")
+}
+
 func BuildSummary(resources []*schema.Resource, opts SummaryOptions) (*Summary, error) {
 	s := &Summary{}
 
@@ -615,7 +654,7 @@ func BuildSummary(resources []*schema.Resource, opts SummaryOptions) (*Summary, 
 	}
 
 	for _, r := range resources {
-		if !opts.IncludeUnsupportedProviders && !terraform.HasSupportedProvider(r.ResourceType) && !pulumi.HasSupportedProvider(r.ResourceType) {
+		if !opts.IncludeUnsupportedProviders && !hasSupportedTerraformProvider(r.ResourceType) && !pulumi.HasSupportedProvider(r.ResourceType) {
 			continue
 		}
 

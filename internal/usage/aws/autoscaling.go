@@ -17,9 +17,9 @@ func autoscalingNewClient(ctx context.Context, region string) (*autoscaling.Clie
 
 // AutoscalingGetInstanceCount uses various techniques to estimate number of instances in an AutoScaling group.
 // In order of preference:
-//   1) CloudWatch monthly average
-//	 2) Instantaneous count right now
-//   3) Mean of min-size and max-size
+//  1. CloudWatch monthly average
+//  2. Instantaneous count right now
+//  3. Mean of min-size and max-size
 func AutoscalingGetInstanceCount(ctx context.Context, region string, name string) (float64, error) {
 	log.Debugf("Querying AWS CloudWatch: AWS/AutoScaling GroupTotalInstances (region: %s, AutoScalingGroupName: %s)", region, name)
 	stats, err := cloudwatchGetMonthlyStats(ctx, statsRequest{

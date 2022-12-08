@@ -173,7 +173,7 @@ func storageCostComponent(region, diskName, productName string) *schema.CostComp
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr(productName)},
 				{Key: "skuName", Value: strPtr(fmt.Sprintf("%s LRS", diskName))},
-				{Key: "meterName", Value: strPtr(fmt.Sprintf("%s Disks", diskName))},
+				{Key: "meterName", ValueRegex: regexPtr(fmt.Sprintf("^%s (LRS )?Disk(s)?$", diskName))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -215,7 +215,7 @@ func ultraDiskCostComponents(region string, diskType string, diskData gjson.Resu
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "productName", Value: strPtr("Ultra Disks")},
 					{Key: "skuName", Value: strPtr("Ultra LRS")},
-					{Key: "meterName", Value: strPtr("Provisioned Capacity")},
+					{Key: "meterName", ValueRegex: regexPtr("Provisioned Capacity$")},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
@@ -235,7 +235,7 @@ func ultraDiskCostComponents(region string, diskType string, diskData gjson.Resu
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "productName", Value: strPtr("Ultra Disks")},
 					{Key: "skuName", Value: strPtr("Ultra LRS")},
-					{Key: "meterName", Value: strPtr("Provisioned IOPS")},
+					{Key: "meterName", ValueRegex: regexPtr("Provisioned IOPS$")},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
@@ -255,7 +255,7 @@ func ultraDiskCostComponents(region string, diskType string, diskData gjson.Resu
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "productName", Value: strPtr("Ultra Disks")},
 					{Key: "skuName", Value: strPtr("Ultra LRS")},
-					{Key: "meterName", Value: strPtr("Provisioned Throughput (MBps)")},
+					{Key: "meterName", ValueRegex: regexPtr("Provisioned Throughput \\(MBps\\)$")},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{

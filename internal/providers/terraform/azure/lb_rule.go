@@ -41,7 +41,7 @@ func rulesCostComponent(region string) *schema.CostComponent {
 			ProductFamily: strPtr("Networking"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "skuName", Value: strPtr("Standard")},
-				{Key: "meterName", Value: strPtr("Overage LB Rules and Outbound Rules")},
+				{Key: "meterName", ValueRegex: regexPtr("Overage LB Rules and Outbound Rules$")},
 			},
 		},
 	}

@@ -1,0 +1,17 @@
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_with_depends_upon_module
+
+ Name                                            Monthly Qty  Unit   Monthly Cost 
+                                                                                  
+ module.database.module.primary.aws_eip.test[0]                                   
+ └─ IP address (if unused)                               730  hours         $3.65 
+                                                                                  
+ module.database.module.replica.aws_eip.test[0]                                   
+ └─ IP address (if unused)                               730  hours         $3.65 
+                                                                                  
+ OVERALL TOTAL                                                              $7.30 
+──────────────────────────────────
+2 cloud resources were detected:
+∙ 2 were estimated
+
+Err:
+

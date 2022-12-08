@@ -119,9 +119,11 @@ var RegionMapping = map[string]string{
 	"cn-north-1":      "China (Beijing)",
 	"cn-northwest-1":  "China (Ningxia)",
 	"eu-central-1":    "EU (Frankfurt)",
+	"eu-central-2":    "EU (Zurich)",
 	"eu-west-1":       "EU (Ireland)",
 	"eu-west-2":       "EU (London)",
 	"eu-south-1":      "EU (Milan)",
+	"eu-south-2":      "EU (Spain)",
 	"eu-west-3":       "EU (Paris)",
 	"eu-north-1":      "EU (Stockholm)",
 	"ap-east-1":       "Asia Pacific (Hong Kong)",
@@ -132,6 +134,7 @@ var RegionMapping = map[string]string{
 	"ap-southeast-2":  "Asia Pacific (Sydney)",
 	"ap-southeast-3":  "Asia Pacific (Jakarta)",
 	"ap-south-1":      "Asia Pacific (Mumbai)",
+	"ap-south-2":      "Asia Pacific (Hyderabad)",
 	"me-central-1":    "Middle East (UAE)",
 	"me-south-1":      "Middle East (Bahrain)",
 	"sa-east-1":       "South America (Sao Paulo)",
@@ -149,15 +152,16 @@ var RegionCodeMapping = map[string]string{
 // changed on a per-region basis. e.g.
 //
 // monthly_data_processed_gb:
-//   us_gov_west_1: 188
-//   us_east_1: 78
+//
+//	us_gov_west_1: 188
+//	us_east_1: 78
 //
 // can be handled by adding a usage cost property to your resource like so:
 //
-// type MyResource struct {
-//    ...
-//    MonthlyDataProcessedGB *RegionsUsage `infracost_usage:"monthly_processed_gb"`
-// }
+//	type MyResource struct {
+//	   ...
+//	   MonthlyDataProcessedGB *RegionsUsage `infracost_usage:"monthly_processed_gb"`
+//	}
 type RegionsUsage struct {
 	USGovWest1   *float64 `infracost_usage:"us_gov_west_1"`
 	USGovEast1   *float64 `infracost_usage:"us_gov_east_1"`
@@ -223,9 +227,9 @@ func (r RegionsUsage) Values() []RegionUsage {
 // This can be used as a schema.SubResourceUsage to define a structure that's
 // commonly used with data transfer usage. e.g:
 //
-// 		monthly_data_transfer_out_gb:
-//			us_gov_west_1: 122
-//			ca_central_1: 99
+//	monthly_data_transfer_out_gb:
+//		us_gov_west_1: 122
+//		ca_central_1: 99
 //
 // See DirectoryServiceDirectory for an example usage.
 var RegionUsageSchema = []*schema.UsageItem{
@@ -689,6 +693,13 @@ var reservedPaymentOptionMapping = map[string]string{
 	"no_upfront":      "No Upfront",
 	"partial_upfront": "Partial Upfront",
 	"all_upfront":     "All Upfront",
+}
+
+// There's differences within the pricing API, the Values have no space.
+var reservedHostPaymentOptionMapping = map[string]string{
+	"no_upfront":      "NoUpfront",
+	"partial_upfront": "PartialUpfront",
+	"all_upfront":     "AllUpfront",
 }
 
 var elasticacheReservedNodeCacheLegacyOfferings = map[string]string{

@@ -16,7 +16,7 @@ const (
 
 // SQLManagedInstance struct represents an azure Sql Managed Instance.
 //
-// SQLManagedInstance currently only Gen5 database instance
+// # SQLManagedInstance currently only Gen5 database instance
 //
 // More resource information here: https://azure.microsoft.com/en-gb/products/azure-sql/managed-instance/
 // Pricing information here: https://azure.microsoft.com/en-gb/pricing/details/azure-sql-managed-instance/single/
@@ -123,7 +123,7 @@ func (r *SQLManagedInstance) sqlMIStorageCostComponent() *schema.CostComponent {
 			ProductFamily: strPtr(sqlMIProductFamily),
 			AttributeFilters: ([]*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("SQL Managed Instance General Purpose - Storage")},
-				{Key: "meterName", Value: strPtr("Data Stored")},
+				{Key: "meterName", ValueRegex: regexPtr("Data Stored$")},
 			}),
 		},
 		PriceFilter: priceFilterConsumption,

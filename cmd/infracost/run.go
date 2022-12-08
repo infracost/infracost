@@ -67,6 +67,7 @@ func addRunFlags(cmd *cobra.Command) {
 	cmd.Flags().String("terraform-workspace", "", "Terraform workspace to use. Applicable when path is a Terraform directory")
 
 	cmd.Flags().StringSlice("exclude-path", nil, "Paths of directories to exclude, glob patterns need quotes")
+	cmd.Flags().Bool("include-all-paths", false, "Set project auto-detection to use all subdirectories in given path")
 
 	cmd.Flags().Bool("no-cache", false, "Don't attempt to cache Terraform plans")
 
@@ -482,6 +483,8 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 		return nil, err
 	}
 
+	_ = r.uploadCloudResourceIDs(projects)
+
 	r.buildResources(projects)
 
 	spinnerOpts := ui.SpinnerOptions{
@@ -533,7 +536,9 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 
 	spinner.Success()
 
-	r.populateActualCosts(projects)
+	if r.runCtx.Config.UsageActualCosts {
+		r.populateActualCosts(projects)
+	}
 
 	out.projects = projects
 
@@ -544,25 +549,51 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 	return out, nil
 }
 
+func (r *parallelRunner) uploadCloudResourceIDs(projects []*schema.Project) error {
+	if r.runCtx.Config.UsageAPIEndpoint == "" || !r.hasCloudResourceIDToUpload(projects) {
+		return nil
+	}
+
+	r.runCtx.SetContextValue("uploadedResourceIds", true)
+
+	spinnerOpts := ui.SpinnerOptions{
+		EnableLogging: r.runCtx.Config.IsLogging(),
+		NoColor:       r.runCtx.Config.NoColor,
+		Indent:        "  ",
+	}
+	spinner := ui.NewSpinner("Sending resource IDs to Infracost Cloud for usage estimates", spinnerOpts)
+	defer spinner.Fail()
+
+	for _, project := range projects {
+		if err := prices.UploadCloudResourceIDs(r.runCtx, project); err != nil {
+			logging.Logger.WithError(err).Debugf("failed to upload resource IDs for project %s", project.Name)
+			return err
+		}
+	}
+
+	spinner.Success()
+	return nil
+}
+
+func (r *parallelRunner) hasCloudResourceIDToUpload(projects []*schema.Project) bool {
+	for _, project := range projects {
+		for _, partial := range project.AllPartialResources() {
+			if len(partial.CloudResourceIDs) > 0 {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
 func (r *parallelRunner) buildResources(projects []*schema.Project) {
 	var projectPtrToUsageMap map[*schema.Project]map[string]*schema.UsageData
 	if r.runCtx.Config.UsageAPIEndpoint != "" {
 		projectPtrToUsageMap = r.fetchProjectUsage(projects)
 	}
 
-	for _, project := range projects {
-		usageMap := projectPtrToUsageMap[project]
-
-		for _, partial := range project.PartialResources {
-			u := usageMap[partial.ResourceData.Address]
-			project.Resources = append(project.Resources, schema.BuildResource(partial, u))
-		}
-
-		for _, partial := range project.PartialPastResources {
-			u := usageMap[partial.ResourceData.Address]
-			project.PastResources = append(project.PastResources, schema.BuildResource(partial, u))
-		}
-	}
+	schema.BuildResources(projects, projectPtrToUsageMap)
 }
 
 func (r *parallelRunner) fetchProjectUsage(projects []*schema.Project) map[*schema.Project]map[string]*schema.UsageData {
@@ -600,7 +631,7 @@ func (r *parallelRunner) fetchProjectUsage(projects []*schema.Project) map[*sche
 			logging.Logger.WithError(err).Debugf("failed to retrieve usage data for project %s", project.Name)
 			return nil
 		}
-
+		r.runCtx.SetContextValue("fetchedUsageData", true)
 		projectPtrToUsageMap[project] = usageMap
 	}
 
@@ -810,8 +841,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 		cmd.Flags().Changed("terraform-var-file") ||
 		cmd.Flags().Changed("terraform-var") ||
 		cmd.Flags().Changed("terraform-init-flags") ||
-		cmd.Flags().Changed("terraform-workspace") ||
-		cmd.Flags().Changed("terraform-use-state"))
+		cmd.Flags().Changed("terraform-workspace"))
 
 	if hasConfigFile && hasProjectFlags {
 		m := "--config-file flag cannot be used with the following flags: "
@@ -837,6 +867,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 		projectCfg.TerraformInitFlags, _ = cmd.Flags().GetString("terraform-init-flags")
 		projectCfg.TerraformUseState, _ = cmd.Flags().GetBool("terraform-use-state")
 		projectCfg.ExcludePaths, _ = cmd.Flags().GetStringSlice("exclude-path")
+		projectCfg.IncludeAllPaths, _ = cmd.Flags().GetBool("include-all-paths")
 
 		if cmd.Flags().Changed("terraform-workspace") {
 			projectCfg.TerraformWorkspace, _ = cmd.Flags().GetString("terraform-workspace")
@@ -856,6 +887,11 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 		if forceCLI, _ := cmd.Flags().GetBool("terraform-force-cli"); forceCLI {
 			for _, p := range cfg.Projects {
 				p.TerraformForceCLI = true
+			}
+		}
+		if useState, _ := cmd.Flags().GetBool("terraform-use-state"); useState {
+			for _, p := range cfg.Projects {
+				p.TerraformUseState = true
 			}
 		}
 	}

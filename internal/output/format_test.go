@@ -3,6 +3,8 @@ package output
 import (
 	"testing"
 
+	"github.com/Rhymond/go-money"
+
 	"github.com/google/go-cmp/cmp"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/require"
@@ -72,7 +74,7 @@ func TestFormatCost2DP(t *testing.T) {
 				val = &parsed
 			}
 
-			got := formatCost2DP(tc.currency, val)
+			got := FormatCost2DP(tc.currency, val)
 
 			diff := cmp.Diff(tc.expected, got)
 			if diff != "" {
@@ -103,7 +105,10 @@ func TestCurrencyFormatCost(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
+			reset := resetCurrencyFormatFunc(tc.format)
 			addCurrencyFormat(tc.format)
+			defer reset()
+
 			var val *decimal.Decimal
 			if tc.val != "" {
 				parsed, err := decimal.NewFromString(tc.val)
@@ -119,6 +124,14 @@ func TestCurrencyFormatCost(t *testing.T) {
 				t.Fatalf(diff)
 			}
 		})
+	}
+}
+
+func resetCurrencyFormatFunc(format string) func() {
+	code := format[0:3]
+	currency := money.GetCurrency(code)
+	return func() {
+		money.AddCurrency(currency.Code, currency.Grapheme, currency.Template, currency.Decimal, currency.Thousand, currency.Fraction)
 	}
 }
 

@@ -1,0 +1,11 @@
+
+Err:
+Error: Guardrail check failed:
+
+medical problems
+
+
+Logs:
+level=info msg="Estimate uploaded to organization 'tim' in Infracost Cloud"
+level=info msg="2 guardrails checked"
+level=info msg="guardrail check failed: medical problems"

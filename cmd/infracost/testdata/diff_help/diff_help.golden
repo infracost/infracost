@@ -22,6 +22,7 @@ FLAGS
       --exclude-path strings         Paths of directories to exclude, glob patterns need quotes
       --format string                Output format: json, diff (default "diff")
   -h, --help                         help for diff
+      --include-all-paths            Set project auto-detection to use all subdirectories in given path
       --no-cache                     Don't attempt to cache Terraform plans
       --out-file string              Save output to a file
   -p, --path string                  Path to the Terraform directory or JSON/plan file

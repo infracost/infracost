@@ -58,7 +58,7 @@ func NewAzureRMCDNEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.
 				region,
 				"Azure CDN from Microsoft",
 				"Standard",
-				"Rules",
+				"Rule",
 				"5",
 				decimalPtr(decimal.NewFromInt(int64(numberOfRules))),
 			))
@@ -232,9 +232,9 @@ func cdnCostComponent(name, unit, region, productName, skuName, meterName, start
 			Service:       strPtr("Content Delivery Network"),
 			ProductFamily: strPtr("Networking"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", productName))},
-				{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", skuName))},
-				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", meterName))},
+				{Key: "productName", ValueRegex: regexPtr(fmt.Sprintf("^%s$", productName))},
+				{Key: "skuName", ValueRegex: regexPtr(fmt.Sprintf("^%s$", skuName))},
+				{Key: "meterName", ValueRegex: regexPtr(fmt.Sprintf("%s$", meterName))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

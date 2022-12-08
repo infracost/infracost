@@ -55,6 +55,25 @@ func getEnv(key string) string {
 	return strings.TrimSpace(os.Getenv(key))
 }
 
+func getEnvList(key string) []string {
+	val := getEnv(key)
+
+	if val == "" {
+		return nil
+	}
+
+	list := make([]string, 0)
+
+	for _, v := range strings.Split(val, ",") {
+		v = strings.TrimSpace(v)
+		if v != "" {
+			list = append(list, v)
+		}
+	}
+
+	return list
+}
+
 func buildEnvProvidedMetadata() Metadata {
 	remote := urlStringToRemote(getEnv("INFRACOST_VCS_REPOSITORY_URL"))
 	m := Metadata{
@@ -143,6 +162,7 @@ func buildDefaultPR() *PullRequest {
 		"INFRACOST_VCS_PROVIDER",
 		"INFRACOST_VCS_PULL_REQUEST_TITLE",
 		"INFRACOST_VCS_PULL_REQUEST_AUTHOR",
+		"INFRACOST_VCS_PULL_REQUEST_LABELS",
 		"INFRACOST_VCS_BRANCH",
 		"INFRACOST_VCS_BASE_BRANCH",
 		"INFRACOST_VCS_PULL_REQUEST_URL",
@@ -167,6 +187,7 @@ func buildDefaultPR() *PullRequest {
 		VCSProvider:  provider,
 		Title:        getEnv("INFRACOST_VCS_PULL_REQUEST_TITLE"),
 		Author:       getEnv("INFRACOST_VCS_PULL_REQUEST_AUTHOR"),
+		Labels:       getEnvList("INFRACOST_VCS_PULL_REQUEST_LABELS"),
 		SourceBranch: getEnv("INFRACOST_VCS_BRANCH"),
 		BaseBranch:   getEnv("INFRACOST_VCS_BASE_BRANCH"),
 		URL:          prURL,
@@ -424,7 +445,7 @@ func (f *metadataFetcher) getGithubMetadata(path string) (Metadata, error) {
 				return Metadata{}, fmt.Errorf("could not open previously cloned path %w", err)
 			}
 		} else {
-			logging.Logger.Debugf("cloning auhor commit into '%s'", clonePath)
+			logging.Logger.Debugf("cloning author commit into '%s'", clonePath)
 			r, err = git.PlainClone(clonePath, false, &git.CloneOptions{
 				URL:           gjson.GetBytes(event, "repository.clone_url").String(),
 				ReferenceName: plumbing.NewBranchReferenceName(headRef),
@@ -460,11 +481,19 @@ func (f *metadataFetcher) getGithubMetadata(path string) (Metadata, error) {
 
 	m.Remote = urlStringToRemote(remote)
 	m.Pipeline = &Pipeline{ID: getEnv("GITHUB_RUN_ID")}
+
+	l := gjson.GetBytes(event, "pull_request.labels").Array()
+	labels := make([]string, 0, len(l))
+	for _, v := range l {
+		labels = append(labels, v.String())
+	}
+
 	m.PullRequest = &PullRequest{
 		VCSProvider:  "github",
 		ID:           gjson.GetBytes(event, "pull_request.number").String(),
 		Title:        gjson.GetBytes(event, "pull_request.title").String(),
 		Author:       gjson.GetBytes(event, "pull_request.user.login").String(),
+		Labels:       labels,
 		SourceBranch: gjson.GetBytes(event, "pull_request.head.ref").String(),
 		BaseBranch:   gjson.GetBytes(event, "pull_request.base.ref").String(),
 		URL:          gjson.GetBytes(event, "pull_request._links.html.href").String(),
@@ -860,6 +889,7 @@ type PullRequest struct {
 	VCSProvider  string
 	Title        string
 	Author       string
+	Labels       []string
 	SourceBranch string
 	BaseBranch   string
 	URL          string

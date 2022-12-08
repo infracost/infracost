@@ -13,7 +13,7 @@ Module path: dev
                                                                                                                     
  aws_lambda_function.hello_world                                                                                    
  ├─ Requests                                          Monthly cost depends on usage: $0.20 per 1M requests          
- └─ Duration                                          Monthly cost depends on usage: $0.0000166667 per GB-seconds   
+ └─ Duration (first 6B)                               Monthly cost depends on usage: $0.0000166667 per GB-seconds   
                                                                                                                     
  Project total                                                                                               $51.97 
 
@@ -33,7 +33,7 @@ Module path: prod
                                                                                                                       
  aws_lambda_function.hello_world                                                                                      
  ├─ Requests                                            Monthly cost depends on usage: $0.20 per 1M requests          
- └─ Duration                                            Monthly cost depends on usage: $0.0000166667 per GB-seconds   
+ └─ Duration (first 6B)                                 Monthly cost depends on usage: $0.0000166667 per GB-seconds   
                                                                                                                       
  Project total                                                                                                $747.64 
 

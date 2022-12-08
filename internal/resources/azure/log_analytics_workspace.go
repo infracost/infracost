@@ -63,9 +63,9 @@ var (
 // LogAnalyticsWorkspace struct represents an Azure Monitor log workspace. A workspace consolidates data
 // from multiple sources into a single data lake. A workspace defines:
 //
-//		1. The geographic location of the data.
-//		2. Access rights that define which users can access data.
-//		3. Configuration settings such as the pricing tier and data retention.
+//  1. The geographic location of the data.
+//  2. Access rights that define which users can access data.
+//  3. Configuration settings such as the pricing tier and data retention.
 //
 // Resource information: https://azure.microsoft.com/en-gb/services/monitor/
 // Pricing information: https://azure.microsoft.com/en-gb/pricing/details/monitor/
@@ -117,13 +117,13 @@ func (r *LogAnalyticsWorkspace) PopulateUsage(u *schema.UsageData) {
 // BuildResource builds a schema.Resource from a valid LogAnalyticsWorkspace struct.
 // The returned schema.Resource can have 4 potential schema.CostComponent associated with it:
 //
-//		1. Log data ingestion, which can be either:
-//			a) Pay-as-you-go, which is only valid for a sku of PerGB2018 and uses a usage param
-//			b) Billed per commitment tiers, which is only valid for a sku of CapacityReservation
-//		2. Log retention, which is free up to 31 days. Data retained beyond these no-charge periods
-//		   will be charged for each GB of data retained for a month (pro-rated daily).
-//		3. Data export, which is billed per monthly GB exported and is defined from a usage param.
-//		4. Sentinel data ingestion if Sentinel usage is detected.
+//  1. Log data ingestion, which can be either:
+//     a) Pay-as-you-go, which is only valid for a sku of PerGB2018 and uses a usage param
+//     b) Billed per commitment tiers, which is only valid for a sku of CapacityReservation
+//  2. Log retention, which is free up to 31 days. Data retained beyond these no-charge periods
+//     will be charged for each GB of data retained for a month (pro-rated daily).
+//  3. Data export, which is billed per monthly GB exported and is defined from a usage param.
+//  4. Sentinel data ingestion if Sentinel usage is detected.
 //
 // Outside the above rules - if the workspace has sku of Free we return as a free resource & if the workspace sku
 // is in a list of unsupported skus then we mark as skipped with a warning.
@@ -212,7 +212,7 @@ func (r *LogAnalyticsWorkspace) logDataIngestionFromCapacityReservation(name str
 			ProductFamily: strPtr(governanceProductFamily),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "skuName", Value: strPtr(fmt.Sprintf("%d GB Commitment Tier", selectedTier))},
-				{Key: "meterName", Value: strPtr(fmt.Sprintf("%d GB Commitment Tier", selectedTier))},
+				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("^%d GB Commitment Tier", selectedTier))},
 			},
 		},
 		PriceFilter: priceFilterConsumption,
@@ -237,7 +237,7 @@ func (r *LogAnalyticsWorkspace) logDataIngestion(name string, monthlyData *float
 			ProductFamily: strPtr(governanceProductFamily),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "skuName", Value: strPtr(skuFilterPAYG)},
-				{Key: "meterName", ValueRegex: strPtr("/Data Ingestion/i")},
+				{Key: "meterName", ValueRegex: regexPtr("Data Ingestion$")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -265,7 +265,7 @@ func (r *LogAnalyticsWorkspace) logDataRetention() *schema.CostComponent {
 			ProductFamily: strPtr(governanceProductFamily),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "skuName", Value: strPtr(skuFilterPAYG)},
-				{Key: "meterName", ValueRegex: strPtr("/Data Retention/i")},
+				{Key: "meterName", ValueRegex: regexPtr("Data Retention$")},
 			},
 		},
 		PriceFilter: priceFilterConsumption,
@@ -290,7 +290,7 @@ func (r *LogAnalyticsWorkspace) logDataExport() *schema.CostComponent {
 			ProductFamily: strPtr(governanceProductFamily),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "skuName", Value: strPtr("Log Analytics data export")},
-				{Key: "meterName", Value: strPtr("Data Exported")},
+				{Key: "meterName", ValueRegex: regexPtr("Data Exported$")},
 			},
 		},
 		PriceFilter: priceFilterConsumption,

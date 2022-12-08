@@ -13,7 +13,7 @@ Module path: dev
                                                                                                                     
  aws_lambda_function.hello_world                                                                                    
  ├─ Requests                                          Monthly cost depends on usage: $0.20 per 1M requests          
- └─ Duration                                          Monthly cost depends on usage: $0.0000166667 per GB-seconds   
+ └─ Duration (first 6B)                               Monthly cost depends on usage: $0.0000166667 per GB-seconds   
                                                                                                                     
  Project total                                                                                               $64.97 
 
@@ -33,7 +33,7 @@ Module path: prod
                                                                                                                       
  aws_lambda_function.hello_world                                                                                      
  ├─ Requests                                            Monthly cost depends on usage: $0.20 per 1M requests          
- └─ Duration                                            Monthly cost depends on usage: $0.0000166667 per GB-seconds   
+ └─ Duration (first 6B)                                 Monthly cost depends on usage: $0.0000166667 per GB-seconds   
                                                                                                                       
  Project total                                                                                                $747.64 
 
@@ -53,7 +53,7 @@ Module path: prod2
                                                                                                                       
  aws_lambda_function.hello_world                                                                                      
  ├─ Requests                                            Monthly cost depends on usage: $0.20 per 1M requests          
- └─ Duration                                            Monthly cost depends on usage: $0.0000166667 per GB-seconds   
+ └─ Duration (first 6B)                                 Monthly cost depends on usage: $0.0000166667 per GB-seconds   
                                                                                                                       
  Project total                                                                                                $747.64 
 
@@ -63,4 +63,5 @@ Module path: prod2
 ∙ 6 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 
 Err:
+Warning: Input values were not provided for following Terraform variables: "variable.unspecified_variable". Use --terraform-var-file or --terraform-var to specify them.
 

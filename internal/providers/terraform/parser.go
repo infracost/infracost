@@ -8,11 +8,11 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 
 	address_parser "github.com/hashicorp/go-terraform-address"
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/providers/terraform/aws"
 	"github.com/infracost/infracost/internal/providers/terraform/azure"
 	"github.com/infracost/infracost/internal/providers/terraform/google"
@@ -52,6 +52,7 @@ func (p *Parser) createPartialResource(d *schema.ResourceData, u *schema.UsageDa
 					NoPrice:     true,
 					SkipMessage: "Free resource.",
 				},
+				CloudResourceIDs: registryItem.CloudResourceIDFunc(d),
 			}
 		}
 
@@ -62,7 +63,7 @@ func (p *Parser) createPartialResource(d *schema.ResourceData, u *schema.UsageDa
 		if registryItem.CoreRFunc != nil {
 			coreRes := registryItem.CoreRFunc(d)
 			if coreRes != nil {
-				return &schema.PartialResource{ResourceData: d, CoreResource: coreRes}
+				return &schema.PartialResource{ResourceData: d, CoreResource: coreRes, CloudResourceIDs: registryItem.CloudResourceIDFunc(d)}
 			}
 		} else {
 			res := registryItem.RFunc(d, u)
@@ -71,7 +72,7 @@ func (p *Parser) createPartialResource(d *schema.ResourceData, u *schema.UsageDa
 					res.EstimationSummary = u.CalcEstimationSummary()
 				}
 
-				return &schema.PartialResource{ResourceData: d, Resource: res}
+				return &schema.PartialResource{ResourceData: d, Resource: res, CloudResourceIDs: registryItem.CloudResourceIDFunc(d)}
 			}
 		}
 	}
@@ -266,8 +267,13 @@ func (p *Parser) parseResourceData(isState bool, providerConf, planVals gjson.Re
 
 		resConf := getConfJSON(conf, addr)
 
-		// Try getting the region from the ARN
-		region := resourceRegion(t, v)
+		// Override the region when requested
+		region := overrideRegion(addr, t, p.ctx.RunContext.Config)
+
+		// If not overridden try getting the region from the ARN
+		if region == "" {
+			region = resourceRegion(t, v)
+		}
 
 		// Otherwise use region from the provider conf
 		if region == "" {
@@ -294,7 +300,7 @@ func (p *Parser) parseResourceData(isState bool, providerConf, planVals gjson.Re
 }
 
 func getSpecialContext(d *schema.ResourceData) map[string]interface{} {
-	providerPrefix := strings.Split(d.Type, "_")[0]
+	providerPrefix := getProviderPrefix(d.Type)
 
 	switch providerPrefix {
 	case "aws":
@@ -304,14 +310,13 @@ func getSpecialContext(d *schema.ResourceData) map[string]interface{} {
 	case "google":
 		return google.GetSpecialContext(d)
 	default:
-		log.Debugf("Unsupported provider %s", providerPrefix)
+		logging.Logger.Debugf("Unsupported provider %s", providerPrefix)
 		return map[string]interface{}{}
 	}
 }
 
 func parseTags(resourceType string, v gjson.Result) map[string]string {
-
-	providerPrefix := strings.Split(resourceType, "_")[0]
+	providerPrefix := getProviderPrefix(resourceType)
 
 	switch providerPrefix {
 	case "aws":
@@ -321,14 +326,35 @@ func parseTags(resourceType string, v gjson.Result) map[string]string {
 	case "google":
 		return google.ParseTags(resourceType, v)
 	default:
-		log.Debugf("Unsupported provider %s", providerPrefix)
+		logging.Logger.Debugf("Unsupported provider %s", providerPrefix)
 		return map[string]string{}
 	}
 }
 
-func resourceRegion(resourceType string, v gjson.Result) string {
+func overrideRegion(addr string, resourceType string, config *config.Config) string {
+	region := ""
+	providerPrefix := getProviderPrefix(resourceType)
 
-	providerPrefix := strings.Split(resourceType, "_")[0]
+	switch providerPrefix {
+	case "aws":
+		region = config.AWSOverrideRegion
+	case "azurerm":
+		region = config.AzureOverrideRegion
+	case "google":
+		region = config.GoogleOverrideRegion
+	default:
+		logging.Logger.Debugf("Unsupported provider %s", providerPrefix)
+	}
+
+	if region != "" {
+		logging.Logger.Debugf("Overriding region (%s) for %s", region, addr)
+	}
+
+	return region
+}
+
+func resourceRegion(resourceType string, v gjson.Result) string {
+	providerPrefix := getProviderPrefix(resourceType)
 
 	switch providerPrefix {
 	case "aws":
@@ -338,7 +364,7 @@ func resourceRegion(resourceType string, v gjson.Result) string {
 	case "google":
 		return google.GetResourceRegion(resourceType, v)
 	default:
-		log.Debugf("Unsupported provider %s", providerPrefix)
+		logging.Logger.Debugf("Unsupported provider %s", providerPrefix)
 		return ""
 	}
 }
@@ -356,7 +382,7 @@ func providerRegion(addr string, providerConf gjson.Result, vars gjson.Result, r
 
 	if region == "" {
 		// Try to get the provider key from the first part of the resource
-		providerPrefix := strings.Split(resourceType, "_")[0]
+		providerPrefix := getProviderPrefix(resourceType)
 		region = parseRegion(providerConf, vars, providerPrefix)
 
 		if region == "" {
@@ -373,12 +399,21 @@ func providerRegion(addr string, providerConf gjson.Result, vars gjson.Result, r
 			// Don't show this log for azurerm users since they have a different method of looking up the region.
 			// A lot of Azure resources get their region from their referenced azurerm_resource_group resource
 			if region != "" && providerPrefix != "azurerm" {
-				log.Debugf("Falling back to default region (%s) for %s", region, addr)
+				logging.Logger.Debugf("Falling back to default region (%s) for %s", region, addr)
 			}
 		}
 	}
 
 	return region
+}
+
+func getProviderPrefix(resourceType string) string {
+	providerPrefix := strings.Split(resourceType, "_")
+	if len(providerPrefix) == 0 {
+		return ""
+	}
+
+	return providerPrefix[0]
 }
 
 func parseProviderKey(resConf gjson.Result) string {
@@ -415,7 +450,7 @@ func parseRegion(providerConf gjson.Result, vars gjson.Result, providerKey strin
 }
 
 func (p *Parser) loadInfracostProviderUsageData(u map[string]*schema.UsageData, resData map[string]*schema.ResourceData) {
-	log.Debugf("Loading usage data from Infracost provider resources")
+	logging.Logger.Debugf("Loading usage data from Infracost provider resources")
 
 	for _, d := range resData {
 		if isInfracostResource(d) {
@@ -425,7 +460,7 @@ func (p *Parser) loadInfracostProviderUsageData(u map[string]*schema.UsageData, 
 				if _, ok := u[ref.Address]; !ok {
 					u[ref.Address] = schema.NewUsageData(ref.Address, convertToUsageAttributes(d.RawValues))
 				} else {
-					log.Debugf("Skipping loading usage for resource %s since it has already been defined", ref.Address)
+					logging.Logger.Debugf("Skipping loading usage for resource %s since it has already been defined", ref.Address)
 				}
 			}
 		}
@@ -554,14 +589,14 @@ func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, co
 				refData, ok = resData[a]
 
 				if ok {
-					log.Debugf("reference specifies a count: using resource %s for %s.%s", a, d.Address, attr)
+					logging.Logger.Debugf("reference specifies a count: using resource %s for %s.%s", a, d.Address, attr)
 				}
 			} else if containsString(refs, "each.key") {
 				a := fmt.Sprintf("%s[\"%s\"]", refAddr, addressKey(d.Address))
 				refData, ok = resData[a]
 
 				if ok {
-					log.Debugf("reference specifies a key: using resource %s for %s.%s", a, d.Address, attr)
+					logging.Logger.Debugf("reference specifies a key: using resource %s for %s.%s", a, d.Address, attr)
 				}
 			}
 		}
@@ -572,7 +607,7 @@ func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, co
 			refData, ok = resData[a]
 
 			if ok {
-				log.Debugf("reference does not specify a count: using resource %s for for %s.%s", a, d.Address, attr)
+				logging.Logger.Debugf("reference does not specify a count: using resource %s for for %s.%s", a, d.Address, attr)
 			}
 		}
 

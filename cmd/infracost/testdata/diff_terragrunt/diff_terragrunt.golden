@@ -27,7 +27,7 @@ Module path: dev
       Monthly cost depends on usage
         +$0.20 per 1M requests
 
-    + Duration
+    + Duration (first 6B)
       Monthly cost depends on usage
         +$0.0000166667 per GB-seconds
 
@@ -64,7 +64,7 @@ Module path: prod
       Monthly cost depends on usage
         +$0.20 per 1M requests
 
-    + Duration
+    + Duration (first 6B)
       Monthly cost depends on usage
         +$0.0000166667 per GB-seconds
 

@@ -1,6 +1,7 @@
 package google
 
 import (
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -37,8 +38,10 @@ func (r *ComputeInstance) PopulateUsage(u *schema.UsageData) {
 // This method is called after the resource is initialised by an IaC provider.
 // See providers folder for more information.
 func (r *ComputeInstance) BuildResource() *schema.Resource {
-	costComponents := []*schema.CostComponent{
-		computeCostComponent(r.Region, r.MachineType, r.PurchaseOption, r.Size, r.MonthlyHours),
+	costComponents, err := computeCostComponents(r.Region, r.MachineType, r.PurchaseOption, r.Size, r.MonthlyHours)
+	if err != nil {
+		logging.Logger.Warnf("Skipping resource %s. %s", r.Address, err)
+		return nil
 	}
 
 	if r.HasBootDisk {

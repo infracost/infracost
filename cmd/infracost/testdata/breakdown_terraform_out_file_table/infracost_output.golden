@@ -20,11 +20,11 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
                                                                                                                       
  aws_lambda_function.hello_world                                                                                      
  ├─ Requests                                            Monthly cost depends on usage: $0.20 per 1M requests          
- └─ Duration                                            Monthly cost depends on usage: $0.0000166667 per GB-seconds   
+ └─ Duration (first 6B)                                 Monthly cost depends on usage: $0.0000166667 per GB-seconds   
                                                                                                                       
  aws_lambda_function.zero_cost_lambda                                                                                 
  ├─ Requests                                            Monthly cost depends on usage: $0.20 per 1M requests          
- └─ Duration                                            Monthly cost depends on usage: $0.0000166667 per GB-seconds   
+ └─ Duration (first 6B)                                 Monthly cost depends on usage: $0.0000166667 per GB-seconds   
                                                                                                                       
  aws_s3_bucket.usage                                                                                                  
  └─ Standard                                                                                                          

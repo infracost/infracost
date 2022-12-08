@@ -663,7 +663,8 @@ func Index(list, value cty.Value) (cty.Value, error) {
 }
 
 // List takes any number of list arguments and returns a list containing those
-//  values in the same order.
+//
+//	values in the same order.
 func List(args ...cty.Value) (cty.Value, error) {
 	return ListFunc.Call(args)
 }

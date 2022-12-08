@@ -253,3 +253,18 @@ resource "aws_instance" "instance_detailedMonitoring_withMonthlyHours" {
   instance_type = "m3.large"
   monitoring    = true
 }
+
+resource "aws_ec2_host" "mac" {
+  instance_type     = "mac1.metal"
+  availability_zone = "us-east-2a"
+}
+
+resource "aws_instance" "with_host" {
+  ami           = "fake_ami"
+  instance_type = "fake" # TF requires it
+  host_id       = aws_ec2_host.mac.id
+
+  root_block_device {
+    volume_size = 50
+  }
+}

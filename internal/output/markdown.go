@@ -69,9 +69,14 @@ func formatCostChangeSentence(currency string, pastCost, cost *decimal.Decimal, 
 func calculateMetadataToDisplay(projects []Project) (hasModulePath bool, hasWorkspace bool) {
 	// we only want to show metadata fields if they can help distinguish projects with the same name
 
-	// copy so we can sort without side effects
-	sprojects := make([]Project, len(projects))
-	copy(sprojects, projects)
+	sprojects := make([]Project, 0)
+	for _, p := range projects {
+		if p.Diff == nil || len(p.Diff.Resources) == 0 { // ignore the projects that are skipped
+			continue
+		}
+		sprojects = append(sprojects, p)
+	}
+
 	sort.Slice(sprojects, func(i, j int) bool {
 		if sprojects[i].Name != sprojects[j].Name {
 			return sprojects[i].Name < sprojects[j].Name
@@ -134,11 +139,14 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 			return formatMarkdownCostChange(out.Currency, pastCost, cost, false)
 		},
 		"formatCostChangeSentence": formatCostChangeSentence,
-		"hasDiff": func(p Project) bool {
-			if p.Diff == nil || len(p.Diff.Resources) == 0 {
+		"showProject": func(p Project) bool {
+			if opts.ShowAllProjects {
+				return true
+			}
+			if p.Diff == nil || len(p.Diff.Resources) == 0 { // has no diff
 				return false
 			}
-			return true
+			return true // has diff
 		},
 		"metadataHeaders": func() []string {
 			headers := []string{}
@@ -208,9 +216,12 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 	bufw.Flush()
 	msg := buf.Bytes()
 
-	msgLength := utf8.RuneCount(msg)
-	if markdownOpts.MaxMessageSize > 0 && msgLength > markdownOpts.MaxMessageSize {
-		truncateLength := msgLength - markdownOpts.MaxMessageSize
+	msgByteLength := len(msg)
+	if markdownOpts.MaxMessageSize > 0 && msgByteLength > markdownOpts.MaxMessageSize {
+		msgRuneLength := utf8.RuneCount(msg)
+		// truncation relies on rune length
+		q := float64(msgRuneLength) / float64(msgByteLength)
+		truncateLength := msgRuneLength - int(q*float64(markdownOpts.MaxMessageSize))
 		newLength := utf8.RuneCountInString(diffMsg) - truncateLength - 1000
 
 		opts.diffMsg = truncateMiddle(diffMsg, newLength, "\n\n...(truncated due to message size limit)...\n\n")

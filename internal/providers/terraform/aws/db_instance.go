@@ -8,12 +8,12 @@ import (
 func getDBInstanceRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:                "aws_db_instance",
-		RFunc:               NewDBInstance,
+		CoreRFunc:           NewDBInstance,
 		ReferenceAttributes: []string{"replicate_source_db"},
 	}
 }
 
-func NewDBInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewDBInstance(d *schema.ResourceData) schema.CoreResource {
 	piEnabled := d.Get("performance_insights_enabled").Bool()
 	piLongTerm := piEnabled && d.Get("performance_insights_retention_period").Int() > 7
 	engine := d.Get("engine").String()
@@ -43,6 +43,5 @@ func NewDBInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 		r.AllocatedStorageGB = floatPtr(d.Get("allocated_storage").Float())
 	}
 
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

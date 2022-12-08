@@ -2,4 +2,5 @@ version: 0.1
 resource_usage:
   aws_fsx_windows_file_system.my_system:
     backup_storage_gb: 10000
-    
+  aws_fsx_windows_file_system.my_system_ssd:
+    backup_storage_gb: 10000    

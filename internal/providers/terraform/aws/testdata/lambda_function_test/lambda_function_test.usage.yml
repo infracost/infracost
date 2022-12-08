@@ -7,3 +7,15 @@ resource_usage:
   aws_lambda_function.lambda_withUsage512Mem:
     monthly_requests: 100000
     request_duration_ms: 350
+
+  aws_lambda_function.lambda_duration_6B:
+    monthly_requests: 6000000000
+    request_duration_ms: 1024
+
+  aws_lambda_function.lambda_duration_9B:
+    monthly_requests: 6000000000
+    request_duration_ms: 1024
+
+  aws_lambda_function.lambda_duration_15B:
+    monthly_requests: 6000000000
+    request_duration_ms: 2048
