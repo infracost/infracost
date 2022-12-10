@@ -380,9 +380,7 @@ var CommentMarkdownWithHTMLTemplate = `
 				{{- end}}
 		</details>
 	{{ else }}
-		<details>
-			<summary><strong>✅ Guardrail checks passed</strong></summary>
-		</details>
+<strong>✅ Guardrail checks passed</strong>
 	{{- end }}
 {{- end }}
 {{- if .MarkdownOptions.WillUpdate }}
