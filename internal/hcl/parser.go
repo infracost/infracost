@@ -203,6 +203,7 @@ type Parser struct {
 	remoteVariablesLoader *RemoteVariablesLoader
 	credentialsSource     *modules.CredentialsSource
 	logger                *logrus.Entry
+	hasChanges            bool
 }
 
 // LoadParsers inits a list of Parser with the provided option and initialPath. LoadParsers locates Terraform files
@@ -211,6 +212,10 @@ type Parser struct {
 func LoadParsers(initialPath string, locatorConfig *ProjectLocatorConfig, logger *logrus.Entry, options ...Option) ([]*Parser, error) {
 	pl := NewProjectLocator(logger, locatorConfig)
 	rootPaths := pl.FindRootModules(initialPath)
+	if len(rootPaths) == 0 && len(locatorConfig.ChangedObjects) > 0 {
+		return nil, nil
+	}
+
 	if len(rootPaths) == 0 {
 		return nil, errors.New("No valid Terraform files found at the given path, try a different directory")
 	}
@@ -223,13 +228,14 @@ func LoadParsers(initialPath string, locatorConfig *ProjectLocatorConfig, logger
 	return parsers, nil
 }
 
-func newParser(initialPath string, logger *logrus.Entry, options ...Option) *Parser {
+func newParser(projectRoot RootPath, logger *logrus.Entry, options ...Option) *Parser {
 	parserLogger := logger.WithFields(logrus.Fields{
-		"parser_path": initialPath,
+		"parser_path": projectRoot.Path,
 	})
 
 	p := &Parser{
-		initialPath:   initialPath,
+		initialPath:   projectRoot.Path,
+		hasChanges:    projectRoot.HasChanges,
 		workspaceName: defaultTerraformWorkspaceName,
 		blockBuilder:  BlockBuilder{SetAttributes: []SetAttributesFunc{SetUUIDAttributes}, Logger: logger},
 		logger:        parserLogger,
@@ -237,7 +243,7 @@ func newParser(initialPath string, logger *logrus.Entry, options ...Option) *Par
 
 	var defaultVarFiles []string
 
-	defaultTfFile := path.Join(initialPath, "terraform.tfvars")
+	defaultTfFile := path.Join(projectRoot.Path, "terraform.tfvars")
 	if _, err := os.Stat(defaultTfFile); err == nil {
 		parserLogger.Debugf("using terraform.tfvar file %s", defaultTfFile)
 		defaultVarFiles = append(defaultVarFiles, defaultTfFile)
@@ -249,12 +255,12 @@ func newParser(initialPath string, logger *logrus.Entry, options ...Option) *Par
 	}
 
 	autoVarsSuffix := ".auto.tfvars"
-	infos, _ := os.ReadDir(initialPath)
+	infos, _ := os.ReadDir(projectRoot.Path)
 	for _, info := range infos {
 		name := info.Name()
 		if strings.HasSuffix(name, autoVarsSuffix) || strings.HasSuffix(name, autoVarsSuffix+".json") {
 			parserLogger.Debugf("using auto var file %s", name)
-			defaultVarFiles = append(defaultVarFiles, path.Join(initialPath, name))
+			defaultVarFiles = append(defaultVarFiles, path.Join(projectRoot.Path, name))
 		}
 	}
 
@@ -270,7 +276,7 @@ func newParser(initialPath string, logger *logrus.Entry, options ...Option) *Par
 		loaderOpts = append(loaderOpts, modules.LoaderWithSpinner(p.newSpinner))
 	}
 
-	p.moduleLoader = modules.NewModuleLoader(initialPath, p.credentialsSource, p.logger, loaderOpts...)
+	p.moduleLoader = modules.NewModuleLoader(projectRoot.Path, p.credentialsSource, p.logger, loaderOpts...)
 
 	return p
 }
@@ -343,6 +349,7 @@ func (p *Parser) ParseDirectory() (*Module, error) {
 		return nil, err
 	}
 
+	root.HasChanges = p.hasChanges
 	return root, nil
 }
 

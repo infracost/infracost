@@ -233,6 +233,7 @@ type Options struct {
 	NoColor           bool
 	ShowSkipped       bool
 	ShowAllProjects   bool
+	ShowOnlyChanges   bool
 	Fields            []string
 	IncludeHTML       bool
 	PolicyChecks      PolicyCheck

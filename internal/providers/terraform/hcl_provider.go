@@ -128,9 +128,11 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 	)
 
 	logger := ctx.Logger().WithFields(log.Fields{"provider": "terraform_dir"})
+	locatorConfig := &hcl.ProjectLocatorConfig{ExcludedSubDirs: ctx.ProjectConfig.ExcludePaths, ChangedObjects: ctx.RunContext.VCSMetadata.Commit.ChangedObjects, UseAllPaths: ctx.ProjectConfig.IncludeAllPaths}
+
 	parsers, err := hcl.LoadParsers(
 		ctx.ProjectConfig.Path,
-		&hcl.ProjectLocatorConfig{ExcludedSubDirs: ctx.ProjectConfig.ExcludePaths, UseAllPaths: ctx.ProjectConfig.IncludeAllPaths},
+		locatorConfig,
 		logger,
 		options...,
 	)
@@ -183,6 +185,10 @@ func (p *HCLProvider) LoadResources(usage map[string]*schema.UsageData) ([]*sche
 		project, err := p.parseResources(j, usage)
 		if err != nil {
 			return nil, err
+		}
+
+		if p.ctx.RunContext.VCSMetadata.HasChanges() {
+			project.Metadata.VCSCodeChanged = &j.Module.HasChanges
 		}
 
 		if p.scanner != nil {

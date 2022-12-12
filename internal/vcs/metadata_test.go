@@ -3,8 +3,8 @@ package vcs
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"net/http"
+	"os"
 	"path/filepath"
 	"reflect"
 	"testing"
@@ -12,8 +12,10 @@ import (
 
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/config"
+	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func Test_urlStringToRemote(t *testing.T) {
@@ -83,7 +85,7 @@ func Test_urlStringToRemote(t *testing.T) {
 
 func Test_metadataFetcher_GetLocalMetadata(t *testing.T) {
 	tmp := t.TempDir()
-	obj := createLocalRepoWithCommit(t, tmp)
+	_, lastCommit := createLocalRepoWithCommits(t, tmp)
 	t.Setenv("GITHUB_ACTIONS", "")
 
 	test := false
@@ -93,7 +95,7 @@ func Test_metadataFetcher_GetLocalMetadata(t *testing.T) {
 		test:   &test,
 	}
 
-	actual, err := m.Get(tmp)
+	actual, err := m.Get(tmp, nil)
 	assert.NoError(t, err)
 
 	assert.Equal(t, Metadata{
@@ -106,11 +108,66 @@ func Test_metadataFetcher_GetLocalMetadata(t *testing.T) {
 			Name: "master",
 		},
 		Commit: Commit{
-			SHA:         obj.Hash.String(),
-			AuthorName:  obj.Author.Name,
-			AuthorEmail: obj.Author.Email,
-			Time:        obj.Author.When,
-			Message:     obj.Message,
+			SHA:         lastCommit.Hash.String(),
+			AuthorName:  lastCommit.Author.Name,
+			AuthorEmail: lastCommit.Author.Email,
+			Time:        lastCommit.Author.When,
+			Message:     lastCommit.Message,
+			ChangedObjects: []string{
+				filepath.Join(tmp, "added-file"),
+			},
+		},
+		PullRequest: nil,
+		Pipeline:    nil,
+	}, actual)
+}
+
+func Test_metadataFetcher_GetLocalMetadata_WithChangeBase(t *testing.T) {
+	tmp := t.TempDir()
+	r, _ := createLocalRepoWithCommits(t, tmp)
+
+	w, err := r.Worktree()
+	require.NoError(t, err)
+	err = w.Checkout(&git.CheckoutOptions{
+		Create: true,
+		Branch: plumbing.NewBranchReferenceName("a-branch"),
+	})
+	require.NoError(t, err)
+
+	lastCommit := createCommit(t, r, w, tmp, "branch-file", "something")
+
+	t.Setenv("GITHUB_ACTIONS", "")
+	base := "master"
+
+	test := false
+	m := metadataFetcher{
+		mu:     &keyMutex{},
+		client: &http.Client{Timeout: time.Second * 5},
+		test:   &test,
+	}
+
+	actual, err := m.Get(tmp, &base)
+	assert.NoError(t, err)
+
+	assert.Equal(t, Metadata{
+		Remote: Remote{
+			Host: "github.com",
+			Name: "git-fixtures/basic",
+			URL:  "https://github.com/git-fixtures/basic.git",
+		},
+		Branch: Branch{
+			Name: "a-branch",
+		},
+		Commit: Commit{
+			SHA:         lastCommit.Hash.String(),
+			AuthorName:  lastCommit.Author.Name,
+			AuthorEmail: lastCommit.Author.Email,
+			Time:        lastCommit.Author.When,
+			Message:     lastCommit.Message,
+			ChangedObjects: []string{
+				filepath.Join(tmp, "branch-file"),
+			},
+			ChangeBase: &base,
 		},
 		PullRequest: nil,
 		Pipeline:    nil,
@@ -119,7 +176,7 @@ func Test_metadataFetcher_GetLocalMetadata(t *testing.T) {
 
 func Test_metadataFetcher_GetLocalMetadataMergesWithEnv(t *testing.T) {
 	tmp := t.TempDir()
-	obj := createLocalRepoWithCommit(t, tmp)
+	_, lastCommit := createLocalRepoWithCommits(t, tmp)
 	providedName := "test provided name"
 
 	t.Setenv("GITHUB_ACTIONS", "")
@@ -135,7 +192,7 @@ func Test_metadataFetcher_GetLocalMetadataMergesWithEnv(t *testing.T) {
 		test:   &test,
 	}
 
-	actual, err := m.Get(tmp)
+	actual, err := m.Get(tmp, nil)
 	assert.NoError(t, err)
 
 	assert.Equal(t, Metadata{
@@ -148,48 +205,37 @@ func Test_metadataFetcher_GetLocalMetadataMergesWithEnv(t *testing.T) {
 			Name: "master",
 		},
 		Commit: Commit{
-			SHA:         obj.Hash.String(),
+			SHA:         lastCommit.Hash.String(),
 			AuthorName:  providedName,
-			AuthorEmail: obj.Author.Email,
-			Time:        obj.Author.When,
-			Message:     obj.Message,
+			AuthorEmail: lastCommit.Author.Email,
+			Time:        lastCommit.Author.When,
+			Message:     lastCommit.Message,
+			ChangedObjects: []string{
+				filepath.Join(tmp, "added-file"),
+			},
 		},
 		PullRequest: &PullRequest{ID: pullID, VCSProvider: "github"},
 		Pipeline:    nil,
 	}, actual)
 }
 
-func createLocalRepoWithCommit(t *testing.T, tmp string) *object.Commit {
+func createLocalRepoWithCommits(t *testing.T, tmp string) (*git.Repository, *object.Commit) {
 	t.Helper()
 	r, err := git.PlainInit(tmp, false)
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	_, err = r.CreateRemote(&config.RemoteConfig{
 		Name: "origin",
 		URLs: []string{"https://github.com/git-fixtures/basic.git"},
 	})
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	w, err := r.Worktree()
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
-	filename := filepath.Join(tmp, "example-git-file")
-	err = ioutil.WriteFile(filename, []byte("hello world!"), 0600)
-	assert.NoError(t, err)
-
-	commit, err := w.Commit("example go-git commit", &git.CommitOptions{
-		Author: &object.Signature{
-			Name:  "John Doe",
-			Email: "john@doe.org",
-			When:  time.Now(),
-		},
-	})
-	assert.NoError(t, err)
-
-	obj, err := r.CommitObject(commit)
-	assert.NoError(t, err)
-
-	return obj
+	createCommit(t, r, w, tmp, "example-git-file", "hello-world!")
+	obj := createCommit(t, r, w, tmp, "added-file", "i'm added!")
+	return r, obj
 }
 
 func Test_metadataFetcher_Get_ReturnsUserDefinedEnvs(t *testing.T) {
@@ -220,7 +266,7 @@ func Test_metadataFetcher_Get_ReturnsUserDefinedEnvs(t *testing.T) {
 		test:   &test,
 	}
 
-	actual, _ := m.Get(t.TempDir())
+	actual, _ := m.Get(t.TempDir(), nil)
 
 	_, err := json.Marshal(actual)
 	assert.NoError(t, err)
@@ -265,7 +311,7 @@ func Test_metadataFetcher_Get_ReturnsPRIDFromURL(t *testing.T) {
 		test:   &test,
 	}
 
-	actual, _ := m.Get(t.TempDir())
+	actual, _ := m.Get(t.TempDir(), nil)
 
 	_, err := json.Marshal(actual)
 	assert.NoError(t, err)
@@ -276,4 +322,29 @@ func Test_metadataFetcher_Get_ReturnsPRIDFromURL(t *testing.T) {
 			URL: "https://github.com/infracost/test-repo/pull/1979",
 		},
 	}, actual)
+}
+
+func createCommit(t *testing.T, r *git.Repository, w *git.Worktree, tmp, name, contents string) *object.Commit {
+	t.Helper()
+
+	filename := filepath.Join(tmp, name)
+	err := os.WriteFile(filename, []byte(contents), 0600)
+	require.NoError(t, err)
+
+	_, err = w.Add(name)
+	require.NoError(t, err)
+
+	commit, err := w.Commit(name, &git.CommitOptions{
+		Author: &object.Signature{
+			Name:  "John Doe",
+			Email: "john@doe.org",
+			When:  time.Now(),
+		},
+	})
+	require.NoError(t, err)
+
+	obj, err := r.CommitObject(commit)
+	require.NoError(t, err)
+
+	return obj
 }

@@ -328,7 +328,13 @@ var CommentMarkdownWithHTMLTemplate = `
   </tbody>
 </table>
 
-  {{- if eq .SkippedProjectCount 1 }}
+  {{- if eq .SkippedUnchangedProjectCount 1 }}
+
+1 project has no code changes.
+  {{- else if gt .SkippedUnchangedProjectCount  0 }}
+
+{{ .SkippedUnchangedProjectCount }} projects have no code changes.
+  {{- else if eq .SkippedProjectCount 1 }}
 
 1 project has no cost estimate changes.
   {{- else if gt .SkippedProjectCount  0 }}

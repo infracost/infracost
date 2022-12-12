@@ -100,6 +100,7 @@ type Config struct {
 	SyncUsageFile   bool       `yaml:"sync_usage_file,omitempty" ignored:"true"`
 	Fields          []string   `yaml:"fields,omitempty" ignored:"true"`
 	CompareTo       string
+	ChangeTarget    *string
 
 	// Base configuration settings
 	// RootPath defines the raw value of the `--path` flag provided by the user
@@ -148,7 +149,7 @@ func DefaultConfig() *Config {
 // RepoPath returns the filepath to either the config-file location or initial path provided by the user.
 func (c *Config) RepoPath() string {
 	if c.ConfigFilePath != "" {
-		return c.ConfigFilePath
+		return strings.TrimRight(c.ConfigFilePath, filepath.Base(c.ConfigFilePath))
 	}
 
 	return c.RootPath

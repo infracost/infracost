@@ -140,12 +140,22 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 		},
 		"formatCostChangeSentence": formatCostChangeSentence,
 		"showProject": func(p Project) bool {
+			if opts.ShowOnlyChanges {
+				// only return true if the project has code changes so the table can also show
+				// project that have cost changes.
+				if p.Metadata.VCSCodeChanged != nil && *p.Metadata.VCSCodeChanged {
+					return true
+				}
+			}
+
 			if opts.ShowAllProjects {
 				return true
 			}
+
 			if p.Diff == nil || len(p.Diff.Resources) == 0 { // has no diff
 				return false
 			}
+
 			return true // has diff
 		},
 		"metadataHeaders": func() []string {
@@ -192,20 +202,29 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 
 	skippedProjectCount := 0
 	for _, p := range out.Projects {
-		if p.Diff == nil || len(p.Diff.Resources) == 0 {
+		if (p.Diff == nil || len(p.Diff.Resources) == 0) && !hasCodeChanges(opts, p) {
 			skippedProjectCount++
 		}
 	}
 
+	skippedUnchangedProjectCount := 0
+	for _, p := range out.Projects {
+		if hasCodeChanges(opts, p) {
+			skippedUnchangedProjectCount++
+		}
+	}
+
 	err = tmpl.Execute(bufw, struct {
-		Root                Root
-		SkippedProjectCount int
-		DiffOutput          string
-		Options             Options
-		MarkdownOptions     MarkdownOptions
+		Root                         Root
+		SkippedProjectCount          int
+		SkippedUnchangedProjectCount int
+		DiffOutput                   string
+		Options                      Options
+		MarkdownOptions              MarkdownOptions
 	}{
 		out,
 		skippedProjectCount,
+		skippedUnchangedProjectCount,
 		diffMsg,
 		opts,
 		markdownOpts})
@@ -229,4 +248,8 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 	}
 
 	return msg, nil
+}
+
+func hasCodeChanges(options Options, project Project) bool {
+	return options.ShowOnlyChanges && project.Metadata.VCSCodeChanged != nil && *project.Metadata.VCSCodeChanged
 }
