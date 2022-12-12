@@ -15,7 +15,7 @@ import (
 // ProjectLocator finds Terraform projects for given paths.
 // It naively excludes folders that are imported as modules in other projects.
 type ProjectLocator struct {
-	moduleCalls  map[string]struct{}
+	modules      map[string]struct{}
 	excludedDirs []string
 	useAllPaths  bool
 	logger       *logrus.Entry
@@ -26,6 +26,7 @@ type ProjectLocator struct {
 // ProjectLocatorConfig provides configuration options on how the locator functions.
 type ProjectLocatorConfig struct {
 	ExcludedSubDirs []string
+	ChangedObjects  []string
 	UseAllPaths     bool
 }
 
@@ -33,7 +34,7 @@ type ProjectLocatorConfig struct {
 func NewProjectLocator(logger *logrus.Entry, config *ProjectLocatorConfig) *ProjectLocator {
 	if config != nil {
 		return &ProjectLocator{
-			moduleCalls:  make(map[string]struct{}),
+			modules:      make(map[string]struct{}),
 			excludedDirs: config.ExcludedSubDirs,
 			logger:       logger,
 			useAllPaths:  config.UseAllPaths,
@@ -41,19 +42,19 @@ func NewProjectLocator(logger *logrus.Entry, config *ProjectLocatorConfig) *Proj
 	}
 
 	return &ProjectLocator{
-		moduleCalls: make(map[string]struct{}),
-		logger:      logger,
+		modules: make(map[string]struct{}),
+		logger:  logger,
 	}
 }
 
-func (p *ProjectLocator) buildMatches(fullPath string) func(string) bool {
-	var matches []string
-	globMatches := make(map[string]struct{})
+func (p *ProjectLocator) buildSkippedMatcher(fullPath string) func(string) bool {
+	var excludedMatches []string
+	excludedGlobs := make(map[string]struct{})
 
 	for _, dir := range p.excludedDirs {
 		var absoluteDir string
 		if dir == filepath.Base(dir) {
-			matches = append(matches, dir)
+			excludedMatches = append(excludedMatches, dir)
 		}
 
 		if filepath.IsAbs(dir) {
@@ -65,18 +66,18 @@ func (p *ProjectLocator) buildMatches(fullPath string) func(string) bool {
 		globs, err := filepath.Glob(absoluteDir)
 		if err == nil {
 			for _, m := range globs {
-				globMatches[m] = struct{}{}
+				excludedGlobs[m] = struct{}{}
 			}
 		}
 	}
 
 	return func(dir string) bool {
-		if _, ok := globMatches[dir]; ok {
+		if _, ok := excludedGlobs[dir]; ok {
 			return true
 		}
 
 		base := filepath.Base(dir)
-		for _, match := range matches {
+		for _, match := range excludedMatches {
 			if match == base {
 				return true
 			}
@@ -90,9 +91,9 @@ func (p *ProjectLocator) buildMatches(fullPath string) func(string) bool {
 // This list excludes any Terraform modules that have been found (if they have been called by a Module source).
 func (p *ProjectLocator) FindRootModules(fullPath string) []string {
 	p.basePath, _ = filepath.Abs(fullPath)
-	p.moduleCalls = make(map[string]struct{})
+	p.modules = make(map[string]struct{})
 
-	isSkipped := p.buildMatches(fullPath)
+	isSkipped := p.buildSkippedMatcher(fullPath)
 	dirs := p.walkPaths(fullPath, 0)
 	p.logger.Debugf("walking directory at %s returned a list of possible Terraform projects: %+v", fullPath, dirs)
 
@@ -103,11 +104,12 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []string {
 			continue
 		}
 
-		if _, ok := p.moduleCalls[dir]; !ok {
-			filtered = append(filtered, dir)
-		} else {
+		if _, ok := p.modules[dir]; ok && !p.useAllPaths {
 			p.logger.Debugf("skipping directory %s as it has been called as a module", dir)
+			continue
 		}
+
+		filtered = append(filtered, dir)
 	}
 
 	return filtered
@@ -163,9 +165,7 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) []string {
 		return []string{fullPath}
 	}
 
-	if p.useAllPaths && len(files) > 0 {
-		return []string{fullPath}
-	}
+	var providerBlocks bool
 
 	for _, file := range files {
 		body, content, diags := file.Body.PartialContent(justProviderBlocks)
@@ -174,8 +174,8 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) []string {
 			continue
 		}
 
-		if len(body.Blocks) == 0 {
-			continue
+		if len(body.Blocks) > 0 {
+			providerBlocks = true
 		}
 
 		moduleBody, _, _ := content.PartialContent(justModuleBlocks)
@@ -200,10 +200,17 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) []string {
 				}
 
 				mp := filepath.Join(fullPath, realPath)
-				p.moduleCalls[mp] = struct{}{}
+				p.modules[mp] = struct{}{}
 			}
 		}
 
+	}
+
+	if providerBlocks {
+		return []string{fullPath}
+	}
+
+	if p.useAllPaths && len(files) > 0 {
 		return []string{fullPath}
 	}
 
