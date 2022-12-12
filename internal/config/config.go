@@ -14,6 +14,8 @@ import (
 	"github.com/infracost/infracost/internal/logging"
 )
 
+const InfracostDir = ".infracost"
+
 // Project defines a specific terraform project config. This can be used
 // specify per folder/project configurations so that users don't have
 // to provide flags every run. Fields are documented below. More info
