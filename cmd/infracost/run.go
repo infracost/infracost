@@ -68,8 +68,8 @@ func addRunFlags(cmd *cobra.Command) {
 
 	cmd.Flags().StringSlice("exclude-path", nil, "Paths of directories to exclude, glob patterns need quotes")
 	cmd.Flags().Bool("include-all-paths", false, "Set project auto-detection to use all subdirectories in given path")
-	cmd.Flags().String("git-diff", "master", "Show only costs that have git changes compared to the provided branch. Use the name of the current branch to fetch changes from the last two commits")
-	_ = cmd.Flags().MarkHidden("git-diff")
+	cmd.Flags().String("git-diff-target", "master", "Show only costs that have git changes compared to the provided branch. Use the name of the current branch to fetch changes from the last two commits")
+	_ = cmd.Flags().MarkHidden("git-diff-target")
 
 	cmd.Flags().Bool("no-cache", false, "Don't attempt to cache Terraform plans")
 
@@ -93,7 +93,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	}
 
 	repoPath := runCtx.Config.RepoPath()
-	metadata, err := vcs.MetadataFetcher.Get(repoPath, runCtx.Config.ChangeTarget)
+	metadata, err := vcs.MetadataFetcher.Get(repoPath, runCtx.Config.GitDiffTarget)
 	if err != nil {
 		logging.Logger.WithError(err).Debugf("failed to fetch vcs metadata for path %s", repoPath)
 	}
@@ -825,9 +825,9 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	hasPathFlag := cmd.Flags().Changed("path")
 	hasConfigFile := cmd.Flags().Changed("config-file")
 
-	if cmd.Flags().Changed("git-diff") {
-		s, _ := cmd.Flags().GetString("git-diff")
-		cfg.ChangeTarget = &s
+	if cmd.Flags().Changed("git-diff-target") {
+		s, _ := cmd.Flags().GetString("git-diff-target")
+		cfg.GitDiffTarget = &s
 	}
 
 	cfg.CompareTo, _ = cmd.Flags().GetString("compare-to")

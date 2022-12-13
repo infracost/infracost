@@ -100,7 +100,7 @@ type Config struct {
 	SyncUsageFile   bool       `yaml:"sync_usage_file,omitempty" ignored:"true"`
 	Fields          []string   `yaml:"fields,omitempty" ignored:"true"`
 	CompareTo       string
-	ChangeTarget    *string
+	GitDiffTarget   *string
 
 	// Base configuration settings
 	// RootPath defines the raw value of the `--path` flag provided by the user

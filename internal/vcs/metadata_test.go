@@ -122,7 +122,7 @@ func Test_metadataFetcher_GetLocalMetadata(t *testing.T) {
 	}, actual)
 }
 
-func Test_metadataFetcher_GetLocalMetadata_WithChangeBase(t *testing.T) {
+func Test_metadataFetcher_GetLocalMetadata_WithGitDiffTarget(t *testing.T) {
 	tmp := t.TempDir()
 	r, _ := createLocalRepoWithCommits(t, tmp)
 
@@ -167,7 +167,7 @@ func Test_metadataFetcher_GetLocalMetadata_WithChangeBase(t *testing.T) {
 			ChangedObjects: []string{
 				filepath.Join(tmp, "branch-file"),
 			},
-			ChangeBase: &base,
+			GitDiffTarget: &base,
 		},
 		PullRequest: nil,
 		Pipeline:    nil,
