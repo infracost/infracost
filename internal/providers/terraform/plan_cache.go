@@ -3,7 +3,6 @@ package terraform
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/hashicorp/terraform-config-inspect/tfconfig"
 	"os"
 	"path"
 	"path/filepath"
@@ -11,11 +10,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hashicorp/terraform-config-inspect/tfconfig"
+	"github.com/infracost/infracost/internal/config"
+
 	log "github.com/sirupsen/logrus"
 )
 
 var cacheFileVersion = "0.1"
-var infracostDir = ".infracost"
 var cacheFileName = ".infracost-cache"
 var cacheMaxAgeSecs int64 = 60 * 30 // 30 minutes
 
@@ -194,7 +195,7 @@ func WritePlanCache(p *DirProvider, planJSON []byte) {
 		if os.IsNotExist(err) {
 			err := os.MkdirAll(cacheDir, 0700)
 			if err != nil {
-				log.Debugf("Couldn't create %v directory: %v", infracostDir, err)
+				log.Debugf("Couldn't create %v directory: %v", config.InfracostDir, err)
 				return
 			}
 		}
@@ -225,10 +226,10 @@ func calcCacheDir(p *DirProvider) string {
 
 	if dataDir != (path.Join(p.Path, ".terraform")) {
 		// there is a custom data dir, store the cache under that
-		return path.Join(dataDir, infracostDir)
+		return path.Join(dataDir, config.InfracostDir)
 	}
 
-	return path.Join(p.Path, infracostDir)
+	return path.Join(p.Path, config.InfracostDir)
 }
 
 func calcConfigState(p *DirProvider) configState {
@@ -259,7 +260,7 @@ func calcTFDataDate(path string, maxDepth int) time.Time {
 	entries, err := os.ReadDir(path)
 	if err == nil {
 		for _, entry := range entries {
-			if entry.Name() == infracostDir {
+			if entry.Name() == config.InfracostDir {
 				// ignore the infradir since we expect that to change
 				continue
 			}

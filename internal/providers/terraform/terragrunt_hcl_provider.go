@@ -24,6 +24,7 @@ import (
 	hcl2 "github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/gohcl"
 	"github.com/hashicorp/hcl/v2/hclparse"
+	"github.com/otiai10/copy"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
@@ -36,6 +37,8 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
 )
+
+const terragruntSourceVersionFile = ".terragrunt-source-version"
 
 type panicError struct {
 	msg string
@@ -53,6 +56,7 @@ type TerragruntHCLProvider struct {
 	stack                *tgconfigstack.Stack
 	excludedPaths        []string
 	env                  map[string]string
+	sourceCache          map[string]string
 	logger               *log.Entry
 }
 
@@ -70,6 +74,7 @@ func NewTerragruntHCLProvider(ctx *config.ProjectContext, includePastResources b
 		outputs:              map[string]cty.Value{},
 		excludedPaths:        ctx.ProjectConfig.ExcludePaths,
 		env:                  parseEnvironmentVariables(os.Environ()),
+		sourceCache:          map[string]string{},
 		logger:               logger,
 	}
 }
@@ -179,7 +184,8 @@ func (p *TerragruntHCLProvider) initTerraformVars(tfVars map[string]string, inpu
 func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, error) {
 	terragruntConfigPath := tgconfig.GetDefaultConfigPath(p.Path)
 
-	terragruntDownloadDir := filepath.Join(p.Path, ".infracost/.terragrunt-cache")
+	terragruntCacheDir := filepath.Join(config.InfracostDir, ".terragrunt-cache")
+	terragruntDownloadDir := filepath.Join(p.Path, terragruntCacheDir)
 	err := os.MkdirAll(terragruntDownloadDir, os.ModePerm)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to create download directories for terragrunt in working directory: %w", err)
@@ -632,6 +638,11 @@ func (p *TerragruntHCLProvider) downloadTerraformSource(source string, terragrun
 		return nil, err
 	}
 
+	if _, ok := p.sourceCache[terraformSource.CanonicalSourceURL.String()]; !ok {
+		terragruntOptions.Logger.Debugf("Adding %s to the source cache", terraformSource.CanonicalSourceURL.String())
+		p.sourceCache[terraformSource.CanonicalSourceURL.String()] = terraformSource.DownloadDir
+	}
+
 	terragruntOptions.Logger.Debugf("Copying files from %s into %s", terragruntOptions.WorkingDir, terraformSource.WorkingDir)
 	var includeInCopy []string
 	if terragruntConfig.Terraform != nil && terragruntConfig.Terraform.IncludeInCopy != nil {
@@ -649,16 +660,42 @@ func (p *TerragruntHCLProvider) downloadTerraformSource(source string, terragrun
 	return updatedTerragruntOptions, nil
 }
 
+// copyLocalSource copies the contents of a previously downloaded source folder into the destination folder
+func (p *TerragruntHCLProvider) copyLocalSource(prevDest string, dest string, terragruntOptions *tgoptions.TerragruntOptions) error {
+	err := os.MkdirAll(dest, os.ModePerm)
+	if err != nil {
+		return fmt.Errorf("failed to create directory '%s': %w", dest, err)
+	}
+
+	// Skip dotfiles and, but keep:
+	// 1. Terraform lock files - these are normally committed to source control
+	// 2. .terragrunt-source-version files - these are used to determine if the source has changed
+	// 3. .infracost dir - this contains any cached third party modules. We can remove this when we move this directory to the root path
+	opt := copy.Options{
+		Skip: func(src string) (bool, error) {
+			base := filepath.Base(src)
+			if base == util.TerraformLockFile || base == terragruntSourceVersionFile || base == config.InfracostDir {
+				return false, nil
+			}
+
+			return strings.HasPrefix(base, "."), nil
+		},
+		OnSymlink: func(src string) copy.SymlinkAction {
+			return copy.Shallow
+		},
+	}
+
+	err = copy.Copy(prevDest, dest, opt)
+	if err != nil {
+		return fmt.Errorf("failed to copy source from '%s' to '%s': %w", prevDest, dest, err)
+	}
+
+	return nil
+}
+
 // Download the specified TerraformSource if the latest code hasn't already been downloaded.
 // Copied from github.com/gruntwork-io/terragrunt
 func (p *TerragruntHCLProvider) downloadTerraformSourceIfNecessary(terraformSource *tfsource.TerraformSource, terragruntOptions *tgoptions.TerragruntOptions, terragruntConfig *tgconfig.TerragruntConfig) error {
-	if terragruntOptions.SourceUpdate {
-		terragruntOptions.Logger.Debugf("The --%s flag is set, so deleting the temporary folder %s before downloading source.", "terragrunt-source-update", terraformSource.DownloadDir)
-		if err := os.RemoveAll(terraformSource.DownloadDir); err != nil {
-			return tgerrors.WithStackTrace(err)
-		}
-	}
-
 	alreadyLatest, err := p.alreadyHaveLatestCode(terraformSource, terragruntOptions)
 	if err != nil {
 		return err
@@ -679,6 +716,19 @@ func (p *TerragruntHCLProvider) downloadTerraformSourceIfNecessary(terraformSour
 		previousVersion, err = p.readVersionFile(terraformSource)
 		if err != nil {
 			return err
+		}
+	}
+
+	// Check if the directory has already been downloaded during this run and is in the source cache
+	// If so, we can just copy the files from the previous download to avoid downloading again
+	if prevDownloadDir, ok := p.sourceCache[terraformSource.CanonicalSourceURL.String()]; ok {
+		terragruntOptions.Logger.Debugf("Source files have already been downloading. Copying files from %s into %s", prevDownloadDir, terraformSource.DownloadDir)
+		err := p.copyLocalSource(prevDownloadDir, terraformSource.DownloadDir, terragruntOptions)
+		if err != nil {
+			terragruntOptions.Logger.Debugf("Failed to copy local source from %s to %s: %v. Will try to redownload", prevDownloadDir, terraformSource.DownloadDir, err)
+		} else {
+			terragruntOptions.Logger.Debugf("Successfully copied files from %s to %s. Will not download again", prevDownloadDir, terraformSource.DownloadDir)
+			return nil
 		}
 	}
 
