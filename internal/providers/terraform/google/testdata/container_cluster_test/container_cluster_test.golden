@@ -142,3 +142,6 @@
 ──────────────────────────────────
 16 cloud resources were detected:
 ∙ 16 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+Logs:
+
+level=warning msg="Skipping resource node_pool[0]. Infracost currently does not support E2 custom instances"
