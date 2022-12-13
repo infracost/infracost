@@ -257,6 +257,9 @@
         "vcsSubPath": {
           "type": "string"
         },
+        "vcsCodeChanged": {
+          "type": "boolean"
+        },
         "warnings": {
           "items": {
             "$schema": "http://json-schema.org/draft-04/schema#",

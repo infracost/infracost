@@ -37,6 +37,12 @@ func TestCommentGitHubShowAllProjects(t *testing.T) {
 		nil)
 }
 
+func TestCommentGitHubShowChangedProjects(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
+		[]string{"comment", "github", "--github-token", "abc", "--repo", "test/test", "--commit", "5", "--show-changed", "--path", "./testdata/changes.json", "--dry-run"},
+		nil)
+}
+
 func TestCommentGitHubWithNoGuardrailt(t *testing.T) {
 	ts := guardrailTestEndpoint(guardrailAddRunResponse{
 		GuardrailsChecked: 0,

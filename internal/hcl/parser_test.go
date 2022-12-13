@@ -139,7 +139,7 @@ output "loadbalancer"  {
 }
 `)
 
-	parser := newParser(filepath.Dir(path), newDiscardLogger())
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, newDiscardLogger())
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -211,7 +211,7 @@ output "exp2" {
 }
 `)
 
-	parser := newParser(filepath.Dir(path), newDiscardLogger())
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, newDiscardLogger())
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -257,7 +257,7 @@ output "instances" {
 }
 `)
 
-	parser := newParser(filepath.Dir(path), newDiscardLogger())
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, newDiscardLogger())
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -295,7 +295,7 @@ resource "other_resource" "test" {
 
 `)
 
-	parser := newParser(filepath.Dir(path), newDiscardLogger())
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, newDiscardLogger())
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -339,7 +339,7 @@ output "attr_not_exists" {
 
 `)
 
-	parser := newParser(filepath.Dir(path), newDiscardLogger())
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, newDiscardLogger())
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -378,7 +378,7 @@ resource "other_resource" "test" {
 
 `)
 
-	parser := newParser(filepath.Dir(path), newDiscardLogger())
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, newDiscardLogger())
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -429,7 +429,7 @@ output "serviceendpoint_principals" {
 
 `)
 
-	parser := newParser(filepath.Dir(path), newDiscardLogger())
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, newDiscardLogger())
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -466,7 +466,7 @@ output "val" {
 
 `)
 
-	parser := newParser(filepath.Dir(path), newDiscardLogger())
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, newDiscardLogger())
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -478,6 +478,16 @@ output "val" {
 	value := attr.Value()
 	require.True(t, value.Type().IsPrimitiveType(), "value is not primitive type but %s", value.Type().GoString())
 	assert.Equal(t, "val-mock", value.AsString())
+}
+
+func Test_SetsHasChangesOnMod(t *testing.T) {
+	path := createTestFile("test.tf", `variable "foo" {}`)
+
+	parser := newParser(RootPath{Path: filepath.Dir(path), HasChanges: true}, newDiscardLogger())
+	module, err := parser.ParseDirectory()
+	require.NoError(t, err)
+
+	assert.True(t, module.HasChanges)
 }
 
 func Test_UnsupportedAttributesMapIndex(t *testing.T) {
@@ -494,7 +504,7 @@ output "val" {
 
 `)
 
-	parser := newParser(filepath.Dir(path), newDiscardLogger())
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, newDiscardLogger())
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -642,7 +652,7 @@ resource "aws_instance" "my_instance" {
 }
 `)
 
-	parser := newParser(filepath.Dir(path), newDiscardLogger())
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, newDiscardLogger())
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
