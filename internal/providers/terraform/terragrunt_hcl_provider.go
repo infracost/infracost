@@ -673,11 +673,12 @@ func (p *TerragruntHCLProvider) copyLocalSource(prevDest string, dest string, te
 	// 3. .infracost dir - this contains any cached third party modules. We can remove this when we move this directory to the root path
 	opt := copy.Options{
 		Skip: func(src string) (bool, error) {
-			if filepath.Base(src) == util.TerraformLockFile || filepath.Base(src) == terragruntSourceVersionFile || filepath.Base(src) == config.InfracostDir {
+			base := filepath.Base(src)
+			if base == util.TerraformLockFile || base == terragruntSourceVersionFile || base == config.InfracostDir {
 				return false, nil
 			}
 
-			return strings.HasPrefix(filepath.Base(src), "."), nil
+			return strings.HasPrefix(base, "."), nil
 		},
 		OnSymlink: func(src string) copy.SymlinkAction {
 			return copy.Shallow
