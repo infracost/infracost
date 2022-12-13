@@ -208,9 +208,11 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 	}
 
 	skippedUnchangedProjectCount := 0
-	for _, p := range out.Projects {
-		if hasCodeChanges(opts, p) {
-			skippedUnchangedProjectCount++
+	if opts.ShowOnlyChanges {
+		for _, p := range out.Projects {
+			if !hasCodeChanges(opts, p) {
+				skippedUnchangedProjectCount++
+			}
 		}
 	}
 
