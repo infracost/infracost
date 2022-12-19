@@ -40,6 +40,19 @@ func TestSpotInstanceRequest(t *testing.T) {
 				},
 			},
 		},
+		{
+			Name: "aws_spot_instance_request.t3_large",
+			CostComponentChecks: []testutil.CostComponentCheck{
+				{
+					Name:      "Instance Usage (Linux/UNIX, spot, t3.large)",
+					PriceHash: "3a45cd05e73384099c2ff360bdb74b74-803d7f1cd2f621429b63f791730e7935",
+				},
+				{
+					Name:      "CPU credits",
+					PriceHash: "ccdf11d8e4c0267d78a19b6663a566c1-e8e892be2fbd1c8f42fd6761ad8977d8",
+				},
+			},
+		},
 	}
 
 	tftest.ResourceTests(t, tf, schema.NewEmptyUsageMap(), resourceChecks)
