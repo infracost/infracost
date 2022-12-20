@@ -57,10 +57,10 @@ func NewECSService(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 }
 
 // calcLaunchType determines the launch type for the resource using the following precedence:
-//   1. aws_ecs_service.launch_type
-//   2. aws_ecs_service.capacity_provider_strategy
-//   3. aws_ecs_service.aws_ecs_cluster.default_capacity_provider_strategy
-//   4. aws_ecs_service.aws_ecs_cluster.aws_ecs_cluster_capacity_providers
+//  1. aws_ecs_service.launch_type
+//  2. aws_ecs_service.capacity_provider_strategy
+//  3. aws_ecs_service.aws_ecs_cluster.default_capacity_provider_strategy
+//  4. aws_ecs_service.aws_ecs_cluster.aws_ecs_cluster_capacity_providers
 func calcLaunchType(d *schema.ResourceData) string {
 	// Use the launch_type if it is set
 	launchType := d.Get("launch_type").String()

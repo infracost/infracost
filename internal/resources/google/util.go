@@ -58,15 +58,16 @@ func contains(a []string, x string) bool {
 // This can be used in resources that define a usage parameter that's changed on a per-region basis, e.g:
 //
 // monthly_data_processed_gb:
-//   asia_northeast1: 188
-//   asia_east2: 78
+//
+//	asia_northeast1: 188
+//	asia_east2: 78
 //
 // can be handled by adding a usage cost property to your resource like so:
 //
-// type MyResource struct {
-//    ...
-//    MonthlyDataProcessedGB *RegionsUsage `infracost_usage:"monthly_processed_gb"`
-// }
+//	type MyResource struct {
+//	   ...
+//	   MonthlyDataProcessedGB *RegionsUsage `infracost_usage:"monthly_processed_gb"`
+//	}
 type RegionsUsage struct {
 	AsiaEast1              *float64 `infracost_usage:"asia_east1"`
 	AsiaEast2              *float64 `infracost_usage:"asia_east2"`

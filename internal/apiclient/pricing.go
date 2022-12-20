@@ -4,7 +4,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	"io/ioutil"
+	"os"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
@@ -49,7 +49,7 @@ func NewPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
 			rootCAs = x509.NewCertPool()
 		}
 
-		caCerts, err := ioutil.ReadFile(ctx.Config.TLSCACertFile)
+		caCerts, err := os.ReadFile(ctx.Config.TLSCACertFile)
 		if err != nil {
 			log.Errorf("Error reading CA cert file %s: %v", ctx.Config.TLSCACertFile, err)
 		} else {

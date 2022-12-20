@@ -18,11 +18,14 @@ import (
 	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/hcl/modules"
 	"github.com/infracost/infracost/internal/logging"
+	"github.com/infracost/infracost/internal/prices"
+	"github.com/infracost/infracost/internal/scan"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
 )
 
 type HCLProvider struct {
+	scanner        *scan.TerraformPlanScanner
 	parsers        []*hcl.Parser
 	planJSONParser *Parser
 	logger         *log.Entry
@@ -125,17 +128,24 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 	)
 
 	logger := ctx.Logger().WithFields(log.Fields{"provider": "terraform_dir"})
+	locatorConfig := &hcl.ProjectLocatorConfig{ExcludedSubDirs: ctx.ProjectConfig.ExcludePaths, ChangedObjects: ctx.RunContext.VCSMetadata.Commit.ChangedObjects, UseAllPaths: ctx.ProjectConfig.IncludeAllPaths}
+
 	parsers, err := hcl.LoadParsers(
 		ctx.ProjectConfig.Path,
-		&hcl.ProjectLocatorConfig{ExcludedSubDirs: ctx.ProjectConfig.ExcludePaths, UseAllPaths: ctx.ProjectConfig.IncludeAllPaths},
+		locatorConfig,
 		logger,
 		options...,
 	)
 	if err != nil {
 		return nil, err
 	}
+	var scanner *scan.TerraformPlanScanner
+	if ctx.RunContext.Config.PolicyAPIEndpoint != "" {
+		scanner = scan.NewTerraformPlanScanner(ctx.RunContext, ctx.Logger(), prices.GetPrices)
+	}
 
 	return &HCLProvider{
+		scanner:        scanner,
 		parsers:        parsers,
 		planJSONParser: NewParser(ctx, false),
 		ctx:            ctx,
@@ -177,16 +187,26 @@ func (p *HCLProvider) LoadResources(usage map[string]*schema.UsageData) ([]*sche
 			return nil, err
 		}
 
+		if p.ctx.RunContext.VCSMetadata.HasChanges() {
+			project.Metadata.VCSCodeChanged = &j.Module.HasChanges
+		}
+
+		if p.scanner != nil {
+			err := p.scanner.ScanPlan(project, j.JSON)
+			if err != nil {
+				p.logger.WithError(err).Debugf("failed to scan Terraform project %s", project.Name)
+			}
+		}
 		projects[i] = project
 	}
 
 	return projects, nil
 }
 
-func (p *HCLProvider) parseResources(parsed hclProject, usage map[string]*schema.UsageData) (*schema.Project, error) {
+func (p *HCLProvider) parseResources(parsed HCLProject, usage map[string]*schema.UsageData) (*schema.Project, error) {
 	project := p.newProject(parsed)
 
-	partialPastResources, partialResources, err := p.planJSONParser.parseJSON(parsed.json, usage)
+	partialPastResources, partialResources, err := p.planJSONParser.parseJSON(parsed.JSON, usage)
 	if err != nil {
 		return project, fmt.Errorf("Error parsing Terraform plan JSON file %w", err)
 	}
@@ -197,15 +217,15 @@ func (p *HCLProvider) parseResources(parsed hclProject, usage map[string]*schema
 	return project, nil
 }
 
-func (p *HCLProvider) newProject(parsed hclProject) *schema.Project {
-	metadata := config.DetectProjectMetadata(parsed.module.RootPath)
+func (p *HCLProvider) newProject(parsed HCLProject) *schema.Project {
+	metadata := config.DetectProjectMetadata(parsed.Module.RootPath)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
 
-	if len(parsed.module.Warnings) > 0 {
-		warnings := make([]schema.Warning, len(parsed.module.Warnings))
+	if len(parsed.Module.Warnings) > 0 {
+		warnings := make([]schema.Warning, len(parsed.Module.Warnings))
 
-		for i, warning := range parsed.module.Warnings {
+		for i, warning := range parsed.Module.Warnings {
 			warnings[i] = schema.Warning{
 				Code:    int(warning.Code),
 				Message: warning.Title,
@@ -226,14 +246,14 @@ func (p *HCLProvider) newProject(parsed hclProject) *schema.Project {
 	return schema.NewProject(name, metadata)
 }
 
-type hclProject struct {
-	json   []byte
-	module *hcl.Module
+type HCLProject struct {
+	JSON   []byte
+	Module *hcl.Module
 }
 
 // LoadPlanJSONs parses the found directories and return the blocks in Terraform plan JSON format.
-func (p *HCLProvider) LoadPlanJSONs() ([]hclProject, error) {
-	var jsons = make([]hclProject, len(p.parsers))
+func (p *HCLProvider) LoadPlanJSONs() ([]HCLProject, error) {
+	var jsons = make([]HCLProject, len(p.parsers))
 	modules, err := p.Modules()
 	if err != nil {
 		return nil, err
@@ -245,9 +265,9 @@ func (p *HCLProvider) LoadPlanJSONs() ([]hclProject, error) {
 			return nil, err
 		}
 
-		jsons[i] = hclProject{
-			json:   b,
-			module: module,
+		jsons[i] = HCLProject{
+			JSON:   b,
+			Module: module,
 		}
 	}
 

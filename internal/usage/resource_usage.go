@@ -309,53 +309,52 @@ func ResourceUsagesToYAML(resourceUsages []*ResourceUsage) (yamlv3.Node, bool) {
 //
 // e.g. given:
 //
-//		keyNode: &yaml.Node{
-//			Value: "testKey",
-//		}
+//	keyNode: &yaml.Node{
+//		Value: "testKey",
+//	}
 //
-//		valNode: &yaml.Node{
-//			Kind: yaml.MappingNode,
-//			Content: []*yaml.Node{
-//				&yaml.Node{Value: "prop1"},
-//				&yaml.Node{Value: "test"},
-//				&yaml.Node{Value: "prop2"},
-//				&yaml.Node{Value: "test2"},
-//				&yaml.Node{Value: "prop3"},
-//				&yaml.Node{
-//					Kind: yaml.MappingNode,
-//					Content: []*yaml.Node{
-//						&yaml.Node{Value: "nested1"},
-//						&yaml.Node{Value: "test3"},
+//	valNode: &yaml.Node{
+//		Kind: yaml.MappingNode,
+//		Content: []*yaml.Node{
+//			&yaml.Node{Value: "prop1"},
+//			&yaml.Node{Value: "test"},
+//			&yaml.Node{Value: "prop2"},
+//			&yaml.Node{Value: "test2"},
+//			&yaml.Node{Value: "prop3"},
+//			&yaml.Node{
+//				Kind: yaml.MappingNode,
+//				Content: []*yaml.Node{
+//					&yaml.Node{Value: "nested1"},
+//					&yaml.Node{Value: "test3"},
+//				},
+//			},
+//		},
+//	}
+//
+// usageItemFromYAML will return:
+//
+//	UsageItem{
+//			Key:          "testKey",
+//			Value: []*UsageItem{
+//				{
+//					Key: "prop1",
+//					Value: "test",
+//				},
+//				{
+//					Key: "prop2",
+//					Value: "test2",
+//				},
+//				{
+//					Key: "prop3",
+//					Value: []*UsageItem{
+//						{
+//							Key: "nested1",
+//							Value: "test3",
+//						},
 //					},
 //				},
 //			},
 //		}
-//
-// usageItemFromYAML will return:
-//
-// 		UsageItem{
-//				Key:          "testKey",
-//				Value: []*UsageItem{
-//					{
-//						Key: "prop1",
-//						Value: "test",
-//					},
-//					{
-//						Key: "prop2",
-//						Value: "test2",
-//					},
-//					{
-//						Key: "prop3",
-//						Value: []*UsageItem{
-//							{
-//								Key: "nested1",
-//								Value: "test3",
-//							},
-//						},
-//					},
-//				},
-//			}
-//
 func usageItemFromYAML(keyNode *yamlv3.Node, valNode *yamlv3.Node) (*schema.UsageItem, error) {
 	if keyNode == nil || valNode == nil {
 		log.Errorf("YAML contains nil key or value node")

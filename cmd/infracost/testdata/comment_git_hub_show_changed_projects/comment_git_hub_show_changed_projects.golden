@@ -1,0 +1,47 @@
+
+💰 Infracost estimate: **monthly cost will not change**
+<table>
+  <thead>
+    <td>Project</td>
+    <td>Previous</td>
+    <td>New</td>
+    <td>Diff</td>
+  </thead>
+  <tbody>
+    <tr>
+      <td>infracost/infracost/internal/hc.../multi_project_with_module/dev</td>
+      <td align="right">$566</td>
+      <td align="right">$566</td>
+      <td>$0</td>
+    </tr>
+    <tr>
+      <td>All projects</td>
+      <td align="right">$1,697</td>
+      <td align="right">$1,697</td>
+      <td>$0</td>
+    </tr>
+  </tbody>
+</table>
+
+1 project has no code changes.
+
+<details>
+<summary><strong>Infracost output</strong></summary>
+
+```
+──────────────────────────────────
+
+The following projects have no cost estimate changes: infracost/infracost/internal/hcl/testdata/project_locator/multi_project_with_module/dev (Module path: dev), infracost/infracost/internal/hcl/testdata/project_locator/multi_project_with_module/prod (Module path: prod)
+Run the following command to see their breakdown: infracost breakdown --path=/path/to/code
+
+──────────────────────────────────
+3 cloud resources were detected:
+∙ 3 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+```
+</details>
+
+<sub>
+  Is this comment useful? <a href="https://dashboard.infracost.io/feedback/redirect?runId=&value=yes" rel="noopener noreferrer" target="_blank">Yes</a>, <a href="https://dashboard.infracost.io/feedback/redirect?runId=&value=no" rel="noopener noreferrer" target="_blank">No</a>, <a href="https://dashboard.infracost.io/feedback/redirect?runId=&value=other" rel="noopener noreferrer" target="_blank">Other</a>
+</sub>
+
+Comment not posted to GitHub (--dry-run was specified)

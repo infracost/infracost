@@ -117,6 +117,15 @@
     ├─ Instance usage (Linux/UNIX, preemptible, n1-standard-16)               2,920  hours                    $467.20 
     └─ Standard provisioned storage (pd-standard)                               400  GB                        $16.00 
                                                                                                                       
+ google_container_cluster.with_unsupported_node_pool                                                                  
+ ├─ Cluster management fee                                                      730  hours                     $73.00 
+ ├─ default_pool                                                                                                      
+ │  ├─ Instance usage (Linux/UNIX, on-demand, e2-medium)                      6,570  hours                    $220.13 
+ │  └─ Standard provisioned storage (pd-standard)                               900  GB                        $36.00 
+ └─ node_pool[1]                                                                                                      
+    ├─ Instance usage (Linux/UNIX, preemptible, n1-standard-16)               8,760  hours                  $1,401.60 
+    └─ Standard provisioned storage (pd-standard)                             1,200  GB                        $48.00 
+                                                                                                                      
  google_container_cluster.zonal                                                                                       
  ├─ Cluster management fee                                                      730  hours                     $73.00 
  └─ default_pool                                                                                                      
@@ -129,7 +138,10 @@
     ├─ Instance usage (Linux/UNIX, on-demand, e2-medium)                      2,920  hours                     $97.84 
     └─ Standard provisioned storage (pd-standard)                               400  GB                        $16.00 
                                                                                                                       
- OVERALL TOTAL                                                                                             $26,614.30 
+ OVERALL TOTAL                                                                                             $28,393.03 
 ──────────────────────────────────
-15 cloud resources were detected:
-∙ 15 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+16 cloud resources were detected:
+∙ 16 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+Logs:
+
+level=warning msg="Skipping resource node_pool[0]. Infracost currently does not support E2 custom instances"

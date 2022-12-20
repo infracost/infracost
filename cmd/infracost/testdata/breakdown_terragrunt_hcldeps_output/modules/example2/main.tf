@@ -23,6 +23,9 @@ variable "hello_world_function_memory_size" {
   type        = number
 }
 
+variable "unspecified_variable" {
+}
+
 resource "aws_instance" "web_app" {
   ami           = "ami-674cbc1e"
   instance_type = var.instance_type
@@ -47,8 +50,79 @@ resource "aws_lambda_function" "hello_world" {
   memory_size   = var.hello_world_function_memory_size
 }
 
+locals {
+  bad  = format("%s", var.unspecified_variable.id[0])
+  bad2 = format("%s", var.unspecified_variable.id[0])
+}
+
+output "bad" {
+  value = local.bad
+}
+
+output "bad_list" {
+  value = [local.bad2]
+}
+
+output "good_list_bad_prop" {
+  value = [
+    {
+      id : local.bad
+    }
+  ]
+}
+
+output "bad_map" {
+  value = tomap({
+    "test" : local.bad
+  })
+}
+
 output "block_iops" {
   value = 600
+}
+
+output "obj" {
+  value = {}
+}
+
+output "list" {
+  value = []
+}
+
+output "list_simple" {
+  value = []
+}
+
+output "list_existing" {
+  value = [{ "foo" : "bar" }]
+}
+
+output "list_simple_existing" {
+  value = ["foo"]
+}
+
+output "map" {
+  value = tomap({})
+}
+
+output "map_existing" {
+  value = tomap({ "foo" : "bar" })
+}
+
+output "map_simple" {
+  value = tomap({})
+}
+
+output "improper_mock" {
+  value = "invalid-mock-of-a-complex-type"
+}
+
+output "improper_mock2" {
+  value = "invalid-mock-of-a-complex-type"
+}
+
+output "improper_mock3" {
+  value = "invalid-mock-of-a-complex-type"
 }
 
 output "test_object_type" {

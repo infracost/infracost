@@ -152,15 +152,16 @@ var RegionCodeMapping = map[string]string{
 // changed on a per-region basis. e.g.
 //
 // monthly_data_processed_gb:
-//   us_gov_west_1: 188
-//   us_east_1: 78
+//
+//	us_gov_west_1: 188
+//	us_east_1: 78
 //
 // can be handled by adding a usage cost property to your resource like so:
 //
-// type MyResource struct {
-//    ...
-//    MonthlyDataProcessedGB *RegionsUsage `infracost_usage:"monthly_processed_gb"`
-// }
+//	type MyResource struct {
+//	   ...
+//	   MonthlyDataProcessedGB *RegionsUsage `infracost_usage:"monthly_processed_gb"`
+//	}
 type RegionsUsage struct {
 	USGovWest1   *float64 `infracost_usage:"us_gov_west_1"`
 	USGovEast1   *float64 `infracost_usage:"us_gov_east_1"`
@@ -226,9 +227,9 @@ func (r RegionsUsage) Values() []RegionUsage {
 // This can be used as a schema.SubResourceUsage to define a structure that's
 // commonly used with data transfer usage. e.g:
 //
-// 		monthly_data_transfer_out_gb:
-//			us_gov_west_1: 122
-//			ca_central_1: 99
+//	monthly_data_transfer_out_gb:
+//		us_gov_west_1: 122
+//		ca_central_1: 99
 //
 // See DirectoryServiceDirectory for an example usage.
 var RegionUsageSchema = []*schema.UsageItem{

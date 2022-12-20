@@ -87,9 +87,12 @@ func commentBitbucketCmd(ctx *config.RunContext) *cobra.Command {
 				BasicSyntax:         true,
 			})
 			var policyFailure output.PolicyCheckFailures
+			var guardrailFailure output.GuardrailFailures
 			if err != nil {
 				if v, ok := err.(output.PolicyCheckFailures); ok {
 					policyFailure = v
+				} else if v, ok := err.(output.GuardrailFailures); ok {
+					guardrailFailure = v
 				} else {
 					return err
 				}
@@ -116,6 +119,9 @@ func commentBitbucketCmd(ctx *config.RunContext) *cobra.Command {
 
 			if policyFailure != nil {
 				return policyFailure
+			}
+			if guardrailFailure != nil {
+				return guardrailFailure
 			}
 
 			return nil

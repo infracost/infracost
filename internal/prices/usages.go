@@ -1,12 +1,14 @@
 package prices
 
 import (
+	"runtime"
+
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
-	"github.com/shopspring/decimal"
-	"runtime"
 )
 
 // PopulateActualCosts fetches cloud provider reported costs from the Infracost

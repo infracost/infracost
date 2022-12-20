@@ -3,7 +3,6 @@ package modules
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 )
@@ -52,7 +51,7 @@ func writeManifest(manifest *Manifest, path string) error {
 		return fmt.Errorf("Failed to create directories for manifest: %w", err)
 	}
 
-	err = ioutil.WriteFile(path, b, 0644) // nolint:gosec
+	err = os.WriteFile(path, b, 0644) // nolint:gosec
 	if err != nil {
 		return fmt.Errorf("Failed to write manifest: %w", err)
 	}

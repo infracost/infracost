@@ -12,6 +12,7 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/ext/tryfunc"
+	"github.com/hashicorp/hcl/v2/ext/typeexpr"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/sirupsen/logrus"
 	yaml "github.com/zclconf/go-cty-yaml"
@@ -40,7 +41,7 @@ var (
 	}
 )
 
-const maxContextIterations = 32
+const maxContextIterations = 120
 
 // Evaluator provides a set of given Blocks with contextual information.
 // Evaluator is an important step in retrieving Block values that can be used in the
@@ -89,7 +90,7 @@ func NewEvaluator(
 	logger *logrus.Entry,
 ) *Evaluator {
 	ctx := NewContext(&hcl.EvalContext{
-		Functions: expFunctions(module.RootPath),
+		Functions: expFunctions(module.RootPath, logger),
 	}, nil, logger)
 
 	if visitedModules == nil {
@@ -206,7 +207,9 @@ func (e *Evaluator) collectModules() *Module {
 // been evaluated and the context variables should remain unchanged. In reality 90% of cases will require
 // 2 loops, however other complex modules will take > 2.
 func (e *Evaluator) evaluate(lastContext hcl.EvalContext) {
-	for i := 0; i < maxContextIterations; i++ {
+	var i int
+
+	for i = 0; i < maxContextIterations; i++ {
 		e.evaluateStep(i)
 
 		if reflect.DeepEqual(lastContext.Variables, e.ctx.Inner().Variables) {
@@ -222,6 +225,11 @@ func (e *Evaluator) evaluate(lastContext hcl.EvalContext) {
 			lastContext.Variables[k] = v
 		}
 	}
+
+	if i == maxContextIterations {
+		e.logger.Warnf("hit max context iterations evaluating module %s", e.module.Name)
+	}
+
 }
 
 // evaluateStep gets the values for all the Block types in the current Module that affect Context.
@@ -275,7 +283,7 @@ func (e *Evaluator) evaluateModules() {
 			e.workingDir,
 			vars,
 			e.moduleMetadata,
-			e.visitedModules,
+			map[string]map[string]cty.Value{},
 			e.workspace,
 			e.blockBuilder,
 			nil,
@@ -296,7 +304,8 @@ func (e *Evaluator) exportOutputs() cty.Value {
 func (e *Evaluator) expandBlocks(blocks Blocks, lastContext hcl.EvalContext) Blocks {
 	expanded := blocks
 
-	for i := 0; i < maxContextIterations; i++ {
+	var i int
+	for i = 0; i < maxContextIterations; i++ {
 		expanded = e.expandBlockForEaches(e.expandBlockCounts(expanded))
 
 		if reflect.DeepEqual(lastContext.Variables, e.ctx.Inner().Variables) {
@@ -311,6 +320,10 @@ func (e *Evaluator) expandBlocks(blocks Blocks, lastContext hcl.EvalContext) Blo
 		for k, v := range e.ctx.Inner().Variables {
 			lastContext.Variables[k] = v
 		}
+	}
+
+	if i == maxContextIterations {
+		e.logger.Warnf("hit max context iterations expanding blocks in module %s", e.module.Name)
 	}
 
 	return e.expandDynamicBlocks(expanded...)
@@ -350,19 +363,19 @@ func (e *Evaluator) expandDynamicBlock(b *Block) {
 //
 // value of:
 //
-//		test.test
-//			id: test
-//			arn: test-arn
+//	test.test
+//		id: test
+//		arn: test-arn
 //
 // that gets expanded should be:
 //
-//	   test.test
-//			a:
-//			  id: test
-//			  arn: test-arn
-//			b:
-//			  id: test
-//			  arn: test-arn
+//	test.test
+//		a:
+//		  id: test
+//		  arn: test-arn
+//		b:
+//		  id: test
+//		  arn: test-arn
 //
 // and not:
 //
@@ -375,10 +388,10 @@ func (e *Evaluator) expandDynamicBlock(b *Block) {
 //
 // which means that blocks written like:
 //
-//		resource "aws_eip" "nat_gateway" {
-//  		for_each   = test.test
+//	resource "aws_eip" "nat_gateway" {
+//		for_each   = test.test
 //			...
-//		}
+//	}
 //
 // will expand correctly to: aws_eip.nat_gateway[a], aws_eip.nat_gateway[b]. Rather than aws_eip.nat_gateway[id], aws_eip.nat_gateway[a] ...
 func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
@@ -509,16 +522,25 @@ func (e *Evaluator) evaluateVariable(b *Block) (cty.Value, error) {
 		return cty.NilVal, fmt.Errorf("cannot resolve variable with no attributes")
 	}
 
-	attribute := attributes["type"]
+	attrType := attributes["type"]
 	if override, exists := e.inputVars[b.Label()]; exists {
-		return convertType(override, attribute), nil
+		return convertType(override, attrType), nil
 	}
 
 	if def, exists := attributes["default"]; exists {
-		return def.Value(), nil
+		if attrType == nil {
+			return def.Value(), nil
+		}
+
+		ty, diag := typeexpr.TypeConstraint(attrType.HCLAttr.Expr)
+		if diag.HasErrors() {
+			e.logger.WithError(diag).Debugf("error trying to convert variable %s to type %s", b.Label(), attrType.AsString())
+			return def.Value(), nil
+		}
+		return convert.Convert(def.Value(), ty)
 	}
 
-	return convertType(cty.NilVal, attribute), errorNoVarValue
+	return convertType(cty.NilVal, attrType), errorNoVarValue
 }
 
 func convertType(val cty.Value, attribute *Attribute) cty.Value {
@@ -803,7 +825,7 @@ func (e *Evaluator) loadModules(lastContext hcl.EvalContext) []*ModuleCall {
 
 // expFunctions returns the set of functions that should be used to when evaluating
 // expressions in the receiving scope.
-func expFunctions(baseDir string) map[string]function.Function {
+func expFunctions(baseDir string, logger *logrus.Entry) map[string]function.Function {
 	return map[string]function.Function{
 		"abs":              stdlib.AbsoluteFunc,
 		"abspath":          funcs.AbsPathFunc,
@@ -865,6 +887,8 @@ func expFunctions(baseDir string) map[string]function.Function {
 		"min":              stdlib.MinFunc,
 		"parseint":         stdlib.ParseIntFunc,
 		"pathexpand":       funcs.PathExpandFunc,
+		"infracostlog":     funcs.LogArgs(logger),
+		"infracostprint":   funcs.PrintArgs,
 		"pow":              stdlib.PowFunc,
 		"range":            stdlib.RangeFunc,
 		"regex":            stdlib.RegexFunc,

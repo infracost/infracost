@@ -68,6 +68,8 @@ func addRunFlags(cmd *cobra.Command) {
 
 	cmd.Flags().StringSlice("exclude-path", nil, "Paths of directories to exclude, glob patterns need quotes")
 	cmd.Flags().Bool("include-all-paths", false, "Set project auto-detection to use all subdirectories in given path")
+	cmd.Flags().String("git-diff-target", "master", "Show only costs that have git changes compared to the provided branch. Use the name of the current branch to fetch changes from the last two commits")
+	_ = cmd.Flags().MarkHidden("git-diff-target")
 
 	cmd.Flags().Bool("no-cache", false, "Don't attempt to cache Terraform plans")
 
@@ -91,7 +93,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	}
 
 	repoPath := runCtx.Config.RepoPath()
-	metadata, err := vcs.MetadataFetcher.Get(repoPath)
+	metadata, err := vcs.MetadataFetcher.Get(repoPath, runCtx.Config.GitDiffTarget)
 	if err != nil {
 		logging.Logger.WithError(err).Debugf("failed to fetch vcs metadata for path %s", repoPath)
 	}
@@ -593,19 +595,7 @@ func (r *parallelRunner) buildResources(projects []*schema.Project) {
 		projectPtrToUsageMap = r.fetchProjectUsage(projects)
 	}
 
-	for _, project := range projects {
-		usageMap := projectPtrToUsageMap[project]
-
-		for _, partial := range project.PartialResources {
-			u := usageMap[partial.ResourceData.Address]
-			project.Resources = append(project.Resources, schema.BuildResource(partial, u))
-		}
-
-		for _, partial := range project.PartialPastResources {
-			u := usageMap[partial.ResourceData.Address]
-			project.PastResources = append(project.PastResources, schema.BuildResource(partial, u))
-		}
-	}
+	schema.BuildResources(projects, projectPtrToUsageMap)
 }
 
 func (r *parallelRunner) fetchProjectUsage(projects []*schema.Project) map[*schema.Project]map[string]*schema.UsageData {
@@ -834,6 +824,13 @@ func getParallelism(cmd *cobra.Command, runCtx *config.RunContext) (int, error) 
 func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	hasPathFlag := cmd.Flags().Changed("path")
 	hasConfigFile := cmd.Flags().Changed("config-file")
+
+	if cmd.Flags().Changed("git-diff-target") {
+		s, _ := cmd.Flags().GetString("git-diff-target")
+		cfg.GitDiffTarget = &s
+	}
+
+	cfg.CompareTo, _ = cmd.Flags().GetString("compare-to")
 
 	cfg.CompareTo, _ = cmd.Flags().GetString("compare-to")
 

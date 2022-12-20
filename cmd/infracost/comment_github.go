@@ -84,9 +84,12 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 				MaxMessageSize:      output.GitHubMaxMessageSize,
 			})
 			var policyFailure output.PolicyCheckFailures
+			var guardrailFailure output.GuardrailFailures
 			if err != nil {
 				if v, ok := err.(output.PolicyCheckFailures); ok {
 					policyFailure = v
+				} else if v, ok := err.(output.GuardrailFailures); ok {
+					guardrailFailure = v
 				} else {
 					return err
 				}
@@ -114,6 +117,10 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 			if policyFailure != nil {
 				cmd.Printf("\n")
 				return policyFailure
+			}
+			if guardrailFailure != nil {
+				cmd.Printf("\n")
+				return guardrailFailure
 			}
 
 			return nil

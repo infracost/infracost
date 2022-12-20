@@ -65,13 +65,11 @@ func NewS3BucketResource(d *schema.ResourceData) schema.CoreResource {
 		lifecycleStorageClasses = append(lifecycleStorageClasses, storageClass)
 	}
 
-	a := &aws.S3Bucket{
+	return &aws.S3Bucket{
 		Address:                 d.Address,
 		Region:                  d.Get("region").String(),
 		Name:                    d.Get("bucket").String(),
 		ObjectTagsEnabled:       objTagsEnabled,
 		LifecycleStorageClasses: lifecycleStorageClasses,
 	}
-
-	return a
 }

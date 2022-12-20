@@ -1,7 +1,6 @@
 package terraform
 
 import (
-	"strings"
 	"sync"
 
 	"github.com/infracost/infracost/internal/schema"
@@ -91,10 +90,6 @@ func GetUsageOnlyResources() []string {
 	r = append(r, azure.UsageOnlyResources...)
 	r = append(r, google.UsageOnlyResources...)
 	return r
-}
-
-func HasSupportedProvider(rType string) bool {
-	return strings.HasPrefix(rType, "aws_") || strings.HasPrefix(rType, "google_") || strings.HasPrefix(rType, "azurerm_")
 }
 
 func createFreeResources(l []string, defaultRefsFunc schema.ReferenceIDFunc, resourceIdFunc schema.CloudResourceIDFunc) []*schema.RegistryItem {

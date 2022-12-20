@@ -41,6 +41,16 @@ resource "google_container_node_pool" "with_node_config_regional" {
   }
 }
 
+resource "google_container_node_pool" "with_custom_instance" {
+  name       = "with-custom-instance"
+  cluster    = google_container_cluster.default_regional.id
+  node_count = 3
+
+  node_config {
+    machine_type = "n1-custom-6-20480"
+  }
+}
+
 resource "google_container_node_pool" "with_guest_accelerator_a100" {
   name       = "with-a100"
   cluster    = google_container_cluster.default_regional.id

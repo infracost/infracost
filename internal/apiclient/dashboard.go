@@ -23,8 +23,9 @@ type CreateAPIKeyResponse struct {
 }
 
 type AddRunResponse struct {
-	RunID    string `json:"id"`
-	ShareURL string `json:"shareUrl"`
+	RunID          string `json:"id"`
+	ShareURL       string `json:"shareUrl"`
+	GuardrailCheck output.GuardrailCheck
 }
 
 type QueryCLISettingsResponse struct {
@@ -115,6 +116,13 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (Ad
 					id
 					name
 				}
+				guardrailsChecked
+				guardrailComment
+				guardrailEvents {
+					triggerReason
+					prComment
+					blockPr
+				}
 			}
 		}
 	`
@@ -145,6 +153,41 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (Ad
 
 		response.RunID = cloudRun.Get("id").String()
 		response.ShareURL = cloudRun.Get("shareUrl").String()
+		response.GuardrailCheck.TotalChecked = cloudRun.Get("guardrailsChecked").Int()
+		response.GuardrailCheck.Comment = cloudRun.Get("guardrailComment").Bool()
+		var allGuardrailFailures []string
+		for _, event := range cloudRun.Get("guardrailEvents").Array() {
+			allGuardrailFailures = append(allGuardrailFailures, event.Get("triggerReason").String())
+
+			if event.Get("prComment").Bool() {
+				response.GuardrailCheck.CommentableFailures = append(response.GuardrailCheck.CommentableFailures, event.Get("triggerReason").String())
+			}
+
+			if event.Get("blockPr").Bool() {
+				response.GuardrailCheck.BlockingFailures = append(response.GuardrailCheck.BlockingFailures, event.Get("triggerReason").String())
+			}
+		}
+
+		if response.GuardrailCheck.TotalChecked > 0 {
+			guardrailStr := "guardrail"
+			if response.GuardrailCheck.TotalChecked > 1 {
+				guardrailStr = "guardrails"
+			}
+			guardrailsMsg := fmt.Sprintf(`%d %s checked`, response.GuardrailCheck.TotalChecked, guardrailStr)
+			if ctx.Config.IsLogging() {
+				log.Info(guardrailsMsg)
+			} else {
+				fmt.Fprintf(ctx.ErrWriter, "%s\n", guardrailsMsg)
+			}
+			for _, f := range allGuardrailFailures {
+				failureMsg := fmt.Sprintf(`guardrail check failed: %s`, f)
+				if ctx.Config.IsLogging() {
+					log.Info(failureMsg)
+				} else {
+					fmt.Fprintf(ctx.ErrWriter, " - %s\n", failureMsg)
+				}
+			}
+		}
 	}
 	return response, nil
 }

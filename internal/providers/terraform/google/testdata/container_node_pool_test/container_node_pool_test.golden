@@ -91,6 +91,11 @@
  ├─ Instance usage (Linux/UNIX, on-demand, e2-medium)              8,760  hours       $293.51 
  └─ Standard provisioned storage (pd-standard)                     1,200  GB           $48.00 
                                                                                               
+ google_container_node_pool.with_custom_instance                                              
+ ├─ Custom instance CPU (Linux/UNIX, on-demand, N1 6 vCPUs)        2,190  hours       $305.13 
+ ├─ Custom Instance RAM (Linux/UNIX, on-demand, N1 20 GB)          2,190  hours       $136.31 
+ └─ Standard provisioned storage (pd-standard)                       300  GB           $12.00 
+                                                                                              
  google_container_node_pool.with_guest_accelerator_a100                                       
  ├─ Instance usage (Linux/UNIX, on-demand, n1-standard-16)         2,190  hours     $1,165.07 
  ├─ SSD provisioned storage (pd-ssd)                                 360  GB           $61.20 
@@ -107,7 +112,7 @@
  ├─ Instance usage (Linux/UNIX, on-demand, e2-medium)              2,920  hours        $97.84 
  └─ Standard provisioned storage (pd-standard)                       400  GB           $16.00 
                                                                                               
- OVERALL TOTAL                                                                     $27,251.85 
+ OVERALL TOTAL                                                                     $27,705.30 
 ──────────────────────────────────
-22 cloud resources were detected:
-∙ 22 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+23 cloud resources were detected:
+∙ 23 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

@@ -7,10 +7,9 @@ import (
 )
 
 func TestContainerClusterGoldenFile(t *testing.T) {
-	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
 
-	tftest.GoldenFileResourceTests(t, "container_cluster_test")
+	tftest.GoldenFileResourceTestsWithOpts(t, "container_cluster_test", &tftest.GoldenFileOptions{CaptureLogs: true})
 }

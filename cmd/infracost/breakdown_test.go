@@ -440,7 +440,7 @@ func TestBreakdownWithActualCosts(t *testing.T) {
 						"monthlyQuantity": "1000",
 						"price": "0.005123",
 						"unit": "GB"
-					},	
+					},
 					{
 						"usageType": "someusagetype",
 						"description": "$0.045 per some other aws thing",
@@ -483,6 +483,45 @@ func TestBreakdownWithActualCosts(t *testing.T) {
 }
 
 func TestBreakdownWithNestedForeach(t *testing.T) {
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path",
+			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+		},
+		nil,
+	)
+}
+
+func TestBreakdownWithDependsUponModule(t *testing.T) {
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path",
+			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+		},
+		nil,
+	)
+}
+
+func TestBreakdownWithOptionalVariables(t *testing.T) {
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path",
+			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+		},
+		nil,
+	)
+}
+
+func TestBreakdownWithDeepMergeModule(t *testing.T) {
 	GoldenFileCommandTest(
 		t,
 		testutil.CalcGoldenFileTestdataDirName(),

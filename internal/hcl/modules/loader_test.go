@@ -10,12 +10,13 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/credentials"
 )
 
 func testLoaderE2E(t *testing.T, path string, expectedModules []*ManifestModule, cleanup bool) {
 	if cleanup {
-		err := os.RemoveAll(filepath.Join(path, ".infracost"))
+		err := os.RemoveAll(filepath.Join(path, config.InfracostDir))
 		assert.NoError(t, err)
 	}
 

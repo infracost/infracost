@@ -4,7 +4,11 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/sirupsen/logrus"
+
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/prices"
+	"github.com/infracost/infracost/internal/scan"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
 )
@@ -13,13 +17,21 @@ type PlanJSONProvider struct {
 	ctx                  *config.ProjectContext
 	Path                 string
 	includePastResources bool
+	scanner              *scan.TerraformPlanScanner
+	logger               *logrus.Entry
 }
 
 func NewPlanJSONProvider(ctx *config.ProjectContext, includePastResources bool) *PlanJSONProvider {
+	var scanner *scan.TerraformPlanScanner
+	if ctx.RunContext.Config.PolicyAPIEndpoint != "" {
+		scanner = scan.NewTerraformPlanScanner(ctx.RunContext, ctx.Logger(), prices.GetPrices)
+	}
+
 	return &PlanJSONProvider{
 		ctx:                  ctx,
 		Path:                 ctx.ProjectConfig.Path,
 		includePastResources: includePastResources,
+		scanner:              scanner,
 	}
 }
 
@@ -78,8 +90,16 @@ func (p *PlanJSONProvider) LoadResourcesFromSrc(usage map[string]*schema.UsageDa
 	project.PartialPastResources = partialPastResources
 	project.PartialResources = partialResources
 
+	if p.scanner != nil {
+		err := p.scanner.ScanPlan(project, j)
+		if err != nil {
+			p.logger.WithError(err).Debugf("Terraform project %s plan JSON scan failed", project.Name)
+		}
+	}
+
 	if spinner != nil {
 		spinner.Success()
 	}
+
 	return project, nil
 }
