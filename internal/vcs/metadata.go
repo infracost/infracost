@@ -644,8 +644,8 @@ func (f *metadataFetcher) getAzureReposMetadata(path string, gitDiffTarget *stri
 		VCSProvider:  "azure_devops_tfsgit",
 		Title:        res.Title,
 		Author:       res.CreatedBy.UniqueName,
-		SourceBranch: strings.TrimLeft(getEnv("SYSTEM_PULLREQUEST_SOURCEBRANCH"), "refs/heads/"),
-		BaseBranch:   strings.TrimLeft(getEnv("SYSTEM_PULLREQUEST_TARGETBRANCH"), "refs/heads/"),
+		SourceBranch: strings.TrimPrefix(getEnv("SYSTEM_PULLREQUEST_SOURCEBRANCH"), "refs/heads/"),
+		BaseBranch:   strings.TrimPrefix(getEnv("SYSTEM_PULLREQUEST_TARGETBRANCH"), "refs/heads/"),
 		URL:          fmt.Sprintf("%s/pullrequest/%s", getEnv("SYSTEM_PULLREQUEST_SOURCEREPOSITORYURI"), pullID),
 	}
 	return m, nil
@@ -705,6 +705,7 @@ func (f *metadataFetcher) getAzureReposPRInfo() azurePullRequestResponse {
 		logging.Logger.WithError(err).Debugf("could not fetch Azure DevOps pull request information using URL '%s'", apiURL)
 		return out
 	}
+	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
 		b, _ := io.ReadAll(res.Body)
@@ -742,8 +743,8 @@ func (f *metadataFetcher) getAzureReposGithubMetadata(path string, gitDiffTarget
 	m.PullRequest = &PullRequest{
 		ID:           pullNumber,
 		VCSProvider:  "azure_devops_github",
-		SourceBranch: strings.TrimLeft(getEnv("SYSTEM_PULLREQUEST_SOURCEBRANCH"), "refs/heads/"),
-		BaseBranch:   strings.TrimLeft(getEnv("SYSTEM_PULLREQUEST_TARGETBRANCH"), "refs/heads/"),
+		SourceBranch: strings.TrimPrefix(getEnv("SYSTEM_PULLREQUEST_SOURCEBRANCH"), "refs/heads/"),
+		BaseBranch:   strings.TrimPrefix(getEnv("SYSTEM_PULLREQUEST_TARGETBRANCH"), "refs/heads/"),
 		URL:          fmt.Sprintf("%s/pulls/%s", getEnv("SYSTEM_PULLREQUEST_SOURCEREPOSITORYURI"), pullNumber),
 
 		// We are unable to fetch pull request title and author for repositories using the GitHub <> Azure DevOps
@@ -761,7 +762,7 @@ func (f *metadataFetcher) getAzureReposGithubMetadata(path string, gitDiffTarget
 // in the original Commit of Metadata m. Otherwise, transformAzureDevOpsMergeCommit returns the first commit
 // on a git log call that doesn't appear to be a Merge commit.
 func (f *metadataFetcher) transformAzureDevOpsMergeCommit(path string, m *Metadata) error {
-	m.Branch.Name = strings.TrimLeft(getEnv("SYSTEM_PULLREQUEST_SOURCEBRANCH"), "refs/heads/")
+	m.Branch.Name = strings.TrimPrefix(getEnv("SYSTEM_PULLREQUEST_SOURCEBRANCH"), "refs/heads/")
 
 	matches := mergeCommitRegxp.FindStringSubmatch(m.Commit.Message)
 	if len(matches) <= 1 {
@@ -1055,7 +1056,7 @@ func urlStringToRemote(remote string) Remote {
 	}
 
 	if strings.Contains(host, "azure") {
-		host = strings.TrimLeft(m[2], "ssh.")
+		host = strings.TrimPrefix(m[2], "ssh.")
 		path = versionRegxp.ReplaceAllString(path, "")
 		pieces := strings.Split(path, "/")
 		if len(pieces) == 3 {
