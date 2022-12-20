@@ -105,45 +105,51 @@ func NewAzureRMManagedDisk(d *schema.ResourceData, u *schema.UsageData) *schema.
 }
 
 func managedDiskCostComponents(region, diskType string, diskData gjson.Result, monthlyDiskOperations *decimal.Decimal) []*schema.CostComponent {
-	storageReplicationType := strings.Split(strings.ToUpper(diskType), "_")[1]
+	p := strings.Split(diskType, "_")
+	diskTypePrefix := p[0]
+
+	var storageReplicationType string
+	if len(p) > 1 {
+		storageReplicationType = strings.ToUpper(p[1])
+	}
+
 	validstorageReplicationType := mapStorageReplicationType(storageReplicationType)
 	if !validstorageReplicationType {
 		log.Warnf("Could not map %s to a valid storage type", storageReplicationType)
 		return nil
 	}
 
-	diskName := strings.Split(diskType, "_")[0]
-	if strings.ToLower(diskName) == "ultrassd" {
+	if strings.ToLower(diskTypePrefix) == "ultrassd" {
 		return ultraDiskCostComponents(region, storageReplicationType, diskData)
 	}
 
-	return standardPremiumDiskCostComponents(region, diskName, storageReplicationType, diskData, monthlyDiskOperations)
+	return standardPremiumDiskCostComponents(region, diskTypePrefix, storageReplicationType, diskData, monthlyDiskOperations)
 }
 
-func standardPremiumDiskCostComponents(region string, diskName string, storageReplicationType string, diskData gjson.Result, monthlyDiskOperations *decimal.Decimal) []*schema.CostComponent {
+func standardPremiumDiskCostComponents(region string, diskTypePrefix string, storageReplicationType string, diskData gjson.Result, monthlyDiskOperations *decimal.Decimal) []*schema.CostComponent {
 	requestedSize := 30
 
 	if diskData.Get("disk_size_gb").Exists() {
 		requestedSize = int(diskData.Get("disk_size_gb").Int())
 	}
 
-	diskName = mapDiskName(diskName, requestedSize)
-	if diskName == "" {
-		log.Warnf("Could not map disk type %s and size %d to disk name", diskName, requestedSize)
+	diskTypePrefix = mapDiskName(diskTypePrefix, requestedSize)
+	if diskTypePrefix == "" {
+		log.Warnf("Could not map disk type %s and size %d to disk name", diskTypePrefix, requestedSize)
 		return nil
 	}
 
-	productName, ok := diskProductNameMap[diskName]
+	productName, ok := diskProductNameMap[diskTypePrefix]
 	if !ok {
-		log.Warnf("Could not map disk type %s to product name", diskName)
+		log.Warnf("Could not map disk type %s to product name", diskTypePrefix)
 		return nil
 	}
 
 	// put diskType and storageReplicationType back together again
 	productName = fmt.Sprintf("%s_%s", productName, storageReplicationType)
-	costComponents := []*schema.CostComponent{storageCostComponent(region, diskName, storageReplicationType, productName)}
+	costComponents := []*schema.CostComponent{storageCostComponent(region, diskTypePrefix, storageReplicationType, productName)}
 
-	if strings.ToLower(diskName) == "standard" || strings.ToLower(diskName) == "standardssd" {
+	if strings.ToLower(diskTypePrefix) == "standard" || strings.ToLower(diskTypePrefix) == "standardssd" {
 		var opsQty *decimal.Decimal
 
 		if monthlyDiskOperations != nil {
@@ -162,7 +168,7 @@ func standardPremiumDiskCostComponents(region string, diskName string, storageRe
 				ProductFamily: strPtr("Storage"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "productName", Value: strPtr(productName)},
-					{Key: "skuName", Value: strPtr(fmt.Sprintf("%s %s", diskName, storageReplicationType))},
+					{Key: "skuName", Value: strPtr(fmt.Sprintf("%s %s", diskTypePrefix, storageReplicationType))},
 					{Key: "meterName", Value: strPtr("Disk Operations")},
 				},
 			},
@@ -177,7 +183,7 @@ func standardPremiumDiskCostComponents(region string, diskName string, storageRe
 
 func storageCostComponent(region, diskName string, storageReplicationType string, productName string) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:            fmt.Sprintf("Storage (%s_%s)", diskName, storageReplicationType),
+		Name:            fmt.Sprintf("Storage (%s, %s)", diskName, storageReplicationType),
 		Unit:            "months",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
