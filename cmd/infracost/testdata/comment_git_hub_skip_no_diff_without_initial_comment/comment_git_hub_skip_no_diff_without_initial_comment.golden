@@ -1,0 +1,6 @@
+Comment not posted to GitHub (skipped)
+
+Logs:
+level=info msg="Finding matching comments for tag infracost-comment"
+level=info msg="Found 0 matching comments"
+level=info msg="Not creating initial comment since there is no resource or cost difference"

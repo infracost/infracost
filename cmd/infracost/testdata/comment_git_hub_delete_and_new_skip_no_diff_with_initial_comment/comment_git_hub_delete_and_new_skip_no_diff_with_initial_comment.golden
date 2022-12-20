@@ -1,0 +1,9 @@
+Comment posted to GitHub
+
+Logs:
+level=info msg="Finding matching comments for tag infracost-comment"
+level=info msg="Found 1 matching comment"
+level=info msg="Deleting 1 comment"
+level=info msg="Deleting comment "
+level=info msg="Creating new comment"
+level=info msg="Created new comment: "

@@ -43,6 +43,171 @@ func TestCommentGitHubShowChangedProjects(t *testing.T) {
 		nil)
 }
 
+var ghZeroCommentsResponse = `{ "data": { "repository": { "pullRequest": { "comments": { "nodes": [], "pageInfo": { "endCursor": "abc", "hasNextPage": false }}}}}}`
+var ghOneMatchingCommentResponse = `{ "data": { "repository": { "pullRequest": { "comments": { "nodes": [ 
+            { "id": "123", "body": "infracomment body here, followed by tag: [//]: <> (infracost-comment)" }
+          ], "pageInfo": { "endCursor": "abc", "hasNextPage": false }}}}}}`
+
+func TestCommentGitHubSkipNoDiffWithoutInitialComment(t *testing.T) {
+	githubGraphQLresponses := []string{
+		// show zero comments in the response for findComments
+		ghZeroCommentsResponse,
+	}
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, githubGraphQLresponses[0])
+		githubGraphQLresponses = githubGraphQLresponses[1:]
+	}))
+	defer ts.Close()
+
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
+		[]string{"comment",
+			"github", "--github-token",
+			"abc", "--repo", "test/test",
+			"--pull-request", "5",
+			"--path", "./testdata/terraform_v0.14_nochange_breakdown.json",
+			"--skip-no-diff",
+			"--log-level", "info",
+			"--github-api-url", ts.URL},
+		&GoldenFileOptions{CaptureLogs: true},
+	)
+}
+
+func TestCommentGitHubSkipNoDiffWithInitialComment(t *testing.T) {
+	githubGraphQLresponses := []string{
+		// show one comment with a matching tag in the response for findComments
+		ghOneMatchingCommentResponse,
+		// empty json as response to the post comment mutation
+		`{}`,
+	}
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, githubGraphQLresponses[0])
+		githubGraphQLresponses = githubGraphQLresponses[1:]
+	}))
+	defer ts.Close()
+
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
+		[]string{"comment",
+			"github", "--github-token",
+			"abc", "--repo", "test/test",
+			"--pull-request", "5",
+			"--path", "./testdata/terraform_v0.14_nochange_breakdown.json",
+			"--skip-no-diff",
+			"--log-level", "info",
+			"--github-api-url", ts.URL},
+		&GoldenFileOptions{CaptureLogs: true},
+	)
+}
+
+func TestCommentGitHubNewAndHideSkipNoDiffWithoutInitialComment(t *testing.T) {
+	githubGraphQLresponses := []string{
+		// show zero comments in the response for findComments
+		ghZeroCommentsResponse,
+	}
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, githubGraphQLresponses[0])
+		githubGraphQLresponses = githubGraphQLresponses[1:]
+	}))
+	defer ts.Close()
+
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
+		[]string{"comment",
+			"github", "--github-token",
+			"abc", "--repo", "test/test",
+			"--pull-request", "5",
+			"--path", "./testdata/terraform_v0.14_nochange_breakdown.json",
+			"--behavior", "hide-and-new",
+			"--skip-no-diff",
+			"--log-level", "info",
+			"--github-api-url", ts.URL},
+		&GoldenFileOptions{CaptureLogs: true},
+	)
+}
+
+func TestCommentGitHubNewAndHideSkipNoDiffWithInitialComment(t *testing.T) {
+	githubGraphQLresponses := []string{
+		// show one comment with a matching tag in the response for findComments
+		ghOneMatchingCommentResponse,
+		`{}`, // empty json as response to the hide comment mutation
+		`{}`, // empty json as response to the post comment mutation
+	}
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, githubGraphQLresponses[0])
+		githubGraphQLresponses = githubGraphQLresponses[1:]
+	}))
+	defer ts.Close()
+
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
+		[]string{"comment",
+			"github", "--github-token",
+			"abc", "--repo", "test/test",
+			"--pull-request", "5",
+			"--path", "./testdata/terraform_v0.14_nochange_breakdown.json",
+			"--behavior", "hide-and-new",
+			"--skip-no-diff",
+			"--log-level", "info",
+			"--github-api-url", ts.URL},
+		&GoldenFileOptions{CaptureLogs: true},
+	)
+}
+
+func TestCommentGitHubDeleteAndNewSkipNoDiffWithoutInitialComment(t *testing.T) {
+	githubGraphQLresponses := []string{
+		// show zero comments in the response for findComments
+		ghZeroCommentsResponse,
+	}
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, githubGraphQLresponses[0])
+		githubGraphQLresponses = githubGraphQLresponses[1:]
+	}))
+	defer ts.Close()
+
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
+		[]string{"comment",
+			"github", "--github-token",
+			"abc", "--repo", "test/test",
+			"--pull-request", "5",
+			"--path", "./testdata/terraform_v0.14_nochange_breakdown.json",
+			"--behavior", "delete-and-new",
+			"--skip-no-diff",
+			"--log-level", "info",
+			"--github-api-url", ts.URL},
+		&GoldenFileOptions{CaptureLogs: true},
+	)
+}
+
+func TestCommentGitHubDeleteAndNewSkipNoDiffWithInitialComment(t *testing.T) {
+	githubGraphQLresponses := []string{
+		// show one comment with a matching tag in the response for findComments
+		ghOneMatchingCommentResponse,
+		`{}`, // empty json as response to the delete comment mutation
+		`{}`, // empty json as response to the post comment mutation
+	}
+
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, githubGraphQLresponses[0])
+		githubGraphQLresponses = githubGraphQLresponses[1:]
+	}))
+	defer ts.Close()
+
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
+		[]string{"comment",
+			"github", "--github-token",
+			"abc", "--repo", "test/test",
+			"--pull-request", "5",
+			"--path", "./testdata/terraform_v0.14_nochange_breakdown.json",
+			"--behavior", "delete-and-new",
+			"--skip-no-diff",
+			"--log-level", "info",
+			"--github-api-url", ts.URL},
+		&GoldenFileOptions{CaptureLogs: true},
+	)
+}
+
 func TestCommentGitHubWithNoGuardrailt(t *testing.T) {
 	ts := guardrailTestEndpoint(guardrailAddRunResponse{
 		GuardrailsChecked: 0,
