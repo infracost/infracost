@@ -138,6 +138,17 @@ func (r *Root) ExampleProjectName() string {
 	return r.Projects[0].Name
 }
 
+// HasDiff returns true if any project has a difference in monthly cost or resources
+func (r *Root) HasDiff() bool {
+	for _, p := range r.Projects {
+		if p.Diff != nil && (!p.Diff.TotalMonthlyCost.IsZero() || len(p.Diff.Resources) != 0) {
+			return true
+		}
+	}
+
+	return false
+}
+
 // Label returns the display name of the project
 func (p *Project) Label() string {
 	return p.Name
