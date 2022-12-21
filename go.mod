@@ -103,6 +103,7 @@ require (
 	github.com/hashicorp/go-terraform-address v0.0.0-20210506203813-2cc4f0f34da8
 	github.com/hashicorp/terraform-svchost v0.0.0-20200729002733-f050f53b9734
 	github.com/maruel/panicparse/v2 v2.3.1
+	github.com/olekukonko/tablewriter v0.0.5
 	github.com/pkg/browser v0.0.0-20201207095918-0426ae3fba23
 	github.com/pterm/pterm v0.12.50
 	github.com/shurcooL/githubv4 v0.0.0-20220115235240-a14260e6f8a2
