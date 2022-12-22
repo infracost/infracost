@@ -80,6 +80,7 @@ type Config struct {
 	PolicyAPIEndpoint         string `yaml:"policy_api_endpoint" envconfig:"POLICY_API_ENDPOINT"`
 	EnableDashboard           bool   `yaml:"enable_dashboard,omitempty" envconfig:"ENABLE_DASHBOARD"`
 	EnableCloud               *bool  `yaml:"enable_cloud,omitempty" envconfig:"ENABLE_CLOUD"`
+	EnableCloudUpload         *bool  `yaml:"enable_cloud,omitempty" envconfig:"ENABLE_CLOUD_UPLOAD"`
 	DisableHCLParsing         bool   `yaml:"disable_hcl_parsing,omitempty" envconfig:"DISABLE_HCL_PARSING"`
 
 	TLSInsecureSkipVerify *bool  `envconfig:"TLS_INSECURE_SKIP_VERIFY"`
