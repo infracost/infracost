@@ -426,12 +426,12 @@ func TestBreakdownWithActualCosts(t *testing.T) {
 		bodyBytes, _ := ioutil.ReadAll(r.Body)
 		graphqlQuery := string(bodyBytes)
 
-		if strings.Contains(graphqlQuery, "actualCosts") {
-			fmt.Fprintln(w, `[{"data": {"actualCosts":{
+		if strings.Contains(graphqlQuery, "actualCostsList") {
+			fmt.Fprintln(w, `[{"data": {"actualCostsList":[{
 				"address": "aws_dynamodb_table.usage",
 				"resourceId": "arn:aws_dynamodb_table",
-				"startAt": "20220915T090909Z",
-				"endAt": "20220922T090909Z",
+				"startAt": "2022-09-15T09:09:09Z",
+				"endAt": "2022-09-22T09:09:09Z",
 				"costComponents": [{
 						"usageType": "someusagetype",
 						"description": "$0.005123 per some aws thing",
@@ -451,7 +451,23 @@ func TestBreakdownWithActualCosts(t *testing.T) {
 						"unit": "GB"
 					}
 				]
-			}}}]`)
+			},
+			{
+				"address": "aws_dynamodb_table.usage",
+				"resourceId": "arn:another_aws_dynamodb_table",
+				"startAt": "2022-08-15T09:09:09Z",
+				"endAt": "2022-09-22T09:09:09Z",
+				"costComponents": [{
+					"usageType": "someusagetype",
+					"description": "$0.005123 per some aws thing",
+					"currency": "USD",
+					"monthlyCost": "5.123",
+					"monthlyQuantity": "1000",
+					"price": "0.005123",
+					"unit": "GB"
+				}]
+			}
+			]}}]`)
 		} else if strings.Contains(graphqlQuery, "usageQuantities") {
 			keys := []string{
 				"monthly_write_request_units",
@@ -478,6 +494,7 @@ func TestBreakdownWithActualCosts(t *testing.T) {
 		&GoldenFileOptions{CaptureLogs: true},
 		func(c *config.RunContext) {
 			c.Config.UsageAPIEndpoint = ts.URL
+			c.Config.UsageActualCosts = true
 		},
 	)
 }

@@ -90,7 +90,7 @@ func NewUsageAPIClient(ctx *config.RunContext) *UsageAPIClient {
 
 // ListActualCosts queries the Infracost Cloud Usage API to retrieve any cloud provider
 // reported costs associated with the resource.
-func (c *UsageAPIClient) ListActualCosts(vars ActualCostsQueryVariables) (*ActualCostsResult, error) {
+func (c *UsageAPIClient) ListActualCosts(vars ActualCostsQueryVariables) ([]ActualCostsResult, error) {
 	query := c.buildActualCostsQuery(vars)
 
 	logging.Logger.Debugf("Getting actual costs from %s for %s", c.endpoint, vars.Address)
@@ -107,26 +107,32 @@ func (c *UsageAPIClient) ListActualCosts(vars ActualCostsQueryVariables) (*Actua
 	}
 
 	result := results[0]
-	acr := &ActualCostsResult{
-		Address:        result.Get("data.actualCosts.address").String(),
-		ResourceID:     result.Get("data.actualCosts.resourceId").String(),
-		StartTimestamp: result.Get("data.actualCosts.startAt").Time(),
-		EndTimestamp:   result.Get("data.actualCosts.endAt").Time(),
+
+	actualCostResults := make([]ActualCostsResult, 0)
+	for _, ac := range result.Get("data.actualCostsList").Array() {
+		acr := ActualCostsResult{
+			Address:        ac.Get("address").String(),
+			ResourceID:     ac.Get("resourceId").String(),
+			StartTimestamp: ac.Get("startAt").Time(),
+			EndTimestamp:   ac.Get("endAt").Time(),
+		}
+
+		for _, cc := range ac.Get("costComponents").Array() {
+			acr.CostComponents = append(acr.CostComponents, ActualCostComponent{
+				UsageType:       cc.Get("usageType").String(),
+				Description:     cc.Get("description").String(),
+				Unit:            cc.Get("unit").String(),
+				Price:           cc.Get("price").String(),
+				MonthlyCost:     cc.Get("monthlyCost").String(),
+				MonthlyQuantity: cc.Get("monthlyQuantity").String(),
+				Currency:        cc.Get("currency").String(),
+			})
+		}
+
+		actualCostResults = append(actualCostResults, acr)
 	}
 
-	for _, cc := range result.Get("data.actualCosts.costComponents").Array() {
-		acr.CostComponents = append(acr.CostComponents, ActualCostComponent{
-			UsageType:       cc.Get("usageType").String(),
-			Description:     cc.Get("description").String(),
-			Unit:            cc.Get("unit").String(),
-			Price:           cc.Get("price").String(),
-			MonthlyCost:     cc.Get("monthlyCost").String(),
-			MonthlyQuantity: cc.Get("monthlyQuantity").String(),
-			Currency:        cc.Get("currency").String(),
-		})
-	}
-
-	return acr, nil
+	return actualCostResults, nil
 }
 
 type ActualCostsQueryVariables struct {
@@ -141,7 +147,7 @@ func (c *UsageAPIClient) buildActualCostsQuery(vars ActualCostsQueryVariables) G
 
 	query := `
 		query($repoUrl: String!, $project: String!, $address: String!, $currency: String!) {
-			actualCosts(repoUrl: $repoUrl, project: $project, address: $address, currency: $currency) {
+			actualCostsList(repoUrl: $repoUrl, project: $project, address: $address, currency: $currency) {
 				address
 				resourceId
 				startAt
