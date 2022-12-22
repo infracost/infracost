@@ -193,6 +193,13 @@ func (r *RunContext) IsCloudEnabled() bool {
 	return r.Config.EnableDashboard
 }
 
+func (r *RunContext) IsCloudUploadEnabled() bool {
+	if r.Config.EnableCloudUpload != nil {
+		return *r.Config.EnableCloudUpload
+	}
+	return r.IsCloudEnabled()
+}
+
 func baseVersion(v string) string {
 	return strings.SplitN(v, "+", 2)[0]
 }

@@ -319,8 +319,11 @@
           "type": "array"
         },
         "actualCosts": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/ActualCosts"
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/ActualCosts"
+          },
+          "type": "array"
         },
         "subresources": {
           "items": {
@@ -441,8 +444,11 @@
           "type": "array"
         },
         "actualCosts": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/ActualCosts"
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/ActualCosts"
+          },
+          "type": "array"
         },
         "subresources": {
           "items": {

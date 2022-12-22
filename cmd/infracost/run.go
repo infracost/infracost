@@ -147,7 +147,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	r.Currency = runCtx.Config.Currency
 	r.Metadata = output.NewMetadata(runCtx)
 
-	if runCtx.IsCloudEnabled() {
+	if runCtx.IsCloudUploadEnabled() {
 		dashboardClient := apiclient.NewDashboardAPIClient(runCtx)
 		result, err := dashboardClient.AddRun(runCtx, r)
 		if err != nil {
@@ -156,7 +156,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 
 		r.RunID, r.ShareURL = result.RunID, result.ShareURL
 	} else {
-		log.Debug("Skipping sending project results since Infracost Cloud is not enabled.")
+		log.Debug("Skipping sending project results since Infracost Cloud upload is not enabled.")
 	}
 
 	format := strings.ToLower(runCtx.Config.Format)

@@ -75,7 +75,7 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 
 	var guardrailCheck output.GuardrailCheck
 	dryRun, _ := cmd.Flags().GetBool("dry-run")
-	if ctx.IsCloudEnabled() && !dryRun {
+	if ctx.IsCloudUploadEnabled() && !dryRun {
 		if ctx.Config.IsSelfHosted() {
 			ui.PrintWarning(cmd.ErrOrStderr(), "Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
 		} else {

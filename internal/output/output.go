@@ -107,17 +107,21 @@ func convertCostComponents(outComponents []CostComponent) []*schema.CostComponen
 	return components
 }
 
-func convertActualCosts(ac *ActualCosts) *schema.ActualCosts {
-	if ac == nil {
-		return nil
+func convertActualCosts(outActualCosts []ActualCosts) []*schema.ActualCosts {
+	actualCosts := make([]*schema.ActualCosts, len(outActualCosts))
+
+	for i, ac := range outActualCosts {
+		sac := &schema.ActualCosts{
+			ResourceID:     ac.ResourceID,
+			StartTimestamp: ac.StartTimestamp,
+			EndTimestamp:   ac.EndTimestamp,
+			CostComponents: convertCostComponents(ac.CostComponents),
+		}
+
+		actualCosts[i] = sac
 	}
 
-	return &schema.ActualCosts{
-		ResourceID:     ac.ResourceID,
-		StartTimestamp: ac.StartTimestamp,
-		EndTimestamp:   ac.EndTimestamp,
-		CostComponents: convertCostComponents(ac.CostComponents),
-	}
+	return actualCosts
 }
 
 type Projects []Project
@@ -202,7 +206,7 @@ type Resource struct {
 	HourlyCost     *decimal.Decimal       `json:"hourlyCost"`
 	MonthlyCost    *decimal.Decimal       `json:"monthlyCost"`
 	CostComponents []CostComponent        `json:"costComponents,omitempty"`
-	ActualCosts    *ActualCosts           `json:"actualCosts,omitempty"`
+	ActualCosts    []ActualCosts          `json:"actualCosts,omitempty"`
 	SubResources   []Resource             `json:"subresources,omitempty"`
 }
 
@@ -394,17 +398,17 @@ func outputCostComponents(costComponents []*schema.CostComponent) []CostComponen
 	return comps
 }
 
-func outputActualCosts(ac *schema.ActualCosts) *ActualCosts {
-	if ac == nil {
-		return nil
+func outputActualCosts(actualCosts []*schema.ActualCosts) []ActualCosts {
+	acs := make([]ActualCosts, 0, len(actualCosts))
+	for _, ac := range actualCosts {
+		acs = append(acs, ActualCosts{
+			ResourceID:     ac.ResourceID,
+			StartTimestamp: ac.StartTimestamp,
+			EndTimestamp:   ac.EndTimestamp,
+			CostComponents: outputCostComponents(ac.CostComponents),
+		})
 	}
-
-	return &ActualCosts{
-		ResourceID:     ac.ResourceID,
-		StartTimestamp: ac.StartTimestamp,
-		EndTimestamp:   ac.EndTimestamp,
-		CostComponents: outputCostComponents(ac.CostComponents),
-	}
+	return acs
 }
 
 func ToOutputFormat(projects []*schema.Project) (Root, error) {
