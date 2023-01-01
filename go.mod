@@ -104,7 +104,7 @@ require (
 	github.com/hashicorp/terraform-svchost v0.0.0-20200729002733-f050f53b9734
 	github.com/maruel/panicparse/v2 v2.3.1
 	github.com/pkg/browser v0.0.0-20201207095918-0426ae3fba23
-	github.com/pterm/pterm v0.12.50
+	github.com/pterm/pterm v0.12.51
 	github.com/shurcooL/githubv4 v0.0.0-20220115235240-a14260e6f8a2
 	github.com/shurcooL/graphql v0.0.0-20200928012149-18c5c3165e3a
 	github.com/withfig/autocomplete-tools/packages/cobra v1.2.0
