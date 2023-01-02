@@ -16,6 +16,8 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/object"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/infracost/infracost/internal/sync"
 )
 
 func Test_urlStringToRemote(t *testing.T) {
@@ -90,7 +92,7 @@ func Test_metadataFetcher_GetLocalMetadata(t *testing.T) {
 
 	test := false
 	m := metadataFetcher{
-		mu:     &keyMutex{},
+		mu:     &sync.KeyMutex{},
 		client: &http.Client{Timeout: time.Second * 5},
 		test:   &test,
 	}
@@ -141,7 +143,7 @@ func Test_metadataFetcher_GetLocalMetadata_WithGitDiffTarget(t *testing.T) {
 
 	test := false
 	m := metadataFetcher{
-		mu:     &keyMutex{},
+		mu:     &sync.KeyMutex{},
 		client: &http.Client{Timeout: time.Second * 5},
 		test:   &test,
 	}
@@ -187,7 +189,7 @@ func Test_metadataFetcher_GetLocalMetadataMergesWithEnv(t *testing.T) {
 
 	test := false
 	m := metadataFetcher{
-		mu:     &keyMutex{},
+		mu:     &sync.KeyMutex{},
 		client: &http.Client{Timeout: time.Second * 5},
 		test:   &test,
 	}
@@ -261,7 +263,7 @@ func Test_metadataFetcher_Get_ReturnsUserDefinedEnvs(t *testing.T) {
 
 	test := false
 	m := metadataFetcher{
-		mu:     &keyMutex{},
+		mu:     &sync.KeyMutex{},
 		client: &http.Client{Timeout: time.Second * 5},
 		test:   &test,
 	}
@@ -306,7 +308,7 @@ func Test_metadataFetcher_Get_ReturnsPRIDFromURL(t *testing.T) {
 
 	test := false
 	m := metadataFetcher{
-		mu:     &keyMutex{},
+		mu:     &sync.KeyMutex{},
 		client: &http.Client{Timeout: time.Second * 5},
 		test:   &test,
 	}

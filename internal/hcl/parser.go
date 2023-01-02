@@ -149,12 +149,6 @@ func OptionWithRemoteVarLoader(host, token, localWorkspace string) Option {
 	}
 }
 
-func OptionWithCredentialsSource(source *modules.CredentialsSource) Option {
-	return func(p *Parser) {
-		p.credentialsSource = source
-	}
-}
-
 func OptionWithBlockBuilder(blockBuilder BlockBuilder) Option {
 	return func(p *Parser) {
 		p.blockBuilder = blockBuilder
@@ -185,6 +179,10 @@ func OptionWithTerraformWorkspace(name string) Option {
 func OptionWithSpinner(f ui.SpinnerFunc) Option {
 	return func(p *Parser) {
 		p.newSpinner = f
+
+		if p.moduleLoader != nil {
+			p.moduleLoader.NewSpinner = f
+		}
 	}
 }
 
@@ -209,7 +207,7 @@ type Parser struct {
 // LoadParsers inits a list of Parser with the provided option and initialPath. LoadParsers locates Terraform files
 // in the given initialPath and returns a Parser for each directory it locates a Terraform project within. If
 // the initialPath contains Terraform files at the top level parsers will be len 1.
-func LoadParsers(initialPath string, locatorConfig *ProjectLocatorConfig, logger *logrus.Entry, options ...Option) ([]*Parser, error) {
+func LoadParsers(initialPath string, loader *modules.ModuleLoader, locatorConfig *ProjectLocatorConfig, logger *logrus.Entry, options ...Option) ([]*Parser, error) {
 	pl := NewProjectLocator(logger, locatorConfig)
 	rootPaths := pl.FindRootModules(initialPath)
 	if len(rootPaths) == 0 && len(locatorConfig.ChangedObjects) > 0 {
@@ -222,13 +220,13 @@ func LoadParsers(initialPath string, locatorConfig *ProjectLocatorConfig, logger
 
 	var parsers = make([]*Parser, len(rootPaths))
 	for i, rootPath := range rootPaths {
-		parsers[i] = newParser(rootPath, logger, options...)
+		parsers[i] = newParser(rootPath, loader, logger, options...)
 	}
 
 	return parsers, nil
 }
 
-func newParser(projectRoot RootPath, logger *logrus.Entry, options ...Option) *Parser {
+func newParser(projectRoot RootPath, moduleLoader *modules.ModuleLoader, logger *logrus.Entry, options ...Option) *Parser {
 	parserLogger := logger.WithFields(logrus.Fields{
 		"parser_path": projectRoot.Path,
 	})
@@ -239,6 +237,7 @@ func newParser(projectRoot RootPath, logger *logrus.Entry, options ...Option) *P
 		workspaceName: defaultTerraformWorkspaceName,
 		blockBuilder:  BlockBuilder{SetAttributes: []SetAttributesFunc{SetUUIDAttributes}, Logger: logger},
 		logger:        parserLogger,
+		moduleLoader:  moduleLoader,
 	}
 
 	var defaultVarFiles []string
@@ -269,14 +268,6 @@ func newParser(projectRoot RootPath, logger *logrus.Entry, options ...Option) *P
 	for _, option := range options {
 		option(p)
 	}
-
-	var loaderOpts []modules.LoaderOption
-	if p.newSpinner != nil {
-		parserLogger.Debug("excluding spinner output")
-		loaderOpts = append(loaderOpts, modules.LoaderWithSpinner(p.newSpinner))
-	}
-
-	p.moduleLoader = modules.NewModuleLoader(projectRoot.Path, p.credentialsSource, p.logger, loaderOpts...)
 
 	return p
 }
@@ -313,7 +304,7 @@ func (p *Parser) ParseDirectory() (*Module, error) {
 	}
 
 	// load the modules. This downloads any remote modules to the local file system
-	modulesManifest, err := p.moduleLoader.Load()
+	modulesManifest, err := p.moduleLoader.Load(p.initialPath)
 	if err != nil {
 		return nil, fmt.Errorf("Error loading Terraform modules: %s", err)
 	}

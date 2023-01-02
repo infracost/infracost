@@ -11,7 +11,20 @@ import (
 // It is used for caching the modules that have already been downloaded.
 // It uses the same format as the .terraform/modules/modules.json file
 type Manifest struct {
+	cachePath string
+
 	Modules []*ManifestModule `json:"Modules"`
+}
+
+func (m Manifest) FindModulePath(key string) string {
+	for _, module := range m.Modules {
+		if module.Key == key {
+			loc := filepath.Clean(filepath.Join(m.cachePath, module.Dir))
+			return loc
+		}
+	}
+
+	return ""
 }
 
 // ManifestModule represents a single module in the manifest.json file
