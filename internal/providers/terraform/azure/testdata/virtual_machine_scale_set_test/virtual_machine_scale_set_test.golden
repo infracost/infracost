@@ -4,25 +4,25 @@
  azurerm_virtual_machine_scale_set.linux                                                                     
  ├─ Instance usage (pay as you go, Standard_F2)                1,460  hours                          $166.44 
  ├─ storage_os_disk                                                                                          
- │  ├─ Storage (S4)                                                1  months                           $1.54 
+ │  ├─ Storage (S4, LRS)                                           1  months                           $1.54 
  │  └─ Disk operations                            Monthly cost depends on usage: $0.0005 per 10k operations  
  ├─ storage_data_disk                                                                                        
- │  ├─ Storage (E4)                                                1  months                           $2.40 
+ │  ├─ Storage (E4, LRS)                                           1  months                           $2.40 
  │  └─ Disk operations                            Monthly cost depends on usage: $0.002 per 10k operations   
  └─ storage_data_disk                                                                                        
-    ├─ Storage (S4)                                                1  months                           $1.54 
+    ├─ Storage (S4, LRS)                                           1  months                           $1.54 
     └─ Disk operations                            Monthly cost depends on usage: $0.0005 per 10k operations  
                                                                                                              
  azurerm_virtual_machine_scale_set.windows                                                                   
  ├─ Instance usage (hybrid benefit, Standard_F2)               2,190  hours                          $249.66 
  ├─ storage_os_disk                                                                                          
- │  ├─ Storage (S4)                                                1  months                           $1.54 
+ │  ├─ Storage (S4, LRS)                                           1  months                           $1.54 
  │  └─ Disk operations                                           100  10k operations                   $0.05 
  ├─ storage_data_disk                                                                                        
- │  ├─ Storage (E4)                                                1  months                           $2.40 
+ │  ├─ Storage (E4, LRS)                                           1  months                           $2.40 
  │  └─ Disk operations                                           200  10k operations                   $0.40 
  └─ storage_data_disk                                                                                        
-    ├─ Storage (S4)                                                1  months                           $1.54 
+    ├─ Storage (S4, LRS)                                           1  months                           $1.54 
     └─ Disk operations                                           200  10k operations                   $0.10 
                                                                                                              
  OVERALL TOTAL                                                                                       $427.59 

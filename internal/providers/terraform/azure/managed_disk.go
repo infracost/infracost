@@ -133,7 +133,7 @@ func standardPremiumDiskCostComponents(region string, diskTypePrefix string, sto
 		requestedSize = int(diskData.Get("disk_size_gb").Int())
 	}
 
-	diskTypePrefix = mapDiskName(diskTypePrefix, requestedSize)
+	diskName := mapDiskName(diskTypePrefix, requestedSize)
 	if diskTypePrefix == "" {
 		log.Warnf("Could not map disk type %s and size %d to disk name", diskTypePrefix, requestedSize)
 		return nil
@@ -145,9 +145,7 @@ func standardPremiumDiskCostComponents(region string, diskTypePrefix string, sto
 		return nil
 	}
 
-	// put diskType and storageReplicationType back together again
-	productName = fmt.Sprintf("%s_%s", productName, storageReplicationType)
-	costComponents := []*schema.CostComponent{storageCostComponent(region, diskTypePrefix, storageReplicationType, productName)}
+	costComponents := []*schema.CostComponent{storageCostComponent(region, diskName, storageReplicationType, productName)}
 
 	if strings.ToLower(diskTypePrefix) == "standard" || strings.ToLower(diskTypePrefix) == "standardssd" {
 		var opsQty *decimal.Decimal
@@ -168,7 +166,7 @@ func standardPremiumDiskCostComponents(region string, diskTypePrefix string, sto
 				ProductFamily: strPtr("Storage"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "productName", Value: strPtr(productName)},
-					{Key: "skuName", Value: strPtr(fmt.Sprintf("%s %s", diskTypePrefix, storageReplicationType))},
+					{Key: "skuName", Value: strPtr(fmt.Sprintf("%s %s", diskName, storageReplicationType))},
 					{Key: "meterName", Value: strPtr("Disk Operations")},
 				},
 			},
