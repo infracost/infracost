@@ -95,6 +95,36 @@ func (r *RunContext) NewSpinner(msg string) *ui.Spinner {
 	})
 }
 
+func (r *RunContext) GetParallelism() (int, error) {
+	var parallelism int
+
+	if r.Config.Parallelism == nil {
+		parallelism = 4
+		numCPU := runtime.NumCPU()
+		if numCPU*4 > parallelism {
+			parallelism = numCPU * 4
+		}
+
+		if parallelism > 16 {
+			parallelism = 16
+		}
+
+		return parallelism, nil
+	}
+
+	parallelism = *r.Config.Parallelism
+
+	if parallelism < 0 {
+		return parallelism, fmt.Errorf("parallelism must be a positive number")
+	}
+
+	if parallelism > 16 {
+		return parallelism, fmt.Errorf("parallelism must be less than 16")
+	}
+
+	return parallelism, nil
+}
+
 // Context returns the underlying context.
 func (r *RunContext) Context() context.Context {
 	return r.ctx
@@ -105,8 +135,8 @@ func (r *RunContext) UUID() uuid.UUID {
 	return r.uuid
 }
 
-func (c *RunContext) VCSRepositoryURL() string {
-	return c.VCSMetadata.Remote.URL
+func (r *RunContext) VCSRepositoryURL() string {
+	return r.VCSMetadata.Remote.URL
 }
 
 func (r *RunContext) SetContextValue(key string, value interface{}) {

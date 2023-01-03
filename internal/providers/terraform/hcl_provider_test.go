@@ -16,6 +16,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/zclconf/go-cty/cty"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/hcl/modules"
 	"github.com/infracost/infracost/internal/sync"
@@ -204,6 +205,7 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 			p := HCLProvider{
 				parsers: parsers,
 				logger:  entry,
+				ctx:     &config.ProjectContext{RunContext: &config.RunContext{Config: &config.Config{}}},
 			}
 			got, err := p.LoadPlanJSONs()
 			require.NoError(t, err)

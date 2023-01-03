@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"runtime"
 	"runtime/debug"
 	"sort"
 	"strings"
@@ -259,7 +258,7 @@ func newParallelRunner(cmd *cobra.Command, runCtx *config.RunContext) (*parallel
 		prior = &snapshot
 	}
 
-	parallelism, err := getParallelism(cmd, runCtx)
+	parallelism, err := runCtx.GetParallelism()
 	if err != nil {
 		return nil, err
 	}
@@ -792,33 +791,6 @@ func (r *parallelRunner) generateUsageFile(ctx *config.ProjectContext, provider 
 			pluralized))
 	}
 	return nil
-}
-
-func getParallelism(cmd *cobra.Command, runCtx *config.RunContext) (int, error) {
-	var parallelism int
-
-	if runCtx.Config.Parallelism == nil {
-		parallelism = 4
-		numCPU := runtime.NumCPU()
-		if numCPU*4 > parallelism {
-			parallelism = numCPU * 4
-		}
-		if parallelism > 16 {
-			parallelism = 16
-		}
-	} else {
-		parallelism = *runCtx.Config.Parallelism
-
-		if parallelism < 0 {
-			return parallelism, fmt.Errorf("parallelism must be a positive number")
-		}
-
-		if parallelism > 16 {
-			return parallelism, fmt.Errorf("parallelism must be less than 16")
-		}
-	}
-
-	return parallelism, nil
 }
 
 func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {

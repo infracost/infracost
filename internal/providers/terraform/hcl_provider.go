@@ -7,13 +7,18 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"runtime/debug"
+	"sort"
 	"strings"
+	"sync"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 	ctyJson "github.com/zclconf/go-cty/cty/json"
+	"golang.org/x/sync/errgroup"
 
+	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/hcl/modules"
@@ -127,7 +132,8 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 	)
 
 	logger := ctx.Logger().WithFields(log.Fields{"provider": "terraform_dir"})
-	locatorConfig := &hcl.ProjectLocatorConfig{ExcludedSubDirs: ctx.ProjectConfig.ExcludePaths, ChangedObjects: ctx.RunContext.VCSMetadata.Commit.ChangedObjects, UseAllPaths: ctx.ProjectConfig.IncludeAllPaths}
+	runCtx := ctx.RunContext
+	locatorConfig := &hcl.ProjectLocatorConfig{ExcludedSubDirs: ctx.ProjectConfig.ExcludePaths, ChangedObjects: runCtx.VCSMetadata.Commit.ChangedObjects, UseAllPaths: ctx.ProjectConfig.IncludeAllPaths}
 
 	path := ctx.RunContext.Config.RepoPath()
 	loader := modules.NewModuleLoader(path, credsSource, logger, ctx.RunContext.ModuleMutex)
@@ -142,8 +148,8 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 		return nil, err
 	}
 	var scanner *scan.TerraformPlanScanner
-	if ctx.RunContext.Config.PolicyAPIEndpoint != "" {
-		scanner = scan.NewTerraformPlanScanner(ctx.RunContext, ctx.Logger(), prices.GetPrices)
+	if runCtx.Config.PolicyAPIEndpoint != "" {
+		scanner = scan.NewTerraformPlanScanner(runCtx, ctx.Logger(), prices.GetPrices)
 	}
 
 	return &HCLProvider{
@@ -284,26 +290,81 @@ func (p *HCLProvider) Modules() ([]*hcl.Module, error) {
 		return p.cache, nil
 	}
 
-	var modules = make([]*hcl.Module, len(p.parsers))
+	runCtx := p.ctx.RunContext
+	parallelism, err := runCtx.GetParallelism()
+	if err != nil {
+		return nil, err
+	}
 
-	for i, parser := range p.parsers {
-		if len(p.parsers) > 1 && !p.config.SuppressLogging {
-			fmt.Fprintf(os.Stderr, "Detected Terraform project at %s\n", ui.DisplayPath(parser.Path()))
+	numJobs := len(p.parsers)
+
+	runInParallel := parallelism > 1 && numJobs > 1
+	if runInParallel && !runCtx.Config.IsLogging() {
+		if runInParallel && !p.config.SuppressLogging {
+			fmt.Fprintln(os.Stderr, "Running multiple projects in parallel, so log-level=info is enabled by default.")
+			fmt.Fprintln(os.Stderr, "Run with INFRACOST_PARALLELISM=1 to disable parallelism to help debugging.")
+			fmt.Fprintln(os.Stderr)
 		}
 
-		module, err := parser.ParseDirectory()
-		if err != nil {
-			return nil, err
-		}
+		p.logger.Logger.SetLevel(log.InfoLevel)
+		p.ctx.RunContext.Config.LogLevel = "info"
+	}
 
-		modules[i] = module
+	var mods = make([]*hcl.Module, 0, len(p.parsers))
+	errGroup := &errgroup.Group{}
+	ch := make(chan *hcl.Parser, len(p.parsers))
+	for _, parser := range p.parsers {
+		ch <- parser
+	}
+	close(ch)
+	lock := &sync.Mutex{}
+
+	for i := 0; i < parallelism; i++ {
+		errGroup.Go(func() (err error) {
+			defer func() {
+				e := recover()
+				if e != nil {
+					err = clierror.NewPanicError(fmt.Errorf("%s", e), debug.Stack())
+				}
+			}()
+
+			for parser := range ch {
+				if len(p.parsers) > 1 && !p.config.SuppressLogging {
+					fmt.Fprintf(os.Stderr, "Detected Terraform project at %s\n", ui.DisplayPath(parser.Path()))
+				}
+
+				module, err := parser.ParseDirectory()
+				if err != nil {
+					return err
+				}
+
+				lock.Lock()
+				mods = append(mods, module)
+				lock.Unlock()
+			}
+
+			return nil
+		})
+	}
+
+	err = errGroup.Wait()
+	if err != nil {
+		return nil, err
 	}
 
 	if p.config.CacheParsingModules {
-		p.cache = modules
+		p.cache = mods
 	}
 
-	return modules, nil
+	sort.Slice(mods, func(i, j int) bool {
+		if mods[i].Name != "" && mods[j].Name != "" {
+			return mods[i].Name < mods[j].Name
+		}
+
+		return mods[i].ModulePath < mods[j].ModulePath
+	})
+
+	return mods, nil
 }
 
 // InvalidateCache removes the module cache from the prior hcl parse.
