@@ -13,6 +13,8 @@ import (
 type Manifest struct {
 	cachePath string
 
+	Path    string            `json:"Path"`
+	Version string            `json:"Version"`
 	Modules []*ManifestModule `json:"Modules"`
 }
 
@@ -54,19 +56,20 @@ func readManifest(path string) (*Manifest, error) {
 
 // writeManifest writes the manifest file to the given path
 func writeManifest(manifest *Manifest, path string) error {
+
 	b, err := json.Marshal(manifest)
 	if err != nil {
-		return fmt.Errorf("Failed to marshal manifest: %w", err)
+		return fmt.Errorf("failed to marshal manifest: %w", err)
 	}
 
 	err = os.MkdirAll(filepath.Dir(path), os.ModePerm)
 	if err != nil {
-		return fmt.Errorf("Failed to create directories for manifest: %w", err)
+		return fmt.Errorf("failed to create directories for manifest: %w", err)
 	}
 
 	err = os.WriteFile(path, b, 0644) // nolint:gosec
 	if err != nil {
-		return fmt.Errorf("Failed to write manifest: %w", err)
+		return fmt.Errorf("failed to write manifest: %w", err)
 	}
 
 	return nil

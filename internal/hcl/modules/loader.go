@@ -24,9 +24,11 @@ var (
 	// downloadDir is name of the directory where remote modules are download
 	downloadDir = ".infracost/terraform_modules"
 	// manifestPath is the name of the module manifest file which stores the metadata of the modules
-	manifestPath = ".infracost/terraform_modules/manifest.v2.json"
+	manifestPath = ".infracost/terraform_modules/manifest.json"
 	// tfManifestPath is the name of the terraform module manifest file which stores the metadata of the modules
 	tfManifestPath = ".terraform/modules/modules.json"
+
+	supportedManifestVersion = "2.0"
 )
 
 // ModuleLoader handles the loading of Terraform modules. It supports local, registry and other remote modules.
@@ -140,6 +142,10 @@ func (m *ModuleLoader) Load(path string) (man *Manifest, err error) {
 		if err != nil {
 			m.logger.WithError(err).Debug("could not read module manifest")
 		}
+
+		if manifest.Version != supportedManifestVersion {
+			manifest = &Manifest{cachePath: m.cachePath}
+		}
 	}
 	m.cache.loadFromManifest(manifest)
 
@@ -149,6 +155,8 @@ func (m *ModuleLoader) Load(path string) (man *Manifest, err error) {
 	}
 
 	manifest.Modules = metadatas
+	manifest.Path = path
+	manifest.Version = supportedManifestVersion
 
 	err = writeManifest(manifest, manifestFilePath)
 	if err != nil {

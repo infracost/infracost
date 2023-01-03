@@ -174,7 +174,7 @@ func TestModuleMultipleUsesMissingManifest(t *testing.T) {
 	testLoaderE2E(t, "./testdata/module_multiple_uses", expectedModules, true)
 
 	// Remove the manifest file to test we can still work with broken manifests
-	err := os.Remove("./testdata/module_multiple_uses/.infracost/terraform_modules/manifest.v2.json")
+	err := os.Remove("./testdata/module_multiple_uses/.infracost/terraform_modules/manifest.json")
 	if !assert.NoError(t, err) {
 		t.FailNow()
 	}
