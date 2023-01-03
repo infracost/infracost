@@ -12,18 +12,18 @@ func TestMapDiskName(t *testing.T) {
 		requestedSize int
 		expected      string
 	}{
-		{"Standard_LRS", 32, "S4"},
-		{"Standard_LRS", 4000, "S50"},
-		{"Standard_LRS", 8192, "S60"},
-		{"Standard_LRS", 400000, ""},
-		{"StandardSSD_LRS", 32, "E4"},
-		{"StandardSSD_LRS", 4000, "E50"},
-		{"StandardSSD_LRS", 8192, "E60"},
-		{"StandardSSD_LRS", 400000, ""},
-		{"Premium_LRS", 32, "P4"},
-		{"Premium_LRS", 4000, "P50"},
-		{"Premium_LRS", 8192, "P60"},
-		{"Premium_LRS", 400000, ""},
+		{"Standard", 32, "S4"},
+		{"Standard", 4000, "S50"},
+		{"Standard", 8192, "S60"},
+		{"Standard", 400000, ""},
+		{"StandardSSD", 32, "E4"},
+		{"StandardSSD", 4000, "E50"},
+		{"StandardSSD", 8192, "E60"},
+		{"StandardSSD", 400000, ""},
+		{"Premium", 32, "P4"},
+		{"Premium", 4000, "P50"},
+		{"Premium", 8192, "P60"},
+		{"Premium", 400000, ""},
 	}
 
 	for _, test := range tests {
@@ -50,6 +50,22 @@ func TestMapUltraDiskSize(t *testing.T) {
 
 	for _, test := range tests {
 		actual := mapUltraDiskSize(test.requestedSize)
+		assert.Equal(t, test.expected, actual)
+	}
+}
+
+func TestMapStorageReplicationType(t *testing.T) {
+	tests := []struct {
+		storageType string
+		expected    bool
+	}{
+		{"LRS", true},
+		{"ZRS", true},
+		{"ABC", false},
+	}
+
+	for _, test := range tests {
+		actual := mapStorageReplicationType(test.storageType)
 		assert.Equal(t, test.expected, actual)
 	}
 }
