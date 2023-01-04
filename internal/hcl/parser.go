@@ -20,7 +20,6 @@ import (
 )
 
 var (
-	maxTfProjectSearchLevel       = 5
 	defaultTerraformWorkspaceName = "default"
 )
 

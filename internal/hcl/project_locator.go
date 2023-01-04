@@ -162,10 +162,18 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 	return projects
 }
 
+func (p *ProjectLocator) maxSearchDepth() int {
+	if p.useAllPaths {
+		return 10
+	}
+
+	return 5
+}
+
 func (p *ProjectLocator) walkPaths(fullPath string, level int) []string {
 	p.logger.Debugf("walking path %s to discover terraform files", fullPath)
 
-	if level >= maxTfProjectSearchLevel {
+	if level >= p.maxSearchDepth() {
 		p.logger.Debugf("exiting parsing directory %s as it is outside the maximum evaluation threshold", fullPath)
 		return nil
 	}
