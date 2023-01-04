@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/infracost/infracost/internal/logging"
+	intSync "github.com/infracost/infracost/internal/sync"
 	"github.com/infracost/infracost/internal/vcs"
 
 	"github.com/google/uuid"
@@ -29,6 +30,7 @@ type RunContext struct {
 	CMD         string
 	contextVals map[string]interface{}
 	mu          *sync.RWMutex
+	ModuleMutex *intSync.KeyMutex
 	StartTime   int64
 
 	isCommentCmd bool
@@ -57,6 +59,7 @@ func NewRunContextFromEnv(rootCtx context.Context) (*RunContext, error) {
 		State:       state,
 		contextVals: map[string]interface{}{},
 		mu:          &sync.RWMutex{},
+		ModuleMutex: &intSync.KeyMutex{},
 		StartTime:   time.Now().Unix(),
 	}
 
@@ -71,6 +74,7 @@ func EmptyRunContext() *RunContext {
 		State:       &State{},
 		contextVals: map[string]interface{}{},
 		mu:          &sync.RWMutex{},
+		ModuleMutex: &intSync.KeyMutex{},
 		StartTime:   time.Now().Unix(),
 		OutWriter:   os.Stdout,
 		ErrWriter:   os.Stderr,

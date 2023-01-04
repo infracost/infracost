@@ -13,7 +13,6 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/go-git/go-git/v5"
@@ -24,6 +23,7 @@ import (
 	"github.com/tidwall/gjson"
 
 	"github.com/infracost/infracost/internal/logging"
+	"github.com/infracost/infracost/internal/sync"
 )
 
 var (
@@ -249,30 +249,18 @@ func envToTime(key string) time.Time {
 	return t.UTC()
 }
 
-type keyMutex struct {
-	mutexes sync.Map // Zero value is empty and ready for use
-}
-
-func (m *keyMutex) Lock(key string) func() {
-	value, _ := m.mutexes.LoadOrStore(key, &sync.Mutex{})
-	mtx := value.(*sync.Mutex)
-	mtx.Lock()
-
-	return func() { mtx.Unlock() }
-}
-
 // metadataFetcher is an object designed to find metadata for different systems.
 // It is designed to be safe for parallelism. So interactions across branches and for different commits
 // will not affect other goroutines.
 type metadataFetcher struct {
-	mu     *keyMutex
+	mu     *sync.KeyMutex
 	client *http.Client
 	test   *bool
 }
 
 func newMetadataFetcher() *metadataFetcher {
 	return &metadataFetcher{
-		mu:     &keyMutex{},
+		mu:     &sync.KeyMutex{},
 		client: &http.Client{Timeout: time.Second * 5},
 	}
 }

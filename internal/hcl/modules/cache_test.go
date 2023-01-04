@@ -10,7 +10,7 @@ import (
 )
 
 func TestLookupModule(t *testing.T) {
-	keyMap := map[string]*ManifestModule{
+	toStore := map[string]*ManifestModule{
 		"module-a": {
 			Key:     "module-a",
 			Source:  "registry.terraform.io/namespace/module-a/aws",
@@ -45,9 +45,12 @@ func TestLookupModule(t *testing.T) {
 	logger := logrus.NewEntry(l)
 
 	cache := &Cache{
-		keyMap: keyMap,
 		disco:  NewDisco(nil, logrus.NewEntry(logrus.New())),
 		logger: logger,
+	}
+
+	for k, module := range toStore {
+		cache.keyMap.Store(k, module)
 	}
 
 	tests := []struct {
@@ -56,19 +59,19 @@ func TestLookupModule(t *testing.T) {
 		expected      *ManifestModule
 		expectedError string
 	}{
-		{"module-a", &tfconfig.ModuleCall{Source: "registry.terraform.io/namespace/module-a/aws", Version: ">=1.0"}, keyMap["module-a"], ""},
-		{"module-a", &tfconfig.ModuleCall{Source: "namespace/module-a/aws", Version: ">=1.0"}, keyMap["module-a"], ""},
+		{"module-a", &tfconfig.ModuleCall{Source: "registry.terraform.io/namespace/module-a/aws", Version: ">=1.0"}, toStore["module-a"], ""},
+		{"module-a", &tfconfig.ModuleCall{Source: "namespace/module-a/aws", Version: ">=1.0"}, toStore["module-a"], ""},
 		{"module-a", &tfconfig.ModuleCall{Source: "registry.terraform.io/namespace/module-a/aws", Version: ">=2.0"}, nil, "version constraint doesn't match"},
 		{"module-a", &tfconfig.ModuleCall{Source: "registry.terraform.io/different-namespace/module-a-/aws", Version: "1.0.0"}, nil, "source has changed"},
-		{"module-b", &tfconfig.ModuleCall{Source: "git::https://github.com/namespace/module-b.git?v=0.5.0"}, keyMap["module-b"], ""},
+		{"module-b", &tfconfig.ModuleCall{Source: "git::https://github.com/namespace/module-b.git?v=0.5.0"}, toStore["module-b"], ""},
 		{"module-b", &tfconfig.ModuleCall{Source: "git::https://github.com/namespace/module-b.git?v=0.6.0"}, nil, "source has changed"},
 		{"module-c", &tfconfig.ModuleCall{Source: "git::https://github.com/namespace/module-c.git?v=0.6.0"}, nil, "not in cache"},
-		{"module-d", &tfconfig.ModuleCall{Source: "app.terraform.io/infracost/ec2-instance/aws"}, keyMap["module-d"], ""},
-		{"submodule-a", &tfconfig.ModuleCall{Source: "registry.terraform.io/namespace/module-a/aws//submodule/path", Version: ">=1.0"}, keyMap["submodule-a"], ""},
-		{"submodule-a", &tfconfig.ModuleCall{Source: "namespace/module-a/aws//submodule/path", Version: ">=1.0"}, keyMap["submodule-a"], ""},
+		{"module-d", &tfconfig.ModuleCall{Source: "app.terraform.io/infracost/ec2-instance/aws"}, toStore["module-d"], ""},
+		{"submodule-a", &tfconfig.ModuleCall{Source: "registry.terraform.io/namespace/module-a/aws//submodule/path", Version: ">=1.0"}, toStore["submodule-a"], ""},
+		{"submodule-a", &tfconfig.ModuleCall{Source: "namespace/module-a/aws//submodule/path", Version: ">=1.0"}, toStore["submodule-a"], ""},
 		{"submodule-a", &tfconfig.ModuleCall{Source: "registry.terraform.io/namespace/module-a/aws//submodule/path", Version: ">=2.0"}, nil, "version constraint doesn't match"},
 		{"submodule-a", &tfconfig.ModuleCall{Source: "registry.terraform.io/different-namespace/module-a-/aws//submodule/path", Version: "1.0.0"}, nil, "source has changed"},
-		{"submodule-b", &tfconfig.ModuleCall{Source: "git::https://github.com/namespace/module-b.git//submodule/path?v=0.5.0"}, keyMap["submodule-b"], ""},
+		{"submodule-b", &tfconfig.ModuleCall{Source: "git::https://github.com/namespace/module-b.git//submodule/path?v=0.5.0"}, toStore["submodule-b"], ""},
 		{"submodule-b", &tfconfig.ModuleCall{Source: "git::https://github.com/namespace/module-b.git//submodule/path?v=0.6.0"}, nil, "source has changed"},
 	}
 

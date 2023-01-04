@@ -13,6 +13,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zclconf/go-cty/cty"
+
+	"github.com/infracost/infracost/internal/hcl/modules"
+	"github.com/infracost/infracost/internal/sync"
 )
 
 func Test_BasicParsing(t *testing.T) {
@@ -47,7 +50,9 @@ data "cats_cat" "the-cats-mother" {
 
 `)
 
-	parsers, err := LoadParsers(filepath.Dir(path), nil, newDiscardLogger(), OptionStopOnHCLError())
+	logger := newDiscardLogger()
+	loader := modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{})
+	parsers, err := LoadParsers(filepath.Dir(path), loader, nil, logger, OptionStopOnHCLError())
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -139,7 +144,8 @@ output "loadbalancer"  {
 }
 `)
 
-	parser := newParser(RootPath{Path: filepath.Dir(path)}, newDiscardLogger())
+	logger := newDiscardLogger()
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -211,7 +217,8 @@ output "exp2" {
 }
 `)
 
-	parser := newParser(RootPath{Path: filepath.Dir(path)}, newDiscardLogger())
+	logger := newDiscardLogger()
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -257,7 +264,8 @@ output "instances" {
 }
 `)
 
-	parser := newParser(RootPath{Path: filepath.Dir(path)}, newDiscardLogger())
+	logger := newDiscardLogger()
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -295,7 +303,8 @@ resource "other_resource" "test" {
 
 `)
 
-	parser := newParser(RootPath{Path: filepath.Dir(path)}, newDiscardLogger())
+	logger := newDiscardLogger()
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -339,7 +348,8 @@ output "attr_not_exists" {
 
 `)
 
-	parser := newParser(RootPath{Path: filepath.Dir(path)}, newDiscardLogger())
+	logger := newDiscardLogger()
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -378,7 +388,8 @@ resource "other_resource" "test" {
 
 `)
 
-	parser := newParser(RootPath{Path: filepath.Dir(path)}, newDiscardLogger())
+	logger := newDiscardLogger()
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -429,7 +440,8 @@ output "serviceendpoint_principals" {
 
 `)
 
-	parser := newParser(RootPath{Path: filepath.Dir(path)}, newDiscardLogger())
+	logger := newDiscardLogger()
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -466,7 +478,8 @@ output "val" {
 
 `)
 
-	parser := newParser(RootPath{Path: filepath.Dir(path)}, newDiscardLogger())
+	logger := newDiscardLogger()
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -483,7 +496,8 @@ output "val" {
 func Test_SetsHasChangesOnMod(t *testing.T) {
 	path := createTestFile("test.tf", `variable "foo" {}`)
 
-	parser := newParser(RootPath{Path: filepath.Dir(path), HasChanges: true}, newDiscardLogger())
+	logger := newDiscardLogger()
+	parser := newParser(RootPath{Path: filepath.Dir(path), HasChanges: true}, modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -504,7 +518,8 @@ output "val" {
 
 `)
 
-	parser := newParser(RootPath{Path: filepath.Dir(path)}, newDiscardLogger())
+	logger := newDiscardLogger()
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -542,7 +557,10 @@ output "mod_result" {
 		"module",
 	)
 
-	parsers, err := LoadParsers(path, nil, newDiscardLogger(), OptionStopOnHCLError())
+	logger := newDiscardLogger()
+	dir := filepath.Dir(path)
+	loader := modules.NewModuleLoader(dir, nil, logger, &sync.KeyMutex{})
+	parsers, err := LoadParsers(path, loader, nil, logger, OptionStopOnHCLError())
 	require.NoError(t, err)
 	rootModule, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -600,7 +618,9 @@ output "mod_result" {
 		"",
 	)
 
-	parsers, err := LoadParsers(path, nil, newDiscardLogger(), OptionStopOnHCLError())
+	logger := newDiscardLogger()
+	loader := modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{})
+	parsers, err := LoadParsers(path, loader, nil, logger, OptionStopOnHCLError())
 	require.NoError(t, err)
 	rootModule, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -652,7 +672,8 @@ resource "aws_instance" "my_instance" {
 }
 `)
 
-	parser := newParser(RootPath{Path: filepath.Dir(path)}, newDiscardLogger())
+	logger := newDiscardLogger()
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -794,7 +815,9 @@ resource "test_resource_two" "test" {
 }
 `)
 
-	parsers, err := LoadParsers(filepath.Dir(path), nil, newDiscardLogger(), OptionStopOnHCLError())
+	logger := newDiscardLogger()
+	loader := modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{})
+	parsers, err := LoadParsers(filepath.Dir(path), loader, nil, logger, OptionStopOnHCLError())
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -854,7 +877,9 @@ output "mod_result" {
 		"",
 	)
 
-	parsers, err := LoadParsers(path, nil, newDiscardLogger(), OptionStopOnHCLError())
+	logger := newDiscardLogger()
+	loader := modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{})
+	parsers, err := LoadParsers(path, loader, nil, logger, OptionStopOnHCLError())
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)

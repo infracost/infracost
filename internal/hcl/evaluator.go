@@ -756,13 +756,7 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 		key = nestedModReplace.ReplaceAllString(key, ".")
 		key = modArrayPartReplace.ReplaceAllString(key, "")
 
-		for _, module := range e.moduleMetadata.Modules {
-			if module.Key == key {
-				modulePath = filepath.Clean(filepath.Join(e.module.RootPath, module.Dir))
-				break
-			}
-		}
-
+		modulePath = e.moduleMetadata.FindModulePath(key)
 		e.logger.Debugf("using path '%s' for module '%s' based on key '%s'", modulePath, b.FullName(), key)
 	}
 

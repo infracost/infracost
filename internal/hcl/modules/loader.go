@@ -1,17 +1,22 @@
 package modules
 
 import (
+	"crypto/md5" //nolint
 	"errors"
 	"fmt"
 	"os"
 	"path"
 	"path/filepath"
+	"runtime"
 	"strings"
+	"sync"
 
 	getter "github.com/hashicorp/go-getter"
 	"github.com/hashicorp/terraform-config-inspect/tfconfig"
 	"github.com/sirupsen/logrus"
+	"golang.org/x/sync/errgroup"
 
+	intSync "github.com/infracost/infracost/internal/sync"
 	"github.com/infracost/infracost/internal/ui"
 )
 
@@ -22,6 +27,8 @@ var (
 	manifestPath = ".infracost/terraform_modules/manifest.json"
 	// tfManifestPath is the name of the terraform module manifest file which stores the metadata of the modules
 	tfManifestPath = ".terraform/modules/modules.json"
+
+	supportedManifestVersion = "2.0"
 )
 
 // ModuleLoader handles the loading of Terraform modules. It supports local, registry and other remote modules.
@@ -31,38 +38,32 @@ var (
 // .infracost/terraform_modules directory. We could implement a global cache in the future, but for now have decided
 // to go with the same approach as Terraform.
 type ModuleLoader struct {
-	Path           string
-	cache          *Cache
+	NewSpinner ui.SpinnerFunc
+
+	// cachePath is the path to the directory that Infracost will download modules to.
+	// This is normally the top level directory of a multi-project environment, where the
+	// Infracost config file resides or project auto-detection starts from.
+	cachePath string
+	cache     *Cache
+	sync      *intSync.KeyMutex
+
 	packageFetcher *PackageFetcher
 	registryLoader *RegistryLoader
-	newSpinner     ui.SpinnerFunc
 	logger         *logrus.Entry
 }
 
-// LoaderOption defines a function that can set properties on an ModuleLoader.
-type LoaderOption func(l *ModuleLoader)
-
-// LoaderWithSpinner enables the ModuleLoader to use an ui.Spinner to show the progress of loading the modules.
-func LoaderWithSpinner(f ui.SpinnerFunc) LoaderOption {
-	return func(l *ModuleLoader) {
-		l.newSpinner = f
-	}
-}
-
 // NewModuleLoader constructs a new module loader
-func NewModuleLoader(path string, credentialsSource *CredentialsSource, logger *logrus.Entry, opts ...LoaderOption) *ModuleLoader {
+func NewModuleLoader(cachePath string, credentialsSource *CredentialsSource, logger *logrus.Entry, moduleSync *intSync.KeyMutex) *ModuleLoader {
 	fetcher := NewPackageFetcher(logger)
+	// we need to have a disco for each project that has defined credentials
 	d := NewDisco(credentialsSource, logger)
 
 	m := &ModuleLoader{
-		Path:           path,
+		cachePath:      cachePath,
 		cache:          NewCache(d, logger),
 		packageFetcher: fetcher,
 		logger:         logger,
-	}
-
-	for _, opt := range opts {
-		opt(m)
+		sync:           moduleSync,
 	}
 
 	m.registryLoader = NewRegistryLoader(fetcher, d, logger)
@@ -72,38 +73,63 @@ func NewModuleLoader(path string, credentialsSource *CredentialsSource, logger *
 
 // downloadDir returns the path to the directory where remote modules are downloaded relative to the current working directory
 func (m *ModuleLoader) downloadDir() string {
-	return filepath.Join(m.Path, downloadDir)
+	return filepath.Join(m.cachePath, downloadDir)
 }
 
 // manifestFilePath is the path to the module manifest file relative to the current working directory
-func (m *ModuleLoader) manifestFilePath() string {
-	return filepath.Join(m.Path, manifestPath)
+func (m *ModuleLoader) manifestFilePath(projectPath string) string {
+	if m.cachePath == projectPath {
+		return filepath.Join(m.cachePath, manifestPath)
+	}
+
+	rel, _ := filepath.Rel(m.cachePath, projectPath)
+	sum := md5.Sum([]byte(rel)) //nolint
+	return filepath.Join(m.cachePath, ".infracost/terraform_modules/", fmt.Sprintf("manifest-%x.json", sum))
 }
 
-// tfManifestFilePath is the path to the terraform module manifest file relative to the current working directory.
-func (m *ModuleLoader) tfManifestFilePath() string {
-	return filepath.Join(m.Path, tfManifestPath)
+// tfManifestFilePath is the path to the Terraform module manifest file relative to the current working directory.
+func (m *ModuleLoader) tfManifestFilePath(path string) string {
+	return filepath.Join(path, tfManifestPath)
 }
 
 // Load loads the modules from the given path.
 // For each module it checks if the module has already been downloaded, by checking if iut exists in the manifest
 // If not then it downloads the module from the registry or from a remote source and updates the module manifest with the latest metadata.
-func (m *ModuleLoader) Load() (*Manifest, error) {
-	if m.newSpinner != nil {
-		spin := m.newSpinner("Downloading Terraform modules")
+func (m *ModuleLoader) Load(path string) (man *Manifest, err error) {
+	defer func() {
+		if man != nil {
+			man.cachePath = m.cachePath
+		}
+	}()
+
+	if m.NewSpinner != nil {
+		spin := m.NewSpinner("Downloading Terraform modules")
 		defer spin.Success()
 	}
 
 	manifest := &Manifest{}
-
-	_, err := os.Stat(m.manifestFilePath())
+	manifestFilePath := m.manifestFilePath(path)
+	_, err = os.Stat(manifestFilePath)
 	if errors.Is(err, os.ErrNotExist) {
 		m.logger.Debug("No existing module manifest file found")
 
-		_, err = os.Stat(m.tfManifestFilePath())
+		tfManifestFilePath := m.tfManifestFilePath(path)
+		_, err = os.Stat(tfManifestFilePath)
 		if err == nil {
-			manifest, err = readManifest(m.tfManifestFilePath())
+			manifest, err = readManifest(tfManifestFilePath)
 			if err == nil {
+				// let's make the module dirs relative to the path directory as later
+				// we'll look up the modules based on the cache path at the Infracost root (where the infracost.yml
+				// resides or where the --path autodetect started for multi-project)
+				for i, module := range manifest.Modules {
+					dir := path
+					if m.cachePath != "" {
+						dir, _ = filepath.Rel(m.cachePath, path)
+					}
+
+					manifest.Modules[i].Dir = filepath.Join(dir, module.Dir)
+				}
+
 				return manifest, nil
 			}
 
@@ -112,22 +138,27 @@ func (m *ModuleLoader) Load() (*Manifest, error) {
 	} else if err != nil {
 		m.logger.WithError(err).Debug("error checking for existing module manifest")
 	} else {
-		manifest, err = readManifest(m.manifestFilePath())
+		manifest, err = readManifest(manifestFilePath)
 		if err != nil {
 			m.logger.WithError(err).Debug("could not read module manifest")
 		}
-	}
 
+		if manifest.Version != supportedManifestVersion {
+			manifest = &Manifest{cachePath: m.cachePath}
+		}
+	}
 	m.cache.loadFromManifest(manifest)
 
-	metadatas, err := m.loadModules(m.Path, "")
+	metadatas, err := m.loadModules(path, "")
 	if err != nil {
 		return nil, err
 	}
 
 	manifest.Modules = metadatas
+	manifest.Path = path
+	manifest.Version = supportedManifestVersion
 
-	err = writeManifest(manifest, m.manifestFilePath())
+	err = writeManifest(manifest, manifestFilePath)
 	if err != nil {
 		m.logger.WithError(err).Debug("error writing module manifest")
 	}
@@ -141,23 +172,49 @@ func (m *ModuleLoader) loadModules(path string, prefix string) ([]*ManifestModul
 
 	module, diags := tfconfig.LoadModule(path)
 	if diags.HasErrors() {
-		return nil, diags.Err()
+		return nil, fmt.Errorf("failed to inspect module path %s diag: %w", path, diags.Err())
 	}
 
+	numJobs := len(module.ModuleCalls)
+	jobs := make(chan *tfconfig.ModuleCall, numJobs)
 	for _, moduleCall := range module.ModuleCalls {
-		metadata, err := m.loadModule(moduleCall, path, prefix)
-		if err != nil {
-			return nil, err
-		}
+		jobs <- moduleCall
+	}
+	close(jobs)
 
-		manifestModules = append(manifestModules, metadata)
+	errGroup := &errgroup.Group{}
+	manifestMu := sync.Mutex{}
 
-		nestedManifestModules, err := m.loadModules(filepath.Join(m.Path, metadata.Dir), metadata.Key+".")
-		if err != nil {
-			return nil, err
-		}
+	for i := 0; i < getProcessCount(); i++ {
+		errGroup.Go(func() error {
+			for moduleCall := range jobs {
+				metadata, err := m.loadModule(moduleCall, path, prefix)
+				if err != nil {
+					return err
+				}
 
-		manifestModules = append(manifestModules, nestedManifestModules...)
+				manifestMu.Lock()
+				manifestModules = append(manifestModules, metadata)
+				manifestMu.Unlock()
+
+				moduleDir := filepath.Join(m.cachePath, metadata.Dir)
+				nestedManifestModules, err := m.loadModules(moduleDir, metadata.Key+".")
+				if err != nil {
+					return err
+				}
+
+				manifestMu.Lock()
+				manifestModules = append(manifestModules, nestedManifestModules...)
+				manifestMu.Unlock()
+			}
+
+			return nil
+		})
+	}
+
+	err := errGroup.Wait()
+	if err != nil {
+		return manifestModules, fmt.Errorf("could not load modules for path %s %w", path, err)
 	}
 
 	return manifestModules, nil
@@ -171,6 +228,7 @@ func (m *ModuleLoader) loadModules(path string, prefix string) ([]*ManifestModul
 // 4. Checks if the module is a remote module and downloads it.
 func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath string, prefix string) (*ManifestModule, error) {
 	key := prefix + moduleCall.Name
+	source := moduleCall.Source
 
 	manifestModule, err := m.cache.lookupModule(key, moduleCall)
 	if err == nil {
@@ -179,7 +237,7 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 		// Test if we can actually load the module. If not, then we should try re-loading it.
 		// This can happen if the directory the module was downloaded to has been deleted and moved
 		// so the existing manifest.json is out-of-date.
-		_, diags := tfconfig.LoadModule(path.Join(m.Path, manifestModule.Dir))
+		_, diags := tfconfig.LoadModule(path.Join(m.cachePath, manifestModule.Dir))
 		if !diags.HasErrors() {
 			return manifestModule, err
 		}
@@ -191,11 +249,11 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 
 	manifestModule = &ManifestModule{
 		Key:    key,
-		Source: moduleCall.Source,
+		Source: source,
 	}
 
 	if m.isLocalModule(moduleCall) {
-		dir, err := filepath.Rel(m.Path, filepath.Join(parentPath, moduleCall.Source))
+		dir, err := filepath.Rel(m.cachePath, filepath.Join(parentPath, source))
 		if err != nil {
 			return nil, err
 		}
@@ -205,21 +263,19 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 		return manifestModule, nil
 	}
 
-	dest := filepath.Join(m.downloadDir(), key)
-
-	// Since we're downloading the module, make sure any old installation of it is removed
-	// since this can cause issues with go-getter
-	err = os.RemoveAll(dest)
-	if err != nil && !os.IsNotExist(err) {
-		return nil, fmt.Errorf("error cleaning up existing module from '%s': %w", dest, err)
-	}
-
-	moduleAddr, submodulePath, err := splitModuleSubDir(moduleCall.Source)
+	moduleAddr, submodulePath, err := splitModuleSubDir(source)
 	if err != nil {
 		return nil, err
 	}
 
-	moduleDownloadDir, err := filepath.Rel(m.Path, dest)
+	hash := fmt.Sprintf("%x", md5.Sum([]byte(moduleAddr+moduleCall.Version))) //nolint
+	dest := filepath.Join(m.downloadDir(), hash)
+
+	// lock the module address so that we don't interact with an incomplete download.
+	unlock := m.sync.Lock(moduleAddr)
+	defer unlock()
+
+	moduleDownloadDir, err := filepath.Rel(m.cachePath, dest)
 	if err != nil {
 		return nil, err
 	}
@@ -231,21 +287,31 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 	}
 
 	if lookupResult.OK {
+		// The moduleCall.Source might not have the registry hostname if it is using the default registry
+		// so we set the source here to the lookup result's source which always includes the registry hostname.
+		manifestModule.Source = joinModuleSubDir(lookupResult.ModuleURL.RawSource, submodulePath)
+		manifestModule.Version = lookupResult.Version
+
+		_, err = os.Stat(dest)
+		if err == nil {
+			return manifestModule, nil
+		}
+
 		err = m.registryLoader.downloadModule(lookupResult, dest)
 		if err != nil {
 			return nil, fmt.Errorf("failed to download registry module %s: %w", key, err)
 		}
 
-		// The moduleCall.Source might not have the registry hostname if it is using the default registry
-		// so we set the source here to the lookup result's source which always includes the registry hostname.
-		manifestModule.Source = joinModuleSubDir(lookupResult.ModuleURL.RawSource, submodulePath)
-
-		manifestModule.Version = lookupResult.Version
 		return manifestModule, nil
 	}
 
 	m.logger.Debugf("Detected %s as remote module", key)
-	m.logger.Debugf("Downloading module %s from remote %s", key, moduleCall.Source)
+	m.logger.Debugf("Downloading module %s from remote %s", key, source)
+
+	_, err = os.Stat(dest)
+	if err == nil {
+		return manifestModule, nil
+	}
 
 	err = m.packageFetcher.fetch(moduleAddr, dest)
 	if err != nil {
@@ -258,10 +324,10 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 // isLocalModule checks if the module is a local module by checking
 // if the module source starts with any known local prefixes
 func (m *ModuleLoader) isLocalModule(moduleCall *tfconfig.ModuleCall) bool {
-	return (strings.HasPrefix(moduleCall.Source, "./") ||
+	return strings.HasPrefix(moduleCall.Source, "./") ||
 		strings.HasPrefix(moduleCall.Source, "../") ||
 		strings.HasPrefix(moduleCall.Source, ".\\") ||
-		strings.HasPrefix(moduleCall.Source, "..\\"))
+		strings.HasPrefix(moduleCall.Source, "..\\")
 }
 
 func splitModuleSubDir(moduleSource string) (string, string, error) {
@@ -279,4 +345,18 @@ func joinModuleSubDir(moduleAddr string, submodulePath string) string {
 	}
 
 	return moduleAddr
+}
+
+func getProcessCount() int {
+	numWorkers := 4
+	numCPU := runtime.NumCPU()
+
+	if numCPU*4 > numWorkers {
+		numWorkers = numCPU * 4
+	}
+	if numWorkers > 16 {
+		numWorkers = 16
+	}
+
+	return numWorkers
 }

@@ -124,14 +124,16 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 
 	options = append(options,
 		hcl.OptionWithTerraformWorkspace(localWorkspace),
-		hcl.OptionWithCredentialsSource(credsSource),
 	)
 
 	logger := ctx.Logger().WithFields(log.Fields{"provider": "terraform_dir"})
 	locatorConfig := &hcl.ProjectLocatorConfig{ExcludedSubDirs: ctx.ProjectConfig.ExcludePaths, ChangedObjects: ctx.RunContext.VCSMetadata.Commit.ChangedObjects, UseAllPaths: ctx.ProjectConfig.IncludeAllPaths}
 
+	path := ctx.RunContext.Config.RepoPath()
+	loader := modules.NewModuleLoader(path, credsSource, logger, ctx.RunContext.ModuleMutex)
 	parsers, err := hcl.LoadParsers(
 		ctx.ProjectConfig.Path,
+		loader,
 		locatorConfig,
 		logger,
 		options...,
