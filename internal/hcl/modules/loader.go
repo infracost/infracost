@@ -84,7 +84,7 @@ func (m *ModuleLoader) manifestFilePath(projectPath string) string {
 
 	rel, _ := filepath.Rel(m.cachePath, projectPath)
 	sum := md5.Sum([]byte(rel)) //nolint
-	return filepath.Join(m.cachePath, ".infracost/terraform_modules/", fmt.Sprintf("%x.json", sum))
+	return filepath.Join(m.cachePath, ".infracost/terraform_modules/", fmt.Sprintf("manifest-%x.json", sum))
 }
 
 // tfManifestFilePath is the path to the Terraform module manifest file relative to the current working directory.
