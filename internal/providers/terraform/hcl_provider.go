@@ -35,11 +35,10 @@ type HCLProvider struct {
 	planJSONParser *Parser
 	logger         *log.Entry
 
-	schema      *PlanSchema
-	providerKey string
-	ctx         *config.ProjectContext
-	cache       []*hcl.Module
-	config      HCLProviderConfig
+	schema *PlanSchema
+	ctx    *config.ProjectContext
+	cache  []*hcl.Module
+	config HCLProviderConfig
 }
 
 type HCLProviderConfig struct {
@@ -396,8 +395,6 @@ func (p *HCLProvider) newPlanSchema() {
 			},
 		},
 	}
-
-	p.providerKey = ""
 }
 
 func (p *HCLProvider) modulesToPlanJSON(rootModule *hcl.Module) ([]byte, error) {
@@ -498,7 +495,8 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 	changes.Change.After = jsonValues
 	planned.Values = jsonValues
 
-	providerConfigKey := p.providerKey
+	providerConfigKey := strings.Split(block.TypeLabel(), "_")[0]
+
 	providerAttr := block.GetAttribute("provider")
 	if providerAttr != nil {
 		r, err := providerAttr.Reference()
@@ -557,10 +555,6 @@ func (p *HCLProvider) marshalProviderBlock(block *hcl.Block) string {
 				"constant_value": region,
 			},
 		},
-	}
-
-	if p.providerKey == "" {
-		p.providerKey = name
 	}
 
 	return name
