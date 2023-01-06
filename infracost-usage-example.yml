@@ -1193,6 +1193,7 @@ resource_usage:
     monthly_instance_hours: 730 # Monthly number of instance hours
     storage: 20 # GBs of storage associated with the instance
     rational_dev_studio_licenses: 0 # Number IBM Rational Dev Studio Licenses, only valid for IBM i
+    epic: 0 # Epic workload configuration
 
   ibm_resource_instance.resource_instance_kms: 
     kms_key_versions: 300 # Number of key versions managed per month
