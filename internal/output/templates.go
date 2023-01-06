@@ -320,7 +320,7 @@ var CommentMarkdownWithHTMLTemplate = `
 {{- if gt (len .Root.Projects) 1  }}
   <tbody>
   {{- range .Root.Projects }}
-    {{- if hasDiff . }}
+    {{- if showProject . }}
       {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
     {{- end }}
   {{- end }}
@@ -328,7 +328,13 @@ var CommentMarkdownWithHTMLTemplate = `
   </tbody>
 </table>
 
-  {{- if eq .SkippedProjectCount 1 }}
+  {{- if eq .SkippedUnchangedProjectCount 1 }}
+
+1 project has no code changes.
+  {{- else if gt .SkippedUnchangedProjectCount  0 }}
+
+{{ .SkippedUnchangedProjectCount }} projects have no code changes.
+  {{- else if eq .SkippedProjectCount 1 }}
 
 1 project has no cost estimate changes.
   {{- else if gt .SkippedProjectCount  0 }}
@@ -359,16 +365,28 @@ var CommentMarkdownWithHTMLTemplate = `
 		<details>
 			<summary><strong>❌ Policy checks failed</strong></summary>
 				{{ range $v, $f := .Options.PolicyChecks.Failures}}
-> {{ $f }}
+> - {{ $f }}
 				{{- end}}
 		</details>
 	{{ else }}
 		<details>
 			<summary><strong>✅ Policy checks passed</strong></summary>
 			{{ range $v, $f := .Options.PolicyChecks.Passed}}
-> {{ $f }}
+> - {{ $f }}
 			{{- end}}
 		</details>
+	{{- end }}
+{{- end }}
+{{- if .Options.GuardrailCheck.Comment }}
+	{{- if gt (len .Options.GuardrailCheck.CommentableFailures) 0 }}
+		<details>
+			<summary><strong>❌ Guardrail checks failed</strong></summary>
+				{{ range $v, $f := .Options.GuardrailCheck.CommentableFailures}}
+> - {{ $f }}
+				{{- end}}
+		</details>
+	{{ else }}
+<strong>✅ Guardrail checks passed</strong>
 	{{- end }}
 {{- end }}
 {{- if .MarkdownOptions.WillUpdate }}
@@ -402,7 +420,7 @@ var CommentMarkdownTemplate = `
 
 {{- if gt (len .Root.Projects) 1  }}
   {{- range .Root.Projects }}
-    {{- if hasDiff . }}
+    {{- if showProject . }}
       {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
     {{- end }}
   {{- end }}

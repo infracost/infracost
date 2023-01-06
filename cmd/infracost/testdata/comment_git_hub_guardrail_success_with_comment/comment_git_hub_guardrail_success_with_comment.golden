@@ -1,0 +1,8 @@
+Comment posted to GitHub
+
+Logs:
+level=info msg="Estimate uploaded to Infracost Cloud"
+level=info msg="1 guardrail checked"
+level=info msg="Creating new comment"
+level=warning msg=">\\n<strong>✅ Guardrail checks passed</strong>\\n\\n<sub>\\n  Is this comment useful? <a href=\\\"https://dashboard.infracost.io/feedback/redirect?runId=&value=yes\\\" rel=\\\"noopener noreferrer\\\" target=\\\"_blank\\\">Yes</a>, <a href=\\\"https://dashboard.infracost.io/feedback/redirect?runId=&value=no\\\" rel=\\\"noopener noreferrer\\\" target=\\\"_blank\\\">No</a>, <a href=\\\"https://dashboard.infracost.io/feedback/redirect?runId=&value=other\\\" rel=\\\"noopener noreferrer\\\" target=\\\"_blank\\\">Other</a>\\n</sub>\\n\"}\n"
+level=info msg="Created new comment: "

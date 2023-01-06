@@ -12,7 +12,7 @@ Project: infracost/infracost/cmd/infracost/testdata/plan_with_terraform_wrapper.
                                                                                                                       
  aws_lambda_function.hello_world                                                                                      
  ├─ Requests                                            Monthly cost depends on usage: $0.20 per 1M requests          
- └─ Duration                                            Monthly cost depends on usage: $0.0000166667 per GB-seconds   
+ └─ Duration (first 6B)                                 Monthly cost depends on usage: $0.0000166667 per GB-seconds   
                                                                                                                       
  OVERALL TOTAL                                                                                                $742.64 
 ──────────────────────────────────

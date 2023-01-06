@@ -77,15 +77,18 @@ func commentGitLabCmd(ctx *config.RunContext) *cobra.Command {
 
 			paths, _ := cmd.Flags().GetStringArray("path")
 
-			body, err := buildCommentBody(cmd, ctx, paths, output.MarkdownOptions{
+			body, hasDiff, err := buildCommentBody(cmd, ctx, paths, output.MarkdownOptions{
 				WillUpdate:          mrNumber != 0 && behavior == "update",
 				WillReplace:         mrNumber != 0 && behavior == "delete-and-new",
 				IncludeFeedbackLink: true,
 			})
 			var policyFailure output.PolicyCheckFailures
+			var guardrailFailure output.GuardrailFailures
 			if err != nil {
 				if v, ok := err.(output.PolicyCheckFailures); ok {
 					policyFailure = v
+				} else if v, ok := err.(output.GuardrailFailures); ok {
+					guardrailFailure = v
 				} else {
 					return err
 				}
@@ -93,7 +96,9 @@ func commentGitLabCmd(ctx *config.RunContext) *cobra.Command {
 
 			dryRun, _ := cmd.Flags().GetBool("dry-run")
 			if !dryRun {
-				err = commentHandler.CommentWithBehavior(ctx.Context(), behavior, string(body))
+				skipNoDiff, _ := cmd.Flags().GetBool("skip-no-diff")
+
+				posted, err := commentHandler.CommentWithBehavior(ctx.Context(), !hasDiff && skipNoDiff, behavior, string(body))
 				if err != nil {
 					return err
 				}
@@ -104,7 +109,11 @@ func commentGitLabCmd(ctx *config.RunContext) *cobra.Command {
 					logging.Logger.WithError(err).Error("could not report infracost-comment event")
 				}
 
-				cmd.Println("Comment posted to GitLab")
+				if posted {
+					cmd.Println("Comment posted to GitLab")
+				} else {
+					cmd.Println("Comment not posted to GitHub (GitLab)")
+				}
 			} else {
 				cmd.Println(string(body))
 				cmd.Println("Comment not posted to GitLab (--dry-run was specified)")
@@ -112,6 +121,9 @@ func commentGitLabCmd(ctx *config.RunContext) *cobra.Command {
 
 			if policyFailure != nil {
 				return policyFailure
+			}
+			if guardrailFailure != nil {
+				return guardrailFailure
 			}
 
 			return nil

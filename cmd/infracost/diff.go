@@ -102,6 +102,7 @@ func runCompare(cmd *cobra.Command, ctx *config.RunContext, current output.Root)
 		ShowSkipped:       ctx.Config.ShowSkipped,
 		NoColor:           ctx.Config.NoColor,
 		Fields:            ctx.Config.Fields,
+		CurrencyFormat:    ctx.Config.CurrencyFormat,
 	})
 	if err != nil {
 		return err

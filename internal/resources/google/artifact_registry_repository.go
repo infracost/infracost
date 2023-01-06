@@ -78,17 +78,18 @@ func (r *ArtifactRegistryRepository) PopulateUsage(u *schema.UsageData) {
 // as a schema.Resource with two main cost components: storage costs & egress costs.
 //
 // Storage costs:
-// 		priced at $0.10 a month after artifact registry usage is > 0.5 GB. We ignore the free tier as there
-// 		is no way to currently tell if other artifact registry resources have gone beyond this free usage tier.
+//
+//	priced at $0.10 a month after artifact registry usage is > 0.5 GB. We ignore the free tier as there
+//	is no way to currently tell if other artifact registry resources have gone beyond this free usage tier.
 //
 // Network costs:
-//		1. free within the same region
-// 		2. free from multi-region to a region within the same continent, e.g. europe -> europe-west1
-//		3. $0.01 when between different regions in North America continent
-// 		4. $0.02 when between different regions in Europe continent
-//		5. $0.05 when between different regions in AsiaPacific continent
-// 		6. $0.15 when between any region and Oceania continent
-// 		7. $0.08 for all other intercontinental data transfer
+//  1. free within the same region
+//  2. free from multi-region to a region within the same continent, e.g. europe -> europe-west1
+//  3. $0.01 when between different regions in North America continent
+//  4. $0.02 when between different regions in Europe continent
+//  5. $0.05 when between different regions in AsiaPacific continent
+//  6. $0.15 when between any region and Oceania continent
+//  7. $0.08 for all other intercontinental data transfer
 //
 // This method is called after the resource is initialised by an IaC provider. See providers folder for more information.
 func (r *ArtifactRegistryRepository) BuildResource() *schema.Resource {

@@ -12,7 +12,7 @@ Project: infracost/infracost/cmd/infracost/testdata/breakdown_terraform_director
                                                                                                                                       
  aws_lambda_function.hello_world                                                                                                      
  ├─ Requests                                                            Monthly cost depends on usage: $0.20 per 1M requests          
- └─ Duration                                                            Monthly cost depends on usage: $0.0000166667 per GB-seconds   
+ └─ Duration (first 6B)                                                 Monthly cost depends on usage: $0.0000166667 per GB-seconds   
                                                                                                                                       
  module.big_app.aws_instance.web_app                                                                                                  
  ├─ Instance usage (Linux/UNIX, on-demand, m5.8xlarge)                                  730  hours                          $1,121.28 

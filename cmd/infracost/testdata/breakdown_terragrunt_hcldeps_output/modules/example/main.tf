@@ -23,6 +23,10 @@ variable "hello_world_function_memory_size" {
   type        = number
 }
 
+variable "test_input" {
+  type = object({})
+}
+
 resource "aws_instance" "web_app" {
   ami           = "ami-674cbc1e"
   instance_type = var.instance_type

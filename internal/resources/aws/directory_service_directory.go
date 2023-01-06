@@ -46,18 +46,20 @@ var (
 // Read more about Directory service here: https://aws.amazon.com/directoryservice/
 // Microsoft Active Directory here: https://docs.aws.amazon.com/directoryservice/latest/admin-guide/directory_microsoft_ad.html
 // Other Supported Active Directory types here:
-//		https://docs.aws.amazon.com/directoryservice/latest/admin-guide/directory_simple_ad.html
-//		https://docs.aws.amazon.com/directoryservice/latest/admin-guide/directory_simple_ad.html
 //
-// DirectoryServicePricing pricing is based on
+//	https://docs.aws.amazon.com/directoryservice/latest/admin-guide/directory_simple_ad.html
+//	https://docs.aws.amazon.com/directoryservice/latest/admin-guide/directory_simple_ad.html
+//
+// # DirectoryServicePricing pricing is based on
 //
 // > Hourly price based on the type and edition (only Microsoft AD) of the directory service directory
 // > Additional hourly price added directory per account/vpc the directory is shared with (only Microsoft AD)
 // > Costs for data transfer out (on a per-region basis)
 //
 // More information on pricing can be found here:
-//		https://aws.amazon.com/directoryservice/pricing/
-// 		https://aws.amazon.com/directoryservice/other-directories-pricing/
+//
+//	https://aws.amazon.com/directoryservice/pricing/
+//	https://aws.amazon.com/directoryservice/other-directories-pricing/
 type DirectoryServiceDirectory struct {
 	// Address is the unique name of the resource in terraform/cloudfront.
 	Address string

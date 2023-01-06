@@ -168,6 +168,9 @@ var FreeResources = []string{
 	"azurerm_app_service_source_control_token",
 	"azurerm_app_service_virtual_network_swift_connection",
 
+	// Azure Attestation
+	"azurerm_attestation_provider",
+
 	// Azure Automation
 	"azurerm_automation_certificate",
 	"azurerm_automation_connection",

@@ -23,14 +23,14 @@ var (
 //
 // Attributes are key/value pairs that are part of a Block. For example take the following Block:
 //
-//		resource "aws_instance" "t3_standard" {
-//		  	ami           = "fake_ami"
-//  		instance_type = "t3.medium"
+//			resource "aws_instance" "t3_standard" {
+//			  	ami           = "fake_ami"
+//	 		instance_type = "t3.medium"
 //
-//  		credit_specification {
-//    			cpu_credits = "standard"
-//  		}
-//		}
+//	 		credit_specification {
+//	   			cpu_credits = "standard"
+//	 		}
+//			}
 //
 // "ami" & "instance_type" are the Attributes of this Block, "credit_specification" is a child Block
 // see Block.Children for more info.
@@ -121,7 +121,7 @@ func (attr *Attribute) AsString() string {
 // that the Context carries.
 func (attr *Attribute) Value() cty.Value {
 	if attr == nil {
-		return cty.NilVal
+		return cty.DynamicVal
 	}
 
 	attr.Logger.Debug("fetching attribute value")
@@ -131,8 +131,8 @@ func (attr *Attribute) Value() cty.Value {
 func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 	defer func() {
 		if err := recover(); err != nil {
-			attr.Logger.Debugf("could not evaluate value for attr: %s. This is most likely an issue in the underlying hcl/go-cty libraries and can be ignored, but we log the stacktrace for debugging purposes. Err: %s\n%s", attr.Name(), err, debug.Stack())
-			ctyVal = cty.NilVal
+			trace := debug.Stack()
+			attr.Logger.Debugf("could not evaluate value for attr: %s. This is most likely an issue in the underlying hcl/go-cty libraries and can be ignored, but we log the stacktrace for debugging purposes. Err: %s\n%s", attr.Name(), err, trace)
 		}
 	}()
 
@@ -199,12 +199,12 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 // traverseVarAndSetCtx uses the hcl traversal to build a mocked attribute on the evaluation context.
 // hcl Traversals from missing are normally provided in the following manner:
 //
-// 1. The root traversal or TraverseRoot fetches the top level reference for the block. We use this traversal to
-//    determine which ctx we use. We loop through the list of EvaluationContext until we find an entry matching the
-//    reference. If there is none, we exit, this shouldn't happen and is likely an indicator of a bug.
-// 2. The remaining attribute traversals or TraverseAttr. These use the value fetched from the context by the TraverseRoot
-//    to find the value of the attribute the expression is trying to evaluate. In our case this is the attribute that
-//    we need to populate with a mocked value.
+//  1. The root traversal or TraverseRoot fetches the top level reference for the block. We use this traversal to
+//     determine which ctx we use. We loop through the list of EvaluationContext until we find an entry matching the
+//     reference. If there is none, we exit, this shouldn't happen and is likely an indicator of a bug.
+//  2. The remaining attribute traversals or TraverseAttr. These use the value fetched from the context by the TraverseRoot
+//     to find the value of the attribute the expression is trying to evaluate. In our case this is the attribute that
+//     we need to populate with a mocked value.
 //
 // Once we've found the missing attribute we set a mocked value and return. This value should now be available for
 // the entire context evaluation as ctx is share across all blocks.
@@ -226,37 +226,39 @@ func traverseVarAndSetCtx(ctx *hcl.EvalContext, traversal hcl.Traversal, mock ct
 		return
 	}
 
-	ob := ctx.Variables[rootName].AsValueMap()
-	if ob == nil {
-		ob = make(map[string]cty.Value)
+	ob := ctx.Variables[rootName]
+	if ob.IsNull() || !ob.IsKnown() {
+		ob = cty.ObjectVal(make(map[string]cty.Value))
 	}
 
-	ob = buildObject(traversal, ob, mock, 0)
-	ctx.Variables[rootName] = cty.ObjectVal(ob)
+	ctx.Variables[rootName] = buildObject(traversal, ob, mock, 0)
 }
 
 // buildObject builds an attribute map from the traversal. It fills any missing attributes that are
 // defined by the traversal.
-func buildObject(traversal hcl.Traversal, ob map[string]cty.Value, mock cty.Value, i int) map[string]cty.Value {
+func buildObject(traversal hcl.Traversal, value cty.Value, mock cty.Value, i int) cty.Value {
 	if i > len(traversal)-1 {
-		return ob
+		return value
 	}
 
 	traverser := traversal[i]
+	valueMap := value.AsValueMap()
+	if valueMap == nil {
+		valueMap = make(map[string]cty.Value)
+	}
 
 	// traverse splat is a special holding type which means we want to traverse all the attributes on the map.
 	if _, ok := traverser.(hcl.TraverseSplat); ok {
-		for k, v := range ob {
+		for k, v := range valueMap {
 			if v.Type().IsObjectType() {
-				valueMap := v.AsValueMap()
-				ob[k] = cty.ObjectVal(buildObject(traversal, valueMap, mock, i+1))
+				valueMap[k] = buildObject(traversal, v, mock, i+1)
 				continue
 			}
 
-			ob[k] = v
+			valueMap[k] = v
 		}
 
-		return ob
+		return cty.ObjectVal(valueMap)
 	}
 
 	if index, ok := traverser.(hcl.TraverseIndex); ok {
@@ -267,15 +269,18 @@ func buildObject(traversal hcl.Traversal, ob map[string]cty.Value, mock cty.Valu
 
 		k := kc.AsString()
 
-		if vv, exists := ob[k]; exists {
-			val := buildObject(traversal, vv.AsValueMap(), mock, i+1)
-			ob[k] = cty.ObjectVal(val)
-			return ob
+		if vv, exists := valueMap[k]; exists {
+			valueMap[k] = buildObject(traversal, vv, mock, i+1)
+			return cty.ObjectVal(valueMap)
 		}
 
-		val := buildObject(traversal, make(map[string]cty.Value), mock, i+1)
-		ob[k] = cty.ObjectVal(val)
-		return ob
+		if len(traversal)-1 == i {
+			valueMap[k] = mock
+		} else {
+			valueMap[k] = buildObject(traversal, cty.ObjectVal(make(map[string]cty.Value)), mock, i+1)
+		}
+
+		return cty.ObjectVal(valueMap)
 	}
 
 	if v, ok := traverser.(hcl.TraverseAttr); ok {
@@ -284,26 +289,26 @@ func buildObject(traversal hcl.Traversal, ob map[string]cty.Value, mock cty.Valu
 			// then we should return here. It's most likely that we weren't able to
 			// get the full variable calls for the context, so resetting the value could
 			// be harmful.
-			if _, exists := ob[v.Name]; exists && mock.Type() == cty.String {
-				return ob
+			if _, exists := valueMap[v.Name]; exists && mock.Type() == cty.String {
+				return value
 			}
 
-			ob[v.Name] = mock
-			return ob
+			valueMap[v.Name] = mock
+			return cty.ObjectVal(valueMap)
 		}
 
-		if vv, exists := ob[v.Name]; exists {
+		if vv, exists := valueMap[v.Name]; exists {
 			if isList(vv) {
 				items := make([]cty.Value, vv.LengthInt())
 				it := vv.ElementIterator()
 				for it.Next() {
 					key, sourceItem := it.Element()
-					val := buildObject(traversal, sourceItem.AsValueMap(), mock, i+1)
+					val := buildObject(traversal, sourceItem, mock, i+1)
 					i, _ := key.AsBigFloat().Int64()
-					items[i] = cty.ObjectVal(val)
+					items[i] = val
 				}
-				ob[v.Name] = cty.TupleVal(items)
-				return ob
+				valueMap[v.Name] = cty.TupleVal(items)
+				return cty.ObjectVal(valueMap)
 			}
 
 			next := traversal[i+1]
@@ -313,17 +318,15 @@ func buildObject(traversal hcl.Traversal, ob map[string]cty.Value, mock cty.Valu
 				}
 			}
 
-			val := buildObject(traversal, vv.AsValueMap(), mock, i+1)
-			ob[v.Name] = cty.ObjectVal(val)
-			return ob
+			valueMap[v.Name] = buildObject(traversal, vv, mock, i+1)
+			return cty.ObjectVal(valueMap)
 		}
 
-		val := buildObject(traversal, make(map[string]cty.Value), mock, i+1)
-		ob[v.Name] = cty.ObjectVal(val)
-		return ob
+		valueMap[v.Name] = buildObject(traversal, cty.ObjectVal(make(map[string]cty.Value)), mock, i+1)
+		return cty.ObjectVal(valueMap)
 	}
 
-	return buildObject(traversal, ob, mock, i+1)
+	return buildObject(traversal, value, mock, i+1)
 }
 
 // findCorrectCtx uses name to find the correct context to target. findCorrectCtx returns the first
@@ -414,25 +417,25 @@ func (attr *Attribute) getIndexValue(part hcl.TraverseIndex) string {
 // referenced block. Reference achieves this by traversing the Attribute Expression in order to find the
 // parent block. E.g. with the following HCL
 //
-// 		resource "aws_launch_template" "foo2" {
-// 			name = "foo2"
-// 		}
+//	resource "aws_launch_template" "foo2" {
+//		name = "foo2"
+//	}
 //
-//		resource "some_resource" "example_with_launch_template_3" {
-//			...
-//			name    = aws_launch_template.foo2.name
-//		}
+//	resource "some_resource" "example_with_launch_template_3" {
+//		...
+//		name    = aws_launch_template.foo2.name
+//	}
 //
 // The Attribute some_resource.name would have a reference of
 //
-//		Reference {
-//			blockType: Type{
-//				name:                  "resource",
-//				removeTypeInReference: true,
-//			}
-//			typeLabel: "aws_launch_template"
-//			nameLabel: "foo2"
+//	Reference {
+//		blockType: Type{
+//			name:                  "resource",
+//			removeTypeInReference: true,
 //		}
+//		typeLabel: "aws_launch_template"
+//		nameLabel: "foo2"
+//	}
 //
 // Reference is used to build up a Terraform JSON configuration file that holds information about the expressions
 // and their parents. Infracost uses these references in resource evaluation to lookup connecting resource information.

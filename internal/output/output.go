@@ -10,7 +10,6 @@ import (
 
 	"github.com/shopspring/decimal"
 
-	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/infracost/infracost/internal/usage"
@@ -76,6 +75,7 @@ func convertOutputResources(outResources []Resource) []*schema.Resource {
 		resources[i] = &schema.Resource{
 			Name:           resource.Name,
 			CostComponents: convertCostComponents(resource.CostComponents),
+			ActualCosts:    convertActualCosts(resource.ActualCosts),
 			SubResources:   convertOutputResources(resource.SubResources),
 			HourlyCost:     resource.HourlyCost,
 			MonthlyCost:    resource.MonthlyCost,
@@ -107,6 +107,23 @@ func convertCostComponents(outComponents []CostComponent) []*schema.CostComponen
 	return components
 }
 
+func convertActualCosts(outActualCosts []ActualCosts) []*schema.ActualCosts {
+	actualCosts := make([]*schema.ActualCosts, len(outActualCosts))
+
+	for i, ac := range outActualCosts {
+		sac := &schema.ActualCosts{
+			ResourceID:     ac.ResourceID,
+			StartTimestamp: ac.StartTimestamp,
+			EndTimestamp:   ac.EndTimestamp,
+			CostComponents: convertCostComponents(ac.CostComponents),
+		}
+
+		actualCosts[i] = sac
+	}
+
+	return actualCosts
+}
+
 type Projects []Project
 
 var exampleProjectsRegex = regexp.MustCompile(`^infracost\/(infracost\/examples|example-terraform)\/`)
@@ -123,6 +140,17 @@ func (r *Root) ExampleProjectName() string {
 	}
 
 	return r.Projects[0].Name
+}
+
+// HasDiff returns true if any project has a difference in monthly cost or resources
+func (r *Root) HasDiff() bool {
+	for _, p := range r.Projects {
+		if p.Diff != nil && (!p.Diff.TotalMonthlyCost.IsZero() || len(p.Diff.Resources) != 0) {
+			return true
+		}
+	}
+
+	return false
 }
 
 // Label returns the display name of the project
@@ -165,6 +193,13 @@ type CostComponent struct {
 	TierData        []schema.PriceTier `json:"tiers,omitempty"`
 }
 
+type ActualCosts struct {
+	ResourceID     string          `json:"resourceId"`
+	StartTimestamp time.Time       `json:"startTimestamp"`
+	EndTimestamp   time.Time       `json:"endTimestamp"`
+	CostComponents []CostComponent `json:"costComponents,omitempty"`
+}
+
 type Resource struct {
 	Name           string                 `json:"name"`
 	Tags           map[string]string      `json:"tags,omitempty"`
@@ -172,6 +207,7 @@ type Resource struct {
 	HourlyCost     *decimal.Decimal       `json:"hourlyCost"`
 	MonthlyCost    *decimal.Decimal       `json:"monthlyCost"`
 	CostComponents []CostComponent        `json:"costComponents,omitempty"`
+	ActualCosts    []ActualCosts          `json:"actualCosts,omitempty"`
 	SubResources   []Resource             `json:"subresources,omitempty"`
 }
 
@@ -212,10 +248,14 @@ type Options struct {
 	DashboardEndpoint string
 	NoColor           bool
 	ShowSkipped       bool
+	ShowAllProjects   bool
+	ShowOnlyChanges   bool
 	Fields            []string
 	IncludeHTML       bool
 	PolicyChecks      PolicyCheck
+	GuardrailCheck    GuardrailCheck
 	diffMsg           string
+	CurrencyFormat    string
 }
 
 // PolicyCheck holds information if a given run has any policy checks enabled.
@@ -243,7 +283,42 @@ func (p PolicyCheckFailures) Error() string {
 	out := bytes.NewBuffer([]byte("Policy check failed:\n\n"))
 
 	for _, e := range p {
-		out.WriteString(e + "\n")
+		out.WriteString(" - " + e + "\n")
+	}
+
+	return out.String()
+}
+
+// GuardrailCheck holds information if a given run has applicable guardrail checks.
+// This struct is used to create guardrail outputs.
+type GuardrailCheck struct {
+	// TotalChecked is the total number of guardrails checked
+	TotalChecked int64
+
+	// Comment indicates that the guardrail status should be reported in the PR
+	// comment (either as a success or as a failure depending on CommentableFailures).
+	Comment bool
+	// CommentableFailures are the failures that should be listed in the PR comment
+	CommentableFailures GuardrailFailures
+
+	// BlockingFailures is the list of failures causing the CLI to return with a
+	// failing (non-zero) error code
+	BlockingFailures GuardrailFailures
+}
+
+// GuardrailFailures defines a list of guardrail failures that were returned from infracost cloud.
+type GuardrailFailures []string
+
+// Error implements the Error interface returning the failures as a single message that can be used in stderr.
+func (g GuardrailFailures) Error() string {
+	if len(g) == 0 {
+		return ""
+	}
+
+	out := bytes.NewBuffer([]byte("Guardrail check failed:\n\n"))
+
+	for _, e := range g {
+		out.WriteString(" - " + e + "\n")
 	}
 
 	return out.String()
@@ -280,19 +355,9 @@ func outputBreakdown(resources []*schema.Resource) *Breakdown {
 }
 
 func outputResource(r *schema.Resource) Resource {
-	comps := make([]CostComponent, 0, len(r.CostComponents))
-	for _, c := range r.CostComponents {
-		comps = append(comps, CostComponent{
-			Name:            c.Name,
-			Unit:            c.Unit,
-			HourlyQuantity:  c.UnitMultiplierHourlyQuantity(),
-			MonthlyQuantity: c.UnitMultiplierMonthlyQuantity(),
-			Price:           c.UnitMultiplierPrice(),
-			HourlyCost:      c.HourlyCost,
-			MonthlyCost:     c.MonthlyCost,
-			TierData:        c.PriceTiers(),
-		})
-	}
+	comps := outputCostComponents(r.CostComponents)
+
+	actualCosts := outputActualCosts(r.ActualCosts)
 
 	subresources := make([]Resource, 0, len(r.SubResources))
 	for _, s := range r.SubResources {
@@ -313,8 +378,39 @@ func outputResource(r *schema.Resource) Resource {
 		HourlyCost:     r.HourlyCost,
 		MonthlyCost:    r.MonthlyCost,
 		CostComponents: comps,
+		ActualCosts:    actualCosts,
 		SubResources:   subresources,
 	}
+}
+
+func outputCostComponents(costComponents []*schema.CostComponent) []CostComponent {
+	comps := make([]CostComponent, 0, len(costComponents))
+	for _, c := range costComponents {
+		comps = append(comps, CostComponent{
+			Name:            c.Name,
+			Unit:            c.Unit,
+			HourlyQuantity:  c.UnitMultiplierHourlyQuantity(),
+			MonthlyQuantity: c.UnitMultiplierMonthlyQuantity(),
+			Price:           c.UnitMultiplierPrice(),
+			HourlyCost:      c.HourlyCost,
+			MonthlyCost:     c.MonthlyCost,
+			TierData:        c.PriceTiers(),
+		})
+	}
+	return comps
+}
+
+func outputActualCosts(actualCosts []*schema.ActualCosts) []ActualCosts {
+	acs := make([]ActualCosts, 0, len(actualCosts))
+	for _, ac := range actualCosts {
+		acs = append(acs, ActualCosts{
+			ResourceID:     ac.ResourceID,
+			StartTimestamp: ac.StartTimestamp,
+			EndTimestamp:   ac.EndTimestamp,
+			CostComponents: outputCostComponents(ac.CostComponents),
+		})
+	}
+	return acs
 }
 
 func ToOutputFormat(projects []*schema.Project) (Root, error) {
@@ -549,6 +645,10 @@ func formatCounts(countMap *map[string]int) string {
 	return msg
 }
 
+func hasSupportedTerraformProvider(rType string) bool {
+	return strings.HasPrefix(rType, "aws_") || strings.HasPrefix(rType, "google_") || strings.HasPrefix(rType, "azurerm_") || strings.HasPrefix(rType, "ibm_")
+}
+
 func BuildSummary(resources []*schema.Resource, opts SummaryOptions) (*Summary, error) {
 	s := &Summary{}
 
@@ -572,7 +672,7 @@ func BuildSummary(resources []*schema.Resource, opts SummaryOptions) (*Summary, 
 	}
 
 	for _, r := range resources {
-		if !opts.IncludeUnsupportedProviders && !terraform.HasSupportedProvider(r.ResourceType) {
+		if !opts.IncludeUnsupportedProviders && !hasSupportedTerraformProvider(r.ResourceType) {
 			continue
 		}
 

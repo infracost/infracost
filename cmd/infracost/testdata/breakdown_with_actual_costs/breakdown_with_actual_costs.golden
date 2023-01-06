@@ -1,0 +1,25 @@
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_with_actual_costs
+
+ Name                                                            Monthly Qty  Unit   Monthly Cost 
+                                                                                                  
+ aws_dynamodb_table.usage                                                                         
+ ├─ Write request unit (WRU)                                         100,000  WRUs          $0.13 
+ ├─ Read request unit (RRU)                                          100,001  RRUs          $0.03 
+ ├─ Data storage                                                     100,002  GB       $25,000.50 
+ ├─ Point-In-Time Recovery (PITR) backup storage                     100,003  GB       $20,000.60 
+ ├─ On-demand backup storage                                         100,004  GB       $10,000.40 
+ ├─ Table data restored                                              100,005  GB       $15,000.75 
+ └─ Streams read request unit (sRRU)                                 100,006  sRRUs         $0.02 
+ ├─ Actual costs Sep 15-22 (arn:aws_dynamodb_table)                                               
+    ├─ $0.005123 per some aws thing                                    1,000  GB            $5.12 
+    └─ $0.045 per some other aws thing                                 1,000  GB           $45.00 
+ └─ Actual costs Aug 15-Sep 22 (arn:another_aws_dynamodb_table)                                   
+    └─ $0.005123 per some aws thing                                    1,000  GB            $5.12 
+                                                                                                  
+ OVERALL TOTAL                                                                         $70,002.42 
+──────────────────────────────────
+1 cloud resource was detected:
+∙ 1 was estimated, it includes usage-based costs, see https://infracost.io/usage-file
+
+Err:
+

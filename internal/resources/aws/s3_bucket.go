@@ -4,12 +4,13 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/shopspring/decimal"
+	log "github.com/sirupsen/logrus"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
 	"github.com/infracost/infracost/internal/usage/aws"
-	"github.com/shopspring/decimal"
-	log "github.com/sirupsen/logrus"
 )
 
 type S3Bucket struct {
@@ -30,20 +31,26 @@ type S3Bucket struct {
 	allStorageClasses []S3StorageClass
 }
 
+func (a *S3Bucket) CoreType() string {
+	return "S3Bucket"
+}
+
+func (a *S3Bucket) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "object_tags", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "standard", DefaultValue: &usage.ResourceUsage{Name: "standard", Items: S3StandardStorageClassUsageSchema}, ValueType: schema.SubResourceUsage},
+		{Key: "intelligent_tiering", DefaultValue: &usage.ResourceUsage{Name: "intelligent_tiering", Items: S3IntelligentTieringStorageClassUsageSchema}, ValueType: schema.SubResourceUsage},
+		{Key: "standard_infrequent_access", DefaultValue: &usage.ResourceUsage{Name: "standard_infrequent_access", Items: S3StandardInfrequentAccessStorageClassUsageSchema}, ValueType: schema.SubResourceUsage},
+		{Key: "one_zone_infrequent_access", DefaultValue: &usage.ResourceUsage{Name: "one_zone_infrequent_access", Items: S3OneZoneInfrequentAccessStorageClassUsageSchema}, ValueType: schema.SubResourceUsage},
+		{Key: "glacier_flexible_retrieval", DefaultValue: &usage.ResourceUsage{Name: "glacier_flexible_retrieval", Items: S3GlacierFlexibleRetrievalStorageClassUsageSchema}, ValueType: schema.SubResourceUsage},
+		{Key: "glacier_deep_archive", DefaultValue: &usage.ResourceUsage{Name: "glacier_deep_archive", Items: S3GlacierDeepArchiveStorageClassUsageSchema}, ValueType: schema.SubResourceUsage},
+	}
+}
+
 type S3StorageClass interface {
 	UsageKey() string
 	PopulateUsage(u *schema.UsageData)
 	BuildResource() *schema.Resource
-}
-
-var S3BucketUsageSchema = []*schema.UsageItem{
-	{Key: "object_tags", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "standard", DefaultValue: &usage.ResourceUsage{Name: "standard", Items: S3StandardStorageClassUsageSchema}, ValueType: schema.SubResourceUsage},
-	{Key: "intelligent_tiering", DefaultValue: &usage.ResourceUsage{Name: "intelligent_tiering", Items: S3IntelligentTieringStorageClassUsageSchema}, ValueType: schema.SubResourceUsage},
-	{Key: "standard_infrequent_access", DefaultValue: &usage.ResourceUsage{Name: "standard_infrequent_access", Items: S3StandardInfrequentAccessStorageClassUsageSchema}, ValueType: schema.SubResourceUsage},
-	{Key: "one_zone_infrequent_access", DefaultValue: &usage.ResourceUsage{Name: "one_zone_infrequent_access", Items: S3OneZoneInfrequentAccessStorageClassUsageSchema}, ValueType: schema.SubResourceUsage},
-	{Key: "glacier_flexible_retrieval", DefaultValue: &usage.ResourceUsage{Name: "glacier_flexible_retrieval", Items: S3GlacierFlexibleRetrievalStorageClassUsageSchema}, ValueType: schema.SubResourceUsage},
-	{Key: "glacier_deep_archive", DefaultValue: &usage.ResourceUsage{Name: "glacier_deep_archive", Items: S3GlacierDeepArchiveStorageClassUsageSchema}, ValueType: schema.SubResourceUsage},
 }
 
 func (a *S3Bucket) AllStorageClasses() []S3StorageClass {
@@ -188,7 +195,7 @@ func (a *S3Bucket) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           a.Address,
-		UsageSchema:    S3BucketUsageSchema,
+		UsageSchema:    a.UsageSchema(),
 		EstimateUsage:  estimate,
 		CostComponents: costComponents,
 		SubResources:   subResources,

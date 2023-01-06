@@ -15,6 +15,7 @@ type ResourceFunc func(*ResourceData, *UsageData) *Resource
 type Resource struct {
 	Name              string
 	CostComponents    []*CostComponent
+	ActualCosts       []*ActualCosts
 	SubResources      []*Resource
 	HourlyCost        *decimal.Decimal
 	MonthlyCost       *decimal.Decimal

@@ -3,7 +3,6 @@ package modules
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 )
@@ -12,7 +11,22 @@ import (
 // It is used for caching the modules that have already been downloaded.
 // It uses the same format as the .terraform/modules/modules.json file
 type Manifest struct {
+	cachePath string
+
+	Path    string            `json:"Path"`
+	Version string            `json:"Version"`
 	Modules []*ManifestModule `json:"Modules"`
+}
+
+func (m Manifest) FindModulePath(key string) string {
+	for _, module := range m.Modules {
+		if module.Key == key {
+			loc := filepath.Clean(filepath.Join(m.cachePath, module.Dir))
+			return loc
+		}
+	}
+
+	return ""
 }
 
 // ManifestModule represents a single module in the manifest.json file
@@ -42,19 +56,20 @@ func readManifest(path string) (*Manifest, error) {
 
 // writeManifest writes the manifest file to the given path
 func writeManifest(manifest *Manifest, path string) error {
+
 	b, err := json.Marshal(manifest)
 	if err != nil {
-		return fmt.Errorf("Failed to marshal manifest: %w", err)
+		return fmt.Errorf("failed to marshal manifest: %w", err)
 	}
 
 	err = os.MkdirAll(filepath.Dir(path), os.ModePerm)
 	if err != nil {
-		return fmt.Errorf("Failed to create directories for manifest: %w", err)
+		return fmt.Errorf("failed to create directories for manifest: %w", err)
 	}
 
-	err = ioutil.WriteFile(path, b, 0644) // nolint:gosec
+	err = os.WriteFile(path, b, 0644) // nolint:gosec
 	if err != nil {
-		return fmt.Errorf("Failed to write manifest: %w", err)
+		return fmt.Errorf("failed to write manifest: %w", err)
 	}
 
 	return nil

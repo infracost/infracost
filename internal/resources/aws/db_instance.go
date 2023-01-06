@@ -1,9 +1,10 @@
 package aws
 
 import (
+	log "github.com/sirupsen/logrus"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	log "github.com/sirupsen/logrus"
 
 	"fmt"
 	"strings"
@@ -29,6 +30,14 @@ type DBInstance struct {
 	MonthlyAdditionalPerformanceInsightsRequests *int64   `infracost_usage:"monthly_additional_performance_insights_requests"`
 	ReservedInstanceTerm                         *string  `infracost_usage:"reserved_instance_term"`
 	ReservedInstancePaymentOption                *string  `infracost_usage:"reserved_instance_payment_option"`
+}
+
+func (r *DBInstance) CoreType() string {
+	return "DBInstance"
+}
+
+func (r *DBInstance) UsageSchema() []*schema.UsageItem {
+	return DBInstanceUsageSchema
 }
 
 var DBInstanceUsageSchema = []*schema.UsageItem{
@@ -222,6 +231,7 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 				ProductFamily: strPtr("Provisioned IOPS"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "deploymentOption", Value: strPtr(deploymentOption)},
+					{Key: "groupDescription", Value: strPtr("RDS Provisioned IOPS")},
 					{Key: "databaseEngine", Value: strPtr("Any")},
 				},
 			},

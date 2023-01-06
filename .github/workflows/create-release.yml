@@ -16,7 +16,7 @@ jobs:
       - name: Set up Go 1.x
         uses: actions/setup-go@v3
         with:
-          go-version: 1.18
+          go-version: 1.19
 
       - name: Build project
         run: |
@@ -81,6 +81,14 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
+      - name: Install brew
+        run: |
+          # Add brew to the path. This is required as brew is no longer supported by runner-images.
+          # see: https://github.com/actions/runner-images/issues/6283 for more context
+          echo "/home/linuxbrew/.linuxbrew/bin:/home/linuxbrew/.linuxbrew/sbin" >> $GITHUB_PATH
+          # Setup brew environment for coming steps.
+          eval "$(/home/linuxbrew/.linuxbrew/bin/brew shellenv)"
+
       - uses: dawidd6/action-homebrew-bump-formula@v3
         with:
           token: ${{secrets.HOMEBREW_RELEASE_TOKEN}}

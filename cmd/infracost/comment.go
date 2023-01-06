@@ -42,6 +42,11 @@ func commentCmd(ctx *config.RunContext) *cobra.Command {
 	cmds := []*cobra.Command{commentGitHubCmd(ctx), commentGitLabCmd(ctx), commentAzureReposCmd(ctx), commentBitbucketCmd(ctx)}
 	for _, subCmd := range cmds {
 		subCmd.Flags().StringArray("policy-path", nil, "Path to Infracost policy files, glob patterns need quotes (experimental)")
+		subCmd.Flags().Bool("show-all-projects", false, "Show all projects in the table of the comment output")
+		subCmd.Flags().Bool("show-changed", false, "Show only projects in the table that have code changes")
+		_ = subCmd.Flags().MarkHidden("show-changed")
+		subCmd.Flags().Bool("skip-no-diff", false, "Skip posting comment if there are no resource changes. Only applies to update, hide-and-new, and delete-and-new behaviors")
+		_ = subCmd.Flags().MarkHidden("skip-no-diff")
 	}
 
 	cmd.AddCommand(cmds...)
@@ -49,28 +54,33 @@ func commentCmd(ctx *config.RunContext) *cobra.Command {
 	return cmd
 }
 
-func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string, mdOpts output.MarkdownOptions) ([]byte, error) {
+func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string, mdOpts output.MarkdownOptions) ([]byte, bool, error) {
+	hasDiff := false
+
 	inputs, err := output.LoadPaths(paths)
 	if err != nil {
-		return nil, err
+		return nil, hasDiff, err
 	}
 
 	combined, err := output.Combine(inputs)
 	if errors.As(err, &clierror.WarningError{}) {
 		ui.PrintWarningf(cmd.ErrOrStderr(), err.Error())
 	} else if err != nil {
-		return nil, err
+		return nil, hasDiff, err
 	}
+
+	hasDiff = combined.HasDiff()
 
 	combined.IsCIRun = ctx.IsCIRun()
 
+	var guardrailCheck output.GuardrailCheck
 	dryRun, _ := cmd.Flags().GetBool("dry-run")
-	if ctx.IsCloudEnabled() && !dryRun {
+	if ctx.IsCloudUploadEnabled() && !dryRun {
 		if ctx.Config.IsSelfHosted() {
 			ui.PrintWarning(cmd.ErrOrStderr(), "Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
 		} else {
 			combined.Metadata.InfracostCommand = "comment"
-			combined.RunID, combined.ShareURL = shareCombinedRun(ctx, combined, inputs)
+			combined.RunID, combined.ShareURL, guardrailCheck = shareCombinedRun(ctx, combined, inputs)
 		}
 	}
 
@@ -79,7 +89,7 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 	if len(policyPaths) > 0 {
 		policyChecks, err = queryPolicy(policyPaths, combined)
 		if err != nil {
-			return nil, err
+			return nil, hasDiff, err
 		}
 
 		ctx.SetContextValue("passedPolicyCount", len(policyChecks.Passed))
@@ -91,18 +101,24 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 		NoColor:           ctx.Config.NoColor,
 		ShowSkipped:       true,
 		PolicyChecks:      policyChecks,
+		GuardrailCheck:    guardrailCheck,
 	}
+	opts.ShowAllProjects, _ = cmd.Flags().GetBool("show-all-projects")
+	opts.ShowOnlyChanges, _ = cmd.Flags().GetBool("show-changed")
 
 	b, err := output.ToMarkdown(combined, opts, mdOpts)
 	if err != nil {
-		return nil, err
+		return nil, hasDiff, err
 	}
 
 	if policyChecks.HasFailed() {
-		return b, policyChecks.Failures
+		return b, hasDiff, policyChecks.Failures
+	}
+	if len(guardrailCheck.BlockingFailures) > 0 {
+		return b, hasDiff, guardrailCheck.BlockingFailures
 	}
 
-	return b, nil
+	return b, hasDiff, nil
 }
 
 type PRNumber int

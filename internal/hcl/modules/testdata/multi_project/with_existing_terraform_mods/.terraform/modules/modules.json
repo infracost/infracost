@@ -1,0 +1,42 @@
+{
+  "Modules": [
+    {
+      "Key": "",
+      "Source": "",
+      "Dir": "."
+    },
+    {
+      "Key": "local-module",
+      "Source": "../modules/local-module",
+      "Dir": "../modules/local-module"
+    },
+    {
+      "Key": "local-module.nested-git-module",
+      "Source": "git::https://github.com/terraform-aws-modules/terraform-aws-sns.git",
+      "Dir": ".terraform/modules/local-module.nested-git-module"
+    },
+    {
+      "Key": "local-module.nested-local-module",
+      "Source": "./nested-local-module",
+      "Dir": "../modules/local-module/nested-local-module"
+    },
+    {
+      "Key": "local-module.nested-registry-module",
+      "Source": "registry.terraform.io/terraform-aws-modules/sns/aws",
+      "Version": "3.1.0",
+      "Dir": ".terraform/modules/local-module.nested-registry-module"
+    },
+    {
+      "Key": "local-module.nested-registry-module-using-same-source",
+      "Source": "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+      "Version": "3.4.0",
+      "Dir": ".terraform/modules/local-module.nested-registry-module-using-same-source"
+    },
+    {
+      "Key": "registry-module",
+      "Source": "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+      "Version": "3.4.0",
+      "Dir": ".terraform/modules/registry-module"
+    }
+  ]
+}

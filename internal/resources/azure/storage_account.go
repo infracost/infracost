@@ -14,11 +14,14 @@ import (
 // StorageAccount represents Azure data storage services.
 //
 // More resource information here:
-//   Block Blob Storage: https://azure.microsoft.com/en-us/services/storage/blobs/
-//   File Storage: https://azure.microsoft.com/en-us/services/storage/files/
+//
+//	Block Blob Storage: https://azure.microsoft.com/en-us/services/storage/blobs/
+//	File Storage: https://azure.microsoft.com/en-us/services/storage/files/
+//
 // Pricing information here:
-//   Block Blob Storage: https://azure.microsoft.com/en-us/pricing/details/storage/blobs/
-//   File Storage: https://azure.microsoft.com/en-us/pricing/details/storage/files/
+//
+//	Block Blob Storage: https://azure.microsoft.com/en-us/pricing/details/storage/blobs/
+//	File Storage: https://azure.microsoft.com/en-us/pricing/details/storage/files/
 type StorageAccount struct {
 	Address string
 	Region  string
@@ -164,16 +167,20 @@ func (r *StorageAccount) buildProductFilter(meterName string) *schema.ProductFil
 // storage capacity in Blob Storage.
 //
 // BlockBlobStorage:
-//   Standard Hot:  cost exists
-//   Standard Cool: cost exists
-//   Premium:       cost exists
+//
+//	Standard Hot:  cost exists
+//	Standard Cool: cost exists
+//	Premium:       cost exists
+//
 // StorageV2:
-//   Standard Hot:        cost exists
-//   Standard Hot NFSv3:  cost exists
-//   Standard Cool:       cost exists
-//   Standard Cool NFSv3: cost exists
-//   Premium:             cost exists
-//   Premium NFSv3:       cost exists
+//
+//	Standard Hot:        cost exists
+//	Standard Hot NFSv3:  cost exists
+//	Standard Cool:       cost exists
+//	Standard Cool NFSv3: cost exists
+//	Premium:             cost exists
+//	Premium NFSv3:       cost exists
+//
 // FileStorage: see dataAtRestCostComponents()
 func (r *StorageAccount) storageCostComponents() []*schema.CostComponent {
 	costComponents := []*schema.CostComponent{}
@@ -239,12 +246,14 @@ func (r *StorageAccount) storageCostComponents() []*schema.CostComponent {
 //
 // BlockBlobStorage: n/a
 // StorageV2:
-//   Standard Hot:        no cost
-//   Standard Hot NFSv3:  cost exists
-//   Standard Cool:       no cost
-//   Standard Cool NFSv3: cost exists
-//   Premium:             no cost
-//   Premium NFSv3:       no cost
+//
+//	Standard Hot:        no cost
+//	Standard Hot NFSv3:  cost exists
+//	Standard Cool:       no cost
+//	Standard Cool NFSv3: cost exists
+//	Premium:             no cost
+//	Premium NFSv3:       no cost
+//
 // FileStorage: n/a
 func (r *StorageAccount) iterativeWriteOperationsCostComponents() []*schema.CostComponent {
 	costComponents := []*schema.CostComponent{}
@@ -281,20 +290,25 @@ func (r *StorageAccount) iterativeWriteOperationsCostComponents() []*schema.Cost
 // writeOperationsCostComponents returns a cost component for Write Operations.
 //
 // BlockBlobStorage:
-//   Standard Hot:  cost exists
-//   Standard Cool: cost exists
-//   Premium:       cost exists
+//
+//	Standard Hot:  cost exists
+//	Standard Cool: cost exists
+//	Premium:       cost exists
+//
 // StorageV2:
-//   Standard Hot:        cost exists
-//   Standard Hot NFSv3:  cost exists
-//   Standard Cool:       cost exists
-//   Standard Cool NFSv3: cost exists
-//   Premium:             cost exists
-//   Premium NFSv3:       cost exists
+//
+//	Standard Hot:        cost exists
+//	Standard Hot NFSv3:  cost exists
+//	Standard Cool:       cost exists
+//	Standard Cool NFSv3: cost exists
+//	Premium:             cost exists
+//	Premium NFSv3:       cost exists
+//
 // FileStorage:
-//   Standard Hot:  cost exists
-//   Standard Cool: cost exists
-//   Premium:       no cost
+//
+//	Standard Hot:  cost exists
+//	Standard Cool: cost exists
+//	Premium:       no cost
 func (r *StorageAccount) writeOperationsCostComponents() []*schema.CostComponent {
 	costComponents := []*schema.CostComponent{}
 
@@ -334,20 +348,25 @@ func (r *StorageAccount) writeOperationsCostComponents() []*schema.CostComponent
 // List and Create Container Operations (List Operations for File storage).
 //
 // BlockBlobStorage:
-//   Standard Hot:  cost exists
-//   Standard Cool: cost exists
-//   Premium:       cost exists
+//
+//	Standard Hot:  cost exists
+//	Standard Cool: cost exists
+//	Premium:       cost exists
+//
 // StorageV2:
-//   Standard Hot:        cost exists
-//   Standard Hot NFSv3:  no cost
-//   Standard Cool:       cost exists
-//   Standard Cool NFSv3: no cost
-//   Premium:             cost exists
-//   Premium NFSv3:       cost exists
+//
+//	Standard Hot:        cost exists
+//	Standard Hot NFSv3:  no cost
+//	Standard Cool:       cost exists
+//	Standard Cool NFSv3: no cost
+//	Premium:             cost exists
+//	Premium NFSv3:       cost exists
+//
 // FileStorage:
-//   Standard Hot:  cost exists
-//   Standard Cool: cost exists
-//   Premium:       no cost
+//
+//	Standard Hot:  cost exists
+//	Standard Cool: cost exists
+//	Premium:       no cost
 func (r *StorageAccount) listAndCreateContainerOperationsCostComponents() []*schema.CostComponent {
 	costComponents := []*schema.CostComponent{}
 
@@ -390,12 +409,14 @@ func (r *StorageAccount) listAndCreateContainerOperationsCostComponents() []*sch
 //
 // BlockBlobStorage: n/a
 // StorageV2:
-//   Standard Hot:        no cost
-//   Standard Hot NFSv3:  cost exists
-//   Standard Cool:       no cost
-//   Standard Cool NFSv3: cost exists
-//   Premium:             no cost
-//   Premium NFSv3:       no cost
+//
+//	Standard Hot:        no cost
+//	Standard Hot NFSv3:  cost exists
+//	Standard Cool:       no cost
+//	Standard Cool NFSv3: cost exists
+//	Premium:             no cost
+//	Premium NFSv3:       no cost
+//
 // FileStorage: n/a
 func (r *StorageAccount) iterativeReadOperationsCostComponents() []*schema.CostComponent {
 	costComponents := []*schema.CostComponent{}
@@ -432,20 +453,25 @@ func (r *StorageAccount) iterativeReadOperationsCostComponents() []*schema.CostC
 // readOperationsCostComponents returns a cost component for Read Operations.
 //
 // BlockBlobStorage:
-//   Standard Hot:  cost exists
-//   Standard Cool: cost exists
-//   Premium:       cost exists
+//
+//	Standard Hot:  cost exists
+//	Standard Cool: cost exists
+//	Premium:       cost exists
+//
 // StorageV2:
-//   Standard Hot:        cost exists
-//   Standard Hot NFSv3:  cost exists
-//   Standard Cool:       cost exists
-//   Standard Cool NFSv3: cost exists
-//   Premium:             cost exists
-//   Premium NFSv3:       cost exists
+//
+//	Standard Hot:        cost exists
+//	Standard Hot NFSv3:  cost exists
+//	Standard Cool:       cost exists
+//	Standard Cool NFSv3: cost exists
+//	Premium:             cost exists
+//	Premium NFSv3:       cost exists
+//
 // FileStorage:
-//   Standard Hot:  cost exists
-//   Standard Cool: cost exists
-//   Premium:       no cost
+//
+//	Standard Hot:  cost exists
+//	Standard Cool: cost exists
+//	Premium:       no cost
 func (r *StorageAccount) readOperationsCostComponents() []*schema.CostComponent {
 	costComponents := []*schema.CostComponent{}
 
@@ -484,20 +510,25 @@ func (r *StorageAccount) readOperationsCostComponents() []*schema.CostComponent 
 // otherOperationsCostComponents returns a cost component for All Other Operations.
 //
 // BlockBlobStorage:
-//   Standard Hot:  cost exists
-//   Standard Cool: cost exists
-//   Premium:       cost exists
+//
+//	Standard Hot:  cost exists
+//	Standard Cool: cost exists
+//	Premium:       cost exists
+//
 // StorageV2:
-//   Standard Hot:        cost exists
-//   Standard Hot NFSv3:  cost exists
-//   Standard Cool:       cost exists
-//   Standard Cool NFSv3: cost exists
-//   Premium:             cost exists
-//   Premium NFSv3:       cost exists
+//
+//	Standard Hot:        cost exists
+//	Standard Hot NFSv3:  cost exists
+//	Standard Cool:       cost exists
+//	Standard Cool NFSv3: cost exists
+//	Premium:             cost exists
+//	Premium NFSv3:       cost exists
+//
 // FileStorage:
-//   Standard Hot:  cost exists
-//   Standard Cool: cost exists
-//   Premium:       no cost
+//
+//	Standard Hot:  cost exists
+//	Standard Cool: cost exists
+//	Premium:       no cost
 func (r *StorageAccount) otherOperationsCostComponents() []*schema.CostComponent {
 	costComponents := []*schema.CostComponent{}
 
@@ -534,20 +565,25 @@ func (r *StorageAccount) otherOperationsCostComponents() []*schema.CostComponent
 // amount.
 //
 // BlockBlobStorage:
-//   Standard Hot:  no cost
-//   Standard Cool: cost exists
-//   Premium:       no cost
+//
+//	Standard Hot:  no cost
+//	Standard Cool: cost exists
+//	Premium:       no cost
+//
 // StorageV2:
-//   Standard Hot:        no cost
-//   Standard Hot NFSv3:  no cost
-//   Standard Cool:       cost exists
-//   Standard Cool NFSv3: cost exists
-//   Premium:             no cost
-//   Premium NFSv3:       no cost
+//
+//	Standard Hot:        no cost
+//	Standard Hot NFSv3:  no cost
+//	Standard Cool:       cost exists
+//	Standard Cool NFSv3: cost exists
+//	Premium:             no cost
+//	Premium NFSv3:       no cost
+//
 // FileStorage:
-//   Standard Hot:  no cost
-//   Standard Cool: cost exists
-//   Premium:       no cost
+//
+//	Standard Hot:  no cost
+//	Standard Cool: cost exists
+//	Premium:       no cost
 func (r *StorageAccount) dataRetrievalCostComponents() []*schema.CostComponent {
 	costComponents := []*schema.CostComponent{}
 
@@ -581,20 +617,25 @@ func (r *StorageAccount) dataRetrievalCostComponents() []*schema.CostComponent {
 // dataWriteCostComponents returns a cost component for Data Write amount.
 //
 // BlockBlobStorage:
-//   Standard Hot:  no cost
-//   Standard Cool: cost exists
-//   Premium:       no cost
+//
+//	Standard Hot:  no cost
+//	Standard Cool: cost exists
+//	Premium:       no cost
+//
 // StorageV2:
-//   Standard Hot:        no cost
-//   Standard Hot NFSv3:  no cost
-//   Standard Cool:       no cost
-//   Standard Cool NFSv3: no cost
-//   Premium:             no cost
-//   Premium NFSv3:       no cost
+//
+//	Standard Hot:        no cost
+//	Standard Hot NFSv3:  no cost
+//	Standard Cool:       no cost
+//	Standard Cool NFSv3: no cost
+//	Premium:             no cost
+//	Premium NFSv3:       no cost
+//
 // FileStorage:
-//   Standard Hot:  no cost
-//   Standard Cool: no cost
-//   Premium:       no cost
+//
+//	Standard Hot:  no cost
+//	Standard Cool: no cost
+//	Premium:       no cost
 func (r *StorageAccount) dataWriteCostComponents() []*schema.CostComponent {
 	costComponents := []*schema.CostComponent{}
 
@@ -629,20 +670,25 @@ func (r *StorageAccount) dataWriteCostComponents() []*schema.CostComponent {
 // subresources amount.
 //
 // BlockBlobStorage:
-//   Standard Hot:  cost exists
-//   Standard Cool: cost exists
-//   Premium:       no cost
+//
+//	Standard Hot:  cost exists
+//	Standard Cool: cost exists
+//	Premium:       no cost
+//
 // StorageV2:
-//   Standard Hot:        cost exists
-//   Standard Hot NFSv3:  no cost
-//   Standard Cool:       cost exists
-//   Standard Cool NFSv3: no cost
-//   Premium:             no cost
-//   Premium NFSv3:       no cost
+//
+//	Standard Hot:        cost exists
+//	Standard Hot NFSv3:  no cost
+//	Standard Cool:       cost exists
+//	Standard Cool NFSv3: no cost
+//	Premium:             no cost
+//	Premium NFSv3:       no cost
+//
 // FileStorage:
-//   Standard Hot:  no cost
-//   Standard Cool: no cost
-//   Premium:       no cost
+//
+//	Standard Hot:  no cost
+//	Standard Cool: no cost
+//	Premium:       no cost
 func (r *StorageAccount) blobIndexTagsCostComponents() []*schema.CostComponent {
 	costComponents := []*schema.CostComponent{}
 
@@ -683,9 +729,10 @@ func (r *StorageAccount) blobIndexTagsCostComponents() []*schema.CostComponent {
 // BlockBlobStorage: n/a
 // StorageV2: n/a
 // FileStorage:
-//   Standard Hot:  cost exists
-//   Standard Cool: cost exists
-//   Premium:       cost exists
+//
+//	Standard Hot:  cost exists
+//	Standard Cool: cost exists
+//	Premium:       cost exists
 func (r *StorageAccount) dataAtRestCostComponents() []*schema.CostComponent {
 	costComponents := []*schema.CostComponent{}
 
@@ -724,9 +771,10 @@ func (r *StorageAccount) dataAtRestCostComponents() []*schema.CostComponent {
 // BlockBlobStorage: n/a
 // StorageV2: n/a
 // FileStorage:
-//   Standard Hot:  cost exists
-//   Standard Cool: cost exists
-//   Premium:       cost exists
+//
+//	Standard Hot:  cost exists
+//	Standard Cool: cost exists
+//	Premium:       cost exists
 func (r *StorageAccount) snapshotsCostComponents() []*schema.CostComponent {
 	costComponents := []*schema.CostComponent{}
 
@@ -765,9 +813,10 @@ func (r *StorageAccount) snapshotsCostComponents() []*schema.CostComponent {
 // BlockBlobStorage: n/a
 // StorageV2: n/a
 // FileStorage:
-//   Standard Hot:  cost exists
-//   Standard Cool: cost exists
-//   Premium:       no cost
+//
+//	Standard Hot:  cost exists
+//	Standard Cool: cost exists
+//	Premium:       no cost
 func (r *StorageAccount) metadataAtRestCostComponents() []*schema.CostComponent {
 	costComponents := []*schema.CostComponent{}
 
@@ -802,16 +851,19 @@ func (r *StorageAccount) metadataAtRestCostComponents() []*schema.CostComponent 
 //
 // BlockBlobStorage: n/a
 // StorageV2:
-//   Standard Hot:        no cost
-//   Standard Hot NFSv3:  no cost
-//   Standard Cool:       cost exists
-//   Standard Cool NFSv3: cost exists
-//   Premium:             no cost
-//   Premium NFSv3:       no cost
+//
+//	Standard Hot:        no cost
+//	Standard Hot NFSv3:  no cost
+//	Standard Cool:       cost exists
+//	Standard Cool NFSv3: cost exists
+//	Premium:             no cost
+//	Premium NFSv3:       no cost
+//
 // FileStorage:
-//   Standard Hot:  no cost
-//   Standard Cool: cost exists
-//   Premium:       no cost
+//
+//	Standard Hot:  no cost
+//	Standard Cool: cost exists
+//	Premium:       no cost
 func (r *StorageAccount) earlyDeletionCostComponents() []*schema.CostComponent {
 	costComponents := []*schema.CostComponent{}
 

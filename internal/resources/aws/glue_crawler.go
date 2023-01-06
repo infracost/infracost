@@ -31,7 +31,7 @@ func (r *GlueCrawler) PopulateUsage(u *schema.UsageData) {
 // BuildResource builds a schema.Resource from a valid GlueCrawler struct. GlueCrawler has just one schema.CostComponent
 // associated with it:
 //
-//		1. Hours - GlueCrawler is charged per hour that the crawler is run.
+//  1. Hours - GlueCrawler is charged per hour that the crawler is run.
 //
 // This method is called after the resource is initialised by an IaC provider. See providers folder for more information.
 func (r *GlueCrawler) BuildResource() *schema.Resource {

@@ -1,0 +1,6 @@
+version: 0.1
+resource_usage:
+  aws_fsx_openzfs_file_system.my_system_ssd:
+    backup_storage_gb: 10000
+  aws_fsx_openzfs_file_system.my_compressed_system_ssd:
+    compression_savings_percent: 40

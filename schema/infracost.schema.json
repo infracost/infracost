@@ -2,6 +2,34 @@
   "$schema": "http://json-schema.org/draft-04/schema#",
   "$ref": "#/definitions/Root",
   "definitions": {
+    "ActualCosts": {
+      "required": [
+        "resourceId",
+        "startTimestamp",
+        "endTimestamp"
+      ],
+      "properties": {
+        "resourceId": {
+          "type": "string"
+        },
+        "startTimestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "endTimestamp": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "costComponents": {
+          "items": {
+            "$ref": "#/definitions/CostComponent"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
     "Breakdown": {
       "required": [
         "resources",
@@ -120,11 +148,61 @@
         "vcsPullRequestAuthor": {
           "type": "string"
         },
+        "vcsPullRequestLabels": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
         "vcsPipelineRunId": {
           "type": "string"
         },
         "vcsPullRequestId": {
           "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "Policy": {
+      "required": [
+        "id",
+        "title",
+        "description",
+        "resource_type",
+        "resource_attributes",
+        "address",
+        "suggested",
+        "no_cost",
+        "cost"
+      ],
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "title": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        },
+        "resource_type": {
+          "type": "string"
+        },
+        "resource_attributes": {
+          "additionalProperties": true
+        },
+        "address": {
+          "type": "string"
+        },
+        "suggested": {
+          "type": "string"
+        },
+        "no_cost": {
+          "type": "boolean"
+        },
+        "cost": {
+          "type": ["string", "null"]
         }
       },
       "additionalProperties": false,
@@ -226,10 +304,20 @@
         "vcsSubPath": {
           "type": "string"
         },
+        "vcsCodeChanged": {
+          "type": "boolean"
+        },
         "warnings": {
           "items": {
             "$schema": "http://json-schema.org/draft-04/schema#",
             "$ref": "#/definitions/Warning"
+          },
+          "type": "array"
+        },
+        "policies": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/Policy"
           },
           "type": "array"
         }
@@ -274,6 +362,13 @@
           "items": {
             "$schema": "http://json-schema.org/draft-04/schema#",
             "$ref": "#/definitions/CostComponent"
+          },
+          "type": "array"
+        },
+        "actualCosts": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/ActualCosts"
           },
           "type": "array"
         },
@@ -392,6 +487,13 @@
           "items": {
             "$schema": "http://json-schema.org/draft-04/schema#",
             "$ref": "#/definitions/CostComponent"
+          },
+          "type": "array"
+        },
+        "actualCosts": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/ActualCosts"
           },
           "type": "array"
         },

@@ -26,7 +26,9 @@ type ProjectMetadata struct {
 	TerraformModulePath string    `json:"terraformModulePath,omitempty"`
 	TerraformWorkspace  string    `json:"terraformWorkspace,omitempty"`
 	VCSSubPath          string    `json:"vcsSubPath,omitempty"`
+	VCSCodeChanged      *bool     `json:"vcsCodeChanged,omitempty"`
 	Warnings            []Warning `json:"warnings,omitempty"`
+	Policies            Policies  `json:"policies,omitempty"`
 }
 
 func (m *ProjectMetadata) WorkspaceLabel() string {
@@ -91,11 +93,28 @@ func NewProject(name string, metadata *ProjectMetadata) *Project {
 	}
 }
 
+// NameWithWorkspace returns the proect Name appended with the paranenthized workspace name
+// from Metadata if one exists.
+func (p *Project) NameWithWorkspace() string {
+	if p.Metadata.WorkspaceLabel() == "" {
+		return p.Name
+	}
+	return fmt.Sprintf("%s (%s)", p.Name, p.Metadata.WorkspaceLabel())
+}
+
 // AllResources returns a pointer list of all resources of the state.
 func (p *Project) AllResources() []*Resource {
 	var resources []*Resource
 	resources = append(resources, p.PastResources...)
 	resources = append(resources, p.Resources...)
+	return resources
+}
+
+// AllPartialResources returns a pointer list of the current and past partial resources
+func (p *Project) AllPartialResources() []*PartialResource {
+	var resources []*PartialResource
+	resources = append(resources, p.PartialPastResources...)
+	resources = append(resources, p.PartialResources...)
 	return resources
 }
 

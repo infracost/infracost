@@ -1,10 +1,14 @@
 package main_test
 
 import (
+	"fmt"
 	"io/ioutil"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -412,6 +416,149 @@ func TestBreakdownWithWorkspace(t *testing.T) {
 			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
 			"--terraform-workspace",
 			"prod",
+		},
+		nil,
+	)
+}
+
+func TestBreakdownWithActualCosts(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		bodyBytes, _ := ioutil.ReadAll(r.Body)
+		graphqlQuery := string(bodyBytes)
+
+		if strings.Contains(graphqlQuery, "actualCostsList") {
+			fmt.Fprintln(w, `[{"data": {"actualCostsList":[{
+				"address": "aws_dynamodb_table.usage",
+				"resourceId": "arn:aws_dynamodb_table",
+				"startAt": "2022-09-15T09:09:09Z",
+				"endAt": "2022-09-22T09:09:09Z",
+				"costComponents": [{
+						"usageType": "someusagetype",
+						"description": "$0.005123 per some aws thing",
+						"currency": "USD",
+						"monthlyCost": "5.123",
+						"monthlyQuantity": "1000",
+						"price": "0.005123",
+						"unit": "GB"
+					},
+					{
+						"usageType": "someusagetype",
+						"description": "$0.045 per some other aws thing",
+						"currency": "USD",
+						"monthlyCost": "45.0",
+						"monthlyQuantity": "1000",
+						"price": "0.045",
+						"unit": "GB"
+					}
+				]
+			},
+			{
+				"address": "aws_dynamodb_table.usage",
+				"resourceId": "arn:another_aws_dynamodb_table",
+				"startAt": "2022-08-15T09:09:09Z",
+				"endAt": "2022-09-22T09:09:09Z",
+				"costComponents": [{
+					"usageType": "someusagetype",
+					"description": "$0.005123 per some aws thing",
+					"currency": "USD",
+					"monthlyCost": "5.123",
+					"monthlyQuantity": "1000",
+					"price": "0.005123",
+					"unit": "GB"
+				}]
+			}
+			]}}]`)
+		} else if strings.Contains(graphqlQuery, "usageQuantities") {
+			keys := []string{
+				"monthly_write_request_units",
+				"monthly_read_request_units",
+				"storage_gb",
+				"pitr_backup_storage_gb",
+				"on_demand_backup_storage_gb",
+				"monthly_data_restored_gb",
+				"monthly_streams_read_request_units",
+			}
+
+			keyRows := make([]string, len(keys))
+			for i, k := range keys {
+				keyRows[i] = fmt.Sprintf(`{"address": "aws_dynamodb_table.usage", "usageKey": "%s", "monthlyQuantity": "%d"}`, k, 100000+i)
+			}
+			fmt.Fprintf(w, `[{"data": {"usageQuantities":[%s]}}]`, strings.Join(keyRows, ","))
+		}
+	}))
+	defer ts.Close()
+
+	GoldenFileCommandTest(t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{"breakdown", "--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())},
+		&GoldenFileOptions{CaptureLogs: true},
+		func(c *config.RunContext) {
+			c.Config.UsageAPIEndpoint = ts.URL
+			c.Config.UsageActualCosts = true
+		},
+	)
+}
+
+func TestBreakdownWithNestedForeach(t *testing.T) {
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path",
+			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+		},
+		nil,
+	)
+}
+
+func TestBreakdownWithDependsUponModule(t *testing.T) {
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path",
+			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+		},
+		nil,
+	)
+}
+
+func TestBreakdownWithOptionalVariables(t *testing.T) {
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path",
+			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+		},
+		nil,
+	)
+}
+
+func TestBreakdownWithDeepMergeModule(t *testing.T) {
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path",
+			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+		},
+		nil,
+	)
+}
+
+func TestBreakdownWithMultipleProviders(t *testing.T) {
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path",
+			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
 		},
 		nil,
 	)

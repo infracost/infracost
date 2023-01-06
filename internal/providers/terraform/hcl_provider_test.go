@@ -16,7 +16,10 @@ import (
 	"github.com/stretchr/testify/require"
 	"github.com/zclconf/go-cty/cty"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/hcl"
+	"github.com/infracost/infracost/internal/hcl/modules"
+	"github.com/infracost/infracost/internal/sync"
 )
 
 func setMockAttributes(blockAtts map[string]map[string]string) hcl.SetAttributesFunc {
@@ -181,25 +184,28 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 
 			logger := logrus.New()
 			logger.SetOutput(io.Discard)
+			entry := logrus.NewEntry(logger)
+
 			parsers, err := hcl.LoadParsers(
 				testPath,
-				[]string{},
-				logrus.NewEntry(logger),
+				modules.NewModuleLoader(testPath, nil, entry, &sync.KeyMutex{}),
+				nil,
+				entry,
 				hcl.OptionWithBlockBuilder(
 					hcl.BlockBuilder{
 						MockFunc: func(a *hcl.Attribute) cty.Value {
 							return cty.StringVal(fmt.Sprintf("mocked-%s", a.Name()))
 						},
 						SetAttributes: []hcl.SetAttributesFunc{setMockAttributes(tt.attrs)},
-						Logger:        logrus.NewEntry(logger),
+						Logger:        entry,
 					},
-				),
-			)
+				))
 			require.NoError(t, err)
 
 			p := HCLProvider{
 				parsers: parsers,
-				logger:  logrus.NewEntry(logger),
+				logger:  entry,
+				ctx:     &config.ProjectContext{RunContext: &config.RunContext{Config: &config.Config{}}},
 			}
 			got, err := p.LoadPlanJSONs()
 			require.NoError(t, err)
@@ -213,11 +219,11 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 
 			expected := exp.String()
 			root := got[0]
-			actual := string(root.json)
+			actual := string(root.JSON)
 			assert.JSONEq(t, expected, actual)
 
-			codes := make([]hcl.WarningCode, len(root.module.Warnings))
-			for i, w := range root.module.Warnings {
+			codes := make([]hcl.WarningCode, len(root.Module.Warnings))
+			for i, w := range root.Module.Warnings {
 				codes[i] = w.Code
 			}
 

@@ -51,6 +51,12 @@ func NewAzureRMKubernetesCluster(d *schema.ResourceData, u *schema.UsageData) *s
 	if d.Get("default_node_pool.0.node_count").Type != gjson.Null {
 		nodeCount = decimal.NewFromInt(d.Get("default_node_pool.0.node_count").Int())
 	}
+
+	// if the node count is not set explicitly let's take the min_count.
+	if d.Get("default_node_pool.0.min_count").Type != gjson.Null && nodeCount.Equal(decimal.NewFromInt(1)) {
+		nodeCount = decimal.NewFromInt(d.Get("default_node_pool.0.min_count").Int())
+	}
+
 	if u != nil {
 		if v, ok := u.Get("default_node_pool").Map()["nodes"]; ok {
 			nodeCount = decimal.NewFromInt(v.Int())
