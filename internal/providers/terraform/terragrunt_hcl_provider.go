@@ -377,7 +377,7 @@ func convertToCtyWithJson(val interface{}) (cty.Value, error) {
 var (
 	depRegexp   = regexp.MustCompile(`dependency\.[\w.\[\]"]+`)
 	indexRegexp = regexp.MustCompile(`(\w+)\[(\d+)]`)
-	mapRegexp   = regexp.MustCompile(`(\w+)\["([\w\d]+)"]`)
+	mapRegexp   = regexp.MustCompile(`\["([\w\d]+)"]`)
 )
 
 func (p *TerragruntHCLProvider) fetchDependencyOutputs(opts *tgoptions.TerragruntOptions) cty.Value {
@@ -448,10 +448,16 @@ func mergeObjectWithDependencyMap(valueMap map[string]cty.Value, pieces []string
 		return mergeListWithDependencyMap(valueMap, pieces, indexKeys[1], index)
 	}
 
-	mapKeys := mapRegexp.FindStringSubmatch(key)
+	mapKeys := mapRegexp.FindAllStringSubmatch(key, -1)
 	if len(mapKeys) != 0 {
-		key = mapKeys[1]
-		pieces = append([]string{pieces[0], mapKeys[2]}, pieces[1:]...)
+		keys := []string{pieces[0]}
+		for _, match := range mapKeys {
+			keys = append(keys, match[1])
+		}
+
+		split := strings.Split(key, "[")
+		key = split[0]
+		pieces = append(keys, pieces[1:]...)
 	}
 
 	if len(pieces) == 1 {
