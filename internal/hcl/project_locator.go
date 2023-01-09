@@ -144,7 +144,7 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 	var projects []RootPath
 	for _, dir := range dirs {
 		if isSkipped(dir) {
-			p.logger.Debugf("skipping directory %s as it is marked as exluded by --exclude-path", dir)
+			p.logger.Debugf("skipping directory %s as it is marked as excluded by --exclude-path", dir)
 			continue
 		}
 
