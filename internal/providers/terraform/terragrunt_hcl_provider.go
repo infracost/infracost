@@ -18,6 +18,7 @@ import (
 	tgconfig "github.com/gruntwork-io/terragrunt/config"
 	tgconfigstack "github.com/gruntwork-io/terragrunt/configstack"
 	tgerrors "github.com/gruntwork-io/terragrunt/errors"
+	"github.com/gruntwork-io/terragrunt/options"
 	tgoptions "github.com/gruntwork-io/terragrunt/options"
 	"github.com/gruntwork-io/terragrunt/util"
 	"github.com/hashicorp/go-getter"
@@ -225,7 +226,15 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 		Parallelism: 1,
 	}
 
-	s, err := tgconfigstack.FindStackInSubfolders(terragruntOptions)
+	terragruntConfigFiles, err := tgconfig.FindConfigFilesInPath(terragruntOptions.WorkingDir, terragruntOptions)
+	if err != nil {
+		return nil, err
+	}
+	// Filter these config files against the exclude paths so Terragrunt doesn't even try to evaluate them
+	terragruntConfigFiles = p.filterExcludedPaths(terragruntConfigFiles)
+
+	howThesePathsWereFound := fmt.Sprintf("Terragrunt config file found in a subdirectory of %s", terragruntOptions.WorkingDir)
+	s, err := createStackForTerragruntConfigPaths(terragruntOptions.WorkingDir, terragruntConfigFiles, terragruntOptions, howThesePathsWereFound)
 	if err != nil {
 		return nil, err
 	}
@@ -250,6 +259,22 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 	p.outputs = map[string]cty.Value{}
 
 	return workingDirsToEstimate, nil
+}
+
+func (p *TerragruntHCLProvider) filterExcludedPaths(paths []string) []string {
+	isSkipped := buildExcludedPathsMatcher(p.Path, p.excludedPaths)
+
+	var filteredPaths []string
+
+	for _, path := range paths {
+		if !isSkipped(path) {
+			filteredPaths = append(filteredPaths, path)
+		} else {
+			p.logger.Debugf("skipping path %s as it is marked as excluded by --exclude-path", path)
+		}
+	}
+
+	return filteredPaths
 }
 
 // runTerragrunt evaluates a Terragrunt directory with the given opts. This method is called from the
@@ -360,6 +385,45 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 
 	info.provider = h
 	return info, nil
+}
+
+func buildExcludedPathsMatcher(fullPath string, excludedDirs []string) func(string) bool {
+	var excludedMatches []string
+
+	for _, dir := range excludedDirs {
+		var absoluteDir string
+
+		if filepath.IsAbs(dir) {
+			absoluteDir = dir
+		} else {
+			absoluteDir = filepath.Join(fullPath, dir)
+		}
+
+		globs, err := filepath.Glob(absoluteDir)
+		if err == nil {
+			for _, m := range globs {
+				excludedMatches = append(excludedMatches, m)
+			}
+		}
+	}
+
+	return func(dir string) bool {
+		var absoluteDir string
+
+		if filepath.IsAbs(dir) {
+			absoluteDir = dir
+		} else {
+			absoluteDir = filepath.Join(fullPath, dir)
+		}
+
+		for _, match := range excludedMatches {
+			if strings.HasPrefix(absoluteDir, match) {
+				return true
+			}
+		}
+
+		return false
+	}
 }
 
 func convertToCtyWithJson(val interface{}) (cty.Value, error) {
@@ -880,6 +944,26 @@ func (p *TerragruntHCLProvider) readVersionFile(terraformSource *tfsource.Terraf
 type terragruntDependency struct {
 	Dependencies []tgconfig.Dependency `hcl:"dependency,block"`
 	Remain       hcl2.Body             `hcl:",remain"`
+}
+
+// Find all the Terraform modules in the folders that contain the given Terragrunt config files and assemble those
+// modules into a Stack object
+func createStackForTerragruntConfigPaths(path string, terragruntConfigPaths []string, terragruntOptions *options.TerragruntOptions, howThesePathsWereFound string) (*tgconfigstack.Stack, error) {
+	if len(terragruntConfigPaths) == 0 {
+		return nil, tgerrors.WithStackTrace(tgconfigstack.NoTerraformModulesFound)
+	}
+
+	modules, err := tgconfigstack.ResolveTerraformModules(terragruntConfigPaths, terragruntOptions, howThesePathsWereFound)
+	if err != nil {
+		return nil, err
+	}
+
+	stack := &tgconfigstack.Stack{Path: path, Modules: modules}
+	if err := stack.CheckForCycles(); err != nil {
+		return nil, err
+	}
+
+	return stack, nil
 }
 
 // decodeDependencyBlocks parses the file at filename and returns a map containing all the hcl blocks with the "dependency" label.
