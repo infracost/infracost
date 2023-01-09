@@ -396,7 +396,7 @@ func buildExcludedPathsMatcher(fullPath string, excludedDirs []string) func(stri
 		if filepath.IsAbs(dir) {
 			absoluteDir = dir
 		} else {
-			absoluteDir = filepath.Join(fullPath, dir)
+			absoluteDir, _ = filepath.Abs(filepath.Join(fullPath, dir))
 		}
 
 		globs, err := filepath.Glob(absoluteDir)
@@ -408,13 +408,7 @@ func buildExcludedPathsMatcher(fullPath string, excludedDirs []string) func(stri
 	}
 
 	return func(dir string) bool {
-		var absoluteDir string
-
-		if filepath.IsAbs(dir) {
-			absoluteDir = dir
-		} else {
-			absoluteDir = filepath.Join(fullPath, dir)
-		}
+		absoluteDir, _ := filepath.Abs(dir)
 
 		for _, match := range excludedMatches {
 			if strings.HasPrefix(absoluteDir, match) {
