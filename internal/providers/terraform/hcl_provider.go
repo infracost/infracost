@@ -83,7 +83,7 @@ func varsFromPlanFlags(planFlags string) (vars, error) {
 // NewHCLProvider returns a HCLProvider with a hcl.Parser initialised using the config.ProjectContext.
 // It will use input flags from either the terraform-plan-flags or top level var and var-file flags to
 // set input vars and files on the underlying hcl.Parser.
-func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts ...hcl.Option) (*HCLProvider, error) {
+func NewHCLProvider(ctx *config.ProjectContext, dirLoader *hcl.DirLoader, config *HCLProviderConfig, opts ...hcl.Option) (*HCLProvider, error) {
 	if config == nil {
 		config = &HCLProviderConfig{}
 	}
@@ -136,9 +136,11 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 
 	path := ctx.RunContext.Config.RepoPath()
 	loader := modules.NewModuleLoader(path, credsSource, logger, ctx.RunContext.ModuleMutex)
+
 	parsers, err := hcl.LoadParsers(
 		ctx.ProjectConfig.Path,
 		loader,
+		dirLoader,
 		locatorConfig,
 		logger,
 		options...,

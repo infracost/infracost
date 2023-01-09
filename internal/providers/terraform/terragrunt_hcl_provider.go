@@ -59,11 +59,12 @@ type TerragruntHCLProvider struct {
 	env                  map[string]string
 	sourceCache          map[string]string
 	logger               *log.Entry
+	dirLoader            *hcl.DirLoader
 }
 
 // NewTerragruntHCLProvider creates a new provider intialized with the configured project path (usually the terragrunt
 // root directory).
-func NewTerragruntHCLProvider(ctx *config.ProjectContext, includePastResources bool) schema.Provider {
+func NewTerragruntHCLProvider(ctx *config.ProjectContext, dirLoader *hcl.DirLoader, includePastResources bool) schema.Provider {
 	logger := ctx.Logger().WithFields(log.Fields{
 		"provider": "terragrunt_dir",
 	})
@@ -71,6 +72,7 @@ func NewTerragruntHCLProvider(ctx *config.ProjectContext, includePastResources b
 	return &TerragruntHCLProvider{
 		ctx:                  ctx,
 		Path:                 ctx.ProjectConfig.Path,
+		dirLoader:            dirLoader,
 		includePastResources: includePastResources,
 		outputs:              map[string]cty.Value{},
 		excludedPaths:        ctx.ProjectConfig.ExcludePaths,
@@ -371,6 +373,7 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 
 	h, err := NewHCLProvider(
 		config.NewProjectContext(p.ctx.RunContext, &pconfig, fields),
+		p.dirLoader,
 		&HCLProviderConfig{CacheParsingModules: true},
 		ops...,
 	)

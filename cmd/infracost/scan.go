@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/providers/terraform"
@@ -102,10 +103,12 @@ func (s scanCmd) run(runCtx *config.RunContext) error {
 		usageData = usageFile.ToUsageDataMap()
 	}
 
+	dirLoader := hcl.NewDirLoader(logging.Logger.WithFields(log.Fields{}))
+
 	var projects []*schema.Project
 	for _, project := range runCtx.Config.Projects {
 		projectCtx := config.NewProjectContext(runCtx, project, log.Fields{})
-		hclProvider, err := terraform.NewHCLProvider(projectCtx, &terraform.HCLProviderConfig{SuppressLogging: true})
+		hclProvider, err := terraform.NewHCLProvider(projectCtx, dirLoader, &terraform.HCLProviderConfig{SuppressLogging: true})
 		if err != nil {
 			logging.Logger.WithError(err).Errorf("failed to load a provider for path %s", project.Path)
 			continue

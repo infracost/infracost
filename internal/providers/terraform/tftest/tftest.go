@@ -14,6 +14,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/infracost/infracost/internal/hcl"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/usage"
 
@@ -401,7 +403,8 @@ func newHCLProvider(t *testing.T, runCtx *config.RunContext, tfdir string) *terr
 		Path: tfdir,
 	}, log.Fields{})
 
-	provider, err := terraform.NewHCLProvider(projectCtx, &terraform.HCLProviderConfig{SuppressLogging: true})
+	provider, err := terraform.NewHCLProvider(
+		projectCtx, hcl.NewDirLoader(logging.Logger.WithFields(log.Fields{})), &terraform.HCLProviderConfig{SuppressLogging: true})
 	require.NoError(t, err)
 
 	return provider

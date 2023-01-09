@@ -7,6 +7,7 @@ import (
 	"path"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclparse"
@@ -195,6 +196,7 @@ type Parser struct {
 	stopOnHCLError        bool
 	workspaceName         string
 	moduleLoader          *modules.ModuleLoader
+	dirLoader             *DirLoader
 	blockBuilder          BlockBuilder
 	newSpinner            ui.SpinnerFunc
 	remoteVariablesLoader *RemoteVariablesLoader
@@ -206,7 +208,7 @@ type Parser struct {
 // LoadParsers inits a list of Parser with the provided option and initialPath. LoadParsers locates Terraform files
 // in the given initialPath and returns a Parser for each directory it locates a Terraform project within. If
 // the initialPath contains Terraform files at the top level parsers will be len 1.
-func LoadParsers(initialPath string, loader *modules.ModuleLoader, locatorConfig *ProjectLocatorConfig, logger *logrus.Entry, options ...Option) ([]*Parser, error) {
+func LoadParsers(initialPath string, loader *modules.ModuleLoader, dirLoader *DirLoader, locatorConfig *ProjectLocatorConfig, logger *logrus.Entry, options ...Option) ([]*Parser, error) {
 	pl := NewProjectLocator(logger, locatorConfig)
 	rootPaths := pl.FindRootModules(initialPath)
 	if len(rootPaths) == 0 && len(locatorConfig.ChangedObjects) > 0 {
@@ -219,13 +221,13 @@ func LoadParsers(initialPath string, loader *modules.ModuleLoader, locatorConfig
 
 	var parsers = make([]*Parser, len(rootPaths))
 	for i, rootPath := range rootPaths {
-		parsers[i] = newParser(rootPath, loader, logger, options...)
+		parsers[i] = newParser(rootPath, loader, dirLoader, logger, options...)
 	}
 
 	return parsers, nil
 }
 
-func newParser(projectRoot RootPath, moduleLoader *modules.ModuleLoader, logger *logrus.Entry, options ...Option) *Parser {
+func newParser(projectRoot RootPath, moduleLoader *modules.ModuleLoader, dirLoader *DirLoader, logger *logrus.Entry, options ...Option) *Parser {
 	parserLogger := logger.WithFields(logrus.Fields{
 		"parser_path": projectRoot.Path,
 	})
@@ -234,9 +236,10 @@ func newParser(projectRoot RootPath, moduleLoader *modules.ModuleLoader, logger 
 		initialPath:   projectRoot.Path,
 		hasChanges:    projectRoot.HasChanges,
 		workspaceName: defaultTerraformWorkspaceName,
-		blockBuilder:  BlockBuilder{SetAttributes: []SetAttributesFunc{SetUUIDAttributes}, Logger: logger},
+		blockBuilder:  BlockBuilder{SetAttributes: []SetAttributesFunc{SetUUIDAttributes}, Logger: logger, DirLoader: dirLoader},
 		logger:        parserLogger,
 		moduleLoader:  moduleLoader,
+		dirLoader:     dirLoader,
 	}
 
 	var defaultVarFiles []string
@@ -281,7 +284,7 @@ func (p *Parser) ParseDirectory() (*Module, error) {
 
 	// load the initial root directory into a list of hcl files
 	// at this point these files have no schema associated with them.
-	files, err := loadDirectory(p.logger, p.initialPath, p.stopOnHCLError)
+	files, err := p.dirLoader.Load(p.initialPath, p.stopOnHCLError)
 	if err != nil {
 		return nil, err
 	}
@@ -485,8 +488,20 @@ type file struct {
 	hclFile *hcl.File
 }
 
-func loadDirectory(logger *logrus.Entry, fullPath string, stopOnHCLError bool) ([]file, error) {
-	hclParser := hclparse.NewParser()
+type DirLoader struct {
+	pathMap sync.Map
+	logger  *logrus.Entry
+}
+
+func NewDirLoader(logger *logrus.Entry) *DirLoader {
+	return &DirLoader{
+		logger: logger,
+	}
+}
+
+func (d *DirLoader) Load(fullPath string, stopOnHCLError bool) ([]file, error) {
+	v, _ := d.pathMap.LoadOrStore(fullPath, hclparse.NewParser())
+	hclParser := v.(*hclparse.Parser)
 
 	fileInfos, err := os.ReadDir(fullPath)
 	if err != nil {
@@ -519,7 +534,7 @@ func loadDirectory(logger *logrus.Entry, fullPath string, stopOnHCLError bool) (
 				return nil, diag
 			}
 
-			logger.Warnf("skipping file: %s hcl parsing err: %s", path, diag.Error())
+			d.logger.Warnf("skipping file: %s hcl parsing err: %s", path, diag.Error())
 			continue
 		}
 	}

@@ -19,6 +19,7 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
 
+	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/vcs"
 
@@ -237,6 +238,7 @@ type parallelRunner struct {
 	prior       *output.Root
 	parallelism int
 	numJobs     int
+	detector    providers.Detector
 }
 
 func newParallelRunner(cmd *cobra.Command, runCtx *config.RunContext) (*parallelRunner, error) {
@@ -288,6 +290,7 @@ func newParallelRunner(cmd *cobra.Command, runCtx *config.RunContext) (*parallel
 		cmd:         cmd,
 		pathMuxs:    pathMuxs,
 		prior:       prior,
+		detector:    providers.Detector{DirLoader: hcl.NewDirLoader(logging.Logger.WithFields(log.Fields{})), IncludePastResources: prior != nil},
 	}, nil
 }
 
@@ -361,7 +364,7 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 		defer mux.Unlock()
 	}
 
-	provider, err := providers.Detect(ctx, r.prior == nil)
+	provider, err := r.detector.Detect(ctx)
 	var warn *string
 	if v, ok := err.(*providers.ValidationError); ok {
 		if v.Warn() == nil {
@@ -681,7 +684,7 @@ func (r *parallelRunner) runHCLProvider(wg *sync.WaitGroup, ctx *config.ProjectC
 
 	t1 := time.Now()
 
-	hclProvider, err := terraform.NewHCLProvider(ctx, &terraform.HCLProviderConfig{SuppressLogging: true})
+	hclProvider, err := terraform.NewHCLProvider(ctx, r.detector.DirLoader, &terraform.HCLProviderConfig{SuppressLogging: true})
 	if err != nil {
 		log.Debugf("Could not init HCL provider: %s", err)
 		return

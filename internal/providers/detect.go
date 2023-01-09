@@ -42,7 +42,12 @@ func (e *ValidationError) Error() string {
 	return e.err
 }
 
-func Detect(ctx *config.ProjectContext, includePastResources bool) (schema.Provider, error) {
+type Detector struct {
+	IncludePastResources bool
+	DirLoader            *hcl.DirLoader
+}
+
+func (d *Detector) Detect(ctx *config.ProjectContext) (schema.Provider, error) {
 	path := ctx.ProjectConfig.Path
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
@@ -56,6 +61,7 @@ func Detect(ctx *config.ProjectContext, includePastResources bool) (schema.Provi
 	case "terraform_dir":
 		h, providerErr := terraform.NewHCLProvider(
 			ctx,
+			d.DirLoader,
 			nil,
 			hcl.OptionWithSpinner(ctx.RunContext.NewSpinner),
 		)
@@ -70,24 +76,24 @@ func Detect(ctx *config.ProjectContext, includePastResources bool) (schema.Provi
 
 		return h, nil
 	case "terragrunt_dir":
-		h := terraform.NewTerragruntHCLProvider(ctx, includePastResources)
+		h := terraform.NewTerragruntHCLProvider(ctx, d.DirLoader, d.IncludePastResources)
 		if err := validateProjectForHCL(ctx, path); err != nil {
 			return h, err
 		}
 
 		return h, nil
 	case "terraform_plan_json":
-		return terraform.NewPlanJSONProvider(ctx, includePastResources), nil
+		return terraform.NewPlanJSONProvider(ctx, d.IncludePastResources), nil
 	case "terraform_plan_binary":
-		return terraform.NewPlanProvider(ctx, includePastResources), nil
+		return terraform.NewPlanProvider(ctx, d.IncludePastResources), nil
 	case "terraform_cli":
-		return terraform.NewDirProvider(ctx, includePastResources), nil
+		return terraform.NewDirProvider(ctx, d.IncludePastResources), nil
 	case "terragrunt_cli":
-		return terraform.NewTerragruntProvider(ctx, includePastResources), nil
+		return terraform.NewTerragruntProvider(ctx, d.IncludePastResources), nil
 	case "terraform_state_json":
-		return terraform.NewStateJSONProvider(ctx, includePastResources), nil
+		return terraform.NewStateJSONProvider(ctx, d.IncludePastResources), nil
 	case "cloudformation":
-		return cloudformation.NewTemplateProvider(ctx, includePastResources), nil
+		return cloudformation.NewTemplateProvider(ctx, d.IncludePastResources), nil
 	}
 
 	return nil, fmt.Errorf("could not detect path type for '%s'", path)

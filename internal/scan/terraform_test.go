@@ -14,6 +14,7 @@ import (
 
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/scan"
 	"github.com/infracost/infracost/internal/schema"
@@ -82,6 +83,7 @@ func TestTerraformPlanScanner_ScanPlan(t *testing.T) {
 	ctx := config.NewProjectContext(&config.RunContext{Config: &config.Config{}}, &config.Project{Path: "./testdata/simple_project"}, logrus.Fields{})
 	hclp, err := terraform.NewHCLProvider(
 		ctx,
+		hcl.NewDirLoader(newDiscardLogger()),
 		nil,
 	)
 	require.NoError(t, err)

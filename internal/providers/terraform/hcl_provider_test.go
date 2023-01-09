@@ -189,6 +189,7 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 			parsers, err := hcl.LoadParsers(
 				testPath,
 				modules.NewModuleLoader(testPath, nil, entry, &sync.KeyMutex{}),
+				hcl.NewDirLoader(entry),
 				nil,
 				entry,
 				hcl.OptionWithBlockBuilder(

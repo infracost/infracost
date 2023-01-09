@@ -244,10 +244,15 @@ type Block struct {
 	// See Block docs for more information about child Blocks.
 	childBlocks Blocks
 	// verbose determines whether the block uses verbose debug logging.
-	verbose  bool
-	newMock  func(attr *Attribute) cty.Value
+	verbose bool
+	// newMock is a function for generating a mock value for a given Attribute
+	newMock func(attr *Attribute) cty.Value
+	logger  *logrus.Entry
+
+	id  *hcl.Attribute
+	arn *hcl.Attribute
+
 	Filename string
-	logger   *logrus.Entry
 }
 
 // BlockBuilder handles generating new Blocks as part of the parsing and evaluation process.
@@ -255,10 +260,17 @@ type BlockBuilder struct {
 	MockFunc      func(a *Attribute) cty.Value
 	SetAttributes []SetAttributesFunc
 	Logger        *logrus.Entry
+	DirLoader     *DirLoader
 }
 
 // NewBlock returns a Block with Context and child Blocks initialised.
-func (b BlockBuilder) NewBlock(filename string, hclBlock *hcl.Block, ctx *Context, moduleBlock *Block) *Block {
+func (b BlockBuilder) NewBlock(filename string, hclBlock *hcl.Block, ctx *Context, moduleBlock *Block) (block *Block) {
+	defer func() {
+		for _, f := range b.SetAttributes {
+			f(block)
+		}
+	}()
+
 	if ctx == nil {
 		ctx = NewContext(&hcl.EvalContext{}, nil, b.Logger)
 	}
@@ -270,11 +282,7 @@ func (b BlockBuilder) NewBlock(filename string, hclBlock *hcl.Block, ctx *Contex
 			children = append(children, b.NewBlock(filename, bb.AsHCLBlock(), ctx, moduleBlock))
 		}
 
-		for _, f := range b.SetAttributes {
-			f(moduleBlock, hclBlock)
-		}
-
-		block := &Block{
+		block = &Block{
 			Filename:    filename,
 			context:     ctx,
 			hclBlock:    hclBlock,
@@ -284,7 +292,6 @@ func (b BlockBuilder) NewBlock(filename string, hclBlock *hcl.Block, ctx *Contex
 			newMock:     b.MockFunc,
 		}
 		block.setLogger(b.Logger)
-
 		return block
 	}
 
@@ -294,7 +301,7 @@ func (b BlockBuilder) NewBlock(filename string, hclBlock *hcl.Block, ctx *Contex
 	if diag != nil && diag.HasErrors() {
 		b.Logger.Debugf("error loading partial content from hcl file %s", diag.Error())
 
-		block := &Block{
+		block = &Block{
 			context:     ctx,
 			hclBlock:    hclBlock,
 			moduleBlock: moduleBlock,
@@ -303,7 +310,6 @@ func (b BlockBuilder) NewBlock(filename string, hclBlock *hcl.Block, ctx *Contex
 			newMock:     b.MockFunc,
 		}
 		block.setLogger(b.Logger)
-
 		return block
 	}
 
@@ -311,7 +317,7 @@ func (b BlockBuilder) NewBlock(filename string, hclBlock *hcl.Block, ctx *Contex
 		children = append(children, b.NewBlock(filename, hb, ctx, moduleBlock))
 	}
 
-	block := &Block{
+	block = &Block{
 		context:     ctx,
 		hclBlock:    hclBlock,
 		moduleBlock: moduleBlock,
@@ -371,7 +377,7 @@ func (b BlockBuilder) CloneBlock(block *Block, index cty.Value) *Block {
 // BuildModuleBlocks loads all the Blocks for the module at the given path
 func (b BlockBuilder) BuildModuleBlocks(block *Block, modulePath string) (Blocks, error) {
 	var blocks Blocks
-	moduleFiles, err := loadDirectory(b.Logger, modulePath, true)
+	moduleFiles, err := b.DirLoader.Load(modulePath, true)
 	if err != nil {
 		return blocks, fmt.Errorf("failed to load module %s: %w", block.Label(), err)
 	}
@@ -398,27 +404,23 @@ func (b BlockBuilder) BuildModuleBlocks(block *Block, modulePath string) (Blocks
 // SetAttributesFunc defines a function that sets required attributes on a hcl.Block.
 // This is done so that identifiers that are normally propagated from a Terraform state/apply
 // are set on the Block. This means they can be used properly in references and outputs.
-type SetAttributesFunc func(moduleBlock *Block, block *hcl.Block)
+type SetAttributesFunc func(block *Block)
 
 // SetUUIDAttributes adds commonly used identifiers to the block so that it can be referenced by other
 // blocks in context evaluation. The identifiers are only set if they don't already exist as attributes
 // on the block.
-func SetUUIDAttributes(moduleBlock *Block, block *hcl.Block) {
-	if body, ok := block.Body.(*hclsyntax.Body); ok {
-		if (block.Type == "resource" || block.Type == "data") && body.Attributes != nil {
-			_, withCount := body.Attributes["count"]
-			if _, ok := body.Attributes["id"]; !ok {
-				body.Attributes["id"] = newUniqueAttribute("id", withCount)
-			}
-
-			if _, ok := body.Attributes["arn"]; !ok {
-				body.Attributes["arn"] = newArnAttribute("arn", withCount)
-			}
-		}
+func SetUUIDAttributes(block *Block) {
+	var withCount bool
+	attr := block.GetAttribute("count")
+	if attr != nil {
+		withCount = true
 	}
+
+	block.id = newUniqueAttribute("id", withCount)
+	block.arn = newArnAttribute("arn", withCount)
 }
 
-func newUniqueAttribute(name string, withCount bool) *hclsyntax.Attribute {
+func newUniqueAttribute(name string, withCount bool) *hcl.Attribute {
 	// prefix ids with hcl- so they can be identified as fake
 	var exp hclsyntax.Expression = &hclsyntax.LiteralValueExpr{
 		Val: cty.StringVal("hcl-" + uuid.NewString()),
@@ -431,13 +433,13 @@ func newUniqueAttribute(name string, withCount bool) *hclsyntax.Attribute {
 		}
 	}
 
-	return &hclsyntax.Attribute{
+	return &hcl.Attribute{
 		Name: name,
 		Expr: exp,
 	}
 }
 
-func newArnAttribute(name string, withCount bool) *hclsyntax.Attribute {
+func newArnAttribute(name string, withCount bool) *hcl.Attribute {
 	// fakeARN replicates an aws arn string it deliberately leaves the
 	// region section (in between the 3rd and 4th semicolon) blank as
 	// Infracost will try and parse this region later down the line.
@@ -454,7 +456,7 @@ func newArnAttribute(name string, withCount bool) *hclsyntax.Attribute {
 		}
 	}
 
-	return &hclsyntax.Attribute{
+	return &hcl.Attribute{
 		Name: name,
 		Expr: exp,
 	}
@@ -708,18 +710,30 @@ func (b *Block) GetAttributes() []*Attribute {
 	}
 
 	for _, attr := range b.getHCLAttributes() {
-		results = append(results, &Attribute{
-			newMock: b.newMock,
-			HCLAttr: attr,
-			Ctx:     b.context,
-			Verbose: b.verbose,
-			Logger: b.logger.WithFields(logrus.Fields{
-				"attribute_name": attr.Name,
-			}),
-		})
+		results = append(results, b.newAttribute(attr))
+	}
+
+	if b.id != nil {
+		results = append(results, b.newAttribute(b.id))
+	}
+
+	if b.arn != nil {
+		results = append(results, b.newAttribute(b.arn))
 	}
 
 	return results
+}
+
+func (b *Block) newAttribute(attr *hcl.Attribute) *Attribute {
+	return &Attribute{
+		newMock: b.newMock,
+		HCLAttr: attr,
+		Ctx:     b.context,
+		Verbose: b.verbose,
+		Logger: b.logger.WithFields(logrus.Fields{
+			"attribute_name": attr.Name,
+		}),
+	}
 }
 
 // GetAttribute returns the given attribute with the provided name. It will return nil if the attribute is not found.
