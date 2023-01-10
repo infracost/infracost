@@ -171,6 +171,26 @@ func (p *TerragruntHCLProvider) LoadResources(usage map[string]*schema.UsageData
 	return allProjects, nil
 }
 
+func (p *TerragruntHCLProvider) initTerraformVarFiles(tfVarFiles []string, extraArgs []tgconfig.TerraformExtraArguments, basePath string) []string {
+	v := tfVarFiles
+
+	for _, extraArg := range extraArgs {
+		varFiles := extraArg.GetVarFiles(p.logger)
+		for _, f := range varFiles {
+			absBasePath, _ := filepath.Abs(basePath)
+			relPath, err := filepath.Rel(absBasePath, f)
+			if err != nil {
+				p.logger.Debugf("Error processing var-file, could not get relative path for %s from %s", f, basePath)
+				continue
+			}
+
+			v = append(v, relPath)
+		}
+	}
+
+	return v
+}
+
 func (p *TerragruntHCLProvider) initTerraformVars(tfVars map[string]string, inputs map[string]interface{}) map[string]string {
 	m := make(map[string]string, len(tfVars)+len(inputs))
 	for k, v := range tfVars {
@@ -354,6 +374,10 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 
 	pconfig := *p.ctx.ProjectConfig // clone the projectConfig
 	pconfig.Path = info.workingDir
+
+	if terragruntConfig.Terraform != nil {
+		pconfig.TerraformVarFiles = p.initTerraformVarFiles(pconfig.TerraformVarFiles, terragruntConfig.Terraform.ExtraArgs, pconfig.Path)
+	}
 	pconfig.TerraformVars = p.initTerraformVars(pconfig.TerraformVars, terragruntConfig.Inputs)
 
 	ops := []hcl.Option{
