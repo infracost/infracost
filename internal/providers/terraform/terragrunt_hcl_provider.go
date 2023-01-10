@@ -516,6 +516,8 @@ func mergeObjectWithDependencyMap(valueMap map[string]cty.Value, pieces []string
 		split := strings.Split(key, "[")
 		key = split[0]
 		pieces = append(keys, pieces[1:]...)
+	} else {
+		key = strings.TrimSuffix(key, "]")
 	}
 
 	if len(pieces) == 1 {

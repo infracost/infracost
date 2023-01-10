@@ -48,6 +48,7 @@ inputs = {
     input24 = dependency.test2.outputs.good_list_bad_prop[0].id
     input24 = dependency.test2.outputs.bad_map["test"]
     input25 = dependency.test2.outputs.bad_map["test"]["bar"].id
+    input26 = [dependency.test2.outputs.map_existing["test"]["bar"].id]
   }
 
   hello_world_function_memory_size = 512
