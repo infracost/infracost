@@ -461,7 +461,7 @@ func convertToCtyWithJson(val interface{}) (cty.Value, error) {
 }
 
 var (
-	depRegexp   = regexp.MustCompile(`dependency\.[\w.\[\]"]+`)
+	depRegexp   = regexp.MustCompile(`dependency\.[\w\-.\[\]"]+`)
 	indexRegexp = regexp.MustCompile(`(\w+)\[(\d+)]`)
 	mapRegexp   = regexp.MustCompile(`\["([\w\d]+)"]`)
 )
@@ -544,6 +544,8 @@ func mergeObjectWithDependencyMap(valueMap map[string]cty.Value, pieces []string
 		split := strings.Split(key, "[")
 		key = split[0]
 		pieces = append(keys, pieces[1:]...)
+	} else {
+		key = strings.TrimSuffix(key, "]")
 	}
 
 	if len(pieces) == 1 {
@@ -557,6 +559,12 @@ func mergeObjectWithDependencyMap(valueMap map[string]cty.Value, pieces []string
 
 	if v, ok := valueMap[key]; ok {
 		if v.CanIterateElements() {
+			if isList(v) {
+				index, _ := strconv.Atoi(pieces[1])
+
+				return mergeListWithDependencyMap(valueMap, pieces[1:], key, index)
+			}
+
 			valueMap[key] = cty.ObjectVal(mergeObjectWithDependencyMap(v.AsValueMap(), pieces[1:]))
 			return valueMap
 		}
@@ -569,11 +577,15 @@ func mergeObjectWithDependencyMap(valueMap map[string]cty.Value, pieces []string
 	return valueMap
 }
 
+func isList(v cty.Value) bool {
+	return v.Type().IsTupleType() || v.Type().IsListType()
+}
+
 func mergeListWithDependencyMap(valueMap map[string]cty.Value, pieces []string, key string, index int) map[string]cty.Value {
 	indexVal := cty.NumberIntVal(int64(index))
 
 	if len(pieces) == 1 {
-		if v, ok := valueMap[key]; ok && (v.Type().IsListType() || v.Type().IsTupleType()) {
+		if v, ok := valueMap[key]; ok && isList(v) {
 			// if we have the index already in the dependency output, and it is known use the existing value.
 			// If the value is unknown we need to override it wil a mock as Terragrunt will explode when they
 			// try and marshal the cty values to JSON.
@@ -611,7 +623,7 @@ func mergeListWithDependencyMap(valueMap map[string]cty.Value, pieces []string, 
 
 	mockValue := cty.ObjectVal(mergeObjectWithDependencyMap(map[string]cty.Value{}, pieces[1:]))
 
-	if v, ok := valueMap[key]; ok && (v.Type().IsListType() || v.Type().IsTupleType()) {
+	if v, ok := valueMap[key]; ok && isList(v) {
 		// if we have the index already in the dependency output, and it is known use the existing value.
 		// If the value is unknown we need to override it wil a mock as Terragrunt will explode when they
 		// try and marshal the cty values to JSON.
