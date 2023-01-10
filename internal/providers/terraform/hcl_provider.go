@@ -661,7 +661,7 @@ func (p *HCLProvider) marshalBlock(block *hcl.Block, jsonValues map[string]inter
 }
 
 func marshalAttributeValues(blockType string, value cty.Value) map[string]interface{} {
-	if value == cty.NilVal || value.IsNull() {
+	if value.IsNull() {
 		return nil
 	}
 	ret := make(map[string]interface{})

@@ -173,7 +173,7 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 					// let's first try and find the actual value for this bad variable.
 					// If it has an actual value let's use that to pass into the list.
 					val, _ := traversal.TraverseAbs(ctx)
-					if val == cty.NilVal {
+					if val.IsNull() {
 						val = mockedVal
 					}
 
