@@ -514,12 +514,12 @@ func (e *Evaluator) getSourceValue(from *Block) cty.Value {
 
 func (e *Evaluator) evaluateVariable(b *Block) (cty.Value, error) {
 	if b.Label() == "" {
-		return cty.NilVal, fmt.Errorf("empty label - cannot resolve")
+		return cty.DynamicVal, fmt.Errorf("empty label - cannot resolve")
 	}
 
 	attributes := b.AttributesAsMap()
 	if attributes == nil {
-		return cty.NilVal, fmt.Errorf("cannot resolve variable with no attributes")
+		return cty.DynamicVal, fmt.Errorf("cannot resolve variable with no attributes")
 	}
 
 	attrType := attributes["type"]
@@ -540,7 +540,7 @@ func (e *Evaluator) evaluateVariable(b *Block) (cty.Value, error) {
 		return convert.Convert(def.Value(), ty)
 	}
 
-	return convertType(cty.NilVal, attrType), errorNoVarValue
+	return convertType(cty.DynamicVal, attrType), errorNoVarValue
 }
 
 func convertType(val cty.Value, attribute *Attribute) cty.Value {
@@ -569,7 +569,7 @@ func convertType(val cty.Value, attribute *Attribute) cty.Value {
 }
 
 func valueToType(val cty.Value, want cty.Type) cty.Value {
-	if val == cty.NilVal {
+	if val.IsNull() || !val.IsKnown() {
 		return val
 	}
 
@@ -583,12 +583,12 @@ func valueToType(val cty.Value, want cty.Type) cty.Value {
 
 func (e *Evaluator) evaluateOutput(b *Block) (cty.Value, error) {
 	if b.Label() == "" {
-		return cty.NilVal, fmt.Errorf("empty label - cannot resolve")
+		return cty.DynamicVal, fmt.Errorf("empty label - cannot resolve")
 	}
 
 	attribute := b.GetAttribute("value")
 	if attribute == nil {
-		return cty.NilVal, fmt.Errorf("cannot resolve variable with no attributes")
+		return cty.DynamicVal, fmt.Errorf("cannot resolve variable with no attributes")
 	}
 	return attribute.Value(), nil
 }
@@ -677,7 +677,7 @@ func (e *Evaluator) evaluateResource(b *Block, values map[string]cty.Value) cty.
 func expandCountBlockToValue(b *Block, existingValues map[string]cty.Value) cty.Value {
 	k := b.Index()
 	if k == nil {
-		return cty.NilVal
+		return cty.DynamicVal
 	}
 
 	vals := existingValues[stripCount(b.Labels()[1])]
@@ -700,14 +700,14 @@ func expandCountBlockToValue(b *Block, existingValues map[string]cty.Value) cty.
 func (e *Evaluator) expandedEachBlockToValue(b *Block, existingValues map[string]cty.Value) cty.Value {
 	k := b.Key()
 	if k == nil {
-		return cty.NilVal
+		return cty.DynamicVal
 	}
 
 	ob := make(map[string]cty.Value)
 
 	name := b.Labels()[1]
 	eachMap := existingValues[stripCount(name)]
-	if eachMap != cty.NilVal {
+	if !eachMap.IsNull() && eachMap.IsKnown() {
 		if !eachMap.Type().IsObjectType() && !eachMap.Type().IsMapType() {
 			e.logger.WithFields(logrus.Fields{
 				"block": b.Label(),

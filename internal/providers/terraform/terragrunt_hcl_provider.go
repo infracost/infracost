@@ -356,9 +356,14 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 	pconfig.Path = info.workingDir
 	pconfig.TerraformVars = p.initTerraformVars(pconfig.TerraformVars, terragruntConfig.Inputs)
 
+	ops := []hcl.Option{
+		hcl.OptionWithSpinner(p.ctx.RunContext.NewSpinner),
+	}
 	inputs, err := convertToCtyWithJson(terragruntConfig.Inputs)
 	if err != nil {
 		p.logger.Debugf("Failed to build Terragrunt inputs for: %s err: %s", info.workingDir, err)
+	} else {
+		ops = append(ops, hcl.OptionWithRawCtyInput(inputs))
 	}
 
 	fields := p.logger.Data
@@ -367,8 +372,7 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 	h, err := NewHCLProvider(
 		config.NewProjectContext(p.ctx.RunContext, &pconfig, fields),
 		&HCLProviderConfig{CacheParsingModules: true},
-		hcl.OptionWithSpinner(p.ctx.RunContext.NewSpinner),
-		hcl.OptionWithRawCtyInput(inputs),
+		ops...,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("could not create provider for Terragrunt generated dir %w", err)
@@ -423,11 +427,11 @@ func buildExcludedPathsMatcher(fullPath string, excludedDirs []string) func(stri
 func convertToCtyWithJson(val interface{}) (cty.Value, error) {
 	jsonBytes, err := json.Marshal(val)
 	if err != nil {
-		return cty.NilVal, fmt.Errorf("could not marshal terragrunt inputs %w", err)
+		return cty.DynamicVal, fmt.Errorf("could not marshal terragrunt inputs %w", err)
 	}
 	var ctyJsonVal ctyJson.SimpleJSONValue
 	if err := ctyJsonVal.UnmarshalJSON(jsonBytes); err != nil {
-		return cty.NilVal, fmt.Errorf("could not unmarshall terragrunt inputs %w", err)
+		return cty.DynamicVal, fmt.Errorf("could not unmarshall terragrunt inputs %w", err)
 	}
 	return ctyJsonVal.Value, nil
 }
@@ -659,7 +663,7 @@ func (p *TerragruntHCLProvider) fetchModuleOutputs(opts *tgoptions.TerragruntOpt
 			}
 
 			if len(out) > 0 {
-				encoded, err := gocty.ToCtyValue(out, generateTypeFromValuesMap(out))
+				encoded, err := toCtyValue(out, generateTypeFromValuesMap(out))
 				if err == nil {
 					return encoded, nil
 				}
@@ -670,6 +674,18 @@ func (p *TerragruntHCLProvider) fetchModuleOutputs(opts *tgoptions.TerragruntOpt
 	}
 
 	return outputs, nil
+}
+
+func toCtyValue(val map[string]cty.Value, ty cty.Type) (v cty.Value, err error) {
+	defer func() {
+		if e := recover(); e != nil {
+			trace := debug.Stack()
+			v = cty.DynamicVal
+			err = fmt.Errorf("recovered from cty panic converting value (%+v) to type (%s) err: %s trace: %s", val, ty.GoString(), e, trace)
+		}
+	}()
+
+	return gocty.ToCtyValue(val, ty)
 }
 
 // generateTypeFromValuesMap takes a values map and returns an object type that has the same number of fields, but
