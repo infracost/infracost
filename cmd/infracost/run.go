@@ -534,7 +534,7 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 	}
 
 	t2 := time.Now()
-	fmt.Fprintf(os.Stderr, "time to fetch prices %f\n", t2.Sub(t1).Seconds())
+	fmt.Fprintf(os.Stderr, "time to fetch prices %f\n", t2.Sub(ta).Seconds())
 	taken := t2.Sub(t1).Milliseconds()
 	ctx.SetContextValue("tfProjectRunTimeMs", taken)
 
