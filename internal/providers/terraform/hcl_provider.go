@@ -331,7 +331,7 @@ func (p *HCLProvider) Modules() ([]*hcl.Module, error) {
 
 			for parser := range ch {
 				if len(p.parsers) > 1 && !p.config.SuppressLogging {
-					fmt.Fprintf(os.Stderr, "Detected Terraform project at %s\n", ui.DisplayPath(parser.Path()))
+					//fmt.Fprintf(os.Stderr, "Detected Terraform project at %s\n", ui.DisplayPath(parser.Path()))
 				}
 
 				module, err := parser.ParseDirectory()

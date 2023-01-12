@@ -1,6 +1,7 @@
 package hcl
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"os"
@@ -281,6 +282,8 @@ func newParser(projectRoot RootPath, moduleLoader *modules.ModuleLoader, dirLoad
 //
 // ParseDirectory returns the root Module that represents the top of the Terraform Config tree.
 func (p *Parser) ParseDirectory() (*Module, error) {
+	buf := bytes.NewBuffer([]byte{})
+	buf.WriteString(fmt.Sprintf("%s times:\n", p.initialPath))
 	p.logger.Debugf("Beginning parse for directory '%s'...", p.initialPath)
 
 	t1 := time.Now()
@@ -291,7 +294,9 @@ func (p *Parser) ParseDirectory() (*Module, error) {
 		return nil, err
 	}
 	t2 := time.Now()
-	fmt.Fprintf(os.Stderr, "%s module took %f to load initial directory files\n", p.initialPath, t2.Sub(t1).Seconds())
+	fmt.Fprintf(buf, "	took %f to load initial directory files\n", t2.Sub(t1).Seconds())
+
+	fmt.Fprintf(os.Stderr, "")
 
 	// load the files into given hcl block types. These are then wrapped with *Block structs.
 	blocks, err := p.parseDirectoryFiles(files)
@@ -299,7 +304,9 @@ func (p *Parser) ParseDirectory() (*Module, error) {
 		return nil, err
 	}
 	t3 := time.Now()
-	fmt.Fprintf(os.Stderr, "%s module took %f to parse initial directory files\n", p.initialPath, t3.Sub(t2).Seconds())
+	fmt.Fprintf(buf, "	took %f to parse initial directory files\n", t3.Sub(t2).Seconds())
+
+	fmt.Fprintf(os.Stderr, "")
 
 	if len(blocks) == 0 {
 		return nil, errors.New("No valid terraform files found given path, try a different directory")
@@ -317,7 +324,9 @@ func (p *Parser) ParseDirectory() (*Module, error) {
 		return nil, fmt.Errorf("Error loading Terraform modules: %s", err)
 	}
 	t4 := time.Now()
-	fmt.Fprintf(os.Stderr, "%s module took %f to load initial mod manifest\n", p.initialPath, t4.Sub(t3).Seconds())
+	fmt.Fprintf(buf, "	took %f to load initial mod manifest\n", t4.Sub(t3).Seconds())
+
+	fmt.Fprintf(os.Stderr, "")
 
 	p.logger.Debug("Evaluating expressions...")
 	workingDir, err := os.Getwd()
@@ -350,7 +359,9 @@ func (p *Parser) ParseDirectory() (*Module, error) {
 		return nil, err
 	}
 	t5 := time.Now()
-	fmt.Fprintf(os.Stderr, "%s module took %f to evalute\n", p.initialPath, t5.Sub(t4).Seconds())
+	fmt.Fprintf(buf, "	took %f to evalute\n", t5.Sub(t4).Seconds())
+
+	fmt.Fprintf(os.Stderr, buf.String())
 
 	root.HasChanges = p.hasChanges
 	return root, nil
