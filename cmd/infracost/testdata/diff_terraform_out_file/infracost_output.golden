@@ -45,7 +45,7 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
       Monthly cost depends on usage
         +$0.20 per 1M requests
 
-    + Duration
+    + Duration (first 6B)
       Monthly cost depends on usage
         +$0.0000166667 per GB-seconds
 
@@ -56,7 +56,7 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
       Monthly cost depends on usage
         +$0.20 per 1M requests
 
-    + Duration
+    + Duration (first 6B)
       Monthly cost depends on usage
         +$0.0000166667 per GB-seconds
 

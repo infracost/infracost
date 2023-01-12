@@ -5,11 +5,12 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/shopspring/decimal"
+	log "github.com/sirupsen/logrus"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage/aws"
-	"github.com/shopspring/decimal"
-	log "github.com/sirupsen/logrus"
 )
 
 var defaultEC2InstanceMetricCount = 7
@@ -26,6 +27,7 @@ type Instance struct {
 	EBSOptimized     bool
 	EnableMonitoring bool
 	CPUCredits       string
+	HasHost          bool
 
 	// "optional" args, that may be empty depending on the resource config
 	ElasticInferenceAcceleratorType *string
@@ -40,6 +42,14 @@ type Instance struct {
 	MonthlyCPUCreditHours         *int64   `infracost_usage:"monthly_cpu_credit_hrs"`
 	VCPUCount                     *int64   `infracost_usage:"vcpu_count"`
 	MonthlyHours                  *float64 `infracost_usage:"monthly_hrs"`
+}
+
+func (a *Instance) CoreType() string {
+	return "Instance"
+}
+
+func (a *Instance) UsageSchema() []*schema.UsageItem {
+	return InstanceUsageSchema
 }
 
 var InstanceUsageSchema = []*schema.UsageItem{
@@ -58,8 +68,12 @@ func (a *Instance) PopulateUsage(u *schema.UsageData) {
 
 func (a *Instance) BuildResource() *schema.Resource {
 	if strings.ToLower(a.Tenancy) == "host" {
-		log.Warnf("Skipping resource %s. Infracost currently does not support host tenancy for AWS EC2 instances", a.Address)
-		return nil
+		if a.HasHost {
+			a.Tenancy = "Host"
+		} else {
+			log.Warnf("Skipping resource %s. Infracost currently does not support host tenancy for AWS EC2 instances without Host ID set up", a.Address)
+			return nil
+		}
 	} else if strings.ToLower(a.Tenancy) == "dedicated" {
 		a.Tenancy = "Dedicated"
 	} else {
@@ -89,7 +103,9 @@ func (a *Instance) BuildResource() *schema.Resource {
 		subResources = append(subResources, ebs.BuildResource())
 	}
 
-	costComponents = append(costComponents, a.computeCostComponent())
+	if !a.HasHost {
+		costComponents = append(costComponents, a.computeCostComponent())
+	}
 
 	if a.EBSOptimized {
 		costComponents = append(costComponents, a.ebsOptimizedCostComponent())
@@ -124,7 +140,7 @@ func (a *Instance) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           a.Address,
-		UsageSchema:    InstanceUsageSchema,
+		UsageSchema:    a.UsageSchema(),
 		CostComponents: costComponents,
 		SubResources:   subResources,
 		EstimateUsage:  estimate,

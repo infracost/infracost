@@ -32,6 +32,8 @@ type Module struct {
 	Modules  []*Module
 	Parent   *Module
 	Warnings []Warning
+
+	HasChanges bool
 }
 
 // WarningCode is used to delineate warnings across Infracost.

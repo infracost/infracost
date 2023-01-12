@@ -1,0 +1,66 @@
+
+💰 Infracost estimate: **monthly cost will not change**
+<table>
+  <thead>
+    <td>Project</td>
+    <td>Previous</td>
+    <td>New</td>
+    <td>Diff</td>
+  </thead>
+  <tbody>
+    <tr>
+      <td>same_name_plan</td>
+      <td align="right">$40.56</td>
+      <td align="right">$40.56</td>
+      <td>$0</td>
+    </tr>
+    <tr>
+      <td>All projects</td>
+      <td align="right">$40.56</td>
+      <td align="right">$40.56</td>
+      <td>$0</td>
+    </tr>
+  </tbody>
+</table>
+
+1 project has no cost estimate changes.
+
+<details>
+<summary><strong>Infracost output</strong></summary>
+
+```
+──────────────────────────────────
+Project: same_name_plan
+
++ aws_instance.instance_2
+  Monthly cost depends on usage
+
+    + Instance usage (Linux/UNIX, on-demand, t3.nano)
+      Monthly cost depends on usage
+        +$0.0052 per hours
+
+    + CPU credits
+      Monthly cost depends on usage
+        +$0.05 per vCPU-hours
+
+    + root_block_device
+    
+        + Storage (general purpose SSD, gp2)
+          Monthly cost depends on usage
+            +$0.10 per GB
+
+Monthly cost change for same_name_plan
+Amount:  $0.00 ($40.56 → $40.56)
+Percent: 0%
+
+──────────────────────────────────
+
+The following projects have no cost estimate changes: same_name_plan (Module path: dev)
+Run the following command to see their breakdown: infracost breakdown --path=/path/to/code
+
+──────────────────────────────────
+Key: ~ changed, + added, - removed
+
+```
+</details>
+

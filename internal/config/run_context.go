@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/infracost/infracost/internal/logging"
+	intSync "github.com/infracost/infracost/internal/sync"
 	"github.com/infracost/infracost/internal/vcs"
 
 	"github.com/google/uuid"
@@ -29,6 +30,7 @@ type RunContext struct {
 	CMD         string
 	contextVals map[string]interface{}
 	mu          *sync.RWMutex
+	ModuleMutex *intSync.KeyMutex
 	StartTime   int64
 
 	isCommentCmd bool
@@ -57,6 +59,7 @@ func NewRunContextFromEnv(rootCtx context.Context) (*RunContext, error) {
 		State:       state,
 		contextVals: map[string]interface{}{},
 		mu:          &sync.RWMutex{},
+		ModuleMutex: &intSync.KeyMutex{},
 		StartTime:   time.Now().Unix(),
 	}
 
@@ -71,6 +74,7 @@ func EmptyRunContext() *RunContext {
 		State:       &State{},
 		contextVals: map[string]interface{}{},
 		mu:          &sync.RWMutex{},
+		ModuleMutex: &intSync.KeyMutex{},
 		StartTime:   time.Now().Unix(),
 		OutWriter:   os.Stdout,
 		ErrWriter:   os.Stderr,
@@ -91,6 +95,36 @@ func (r *RunContext) NewSpinner(msg string) *ui.Spinner {
 	})
 }
 
+func (r *RunContext) GetParallelism() (int, error) {
+	var parallelism int
+
+	if r.Config.Parallelism == nil {
+		parallelism = 4
+		numCPU := runtime.NumCPU()
+		if numCPU*4 > parallelism {
+			parallelism = numCPU * 4
+		}
+
+		if parallelism > 16 {
+			parallelism = 16
+		}
+
+		return parallelism, nil
+	}
+
+	parallelism = *r.Config.Parallelism
+
+	if parallelism < 0 {
+		return parallelism, fmt.Errorf("parallelism must be a positive number")
+	}
+
+	if parallelism > 16 {
+		return parallelism, fmt.Errorf("parallelism must be less than 16")
+	}
+
+	return parallelism, nil
+}
+
 // Context returns the underlying context.
 func (r *RunContext) Context() context.Context {
 	return r.ctx
@@ -101,8 +135,8 @@ func (r *RunContext) UUID() uuid.UUID {
 	return r.uuid
 }
 
-func (c *RunContext) VCSRepositoryURL() string {
-	return c.VCSMetadata.Remote.URL
+func (r *RunContext) VCSRepositoryURL() string {
+	return r.VCSMetadata.Remote.URL
 }
 
 func (r *RunContext) SetContextValue(key string, value interface{}) {
@@ -193,6 +227,13 @@ func (r *RunContext) IsCloudEnabled() bool {
 	return r.Config.EnableDashboard
 }
 
+func (r *RunContext) IsCloudUploadEnabled() bool {
+	if r.Config.EnableCloudUpload != nil {
+		return *r.Config.EnableCloudUpload
+	}
+	return r.IsCloudEnabled()
+}
+
 func baseVersion(v string) string {
 	return strings.SplitN(v, "+", 2)[0]
 }
@@ -262,6 +303,10 @@ var ciMap = ciEnvMap{
 }
 
 func ciPlatform() string {
+	if os.Getenv("INFRACOST_CI_PLATFORM") != "" {
+		return os.Getenv("INFRACOST_CI_PLATFORM")
+	}
+
 	for env, name := range ciMap.vars {
 		if IsEnvPresent(env) {
 			return name

@@ -1,6 +1,9 @@
 
  Name                                                            Monthly Qty  Unit                  Monthly Cost 
                                                                                                                  
+ aws_ec2_host.mac                                                                                                
+ └─ EC2 Dedicated Host (on-demand, mac1)                                 730  hours                      $790.59 
+                                                                                                                 
  aws_instance.cnvr_1yr_all_upfront                                                                               
  ├─ Instance usage (Linux/UNIX, reserved, t3.medium)                     730  hours                        $0.00 
  └─ root_block_device                                                                                            
@@ -174,14 +177,16 @@
  └─ root_block_device                                                                                            
     └─ Storage (general purpose SSD, gp2)                                  8  GB                           $0.80 
                                                                                                                  
- OVERALL TOTAL                                                                                         $1,294.12 
+ aws_instance.with_host                                                                                          
+ └─ root_block_device                                                                                            
+    └─ Storage (general purpose SSD, gp2)                                 50  GB                           $5.00 
+                                                                                                                 
+ OVERALL TOTAL                                                                                         $2,089.71 
 ──────────────────────────────────
-30 cloud resources were detected:
-∙ 28 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+31 cloud resources were detected:
+∙ 30 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 1 was free:
   ∙ 1 x aws_launch_template
-∙ 1 is not supported yet, see https://infracost.io/requested-resources:
-  ∙ 1 x aws_instance
 Logs:
 
-level=warning msg="Skipping resource aws_instance.instance1_hostTenancy. Infracost currently does not support host tenancy for AWS EC2 instances"
+level=warning msg="Skipping resource aws_instance.instance1_hostTenancy. Infracost currently does not support host tenancy for AWS EC2 instances without Host ID set up"

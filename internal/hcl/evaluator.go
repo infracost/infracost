@@ -12,6 +12,7 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/ext/tryfunc"
+	"github.com/hashicorp/hcl/v2/ext/typeexpr"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/sirupsen/logrus"
 	yaml "github.com/zclconf/go-cty-yaml"
@@ -40,7 +41,7 @@ var (
 	}
 )
 
-const maxContextIterations = 32
+const maxContextIterations = 120
 
 // Evaluator provides a set of given Blocks with contextual information.
 // Evaluator is an important step in retrieving Block values that can be used in the
@@ -89,7 +90,7 @@ func NewEvaluator(
 	logger *logrus.Entry,
 ) *Evaluator {
 	ctx := NewContext(&hcl.EvalContext{
-		Functions: expFunctions(module.RootPath),
+		Functions: expFunctions(module.RootPath, logger),
 	}, nil, logger)
 
 	if visitedModules == nil {
@@ -172,13 +173,13 @@ func (e *Evaluator) Run() (*Module, error) {
 	e.evaluate(lastContext)
 
 	// let's load the modules now we have our top level context.
-	e.moduleCalls = e.loadModules()
+	e.moduleCalls = e.loadModules(lastContext)
 	e.logger.Debug("evaluating context after loading modules")
 	e.evaluate(lastContext)
 
 	// expand out resources and modules via count and evaluate again so that we can include
 	// any module outputs and or count references.
-	e.module.Blocks = e.expandBlocks(e.module.Blocks)
+	e.module.Blocks = e.expandBlocks(e.module.Blocks, lastContext)
 	e.logger.Debug("evaluating context after expanding blocks")
 	e.evaluate(lastContext)
 
@@ -206,7 +207,9 @@ func (e *Evaluator) collectModules() *Module {
 // been evaluated and the context variables should remain unchanged. In reality 90% of cases will require
 // 2 loops, however other complex modules will take > 2.
 func (e *Evaluator) evaluate(lastContext hcl.EvalContext) {
-	for i := 0; i < maxContextIterations; i++ {
+	var i int
+
+	for i = 0; i < maxContextIterations; i++ {
 		e.evaluateStep(i)
 
 		if reflect.DeepEqual(lastContext.Variables, e.ctx.Inner().Variables) {
@@ -222,6 +225,11 @@ func (e *Evaluator) evaluate(lastContext hcl.EvalContext) {
 			lastContext.Variables[k] = v
 		}
 	}
+
+	if i == maxContextIterations {
+		e.logger.Warnf("hit max context iterations evaluating module %s", e.module.Name)
+	}
+
 }
 
 // evaluateStep gets the values for all the Block types in the current Module that affect Context.
@@ -275,7 +283,7 @@ func (e *Evaluator) evaluateModules() {
 			e.workingDir,
 			vars,
 			e.moduleMetadata,
-			e.visitedModules,
+			map[string]map[string]cty.Value{},
 			e.workspace,
 			e.blockBuilder,
 			nil,
@@ -293,8 +301,32 @@ func (e *Evaluator) exportOutputs() cty.Value {
 	return e.module.Blocks.Outputs(false)
 }
 
-func (e *Evaluator) expandBlocks(blocks Blocks) Blocks {
-	return e.expandDynamicBlocks(e.expandBlockForEaches(e.expandBlockCounts(blocks))...)
+func (e *Evaluator) expandBlocks(blocks Blocks, lastContext hcl.EvalContext) Blocks {
+	expanded := blocks
+
+	var i int
+	for i = 0; i < maxContextIterations; i++ {
+		expanded = e.expandBlockForEaches(e.expandBlockCounts(expanded))
+
+		if reflect.DeepEqual(lastContext.Variables, e.ctx.Inner().Variables) {
+			e.logger.Debug("evaluated outputs are the same as prior evaluation, exiting and returning expanded block")
+			break
+		}
+
+		if len(e.ctx.Inner().Variables) != len(lastContext.Variables) {
+			lastContext.Variables = make(map[string]cty.Value, len(e.ctx.Inner().Variables))
+		}
+
+		for k, v := range e.ctx.Inner().Variables {
+			lastContext.Variables[k] = v
+		}
+	}
+
+	if i == maxContextIterations {
+		e.logger.Warnf("hit max context iterations expanding blocks in module %s", e.module.Name)
+	}
+
+	return e.expandDynamicBlocks(expanded...)
 }
 
 func (e *Evaluator) expandDynamicBlocks(blocks ...*Block) Blocks {
@@ -323,24 +355,82 @@ func (e *Evaluator) expandDynamicBlock(b *Block) {
 	}
 }
 
+// expandBlockForEaches expands the block for_each attributes. Every block that is expanded has it's value
+// reset in the context map. The original value of the block is replaced with the expanded values.
+// This is required as otherwise we'll have the original attributes polluting the expanded values.
+// Leaving the original attributes is problematic as any resources referencing the expanded block will
+// iterate over those as well. So the context map will get overwritten as follows:
+//
+// value of:
+//
+//	test.test
+//		id: test
+//		arn: test-arn
+//
+// that gets expanded should be:
+//
+//	test.test
+//		a:
+//		  id: test
+//		  arn: test-arn
+//		b:
+//		  id: test
+//		  arn: test-arn
+//
+// and not:
+//
+//	   test.test
+//			id: test
+//			arn: test-arn
+//			a:
+//			  id: test
+//			...
+//
+// which means that blocks written like:
+//
+//	resource "aws_eip" "nat_gateway" {
+//		for_each   = test.test
+//			...
+//	}
+//
+// will expand correctly to: aws_eip.nat_gateway[a], aws_eip.nat_gateway[b]. Rather than aws_eip.nat_gateway[id], aws_eip.nat_gateway[a] ...
 func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
-	var forEachFiltered Blocks
+	var expanded Blocks
 	for _, block := range blocks {
 		forEachAttr := block.GetAttribute("for_each")
-		if forEachAttr == nil || block.IsCountExpanded() || !shouldExpandBlock(block) {
-			forEachFiltered = append(forEachFiltered, block)
+
+		if forEachAttr == nil || block.IsCountExpanded() || !block.IsForEachReferencedExpanded(blocks) || !shouldExpandBlock(block) {
+			expanded = append(expanded, block)
 			continue
 		}
 
 		e.logger.Debugf("expanding block %s because a for_each attribute was found", block.LocalName())
 
-		if !forEachAttr.Value().IsNull() && forEachAttr.Value().IsKnown() && forEachAttr.IsIterable() {
-			forEachAttr.Value().ForEachElement(func(key cty.Value, val cty.Value) bool {
+		value := forEachAttr.Value()
+		if !value.IsNull() && value.IsKnown() && forEachAttr.IsIterable() {
+			srcValue := e.getSourceValue(block)
+
+			typeLabel := block.TypeLabel()
+			nameLabel := block.NameLabel()
+			if block.Type() == "module" {
+				typeLabel = block.Type()
+				nameLabel = block.TypeLabel()
+			}
+
+			e.ctx.Set(cty.ObjectVal(make(map[string]cty.Value)), typeLabel, nameLabel)
+
+			value.ForEachElement(func(key cty.Value, val cty.Value) bool {
 				clone := e.blockBuilder.CloneBlock(block, key)
 
 				ctx := clone.Context()
 
-				e.copyVariables(block, clone)
+				var keyStr string
+				err := gocty.FromCtyValue(key, &keyStr)
+				if err != nil {
+					e.logger.WithError(err).Debugf("could not marshal gocty key %s to string", key)
+				}
+
+				e.ctx.Set(srcValue, typeLabel, nameLabel, keyStr)
 
 				ctx.SetByDot(key, "each.key")
 				ctx.SetByDot(val, "each.value")
@@ -348,14 +438,14 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 				ctx.Set(key, block.TypeLabel(), "key")
 				ctx.Set(val, block.TypeLabel(), "value")
 
-				forEachFiltered = append(forEachFiltered, clone)
+				expanded = append(expanded, clone)
 
 				return false
 			})
 		}
 	}
 
-	return forEachFiltered
+	return expanded
 }
 
 func shouldExpandBlock(block *Block) bool {
@@ -398,30 +488,28 @@ func (e *Evaluator) expandBlockCounts(blocks Blocks) Blocks {
 	return countFiltered
 }
 
-func (e *Evaluator) copyVariables(from, to *Block) {
+func (e *Evaluator) getSourceValue(from *Block) cty.Value {
 	var fromBase string
 	var fromRel string
-	var toRel string
 
 	switch from.Type() {
 	case "resource":
 		fromBase = from.TypeLabel()
 		fromRel = from.NameLabel()
-		toRel = to.NameLabel()
 	case "module":
 		fromBase = from.Type()
 		fromRel = from.TypeLabel()
-		toRel = to.TypeLabel()
 	default:
-		return
+		return cty.ObjectVal(make(map[string]cty.Value))
 	}
 
 	srcValue := e.ctx.Root().Get(fromBase, fromRel)
 	if srcValue == cty.NilVal {
 		e.logger.Debugf("error trying to copyVariable from the source of '%s.%s'", fromBase, fromRel)
-		return
+		return cty.ObjectVal(make(map[string]cty.Value))
 	}
-	e.ctx.Root().Set(srcValue, fromBase, toRel)
+
+	return srcValue
 }
 
 func (e *Evaluator) evaluateVariable(b *Block) (cty.Value, error) {
@@ -434,16 +522,25 @@ func (e *Evaluator) evaluateVariable(b *Block) (cty.Value, error) {
 		return cty.NilVal, fmt.Errorf("cannot resolve variable with no attributes")
 	}
 
-	attribute := attributes["type"]
+	attrType := attributes["type"]
 	if override, exists := e.inputVars[b.Label()]; exists {
-		return convertType(override, attribute), nil
+		return convertType(override, attrType), nil
 	}
 
 	if def, exists := attributes["default"]; exists {
-		return def.Value(), nil
+		if attrType == nil {
+			return def.Value(), nil
+		}
+
+		ty, diag := typeexpr.TypeConstraint(attrType.HCLAttr.Expr)
+		if diag.HasErrors() {
+			e.logger.WithError(diag).Debugf("error trying to convert variable %s to type %s", b.Label(), attrType.AsString())
+			return def.Value(), nil
+		}
+		return convert.Convert(def.Value(), ty)
 	}
 
-	return convertType(cty.NilVal, attribute), errorNoVarValue
+	return convertType(cty.NilVal, attrType), errorNoVarValue
 }
 
 func convertType(val cty.Value, attribute *Attribute) cty.Value {
@@ -659,13 +756,7 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 		key = nestedModReplace.ReplaceAllString(key, ".")
 		key = modArrayPartReplace.ReplaceAllString(key, "")
 
-		for _, module := range e.moduleMetadata.Modules {
-			if module.Key == key {
-				modulePath = filepath.Clean(filepath.Join(e.module.RootPath, module.Dir))
-				break
-			}
-		}
-
+		modulePath = e.moduleMetadata.FindModulePath(key)
 		e.logger.Debugf("using path '%s' for module '%s' based on key '%s'", modulePath, b.FullName(), key)
 	}
 
@@ -702,12 +793,12 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 }
 
 // loadModules reads all module blocks and loads the underlying modules, adding blocks to moduleCalls.
-func (e *Evaluator) loadModules() []*ModuleCall {
+func (e *Evaluator) loadModules(lastContext hcl.EvalContext) []*ModuleCall {
 	e.logger.Debug("loading module calls")
 	var moduleDefinitions []*ModuleCall
 
 	// TODO: if a module uses a count that depends on a module output, then the block expansion might be incorrect.
-	expanded := e.expandBlocks(e.module.Blocks.ModuleBlocks())
+	expanded := e.expandBlocks(e.module.Blocks.ModuleBlocks(), lastContext)
 
 	for _, moduleBlock := range expanded {
 		if moduleBlock.Label() == "" {
@@ -728,7 +819,7 @@ func (e *Evaluator) loadModules() []*ModuleCall {
 
 // expFunctions returns the set of functions that should be used to when evaluating
 // expressions in the receiving scope.
-func expFunctions(baseDir string) map[string]function.Function {
+func expFunctions(baseDir string, logger *logrus.Entry) map[string]function.Function {
 	return map[string]function.Function{
 		"abs":              stdlib.AbsoluteFunc,
 		"abspath":          funcs.AbsPathFunc,
@@ -790,6 +881,8 @@ func expFunctions(baseDir string) map[string]function.Function {
 		"min":              stdlib.MinFunc,
 		"parseint":         stdlib.ParseIntFunc,
 		"pathexpand":       funcs.PathExpandFunc,
+		"infracostlog":     funcs.LogArgs(logger),
+		"infracostprint":   funcs.PrintArgs,
 		"pow":              stdlib.PowFunc,
 		"range":            stdlib.RangeFunc,
 		"regex":            stdlib.RegexFunc,

@@ -11,12 +11,17 @@ import (
 	"github.com/tidwall/gjson"
 )
 
+const Standard = "Standard"
+const StandardSSD = "StandardSSD"
+const Premium = "Premium"
+
 var diskSizeMap = map[string][]struct {
 	Name string
 	Size int
 }{
 	// The mapping is from https://docs.microsoft.com/en-us/azure/virtual-machines/disks-types
-	"Standard_LRS": {
+	// sizes of disks don't depend on replication types. meaning, Standard_LRS disk sizes are the same as Standard_ZRS
+	Standard: {
 		{"S4", 32},
 		{"S6", 64},
 		{"S10", 128},
@@ -29,7 +34,7 @@ var diskSizeMap = map[string][]struct {
 		{"S70", 16384},
 		{"S80", 32767},
 	},
-	"StandardSSD_LRS": {
+	StandardSSD: {
 		{"E1", 4},
 		{"E2", 8},
 		{"E3", 16},
@@ -45,7 +50,7 @@ var diskSizeMap = map[string][]struct {
 		{"E70", 16384},
 		{"E80", 32767},
 	},
-	"Premium_LRS": {
+	Premium: {
 		{"P1", 4},
 		{"P2", 8},
 		{"P3", 16},
@@ -63,14 +68,15 @@ var diskSizeMap = map[string][]struct {
 	},
 }
 
+var storageReplicationTypes = []string{"LRS", "ZRS"}
 var ultraDiskSizes = []int{4, 8, 16, 32, 64, 128, 256, 512}
 var ultraDiskSizeStep = 1024
 var ultraDiskMaxSize = 65536
 
 var diskProductNameMap = map[string]string{
-	"Standard_LRS":    "Standard HDD Managed Disks",
-	"StandardSSD_LRS": "Standard SSD Managed Disks",
-	"Premium_LRS":     "Premium SSD Managed Disks",
+	Standard:    "Standard HDD Managed Disks",
+	StandardSSD: "Standard SSD Managed Disks",
+	Premium:     "Premium SSD Managed Disks",
 }
 
 func GetAzureRMManagedDiskRegistryItem() *schema.RegistryItem {
@@ -99,35 +105,49 @@ func NewAzureRMManagedDisk(d *schema.ResourceData, u *schema.UsageData) *schema.
 }
 
 func managedDiskCostComponents(region, diskType string, diskData gjson.Result, monthlyDiskOperations *decimal.Decimal) []*schema.CostComponent {
-	if strings.ToLower(diskType) == "ultrassd_lrs" {
-		return ultraDiskCostComponents(region, diskType, diskData)
+	p := strings.Split(diskType, "_")
+	diskTypePrefix := p[0]
+
+	var storageReplicationType string
+	if len(p) > 1 {
+		storageReplicationType = strings.ToUpper(p[1])
 	}
 
-	return standardPremiumDiskCostComponents(region, diskType, diskData, monthlyDiskOperations)
+	validstorageReplicationType := mapStorageReplicationType(storageReplicationType)
+	if !validstorageReplicationType {
+		log.Warnf("Could not map %s to a valid storage type", storageReplicationType)
+		return nil
+	}
+
+	if strings.ToLower(diskTypePrefix) == "ultrassd" {
+		return ultraDiskCostComponents(region, storageReplicationType, diskData)
+	}
+
+	return standardPremiumDiskCostComponents(region, diskTypePrefix, storageReplicationType, diskData, monthlyDiskOperations)
 }
 
-func standardPremiumDiskCostComponents(region string, diskType string, diskData gjson.Result, monthlyDiskOperations *decimal.Decimal) []*schema.CostComponent {
+func standardPremiumDiskCostComponents(region string, diskTypePrefix string, storageReplicationType string, diskData gjson.Result, monthlyDiskOperations *decimal.Decimal) []*schema.CostComponent {
 	requestedSize := 30
 
 	if diskData.Get("disk_size_gb").Exists() {
 		requestedSize = int(diskData.Get("disk_size_gb").Int())
 	}
 
-	diskName := mapDiskName(diskType, requestedSize)
-	if diskName == "" {
-		log.Warnf("Could not map disk type %s and size %d to disk name", diskType, requestedSize)
+	diskName := mapDiskName(diskTypePrefix, requestedSize)
+	if diskTypePrefix == "" {
+		log.Warnf("Could not map disk type %s and size %d to disk name", diskTypePrefix, requestedSize)
 		return nil
 	}
 
-	productName, ok := diskProductNameMap[diskType]
+	productName, ok := diskProductNameMap[diskTypePrefix]
 	if !ok {
-		log.Warnf("Could not map disk type %s to product name", diskType)
+		log.Warnf("Could not map disk type %s to product name", diskTypePrefix)
 		return nil
 	}
 
-	costComponents := []*schema.CostComponent{storageCostComponent(region, diskName, productName)}
+	costComponents := []*schema.CostComponent{storageCostComponent(region, diskName, storageReplicationType, productName)}
 
-	if strings.ToLower(diskType) == "standard_lrs" || strings.ToLower(diskType) == "standardssd_lrs" {
+	if strings.ToLower(diskTypePrefix) == "standard" || strings.ToLower(diskTypePrefix) == "standardssd" {
 		var opsQty *decimal.Decimal
 
 		if monthlyDiskOperations != nil {
@@ -146,7 +166,7 @@ func standardPremiumDiskCostComponents(region string, diskType string, diskData 
 				ProductFamily: strPtr("Storage"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "productName", Value: strPtr(productName)},
-					{Key: "skuName", Value: strPtr(fmt.Sprintf("%s LRS", diskName))},
+					{Key: "skuName", Value: strPtr(fmt.Sprintf("%s %s", diskName, storageReplicationType))},
 					{Key: "meterName", Value: strPtr("Disk Operations")},
 				},
 			},
@@ -159,9 +179,9 @@ func standardPremiumDiskCostComponents(region string, diskType string, diskData 
 	return costComponents
 }
 
-func storageCostComponent(region, diskName, productName string) *schema.CostComponent {
+func storageCostComponent(region, diskName string, storageReplicationType string, productName string) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:            fmt.Sprintf("Storage (%s)", diskName),
+		Name:            fmt.Sprintf("Storage (%s, %s)", diskName, storageReplicationType),
 		Unit:            "months",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
@@ -172,8 +192,8 @@ func storageCostComponent(region, diskName, productName string) *schema.CostComp
 			ProductFamily: strPtr("Storage"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr(productName)},
-				{Key: "skuName", Value: strPtr(fmt.Sprintf("%s LRS", diskName))},
-				{Key: "meterName", Value: strPtr(fmt.Sprintf("%s Disks", diskName))},
+				{Key: "skuName", Value: strPtr(fmt.Sprintf("%s %s", diskName, storageReplicationType))},
+				{Key: "meterName", ValueRegex: regexPtr(fmt.Sprintf("^%s (%s )?Disk(s)?$", diskName, storageReplicationType))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -182,7 +202,7 @@ func storageCostComponent(region, diskName, productName string) *schema.CostComp
 	}
 }
 
-func ultraDiskCostComponents(region string, diskType string, diskData gjson.Result) []*schema.CostComponent {
+func ultraDiskCostComponents(region string, storageReplicationType string, diskData gjson.Result) []*schema.CostComponent {
 	requestedSize := 1024
 	iops := 2048
 	throughput := 8
@@ -200,7 +220,6 @@ func ultraDiskCostComponents(region string, diskType string, diskData gjson.Resu
 	}
 
 	diskSize := mapUltraDiskSize(requestedSize)
-
 	costComponents := []*schema.CostComponent{
 		{
 			Name:           fmt.Sprintf("Storage (ultra, %d GiB)", diskSize),
@@ -214,8 +233,8 @@ func ultraDiskCostComponents(region string, diskType string, diskData gjson.Resu
 				ProductFamily: strPtr("Storage"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "productName", Value: strPtr("Ultra Disks")},
-					{Key: "skuName", Value: strPtr("Ultra LRS")},
-					{Key: "meterName", Value: strPtr("Provisioned Capacity")},
+					{Key: "skuName", Value: strPtr(fmt.Sprintf("Ultra %s", storageReplicationType))},
+					{Key: "meterName", ValueRegex: regexPtr("Provisioned Capacity$")},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
@@ -234,8 +253,8 @@ func ultraDiskCostComponents(region string, diskType string, diskData gjson.Resu
 				ProductFamily: strPtr("Storage"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "productName", Value: strPtr("Ultra Disks")},
-					{Key: "skuName", Value: strPtr("Ultra LRS")},
-					{Key: "meterName", Value: strPtr("Provisioned IOPS")},
+					{Key: "skuName", Value: strPtr(fmt.Sprintf("Ultra %s", storageReplicationType))},
+					{Key: "meterName", ValueRegex: regexPtr("Provisioned IOPS$")},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
@@ -254,8 +273,8 @@ func ultraDiskCostComponents(region string, diskType string, diskData gjson.Resu
 				ProductFamily: strPtr("Storage"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "productName", Value: strPtr("Ultra Disks")},
-					{Key: "skuName", Value: strPtr("Ultra LRS")},
-					{Key: "meterName", Value: strPtr("Provisioned Throughput (MBps)")},
+					{Key: "skuName", Value: strPtr(fmt.Sprintf("Ultra %s", storageReplicationType))},
+					{Key: "meterName", ValueRegex: regexPtr("Provisioned Throughput \\(MBps\\)$")},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
@@ -288,6 +307,16 @@ func mapDiskName(diskType string, requestedSize int) string {
 	return name
 }
 
+func mapStorageReplicationType(storageReplicationType string) bool {
+	for _, b := range storageReplicationTypes {
+		if storageReplicationType == b {
+			return true
+		}
+	}
+
+	return false
+}
+
 func mapUltraDiskSize(requestedSize int) int {
 	if requestedSize >= ultraDiskMaxSize {
 		return ultraDiskMaxSize
@@ -310,5 +339,4 @@ func mapUltraDiskSize(requestedSize int) int {
 	}
 
 	return size
-
 }

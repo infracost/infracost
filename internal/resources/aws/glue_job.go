@@ -34,8 +34,8 @@ func (r *GlueJob) PopulateUsage(u *schema.UsageData) {
 // BuildResource builds a schema.Resource from a valid GlueJob struct. GlueJob has just one schema.CostComponent
 // associated with it:
 //
-//		1. DPU hours - GlueJob is charged per hour that the job is run. Users are charged based on the number of DPU
-//		   units they use in that time.
+//  1. DPU hours - GlueJob is charged per hour that the job is run. Users are charged based on the number of DPU
+//     units they use in that time.
 //
 // This method is called after the resource is initialised by an IaC provider. See providers folder for more information.
 func (r *GlueJob) BuildResource() *schema.Resource {

@@ -4,13 +4,13 @@
  azurerm_linux_virtual_machine_scale_set.basic_a2                                                                   
  ├─ Instance usage (pay as you go, Basic_A2)                          2,190  hours                          $173.01 
  └─ os_disk                                                                                                         
-    ├─ Storage (S4)                                                       3  months                           $4.61 
+    ├─ Storage (S4, LRS)                                                  3  months                           $4.61 
     └─ Disk operations                                   Monthly cost depends on usage: $0.0005 per 10k operations  
                                                                                                                     
  azurerm_linux_virtual_machine_scale_set.basic_a2_usage                                                             
  ├─ Instance usage (pay as you go, Basic_A2)                          2,920  hours                          $230.68 
  └─ os_disk                                                                                                         
-    ├─ Storage (S4)                                                       4  months                           $6.14 
+    ├─ Storage (S4, LRS)                                                  4  months                           $6.14 
     └─ Disk operations                                   Monthly cost depends on usage: $0.0005 per 10k operations  
                                                                                                                     
  OVERALL TOTAL                                                                                              $414.44 

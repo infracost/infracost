@@ -3,17 +3,32 @@
                                                                                                            
  aws_lambda_function.lambda                                                                                
  ├─ Requests                                 Monthly cost depends on usage: $0.20 per 1M requests          
- └─ Duration                                 Monthly cost depends on usage: $0.0000166667 per GB-seconds   
+ └─ Duration (first 6B)                      Monthly cost depends on usage: $0.0000166667 per GB-seconds   
+                                                                                                           
+ aws_lambda_function.lambda_duration_15B                                                                   
+ ├─ Requests                                 Monthly cost depends on usage: $0.20 per 1M requests          
+ ├─ Duration (first 6B)                            6,000,000,000  GB-seconds                   $100,000.20 
+ ├─ Duration (next 9B)                             9,000,000,000  GB-seconds                   $135,000.00 
+ └─ Duration (over 15B)                            9,576,000,000  GB-seconds                   $127,680.64 
+                                                                                                           
+ aws_lambda_function.lambda_duration_6B                                                                    
+ ├─ Requests                                 Monthly cost depends on usage: $0.20 per 1M requests          
+ └─ Duration (first 6B)                            3,072,000,000  GB-seconds                    $51,200.10 
+                                                                                                           
+ aws_lambda_function.lambda_duration_9B                                                                    
+ ├─ Requests                                 Monthly cost depends on usage: $0.20 per 1M requests          
+ ├─ Duration (first 6B)                            6,000,000,000  GB-seconds                   $100,000.20 
+ └─ Duration (next 9B)                               144,000,000  GB-seconds                     $2,160.00 
                                                                                                            
  aws_lambda_function.lambda_withUsage                                                                      
- ├─ Requests                                                 0.1  1M requests                        $0.02 
- └─ Duration                                               4,375  GB-seconds                         $0.07 
+ ├─ Requests                                 Monthly cost depends on usage: $0.20 per 1M requests          
+ └─ Duration (first 6B)                                    4,375  GB-seconds                         $0.07 
                                                                                                            
  aws_lambda_function.lambda_withUsage512Mem                                                                
- ├─ Requests                                                 0.1  1M requests                        $0.02 
- └─ Duration                                              17,500  GB-seconds                         $0.29 
+ ├─ Requests                                 Monthly cost depends on usage: $0.20 per 1M requests          
+ └─ Duration (first 6B)                                   17,500  GB-seconds                         $0.29 
                                                                                                            
- OVERALL TOTAL                                                                                       $0.40 
+ OVERALL TOTAL                                                                                 $516,041.51 
 ──────────────────────────────────
-3 cloud resources were detected:
-∙ 3 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+6 cloud resources were detected:
+∙ 6 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

@@ -296,6 +296,7 @@ func loadResources(t *testing.T, pName string, tfProject TerraformProject, runCt
 	t.Helper()
 
 	tfdir := createTerraformProject(t, tfProject)
+	runCtx.Config.RootPath = tfdir
 	var provider schema.Provider
 	if pName == "hcl" {
 		provider = newHCLProvider(t, runCtx, tfdir)

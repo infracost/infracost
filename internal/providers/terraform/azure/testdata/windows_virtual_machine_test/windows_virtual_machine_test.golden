@@ -4,44 +4,44 @@
  azurerm_windows_virtual_machine.Standard_E16-8as_v4                                                                       
  ├─ Instance usage (pay as you go, Standard_E16-8as_v4)                        730  hours                        $1,273.12 
  └─ os_disk                                                                                                                
-    ├─ Storage (S4)                                                              1  months                           $1.54 
+    ├─ Storage (S4, LRS)                                                         1  months                           $1.54 
     └─ Disk operations                                          Monthly cost depends on usage: $0.0005 per 10k operations  
                                                                                                                            
  azurerm_windows_virtual_machine.basic_a2                                                                                  
  ├─ Instance usage (pay as you go, Basic_A2)                                   730  hours                           $97.09 
  └─ os_disk                                                                                                                
-    ├─ Storage (S4)                                                              1  months                           $1.54 
+    ├─ Storage (S4, LRS)                                                         1  months                           $1.54 
     └─ Disk operations                                          Monthly cost depends on usage: $0.0005 per 10k operations  
                                                                                                                            
  azurerm_windows_virtual_machine.basic_a2_withMonthlyHours                                                                 
  ├─ Instance usage (pay as you go, Basic_A2)                                   100  hours                           $13.30 
  └─ os_disk                                                                                                                
-    ├─ Storage (S4)                                                              1  months                           $1.54 
+    ├─ Storage (S4, LRS)                                                         1  months                           $1.54 
     └─ Disk operations                                          Monthly cost depends on usage: $0.0005 per 10k operations  
                                                                                                                            
  azurerm_windows_virtual_machine.standard_a2_ultra_enabled                                                                 
  ├─ Instance usage (pay as you go, Standard_A2_v2)                             730  hours                           $99.28 
  ├─ Ultra disk reservation (if unattached)                      Monthly cost depends on usage: $4.38 per vCPU              
  └─ os_disk                                                                                                                
-    ├─ Storage (E4)                                                              1  months                           $2.40 
+    ├─ Storage (E4, LRS)                                                         1  months                           $2.40 
     └─ Disk operations                                          Monthly cost depends on usage: $0.002 per 10k operations   
                                                                                                                            
  azurerm_windows_virtual_machine.standard_a2_v2_custom_disk                                                                
  ├─ Instance usage (pay as you go, Standard_A2_v2)                             730  hours                           $99.28 
  └─ os_disk                                                                                                                
-    ├─ Storage (E30)                                                             1  months                          $76.80 
+    ├─ Storage (E30, LRS)                                                        1  months                          $76.80 
     └─ Disk operations                                                           2  10k operations                   $0.00 
                                                                                                                            
  azurerm_windows_virtual_machine.standard_d2_v4_hybrid_benefit                                                             
  ├─ Instance usage (hybrid benefit, Standard_D2_v4)                            730  hours                           $70.08 
  └─ os_disk                                                                                                                
-    ├─ Storage (E30)                                                             1  months                          $76.80 
+    ├─ Storage (E30, LRS)                                                        1  months                          $76.80 
     └─ Disk operations                                          Monthly cost depends on usage: $0.002 per 10k operations   
                                                                                                                            
  azurerm_windows_virtual_machine.standard_f2_premium_disk                                                                  
  ├─ Instance usage (pay as you go, Standard_F2)                                730  hours                          $140.16 
  └─ os_disk                                                                                                                
-    └─ Storage (P4)                                                              1  months                           $5.28 
+    └─ Storage (P4, LRS)                                                         1  months                           $5.28 
                                                                                                                            
  OVERALL TOTAL                                                                                                   $1,958.20 
 ──────────────────────────────────

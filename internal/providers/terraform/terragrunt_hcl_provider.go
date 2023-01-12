@@ -1,12 +1,15 @@
 package terraform
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"runtime/debug"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -21,6 +24,7 @@ import (
 	hcl2 "github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/gohcl"
 	"github.com/hashicorp/hcl/v2/hclparse"
+	"github.com/otiai10/copy"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
@@ -33,6 +37,8 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
 )
+
+const terragruntSourceVersionFile = ".terragrunt-source-version"
 
 type panicError struct {
 	msg string
@@ -50,6 +56,7 @@ type TerragruntHCLProvider struct {
 	stack                *tgconfigstack.Stack
 	excludedPaths        []string
 	env                  map[string]string
+	sourceCache          map[string]string
 	logger               *log.Entry
 }
 
@@ -67,6 +74,7 @@ func NewTerragruntHCLProvider(ctx *config.ProjectContext, includePastResources b
 		outputs:              map[string]cty.Value{},
 		excludedPaths:        ctx.ProjectConfig.ExcludePaths,
 		env:                  parseEnvironmentVariables(os.Environ()),
+		sourceCache:          map[string]string{},
 		logger:               logger,
 	}
 }
@@ -176,7 +184,8 @@ func (p *TerragruntHCLProvider) initTerraformVars(tfVars map[string]string, inpu
 func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, error) {
 	terragruntConfigPath := tgconfig.GetDefaultConfigPath(p.Path)
 
-	terragruntDownloadDir := filepath.Join(p.Path, ".infracost/.terragrunt-cache")
+	terragruntCacheDir := filepath.Join(config.InfracostDir, ".terragrunt-cache")
+	terragruntDownloadDir := filepath.Join(p.Path, terragruntCacheDir)
 	err := os.MkdirAll(terragruntDownloadDir, os.ModePerm)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to create download directories for terragrunt in working directory: %w", err)
@@ -248,15 +257,12 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 // in a Terragrunt project. Folders that have outputs that are used by other folders are evaluated first.
 //
 // runTerragrunt will
-//		1. build a valid Terraform run env from the opts provided.
-//		2. download source modules that are required for the project.
-// 		3. we then evaluate the Terraform project built by Terragrunt storing any outputs so that we can use
-//			these for further runTerragrunt calls that use the dependency outputs.
+//  1. build a valid Terraform run env from the opts provided.
+//  2. download source modules that are required for the project.
+//  3. we then evaluate the Terraform project built by Terragrunt storing any outputs so that we can use
+//     these for further runTerragrunt calls that use the dependency outputs.
 func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions) (*terragruntWorkingDirInfo, error) {
-	outputs, err := p.fetchDependencyOutputs(opts)
-	if err != nil {
-		return nil, err
-	}
+	outputs := p.fetchDependencyOutputs(opts)
 
 	terragruntConfig, err := tgconfig.ParseConfigFile(opts.TerragruntConfigPath, opts, nil, &outputs)
 	if err != nil {
@@ -368,8 +374,189 @@ func convertToCtyWithJson(val interface{}) (cty.Value, error) {
 	return ctyJsonVal.Value, nil
 }
 
-// fetchDependencyOutputs returns the Terraform outputs from the dependencies of Terragrunt file provided in the opts input.
-func (p *TerragruntHCLProvider) fetchDependencyOutputs(opts *tgoptions.TerragruntOptions) (cty.Value, error) {
+var (
+	depRegexp   = regexp.MustCompile(`dependency\.[\w.\[\]"]+`)
+	indexRegexp = regexp.MustCompile(`(\w+)\[(\d+)]`)
+	mapRegexp   = regexp.MustCompile(`(\w+)\["([\w\d]+)"]`)
+)
+
+func (p *TerragruntHCLProvider) fetchDependencyOutputs(opts *tgoptions.TerragruntOptions) cty.Value {
+	moduleOutputs, err := p.fetchModuleOutputs(opts)
+	if err != nil {
+		p.logger.WithError(err).Debug("failed to fetch real module outputs, defaulting to mocked outputs from file regexp")
+	}
+
+	file, err := os.Open(opts.TerragruntConfigPath)
+	if err != nil {
+		p.logger.WithError(err).Debug("could not open Terragrunt file for dependency regexps")
+		return moduleOutputs
+	}
+
+	var matches []string
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		// skip any commented out lines
+		if strings.HasPrefix(line, "#") {
+			continue
+		}
+
+		match := depRegexp.FindString(line)
+		if match != "" {
+			matches = append(matches, match)
+		}
+	}
+
+	if err := scanner.Err(); err != nil {
+		p.logger.WithError(err).Debug("error scanning Terragrunt file lines matching whole file with regexp")
+
+		b, err := os.ReadFile(opts.TerragruntConfigPath)
+		if err != nil {
+			p.logger.WithError(err).Debug("could not read Terragrunt file for dependency regxps")
+		}
+
+		matches = depRegexp.FindAllString(string(b), -1)
+	}
+
+	if len(matches) == 0 {
+		return moduleOutputs
+	}
+
+	valueMap := moduleOutputs.AsValueMap()
+
+	for _, match := range matches {
+		pieces := strings.Split(match, ".")
+		valueMap = mergeObjectWithDependencyMap(valueMap, pieces[1:])
+	}
+
+	return cty.ObjectVal(valueMap)
+}
+
+func mergeObjectWithDependencyMap(valueMap map[string]cty.Value, pieces []string) map[string]cty.Value {
+	if valueMap == nil {
+		valueMap = make(map[string]cty.Value)
+	}
+
+	if len(pieces) == 0 {
+		return valueMap
+	}
+
+	key := pieces[0]
+	indexKeys := indexRegexp.FindStringSubmatch(key)
+	if len(indexKeys) != 0 {
+		index, _ := strconv.Atoi(indexKeys[2])
+		return mergeListWithDependencyMap(valueMap, pieces, indexKeys[1], index)
+	}
+
+	mapKeys := mapRegexp.FindStringSubmatch(key)
+	if len(mapKeys) != 0 {
+		key = mapKeys[1]
+		pieces = append([]string{pieces[0], mapKeys[2]}, pieces[1:]...)
+	}
+
+	if len(pieces) == 1 {
+		if v, ok := valueMap[key]; ok && v.IsKnown() {
+			return valueMap
+		}
+
+		valueMap[key] = cty.StringVal(fmt.Sprintf("%s-mock", key))
+		return valueMap
+	}
+
+	if v, ok := valueMap[key]; ok {
+		if v.CanIterateElements() {
+			valueMap[key] = cty.ObjectVal(mergeObjectWithDependencyMap(v.AsValueMap(), pieces[1:]))
+			return valueMap
+		}
+
+		valueMap[key] = cty.ObjectVal(mergeObjectWithDependencyMap(make(map[string]cty.Value), pieces[1:]))
+		return valueMap
+	}
+
+	valueMap[key] = cty.ObjectVal(mergeObjectWithDependencyMap(make(map[string]cty.Value), pieces[1:]))
+	return valueMap
+}
+
+func mergeListWithDependencyMap(valueMap map[string]cty.Value, pieces []string, key string, index int) map[string]cty.Value {
+	indexVal := cty.NumberIntVal(int64(index))
+
+	if len(pieces) == 1 {
+		if v, ok := valueMap[key]; ok && (v.Type().IsListType() || v.Type().IsTupleType()) {
+			// if we have the index already in the dependency output, and it is known use the existing value.
+			// If the value is unknown we need to override it wil a mock as Terragrunt will explode when they
+			// try and marshal the cty values to JSON.
+			if v.HasIndex(indexVal).True() && v.Index(indexVal).IsKnown() {
+				return valueMap
+			}
+
+			existing := v.AsValueSlice()
+			vals := make([]cty.Value, index+1)
+			for i, value := range existing {
+				if value.IsKnown() {
+					vals[i] = value
+					continue
+				}
+
+				vals[i] = cty.StringVal(fmt.Sprintf("%s-%d-mock", key, i))
+			}
+
+			for i := len(existing); i <= index; i++ {
+				vals[i] = cty.StringVal(fmt.Sprintf("%s-%d-mock", key, i))
+			}
+
+			valueMap[key] = cty.TupleVal(vals)
+			return valueMap
+		}
+
+		vals := make([]cty.Value, index+1)
+		for i := 0; i <= index; i++ {
+			vals[i] = cty.StringVal(fmt.Sprintf("%s-%d-mock", key, i))
+		}
+
+		valueMap[key] = cty.ListVal(vals)
+		return valueMap
+	}
+
+	mockValue := cty.ObjectVal(mergeObjectWithDependencyMap(map[string]cty.Value{}, pieces[1:]))
+
+	if v, ok := valueMap[key]; ok && (v.Type().IsListType() || v.Type().IsTupleType()) {
+		// if we have the index already in the dependency output, and it is known use the existing value.
+		// If the value is unknown we need to override it wil a mock as Terragrunt will explode when they
+		// try and marshal the cty values to JSON.
+		if v.HasIndex(indexVal).True() && v.Index(indexVal).IsKnown() {
+			return valueMap
+		}
+
+		existing := v.AsValueSlice()
+		vals := make([]cty.Value, index+1)
+		for i, value := range existing {
+			if value.IsKnown() {
+				vals[i] = value
+				continue
+			}
+
+			vals[i] = mockValue
+		}
+
+		for i := len(existing); i <= index; i++ {
+			vals[i] = mockValue
+		}
+
+		valueMap[key] = cty.TupleVal(vals)
+		return valueMap
+	}
+
+	vals := make([]cty.Value, index+1)
+	for i := 0; i <= index; i++ {
+		vals[i] = mockValue
+	}
+
+	valueMap[key] = cty.ListVal(vals)
+	return valueMap
+}
+
+// fetchModuleOutputs returns the Terraform outputs from the dependencies of Terragrunt file provided in the opts input.
+func (p *TerragruntHCLProvider) fetchModuleOutputs(opts *tgoptions.TerragruntOptions) (cty.Value, error) {
 	outputs := cty.MapVal(map[string]cty.Value{
 		"outputs": cty.ObjectVal(map[string]cty.Value{
 			"mock": cty.StringVal("val"),
@@ -451,6 +638,11 @@ func (p *TerragruntHCLProvider) downloadTerraformSource(source string, terragrun
 		return nil, err
 	}
 
+	if _, ok := p.sourceCache[terraformSource.CanonicalSourceURL.String()]; !ok {
+		terragruntOptions.Logger.Debugf("Adding %s to the source cache", terraformSource.CanonicalSourceURL.String())
+		p.sourceCache[terraformSource.CanonicalSourceURL.String()] = terraformSource.DownloadDir
+	}
+
 	terragruntOptions.Logger.Debugf("Copying files from %s into %s", terragruntOptions.WorkingDir, terraformSource.WorkingDir)
 	var includeInCopy []string
 	if terragruntConfig.Terraform != nil && terragruntConfig.Terraform.IncludeInCopy != nil {
@@ -468,16 +660,42 @@ func (p *TerragruntHCLProvider) downloadTerraformSource(source string, terragrun
 	return updatedTerragruntOptions, nil
 }
 
+// copyLocalSource copies the contents of a previously downloaded source folder into the destination folder
+func (p *TerragruntHCLProvider) copyLocalSource(prevDest string, dest string, terragruntOptions *tgoptions.TerragruntOptions) error {
+	err := os.MkdirAll(dest, os.ModePerm)
+	if err != nil {
+		return fmt.Errorf("failed to create directory '%s': %w", dest, err)
+	}
+
+	// Skip dotfiles and, but keep:
+	// 1. Terraform lock files - these are normally committed to source control
+	// 2. .terragrunt-source-version files - these are used to determine if the source has changed
+	// 3. .infracost dir - this contains any cached third party modules. We can remove this when we move this directory to the root path
+	opt := copy.Options{
+		Skip: func(src string) (bool, error) {
+			base := filepath.Base(src)
+			if base == util.TerraformLockFile || base == terragruntSourceVersionFile || base == config.InfracostDir {
+				return false, nil
+			}
+
+			return strings.HasPrefix(base, "."), nil
+		},
+		OnSymlink: func(src string) copy.SymlinkAction {
+			return copy.Shallow
+		},
+	}
+
+	err = copy.Copy(prevDest, dest, opt)
+	if err != nil {
+		return fmt.Errorf("failed to copy source from '%s' to '%s': %w", prevDest, dest, err)
+	}
+
+	return nil
+}
+
 // Download the specified TerraformSource if the latest code hasn't already been downloaded.
 // Copied from github.com/gruntwork-io/terragrunt
 func (p *TerragruntHCLProvider) downloadTerraformSourceIfNecessary(terraformSource *tfsource.TerraformSource, terragruntOptions *tgoptions.TerragruntOptions, terragruntConfig *tgconfig.TerragruntConfig) error {
-	if terragruntOptions.SourceUpdate {
-		terragruntOptions.Logger.Debugf("The --%s flag is set, so deleting the temporary folder %s before downloading source.", "terragrunt-source-update", terraformSource.DownloadDir)
-		if err := os.RemoveAll(terraformSource.DownloadDir); err != nil {
-			return tgerrors.WithStackTrace(err)
-		}
-	}
-
 	alreadyLatest, err := p.alreadyHaveLatestCode(terraformSource, terragruntOptions)
 	if err != nil {
 		return err
@@ -498,6 +716,19 @@ func (p *TerragruntHCLProvider) downloadTerraformSourceIfNecessary(terraformSour
 		previousVersion, err = p.readVersionFile(terraformSource)
 		if err != nil {
 			return err
+		}
+	}
+
+	// Check if the directory has already been downloaded during this run and is in the source cache
+	// If so, we can just copy the files from the previous download to avoid downloading again
+	if prevDownloadDir, ok := p.sourceCache[terraformSource.CanonicalSourceURL.String()]; ok {
+		terragruntOptions.Logger.Debugf("Source files have already been downloading. Copying files from %s into %s", prevDownloadDir, terraformSource.DownloadDir)
+		err := p.copyLocalSource(prevDownloadDir, terraformSource.DownloadDir, terragruntOptions)
+		if err != nil {
+			terragruntOptions.Logger.Debugf("Failed to copy local source from %s to %s: %v. Will try to redownload", prevDownloadDir, terraformSource.DownloadDir, err)
+		} else {
+			terragruntOptions.Logger.Debugf("Successfully copied files from %s to %s. Will not download again", prevDownloadDir, terraformSource.DownloadDir)
+			return nil
 		}
 	}
 
@@ -551,9 +782,10 @@ func (p *TerragruntHCLProvider) downloadSource(terraformSource *tfsource.Terrafo
 }
 
 // updateGetters returns the customized go-getter interfaces that Terragrunt relies on. Specifically:
-// - Local file path getter is updated to copy the files instead of creating symlinks, which is what go-getter defaults
-//   to.
-// - Include the customized getter for fetching sources from the Terraform Registry.
+//   - Local file path getter is updated to copy the files instead of creating symlinks, which is what go-getter defaults
+//     to.
+//   - Include the customized getter for fetching sources from the Terraform Registry.
+//
 // This creates a closure that returns a function so that we have access to the terragrunt configuration, which is
 // necessary for customizing the behavior of the file getter.
 // Copied from github.com/gruntwork-io/terragrunt
@@ -648,7 +880,13 @@ type terragruntDependency struct {
 // The map is keyed by the full path of the config_path attribute specified in the dependency block.
 func decodeDependencyBlocks(filename string, terragruntOptions *tgoptions.TerragruntOptions, dependencyOutputs *cty.Value, include *tgconfig.IncludeConfig) (map[string]tgconfig.Dependency, error) {
 	parser := hclparse.NewParser()
-	file, diags := parser.ParseHCLFile(filename)
+
+	parseFunc := parser.ParseHCLFile
+	if strings.HasSuffix(filename, ".json") {
+		parseFunc = parser.ParseJSONFile
+	}
+
+	file, diags := parseFunc(filename)
 	if diags != nil && diags.HasErrors() {
 		return nil, fmt.Errorf("could not parse hcl file %s to decode dependency blocks %w", filename, diags)
 	}

@@ -7,10 +7,11 @@ import (
 )
 
 func TestWAFWebACLGoldenFile(t *testing.T) {
-	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
 
-	tftest.GoldenFileResourceTests(t, "waf_web_acl_test")
+	opts := tftest.DefaultGoldenFileOptions()
+	opts.CaptureLogs = true
+	tftest.GoldenFileResourceTestsWithOpts(t, "waf_web_acl_test", opts)
 }

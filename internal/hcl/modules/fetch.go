@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	getter "github.com/hashicorp/go-getter"
 	"github.com/otiai10/copy"
@@ -14,14 +15,13 @@ import (
 // PackageFetcher downloads modules from a remote source to the given destination
 // This supports all the non-local and non-Terraform registry sources listed here: https://www.terraform.io/language/modules/sources
 type PackageFetcher struct {
-	cache  map[string]string
+	cache  sync.Map
 	logger *logrus.Entry
 }
 
 // NewPackageFetcher constructs a new package fetcher
 func NewPackageFetcher(logger *logrus.Entry) *PackageFetcher {
 	return &PackageFetcher{
-		cache:  make(map[string]string),
 		logger: logger,
 	}
 }
@@ -29,7 +29,9 @@ func NewPackageFetcher(logger *logrus.Entry) *PackageFetcher {
 // fetch downloads the remote module using the go-getter library
 // See: https://github.com/hashicorp/go-getter
 func (r *PackageFetcher) fetch(moduleAddr string, dest string) error {
-	if prevDest, ok := r.cache[moduleAddr]; ok {
+	if v, ok := r.cache.Load(moduleAddr); ok {
+		prevDest, _ := v.(string)
+
 		r.logger.Debugf("module %s already downloaded, copying from '%s' to '%s'", moduleAddr, prevDest, dest)
 
 		err := os.Mkdir(dest, os.ModePerm)
@@ -55,9 +57,12 @@ func (r *PackageFetcher) fetch(moduleAddr string, dest string) error {
 		return nil
 	}
 	var cached []string
-	for k := range r.cache {
-		cached = append(cached, k)
-	}
+	r.cache.Range(func(k, value any) bool {
+		s, _ := value.(string)
+		cached = append(cached, s)
+
+		return true
+	})
 
 	r.logger.WithFields(logrus.Fields{"cached_module_addresses": cached}).Debugf("module %s does not exist in cache, proceeding to download", moduleAddr)
 
@@ -81,7 +86,7 @@ func (r *PackageFetcher) fetch(moduleAddr string, dest string) error {
 		// Getters: getters,
 	}
 
-	r.cache[moduleAddr] = dest
+	r.cache.Store(moduleAddr, dest)
 
 	err := client.Get()
 	if err != nil {

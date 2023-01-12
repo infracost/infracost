@@ -27,6 +27,12 @@ func NewAzureRMKubernetesClusterNodePool(d *schema.ResourceData, u *schema.Usage
 	if d.Get("node_count").Type != gjson.Null {
 		nodeCount = decimal.NewFromInt(d.Get("node_count").Int())
 	}
+
+	// if the node count is not set explicitly let's take the min_count.
+	if d.Get("min_count").Type != gjson.Null && nodeCount.Equal(decimal.NewFromInt(1)) {
+		nodeCount = decimal.NewFromInt(d.Get("min_count").Int())
+	}
+
 	if u != nil && u.Get("nodes").Exists() {
 		nodeCount = decimal.NewFromInt(u.Get("nodes").Int())
 	}
@@ -68,7 +74,8 @@ func aksClusterNodePool(name, region string, n gjson.Result, nodeCount decimal.D
 }
 
 func aksOSDiskSubResource(region string, diskSize int) *schema.Resource {
-	diskType := "Premium_LRS"
+	diskType := "Premium"
+	storageReplicationType := "LRS"
 
 	diskName := mapDiskName(diskType, diskSize)
 	if diskName == "" {
@@ -82,7 +89,7 @@ func aksOSDiskSubResource(region string, diskSize int) *schema.Resource {
 		return nil
 	}
 
-	costComponent := []*schema.CostComponent{storageCostComponent(region, diskName, productName)}
+	costComponent := []*schema.CostComponent{storageCostComponent(region, diskName, storageReplicationType, productName)}
 
 	return &schema.Resource{
 		Name:           "os_disk",

@@ -179,6 +179,7 @@ func newRootCmd(ctx *config.RunContext) *cobra.Command {
 	rootCmd.AddCommand(configureCmd(ctx))
 	rootCmd.AddCommand(diffCmd(ctx))
 	rootCmd.AddCommand(breakdownCmd(ctx))
+	rootCmd.AddCommand(scanCommand(ctx))
 	rootCmd.AddCommand(outputCmd(ctx))
 	rootCmd.AddCommand(uploadCmd(ctx))
 	rootCmd.AddCommand(commentCmd(ctx))
@@ -251,6 +252,14 @@ func loadCloudSettings(ctx *config.RunContext) {
 	logging.Logger.WithFields(log.Fields{"result": fmt.Sprintf("%+v", result)}).Debug("Successfully loaded settings from Infracost Cloud")
 
 	ctx.Config.EnableCloudForOrganization = result.CloudEnabled
+	if result.UsageAPIEnabled && ctx.Config.UsageAPIEndpoint == "" {
+		ctx.Config.UsageAPIEndpoint = ctx.Config.DashboardAPIEndpoint
+		logging.Logger.Info("Enabled usage API")
+	}
+	if result.ActualCostsEnabled && ctx.Config.UsageAPIEndpoint != "" {
+		ctx.Config.UsageActualCosts = true
+		logging.Logger.Info("Enabled actual costs")
+	}
 }
 
 func checkAPIKey(apiKey string, apiEndpoint string, defaultEndpoint string) error {

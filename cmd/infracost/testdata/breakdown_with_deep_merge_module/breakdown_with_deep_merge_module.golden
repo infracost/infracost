@@ -1,0 +1,10 @@
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_with_deep_merge_module
+
+ Name  Monthly Qty  Unit  Monthly Cost 
+                                       
+ OVERALL TOTAL                   $0.00 
+──────────────────────────────────
+No cloud resources were detected
+
+Err:
+

@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
+
+	"github.com/infracost/infracost/internal/resources/aws"
 
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -68,7 +69,7 @@ func NewAutoscalingGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 			onDemandPercentageAboveBaseCount = int64(0)
 		}
 
-		a.LaunchTemplate = newLaunchTemplate(data, u, a.Region, instanceCount, int64(0), onDemandPercentageAboveBaseCount)
+		a.LaunchTemplate = newLaunchTemplate(data, a.Region, instanceCount, int64(0), onDemandPercentageAboveBaseCount)
 	} else if len(mixedInstanceLaunchTemplateRef) > 0 {
 		data := mixedInstanceLaunchTemplateRef[0]
 		a.LaunchTemplate = newMixedInstancesLaunchTemplate(data, u, a.Region, instanceCount, d.Get("mixed_instances_policy.0"))
@@ -127,7 +128,7 @@ func newLaunchConfiguration(d *schema.ResourceData, u *schema.UsageData, region 
 	return a
 }
 
-func newLaunchTemplate(d *schema.ResourceData, u *schema.UsageData, region string, instanceCount, onDemandBaseCount, onDemandPercentageAboveBaseCount int64) *aws.LaunchTemplate {
+func newLaunchTemplate(d *schema.ResourceData, region string, instanceCount, onDemandBaseCount, onDemandPercentageAboveBaseCount int64) *aws.LaunchTemplate {
 	a := &aws.LaunchTemplate{
 		Address:                          d.Address,
 		Region:                           region,
@@ -181,7 +182,7 @@ func newMixedInstancesLaunchTemplate(d *schema.ResourceData, u *schema.UsageData
 		onDemandPercentageAboveBaseCount = instanceDistribution.Get("on_demand_percentage_above_base_capacity").Int()
 	}
 
-	return newLaunchTemplate(d, u, region, instanceCount, onDemandBaseCount, onDemandPercentageAboveBaseCount)
+	return newLaunchTemplate(d, region, instanceCount, onDemandBaseCount, onDemandPercentageAboveBaseCount)
 }
 
 func getInstanceTypeAndCount(mixedInstancePolicyData gjson.Result, capacity int64) (string, int64) {

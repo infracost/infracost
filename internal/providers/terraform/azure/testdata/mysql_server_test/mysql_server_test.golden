@@ -32,3 +32,10 @@
 ∙ 5 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 1 was free:
   ∙ 1 x azurerm_resource_group
+Logs:
+
+level=warning msg="'Multiple products found' are safe to ignore for 'Compute (B_Gen5_2)' due to limitations in the Azure API."
+level=warning msg="'Multiple products found' are safe to ignore for 'Compute (GP_Gen5_4)' due to limitations in the Azure API."
+level=warning msg="'Multiple products found' are safe to ignore for 'Compute (GP_Gen5_4)' due to limitations in the Azure API."
+level=warning msg="'Multiple products found' are safe to ignore for 'Compute (MO_Gen5_16)' due to limitations in the Azure API."
+level=warning msg="'Multiple products found' are safe to ignore for 'Compute (MO_Gen5_16)' due to limitations in the Azure API."

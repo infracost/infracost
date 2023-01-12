@@ -5,30 +5,30 @@
  ├─ Instance usage (pay as you go, Standard_DS1_v2)                 730  hours                           $53.29 
  ├─ Ultra disk reservation (if unattached)           Monthly cost depends on usage: $4.38 per vCPU              
  └─ storage_os_disk                                                                                             
-    ├─ Storage (S4)                                                   1  months                           $1.54 
+    ├─ Storage (S4, LRS)                                              1  months                           $1.54 
     └─ Disk operations                               Monthly cost depends on usage: $0.0005 per 10k operations  
                                                                                                                 
  azurerm_virtual_machine.linux_withMonthlyHours                                                                 
  ├─ Instance usage (pay as you go, Standard_DS1_v2)                 100  hours                            $7.30 
  ├─ Ultra disk reservation (if unattached)           Monthly cost depends on usage: $4.38 per vCPU              
  └─ storage_os_disk                                                                                             
-    ├─ Storage (S4)                                                   1  months                           $1.54 
+    ├─ Storage (S4, LRS)                                              1  months                           $1.54 
     └─ Disk operations                               Monthly cost depends on usage: $0.0005 per 10k operations  
                                                                                                                 
  azurerm_virtual_machine.windows                                                                                
  ├─ Instance usage (pay as you go, Standard_DS1_v2)                 730  hours                           $91.98 
  ├─ Ultra disk reservation (if unattached)           Monthly cost depends on usage: $4.38 per vCPU              
  ├─ storage_os_disk                                                                                             
- │  ├─ Storage (S4)                                                   1  months                           $1.54 
+ │  ├─ Storage (S4, LRS)                                              1  months                           $1.54 
  │  └─ Disk operations                                              100  10k operations                   $0.05 
  ├─ storage_data_disk                                                                                           
- │  ├─ Storage (S4)                                                   1  months                           $1.54 
+ │  ├─ Storage (S4, LRS)                                              1  months                           $1.54 
  │  └─ Disk operations                                              200  10k operations                   $0.10 
  ├─ storage_data_disk                                                                                           
- │  ├─ Storage (E4)                                                   1  months                           $2.40 
+ │  ├─ Storage (E4, LRS)                                              1  months                           $2.40 
  │  └─ Disk operations                                              200  10k operations                   $0.40 
  ├─ storage_data_disk                                                                                           
- │  └─ Storage (P4)                                                   1  months                           $5.28 
+ │  └─ Storage (P4, LRS)                                              1  months                           $5.28 
  └─ storage_data_disk                                                                                           
     ├─ Storage (ultra, 1024 GiB)                                  1,024  GiB                            $122.59 
     ├─ Provisioned IOPS                                           2,048  IOPS                           $101.66 
@@ -38,7 +38,7 @@
  ├─ Instance usage (pay as you go, Standard_DS1_v2)                 100  hours                           $12.60 
  ├─ Ultra disk reservation (if unattached)           Monthly cost depends on usage: $4.38 per vCPU              
  └─ storage_os_disk                                                                                             
-    ├─ Storage (S4)                                                   1  months                           $1.54 
+    ├─ Storage (S4, LRS)                                              1  months                           $1.54 
     └─ Disk operations                               Monthly cost depends on usage: $0.0005 per 10k operations  
                                                                                                                 
  OVERALL TOTAL                                                                                          $408.13 

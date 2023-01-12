@@ -13,6 +13,9 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zclconf/go-cty/cty"
+
+	"github.com/infracost/infracost/internal/hcl/modules"
+	"github.com/infracost/infracost/internal/sync"
 )
 
 func Test_BasicParsing(t *testing.T) {
@@ -47,7 +50,9 @@ data "cats_cat" "the-cats-mother" {
 
 `)
 
-	parsers, err := LoadParsers(filepath.Dir(path), []string{}, newDiscardLogger(), OptionStopOnHCLError())
+	logger := newDiscardLogger()
+	loader := modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{})
+	parsers, err := LoadParsers(filepath.Dir(path), loader, nil, logger, OptionStopOnHCLError())
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -139,7 +144,8 @@ output "loadbalancer"  {
 }
 `)
 
-	parser := newParser(filepath.Dir(path), newDiscardLogger())
+	logger := newDiscardLogger()
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -211,7 +217,8 @@ output "exp2" {
 }
 `)
 
-	parser := newParser(filepath.Dir(path), newDiscardLogger())
+	logger := newDiscardLogger()
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -257,7 +264,8 @@ output "instances" {
 }
 `)
 
-	parser := newParser(filepath.Dir(path), newDiscardLogger())
+	logger := newDiscardLogger()
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -295,7 +303,8 @@ resource "other_resource" "test" {
 
 `)
 
-	parser := newParser(filepath.Dir(path), newDiscardLogger())
+	logger := newDiscardLogger()
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -339,7 +348,8 @@ output "attr_not_exists" {
 
 `)
 
-	parser := newParser(filepath.Dir(path), newDiscardLogger())
+	logger := newDiscardLogger()
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -378,7 +388,8 @@ resource "other_resource" "test" {
 
 `)
 
-	parser := newParser(filepath.Dir(path), newDiscardLogger())
+	logger := newDiscardLogger()
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -429,7 +440,8 @@ output "serviceendpoint_principals" {
 
 `)
 
-	parser := newParser(filepath.Dir(path), newDiscardLogger())
+	logger := newDiscardLogger()
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -450,6 +462,75 @@ output "serviceendpoint_principals" {
 
 	assert.Equal(t, "value-mock", asMap["dev"].AsString())
 	assert.Equal(t, "value-mock", asMap["prod"].AsString())
+}
+
+func Test_UnsupportedAttributesLocalIndex(t *testing.T) {
+	path := createTestFile("test.tf", `
+variable "test" {}
+
+locals {
+  val = format("%s", var.test.id[0])
+}
+
+output "val" {
+  value = local.val
+}
+
+`)
+
+	logger := newDiscardLogger()
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{}), logger)
+	module, err := parser.ParseDirectory()
+	require.NoError(t, err)
+
+	blocks := module.Blocks
+
+	output := blocks.Matching(BlockMatcher{Label: "val", Type: "output"})
+	require.NotNil(t, output)
+	attr := output.GetAttribute("value")
+	value := attr.Value()
+	require.True(t, value.Type().IsPrimitiveType(), "value is not primitive type but %s", value.Type().GoString())
+	assert.Equal(t, "val-mock", value.AsString())
+}
+
+func Test_SetsHasChangesOnMod(t *testing.T) {
+	path := createTestFile("test.tf", `variable "foo" {}`)
+
+	logger := newDiscardLogger()
+	parser := newParser(RootPath{Path: filepath.Dir(path), HasChanges: true}, modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{}), logger)
+	module, err := parser.ParseDirectory()
+	require.NoError(t, err)
+
+	assert.True(t, module.HasChanges)
+}
+
+func Test_UnsupportedAttributesMapIndex(t *testing.T) {
+	path := createTestFile("test.tf", `
+variable "test" {}
+
+locals {
+  val = format("%s", var.test.id["foo"])
+}
+
+output "val" {
+  value = local.val
+}
+
+`)
+
+	logger := newDiscardLogger()
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{}), logger)
+	module, err := parser.ParseDirectory()
+	require.NoError(t, err)
+
+	blocks := module.Blocks
+
+	output := blocks.Matching(BlockMatcher{Label: "val", Type: "output"})
+	require.NotNil(t, output)
+	attr := output.GetAttribute("value")
+	value := attr.Value()
+	require.True(t, value.Type().IsPrimitiveType(), "value is not primitive type but %s", value.Type().GoString())
+	assert.Equal(t, "val-mock", value.AsString())
 }
 
 func Test_Modules(t *testing.T) {
@@ -476,7 +557,10 @@ output "mod_result" {
 		"module",
 	)
 
-	parsers, err := LoadParsers(path, []string{}, newDiscardLogger(), OptionStopOnHCLError())
+	logger := newDiscardLogger()
+	dir := filepath.Dir(path)
+	loader := modules.NewModuleLoader(dir, nil, logger, &sync.KeyMutex{})
+	parsers, err := LoadParsers(path, loader, nil, logger, OptionStopOnHCLError())
 	require.NoError(t, err)
 	rootModule, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -534,7 +618,9 @@ output "mod_result" {
 		"",
 	)
 
-	parsers, err := LoadParsers(path, []string{}, newDiscardLogger(), OptionStopOnHCLError())
+	logger := newDiscardLogger()
+	loader := modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{})
+	parsers, err := LoadParsers(path, loader, nil, logger, OptionStopOnHCLError())
 	require.NoError(t, err)
 	rootModule, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -586,7 +672,8 @@ resource "aws_instance" "my_instance" {
 }
 `)
 
-	parser := newParser(filepath.Dir(path), newDiscardLogger())
+	logger := newDiscardLogger()
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -692,4 +779,129 @@ func newDiscardLogger() *logrus.Entry {
 	l := logrus.New()
 	l.SetOutput(io.Discard)
 	return l.WithFields(logrus.Fields{})
+}
+
+func Test_NestedForEach(t *testing.T) {
+	path := createTestFile("test.tf", `
+
+locals {
+  az = {
+    a = {
+      az = "us-east-1a"
+      bz = "w"
+    }
+    b = {
+      az = "us-east-1b"
+      bz = "z"
+    }
+  }
+}
+
+resource "test_resource" "test" {
+  for_each = local.az
+  availability_zone       = each.value.az
+  another_attr = "attr-${each.value.bz}"
+}
+
+resource "test_resource" "static" {
+  availability_zone       = "az-static"
+  another_attr = "attr-static"
+}
+
+resource "test_resource_two" "test" {
+  for_each        = test_resource.test 
+  inherited_id    = each.value.id
+  inherited_attr  = each.value.another_attr
+}
+`)
+
+	logger := newDiscardLogger()
+	loader := modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{})
+	parsers, err := LoadParsers(filepath.Dir(path), loader, nil, logger, OptionStopOnHCLError())
+	require.NoError(t, err)
+	module, err := parsers[0].ParseDirectory()
+	require.NoError(t, err)
+
+	blocks := module.Blocks
+	resources := blocks.OfType("resource")
+	labels := make([]string, len(resources))
+	for i, resource := range resources {
+		labels[i] = resource.Label()
+	}
+	assert.ElementsMatch(t, []string{
+		`test_resource.test["a"]`,
+		`test_resource.test["b"]`,
+		`test_resource.static`,
+		`test_resource_two.test["a"]`,
+		`test_resource_two.test["b"]`,
+	}, labels)
+}
+
+func Test_ModuleForEaches(t *testing.T) {
+
+	path := createTestFileWithModule(`
+locals {
+  az = {
+    a = {
+      az = "us-east-1a"
+      bz = "w"
+    }
+    b = {
+      az = "us-east-1b"
+      bz = "z"
+    }
+  }
+}
+
+module "test" {
+    for_each = local.az
+	source = "../."
+	input = "ok"
+}
+
+resource "test_two" "test" {
+  for_each        = module.test 
+  inherited_id    = each.value.id
+  inherited_attr  = each.value.another_attr
+}
+`,
+		`
+variable "input" {
+	default = "?"
+}
+
+output "mod_result" {
+	value = var.input
+}
+`,
+		"",
+	)
+
+	logger := newDiscardLogger()
+	loader := modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{})
+	parsers, err := LoadParsers(path, loader, nil, logger, OptionStopOnHCLError())
+	require.NoError(t, err)
+	module, err := parsers[0].ParseDirectory()
+	require.NoError(t, err)
+
+	blocks := module.Blocks
+	resources := blocks.OfType("resource")
+	labels := make([]string, len(resources))
+	for i, resource := range resources {
+		labels[i] = resource.Label()
+	}
+	assert.ElementsMatch(t, []string{
+		`test_two.test["a"]`,
+		`test_two.test["b"]`,
+	}, labels)
+
+	modules := blocks.OfType("module")
+	modLabels := make([]string, len(modules))
+	for i, module := range modules {
+		modLabels[i] = "module." + module.Label()
+	}
+	assert.ElementsMatch(t, []string{
+		`module.test["a"]`,
+		`module.test["b"]`,
+	}, modLabels)
 }
