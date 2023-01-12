@@ -45,6 +45,9 @@ type Attribute struct {
 	Logger  *logrus.Entry
 	// newMock generates a mock value for the attribute if it's value is missing.
 	newMock func(attr *Attribute) cty.Value
+
+	previousValue *cty.Value
+	valueCtx      *hcl.EvalContext
 }
 
 // IsIterable returns if the attribute can be ranged over.
@@ -136,8 +139,15 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 		}
 	}()
 
+	currentCtx := attr.Ctx.Inner()
+	if attr.previousValue != nil {
+		if VariablesEqual(attr.valueCtx.Variables, currentCtx.Variables) {
+			return *attr.previousValue
+		}
+	}
+
 	var diag hcl.Diagnostics
-	ctyVal, diag = attr.HCLAttr.Expr.Value(attr.Ctx.Inner())
+	ctyVal, diag = attr.HCLAttr.Expr.Value(currentCtx)
 	if diag.HasErrors() {
 		mockedVal := cty.StringVal(fmt.Sprintf("%s-mock", attr.Name()))
 		if attr.newMock != nil {
@@ -148,7 +158,7 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 			return mockedVal
 		}
 
-		ctx := attr.Ctx.Inner()
+		ctx := currentCtx
 		for _, d := range diag {
 			// if the diagnostic summary indicates that we were the attribute we attempted to fetch is unsupported
 			// this is likely from a Terraform attribute that is built from the provider. We then try and build
@@ -193,6 +203,8 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 		}
 	}
 
+	attr.previousValue = &ctyVal
+	attr.valueCtx = currentCtx
 	return ctyVal
 }
 

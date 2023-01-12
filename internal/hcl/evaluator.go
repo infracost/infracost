@@ -6,7 +6,6 @@ import (
 	"math"
 	"os"
 	"path/filepath"
-	"reflect"
 	"regexp"
 	"strings"
 
@@ -212,7 +211,7 @@ func (e *Evaluator) evaluate(lastContext hcl.EvalContext) {
 	for i = 0; i < maxContextIterations; i++ {
 		e.evaluateStep(i)
 
-		if reflect.DeepEqual(lastContext.Variables, e.ctx.Inner().Variables) {
+		if VariablesEqual(lastContext.Variables, e.ctx.Inner().Variables) {
 			e.logger.Debug("evaluated outputs are the same a last context, exiting")
 			break
 		}
@@ -230,6 +229,32 @@ func (e *Evaluator) evaluate(lastContext hcl.EvalContext) {
 		e.logger.Warnf("hit max context iterations evaluating module %s", e.module.Name)
 	}
 
+}
+
+func VariablesEqual(last, current map[string]cty.Value) bool {
+	if len(last) != len(current) {
+		return false
+	}
+
+	for k, _ := range current {
+		if _, ok := last[k]; !ok {
+			return false
+		}
+	}
+
+	for k, _ := range last {
+		if _, ok := current[k]; !ok {
+			return false
+		}
+	}
+
+	for k, v := range current {
+		if !v.RawEquals(last[k]) {
+			return false
+		}
+	}
+
+	return true
 }
 
 // evaluateStep gets the values for all the Block types in the current Module that affect Context.
@@ -260,7 +285,7 @@ func (e *Evaluator) evaluateModules() {
 		e.logger.Debugf("evaluating module call %s with source %s", fullName, moduleCall.Module.Source)
 		vars := moduleCall.Definition.Values().AsValueMap()
 		if oldVars, ok := e.visitedModules[fullName]; ok {
-			if reflect.DeepEqual(vars, oldVars) {
+			if VariablesEqual(oldVars, vars) {
 				continue
 			}
 
@@ -308,7 +333,7 @@ func (e *Evaluator) expandBlocks(blocks Blocks, lastContext hcl.EvalContext) Blo
 	for i = 0; i < maxContextIterations; i++ {
 		expanded = e.expandBlockForEaches(e.expandBlockCounts(expanded))
 
-		if reflect.DeepEqual(lastContext.Variables, e.ctx.Inner().Variables) {
+		if VariablesEqual(lastContext.Variables, e.ctx.Inner().Variables) {
 			e.logger.Debug("evaluated outputs are the same as prior evaluation, exiting and returning expanded block")
 			break
 		}

@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime/debug"
+	"runtime/pprof"
 	"sort"
 	"strings"
 	"sync"
@@ -293,6 +294,17 @@ func (p *HCLProvider) LoadPlanJSONs() ([]HCLProject, error) {
 // Modules returns the raw hcl blocks associated with each found Terraform project. This can be used
 // to fetch raw information like outputs, vars, resources, e.t.c.
 func (p *HCLProvider) Modules() ([]*hcl.Module, error) {
+	f, err := os.Create("infracost.prof")
+	if err != nil {
+		log.Fatalln(err)
+	}
+	err = pprof.StartCPUProfile(f)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	defer pprof.StopCPUProfile()
+
 	if p.cache != nil {
 		return p.cache, nil
 	}

@@ -252,6 +252,9 @@ type Block struct {
 	id  *hcl.Attribute
 	arn *hcl.Attribute
 
+	values   *cty.Value
+	ctxValue *hcl.EvalContext
+
 	Filename string
 }
 
@@ -811,13 +814,21 @@ func (b *Block) getHCLAttributes() hcl.Attributes {
 //
 // Would evaluate to a cty.Value of type Object with the instance_type Attribute holding the value "t3.medium".
 func (b *Block) Values() cty.Value {
+	inner := b.context.Inner()
+	if b.values != nil && VariablesEqual(b.ctxValue.Variables, inner.Variables) {
+		return *b.values
+	}
+
 	values := make(map[string]cty.Value)
 
 	for _, attribute := range b.GetAttributes() {
 		values[attribute.Name()] = attribute.Value()
 	}
 
-	return cty.ObjectVal(values)
+	v := cty.ObjectVal(values)
+	b.values = &v
+	b.ctxValue = inner
+	return v
 }
 
 // Reference returns a Reference to the given Block this can be used to when printing
