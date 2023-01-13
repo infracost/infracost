@@ -13,7 +13,6 @@ import (
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/ext/tryfunc"
 	"github.com/hashicorp/hcl/v2/ext/typeexpr"
-	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/sirupsen/logrus"
 	yaml "github.com/zclconf/go-cty-yaml"
 	"github.com/zclconf/go-cty/cty"
@@ -524,61 +523,32 @@ func (e *Evaluator) evaluateVariable(b *Block) (cty.Value, error) {
 
 	attrType := attributes["type"]
 	if override, exists := e.inputVars[b.Label()]; exists {
-		return convertType(override, attrType), nil
+		return e.convertType(b, override, attrType)
 	}
 
 	if def, exists := attributes["default"]; exists {
-		if attrType == nil {
-			return def.Value(), nil
-		}
-
-		ty, diag := typeexpr.TypeConstraint(attrType.HCLAttr.Expr)
-		if diag.HasErrors() {
-			e.logger.WithError(diag).Debugf("error trying to convert variable %s to type %s", b.Label(), attrType.AsString())
-			return def.Value(), nil
-		}
-		return convert.Convert(def.Value(), ty)
+		return e.convertType(b, def.Value(), attrType)
 	}
 
-	return convertType(cty.DynamicVal, attrType), errorNoVarValue
-}
-
-func convertType(val cty.Value, attribute *Attribute) cty.Value {
-	if attribute == nil {
-		return val
-	}
-
-	var t string
-	switch v := attribute.HCLAttr.Expr.(type) {
-	case *hclsyntax.ScopeTraversalExpr:
-		t = v.Traversal.RootName()
-	case *hclsyntax.LiteralValueExpr:
-		t = attribute.AsString()
-	}
-
-	switch t {
-	case "string":
-		return valueToType(val, cty.String)
-	case "number":
-		return valueToType(val, cty.Number)
-	case "bool":
-		return valueToType(val, cty.Bool)
-	}
-
-	return val
-}
-
-func valueToType(val cty.Value, want cty.Type) cty.Value {
-	if val.IsNull() || !val.IsKnown() {
-		return val
-	}
-
-	newVal, err := convert.Convert(val, want)
+	c, err := e.convertType(b, cty.DynamicVal, attrType)
 	if err != nil {
-		return val
+		return c, err
 	}
 
-	return newVal
+	return c, errorNoVarValue
+}
+
+func (e *Evaluator) convertType(b *Block, val cty.Value, attrType *Attribute) (cty.Value, error) {
+	if attrType == nil || val.IsNull() || !val.IsKnown() {
+		return val, nil
+	}
+
+	ty, diag := typeexpr.TypeConstraint(attrType.HCLAttr.Expr)
+	if diag.HasErrors() {
+		e.logger.WithError(diag).Debugf("error trying to convert variable %s to type %s", b.Label(), attrType.AsString())
+		return val, nil
+	}
+	return convert.Convert(val, ty)
 }
 
 func (e *Evaluator) evaluateOutput(b *Block) (cty.Value, error) {
