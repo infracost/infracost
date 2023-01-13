@@ -242,7 +242,7 @@ func (p *TerragruntProvider) generateStateJSONs(projectDirs []terragruntProjectD
 			defer os.Remove(opts.TerraformConfigFile)
 		}
 
-		out, err := p.runShow(opts, spinner, "")
+		out, err := p.runShow(opts, spinner, "", false)
 		if err != nil {
 			return outs, err
 		}
@@ -315,7 +315,7 @@ func (p *TerragruntProvider) generatePlanJSONs(projectDirs []terragruntProjectDi
 			defer os.Remove(opts.TerraformConfigFile)
 		}
 
-		out, err := p.runShow(opts, spinner, filepath.Join(projectDir.WorkingDir, planFile))
+		out, err := p.runShow(opts, spinner, filepath.Join(projectDir.WorkingDir, planFile), false)
 		if err != nil {
 			return outs, err
 		}

@@ -246,7 +246,7 @@ func (p *DirProvider) generatePlanJSON() ([]byte, error) {
 	}
 
 	spinner = ui.NewSpinner("Running terraform show", p.spinnerOpts)
-	j, err := p.runShow(opts, spinner, planFile)
+	j, err := p.runShow(opts, spinner, planFile, false)
 	if err == nil {
 		p.cachedPlanJSON = j
 		if UsePlanCache(p) {
@@ -278,7 +278,7 @@ func (p *DirProvider) generateStateJSON() ([]byte, error) {
 	spinner := ui.NewSpinner("Running terraform show", p.spinnerOpts)
 	defer spinner.Fail()
 
-	j, err := p.runShow(opts, spinner, "")
+	j, err := p.runShow(opts, spinner, "", true)
 	if err == nil {
 		p.cachedStateJSON = j
 	}
@@ -331,19 +331,11 @@ func (p *DirProvider) runPlan(opts *CmdOptions, spinner *ui.Spinner, initOnFail 
 		extractedErr := extractStderr(err)
 
 		// If the plan returns this error then Terraform is configured with remote execution mode
-		if strings.HasPrefix(extractedErr, "Error: Saving a generated plan is currently not supported") {
+		if isTerraformRemoteExecutionErr(extractedErr) {
 			log.Info("Continuing with Terraform Remote Execution Mode")
 			p.ctx.SetContextValue("terraformRemoteExecutionModeEnabled", true)
 			planJSON, err = p.runRemotePlan(opts, args)
-		} else if initOnFail && (strings.Contains(extractedErr, "Error: Could not load plugin") ||
-			strings.Contains(extractedErr, "Error: Required plugins are not installed") ||
-			strings.Contains(extractedErr, "Error: Initialization required") ||
-			strings.Contains(extractedErr, "Error: Backend initialization required") ||
-			strings.Contains(extractedErr, "Error: Provider requirements cannot be satisfied by locked dependencies") ||
-			strings.Contains(extractedErr, "Error: Inconsistent dependency lock file") ||
-			strings.Contains(extractedErr, "Error: Module not installed") ||
-			strings.Contains(extractedErr, "Error: Terraform Cloud initialization required") ||
-			strings.Contains(extractedErr, "please run \"terraform init\"")) {
+		} else if initOnFail && isTerraformInitErr(extractedErr) {
 			spinner.Stop()
 			err = p.runInit(opts, ui.NewSpinner("Running terraform init", p.spinnerOpts))
 			if err != nil {
@@ -459,12 +451,30 @@ func (p *DirProvider) runRemotePlan(opts *CmdOptions, args []string) ([]byte, er
 	return cloudAPI(host, jsonPath, token)
 }
 
-func (p *DirProvider) runShow(opts *CmdOptions, spinner *ui.Spinner, planFile string) ([]byte, error) {
+func (p *DirProvider) runShow(opts *CmdOptions, spinner *ui.Spinner, planFile string, initOnFail bool) ([]byte, error) {
 	args := []string{"show", "-no-color", "-json"}
 	if planFile != "" {
 		args = append(args, planFile)
 	}
 	out, err := Cmd(opts, args...)
+
+	// Check if the error requires a remote run or an init
+	if err != nil {
+		extractedErr := extractStderr(err)
+
+		// If the plan returns this error then Terraform is configured with remote execution mode
+		if isTerraformRemoteExecutionErr(extractedErr) {
+			log.Info("Terraform expected Remote Execution Mode")
+		} else if initOnFail && isTerraformInitErr(extractedErr) {
+			spinner.Stop()
+			err = p.runInit(opts, ui.NewSpinner("Running terraform init", p.spinnerOpts))
+			if err != nil {
+				return out, err
+			}
+			return p.runShow(opts, spinner, planFile, false)
+		}
+	}
+
 	if err != nil {
 		spinner.Fail()
 		err = p.buildTerraformErr(err, false)
@@ -570,6 +580,22 @@ func extractStderr(err error) string {
 		return stripBlankLines(string(e.Stderr))
 	}
 	return ""
+}
+
+func isTerraformRemoteExecutionErr(extractedErr string) bool {
+	return strings.HasPrefix(extractedErr, "Error: Saving a generated plan is currently not supported")
+}
+
+func isTerraformInitErr(extractedErr string) bool {
+	return strings.Contains(extractedErr, "Error: Could not load plugin") ||
+		strings.Contains(extractedErr, "Error: Required plugins are not installed") ||
+		strings.Contains(extractedErr, "Error: Initialization required") ||
+		strings.Contains(extractedErr, "Error: Backend initialization required") ||
+		strings.Contains(extractedErr, "Error: Provider requirements cannot be satisfied by locked dependencies") ||
+		strings.Contains(extractedErr, "Error: Inconsistent dependency lock file") ||
+		strings.Contains(extractedErr, "Error: Module not installed") ||
+		strings.Contains(extractedErr, "Error: Terraform Cloud initialization required") ||
+		strings.Contains(extractedErr, "please run \"terraform init\"")
 }
 
 func stripBlankLines(s string) string {
