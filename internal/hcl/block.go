@@ -3,6 +3,7 @@ package hcl
 import (
 	"fmt"
 	"os"
+	"reflect"
 	"regexp"
 	"sort"
 	"strconv"
@@ -248,6 +249,10 @@ type Block struct {
 	newMock  func(attr *Attribute) cty.Value
 	Filename string
 	logger   *logrus.Entry
+
+	previousValues          *cty.Value
+	previousContext         *Context
+	finishedBlockEvaluation bool
 }
 
 // BlockBuilder handles generating new Blocks as part of the parsing and evaluation process.
@@ -798,12 +803,21 @@ func (b *Block) getHCLAttributes() hcl.Attributes {
 // Would evaluate to a cty.Value of type Object with the instance_type Attribute holding the value "t3.medium".
 func (b *Block) Values() cty.Value {
 	values := make(map[string]cty.Value)
+	hasSameContext := reflect.DeepEqual(b.previousContext, b.context)
+	if b.finishedBlockEvaluation && hasSameContext {
+		return *b.previousValues
+	}
 
 	for _, attribute := range b.GetAttributes() {
 		values[attribute.Name()] = attribute.Value()
 	}
 
-	return cty.ObjectVal(values)
+	v := cty.ObjectVal(values)
+	b.finishedBlockEvaluation = reflect.DeepEqual(b.previousValues, &v)
+	b.previousValues = &v
+	b.previousContext = b.context
+
+	return v
 }
 
 // Reference returns a Reference to the given Block this can be used to when printing
