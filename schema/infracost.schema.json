@@ -236,6 +236,26 @@
       "additionalProperties": false,
       "type": "object"
     },
+    "ProjectDiag": {
+      "required": [
+        "code",
+        "message",
+        "data"
+      ],
+      "properties": {
+        "code": {
+          "type": "integer"
+        },
+        "message": {
+          "type": "string"
+        },
+        "data": {
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
     "ProjectMetadata": {
       "required": [
         "path",
@@ -260,10 +280,16 @@
         "vcsCodeChanged": {
           "type": "boolean"
         },
-        "warnings": {
+        "errors": {
           "items": {
             "$schema": "http://json-schema.org/draft-04/schema#",
-            "$ref": "#/definitions/Warning"
+            "$ref": "#/definitions/ProjectDiag"
+          },
+          "type": "array"
+        },
+        "warnings": {
+          "items": {
+            "$ref": "#/definitions/ProjectDiag"
           },
           "type": "array"
         },
@@ -503,26 +529,6 @@
             }
           },
           "type": "object"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    },
-    "Warning": {
-      "required": [
-        "code",
-        "message",
-        "data"
-      ],
-      "properties": {
-        "code": {
-          "type": "integer"
-        },
-        "message": {
-          "type": "string"
-        },
-        "data": {
-          "additionalProperties": true
         }
       },
       "additionalProperties": false,

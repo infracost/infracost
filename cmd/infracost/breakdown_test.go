@@ -275,6 +275,17 @@ func TestBreakdownTerragrunt(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terragrunt"}, nil)
 }
 
+func TestBreakdownTerragruntWithProjectError(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(t,
+		testName,
+		[]string{
+			"breakdown",
+			"--path", dir},
+		nil)
+}
+
 func TestBreakdownTerragruntWithDashboardEnabled(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terragrunt"}, nil, func(c *config.RunContext) {
 		c.Config.EnableDashboard = true
@@ -565,5 +576,48 @@ func TestBreakdownWithMultipleProviders(t *testing.T) {
 			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
 		},
 		nil,
+	)
+}
+
+func TestBreakdownMultiProjectWithError(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", dir,
+		}, &GoldenFileOptions{CaptureLogs: true},
+	)
+}
+
+func TestBreakdownMultiProjectWithErrorOutputJSON(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testName,
+		[]string{
+			"breakdown",
+			"--format", "json",
+			"--path",
+			dir,
+			"--format",
+			"json",
+		}, &GoldenFileOptions{CaptureLogs: true},
+	)
+}
+
+func TestBreakdownMultiProjectWithAllErrors(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", dir,
+		}, &GoldenFileOptions{CaptureLogs: true},
 	)
 }

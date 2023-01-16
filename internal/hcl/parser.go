@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"runtime/debug"
 	"strings"
 
 	"github.com/hashicorp/hcl/v2"
@@ -13,6 +14,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 
+	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/extclient"
 	"github.com/infracost/infracost/internal/hcl/modules"
 	"github.com/infracost/infracost/internal/logging"
@@ -35,12 +37,6 @@ func OptionWithTFVarsPaths(paths []string) Option {
 			relative = append(relative, tfvp)
 		}
 		p.tfvarsPaths = relative
-	}
-}
-
-func OptionStopOnHCLError() Option {
-	return func(p *Parser) {
-		p.stopOnHCLError = true
 	}
 }
 
@@ -192,7 +188,6 @@ type Parser struct {
 	defaultVarFiles       []string
 	tfvarsPaths           []string
 	inputVars             map[string]cty.Value
-	stopOnHCLError        bool
 	workspaceName         string
 	moduleLoader          *modules.ModuleLoader
 	blockBuilder          BlockBuilder
@@ -276,42 +271,54 @@ func newParser(projectRoot RootPath, moduleLoader *modules.ModuleLoader, logger 
 // It instead leaves ModuleLoader to fetch these Modules on demand. See ModuleLoader.Load for more information.
 //
 // ParseDirectory returns the root Module that represents the top of the Terraform Config tree.
-func (p *Parser) ParseDirectory() (*Module, error) {
+func (p *Parser) ParseDirectory() (m *Module, err error) {
+	m = &Module{
+		RootPath:   p.initialPath,
+		ModulePath: p.initialPath,
+	}
+
+	defer func() {
+		e := recover()
+		if e != nil {
+			err = clierror.NewPanicError(fmt.Errorf("%s", e), debug.Stack())
+		}
+	}()
+
 	p.logger.Debugf("Beginning parse for directory '%s'...", p.initialPath)
 
 	// load the initial root directory into a list of hcl files
 	// at this point these files have no schema associated with them.
-	files, err := loadDirectory(p.logger, p.initialPath, p.stopOnHCLError)
+	files, err := loadDirectory(p.logger, p.initialPath, false)
 	if err != nil {
-		return nil, err
+		return m, err
 	}
 
 	// load the files into given hcl block types. These are then wrapped with *Block structs.
 	blocks, err := p.parseDirectoryFiles(files)
 	if err != nil {
-		return nil, err
+		return m, err
 	}
 
 	if len(blocks) == 0 {
-		return nil, errors.New("No valid terraform files found given path, try a different directory")
+		return m, errors.New("No valid terraform files found given path, try a different directory")
 	}
 
 	p.logger.Debug("Loading TFVars...")
 	inputVars, err := p.loadVars(blocks, p.tfvarsPaths)
 	if err != nil {
-		return nil, err
+		return m, err
 	}
 
 	// load the modules. This downloads any remote modules to the local file system
 	modulesManifest, err := p.moduleLoader.Load(p.initialPath)
 	if err != nil {
-		return nil, fmt.Errorf("Error loading Terraform modules: %s", err)
+		return m, fmt.Errorf("Error loading Terraform modules: %s", err)
 	}
 
 	p.logger.Debug("Evaluating expressions...")
 	workingDir, err := os.Getwd()
 	if err != nil {
-		return nil, fmt.Errorf("Error could not evaluate current working directory %w", err)
+		return m, fmt.Errorf("Error could not evaluate current working directory %w", err)
 	}
 
 	// load an Evaluator with the top level Blocks to begin Context propagation.
@@ -336,7 +343,7 @@ func (p *Parser) ParseDirectory() (*Module, error) {
 
 	root, err := evaluator.Run()
 	if err != nil {
-		return nil, err
+		return m, err
 	}
 
 	root.HasChanges = p.hasChanges
@@ -354,11 +361,7 @@ func (p *Parser) parseDirectoryFiles(files []file) (Blocks, error) {
 	for _, file := range files {
 		fileBlocks, err := loadBlocksFromFile(file, nil)
 		if err != nil {
-			if p.stopOnHCLError {
-				return nil, err
-			}
-
-			p.logger.Warnf("skipping file could not load blocks err: %s", err)
+			p.logger.Debugf("skipping file could not load blocks err: %s", err)
 			continue
 		}
 
@@ -519,7 +522,7 @@ func loadDirectory(logger *logrus.Entry, fullPath string, stopOnHCLError bool) (
 				return nil, diag
 			}
 
-			logger.Warnf("skipping file: %s hcl parsing err: %s", path, diag.Error())
+			logger.Debugf("skipping file: %s hcl parsing err: %s", path, diag.Error())
 			continue
 		}
 	}

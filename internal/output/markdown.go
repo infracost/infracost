@@ -140,6 +140,10 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 		},
 		"formatCostChangeSentence": formatCostChangeSentence,
 		"showProject": func(p Project) bool {
+			if len(p.Metadata.Errors) > 0 {
+				return false
+			}
+
 			if opts.ShowOnlyChanges {
 				// only return true if the project has code changes so the table can also show
 				// project that have cost changes.
@@ -207,6 +211,13 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 		}
 	}
 
+	erroredProjectCount := 0
+	for _, p := range out.Projects {
+		if len(p.Metadata.Errors) > 0 {
+			erroredProjectCount++
+		}
+	}
+
 	skippedUnchangedProjectCount := 0
 	if opts.ShowOnlyChanges {
 		for _, p := range out.Projects {
@@ -219,6 +230,7 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 	err = tmpl.Execute(bufw, struct {
 		Root                         Root
 		SkippedProjectCount          int
+		ErroredProjectCount          int
 		SkippedUnchangedProjectCount int
 		DiffOutput                   string
 		Options                      Options
@@ -226,6 +238,7 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 	}{
 		out,
 		skippedProjectCount,
+		erroredProjectCount,
 		skippedUnchangedProjectCount,
 		diffMsg,
 		opts,

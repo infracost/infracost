@@ -208,7 +208,7 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) []string {
 		path := filepath.Join(fullPath, info.Name())
 		_, diag := parseFunc(path)
 		if diag != nil && diag.HasErrors() {
-			p.logger.Warnf("skipping file: %s hcl parsing err: %s", path, diag.Error())
+			p.logger.Debugf("skipping file: %s hcl parsing err: %s", path, diag.Error())
 			continue
 		}
 	}

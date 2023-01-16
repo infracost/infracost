@@ -7,7 +7,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"runtime/debug"
 	"sort"
 	"strings"
 	"sync"
@@ -16,9 +15,7 @@ import (
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 	ctyJson "github.com/zclconf/go-cty/cty/json"
-	"golang.org/x/sync/errgroup"
 
-	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/hcl/modules"
@@ -37,7 +34,7 @@ type HCLProvider struct {
 
 	schema *PlanSchema
 	ctx    *config.ProjectContext
-	cache  []*hcl.Module
+	cache  []HCLProject
 	config HCLProviderConfig
 }
 
@@ -182,18 +179,16 @@ func (p *HCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 // representation of the terraform plan JSON files from these Blocks, this is passed to the PlanJSONProvider.
 // The PlanJSONProvider uses this shallow representation to actually load Infracost resources.
 func (p *HCLProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
-	jsons, err := p.LoadPlanJSONs()
-	if err != nil {
-		return nil, err
-	}
+	jsons := p.LoadPlanJSONs()
 
 	var projects = make([]*schema.Project, len(jsons))
 	for i, j := range jsons {
-		project, err := p.parseResources(j, usage)
-		if err != nil {
-			return nil, err
+		if j.Error != nil {
+			projects[i] = p.newProject(j)
+			continue
 		}
 
+		project := p.parseResources(j, usage)
 		if p.ctx.RunContext.VCSMetadata.HasChanges() {
 			project.Metadata.VCSCodeChanged = &j.Module.HasChanges
 		}
@@ -210,18 +205,25 @@ func (p *HCLProvider) LoadResources(usage map[string]*schema.UsageData) ([]*sche
 	return projects, nil
 }
 
-func (p *HCLProvider) parseResources(parsed HCLProject, usage map[string]*schema.UsageData) (*schema.Project, error) {
+func (p *HCLProvider) parseResources(parsed HCLProject, usage map[string]*schema.UsageData) *schema.Project {
 	project := p.newProject(parsed)
 
 	partialPastResources, partialResources, err := p.planJSONParser.parseJSON(parsed.JSON, usage)
 	if err != nil {
-		return project, fmt.Errorf("Error parsing Terraform plan JSON file %w", err)
+		project.Metadata.Errors = []schema.ProjectDiag{
+			{
+				Code:    schema.DiagJSONParsingFailure,
+				Message: err.Error(),
+			},
+		}
+
+		return project
 	}
 
 	project.PartialPastResources = partialPastResources
 	project.PartialResources = partialResources
 
-	return project, nil
+	return project
 }
 
 func (p *HCLProvider) newProject(parsed HCLProject) *schema.Project {
@@ -229,11 +231,20 @@ func (p *HCLProvider) newProject(parsed HCLProject) *schema.Project {
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
 
+	if parsed.Error != nil {
+		metadata.Errors = []schema.ProjectDiag{
+			{
+				Code:    schema.DiagModuleEvaluationFailure,
+				Message: parsed.Error.Error(),
+			},
+		}
+	}
+
 	if len(parsed.Module.Warnings) > 0 {
-		warnings := make([]schema.Warning, len(parsed.Module.Warnings))
+		warnings := make([]schema.ProjectDiag, len(parsed.Module.Warnings))
 
 		for i, warning := range parsed.Module.Warnings {
-			warnings[i] = schema.Warning{
+			warnings[i] = schema.ProjectDiag{
 				Code:    int(warning.Code),
 				Message: warning.Title,
 				Data:    warning.Data,
@@ -256,47 +267,43 @@ func (p *HCLProvider) newProject(parsed HCLProject) *schema.Project {
 type HCLProject struct {
 	JSON   []byte
 	Module *hcl.Module
+	Error  error
 }
 
 // LoadPlanJSONs parses the found directories and return the blocks in Terraform plan JSON format.
-func (p *HCLProvider) LoadPlanJSONs() ([]HCLProject, error) {
+func (p *HCLProvider) LoadPlanJSONs() []HCLProject {
 	var jsons = make([]HCLProject, len(p.parsers))
-	modules, err := p.Modules()
-	if err != nil {
-		return nil, err
-	}
+	mods := p.Modules()
 
-	for i, module := range modules {
-		b, err := p.modulesToPlanJSON(module)
-		if err != nil {
-			return nil, err
+	for i, module := range mods {
+		if module.Error == nil {
+			b, err := p.modulesToPlanJSON(module.Module)
+			if err != nil {
+				module.Error = err
+			} else {
+				module.JSON = b
+			}
+
 		}
 
-		jsons[i] = HCLProject{
-			JSON:   b,
-			Module: module,
-		}
+		jsons[i] = module
 	}
 
-	return jsons, nil
+	return jsons
 }
 
 // Modules parses the found directories into hcl modules representing a config tree of Terraform information.
 // Modules returns the raw hcl blocks associated with each found Terraform project. This can be used
 // to fetch raw information like outputs, vars, resources, e.t.c.
-func (p *HCLProvider) Modules() ([]*hcl.Module, error) {
+func (p *HCLProvider) Modules() []HCLProject {
 	if p.cache != nil {
-		return p.cache, nil
+		return p.cache
 	}
 
 	runCtx := p.ctx.RunContext
-	parallelism, err := runCtx.GetParallelism()
-	if err != nil {
-		return nil, err
-	}
+	parallelism, _ := runCtx.GetParallelism()
 
 	numJobs := len(p.parsers)
-
 	runInParallel := parallelism > 1 && numJobs > 1
 	if runInParallel && !runCtx.Config.IsLogging() {
 		if runInParallel && !p.config.SuppressLogging {
@@ -309,61 +316,57 @@ func (p *HCLProvider) Modules() ([]*hcl.Module, error) {
 		p.ctx.RunContext.Config.LogLevel = "info"
 	}
 
-	var mods = make([]*hcl.Module, 0, len(p.parsers))
-	errGroup := &errgroup.Group{}
-	ch := make(chan *hcl.Parser, len(p.parsers))
+	if numJobs < parallelism {
+		parallelism = numJobs
+	}
+
+	ch := make(chan *hcl.Parser, numJobs)
+	mods := make([]HCLProject, 0, numJobs)
+	mu := &sync.Mutex{}
+	wg := &sync.WaitGroup{}
+
 	for _, parser := range p.parsers {
 		ch <- parser
 	}
 	close(ch)
-	lock := &sync.Mutex{}
+	wg.Add(parallelism)
 
 	for i := 0; i < parallelism; i++ {
-		errGroup.Go(func() (err error) {
+		go func() {
 			defer func() {
-				e := recover()
-				if e != nil {
-					err = clierror.NewPanicError(fmt.Errorf("%s", e), debug.Stack())
-				}
+				wg.Done()
 			}()
 
 			for parser := range ch {
-				if len(p.parsers) > 1 && !p.config.SuppressLogging {
+				if numJobs > 1 && !p.config.SuppressLogging {
 					fmt.Fprintf(os.Stderr, "Detected Terraform project at %s\n", ui.DisplayPath(parser.Path()))
 				}
 
 				module, err := parser.ParseDirectory()
-				if err != nil {
-					return err
-				}
 
-				lock.Lock()
-				mods = append(mods, module)
-				lock.Unlock()
+				mu.Lock()
+				mods = append(mods, HCLProject{Module: module, Error: err})
+				mu.Unlock()
 			}
-
-			return nil
-		})
+		}()
 	}
 
-	err = errGroup.Wait()
-	if err != nil {
-		return nil, err
-	}
+	wg.Wait()
 
 	if p.config.CacheParsingModules {
 		p.cache = mods
 	}
 
+	// TODO: handle nil modules from error return
 	sort.Slice(mods, func(i, j int) bool {
-		if mods[i].Name != "" && mods[j].Name != "" {
-			return mods[i].Name < mods[j].Name
+		if mods[i].Module.Name != "" && mods[j].Module.Name != "" {
+			return mods[i].Module.Name < mods[j].Module.Name
 		}
 
-		return mods[i].ModulePath < mods[j].ModulePath
+		return mods[i].Module.ModulePath < mods[j].Module.ModulePath
 	})
 
-	return mods, nil
+	return mods
 }
 
 // InvalidateCache removes the module cache from the prior hcl parse.

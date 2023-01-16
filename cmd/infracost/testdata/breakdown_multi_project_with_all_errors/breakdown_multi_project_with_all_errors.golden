@@ -1,0 +1,9 @@
+
+Err:
+Error: 2 errors occurred:
+	* project infracost/infracost/cmd/infracost/testdata/breakdown_multi_project_with_all_errors/dev errored: 
+			Error loading Terraform modules: failed to inspect module path testdata/breakdown_multi_project_with_all_errors/dev diag: Invalid block definition: Either a quoted string block label or an opening brace ("{") is expected here. (and 1 other messages)
+	* project infracost/infracost/cmd/infracost/testdata/breakdown_multi_project_with_all_errors/prod errored: 
+			Error loading Terraform modules: failed to inspect module path testdata/breakdown_multi_project_with_all_errors/prod diag: Invalid block definition: Either a quoted string block label or an opening brace ("{") is expected here. (and 1 other messages)
+
+

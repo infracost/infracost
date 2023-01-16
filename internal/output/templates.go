@@ -341,6 +341,12 @@ var CommentMarkdownWithHTMLTemplate = `
 
 {{ .SkippedProjectCount }} projects have no cost estimate changes.
   {{- end }}
+  {{- if eq .ErroredProjectCount 1 }}
+
+1 project could not be evaluated.
+  {{- else if gt .ErroredProjectCount 0 }}
+{{ .ErroredProjectCount }} projects could not be evaluated.
+  {{- end }}
 {{- else }}
   <tbody>
   {{- range .Root.Projects }}
@@ -432,6 +438,12 @@ var CommentMarkdownTemplate = `
   {{- else if gt .SkippedProjectCount 0 }}
 
 {{ .SkippedProjectCount }} projects have no cost estimate changes.
+  {{- end }}
+  {{- if eq .ErroredProjectCount 1 }}
+
+1 project could not be evaluated.
+  {{- else if gt .ErroredProjectCount 0 }}
+{{ .ErroredProjectCount }} projects could not be evaluated.
   {{- end }}
 {{- else }}
   {{- range .Root.Projects }}

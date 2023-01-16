@@ -51,14 +51,31 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 
 		s += "\n"
 
-		tableOut := tableForBreakdown(out.Currency, *project.Breakdown, opts.Fields, includeProjectTotals)
+		if len(project.Metadata.Errors) > 0 {
+			s += ui.BoldString("Errors:") + "\n"
 
-		// Get the last table length so we can align the overall total with it
-		if i == len(out.Projects)-1 {
-			tableLen = len(ui.StripColor(strings.SplitN(tableOut, "\n", 2)[0]))
+			for _, diag := range project.Metadata.Errors {
+				pieces := strings.Split(diag.Message, ":")
+				for x, piece := range pieces {
+					s += strings.Repeat("  ", x+1) + piece
+
+					if len(pieces)-1 == x {
+						s += "\n"
+					} else {
+						s += ":\n"
+					}
+				}
+			}
+		} else {
+			tableOut := tableForBreakdown(out.Currency, *project.Breakdown, opts.Fields, includeProjectTotals)
+
+			// Get the last table length so we can align the overall total with it
+			if i == len(out.Projects)-1 {
+				tableLen = len(ui.StripColor(strings.SplitN(tableOut, "\n", 2)[0]))
+			}
+
+			s += tableOut
 		}
-
-		s += tableOut
 
 		s += "\n"
 
