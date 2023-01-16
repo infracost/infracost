@@ -11,21 +11,23 @@ import (
 )
 
 type BigQueryTable struct {
-	Address                   string
-	Region                    string
-	MonthlyStreamingInsertsMB *float64 `infracost_usage:"monthly_streaming_inserts_mb"`
-	MonthlyStorageWriteAPIGB  *float64 `infracost_usage:"monthly_storage_write_api_gb"`
-	MonthlyStorageReadAPITB   *float64 `infracost_usage:"monthly_storage_read_api_tb"`
-	MonthlyActiveStorageGB    *float64 `infracost_usage:"monthly_active_storage_gb"`
-	MonthlyLongTermStorageGB  *float64 `infracost_usage:"monthly_long_term_storage_gb"`
+	Address                         string
+	Region                          string
+	MonthlyStreamingInsertsMB       *float64 `infracost_usage:"monthly_streaming_inserts_mb"`
+	MonthlyStorageWriteAPIGB        *float64 `infracost_usage:"monthly_storage_write_api_gb"`
+	MonthlyStorageReadAPITB         *float64 `infracost_usage:"monthly_storage_read_api_tb"`
+	MonthlyActiveLogicalStorageGB   *float64 `infracost_usage:"monthly_active_logical_storage_gb"`
+	MonthlyActivePhysicalStorageGB  *float64 `infracost_usage:"monthly_active_physical_storage_gb"`
+	MonthlyLongTermLogicalStorageGB *float64 `infracost_usage:"monthly_long_term_logical_storage_gb"`
 }
 
 var BigQueryTableUsageSchema = []*schema.UsageItem{
 	{Key: "monthly_streaming_inserts_mb", ValueType: schema.Float64, DefaultValue: 0},
 	{Key: "monthly_storage_write_api_gb", ValueType: schema.Float64, DefaultValue: 0},
 	{Key: "monthly_storage_read_api_tb", ValueType: schema.Float64, DefaultValue: 0},
-	{Key: "monthly_active_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
-	{Key: "monthly_long_term_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+	{Key: "monthly_active_logical_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+	{Key: "monthly_active_physical_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+	{Key: "monthly_long_term_logical_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
 }
 
 func (r *BigQueryTable) PopulateUsage(u *schema.UsageData) {
@@ -34,7 +36,8 @@ func (r *BigQueryTable) PopulateUsage(u *schema.UsageData) {
 
 func (r *BigQueryTable) BuildResource() *schema.Resource {
 	costComponents := []*schema.CostComponent{
-		r.activeStorageCostComponent(),
+		r.activeLogicalStorageCostComponent(),
+		r.activePhysicalStorageCostComponent(),
 		r.longTermStorageCostComponent(),
 		r.streamingInsertsCostComponent(),
 	}
@@ -56,14 +59,14 @@ func (r *BigQueryTable) BuildResource() *schema.Resource {
 	}
 }
 
-func (r *BigQueryTable) activeStorageCostComponent() *schema.CostComponent {
+func (r *BigQueryTable) activeLogicalStorageCostComponent() *schema.CostComponent {
 	var activeStorageGB *decimal.Decimal
-	if r.MonthlyActiveStorageGB != nil {
-		activeStorageGB = decimalPtr(decimal.NewFromFloat(*r.MonthlyActiveStorageGB))
+	if r.MonthlyActiveLogicalStorageGB != nil {
+		activeStorageGB = decimalPtr(decimal.NewFromFloat(*r.MonthlyActiveLogicalStorageGB))
 	}
 
 	return &schema.CostComponent{
-		Name:            "Active storage",
+		Name:            "Active logical storage",
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: activeStorageGB,
@@ -73,7 +76,33 @@ func (r *BigQueryTable) activeStorageCostComponent() *schema.CostComponent {
 			Service:       strPtr("BigQuery"),
 			ProductFamily: strPtr("ApplicationServices"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "description", Value: strPtr(fmt.Sprintf("Active Storage (%s)", r.Region))},
+				{Key: "description", Value: strPtr(fmt.Sprintf("Active Logical Storage (%s)", r.Region))},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			StartUsageAmount: strPtr("10"),
+		},
+	}
+}
+
+func (r *BigQueryTable) activePhysicalStorageCostComponent() *schema.CostComponent {
+	var activeStorageGB *decimal.Decimal
+	if r.MonthlyActiveLogicalStorageGB != nil {
+		activeStorageGB = decimalPtr(decimal.NewFromFloat(*r.MonthlyActiveLogicalStorageGB))
+	}
+
+	return &schema.CostComponent{
+		Name:            "Active physical storage",
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: activeStorageGB,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("gcp"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("BigQuery"),
+			ProductFamily: strPtr("ApplicationServices"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "description", Value: strPtr(fmt.Sprintf("Active Physical Storage (%s)", r.Region))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -84,12 +113,12 @@ func (r *BigQueryTable) activeStorageCostComponent() *schema.CostComponent {
 
 func (r *BigQueryTable) longTermStorageCostComponent() *schema.CostComponent {
 	var longTermStorageGB *decimal.Decimal
-	if r.MonthlyLongTermStorageGB != nil {
-		longTermStorageGB = decimalPtr(decimal.NewFromFloat(*r.MonthlyLongTermStorageGB))
+	if r.MonthlyLongTermLogicalStorageGB != nil {
+		longTermStorageGB = decimalPtr(decimal.NewFromFloat(*r.MonthlyLongTermLogicalStorageGB))
 	}
 
 	return &schema.CostComponent{
-		Name:            "Long-term storage",
+		Name:            "Long-term logical storage",
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: longTermStorageGB,
@@ -99,7 +128,7 @@ func (r *BigQueryTable) longTermStorageCostComponent() *schema.CostComponent {
 			Service:       strPtr("BigQuery"),
 			ProductFamily: strPtr("ApplicationServices"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "description", Value: strPtr(fmt.Sprintf("Long Term Storage (%s)", r.Region))},
+				{Key: "description", Value: strPtr(fmt.Sprintf("Long Term Logical Storage (%s)", r.Region))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

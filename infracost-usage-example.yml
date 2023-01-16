@@ -145,7 +145,7 @@ resource_usage:
 
   aws_ebs_volume.my_standard_volume:
     monthly_standard_io_requests: 10000000 # Monthly I/O requests for standard volume (Magnetic storage).
-  
+
   aws_ec2_host.my_host:
     reserved_instance_term: 1_year # Term for Reserved Instances, can be: 1_year, 3_year.
     reserved_instance_payment_option: partial_upfront # Payment option for Reserved Instances, can be: no_upfront, partial_upfront, all_upfront.
@@ -189,7 +189,7 @@ resource_usage:
       rule_evaluations: 10000    # Number of rule evaluations on application/network load balancers
     elb:
       monthly_data_processed_gb: 10000 # Monthly data processed on classic loadbalaner
-    
+
   aws_elasticache_cluster.my_redis_snapshot:
     snapshot_storage_size_gb: 10000 # Size of Redis snapshots in GB.
     reserved_instance_term: 1_year                          # Term for Reserved Instances, can be: 1_year, 3_year.
@@ -583,11 +583,12 @@ resource_usage:
     monthly_queries_tb: 100 # Monthly number of bytes processed (also referred to as bytes read) in TB.
 
   google_bigquery_table.usage:
-    monthly_active_storage_gb: 1000    # Monthly number of active storage modifications in GB.
-    monthly_long_term_storage_gb: 1000 # Monthly number of long-term storage modifications in GB.
-    monthly_streaming_inserts_mb: 1000 # Monthly number of streaming data inserts in MB.
-    monthly_storage_write_api_gb: 1000 # Monthly number of storage write api in GB.
-    monthly_storage_read_api_tb: 1000  # Monthly number of storage read api in TB.
+    monthly_active_logical storage_gb: 1000    # Monthly number of active logical storage modifications in GB.
+    monthly_active_physical storage_gb: 1000   # Monthly number of active logical storage modifications in GB.
+    monthly_long_term_logical_storage_gb: 1000 # Monthly number of long-term logical storage modifications in GB.
+    monthly_streaming_inserts_mb: 1000         # Monthly number of streaming data inserts in MB.
+    monthly_storage_write_api_gb: 1000         # Monthly number of storage write api in GB.
+    monthly_storage_read_api_tb: 1000          # Monthly number of storage read api in TB.
 
   google_cloudfunctions_function.my_function:
     request_duration_ms: 300               # Average duration of each request in milliseconds.
@@ -1082,7 +1083,7 @@ resource_usage:
     monthly_vcore_hours: 600             # Monthly number of used vCore-hours for serverless compute.
     long_term_retention_storage_gb: 1000 # Number of GBs used by long-term retention backup storage.
     extra_data_storage_gb: 250           # Override number of GBs used by extra data storage.
-  
+
   azurerm_sql_managed_instance.my_database:
     backup_storage_gb: 100            # Backup storage size dedicated for Point In Time Restoration
     long_term_retention_storage_gb: 5 # Number of GBs used by long-term retention backup storage.
