@@ -68,6 +68,7 @@ func (r *CloudwatchMetricAlarm) cloudwatchMetricAlarmCostComponent() *schema.Cos
 			Service:       strPtr("AmazonCloudWatch"),
 			ProductFamily: strPtr("Alarm"),
 			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "group", Value: strPtr("Alarm")},
 				{Key: "alarmType", ValueRegex: regexPtr(alarmType)},
 			},
 		},
