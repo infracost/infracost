@@ -84,6 +84,20 @@ func TestDiffWithCompareTo(t *testing.T) {
 			RunTerraformCLI: true,
 		})
 }
+func TestDiffWithCompareToWithProjectError(t *testing.T) {
+	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"diff",
+			"--path",
+			dir,
+			"--compare-to",
+			path.Join(dir, "prior.json"),
+			"--format", "json",
+		}, nil)
+}
 
 func TestDiffWithCompareToFormatJSON(t *testing.T) {
 	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
