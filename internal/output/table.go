@@ -75,9 +75,9 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 			}
 
 			s += tableOut
-		}
 
-		s += "\n"
+			s += "\n"
+		}
 
 		if i != len(out.Projects)-1 {
 			s += "\n"
