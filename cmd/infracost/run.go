@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/Rhymond/go-money"
+	"github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
@@ -129,6 +130,11 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		go formatHCLProjects(wg, runCtx, hclProjects, hclR)
 	}
 
+	err = checkIfAllProjectsErrored(projects)
+	if err != nil {
+		return err
+	}
+
 	r, err := output.ToOutputFormat(projects)
 	if err != nil {
 		return err
@@ -199,6 +205,37 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 			cmd.PrintErrln()
 		}
 		cmd.Println(string(b))
+	}
+
+	return nil
+}
+
+func checkIfAllProjectsErrored(projects []*schema.Project) error {
+	allError := true
+	for _, project := range projects {
+		if !project.Metadata.HasErrors() {
+			allError = false
+			break
+		}
+	}
+
+	if allError {
+		multi := &multierror.Error{}
+		for _, project := range projects {
+			msg := fmt.Sprintf("project %s errored: \n", project.Name)
+			for i, diag := range project.Metadata.Errors {
+				msg += "\t\t\t" + diag.Message
+
+				if i != len(project.Metadata.Errors)-1 {
+					msg += "\n"
+				}
+
+			}
+
+			multi.Errors = append(multi.Errors, errors.New(msg))
+		}
+
+		return multi
 	}
 
 	return nil

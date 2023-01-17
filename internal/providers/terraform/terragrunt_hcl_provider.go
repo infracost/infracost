@@ -11,6 +11,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	tgcli "github.com/gruntwork-io/terragrunt/cli"
@@ -121,6 +122,7 @@ type terragruntWorkingDirInfo struct {
 	configDir  string
 	workingDir string
 	provider   *HCLProvider
+	error      error
 }
 
 // LoadResources finds any Terragrunt projects, prepares them by downloading any required source files, then
@@ -133,42 +135,113 @@ func (p *TerragruntHCLProvider) LoadResources(usage map[string]*schema.UsageData
 
 	var allProjects []*schema.Project
 
-	// Sort the dirs so they are consistent in the output
-	sort.Slice(dirs, func(i, j int) bool {
-		return dirs[i].configDir < dirs[j].configDir
-	})
+	runCtx := p.ctx.RunContext
+	parallelism, _ := runCtx.GetParallelism()
 
-	for _, di := range dirs {
-		p.logger.Debugf("Found terragrunt HCL working dir: %v", di.workingDir)
+	numJobs := len(dirs)
+	runInParallel := parallelism > 1 && numJobs > 1
+	if runInParallel && !runCtx.Config.IsLogging() {
+		p.logger.Logger.SetLevel(log.InfoLevel)
+		p.ctx.RunContext.Config.LogLevel = "info"
+	}
 
-		projects, err := di.provider.LoadResources(usage)
-		if err != nil {
-			return nil, err
-		}
+	if numJobs < parallelism {
+		parallelism = numJobs
+	}
 
-		for _, project := range projects {
-			projectPath := di.configDir
-			// attempt to convert project path to be relative to the top level provider path
-			if absPath, err := filepath.Abs(p.ctx.ProjectConfig.Path); err == nil {
-				if relProjectPath, err := filepath.Rel(absPath, projectPath); err == nil {
-					projectPath = filepath.Join(p.ctx.ProjectConfig.Path, relProjectPath)
+	ch := make(chan *terragruntWorkingDirInfo, numJobs)
+	mu := &sync.Mutex{}
+	wg := &sync.WaitGroup{}
+
+	for _, dir := range dirs {
+		ch <- dir
+	}
+	close(ch)
+	wg.Add(parallelism)
+
+	for i := 0; i < parallelism; i++ {
+		go func() {
+			defer func() {
+				wg.Done()
+			}()
+
+			for di := range ch {
+				if di.error != nil {
+					mu.Lock()
+					allProjects = append(allProjects, p.newErroredProject(di))
+					mu.Unlock()
+					continue
+				}
+
+				p.logger.Debugf("Found terragrunt HCL working dir: %v", di.workingDir)
+
+				// HCLProvider.LoadResources never returns an error.
+				projects, _ := di.provider.LoadResources(usage)
+
+				for _, project := range projects {
+					projectPath := di.configDir
+					// attempt to convert project path to be relative to the top level provider path
+					if absPath, err := filepath.Abs(p.ctx.ProjectConfig.Path); err == nil {
+						if relProjectPath, err := filepath.Rel(absPath, projectPath); err == nil {
+							projectPath = filepath.Join(p.ctx.ProjectConfig.Path, relProjectPath)
+						}
+					}
+
+					metadata := p.newProjectMetadata(projectPath)
+					project.Metadata = metadata
+					project.Name = p.generateProjectName(metadata)
+					mu.Lock()
+					allProjects = append(allProjects, project)
+					mu.Unlock()
 				}
 			}
+		}()
+	}
 
-			project.Metadata = config.DetectProjectMetadata(projectPath)
-			project.Metadata.Type = p.Type()
-			p.AddMetadata(project.Metadata)
-			name := p.ctx.ProjectConfig.Name
-			if name == "" {
-				name = project.Metadata.GenerateProjectName(p.ctx.RunContext.VCSMetadata.Remote, p.ctx.RunContext.IsCloudEnabled())
-			}
+	wg.Wait()
+	sort.Slice(allProjects, func(i, j int) bool {
+		return allProjects[i].Metadata.TerraformModulePath < allProjects[j].Metadata.TerraformModulePath
+	})
 
-			project.Name = name
-			allProjects = append(allProjects, project)
+	return allProjects, nil
+}
+
+func (p *TerragruntHCLProvider) newErroredProject(di *terragruntWorkingDirInfo) *schema.Project {
+	projectPath := di.configDir
+	if absPath, err := filepath.Abs(p.ctx.ProjectConfig.Path); err == nil {
+		if relProjectPath, err := filepath.Rel(absPath, projectPath); err == nil {
+			projectPath = filepath.Join(p.ctx.ProjectConfig.Path, relProjectPath)
 		}
 	}
 
-	return allProjects, nil
+	metadata := p.newProjectMetadata(projectPath)
+
+	if di.error != nil {
+		metadata.Errors = []schema.ProjectDiag{
+			{
+				Code:    schema.DiagTerragruntEvaluationFailure,
+				Message: di.error.Error(),
+			},
+		}
+	}
+
+	return schema.NewProject(p.generateProjectName(metadata), metadata)
+}
+
+func (p *TerragruntHCLProvider) generateProjectName(metadata *schema.ProjectMetadata) string {
+	name := p.ctx.ProjectConfig.Name
+	if name == "" {
+		name = metadata.GenerateProjectName(p.ctx.RunContext.VCSMetadata.Remote, p.ctx.RunContext.IsCloudEnabled())
+	}
+	return name
+}
+
+func (p *TerragruntHCLProvider) newProjectMetadata(projectPath string) *schema.ProjectMetadata {
+	metadata := config.DetectProjectMetadata(projectPath)
+	metadata.Type = p.Type()
+	p.AddMetadata(metadata)
+
+	return metadata
 }
 
 func (p *TerragruntHCLProvider) initTerraformVarFiles(tfVarFiles []string, extraArgs []tgconfig.TerraformExtraArguments, basePath string) []string {
@@ -212,6 +285,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 		return nil, fmt.Errorf("Failed to create download directories for terragrunt in working directory: %w", err)
 	}
 
+	mu := sync.Mutex{}
 	var workingDirsToEstimate []*terragruntWorkingDirInfo
 
 	tgLog := p.logger.WithFields(log.Fields{"library": "terragrunt"})
@@ -228,17 +302,25 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 		TerraformCliArgs:           []string{tgcli.CMD_TERRAGRUNT_INFO},
 		Env:                        p.env,
 		IgnoreExternalDependencies: true,
-		RunTerragrunt: func(terragruntOptions *tgoptions.TerragruntOptions) (err error) {
+		RunTerragrunt: func(opts *tgoptions.TerragruntOptions) (err error) {
 			defer func() {
 				unexpectedErr := recover()
 				if unexpectedErr != nil {
 					err = panicError{msg: fmt.Sprintf("%s\n%s", unexpectedErr, debug.Stack())}
+					mu.Lock()
+					workingDirsToEstimate = append(
+						workingDirsToEstimate,
+						&terragruntWorkingDirInfo{configDir: opts.WorkingDir, workingDir: opts.WorkingDir, error: err},
+					)
+					mu.Unlock()
 				}
 			}()
 
-			workingDirInfo, err := p.runTerragrunt(terragruntOptions)
+			workingDirInfo := p.runTerragrunt(opts)
 			if workingDirInfo != nil {
+				mu.Lock()
 				workingDirsToEstimate = append(workingDirsToEstimate, workingDirInfo)
+				mu.Unlock()
 			}
 
 			return
@@ -262,10 +344,6 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 
 	err = s.Run(terragruntOptions)
 	if err != nil {
-		if errors.As(err, &panicError{}) {
-			panic(err)
-		}
-
 		return nil, clierror.NewCLIError(
 			errors.Errorf(
 				"%s\n%v%s",
@@ -306,12 +384,14 @@ func (p *TerragruntHCLProvider) filterExcludedPaths(paths []string) []string {
 //  2. download source modules that are required for the project.
 //  3. we then evaluate the Terraform project built by Terragrunt storing any outputs so that we can use
 //     these for further runTerragrunt calls that use the dependency outputs.
-func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions) (*terragruntWorkingDirInfo, error) {
+func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions) (info *terragruntWorkingDirInfo) {
+	info = &terragruntWorkingDirInfo{configDir: opts.WorkingDir, workingDir: opts.WorkingDir}
 	outputs := p.fetchDependencyOutputs(opts)
 
 	terragruntConfig, err := tgconfig.ParseConfigFile(opts.TerragruntConfigPath, opts, nil, &outputs)
 	if err != nil {
-		return nil, err
+		info.error = err
+		return
 	}
 
 	terragruntOptionsClone := opts.Clone(opts.TerragruntConfigPath)
@@ -322,13 +402,15 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 			"Skipping terragrunt module %s due to skip = true.",
 			opts.TerragruntConfigPath,
 		)
-		return nil, nil
+
+		return nil
 	}
 
 	// get the default download dir
 	_, defaultDownloadDir, err := tgoptions.DefaultWorkingAndDownloadDirs(opts.TerragruntConfigPath)
 	if err != nil {
-		return nil, err
+		info.error = err
+		return
 	}
 
 	// if the download dir hasn't been changed from default, and is set in the config,
@@ -344,29 +426,32 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 
 	if terragruntConfig.RetryMaxAttempts != nil {
 		if *terragruntConfig.RetryMaxAttempts < 1 {
-			return nil, fmt.Errorf("Cannot have less than 1 max retry, but you specified %d", *terragruntConfig.RetryMaxAttempts)
+			info.error = fmt.Errorf("Cannot have less than 1 max retry, but you specified %d", *terragruntConfig.RetryMaxAttempts)
+			return
 		}
 		opts.RetryMaxAttempts = *terragruntConfig.RetryMaxAttempts
 	}
 
 	if terragruntConfig.RetrySleepIntervalSec != nil {
 		if *terragruntConfig.RetrySleepIntervalSec < 0 {
-			return nil, fmt.Errorf("Cannot sleep for less than 0 seconds, but you specified %d", *terragruntConfig.RetrySleepIntervalSec)
+			info.error = fmt.Errorf("Cannot sleep for less than 0 seconds, but you specified %d", *terragruntConfig.RetrySleepIntervalSec)
+			return
 		}
 		opts.RetrySleepIntervalSec = time.Duration(*terragruntConfig.RetrySleepIntervalSec) * time.Second
 	}
 
-	info := &terragruntWorkingDirInfo{configDir: opts.WorkingDir, workingDir: opts.WorkingDir}
-
 	sourceURL, err := tgconfig.GetTerraformSourceUrl(opts, terragruntConfig)
 	if err != nil {
-		return nil, err
+		info.error = err
+		return
 	}
 	if sourceURL != "" {
 		updatedTerragruntOptions, err := p.downloadTerraformSource(sourceURL, opts, terragruntConfig)
 		if err != nil {
-			return nil, err
+			info.error = err
+			return
 		}
+
 		if updatedTerragruntOptions != nil && updatedTerragruntOptions.WorkingDir != "" {
 			info = &terragruntWorkingDirInfo{configDir: opts.WorkingDir, workingDir: updatedTerragruntOptions.WorkingDir}
 		}
@@ -399,20 +484,24 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 		ops...,
 	)
 	if err != nil {
-		return nil, fmt.Errorf("could not create provider for Terragrunt generated dir %w", err)
+		projectPath := info.configDir
+		if absPath, err := filepath.Abs(p.ctx.ProjectConfig.Path); err == nil {
+			if relProjectPath, err := filepath.Rel(absPath, projectPath); err == nil {
+				projectPath = filepath.Join(p.ctx.ProjectConfig.Path, relProjectPath)
+			}
+		}
+
+		info.error = fmt.Errorf("failed to evaluated Terraform directory %s: %w", projectPath, err)
+		return
 	}
 
-	mods, err := h.Modules()
-	if err != nil {
-		return nil, fmt.Errorf("could not parse generated Terraform dir from Terragrunt generated dir %w", err)
-	}
-
+	mods := h.Modules()
 	for _, mod := range mods {
-		p.outputs[opts.TerragruntConfigPath] = mod.Blocks.Outputs(true)
+		p.outputs[opts.TerragruntConfigPath] = mod.Module.Blocks.Outputs(true)
 	}
 
 	info.provider = h
-	return info, nil
+	return info
 }
 
 func buildExcludedPathsMatcher(fullPath string, excludedDirs []string) func(string) bool {
@@ -685,8 +774,8 @@ func (p *TerragruntHCLProvider) fetchModuleOutputs(opts *tgoptions.TerragruntOpt
 			for dir, dep := range blocks {
 				value, evaluated := p.outputs[dir]
 				if !evaluated {
-					_, err := p.runTerragrunt(opts.Clone(dir))
-					if err != nil {
+					info := p.runTerragrunt(opts.Clone(dir))
+					if info.error != nil {
 						return outputs, fmt.Errorf("could not evaluate dependency %s at dir %s err: %w", dep.Name, dir, err)
 					}
 

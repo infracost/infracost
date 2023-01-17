@@ -207,7 +207,7 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 				logger:  entry,
 				ctx:     &config.ProjectContext{RunContext: &config.RunContext{Config: &config.Config{}}},
 			}
-			got, err := p.LoadPlanJSONs()
+			got := p.LoadPlanJSONs()
 			require.NoError(t, err)
 
 			tmpl, err := template.ParseFiles(path.Join(testPath, "expected.json"))
