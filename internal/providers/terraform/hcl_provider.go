@@ -357,7 +357,6 @@ func (p *HCLProvider) Modules() []HCLProject {
 		p.cache = mods
 	}
 
-	// TODO: handle nil modules from error return
 	sort.Slice(mods, func(i, j int) bool {
 		if mods[i].Module.Name != "" && mods[j].Module.Name != "" {
 			return mods[i].Module.Name < mods[j].Module.Name
