@@ -51,7 +51,7 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 
 		s += "\n"
 
-		if len(project.Metadata.Errors) > 0 {
+		if project.Metadata.HasErrors() {
 			s += ui.BoldString("Errors:") + "\n"
 
 			for _, diag := range project.Metadata.Errors {

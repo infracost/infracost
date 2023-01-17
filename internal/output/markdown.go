@@ -140,7 +140,7 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 		},
 		"formatCostChangeSentence": formatCostChangeSentence,
 		"showProject": func(p Project) bool {
-			if len(p.Metadata.Errors) > 0 {
+			if p.Metadata.HasErrors() {
 				return false
 			}
 
@@ -206,6 +206,10 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 
 	skippedProjectCount := 0
 	for _, p := range out.Projects {
+		if p.Metadata.HasErrors() {
+			continue
+		}
+
 		if (p.Diff == nil || len(p.Diff.Resources) == 0) && !hasCodeChanges(opts, p) {
 			skippedProjectCount++
 		}
@@ -213,7 +217,7 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 
 	erroredProjectCount := 0
 	for _, p := range out.Projects {
-		if len(p.Metadata.Errors) > 0 {
+		if p.Metadata.HasErrors() {
 			erroredProjectCount++
 		}
 	}
