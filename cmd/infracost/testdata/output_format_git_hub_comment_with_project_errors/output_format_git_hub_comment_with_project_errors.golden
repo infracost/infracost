@@ -59,8 +59,9 @@ Amount:  +$1,303 ($0.00 → $1,303)
 
 ──────────────────────────────────
 
-The following projects have no cost estimate changes: infracost/infracost/cmd/infracost/testdata/breakdown_multi_project_with_error/dev (Module path: dev)
-Run the following command to see their breakdown: infracost breakdown --path=/path/to/code
+The following projects could not be evaluated: 
+infracost/infracost/cmd/infracost/testdata/breakdown_multi_project_with_error/dev (Module path: dev)
+Run the following command to see more details: infracost breakdown --path=/path/to/code
 
 ──────────────────────────────────
 Key: ~ changed, + added, - removed

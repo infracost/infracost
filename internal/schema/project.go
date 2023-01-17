@@ -39,6 +39,10 @@ type ProjectMetadata struct {
 	Policies            Policies      `json:"policies,omitempty"`
 }
 
+func (m *ProjectMetadata) HasErrors() bool {
+	return len(m.Errors) > 0
+}
+
 func (m *ProjectMetadata) WorkspaceLabel() string {
 	if m.TerraformWorkspace == "default" {
 		return ""

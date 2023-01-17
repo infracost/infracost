@@ -5,7 +5,6 @@ Errors:
   failed to evaluated Terraform directory testdata/breakdown_terragrunt_with_project_error/dev:
      No valid Terraform files found at the given path, try a different directory
 
-
 ──────────────────────────────────
 Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_with_project_error/prod
 Module path: prod

@@ -213,7 +213,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 func checkIfAllProjectsErrored(projects []*schema.Project) error {
 	allError := true
 	for _, project := range projects {
-		if len(project.Metadata.Errors) == 0 {
+		if !project.Metadata.HasErrors() {
 			allError = false
 			break
 		}
