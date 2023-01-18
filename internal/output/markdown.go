@@ -3,7 +3,9 @@ package output
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"sort"
+	"strings"
 	"text/template"
 	"unicode/utf8"
 
@@ -105,6 +107,43 @@ func calculateMetadataToDisplay(projects []Project) (hasModulePath bool, hasWork
 	}
 
 	return hasModulePath, hasWorkspace
+}
+
+// MarkdownCtx holds information that can be used and executed with a go template.
+type MarkdownCtx struct {
+	Root                         Root
+	SkippedProjectCount          int
+	ErroredProjectCount          int
+	SkippedUnchangedProjectCount int
+	DiffOutput                   string
+	Options                      Options
+	MarkdownOptions              MarkdownOptions
+}
+
+// ProjectCounts returns a string that represents additional information about missing/errored projects.
+func (m MarkdownCtx) ProjectCounts() string {
+	out := ""
+	if m.SkippedUnchangedProjectCount == 1 {
+		out += "1 project has no code changes, "
+	} else if m.SkippedUnchangedProjectCount > 0 {
+		out += fmt.Sprintf("%d projects have no code changes, ", m.SkippedUnchangedProjectCount)
+	} else if m.SkippedProjectCount == 1 {
+		out += "1 project has no cost estimate changes, "
+	} else if m.SkippedProjectCount > 0 {
+		out += fmt.Sprintf("%d projects have no cost estimate changes, ", m.SkippedProjectCount)
+	}
+
+	if m.ErroredProjectCount == 1 {
+		out += "1 project could not be evaluated"
+	} else if m.ErroredProjectCount > 0 {
+		out += fmt.Sprintf("%d projects could not be evaluated, ", m.ErroredProjectCount)
+	}
+
+	if out == "" {
+		return out
+	}
+
+	return "\n" + strings.TrimSuffix(out, ", ") + "."
 }
 
 func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, error) {
@@ -231,15 +270,7 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 		}
 	}
 
-	err = tmpl.Execute(bufw, struct {
-		Root                         Root
-		SkippedProjectCount          int
-		ErroredProjectCount          int
-		SkippedUnchangedProjectCount int
-		DiffOutput                   string
-		Options                      Options
-		MarkdownOptions              MarkdownOptions
-	}{
+	err = tmpl.Execute(bufw, MarkdownCtx{
 		out,
 		skippedProjectCount,
 		erroredProjectCount,

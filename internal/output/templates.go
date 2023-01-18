@@ -327,26 +327,7 @@ var CommentMarkdownWithHTMLTemplate = `
   {{- template "summaryRow" dict "Name" "All projects" "MetadataFields" (metadataPlaceholders) "PastCost" .Root.PastTotalMonthlyCost "Cost" .Root.TotalMonthlyCost  }}
   </tbody>
 </table>
-
-  {{- if eq .SkippedUnchangedProjectCount 1 }}
-
-1 project has no code changes.
-  {{- else if gt .SkippedUnchangedProjectCount  0 }}
-
-{{ .SkippedUnchangedProjectCount }} projects have no code changes.
-  {{- else if eq .SkippedProjectCount 1 }}
-
-1 project has no cost estimate changes.
-  {{- else if gt .SkippedProjectCount  0 }}
-
-{{ .SkippedProjectCount }} projects have no cost estimate changes.
-  {{- end }}
-  {{- if eq .ErroredProjectCount 1 }}
-
-1 project could not be evaluated.
-  {{- else if gt .ErroredProjectCount 0 }}
-{{ .ErroredProjectCount }} projects could not be evaluated.
-  {{- end }}
+{{ .ProjectCounts }}
 {{- else }}
   <tbody>
   {{- range .Root.Projects }}
@@ -431,20 +412,7 @@ var CommentMarkdownTemplate = `
     {{- end }}
   {{- end }}
   {{- template "totalRow" dict "Name" "All projects" "PastCost" .Root.PastTotalMonthlyCost "Cost" .Root.TotalMonthlyCost  }}
-
-  {{- if eq .SkippedProjectCount 1 }}
-
-1 project has no cost estimate changes.
-  {{- else if gt .SkippedProjectCount 0 }}
-
-{{ .SkippedProjectCount }} projects have no cost estimate changes.
-  {{- end }}
-  {{- if eq .ErroredProjectCount 1 }}
-
-1 project could not be evaluated.
-  {{- else if gt .ErroredProjectCount 0 }}
-{{ .ErroredProjectCount }} projects could not be evaluated.
-  {{- end }}
+{{ .ProjectCounts }}
 {{- else }}
   {{- range .Root.Projects }}
     {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}

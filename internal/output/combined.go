@@ -16,9 +16,10 @@ import (
 	"github.com/shopspring/decimal"
 	"golang.org/x/mod/semver"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/schema"
-	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -127,8 +128,11 @@ func CompareTo(current, prior Root) (Root, error) {
 		scp.HasDiff = true
 
 		if v, ok := priorProjects[p.LabelWithMetadata()]; ok {
-			scp.PastResources = v.Resources
-			scp.Diff = schema.CalculateDiff(scp.PastResources, scp.Resources)
+			if !p.Metadata.HasErrors() && !v.Metadata.HasErrors() {
+				scp.PastResources = v.Resources
+				scp.Diff = schema.CalculateDiff(scp.PastResources, scp.Resources)
+			}
+
 			delete(priorProjects, p.LabelWithMetadata())
 		}
 
