@@ -63,3 +63,73 @@ resource "ibm_resource_instance" "resource_instance_appconnect_lite" {
   plan              = "lite"
   location          = "us-south"
 }
+
+resource "ibm_resource_instance" "resource_instance_logdna_lite" {
+  name              = "logdna-lite"
+  service           = "logdna"
+  plan              = "lite"
+  location          = "us-south"
+}
+
+resource "ibm_resource_instance" "resource_instance_logdna_7day" {
+  name              = "logdna-7day"
+  service           = "logdna"
+  plan              = "7-day"
+  location          = "us-south"
+}
+
+resource "ibm_resource_instance" "resource_instance_logdna_7day_no_usage" {
+  name              = "logdna-7day-no-usage"
+  service           = "logdna"
+  plan              = "7-day"
+  location          = "us-south"
+}
+
+resource "ibm_resource_instance" "resource_instance_activity_tracker_lite" {
+  name              = "activity-tracker-lite"
+  service           = "logdnaat"
+  plan              = "lite"
+  location          = "us-south"
+}
+
+resource "ibm_resource_instance" "resource_instance_activity_tracker_7day" {
+  name              = "activity-tracker-7day"
+  service           = "logdnaat"
+  plan              = "7-day"
+  location          = "us-south"
+}
+
+resource "ibm_resource_instance" "resource_instance_activity_tracker_7day_no_usage" {
+  name              = "activity-tracker-7day-no-usage"
+  service           = "logdnaat"
+  plan              = "7-day"
+  location          = "us-south"
+}
+
+resource "ibm_resource_instance" "resource_instance_monitoring_lite" {
+  name              = "sysdig-lite"
+  service           = "sysdig-monitor"
+  plan              = "lite"
+  location          = "us-south"
+}
+
+resource "ibm_resource_instance" "resource_instance_monitoring_graduated" {
+  name              = "sysdig-graduated"
+  service           = "sysdig-monitor"
+  plan              = "graduated-tier"
+  location          = "us-south"
+}
+
+resource "ibm_resource_instance" "resource_instance_monitoring_graduated_no_usage" {
+  name              = "sysdig-graduated-no-usage"
+  service           = "sysdig-monitor"
+  plan              = "graduated-tier"
+  location          = "us-south"
+}
+
+resource "ibm_resource_instance" "resource_instance_monitoring_graduated_secure" {
+  name              = "sysdig-graduated-secure"
+  service           = "graduated-tier-sysdig-secure-plus-monitor"
+  plan              = "7-day"
+  location          = "us-south"
+}
