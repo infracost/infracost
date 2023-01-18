@@ -510,6 +510,10 @@ func (b *Block) IsForEachReferencedExpanded(moduleBlocks Blocks) bool {
 		return true
 	}
 
+	if !referenced.ShouldExpand() {
+		return true
+	}
+
 	return referenced.IsCountExpanded()
 }
 
@@ -518,7 +522,15 @@ func (b Block) ShouldExpand() bool {
 		return false
 	}
 
-	return b.Type() == "resource" || b.Type() == "module" || b.Type() == "data"
+	validType := b.Type() == "resource" || b.Type() == "module" || b.Type() == "data"
+	if !validType {
+		return false
+	}
+
+	countAttr := b.GetAttribute("count")
+	forEachAttr := b.GetAttribute("for_each")
+
+	return countAttr != nil || forEachAttr != nil
 }
 
 // SetContext sets the Block.context to the provided ctx. This ctx is also set on the child Blocks as
