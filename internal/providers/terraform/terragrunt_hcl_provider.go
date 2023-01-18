@@ -388,11 +388,11 @@ func (p *TerragruntHCLProvider) filterExcludedPaths(paths []string) []string {
 func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions) (info *terragruntWorkingDirInfo) {
 	info = &terragruntWorkingDirInfo{configDir: opts.WorkingDir, workingDir: opts.WorkingDir}
 	outputs := p.fetchDependencyOutputs(opts)
-	fmt.Fprintf(os.Stderr, "%s dependency outputs:\n", opts.TerragruntConfigPath)
-	spew.Dump(outputs)
-
 	terragruntConfig, err := tgconfig.ParseConfigFile(opts.TerragruntConfigPath, opts, nil, &outputs)
 	if err != nil {
+		fmt.Fprintf(os.Stderr, "%s dependency outputs:\n", opts.TerragruntConfigPath)
+		spew.Dump(outputs)
+
 		info.error = err
 		return
 	}
