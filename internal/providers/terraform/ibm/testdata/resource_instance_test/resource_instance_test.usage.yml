@@ -17,3 +17,26 @@ resource_usage:
     appconnect_gigabyte_transmitted_outbounds: 10
     appconnect_thousand_runs: 10
     appconnect_vcpu_hours: 10
+  ibm_resource_instance.resource_instance_logdna_7day:
+    logdna_gigabyte_months: 10
+  ibm_resource_instance.resource_instance_logdna_lite:
+    logdna_gigabyte_months: 10
+  ibm_resource_instance.resource_instance_activity_tracker_7day:
+    activitytracker_gigabyte_months: 10
+  ibm_resource_instance.resource_instance_activity_tracker_lite:
+    activitytracker_gigabyte_months: 10
+  ibm_resource_instance.resource_instance_monitoring_lite:
+    monitoring_node_hour: 730
+    monitoring_container_hour: 10
+    monitoring_api_call: 100000
+    monitoring_timeseries_hour: 100
+  ibm_resource_instance.resource_instance_monitoring_graduated:
+    monitoring_node_hour: 730
+    monitoring_container_hour: 1460
+    monitoring_api_call: 100000
+    monitoring_timeseries_hour: 100
+  ibm_resource_instance.resource_instance_monitoring_graduated_secure:
+    monitoring_node_hour: 730
+    monitoring_container_hour: 1460
+    monitoring_api_call: 100000
+    monitoring_timeseries_hour: 100

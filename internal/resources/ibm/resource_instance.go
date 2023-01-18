@@ -40,6 +40,27 @@ type ResourceInstance struct {
 	AppConnect_GigabyteTransmittedOutbounds *float64 `infracost_usage:"appconnect_gigabyte_transmitted_outbounds"`
 	AppConnect_ThousandRuns                 *float64 `infracost_usage:"appconnect_thousand_runs"`
 	AppConnect_VCPUHours                    *float64 `infracost_usage:"appconnect_vcpu_hours"`
+	// LogDNA
+	// Catalog https://cloud.ibm.com/catalog/services/logdna
+	LogDNA_GigabyteMonths *float64 `infracost_usage:"logdna_gigabyte_months"`
+	// Activity Tracker
+	// Catalog https://cloud.ibm.com/catalog/services/logdnaat
+	ActivityTracker_GigabyteMonths *float64 `infracost_usage:"activitytracker_gigabyte_months"`
+	// Monitoring (Sysdig)
+	// Catalog https://cloud.ibm.com/catalog/services/ibm-cloud-monitoring
+	// Pricing https://cloud.ibm.com/docs/monitoring?topic=monitoring-pricing_plans
+	Monitoring_NodeHour       *float64 `infracost_usage:"monitoring_node_hour"`
+	Monitoring_ContainerHour  *float64 `infracost_usage:"monitoring_container_hour"`
+	Monitoring_APICall        *float64 `infracost_usage:"monitoring_api_call"`
+	Monitoring_TimeSeriesHour *float64 `infracost_usage:"monitoring_timeseries_hour"`
+}
+
+type ResourceCostComponentsFunc func(*ResourceInstance) []*schema.CostComponent
+
+// PopulateUsage parses the u schema.UsageData into the ResourceInstance.
+// It uses the `infracost_usage` struct tags to populate data into the ResourceInstance.
+func (r *ResourceInstance) PopulateUsage(u *schema.UsageData) {
+	resources.PopulateArgsWithUsage(r, u)
 }
 
 // ResourceInstanceUsageSchema defines a list which represents the usage schema of ResourceInstance.
@@ -53,6 +74,13 @@ var ResourceInstanceUsageSchema = []*schema.UsageItem{
 	{Key: "appconnect_gigabyte_transmitted_outbounds", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "appconnect_thousand_runs", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "appconnect_vcpu_hours", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "logdna_gigabyte_months", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "activitytracker_gigabyte_months", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "monitoring_node_hour", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "monitoring_node_hour_lite", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "monitoring_container_hour", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "monitoring_api_call", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "monitoring_timeseries_hour", DefaultValue: 0, ValueType: schema.Float64},
 }
 
 var ResourceInstanceCostMap map[string]ResourceCostComponentsFunc = map[string]ResourceCostComponentsFunc{
@@ -61,15 +89,10 @@ var ResourceInstanceCostMap map[string]ResourceCostComponentsFunc = map[string]R
 	"appid":           GetAppIDCostComponents,
 	"appconnect":      GetAppConnectCostComponents,
 	"power-iaas":      GetPowerCostComponents,
+	"logdna":          GetLogDNACostComponents,
+	"logdnaat":        GetActivityTrackerCostComponents,
+	"sysdig-monitor":  GetSysdigCostComponenets,
 }
-
-// PopulateUsage parses the u schema.UsageData into the ResourceInstance.
-// It uses the `infracost_usage` struct tags to populate data into the ResourceInstance.
-func (r *ResourceInstance) PopulateUsage(u *schema.UsageData) {
-	resources.PopulateArgsWithUsage(r, u)
-}
-
-type ResourceCostComponentsFunc func(*ResourceInstance) []*schema.CostComponent
 
 func KMSKeyVersionsFreeCostComponent(r *ResourceInstance) *schema.CostComponent {
 	var q *decimal.Decimal
@@ -411,6 +434,204 @@ func GetAppConnectCostComponents(r *ResourceInstance) []*schema.CostComponent {
 		return []*schema.CostComponent{
 			&costComponent,
 		}
+	}
+}
+
+func GetLogDNACostComponents(r *ResourceInstance) []*schema.CostComponent {
+	var q *decimal.Decimal
+	if r.LogDNA_GigabyteMonths != nil {
+		q = decimalPtr(decimal.NewFromFloat(*r.LogDNA_GigabyteMonths))
+	}
+	if r.Plan == "lite" {
+		costComponent := schema.CostComponent{
+			Name:            "Lite plan",
+			UnitMultiplier:  decimal.NewFromInt(1),
+			MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+		}
+		costComponent.SetCustomPrice(decimalPtr(decimal.NewFromInt(0)))
+		return []*schema.CostComponent{
+			&costComponent,
+		}
+	} else {
+		return []*schema.CostComponent{{
+			Name:            "Gigabyte Months",
+			Unit:            "Gigabyte Months",
+			UnitMultiplier:  decimal.NewFromInt(1),
+			MonthlyQuantity: q,
+			ProductFilter: &schema.ProductFilter{
+				VendorName: strPtr("ibm"),
+				Region:     strPtr(r.Location),
+				Service:    &r.Service,
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "planName", Value: &r.Plan},
+				},
+			},
+			PriceFilter: &schema.PriceFilter{
+				Unit: strPtr("GIGABYTE_MONTHS"),
+			},
+		}}
+	}
+}
+
+func GetSysdigTimeseriesCostComponent(r *ResourceInstance) *schema.CostComponent {
+	var q *decimal.Decimal
+	if r.Monitoring_TimeSeriesHour != nil {
+		q = decimalPtr(decimal.NewFromFloat(*r.Monitoring_TimeSeriesHour))
+	}
+	return &schema.CostComponent{
+		Name:            "Additional Time series",
+		Unit:            "Time series hour",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: q,
+		ProductFilter: &schema.ProductFilter{
+			VendorName: strPtr("ibm"),
+			Region:     strPtr(r.Location),
+			Service:    &r.Service,
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "planName", Value: &r.Plan},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			Unit: strPtr("TIME_SERIES_HOURS"),
+		},
+	}
+}
+
+func GetSysdigContainerCostComponent(r *ResourceInstance) *schema.CostComponent {
+	var q *decimal.Decimal
+	if r.Monitoring_ContainerHour != nil {
+		q = decimalPtr(decimal.NewFromFloat(*r.Monitoring_ContainerHour))
+	}
+	return &schema.CostComponent{
+		Name:            "Additional Containers",
+		Unit:            "Container Hours",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: q,
+		ProductFilter: &schema.ProductFilter{
+			VendorName: strPtr("ibm"),
+			Region:     strPtr(r.Location),
+			Service:    &r.Service,
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "planName", Value: &r.Plan},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			Unit: strPtr("CONTAINER_HOURS"),
+		},
+	}
+}
+
+func GetSysdigApiCallCostComponent(r *ResourceInstance) *schema.CostComponent {
+	var q *decimal.Decimal
+	if r.Monitoring_APICall != nil {
+		q = decimalPtr(decimal.NewFromFloat(*r.Monitoring_APICall))
+	}
+	return &schema.CostComponent{
+		Name:            "Additional API Calls",
+		Unit:            "API Calls",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: q,
+		ProductFilter: &schema.ProductFilter{
+			VendorName: strPtr("ibm"),
+			Region:     strPtr(r.Location),
+			Service:    &r.Service,
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "planName", Value: &r.Plan},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			Unit: strPtr("API_CALL_HOURS"),
+		},
+	}
+}
+
+func GetSysdigNodeHourCostComponent(r *ResourceInstance) *schema.CostComponent {
+	var q *decimal.Decimal
+	if r.Monitoring_NodeHour != nil {
+		q = decimalPtr(decimal.NewFromFloat(*r.Monitoring_NodeHour))
+	}
+	return &schema.CostComponent{
+		Name:            "Base Node Hour",
+		Unit:            "Node Hours",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: q,
+		ProductFilter: &schema.ProductFilter{
+			VendorName: strPtr("ibm"),
+			Region:     strPtr(r.Location),
+			Service:    &r.Service,
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "planName", Value: &r.Plan},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			Unit: strPtr("NODE_HOURS"),
+		},
+	}
+}
+
+func GetSysdigCostComponenets(r *ResourceInstance) []*schema.CostComponent {
+
+	if r.Plan == "lite" {
+		costComponent := &schema.CostComponent{
+			Name:            "Lite plan",
+			UnitMultiplier:  decimal.NewFromInt(1),
+			MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+		}
+		costComponent.SetCustomPrice(decimalPtr(decimal.NewFromInt(0)))
+		return []*schema.CostComponent{costComponent}
+	} else {
+		return []*schema.CostComponent{
+			GetSysdigTimeseriesCostComponent(r),
+			GetSysdigContainerCostComponent(r),
+			GetSysdigApiCallCostComponent(r),
+			GetSysdigNodeHourCostComponent(r),
+		}
+	}
+}
+
+func GetActivityTrackerCostComponents(r *ResourceInstance) []*schema.CostComponent {
+	var q *decimal.Decimal
+	if r.ActivityTracker_GigabyteMonths != nil {
+		q = decimalPtr(decimal.NewFromFloat(*r.ActivityTracker_GigabyteMonths))
+	}
+	if r.Plan == "lite" {
+		liteCostComponent := &schema.CostComponent{
+			Name:            "Gigabyte Months",
+			Unit:            "Gigabyte Months",
+			UnitMultiplier:  decimal.NewFromInt(1),
+			MonthlyQuantity: q,
+			ProductFilter: &schema.ProductFilter{
+				VendorName: strPtr("ibm"),
+				Region:     strPtr(r.Location),
+				Service:    &r.Service,
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "planName", Value: &r.Plan},
+				},
+			},
+			PriceFilter: &schema.PriceFilter{
+				Unit: strPtr("GIGABYTE_MONTHS"),
+			},
+		}
+		liteCostComponent.SetCustomPrice(decimalPtr(decimal.NewFromFloat(0.0)))
+		return []*schema.CostComponent{liteCostComponent}
+	} else {
+		return []*schema.CostComponent{{
+			Name:            "Gigabyte Months",
+			Unit:            "Gigabyte Months",
+			UnitMultiplier:  decimal.NewFromInt(1),
+			MonthlyQuantity: q,
+			ProductFilter: &schema.ProductFilter{
+				VendorName: strPtr("ibm"),
+				Region:     strPtr(r.Location),
+				Service:    &r.Service,
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "planName", Value: &r.Plan},
+				},
+			},
+			PriceFilter: &schema.PriceFilter{
+				Unit: strPtr("GIGABYTE_MONTHS"),
+			},
+		}}
 	}
 }
 
