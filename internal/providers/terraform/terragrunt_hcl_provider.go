@@ -14,7 +14,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
 	tgcli "github.com/gruntwork-io/terragrunt/cli"
 	"github.com/gruntwork-io/terragrunt/cli/tfsource"
 	tgconfig "github.com/gruntwork-io/terragrunt/config"
@@ -390,8 +389,9 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 	outputs := p.fetchDependencyOutputs(opts)
 	terragruntConfig, err := tgconfig.ParseConfigFile(opts.TerragruntConfigPath, opts, nil, &outputs)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "%s dependency outputs:\n", opts.TerragruntConfigPath)
-		spew.Dump(outputs)
+		ty, _ := gocty.ImpliedType(outputs)
+		b, _ := ctyJson.Marshal(outputs, ty)
+		fmt.Fprintf(os.Stderr, "%s dependency outputs: %s \n", opts.TerragruntConfigPath, b)
 
 		info.error = err
 		return
