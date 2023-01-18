@@ -291,7 +291,13 @@ func (e *Evaluator) evaluateModules() {
 
 		moduleCall.Module, _ = moduleEvaluator.Run()
 		outputs := moduleEvaluator.exportOutputs()
-		e.ctx.Set(outputs, "module", moduleCall.Name)
+		if v := moduleCall.Module.Key(); v != nil {
+			e.ctx.Set(outputs, "module", stripCount(moduleCall.Name), *v)
+		} else if v := moduleCall.Module.Index(); v != nil {
+			e.ctx.Set(outputs, "module", stripCount(moduleCall.Name), fmt.Sprintf("%d", *v))
+		} else {
+			e.ctx.Set(outputs, "module", moduleCall.Name)
+		}
 	}
 }
 
@@ -341,7 +347,7 @@ func (e *Evaluator) expandDynamicBlock(b *Block) {
 	}
 
 	for _, sub := range b.Children().OfType("dynamic") {
-		e.logger.Debugf("expanding block %s because a dynamic blocka was found %s", b.LocalName(), sub.LocalName())
+		e.logger.Debugf("expanding block %s because a dynamic block was found %s", b.LocalName(), sub.LocalName())
 
 		blockName := sub.TypeLabel()
 		expanded := e.expandBlockForEaches([]*Block{sub})
@@ -416,6 +422,9 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 				nameLabel = block.TypeLabel()
 			}
 
+			// set the context to an empty object so that we don't have any of the prior unexpanded attributes
+			// like id/arn e.t.c polluting the expansion. Otherwise we can end up with lots of expanded resources
+			// with attribute names e.g. aws_instance.test[id], aws_instance.test[arn].
 			e.ctx.Set(cty.ObjectVal(make(map[string]cty.Value)), typeLabel, nameLabel)
 
 			value.ForEachElement(func(key cty.Value, val cty.Value) bool {
@@ -767,9 +776,22 @@ func (e *Evaluator) loadModules(lastContext hcl.EvalContext) []*ModuleCall {
 	e.logger.Debug("loading module calls")
 	var moduleDefinitions []*ModuleCall
 
-	// TODO: if a module uses a count that depends on a module output, then the block expansion might be incorrect.
-	expanded := e.expandBlocks(e.module.Blocks.ModuleBlocks(), lastContext)
+	var moduleBlocks Blocks
+	var filtered Blocks
+	for _, block := range e.module.Blocks {
+		if block.Type() == "module" {
+			moduleBlocks = append(moduleBlocks, block)
+		} else {
+			// remove the block from the top level blocks as we'll replace these with expanded blocks.
+			filtered = append(filtered, block)
+		}
+	}
 
+	expanded := e.expandBlocks(moduleBlocks.SortedByCaller(), lastContext)
+	filtered = append(filtered, expanded...)
+	e.module.Blocks = filtered
+
+	// TODO: if a module uses a count that depends on a module output, then the block expansion might be incorrect.
 	for _, moduleBlock := range expanded {
 		if moduleBlock.Label() == "" {
 			continue

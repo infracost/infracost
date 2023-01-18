@@ -98,7 +98,13 @@ func (b referencedBlocks) Less(i, j int) bool {
 	return false
 }
 
-// ModuleBlocks returns all the Blocks of type module. The returned Blocks
+// ModuleBlocks is a wrapper around SortedByCaller that selects just Modules to be sorted.
+func (blocks Blocks) ModuleBlocks() Blocks {
+	justModules := blocks.OfType("module")
+	return justModules.SortedByCaller()
+}
+
+// SortedByCaller returns all the Blocks of type module. The returned Blocks
 // are sorted in order of reference. Blocks that are referenced by others are
 // the first in this list.
 //
@@ -107,17 +113,15 @@ func (b referencedBlocks) Less(i, j int) bool {
 //
 // This makes the list returned safe for context evaluation, as we evaluate modules that have
 // outputs that other modules rely on first.
-func (blocks Blocks) ModuleBlocks() Blocks {
-	justModules := blocks.OfType("module")
-	toSort := make(referencedBlocks, len(justModules))
+func (blocks Blocks) SortedByCaller() Blocks {
+	sorted := make(Blocks, len(blocks))
+	toSort := make(referencedBlocks, len(blocks))
 
-	copy(toSort, justModules)
-
+	copy(toSort, blocks)
 	sort.Sort(toSort)
+	copy(sorted, toSort)
 
-	copy(justModules, toSort)
-
-	return justModules
+	return sorted
 }
 
 // Blocks is a helper type around a slice of blocks to provide easy access
@@ -500,6 +504,10 @@ func (b *Block) IsForEachReferencedExpanded(moduleBlocks Blocks) bool {
 	}
 
 	label := r.String()
+	if blockType == "module" {
+		label = r.typeLabel
+	}
+
 	referenced := moduleBlocks.Matching(BlockMatcher{
 		Type:       blockType,
 		Label:      label,
@@ -510,7 +518,7 @@ func (b *Block) IsForEachReferencedExpanded(moduleBlocks Blocks) bool {
 		return true
 	}
 
-	return referenced.IsCountExpanded()
+	return !referenced.ShouldExpand()
 }
 
 func (b Block) ShouldExpand() bool {
@@ -518,7 +526,15 @@ func (b Block) ShouldExpand() bool {
 		return false
 	}
 
-	return b.Type() == "resource" || b.Type() == "module" || b.Type() == "data"
+	validType := b.Type() == "resource" || b.Type() == "module" || b.Type() == "data"
+	if !validType {
+		return false
+	}
+
+	countAttr := b.GetAttribute("count")
+	forEachAttr := b.GetAttribute("for_each")
+
+	return countAttr != nil || forEachAttr != nil
 }
 
 // SetContext sets the Block.context to the provided ctx. This ctx is also set on the child Blocks as
@@ -800,6 +816,10 @@ func (b *Block) Values() cty.Value {
 	values := make(map[string]cty.Value)
 
 	for _, attribute := range b.GetAttributes() {
+		if attribute.Name() == "for_each" {
+			continue
+		}
+
 		values[attribute.Name()] = attribute.Value()
 	}
 

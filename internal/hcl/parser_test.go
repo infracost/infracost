@@ -856,13 +856,13 @@ locals {
 module "test" {
     for_each = local.az
 	source = "../."
-	input = "ok"
+	input = each.value.bz
 }
 
 resource "test_two" "test" {
   for_each        = module.test 
   inherited_id    = each.value.id
-  inherited_attr  = each.value.another_attr
+  inherited_attr  = each.value.mod_result
 }
 `,
 		`
@@ -886,22 +886,59 @@ output "mod_result" {
 
 	blocks := module.Blocks
 	resources := blocks.OfType("resource")
-	labels := make([]string, len(resources))
-	for i, resource := range resources {
-		labels[i] = resource.Label()
+
+	var ar *Block
+	var br *Block
+	for _, resource := range resources {
+		if resource.Label() == "test_two.test[\"a\"]" {
+			ar = resource
+		}
+
+		if resource.Label() == "test_two.test[\"b\"]" {
+			br = resource
+		}
 	}
-	assert.ElementsMatch(t, []string{
-		`test_two.test["a"]`,
-		`test_two.test["b"]`,
-	}, labels)
+	require.NotNil(t, ar, "test_two.test[\"a\"] was not found in module blocks")
+	require.NotNil(t, br, "test_two.test[\"b\"] was not found in module blocks")
+
+	s := ar.GetAttribute("inherited_attr").AsString()
+	assert.Equal(t, "w", s)
+
+	s = br.GetAttribute("inherited_attr").AsString()
+	assert.Equal(t, "z", s)
 
 	modules := blocks.OfType("module")
 	modLabels := make([]string, len(modules))
 	for i, module := range modules {
 		modLabels[i] = "module." + module.Label()
 	}
+
 	assert.ElementsMatch(t, []string{
 		`module.test["a"]`,
 		`module.test["b"]`,
 	}, modLabels)
+
+	var a *Module
+	for _, m := range module.Modules {
+		if m.Name == `module.test["a"]` {
+			a = m
+		}
+	}
+	require.NotNil(t, a, "could not find module.test[a] in root module")
+	out := a.Blocks.Outputs(false)
+	v := out.AsValueMap()
+	s = v["mod_result"].AsString()
+	assert.Equal(t, "w", s)
+
+	var b *Module
+	for _, m := range module.Modules {
+		if m.Name == `module.test["b"]` {
+			b = m
+		}
+	}
+	require.NotNil(t, b, "could not find module.test[b] in root module")
+	out = b.Blocks.Outputs(false)
+	v = out.AsValueMap()
+	s = v["mod_result"].AsString()
+	assert.Equal(t, "z", s)
 }
