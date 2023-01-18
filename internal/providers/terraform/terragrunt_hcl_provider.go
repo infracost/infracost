@@ -391,7 +391,7 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 	if err != nil {
 		ty, _ := gocty.ImpliedType(outputs)
 		b, _ := ctyJson.Marshal(outputs, ty)
-		fmt.Fprintf(os.Stderr, "%s dependency outputs: %s \n", opts.TerragruntConfigPath, b)
+		fmt.Fprintf(os.Stderr, "%s recieved error to parse file:\n%s\ndependency outputs:\n%s \n\n", opts.TerragruntConfigPath, err, b)
 
 		info.error = err
 		return
