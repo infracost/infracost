@@ -403,7 +403,7 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 			opts.TerragruntConfigPath,
 		)
 
-		return info
+		return nil
 	}
 
 	// get the default download dir
@@ -775,7 +775,7 @@ func (p *TerragruntHCLProvider) fetchModuleOutputs(opts *tgoptions.TerragruntOpt
 				value, evaluated := p.outputs[dir]
 				if !evaluated {
 					info := p.runTerragrunt(opts.Clone(dir))
-					if info.error != nil {
+					if info != nil && info.error != nil {
 						return outputs, fmt.Errorf("could not evaluate dependency %s at dir %s err: %w", dep.Name, dir, err)
 					}
 
