@@ -600,6 +600,8 @@ func (p *TerragruntHCLProvider) fetchDependencyOutputs(opts *tgoptions.Terragrun
 		return moduleOutputs
 	}
 
+	fmt.Fprintf(os.Stderr, "%s dependency usage matches: %+v\n", opts.TerragruntConfigPath, matches)
+
 	valueMap := moduleOutputs.AsValueMap()
 
 	for _, match := range matches {
