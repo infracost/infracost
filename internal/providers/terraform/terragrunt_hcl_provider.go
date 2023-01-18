@@ -14,6 +14,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/davecgh/go-spew/spew"
 	tgcli "github.com/gruntwork-io/terragrunt/cli"
 	"github.com/gruntwork-io/terragrunt/cli/tfsource"
 	tgconfig "github.com/gruntwork-io/terragrunt/config"
@@ -387,8 +388,8 @@ func (p *TerragruntHCLProvider) filterExcludedPaths(paths []string) []string {
 func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions) (info *terragruntWorkingDirInfo) {
 	info = &terragruntWorkingDirInfo{configDir: opts.WorkingDir, workingDir: opts.WorkingDir}
 	outputs := p.fetchDependencyOutputs(opts)
-	b, _ := json.Marshal(outputs)
-	fmt.Fprintf(os.Stderr, "%s dependency outputs %s", opts.TerragruntConfigPath, b)
+	fmt.Fprintf(os.Stderr, "%s dependency outputs:\n", opts.TerragruntConfigPath)
+	spew.Dump(outputs)
 
 	terragruntConfig, err := tgconfig.ParseConfigFile(opts.TerragruntConfigPath, opts, nil, &outputs)
 	if err != nil {
