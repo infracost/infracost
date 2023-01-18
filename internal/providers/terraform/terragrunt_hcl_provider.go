@@ -403,7 +403,7 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 			opts.TerragruntConfigPath,
 		)
 
-		return nil
+		return info
 	}
 
 	// get the default download dir
