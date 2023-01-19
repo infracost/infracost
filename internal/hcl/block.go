@@ -98,7 +98,13 @@ func (b referencedBlocks) Less(i, j int) bool {
 	return false
 }
 
-// ModuleBlocks returns all the Blocks of type module. The returned Blocks
+// ModuleBlocks is a wrapper around SortedByCaller that selects just Modules to be sorted.
+func (blocks Blocks) ModuleBlocks() Blocks {
+	justModules := blocks.OfType("module")
+	return justModules.SortedByCaller()
+}
+
+// SortedByCaller returns all the Blocks of type module. The returned Blocks
 // are sorted in order of reference. Blocks that are referenced by others are
 // the first in this list.
 //
@@ -107,17 +113,15 @@ func (b referencedBlocks) Less(i, j int) bool {
 //
 // This makes the list returned safe for context evaluation, as we evaluate modules that have
 // outputs that other modules rely on first.
-func (blocks Blocks) ModuleBlocks() Blocks {
-	justModules := blocks.OfType("module")
-	toSort := make(referencedBlocks, len(justModules))
+func (blocks Blocks) SortedByCaller() Blocks {
+	sorted := make(Blocks, len(blocks))
+	toSort := make(referencedBlocks, len(blocks))
 
-	copy(toSort, justModules)
-
+	copy(toSort, blocks)
 	sort.Sort(toSort)
+	copy(sorted, toSort)
 
-	copy(justModules, toSort)
-
-	return justModules
+	return sorted
 }
 
 // Blocks is a helper type around a slice of blocks to provide easy access

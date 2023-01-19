@@ -291,7 +291,13 @@ func (e *Evaluator) evaluateModules() {
 
 		moduleCall.Module, _ = moduleEvaluator.Run()
 		outputs := moduleEvaluator.exportOutputs()
-		e.ctx.Set(outputs, "module", moduleCall.Name)
+		if v := moduleCall.Module.Key(); v != nil {
+			e.ctx.Set(outputs, "module", stripCount(moduleCall.Name), *v)
+		} else if v := moduleCall.Module.Index(); v != nil {
+			e.ctx.Set(outputs, "module", stripCount(moduleCall.Name), fmt.Sprintf("%d", *v))
+		} else {
+			e.ctx.Set(outputs, "module", moduleCall.Name)
+		}
 	}
 }
 
@@ -341,7 +347,7 @@ func (e *Evaluator) expandDynamicBlock(b *Block) {
 	}
 
 	for _, sub := range b.Children().OfType("dynamic") {
-		e.logger.Debugf("expanding block %s because a dynamic blocka was found %s", b.LocalName(), sub.LocalName())
+		e.logger.Debugf("expanding block %s because a dynamic block was found %s", b.LocalName(), sub.LocalName())
 
 		blockName := sub.TypeLabel()
 		expanded := e.expandBlockForEaches([]*Block{sub})
@@ -415,8 +421,6 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 				typeLabel = block.Type()
 				nameLabel = block.TypeLabel()
 			}
-
-			e.ctx.Set(cty.ObjectVal(make(map[string]cty.Value)), typeLabel, nameLabel)
 
 			value.ForEachElement(func(key cty.Value, val cty.Value) bool {
 				clone := e.blockBuilder.CloneBlock(block, key)
@@ -767,9 +771,19 @@ func (e *Evaluator) loadModules(lastContext hcl.EvalContext) []*ModuleCall {
 	e.logger.Debug("loading module calls")
 	var moduleDefinitions []*ModuleCall
 
-	// TODO: if a module uses a count that depends on a module output, then the block expansion might be incorrect.
-	expanded := e.expandBlocks(e.module.Blocks.ModuleBlocks(), lastContext)
+	var moduleBlocks Blocks
+	for i, block := range e.module.Blocks {
+		if block.Type() == "module" {
+			// remove the block from the top level blocks as we'll replace these with expanded blocks.
+			e.module.Blocks = removeBlock(e.module.Blocks, i)
+			moduleBlocks = append(moduleBlocks, block)
+		}
+	}
 
+	expanded := e.expandBlocks(moduleBlocks.SortedByCaller(), lastContext)
+	e.module.Blocks = append(e.module.Blocks, expanded...)
+
+	// TODO: if a module uses a count that depends on a module output, then the block expansion might be incorrect.
 	for _, moduleBlock := range expanded {
 		if moduleBlock.Label() == "" {
 			continue
@@ -785,6 +799,11 @@ func (e *Evaluator) loadModules(lastContext hcl.EvalContext) []*ModuleCall {
 	}
 
 	return moduleDefinitions
+}
+
+func removeBlock(blocks Blocks, i int) Blocks {
+	blocks[i] = blocks[len(blocks)-1]
+	return blocks[:len(blocks)-1]
 }
 
 // expFunctions returns the set of functions that should be used to when evaluating

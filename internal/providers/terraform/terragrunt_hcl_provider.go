@@ -388,7 +388,7 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 	info = &terragruntWorkingDirInfo{configDir: opts.WorkingDir, workingDir: opts.WorkingDir}
 	outputs := p.fetchDependencyOutputs(opts)
 	terragruntConfig, err := tgconfig.ParseConfigFile(opts.TerragruntConfigPath, opts, nil, &outputs)
-	
+
 	ty, _ := gocty.ImpliedType(outputs)
 	b, _ := ctyJson.Marshal(outputs, ty)
 	fmt.Fprintf(os.Stderr, "%s recieved error to parse file:\n%s\ndependency outputs:\n%s \n\n", opts.TerragruntConfigPath, err, b)
