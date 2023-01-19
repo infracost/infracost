@@ -317,11 +317,11 @@ var CommentMarkdownWithHTMLTemplate = `
     <td>New</td>
     <td>Diff</td>
   </thead>
-{{- if gt (len .Root.Projects) 1  }}
+{{- if gt (len .ProjectRows) 1  }}
   <tbody>
-  {{- range .Root.Projects }}
-    {{- if showProject . }}
-      {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
+  {{- range .ProjectRows }}
+    {{- if showProjectRow . }}
+      {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastTotalMonthlyCost "Cost" .TotalMonthlyCost  }}
     {{- end }}
   {{- end }}
   {{- template "summaryRow" dict "Name" "All projects" "MetadataFields" (metadataPlaceholders) "PastCost" .Root.PastTotalMonthlyCost "Cost" .Root.TotalMonthlyCost  }}
@@ -330,8 +330,8 @@ var CommentMarkdownWithHTMLTemplate = `
 {{ .ProjectCounts }}
 {{- else }}
   <tbody>
-  {{- range .Root.Projects }}
-    {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
+  {{- range .ProjectRows }}
+    {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastTotalMonthlyCost "Cost" .TotalMonthlyCost  }}
   {{- end }}
   </tbody>
 </table>
@@ -405,17 +405,17 @@ var CommentMarkdownTemplate = `
 | **Project**{{- range metadataHeaders }} | **{{ . }}** {{- end }} | **Previous** | **New** | **Diff** |
 | -----------{{- range metadataHeaders }} | ---------- {{- end }} | -----------: | ------: | -------- |
 
-{{- if gt (len .Root.Projects) 1  }}
-  {{- range .Root.Projects }}
-    {{- if showProject . }}
-      {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
+{{- if gt (len .ProjectRows) 1  }}
+  {{- range .ProjectRows }}
+    {{- if showProjectRow . }}
+      {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastTotalMonthlyCost "Cost" .TotalMonthlyCost  }}
     {{- end }}
   {{- end }}
   {{- template "totalRow" dict "Name" "All projects" "PastCost" .Root.PastTotalMonthlyCost "Cost" .Root.TotalMonthlyCost  }}
 {{ .ProjectCounts }}
 {{- else }}
-  {{- range .Root.Projects }}
-    {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
+  {{- range .ProjectRows }}
+    {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastTotalMonthlyCost "Cost" .TotalMonthlyCost  }}
   {{- end }}
 {{- end }}
 

@@ -68,38 +68,122 @@ func formatCostChangeSentence(currency string, pastCost, cost *decimal.Decimal, 
 	return "monthly cost will increase by " + formatMarkdownCostChange(currency, pastCost, cost, true) + " " + up
 }
 
-func calculateMetadataToDisplay(projects []Project) (hasModulePath bool, hasWorkspace bool) {
-	// we only want to show metadata fields if they can help distinguish projects with the same name
+// ProjectRow is used to display the summary table of projects in the markdown output.
+type ProjectRow struct {
+	Name                 string
+	ModulePath           string
+	Workspace            string
+	PastTotalMonthlyCost *decimal.Decimal
+	TotalMonthlyCost     *decimal.Decimal
+	DiffTotalMonthlyCost *decimal.Decimal
+	HasErrors            bool
+	VCSCodeChanged       bool
+	HasDiff              bool
+}
 
-	sprojects := make([]Project, 0)
+func calculateProjectRows(projects []Project) []ProjectRow {
+	rows := make([]ProjectRow, 0, len(projects))
+
+	pm := make(map[string][]Project)
+
 	for _, p := range projects {
-		if p.Diff == nil || len(p.Diff.Resources) == 0 { // ignore the projects that are skipped
-			continue
-		}
-		sprojects = append(sprojects, p)
+		pm[p.Name] = append(pm[p.Name], p)
 	}
 
-	sort.Slice(sprojects, func(i, j int) bool {
-		if sprojects[i].Name != sprojects[j].Name {
-			return sprojects[i].Name < sprojects[j].Name
+
+	for name, projects := range pm {
+
+		var pastTotalMonthlyCost, totalMonthlyCost, diffTotalMonthlyCost *decimal.Decimal
+		hasError, hasDiff, vcsCodeChanged := false, false, false
+
+		for _, p := range projects {
+			if p.Metadata.HasErrors() {
+				hasError = true
+			}
+
+			if p.Diff != nil && len(p.Diff.Resources) > 0 {
+				hasDiff = true
+			}
+
+			if p.Metadata.VCSCodeChanged != nil && *p.Metadata.VCSCodeChanged {
+				vcsCodeChanged = true
+			}
+
+			if p.PastBreakdown != nil && p.PastBreakdown.TotalMonthlyCost != nil {
+				if pastTotalMonthlyCost == nil {
+					pastTotalMonthlyCost = decimalPtr(decimal.NewFromInt(0))
+				}
+				pastTotalMonthlyCost = decimalPtr(pastTotalMonthlyCost.Add(*p.PastBreakdown.TotalMonthlyCost))
+			}
+
+			if p.Breakdown != nil && p.Breakdown.TotalMonthlyCost != nil {
+				if totalMonthlyCost == nil {
+					totalMonthlyCost = decimalPtr(decimal.NewFromInt(0))
+				}
+				totalMonthlyCost = decimalPtr(totalMonthlyCost.Add(*p.Breakdown.TotalMonthlyCost))
+			}
+
+			if p.Diff != nil && p.Diff.TotalMonthlyCost != nil {
+				if diffTotalMonthlyCost == nil {
+					diffTotalMonthlyCost = decimalPtr(decimal.NewFromInt(0))
+				}
+				diffTotalMonthlyCost = decimalPtr(diffTotalMonthlyCost.Add(*p.Diff.TotalMonthlyCost))
+			}
 		}
 
-		if sprojects[i].Metadata.TerraformModulePath != sprojects[j].Metadata.TerraformModulePath {
-			return sprojects[i].Metadata.TerraformModulePath < sprojects[j].Metadata.TerraformModulePath
+		modulePath, workspace := "", ""
+		if len(projects) == 1 {
+			modulePath = projects[0].Metadata.TerraformModulePath
+			workspace = projects[0].Metadata.WorkspaceLabel()
 		}
 
-		return sprojects[i].Metadata.WorkspaceLabel() < sprojects[j].Metadata.WorkspaceLabel()
+		rows = append(rows, ProjectRow{
+			Name:                 name,
+			ModulePath:           modulePath,
+			Workspace:            workspace,
+			PastTotalMonthlyCost: pastTotalMonthlyCost,
+			TotalMonthlyCost:     totalMonthlyCost,
+			DiffTotalMonthlyCost: diffTotalMonthlyCost,
+			HasErrors:            hasError,
+			VCSCodeChanged:       vcsCodeChanged,
+			HasDiff:              hasDiff,
+		})
+	}
+
+	sort.Slice(rows, func(i, j int) bool {
+		return rows[i].Name < rows[j].Name
+	})
+
+	return rows
+}
+
+func calculateMetadataToDisplay(rows []ProjectRow) (hasModulePath bool, hasWorkspace bool) {
+	// we only want to show metadata fields if they can help distinguish projects with the same name
+
+	srows := make([]ProjectRow, 0, len(rows))
+	srows = append(srows, rows...)
+
+	sort.Slice(srows, func(i, j int) bool {
+		if srows[i].Name != srows[j].Name {
+			return srows[i].Name < srows[j].Name
+		}
+
+		if srows[i].ModulePath != srows[j].ModulePath {
+			return srows[i].ModulePath < srows[j].ModulePath
+		}
+
+		return srows[i].Workspace < srows[j].Workspace
 	})
 
 	// check if any projects that have the same name have different path or workspace
-	for i, p := range sprojects {
+	for i, p := range srows {
 		if i > 0 { // we compare vs the previous item, so skip index 0
-			prev := sprojects[i-1]
+			prev := srows[i-1]
 			if p.Name == prev.Name {
-				if p.Metadata.TerraformModulePath != prev.Metadata.TerraformModulePath {
+				if p.ModulePath != prev.ModulePath {
 					hasModulePath = true
 				}
-				if p.Metadata.WorkspaceLabel() != prev.Metadata.WorkspaceLabel() {
+				if p.Workspace != prev.Workspace {
 					hasWorkspace = true
 				}
 			}
@@ -112,6 +196,7 @@ func calculateMetadataToDisplay(projects []Project) (hasModulePath bool, hasWork
 // MarkdownCtx holds information that can be used and executed with a go template.
 type MarkdownCtx struct {
 	Root                         Root
+	ProjectRows                  []ProjectRow
 	SkippedProjectCount          int
 	ErroredProjectCount          int
 	SkippedUnchangedProjectCount int
@@ -160,7 +245,8 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 		diffMsg = ui.StripColor(string(diff))
 	}
 
-	hasModulePath, hasWorkspace := calculateMetadataToDisplay(out.Projects)
+	projectRows := calculateProjectRows(out.Projects)
+	hasModulePath, hasWorkspace := calculateMetadataToDisplay(projectRows)
 
 	var buf bytes.Buffer
 	bufw := bufio.NewWriter(&buf)
@@ -178,15 +264,15 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 			return formatMarkdownCostChange(out.Currency, pastCost, cost, false)
 		},
 		"formatCostChangeSentence": formatCostChangeSentence,
-		"showProject": func(p Project) bool {
-			if p.Metadata.HasErrors() {
+		"showProjectRow": func(p ProjectRow) bool {
+			if p.HasErrors {
 				return false
 			}
 
 			if opts.ShowOnlyChanges {
 				// only return true if the project has code changes so the table can also show
 				// project that have cost changes.
-				if p.Metadata.VCSCodeChanged != nil && *p.Metadata.VCSCodeChanged {
+				if p.VCSCodeChanged {
 					return true
 				}
 			}
@@ -195,7 +281,7 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 				return true
 			}
 
-			if p.Diff == nil || len(p.Diff.Resources) == 0 { // has no diff
+			if !p.HasDiff {
 				return false
 			}
 
@@ -211,13 +297,13 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 			}
 			return headers
 		},
-		"metadataFields": func(p Project) []string {
+		"metadataFields": func(p ProjectRow) []string {
 			fields := []string{}
 			if hasModulePath {
-				fields = append(fields, p.Metadata.TerraformModulePath)
+				fields = append(fields, p.ModulePath)
 			}
 			if hasWorkspace {
-				fields = append(fields, p.Metadata.WorkspaceLabel())
+				fields = append(fields, p.Workspace)
 			}
 			return fields
 		},
@@ -244,27 +330,25 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 	}
 
 	skippedProjectCount := 0
-	for _, p := range out.Projects {
-		if p.Metadata.HasErrors() {
-			continue
-		}
+	for _, p := range projectRows {
+		hasCodeChanges := opts.ShowOnlyChanges && p.VCSCodeChanged
 
-		if (p.Diff == nil || len(p.Diff.Resources) == 0) && !hasCodeChanges(opts, p) {
+		if !p.HasErrors && !p.HasDiff && !hasCodeChanges {
 			skippedProjectCount++
 		}
 	}
 
 	erroredProjectCount := 0
-	for _, p := range out.Projects {
-		if p.Metadata.HasErrors() {
+	for _, p := range projectRows {
+		if p.HasErrors {
 			erroredProjectCount++
 		}
 	}
 
 	skippedUnchangedProjectCount := 0
 	if opts.ShowOnlyChanges {
-		for _, p := range out.Projects {
-			if !hasCodeChanges(opts, p) {
+		for _, p := range projectRows {
+			if !p.VCSCodeChanged {
 				skippedUnchangedProjectCount++
 			}
 		}
@@ -272,6 +356,7 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 
 	err = tmpl.Execute(bufw, MarkdownCtx{
 		out,
+		projectRows,
 		skippedProjectCount,
 		erroredProjectCount,
 		skippedUnchangedProjectCount,
