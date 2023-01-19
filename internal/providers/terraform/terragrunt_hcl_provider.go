@@ -391,7 +391,10 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 
 	ty, _ := gocty.ImpliedType(outputs)
 	b, _ := ctyJson.Marshal(outputs, ty)
-	fmt.Fprintf(os.Stderr, "%s recieved error to parse file:\n%s\ndependency outputs:\n%s \n\n", opts.TerragruntConfigPath, err, b)
+	v := make(map[string]interface{})
+	json.Unmarshal(b, &v)
+	pretty, _ := json.MarshalIndent(v["value"], "", "\t")
+	fmt.Fprintf(os.Stderr, "%s recieved error to parse file:\n%s\ndependency outputs:\n%s \n\n", opts.TerragruntConfigPath, err, pretty)
 
 	if err != nil {
 		info.error = err
