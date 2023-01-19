@@ -772,16 +772,18 @@ func (e *Evaluator) loadModules(lastContext hcl.EvalContext) []*ModuleCall {
 	var moduleDefinitions []*ModuleCall
 
 	var moduleBlocks Blocks
-	for i, block := range e.module.Blocks {
+	var filtered Blocks
+	for _, block := range e.module.Blocks {
 		if block.Type() == "module" {
-			// remove the block from the top level blocks as we'll replace these with expanded blocks.
-			e.module.Blocks = removeBlock(e.module.Blocks, i)
 			moduleBlocks = append(moduleBlocks, block)
+		} else {
+			// remove the block from the top level blocks as we'll replace these with expanded blocks.
+			filtered = append(filtered, block)
 		}
 	}
 
 	expanded := e.expandBlocks(moduleBlocks.SortedByCaller(), lastContext)
-	e.module.Blocks = append(e.module.Blocks, expanded...)
+	e.module.Blocks = append(filtered, expanded...)
 
 	// TODO: if a module uses a count that depends on a module output, then the block expansion might be incorrect.
 	for _, moduleBlock := range expanded {
@@ -799,11 +801,6 @@ func (e *Evaluator) loadModules(lastContext hcl.EvalContext) []*ModuleCall {
 	}
 
 	return moduleDefinitions
-}
-
-func removeBlock(blocks Blocks, i int) Blocks {
-	blocks[i] = blocks[len(blocks)-1]
-	return blocks[:len(blocks)-1]
 }
 
 // expFunctions returns the set of functions that should be used to when evaluating

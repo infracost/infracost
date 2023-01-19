@@ -504,6 +504,14 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 
 	mods := h.Modules()
 	for _, mod := range mods {
+		if mod.Error != nil {
+			path := ""
+			if mod.Module != nil {
+				path = mod.Module.RootPath
+			}
+
+			p.logger.Debugf("Terragrunt config path %s returned module %s with error: %s", opts.TerragruntConfigPath, path, mod.Error)
+		}
 		p.outputs[opts.TerragruntConfigPath] = mod.Module.Blocks.Outputs(true)
 	}
 
@@ -770,6 +778,7 @@ func (p *TerragruntHCLProvider) fetchModuleOutputs(opts *tgoptions.TerragruntOpt
 		for _, module := range p.stack.Modules {
 			if module.TerragruntOptions.TerragruntConfigPath == opts.TerragruntConfigPath {
 				mod = module
+				break
 			}
 		}
 

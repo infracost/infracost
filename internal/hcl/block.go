@@ -504,6 +504,10 @@ func (b *Block) IsForEachReferencedExpanded(moduleBlocks Blocks) bool {
 	}
 
 	label := r.String()
+	if blockType == "module" {
+		label = r.typeLabel
+	}
+
 	referenced := moduleBlocks.Matching(BlockMatcher{
 		Type:       blockType,
 		Label:      label,
