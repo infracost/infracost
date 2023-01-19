@@ -820,6 +820,10 @@ func (b *Block) Values() cty.Value {
 	values := make(map[string]cty.Value)
 
 	for _, attribute := range b.GetAttributes() {
+		if attribute.Name() == "for_each" || attribute.Name() == "count" {
+			continue
+		}
+
 		values[attribute.Name()] = attribute.Value()
 	}
 

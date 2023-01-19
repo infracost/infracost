@@ -388,14 +388,6 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 	info = &terragruntWorkingDirInfo{configDir: opts.WorkingDir, workingDir: opts.WorkingDir}
 	outputs := p.fetchDependencyOutputs(opts)
 	terragruntConfig, err := tgconfig.ParseConfigFile(opts.TerragruntConfigPath, opts, nil, &outputs)
-
-	ty, _ := gocty.ImpliedType(outputs)
-	b, _ := ctyJson.Marshal(outputs, ty)
-	v := make(map[string]interface{})
-	json.Unmarshal(b, &v)
-	pretty, _ := json.MarshalIndent(v["value"], "", "\t")
-	fmt.Fprintf(os.Stderr, "%s recieved error to parse file:\n%s\ndependency outputs:\n%s \n\n", opts.TerragruntConfigPath, err, pretty)
-
 	if err != nil {
 		info.error = err
 		return
@@ -512,7 +504,8 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 
 			p.logger.Debugf("Terragrunt config path %s returned module %s with error: %s", opts.TerragruntConfigPath, path, mod.Error)
 		}
-		p.outputs[opts.TerragruntConfigPath] = mod.Module.Blocks.Outputs(true)
+		evaluatedOutputs := mod.Module.Blocks.Outputs(true)
+		p.outputs[opts.TerragruntConfigPath] = evaluatedOutputs
 	}
 
 	info.provider = h
@@ -611,8 +604,6 @@ func (p *TerragruntHCLProvider) fetchDependencyOutputs(opts *tgoptions.Terragrun
 	if len(matches) == 0 {
 		return moduleOutputs
 	}
-
-	fmt.Fprintf(os.Stderr, "%s dependency usage matches: %+v\n", opts.TerragruntConfigPath, matches)
 
 	valueMap := moduleOutputs.AsValueMap()
 
