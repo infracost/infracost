@@ -1,0 +1,33 @@
+
+ Name                                                     Monthly Qty  Unit                               Monthly Cost 
+                                                                                                                       
+ ibm_pi_volume.pi_volume_affinity_set                                                                                  
+ └─ Price dependent upon affinity settings                     73,000  Gigabyte Instance Hours                   $0.00 
+                                                                                                                       
+ ibm_pi_volume.pi_volume_ssd                                                                                           
+ └─ Price dependent upon affinity settings                     73,000  Gigabyte Instance Hours                  $20.00 
+                                                                                                                       
+ ibm_pi_volume.pi_volume_standard                                                                                      
+ └─ Price dependent upon affinity settings                     73,000  Gigabyte Instance Hours                  $10.00 
+                                                                                                                       
+ ibm_pi_volume.pi_volume_tier1                                                                                         
+ └─ Price dependent upon affinity settings                     73,000  Gigabyte Instance Hours                  $20.00 
+                                                                                                                       
+ ibm_pi_volume.pi_volume_tier1_no_usage                                                                                
+ └─ Price dependent upon affinity settings     Monthly cost depends on usage: $0.000274 per Gigabyte Instance Hours    
+                                                                                                                       
+ ibm_pi_volume.pi_volume_tier3                                                                                         
+ └─ Price dependent upon affinity settings                     73,000  Gigabyte Instance Hours                  $10.00 
+                                                                                                                       
+ ibm_pi_volume.pi_volume_volume_set                                                                                    
+ └─ Price dependent upon volume pool settings                  73,000  Gigabyte Instance Hours                   $0.00 
+                                                                                                                       
+ ibm_resource_instance.powervs_service                                                                                 
+ └─ Power instance                                                  1  Instance                                  $0.00 
+                                                                                                                       
+ OVERALL TOTAL                                                                                                  $60.01 
+──────────────────────────────────
+9 cloud resources were detected:
+∙ 8 were estimated, 1 of which usage-based costs, see https://infracost.io/usage-file
+∙ 1 was free:
+  ∙ 1 x ibm_resource_group

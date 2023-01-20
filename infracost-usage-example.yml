@@ -1199,6 +1199,9 @@ resource_usage:
     rational_dev_studio_licenses: 0 # Number IBM Rational Dev Studio Licenses, only valid for IBM i
     epic: 0 # Epic workload configuration
 
+  ibm_pi_volume.pi_volume:
+    monthly_instance_hours: 730 # Monthly number of instance hours
+
   ibm_resource_instance.resource_instance_kms: 
     kms_key_versions: 300 # Number of key versions managed per month
     secretsmanager_active_secrets: 400 # Number of active secrets
