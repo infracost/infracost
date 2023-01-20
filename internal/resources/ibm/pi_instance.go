@@ -81,10 +81,6 @@ func (r *PiInstance) BuildResource() *schema.Resource {
 		costComponents = append(costComponents, r.piInstanceCoresCostComponent(), r.piInstanceMemoryCostComponent())
 	}
 
-	if r.OperatingSystem != AIX && r.OperatingSystem != IBMI {
-		costComponents = append(costComponents, r.piInstanceLinuxOperatingSystemCostComponent())
-	}
-
 	if r.OperatingSystem == AIX {
 		costComponents = append(costComponents, r.piInstanceAIXOperatingSystemCostComponent())
 	} else if r.OperatingSystem == IBMI {
@@ -106,34 +102,6 @@ func (r *PiInstance) BuildResource() *schema.Resource {
 		UsageSchema:    PiInstanceUsageSchema,
 		CostComponents: costComponents,
 	}
-}
-
-func (r *PiInstance) piInstanceLinuxOperatingSystemCostComponent() *schema.CostComponent {
-	n := "Linux Operating System"
-
-	if r.Profile != "" {
-		n = "SAP"
-	}
-	c := schema.CostComponent{
-		Name:            n,
-		Unit:            "Instance",
-		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("ibm"),
-			Region:        strPtr(r.Region),
-			ProductFamily: strPtr("service"),
-			Service:       strPtr("power-iaas"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "planName", Value: strPtr("power-virtual-server-group")},
-				{Key: "planType", Value: strPtr("Paid")},
-			},
-		},
-	}
-
-	c.SetCustomPrice(decimalPtr(decimal.NewFromInt(0)))
-
-	return &c
 }
 
 func (r *PiInstance) piInstanceAIXOperatingSystemCostComponent() *schema.CostComponent {

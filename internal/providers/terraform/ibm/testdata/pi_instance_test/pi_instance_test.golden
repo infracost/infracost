@@ -10,8 +10,7 @@
  ibm_pi_instance.hana-dedicated-e980-instance                                                                               
  ├─ Storage - tier1                                                            14,600  GB hours                       $4.00 
  ├─ Linux HANA Memory                                                          93,440  Memory hours                 $288.08 
- ├─ Linux HANA Cores                                                            2,920  Core hours                 $1,279.54 
- └─ SAP                                                                             1  Instance                       $0.00 
+ └─ Linux HANA Cores                                                            2,920  Core hours                 $1,279.54 
                                                                                                                             
  ibm_pi_instance.ibmi-dedicated-e980-instance                                                                               
  ├─ Storage - tier1                                                            14,600  GB hours                       $4.00 
@@ -24,14 +23,12 @@
  ibm_pi_instance.netweaver-shared-s922-instance                                                                             
  ├─ Storage - tier1                                                            14,600  GB hours                       $4.00 
  ├─ Cores                                                                         730  Core hours                    $88.26 
- ├─ Memory                                                                        730  GB hours                       $8.32 
- └─ Linux Operating System                                                          1  Instance                       $0.00 
+ └─ Memory                                                                        730  GB hours                       $8.32 
                                                                                                                             
  ibm_pi_instance.netweaver-shared-s922-no-usage-specified-instance                                                          
  ├─ Storage - tier1                                                 Monthly cost depends on usage: $0.000274 per GB hours   
  ├─ Cores                                                           Monthly cost depends on usage: $0.12 per Core hours     
- ├─ Memory                                                          Monthly cost depends on usage: $0.0114 per GB hours     
- └─ Linux Operating System                                                          1  Instance                       $0.00 
+ └─ Memory                                                          Monthly cost depends on usage: $0.0114 per GB hours     
                                                                                                                             
  ibm_resource_instance.powervs_service                                                                                      
  └─ Power instance                                                                  1  Instance                       $0.00 

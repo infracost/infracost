@@ -60,7 +60,7 @@ var globalCatalogServiceId = map[string]catalogMetadata{
 	"ibm_is_floating_ip":            {"is.floating-ip", []string{}, nil},
 	"ibm_is_flow_log":               {"is.flow-log-collector", []string{}, nil},
 	"ibm_cloudant":                  {"cloudant", []string{}, nil},
-	"ibm_pi_instance":               {"abd259f0-9990-11e8-acc8-b9f54a8f1661", []string{}, nil},
+	"ibm_pi_instance":               {"Virtual Servers for PowerVS", []string{}, nil},
 	"ibm_cos_bucket":                {"Cloud Object Storage Bucket", []string{}, nil},
 	"ibm_is_lb":                     {"is.load-balancer", []string{}, nil},
 	"ibm_is_public_gateway":         {"is.public-gateway", []string{"ibm_is_floating_ip"}, nil},

@@ -68,7 +68,7 @@ func (r *TgGateway) connectionCostComponent() *schema.CostComponent {
 		}
 	}
 	return &schema.CostComponent{
-		Name:            "Connections",
+		Name:            "Additional Connections",
 		Unit:            "Connection",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: q,

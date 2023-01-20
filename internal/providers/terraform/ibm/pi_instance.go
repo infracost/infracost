@@ -101,14 +101,20 @@ func newPiInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	}
 	r.PopulateUsage(u)
 
+	// instances either have a value for profile or (cpus/memory/processorMode/systemType)
 	configuration := make(map[string]any)
 	configuration["region"] = region
-	configuration["systemType"] = systemType
-	configuration["processorMode"] = processorMode
-	configuration["cpus"] = cpus
-	configuration["memory"] = memory
 	configuration["storageType"] = storageType
-	configuration["profile"] = profile
+	configuration["os"] = os
+
+	if profile != "" {
+		configuration["profile"] = profile
+	} else {
+		configuration["systemType"] = systemType
+		configuration["processorMode"] = processorMode
+		configuration["cpus"] = cpus
+		configuration["memory"] = memory
+	}
 
 	SetCatalogMetadata(d, d.Type, configuration)
 
