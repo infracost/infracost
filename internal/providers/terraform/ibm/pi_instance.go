@@ -105,7 +105,7 @@ func newPiInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	configuration := make(map[string]any)
 	configuration["region"] = region
 	configuration["storageType"] = storageType
-	configuration["os"] = os
+	configuration["image"] = imageName
 
 	if profile != "" {
 		configuration["profile"] = profile
