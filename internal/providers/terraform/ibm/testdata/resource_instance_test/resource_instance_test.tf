@@ -133,3 +133,19 @@ resource "ibm_resource_instance" "resource_instance_monitoring_graduated_secure"
   plan              = "7-day"
   location          = "us-south"
 }
+
+resource "ibm_resource_instance" "cd_instance_professional" {
+  name              = "cd_professional"
+  service           = "continuous-delivery"
+  plan              = "professional"
+  location          = "us-south"
+  resource_group_id = "default"
+}
+
+resource "ibm_resource_instance" "cd_instance_lite" {
+  name              = "cd_lite"
+  service           = "continuous-delivery"
+  plan              = "lite"
+  location          = "us-south"
+  resource_group_id = "default"
+}

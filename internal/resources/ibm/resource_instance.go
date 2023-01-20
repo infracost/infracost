@@ -53,6 +53,10 @@ type ResourceInstance struct {
 	Monitoring_ContainerHour  *float64 `infracost_usage:"monitoring_container_hour"`
 	Monitoring_APICall        *float64 `infracost_usage:"monitoring_api_call"`
 	Monitoring_TimeSeriesHour *float64 `infracost_usage:"monitoring_timeseries_hour"`
+	// Continuous Delivery
+	// Catalog https://cloud.ibm.com/catalog/services/continuous-delivery
+	// Pricing https://cloud.ibm.com/docs/ContinuousDelivery?topic=ContinuousDelivery-limitations_usage&interface=ui
+	ContinuousDelivery_AuthorizedUsers *int64 `infracost_usage:"continuousdelivery_authorized_users"`
 }
 
 type ResourceCostComponentsFunc func(*ResourceInstance) []*schema.CostComponent
@@ -84,14 +88,15 @@ var ResourceInstanceUsageSchema = []*schema.UsageItem{
 }
 
 var ResourceInstanceCostMap map[string]ResourceCostComponentsFunc = map[string]ResourceCostComponentsFunc{
-	"kms":             GetKMSCostComponents,
-	"secrets-manager": GetSecretsManagerCostComponents,
-	"appid":           GetAppIDCostComponents,
-	"appconnect":      GetAppConnectCostComponents,
-	"power-iaas":      GetPowerCostComponents,
-	"logdna":          GetLogDNACostComponents,
-	"logdnaat":        GetActivityTrackerCostComponents,
-	"sysdig-monitor":  GetSysdigCostComponenets,
+	"kms":                 GetKMSCostComponents,
+	"secrets-manager":     GetSecretsManagerCostComponents,
+	"appid":               GetAppIDCostComponents,
+	"appconnect":          GetAppConnectCostComponents,
+	"power-iaas":          GetPowerCostComponents,
+	"logdna":              GetLogDNACostComponents,
+	"logdnaat":            GetActivityTrackerCostComponents,
+	"sysdig-monitor":      GetSysdigCostComponenets,
+	"continuous-delivery": GetContinuousDeliveryCostComponenets,
 }
 
 func KMSKeyVersionsFreeCostComponent(r *ResourceInstance) *schema.CostComponent {
@@ -595,25 +600,13 @@ func GetActivityTrackerCostComponents(r *ResourceInstance) []*schema.CostCompone
 		q = decimalPtr(decimal.NewFromFloat(*r.ActivityTracker_GigabyteMonths))
 	}
 	if r.Plan == "lite" {
-		liteCostComponent := &schema.CostComponent{
-			Name:            "Gigabyte Months",
-			Unit:            "Gigabyte Months",
+		costComponent := &schema.CostComponent{
+			Name:            "Lite plan",
 			UnitMultiplier:  decimal.NewFromInt(1),
-			MonthlyQuantity: q,
-			ProductFilter: &schema.ProductFilter{
-				VendorName: strPtr("ibm"),
-				Region:     strPtr(r.Location),
-				Service:    &r.Service,
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "planName", Value: &r.Plan},
-				},
-			},
-			PriceFilter: &schema.PriceFilter{
-				Unit: strPtr("GIGABYTE_MONTHS"),
-			},
+			MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		}
-		liteCostComponent.SetCustomPrice(decimalPtr(decimal.NewFromFloat(0.0)))
-		return []*schema.CostComponent{liteCostComponent}
+		costComponent.SetCustomPrice(decimalPtr(decimal.NewFromInt(0)))
+		return []*schema.CostComponent{costComponent}
 	} else {
 		return []*schema.CostComponent{{
 			Name:            "Gigabyte Months",
@@ -630,6 +623,40 @@ func GetActivityTrackerCostComponents(r *ResourceInstance) []*schema.CostCompone
 			},
 			PriceFilter: &schema.PriceFilter{
 				Unit: strPtr("GIGABYTE_MONTHS"),
+			},
+		}}
+	}
+}
+
+func GetContinuousDeliveryCostComponenets(r *ResourceInstance) []*schema.CostComponent {
+	var q *decimal.Decimal
+	if r.ContinuousDelivery_AuthorizedUsers != nil {
+		q = decimalPtr(decimal.NewFromInt(*r.ContinuousDelivery_AuthorizedUsers))
+	}
+	if r.Plan == "lite" {
+		costComponent := &schema.CostComponent{
+			Name:            "Lite plan",
+			UnitMultiplier:  decimal.NewFromInt(1),
+			MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+		}
+		costComponent.SetCustomPrice(decimalPtr(decimal.NewFromInt(0)))
+		return []*schema.CostComponent{costComponent}
+	} else {
+		return []*schema.CostComponent{{
+			Name:            "Authorized Users",
+			Unit:            "Authorized Users",
+			UnitMultiplier:  decimal.NewFromInt(1),
+			MonthlyQuantity: q,
+			ProductFilter: &schema.ProductFilter{
+				VendorName: strPtr("ibm"),
+				Region:     strPtr(r.Location),
+				Service:    &r.Service,
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "planName", Value: &r.Plan},
+				},
+			},
+			PriceFilter: &schema.PriceFilter{
+				Unit: strPtr("AUTHORIZED_USERS_PER_MONTH"),
 			},
 		}}
 	}

@@ -1218,6 +1218,7 @@ resource_usage:
     monitoring_container_hour: 1460 # Additional containers on a host above the base 50
     monitoring_api_call: 100000 # Additional API calls above the base 1M/instance
     monitoring_timeseries_hour: 100 # Additional time-series cost above the base 1000/host
+    continuousdelivery_authorized_users: 10 # Number of authorized users to the CD instance and its managed toolchains
     
   ibm_tg_gateway.tg_gateway:
     connection: 25 # Monthly number of connections to the gateway

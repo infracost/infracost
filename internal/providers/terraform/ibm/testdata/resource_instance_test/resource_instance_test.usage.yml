@@ -40,3 +40,5 @@ resource_usage:
     monitoring_container_hour: 1460
     monitoring_api_call: 100000
     monitoring_timeseries_hour: 100
+  ibm_resource_instance.cd_instance_professional:
+    continuousdelivery_authorized_users: 2
