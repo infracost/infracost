@@ -387,7 +387,6 @@ func (p *TerragruntHCLProvider) filterExcludedPaths(paths []string) []string {
 func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions) (info *terragruntWorkingDirInfo) {
 	info = &terragruntWorkingDirInfo{configDir: opts.WorkingDir, workingDir: opts.WorkingDir}
 	outputs := p.fetchDependencyOutputs(opts)
-
 	terragruntConfig, err := tgconfig.ParseConfigFile(opts.TerragruntConfigPath, opts, nil, &outputs)
 	if err != nil {
 		info.error = err
@@ -497,7 +496,16 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 
 	mods := h.Modules()
 	for _, mod := range mods {
-		p.outputs[opts.TerragruntConfigPath] = mod.Module.Blocks.Outputs(true)
+		if mod.Error != nil {
+			path := ""
+			if mod.Module != nil {
+				path = mod.Module.RootPath
+			}
+
+			p.logger.Debugf("Terragrunt config path %s returned module %s with error: %s", opts.TerragruntConfigPath, path, mod.Error)
+		}
+		evaluatedOutputs := mod.Module.Blocks.Outputs(true)
+		p.outputs[opts.TerragruntConfigPath] = evaluatedOutputs
 	}
 
 	info.provider = h
@@ -761,6 +769,7 @@ func (p *TerragruntHCLProvider) fetchModuleOutputs(opts *tgoptions.TerragruntOpt
 		for _, module := range p.stack.Modules {
 			if module.TerragruntOptions.TerragruntConfigPath == opts.TerragruntConfigPath {
 				mod = module
+				break
 			}
 		}
 
