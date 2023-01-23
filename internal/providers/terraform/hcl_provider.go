@@ -131,10 +131,20 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 	runCtx := ctx.RunContext
 	locatorConfig := &hcl.ProjectLocatorConfig{ExcludedSubDirs: ctx.ProjectConfig.ExcludePaths, ChangedObjects: runCtx.VCSMetadata.Commit.ChangedObjects, UseAllPaths: ctx.ProjectConfig.IncludeAllPaths}
 
-	path := ctx.RunContext.Config.RepoPath()
-	loader := modules.NewModuleLoader(path, credsSource, logger, ctx.RunContext.ModuleMutex)
+	wd := ctx.RunContext.Config.RepoPath()
+	initialPath := ctx.ProjectConfig.Path
+	if filepath.IsAbs(wd) {
+		abs, err := filepath.Abs(initialPath)
+		if err != nil {
+			logger.WithError(err).Warnf("could not make project path absolute to match provided --config-file/--path path absolute, this will result in module loading failures")
+		} else {
+			initialPath = abs
+		}
+	}
+
+	loader := modules.NewModuleLoader(wd, credsSource, logger, ctx.RunContext.ModuleMutex)
 	parsers, err := hcl.LoadParsers(
-		ctx.ProjectConfig.Path,
+		initialPath,
 		loader,
 		locatorConfig,
 		logger,
