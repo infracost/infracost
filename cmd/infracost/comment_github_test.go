@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
+	"path"
 	"strings"
 	"testing"
 
@@ -40,6 +41,37 @@ func TestCommentGitHubShowAllProjects(t *testing.T) {
 func TestCommentGitHubShowChangedProjects(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
 		[]string{"comment", "github", "--github-token", "abc", "--repo", "test/test", "--commit", "5", "--show-changed", "--path", "./testdata/changes.json", "--dry-run"},
+		nil)
+}
+
+func TestCommentGitHubWithMissingGuardrailCheckPath(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"comment",
+			"github",
+			"--github-token", "abc",
+			"--repo", "test/test",
+			"--commit", "5",
+			"--show-changed",
+			"--path", "./testdata/changes.json",
+			"--dry-run",
+			"--guardrail-check-path", "./does/not/exist.json"},
+		nil)
+}
+
+func TestCommentGitHubWithGuardrailCheckPath(t *testing.T) {
+	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"comment",
+			"github",
+			"--github-token", "abc",
+			"--repo", "test/test",
+			"--commit", "5",
+			"--show-changed",
+			"--path", "./testdata/changes.json",
+			"--dry-run",
+			"--guardrail-check-path", path.Join(dir, "./guardrailCheck.json")},
 		nil)
 }
 

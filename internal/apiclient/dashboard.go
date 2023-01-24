@@ -157,17 +157,13 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (Ad
 		response.ShareURL = cloudRun.Get("shareUrl").String()
 		response.GuardrailCheck.TotalChecked = cloudRun.Get("guardrailsChecked").Int()
 		response.GuardrailCheck.Comment = cloudRun.Get("guardrailComment").Bool()
-		var allGuardrailFailures []string
 		for _, event := range cloudRun.Get("guardrailEvents").Array() {
-			allGuardrailFailures = append(allGuardrailFailures, event.Get("triggerReason").String())
-
-			if event.Get("prComment").Bool() {
-				response.GuardrailCheck.CommentableFailures = append(response.GuardrailCheck.CommentableFailures, event.Get("triggerReason").String())
+			newEvent := output.GuardrailEvent{
+				TriggerReason: event.Get("triggerReason").String(),
+				PRComment:     event.Get("prComment").Bool(),
+				BlockPR:       event.Get("blockPr").Bool(),
 			}
-
-			if event.Get("blockPr").Bool() {
-				response.GuardrailCheck.BlockingFailures = append(response.GuardrailCheck.BlockingFailures, event.Get("triggerReason").String())
-			}
+			response.GuardrailCheck.GuardrailEvents = append(response.GuardrailCheck.GuardrailEvents, newEvent)
 		}
 
 		if response.GuardrailCheck.TotalChecked > 0 {
@@ -181,7 +177,7 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (Ad
 			} else {
 				fmt.Fprintf(ctx.ErrWriter, "%s\n", guardrailsMsg)
 			}
-			for _, f := range allGuardrailFailures {
+			for _, f := range response.GuardrailCheck.AllFailures() {
 				failureMsg := fmt.Sprintf(`guardrail check failed: %s`, f)
 				if ctx.Config.IsLogging() {
 					log.Info(failureMsg)

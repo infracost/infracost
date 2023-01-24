@@ -47,6 +47,8 @@ func commentCmd(ctx *config.RunContext) *cobra.Command {
 		_ = subCmd.Flags().MarkHidden("show-changed")
 		subCmd.Flags().Bool("skip-no-diff", false, "Skip posting comment if there are no resource changes. Only applies to update, hide-and-new, and delete-and-new behaviors")
 		_ = subCmd.Flags().MarkHidden("skip-no-diff")
+		subCmd.Flags().String("guardrail-check-path", "", "Path to Infracost guardrail data (experimental)")
+		_ = subCmd.Flags().MarkHidden("guardrail-check-path")
 	}
 
 	cmd.AddCommand(cmds...)
@@ -84,6 +86,14 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 		}
 	}
 
+	guardrailCheckPath, _ := cmd.Flags().GetString("guardrail-check-path")
+	if guardrailCheckPath != "" {
+		guardrailCheck, err = output.LoadGuardrailCheck(guardrailCheckPath)
+		if err != nil {
+			return nil, hasDiff, fmt.Errorf("Error loading %s used by --guardrail-check-path flag. %s", guardrailCheckPath, err)
+		}
+	}
+
 	var policyChecks output.PolicyCheck
 	policyPaths, _ := cmd.Flags().GetStringArray("policy-path")
 	if len(policyPaths) > 0 {
@@ -114,8 +124,8 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 	if policyChecks.HasFailed() {
 		return b, hasDiff, policyChecks.Failures
 	}
-	if len(guardrailCheck.BlockingFailures) > 0 {
-		return b, hasDiff, guardrailCheck.BlockingFailures
+	if len(guardrailCheck.BlockingFailures()) > 0 {
+		return b, hasDiff, guardrailCheck.BlockingFailures()
 	}
 
 	return b, hasDiff, nil
