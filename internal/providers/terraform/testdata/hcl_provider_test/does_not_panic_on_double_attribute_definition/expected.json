@@ -1,6 +1,35 @@
 {
   "format_version": "1.0",
   "terraform_version": "1.1.0",
+  "prior_state": {
+    "values": {
+      "root_module": {
+        "resources": [
+          {
+            "address": "aws_eip.invalid_eip",
+            "mode": "managed",
+            "type": "aws_eip",
+            "name": "invalid_eip",
+            "schema_version": 0,
+            "values": {
+              "arn": "eip-arn",
+              "id": "eip",
+              "network_interface": "test"
+            },
+            "infracost_metadata": {
+              "calls": [
+                {
+                  "filename": "testdata/hcl_provider_test/does_not_panic_on_double_attribute_definition/main.tf",
+                  "blockName": "aws_eip.invalid_eip"
+                }
+              ],
+              "filename": "testdata/hcl_provider_test/does_not_panic_on_double_attribute_definition/main.tf"
+            }
+          }
+        ]
+      }
+    }
+  },
   "planned_values": {
     "root_module": {
       "resources": [
@@ -28,25 +57,6 @@
       ]
     }
   },
-  "resource_changes": [
-    {
-      "address": "aws_eip.invalid_eip",
-      "mode": "managed",
-      "type": "aws_eip",
-      "name": "invalid_eip",
-      "change": {
-        "actions": [
-          "create"
-        ],
-        "before": null,
-        "after": {
-          "arn": "eip-arn",
-          "id": "eip",
-          "network_interface": "test"
-        }
-      }
-    }
-  ],
   "configuration": {
     "provider_config": {
       "aws": {
