@@ -55,7 +55,7 @@ projects:
 
 projects:
 `),
-			error: &YamlError{raw: ErrorNilProjects},
+			expected: []*Project{},
 		},
 		{
 			name: "should return panic error wrapped with invalid config file error",
