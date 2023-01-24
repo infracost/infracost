@@ -1,6 +1,95 @@
 {
   "format_version": "1.0",
   "terraform_version": "1.1.0",
+  "prior_state": {
+    "values": {
+      "root_module": {
+        "resources": [
+          {
+            "address": "aws_vpn_connection.example",
+            "mode": "managed",
+            "type": "aws_vpn_connection",
+            "name": "example",
+            "schema_version": 0,
+            "values": {
+              "arn": "vpn-arn",
+              "customer_gateway_id": "c-gw-id",
+              "id": "vpn-id",
+              "transit_gateway_id": "t-gw-id",
+              "type": "ipsec.1"
+            },
+            "infracost_metadata": {
+              "calls": [
+                {
+                  "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf",
+                  "blockName": "aws_vpn_connection.example"
+                }
+              ],
+              "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf"
+            }
+          }
+        ],
+        "child_modules": [
+          {
+            "resources": [
+              {
+                "address": "module.gateway.aws_ec2_transit_gateway.example",
+                "mode": "managed",
+                "type": "aws_ec2_transit_gateway",
+                "name": "example",
+                "schema_version": 0,
+                "values": {
+                  "arn": "t-gw-arn",
+                  "id": "t-gw-id"
+                },
+                "infracost_metadata": {
+                  "calls": [
+                    {
+                      "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf",
+                      "blockName": "module.gateway"
+                    },
+                    {
+                      "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf",
+                      "blockName": "aws_ec2_transit_gateway.example"
+                    }
+                  ],
+                  "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf"
+                }
+              },
+              {
+                "address": "module.gateway.aws_customer_gateway.example",
+                "mode": "managed",
+                "type": "aws_customer_gateway",
+                "name": "example",
+                "schema_version": 0,
+                "values": {
+                  "arn": "c-gw-arn",
+                  "bgp_asn": 65000,
+                  "id": "c-gw-id",
+                  "ip_address": "172.0.0.1",
+                  "type": "ipsec.1"
+                },
+                "infracost_metadata": {
+                  "calls": [
+                    {
+                      "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf",
+                      "blockName": "module.gateway"
+                    },
+                    {
+                      "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf",
+                      "blockName": "aws_customer_gateway.example"
+                    }
+                  ],
+                  "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf"
+                }
+              }
+            ],
+            "address": "module.gateway"
+          }
+        ]
+      }
+    }
+  },
   "planned_values": {
     "root_module": {
       "resources": [
@@ -88,64 +177,6 @@
       ]
     }
   },
-  "resource_changes": [
-    {
-      "address": "aws_vpn_connection.example",
-      "mode": "managed",
-      "type": "aws_vpn_connection",
-      "name": "example",
-      "change": {
-        "actions": [
-          "create"
-        ],
-        "before": null,
-        "after": {
-          "arn": "vpn-arn",
-          "customer_gateway_id": "c-gw-id",
-          "id": "vpn-id",
-          "transit_gateway_id": "t-gw-id",
-          "type": "ipsec.1"
-        }
-      }
-    },
-    {
-      "address": "module.gateway.aws_ec2_transit_gateway.example",
-      "module_address": "module.gateway",
-      "mode": "managed",
-      "type": "aws_ec2_transit_gateway",
-      "name": "example",
-      "change": {
-        "actions": [
-          "create"
-        ],
-        "before": null,
-        "after": {
-          "arn": "t-gw-arn",
-          "id": "t-gw-id"
-        }
-      }
-    },
-    {
-      "address": "module.gateway.aws_customer_gateway.example",
-      "module_address": "module.gateway",
-      "mode": "managed",
-      "type": "aws_customer_gateway",
-      "name": "example",
-      "change": {
-        "actions": [
-          "create"
-        ],
-        "before": null,
-        "after": {
-          "arn": "c-gw-arn",
-          "bgp_asn": 65000,
-          "id": "c-gw-id",
-          "ip_address": "172.0.0.1",
-          "type": "ipsec.1"
-        }
-      }
-    }
-  ],
   "configuration": {
     "provider_config": {
       "aws": {
