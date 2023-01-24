@@ -151,7 +151,7 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 	return &HCLProvider{
 		scanner:        scanner,
 		parsers:        parsers,
-		planJSONParser: NewParser(ctx, false),
+		planJSONParser: NewParser(ctx, true),
 		ctx:            ctx,
 		config:         *config,
 		logger:         logger,
@@ -380,15 +380,22 @@ func (p *HCLProvider) newPlanSchema() {
 		FormatVersion:    "1.0",
 		TerraformVersion: "1.1.0",
 		Variables:        nil,
-		PlannedValues: struct {
-			RootModule PlanModule `json:"root_module"`
+		PriorState: struct {
+			Values PlanValues `json:"values"`
 		}{
+			Values: PlanValues{
+				RootModule: PlanModule{
+					Resources:    []ResourceJSON{},
+					ChildModules: []PlanModule{},
+				},
+			},
+		},
+		PlannedValues: PlanValues{
 			RootModule: PlanModule{
 				Resources:    []ResourceJSON{},
 				ChildModules: []PlanModule{},
 			},
 		},
-		ResourceChanges: []ResourceChangesJSON{},
 		Configuration: Configuration{
 			ProviderConfig: make(map[string]ProviderConfig),
 			RootModule: ModuleConfig{
@@ -404,12 +411,14 @@ func (p *HCLProvider) modulesToPlanJSON(rootModule *hcl.Module) ([]byte, error) 
 
 	mo := p.marshalModule(rootModule)
 	p.schema.Configuration.RootModule = mo.ModuleConfig
+	p.schema.PriorState.Values.RootModule = mo.PlanModule
 	p.schema.PlannedValues.RootModule = mo.PlanModule
 
 	b, err := json.MarshalIndent(p.schema, "", "  ")
 	if err != nil {
 		return nil, fmt.Errorf("error handling built plan json from hcl %w", err)
 	}
+
 	return b, nil
 }
 
@@ -440,8 +449,6 @@ func (p *HCLProvider) marshalModule(module *hcl.Module) ModuleOut {
 			}
 
 			planModule.Resources = append(planModule.Resources, out.Planned)
-
-			p.schema.ResourceChanges = append(p.schema.ResourceChanges, out.Changes)
 		}
 	}
 
@@ -479,22 +486,9 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 		},
 	}
 
-	changes := ResourceChangesJSON{
-		Address:       block.FullName(),
-		ModuleAddress: newString(block.ModuleAddress()),
-		Mode:          "managed",
-		Type:          block.TypeLabel(),
-		Name:          stripCount(block.NameLabel()),
-		Index:         block.Index(),
-		Change: ResourceChange{
-			Actions: []string{"create"},
-		},
-	}
-
 	jsonValues := marshalAttributeValues(block.Type(), block.Values())
 	p.marshalBlock(block, jsonValues)
 
-	changes.Change.After = jsonValues
 	planned.Values = jsonValues
 
 	providerConfigKey := strings.Split(block.TypeLabel(), "_")[0]
@@ -537,7 +531,7 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 
 	return ResourceOutput{
 		Planned:       planned,
-		Changes:       changes,
+		PriorState:    planned,
 		Configuration: configuration,
 	}
 }
@@ -690,7 +684,7 @@ func marshalAttributeValues(blockType string, value cty.Value) map[string]interf
 
 type ResourceOutput struct {
 	Planned       ResourceJSON
-	Changes       ResourceChangesJSON
+	PriorState    ResourceJSON
 	Configuration ResourceData
 }
 
@@ -705,31 +699,25 @@ type ResourceJSON struct {
 	InfracostMetadata map[string]interface{} `json:"infracost_metadata"`
 }
 
-type ResourceChangesJSON struct {
-	Address       string         `json:"address"`
-	ModuleAddress *string        `json:"module_address,omitempty"`
-	Mode          string         `json:"mode"`
-	Type          string         `json:"type"`
-	Name          string         `json:"name"`
-	Index         *int64         `json:"index,omitempty"`
-	Change        ResourceChange `json:"change"`
-}
-
 type ResourceChange struct {
 	Actions []string               `json:"actions"`
 	Before  interface{}            `json:"before"`
 	After   map[string]interface{} `json:"after"`
 }
 
+type PlanValues struct {
+	RootModule PlanModule `json:"root_module"`
+}
+
 type PlanSchema struct {
 	FormatVersion    string      `json:"format_version"`
 	TerraformVersion string      `json:"terraform_version"`
 	Variables        interface{} `json:"variables,omitempty"`
-	PlannedValues    struct {
-		RootModule PlanModule `json:"root_module"`
-	} `json:"planned_values"`
-	ResourceChanges []ResourceChangesJSON `json:"resource_changes"`
-	Configuration   Configuration         `json:"configuration"`
+	PriorState       struct {
+		Values PlanValues `json:"values"`
+	} `json:"prior_state"`
+	PlannedValues PlanValues    `json:"planned_values"`
+	Configuration Configuration `json:"configuration"`
 }
 
 type PlanModule struct {
