@@ -118,6 +118,23 @@ func TestDiffWithCompareToFormatJSON(t *testing.T) {
 	)
 }
 
+func TestDiffWithCompareToPreserveSummary(t *testing.T) {
+	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"diff",
+			"--path",
+			"./testdata/express_route_gateway_plan.json",
+			"--compare-to",
+			path.Join(dir, "prior.json"),
+			"--show-skipped",
+		}, &GoldenFileOptions{
+			RunTerraformCLI: true,
+		})
+}
+
 func TestDiffWithInfracostJSON(t *testing.T) {
 	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
 	GoldenFileCommandTest(
