@@ -11,6 +11,7 @@ import (
 	"github.com/tidwall/gjson"
 
 	address_parser "github.com/hashicorp/go-terraform-address"
+
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/providers/terraform/aws"
@@ -26,23 +27,23 @@ type Parser struct {
 	ctx                  *config.ProjectContext
 	terraformVersion     string
 	includePastResources bool
+	registryMap          *ResourceRegistryMap
 }
 
 func NewParser(ctx *config.ProjectContext, includePastResources bool) *Parser {
 	return &Parser{
 		ctx:                  ctx,
 		includePastResources: includePastResources,
+		registryMap:          GetResourceRegistryMap(),
 	}
 }
 
 func (p *Parser) createPartialResource(d *schema.ResourceData, u *schema.UsageData) *schema.PartialResource {
-	registryMap := GetResourceRegistryMap()
-
 	for cKey, cValue := range getSpecialContext(d) {
 		p.ctx.SetContextValue(cKey, cValue)
 	}
 
-	if registryItem, ok := (*registryMap)[d.Type]; ok {
+	if registryItem, ok := (*p.registryMap)[d.Type]; ok {
 		if registryItem.NoPrice {
 			return &schema.PartialResource{
 				ResourceData: d,
@@ -105,8 +106,9 @@ func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.Par
 	}
 
 	resData := p.parseResourceData(isState, providerConf, vals, conf, vars)
+	crossPlanData := p.parseResourceData(false, gjson.Result{}, parsed.Get("infracost.cross_plan_refs"), gjson.Result{}, gjson.Result{})
 
-	p.parseReferences(resData, conf)
+	p.parseReferences(resData, crossPlanData, conf)
 	p.loadInfracostProviderUsageData(usage, resData)
 	p.stripDataResources(resData)
 	p.populateUsageData(resData, usage)
@@ -475,35 +477,11 @@ func (p *Parser) stripDataResources(resData map[string]*schema.ResourceData) {
 	}
 }
 
-func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf gjson.Result) {
-	registryMap := GetResourceRegistryMap()
-
+func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, crossPlanData map[string]*schema.ResourceData, conf gjson.Result) {
 	// Create a map of id -> resource data so we can lookup references
 	idMap := make(map[string][]*schema.ResourceData)
-
-	for _, d := range resData {
-
-		// check for any "default" ids declared by the provider for this resource
-		if f := registryMap.GetDefaultRefIDFunc(d.Type); f != nil {
-			for _, defaultID := range f(d) {
-				if _, ok := idMap[defaultID]; !ok {
-					idMap[defaultID] = []*schema.ResourceData{}
-				}
-				idMap[defaultID] = append(idMap[defaultID], d)
-			}
-		}
-
-		// check for any "custom" ids specified by the resource and add them.
-		if f := registryMap.GetCustomRefIDFunc(d.Type); f != nil {
-			for _, customID := range f(d) {
-				if _, ok := idMap[customID]; !ok {
-					idMap[customID] = []*schema.ResourceData{}
-				}
-				idMap[customID] = append(idMap[customID], d)
-			}
-		}
-
-	}
+	p.addResourcesToIdMap(resData, idMap)
+	p.addResourcesToIdMap(crossPlanData, idMap)
 
 	parseKnownModuleRefs(resData, conf)
 
@@ -513,11 +491,11 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf g
 		if isInfracostResource(d) {
 			refAttrs = []string{"resources"}
 		} else {
-			refAttrs = registryMap.GetReferenceAttributes(d.Type)
+			refAttrs = p.registryMap.GetReferenceAttributes(d.Type)
 		}
 
 		for _, attr := range refAttrs {
-			found := p.parseConfReferences(resData, conf, d, attr, registryMap)
+			found := p.parseConfReferences(resData, conf, d, attr)
 
 			if found {
 				continue
@@ -534,7 +512,7 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf g
 				if ok {
 
 					for _, ref := range idRefs {
-						reverseRefAttrs := registryMap.GetReferenceAttributes(ref.Type)
+						reverseRefAttrs := p.registryMap.GetReferenceAttributes(ref.Type)
 						d.AddReference(attr, ref, reverseRefAttrs)
 					}
 				}
@@ -543,7 +521,32 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf g
 	}
 }
 
-func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, conf gjson.Result, d *schema.ResourceData, attr string, registryMap *ResourceRegistryMap) bool {
+func (p *Parser) addResourcesToIdMap(resData map[string]*schema.ResourceData, idMap map[string][]*schema.ResourceData) {
+	for _, d := range resData {
+
+		// check for any "default" ids declared by the provider for this resource
+		if f := p.registryMap.GetDefaultRefIDFunc(d.Type); f != nil {
+			for _, defaultID := range f(d) {
+				if _, ok := idMap[defaultID]; !ok {
+					idMap[defaultID] = []*schema.ResourceData{}
+				}
+				idMap[defaultID] = append(idMap[defaultID], d)
+			}
+		}
+
+		// check for any "custom" ids specified by the resource and add them.
+		if f := p.registryMap.GetCustomRefIDFunc(d.Type); f != nil {
+			for _, customID := range f(d) {
+				if _, ok := idMap[customID]; !ok {
+					idMap[customID] = []*schema.ResourceData{}
+				}
+				idMap[customID] = append(idMap[customID], d)
+			}
+		}
+	}
+}
+
+func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, conf gjson.Result, d *schema.ResourceData, attr string) bool {
 	// Check if there's a reference in the conf
 	resConf := getConfJSON(conf, d.Address)
 	exps := resConf.Get("expressions").Get(attr)
@@ -613,7 +616,7 @@ func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, co
 
 		if ok {
 			found = true
-			reverseRefAttrs := registryMap.GetReferenceAttributes(refData.Type)
+			reverseRefAttrs := p.registryMap.GetReferenceAttributes(refData.Type)
 			d.AddReference(attr, refData, reverseRefAttrs)
 		}
 	}

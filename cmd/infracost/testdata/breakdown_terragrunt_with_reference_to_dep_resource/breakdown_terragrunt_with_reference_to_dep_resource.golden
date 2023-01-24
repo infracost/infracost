@@ -1,0 +1,26 @@
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_with_reference_to_dep_resource/core
+Module path: core
+
+ Name           Monthly Qty  Unit  Monthly Cost 
+                                                
+ Project total                            $0.00 
+
+──────────────────────────────────
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_with_reference_to_dep_resource/prod
+Module path: prod
+
+ Name                      Monthly Qty  Unit    Monthly Cost 
+                                                             
+ azurerm_dns_zone.example                                    
+ └─ Hosted zone                      1  months         $0.50 
+                                                             
+ Project total                                         $0.50 
+
+ OVERALL TOTAL                                         $0.50 
+──────────────────────────────────
+2 cloud resources were detected:
+∙ 1 was estimated
+∙ 1 was free, rerun with --show-skipped to see details
+
+Err:
+

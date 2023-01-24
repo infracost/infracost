@@ -734,7 +734,7 @@ func TestParseReferences_plan(t *testing.T) {
 	}
 
 	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, log.Fields{}), true)
-	p.parseReferences(resData, conf)
+	p.parseReferences(resData, map[string]*schema.ResourceData{}, conf)
 
 	assert.Equal(t, []*schema.ResourceData{vol1}, resData["aws_ebs_snapshot.snapshot1"].References("volume_id"))
 }
@@ -774,7 +774,7 @@ func TestParseReferences_state(t *testing.T) {
 	conf := gjson.Result{}
 
 	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, log.Fields{}), true)
-	p.parseReferences(resData, conf)
+	p.parseReferences(resData, map[string]*schema.ResourceData{}, conf)
 
 	assert.Equal(t, []*schema.ResourceData{vol1}, resData["aws_ebs_snapshot.snapshot1"].References("volume_id"))
 }

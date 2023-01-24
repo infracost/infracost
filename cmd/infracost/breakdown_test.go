@@ -286,6 +286,17 @@ func TestBreakdownTerragruntWithProjectError(t *testing.T) {
 		nil)
 }
 
+func TestBreakdownTerragruntWithReferenceToDepResource(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(t,
+		testName,
+		[]string{
+			"breakdown",
+			"--path", dir},
+		&GoldenFileOptions{CaptureLogs: true})
+}
+
 func TestBreakdownTerragruntWithDashboardEnabled(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terragrunt"}, nil, func(c *config.RunContext) {
 		c.Config.EnableDashboard = true

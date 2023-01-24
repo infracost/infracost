@@ -110,6 +110,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getDataFactoryIntegrationRuntimeSelfHostedRegistryItem(),
 	getLogAnalyticsSolutionRegistryItem(),
 	getMySQLFlexibleServerRegistryItem(),
+	getResourceGroupDefinitionRegistryItem(),
 	getSentinelDataConnectorAwsCloudTrailRegistryItem(),
 	getSentinelDataConnectorAzureActiveDirectoryRegistryItem(),
 	getSentinelDataConnectorAzureAdvancedThreatProtectionRegistryItem(),
@@ -193,7 +194,6 @@ var FreeResources = []string{
 	"azurerm_site_recovery_replication_policy",
 
 	// Azure Base
-	"azurerm_resource_group",
 	"azurerm_resource_provider_registration",
 	"azurerm_subscription",
 	"azurerm_role_assignment",

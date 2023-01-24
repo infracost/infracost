@@ -211,5 +211,10 @@
         }
       }
     }
+  },
+  "infracost": {
+    "cross_plan_refs": {
+      "resources": null
+    }
   }
 }

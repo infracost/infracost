@@ -6,6 +6,13 @@ import (
 	"strings"
 )
 
+var (
+	// allowedCrossPlanRefs is a lookup map of all the resources that can be referenced across different plan JSONs.
+	allowedCrossPlanRefs = map[string]struct{}{
+		"azurerm_resource_group": {},
+	}
+)
+
 // ModuleCall represents a call to a defined Module by a parent Module.
 type ModuleCall struct {
 	// Name the name of the module as specified a the point of definition.
@@ -35,6 +42,23 @@ type Module struct {
 	Warnings []Warning
 
 	HasChanges bool
+}
+
+func (m *Module) CrossPlanReferences() Blocks {
+	var refs Blocks
+
+	for _, r := range m.Blocks.OfType("resource") {
+		label := r.TypeLabel()
+		if _, ok := allowedCrossPlanRefs[label]; ok {
+			refs = append(refs, r)
+		}
+	}
+
+	for _, mm := range m.Modules {
+		refs = append(refs, mm.CrossPlanReferences()...)
+	}
+
+	return refs
 }
 
 // Index returns the count index of the Module using the name.

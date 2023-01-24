@@ -55,6 +55,7 @@ type TerragruntHCLProvider struct {
 	Path                 string
 	includePastResources bool
 	outputs              map[string]cty.Value
+	references           map[string]hcl.Blocks
 	stack                *tgconfigstack.Stack
 	excludedPaths        []string
 	env                  map[string]string
@@ -74,6 +75,7 @@ func NewTerragruntHCLProvider(ctx *config.ProjectContext, includePastResources b
 		Path:                 ctx.ProjectConfig.Path,
 		includePastResources: includePastResources,
 		outputs:              map[string]cty.Value{},
+		references:           map[string]hcl.Blocks{},
 		excludedPaths:        ctx.ProjectConfig.ExcludePaths,
 		env:                  parseEnvironmentVariables(os.Environ()),
 		sourceCache:          map[string]string{},
@@ -386,8 +388,8 @@ func (p *TerragruntHCLProvider) filterExcludedPaths(paths []string) []string {
 //     these for further runTerragrunt calls that use the dependency outputs.
 func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions) (info *terragruntWorkingDirInfo) {
 	info = &terragruntWorkingDirInfo{configDir: opts.WorkingDir, workingDir: opts.WorkingDir}
-	outputs := p.fetchDependencyOutputs(opts)
-	terragruntConfig, err := tgconfig.ParseConfigFile(opts.TerragruntConfigPath, opts, nil, &outputs)
+	out := p.fetchDependencyOutputs(opts)
+	terragruntConfig, err := tgconfig.ParseConfigFile(opts.TerragruntConfigPath, opts, nil, &out.moduleOutputs)
 	if err != nil {
 		info.error = err
 		return
@@ -479,7 +481,7 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 
 	h, err := NewHCLProvider(
 		config.NewProjectContext(p.ctx.RunContext, &pconfig, fields),
-		&HCLProviderConfig{CacheParsingModules: true},
+		&HCLProviderConfig{CacheParsingModules: true, CrossPlanRefs: out.crossPlanReferences},
 		ops...,
 	)
 	if err != nil {
@@ -504,8 +506,10 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 
 			p.logger.Debugf("Terragrunt config path %s returned module %s with error: %s", opts.TerragruntConfigPath, path, mod.Error)
 		}
+
 		evaluatedOutputs := mod.Module.Blocks.Outputs(true)
 		p.outputs[opts.TerragruntConfigPath] = evaluatedOutputs
+		p.references[opts.TerragruntConfigPath] = mod.Module.CrossPlanReferences()
 	}
 
 	info.provider = h
@@ -563,7 +567,12 @@ var (
 	mapRegexp   = regexp.MustCompile(`\["([\w\d]+)"]`)
 )
 
-func (p *TerragruntHCLProvider) fetchDependencyOutputs(opts *tgoptions.TerragruntOptions) cty.Value {
+type outputs struct {
+	moduleOutputs       cty.Value
+	crossPlanReferences hcl.Blocks
+}
+
+func (p *TerragruntHCLProvider) fetchDependencyOutputs(opts *tgoptions.TerragruntOptions) outputs {
 	moduleOutputs, err := p.fetchModuleOutputs(opts)
 	if err != nil {
 		p.logger.WithError(err).Debug("failed to fetch real module outputs, defaulting to mocked outputs from file regexp")
@@ -605,14 +614,17 @@ func (p *TerragruntHCLProvider) fetchDependencyOutputs(opts *tgoptions.Terragrun
 		return moduleOutputs
 	}
 
-	valueMap := moduleOutputs.AsValueMap()
+	valueMap := moduleOutputs.moduleOutputs.AsValueMap()
 
 	for _, match := range matches {
 		pieces := strings.Split(match, ".")
 		valueMap = mergeObjectWithDependencyMap(valueMap, pieces[1:])
 	}
 
-	return cty.ObjectVal(valueMap)
+	return outputs{
+		moduleOutputs:       cty.ObjectVal(valueMap),
+		crossPlanReferences: moduleOutputs.crossPlanReferences,
+	}
 }
 
 func mergeObjectWithDependencyMap(valueMap map[string]cty.Value, pieces []string) map[string]cty.Value {
@@ -757,12 +769,12 @@ func mergeListWithDependencyMap(valueMap map[string]cty.Value, pieces []string, 
 }
 
 // fetchModuleOutputs returns the Terraform outputs from the dependencies of Terragrunt file provided in the opts input.
-func (p *TerragruntHCLProvider) fetchModuleOutputs(opts *tgoptions.TerragruntOptions) (cty.Value, error) {
-	outputs := cty.MapVal(map[string]cty.Value{
+func (p *TerragruntHCLProvider) fetchModuleOutputs(opts *tgoptions.TerragruntOptions) (outputs, error) {
+	depOutputs := outputs{moduleOutputs: cty.MapVal(map[string]cty.Value{
 		"outputs": cty.ObjectVal(map[string]cty.Value{
 			"mock": cty.StringVal("val"),
 		}),
-	})
+	})}
 
 	if p.stack != nil {
 		var mod *tgconfigstack.TerraformModule
@@ -776,30 +788,38 @@ func (p *TerragruntHCLProvider) fetchModuleOutputs(opts *tgoptions.TerragruntOpt
 		if mod != nil && len(mod.Dependencies) > 0 {
 			blocks, err := decodeDependencyBlocks(mod.TerragruntOptions.TerragruntConfigPath, opts, nil, nil)
 			if err != nil {
-				return cty.Value{}, fmt.Errorf("could not parse dependency blocks for Terragrunt file %s %w", mod.TerragruntOptions.TerragruntConfigPath, err)
+				return outputs{}, fmt.Errorf("could not parse dependency blocks for Terragrunt file %s %w", mod.TerragruntOptions.TerragruntConfigPath, err)
 			}
 
-			out := map[string]cty.Value{}
+			raw := map[string]cty.Value{}
+			var refs hcl.Blocks
 			for dir, dep := range blocks {
 				value, evaluated := p.outputs[dir]
 				if !evaluated {
 					info := p.runTerragrunt(opts.Clone(dir))
 					if info != nil && info.error != nil {
-						return outputs, fmt.Errorf("could not evaluate dependency %s at dir %s err: %w", dep.Name, dir, err)
+						return depOutputs, fmt.Errorf("could not evaluate dependency %s at dir %s err: %w", dep.Name, dir, err)
 					}
 
 					value = p.outputs[dir]
 				}
 
-				out[dep.Name] = cty.MapVal(map[string]cty.Value{
+				raw[dep.Name] = cty.MapVal(map[string]cty.Value{
 					"outputs": value,
 				})
+
+				modRefs := p.references[dir]
+				if len(modRefs) > 0 {
+					refs = append(refs, modRefs...)
+				}
 			}
 
-			if len(out) > 0 {
-				encoded, err := toCtyValue(out, generateTypeFromValuesMap(out))
+			depOutputs.crossPlanReferences = refs
+			if len(raw) > 0 {
+				encoded, err := toCtyValue(raw, generateTypeFromValuesMap(raw))
 				if err == nil {
-					return encoded, nil
+					depOutputs.moduleOutputs = encoded
+					return depOutputs, nil
 				}
 
 				p.logger.WithError(err).Warn("could not transform output blocks to cty type, using dummy output type")
@@ -807,7 +827,7 @@ func (p *TerragruntHCLProvider) fetchModuleOutputs(opts *tgoptions.TerragruntOpt
 		}
 	}
 
-	return outputs, nil
+	return depOutputs, nil
 }
 
 func toCtyValue(val map[string]cty.Value, ty cty.Type) (v cty.Value, err error) {

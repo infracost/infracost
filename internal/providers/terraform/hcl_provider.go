@@ -41,6 +41,7 @@ type HCLProvider struct {
 type HCLProviderConfig struct {
 	SuppressLogging     bool
 	CacheParsingModules bool
+	CrossPlanRefs       hcl.Blocks
 }
 
 type flagStringSlice []string
@@ -406,6 +407,17 @@ func (p *HCLProvider) modulesToPlanJSON(rootModule *hcl.Module) ([]byte, error) 
 	p.schema.Configuration.RootModule = mo.ModuleConfig
 	p.schema.PlannedValues.RootModule = mo.PlanModule
 
+	if len(p.config.CrossPlanRefs) > 0 {
+		var refs = make([]ResourceJSON, len(p.config.CrossPlanRefs))
+
+		for i, ref := range p.config.CrossPlanRefs {
+			jsonValues := p.JSONValuesForBlock(ref)
+			refs[i] = p.blockToResourceJSON(ref, jsonValues)
+		}
+
+		p.schema.Infracost.CrossPlanRefs.Resources = refs
+	}
+
 	b, err := json.MarshalIndent(p.schema, "", "  ")
 	if err != nil {
 		return nil, fmt.Errorf("error handling built plan json from hcl %w", err)
@@ -466,36 +478,9 @@ func (p *HCLProvider) marshalModule(module *hcl.Module) ModuleOut {
 }
 
 func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
-	planned := ResourceJSON{
-		Address:       block.FullName(),
-		Mode:          "managed",
-		Type:          block.TypeLabel(),
-		Name:          stripCount(block.NameLabel()),
-		Index:         block.Index(),
-		SchemaVersion: 0,
-		InfracostMetadata: map[string]interface{}{
-			"filename": block.Filename,
-			"calls":    block.CallDetails(),
-		},
-	}
-
-	changes := ResourceChangesJSON{
-		Address:       block.FullName(),
-		ModuleAddress: newString(block.ModuleAddress()),
-		Mode:          "managed",
-		Type:          block.TypeLabel(),
-		Name:          stripCount(block.NameLabel()),
-		Index:         block.Index(),
-		Change: ResourceChange{
-			Actions: []string{"create"},
-		},
-	}
-
-	jsonValues := marshalAttributeValues(block.Type(), block.Values())
-	p.marshalBlock(block, jsonValues)
-
-	changes.Change.After = jsonValues
-	planned.Values = jsonValues
+	jsonValues := p.JSONValuesForBlock(block)
+	planned := p.blockToResourceJSON(block, jsonValues)
+	changes := p.blockToChangesJSON(block, jsonValues)
 
 	providerConfigKey := strings.Split(block.TypeLabel(), "_")[0]
 
@@ -540,6 +525,43 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 		Changes:       changes,
 		Configuration: configuration,
 	}
+}
+
+func (p *HCLProvider) blockToChangesJSON(block *hcl.Block, jsonValues map[string]interface{}) ResourceChangesJSON {
+	return ResourceChangesJSON{
+		Address:       block.FullName(),
+		ModuleAddress: newString(block.ModuleAddress()),
+		Mode:          "managed",
+		Type:          block.TypeLabel(),
+		Name:          stripCount(block.NameLabel()),
+		Index:         block.Index(),
+		Change: ResourceChange{
+			Actions: []string{"create"},
+			After:   jsonValues,
+		},
+	}
+}
+
+func (p *HCLProvider) blockToResourceJSON(block *hcl.Block, jsonValues map[string]interface{}) ResourceJSON {
+	return ResourceJSON{
+		Address:       block.FullName(),
+		Mode:          "managed",
+		Type:          block.TypeLabel(),
+		Name:          stripCount(block.NameLabel()),
+		Index:         block.Index(),
+		SchemaVersion: 0,
+		InfracostMetadata: map[string]interface{}{
+			"filename": block.Filename,
+			"calls":    block.CallDetails(),
+		},
+		Values: jsonValues,
+	}
+}
+
+func (p *HCLProvider) JSONValuesForBlock(block *hcl.Block) map[string]interface{} {
+	jsonValues := marshalAttributeValues(block.Type(), block.Values())
+	p.marshalBlock(block, jsonValues)
+	return jsonValues
 }
 
 func (p *HCLProvider) marshalProviderBlock(block *hcl.Block) string {
@@ -730,6 +752,15 @@ type PlanSchema struct {
 	} `json:"planned_values"`
 	ResourceChanges []ResourceChangesJSON `json:"resource_changes"`
 	Configuration   Configuration         `json:"configuration"`
+	Infracost       InfracostPlanData     `json:"infracost"`
+}
+
+type InfracostPlanData struct {
+	CrossPlanRefs CrossPlanRefs `json:"cross_plan_refs"`
+}
+
+type CrossPlanRefs struct {
+	Resources []ResourceJSON `json:"resources"`
 }
 
 type PlanModule struct {
