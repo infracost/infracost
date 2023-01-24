@@ -248,10 +248,11 @@ type Block struct {
 	// See Block docs for more information about child Blocks.
 	childBlocks Blocks
 	// verbose determines whether the block uses verbose debug logging.
-	verbose  bool
-	newMock  func(attr *Attribute) cty.Value
-	Filename string
-	logger   *logrus.Entry
+	verbose    bool
+	newMock    func(attr *Attribute) cty.Value
+	Filename   string
+	logger     *logrus.Entry
+	attributes []*Attribute
 }
 
 // BlockBuilder handles generating new Blocks as part of the parsing and evaluation process.
@@ -718,12 +719,18 @@ func (b *Block) Children() Blocks {
 //
 // ami & instance_type are the Attributes of this Block and credit_specification is a child Block.
 func (b *Block) GetAttributes() []*Attribute {
-	var results []*Attribute
 	if b == nil || b.hclBlock == nil {
 		return nil
 	}
 
-	for _, attr := range b.getHCLAttributes() {
+	if len(b.attributes) != 0 {
+		return b.attributes
+	}
+
+	hclAttrs := b.getHCLAttributes()
+	var results = make([]*Attribute, len(hclAttrs), 0)
+
+	for _, attr := range hclAttrs {
 		results = append(results, &Attribute{
 			newMock: b.newMock,
 			HCLAttr: attr,
@@ -735,6 +742,7 @@ func (b *Block) GetAttributes() []*Attribute {
 		})
 	}
 
+	b.attributes = results
 	return results
 }
 
