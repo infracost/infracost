@@ -728,7 +728,7 @@ func (b *Block) GetAttributes() []*Attribute {
 	}
 
 	hclAttrs := b.getHCLAttributes()
-	var results = make([]*Attribute, len(hclAttrs), 0)
+	var results []*Attribute
 
 	for _, attr := range hclAttrs {
 		results = append(results, &Attribute{
