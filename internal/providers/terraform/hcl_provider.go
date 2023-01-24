@@ -10,6 +10,7 @@ import (
 	"sort"
 	"strings"
 	"sync"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
@@ -273,7 +274,10 @@ type HCLProject struct {
 // LoadPlanJSONs parses the found directories and return the blocks in Terraform plan JSON format.
 func (p *HCLProvider) LoadPlanJSONs() []HCLProject {
 	var jsons = make([]HCLProject, len(p.parsers))
+	t1 := time.Now()
 	mods := p.Modules()
+	t2 := time.Now()
+	fmt.Fprintf(os.Stderr, "evaluated mods %f\n", t2.Sub(t1).Seconds())
 
 	for i, module := range mods {
 		if module.Error == nil {
