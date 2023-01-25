@@ -31,7 +31,7 @@ func (p *TemplateProvider) DisplayType() string {
 }
 
 func (p *TemplateProvider) AddMetadata(metadata *schema.ProjectMetadata) {
-	// no op
+	metadata.ConfigSha = p.ctx.ProjectConfig.ConfigSha
 }
 
 func (p *TemplateProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {

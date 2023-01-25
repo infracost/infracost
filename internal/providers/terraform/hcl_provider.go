@@ -171,6 +171,8 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 func (p *HCLProvider) Type() string        { return "terraform_dir" }
 func (p *HCLProvider) DisplayType() string { return "Terraform directory" }
 func (p *HCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
+	metadata.ConfigSha = p.ctx.ProjectConfig.ConfigSha
+
 	basePath := p.ctx.ProjectConfig.Path
 	if p.ctx.RunContext.Config.ConfigFilePath != "" {
 		basePath = filepath.Dir(p.ctx.RunContext.Config.ConfigFilePath)

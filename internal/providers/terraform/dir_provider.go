@@ -112,6 +112,8 @@ func (p *DirProvider) checks() error {
 }
 
 func (p *DirProvider) AddMetadata(metadata *schema.ProjectMetadata) {
+	metadata.ConfigSha = p.ctx.ProjectConfig.ConfigSha
+
 	basePath := p.ctx.ProjectConfig.Path
 	if p.ctx.RunContext.Config.ConfigFilePath != "" {
 		basePath = filepath.Dir(p.ctx.RunContext.Config.ConfigFilePath)
