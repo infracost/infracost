@@ -69,32 +69,22 @@ func formatCostChangeSentence(currency string, pastCost, cost *decimal.Decimal, 
 }
 
 func calculateMetadataToDisplay(projects []Project) (hasModulePath bool, hasWorkspace bool) {
-	// we only want to show metadata fields if they can help distinguish projects with the same name
-
-	sprojects := make([]Project, 0)
-	for _, p := range projects {
-		if p.Diff == nil || len(p.Diff.Resources) == 0 { // ignore the projects that are skipped
-			continue
-		}
-		sprojects = append(sprojects, p)
-	}
-
-	sort.Slice(sprojects, func(i, j int) bool {
-		if sprojects[i].Name != sprojects[j].Name {
-			return sprojects[i].Name < sprojects[j].Name
+	sort.Slice(projects, func(i, j int) bool {
+		if projects[i].Name != projects[j].Name {
+			return projects[i].Name < projects[j].Name
 		}
 
-		if sprojects[i].Metadata.TerraformModulePath != sprojects[j].Metadata.TerraformModulePath {
-			return sprojects[i].Metadata.TerraformModulePath < sprojects[j].Metadata.TerraformModulePath
+		if projects[i].Metadata.TerraformModulePath != projects[j].Metadata.TerraformModulePath {
+			return projects[i].Metadata.TerraformModulePath < projects[j].Metadata.TerraformModulePath
 		}
 
-		return sprojects[i].Metadata.WorkspaceLabel() < sprojects[j].Metadata.WorkspaceLabel()
+		return projects[i].Metadata.WorkspaceLabel() < projects[j].Metadata.WorkspaceLabel()
 	})
 
 	// check if any projects that have the same name have different path or workspace
-	for i, p := range sprojects {
+	for i, p := range projects {
 		if i > 0 { // we compare vs the previous item, so skip index 0
-			prev := sprojects[i-1]
+			prev := projects[i-1]
 			if p.Name == prev.Name {
 				if p.Metadata.TerraformModulePath != prev.Metadata.TerraformModulePath {
 					hasModulePath = true
