@@ -21,6 +21,8 @@ const InfracostDir = ".infracost"
 // to provide flags every run. Fields are documented below. More info
 // is outlined here: https://www.infracost.io/config-file
 type Project struct {
+	// ConfigSha can be provided to identify the configuration used for the project
+	ConfigSha string `yaml:"configSha,omitempty"  ignored:"true"`
 	// Path to the Terraform directory or JSON/plan file.
 	// A path can be repeated with different parameters, e.g. for multiple workspaces.
 	Path string `yaml:"path,omitempty" ignored:"true"`

@@ -88,6 +88,20 @@ func TestBreakdownMultiProjectAutodetect(t *testing.T) {
 	)
 }
 
+func TestBreakdownConfigFile(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--config-file", path.Join(dir, "infracost.yml"),
+			"--format", "json",
+		}, nil,
+	)
+}
+
 func TestBreakdownMultiProjectSkipPaths(t *testing.T) {
 	testName := testutil.CalcGoldenFileTestdataDirName()
 	dir := path.Join("./testdata", testName)
