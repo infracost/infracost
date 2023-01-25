@@ -9,7 +9,7 @@
   </thead>
   <tbody>
     <tr>
-      <td>same_name_plan</td>
+      <td>different_name_plan</td>
       <td align="right">$40.56</td>
       <td align="right">$40.56</td>
       <td>$0</td>
@@ -30,7 +30,7 @@
 
 ```
 ──────────────────────────────────
-Project: same_name_plan
+Project: different_name_plan
 
 + aws_instance.instance_2
   Monthly cost depends on usage
@@ -49,7 +49,7 @@ Project: same_name_plan
           Monthly cost depends on usage
             +$0.10 per GB
 
-Monthly cost change for same_name_plan
+Monthly cost change for different_name_plan
 Amount:  $0.00 ($40.56 → $40.56)
 Percent: 0%
 
