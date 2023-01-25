@@ -81,7 +81,9 @@ func (r *ResourceRegistryMap) GetDefaultRefIDFunc(resourceDataType string) schem
 	if ok {
 		return item.DefaultRefIDFunc
 	}
-	return nil
+	return func(d *schema.ResourceData) []string {
+		return []string{d.Get("id").String()}
+	}
 }
 
 func GetUsageOnlyResources() []string {

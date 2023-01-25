@@ -244,14 +244,18 @@ type Block struct {
 	expanded bool
 	// cloneIndex represents the index of the parent that this Block has been cloned from
 	cloneIndex int
+	// parent is the block that the block was cloned from
+	parent *Block
 	// childBlocks holds information about any child Blocks that the Block may have. This can be empty.
 	// See Block docs for more information about child Blocks.
 	childBlocks Blocks
 	// verbose determines whether the block uses verbose debug logging.
-	verbose  bool
-	newMock  func(attr *Attribute) cty.Value
+	verbose    bool
+	logger     *logrus.Entry
+	newMock    func(attr *Attribute) cty.Value
+	attributes []*Attribute
+
 	Filename string
-	logger   *logrus.Entry
 }
 
 // BlockBuilder handles generating new Blocks as part of the parsing and evaluation process.
@@ -369,6 +373,7 @@ func (b BlockBuilder) CloneBlock(block *Block, index cty.Value) *Block {
 	clone.expanded = true
 	block.cloneIndex++
 
+	clone.parent = block
 	return clone
 }
 
@@ -541,6 +546,10 @@ func (b Block) ShouldExpand() bool {
 // a child Context. Meaning that it can be used in traversal evaluation when looking up Context variables.
 func (b *Block) SetContext(ctx *Context) {
 	b.context = ctx
+	for _, attribute := range b.attributes {
+		attribute.Ctx = ctx
+	}
+
 	for _, block := range b.childBlocks {
 		block.SetContext(ctx.NewChild())
 	}
@@ -718,13 +727,18 @@ func (b *Block) Children() Blocks {
 //
 // ami & instance_type are the Attributes of this Block and credit_specification is a child Block.
 func (b *Block) GetAttributes() []*Attribute {
-	var results []*Attribute
 	if b == nil || b.hclBlock == nil {
 		return nil
 	}
 
-	for _, attr := range b.getHCLAttributes() {
-		results = append(results, &Attribute{
+	if b.attributes != nil {
+		return b.attributes
+	}
+
+	hclAttributes := b.getHCLAttributes()
+	var attributes = make([]*Attribute, 0, len(hclAttributes))
+	for _, attr := range hclAttributes {
+		attributes = append(attributes, &Attribute{
 			newMock: b.newMock,
 			HCLAttr: attr,
 			Ctx:     b.context,
@@ -735,7 +749,8 @@ func (b *Block) GetAttributes() []*Attribute {
 		})
 	}
 
-	return results
+	b.attributes = attributes
+	return attributes
 }
 
 // GetAttribute returns the given attribute with the provided name. It will return nil if the attribute is not found.

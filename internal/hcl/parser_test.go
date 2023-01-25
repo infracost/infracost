@@ -13,6 +13,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zclconf/go-cty/cty"
+	ctyJson "github.com/zclconf/go-cty/cty/json"
 
 	"github.com/infracost/infracost/internal/hcl/modules"
 	"github.com/infracost/infracost/internal/sync"
@@ -941,4 +942,125 @@ output "mod_result" {
 	v = out.AsValueMap()
 	s = v["mod_result"].AsString()
 	assert.Equal(t, "z", s)
+}
+
+func Test_ModuleExpansionBehindComplexExpression(t *testing.T) {
+	path := createTestFileWithModule(`
+variable "var1" {
+  default = {
+	"foo" = {
+		"initial_prop" = {
+			"name" = "test"
+		}
+    }
+	"bar" = {
+		"initial_prop" = {
+			"name" = "test2"
+		}
+    }
+  }
+}
+
+variable "var2" {
+  default = {
+	"foo" = {
+		"merged_prop" = {
+			"another_name" = "test_again"
+		}
+    }
+	"bar" = {
+		"merged_prop" = {
+			"another_name" = "test_again_2"
+		}
+    }
+  }
+}
+
+locals {
+  to_merge = { for to_merge_key, to_merge_value in var.var1 : to_merge_key => {
+    merged       = module.test[local.index_prop].mod_result.out.obj
+    }
+  }
+
+  merged = { for k, v in var.var1 : k => merge(v, local.to_merge[k]) }
+}
+
+locals {
+  index_prop    =  "foo"
+}
+
+module "test" {
+  for_each = var.var2
+
+  source                      = "../."
+  name                        = each.key
+  obj                   	  = each.value.merged_prop
+}
+
+module "test2" {
+	for_each = local.merged
+  	source                      = "../."
+
+    name                        = each.key
+	obj                   	  	= each.value
+}
+`,
+		`
+variable "name" {
+	default = "?"
+}
+
+variable "obj" {
+	default = "?"
+}
+
+output "mod_result" {
+	value = {
+		"out" = {
+			"name": var.name
+			"obj": var.obj
+		}
+	}
+}
+`,
+		"",
+	)
+
+	logger := newDiscardLogger()
+	loader := modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{})
+	parsers, err := LoadParsers(path, loader, nil, logger)
+	require.NoError(t, err)
+	module, err := parsers[0].ParseDirectory()
+	require.NoError(t, err)
+
+	var mod1 *Module
+	var mod2 *Module
+	for _, m := range module.Modules {
+		if m.Name == `module.test["foo"]` {
+			mod1 = m
+		}
+
+		if m.Name == `module.test2["foo"]` {
+			mod2 = m
+		}
+	}
+
+	assert.Len(t, module.Modules, 4)
+	require.NotNil(t, mod1, "could not find module.test[foo] in root module")
+	require.NotNil(t, mod2, "could not find module.test2[foo] in root module")
+	out := mod1.Blocks.Outputs(false)
+	v := out.AsValueMap()
+	output := v["mod_result"]
+	simple := ctyJson.SimpleJSONValue{Value: output}
+	b, err := simple.MarshalJSON()
+	require.NoError(t, err)
+	assert.JSONEq(t, `{"out":{"name":"foo","obj":{"another_name":"test_again"}}}`, string(b))
+
+	out = mod2.Blocks.Outputs(false)
+	v = out.AsValueMap()
+	output = v["mod_result"]
+	simple = ctyJson.SimpleJSONValue{Value: output}
+	b, err = simple.MarshalJSON()
+	require.NoError(t, err)
+	assert.JSONEq(t, `{"out":{"name":"foo","obj":{"initial_prop":{"name":"test"},"merged":{"another_name":"test_again"}}}}`, string(b))
 }
