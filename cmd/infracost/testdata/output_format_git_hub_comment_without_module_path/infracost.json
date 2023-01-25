@@ -658,7 +658,7 @@
       }
     },
     {
-      "name": "same_name_plan",
+      "name": "different_name_plan",
       "metadata": {
         "path": "./cmd/infracost/testdata/terraform_v0.14_plan.json",
         "type": "terraform_plan_json",
