@@ -30,6 +30,7 @@ type ProjectDiag struct {
 type ProjectMetadata struct {
 	Path                string        `json:"path"`
 	Type                string        `json:"type"`
+	ConfigSha           string        `json:"configSha,omitempty"`
 	TerraformModulePath string        `json:"terraformModulePath,omitempty"`
 	TerraformWorkspace  string        `json:"terraformWorkspace,omitempty"`
 	VCSSubPath          string        `json:"vcsSubPath,omitempty"`

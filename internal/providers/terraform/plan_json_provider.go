@@ -44,6 +44,8 @@ func (p *PlanJSONProvider) DisplayType() string {
 }
 
 func (p *PlanJSONProvider) AddMetadata(metadata *schema.ProjectMetadata) {
+	metadata.ConfigSha = p.ctx.ProjectConfig.ConfigSha
+
 	// TerraformWorkspace isn't used to load resources but we still pass it
 	// on so it appears in the project name of the output
 	metadata.TerraformWorkspace = p.ctx.ProjectConfig.TerraformWorkspace

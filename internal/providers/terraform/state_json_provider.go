@@ -33,7 +33,7 @@ func (p *StateJSONProvider) DisplayType() string {
 }
 
 func (p *StateJSONProvider) AddMetadata(metadata *schema.ProjectMetadata) {
-	// no op
+	metadata.ConfigSha = p.ctx.ProjectConfig.ConfigSha
 }
 
 func (p *StateJSONProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
