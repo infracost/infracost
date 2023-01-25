@@ -2,7 +2,10 @@ package output
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
+	"github.com/pkg/errors"
+	"os"
 	"regexp"
 	"sort"
 	"strings"
@@ -292,17 +295,77 @@ func (p PolicyCheckFailures) Error() string {
 // This struct is used to create guardrail outputs.
 type GuardrailCheck struct {
 	// TotalChecked is the total number of guardrails checked
-	TotalChecked int64
+	TotalChecked int64 `json:"guardrailsChecked"`
 
 	// Comment indicates that the guardrail status should be reported in the PR
 	// comment (either as a success or as a failure depending on CommentableFailures).
-	Comment bool
-	// CommentableFailures are the failures that should be listed in the PR comment
-	CommentableFailures GuardrailFailures
+	Comment bool `json:"guardrailComment"`
 
-	// BlockingFailures is the list of failures causing the CLI to return with a
-	// failing (non-zero) error code
-	BlockingFailures GuardrailFailures
+	// GuardrailEvents
+	GuardrailEvents []GuardrailEvent `json:"guardrailEvents"`
+}
+
+type GuardrailEvent struct {
+	// TriggerReason details the reason that the guardrail was triggered
+	TriggerReason string `json:"triggerReason"`
+
+	// PRComment indicates whether this guardrail event should be posted in th PR Comment
+	PRComment bool `json:"prComment"`
+
+	// BlockPR indicated whether this guardrail event should return a failure blocking the PR
+	BlockPR bool `json:"blockPr"`
+}
+
+// LoadGuardrailCheck reads the file at the path  into a GuardrailCheck struct.
+func LoadGuardrailCheck(path string) (GuardrailCheck, error) {
+	var out GuardrailCheck
+	_, err := os.Stat(path)
+	if errors.Is(err, os.ErrNotExist) {
+		return out, errors.New("guardrail-check-path does not exist ")
+	}
+
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return out, fmt.Errorf("error reading guardrail check JSON file %w", err)
+	}
+
+	err = json.Unmarshal(data, &out)
+	if err != nil {
+		return out, fmt.Errorf("invalid guardrail check JSON file %w", err)
+	}
+
+	return out, nil
+}
+
+// AllFailures are all the guardrail failures triggered by the run
+func (g GuardrailCheck) AllFailures() GuardrailFailures {
+	var failures GuardrailFailures
+	for _, event := range g.GuardrailEvents {
+		failures = append(failures, event.TriggerReason)
+	}
+	return failures
+}
+
+// CommentableFailures are the failures that should be listed in the PR comment
+func (g GuardrailCheck) CommentableFailures() GuardrailFailures {
+	var failures GuardrailFailures
+	for _, event := range g.GuardrailEvents {
+		if event.PRComment {
+			failures = append(failures, event.TriggerReason)
+		}
+	}
+	return failures
+}
+
+// BlockingFailures is the list of failures causing the CLI to return with a failing (non-zero) error code
+func (g GuardrailCheck) BlockingFailures() GuardrailFailures {
+	var failures GuardrailFailures
+	for _, event := range g.GuardrailEvents {
+		if event.BlockPR {
+			failures = append(failures, event.TriggerReason)
+		}
+	}
+	return failures
 }
 
 // GuardrailFailures defines a list of guardrail failures that were returned from infracost cloud.
