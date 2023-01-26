@@ -504,7 +504,7 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 				path = mod.Module.RootPath
 			}
 
-			p.logger.Debugf("Terragrunt config path %s returned module %s with error: %s", opts.TerragruntConfigPath, path, mod.Error)
+			p.logger.Warnf("Terragrunt config path %s returned module %s with error: %s", opts.TerragruntConfigPath, path, mod.Error)
 		}
 		evaluatedOutputs := mod.Module.Blocks.Outputs(true)
 		p.outputs[opts.TerragruntConfigPath] = evaluatedOutputs

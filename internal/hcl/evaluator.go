@@ -55,7 +55,7 @@ type Evaluator struct {
 	// HCL attributes.
 	inputVars map[string]cty.Value
 	// moduleCalls are the modules that the list of Blocks call to. This is built at runtime.
-	moduleCalls []*ModuleCall
+	moduleCalls map[string]*ModuleCall
 	// moduleMetadata is a lookup map of where modules exist on the local filesystem. This is built as part of a
 	// Terraform or Infracost init.
 	moduleMetadata *modules.Manifest
@@ -132,6 +132,7 @@ func NewEvaluator(
 		ctx:            ctx,
 		inputVars:      inputVars,
 		moduleMetadata: moduleMetadata,
+		moduleCalls:    map[string]*ModuleCall{},
 		visitedModules: visitedModules,
 		workspace:      workspace,
 		workingDir:     workingDir,
@@ -172,7 +173,7 @@ func (e *Evaluator) Run() (*Module, error) {
 	e.evaluate(lastContext)
 
 	// let's load the modules now we have our top level context.
-	e.moduleCalls = e.loadModules(lastContext)
+	e.loadModules(lastContext)
 	e.logger.Debug("evaluating context after loading modules")
 	e.evaluate(lastContext)
 
@@ -401,11 +402,22 @@ func (e *Evaluator) expandDynamicBlock(b *Block) {
 // will expand correctly to: aws_eip.nat_gateway[a], aws_eip.nat_gateway[b]. Rather than aws_eip.nat_gateway[id], aws_eip.nat_gateway[a] ...
 func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 	var expanded Blocks
+	var haveChanged = make(map[string]*Block)
 	for _, block := range blocks {
 		forEachAttr := block.GetAttribute("for_each")
-
-		if forEachAttr == nil || block.IsCountExpanded() || !block.IsForEachReferencedExpanded(blocks) || !shouldExpandBlock(block) {
+		if forEachAttr == nil {
 			expanded = append(expanded, block)
+			continue
+		}
+
+		if block.IsCountExpanded() || !block.IsForEachReferencedExpanded(blocks) || !shouldExpandBlock(block) {
+			parent := block.parent.GetAttribute("for_each")
+			if !parent.HasChanged() {
+				expanded = append(expanded, block)
+			} else {
+				haveChanged[block.parent.FullName()] = block.parent
+			}
+
 			continue
 		}
 
@@ -446,11 +458,24 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 				ctx.Set(key, block.TypeLabel(), "key")
 				ctx.Set(val, block.TypeLabel(), "value")
 
+				if v, ok := e.moduleCalls[clone.FullName()]; ok {
+					v.Definition = clone
+				}
 				expanded = append(expanded, clone)
 
 				return false
 			})
 		}
+	}
+
+	if len(haveChanged) > 0 {
+		var changes = make(Blocks, 0, len(haveChanged))
+		for _, block := range haveChanged {
+			changes = append(changes, block)
+		}
+
+		eaches := e.expandBlockForEaches(changes)
+		return append(expanded, eaches...)
 	}
 
 	return expanded
@@ -772,9 +797,8 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 }
 
 // loadModules reads all module blocks and loads the underlying modules, adding blocks to moduleCalls.
-func (e *Evaluator) loadModules(lastContext hcl.EvalContext) []*ModuleCall {
+func (e *Evaluator) loadModules(lastContext hcl.EvalContext) {
 	e.logger.Debug("loading module calls")
-	var moduleDefinitions []*ModuleCall
 
 	var moduleBlocks Blocks
 	var filtered Blocks
@@ -803,10 +827,8 @@ func (e *Evaluator) loadModules(lastContext hcl.EvalContext) []*ModuleCall {
 			continue
 		}
 
-		moduleDefinitions = append(moduleDefinitions, moduleCall)
+		e.moduleCalls[moduleBlock.FullName()] = moduleCall
 	}
-
-	return moduleDefinitions
 }
 
 // expFunctions returns the set of functions that should be used to when evaluating
