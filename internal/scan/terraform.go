@@ -9,6 +9,8 @@ import (
 	jsoniter "github.com/json-iterator/go"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
+	"github.com/tidwall/gjson"
+	"github.com/tidwall/sjson"
 
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/config"
@@ -45,6 +47,19 @@ func NewTerraformPlanScanner(ctx *config.RunContext, logger *log.Entry, getPrice
 // the Scanner will attempt to fetch costs for the suggestion and given resource. These suggestions will only
 // be provided for resources that are marked as a schema.CoreResource.
 func (s *TerraformPlanScanner) ScanPlan(project *schema.Project, projectPlan []byte) error {
+	res := gjson.ParseBytes(projectPlan)
+
+	// if we have the infracost_resource_changes then this projectPlan has been passed from the HCLProvider,
+	// and we need to transform this list to the standard `resource_changes` key.
+	changes := res.Get("infracost_resource_changes")
+	if changes.Exists() {
+		standardPlan, err := sjson.SetBytes(projectPlan, "resource_changes", changes.Value())
+		if err != nil {
+			s.logger.WithError(err).Debugf("failed to set resource_changes on plan before policy API evaluation")
+		}
+		projectPlan = standardPlan
+	}
+
 	apiPolicies, err := s.policyAPIClient.GetPolicies(projectPlan)
 	if err != nil {
 		return fmt.Errorf("failed to get suggestions %w", err)

@@ -323,6 +323,114 @@
       ]
     }
   },
+  "infracost_resource_changes": [
+    {
+      "address": "module.module1.aws_ecs_task_definition.ecs_task[0]",
+      "module_address": "module.module1",
+      "mode": "managed",
+      "type": "aws_ecs_task_definition",
+      "name": "ecs_task",
+      "index": 0,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "arn": "task-1-arn",
+          "container_definitions": "\t\t\t[\n\t\t\t\t{\n\t\t\t\t\t\t\"command\": [\"sleep\", \"10\"],\n\t\t\t\t\t\t\"entryPoint\": [\"/\"],\n\t\t\t\t\t\t\"essential\": true,\n\t\t\t\t\t\t\"image\": \"alpine\",\n\t\t\t\t\t\t\"name\": \"alpine\",\n\t\t\t\t\t\t\"network_mode\": \"none\"\n\t\t\t\t}\n\t\t\t]\n",
+          "cpu": "1 vCPU",
+          "family": "ecs_task_module_1",
+          "id": "task-1",
+          "inference_accelerator": [
+            {
+              "device_name": "device1",
+              "device_type": "eia2.medium"
+            }
+          ],
+          "memory": "2 GB",
+          "requires_compatibilities": [
+            "FARGATE"
+          ]
+        }
+      }
+    },
+    {
+      "address": "module.module1.aws_ecs_service.ecs_service[0]",
+      "module_address": "module.module1",
+      "mode": "managed",
+      "type": "aws_ecs_service",
+      "name": "ecs_service",
+      "index": 0,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "arn": "svc-1-arn",
+          "desired_count": 1,
+          "id": "svc-1",
+          "launch_type": "FARGATE",
+          "name": "ecs_service_module_1",
+          "task_definition": "ecs_task_module_1:mocked-task_definition"
+        }
+      }
+    },
+    {
+      "address": "module.module1.module.module2.aws_ecs_task_definition.ecs_task[0]",
+      "module_address": "module.module1.module.module2",
+      "mode": "managed",
+      "type": "aws_ecs_task_definition",
+      "name": "ecs_task",
+      "index": 0,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "arn": "task-2-arn",
+          "container_definitions": "\t\t\t[\n\t\t\t\t{\n\t\t\t\t\t\t\"command\": [\"sleep\", \"10\"],\n\t\t\t\t\t\t\"entryPoint\": [\"/\"],\n\t\t\t\t\t\t\"essential\": true,\n\t\t\t\t\t\t\"image\": \"alpine\",\n\t\t\t\t\t\t\"name\": \"alpine\",\n\t\t\t\t\t\t\"network_mode\": \"none\"\n\t\t\t\t}\n\t\t\t]\n",
+          "cpu": "1 vCPU",
+          "family": "ecs_task_module_2",
+          "id": "task-2",
+          "inference_accelerator": [
+            {
+              "device_name": "device1",
+              "device_type": "eia2.medium"
+            }
+          ],
+          "memory": "2 GB",
+          "requires_compatibilities": [
+            "FARGATE"
+          ]
+        }
+      }
+    },
+    {
+      "address": "module.module1.module.module2.aws_ecs_service.ecs_service[0]",
+      "module_address": "module.module1.module.module2",
+      "mode": "managed",
+      "type": "aws_ecs_service",
+      "name": "ecs_service",
+      "index": 0,
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "arn": "svc-2-arn",
+          "desired_count": 1,
+          "id": "svc-2",
+          "launch_type": "FARGATE",
+          "name": "ecs_service_module_2",
+          "task_definition": "ecs_task_module_2:mocked-task_definition"
+        }
+      }
+    }
+  ],
   "configuration": {
     "provider_config": {
       "aws": {
