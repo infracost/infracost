@@ -57,6 +57,25 @@
       ]
     }
   },
+  "infracost_resource_changes": [
+    {
+      "address": "aws_eip.invalid_eip",
+      "mode": "managed",
+      "type": "aws_eip",
+      "name": "invalid_eip",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "arn": "eip-arn",
+          "id": "eip",
+          "network_interface": "test"
+        }
+      }
+    }
+  ],
   "configuration": {
     "provider_config": {
       "aws": {

@@ -177,6 +177,64 @@
       ]
     }
   },
+  "infracost_resource_changes": [
+    {
+      "address": "aws_vpn_connection.example",
+      "mode": "managed",
+      "type": "aws_vpn_connection",
+      "name": "example",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "arn": "vpn-arn",
+          "customer_gateway_id": "c-gw-id",
+          "id": "vpn-id",
+          "transit_gateway_id": "t-gw-id",
+          "type": "ipsec.1"
+        }
+      }
+    },
+    {
+      "address": "module.gateway.aws_ec2_transit_gateway.example",
+      "module_address": "module.gateway",
+      "mode": "managed",
+      "type": "aws_ec2_transit_gateway",
+      "name": "example",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "arn": "t-gw-arn",
+          "id": "t-gw-id"
+        }
+      }
+    },
+    {
+      "address": "module.gateway.aws_customer_gateway.example",
+      "module_address": "module.gateway",
+      "mode": "managed",
+      "type": "aws_customer_gateway",
+      "name": "example",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "arn": "c-gw-arn",
+          "bgp_asn": 65000,
+          "id": "c-gw-id",
+          "ip_address": "172.0.0.1",
+          "type": "ipsec.1"
+        }
+      }
+    }
+  ],
   "configuration": {
     "provider_config": {
       "aws": {
