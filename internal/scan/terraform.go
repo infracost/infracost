@@ -3,6 +3,7 @@ package scan
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"sort"
 
 	"github.com/imdario/mergo"
@@ -97,24 +98,33 @@ func (s *TerraformPlanScanner) ScanPlan(project *schema.Project, projectPlan []b
 			continue
 		}
 
-		baselineSchema, err := jsoniter.Marshal(coreResource)
+		// copy the coreResource here as the underlying interface is a pointer to a struct.
+		// If we don't copy the value then when we set the values to cost the policy we will
+		// overwrite the struct fields causing Infracost output to be incorrect.
+		clone, err := deepCopy(coreResource)
+		if err != nil {
+			s.logger.WithError(err).Debugf("failed to clone core resource type: %s", coreResource.CoreType())
+			continue
+		}
+
+		baselineSchema, err := jsoniter.Marshal(clone)
 		if err != nil {
 			s.logger.WithError(err).Debug("could not marshal initial schema for policy resource")
 			continue
 		}
 
-		baselineResource, err := s.buildResource(coreResource, resource.ResourceData.UsageData)
+		baselineResource, err := s.buildResource(clone, resource.ResourceData.UsageData)
 		if err != nil {
 			s.logger.WithError(err).Debug("could not fetch prices for initial resource")
 			continue
 		}
 
-		for _, policy := range recMap[coreResource.CoreType()] {
+		for _, policy := range recMap[clone.CoreType()] {
 			if policy.Address != baselineResource.Name {
 				continue
 			}
 
-			costedPolicy, err := s.costSuggestion(coreResource, baselineSchema, baselineResource, resource.ResourceData.UsageData, policy)
+			costedPolicy, err := s.costSuggestion(clone, baselineSchema, baselineResource, resource.ResourceData.UsageData, policy)
 			if err != nil {
 				s.logger.WithError(err).Debugf("failed to cost policy for resource %s", baselineResource.Name)
 				continue
@@ -210,4 +220,26 @@ func mergeSuggestionWithResource(schema []byte, suggestedSchema []byte, resource
 	}
 
 	return nil
+}
+
+func deepCopy(v schema.CoreResource) (r schema.CoreResource, err error) {
+	defer func() {
+		e := recover()
+		if e != nil {
+			err = fmt.Errorf("deepCopy recover from interface conversion %s", e)
+		}
+	}()
+
+	data, err := jsoniter.Marshal(v)
+	if err != nil {
+		return nil, err
+	}
+
+	vptr := reflect.New(reflect.TypeOf(v))
+	err = jsoniter.Unmarshal(data, vptr.Interface())
+	if err != nil {
+		return nil, err
+	}
+
+	return vptr.Elem().Interface().(schema.CoreResource), nil
 }
