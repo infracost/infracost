@@ -209,7 +209,7 @@ func LoadParsers(initialPath string, loader *modules.ModuleLoader, locatorConfig
 	}
 
 	if len(rootPaths) == 0 {
-		return nil, errors.New("No valid Terraform files found at the given path, try a different directory")
+		return nil, fmt.Errorf("No valid Terraform files found at path %s, try a different directory", initialPath)
 	}
 
 	var parsers = make([]*Parser, len(rootPaths))
