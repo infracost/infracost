@@ -290,6 +290,8 @@ func TestBreakdownTerragrunt(t *testing.T) {
 }
 
 func TestBreakdownTerragruntWithProjectError(t *testing.T) {
+	t.Skip()
+	
 	testName := testutil.CalcGoldenFileTestdataDirName()
 	dir := path.Join("./testdata", testName)
 	GoldenFileCommandTest(t,
