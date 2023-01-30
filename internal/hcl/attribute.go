@@ -44,7 +44,8 @@ type Attribute struct {
 	Verbose bool
 	Logger  *logrus.Entry
 	// newMock generates a mock value for the attribute if it's value is missing.
-	newMock func(attr *Attribute) cty.Value
+	newMock       func(attr *Attribute) cty.Value
+	previousValue cty.Value
 }
 
 // IsIterable returns if the attribute can be ranged over.
@@ -125,7 +126,29 @@ func (attr *Attribute) Value() cty.Value {
 	}
 
 	attr.Logger.Debug("fetching attribute value")
-	return attr.value(0)
+	val := attr.value(0)
+	attr.previousValue = val
+
+	return val
+}
+
+// HasChanged returns if the Attribute Value has changed since Value was last called.
+func (attr *Attribute) HasChanged() (change bool) {
+	if attr == nil {
+		return false
+	}
+
+	defer func() {
+		e := recover()
+		if e != nil {
+			attr.Logger.Debugf("HasChanged panicked with cty.Value comparison %s", e)
+			change = true
+		}
+	}()
+
+	previous := attr.previousValue
+	current := attr.value(0)
+	return !previous.RawEquals(current)
 }
 
 func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
@@ -173,7 +196,7 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 					// let's first try and find the actual value for this bad variable.
 					// If it has an actual value let's use that to pass into the list.
 					val, _ := traversal.TraverseAbs(ctx)
-					if val == cty.NilVal {
+					if val.IsNull() {
 						val = mockedVal
 					}
 

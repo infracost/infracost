@@ -2,13 +2,22 @@ Project: infracost/infracost/cmd/infracost/testdata/breakdown_with_optional_vari
 
  Name                       Monthly Qty  Unit   Monthly Cost 
                                                              
- aws_eip.test[0]                                             
+ aws_eip.test1[0]                                            
  └─ IP address (if unused)          730  hours         $3.65 
                                                              
- OVERALL TOTAL                                         $3.65 
+ aws_eip.test1[1]                                            
+ └─ IP address (if unused)          730  hours         $3.65 
+                                                             
+ aws_eip.test2[0]                                            
+ └─ IP address (if unused)          730  hours         $3.65 
+                                                             
+ aws_eip.test2[1]                                            
+ └─ IP address (if unused)          730  hours         $3.65 
+                                                             
+ OVERALL TOTAL                                        $14.60 
 ──────────────────────────────────
-1 cloud resource was detected:
-∙ 1 was estimated
+4 cloud resources were detected:
+∙ 4 were estimated
 
 Err:
 

@@ -16,9 +16,10 @@ import (
 	"github.com/shopspring/decimal"
 	"golang.org/x/mod/semver"
 
+	log "github.com/sirupsen/logrus"
+
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/schema"
-	log "github.com/sirupsen/logrus"
 )
 
 var (
@@ -127,8 +128,11 @@ func CompareTo(current, prior Root) (Root, error) {
 		scp.HasDiff = true
 
 		if v, ok := priorProjects[p.LabelWithMetadata()]; ok {
-			scp.PastResources = v.Resources
-			scp.Diff = schema.CalculateDiff(scp.PastResources, scp.Resources)
+			if !p.Metadata.HasErrors() && !v.Metadata.HasErrors() {
+				scp.PastResources = v.Resources
+				scp.Diff = schema.CalculateDiff(scp.PastResources, scp.Resources)
+			}
+
 			delete(priorProjects, p.LabelWithMetadata())
 		}
 
@@ -151,6 +155,20 @@ func CompareTo(current, prior Root) (Root, error) {
 		return out, err
 	}
 
+	// preserve the summary from the original run
+	currentProjects := make(map[string]Project)
+	for _, p := range prior.Projects {
+		currentProjects[p.LabelWithMetadata()] = p
+	}
+	for _, outP := range out.Projects {
+		if v, ok := currentProjects[outP.LabelWithMetadata()]; ok {
+			outP.Summary = v.Summary
+			outP.fullSummary = v.fullSummary
+		}
+	}
+
+	out.Summary = current.Summary
+	out.FullSummary = current.FullSummary
 	out.Currency = current.Currency
 	return out, nil
 }

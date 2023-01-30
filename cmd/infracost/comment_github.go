@@ -77,7 +77,7 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 
 			paths, _ := cmd.Flags().GetStringArray("path")
 
-			body, err := buildCommentBody(cmd, ctx, paths, output.MarkdownOptions{
+			body, hasDiff, err := buildCommentBody(cmd, ctx, paths, output.MarkdownOptions{
 				WillUpdate:          prNumber != 0 && behavior == "update",
 				WillReplace:         prNumber != 0 && behavior == "delete-and-new",
 				IncludeFeedbackLink: true,
@@ -97,7 +97,9 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 
 			dryRun, _ := cmd.Flags().GetBool("dry-run")
 			if !dryRun {
-				err = commentHandler.CommentWithBehavior(ctx.Context(), behavior, string(body))
+				skipNoDiff, _ := cmd.Flags().GetBool("skip-no-diff")
+
+				posted, err := commentHandler.CommentWithBehavior(ctx.Context(), !hasDiff && skipNoDiff, behavior, string(body))
 				if err != nil {
 					return err
 				}
@@ -108,7 +110,11 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 					logging.Logger.WithError(err).Error("could not report infracost-comment event")
 				}
 
-				cmd.Println("Comment posted to GitHub")
+				if posted {
+					cmd.Println("Comment posted to GitHub")
+				} else {
+					cmd.Println("Comment not posted to GitHub (skipped)")
+				}
 			} else {
 				cmd.Println(string(body))
 				cmd.Println("Comment not posted to GitHub (--dry-run was specified)")

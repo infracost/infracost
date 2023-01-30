@@ -63,6 +63,15 @@ func TestOutputFormatGitHubCommentWithProjectNamesWithMetadata(t *testing.T) {
 		}, nil)
 }
 
+func TestOutputFormatGitHubCommentWithProjectErrors(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"output",
+			"--format", "github-comment",
+			"--path", "./testdata/out_with_project_error.json",
+		}, nil)
+}
+
 func TestOutputFormatGitHubCommentMultipleSkipped(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--format", "github-comment", "--path", "./testdata/example_out.json", "--path", "./testdata/terraform_v0.14_breakdown.json", "--path", "./testdata/terraform_v0.14_nochange_breakdown.json", "--path", "./testdata/terraform_v0.14_nochange_breakdown.json"}, nil)
 }
@@ -127,6 +136,10 @@ func TestOutputFormatSlackMessageMoreProjects(t *testing.T) {
 
 func TestOutputFormatTable(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--format", "table", "--path", "./testdata/example_out.json", "--path", "./testdata/azure_firewall_out.json"}, nil)
+}
+
+func TestOutputFormatTableWithError(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--format", "table", "--path", "./testdata/out_with_project_error.json"}, nil)
 }
 
 func TestOutputTerraformFieldsAll(t *testing.T) {

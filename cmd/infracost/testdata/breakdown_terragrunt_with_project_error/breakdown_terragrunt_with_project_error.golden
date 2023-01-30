@@ -1,0 +1,34 @@
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_with_project_error/dev
+Module path: dev
+
+Errors:
+  failed to evaluated Terraform directory testdata/breakdown_terragrunt_with_project_error/dev:
+     No valid Terraform files found at the given path, try a different directory
+
+──────────────────────────────────
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_with_project_error/prod
+Module path: prod
+
+ Name                                                           Monthly Qty  Unit                        Monthly Cost 
+                                                                                                                      
+ aws_instance.web_app                                                                                                 
+ ├─ Instance usage (Linux/UNIX, on-demand, m5.4xlarge)                  730  hours                            $560.64 
+ ├─ root_block_device                                                                                                 
+ │  └─ Storage (general purpose SSD, gp2)                               100  GB                                $10.00 
+ └─ ebs_block_device[0]                                                                                               
+    ├─ Storage (provisioned IOPS SSD, io1)                            1,000  GB                               $125.00 
+    └─ Provisioned IOPS                                                 800  IOPS                              $52.00 
+                                                                                                                      
+ aws_lambda_function.hello_world                                                                                      
+ ├─ Requests                                            Monthly cost depends on usage: $0.20 per 1M requests          
+ └─ Duration (first 6B)                                 Monthly cost depends on usage: $0.0000166667 per GB-seconds   
+                                                                                                                      
+ Project total                                                                                                $747.64 
+
+ OVERALL TOTAL                                                                                                $747.64 
+──────────────────────────────────
+2 cloud resources were detected:
+∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+
+Err:
+

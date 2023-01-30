@@ -1,0 +1,150 @@
+{
+  "version": "0.2",
+  "metadata": {
+    "infracostCommand": "breakdown",
+    "vcsBranch": "fix/preserve_diff_summary",
+    "vcsCommitSha": "1e9f236e698f8529d9bd333bcd1092ceaa928f4b",
+    "vcsCommitAuthorName": "Hugo Rut",
+    "vcsCommitAuthorEmail": "hugorut@gmail.com",
+    "vcsCommitTimestamp": "2023-01-24T09:52:59Z",
+    "vcsCommitMessage": " fix: add filename to lambda function to prevent test failures (#2235)\n\n* fix: add filename to lambda function to prevent test failures\r\n\r\n* fix: add doesnotexit module with invalid files to ensure correct error for test\r\n\r\n* fix: aws lambda test",
+    "vcsRepositoryUrl": "https://github.com/infracost/infracost.git"
+  },
+  "currency": "USD",
+  "projects": [
+    {
+      "name": "infracost/infracost/cmd/infracost/testdata/express_route_gateway_plan.json",
+      "metadata": {
+        "path": "cmd/infracost/testdata/express_route_gateway_plan.json",
+        "type": "terraform_plan_json",
+        "vcsSubPath": "cmd/infracost/testdata/express_route_gateway_plan.json"
+      },
+      "pastBreakdown": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
+      },
+      "breakdown": {
+        "resources": [
+          {
+            "name": "azurerm_express_route_connection.express_route_conn",
+            "metadata": {},
+            "hourlyCost": "0.05",
+            "monthlyCost": "36.5",
+            "costComponents": [
+              {
+                "name": "ER Connections",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.05",
+                "hourlyCost": "0.05",
+                "monthlyCost": "36.5"
+              }
+            ]
+          },
+          {
+            "name": "azurerm_express_route_gateway.express_route",
+            "metadata": {},
+            "hourlyCost": "0.42",
+            "monthlyCost": "306.6",
+            "costComponents": [
+              {
+                "name": "ER scale units (2 Gbps)",
+                "unit": "scale units",
+                "hourlyQuantity": "0.0013698630136986",
+                "monthlyQuantity": "1",
+                "price": "306.6",
+                "hourlyCost": "0.42",
+                "monthlyCost": "306.6"
+              }
+            ]
+          }
+        ],
+        "totalHourlyCost": "0.47",
+        "totalMonthlyCost": "343.1"
+      },
+      "diff": {
+        "resources": [
+          {
+            "name": "azurerm_express_route_connection.express_route_conn",
+            "metadata": {},
+            "hourlyCost": "0.05",
+            "monthlyCost": "36.5",
+            "costComponents": [
+              {
+                "name": "ER Connections",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.05",
+                "hourlyCost": "0.05",
+                "monthlyCost": "36.5"
+              }
+            ]
+          },
+          {
+            "name": "azurerm_express_route_gateway.express_route",
+            "metadata": {},
+            "hourlyCost": "0.42",
+            "monthlyCost": "306.6",
+            "costComponents": [
+              {
+                "name": "ER scale units (2 Gbps)",
+                "unit": "scale units",
+                "hourlyQuantity": "0.0013698630136986",
+                "monthlyQuantity": "1",
+                "price": "306.6",
+                "hourlyCost": "0.42",
+                "monthlyCost": "306.6"
+              }
+            ]
+          }
+        ],
+        "totalHourlyCost": "0.47",
+        "totalMonthlyCost": "343.1"
+      },
+      "summary": {
+        "totalDetectedResources": 8,
+        "totalSupportedResources": 2,
+        "totalUnsupportedResources": 3,
+        "totalUsageBasedResources": 0,
+        "totalNoPriceResources": 3,
+        "unsupportedResourceCounts": {
+          "azurerm_express_route_circuit": 1,
+          "azurerm_express_route_circuit_peering": 1,
+          "azurerm_express_route_port": 1
+        },
+        "noPriceResourceCounts": {
+          "azurerm_resource_group": 1,
+          "azurerm_virtual_hub": 1,
+          "azurerm_virtual_wan": 1
+        }
+      }
+    }
+  ],
+  "totalHourlyCost": "0.47",
+  "totalMonthlyCost": "343.1",
+  "pastTotalHourlyCost": "0",
+  "pastTotalMonthlyCost": "0",
+  "diffTotalHourlyCost": "0.47",
+  "diffTotalMonthlyCost": "343.1",
+  "timeGenerated": "2023-01-24T13:58:36.056526Z",
+  "summary": {
+    "totalDetectedResources": 8,
+    "totalSupportedResources": 2,
+    "totalUnsupportedResources": 3,
+    "totalUsageBasedResources": 0,
+    "totalNoPriceResources": 3,
+    "unsupportedResourceCounts": {
+      "azurerm_express_route_circuit": 1,
+      "azurerm_express_route_circuit_peering": 1,
+      "azurerm_express_route_port": 1
+    },
+    "noPriceResourceCounts": {
+      "azurerm_resource_group": 1,
+      "azurerm_virtual_hub": 1,
+      "azurerm_virtual_wan": 1
+    }
+  }
+}

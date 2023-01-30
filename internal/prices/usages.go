@@ -78,47 +78,49 @@ func popResourceActualCosts(ctx *config.RunContext, c *apiclient.UsageAPIClient,
 		Address:              r.Name,
 		Currency:             c.Currency,
 	}
-	actualCost, err := c.ListActualCosts(vars)
-	if actualCost == nil || err != nil {
+	actualCostResults, err := c.ListActualCosts(vars)
+	if actualCostResults == nil || err != nil {
 		return err
 	}
 
-	actualCosts := &schema.ActualCosts{
-		ResourceID:     actualCost.ResourceID,
-		StartTimestamp: actualCost.StartTimestamp.UTC(),
-		EndTimestamp:   actualCost.EndTimestamp.UTC(),
-		CostComponents: make([]*schema.CostComponent, 0, len(actualCost.CostComponents)),
-	}
-
-	for _, actual := range actualCost.CostComponents {
-		monthlyCost, err := decimal.NewFromString(actual.MonthlyCost)
-		if err != nil {
-			break
+	for _, actualCost := range actualCostResults {
+		actualCosts := &schema.ActualCosts{
+			ResourceID:     actualCost.ResourceID,
+			StartTimestamp: actualCost.StartTimestamp.UTC(),
+			EndTimestamp:   actualCost.EndTimestamp.UTC(),
+			CostComponents: make([]*schema.CostComponent, 0, len(actualCost.CostComponents)),
 		}
 
-		monthlyQuantity, err := decimal.NewFromString(actual.MonthlyQuantity)
-		if err != nil {
-			break
-		}
-		price, err := decimal.NewFromString(actual.Price)
-		if err != nil {
-			break
+		for _, actual := range actualCost.CostComponents {
+			monthlyCost, err := decimal.NewFromString(actual.MonthlyCost)
+			if err != nil {
+				break
+			}
+
+			monthlyQuantity, err := decimal.NewFromString(actual.MonthlyQuantity)
+			if err != nil {
+				break
+			}
+			price, err := decimal.NewFromString(actual.Price)
+			if err != nil {
+				break
+			}
+
+			cc := &schema.CostComponent{
+				Name:            actual.Description,
+				Unit:            actual.Unit,
+				UnitMultiplier:  decimal.NewFromInt(1),
+				MonthlyCost:     &monthlyCost,
+				MonthlyQuantity: &monthlyQuantity,
+			}
+			cc.SetPrice(price)
+
+			actualCosts.CostComponents = append(actualCosts.CostComponents, cc)
 		}
 
-		cc := &schema.CostComponent{
-			Name:            actual.Description,
-			Unit:            actual.Unit,
-			UnitMultiplier:  decimal.NewFromInt(1),
-			MonthlyCost:     &monthlyCost,
-			MonthlyQuantity: &monthlyQuantity,
+		if len(actualCosts.CostComponents) > 0 {
+			r.ActualCosts = append(r.ActualCosts, actualCosts)
 		}
-		cc.SetPrice(price)
-
-		actualCosts.CostComponents = append(actualCosts.CostComponents, cc)
-	}
-
-	if len(actualCosts.CostComponents) > 0 {
-		r.ActualCosts = actualCosts
 	}
 
 	return nil

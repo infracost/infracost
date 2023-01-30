@@ -17,6 +17,11 @@ module "registry-submodule" {
   }
 }
 
+module "registry-submodule-records" {
+  source  = "terraform-aws-modules/route53/aws//modules/records"
+  version = "2.5.0"
+}
+
 module "git-submodule" {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git//modules/zones"
 

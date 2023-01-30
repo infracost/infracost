@@ -1,6 +1,9 @@
 # IDE
 .vscode/
 .idea/
+*.suo
+*.wsuo
+VSWorkspaceState.json
 
 # OS
 **/.DS_Store

@@ -3,12 +3,15 @@ package scan
 import (
 	"encoding/json"
 	"fmt"
+	"reflect"
 	"sort"
 
 	"github.com/imdario/mergo"
 	jsoniter "github.com/json-iterator/go"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
+	"github.com/tidwall/gjson"
+	"github.com/tidwall/sjson"
 
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/config"
@@ -45,6 +48,19 @@ func NewTerraformPlanScanner(ctx *config.RunContext, logger *log.Entry, getPrice
 // the Scanner will attempt to fetch costs for the suggestion and given resource. These suggestions will only
 // be provided for resources that are marked as a schema.CoreResource.
 func (s *TerraformPlanScanner) ScanPlan(project *schema.Project, projectPlan []byte) error {
+	res := gjson.ParseBytes(projectPlan)
+
+	// if we have the infracost_resource_changes then this projectPlan has been passed from the HCLProvider,
+	// and we need to transform this list to the standard `resource_changes` key.
+	changes := res.Get("infracost_resource_changes")
+	if changes.Exists() {
+		standardPlan, err := sjson.SetBytes(projectPlan, "resource_changes", changes.Value())
+		if err != nil {
+			s.logger.WithError(err).Debugf("failed to set resource_changes on plan before policy API evaluation")
+		}
+		projectPlan = standardPlan
+	}
+
 	apiPolicies, err := s.policyAPIClient.GetPolicies(projectPlan)
 	if err != nil {
 		return fmt.Errorf("failed to get suggestions %w", err)
@@ -82,24 +98,33 @@ func (s *TerraformPlanScanner) ScanPlan(project *schema.Project, projectPlan []b
 			continue
 		}
 
-		baselineSchema, err := jsoniter.Marshal(coreResource)
+		// copy the coreResource here as the underlying interface is a pointer to a struct.
+		// If we don't copy the value then when we set the values to cost the policy we will
+		// overwrite the struct fields causing Infracost output to be incorrect.
+		clone, err := deepCopy(coreResource)
+		if err != nil {
+			s.logger.WithError(err).Debugf("failed to clone core resource type: %s", coreResource.CoreType())
+			continue
+		}
+
+		baselineSchema, err := jsoniter.Marshal(clone)
 		if err != nil {
 			s.logger.WithError(err).Debug("could not marshal initial schema for policy resource")
 			continue
 		}
 
-		baselineResource, err := s.buildResource(coreResource, resource.ResourceData.UsageData)
+		baselineResource, err := s.buildResource(clone, resource.ResourceData.UsageData)
 		if err != nil {
 			s.logger.WithError(err).Debug("could not fetch prices for initial resource")
 			continue
 		}
 
-		for _, policy := range recMap[coreResource.CoreType()] {
+		for _, policy := range recMap[clone.CoreType()] {
 			if policy.Address != baselineResource.Name {
 				continue
 			}
 
-			costedPolicy, err := s.costSuggestion(coreResource, baselineSchema, baselineResource, resource.ResourceData.UsageData, policy)
+			costedPolicy, err := s.costSuggestion(clone, baselineSchema, baselineResource, resource.ResourceData.UsageData, policy)
 			if err != nil {
 				s.logger.WithError(err).Debugf("failed to cost policy for resource %s", baselineResource.Name)
 				continue
@@ -195,4 +220,26 @@ func mergeSuggestionWithResource(schema []byte, suggestedSchema []byte, resource
 	}
 
 	return nil
+}
+
+func deepCopy(v schema.CoreResource) (r schema.CoreResource, err error) {
+	defer func() {
+		e := recover()
+		if e != nil {
+			err = fmt.Errorf("deepCopy recover from interface conversion %s", e)
+		}
+	}()
+
+	data, err := jsoniter.Marshal(v)
+	if err != nil {
+		return nil, err
+	}
+
+	vptr := reflect.New(reflect.TypeOf(v))
+	err = jsoniter.Unmarshal(data, vptr.Interface())
+	if err != nil {
+		return nil, err
+	}
+
+	return vptr.Elem().Interface().(schema.CoreResource), nil
 }

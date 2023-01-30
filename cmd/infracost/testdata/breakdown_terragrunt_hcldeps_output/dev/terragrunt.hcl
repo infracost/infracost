@@ -10,6 +10,10 @@ dependency "test2" {
   config_path = "../prod2"
 }
 
+dependency "stag-dep" {
+  config_path = "../stag"
+}
+
 terraform {
   source = "..//modules/example"
 }
@@ -21,15 +25,15 @@ inputs = {
   block_device_iops             = dependency.test2.outputs.block_iops
 
   test_input = {
-    input1 = dependency.test2.outputs.obj.foo
-    input2 = dependency.test2.outputs.obj.bar
-    input3 = dependency.test2.outputs.improper_mock.foo
-    input4 = dependency.test2.outputs.improper_mock.bar
-    input5 = dependency.test2.outputs.list[0].foo
-    input6 = dependency.test2.outputs.list[1].bar
-    input7 = dependency.test2.outputs.improper_mock2[0].foo
-    input8 = dependency.test2.outputs.map["foo"].bar
-    input9 = dependency.test2.outputs.map["baz"].bat
+    input1  = dependency.test2.outputs.obj.foo
+    input2  = dependency.test2.outputs.obj.bar
+    input3  = dependency.test2.outputs.improper_mock.foo
+    input4  = dependency.test2.outputs.improper_mock.bar
+    input5  = dependency.test2.outputs.list[0].foo
+    input6  = dependency.test2.outputs.list[1].bar
+    input7  = dependency.test2.outputs.improper_mock2[0].foo
+    input8  = dependency.test2.outputs.map["foo"].bar
+    input9  = dependency.test2.outputs.map["baz"].bat
     input10 = dependency.test2.outputs.improper_mock3["foo"].bar
     input11 = dependency.test2.outputs.not_exist.foo
     input12 = dependency.test2.outputs.not_exist_list[0].foo
@@ -47,6 +51,14 @@ inputs = {
     input24 = dependency.test2.outputs.bad_list[0]
     input24 = dependency.test2.outputs.good_list_bad_prop[0].id
     input24 = dependency.test2.outputs.bad_map["test"]
+    input25 = dependency.test2.outputs.bad_map["test"]["bar"].id
+    input26 = [dependency.test2.outputs.map_existing["test"]["bar"].id]
+    input27 = <<EOF
+    {
+      "key": "${dependency.stag-dep.outputs.retrieved_secrets.0}",
+      "key2": "${dependency.stag-dep.outputs.retrieved_secrets.1}"
+    }
+EOF
   }
 
   hello_world_function_memory_size = 512

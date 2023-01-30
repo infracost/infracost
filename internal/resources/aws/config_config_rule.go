@@ -66,7 +66,7 @@ func (r *ConfigConfigRule) configRulesCostComponent(displayName string, usageTie
 			Service:       strPtr("AWSConfig"),
 			ProductFamily: strPtr("Management Tools - AWS Config Rules"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr("/ConfigRuleEvaluations/")},
+				{Key: "usagetype", ValueRegex: regexPtr("^[A-Z0-9]*-ConfigRuleEvaluations$")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

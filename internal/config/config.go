@@ -14,11 +14,15 @@ import (
 	"github.com/infracost/infracost/internal/logging"
 )
 
+const InfracostDir = ".infracost"
+
 // Project defines a specific terraform project config. This can be used
 // specify per folder/project configurations so that users don't have
 // to provide flags every run. Fields are documented below. More info
 // is outlined here: https://www.infracost.io/config-file
 type Project struct {
+	// ConfigSha can be provided to identify the configuration used for the project
+	ConfigSha string `yaml:"config_sha,omitempty"  ignored:"true"`
 	// Path to the Terraform directory or JSON/plan file.
 	// A path can be repeated with different parameters, e.g. for multiple workspaces.
 	Path string `yaml:"path,omitempty" ignored:"true"`
@@ -78,6 +82,7 @@ type Config struct {
 	PolicyAPIEndpoint         string `yaml:"policy_api_endpoint" envconfig:"POLICY_API_ENDPOINT"`
 	EnableDashboard           bool   `yaml:"enable_dashboard,omitempty" envconfig:"ENABLE_DASHBOARD"`
 	EnableCloud               *bool  `yaml:"enable_cloud,omitempty" envconfig:"ENABLE_CLOUD"`
+	EnableCloudUpload         *bool  `yaml:"enable_cloud,omitempty" envconfig:"ENABLE_CLOUD_UPLOAD"`
 	DisableHCLParsing         bool   `yaml:"disable_hcl_parsing,omitempty" envconfig:"DISABLE_HCL_PARSING"`
 
 	TLSInsecureSkipVerify *bool  `envconfig:"TLS_INSECURE_SKIP_VERIFY"`
@@ -100,6 +105,7 @@ type Config struct {
 	SyncUsageFile   bool       `yaml:"sync_usage_file,omitempty" ignored:"true"`
 	Fields          []string   `yaml:"fields,omitempty" ignored:"true"`
 	CompareTo       string
+	GitDiffTarget   *string
 
 	// Base configuration settings
 	// RootPath defines the raw value of the `--path` flag provided by the user
@@ -148,7 +154,7 @@ func DefaultConfig() *Config {
 // RepoPath returns the filepath to either the config-file location or initial path provided by the user.
 func (c *Config) RepoPath() string {
 	if c.ConfigFilePath != "" {
-		return c.ConfigFilePath
+		return strings.TrimRight(c.ConfigFilePath, filepath.Base(c.ConfigFilePath))
 	}
 
 	return c.RootPath

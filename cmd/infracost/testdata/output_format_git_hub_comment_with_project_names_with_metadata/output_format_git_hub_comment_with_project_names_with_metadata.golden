@@ -20,19 +20,19 @@
     </tr>
     <tr>
       <td>my terragrunt project</td>
-      <td>prod</td>
-      <td></td>
-      <td align="right">$1,308</td>
-      <td align="right">$748</td>
-      <td>-$560.64 (-43%)</td>
-    </tr>
-    <tr>
-      <td>my terragrunt project</td>
       <td>dev</td>
       <td>ws2</td>
       <td align="right">$51.09</td>
       <td align="right">$51.97</td>
       <td>+$0.88 (+2%)</td>
+    </tr>
+    <tr>
+      <td>my terragrunt project</td>
+      <td>prod</td>
+      <td></td>
+      <td align="right">$1,308</td>
+      <td align="right">$748</td>
+      <td>-$560.64 (-43%)</td>
     </tr>
     <tr>
       <td>my terragrunt project</td>
@@ -68,6 +68,7 @@
     </tr>
   </tbody>
 </table>
+
 
 <details>
 <summary><strong>Infracost output</strong></summary>

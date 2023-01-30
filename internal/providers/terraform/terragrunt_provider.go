@@ -69,6 +69,8 @@ func (p *TerragruntProvider) DisplayType() string {
 }
 
 func (p *TerragruntProvider) AddMetadata(metadata *schema.ProjectMetadata) {
+	metadata.ConfigSha = p.ctx.ProjectConfig.ConfigSha
+
 	basePath := p.ctx.ProjectConfig.Path
 	if p.ctx.RunContext.Config.ConfigFilePath != "" {
 		basePath = filepath.Dir(p.ctx.RunContext.Config.ConfigFilePath)
@@ -242,7 +244,7 @@ func (p *TerragruntProvider) generateStateJSONs(projectDirs []terragruntProjectD
 			defer os.Remove(opts.TerraformConfigFile)
 		}
 
-		out, err := p.runShow(opts, spinner, "")
+		out, err := p.runShow(opts, spinner, "", false)
 		if err != nil {
 			return outs, err
 		}
@@ -315,7 +317,7 @@ func (p *TerragruntProvider) generatePlanJSONs(projectDirs []terragruntProjectDi
 			defer os.Remove(opts.TerraformConfigFile)
 		}
 
-		out, err := p.runShow(opts, spinner, filepath.Join(projectDir.WorkingDir, planFile))
+		out, err := p.runShow(opts, spinner, filepath.Join(projectDir.WorkingDir, planFile), false)
 		if err != nil {
 			return outs, err
 		}

@@ -50,12 +50,12 @@ projects:
 			},
 		},
 		{
-			name: "should return error if no projects given",
+			name: "should not return error if no projects given",
 			contents: []byte(`version: 0.1
 
 projects:
 `),
-			error: &YamlError{raw: ErrorNilProjects},
+			expected: nil,
 		},
 		{
 			name: "should return panic error wrapped with invalid config file error",

@@ -51,16 +51,33 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 
 		s += "\n"
 
-		tableOut := tableForBreakdown(out.Currency, *project.Breakdown, opts.Fields, includeProjectTotals)
+		if project.Metadata.HasErrors() {
+			s += ui.BoldString("Errors:") + "\n"
 
-		// Get the last table length so we can align the overall total with it
-		if i == len(out.Projects)-1 {
-			tableLen = len(ui.StripColor(strings.SplitN(tableOut, "\n", 2)[0]))
+			for _, diag := range project.Metadata.Errors {
+				pieces := strings.Split(diag.Message, ":")
+				for x, piece := range pieces {
+					s += strings.Repeat("  ", x+1) + piece
+
+					if len(pieces)-1 == x {
+						s += "\n"
+					} else {
+						s += ":\n"
+					}
+				}
+			}
+		} else {
+			tableOut := tableForBreakdown(out.Currency, *project.Breakdown, opts.Fields, includeProjectTotals)
+
+			// Get the last table length so we can align the overall total with it
+			if i == len(out.Projects)-1 {
+				tableLen = len(ui.StripColor(strings.SplitN(tableOut, "\n", 2)[0]))
+			}
+
+			s += tableOut
+
+			s += "\n"
 		}
-
-		s += tableOut
-
-		s += "\n"
 
 		if i != len(out.Projects)-1 {
 			s += "\n"
@@ -263,36 +280,37 @@ func buildCostComponentRows(t table.Writer, currency string, costComponents []Co
 	}
 }
 
-func buildActualCostRows(t table.Writer, currency string, ac *ActualCosts, prefix string, fields []string) {
-	if ac == nil {
-		return
-	}
-
-	labelPrefix := ui.FaintString(prefix + "└─")
-
-	var dateRange string
-	if !ac.StartTimestamp.IsZero() && !ac.EndTimestamp.IsZero() {
-		// We want to display the range as "days" which means "inclusive", so subtract
-		// 1 nano second from the exclusive endTimestamp.  This means the (exclusive) timestamp
-		// range "2020/10/10 00:00:00Z-2020/10/20 00:00:00Z" will be displayed as the (inclusive)
-		// day range "2020/10/10 - 2020/10/19".
-		endDay := ac.EndTimestamp.Add(-1)
-		endFmt := "Jan 2"
-		if ac.StartTimestamp.Month() == endDay.Month() {
-			endFmt = "2"
+func buildActualCostRows(t table.Writer, currency string, actualCosts []ActualCosts, prefix string, fields []string) {
+	for i, ac := range actualCosts {
+		labelPrefix := prefix + "├─"
+		if i == len(actualCosts)-1 {
+			labelPrefix = prefix + "└─"
 		}
-		dateRange = fmt.Sprintf(" %s-%s", ac.StartTimestamp.Format("Jan 2"), endDay.Format(endFmt))
-	}
-	var resourceID string
-	if ac.ResourceID != "" {
-		resourceID = fmt.Sprintf(" (%s)", ac.ResourceID)
-	}
 
-	t.AppendRow(
-		table.Row{fmt.Sprintf("%s Actual costs%s%s", labelPrefix, dateRange, resourceID)},
-		table.RowConfig{AutoMerge: true},
-	)
-	buildCostComponentRows(t, currency, ac.CostComponents, prefix+"   ", false, fields)
+		var dateRange string
+		if !ac.StartTimestamp.IsZero() && !ac.EndTimestamp.IsZero() {
+			// We want to display the range as "days" which means "inclusive", so subtract
+			// 1 nano second from the exclusive endTimestamp.  This means the (exclusive) timestamp
+			// range "2020/10/10 00:00:00Z-2020/10/20 00:00:00Z" will be displayed as the (inclusive)
+			// day range "2020/10/10 - 2020/10/19".
+			endDay := ac.EndTimestamp.Add(-1)
+			endFmt := "Jan 2"
+			if ac.StartTimestamp.Month() == endDay.Month() {
+				endFmt = "2"
+			}
+			dateRange = fmt.Sprintf(" %s-%s", ac.StartTimestamp.Format("Jan 2"), endDay.Format(endFmt))
+		}
+		var resourceID string
+		if ac.ResourceID != "" {
+			resourceID = fmt.Sprintf(" (%s)", ac.ResourceID)
+		}
+
+		t.AppendRow(
+			table.Row{fmt.Sprintf("%s Actual costs%s%s", labelPrefix, dateRange, resourceID)},
+			table.RowConfig{AutoMerge: true},
+		)
+		buildCostComponentRows(t, currency, ac.CostComponents, prefix+"   ", false, fields)
+	}
 }
 
 func filterZeroValComponents(costComponents []CostComponent, resourceName string) []CostComponent {

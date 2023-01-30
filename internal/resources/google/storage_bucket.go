@@ -156,6 +156,18 @@ func operationsCostComponents(storageClass string, monthlyClassAOperations, mont
 		"ARCHIVE":        "ArchiveOps",
 	}
 
+	resourceGroup := storageClassResourceGroupMap[storageClass]
+
+	var descriptionRegex string
+	switch resourceGroup {
+	case "RegionalOps":
+		descriptionRegex = "^(?!Multi-Region|Dual-Region)(?:(?!Tagging).)*"
+	case "MultiRegionalOps":
+		descriptionRegex = "^(?:(?!Tagging).)*"
+	default:
+		descriptionRegex = "^(?!Regional|Multi-Region|Dual-Region|Region)(?:(?!Tagging).)*"
+	}
+
 	return []*schema.CostComponent{
 		{
 			Name:            "Object adds, bucket/object list (class A)",
@@ -166,8 +178,8 @@ func operationsCostComponents(storageClass string, monthlyClassAOperations, mont
 				VendorName: strPtr("gcp"),
 				Service:    strPtr("Cloud Storage"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "resourceGroup", Value: strPtr(storageClassResourceGroupMap[storageClass])},
-					{Key: "description", ValueRegex: regexPtr("^(?:(?!Tagging).)* Class A")},
+					{Key: "resourceGroup", Value: strPtr(resourceGroup)},
+					{Key: "description", ValueRegex: regexPtr(fmt.Sprintf("%sClass A", descriptionRegex))},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
@@ -183,8 +195,8 @@ func operationsCostComponents(storageClass string, monthlyClassAOperations, mont
 				VendorName: strPtr("gcp"),
 				Service:    strPtr("Cloud Storage"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "resourceGroup", Value: strPtr(storageClassResourceGroupMap[storageClass])},
-					{Key: "description", ValueRegex: regexPtr("^(?:(?!Tagging).)* Class B")},
+					{Key: "resourceGroup", Value: strPtr(resourceGroup)},
+					{Key: "description", ValueRegex: regexPtr(fmt.Sprintf("%sClass B", descriptionRegex))},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{

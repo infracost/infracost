@@ -17,10 +17,7 @@ const (
 	maxConfigFileVersion = "0.1"
 )
 
-var (
-	ErrorInvalidConfigFile = errors.New("parsing config file failed check file syntax")
-	ErrorNilProjects       = errors.New("no projects specified in config file, please specify at least one project, see https://infracost.io/config-file for file specification")
-)
+var ErrorInvalidConfigFile = errors.New("parsing config file failed check file syntax")
 
 // YamlError is a custom error type that allows setting multiple
 // error messages under a base message. It is used to decipher
@@ -138,10 +135,6 @@ func (f *fileSpec) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		tag := v.Field(i).Tag.Get("yaml")
 		pieces := strings.Split(tag, ",")
 		allowedKeys[strings.TrimSpace(pieces[0])] = struct{}{}
-	}
-
-	if len(r.Projects) == 0 {
-		return &YamlError{raw: ErrorNilProjects}
 	}
 
 	validationError := &YamlError{

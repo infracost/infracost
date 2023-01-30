@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"runtime"
 	"runtime/debug"
 	"sort"
 	"strings"
@@ -14,6 +13,7 @@ import (
 	"time"
 
 	"github.com/Rhymond/go-money"
+	"github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
@@ -68,6 +68,8 @@ func addRunFlags(cmd *cobra.Command) {
 
 	cmd.Flags().StringSlice("exclude-path", nil, "Paths of directories to exclude, glob patterns need quotes")
 	cmd.Flags().Bool("include-all-paths", false, "Set project auto-detection to use all subdirectories in given path")
+	cmd.Flags().String("git-diff-target", "master", "Show only costs that have git changes compared to the provided branch. Use the name of the current branch to fetch changes from the last two commits")
+	_ = cmd.Flags().MarkHidden("git-diff-target")
 
 	cmd.Flags().Bool("no-cache", false, "Don't attempt to cache Terraform plans")
 
@@ -91,7 +93,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	}
 
 	repoPath := runCtx.Config.RepoPath()
-	metadata, err := vcs.MetadataFetcher.Get(repoPath)
+	metadata, err := vcs.MetadataFetcher.Get(repoPath, runCtx.Config.GitDiffTarget)
 	if err != nil {
 		logging.Logger.WithError(err).Debugf("failed to fetch vcs metadata for path %s", repoPath)
 	}
@@ -128,6 +130,11 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		go formatHCLProjects(wg, runCtx, hclProjects, hclR)
 	}
 
+	err = checkIfAllProjectsErrored(projects)
+	if err != nil {
+		return err
+	}
+
 	r, err := output.ToOutputFormat(projects)
 	if err != nil {
 		return err
@@ -145,7 +152,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	r.Currency = runCtx.Config.Currency
 	r.Metadata = output.NewMetadata(runCtx)
 
-	if runCtx.IsCloudEnabled() {
+	if runCtx.IsCloudUploadEnabled() {
 		dashboardClient := apiclient.NewDashboardAPIClient(runCtx)
 		result, err := dashboardClient.AddRun(runCtx, r)
 		if err != nil {
@@ -154,7 +161,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 
 		r.RunID, r.ShareURL = result.RunID, result.ShareURL
 	} else {
-		log.Debug("Skipping sending project results since Infracost Cloud is not enabled.")
+		log.Debug("Skipping sending project results since Infracost Cloud upload is not enabled.")
 	}
 
 	format := strings.ToLower(runCtx.Config.Format)
@@ -198,6 +205,42 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 			cmd.PrintErrln()
 		}
 		cmd.Println(string(b))
+	}
+
+	return nil
+}
+
+func checkIfAllProjectsErrored(projects []*schema.Project) error {
+	allError := true
+
+	if len(projects) == 0 {
+		allError = false
+	}
+
+	for _, project := range projects {
+		if !project.Metadata.HasErrors() {
+			allError = false
+			break
+		}
+	}
+
+	if allError {
+		multi := &multierror.Error{}
+		for _, project := range projects {
+			msg := fmt.Sprintf("project %s errored: \n", project.Name)
+			for i, diag := range project.Metadata.Errors {
+				msg += "\t\t\t" + diag.Message
+
+				if i != len(project.Metadata.Errors)-1 {
+					msg += "\n"
+				}
+
+			}
+
+			multi.Errors = append(multi.Errors, errors.New(msg))
+		}
+
+		return multi
 	}
 
 	return nil
@@ -257,7 +300,7 @@ func newParallelRunner(cmd *cobra.Command, runCtx *config.RunContext) (*parallel
 		prior = &snapshot
 	}
 
-	parallelism, err := getParallelism(cmd, runCtx)
+	parallelism, err := runCtx.GetParallelism()
 	if err != nil {
 		return nil, err
 	}
@@ -792,36 +835,16 @@ func (r *parallelRunner) generateUsageFile(ctx *config.ProjectContext, provider 
 	return nil
 }
 
-func getParallelism(cmd *cobra.Command, runCtx *config.RunContext) (int, error) {
-	var parallelism int
-
-	if runCtx.Config.Parallelism == nil {
-		parallelism = 4
-		numCPU := runtime.NumCPU()
-		if numCPU*4 > parallelism {
-			parallelism = numCPU * 4
-		}
-		if parallelism > 16 {
-			parallelism = 16
-		}
-	} else {
-		parallelism = *runCtx.Config.Parallelism
-
-		if parallelism < 0 {
-			return parallelism, fmt.Errorf("parallelism must be a positive number")
-		}
-
-		if parallelism > 16 {
-			return parallelism, fmt.Errorf("parallelism must be less than 16")
-		}
-	}
-
-	return parallelism, nil
-}
-
 func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	hasPathFlag := cmd.Flags().Changed("path")
 	hasConfigFile := cmd.Flags().Changed("config-file")
+
+	if cmd.Flags().Changed("git-diff-target") {
+		s, _ := cmd.Flags().GetString("git-diff-target")
+		cfg.GitDiffTarget = &s
+	}
+
+	cfg.CompareTo, _ = cmd.Flags().GetString("compare-to")
 
 	cfg.CompareTo, _ = cmd.Flags().GetString("compare-to")
 

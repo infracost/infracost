@@ -65,6 +65,14 @@ func newAzureRMMSSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schem
 
 	sku := d.GetStringOrDefault("sku_name", "GP_S_Gen5_2")
 
+	if strings.ToLower(sku) == "elasticpool" {
+		return &schema.Resource{
+			Name:      d.Address,
+			NoPrice:   true,
+			IsSkipped: true,
+		}
+	}
+
 	var maxSize *float64
 	if !d.IsEmpty("max_size_gb") {
 		val := d.Get("max_size_gb").Float()

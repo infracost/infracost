@@ -88,6 +88,20 @@ func TestBreakdownMultiProjectAutodetect(t *testing.T) {
 	)
 }
 
+func TestBreakdownConfigFile(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--config-file", path.Join(dir, "infracost.yml"),
+			"--format", "json",
+		}, nil,
+	)
+}
+
 func TestBreakdownMultiProjectSkipPaths(t *testing.T) {
 	testName := testutil.CalcGoldenFileTestdataDirName()
 	dir := path.Join("./testdata", testName)
@@ -275,6 +289,19 @@ func TestBreakdownTerragrunt(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terragrunt"}, nil)
 }
 
+func TestBreakdownTerragruntWithProjectError(t *testing.T) {
+	t.Skip()
+
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(t,
+		testName,
+		[]string{
+			"breakdown",
+			"--path", dir},
+		nil)
+}
+
 func TestBreakdownTerragruntWithDashboardEnabled(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terragrunt"}, nil, func(c *config.RunContext) {
 		c.Config.EnableDashboard = true
@@ -339,6 +366,10 @@ func TestBreakdownTerragruntNested(t *testing.T) {
 }
 
 func TestBreakdownTerragruntIAMRoles(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())}, nil)
+}
+
+func TestBreakdownTerragruntExtraArgs(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())}, nil)
 }
 
@@ -426,12 +457,12 @@ func TestBreakdownWithActualCosts(t *testing.T) {
 		bodyBytes, _ := ioutil.ReadAll(r.Body)
 		graphqlQuery := string(bodyBytes)
 
-		if strings.Contains(graphqlQuery, "actualCosts") {
-			fmt.Fprintln(w, `[{"data": {"actualCosts":{
+		if strings.Contains(graphqlQuery, "actualCostsList") {
+			fmt.Fprintln(w, `[{"data": {"actualCostsList":[{
 				"address": "aws_dynamodb_table.usage",
 				"resourceId": "arn:aws_dynamodb_table",
-				"startAt": "20220915T090909Z",
-				"endAt": "20220922T090909Z",
+				"startAt": "2022-09-15T09:09:09Z",
+				"endAt": "2022-09-22T09:09:09Z",
 				"costComponents": [{
 						"usageType": "someusagetype",
 						"description": "$0.005123 per some aws thing",
@@ -451,7 +482,23 @@ func TestBreakdownWithActualCosts(t *testing.T) {
 						"unit": "GB"
 					}
 				]
-			}}}]`)
+			},
+			{
+				"address": "aws_dynamodb_table.usage",
+				"resourceId": "arn:another_aws_dynamodb_table",
+				"startAt": "2022-08-15T09:09:09Z",
+				"endAt": "2022-09-22T09:09:09Z",
+				"costComponents": [{
+					"usageType": "someusagetype",
+					"description": "$0.005123 per some aws thing",
+					"currency": "USD",
+					"monthlyCost": "5.123",
+					"monthlyQuantity": "1000",
+					"price": "0.005123",
+					"unit": "GB"
+				}]
+			}
+			]}}]`)
 		} else if strings.Contains(graphqlQuery, "usageQuantities") {
 			keys := []string{
 				"monthly_write_request_units",
@@ -478,6 +525,7 @@ func TestBreakdownWithActualCosts(t *testing.T) {
 		&GoldenFileOptions{CaptureLogs: true},
 		func(c *config.RunContext) {
 			c.Config.UsageAPIEndpoint = ts.URL
+			c.Config.UsageActualCosts = true
 		},
 	)
 }
@@ -531,5 +579,61 @@ func TestBreakdownWithDeepMergeModule(t *testing.T) {
 			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
 		},
 		nil,
+	)
+}
+
+func TestBreakdownWithMultipleProviders(t *testing.T) {
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path",
+			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+		},
+		nil,
+	)
+}
+
+func TestBreakdownMultiProjectWithError(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", dir,
+		}, &GoldenFileOptions{CaptureLogs: true},
+	)
+}
+
+func TestBreakdownMultiProjectWithErrorOutputJSON(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testName,
+		[]string{
+			"breakdown",
+			"--format", "json",
+			"--path",
+			dir,
+			"--format",
+			"json",
+		}, &GoldenFileOptions{CaptureLogs: true},
+	)
+}
+
+func TestBreakdownMultiProjectWithAllErrors(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", dir,
+		}, &GoldenFileOptions{CaptureLogs: true},
 	)
 }

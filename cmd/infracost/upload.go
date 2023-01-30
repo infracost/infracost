@@ -61,8 +61,8 @@ See https://infracost.io/docs/features/cli_commands/#upload-runs`,
 				logging.Logger.WithError(err).Warn("could not report `infracost-upload` event")
 			}
 
-			if len(result.GuardrailCheck.BlockingFailures) > 0 {
-				return result.GuardrailCheck.BlockingFailures
+			if len(result.GuardrailCheck.BlockingFailures()) > 0 {
+				return result.GuardrailCheck.BlockingFailures()
 			}
 
 			return nil

@@ -2,6 +2,7 @@ package hcl
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 )
 
@@ -32,6 +33,34 @@ type Module struct {
 	Modules  []*Module
 	Parent   *Module
 	Warnings []Warning
+
+	HasChanges bool
+}
+
+// Index returns the count index of the Module using the name.
+// Index returns nil if the Module has no count.
+func (m *Module) Index() *int64 {
+	matches := countRegex.FindStringSubmatch(m.Name)
+
+	if len(matches) > 0 {
+		i, _ := strconv.ParseInt(matches[1], 10, 64)
+
+		return &i
+	}
+
+	return nil
+}
+
+// Key returns the foreach key of the Module using the name.
+// Key returns nil if the Module has no each key.
+func (m *Module) Key() *string {
+	matches := foreachRegex.FindStringSubmatch(m.Name)
+
+	if len(matches) > 0 {
+		return &matches[1]
+	}
+
+	return nil
 }
 
 // WarningCode is used to delineate warnings across Infracost.

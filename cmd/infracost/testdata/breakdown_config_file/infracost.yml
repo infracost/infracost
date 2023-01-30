@@ -1,0 +1,5 @@
+version: 0.1
+
+projects:
+  - path: "./testdata/breakdown_config_file/dev"
+    config_sha: "1234"

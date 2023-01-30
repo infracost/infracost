@@ -189,6 +189,7 @@
  └─ All other operations                                         100  10k operations                   $0.60 
                                                                                                              
  azurerm_storage_account.v2_hot_ragzrs                                                                       
+ ├─ List and create container operations                         100  10k operations                   $6.79 
  ├─ Read operations                                               10  10k operations                   $0.04 
  └─ All other operations                                         100  10k operations                   $0.44 
                                                                                                              
@@ -214,7 +215,7 @@
  ├─ Read operations                               Monthly cost depends on usage: $0.006 per 10k operations   
  └─ All other operations                          Monthly cost depends on usage: $0.006 per 10k operations   
                                                                                                              
- OVERALL TOTAL                                                                                 $2,121,847.27 
+ OVERALL TOTAL                                                                                 $2,121,854.06 
 ──────────────────────────────────
 33 cloud resources were detected:
 ∙ 26 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
