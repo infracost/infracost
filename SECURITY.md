@@ -1,4 +1,4 @@
-# Security policy
+#Security policy
 
 ## Reporting a vulnerability
 
