@@ -1,0 +1,100 @@
+Contribuyendo a Infracost
+🙌Gracias por contribuir y unirse a nuestra misión de ayudar a los ingenieros a utilizar la infraestructura de la nube de manera económica y eficiente.🚀.
+
+Únase a nuestro canal comunitario de Slack , somos un grupo amigable y estamos felices de ayudarlo a comenzar :)
+
+Tabla de contenido
+Descripción general
+Configuración del entorno de desarrollo
+Instalar
+Correr
+Prueba
+Pruebas unitarias
+Pruebas de integración
+Construir
+Adición de nuevos recursos
+Credenciales de Azure
+Consultando la API de GraphQL
+Revisiones de código
+Descripción general
+El proceso general para contribuir a Infracost es:
+
+Revisa el tablero de proyectos para ver si hay algo en lo que te gustaría trabajar; estos son los temas en los que nos gustaría centrarnos en un futuro próximo. Las etiquetas de problemas deberían ayudarlo a encontrar un problema en el que trabajar. También hay otros temas y debates que le gustaría consultar.
+Cree un problema nuevo si no hay ningún problema en el que desee trabajar. Indique todos los detalles que considere necesarios, el contexto del caso de uso es especialmente útil si desea recibir buenos comentarios.
+Agregue un comentario al problema en el que está trabajando para que el resto de la comunidad lo sepa.
+Cree una bifurcación, confirme y empuje a su bifurcación. Envía una solicitud de extracción (PR) desde tu bifurcación a este repositorio con el cambio propuesto. No te olvides de correr make linty make fmtprimero. Incluya pruebas unitarias y de integración cuando corresponda. Usamos confirmaciones convencionales . Los mensajes de confirmación generalmente pueden comenzar con "feat(aws): add...", "feat(google): add...", "fix: nil pointer...", "docs: Explain...", o "tarea: corregir error tipográfico". Esto nos ayuda a generar un registro de cambios más limpio.
+Si es su primer PR en la organización de Infracost, un bot dejará un comentario pidiéndole que siga un paso rápido para firmar nuestro Acuerdo de licencia de colaborador.
+Revisaremos su cambio y le proporcionaremos comentarios.
+Configuración del entorno de desarrollo
+Esta guía asume que está familiarizado con Terraform, si no, puede tomarse una hora para leer/ver esto y esto .
+
+Instalar
+Suponiendo que ya ha instalado go , instale las dependencias de go
+
+make deps
+Correr
+Ejecute el código:
+
+make run ARGS="breakdown --path examples/terraform --usage-file=examples/terraform/infracost-usage.yml"
+Esto utilizará su clave API de Infracost existente; regístrese para obtener una clave de clave de API gratuita si aún no tiene una.
+
+Prueba
+Pruebas unitarias
+Para ejecutar solo las pruebas unitarias:
+
+make test
+Pruebas de integración
+Debe ejecutar pruebas con el -vnivel de registro de bandera y advertencia para que pueda ver y corregir cualquier advertencia:
+
+INFRACOST_LOG_LEVEL=warn go test -v -cover ./internal/providers/terraform/aws/ebs_volume_test.go
+
+time="2021-04-05T15:24:16Z" level=warning msg="Multiple prices found for aws_ebs_volume.gp3 Provisioned throughput, using the first price"
+Para ejecutar todas las pruebas para un proveedor de nube específico:
+
+make test_aws
+make test_google
+make test_azure
+Para ejecutar todas las pruebas, puede utilizar:
+
+make test_all
+Los archivos dorados de prueba se pueden actualizar para todas las pruebas o para un proveedor de nube específico:
+
+make test_update
+make test_update_aws
+make test_update_google
+make test_update_azure # see the Azure credentials section below
+Construir
+make build
+Adición de nuevos recursos
+¡ Consulte nuestra guía dedicada para agregar recursos!
+
+Credenciales de Azure
+Trabajar en recursos de Azure requiere credenciales de Azure, ya que el proveedor de Azure Terraform requiere credenciales reales para poder ejecutarse terraform plan. Esto significa que debe tener credenciales de Azure para ejecutar los comandos de Infracost y las pruebas de integración para Azure. Recomendamos crear credenciales de Azure de solo lectura para este fin. Si tiene una suscripción de Azure, puede hacerlo ejecutando la azlínea de comando:
+
+az ad sp create-for-rbac --name http://InfracostReadOnly --role Reader --scope=/subscriptions/<SUBSCRIPTION ID> --years=10
+Si no tiene una suscripción de Azure, pregunte en el canal de colaboradores en Infracost Slack y podemos proporcionarle las credenciales.
+
+Para ejecutar las pruebas de integración de Azure en la acción de GitHub en las solicitudes de incorporación de cambios, estas credenciales también deben agregarse a los secretos de su bifurcación. Para hacer esto:
+
+Ir https://github.com/<YOUR GITHUB NAME>/infracost/settings/secrets/actionsa
+Agregue secretos de repositorio para ARM_SUBSCRIPTION_ID, ARM_TENANT_IDy .ARM_CLIENT_IDARM_CLIENT_SECRET
+Consultando la API de GraphQL
+Use una extensión de navegador como modheader para permitirle especificar encabezados adicionales en su navegador.
+Vaya a https://pricing.api.infracost.io/graphql
+Configure su X-API-Keyuso de la extensión del navegador
+Ejecute consultas GraphQL para encontrar los productos correctos. Se pueden encontrar ejemplos aquí: https://github.com/infracost/cloud-pricing-api/tree/master/examples/queries
+La API de precios de GraphQL limita la cantidad de resultados devueltos a 1000, lo que puede limitar su utilidad para explorar los datos. AWS utiliza muchos acrónimos, así que asegúrese de buscarlos también, por ejemplo, "ES" devuelve "AmazonES" para ElasticSearch.
+
+Revisiones de código
+Aquí hay una lista de cosas que debemos buscar durante la revisión del código al agregar nuevos recursos:
+
+¿El archivo infracost-usage-example.yml está actualizado con nuevos parámetros y descripciones del archivo de uso?
+Algunos errores comunes que se descubren en las revisiones:
+comparaciones de cadenas sensibles a mayúsculas y minúsculas: d.Get("kind") ==debe serstrings.ToLower(d.Get("kind").String()) ==
+Regex sensible a mayúsculas y minúsculas en los filtros de precios: ValueRegex: strPtr(fmt.Sprintf("/%s/", deviceType))debe serValueRegex: strPtr(fmt.Sprintf("/%s/i", deviceType))
+anclas faltantes en la expresión regular del filtro de precios: fmt.Sprintf("/%s/", x)cuándo debería serfmt.Sprintf("/^%s$/", x)
+mayúsculas de salida incorrectas: └─ Los datos ingeridos deben ser └─ Los datos ingeridos
+unidad mal llamada: GB-monthdebe serGB
+¿Alguna línea de "Precios faltantes" o "Precios múltiples" cuando se ejecuta con --log-level debug?
+¿Algún precio o cálculo incorrecto?
+¿ Alguna página de documentos necesita ser actualizada? por ejemplo, las páginas de recursos admitidos . Si es así, abra un PR para que pueda fusionarse después de que se publique la CLI.
