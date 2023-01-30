@@ -98,3 +98,9 @@ resource "azurerm_mssql_database" "blank_sku" {
   name      = "acctest-db-e"
   server_id = azurerm_sql_server.example.id
 }
+
+resource "azurerm_mssql_database" "elastic_pool" {
+  name      = "acctest-db-f"
+  server_id = azurerm_sql_server.example.id
+  sku_name  = "ElasticPool"
+}
