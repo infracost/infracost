@@ -1,10 +1,13 @@
 package main
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"fmt"
 	"strconv"
 	"strings"
 
+	"github.com/pkg/errors"
 	"github.com/spf13/cobra"
 
 	"github.com/infracost/infracost/internal/apiclient"
@@ -38,10 +41,34 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 			apiURL, _ := cmd.Flags().GetString("github-api-url")
 			token, _ := cmd.Flags().GetString("github-token")
 			tag, _ := cmd.Flags().GetString("tag")
+
+			tlsCertFile, _ := cmd.Flags().GetString("github-tls-cert-file")
+			tlsKeyFile, _ := cmd.Flags().GetString("github-tls-key-file")
+			tlsInsecureSkipVerify, _ := cmd.Flags().GetBool("github-tls-insecure-skip-verify")
+
+			tlsConfig := tls.Config{} // nolint: gosec
+
+			rootCAs, _ := x509.SystemCertPool()
+			if rootCAs == nil {
+				rootCAs = x509.NewCertPool()
+			}
+
+			tlsConfig.RootCAs = rootCAs
+			tlsConfig.InsecureSkipVerify = tlsInsecureSkipVerify
+
+			if tlsCertFile != "" && tlsKeyFile != "" {
+				cert, err := tls.LoadX509KeyPair(tlsCertFile, tlsKeyFile)
+				if err != nil {
+					return errors.Wrap(err, "Error loading TLS certificate and key")
+				}
+				tlsConfig.Certificates = []tls.Certificate{cert}
+			}
+
 			extra := comment.GitHubExtra{
-				APIURL: apiURL,
-				Token:  token,
-				Tag:    tag,
+				APIURL:    apiURL,
+				Token:     token,
+				Tag:       tag,
+				TLSConfig: &tlsConfig,
 			}
 
 			commit, _ := cmd.Flags().GetString("commit")
@@ -145,6 +172,9 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 	cmd.Flags().String("github-api-url", "https://api.github.com", "GitHub API URL")
 	cmd.Flags().String("github-token", "", "GitHub token")
 	_ = cmd.MarkFlagRequired("github-token")
+	cmd.Flags().String("github-tls-cert-file", "", "Path to optional client certificate file when communicating with GitHub Enterprise API")
+	cmd.Flags().String("github-tls-key-file", "", "Path to optional client key file when communicating with GitHub Enterprise API")
+	cmd.Flags().Bool("github-tls-insecure-skip-verify", false, "Skip TLS certificate checks for GitHub Enterprise API")
 	cmd.Flags().StringArrayP("path", "p", []string{}, "Path to Infracost JSON files, glob patterns need quotes")
 	_ = cmd.MarkFlagRequired("path")
 	_ = cmd.MarkFlagFilename("path", "json")
