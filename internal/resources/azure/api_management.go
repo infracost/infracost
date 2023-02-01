@@ -87,6 +87,7 @@ func (r *APIManagement) apiManagementCostComponent(name, unit, tier string, quan
 			ProductFamily: strPtr("Developer Tools"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", tier))},
+				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/^%s unit$/i", tier))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
