@@ -217,6 +217,10 @@ func checkIfAllProjectsErrored(projects []*schema.Project) error {
 		allError = false
 	}
 
+	if len(projects) == 1 && len(projects[0].Metadata.Errors) == 1 {
+		return errors.New(projects[0].Metadata.Errors[0].Message)
+	}
+
 	for _, project := range projects {
 		if !project.Metadata.HasErrors() {
 			allError = false
