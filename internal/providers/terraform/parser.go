@@ -1,6 +1,8 @@
 package terraform
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -168,6 +170,16 @@ func (p *Parser) parseJSON(j []byte, usage map[string]*schema.UsageData) ([]*sch
 	resources := p.parseJSONResources(false, baseResources, usage, parsed, providerConf, conf, vars)
 	if !p.includePastResources {
 		return nil, resources, nil
+	}
+
+	if parsed.Get("prior_state").Exists() == false {
+		return nil, resources, nil
+	}
+
+	// Check if the prior state is the same as the planned state
+	// and if so we can just return pointers to the same resources
+	if gjsonEqual(parsed.Get("prior_state.values.root_module"), parsed.Get("planned_values.root_module")) {
+		return resources, resources, nil
 	}
 
 	pastResources := p.parseJSONResources(true, baseResources, usage, parsed, providerConf, conf, vars)
@@ -830,4 +842,24 @@ func parseKnownModuleRefs(resData map[string]*schema.ResourceData, conf gjson.Re
 			}
 		}
 	}
+}
+
+func gjsonEqual(a, b gjson.Result) bool {
+	var err error
+
+	var aOut bytes.Buffer
+	err = json.Compact(&aOut, []byte(a.Raw))
+	if err != nil {
+		logging.Logger.Debugf("error indenting JSON: %s", err)
+		return false
+	}
+
+	var bOut bytes.Buffer
+	err = json.Compact(&bOut, []byte(b.Raw))
+	if err != nil {
+		logging.Logger.Debugf("error indenting JSON: %s", err)
+		return false
+	}
+
+	return string(aOut.Bytes()) == string(bOut.Bytes())
 }
