@@ -40,6 +40,10 @@ type ProjectMetadata struct {
 	Policies            Policies      `json:"policies,omitempty"`
 }
 
+func (m *ProjectMetadata) AddError(err error) {
+	m.Errors = append(m.Errors, ProjectDiag{Message: err.Error()})
+}
+
 func (m *ProjectMetadata) HasErrors() bool {
 	return len(m.Errors) > 0
 }

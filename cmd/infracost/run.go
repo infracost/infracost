@@ -217,6 +217,10 @@ func checkIfAllProjectsErrored(projects []*schema.Project) error {
 		allError = false
 	}
 
+	if len(projects) == 1 && len(projects[0].Metadata.Errors) == 1 {
+		return errors.New(projects[0].Metadata.Errors[0].Message)
+	}
+
 	for _, project := range projects {
 		if !project.Metadata.HasErrors() {
 			allError = false
@@ -358,7 +362,7 @@ func (r *parallelRunner) run() ([]projectResult, error) {
 				})
 				configProjects, err := r.runProjectConfig(ctx)
 				if err != nil {
-					return err
+					configProjects = newErroredProject(ctx, err)
 				}
 
 				projectResultChan <- projectResult{
@@ -1184,4 +1188,17 @@ func unwrapped(err error) error {
 	}
 
 	return e
+}
+
+func newErroredProject(ctx *config.ProjectContext, err error) *projectOutput {
+	metadata := config.DetectProjectMetadata(ctx.ProjectConfig.Path)
+	metadata.Type = "error"
+	metadata.AddError(err)
+
+	name := ctx.ProjectConfig.Name
+	if name == "" {
+		name = metadata.GenerateProjectName(ctx.RunContext.VCSMetadata.Remote, ctx.RunContext.IsCloudEnabled())
+	}
+
+	return &projectOutput{projects: []*schema.Project{schema.NewProject(name, metadata)}}
 }
