@@ -145,12 +145,8 @@ resource_usage:
     # monthly_cpu_credit_hrs: 0 # Number of hours in the month where the instance is expected to burst. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
     # vcpu_count: 0 # Number of the vCPUs for the instance type. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
     # monthly_hrs: 730.0 # Monthly number of hours the instance ran for.
-  ##
-  ## The following usage values apply to individual resources and override any value defined in the resource_type_default_usage section.
-  ## All values are commented-out, you can uncomment resources and customize as needed.
-  ##
-  # aws_instance.instance_counted[1]:
-    # operating_system: linux # Override the operating system of the instance, can be: linux, windows, suse, rhel.
+  aws_instance.instance_counted[1]:
+    operating_system: linux # Override the operating system of the instance, can be: linux, windows, suse, rhel.
     # reserved_instance_type: "" # Offering class for Reserved Instances, can be: convertible, standard.
     # reserved_instance_term: "" # Term for Reserved Instances, can be: 1_year, 3_year.
     # reserved_instance_payment_option: "" # Payment option for Reserved Instances, can be: no_upfront, partial_upfront, all_upfront.
@@ -167,8 +163,8 @@ resource_usage:
     # monthly_hrs: 730.0 # Monthly number of hours the instance ran for.
   aws_s3_bucket.with_usage:
     object_tags: 10000000 # This comment shouldn't be overwritten
-    # standard:
-      # storage_gb: 0.0 # Total storage in GB.
+    standard:
+      storage_gb: 0.0 # Total storage in GB.
       # monthly_tier_1_requests: 0 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
       # monthly_tier_2_requests: 0 # Monthly GET, SELECT, and all other requests (Tier 2).
       # monthly_select_data_scanned_gb: 0.0 # Monthly data scanned by S3 Select in GB.
@@ -277,68 +273,10 @@ resource_usage:
     # monthly_encryption_requests: 0 # Monthly number of field level encryption requests.
     # monthly_log_lines: 0 # Monthly number of real-time log lines.
     custom_ssl_certificates: 3 # Number of dedicated IP custom SSL certificates.
-  # aws_cloudfront_distribution.no_usage:
-    # monthly_data_transfer_to_internet_gb:
-      # us: 0 # United States, Mexico, Canada
-      # europe: 0 # Europe, Israel
-      # south_africa: 0 # South Africa, Kenya, Middle East
-      # south_america: 0 # South America
-      # japan: 0 # Japan
-      # australia: 0 # Australia, New Zealand
-      # asia_pacific: 0 # Hong Kong, Philippines, Singapore, South Korea, Taiwan, Thailand
-      # india: 0 # India
-    # monthly_data_transfer_to_origin_gb:
-      # us: 0 # United States, Mexico, Canada
-      # europe: 0 # Europe, Israel
-      # south_africa: 0 # South Africa, Kenya, Middle East
-      # south_america: 0 # South America
-      # japan: 0 # Japan
-      # australia: 0 # Australia, New Zealand
-      # asia_pacific: 0 # Hong Kong, Philippines, Singapore, South Korea, Taiwan, Thailand
-      # india: 0 # India
-    # monthly_http_requests:
-      # us: 0 # United States, Mexico, Canada
-      # europe: 0 # Europe, Israel
-      # south_africa: 0 # South Africa, Kenya, Middle East
-      # south_america: 0 # South America
-      # japan: 0 # Japan
-      # australia: 0 # Australia, New Zealand
-      # asia_pacific: 0 # Hong Kong, Philippines, Singapore, South Korea, Taiwan, Thailand
-      # india: 0 # India
-    # monthly_https_requests:
-      # us: 0 # United States, Mexico, Canada
-      # europe: 0 # Europe, Israel
-      # south_africa: 0 # South Africa, Kenya, Middle East
-      # south_america: 0 # South America
-      # japan: 0 # Japan
-      # australia: 0 # Australia, New Zealand
-      # asia_pacific: 0 # Hong Kong, Philippines, Singapore, South Korea, Taiwan, Thailand
-      # india: 0 # India
-    # monthly_shield_requests:
-      # us: 0 # United States
-      # europe: 0 # Europe
-      # south_america: 0 # South America
-      # japan: 0 # Japan
-      # australia: 0 # Australia
-      # singapore: 0 # Singapore
-      # south_korea: 0 # South Korea
-      # india: 0 # India
-    # monthly_invalidation_requests: 0 # Monthly number of invalidation requests.
-    # monthly_encryption_requests: 0 # Monthly number of field level encryption requests.
-    # monthly_log_lines: 0 # Monthly number of real-time log lines.
-    # custom_ssl_certificates: 0 # Number of dedicated IP custom SSL certificates.
-  # aws_instance.no_usage:
-    # operating_system: linux # Override the operating system of the instance, can be: linux, windows, suse, rhel.
-    # reserved_instance_type: "" # Offering class for Reserved Instances, can be: convertible, standard.
-    # reserved_instance_term: "" # Term for Reserved Instances, can be: 1_year, 3_year.
-    # reserved_instance_payment_option: "" # Payment option for Reserved Instances, can be: no_upfront, partial_upfront, all_upfront.
-    # monthly_cpu_credit_hrs: 0 # Number of hours in the month where the instance is expected to burst. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
-    # vcpu_count: 0 # Number of the vCPUs for the instance type. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
-    # monthly_hrs: 730.0 # Monthly number of hours the instance ran for.
-  # aws_s3_bucket.no_usage:
+  aws_s3_bucket.no_usage:
     # object_tags: 0 # Total object tags. Only for AWS provider V3.
-    # standard:
-      # storage_gb: 0.0 # Total storage in GB.
+    standard:
+      storage_gb: 0.0 # Total storage in GB.
       # monthly_tier_1_requests: 0 # Monthly PUT, COPY, POST, LIST requests (Tier 1).
       # monthly_tier_2_requests: 0 # Monthly GET, SELECT, and all other requests (Tier 2).
       # monthly_select_data_scanned_gb: 0.0 # Monthly data scanned by S3 Select in GB.
@@ -397,3 +335,65 @@ resource_usage:
       # monthly_standard_data_retrieval_gb: 0.0 # Monthly data retrievals in GB (for standard level of S3 Glacier).
       # monthly_bulk_data_retrieval_gb: 0.0 # Monthly data retrievals in GB (for bulk level of S3 Glacier).
       # early_delete_gb: 0.0 # If an archive is deleted within 6 months of being uploaded, you will be charged an early deletion fee per GB.
+  ##
+  ## The following usage values apply to individual resources and override any value defined in the resource_type_default_usage section.
+  ## All values are commented-out, you can uncomment resources and customize as needed.
+  ##
+  # aws_cloudfront_distribution.no_usage:
+    # monthly_data_transfer_to_internet_gb:
+      # us: 0 # United States, Mexico, Canada
+      # europe: 0 # Europe, Israel
+      # south_africa: 0 # South Africa, Kenya, Middle East
+      # south_america: 0 # South America
+      # japan: 0 # Japan
+      # australia: 0 # Australia, New Zealand
+      # asia_pacific: 0 # Hong Kong, Philippines, Singapore, South Korea, Taiwan, Thailand
+      # india: 0 # India
+    # monthly_data_transfer_to_origin_gb:
+      # us: 0 # United States, Mexico, Canada
+      # europe: 0 # Europe, Israel
+      # south_africa: 0 # South Africa, Kenya, Middle East
+      # south_america: 0 # South America
+      # japan: 0 # Japan
+      # australia: 0 # Australia, New Zealand
+      # asia_pacific: 0 # Hong Kong, Philippines, Singapore, South Korea, Taiwan, Thailand
+      # india: 0 # India
+    # monthly_http_requests:
+      # us: 0 # United States, Mexico, Canada
+      # europe: 0 # Europe, Israel
+      # south_africa: 0 # South Africa, Kenya, Middle East
+      # south_america: 0 # South America
+      # japan: 0 # Japan
+      # australia: 0 # Australia, New Zealand
+      # asia_pacific: 0 # Hong Kong, Philippines, Singapore, South Korea, Taiwan, Thailand
+      # india: 0 # India
+    # monthly_https_requests:
+      # us: 0 # United States, Mexico, Canada
+      # europe: 0 # Europe, Israel
+      # south_africa: 0 # South Africa, Kenya, Middle East
+      # south_america: 0 # South America
+      # japan: 0 # Japan
+      # australia: 0 # Australia, New Zealand
+      # asia_pacific: 0 # Hong Kong, Philippines, Singapore, South Korea, Taiwan, Thailand
+      # india: 0 # India
+    # monthly_shield_requests:
+      # us: 0 # United States
+      # europe: 0 # Europe
+      # south_america: 0 # South America
+      # japan: 0 # Japan
+      # australia: 0 # Australia
+      # singapore: 0 # Singapore
+      # south_korea: 0 # South Korea
+      # india: 0 # India
+    # monthly_invalidation_requests: 0 # Monthly number of invalidation requests.
+    # monthly_encryption_requests: 0 # Monthly number of field level encryption requests.
+    # monthly_log_lines: 0 # Monthly number of real-time log lines.
+    # custom_ssl_certificates: 0 # Number of dedicated IP custom SSL certificates.
+  # aws_instance.no_usage:
+    # operating_system: linux # Override the operating system of the instance, can be: linux, windows, suse, rhel.
+    # reserved_instance_type: "" # Offering class for Reserved Instances, can be: convertible, standard.
+    # reserved_instance_term: "" # Term for Reserved Instances, can be: 1_year, 3_year.
+    # reserved_instance_payment_option: "" # Payment option for Reserved Instances, can be: no_upfront, partial_upfront, all_upfront.
+    # monthly_cpu_credit_hrs: 0 # Number of hours in the month where the instance is expected to burst. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
+    # vcpu_count: 0 # Number of the vCPUs for the instance type. Only applicable with t2, t3 & t4 Instance types. T2 requires credit_specification to be unlimited.
+    # monthly_hrs: 730.0 # Monthly number of hours the instance ran for.
