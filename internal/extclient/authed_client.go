@@ -20,7 +20,7 @@ type AuthedAPIClient struct {
 // NewAuthedAPIClient returns a new API client.
 func NewAuthedAPIClient(host, token string) *AuthedAPIClient {
 	client := retryablehttp.NewClient()
-	client.HTTPClient.Timeout = time.Second * 5
+	client.HTTPClient.Timeout = time.Second * 30
 	return &AuthedAPIClient{
 		host:   host,
 		token:  token,
