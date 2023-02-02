@@ -84,7 +84,7 @@ func TestDiffWithCompareTo(t *testing.T) {
 			RunTerraformCLI: true,
 		})
 }
-func TestDiffWithCompareToWithProjectError(t *testing.T) {
+func TestDiffWithCompareToWithCurrentAndPastProjectError(t *testing.T) {
 	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
 	GoldenFileCommandTest(
 		t,
@@ -96,7 +96,44 @@ func TestDiffWithCompareToWithProjectError(t *testing.T) {
 			"--compare-to",
 			path.Join(dir, "prior.json"),
 			"--format", "json",
-		}, nil)
+		}, &GoldenFileOptions{
+			IsJSON: true,
+		})
+}
+
+func TestDiffWithCompareToWithCurrentProjectError(t *testing.T) {
+
+	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"diff",
+			"--path",
+			dir,
+			"--compare-to",
+			path.Join(dir, "prior.json"),
+			"--format", "json",
+		}, &GoldenFileOptions{
+			IsJSON: true,
+		})
+}
+
+func TestDiffWithCompareToWithPastProjectError(t *testing.T) {
+	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"diff",
+			"--path",
+			dir,
+			"--compare-to",
+			path.Join(dir, "prior.json"),
+			"--format", "json",
+		}, &GoldenFileOptions{
+			IsJSON: true,
+		})
 }
 
 func TestDiffWithCompareToFormatJSON(t *testing.T) {
