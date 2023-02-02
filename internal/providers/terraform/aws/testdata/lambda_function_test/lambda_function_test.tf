@@ -17,12 +17,30 @@ resource "aws_lambda_function" "lambda" {
   runtime       = "nodejs12.x"
 }
 
+resource "aws_lambda_function" "lambda_arm" {
+  function_name = "lambda_function_name"
+  role          = "arn:aws:lambda:us-east-1:account-id:resource-id"
+  handler       = "exports.test"
+  filename      = "function.zip"
+  runtime       = "nodejs12.x"
+  architectures = ["arm64"]
+}
+
 resource "aws_lambda_function" "lambda_withUsage" {
   function_name = "lambda_function_name"
   role          = "arn:aws:lambda:us-east-1:account-id:resource-id"
   handler       = "exports.test"
   filename      = "function.zip"
   runtime       = "nodejs12.x"
+}
+
+resource "aws_lambda_function" "lambda_withUsage_arm" {
+  function_name = "lambda_function_name"
+  role          = "arn:aws:lambda:us-east-1:account-id:resource-id"
+  handler       = "exports.test"
+  filename      = "function.zip"
+  runtime       = "nodejs12.x"
+  architectures = ["arm64"]
 }
 
 resource "aws_lambda_function" "lambda_withUsage512Mem" {
@@ -34,6 +52,16 @@ resource "aws_lambda_function" "lambda_withUsage512Mem" {
   memory_size   = 512
 }
 
+resource "aws_lambda_function" "lambda_withUsage512Mem_arm" {
+  function_name = "lambda_function_name"
+  role          = "arn:aws:lambda:us-east-1:account-id:resource-id"
+  handler       = "exports.test"
+  filename      = "function.zip"
+  runtime       = "nodejs12.x"
+  memory_size   = 512
+  architectures = ["arm64"]
+}
+
 resource "aws_lambda_function" "lambda_duration_6B" {
   function_name = "lambda_function_name"
   role          = "arn:aws:lambda:us-east-1:account-id:resource-id"
@@ -41,6 +69,16 @@ resource "aws_lambda_function" "lambda_duration_6B" {
   filename      = "function.zip"
   runtime       = "nodejs12.x"
   memory_size   = 512
+}
+
+resource "aws_lambda_function" "lambda_duration_75B_arm" {
+  function_name = "lambda_function_name"
+  role          = "arn:aws:lambda:us-east-1:account-id:resource-id"
+  handler       = "exports.test"
+  filename      = "function.zip"
+  runtime       = "nodejs12.x"
+  memory_size   = 512
+  architectures = ["arm64"]
 }
 
 resource "aws_lambda_function" "lambda_duration_9B" {
@@ -52,6 +90,16 @@ resource "aws_lambda_function" "lambda_duration_9B" {
   memory_size   = 1024
 }
 
+resource "aws_lambda_function" "lambda_duration_11B_arm" {
+  function_name = "lambda_function_name"
+  role          = "arn:aws:lambda:us-east-1:account-id:resource-id"
+  handler       = "exports.test"
+  filename      = "function.zip"
+  runtime       = "nodejs12.x"
+  memory_size   = 1024
+  architectures = ["arm64"]
+}
+
 resource "aws_lambda_function" "lambda_duration_15B" {
   function_name = "lambda_function_name"
   role          = "arn:aws:lambda:us-east-1:account-id:resource-id"
@@ -59,4 +107,14 @@ resource "aws_lambda_function" "lambda_duration_15B" {
   filename      = "function.zip"
   runtime       = "nodejs12.x"
   memory_size   = 2048
+}
+
+resource "aws_lambda_function" "lambda_duration_18B_arm" {
+  function_name = "lambda_function_name"
+  role          = "arn:aws:lambda:us-east-1:account-id:resource-id"
+  handler       = "exports.test"
+  filename      = "function.zip"
+  runtime       = "nodejs12.x"
+  memory_size   = 2048
+  architectures = ["arm64"]
 }

@@ -3,6 +3,7 @@ package aws
 import (
 	"context"
 	"math"
+	"strconv"
 
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
@@ -13,10 +14,11 @@ import (
 )
 
 type LambdaFunction struct {
-	Address    string
-	Region     string
-	Name       string
-	MemorySize int64
+	Address      string
+	Region       string
+	Name         string
+	MemorySize   int64
+	Architecture string
 
 	RequestDurationMS *int64 `infracost_usage:"request_duration_ms"`
 	MonthlyRequests   *int64 `infracost_usage:"monthly_requests"`
@@ -45,15 +47,26 @@ func (a *LambdaFunction) PopulateUsage(u *schema.UsageData) {
 
 func (a *LambdaFunction) BuildResource() *schema.Resource {
 	memorySize := decimal.NewFromInt(a.MemorySize)
+	requestType := "AWS-Lambda-Requests"
+	durationType := "AWS-Lambda-Duration"
 
 	averageRequestDuration := decimal.NewFromInt(1)
 	if a.RequestDurationMS != nil {
 		averageRequestDuration = decimal.NewFromInt(*a.RequestDurationMS)
 	}
 
+	if a.Architecture == "arm64" {
+		requestType = "AWS-Lambda-Requests-ARM"
+		durationType = "AWS-Lambda-Duration-ARM"
+	}
+
 	var monthlyRequests *decimal.Decimal
 	var gbSeconds *decimal.Decimal
 	var costComponents []*schema.CostComponent
+
+	if a.MonthlyRequests != nil {
+		monthlyRequests = decimalPtr(decimal.NewFromInt(*a.MonthlyRequests))
+	}
 
 	costComponents = append(costComponents, &schema.CostComponent{
 		Name:            "Requests",
@@ -66,32 +79,40 @@ func (a *LambdaFunction) BuildResource() *schema.Resource {
 			Service:       strPtr("AWSLambda"),
 			ProductFamily: strPtr("Serverless"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "group", Value: strPtr("AWS-Lambda-Requests")},
+				{Key: "group", Value: strPtr(requestType)},
 				{Key: "usagetype", ValueRegex: strPtr("/Request/")},
 			},
 		},
 	},
 	)
 
+	// Defaults to x86 tiers
+	gbRequestTiers := []int{6000000000, 9000000000, 15000000000}
+	displayNameList := []string{"Duration (first 6B)", "Duration (next 9B)", "Duration (over 15B)"}
+
+	if a.Architecture == "arm64" {
+		gbRequestTiers = []int{7500000000, 11250000000, 18750000000}
+		displayNameList = []string{"Duration (first 7.5B)", "Duration (next 11.25B)", "Duration (over 18.75B)"}
+	}
+
 	if a.MonthlyRequests != nil {
 		monthlyRequests = decimalPtr(decimal.NewFromInt(*a.MonthlyRequests))
 		gbSeconds = decimalPtr(calculateGBSeconds(memorySize, averageRequestDuration, *monthlyRequests))
 
-		gbRequestTiers := []int{6000000000, 9000000000, 15000000000}
 		gbSecondQuantities := usage.CalculateTierBuckets(*gbSeconds, gbRequestTiers)
 
-		costComponents = append(costComponents, a.durationCostComponent("Duration (first 6B)", "0", &gbSecondQuantities[0]))
+		costComponents = append(costComponents, a.durationCostComponent(displayNameList[0], "0", &gbSecondQuantities[0], durationType))
 
 		if gbSecondQuantities[1].GreaterThan(decimal.NewFromInt(0)) {
-			costComponents = append(costComponents, a.durationCostComponent("Duration (next 9B)", "6000000000", &gbSecondQuantities[1]))
+			costComponents = append(costComponents, a.durationCostComponent(displayNameList[1], strconv.Itoa(gbRequestTiers[0]), &gbSecondQuantities[1], durationType))
 		}
 
 		if gbSecondQuantities[2].GreaterThanOrEqual(decimal.NewFromInt(0)) {
-			costComponents = append(costComponents, a.durationCostComponent("Duration (over 15B)", "15000000000", &gbSecondQuantities[2]))
+			costComponents = append(costComponents, a.durationCostComponent(displayNameList[2], strconv.Itoa(gbRequestTiers[2]), &gbSecondQuantities[2], durationType))
 		}
 
 	} else {
-		costComponents = append(costComponents, a.durationCostComponent("Duration (first 6B)", "0", gbSeconds))
+		costComponents = append(costComponents, a.durationCostComponent(displayNameList[0], "0", gbSeconds, durationType))
 	}
 
 	estimate := func(ctx context.Context, values map[string]interface{}) error {
@@ -122,7 +143,7 @@ func calculateGBSeconds(memorySize decimal.Decimal, averageRequestDuration decim
 	return monthlyRequests.Mul(gb).Mul(seconds)
 }
 
-func (a *LambdaFunction) durationCostComponent(displayName string, usageTier string, quantity *decimal.Decimal) *schema.CostComponent {
+func (a *LambdaFunction) durationCostComponent(displayName string, usageTier string, quantity *decimal.Decimal, durationType string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            displayName,
 		Unit:            "GB-seconds",
@@ -134,7 +155,7 @@ func (a *LambdaFunction) durationCostComponent(displayName string, usageTier str
 			Service:       strPtr("AWSLambda"),
 			ProductFamily: strPtr("Serverless"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "group", Value: strPtr("AWS-Lambda-Duration")},
+				{Key: "group", Value: strPtr(durationType)},
 				{Key: "usagetype", ValueRegex: strPtr("/GB-Second/")},
 			},
 		},
