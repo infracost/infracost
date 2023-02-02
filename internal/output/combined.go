@@ -133,6 +133,20 @@ func CompareTo(current, prior Root) (Root, error) {
 				scp.Diff = schema.CalculateDiff(scp.PastResources, scp.Resources)
 			}
 
+			if !p.Metadata.HasErrors() && v.Metadata.HasErrors() {
+				// the prior project has errors, but the current one does not
+				// The prior errors will be copied over to the current, but we
+				// also need to remove the current project costs
+				scp.Resources = nil
+				scp.Diff = nil
+				scp.HasDiff = false
+			}
+
+			for _, pastE := range v.Metadata.Errors {
+				pastE.Message = "Diff baseline error: " + pastE.Message
+				scp.Metadata.Errors = append(scp.Metadata.Errors, pastE)
+			}
+
 			delete(priorProjects, p.LabelWithMetadata())
 		}
 

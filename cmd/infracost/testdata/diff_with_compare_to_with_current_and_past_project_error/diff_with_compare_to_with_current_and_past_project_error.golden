@@ -24,6 +24,11 @@
             "code": 2,
             "message": "Error loading Terraform modules: failed to inspect module path testdata/diff_with_compare_to_with_current_and_past_project_error/dev diag: Invalid block definition: Either a quoted string block label or an opening brace (\"{\") is expected here. (and 1 other messages)",
             "data": null
+          },
+          {
+            "code": 2,
+            "message": "Diff baseline error: Error loading Terraform modules: failed to inspect module path dev diag: Invalid block definition: Either a quoted string block label or an opening brace (\"{\") is expected here. (and 1 other messages)",
+            "data": null
           }
         ]
       },
