@@ -38,6 +38,8 @@ var (
 		"dynamic":  {},
 		"data":     {},
 	}
+
+	sensitiveRegxp = regexp.MustCompile(`_token$|^token_|_secret$|^secret_|_password$|^password_|_username$|^username_|api_key|expiration_date`)
 )
 
 const maxContextIterations = 120
@@ -148,9 +150,28 @@ func (e *Evaluator) MissingVars() []string {
 
 	blocks := e.module.Blocks.OfType("variable")
 	for _, block := range blocks {
+		name := block.Label()
+
+		var sensitive bool
+		value := block.GetAttribute("sensitive").Value()
+		if !value.IsNull() {
+			err := gocty.FromCtyValue(value, &sensitive)
+			if err != nil {
+				e.logger.Debugf("could not convert 'sensitive' attribute for variable.%s err: %s", name, err)
+			}
+		}
+
+		if sensitive {
+			continue
+		}
+
+		if sensitiveRegxp.MatchString(name) {
+			continue
+		}
+
 		_, v := e.evaluateVariable(block)
 		if v == errorNoVarValue {
-			missing = append(missing, fmt.Sprintf("variable.%s", block.Label()))
+			missing = append(missing, fmt.Sprintf("variable.%s", name))
 		}
 	}
 
