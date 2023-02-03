@@ -39,11 +39,10 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
           +$52.00
 
 + aws_lambda_function.hello_world
-  +$417
+  +$437
 
     + Requests
-      Monthly cost depends on usage
-        +$0.20 per 1M requests
+      +$20.00
 
     + Duration (first 6B)
       +$417
@@ -55,8 +54,7 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
   $0.00
 
     + Requests
-      Monthly cost depends on usage
-        +$0.20 per 1M requests
+      $0.00
 
     + Duration (first 6B)
       $0.00
@@ -85,7 +83,7 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
           $0.00
 
 Monthly cost change for infracost/infracost/cmd/infracost/testdata/example_plan.json
-Amount:  +$1,341 ($0.00 → $1,341)
+Amount:  +$1,361 ($0.00 → $1,361)
 
 ──────────────────────────────────
 Key: ~ changed, + added, - removed

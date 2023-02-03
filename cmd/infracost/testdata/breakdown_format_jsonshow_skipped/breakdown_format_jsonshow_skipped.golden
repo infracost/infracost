@@ -153,17 +153,17 @@
           {
             "name": "aws_lambda_function.hello_world",
             "metadata": {},
-            "hourlyCost": "0.57077739726027397260344749",
-            "monthlyCost": "416.6675",
+            "hourlyCost": "0.59817465753424657534316749",
+            "monthlyCost": "436.6675",
             "costComponents": [
               {
                 "name": "Requests",
                 "unit": "1M requests",
-                "hourlyQuantity": null,
-                "monthlyQuantity": null,
+                "hourlyQuantity": "0.136986301369863",
+                "monthlyQuantity": "100",
                 "price": "0.2",
-                "hourlyCost": null,
-                "monthlyCost": null
+                "hourlyCost": "0.02739726027397260273972",
+                "monthlyCost": "20"
               },
               {
                 "name": "Duration (first 6B)",
@@ -194,11 +194,11 @@
               {
                 "name": "Requests",
                 "unit": "1M requests",
-                "hourlyQuantity": null,
-                "monthlyQuantity": null,
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
                 "price": "0.2",
-                "hourlyCost": null,
-                "monthlyCost": null
+                "hourlyCost": "0",
+                "monthlyCost": "0"
               },
               {
                 "name": "Duration (first 6B)",
@@ -282,8 +282,8 @@
             ]
           }
         ],
-        "totalHourlyCost": "1.83740753424657533060344749",
-        "totalMonthlyCost": "1341.3075"
+        "totalHourlyCost": "1.86480479452054793334316749",
+        "totalMonthlyCost": "1361.3075"
       },
       "diff": {
         "resources": [
@@ -414,17 +414,17 @@
           {
             "name": "aws_lambda_function.hello_world",
             "metadata": {},
-            "hourlyCost": "0.57077739726027397260344749",
-            "monthlyCost": "416.6675",
+            "hourlyCost": "0.59817465753424657534316749",
+            "monthlyCost": "436.6675",
             "costComponents": [
               {
                 "name": "Requests",
                 "unit": "1M requests",
-                "hourlyQuantity": "0",
-                "monthlyQuantity": "0",
+                "hourlyQuantity": "0.136986301369863",
+                "monthlyQuantity": "100",
                 "price": "0.2",
-                "hourlyCost": "0",
-                "monthlyCost": "0"
+                "hourlyCost": "0.02739726027397260273972",
+                "monthlyCost": "20"
               },
               {
                 "name": "Duration (first 6B)",
@@ -543,8 +543,8 @@
             ]
           }
         ],
-        "totalHourlyCost": "1.83740753424657533060344749",
-        "totalMonthlyCost": "1341.3075"
+        "totalHourlyCost": "1.86480479452054793334316749",
+        "totalMonthlyCost": "1361.3075"
       },
       "summary": {
         "totalDetectedResources": 5,
@@ -557,12 +557,12 @@
       }
     }
   ],
-  "totalHourlyCost": "1.83740753424657533060344749",
-  "totalMonthlyCost": "1341.3075",
+  "totalHourlyCost": "1.86480479452054793334316749",
+  "totalMonthlyCost": "1361.3075",
   "pastTotalHourlyCost": "0",
   "pastTotalMonthlyCost": "0",
-  "diffTotalHourlyCost": "1.83740753424657533060344749",
-  "diffTotalMonthlyCost": "1341.3075",
+  "diffTotalHourlyCost": "1.86480479452054793334316749",
+  "diffTotalMonthlyCost": "1361.3075",
   "timeGenerated": "REPLACED_TIME",
   "summary": {
     "totalDetectedResources": 5,
