@@ -217,6 +217,7 @@ func (r *SQLDatabase) serverlessComputeHoursCostComponent() *schema.CostComponen
 		ProductFilter: r.productFilter([]*schema.AttributeFilter{
 			{Key: "productName", ValueRegex: strPtr(productNameRegex)},
 			{Key: "skuName", Value: strPtr(serverlessSkuName)},
+			{Key: "meterName", ValueRegex: regexPtr("^(?!.* - Free$).*$")},
 		}),
 		PriceFilter: priceFilterConsumption,
 	}
