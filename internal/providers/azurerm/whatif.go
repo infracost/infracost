@@ -38,11 +38,11 @@ type WhatIf struct {
 }
 
 type WhatifProperties struct {
-	CorrelationId string         `json:"correlationId"`
-	Changes       []WhatifChange `json:"changes,omitempty"`
+	CorrelationId string             `json:"correlationId"`
+	Changes       []ResourceSnapshot `json:"changes,omitempty"`
 }
 
-type WhatifChange struct {
+type ResourceSnapshot struct {
 	ResourceId string     `json:"resourceId"`
 	ChangeType ChangeType `json:"changeType"`
 	// Before/After include several fields that are always present (resourceId, type etc.)
@@ -61,7 +61,7 @@ type WhatifChange struct {
 	after  gjson.Result
 }
 
-func (w *WhatifChange) After() gjson.Result {
+func (w *ResourceSnapshot) After() gjson.Result {
 	if w.after.Get("id").Exists() {
 		return w.after
 	}
@@ -75,7 +75,7 @@ func (w *WhatifChange) After() gjson.Result {
 	return w.after
 }
 
-func (w *WhatifChange) Before() gjson.Result {
+func (w *ResourceSnapshot) Before() gjson.Result {
 	if w.before.Get("id").Exists() {
 		return w.before
 	}

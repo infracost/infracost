@@ -21,7 +21,7 @@ func TestWhatifSerialization(t *testing.T) {
 		{
 			Status: "Succeeded",
 			Properties: WhatifProperties{
-				Changes: []WhatifChange{
+				Changes: []ResourceSnapshot{
 					{
 						ResourceId: "/subscriptions/00000000-0000-0000-0000-000000000001/resourceGroups/my-resource-group2",
 						ChangeType: Create,

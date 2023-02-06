@@ -1,7 +1,17 @@
 package resources
 
 import (
+	"sync"
+
 	"github.com/infracost/infracost/internal/schema"
+)
+
+type ResourceRegistryMap map[string]*schema.RegistryItem
+type stringMap map[string]string
+
+var (
+	once                sync.Once
+	resourceRegistryMap ResourceRegistryMap
 )
 
 // TODO: see providers/terraform/azure/registry.go
@@ -11,7 +21,17 @@ var Registry []*schema.RegistryItem = []*schema.RegistryItem{
 	getAppServicePlanRegistryItem(),
 }
 
-type ResourceRegistryMap map[string]*schema.RegistryItem
+var azureRMToTerraformResourceMap stringMap = stringMap{
+	"Microsoft.Resources/resourceGroups": "azurerm_resource_group",
+	"Microsoft.Web/serverFarms":          "azurerm_app_service_plan",
+	"Microsoft.Web/sites":                "azurerm_linux_web_app",
+}
+
+// TODO: Terraform resources and azure resources don't map 1-on-1 to eachother
+// Use this function as a stub for later exceptions
+func GetTFResourceFromAzureRMType(armResource string) string {
+	return azureRMToTerraformResourceMap[armResource]
+}
 
 var FreeResources = []string{
 	// Azure Api Management
@@ -310,6 +330,51 @@ var FreeResources = []string{
 
 var UsageOnlyResources = []string{}
 
+func DefaultCloudResourceIDFunc(d *schema.ResourceData) []string {
+	return []string{}
+}
+
+func GetDefaultRefIDFunc(d *schema.ResourceData) []string {
+	return []string{d.Get("id").String()}
+}
+
 func GetRegistryMap() *ResourceRegistryMap {
-	return &ResourceRegistryMap{}
+	once.Do(func() {
+		resourceRegistryMap = make(ResourceRegistryMap)
+
+		for _, registryItem := range Registry {
+			if registryItem.CloudResourceIDFunc == nil {
+				registryItem.CloudResourceIDFunc = DefaultCloudResourceIDFunc
+			}
+			resourceRegistryMap[registryItem.Name] = registryItem
+			resourceRegistryMap[registryItem.Name].DefaultRefIDFunc = GetDefaultRefIDFunc
+		}
+		for _, registryItem := range createFreeResources(FreeResources) {
+			if registryItem.CloudResourceIDFunc == nil {
+				registryItem.CloudResourceIDFunc = DefaultCloudResourceIDFunc
+			}
+			resourceRegistryMap[registryItem.Name] = registryItem
+			resourceRegistryMap[registryItem.Name].DefaultRefIDFunc = GetDefaultRefIDFunc
+		}
+	})
+
+	return &resourceRegistryMap
+}
+
+func GetUsageOnlyResources() []string {
+	r := []string{}
+	r = append(r, UsageOnlyResources...)
+	return r
+}
+
+func createFreeResources(l []string) []*schema.RegistryItem {
+	freeResources := make([]*schema.RegistryItem, 0)
+	for _, resourceName := range l {
+		freeResources = append(freeResources, &schema.RegistryItem{
+			Name:    resourceName,
+			NoPrice: true,
+			Notes:   []string{"Free resource."},
+		})
+	}
+	return freeResources
 }
