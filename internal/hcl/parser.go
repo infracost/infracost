@@ -31,12 +31,18 @@ type Option func(p *Parser)
 // to the Parser initialPath. Paths that don't exist will be ignored.
 func OptionWithTFVarsPaths(paths []string) Option {
 	return func(p *Parser) {
-		var relative []string
+		var filenames []string
 		for _, name := range paths {
-			tfvp := path.Join(p.initialPath, name)
-			relative = append(relative, tfvp)
+			if path.IsAbs(name) {
+				filenames = append(filenames, name)
+				continue
+			}
+
+			relToProject := path.Join(p.initialPath, name)
+			filenames = append(filenames, relToProject)
 		}
-		p.tfvarsPaths = relative
+
+		p.tfvarsPaths = filenames
 	}
 }
 

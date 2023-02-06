@@ -150,6 +150,7 @@ func TestBreakdownTerraformDirectoryWithDefaultVarFiles(t *testing.T) {
 	})
 
 	t.Run("with hcl var flags", func(t *testing.T) {
+		abs, _ := filepath.Abs(path.Join(dir, "abs.tfvars"))
 		GoldenFileCommandTest(
 			t,
 			testName,
@@ -157,6 +158,7 @@ func TestBreakdownTerraformDirectoryWithDefaultVarFiles(t *testing.T) {
 				"breakdown",
 				"--path", dir,
 				"--terraform-var-file", "hcl.tfvars",
+				"--terraform-var-file", abs,
 				"--terraform-var-file", "hcl.tfvars.json",
 				"--terraform-var", "block2_ebs_volume_size=2000",
 				"--terraform-var", "block2_volume_type=io1",
