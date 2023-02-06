@@ -5,10 +5,12 @@ import (
 	"crypto/x509"
 	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
 	"time"
 
+	"github.com/hashicorp/go-cleanhttp"
 	"github.com/tidwall/gjson"
 
 	"github.com/infracost/infracost/internal/config"
@@ -77,12 +79,15 @@ func NewUsageAPIClient(ctx *config.RunContext) *UsageAPIClient {
 		tlsConfig.InsecureSkipVerify = *ctx.Config.TLSInsecureSkipVerify
 	}
 
+	httpClient := cleanhttp.DefaultClient()
+	httpClient.Transport.(*http.Transport).TLSClientConfig = &tlsConfig
+
 	return &UsageAPIClient{
 		APIClient: APIClient{
-			endpoint:  ctx.Config.UsageAPIEndpoint,
-			apiKey:    ctx.Config.APIKey,
-			tlsConfig: &tlsConfig,
-			uuid:      ctx.UUID(),
+			httpClient: httpClient,
+			endpoint:   ctx.Config.UsageAPIEndpoint,
+			apiKey:     ctx.Config.APIKey,
+			uuid:       ctx.UUID(),
 		},
 		Currency: currency,
 	}
@@ -292,7 +297,7 @@ func (c *UsageAPIClient) UploadCloudResourceIDs(vars CloudResourceIDVariables) e
 			mutation($repoUrl: String!, $project: String!, $addressResourceIds: [AddressResourceIdInput!]!) {
 				addAddressResourceIds(repoUrl: $repoUrl, project: $project, addressResourceIds: $addressResourceIds) {
 					newCount
-				} 
+				}
 			}
 		`,
 		Variables: interfaceToMap(vars),
