@@ -133,6 +133,7 @@ var RegionMapping = map[string]string{
 	"ap-southeast-1":  "Asia Pacific (Singapore)",
 	"ap-southeast-2":  "Asia Pacific (Sydney)",
 	"ap-southeast-3":  "Asia Pacific (Jakarta)",
+	"ap-southeast-4":  "Asia Pacific (Melbourne)",
 	"ap-south-1":      "Asia Pacific (Mumbai)",
 	"ap-south-2":      "Asia Pacific (Hyderabad)",
 	"me-central-1":    "Middle East (UAE)",
@@ -186,6 +187,7 @@ type RegionsUsage struct {
 	APSoutheast1 *float64 `infracost_usage:"ap_southeast_1"`
 	APSoutheast2 *float64 `infracost_usage:"ap_southeast_2"`
 	APSoutheast3 *float64 `infracost_usage:"ap_southeast_3"`
+	APSoutheast4 *float64 `infracost_usage:"ap_southeast_4"`
 	APSouth1     *float64 `infracost_usage:"ap_south_1"`
 	MESouth1     *float64 `infracost_usage:"me_south_1"`
 	SAEast1      *float64 `infracost_usage:"sa_east_1"`
