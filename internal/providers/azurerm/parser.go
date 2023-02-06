@@ -2,8 +2,8 @@ package azurerm
 
 import (
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/providers/azurerm/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/tidwall/gjson"
 )
 
 type Parser struct {
@@ -15,7 +15,7 @@ func NewParser(ctx *config.ProjectContext) *Parser {
 }
 
 func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	registryMap := GetRegistryMap()
+	registryMap := resources.GetRegistryMap()
 
 	if registryItem, ok := (*registryMap)[d.Type]; ok {
 		if registryItem.NoPrice {
@@ -39,8 +39,8 @@ func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *sc
 			}
 			return res
 		}
+	}
 
-	
 	return &schema.Resource{
 		Name:         d.Address,
 		ResourceType: d.Type,
@@ -48,14 +48,4 @@ func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *sc
 		IsSkipped:    true,
 		SkipMessage:  "This resource is not currently supported",
 	}
-}
-
-func (p *Parser) parseWhatifJSONResources(
-	parsePrior bool,
-	baseResources []*schema.PartialResource,
-	usage map[string]*schema.UsageData) []*schema.PartialResource {
-
-
-
-	return []*schema.PartialResource{}
 }

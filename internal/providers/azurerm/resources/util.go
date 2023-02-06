@@ -1,5 +1,5 @@
 // Yoinked from providers/terraform/azure/util.go
-package azurerm
+package resources
 
 import (
 	"fmt"

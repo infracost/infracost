@@ -1,13 +1,8 @@
 package azurerm
 
 import (
-	"encoding/json"
-	"os"
-
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/pkg/errors"
-	"github.com/tidwall/gjson"
 )
 
 type WhatifJsonProvider struct {
@@ -39,28 +34,28 @@ func (p *WhatifJsonProvider) LoadResources(usage map[string]*schema.UsageData) (
 	// Then pass the response to the code below
 	// For now, pass the whatif result directly
 
-	b, err := os.ReadFile(p.Path)
-	if err != nil {
-		return []*schema.Project{}, errors.Wrap(err, "Error reading WhatIf operation result")
-	}
+	// b, err := os.ReadFile(p.Path)
+	// if err != nil {
+	// 	return []*schema.Project{}, errors.Wrap(err, "Error reading WhatIf operation result")
+	// }
 
-	var whatif WhatIf
-	err = json.Unmarshal(b, &whatif)
-	gjsonResult := gjson.ParseBytes(b)
+	// var whatif WhatIf
+	// err = json.Unmarshal(b, &whatif)
+	// gjsonResult := gjson.ParseBytes(b)
 
-	if err != nil {
-		return []*schema.Project{}, errors.Wrap(err, "Error reading WhatIf operation result")
-	}
+	// if err != nil {
+	// 	return []*schema.Project{}, errors.Wrap(err, "Error reading WhatIf operation result")
+	// }
 
-	metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
-	metadata.Type = p.Type()
+	// metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
+	// metadata.Type = p.Type()
 
-	p.AddMetadata(metadata)
-	name := metadata.GenerateProjectName(p.ctx.RunContext.VCSMetadata.Remote, p.ctx.RunContext.IsCloudEnabled())
+	// p.AddMetadata(metadata)
+	// name := metadata.GenerateProjectName(p.ctx.RunContext.VCSMetadata.Remote, p.ctx.RunContext.IsCloudEnabled())
 
-	project := schema.NewProject(name, metadata)
-	parser := NewParser(p.ctx)
+	// project := schema.NewProject(name, metadata)
+	// parser := NewParser(p.ctx)
 
-	parser.parse
-
+	// parser.parse
+	return []*schema.Project{}, nil
 }

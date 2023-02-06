@@ -47,26 +47,24 @@ type WhatifChange struct {
 	ChangeType ChangeType `json:"changeType"`
 	// Before/After include several fields that are always present (resourceId, type etc.)
 	// A resource's 'properties' field differs greatly, so serialize as raw JSON
-	Before json.RawMessage `json:"before,omitempty"`
-	After  json.RawMessage `json:"after,omitempty"`
+	BeforeRaw json.RawMessage `json:"before,omitempty"`
+	AfterRaw  json.RawMessage `json:"after,omitempty"`
 	// TODO: Should be of type WhatIfChange
-	Delta             json.RawMessage `json:"delta,omitempty"`
+	DeltaRaw          json.RawMessage `json:"delta,omitempty"`
 	UnsupportedReadon string          `json:"unsupportedReason,omitempty"`
 }
 
-func (this *WhatifChange) MarshalAfter() gjson.Result {
-	marshal, err := this.After.MarshalJSON()
+func (w *WhatifChange) After() gjson.Result {
+	marshal, err := w.AfterRaw.MarshalJSON()
 	if err != nil {
 		log.Fatalf("Failed marshalling After")
 	}
 
 	return gjson.ParseBytes(marshal)
-
-	gjson.ParseBytes(marshal)
 }
 
-func (this *WhatifChange) MarshalBefore() {
-	marshal, err := this.Before.MarshalJSON()
+func (w *WhatifChange) Before() gjson.Result {
+	marshal, err := w.BeforeRaw.MarshalJSON()
 	if err != nil {
 		log.Fatalf("Failed marshalling Before")
 	}

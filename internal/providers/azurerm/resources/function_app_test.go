@@ -1,4 +1,4 @@
-package azurerm_test
+package resources
 
 import (
 	"testing"
