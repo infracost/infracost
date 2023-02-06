@@ -1,0 +1,3 @@
+package azurerm
+
+func test() {}
