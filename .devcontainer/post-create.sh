@@ -1,0 +1,2 @@
+make deps
+make install

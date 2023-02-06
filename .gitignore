@@ -46,3 +46,6 @@ docs/generated/
 
 # Infracost generated files
 infracost-debug-report.json
+
+# Devcontainer files
+.devcontainer/post-create.log
