@@ -7,7 +7,7 @@ import (
 )
 
 // LambdaProvisionedConcurrencyConfig initializes a requested number of execution environments so that
-// they are prepared to respond immediatley to your functions invocations. Configuring provisioned
+// they are prepared to respond immediately to your functions invocations. Configuring provisioned
 // concurrency incurs charges to your AWS Account.
 //
 // Resource information: https://docs.aws.amazon.com/lambda/latest/dg/lambda-concurrency.html
