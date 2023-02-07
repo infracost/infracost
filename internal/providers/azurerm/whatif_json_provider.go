@@ -11,14 +11,16 @@ import (
 
 // TODO: AzureRM doesn't have a concept of a 'Project', needs its own config.ProjectContext object
 type WhatifJsonProvider struct {
-	ctx  *config.ProjectContext
-	Path string
+	ctx                  *config.ProjectContext
+	Path                 string
+	includePastResources bool
 }
 
-func NewWhatifJsonProvider(ctx *config.ProjectContext) schema.Provider {
+func NewWhatifJsonProvider(ctx *config.ProjectContext, includePastResources bool) schema.Provider {
 	return &WhatifJsonProvider{
-		ctx:  ctx,
-		Path: ctx.ProjectConfig.Path,
+		ctx:                  ctx,
+		Path:                 ctx.ProjectConfig.Path,
+		includePastResources: includePastResources,
 	}
 }
 
@@ -64,7 +66,7 @@ func (p *WhatifJsonProvider) LoadResources(usage map[string]*schema.UsageData) (
 	parser := NewParser(p.ctx)
 
 	// TODO: pastResources are ??, check what they are in Azure context
-	partialPastResources, partialResources, err := parser.parse(true, j, usage)
+	partialPastResources, partialResources, err := parser.parse(p.includePastResources, j, usage)
 	if err != nil {
 		return []*schema.Project{project}, errors.Wrap(err, "Error parsing WhatIf data")
 	}

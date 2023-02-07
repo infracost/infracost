@@ -39,7 +39,8 @@ func TestBreakdownFormatHTMLProjectName(t *testing.T) {
 func TestBreakdownFormatJSON(t *testing.T) {
 	opts := DefaultOptions()
 	opts.IsJSON = true
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--format", "json", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/example_usage.yml"}, opts)
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
+		[]string{"breakdown", "--format", "json", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/example_usage.yml"}, opts)
 }
 
 func TestBreakdownFormatJsonWithWarnings(t *testing.T) {

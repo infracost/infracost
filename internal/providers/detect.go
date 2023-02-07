@@ -13,6 +13,7 @@ import (
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/logging"
+	"github.com/infracost/infracost/internal/providers/azurerm"
 	"github.com/infracost/infracost/internal/providers/cloudformation"
 	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/schema"
@@ -88,6 +89,8 @@ func Detect(ctx *config.ProjectContext, includePastResources bool) (schema.Provi
 		return terraform.NewStateJSONProvider(ctx, includePastResources), nil
 	case "cloudformation":
 		return cloudformation.NewTemplateProvider(ctx, includePastResources), nil
+	case "azurerm_whatif_json":
+		return azurerm.NewWhatifJsonProvider(ctx, includePastResources), nil
 	}
 
 	return nil, fmt.Errorf("could not detect path type for '%s'", path)
@@ -137,6 +140,10 @@ func DetectProjectType(path string, forceCLI bool) string {
 			return "terragrunt_cli"
 		}
 		return "terragrunt_dir"
+	}
+
+	if isAzureRMWhatifTemplate(path) {
+		return "azurerm_whatif_json"
 	}
 
 	if forceCLI {
@@ -192,6 +199,18 @@ func isTerraformStateJSON(path string) bool {
 	}
 
 	return jsonFormat.FormatVersion != "" && jsonFormat.Values != nil
+}
+
+func isAzureRMWhatifTemplate(path string) bool {
+	b, err := os.ReadFile(path)
+	if err != nil {
+		return false
+	}
+
+	var jsonFormat azurerm.WhatIf
+	err = json.Unmarshal(b, &jsonFormat)
+
+	return err == nil
 }
 
 func isTerraformPlan(path string) bool {

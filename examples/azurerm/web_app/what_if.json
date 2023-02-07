@@ -1,0 +1,50 @@
+{
+    "changes": [
+        {
+            "after": {
+                "apiVersion": "2022-03-01",
+                "id": "/subscriptions/b9f8aae4-de27-4cea-b8c7-4f196e745517/resourceGroups/rg-infracost-testing/providers/Microsoft.Web/serverfarms/AppServicePlan-AzureLinuxApp",
+                "kind": "linux",
+                "location": "westeurope",
+                "name": "AppServicePlan-AzureLinuxApp",
+                "properties": {
+                    "reserved": true
+                },
+                "resourceGroup": "rg-infracost-testing",
+                "sku": {
+                    "name": "S1"
+                },
+                "type": "Microsoft.Web/serverfarms"
+            },
+            "before": null,
+            "changeType": "Create",
+            "delta": null,
+            "resourceId": "/subscriptions/b9f8aae4-de27-4cea-b8c7-4f196e745517/resourceGroups/rg-infracost-testing/providers/Microsoft.Web/serverfarms/AppServicePlan-AzureLinuxApp",
+            "unsupportedReason": null
+        },
+        {
+            "after": {
+                "apiVersion": "2022-03-01",
+                "id": "/subscriptions/b9f8aae4-de27-4cea-b8c7-4f196e745517/resourceGroups/rg-infracost-testing/providers/Microsoft.Web/sites/AzureLinuxApp-webapp",
+                "identity": "*******",
+                "kind": "app",
+                "location": "westeurope",
+                "name": "AzureLinuxApp-webapp",
+                "properties": {
+                    "httpsOnly": true,
+                    "serverFarmId": "/subscriptions/b9f8aae4-de27-4cea-b8c7-4f196e745517/resourceGroups/rg-infracost-testing/providers/Microsoft.Web/serverfarms/AppServicePlan-AzureLinuxApp",
+                    "siteConfig": "*******"
+                },
+                "resourceGroup": "rg-infracost-testing",
+                "type": "Microsoft.Web/sites"
+            },
+            "before": null,
+            "changeType": "Create",
+            "delta": null,
+            "resourceId": "/subscriptions/b9f8aae4-de27-4cea-b8c7-4f196e745517/resourceGroups/rg-infracost-testing/providers/Microsoft.Web/sites/AzureLinuxApp-webapp",
+            "unsupportedReason": null
+        }
+    ],
+    "error": null,
+    "status": "Succeeded"
+}
