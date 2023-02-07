@@ -93,6 +93,10 @@ test_google:
 test_azure:
 	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/azure $(or $(ARGS), -v -cover)
 
+# Run AzureRM tests
+test_azurerm:
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/azurerm $(or $(ARGS), -v -cover)
+
 # Update AWS golden files tests
 test_update:
 	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/... $(or $(ARGS), -update -v -cover)

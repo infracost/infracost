@@ -44,6 +44,18 @@ func NewCFResourceData(resourceType string, providerName string, address string,
 	}
 }
 
+func NewAzureRMResourceData(resourceType string, resourceId string, rawValues gjson.Result) *ResourceData {
+	return &ResourceData{
+		Type:          resourceType,
+		ProviderName:  "azurerm",
+		Address:       resourceId,
+		Tags:          make(map[string]string),
+		RawValues:     rawValues,
+		referencesMap: make(map[string][]*ResourceData),
+		CFResource:    nil,
+	}
+}
+
 func (d *ResourceData) Get(key string) gjson.Result {
 	return d.RawValues.Get(key)
 }
