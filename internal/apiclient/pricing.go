@@ -9,6 +9,7 @@ import (
 
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
 
 	log "github.com/sirupsen/logrus"
@@ -72,7 +73,7 @@ func NewPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
 	}
 
 	client := retryablehttp.NewClient()
-	client.Logger = log.StandardLogger()
+	client.Logger = &LeveledLogger{Logger: logging.Logger.WithField("library", "retryablehttp")}
 	client.HTTPClient.Transport.(*http.Transport).TLSClientConfig = &tlsConfig
 
 	return &PricingAPIClient{
