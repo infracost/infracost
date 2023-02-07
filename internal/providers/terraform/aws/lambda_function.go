@@ -9,7 +9,6 @@ import (
 func getLambdaFunctionRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:      "aws_lambda_function",
-		Notes:     []string{"Provisioned concurrency is not yet supported."},
 		CoreRFunc: NewLambdaFunction,
 	}
 }
