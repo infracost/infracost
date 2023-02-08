@@ -20,13 +20,11 @@ func TestWhatifSerialization(t *testing.T) {
 	expected := []WhatIf{
 		{
 			Status: "Succeeded",
-			Properties: WhatifProperties{
-				Changes: []ResourceSnapshot{
-					{
-						ResourceId: "/subscriptions/00000000-0000-0000-0000-000000000001/resourceGroups/my-resource-group2",
-						ChangeType: Create,
-						AfterRaw:   []byte("{\"apiVersion\":\"2019-03-01\",\"id\":\"/subscriptions/00000000-0000-0000-0000-000000000001/resourceGroups/my-resource-group2\",\"type\":\"Microsoft.Resources/resourceGroups\",\"name\":\"my-resource-group2\",\"location\":\"location3\"}"),
-					},
+			Changes: []ResourceSnapshot{
+				{
+					ResourceId: "/subscriptions/00000000-0000-0000-0000-000000000001/resourceGroups/my-resource-group2",
+					ChangeType: Create,
+					AfterRaw:   []byte("{\"apiVersion\":\"2019-03-01\",\"id\":\"/subscriptions/00000000-0000-0000-0000-000000000001/resourceGroups/my-resource-group2\",\"type\":\"Microsoft.Resources/resourceGroups\",\"name\":\"my-resource-group2\",\"location\":\"location3\"}"),
 				},
 			},
 		},
@@ -44,14 +42,14 @@ func TestWhatifSerialization(t *testing.T) {
 
 		json.Unmarshal(file, &whatIf)
 
-		assert.Equal(t, len(exp.Properties.Changes), len(whatIf.Properties.Changes))
+		assert.Equal(t, len(exp.Changes), len(whatIf.Changes))
 
-		for j, c := range whatIf.Properties.Changes {
+		for j, c := range whatIf.Changes {
 			wiBefore := c.Before()
 			wiAfter := c.After()
 
-			expBefore := exp.Properties.Changes[j].Before()
-			expAfter := exp.Properties.Changes[j].After()
+			expBefore := exp.Changes[j].Before()
+			expAfter := exp.Changes[j].After()
 
 			assert.Equal(t, expBefore.Get("apiVersion").Str, wiBefore.Get("apiVersion").Str)
 			assert.Equal(t, expBefore.Get("id").Str, wiBefore.Get("id").Str)

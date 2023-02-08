@@ -32,28 +32,26 @@ const (
 // Modeled after the schema of deployments/whatIf in the AzureRM REST API
 // see: https://learn.microsoft.com/en-us/rest/api/resources/deployments/what-if-at-subscription-scope
 type WhatIf struct {
-	Status     string           `json:"status"`
-	Properties WhatifProperties `json:"properties"`
-	Error      ErrorResponse    `json:"error,omitempty"`
+	Status  string             `json:"status"`
+	Error   ErrorResponse      `json:"error,omitempty"`
+	Changes []ResourceSnapshot `json:"changes,omitempty"`
 }
 
 type WhatifProperties struct {
-	CorrelationId string             `json:"correlationId"`
-	Changes       []ResourceSnapshot `json:"changes,omitempty"`
+	CorrelationId string `json:"correlationId"`
 }
 
 type ResourceSnapshot struct {
-	ResourceId string     `json:"resourceId"`
-	ChangeType ChangeType `json:"changeType"`
+	ResourceId        string     `json:"resourceId"`
+	UnsupportedReason string     `json:"unsupportedReason,omitempty"`
+	ChangeType        ChangeType `json:"changeType"`
+
 	// Before/After include several fields that are always present (resourceId, type etc.)
 	// A resource's 'properties' field differs greatly, so serialize as raw JSON
-
 	BeforeRaw json.RawMessage `json:"before,omitempty"`
 	AfterRaw  json.RawMessage `json:"after,omitempty"`
-
 	// TODO: Should be of type WhatIfChange
-	DeltaRaw          json.RawMessage `json:"delta,omitempty"`
-	UnsupportedReadon string          `json:"unsupportedReason,omitempty"`
+	DeltaRaw json.RawMessage `json:"delta,omitempty"`
 
 	// Parsed backing fields using gjson
 
