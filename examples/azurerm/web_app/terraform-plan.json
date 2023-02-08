@@ -1,0 +1,464 @@
+{
+    "format_version": "1.1",
+    "terraform_version": "1.3.7",
+    "planned_values": {
+        "root_module": {
+            "resources": [
+                {
+                    "address": "azurerm_app_service_plan.appserviceplan",
+                    "mode": "managed",
+                    "type": "azurerm_app_service_plan",
+                    "name": "appserviceplan",
+                    "provider_name": "registry.terraform.io/hashicorp/azurerm",
+                    "schema_version": 0,
+                    "values": {
+                        "app_service_environment_id": null,
+                        "is_xenon": null,
+                        "kind": "Linux",
+                        "location": "westeurope",
+                        "name": "appserviceplan",
+                        "per_site_scaling": null,
+                        "reserved": true,
+                        "resource_group_name": "appservice-rg",
+                        "sku": [
+                            {
+                                "size": "S1",
+                                "tier": "Standard"
+                            }
+                        ],
+                        "tags": null,
+                        "timeouts": null,
+                        "zone_redundant": null
+                    },
+                    "sensitive_values": {
+                        "sku": [
+                            {}
+                        ]
+                    }
+                },
+                {
+                    "address": "azurerm_resource_group.rg",
+                    "mode": "managed",
+                    "type": "azurerm_resource_group",
+                    "name": "rg",
+                    "provider_name": "registry.terraform.io/hashicorp/azurerm",
+                    "schema_version": 0,
+                    "values": {
+                        "location": "westeurope",
+                        "name": "appservice-rg",
+                        "tags": null,
+                        "timeouts": null
+                    },
+                    "sensitive_values": {}
+                },
+                {
+                    "address": "azurerm_windows_web_app.frontwebapp",
+                    "mode": "managed",
+                    "type": "azurerm_windows_web_app",
+                    "name": "frontwebapp",
+                    "provider_name": "registry.terraform.io/hashicorp/azurerm",
+                    "schema_version": 0,
+                    "values": {
+                        "app_settings": null,
+                        "backup": [],
+                        "client_affinity_enabled": false,
+                        "client_certificate_enabled": false,
+                        "client_certificate_exclusion_paths": null,
+                        "client_certificate_mode": "Required",
+                        "connection_string": [],
+                        "enabled": true,
+                        "https_only": false,
+                        "identity": [],
+                        "location": "westeurope",
+                        "logs": [],
+                        "name": "testazurermwebapp",
+                        "resource_group_name": "appservice-rg",
+                        "site_config": [
+                            {
+                                "always_on": true,
+                                "api_definition_url": null,
+                                "api_management_api_id": null,
+                                "app_command_line": null,
+                                "auto_heal_enabled": false,
+                                "auto_heal_setting": [],
+                                "container_registry_managed_identity_client_id": null,
+                                "container_registry_use_managed_identity": false,
+                                "cors": [],
+                                "ftps_state": "Disabled",
+                                "health_check_path": null,
+                                "http2_enabled": false,
+                                "load_balancing_mode": "LeastRequests",
+                                "local_mysql_enabled": false,
+                                "managed_pipeline_mode": "Integrated",
+                                "minimum_tls_version": "1.2",
+                                "remote_debugging_enabled": false,
+                                "scm_minimum_tls_version": "1.2",
+                                "scm_use_main_ip_restriction": false,
+                                "use_32_bit_worker": true,
+                                "virtual_application": [],
+                                "vnet_route_all_enabled": false,
+                                "websockets_enabled": false
+                            }
+                        ],
+                        "sticky_settings": [],
+                        "storage_account": [],
+                        "tags": null,
+                        "timeouts": null,
+                        "virtual_network_subnet_id": null
+                    },
+                    "sensitive_values": {
+                        "auth_settings": [],
+                        "backup": [],
+                        "connection_string": [],
+                        "identity": [],
+                        "logs": [],
+                        "outbound_ip_address_list": [],
+                        "possible_outbound_ip_address_list": [],
+                        "site_config": [
+                            {
+                                "application_stack": [],
+                                "auto_heal_setting": [],
+                                "cors": [],
+                                "default_documents": [],
+                                "ip_restriction": [],
+                                "scm_ip_restriction": [],
+                                "virtual_application": []
+                            }
+                        ],
+                        "site_credential": [],
+                        "sticky_settings": [],
+                        "storage_account": []
+                    }
+                }
+            ]
+        }
+    },
+    "resource_changes": [
+        {
+            "address": "azurerm_app_service_plan.appserviceplan",
+            "mode": "managed",
+            "type": "azurerm_app_service_plan",
+            "name": "appserviceplan",
+            "provider_name": "registry.terraform.io/hashicorp/azurerm",
+            "change": {
+                "actions": [
+                    "create"
+                ],
+                "before": null,
+                "after": {
+                    "app_service_environment_id": null,
+                    "is_xenon": null,
+                    "kind": "Linux",
+                    "location": "westeurope",
+                    "name": "appserviceplan",
+                    "per_site_scaling": null,
+                    "reserved": true,
+                    "resource_group_name": "appservice-rg",
+                    "sku": [
+                        {
+                            "size": "P1v2",
+                            "tier": "Premium"
+                        }
+                    ],
+                    "tags": null,
+                    "timeouts": null,
+                    "zone_redundant": null
+                },
+                "after_unknown": {
+                    "id": true,
+                    "maximum_elastic_worker_count": true,
+                    "maximum_number_of_workers": true,
+                    "sku": [
+                        {
+                            "capacity": true
+                        }
+                    ]
+                },
+                "before_sensitive": false,
+                "after_sensitive": {
+                    "sku": [
+                        {}
+                    ]
+                }
+            }
+        },
+        {
+            "address": "azurerm_resource_group.rg",
+            "mode": "managed",
+            "type": "azurerm_resource_group",
+            "name": "rg",
+            "provider_name": "registry.terraform.io/hashicorp/azurerm",
+            "change": {
+                "actions": [
+                    "create"
+                ],
+                "before": null,
+                "after": {
+                    "location": "westeurope",
+                    "name": "appservice-rg",
+                    "tags": null,
+                    "timeouts": null
+                },
+                "after_unknown": {
+                    "id": true
+                },
+                "before_sensitive": false,
+                "after_sensitive": {}
+            }
+        },
+        {
+            "address": "azurerm_windows_web_app.frontwebapp",
+            "mode": "managed",
+            "type": "azurerm_windows_web_app",
+            "name": "frontwebapp",
+            "provider_name": "registry.terraform.io/hashicorp/azurerm",
+            "change": {
+                "actions": [
+                    "create"
+                ],
+                "before": null,
+                "after": {
+                    "app_settings": null,
+                    "backup": [],
+                    "client_affinity_enabled": false,
+                    "client_certificate_enabled": false,
+                    "client_certificate_exclusion_paths": null,
+                    "client_certificate_mode": "Required",
+                    "connection_string": [],
+                    "enabled": true,
+                    "https_only": false,
+                    "identity": [],
+                    "location": "westeurope",
+                    "logs": [],
+                    "name": "testazurermwebapp",
+                    "resource_group_name": "appservice-rg",
+                    "site_config": [
+                        {
+                            "always_on": true,
+                            "api_definition_url": null,
+                            "api_management_api_id": null,
+                            "app_command_line": null,
+                            "auto_heal_enabled": false,
+                            "auto_heal_setting": [],
+                            "container_registry_managed_identity_client_id": null,
+                            "container_registry_use_managed_identity": false,
+                            "cors": [],
+                            "ftps_state": "Disabled",
+                            "health_check_path": null,
+                            "http2_enabled": false,
+                            "load_balancing_mode": "LeastRequests",
+                            "local_mysql_enabled": false,
+                            "managed_pipeline_mode": "Integrated",
+                            "minimum_tls_version": "1.2",
+                            "remote_debugging_enabled": false,
+                            "scm_minimum_tls_version": "1.2",
+                            "scm_use_main_ip_restriction": false,
+                            "use_32_bit_worker": true,
+                            "virtual_application": [],
+                            "vnet_route_all_enabled": false,
+                            "websockets_enabled": false
+                        }
+                    ],
+                    "sticky_settings": [],
+                    "storage_account": [],
+                    "tags": null,
+                    "timeouts": null,
+                    "virtual_network_subnet_id": null
+                },
+                "after_unknown": {
+                    "auth_settings": true,
+                    "backup": [],
+                    "connection_string": [],
+                    "custom_domain_verification_id": true,
+                    "default_hostname": true,
+                    "id": true,
+                    "identity": [],
+                    "key_vault_reference_identity_id": true,
+                    "kind": true,
+                    "logs": [],
+                    "outbound_ip_address_list": true,
+                    "outbound_ip_addresses": true,
+                    "possible_outbound_ip_address_list": true,
+                    "possible_outbound_ip_addresses": true,
+                    "service_plan_id": true,
+                    "site_config": [
+                        {
+                            "application_stack": true,
+                            "auto_heal_setting": [],
+                            "cors": [],
+                            "default_documents": true,
+                            "detailed_error_logging_enabled": true,
+                            "health_check_eviction_time_in_min": true,
+                            "ip_restriction": true,
+                            "linux_fx_version": true,
+                            "remote_debugging_version": true,
+                            "scm_ip_restriction": true,
+                            "scm_type": true,
+                            "virtual_application": [],
+                            "windows_fx_version": true,
+                            "worker_count": true
+                        }
+                    ],
+                    "site_credential": true,
+                    "sticky_settings": [],
+                    "storage_account": [],
+                    "zip_deploy_file": true
+                },
+                "before_sensitive": false,
+                "after_sensitive": {
+                    "auth_settings": [],
+                    "backup": [],
+                    "connection_string": [],
+                    "custom_domain_verification_id": true,
+                    "identity": [],
+                    "logs": [],
+                    "outbound_ip_address_list": [],
+                    "possible_outbound_ip_address_list": [],
+                    "site_config": [
+                        {
+                            "application_stack": [],
+                            "auto_heal_setting": [],
+                            "cors": [],
+                            "default_documents": [],
+                            "ip_restriction": [],
+                            "scm_ip_restriction": [],
+                            "virtual_application": []
+                        }
+                    ],
+                    "site_credential": [],
+                    "sticky_settings": [],
+                    "storage_account": []
+                }
+            }
+        }
+    ],
+    "configuration": {
+        "provider_config": {
+            "azurerm": {
+                "name": "azurerm",
+                "full_name": "registry.terraform.io/hashicorp/azurerm",
+                "version_constraint": "~\u003e 3.0",
+                "expressions": {
+                    "features": [
+                        {}
+                    ]
+                }
+            }
+        },
+        "root_module": {
+            "resources": [
+                {
+                    "address": "azurerm_app_service_plan.appserviceplan",
+                    "mode": "managed",
+                    "type": "azurerm_app_service_plan",
+                    "name": "appserviceplan",
+                    "provider_config_key": "azurerm",
+                    "expressions": {
+                        "kind": {
+                            "constant_value": "Linux"
+                        },
+                        "location": {
+                            "references": [
+                                "azurerm_resource_group.rg.location",
+                                "azurerm_resource_group.rg"
+                            ]
+                        },
+                        "name": {
+                            "constant_value": "appserviceplan"
+                        },
+                        "reserved": {
+                            "constant_value": true
+                        },
+                        "resource_group_name": {
+                            "references": [
+                                "azurerm_resource_group.rg.name",
+                                "azurerm_resource_group.rg"
+                            ]
+                        },
+                        "sku": [
+                            {
+                                "size": {
+                                    "constant_value": "P1v2"
+                                },
+                                "tier": {
+                                    "constant_value": "Premium"
+                                }
+                            }
+                        ]
+                    },
+                    "schema_version": 0
+                },
+                {
+                    "address": "azurerm_resource_group.rg",
+                    "mode": "managed",
+                    "type": "azurerm_resource_group",
+                    "name": "rg",
+                    "provider_config_key": "azurerm",
+                    "expressions": {
+                        "location": {
+                            "constant_value": "westeurope"
+                        },
+                        "name": {
+                            "constant_value": "appservice-rg"
+                        }
+                    },
+                    "schema_version": 0
+                },
+                {
+                    "address": "azurerm_windows_web_app.frontwebapp",
+                    "mode": "managed",
+                    "type": "azurerm_windows_web_app",
+                    "name": "frontwebapp",
+                    "provider_config_key": "azurerm",
+                    "expressions": {
+                        "location": {
+                            "references": [
+                                "azurerm_resource_group.rg.location",
+                                "azurerm_resource_group.rg"
+                            ]
+                        },
+                        "name": {
+                            "constant_value": "testazurermwebapp"
+                        },
+                        "resource_group_name": {
+                            "references": [
+                                "azurerm_resource_group.rg.name",
+                                "azurerm_resource_group.rg"
+                            ]
+                        },
+                        "service_plan_id": {
+                            "references": [
+                                "azurerm_app_service_plan.appserviceplan.id",
+                                "azurerm_app_service_plan.appserviceplan"
+                            ]
+                        },
+                        "site_config": [
+                            {}
+                        ]
+                    },
+                    "schema_version": 0
+                }
+            ]
+        }
+    },
+    "relevant_attributes": [
+        {
+            "resource": "azurerm_app_service_plan.appserviceplan",
+            "attribute": [
+                "id"
+            ]
+        },
+        {
+            "resource": "azurerm_resource_group.rg",
+            "attribute": [
+                "name"
+            ]
+        },
+        {
+            "resource": "azurerm_resource_group.rg",
+            "attribute": [
+                "location"
+            ]
+        }
+    ]
+}
