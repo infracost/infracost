@@ -1,0 +1,13 @@
+package azurerm_test
+
+import (
+	"os"
+	"testing"
+
+	"github.com/infracost/infracost/internal/providers/azurerm/armtest"
+)
+
+func TestMain(m *testing.M) {
+	code := m.Run()
+	os.Exit(code)
+}
