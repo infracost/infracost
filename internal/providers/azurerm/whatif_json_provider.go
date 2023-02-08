@@ -66,9 +66,9 @@ func (p *WhatifJsonProvider) LoadResources(usage map[string]*schema.UsageData) (
 	parser := NewParser(p.ctx)
 
 	// TODO: pastResources are ??, check what they are in Azure context
-	partialPastResources, partialResources, err := parser.parse(p.includePastResources, j, usage)
+	partialPastResources, partialResources, err := parser.parse(j, usage)
 	if err != nil {
-		return []*schema.Project{project}, errors.Wrap(err, "Error parsing WhatIf data")
+		return []*schema.Project{}, errors.Wrap(err, "Error parsing WhatIf data")
 	}
 
 	project.PartialPastResources = partialPastResources
