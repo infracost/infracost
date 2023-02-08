@@ -1,0 +1,13 @@
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_azurerm_whatif_json/what_if.json
+
+ Name                                                                                                                                                   Monthly Qty  Unit   Monthly Cost 
+                                                                                                                                                                                         
+ /subscriptions/00000000-0000-0000-0000-000000000001/resourceGroups/my-resource-group/providers/Microsoft.Web/serverfarms/AppServicePlan-AzureLinuxApp                                   
+ └─ Instance usage (S1)                                                                                                                                         730  hours        $69.35 
+                                                                                                                                                                                         
+ OVERALL TOTAL                                                                                                                                                                    $69.35 
+──────────────────────────────────
+2 cloud resources were detected:
+∙ 1 was estimated
+∙ 1 was free:
+  ∙ 1 x azurerm_windows_web_app

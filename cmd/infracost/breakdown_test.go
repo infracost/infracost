@@ -638,3 +638,19 @@ func TestBreakdownMultiProjectWithAllErrors(t *testing.T) {
 		}, &GoldenFileOptions{CaptureLogs: true},
 	)
 }
+
+// cmd/infracost/run.go:runProjectConfig calls everything
+func TestBreakdownAzurermWhatifJson(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	testFile := path.Join("./testdata", testName, "what_if.json")
+
+	GoldenFileCommandTest(
+		t,
+		testName,
+		[]string{"breakdown",
+			"--path",
+			testFile,
+			"--show-skipped",
+		}, &GoldenFileOptions{CaptureLogs: true},
+	)
+}

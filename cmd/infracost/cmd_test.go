@@ -43,7 +43,11 @@ func DefaultOptions() *GoldenFileOptions {
 }
 
 func GoldenFileCommandTest(t *testing.T, testName string, args []string, testOptions *GoldenFileOptions, ctxOptions ...func(ctx *config.RunContext)) {
-	if testOptions == nil || !testOptions.OnlyRunTerraformCLI {
+	if testOptions != nil && !testOptions.OnlyRunTerraformCLI && !testOptions.RunTerraformCLI {
+		t.Run("AZURERM", func(t *testing.T) {
+			goldenFileCommandTest(t, testName, args, testOptions, false, ctxOptions...)
+		})
+	} else if testOptions == nil || !testOptions.OnlyRunTerraformCLI {
 		t.Run("HCL", func(t *testing.T) {
 			goldenFileCommandTest(t, testName, args, testOptions, true, ctxOptions...)
 		})
