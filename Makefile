@@ -113,6 +113,10 @@ test_update_google:
 test_update_azure:
 	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/azure $(or $(ARGS), -update -v -cover)
 
+# Update AzureRM golden files tests
+test_update_azurerm:
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/azurerm $(or $(ARGS), -update -v -cover)
+
 fmt:
 	go fmt ./...
 	find . -name '*.tf' -exec terraform fmt {} \;

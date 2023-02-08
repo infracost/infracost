@@ -1,0 +1,170 @@
+{
+    "changes": [
+        {
+            "resourceId": "/subscriptions/00000000-0000-0000-0000-000000000001/resourceGroups/rg",
+            "changeType": "Create",
+            "after": {
+                "apiVersion": "2019-03-01",
+                "id": "/subscriptions/00000000-0000-0000-0000-000000000001/resourceGroups/rg",
+                "type": "Microsoft.Resources/resourceGroups",
+                "name": "rg",
+                "location": "westeurope"
+            }
+        },
+        {
+            "after": {
+                "apiVersion": "2022-03-01",
+                "id": "/subscriptions/00000000-0000-0000-0000-000000000001/resourceGroups/rg/providers/Microsoft.Web/serverfarms/asp-basic",
+                "kind": "linux",
+                "location": "westeurope",
+                "name": "asp-basic",
+                "properties": {
+                    "reserved": true
+                },
+                "resourceGroup": "rg",
+                "sku": {
+                    "tier": "Basic",
+                    "name": "B2"
+                },
+                "skuCapacity": {
+                    "default": 1
+                },
+                "type": "Microsoft.Web/serverfarms"
+            },
+            "before": null,
+            "changeType": "Create",
+            "delta": null,
+            "resourceId": "/subscriptions/00000000-0000-0000-0000-000000000001/resourceGroups/rg/providers/Microsoft.Web/serverfarms/asp-basic",
+            "unsupportedReason": null
+        },
+        {
+            "after": {
+                "apiVersion": "2022-03-01",
+                "id": "/subscriptions/00000000-0000-0000-0000-000000000001/resourceGroups/rg/providers/Microsoft.Web/serverfarms/asp-basic-default-cap",
+                "kind": "linux",
+                "location": "westeurope",
+                "name": "asp-basic-default-cap",
+                "properties": {
+                    "reserved": true
+                },
+                "resourceGroup": "rg",
+                "sku": {
+                    "tier": "Basic",
+                    "name": "B1"
+                },
+                "type": "Microsoft.Web/serverfarms"
+            },
+            "before": null,
+            "changeType": "Create",
+            "delta": null,
+            "resourceId": "/subscriptions/00000000-0000-0000-0000-000000000001/resourceGroups/rg/providers/Microsoft.Web/serverfarms/asp-basic-default-cap",
+            "unsupportedReason": null
+        },
+        {
+            "after": {
+                "apiVersion": "2022-03-01",
+                "id": "/subscriptions/00000000-0000-0000-0000-000000000001/resourceGroups/rg/providers/Microsoft.Web/serverfarms/asp-premiumv1",
+                "kind": "linux",
+                "location": "westeurope",
+                "name": "asp-premiumv1",
+                "properties": {
+                    "reserved": true
+                },
+                "resourceGroup": "rg",
+                "sku": {
+                    "tier": "PremiumContainer",
+                    "name": "P1v1"
+                },
+                "skuCapacity": {
+                    "default": 1
+                },
+                "type": "Microsoft.Web/serverfarms"
+            },
+            "before": null,
+            "changeType": "Create",
+            "delta": null,
+            "resourceId": "/subscriptions/00000000-0000-0000-0000-000000000001/resourceGroups/rg/providers/Microsoft.Web/serverfarms/asp-premiumv1",
+            "unsupportedReason": null
+        },
+        {
+            "after": {
+                "apiVersion": "2022-03-01",
+                "id": "/subscriptions/00000000-0000-0000-0000-000000000001/resourceGroups/rg/providers/Microsoft.Web/serverfarms/asp-premiumv2",
+                "kind": "linux",
+                "location": "westeurope",
+                "name": "asp-premiumv2",
+                "properties": {
+                    "reserved": true
+                },
+                "resourceGroup": "rg",
+                "sku": {
+                    "tier": "PremiumContainer",
+                    "name": "P1v2"
+                },
+                "skuCapacity": {
+                    "default": 10  
+                },
+                "type": "Microsoft.Web/serverfarms"
+            },
+            "before": null,
+            "changeType": "Create",
+            "delta": null,
+            "resourceId": "/subscriptions/00000000-0000-0000-0000-000000000001/resourceGroups/rg/providers/Microsoft.Web/serverfarms/asp-premiumv2",
+            "unsupportedReason": null
+        },
+        {
+            "after": {
+                "apiVersion": "2022-03-01",
+                "id": "/subscriptions/00000000-0000-0000-0000-000000000001/resourceGroups/rg/providers/Microsoft.Web/serverfarms/asp-standards1",
+                "kind": "windows",
+                "location": "westeurope",
+                "name": "asp-standards1",
+                "properties": {
+                    "reserved": true
+                },
+                "resourceGroup": "rg",
+                "sku": {
+                    "tier": "Standard",
+                    "name": "S1"
+                },
+                "skuCapacity": {
+                    "default": 1
+                },
+                "type": "Microsoft.Web/serverfarms"
+            },
+            "before": null,
+            "changeType": "Create",
+            "delta": null,
+            "resourceId": "/subscriptions/00000000-0000-0000-0000-000000000001/resourceGroups/rg/providers/Microsoft.Web/serverfarms/asp-standards1",
+            "unsupportedReason": null
+        },
+        {
+            "after": {
+                "apiVersion": "2022-03-01",
+                "id": "/subscriptions/00000000-0000-0000-0000-000000000001/resourceGroups/rg/providers/Microsoft.Web/serverfarms/asp-standards2",
+                "kind": "windows",
+                "location": "westeurope",
+                "name": "asp-standards2",
+                "properties": {
+                    "reserved": true
+                },
+                "resourceGroup": "rg",
+                "sku": {
+                    "tier": "Standard",
+                    "name": "S1"
+                },
+                "skuCapacity": {
+                    "default": 5
+                },
+                "type": "Microsoft.Web/serverfarms"
+            },
+            "before": null,
+            "changeType": "Create",
+            "delta": null,
+            "resourceId": "/subscriptions/00000000-0000-0000-0000-000000000001/resourceGroups/rg/providers/Microsoft.Web/serverfarms/asp-standards2",
+            "unsupportedReason": null
+        }
+    ],
+    "error": null,
+    "status": "Succeeded"
+}

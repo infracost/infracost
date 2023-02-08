@@ -1,33 +1,27 @@
 
- Name                                       Monthly Qty  Unit   Monthly Cost 
-                                                                             
- azurerm_app_service_plan.basic                                              
- └─ Instance usage (B2)                             730  hours        $24.82 
-                                                                             
- azurerm_app_service_plan.default_capacity                                   
- └─ Instance usage (B2)                             730  hours        $24.82 
-                                                                             
- azurerm_app_service_plan.pc2                                                
- └─ Instance usage (PC2)                            730  hours       $118.59 
-                                                                             
- azurerm_app_service_plan.pc3                                                
- └─ Instance usage (PC3)                         10,950  hours     $3,557.57 
-                                                                             
- azurerm_app_service_plan.premium_v1                                         
- └─ Instance usage (P1v1)                           730  hours       $219.00 
-                                                                             
- azurerm_app_service_plan.premium_v2                                         
- └─ Instance usage (P1v2)                         7,300  hours       $737.30 
-                                                                             
- azurerm_app_service_plan.standard_s1                                        
- └─ Instance usage (S1)                             730  hours        $73.00 
-                                                                             
- azurerm_app_service_plan.standard_s2                                        
- └─ Instance usage (S1)                           3,650  hours       $365.00 
-                                                                             
- OVERALL TOTAL                                                     $5,120.09 
+ Name                                                                                                                             Monthly Qty  Unit   Monthly Cost 
+                                                                                                                                                                   
+ /subscriptions/00000000-0000-0000-0000-000000000001/resourceGroups/rg/providers/Microsoft.Web/serverfarms/asp-basic                                               
+ └─ Instance usage (B2)                                                                                                                   730  hours        $26.28 
+                                                                                                                                                                   
+ /subscriptions/00000000-0000-0000-0000-000000000001/resourceGroups/rg/providers/Microsoft.Web/serverfarms/asp-basic-default-cap                                   
+ └─ Instance usage (B1)                                                                                                                   730  hours        $13.14 
+                                                                                                                                                                   
+ /subscriptions/00000000-0000-0000-0000-000000000001/resourceGroups/rg/providers/Microsoft.Web/serverfarms/asp-premiumv1                                           
+ └─ Instance usage (P1v1)                                                                                                                 730  hours       $219.00 
+                                                                                                                                                                   
+ /subscriptions/00000000-0000-0000-0000-000000000001/resourceGroups/rg/providers/Microsoft.Web/serverfarms/asp-premiumv2                                           
+ └─ Instance usage (P1v2)                                                                                                               7,300  hours       $839.50 
+                                                                                                                                                                   
+ /subscriptions/00000000-0000-0000-0000-000000000001/resourceGroups/rg/providers/Microsoft.Web/serverfarms/asp-standards1                                          
+ └─ Instance usage (S1)                                                                                                                   730  hours        $73.00 
+                                                                                                                                                                   
+ /subscriptions/00000000-0000-0000-0000-000000000001/resourceGroups/rg/providers/Microsoft.Web/serverfarms/asp-standards2                                          
+ └─ Instance usage (S1)                                                                                                                 3,650  hours       $365.00 
+                                                                                                                                                                   
+ OVERALL TOTAL                                                                                                                                           $1,535.92 
 ──────────────────────────────────
-9 cloud resources were detected:
-∙ 8 were estimated
+7 cloud resources were detected:
+∙ 6 were estimated
 ∙ 1 was free:
   ∙ 1 x azurerm_resource_group

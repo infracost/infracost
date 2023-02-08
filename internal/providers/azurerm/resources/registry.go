@@ -4,33 +4,41 @@ import (
 	"sync"
 
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/tidwall/gjson"
 )
 
 type ResourceRegistryMap map[string]*schema.RegistryItem
-type stringMap map[string]string
+type ArmToTfMapper func(rawResource gjson.Result) string
+type ArmToTfResourceMapperMap map[string]ArmToTfMapper
 
 var (
 	once                sync.Once
 	resourceRegistryMap ResourceRegistryMap
 )
 
+func defaultArmToTfMapper(tfResource string) ArmToTfMapper {
+	return func(_ gjson.Result) string {
+		return tfResource
+	}
+}
+
 // TODO: see providers/terraform/azure/registry.go
 // Use ASP/Function app as testing resources
 var Registry []*schema.RegistryItem = []*schema.RegistryItem{
-	getAppFunctionRegistryItem(),
 	getAppServicePlanRegistryItem(),
 }
 
-var azureRMToTerraformResourceMap stringMap = stringMap{
-	"Microsoft.Resources/resourceGroups": "azurerm_resource_group",
-	"Microsoft.Web/serverFarms":          "azurerm_app_service_plan",
-	"Microsoft.Web/sites":                "azurerm_linux_web_app",
+var azureRMToTerraformResourceMap = ArmToTfResourceMapperMap{
+	"Microsoft.Resources/resourceGroups": defaultArmToTfMapper("azurerm_resource_group"),
+	"Microsoft.Web/serverfarms":          defaultArmToTfMapper("azurerm_app_service_plan"),
+	"Microsoft.Web/sites":                mapWebAppTfResource,
 }
 
 // TODO: Terraform resources and azure resources don't map 1-on-1 to eachother
 // Use this function as a stub for later exceptions
-func GetTFResourceFromAzureRMType(armResource string) string {
-	return azureRMToTerraformResourceMap[armResource]
+func GetTFResourceFromAzureRMType(armResource string, rawResource gjson.Result) string {
+	mapper := azureRMToTerraformResourceMap[armResource]
+	return mapper(rawResource)
 }
 
 var FreeResources = []string{
@@ -69,6 +77,8 @@ var FreeResources = []string{
 	"azurerm_api_management_user",
 
 	// Azure App Service
+	"azurerm_windows_web_app",
+	"azurerm_linux_web_app",
 	"azurerm_app_service_active_slot",
 	"azurerm_app_service_certificate",
 	"azurerm_app_service_managed_certificate",

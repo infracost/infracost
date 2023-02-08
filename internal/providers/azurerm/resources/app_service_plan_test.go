@@ -1,9 +1,9 @@
-package resources
+package resources_test
 
 import (
 	"testing"
 
-	"github.com/infracost/infracost/internal/providers/terraform/tftest"
+	"github.com/infracost/infracost/internal/providers/azurerm/armtest"
 )
 
 func TestAzureRMAppServicePlan(t *testing.T) {
@@ -12,5 +12,5 @@ func TestAzureRMAppServicePlan(t *testing.T) {
 		t.Skip("skipping test in short mode")
 	}
 
-	tftest.GoldenFileResourceTests(t, "app_service_plan_test")
+	armtest.GoldenFileResourceTests(t, "app_service_plan_test")
 }

@@ -1,18 +1,16 @@
 {
   "status": "Succeeded",
-  "properties": {
-    "changes": [
-      {
-        "resourceId": "/subscriptions/00000000-0000-0000-0000-000000000001/resourceGroups/my-resource-group2",
-        "changeType": "Create",
-        "after": {
-          "apiVersion": "2019-03-01",
-          "id": "/subscriptions/00000000-0000-0000-0000-000000000001/resourceGroups/my-resource-group2",
-          "type": "Microsoft.Resources/resourceGroups",
-          "name": "my-resource-group2",
-          "location": "location3"
-        }
+  "changes": [
+    {
+      "resourceId": "/subscriptions/00000000-0000-0000-0000-000000000001/resourceGroups/my-resource-group2",
+      "changeType": "Create",
+      "after": {
+        "apiVersion": "2019-03-01",
+        "id": "/subscriptions/00000000-0000-0000-0000-000000000001/resourceGroups/my-resource-group2",
+        "type": "Microsoft.Resources/resourceGroups",
+        "name": "my-resource-group2",
+        "location": "location3"
       }
-    ]
-  }
+    }
+  ]
 }

@@ -1,5 +1,4 @@
-// Yoinked from providers/terraform/azure/util.go
-package resources
+package util
 
 import (
 	"fmt"
@@ -12,29 +11,29 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func strPtr(s string) *string {
+func StrPtr(s string) *string {
 	return &s
 }
 
-func decimalPtr(d decimal.Decimal) *decimal.Decimal {
+func DecimalPtr(d decimal.Decimal) *decimal.Decimal {
 	return &d
 }
 
-func regexPtr(regex string) *string {
-	return strPtr(fmt.Sprintf("/%s/i", regex))
+func RegexPtr(regex string) *string {
+	return StrPtr(fmt.Sprintf("/%s/i", regex))
 }
 
-var sReg = regexp.MustCompile(`\s+`)
+var SReg = regexp.MustCompile(`\s+`)
 
-func toAzureCLIName(location string) string {
-	return strings.ToLower(sReg.ReplaceAllString(location, ""))
+func ToAzureCLIName(location string) string {
+	return strings.ToLower(SReg.ReplaceAllString(location, ""))
 }
 
-func lookupRegion(d *schema.ResourceData, parentResourceKeys []string) string {
+func LookupRegion(d *schema.ResourceData, parentResourceKeys []string) string {
 	// First check for a location set directly on a resource
 	location := d.Get("location").String()
 	if location != "" && !strings.Contains(location, "mock") {
-		return toAzureCLIName(location)
+		return ToAzureCLIName(location)
 	}
 
 	// Then check for any parent resources with a location
@@ -43,18 +42,18 @@ func lookupRegion(d *schema.ResourceData, parentResourceKeys []string) string {
 		for _, p := range parents {
 			location := p.Get("location").String()
 			if location != "" && !strings.Contains(location, "mock") {
-				return toAzureCLIName(location)
+				return ToAzureCLIName(location)
 			}
 		}
 	}
 
 	// When all else fails use the default region
-	defaultRegion := toAzureCLIName(d.Get("region").String())
+	defaultRegion := ToAzureCLIName(d.Get("region").String())
 	log.Warnf("Using %s for resource %s as its 'location' property could not be found.", defaultRegion, d.Address)
 	return defaultRegion
 }
 
-func convertRegion(region string) string {
+func ConvertRegion(region string) string {
 	if strings.Contains(strings.ToLower(region), "usgov") {
 		return "US Gov"
 	} else if strings.Contains(strings.ToLower(region), "china") {
@@ -64,7 +63,7 @@ func convertRegion(region string) string {
 	}
 }
 
-func locationNameMapping(l string) string {
+func LocationNameMapping(l string) string {
 	name := map[string]string{
 		"westus":             "West US",
 		"westus2":            "West US 2",
@@ -119,11 +118,11 @@ func locationNameMapping(l string) string {
 	return name
 }
 
-func intPtr(i int64) *int64 {
+func IntPtr(i int64) *int64 {
 	return &i
 }
 
-func contains(arr []string, e string) bool {
+func Contains(arr []string, e string) bool {
 	for _, a := range arr {
 		if a == e {
 			return true
