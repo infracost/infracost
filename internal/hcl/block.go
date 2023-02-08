@@ -1,6 +1,8 @@
 package hcl
 
 import (
+	"bufio"
+	"bytes"
 	"fmt"
 	"os"
 	"regexp"
@@ -12,8 +14,11 @@ import (
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/sirupsen/logrus"
+	"github.com/tidwall/gjson"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 var (
@@ -955,12 +960,32 @@ func (b *Block) Label() string {
 	return strings.Join(b.hclBlock.Labels, ".")
 }
 
-func loadBlocksFromFile(file file, schema *hcl.BodySchema) (hcl.Blocks, error) {
-	if schema == nil {
-		schema = terraformSchemaV012
+type usage struct {
+	line  int
+	usage *schema.UsageData
+}
+
+func loadBlocksFromFile(file file, bodySchema *hcl.BodySchema) (hcl.Blocks, error) {
+	if bodySchema == nil {
+		bodySchema = terraformSchemaV012
 	}
 
-	contents, diags := file.hclFile.Body.Content(schema)
+	var depRegexp = regexp.MustCompile(`^#\s+?infracost-usage:\s+?(.*)`)
+	var matches []usage
+	var lineNumber = 1
+	scanner := bufio.NewScanner(bytes.NewBuffer(file.hclFile.Bytes))
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		match := depRegexp.FindStringSubmatch(line)
+		if len(match) > 1 {
+			m := gjson.Parse(match[1]).Map()
+			matches = append(matches, usage{line: lineNumber, usage: schema.NewUsageData("", m)})
+		}
+
+		lineNumber++
+	}
+
+	contents, diags := file.hclFile.Body.Content(bodySchema)
 	if diags != nil && diags.HasErrors() {
 		return nil, diags
 	}
