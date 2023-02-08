@@ -1,0 +1,39 @@
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_terraform_usage_file_wildcard_module
+
+ Name                                                 Monthly Qty  Unit         Monthly Cost 
+                                                                                             
+ aws_lambda_function.test                                                                    
+ ├─ Requests                                                  500  1M requests       $100.00 
+ └─ Duration (first 6B)                               275,000,000  GB-seconds      $4,583.34 
+                                                                                             
+ module.mod["test"].aws_lambda_function.test2                                                
+ ├─ Requests                                                  200  1M requests        $40.00 
+ └─ Duration (first 6B)                                70,000,000  GB-seconds      $1,166.67 
+                                                                                             
+ module.mod["test"].aws_lambda_function.test["baz"]                                          
+ ├─ Requests                                                  100  1M requests        $20.00 
+ └─ Duration (first 6B)                                25,000,000  GB-seconds        $416.67 
+                                                                                             
+ module.mod["test"].aws_lambda_function.test["foo"]                                          
+ ├─ Requests                                                  100  1M requests        $20.00 
+ └─ Duration (first 6B)                                25,000,000  GB-seconds        $416.67 
+                                                                                             
+ module.mod["test2"].aws_lambda_function.test2                                               
+ ├─ Requests                                                  200  1M requests        $40.00 
+ └─ Duration (first 6B)                                70,000,000  GB-seconds      $1,166.67 
+                                                                                             
+ module.mod["test2"].aws_lambda_function.test["baz"]                                         
+ ├─ Requests                                                  700  1M requests       $140.00 
+ └─ Duration (first 6B)                               525,000,000  GB-seconds      $8,750.02 
+                                                                                             
+ module.mod["test2"].aws_lambda_function.test["foo"]                                         
+ ├─ Requests                                                  400  1M requests        $80.00 
+ └─ Duration (first 6B)                               180,000,000  GB-seconds      $3,000.01 
+                                                                                             
+ OVERALL TOTAL                                                                    $19,940.04 
+──────────────────────────────────
+7 cloud resources were detected:
+∙ 7 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+
+Err:
+

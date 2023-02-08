@@ -85,7 +85,7 @@ func (p *TerragruntProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 	metadata.TerraformWorkspace = p.ctx.ProjectConfig.TerraformWorkspace
 }
 
-func (p *TerragruntProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
+func (p *TerragruntProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, error) {
 	// We want to run Terragrunt commands from the config dirs
 	// Terragrunt internally runs Terraform in the working dirs, so we need to be aware of these
 	// so we can handle reading and cleaning up the generated plan files.

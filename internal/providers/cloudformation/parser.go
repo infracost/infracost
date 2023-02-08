@@ -6,9 +6,10 @@ import (
 
 	"github.com/awslabs/goformation/v4/cloudformation"
 
+	"github.com/tidwall/gjson"
+
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/tidwall/gjson"
 )
 
 type Parser struct {
@@ -59,7 +60,7 @@ func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *sc
 	}
 }
 
-func (p *Parser) parseTemplate(t *cloudformation.Template, usage map[string]*schema.UsageData) ([]*schema.Resource, []*schema.Resource, error) {
+func (p *Parser) parseTemplate(t *cloudformation.Template, usage schema.UsageMap) ([]*schema.Resource, []*schema.Resource, error) {
 	baseResources := p.loadUsageFileResources(usage)
 
 	var resources []*schema.Resource
@@ -67,17 +68,8 @@ func (p *Parser) parseTemplate(t *cloudformation.Template, usage map[string]*sch
 
 	for name, d := range t.Resources {
 		tags := map[string]string{} // TODO: Where do I get tags?
-		var usageData *schema.UsageData
+		usageData := usage.Get(name)
 
-		if ud := usage[name]; ud != nil {
-			usageData = ud
-		} else if strings.HasSuffix(name, "]") {
-			lastIndexOfOpenBracket := strings.LastIndex(name, "[")
-
-			if arrayUsageData := usage[fmt.Sprintf("%s[*]", name[:lastIndexOfOpenBracket])]; arrayUsageData != nil {
-				usageData = arrayUsageData
-			}
-		}
 		resourceData := schema.NewCFResourceData(d.AWSCloudFormationType(), "aws", name, tags, d)
 
 		if r := p.createResource(resourceData, usageData); r != nil {
@@ -88,10 +80,10 @@ func (p *Parser) parseTemplate(t *cloudformation.Template, usage map[string]*sch
 	return resources, resources, nil
 }
 
-func (p *Parser) loadUsageFileResources(u map[string]*schema.UsageData) []*schema.Resource {
+func (p *Parser) loadUsageFileResources(u schema.UsageMap) []*schema.Resource {
 	resources := make([]*schema.Resource, 0)
 
-	for k, v := range u {
+	for k, v := range u.Data() {
 		for _, t := range GetUsageOnlyResources() {
 			if strings.HasPrefix(k, fmt.Sprintf("%s.", t)) {
 				d := schema.NewResourceData(t, "global", k, map[string]string{}, gjson.Result{})

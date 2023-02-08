@@ -1,10 +1,12 @@
 package aws_test
 
 import (
+	"testing"
+
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/testutil"
-	"github.com/shopspring/decimal"
-	"testing"
 
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
 )
@@ -27,7 +29,7 @@ func TestChinaDataTransfer(t *testing.T) {
 
 	tf := ``
 
-	usage := schema.NewUsageMap(map[string]interface{}{
+	usage := schema.NewUsageMapFromInterface(map[string]interface{}{
 		"aws_data_transfer.cn-north-1": map[string]interface{}{
 			"region":                            "cn-north-1",
 			"monthly_intra_region_gb":           10,

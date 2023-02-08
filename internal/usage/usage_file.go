@@ -7,11 +7,12 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/infracost/infracost/internal/schema"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/mod/semver"
 	yamlv3 "gopkg.in/yaml.v3"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 const minUsageFileVersion = "0.1"
@@ -180,18 +181,18 @@ See https://infracost.io/usage-file/ for docs`,
 	return os.WriteFile(path, b, 0600)
 }
 
-func (u *UsageFile) ToUsageDataMap() map[string]*schema.UsageData {
-	m := make(map[string]*schema.UsageData)
+func (u *UsageFile) ToUsageDataMap() schema.UsageMap {
+	m := make(map[string]interface{})
 
 	for _, resourceUsage := range u.ResourceTypeUsages {
-		m[resourceUsage.Name] = schema.NewUsageData(resourceUsage.Name, schema.ParseAttributes(resourceUsage.Map()))
+		m[resourceUsage.Name] = resourceUsage.Map()
 	}
 
 	for _, resourceUsage := range u.ResourceUsages {
-		m[resourceUsage.Name] = schema.NewUsageData(resourceUsage.Name, schema.ParseAttributes(resourceUsage.Map()))
+		m[resourceUsage.Name] = resourceUsage.Map()
 	}
 
-	return m
+	return schema.NewUsageMapFromInterface(m)
 }
 
 func (u *UsageFile) checkVersion() bool {

@@ -275,6 +275,21 @@ func TestBreakdownTerraformUsageFile(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/example_usage.yml"}, nil)
 }
 
+func TestBreakdownTerraformUsageFileWildcardModule(t *testing.T) {
+	name := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
+	GoldenFileCommandTest(
+		t,
+		name,
+		[]string{
+			"breakdown",
+			"--path", dir,
+			"--usage-file", filepath.Join(dir, "infracost-usage.yml"),
+		},
+		nil,
+	)
+}
+
 func TestBreakdownTerraformUsageFileInvalidKey(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/infracost-usage-invalid-key.yml"}, nil)
 }

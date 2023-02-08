@@ -1,9 +1,11 @@
 package usage_test
 
 import (
-	"github.com/infracost/infracost/internal/usage"
-	"github.com/stretchr/testify/assert"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"github.com/infracost/infracost/internal/usage"
 
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
 )
@@ -71,7 +73,7 @@ resource_usage:
 `)
 	assert.NoError(t, err)
 
-	u := usageFile.ToUsageDataMap()["some.resource"]
+	u := usageFile.ToUsageDataMap().Get("some.resource")
 
 	tests := []struct {
 		key  string
