@@ -11,8 +11,9 @@ import (
 	addressParser "github.com/hashicorp/go-terraform-address"
 	"github.com/imdario/mergo"
 	jsoniter "github.com/json-iterator/go"
-	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
+
+	"github.com/infracost/infracost/internal/logging"
 )
 
 type UsageData struct {
@@ -27,12 +28,31 @@ func NewUsageData(address string, attributes map[string]gjson.Result) *UsageData
 	}
 }
 
+// Copy returns a clone of UsageData u.
+func (u *UsageData) Copy() *UsageData {
+	if u == nil {
+		return nil
+	}
+
+	c := &UsageData{
+		Address:    u.Address,
+		Attributes: map[string]gjson.Result{},
+	}
+
+	for k, v := range u.Attributes {
+		c.Attributes[k] = v
+	}
+
+	return c
+}
+
 // Merge returns a new UsageData which is the result of adding all keys from other that do not already exists in the usage data
 func (u *UsageData) Merge(other *UsageData) *UsageData {
 	if u == nil {
 		if other != nil {
-			return other.Merge(u) // this will return a new copy of other
+			return other.Copy()
 		}
+
 		return nil // both are nil
 	}
 
@@ -198,7 +218,22 @@ func (usage UsageMap) Data() map[string]*UsageData {
 	return usage.data
 }
 
-// Get returns UsageData for a given resource address.
+// Get returns UsageData for a given resource address, this can be a combined/merged UsageData from multiple keys.
+// Usage data is merged adhering to the following hierarchy:
+//
+//  1. Resource type defaults - e.g. aws_lambda:
+//  2. Wildcard specified data - e.g. aws_lambda.my_lambda[*]
+//  3. Exact resource data - e.g. aws_lambda.my_lambda["foo"]
+//
+// Duplicate keys specified between levels are always overwritten by keys specified at a lower level, e.g:
+//
+//	aws_lambda.my_lambda[*]:
+//		monthly_requests: 700000000
+//		request_duration_ms: 750
+//	aws_lambda.my_lambda["foo"]:
+//		request_duration_ms: 100 << this overwrites the 750 value given in the wildcard usage
+//
+// If no usage key is found, Get will return nil.
 func (usage UsageMap) Get(address string) *UsageData {
 	var data *UsageData
 
@@ -206,16 +241,8 @@ func (usage UsageMap) Get(address string) *UsageData {
 	if err == nil {
 		val, ok := usage.data[parsedAddress.ResourceSpec.Type]
 		if ok {
-			data = val
+			data = val.Copy()
 		}
-	}
-
-	if ud := usage.data[address]; ud != nil {
-		if data != nil {
-			mergeAttributes(data, ud)
-		}
-
-		return ud
 	}
 
 	for _, key := range usage.wildcards {
@@ -223,10 +250,20 @@ func (usage UsageMap) Get(address string) *UsageData {
 
 		if key.regexp.MatchString(address) {
 			if data != nil {
-				mergeAttributes(data, d)
+				mergeUsage(data, d)
+			} else {
+				data = d.Copy()
 			}
 
-			return d
+			break
+		}
+	}
+
+	if ud := usage.data[address]; ud != nil {
+		if data != nil {
+			mergeUsage(data, ud)
+		} else {
+			data = ud.Copy()
 		}
 	}
 
@@ -307,7 +344,7 @@ func usageKeyToRegexp(pattern string) *regexp.Regexp {
 	return regexp.MustCompile("^" + result.String() + "$")
 }
 
-func mergeAttributes(dst *UsageData, src *UsageData) {
+func mergeUsage(dst *UsageData, src *UsageData) {
 	for key, srcAttr := range src.Attributes {
 		if _, ok := dst.Attributes[key]; !ok {
 			dst.Attributes[key] = srcAttr
@@ -324,27 +361,30 @@ func mergeAttributes(dst *UsageData, src *UsageData) {
 			var srcJson map[string]interface{}
 			err = json.Unmarshal([]byte(dst.Attributes[key].Raw), &destJson)
 			if err != nil {
-				log.Errorf("Error merging attribute '%s': %v", key, err)
-				break
+				logging.Logger.WithError(err).Errorf("failed to merge UsageData attributes, could not unmarshal dst attribute key: %q", key)
+				continue
 			}
 			err = json.Unmarshal([]byte(srcAttr.Raw), &srcJson)
 			if err != nil {
-				log.Errorf("Error merging attribute '%s': %v", key, err)
-				break
+				logging.Logger.WithError(err).Errorf("failed to merge UsageData attributes, could not unmarshal src attribute key: %q", key)
+				continue
 			}
 			err = mergo.Map(&destJson, srcJson)
 			if err != nil {
-				log.Errorf("Error merging attribute '%s': %v", key, err)
-				break
+				logging.Logger.WithError(err).Errorf("failed to merge UsageData attributes, could not merge attribute key: %q", key)
+				continue
 			}
 			src, err := json.Marshal(destJson)
 			if err != nil {
-				log.Errorf("Error merging attribute '%s': %v", key, err)
-				break
+				logging.Logger.WithError(err).Errorf("failed to merge UsageData attributes, could not marshal attribute key: %q", key)
+				continue
 			}
+
 			dst.Attributes[key] = gjson.Parse(string(src))
 		}
 	}
+
+	dst.Address = src.Address
 }
 
 func ParseAttributes(i interface{}) map[string]gjson.Result {

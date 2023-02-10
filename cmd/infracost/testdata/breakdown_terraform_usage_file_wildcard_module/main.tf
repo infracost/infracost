@@ -15,6 +15,22 @@ module "mod" {
   range = { foo = "bar", baz = "bat" }
 }
 
+module "mod2" {
+  for_each = { test = "1", test2 = "2" }
+
+  source = "./modules/test"
+
+  range = { foo = "bar", baz = "bat" }
+}
+
+module "mod3" {
+  for_each = { test = "1", test2 = "2" }
+
+  source = "./modules/test"
+
+  range = { foo = "bar", baz = "bat" }
+}
+
 resource "aws_lambda_function" "test" {
   function_name = "hello_world"
   role          = "arn:aws:lambda:us-east-1:account-id:resource-id"

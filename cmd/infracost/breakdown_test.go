@@ -264,7 +264,7 @@ func TestBreakdownTerraformSyncUsageFile(t *testing.T) {
 
 	GoldenFileCommandTest(t, testdataName, []string{"breakdown", "--path", "testdata/breakdown_terraform_sync_usage_file/sync_usage_file.json", "--usage-file", usageFilePath, "--sync-usage-file"}, nil)
 
-	actual, err := ioutil.ReadFile(usageFilePath)
+	actual, err := os.ReadFile(usageFilePath)
 	require.Nil(t, err)
 	actual = stripDynamicValues(actual)
 
