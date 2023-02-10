@@ -152,14 +152,17 @@ func (r *RunContext) ContextValues() map[string]interface{} {
 }
 
 func (r *RunContext) GetResourceWarnings() map[string]map[string]int {
-	if warnings := r.contextVals["resourceWarnings"]; warnings != nil {
+	contextValues := r.ContextValues()
+
+	if warnings := contextValues["resourceWarnings"]; warnings != nil {
 		return warnings.(map[string]map[string]int)
 	}
+
 	return nil
 }
 
 func (r *RunContext) SetResourceWarnings(resourceWarnings map[string]map[string]int) {
-	r.contextVals["resourceWarnings"] = resourceWarnings
+	r.SetContextValue("resourceWarnings", resourceWarnings)
 }
 
 func (r *RunContext) EventEnv() map[string]interface{} {
