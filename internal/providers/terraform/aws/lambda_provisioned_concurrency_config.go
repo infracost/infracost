@@ -1,8 +1,6 @@
 package aws
 
 import (
-	"fmt"
-
 	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -18,8 +16,6 @@ func NewLambdaProvisionedConcurrencyConfig(d *schema.ResourceData, u *schema.Usa
 	region := d.Get("region").String()
 	name := d.Get("function_name").String()
 	provisionedConcurrentExecutions := d.Get("provisioned_concurrent_executions").Int()
-
-	fmt.Println(provisionedConcurrentExecutions)
 
 	r := &aws.LambdaProvisionedConcurrencyConfig{
 		Address:                         d.Address,
