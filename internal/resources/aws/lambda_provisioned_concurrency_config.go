@@ -67,15 +67,33 @@ func (r *LambdaProvisionedConcurrencyConfig) BuildResource() *schema.Resource {
 
 	concurrencyType := "AWS-Lambda-Provisioned-Concurrency"
 	durationType := "AWS-Lambda-Duration-Provisioned"
+	requestType := "AWS-Lambda-Requests"
 
 	if strVal(r.Architecture) == "arm64" {
 		concurrencyType = "AWS-Lambda-Provisioned-Concurrency-ARM"
 		durationType = "AWS-Lambda-Duration-Provisioned-ARM"
+		requestType = "AWS-Lambda-Requests-ARM"
 	}
 
 	provisionDuration := calculateGBSeconds(memorySize, averageRequestDuration, monthlyRequests)
 
 	costComponents := []*schema.CostComponent{
+		{
+			Name:            "Requests",
+			Unit:            "1M requests",
+			UnitMultiplier:  decimal.NewFromInt(1000000),
+			MonthlyQuantity: decimalPtr(monthlyRequests),
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("aws"),
+				Region:        strPtr(r.Region),
+				Service:       strPtr("AWSLambda"),
+				ProductFamily: strPtr("Serverless"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "group", Value: strPtr(requestType)},
+					{Key: "usagetype", ValueRegex: strPtr("/Request/")},
+				},
+			},
+		},
 		{
 			Name:            "Provisioned Concurrency",
 			Unit:            "GB-seconds",
