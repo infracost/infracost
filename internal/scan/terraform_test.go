@@ -86,7 +86,7 @@ func TestTerraformPlanScanner_ScanPlan(t *testing.T) {
 	)
 	require.NoError(t, err)
 
-	projects, err := hclp.LoadResources(map[string]*schema.UsageData{})
+	projects, err := hclp.LoadResources(schema.UsageMap{})
 	require.NoError(t, err)
 	plans := hclp.LoadPlanJSONs()
 	require.NoError(t, err)

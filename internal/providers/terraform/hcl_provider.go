@@ -190,7 +190,7 @@ func (p *HCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 // LoadResources calls a hcl.Parser to parse the directory config files into hcl.Blocks. It then builds a shallow
 // representation of the terraform plan JSON files from these Blocks, this is passed to the PlanJSONProvider.
 // The PlanJSONProvider uses this shallow representation to actually load Infracost resources.
-func (p *HCLProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
+func (p *HCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, error) {
 	jsons := p.LoadPlanJSONs()
 
 	var projects = make([]*schema.Project, len(jsons))
@@ -217,7 +217,7 @@ func (p *HCLProvider) LoadResources(usage map[string]*schema.UsageData) ([]*sche
 	return projects, nil
 }
 
-func (p *HCLProvider) parseResources(parsed HCLProject, usage map[string]*schema.UsageData) *schema.Project {
+func (p *HCLProvider) parseResources(parsed HCLProject, usage schema.UsageMap) *schema.Project {
 	project := p.newProject(parsed)
 
 	partialPastResources, partialResources, err := p.planJSONParser.parseJSON(parsed.JSON, usage)

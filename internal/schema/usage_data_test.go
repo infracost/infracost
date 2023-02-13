@@ -114,3 +114,102 @@ func TestParseAttributes(t *testing.T) {
 		})
 	}
 }
+
+func TestUsageMap_Get(t *testing.T) {
+	tests := []struct {
+		address string
+		usage   UsageMap
+		want    *UsageData
+	}{
+		{
+			address: "aws_lambda_function.hello_world",
+			usage: NewUsageMapFromInterface(map[string]interface{}{"aws_lambda_function.hello_world": map[string]interface{}{
+				"test": "this",
+			}, "aws_lambda_function.hello_world2": ""}),
+			want: &UsageData{
+				Attributes: map[string]gjson.Result{
+					"test": gjson.Parse(`"this"`),
+				},
+				Address: "aws_lambda_function.hello_world",
+			},
+		},
+		{
+			address: `aws_lambda_function.hello_world["foo"]`,
+			usage: NewUsageMapFromInterface(map[string]interface{}{`aws_lambda_function.hello_world["foo"]`: map[string]interface{}{
+				"test": "this",
+			}, `aws_lambda_function.hello_world["bar"]`: ""}),
+			want: &UsageData{
+				Attributes: map[string]gjson.Result{
+					"test": gjson.Parse(`"this"`),
+				},
+				Address: `aws_lambda_function.hello_world["foo"]`,
+			},
+		},
+		{
+			address: `aws_lambda_function.hello_world["foo"]`,
+			usage: NewUsageMapFromInterface(map[string]interface{}{`aws_lambda_function.hello_world[*]`: map[string]interface{}{
+				"test": "this",
+			}, `aws_lambda_function.bar`: ""}),
+			want: &UsageData{
+				Attributes: map[string]gjson.Result{
+					"test": gjson.Parse(`"this"`),
+				},
+				Address: `aws_lambda_function.hello_world[*]`,
+			},
+		},
+		{
+			address: `module.some_mod["foo"].aws_lambda_function.hello_world["bar"]`,
+			usage: NewUsageMapFromInterface(map[string]interface{}{`module.some_mod["foo"].aws_lambda_function.hello_world["bar"]`: map[string]interface{}{
+				"test": "this",
+			}, `aws_lambda_function.hello_world`: ""}),
+			want: &UsageData{
+				Attributes: map[string]gjson.Result{
+					"test": gjson.Parse(`"this"`),
+				},
+				Address: `module.some_mod["foo"].aws_lambda_function.hello_world["bar"]`,
+			},
+		},
+		{
+			address: `module.some_mod["foo"].aws_lambda_function.hello_world["bar"]`,
+			usage: NewUsageMapFromInterface(map[string]interface{}{`module.some_mod["foo"].aws_lambda_function.hello_world[*]`: map[string]interface{}{
+				"test": "this",
+			}, `aws_lambda_function.hello_world`: ""}),
+			want: &UsageData{
+				Attributes: map[string]gjson.Result{
+					"test": gjson.Parse(`"this"`),
+				},
+				Address: `module.some_mod["foo"].aws_lambda_function.hello_world[*]`,
+			},
+		},
+		{
+			address: `module.some_mod["foo"].module.some_bar["baz"].aws_lambda_function.hello_world["bar"]`,
+			usage: NewUsageMapFromInterface(map[string]interface{}{`module.some_mod["foo"].module.some_bar[*].aws_lambda_function.hello_world[*]`: map[string]interface{}{
+				"test": "this",
+			}, `aws_lambda_function.hello_world`: ""}),
+			want: &UsageData{
+				Attributes: map[string]gjson.Result{
+					"test": gjson.Parse(`"this"`),
+				},
+				Address: `module.some_mod["foo"].module.some_bar[*].aws_lambda_function.hello_world[*]`,
+			},
+		},
+		{
+			address: `module.mod["test2"].aws_lambda_function.test["foo"]`,
+			usage: NewUsageMapFromInterface(map[string]interface{}{`module.mod["test2"].aws_lambda_function.test["foo"]`: map[string]interface{}{
+				"test": "this",
+			}, `module.mod[*].aws_lambda_function.test[*]`: ""}),
+			want: &UsageData{
+				Attributes: map[string]gjson.Result{
+					"test": gjson.Parse(`"this"`),
+				},
+				Address: `module.mod["test2"].aws_lambda_function.test["foo"]`,
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.address, func(t *testing.T) {
+			assert.Equalf(t, tt.want, tt.usage.Get(tt.address), "Get(%v)", tt.address)
+		})
+	}
+}

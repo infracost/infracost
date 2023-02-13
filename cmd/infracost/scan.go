@@ -91,7 +91,7 @@ func (s scanCmd) run(runCtx *config.RunContext) error {
 	spinner := ui.NewSpinner("Scanning projects for cost optimizations...", spinnerOpts)
 	defer spinner.Fail()
 
-	usageData := make(map[string]*schema.UsageData)
+	usageData := schema.NewUsageMapFromInterface(map[string]interface{}{})
 
 	if s.UsageFile != "" {
 		usageFile, err := usage.LoadUsageFile(s.UsageFile)

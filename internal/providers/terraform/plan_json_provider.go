@@ -51,7 +51,7 @@ func (p *PlanJSONProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 	metadata.TerraformWorkspace = p.ctx.ProjectConfig.TerraformWorkspace
 }
 
-func (p *PlanJSONProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
+func (p *PlanJSONProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, error) {
 	spinner := ui.NewSpinner("Extracting only cost-related params from terraform", ui.SpinnerOptions{
 		EnableLogging: p.ctx.RunContext.Config.IsLogging(),
 		NoColor:       p.ctx.RunContext.Config.NoColor,
@@ -72,7 +72,7 @@ func (p *PlanJSONProvider) LoadResources(usage map[string]*schema.UsageData) ([]
 	return []*schema.Project{project}, nil
 }
 
-func (p *PlanJSONProvider) LoadResourcesFromSrc(usage map[string]*schema.UsageData, j []byte, spinner *ui.Spinner) (*schema.Project, error) {
+func (p *PlanJSONProvider) LoadResourcesFromSrc(usage schema.UsageMap, j []byte, spinner *ui.Spinner) (*schema.Project, error) {
 	metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)

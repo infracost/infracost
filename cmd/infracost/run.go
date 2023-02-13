@@ -421,7 +421,6 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 	}
 
 	// Load usage data
-	usageData := make(map[string]*schema.UsageData)
 	var usageFile *usage.UsageFile
 
 	if ctx.ProjectConfig.UsageFile != "" {
@@ -440,12 +439,10 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 				strings.Join(invalidKeys, ", "),
 			)
 		}
+
+		ctx.SetContextValue("hasUsageFile", true)
 	} else {
 		usageFile = usage.NewBlankUsageFile()
-	}
-
-	if len(usageData) > 0 {
-		ctx.SetContextValue("hasUsageFile", true)
 	}
 
 	// Merge wildcard usages into individual usage
@@ -472,7 +469,7 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 		us.MergeResourceUsage(wildCardUsage[prefixName])
 	}
 
-	usageData = usageFile.ToUsageDataMap()
+	usageData := usageFile.ToUsageDataMap()
 	out := &projectOutput{}
 
 	t1 := time.Now()
@@ -584,7 +581,7 @@ func (r *parallelRunner) hasCloudResourceIDToUpload(projects []*schema.Project) 
 }
 
 func (r *parallelRunner) buildResources(projects []*schema.Project) {
-	var projectPtrToUsageMap map[*schema.Project]map[string]*schema.UsageData
+	var projectPtrToUsageMap map[*schema.Project]schema.UsageMap
 	if r.runCtx.Config.UsageAPIEndpoint != "" {
 		projectPtrToUsageMap = r.fetchProjectUsage(projects)
 	}
@@ -592,7 +589,7 @@ func (r *parallelRunner) buildResources(projects []*schema.Project) {
 	schema.BuildResources(projects, projectPtrToUsageMap)
 }
 
-func (r *parallelRunner) fetchProjectUsage(projects []*schema.Project) map[*schema.Project]map[string]*schema.UsageData {
+func (r *parallelRunner) fetchProjectUsage(projects []*schema.Project) map[*schema.Project]schema.UsageMap {
 	coreResourceCount := 0
 	for _, project := range projects {
 		for _, partial := range project.PartialResources {
@@ -619,7 +616,7 @@ func (r *parallelRunner) fetchProjectUsage(projects []*schema.Project) map[*sche
 	spinner := ui.NewSpinner(fmt.Sprintf("Retrieving usage estimates for %s from Infracost Cloud", resourceStr), spinnerOpts)
 	defer spinner.Fail()
 
-	projectPtrToUsageMap := make(map[*schema.Project]map[string]*schema.UsageData, len(projects))
+	projectPtrToUsageMap := make(map[*schema.Project]schema.UsageMap, len(projects))
 
 	for _, project := range projects {
 		usageMap, err := prices.FetchUsageData(r.runCtx, project)

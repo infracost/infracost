@@ -4,12 +4,16 @@ import (
 	"encoding/json"
 	"fmt"
 	"math"
+	"regexp"
+	"sort"
 	"strings"
 
+	addressParser "github.com/hashicorp/go-terraform-address"
 	"github.com/imdario/mergo"
 	jsoniter "github.com/json-iterator/go"
-	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
+
+	"github.com/infracost/infracost/internal/logging"
 )
 
 type UsageData struct {
@@ -24,12 +28,31 @@ func NewUsageData(address string, attributes map[string]gjson.Result) *UsageData
 	}
 }
 
+// Copy returns a clone of UsageData u.
+func (u *UsageData) Copy() *UsageData {
+	if u == nil {
+		return nil
+	}
+
+	c := &UsageData{
+		Address:    u.Address,
+		Attributes: map[string]gjson.Result{},
+	}
+
+	for k, v := range u.Attributes {
+		c.Attributes[k] = v
+	}
+
+	return c
+}
+
 // Merge returns a new UsageData which is the result of adding all keys from other that do not already exists in the usage data
 func (u *UsageData) Merge(other *UsageData) *UsageData {
 	if u == nil {
 		if other != nil {
-			return other.Merge(u) // this will return a new copy of other
+			return other.Copy()
 		}
+
 		return nil // both are nil
 	}
 
@@ -149,21 +172,219 @@ func (u *UsageData) CalcEstimationSummary() map[string]bool {
 	return estimationMap
 }
 
-func NewUsageMap(m map[string]interface{}) map[string]*UsageData {
-	usageMap := make(map[string]*UsageData)
+// UsageMap is a map of address to UsageData built from a usage file.
+// UsageMap is a standalone type so that we can do more involved matching functionality.
+type UsageMap struct {
+	data      map[string]*UsageData
+	wildcards wildcards
+}
+
+// NewUsageMapFromInterface returns an initialised UsageMap from interface map.
+func NewUsageMapFromInterface(m map[string]interface{}) UsageMap {
+	data := make(map[string]*UsageData)
 
 	for addr, v := range m {
-		usageMap[addr] = NewUsageData(
+		data[addr] = NewUsageData(
 			addr,
 			ParseAttributes(v),
 		)
 	}
 
-	return usageMap
+	return NewUsageMap(data)
 }
 
-func NewEmptyUsageMap() map[string]*UsageData {
-	return map[string]*UsageData{}
+// NewUsageMap initialises a Usage map with the provided usage key data.
+// It builds a set of wildcard keys if any are found and sorts them ready for searching
+// by Attribute name at a later point.
+func NewUsageMap(data map[string]*UsageData) UsageMap {
+	var keys wildcards
+
+	for key := range data {
+		if strings.Contains(key, "*") {
+			keys = append(keys, wildcard{
+				raw:    key,
+				regexp: usageKeyToRegexp(key),
+			})
+		}
+	}
+
+	sort.Sort(keys)
+
+	return UsageMap{data: data, wildcards: keys}
+}
+
+// Data returns the entire map of usage data stored.
+func (usage UsageMap) Data() map[string]*UsageData {
+	return usage.data
+}
+
+// Get returns UsageData for a given resource address, this can be a combined/merged UsageData from multiple keys.
+// Usage data is merged adhering to the following hierarchy:
+//
+//  1. Resource type defaults - e.g. aws_lambda:
+//  2. Wildcard specified data - e.g. aws_lambda.my_lambda[*]
+//  3. Exact resource data - e.g. aws_lambda.my_lambda["foo"]
+//
+// Duplicate keys specified between levels are always overwritten by keys specified at a lower level, e.g:
+//
+//	aws_lambda.my_lambda[*]:
+//		monthly_requests: 700000000
+//		request_duration_ms: 750
+//	aws_lambda.my_lambda["foo"]:
+//		request_duration_ms: 100 << this overwrites the 750 value given in the wildcard usage
+//
+// If no usage key is found, Get will return nil.
+func (usage UsageMap) Get(address string) *UsageData {
+	var data *UsageData
+
+	parsedAddress, err := addressParser.NewAddress(address)
+	if err == nil {
+		val, ok := usage.data[parsedAddress.ResourceSpec.Type]
+		if ok {
+			data = val.Copy()
+		}
+	}
+
+	for _, key := range usage.wildcards {
+		d := usage.data[key.raw]
+
+		if key.regexp.MatchString(address) {
+			if data != nil {
+				mergeUsage(data, d)
+			} else {
+				data = d.Copy()
+			}
+
+			break
+		}
+	}
+
+	if ud := usage.data[address]; ud != nil {
+		if data != nil {
+			mergeUsage(data, ud)
+		} else {
+			data = ud.Copy()
+		}
+	}
+
+	return data
+}
+
+var wildCardRegxp = regexp.MustCompile(`\[.*?]`)
+
+// wildcard contains information about a wildcard specified usage key.
+type wildcard struct {
+	raw    string
+	regexp *regexp.Regexp
+}
+
+// wildcards implements the Sort.Interface to sort a slice of usage keys with more specific keys first.
+// This means a list with the following:
+//
+//   - module.mod[*].resource.test[*]
+//   - module.mod["foo"].resource.test["baz]
+//   - module.mod["foo].resource.test[*]
+//
+// will be reordered to the following:
+//
+//   - module.mod["foo"].resource.test["baz]
+//   - module.mod["foo].resource.test[*]
+//   - module.mod[*].resource.test[*]
+type wildcards []wildcard
+
+func (w wildcards) Len() int {
+	return len(w)
+}
+
+func (w wildcards) Less(i, j int) bool {
+	a := w[i].raw
+	b := w[j].raw
+
+	aSplit := wildCardRegxp.Split(a, -1)
+	bSplit := wildCardRegxp.Split(b, -1)
+
+	// if these aren't the same resource key then return false.
+	aJoined := strings.Join(aSplit, "")
+	bJoined := strings.Join(bSplit, "")
+	if aJoined != bJoined {
+		return aJoined < bJoined
+	}
+
+	aKeys := wildCardRegxp.FindAllString(a, -1)
+	bKeys := wildCardRegxp.FindAllString(b, -1)
+
+	for index, key := range aKeys {
+		if bKeys[index] == key {
+			continue
+		}
+
+		if key == "[*]" {
+			return false
+		}
+	}
+
+	return true
+}
+
+func (w wildcards) Swap(i, j int) {
+	w[i], w[j] = w[j], w[i]
+}
+
+func usageKeyToRegexp(pattern string) *regexp.Regexp {
+	var result strings.Builder
+	for i, literal := range strings.Split(pattern, "*") {
+		if i > 0 {
+			result.WriteString(".*")
+		}
+
+		// QuoteMeta escapes all regular expression metacharacters so that we don't match things like [ or .
+		result.WriteString(regexp.QuoteMeta(literal))
+	}
+
+	return regexp.MustCompile("^" + result.String() + "$")
+}
+
+func mergeUsage(dst *UsageData, src *UsageData) {
+	for key, srcAttr := range src.Attributes {
+		if _, ok := dst.Attributes[key]; !ok {
+			dst.Attributes[key] = srcAttr
+			continue
+		}
+
+		switch srcAttr.Type {
+		case gjson.String, gjson.Number, gjson.False, gjson.True, gjson.Null:
+			// Should be safe to override
+			dst.Attributes[key] = srcAttr
+		case gjson.JSON:
+			var err error
+			var destJson map[string]interface{}
+			var srcJson map[string]interface{}
+			err = json.Unmarshal([]byte(dst.Attributes[key].Raw), &destJson)
+			if err != nil {
+				logging.Logger.WithError(err).Errorf("failed to merge UsageData attributes, could not unmarshal dst attribute key: %q", key)
+				continue
+			}
+			err = json.Unmarshal([]byte(srcAttr.Raw), &srcJson)
+			if err != nil {
+				logging.Logger.WithError(err).Errorf("failed to merge UsageData attributes, could not unmarshal src attribute key: %q", key)
+				continue
+			}
+			err = mergo.Map(&destJson, srcJson)
+			if err != nil {
+				logging.Logger.WithError(err).Errorf("failed to merge UsageData attributes, could not merge attribute key: %q", key)
+				continue
+			}
+			src, err := json.Marshal(destJson)
+			if err != nil {
+				logging.Logger.WithError(err).Errorf("failed to merge UsageData attributes, could not marshal attribute key: %q", key)
+				continue
+			}
+
+			dst.Attributes[key] = gjson.Parse(string(src))
+		}
+	}
+
+	dst.Address = src.Address
 }
 
 func ParseAttributes(i interface{}) map[string]gjson.Result {
@@ -185,51 +406,4 @@ func ParseAttributes(i interface{}) map[string]gjson.Result {
 	}
 
 	return a
-}
-
-func MergeAttributes(dst *UsageData, src *UsageData) {
-	for key, srcAttr := range src.Attributes {
-		if _, has := dst.Attributes[key]; has {
-			switch srcAttr.Type {
-			case gjson.Null:
-				fallthrough
-			case gjson.True:
-				fallthrough
-			case gjson.False:
-				fallthrough
-			case gjson.Number:
-				fallthrough
-			case gjson.String:
-				// Should be safe to override
-				dst.Attributes[key] = srcAttr
-			case gjson.JSON:
-				var err error
-				var destJson map[string]interface{}
-				var srcJson map[string]interface{}
-				err = json.Unmarshal([]byte(dst.Attributes[key].Raw), &destJson)
-				if err != nil {
-					log.Errorf("Error merging attribute '%s': %v", key, err)
-					break
-				}
-				err = json.Unmarshal([]byte(srcAttr.Raw), &srcJson)
-				if err != nil {
-					log.Errorf("Error merging attribute '%s': %v", key, err)
-					break
-				}
-				err = mergo.Map(&destJson, srcJson)
-				if err != nil {
-					log.Errorf("Error merging attribute '%s': %v", key, err)
-					break
-				}
-				src, err := json.Marshal(destJson)
-				if err != nil {
-					log.Errorf("Error merging attribute '%s': %v", key, err)
-					break
-				}
-				dst.Attributes[key] = gjson.Parse(string(src))
-			}
-		} else {
-			dst.Attributes[key] = srcAttr
-		}
-	}
 }

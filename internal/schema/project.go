@@ -163,14 +163,14 @@ func (p *Project) AllPartialResources() []*PartialResource {
 
 // BuildResources builds the resources from the partial resources
 // and sets the PastResources and Resources fields.
-func (p *Project) BuildResources(usageMap map[string]*UsageData) {
+func (p *Project) BuildResources(usageMap UsageMap) {
 	pastResources := make([]*Resource, 0, len(p.PartialPastResources))
 	resources := make([]*Resource, 0, len(p.PartialResources))
 
 	seen := make(map[*PartialResource]*Resource)
 
 	for _, p := range p.PartialPastResources {
-		u := usageMap[p.ResourceData.Address]
+		u := usageMap.Get(p.ResourceData.Address)
 		r := BuildResource(p, u)
 		seen[p] = r
 		pastResources = append(pastResources, r)
@@ -179,7 +179,7 @@ func (p *Project) BuildResources(usageMap map[string]*UsageData) {
 	for _, p := range p.PartialResources {
 		r, ok := seen[p]
 		if !ok {
-			u := usageMap[p.ResourceData.Address]
+			u := usageMap.Get(p.ResourceData.Address)
 			r = BuildResource(p, u)
 			seen[p] = r
 		}

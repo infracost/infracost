@@ -264,7 +264,7 @@ func TestBreakdownTerraformSyncUsageFile(t *testing.T) {
 
 	GoldenFileCommandTest(t, testdataName, []string{"breakdown", "--path", "testdata/breakdown_terraform_sync_usage_file/sync_usage_file.json", "--usage-file", usageFilePath, "--sync-usage-file"}, nil)
 
-	actual, err := ioutil.ReadFile(usageFilePath)
+	actual, err := os.ReadFile(usageFilePath)
 	require.Nil(t, err)
 	actual = stripDynamicValues(actual)
 
@@ -273,6 +273,21 @@ func TestBreakdownTerraformSyncUsageFile(t *testing.T) {
 
 func TestBreakdownTerraformUsageFile(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/example_usage.yml"}, nil)
+}
+
+func TestBreakdownTerraformUsageFileWildcardModule(t *testing.T) {
+	name := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
+	GoldenFileCommandTest(
+		t,
+		name,
+		[]string{
+			"breakdown",
+			"--path", dir,
+			"--usage-file", filepath.Join(dir, "infracost-usage.yml"),
+		},
+		nil,
+	)
 }
 
 func TestBreakdownTerraformUsageFileInvalidKey(t *testing.T) {

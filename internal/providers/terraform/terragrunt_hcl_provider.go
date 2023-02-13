@@ -129,7 +129,7 @@ type terragruntWorkingDirInfo struct {
 
 // LoadResources finds any Terragrunt projects, prepares them by downloading any required source files, then
 // process each with an HCLProvider.
-func (p *TerragruntHCLProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
+func (p *TerragruntHCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, error) {
 	dirs, err := p.prepWorkingDirs()
 	if err != nil {
 		return nil, err

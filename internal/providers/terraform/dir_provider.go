@@ -142,7 +142,7 @@ func (p *DirProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 	metadata.TerraformWorkspace = terraformWorkspace
 }
 
-func (p *DirProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
+func (p *DirProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, error) {
 	projects := make([]*schema.Project, 0)
 	var out []byte
 	var err error
