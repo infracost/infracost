@@ -1,10 +1,12 @@
+Project: infracost/infracost/examples/terraform
 
-Err:
-
-Error: terraform plan failed: exit status 1
+Errors:
+  terraform plan failed:
+    exit status 1
 
   Terraform command failed with:
-    Error: Failed to read variables file
+    Error:
+      Failed to read variables file
     Given variables file invalid does not exist.
 
 You have two options:
@@ -12,3 +14,11 @@ You have two options:
      e.g. --path=path/to/code --terraform-plan-flags="-var-file=my.tfvars"
 
 2. Set --path to a Terraform plan JSON file. See https://infracost.io/troubleshoot for how to generate this.
+
+ OVERALL TOTAL       $0.00 
+──────────────────────────────────
+No cloud resources were detected
+
+Err:
+
+

@@ -1,0 +1,36 @@
+
+💰 Infracost estimate: **monthly cost will not change**
+<table>
+  <thead>
+    <td>Project</td>
+    <td>Previous</td>
+    <td>New</td>
+    <td>Diff</td>
+  </thead>
+  <tbody>
+    <tr>
+      <td>infracost/infracost/examples/terraform</td>
+      <td align="right">$0</td>
+      <td align="right">$0</td>
+      <td>$0</td>
+    </tr>
+  </tbody>
+</table>
+
+<details>
+<summary><strong>Infracost output</strong></summary>
+
+```
+──────────────────────────────────
+
+The following projects could not be evaluated: 
+infracost/infracost/examples/terraform
+Run the following command to see more details: infracost breakdown --path=/path/to/code
+
+──────────────────────────────────
+Key: ~ changed, + added, - removed
+
+No cloud resources were detected
+```
+</details>
+
