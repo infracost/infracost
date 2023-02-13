@@ -80,7 +80,7 @@ func commentGitLabCmd(ctx *config.RunContext) *cobra.Command {
 			body, hasDiff, err := buildCommentBody(cmd, ctx, paths, output.MarkdownOptions{
 				WillUpdate:          mrNumber != 0 && behavior == "update",
 				WillReplace:         mrNumber != 0 && behavior == "delete-and-new",
-				IncludeFeedbackLink: true,
+				IncludeFeedbackLink: !ctx.Config.IsSelfHosted(),
 			})
 			var policyFailure output.PolicyCheckFailures
 			var guardrailFailure output.GuardrailFailures

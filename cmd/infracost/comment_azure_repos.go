@@ -66,7 +66,7 @@ func commentAzureReposCmd(ctx *config.RunContext) *cobra.Command {
 			body, hasDiff, err := buildCommentBody(cmd, ctx, paths, output.MarkdownOptions{
 				WillUpdate:          prNumber != 0 && behavior == "update",
 				WillReplace:         prNumber != 0 && behavior == "delete-and-new",
-				IncludeFeedbackLink: true,
+				IncludeFeedbackLink: !ctx.Config.IsSelfHosted(),
 			})
 			var policyFailure output.PolicyCheckFailures
 			var guardrailFailure output.GuardrailFailures

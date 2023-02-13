@@ -107,7 +107,7 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 			body, hasDiff, err := buildCommentBody(cmd, ctx, paths, output.MarkdownOptions{
 				WillUpdate:          prNumber != 0 && behavior == "update",
 				WillReplace:         prNumber != 0 && behavior == "delete-and-new",
-				IncludeFeedbackLink: true,
+				IncludeFeedbackLink: !ctx.Config.IsSelfHosted(),
 				MaxMessageSize:      output.GitHubMaxMessageSize,
 			})
 			var policyFailure output.PolicyCheckFailures
