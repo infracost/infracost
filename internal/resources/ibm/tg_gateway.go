@@ -1,6 +1,8 @@
 package ibm
 
 import (
+	"fmt"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
@@ -33,16 +35,18 @@ func (r *TgGateway) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
+const connectionFreeAllowance = 2
+
 func (r *TgGateway) connectionFreeCostComponent() *schema.CostComponent {
 	var q *decimal.Decimal
 	if r.Connection != nil {
 		q = decimalPtr(decimal.NewFromInt(*r.Connection))
-		if q.GreaterThan(decimal.NewFromInt(10)) {
-			q = decimalPtr(decimal.NewFromInt(10))
+		if q.GreaterThan(decimal.NewFromInt(connectionFreeAllowance)) {
+			q = decimalPtr(decimal.NewFromInt(connectionFreeAllowance))
 		}
 	}
 	component := schema.CostComponent{
-		Name:            "Connections Free allowance (first 10 Connection)",
+		Name:            fmt.Sprintf("Connections Free allowance (first %d Connection)", connectionFreeAllowance),
 		Unit:            "Connection",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: q,
@@ -61,10 +65,10 @@ func (r *TgGateway) connectionCostComponent() *schema.CostComponent {
 	var q *decimal.Decimal
 	if r.Connection != nil {
 		q = decimalPtr(decimal.NewFromInt(*r.Connection))
-		if q.LessThanOrEqual(decimal.NewFromInt(10)) {
+		if q.LessThanOrEqual(decimal.NewFromInt(connectionFreeAllowance)) {
 			q = decimalPtr(decimal.NewFromInt(0))
 		} else {
-			q = decimalPtr(q.Sub(decimal.NewFromInt(10)))
+			q = decimalPtr(q.Sub(decimal.NewFromInt(connectionFreeAllowance)))
 		}
 	}
 	return &schema.CostComponent{
@@ -106,36 +110,13 @@ func (r *TgGateway) dataTransferLocalCostComponent() *schema.CostComponent {
 	}
 }
 
-func (r *TgGateway) dataTransferGlobalFreeCostComponent() *schema.CostComponent {
-	var q *decimal.Decimal
-	if r.DataTransferGlobal != nil {
-		q = decimalPtr(decimal.NewFromFloat(*r.DataTransferGlobal))
-	}
-	if q.GreaterThan(decimal.NewFromInt(1000)) {
-		q = decimalPtr(decimal.NewFromInt(1000))
-	}
-	component := schema.CostComponent{
-		Name:            "Data Transfer Global Free allowance (first 1000 GB)",
-		Unit:            "GB",
-		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: q,
-	}
-	component.SetCustomPrice(decimalPtr(decimal.NewFromInt(0)))
-	return &component
-}
-
 func (r *TgGateway) dataTransferGlobalCostComponent() *schema.CostComponent {
 	var q *decimal.Decimal
 	if r.DataTransferGlobal != nil {
 		q = decimalPtr(decimal.NewFromFloat(*r.DataTransferGlobal))
 	}
-	if q.LessThanOrEqual(decimal.NewFromInt(1000)) {
-		q = decimalPtr(decimal.NewFromInt(0))
-	} else {
-		q = decimalPtr(q.Sub(decimal.NewFromInt(1000)))
-	}
 	return &schema.CostComponent{
-		Name:            "Data Transfer Global (over 1000 GB)",
+		Name:            "Data Transfer Global",
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: q,
@@ -161,7 +142,6 @@ func (r *TgGateway) BuildResource() *schema.Resource {
 	}
 
 	if r.GlobalRouting {
-		costComponents = append(costComponents, r.dataTransferGlobalFreeCostComponent())
 		costComponents = append(costComponents, r.dataTransferGlobalCostComponent())
 	} else {
 		costComponents = append(costComponents, r.dataTransferLocalCostComponent())

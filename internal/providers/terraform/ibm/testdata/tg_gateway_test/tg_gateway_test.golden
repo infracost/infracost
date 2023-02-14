@@ -1,15 +1,14 @@
 
- Name                                                    Monthly Qty  Unit        Monthly Cost 
-                                                                                               
- ibm_tg_gateway.new_tg_gw                                                                      
- ├─ Connections Free allowance (first 10 Connection)              10  Connection         $0.00 
- ├─ Additional Connections (first 10 Connection)                  10  Connection       $200.00 
- ├─ Additional Connections (next 30 Connection)                    5  Connection        $75.00 
- ├─ Additional Connections (over 40 Connection)                    0  Connection         $0.00 
- ├─ Data Transfer Global Free allowance (first 1000 GB)        1,000  GB                 $0.00 
- └─ Data Transfer Global (over 1000 GB)                        1,500  GB                $30.00 
-                                                                                               
- OVERALL TOTAL                                                                         $305.00 
+ Name                                                Monthly Qty  Unit        Monthly Cost 
+                                                                                           
+ ibm_tg_gateway.new_tg_gw                                                                  
+ ├─ Connections Free allowance (first 2 Connection)            2  Connection         $0.00 
+ ├─ Additional Connections (first 10 Connection)              10  Connection       $200.00 
+ ├─ Additional Connections (next 30 Connection)               13  Connection       $195.00 
+ ├─ Additional Connections (over 40 Connection)                0  Connection         $0.00 
+ └─ Data Transfer Global                                   2,500  GB                $50.00 
+                                                                                           
+ OVERALL TOTAL                                                                     $445.00 
 ──────────────────────────────────
 1 cloud resource was detected:
 ∙ 1 was estimated, it includes usage-based costs, see https://infracost.io/usage-file
