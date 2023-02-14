@@ -483,6 +483,19 @@ func (b *Block) InjectBlock(block *Block, name string) {
 	b.childBlocks = append(b.childBlocks, block)
 }
 
+// RemoveBlocks removes all the child Blocks of type name.
+func (b *Block) RemoveBlocks(name string) {
+	var filtered Blocks
+
+	for _, block := range b.childBlocks {
+		if block.Type() != name {
+			filtered = append(filtered, block)
+		}
+	}
+
+	b.childBlocks = filtered
+}
+
 // IsCountExpanded returns if the Block has been expanded as part of a for_each or count evaluation.
 func (b *Block) IsCountExpanded() bool {
 	return b.expanded
@@ -669,7 +682,17 @@ func (b *Block) Provider() string {
 	return ""
 }
 
-// GetChildBlock returns the first child Block that has the name provided. e.g:
+// GetChildBlock is a helper method around GetChildBlocks. It returns the first non nil child block matching name.
+func (b *Block) GetChildBlock(name string) *Block {
+	blocks := b.GetChildBlocks(name)
+	if len(blocks) > 0 {
+		return blocks[0]
+	}
+
+	return nil
+}
+
+// GetChildBlocks returns all the child Block that match the name provided. e.g:
 // If the current Block looks like such:
 //
 //			resource "aws_instance" "t3_standard_cpuCredits" {
@@ -686,18 +709,19 @@ func (b *Block) Provider() string {
 //			}
 //
 // Then "credit_specification" &  "ebs_block_device" would be valid names that could be used to retrieve child Blocks.
-func (b *Block) GetChildBlock(name string) *Block {
-	var returnBlock *Block
+func (b *Block) GetChildBlocks(name string) []*Block {
 	if b == nil || b.hclBlock == nil {
-		return returnBlock
+		return nil
 	}
 
+	var children Blocks
 	for _, child := range b.childBlocks {
 		if child.Type() == name {
-			return child
+			children = append(children, child)
 		}
 	}
-	return returnBlock
+
+	return children
 }
 
 func (b *Block) HasChild(childElement string) bool {
