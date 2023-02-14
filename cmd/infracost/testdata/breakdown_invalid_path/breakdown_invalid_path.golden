@@ -1,5 +1,13 @@
+Project: infracost/infracost/cmd/infracost/invalid
 
-Err:
-Error: No such file or directory invalid
+Errors:
+  No such file or directory invalid
 
 Try setting --path to a Terraform plan JSON file. See https://infracost.io/troubleshoot for how to generate this.
+
+ OVERALL TOTAL       $0.00 
+──────────────────────────────────
+No cloud resources were detected
+
+Err:
+

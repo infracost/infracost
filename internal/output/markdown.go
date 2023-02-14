@@ -261,13 +261,13 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 	}
 
 	err = tmpl.Execute(bufw, MarkdownCtx{
-		out,
-		skippedProjectCount,
-		erroredProjectCount,
-		skippedUnchangedProjectCount,
-		diffMsg,
-		opts,
-		markdownOpts})
+		Root:                         out,
+		SkippedProjectCount:          skippedProjectCount,
+		ErroredProjectCount:          erroredProjectCount,
+		SkippedUnchangedProjectCount: skippedUnchangedProjectCount,
+		DiffOutput:                   diffMsg,
+		Options:                      opts,
+		MarkdownOptions:              markdownOpts})
 	if err != nil {
 		return []byte{}, err
 	}
