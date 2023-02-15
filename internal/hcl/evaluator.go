@@ -372,6 +372,10 @@ func (e *Evaluator) expandDynamicBlock(b *Block) {
 		e.logger.Debugf("expanding block %s because a dynamic block was found %s", b.LocalName(), sub.LocalName())
 
 		blockName := sub.TypeLabel()
+		// Remove all the child blocks with the blockName so that we don't inject the expanded blocks twice.
+		// This could happen if a module "reloads" and the input variables change.
+		b.RemoveBlocks(blockName)
+
 		expanded := e.expandBlockForEaches([]*Block{sub})
 		for _, ex := range expanded {
 			if content := ex.GetChildBlock("content"); content != nil {
