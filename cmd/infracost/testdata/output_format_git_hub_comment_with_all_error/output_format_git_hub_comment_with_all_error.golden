@@ -1,21 +1,5 @@
 
 💰 Infracost estimate: **monthly cost will not change**
-<table>
-  <thead>
-    <td>Project</td>
-    <td>Previous</td>
-    <td>New</td>
-    <td>Diff</td>
-  </thead>
-  <tbody>
-    <tr>
-      <td>infracost/infracost/examples/terraform</td>
-      <td align="right">$0</td>
-      <td align="right">$0</td>
-      <td>$0</td>
-    </tr>
-  </tbody>
-</table>
 
 <details>
 <summary><strong>Infracost output</strong></summary>
