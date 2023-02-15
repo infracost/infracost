@@ -204,7 +204,9 @@ func newParallelRunner(cmd *cobra.Command, runCtx *config.RunContext) (*parallel
 	// can't run multiple operations in parallel on the same path.
 	pathMuxs := map[string]*sync.Mutex{}
 	for _, projectCfg := range runCtx.Config.Projects {
-		pathMuxs[projectCfg.Path] = &sync.Mutex{}
+		if projectCfg.TerraformForceCLI {
+			pathMuxs[projectCfg.Path] = &sync.Mutex{}
+		}
 	}
 
 	var prior *output.Root
