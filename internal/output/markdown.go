@@ -191,6 +191,16 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 
 			return true // has diff
 		},
+		"validProjects": func() Projects {
+			var valid Projects
+			for _, project := range out.Projects {
+				if !project.Metadata.HasErrors() {
+					valid = append(valid, project)
+				}
+			}
+
+			return valid
+		},
 		"metadataHeaders": func() []string {
 			headers := []string{}
 			if hasModulePath {

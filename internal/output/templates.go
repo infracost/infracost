@@ -307,7 +307,7 @@ var CommentMarkdownWithHTMLTemplate = `
     </tr>
 {{- end}}
 💰 Infracost estimate: **{{ formatCostChangeSentence .Root.Currency .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost true }}**
-{{- if gt (len .Root.Projects) 0  }}
+{{- if gt (len validProjects) 0  }}
 <table>
   <thead>
     <td>Project</td>
@@ -332,7 +332,7 @@ var CommentMarkdownWithHTMLTemplate = `
 {{- else }}
   <tbody>
   {{- range .Root.Projects }}
-    {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
+	{{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
   {{- end }}
   </tbody>
 </table>
@@ -403,7 +403,7 @@ var CommentMarkdownTemplate = `
 | **{{ truncateMiddle .Name 64 "..." }}**{{- range metadataHeaders }} | {{- end }} | **{{ formatCost .PastCost }}** | **{{ formatCost .Cost }}** | **{{ formatCostChange .PastCost .Cost }}** |
 {{- end }}
 ## Infracost estimate: **{{ formatCostChangeSentence .Root.Currency .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost false }}**
-{{- if gt (len .Root.Projects) 0  }}
+{{- if gt (len validProjects) 0  }}
 
 | **Project**{{- range metadataHeaders }} | **{{ . }}** {{- end }} | **Previous** | **New** | **Diff** |
 | -----------{{- range metadataHeaders }} | ---------- {{- end }} | -----------: | ------: | -------- |
