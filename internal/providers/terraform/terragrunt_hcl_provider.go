@@ -281,7 +281,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 	terragruntConfigPath := tgconfig.GetDefaultConfigPath(p.Path)
 
 	terragruntCacheDir := filepath.Join(config.InfracostDir, ".terragrunt-cache")
-	terragruntDownloadDir := filepath.Join(p.Path, terragruntCacheDir)
+	terragruntDownloadDir := filepath.Join(p.ctx.RunContext.Config.RepoPath(), terragruntCacheDir)
 	err := os.MkdirAll(terragruntDownloadDir, os.ModePerm)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to create download directories for terragrunt in working directory: %w", err)
