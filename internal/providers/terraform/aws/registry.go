@@ -42,6 +42,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getEC2TransitGatewayPeeringAttachmentRegistryItem(),
 	getEC2TransitGatewayVpcAttachmentRegistryItem(),
 	getECRRegistryItem(),
+	getECRLifecyclePolicy(),
 	getECSClusterCapacityProvidersRegistryItem(),
 	getECSClusterRegistryItem(),
 	getECSServiceRegistryItem(),
@@ -54,6 +55,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getElastiCacheReplicationGroupItem(),
 	getElasticsearchDomainRegistryItem(),
 	getELBRegistryItem(),
+	getFlowLogRegistryItem(),
 	getFSxOpenZFSFSRegistryItem(),
 	getFSxWindowsFSRegistryItem(),
 	getGlueCatalogDatabaseRegistryItem(),
@@ -211,7 +213,6 @@ var FreeResources = []string{
 	"aws_config_remediation_configuration",
 
 	// AWS ECR
-	"aws_ecr_lifecycle_policy",
 	"aws_ecr_repository_policy",
 
 	// AWS Elastic Beanstalk
@@ -431,7 +432,6 @@ var FreeResources = []string{
 	"aws_ec2_transit_gateway_route_table_propagation",
 	"aws_ec2_transit_gateway_vpc_attachment_accepter",
 	"aws_egress_only_internet_gateway",
-	"aws_flow_log",
 	"aws_internet_gateway",
 	"aws_main_route_table_association",
 	"aws_network_acl",

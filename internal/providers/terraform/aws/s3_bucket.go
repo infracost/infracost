@@ -13,6 +13,11 @@ func getS3BucketRegistryItem() *schema.RegistryItem {
 			"S3 replication time control data transfer, and batch operations are not supported by Terraform.",
 		},
 		CoreRFunc: NewS3BucketResource,
+		ReferenceAttributes: []string{
+			"aws_s3_bucket_lifecycle_configuration.bucket",
+			"aws_cloudfront_distribution.origin.0.domain_name",
+			"aws_cloudfront_distribution.origin.0.origin_id",
+		},
 	}
 }
 
