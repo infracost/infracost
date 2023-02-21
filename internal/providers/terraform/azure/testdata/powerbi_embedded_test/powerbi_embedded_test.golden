@@ -1,0 +1,15 @@
+
+ Name                         Monthly Qty  Unit   Monthly Cost 
+                                                               
+ azurerm_powerbi_embedded.a1                                   
+ └─ Node usage (A1)                   730  hours       $735.91 
+                                                               
+ azurerm_powerbi_embedded.a5                                   
+ └─ Node usage (A5)                   730  hours    $11,768.33 
+                                                               
+ OVERALL TOTAL                                      $12,504.24 
+──────────────────────────────────
+3 cloud resources were detected:
+∙ 2 were estimated
+∙ 1 was free:
+  ∙ 1 x azurerm_resource_group
