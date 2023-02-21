@@ -261,18 +261,29 @@ var FreeResources = []string{
 
 	// Azure Database
 	"azurerm_mariadb_configuration",
+	"azurerm_mariadb_database",
 	"azurerm_mariadb_firewall_rule",
 	"azurerm_mariadb_virtual_network_rule",
+
+	"azurerm_mysql_active_directory_administrator",
+	"azurerm_mysql_configuration",
+	"azurerm_mysql_database",
 	"azurerm_mysql_firewall_rule",
 	"azurerm_mysql_flexible_database",
 	"azurerm_mysql_flexible_server_configuration",
 	"azurerm_mysql_flexible_server_firewall_rule",
+	"azurerm_mysql_server_key",
 	"azurerm_mysql_virtual_network_rule",
+
+	"azurerm_postgresql_active_directory_administrator",
 	"azurerm_postgresql_configuration",
+	"azurerm_postgresql_database",
 	"azurerm_postgresql_firewall_rule",
+	"azurerm_postgresql_flexible_server_active_directory_administrator",
 	"azurerm_postgresql_flexible_server_configuration",
 	"azurerm_postgresql_flexible_server_database",
 	"azurerm_postgresql_flexible_server_firewall_rule",
+	"azurerm_postgresql_server_key",
 	"azurerm_postgresql_virtual_network_rule",
 
 	// Azure Datalake Gen 2
@@ -389,7 +400,25 @@ var FreeResources = []string{
 	"azurerm_sql_server",
 	"azurerm_sql_firewall_rule",
 	"azurerm_sql_virtual_network_rule",
+
+	"azurerm_mssql_database_extended_auditing_policy",
+	"azurerm_mssql_database_vulnerability_assessment_rule_baseline",
 	"azurerm_mssql_firewall_rule",
+	"azurerm_mssql_job_agent",
+	"azurerm_mssql_job_credential",
+	"azurerm_mssql_managed_instance_active_directory_administrator",
+	"azurerm_mssql_managed_instance_security_alert_policy",
+	"azurerm_mssql_managed_instance_transparent_data_encryption",
+	"azurerm_mssql_managed_instance_vulnerability_assessment",
+	"azurerm_mssql_outbound_firewall_rule",
+	"azurerm_mssql_server",
+	"azurerm_mssql_server_dns_alias",
+	"azurerm_mssql_server_extended_auditing_policy",
+	"azurerm_mssql_server_microsoft_support_auditing_policy",
+	"azurerm_mssql_server_security_alert_policy",
+	"azurerm_mssql_server_transparent_data_encryption",
+	"azurerm_mssql_server_vulnerability_assessment",
+	"azurerm_mssql_virtual_network_rule",
 
 	// Azure Storage
 	"azurerm_storage_blob_inventory_policy",
