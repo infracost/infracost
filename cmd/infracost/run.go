@@ -332,7 +332,7 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 		warn = v.Warn()
 	} else if err != nil {
 		m := fmt.Sprintf("%s\n\n", err)
-		m += fmt.Sprintf("Try setting --path to a Terraform plan JSON file. See %s for how to generate this.", ui.LinkString("https://infracost.io/troubleshoot"))
+		m += fmt.Sprintf("Try adding a config-file to configure how Infracost should run. See %s for details and examples.", ui.LinkString("https://infracost.io/config-file"))
 
 		return nil, clierror.NewCLIError(errors.New(m), "Could not detect path type")
 	}
