@@ -160,6 +160,7 @@ var FreeResources = []string{
 	"azurerm_api_management_user",
 
 	// Azure App Service
+	"azurerm_app_service",
 	"azurerm_app_service_active_slot",
 	"azurerm_app_service_certificate",
 	"azurerm_app_service_managed_certificate",
@@ -360,13 +361,24 @@ var FreeResources = []string{
 	"azurerm_nat_gateway_public_ip_association",
 	"azurerm_nat_gateway_public_ip_prefix_association",
 	"azurerm_network_interface",
+	"azurerm_network_interface_application_gateway_backend_address_pool_association",
+	"azurerm_network_interface_application_security_group_association",
+	"azurerm_network_interface_backend_address_pool_association",
+	"azurerm_network_interface_nat_rule_association",
 	"azurerm_network_interface_security_group_association",
 	"azurerm_network_security_group",
 	"azurerm_network_security_rule",
 	"azurerm_private_link_service",
+	"azurerm_route",
+	"azurerm_route_filter",
+	"azurerm_route_map",
+	"azurerm_route_table",
 	"azurerm_storage_account_network_rules",
 	"azurerm_subnet",
+	"azurerm_subnet_nat_gateway_association",
 	"azurerm_subnet_network_security_group_association",
+	"azurerm_subnet_route_table_association",
+	"azurerm_subnet_service_endpoint_storage_policy",
 	"azurerm_virtual_network",
 
 	// Azure Notification Hub
@@ -395,6 +407,10 @@ var FreeResources = []string{
 	"azurerm_sentinel_alert_rule_fusion",
 	"azurerm_sentinel_alert_rule_ms_security_incident",
 	"azurerm_sentinel_alert_rule_scheduled",
+
+	// Azure Shared Image Gallery
+	"azurerm_shared_image",
+	"azurerm_shared_image_gallery",
 
 	// Azure SQL
 	"azurerm_sql_server",
