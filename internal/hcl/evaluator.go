@@ -39,7 +39,26 @@ var (
 		"data":     {},
 	}
 
-	sensitiveRegxp = regexp.MustCompile(`^image[_|-]|[_|-]image$|saml[_|-]role$|secrets$|aws[_|-]profile$|key[_|-]id$|secret[_|-]key$|access[_|-]key$|[_|-]token$|^token[_|-]|[_|-]secret$|^secret[_|-]|[_|-]password$|^password[_|-]|[_|-]username$|^username[_|-]|api[_|-]key|expiration[_|-]date`)
+	sensitiveRegxp = regexp.MustCompile(strings.Join([]string{
+		"^image[_|-]",
+		"[_|-]image$",
+		"saml[_|-]role$",
+		"secrets$",
+		"aws[_|-]profile$",
+		"key[_|-]id$",
+		"secret[_|-]key$",
+		"access[_|-]key$",
+		"[_|-]token$",
+		"^token[_|-]",
+		"[_|-]secret$",
+		"^secret[_|-]",
+		"[_|-]password$",
+		"^password[_|-]",
+		"[_|-]username$",
+		"^username[_|-]",
+		"api[_|-]key",
+		"expiration[_|-]date",
+	}, "|"))
 )
 
 const maxContextIterations = 120
