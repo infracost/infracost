@@ -39,7 +39,26 @@ var (
 		"data":     {},
 	}
 
-	sensitiveRegxp = regexp.MustCompile(`_token$|^token_|_secret$|^secret_|_password$|^password_|_username$|^username_|api_key|expiration_date`)
+	sensitiveRegxp = regexp.MustCompile(strings.Join([]string{
+		"^image[_|-]",
+		"[_|-]image$",
+		"saml[_|-]role$",
+		"secrets$",
+		"aws[_|-]profile$",
+		"key[_|-]id$",
+		"secret[_|-]key$",
+		"access[_|-]key$",
+		"[_|-]token$",
+		"^token[_|-]",
+		"[_|-]secret$",
+		"^secret[_|-]",
+		"[_|-]password$",
+		"^password[_|-]",
+		"[_|-]username$",
+		"^username[_|-]",
+		"api[_|-]key",
+		"expiration[_|-]date",
+	}, "|"))
 )
 
 const maxContextIterations = 120
@@ -165,7 +184,7 @@ func (e *Evaluator) MissingVars() []string {
 			continue
 		}
 
-		if sensitiveRegxp.MatchString(name) {
+		if sensitiveRegxp.MatchString(strings.ToLower(name)) {
 			continue
 		}
 

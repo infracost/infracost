@@ -6,55 +6,33 @@ provider "aws" {
   secret_key                  = "mock_secret_key"
 }
 
-variable "missing_var" {
-  type = bool
-}
-
-variable "test_token" {
-  type = bool
-}
-
-variable "token_test" {
-  type = bool
-}
-
-variable "test_secret" {
-  type = bool
-}
-
-variable "secret_test" {
-  type = bool
-}
-
-variable "test_password" {
-  type = bool
-}
-
-variable "password_test" {
-  type = bool
-}
-
-variable "test_username" {
-  type = bool
-}
-
-variable "username_test" {
-  type = bool
-}
-
-variable "test_api_key_test" {
-  type = bool
-}
-
-variable "test_expiration_date_test" {
-  type = bool
-}
-
 variable "sensitive_test" {
-  type      = bool
   sensitive = true
 }
+
+variable "missing_var" {}
+variable "test_token" {}
+variable "token_test" {}
+variable "test_secret" {}
+variable "secret_test" {}
+variable "test_password" {}
+variable "password_test" {}
+variable "test_username" {}
+variable "username_test" {}
+variable "test_api_key_test" {}
+variable "test_expiration_date_test" {}
+variable "AWS_ACCESS_KEY_ID" {}
+variable "AWS_SECRET_ACCESS_KEY" {}
+variable "access_key" {}
+variable "secret_key" {}
+variable "aws-secret-key" {}
+variable "aws_profile" {}
+variable "application-secrets" {}
+variable "saml_role" {}
+variable "_image" {}
+variable "image_" {}
 
 resource "aws_eip" "eip" {
   network_interface = "test"
 }
+
