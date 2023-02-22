@@ -18,6 +18,14 @@ type PowerBIEmbedded struct {
 	Region  string
 }
 
+func (r *PowerBIEmbedded) CoreType() string {
+	return "PowerBIEmbedded"
+}
+
+func (r *PowerBIEmbedded) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
+
 // PopulateUsage parses the u schema.UsageData into the PowerBIEmbedded.
 // It uses the `infracost_usage` struct tags to populate data into the PowerBIEmbedded.
 func (r *PowerBIEmbedded) PopulateUsage(u *schema.UsageData) {

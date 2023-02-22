@@ -8,21 +8,18 @@ import (
 func getPowerBIEmbeddedRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_powerbi_embedded",
-		RFunc: newPowerBIEmbedded,
+		CoreRFunc: newPowerBIEmbedded,
 		ReferenceAttributes: []string{
 			"resource_group_name",
 		},
 	}
 }
 
-func newPowerBIEmbedded(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newPowerBIEmbedded(d *schema.ResourceData, u *schema.UsageData) schema.CoreResource  {
 	region := lookupRegion(d, []string{"resource_group_name"})
-	r := &azure.PowerBIEmbedded{
+	return &azure.PowerBIEmbedded{
 		Address: d.Address,
 		Region:  region,
 		SKU:     d.Get("sku_name").String(),
 	}
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
 }
