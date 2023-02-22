@@ -65,6 +65,7 @@ func (c *CostComponent) CustomPrice() *decimal.Decimal {
 }
 
 func (c *CostComponent) UnitMultiplierPrice() decimal.Decimal {
+	// Round the final number to 16 decimal places to avoid floating point issues.
 	return c.Price().Mul(c.UnitMultiplier)
 }
 
@@ -78,6 +79,7 @@ func (c *CostComponent) UnitMultiplierHourlyQuantity() *decimal.Decimal {
 	if c.UnitMultiplier.IsZero() {
 		m = decimal.Zero
 	} else {
+		// Round the final number to 16 decimal places to avoid floating point issues.
 		m = c.HourlyQuantity.Div(c.UnitMultiplier)
 	}
 
@@ -94,6 +96,7 @@ func (c *CostComponent) UnitMultiplierMonthlyQuantity() *decimal.Decimal {
 	if c.UnitMultiplier.IsZero() {
 		m = decimal.Zero
 	} else {
+		// Round the final number to 16 decimal places to avoid floating point issues.
 		m = c.MonthlyQuantity.Div(c.UnitMultiplier)
 	}
 
