@@ -12,9 +12,6 @@ import (
 )
 
 const (
-	sqlServiceName   = "SQL Database"
-	sqlProductFamily = "Databases"
-
 	sqlServerlessTier = "general purpose - serverless"
 	sqlHyperscaleTier = "hyperscale"
 )
@@ -26,7 +23,16 @@ var (
 	}
 )
 
-// SQLDatabase represents an azure sql database instance.
+var mssqlPremiumDTUIncludedStorage = map[string]float64{
+	"p1":  500,
+	"p2":  500,
+	"p4":  500,
+	"p6":  500,
+	"p11": 4096,
+	"p15": 4096,
+}
+
+// SQLDatabase represents an Azure SQL database instance.
 //
 // More resource information here: https://azure.microsoft.com/en-gb/products/azure-sql/database/
 // Pricing information here: https://azure.microsoft.com/en-gb/pricing/details/azure-sql-database/single/
@@ -43,7 +49,7 @@ type SQLDatabase struct {
 	ZoneRedundant    bool
 
 	// ExtraDataStorageGB represents a usage cost of additional backup storage used by the sql database.
-	ExtraDataStorageGB *int64 `infracost_usage:"extra_data_storage_gb"`
+	ExtraDataStorageGB *float64 `infracost_usage:"extra_data_storage_gb"`
 	// MonthlyVCoreHours represents a usage param that allows users to define how many hours of usage a serverless sql database instance uses.
 	MonthlyVCoreHours *int64 `infracost_usage:"monthly_vcore_hours"`
 	// LongTermRetentionStorageGB defines a usage param that allows users to define how many gb of cold storage the database uses.
@@ -56,16 +62,22 @@ func (r *SQLDatabase) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
+var SQLDatabaseUsageSchema = []*schema.UsageItem{
+	{Key: "extra_data_storage_gb", DefaultValue: 0.0, ValueType: schema.Float64},
+	{Key: "monthly_vcore_hours", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "long_term_retention_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
+}
+
 // BuildResource builds a schema.Resource from a valid SQLDatabase.
 // It returns a SQLDatabase as a *schema.Resource with cost components initialized.
 //
 // SQLDatabase splits pricing into two different models. DTU & vCores.
 //
 //	Database Transaction Unit (DTU) is made a performance metric representing a mixture of performance metrics
-//	in azure sql. Some include: CPU, I/O, Memory. DTU is used as Azure tries to simplify billing by using a single metric.
+//	in Azure SQL. Some include: CPU, I/O, Memory. DTU is used as Azure tries to simplify billing by using a single metric.
 //
 //	Virtual Core (vCore) pricing is designed to translate from on premise hardware metrics (cores) into the cloud
-//	sql instance. vCore is designed to allow users to better estimate their resource limits, e.g. RAM.
+//	SQL instance. vCore is designed to allow users to better estimate their resource limits, e.g. RAM.
 //
 // SQL databases that follow a DTU pricing model have the following costs associated with them:
 //
@@ -77,45 +89,46 @@ func (r *SQLDatabase) PopulateUsage(u *schema.UsageData) {
 //
 //  1. Costs based on the number of vCores the resource has
 //  2. Extra pricing if any database read replicas have been provisioned
-//  3. Additional charge for sql server licencing based on vCores amount
+//  3. Additional charge for SQL Server licencing based on vCores amount
 //  4. Charges for storage used
 //  5. Charges for long term data backup - this is configured using SQLDatabase.LongTermRetentionStorageGB
 //
 // This method is called after the resource is initialized by an IaC provider. SQLDatabase is used by both mssql_database
-// and sql_database terraform resources to build a sql database costing.
+// and sql_database Terraform resources.
 func (r *SQLDatabase) BuildResource() *schema.Resource {
 	return &schema.Resource{
-		Name: r.Address,
-		UsageSchema: []*schema.UsageItem{
-			{Key: "extra_data_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
-			{Key: "monthly_vcore_hours", DefaultValue: 0, ValueType: schema.Int64},
-			{Key: "long_term_retention_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
-		},
+		Name:           r.Address,
+		UsageSchema:    SQLDatabaseUsageSchema,
 		CostComponents: r.costComponents(),
 	}
 }
 
 func (r *SQLDatabase) costComponents() []*schema.CostComponent {
 	if r.Cores != nil {
-		return r.vCorePurchaseCostComponents()
+		return r.vCoreCostComponents()
 	}
 
-	return r.dtuPurchaseCostComponents()
+	return r.dtuCostComponents()
 }
 
-func (r *SQLDatabase) dtuPurchaseCostComponents() []*schema.CostComponent {
+func (r *SQLDatabase) dtuCostComponents() []*schema.CostComponent {
 	skuName := strings.ToLower(r.SKU)
 	if skuName == "basic" {
 		skuName = "b"
 	}
 
+	// This is a bit of a hack, but the Azure pricing API returns the price per day
+	// and the Azure pricing calculator uses 730 hours to show the cost
+	// so we need to convert the price per day to price per hour.
+	// Use precision 24 to avoid rounding errors later since the default decimal precision is 16.
+	daysInMonth := schema.HourToMonthUnitMultiplier.DivRound(decimal.NewFromInt(24), 24)
+
 	costComponents := []*schema.CostComponent{
 		{
-			Name:           fmt.Sprintf("Compute (%s)", strings.ToTitle(r.SKU)),
-			Unit:           "days",
-			UnitMultiplier: decimal.NewFromInt(1),
-			// This is not the same as the 730h/month value we use elsewhere but it looks more understandable than seeing `30.4166` in the output
-			MonthlyQuantity: decimalPtr(decimal.NewFromInt(30)),
+			Name:            fmt.Sprintf("Compute (%s)", strings.ToTitle(r.SKU)),
+			Unit:            "hours",
+			UnitMultiplier:  daysInMonth.DivRound(schema.HourToMonthUnitMultiplier, 24),
+			MonthlyQuantity: decimalPtr(daysInMonth),
 			ProductFilter: r.productFilter([]*schema.AttributeFilter{
 				{Key: "productName", ValueRegex: regexPtr("^SQL Database Single")},
 				{Key: "skuName", ValueRegex: regexPtr(fmt.Sprintf("^%s$", skuName))},
@@ -125,52 +138,30 @@ func (r *SQLDatabase) dtuPurchaseCostComponents() []*schema.CostComponent {
 		},
 	}
 
-	if skuName != "b" {
-		costComponents = append(costComponents, r.extraDataStorageCostComponent())
+	var extraStorageGB float64
+
+	if strings.ToLower(r.SKU) != "basic" && r.ExtraDataStorageGB != nil {
+		extraStorageGB = *r.ExtraDataStorageGB
+	} else if strings.ToLower(r.SKU) == "standard" && r.MaxSizeGB != nil {
+		includedStorageGB := 250.0
+		extraStorageGB = *r.MaxSizeGB - includedStorageGB
+	} else if strings.ToLower(r.SKU) == "premium" && r.MaxSizeGB != nil {
+		includedStorageGB, ok := mssqlPremiumDTUIncludedStorage[strings.ToLower(r.SKU)]
+		if ok {
+			extraStorageGB = *r.MaxSizeGB - includedStorageGB
+		}
 	}
 
-	costComponents = append(costComponents, r.longTermRetentionMSSQLCostComponent())
+	if extraStorageGB > 0 {
+		costComponents = append(costComponents, r.extraDataStorageCostComponent(extraStorageGB))
+	}
+
+	costComponents = append(costComponents, r.longTermRetentionCostComponent())
 
 	return costComponents
 }
 
-func (r *SQLDatabase) extraDataStorageCostComponent() *schema.CostComponent {
-	sn := tierMapping[strings.ToLower(r.SKU)[:1]]
-
-	var storageGB *decimal.Decimal
-	if r.MaxSizeGB != nil {
-		storageGB = decimalPtr(decimal.NewFromFloat(*r.MaxSizeGB))
-
-		if strings.ToLower(sn) == "premium" {
-			storageGB = decimalPtr(storageGB.Sub(decimal.NewFromInt(500)))
-		} else {
-			storageGB = decimalPtr(storageGB.Sub(decimal.NewFromInt(250)))
-		}
-
-		if storageGB.IsNegative() {
-			storageGB = nil
-		}
-	}
-
-	if r.ExtraDataStorageGB != nil {
-		storageGB = decimalPtr(decimal.NewFromInt(*r.ExtraDataStorageGB))
-	}
-
-	return &schema.CostComponent{
-		Name:            "Extra data storage",
-		Unit:            "GB",
-		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: storageGB,
-		ProductFilter: r.productFilter([]*schema.AttributeFilter{
-			{Key: "productName", ValueRegex: strPtr(fmt.Sprintf("/SQL Database %s - Storage/i", sn))},
-			{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", sn))},
-			{Key: "meterName", Value: strPtr("Data Stored")},
-		}),
-		PriceFilter: priceFilterConsumption,
-	}
-}
-
-func (r *SQLDatabase) vCorePurchaseCostComponents() []*schema.CostComponent {
+func (r *SQLDatabase) vCoreCostComponents() []*schema.CostComponent {
 	costComponents := []*schema.CostComponent{
 		r.computeHoursCostComponent(),
 	}
@@ -183,10 +174,10 @@ func (r *SQLDatabase) vCorePurchaseCostComponents() []*schema.CostComponent {
 		costComponents = append(costComponents, r.sqlLicenseCostComponent())
 	}
 
-	costComponents = append(costComponents, r.mssqlStorageComponent())
+	costComponents = append(costComponents, r.storageCostComponent())
 
 	if strings.ToLower(r.Tier) != sqlHyperscaleTier {
-		costComponents = append(costComponents, r.longTermRetentionMSSQLCostComponent())
+		costComponents = append(costComponents, r.longTermRetentionCostComponent())
 	}
 
 	return costComponents
@@ -208,7 +199,7 @@ func (r *SQLDatabase) serverlessComputeHoursCostComponent() *schema.CostComponen
 		vCoreHours = decimalPtr(decimal.NewFromInt(*r.MonthlyVCoreHours))
 	}
 
-	serverlessSkuName := r.mssqlSkuName(1)
+	serverlessSkuName := mssqlSkuName(1, r.ZoneRedundant)
 	return &schema.CostComponent{
 		Name:            fmt.Sprintf("Compute (serverless, %s)", r.SKU),
 		Unit:            "vCore-hours",
@@ -224,7 +215,7 @@ func (r *SQLDatabase) serverlessComputeHoursCostComponent() *schema.CostComponen
 }
 
 func (r *SQLDatabase) provisionedComputeCostComponent() *schema.CostComponent {
-	skuName := r.mssqlSkuName(*r.Cores)
+	skuName := mssqlSkuName(*r.Cores, r.ZoneRedundant)
 	productNameRegex := fmt.Sprintf("/%s - %s/", r.Tier, r.Family)
 	name := fmt.Sprintf("Compute (provisioned, %s)", r.SKU)
 
@@ -245,7 +236,7 @@ func (r *SQLDatabase) provisionedComputeCostComponent() *schema.CostComponent {
 
 func (r *SQLDatabase) readReplicaCostComponent() *schema.CostComponent {
 	productNameRegex := fmt.Sprintf("/%s - %s/", r.Tier, r.Family)
-	skuName := r.mssqlSkuName(*r.Cores)
+	skuName := mssqlSkuName(*r.Cores, r.ZoneRedundant)
 
 	var replicaCount *decimal.Decimal
 	if r.ReadReplicaCount != nil {
@@ -265,51 +256,111 @@ func (r *SQLDatabase) readReplicaCostComponent() *schema.CostComponent {
 	}
 }
 
+func (r *SQLDatabase) extraDataStorageCostComponent(extraStorageGB float64) *schema.CostComponent {
+	tier := tierMapping[strings.ToLower(r.SKU)[:1]]
+	return mssqlExtraDataStorageCostComponent(r.Region, tier, extraStorageGB)
+}
+
 func (r *SQLDatabase) sqlLicenseCostComponent() *schema.CostComponent {
+	return mssqlLicenseCostComponent(r.Region, r.Cores, r.Tier)
+}
+
+func (r *SQLDatabase) storageCostComponent() *schema.CostComponent {
+	return mssqlStorageCostComponent(r.Region, r.Tier, r.ZoneRedundant, r.MaxSizeGB)
+}
+
+func (r *SQLDatabase) longTermRetentionCostComponent() *schema.CostComponent {
+	return mssqlLongTermRetentionCostComponent(r.Region, r.LongTermRetentionStorageGB)
+}
+
+func (r *SQLDatabase) productFilter(filters []*schema.AttributeFilter) *schema.ProductFilter {
+	return mssqlProductFilter(r.Region, filters)
+}
+
+func mssqlSkuName(cores int64, zoneRedundant bool) string {
+	sku := fmt.Sprintf("%d vCore", cores)
+
+	if zoneRedundant {
+		sku += " Zone Redundancy"
+	}
+	return sku
+}
+
+func mssqlProductFilter(region string, filters []*schema.AttributeFilter) *schema.ProductFilter {
+	return &schema.ProductFilter{
+		VendorName:       strPtr(vendorName),
+		Region:           strPtr(region),
+		Service:          strPtr("SQL Database"),
+		ProductFamily:    strPtr("Databases"),
+		AttributeFilters: filters,
+	}
+}
+
+func mssqlExtraDataStorageCostComponent(region string, tier string, extraStorageGB float64) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            "Extra data storage",
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: decimalPtr(decimal.NewFromFloat(extraStorageGB)),
+		ProductFilter: mssqlProductFilter(region, []*schema.AttributeFilter{
+			{Key: "productName", ValueRegex: strPtr(fmt.Sprintf("/SQL Database %s - Storage/i", tier))},
+			{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", tier))},
+			{Key: "meterName", Value: strPtr("Data Stored")},
+		}),
+		PriceFilter: priceFilterConsumption,
+	}
+}
+
+func mssqlLicenseCostComponent(region string, cores *int64, tier string) *schema.CostComponent {
 	licenseRegion := "Global"
-	if strings.Contains(r.Region, "usgov") {
+	if strings.Contains(region, "usgov") {
 		licenseRegion = "US Gov"
 	}
 
-	if strings.Contains(r.Region, "china") {
+	if strings.Contains(region, "china") {
 		licenseRegion = "China"
 	}
 
-	if strings.Contains(r.Region, "germany") {
+	if strings.Contains(region, "germany") {
 		licenseRegion = "Germany"
+	}
+
+	coresVal := int64(1)
+	if cores != nil {
+		coresVal = *cores
 	}
 
 	return &schema.CostComponent{
 		Name:           "SQL license",
 		Unit:           "vCore-hours",
 		UnitMultiplier: decimal.NewFromInt(1),
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(*r.Cores)),
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(coresVal)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr(vendorName),
 			Region:        strPtr(licenseRegion),
-			Service:       strPtr(sqlServiceName),
-			ProductFamily: strPtr(sqlProductFamily),
+			Service:       strPtr("SQL Database"),
+			ProductFamily: strPtr("Databases"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", ValueRegex: strPtr(fmt.Sprintf("/%s - %s/", r.Tier, "SQL License"))},
+				{Key: "productName", ValueRegex: strPtr(fmt.Sprintf("/%s - %s/", tier, "SQL License"))},
 			},
 		},
 		PriceFilter: priceFilterConsumption,
 	}
 }
 
-func (r *SQLDatabase) mssqlStorageComponent() *schema.CostComponent {
+func mssqlStorageCostComponent(region string, tier string, zoneRedundant bool, maxSizeGB *float64) *schema.CostComponent {
 	storageGB := decimalPtr(decimal.NewFromInt(5))
-	if r.MaxSizeGB != nil {
-		storageGB = decimalPtr(decimal.NewFromFloat(*r.MaxSizeGB))
+	if maxSizeGB != nil {
+		storageGB = decimalPtr(decimal.NewFromFloat(*maxSizeGB))
 	}
 
-	storageTier := r.Tier
+	storageTier := tier
 	if strings.ToLower(storageTier) == "general purpose - serverless" {
 		storageTier = "General Purpose"
 	}
 
 	skuName := storageTier
-	if r.ZoneRedundant {
+	if zoneRedundant {
 		skuName += " Zone Redundancy"
 	}
 
@@ -320,7 +371,7 @@ func (r *SQLDatabase) mssqlStorageComponent() *schema.CostComponent {
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: storageGB,
-		ProductFilter: r.productFilter([]*schema.AttributeFilter{
+		ProductFilter: mssqlProductFilter(region, []*schema.AttributeFilter{
 			{Key: "productName", ValueRegex: strPtr(productNameRegex)},
 			{Key: "skuName", Value: strPtr(skuName)},
 			{Key: "meterName", ValueRegex: regexPtr("Data Stored$")},
@@ -328,10 +379,10 @@ func (r *SQLDatabase) mssqlStorageComponent() *schema.CostComponent {
 	}
 }
 
-func (r *SQLDatabase) longTermRetentionMSSQLCostComponent() *schema.CostComponent {
+func mssqlLongTermRetentionCostComponent(region string, longTermRetentionStorageGB *int64) *schema.CostComponent {
 	var retention *decimal.Decimal
-	if r.LongTermRetentionStorageGB != nil {
-		retention = decimalPtr(decimal.NewFromInt(*r.LongTermRetentionStorageGB))
+	if longTermRetentionStorageGB != nil {
+		retention = decimalPtr(decimal.NewFromInt(*longTermRetentionStorageGB))
 	}
 
 	return &schema.CostComponent{
@@ -339,30 +390,11 @@ func (r *SQLDatabase) longTermRetentionMSSQLCostComponent() *schema.CostComponen
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: retention,
-		ProductFilter: r.productFilter([]*schema.AttributeFilter{
+		ProductFilter: mssqlProductFilter(region, []*schema.AttributeFilter{
 			{Key: "productName", Value: strPtr("SQL Database - LTR Backup Storage")},
 			{Key: "skuName", Value: strPtr("Backup RA-GRS")},
 			{Key: "meterName", ValueRegex: strPtr("/RA-GRS Data Stored/i")},
 		}),
 		PriceFilter: priceFilterConsumption,
-	}
-}
-
-func (r *SQLDatabase) mssqlSkuName(cores int64) string {
-	sku := fmt.Sprintf("%d vCore", cores)
-
-	if r.ZoneRedundant {
-		sku += " Zone Redundancy"
-	}
-	return sku
-}
-
-func (r *SQLDatabase) productFilter(filters []*schema.AttributeFilter) *schema.ProductFilter {
-	return &schema.ProductFilter{
-		VendorName:       strPtr(vendorName),
-		Region:           strPtr(r.Region),
-		Service:          strPtr(sqlServiceName),
-		ProductFamily:    strPtr(sqlProductFamily),
-		AttributeFilters: filters,
 	}
 }

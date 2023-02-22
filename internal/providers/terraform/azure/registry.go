@@ -122,6 +122,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getIoTHubDPSRegistryItem(),
 	getVirtualNetworkPeeringRegistryItem(),
 	getPowerBIEmbeddedRegistryItem(),
+	getMSSQLElasticPoolRegistryItem(),
 }
 
 // FreeResources grouped alphabetically

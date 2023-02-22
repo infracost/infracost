@@ -12,7 +12,7 @@
  └─ Long-term retention                                      Monthly cost depends on usage: $0.05 per GB    
                                                                                                             
  azurerm_sql_database.premium6                                                                              
- ├─ Compute (P6)                                                         30  days                 $3,600.00 
+ ├─ Compute (P6)                                                        730  hours                $3,650.00 
  ├─ Extra data storage                                                  500  GB                     $170.00 
  └─ Long-term retention                                               1,000  GB                      $50.00 
                                                                                                             
@@ -37,12 +37,12 @@
  └─ Storage                                                               5  GB                       $0.50 
                                                                                                             
  azurerm_sql_database.sql_database_with_edition_premium                                                     
- ├─ Compute (P1)                                                         30  days                   $450.00 
+ ├─ Compute (P1)                                                        730  hours                  $456.25 
  ├─ Extra data storage                                       Monthly cost depends on usage: $0.34 per GB    
  └─ Long-term retention                                      Monthly cost depends on usage: $0.05 per GB    
                                                                                                             
  azurerm_sql_database.sql_database_with_edition_standard                                                    
- ├─ Compute (S0)                                                         30  days                    $14.52 
+ ├─ Compute (S0)                                                        730  hours                   $14.72 
  ├─ Extra data storage                                       Monthly cost depends on usage: $0.17 per GB    
  └─ Long-term retention                                      Monthly cost depends on usage: $0.05 per GB    
                                                                                                             
@@ -56,7 +56,7 @@
  ├─ Storage                                                               5  GB                       $1.25 
  └─ Long-term retention                                      Monthly cost depends on usage: $0.05 per GB    
                                                                                                             
- OVERALL TOTAL                                                                                    $6,868.66 
+ OVERALL TOTAL                                                                                    $6,925.12 
 ──────────────────────────────────
 13 cloud resources were detected:
 ∙ 11 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
