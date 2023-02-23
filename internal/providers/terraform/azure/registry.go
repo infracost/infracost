@@ -323,6 +323,7 @@ var FreeResources = []string{
 	"azurerm_iothub_consumer_group",
 	"azurerm_iothub_dps_certificate",
 	"azurerm_iothub_dps_shared_access_policy",
+	"azurerm_iothub_enrichment",
 	"azurerm_iothub_shared_access_policy",
 
 	// Azure Lighthouse (Delegated Resoure Management)
@@ -374,6 +375,7 @@ var FreeResources = []string{
 	"azurerm_route_filter",
 	"azurerm_route_map",
 	"azurerm_route_table",
+	"azurerm_storage_account_local_user",
 	"azurerm_storage_account_network_rules",
 	"azurerm_subnet",
 	"azurerm_subnet_nat_gateway_association",
@@ -414,12 +416,14 @@ var FreeResources = []string{
 	"azurerm_shared_image_gallery",
 
 	// Azure SQL
-	"azurerm_sql_server",
+	"azurerm_sql_failover_group",
 	"azurerm_sql_firewall_rule",
+	"azurerm_sql_server",
 	"azurerm_sql_virtual_network_rule",
 
 	"azurerm_mssql_database_extended_auditing_policy",
 	"azurerm_mssql_database_vulnerability_assessment_rule_baseline",
+	"azurerm_mssql_failover_group",
 	"azurerm_mssql_firewall_rule",
 	"azurerm_mssql_job_agent",
 	"azurerm_mssql_job_credential",
@@ -456,6 +460,8 @@ var FreeResources = []string{
 
 	// Azure Virtual Machines
 	"azurerm_virtual_machine_data_disk_attachment",
+	"azurerm_virtual_machine_extension",
+	"azurerm_virtual_machine_scale_set_extension",
 	"azurerm_availability_set",
 	"azurerm_proximity_placement_group",
 	"azurerm_ssh_public_key",
