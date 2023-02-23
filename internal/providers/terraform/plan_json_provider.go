@@ -93,7 +93,7 @@ func (p *PlanJSONProvider) LoadResourcesFromSrc(usage schema.UsageMap, j []byte,
 	project.PartialResources = partialResources
 
 	if p.scanner != nil {
-		err := p.scanner.ScanPlan(project, j)
+		err := p.scanner.ScanPlan(project)
 		if err != nil {
 			p.logger.WithError(err).Debugf("Terraform project %s plan JSON scan failed", project.Name)
 		}

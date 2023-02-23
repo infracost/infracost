@@ -206,7 +206,7 @@ func (p *HCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, e
 		}
 
 		if p.scanner != nil {
-			err := p.scanner.ScanPlan(project, j.JSON)
+			err := p.scanner.ScanPlan(project)
 			if err != nil {
 				p.logger.WithError(err).Debugf("failed to scan Terraform project %s", project.Name)
 			}

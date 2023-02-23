@@ -11,6 +11,25 @@ type CoreResource interface {
 	BuildResource() *Resource
 }
 
+// BlankCoreResource is a helper struct for NoPrice and Skipped resources that are evaluated as
+// part of the Policy API. This implements the CoreResource interface and returns a skipped resource
+// that doesn't affect the CLI output.
+type BlankCoreResource struct {
+	Name string
+	Type string
+}
+
+func (b BlankCoreResource) CoreType() string           { return b.Type }
+func (b BlankCoreResource) UsageSchema() []*UsageItem  { return nil }
+func (b BlankCoreResource) PopulateUsage(u *UsageData) {}
+func (b BlankCoreResource) BuildResource() *Resource {
+	return &Resource{
+		Name:      b.Name,
+		IsSkipped: true,
+		NoPrice:   true,
+	}
+}
+
 type UsageParam struct {
 	Key   string `json:"key"`
 	Value string `json:"value"`

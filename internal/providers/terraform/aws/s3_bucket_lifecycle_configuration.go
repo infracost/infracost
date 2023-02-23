@@ -10,6 +10,9 @@ func getS3BucketLifecycleConfigurationRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_s3_bucket_lifecycle_configuration",
 		RFunc: newS3BucketLifecycleConfigurationResource,
+		ReferenceAttributes: []string{
+			"bucket",
+		},
 	}
 }
 
