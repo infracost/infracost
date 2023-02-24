@@ -69,6 +69,13 @@ resource "azurerm_mssql_database" "serverless" {
   sku_name  = "GP_S_Gen5_4"
 }
 
+resource "azurerm_mssql_database" "serverless_zone" {
+  name      = "acctest-db-d"
+  server_id = azurerm_sql_server.example.id
+  sku_name  = "GP_S_Gen5_4"
+  zone_redundant = true
+}
+
 resource "azurerm_mssql_database" "LTR" {
   name      = "acctest-db-d"
   server_id = azurerm_sql_server.example.id

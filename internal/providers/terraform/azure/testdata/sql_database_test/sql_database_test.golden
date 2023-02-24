@@ -38,12 +38,10 @@
                                                                                                             
  azurerm_sql_database.sql_database_with_edition_premium                                                     
  ├─ Compute (P1)                                                        730  hours                  $456.25 
- ├─ Extra data storage                                       Monthly cost depends on usage: $0.34 per GB    
  └─ Long-term retention                                      Monthly cost depends on usage: $0.05 per GB    
                                                                                                             
  azurerm_sql_database.sql_database_with_edition_standard                                                    
  ├─ Compute (S0)                                                        730  hours                   $14.72 
- ├─ Extra data storage                                       Monthly cost depends on usage: $0.17 per GB    
  └─ Long-term retention                                      Monthly cost depends on usage: $0.05 per GB    
                                                                                                             
  azurerm_sql_database.sql_database_with_max_size                                                            
