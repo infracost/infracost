@@ -140,13 +140,7 @@ func (r *MSSQLElasticPool) dtuCostComponents() []*schema.CostComponent {
 }
 
 func (r *MSSQLElasticPool) vCoreCostComponents() []*schema.CostComponent {
-	costComponents := []*schema.CostComponent{
-		r.computeHoursCostComponent(),
-	}
-
-	if r.ZoneRedundant {
-		costComponents = append(costComponents, r.zoneRedundancyCostComponent())
-	}
+	costComponents := r.computeHoursCostComponents()
 
 	if strings.ToLower(r.LicenceType) == "licenseincluded" {
 		costComponents = append(costComponents, r.sqlLicenseCostComponent())
@@ -157,53 +151,46 @@ func (r *MSSQLElasticPool) vCoreCostComponents() []*schema.CostComponent {
 	return costComponents
 }
 
-func (r *MSSQLElasticPool) computeHoursCostComponent() *schema.CostComponent {
+func (r *MSSQLElasticPool) computeHoursCostComponents() []*schema.CostComponent {
 	var cores int64
 	if r.Cores != nil {
 		cores = *r.Cores
 	}
 
-	skuName := fmt.Sprintf("%d vCore", cores)
 	productNameRegex := fmt.Sprintf("/%s - %s/", r.Tier, r.Family)
 	name := fmt.Sprintf("Compute (%s, %d vCore)", r.SKU, cores)
 
 	log.Warnf("'Multiple products found' are safe to ignore for '%s' due to limitations in the Azure API.", name)
 
-	return &schema.CostComponent{
-		Name:           name,
-		Unit:           "hours",
-		UnitMultiplier: decimal.NewFromInt(1),
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
-		ProductFilter: r.productFilter([]*schema.AttributeFilter{
-			{Key: "productName", ValueRegex: strPtr(productNameRegex)},
-			{Key: "skuName", Value: strPtr(skuName)},
-		}),
-		PriceFilter: priceFilterConsumption,
-	}
-}
-
-func (r *MSSQLElasticPool) zoneRedundancyCostComponent() *schema.CostComponent {
-	var cores int64
-	if r.Cores != nil {
-		cores = *r.Cores
+	costComponents := []*schema.CostComponent{
+		{
+			Name:           name,
+			Unit:           "hours",
+			UnitMultiplier: decimal.NewFromInt(1),
+			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+			ProductFilter: r.productFilter([]*schema.AttributeFilter{
+				{Key: "productName", ValueRegex: strPtr(productNameRegex)},
+				{Key: "skuName", Value: strPtr(fmt.Sprintf("%d vCore", cores))},
+			}),
+			PriceFilter: priceFilterConsumption,
+		},
 	}
 
-	skuName := fmt.Sprintf("%d vCore Zone Redundancy", cores)
-	productNameRegex := fmt.Sprintf("/%s - %s/", r.Tier, r.Family)
-	name := fmt.Sprintf("Zone-redundancy (%s, %d vCore)", r.SKU, cores)
-	log.Warnf("'Multiple products found' are safe to ignore for '%s' due to limitations in the Azure API.", name)
-
-	return &schema.CostComponent{
-		Name:           name,
-		Unit:           "hours",
-		UnitMultiplier: decimal.NewFromInt(1),
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
-		ProductFilter: r.productFilter([]*schema.AttributeFilter{
-			{Key: "productName", ValueRegex: strPtr(productNameRegex)},
-			{Key: "skuName", Value: strPtr(skuName)},
-		}),
-		PriceFilter: priceFilterConsumption,
+	if r.ZoneRedundant {
+		costComponents = append(costComponents, &schema.CostComponent{
+			Name:           fmt.Sprintf("Zone redundancy (%s, %d vCore)", r.SKU, cores),
+			Unit:           "hours",
+			UnitMultiplier: decimal.NewFromInt(1),
+			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+			ProductFilter: r.productFilter([]*schema.AttributeFilter{
+				{Key: "productName", ValueRegex: strPtr(productNameRegex)},
+				{Key: "skuName", Value: strPtr(fmt.Sprintf("%d vCore Zone Redundancy", cores))},
+			}),
+			PriceFilter: priceFilterConsumption,
+		})
 	}
+
+	return costComponents
 }
 
 func (r *MSSQLElasticPool) extraDataStorageCostComponent(extraStorageGB float64) *schema.CostComponent {

@@ -13,16 +13,16 @@ import (
 
 var (
 	sqlTierMapping = map[string]string{
-		"GP":   "General Purpose",
-		"GP_S": "General Purpose - Serverless",
-		"HS":   "Hyperscale",
-		"BC":   "Business Critical",
+		"gp":   "General Purpose",
+		"gp_s": "General Purpose - Serverless",
+		"hs":   "Hyperscale",
+		"bc":   "Business Critical",
 	}
 
 	sqlFamilyMapping = map[string]string{
-		"Gen5": "Compute Gen5",
-		"Gen4": "Compute Gen4",
-		"M":    "Compute M Series",
+		"gen5": "Compute Gen5",
+		"gen4": "Compute Gen4",
+		"m":    "Compute M Series",
 	}
 
 	dtuMap = dtuMapping{
@@ -126,13 +126,13 @@ func parseMSSQLSku(address, sku string) (skuConfig, error) {
 		return skuConfig{}, fmt.Errorf("Unrecognized MSSQL SKU format for resource %s: %s", address, sku)
 	}
 
-	tierKey := strings.Join(s[0:len(s)-2], "_")
+	tierKey := strings.ToLower(strings.Join(s[0:len(s)-2], "_"))
 	tier, ok := sqlTierMapping[tierKey]
 	if !ok {
 		return skuConfig{}, fmt.Errorf("Invalid tier in MSSQL SKU for resource %s: %s", address, sku)
 	}
 
-	familyKey := s[len(s)-2]
+	familyKey := strings.ToLower(s[len(s)-2])
 	family, ok := sqlFamilyMapping[familyKey]
 	if !ok {
 		return skuConfig{}, fmt.Errorf("Invalid family in MSSQL SKU for resource %s: %s", address, sku)

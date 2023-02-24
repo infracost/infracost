@@ -18,6 +18,7 @@ const (
 
 var (
 	tierMapping = map[string]string{
+		"b": "Basic",
 		"p": "Premium",
 		"s": "Standard",
 	}
@@ -140,20 +141,23 @@ func (r *SQLDatabase) dtuCostComponents() []*schema.CostComponent {
 
 	var extraStorageGB float64
 
-	if strings.ToLower(r.SKU) != "basic" && r.ExtraDataStorageGB != nil {
+	if !strings.HasPrefix(skuName, "b") && r.ExtraDataStorageGB != nil {
 		extraStorageGB = *r.ExtraDataStorageGB
-	} else if strings.ToLower(r.SKU) == "standard" && r.MaxSizeGB != nil {
+	} else if strings.HasPrefix(skuName, "s") && r.MaxSizeGB != nil {
 		includedStorageGB := 250.0
 		extraStorageGB = *r.MaxSizeGB - includedStorageGB
-	} else if strings.ToLower(r.SKU) == "premium" && r.MaxSizeGB != nil {
-		includedStorageGB, ok := mssqlPremiumDTUIncludedStorage[strings.ToLower(r.SKU)]
+	} else if strings.HasPrefix(skuName, "p") && r.MaxSizeGB != nil {
+		includedStorageGB, ok := mssqlPremiumDTUIncludedStorage[skuName]
 		if ok {
 			extraStorageGB = *r.MaxSizeGB - includedStorageGB
 		}
 	}
 
 	if extraStorageGB > 0 {
-		costComponents = append(costComponents, r.extraDataStorageCostComponent(extraStorageGB))
+		c := r.extraDataStorageCostComponent(extraStorageGB)
+		if c != nil {
+			costComponents = append(costComponents, c)
+		}
 	}
 
 	costComponents = append(costComponents, r.longTermRetentionCostComponent())
@@ -162,9 +166,7 @@ func (r *SQLDatabase) dtuCostComponents() []*schema.CostComponent {
 }
 
 func (r *SQLDatabase) vCoreCostComponents() []*schema.CostComponent {
-	costComponents := []*schema.CostComponent{
-		r.computeHoursCostComponent(),
-	}
+	costComponents := r.computeHoursCostComponents()
 
 	if strings.ToLower(r.Tier) == sqlHyperscaleTier {
 		costComponents = append(costComponents, r.readReplicaCostComponent())
@@ -183,15 +185,15 @@ func (r *SQLDatabase) vCoreCostComponents() []*schema.CostComponent {
 	return costComponents
 }
 
-func (r *SQLDatabase) computeHoursCostComponent() *schema.CostComponent {
+func (r *SQLDatabase) computeHoursCostComponents() []*schema.CostComponent {
 	if strings.ToLower(r.Tier) == sqlServerlessTier {
-		return r.serverlessComputeHoursCostComponent()
+		return r.serverlessComputeHoursCostComponents()
 	}
 
-	return r.provisionedComputeCostComponent()
+	return r.provisionedComputeCostComponents()
 }
 
-func (r *SQLDatabase) serverlessComputeHoursCostComponent() *schema.CostComponent {
+func (r *SQLDatabase) serverlessComputeHoursCostComponents() []*schema.CostComponent {
 	productNameRegex := fmt.Sprintf("/%s - %s/", r.Tier, r.Family)
 
 	var vCoreHours *decimal.Decimal
@@ -199,39 +201,79 @@ func (r *SQLDatabase) serverlessComputeHoursCostComponent() *schema.CostComponen
 		vCoreHours = decimalPtr(decimal.NewFromInt(*r.MonthlyVCoreHours))
 	}
 
-	serverlessSkuName := mssqlSkuName(1, r.ZoneRedundant)
-	return &schema.CostComponent{
-		Name:            fmt.Sprintf("Compute (serverless, %s)", r.SKU),
-		Unit:            "vCore-hours",
-		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: vCoreHours,
-		ProductFilter: r.productFilter([]*schema.AttributeFilter{
-			{Key: "productName", ValueRegex: strPtr(productNameRegex)},
-			{Key: "skuName", Value: strPtr(serverlessSkuName)},
-			{Key: "meterName", ValueRegex: regexPtr("^(?!.* - Free$).*$")},
-		}),
-		PriceFilter: priceFilterConsumption,
+	costComponents := []*schema.CostComponent{
+		{
+			Name:            fmt.Sprintf("Compute (serverless, %s)", r.SKU),
+			Unit:            "vCore-hours",
+			UnitMultiplier:  decimal.NewFromInt(1),
+			MonthlyQuantity: vCoreHours,
+			ProductFilter: r.productFilter([]*schema.AttributeFilter{
+				{Key: "productName", ValueRegex: strPtr(productNameRegex)},
+				{Key: "skuName", Value: strPtr("1 vCore")},
+				{Key: "meterName", ValueRegex: regexPtr("^(?!.* - Free$).*$")},
+			}),
+			PriceFilter: priceFilterConsumption,
+		},
 	}
+
+	if r.ZoneRedundant {
+		costComponents = append(costComponents, &schema.CostComponent{
+			Name:            fmt.Sprintf("Zone redundancy (serverless, %s)", r.SKU),
+			Unit:            "vCore-hours",
+			UnitMultiplier:  decimal.NewFromInt(1),
+			MonthlyQuantity: vCoreHours,
+			ProductFilter: r.productFilter([]*schema.AttributeFilter{
+				{Key: "productName", ValueRegex: strPtr(productNameRegex)},
+				{Key: "skuName", Value: strPtr("1 vCore Zone Redundancy")},
+				{Key: "meterName", ValueRegex: regexPtr("^(?!.* - Free$).*$")},
+			}),
+			PriceFilter: priceFilterConsumption,
+		})
+	}
+
+	return costComponents
 }
 
-func (r *SQLDatabase) provisionedComputeCostComponent() *schema.CostComponent {
-	skuName := mssqlSkuName(*r.Cores, r.ZoneRedundant)
+func (r *SQLDatabase) provisionedComputeCostComponents() []*schema.CostComponent {
+	var cores int64
+	if r.Cores != nil {
+		cores = *r.Cores
+	}
+
 	productNameRegex := fmt.Sprintf("/%s - %s/", r.Tier, r.Family)
 	name := fmt.Sprintf("Compute (provisioned, %s)", r.SKU)
 
 	log.Warnf("'Multiple products found' are safe to ignore for '%s' due to limitations in the Azure API.", name)
 
-	return &schema.CostComponent{
-		Name:           name,
-		Unit:           "hours",
-		UnitMultiplier: decimal.NewFromInt(1),
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
-		ProductFilter: r.productFilter([]*schema.AttributeFilter{
-			{Key: "productName", ValueRegex: strPtr(productNameRegex)},
-			{Key: "skuName", Value: strPtr(skuName)},
-		}),
-		PriceFilter: priceFilterConsumption,
+	costComponents := []*schema.CostComponent{
+		{
+			Name:           name,
+			Unit:           "hours",
+			UnitMultiplier: decimal.NewFromInt(1),
+			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+			ProductFilter: r.productFilter([]*schema.AttributeFilter{
+				{Key: "productName", ValueRegex: strPtr(productNameRegex)},
+				{Key: "skuName", Value: strPtr(fmt.Sprintf("%d vCore", cores))},
+			}),
+			PriceFilter: priceFilterConsumption,
+		},
 	}
+
+	if r.ZoneRedundant {
+		costComponents = append(costComponents, &schema.CostComponent{
+			Name:           fmt.Sprintf("Zone redundancy (provisioned, %s)", r.SKU),
+			Unit:           "hours",
+			UnitMultiplier: decimal.NewFromInt(1),
+			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+			ProductFilter: r.productFilter([]*schema.AttributeFilter{
+				{Key: "productName", ValueRegex: strPtr(productNameRegex)},
+				{Key: "skuName", Value: strPtr(fmt.Sprintf("%d vCore Zone Redundancy", cores))},
+			}),
+			PriceFilter: priceFilterConsumption,
+		})
+	}
+
+	return costComponents
 }
 
 func (r *SQLDatabase) readReplicaCostComponent() *schema.CostComponent {
@@ -257,7 +299,17 @@ func (r *SQLDatabase) readReplicaCostComponent() *schema.CostComponent {
 }
 
 func (r *SQLDatabase) extraDataStorageCostComponent(extraStorageGB float64) *schema.CostComponent {
-	tier := tierMapping[strings.ToLower(r.SKU)[:1]]
+	tier := r.Tier
+	if tier == "" {
+		var ok bool
+		tier, ok = tierMapping[strings.ToLower(r.SKU)[:1]]
+
+		if !ok {
+			log.Warnf("Unrecognized tier for SKU '%s' for resource %s", r.SKU, r.Address)
+			return nil
+		}
+	}
+
 	return mssqlExtraDataStorageCostComponent(r.Region, tier, extraStorageGB)
 }
 
