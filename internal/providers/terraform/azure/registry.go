@@ -123,6 +123,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getVirtualNetworkPeeringRegistryItem(),
 	getPowerBIEmbeddedRegistryItem(),
 	getMSSQLElasticPoolRegistryItem(),
+	getSQLElasticPoolRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
