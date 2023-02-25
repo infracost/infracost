@@ -32,7 +32,7 @@ type MSSQLElasticPool struct {
 	Address       string
 	Region        string
 	SKU           string
-	LicenceType   string
+	LicenseType   string
 	Tier          string
 	Family        string
 	Cores         *int64
@@ -68,7 +68,7 @@ func (r *MSSQLElasticPool) PopulateUsage(u *schema.UsageData) {
 // Elastic pools that follow a vCore pricing model have the following costs associated with them:
 //
 //  1. Costs based on the number of vCores the resource has
-//  2. Additional charge for SQL Server licencing based on vCores amount
+//  2. Additional charge for SQL Server licensing based on vCores amount
 //  3. Charges for storage used
 //  4. Charges for long term data backup - this is configured using MSSQLElasticPool.LongTermRetentionStorageGB
 //
@@ -142,7 +142,7 @@ func (r *MSSQLElasticPool) dtuCostComponents() []*schema.CostComponent {
 func (r *MSSQLElasticPool) vCoreCostComponents() []*schema.CostComponent {
 	costComponents := r.computeHoursCostComponents()
 
-	if strings.ToLower(r.LicenceType) == "licenseincluded" {
+	if strings.ToLower(r.LicenseType) == "licenseincluded" {
 		costComponents = append(costComponents, r.sqlLicenseCostComponent())
 	}
 

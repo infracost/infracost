@@ -32,7 +32,7 @@ func newSQLElasticPool(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 		Family:        "",
 		Tier:          tier,
 		DTUCapacity:   &dtu,
-		LicenceType:   "LicenseIncluded",
+		LicenseType:   "LicenseIncluded",
 		ZoneRedundant: d.Get("zone_redundant").Bool(),
 	}
 

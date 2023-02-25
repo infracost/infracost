@@ -77,14 +77,14 @@ func newAzureRMMSSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schem
 		replicaCount = &val
 	}
 
-	licenceType := d.GetStringOrDefault("license_type", "LicenseIncluded")
+	licenseType := d.GetStringOrDefault("license_type", "LicenseIncluded")
 	storageAccountType := d.GetStringOrDefault("storage_account_type", "Geo")
 
 	r := &azure.SQLDatabase{
 		Address:           d.Address,
 		Region:            region,
 		SKU:               sku,
-		LicenceType:       licenceType,
+		LicenseType:       licenseType,
 		MaxSizeGB:         maxSize,
 		ReadReplicaCount:  replicaCount,
 		ZoneRedundant:     d.Get("zone_redundant").Bool(),
