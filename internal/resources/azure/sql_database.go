@@ -61,9 +61,11 @@ type SQLDatabase struct {
 	ExtraDataStorageGB *float64 `infracost_usage:"extra_data_storage_gb"`
 	// MonthlyVCoreHours represents a usage param that allows users to define how many hours of usage a serverless sql database instance uses.
 	MonthlyVCoreHours *int64 `infracost_usage:"monthly_vcore_hours"`
-	// LongTermRetentionStorageGB defines a usage param that allows users to define how many gb of cold storage the database uses.
+	// LongTermRetentionStorageGB defines a usage param that allows users to define how many GB of cold storage the database uses.
 	// This is storage that can be kept for up to 10 years.
 	LongTermRetentionStorageGB *int64 `infracost_usage:"long_term_retention_storage_gb"`
+	// BackupStorageGB defines a usage param that allows users to define how many GB Point-In-Time Restore (PITR) backup storage the database uses.
+	BackupStorageGB *int64 `infracost_usage:"backup_storage_gb"`
 }
 
 // PopulateUsage parses the u schema.UsageData into the SQLDatabase.
@@ -75,6 +77,7 @@ var SQLDatabaseUsageSchema = []*schema.UsageItem{
 	{Key: "extra_data_storage_gb", DefaultValue: 0.0, ValueType: schema.Float64},
 	{Key: "monthly_vcore_hours", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "long_term_retention_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "backup_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
 }
 
 // BuildResource builds a schema.Resource from a valid SQLDatabase.
@@ -173,6 +176,7 @@ func (r *SQLDatabase) dtuCostComponents() []*schema.CostComponent {
 	}
 
 	costComponents = append(costComponents, r.longTermRetentionCostComponent())
+	costComponents = append(costComponents, r.pitrBackupCostComponent())
 
 	return costComponents
 }
@@ -192,6 +196,7 @@ func (r *SQLDatabase) vCoreCostComponents() []*schema.CostComponent {
 
 	if strings.ToLower(r.Tier) != sqlHyperscaleTier {
 		costComponents = append(costComponents, r.longTermRetentionCostComponent())
+		costComponents = append(costComponents, r.pitrBackupCostComponent())
 	}
 
 	return costComponents
@@ -200,6 +205,7 @@ func (r *SQLDatabase) vCoreCostComponents() []*schema.CostComponent {
 func (r *SQLDatabase) elasticPoolCostComponents() []*schema.CostComponent {
 	return []*schema.CostComponent{
 		r.longTermRetentionCostComponent(),
+		r.pitrBackupCostComponent(),
 	}
 }
 
@@ -316,21 +322,6 @@ func (r *SQLDatabase) readReplicaCostComponent() *schema.CostComponent {
 	}
 }
 
-func (r *SQLDatabase) extraDataStorageCostComponent(extraStorageGB float64) *schema.CostComponent {
-	tier := r.Tier
-	if tier == "" {
-		var ok bool
-		tier, ok = mssqlTierMapping[strings.ToLower(r.SKU)[:1]]
-
-		if !ok {
-			log.Warnf("Unrecognized tier for SKU '%s' for resource %s", r.SKU, r.Address)
-			return nil
-		}
-	}
-
-	return mssqlExtraDataStorageCostComponent(r.Region, tier, extraStorageGB)
-}
-
 func (r *SQLDatabase) longTermRetentionCostComponent() *schema.CostComponent {
 	var retention *decimal.Decimal
 	if r.LongTermRetentionStorageGB != nil {
@@ -344,17 +335,58 @@ func (r *SQLDatabase) longTermRetentionCostComponent() *schema.CostComponent {
 	}
 
 	return &schema.CostComponent{
-		Name:            "Long-term retention",
+		Name:            fmt.Sprintf("Long-term retention (%s)", redundancyType),
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: retention,
 		ProductFilter: r.productFilter([]*schema.AttributeFilter{
 			{Key: "productName", Value: strPtr("SQL Database - LTR Backup Storage")},
 			{Key: "skuName", Value: strPtr(fmt.Sprintf("Backup %s", redundancyType))},
-			{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/%s Data Stored/i", redundancyType))},
+			{Key: "meterName", ValueRegex: regexPtr(fmt.Sprintf("%s Data Stored", redundancyType))},
 		}),
 		PriceFilter: priceFilterConsumption,
 	}
+}
+
+func (r *SQLDatabase) pitrBackupCostComponent() *schema.CostComponent {
+	var pitrGB *decimal.Decimal
+	if r.BackupStorageGB != nil {
+		pitrGB = decimalPtr(decimal.NewFromInt(*r.BackupStorageGB))
+	}
+
+	redundancyType, ok := mssqlStorageRedundancyTypeMapping[strings.ToLower(r.BackupStorageType)]
+	if !ok {
+		log.Warnf("Unrecognized backup storage type '%s'", r.BackupStorageType)
+		redundancyType = "RA-GRS"
+	}
+
+	return &schema.CostComponent{
+		Name:            fmt.Sprintf("PITR backup storage (%s)", redundancyType),
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: pitrGB,
+		ProductFilter: r.productFilter([]*schema.AttributeFilter{
+			{Key: "productName", ValueRegex: regexPtr("PITR Backup Storage")},
+			{Key: "skuName", Value: strPtr(fmt.Sprintf("Backup %s", redundancyType))},
+			{Key: "meterName", ValueRegex: regexPtr(fmt.Sprintf("%s Data Stored", redundancyType))},
+		}),
+		PriceFilter: priceFilterConsumption,
+	}
+}
+
+func (r *SQLDatabase) extraDataStorageCostComponent(extraStorageGB float64) *schema.CostComponent {
+	tier := r.Tier
+	if tier == "" {
+		var ok bool
+		tier, ok = mssqlTierMapping[strings.ToLower(r.SKU)[:1]]
+
+		if !ok {
+			log.Warnf("Unrecognized tier for SKU '%s' for resource %s", r.SKU, r.Address)
+			return nil
+		}
+	}
+
+	return mssqlExtraDataStorageCostComponent(r.Region, tier, extraStorageGB)
 }
 
 func (r *SQLDatabase) sqlLicenseCostComponent() *schema.CostComponent {

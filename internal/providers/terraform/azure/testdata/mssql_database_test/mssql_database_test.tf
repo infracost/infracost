@@ -70,36 +70,36 @@ resource "azurerm_mssql_database" "serverless" {
 }
 
 resource "azurerm_mssql_database" "serverless_zone" {
-  name      = "acctest-db-d"
-  server_id = azurerm_sql_server.example.id
-  sku_name  = "GP_S_Gen5_4"
+  name           = "acctest-db-d"
+  server_id      = azurerm_sql_server.example.id
+  sku_name       = "GP_S_Gen5_4"
   zone_redundant = true
 }
 
-resource "azurerm_mssql_database" "ltr_default" {
+resource "azurerm_mssql_database" "backup_default" {
   name      = "acctest-db-d"
   server_id = azurerm_sql_server.example.id
   sku_name  = "GP_Gen5_4"
 }
 
-resource "azurerm_mssql_database" "ltr_geo" {
-  name      = "acctest-db-d"
-  server_id = azurerm_sql_server.example.id
-  sku_name  = "GP_Gen5_4"
+resource "azurerm_mssql_database" "backup_geo" {
+  name                 = "acctest-db-d"
+  server_id            = azurerm_sql_server.example.id
+  sku_name             = "GP_Gen5_4"
   storage_account_type = "Geo"
 }
 
-resource "azurerm_mssql_database" "ltr_zone" {
-  name      = "acctest-db-d"
-  server_id = azurerm_sql_server.example.id
-  sku_name  = "GP_Gen5_4"
+resource "azurerm_mssql_database" "backup_zone" {
+  name                 = "acctest-db-d"
+  server_id            = azurerm_sql_server.example.id
+  sku_name             = "GP_Gen5_4"
   storage_account_type = "Zone"
 }
 
-resource "azurerm_mssql_database" "ltr_local" {
-  name      = "acctest-db-d"
-  server_id = azurerm_sql_server.example.id
-  sku_name  = "GP_Gen5_4"
+resource "azurerm_mssql_database" "backup_local" {
+  name                 = "acctest-db-d"
+  server_id            = azurerm_sql_server.example.id
+  sku_name             = "GP_Gen5_4"
   storage_account_type = "Local"
 }
 
