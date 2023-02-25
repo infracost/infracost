@@ -48,7 +48,7 @@ type SQLDatabase struct {
 	Region            string
 	SKU               string
 	IsElasticPool     bool
-	LicenceType       string
+	LicenseType       string
 	Tier              string
 	Family            string
 	Cores             *int64
@@ -101,7 +101,7 @@ var SQLDatabaseUsageSchema = []*schema.UsageItem{
 //
 //  1. Costs based on the number of vCores the resource has
 //  2. Extra pricing if any database read replicas have been provisioned
-//  3. Additional charge for SQL Server licencing based on vCores amount
+//  3. Additional charge for SQL Server licensing based on vCores amount
 //  4. Charges for storage used
 //  5. Charges for long term data backup - this is configured using SQLDatabase.LongTermRetentionStorageGB
 //
@@ -188,7 +188,7 @@ func (r *SQLDatabase) vCoreCostComponents() []*schema.CostComponent {
 		costComponents = append(costComponents, r.readReplicaCostComponent())
 	}
 
-	if strings.ToLower(r.Tier) != sqlServerlessTier && strings.ToLower(r.LicenceType) == "licenseincluded" {
+	if strings.ToLower(r.Tier) != sqlServerlessTier && strings.ToLower(r.LicenseType) == "licenseincluded" {
 		costComponents = append(costComponents, r.sqlLicenseCostComponent())
 	}
 

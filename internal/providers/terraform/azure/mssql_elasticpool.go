@@ -36,7 +36,7 @@ func newMSSQLElasticPool(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 		maxSizeGB = d.Get("max_size_bytes").Float() / 1024.0 / 1024.0 / 1024.0
 	}
 
-	licenceType := d.GetStringOrDefault("license_type", "LicenseIncluded")
+	licenseType := d.GetStringOrDefault("license_type", "LicenseIncluded")
 
 	r := &azure.MSSQLElasticPool{
 		Address:       d.Address,
@@ -44,7 +44,7 @@ func newMSSQLElasticPool(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 		SKU:           sku,
 		Tier:          tier,
 		Family:        family,
-		LicenceType:   licenceType,
+		LicenseType:   licenseType,
 		MaxSizeGB:     &maxSizeGB,
 		ZoneRedundant: d.Get("zone_redundant").Bool(),
 	}

@@ -24,7 +24,7 @@ type SQLManagedInstance struct {
 	Address            string
 	Region             string
 	SKU                string
-	LicenceType        string
+	LicenseType        string
 	Cores              int64
 	StorageSizeInGb    int64
 	StorageAccountType string
@@ -79,7 +79,7 @@ func (r *SQLManagedInstance) costComponents() []*schema.CostComponent {
 
 	costComponents = append(costComponents, r.sqlMIStorageCostComponent(), r.sqlMIBackupCostComponent())
 
-	if r.LicenceType == "LicenseIncluded" {
+	if r.LicenseType == "LicenseIncluded" {
 		costComponents = append(costComponents, r.sqlMILicenseCostComponent())
 	}
 
