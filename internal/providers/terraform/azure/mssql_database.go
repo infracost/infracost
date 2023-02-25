@@ -65,14 +65,6 @@ func newAzureRMMSSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schem
 
 	sku := d.GetStringOrDefault("sku_name", "GP_S_Gen5_2")
 
-	if strings.ToLower(sku) == "elasticpool" {
-		return &schema.Resource{
-			Name:      d.Address,
-			NoPrice:   true,
-			IsSkipped: true,
-		}
-	}
-
 	var maxSize *float64
 	if !d.IsEmpty("max_size_gb") {
 		val := d.Get("max_size_gb").Float()
@@ -97,7 +89,9 @@ func newAzureRMMSSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schem
 		ZoneRedundant:    d.Get("zone_redundant").Bool(),
 	}
 
-	if !dtuMap.usesDTUUnits(sku) {
+	if strings.ToLower(sku) == "elasticpool" || !d.IsEmpty("elastic_pool_id") {
+		r.IsElasticPool = true
+	} else if !dtuMap.usesDTUUnits(sku) {
 		c, err := parseMSSQLSku(d.Address, sku)
 		if err != nil {
 			log.Warnf(err.Error())

@@ -41,6 +41,7 @@ type SQLDatabase struct {
 	Address          string
 	Region           string
 	SKU              string
+	IsElasticPool    bool
 	LicenceType      string
 	Tier             string
 	Family           string
@@ -105,6 +106,10 @@ func (r *SQLDatabase) BuildResource() *schema.Resource {
 }
 
 func (r *SQLDatabase) costComponents() []*schema.CostComponent {
+	if r.IsElasticPool {
+		return r.elasticPoolCostComponents()
+	}
+
 	if r.Cores != nil {
 		return r.vCoreCostComponents()
 	}
@@ -183,6 +188,12 @@ func (r *SQLDatabase) vCoreCostComponents() []*schema.CostComponent {
 	}
 
 	return costComponents
+}
+
+func (r *SQLDatabase) elasticPoolCostComponents() []*schema.CostComponent {
+	return []*schema.CostComponent{
+		r.longTermRetentionCostComponent(),
+	}
 }
 
 func (r *SQLDatabase) computeHoursCostComponents() []*schema.CostComponent {
