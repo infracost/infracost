@@ -78,15 +78,17 @@ func newAzureRMMSSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schem
 	}
 
 	licenceType := d.GetStringOrDefault("license_type", "LicenseIncluded")
+	storageAccountType := d.GetStringOrDefault("storage_account_type", "Geo")
 
 	r := &azure.SQLDatabase{
-		Address:          d.Address,
-		Region:           region,
-		SKU:              sku,
-		LicenceType:      licenceType,
-		MaxSizeGB:        maxSize,
-		ReadReplicaCount: replicaCount,
-		ZoneRedundant:    d.Get("zone_redundant").Bool(),
+		Address:           d.Address,
+		Region:            region,
+		SKU:               sku,
+		LicenceType:       licenceType,
+		MaxSizeGB:         maxSize,
+		ReadReplicaCount:  replicaCount,
+		ZoneRedundant:     d.Get("zone_redundant").Bool(),
+		BackupStorageType: storageAccountType,
 	}
 
 	if strings.ToLower(sku) == "elasticpool" || !d.IsEmpty("elastic_pool_id") {

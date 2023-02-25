@@ -17,38 +17,45 @@ const (
 )
 
 var (
-	tierMapping = map[string]string{
+	mssqlTierMapping = map[string]string{
 		"b": "Basic",
 		"p": "Premium",
 		"s": "Standard",
 	}
-)
 
-var mssqlPremiumDTUIncludedStorage = map[string]float64{
-	"p1":  500,
-	"p2":  500,
-	"p4":  500,
-	"p6":  500,
-	"p11": 4096,
-	"p15": 4096,
-}
+	mssqlPremiumDTUIncludedStorage = map[string]float64{
+		"p1":  500,
+		"p2":  500,
+		"p4":  500,
+		"p6":  500,
+		"p11": 4096,
+		"p15": 4096,
+	}
+
+	mssqlStorageRedundancyTypeMapping = map[string]string{
+		"geo":   "RA-GRS",
+		"local": "LRS",
+		"zone":  "ZRS",
+	}
+)
 
 // SQLDatabase represents an Azure SQL database instance.
 //
 // More resource information here: https://azure.microsoft.com/en-gb/products/azure-sql/database/
 // Pricing information here: https://azure.microsoft.com/en-gb/pricing/details/azure-sql-database/single/
 type SQLDatabase struct {
-	Address          string
-	Region           string
-	SKU              string
-	IsElasticPool    bool
-	LicenceType      string
-	Tier             string
-	Family           string
-	Cores            *int64
-	MaxSizeGB        *float64
-	ReadReplicaCount *int64
-	ZoneRedundant    bool
+	Address           string
+	Region            string
+	SKU               string
+	IsElasticPool     bool
+	LicenceType       string
+	Tier              string
+	Family            string
+	Cores             *int64
+	MaxSizeGB         *float64
+	ReadReplicaCount  *int64
+	ZoneRedundant     bool
+	BackupStorageType string
 
 	// ExtraDataStorageGB represents a usage cost of additional backup storage used by the sql database.
 	ExtraDataStorageGB *float64 `infracost_usage:"extra_data_storage_gb"`
@@ -313,7 +320,7 @@ func (r *SQLDatabase) extraDataStorageCostComponent(extraStorageGB float64) *sch
 	tier := r.Tier
 	if tier == "" {
 		var ok bool
-		tier, ok = tierMapping[strings.ToLower(r.SKU)[:1]]
+		tier, ok = mssqlTierMapping[strings.ToLower(r.SKU)[:1]]
 
 		if !ok {
 			log.Warnf("Unrecognized tier for SKU '%s' for resource %s", r.SKU, r.Address)
@@ -324,16 +331,38 @@ func (r *SQLDatabase) extraDataStorageCostComponent(extraStorageGB float64) *sch
 	return mssqlExtraDataStorageCostComponent(r.Region, tier, extraStorageGB)
 }
 
+func (r *SQLDatabase) longTermRetentionCostComponent() *schema.CostComponent {
+	var retention *decimal.Decimal
+	if r.LongTermRetentionStorageGB != nil {
+		retention = decimalPtr(decimal.NewFromInt(*r.LongTermRetentionStorageGB))
+	}
+
+	redundancyType, ok := mssqlStorageRedundancyTypeMapping[strings.ToLower(r.BackupStorageType)]
+	if !ok {
+		log.Warnf("Unrecognized backup storage type '%s'", r.BackupStorageType)
+		redundancyType = "RA-GRS"
+	}
+
+	return &schema.CostComponent{
+		Name:            "Long-term retention",
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: retention,
+		ProductFilter: r.productFilter([]*schema.AttributeFilter{
+			{Key: "productName", Value: strPtr("SQL Database - LTR Backup Storage")},
+			{Key: "skuName", Value: strPtr(fmt.Sprintf("Backup %s", redundancyType))},
+			{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/%s Data Stored/i", redundancyType))},
+		}),
+		PriceFilter: priceFilterConsumption,
+	}
+}
+
 func (r *SQLDatabase) sqlLicenseCostComponent() *schema.CostComponent {
 	return mssqlLicenseCostComponent(r.Region, r.Cores, r.Tier)
 }
 
 func (r *SQLDatabase) storageCostComponent() *schema.CostComponent {
 	return mssqlStorageCostComponent(r.Region, r.Tier, r.ZoneRedundant, r.MaxSizeGB)
-}
-
-func (r *SQLDatabase) longTermRetentionCostComponent() *schema.CostComponent {
-	return mssqlLongTermRetentionCostComponent(r.Region, r.LongTermRetentionStorageGB)
 }
 
 func (r *SQLDatabase) productFilter(filters []*schema.AttributeFilter) *schema.ProductFilter {
@@ -439,25 +468,5 @@ func mssqlStorageCostComponent(region string, tier string, zoneRedundant bool, m
 			{Key: "skuName", Value: strPtr(skuName)},
 			{Key: "meterName", ValueRegex: regexPtr("Data Stored$")},
 		}),
-	}
-}
-
-func mssqlLongTermRetentionCostComponent(region string, longTermRetentionStorageGB *int64) *schema.CostComponent {
-	var retention *decimal.Decimal
-	if longTermRetentionStorageGB != nil {
-		retention = decimalPtr(decimal.NewFromInt(*longTermRetentionStorageGB))
-	}
-
-	return &schema.CostComponent{
-		Name:            "Long-term retention",
-		Unit:            "GB",
-		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: retention,
-		ProductFilter: mssqlProductFilter(region, []*schema.AttributeFilter{
-			{Key: "productName", Value: strPtr("SQL Database - LTR Backup Storage")},
-			{Key: "skuName", Value: strPtr("Backup RA-GRS")},
-			{Key: "meterName", ValueRegex: strPtr("/RA-GRS Data Stored/i")},
-		}),
-		PriceFilter: priceFilterConsumption,
 	}
 }

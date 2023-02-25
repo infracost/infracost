@@ -2,7 +2,13 @@ version: 0.1
 resource_usage:
   azurerm_mssql_database.serverless:
     monthly_vcore_hours: 500
-  azurerm_mssql_database.LTR:
+  azurerm_mssql_database.ltr_default:
+    long_term_retention_storage_gb: 1000
+  azurerm_mssql_database.ltr_geo:
+    long_term_retention_storage_gb: 1000
+  azurerm_mssql_database.ltr_zone:
+    long_term_retention_storage_gb: 1000
+  azurerm_mssql_database.ltr_local:
     long_term_retention_storage_gb: 1000
   azurerm_mssql_database.premium6:
     long_term_retention_storage_gb: 1000
