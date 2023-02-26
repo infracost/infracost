@@ -11,7 +11,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "basic_a2" {
 
   sku            = "Basic_A2"
   admin_username = "fakeuser"
-  admin_password = "fakepass"
+  admin_password = "Password1234!"
 
   network_interface {
     name    = "example"
@@ -45,7 +45,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "basic_a2_usage" {
 
   sku            = "Basic_A2"
   admin_username = "fakeuser"
-  admin_password = "fakepass"
+  admin_password = "Password1234!"
 
   network_interface {
     name    = "example"
