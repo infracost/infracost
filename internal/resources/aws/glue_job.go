@@ -72,6 +72,7 @@ func (r *GlueJob) BuildResource() *schema.Resource {
 					Service:       strPtr("AWSGlue"),
 					ProductFamily: strPtr("AWS Glue"),
 					AttributeFilters: []*schema.AttributeFilter{
+						{Key: "group", Value: strPtr("ETL Job run")},
 						{Key: "operation", ValueRegex: strPtr("/^jobrun$/i")},
 					},
 				},
