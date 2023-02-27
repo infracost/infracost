@@ -185,6 +185,7 @@ func newRootCmd(ctx *config.RunContext) *cobra.Command {
 	rootCmd.AddCommand(commentCmd(ctx))
 	rootCmd.AddCommand(completionCmd())
 	rootCmd.AddCommand(figAutocompleteCmd())
+	rootCmd.AddCommand(newGenerateCommand())
 
 	rootCmd.SetUsageTemplate(fmt.Sprintf(`%s{{if .Runnable}}
   {{.UseLine}}{{end}}{{if .HasAvailableSubCommands}}

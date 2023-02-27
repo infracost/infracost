@@ -1048,6 +1048,71 @@ _infracost_diff()
     noun_aliases=()
 }
 
+_infracost_generate_config()
+{
+    last_command="infracost_generate_config"
+
+    command_aliases=()
+
+    commands=()
+
+    flags=()
+    two_word_flags=()
+    local_nonpersistent_flags=()
+    flags_with_completion=()
+    flags_completion=()
+
+    flags+=("--out-file=")
+    two_word_flags+=("--out-file")
+    local_nonpersistent_flags+=("--out-file")
+    local_nonpersistent_flags+=("--out-file=")
+    flags+=("--project-path=")
+    two_word_flags+=("--project-path")
+    local_nonpersistent_flags+=("--project-path")
+    local_nonpersistent_flags+=("--project-path=")
+    flags+=("--template-path=")
+    two_word_flags+=("--template-path")
+    local_nonpersistent_flags+=("--template-path")
+    local_nonpersistent_flags+=("--template-path=")
+    flags+=("--debug-report")
+    flags+=("--log-level=")
+    two_word_flags+=("--log-level")
+    flags+=("--no-color")
+
+    must_have_one_flag=()
+    must_have_one_noun=()
+    must_have_one_noun+=("-")
+    must_have_one_noun+=("--")
+    noun_aliases=()
+}
+
+_infracost_generate()
+{
+    last_command="infracost_generate"
+
+    command_aliases=()
+
+    commands=()
+    commands+=("config")
+
+    flags=()
+    two_word_flags=()
+    local_nonpersistent_flags=()
+    flags_with_completion=()
+    flags_completion=()
+
+    flags+=("--debug-report")
+    flags+=("--log-level=")
+    two_word_flags+=("--log-level")
+    flags+=("--no-color")
+
+    must_have_one_flag=()
+    must_have_one_noun=()
+    must_have_one_noun+=("-")
+    must_have_one_noun+=("--")
+    noun_aliases=()
+}
+
 _infracost_help()
 {
     last_command="infracost_help"
@@ -1177,6 +1242,7 @@ _infracost_root_command()
     commands+=("completion")
     commands+=("configure")
     commands+=("diff")
+    commands+=("generate")
     commands+=("help")
     commands+=("output")
     commands+=("upload")

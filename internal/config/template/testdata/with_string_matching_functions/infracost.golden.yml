@@ -1,0 +1,9 @@
+version: 0.1
+
+projects:
+  - path: startsWith/included
+    name: startsWith-included
+  - path: endsWith/included
+    name: endsWith-included
+  - path: contains/included
+    name: contains-included

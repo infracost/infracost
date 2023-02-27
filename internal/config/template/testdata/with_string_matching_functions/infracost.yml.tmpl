@@ -1,0 +1,21 @@
+version: 0.1
+
+projects:
+{{- range $app := matchPaths "startsWith/:name" }}
+    {{- if not (startsWith $app.name "_") }}
+      - path: {{ $app._path }}
+        name: startsWith-{{ $app.name }}
+    {{- end }}
+{{- end }}
+{{- range $app := matchPaths "endsWith/:name" }}
+    {{- if not (endsWith $app.name "_") }}
+      - path: {{ $app._path }}
+        name: endsWith-{{ $app.name }}
+    {{- end }}
+{{- end }}
+{{- range $app := matchPaths "contains/:name" }}
+    {{- if not (contains $app.name "because_contains_str") }}
+      - path: {{ $app._path }}
+        name: contains-{{ $app.name }}
+    {{- end }}
+{{- end }}
