@@ -19,6 +19,7 @@ type LambdaFunction struct {
 	Name         string
 	MemorySize   int64
 	Architecture string
+	StorageSize  int64
 
 	RequestDurationMS *int64 `infracost_usage:"request_duration_ms"`
 	MonthlyRequests   *int64 `infracost_usage:"monthly_requests"`
@@ -47,8 +48,10 @@ func (a *LambdaFunction) PopulateUsage(u *schema.UsageData) {
 
 func (a *LambdaFunction) BuildResource() *schema.Resource {
 	memorySize := decimal.NewFromInt(a.MemorySize)
+	storageSize := decimal.NewFromInt(a.StorageSize)
 	requestType := "AWS-Lambda-Requests"
 	durationType := "AWS-Lambda-Duration"
+	storageType := "AWS-Lambda-Storage-Duration"
 
 	averageRequestDuration := decimal.NewFromInt(1)
 	if a.RequestDurationMS != nil {
@@ -58,10 +61,12 @@ func (a *LambdaFunction) BuildResource() *schema.Resource {
 	if a.Architecture == "arm64" {
 		requestType = "AWS-Lambda-Requests-ARM"
 		durationType = "AWS-Lambda-Duration-ARM"
+		storageType = "AWS-Lambda-Storage-Duration-ARM"
 	}
 
 	var monthlyRequests *decimal.Decimal
 	var gbSeconds *decimal.Decimal
+	var storageGBSeconds *decimal.Decimal
 	var costComponents []*schema.CostComponent
 
 	if a.MonthlyRequests != nil {
@@ -98,9 +103,11 @@ func (a *LambdaFunction) BuildResource() *schema.Resource {
 	if a.MonthlyRequests != nil {
 		monthlyRequests = decimalPtr(decimal.NewFromInt(*a.MonthlyRequests))
 		gbSeconds = decimalPtr(calculateGBSeconds(memorySize, averageRequestDuration, *monthlyRequests))
+		storageGBSeconds = decimalPtr(calculateStorageGBSeconds(storageSize, *gbSeconds))
 
 		gbSecondQuantities := usage.CalculateTierBuckets(*gbSeconds, gbRequestTiers)
 
+		costComponents = append(costComponents, a.storageCostComponent(storageGBSeconds, storageType))
 		costComponents = append(costComponents, a.durationCostComponent(displayNameList[0], "0", &gbSecondQuantities[0], durationType))
 
 		if gbSecondQuantities[1].GreaterThan(decimal.NewFromInt(0)) {
@@ -112,6 +119,7 @@ func (a *LambdaFunction) BuildResource() *schema.Resource {
 		}
 
 	} else {
+		costComponents = append(costComponents, a.storageCostComponent(nil, storageType))
 		costComponents = append(costComponents, a.durationCostComponent(displayNameList[0], "0", gbSeconds, durationType))
 	}
 
@@ -143,6 +151,11 @@ func calculateGBSeconds(memorySize decimal.Decimal, averageRequestDuration decim
 	return monthlyRequests.Mul(gb).Mul(seconds)
 }
 
+func calculateStorageGBSeconds(storageSize decimal.Decimal, gbSeconds decimal.Decimal) decimal.Decimal {
+	storage := storageSize.Sub(decimal.NewFromInt(512)).Div(decimal.NewFromInt(1024))
+	return storage.Mul(gbSeconds)
+}
+
 func (a *LambdaFunction) durationCostComponent(displayName string, usageTier string, quantity *decimal.Decimal, durationType string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            displayName,
@@ -161,6 +174,25 @@ func (a *LambdaFunction) durationCostComponent(displayName string, usageTier str
 		},
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr(usageTier),
+		},
+	}
+}
+
+func (a *LambdaFunction) storageCostComponent(quantity *decimal.Decimal, storageType string) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            "Ephemeral storage",
+		Unit:            "GB-seconds",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: quantity,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(a.Region),
+			Service:       strPtr("AWSLambda"),
+			ProductFamily: strPtr("Serverless"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "group", Value: strPtr(storageType)},
+				{Key: "usagetype", ValueRegex: strPtr("/GB-Second/")},
+			},
 		},
 	}
 }

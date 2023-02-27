@@ -3,7 +3,35 @@ Err:
 
 Error: An unexpected error occurred
 
-runtime error: REPLACED ERROR
+runtime error: invalid memory address or nil pointer dereference
+goroutine 10018 [running]:
+runtime/debug.Stack()
+	/usr/local/go/src/runtime/debug/stack.go:24 +0x65
+github.com/infracost/infracost/cmd/infracost.Run.func1()
+	/Users/Rob_Houghton/projects/infracost-latest/cmd/infracost/main.go:68 +0xfe
+panic({0x2bc8840, 0x48497f0})
+	/usr/local/go/src/runtime/panic.go:838 +0x207
+github.com/infracost/infracost/cmd/infracost.loadRunFlags(0xc001ff4a00, 0x24?)
+	/Users/Rob_Houghton/projects/infracost-latest/cmd/infracost/run.go:734 +0x7bf
+github.com/infracost/infracost/cmd/infracost.breakdownCmd.func1(0xc002500500?, {0x3100144?, 0x4?, 0x4?})
+	/Users/Rob_Houghton/projects/infracost-latest/cmd/infracost/breakdown.go:30 +0x8c
+github.com/spf13/cobra.(*Command).execute(0xc002500500, {0xc0002dcf40, 0x4, 0x4})
+	/Users/Rob_Houghton/go/pkg/mod/github.com/spf13/cobra@v1.4.0/command.go:856 +0x67c
+github.com/spf13/cobra.(*Command).ExecuteC(0xc001ff4c80)
+	/Users/Rob_Houghton/go/pkg/mod/github.com/spf13/cobra@v1.4.0/command.go:974 +0x3b4
+github.com/spf13/cobra.(*Command).Execute(...)
+	/Users/Rob_Houghton/go/pkg/mod/github.com/spf13/cobra@v1.4.0/command.go:902
+github.com/infracost/infracost/cmd/infracost.Run(0xc00065be40, 0xc00065bf38)
+	/Users/Rob_Houghton/projects/infracost-latest/cmd/infracost/main.go:86 +0x1f5
+github.com/infracost/infracost/cmd/infracost_test.goldenFileCommandTest(0xc001ffcb60, {0xc002b09968, 0x15}, {0xc0027ea190, 0x5, 0x5}, 0xc000932150, 0x1, {0xc0025ba378, 0x1, ...})
+	/Users/Rob_Houghton/projects/infracost-latest/cmd/infracost/cmd_test.go:90 +0x336
+github.com/infracost/infracost/cmd/infracost_test.GoldenFileCommandTest.func1(0x2283687?)
+	/Users/Rob_Houghton/projects/infracost-latest/cmd/infracost/cmd_test.go:48 +0x51
+testing.tRunner(0xc001ffcb60, 0xc0027ea1e0)
+	/usr/local/go/src/testing/testing.go:1439 +0x102
+created by testing.(*T).Run
+	/usr/local/go/src/testing/testing.go:1486 +0x35f
+
 Environment:
 Infracost vREPLACED_VERSION
 

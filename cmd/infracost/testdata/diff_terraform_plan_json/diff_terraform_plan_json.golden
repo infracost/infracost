@@ -44,6 +44,9 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
     + Requests
       +$20.00
 
+    + Ephemeral storage
+      $0.00
+
     + Duration (first 6B)
       +$417
 
@@ -54,6 +57,9 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
   $0.00
 
     + Requests
+      $0.00
+
+    + Ephemeral storage
       $0.00
 
     + Duration (first 6B)

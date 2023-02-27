@@ -14,6 +14,10 @@ Module path: ../../../../examples/terraform
       Monthly cost depends on usage
         -$0.0000166667 per GB-seconds
 
+    + Ephemeral storage
+      Monthly cost depends on usage
+        +$0.0000000309 per GB-seconds
+
     + Duration (first 6B)
       Monthly cost depends on usage
         +$0.0000166667 per GB-seconds
@@ -39,6 +43,10 @@ Module path: ../../../../examples/terraform
       Monthly cost depends on usage
         -$0.0000166667 per GB-seconds
 
+    + Ephemeral storage
+      Monthly cost depends on usage
+        +$0.0000000309 per GB-seconds
+
     + Duration (first 6B)
       Monthly cost depends on usage
         +$0.0000166667 per GB-seconds
@@ -57,6 +65,10 @@ Module path: ../../../../examples/terragrunt/dev
     - Duration
       Monthly cost depends on usage
         -$0.0000166667 per GB-seconds
+
+    + Ephemeral storage
+      Monthly cost depends on usage
+        +$0.0000000309 per GB-seconds
 
     + Duration (first 6B)
       Monthly cost depends on usage
@@ -77,6 +89,10 @@ Module path: ../../../../examples/terragrunt/dev
       Monthly cost depends on usage
         -$0.0000166667 per GB-seconds
 
+    + Ephemeral storage
+      Monthly cost depends on usage
+        +$0.0000000309 per GB-seconds
+
     + Duration (first 6B)
       Monthly cost depends on usage
         +$0.0000166667 per GB-seconds
@@ -84,31 +100,6 @@ Module path: ../../../../examples/terragrunt/dev
 Monthly cost change for my terragrunt multi project (Module path: ../../../../examples/terragrunt/dev)
 Amount:  $0.00 ($51.97 → $51.97)
 Percent: 0%
-
-──────────────────────────────────
-Project: my terragrunt multi project
-Module path: ../../../../examples/terragrunt/prod
-
-~ aws_instance.web_app
-  -$561 ($1,308 → $748)
-
-    ~ Instance usage (Linux/UNIX, on-demand, m5.8xlarge → m5.4xlarge)
-      -$561 ($1,121 → $561)
-
-~ aws_lambda_function.hello_world
-  Monthly cost depends on usage
-
-    - Duration
-      Monthly cost depends on usage
-        -$0.0000166667 per GB-seconds
-
-    + Duration (first 6B)
-      Monthly cost depends on usage
-        +$0.0000166667 per GB-seconds
-
-Monthly cost change for my terragrunt multi project (Module path: ../../../../examples/terragrunt/prod)
-Amount:  -$561 ($1,308 → $748)
-Percent: -43%
 
 ──────────────────────────────────
 Project: my terragrunt prod project
@@ -126,6 +117,10 @@ Module path: ../../../../examples/terragrunt/prod
     - Duration
       Monthly cost depends on usage
         -$0.0000166667 per GB-seconds
+
+    + Ephemeral storage
+      Monthly cost depends on usage
+        +$0.0000000309 per GB-seconds
 
     + Duration (first 6B)
       Monthly cost depends on usage
@@ -146,6 +141,10 @@ Workspace: ws2
     - Duration
       Monthly cost depends on usage
         -$0.0000166667 per GB-seconds
+
+    + Ephemeral storage
+      Monthly cost depends on usage
+        +$0.0000000309 per GB-seconds
 
     + Duration (first 6B)
       Monthly cost depends on usage
@@ -173,6 +172,10 @@ Workspace: ws2
       Monthly cost depends on usage
         -$0.0000166667 per GB-seconds
 
+    + Ephemeral storage
+      Monthly cost depends on usage
+        +$0.0000000309 per GB-seconds
+
     + Duration (first 6B)
       Monthly cost depends on usage
         +$0.0000166667 per GB-seconds
@@ -199,6 +202,10 @@ Workspace: ws1
       Monthly cost depends on usage
         -$0.0000166667 per GB-seconds
 
+    + Ephemeral storage
+      Monthly cost depends on usage
+        +$0.0000000309 per GB-seconds
+
     + Duration (first 6B)
       Monthly cost depends on usage
         +$0.0000166667 per GB-seconds
@@ -208,10 +215,16 @@ Amount:  -$561 ($1,303 → $743)
 Percent: -43%
 
 ──────────────────────────────────
+
+The following projects could not be evaluated: 
+my terragrunt multi project (Module path: ../../../../examples/terragrunt/prod)
+Run the following command to see more details: infracost breakdown --path=/path/to/code
+
+──────────────────────────────────
 Key: ~ changed, + added, - removed
 
-18 cloud resources were detected:
-∙ 18 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+16 cloud resources were detected:
+∙ 16 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 
 Err:
 
