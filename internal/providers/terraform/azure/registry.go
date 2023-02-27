@@ -323,7 +323,9 @@ var FreeResources = []string{
 	"azurerm_iothub_consumer_group",
 	"azurerm_iothub_dps_certificate",
 	"azurerm_iothub_dps_shared_access_policy",
+	"azurerm_iothub_endpoint_eventhub",
 	"azurerm_iothub_enrichment",
+	"azurerm_iothub_route",
 	"azurerm_iothub_shared_access_policy",
 
 	// Azure Lighthouse (Delegated Resoure Management)
@@ -468,7 +470,9 @@ var FreeResources = []string{
 	"azurerm_marketplace_agreement",
 
 	// Azure WAN
+	"azurerm_virtual_hub_connection",
 	"azurerm_virtual_wan",
+	"azurerm_vpn_server_configuration",
 }
 
 var UsageOnlyResources = []string{}
