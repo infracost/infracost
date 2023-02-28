@@ -49,6 +49,9 @@ var (
 				Type:       "data",
 				LabelNames: []string{"type", "name"},
 			},
+			{
+				Type: "moved",
+			},
 		},
 	}
 	justProviderBlocks = &hcl.BodySchema{
@@ -265,7 +268,7 @@ type BlockBuilder struct {
 	Logger        *logrus.Entry
 }
 
-// NewBlock returns a Block with Context and child Blocks initialised.
+// NewBlock returns a Block with Context and child Blocks initialized.
 func (b BlockBuilder) NewBlock(filename string, hclBlock *hcl.Block, ctx *Context, moduleBlock *Block) *Block {
 	if ctx == nil {
 		ctx = NewContext(&hcl.EvalContext{}, nil, b.Logger)
