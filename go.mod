@@ -143,6 +143,7 @@ require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
 	github.com/creack/pty v1.1.11 // indirect
 	github.com/dimchansky/utfbom v1.1.1 // indirect
+	github.com/dlclark/regexp2 v1.8.1 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
 	github.com/fatih/camelcase v1.0.0 // indirect
 	github.com/frankban/quicktest v1.11.3 // indirect
@@ -175,6 +176,7 @@ require (
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/ryanuber/go-glob v1.0.0 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
+	github.com/soongo/path-to-regexp v1.6.4 // indirect
 	github.com/tchap/go-patricia/v2 v2.3.1 // indirect
 	github.com/urfave/cli v1.22.3 // indirect
 	github.com/xanzy/ssh-agent v0.3.1 // indirect

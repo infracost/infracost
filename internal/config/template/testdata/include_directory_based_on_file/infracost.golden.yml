@@ -1,0 +1,20 @@
+version: 0.1
+
+projects:
+  - path: app2/region1
+    name: app2-region1-dev
+    terraform_var_files:
+      - dev/terraform.tfvars
+  - path: app2/region1
+    name: app2-region1-prod
+    terraform_var_files:
+      - prod/terraform.tfvars
+  - path: app2/region2
+    name: app2-region2-dev
+    terraform_var_files:
+      - dev/terraform.tfvars
+  - path: app2/region2
+    name: app2-region2-prod
+    terraform_var_files:
+      - prod/terraform.tfvars
+
