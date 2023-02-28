@@ -8,6 +8,10 @@ Module path: ../../../../examples/terraform
       Monthly cost depends on usage
         -$0.0000166667 per GB-seconds
 
+    + Ephemeral storage
+      Monthly cost depends on usage
+        +$0.0000000309 per GB-seconds
+
     + Duration (first 6B)
       Monthly cost depends on usage
         +$0.0000166667 per GB-seconds
@@ -26,6 +30,10 @@ Module path: ../../../../examples/terraform
     - Duration
       Monthly cost depends on usage
         -$0.0000166667 per GB-seconds
+
+    + Ephemeral storage
+      Monthly cost depends on usage
+        +$0.0000000309 per GB-seconds
 
     + Duration (first 6B)
       Monthly cost depends on usage
@@ -46,6 +54,10 @@ Module path: ../../../../examples/terragrunt/dev
       Monthly cost depends on usage
         -$0.0000166667 per GB-seconds
 
+    + Ephemeral storage
+      Monthly cost depends on usage
+        +$0.0000000309 per GB-seconds
+
     + Duration (first 6B)
       Monthly cost depends on usage
         +$0.0000166667 per GB-seconds
@@ -64,6 +76,10 @@ Module path: ../../../../examples/terragrunt/dev
     - Duration
       Monthly cost depends on usage
         -$0.0000166667 per GB-seconds
+
+    + Ephemeral storage
+      Monthly cost depends on usage
+        +$0.0000000309 per GB-seconds
 
     + Duration (first 6B)
       Monthly cost depends on usage
@@ -84,6 +100,10 @@ Module path: ../../../../examples/terragrunt/prod
       Monthly cost depends on usage
         -$0.0000166667 per GB-seconds
 
+    + Ephemeral storage
+      Monthly cost depends on usage
+        +$0.0000000309 per GB-seconds
+
     + Duration (first 6B)
       Monthly cost depends on usage
         +$0.0000166667 per GB-seconds
@@ -102,6 +122,10 @@ Module path: ../../../../examples/terragrunt/prod
     - Duration
       Monthly cost depends on usage
         -$0.0000166667 per GB-seconds
+
+    + Ephemeral storage
+      Monthly cost depends on usage
+        +$0.0000000309 per GB-seconds
 
     + Duration (first 6B)
       Monthly cost depends on usage
@@ -123,6 +147,10 @@ Workspace: ws2
       Monthly cost depends on usage
         -$0.0000166667 per GB-seconds
 
+    + Ephemeral storage
+      Monthly cost depends on usage
+        +$0.0000000309 per GB-seconds
+
     + Duration (first 6B)
       Monthly cost depends on usage
         +$0.0000166667 per GB-seconds
@@ -143,6 +171,10 @@ Workspace: ws2
       Monthly cost depends on usage
         -$0.0000166667 per GB-seconds
 
+    + Ephemeral storage
+      Monthly cost depends on usage
+        +$0.0000000309 per GB-seconds
+
     + Duration (first 6B)
       Monthly cost depends on usage
         +$0.0000166667 per GB-seconds
@@ -162,6 +194,10 @@ Workspace: ws1
     - Duration
       Monthly cost depends on usage
         -$0.0000166667 per GB-seconds
+
+    + Ephemeral storage
+      Monthly cost depends on usage
+        +$0.0000000309 per GB-seconds
 
     + Duration (first 6B)
       Monthly cost depends on usage

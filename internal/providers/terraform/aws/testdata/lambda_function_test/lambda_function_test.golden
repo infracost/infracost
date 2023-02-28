@@ -3,10 +3,12 @@
                                                                                                                
  aws_lambda_function.lambda                                                                                    
  ├─ Requests                                     Monthly cost depends on usage: $0.20 per 1M requests          
+ ├─ Ephemeral storage                            Monthly cost depends on usage: $0.0000000309 per GB-seconds   
  └─ Duration (first 6B)                          Monthly cost depends on usage: $0.0000166667 per GB-seconds   
                                                                                                                
  aws_lambda_function.lambda_arm                                                                                
  ├─ Requests                                     Monthly cost depends on usage: $0.20 per 1M requests          
+ ├─ Ephemeral storage                            Monthly cost depends on usage: $0.0000000309 per GB-seconds   
  └─ Duration (first 7.5B)                        Monthly cost depends on usage: $0.0000133334 per GB-seconds   
                                                                                                                
  aws_lambda_function.lambda_duration_11B_arm                                                                   

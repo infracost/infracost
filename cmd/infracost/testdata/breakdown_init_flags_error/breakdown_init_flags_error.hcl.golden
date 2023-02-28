@@ -12,6 +12,7 @@ Project: infracost/infracost/cmd/infracost/testdata/breakdown_init_flags_error
                                                                                                                       
  aws_lambda_function.hello_world                                                                                      
  ├─ Requests                                            Monthly cost depends on usage: $0.20 per 1M requests          
+ ├─ Ephemeral storage                                   Monthly cost depends on usage: $0.0000000309 per GB-seconds   
  └─ Duration (first 6B)                                 Monthly cost depends on usage: $0.0000166667 per GB-seconds   
                                                                                                                       
  OVERALL TOTAL                                                                                                $742.64 

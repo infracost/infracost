@@ -166,6 +166,15 @@
                 "monthlyCost": "20"
               },
               {
+                "name": "Ephemeral storage",
+                "unit": "GB-seconds",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.0000000309",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              },
+              {
                 "name": "Duration (first 6B)",
                 "unit": "GB-seconds",
                 "hourlyQuantity": "34246.5753424657534247",
@@ -197,6 +206,15 @@
                 "hourlyQuantity": "0",
                 "monthlyQuantity": "0",
                 "price": "0.2",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              },
+              {
+                "name": "Ephemeral storage",
+                "unit": "GB-seconds",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.0000000309",
                 "hourlyCost": "0",
                 "monthlyCost": "0"
               },
@@ -427,6 +445,15 @@
                 "monthlyCost": "20"
               },
               {
+                "name": "Ephemeral storage",
+                "unit": "GB-seconds",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.0000000309",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              },
+              {
                 "name": "Duration (first 6B)",
                 "unit": "GB-seconds",
                 "hourlyQuantity": "34246.5753424657534247",
@@ -458,6 +485,15 @@
                 "hourlyQuantity": "0",
                 "monthlyQuantity": "0",
                 "price": "0.2",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              },
+              {
+                "name": "Ephemeral storage",
+                "unit": "GB-seconds",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.0000000309",
                 "hourlyCost": "0",
                 "monthlyCost": "0"
               },

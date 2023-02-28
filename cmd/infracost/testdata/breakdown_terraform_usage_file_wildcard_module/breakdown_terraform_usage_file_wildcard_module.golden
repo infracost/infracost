@@ -8,18 +8,22 @@ Project: infracost/infracost/cmd/infracost/testdata/breakdown_terraform_usage_fi
                                                                                                                      
  module.mod2["test"].aws_lambda_function.test2                                                                       
  ├─ Requests                                           Monthly cost depends on usage: $0.20 per 1M requests          
+ ├─ Ephemeral storage                                  Monthly cost depends on usage: $0.0000000309 per GB-seconds   
  └─ Duration (first 6B)                                Monthly cost depends on usage: $0.0000166667 per GB-seconds   
                                                                                                                      
  module.mod2["test"].aws_lambda_function.test["baz"]                                                                 
  ├─ Requests                                           Monthly cost depends on usage: $0.20 per 1M requests          
+ ├─ Ephemeral storage                                  Monthly cost depends on usage: $0.0000000309 per GB-seconds   
  └─ Duration (first 6B)                                Monthly cost depends on usage: $0.0000166667 per GB-seconds   
                                                                                                                      
  module.mod2["test"].aws_lambda_function.test["foo"]                                                                 
  ├─ Requests                                           Monthly cost depends on usage: $0.20 per 1M requests          
+ ├─ Ephemeral storage                                  Monthly cost depends on usage: $0.0000000309 per GB-seconds   
  └─ Duration (first 6B)                                Monthly cost depends on usage: $0.0000166667 per GB-seconds   
                                                                                                                      
  module.mod2["test2"].aws_lambda_function.test2                                                                      
  ├─ Requests                                           Monthly cost depends on usage: $0.20 per 1M requests          
+ ├─ Ephemeral storage                                  Monthly cost depends on usage: $0.0000000309 per GB-seconds   
  └─ Duration (first 6B)                                Monthly cost depends on usage: $0.0000166667 per GB-seconds   
                                                                                                                      
  module.mod2["test2"].aws_lambda_function.test["baz"]                                                                
@@ -32,6 +36,7 @@ Project: infracost/infracost/cmd/infracost/testdata/breakdown_terraform_usage_fi
                                                                                                                      
  module.mod3["test"].aws_lambda_function.test2                                                                       
  ├─ Requests                                           Monthly cost depends on usage: $0.20 per 1M requests          
+ ├─ Ephemeral storage                                  Monthly cost depends on usage: $0.0000000309 per GB-seconds   
  └─ Duration (first 6B)                                Monthly cost depends on usage: $0.0000166667 per GB-seconds   
                                                                                                                      
  module.mod3["test"].aws_lambda_function.test["baz"]                                                                 
@@ -44,6 +49,7 @@ Project: infracost/infracost/cmd/infracost/testdata/breakdown_terraform_usage_fi
                                                                                                                      
  module.mod3["test2"].aws_lambda_function.test2                                                                      
  ├─ Requests                                           Monthly cost depends on usage: $0.20 per 1M requests          
+ ├─ Ephemeral storage                                  Monthly cost depends on usage: $0.0000000309 per GB-seconds   
  └─ Duration (first 6B)                                Monthly cost depends on usage: $0.0000166667 per GB-seconds   
                                                                                                                      
  module.mod3["test2"].aws_lambda_function.test["baz"]                                                                

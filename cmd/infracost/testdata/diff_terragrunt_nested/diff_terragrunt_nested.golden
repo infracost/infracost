@@ -27,6 +27,10 @@ Module path: terragrunt/dev
       Monthly cost depends on usage
         +$0.20 per 1M requests
 
+    + Ephemeral storage
+      Monthly cost depends on usage
+        +$0.0000000309 per GB-seconds
+
     + Duration (first 6B)
       Monthly cost depends on usage
         +$0.0000166667 per GB-seconds
@@ -63,6 +67,10 @@ Module path: terragrunt/prod
     + Requests
       Monthly cost depends on usage
         +$0.20 per 1M requests
+
+    + Ephemeral storage
+      Monthly cost depends on usage
+        +$0.0000000309 per GB-seconds
 
     + Duration (first 6B)
       Monthly cost depends on usage
