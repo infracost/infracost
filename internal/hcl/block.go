@@ -49,6 +49,9 @@ var (
 				Type:       "data",
 				LabelNames: []string{"type", "name"},
 			},
+			{
+				Type: "moved",
+			},
 		},
 	}
 	justProviderBlocks = &hcl.BodySchema{

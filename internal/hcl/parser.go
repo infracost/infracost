@@ -272,7 +272,7 @@ func newParser(projectRoot RootPath, moduleLoader *modules.ModuleLoader, logger 
 	return p
 }
 
-// ParseDirectory parses all the terraform files in the initalPath into Blocks and then passes them to an Evaluator
+// ParseDirectory parses all the terraform files in the initialPath into Blocks and then passes them to an Evaluator
 // to fill these Blocks with additional Context information. Parser does not parse any blocks outside the root Module.
 // It instead leaves ModuleLoader to fetch these Modules on demand. See ModuleLoader.Load for more information.
 //
