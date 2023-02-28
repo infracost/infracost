@@ -31,11 +31,6 @@ resource "aws_lambda_function" "hello_world" {
   memory_size   = 1024 # <<<<< Try changing this to 512 to compare costs
 }
 
-moved {
-  from = aws_lambda_function.hola_mundo
-  to   = aws_lambda_function.hello_world
-}
-
 output "aws_instance_type" {
   value = aws_instance.web_app.instance_type
 }
