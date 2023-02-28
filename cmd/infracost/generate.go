@@ -21,8 +21,8 @@ func newGenerateConfigCommand() *cobra.Command {
 
 	cmd := &cobra.Command{
 		Use:   "config",
-		Short: "Generate Infracost YML file from a template file",
-		Long:  "Generate Infracost YML file from a template file",
+		Short: "Generate Infracost config file from a template file",
+		Long:  "Generate Infracost config file from a template file",
 		Example: `
       infracost generate config --project-path . --template-path infracost.yml.tmpl
       `,
@@ -32,14 +32,14 @@ func newGenerateConfigCommand() *cobra.Command {
 
 	cmd.Flags().StringVar(&gen.projectPath, "project-path", ".", "Path to the Terraform project you want to run the template file on")
 	cmd.Flags().StringVar(&gen.templatePath, "template-path", "", "Path to the Infracost template file which will generate the yml output")
-	cmd.Flags().StringVar(&gen.outFile, "out-file", "", "Path to the Infracost template file which will generate the yml output")
+	cmd.Flags().StringVar(&gen.outFile, "out-file", "", "Save output to a file")
 
 	return cmd
 }
 
 func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 	if g.templatePath == "" {
-		ui.PrintErrorf(cmd.ErrOrStderr(), "Please provide a path to a Infracost template file.\n")
+		ui.PrintErrorf(cmd.ErrOrStderr(), "Please provide a path to an Infracost config template file.\n")
 		ui.PrintUsage(cmd)
 		return nil
 	}
@@ -77,9 +77,9 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 func newGenerateCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "generate",
-		Short: "Generate configuration and templates to help run Infracost",
-		Long:  "Generate configuration and templates to help run Infracost",
-		Example: ` Generate Infracost YML file from a template file:
+		Short: "Generate configuration to help run Infracost",
+		Long:  "Generate configuration to help run Infracost",
+		Example: ` Generate Infracost config file from a template file:
 
       infracost generate config --project-path . --template-path infracost.yml.tmpl
       `,
