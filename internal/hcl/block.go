@@ -49,9 +49,6 @@ var (
 				Type:       "data",
 				LabelNames: []string{"type", "name"},
 			},
-			{
-				Type: "moved",
-			},
 		},
 	}
 	justProviderBlocks = &hcl.BodySchema{
@@ -987,7 +984,7 @@ func loadBlocksFromFile(file file, schema *hcl.BodySchema) (hcl.Blocks, error) {
 		schema = terraformSchemaV012
 	}
 
-	contents, diags := file.hclFile.Body.Content(schema)
+	contents, _, diags := file.hclFile.Body.PartialContent(schema)
 	if diags != nil && diags.HasErrors() {
 		return nil, diags
 	}
