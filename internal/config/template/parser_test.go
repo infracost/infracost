@@ -44,17 +44,29 @@ func TestParser_Compile(t *testing.T) {
 			p := NewParser(testDataPath)
 
 			wr := &bytes.Buffer{}
-			err = p.Compile(input, wr)
+			err = p.CompileFromFile(input, wr)
 			require.NoError(t, err)
 
-			var actual interface{}
-			err = yaml.NewDecoder(wr).Decode(&actual)
+			contents, err := os.ReadFile(input)
+			require.NoError(t, err)
+
+			wrr := &bytes.Buffer{}
+			err = p.Compile(string(contents), wrr)
+			require.NoError(t, err)
+
+			var actualFileOutput interface{}
+			err = yaml.NewDecoder(wr).Decode(&actualFileOutput)
+			require.NoError(t, err)
+
+			var actualStringOutput interface{}
+			err = yaml.NewDecoder(wrr).Decode(&actualStringOutput)
 			require.NoError(t, err)
 
 			var expected interface{}
 			err = yaml.NewDecoder(f).Decode(&expected)
 			require.NoError(t, err)
-			assert.Equal(t, expected, actual)
+			assert.Equal(t, expected, actualFileOutput)
+			assert.Equal(t, expected, actualStringOutput)
 		})
 	}
 }

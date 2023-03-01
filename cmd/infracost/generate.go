@@ -11,8 +11,9 @@ import (
 )
 
 type generateConfigCommand struct {
-	projectPath  string
+	repoPath     string
 	templatePath string
+	template     string
 	outFile      string
 }
 
@@ -30,29 +31,30 @@ func newGenerateConfigCommand() *cobra.Command {
 		RunE:      gen.run,
 	}
 
-	cmd.Flags().StringVar(&gen.projectPath, "project-path", ".", "Path to the Terraform project you want to run the template file on")
-	cmd.Flags().StringVar(&gen.templatePath, "template-path", "", "Path to the Infracost template file which will generate the yml output")
+	cmd.Flags().StringVar(&gen.repoPath, "repo-path", ".", "Path to the Terraform repo or directory you want to run the template file on")
+	cmd.Flags().StringVar(&gen.template, "template", "", "Infracost template string that will generate the config-file yaml output")
+	cmd.Flags().StringVar(&gen.templatePath, "template-path", "", "Path to the Infracost template file that will generate the config-file yaml output")
 	cmd.Flags().StringVar(&gen.outFile, "out-file", "", "Save output to a file")
 
 	return cmd
 }
 
 func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
-	if g.templatePath == "" {
-		ui.PrintErrorf(cmd.ErrOrStderr(), "Please provide a path to an Infracost config template file.\n")
+	if g.templatePath == "" && g.template == "" {
+		ui.PrintErrorf(cmd.ErrOrStderr(), "Please provide an Infracost config template.\n")
 		ui.PrintUsage(cmd)
 		return nil
 	}
 
-	if _, err := os.Stat(g.templatePath); err != nil {
+	if _, err := os.Stat(g.templatePath); g.templatePath != "" && err != nil {
 		ui.PrintErrorf(cmd.ErrOrStderr(), "Provided template file %q does not exist\n", g.templatePath)
 		ui.PrintUsage(cmd)
 		return nil
 	}
 
-	projectPath, _ := os.Getwd()
-	if g.projectPath != "." && g.projectPath != "" {
-		projectPath = g.projectPath
+	repoPath, _ := os.Getwd()
+	if g.repoPath != "." && g.repoPath != "" {
+		repoPath = g.repoPath
 	}
 
 	var out io.Writer = cmd.OutOrStderr()
@@ -65,12 +67,20 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	parser := template.NewParser(projectPath)
-	err := parser.Compile(g.templatePath, out)
-	if err != nil {
-		ui.PrintErrorf(cmd.ErrOrStderr(), "Could not compile template file %q error: %s", g.templatePath, err)
+	parser := template.NewParser(repoPath)
+	if g.template != "" {
+		err := parser.Compile(g.template, out)
+		if err != nil {
+			ui.PrintErrorf(cmd.ErrOrStderr(), "Could not compile template error: %s", err)
+		}
+
+		return nil
 	}
 
+	err := parser.CompileFromFile(g.templatePath, out)
+	if err != nil {
+		ui.PrintErrorf(cmd.ErrOrStderr(), "Could not compile template error: %s", err)
+	}
 	return nil
 }
 

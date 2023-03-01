@@ -17,7 +17,7 @@ func TestGenerateConfig(t *testing.T) {
 			"config",
 			"--template-path",
 			path.Join("./testdata", dir, "infracost.yml.tmpl"),
-			"--project-path",
+			"--repo-path",
 			path.Join("./testdata", dir),
 		},
 		nil)
