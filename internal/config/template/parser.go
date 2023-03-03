@@ -17,17 +17,17 @@ var (
 )
 
 // Parser is the representation of an initialized Infracost template parser.
-// It exposes custom template functions to the user which can act on Parser.projectDir
+// It exposes custom template functions to the user which can act on Parser.repoDir
 // or in isolation.
 type Parser struct {
-	projectDir string
-	template   *template.Template
+	repoDir  string
+	template *template.Template
 }
 
 // NewParser returns a safely initialized Infracost template parser, this builds the underlying template with the
 // Parser functions and sets the underlying default template name.
-func NewParser(projectDir string) *Parser {
-	p := Parser{projectDir: projectDir}
+func NewParser(repoDir string) *Parser {
+	p := Parser{repoDir: repoDir}
 	t := template.New(defaultInfracostTmplName).Funcs(template.FuncMap{
 		"base":       p.base,
 		"stem":       p.stem,
@@ -43,8 +43,8 @@ func NewParser(projectDir string) *Parser {
 	return &p
 }
 
-// Compile writes an Infracost config to io.Writer wr using the provided template path.
-func (p *Parser) Compile(templatePath string, wr io.Writer) error {
+// CompileFromFile writes an Infracost config to io.Writer wr using the provided template path.
+func (p *Parser) CompileFromFile(templatePath string, wr io.Writer) error {
 	baseTemplate := p.template
 
 	// if the template name is not `infracost.yml.tmpl` we need to change the template base
@@ -64,6 +64,26 @@ func (p *Parser) Compile(templatePath string, wr io.Writer) error {
 	err = t.Execute(wr, nil)
 	if err != nil {
 		return fmt.Errorf("could not execute template: %s err: %w", templatePath, err)
+	}
+
+	return nil
+}
+
+// Compile writes an Infracost config to io.Writer wr using the provided template string.
+func (p *Parser) Compile(template string, wr io.Writer) error {
+	// rewrite escaped values to their literal values so that we get a nice output.
+	template = strings.ReplaceAll(template, `\n`, "\n")
+	template = strings.ReplaceAll(template, `\r`, "\r")
+	template = strings.ReplaceAll(template, `\t`, "\t")
+
+	t, err := p.template.Parse(template)
+	if err != nil {
+		return fmt.Errorf("could not parse template: %q err: %w", template, err)
+	}
+
+	err = t.Execute(wr, nil)
+	if err != nil {
+		return fmt.Errorf("could not execute template: %q err: %w", template, err)
 	}
 
 	return nil
@@ -102,11 +122,11 @@ func (p *Parser) contains(s, substr string) bool {
 // pathExists reports whether path is a subpath within base.
 func (p *Parser) pathExists(base, path string) bool {
 	if base == "." {
-		base = p.projectDir
+		base = p.repoDir
 	}
 
 	if !filepath.IsAbs(base) {
-		base = filepath.Join(p.projectDir, base)
+		base = filepath.Join(p.repoDir, base)
 	}
 
 	var fileExists bool
@@ -157,8 +177,8 @@ func (p *Parser) matchPaths(pattern string) []map[interface{}]interface{} {
 	match := pathToRegexp.MustMatch(pattern, nil)
 
 	var matches []map[interface{}]interface{}
-	_ = filepath.WalkDir(p.projectDir, func(path string, d fs.DirEntry, err error) error {
-		rel, _ := filepath.Rel(p.projectDir, path)
+	_ = filepath.WalkDir(p.repoDir, func(path string, d fs.DirEntry, err error) error {
+		rel, _ := filepath.Rel(p.repoDir, path)
 		res, _ := match(rel)
 		if res != nil {
 			params := make(map[interface{}]interface{}, len(res.Params)+2)
