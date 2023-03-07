@@ -237,6 +237,13 @@ func (r *RunContext) IsCloudUploadEnabled() bool {
 	return r.IsCloudEnabled()
 }
 
+// IsCloudUploadExplicitlyEnabled returns true if cloud upload has been enabled through one of the
+// env variables ENABLE_CLOUD, ENABLE_CLOUD_UPLOAD, or ENABLE_DASHBOARD
+func (r *RunContext) IsCloudUploadExplicitlyEnabled() bool {
+	return r.IsCloudUploadEnabled() &&
+		(r.Config.EnableCloud != nil || r.Config.EnableCloudUpload != nil || r.Config.EnableDashboard)
+}
+
 func baseVersion(v string) string {
 	return strings.SplitN(v, "+", 2)[0]
 }
