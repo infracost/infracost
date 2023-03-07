@@ -328,7 +328,9 @@ var CommentMarkdownWithHTMLTemplate = `
   {{- template "summaryRow" dict "Name" "All projects" "MetadataFields" (metadataPlaceholders) "PastCost" .Root.PastTotalMonthlyCost "Cost" .Root.TotalMonthlyCost  }}
   </tbody>
 </table>
+{{- if .ProjectCounts }}
 {{ .ProjectCounts }}
+{{- end }}
 {{- else }}
   <tbody>
   {{- range .Root.Projects }}
@@ -415,7 +417,9 @@ var CommentMarkdownTemplate = `
     {{- end }}
   {{- end }}
   {{- template "totalRow" dict "Name" "All projects" "PastCost" .Root.PastTotalMonthlyCost "Cost" .Root.TotalMonthlyCost  }}
+{{- if .ProjectCounts }}
 {{ .ProjectCounts }}
+{{- end }}
 {{- else }}
   {{- range .Root.Projects }}
     {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
