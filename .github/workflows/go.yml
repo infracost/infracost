@@ -19,11 +19,11 @@ jobs:
           go-version: 1.19
 
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v2.5.2
+        uses: golangci/golangci-lint-action@v3.4.0
         with:
           # Required: the version of golangci-lint is required and must be specified without patch version: they always use the latest patch version.
           version: v1.51.2
-          args: --timeout 3m0s
+          args: --timeout 5m
 
       - name: Install Terragrunt v0.31.8
         run: |
