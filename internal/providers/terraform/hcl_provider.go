@@ -318,13 +318,7 @@ func (p *HCLProvider) Modules() []HCLProject {
 	numJobs := len(p.parsers)
 	runInParallel := parallelism > 1 && numJobs > 1
 	if runInParallel && !runCtx.Config.IsLogging() {
-		if runInParallel && !p.config.SuppressLogging {
-			fmt.Fprintln(os.Stderr, "Running multiple projects in parallel, so log-level=info is enabled by default.")
-			fmt.Fprintln(os.Stderr, "Run with INFRACOST_PARALLELISM=1 to disable parallelism to help debugging.")
-			fmt.Fprintln(os.Stderr)
-		}
-
-		p.logger.Logger.SetLevel(log.InfoLevel)
+		// set the config level to info so that the spinners don't report to the console.
 		p.ctx.RunContext.Config.LogLevel = "info"
 	}
 
