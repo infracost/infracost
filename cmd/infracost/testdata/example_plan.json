@@ -144,7 +144,7 @@
             "package_type": "Zip",
             "publish": false,
             "reserved_concurrent_executions": -1,
-            "role": "arn:aws:lambda:us-east-1:account-id:resource-id",
+            "role": "arn:aws:lambda:us-east-1:aws:resource-id",
             "runtime": "nodejs12.x",
             "s3_bucket": null,
             "s3_key": null,
@@ -189,7 +189,7 @@
             "package_type": "Zip",
             "publish": false,
             "reserved_concurrent_executions": -1,
-            "role": "arn:aws:lambda:us-east-1:account-id:resource-id",
+            "role": "arn:aws:lambda:us-east-1:aws:resource-id",
             "runtime": "nodejs12.x",
             "s3_bucket": null,
             "s3_key": null,
@@ -526,7 +526,7 @@
           "package_type": "Zip",
           "publish": false,
           "reserved_concurrent_executions": -1,
-          "role": "arn:aws:lambda:us-east-1:account-id:resource-id",
+          "role": "arn:aws:lambda:us-east-1:aws:resource-id",
           "runtime": "nodejs12.x",
           "s3_bucket": null,
           "s3_key": null,
@@ -597,7 +597,7 @@
           "package_type": "Zip",
           "publish": false,
           "reserved_concurrent_executions": -1,
-          "role": "arn:aws:lambda:us-east-1:account-id:resource-id",
+          "role": "arn:aws:lambda:us-east-1:aws:resource-id",
           "runtime": "nodejs12.x",
           "s3_bucket": null,
           "s3_key": null,
@@ -825,7 +825,7 @@
               "constant_value": 1024
             },
             "role": {
-              "constant_value": "arn:aws:lambda:us-east-1:account-id:resource-id"
+              "constant_value": "arn:aws:lambda:us-east-1:aws:resource-id"
             },
             "runtime": {
               "constant_value": "nodejs12.x"
@@ -850,7 +850,7 @@
               "constant_value": 1024
             },
             "role": {
-              "constant_value": "arn:aws:lambda:us-east-1:account-id:resource-id"
+              "constant_value": "arn:aws:lambda:us-east-1:aws:resource-id"
             },
             "runtime": {
               "constant_value": "nodejs12.x"
