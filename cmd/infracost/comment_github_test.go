@@ -3,7 +3,7 @@ package main_test
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"path"
@@ -372,7 +372,7 @@ type guardrailEvent struct {
 
 func guardrailTestEndpoint(gr guardrailAddRunResponse) *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		bodyBytes, _ := ioutil.ReadAll(r.Body)
+		bodyBytes, _ := io.ReadAll(r.Body)
 		graphqlQuery := string(bodyBytes)
 
 		if strings.Contains(graphqlQuery, "mutation($run: RunInput!)") {

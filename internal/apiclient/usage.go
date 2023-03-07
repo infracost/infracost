@@ -76,7 +76,7 @@ func NewUsageAPIClient(ctx *config.RunContext) *UsageAPIClient {
 	}
 
 	if ctx.Config.TLSInsecureSkipVerify != nil {
-		tlsConfig.InsecureSkipVerify = *ctx.Config.TLSInsecureSkipVerify
+		tlsConfig.InsecureSkipVerify = *ctx.Config.TLSInsecureSkipVerify // nolint: gosec
 	}
 
 	httpClient := cleanhttp.DefaultClient()

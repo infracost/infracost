@@ -2,7 +2,6 @@ package hcl
 
 import (
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
@@ -732,7 +731,7 @@ func TestOptionWithRawCtyInput(t *testing.T) {
 }
 
 func createTestFile(filename, contents string) string {
-	dir, err := ioutil.TempDir(os.TempDir(), "infracost")
+	dir, err := os.MkdirTemp(os.TempDir(), "infracost")
 	if err != nil {
 		panic(err)
 	}
@@ -744,7 +743,7 @@ func createTestFile(filename, contents string) string {
 }
 
 func createTestFileWithModule(contents string, moduleContents string, moduleName string) string {
-	dir, err := ioutil.TempDir(os.TempDir(), "infracost")
+	dir, err := os.MkdirTemp(os.TempDir(), "infracost")
 	if err != nil {
 		panic(err)
 	}

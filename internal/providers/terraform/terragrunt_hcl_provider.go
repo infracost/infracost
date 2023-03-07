@@ -528,9 +528,7 @@ func buildExcludedPathsMatcher(fullPath string, excludedDirs []string) func(stri
 
 		globs, err := filepath.Glob(absoluteDir)
 		if err == nil {
-			for _, m := range globs {
-				excludedMatches = append(excludedMatches, m)
-			}
+			excludedMatches = append(excludedMatches, globs...)
 		}
 	}
 
