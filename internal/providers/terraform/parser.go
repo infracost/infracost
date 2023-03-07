@@ -149,7 +149,7 @@ func (p *Parser) parseJSON(j []byte, usage schema.UsageMap) ([]*schema.PartialRe
 		return nil, resources, nil
 	}
 
-	if parsed.Get("prior_state").Exists() == false {
+	if !parsed.Get("prior_state").Exists() {
 		return nil, resources, nil
 	}
 
@@ -810,5 +810,5 @@ func gjsonEqual(a, b gjson.Result) bool {
 		return false
 	}
 
-	return string(aOut.Bytes()) == string(bOut.Bytes())
+	return aOut.String() == bOut.String()
 }

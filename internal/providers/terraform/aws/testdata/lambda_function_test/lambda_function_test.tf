@@ -11,7 +11,7 @@ provider "aws" {
 
 resource "aws_lambda_function" "lambda" {
   function_name = "lambda_function_name"
-  role          = "arn:aws:lambda:us-east-1:account-id:resource-id"
+  role          = "arn:aws:lambda:us-east-1:aws:resource-id"
   handler       = "exports.test"
   filename      = "function.zip"
   runtime       = "nodejs12.x"
@@ -19,7 +19,7 @@ resource "aws_lambda_function" "lambda" {
 
 resource "aws_lambda_function" "lambda_arm" {
   function_name = "lambda_function_name"
-  role          = "arn:aws:lambda:us-east-1:account-id:resource-id"
+  role          = "arn:aws:lambda:us-east-1:aws:resource-id"
   handler       = "exports.test"
   filename      = "function.zip"
   runtime       = "nodejs12.x"
@@ -28,7 +28,7 @@ resource "aws_lambda_function" "lambda_arm" {
 
 resource "aws_lambda_function" "lambda_withUsage" {
   function_name = "lambda_function_name"
-  role          = "arn:aws:lambda:us-east-1:account-id:resource-id"
+  role          = "arn:aws:lambda:us-east-1:aws:resource-id"
   handler       = "exports.test"
   filename      = "function.zip"
   runtime       = "nodejs12.x"
@@ -36,7 +36,7 @@ resource "aws_lambda_function" "lambda_withUsage" {
 
 resource "aws_lambda_function" "lambda_withUsage_arm" {
   function_name = "lambda_function_name"
-  role          = "arn:aws:lambda:us-east-1:account-id:resource-id"
+  role          = "arn:aws:lambda:us-east-1:aws:resource-id"
   handler       = "exports.test"
   filename      = "function.zip"
   runtime       = "nodejs12.x"
@@ -45,7 +45,7 @@ resource "aws_lambda_function" "lambda_withUsage_arm" {
 
 resource "aws_lambda_function" "lambda_withUsage512Mem" {
   function_name = "lambda_function_name"
-  role          = "arn:aws:lambda:us-east-1:account-id:resource-id"
+  role          = "arn:aws:lambda:us-east-1:aws:resource-id"
   handler       = "exports.test"
   filename      = "function.zip"
   runtime       = "nodejs12.x"
@@ -54,7 +54,7 @@ resource "aws_lambda_function" "lambda_withUsage512Mem" {
 
 resource "aws_lambda_function" "lambda_withUsage512Mem_arm" {
   function_name = "lambda_function_name"
-  role          = "arn:aws:lambda:us-east-1:account-id:resource-id"
+  role          = "arn:aws:lambda:us-east-1:aws:resource-id"
   handler       = "exports.test"
   filename      = "function.zip"
   runtime       = "nodejs12.x"
@@ -64,7 +64,7 @@ resource "aws_lambda_function" "lambda_withUsage512Mem_arm" {
 
 resource "aws_lambda_function" "lambda_duration_6B" {
   function_name = "lambda_function_name"
-  role          = "arn:aws:lambda:us-east-1:account-id:resource-id"
+  role          = "arn:aws:lambda:us-east-1:aws:resource-id"
   handler       = "exports.test"
   filename      = "function.zip"
   runtime       = "nodejs12.x"
@@ -73,7 +73,7 @@ resource "aws_lambda_function" "lambda_duration_6B" {
 
 resource "aws_lambda_function" "lambda_duration_75B_arm" {
   function_name = "lambda_function_name"
-  role          = "arn:aws:lambda:us-east-1:account-id:resource-id"
+  role          = "arn:aws:lambda:us-east-1:aws:resource-id"
   handler       = "exports.test"
   filename      = "function.zip"
   runtime       = "nodejs12.x"
@@ -83,7 +83,7 @@ resource "aws_lambda_function" "lambda_duration_75B_arm" {
 
 resource "aws_lambda_function" "lambda_duration_9B" {
   function_name = "lambda_function_name"
-  role          = "arn:aws:lambda:us-east-1:account-id:resource-id"
+  role          = "arn:aws:lambda:us-east-1:aws:resource-id"
   handler       = "exports.test"
   filename      = "function.zip"
   runtime       = "nodejs12.x"
@@ -92,7 +92,7 @@ resource "aws_lambda_function" "lambda_duration_9B" {
 
 resource "aws_lambda_function" "lambda_duration_11B_arm" {
   function_name = "lambda_function_name"
-  role          = "arn:aws:lambda:us-east-1:account-id:resource-id"
+  role          = "arn:aws:lambda:us-east-1:aws:resource-id"
   handler       = "exports.test"
   filename      = "function.zip"
   runtime       = "nodejs12.x"
@@ -102,7 +102,7 @@ resource "aws_lambda_function" "lambda_duration_11B_arm" {
 
 resource "aws_lambda_function" "lambda_duration_15B" {
   function_name = "lambda_function_name"
-  role          = "arn:aws:lambda:us-east-1:account-id:resource-id"
+  role          = "arn:aws:lambda:us-east-1:aws:resource-id"
   handler       = "exports.test"
   filename      = "function.zip"
   runtime       = "nodejs12.x"
@@ -111,7 +111,7 @@ resource "aws_lambda_function" "lambda_duration_15B" {
 
 resource "aws_lambda_function" "lambda_duration_18B_arm" {
   function_name = "lambda_function_name"
-  role          = "arn:aws:lambda:us-east-1:account-id:resource-id"
+  role          = "arn:aws:lambda:us-east-1:aws:resource-id"
   handler       = "exports.test"
   filename      = "function.zip"
   runtime       = "nodejs12.x"

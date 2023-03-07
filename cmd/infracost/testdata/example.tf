@@ -40,7 +40,7 @@ resource "aws_instance" "zero_cost_instance" {
 
 resource "aws_lambda_function" "hello_world" {
   function_name = "hello_world"
-  role          = "arn:aws:lambda:us-east-1:account-id:resource-id"
+  role          = "arn:aws:lambda:us-east-1:aws:resource-id"
   handler       = "exports.test"
   runtime       = "nodejs12.x"
   memory_size   = 1024 # <<<<< Try changing this to 512 to compare costs
@@ -48,7 +48,7 @@ resource "aws_lambda_function" "hello_world" {
 
 resource "aws_lambda_function" "zero_cost_lambda" {
   function_name = "hello_world"
-  role          = "arn:aws:lambda:us-east-1:account-id:resource-id"
+  role          = "arn:aws:lambda:us-east-1:aws:resource-id"
   handler       = "exports.test"
   runtime       = "nodejs12.x"
   memory_size   = 1024 # <<<<< Try changing this to 512 to compare costs

@@ -54,7 +54,7 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 			}
 
 			tlsConfig.RootCAs = rootCAs
-			tlsConfig.InsecureSkipVerify = tlsInsecureSkipVerify
+			tlsConfig.InsecureSkipVerify = tlsInsecureSkipVerify // nolint: gosec
 
 			if tlsCertFile != "" && tlsKeyFile != "" {
 				cert, err := tls.LoadX509KeyPair(tlsCertFile, tlsKeyFile)

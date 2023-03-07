@@ -2,7 +2,6 @@ package main_test
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -36,7 +35,7 @@ func TestDiffTerraformOutFile(t *testing.T) {
 
 	GoldenFileCommandTest(t, testdataName, []string{"diff", "--path", "./testdata/example_plan.json", "--out-file", outputPath}, nil)
 
-	actual, err := ioutil.ReadFile(outputPath)
+	actual, err := os.ReadFile(outputPath)
 	require.Nil(t, err)
 	actual = stripDynamicValues(actual)
 

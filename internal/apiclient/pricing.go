@@ -8,6 +8,7 @@ import (
 	"os"
 
 	"github.com/hashicorp/go-retryablehttp"
+
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
@@ -69,7 +70,7 @@ func NewPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
 	}
 
 	if ctx.Config.TLSInsecureSkipVerify != nil {
-		tlsConfig.InsecureSkipVerify = *ctx.Config.TLSInsecureSkipVerify
+		tlsConfig.InsecureSkipVerify = *ctx.Config.TLSInsecureSkipVerify // nolint: gosec
 	}
 
 	client := retryablehttp.NewClient()

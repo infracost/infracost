@@ -5,7 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"os"
@@ -284,7 +284,7 @@ func httpGETAndGetResponse(ctx context.Context, getURL url.URL) ([]byte, *http.H
 		return nil, nil, errors.WithStackTrace(RegistryAPIErr{url: getURL.String(), statusCode: resp.StatusCode})
 	}
 
-	bodyData, err := ioutil.ReadAll(resp.Body)
+	bodyData, err := io.ReadAll(resp.Body)
 	return bodyData, &resp.Header, errors.WithStackTrace(err)
 }
 
