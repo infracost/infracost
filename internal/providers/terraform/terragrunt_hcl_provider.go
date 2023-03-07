@@ -334,8 +334,16 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 	if err != nil {
 		return nil, err
 	}
+
+	var filtered []string
+	for _, file := range terragruntConfigFiles {
+		if !p.isParentTerragruntConfig(file, terragruntConfigFiles) {
+			filtered = append(filtered, file)
+		}
+	}
+
 	// Filter these config files against the exclude paths so Terragrunt doesn't even try to evaluate them
-	terragruntConfigFiles = p.filterExcludedPaths(terragruntConfigFiles)
+	terragruntConfigFiles = p.filterExcludedPaths(filtered)
 
 	howThesePathsWereFound := fmt.Sprintf("Terragrunt config file found in a subdirectory of %s", terragruntOptions.WorkingDir)
 	s, err := createStackForTerragruntConfigPaths(terragruntOptions.WorkingDir, terragruntConfigFiles, terragruntOptions, howThesePathsWereFound)
@@ -359,6 +367,56 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 	p.outputs = map[string]cty.Value{}
 
 	return workingDirsToEstimate, nil
+}
+
+// isParentTerragruntConfig checks if a terragrunt config entry is a parent file that is referenced by another config
+// with a find_in_parent_folders call. The find_in_parent_folders function searches up the directory tree
+// from the file and returns the absolute path to the first terragrunt.hcl. This means if it is found
+// we can treat this file as a child terragrunt.hcl.
+func (p *TerragruntHCLProvider) isParentTerragruntConfig(parent string, configFiles []string) bool {
+	for _, name := range configFiles {
+		if !isChildDirectory(parent, name) {
+			continue
+		}
+
+		file, err := os.Open(name)
+		if err != nil {
+			continue
+		}
+
+		scanner := bufio.NewScanner(file)
+		for scanner.Scan() {
+			line := strings.TrimSpace(scanner.Text())
+			// skip any commented out lines
+			if strings.HasPrefix(line, "#") {
+				continue
+			}
+
+			if strings.Contains(line, "find_in_parent_folders()") {
+				file.Close()
+				return true
+			}
+		}
+
+		file.Close()
+	}
+
+	return false
+}
+
+func isChildDirectory(parent, child string) bool {
+	if parent == child {
+		return false
+	}
+
+	parentDir := filepath.Dir(parent)
+	childDir := filepath.Dir(child)
+	p, err := filepath.Rel(parentDir, childDir)
+	if err != nil || strings.Contains(p, "..") {
+		return false
+	}
+
+	return true
 }
 
 func (p *TerragruntHCLProvider) filterExcludedPaths(paths []string) []string {
