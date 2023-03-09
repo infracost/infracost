@@ -2,23 +2,23 @@ Project: infracost/infracost/examples/terragrunt/dev
 Module path: terragrunt/dev
 
 + aws_instance.web_app
-  +$51.97
+  +$52
 
     + Instance usage (Linux/UNIX, on-demand, t2.micro)
-      +$8.47
+      +$8
 
     + root_block_device
     
         + Storage (general purpose SSD, gp2)
-          +$5.00
+          +$5
 
     + ebs_block_device[0]
     
         + Storage (provisioned IOPS SSD, io1)
-          +$12.50
+          +$13
     
         + Provisioned IOPS
-          +$26.00
+          +$26
 
 + aws_lambda_function.hello_world
   Monthly cost depends on usage
@@ -36,7 +36,7 @@ Module path: terragrunt/dev
         +$0.0000166667 per GB-seconds
 
 Monthly cost change for infracost/infracost/examples/terragrunt/dev (Module path: terragrunt/dev)
-Amount:  +$51.97 ($0.00 → $51.97)
+Amount:  +$52 ($0.00 → $52)
 
 ──────────────────────────────────
 Project: infracost/infracost/examples/terragrunt/prod
@@ -51,7 +51,7 @@ Module path: terragrunt/prod
     + root_block_device
     
         + Storage (general purpose SSD, gp2)
-          +$10.00
+          +$10
 
     + ebs_block_device[0]
     
@@ -59,7 +59,7 @@ Module path: terragrunt/prod
           +$125
     
         + Provisioned IOPS
-          +$52.00
+          +$52
 
 + aws_lambda_function.hello_world
   Monthly cost depends on usage

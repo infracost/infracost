@@ -75,7 +75,7 @@ Module path: ../../../../examples/terragrunt/dev
         +$0.0000166667 per GB-seconds
 
 Monthly cost change for my terragrunt dev project (Module path: ../../../../examples/terragrunt/dev)
-Amount:  $0.00 ($51.97 → $51.97)
+Amount:  $0.00 ($52 → $52)
 Percent: 0%
 
 ──────────────────────────────────
@@ -98,7 +98,7 @@ Module path: ../../../../examples/terragrunt/dev
         +$0.0000166667 per GB-seconds
 
 Monthly cost change for my terragrunt multi project (Module path: ../../../../examples/terragrunt/dev)
-Amount:  $0.00 ($51.97 → $51.97)
+Amount:  $0.00 ($52 → $52)
 Percent: 0%
 
 ──────────────────────────────────
@@ -180,7 +180,7 @@ Workspace: ws2
         +$0.0000166667 per GB-seconds
 
 Monthly cost change for my terragrunt workspace (Module path: ../../../../examples/terragrunt/dev, Workspace: ws2)
-Amount:  $0.00 ($51.97 → $51.97)
+Amount:  $0.00 ($52 → $52)
 Percent: 0%
 
 ──────────────────────────────────

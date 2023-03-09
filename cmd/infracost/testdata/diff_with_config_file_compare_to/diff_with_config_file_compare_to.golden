@@ -5,7 +5,7 @@ Module path: dev
   -$210 ($462 → $252)
 
     ~ Instance usage (Linux/UNIX, on-demand, m5.2xlarge → m5.large)
-      -$210 ($280 → $70.08)
+      -$210 ($280 → $70)
 
 Monthly cost change for infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to/dev (Module path: dev)
 Amount:  -$210 ($462 → $252)
