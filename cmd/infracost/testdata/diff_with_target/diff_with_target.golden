@@ -1,13 +1,13 @@
 Project: infracost/infracost/cmd/infracost/testdata/plan_with_target.json
 
 ~ aws_instance.web_app_1
-  +$7.59 ($8.59 → $16.18)
+  +$8 ($9 → $16)
 
     ~ Instance usage (Linux/UNIX, on-demand, t3.micro → t3.small)
-      +$7.59 ($7.59 → $15.18)
+      +$8 ($8 → $15)
 
 Monthly cost change for infracost/infracost/cmd/infracost/testdata/plan_with_target.json
-Amount:  +$7.59 ($8.59 → $16.18)
+Amount:  +$8 ($9 → $16)
 Percent: +88%
 
 ──────────────────────────────────

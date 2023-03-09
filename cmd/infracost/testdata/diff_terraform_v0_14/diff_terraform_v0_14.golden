@@ -1,10 +1,10 @@
 Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
 
 + aws_instance.instance_2
-  +$4.60
+  +$5
 
     + Instance usage (Linux/UNIX, on-demand, t3.nano)
-      +$3.80
+      +$4
 
     + CPU credits
       $0.00
@@ -15,10 +15,10 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
           +$0.80
 
 + aws_instance.instance_counted[1]
-  +$4.60
+  +$5
 
     + Instance usage (Linux/UNIX, on-demand, t3.nano)
-      +$3.80
+      +$4
 
     + CPU credits
       $0.00
@@ -29,10 +29,10 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
           +$0.80
 
 + aws_instance.instance_named["test.2"]
-  +$4.60
+  +$5
 
     + Instance usage (Linux/UNIX, on-demand, t3.nano)
-      +$3.80
+      +$4
 
     + CPU credits
       $0.00
@@ -43,19 +43,19 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
           +$0.80
 
 + module.db.module.db_2.module.db_instance.aws_db_instance.this[0]
-  +$12.99
+  +$13
 
     + Database instance (on-demand, Single-AZ, db.t3.micro)
-      +$12.41
+      +$12
 
     + Storage (general purpose SSD, gp2)
       +$0.58
 
 + module.instances.aws_instance.module_instance_2
-  +$4.60
+  +$5
 
     + Instance usage (Linux/UNIX, on-demand, t3.nano)
-      +$3.80
+      +$4
 
     + CPU credits
       $0.00
@@ -66,10 +66,10 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
           +$0.80
 
 + module.instances.aws_instance.module_instance_counted[1]
-  +$4.60
+  +$5
 
     + Instance usage (Linux/UNIX, on-demand, t3.nano)
-      +$3.80
+      +$4
 
     + CPU credits
       $0.00
@@ -80,10 +80,10 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
           +$0.80
 
 + module.instances.aws_instance.module_instance_named["test.2"]
-  +$4.60
+  +$5
 
     + Instance usage (Linux/UNIX, on-demand, t3.nano)
-      +$3.80
+      +$4
 
     + CPU credits
       $0.00
@@ -94,7 +94,7 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
           +$0.80
 
 Monthly cost change for infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
-Amount:  +$40.56 ($40.56 → $81.12)
+Amount:  +$41 ($41 → $81)
 Percent: +100%
 
 ──────────────────────────────────

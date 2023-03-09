@@ -22,8 +22,8 @@
     </tr>
     <tr>
       <td>my terragrunt dev project</td>
-      <td align="right">$51.09</td>
-      <td align="right">$51.97</td>
+      <td align="right">$51</td>
+      <td align="right">$52</td>
       <td>+$0.88 (+2%)</td>
     </tr>
     <tr>
@@ -80,16 +80,16 @@ Percent: -43%
 Project: my terragrunt dev project
 
 ~ aws_instance.web_app
-  +$0.88 ($51.09 → $51.97)
+  +$0.88 ($51 → $52)
 
     ~ Instance usage (Linux/UNIX, on-demand, t3.micro → t2.micro)
-      +$0.88 ($7.59 → $8.47)
+      +$0.88 ($8 → $8)
 
     - CPU credits
       $0.00
 
 Monthly cost change for my terragrunt dev project
-Amount:  +$0.88 ($51.09 → $51.97)
+Amount:  +$0.88 ($51 → $52)
 Percent: +2%
 
 ──────────────────────────────────

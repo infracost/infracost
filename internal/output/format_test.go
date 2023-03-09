@@ -17,13 +17,13 @@ func TestFormatCost(t *testing.T) {
 		expected string
 	}{
 		"rounds large USD":        {currency: "USD", val: "1234.567", expected: "$1,235"}, // format cost rounds large numbers to whole units
-		"rounds small USD":        {currency: "USD", val: "1.234567", expected: "$1.23"},
+		"rounds small USD":        {currency: "USD", val: "1.234567", expected: "$1"},
 		"rounds really small USD": {currency: "USD", val: "0.01234567890123456789", expected: "$0.01"},
 		"rounds large PAB":        {currency: "PAB", val: "1234.567", expected: "B/.1,235"},
-		"rounds small PAB":        {currency: "PAB", val: "1.234567", expected: "B/.1.23"},
+		"rounds small PAB":        {currency: "PAB", val: "1.234567", expected: "B/.1"},
 		"rounds really small PAB": {currency: "PAB", val: "0.01234567890123456789", expected: "B/.0.01"},
 		"rounds large BSD":        {currency: "BSD", val: "1234.567", expected: "$1,235"},
-		"rounds small BSD":        {currency: "BSD", val: "1.234567", expected: "$1.23"},
+		"rounds small BSD":        {currency: "BSD", val: "1.234567", expected: "$1"},
 		"rounds really small BSD": {currency: "BSD", val: "0.01234567890123456789", expected: "$0.01"},
 		"handles nil":             {currency: "USD", val: "", expected: "-"},
 	}
@@ -92,15 +92,15 @@ func TestCurrencyFormatCost(t *testing.T) {
 	}{
 		"rounds large USD":                               {format: "USD: $1,234.567890", val: "1234.56789", expected: "$1,235"},
 		"rounds large USD with space":                    {format: "USD: 1.234,567890 $", val: "1234.56789", expected: "1.235 $"},
-		"rounds small USD":                               {format: "USD: $1,234.56", val: "1.234567", expected: "$1.23"},
+		"rounds small USD":                               {format: "USD: $1,234.56", val: "1.234567", expected: "$1"},
 		"rounds really small USD":                        {format: "USD: $1,234.56", val: "0.01234567890123456789", expected: "$0.01"},
 		"rounds large PAB":                               {format: "PAB: B/.1,234", val: "1234.567", expected: "B/.1,235"},
-		"rounds small PAB":                               {format: "PAB: B/.1,234.56", val: "1.234567", expected: "B/.1.23"},
+		"rounds small PAB":                               {format: "PAB: B/.1,234.56", val: "1.234567", expected: "B/.1"},
 		"rounds really small PAB":                        {format: "PAB: B/.1,234.56", val: "0.01234567890123456789", expected: "B/.0.01"},
-		"rounds small BSD":                               {format: "BSD: $1,234.56", val: "1.234567", expected: "$1.23"},
+		"rounds small BSD":                               {format: "BSD: $1,234.56", val: "1.234567", expected: "$1"},
 		"rounds really small BSD":                        {format: "BSD: $1,234.56", val: "0.01234567890123456789", expected: "$0.01"},
 		"handles nil":                                    {format: "USD: $1,234.56", val: "", expected: "-"},
-		"handles invalid format with the default format": {format: "USD: $1,23.56,7", val: "1.234567", expected: "$1.23"},
+		"handles invalid format with the default format": {format: "USD: $1,23.56,7", val: "1.234567", expected: "$1"},
 	}
 
 	for name, tc := range tests {
