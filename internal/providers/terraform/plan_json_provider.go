@@ -32,6 +32,7 @@ func NewPlanJSONProvider(ctx *config.ProjectContext, includePastResources bool) 
 		Path:                 ctx.ProjectConfig.Path,
 		includePastResources: includePastResources,
 		scanner:              scanner,
+		logger:               ctx.Logger(),
 	}
 }
 
