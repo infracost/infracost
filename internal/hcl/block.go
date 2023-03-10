@@ -423,6 +423,10 @@ func SetUUIDAttributes(moduleBlock *Block, block *hcl.Block) {
 			if _, ok := body.Attributes["arn"]; !ok {
 				body.Attributes["arn"] = newArnAttribute("arn", withCount)
 			}
+
+			if _, ok := body.Attributes["self_link"]; !ok {
+				body.Attributes["self_link"] = newUniqueAttribute("self_link", withCount)
+			}
 		}
 	}
 }
