@@ -52,6 +52,10 @@ func newEstimates(ctx context.Context, t *testing.T, resource *schema.Resource) 
 			if _, ok := value.(map[string]interface{}); !ok {
 				t.Errorf("Expected %T %s of type map[string]interface{}, got a %T", resource, item.Key, value)
 			}
+		case schema.KeyValueMap:
+			if _, ok := value.(map[string]float64); !ok {
+				t.Errorf("Expected %T %s of type map[string]float64, got a %T", resource, item.Key, value)
+			}
 		default:
 			t.Errorf("Unknown UsageItem.ValueType %v", item.ValueType)
 		}

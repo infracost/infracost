@@ -404,6 +404,10 @@ func mergeResourceUsageWithUsageData(resourceUsage *ResourceUsage, usageData *sc
 			if subResourceUsage != nil {
 				val = subResourceUsage
 			}
+		case schema.KeyValueMap:
+			if v := usageData.Get(item.Key).Map(); v != nil {
+				val = v
+			}
 		}
 
 		if val != nil {
