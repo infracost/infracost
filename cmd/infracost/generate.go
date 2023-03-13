@@ -25,7 +25,7 @@ func newGenerateConfigCommand() *cobra.Command {
 		Short: "Generate Infracost config file from a template file",
 		Long:  "Generate Infracost config file from a template file",
 		Example: `
-      infracost generate config --project-path . --template-path infracost.yml.tmpl
+      infracost generate config --repo-path . --template-path infracost.yml.tmpl
       `,
 		ValidArgs: []string{"--", "-"},
 		RunE:      gen.run,
@@ -91,7 +91,7 @@ func newGenerateCommand() *cobra.Command {
 		Long:  "Generate configuration to help run Infracost",
 		Example: ` Generate Infracost config file from a template file:
 
-      infracost generate config --project-path . --template-path infracost.yml.tmpl
+      infracost generate config --repo-path . --template-path infracost.yml.tmpl
       `,
 		ValidArgs: []string{"--", "-"},
 		RunE: func(cmd *cobra.Command, args []string) error {
