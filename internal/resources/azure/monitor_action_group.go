@@ -19,8 +19,13 @@ type MonitorActionGroup struct {
 	Address string
 	Region  string
 
-	MonthlySMSMessages map[string]float64 `infracost_usage:"monthly_sms_messages"`
-	MonthlyVoiceCalls  map[string]float64 `infracost_usage:"monthly_voice_calls"`
+	MonthlyEmails            *int64             `infracost_usage:"monthly_emails"`
+	MonthlyITSMEvents        *int64             `infracost_usage:"monthly_itsm_events"`
+	MonthlyPushNotifications *int64             `infracost_usage:"monthly_push_notifications"`
+	MonthlySecureWebHooks    *int64             `infracost_usage:"monthly_secure_web_hooks"`
+	MonthlySMSMessages       map[string]float64 `infracost_usage:"monthly_sms_messages"`
+	MonthlyVoiceCalls        map[string]float64 `infracost_usage:"monthly_voice_calls"`
+	MonthlyWebHooks          *int64             `infracost_usage:"monthly_web_hooks"`
 }
 
 func (r *MonitorActionGroup) CoreType() string {
@@ -29,6 +34,10 @@ func (r *MonitorActionGroup) CoreType() string {
 
 func (r *MonitorActionGroup) UsageSchema() []*schema.UsageItem {
 	return []*schema.UsageItem{
+		{Key: "monthly_emails", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_itsm_events", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_push_notifications", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_secure_web_hooks", ValueType: schema.Int64, DefaultValue: 0},
 		{
 			Key:          "monthly_sms_messages",
 			ValueType:    schema.KeyValueMap,
@@ -39,6 +48,7 @@ func (r *MonitorActionGroup) UsageSchema() []*schema.UsageItem {
 			ValueType:    schema.KeyValueMap,
 			DefaultValue: map[string]float64{"country_code_1": 0},
 		},
+		{Key: "monthly_web_hooks", ValueType: schema.Int64, DefaultValue: 0},
 	}
 }
 
@@ -54,6 +64,22 @@ func (r *MonitorActionGroup) PopulateUsage(u *schema.UsageData) {
 func (r *MonitorActionGroup) BuildResource() *schema.Resource {
 	subResources := []*schema.Resource{}
 	costComponents := []*schema.CostComponent{}
+
+	if r.MonthlyEmails != nil {
+		costComponents = append(costComponents, r.emailCostComponent(*r.MonthlyEmails))
+	}
+	if r.MonthlyITSMEvents != nil {
+		costComponents = append(costComponents, r.ITSMEventCostComponent(*r.MonthlyITSMEvents))
+	}
+	if r.MonthlyPushNotifications != nil {
+		costComponents = append(costComponents, r.pushNotificationCostComponent(*r.MonthlyPushNotifications))
+	}
+	if r.MonthlySecureWebHooks != nil {
+		costComponents = append(costComponents, r.secureWebHookCostComponent(*r.MonthlySecureWebHooks))
+	}
+	if r.MonthlyWebHooks != nil {
+		costComponents = append(costComponents, r.webHookCostComponent(*r.MonthlyWebHooks))
+	}
 
 	// SMS messages
 	smsCostComponents := []*schema.CostComponent{}
@@ -107,6 +133,115 @@ func (r *MonitorActionGroup) mapCountryCodesToQuantity(usageMap map[string]float
 	sort.Ints(countryCodes)
 
 	return countryCodes, countryCodeToQuantity
+}
+
+func (r *MonitorActionGroup) emailCostComponent(quantity int64) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            "Email notifications",
+		Unit:            "emails",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(quantity)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("azure"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("Azure Monitor"),
+			ProductFamily: strPtr("Management and Governance"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "skuName", Value: strPtr("Emails")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			StartUsageAmount: strPtr("1000"),
+		},
+	}
+}
+
+func (r *MonitorActionGroup) ITSMEventCostComponent(quantity int64) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            "ITSM connector events",
+		Unit:            "events",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(quantity)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("azure"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("Azure Monitor"),
+			ProductFamily: strPtr("Management and Governance"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "skuName", Value: strPtr("Notifications")},
+				{Key: "meterName", Value: strPtr("Notifications ITSM Connector Create/Update Event")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			StartUsageAmount: strPtr("1000"),
+		},
+	}
+}
+
+func (r *MonitorActionGroup) pushNotificationCostComponent(quantity int64) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            "Push notifications",
+		Unit:            "notifications",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(quantity)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("azure"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("Azure Monitor"),
+			ProductFamily: strPtr("Management and Governance"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "skuName", Value: strPtr("Notifications")},
+				{Key: "meterName", Value: strPtr("Notifications Push Notification")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			StartUsageAmount: strPtr("1000"),
+		},
+	}
+}
+
+func (r *MonitorActionGroup) secureWebHookCostComponent(quantity int64) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            "Secure web hook notifications",
+		Unit:            "notifications",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(quantity)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("azure"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("Azure Monitor"),
+			ProductFamily: strPtr("Management and Governance"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "skuName", Value: strPtr("Notifications")},
+				{Key: "meterName", Value: strPtr("Notifications Secure web hook")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			StartUsageAmount: strPtr("100"),
+		},
+	}
+}
+
+func (r *MonitorActionGroup) webHookCostComponent(quantity int64) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            "Web hook notifications",
+		Unit:            "notifications",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(quantity)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("azure"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("Azure Monitor"),
+			ProductFamily: strPtr("Management and Governance"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "skuName", Value: strPtr("Notifications")},
+				{Key: "meterName", Value: strPtr("Notifications Web hook")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			StartUsageAmount: strPtr("10000"),
+		},
+	}
 }
 
 func (r *MonitorActionGroup) smsMessageCostComponent(countryCode int, quantity float64) *schema.CostComponent {

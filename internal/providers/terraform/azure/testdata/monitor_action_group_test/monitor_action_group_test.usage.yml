@@ -1,6 +1,10 @@
 version: 0.1
 resource_usage:
-  azurerm_monitor_action_group.example:
+  azurerm_monitor_action_group.example_with_usage:
+    monthly_emails: 4000
+    monthly_itsm_events: 5000
+    monthly_push_notifications: 3000
+    monthly_secure_web_hooks: 2000
     monthly_sms_messages:
       country_code_1: 300
       country_code_82: 400
@@ -8,3 +12,4 @@ resource_usage:
     monthly_voice_calls:
       country_code_1: 100
       country_code_82: 200
+    monthly_web_hooks: 12000

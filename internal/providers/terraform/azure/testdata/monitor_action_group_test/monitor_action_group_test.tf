@@ -13,3 +13,9 @@ resource "azurerm_monitor_action_group" "example" {
   resource_group_name = azurerm_resource_group.example.name
   short_name          = "p0action"
 }
+
+resource "azurerm_monitor_action_group" "example_with_usage" {
+  name                = "CriticalAlertsActionWithUsage"
+  resource_group_name = azurerm_resource_group.example.name
+  short_name          = "p0action"
+}
