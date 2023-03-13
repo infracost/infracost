@@ -21,6 +21,14 @@ type ServicePlan struct {
 	Region      string
 }
 
+func (r *ServicePlan) CoreType() string {
+	return "ServicePlan"
+}
+
+func (r *ServicePlan) UsageSchema() []*schema.UsageItem {
+	return nil
+}
+
 // PopulateUsage parses the u schema.UsageData into the ServicePlan struct
 // It uses the `infracost_usage` struct tags to populate data into the ServicePlan
 func (r *ServicePlan) PopulateUsage(u *schema.UsageData) {
@@ -81,6 +89,5 @@ func (r *ServicePlan) BuildResource() *schema.Resource {
 				r.WorkerCount,
 				additionalAttributeFilters...),
 		},
-		UsageSchema: []*schema.UsageItem{},
 	}
 }
