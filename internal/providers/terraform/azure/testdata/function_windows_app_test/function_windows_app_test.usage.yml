@@ -1,0 +1,13 @@
+version: 0.1
+resource_usage:
+    azurerm_windows_function_app.function_with_usage[*]:
+        monthly_executions: 3_540_123
+        execution_duration_ms: 495
+        memory_mb: 490
+        instances: 2
+
+    azurerm_windows_function_app.legacy_service_plan_function_with_usage[*]:
+        monthly_executions: 3_540_123
+        execution_duration_ms: 495
+        memory_mb: 490
+        instances: 2

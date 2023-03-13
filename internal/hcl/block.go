@@ -416,22 +416,23 @@ func SetUUIDAttributes(moduleBlock *Block, block *hcl.Block) {
 	if body, ok := block.Body.(*hclsyntax.Body); ok {
 		if (block.Type == "resource" || block.Type == "data") && body.Attributes != nil {
 			_, withCount := body.Attributes["count"]
+			_, withEach := body.Attributes["for_each"]
 			if _, ok := body.Attributes["id"]; !ok {
-				body.Attributes["id"] = newUniqueAttribute("id", withCount)
+				body.Attributes["id"] = newUniqueAttribute("id", withCount, withEach)
 			}
 
 			if _, ok := body.Attributes["arn"]; !ok {
-				body.Attributes["arn"] = newArnAttribute("arn", withCount)
+				body.Attributes["arn"] = newArnAttribute("arn", withCount, withEach)
 			}
 
 			if _, ok := body.Attributes["self_link"]; !ok {
-				body.Attributes["self_link"] = newUniqueAttribute("self_link", withCount)
+				body.Attributes["self_link"] = newUniqueAttribute("self_link", withCount, withEach)
 			}
 		}
 	}
 }
 
-func newUniqueAttribute(name string, withCount bool) *hclsyntax.Attribute {
+func newUniqueAttribute(name string, withCount bool, withEach bool) *hclsyntax.Attribute {
 	// prefix ids with hcl- so they can be identified as fake
 	var exp hclsyntax.Expression = &hclsyntax.LiteralValueExpr{
 		Val: cty.StringVal("hcl-" + uuid.NewString()),
@@ -444,13 +445,20 @@ func newUniqueAttribute(name string, withCount bool) *hclsyntax.Attribute {
 		}
 	}
 
+	if withEach {
+		e, diags := hclsyntax.ParseExpression([]byte(`"hcl-`+uuid.NewString()+`-${each.key}"`), name, hcl.Pos{})
+		if !diags.HasErrors() {
+			exp = e
+		}
+	}
+
 	return &hclsyntax.Attribute{
 		Name: name,
 		Expr: exp,
 	}
 }
 
-func newArnAttribute(name string, withCount bool) *hclsyntax.Attribute {
+func newArnAttribute(name string, withCount bool, withEach bool) *hclsyntax.Attribute {
 	// fakeARN replicates an aws arn string it deliberately leaves the
 	// region section (in between the 3rd and 4th semicolon) blank as
 	// Infracost will try and parse this region later down the line.
@@ -462,6 +470,13 @@ func newArnAttribute(name string, withCount bool) *hclsyntax.Attribute {
 
 	if withCount {
 		e, diags := hclsyntax.ParseExpression([]byte(`"`+fakeARN+`-${count.index}"`), name, hcl.Pos{})
+		if !diags.HasErrors() {
+			exp = e
+		}
+	}
+
+	if withEach {
+		e, diags := hclsyntax.ParseExpression([]byte(fakeARN+`-${each.key}"`), name, hcl.Pos{})
 		if !diags.HasErrors() {
 			exp = e
 		}
@@ -543,7 +558,7 @@ func (b *Block) IsForEachReferencedExpanded(moduleBlocks Blocks) bool {
 	return !referenced.ShouldExpand()
 }
 
-func (b Block) ShouldExpand() bool {
+func (b *Block) ShouldExpand() bool {
 	if b.IsCountExpanded() {
 		return false
 	}

@@ -17,6 +17,10 @@
  ├─ Execution time                                                  Monthly cost depends on usage: $0.000016 per GB-seconds    
  └─ Executions                                                      Monthly cost depends on usage: $0.20 per 1M requests       
                                                                                                                                
+ azurerm_function_app.functionAppNoAvailableServicePlan                                                                        
+ ├─ Execution time                                                  Monthly cost depends on usage: $0.000016 per GB-seconds    
+ └─ Executions                                                      Monthly cost depends on usage: $0.20 per 1M requests       
+                                                                                                                               
  azurerm_function_app.functionAppNoAvailableServicePlanButHasUsage                                                             
  ├─ Execution time                                                        876,180.4425  GB-seconds                      $14.02 
  └─ Executions                                                                  3.5401  1M requests                      $0.71 
@@ -50,12 +54,7 @@
  OVERALL TOTAL                                                                                                       $1,134.69 
 ──────────────────────────────────
 16 cloud resources were detected:
-∙ 11 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 12 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 4 were free:
   ∙ 3 x azurerm_app_service_plan
   ∙ 1 x azurerm_resource_group
-∙ 1 is not supported yet, see https://infracost.io/requested-resources:
-  ∙ 1 x azurerm_function_app
-Logs:
-
-level=warning msg="Skipping resource azurerm_function_app.functionAppNoAvailableServicePlan. Could not find a way to get its cost components from the resource or usage file."
