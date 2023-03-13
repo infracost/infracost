@@ -1,0 +1,21 @@
+
+ Name                                  Monthly Qty  Unit      Monthly Cost 
+                                                                           
+ azurerm_monitor_action_group.example                                      
+ ├─ SMS messages                                                           
+ │  ├─ Country code 1                          300  messages         $1.94 
+ │  ├─ Country code 82                         400  messages        $18.80 
+ │  └─ Country code 370                        500  messages        $26.90 
+ └─ Voice calls                                                            
+    ├─ Country code 1                          100  calls            $1.30 
+    └─ Country code 82                         200  calls            $8.00 
+                                                                           
+ OVERALL TOTAL                                                      $56.94 
+──────────────────────────────────
+2 cloud resources were detected:
+∙ 1 was estimated, it includes usage-based costs, see https://infracost.io/usage-file
+∙ 1 was free:
+  ∙ 1 x azurerm_resource_group
+Logs:
+
+level=warning msg="Multiple products with prices found for SMS messages Country code 370, using the first product"

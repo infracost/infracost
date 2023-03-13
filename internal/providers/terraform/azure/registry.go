@@ -125,6 +125,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getPowerBIEmbeddedRegistryItem(),
 	getMSSQLElasticPoolRegistryItem(),
 	getSQLElasticPoolRegistryItem(),
+	getMonitorActionGroupRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
