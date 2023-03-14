@@ -190,15 +190,6 @@
  azurerm_service_plan.example["Linux.SHARED.3"]                                              
  └─ Instance usage (SHARED)                                       2,190  hours        $28.47 
                                                                                              
- azurerm_service_plan.example["Linux.Y1.1"]                                                  
- └─ Instance usage (Y1)                                             730  hours         $9.49 
-                                                                                             
- azurerm_service_plan.example["Linux.Y1.2"]                                                  
- └─ Instance usage (Y1)                                           1,460  hours        $18.98 
-                                                                                             
- azurerm_service_plan.example["Linux.Y1.3"]                                                  
- └─ Instance usage (Y1)                                           2,190  hours        $28.47 
-                                                                                             
  azurerm_service_plan.example["Windows.B1.1"]                                                
  └─ Instance usage (B1)                                             730  hours        $54.75 
                                                                                              
@@ -387,15 +378,6 @@
                                                                                              
  azurerm_service_plan.example["Windows.SHARED.3"]                                            
  └─ Instance usage (SHARED)                                       2,190  hours        $28.47 
-                                                                                             
- azurerm_service_plan.example["Windows.Y1.1"]                                                
- └─ Instance usage (Y1)                                             730  hours         $9.49 
-                                                                                             
- azurerm_service_plan.example["Windows.Y1.2"]                                                
- └─ Instance usage (Y1)                                           1,460  hours        $18.98 
-                                                                                             
- azurerm_service_plan.example["Windows.Y1.3"]                                                
- └─ Instance usage (Y1)                                           2,190  hours        $28.47 
                                                                                              
  azurerm_service_plan.example["WindowsContainer.B1.1"]                                       
  └─ Instance usage (B1)                                             730  hours        $54.75 
@@ -586,21 +568,12 @@
  azurerm_service_plan.example["WindowsContainer.SHARED.3"]                                   
  └─ Instance usage (SHARED)                                       2,190  hours        $28.47 
                                                                                              
- azurerm_service_plan.example["WindowsContainer.Y1.1"]                                       
- └─ Instance usage (Y1)                                             730  hours         $9.49 
-                                                                                             
- azurerm_service_plan.example["WindowsContainer.Y1.2"]                                       
- └─ Instance usage (Y1)                                           1,460  hours        $18.98 
-                                                                                             
- azurerm_service_plan.example["WindowsContainer.Y1.3"]                                       
- └─ Instance usage (Y1)                                           2,190  hours        $28.47 
-                                                                                             
- OVERALL TOTAL                                                                   $127,068.18 
+ OVERALL TOTAL                                                                   $126,897.36 
 ──────────────────────────────────
 253 cloud resources were detected:
-∙ 198 were estimated
-∙ 55 were free:
-  ∙ 54 x azurerm_service_plan
+∙ 189 were estimated
+∙ 64 were free:
+  ∙ 63 x azurerm_service_plan
   ∙ 1 x azurerm_resource_group
 Logs:
 
