@@ -8,7 +8,7 @@ resource_usage:
     monthly_sms_messages:
       country_code_1: 300
       country_code_82: 400
-      country_code_370: 500
+      country_code_351: 500
     monthly_voice_calls:
       country_code_1: 100
       country_code_82: 200
