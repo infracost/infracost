@@ -8,6 +8,7 @@ const (
 	Float64
 	StringArray
 	SubResourceUsage
+	KeyValueMap
 )
 
 type UsageItem struct {
