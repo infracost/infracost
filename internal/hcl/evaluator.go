@@ -469,8 +469,6 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 
 		value := forEachAttr.Value()
 		if !value.IsNull() && value.IsKnown() && forEachAttr.IsIterable() {
-			srcValue := e.getSourceValue(block)
-
 			typeLabel := block.TypeLabel()
 			nameLabel := block.NameLabel()
 			if block.Type() == "module" {
@@ -494,13 +492,14 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 					e.logger.WithError(err).Debugf("could not marshal gocty key %s to string", key)
 				}
 
-				e.ctx.Set(srcValue, typeLabel, nameLabel, keyStr)
-
 				ctx.SetByDot(key, "each.key")
 				ctx.SetByDot(val, "each.value")
 
 				ctx.Set(key, block.TypeLabel(), "key")
 				ctx.Set(val, block.TypeLabel(), "value")
+
+				cloneValues := clone.Values()
+				e.ctx.Set(cloneValues, typeLabel, nameLabel, keyStr)
 
 				if v, ok := e.moduleCalls[clone.FullName()]; ok {
 					v.Definition = clone
@@ -509,6 +508,8 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 
 				return false
 			})
+		} else {
+			expanded = append(expanded, block)
 		}
 	}
 
@@ -563,30 +564,6 @@ func (e *Evaluator) expandBlockCounts(blocks Blocks) Blocks {
 	}
 
 	return countFiltered
-}
-
-func (e *Evaluator) getSourceValue(from *Block) cty.Value {
-	var fromBase string
-	var fromRel string
-
-	switch from.Type() {
-	case "resource":
-		fromBase = from.TypeLabel()
-		fromRel = from.NameLabel()
-	case "module":
-		fromBase = from.Type()
-		fromRel = from.TypeLabel()
-	default:
-		return cty.ObjectVal(make(map[string]cty.Value))
-	}
-
-	srcValue := e.ctx.Root().Get(fromBase, fromRel)
-	if srcValue == cty.NilVal {
-		e.logger.Debugf("error trying to copyVariable from the source of '%s.%s'", fromBase, fromRel)
-		return cty.ObjectVal(make(map[string]cty.Value))
-	}
-
-	return srcValue
 }
 
 func (e *Evaluator) evaluateVariable(b *Block) (cty.Value, error) {

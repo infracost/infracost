@@ -1132,6 +1132,48 @@ resource "dynamic" "resource" {
 
 }
 
+func Test_ForEachReferencesAnotherForEachDependentAttribute(t *testing.T) {
+	path := createTestFile("test.tf", `
+locals {
+  os_types = ["Windows"]
+  skus     = ["EP1"]
+
+  permutations = distinct(flatten([
+	  for os_type in local.os_types : [
+		  for sku in local.skus :{
+			sku     = sku
+			os_type = os_type
+		  }
+	  ]
+  ]))
+}
+
+resource "azurerm_service_plan" "plan" {
+  for_each = {for entry in local.permutations : "${entry.os_type}.${entry.sku}" => entry}
+
+  name                = "plan-${each.value.os_type}-${each.value.sku}"
+}
+
+resource "azurerm_linux_function_app" "function" {
+  for_each = {for entry in azurerm_service_plan.plan : "${entry.name}" => entry}
+
+  name                       = each.value.name
+}
+`,
+	)
+
+	logger := newDiscardLogger()
+	loader := modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{})
+	parsers, err := LoadParsers(filepath.Dir(path), loader, nil, logger)
+	require.NoError(t, err)
+	module, err := parsers[0].ParseDirectory()
+	require.NoError(t, err)
+
+	resource := module.Blocks.Matching(BlockMatcher{Label: `azurerm_linux_function_app.function["plan-Windows-EP1"]`})
+	name := resource.GetAttribute("name").AsString()
+	assert.Equal(t, "plan-Windows-EP1", name)
+}
+
 func valueToBytes(t *testing.T, v cty.Value) []byte {
 	t.Helper()
 

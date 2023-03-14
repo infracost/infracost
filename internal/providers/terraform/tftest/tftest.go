@@ -185,6 +185,7 @@ func resourceTestsForTfProject(t *testing.T, pName string, tfProject TerraformPr
 type GoldenFileOptions = struct {
 	Currency    string
 	CaptureLogs bool
+	IgnoreCLI   bool
 }
 
 func DefaultGoldenFileOptions() *GoldenFileOptions {
@@ -202,6 +203,10 @@ func GoldenFileResourceTestsWithOpts(t *testing.T, testName string, options *Gol
 	t.Run("HCL", func(t *testing.T) {
 		goldenFileResourceTestWithOpts(t, "hcl", testName, options)
 	})
+
+	if options != nil && options.IgnoreCLI {
+		return
+	}
 
 	t.Run("Terraform CLI", func(t *testing.T) {
 		goldenFileResourceTestWithOpts(t, "terraform", testName, options)

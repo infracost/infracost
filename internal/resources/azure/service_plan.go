@@ -42,7 +42,7 @@ func (r *ServicePlan) BuildResource() *schema.Resource {
 	productName := "Standard Plan"
 	sku := r.SKUName
 
-	if len(r.SKUName) < 2 || strings.ToLower(r.SKUName[:2]) == "ep" || strings.ToLower(r.SKUName[:2]) == "ws" {
+	if len(r.SKUName) < 2 || strings.ToLower(r.SKUName[:2]) == "ep" || strings.ToLower(r.SKUName[:2]) == "ws" || strings.ToLower(r.SKUName[:2]) == "y1" {
 		return &schema.Resource{
 			Name:      r.Address,
 			IsSkipped: true,
@@ -62,7 +62,7 @@ func (r *ServicePlan) BuildResource() *schema.Resource {
 		productName = "Basic Plan"
 	case "f":
 		productName = "Free Plan"
-	case "y", "d":
+	case "d":
 		sku = "Shared"
 		productName = "Shared Plan"
 	case "p", "i":
