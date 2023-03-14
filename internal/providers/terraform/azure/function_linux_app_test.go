@@ -7,12 +7,13 @@ import (
 )
 
 func TestAzureRMLinuxAppFunctionGoldenFile(t *testing.T) {
+	t.Parallel()
+
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
 
 	opts := tftest.DefaultGoldenFileOptions()
-	opts.CaptureLogs = true
 	// ignore the CLI as the Terraform provider cannot traverse the each.value references correctly
 	// meaning that the HCL provider is more accurate here.
 	opts.IgnoreCLI = true

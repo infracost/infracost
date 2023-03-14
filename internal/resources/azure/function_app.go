@@ -44,7 +44,7 @@ type FunctionApp struct {
 }
 
 func (r *FunctionApp) CoreType() string {
-	return "FunctionAPp"
+	return "FunctionApp"
 }
 
 func (r *FunctionApp) UsageSchema() []*schema.UsageItem {
