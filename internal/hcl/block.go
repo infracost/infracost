@@ -14,6 +14,8 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
+
+	"github.com/infracost/infracost/internal/hcl/funcs"
 )
 
 var (
@@ -240,6 +242,8 @@ type Block struct {
 	// moduleBlock represents the parent module of this Block. If this is nil the Block is part of the root
 	// module (the top level directory in a Terraform dir).
 	moduleBlock *Block
+	// rootPath is the working directory of the CLI process.
+	rootPath string
 	// expanded marks if the block has been cloned or duplicated as part of a foreach or count.
 	expanded bool
 	// cloneIndex represents the index of the parent that this Block has been cloned from
@@ -266,7 +270,7 @@ type BlockBuilder struct {
 }
 
 // NewBlock returns a Block with Context and child Blocks initialised.
-func (b BlockBuilder) NewBlock(filename string, hclBlock *hcl.Block, ctx *Context, moduleBlock *Block) *Block {
+func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.Block, ctx *Context, moduleBlock *Block) *Block {
 	if ctx == nil {
 		ctx = NewContext(&hcl.EvalContext{}, nil, b.Logger)
 	}
@@ -275,7 +279,7 @@ func (b BlockBuilder) NewBlock(filename string, hclBlock *hcl.Block, ctx *Contex
 	var children Blocks
 	if body, ok := hclBlock.Body.(*hclsyntax.Body); ok {
 		for _, bb := range body.Blocks {
-			children = append(children, b.NewBlock(filename, bb.AsHCLBlock(), ctx, moduleBlock))
+			children = append(children, b.NewBlock(filename, rootPath, bb.AsHCLBlock(), ctx, moduleBlock))
 		}
 
 		for _, f := range b.SetAttributes {
@@ -287,6 +291,7 @@ func (b BlockBuilder) NewBlock(filename string, hclBlock *hcl.Block, ctx *Contex
 			context:     ctx,
 			hclBlock:    hclBlock,
 			moduleBlock: moduleBlock,
+			rootPath:    rootPath,
 			childBlocks: children,
 			verbose:     isLoggingVerbose,
 			newMock:     b.MockFunc,
@@ -306,6 +311,7 @@ func (b BlockBuilder) NewBlock(filename string, hclBlock *hcl.Block, ctx *Contex
 			context:     ctx,
 			hclBlock:    hclBlock,
 			moduleBlock: moduleBlock,
+			rootPath:    rootPath,
 			childBlocks: children,
 			verbose:     isLoggingVerbose,
 			newMock:     b.MockFunc,
@@ -316,13 +322,14 @@ func (b BlockBuilder) NewBlock(filename string, hclBlock *hcl.Block, ctx *Contex
 	}
 
 	for _, hb := range content.Blocks {
-		children = append(children, b.NewBlock(filename, hb, ctx, moduleBlock))
+		children = append(children, b.NewBlock(filename, rootPath, hb, ctx, moduleBlock))
 	}
 
 	block := &Block{
 		context:     ctx,
 		hclBlock:    hclBlock,
 		moduleBlock: moduleBlock,
+		rootPath:    rootPath,
 		childBlocks: children,
 		verbose:     isLoggingVerbose,
 		newMock:     b.MockFunc,
@@ -344,7 +351,7 @@ func (b BlockBuilder) CloneBlock(block *Block, index cty.Value) *Block {
 
 	cloneHCL := *block.hclBlock
 
-	clone := b.NewBlock(block.Filename, &cloneHCL, childCtx, block.moduleBlock)
+	clone := b.NewBlock(block.Filename, block.rootPath, &cloneHCL, childCtx, block.moduleBlock)
 	if len(clone.hclBlock.Labels) > 0 {
 		position := len(clone.hclBlock.Labels) - 1
 		labels := make([]string, len(clone.hclBlock.Labels))
@@ -378,7 +385,7 @@ func (b BlockBuilder) CloneBlock(block *Block, index cty.Value) *Block {
 }
 
 // BuildModuleBlocks loads all the Blocks for the module at the given path
-func (b BlockBuilder) BuildModuleBlocks(block *Block, modulePath string) (Blocks, error) {
+func (b BlockBuilder) BuildModuleBlocks(block *Block, modulePath string, rootPath string) (Blocks, error) {
 	var blocks Blocks
 	moduleFiles, err := loadDirectory(b.Logger, modulePath, true)
 	if err != nil {
@@ -397,7 +404,7 @@ func (b BlockBuilder) BuildModuleBlocks(block *Block, modulePath string) (Blocks
 		}
 
 		for _, fileBlock := range fileBlocks {
-			blocks = append(blocks, b.NewBlock(file.path, fileBlock, moduleCtx, block))
+			blocks = append(blocks, b.NewBlock(file.path, rootPath, fileBlock, moduleCtx, block))
 		}
 	}
 
@@ -792,8 +799,61 @@ func (b *Block) GetAttributes() []*Attribute {
 		})
 	}
 
+	if b.Type() == "data" && b.TypeLabel() == "local_file" {
+		attributes = b.loadFileContentsToAttributes(attributes)
+	}
+
 	b.attributes = attributes
 	return attributes
+}
+
+func (b *Block) loadFileContentsToAttributes(attributes []*Attribute) []*Attribute {
+	for _, attribute := range attributes {
+		if attribute.Name() == "filename" {
+			content, err := funcs.File(b.rootPath, attribute.Value())
+			if err != nil {
+				b.logger.WithError(err).Debugf("failed to load %s file contents", b.FullName())
+				break
+			}
+
+			attributes = []*Attribute{
+				attribute,
+				b.syntheticAttribute("content", content),
+			}
+
+			break
+		}
+	}
+
+	return attributes
+}
+
+func (b *Block) syntheticAttribute(name string, val cty.Value) *Attribute {
+	rng := hcl.Range{
+		Filename: b.Filename,
+		Start:    hcl.Pos{Line: 1, Column: 1},
+		End:      hcl.Pos{Line: 1, Column: 1},
+	}
+
+	hclAttr := &hcl.Attribute{
+		Name: name,
+		Expr: &hclsyntax.LiteralValueExpr{
+			Val:      val,
+			SrcRange: rng,
+		},
+		NameRange: rng,
+		Range:     rng,
+	}
+
+	return &Attribute{
+		newMock: b.newMock,
+		HCLAttr: hclAttr,
+		Ctx:     b.context,
+		Verbose: b.verbose,
+		Logger: b.logger.WithFields(logrus.Fields{
+			"attribute_name": name,
+		}),
+	}
 }
 
 // GetAttribute returns the given attribute with the provided name. It will return nil if the attribute is not found.

@@ -658,3 +658,16 @@ func TestBreakdownMultiProjectWithAllErrors(t *testing.T) {
 		}, &GoldenFileOptions{CaptureLogs: true},
 	)
 }
+
+func TestBreakdownWithLocalPathDataBlock(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", dir,
+		}, &GoldenFileOptions{CaptureLogs: true},
+	)
+}
