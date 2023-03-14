@@ -5,7 +5,7 @@ provider "azurerm" {
 
 resource "azurerm_resource_group" "example" {
   name     = "example-resources"
-  location = "westeurope"
+  location = "eastus"
 }
 
 resource "azurerm_monitor_action_group" "example" {
