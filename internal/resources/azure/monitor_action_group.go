@@ -143,7 +143,7 @@ func (r *MonitorActionGroup) emailCostComponent(quantity int64) *schema.CostComp
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(quantity)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(r.Region),
+			Region:        r.normalizedRegion(),
 			Service:       strPtr("Azure Monitor"),
 			ProductFamily: strPtr("Management and Governance"),
 			AttributeFilters: []*schema.AttributeFilter{
@@ -164,7 +164,7 @@ func (r *MonitorActionGroup) ITSMEventCostComponent(quantity int64) *schema.Cost
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(quantity)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(r.Region),
+			Region:        r.normalizedRegion(),
 			Service:       strPtr("Azure Monitor"),
 			ProductFamily: strPtr("Management and Governance"),
 			AttributeFilters: []*schema.AttributeFilter{
@@ -186,7 +186,7 @@ func (r *MonitorActionGroup) pushNotificationCostComponent(quantity int64) *sche
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(quantity)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(r.Region),
+			Region:        r.normalizedRegion(),
 			Service:       strPtr("Azure Monitor"),
 			ProductFamily: strPtr("Management and Governance"),
 			AttributeFilters: []*schema.AttributeFilter{
@@ -208,7 +208,7 @@ func (r *MonitorActionGroup) secureWebHookCostComponent(quantity int64) *schema.
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(quantity)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(r.Region),
+			Region:        r.normalizedRegion(),
 			Service:       strPtr("Azure Monitor"),
 			ProductFamily: strPtr("Management and Governance"),
 			AttributeFilters: []*schema.AttributeFilter{
@@ -230,7 +230,7 @@ func (r *MonitorActionGroup) webHookCostComponent(quantity int64) *schema.CostCo
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(quantity)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(r.Region),
+			Region:        r.normalizedRegion(),
 			Service:       strPtr("Azure Monitor"),
 			ProductFamily: strPtr("Management and Governance"),
 			AttributeFilters: []*schema.AttributeFilter{
@@ -259,7 +259,7 @@ func (r *MonitorActionGroup) smsMessageCostComponent(countryCode int, quantity f
 		MonthlyQuantity: decimalPtr(decimal.NewFromFloat(quantity)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(r.Region),
+			Region:        r.normalizedRegion(),
 			Service:       strPtr("Azure Monitor"),
 			ProductFamily: strPtr("Management and Governance"),
 			AttributeFilters: []*schema.AttributeFilter{
@@ -290,7 +290,7 @@ func (r *MonitorActionGroup) voiceCallsCostComponent(countryCode int, quantity f
 		MonthlyQuantity: decimalPtr(decimal.NewFromFloat(quantity)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(r.Region),
+			Region:        r.normalizedRegion(),
 			Service:       strPtr("Azure Monitor"),
 			ProductFamily: strPtr("Management and Governance"),
 			AttributeFilters: []*schema.AttributeFilter{
@@ -302,4 +302,11 @@ func (r *MonitorActionGroup) voiceCallsCostComponent(countryCode int, quantity f
 			StartUsageAmount: strPtr(startUsageAmount),
 		},
 	}
+}
+
+func (r *MonitorActionGroup) normalizedRegion() *string {
+	if r.Region == "global" {
+		return strPtr("Global")
+	}
+	return strPtr(r.Region)
 }
