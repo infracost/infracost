@@ -129,6 +129,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getSQLElasticPoolRegistryItem(),
 	getMonitorActionGroupRegistryItem(),
 	getMonitorDiagnosticSettingRegistryItem(),
+	getMonitorMetricAlertRegistryItem(),
 	getMonitorScheduledQueryRulesAlertRegistryItem(),
 	getMonitorScheduledQueryRulesAlertV2RegistryItem(),
 }
@@ -489,6 +490,9 @@ var FreeResources = []string{
 
 	// Acure Monitor
 	"azurerm_monitor_aad_diagnostic_setting",
+	"azurerm_monitor_action_rule_action_group",
+	"azurerm_monitor_action_rule_suppression",
+	"azurerm_monitor_activity_log_alert",
 }
 
 var UsageOnlyResources = []string{}
