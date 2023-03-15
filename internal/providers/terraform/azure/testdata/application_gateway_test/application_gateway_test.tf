@@ -182,8 +182,8 @@ resource "azurerm_application_gateway" "waf_with_autoscaling" {
   location            = azurerm_resource_group.example.location
 
   sku {
-    name     = "WAF_Medium"
-    tier     = "WAF"
+    name = "WAF_Medium"
+    tier = "WAF"
   }
 
   gateway_ip_configuration {
@@ -242,8 +242,8 @@ resource "azurerm_application_gateway" "waf_with_autoscaling_without_usage" {
   location            = azurerm_resource_group.example.location
 
   sku {
-    name     = "WAF_Medium"
-    tier     = "WAF"
+    name = "WAF_Medium"
+    tier = "WAF"
   }
 
   gateway_ip_configuration {
@@ -414,8 +414,8 @@ resource "azurerm_application_gateway" "wafv2_with_autoscaling" {
   location            = azurerm_resource_group.example.location
 
   sku {
-    name     = "WAF_v2"
-    tier     = "WAF_v2"
+    name = "WAF_v2"
+    tier = "WAF_v2"
   }
 
   gateway_ip_configuration {
@@ -474,8 +474,8 @@ resource "azurerm_application_gateway" "wafv2_with_autoscaling_without_usage" {
   location            = azurerm_resource_group.example.location
 
   sku {
-    name     = "WAF_v2"
-    tier     = "WAF_v2"
+    name = "WAF_v2"
+    tier = "WAF_v2"
   }
 
   gateway_ip_configuration {
