@@ -377,7 +377,7 @@ func (p *Parser) parseDirectoryFiles(files []file) (Blocks, error) {
 		for _, fileBlock := range fileBlocks {
 			blocks = append(
 				blocks,
-				p.blockBuilder.NewBlock(file.path, fileBlock, nil, nil),
+				p.blockBuilder.NewBlock(file.path, p.initialPath, fileBlock, nil, nil),
 			)
 		}
 	}
