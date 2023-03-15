@@ -11,8 +11,8 @@ import (
 
 func {{.RegistryFuncName}}() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "{{ .FullResourceName }}",
-		RFunc: {{ .RFuncName }},
+		Name:      "{{ .FullResourceName }}",
+		CoreRFunc: {{ .RFuncName }},
 		{{- if (eq .CloudProvider "azure") }}
 		ReferenceAttributes: []string{
 			"resource_group_name",
@@ -21,7 +21,7 @@ func {{.RegistryFuncName}}() *schema.RegistryItem {
 	}
 }
 
-func {{ .RFuncName }}(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func {{ .RFuncName }}(d *schema.ResourceData) schema.CoreResource {
 	{{- if (eq .CloudProvider "azure") }}
 	region := lookupRegion(d, []string{"resource_group_name"})
 	{{- else }}
@@ -41,21 +41,17 @@ func {{ .RFuncName }}(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 		usageType = d.Get("usageType").String()
 	}
 
-	r := &{{ .CloudProvider }}.{{ .ResourceName }}{
+	return &{{ .CloudProvider }}.{{ .ResourceName }}{
 		Address:       d.Address,
 		Region:        region,
 		InstanceCount: count,
 		InstanceType:  instanceType,
 		UsageType:     usageType,
 	}
-
 	{{- else }}
-	r := &{{ .CloudProvider }}.{{ .ResourceName }}{
+	return &{{ .CloudProvider }}.{{ .ResourceName }}{
 		Address: d.Address,
 		Region:  region,
 	}
 	{{- end }}
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
 }
