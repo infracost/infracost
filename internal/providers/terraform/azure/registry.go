@@ -130,6 +130,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getMonitorActionGroupRegistryItem(),
 	getMonitorDiagnosticSettingRegistryItem(),
 	getMonitorScheduledQueryRulesAlertRegistryItem(),
+	getMonitorScheduledQueryRulesAlertV2RegistryItem(),
 }
 
 // FreeResources grouped alphabetically
