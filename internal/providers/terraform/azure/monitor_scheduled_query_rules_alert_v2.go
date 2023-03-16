@@ -25,14 +25,13 @@ func newMonitorScheduledQueryRulesAlertV2(d *schema.ResourceData) schema.CoreRes
 	if err != nil {
 		log.WithFields(log.Fields{
 			"resource": d.Address,
-		}).Warnf("failed to parse IS8061 duration string '%s' using 1 minute frequency", d.Get("evaluation_frequency").String())
+		}).Warnf("failed to parse ISO8061 duration string '%s' using 1 minute frequency", d.Get("evaluation_frequency").String())
 	} else {
 		freq = int64(ef.ToDuration().Minutes())
 	}
 
 	scopeCount := 1 // default scope is the azure subscription, so count == 1
 	if !d.IsEmpty("scopes") {
-
 		scopeCount = len(d.Get("scopes").Array())
 	}
 

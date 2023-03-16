@@ -7,13 +7,15 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// MonitorScheduledQueryRulesAlert struct represents <TODO: cloud service short description>.
+// MonitorScheduledQueryRulesAlert struct represents Azure Monitor Log Alert Rules,
+// aka Scheduled Query Rules.
 //
-// <TODO: Add any important information about the resource and links to the
-// pricing pages or documentation that might be useful to developers in the future, e.g:>
+// Resource information:
 //
-// Resource information: https://azure.microsoft.com/<PATH/TO/RESOURCE>/
-// Pricing information: https://azure.microsoft.com/<PATH/TO/PRICING>/
+//	 https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_scheduled_query_rules_alert_v2
+//		https://registry.terraform.io/providers/hashicorp/azurerm/latest/docs/resources/monitor_scheduled_query_rules_alert
+//
+// Pricing information: https://azure.microsoft.com/en-in/pricing/details/monitor/
 type MonitorScheduledQueryRulesAlert struct {
 	Address string
 	Region  string
