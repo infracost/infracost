@@ -129,6 +129,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getSQLElasticPoolRegistryItem(),
 	getMonitorActionGroupRegistryItem(),
 	getMonitorDiagnosticSettingRegistryItem(),
+	getMonitorScheduledQueryRulesAlertRegistryItem(),
+	getMonitorScheduledQueryRulesAlertV2RegistryItem(),
 }
 
 // FreeResources grouped alphabetically

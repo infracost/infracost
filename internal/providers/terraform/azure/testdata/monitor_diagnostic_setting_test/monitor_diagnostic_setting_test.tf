@@ -12,7 +12,7 @@ data "azurerm_client_config" "current" {}
 
 variable "fake_storage_id" {
   type    = string
-  default = "/subscriptions/12345678-1234-5678-90ab-1234567890ab/resourceGroups/MyRG/providers/Microsoft.Compute/storageAccounts/MyST1"
+  default = "/subscriptions/12345678-1234-5678-90ab-1234567890ab/resourceGroups/MyRG/providers/Microsoft.Storage/storageAccounts/MyST1"
 }
 
 variable "fake_log_analytics_id" {
