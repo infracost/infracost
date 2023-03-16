@@ -128,6 +128,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getMSSQLElasticPoolRegistryItem(),
 	getSQLElasticPoolRegistryItem(),
 	getMonitorActionGroupRegistryItem(),
+	getMonitorDiagnosticSettingRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -483,6 +484,9 @@ var FreeResources = []string{
 	"azurerm_virtual_hub_connection",
 	"azurerm_virtual_wan",
 	"azurerm_vpn_server_configuration",
+
+	// Acure Monitor
+	"azurerm_monitor_aad_diagnostic_setting",
 }
 
 var UsageOnlyResources = []string{}

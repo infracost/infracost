@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  azurerm_monitor_diagnostic_setting.example_with_usage:
+    monthly_platform_log_gb: 1000

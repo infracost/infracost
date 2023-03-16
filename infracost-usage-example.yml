@@ -1028,6 +1028,9 @@ resource_usage:
       country_code_82: 200
     monthly_web_hooks: 1000
 
+  azurerm_monitor_diagnostic_setting.my_setting:
+    monthly_platform_log_gb: 1000
+
   azurerm_mssql_database.my_database:
     monthly_vcore_hours: 600             # Monthly number of used vCore-hours for serverless compute.
     long_term_retention_storage_gb: 1000 # Number of GBs used by long-term retention backup storage.
