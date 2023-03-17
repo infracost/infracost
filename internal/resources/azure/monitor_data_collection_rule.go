@@ -14,7 +14,7 @@ type MonitorDataCollectionRule struct {
 	Address string
 	Region  string
 
-	MonthlyCustomMetricsIngestGB *int64 `infracost_usage:"monthly_custom_metrics_samples"`
+	MonthlyCustomMetricsSamplesGB *int64 `infracost_usage:"monthly_custom_metrics_samples"`
 }
 
 // CoreType returns the name of this resource type
@@ -40,7 +40,7 @@ func (r *MonitorDataCollectionRule) PopulateUsage(u *schema.UsageData) {
 // See providers folder for more information.
 func (r *MonitorDataCollectionRule) BuildResource() *schema.Resource {
 	costComponents := []*schema.CostComponent{
-		r.metricsIngestionCostComponent(r.MonthlyCustomMetricsIngestGB),
+		r.metricsIngestionCostComponent(r.MonthlyCustomMetricsSamplesGB),
 	}
 
 	return &schema.Resource{
