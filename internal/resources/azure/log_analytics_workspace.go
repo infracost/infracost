@@ -84,28 +84,35 @@ type LogAnalyticsWorkspace struct {
 	MonthlySentinelDataIngestionGB      *float64 `infracost_usage:"monthly_sentinel_data_ingestion_gb"`
 }
 
-// LogAnalyticsWorkspaceUsageSchema defines a list which represents the usage schema of LogAnalyticsWorkspace.
-var LogAnalyticsWorkspaceUsageSchema = []*schema.UsageItem{
-	{
-		Key:          "monthly_log_data_ingestion_gb",
-		DefaultValue: 0,
-		ValueType:    schema.Float64,
-	},
-	{
-		Key:          "monthly_additional_log_data_retention_gb",
-		DefaultValue: 0,
-		ValueType:    schema.Float64,
-	},
-	{
-		Key:          "monthly_log_data_export_gb",
-		DefaultValue: 0,
-		ValueType:    schema.Float64,
-	},
-	{
-		Key:          "monthly_sentinel_data_ingestion_gb",
-		DefaultValue: 0,
-		ValueType:    schema.Float64,
-	},
+// CoreType returns the name of this resource type
+func (r *LogAnalyticsWorkspace) CoreType() string {
+	return "LogAnalyticsWorkspace"
+}
+
+// UsageSchema defines a list which represents the usage schema of LogAnalyticsWorkspace.
+func (r *LogAnalyticsWorkspace) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{
+			Key:          "monthly_log_data_ingestion_gb",
+			DefaultValue: 0,
+			ValueType:    schema.Float64,
+		},
+		{
+			Key:          "monthly_additional_log_data_retention_gb",
+			DefaultValue: 0,
+			ValueType:    schema.Float64,
+		},
+		{
+			Key:          "monthly_log_data_export_gb",
+			DefaultValue: 0,
+			ValueType:    schema.Float64,
+		},
+		{
+			Key:          "monthly_sentinel_data_ingestion_gb",
+			DefaultValue: 0,
+			ValueType:    schema.Float64,
+		},
+	}
 }
 
 // PopulateUsage parses the u schema.UsageData into the LogAnalyticsWorkspace.
@@ -133,7 +140,7 @@ func (r *LogAnalyticsWorkspace) BuildResource() *schema.Resource {
 			Name:        r.Address,
 			IsSkipped:   true,
 			NoPrice:     true,
-			UsageSchema: LogAnalyticsWorkspaceUsageSchema,
+			UsageSchema: r.UsageSchema(),
 		}
 	}
 
@@ -143,7 +150,7 @@ func (r *LogAnalyticsWorkspace) BuildResource() *schema.Resource {
 		return &schema.Resource{
 			Name:        r.Address,
 			IsSkipped:   true,
-			UsageSchema: LogAnalyticsWorkspaceUsageSchema,
+			UsageSchema: r.UsageSchema(),
 		}
 	}
 
@@ -173,7 +180,7 @@ func (r *LogAnalyticsWorkspace) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    LogAnalyticsWorkspaceUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }
