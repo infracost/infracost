@@ -74,14 +74,15 @@ func (r *StorageAccount) PopulateUsage(u *schema.UsageData) {
 }
 
 // BuildResource builds a schema.Resource from valid StorageAccount data.
-// This method is called after the resource is initialised by an IaC provider.
+// This method is called after the resource is initialized by an IaC provider.
 func (r *StorageAccount) BuildResource() *schema.Resource {
-	if !r.isBlockBlobStorage() && !r.isFileStorage() && !r.isStorageV2() {
-		log.Warnf("Skipping resource %s. Infracost only supports StorageV2, BlockBlobStorage and FileStorage account kinds", r.Address)
+	if !r.isBlockBlobStorage() && !r.isFileStorage() && !r.isStorageV2() && !r.isBlobStorage() {
+		log.Warnf("Skipping resource %s. Infracost only supports StorageV2, BlockBlobStorage, BlobStorage, FileStorage account kinds", r.Address)
 		return nil
 	}
 
 	if !r.isReplicationTypeSupported() {
+
 		log.Warnf("Skipping resource %s. %s %s doesn't support %s redundancy", r.Address, r.AccountKind, r.AccountTier, r.AccountReplicationType)
 		return nil
 	}
@@ -141,6 +142,11 @@ func (r *StorageAccount) buildProductFilter(meterName string) *schema.ProductFil
 				"Premium":  "Premium Block Blob",
 			}[r.AccountTier]
 		}
+	case r.isBlobStorage():
+		productName = map[string]string{
+			"Standard": "Blob Storage",
+			"Premium":  "Premium Block Blob",
+		}[r.AccountTier]
 	case r.isFileStorage():
 		productName = map[string]string{
 			"Standard": "Files v2",
@@ -167,6 +173,12 @@ func (r *StorageAccount) buildProductFilter(meterName string) *schema.ProductFil
 // storage capacity in Blob Storage.
 //
 // BlockBlobStorage:
+//
+//	Standard Hot:  cost exists
+//	Standard Cool: cost exists
+//	Premium:       cost exists
+//
+// BlobStorage:
 //
 //	Standard Hot:  cost exists
 //	Standard Cool: cost exists
@@ -245,6 +257,9 @@ func (r *StorageAccount) storageCostComponents() []*schema.CostComponent {
 // Write Operations.
 //
 // BlockBlobStorage: n/a
+//
+// BlobStorage: n/a
+//
 // StorageV2:
 //
 //	Standard Hot:        no cost
@@ -290,6 +305,12 @@ func (r *StorageAccount) iterativeWriteOperationsCostComponents() []*schema.Cost
 // writeOperationsCostComponents returns a cost component for Write Operations.
 //
 // BlockBlobStorage:
+//
+//	Standard Hot:  cost exists
+//	Standard Cool: cost exists
+//	Premium:       cost exists
+//
+// BlobStorage:
 //
 //	Standard Hot:  cost exists
 //	Standard Cool: cost exists
@@ -353,6 +374,12 @@ func (r *StorageAccount) writeOperationsCostComponents() []*schema.CostComponent
 //	Standard Cool: cost exists
 //	Premium:       cost exists
 //
+// BlobStorage:
+//
+//	Standard Hot:  cost exists
+//	Standard Cool: cost exists
+//	Premium:       cost exists
+//
 // StorageV2:
 //
 //	Standard Hot:        cost exists
@@ -408,6 +435,9 @@ func (r *StorageAccount) listAndCreateContainerOperationsCostComponents() []*sch
 // iterativeReadOperationsCostComponents returns a cost component for Iterative Read Operations.
 //
 // BlockBlobStorage: n/a
+//
+// BlobStorage: n/a
+//
 // StorageV2:
 //
 //	Standard Hot:        no cost
@@ -515,6 +545,12 @@ func (r *StorageAccount) readOperationsCostComponents() []*schema.CostComponent 
 //	Standard Cool: cost exists
 //	Premium:       cost exists
 //
+// BlobStorage:
+//
+//	Standard Hot:  cost exists
+//	Standard Cool: cost exists
+//	Premium:       cost exists
+//
 // StorageV2:
 //
 //	Standard Hot:        cost exists
@@ -565,6 +601,12 @@ func (r *StorageAccount) otherOperationsCostComponents() []*schema.CostComponent
 // amount.
 //
 // BlockBlobStorage:
+//
+//	Standard Hot:  no cost
+//	Standard Cool: cost exists
+//	Premium:       no cost
+//
+// BlobStorage:
 //
 //	Standard Hot:  no cost
 //	Standard Cool: cost exists
@@ -622,6 +664,12 @@ func (r *StorageAccount) dataRetrievalCostComponents() []*schema.CostComponent {
 //	Standard Cool: cost exists
 //	Premium:       no cost
 //
+// BlobStorage:
+//
+//	Standard Hot:  no cost
+//	Standard Cool: cost exists
+//	Premium:       no cost
+//
 // StorageV2:
 //
 //	Standard Hot:        no cost
@@ -639,7 +687,7 @@ func (r *StorageAccount) dataRetrievalCostComponents() []*schema.CostComponent {
 func (r *StorageAccount) dataWriteCostComponents() []*schema.CostComponent {
 	costComponents := []*schema.CostComponent{}
 
-	if !r.isBlockBlobStorage() || !r.isCool() {
+	if !(r.isBlockBlobStorage() && !r.isBlobStorage()) || !r.isCool() {
 		return costComponents
 	}
 
@@ -675,6 +723,12 @@ func (r *StorageAccount) dataWriteCostComponents() []*schema.CostComponent {
 //	Standard Cool: cost exists
 //	Premium:       no cost
 //
+// BlobStorage:
+//
+//	Standard Hot:  cost exists
+//	Standard Cool: cost exists
+//	Premium:       no cost
+//
 // StorageV2:
 //
 //	Standard Hot:        cost exists
@@ -693,8 +747,9 @@ func (r *StorageAccount) blobIndexTagsCostComponents() []*schema.CostComponent {
 	costComponents := []*schema.CostComponent{}
 
 	isBlockPremium := r.isBlockBlobStorage() && r.isPremium()
+	isBlobPremium := r.isBlobStorage() && r.isPremium()
 	isV2NFSv3 := r.isStorageV2() && (r.NFSv3 || r.isPremium())
-	if r.isFileStorage() || isBlockPremium || isV2NFSv3 {
+	if r.isFileStorage() || isBlockPremium || isBlobPremium || isV2NFSv3 {
 		return costComponents
 	}
 
@@ -727,7 +782,11 @@ func (r *StorageAccount) blobIndexTagsCostComponents() []*schema.CostComponent {
 // File Storage.
 //
 // BlockBlobStorage: n/a
+//
+// BlobStorage: n/a
+//
 // StorageV2: n/a
+//
 // FileStorage:
 //
 //	Standard Hot:  cost exists
@@ -769,7 +828,11 @@ func (r *StorageAccount) dataAtRestCostComponents() []*schema.CostComponent {
 // File Storage.
 //
 // BlockBlobStorage: n/a
+//
+// BlobStorage: n/a
+//
 // StorageV2: n/a
+//
 // FileStorage:
 //
 //	Standard Hot:  cost exists
@@ -811,7 +874,11 @@ func (r *StorageAccount) snapshotsCostComponents() []*schema.CostComponent {
 // File Storage.
 //
 // BlockBlobStorage: n/a
+//
+// BlobStorage: n/a
+//
 // StorageV2: n/a
+//
 // FileStorage:
 //
 //	Standard Hot:  cost exists
@@ -850,6 +917,9 @@ func (r *StorageAccount) metadataAtRestCostComponents() []*schema.CostComponent 
 // File Storage.
 //
 // BlockBlobStorage: n/a
+//
+// BlobStorage: n/a
+//
 // StorageV2:
 //
 //	Standard Hot:        no cost
@@ -867,7 +937,7 @@ func (r *StorageAccount) metadataAtRestCostComponents() []*schema.CostComponent 
 func (r *StorageAccount) earlyDeletionCostComponents() []*schema.CostComponent {
 	costComponents := []*schema.CostComponent{}
 
-	if r.isBlockBlobStorage() || !r.isCool() {
+	if r.isBlockBlobStorage() || r.isBlobStorage() || !r.isCool() {
 		return costComponents
 	}
 
@@ -920,6 +990,10 @@ func (r *StorageAccount) isFileStorage() bool {
 	return strings.EqualFold(r.AccountKind, "filestorage")
 }
 
+func (r *StorageAccount) isBlobStorage() bool {
+	return strings.EqualFold(r.AccountKind, "blobstorage")
+}
+
 func (r *StorageAccount) isStorageV2() bool {
 	return strings.EqualFold(r.AccountKind, "storagev2")
 }
@@ -943,7 +1017,9 @@ func (r *StorageAccount) isReplicationTypeSupported() bool {
 	case r.isPremium():
 		validReplicationTypes = []string{"LRS", "ZRS"}
 	case r.isBlockBlobStorage():
-		validReplicationTypes = []string{"LRS", "GRS", "RA-GRS", "ZRS"}
+		validReplicationTypes = []string{"LRS", "GRS", "RA-GRS"}
+	case r.isBlobStorage():
+		validReplicationTypes = []string{"LRS", "GRS"}
 	case r.isFileStorage():
 		validReplicationTypes = []string{"LRS", "GRS", "ZRS"}
 	}
