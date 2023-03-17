@@ -37,7 +37,7 @@ locals {
 
   permutations = distinct(flatten([
     for os_type in local.os_types : [
-      for sku in local.skus :{
+      for sku in local.skus : {
         sku     = sku
         os_type = os_type
       }
@@ -49,8 +49,8 @@ locals {
   legacy_permutations = distinct(flatten([
     for tier in local.tiers : [
       for kind in local.kinds : [
-        for sku in local.skus :{
-          sku     = sku
+        for sku in local.skus : {
+          sku  = sku
           tier = tier
           kind = kind
         }
@@ -60,7 +60,7 @@ locals {
 }
 
 resource "azurerm_service_plan" "plan" {
-  for_each = {for entry in local.permutations : "${entry.os_type}.${entry.sku}" => entry}
+  for_each = { for entry in local.permutations : "${entry.os_type}.${entry.sku}" => entry }
 
   name                = "plan-${each.value.os_type}-${each.value.sku}"
   location            = azurerm_resource_group.example1.location
@@ -70,7 +70,7 @@ resource "azurerm_service_plan" "plan" {
 }
 
 resource "azurerm_app_service_plan" "legacy_plan" {
-  for_each = {for entry in local.legacy_permutations : "${entry.tier}.${entry.sku}.${entry.kind}" => entry}
+  for_each = { for entry in local.legacy_permutations : "${entry.tier}.${entry.sku}.${entry.kind}" => entry }
 
   name                = "legacy-plan-${each.value.tier}-${each.value.sku}-${each.value.kind}"
   location            = azurerm_resource_group.example1.location
@@ -87,7 +87,7 @@ resource "azurerm_app_service_plan" "legacy_plan" {
 
 
 resource "azurerm_windows_function_app" "function" {
-  for_each = {for entry in azurerm_service_plan.plan : "${entry.name}" => entry}
+  for_each = { for entry in azurerm_service_plan.plan : "${entry.name}" => entry }
 
   name                       = each.value.name
   location                   = azurerm_resource_group.example1.location
@@ -100,7 +100,7 @@ resource "azurerm_windows_function_app" "function" {
 }
 
 resource "azurerm_windows_function_app" "function_with_usage" {
-  for_each = {for entry in azurerm_service_plan.plan : "${entry.name}" => entry}
+  for_each = { for entry in azurerm_service_plan.plan : "${entry.name}" => entry }
 
   name                       = each.value.name
   location                   = azurerm_resource_group.example1.location
@@ -113,7 +113,7 @@ resource "azurerm_windows_function_app" "function_with_usage" {
 }
 
 resource "azurerm_windows_function_app" "legacy_service_plan_function" {
-  for_each = {for entry in azurerm_app_service_plan.legacy_plan : "${entry.name}" => entry}
+  for_each = { for entry in azurerm_app_service_plan.legacy_plan : "${entry.name}" => entry }
 
   name                       = each.value.name
   location                   = azurerm_resource_group.example1.location
@@ -126,7 +126,7 @@ resource "azurerm_windows_function_app" "legacy_service_plan_function" {
 }
 
 resource "azurerm_windows_function_app" "legacy_service_plan_function_with_usage" {
-  for_each = {for entry in azurerm_app_service_plan.legacy_plan : "${entry.name}" => entry}
+  for_each = { for entry in azurerm_app_service_plan.legacy_plan : "${entry.name}" => entry }
 
   name                       = each.value.name
   location                   = azurerm_resource_group.example1.location

@@ -128,6 +128,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getMSSQLElasticPoolRegistryItem(),
 	getSQLElasticPoolRegistryItem(),
 	getMonitorActionGroupRegistryItem(),
+	getMonitorDataCollectionRuleRegistryItem(),
 	getMonitorDiagnosticSettingRegistryItem(),
 	getMonitorMetricAlertRegistryItem(),
 	getMonitorScheduledQueryRulesAlertRegistryItem(),

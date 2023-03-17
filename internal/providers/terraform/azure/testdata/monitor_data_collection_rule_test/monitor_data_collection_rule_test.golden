@@ -1,0 +1,15 @@
+
+ Name                                                                Monthly Qty  Unit                  Monthly Cost 
+                                                                                                                     
+ azurerm_monitor_data_collection_rule.example["with_usage"]                                                          
+ └─ Metrics ingestion                                                      10.56  10M samples                  $1.69 
+                                                                                                                     
+ azurerm_monitor_data_collection_rule.example["without_usage"]                                                       
+ └─ Metrics ingestion                                           Monthly cost depends on usage: $0.16 per 10M samples 
+                                                                                                                     
+ OVERALL TOTAL                                                                                                 $1.69 
+──────────────────────────────────
+3 cloud resources were detected:
+∙ 2 were estimated
+∙ 1 was free:
+  ∙ 1 x azurerm_resource_group

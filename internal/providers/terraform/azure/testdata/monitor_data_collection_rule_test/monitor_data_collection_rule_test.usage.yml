@@ -1,0 +1,5 @@
+version: 0.1
+resource_usage:
+  azurerm_monitor_data_collection_rule.example["with_usage"]:
+    monthly_custom_metrics_samples: 105600000
+
