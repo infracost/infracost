@@ -5,10 +5,7 @@ import (
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
-	log "github.com/sirupsen/logrus"
-	"regexp"
 	"sort"
-	"strconv"
 )
 
 // MonitorActionGroup struct represents an Azure Monitor Action Group.
@@ -19,13 +16,15 @@ type MonitorActionGroup struct {
 	Address string
 	Region  string
 
-	MonthlyEmails            *int64             `infracost_usage:"monthly_emails"`
-	MonthlyITSMEvents        *int64             `infracost_usage:"monthly_itsm_events"`
-	MonthlyPushNotifications *int64             `infracost_usage:"monthly_push_notifications"`
-	MonthlySecureWebHooks    *int64             `infracost_usage:"monthly_secure_web_hooks"`
-	MonthlySMSMessages       map[string]float64 `infracost_usage:"monthly_sms_messages"`
-	MonthlyVoiceCalls        map[string]float64 `infracost_usage:"monthly_voice_calls"`
-	MonthlyWebHooks          *int64             `infracost_usage:"monthly_web_hooks"`
+	EmailReceivers                  int
+	ITSMEventReceivers              int
+	PushNotificationReceivers       int
+	SecureWebHookReceivers          int
+	WebHookReceivers                int
+	SMSReceiversByCountryCode       map[int]int
+	VoiceCallReceiversByCountryCode map[int]int
+
+	MonthlyNotifications *int64 `infracost_usage:"monthly_notifications"`
 }
 
 func (r *MonitorActionGroup) CoreType() string {
@@ -34,21 +33,7 @@ func (r *MonitorActionGroup) CoreType() string {
 
 func (r *MonitorActionGroup) UsageSchema() []*schema.UsageItem {
 	return []*schema.UsageItem{
-		{Key: "monthly_emails", ValueType: schema.Int64, DefaultValue: 0},
-		{Key: "monthly_itsm_events", ValueType: schema.Int64, DefaultValue: 0},
-		{Key: "monthly_push_notifications", ValueType: schema.Int64, DefaultValue: 0},
-		{Key: "monthly_secure_web_hooks", ValueType: schema.Int64, DefaultValue: 0},
-		{
-			Key:          "monthly_sms_messages",
-			ValueType:    schema.KeyValueMap,
-			DefaultValue: map[string]float64{"country_code_1": 0},
-		},
-		{
-			Key:          "monthly_voice_calls",
-			ValueType:    schema.KeyValueMap,
-			DefaultValue: map[string]float64{"country_code_1": 0},
-		},
-		{Key: "monthly_web_hooks", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_notifications", ValueType: schema.Int64, DefaultValue: 0},
 	}
 }
 
@@ -65,27 +50,26 @@ func (r *MonitorActionGroup) BuildResource() *schema.Resource {
 	subResources := []*schema.Resource{}
 	costComponents := []*schema.CostComponent{}
 
-	if r.MonthlyEmails != nil {
-		costComponents = append(costComponents, r.emailCostComponent(*r.MonthlyEmails))
+	if r.EmailReceivers > 0 {
+		costComponents = append(costComponents, r.emailCostComponent(r.EmailReceivers, r.MonthlyNotifications))
 	}
-	if r.MonthlyITSMEvents != nil {
-		costComponents = append(costComponents, r.ITSMEventCostComponent(*r.MonthlyITSMEvents))
+	if r.ITSMEventReceivers > 0 {
+		costComponents = append(costComponents, r.ITSMEventCostComponent(r.ITSMEventReceivers, r.MonthlyNotifications))
 	}
-	if r.MonthlyPushNotifications != nil {
-		costComponents = append(costComponents, r.pushNotificationCostComponent(*r.MonthlyPushNotifications))
+	if r.PushNotificationReceivers > 0 {
+		costComponents = append(costComponents, r.pushNotificationCostComponent(r.PushNotificationReceivers, r.MonthlyNotifications))
 	}
-	if r.MonthlySecureWebHooks != nil {
-		costComponents = append(costComponents, r.secureWebHookCostComponent(*r.MonthlySecureWebHooks))
+	if r.SecureWebHookReceivers > 0 {
+		costComponents = append(costComponents, r.secureWebHookCostComponent(r.SecureWebHookReceivers, r.MonthlyNotifications))
 	}
-	if r.MonthlyWebHooks != nil {
-		costComponents = append(costComponents, r.webHookCostComponent(*r.MonthlyWebHooks))
+	if r.WebHookReceivers > 0 {
+		costComponents = append(costComponents, r.webHookCostComponent(r.WebHookReceivers, r.MonthlyNotifications))
 	}
 
 	// SMS messages
 	smsCostComponents := []*schema.CostComponent{}
-	smsCountryCodes, smsCallUsage := r.mapCountryCodesToQuantity(r.MonthlySMSMessages)
-	for _, countryCode := range smsCountryCodes {
-		smsCostComponents = append(smsCostComponents, r.smsMessageCostComponent(countryCode, smsCallUsage[countryCode]))
+	for _, countryCode := range r.getSortedKeys(r.SMSReceiversByCountryCode) {
+		smsCostComponents = append(smsCostComponents, r.smsMessageCostComponent(countryCode, r.SMSReceiversByCountryCode[countryCode], r.MonthlyNotifications))
 	}
 	if len(smsCostComponents) > 0 {
 		subResources = append(subResources, &schema.Resource{
@@ -96,9 +80,8 @@ func (r *MonitorActionGroup) BuildResource() *schema.Resource {
 
 	// Voice calls
 	voiceCallCostComponents := []*schema.CostComponent{}
-	voiceCallCountryCodes, voiceCallUsage := r.mapCountryCodesToQuantity(r.MonthlyVoiceCalls)
-	for _, countryCode := range voiceCallCountryCodes {
-		voiceCallCostComponents = append(voiceCallCostComponents, r.voiceCallsCostComponent(countryCode, voiceCallUsage[countryCode]))
+	for _, countryCode := range r.getSortedKeys(r.VoiceCallReceiversByCountryCode) {
+		voiceCallCostComponents = append(voiceCallCostComponents, r.voiceCallsCostComponent(countryCode, r.VoiceCallReceiversByCountryCode[countryCode], r.MonthlyNotifications))
 	}
 	if len(voiceCallCostComponents) > 0 {
 		subResources = append(subResources, &schema.Resource{
@@ -114,33 +97,12 @@ func (r *MonitorActionGroup) BuildResource() *schema.Resource {
 	}
 }
 
-var countryCodeRegex = regexp.MustCompile(`^country_code_(\d+)$`)
-
-func (r *MonitorActionGroup) mapCountryCodesToQuantity(usageMap map[string]float64) ([]int, map[int]float64) {
-	countryCodes := make([]int, 0, len(usageMap))
-	countryCodeToQuantity := make(map[int]float64, len(usageMap))
-
-	for k, v := range usageMap {
-		if match := countryCodeRegex.FindStringSubmatch(k); match != nil {
-			code, _ := strconv.Atoi(match[1])
-			countryCodes = append(countryCodes, code)
-			countryCodeToQuantity[code] = v
-		} else {
-			log.Warnf("Unrecognized country code key %s, must match country_code_(\\d+)", k)
-		}
-	}
-
-	sort.Ints(countryCodes)
-
-	return countryCodes, countryCodeToQuantity
-}
-
-func (r *MonitorActionGroup) emailCostComponent(quantity int64) *schema.CostComponent {
+func (r *MonitorActionGroup) emailCostComponent(count int, quantity *int64) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:            "Email notifications",
+		Name:            fmt.Sprintf("Email notifications (%d)", count),
 		Unit:            "emails",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(quantity)),
+		MonthlyQuantity: r.monthlyQuantity(count, quantity),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        r.normalizedRegion(),
@@ -156,12 +118,12 @@ func (r *MonitorActionGroup) emailCostComponent(quantity int64) *schema.CostComp
 	}
 }
 
-func (r *MonitorActionGroup) ITSMEventCostComponent(quantity int64) *schema.CostComponent {
+func (r *MonitorActionGroup) ITSMEventCostComponent(count int, quantity *int64) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:            "ITSM connector events",
+		Name:            fmt.Sprintf("ITSM connectors (%d)", count),
 		Unit:            "events",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(quantity)),
+		MonthlyQuantity: r.monthlyQuantity(count, quantity),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        r.normalizedRegion(),
@@ -178,12 +140,12 @@ func (r *MonitorActionGroup) ITSMEventCostComponent(quantity int64) *schema.Cost
 	}
 }
 
-func (r *MonitorActionGroup) pushNotificationCostComponent(quantity int64) *schema.CostComponent {
+func (r *MonitorActionGroup) pushNotificationCostComponent(count int, quantity *int64) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:            "Push notifications",
+		Name:            fmt.Sprintf("Push notifications (%d)", count),
 		Unit:            "notifications",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(quantity)),
+		MonthlyQuantity: r.monthlyQuantity(count, quantity),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        r.normalizedRegion(),
@@ -200,12 +162,12 @@ func (r *MonitorActionGroup) pushNotificationCostComponent(quantity int64) *sche
 	}
 }
 
-func (r *MonitorActionGroup) secureWebHookCostComponent(quantity int64) *schema.CostComponent {
+func (r *MonitorActionGroup) secureWebHookCostComponent(count int, quantity *int64) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:            "Secure web hook notifications",
+		Name:            fmt.Sprintf("Secure web hooks (%d)", count),
 		Unit:            "notifications",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(quantity)),
+		MonthlyQuantity: r.monthlyQuantity(count, quantity),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        r.normalizedRegion(),
@@ -222,12 +184,12 @@ func (r *MonitorActionGroup) secureWebHookCostComponent(quantity int64) *schema.
 	}
 }
 
-func (r *MonitorActionGroup) webHookCostComponent(quantity int64) *schema.CostComponent {
+func (r *MonitorActionGroup) webHookCostComponent(count int, quantity *int64) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:            "Web hook notifications",
+		Name:            fmt.Sprintf("Web hooks (%d)", count),
 		Unit:            "notifications",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(quantity)),
+		MonthlyQuantity: r.monthlyQuantity(count, quantity),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        r.normalizedRegion(),
@@ -244,7 +206,7 @@ func (r *MonitorActionGroup) webHookCostComponent(quantity int64) *schema.CostCo
 	}
 }
 
-func (r *MonitorActionGroup) smsMessageCostComponent(countryCode int, quantity float64) *schema.CostComponent {
+func (r *MonitorActionGroup) smsMessageCostComponent(countryCode int, count int, quantity *int64) *schema.CostComponent {
 	var startUsageAmount string
 	if countryCode == 1 {
 		startUsageAmount = "100" // the first 10 US calls are free
@@ -253,10 +215,10 @@ func (r *MonitorActionGroup) smsMessageCostComponent(countryCode int, quantity f
 	}
 
 	return &schema.CostComponent{
-		Name:            fmt.Sprintf("Country code %d", countryCode),
+		Name:            fmt.Sprintf("Country code %d (%d)", countryCode, count),
 		Unit:            "messages",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: decimalPtr(decimal.NewFromFloat(quantity)),
+		MonthlyQuantity: r.monthlyQuantity(count, quantity),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        r.normalizedRegion(),
@@ -272,7 +234,7 @@ func (r *MonitorActionGroup) smsMessageCostComponent(countryCode int, quantity f
 	}
 }
 
-func (r *MonitorActionGroup) voiceCallsCostComponent(countryCode int, quantity float64) *schema.CostComponent {
+func (r *MonitorActionGroup) voiceCallsCostComponent(countryCode int, count int, quantity *int64) *schema.CostComponent {
 	var meterName string
 	var startUsageAmount string
 	if countryCode == 1 {
@@ -284,10 +246,10 @@ func (r *MonitorActionGroup) voiceCallsCostComponent(countryCode int, quantity f
 	}
 
 	return &schema.CostComponent{
-		Name:            fmt.Sprintf("Country code %d", countryCode),
+		Name:            fmt.Sprintf("Country code %d (%d)", countryCode, count),
 		Unit:            "calls",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: decimalPtr(decimal.NewFromFloat(quantity)),
+		MonthlyQuantity: r.monthlyQuantity(count, quantity),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        r.normalizedRegion(),
@@ -302,6 +264,25 @@ func (r *MonitorActionGroup) voiceCallsCostComponent(countryCode int, quantity f
 			StartUsageAmount: strPtr(startUsageAmount),
 		},
 	}
+}
+
+func (r *MonitorActionGroup) monthlyQuantity(count int, quantity *int64) *decimal.Decimal {
+	if quantity == nil {
+		return nil
+	}
+
+	return decimalPtr(decimal.NewFromInt(int64(count) * *quantity))
+}
+
+func (r *MonitorActionGroup) getSortedKeys(m map[int]int) []int {
+	keys := make([]int, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+
+	sort.Ints(keys)
+
+	return keys
 }
 
 func (r *MonitorActionGroup) normalizedRegion() *string {
