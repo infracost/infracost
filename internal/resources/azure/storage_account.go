@@ -49,22 +49,28 @@ type StorageAccount struct {
 	EarlyDeletionGB                         *float64 `infracost_usage:"early_deletion_gb"`
 }
 
-// StorageAccountUsageSchema defines a list which represents the usage schema of StorageAccount.
-var StorageAccountUsageSchema = []*schema.UsageItem{
-	{Key: "storage_gb", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "monthly_iterative_read_operations", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_read_operations", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_iterative_write_operations", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_write_operations", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_list_and_create_container_operations", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_other_operations", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_data_retrieval_gb", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "monthly_data_write_gb", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "blob_index_tags", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "data_at_rest_storage_gb", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "snapshots_storage_gb", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "metadata_at_rest_storage_gb", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "early_deletion_gb", DefaultValue: 0, ValueType: schema.Float64},
+// CoreType returns the name of this resource type
+func (r *StorageAccount) CoreType() string {
+	return "StorageAccount"
+}
+
+func (r *StorageAccount) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "storage_gb", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "monthly_iterative_read_operations", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "monthly_read_operations", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "monthly_iterative_write_operations", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "monthly_write_operations", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "monthly_list_and_create_container_operations", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "monthly_other_operations", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "monthly_data_retrieval_gb", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "monthly_data_write_gb", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "blob_index_tags", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "data_at_rest_storage_gb", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "snapshots_storage_gb", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "metadata_at_rest_storage_gb", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "early_deletion_gb", DefaultValue: 0, ValueType: schema.Float64},
+	}
 }
 
 // PopulateUsage parses the u schema.UsageData into the StorageAccount.
@@ -115,7 +121,7 @@ func (r *StorageAccount) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    StorageAccountUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }
