@@ -1018,6 +1018,9 @@ resource_usage:
   azurerm_monitor_action_group.my_group:
     monthly_notifications: 1000
 
+  azure_monitor_data_collection_rule.my_rule:
+    monthly_custom_metrics_samples: 100000000
+
   azurerm_monitor_diagnostic_setting.my_setting:
     monthly_platform_log_gb: 1000
 
