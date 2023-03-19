@@ -20,6 +20,11 @@ const (
 	skuPerGB2018           = "PerGB2018"
 	skuFree                = "Free"
 	skuFilterPAYG          = "Pay-as-you-go"
+	skuBasicLogsIngest     = "Basic Logs"
+	skuBasicLogsSearch     = "Search Queries"
+	skuArchive             = "Data Archive"
+	skuArchiveRestore      = "Data Restore"
+	skuArchiveSearch       = "Search Jobs"
 
 	logRetentionFreeTierLimit = 30
 )
@@ -78,6 +83,11 @@ type LogAnalyticsWorkspace struct {
 	RetentionInDays               int64
 	SentinelEnabled               bool
 
+	MonthlyArchivedDataGB               *float64 `infracost_usage:"monthly_archive_data_gb"`
+	MonthlyArchivedDataRestoredGB       *float64 `infracost_usage:"monthly_archive_data_restored_gb"`
+	MonthlyArchivedDataSearchedGB       *float64 `infracost_usage:"monthly_archive_data_searched_gb"`
+	MonthlyBasicLogDataIngestionGB      *float64 `infracost_usage:"monthly_basic_log_data_ingestion_gb"`
+	MonthlyBasicLogSearchGB             *float64 `infracost_usage:"monthly_basic_log_search_gb"`
 	MonthlyLogDataIngestionGB           *float64 `infracost_usage:"monthly_log_data_ingestion_gb"`
 	MonthlyAdditionalLogDataRetentionGB *float64 `infracost_usage:"monthly_additional_log_data_retention_gb"`
 	MonthlyLogDataExportGB              *float64 `infracost_usage:"monthly_log_data_export_gb"`
@@ -92,6 +102,31 @@ func (r *LogAnalyticsWorkspace) CoreType() string {
 // UsageSchema defines a list which represents the usage schema of LogAnalyticsWorkspace.
 func (r *LogAnalyticsWorkspace) UsageSchema() []*schema.UsageItem {
 	return []*schema.UsageItem{
+		{
+			Key:          "monthly_archived_data_gb",
+			DefaultValue: 0,
+			ValueType:    schema.Float64,
+		},
+		{
+			Key:          "monthly_archived_data_restored_gb",
+			DefaultValue: 0,
+			ValueType:    schema.Float64,
+		},
+		{
+			Key:          "monthly_archived_data_searched_gb",
+			DefaultValue: 0,
+			ValueType:    schema.Float64,
+		},
+		{
+			Key:          "monthly_basic_log_data_ingestion_gb",
+			DefaultValue: 0,
+			ValueType:    schema.Float64,
+		},
+		{
+			Key:          "monthly_basic_log_search_gb",
+			DefaultValue: 0,
+			ValueType:    schema.Float64,
+		},
 		{
 			Key:          "monthly_log_data_ingestion_gb",
 			DefaultValue: 0,
@@ -122,7 +157,7 @@ func (r *LogAnalyticsWorkspace) PopulateUsage(u *schema.UsageData) {
 }
 
 // BuildResource builds a schema.Resource from a valid LogAnalyticsWorkspace struct.
-// The returned schema.Resource can have 4 potential schema.CostComponent associated with it:
+// The returned schema.Resource can have 9 potential schema.CostComponent associated with it:
 //
 //  1. Log data ingestion, which can be either:
 //     a) Pay-as-you-go, which is only valid for a sku of PerGB2018 and uses a usage param
@@ -131,6 +166,13 @@ func (r *LogAnalyticsWorkspace) PopulateUsage(u *schema.UsageData) {
 //     will be charged for each GB of data retained for a month (pro-rated daily).
 //  3. Data export, which is billed per monthly GB exported and is defined from a usage param.
 //  4. Sentinel data ingestion if Sentinel usage is detected.
+//  5. Basic log data ingestion, which is a less expensive of tier for "ingesting and storing
+//     high-volume verbose logs in your Log Analytics workspace for debugging, troubleshooting,
+//     and auditing, but not for analytics and alerts."
+//  6. Basic log search, which is billed per monthly GB of basic log data queried.
+//  7. Archive data, which is billed per monthly GB of archived data
+//  8. Archive restore, which is billed per monthly GB of archived data restored
+//  9. Archive search, which is billed per monthly GB of archived data searched
 //
 // Outside the above rules - if the workspace has sku of Free we return as a free resource & if the workspace sku
 // is in a list of unsupported skus then we mark as skipped with a warning.
@@ -177,6 +219,11 @@ func (r *LogAnalyticsWorkspace) BuildResource() *schema.Resource {
 	}
 
 	costComponents = append(costComponents, r.logDataExport())
+	costComponents = append(costComponents, r.basicLogIngestion())
+	costComponents = append(costComponents, r.basicLogSearch())
+	costComponents = append(costComponents, r.archiveData())
+	costComponents = append(costComponents, r.archiveDataRestore())
+	costComponents = append(costComponents, r.archiveDataSearch())
 
 	return &schema.Resource{
 		Name:           r.Address,
@@ -301,5 +348,125 @@ func (r *LogAnalyticsWorkspace) logDataExport() *schema.CostComponent {
 			},
 		},
 		PriceFilter: priceFilterConsumption,
+	}
+}
+
+func (r *LogAnalyticsWorkspace) basicLogIngestion() *schema.CostComponent {
+	var quantity *decimal.Decimal
+	if r.MonthlyBasicLogDataIngestionGB != nil {
+		quantity = decimalPtr(decimal.NewFromFloat(*r.MonthlyBasicLogDataIngestionGB))
+	}
+
+	return &schema.CostComponent{
+		Name:            "Basic log data ingestion",
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: quantity,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr(vendorName),
+			Region:        strPtr(r.Region),
+			Service:       strPtr(azureMonitorServiceName),
+			ProductFamily: strPtr(governanceProductFamily),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "skuName", Value: strPtr(skuBasicLogsIngest)},
+				{Key: "meterName", Value: strPtr("Basic Logs Data Ingestion")},
+			},
+		},
+	}
+}
+
+func (r *LogAnalyticsWorkspace) basicLogSearch() *schema.CostComponent {
+	var quantity *decimal.Decimal
+	if r.MonthlyBasicLogSearchGB != nil {
+		quantity = decimalPtr(decimal.NewFromFloat(*r.MonthlyBasicLogSearchGB))
+	}
+
+	return &schema.CostComponent{
+		Name:            "Basic log search queries",
+		Unit:            "GB searched",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: quantity,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr(vendorName),
+			Region:        strPtr(r.Region),
+			Service:       strPtr(azureMonitorServiceName),
+			ProductFamily: strPtr(governanceProductFamily),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "skuName", Value: strPtr(skuBasicLogsSearch)},
+				{Key: "meterName", Value: strPtr("Search Queries Scanned")},
+			},
+		},
+	}
+}
+
+func (r *LogAnalyticsWorkspace) archiveData() *schema.CostComponent {
+	var quantity *decimal.Decimal
+	if r.MonthlyArchivedDataGB != nil {
+		quantity = decimalPtr(decimal.NewFromFloat(*r.MonthlyArchivedDataGB))
+	}
+
+	return &schema.CostComponent{
+		Name:            "Archive data",
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: quantity,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr(vendorName),
+			Region:        strPtr(r.Region),
+			Service:       strPtr(azureMonitorServiceName),
+			ProductFamily: strPtr(governanceProductFamily),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "skuName", Value: strPtr(skuArchive)},
+				{Key: "meterName", Value: strPtr("Data Archive")},
+			},
+		},
+	}
+}
+
+func (r *LogAnalyticsWorkspace) archiveDataRestore() *schema.CostComponent {
+	var quantity *decimal.Decimal
+	if r.MonthlyArchivedDataRestoredGB != nil {
+		quantity = decimalPtr(decimal.NewFromFloat(*r.MonthlyArchivedDataRestoredGB))
+	}
+
+	return &schema.CostComponent{
+		Name:            "Archive data restored",
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: quantity,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr(vendorName),
+			Region:        strPtr(r.Region),
+			Service:       strPtr(azureMonitorServiceName),
+			ProductFamily: strPtr(governanceProductFamily),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "skuName", Value: strPtr(skuArchiveRestore)},
+				{Key: "meterName", Value: strPtr("Data Restore")},
+			},
+		},
+	}
+}
+
+func (r *LogAnalyticsWorkspace) archiveDataSearch() *schema.CostComponent {
+	var quantity *decimal.Decimal
+	if r.MonthlyArchivedDataSearchedGB != nil {
+		quantity = decimalPtr(decimal.NewFromFloat(*r.MonthlyArchivedDataSearchedGB))
+	}
+
+	return &schema.CostComponent{
+		Name:            "Archive data searched",
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: quantity,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr(vendorName),
+			Region:        strPtr(r.Region),
+			Service:       strPtr(azureMonitorServiceName),
+			ProductFamily: strPtr(governanceProductFamily),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "skuName", Value: strPtr(skuArchiveSearch)},
+				{Key: "meterName", Value: strPtr("Search Jobs Scanned")},
+			},
+		},
 	}
 }
