@@ -958,6 +958,11 @@ resource_usage:
     monthly_additional_log_data_retention_gb: 30 # Monthly additional GB of data retained past the free allowance.
     monthly_log_data_export_gb: 40               # Monthly data in GB exported from the workspace.
     monthly_sentinel_data_ingestion_gb: 40       # Monthly data in GB exported from Microsoft Sentinel, this only applies when it is enabled.
+    monthly_basic_log_data_ingestion_gb: 50      # Monthly data ingested by the workspace to basic tables in GB
+    monthly_basic_log_search_gb: 60              # Monthly basic log data queried in GB
+    monthly_archive_data_gb: 70                  # Monthly archived data in GB
+    monthly_archive_data_restored_gb: 80         # Monthly data restored from archive in GB
+    monthly_archive_data_searched_gb: 90         # Monthly data searched in archive with a Search Job, in GB
 
   azurerm_frontdoor_firewall_policy.my_frontdoor_firewall_policy:
     monthly_custom_rule_requests: 11000     # Monthly number of custom rule requests
