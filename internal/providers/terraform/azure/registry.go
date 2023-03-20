@@ -351,16 +351,6 @@ var FreeResources = []string{
 	"azurerm_lb_nat_rule",
 	"azurerm_lb_probe",
 
-	// Azure Log Analytics
-	"azurerm_log_analytics_cluster_customer_managed_key",
-	"azurerm_log_analytics_data_export_rule",
-	"azurerm_log_analytics_datasource_windows_event",
-	"azurerm_log_analytics_datasource_windows_performance_counter",
-	"azurerm_log_analytics_linked_service",
-	"azurerm_log_analytics_linked_storage_account",
-	"azurerm_log_analytics_saved_search",
-	"azurerm_log_analytics_storage_insights",
-
 	// Azure Management
 	"azurerm_management_group",
 	"azurerm_management_group_subscription_association",
@@ -370,6 +360,41 @@ var FreeResources = []string{
 	// Azure Managed Applications
 	"azurerm_managed_application",
 	"azurerm_managed_application_definition",
+
+	// Azure Monitor
+	"azurerm_monitor_aad_diagnostic_setting",
+	"azurerm_monitor_action_rule_action_group",
+	"azurerm_monitor_action_rule_suppression",
+	"azurerm_monitor_activity_log_alert",
+	"azurerm_monitor_alert_processing_rule_action_group",
+	"azurerm_monitor_alert_processing_rule_suppression",
+	"azurerm_monitor_autoscale_setting",
+	"azurerm_monitor_data_collection",
+	"azurerm_monitor_data_collection_rule_association",
+	"azurerm_monitor_log_profile",
+	"azurerm_monitor_private_link_scope",
+	"azurerm_monitor_private_link_scoped_service",
+	"azurerm_monitor_scheduled_query_rules_log",
+	"azurerm_monitor_smart_detector_alert_rule",
+
+	// Azure Monitor - Application Insights
+	"azurerm_application_insights_analytics_item",
+	"azurerm_application_insights_api_key",
+	"azurerm_application_insights_smart_detection_rule",
+	"azurerm_application_insights_workbook",
+	"azurerm_application_insights_workbook_template",
+
+	// Azure Monitor - Log Analytics
+	"azurerm_log_analytics_cluster_customer_managed_key",
+	"azurerm_log_analytics_data_export_rule",
+	"azurerm_log_analytics_datasource_windows_event",
+	"azurerm_log_analytics_datasource_windows_performance_counter",
+	"azurerm_log_analytics_linked_service",
+	"azurerm_log_analytics_linked_storage_account",
+	"azurerm_log_analytics_query_pack",
+	"azurerm_log_analytics_query_pack_query",
+	"azurerm_log_analytics_saved_search",
+	"azurerm_log_analytics_storage_insights",
 
 	// Azure Networking
 	"azurerm_application_security_group",
@@ -489,12 +514,6 @@ var FreeResources = []string{
 	"azurerm_virtual_hub_connection",
 	"azurerm_virtual_wan",
 	"azurerm_vpn_server_configuration",
-
-	// Acure Monitor
-	"azurerm_monitor_aad_diagnostic_setting",
-	"azurerm_monitor_action_rule_action_group",
-	"azurerm_monitor_action_rule_suppression",
-	"azurerm_monitor_activity_log_alert",
 }
 
 var UsageOnlyResources = []string{}
