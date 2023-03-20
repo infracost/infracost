@@ -47,7 +47,7 @@ func (r *ApplicationInsightsStandardWebTest) BuildResource() *schema.Resource {
 
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            fmt.Sprintf("Standard web test (%d second frequency)", r.Frequency),
-			Unit:            "test",
+			Unit:            "tests",
 			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: decimalPtr(decimal.NewFromInt(tests)),
 			ProductFilter: &schema.ProductFilter{
