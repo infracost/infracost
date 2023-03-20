@@ -9,6 +9,8 @@ import (
 	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 )
 
 // StorageAccount represents Azure data storage services.
@@ -160,7 +162,7 @@ func (r *StorageAccount) buildProductFilter(meterName string) *schema.ProductFil
 		}[r.AccountTier]
 	}
 
-	skuName := fmt.Sprintf("%s %s", r.AccessTier, r.AccountReplicationType)
+	skuName := fmt.Sprintf("%s %s", cases.Title(language.English).String(r.AccessTier), strings.ToUpper(r.AccountReplicationType))
 
 	return &schema.ProductFilter{
 		VendorName:    strPtr("azure"),
@@ -1031,7 +1033,7 @@ func (r *StorageAccount) isReplicationTypeSupported() bool {
 	}
 
 	if validReplicationTypes != nil {
-		return contains(validReplicationTypes, r.AccountReplicationType)
+		return contains(validReplicationTypes, strings.ToUpper(r.AccountReplicationType))
 	}
 
 	return true

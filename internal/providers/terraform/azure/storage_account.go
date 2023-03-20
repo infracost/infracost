@@ -11,6 +11,9 @@ func getAzureRMStorageAccountRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:      "azurerm_storage_account",
 		CoreRFunc: newAzureRMStorageAccount,
+		CustomRefIDFunc: func(d *schema.ResourceData) []string {
+			return []string{d.Get("name").String()}
+		},
 	}
 }
 
