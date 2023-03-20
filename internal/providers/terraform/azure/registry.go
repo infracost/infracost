@@ -133,6 +133,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getMonitorMetricAlertRegistryItem(),
 	getMonitorScheduledQueryRulesAlertRegistryItem(),
 	getMonitorScheduledQueryRulesAlertV2RegistryItem(),
+	getApplicationInsightsStandardWebTestRegistryItem(),
 }
 
 // FreeResources grouped alphabetically

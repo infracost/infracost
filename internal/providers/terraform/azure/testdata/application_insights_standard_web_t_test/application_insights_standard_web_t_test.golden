@@ -1,0 +1,24 @@
+
+ Name                                                                        Monthly Qty  Unit            Monthly Cost 
+                                                                                                                       
+ azurerm_application_insights.example                                                                                  
+ └─ Data ingested                                                          Monthly cost depends on usage: $2.30 per GB 
+                                                                                                                       
+ azurerm_application_insights_standard_web_test.example-default-frequency                                              
+ └─ Standard web test (300 second frequency)                                       8,760  test                   $5.65 
+                                                                                                                       
+ azurerm_application_insights_standard_web_test.example["300"]                                                         
+ └─ Standard web test (300 second frequency)                                       8,760  test                   $5.65 
+                                                                                                                       
+ azurerm_application_insights_standard_web_test.example["600"]                                                         
+ └─ Standard web test (600 second frequency)                                       4,380  test                   $2.83 
+                                                                                                                       
+ azurerm_application_insights_standard_web_test.example["900"]                                                         
+ └─ Standard web test (900 second frequency)                                       2,920  test                   $1.88 
+                                                                                                                       
+ OVERALL TOTAL                                                                                                  $16.01 
+──────────────────────────────────
+7 cloud resources were detected:
+∙ 6 were estimated, 1 of which usage-based costs, see https://infracost.io/usage-file
+∙ 1 was free:
+  ∙ 1 x azurerm_resource_group
