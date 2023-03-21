@@ -485,7 +485,7 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 		Address:       block.FullName(),
 		Mode:          "managed",
 		Type:          block.TypeLabel(),
-		Name:          stripCount(block.NameLabel()),
+		Name:          stripCountOrForEach(block.NameLabel()),
 		Index:         block.Index(),
 		SchemaVersion: 0,
 		InfracostMetadata: map[string]interface{}{
@@ -499,7 +499,7 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 		ModuleAddress: newString(block.ModuleAddress()),
 		Mode:          "managed",
 		Type:          block.TypeLabel(),
-		Name:          stripCount(block.NameLabel()),
+		Name:          stripCountOrForEach(block.NameLabel()),
 		Index:         block.Index(),
 		Change: ResourceChange{
 			Actions: []string{"create"},
@@ -530,20 +530,20 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 	var configuration ResourceData
 	if block.HasModuleBlock() {
 		configuration = ResourceData{
-			Address:           stripCount(block.LocalName()),
+			Address:           stripCountOrForEach(block.LocalName()),
 			Mode:              "managed",
 			Type:              block.TypeLabel(),
-			Name:              stripCount(block.NameLabel()),
+			Name:              stripCountOrForEach(block.NameLabel()),
 			ProviderConfigKey: block.ModuleName() + ":" + block.Provider(),
 			Expressions:       blockToReferences(block),
 			CountExpression:   p.countReferences(block),
 		}
 	} else {
 		configuration = ResourceData{
-			Address:           stripCount(block.FullName()),
+			Address:           stripCountOrForEach(block.FullName()),
 			Mode:              "managed",
 			Type:              block.TypeLabel(),
-			Name:              stripCount(block.NameLabel()),
+			Name:              stripCountOrForEach(block.NameLabel()),
 			ProviderConfigKey: providerConfigKey,
 			Expressions:       blockToReferences(block),
 			CountExpression:   p.countReferences(block),
@@ -818,8 +818,8 @@ func newString(s string) *string {
 	return &s
 }
 
-var countRegex = regexp.MustCompile(`\[\d+\]$`)
+var countRegex = regexp.MustCompile(`\[.+\]$`)
 
-func stripCount(s string) string {
+func stripCountOrForEach(s string) string {
 	return countRegex.ReplaceAllString(s, "")
 }
