@@ -156,278 +156,306 @@
  └─ Blob index                                                                       10  10k tags                $0.69 
                                                                                                                        
  azurerm_storage_account.file["FileStorage.Premium.LRS.Cool"]                                                          
- ├─ Data at rest                                                                 40,000  GB                  $7,040.00 
- └─ Snapshots                                                                    40,000  GB                  $6,000.00 
+ ├─ Data at rest                                                                 50,000  GB                  $8,800.00 
+ └─ Snapshots                                                                    50,000  GB                  $7,500.00 
                                                                                                                        
  azurerm_storage_account.file["FileStorage.Premium.LRS.Hot"]                                                           
- ├─ Data at rest                                                                 40,000  GB                  $7,040.00 
- └─ Snapshots                                                                    40,000  GB                  $6,000.00 
+ ├─ Data at rest                                                                 50,000  GB                  $8,800.00 
+ └─ Snapshots                                                                    50,000  GB                  $7,500.00 
                                                                                                                        
  azurerm_storage_account.file["FileStorage.Premium.ZRS.Cool"]                                                          
- ├─ Data at rest                                                                 40,000  GB                  $8,800.00 
- └─ Snapshots                                                                    40,000  GB                  $7,480.00 
+ ├─ Data at rest                                                                 50,000  GB                 $11,000.00 
+ └─ Snapshots                                                                    50,000  GB                  $9,350.00 
                                                                                                                        
  azurerm_storage_account.file["FileStorage.Premium.ZRS.Hot"]                                                           
- ├─ Data at rest                                                                 40,000  GB                  $8,800.00 
- └─ Snapshots                                                                    40,000  GB                  $7,480.00 
+ ├─ Data at rest                                                                 50,000  GB                 $11,000.00 
+ └─ Snapshots                                                                    50,000  GB                  $9,350.00 
                                                                                                                        
  azurerm_storage_account.file["FileStorage.Standard.GRS.Cool"]                                                         
- ├─ Data at rest                                                                 40,000  GB                  $2,004.00 
- ├─ Snapshots                                                                    40,000  GB                  $2,004.00 
- ├─ Metadata at rest                                                             40,000  GB                  $2,620.00 
- ├─ Write operations                                                                400  10k operations        $104.00 
- ├─ List operations                                                                 400  10k operations         $57.20 
- ├─ Read operations                                                                  40  10k operations          $0.52 
- ├─ All other operations                                                            400  10k operations          $2.29 
- ├─ Data retrieval                                                                4,000  GB                     $40.00 
- └─ Early deletion                                                                4,000  GB                    $200.40 
+ ├─ Data at rest                                                                 50,000  GB                  $2,505.00 
+ ├─ Snapshots                                                                    50,000  GB                  $2,505.00 
+ ├─ Metadata at rest                                                             50,000  GB                  $3,275.00 
+ ├─ Write operations                                                                600  10k operations        $156.00 
+ ├─ List operations                                                                 500  10k operations         $71.50 
+ ├─ Read operations                                                                  50  10k operations          $0.65 
+ ├─ All other operations                                                            500  10k operations          $2.86 
+ ├─ Data retrieval                                                                5,000  GB                     $50.00 
+ └─ Early deletion                                                                5,000  GB                    $250.50 
                                                                                                                        
  azurerm_storage_account.file["FileStorage.Standard.GRS.Hot"]                                                          
- ├─ Data at rest                                                                 40,000  GB                  $2,528.00 
- ├─ Snapshots                                                                    40,000  GB                  $2,528.00 
- ├─ Metadata at rest                                                             40,000  GB                  $2,620.00 
- ├─ Write operations                                                                400  10k operations         $57.20 
- ├─ List operations                                                                 400  10k operations         $57.20 
- ├─ Read operations                                                                  40  10k operations          $0.23 
- └─ All other operations                                                            400  10k operations          $2.29 
+ ├─ Data at rest                                                                 50,000  GB                  $3,160.00 
+ ├─ Snapshots                                                                    50,000  GB                  $3,160.00 
+ ├─ Metadata at rest                                                             50,000  GB                  $3,275.00 
+ ├─ Write operations                                                                600  10k operations         $85.80 
+ ├─ List operations                                                                 500  10k operations         $71.50 
+ ├─ Read operations                                                                  50  10k operations          $0.29 
+ └─ All other operations                                                            500  10k operations          $2.86 
                                                                                                                        
  azurerm_storage_account.file["FileStorage.Standard.LRS.Cool"]                                                         
- ├─ Data at rest                                                                 40,000  GB                    $912.00 
- ├─ Snapshots                                                                    40,000  GB                    $912.00 
- ├─ Metadata at rest                                                             40,000  GB                  $1,188.00 
- ├─ Write operations                                                                400  10k operations         $52.00 
- ├─ List operations                                                                 400  10k operations         $28.60 
- ├─ Read operations                                                                  40  10k operations          $0.52 
- ├─ All other operations                                                            400  10k operations          $2.29 
- ├─ Data retrieval                                                                4,000  GB                     $40.00 
- └─ Early deletion                                                                4,000  GB                     $91.20 
+ ├─ Data at rest                                                                 50,000  GB                  $1,140.00 
+ ├─ Snapshots                                                                    50,000  GB                  $1,140.00 
+ ├─ Metadata at rest                                                             50,000  GB                  $1,485.00 
+ ├─ Write operations                                                                600  10k operations         $78.00 
+ ├─ List operations                                                                 500  10k operations         $35.75 
+ ├─ Read operations                                                                  50  10k operations          $0.65 
+ ├─ All other operations                                                            500  10k operations          $2.86 
+ ├─ Data retrieval                                                                5,000  GB                     $50.00 
+ └─ Early deletion                                                                5,000  GB                    $114.00 
                                                                                                                        
  azurerm_storage_account.file["FileStorage.Standard.LRS.Hot"]                                                          
- ├─ Data at rest                                                                 40,000  GB                  $1,148.00 
- ├─ Snapshots                                                                    40,000  GB                  $1,148.00 
- ├─ Metadata at rest                                                             40,000  GB                  $1,188.00 
- ├─ Write operations                                                                400  10k operations         $28.60 
- ├─ List operations                                                                 400  10k operations         $28.60 
- ├─ Read operations                                                                  40  10k operations          $0.23 
- └─ All other operations                                                            400  10k operations          $2.29 
+ ├─ Data at rest                                                                 50,000  GB                  $1,435.00 
+ ├─ Snapshots                                                                    50,000  GB                  $1,435.00 
+ ├─ Metadata at rest                                                             50,000  GB                  $1,485.00 
+ ├─ Write operations                                                                600  10k operations         $42.90 
+ ├─ List operations                                                                 500  10k operations         $35.75 
+ ├─ Read operations                                                                  50  10k operations          $0.29 
+ └─ All other operations                                                            500  10k operations          $2.86 
                                                                                                                        
  azurerm_storage_account.file["FileStorage.Standard.ZRS.Cool"]                                                         
- ├─ Data at rest                                                                 40,000  GB                  $1,140.00 
- ├─ Snapshots                                                                    40,000  GB                  $1,140.00 
- ├─ Metadata at rest                                                             40,000  GB                  $1,484.00 
- ├─ Write operations                                                                400  10k operations         $52.00 
- ├─ List operations                                                                 400  10k operations         $35.76 
- ├─ Read operations                                                                  40  10k operations          $0.52 
- ├─ All other operations                                                            400  10k operations          $2.29 
- ├─ Data retrieval                                                                4,000  GB                     $40.00 
- └─ Early deletion                                                                4,000  GB                    $114.00 
+ ├─ Data at rest                                                                 50,000  GB                  $1,425.00 
+ ├─ Snapshots                                                                    50,000  GB                  $1,425.00 
+ ├─ Metadata at rest                                                             50,000  GB                  $1,855.00 
+ ├─ Write operations                                                                600  10k operations         $78.00 
+ ├─ List operations                                                                 500  10k operations         $44.70 
+ ├─ Read operations                                                                  50  10k operations          $0.65 
+ ├─ All other operations                                                            500  10k operations          $2.86 
+ ├─ Data retrieval                                                                5,000  GB                     $50.00 
+ └─ Early deletion                                                                5,000  GB                    $142.50 
                                                                                                                        
  azurerm_storage_account.file["FileStorage.Standard.ZRS.Hot"]                                                          
- ├─ Data at rest                                                                 40,000  GB                  $1,440.00 
- ├─ Snapshots                                                                    40,000  GB                  $1,440.00 
- ├─ Metadata at rest                                                             40,000  GB                  $1,484.00 
- ├─ Write operations                                                                400  10k operations         $35.76 
- ├─ List operations                                                                 400  10k operations         $35.76 
- ├─ Read operations                                                                  40  10k operations          $0.23 
- └─ All other operations                                                            400  10k operations          $2.29 
+ ├─ Data at rest                                                                 50,000  GB                  $1,800.00 
+ ├─ Snapshots                                                                    50,000  GB                  $1,800.00 
+ ├─ Metadata at rest                                                             50,000  GB                  $1,855.00 
+ ├─ Write operations                                                                600  10k operations         $53.64 
+ ├─ List operations                                                                 500  10k operations         $44.70 
+ ├─ Read operations                                                                  50  10k operations          $0.29 
+ └─ All other operations                                                            500  10k operations          $2.86 
                                                                                                                        
  azurerm_storage_account.nfsv3["BlockBlobStorage.Premium.LRS.Cool"]                                                    
- ├─ Capacity                                                                  5,000,000  GB                $975,000.00 
- ├─ Write operations                                                                500  10k operations         $11.40 
- ├─ List and create container operations                                            500  10k operations         $32.50 
- ├─ Read operations                                                                  50  10k operations          $0.09 
- └─ All other operations                                                            500  10k operations          $0.91 
+ ├─ Capacity                                                                  6,000,000  GB              $1,170,000.00 
+ ├─ Write operations                                                                600  10k operations         $13.68 
+ ├─ List and create container operations                                            600  10k operations         $39.00 
+ ├─ Read operations                                                                  60  10k operations          $0.11 
+ └─ All other operations                                                            600  10k operations          $1.09 
                                                                                                                        
  azurerm_storage_account.nfsv3["BlockBlobStorage.Premium.LRS.Hot"]                                                     
- ├─ Capacity                                                                  5,000,000  GB                $975,000.00 
- ├─ Write operations                                                                500  10k operations         $11.40 
- ├─ List and create container operations                                            500  10k operations         $32.50 
- ├─ Read operations                                                                  50  10k operations          $0.09 
- └─ All other operations                                                            500  10k operations          $0.91 
+ ├─ Capacity                                                                  6,000,000  GB              $1,170,000.00 
+ ├─ Write operations                                                                600  10k operations         $13.68 
+ ├─ List and create container operations                                            600  10k operations         $39.00 
+ ├─ Read operations                                                                  60  10k operations          $0.11 
+ └─ All other operations                                                            600  10k operations          $1.09 
                                                                                                                        
  azurerm_storage_account.nfsv3["BlockBlobStorage.Premium.ZRS.Cool"]                                                    
- ├─ Capacity                                                                  5,000,000  GB              $1,295,000.00 
- ├─ Write operations                                                                500  10k operations         $15.15 
- ├─ List and create container operations                                            500  10k operations         $43.00 
- ├─ Read operations                                                                  50  10k operations          $0.12 
- └─ All other operations                                                            500  10k operations          $1.21 
+ ├─ Capacity                                                                  6,000,000  GB              $1,554,000.00 
+ ├─ Write operations                                                                600  10k operations         $18.18 
+ ├─ List and create container operations                                            600  10k operations         $51.60 
+ ├─ Read operations                                                                  60  10k operations          $0.15 
+ └─ All other operations                                                            600  10k operations          $1.45 
                                                                                                                        
  azurerm_storage_account.nfsv3["BlockBlobStorage.Premium.ZRS.Hot"]                                                     
- ├─ Capacity                                                                  5,000,000  GB              $1,295,000.00 
- ├─ Write operations                                                                500  10k operations         $15.15 
- ├─ List and create container operations                                            500  10k operations         $43.00 
- ├─ Read operations                                                                  50  10k operations          $0.12 
- └─ All other operations                                                            500  10k operations          $1.21 
+ ├─ Capacity                                                                  6,000,000  GB              $1,554,000.00 
+ ├─ Write operations                                                                600  10k operations         $18.18 
+ ├─ List and create container operations                                            600  10k operations         $51.60 
+ ├─ Read operations                                                                  60  10k operations          $0.15 
+ └─ All other operations                                                            600  10k operations          $1.45 
                                                                                                                        
  azurerm_storage_account.nfsv3["StorageV2.Standard.GRS.Cool"]                                                          
- ├─ Capacity                                                                  5,000,000  GB                $115,000.00 
- ├─ Iterative write operations                                                    5,700  100 operations      $1,482.00 
- ├─ Write operations                                                                500  10k operations        $130.00 
- ├─ Iterative read operations                                                        56  10k operations          $8.01 
- ├─ Read operations                                                                  50  10k operations          $0.65 
- ├─ All other operations                                                            500  10k operations          $3.00 
- ├─ Data retrieval                                                                5,000  GB                     $50.00 
- └─ Early deletion                                                                5,000  GB                    $165.00 
+ ├─ Capacity                                                                  6,000,000  GB                $138,000.00 
+ ├─ Iterative write operations                                                    6,700  100 operations      $1,742.00 
+ ├─ Write operations                                                                600  10k operations        $156.00 
+ ├─ Iterative read operations                                                        66  10k operations          $9.44 
+ ├─ Read operations                                                                  60  10k operations          $0.78 
+ ├─ All other operations                                                            600  10k operations          $3.60 
+ ├─ Data retrieval                                                                6,000  GB                     $60.00 
+ └─ Early deletion                                                                6,000  GB                    $198.00 
                                                                                                                        
  azurerm_storage_account.nfsv3["StorageV2.Standard.GRS.Hot"]                                                           
  ├─ Capacity (first 50TB)                                                        51,200  GB                  $2,355.20 
  ├─ Capacity (next 450TB)                                                       512,000  GB                 $22,528.00 
- ├─ Capacity (over 500TB)                                                     4,436,800  GB                $186,789.28 
- ├─ Iterative write operations                                                    5,700  100 operations        $815.10 
- ├─ Write operations                                                                500  10k operations         $71.50 
- ├─ Iterative read operations                                                        56  10k operations          $8.01 
- ├─ Read operations                                                                  50  10k operations          $0.30 
- └─ All other operations                                                            500  10k operations          $3.00 
+ ├─ Capacity (over 500TB)                                                     5,436,800  GB                $228,889.28 
+ ├─ Iterative write operations                                                    6,700  100 operations        $958.10 
+ ├─ Write operations                                                                600  10k operations         $85.80 
+ ├─ Iterative read operations                                                        66  10k operations          $9.44 
+ ├─ Read operations                                                                  60  10k operations          $0.36 
+ └─ All other operations                                                            600  10k operations          $3.60 
                                                                                                                        
  azurerm_storage_account.nfsv3["StorageV2.Standard.LRS.Cool"]                                                          
- ├─ Capacity                                                                  5,000,000  GB                 $57,500.00 
- ├─ Iterative write operations                                                    5,700  100 operations        $741.00 
- ├─ Write operations                                                                500  10k operations         $65.00 
- ├─ Iterative read operations                                                        56  10k operations          $4.03 
- ├─ Read operations                                                                  50  10k operations          $0.65 
- ├─ All other operations                                                            500  10k operations          $3.00 
- ├─ Data retrieval                                                                5,000  GB                     $50.00 
- └─ Early deletion                                                                5,000  GB                     $75.00 
+ ├─ Capacity                                                                  6,000,000  GB                 $69,000.00 
+ ├─ Iterative write operations                                                    6,700  100 operations        $871.00 
+ ├─ Write operations                                                                600  10k operations         $78.00 
+ ├─ Iterative read operations                                                        66  10k operations          $4.75 
+ ├─ Read operations                                                                  60  10k operations          $0.78 
+ ├─ All other operations                                                            600  10k operations          $3.60 
+ ├─ Data retrieval                                                                6,000  GB                     $60.00 
+ └─ Early deletion                                                                6,000  GB                     $90.00 
                                                                                                                        
  azurerm_storage_account.nfsv3["StorageV2.Standard.LRS.Hot"]                                                           
  ├─ Capacity (first 50TB)                                                        51,200  GB                  $1,075.20 
  ├─ Capacity (next 450TB)                                                       512,000  GB                 $10,240.00 
- ├─ Capacity (over 500TB)                                                     4,436,800  GB                 $84,742.88 
- ├─ Iterative write operations                                                    5,700  100 operations        $410.40 
- ├─ Write operations                                                                500  10k operations         $36.00 
- ├─ Iterative read operations                                                        56  10k operations          $4.03 
- ├─ Read operations                                                                  50  10k operations          $0.30 
- └─ All other operations                                                            500  10k operations          $3.00 
+ ├─ Capacity (over 500TB)                                                     5,436,800  GB                $103,842.88 
+ ├─ Iterative write operations                                                    6,700  100 operations        $482.40 
+ ├─ Write operations                                                                600  10k operations         $43.20 
+ ├─ Iterative read operations                                                        66  10k operations          $4.75 
+ ├─ Read operations                                                                  60  10k operations          $0.36 
+ └─ All other operations                                                            600  10k operations          $3.60 
+                                                                                                                       
+ azurerm_storage_account.storagev1["Storage.Standard.GRS"]                                                             
+ ├─ Capacity                                                                  3,000,000  GB                $144,000.00 
+ ├─ Write operations                                                                300  10k operations          $0.11 
+ ├─ List and create container operations                                            300  10k operations          $0.11 
+ ├─ Read operations                                                                  30  10k operations          $0.01 
+ └─ All other operations                                                            300  10k operations          $0.11 
+                                                                                                                       
+ azurerm_storage_account.storagev1["Storage.Standard.LRS"]                                                             
+ ├─ Capacity                                                                  3,000,000  GB                 $72,000.00 
+ ├─ Write operations                                                                300  10k operations          $0.11 
+ ├─ List and create container operations                                            300  10k operations          $0.11 
+ ├─ Read operations                                                                  30  10k operations          $0.01 
+ └─ All other operations                                                            300  10k operations          $0.11 
+                                                                                                                       
+ azurerm_storage_account.storagev1["Storage.Standard.RAGRS"]                                                           
+ ├─ Capacity                                                                  3,000,000  GB                $183,000.00 
+ ├─ Write operations                                                                300  10k operations          $0.11 
+ ├─ List and create container operations                                            300  10k operations          $0.11 
+ ├─ Read operations                                                                  30  10k operations          $0.01 
+ └─ All other operations                                                            300  10k operations          $0.11 
+                                                                                                                       
+ azurerm_storage_account.storagev1["Storage.Standard.ZRS"]                                                             
+ ├─ Capacity                                                                  3,000,000  GB                 $90,000.00 
+ ├─ Write operations                                                                300  10k operations          $0.11 
+ ├─ List and create container operations                                            300  10k operations          $0.11 
+ ├─ Read operations                                                                  30  10k operations          $0.01 
+ └─ All other operations                                                            300  10k operations          $0.11 
                                                                                                                        
  azurerm_storage_account.storagev2["StorageV2.Premium.LRS.Cool"]                                                       
- ├─ Capacity                                                                  3,000,000  GB                $585,000.00 
- ├─ Write operations                                                                300  10k operations          $6.84 
- ├─ List and create container operations                                            300  10k operations         $19.50 
- ├─ Read operations                                                                  30  10k operations          $0.05 
- └─ All other operations                                                            300  10k operations          $0.55 
+ ├─ Capacity                                                                  4,000,000  GB                $780,000.00 
+ ├─ Write operations                                                                400  10k operations          $9.12 
+ ├─ List and create container operations                                            400  10k operations         $26.00 
+ ├─ Read operations                                                                  40  10k operations          $0.07 
+ └─ All other operations                                                            400  10k operations          $0.73 
                                                                                                                        
  azurerm_storage_account.storagev2["StorageV2.Premium.LRS.Hot"]                                                        
- ├─ Capacity                                                                  3,000,000  GB                $585,000.00 
- ├─ Write operations                                                                300  10k operations          $6.84 
- ├─ List and create container operations                                            300  10k operations         $19.50 
- ├─ Read operations                                                                  30  10k operations          $0.05 
- └─ All other operations                                                            300  10k operations          $0.55 
+ ├─ Capacity                                                                  4,000,000  GB                $780,000.00 
+ ├─ Write operations                                                                400  10k operations          $9.12 
+ ├─ List and create container operations                                            400  10k operations         $26.00 
+ ├─ Read operations                                                                  40  10k operations          $0.07 
+ └─ All other operations                                                            400  10k operations          $0.73 
                                                                                                                        
  azurerm_storage_account.storagev2["StorageV2.Premium.ZRS.Cool"]                                                       
- ├─ Capacity                                                                  3,000,000  GB                $777,000.00 
- ├─ Write operations                                                                300  10k operations          $9.09 
- ├─ List and create container operations                                            300  10k operations         $25.80 
- ├─ Read operations                                                                  30  10k operations          $0.07 
- └─ All other operations                                                            300  10k operations          $0.73 
+ ├─ Capacity                                                                  4,000,000  GB              $1,036,000.00 
+ ├─ Write operations                                                                400  10k operations         $12.12 
+ ├─ List and create container operations                                            400  10k operations         $34.40 
+ ├─ Read operations                                                                  40  10k operations          $0.10 
+ └─ All other operations                                                            400  10k operations          $0.97 
                                                                                                                        
  azurerm_storage_account.storagev2["StorageV2.Premium.ZRS.Hot"]                                                        
- ├─ Capacity                                                                  3,000,000  GB                $777,000.00 
- ├─ Write operations                                                                300  10k operations          $9.09 
- ├─ List and create container operations                                            300  10k operations         $25.80 
- ├─ Read operations                                                                  30  10k operations          $0.07 
- └─ All other operations                                                            300  10k operations          $0.73 
+ ├─ Capacity                                                                  4,000,000  GB              $1,036,000.00 
+ ├─ Write operations                                                                400  10k operations         $12.12 
+ ├─ List and create container operations                                            400  10k operations         $34.40 
+ ├─ Read operations                                                                  40  10k operations          $0.10 
+ └─ All other operations                                                            400  10k operations          $0.97 
                                                                                                                        
  azurerm_storage_account.storagev2["StorageV2.Standard.GRS.Cool"]                                                      
- ├─ Capacity                                                                  3,000,000  GB                 $69,000.00 
- ├─ Write operations                                                                300  10k operations         $60.00 
- ├─ List and create container operations                                            300  10k operations         $33.00 
- ├─ Read operations                                                                  30  10k operations          $0.30 
- ├─ All other operations                                                            300  10k operations          $1.32 
- ├─ Data retrieval                                                                3,000  GB                     $30.00 
- ├─ Blob index                                                                       30  10k tags                $2.07 
- └─ Early deletion                                                                3,000  GB                    $100.20 
+ ├─ Capacity                                                                  4,000,000  GB                 $92,000.00 
+ ├─ Write operations                                                                400  10k operations         $80.00 
+ ├─ List and create container operations                                            400  10k operations         $44.00 
+ ├─ Read operations                                                                  40  10k operations          $0.40 
+ ├─ All other operations                                                            400  10k operations          $1.76 
+ ├─ Data retrieval                                                                4,000  GB                     $40.00 
+ ├─ Blob index                                                                       40  10k tags                $2.76 
+ └─ Early deletion                                                                4,000  GB                    $133.60 
                                                                                                                        
  azurerm_storage_account.storagev2["StorageV2.Standard.GRS.Hot"]                                                       
  ├─ Capacity (first 50TB)                                                        51,200  GB                  $2,344.96 
  ├─ Capacity (next 450TB)                                                       512,000  GB                 $22,511.62 
- ├─ Capacity (over 500TB)                                                     2,436,800  GB                $102,677.00 
- ├─ Write operations                                                                300  10k operations         $33.00 
- ├─ List and create container operations                                            300  10k operations         $33.00 
- ├─ Read operations                                                                  30  10k operations          $0.13 
- ├─ All other operations                                                            300  10k operations          $1.32 
- └─ Blob index                                                                       30  10k tags                $2.07 
+ ├─ Capacity (over 500TB)                                                     3,436,800  GB                $144,813.00 
+ ├─ Write operations                                                                400  10k operations         $44.00 
+ ├─ List and create container operations                                            400  10k operations         $44.00 
+ ├─ Read operations                                                                  40  10k operations          $0.18 
+ ├─ All other operations                                                            400  10k operations          $1.76 
+ └─ Blob index                                                                       40  10k tags                $2.76 
                                                                                                                        
  azurerm_storage_account.storagev2["StorageV2.Standard.GZRS.Cool"]                                                     
- ├─ Read operations                                                                  30  10k operations          $0.30 
- ├─ All other operations                                                            300  10k operations          $1.32 
- └─ Data retrieval                                                                3,000  GB                     $30.00 
+ ├─ Read operations                                                                  40  10k operations          $0.40 
+ ├─ All other operations                                                            400  10k operations          $1.76 
+ └─ Data retrieval                                                                4,000  GB                     $40.00 
                                                                                                                        
  azurerm_storage_account.storagev2["StorageV2.Standard.GZRS.Hot"]                                                      
- ├─ Read operations                                                                  30  10k operations          $0.13 
- └─ All other operations                                                            300  10k operations          $1.32 
+ ├─ Read operations                                                                  40  10k operations          $0.18 
+ └─ All other operations                                                            400  10k operations          $1.76 
                                                                                                                        
  azurerm_storage_account.storagev2["StorageV2.Standard.LRS.Cool"]                                                      
- ├─ Capacity                                                                  3,000,000  GB                 $34,500.00 
- ├─ Write operations                                                                300  10k operations         $30.00 
- ├─ List and create container operations                                            300  10k operations         $16.50 
- ├─ Read operations                                                                  30  10k operations          $0.30 
- ├─ All other operations                                                            300  10k operations          $1.32 
- ├─ Data retrieval                                                                3,000  GB                     $30.00 
- ├─ Blob index                                                                       30  10k tags                $1.17 
- └─ Early deletion                                                                3,000  GB                     $45.60 
+ ├─ Capacity                                                                  4,000,000  GB                 $46,000.00 
+ ├─ Write operations                                                                400  10k operations         $40.00 
+ ├─ List and create container operations                                            400  10k operations         $22.00 
+ ├─ Read operations                                                                  40  10k operations          $0.40 
+ ├─ All other operations                                                            400  10k operations          $1.76 
+ ├─ Data retrieval                                                                4,000  GB                     $40.00 
+ ├─ Blob index                                                                       40  10k tags                $1.56 
+ └─ Early deletion                                                                4,000  GB                     $60.80 
                                                                                                                        
  azurerm_storage_account.storagev2["StorageV2.Standard.LRS.Hot"]                                                       
  ├─ Capacity (first 50TB)                                                        51,200  GB                  $1,064.96 
  ├─ Capacity (next 450TB)                                                       512,000  GB                 $10,223.62 
- ├─ Capacity (over 500TB)                                                     2,436,800  GB                 $46,630.60 
- ├─ List and create container operations                                            300  10k operations         $16.50 
- ├─ Read operations                                                                  30  10k operations          $0.13 
- ├─ All other operations                                                            300  10k operations          $1.32 
- └─ Blob index                                                                       30  10k tags                $1.17 
+ ├─ Capacity (over 500TB)                                                     3,436,800  GB                 $65,766.60 
+ ├─ List and create container operations                                            400  10k operations         $22.00 
+ ├─ Read operations                                                                  40  10k operations          $0.18 
+ ├─ All other operations                                                            400  10k operations          $1.76 
+ └─ Blob index                                                                       40  10k tags                $1.56 
                                                                                                                        
  azurerm_storage_account.storagev2["StorageV2.Standard.RAGRS.Cool"]                                                    
- ├─ Capacity                                                                  3,000,000  GB                 $86,400.00 
- ├─ Write operations                                                                300  10k operations         $60.00 
- ├─ List and create container operations                                            300  10k operations         $33.00 
- ├─ Read operations                                                                  30  10k operations          $0.30 
- ├─ All other operations                                                            300  10k operations          $1.32 
- ├─ Data retrieval                                                                3,000  GB                     $30.00 
- ├─ Blob index                                                                       30  10k tags                $2.07 
- └─ Early deletion                                                                3,000  GB                    $105.00 
+ ├─ Capacity                                                                  4,000,000  GB                $115,200.00 
+ ├─ Write operations                                                                400  10k operations         $80.00 
+ ├─ List and create container operations                                            400  10k operations         $44.00 
+ ├─ Read operations                                                                  40  10k operations          $0.40 
+ ├─ All other operations                                                            400  10k operations          $1.76 
+ ├─ Data retrieval                                                                4,000  GB                     $40.00 
+ ├─ Blob index                                                                       40  10k tags                $2.76 
+ └─ Early deletion                                                                4,000  GB                    $140.00 
                                                                                                                        
  azurerm_storage_account.storagev2["StorageV2.Standard.RAGRS.Hot"]                                                     
  ├─ Capacity (first 50TB)                                                        51,200  GB                  $2,447.36 
  ├─ Capacity (next 450TB)                                                       512,000  GB                 $23,494.66 
- ├─ Capacity (over 500TB)                                                     2,436,800  GB                $107,160.72 
- ├─ Write operations                                                                300  10k operations         $33.00 
- ├─ List and create container operations                                            300  10k operations         $33.00 
- ├─ Read operations                                                                  30  10k operations          $0.13 
- ├─ All other operations                                                            300  10k operations          $1.32 
- └─ Blob index                                                                       30  10k tags                $2.07 
+ ├─ Capacity (over 500TB)                                                     3,436,800  GB                $151,136.72 
+ ├─ Write operations                                                                400  10k operations         $44.00 
+ ├─ List and create container operations                                            400  10k operations         $44.00 
+ ├─ Read operations                                                                  40  10k operations          $0.18 
+ ├─ All other operations                                                            400  10k operations          $1.76 
+ └─ Blob index                                                                       40  10k tags                $2.76 
                                                                                                                        
  azurerm_storage_account.storagev2["StorageV2.Standard.RAGZRS.Cool"]                                                   
- ├─ Read operations                                                                  30  10k operations          $0.30 
- ├─ All other operations                                                            300  10k operations          $1.32 
- └─ Data retrieval                                                                3,000  GB                     $30.00 
+ ├─ Read operations                                                                  40  10k operations          $0.40 
+ ├─ All other operations                                                            400  10k operations          $1.76 
+ └─ Data retrieval                                                                4,000  GB                     $40.00 
                                                                                                                        
  azurerm_storage_account.storagev2["StorageV2.Standard.RAGZRS.Hot"]                                                    
- ├─ List and create container operations                                            300  10k operations         $20.36 
- ├─ Read operations                                                                  30  10k operations          $0.13 
- └─ All other operations                                                            300  10k operations          $1.32 
+ ├─ List and create container operations                                            400  10k operations         $27.14 
+ ├─ Read operations                                                                  40  10k operations          $0.18 
+ └─ All other operations                                                            400  10k operations          $1.76 
                                                                                                                        
  azurerm_storage_account.storagev2["StorageV2.Standard.ZRS.Cool"]                                                      
- ├─ Capacity                                                                  3,000,000  GB                 $43,200.00 
- ├─ Write operations                                                                300  10k operations         $30.00 
- ├─ List and create container operations                                            300  10k operations         $20.63 
- ├─ Read operations                                                                  30  10k operations          $0.30 
- ├─ All other operations                                                            300  10k operations          $1.32 
- ├─ Data retrieval                                                                3,000  GB                     $30.00 
- ├─ Blob index                                                                       30  10k tags                $1.17 
- └─ Early deletion                                                                3,000  GB                     $57.00 
+ ├─ Capacity                                                                  4,000,000  GB                 $57,600.00 
+ ├─ Write operations                                                                400  10k operations         $40.00 
+ ├─ List and create container operations                                            400  10k operations         $27.50 
+ ├─ Read operations                                                                  40  10k operations          $0.40 
+ ├─ All other operations                                                            400  10k operations          $1.76 
+ ├─ Data retrieval                                                                4,000  GB                     $40.00 
+ ├─ Blob index                                                                       40  10k tags                $1.56 
+ └─ Early deletion                                                                4,000  GB                     $76.00 
                                                                                                                        
  azurerm_storage_account.storagev2["StorageV2.Standard.ZRS.Hot"]                                                       
  ├─ Capacity (first 50TB)                                                        51,200  GB                  $1,331.20 
  ├─ Capacity (next 450TB)                                                       512,000  GB                 $12,779.52 
- ├─ Capacity (over 500TB)                                                     2,436,800  GB                 $58,288.26 
- ├─ List and create container operations                                            300  10k operations         $20.63 
- ├─ Read operations                                                                  30  10k operations          $0.13 
- ├─ All other operations                                                            300  10k operations          $1.32 
- └─ Blob index                                                                       30  10k tags                $1.17 
+ ├─ Capacity (over 500TB)                                                     3,436,800  GB                 $82,208.26 
+ ├─ List and create container operations                                            400  10k operations         $27.50 
+ ├─ Read operations                                                                  40  10k operations          $0.18 
+ ├─ All other operations                                                            400  10k operations          $1.76 
+ └─ Blob index                                                                       40  10k tags                $1.56 
                                                                                                                        
- OVERALL TOTAL                                                                                          $11,551,476.63 
+ OVERALL TOTAL                                                                                          $14,182,453.61 
 ──────────────────────────────────
-53 cloud resources were detected:
-∙ 52 were estimated
+57 cloud resources were detected:
+∙ 56 were estimated
 ∙ 1 was free:
   ∙ 1 x azurerm_resource_group
 Logs:
