@@ -17,6 +17,7 @@ import (
 type StorageQueue struct {
 	Address                string
 	Region                 string
+	AccountKind            string
 	AccountReplicationType string
 
 	MonthlyStorageGB                    *float64 `infracost_usage:"monthly_storage_gb"`
@@ -50,8 +51,13 @@ func (r *StorageQueue) PopulateUsage(u *schema.UsageData) {
 // This method is called after the resource is initialised by an IaC provider.
 // See providers folder for more information.
 func (r *StorageQueue) BuildResource() *schema.Resource {
+	if !r.isAccountKindSupported() {
+		log.Warnf("Skipping resource %s. Storage Queues don't support %s accounts", r.Address, r.AccountKind)
+		return nil
+	}
+
 	if !r.isReplicationTypeSupported() {
-		log.Warnf("Skipping resource %s. Storage queues don't support %s redundancy", r.Address, r.AccountReplicationType)
+		log.Warnf("Skipping resource %s. Storage Queues don't support %s redundancy", r.Address, r.AccountReplicationType)
 		return nil
 	}
 
@@ -68,8 +74,41 @@ func (r *StorageQueue) BuildResource() *schema.Resource {
 	}
 }
 
+func (r *StorageQueue) isAccountKindSupported() bool {
+	return r.isStorageV1() || r.isStorageV2()
+}
+
 func (r *StorageQueue) isReplicationTypeSupported() bool {
-	return contains([]string{"LRS", "ZRS", "GRS", "RA-GRS", "GZRS", "RA-GZRS"}, strings.ToUpper(r.AccountReplicationType))
+	var validReplicationTypes []string
+
+	switch {
+	case r.isStorageV1():
+		validReplicationTypes = []string{"LRS", "GRS", "RA-GRS"}
+	case r.isStorageV2():
+		validReplicationTypes = []string{"LRS", "ZRS", "GRS", "RA-GRS", "GZRS", "RA-GZRS"}
+	}
+
+	if validReplicationTypes != nil {
+		return contains(validReplicationTypes, strings.ToUpper(r.AccountReplicationType))
+	}
+
+	return true
+}
+
+func (r *StorageQueue) isStorageV1() bool {
+	return strings.EqualFold(r.AccountKind, "storage")
+}
+
+func (r *StorageQueue) isStorageV2() bool {
+	return strings.EqualFold(r.AccountKind, "storagev2")
+}
+
+func (r *StorageQueue) productName() string {
+	if r.isStorageV1() {
+		return "Queues"
+	}
+
+	return "Queues v2"
 }
 
 func (r *StorageQueue) dataStorageCostComponent() *schema.CostComponent {
@@ -89,7 +128,7 @@ func (r *StorageQueue) dataStorageCostComponent() *schema.CostComponent {
 			Service:       strPtr("Storage"),
 			ProductFamily: strPtr("Storage"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", Value: strPtr("Queues v2")},
+				{Key: "productName", Value: strPtr(r.productName())},
 				{Key: "skuName", Value: strPtr(fmt.Sprintf("Standard %s", strings.ToUpper(r.AccountReplicationType)))},
 				{Key: "meterName", Value: strPtr(fmt.Sprintf("%s Data Stored", strings.ToUpper(r.AccountReplicationType)))},
 			},
@@ -121,7 +160,7 @@ func (r *StorageQueue) operationsCostComponents() []*schema.CostComponent {
 				Service:       strPtr("Storage"),
 				ProductFamily: strPtr("Storage"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "productName", Value: strPtr("Queues v2")},
+					{Key: "productName", Value: strPtr(r.productName())},
 					{Key: "skuName", Value: strPtr(fmt.Sprintf("Standard %s", strings.ToUpper(r.AccountReplicationType)))},
 					{Key: "meterName", ValueRegex: regexPtr("Class 1 Operations$")},
 				},
@@ -149,7 +188,7 @@ func (r *StorageQueue) operationsCostComponents() []*schema.CostComponent {
 			Service:       strPtr("Storage"),
 			ProductFamily: strPtr("Storage"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", Value: strPtr("Queues v2")},
+				{Key: "productName", Value: strPtr(r.productName())},
 				{Key: "skuName", Value: strPtr(fmt.Sprintf("Standard %s", strings.ToUpper(r.AccountReplicationType)))},
 				{Key: "meterName", ValueRegex: regexPtr("Class 2 Operations$")},
 			},

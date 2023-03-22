@@ -195,6 +195,10 @@ func (r *StorageAccount) buildProductFilter(meterName string) *schema.ProductFil
 //	Standard Cool: cost exists
 //	Premium:       cost exists
 //
+// Storage:
+//
+// Standard: cost exists
+//
 // StorageV2:
 //
 //	Standard Hot:        cost exists
@@ -271,6 +275,8 @@ func (r *StorageAccount) storageCostComponents() []*schema.CostComponent {
 //
 // BlobStorage: n/a
 //
+// Storage: n/a
+//
 // StorageV2:
 //
 //	Standard Hot:        no cost
@@ -326,6 +332,10 @@ func (r *StorageAccount) iterativeWriteOperationsCostComponents() []*schema.Cost
 //	Standard Hot:  cost exists
 //	Standard Cool: cost exists
 //	Premium:       cost exists
+//
+// Storage:
+//
+// Standard: cost exists
 //
 // StorageV2:
 //
@@ -391,6 +401,10 @@ func (r *StorageAccount) writeOperationsCostComponents() []*schema.CostComponent
 //	Standard Cool: cost exists
 //	Premium:       cost exists
 //
+// Storage:
+//
+// Standard: cost exists
+//
 // StorageV2:
 //
 //	Standard Hot:        cost exists
@@ -449,6 +463,8 @@ func (r *StorageAccount) listAndCreateContainerOperationsCostComponents() []*sch
 //
 // BlobStorage: n/a
 //
+// Storage: n/a
+//
 // StorageV2:
 //
 //	Standard Hot:        no cost
@@ -499,7 +515,7 @@ func (r *StorageAccount) iterativeReadOperationsCostComponents() []*schema.CostC
 //	Standard Cool: cost exists
 //	Premium:       cost exists
 //
-// StorageV1:
+// Storage:
 //
 // Standard: cost exists
 //
@@ -571,6 +587,10 @@ func (r *StorageAccount) readOperationsCostComponents() []*schema.CostComponent 
 //	Standard Cool: cost exists
 //	Premium:       cost exists
 //
+// Storage:
+//
+// Standard: cost exists
+//
 // StorageV2:
 //
 //	Standard Hot:        cost exists
@@ -637,6 +657,8 @@ func (r *StorageAccount) otherOperationsCostComponents() []*schema.CostComponent
 //	Standard Cool: cost exists
 //	Premium:       no cost
 //
+// Storage: n/a
+//
 // StorageV2:
 //
 //	Standard Hot:        no cost
@@ -694,6 +716,8 @@ func (r *StorageAccount) dataRetrievalCostComponents() []*schema.CostComponent {
 //	Standard Hot:  no cost
 //	Standard Cool: cost exists
 //	Premium:       no cost
+//
+// Storage: n/a
 //
 // StorageV2:
 //
@@ -754,6 +778,8 @@ func (r *StorageAccount) dataWriteCostComponents() []*schema.CostComponent {
 //	Standard Cool: cost exists
 //	Premium:       no cost
 //
+// Storage: n/a
+//
 // StorageV2:
 //
 //	Standard Hot:        cost exists
@@ -810,6 +836,8 @@ func (r *StorageAccount) blobIndexTagsCostComponents() []*schema.CostComponent {
 //
 // BlobStorage: n/a
 //
+// Storage: n/a
+//
 // StorageV2: n/a
 //
 // FileStorage:
@@ -855,6 +883,8 @@ func (r *StorageAccount) dataAtRestCostComponents() []*schema.CostComponent {
 // BlockBlobStorage: n/a
 //
 // BlobStorage: n/a
+//
+// Storage: n/a
 //
 // StorageV2: n/a
 //
@@ -902,6 +932,8 @@ func (r *StorageAccount) snapshotsCostComponents() []*schema.CostComponent {
 //
 // BlobStorage: n/a
 //
+// Storage: n/a
+//
 // StorageV2: n/a
 //
 // FileStorage:
@@ -945,6 +977,8 @@ func (r *StorageAccount) metadataAtRestCostComponents() []*schema.CostComponent 
 //
 // BlobStorage: n/a
 //
+// Storage: n/a
+//
 // StorageV2:
 //
 //	Standard Hot:        no cost
@@ -962,7 +996,7 @@ func (r *StorageAccount) metadataAtRestCostComponents() []*schema.CostComponent 
 func (r *StorageAccount) earlyDeletionCostComponents() []*schema.CostComponent {
 	costComponents := []*schema.CostComponent{}
 
-	if r.isBlockBlobStorage() || r.isBlobStorage() || !r.isCool() {
+	if r.isStorageV1() || r.isBlockBlobStorage() || r.isBlobStorage() || !r.isCool() {
 		return costComponents
 	}
 
@@ -1047,6 +1081,10 @@ func (r *StorageAccount) isReplicationTypeSupported() bool {
 		validReplicationTypes = []string{"LRS", "ZRS"}
 	case r.isBlockBlobStorage():
 		validReplicationTypes = []string{"LRS", "GRS", "RA-GRS"}
+	case r.isStorageV1():
+		validReplicationTypes = []string{"LRS", "ZRS", "GRS", "RA-GRS"}
+	case r.isStorageV2():
+		validReplicationTypes = []string{"LRS", "ZRS", "GRS", "RA-GRS", "GZRS", "RA-GZRS"}
 	case r.isBlobStorage():
 		validReplicationTypes = []string{"LRS", "GRS"}
 	case r.isFileStorage():
