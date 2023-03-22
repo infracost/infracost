@@ -1081,6 +1081,11 @@ resource_usage:
     monthly_inbound_data_processed_gb: 100 # Monthly inbound data processed in GB.
     monthly_outbound_data_processed_gb: 100 # Monthly outbound data processed in GB.
 
+  azurerm_recovery_services_vault.my_vault:
+    azurerm_backup_protected_vm.my_vm: # Any protected VMs that come under this vault can be configured with the following
+      disk_utilization_gb: 300 # Total size in GB of the data that will be backed up into the recovery service vault. Defaults to the entire storage capacity of the VM.
+      additional_backup_retention_gb: 100 # Total size in GB of the additional data stored by this VM because of retention rules.
+
   azurerm_search_service.my_service:
     monthly_images_extracted: 1000000 # Monthly number of extracted images
 
