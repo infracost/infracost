@@ -1,47 +1,47 @@
 
- Name                                                                  Monthly Qty  Unit                      Monthly Cost 
-                                                                                                                           
- azurerm_monitor_action_group.everything_example_with_usage                                                                
- ├─ Email notifications (2)                                                 26,000  emails                           $0.52 
- ├─ ITSM connectors (1)                                                     13,000  events                          $65.00 
- ├─ Push notifications (1)                                                  13,000  notifications                    $0.26 
- ├─ Secure web hooks (1)                                                    13,000  notifications                    $0.78 
- ├─ Web hooks (2)                                                           26,000  notifications                    $0.16 
- ├─ SMS messages                                                                                                           
- │  └─ Country code 1 (1)                                                   13,000  messages                        $83.85 
- └─ Voice calls                                                                                                            
-    └─ Country code 86 (1)                                                  13,000  calls                          $780.00 
-                                                                                                                           
- azurerm_monitor_action_group.everything_example_without_usage                                                             
- ├─ Email notifications (2)                                     Monthly cost depends on usage: $0.00002 per emails         
- ├─ ITSM connectors (1)                                         Monthly cost depends on usage: $0.005 per events           
- ├─ Push notifications (1)                                      Monthly cost depends on usage: $0.00002 per notifications  
- ├─ Secure web hooks (1)                                        Monthly cost depends on usage: $0.00006 per notifications  
- ├─ Web hooks (2)                                               Monthly cost depends on usage: $0.000006 per notifications 
- ├─ SMS messages                                                                                                           
- │  └─ Country code 1 (1)                                       Monthly cost depends on usage: $0.00645 per messages       
- └─ Voice calls                                                                                                            
-    └─ Country code 86 (1)                                      Monthly cost depends on usage: $0.06 per calls             
-                                                                                                                           
- azurerm_monitor_action_group.partial_example_with_usage                                                                   
- ├─ Web hooks (1)                                                           16,000  notifications                    $0.10 
- ├─ SMS messages                                                                                                           
- │  ├─ Country code 1 (1)                                                   16,000  messages                       $103.20 
- │  └─ Country code 34 (1)                                                  16,000  messages                     $1,408.00 
- └─ Voice calls                                                                                                            
-    ├─ Country code 64 (1)                                                  16,000  calls                        $1,280.00 
-    └─ Country code 86 (1)                                                  16,000  calls                          $960.00 
-                                                                                                                           
- azurerm_monitor_action_group.partial_example_without_usage                                                                
- ├─ Web hooks (1)                                               Monthly cost depends on usage: $0.000006 per notifications 
- ├─ SMS messages                                                                                                           
- │  ├─ Country code 1 (1)                                       Monthly cost depends on usage: $0.00645 per messages       
- │  └─ Country code 34 (1)                                      Monthly cost depends on usage: $0.088 per messages         
- └─ Voice calls                                                                                                            
-    ├─ Country code 64 (1)                                      Monthly cost depends on usage: $0.08 per calls             
-    └─ Country code 86 (1)                                      Monthly cost depends on usage: $0.06 per calls             
-                                                                                                                           
- OVERALL TOTAL                                                                                                   $4,681.86 
+ Name                                                                     Monthly Qty  Unit                      Monthly Cost 
+                                                                                                                              
+ azurerm_monitor_action_group.everything_example["with_usage"]                                                                
+ ├─ Email notifications (2)                                                    26,000  emails                           $0.52 
+ ├─ ITSM connectors (1)                                                        13,000  events                          $65.00 
+ ├─ Push notifications (1)                                                     13,000  notifications                    $0.26 
+ ├─ Secure web hooks (1)                                                       13,000  notifications                    $0.78 
+ ├─ Web hooks (2)                                                              26,000  notifications                    $0.16 
+ ├─ SMS messages                                                                                                              
+ │  └─ Country code 1 (1)                                                      13,000  messages                        $83.85 
+ └─ Voice calls                                                                                                               
+    └─ Country code 86 (1)                                                     13,000  calls                          $780.00 
+                                                                                                                              
+ azurerm_monitor_action_group.everything_example["without_usage"]                                                             
+ ├─ Email notifications (2)                                        Monthly cost depends on usage: $0.00002 per emails         
+ ├─ ITSM connectors (1)                                            Monthly cost depends on usage: $0.005 per events           
+ ├─ Push notifications (1)                                         Monthly cost depends on usage: $0.00002 per notifications  
+ ├─ Secure web hooks (1)                                           Monthly cost depends on usage: $0.00006 per notifications  
+ ├─ Web hooks (2)                                                  Monthly cost depends on usage: $0.000006 per notifications 
+ ├─ SMS messages                                                                                                              
+ │  └─ Country code 1 (1)                                          Monthly cost depends on usage: $0.00645 per messages       
+ └─ Voice calls                                                                                                               
+    └─ Country code 86 (1)                                         Monthly cost depends on usage: $0.06 per calls             
+                                                                                                                              
+ azurerm_monitor_action_group.partial_example["with_usage"]                                                                   
+ ├─ Web hooks (1)                                                              16,000  notifications                    $0.10 
+ ├─ SMS messages                                                                                                              
+ │  ├─ Country code 1 (1)                                                      16,000  messages                       $103.20 
+ │  └─ Country code 34 (1)                                                     16,000  messages                     $1,408.00 
+ └─ Voice calls                                                                                                               
+    ├─ Country code 64 (1)                                                     16,000  calls                        $1,280.00 
+    └─ Country code 86 (1)                                                     16,000  calls                          $960.00 
+                                                                                                                              
+ azurerm_monitor_action_group.partial_example["without_usage"]                                                                
+ ├─ Web hooks (1)                                                  Monthly cost depends on usage: $0.000006 per notifications 
+ ├─ SMS messages                                                                                                              
+ │  ├─ Country code 1 (1)                                          Monthly cost depends on usage: $0.00645 per messages       
+ │  └─ Country code 34 (1)                                         Monthly cost depends on usage: $0.088 per messages         
+ └─ Voice calls                                                                                                               
+    ├─ Country code 64 (1)                                         Monthly cost depends on usage: $0.08 per calls             
+    └─ Country code 86 (1)                                         Monthly cost depends on usage: $0.06 per calls             
+                                                                                                                              
+ OVERALL TOTAL                                                                                                      $4,681.86 
 ──────────────────────────────────
 5 cloud resources were detected:
 ∙ 4 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
