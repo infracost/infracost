@@ -128,7 +128,7 @@ type terragruntWorkingDirInfo struct {
 	warnings   []schema.ProjectDiag
 }
 
-func (i *terragruntWorkingDirInfo) AddWarning(pd schema.ProjectDiag) {
+func (i *terragruntWorkingDirInfo) addWarning(pd schema.ProjectDiag) {
 	i.warnings = append(i.warnings, pd)
 }
 
@@ -567,8 +567,8 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 			if mod.Module != nil {
 				path = mod.Module.RootPath
 			}
-			info.AddWarning(schema.ProjectDiag{
-				Code:    schema.DiagModuleEvaluationFailure,
+			info.addWarning(schema.ProjectDiag{
+				Code:    schema.DiagTerragruntModuleEvaluationFailure,
 				Message: mod.Error.Error(),
 			})
 			p.logger.Warnf("Terragrunt config path %s returned module %s with error: %s", opts.TerragruntConfigPath, path, mod.Error)
