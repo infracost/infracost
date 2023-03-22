@@ -17,6 +17,7 @@ const (
 	DiagJSONParsingFailure = iota + 1
 	DiagModuleEvaluationFailure
 	DiagTerragruntEvaluationFailure
+	DiagTerragruntModuleEvaluationFailure
 )
 
 // ProjectDiag holds information about all diagnostics associated with a project.

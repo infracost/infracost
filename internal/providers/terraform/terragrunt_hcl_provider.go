@@ -125,6 +125,11 @@ type terragruntWorkingDirInfo struct {
 	workingDir string
 	provider   *HCLProvider
 	error      error
+	warnings   []schema.ProjectDiag
+}
+
+func (i *terragruntWorkingDirInfo) addWarning(pd schema.ProjectDiag) {
+	i.warnings = append(i.warnings, pd)
 }
 
 // LoadResources finds any Terragrunt projects, prepares them by downloading any required source files, then
@@ -190,6 +195,7 @@ func (p *TerragruntHCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.
 					}
 
 					metadata := p.newProjectMetadata(projectPath)
+					metadata.Warnings = di.warnings
 					project.Metadata = metadata
 					project.Name = p.generateProjectName(metadata)
 					mu.Lock()
@@ -561,7 +567,10 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 			if mod.Module != nil {
 				path = mod.Module.RootPath
 			}
-
+			info.addWarning(schema.ProjectDiag{
+				Code:    schema.DiagTerragruntModuleEvaluationFailure,
+				Message: mod.Error.Error(),
+			})
 			p.logger.Warnf("Terragrunt config path %s returned module %s with error: %s", opts.TerragruntConfigPath, path, mod.Error)
 		}
 		evaluatedOutputs := mod.Module.Blocks.Outputs(true)
