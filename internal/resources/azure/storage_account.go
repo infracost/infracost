@@ -84,13 +84,7 @@ func (r *StorageAccount) PopulateUsage(u *schema.UsageData) {
 // BuildResource builds a schema.Resource from valid StorageAccount data.
 // This method is called after the resource is initialized by an IaC provider.
 func (r *StorageAccount) BuildResource() *schema.Resource {
-	if !r.isBlockBlobStorage() && !r.isFileStorage() && !r.isStorageV2() && !r.isBlobStorage() {
-		log.Warnf("Skipping resource %s. Infracost only supports StorageV2, BlockBlobStorage, BlobStorage, FileStorage account kinds", r.Address)
-		return nil
-	}
-
 	if !r.isReplicationTypeSupported() {
-
 		log.Warnf("Skipping resource %s. %s %s doesn't support %s redundancy", r.Address, r.AccountKind, r.AccountTier, r.AccountReplicationType)
 		return nil
 	}
@@ -99,6 +93,11 @@ func (r *StorageAccount) BuildResource() *schema.Resource {
 		// Premium tier doesn't differentiate between Hot or Cool storage. This
 		// helps to simplify skuName search.
 		r.AccessTier = "Premium"
+	}
+
+	if r.isStorageV1() {
+		// StorageV1 doesn't support Hot or Cool storage.
+		r.AccessTier = "Standard"
 	}
 
 	costComponents := []*schema.CostComponent{}
@@ -138,6 +137,11 @@ func (r *StorageAccount) buildProductFilter(meterName string) *schema.ProductFil
 			"Standard": "Blob Storage",
 			"Premium":  "Premium Block Blob",
 		}[r.AccountTier]
+	case r.isStorageV1():
+		productName = map[string]string{
+			"Standard": "General Block Blob",
+			"Premium":  "Premium Block Blob",
+		}[r.AccountTier]
 	case r.isStorageV2():
 		if r.NFSv3 {
 			productName = map[string]string{
@@ -163,7 +167,6 @@ func (r *StorageAccount) buildProductFilter(meterName string) *schema.ProductFil
 	}
 
 	skuName := fmt.Sprintf("%s %s", cases.Title(language.English).String(r.AccessTier), strings.ToUpper(r.AccountReplicationType))
-
 	return &schema.ProductFilter{
 		VendorName:    strPtr("azure"),
 		Region:        strPtr(r.Region),
@@ -496,6 +499,10 @@ func (r *StorageAccount) iterativeReadOperationsCostComponents() []*schema.CostC
 //	Standard Cool: cost exists
 //	Premium:       cost exists
 //
+// StorageV1:
+//
+// Standard: cost exists
+//
 // StorageV2:
 //
 //	Standard Hot:        cost exists
@@ -528,6 +535,11 @@ func (r *StorageAccount) readOperationsCostComponents() []*schema.CostComponent 
 	meterName := "Read Operations"
 	if r.isStorageV2() && r.NFSv3 {
 		meterName = "(?<!Iterative) Read Operations"
+	}
+	if r.isStorageV1() && strings.EqualFold(r.AccountReplicationType, "GRS") {
+		// Storage V1 GRS doesn't have a Read Operations meter name, but we can
+		// use the Other Operations meter instead since it's the same price.
+		meterName = "Other Operations"
 	}
 
 	costComponents = append(costComponents, &schema.CostComponent{
@@ -589,6 +601,11 @@ func (r *StorageAccount) otherOperationsCostComponents() []*schema.CostComponent
 	}
 
 	meterName := "Other Operations"
+	if r.isStorageV1() {
+		// Most StorageV1 rows don't have a meter name called Other Operations,
+		// but they do have Delete Operations which is the same price.
+		meterName = "Delete Operations"
+	}
 
 	costComponents = append(costComponents, &schema.CostComponent{
 		Name:                 "All other operations",
@@ -757,7 +774,7 @@ func (r *StorageAccount) blobIndexTagsCostComponents() []*schema.CostComponent {
 	isBlockPremium := r.isBlockBlobStorage() && r.isPremium()
 	isBlobPremium := r.isBlobStorage() && r.isPremium()
 	isV2NFSv3 := r.isStorageV2() && (r.NFSv3 || r.isPremium())
-	if r.isFileStorage() || isBlockPremium || isBlobPremium || isV2NFSv3 {
+	if r.isFileStorage() || r.isStorageV1() || isBlockPremium || isBlobPremium || isV2NFSv3 {
 		return costComponents
 	}
 
@@ -1000,6 +1017,10 @@ func (r *StorageAccount) isFileStorage() bool {
 
 func (r *StorageAccount) isBlobStorage() bool {
 	return strings.EqualFold(r.AccountKind, "blobstorage")
+}
+
+func (r *StorageAccount) isStorageV1() bool {
+	return strings.EqualFold(r.AccountKind, "storage")
 }
 
 func (r *StorageAccount) isStorageV2() bool {
