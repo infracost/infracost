@@ -23,6 +23,9 @@ func TestParser_Compile(t *testing.T) {
 			name: "different env files",
 		},
 		{
+			name: "external dirs",
+		},
+		{
 			name: "include directory based on file",
 		},
 		{

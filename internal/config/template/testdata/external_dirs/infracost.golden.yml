@@ -1,0 +1,7 @@
+external_dir: fail
+external_dir_trailing_slash: fail
+parent_dir: fail
+dot_path: success
+dot_path_trailing_slash: success
+dot_dot_path: success
+dot_dot_path_trailing_slash: success
