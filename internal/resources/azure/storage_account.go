@@ -148,6 +148,13 @@ func (r *StorageAccount) buildProductFilter(meterName string) *schema.ProductFil
 				"Standard": "General Block Blob v2 Hierarchical Namespace",
 				"Premium":  "Premium Block Blob v2 Hierarchical Namespace",
 			}[r.AccountTier]
+		} else if strings.EqualFold(r.AccountReplicationType, "lrs") && r.isHot() {
+			// For some reason the Azure pricing doesn't contain all the LRS costs for all regions under "General Block Blob v2" product name.
+			// But, the same pricing is available under "Blob Storage" product name.
+			productName = map[string]string{
+				"Standard": "Blob Storage",
+				"Premium":  "Premium Block Blob",
+			}[r.AccountTier]
 		} else {
 			productName = map[string]string{
 				"Standard": "General Block Blob v2",
@@ -167,6 +174,7 @@ func (r *StorageAccount) buildProductFilter(meterName string) *schema.ProductFil
 	}
 
 	skuName := fmt.Sprintf("%s %s", cases.Title(language.English).String(r.AccessTier), strings.ToUpper(r.AccountReplicationType))
+
 	return &schema.ProductFilter{
 		VendorName:    strPtr("azure"),
 		Region:        strPtr(r.Region),
@@ -552,8 +560,8 @@ func (r *StorageAccount) readOperationsCostComponents() []*schema.CostComponent 
 	if r.isStorageV2() && r.NFSv3 {
 		meterName = "(?<!Iterative) Read Operations"
 	}
-	if r.isStorageV1() && strings.EqualFold(r.AccountReplicationType, "GRS") {
-		// Storage V1 GRS doesn't have a Read Operations meter name, but we can
+	if r.isStorageV1() && contains([]string{"GRS", "RA-GRS"}, strings.ToUpper(r.AccountReplicationType)) {
+		// Storage V1 GRS/RA-GRS doesn't always have a Read Operations meter name, but we can
 		// use the Other Operations meter instead since it's the same price.
 		meterName = "Other Operations"
 	}
