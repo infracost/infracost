@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
-	log "github.com/sirupsen/logrus"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 )
@@ -85,7 +85,7 @@ func (r *StorageAccount) PopulateUsage(u *schema.UsageData) {
 // This method is called after the resource is initialized by an IaC provider.
 func (r *StorageAccount) BuildResource() *schema.Resource {
 	if !r.isReplicationTypeSupported() {
-		log.Warnf("Skipping resource %s. %s %s doesn't support %s redundancy", r.Address, r.AccountKind, r.AccountTier, r.AccountReplicationType)
+		logging.Logger.Warnf("Skipping resource %s. %s %s doesn't support %s redundancy", r.Address, r.AccountKind, r.AccountTier, r.AccountReplicationType)
 		return nil
 	}
 
