@@ -38,6 +38,27 @@ var (
 		"dynamic":  {},
 		"data":     {},
 	}
+
+	sensitiveRegxp = regexp.MustCompile(strings.Join([]string{
+		"^image[_|-]",
+		"[_|-]image$",
+		"saml[_|-]role$",
+		"secrets$",
+		"aws[_|-]profile$",
+		"key[_|-]id$",
+		"secret[_|-]key$",
+		"access[_|-]key$",
+		"[_|-]token$",
+		"^token[_|-]",
+		"[_|-]secret$",
+		"^secret[_|-]",
+		"[_|-]password$",
+		"^password[_|-]",
+		"[_|-]username$",
+		"^username[_|-]",
+		"api[_|-]key",
+		"expiration[_|-]date",
+	}, "|"))
 )
 
 const maxContextIterations = 120
@@ -148,9 +169,28 @@ func (e *Evaluator) MissingVars() []string {
 
 	blocks := e.module.Blocks.OfType("variable")
 	for _, block := range blocks {
+		name := block.Label()
+
+		var sensitive bool
+		value := block.GetAttribute("sensitive").Value()
+		if !value.IsNull() {
+			err := gocty.FromCtyValue(value, &sensitive)
+			if err != nil {
+				e.logger.Debugf("could not convert 'sensitive' attribute for variable.%s err: %s", name, err)
+			}
+		}
+
+		if sensitive {
+			continue
+		}
+
+		if sensitiveRegxp.MatchString(strings.ToLower(name)) {
+			continue
+		}
+
 		_, v := e.evaluateVariable(block)
 		if v == errorNoVarValue {
-			missing = append(missing, fmt.Sprintf("variable.%s", block.Label()))
+			missing = append(missing, fmt.Sprintf("variable.%s", name))
 		}
 	}
 
@@ -351,6 +391,10 @@ func (e *Evaluator) expandDynamicBlock(b *Block) {
 		e.logger.Debugf("expanding block %s because a dynamic block was found %s", b.LocalName(), sub.LocalName())
 
 		blockName := sub.TypeLabel()
+		// Remove all the child blocks with the blockName so that we don't inject the expanded blocks twice.
+		// This could happen if a module "reloads" and the input variables change.
+		b.RemoveBlocks(blockName)
+
 		expanded := e.expandBlockForEaches([]*Block{sub})
 		for _, ex := range expanded {
 			if content := ex.GetChildBlock("content"); content != nil {
@@ -425,8 +469,6 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 
 		value := forEachAttr.Value()
 		if !value.IsNull() && value.IsKnown() && forEachAttr.IsIterable() {
-			srcValue := e.getSourceValue(block)
-
 			typeLabel := block.TypeLabel()
 			nameLabel := block.NameLabel()
 			if block.Type() == "module" {
@@ -450,13 +492,14 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 					e.logger.WithError(err).Debugf("could not marshal gocty key %s to string", key)
 				}
 
-				e.ctx.Set(srcValue, typeLabel, nameLabel, keyStr)
-
 				ctx.SetByDot(key, "each.key")
 				ctx.SetByDot(val, "each.value")
 
 				ctx.Set(key, block.TypeLabel(), "key")
 				ctx.Set(val, block.TypeLabel(), "value")
+
+				cloneValues := clone.Values()
+				e.ctx.Set(cloneValues, typeLabel, nameLabel, keyStr)
 
 				if v, ok := e.moduleCalls[clone.FullName()]; ok {
 					v.Definition = clone
@@ -465,6 +508,8 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 
 				return false
 			})
+		} else {
+			expanded = append(expanded, block)
 		}
 	}
 
@@ -519,30 +564,6 @@ func (e *Evaluator) expandBlockCounts(blocks Blocks) Blocks {
 	}
 
 	return countFiltered
-}
-
-func (e *Evaluator) getSourceValue(from *Block) cty.Value {
-	var fromBase string
-	var fromRel string
-
-	switch from.Type() {
-	case "resource":
-		fromBase = from.TypeLabel()
-		fromRel = from.NameLabel()
-	case "module":
-		fromBase = from.Type()
-		fromRel = from.TypeLabel()
-	default:
-		return cty.ObjectVal(make(map[string]cty.Value))
-	}
-
-	srcValue := e.ctx.Root().Get(fromBase, fromRel)
-	if srcValue == cty.NilVal {
-		e.logger.Debugf("error trying to copyVariable from the source of '%s.%s'", fromBase, fromRel)
-		return cty.ObjectVal(make(map[string]cty.Value))
-	}
-
-	return srcValue
 }
 
 func (e *Evaluator) evaluateVariable(b *Block) (cty.Value, error) {
@@ -774,7 +795,7 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 		modulePath = filepath.Join(e.module.ModulePath, source)
 	}
 
-	blocks, err := e.blockBuilder.BuildModuleBlocks(b, modulePath)
+	blocks, err := e.blockBuilder.BuildModuleBlocks(b, modulePath, e.module.RootPath)
 	if err != nil {
 		return nil, err
 	}

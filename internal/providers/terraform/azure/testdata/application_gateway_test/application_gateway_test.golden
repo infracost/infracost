@@ -1,32 +1,53 @@
 
- Name                                        Monthly Qty  Unit            Monthly Cost 
-                                                                                       
- azurerm_application_gateway.standard                                                  
- ├─ Gateway usage (basic, small)                   1,460  hours                 $36.50 
- ├─ Data processing (0-10TB)                      10,240  GB                    $81.92 
- ├─ Data processing (10-40TB)                     30,720  GB                   $245.76 
- └─ Data processing (over 40TB)                   59,040  GB                   $472.32 
-                                                                                       
- azurerm_application_gateway.waf                                                       
- ├─ Gateway usage (WAF, medium)                    1,460  hours                $183.96 
- ├─ Data processing (10-40TB)                     30,720  GB                   $215.04 
- └─ Data processing (over 40TB)                   59,040  GB                   $413.28 
-                                                                                       
- azurerm_application_gateway.wafV2                                                     
- ├─ Gateway usage (WAF v2)                         1,460  hours                $525.60 
- └─ V2 capacity units (WAF)                       10,000  CU                   $144.00 
-                                                                                       
- azurerm_application_gateway.withoutUsage                                              
- ├─ Gateway usage (WAF, medium)                    1,460  hours                $183.96 
- └─ Data processing (0-10TB)               Monthly cost depends on usage: $0.00 per GB 
-                                                                                       
- azurerm_public_ip.example                                                             
- └─ IP address (dynamic)                             730  hours                  $2.92 
-                                                                                       
- OVERALL TOTAL                                                               $2,505.26 
+ Name                                                                Monthly Qty  Unit            Monthly Cost 
+                                                                                                               
+ azurerm_application_gateway.standard                                                                          
+ ├─ Gateway usage (basic, small)                                           1,460  hours                 $36.50 
+ ├─ Data processing (0-10TB)                                              10,240  GB                    $81.92 
+ ├─ Data processing (10-40TB)                                             30,720  GB                   $245.76 
+ └─ Data processing (over 40TB)                                           59,040  GB                   $472.32 
+                                                                                                               
+ azurerm_application_gateway.waf                                                                               
+ ├─ Gateway usage (WAF, medium)                                            1,460  hours                $183.96 
+ ├─ Data processing (10-40TB)                                             30,720  GB                   $215.04 
+ └─ Data processing (over 40TB)                                           59,040  GB                   $413.28 
+                                                                                                               
+ azurerm_application_gateway.waf_with_autoscaling                                                              
+ ├─ Gateway usage (WAF, medium)                                           14,600  hours              $1,839.60 
+ ├─ Data processing (10-40TB)                                             30,720  GB                   $215.04 
+ └─ Data processing (over 40TB)                                           59,040  GB                   $413.28 
+                                                                                                               
+ azurerm_application_gateway.waf_with_autoscaling_without_usage                                                
+ ├─ Gateway usage (WAF, medium)                                            2,190  hours                $275.94 
+ └─ Data processing (0-10TB)                                       Monthly cost depends on usage: $0.00 per GB 
+                                                                                                               
+ azurerm_application_gateway.waf_without_usage                                                                 
+ ├─ Gateway usage (WAF, medium)                                            1,460  hours                $183.96 
+ └─ Data processing (0-10TB)                                       Monthly cost depends on usage: $0.00 per GB 
+                                                                                                               
+ azurerm_application_gateway.wafv2                                                                             
+ ├─ Gateway usage (WAF v2)                                                   730  hours                $262.80 
+ └─ V2 capacity units (WAF)                                                1,460  CU                    $21.02 
+                                                                                                               
+ azurerm_application_gateway.wafv2_with_autoscaling                                                            
+ ├─ Gateway usage (WAF v2)                                                   730  hours                $262.80 
+ └─ V2 capacity units (WAF)                                               14,600  CU                   $210.24 
+                                                                                                               
+ azurerm_application_gateway.wafv2_with_autoscaling_without_usage                                              
+ ├─ Gateway usage (WAF v2)                                                   730  hours                $262.80 
+ └─ V2 capacity units (WAF)                                                2,190  CU                    $31.54 
+                                                                                                               
+ azurerm_application_gateway.wafv2_without_usage                                                               
+ ├─ Gateway usage (WAF v2)                                                   730  hours                $262.80 
+ └─ V2 capacity units (WAF)                                                1,460  CU                    $21.02 
+                                                                                                               
+ azurerm_public_ip.example                                                                                     
+ └─ IP address (dynamic)                                                     730  hours                  $2.92 
+                                                                                                               
+ OVERALL TOTAL                                                                                       $5,914.54 
 ──────────────────────────────────
-9 cloud resources were detected:
-∙ 5 were estimated, 4 of which include usage-based costs, see https://infracost.io/usage-file
+14 cloud resources were detected:
+∙ 10 were estimated, 9 of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 4 were free:
   ∙ 2 x azurerm_subnet
   ∙ 1 x azurerm_resource_group

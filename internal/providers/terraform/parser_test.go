@@ -399,7 +399,7 @@ func TestParseJSONResources(t *testing.T) {
 
 	parsed := gjson.Parse(testData)
 
-	usage := schema.NewUsageMap(map[string]interface{}{
+	usage := schema.NewUsageMapFromInterface(map[string]interface{}{
 		"aws_cloudwatch_log_group.array_resource[*]": map[string]interface{}{
 			"monthly_data_ingested_gb": 0,
 		},

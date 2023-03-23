@@ -17,6 +17,7 @@ const (
 	DiagJSONParsingFailure = iota + 1
 	DiagModuleEvaluationFailure
 	DiagTerragruntEvaluationFailure
+	DiagTerragruntModuleEvaluationFailure
 )
 
 // ProjectDiag holds information about all diagnostics associated with a project.
@@ -38,6 +39,10 @@ type ProjectMetadata struct {
 	Errors              []ProjectDiag `json:"errors,omitempty"`
 	Warnings            []ProjectDiag `json:"warnings,omitempty"`
 	Policies            Policies      `json:"policies,omitempty"`
+}
+
+func (m *ProjectMetadata) AddError(err error) {
+	m.Errors = append(m.Errors, ProjectDiag{Message: err.Error()})
 }
 
 func (m *ProjectMetadata) HasErrors() bool {
@@ -117,18 +122,73 @@ func (p *Project) NameWithWorkspace() string {
 
 // AllResources returns a pointer list of all resources of the state.
 func (p *Project) AllResources() []*Resource {
+	m := make(map[*Resource]bool)
+	for _, r := range p.PastResources {
+		m[r] = true
+	}
+
+	for _, r := range p.Resources {
+		if _, ok := m[r]; !ok {
+			m[r] = true
+		}
+	}
+
 	var resources []*Resource
-	resources = append(resources, p.PastResources...)
-	resources = append(resources, p.Resources...)
+	for r := range m {
+		resources = append(resources, r)
+	}
+
 	return resources
 }
 
 // AllPartialResources returns a pointer list of the current and past partial resources
 func (p *Project) AllPartialResources() []*PartialResource {
+	m := make(map[*PartialResource]bool)
+	for _, r := range p.PartialPastResources {
+		m[r] = true
+	}
+
+	for _, r := range p.PartialResources {
+		if _, ok := m[r]; !ok {
+			m[r] = true
+		}
+	}
+
 	var resources []*PartialResource
-	resources = append(resources, p.PartialPastResources...)
-	resources = append(resources, p.PartialResources...)
+	for r := range m {
+		resources = append(resources, r)
+	}
+
 	return resources
+}
+
+// BuildResources builds the resources from the partial resources
+// and sets the PastResources and Resources fields.
+func (p *Project) BuildResources(usageMap UsageMap) {
+	pastResources := make([]*Resource, 0, len(p.PartialPastResources))
+	resources := make([]*Resource, 0, len(p.PartialResources))
+
+	seen := make(map[*PartialResource]*Resource)
+
+	for _, p := range p.PartialPastResources {
+		u := usageMap.Get(p.ResourceData.Address)
+		r := BuildResource(p, u)
+		seen[p] = r
+		pastResources = append(pastResources, r)
+	}
+
+	for _, p := range p.PartialResources {
+		r, ok := seen[p]
+		if !ok {
+			u := usageMap.Get(p.ResourceData.Address)
+			r = BuildResource(p, u)
+			seen[p] = r
+		}
+		resources = append(resources, r)
+	}
+
+	p.PastResources = pastResources
+	p.Resources = resources
 }
 
 // CalculateDiff calculates the diff of past and current resources

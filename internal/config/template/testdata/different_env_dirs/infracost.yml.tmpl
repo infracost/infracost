@@ -1,0 +1,11 @@
+version: 0.1
+
+projects:
+{{- range $project := matchPaths "environment/:env/terraform.tfvars" }}
+  {{- if ne $project.env "legacy"}}
+    - path: .
+      name: {{ $project.env }}
+      terraform_var_files:
+        - environment/{{ $project.env }}/terraform.tfvars
+  {{- end}}
+{{- end }}

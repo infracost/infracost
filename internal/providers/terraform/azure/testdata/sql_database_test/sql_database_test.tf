@@ -88,7 +88,7 @@ resource "azurerm_sql_database" "serverless" {
   requested_service_objective_name = "GP_S_Gen5_4"
 }
 
-resource "azurerm_sql_database" "LTR" {
+resource "azurerm_sql_database" "backup" {
   name                             = "myexamplesqldatabase9"
   resource_group_name              = azurerm_resource_group.example.name
   location                         = "eastus"

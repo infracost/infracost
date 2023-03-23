@@ -10,7 +10,7 @@ Module path: dev
     - root_block_device
     
         - Storage (general purpose SSD, gp2)
-          -$5.00
+          -$5
 
     - ebs_block_device[0]
     
@@ -18,7 +18,7 @@ Module path: dev
           -$125
     
         - Provisioned IOPS
-          -$52.00
+          -$52
 
 Monthly cost change for infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to_deleted_project/dev (Module path: dev)
 Amount:  -$462 ($462 → $0.00)

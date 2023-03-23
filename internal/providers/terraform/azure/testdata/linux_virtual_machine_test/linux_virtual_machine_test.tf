@@ -10,7 +10,7 @@ resource "azurerm_linux_virtual_machine" "basic_b1" {
 
   size           = "Standard_B1s"
   admin_username = "fakeuser"
-  admin_password = "fakepass"
+  admin_password = "Password1234!"
 
   network_interface_ids = [
     "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/testrg/providers/Microsoft.Network/networkInterfaces/fakenic",
@@ -36,7 +36,7 @@ resource "azurerm_linux_virtual_machine" "basic_b1_lowercase" {
 
   size           = "standard_b1s"
   admin_username = "fakeuser"
-  admin_password = "fakepass"
+  admin_password = "Password1234!"
 
   network_interface_ids = [
     "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/testrg/providers/Microsoft.Network/networkInterfaces/fakenic",
@@ -62,7 +62,7 @@ resource "azurerm_linux_virtual_machine" "basic_a2" {
 
   size           = "Basic_A2"
   admin_username = "fakeuser"
-  admin_password = "fakepass"
+  admin_password = "Password1234!"
 
   network_interface_ids = [
     "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/testrg/providers/Microsoft.Network/networkInterfaces/fakenic",
@@ -88,7 +88,7 @@ resource "azurerm_linux_virtual_machine" "standard_f2_premium_disk" {
 
   size           = "Standard_F2"
   admin_username = "fakeuser"
-  admin_password = "fakepass"
+  admin_password = "Password1234!"
 
   network_interface_ids = [
     "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/testrg/providers/Microsoft.Network/networkInterfaces/fakenic",
@@ -114,7 +114,7 @@ resource "azurerm_linux_virtual_machine" "standard_f2_lowercase" {
 
   size           = "standard_f2"
   admin_username = "fakeuser"
-  admin_password = "fakepass"
+  admin_password = "Password1234!"
 
   network_interface_ids = [
     "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/testrg/providers/Microsoft.Network/networkInterfaces/fakenic",
@@ -140,7 +140,7 @@ resource "azurerm_linux_virtual_machine" "standard_a2_v2_custom_disk" {
 
   size           = "Standard_A2_v2"
   admin_username = "fakeuser"
-  admin_password = "fakepass"
+  admin_password = "Password1234!"
 
   network_interface_ids = [
     "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/testrg/providers/Microsoft.Network/networkInterfaces/fakenic",
@@ -167,7 +167,7 @@ resource "azurerm_linux_virtual_machine" "standard_a2_ultra_enabled" {
 
   size           = "Standard_A2_v2"
   admin_username = "fakeuser"
-  admin_password = "fakepass"
+  admin_password = "Password1234!"
 
   network_interface_ids = [
     "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/testrg/providers/Microsoft.Network/networkInterfaces/fakenic",
@@ -197,7 +197,7 @@ resource "azurerm_linux_virtual_machine" "basic_b1_withMonthlyHours" {
 
   size           = "Standard_B1s"
   admin_username = "fakeuser"
-  admin_password = "fakepass"
+  admin_password = "Password1234!"
 
   network_interface_ids = [
     "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/testrg/providers/Microsoft.Network/networkInterfaces/fakenic",

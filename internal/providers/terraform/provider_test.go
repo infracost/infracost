@@ -43,7 +43,7 @@ func TestLoadResources_rootModule(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTestsForTerraformProject(t, project, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTestsForTerraformProject(t, project, schema.UsageMap{}, resourceChecks)
 }
 
 func TestLoadResources_nestedModule(t *testing.T) {
@@ -98,5 +98,5 @@ func TestLoadResources_nestedModule(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTestsForTerraformProject(t, project, schema.NewEmptyUsageMap(), resourceChecks)
+	tftest.ResourceTestsForTerraformProject(t, project, schema.UsageMap{}, resourceChecks)
 }

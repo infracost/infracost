@@ -31,12 +31,18 @@ type Option func(p *Parser)
 // to the Parser initialPath. Paths that don't exist will be ignored.
 func OptionWithTFVarsPaths(paths []string) Option {
 	return func(p *Parser) {
-		var relative []string
+		var filenames []string
 		for _, name := range paths {
-			tfvp := path.Join(p.initialPath, name)
-			relative = append(relative, tfvp)
+			if path.IsAbs(name) {
+				filenames = append(filenames, name)
+				continue
+			}
+
+			relToProject := path.Join(p.initialPath, name)
+			filenames = append(filenames, relToProject)
 		}
-		p.tfvarsPaths = relative
+
+		p.tfvarsPaths = filenames
 	}
 }
 
@@ -193,7 +199,6 @@ type Parser struct {
 	blockBuilder          BlockBuilder
 	newSpinner            ui.SpinnerFunc
 	remoteVariablesLoader *RemoteVariablesLoader
-	credentialsSource     *modules.CredentialsSource
 	logger                *logrus.Entry
 	hasChanges            bool
 }
@@ -266,7 +271,7 @@ func newParser(projectRoot RootPath, moduleLoader *modules.ModuleLoader, logger 
 	return p
 }
 
-// ParseDirectory parses all the terraform files in the initalPath into Blocks and then passes them to an Evaluator
+// ParseDirectory parses all the terraform files in the initialPath into Blocks and then passes them to an Evaluator
 // to fill these Blocks with additional Context information. Parser does not parse any blocks outside the root Module.
 // It instead leaves ModuleLoader to fetch these Modules on demand. See ModuleLoader.Load for more information.
 //
@@ -372,7 +377,7 @@ func (p *Parser) parseDirectoryFiles(files []file) (Blocks, error) {
 		for _, fileBlock := range fileBlocks {
 			blocks = append(
 				blocks,
-				p.blockBuilder.NewBlock(file.path, fileBlock, nil, nil),
+				p.blockBuilder.NewBlock(file.path, p.initialPath, fileBlock, nil, nil),
 			)
 		}
 	}

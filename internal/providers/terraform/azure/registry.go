@@ -10,7 +10,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMApplicationGatewayRegistryItem(),
 	getAppServiceEnvironmentRegistryItem(),
 	GetAzureRMAppIntegrationServiceEnvironmentRegistryItem(),
-	GetAzureRMAppFunctionRegistryItem(),
+	getFunctionAppRegistryItem(),
 	GetAzureRMAppNATGatewayRegistryItem(),
 	getAppServiceCertificateBindingRegistryItem(),
 	getAppServiceCertificateOrderRegistryItem(),
@@ -65,6 +65,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMLoadBalancerRegistryItem(),
 	GetAzureRMLoadBalancerRuleRegistryItem(),
 	GetAzureRMLoadBalancerOutboundRuleRegistryItem(),
+	getLinuxFunctionAppRegistryItem(),
 	GetAzureRMLinuxVirtualMachineRegistryItem(),
 	GetAzureRMLinuxVirtualMachineScaleSetRegistryItem(),
 	getAzureRMLogAnalyticsWorkspaceRegistryItem(),
@@ -110,6 +111,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getDataFactoryIntegrationRuntimeSelfHostedRegistryItem(),
 	getLogAnalyticsSolutionRegistryItem(),
 	getMySQLFlexibleServerRegistryItem(),
+	getServicePlanRegistryItem(),
 	getSentinelDataConnectorAwsCloudTrailRegistryItem(),
 	getSentinelDataConnectorAzureActiveDirectoryRegistryItem(),
 	getSentinelDataConnectorAzureAdvancedThreatProtectionRegistryItem(),
@@ -121,6 +123,17 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getIoTHubRegistryItem(),
 	getIoTHubDPSRegistryItem(),
 	getVirtualNetworkPeeringRegistryItem(),
+	geWindowsFunctionAppRegistryItem(),
+	getPowerBIEmbeddedRegistryItem(),
+	getMSSQLElasticPoolRegistryItem(),
+	getSQLElasticPoolRegistryItem(),
+	getMonitorActionGroupRegistryItem(),
+	getMonitorDataCollectionRuleRegistryItem(),
+	getMonitorDiagnosticSettingRegistryItem(),
+	getMonitorMetricAlertRegistryItem(),
+	getMonitorScheduledQueryRulesAlertRegistryItem(),
+	getMonitorScheduledQueryRulesAlertV2RegistryItem(),
+	getApplicationInsightsStandardWebTestRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -160,6 +173,7 @@ var FreeResources = []string{
 	"azurerm_api_management_user",
 
 	// Azure App Service
+	"azurerm_app_service",
 	"azurerm_app_service_active_slot",
 	"azurerm_app_service_certificate",
 	"azurerm_app_service_managed_certificate",
@@ -261,18 +275,29 @@ var FreeResources = []string{
 
 	// Azure Database
 	"azurerm_mariadb_configuration",
+	"azurerm_mariadb_database",
 	"azurerm_mariadb_firewall_rule",
 	"azurerm_mariadb_virtual_network_rule",
+
+	"azurerm_mysql_active_directory_administrator",
+	"azurerm_mysql_configuration",
+	"azurerm_mysql_database",
 	"azurerm_mysql_firewall_rule",
 	"azurerm_mysql_flexible_database",
 	"azurerm_mysql_flexible_server_configuration",
 	"azurerm_mysql_flexible_server_firewall_rule",
+	"azurerm_mysql_server_key",
 	"azurerm_mysql_virtual_network_rule",
+
+	"azurerm_postgresql_active_directory_administrator",
 	"azurerm_postgresql_configuration",
+	"azurerm_postgresql_database",
 	"azurerm_postgresql_firewall_rule",
+	"azurerm_postgresql_flexible_server_active_directory_administrator",
 	"azurerm_postgresql_flexible_server_configuration",
 	"azurerm_postgresql_flexible_server_database",
 	"azurerm_postgresql_flexible_server_firewall_rule",
+	"azurerm_postgresql_server_key",
 	"azurerm_postgresql_virtual_network_rule",
 
 	// Azure Datalake Gen 2
@@ -310,6 +335,9 @@ var FreeResources = []string{
 	"azurerm_iothub_consumer_group",
 	"azurerm_iothub_dps_certificate",
 	"azurerm_iothub_dps_shared_access_policy",
+	"azurerm_iothub_endpoint_eventhub",
+	"azurerm_iothub_enrichment",
+	"azurerm_iothub_route",
 	"azurerm_iothub_shared_access_policy",
 
 	// Azure Lighthouse (Delegated Resoure Management)
@@ -323,16 +351,6 @@ var FreeResources = []string{
 	"azurerm_lb_nat_rule",
 	"azurerm_lb_probe",
 
-	// Azure Log Analytics
-	"azurerm_log_analytics_cluster_customer_managed_key",
-	"azurerm_log_analytics_data_export_rule",
-	"azurerm_log_analytics_datasource_windows_event",
-	"azurerm_log_analytics_datasource_windows_performance_counter",
-	"azurerm_log_analytics_linked_service",
-	"azurerm_log_analytics_linked_storage_account",
-	"azurerm_log_analytics_saved_search",
-	"azurerm_log_analytics_storage_insights",
-
 	// Azure Management
 	"azurerm_management_group",
 	"azurerm_management_group_subscription_association",
@@ -343,19 +361,66 @@ var FreeResources = []string{
 	"azurerm_managed_application",
 	"azurerm_managed_application_definition",
 
+	// Azure Monitor
+	"azurerm_monitor_aad_diagnostic_setting",
+	"azurerm_monitor_action_rule_action_group",
+	"azurerm_monitor_action_rule_suppression",
+	"azurerm_monitor_activity_log_alert",
+	"azurerm_monitor_alert_processing_rule_action_group",
+	"azurerm_monitor_alert_processing_rule_suppression",
+	"azurerm_monitor_autoscale_setting",
+	"azurerm_monitor_data_collection",
+	"azurerm_monitor_data_collection_rule_association",
+	"azurerm_monitor_log_profile",
+	"azurerm_monitor_private_link_scope",
+	"azurerm_monitor_private_link_scoped_service",
+	"azurerm_monitor_scheduled_query_rules_log",
+	"azurerm_monitor_smart_detector_alert_rule",
+
+	// Azure Monitor - Application Insights
+	"azurerm_application_insights_analytics_item",
+	"azurerm_application_insights_api_key",
+	"azurerm_application_insights_smart_detection_rule",
+	"azurerm_application_insights_workbook",
+	"azurerm_application_insights_workbook_template",
+
+	// Azure Monitor - Log Analytics
+	"azurerm_log_analytics_cluster_customer_managed_key",
+	"azurerm_log_analytics_data_export_rule",
+	"azurerm_log_analytics_datasource_windows_event",
+	"azurerm_log_analytics_datasource_windows_performance_counter",
+	"azurerm_log_analytics_linked_service",
+	"azurerm_log_analytics_linked_storage_account",
+	"azurerm_log_analytics_query_pack",
+	"azurerm_log_analytics_query_pack_query",
+	"azurerm_log_analytics_saved_search",
+	"azurerm_log_analytics_storage_insights",
+
 	// Azure Networking
 	"azurerm_application_security_group",
 	"azurerm_local_network_gateway",
 	"azurerm_nat_gateway_public_ip_association",
 	"azurerm_nat_gateway_public_ip_prefix_association",
 	"azurerm_network_interface",
+	"azurerm_network_interface_application_gateway_backend_address_pool_association",
+	"azurerm_network_interface_application_security_group_association",
+	"azurerm_network_interface_backend_address_pool_association",
+	"azurerm_network_interface_nat_rule_association",
 	"azurerm_network_interface_security_group_association",
 	"azurerm_network_security_group",
 	"azurerm_network_security_rule",
 	"azurerm_private_link_service",
+	"azurerm_route",
+	"azurerm_route_filter",
+	"azurerm_route_map",
+	"azurerm_route_table",
+	"azurerm_storage_account_local_user",
 	"azurerm_storage_account_network_rules",
 	"azurerm_subnet",
+	"azurerm_subnet_nat_gateway_association",
 	"azurerm_subnet_network_security_group_association",
+	"azurerm_subnet_route_table_association",
+	"azurerm_subnet_service_endpoint_storage_policy",
 	"azurerm_virtual_network",
 
 	// Azure Notification Hub
@@ -385,11 +450,35 @@ var FreeResources = []string{
 	"azurerm_sentinel_alert_rule_ms_security_incident",
 	"azurerm_sentinel_alert_rule_scheduled",
 
+	// Azure Shared Image Gallery
+	"azurerm_shared_image",
+	"azurerm_shared_image_gallery",
+
 	// Azure SQL
-	"azurerm_sql_server",
+	"azurerm_sql_failover_group",
 	"azurerm_sql_firewall_rule",
+	"azurerm_sql_server",
 	"azurerm_sql_virtual_network_rule",
+
+	"azurerm_mssql_database_extended_auditing_policy",
+	"azurerm_mssql_database_vulnerability_assessment_rule_baseline",
+	"azurerm_mssql_failover_group",
 	"azurerm_mssql_firewall_rule",
+	"azurerm_mssql_job_agent",
+	"azurerm_mssql_job_credential",
+	"azurerm_mssql_managed_instance_active_directory_administrator",
+	"azurerm_mssql_managed_instance_security_alert_policy",
+	"azurerm_mssql_managed_instance_transparent_data_encryption",
+	"azurerm_mssql_managed_instance_vulnerability_assessment",
+	"azurerm_mssql_outbound_firewall_rule",
+	"azurerm_mssql_server",
+	"azurerm_mssql_server_dns_alias",
+	"azurerm_mssql_server_extended_auditing_policy",
+	"azurerm_mssql_server_microsoft_support_auditing_policy",
+	"azurerm_mssql_server_security_alert_policy",
+	"azurerm_mssql_server_transparent_data_encryption",
+	"azurerm_mssql_server_vulnerability_assessment",
+	"azurerm_mssql_virtual_network_rule",
 
 	// Azure Storage
 	"azurerm_storage_blob_inventory_policy",
@@ -404,19 +493,27 @@ var FreeResources = []string{
 	"azurerm_virtual_desktop_workspace_application_group_association",
 	"azurerm_virtual_desktop_host_pool",
 
+	// Azure Service Plan
+	"azurerm_windows_web_app",
+	"azurerm_linux_web_app",
+
 	// Azure Synapse Analytics
 	"azurerm_synapse_firewall_rule",
 	"azurerm_synapse_private_link_hub",
 
 	// Azure Virtual Machines
 	"azurerm_virtual_machine_data_disk_attachment",
+	"azurerm_virtual_machine_extension",
+	"azurerm_virtual_machine_scale_set_extension",
 	"azurerm_availability_set",
 	"azurerm_proximity_placement_group",
 	"azurerm_ssh_public_key",
 	"azurerm_marketplace_agreement",
 
 	// Azure WAN
+	"azurerm_virtual_hub_connection",
 	"azurerm_virtual_wan",
+	"azurerm_vpn_server_configuration",
 }
 
 var UsageOnlyResources = []string{}

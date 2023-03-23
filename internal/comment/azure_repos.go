@@ -6,7 +6,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -183,7 +183,7 @@ func (h *azureReposPRHandler) CallFindMatchingComments(ctx context.Context, tag 
 		defer res.Body.Close()
 	}
 
-	resBody, err := ioutil.ReadAll(res.Body)
+	resBody, err := io.ReadAll(res.Body)
 	if err != nil {
 		return []Comment{}, errors.Wrap(err, "Error reading response body")
 	}
@@ -265,7 +265,7 @@ func (h *azureReposPRHandler) CallCreateComment(ctx context.Context, body string
 		defer res.Body.Close()
 	}
 
-	resBody, err := ioutil.ReadAll(res.Body)
+	resBody, err := io.ReadAll(res.Body)
 	if err != nil {
 		return nil, errors.Wrap(err, "Error reading response body")
 	}

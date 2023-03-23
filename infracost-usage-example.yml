@@ -145,7 +145,7 @@ resource_usage:
 
   aws_ebs_volume.my_standard_volume:
     monthly_standard_io_requests: 10000000 # Monthly I/O requests for standard volume (Magnetic storage).
-  
+
   aws_ec2_host.my_host:
     reserved_instance_term: 1_year # Term for Reserved Instances, can be: 1_year, 3_year.
     reserved_instance_payment_option: partial_upfront # Payment option for Reserved Instances, can be: no_upfront, partial_upfront, all_upfront.
@@ -189,7 +189,7 @@ resource_usage:
       rule_evaluations: 10000    # Number of rule evaluations on application/network load balancers
     elb:
       monthly_data_processed_gb: 10000 # Monthly data processed on classic loadbalaner
-    
+
   aws_elasticache_cluster.my_redis_snapshot:
     snapshot_storage_size_gb: 10000 # Size of Redis snapshots in GB.
     reserved_instance_term: 1_year                          # Term for Reserved Instances, can be: 1_year, 3_year.
@@ -262,6 +262,13 @@ resource_usage:
   aws_lambda_function.my_function:
     monthly_requests: 100000 # Monthly requests to the Lambda function.
     request_duration_ms: 500 # Average duration of each request in milliseconds.
+
+  aws_lambda_provisioned_concurrency_config.my_config:
+    monthly_duration_hrs: 100 # Number of hours in a month that provisioned concurrency will be enabled.
+    request_duration_ms: 350 # Average duration of each request in milliseconds during the enabled period.
+    monthly_requests: 10000000 # Number of requests sent to the function during the enabled period.
+    architecture: arm64 # Architecture of the Lambda function.
+    memory_mb: 512 # Memory size of the Lambda function.
 
   aws_alb.my_alb:
     new_connections: 10000    # Number of newly established connections per second on average.
@@ -951,6 +958,11 @@ resource_usage:
     monthly_additional_log_data_retention_gb: 30 # Monthly additional GB of data retained past the free allowance.
     monthly_log_data_export_gb: 40               # Monthly data in GB exported from the workspace.
     monthly_sentinel_data_ingestion_gb: 40       # Monthly data in GB exported from Microsoft Sentinel, this only applies when it is enabled.
+    monthly_basic_log_data_ingestion_gb: 50      # Monthly data ingested by the workspace to basic tables in GB
+    monthly_basic_log_search_gb: 60              # Monthly basic log data queried in GB
+    monthly_archive_data_gb: 70                  # Monthly archived data in GB
+    monthly_archive_data_restored_gb: 80         # Monthly data restored from archive in GB
+    monthly_archive_data_searched_gb: 90         # Monthly data searched in archive with a Search Job, in GB
 
   azurerm_frontdoor_firewall_policy.my_frontdoor_firewall_policy:
     monthly_custom_rule_requests: 11000     # Monthly number of custom rule requests
@@ -1008,9 +1020,19 @@ resource_usage:
   azurerm_mariadb_server.my_server:
     additional_backup_storage_gb: 2000 # Additional consumption of backup storage in GB.
 
+  azurerm_monitor_action_group.my_group:
+    monthly_notifications: 1000
+
+  azure_monitor_data_collection_rule.my_rule:
+    monthly_custom_metrics_samples: 100000000
+
+  azurerm_monitor_diagnostic_setting.my_setting:
+    monthly_platform_log_gb: 1000
+
   azurerm_mssql_database.my_database:
     monthly_vcore_hours: 600             # Monthly number of used vCore-hours for serverless compute.
     long_term_retention_storage_gb: 1000 # Number of GBs used by long-term retention backup storage.
+    backup_storage_gb: 500               # Number of GBs used by Point-In-Time Restore (PITR) backup storage.
     extra_data_storage_gb: 250           # Override number of GBs used by extra data storage.
 
   azurerm_mysql_flexible_server.my_flexible_server:
@@ -1081,10 +1103,11 @@ resource_usage:
   azurerm_sql_database.my_database:
     monthly_vcore_hours: 600             # Monthly number of used vCore-hours for serverless compute.
     long_term_retention_storage_gb: 1000 # Number of GBs used by long-term retention backup storage.
+    backup_storage_gb: 500               # Number of GBs used by Point-In-Time Restore (PITR) backup storage.
     extra_data_storage_gb: 250           # Override number of GBs used by extra data storage.
-  
+
   azurerm_sql_managed_instance.my_database:
-    backup_storage_gb: 100            # Backup storage size dedicated for Point In Time Restoration
+    backup_storage_gb: 100            # Number of GBs used by Point-In-Time Restore (PITR) backup storage.
     long_term_retention_storage_gb: 5 # Number of GBs used by long-term retention backup storage.
 
   azurerm_synapse_spark_pool.my_spark_pool:

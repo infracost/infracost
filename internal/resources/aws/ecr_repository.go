@@ -13,6 +13,14 @@ type ECRRepository struct {
 	StorageGB *float64 `infracost_usage:"storage_gb"`
 }
 
+func (r *ECRRepository) CoreType() string {
+	return "ECRRepository"
+}
+
+func (r *ECRRepository) UsageSchema() []*schema.UsageItem {
+	return ECRRepositoryUsageSchema
+}
+
 var ECRRepositoryUsageSchema = []*schema.UsageItem{
 	{Key: "storage_gb", ValueType: schema.Float64, DefaultValue: 0},
 }

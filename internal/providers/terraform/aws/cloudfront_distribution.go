@@ -9,6 +9,10 @@ func getCloudfrontDistributionRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_cloudfront_distribution",
 		RFunc: newCloudfrontDistribution,
+		ReferenceAttributes: []string{
+			"origin.0.domain_name",
+			"origin.0.origin_id",
+		},
 	}
 }
 func newCloudfrontDistribution(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {

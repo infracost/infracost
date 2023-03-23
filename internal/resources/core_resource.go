@@ -13,6 +13,8 @@ import (
 var intPtr *int64
 var floatPtr *float64
 var strPtr *string
+var strType = reflect.TypeOf("")
+var float64Type = reflect.TypeOf(float64(0))
 
 func PopulateArgsWithUsage(args interface{}, u *schema.UsageData) {
 	if u == nil {
@@ -75,6 +77,17 @@ func PopulateArgsWithUsage(args interface{}, u *schema.UsageData) {
 					Address:    usageKey,
 					Attributes: u.Get(usageKey).Map(),
 				})
+
+				continue
+			}
+
+			if f.Type() == reflect.MapOf(strType, float64Type) {
+				m := make(map[string]float64)
+				for k, v := range u.Get(usageKey).Map() {
+					m[k] = v.Float()
+				}
+
+				f.Set(reflect.ValueOf(m))
 
 				continue
 			}

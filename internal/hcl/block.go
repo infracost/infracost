@@ -14,6 +14,8 @@ import (
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
+
+	"github.com/infracost/infracost/internal/hcl/funcs"
 )
 
 var (
@@ -240,6 +242,8 @@ type Block struct {
 	// moduleBlock represents the parent module of this Block. If this is nil the Block is part of the root
 	// module (the top level directory in a Terraform dir).
 	moduleBlock *Block
+	// rootPath is the working directory of the CLI process.
+	rootPath string
 	// expanded marks if the block has been cloned or duplicated as part of a foreach or count.
 	expanded bool
 	// cloneIndex represents the index of the parent that this Block has been cloned from
@@ -266,7 +270,7 @@ type BlockBuilder struct {
 }
 
 // NewBlock returns a Block with Context and child Blocks initialised.
-func (b BlockBuilder) NewBlock(filename string, hclBlock *hcl.Block, ctx *Context, moduleBlock *Block) *Block {
+func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.Block, ctx *Context, moduleBlock *Block) *Block {
 	if ctx == nil {
 		ctx = NewContext(&hcl.EvalContext{}, nil, b.Logger)
 	}
@@ -275,7 +279,7 @@ func (b BlockBuilder) NewBlock(filename string, hclBlock *hcl.Block, ctx *Contex
 	var children Blocks
 	if body, ok := hclBlock.Body.(*hclsyntax.Body); ok {
 		for _, bb := range body.Blocks {
-			children = append(children, b.NewBlock(filename, bb.AsHCLBlock(), ctx, moduleBlock))
+			children = append(children, b.NewBlock(filename, rootPath, bb.AsHCLBlock(), ctx, moduleBlock))
 		}
 
 		for _, f := range b.SetAttributes {
@@ -287,6 +291,7 @@ func (b BlockBuilder) NewBlock(filename string, hclBlock *hcl.Block, ctx *Contex
 			context:     ctx,
 			hclBlock:    hclBlock,
 			moduleBlock: moduleBlock,
+			rootPath:    rootPath,
 			childBlocks: children,
 			verbose:     isLoggingVerbose,
 			newMock:     b.MockFunc,
@@ -306,6 +311,7 @@ func (b BlockBuilder) NewBlock(filename string, hclBlock *hcl.Block, ctx *Contex
 			context:     ctx,
 			hclBlock:    hclBlock,
 			moduleBlock: moduleBlock,
+			rootPath:    rootPath,
 			childBlocks: children,
 			verbose:     isLoggingVerbose,
 			newMock:     b.MockFunc,
@@ -316,13 +322,14 @@ func (b BlockBuilder) NewBlock(filename string, hclBlock *hcl.Block, ctx *Contex
 	}
 
 	for _, hb := range content.Blocks {
-		children = append(children, b.NewBlock(filename, hb, ctx, moduleBlock))
+		children = append(children, b.NewBlock(filename, rootPath, hb, ctx, moduleBlock))
 	}
 
 	block := &Block{
 		context:     ctx,
 		hclBlock:    hclBlock,
 		moduleBlock: moduleBlock,
+		rootPath:    rootPath,
 		childBlocks: children,
 		verbose:     isLoggingVerbose,
 		newMock:     b.MockFunc,
@@ -344,7 +351,7 @@ func (b BlockBuilder) CloneBlock(block *Block, index cty.Value) *Block {
 
 	cloneHCL := *block.hclBlock
 
-	clone := b.NewBlock(block.Filename, &cloneHCL, childCtx, block.moduleBlock)
+	clone := b.NewBlock(block.Filename, block.rootPath, &cloneHCL, childCtx, block.moduleBlock)
 	if len(clone.hclBlock.Labels) > 0 {
 		position := len(clone.hclBlock.Labels) - 1
 		labels := make([]string, len(clone.hclBlock.Labels))
@@ -378,7 +385,7 @@ func (b BlockBuilder) CloneBlock(block *Block, index cty.Value) *Block {
 }
 
 // BuildModuleBlocks loads all the Blocks for the module at the given path
-func (b BlockBuilder) BuildModuleBlocks(block *Block, modulePath string) (Blocks, error) {
+func (b BlockBuilder) BuildModuleBlocks(block *Block, modulePath string, rootPath string) (Blocks, error) {
 	var blocks Blocks
 	moduleFiles, err := loadDirectory(b.Logger, modulePath, true)
 	if err != nil {
@@ -397,7 +404,7 @@ func (b BlockBuilder) BuildModuleBlocks(block *Block, modulePath string) (Blocks
 		}
 
 		for _, fileBlock := range fileBlocks {
-			blocks = append(blocks, b.NewBlock(file.path, fileBlock, moduleCtx, block))
+			blocks = append(blocks, b.NewBlock(file.path, rootPath, fileBlock, moduleCtx, block))
 		}
 	}
 
@@ -416,18 +423,23 @@ func SetUUIDAttributes(moduleBlock *Block, block *hcl.Block) {
 	if body, ok := block.Body.(*hclsyntax.Body); ok {
 		if (block.Type == "resource" || block.Type == "data") && body.Attributes != nil {
 			_, withCount := body.Attributes["count"]
+			_, withEach := body.Attributes["for_each"]
 			if _, ok := body.Attributes["id"]; !ok {
-				body.Attributes["id"] = newUniqueAttribute("id", withCount)
+				body.Attributes["id"] = newUniqueAttribute("id", withCount, withEach)
 			}
 
 			if _, ok := body.Attributes["arn"]; !ok {
-				body.Attributes["arn"] = newArnAttribute("arn", withCount)
+				body.Attributes["arn"] = newArnAttribute("arn", withCount, withEach)
+			}
+
+			if _, ok := body.Attributes["self_link"]; !ok {
+				body.Attributes["self_link"] = newUniqueAttribute("self_link", withCount, withEach)
 			}
 		}
 	}
 }
 
-func newUniqueAttribute(name string, withCount bool) *hclsyntax.Attribute {
+func newUniqueAttribute(name string, withCount bool, withEach bool) *hclsyntax.Attribute {
 	// prefix ids with hcl- so they can be identified as fake
 	var exp hclsyntax.Expression = &hclsyntax.LiteralValueExpr{
 		Val: cty.StringVal("hcl-" + uuid.NewString()),
@@ -440,13 +452,20 @@ func newUniqueAttribute(name string, withCount bool) *hclsyntax.Attribute {
 		}
 	}
 
+	if withEach {
+		e, diags := hclsyntax.ParseExpression([]byte(`"hcl-`+uuid.NewString()+`-${each.key}"`), name, hcl.Pos{})
+		if !diags.HasErrors() {
+			exp = e
+		}
+	}
+
 	return &hclsyntax.Attribute{
 		Name: name,
 		Expr: exp,
 	}
 }
 
-func newArnAttribute(name string, withCount bool) *hclsyntax.Attribute {
+func newArnAttribute(name string, withCount bool, withEach bool) *hclsyntax.Attribute {
 	// fakeARN replicates an aws arn string it deliberately leaves the
 	// region section (in between the 3rd and 4th semicolon) blank as
 	// Infracost will try and parse this region later down the line.
@@ -458,6 +477,13 @@ func newArnAttribute(name string, withCount bool) *hclsyntax.Attribute {
 
 	if withCount {
 		e, diags := hclsyntax.ParseExpression([]byte(`"`+fakeARN+`-${count.index}"`), name, hcl.Pos{})
+		if !diags.HasErrors() {
+			exp = e
+		}
+	}
+
+	if withEach {
+		e, diags := hclsyntax.ParseExpression([]byte(fakeARN+`-${each.key}"`), name, hcl.Pos{})
 		if !diags.HasErrors() {
 			exp = e
 		}
@@ -481,6 +507,19 @@ func (b *Block) InjectBlock(block *Block, name string) {
 	}
 
 	b.childBlocks = append(b.childBlocks, block)
+}
+
+// RemoveBlocks removes all the child Blocks of type name.
+func (b *Block) RemoveBlocks(name string) {
+	var filtered Blocks
+
+	for _, block := range b.childBlocks {
+		if block.Type() != name {
+			filtered = append(filtered, block)
+		}
+	}
+
+	b.childBlocks = filtered
 }
 
 // IsCountExpanded returns if the Block has been expanded as part of a for_each or count evaluation.
@@ -526,7 +565,7 @@ func (b *Block) IsForEachReferencedExpanded(moduleBlocks Blocks) bool {
 	return !referenced.ShouldExpand()
 }
 
-func (b Block) ShouldExpand() bool {
+func (b *Block) ShouldExpand() bool {
 	if b.IsCountExpanded() {
 		return false
 	}
@@ -669,7 +708,17 @@ func (b *Block) Provider() string {
 	return ""
 }
 
-// GetChildBlock returns the first child Block that has the name provided. e.g:
+// GetChildBlock is a helper method around GetChildBlocks. It returns the first non nil child block matching name.
+func (b *Block) GetChildBlock(name string) *Block {
+	blocks := b.GetChildBlocks(name)
+	if len(blocks) > 0 {
+		return blocks[0]
+	}
+
+	return nil
+}
+
+// GetChildBlocks returns all the child Block that match the name provided. e.g:
 // If the current Block looks like such:
 //
 //			resource "aws_instance" "t3_standard_cpuCredits" {
@@ -686,18 +735,19 @@ func (b *Block) Provider() string {
 //			}
 //
 // Then "credit_specification" &  "ebs_block_device" would be valid names that could be used to retrieve child Blocks.
-func (b *Block) GetChildBlock(name string) *Block {
-	var returnBlock *Block
+func (b *Block) GetChildBlocks(name string) []*Block {
 	if b == nil || b.hclBlock == nil {
-		return returnBlock
+		return nil
 	}
 
+	var children Blocks
 	for _, child := range b.childBlocks {
 		if child.Type() == name {
-			return child
+			children = append(children, child)
 		}
 	}
-	return returnBlock
+
+	return children
 }
 
 func (b *Block) HasChild(childElement string) bool {
@@ -749,8 +799,61 @@ func (b *Block) GetAttributes() []*Attribute {
 		})
 	}
 
+	if b.Type() == "data" && b.TypeLabel() == "local_file" {
+		attributes = b.loadFileContentsToAttributes(attributes)
+	}
+
 	b.attributes = attributes
 	return attributes
+}
+
+func (b *Block) loadFileContentsToAttributes(attributes []*Attribute) []*Attribute {
+	for _, attribute := range attributes {
+		if attribute.Name() == "filename" {
+			content, err := funcs.File(b.rootPath, attribute.Value())
+			if err != nil {
+				b.logger.WithError(err).Debugf("failed to load %s file contents", b.FullName())
+				break
+			}
+
+			attributes = []*Attribute{
+				attribute,
+				b.syntheticAttribute("content", content),
+			}
+
+			break
+		}
+	}
+
+	return attributes
+}
+
+func (b *Block) syntheticAttribute(name string, val cty.Value) *Attribute {
+	rng := hcl.Range{
+		Filename: b.Filename,
+		Start:    hcl.Pos{Line: 1, Column: 1},
+		End:      hcl.Pos{Line: 1, Column: 1},
+	}
+
+	hclAttr := &hcl.Attribute{
+		Name: name,
+		Expr: &hclsyntax.LiteralValueExpr{
+			Val:      val,
+			SrcRange: rng,
+		},
+		NameRange: rng,
+		Range:     rng,
+	}
+
+	return &Attribute{
+		newMock: b.newMock,
+		HCLAttr: hclAttr,
+		Ctx:     b.context,
+		Verbose: b.verbose,
+		Logger: b.logger.WithFields(logrus.Fields{
+			"attribute_name": name,
+		}),
+	}
 }
 
 // GetAttribute returns the given attribute with the provided name. It will return nil if the attribute is not found.
@@ -960,7 +1063,7 @@ func loadBlocksFromFile(file file, schema *hcl.BodySchema) (hcl.Blocks, error) {
 		schema = terraformSchemaV012
 	}
 
-	contents, diags := file.hclFile.Body.Content(schema)
+	contents, _, diags := file.hclFile.Body.PartialContent(schema)
 	if diags != nil && diags.HasErrors() {
 		return nil, diags
 	}

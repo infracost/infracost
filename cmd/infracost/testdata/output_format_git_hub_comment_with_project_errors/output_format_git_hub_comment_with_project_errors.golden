@@ -42,7 +42,7 @@ Module path: prod
     + root_block_device
     
         + Storage (general purpose SSD, gp2)
-          +$5.00
+          +$5
 
     + ebs_block_device[0]
     
@@ -50,7 +50,7 @@ Module path: prod
           +$125
     
         + Provisioned IOPS
-          +$52.00
+          +$52
 
 Monthly cost change for infracost/infracost/cmd/infracost/testdata/breakdown_multi_project_with_error/prod (Module path: prod)
 Amount:  +$1,303 ($0.00 → $1,303)

@@ -1,0 +1,8 @@
+version: 0.1
+resource_usage:
+  aws_lambda_provisioned_concurrency_config.with_usage:
+    monthly_duration_hrs: 100
+    request_duration_ms: 350
+    monthly_requests: 10000000
+    architecture: arm64
+    memory_mb: 512

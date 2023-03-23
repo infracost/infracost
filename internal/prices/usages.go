@@ -128,7 +128,7 @@ func popResourceActualCosts(ctx *config.RunContext, c *apiclient.UsageAPIClient,
 
 // FetchUsageData fetches usage estimates derived from cloud provider reported usage
 // from the Infracost Cloud Usage API for each supported resource in the project
-func FetchUsageData(ctx *config.RunContext, project *schema.Project) (map[string]*schema.UsageData, error) {
+func FetchUsageData(ctx *config.RunContext, project *schema.Project) (schema.UsageMap, error) {
 	c := apiclient.NewUsageAPIClient(ctx)
 
 	// gather all the CoreResource
@@ -162,7 +162,7 @@ func FetchUsageData(ctx *config.RunContext, project *schema.Project) (map[string
 
 			attributes, err := c.ListUsageQuantities(vars)
 			if err != nil {
-				return nil, err
+				return schema.NewUsageMap(usageMap), err
 			}
 
 			usageMap[address] = &schema.UsageData{
@@ -172,7 +172,7 @@ func FetchUsageData(ctx *config.RunContext, project *schema.Project) (map[string
 		}
 	}
 
-	return usageMap, nil
+	return schema.NewUsageMap(usageMap), nil
 }
 
 // UploadCloudResourceIDs sends the project scoped cloud resource ids to the Usage API, so they can be used

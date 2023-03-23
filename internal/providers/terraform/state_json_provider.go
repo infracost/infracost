@@ -36,7 +36,7 @@ func (p *StateJSONProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 	metadata.ConfigSha = p.ctx.ProjectConfig.ConfigSha
 }
 
-func (p *StateJSONProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
+func (p *StateJSONProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, error) {
 	spinner := ui.NewSpinner("Extracting only cost-related params from terraform", ui.SpinnerOptions{
 		EnableLogging: p.ctx.RunContext.Config.IsLogging(),
 		NoColor:       p.ctx.RunContext.Config.NoColor,

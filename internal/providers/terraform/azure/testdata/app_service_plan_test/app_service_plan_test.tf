@@ -50,6 +50,36 @@ resource "azurerm_app_service_plan" "premium_v1" {
   }
 }
 
+
+resource "azurerm_app_service_plan" "isolated" {
+  name                = "api-appserviceplan-pro"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  kind                = "Linux"
+  reserved            = false
+
+  sku {
+    tier     = "Isolated"
+    size     = "I1"
+    capacity = 1
+  }
+}
+
+
+resource "azurerm_app_service_plan" "isolated_v2" {
+  name                = "api-appserviceplan-pro"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  kind                = "Linux"
+  reserved            = false
+
+  sku {
+    tier     = "Isolated"
+    size     = "I1v2"
+    capacity = 1
+  }
+}
+
 resource "azurerm_app_service_plan" "premium_v2" {
   name                = "api-appserviceplan-pro"
   location            = azurerm_resource_group.example.location

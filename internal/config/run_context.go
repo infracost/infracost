@@ -152,14 +152,17 @@ func (r *RunContext) ContextValues() map[string]interface{} {
 }
 
 func (r *RunContext) GetResourceWarnings() map[string]map[string]int {
-	if warnings := r.contextVals["resourceWarnings"]; warnings != nil {
+	contextValues := r.ContextValues()
+
+	if warnings := contextValues["resourceWarnings"]; warnings != nil {
 		return warnings.(map[string]map[string]int)
 	}
+
 	return nil
 }
 
 func (r *RunContext) SetResourceWarnings(resourceWarnings map[string]map[string]int) {
-	r.contextVals["resourceWarnings"] = resourceWarnings
+	r.SetContextValue("resourceWarnings", resourceWarnings)
 }
 
 func (r *RunContext) EventEnv() map[string]interface{} {
@@ -232,6 +235,13 @@ func (r *RunContext) IsCloudUploadEnabled() bool {
 		return *r.Config.EnableCloudUpload
 	}
 	return r.IsCloudEnabled()
+}
+
+// IsCloudUploadExplicitlyEnabled returns true if cloud upload has been enabled through one of the
+// env variables ENABLE_CLOUD, ENABLE_CLOUD_UPLOAD, or ENABLE_DASHBOARD
+func (r *RunContext) IsCloudUploadExplicitlyEnabled() bool {
+	return r.IsCloudUploadEnabled() &&
+		(r.Config.EnableCloud != nil || r.Config.EnableCloudUpload != nil || r.Config.EnableDashboard)
 }
 
 func baseVersion(v string) string {

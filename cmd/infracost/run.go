@@ -13,9 +13,7 @@ import (
 	"time"
 
 	"github.com/Rhymond/go-money"
-	"github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
-	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
@@ -29,7 +27,6 @@ import (
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/prices"
 	"github.com/infracost/infracost/internal/providers"
-	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/infracost/infracost/internal/usage"
@@ -44,11 +41,6 @@ type projectResult struct {
 	index      int
 	ctx        *config.ProjectContext
 	projectOut *projectOutput
-}
-
-type hclRunDiff struct {
-	resourceDiffs    map[string][]string
-	missingResources []string
 }
 
 func addRunFlags(cmd *cobra.Command) {
@@ -112,27 +104,11 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	projects := make([]*schema.Project, 0)
 	projectContexts := make([]*config.ProjectContext, 0)
 
-	hclProjects := make([]*schema.Project, 0)
 	for _, projectResult := range projectResults {
 		for _, project := range projectResult.projectOut.projects {
 			projectContexts = append(projectContexts, projectResult.ctx)
 			projects = append(projects, project)
 		}
-
-		hclProjects = append(hclProjects, projectResult.projectOut.hclProjects...)
-	}
-
-	wg := &sync.WaitGroup{}
-	var hclR *output.Root
-	if len(hclProjects) > 0 {
-		wg.Add(1)
-		hclR = new(output.Root)
-		go formatHCLProjects(wg, runCtx, hclProjects, hclR)
-	}
-
-	err = checkIfAllProjectsErrored(projects)
-	if err != nil {
-		return err
 	}
 
 	r, err := output.ToOutputFormat(projects)
@@ -147,12 +123,11 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		}
 	}
 
-	wg.Wait()
 	r.IsCIRun = runCtx.IsCIRun()
 	r.Currency = runCtx.Config.Currency
 	r.Metadata = output.NewMetadata(runCtx)
 
-	if runCtx.IsCloudUploadEnabled() {
+	if runCtx.IsCloudUploadExplicitlyEnabled() {
 		dashboardClient := apiclient.NewDashboardAPIClient(runCtx)
 		result, err := dashboardClient.AddRun(runCtx, r)
 		if err != nil {
@@ -186,7 +161,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		runCtx.SetContextValue("lineCount", lines)
 	}
 
-	env := buildRunEnv(runCtx, projectContexts, r, projects, hclR, hclProjects)
+	env := buildRunEnv(runCtx, projectContexts, r)
 
 	pricingClient := apiclient.NewPricingAPIClient(runCtx)
 	err = pricingClient.AddEvent("infracost-run", env)
@@ -210,66 +185,8 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	return nil
 }
 
-func checkIfAllProjectsErrored(projects []*schema.Project) error {
-	allError := true
-
-	if len(projects) == 0 {
-		allError = false
-	}
-
-	for _, project := range projects {
-		if !project.Metadata.HasErrors() {
-			allError = false
-			break
-		}
-	}
-
-	if allError {
-		multi := &multierror.Error{}
-		for _, project := range projects {
-			msg := fmt.Sprintf("project %s errored: \n", project.Name)
-			for i, diag := range project.Metadata.Errors {
-				msg += "\t\t\t" + diag.Message
-
-				if i != len(project.Metadata.Errors)-1 {
-					msg += "\n"
-				}
-
-			}
-
-			multi.Errors = append(multi.Errors, errors.New(msg))
-		}
-
-		return multi
-	}
-
-	return nil
-}
-
-func formatHCLProjects(wg *sync.WaitGroup, ctx *config.RunContext, hclProjects []*schema.Project, hclR *output.Root) {
-	defer func() {
-		err := recover()
-		wg.Done()
-
-		if err != nil {
-			err = apiclient.ReportCLIError(ctx, fmt.Errorf("hcl-runtime-error: formatting hcl projects %s\n%s", err, debug.Stack()), false)
-			if err != nil {
-				log.Debugf("error reporting unexpected hcl runtime error: %s", err)
-			}
-		}
-	}()
-
-	rr, err := output.ToOutputFormat(hclProjects)
-	if err != nil {
-		log.Debugf("could not format hcl project to root output")
-	}
-
-	*hclR = rr
-}
-
 type projectOutput struct {
-	projects    []*schema.Project
-	hclProjects []*schema.Project
+	projects []*schema.Project
 }
 
 type parallelRunner struct {
@@ -287,7 +204,9 @@ func newParallelRunner(cmd *cobra.Command, runCtx *config.RunContext) (*parallel
 	// can't run multiple operations in parallel on the same path.
 	pathMuxs := map[string]*sync.Mutex{}
 	for _, projectCfg := range runCtx.Config.Projects {
-		pathMuxs[projectCfg.Path] = &sync.Mutex{}
+		if projectCfg.TerraformForceCLI {
+			pathMuxs[projectCfg.Path] = &sync.Mutex{}
+		}
 	}
 
 	var prior *output.Root
@@ -358,7 +277,7 @@ func (r *parallelRunner) run() ([]projectResult, error) {
 				})
 				configProjects, err := r.runProjectConfig(ctx)
 				if err != nil {
-					return err
+					configProjects = newErroredProject(ctx, err)
 				}
 
 				projectResultChan <- projectResult{
@@ -413,7 +332,7 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 		warn = v.Warn()
 	} else if err != nil {
 		m := fmt.Sprintf("%s\n\n", err)
-		m += fmt.Sprintf("Try setting --path to a Terraform plan JSON file. See %s for how to generate this.", ui.LinkString("https://infracost.io/troubleshoot"))
+		m += fmt.Sprintf("Try adding a config-file to configure how Infracost should run. See %s for details and examples.", ui.LinkString("https://infracost.io/config-file"))
 
 		return nil, clierror.NewCLIError(errors.New(m), "Could not detect path type")
 	}
@@ -458,7 +377,6 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 	}
 
 	// Load usage data
-	usageData := make(map[string]*schema.UsageData)
 	var usageFile *usage.UsageFile
 
 	if ctx.ProjectConfig.UsageFile != "" {
@@ -477,12 +395,10 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 				strings.Join(invalidKeys, ", "),
 			)
 		}
+
+		ctx.SetContextValue("hasUsageFile", true)
 	} else {
 		usageFile = usage.NewBlankUsageFile()
-	}
-
-	if len(usageData) > 0 {
-		ctx.SetContextValue("hasUsageFile", true)
 	}
 
 	// Merge wildcard usages into individual usage
@@ -509,15 +425,8 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 		us.MergeResourceUsage(wildCardUsage[prefixName])
 	}
 
-	usageData = usageFile.ToUsageDataMap()
+	usageData := usageFile.ToUsageDataMap()
 	out := &projectOutput{}
-	wg := &sync.WaitGroup{}
-
-	// if the provider is the dir provider let's run the hcl provider at the same time to get reporting metrics.
-	if _, ok := provider.(*terraform.DirProvider); ok {
-		wg.Add(1)
-		go r.runHCLProvider(wg, ctx, usageFile, out)
-	}
 
 	t1 := time.Now()
 	projects, err := provider.LoadResources(usageData)
@@ -574,9 +483,6 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 	taken := t2.Sub(t1).Milliseconds()
 	ctx.SetContextValue("tfProjectRunTimeMs", taken)
 
-	// wait for the hcl provider to finish if it hasn't already
-	wg.Wait()
-
 	spinner.Success()
 
 	if r.runCtx.Config.UsageActualCosts {
@@ -631,7 +537,7 @@ func (r *parallelRunner) hasCloudResourceIDToUpload(projects []*schema.Project) 
 }
 
 func (r *parallelRunner) buildResources(projects []*schema.Project) {
-	var projectPtrToUsageMap map[*schema.Project]map[string]*schema.UsageData
+	var projectPtrToUsageMap map[*schema.Project]schema.UsageMap
 	if r.runCtx.Config.UsageAPIEndpoint != "" {
 		projectPtrToUsageMap = r.fetchProjectUsage(projects)
 	}
@@ -639,7 +545,7 @@ func (r *parallelRunner) buildResources(projects []*schema.Project) {
 	schema.BuildResources(projects, projectPtrToUsageMap)
 }
 
-func (r *parallelRunner) fetchProjectUsage(projects []*schema.Project) map[*schema.Project]map[string]*schema.UsageData {
+func (r *parallelRunner) fetchProjectUsage(projects []*schema.Project) map[*schema.Project]schema.UsageMap {
 	coreResourceCount := 0
 	for _, project := range projects {
 		for _, partial := range project.PartialResources {
@@ -666,7 +572,7 @@ func (r *parallelRunner) fetchProjectUsage(projects []*schema.Project) map[*sche
 	spinner := ui.NewSpinner(fmt.Sprintf("Retrieving usage estimates for %s from Infracost Cloud", resourceStr), spinnerOpts)
 	defer spinner.Fail()
 
-	projectPtrToUsageMap := make(map[*schema.Project]map[string]*schema.UsageData, len(projects))
+	projectPtrToUsageMap := make(map[*schema.Project]schema.UsageMap, len(projects))
 
 	for _, project := range projects {
 		usageMap, err := prices.FetchUsageData(r.runCtx, project)
@@ -702,59 +608,6 @@ func (r *parallelRunner) populateActualCosts(projects []*schema.Project) {
 
 		spinner.Success()
 	}
-}
-
-func (r *parallelRunner) runHCLProvider(wg *sync.WaitGroup, ctx *config.ProjectContext, usageFile *usage.UsageFile, out *projectOutput) {
-	defer func() {
-		err := recover()
-		wg.Done()
-
-		if err != nil {
-			log.Debugf("recovered from hcl provider panic %s", err)
-			err = apiclient.ReportCLIError(r.runCtx, fmt.Errorf("hcl-runtime-error: loading resources %s\n%s", err, debug.Stack()), false)
-			if err != nil {
-				log.Debugf("error reporting unexpected hcl runtime error: %s", err)
-			}
-		}
-	}()
-	if r.runCtx.Config.DisableHCLParsing {
-		return
-	}
-
-	t1 := time.Now()
-
-	hclProvider, err := terraform.NewHCLProvider(ctx, &terraform.HCLProviderConfig{SuppressLogging: true})
-	if err != nil {
-		log.Debugf("Could not init HCL provider: %s", err)
-		return
-	}
-
-	projects, err := hclProvider.LoadResources(usageFile.ToUsageDataMap())
-	if err != nil {
-		log.Debugf("Error loading projects from HCL provider: %s", err)
-		return
-	}
-
-	for _, project := range projects {
-		err := prices.PopulatePrices(r.runCtx, project)
-		if err != nil {
-			log.Debugf("Error populating prices for HCL project: %s", err)
-			return
-		}
-		err = prices.PopulateActualCosts(r.runCtx, project)
-		if err != nil {
-			log.Debugf("Error populating usages for HCL project: %s", err)
-			return
-		}
-
-		schema.CalculateCosts(project)
-		project.CalculateDiff()
-	}
-
-	out.hclProjects = projects
-	t2 := time.Now()
-	taken := t2.Sub(t1).Milliseconds()
-	ctx.SetContextValue("hclProjectRunTimeMs", taken)
 }
 
 func (r *parallelRunner) generateUsageFile(ctx *config.ProjectContext, provider schema.Provider) error {
@@ -999,7 +852,7 @@ func checkRunConfig(warningWriter io.Writer, cfg *config.Config) error {
 	return nil
 }
 
-func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectContext, r output.Root, projects []*schema.Project, hclR *output.Root, hclProjects []*schema.Project) map[string]interface{} {
+func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectContext, r output.Root) map[string]interface{} {
 	env := runCtx.EventEnvWithProjectContexts(projectContexts)
 
 	env["runId"] = r.RunID
@@ -1030,11 +883,6 @@ func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectCon
 	env["totalEstimatedUsages"] = summary.TotalEstimatedUsages
 	env["totalUnestimatedUsages"] = summary.TotalUnestimatedUsages
 
-	if hclR != nil {
-		AddHCLEnvVars(projectContexts, r, projects, *hclR, hclProjects, env)
-
-	}
-
 	if warnings := runCtx.GetResourceWarnings(); warnings != nil {
 		env["resourceWarnings"] = warnings
 	}
@@ -1046,137 +894,6 @@ func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectCon
 	return env
 }
 
-// AddHCLEnvVars adds HCL reporting metrics to the Infracost run so that we can assess the accuracy of
-// the HCL approach.
-func AddHCLEnvVars(projectContexts []*config.ProjectContext, r output.Root, projects []*schema.Project, hclR output.Root, hclProjects []*schema.Project, env map[string]interface{}) {
-	var initialTotal decimal.Decimal
-	if r.TotalMonthlyCost != nil {
-		initialTotal = *r.TotalMonthlyCost
-	}
-
-	var hclTotal decimal.Decimal
-	if hclR.TotalMonthlyCost != nil {
-		hclTotal = *hclR.TotalMonthlyCost
-	}
-
-	env["hclPercentChange"] = "0.00"
-	env["absHclPercentChange"] = "0.00"
-	change := percentChange(hclTotal, initialTotal)
-	abs := change.Abs()
-
-	if abs.GreaterThan(decimal.NewFromInt(0)) {
-		env["hclPercentChange"] = change.StringFixed(2)
-		env["absHclPercentChange"] = abs.StringFixed(2)
-	}
-
-	for _, k := range os.Environ() {
-		if strings.HasPrefix(k, "TF_VAR") {
-			env["tfVarPresent"] = true
-			break
-		}
-	}
-
-	var tfTimeTaken int64
-	var hclTimeTaken int64
-	for _, pCtx := range projectContexts {
-		if v, ok := pCtx.ContextValues()["tfProjectRunTimeMs"]; ok {
-			tfTimeTaken += v.(int64)
-		}
-
-		if v, ok := pCtx.ContextValues()["hclProjectRunTimeMs"]; ok {
-			hclTimeTaken += v.(int64)
-		}
-	}
-
-	env["tfRunTimeMs"] = tfTimeTaken
-	env["hclRunTimeMs"] = hclTimeTaken
-
-	diff := collectHCLRunDiff(projects, hclProjects)
-	env["hclMissingResources"] = diff.missingResources
-	env["hclResourceDiff"] = diff.resourceDiffs
-}
-
-func collectHCLRunDiff(projects, hclProjects []*schema.Project) hclRunDiff {
-	diff := map[string][]string{}
-	missingResources := map[string]bool{}
-
-	hclProjectsMapping := map[string]*schema.Project{}
-	for _, project := range hclProjects {
-		hclProjectsMapping[project.Name] = project
-	}
-
-	for _, project := range projects {
-		hclProject := hclProjectsMapping[project.Name]
-
-		if hclProject == nil {
-			log.Debugf("could not find a matching HCL project '%s' for HCL run diff", project.Name)
-			continue
-		}
-
-		hclResourcesMapping := map[string]*decimal.Decimal{}
-
-		for _, hclResource := range hclProject.Resources {
-			hclResourcesMapping[hclResource.Name] = hclResource.MonthlyCost
-		}
-
-		for _, resource := range project.Resources {
-			hclResourceCost, ok := hclResourcesMapping[resource.Name]
-			if !ok {
-				missingResources[resource.ResourceType] = true
-				continue
-			}
-
-			if resource.MonthlyCost == nil && hclResourceCost == nil {
-				continue
-			}
-
-			hclCost := decimal.NewFromInt(0)
-			if hclResourceCost != nil {
-				hclCost = *hclResourceCost
-			}
-
-			var cost decimal.Decimal
-			change := decimal.NewFromInt(100)
-			abs := decimal.NewFromInt(100)
-
-			if resource.MonthlyCost != nil {
-				cost = *resource.MonthlyCost
-
-				change = percentChange(hclCost, cost)
-				abs = change.Abs()
-			}
-
-			if abs.GreaterThan(decimal.NewFromInt(0)) {
-				if diff[resource.ResourceType] == nil {
-					diff[resource.ResourceType] = []string{}
-				}
-
-				diff[resource.ResourceType] = append(diff[resource.ResourceType], change.StringFixed(2))
-			}
-		}
-	}
-
-	missingList := make([]string, 0, len(missingResources))
-	for key := range missingResources {
-		missingList = append(missingList, key)
-	}
-
-	runDiff := hclRunDiff{
-		missingResources: missingList,
-		resourceDiffs:    diff,
-	}
-
-	return runDiff
-}
-
-func percentChange(a decimal.Decimal, b decimal.Decimal) decimal.Decimal {
-	if b.IsZero() {
-		return decimal.NewFromInt(0)
-	}
-
-	return a.Sub(b).Div(b).Mul(decimal.NewFromInt(100))
-}
-
 func unwrapped(err error) error {
 	e := err
 	for errors.Unwrap(e) != nil {
@@ -1184,4 +901,17 @@ func unwrapped(err error) error {
 	}
 
 	return e
+}
+
+func newErroredProject(ctx *config.ProjectContext, err error) *projectOutput {
+	metadata := config.DetectProjectMetadata(ctx.ProjectConfig.Path)
+	metadata.Type = "error"
+	metadata.AddError(err)
+
+	name := ctx.ProjectConfig.Name
+	if name == "" {
+		name = metadata.GenerateProjectName(ctx.RunContext.VCSMetadata.Remote, ctx.RunContext.IsCloudEnabled())
+	}
+
+	return &projectOutput{projects: []*schema.Project{schema.NewProject(name, metadata)}}
 }

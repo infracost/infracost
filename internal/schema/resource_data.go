@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 
 	"github.com/awslabs/goformation/v4/cloudformation"
-
 	"github.com/tidwall/gjson"
 )
 
@@ -14,7 +13,7 @@ type ResourceData struct {
 	Address       string
 	Tags          map[string]string
 	RawValues     gjson.Result
-	referencesMap map[string][]*ResourceData
+	ReferencesMap map[string][]*ResourceData
 	CFResource    cloudformation.Resource
 	UsageData     *UsageData
 	Metadata      map[string]gjson.Result
@@ -28,7 +27,7 @@ func NewResourceData(resourceType string, providerName string, address string, t
 		Address:       address,
 		Tags:          tags,
 		RawValues:     rawValues,
-		referencesMap: make(map[string][]*ResourceData),
+		ReferencesMap: make(map[string][]*ResourceData),
 		CFResource:    nil,
 		pulumiUrn:     "",
 	}
@@ -41,7 +40,7 @@ func NewCFResourceData(resourceType string, providerName string, address string,
 		Address:       address,
 		Tags:          tags,
 		RawValues:     gjson.Result{},
-		referencesMap: make(map[string][]*ResourceData),
+		ReferencesMap: make(map[string][]*ResourceData),
 		CFResource:    cfResource,
 		pulumiUrn:     "",
 	}
@@ -54,7 +53,7 @@ func NewPulumiResourceData(resourceType string, providerName string, address str
 		Address:       address,
 		Tags:          tags,
 		RawValues:     rawValues,
-		referencesMap: make(map[string][]*ResourceData),
+		ReferencesMap: make(map[string][]*ResourceData),
 		CFResource:    nil,
 		pulumiUrn:     pulumiURN,
 	}
@@ -113,26 +112,27 @@ func (d *ResourceData) References(keys ...string) []*ResourceData {
 	var data []*ResourceData
 
 	for _, key := range keys {
-		data = append(data, d.referencesMap[key]...)
+		data = append(data, d.ReferencesMap[key]...)
 	}
 
 	return data
 }
 
 func (d *ResourceData) AddReference(key string, reference *ResourceData, reverseRefAttrs []string) {
-	if _, ok := d.referencesMap[key]; !ok {
-		d.referencesMap[key] = make([]*ResourceData, 0)
+	if _, ok := d.ReferencesMap[key]; !ok {
+		d.ReferencesMap[key] = make([]*ResourceData, 0)
 	}
 
-	d.referencesMap[key] = append(d.referencesMap[key], reference)
+	d.ReferencesMap[key] = append(d.ReferencesMap[key], reference)
+
 	// add any reverse references
 	reverseRefKey := d.Type + "." + key
 	for _, attr := range reverseRefAttrs {
 		if attr == reverseRefKey {
-			if _, ok := reference.referencesMap[reverseRefKey]; !ok {
-				reference.referencesMap[reverseRefKey] = make([]*ResourceData, 0)
+			if _, ok := reference.ReferencesMap[reverseRefKey]; !ok {
+				reference.ReferencesMap[reverseRefKey] = make([]*ResourceData, 0)
 			}
-			reference.referencesMap[reverseRefKey] = append(reference.referencesMap[reverseRefKey], d)
+			reference.ReferencesMap[reverseRefKey] = append(reference.ReferencesMap[reverseRefKey], d)
 		}
 	}
 }

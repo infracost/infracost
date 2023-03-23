@@ -190,7 +190,7 @@ func (p *HCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 // LoadResources calls a hcl.Parser to parse the directory config files into hcl.Blocks. It then builds a shallow
 // representation of the terraform plan JSON files from these Blocks, this is passed to the PlanJSONProvider.
 // The PlanJSONProvider uses this shallow representation to actually load Infracost resources.
-func (p *HCLProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
+func (p *HCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, error) {
 	jsons := p.LoadPlanJSONs()
 
 	var projects = make([]*schema.Project, len(jsons))
@@ -206,7 +206,7 @@ func (p *HCLProvider) LoadResources(usage map[string]*schema.UsageData) ([]*sche
 		}
 
 		if p.scanner != nil {
-			err := p.scanner.ScanPlan(project, j.JSON)
+			err := p.scanner.ScanPlan(project)
 			if err != nil {
 				p.logger.WithError(err).Debugf("failed to scan Terraform project %s", project.Name)
 			}
@@ -217,7 +217,7 @@ func (p *HCLProvider) LoadResources(usage map[string]*schema.UsageData) ([]*sche
 	return projects, nil
 }
 
-func (p *HCLProvider) parseResources(parsed HCLProject, usage map[string]*schema.UsageData) *schema.Project {
+func (p *HCLProvider) parseResources(parsed HCLProject, usage schema.UsageMap) *schema.Project {
 	project := p.newProject(parsed)
 
 	partialPastResources, partialResources, err := p.planJSONParser.parseJSON(parsed.JSON, usage)
@@ -318,13 +318,7 @@ func (p *HCLProvider) Modules() []HCLProject {
 	numJobs := len(p.parsers)
 	runInParallel := parallelism > 1 && numJobs > 1
 	if runInParallel && !runCtx.Config.IsLogging() {
-		if runInParallel && !p.config.SuppressLogging {
-			fmt.Fprintln(os.Stderr, "Running multiple projects in parallel, so log-level=info is enabled by default.")
-			fmt.Fprintln(os.Stderr, "Run with INFRACOST_PARALLELISM=1 to disable parallelism to help debugging.")
-			fmt.Fprintln(os.Stderr)
-		}
-
-		p.logger.Logger.SetLevel(log.InfoLevel)
+		// set the config level to info so that the spinners don't report to the console.
 		p.ctx.RunContext.Config.LogLevel = "info"
 	}
 
@@ -491,7 +485,7 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 		Address:       block.FullName(),
 		Mode:          "managed",
 		Type:          block.TypeLabel(),
-		Name:          stripCount(block.NameLabel()),
+		Name:          stripCountOrForEach(block.NameLabel()),
 		Index:         block.Index(),
 		SchemaVersion: 0,
 		InfracostMetadata: map[string]interface{}{
@@ -505,7 +499,7 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 		ModuleAddress: newString(block.ModuleAddress()),
 		Mode:          "managed",
 		Type:          block.TypeLabel(),
-		Name:          stripCount(block.NameLabel()),
+		Name:          stripCountOrForEach(block.NameLabel()),
 		Index:         block.Index(),
 		Change: ResourceChange{
 			Actions: []string{"create"},
@@ -536,20 +530,20 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 	var configuration ResourceData
 	if block.HasModuleBlock() {
 		configuration = ResourceData{
-			Address:           stripCount(block.LocalName()),
+			Address:           stripCountOrForEach(block.LocalName()),
 			Mode:              "managed",
 			Type:              block.TypeLabel(),
-			Name:              stripCount(block.NameLabel()),
+			Name:              stripCountOrForEach(block.NameLabel()),
 			ProviderConfigKey: block.ModuleName() + ":" + block.Provider(),
 			Expressions:       blockToReferences(block),
 			CountExpression:   p.countReferences(block),
 		}
 	} else {
 		configuration = ResourceData{
-			Address:           stripCount(block.FullName()),
+			Address:           stripCountOrForEach(block.FullName()),
 			Mode:              "managed",
 			Type:              block.TypeLabel(),
-			Name:              stripCount(block.NameLabel()),
+			Name:              stripCountOrForEach(block.NameLabel()),
 			ProviderConfigKey: providerConfigKey,
 			Expressions:       blockToReferences(block),
 			CountExpression:   p.countReferences(block),
@@ -824,8 +818,8 @@ func newString(s string) *string {
 	return &s
 }
 
-var countRegex = regexp.MustCompile(`\[\d+\]$`)
+var countRegex = regexp.MustCompile(`\[.+\]$`)
 
-func stripCount(s string) string {
+func stripCountOrForEach(s string) string {
 	return countRegex.ReplaceAllString(s, "")
 }

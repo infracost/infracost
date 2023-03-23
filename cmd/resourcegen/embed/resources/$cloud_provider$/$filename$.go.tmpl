@@ -65,16 +65,23 @@ type {{ .ResourceName }} struct {
 	{{- end }}
 }
 
-// {{ .ResourceName }}UsageSchema defines a list which represents the usage schema of {{ .ResourceName }}.
+// CoreType returns the name of this resource type
+func (r *{{ .ResourceName }}) CoreType() string {
+	return "{{ .ResourceName }}"
+}
+
+// UsageSchema defines a list which represents the usage schema of {{ .ResourceName }}.
 {{- if .WithHelp }}
 // If {{ .ResourceName }} has no usage schema it's safe to delete this type.
 {{- end }}
-var {{ .ResourceName }}UsageSchema = []*schema.UsageItem{
-	{{- if .WithHelp }}
-	// e.g. if you follow the example given in {{ .ResourceName }} struct you would need to add a list item with the following:
-	{Key: "monthly_data_processed_gb", DefaultValue: 0, ValueType: schema.Float64},
-	// Replace the above with all the usage items you need for {{ .ResourceName }}.
-	{{- end }}
+func (r *{{ .ResourceName }}) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{{- if .WithHelp }}
+		// e.g. if you follow the example given in {{ .ResourceName }} struct you would need to add a list item with the following:
+		{Key: "monthly_data_processed_gb", DefaultValue: 0, ValueType: schema.Float64},
+		// Replace the above with all the usage items you need for {{ .ResourceName }}.
+		{{- end }}
+	}
 }
 
 // PopulateUsage parses the u schema.UsageData into the {{ .ResourceName }}.
@@ -108,7 +115,7 @@ func (r *{{.ResourceName}}) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    {{ .ResourceName }}UsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }

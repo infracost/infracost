@@ -28,6 +28,9 @@ type Project struct {
 	Path string `yaml:"path,omitempty" ignored:"true"`
 	// ExcludePaths defines a list of directories that the provider should ignore.
 	ExcludePaths []string `yaml:"exclude_paths,omitempty" ignored:"true"`
+	// DependencyPaths is a list of any paths that this project depends on. These paths are relative to the
+	// config file and NOT the project.
+	DependencyPaths []string `yaml:"dependency_paths"`
 	// IncludeAllPaths tells autodetect to use all folders with valid project files.
 	IncludeAllPaths bool `yaml:"include_all_paths,omitempty" ignored:"true"`
 	// Name is a user defined name for the project

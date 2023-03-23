@@ -127,3 +127,17 @@ resource "azurerm_sentinel_data_connector_azure_active_directory" "example" {
   name                       = "example"
   log_analytics_workspace_id = azurerm_log_analytics_workspace.capacity_sentinel_data_ingestion.id
 }
+
+resource "azurerm_log_analytics_workspace" "per_gb_basic_data_ingestion_with_usage" {
+  name                = "acctest-data-ingest"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  sku                 = "PerGB2018"
+}
+
+resource "azurerm_log_analytics_workspace" "archive_data_with_usage" {
+  name                = "acctest-archive"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  sku                 = "PerGB2018"
+}

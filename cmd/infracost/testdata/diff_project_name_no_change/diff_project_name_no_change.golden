@@ -8,6 +8,10 @@ Module path: ../../../../examples/terraform
       Monthly cost depends on usage
         -$0.0000166667 per GB-seconds
 
+    + Ephemeral storage
+      Monthly cost depends on usage
+        +$0.0000000309 per GB-seconds
+
     + Duration (first 6B)
       Monthly cost depends on usage
         +$0.0000166667 per GB-seconds
@@ -26,6 +30,10 @@ Module path: ../../../../examples/terraform
     - Duration
       Monthly cost depends on usage
         -$0.0000166667 per GB-seconds
+
+    + Ephemeral storage
+      Monthly cost depends on usage
+        +$0.0000000309 per GB-seconds
 
     + Duration (first 6B)
       Monthly cost depends on usage
@@ -46,12 +54,16 @@ Module path: ../../../../examples/terragrunt/dev
       Monthly cost depends on usage
         -$0.0000166667 per GB-seconds
 
+    + Ephemeral storage
+      Monthly cost depends on usage
+        +$0.0000000309 per GB-seconds
+
     + Duration (first 6B)
       Monthly cost depends on usage
         +$0.0000166667 per GB-seconds
 
 Monthly cost change for my terragrunt dev project (Module path: ../../../../examples/terragrunt/dev)
-Amount:  $0.00 ($51.97 → $51.97)
+Amount:  $0.00 ($52 → $52)
 Percent: 0%
 
 ──────────────────────────────────
@@ -65,12 +77,16 @@ Module path: ../../../../examples/terragrunt/dev
       Monthly cost depends on usage
         -$0.0000166667 per GB-seconds
 
+    + Ephemeral storage
+      Monthly cost depends on usage
+        +$0.0000000309 per GB-seconds
+
     + Duration (first 6B)
       Monthly cost depends on usage
         +$0.0000166667 per GB-seconds
 
 Monthly cost change for my terragrunt multi project (Module path: ../../../../examples/terragrunt/dev)
-Amount:  $0.00 ($51.97 → $51.97)
+Amount:  $0.00 ($52 → $52)
 Percent: 0%
 
 ──────────────────────────────────
@@ -83,6 +99,10 @@ Module path: ../../../../examples/terragrunt/prod
     - Duration
       Monthly cost depends on usage
         -$0.0000166667 per GB-seconds
+
+    + Ephemeral storage
+      Monthly cost depends on usage
+        +$0.0000000309 per GB-seconds
 
     + Duration (first 6B)
       Monthly cost depends on usage
@@ -102,6 +122,10 @@ Module path: ../../../../examples/terragrunt/prod
     - Duration
       Monthly cost depends on usage
         -$0.0000166667 per GB-seconds
+
+    + Ephemeral storage
+      Monthly cost depends on usage
+        +$0.0000000309 per GB-seconds
 
     + Duration (first 6B)
       Monthly cost depends on usage
@@ -123,12 +147,16 @@ Workspace: ws2
       Monthly cost depends on usage
         -$0.0000166667 per GB-seconds
 
+    + Ephemeral storage
+      Monthly cost depends on usage
+        +$0.0000000309 per GB-seconds
+
     + Duration (first 6B)
       Monthly cost depends on usage
         +$0.0000166667 per GB-seconds
 
 Monthly cost change for my terragrunt workspace (Module path: ../../../../examples/terragrunt/dev, Workspace: ws2)
-Amount:  $0.00 ($51.97 → $51.97)
+Amount:  $0.00 ($52 → $52)
 Percent: 0%
 
 ──────────────────────────────────
@@ -142,6 +170,10 @@ Workspace: ws2
     - Duration
       Monthly cost depends on usage
         -$0.0000166667 per GB-seconds
+
+    + Ephemeral storage
+      Monthly cost depends on usage
+        +$0.0000000309 per GB-seconds
 
     + Duration (first 6B)
       Monthly cost depends on usage
@@ -162,6 +194,10 @@ Workspace: ws1
     - Duration
       Monthly cost depends on usage
         -$0.0000166667 per GB-seconds
+
+    + Ephemeral storage
+      Monthly cost depends on usage
+        +$0.0000000309 per GB-seconds
 
     + Duration (first 6B)
       Monthly cost depends on usage

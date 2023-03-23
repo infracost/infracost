@@ -66,6 +66,7 @@ type cloudfrontDistributionShieldRequestsUsage struct {
 	Australia    *int64 `infracost_usage:"australia"`
 	Singapore    *int64 `infracost_usage:"singapore"`
 	SouthKorea   *int64 `infracost_usage:"south_korea"`
+	Indonesia    *int64 `infracost_usage:"indonesia"`
 	India        *int64 `infracost_usage:"india"`
 }
 
@@ -444,6 +445,8 @@ var regionShieldMapping = map[string]string{
 	"ap-northeast-2":  "south_korea",
 	"ap-southeast-1":  "singapore",
 	"ap-southeast-2":  "australia",
+	"ap-southeast-3":  "indonesia",
+	"ap-southeast-4":  "australia",
 	"ap-south-1":      "india",
 	"ap-south-2":      "india",
 	"sa-east-1":       "south_america",
@@ -488,6 +491,7 @@ func (r *CloudfrontDistribution) shieldRequestsCostComponents() []*schema.CostCo
 		"australia":     r.MonthlyShieldRequests.Australia,
 		"singapore":     r.MonthlyShieldRequests.Singapore,
 		"south_korea":   r.MonthlyShieldRequests.SouthKorea,
+		"indonesia":     r.MonthlyShieldRequests.Indonesia,
 		"india":         r.MonthlyShieldRequests.India,
 	}
 

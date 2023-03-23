@@ -2,7 +2,6 @@ package hcl
 
 import (
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"sort"
@@ -732,7 +731,7 @@ func TestOptionWithRawCtyInput(t *testing.T) {
 }
 
 func createTestFile(filename, contents string) string {
-	dir, err := ioutil.TempDir(os.TempDir(), "infracost")
+	dir, err := os.MkdirTemp(os.TempDir(), "infracost")
 	if err != nil {
 		panic(err)
 	}
@@ -744,7 +743,7 @@ func createTestFile(filename, contents string) string {
 }
 
 func createTestFileWithModule(contents string, moduleContents string, moduleName string) string {
-	dir, err := ioutil.TempDir(os.TempDir(), "infracost")
+	dir, err := os.MkdirTemp(os.TempDir(), "infracost")
 	if err != nil {
 		panic(err)
 	}
@@ -1063,4 +1062,124 @@ output "mod_result" {
 	b, err = simple.MarshalJSON()
 	require.NoError(t, err)
 	assert.JSONEq(t, `{"out":{"name":"foo","obj":{"initial_prop":{"name":"test"},"merged":{"another_name":"test_again"}}}}`, string(b))
+}
+
+func Test_DynamicBlockWithMockedIndex(t *testing.T) {
+	path := createTestFileWithModule(`
+data "bad_state" "bad" {}
+
+module "reload" {
+  source         = "../."
+  input = [
+    {
+      "ip"        = "10.0.0.0"
+      "mock" = data.bad_state.bad.my_bad["10.0.0.0/24"].id
+    },
+    {
+      "ip"        = "10.0.1.0"
+      "mock" = data.bad_state.bad.my_bad["10.0.0.0/24"].id
+    }
+  ]
+}
+
+`,
+		`
+variable "input" {}
+
+resource "dynamic" "resource" {
+  dynamic "child_block" {
+    for_each = {
+    	for i in var.input : i.ip => i
+    }
+
+    content {
+      bar = child_block.value.mock
+      foo = child_block.value.ip
+    }
+  }
+}
+`,
+		"",
+	)
+
+	logger := newDiscardLogger()
+	loader := modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{})
+	parsers, err := LoadParsers(path, loader, nil, logger)
+	require.NoError(t, err)
+	module, err := parsers[0].ParseDirectory()
+	require.NoError(t, err)
+
+	require.Len(t, module.Modules, 1)
+	mod1 := module.Modules[0]
+	resource := mod1.Blocks.Matching(BlockMatcher{Label: "dynamic.resource"})
+	children := resource.GetChildBlocks("child_block")
+
+	values := `[`
+	for _, value := range children {
+		b := valueToBytes(t, value.Values())
+		values += string(b) + ","
+	}
+	values = strings.TrimSuffix(values, ",") + "]"
+
+	assert.JSONEq(
+		t,
+		values,
+		`[
+			{"foo":"10.0.0.0","bar":"input-mock"},
+			{"foo":"10.0.1.0","bar":"input-mock"}
+		]`,
+	)
+
+}
+
+func Test_ForEachReferencesAnotherForEachDependentAttribute(t *testing.T) {
+	path := createTestFile("test.tf", `
+locals {
+  os_types = ["Windows"]
+  skus     = ["EP1"]
+
+  permutations = distinct(flatten([
+	  for os_type in local.os_types : [
+		  for sku in local.skus :{
+			sku     = sku
+			os_type = os_type
+		  }
+	  ]
+  ]))
+}
+
+resource "azurerm_service_plan" "plan" {
+  for_each = {for entry in local.permutations : "${entry.os_type}.${entry.sku}" => entry}
+
+  name                = "plan-${each.value.os_type}-${each.value.sku}"
+}
+
+resource "azurerm_linux_function_app" "function" {
+  for_each = {for entry in azurerm_service_plan.plan : "${entry.name}" => entry}
+
+  name                       = each.value.name
+}
+`,
+	)
+
+	logger := newDiscardLogger()
+	loader := modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{})
+	parsers, err := LoadParsers(filepath.Dir(path), loader, nil, logger)
+	require.NoError(t, err)
+	module, err := parsers[0].ParseDirectory()
+	require.NoError(t, err)
+
+	resource := module.Blocks.Matching(BlockMatcher{Label: `azurerm_linux_function_app.function["plan-Windows-EP1"]`})
+	name := resource.GetAttribute("name").AsString()
+	assert.Equal(t, "plan-Windows-EP1", name)
+}
+
+func valueToBytes(t *testing.T, v cty.Value) []byte {
+	t.Helper()
+
+	simple := ctyJson.SimpleJSONValue{Value: v}
+	b, err := simple.MarshalJSON()
+	require.NoError(t, err)
+
+	return b
 }

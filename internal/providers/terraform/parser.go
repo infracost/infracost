@@ -1,6 +1,8 @@
 package terraform
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -10,7 +12,6 @@ import (
 	"github.com/pkg/errors"
 	"github.com/tidwall/gjson"
 
-	address_parser "github.com/hashicorp/go-terraform-address"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/providers/terraform/aws"
@@ -87,7 +88,7 @@ func (p *Parser) createPartialResource(d *schema.ResourceData, u *schema.UsageDa
 	}
 }
 
-func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.PartialResource, usage map[string]*schema.UsageData, parsed, providerConf, conf, vars gjson.Result) []*schema.PartialResource {
+func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.PartialResource, usage schema.UsageMap, parsed, providerConf, conf, vars gjson.Result) []*schema.PartialResource {
 	var resources []*schema.PartialResource
 	resources = append(resources, baseResources...)
 	var vals gjson.Result
@@ -107,7 +108,6 @@ func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.Par
 	resData := p.parseResourceData(isState, providerConf, vals, conf, vars)
 
 	p.parseReferences(resData, conf)
-	p.loadInfracostProviderUsageData(usage, resData)
 	p.stripDataResources(resData)
 	p.populateUsageData(resData, usage)
 
@@ -122,34 +122,13 @@ func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.Par
 
 // populateUsageData finds the UsageData for each ResourceData and sets the ResourceData.UsageData field
 // in case it is needed when processing a reference attribute
-func (p *Parser) populateUsageData(resData map[string]*schema.ResourceData, usage map[string]*schema.UsageData) {
+func (p *Parser) populateUsageData(resData map[string]*schema.ResourceData, usage schema.UsageMap) {
 	for _, d := range resData {
-		// Look and default to resource_type level data
-		parsed_address, err := address_parser.NewAddress(d.Address)
-		if err == nil {
-			val, ok := usage[parsed_address.ResourceSpec.Type]
-			if ok {
-				d.UsageData = val
-			}
-		}
-
-		if ud := usage[d.Address]; ud != nil {
-			if d.UsageData != nil {
-				schema.MergeAttributes(d.UsageData, ud)
-			} else {
-				d.UsageData = ud
-			}
-		} else if strings.HasSuffix(d.Address, "]") {
-			lastIndexOfOpenBracket := strings.LastIndex(d.Address, "[")
-
-			if arrayUsageData := usage[fmt.Sprintf("%s[*]", d.Address[:lastIndexOfOpenBracket])]; arrayUsageData != nil {
-				d.UsageData = arrayUsageData
-			}
-		}
+		d.UsageData = usage.Get(d.Address)
 	}
 }
 
-func (p *Parser) parseJSON(j []byte, usage map[string]*schema.UsageData) ([]*schema.PartialResource, []*schema.PartialResource, error) {
+func (p *Parser) parseJSON(j []byte, usage schema.UsageMap) ([]*schema.PartialResource, []*schema.PartialResource, error) {
 	baseResources := p.loadUsageFileResources(usage)
 
 	j, _ = StripSetupTerraformWrapper(j)
@@ -168,6 +147,16 @@ func (p *Parser) parseJSON(j []byte, usage map[string]*schema.UsageData) ([]*sch
 	resources := p.parseJSONResources(false, baseResources, usage, parsed, providerConf, conf, vars)
 	if !p.includePastResources {
 		return nil, resources, nil
+	}
+
+	if !parsed.Get("prior_state").Exists() {
+		return nil, resources, nil
+	}
+
+	// Check if the prior state is the same as the planned state
+	// and if so we can just return pointers to the same resources
+	if gjsonEqual(parsed.Get("prior_state.values.root_module"), parsed.Get("planned_values.root_module")) {
+		return resources, resources, nil
 	}
 
 	pastResources := p.parseJSONResources(true, baseResources, usage, parsed, providerConf, conf, vars)
@@ -191,10 +180,10 @@ func StripSetupTerraformWrapper(b []byte) ([]byte, bool) {
 	return stripped, len(stripped) != len(b)
 }
 
-func (p *Parser) loadUsageFileResources(u map[string]*schema.UsageData) []*schema.PartialResource {
+func (p *Parser) loadUsageFileResources(u schema.UsageMap) []*schema.PartialResource {
 	resources := make([]*schema.PartialResource, 0)
 
-	for k, v := range u {
+	for k, v := range u.Data() {
 		for _, t := range GetUsageOnlyResources() {
 			if strings.HasPrefix(k, fmt.Sprintf("%s.", t)) {
 				d := schema.NewResourceData(t, "global", k, map[string]string{}, gjson.Result{})
@@ -449,24 +438,6 @@ func parseRegion(providerConf gjson.Result, vars gjson.Result, providerKey strin
 	return region
 }
 
-func (p *Parser) loadInfracostProviderUsageData(u map[string]*schema.UsageData, resData map[string]*schema.ResourceData) {
-	logging.Logger.Debugf("Loading usage data from Infracost provider resources")
-
-	for _, d := range resData {
-		if isInfracostResource(d) {
-			p.ctx.SetContextValue("terraformInfracostProviderEnabled", true)
-
-			for _, ref := range d.References("resources") {
-				if _, ok := u[ref.Address]; !ok {
-					u[ref.Address] = schema.NewUsageData(ref.Address, convertToUsageAttributes(d.RawValues))
-				} else {
-					logging.Logger.Debugf("Skipping loading usage for resource %s since it has already been defined", ref.Address)
-				}
-			}
-		}
-	}
-}
-
 func (p *Parser) stripDataResources(resData map[string]*schema.ResourceData) {
 	for addr, d := range resData {
 		if strings.HasPrefix(addressResourcePart(d.Address), "data.") {
@@ -619,16 +590,6 @@ func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, co
 	}
 
 	return found
-}
-
-func convertToUsageAttributes(j gjson.Result) map[string]gjson.Result {
-	a := make(map[string]gjson.Result)
-
-	for k, v := range j.Map() {
-		a[k] = v.Get("0.value")
-	}
-
-	return a
 }
 
 func getConfJSON(conf gjson.Result, addr string) gjson.Result {
@@ -830,4 +791,24 @@ func parseKnownModuleRefs(resData map[string]*schema.ResourceData, conf gjson.Re
 			}
 		}
 	}
+}
+
+func gjsonEqual(a, b gjson.Result) bool {
+	var err error
+
+	var aOut bytes.Buffer
+	err = json.Compact(&aOut, []byte(a.Raw))
+	if err != nil {
+		logging.Logger.Debugf("error indenting JSON: %s", err)
+		return false
+	}
+
+	var bOut bytes.Buffer
+	err = json.Compact(&bOut, []byte(b.Raw))
+	if err != nil {
+		logging.Logger.Debugf("error indenting JSON: %s", err)
+		return false
+	}
+
+	return aOut.String() == bOut.String()
 }

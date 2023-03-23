@@ -65,18 +65,13 @@ func (a AuthClient) startCallbackServer(listener net.Listener, generatedState st
 	go func() {
 		defer close(shutdown)
 
-		for {
-			select {
-			case <-time.After(time.Minute * 5):
-				shutdown <- callbackServerResp{err: fmt.Errorf("timeout")}
-				listener.Close()
-				return
-			}
-		}
+		time.Sleep(time.Minute * 5)
+		shutdown <- callbackServerResp{err: fmt.Errorf("timeout")}
+		listener.Close()
 	}()
 
 	go func() {
-		_ = http.Serve(listener, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_ = http.Serve(listener, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) { // nolint: gosec
 			if r.Method == http.MethodOptions {
 				return
 			}

@@ -10,8 +10,6 @@ import (
 	jsoniter "github.com/json-iterator/go"
 	"github.com/shopspring/decimal"
 	log "github.com/sirupsen/logrus"
-	"github.com/tidwall/gjson"
-	"github.com/tidwall/sjson"
 
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/config"
@@ -47,21 +45,23 @@ func NewTerraformPlanScanner(ctx *config.RunContext, logger *log.Entry, getPrice
 // ScanPlan scans the provided projectPlan for the project, if any Policies are found for the plan
 // the Scanner will attempt to fetch costs for the suggestion and given resource. These suggestions will only
 // be provided for resources that are marked as a schema.CoreResource.
-func (s *TerraformPlanScanner) ScanPlan(project *schema.Project, projectPlan []byte) error {
-	res := gjson.ParseBytes(projectPlan)
-
-	// if we have the infracost_resource_changes then this projectPlan has been passed from the HCLProvider,
-	// and we need to transform this list to the standard `resource_changes` key.
-	changes := res.Get("infracost_resource_changes")
-	if changes.Exists() {
-		standardPlan, err := sjson.SetBytes(projectPlan, "resource_changes", changes.Value())
-		if err != nil {
-			s.logger.WithError(err).Debugf("failed to set resource_changes on plan before policy API evaluation")
+func (s *TerraformPlanScanner) ScanPlan(project *schema.Project) error {
+	var toScan []*schema.ResourceData
+	for _, resource := range project.PartialResources {
+		coreResource := resource.CoreResource
+		if coreResource == nil {
+			continue
 		}
-		projectPlan = standardPlan
+
+		toScan = append(toScan, resource.ResourceData)
 	}
 
-	apiPolicies, err := s.policyAPIClient.GetPolicies(projectPlan)
+	if len(toScan) == 0 {
+		s.logger.Debug("skipping scanning resources for policy violations as there are no supported resources to scan")
+		return nil
+	}
+
+	apiPolicies, err := s.policyAPIClient.GetPolicies(toScan)
 	if err != nil {
 		return fmt.Errorf("failed to get suggestions %w", err)
 	}

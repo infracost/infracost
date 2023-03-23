@@ -11,8 +11,7 @@
 ──────────────────────────────────
 6 cloud resources were detected:
 ∙ 2 were estimated
-∙ 3 were free:
+∙ 4 were free:
   ∙ 2 x azurerm_app_service_custom_hostname_binding
-  ∙ 1 x azurerm_resource_group
-∙ 1 is not supported yet, see https://infracost.io/requested-resources:
   ∙ 1 x azurerm_app_service
+  ∙ 1 x azurerm_resource_group

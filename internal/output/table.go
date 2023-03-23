@@ -55,7 +55,7 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 			s += ui.BoldString("Errors:") + "\n"
 
 			for _, diag := range project.Metadata.Errors {
-				pieces := strings.Split(diag.Message, ":")
+				pieces := strings.Split(diag.Message, ": ")
 				for x, piece := range pieces {
 					s += strings.Repeat("  ", x+1) + piece
 
@@ -65,6 +65,10 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 						s += ":\n"
 					}
 				}
+			}
+
+			if len(out.Projects) == 1 {
+				s += "\n"
 			}
 		} else {
 			tableOut := tableForBreakdown(out.Currency, *project.Breakdown, opts.Fields, includeProjectTotals)
@@ -91,9 +95,14 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 	totalOut := FormatCost2DP(out.Currency, out.TotalMonthlyCost)
 
 	overallTitle := formatTitleWithCurrency(" OVERALL TOTAL", out.Currency)
+	padding := 12
+	if tableLen > 0 {
+		padding = tableLen - (len(overallTitle) + 1)
+	}
+
 	s += fmt.Sprintf("%s%s",
 		ui.BoldString(overallTitle),
-		fmt.Sprintf("%*s ", tableLen-(len(overallTitle)+1), totalOut), // pad based on the last line length
+		fmt.Sprintf("%*s ", padding, totalOut), // pad based on the last line length
 	)
 
 	summaryMsg := out.summaryMessage(opts.ShowSkipped)
