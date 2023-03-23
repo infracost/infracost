@@ -398,6 +398,7 @@
  ├─ Capacity (first 50TB)                                                        51,200  GB                  $1,064.96 
  ├─ Capacity (next 450TB)                                                       512,000  GB                 $10,223.62 
  ├─ Capacity (over 500TB)                                                     3,436,800  GB                 $65,766.60 
+ ├─ Write operations                                                                400  10k operations         $22.00 
  ├─ List and create container operations                                            400  10k operations         $22.00 
  ├─ Read operations                                                                  40  10k operations          $0.18 
  ├─ All other operations                                                            400  10k operations          $1.76 
@@ -452,7 +453,7 @@
  ├─ All other operations                                                            400  10k operations          $1.76 
  └─ Blob index                                                                       40  10k tags                $1.56 
                                                                                                                        
- OVERALL TOTAL                                                                                          $14,182,453.61 
+ OVERALL TOTAL                                                                                          $14,182,475.61 
 ──────────────────────────────────
 57 cloud resources were detected:
 ∙ 56 were estimated

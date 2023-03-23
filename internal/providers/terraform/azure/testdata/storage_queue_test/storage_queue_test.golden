@@ -36,6 +36,7 @@
                                                                                                                                 
  azurerm_storage_account.storagev2["StorageV2.Standard.LRS"]                                                                    
  ├─ Capacity                                                         Monthly cost depends on usage: $0.0208 per GB              
+ ├─ Write operations                                                 Monthly cost depends on usage: $0.055 per 10k operations   
  ├─ List and create container operations                             Monthly cost depends on usage: $0.055 per 10k operations   
  ├─ Read operations                                                  Monthly cost depends on usage: $0.0044 per 10k operations  
  ├─ All other operations                                             Monthly cost depends on usage: $0.0044 per 10k operations  
