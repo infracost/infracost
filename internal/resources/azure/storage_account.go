@@ -1094,7 +1094,7 @@ func (r *StorageAccount) isReplicationTypeSupported() bool {
 	case r.isStorageV2():
 		validReplicationTypes = []string{"LRS", "ZRS", "GRS", "RA-GRS", "GZRS", "RA-GZRS"}
 	case r.isBlobStorage():
-		validReplicationTypes = []string{"LRS", "GRS"}
+		validReplicationTypes = []string{"LRS", "GRS", "RA-GRS"}
 	case r.isFileStorage():
 		validReplicationTypes = []string{"LRS", "GRS", "ZRS"}
 	}
