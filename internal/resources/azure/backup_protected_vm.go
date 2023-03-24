@@ -138,7 +138,7 @@ func (r *BackupProtectedVM) storageCostsForVM() *schema.CostComponent {
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("Backup")},
 				{Key: "skuName", Value: strPtr("Standard")},
-				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/%s/i", dataStored))},
+				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/^%s/i", dataStored))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
