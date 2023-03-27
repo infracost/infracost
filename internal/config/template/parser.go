@@ -27,7 +27,8 @@ type Parser struct {
 // NewParser returns a safely initialized Infracost template parser, this builds the underlying template with the
 // Parser functions and sets the underlying default template name.
 func NewParser(repoDir string) *Parser {
-	p := Parser{repoDir: repoDir}
+	absRepoDir, _ := filepath.Abs(repoDir)
+	p := Parser{repoDir: absRepoDir}
 	t := template.New(defaultInfracostTmplName).Funcs(template.FuncMap{
 		"base":       p.base,
 		"stem":       p.stem,
@@ -121,12 +122,17 @@ func (p *Parser) contains(s, substr string) bool {
 
 // pathExists reports whether path is a subpath within base.
 func (p *Parser) pathExists(base, path string) bool {
-	if base == "." {
-		base = p.repoDir
-	}
-
 	if !filepath.IsAbs(base) {
 		base = filepath.Join(p.repoDir, base)
+	}
+
+	// Ensure the base path is within the repo directory
+	baseAbs, _ := filepath.Abs(base)
+	repoDirAbs, _ := filepath.Abs(p.repoDir)
+	// Add a file separator at the end to ensure we don't match a directory that starts with the same prefix
+	// e.g. `/path/to/infracost` shouldn't match `/path/to/infra`.
+	if !strings.HasPrefix(fmt.Sprintf("%s%s", baseAbs, string(filepath.Separator)), fmt.Sprintf("%s%s", repoDirAbs, string(filepath.Separator))) {
+		return false
 	}
 
 	var fileExists bool
