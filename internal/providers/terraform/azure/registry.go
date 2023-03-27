@@ -137,6 +137,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getRecoveryServicesVaultRegistryItem(),
 	getBackupProtectedVmRegistryItem(),
 	getStorageQueueRegistryItem(),
+	getStorageShareRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
