@@ -7,7 +7,7 @@ import (
 func GetAzureRMLoadBalancerOutboundRuleRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_lb_outbound_rule",
-		RFunc: NewAzureRMLoadBalancerRule,
+		RFunc: NewAzureRMLoadBalancerOutboundRule,
 		ReferenceAttributes: []string{
 			"loadbalancer_id",
 			"resource_group_name",
