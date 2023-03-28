@@ -23,9 +23,11 @@ func newGenerateConfigCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "config",
 		Short: "Generate Infracost config file from a template file",
-		Long:  "Generate Infracost config file from a template file",
+		Long: `Generate Infracost config file from a template file. See docs for template examples and syntax:
+
+  https://www.infracost.io/docs/features/config_file/#template-syntax`,
 		Example: `
-      infracost generate config --repo-path . --template-path infracost.yml.tmpl
+      infracost generate config --repo-path . --template-path infracost.yml.tmpl --out-file infracost.yml
       `,
 		ValidArgs: []string{"--", "-"},
 		RunE:      gen.run,
