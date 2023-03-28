@@ -1,0 +1,21 @@
+version: 0.1
+resource_usage:
+  azurerm_storage_share.premium-filestorage[*]:
+    snapshots_storage_gb: 10000
+    metadata_at_rest_storage_gb: 10000
+    monthly_write_operations: 1000000
+    monthly_list_operations: 1000000
+    monthly_read_operations: 100000
+    monthly_other_operations: 1000000
+    monthly_data_retrieval_gb: 1000
+    metadata_at_rest_storage_gb: 50000
+
+  azurerm_storage_share.standard[*]:
+    storage_gb: 2000000
+    snapshots_storage_gb: 20000
+    metadata_at_rest_storage_gb: 20000
+    monthly_write_operations: 2000000
+    monthly_list_operations: 2000000
+    monthly_read_operations: 200000
+    monthly_other_operations: 2000000
+    monthly_data_retrieval_gb: 2000
