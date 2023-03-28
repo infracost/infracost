@@ -1,0 +1,6 @@
+version: 0.1
+resource_usage:
+  azurerm_monitor_action_group.everything_example["with_usage"]:
+    monthly_notifications: 13000
+  azurerm_monitor_action_group.partial_example["with_usage"]:
+    monthly_notifications: 16000

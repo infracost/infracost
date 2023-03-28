@@ -1,0 +1,9 @@
+{
+  "guardrailsChecked": 134,
+  "guardrailComment": true,
+  "guardrailEvents": [
+    { "triggerReason":  "Some hidden reason", "prComment": false, "blockPr": false },
+    { "triggerReason":  "Some non-blocking reason", "prComment": true, "blockPr": false },
+    { "triggerReason":  "Some blocking reason", "prComment": true, "blockPr": true }
+  ]
+}

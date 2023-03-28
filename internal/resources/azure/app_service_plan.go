@@ -33,7 +33,7 @@ func (r *AppServicePlan) BuildResource() *schema.Resource {
 	}
 	productName := "Standard Plan"
 
-	if len(r.SKUSize) < 2 || strings.ToLower(r.SKUSize[:2]) == "ep" {
+	if len(r.SKUSize) < 2 || strings.ToLower(r.SKUSize[:2]) == "ep" || strings.ToLower(r.SKUSize[:2]) == "y1" {
 		return &schema.Resource{
 			Name:      r.Address,
 			IsSkipped: true,
@@ -41,16 +41,16 @@ func (r *AppServicePlan) BuildResource() *schema.Resource {
 		}
 	}
 
-	switch strings.ToLower(r.SKUSize[2:]) {
-	case "v1":
-		sku = r.SKUSize[:2]
-		productName = "Premium Plan"
-	case "v2":
-		sku = r.SKUSize[:2] + " " + r.SKUSize[2:]
-		productName = "Premium v2 Plan"
-	case "v3":
-		sku = r.SKUSize[:2] + " " + r.SKUSize[2:]
-		productName = "Premium v3 Plan"
+	var additionalAttributeFilters []*schema.AttributeFilter
+
+	switch strings.ToLower(r.SKUSize[:1]) {
+	case "s":
+		sku = "S" + r.SKUSize[1:]
+	case "b":
+		sku = "B" + r.SKUSize[1:]
+		productName = "Basic Plan"
+	case "p", "i":
+		sku, productName, additionalAttributeFilters = getVersionedAppServicePlanSKU(r.SKUSize, os)
 	}
 
 	switch strings.ToLower(r.SKUSize[:2]) {
@@ -62,32 +62,33 @@ func (r *AppServicePlan) BuildResource() *schema.Resource {
 		productName = "Shared Plan"
 	}
 
-	switch strings.ToLower(r.SKUSize[:1]) {
-	case "s":
-		sku = "S" + r.SKUSize[1:]
-	case "b":
-		sku = "B" + r.SKUSize[1:]
-		productName = "Basic Plan"
-	}
-
 	if r.Kind != "" {
 		os = strings.ToLower(r.Kind)
 	}
 	if os == "app" {
 		os = "windows"
 	}
-	if os != "windows" && productName != "Premium Plan" {
+	if os != "windows" && productName != "Premium Plan" && productName != "Isolated Plan" {
 		productName += " - Linux"
 	}
 
 	return &schema.Resource{
-		Name:           r.Address,
-		CostComponents: []*schema.CostComponent{r.appServicePlanCostComponent(fmt.Sprintf("Instance usage (%s)", r.SKUSize), productName, sku, capacity)},
-		UsageSchema:    AppServicePlanUsageSchema,
+		Name: r.Address,
+		CostComponents: []*schema.CostComponent{
+			servicePlanCostComponent(
+				r.Region,
+				fmt.Sprintf("Instance usage (%s)", r.SKUSize),
+				productName,
+				sku,
+				capacity,
+				additionalAttributeFilters...,
+			),
+		},
+		UsageSchema: AppServicePlanUsageSchema,
 	}
 }
 
-func (r *AppServicePlan) appServicePlanCostComponent(name, productName, skuRefactor string, capacity int64) *schema.CostComponent {
+func servicePlanCostComponent(region, name, productName, skuRefactor string, capacity int64, additionalAttributeFilters ...*schema.AttributeFilter) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           name,
 		Unit:           "hours",
@@ -95,16 +96,43 @@ func (r *AppServicePlan) appServicePlanCostComponent(name, productName, skuRefac
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(capacity)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
-			Region:        strPtr(r.Region),
+			Region:        strPtr(region),
 			Service:       strPtr("Azure App Service"),
 			ProductFamily: strPtr("Compute"),
-			AttributeFilters: []*schema.AttributeFilter{
+			AttributeFilters: append([]*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("Azure App Service " + productName)},
-				{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/%s/i", skuRefactor))},
-			},
+				{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/%s$/i", skuRefactor))},
+			}, additionalAttributeFilters...),
 		},
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
 	}
+}
+
+func getVersionedAppServicePlanSKU(skuName, os string) (string, string, []*schema.AttributeFilter) {
+	tier := "Premium"
+	if strings.ToLower(skuName[:1]) == "i" {
+		tier = "Isolated"
+	}
+
+	version := strings.ToLower(skuName[2:])
+	if version == "v1" {
+		version = ""
+	}
+
+	formattedSku := strings.TrimSpace(skuName[:2] + " " + version)
+
+	productName := strings.ReplaceAll(tier+" "+version+" Plan", "  ", " ")
+
+	if version == "v3" && os == "linux" {
+		return formattedSku, productName, []*schema.AttributeFilter{
+			{
+				Key:        "armSkuName",
+				ValueRegex: strPtr(fmt.Sprintf("/%s$/i", strings.ReplaceAll(formattedSku, " ", "_"))),
+			},
+		}
+	}
+
+	return formattedSku, productName, nil
 }

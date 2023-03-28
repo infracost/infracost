@@ -32,6 +32,7 @@ func NewPlanJSONProvider(ctx *config.ProjectContext, includePastResources bool) 
 		Path:                 ctx.ProjectConfig.Path,
 		includePastResources: includePastResources,
 		scanner:              scanner,
+		logger:               ctx.Logger(),
 	}
 }
 
@@ -44,12 +45,14 @@ func (p *PlanJSONProvider) DisplayType() string {
 }
 
 func (p *PlanJSONProvider) AddMetadata(metadata *schema.ProjectMetadata) {
+	metadata.ConfigSha = p.ctx.ProjectConfig.ConfigSha
+
 	// TerraformWorkspace isn't used to load resources but we still pass it
 	// on so it appears in the project name of the output
 	metadata.TerraformWorkspace = p.ctx.ProjectConfig.TerraformWorkspace
 }
 
-func (p *PlanJSONProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
+func (p *PlanJSONProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, error) {
 	spinner := ui.NewSpinner("Extracting only cost-related params from terraform", ui.SpinnerOptions{
 		EnableLogging: p.ctx.RunContext.Config.IsLogging(),
 		NoColor:       p.ctx.RunContext.Config.NoColor,
@@ -70,7 +73,7 @@ func (p *PlanJSONProvider) LoadResources(usage map[string]*schema.UsageData) ([]
 	return []*schema.Project{project}, nil
 }
 
-func (p *PlanJSONProvider) LoadResourcesFromSrc(usage map[string]*schema.UsageData, j []byte, spinner *ui.Spinner) (*schema.Project, error) {
+func (p *PlanJSONProvider) LoadResourcesFromSrc(usage schema.UsageMap, j []byte, spinner *ui.Spinner) (*schema.Project, error) {
 	metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
@@ -91,7 +94,7 @@ func (p *PlanJSONProvider) LoadResourcesFromSrc(usage map[string]*schema.UsageDa
 	project.PartialResources = partialResources
 
 	if p.scanner != nil {
-		err := p.scanner.ScanPlan(project, j)
+		err := p.scanner.ScanPlan(project)
 		if err != nil {
 			p.logger.WithError(err).Debugf("Terraform project %s plan JSON scan failed", project.Name)
 		}

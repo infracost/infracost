@@ -24,14 +24,14 @@ type SQLManagedInstance struct {
 	Address            string
 	Region             string
 	SKU                string
-	LicenceType        string
+	LicenseType        string
 	Cores              int64
 	StorageSizeInGb    int64
 	StorageAccountType string
 	// LongTermRetentionStorageGB defines a usage param that allows users to define how many gb of cold storage the database uses.
 	// This is storage that can be kept for up to 10 years.
 	LongTermRetentionStorageGB *int64 `infracost_usage:"long_term_retention_storage_gb"`
-	BackupStorageGb            *int64 `infracost_usage:"backup_storage_gb"`
+	BackupStorageGB            *int64 `infracost_usage:"backup_storage_gb"`
 }
 
 // PopulateUsage parses the u schema.UsageData into the SQLManagedInstance.
@@ -79,7 +79,7 @@ func (r *SQLManagedInstance) costComponents() []*schema.CostComponent {
 
 	costComponents = append(costComponents, r.sqlMIStorageCostComponent(), r.sqlMIBackupCostComponent())
 
-	if r.LicenceType == "LicenseIncluded" {
+	if r.LicenseType == "LicenseIncluded" {
 		costComponents = append(costComponents, r.sqlMILicenseCostComponent())
 	}
 
@@ -133,12 +133,12 @@ func (r *SQLManagedInstance) sqlMIStorageCostComponent() *schema.CostComponent {
 func (r *SQLManagedInstance) sqlMIBackupCostComponent() *schema.CostComponent {
 	var backup *decimal.Decimal
 
-	if r.BackupStorageGb != nil {
-		backup = decimalPtr(decimal.NewFromInt(*r.BackupStorageGb))
+	if r.BackupStorageGB != nil {
+		backup = decimalPtr(decimal.NewFromInt(*r.BackupStorageGB))
 	}
 
 	return &schema.CostComponent{
-		Name:            fmt.Sprintf("PITR Backup storage (%s)", r.StorageAccountType),
+		Name:            fmt.Sprintf("PITR backup storage (%s)", r.StorageAccountType),
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: backup,

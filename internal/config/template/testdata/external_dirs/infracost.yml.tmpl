@@ -1,0 +1,41 @@
+{{- if pathExists "../different_env_dirs" "main.tf" }}
+external_dir: success
+{{- else }}
+external_dir: fail
+{{- end }}
+
+{{- if pathExists "../different_env_dirs/" "main.tf" }}
+external_dir_trailing_slash: success
+{{- else }}
+external_dir_trailing_slash: fail
+{{- end }}
+
+{{- if pathExists "../" "external_dirs" }}
+parent_dir: success
+{{- else }}
+parent_dir: fail
+{{- end }}
+
+{{- if pathExists "." "main.tf" }}
+dot_path: success
+{{- else }}
+dot_path: fail
+{{- end }}
+
+{{- if pathExists "./" "main.tf" }}
+dot_path_trailing_slash: success
+{{- else }}
+dot_path_trailing_slash: fail
+{{- end }}
+
+{{- if pathExists "../external_dirs" "main.tf" }}
+dot_dot_path: success
+{{- else }}
+dot_dot_path: fail
+{{- end }}
+
+{{- if pathExists "../external_dirs/" "main.tf" }}
+dot_dot_path_trailing_slash: success
+{{- else }}
+dot_dot_path_trailing_slash: fail
+{{- end }}

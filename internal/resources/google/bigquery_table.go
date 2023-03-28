@@ -73,7 +73,7 @@ func (r *BigQueryTable) activeStorageCostComponent() *schema.CostComponent {
 			Service:       strPtr("BigQuery"),
 			ProductFamily: strPtr("ApplicationServices"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "description", Value: strPtr(fmt.Sprintf("Active Storage (%s)", r.Region))},
+				{Key: "description", Value: strPtr(fmt.Sprintf("Active Logical Storage (%s)", r.Region))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -99,7 +99,7 @@ func (r *BigQueryTable) longTermStorageCostComponent() *schema.CostComponent {
 			Service:       strPtr("BigQuery"),
 			ProductFamily: strPtr("ApplicationServices"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "description", Value: strPtr(fmt.Sprintf("Long Term Storage (%s)", r.Region))},
+				{Key: "description", Value: strPtr(fmt.Sprintf("Long Term Logical Storage (%s)", r.Region))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

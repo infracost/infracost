@@ -2,7 +2,9 @@ package comment
 
 import (
 	"context"
+	"crypto/tls"
 	"fmt"
+	"net/http"
 	"net/url"
 	"strconv"
 	"strings"
@@ -66,6 +68,8 @@ type GitHubExtra struct {
 	Token string
 	// Tag used to identify the Infracost comment
 	Tag string
+	// TLSConfig is the TLS configuration to use when connecting to the GitHub API.
+	TLSConfig *tls.Config
 }
 
 // splitGitHubProject parses a GitHub project string into its owner and repo parts.
@@ -79,11 +83,17 @@ func splitGitHubProject(project string) (string, string, error) {
 
 // newGitHubAPIClients creates a v3 GitHub client and a v4 (GraphQL) GitHub client.
 // If the apiURL is not set, the default GitHub API URL will be used.
-func newGitHubAPIClients(ctx context.Context, token string, apiURL string) (*github.Client, *githubv4.Client, error) {
+func newGitHubAPIClients(ctx context.Context, token string, apiURL string, tlsConfig *tls.Config) (*github.Client, *githubv4.Client, error) {
 	ts := oauth2.StaticTokenSource(
 		&oauth2.Token{AccessToken: token},
 	)
-	tc := oauth2.NewClient(ctx, ts)
+
+	transport := http.DefaultTransport.(*http.Transport)
+	transport.TLSClientConfig = tlsConfig
+	client := &http.Client{Transport: transport}
+	httpCtx := context.WithValue(ctx, oauth2.HTTPClient, client)
+
+	tc := oauth2.NewClient(httpCtx, ts)
 
 	// Handle default GitHub API client
 	if apiURL == "" || apiURL == "https://api.github.com" {
@@ -144,7 +154,7 @@ func NewGitHubPRHandler(ctx context.Context, project, targetRef string, extra Gi
 		return nil, errors.Wrap(err, "Error parsing targetRef as pull request number")
 	}
 
-	v3client, v4client, err := newGitHubAPIClients(ctx, extra.Token, extra.APIURL)
+	v3client, v4client, err := newGitHubAPIClients(ctx, extra.Token, extra.APIURL, extra.TLSConfig)
 	if err != nil {
 		return nil, err
 	}
@@ -323,7 +333,7 @@ func NewGitHubCommitHandler(ctx context.Context, project, targetRef string, extr
 		return nil, err
 	}
 
-	v3client, v4client, err := newGitHubAPIClients(ctx, extra.Token, extra.APIURL)
+	v3client, v4client, err := newGitHubAPIClients(ctx, extra.Token, extra.APIURL, extra.TLSConfig)
 	if err != nil {
 		return nil, err
 	}

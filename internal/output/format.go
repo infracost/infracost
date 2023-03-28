@@ -9,7 +9,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-var roundCostsAbove = 100
+var roundCostsAbove = 1
 
 func formatQuantity(q *decimal.Decimal) string {
 	if q == nil {

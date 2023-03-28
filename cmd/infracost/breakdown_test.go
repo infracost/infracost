@@ -2,7 +2,7 @@ package main_test
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -88,6 +88,20 @@ func TestBreakdownMultiProjectAutodetect(t *testing.T) {
 	)
 }
 
+func TestBreakdownConfigFile(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--config-file", path.Join(dir, "infracost.yml"),
+			"--format", "json",
+		}, nil,
+	)
+}
+
 func TestBreakdownMultiProjectSkipPaths(t *testing.T) {
 	testName := testutil.CalcGoldenFileTestdataDirName()
 	dir := path.Join("./testdata", testName)
@@ -136,6 +150,7 @@ func TestBreakdownTerraformDirectoryWithDefaultVarFiles(t *testing.T) {
 	})
 
 	t.Run("with hcl var flags", func(t *testing.T) {
+		abs, _ := filepath.Abs(path.Join(dir, "abs.tfvars"))
 		GoldenFileCommandTest(
 			t,
 			testName,
@@ -143,6 +158,7 @@ func TestBreakdownTerraformDirectoryWithDefaultVarFiles(t *testing.T) {
 				"breakdown",
 				"--path", dir,
 				"--terraform-var-file", "hcl.tfvars",
+				"--terraform-var-file", abs,
 				"--terraform-var-file", "hcl.tfvars.json",
 				"--terraform-var", "block2_ebs_volume_size=2000",
 				"--terraform-var", "block2_volume_type=io1",
@@ -206,7 +222,7 @@ func TestBreakdownTerraformOutFileHTML(t *testing.T) {
 
 	GoldenFileCommandTest(t, testdataName, []string{"breakdown", "--path", "./testdata/example_plan.json", "--format", "html", "--out-file", outputPath}, nil)
 
-	actual, err := ioutil.ReadFile(outputPath)
+	actual, err := os.ReadFile(outputPath)
 	require.Nil(t, err)
 	actual = stripDynamicValues(actual)
 
@@ -220,7 +236,7 @@ func TestBreakdownTerraformOutFileJSON(t *testing.T) {
 
 	GoldenFileCommandTest(t, testdataName, []string{"breakdown", "--path", "./testdata/example_plan.json", "--format", "json", "--out-file", outputPath}, nil)
 
-	actual, err := ioutil.ReadFile(outputPath)
+	actual, err := os.ReadFile(outputPath)
 	require.Nil(t, err)
 	actual = stripDynamicValues(actual)
 
@@ -234,7 +250,7 @@ func TestBreakdownTerraformOutFileTable(t *testing.T) {
 
 	GoldenFileCommandTest(t, testdataName, []string{"breakdown", "--path", "./testdata/example_plan.json", "--out-file", outputPath}, nil)
 
-	actual, err := ioutil.ReadFile(outputPath)
+	actual, err := os.ReadFile(outputPath)
 	require.Nil(t, err)
 	actual = stripDynamicValues(actual)
 
@@ -248,7 +264,7 @@ func TestBreakdownTerraformSyncUsageFile(t *testing.T) {
 
 	GoldenFileCommandTest(t, testdataName, []string{"breakdown", "--path", "testdata/breakdown_terraform_sync_usage_file/sync_usage_file.json", "--usage-file", usageFilePath, "--sync-usage-file"}, nil)
 
-	actual, err := ioutil.ReadFile(usageFilePath)
+	actual, err := os.ReadFile(usageFilePath)
 	require.Nil(t, err)
 	actual = stripDynamicValues(actual)
 
@@ -257,6 +273,21 @@ func TestBreakdownTerraformSyncUsageFile(t *testing.T) {
 
 func TestBreakdownTerraformUsageFile(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "./testdata/example_plan.json", "--usage-file", "./testdata/example_usage.yml"}, nil)
+}
+
+func TestBreakdownTerraformUsageFileWildcardModule(t *testing.T) {
+	name := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
+	GoldenFileCommandTest(
+		t,
+		name,
+		[]string{
+			"breakdown",
+			"--path", dir,
+			"--usage-file", filepath.Join(dir, "infracost-usage.yml"),
+		},
+		nil,
+	)
 }
 
 func TestBreakdownTerraformUsageFileInvalidKey(t *testing.T) {
@@ -273,6 +304,19 @@ func TestBreakdownPlanError(t *testing.T) {
 
 func TestBreakdownTerragrunt(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terragrunt"}, nil)
+}
+
+func TestBreakdownTerragruntWithProjectError(t *testing.T) {
+	t.Skip()
+
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(t,
+		testName,
+		[]string{
+			"breakdown",
+			"--path", dir},
+		nil)
 }
 
 func TestBreakdownTerragruntWithDashboardEnabled(t *testing.T) {
@@ -322,6 +366,10 @@ func TestBreakdownTerragruntSkipPaths(t *testing.T) {
 	)
 }
 
+func TestBreakdownTerragruntWithParentInclude(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())}, nil)
+}
+
 func TestBreakdownTerragruntHCLDepsOutputInclude(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()+"/dev")}, nil)
 }
@@ -339,6 +387,10 @@ func TestBreakdownTerragruntNested(t *testing.T) {
 }
 
 func TestBreakdownTerragruntIAMRoles(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())}, nil)
+}
+
+func TestBreakdownTerragruntExtraArgs(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())}, nil)
 }
 
@@ -423,15 +475,15 @@ func TestBreakdownWithWorkspace(t *testing.T) {
 
 func TestBreakdownWithActualCosts(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		bodyBytes, _ := ioutil.ReadAll(r.Body)
+		bodyBytes, _ := io.ReadAll(r.Body)
 		graphqlQuery := string(bodyBytes)
 
-		if strings.Contains(graphqlQuery, "actualCosts") {
-			fmt.Fprintln(w, `[{"data": {"actualCosts":{
+		if strings.Contains(graphqlQuery, "actualCostsList") {
+			fmt.Fprintln(w, `[{"data": {"actualCostsList":[{
 				"address": "aws_dynamodb_table.usage",
 				"resourceId": "arn:aws_dynamodb_table",
-				"startAt": "20220915T090909Z",
-				"endAt": "20220922T090909Z",
+				"startAt": "2022-09-15T09:09:09Z",
+				"endAt": "2022-09-22T09:09:09Z",
 				"costComponents": [{
 						"usageType": "someusagetype",
 						"description": "$0.005123 per some aws thing",
@@ -451,7 +503,23 @@ func TestBreakdownWithActualCosts(t *testing.T) {
 						"unit": "GB"
 					}
 				]
-			}}}]`)
+			},
+			{
+				"address": "aws_dynamodb_table.usage",
+				"resourceId": "arn:another_aws_dynamodb_table",
+				"startAt": "2022-08-15T09:09:09Z",
+				"endAt": "2022-09-22T09:09:09Z",
+				"costComponents": [{
+					"usageType": "someusagetype",
+					"description": "$0.005123 per some aws thing",
+					"currency": "USD",
+					"monthlyCost": "5.123",
+					"monthlyQuantity": "1000",
+					"price": "0.005123",
+					"unit": "GB"
+				}]
+			}
+			]}}]`)
 		} else if strings.Contains(graphqlQuery, "usageQuantities") {
 			keys := []string{
 				"monthly_write_request_units",
@@ -478,6 +546,7 @@ func TestBreakdownWithActualCosts(t *testing.T) {
 		&GoldenFileOptions{CaptureLogs: true},
 		func(c *config.RunContext) {
 			c.Config.UsageAPIEndpoint = ts.URL
+			c.Config.UsageActualCosts = true
 		},
 	)
 }
@@ -518,5 +587,87 @@ func TestBreakdownWithOptionalVariables(t *testing.T) {
 			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
 		},
 		nil,
+	)
+}
+
+func TestBreakdownWithDeepMergeModule(t *testing.T) {
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path",
+			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+		},
+		nil,
+	)
+}
+
+func TestBreakdownWithMultipleProviders(t *testing.T) {
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path",
+			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+		},
+		nil,
+	)
+}
+
+func TestBreakdownMultiProjectWithError(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", dir,
+		}, &GoldenFileOptions{CaptureLogs: true},
+	)
+}
+
+func TestBreakdownMultiProjectWithErrorOutputJSON(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testName,
+		[]string{
+			"breakdown",
+			"--format", "json",
+			"--path",
+			dir,
+			"--format",
+			"json",
+		}, &GoldenFileOptions{CaptureLogs: true},
+	)
+}
+
+func TestBreakdownMultiProjectWithAllErrors(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", dir,
+		}, &GoldenFileOptions{CaptureLogs: true},
+	)
+}
+
+func TestBreakdownWithLocalPathDataBlock(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", dir,
+		}, &GoldenFileOptions{CaptureLogs: true},
 	)
 }

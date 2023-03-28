@@ -1,0 +1,29 @@
+version: 0.1
+resource_usage:
+  module.mod[*].aws_lambda_function.test[*]:
+    monthly_requests: 100000000
+    request_duration_ms: 250
+  module.mod[*].aws_lambda_function.test2:
+    monthly_requests: 200000000
+    request_duration_ms: 350
+  module.mod["test2"].aws_lambda_function.test[*]:
+    monthly_requests: 400000000
+    request_duration_ms: 50
+  module.mod["test2"].aws_lambda_function.test["baz"]:
+    monthly_requests: 700000000
+    request_duration_ms: 750
+  module.mod2["test2"].aws_lambda_function.test[*]:
+    monthly_requests: 900000000
+  module.mod2["test2"].aws_lambda_function.test["baz"]:
+    request_duration_ms: 200
+  module.mod2["test2"].aws_lambda_function.test["foo"]:
+    request_duration_ms: 100
+  module.mod3[*].aws_lambda_function.test[*]:
+    monthly_requests: 200000000
+  module.mod3[*].aws_lambda_function.test["foo"]:
+    request_duration_ms: 10
+  module.mod3[*].aws_lambda_function.test["baz"]:
+    request_duration_ms: 50
+  aws_lambda_function.test:
+    monthly_requests: 500000000
+    request_duration_ms: 550

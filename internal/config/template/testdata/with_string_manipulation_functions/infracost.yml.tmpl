@@ -1,0 +1,15 @@
+version: 0.1
+
+projects:
+{{- range $project := matchPaths "environment/:env/terraform.tfvars" }}
+  - path: .
+    name: stem({{ stem $project._path }})
+{{- end }}
+{{- range $project := matchPaths "environment/:env/terraform.tfvars" }}
+  - path: .
+    name: base({{ base $project._path }})
+{{- end }}
+{{- range $project := matchPaths "environment/:env/terraform.tfvars" }}
+  - path: .
+    name: ext({{ ext $project._path }})
+{{- end }}

@@ -5,10 +5,11 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/infracost/infracost/internal/ui"
 	"github.com/pkg/errors"
 	"github.com/shopspring/decimal"
 	"github.com/slack-go/slack"
+
+	"github.com/infracost/infracost/internal/ui"
 )
 
 func slackSummaryBlock(name string, currency string, cost, pastCost, diffCost *decimal.Decimal) []*slack.TextBlockObject {

@@ -78,47 +78,49 @@ func popResourceActualCosts(ctx *config.RunContext, c *apiclient.UsageAPIClient,
 		Address:              r.Name,
 		Currency:             c.Currency,
 	}
-	actualCost, err := c.ListActualCosts(vars)
-	if actualCost == nil || err != nil {
+	actualCostResults, err := c.ListActualCosts(vars)
+	if actualCostResults == nil || err != nil {
 		return err
 	}
 
-	actualCosts := &schema.ActualCosts{
-		ResourceID:     actualCost.ResourceID,
-		StartTimestamp: actualCost.StartTimestamp.UTC(),
-		EndTimestamp:   actualCost.EndTimestamp.UTC(),
-		CostComponents: make([]*schema.CostComponent, 0, len(actualCost.CostComponents)),
-	}
-
-	for _, actual := range actualCost.CostComponents {
-		monthlyCost, err := decimal.NewFromString(actual.MonthlyCost)
-		if err != nil {
-			break
+	for _, actualCost := range actualCostResults {
+		actualCosts := &schema.ActualCosts{
+			ResourceID:     actualCost.ResourceID,
+			StartTimestamp: actualCost.StartTimestamp.UTC(),
+			EndTimestamp:   actualCost.EndTimestamp.UTC(),
+			CostComponents: make([]*schema.CostComponent, 0, len(actualCost.CostComponents)),
 		}
 
-		monthlyQuantity, err := decimal.NewFromString(actual.MonthlyQuantity)
-		if err != nil {
-			break
-		}
-		price, err := decimal.NewFromString(actual.Price)
-		if err != nil {
-			break
+		for _, actual := range actualCost.CostComponents {
+			monthlyCost, err := decimal.NewFromString(actual.MonthlyCost)
+			if err != nil {
+				break
+			}
+
+			monthlyQuantity, err := decimal.NewFromString(actual.MonthlyQuantity)
+			if err != nil {
+				break
+			}
+			price, err := decimal.NewFromString(actual.Price)
+			if err != nil {
+				break
+			}
+
+			cc := &schema.CostComponent{
+				Name:            actual.Description,
+				Unit:            actual.Unit,
+				UnitMultiplier:  decimal.NewFromInt(1),
+				MonthlyCost:     &monthlyCost,
+				MonthlyQuantity: &monthlyQuantity,
+			}
+			cc.SetPrice(price)
+
+			actualCosts.CostComponents = append(actualCosts.CostComponents, cc)
 		}
 
-		cc := &schema.CostComponent{
-			Name:            actual.Description,
-			Unit:            actual.Unit,
-			UnitMultiplier:  decimal.NewFromInt(1),
-			MonthlyCost:     &monthlyCost,
-			MonthlyQuantity: &monthlyQuantity,
+		if len(actualCosts.CostComponents) > 0 {
+			r.ActualCosts = append(r.ActualCosts, actualCosts)
 		}
-		cc.SetPrice(price)
-
-		actualCosts.CostComponents = append(actualCosts.CostComponents, cc)
-	}
-
-	if len(actualCosts.CostComponents) > 0 {
-		r.ActualCosts = actualCosts
 	}
 
 	return nil
@@ -126,7 +128,7 @@ func popResourceActualCosts(ctx *config.RunContext, c *apiclient.UsageAPIClient,
 
 // FetchUsageData fetches usage estimates derived from cloud provider reported usage
 // from the Infracost Cloud Usage API for each supported resource in the project
-func FetchUsageData(ctx *config.RunContext, project *schema.Project) (map[string]*schema.UsageData, error) {
+func FetchUsageData(ctx *config.RunContext, project *schema.Project) (schema.UsageMap, error) {
 	c := apiclient.NewUsageAPIClient(ctx)
 
 	// gather all the CoreResource
@@ -160,7 +162,7 @@ func FetchUsageData(ctx *config.RunContext, project *schema.Project) (map[string
 
 			attributes, err := c.ListUsageQuantities(vars)
 			if err != nil {
-				return nil, err
+				return schema.NewUsageMap(usageMap), err
 			}
 
 			usageMap[address] = &schema.UsageData{
@@ -170,7 +172,7 @@ func FetchUsageData(ctx *config.RunContext, project *schema.Project) (map[string
 		}
 	}
 
-	return usageMap, nil
+	return schema.NewUsageMap(usageMap), nil
 }
 
 // UploadCloudResourceIDs sends the project scoped cloud resource ids to the Usage API, so they can be used

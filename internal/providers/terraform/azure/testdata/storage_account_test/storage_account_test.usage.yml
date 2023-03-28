@@ -1,6 +1,6 @@
 version: 0.1
 resource_usage:
-  azurerm_storage_account.bb_Premium_LRS:
+  azurerm_storage_account.blockblob[*]:
     storage_gb: 1000000
     monthly_write_operations: 1000000
     monthly_list_and_create_container_operations: 1000000
@@ -10,7 +10,7 @@ resource_usage:
     monthly_data_write_gb: 1000
     blob_index_tags: 100000
 
-  azurerm_storage_account.bb_Premium_ZRS:
+  azurerm_storage_account.blob[*]:
     storage_gb: 2000000
     monthly_write_operations: 2000000
     monthly_list_and_create_container_operations: 2000000
@@ -20,7 +20,7 @@ resource_usage:
     monthly_data_write_gb: 2000
     blob_index_tags: 200000
 
-  azurerm_storage_account.bb_Standard_GRS_Cool:
+  azurerm_storage_account.storagev1[*]:
     storage_gb: 3000000
     monthly_write_operations: 3000000
     monthly_list_and_create_container_operations: 3000000
@@ -28,9 +28,8 @@ resource_usage:
     monthly_other_operations: 3000000
     monthly_data_retrieval_gb: 3000
     monthly_data_write_gb: 3000
-    blob_index_tags: 300000
 
-  azurerm_storage_account.bb_Standard_GRS_Hot:
+  azurerm_storage_account.storagev2[*]:
     storage_gb: 4000000
     monthly_write_operations: 4000000
     monthly_list_and_create_container_operations: 4000000
@@ -39,18 +38,22 @@ resource_usage:
     monthly_data_retrieval_gb: 4000
     monthly_data_write_gb: 4000
     blob_index_tags: 400000
+    monthly_iterative_read_operations: 460000
+    monthly_iterative_write_operations: 470000
+    early_deletion_gb: 4000
 
-  azurerm_storage_account.bb_Standard_LRS_Cool:
-    storage_gb: 5000000
-    monthly_write_operations: 5000000
-    monthly_list_and_create_container_operations: 500000
+  azurerm_storage_account.file[*]:
+    monthly_write_operations: 6000000
+    monthly_list_and_create_container_operations: 5000000
     monthly_read_operations: 500000
     monthly_other_operations: 5000000
+    data_at_rest_storage_gb: 50000
+    snapshots_storage_gb: 50000
+    metadata_at_rest_storage_gb: 50000
     monthly_data_retrieval_gb: 5000
-    monthly_data_write_gb: 5000
-    blob_index_tags: 500000
+    early_deletion_gb: 5000
 
-  azurerm_storage_account.bb_Standard_LRS_Hot:
+  azurerm_storage_account.nfsv3[*]:
     storage_gb: 6000000
     monthly_write_operations: 6000000
     monthly_list_and_create_container_operations: 6000000
@@ -59,221 +62,6 @@ resource_usage:
     monthly_data_retrieval_gb: 6000
     monthly_data_write_gb: 6000
     blob_index_tags: 600000
-
-  azurerm_storage_account.bb_Standard_RAGRS_Cool:
-    storage_gb: 7000000
-    monthly_write_operations: 7000000
-    monthly_list_and_create_container_operations: 7000000
-    monthly_read_operations: 700000
-    monthly_other_operations: 7000000
-    monthly_data_retrieval_gb: 7000
-    monthly_data_write_gb: 7000
-    blob_index_tags: 700000
-
-  azurerm_storage_account.bb_Standard_RAGRS_Hot:
-    storage_gb: 8000000
-    monthly_write_operations: 8000000
-    monthly_list_and_create_container_operations: 8000000
-    monthly_read_operations: 800000
-    monthly_other_operations: 8000000
-    monthly_data_retrieval_gb: 8000
-    monthly_data_write_gb: 8000
-    blob_index_tags: 800000
-
-  azurerm_storage_account.file_cool_lrs:
-    data_at_rest_storage_gb: 10000
-    early_deletion_gb: 1000
-    snapshots_storage_gb: 10000
-    metadata_at_rest_storage_gb: 10000
-    monthly_data_retrieval_gb: 1000
-    monthly_write_operations: 1000000
-    monthly_list_and_create_container_operations: 1000000
-    monthly_read_operations: 100000
-    monthly_other_operations: 1000000
-
-  azurerm_storage_account.file_hot_lrs:
-    data_at_rest_storage_gb: 10000
-    early_deletion_gb: 1000
-    snapshots_storage_gb: 10000
-    metadata_at_rest_storage_gb: 10000
-    monthly_data_retrieval_gb: 1000
-    monthly_write_operations: 1000000
-    monthly_list_and_create_container_operations: 1000000
-    monthly_read_operations: 100000
-    monthly_other_operations: 1000000
-
-  azurerm_storage_account.file_cool_grs:
-    data_at_rest_storage_gb: 10000
-    early_deletion_gb: 1000
-    snapshots_storage_gb: 10000
-    metadata_at_rest_storage_gb: 10000
-    monthly_data_retrieval_gb: 1000
-    monthly_write_operations: 1000000
-    monthly_list_and_create_container_operations: 1000000
-    monthly_read_operations: 100000
-    monthly_other_operations: 1000000
-
-  azurerm_storage_account.file_hot_grs:
-    data_at_rest_storage_gb: 10000
-    early_deletion_gb: 1000
-    snapshots_storage_gb: 10000
-    metadata_at_rest_storage_gb: 10000
-    monthly_data_retrieval_gb: 1000
-    monthly_write_operations: 1000000
-    monthly_list_and_create_container_operations: 1000000
-    monthly_read_operations: 100000
-    monthly_other_operations: 1000000
-
-  azurerm_storage_account.file_premium_lrs:
-    data_at_rest_storage_gb: 10000
-    early_deletion_gb: 1000
-    snapshots_storage_gb: 10000
-    metadata_at_rest_storage_gb: 10000
-    monthly_data_retrieval_gb: 1000
-    monthly_write_operations: 1000000
-    monthly_list_and_create_container_operations: 1000000
-    monthly_read_operations: 100000
-    monthly_other_operations: 1000000
-
-  azurerm_storage_account.v2_cool_lrs:
-    storage_gb: 1000000
-    monthly_iterative_write_operations: 170000
-    monthly_write_operations: 1000000
-    monthly_list_and_create_container_operations: 1000000
-    monthly_iterative_read_operations: 150000
-    monthly_read_operations: 100000
-    monthly_other_operations: 1000000
-    monthly_data_retrieval_gb: 1000
-    monthly_data_write_gb: 1000
-    blob_index_tags: 100000
-    early_deletion_gb: 1000
-
-  azurerm_storage_account.v2_cool_lrs_nfsv3:
-    storage_gb: 1000000
-    monthly_iterative_write_operations: 170000
-    monthly_write_operations: 1000000
-    monthly_list_and_create_container_operations: 1000000
-    monthly_iterative_read_operations: 150000
-    monthly_read_operations: 100000
-    monthly_other_operations: 1000000
-    monthly_data_retrieval_gb: 1000
-    monthly_data_write_gb: 1000
-    blob_index_tags: 100000
-    early_deletion_gb: 1000
-
-  azurerm_storage_account.v2_hot_lrs:
-    storage_gb: 1000000
-    monthly_iterative_write_operations: 170000
-    monthly_write_operations: 1000000
-    monthly_list_and_create_container_operations: 1000000
-    monthly_iterative_read_operations: 150000
-    monthly_read_operations: 100000
-    monthly_other_operations: 1000000
-    monthly_data_retrieval_gb: 1000
-    monthly_data_write_gb: 1000
-    blob_index_tags: 100000
-    early_deletion_gb: 1000
-
-  azurerm_storage_account.v2_hot_lrs_nfsv3:
-    storage_gb: 1000000
-    monthly_iterative_write_operations: 170000
-    monthly_write_operations: 1000000
-    monthly_list_and_create_container_operations: 1000000
-    monthly_iterative_read_operations: 150000
-    monthly_read_operations: 100000
-    monthly_other_operations: 1000000
-    monthly_data_retrieval_gb: 1000
-    monthly_data_write_gb: 1000
-    blob_index_tags: 100000
-    early_deletion_gb: 1000
-
-  azurerm_storage_account.v2_cool_gzrs:
-    storage_gb: 1000000
-    monthly_iterative_write_operations: 170000
-    monthly_write_operations: 1000000
-    monthly_list_and_create_container_operations: 1000000
-    monthly_iterative_read_operations: 150000
-    monthly_read_operations: 100000
-    monthly_other_operations: 1000000
-    monthly_data_retrieval_gb: 1000
-    monthly_data_write_gb: 1000
-    blob_index_tags: 100000
-    early_deletion_gb: 1000
-
-  azurerm_storage_account.v2_hot_gzrs:
-    storage_gb: 1000000
-    monthly_iterative_write_operations: 170000
-    monthly_write_operations: 1000000
-    monthly_list_and_create_container_operations: 1000000
-    monthly_iterative_read_operations: 150000
-    monthly_read_operations: 100000
-    monthly_other_operations: 1000000
-    monthly_data_retrieval_gb: 1000
-    monthly_data_write_gb: 1000
-    blob_index_tags: 100000
-    early_deletion_gb: 1000
-
-  azurerm_storage_account.v2_cool_ragzrs:
-    storage_gb: 1000000
-    monthly_iterative_write_operations: 170000
-    monthly_write_operations: 1000000
-    monthly_list_and_create_container_operations: 1000000
-    monthly_iterative_read_operations: 150000
-    monthly_read_operations: 100000
-    monthly_other_operations: 1000000
-    monthly_data_retrieval_gb: 1000
-    monthly_data_write_gb: 1000
-    blob_index_tags: 100000
-    early_deletion_gb: 1000
-
-  azurerm_storage_account.v2_hot_ragzrs:
-    storage_gb: 1000000
-    monthly_iterative_write_operations: 170000
-    monthly_write_operations: 1000000
-    monthly_list_and_create_container_operations: 1000000
-    monthly_iterative_read_operations: 150000
-    monthly_read_operations: 100000
-    monthly_other_operations: 1000000
-    monthly_data_retrieval_gb: 1000
-    monthly_data_write_gb: 1000
-    blob_index_tags: 100000
-    early_deletion_gb: 1000
-
-  azurerm_storage_account.v2_premium_unsupported_access_tier:
-    storage_gb: 1000000
-    monthly_iterative_write_operations: 170000
-    monthly_write_operations: 1000000
-    monthly_list_and_create_container_operations: 1000000
-    monthly_iterative_read_operations: 150000
-    monthly_read_operations: 100000
-    monthly_other_operations: 1000000
-    monthly_data_retrieval_gb: 1000
-    monthly_data_write_gb: 1000
-    blob_index_tags: 100000
-    early_deletion_gb: 1000
-
-  azurerm_storage_account.v2_premium_lrs:
-    storage_gb: 1000000
-    monthly_iterative_write_operations: 170000
-    monthly_write_operations: 1000000
-    monthly_list_and_create_container_operations: 1000000
-    monthly_iterative_read_operations: 150000
-    monthly_read_operations: 100000
-    monthly_other_operations: 1000000
-    monthly_data_retrieval_gb: 1000
-    monthly_data_write_gb: 1000
-    blob_index_tags: 100000
-    early_deletion_gb: 1000
-
-  azurerm_storage_account.v2_premium_lrs_nfsv3:
-    storage_gb: 1000000
-    monthly_iterative_write_operations: 170000
-    monthly_write_operations: 1000000
-    monthly_list_and_create_container_operations: 1000000
-    monthly_iterative_read_operations: 150000
-    monthly_read_operations: 100000
-    monthly_other_operations: 1000000
-    monthly_data_retrieval_gb: 1000
-    monthly_data_write_gb: 1000
-    blob_index_tags: 100000
-    early_deletion_gb: 1000
+    early_deletion_gb: 6000
+    monthly_iterative_read_operations: 660000
+    monthly_iterative_write_operations: 670000

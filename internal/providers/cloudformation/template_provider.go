@@ -31,10 +31,10 @@ func (p *TemplateProvider) DisplayType() string {
 }
 
 func (p *TemplateProvider) AddMetadata(metadata *schema.ProjectMetadata) {
-	// no op
+	metadata.ConfigSha = p.ctx.ProjectConfig.ConfigSha
 }
 
-func (p *TemplateProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
+func (p *TemplateProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, error) {
 	template, err := goformation.Open(p.Path)
 	if err != nil {
 		return []*schema.Project{}, errors.Wrap(err, "Error reading CloudFormation template file")

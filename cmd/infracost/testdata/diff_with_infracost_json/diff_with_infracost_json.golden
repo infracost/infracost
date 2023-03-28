@@ -15,7 +15,7 @@ Project: infracost/infracost/cmd/infracost/testdata/diff_with_infracost_json
     - root_block_device
     
         - Storage (general purpose SSD, gp2)
-          -$5.00
+          -$5
 
     - ebs_block_device[0]
     
@@ -23,7 +23,7 @@ Project: infracost/infracost/cmd/infracost/testdata/diff_with_infracost_json
           -$125
     
         - Provisioned IOPS
-          -$52.00
+          -$52
 
 Monthly cost change for infracost/infracost/cmd/infracost/testdata/diff_with_infracost_json
 Amount:  -$743 ($2,046 → $1,303)

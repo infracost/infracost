@@ -1,0 +1,141 @@
+
+ Name                                                               Monthly Qty  Unit                      Monthly Cost 
+                                                                                                                        
+ azurerm_storage_account.filestorage["LRS"]                                                                             
+ ├─ Data at rest                                             Monthly cost depends on usage: $0.18 per GB                
+ └─ Snapshots                                                Monthly cost depends on usage: $0.15 per GB                
+                                                                                                                        
+ azurerm_storage_account.filestorage["ZRS"]                                                                             
+ ├─ Data at rest                                             Monthly cost depends on usage: $0.22 per GB                
+ └─ Snapshots                                                Monthly cost depends on usage: $0.19 per GB                
+                                                                                                                        
+ azurerm_storage_account.premium                                                                                        
+ ├─ Capacity                                                 Monthly cost depends on usage: $0.20 per GB                
+ ├─ Write operations                                         Monthly cost depends on usage: $0.0228 per 10k operations  
+ ├─ List and create container operations                     Monthly cost depends on usage: $0.065 per 10k operations   
+ ├─ Read operations                                          Monthly cost depends on usage: $0.00182 per 10k operations 
+ └─ All other operations                                     Monthly cost depends on usage: $0.00182 per 10k operations 
+                                                                                                                        
+ azurerm_storage_account.standard["GRS"]                                                                                
+ ├─ Capacity                                                 Monthly cost depends on usage: $0.0458 per GB              
+ ├─ Write operations                                         Monthly cost depends on usage: $0.11 per 10k operations    
+ ├─ List and create container operations                     Monthly cost depends on usage: $0.11 per 10k operations    
+ ├─ Read operations                                          Monthly cost depends on usage: $0.0044 per 10k operations  
+ ├─ All other operations                                     Monthly cost depends on usage: $0.0044 per 10k operations  
+ └─ Blob index                                               Monthly cost depends on usage: $0.069 per 10k tags         
+                                                                                                                        
+ azurerm_storage_account.standard["LRS"]                                                                                
+ ├─ Capacity                                                 Monthly cost depends on usage: $0.0208 per GB              
+ ├─ Write operations                                         Monthly cost depends on usage: $0.055 per 10k operations   
+ ├─ List and create container operations                     Monthly cost depends on usage: $0.055 per 10k operations   
+ ├─ Read operations                                          Monthly cost depends on usage: $0.0044 per 10k operations  
+ ├─ All other operations                                     Monthly cost depends on usage: $0.0044 per 10k operations  
+ └─ Blob index                                               Monthly cost depends on usage: $0.039 per 10k tags         
+                                                                                                                        
+ azurerm_storage_account.standard["ZRS"]                                                                                
+ ├─ Capacity                                                 Monthly cost depends on usage: $0.026 per GB               
+ ├─ List and create container operations                     Monthly cost depends on usage: $0.06875 per 10k operations 
+ ├─ Read operations                                          Monthly cost depends on usage: $0.0044 per 10k operations  
+ ├─ All other operations                                     Monthly cost depends on usage: $0.0044 per 10k operations  
+ └─ Blob index                                               Monthly cost depends on usage: $0.039 per 10k tags         
+                                                                                                                        
+ azurerm_storage_share.premium-filestorage["Premium.LRS"]                                                               
+ ├─ Data at rest                                                             50  GB                               $8.80 
+ └─ Snapshots                                                            10,000  GB                           $1,500.00 
+                                                                                                                        
+ azurerm_storage_share.premium-filestorage["Premium.ZRS"]                                                               
+ ├─ Data at rest                                                             50  GB                              $11.00 
+ └─ Snapshots                                                            10,000  GB                           $1,870.00 
+                                                                                                                        
+ azurerm_storage_share.standard["Cool.GRS"]                                                                             
+ ├─ Data at rest                                                      2,000,000  GB                         $100,200.00 
+ ├─ Snapshots                                                            20,000  GB                           $1,002.00 
+ ├─ Metadata at rest                                                     20,000  GB                           $1,310.00 
+ ├─ Read operations                                                          20  10k operations                   $0.26 
+ ├─ Write operations                                                        200  10k operations                  $52.00 
+ ├─ List operations                                                         200  10k operations                  $28.60 
+ ├─ Other operations                                                        200  10k operations                   $1.14 
+ └─ Data retrieval                                                        2,000  GB                              $20.00 
+                                                                                                                        
+ azurerm_storage_share.standard["Cool.LRS"]                                                                             
+ ├─ Data at rest                                                      2,000,000  GB                          $45,600.00 
+ ├─ Snapshots                                                            20,000  GB                             $456.00 
+ ├─ Metadata at rest                                                     20,000  GB                             $594.00 
+ ├─ Read operations                                                          20  10k operations                   $0.26 
+ ├─ Write operations                                                        200  10k operations                  $26.00 
+ ├─ List operations                                                         200  10k operations                  $14.30 
+ ├─ Other operations                                                        200  10k operations                   $1.14 
+ └─ Data retrieval                                                        2,000  GB                              $20.00 
+                                                                                                                        
+ azurerm_storage_share.standard["Cool.ZRS"]                                                                             
+ ├─ Data at rest                                                      2,000,000  GB                          $57,000.00 
+ ├─ Snapshots                                                            20,000  GB                             $570.00 
+ ├─ Metadata at rest                                                     20,000  GB                             $742.00 
+ ├─ Read operations                                                          20  10k operations                   $0.26 
+ ├─ Write operations                                                        200  10k operations                  $26.00 
+ ├─ List operations                                                         200  10k operations                  $17.88 
+ ├─ Other operations                                                        200  10k operations                   $1.14 
+ └─ Data retrieval                                                        2,000  GB                              $20.00 
+                                                                                                                        
+ azurerm_storage_share.standard["Hot.GRS"]                                                                              
+ ├─ Data at rest                                                      2,000,000  GB                         $126,400.00 
+ ├─ Snapshots                                                            20,000  GB                           $1,264.00 
+ ├─ Metadata at rest                                                     20,000  GB                           $1,310.00 
+ ├─ Read operations                                                          20  10k operations                   $0.11 
+ ├─ Write operations                                                        200  10k operations                  $28.60 
+ ├─ List operations                                                         200  10k operations                  $28.60 
+ └─ Other operations                                                        200  10k operations                   $1.14 
+                                                                                                                        
+ azurerm_storage_share.standard["Hot.LRS"]                                                                              
+ ├─ Data at rest                                                      2,000,000  GB                          $57,400.00 
+ ├─ Snapshots                                                            20,000  GB                             $574.00 
+ ├─ Metadata at rest                                                     20,000  GB                             $594.00 
+ ├─ Read operations                                                          20  10k operations                   $0.11 
+ ├─ Write operations                                                        200  10k operations                  $14.30 
+ ├─ List operations                                                         200  10k operations                  $14.30 
+ └─ Other operations                                                        200  10k operations                   $1.14 
+                                                                                                                        
+ azurerm_storage_share.standard["Hot.ZRS"]                                                                              
+ ├─ Data at rest                                                      2,000,000  GB                          $72,000.00 
+ ├─ Snapshots                                                            20,000  GB                             $720.00 
+ ├─ Metadata at rest                                                     20,000  GB                             $742.00 
+ ├─ Read operations                                                          20  10k operations                   $0.11 
+ ├─ Write operations                                                        200  10k operations                  $17.88 
+ ├─ List operations                                                         200  10k operations                  $17.88 
+ └─ Other operations                                                        200  10k operations                   $1.14 
+                                                                                                                        
+ azurerm_storage_share.standard["TransactionOptimized.GRS"]                                                             
+ ├─ Data at rest                                                      2,000,000  GB                         $200,000.00 
+ ├─ Snapshots                                                            20,000  GB                           $2,000.00 
+ ├─ Read operations                                                          20  10k operations                   $0.03 
+ ├─ Write operations                                                        200  10k operations                   $6.00 
+ ├─ List operations                                                         200  10k operations                   $3.00 
+ └─ Other operations                                                        200  10k operations                   $0.30 
+                                                                                                                        
+ azurerm_storage_share.standard["TransactionOptimized.LRS"]                                                             
+ ├─ Data at rest                                                      2,000,000  GB                         $120,000.00 
+ ├─ Snapshots                                                            20,000  GB                           $1,200.00 
+ ├─ Read operations                                                          20  10k operations                   $0.03 
+ ├─ Write operations                                                        200  10k operations                   $3.00 
+ ├─ List operations                                                         200  10k operations                   $3.00 
+ └─ Other operations                                                        200  10k operations                   $0.30 
+                                                                                                                        
+ azurerm_storage_share.standard["TransactionOptimized.ZRS"]                                                             
+ ├─ Data at rest                                                      2,000,000  GB                         $150,000.00 
+ ├─ Snapshots                                                            20,000  GB                           $1,500.00 
+ ├─ Read operations                                                          20  10k operations                   $0.03 
+ ├─ Write operations                                                        200  10k operations                   $3.75 
+ ├─ List operations                                                         200  10k operations                   $3.00 
+ └─ Other operations                                                        200  10k operations                   $0.30 
+                                                                                                                        
+ OVERALL TOTAL                                                                                              $946,944.87 
+──────────────────────────────────
+19 cloud resources were detected:
+∙ 17 were estimated, 6 of which include usage-based costs, see https://infracost.io/usage-file
+∙ 1 was free:
+  ∙ 1 x azurerm_resource_group
+∙ 1 is not supported yet, see https://infracost.io/requested-resources:
+  ∙ 1 x azurerm_storage_share
+Logs:
+
+level=warning msg="Skipping resource azurerm_storage_share.unsupported. Premium access tier is only supported for FileStorage accounts"

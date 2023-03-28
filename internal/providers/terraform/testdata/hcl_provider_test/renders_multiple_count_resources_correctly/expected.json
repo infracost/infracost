@@ -1,6 +1,249 @@
 {
   "format_version": "1.0",
   "terraform_version": "1.1.0",
+  "prior_state": {
+    "values": {
+      "root_module": {
+        "resources": [
+          {
+            "address": "aws_eip.test[0]",
+            "mode": "managed",
+            "type": "aws_eip",
+            "name": "test",
+            "index": 0,
+            "schema_version": 0,
+            "values": {
+              "arn": "eip-arn",
+              "id": "eip"
+            },
+            "infracost_metadata": {
+              "calls": [
+                {
+                  "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf",
+                  "blockName": "aws_eip.test"
+                }
+              ],
+              "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf"
+            }
+          },
+          {
+            "address": "aws_eip.test[1]",
+            "mode": "managed",
+            "type": "aws_eip",
+            "name": "test",
+            "index": 1,
+            "schema_version": 0,
+            "values": {
+              "arn": "eip-1-arn",
+              "id": "eip-1"
+            },
+            "infracost_metadata": {
+              "calls": [
+                {
+                  "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf",
+                  "blockName": "aws_eip.test"
+                }
+              ],
+              "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf"
+            }
+          },
+          {
+            "address": "aws_eip.constant_string[0]",
+            "mode": "managed",
+            "type": "aws_eip",
+            "name": "constant_string",
+            "index": 0,
+            "schema_version": 0,
+            "values": {},
+            "infracost_metadata": {
+              "calls": [
+                {
+                  "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf",
+                  "blockName": "aws_eip.constant_string"
+                }
+              ],
+              "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf"
+            }
+          }
+        ],
+        "child_modules": [
+          {
+            "resources": [
+              {
+                "address": "module.autos.aws_autoscaling_group.test[0]",
+                "mode": "managed",
+                "type": "aws_autoscaling_group",
+                "name": "test",
+                "index": 0,
+                "schema_version": 0,
+                "values": {
+                  "arn": "auto-arn",
+                  "desired_capacity": 2,
+                  "id": "auto",
+                  "launch_configuration": "lc",
+                  "max_size": 3,
+                  "min_size": 1
+                },
+                "infracost_metadata": {
+                  "calls": [
+                    {
+                      "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf",
+                      "blockName": "module.autos"
+                    },
+                    {
+                      "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
+                      "blockName": "aws_autoscaling_group.test"
+                    }
+                  ],
+                  "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf"
+                }
+              },
+              {
+                "address": "module.autos.aws_autoscaling_group.test[1]",
+                "mode": "managed",
+                "type": "aws_autoscaling_group",
+                "name": "test",
+                "index": 1,
+                "schema_version": 0,
+                "values": {
+                  "arn": "auto-1-arn",
+                  "desired_capacity": 2,
+                  "id": "auto-1",
+                  "launch_configuration": "lc-1",
+                  "max_size": 3,
+                  "min_size": 1
+                },
+                "infracost_metadata": {
+                  "calls": [
+                    {
+                      "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf",
+                      "blockName": "module.autos"
+                    },
+                    {
+                      "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
+                      "blockName": "aws_autoscaling_group.test"
+                    }
+                  ],
+                  "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf"
+                }
+              },
+              {
+                "address": "module.autos.aws_autoscaling_group.test[2]",
+                "mode": "managed",
+                "type": "aws_autoscaling_group",
+                "name": "test",
+                "index": 2,
+                "schema_version": 0,
+                "values": {
+                  "arn": "auto-2-arn",
+                  "desired_capacity": 2,
+                  "id": "auto-2",
+                  "launch_configuration": "lc-2",
+                  "max_size": 3,
+                  "min_size": 1
+                },
+                "infracost_metadata": {
+                  "calls": [
+                    {
+                      "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf",
+                      "blockName": "module.autos"
+                    },
+                    {
+                      "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
+                      "blockName": "aws_autoscaling_group.test"
+                    }
+                  ],
+                  "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf"
+                }
+              },
+              {
+                "address": "module.autos.aws_launch_configuration.test[0]",
+                "mode": "managed",
+                "type": "aws_launch_configuration",
+                "name": "test",
+                "index": 0,
+                "schema_version": 0,
+                "values": {
+                  "arn": "lc-arn",
+                  "id": "lc",
+                  "image_id": "fake_ami",
+                  "instance_type": "t2.micro"
+                },
+                "infracost_metadata": {
+                  "calls": [
+                    {
+                      "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf",
+                      "blockName": "module.autos"
+                    },
+                    {
+                      "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
+                      "blockName": "aws_launch_configuration.test"
+                    }
+                  ],
+                  "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf"
+                }
+              },
+              {
+                "address": "module.autos.aws_launch_configuration.test[1]",
+                "mode": "managed",
+                "type": "aws_launch_configuration",
+                "name": "test",
+                "index": 1,
+                "schema_version": 0,
+                "values": {
+                  "arn": "lc-1-arn",
+                  "id": "lc-1",
+                  "image_id": "fake_ami",
+                  "instance_type": "t2.medium"
+                },
+                "infracost_metadata": {
+                  "calls": [
+                    {
+                      "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf",
+                      "blockName": "module.autos"
+                    },
+                    {
+                      "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
+                      "blockName": "aws_launch_configuration.test"
+                    }
+                  ],
+                  "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf"
+                }
+              },
+              {
+                "address": "module.autos.aws_launch_configuration.test[2]",
+                "mode": "managed",
+                "type": "aws_launch_configuration",
+                "name": "test",
+                "index": 2,
+                "schema_version": 0,
+                "values": {
+                  "arn": "lc-2-arn",
+                  "id": "lc-2",
+                  "image_id": "fake_ami",
+                  "instance_type": "t2.large"
+                },
+                "infracost_metadata": {
+                  "calls": [
+                    {
+                      "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf",
+                      "blockName": "module.autos"
+                    },
+                    {
+                      "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
+                      "blockName": "aws_launch_configuration.test"
+                    }
+                  ],
+                  "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf"
+                }
+              }
+            ],
+            "address": "module.autos"
+          }
+        ]
+      }
+    }
+  },
   "planned_values": {
     "root_module": {
       "resources": [
@@ -242,7 +485,7 @@
       ]
     }
   },
-  "resource_changes": [
+  "infracost_resource_changes": [
     {
       "address": "aws_eip.test[0]",
       "mode": "managed",

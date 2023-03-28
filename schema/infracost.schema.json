@@ -236,6 +236,26 @@
       "additionalProperties": false,
       "type": "object"
     },
+    "ProjectDiag": {
+      "required": [
+        "code",
+        "message",
+        "data"
+      ],
+      "properties": {
+        "code": {
+          "type": "integer"
+        },
+        "message": {
+          "type": "string"
+        },
+        "data": {
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
     "ProjectMetadata": {
       "required": [
         "path",
@@ -248,6 +268,9 @@
         "type": {
           "type": "string"
         },
+        "configSha": {
+          "type": "string"
+        },
         "terraformModulePath": {
           "type": "string"
         },
@@ -257,10 +280,19 @@
         "vcsSubPath": {
           "type": "string"
         },
-        "warnings": {
+        "vcsCodeChanged": {
+          "type": "boolean"
+        },
+        "errors": {
           "items": {
             "$schema": "http://json-schema.org/draft-04/schema#",
-            "$ref": "#/definitions/Warning"
+            "$ref": "#/definitions/ProjectDiag"
+          },
+          "type": "array"
+        },
+        "warnings": {
+          "items": {
+            "$ref": "#/definitions/ProjectDiag"
           },
           "type": "array"
         },
@@ -316,8 +348,11 @@
           "type": "array"
         },
         "actualCosts": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/ActualCosts"
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/ActualCosts"
+          },
+          "type": "array"
         },
         "subresources": {
           "items": {
@@ -438,8 +473,11 @@
           "type": "array"
         },
         "actualCosts": {
-          "$schema": "http://json-schema.org/draft-04/schema#",
-          "$ref": "#/definitions/ActualCosts"
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/ActualCosts"
+          },
+          "type": "array"
         },
         "subresources": {
           "items": {
@@ -494,26 +532,6 @@
             }
           },
           "type": "object"
-        }
-      },
-      "additionalProperties": false,
-      "type": "object"
-    },
-    "Warning": {
-      "required": [
-        "code",
-        "message",
-        "data"
-      ],
-      "properties": {
-        "code": {
-          "type": "integer"
-        },
-        "message": {
-          "type": "string"
-        },
-        "data": {
-          "additionalProperties": true
         }
       },
       "additionalProperties": false,

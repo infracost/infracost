@@ -30,7 +30,7 @@ Infracost also has many CI/CD integrations so you can easily post cost estimates
 
 #### Infracost Cloud
 
-[Infracost Cloud](https://www.infracost.io/docs/infracost_cloud/get_started/) is our SaaS product that builds on top of Infracost open source and works with CI/CD integrations. It enables team leads, managers and FinOps practitioners to see all cost estimates from a central place so they can help guide the team.
+[Infracost Cloud](https://www.infracost.io/docs/infracost_cloud/get_started/) is our SaaS product that builds on top of Infracost open source and works with CI/CD integrations. It gives team leads, managers and FinOps practitioners dashboards, [guardrails](https://www.infracost.io/docs/infracost_cloud/guardrails/) and [centralized cost policies](https://www.infracost.io/docs/infracost_cloud/cost_policies/) so they can help guide the team (e.g. switch AWS GP2 volumes to GP3).
 
 <img src=".github/assets/infracost_cloud_dashboard_chart.png" alt="Infracost Cloud" width=600 />
 

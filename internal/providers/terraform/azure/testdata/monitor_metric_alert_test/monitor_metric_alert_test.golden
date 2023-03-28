@@ -1,0 +1,23 @@
+
+ Name                                                Monthly Qty  Unit         Monthly Cost 
+                                                                                            
+ azurerm_monitor_metric_alert.example-dynamic                                               
+ ├─ Metrics monitoring                                         1  time-series         $0.10 
+ └─ Dynamic threshold monitoring                               1  time-series         $0.10 
+                                                                                            
+ azurerm_monitor_metric_alert.example-dynamic-multi                                         
+ ├─ Metrics monitoring                                         4  time-series         $0.40 
+ └─ Dynamic threshold monitoring                               4  time-series         $0.40 
+                                                                                            
+ azurerm_monitor_metric_alert.example-multi                                                 
+ └─ Metrics monitoring                                         8  time-series         $0.80 
+                                                                                            
+ azurerm_monitor_metric_alert.example-single                                                
+ └─ Metrics monitoring                                         1  time-series         $0.10 
+                                                                                            
+ OVERALL TOTAL                                                                        $1.90 
+──────────────────────────────────
+7 cloud resources were detected:
+∙ 6 were estimated, 1 of which usage-based costs, see https://infracost.io/usage-file
+∙ 1 was free:
+  ∙ 1 x azurerm_resource_group

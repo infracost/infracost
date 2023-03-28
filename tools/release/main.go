@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 	"path/filepath"
 	"strings"
@@ -54,7 +54,7 @@ func createDraftRelease(cli *github.Client) (*github.RepositoryRelease, error) {
 		},
 	)
 	if err != nil {
-		b, _ := ioutil.ReadAll(res.Body)
+		b, _ := io.ReadAll(res.Body)
 		return nil, fmt.Errorf("body: %s status: %d %w", b, res.StatusCode, err)
 	}
 

@@ -1,0 +1,99 @@
+name: Pre-Commit
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+
+jobs:
+  # Min Terraform version(s)
+  getDirectories:
+    name: Get root directories
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install Python
+        uses: actions/setup-python@v2
+      - name: Build matrix
+        id: matrix
+        run: |
+          DIRS=$(python -c "import json; import glob; print(json.dumps([x.replace('/versions.tf', '') for x in glob.glob('./**/versions.tf', recursive=True)]))")
+          echo "::set-output name=directories::$DIRS"
+    outputs:
+      directories: ${{ steps.matrix.outputs.directories }}
+
+  preCommitMinVersions:
+    name: Min TF validate
+    needs: getDirectories
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        directory: ${{ fromJson(needs.getDirectories.outputs.directories) }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install Python
+        uses: actions/setup-python@v2
+      - name: Terraform min/max versions
+        id: minMax
+        uses: clowdhaus/terraform-min-max@v1.0.2
+        with:
+          directory: ${{ matrix.directory }}
+      - name: Install Terraform v${{ steps.minMax.outputs.minVersion }}
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: ${{ steps.minMax.outputs.minVersion }}
+      - name: Install pre-commit dependencies
+        run: pip install pre-commit
+      - name: Execute pre-commit
+        # Run only validate pre-commit check on min version supported
+        if: ${{ matrix.directory !=  '.' }}
+        run: pre-commit run terraform_validate --color=always --show-diff-on-failure --files ${{ matrix.directory }}/*
+      - name: Execute pre-commit
+        # Run only validate pre-commit check on min version supported
+        if: ${{ matrix.directory ==  '.' }}
+        run: pre-commit run terraform_validate --color=always --show-diff-on-failure --files $(ls *.tf)
+
+  # Max Terraform version
+  getBaseVersion:
+    name: Module max TF version
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Terraform min/max versions
+        id: minMax
+        uses: clowdhaus/terraform-min-max@v1.0.2
+    outputs:
+      minVersion: ${{ steps.minMax.outputs.minVersion }}
+      maxVersion: ${{ steps.minMax.outputs.maxVersion }}
+
+  preCommitMaxVersion:
+    name: Max TF pre-commit
+    runs-on: ubuntu-latest
+    needs: getBaseVersion
+    strategy:
+      fail-fast: false
+      matrix:
+        version:
+          - ${{ needs.getBaseVersion.outputs.maxVersion }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install Python
+        uses: actions/setup-python@v2
+      - name: Install Terraform v${{ matrix.version }}
+        uses: hashicorp/setup-terraform@v1
+        with:
+          terraform_version: ${{ matrix.version }}
+      - name: Install pre-commit dependencies
+        run: |
+          pip install pre-commit
+          curl -Lo ./terraform-docs.tar.gz https://github.com/terraform-docs/terraform-docs/releases/download/v0.13.0/terraform-docs-v0.13.0-$(uname)-amd64.tar.gz && tar -xzf terraform-docs.tar.gz && chmod +x terraform-docs && sudo mv terraform-docs /usr/bin/
+          curl -L "$(curl -s https://api.github.com/repos/terraform-linters/tflint/releases/latest | grep -o -E "https://.+?_linux_amd64.zip")" > tflint.zip && unzip tflint.zip && rm tflint.zip && sudo mv tflint /usr/bin/
+      - name: Execute pre-commit
+        # Run all pre-commit checks on max version supported
+        if: ${{ matrix.version ==  needs.getBaseVersion.outputs.maxVersion }}
+        run: pre-commit run --color=always --show-diff-on-failure --all-files

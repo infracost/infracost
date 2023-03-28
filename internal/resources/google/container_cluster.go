@@ -1,9 +1,10 @@
 package google
 
 import (
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 // ContainerCluster struct represents Container Cluster resource.
@@ -70,11 +71,17 @@ func (r *ContainerCluster) BuildResource() *schema.Resource {
 	subresources := []*schema.Resource{}
 
 	if r.DefaultNodePool != nil {
-		subresources = append(subresources, r.DefaultNodePool.BuildResource())
+		poolResource := r.DefaultNodePool.BuildResource()
+		if poolResource != nil {
+			subresources = append(subresources, poolResource)
+		}
 	}
 
 	for _, nodePool := range r.NodePools {
-		subresources = append(subresources, nodePool.BuildResource())
+		poolResource := nodePool.BuildResource()
+		if poolResource != nil {
+			subresources = append(subresources, poolResource)
+		}
 	}
 
 	return &schema.Resource{

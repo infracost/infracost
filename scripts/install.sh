@@ -19,9 +19,10 @@ if [ "$arch" = "aarch64" ]; then
   arch="arm64"
 fi
 
-url="https://infracost.io/downloads/latest"
+version=${INFRACOST_VERSION:-latest}
+url="https://infracost.io/downloads/${version}"
 tar="infracost-$os-$arch.tar.gz"
-echo "Downloading latest release of infracost-$os-$arch..."
+echo "Downloading version ${version} of infracost-$os-$arch..."
 curl -sL "$url/$tar" -o "/tmp/$tar"
 echo
 

@@ -2,7 +2,10 @@ package output
 
 import (
 	"bytes"
+	"encoding/json"
 	"fmt"
+	"github.com/pkg/errors"
+	"os"
 	"regexp"
 	"sort"
 	"strings"
@@ -107,17 +110,21 @@ func convertCostComponents(outComponents []CostComponent) []*schema.CostComponen
 	return components
 }
 
-func convertActualCosts(ac *ActualCosts) *schema.ActualCosts {
-	if ac == nil {
-		return nil
+func convertActualCosts(outActualCosts []ActualCosts) []*schema.ActualCosts {
+	actualCosts := make([]*schema.ActualCosts, len(outActualCosts))
+
+	for i, ac := range outActualCosts {
+		sac := &schema.ActualCosts{
+			ResourceID:     ac.ResourceID,
+			StartTimestamp: ac.StartTimestamp,
+			EndTimestamp:   ac.EndTimestamp,
+			CostComponents: convertCostComponents(ac.CostComponents),
+		}
+
+		actualCosts[i] = sac
 	}
 
-	return &schema.ActualCosts{
-		ResourceID:     ac.ResourceID,
-		StartTimestamp: ac.StartTimestamp,
-		EndTimestamp:   ac.EndTimestamp,
-		CostComponents: convertCostComponents(ac.CostComponents),
-	}
+	return actualCosts
 }
 
 type Projects []Project
@@ -136,6 +143,17 @@ func (r *Root) ExampleProjectName() string {
 	}
 
 	return r.Projects[0].Name
+}
+
+// HasDiff returns true if any project has a difference in monthly cost or resources
+func (r *Root) HasDiff() bool {
+	for _, p := range r.Projects {
+		if p.Diff != nil && (!p.Diff.TotalMonthlyCost.IsZero() || len(p.Diff.Resources) != 0) {
+			return true
+		}
+	}
+
+	return false
 }
 
 // Label returns the display name of the project
@@ -191,7 +209,7 @@ type Resource struct {
 	HourlyCost     *decimal.Decimal       `json:"hourlyCost"`
 	MonthlyCost    *decimal.Decimal       `json:"monthlyCost"`
 	CostComponents []CostComponent        `json:"costComponents,omitempty"`
-	ActualCosts    *ActualCosts           `json:"actualCosts,omitempty"`
+	ActualCosts    []ActualCosts          `json:"actualCosts,omitempty"`
 	SubResources   []Resource             `json:"subresources,omitempty"`
 }
 
@@ -233,6 +251,7 @@ type Options struct {
 	NoColor           bool
 	ShowSkipped       bool
 	ShowAllProjects   bool
+	ShowOnlyChanges   bool
 	Fields            []string
 	IncludeHTML       bool
 	PolicyChecks      PolicyCheck
@@ -266,7 +285,7 @@ func (p PolicyCheckFailures) Error() string {
 	out := bytes.NewBuffer([]byte("Policy check failed:\n\n"))
 
 	for _, e := range p {
-		out.WriteString(e + "\n")
+		out.WriteString(" - " + e + "\n")
 	}
 
 	return out.String()
@@ -276,17 +295,77 @@ func (p PolicyCheckFailures) Error() string {
 // This struct is used to create guardrail outputs.
 type GuardrailCheck struct {
 	// TotalChecked is the total number of guardrails checked
-	TotalChecked int64
+	TotalChecked int64 `json:"guardrailsChecked"`
 
 	// Comment indicates that the guardrail status should be reported in the PR
 	// comment (either as a success or as a failure depending on CommentableFailures).
-	Comment bool
-	// CommentableFailures are the failures that should be listed in the PR comment
-	CommentableFailures GuardrailFailures
+	Comment bool `json:"guardrailComment"`
 
-	// BlockingFailures is the list of failures causing the CLI to return with a
-	// failing (non-zero) error code
-	BlockingFailures GuardrailFailures
+	// GuardrailEvents
+	GuardrailEvents []GuardrailEvent `json:"guardrailEvents"`
+}
+
+type GuardrailEvent struct {
+	// TriggerReason details the reason that the guardrail was triggered
+	TriggerReason string `json:"triggerReason"`
+
+	// PRComment indicates whether this guardrail event should be posted in th PR Comment
+	PRComment bool `json:"prComment"`
+
+	// BlockPR indicated whether this guardrail event should return a failure blocking the PR
+	BlockPR bool `json:"blockPr"`
+}
+
+// LoadGuardrailCheck reads the file at the path  into a GuardrailCheck struct.
+func LoadGuardrailCheck(path string) (GuardrailCheck, error) {
+	var out GuardrailCheck
+	_, err := os.Stat(path)
+	if errors.Is(err, os.ErrNotExist) {
+		return out, errors.New("guardrail-check-path does not exist ")
+	}
+
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return out, fmt.Errorf("error reading guardrail check JSON file %w", err)
+	}
+
+	err = json.Unmarshal(data, &out)
+	if err != nil {
+		return out, fmt.Errorf("invalid guardrail check JSON file %w", err)
+	}
+
+	return out, nil
+}
+
+// AllFailures are all the guardrail failures triggered by the run
+func (g GuardrailCheck) AllFailures() GuardrailFailures {
+	var failures GuardrailFailures
+	for _, event := range g.GuardrailEvents {
+		failures = append(failures, event.TriggerReason)
+	}
+	return failures
+}
+
+// CommentableFailures are the failures that should be listed in the PR comment
+func (g GuardrailCheck) CommentableFailures() GuardrailFailures {
+	var failures GuardrailFailures
+	for _, event := range g.GuardrailEvents {
+		if event.PRComment {
+			failures = append(failures, event.TriggerReason)
+		}
+	}
+	return failures
+}
+
+// BlockingFailures is the list of failures causing the CLI to return with a failing (non-zero) error code
+func (g GuardrailCheck) BlockingFailures() GuardrailFailures {
+	var failures GuardrailFailures
+	for _, event := range g.GuardrailEvents {
+		if event.BlockPR {
+			failures = append(failures, event.TriggerReason)
+		}
+	}
+	return failures
 }
 
 // GuardrailFailures defines a list of guardrail failures that were returned from infracost cloud.
@@ -301,7 +380,7 @@ func (g GuardrailFailures) Error() string {
 	out := bytes.NewBuffer([]byte("Guardrail check failed:\n\n"))
 
 	for _, e := range g {
-		out.WriteString(e + "\n")
+		out.WriteString(" - " + e + "\n")
 	}
 
 	return out.String()
@@ -382,17 +461,17 @@ func outputCostComponents(costComponents []*schema.CostComponent) []CostComponen
 	return comps
 }
 
-func outputActualCosts(ac *schema.ActualCosts) *ActualCosts {
-	if ac == nil {
-		return nil
+func outputActualCosts(actualCosts []*schema.ActualCosts) []ActualCosts {
+	acs := make([]ActualCosts, 0, len(actualCosts))
+	for _, ac := range actualCosts {
+		acs = append(acs, ActualCosts{
+			ResourceID:     ac.ResourceID,
+			StartTimestamp: ac.StartTimestamp,
+			EndTimestamp:   ac.EndTimestamp,
+			CostComponents: outputCostComponents(ac.CostComponents),
+		})
 	}
-
-	return &ActualCosts{
-		ResourceID:     ac.ResourceID,
-		StartTimestamp: ac.StartTimestamp,
-		EndTimestamp:   ac.EndTimestamp,
-		CostComponents: outputCostComponents(ac.CostComponents),
-	}
+	return acs
 }
 
 func ToOutputFormat(projects []*schema.Project) (Root, error) {

@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 
 	"github.com/maruel/panicparse/v2/stack"
 	log "github.com/sirupsen/logrus"
@@ -82,7 +81,7 @@ func processStack(rawStack []byte) ([]byte, error) {
 	var buf bytes.Buffer
 	w := bufio.NewWriter(&buf)
 
-	s, suffix, err := stack.ScanSnapshot(stream, ioutil.Discard, stack.DefaultOpts())
+	s, suffix, err := stack.ScanSnapshot(stream, io.Discard, stack.DefaultOpts())
 	if err != nil && err != io.EOF {
 		return []byte{}, err
 	}

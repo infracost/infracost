@@ -217,7 +217,7 @@ func (r *RemoteVariablesLoader) Load(blocks Blocks) (map[string]cty.Value, error
 			vv, ok := varsMap[v.ID]
 			if ok {
 				val := getVarValue(vv)
-				if !val.IsNull() {
+				if !val.IsNull() && val.IsKnown() {
 					vars[vv.Key] = val
 				}
 			}
@@ -331,7 +331,7 @@ func getAttribute(block *Block, name string) string {
 
 func getVarValue(variable tfcVar) cty.Value {
 	if variable.Sensitive || variable.Category != "terraform" || variable.Value == "" {
-		return cty.NilVal
+		return cty.DynamicVal
 	}
 
 	return cty.StringVal(variable.Value)

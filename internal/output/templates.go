@@ -307,6 +307,7 @@ var CommentMarkdownWithHTMLTemplate = `
     </tr>
 {{- end}}
 💰 Infracost estimate: **{{ formatCostChangeSentence .Root.Currency .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost true }}**
+{{- if gt (len validProjects) 0  }}
 <table>
   <thead>
     <td>Project</td>
@@ -327,21 +328,17 @@ var CommentMarkdownWithHTMLTemplate = `
   {{- template "summaryRow" dict "Name" "All projects" "MetadataFields" (metadataPlaceholders) "PastCost" .Root.PastTotalMonthlyCost "Cost" .Root.TotalMonthlyCost  }}
   </tbody>
 </table>
-
-  {{- if eq .SkippedProjectCount 1 }}
-
-1 project has no cost estimate changes.
-  {{- else if gt .SkippedProjectCount  0 }}
-
-{{ .SkippedProjectCount }} projects have no cost estimate changes.
-  {{- end }}
+{{- if .ProjectCounts }}
+{{ .ProjectCounts }}
+{{- end }}
 {{- else }}
   <tbody>
   {{- range .Root.Projects }}
-    {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
+	{{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
   {{- end }}
   </tbody>
 </table>
+{{- end }}
 {{- end }}
 
 {{- if not .MarkdownOptions.OmitDetails }}
@@ -359,14 +356,14 @@ var CommentMarkdownWithHTMLTemplate = `
 		<details>
 			<summary><strong>❌ Policy checks failed</strong></summary>
 				{{ range $v, $f := .Options.PolicyChecks.Failures}}
-> {{ $f }}
+> - {{ $f }}
 				{{- end}}
 		</details>
 	{{ else }}
 		<details>
 			<summary><strong>✅ Policy checks passed</strong></summary>
 			{{ range $v, $f := .Options.PolicyChecks.Passed}}
-> {{ $f }}
+> - {{ $f }}
 			{{- end}}
 		</details>
 	{{- end }}
@@ -376,13 +373,11 @@ var CommentMarkdownWithHTMLTemplate = `
 		<details>
 			<summary><strong>❌ Guardrail checks failed</strong></summary>
 				{{ range $v, $f := .Options.GuardrailCheck.CommentableFailures}}
-> {{ $f }}
+> - {{ $f }}
 				{{- end}}
 		</details>
 	{{ else }}
-		<details>
-			<summary><strong>✅ Guardrail checks passed</strong></summary>
-		</details>
+<strong>✅ Guardrail checks passed</strong>
 	{{- end }}
 {{- end }}
 {{- if .MarkdownOptions.WillUpdate }}
@@ -410,6 +405,7 @@ var CommentMarkdownTemplate = `
 | **{{ truncateMiddle .Name 64 "..." }}**{{- range metadataHeaders }} | {{- end }} | **{{ formatCost .PastCost }}** | **{{ formatCost .Cost }}** | **{{ formatCostChange .PastCost .Cost }}** |
 {{- end }}
 ## Infracost estimate: **{{ formatCostChangeSentence .Root.Currency .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost false }}**
+{{- if gt (len validProjects) 0  }}
 
 | **Project**{{- range metadataHeaders }} | **{{ . }}** {{- end }} | **Previous** | **New** | **Diff** |
 | -----------{{- range metadataHeaders }} | ---------- {{- end }} | -----------: | ------: | -------- |
@@ -421,18 +417,14 @@ var CommentMarkdownTemplate = `
     {{- end }}
   {{- end }}
   {{- template "totalRow" dict "Name" "All projects" "PastCost" .Root.PastTotalMonthlyCost "Cost" .Root.TotalMonthlyCost  }}
-
-  {{- if eq .SkippedProjectCount 1 }}
-
-1 project has no cost estimate changes.
-  {{- else if gt .SkippedProjectCount 0 }}
-
-{{ .SkippedProjectCount }} projects have no cost estimate changes.
-  {{- end }}
+{{- if .ProjectCounts }}
+{{ .ProjectCounts }}
+{{- end }}
 {{- else }}
   {{- range .Root.Projects }}
     {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
   {{- end }}
+{{- end }}
 {{- end }}
 
 {{- if not .MarkdownOptions.OmitDetails }}

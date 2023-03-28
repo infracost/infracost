@@ -9,7 +9,7 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
     + root_block_device
     
         + Storage (general purpose SSD, gp2)
-          +$5.00
+          +$5
 
     + ebs_block_device[0]
     
@@ -17,7 +17,7 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
           +$125
     
         + Provisioned IOPS
-          +$52.00
+          +$52
 
 + aws_instance.zero_cost_instance
   +$182
@@ -28,7 +28,7 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
     + root_block_device
     
         + Storage (general purpose SSD, gp2)
-          +$5.00
+          +$5
 
     + ebs_block_device[0]
     
@@ -36,14 +36,16 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
           +$125
     
         + Provisioned IOPS
-          +$52.00
+          +$52
 
 + aws_lambda_function.hello_world
-  +$417
+  +$437
 
     + Requests
-      Monthly cost depends on usage
-        +$0.20 per 1M requests
+      +$20
+
+    + Ephemeral storage
+      $0.00
 
     + Duration (first 6B)
       +$417
@@ -55,8 +57,10 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
   $0.00
 
     + Requests
-      Monthly cost depends on usage
-        +$0.20 per 1M requests
+      $0.00
+
+    + Ephemeral storage
+      $0.00
 
     + Duration (first 6B)
       $0.00
@@ -85,7 +89,7 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
           $0.00
 
 Monthly cost change for infracost/infracost/cmd/infracost/testdata/example_plan.json
-Amount:  +$1,341 ($0.00 → $1,341)
+Amount:  +$1,361 ($0.00 → $1,361)
 
 ──────────────────────────────────
 Key: ~ changed, + added, - removed

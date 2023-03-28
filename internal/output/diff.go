@@ -21,8 +21,14 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 	s := ""
 
 	noDiffProjects := make([]string, 0)
+	erroredProjects := make([]string, 0)
 
 	for i, project := range out.Projects {
+		if project.Metadata.HasErrors() {
+			erroredProjects = append(erroredProjects, project.LabelWithMetadata())
+			continue
+		}
+
 		if project.Diff == nil {
 			continue
 		}
@@ -90,6 +96,16 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 			)
 		}
 
+		s += "\n\n"
+	}
+
+	if len(erroredProjects) > 0 {
+		s += "──────────────────────────────────\n"
+		s += "\nThe following projects could not be evaluated: \n"
+		for _, project := range erroredProjects {
+			s += project + "\n"
+		}
+		s += fmt.Sprintf("Run the following command to see more details: %s", ui.PrimaryString("infracost breakdown --path=/path/to/code"))
 		s += "\n\n"
 	}
 

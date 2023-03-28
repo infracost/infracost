@@ -1,0 +1,6 @@
+version: 0.1
+resource_usage:
+  azurerm_recovery_services_vault.example[*]:
+    azurerm_backup_protected_vm.with_usage[*]:
+      disk_utilization_gb: 300
+      additional_backup_retention_gb: 100

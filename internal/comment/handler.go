@@ -74,24 +74,29 @@ func NewCommentHandler(ctx context.Context, platformHandler PlatformHandler, tag
 	}
 }
 
-// CommentWithBehavior parses the behavior and calls the corresponding *Comment method.
-func (h *CommentHandler) CommentWithBehavior(ctx context.Context, behavior, body string) error {
+// CommentWithBehavior parses the behavior and calls the corresponding *Comment method. Returns
+// boolean indicating if the comment was actually posted.
+func (h *CommentHandler) CommentWithBehavior(ctx context.Context, skipNoDiff bool, behavior, body string) (bool, error) {
+	var commentPosted bool
 	var err error
 
 	switch behavior {
 	case "update":
-		err = h.UpdateComment(ctx, body)
+		commentPosted, err = h.UpdateComment(ctx, skipNoDiff, body)
 	case "new":
 		err = h.NewComment(ctx, body)
+		if err == nil {
+			commentPosted = true
+		}
 	case "hide-and-new":
-		err = h.HideAndNewComment(ctx, body)
+		commentPosted, err = h.HideAndNewComment(ctx, skipNoDiff, body)
 	case "delete-and-new":
-		err = h.DeleteAndNewComment(ctx, body)
+		commentPosted, err = h.DeleteAndNewComment(ctx, skipNoDiff, body)
 	default:
-		return fmt.Errorf("Unable to perform unknown behavior: %v", behavior)
+		return commentPosted, fmt.Errorf("Unable to perform unknown behavior: %v", behavior)
 	}
 
-	return err
+	return commentPosted, err
 }
 
 // matchingComments returns all comments that match the tag.
@@ -130,39 +135,44 @@ func (h *CommentHandler) LatestMatchingComment(ctx context.Context) (Comment, er
 	return matchingComments[len(matchingComments)-1], nil
 }
 
-// UpdateComment updates the comment with the given body.
-func (h *CommentHandler) UpdateComment(ctx context.Context, body string) error {
+// UpdateComment updates the comment with the given body. Returns boolean indicating if the comment was actually posted.
+func (h *CommentHandler) UpdateComment(ctx context.Context, skipNoDiff bool, body string) (bool, error) {
 	bodyWithTag := h.PlatformHandler.AddMarkdownTag(body, h.Tag)
 
 	latestMatchingComment, err := h.LatestMatchingComment(ctx)
 	if err != nil {
-		return err
+		return false, err
 	}
 
 	if latestMatchingComment != nil {
 		if latestMatchingComment.Body() == bodyWithTag {
 			log.Infof("Not updating comment since the latest one matches exactly: %s", color.HiBlueString(latestMatchingComment.Ref()))
-			return nil
+			return false, nil
 		}
 
 		log.Infof("Updating comment %s", color.HiBlueString(latestMatchingComment.Ref()))
 
 		err := h.PlatformHandler.CallUpdateComment(ctx, latestMatchingComment, bodyWithTag)
 		if err != nil {
-			return h.newPlatformError(err)
+			return false, h.newPlatformError(err)
 		}
 	} else {
+		if skipNoDiff {
+			log.Infof("Not creating initial comment since there is no resource or cost difference")
+			return false, nil
+		}
+
 		log.Info("Creating new comment")
 
 		comment, err := h.PlatformHandler.CallCreateComment(ctx, bodyWithTag)
 		if err != nil {
-			return h.newPlatformError(err)
+			return false, h.newPlatformError(err)
 		}
 
 		log.Infof("Created new comment %s", color.HiBlueString(comment.Ref()))
 	}
 
-	return nil
+	return true, nil
 }
 
 // NewComment creates a new comment with the given body.
@@ -181,19 +191,30 @@ func (h *CommentHandler) NewComment(ctx context.Context, body string) error {
 	return err
 }
 
-// HideAndNewComment hides/minimizes all existing matching comment and creates a new one with the given body.
-func (h *CommentHandler) HideAndNewComment(ctx context.Context, body string) error {
+// HideAndNewComment hides/minimizes all existing matching comment and creates a new one with the given body. Returns
+// // boolean indicating if the comment was actually posted.
+func (h *CommentHandler) HideAndNewComment(ctx context.Context, skipNoDiff bool, body string) (bool, error) {
 	matchingComments, err := h.matchingComments(ctx)
 	if err != nil {
-		return err
+		return false, err
+	}
+
+	if len(matchingComments) == 0 && skipNoDiff {
+		log.Infof("Not creating initial comment since there is no resource or cost difference")
+		return false, nil
 	}
 
 	err = h.hideComments(ctx, matchingComments)
 	if err != nil {
-		return err
+		return false, err
 	}
 
-	return h.NewComment(ctx, body)
+	err = h.NewComment(ctx, body)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 // hideComments hides/minimizes all the given comments.
@@ -231,19 +252,30 @@ func (h *CommentHandler) hideComments(ctx context.Context, comments []Comment) e
 	return nil
 }
 
-// DeleteAndNewComment deletes all existing matching comments and creates a new one with the given body.
-func (h *CommentHandler) DeleteAndNewComment(ctx context.Context, body string) error {
+// DeleteAndNewComment deletes all existing matching comments and creates a new one with the given body. Returns
+// boolean indicating if the comment was actually posted.
+func (h *CommentHandler) DeleteAndNewComment(ctx context.Context, skipNoDiff bool, body string) (bool, error) {
 	matchingComments, err := h.matchingComments(ctx)
 	if err != nil {
-		return err
+		return false, err
+	}
+
+	if len(matchingComments) == 0 && skipNoDiff {
+		log.Infof("Not creating initial comment since there is no resource or cost difference")
+		return false, nil
 	}
 
 	err = h.deleteComments(ctx, matchingComments)
 	if err != nil {
-		return err
+		return false, err
 	}
 
-	return h.NewComment(ctx, body)
+	err = h.NewComment(ctx, body)
+	if err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 // deleteComments hides/minimizes all the given comments.

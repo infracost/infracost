@@ -13,16 +13,16 @@ import (
 
 var (
 	sqlTierMapping = map[string]string{
-		"GP":   "General Purpose",
-		"GP_S": "General Purpose - Serverless",
-		"HS":   "Hyperscale",
-		"BC":   "Business Critical",
+		"gp":   "General Purpose",
+		"gp_s": "General Purpose - Serverless",
+		"hs":   "Hyperscale",
+		"bc":   "Business Critical",
 	}
 
 	sqlFamilyMapping = map[string]string{
-		"Gen5": "Compute Gen5",
-		"Gen4": "Compute Gen4",
-		"M":    "Compute M Series",
+		"gen5": "Compute Gen5",
+		"gen4": "Compute Gen4",
+		"m":    "Compute M Series",
 	}
 
 	dtuMap = dtuMapping{
@@ -77,19 +77,23 @@ func newAzureRMMSSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schem
 		replicaCount = &val
 	}
 
-	licenceType := d.GetStringOrDefault("license_type", "LicenseIncluded")
+	licenseType := d.GetStringOrDefault("license_type", "LicenseIncluded")
+	storageAccountType := d.GetStringOrDefault("storage_account_type", "Geo")
 
 	r := &azure.SQLDatabase{
-		Address:          d.Address,
-		Region:           region,
-		SKU:              sku,
-		LicenceType:      licenceType,
-		MaxSizeGB:        maxSize,
-		ReadReplicaCount: replicaCount,
-		ZoneRedundant:    d.Get("zone_redundant").Bool(),
+		Address:           d.Address,
+		Region:            region,
+		SKU:               sku,
+		LicenseType:       licenseType,
+		MaxSizeGB:         maxSize,
+		ReadReplicaCount:  replicaCount,
+		ZoneRedundant:     d.Get("zone_redundant").Bool(),
+		BackupStorageType: storageAccountType,
 	}
 
-	if !dtuMap.usesDTUUnits(sku) {
+	if strings.ToLower(sku) == "elasticpool" || !d.IsEmpty("elastic_pool_id") {
+		r.IsElasticPool = true
+	} else if !dtuMap.usesDTUUnits(sku) {
 		c, err := parseMSSQLSku(d.Address, sku)
 		if err != nil {
 			log.Warnf(err.Error())
@@ -118,13 +122,13 @@ func parseMSSQLSku(address, sku string) (skuConfig, error) {
 		return skuConfig{}, fmt.Errorf("Unrecognized MSSQL SKU format for resource %s: %s", address, sku)
 	}
 
-	tierKey := strings.Join(s[0:len(s)-2], "_")
+	tierKey := strings.ToLower(strings.Join(s[0:len(s)-2], "_"))
 	tier, ok := sqlTierMapping[tierKey]
 	if !ok {
 		return skuConfig{}, fmt.Errorf("Invalid tier in MSSQL SKU for resource %s: %s", address, sku)
 	}
 
-	familyKey := s[len(s)-2]
+	familyKey := strings.ToLower(s[len(s)-2])
 	family, ok := sqlFamilyMapping[familyKey]
 	if !ok {
 		return skuConfig{}, fmt.Errorf("Invalid family in MSSQL SKU for resource %s: %s", address, sku)

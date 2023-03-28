@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"io/ioutil"
+	"io"
 	stdLog "log"
 	"os"
 	"runtime/debug"
@@ -27,7 +27,7 @@ import (
 func init() {
 	// set the stdlib default logger to flush to discard, this is done as a number of
 	// Terraform libs use the std logger directly, which impacts Infracost output.
-	stdLog.SetOutput(ioutil.Discard)
+	stdLog.SetOutput(io.Discard)
 }
 
 func main() {
@@ -185,6 +185,7 @@ func newRootCmd(ctx *config.RunContext) *cobra.Command {
 	rootCmd.AddCommand(commentCmd(ctx))
 	rootCmd.AddCommand(completionCmd())
 	rootCmd.AddCommand(figAutocompleteCmd())
+	rootCmd.AddCommand(newGenerateCommand())
 
 	rootCmd.SetUsageTemplate(fmt.Sprintf(`%s{{if .Runnable}}
   {{.UseLine}}{{end}}{{if .HasAvailableSubCommands}}
@@ -252,6 +253,14 @@ func loadCloudSettings(ctx *config.RunContext) {
 	logging.Logger.WithFields(log.Fields{"result": fmt.Sprintf("%+v", result)}).Debug("Successfully loaded settings from Infracost Cloud")
 
 	ctx.Config.EnableCloudForOrganization = result.CloudEnabled
+	if result.UsageAPIEnabled && ctx.Config.UsageAPIEndpoint == "" {
+		ctx.Config.UsageAPIEndpoint = ctx.Config.DashboardAPIEndpoint
+		logging.Logger.Info("Enabled usage API")
+	}
+	if result.ActualCostsEnabled && ctx.Config.UsageAPIEndpoint != "" {
+		ctx.Config.UsageActualCosts = true
+		logging.Logger.Info("Enabled actual costs")
+	}
 }
 
 func checkAPIKey(apiKey string, apiEndpoint string, defaultEndpoint string) error {
@@ -346,7 +355,7 @@ func saveOutFile(ctx *config.RunContext, cmd *cobra.Command, outFile string, b [
 
 // saveOutFile saves the output of the command to the file path past in the `--out-file` flag
 func saveOutFileWithMsg(ctx *config.RunContext, cmd *cobra.Command, outFile, successMsg string, b []byte) error {
-	err := ioutil.WriteFile(outFile, b, 0644) // nolint:gosec
+	err := os.WriteFile(outFile, b, 0644) // nolint:gosec
 	if err != nil {
 		return errors.Wrap(err, "Unable to save output")
 	}

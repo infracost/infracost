@@ -69,6 +69,7 @@ func (r *CloudwatchMetricAlarm) cloudwatchMetricAlarmCostComponent() *schema.Cos
 			ProductFamily: strPtr("Alarm"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "alarmType", ValueRegex: regexPtr(alarmType)},
+				{Key: "usagetype", ValueRegex: regexPtr("AlarmMonitorUsage$")},
 			},
 		},
 	}

@@ -1,0 +1,24 @@
+
+ Name                                  Monthly Qty  Unit   Monthly Cost 
+                                                                        
+ azurerm_sql_elasticpool.basic_100                                      
+ └─ Compute (Basic, 100 DTUs)                  730  hours       $147.22 
+                                                                        
+ azurerm_sql_elasticpool.premium_500                                    
+ ├─ Compute (Premium, 500 DTUs)                730  hours     $2,737.50 
+ └─ Extra data storage                         274  GB          $121.11 
+                                                                        
+ azurerm_sql_elasticpool.standard_200                                   
+ ├─ Compute (Standard, 200 DTUs)               730  hours       $441.04 
+ └─ Extra data storage                         100  GB           $22.10 
+                                                                        
+ OVERALL TOTAL                                                $3,468.97 
+──────────────────────────────────
+5 cloud resources were detected:
+∙ 3 were estimated
+∙ 2 were free:
+  ∙ 1 x azurerm_resource_group
+  ∙ 1 x azurerm_sql_server
+Logs:
+
+level=warning msg="Multiple products with prices found for azurerm_sql_elasticpool.premium_500 Compute (Premium, 500 DTUs), using the first product"

@@ -8,10 +8,11 @@ import (
 	"net/http"
 	"net/url"
 	"os"
+	"path/filepath"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/go-git/go-git/v5"
@@ -22,6 +23,7 @@ import (
 	"github.com/tidwall/gjson"
 
 	"github.com/infracost/infracost/internal/logging"
+	"github.com/infracost/infracost/internal/sync"
 )
 
 var (
@@ -104,11 +106,13 @@ func mergeEnvProvidedMetadata(m Metadata) Metadata {
 	}
 
 	m.Commit = Commit{
-		SHA:         useEnvValueOrParsedString(envMeta.Commit.SHA, m.Commit.SHA),
-		AuthorName:  useEnvValueOrParsedString(envMeta.Commit.AuthorName, m.Commit.AuthorName),
-		AuthorEmail: useEnvValueOrParsedString(envMeta.Commit.AuthorEmail, m.Commit.AuthorEmail),
-		Time:        useEnvValueOrParsedTime(envMeta.Commit.Time, m.Commit.Time),
-		Message:     useEnvValueOrParsedString(envMeta.Commit.Message, m.Commit.Message),
+		SHA:            useEnvValueOrParsedString(envMeta.Commit.SHA, m.Commit.SHA),
+		AuthorName:     useEnvValueOrParsedString(envMeta.Commit.AuthorName, m.Commit.AuthorName),
+		AuthorEmail:    useEnvValueOrParsedString(envMeta.Commit.AuthorEmail, m.Commit.AuthorEmail),
+		Time:           useEnvValueOrParsedTime(envMeta.Commit.Time, m.Commit.Time),
+		Message:        useEnvValueOrParsedString(envMeta.Commit.Message, m.Commit.Message),
+		ChangedObjects: m.Commit.ChangedObjects,
+		GitDiffTarget:  m.Commit.GitDiffTarget,
 	}
 
 	if envMeta.PullRequest != nil {
@@ -245,30 +249,18 @@ func envToTime(key string) time.Time {
 	return t.UTC()
 }
 
-type keyMutex struct {
-	mutexes sync.Map // Zero value is empty and ready for use
-}
-
-func (m *keyMutex) Lock(key string) func() {
-	value, _ := m.mutexes.LoadOrStore(key, &sync.Mutex{})
-	mtx := value.(*sync.Mutex)
-	mtx.Lock()
-
-	return func() { mtx.Unlock() }
-}
-
 // metadataFetcher is an object designed to find metadata for different systems.
 // It is designed to be safe for parallelism. So interactions across branches and for different commits
 // will not affect other goroutines.
 type metadataFetcher struct {
-	mu     *keyMutex
+	mu     *sync.KeyMutex
 	client *http.Client
 	test   *bool
 }
 
 func newMetadataFetcher() *metadataFetcher {
 	return &metadataFetcher{
-		mu:     &keyMutex{},
+		mu:     &sync.KeyMutex{},
 		client: &http.Client{Timeout: time.Second * 5},
 	}
 }
@@ -287,8 +279,11 @@ func (f *metadataFetcher) isTest() bool {
 // directory is found in path, Get will traverse parent directories to try and determine VCS metadata.
 // Get also supplements base VCS metadata with CI specific data if it can be found.
 //
+// If a gitDiffTarget argument is provided Get will use the local git fetcher to try and resolve
+// file changes to the target. This is equivalent to a `git diff ${gitDiffTarget}`.
+//
 // When Get encounters an error fetching metadata it will return a default that contains basic Metadata information.
-func (f *metadataFetcher) Get(path string) (m Metadata, err error) {
+func (f *metadataFetcher) Get(path string, gitDiffTarget *string) (m Metadata, err error) {
 	defer func() {
 		if f.isTest() {
 			return
@@ -307,46 +302,46 @@ func (f *metadataFetcher) Get(path string) (m Metadata, err error) {
 	v, ok := lookupEnv("GITHUB_ACTIONS")
 	if ok && v != "" {
 		logging.Logger.Debug("fetching GitHub action VCS metadata")
-		return f.getGithubMetadata(path)
+		return f.getGithubMetadata(path, gitDiffTarget)
 	}
 
 	_, ok = lookupEnv("GITLAB_CI")
 	if ok {
 		logging.Logger.Debug("fetching Gitlab CI VCS metadata")
-		return f.getGitlabMetadata(path)
+		return f.getGitlabMetadata(path, gitDiffTarget)
 	}
 
 	v, ok = lookupEnv("BUILD_REPOSITORY_PROVIDER")
 	if ok {
 		if v == "github" {
 			logging.Logger.Debug("fetching GitHub VCS metadata from Azure DevOps pipeline")
-			return f.getAzureReposGithubMetadata(path)
+			return f.getAzureReposGithubMetadata(path, gitDiffTarget)
 		}
 
 		logging.Logger.Debug("fetching Azure Repos VCS metadata")
-		return f.getAzureReposMetadata(path)
+		return f.getAzureReposMetadata(path, gitDiffTarget)
 	}
 
 	_, ok = lookupEnv("BITBUCKET_COMMIT")
 	if ok {
 		logging.Logger.Debug("fetching GitHub VCS metadata from Bitbucket pipeline")
-		return f.getBitbucketMetadata(path)
+		return f.getBitbucketMetadata(path, gitDiffTarget)
 	}
 
 	_, ok = lookupEnv("CIRCLECI")
 	if ok {
 		logging.Logger.Debug("fetching GitHub VCS metadata from Circle CI")
-		return f.getCircleCIMetadata(path)
+		return f.getCircleCIMetadata(path, gitDiffTarget)
 	}
 
 	ok = lookupEnvPrefix("ATLANTIS_")
 	if ok {
 		logging.Logger.Debug("fetching Atlantis VCS metadata")
-		return f.getAtlantisMetadata(path)
+		return f.getAtlantisMetadata(path, gitDiffTarget)
 	}
 
 	logging.Logger.Debug("could not detect a specific CI system, fetching local Git metadata")
-	return f.getLocalGitMetadata(path)
+	return f.getLocalGitMetadata(path, gitDiffTarget)
 }
 
 func lookupEnvPrefix(name string) bool {
@@ -365,8 +360,8 @@ func lookupEnv(name string) (string, bool) {
 	return strings.TrimSpace(strings.ToLower(v)), ok
 }
 
-func (f *metadataFetcher) getGitlabMetadata(path string) (Metadata, error) {
-	m, err := f.getLocalGitMetadata(path)
+func (f *metadataFetcher) getGitlabMetadata(path string, gitDiffTarget *string) (Metadata, error) {
+	m, err := f.getLocalGitMetadata(path, gitDiffTarget)
 	if err != nil {
 		return m, fmt.Errorf("GitLab metadata error, could not fetch initial metadata from local git %w", err)
 	}
@@ -390,13 +385,13 @@ func (f *metadataFetcher) getGitlabMetadata(path string) (Metadata, error) {
 	return m, nil
 }
 
-func (f *metadataFetcher) getGithubMetadata(path string) (Metadata, error) {
+func (f *metadataFetcher) getGithubMetadata(path string, gitDiffTarget *string) (Metadata, error) {
 	event, err := os.ReadFile(getEnv("GITHUB_EVENT_PATH"))
 	if err != nil {
 		return Metadata{}, fmt.Errorf("could not read the GitHub event file %w", err)
 	}
 
-	m, err := f.getLocalGitMetadata(path)
+	m, err := f.getLocalGitMetadata(path, gitDiffTarget)
 	if err != nil {
 		return m, fmt.Errorf("GitHub metadata error, could not fetch initial metadata from local git %w", err)
 	}
@@ -473,7 +468,7 @@ func (f *metadataFetcher) getGithubMetadata(path string) (Metadata, error) {
 			return Metadata{}, fmt.Errorf("could not read head commit from cloned GitHub repo %w", err)
 		}
 
-		m.Commit = commitToMetadata(commit)
+		m.Commit = commitToMetadata(commit, gitDiffTarget)
 		m.Branch.Name = gjson.GetBytes(event, "pull_request.head.ref").String()
 	}
 
@@ -502,7 +497,7 @@ func (f *metadataFetcher) getGithubMetadata(path string) (Metadata, error) {
 	return m, nil
 }
 
-func (f *metadataFetcher) getLocalGitMetadata(path string) (Metadata, error) {
+func (f *metadataFetcher) getLocalGitMetadata(path string, gitDiffTarget *string) (Metadata, error) {
 	r, err := git.PlainOpenWithOptions(path, &git.PlainOpenOptions{DetectDotGit: true})
 	if err != nil {
 		return Metadata{}, fmt.Errorf("could not open git directory to fetch metadata %w", err)
@@ -534,12 +529,88 @@ func (f *metadataFetcher) getLocalGitMetadata(path string) (Metadata, error) {
 	return Metadata{
 		Remote: urlStringToRemote(remote),
 		Branch: Branch{Name: branch},
-		Commit: commitToMetadata(commit),
+		Commit: commitToMetadata(commit, gitDiffTarget, f.getFileChanges(path, r, commit, gitDiffTarget)...),
 	}, nil
 }
 
-func (f *metadataFetcher) getAzureReposMetadata(path string) (Metadata, error) {
-	m, err := f.getLocalGitMetadata(path)
+func (f *metadataFetcher) getFileChanges(path string, r *git.Repository, currentCommit *object.Commit, gitDiffTarget *string) []string {
+	changedMap := make(map[string]struct{})
+	tree, err := currentCommit.Tree()
+	if err != nil {
+		logging.Logger.WithError(err).Debug("could not get local git file changes, failed to get the tree of current commit")
+		return nil
+	}
+	var nextTree *object.Tree
+	if gitDiffTarget != nil {
+		b, err := r.ResolveRevision(plumbing.Revision(*gitDiffTarget))
+		if err != nil {
+			logging.Logger.WithError(err).Debugf("could not get local git file changes, could not resolve revision to branch %s", *gitDiffTarget)
+			return nil
+		}
+
+		previousCommit, err := r.CommitObject(*b)
+		if err != nil {
+			logging.Logger.WithError(err).Debug("could not get local git file changes, failed to get a branch commit to compare the current commit against")
+			return nil
+		}
+
+		nextTree, err = previousCommit.Tree()
+		if err != nil {
+			logging.Logger.WithError(err).Debug("could not get local git file changes, failed to get the tree of previous commits")
+			return nil
+		}
+	} else {
+		commitIter, err := r.Log(&git.LogOptions{Order: git.LogOrderCommitterTime})
+		if err != nil {
+			logging.Logger.WithError(err).Debugf("could not get local git file changes, could not call git log using currentCommit hash %s", currentCommit.Hash)
+			return nil
+		}
+
+		// call Next() twice to get the commit after the currentCommit.
+		_, _ = commitIter.Next()
+		previousCommit, err := commitIter.Next()
+		if err != nil {
+			logging.Logger.WithError(err).Debug("could not get local git file changes, failed to get the previous commit to compare the current commit against, this is likely because of a shallow clone in CI")
+			return nil
+		}
+
+		nextTree, err = previousCommit.Tree()
+		if err != nil {
+			logging.Logger.WithError(err).Debug("could not get local git file changes, failed to get the tree of previous commit")
+			return nil
+		}
+	}
+
+	changes, err := tree.Diff(nextTree)
+	if err != nil {
+		logging.Logger.WithError(err).Debug("could not get local git file changes, failed to get the diff between current and previous commit")
+		return nil
+	}
+
+	for _, change := range changes {
+		changedMap[change.From.Name] = struct{}{}
+		changedMap[change.To.Name] = struct{}{}
+	}
+
+	var changedFiles []string
+	for name := range changedMap {
+		if name == "" {
+			continue
+		}
+
+		if !filepath.IsAbs(name) && !inProject(path, name) {
+			name = filepath.Join(path, name)
+		}
+
+		changedFiles = append(changedFiles, name)
+	}
+
+	sort.Strings(changedFiles)
+	return changedFiles
+}
+
+func (f *metadataFetcher) getAzureReposMetadata(path string, gitDiffTarget *string) (Metadata, error) {
+	m, err := f.getLocalGitMetadata(path, gitDiffTarget)
 	if err != nil {
 		return m, fmt.Errorf("Azure Repos metadata error, could not fetch initial metadata from local git %w", err)
 	}
@@ -561,8 +632,8 @@ func (f *metadataFetcher) getAzureReposMetadata(path string) (Metadata, error) {
 		VCSProvider:  "azure_devops_tfsgit",
 		Title:        res.Title,
 		Author:       res.CreatedBy.UniqueName,
-		SourceBranch: strings.TrimLeft(getEnv("SYSTEM_PULLREQUEST_SOURCEBRANCH"), "refs/heads/"),
-		BaseBranch:   strings.TrimLeft(getEnv("SYSTEM_PULLREQUEST_TARGETBRANCH"), "refs/heads/"),
+		SourceBranch: strings.TrimPrefix(getEnv("SYSTEM_PULLREQUEST_SOURCEBRANCH"), "refs/heads/"),
+		BaseBranch:   strings.TrimPrefix(getEnv("SYSTEM_PULLREQUEST_TARGETBRANCH"), "refs/heads/"),
 		URL:          fmt.Sprintf("%s/pullrequest/%s", getEnv("SYSTEM_PULLREQUEST_SOURCEREPOSITORYURI"), pullID),
 	}
 	return m, nil
@@ -622,6 +693,7 @@ func (f *metadataFetcher) getAzureReposPRInfo() azurePullRequestResponse {
 		logging.Logger.WithError(err).Debugf("could not fetch Azure DevOps pull request information using URL '%s'", apiURL)
 		return out
 	}
+	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
 		b, _ := io.ReadAll(res.Body)
@@ -640,8 +712,8 @@ func (f *metadataFetcher) getAzureReposPRInfo() azurePullRequestResponse {
 	return out
 }
 
-func (f *metadataFetcher) getAzureReposGithubMetadata(path string) (Metadata, error) {
-	m, err := f.getLocalGitMetadata(path)
+func (f *metadataFetcher) getAzureReposGithubMetadata(path string, gitDiffTarget *string) (Metadata, error) {
+	m, err := f.getLocalGitMetadata(path, gitDiffTarget)
 	if err != nil {
 		return m, fmt.Errorf("Azure Repos metadata error, could not fetch initial metadata from local git %w", err)
 	}
@@ -659,8 +731,8 @@ func (f *metadataFetcher) getAzureReposGithubMetadata(path string) (Metadata, er
 	m.PullRequest = &PullRequest{
 		ID:           pullNumber,
 		VCSProvider:  "azure_devops_github",
-		SourceBranch: strings.TrimLeft(getEnv("SYSTEM_PULLREQUEST_SOURCEBRANCH"), "refs/heads/"),
-		BaseBranch:   strings.TrimLeft(getEnv("SYSTEM_PULLREQUEST_TARGETBRANCH"), "refs/heads/"),
+		SourceBranch: strings.TrimPrefix(getEnv("SYSTEM_PULLREQUEST_SOURCEBRANCH"), "refs/heads/"),
+		BaseBranch:   strings.TrimPrefix(getEnv("SYSTEM_PULLREQUEST_TARGETBRANCH"), "refs/heads/"),
 		URL:          fmt.Sprintf("%s/pulls/%s", getEnv("SYSTEM_PULLREQUEST_SOURCEREPOSITORYURI"), pullNumber),
 
 		// We are unable to fetch pull request title and author for repositories using the GitHub <> Azure DevOps
@@ -678,7 +750,7 @@ func (f *metadataFetcher) getAzureReposGithubMetadata(path string) (Metadata, er
 // in the original Commit of Metadata m. Otherwise, transformAzureDevOpsMergeCommit returns the first commit
 // on a git log call that doesn't appear to be a Merge commit.
 func (f *metadataFetcher) transformAzureDevOpsMergeCommit(path string, m *Metadata) error {
-	m.Branch.Name = strings.TrimLeft(getEnv("SYSTEM_PULLREQUEST_SOURCEBRANCH"), "refs/heads/")
+	m.Branch.Name = strings.TrimPrefix(getEnv("SYSTEM_PULLREQUEST_SOURCEBRANCH"), "refs/heads/")
 
 	matches := mergeCommitRegxp.FindStringSubmatch(m.Commit.Message)
 	if len(matches) <= 1 {
@@ -714,7 +786,7 @@ func (f *metadataFetcher) fetchCommit(path string, hash string) (Commit, error) 
 		return Commit{}, fmt.Errorf("failed to fetch commit %s %w", hash, err)
 	}
 
-	return commitToMetadata(c), nil
+	return commitToMetadata(c, nil), nil
 }
 
 func (f *metadataFetcher) shiftCommit(path string) (Commit, error) {
@@ -738,15 +810,15 @@ func (f *metadataFetcher) shiftCommit(path string) (Commit, error) {
 		}
 
 		if !isMergeCommit(c.Message) {
-			return commitToMetadata(c), nil
+			return commitToMetadata(c, nil), nil
 		}
 
 		logging.Logger.Debugf("ignoring commit with msg '%s'", c.Message)
 	}
 }
 
-func (f *metadataFetcher) getBitbucketMetadata(path string) (Metadata, error) {
-	m, err := f.getLocalGitMetadata(path)
+func (f *metadataFetcher) getBitbucketMetadata(path string, gitDiffTarget *string) (Metadata, error) {
+	m, err := f.getLocalGitMetadata(path, gitDiffTarget)
 	if err != nil {
 		return m, fmt.Errorf("BitBucket metadata error, could not fetch initial metadata from local git %w", err)
 	}
@@ -771,8 +843,8 @@ func (f *metadataFetcher) getBitbucketMetadata(path string) (Metadata, error) {
 	return m, nil
 }
 
-func (f *metadataFetcher) getCircleCIMetadata(path string) (Metadata, error) {
-	m, err := f.getLocalGitMetadata(path)
+func (f *metadataFetcher) getCircleCIMetadata(path string, gitDiffTarget *string) (Metadata, error) {
+	m, err := f.getLocalGitMetadata(path, gitDiffTarget)
 	if err != nil {
 		return m, fmt.Errorf("circle CI metadata error, could not fetch initial metadata from local git %w", err)
 	}
@@ -796,8 +868,8 @@ func (f *metadataFetcher) getCircleCIMetadata(path string) (Metadata, error) {
 	return m, nil
 }
 
-func (f *metadataFetcher) getAtlantisMetadata(path string) (Metadata, error) {
-	m, err := f.getLocalGitMetadata(path)
+func (f *metadataFetcher) getAtlantisMetadata(path string, gitDiffTarget *string) (Metadata, error) {
+	m, err := f.getLocalGitMetadata(path, gitDiffTarget)
 	if err != nil {
 		return m, fmt.Errorf("atlantis metadata error, could not fetch initial metadata from local git %w", err)
 	}
@@ -859,13 +931,15 @@ func getAtlantisPullRequestURL(remote Remote) string {
 	return ""
 }
 
-func commitToMetadata(commit *object.Commit) Commit {
+func commitToMetadata(commit *object.Commit, gitDiffTarget *string, changes ...string) Commit {
 	return Commit{
-		SHA:         commit.Hash.String(),
-		AuthorName:  commit.Author.Name,
-		AuthorEmail: commit.Author.Email,
-		Time:        commit.Author.When,
-		Message:     strings.TrimRight(commit.Message, "\n\r "),
+		SHA:            commit.Hash.String(),
+		AuthorName:     commit.Author.Name,
+		AuthorEmail:    commit.Author.Email,
+		Time:           commit.Author.When,
+		Message:        strings.TrimRight(commit.Message, "\n\r "),
+		ChangedObjects: changes,
+		GitDiffTarget:  gitDiffTarget,
 	}
 }
 
@@ -877,6 +951,9 @@ type Commit struct {
 	AuthorEmail string
 	Time        time.Time
 	Message     string
+
+	ChangedObjects []string
+	GitDiffTarget  *string
 }
 
 type Branch struct {
@@ -916,6 +993,10 @@ type Metadata struct {
 	Commit      Commit
 	PullRequest *PullRequest
 	Pipeline    *Pipeline
+}
+
+func (m Metadata) HasChanges() bool {
+	return len(m.Commit.ChangedObjects) > 0
 }
 
 func isMergeCommit(message string) bool {
@@ -963,7 +1044,7 @@ func urlStringToRemote(remote string) Remote {
 	}
 
 	if strings.Contains(host, "azure") {
-		host = strings.TrimLeft(m[2], "ssh.")
+		host = strings.TrimPrefix(m[2], "ssh.")
 		path = versionRegxp.ReplaceAllString(path, "")
 		pieces := strings.Split(path, "/")
 		if len(pieces) == 3 {
@@ -989,4 +1070,12 @@ func generateRepoName(host, path string) string {
 	}
 
 	return name
+}
+
+func inProject(dir string, change string) bool {
+	rel, err := filepath.Rel(dir, change)
+	if err != nil {
+		return false
+	}
+	return !strings.HasPrefix(rel, "..")
 }

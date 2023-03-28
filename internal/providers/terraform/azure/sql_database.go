@@ -98,15 +98,16 @@ func newSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 	}
 
 	r := &azure.SQLDatabase{
-		Address:          d.Address,
-		Region:           region,
-		SKU:              config.sku,
-		Tier:             config.tier,
-		Family:           config.family,
-		Cores:            config.cores,
-		MaxSizeGB:        maxSizeGB,
-		ReadReplicaCount: readReplicas,
-		ZoneRedundant:    d.Get("zone_redundant").Bool(),
+		Address:           d.Address,
+		Region:            region,
+		SKU:               config.sku,
+		Tier:              config.tier,
+		Family:            config.family,
+		Cores:             config.cores,
+		MaxSizeGB:         maxSizeGB,
+		ReadReplicaCount:  readReplicas,
+		ZoneRedundant:     d.Get("zone_redundant").Bool(),
+		BackupStorageType: "Geo",
 	}
 	r.PopulateUsage(u)
 

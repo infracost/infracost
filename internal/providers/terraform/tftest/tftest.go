@@ -144,7 +144,7 @@ func installPlugins() error {
 	return nil
 }
 
-func ResourceTests(t *testing.T, tf string, usage map[string]*schema.UsageData, checks []testutil.ResourceCheck) {
+func ResourceTests(t *testing.T, tf string, usage schema.UsageMap, checks []testutil.ResourceCheck) {
 	project := TerraformProject{
 		Files: []File{
 			{
@@ -157,7 +157,7 @@ func ResourceTests(t *testing.T, tf string, usage map[string]*schema.UsageData, 
 	ResourceTestsForTerraformProject(t, project, usage, checks)
 }
 
-func ResourceTestsForTerraformProject(t *testing.T, tfProject TerraformProject, usage map[string]*schema.UsageData, checks []testutil.ResourceCheck) {
+func ResourceTestsForTerraformProject(t *testing.T, tfProject TerraformProject, usage schema.UsageMap, checks []testutil.ResourceCheck) {
 	t.Run("HCL", func(t *testing.T) {
 		resourceTestsForTfProject(t, "hcl", tfProject, usage, checks)
 	})
@@ -167,7 +167,7 @@ func ResourceTestsForTerraformProject(t *testing.T, tfProject TerraformProject, 
 	})
 }
 
-func resourceTestsForTfProject(t *testing.T, pName string, tfProject TerraformProject, usage map[string]*schema.UsageData, checks []testutil.ResourceCheck) {
+func resourceTestsForTfProject(t *testing.T, pName string, tfProject TerraformProject, usage schema.UsageMap, checks []testutil.ResourceCheck) {
 	t.Helper()
 
 	runCtx, err := config.NewRunContextFromEnv(context.Background())
@@ -185,6 +185,7 @@ func resourceTestsForTfProject(t *testing.T, pName string, tfProject TerraformPr
 type GoldenFileOptions = struct {
 	Currency    string
 	CaptureLogs bool
+	IgnoreCLI   bool
 }
 
 func DefaultGoldenFileOptions() *GoldenFileOptions {
@@ -202,6 +203,10 @@ func GoldenFileResourceTestsWithOpts(t *testing.T, testName string, options *Gol
 	t.Run("HCL", func(t *testing.T) {
 		goldenFileResourceTestWithOpts(t, "hcl", testName, options)
 	})
+
+	if options != nil && options.IgnoreCLI {
+		return
+	}
 
 	t.Run("Terraform CLI", func(t *testing.T) {
 		goldenFileResourceTestWithOpts(t, "terraform", testName, options)
@@ -243,7 +248,7 @@ func goldenFileResourceTestWithOpts(t *testing.T, pName string, testName string,
 	}
 
 	// Load the usage data, if any.
-	var usageData map[string]*schema.UsageData
+	var usageData schema.UsageMap
 	usageFilePath := filepath.Join("testdata", testName, testName+".usage.yml")
 	if _, err := os.Stat(usageFilePath); err == nil || !os.IsNotExist(err) {
 		// usage file exists, load the data
@@ -292,10 +297,11 @@ func goldenFileResourceTestWithOpts(t *testing.T, pName string, testName string,
 	testutil.AssertGoldenFile(t, goldenFilePath, actual)
 }
 
-func loadResources(t *testing.T, pName string, tfProject TerraformProject, runCtx *config.RunContext, usageData map[string]*schema.UsageData) []*schema.Project {
+func loadResources(t *testing.T, pName string, tfProject TerraformProject, runCtx *config.RunContext, usageData schema.UsageMap) []*schema.Project {
 	t.Helper()
 
 	tfdir := createTerraformProject(t, tfProject)
+	runCtx.Config.RootPath = tfdir
 	var provider schema.Provider
 	if pName == "hcl" {
 		provider = newHCLProvider(t, runCtx, tfdir)
@@ -309,13 +315,7 @@ func loadResources(t *testing.T, pName string, tfProject TerraformProject, runCt
 	require.NoError(t, err)
 
 	for _, project := range projects {
-		for _, partial := range project.PartialResources {
-			project.Resources = append(project.Resources, schema.BuildResource(partial, nil))
-		}
-
-		for _, partial := range project.PartialPastResources {
-			project.PastResources = append(project.PastResources, schema.BuildResource(partial, nil))
-		}
+		project.BuildResources(schema.UsageMap{})
 	}
 
 	return projects
@@ -362,7 +362,7 @@ func goldenFileSyncTest(t *testing.T, pName, testName string) {
 	projectCtx := config.NewProjectContext(runCtx, &config.Project{}, log.Fields{})
 
 	usageFilePath := filepath.Join("testdata", testName, testName+"_existing_usage.yml")
-	projects := loadResources(t, pName, tfProject, runCtx, map[string]*schema.UsageData{})
+	projects := loadResources(t, pName, tfProject, runCtx, schema.UsageMap{})
 
 	actual := RunSyncUsage(t, projectCtx, projects, usageFilePath)
 	require.NoError(t, err)

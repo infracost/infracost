@@ -14,8 +14,16 @@
       <td>my terragrunt project</td>
       <td>dev</td>
       <td></td>
-      <td align="right">$51.09</td>
-      <td align="right">$51.97</td>
+      <td align="right">$51</td>
+      <td align="right">$52</td>
+      <td>+$0.88 (+2%)</td>
+    </tr>
+    <tr>
+      <td>my terragrunt project</td>
+      <td>dev</td>
+      <td>ws2</td>
+      <td align="right">$51</td>
+      <td align="right">$52</td>
       <td>+$0.88 (+2%)</td>
     </tr>
     <tr>
@@ -25,14 +33,6 @@
       <td align="right">$1,308</td>
       <td align="right">$748</td>
       <td>-$560.64 (-43%)</td>
-    </tr>
-    <tr>
-      <td>my terragrunt project</td>
-      <td>dev</td>
-      <td>ws2</td>
-      <td align="right">$51.09</td>
-      <td align="right">$51.97</td>
-      <td>+$0.88 (+2%)</td>
     </tr>
     <tr>
       <td>my terragrunt project</td>
@@ -77,16 +77,16 @@ Project: my terragrunt project
 Module path: dev
 
 ~ aws_instance.web_app
-  +$0.88 ($51.09 → $51.97)
+  +$0.88 ($51 → $52)
 
     ~ Instance usage (Linux/UNIX, on-demand, t3.micro → t2.micro)
-      +$0.88 ($7.59 → $8.47)
+      +$0.88 ($8 → $8)
 
     - CPU credits
       $0.00
 
 Monthly cost change for my terragrunt project (Module path: dev)
-Amount:  +$0.88 ($51.09 → $51.97)
+Amount:  +$0.88 ($51 → $52)
 Percent: +2%
 
 ──────────────────────────────────
@@ -109,16 +109,16 @@ Module path: dev
 Workspace: ws2
 
 ~ aws_instance.web_app
-  +$0.88 ($51.09 → $51.97)
+  +$0.88 ($51 → $52)
 
     ~ Instance usage (Linux/UNIX, on-demand, t3.micro → t2.micro)
-      +$0.88 ($7.59 → $8.47)
+      +$0.88 ($8 → $8)
 
     - CPU credits
       $0.00
 
 Monthly cost change for my terragrunt project (Module path: dev, Workspace: ws2)
-Amount:  +$0.88 ($51.09 → $51.97)
+Amount:  +$0.88 ($51 → $52)
 Percent: +2%
 
 ──────────────────────────────────

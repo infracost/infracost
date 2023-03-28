@@ -44,7 +44,8 @@ type Attribute struct {
 	Verbose bool
 	Logger  *logrus.Entry
 	// newMock generates a mock value for the attribute if it's value is missing.
-	newMock func(attr *Attribute) cty.Value
+	newMock       func(attr *Attribute) cty.Value
+	previousValue cty.Value
 }
 
 // IsIterable returns if the attribute can be ranged over.
@@ -121,18 +122,40 @@ func (attr *Attribute) AsString() string {
 // that the Context carries.
 func (attr *Attribute) Value() cty.Value {
 	if attr == nil {
-		return cty.NilVal
+		return cty.DynamicVal
 	}
 
 	attr.Logger.Debug("fetching attribute value")
-	return attr.value(0)
+	val := attr.value(0)
+	attr.previousValue = val
+
+	return val
+}
+
+// HasChanged returns if the Attribute Value has changed since Value was last called.
+func (attr *Attribute) HasChanged() (change bool) {
+	if attr == nil {
+		return false
+	}
+
+	defer func() {
+		e := recover()
+		if e != nil {
+			attr.Logger.Debugf("HasChanged panicked with cty.Value comparison %s", e)
+			change = true
+		}
+	}()
+
+	previous := attr.previousValue
+	current := attr.value(0)
+	return !previous.RawEquals(current)
 }
 
 func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 	defer func() {
 		if err := recover(); err != nil {
-			attr.Logger.Debugf("could not evaluate value for attr: %s. This is most likely an issue in the underlying hcl/go-cty libraries and can be ignored, but we log the stacktrace for debugging purposes. Err: %s\n%s", attr.Name(), err, debug.Stack())
-			ctyVal = cty.NilVal
+			trace := debug.Stack()
+			attr.Logger.Debugf("could not evaluate value for attr: %s. This is most likely an issue in the underlying hcl/go-cty libraries and can be ignored, but we log the stacktrace for debugging purposes. Err: %s\n%s", attr.Name(), err, trace)
 		}
 	}()
 
@@ -173,7 +196,7 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 					// let's first try and find the actual value for this bad variable.
 					// If it has an actual value let's use that to pass into the list.
 					val, _ := traversal.TraverseAbs(ctx)
-					if val == cty.NilVal {
+					if val.IsNull() {
 						val = mockedVal
 					}
 
@@ -226,37 +249,39 @@ func traverseVarAndSetCtx(ctx *hcl.EvalContext, traversal hcl.Traversal, mock ct
 		return
 	}
 
-	ob := ctx.Variables[rootName].AsValueMap()
-	if ob == nil {
-		ob = make(map[string]cty.Value)
+	ob := ctx.Variables[rootName]
+	if ob.IsNull() || !ob.IsKnown() {
+		ob = cty.ObjectVal(make(map[string]cty.Value))
 	}
 
-	ob = buildObject(traversal, ob, mock, 0)
-	ctx.Variables[rootName] = cty.ObjectVal(ob)
+	ctx.Variables[rootName] = buildObject(traversal, ob, mock, 0)
 }
 
 // buildObject builds an attribute map from the traversal. It fills any missing attributes that are
 // defined by the traversal.
-func buildObject(traversal hcl.Traversal, ob map[string]cty.Value, mock cty.Value, i int) map[string]cty.Value {
+func buildObject(traversal hcl.Traversal, value cty.Value, mock cty.Value, i int) cty.Value {
 	if i > len(traversal)-1 {
-		return ob
+		return value
 	}
 
 	traverser := traversal[i]
+	valueMap := value.AsValueMap()
+	if valueMap == nil {
+		valueMap = make(map[string]cty.Value)
+	}
 
 	// traverse splat is a special holding type which means we want to traverse all the attributes on the map.
 	if _, ok := traverser.(hcl.TraverseSplat); ok {
-		for k, v := range ob {
+		for k, v := range valueMap {
 			if v.Type().IsObjectType() {
-				valueMap := v.AsValueMap()
-				ob[k] = cty.ObjectVal(buildObject(traversal, valueMap, mock, i+1))
+				valueMap[k] = buildObject(traversal, v, mock, i+1)
 				continue
 			}
 
-			ob[k] = v
+			valueMap[k] = v
 		}
 
-		return ob
+		return cty.ObjectVal(valueMap)
 	}
 
 	if index, ok := traverser.(hcl.TraverseIndex); ok {
@@ -267,15 +292,18 @@ func buildObject(traversal hcl.Traversal, ob map[string]cty.Value, mock cty.Valu
 
 		k := kc.AsString()
 
-		if vv, exists := ob[k]; exists {
-			val := buildObject(traversal, vv.AsValueMap(), mock, i+1)
-			ob[k] = cty.ObjectVal(val)
-			return ob
+		if vv, exists := valueMap[k]; exists {
+			valueMap[k] = buildObject(traversal, vv, mock, i+1)
+			return cty.ObjectVal(valueMap)
 		}
 
-		val := buildObject(traversal, make(map[string]cty.Value), mock, i+1)
-		ob[k] = cty.ObjectVal(val)
-		return ob
+		if len(traversal)-1 == i {
+			valueMap[k] = mock
+		} else {
+			valueMap[k] = buildObject(traversal, cty.ObjectVal(make(map[string]cty.Value)), mock, i+1)
+		}
+
+		return cty.ObjectVal(valueMap)
 	}
 
 	if v, ok := traverser.(hcl.TraverseAttr); ok {
@@ -284,26 +312,26 @@ func buildObject(traversal hcl.Traversal, ob map[string]cty.Value, mock cty.Valu
 			// then we should return here. It's most likely that we weren't able to
 			// get the full variable calls for the context, so resetting the value could
 			// be harmful.
-			if _, exists := ob[v.Name]; exists && mock.Type() == cty.String {
-				return ob
+			if _, exists := valueMap[v.Name]; exists && mock.Type() == cty.String {
+				return value
 			}
 
-			ob[v.Name] = mock
-			return ob
+			valueMap[v.Name] = mock
+			return cty.ObjectVal(valueMap)
 		}
 
-		if vv, exists := ob[v.Name]; exists {
+		if vv, exists := valueMap[v.Name]; exists {
 			if isList(vv) {
 				items := make([]cty.Value, vv.LengthInt())
 				it := vv.ElementIterator()
 				for it.Next() {
 					key, sourceItem := it.Element()
-					val := buildObject(traversal, sourceItem.AsValueMap(), mock, i+1)
+					val := buildObject(traversal, sourceItem, mock, i+1)
 					i, _ := key.AsBigFloat().Int64()
-					items[i] = cty.ObjectVal(val)
+					items[i] = val
 				}
-				ob[v.Name] = cty.TupleVal(items)
-				return ob
+				valueMap[v.Name] = cty.TupleVal(items)
+				return cty.ObjectVal(valueMap)
 			}
 
 			next := traversal[i+1]
@@ -313,17 +341,15 @@ func buildObject(traversal hcl.Traversal, ob map[string]cty.Value, mock cty.Valu
 				}
 			}
 
-			val := buildObject(traversal, vv.AsValueMap(), mock, i+1)
-			ob[v.Name] = cty.ObjectVal(val)
-			return ob
+			valueMap[v.Name] = buildObject(traversal, vv, mock, i+1)
+			return cty.ObjectVal(valueMap)
 		}
 
-		val := buildObject(traversal, make(map[string]cty.Value), mock, i+1)
-		ob[v.Name] = cty.ObjectVal(val)
-		return ob
+		valueMap[v.Name] = buildObject(traversal, cty.ObjectVal(make(map[string]cty.Value)), mock, i+1)
+		return cty.ObjectVal(valueMap)
 	}
 
-	return buildObject(traversal, ob, mock, i+1)
+	return buildObject(traversal, value, mock, i+1)
 }
 
 // findCorrectCtx uses name to find the correct context to target. findCorrectCtx returns the first
@@ -622,9 +648,9 @@ func (attr *Attribute) findBadVariablesFromExpression(expression hcl.Expression)
 					traversal = append(traversal, t.Traversal...)
 					badVars = append(badVars, traversal)
 					return badVars
+				} else {
+					break
 				}
-
-				break
 			}
 
 			return attr.findBadVariables(s.Collection.Variables())

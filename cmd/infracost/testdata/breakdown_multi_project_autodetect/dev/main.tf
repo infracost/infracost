@@ -21,3 +21,8 @@ resource "aws_instance" "web_app" {
     iops        = 800
   }
 }
+
+moved {
+  from = aws_instance.foo
+  to   = aws_instance.web_app
+}

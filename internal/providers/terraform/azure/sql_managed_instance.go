@@ -24,7 +24,7 @@ func newSQLManagedInstance(d *schema.ResourceData, u *schema.UsageData) *schema.
 
 	r.SKU = d.Get("sku_name").String()
 	r.Cores = d.Get("vcores").Int()
-	r.LicenceType = d.Get("license_type").String()
+	r.LicenseType = d.Get("license_type").String()
 	r.StorageAccountType = d.Get("storage_account_type").String()
 	if r.StorageAccountType == "" {
 		r.StorageAccountType = "LRS"

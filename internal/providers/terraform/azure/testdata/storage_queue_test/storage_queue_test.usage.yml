@@ -1,0 +1,12 @@
+version: 0.1
+resource_usage:
+  azurerm_storage_queue.storagev1-queue[*]:
+    monthly_storage_gb: 1000
+    monthly_class_1_operations: 1000000
+    monthly_class_2_operations: 3000000
+    monthly_geo_replication_data_transfer_gb: 5000
+  azurerm_storage_queue.storagev2-queue[*]:
+    monthly_storage_gb: 2000
+    monthly_class_1_operations: 2000000
+    monthly_class_2_operations: 4000000
+    monthly_geo_replication_data_transfer_gb: 6000

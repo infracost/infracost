@@ -39,7 +39,7 @@ func (p *PlanProvider) DisplayType() string {
 	return "Terraform plan binary file"
 }
 
-func (p *PlanProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
+func (p *PlanProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, error) {
 	j, err := p.generatePlanJSON()
 	if err != nil {
 		return []*schema.Project{}, err
@@ -121,7 +121,7 @@ func (p *PlanProvider) generatePlanJSON() ([]byte, error) {
 	spinner := ui.NewSpinner("Running terraform show", p.spinnerOpts)
 	defer spinner.Fail()
 
-	j, err := p.runShow(opts, spinner, planPath)
+	j, err := p.runShow(opts, spinner, planPath, false)
 	if err == nil {
 		p.cachedPlanJSON = j
 	}

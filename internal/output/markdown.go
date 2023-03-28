@@ -3,7 +3,9 @@ package output
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"sort"
+	"strings"
 	"text/template"
 	"unicode/utf8"
 
@@ -67,32 +69,22 @@ func formatCostChangeSentence(currency string, pastCost, cost *decimal.Decimal, 
 }
 
 func calculateMetadataToDisplay(projects []Project) (hasModulePath bool, hasWorkspace bool) {
-	// we only want to show metadata fields if they can help distinguish projects with the same name
-
-	sprojects := make([]Project, 0)
-	for _, p := range projects {
-		if p.Diff == nil || len(p.Diff.Resources) == 0 { // ignore the projects that are skipped
-			continue
-		}
-		sprojects = append(sprojects, p)
-	}
-
-	sort.Slice(sprojects, func(i, j int) bool {
-		if sprojects[i].Name != sprojects[j].Name {
-			return sprojects[i].Name < sprojects[j].Name
+	sort.Slice(projects, func(i, j int) bool {
+		if projects[i].Name != projects[j].Name {
+			return projects[i].Name < projects[j].Name
 		}
 
-		if sprojects[i].Metadata.TerraformModulePath != sprojects[j].Metadata.TerraformModulePath {
-			return sprojects[i].Metadata.TerraformModulePath < sprojects[j].Metadata.TerraformModulePath
+		if projects[i].Metadata.TerraformModulePath != projects[j].Metadata.TerraformModulePath {
+			return projects[i].Metadata.TerraformModulePath < projects[j].Metadata.TerraformModulePath
 		}
 
-		return sprojects[i].Metadata.WorkspaceLabel() < sprojects[j].Metadata.WorkspaceLabel()
+		return projects[i].Metadata.WorkspaceLabel() < projects[j].Metadata.WorkspaceLabel()
 	})
 
 	// check if any projects that have the same name have different path or workspace
-	for i, p := range sprojects {
+	for i, p := range projects {
 		if i > 0 { // we compare vs the previous item, so skip index 0
-			prev := sprojects[i-1]
+			prev := projects[i-1]
 			if p.Name == prev.Name {
 				if p.Metadata.TerraformModulePath != prev.Metadata.TerraformModulePath {
 					hasModulePath = true
@@ -105,6 +97,43 @@ func calculateMetadataToDisplay(projects []Project) (hasModulePath bool, hasWork
 	}
 
 	return hasModulePath, hasWorkspace
+}
+
+// MarkdownCtx holds information that can be used and executed with a go template.
+type MarkdownCtx struct {
+	Root                         Root
+	SkippedProjectCount          int
+	ErroredProjectCount          int
+	SkippedUnchangedProjectCount int
+	DiffOutput                   string
+	Options                      Options
+	MarkdownOptions              MarkdownOptions
+}
+
+// ProjectCounts returns a string that represents additional information about missing/errored projects.
+func (m MarkdownCtx) ProjectCounts() string {
+	out := ""
+	if m.SkippedUnchangedProjectCount == 1 {
+		out += "1 project has no code changes, "
+	} else if m.SkippedUnchangedProjectCount > 0 {
+		out += fmt.Sprintf("%d projects have no code changes, ", m.SkippedUnchangedProjectCount)
+	} else if m.SkippedProjectCount == 1 {
+		out += "1 project has no cost estimate changes, "
+	} else if m.SkippedProjectCount > 0 {
+		out += fmt.Sprintf("%d projects have no cost estimate changes, ", m.SkippedProjectCount)
+	}
+
+	if m.ErroredProjectCount == 1 {
+		out += "1 project could not be evaluated"
+	} else if m.ErroredProjectCount > 0 {
+		out += fmt.Sprintf("%d projects could not be evaluated, ", m.ErroredProjectCount)
+	}
+
+	if out == "" {
+		return out
+	}
+
+	return "\n" + strings.TrimSuffix(out, ", ") + "."
 }
 
 func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, error) {
@@ -140,13 +169,37 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 		},
 		"formatCostChangeSentence": formatCostChangeSentence,
 		"showProject": func(p Project) bool {
+			if p.Metadata.HasErrors() {
+				return false
+			}
+
+			if opts.ShowOnlyChanges {
+				// only return true if the project has code changes so the table can also show
+				// project that have cost changes.
+				if p.Metadata.VCSCodeChanged != nil && *p.Metadata.VCSCodeChanged {
+					return true
+				}
+			}
+
 			if opts.ShowAllProjects {
 				return true
 			}
+
 			if p.Diff == nil || len(p.Diff.Resources) == 0 { // has no diff
 				return false
 			}
+
 			return true // has diff
+		},
+		"validProjects": func() Projects {
+			var valid Projects
+			for _, project := range out.Projects {
+				if !project.Metadata.HasErrors() {
+					valid = append(valid, project)
+				}
+			}
+
+			return valid
 		},
 		"metadataHeaders": func() []string {
 			headers := []string{}
@@ -192,23 +245,39 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 
 	skippedProjectCount := 0
 	for _, p := range out.Projects {
-		if p.Diff == nil || len(p.Diff.Resources) == 0 {
+		if p.Metadata.HasErrors() {
+			continue
+		}
+
+		if (p.Diff == nil || len(p.Diff.Resources) == 0) && !hasCodeChanges(opts, p) {
 			skippedProjectCount++
 		}
 	}
 
-	err = tmpl.Execute(bufw, struct {
-		Root                Root
-		SkippedProjectCount int
-		DiffOutput          string
-		Options             Options
-		MarkdownOptions     MarkdownOptions
-	}{
-		out,
-		skippedProjectCount,
-		diffMsg,
-		opts,
-		markdownOpts})
+	erroredProjectCount := 0
+	for _, p := range out.Projects {
+		if p.Metadata.HasErrors() {
+			erroredProjectCount++
+		}
+	}
+
+	skippedUnchangedProjectCount := 0
+	if opts.ShowOnlyChanges {
+		for _, p := range out.Projects {
+			if !hasCodeChanges(opts, p) {
+				skippedUnchangedProjectCount++
+			}
+		}
+	}
+
+	err = tmpl.Execute(bufw, MarkdownCtx{
+		Root:                         out,
+		SkippedProjectCount:          skippedProjectCount,
+		ErroredProjectCount:          erroredProjectCount,
+		SkippedUnchangedProjectCount: skippedUnchangedProjectCount,
+		DiffOutput:                   diffMsg,
+		Options:                      opts,
+		MarkdownOptions:              markdownOpts})
 	if err != nil {
 		return []byte{}, err
 	}
@@ -229,4 +298,8 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 	}
 
 	return msg, nil
+}
+
+func hasCodeChanges(options Options, project Project) bool {
+	return options.ShowOnlyChanges && project.Metadata.VCSCodeChanged != nil && *project.Metadata.VCSCodeChanged
 }

@@ -3,8 +3,11 @@ package extclient
 import (
 	"fmt"
 	"io"
-	"net/http"
 	"time"
+
+	"github.com/hashicorp/go-retryablehttp"
+	"github.com/infracost/infracost/internal/apiclient"
+	"github.com/infracost/infracost/internal/logging"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
@@ -14,15 +17,18 @@ import (
 type AuthedAPIClient struct {
 	host   string
 	token  string
-	client *http.Client
+	client *retryablehttp.Client
 }
 
 // NewAuthedAPIClient returns a new API client.
 func NewAuthedAPIClient(host, token string) *AuthedAPIClient {
+	client := retryablehttp.NewClient()
+	client.Logger = &apiclient.LeveledLogger{Logger: logging.Logger.WithField("library", "retryablehttp")}
+	client.HTTPClient.Timeout = time.Second * 30
 	return &AuthedAPIClient{
 		host:   host,
 		token:  token,
-		client: &http.Client{Timeout: time.Second * 5},
+		client: client,
 	}
 }
 
@@ -35,7 +41,7 @@ func (a *AuthedAPIClient) SetHost(host string) {
 func (a *AuthedAPIClient) Get(path string) ([]byte, error) {
 	url := fmt.Sprintf("https://%s%s", a.host, path)
 	log.Debugf("Calling Terraform Cloud API: %s", url)
-	req, err := http.NewRequest("GET", url, nil)
+	req, err := retryablehttp.NewRequest("GET", url, nil)
 	if err != nil {
 		return []byte{}, err
 	}
