@@ -43,6 +43,10 @@ func (r *RecoveryServicesVault) UsageSchema() []*schema.UsageItem {
 // RecoveryServicesVault does not have any actual usage associated with itself and instead relies on
 // users specifying usage for child ProtectedVM resources.
 func (r *RecoveryServicesVault) PopulateUsage(u *schema.UsageData) {
+	if u == nil {
+		return
+	}
+
 	// build a new UsageMap so that we get the wildcard support.
 	data := map[string]*schema.UsageData{}
 	for s, result := range u.Attributes {
