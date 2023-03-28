@@ -9,16 +9,16 @@ resource "azurerm_resource_group" "example" {
 }
 
 locals {
-  storage_modes      = ["GeoRedundant", "LocallyRedundant", "ZoneRedundant"]
+  storage_modes                = ["GeoRedundant", "LocallyRedundant", "ZoneRedundant"]
   cross_region_restore_enabled = [true, false]
-  skus               = ["Standard", "RS0"]
+  skus                         = ["Standard", "RS0"]
   vault_permutations = distinct(flatten([
     for sku in local.skus : [
-    for cross_region in local.cross_region_restore_enabled : [
+      for cross_region in local.cross_region_restore_enabled : [
         for storage_mode in local.storage_modes : {
-            sku: sku
-            storage_mode: storage_mode
-            cross_region: cross_region
+          sku : sku
+          storage_mode : storage_mode
+          cross_region : cross_region
         }
       ]
     ]
@@ -53,18 +53,18 @@ resource "azurerm_network_interface" "example" {
 
 
 resource "azurerm_recovery_services_vault" "example" {
-  for_each = {for entry in local.vault_permutations : "${entry.storage_mode}.${entry.sku}.${entry.cross_region}" => entry}
+  for_each = { for entry in local.vault_permutations : "${entry.storage_mode}.${entry.sku}.${entry.cross_region}" => entry }
 
-  name                = "${each.value.storage_mode}-${each.value.sku}-${each.value.cross_region}"
-  location            = azurerm_resource_group.example.location
-  resource_group_name = azurerm_resource_group.example.name
-  sku                 = each.value.sku
-  storage_mode_type   = each.value.storage_mode
+  name                         = "${each.value.storage_mode}-${each.value.sku}-${each.value.cross_region}"
+  location                     = azurerm_resource_group.example.location
+  resource_group_name          = azurerm_resource_group.example.name
+  sku                          = each.value.sku
+  storage_mode_type            = each.value.storage_mode
   cross_region_restore_enabled = each.value.cross_region
 }
 
 resource "azurerm_backup_policy_vm" "example" {
-  for_each = {for entry in local.vault_permutations : "${entry.storage_mode}.${entry.sku}.${entry.cross_region}" => entry}
+  for_each = { for entry in local.vault_permutations : "${entry.storage_mode}.${entry.sku}.${entry.cross_region}" => entry }
 
   name                = "policy-${each.value.storage_mode}-${each.value.sku}-${each.value.cross_region}"
   resource_group_name = azurerm_resource_group.example.name
@@ -83,7 +83,7 @@ resource "azurerm_backup_policy_vm" "example" {
 }
 
 resource "azurerm_backup_protected_vm" "small" {
-  for_each = {for entry in azurerm_backup_policy_vm.example : "${entry.name}" => entry}
+  for_each = { for entry in azurerm_backup_policy_vm.example : "${entry.name}" => entry }
 
   resource_group_name = azurerm_resource_group.example.name
   recovery_vault_name = each.value.recovery_vault_name
@@ -92,7 +92,7 @@ resource "azurerm_backup_protected_vm" "small" {
 }
 
 resource "azurerm_backup_protected_vm" "medium" {
-  for_each = {for entry in azurerm_backup_policy_vm.example : "${entry.name}" => entry}
+  for_each = { for entry in azurerm_backup_policy_vm.example : "${entry.name}" => entry }
 
   resource_group_name = azurerm_resource_group.example.name
   recovery_vault_name = each.value.recovery_vault_name
@@ -101,7 +101,7 @@ resource "azurerm_backup_protected_vm" "medium" {
 }
 
 resource "azurerm_backup_protected_vm" "large" {
-  for_each = {for entry in azurerm_backup_policy_vm.example : "${entry.name}" => entry}
+  for_each = { for entry in azurerm_backup_policy_vm.example : "${entry.name}" => entry }
 
   resource_group_name = azurerm_resource_group.example.name
   recovery_vault_name = each.value.recovery_vault_name
@@ -110,7 +110,7 @@ resource "azurerm_backup_protected_vm" "large" {
 }
 
 resource "azurerm_backup_protected_vm" "with_usage" {
-  for_each = {for entry in azurerm_backup_policy_vm.example : "${entry.name}" => entry}
+  for_each = { for entry in azurerm_backup_policy_vm.example : "${entry.name}" => entry }
 
   resource_group_name = azurerm_resource_group.example.name
   recovery_vault_name = each.value.recovery_vault_name
