@@ -44,7 +44,7 @@ func TestSpotInstanceRequest(t *testing.T) {
 			Name: "aws_spot_instance_request.t3_large",
 			CostComponentChecks: []testutil.CostComponentCheck{
 				{
-					Name:      "Instance Usage (Linux/UNIX, spot, t3.large)",
+					Name:      "Instance usage (Linux/UNIX, spot, t3.large)",
 					PriceHash: "3a45cd05e73384099c2ff360bdb74b74-803d7f1cd2f621429b63f791730e7935",
 				},
 				{
