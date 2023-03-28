@@ -110,6 +110,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getGlobalAcceleratorRegistryItem(),
 	getGlobalacceleratorEndpointGroupRegistryItem(),
 	getEC2HostRegistryItem(),
+	getSpotInstanceRequestRegistryItem(),
 	getLambdaProvisionedConcurrencyConfigRegistryItem(),
 }
 
