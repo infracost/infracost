@@ -69,7 +69,7 @@ func (r *MonitoringMetricDescriptor) monitoringDataCostComponent(name string, us
 		MonthlyQuantity: monitoringDataMB,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("gcp"),
-			Service:       strPtr("Stackdriver Monitoring"),
+			Service:       strPtr("Cloud Monitoring"),
 			ProductFamily: strPtr("ApplicationServices"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "description", ValueRegex: strPtr("/Metric Volume/i")},
@@ -89,7 +89,7 @@ func (r *MonitoringMetricDescriptor) apiCallsCostComponent(apiCalls *decimal.Dec
 		MonthlyQuantity: apiCalls,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("gcp"),
-			Service:       strPtr("Stackdriver Monitoring"),
+			Service:       strPtr("Cloud Monitoring"),
 			ProductFamily: strPtr("ApplicationServices"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "description", ValueRegex: strPtr("/Monitoring API Requests/i")},
