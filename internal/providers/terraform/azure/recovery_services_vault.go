@@ -30,9 +30,12 @@ func newRecoveryServicesVault(d *schema.ResourceData) schema.CoreResource {
 	region := lookupRegion(d, []string{"resource_group_name"})
 	vms := d.References("azurerm_backup_protected_vm.recovery_vault_name")
 
-	protectedVMs := make([]*azure.BackupProtectedVM, len(vms))
-	for i, vm := range vms {
-		protectedVMs[i] = newBackupProtectedVm(vm)
+	var protectedVMs []*azure.BackupProtectedVM
+	for _, vm := range vms {
+		protectedVm := newBackupProtectedVm(vm)
+		if protectedVm != nil {
+			protectedVMs = append(protectedVMs, protectedVm)
+		}
 	}
 
 	sort.Slice(protectedVMs, func(i, j int) bool {
