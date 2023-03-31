@@ -5,6 +5,7 @@ import (
 
 	"crypto/md5" // nolint:gosec
 	"encoding/base32"
+	"errors"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -18,6 +19,8 @@ const (
 	DiagModuleEvaluationFailure
 	DiagTerragruntEvaluationFailure
 	DiagTerragruntModuleEvaluationFailure
+	DiagPrivateModuleDownloadFailure
+	DiagPrivateRegistryModuleDownloadFailure
 )
 
 // ProjectDiag holds information about all diagnostics associated with a project.
@@ -26,6 +29,14 @@ type ProjectDiag struct {
 	Code    int         `json:"code"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data"`
+}
+
+func (p *ProjectDiag) Error() string {
+	if p == nil {
+		return ""
+	}
+
+	return p.Message
 }
 
 type ProjectMetadata struct {
@@ -41,8 +52,27 @@ type ProjectMetadata struct {
 	Policies            Policies      `json:"policies,omitempty"`
 }
 
+// AddError pushes the provided error onto the metadata list. It does a naive conversion to ProjectDiag
+// if the error provided is not already a diagnostic.
 func (m *ProjectMetadata) AddError(err error) {
+	var diag *ProjectDiag
+	if errors.As(err, &diag) {
+		m.Errors = append(m.Errors, *diag)
+		return
+	}
+
 	m.Errors = append(m.Errors, ProjectDiag{Message: err.Error()})
+}
+
+// AddErrorWithCode is the same as AddError except adds a code to the fallback diagnostic.
+func (m *ProjectMetadata) AddErrorWithCode(err error, code int) {
+	var diag *ProjectDiag
+	if errors.As(err, &diag) {
+		m.Errors = append(m.Errors, *diag)
+		return
+	}
+
+	m.Errors = append(m.Errors, ProjectDiag{Code: code, Message: err.Error()})
 }
 
 func (m *ProjectMetadata) HasErrors() bool {
