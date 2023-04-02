@@ -10,18 +10,17 @@ import (
 )
 
 const (
-	sqlMIServiceName   = "SQL Managed Instance"
-	sqlMIProductFamily = "Databases"
+	mssqlMIServiceName   = "MSSQL Managed Instance"
+	mssqlMIProductFamily = "Databases"
 )
 
-// *** this resource is deprecated in v3.0 of AzureRM provider and will be removed in v4.0 ***
-// SQLManagedInstance struct represents an azure Sql Managed Instance.
+// MSSQLManagedInstance struct represents an azure Sql Managed Instance.
 //
-// # SQLManagedInstance currently only Gen5 database instance
+// # MSSQLManagedInstance currently only Gen5 database instance
 //
 // More resource information here: https://azure.microsoft.com/en-gb/products/azure-sql/managed-instance/
 // Pricing information here: https://azure.microsoft.com/en-gb/pricing/details/azure-sql-managed-instance/single/
-type SQLManagedInstance struct {
+type MSSQLManagedInstance struct {
 	Address            string
 	Region             string
 	SKU                string
@@ -35,16 +34,16 @@ type SQLManagedInstance struct {
 	BackupStorageGB            *int64 `infracost_usage:"backup_storage_gb"`
 }
 
-// PopulateUsage parses the u schema.UsageData into the SQLManagedInstance.
-// It uses the `infracost_usage` struct tags to populate data into the SQLManagedInstance.
-func (r *SQLManagedInstance) PopulateUsage(u *schema.UsageData) {
+// PopulateUsage parses the u schema.UsageData into the MSSQLManagedInstance.
+// It uses the `infracost_usage` struct tags to populate data into the MSSQLManagedInstance.
+func (r *MSSQLManagedInstance) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-// BuildResource builds a schema.Resource from a valid SQLManagedInstance struct.
+// BuildResource builds a schema.Resource from a valid MSSQLManagedInstance struct.
 // This method is called after the resource is initialised by an IaC provider.
 // See providers folder for more information.
-func (r *SQLManagedInstance) BuildResource() *schema.Resource {
+func (r *MSSQLManagedInstance) BuildResource() *schema.Resource {
 	costComponents := r.costComponents()
 
 	return &schema.Resource{
@@ -57,7 +56,7 @@ func (r *SQLManagedInstance) BuildResource() *schema.Resource {
 	}
 }
 
-func (r *SQLManagedInstance) costComponents() []*schema.CostComponent {
+func (r *MSSQLManagedInstance) costComponents() []*schema.CostComponent {
 	costComponents := []*schema.CostComponent{
 		{
 			Name:           fmt.Sprintf("Compute (%s %d Cores)", strings.ToTitle(r.SKU), r.Cores),
@@ -67,8 +66,8 @@ func (r *SQLManagedInstance) costComponents() []*schema.CostComponent {
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr(vendorName),
 				Region:        strPtr(r.Region),
-				Service:       strPtr(sqlMIServiceName),
-				ProductFamily: strPtr(sqlMIProductFamily),
+				Service:       strPtr(mssqlMIServiceName),
+				ProductFamily: strPtr(mssqlMIProductFamily),
 				AttributeFilters: ([]*schema.AttributeFilter{
 					{Key: "productName", Value: r.productDescription()},
 					{Key: "skuName", Value: r.meteredName()},
@@ -78,18 +77,18 @@ func (r *SQLManagedInstance) costComponents() []*schema.CostComponent {
 		},
 	}
 
-	costComponents = append(costComponents, r.sqlMIStorageCostComponent(), r.sqlMIBackupCostComponent())
+	costComponents = append(costComponents, r.mssqlMIStorageCostComponent(), r.mssqlMIBackupCostComponent())
 
 	if r.LicenseType == "LicenseIncluded" {
-		costComponents = append(costComponents, r.sqlMILicenseCostComponent())
+		costComponents = append(costComponents, r.mssqlMILicenseCostComponent())
 	}
 
-	costComponents = append(costComponents, r.sqlMILongTermRetentionStorageGBCostComponent())
+	costComponents = append(costComponents, r.mssqlMILongTermRetentionStorageGBCostComponent())
 
 	return costComponents
 }
 
-func (r *SQLManagedInstance) productDescription() *string {
+func (r *MSSQLManagedInstance) productDescription() *string {
 	productDescription := ""
 
 	if strings.Contains(r.SKU, "GP") {
@@ -105,13 +104,13 @@ func (r *SQLManagedInstance) productDescription() *string {
 	return strPtr(productDescription)
 }
 
-func (r *SQLManagedInstance) meteredName() *string {
+func (r *MSSQLManagedInstance) meteredName() *string {
 	meterName := fmt.Sprintf("%d %s", r.Cores, "vCore")
 
 	return strPtr(meterName)
 }
 
-func (r *SQLManagedInstance) sqlMIStorageCostComponent() *schema.CostComponent {
+func (r *MSSQLManagedInstance) mssqlMIStorageCostComponent() *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "Storage",
 		Unit:            "GB",
@@ -120,8 +119,8 @@ func (r *SQLManagedInstance) sqlMIStorageCostComponent() *schema.CostComponent {
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr(vendorName),
 			Region:        strPtr(r.Region),
-			Service:       strPtr(sqlMIServiceName),
-			ProductFamily: strPtr(sqlMIProductFamily),
+			Service:       strPtr(mssqlMIServiceName),
+			ProductFamily: strPtr(mssqlMIProductFamily),
 			AttributeFilters: ([]*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("SQL Managed Instance General Purpose - Storage")},
 				{Key: "meterName", ValueRegex: regexPtr("Data Stored$")},
@@ -131,7 +130,7 @@ func (r *SQLManagedInstance) sqlMIStorageCostComponent() *schema.CostComponent {
 	}
 }
 
-func (r *SQLManagedInstance) sqlMIBackupCostComponent() *schema.CostComponent {
+func (r *MSSQLManagedInstance) mssqlMIBackupCostComponent() *schema.CostComponent {
 	var backup *decimal.Decimal
 
 	if r.BackupStorageGB != nil {
@@ -146,8 +145,8 @@ func (r *SQLManagedInstance) sqlMIBackupCostComponent() *schema.CostComponent {
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr(vendorName),
 			Region:        strPtr(r.Region),
-			Service:       strPtr(sqlMIServiceName),
-			ProductFamily: strPtr(sqlMIProductFamily),
+			Service:       strPtr(mssqlMIServiceName),
+			ProductFamily: strPtr(mssqlMIProductFamily),
 			AttributeFilters: ([]*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("SQL Managed Instance PITR Backup Storage")},
 				{Key: "meterName", Value: strPtr(fmt.Sprintf("%s Data Stored", r.StorageAccountType))},
@@ -157,7 +156,7 @@ func (r *SQLManagedInstance) sqlMIBackupCostComponent() *schema.CostComponent {
 	}
 }
 
-func (r *SQLManagedInstance) sqlMILicenseCostComponent() *schema.CostComponent {
+func (r *MSSQLManagedInstance) mssqlMILicenseCostComponent() *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           "SQL license",
 		Unit:           "vCore-hours",
@@ -166,8 +165,8 @@ func (r *SQLManagedInstance) sqlMILicenseCostComponent() *schema.CostComponent {
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr(vendorName),
 			Region:        strPtr("Global"),
-			Service:       strPtr(sqlMIServiceName),
-			ProductFamily: strPtr(sqlMIProductFamily),
+			Service:       strPtr(mssqlMIServiceName),
+			ProductFamily: strPtr(mssqlMIProductFamily),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("SQL Managed Instance General Purpose - SQL License")},
 			},
@@ -176,7 +175,7 @@ func (r *SQLManagedInstance) sqlMILicenseCostComponent() *schema.CostComponent {
 	}
 }
 
-func (r *SQLManagedInstance) sqlMILongTermRetentionStorageGBCostComponent() *schema.CostComponent {
+func (r *MSSQLManagedInstance) mssqlMILongTermRetentionStorageGBCostComponent() *schema.CostComponent {
 	var retention *decimal.Decimal
 
 	if r.LongTermRetentionStorageGB != nil {
@@ -191,10 +190,10 @@ func (r *SQLManagedInstance) sqlMILongTermRetentionStorageGBCostComponent() *sch
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr(vendorName),
 			Region:        strPtr(r.Region),
-			Service:       strPtr(sqlMIServiceName),
-			ProductFamily: strPtr(sqlMIProductFamily),
+			Service:       strPtr(mssqlMIServiceName),
+			ProductFamily: strPtr(mssqlMIProductFamily),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", Value: strPtr("SQL Managed Instance - LTR Backup Storage")},
+				{Key: "productName", Value: strPtr("MSSQL Managed Instance - LTR Backup Storage")},
 				{Key: "meterName", Value: strPtr(fmt.Sprintf("Backup %s Data Stored", r.StorageAccountType))},
 			},
 		},

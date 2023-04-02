@@ -92,6 +92,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getAzureRMStorageAccountRegistryItem(),
 	getAzureRMSQLDatabaseRegistryItem(),
 	getAzureRMSQLManagedInstanceRegistryItem(),
+	getAzureRMMSSQLManagedInstanceRegistryItem(),
 	GetAzureRMSynapseSparkPoolRegistryItem(),
 	GetAzureRMSynapseSQLPoolRegistryItem(),
 	GetAzureRMSynapseWorkspacRegistryItem(),
