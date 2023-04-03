@@ -45,7 +45,7 @@ Percent: 0%
 
 ──────────────────────────────────
 Project: my terragrunt dev project
-Module path: ../../../../examples/terragrunt/dev
+Module path: terragrunt/dev
 
 ~ aws_lambda_function.hello_world
   Monthly cost depends on usage
@@ -62,13 +62,13 @@ Module path: ../../../../examples/terragrunt/dev
       Monthly cost depends on usage
         +$0.0000166667 per GB-seconds
 
-Monthly cost change for my terragrunt dev project (Module path: ../../../../examples/terragrunt/dev)
+Monthly cost change for my terragrunt dev project (Module path: terragrunt/dev)
 Amount:  $0.00 ($52 → $52)
 Percent: 0%
 
 ──────────────────────────────────
 Project: my terragrunt multi project
-Module path: ../../../../examples/terragrunt/dev
+Module path: terragrunt/dev
 
 ~ aws_lambda_function.hello_world
   Monthly cost depends on usage
@@ -85,13 +85,13 @@ Module path: ../../../../examples/terragrunt/dev
       Monthly cost depends on usage
         +$0.0000166667 per GB-seconds
 
-Monthly cost change for my terragrunt multi project (Module path: ../../../../examples/terragrunt/dev)
+Monthly cost change for my terragrunt multi project (Module path: terragrunt/dev)
 Amount:  $0.00 ($52 → $52)
 Percent: 0%
 
 ──────────────────────────────────
 Project: my terragrunt multi project
-Module path: ../../../../examples/terragrunt/prod
+Module path: terragrunt/prod
 
 ~ aws_lambda_function.hello_world
   Monthly cost depends on usage
@@ -108,13 +108,13 @@ Module path: ../../../../examples/terragrunt/prod
       Monthly cost depends on usage
         +$0.0000166667 per GB-seconds
 
-Monthly cost change for my terragrunt multi project (Module path: ../../../../examples/terragrunt/prod)
+Monthly cost change for my terragrunt multi project (Module path: terragrunt/prod)
 Amount:  $0.00 ($748 → $748)
 Percent: 0%
 
 ──────────────────────────────────
 Project: my terragrunt prod project
-Module path: ../../../../examples/terragrunt/prod
+Module path: terragrunt/prod
 
 ~ aws_lambda_function.hello_world
   Monthly cost depends on usage
@@ -131,13 +131,13 @@ Module path: ../../../../examples/terragrunt/prod
       Monthly cost depends on usage
         +$0.0000166667 per GB-seconds
 
-Monthly cost change for my terragrunt prod project (Module path: ../../../../examples/terragrunt/prod)
+Monthly cost change for my terragrunt prod project (Module path: terragrunt/prod)
 Amount:  $0.00 ($748 → $748)
 Percent: 0%
 
 ──────────────────────────────────
 Project: my terragrunt workspace
-Module path: ../../../../examples/terragrunt/dev
+Module path: terragrunt/dev
 Workspace: ws2
 
 ~ aws_lambda_function.hello_world
@@ -155,13 +155,13 @@ Workspace: ws2
       Monthly cost depends on usage
         +$0.0000166667 per GB-seconds
 
-Monthly cost change for my terragrunt workspace (Module path: ../../../../examples/terragrunt/dev, Workspace: ws2)
+Monthly cost change for my terragrunt workspace (Module path: terragrunt/dev, Workspace: ws2)
 Amount:  $0.00 ($52 → $52)
 Percent: 0%
 
 ──────────────────────────────────
 Project: my terragrunt workspace
-Module path: ../../../../examples/terragrunt/prod
+Module path: terragrunt/prod
 Workspace: ws2
 
 ~ aws_lambda_function.hello_world
@@ -179,7 +179,7 @@ Workspace: ws2
       Monthly cost depends on usage
         +$0.0000166667 per GB-seconds
 
-Monthly cost change for my terragrunt workspace (Module path: ../../../../examples/terragrunt/prod, Workspace: ws2)
+Monthly cost change for my terragrunt workspace (Module path: terragrunt/prod, Workspace: ws2)
 Amount:  $0.00 ($748 → $748)
 Percent: 0%
 
