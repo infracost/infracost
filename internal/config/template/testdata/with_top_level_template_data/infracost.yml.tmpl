@@ -1,0 +1,11 @@
+version: 0.1
+
+projects:
+{{- if eq .branch "test" }}
+  {{- range $app := matchPaths ":name/main.tf" }}
+      {{- if ne $app.name .branch }}
+        - path: {{ $app._dir }}
+          name: data-{{ $app.name }}
+      {{- end }}
+  {{- end }}
+{{- end }}
