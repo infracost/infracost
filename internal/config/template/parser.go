@@ -27,7 +27,7 @@ type Parser struct {
 
 // NewParser returns a safely initialized Infracost template parser, this builds the underlying template with the
 // Parser functions and sets the underlying default template name. Default data can be passed to the parser which
-// we be passed to the template on execution.
+// will be passed to the template on execution.
 func NewParser(repoDir string, defaultData map[string]interface{}) *Parser {
 	absRepoDir, _ := filepath.Abs(repoDir)
 	p := Parser{repoDir: absRepoDir, data: defaultData}
