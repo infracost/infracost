@@ -22,13 +22,15 @@ var (
 type Parser struct {
 	repoDir  string
 	template *template.Template
+	data     map[string]interface{}
 }
 
 // NewParser returns a safely initialized Infracost template parser, this builds the underlying template with the
-// Parser functions and sets the underlying default template name.
-func NewParser(repoDir string) *Parser {
+// Parser functions and sets the underlying default template name. Default data can be passed to the parser which
+// we be passed to the template on execution.
+func NewParser(repoDir string, defaultData map[string]interface{}) *Parser {
 	absRepoDir, _ := filepath.Abs(repoDir)
-	p := Parser{repoDir: absRepoDir}
+	p := Parser{repoDir: absRepoDir, data: defaultData}
 	t := template.New(defaultInfracostTmplName).Funcs(template.FuncMap{
 		"base":       p.base,
 		"stem":       p.stem,
@@ -62,7 +64,7 @@ func (p *Parser) CompileFromFile(templatePath string, wr io.Writer) error {
 		return fmt.Errorf("could not parse template path: %s err: %w", templatePath, err)
 	}
 
-	err = t.Execute(wr, nil)
+	err = t.Execute(wr, p.data)
 	if err != nil {
 		return fmt.Errorf("could not execute template: %s err: %w", templatePath, err)
 	}
@@ -82,7 +84,7 @@ func (p *Parser) Compile(template string, wr io.Writer) error {
 		return fmt.Errorf("could not parse template: %q err: %w", template, err)
 	}
 
-	err = t.Execute(wr, nil)
+	err = t.Execute(wr, p.data)
 	if err != nil {
 		return fmt.Errorf("could not execute template: %q err: %w", template, err)
 	}
@@ -187,10 +189,15 @@ func (p *Parser) matchPaths(pattern string) []map[interface{}]interface{} {
 		rel, _ := filepath.Rel(p.repoDir, path)
 		res, _ := match(rel)
 		if res != nil {
-			params := make(map[interface{}]interface{}, len(res.Params)+2)
+			params := make(map[interface{}]interface{}, len(res.Params)+len(p.data)+2)
 			for k, v := range res.Params {
 				params[k] = v
 			}
+
+			for k, v := range p.data {
+				params[k] = v
+			}
+
 			params["_path"] = rel
 			dir := filepath.Dir(rel)
 			params["_dir"] = dir
