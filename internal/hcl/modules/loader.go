@@ -16,6 +16,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
 
+	"github.com/infracost/infracost/internal/schema"
 	intSync "github.com/infracost/infracost/internal/sync"
 	"github.com/infracost/infracost/internal/ui"
 )
@@ -283,7 +284,7 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 
 	lookupResult, err := m.registryLoader.lookupModule(moduleAddr, moduleCall.Version)
 	if err != nil {
-		return nil, fmt.Errorf("error looking up registry module %s: %w", key, err)
+		return nil, &schema.ProjectDiag{Code: schema.DiagPrivateRegistryModuleDownloadFailure, Message: fmt.Sprintf("Failed to lookup module %q - %s", key, err)}
 	}
 
 	if lookupResult.OK {
@@ -299,7 +300,7 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 
 		err = m.registryLoader.downloadModule(lookupResult, dest)
 		if err != nil {
-			return nil, fmt.Errorf("failed to download registry module %s: %w", key, err)
+			return nil, &schema.ProjectDiag{Code: schema.DiagPrivateRegistryModuleDownloadFailure, Message: fmt.Sprintf("Failed to download registry module %q - %s", key, err)}
 		}
 
 		return manifestModule, nil
@@ -315,7 +316,7 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 
 	err = m.packageFetcher.fetch(moduleAddr, dest)
 	if err != nil {
-		return nil, fmt.Errorf("failed to download remote module %s: %w", key, err)
+		return nil, newFailedDownloadDiagnostic(fmt.Sprintf("Failed to download remote module %q - %s", key, err))
 	}
 
 	return manifestModule, nil
@@ -359,4 +360,19 @@ func getProcessCount() int {
 	}
 
 	return numWorkers
+}
+
+func newFailedDownloadDiagnostic(msg string) *schema.ProjectDiag {
+	src := "https"
+	if strings.Contains(msg, "ssh://") {
+		src = "ssh"
+	}
+
+	return &schema.ProjectDiag{
+		Code:    schema.DiagPrivateModuleDownloadFailure,
+		Message: msg,
+		Data: map[string]interface{}{
+			"source": src,
+		},
+	}
 }

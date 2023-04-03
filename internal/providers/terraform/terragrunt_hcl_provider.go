@@ -225,12 +225,7 @@ func (p *TerragruntHCLProvider) newErroredProject(di *terragruntWorkingDirInfo) 
 	metadata := p.newProjectMetadata(projectPath)
 
 	if di.error != nil {
-		metadata.Errors = []schema.ProjectDiag{
-			{
-				Code:    schema.DiagTerragruntEvaluationFailure,
-				Message: di.error.Error(),
-			},
-		}
+		metadata.AddErrorWithCode(di.error, schema.DiagTerragruntEvaluationFailure)
 	}
 
 	return schema.NewProject(p.generateProjectName(metadata), metadata)

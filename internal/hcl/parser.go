@@ -317,7 +317,7 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 	// load the modules. This downloads any remote modules to the local file system
 	modulesManifest, err := p.moduleLoader.Load(p.initialPath)
 	if err != nil {
-		return m, fmt.Errorf("Error loading Terraform modules: %s", err)
+		return m, fmt.Errorf("Error loading Terraform modules: %w", err)
 	}
 
 	p.logger.Debug("Evaluating expressions...")
