@@ -5,9 +5,13 @@ import (
 )
 
 type CostComponent struct {
-	Name                 string
-	Unit                 string
-	UnitMultiplier       decimal.Decimal
+	Name           string
+	Unit           string
+	UnitMultiplier decimal.Decimal
+	// UnitRounding specifies the number of decimal places that the output unit should be rounded to.
+	// This should be set to 0 if using MonthToHourUnitMultiplier otherwise the unit will show with
+	// redundant .000 decimal places.
+	UnitRounding         *int32
 	IgnoreIfMissingPrice bool
 	ProductFilter        *ProductFilter
 	PriceFilter          *PriceFilter
@@ -81,6 +85,9 @@ func (c *CostComponent) UnitMultiplierHourlyQuantity() *decimal.Decimal {
 	} else {
 		// Round the final number to 16 decimal places to avoid floating point issues.
 		m = c.HourlyQuantity.Div(c.UnitMultiplier)
+		if c.UnitRounding != nil {
+			m = m.Round(*c.UnitRounding)
+		}
 	}
 
 	return &m
@@ -98,6 +105,9 @@ func (c *CostComponent) UnitMultiplierMonthlyQuantity() *decimal.Decimal {
 	} else {
 		// Round the final number to 16 decimal places to avoid floating point issues.
 		m = c.MonthlyQuantity.Div(c.UnitMultiplier)
+		if c.UnitRounding != nil {
+			m = m.Round(*c.UnitRounding)
+		}
 	}
 
 	return &m

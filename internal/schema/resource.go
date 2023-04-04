@@ -8,7 +8,10 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-var HourToMonthUnitMultiplier = decimal.NewFromInt(730)
+var (
+	HourToMonthUnitMultiplier = decimal.NewFromInt(730)
+	MonthToHourUnitMultiplier = decimal.NewFromInt(1).Div(HourToMonthUnitMultiplier)
+)
 
 type ResourceFunc func(*ResourceData, *UsageData) *Resource
 
