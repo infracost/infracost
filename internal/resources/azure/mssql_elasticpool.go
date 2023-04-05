@@ -99,18 +99,15 @@ func (r *MSSQLElasticPool) dtuCostComponents() []*schema.CostComponent {
 		dtuCapacity = *r.DTUCapacity
 	}
 
-	// This is a bit of a hack, but the Azure pricing API returns the price per day
-	// and the Azure pricing calculator uses 730 hours to show the cost
-	// so we need to convert the price per day to price per hour.
-	// Use precision 24 to avoid rounding errors later since the default decimal precision is 16.
-	daysInMonth := schema.HourToMonthUnitMultiplier.DivRound(decimal.NewFromInt(24), 24)
-
 	costComponents := []*schema.CostComponent{
 		{
-			Name:            fmt.Sprintf("Compute (%s, %d DTUs)", r.Tier, dtuCapacity),
-			Unit:            "hours",
-			UnitMultiplier:  daysInMonth.DivRound(schema.HourToMonthUnitMultiplier, 24),
-			MonthlyQuantity: decimalPtr(daysInMonth),
+			Name: fmt.Sprintf("Compute (%s, %d DTUs)", r.Tier, dtuCapacity),
+			Unit: "hours",
+			// This is a bit of a hack, but the Azure pricing API returns the price per day
+			// and the Azure pricing calculator uses 730 hours to show the cost
+			// so we need to convert the price per day to price per hour.
+			UnitMultiplier:  schema.DayToMonthUnitMultiplier,
+			MonthlyQuantity: decimalPtr(schema.DaysInMonth),
 			ProductFilter: r.productFilter([]*schema.AttributeFilter{
 				{Key: "productName", ValueRegex: regexPtr(productName)},
 				{Key: "skuName", Value: strPtr(fmt.Sprintf("%d DTU Pack", dtuCapacity))},
