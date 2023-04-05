@@ -1089,6 +1089,9 @@ resource_usage:
   azurerm_search_service.my_service:
     monthly_images_extracted: 1000000 # Monthly number of extracted images
 
+  azurerm_signalr_service.my_service:
+    monthly_additional_messages: 1000000 # Monthly number of messages above the included 1M per unit per day
+
   azurerm_storage_account.my_account:
     data_at_rest_storage_gb: 10000                        # Total size of Data at Rest in GB (File storage).
     early_deletion_gb: 1000                               # Total size of Early deletion data in GB.

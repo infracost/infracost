@@ -1,0 +1,8 @@
+version: 0.1
+resource_usage:
+
+  azurerm_signalr_service.example_with_usage["Standard_S1"]:
+    monthly_additional_messages: 1234567
+
+  azurerm_signalr_service.example_with_usage["Premium_P1"]:
+    monthly_additional_messages: 12345678
