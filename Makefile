@@ -111,7 +111,7 @@ test_update_azure:
 
 fmt:
 	go fmt ./...
-	find . -name '*.tf' -exec terraform fmt {} \;
+	find . -name '*_with_error.tf' -prune -o -name '*.tf' -exec terraform fmt {} +;
 
 lint:
 	golangci-lint run
