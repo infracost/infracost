@@ -15,4 +15,4 @@ resource "aws_ec2_traffic_mirror_session" "session" {
   traffic_mirror_filter_id = "a-traffic-filter-id"
   traffic_mirror_target_id = "a-traffic-target-id"
   session_number           = "1"
-}     
+}

@@ -13,4 +13,4 @@ resource "aws_ec2_transit_gateway_peering_attachment" "peering" {
   peer_region             = "eu-west-1"
   peer_transit_gateway_id = "tgw-654321"
   transit_gateway_id      = "tgw-123456"
-}            
+}
