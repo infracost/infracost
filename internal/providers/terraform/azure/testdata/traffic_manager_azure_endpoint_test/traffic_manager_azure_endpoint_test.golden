@@ -1,0 +1,19 @@
+
+ Name                                                                Monthly Qty  Unit   Monthly Cost 
+                                                                                                      
+ azurerm_traffic_manager_azure_endpoint.basic_healthcheck_example                                     
+ └─ Basic health check (Global)                                              730  hours         $0.36 
+                                                                                                      
+ azurerm_traffic_manager_azure_endpoint.default_healthcheck_example                                   
+ └─ Basic health check (Global)                                              730  hours         $0.36 
+                                                                                                      
+ azurerm_traffic_manager_azure_endpoint.fast_healthcheck_example                                      
+ ├─ Basic health check (Global)                                              730  hours         $0.36 
+ └─ Fast interval health checks add-on (Global)                              730  hours         $1.00 
+                                                                                                      
+ OVERALL TOTAL                                                                                  $2.08 
+──────────────────────────────────
+9 cloud resources were detected:
+∙ 8 were estimated, 4 of which include usage-based costs, see https://infracost.io/usage-file
+∙ 1 was free:
+  ∙ 1 x azurerm_resource_group

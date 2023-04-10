@@ -141,6 +141,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getLogicAppIntegrationAccountRegistryItem(),
 	getSignalRServiceRegistryItem(),
 	getTrafficManagerProfileRegistryItem(),
+	getTrafficManagerAzureEndpointRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
