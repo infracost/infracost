@@ -143,6 +143,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getTrafficManagerProfileRegistryItem(),
 	getTrafficManagerAzureEndpointRegistryItem(),
 	getTrafficManagerExternalEndpointRegistryItem(),
+	getTrafficManagerNestedEndpointRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
