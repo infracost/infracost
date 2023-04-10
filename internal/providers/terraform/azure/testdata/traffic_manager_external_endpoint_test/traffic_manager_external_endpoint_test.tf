@@ -25,10 +25,10 @@ resource "azurerm_traffic_manager_profile" "default_healthcheck_example" {
 }
 
 resource "azurerm_traffic_manager_external_endpoint" "default_healthcheck_example" {
-  name               = "example-endpoint"
-  profile_id         = azurerm_traffic_manager_profile.default_healthcheck_example.id
-  weight             = 100
-  target = "sometarget"
+  name       = "example-endpoint"
+  profile_id = azurerm_traffic_manager_profile.default_healthcheck_example.id
+  weight     = 100
+  target     = "sometarget"
 }
 
 
@@ -50,10 +50,10 @@ resource "azurerm_traffic_manager_profile" "basic_healthcheck_example" {
 }
 
 resource "azurerm_traffic_manager_external_endpoint" "basic_healthcheck_example" {
-  name               = "example-endpoint"
-  profile_id         = azurerm_traffic_manager_profile.basic_healthcheck_example.id
-  weight             = 100
-  target = "sometarget"
+  name       = "example-endpoint"
+  profile_id = azurerm_traffic_manager_profile.basic_healthcheck_example.id
+  weight     = 100
+  target     = "sometarget"
 }
 
 resource "azurerm_traffic_manager_profile" "fast_healthcheck_example" {
@@ -74,10 +74,10 @@ resource "azurerm_traffic_manager_profile" "fast_healthcheck_example" {
 }
 
 resource "azurerm_traffic_manager_external_endpoint" "fast_healthcheck_example" {
-  name               = "example-endpoint"
-  profile_id         = azurerm_traffic_manager_profile.fast_healthcheck_example.id
-  weight             = 100
-  target = "sometarget"
+  name       = "example-endpoint"
+  profile_id = azurerm_traffic_manager_profile.fast_healthcheck_example.id
+  weight     = 100
+  target     = "sometarget"
 }
 
 resource "azurerm_traffic_manager_profile" "disabled_example" {
@@ -99,8 +99,8 @@ resource "azurerm_traffic_manager_profile" "disabled_example" {
 }
 
 resource "azurerm_traffic_manager_external_endpoint" "disabled_example" {
-  name               = "example-endpoint"
-  profile_id         = azurerm_traffic_manager_profile.disabled_example.id
-  weight             = 100
-  target = "sometarget"
+  name       = "example-endpoint"
+  profile_id = azurerm_traffic_manager_profile.disabled_example.id
+  weight     = 100
+  target     = "sometarget"
 }

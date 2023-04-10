@@ -25,11 +25,11 @@ resource "azurerm_traffic_manager_profile" "default_healthcheck_example" {
 }
 
 resource "azurerm_traffic_manager_nested_endpoint" "default_healthcheck_example" {
-  name               = "example-endpoint"
-  profile_id         = azurerm_traffic_manager_profile.default_healthcheck_example.id
-  weight             = 100
+  name                    = "example-endpoint"
+  profile_id              = azurerm_traffic_manager_profile.default_healthcheck_example.id
+  weight                  = 100
   minimum_child_endpoints = 1
-  target_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/testrg/providers/Microsoft.Network/networkInterfaces/fakenic"
+  target_resource_id      = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/testrg/providers/Microsoft.Network/networkInterfaces/fakenic"
 }
 
 
@@ -51,11 +51,11 @@ resource "azurerm_traffic_manager_profile" "basic_healthcheck_example" {
 }
 
 resource "azurerm_traffic_manager_nested_endpoint" "basic_healthcheck_example" {
-  name               = "example-endpoint"
-  profile_id         = azurerm_traffic_manager_profile.basic_healthcheck_example.id
-  weight             = 100
+  name                    = "example-endpoint"
+  profile_id              = azurerm_traffic_manager_profile.basic_healthcheck_example.id
+  weight                  = 100
   minimum_child_endpoints = 1
-  target_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/testrg/providers/Microsoft.Network/networkInterfaces/fakenic"
+  target_resource_id      = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/testrg/providers/Microsoft.Network/networkInterfaces/fakenic"
 }
 
 resource "azurerm_traffic_manager_profile" "fast_healthcheck_example" {
@@ -76,11 +76,11 @@ resource "azurerm_traffic_manager_profile" "fast_healthcheck_example" {
 }
 
 resource "azurerm_traffic_manager_nested_endpoint" "fast_healthcheck_example" {
-  name               = "example-endpoint"
-  profile_id         = azurerm_traffic_manager_profile.fast_healthcheck_example.id
-  weight             = 100
+  name                    = "example-endpoint"
+  profile_id              = azurerm_traffic_manager_profile.fast_healthcheck_example.id
+  weight                  = 100
   minimum_child_endpoints = 1
-  target_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/testrg/providers/Microsoft.Network/networkInterfaces/fakenic"
+  target_resource_id      = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/testrg/providers/Microsoft.Network/networkInterfaces/fakenic"
 }
 
 resource "azurerm_traffic_manager_profile" "disabled_example" {
@@ -102,9 +102,9 @@ resource "azurerm_traffic_manager_profile" "disabled_example" {
 }
 
 resource "azurerm_traffic_manager_nested_endpoint" "disabled_example" {
-  name               = "example-endpoint"
-  profile_id         = azurerm_traffic_manager_profile.disabled_example.id
-  weight             = 100
+  name                    = "example-endpoint"
+  profile_id              = azurerm_traffic_manager_profile.disabled_example.id
+  weight                  = 100
   minimum_child_endpoints = 1
-  target_resource_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/testrg/providers/Microsoft.Network/networkInterfaces/fakenic"
+  target_resource_id      = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/testrg/providers/Microsoft.Network/networkInterfaces/fakenic"
 }
