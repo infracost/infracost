@@ -142,6 +142,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getSignalRServiceRegistryItem(),
 	getTrafficManagerProfileRegistryItem(),
 	getTrafficManagerAzureEndpointRegistryItem(),
+	getTrafficManagerExternalEndpointRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
