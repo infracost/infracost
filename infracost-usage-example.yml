@@ -1159,6 +1159,10 @@ resource_usage:
     dataflow_standard_vcores: 12 # Number of Data Flow standard vCores.
     monthly_dataflow_standard_hours: 1 # Monthly number of Data Flow standard hours (this is multiplied by the number of instances and vCores).
 
+  azurerm_traffic_manager_profile.my_profile:
+    monthly_dns_queries: 100000 # Monthly number of DNS queries
+    monthly_traffic_view_data_points: 100000 # Monthly number of Traffic View data points processes
+
   azurerm_virtual_hub.my_virtual_hub:
     monthly_data_processed_gb: 10 # Monthly data processed by the Virtual WAN Hub in GB
 

@@ -140,6 +140,10 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getStorageShareRegistryItem(),
 	getLogicAppIntegrationAccountRegistryItem(),
 	getSignalRServiceRegistryItem(),
+	getTrafficManagerProfileRegistryItem(),
+	getTrafficManagerAzureEndpointRegistryItem(),
+	getTrafficManagerExternalEndpointRegistryItem(),
+	getTrafficManagerNestedEndpointRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
