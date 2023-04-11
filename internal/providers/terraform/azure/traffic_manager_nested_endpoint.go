@@ -22,7 +22,7 @@ func newTrafficManagerNestedEndpoint(d *schema.ResourceData) schema.CoreResource
 
 	if len(d.References("profile_id")) > 0 {
 		profile := d.References("profile_id")[0]
-		lookupRegion(profile, []string{"resource_group_name"})
+		region = lookupRegion(profile, []string{"resource_group_name"})
 		healthCheckInterval = profile.GetInt64OrDefault("monitor_config.0.interval_in_seconds", 30)
 		profileEnabled = trafficManagerProfileEnabled(profile)
 	}

@@ -104,3 +104,32 @@ resource "azurerm_traffic_manager_external_endpoint" "disabled_example" {
   weight     = 100
   target     = "sometarget"
 }
+
+resource "azurerm_resource_group" "germany_example" {
+  name     = "example-resources"
+  location = "Germany North"
+}
+
+resource "azurerm_traffic_manager_profile" "germany_example" {
+  name                   = "example-profile"
+  resource_group_name    = azurerm_resource_group.germany_example.name
+  traffic_routing_method = "Weighted"
+
+  dns_config {
+    relative_name = "example-profile"
+    ttl           = 100
+  }
+
+  monitor_config {
+    protocol            = "HTTP"
+    port                = 80
+    interval_in_seconds = 10
+  }
+}
+
+resource "azurerm_traffic_manager_external_endpoint" "germany_example" {
+  name       = "example-endpoint"
+  profile_id = azurerm_traffic_manager_profile.germany_example.id
+  weight     = 100
+  target     = "sometarget"
+}

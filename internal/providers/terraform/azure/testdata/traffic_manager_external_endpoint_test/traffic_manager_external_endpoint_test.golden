@@ -11,9 +11,13 @@
  ├─ Basic health check (Global)                                                 730  hours         $0.54 
  └─ Fast interval health checks add-on (Global)                                 730  hours         $2.00 
                                                                                                          
- OVERALL TOTAL                                                                                     $3.62 
+ azurerm_traffic_manager_external_endpoint.germany_example                                               
+ ├─ Basic health check (Germany)                                                730  hours         $0.54 
+ └─ Fast interval health checks add-on (Germany)                                730  hours         $2.54 
+                                                                                                         
+ OVERALL TOTAL                                                                                     $6.70 
 ──────────────────────────────────
-9 cloud resources were detected:
-∙ 8 were estimated, 4 of which include usage-based costs, see https://infracost.io/usage-file
-∙ 1 was free:
-  ∙ 1 x azurerm_resource_group
+12 cloud resources were detected:
+∙ 10 were estimated, 5 of which include usage-based costs, see https://infracost.io/usage-file
+∙ 2 were free:
+  ∙ 2 x azurerm_resource_group
