@@ -10,9 +10,10 @@
                                                                                                                     
  azurerm_traffic_manager_profile.example_with_usage                                                                 
  ├─ DNS queries (first 1B)                                              1,000  1M queries                   $540.00 
- └─ DNS queries (over 1B)                                            234.5678  1M queries                    $87.96 
+ ├─ DNS queries (over 1B)                                            234.5678  1M queries                    $87.96 
+ └─ Traffic view                                                      12.3456  1M data points                $24.69 
                                                                                                                     
- OVERALL TOTAL                                                                                              $627.96 
+ OVERALL TOTAL                                                                                              $652.65 
 ──────────────────────────────────
 5 cloud resources were detected:
 ∙ 4 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

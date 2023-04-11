@@ -30,6 +30,7 @@ resource "azurerm_traffic_manager_profile" "example_with_usage" {
   profile_status         = "Enabled"
   resource_group_name    = azurerm_resource_group.example.name
   traffic_routing_method = "Weighted"
+  traffic_view_enabled   = true
 
   dns_config {
     relative_name = "example-profile"
