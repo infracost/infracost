@@ -96,7 +96,6 @@ func (r *ContainerVpcCluster) BuildResource() *schema.Resource {
 			MonthlyQuantity: decimalPtr(quantity),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:       strPtr("ibm"),
-				Region:           strPtr("us-south"),
 				Service:          strPtr("containers-kubernetes"),
 				AttributeFilters: attributeFilters,
 			},
