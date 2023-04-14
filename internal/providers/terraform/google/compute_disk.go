@@ -26,11 +26,14 @@ func newComputeDisk(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 	diskType := d.Get("type").String()
 	size := computeDiskSize(d)
 
+	iops := computeIOPS(d, diskType)
+
 	r := &google.ComputeDisk{
 		Address: d.Address,
 		Region:  region,
 		Type:    diskType,
 		Size:    size,
+		IOPS:    iops,
 	}
 	r.PopulateUsage(u)
 
@@ -93,4 +96,21 @@ func computeSnapshotDiskSize(d *schema.ResourceData) float64 {
 	}
 
 	return 0
+}
+
+func computeIOPS(d *schema.ResourceData, diskType string) int64 {
+	if diskType == "pd-extreme" || diskType == "hyperdisk-extreme" {
+
+		if d.Get("provisioned_iops").Exists() {
+			return d.Get("provisioned_iops").Int()
+		}
+
+		return defaultIOPS()
+	}
+
+	return 0
+}
+
+func defaultIOPS() int64 {
+	return 2500
 }

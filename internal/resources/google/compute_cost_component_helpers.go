@@ -257,7 +257,7 @@ func computeDiskCostComponent(region string, diskType string, diskSize float64, 
 
 	return &schema.CostComponent{
 		Name:            diskTypeLabel,
-		Unit:            "GB"
+		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: size,
 		ProductFilter: &schema.ProductFilter{
@@ -267,6 +267,36 @@ func computeDiskCostComponent(region string, diskType string, diskSize float64, 
 			ProductFamily: strPtr("Storage"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "description", ValueRegex: strPtr(diskTypeDesc)},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			EndUsageAmount: strPtr(""), // use the non-free tier
+		},
+	}
+}
+
+func computeDiskIOPSCostComponent(region string, diskType string, diskSize float64, instanceCount int64, iops int64) *schema.CostComponent {
+	var iopsTypeDesc string
+
+	switch diskType {
+	case "pd-extreme":
+		iopsTypeDesc = "/^Extreme PD IOPS/"
+	case "hyperdisk-extreme":
+		iopsTypeDesc = "/^Hyperdisk Extreme IOPS( in .*)?$/"
+	}
+
+	return &schema.CostComponent{
+		Name:            "Provisioned IOPS",
+		Unit:            "IOPS",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: decimalPtr(decimal.NewFromInt(iops)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("gcp"),
+			Region:        strPtr(region),
+			Service:       strPtr("Compute Engine"),
+			ProductFamily: strPtr("Storage"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "description", ValueRegex: strPtr(iopsTypeDesc)},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
