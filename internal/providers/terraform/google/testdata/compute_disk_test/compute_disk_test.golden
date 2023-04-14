@@ -17,10 +17,10 @@
  └─ Standard provisioned storage (pd-standard)           20  GB           $0.80 
                                                                                 
  google_compute_disk.ssd_default                                                
- └─ SSD provisioned storage (pd-ssd)                    100  GB          $17.00 
+ └─ SSD provisioned storage (pd-ssd)                     10  GB           $1.70 
                                                                                 
  google_compute_disk.standard_default                                           
- └─ Standard provisioned storage (pd-standard)          500  GB          $20.00 
+ └─ Standard provisioned storage (pd-standard)           10  GB           $0.40 
                                                                                 
  google_compute_image.image_disk_size                                           
  └─ Storage                                              30  GB           $1.50 
@@ -34,7 +34,7 @@
  google_compute_snapshot.snapshot_source_disk                                   
  └─ Storage                                              20  GB           $0.52 
                                                                                 
- OVERALL TOTAL                                                           $46.32 
+ OVERALL TOTAL                                                           $11.42 
 ──────────────────────────────────
 11 cloud resources were detected:
 ∙ 11 were estimated, 4 of which include usage-based costs, see https://infracost.io/usage-file
