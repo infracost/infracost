@@ -245,13 +245,19 @@ func computeDiskCostComponent(region string, diskType string, diskSize float64, 
 	case "pd-ssd":
 		diskTypeDesc = "/^SSD backed PD Capacity/"
 		diskTypeLabel = "SSD provisioned storage (pd-ssd)"
+	case "pd-extreme":
+		diskTypeDesc = "/^Extreme PD Capacity/"
+		diskTypeLabel = "Extreme provisioned storage (pd-extreme)"
+	case "hyperdisk-extreme":
+		diskTypeDesc = "/^Hyperdisk Extreme Capacity( in .*)?$/"
+		diskTypeLabel = "Hyperdisk provisioned storage (hyperdisk-extreme)"
 	}
 
 	size := decimalPtr(decimal.NewFromInt(instanceCount).Mul(decimal.NewFromFloat(diskSize)))
 
 	return &schema.CostComponent{
 		Name:            diskTypeLabel,
-		Unit:            "GB",
+		Unit:            "GB"
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: size,
 		ProductFilter: &schema.ProductFilter{
