@@ -55,8 +55,8 @@ func computeDiskSize(d *schema.ResourceData) float64 {
 
 func defaultDiskSize(diskType string) float64 {
 	diskType = strings.ToLower(diskType)
-	if diskType == "pd-balanced" || diskType == "pd-ssd" {
-		return 100
+	if diskType == "pd-balanced" || diskType == "pd-ssd" || diskType == "pd-standard" {
+		return 10
 	}
 	return 500
 }
