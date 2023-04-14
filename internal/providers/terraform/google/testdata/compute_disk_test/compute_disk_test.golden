@@ -1,6 +1,14 @@
 
  Name                                           Monthly Qty  Unit  Monthly Cost 
                                                                                 
+   google_compute_disk.extreme_default                                           
+ └─ Extreme provisioned storage (pd-extreme)            500  GB          $62.50
+ └─ Provisioned IOPS                                   2500  IOPS       $162.50
+
+ google_compute_disk.hyperdisk_default                                           
+ └─ Hyperdisk provisioned storage (hyperdisk-extreme)    64  GB           $8.00
+ └─ Provisioned IOPS                                   2500  IOPS        $80.00  
+ 
  google_compute_disk.image_disk_size                                            
  └─ Standard provisioned storage (pd-standard)           30  GB           $1.20 
                                                                                 
@@ -12,6 +20,10 @@
                                                                                 
  google_compute_disk.size                                                       
  └─ Standard provisioned storage (pd-standard)           20  GB           $0.80 
+
+ google_compute_disk.size_iops                                                         
+ ├─ Hyperdisk provisioned storage (hyperdisk-extreme)   140  GB           $17.50 
+ └─ Provisioned IOPS                                  6,000  IOPS        $192.00 
                                                                                 
  google_compute_disk.snapshot_source_disk                                       
  └─ Standard provisioned storage (pd-standard)           20  GB           $0.80 
@@ -34,7 +46,7 @@
  google_compute_snapshot.snapshot_source_disk                                   
  └─ Storage                                              20  GB           $0.52 
                                                                                 
- OVERALL TOTAL                                                           $11.42 
+ OVERALL TOTAL                                                          $533.92 
 ──────────────────────────────────
-11 cloud resources were detected:
-∙ 11 were estimated, 4 of which include usage-based costs, see https://infracost.io/usage-file
+14 cloud resources were detected:
+∙ 14 were estimated, 4 of which include usage-based costs, see https://infracost.io/usage-file
