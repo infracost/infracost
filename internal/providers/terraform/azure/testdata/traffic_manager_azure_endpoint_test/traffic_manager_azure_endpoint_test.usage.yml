@@ -1,0 +1,4 @@
+version: 0.1
+resource_type_default_usage:
+  azurerm_traffic_manager_profile:
+    monthly_dns_queries: 0

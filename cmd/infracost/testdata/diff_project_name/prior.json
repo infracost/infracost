@@ -475,10 +475,10 @@
     {
       "name": "my terragrunt multi project",
       "metadata": {
-        "path": "../../examples/terragrunt/dev",
+        "path": "./terragrunt/dev",
         "infracostCommand": "breakdown",
         "type": "terragrunt_dir",
-        "terraformModulePath": "../../../../examples/terragrunt/dev",
+        "terraformModulePath": "terragrunt/dev",
         "vcsBranch": "feat/add_project_name",
         "vcsCommitSha": "5347655a3b4e81d0471b7fe1d0891952dbd3b4e7",
         "vcsCommitAuthorName": "tim775",
@@ -710,10 +710,10 @@
     {
       "name": "my terragrunt multi project",
       "metadata": {
-        "path": "../../examples/terragrunt/prod",
+        "path": "./terragrunt/prod",
         "infracostCommand": "breakdown",
         "type": "terragrunt_dir",
-        "terraformModulePath": "../../../../examples/terragrunt/prod",
+        "terraformModulePath": "terragrunt/prod",
         "vcsBranch": "feat/add_project_name",
         "vcsCommitSha": "5347655a3b4e81d0471b7fe1d0891952dbd3b4e7",
         "vcsCommitAuthorName": "tim775",
@@ -945,10 +945,10 @@
     {
       "name": "my terragrunt prod project",
       "metadata": {
-        "path": "../../examples/terragrunt/prod",
+        "path": "./terragrunt/prod",
         "infracostCommand": "breakdown",
         "type": "terragrunt_dir",
-        "terraformModulePath": "../../../../examples/terragrunt/prod",
+        "terraformModulePath": "terragrunt/prod",
         "vcsBranch": "feat/add_project_name",
         "vcsCommitSha": "5347655a3b4e81d0471b7fe1d0891952dbd3b4e7",
         "vcsCommitAuthorName": "tim775",
@@ -1180,10 +1180,10 @@
     {
       "name": "my terragrunt dev project",
       "metadata": {
-        "path": "../../examples/terragrunt/dev",
+        "path": "./terragrunt/dev",
         "infracostCommand": "breakdown",
         "type": "terragrunt_dir",
-        "terraformModulePath": "../../../../examples/terragrunt/dev",
+        "terraformModulePath": "terragrunt/dev",
         "vcsBranch": "feat/add_project_name",
         "vcsCommitSha": "5347655a3b4e81d0471b7fe1d0891952dbd3b4e7",
         "vcsCommitAuthorName": "tim775",
@@ -1651,10 +1651,10 @@
     {
       "name": "my terragrunt workspace",
       "metadata": {
-        "path": "../../examples/terragrunt/dev",
+        "path": "./terragrunt/dev",
         "infracostCommand": "breakdown",
         "type": "terragrunt_dir",
-        "terraformModulePath": "../../../../examples/terragrunt/dev",
+        "terraformModulePath": "terragrunt/dev",
         "terraformWorkspace": "ws2",
         "vcsBranch": "feat/add_project_name",
         "vcsCommitSha": "5347655a3b4e81d0471b7fe1d0891952dbd3b4e7",
@@ -1887,10 +1887,10 @@
     {
       "name": "my terragrunt workspace",
       "metadata": {
-        "path": "../../examples/terragrunt/prod",
+        "path": "./terragrunt/prod",
         "infracostCommand": "breakdown",
         "type": "terragrunt_dir",
-        "terraformModulePath": "../../../../examples/terragrunt/prod",
+        "terraformModulePath": "terragrunt/prod",
         "terraformWorkspace": "ws2",
         "vcsBranch": "feat/add_project_name",
         "vcsCommitSha": "5347655a3b4e81d0471b7fe1d0891952dbd3b4e7",

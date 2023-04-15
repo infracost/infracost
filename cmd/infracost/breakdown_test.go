@@ -11,9 +11,12 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+	"github.com/tidwall/gjson"
 
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/testutil"
 )
 
@@ -453,6 +456,75 @@ func TestBreakdownWithPrivateTerraformRegistryModule(t *testing.T) {
 			"breakdown",
 			"--path",
 			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+		},
+		nil,
+	)
+}
+
+func TestBreakdownWithPrivateSshModulePopulatesErrors(t *testing.T) {
+	output := GetCommandOutput(
+		t,
+		[]string{
+			"breakdown",
+			"--path",
+			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+			"--format",
+			"json",
+		},
+		nil,
+	)
+
+	res := gjson.ParseBytes(output)
+	errs := res.Get("projects.0.metadata.errors").Array()
+	require.Len(t, errs, 1)
+
+	code := errs[0].Get("code").Int()
+	msg := errs[0].Get("message").String()
+	data := errs[0].Get("data").Map()
+
+	assert.Equal(t, schema.DiagPrivateModuleDownloadFailure, int(code))
+	assert.Contains(t, msg, "Failed to download remote module \"ec2_cluster\"")
+	assert.Equal(t, data["source"].String(), "ssh")
+}
+
+func TestBreakdownWithPrivateHttpsModulePopulatesErrors(t *testing.T) {
+	output := GetCommandOutput(
+		t,
+		[]string{
+			"breakdown",
+			"--path",
+			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+			"--format",
+			"json",
+		},
+		nil,
+	)
+
+	res := gjson.ParseBytes(output)
+	errs := res.Get("projects.0.metadata.errors").Array()
+	require.Len(t, errs, 1)
+
+	code := errs[0].Get("code").Int()
+	msg := errs[0].Get("message").String()
+	data := errs[0].Get("data").Map()
+
+	assert.Equal(t, schema.DiagPrivateModuleDownloadFailure, int(code))
+	assert.Contains(t, msg, "Failed to download remote module \"ec2_cluster\"")
+	assert.Equal(t, data["source"].String(), "https")
+}
+
+func TestBreakdownWithPrivateTerraformRegistryModulePopulatesErrors(t *testing.T) {
+	t.Setenv("INFRACOST_TERRAFORM_CLOUD_TOKEN", "badkey")
+
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path",
+			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+			"--format",
+			"json",
 		},
 		nil,
 	)

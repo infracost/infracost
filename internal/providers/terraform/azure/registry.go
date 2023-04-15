@@ -139,6 +139,12 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getBackupProtectedVmRegistryItem(),
 	getStorageQueueRegistryItem(),
 	getStorageShareRegistryItem(),
+	getLogicAppIntegrationAccountRegistryItem(),
+	getSignalRServiceRegistryItem(),
+	getTrafficManagerProfileRegistryItem(),
+	getTrafficManagerAzureEndpointRegistryItem(),
+	getTrafficManagerExternalEndpointRegistryItem(),
+	getTrafficManagerNestedEndpointRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -458,6 +464,10 @@ var FreeResources = []string{
 	// Azure Shared Image Gallery
 	"azurerm_shared_image",
 	"azurerm_shared_image_gallery",
+
+	// Azure SignalR
+	"azurerm_signalr_service_network_acl",
+	"azurerm_signalr_shared_private_link",
 
 	// Azure SQL
 	"azurerm_sql_failover_group",

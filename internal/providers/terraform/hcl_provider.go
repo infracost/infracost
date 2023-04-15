@@ -222,12 +222,7 @@ func (p *HCLProvider) parseResources(parsed HCLProject, usage schema.UsageMap) *
 
 	partialPastResources, partialResources, err := p.planJSONParser.parseJSON(parsed.JSON, usage)
 	if err != nil {
-		project.Metadata.Errors = []schema.ProjectDiag{
-			{
-				Code:    schema.DiagJSONParsingFailure,
-				Message: err.Error(),
-			},
-		}
+		project.Metadata.AddErrorWithCode(err, schema.DiagJSONParsingFailure)
 
 		return project
 	}
@@ -244,12 +239,7 @@ func (p *HCLProvider) newProject(parsed HCLProject) *schema.Project {
 	p.AddMetadata(metadata)
 
 	if parsed.Error != nil {
-		metadata.Errors = []schema.ProjectDiag{
-			{
-				Code:    schema.DiagModuleEvaluationFailure,
-				Message: parsed.Error.Error(),
-			},
-		}
+		metadata.AddErrorWithCode(parsed.Error, schema.DiagModuleEvaluationFailure)
 	}
 
 	if len(parsed.Module.Warnings) > 0 {
