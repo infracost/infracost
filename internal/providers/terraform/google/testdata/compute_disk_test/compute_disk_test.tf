@@ -29,11 +29,18 @@ resource "google_compute_disk" "size" {
   size = 20
 }
 
-resource "google_compute_disk" "size_iops" {
-  name             = "size_iops"
+resource "google_compute_disk" "extreme_size_iops" {
+  name             = "extreme_size_iops"
+  type             = "pd-extreme"
+  size             = 40
+  provisioned_iops = 5000
+}
+
+resource "google_compute_disk" "hyperdisk_size_iops" {
+  name             = "hyperdisk_size_iops"
   type             = "hyperdisk-extreme"
-  size             = 140
-  provisioned_iops = 6000
+  size             = 128
+  provisioned_iops = 20000
 }
 
 resource "google_compute_image" "image_disk_size" {
