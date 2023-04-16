@@ -26,7 +26,7 @@ func newComputeDisk(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 	diskType := d.Get("type").String()
 	size := computeDiskSize(d)
 
-	iops := computeIOPS(d, diskType)
+	iops := computeIOPS(d, diskType, size)
 
 	r := &google.ComputeDisk{
 		Address: d.Address,
@@ -58,16 +58,16 @@ func computeDiskSize(d *schema.ResourceData) float64 {
 
 func defaultDiskSize(diskType string) float64 {
 	diskType = strings.ToLower(diskType)
-
-	if diskType == "pd-balanced" || diskType == "pd-ssd" || diskType == "pd-standard" {
-		return 10
-	} else if diskType == "pd-extreme" {
-		return 500
-	} else if diskType == "hyperdisk-extreme" {
-		return 64
+	if diskType == "pd-balanced" || diskType == "pd-ssd" {
+		return 100
 	}
 
-	return 10
+	if diskType == "pd-extreme" || diskType == "hyperdisk-extreme" {
+		return 1000
+	}
+
+	// if diskType is not specificed, default value is pd-standard
+	return 500
 }
 
 func computeImageDiskSize(d *schema.ResourceData) float64 {
@@ -98,19 +98,32 @@ func computeSnapshotDiskSize(d *schema.ResourceData) float64 {
 	return 0
 }
 
-func computeIOPS(d *schema.ResourceData, diskType string) int64 {
+func computeIOPS(d *schema.ResourceData, diskType string, diskSize float64) int64 {
 	if diskType == "pd-extreme" || diskType == "hyperdisk-extreme" {
 
 		if d.Get("provisioned_iops").Exists() {
 			return d.Get("provisioned_iops").Int()
 		}
 
-		return defaultIOPS()
+		return defaultIOPS(diskType, diskSize)
 	}
 
 	return 0
 }
 
-func defaultIOPS() int64 {
-	return 2500
+func defaultIOPS(diskType string, diskSize float64) int64 {
+	if diskType == "pd-extreme" {
+		return 100000
+	}
+
+	if diskType == "hyperdisk-extreme" {
+
+		if iops := diskSize * 1200; iops < 350000 {
+			return int64(iops)
+		}
+
+		return 350000
+	}
+
+	return 0
 }
