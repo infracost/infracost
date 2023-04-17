@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/shopspring/decimal"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
+
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
-	"github.com/shopspring/decimal"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 )
 
 // StorageAccount represents Azure data storage services.
@@ -566,13 +567,14 @@ func (r *StorageAccount) readOperationsCostComponents() []*schema.CostComponent 
 		meterName = "Other Operations"
 	}
 
+	filter := r.buildProductFilter(meterName)
 	costComponents = append(costComponents, &schema.CostComponent{
 		Name:                 "Read operations",
 		Unit:                 "10k operations",
 		UnitMultiplier:       decimal.NewFromInt(1),
 		MonthlyQuantity:      quantity,
 		IgnoreIfMissingPrice: r.canSkipPrice(),
-		ProductFilter:        r.buildProductFilter(meterName),
+		ProductFilter:        filter,
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
