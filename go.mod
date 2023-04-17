@@ -96,6 +96,8 @@ require (
 
 require (
 	github.com/alecthomas/jsonschema v0.0.0-20211209230136-e2b41affa5c1
+	github.com/channelmeter/iso8601duration v0.0.0-20150204201828-8da3af7a2a61
+	github.com/fatih/camelcase v1.0.0
 	github.com/go-git/go-billy/v5 v5.4.0
 	github.com/go-git/go-git/v5 v5.4.3-0.20220529141257-bc1f419cebcf
 	github.com/google/go-github/v41 v41.0.0
@@ -108,7 +110,7 @@ require (
 	github.com/pterm/pterm v0.12.50
 	github.com/shurcooL/githubv4 v0.0.0-20220115235240-a14260e6f8a2
 	github.com/shurcooL/graphql v0.0.0-20200928012149-18c5c3165e3a
-	github.com/tidwall/sjson v1.2.5
+	github.com/soongo/path-to-regexp v1.6.4
 	github.com/withfig/autocomplete-tools/packages/cobra v1.2.0
 	golang.org/x/oauth2 v0.1.0
 )
@@ -138,7 +140,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.1.22 // indirect
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.13.8 // indirect
 	github.com/blang/semver v3.5.1+incompatible // indirect
-	github.com/channelmeter/iso8601duration v0.0.0-20150204201828-8da3af7a2a61 // indirect
 	github.com/containerd/console v1.0.3 // indirect
 	github.com/containerd/continuity v0.3.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
@@ -146,7 +147,6 @@ require (
 	github.com/dimchansky/utfbom v1.1.1 // indirect
 	github.com/dlclark/regexp2 v1.8.1 // indirect
 	github.com/emirpasic/gods v1.12.0 // indirect
-	github.com/fatih/camelcase v1.0.0 // indirect
 	github.com/frankban/quicktest v1.11.3 // indirect
 	github.com/go-errors/errors v1.0.2-0.20180813162953-d98b870cc4e0 // indirect
 	github.com/go-git/gcfg v1.5.0 // indirect
@@ -171,13 +171,12 @@ require (
 	github.com/lithammer/fuzzysearch v1.1.5 // indirect
 	github.com/mattn/go-zglob v0.0.2-0.20190814121620-e3c945676326 // indirect
 	github.com/mitchellh/mapstructure v1.3.3 // indirect
-	github.com/opencontainers/runc v1.1.2 // indirect
+	github.com/opencontainers/runc v1.1.5 // indirect
 	github.com/pierrec/lz4 v2.5.2+incompatible // indirect
 	github.com/rivo/uniseg v0.4.2 // indirect
 	github.com/russross/blackfriday/v2 v2.1.0 // indirect
 	github.com/ryanuber/go-glob v1.0.0 // indirect
 	github.com/sergi/go-diff v1.2.0 // indirect
-	github.com/soongo/path-to-regexp v1.6.4 // indirect
 	github.com/tchap/go-patricia/v2 v2.3.1 // indirect
 	github.com/urfave/cli v1.22.3 // indirect
 	github.com/xanzy/ssh-agent v0.3.1 // indirect
