@@ -560,10 +560,10 @@ func (r *StorageAccount) readOperationsCostComponents() []*schema.CostComponent 
 	if r.isStorageV2() && r.NFSv3 {
 		meterName = "(?<!Iterative) Read Operations"
 	}
-	if r.isStorageV1() && contains([]string{"LRS"}, strings.ToUpper(r.AccountReplicationType)) {
-		// Storage V1 GRS/RA-GRS doesn't always have a Read Operations meter name, but we can
-		// use the Other Operations meter instead since it's the same price.
-		meterName = "Other Operations"
+	if r.isStorageV1() && contains([]string{"LRS", "GRS"}, strings.ToUpper(r.AccountReplicationType)) {
+		// Storage V1 GRS/LRS doesn't always have a Read Operations meter name, but we can use this regex
+		// to match Read or Other Operations meter since they are the same price.
+		meterName = "(Other|Read) Operations"
 	}
 
 	costComponents = append(costComponents, &schema.CostComponent{
