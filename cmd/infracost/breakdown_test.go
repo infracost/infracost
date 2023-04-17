@@ -56,7 +56,7 @@ func TestBreakdownFormatJsonWithWarnings(t *testing.T) {
 			"--format", "json",
 			"--path", dir,
 		},
-		DefaultOptions(),
+		&GoldenFileOptions{CaptureLogs: true},
 	)
 }
 
@@ -338,7 +338,13 @@ func TestBreakdownTerragruntHCLMulti(t *testing.T) {
 }
 
 func TestBreakdownTerragruntHCLDepsOutput(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())}, nil)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{"breakdown", "--path",
+			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())},
+		&GoldenFileOptions{CaptureLogs: true},
+	)
 }
 
 func TestBreakdownTerragruntGetEnv(t *testing.T) {
