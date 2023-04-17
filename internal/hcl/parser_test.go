@@ -662,7 +662,7 @@ data "aws_ami" "my_ami" {
 locals {
   defaults = {
     platform = "linux"
-    ami = data.aws_ami.my_ami.*.name[0]
+    ami = data.aws_ami.my_ami.*.bad[0]
   }
 }
 
