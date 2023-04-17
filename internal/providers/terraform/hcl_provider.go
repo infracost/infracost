@@ -252,7 +252,11 @@ func (p *HCLProvider) newProject(parsed HCLProject) *schema.Project {
 				Data:    warning.Data,
 			}
 
-			ui.PrintWarning(p.ctx.RunContext.ErrWriter, warning.FriendlyMessage)
+			if p.ctx.RunContext.Config.IsLogging() {
+				logging.Logger.Warn(warning.FriendlyMessage)
+			} else {
+				ui.PrintWarning(p.ctx.RunContext.ErrWriter, warning.FriendlyMessage)
+			}
 		}
 
 		metadata.Warnings = warnings
