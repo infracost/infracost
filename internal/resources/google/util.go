@@ -185,3 +185,26 @@ func GetFloatFieldValueByUsageTag(tagValue string, s interface{}) float64 {
 	}
 	return 0
 }
+
+func regionToContinent(region string) string {
+	gcpRegionPrefixToContinent := map[string]string{
+		"asia":         "Asia",
+		"europe":       "Europe",
+		"northamerica": "Northern America",
+		"southamerica": "Latin America",
+		"us":           "Northern America",
+		"australia":    "Oceania",
+	}
+
+	pieces := strings.Split(region, "-")
+	if len(pieces) == 0 {
+		return "Northern America"
+	}
+
+	continent, ok := gcpRegionPrefixToContinent[pieces[0]]
+	if !ok {
+		return "Northern America"
+	}
+
+	return continent
+}
