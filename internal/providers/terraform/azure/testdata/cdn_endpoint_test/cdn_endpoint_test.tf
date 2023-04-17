@@ -66,7 +66,12 @@ resource "azurerm_cdn_endpoint" "std_microsoft" {
   profile_name        = azurerm_cdn_profile.std_microsoft.name
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
-  global_delivery_rule {}
+  global_delivery_rule {
+    cache_expiration_action {
+      behavior = "SetIfMissing"
+      duration = "00:05:00"
+    }
+  }
   delivery_rule {
     name  = "rule1"
     order = 1
