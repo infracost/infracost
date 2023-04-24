@@ -1,5 +1,0 @@
-version: 0.1
-
-projects:
-  - path: foo
-    name: data-foo
