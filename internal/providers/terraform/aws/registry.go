@@ -116,12 +116,30 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 
 // FreeResources grouped alphabetically
 var FreeResources = []string{
+	// AWS Access Analyzer
+	"aws_accessanalyzer_analyzer",
+	"aws_accessanalyzer_archive_rule",
+
+	// AWS Account
+	"aws_account_alternate_contact",
+
 	// AWS Application Auto Scaling
 	"aws_appautoscaling_policy",
 	"aws_appautoscaling_scheduled_action",
 
 	// AWS Certificate Manager
 	"aws_acm_certificate_validation",
+	"aws_acmpca_permission",
+	"aws_acmpca_policy",
+
+	// AWS AMI
+	"aws_ami_launch_permission",
+
+	// AWS Amplify
+	"aws_amplify_backend_environment",
+	"aws_amplify_branch",
+	"aws_amplify_domain_association",
+	"aws_amplify_webhook",
 
 	// AWS API Gateway Rest APIs
 	"aws_api_gateway_account",
@@ -133,14 +151,17 @@ var FreeResources = []string{
 	"aws_api_gateway_documentation_part",
 	"aws_api_gateway_documentation_version",
 	"aws_api_gateway_domain_name",
-	"aws_api_gateway_response",
+	"aws_api_gateway_gateway_response",
 	"aws_api_gateway_integration",
+	"aws_api_gateway_integration_response",
 	"aws_api_gateway_method",
 	"aws_api_gateway_method_response",
 	"aws_api_gateway_method_settings",
 	"aws_api_gateway_model",
 	"aws_api_gateway_request_validator",
 	"aws_api_gateway_resource",
+	"aws_api_gateway_response",
+	"aws_api_gateway_rest_api_policy",
 	"aws_api_gateway_usage_plan",
 	"aws_api_gateway_usage_plan_key",
 	"aws_api_gateway_vpc_link",
@@ -157,6 +178,26 @@ var FreeResources = []string{
 	"aws_apigatewayv2_route_response",
 	"aws_apigatewayv2_stage",
 	"aws_apigatewayv2_vpc_link",
+
+	// AWS AppConfig
+	"aws_appconfig_extension",
+	"aws_appconfig_extension_association",
+	"aws_appconfig_hosted_configuration_version",
+
+	// AWS AppFlow
+	"aws_appflow_connector_profile",
+
+	// AWS AppIntegrations
+	"aws_appintegrations_event_integration",
+
+	// AWS AppMesh
+	"aws_appmesh_gateway_route",
+	"aws_appmesh_mesh",
+	"aws_appmesh_route",
+	"aws_appmesh_virtual_gateway",
+	"aws_appmesh_virtual_node",
+	"aws_appmesh_virtual_router",
+	"aws_appmesh_virtual_service",
 
 	// AWS Backup
 	"aws_backup_global_settings",
