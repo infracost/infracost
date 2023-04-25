@@ -59,7 +59,7 @@ func (r *MSSQLManagedInstance) BuildResource() *schema.Resource {
 func (r *MSSQLManagedInstance) costComponents() []*schema.CostComponent {
 	costComponents := []*schema.CostComponent{
 		{
-			Name:           fmt.Sprintf("Compute (%s %d Cores)", strings.ToTitle(r.SKU), r.Cores),
+			Name:           fmt.Sprintf("Compute (%s %d cores)", strings.ToTitle(r.SKU), r.Cores),
 			Unit:           "hours",
 			UnitMultiplier: decimal.NewFromInt(1),
 			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
@@ -77,7 +77,9 @@ func (r *MSSQLManagedInstance) costComponents() []*schema.CostComponent {
 		},
 	}
 
-	costComponents = append(costComponents, r.mssqlMIStorageCostComponent(), r.mssqlMIBackupCostComponent())
+	if r.StorageSizeInGb-32 > 0 {
+		costComponents = append(costComponents, r.mssqlMIStorageCostComponent(), r.mssqlMIBackupCostComponent())
+	}
 
 	if r.LicenseType == "LicenseIncluded" {
 		costComponents = append(costComponents, r.mssqlMILicenseCostComponent())
@@ -112,7 +114,7 @@ func (r *MSSQLManagedInstance) meteredName() *string {
 
 func (r *MSSQLManagedInstance) mssqlMIStorageCostComponent() *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:            "Storage",
+		Name:            "Additional Storage",
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: decimalPtr(decimal.NewFromInt(r.StorageSizeInGb - 32)),
@@ -183,7 +185,7 @@ func (r *MSSQLManagedInstance) mssqlMILongTermRetentionStorageGBCostComponent() 
 	}
 
 	return &schema.CostComponent{
-		Name:            fmt.Sprintf("LTR Backup Storage (%s)", r.StorageAccountType),
+		Name:            fmt.Sprintf("LTR backup storage (%s)", r.StorageAccountType),
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: retention,

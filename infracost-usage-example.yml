@@ -1035,6 +1035,10 @@ resource_usage:
     backup_storage_gb: 500               # Number of GBs used by Point-In-Time Restore (PITR) backup storage.
     extra_data_storage_gb: 250           # Override number of GBs used by extra data storage.
 
+  azurerm_mssql_managed_instance.my_database:
+    backup_storage_gb: 100            # Number of GBs used by Point-In-Time Restore (PITR) backup storage.
+    long_term_retention_storage_gb: 5 # Number of GBs used by long-term retention backup storage.
+
   azurerm_mysql_flexible_server.my_flexible_server:
     additional_backup_storage_gb: 5000 # Additional backup storage in GB. If geo-redundancy is enabled, you should set this to twice the required storage capacity.
 
