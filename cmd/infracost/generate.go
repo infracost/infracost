@@ -8,7 +8,6 @@ import (
 
 	"github.com/infracost/infracost/internal/config/template"
 	"github.com/infracost/infracost/internal/ui"
-	"github.com/infracost/infracost/internal/vcs"
 )
 
 type generateConfigCommand struct {
@@ -70,14 +69,7 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	m, err := vcs.MetadataFetcher.Get(repoPath, nil)
-	if err != nil {
-		ui.PrintWarningf(cmd.ErrOrStderr(), "could not fetch git metadata err: %s, default template variables will be blank", err)
-	}
-
-	parser := template.NewParser(repoPath, map[string]interface{}{
-		"branch": m.Branch.Name,
-	})
+	parser := template.NewParser(repoPath)
 	if g.template != "" {
 		err := parser.Compile(g.template, out)
 		if err != nil {
@@ -87,7 +79,7 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	err = parser.CompileFromFile(g.templatePath, out)
+	err := parser.CompileFromFile(g.templatePath, out)
 	if err != nil {
 		ui.PrintErrorf(cmd.ErrOrStderr(), "Could not compile template error: %s", err)
 	}

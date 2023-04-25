@@ -13,10 +13,34 @@ resource "google_compute_disk" "ssd_default" {
   type = "pd-ssd"
 }
 
+resource "google_compute_disk" "extreme_default" {
+  name = "extreme_default"
+  type = "pd-extreme"
+}
+
+resource "google_compute_disk" "hyperdisk_default" {
+  name = "hyperdisk_default"
+  type = "hyperdisk-extreme"
+}
+
 resource "google_compute_disk" "size" {
   name = "size"
   type = "pd-standard"
   size = 20
+}
+
+resource "google_compute_disk" "extreme_size_iops" {
+  name             = "extreme_size_iops"
+  type             = "pd-extreme"
+  size             = 40
+  provisioned_iops = 5000
+}
+
+resource "google_compute_disk" "hyperdisk_size_iops" {
+  name             = "hyperdisk_size_iops"
+  type             = "hyperdisk-extreme"
+  size             = 128
+  provisioned_iops = 20000
 }
 
 resource "google_compute_image" "image_disk_size" {

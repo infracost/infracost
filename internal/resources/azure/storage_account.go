@@ -4,13 +4,14 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/shopspring/decimal"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
+
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
-	"github.com/shopspring/decimal"
-	"golang.org/x/text/cases"
-	"golang.org/x/text/language"
 )
 
 // StorageAccount represents Azure data storage services.
@@ -560,19 +561,20 @@ func (r *StorageAccount) readOperationsCostComponents() []*schema.CostComponent 
 	if r.isStorageV2() && r.NFSv3 {
 		meterName = "(?<!Iterative) Read Operations"
 	}
-	if r.isStorageV1() && contains([]string{"LRS"}, strings.ToUpper(r.AccountReplicationType)) {
-		// Storage V1 GRS/RA-GRS doesn't always have a Read Operations meter name, but we can
-		// use the Other Operations meter instead since it's the same price.
-		meterName = "Other Operations"
+	if r.isStorageV1() && contains([]string{"LRS", "GRS"}, strings.ToUpper(r.AccountReplicationType)) {
+		// Storage V1 GRS/LRS doesn't always have a Read Operations meter name, but we can use this regex
+		// to match Read or Other Operations meter since they are the same price.
+		meterName = "(Other|Read) Operations"
 	}
 
+	filter := r.buildProductFilter(meterName)
 	costComponents = append(costComponents, &schema.CostComponent{
 		Name:                 "Read operations",
 		Unit:                 "10k operations",
 		UnitMultiplier:       decimal.NewFromInt(1),
 		MonthlyQuantity:      quantity,
 		IgnoreIfMissingPrice: r.canSkipPrice(),
-		ProductFilter:        r.buildProductFilter(meterName),
+		ProductFilter:        filter,
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},

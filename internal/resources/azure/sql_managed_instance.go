@@ -184,7 +184,7 @@ func (r *SQLManagedInstance) sqlMILongTermRetentionStorageGBCostComponent() *sch
 	}
 
 	return &schema.CostComponent{
-		Name:            fmt.Sprintf("LTR Backup Storage (%s)", r.StorageAccountType),
+		Name:            fmt.Sprintf("LTR backup storage (%s)", r.StorageAccountType),
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: retention,
@@ -195,7 +195,7 @@ func (r *SQLManagedInstance) sqlMILongTermRetentionStorageGBCostComponent() *sch
 			ProductFamily: strPtr(sqlMIProductFamily),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("SQL Managed Instance - LTR Backup Storage")},
-				{Key: "meterName", Value: strPtr(fmt.Sprintf("Backup %s Data Stored", r.StorageAccountType))},
+				{Key: "meterName", Value: strPtr(fmt.Sprintf("LTR Backup %s Data Stored", r.StorageAccountType))},
 			},
 		},
 		PriceFilter: priceFilterConsumption,

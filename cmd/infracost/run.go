@@ -679,11 +679,16 @@ func (r *parallelRunner) generateUsageFile(ctx *config.ProjectContext, provider 
 		}
 
 		spinner.Success()
-		r.cmd.PrintErrln(fmt.Sprintf("    %s Synced %d of %d resource%s",
-			ui.FaintString("└─"),
-			successes,
-			resources,
-			pluralized))
+
+		if r.runCtx.Config.IsLogging() {
+			logging.Logger.Infof("synced %d of %d resource%s", successes, resources, pluralized)
+		} else {
+			r.cmd.PrintErrln(fmt.Sprintf("    %s Synced %d of %d resource%s",
+				ui.FaintString("└─"),
+				successes,
+				resources,
+				pluralized))
+		}
 	}
 	return nil
 }

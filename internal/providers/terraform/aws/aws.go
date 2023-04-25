@@ -3,9 +3,10 @@ package aws
 import (
 	"strings"
 
-	"github.com/infracost/infracost/internal/schema"
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 var DefaultProviderRegion = "us-east-1"
@@ -23,8 +24,7 @@ var arnAttributeMap = map[string]string{
 }
 
 func GetDefaultRefIDFunc(d *schema.ResourceData) []string {
-
-	defaultRefs := []string{d.Get("id").String()}
+	defaultRefs := []string{d.Get("id").String(), d.Get("name").String()}
 
 	arnAttr, ok := arnAttributeMap[d.Type]
 	if !ok {

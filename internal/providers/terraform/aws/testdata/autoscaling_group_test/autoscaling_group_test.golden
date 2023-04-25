@@ -43,6 +43,17 @@
     └─ ebs_block_device[1]                                                                         
        └─ Storage (general purpose SSD, gp3)                          20  GB                 $1.60 
                                                                                                    
+ aws_autoscaling_group.asg_lc_min_size_name_ref                                                    
+ └─ aws_launch_configuration.lc_basic                                                              
+    ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)           1,460  hours             $67.74 
+    ├─ EC2 detailed monitoring                                        14  metrics            $4.20 
+    ├─ root_block_device                                                                           
+    │  └─ Storage (general purpose SSD, gp2)                          20  GB                 $2.00 
+    ├─ ebs_block_device[0]                                                                         
+    │  └─ Storage (general purpose SSD, gp2)                          20  GB                 $2.00 
+    └─ ebs_block_device[1]                                                                         
+       └─ Storage (general purpose SSD, gp3)                          20  GB                 $1.60 
+                                                                                                   
  aws_autoscaling_group.asg_lc_min_size_zero                                                        
  └─ aws_launch_configuration.lc_basic                                                              
     ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)             730  hours             $33.87 
@@ -173,10 +184,10 @@
     └─ block_device_mapping[0]                                                                     
        └─ Storage (general purpose SSD, gp2)                          10  GB                 $1.00 
                                                                                                    
- OVERALL TOTAL                                                                           $3,507.42 
+ OVERALL TOTAL                                                                           $3,584.96 
 ──────────────────────────────────
-52 cloud resources were detected:
-∙ 27 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+53 cloud resources were detected:
+∙ 28 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 23 were free:
   ∙ 12 x aws_launch_template
   ∙ 11 x aws_launch_configuration
