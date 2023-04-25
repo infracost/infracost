@@ -48,6 +48,33 @@ resource "aws_db_instance" "mysql-iops-below-min" {
   iops              = 500
 }
 
+resource "aws_db_instance" "gp3" {
+  for_each = {
+    "below_low_baseline" : {
+      storage : 20,
+      iops : 2000,
+    }
+    "above_low_baseline" : {
+      storage : 20,
+      iops : 4000,
+    }
+    "below_high_baseline" : {
+      storage : 400,
+      iops : 11000,
+    }
+    "above_high_baseline" : {
+      storage : 400,
+      iops : 14000,
+    }
+  }
+
+  engine            = "mysql"
+  instance_class    = "db.t4g.small"
+  storage_type      = "gp3"
+  allocated_storage = each.value.storage
+  iops              = each.value.iops
+}
+
 resource "aws_db_instance" "mysql-iops" {
   engine            = "mysql"
   instance_class    = "db.t3.large"

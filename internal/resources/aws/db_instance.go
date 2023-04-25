@@ -115,8 +115,11 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 
 	volumeType := "General Purpose"
 	storageName := "Storage (general purpose SSD, gp2)"
+	iopsDescription := "RDS Provisioned IOPS"
 
-	if strings.ToLower(r.StorageType) == "io1" || iopsVal.GreaterThan(decimal.Zero) {
+	storageType := strings.ToLower(r.StorageType)
+	switch storageType {
+	case "io1":
 		volumeType = "Provisioned IOPS"
 		storageName = "Storage (provisioned IOPS SSD, io1)"
 		if iopsVal.LessThan(decimal.NewFromInt(1000)) {
@@ -125,9 +128,14 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 		if allocatedStorageVal.LessThan(decimal.NewFromInt(100)) {
 			allocatedStorageVal = decimal.NewFromInt(100)
 		}
-	} else if strings.ToLower(r.StorageType) == "standard" {
+	case "standard":
 		volumeType = "Magnetic"
 		storageName = "Storage (magnetic)"
+	case "gp3":
+		volumeType = "General Purpose-GP3"
+		storageName = "Storage (general purpose SSD, gp3)"
+		iopsDescription = "RDS Provisioned GP3 IOPS"
+
 	}
 
 	instanceAttributeFilters := []*schema.AttributeFilter{
@@ -166,6 +174,16 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 		purchaseOptionLabel = "reserved"
 	}
 
+	storageFilters := []*schema.AttributeFilter{
+		{Key: "deploymentOption", Value: strPtr(deploymentOption)},
+		{Key: "databaseEngine", Value: strPtr("Any")},
+		{Key: "volumeType", Value: strPtr(volumeType)},
+	}
+
+	if storageType == "gp3" {
+		storageFilters = append(storageFilters, &schema.AttributeFilter{Key: "usagetype", ValueRegex: strPtr("/\\-RDS\\:GP3\\-Storage$/")})
+	}
+
 	costComponents := []*schema.CostComponent{
 		{
 			Name:           fmt.Sprintf("Database instance (%s, %s, %s)", purchaseOptionLabel, deploymentOption, r.InstanceClass),
@@ -187,15 +205,11 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: &allocatedStorageVal,
 			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("aws"),
-				Region:        strPtr(r.Region),
-				Service:       strPtr("AmazonRDS"),
-				ProductFamily: strPtr("Database Storage"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "volumeType", Value: strPtr(volumeType)},
-					{Key: "deploymentOption", Value: strPtr(deploymentOption)},
-					{Key: "databaseEngine", Value: strPtr("Any")},
-				},
+				VendorName:       strPtr("aws"),
+				Region:           strPtr(r.Region),
+				Service:          strPtr("AmazonRDS"),
+				ProductFamily:    strPtr("Database Storage"),
+				AttributeFilters: storageFilters,
 			},
 		},
 	}
@@ -218,24 +232,63 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 		})
 	}
 
-	if strings.ToLower(volumeType) == "provisioned iops" {
-		costComponents = append(costComponents, &schema.CostComponent{
-			Name:            "Provisioned IOPS",
-			Unit:            "IOPS",
-			UnitMultiplier:  decimal.NewFromInt(1),
-			MonthlyQuantity: &iopsVal,
-			ProductFilter: &schema.ProductFilter{
-				VendorName:    strPtr("aws"),
-				Region:        strPtr(r.Region),
-				Service:       strPtr("AmazonRDS"),
-				ProductFamily: strPtr("Provisioned IOPS"),
-				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "deploymentOption", Value: strPtr(deploymentOption)},
-					{Key: "groupDescription", Value: strPtr("RDS Provisioned IOPS")},
-					{Key: "databaseEngine", Value: strPtr("Any")},
+	if storageType == "io1" || storageType == "gp3" {
+		if storageType == "gp3" {
+			// For GP3 Storage volumes, all IOPS and throughput use below the baseline is
+			// included at no additional charge. For volumes below 400 GiB of allocated
+			// storage, the baseline provisioned IOPS is 3,000 and baseline throughput is 125
+			// MiBps. Volumes of 400 GiB and above, baseline provisioned IOPS is 12,000 and
+			// baseline throughput is 500 MiBps. There is an additional charge for
+			// provisioned IOPS and throughput above baseline.
+			baseline := decimal.NewFromInt(3000)
+			baselineStr := "3,000"
+			if allocatedStorageVal.GreaterThanOrEqual(decimal.NewFromInt(400)) {
+				baseline = decimal.NewFromInt(12000)
+				baselineStr = "12,000"
+			}
+
+			if iopsVal.GreaterThan(baseline) {
+				over := iopsVal.Sub(baseline)
+
+				costComponents = append(costComponents, &schema.CostComponent{
+					Name:            fmt.Sprintf("Provisioned GP3 IOPS (above %s)", baselineStr),
+					Unit:            "IOPS",
+					UnitMultiplier:  decimal.NewFromInt(1),
+					MonthlyQuantity: &over,
+					ProductFilter: &schema.ProductFilter{
+						VendorName:    strPtr("aws"),
+						Region:        strPtr(r.Region),
+						Service:       strPtr("AmazonRDS"),
+						ProductFamily: strPtr("Provisioned IOPS"),
+						AttributeFilters: []*schema.AttributeFilter{
+							{Key: "deploymentOption", Value: strPtr(deploymentOption)},
+							{Key: "groupDescription", Value: strPtr(iopsDescription)},
+							{Key: "databaseEngine", Value: strPtr("Any")},
+							{Key: "usagetype", ValueRegex: strPtr("/\\-RDS\\:GP3\\-PIOPS$/")},
+						},
+					},
+				})
+			}
+		} else {
+			costComponents = append(costComponents, &schema.CostComponent{
+				Name:            "Provisioned IOPS",
+				Unit:            "IOPS",
+				UnitMultiplier:  decimal.NewFromInt(1),
+				MonthlyQuantity: &iopsVal,
+				ProductFilter: &schema.ProductFilter{
+					VendorName:    strPtr("aws"),
+					Region:        strPtr(r.Region),
+					Service:       strPtr("AmazonRDS"),
+					ProductFamily: strPtr("Provisioned IOPS"),
+					AttributeFilters: []*schema.AttributeFilter{
+						{Key: "deploymentOption", Value: strPtr(deploymentOption)},
+						{Key: "groupDescription", Value: strPtr(iopsDescription)},
+						{Key: "databaseEngine", Value: strPtr("Any")},
+					},
 				},
-			},
-		})
+			})
+		}
+
 	}
 
 	var backupStorageGB *decimal.Decimal
