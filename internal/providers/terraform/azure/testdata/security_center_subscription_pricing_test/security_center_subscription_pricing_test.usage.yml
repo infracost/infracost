@@ -1,0 +1,31 @@
+version: 0.1
+resource_usage:
+  azurerm_security_center_subscription_pricing.standard_example_with_usage["VirtualMachines"]:
+    monthly_servers_plan_1_nodes: 1
+    monthly_servers_plan_2_nodes: 2
+  azurerm_security_center_subscription_pricing.standard_example_with_usage["Containers"]:
+    monthly_containers_vcores: 3
+  azurerm_security_center_subscription_pricing.standard_example_with_usage["SqlServerVirtualMachines"]:
+    monthly_sql_azure_connected_instances: 4
+  azurerm_security_center_subscription_pricing.standard_example_with_usage["SqlServers"]:
+    monthly_sql_outside_azure_vcores: 5
+  azurerm_security_center_subscription_pricing.standard_example_with_usage["OpenSourceRelationalDatabases"]:
+    monthly_mysql_instances: 6
+    monthly_postgresql_instances: 7
+    monthly_mariadb_instances: 8
+  azurerm_security_center_subscription_pricing.standard_example_with_usage["CosmosDbs"]:
+    cosmosdb_request_units: 900
+  azurerm_security_center_subscription_pricing.standard_example_with_usage["StorageAccounts"]:
+    monthly_storage_accounts: 11
+  azurerm_security_center_subscription_pricing.standard_example_with_usage["AppServices"]:
+    monthly_app_service_nodes: 12
+  azurerm_security_center_subscription_pricing.standard_example_with_usage["KeyVaults"]:
+    monthly_key_vault_transactions: 130000
+  azurerm_security_center_subscription_pricing.standard_example_with_usage["Arm"]:
+    monthly_arm_api_calls: 14000000
+  azurerm_security_center_subscription_pricing.standard_example_with_usage["Dns"]:
+    monthly_dns_queries: 15000000
+  azurerm_security_center_subscription_pricing.standard_example_with_usage["KubernetesService"]:
+    monthly_kubernetes_cores: 16
+  azurerm_security_center_subscription_pricing.standard_example_with_usage["ContainerRegistry"]:
+    monthly_container_registry_images: 17

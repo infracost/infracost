@@ -92,6 +92,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getAzureRMStorageAccountRegistryItem(),
 	getAzureRMSQLDatabaseRegistryItem(),
 	getAzureRMSQLManagedInstanceRegistryItem(),
+	getAzureRMMSSQLManagedInstanceRegistryItem(),
 	GetAzureRMSynapseSparkPoolRegistryItem(),
 	GetAzureRMSynapseSQLPoolRegistryItem(),
 	GetAzureRMSynapseWorkspacRegistryItem(),
@@ -146,6 +147,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getTrafficManagerNestedEndpointRegistryItem(),
 	getEventgridSystemTopicRegistryItem(),
 	getEventgridTopicRegistryItem(),
+	getSecurityCenterSubscriptionPricingRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -545,6 +547,18 @@ var FreeResources = []string{
 	"azurerm_virtual_hub_connection",
 	"azurerm_virtual_wan",
 	"azurerm_vpn_server_configuration",
+
+	// Microsoft Defender for Cloud
+	"azurerm_security_center_automation",
+	"azurerm_security_center_server_vulnerability_assessment",
+	"azurerm_security_center_assessment",
+	"azurerm_security_center_assessment_policy",
+	"azurerm_security_center_auto_provisioning",
+	"azurerm_security_center_automation",
+	"azurerm_security_center_contact",
+	"azurerm_security_center_server_vulnerability_assessment_virtual_machine",
+	"azurerm_security_center_setting",
+	"azurerm_security_center_workspace",
 }
 
 var UsageOnlyResources = []string{}
