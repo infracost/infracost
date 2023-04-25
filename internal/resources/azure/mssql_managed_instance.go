@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	mssqlMIServiceName   = "MSSQL Managed Instance"
+	mssqlMIServiceName   = "SQL Managed Instance"
 	mssqlMIProductFamily = "Databases"
 )
 
@@ -195,8 +195,8 @@ func (r *MSSQLManagedInstance) mssqlMILongTermRetentionStorageGBCostComponent() 
 			Service:       strPtr(mssqlMIServiceName),
 			ProductFamily: strPtr(mssqlMIProductFamily),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", Value: strPtr("MSSQL Managed Instance - LTR Backup Storage")},
-				{Key: "meterName", Value: strPtr(fmt.Sprintf("Backup %s Data Stored", r.StorageAccountType))},
+				{Key: "productName", Value: strPtr("SQL Managed Instance - LTR Backup Storage")},
+				{Key: "meterName", Value: strPtr(fmt.Sprintf("LTR Backup %s Data Stored", r.StorageAccountType))},
 			},
 		},
 		PriceFilter: priceFilterConsumption,
