@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  azurerm_network_watcher.network_watcher_with_usage:
+    monthly_diagnostic_checks: 10000
