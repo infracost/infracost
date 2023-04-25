@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  azurerm_network_connection_monitor.connection_monitor_with_usage:
+    tests: 2_000_000
