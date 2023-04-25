@@ -148,6 +148,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getEventgridSystemTopicRegistryItem(),
 	getEventgridTopicRegistryItem(),
 	getSecurityCenterSubscriptionPricingRegistryItem(),
+	getNetworkWatcherFlowLogRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
