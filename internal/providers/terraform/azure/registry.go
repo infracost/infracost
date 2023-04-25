@@ -146,6 +146,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getTrafficManagerExternalEndpointRegistryItem(),
 	getTrafficManagerNestedEndpointRegistryItem(),
 	getSecurityCenterSubscriptionPricingRegistryItem(),
+	getNetworkWatcherFlowLogRegistryItem(),
 }
 
 // FreeResources grouped alphabetically

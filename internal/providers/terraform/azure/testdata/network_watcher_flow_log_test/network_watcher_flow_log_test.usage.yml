@@ -1,0 +1,8 @@
+version: 0.1
+resource_usage:
+  azurerm_network_watcher_flow_log.network_watcher_flow_log["traffic-analytics-disabled"]:
+    monthly_logs_collected_gb: 10
+  azurerm_network_watcher_flow_log.network_watcher_flow_log["traffic-analytics-interval-10"]:
+    monthly_logs_collected_gb: 20
+  azurerm_network_watcher_flow_log.network_watcher_flow_log["traffic-analytics-interval-60"]:
+    monthly_logs_collected_gb: 30
