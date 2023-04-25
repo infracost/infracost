@@ -148,6 +148,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getSecurityCenterSubscriptionPricingRegistryItem(),
 	getNetworkWatcherFlowLogRegistryItem(),
 	getNetworkWatcherRegistryItem(),
+	getNetworkConnectionMonitorRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
