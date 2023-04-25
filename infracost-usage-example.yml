@@ -1093,6 +1093,24 @@ resource_usage:
   azurerm_search_service.my_service:
     monthly_images_extracted: 1000000 # Monthly number of extracted images
 
+  azurerm_security_center_subscription_pricing:
+    cosmosdb_request_units: 100 # Average number of RUs/hour for Microsoft Defender for Azure Cosmos DB. Applied when resource_type = CosmosDbs.
+    monthly_app_service_nodes: 10 # Monthly number of App Service nodes for Microsoft Defender for App Service. Applied when resource_type = AppServices.
+    monthly_arm_api_calls: 10000000 # Monthly number of API calls for Microsoft Defender for ARM. Applied when resource_type = Arm.
+    monthly_container_registry_images: 10 # Monthly number of images for Microsoft Defender for Container Registries. Applied when resource_type = ContainerRegistry.
+    monthly_containers_vcores: 20 # Monthly number of vCores for Microsoft Defender for Containers. Applied when resource_type = Containers.
+    monthly_dns_queries: 10000000 # Monthly number of queries for Microsoft Defender for DNS. Applied when resource_type = Dns.
+    monthly_key_vault_transactions: 1000000 # Monthly number of transactions for Microsoft Defender for Key Vault. Applied when resource_type = KeyVaults.
+    monthly_kubernetes_cores: 10 # Monthly number of cores for Microsoft Defender for Kubernetes. Applied when resource_type = KubernetesService.
+    monthly_mariadb_instances: 10 # Monthly number of instances for Microsoft Defender for MariaDB. Applied when resource_type = OpenSourceRelationalDatabases.
+    monthly_mysql_instances: 10 # Monthly number of instances for Microsoft Defender for MySQL. Applied when resource_type = OpenSourceRelationalDatabases.
+    monthly_postgresql_instances: 10 # Monthly number of instances for Microsoft Defender for PostgreSQL. Applied when resource_type = OpenSourceRelationalDatabases.
+    monthly_servers_plan_1_nodes: 10 # Monthly number of servers for Microsoft Defender for Servers Plan 1. Applied when resource_type = VirtualMachines.
+    monthly_servers_plan_2_nodes: 10 # Monthly number of servers for Microsoft Defender for Servers Plan 2. Applied when resource_type = VirtualMachines.
+    monthly_sql_azure_connected_instances: 10 # Monthly number of instances for Microsoft Defender for SQL on Azure-connected databases. Applied when resource_type = SqlServerVirtualMachines.
+    monthly_sql_outside_azure_vcores: 20 # Monthly number of vCores for Microsoft Defender for SQL outside Azure. Applied when resource_type = SqlServers.
+    monthly_storage_accounts: 1 # Monthly number of storage accounts for Microsoft Defender for Storage. Applied when resource_type = StorageAccounts.
+
   azurerm_signalr_service.my_service:
     monthly_additional_messages: 1000000 # Monthly number of messages above the included 1M per unit per day
 
