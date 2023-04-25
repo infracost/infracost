@@ -937,6 +937,12 @@ resource_usage:
   azurerm_dns_txt_record.my_txt_record:
     monthly_queries: 11500000000  # Monthly number of DNS queries
 
+  azurerm_eventgrid_topic.my_topic:
+    monthly_operations: 100000  # Monthly number of operations above the free 100k operation limit.
+
+  azurerm_eventgrid_system_topic.my_topic:
+    monthly_operations: 100000  # Monthly number of operations above the free 100k operation limit.
+
   azurerm_eventhub_namespace.my_event_hub:
     monthly_ingress_events: 100000000 # Monthly number of ingress events, only applicable for Basic and Standard namespaces.
     retention_storage_gb: 10000       # Total data stored for retention in GB, used to calculate Extended Retention costs, only applicable for Dedicated namespaces.
