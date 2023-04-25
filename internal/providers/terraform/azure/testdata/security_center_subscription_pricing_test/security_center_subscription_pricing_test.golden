@@ -92,7 +92,7 @@
  OVERALL TOTAL                                                                                                                                                 $876.11 
 ──────────────────────────────────
 30 cloud resources were detected:
-∙ 29 were estimated
+∙ 29 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 1 was free:
   ∙ 1 x azurerm_security_center_subscription_pricing
 Logs:
