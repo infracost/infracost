@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  azurerm_eventgrid_topic.with_usage:
+    monthly_operations: 820000

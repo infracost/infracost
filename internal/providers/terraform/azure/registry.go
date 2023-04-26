@@ -145,6 +145,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getTrafficManagerAzureEndpointRegistryItem(),
 	getTrafficManagerExternalEndpointRegistryItem(),
 	getTrafficManagerNestedEndpointRegistryItem(),
+	getEventgridSystemTopicRegistryItem(),
+	getEventgridTopicRegistryItem(),
 	getSecurityCenterSubscriptionPricingRegistryItem(),
 }
 
@@ -314,6 +316,11 @@ var FreeResources = []string{
 
 	// Azure Datalake Gen 2
 	"azurerm_storage_data_lake_gen2_filesystem",
+
+	// Azure Event Grid
+	"azurerm_eventgrid_domain",
+	"azurerm_eventgrid_event_subscription",
+	"azurerm_eventgrid_system_topic_event_subscription",
 
 	// Azure Event Hub
 	"azurerm_eventhub",
