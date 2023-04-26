@@ -627,6 +627,7 @@ func (f *metadataFetcher) getAzureReposMetadata(path string, gitDiffTarget *stri
 	m.Remote = urlStringToRemote(os.Getenv("BUILD_REPOSITORY_URI"))
 	m.Pipeline = &Pipeline{ID: getEnv("BUILD_BUILDID")}
 	pullID := getEnv("SYSTEM_PULLREQUEST_PULLREQUESTID")
+	prRemote := urlStringToRemote(getEnv("SYSTEM_PULLREQUEST_SOURCEREPOSITORYURI"))
 	m.PullRequest = &PullRequest{
 		ID:           pullID,
 		VCSProvider:  "azure_devops_tfsgit",
@@ -634,7 +635,7 @@ func (f *metadataFetcher) getAzureReposMetadata(path string, gitDiffTarget *stri
 		Author:       res.CreatedBy.UniqueName,
 		SourceBranch: strings.TrimPrefix(getEnv("SYSTEM_PULLREQUEST_SOURCEBRANCH"), "refs/heads/"),
 		BaseBranch:   strings.TrimPrefix(getEnv("SYSTEM_PULLREQUEST_TARGETBRANCH"), "refs/heads/"),
-		URL:          fmt.Sprintf("%s/pullrequest/%s", getEnv("SYSTEM_PULLREQUEST_SOURCEREPOSITORYURI"), pullID),
+		URL:          fmt.Sprintf("%s/pullrequest/%s", prRemote.URL, pullID),
 	}
 	return m, nil
 }
