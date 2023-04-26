@@ -1054,6 +1054,15 @@ resource_usage:
   azurerm_nat_gateway.my_gateway:
     monthly_data_processed_gb: 10 # Monthly data processed by the NAT Gateway in GB.
 
+  azurerm_network_watcher.my_watcher:
+    monthly_diagnostic_checks: 10000 # Monthly number of diagnostic API calls.
+
+  azurerm_network_watcher_flow_log.my_flow_log:
+    monthly_logs_collected_gb: 100 # Monthly amount of logs collected in GB.
+
+  azurerm_network_connection_monitor.my_connection_monitor:
+    tests: 100000 # Overrides the number of tests done in the connection monitor
+
   azurerm_virtual_network_peering.my_peering:
     monthly_data_transfer_gb: 100 # Monthly inbound/outbound data transferred by the VNET peering in GB.
 
