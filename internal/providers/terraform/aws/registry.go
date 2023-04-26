@@ -255,8 +255,20 @@ var FreeResources = []string{
 	"aws_config_delivery_channel",
 	"aws_config_remediation_configuration",
 
+	// AWS EC2
+	"aws_autoscaling_attachment",
+	"aws_autoscaling_group_tag",
+	"aws_autoscaling_lifecycle_hook",
+	"aws_autoscaling_notification",
+	"aws_autoscaling_policy",
+	"aws_placement_group",
+
 	// AWS ECR
 	"aws_ecr_repository_policy",
+
+	// AWS EKS
+	"aws_eks_addon",
+	"aws_eks_identity_provider_config",
 
 	// AWS Elastic Beanstalk
 	"aws_elastic_beanstalk_application",
@@ -415,12 +427,20 @@ var FreeResources = []string{
 	"aws_s3_access_point",
 	"aws_s3_account_public_access_block",
 	"aws_s3_bucket_acl",
+	"aws_s3_bucket_cors_configuration",
+	"aws_s3_bucket_intelligent_tiering_configuration",
+	"aws_s3_bucket_logging",
 	"aws_s3_bucket_metric",
 	"aws_s3_bucket_notification",
 	"aws_s3_bucket_object", // Costs are shown at the bucket level
+	"aws_s3_bucket_object_lock_configuration",
 	"aws_s3_bucket_ownership_controls",
 	"aws_s3_bucket_policy",
 	"aws_s3_bucket_public_access_block",
+	"aws_s3_bucket_replication_configuration",
+	"aws_s3_bucket_server_side_encryption_configuration",
+	"aws_s3_bucket_versioning",
+	"aws_s3_bucket_website_configuration",
 
 	// AWS Secrets Manager
 	"aws_secretsmanager_secret_policy",
