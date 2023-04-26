@@ -189,6 +189,9 @@ var FreeResources = []string{
 	"azurerm_api_management_subscription",
 	"azurerm_api_management_user",
 
+	// Azure Application Gateway
+	"azurerm_web_application_firewall_policy",
+
 	// Azure App Service
 	"azurerm_app_service",
 	"azurerm_app_service_active_slot",
@@ -206,16 +209,22 @@ var FreeResources = []string{
 	"azurerm_automation_certificate",
 	"azurerm_automation_connection",
 	"azurerm_automation_connection_certificate",
+	"azurerm_automation_connection_type",
 	"azurerm_automation_connection_classic_certificate",
 	"azurerm_automation_connection_service_principal",
 	"azurerm_automation_credential",
+	"azurerm_automation_hybrid_runbook_worker",
+	"azurerm_automation_hybrid_runbook_worker_group",
 	"azurerm_automation_module",
 	"azurerm_automation_runbook",
 	"azurerm_automation_schedule",
+	"azurerm_automation_software_update_configuration",
+	"azurerm_automation_source_control",
 	"azurerm_automation_variable_bool",
 	"azurerm_automation_variable_datetime",
 	"azurerm_automation_variable_int",
 	"azurerm_automation_variable_string",
+	"azurerm_automation_webhook",
 
 	// Azure Backup & Recovery Services Vault
 	"azurerm_backup_policy_vm",
@@ -373,6 +382,23 @@ var FreeResources = []string{
 	"azurerm_lb_nat_rule",
 	"azurerm_lb_probe",
 
+	// Azure Logic App
+	"azurerm_logic_app_action_custom",
+	"azurerm_logic_app_action_http",
+	"azurerm_logic_app_integration_account_agreement",
+	"azurerm_logic_app_integration_account_assembly",
+	"azurerm_logic_app_integration_account_batch_configuration",
+	"azurerm_logic_app_integration_account_certificate",
+	"azurerm_logic_app_integration_account_map",
+	"azurerm_logic_app_integration_account_partner",
+	"azurerm_logic_app_integration_account_schema",
+	"azurerm_logic_app_integration_account_session",
+	"azurerm_logic_app_standard",
+	"azurerm_logic_app_trigger_custom",
+	"azurerm_logic_app_trigger_http_request",
+	"azurerm_logic_app_trigger_recurrence",
+	"azurerm_logic_app_workflow",
+
 	// Azure Management
 	"azurerm_management_group",
 	"azurerm_management_group_subscription_association",
@@ -420,6 +446,7 @@ var FreeResources = []string{
 
 	// Azure Networking
 	"azurerm_application_security_group",
+	"azurerm_ip_group",
 	"azurerm_local_network_gateway",
 	"azurerm_nat_gateway_public_ip_association",
 	"azurerm_nat_gateway_public_ip_prefix_association",
@@ -444,6 +471,7 @@ var FreeResources = []string{
 	"azurerm_subnet_route_table_association",
 	"azurerm_subnet_service_endpoint_storage_policy",
 	"azurerm_virtual_network",
+	"azurerm_virtual_network_dns_servers",
 
 	// Azure Notification Hub
 	"azurerm_notification_hub",
@@ -456,6 +484,7 @@ var FreeResources = []string{
 
 	// Azure Portal
 	"azurerm_dashboard",
+	"azurerm_portal_dashboard",
 
 	// Azure Redis
 	"azurerm_redis_firewall_rule",
@@ -471,6 +500,19 @@ var FreeResources = []string{
 	"azurerm_sentinel_alert_rule_fusion",
 	"azurerm_sentinel_alert_rule_ms_security_incident",
 	"azurerm_sentinel_alert_rule_scheduled",
+
+	// Azure Service Bus
+	"azurerm_servicebus_namespace_authorization_rule",
+	"azurerm_servicebus_namespace_disaster_recovery_config",
+	"azurerm_servicebus_namespace_network_rule_set",
+	"azurerm_servicebus_queue",
+	"azurerm_servicebus_queue_authorization_rule",
+	"azurerm_servicebus_subscription",
+	"azurerm_servicebus_subscription_rule",
+	"azurerm_servicebus_topic",
+	"azurerm_servicebus_topic_authorization_rule",
+	"azurerm_relay_hybrid_connection_authorization_rule",
+	"azurerm_relay_namespace_authorization_rule",
 
 	// Azure Shared Image Gallery
 	"azurerm_shared_image",
