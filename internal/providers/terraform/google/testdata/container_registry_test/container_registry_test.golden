@@ -12,6 +12,17 @@
     ├─ Data transfer to China excluding Hong Kong (first 1TB)                      Monthly cost depends on usage: $0.23 per GB                
     └─ Data transfer to Australia (first 1TB)                                      Monthly cost depends on usage: $0.19 per GB                
                                                                                                                                               
+ google_container_registry.my_registry_asia                                                                                                   
+ ├─ Storage (standard)                                                             Monthly cost depends on usage: $0.026 per GiB              
+ ├─ Object adds, bucket/object list (class A)                                      Monthly cost depends on usage: $0.05 per 10k operations    
+ ├─ Object gets, retrieve bucket/object metadata (class B)                         Monthly cost depends on usage: $0.004 per 10k operations   
+ └─ Network egress                                                                                                                            
+    ├─ Data transfer in same continent                                             Monthly cost depends on usage: $0.08 per GB                
+    ├─ Data transfer to worldwide excluding Asia, Australia (first 1TB)            Monthly cost depends on usage: $0.12 per GB                
+    ├─ Data transfer to Asia excluding China, but including Hong Kong (first 1TB)  Monthly cost depends on usage: $0.12 per GB                
+    ├─ Data transfer to China excluding Hong Kong (first 1TB)                      Monthly cost depends on usage: $0.23 per GB                
+    └─ Data transfer to Australia (first 1TB)                                      Monthly cost depends on usage: $0.19 per GB                
+                                                                                                                                              
  google_container_registry.my_registry_usage                                                                                                  
  ├─ Storage (standard)                                                                            150  GiB                              $3.90 
  ├─ Object adds, bucket/object list (class A)                                                       4  10k operations                   $0.20 
@@ -28,5 +39,5 @@
                                                                                                                                               
  OVERALL TOTAL                                                                                                                      $1,566.79 
 ──────────────────────────────────
-2 cloud resources were detected:
-∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+3 cloud resources were detected:
+∙ 3 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
