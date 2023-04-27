@@ -8,11 +8,11 @@ import (
 func getElasticsearchDomainRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "aws_elasticsearch_domain",
-		RFunc: NewElasticsearchDomain,
+		RFunc: newSearchDomain,
 	}
 }
-func NewElasticsearchDomain(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := &aws.ElasticsearchDomain{
+func newSearchDomain(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	r := &aws.SearchDomain{
 		Address:                       d.Address,
 		Region:                        d.Get("region").String(),
 		ClusterInstanceType:           d.Get("cluster_config.0.instance_type").String(),
