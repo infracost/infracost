@@ -304,6 +304,9 @@ var FreeResources = []string{
 	"aws_elasticache_parameter_group",
 	"aws_elasticache_security_group",
 	"aws_elasticache_subnet_group",
+	"aws_elasticache_user",
+	"aws_elasticache_user_group",
+	"aws_elasticache_user_group_association",
 
 	// "AWS Global Accelerator Listener
 	"aws_globalaccelerator_listener",
