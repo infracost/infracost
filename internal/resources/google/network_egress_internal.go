@@ -176,9 +176,10 @@ func (r *ContainerRegistryNetworkEgressUsage) BuildResource() *schema.Resource {
 
 	var startUsage *string
 	continent := regionToContinent(r.Region)
-	// Northern America has two prices, the first is free so we need to use the start usage to 1 to avoid 0.00 prices.
+	// Northern America has three prices available to it, only the start usage 100 is applicable to us, as this is what is reflected in the
+	// pricing calculator.
 	if continent == "Northern America" {
-		startUsage = strPtr("1")
+		startUsage = strPtr("100")
 	}
 
 	resource.CostComponents = append(resource.CostComponents, &schema.CostComponent{
