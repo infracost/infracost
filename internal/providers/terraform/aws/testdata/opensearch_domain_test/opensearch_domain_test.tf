@@ -10,8 +10,7 @@ provider "aws" {
 }
 
 resource "aws_opensearch_domain" "gp2" {
-  domain_name           = "example-domain"
-  elasticsearch_version = "1.5"
+  domain_name = "example-domain"
 
   cluster_config {
     instance_type            = "c4.2xlarge.search"
@@ -32,8 +31,7 @@ resource "aws_opensearch_domain" "gp2" {
 }
 
 resource "aws_opensearch_domain" "io1" {
-  domain_name           = "example-domain"
-  elasticsearch_version = "1.5"
+  domain_name = "example-domain"
 
   cluster_config {
     instance_type  = "c4.2xlarge.search"
@@ -49,8 +47,7 @@ resource "aws_opensearch_domain" "io1" {
 }
 
 resource "aws_opensearch_domain" "std" {
-  domain_name           = "example-domain"
-  elasticsearch_version = "1.5"
+  domain_name = "example-domain"
 
   cluster_config {
     instance_type  = "c4.2xlarge.search"
