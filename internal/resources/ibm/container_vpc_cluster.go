@@ -65,13 +65,17 @@ func (r *ContainerVpcCluster) BuildResource() *schema.Resource {
 		{Key: "catalogRegion", Value: strPtr(r.Region)},
 		{Key: "operatingSystem", ValueRegex: strPtr(fmt.Sprintf("/%s/i", operatingSystem))},
 	}
+	// if an entitlement is specified, then ocp licensing is already covered. use pricing that
+	// does not include ocp charges.
 	if r.Entitlement {
 		attributeFilters = append(attributeFilters, &schema.AttributeFilter{
-			Key: "ocpIncluded", Value: strPtr("true"),
+			Key: "ocpIncluded", Value: strPtr(""),
 		})
 	} else {
+		// if there's no entitlement, then ocp licenses will be added to the hourly pricing.
+		// set filter for prices that include ocp costs.
 		attributeFilters = append(attributeFilters, &schema.AttributeFilter{
-			Key: "ocpIncluded", Value: strPtr(""),
+			Key: "ocpIncluded", Value: strPtr("true"),
 		})
 	}
 	WorkerCount := decimalPtr(decimal.NewFromInt(1))
