@@ -1,0 +1,37 @@
+FROM cgr.dev/chainguard/go as builder
+
+ARG ARCH=linux64
+
+# Set Environment Variables
+SHELL ["/bin/bash", "-c"]
+ENV HOME /app
+ENV CGO_ENABLED 0
+
+WORKDIR /app
+
+# Build Application
+COPY . .
+RUN make deps
+RUN NO_DIRTY=true make build
+RUN chmod +x /app/build/infracost
+
+# Application
+FROM cgr.dev/chainguard/wolfi-base as app
+# Tools needed for running diffs in CI integrations
+RUN apk --no-cache add bash curl git nodejs openssh-client jq
+
+# Install the latest compost version
+RUN npm install -g @infracost/compost
+
+WORKDIR /root/
+
+# Scripts are used by CI integrations and other use-cases
+COPY scripts/ci/comment.sh /scripts/ci/
+
+COPY --from=builder /app/build/infracost /usr/bin/
+
+ENV INFRACOST_CI_IMAGE=true
+ENV INFRACOST_SKIP_UPDATE_CHECK='true'
+ENV INFRACOST_LOG_LEVEL=info
+
+ENTRYPOINT ["infracost"]
