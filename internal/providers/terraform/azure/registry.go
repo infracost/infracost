@@ -151,6 +151,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getNetworkWatcherFlowLogRegistryItem(),
 	getNetworkWatcherRegistryItem(),
 	getNetworkConnectionMonitorRegistryItem(),
+	getServiceBusNamespaceRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
