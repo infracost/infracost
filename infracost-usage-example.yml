@@ -1108,7 +1108,7 @@ resource_usage:
   azurerm_search_service.my_service:
     monthly_images_extracted: 1000000 # Monthly number of extracted images
 
-  azurerm_security_center_subscription_pricing:
+  azurerm_security_center_subscription_pricing.my_subscription_pricing:
     cosmosdb_request_units: 100 # Average number of RUs/hour for Microsoft Defender for Azure Cosmos DB. Applied when resource_type = CosmosDbs.
     monthly_app_service_nodes: 10 # Monthly number of App Service nodes for Microsoft Defender for App Service. Applied when resource_type = AppServices.
     monthly_arm_api_calls: 10000000 # Monthly number of API calls for Microsoft Defender for ARM. Applied when resource_type = Arm.
@@ -1125,6 +1125,10 @@ resource_usage:
     monthly_sql_azure_connected_instances: 10 # Monthly number of instances for Microsoft Defender for SQL on Azure-connected databases. Applied when resource_type = SqlServerVirtualMachines.
     monthly_sql_outside_azure_vcores: 20 # Monthly number of vCores for Microsoft Defender for SQL outside Azure. Applied when resource_type = SqlServers.
     monthly_storage_accounts: 1 # Monthly number of storage accounts for Microsoft Defender for Storage. Applied when resource_type = StorageAccounts.
+
+  azurerm_servicebus_namespace.my_servicebus_namespace:
+    monthly_messaging_operations: 3000000000 # Monthly number of messaging operations, used for Standard tier only
+    monthly_brokered_connections: 1000000 # Monthly number of brokered connections, used for Standard tier only
 
   azurerm_signalr_service.my_service:
     monthly_additional_messages: 1000000 # Monthly number of messages above the included 1M per unit per day

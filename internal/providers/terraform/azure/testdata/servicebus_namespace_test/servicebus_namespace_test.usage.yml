@@ -1,0 +1,7 @@
+version: 0.1
+resource_usage:
+  azurerm_servicebus_namespace.servicebus_namespace_with_usage["Basic.0"]:
+    monthly_messaging_operations: 1_000_000_000
+  azurerm_servicebus_namespace.servicebus_namespace_with_usage["Standard.0"]:
+    monthly_messaging_operations: 3_000_000_000
+    monthly_brokered_connections: 1_000_000
