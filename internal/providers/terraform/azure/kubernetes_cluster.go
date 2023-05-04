@@ -40,7 +40,7 @@ func NewAzureRMKubernetesCluster(d *schema.ResourceData, u *schema.UsageData) *s
 				Service:       strPtr("Azure Kubernetes Service"),
 				ProductFamily: strPtr("Compute"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "skuName", Value: strPtr("Standard")},
+					{Key: "meterName", Value: strPtr("Standard Uptime SLA")},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
