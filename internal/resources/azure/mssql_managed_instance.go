@@ -171,6 +171,7 @@ func (r *MSSQLManagedInstance) mssqlMILicenseCostComponent() *schema.CostCompone
 			ProductFamily: strPtr(mssqlMIProductFamily),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("SQL Managed Instance General Purpose - SQL License")},
+				{Key: "meterName", Value: strPtr("vCore")},
 			},
 		},
 		PriceFilter: priceFilterConsumption,
