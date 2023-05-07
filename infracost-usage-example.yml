@@ -1002,6 +1002,11 @@ resource_usage:
     os_disk:
       monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB.
 
+  azurerm_logic_app_standard.my_logic_app_standard:
+    sku: WS1                                    # Sets the SKU if it cannot be detected from the App Service Plan
+    monthly_standard_connector_calls: 1000000   # Monthly number of Standard Connector calls.
+    monthly_enterprise_connector_calls: 1000000 # Monthly number of Enterprise Connector calls.
+
   azurerm_key_vault_certificate.my_certificate:
     monthly_certificate_renewal_requests: 100    # Monthly number of certificate renewal requests.
     monthly_certificate_other_operations: 100000 # Monthly number of non-renewal certificate operations.
