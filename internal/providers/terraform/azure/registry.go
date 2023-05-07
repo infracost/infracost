@@ -152,6 +152,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getNetworkWatcherRegistryItem(),
 	getNetworkConnectionMonitorRegistryItem(),
 	getServiceBusNamespaceRegistryItem(),
+	getLogicAppStandardRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -394,7 +395,6 @@ var FreeResources = []string{
 	"azurerm_logic_app_integration_account_partner",
 	"azurerm_logic_app_integration_account_schema",
 	"azurerm_logic_app_integration_account_session",
-	"azurerm_logic_app_standard",
 	"azurerm_logic_app_trigger_custom",
 	"azurerm_logic_app_trigger_http_request",
 	"azurerm_logic_app_trigger_recurrence",

@@ -33,11 +33,12 @@ func (r *AppServicePlan) BuildResource() *schema.Resource {
 	}
 	productName := "Standard Plan"
 
-	if len(r.SKUSize) < 2 || strings.ToLower(r.SKUSize[:2]) == "ep" || strings.ToLower(r.SKUSize[:2]) == "y1" {
+	if len(r.SKUSize) < 2 || strings.ToLower(r.SKUSize[:2]) == "ep" || strings.ToLower(r.SKUSize[:2]) == "y1" || strings.ToLower(r.SKUSize[:2]) == "ws" {
 		return &schema.Resource{
-			Name:      r.Address,
-			IsSkipped: true,
-			NoPrice:   true, UsageSchema: AppServicePlanUsageSchema,
+			Name:        r.Address,
+			IsSkipped:   true,
+			NoPrice:     true,
+			UsageSchema: AppServicePlanUsageSchema,
 		}
 	}
 

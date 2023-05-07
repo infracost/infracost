@@ -1,0 +1,9 @@
+version: 0.1
+resource_usage:
+  azurerm_logic_app_standard.logic_app_standard_with_usage:
+    monthly_standard_connector_calls: 2_000_000
+    monthly_enterprise_connector_calls: 1_000_000
+  azurerm_logic_app_standard.logic_app_standard_unknown_sku_with_usage:
+    sku: WS1
+    monthly_standard_connector_calls: 2_000_000
+    monthly_enterprise_connector_calls: 1_000_000
