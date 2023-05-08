@@ -134,7 +134,7 @@ func newContainerNodeConfig(d gjson.Result) *google.ContainerNodeConfig {
 	}
 
 	purchaseOption := "on_demand"
-	if d.Get("preemptible").Bool() {
+	if d.Get("preemptible").Bool() || d.Get("spot").Bool() {
 		purchaseOption = "preemptible"
 	}
 
