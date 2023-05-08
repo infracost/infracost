@@ -757,7 +757,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 
 	if hasConfigFile {
 		cfgFilePath, _ := cmd.Flags().GetString("config-file")
-		err := cfg.LoadFromConfigFile(cfgFilePath)
+		err := cfg.LoadFromConfigFile(cfgFilePath, cmd)
 
 		if err != nil {
 			return err

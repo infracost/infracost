@@ -7,9 +7,11 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
 
 	"github.com/infracost/infracost/internal/logging"
 )
@@ -163,7 +165,7 @@ func (c *Config) RepoPath() string {
 	return c.RootPath
 }
 
-func (c *Config) LoadFromConfigFile(path string) error {
+func (c *Config) LoadFromConfigFile(path string, cmd *cobra.Command) error {
 	cfgFile, err := loadConfigFile(path)
 	if err != nil {
 		return err
@@ -171,8 +173,13 @@ func (c *Config) LoadFromConfigFile(path string) error {
 
 	c.Projects = cfgFile.Projects
 
-	// Reload the environment to overwrite any of the config file configs
+	// Reload the environment and global flags to overwrite any of the config file configs
 	err = c.LoadFromEnv()
+	if err != nil {
+		return err
+	}
+
+	err = c.LoadGlobalFlags(cmd)
 	if err != nil {
 		return err
 	}
@@ -293,6 +300,31 @@ func (c *Config) loadEnvVars() error {
 
 	for _, project := range c.Projects {
 		err = envconfig.Process("INFRACOST", project)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (c *Config) LoadGlobalFlags(cmd *cobra.Command) error {
+	if cmd.Flags().Changed("no-color") {
+		c.NoColor, _ = cmd.Flags().GetBool("no-color")
+	}
+	color.NoColor = c.NoColor
+
+	if cmd.Flags().Changed("log-level") {
+		c.LogLevel, _ = cmd.Flags().GetString("log-level")
+		err := logging.ConfigureBaseLogger(c)
+		if err != nil {
+			return err
+		}
+	}
+
+	if cmd.Flags().Changed("debug-report") {
+		c.DebugReport, _ = cmd.Flags().GetBool("debug-report")
+		err := logging.ConfigureBaseLogger(c)
 		if err != nil {
 			return err
 		}

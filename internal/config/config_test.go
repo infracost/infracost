@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"testing"
 
+	"github.com/spf13/cobra"
 	"github.com/stretchr/testify/require"
 )
 
@@ -122,7 +123,7 @@ projects:
 				}()
 			}
 
-			err = c.LoadFromConfigFile(path)
+			err = c.LoadFromConfigFile(path, &cobra.Command{})
 
 			require.Equal(t, tt.error, err)
 			require.EqualValues(t, tt.expected, c.Projects)
