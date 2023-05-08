@@ -9,7 +9,6 @@ import (
 	"os"
 	"runtime/debug"
 
-	"github.com/fatih/color"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
@@ -149,6 +148,7 @@ func newRootCmd(ctx *config.RunContext) *cobra.Command {
 			}
 
 			loadCloudSettings(ctx)
+
 			return nil
 		},
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -312,25 +312,10 @@ func loadGlobalFlags(ctx *config.RunContext, cmd *cobra.Command) error {
 	if ctx.IsCIRun() {
 		ctx.Config.NoColor = true
 	}
-	if cmd.Flags().Changed("no-color") {
-		ctx.Config.NoColor, _ = cmd.Flags().GetBool("no-color")
-	}
-	color.NoColor = ctx.Config.NoColor
 
-	if cmd.Flags().Changed("log-level") {
-		ctx.Config.LogLevel, _ = cmd.Flags().GetString("log-level")
-		err := logging.ConfigureBaseLogger(ctx.Config)
-		if err != nil {
-			return err
-		}
-	}
-
-	if cmd.Flags().Changed("debug-report") {
-		ctx.Config.DebugReport, _ = cmd.Flags().GetBool("debug-report")
-		err := logging.ConfigureBaseLogger(ctx.Config)
-		if err != nil {
-			return err
-		}
+	err := ctx.Config.LoadGlobalFlags(cmd)
+	if err != nil {
+		return err
 	}
 
 	ctx.SetContextValue("dashboardEnabled", ctx.Config.EnableDashboard)

@@ -66,7 +66,7 @@ func (s scanCmd) loadRunFlags(cfg *config.Config) error {
 	}
 
 	if s.ConfigFile != "" {
-		err := cfg.LoadFromConfigFile(s.ConfigFile)
+		err := cfg.LoadFromConfigFile(s.ConfigFile, s.cmd)
 		if err != nil {
 			return err
 		}
