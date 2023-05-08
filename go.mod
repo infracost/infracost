@@ -40,7 +40,7 @@ require (
 	github.com/tidwall/gjson v1.14.4
 	github.com/zclconf/go-cty v1.12.1
 	golang.org/x/crypto v0.0.0-20220622213112-05595931fe9d
-	golang.org/x/mod v0.8.0
+	golang.org/x/mod v0.10.0
 	gopkg.in/go-playground/assert.v1 v1.2.1
 	gopkg.in/yaml.v2 v2.4.0
 	gopkg.in/yaml.v3 v3.0.1
