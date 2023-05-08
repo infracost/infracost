@@ -1,5 +1,4 @@
 ──────────────────────────────────
-
 The following projects have no cost estimate changes: infracost/infracost/cmd/infracost/testdata/express_route_gateway_plan.json
 Run the following command to see their breakdown: infracost breakdown --path=/path/to/code
 

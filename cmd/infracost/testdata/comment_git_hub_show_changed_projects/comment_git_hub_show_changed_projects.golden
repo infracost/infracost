@@ -30,7 +30,6 @@
 
 ```
 ──────────────────────────────────
-
 The following projects have no cost estimate changes: infracost/infracost/internal/hcl/testdata/project_locator/multi_project_with_module/dev (Module path: dev), infracost/infracost/internal/hcl/testdata/project_locator/multi_project_with_module/prod (Module path: prod)
 Run the following command to see their breakdown: infracost breakdown --path=/path/to/code
 

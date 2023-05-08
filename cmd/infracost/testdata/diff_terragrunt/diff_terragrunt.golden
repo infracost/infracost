@@ -1,3 +1,4 @@
+──────────────────────────────────
 Project: infracost/infracost/examples/terragrunt/dev
 Module path: dev
 
@@ -81,6 +82,13 @@ Amount:  +$748 ($0.00 → $748)
 
 ──────────────────────────────────
 Key: ~ changed, + added, - removed
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Name                                               ┃ Previous   ┃ New        ┃ Diff       ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ infracost/infracost/examples/terragrunt/dev        ┃ $0.00      ┃ $52        ┃ +$52       ┃
+┃ infracost/infracost/examples/terragrunt/prod       ┃ $0.00      ┃ $748       ┃ +$748      ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 4 cloud resources were detected:
 ∙ 4 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

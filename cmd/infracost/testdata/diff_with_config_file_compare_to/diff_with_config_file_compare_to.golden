@@ -1,3 +1,4 @@
+──────────────────────────────────
 Project: infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to/dev
 Module path: dev
 
@@ -27,6 +28,13 @@ Percent: +75%
 
 ──────────────────────────────────
 Key: ~ changed, + added, - removed
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━┓
+┃ Name                                                                             ┃ Previous   ┃ New        ┃ Diff            ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to/dev  ┃ $462       ┃ $252       ┃ -$210.24 (-45%) ┃
+┃ infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to/prod ┃ $743       ┃ $1,303     ┃ +$561 (+75%)    ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━┛
 
 2 cloud resources were detected:
 ∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

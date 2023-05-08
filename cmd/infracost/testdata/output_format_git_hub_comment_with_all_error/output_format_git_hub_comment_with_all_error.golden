@@ -6,13 +6,10 @@
 
 ```
 ──────────────────────────────────
-
 The following projects could not be evaluated: 
 infracost/infracost/examples/terraform
 Run the following command to see more details: infracost breakdown --path=/path/to/code
 
-──────────────────────────────────
-Key: ~ changed, + added, - removed
 
 No cloud resources were detected
 ```

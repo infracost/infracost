@@ -8,6 +8,7 @@
 **Infracost output:**
 
 ```
+──────────────────────────────────
 Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
 
 + aws_instance.instance_2
@@ -109,6 +110,12 @@ Percent: +100%
 
 ──────────────────────────────────
 Key: ~ changed, + added, - removed
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Name                                                                 ┃ Previous   ┃ New        ┃ Diff         ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json ┃ $41        ┃ $81        ┃ +$41 (+100%) ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 
 26 cloud resources were detected:
 ∙ 14 were estimated, 10 of which include usage-based costs, see https://infracost.io/usage-file

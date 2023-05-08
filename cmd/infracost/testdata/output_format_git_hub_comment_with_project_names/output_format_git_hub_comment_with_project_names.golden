@@ -51,6 +51,7 @@
 <summary><strong>Infracost output</strong></summary>
 
 ```
+──────────────────────────────────
 Project: my first project
 
 ~ aws_instance.web_app
@@ -121,6 +122,7 @@ Percent: -43%
 
 ──────────────────────────────────
 Key: ~ changed, + added, - removed
+
 
 10 cloud resources were detected:
 ∙ 10 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
