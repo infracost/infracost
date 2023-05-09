@@ -14,10 +14,13 @@ Percent: +88%
 ──────────────────────────────────
 Key: ~ changed, + added, - removed
 
+──────────────────────────────────
+Infracost estimate: monthly cost will increase by $8 (+88%) ↑
+
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┓
-┃ Name                                                             ┃ Previous   ┃ New        ┃ Diff       ┃
+┃ Project                                                          ┃ Previous   ┃ New        ┃ Diff       ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infracost/testdata/plan_with_target.json ┃ $9         ┃ $16        ┃ +$8 (+88%) ┃
+┃ infracost/infracost/cmd/infracost/testdata/plan_with_target.json ┃         $9 ┃        $16 ┃ +$8 (+88%) ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 1 cloud resource was detected:

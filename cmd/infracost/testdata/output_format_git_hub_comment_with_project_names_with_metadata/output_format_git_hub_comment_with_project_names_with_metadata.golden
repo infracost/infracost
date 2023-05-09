@@ -167,6 +167,19 @@ Percent: -43%
 ──────────────────────────────────
 Key: ~ changed, + added, - removed
 
+──────────────────────────────────
+Infracost estimate: monthly cost will decrease by $2,241 (-42%) ↓
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Previous   ┃ New        ┃ Diff            ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━┫
+┃ my terragrunt project                              ┃        $51 ┃        $52 ┃ +$0.88 (+2%)    ┃
+┃ my terragrunt project                              ┃     $1,308 ┃       $748 ┃ -$560.64 (-43%) ┃
+┃ my terragrunt project                              ┃        $51 ┃        $52 ┃ +$0.88 (+2%)    ┃
+┃ my terragrunt project                              ┃     $1,308 ┃       $748 ┃ -$560.64 (-43%) ┃
+┃ my tf project                                      ┃     $1,303 ┃       $743 ┃ -$560.64 (-43%) ┃
+┃ my tf project                                      ┃     $1,303 ┃       $743 ┃ -$560.64 (-43%) ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━┛
 
 12 cloud resources were detected:
 ∙ 12 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

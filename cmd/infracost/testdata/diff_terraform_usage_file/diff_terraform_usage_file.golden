@@ -95,10 +95,13 @@ Amount:  +$1,361 ($0.00 → $1,361)
 ──────────────────────────────────
 Key: ~ changed, + added, - removed
 
+──────────────────────────────────
+Infracost estimate: monthly cost will increase by $1,361 ↑
+
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┓
-┃ Name                                                         ┃ Previous   ┃ New        ┃ Diff       ┃
+┃ Project                                                      ┃ Previous   ┃ New        ┃ Diff       ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infracost/testdata/example_plan.json ┃ $0.00      ┃ $1,361     ┃ +$1,361    ┃
+┃ infracost/infracost/cmd/infracost/testdata/example_plan.json ┃      $0.00 ┃     $1,361 ┃ +$1,361    ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 5 cloud resources were detected:

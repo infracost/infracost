@@ -120,8 +120,10 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 		s += "\n\n"
 	}
 
-	if hasDiffProjects && out.DiffTotalMonthlyCost != nil && out.DiffTotalMonthlyCost.GreaterThan(decimal.Zero) {
-		s += tableForDiff(out)
+	if hasDiffProjects && out.DiffTotalMonthlyCost != nil && out.DiffTotalMonthlyCost.Abs().GreaterThan(decimal.Zero) {
+		s += "──────────────────────────────────\n"
+		s += fmt.Sprintf("Infracost estimate: %s\n\n", formatCostChangeSentence(out.Currency, out.PastTotalMonthlyCost, out.TotalMonthlyCost, false))
+		s += tableForDiff(out, opts)
 		s += "\n"
 	}
 
@@ -150,37 +152,37 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 	return []byte(s), nil
 }
 
-func tableForDiff(out Root) string {
+func tableForDiff(out Root, opts Options) string {
 	t := table.NewWriter()
 	t.SetStyle(table.StyleBold)
 	t.Style().Format.Header = text.FormatDefault
 	t.AppendHeader(table.Row{
-		"Name",
+		"Project",
 		"Previous",
 		"New",
 		"Diff",
 	})
 
 	t.SetColumnConfigs([]table.ColumnConfig{
-		{Name: "Name", WidthMin: 50},
-		{Name: "Previous", WidthMin: 10},
-		{Name: "New", WidthMin: 10},
+		{Name: "Project", WidthMin: 50},
+		{Name: "Previous", WidthMin: 10, Align: text.AlignRight},
+		{Name: "New", WidthMin: 10, Align: text.AlignRight},
 		{Name: "Diff", WidthMin: 10},
 	})
 
-	for _, r := range out.Projects {
-		change := formatMarkdownCostChange(out.Currency, r.PastBreakdown.TotalMonthlyCost, r.Breakdown.TotalMonthlyCost, false)
-		if change == "" || change == "$0" {
+	for _, project := range out.Projects {
+		if !showProject(project, opts) {
 			continue
 		}
 
-		if strings.Contains(change, "+") {
-			change = color.RedString(change)
-		} else {
-			change = color.GreenString(change)
-		}
-
-		t.AppendRow(table.Row{r.Name, formatCost(out.Currency, r.PastBreakdown.TotalMonthlyCost), formatCost(out.Currency, r.Breakdown.TotalMonthlyCost), change})
+		t.AppendRow(
+			table.Row{
+				truncateMiddle(project.Name, 64, "..."),
+				formatCost(out.Currency, project.PastBreakdown.TotalMonthlyCost),
+				formatCost(out.Currency, project.Breakdown.TotalMonthlyCost),
+				formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyCost, project.Breakdown.TotalMonthlyCost, false),
+			},
+		)
 
 	}
 

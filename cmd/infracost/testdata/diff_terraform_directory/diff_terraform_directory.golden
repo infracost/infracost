@@ -41,10 +41,13 @@ Amount:  +$743 ($0.00 → $743)
 ──────────────────────────────────
 Key: ~ changed, + added, - removed
 
+──────────────────────────────────
+Infracost estimate: monthly cost will increase by $743 ↑
+
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┓
-┃ Name                                               ┃ Previous   ┃ New        ┃ Diff       ┃
+┃ Project                                            ┃ Previous   ┃ New        ┃ Diff       ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ infracost/infracost/examples/terraform             ┃ $0.00      ┃ $743       ┃ +$743      ┃
+┃ infracost/infracost/examples/terraform             ┃      $0.00 ┃       $743 ┃ +$743      ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 2 cloud resources were detected:
