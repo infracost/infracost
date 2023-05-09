@@ -169,27 +169,7 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 		},
 		"formatCostChangeSentence": formatCostChangeSentence,
 		"showProject": func(p Project) bool {
-			if p.Metadata.HasErrors() {
-				return false
-			}
-
-			if opts.ShowOnlyChanges {
-				// only return true if the project has code changes so the table can also show
-				// project that have cost changes.
-				if p.Metadata.VCSCodeChanged != nil && *p.Metadata.VCSCodeChanged {
-					return true
-				}
-			}
-
-			if opts.ShowAllProjects {
-				return true
-			}
-
-			if p.Diff == nil || len(p.Diff.Resources) == 0 { // has no diff
-				return false
-			}
-
-			return true // has diff
+			return showProject(p, opts)
 		},
 		"validProjects": func() Projects {
 			var valid Projects

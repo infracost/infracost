@@ -1,3 +1,4 @@
+──────────────────────────────────
 Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
 
 + aws_instance.web_app
@@ -98,6 +99,15 @@ Amount:  +$1,485 ($0.00 → $1,485)
 
 ──────────────────────────────────
 Key: ~ changed, + added, - removed
+
+──────────────────────────────────
+Infracost estimate: monthly cost will increase by $1,485 ↑
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                                      ┃ Previous   ┃ New        ┃ Diff       ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infracost/testdata/example_plan.json ┃      $0.00 ┃     $1,485 ┃ +$1,485    ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 5 cloud resources were detected:
 ∙ 5 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

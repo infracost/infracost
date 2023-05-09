@@ -35,6 +35,7 @@
 <summary><strong>Infracost output</strong></summary>
 
 ```
+──────────────────────────────────
 Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
 
 + aws_instance.instance_2
@@ -135,13 +136,21 @@ Amount:  +$41 ($41 → $81)
 Percent: +100%
 
 ──────────────────────────────────
+Key: ~ changed, + added, - removed
 
+──────────────────────────────────
+Infracost estimate: monthly cost will increase by $41 (+50%) ↑
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                                          ┃ Previous   ┃ New        ┃ Diff         ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infraco...data/terraform_v0.14_plan.json ┃        $41 ┃        $81 ┃ +$41 (+100%) ┃
+┃ infracost/infracost/cmd/infraco...aform_v0.14_nochange_plan.json ┃        $41 ┃        $41 ┃ $0           ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 The following projects have no cost estimate changes: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_nochange_plan.json
 Run the following command to see their breakdown: infracost breakdown --path=/path/to/code
 
 ──────────────────────────────────
-Key: ~ changed, + added, - removed
-
 26 cloud resources were detected:
 ∙ 14 were estimated, 10 of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 12 were free:

@@ -5,7 +5,10 @@ import (
 	"strings"
 
 	"github.com/dustin/go-humanize"
+	"github.com/dustin/go-humanize/english"
 	"github.com/fatih/color"
+	"github.com/jedib0t/go-pretty/v6/table"
+	"github.com/jedib0t/go-pretty/v6/text"
 	"github.com/shopspring/decimal"
 
 	"github.com/infracost/infracost/internal/ui"
@@ -23,7 +26,8 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 	noDiffProjects := make([]string, 0)
 	erroredProjects := make([]string, 0)
 
-	for i, project := range out.Projects {
+	s += "──────────────────────────────────\n"
+	for _, project := range out.Projects {
 		if project.Metadata.HasErrors() {
 			erroredProjects = append(erroredProjects, project.LabelWithMetadata())
 			continue
@@ -37,10 +41,6 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 		if len(project.Diff.Resources) == 0 {
 			noDiffProjects = append(noDiffProjects, project.LabelWithMetadata())
 			continue
-		}
-
-		if i != 0 {
-			s += "──────────────────────────────────\n"
 		}
 
 		s += fmt.Sprintf("%s %s\n",
@@ -97,11 +97,22 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 		}
 
 		s += "\n\n"
+		s += "──────────────────────────────────\n"
+	}
+
+	hasDiffProjects := len(noDiffProjects)+len(erroredProjects) != len(out.Projects)
+
+	if hasDiffProjects {
+		s += fmt.Sprintf("Key: %s changed, %s added, %s removed",
+			opChar(UPDATED),
+			opChar(ADDED),
+			opChar(REMOVED),
+		)
+		s += "\n\n"
 	}
 
 	if len(erroredProjects) > 0 {
-		s += "──────────────────────────────────\n"
-		s += "\nThe following projects could not be evaluated: \n"
+		s += "The following projects could not be evaluated: \n"
 		for _, project := range erroredProjects {
 			s += project + "\n"
 		}
@@ -109,31 +120,73 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 		s += "\n\n"
 	}
 
-	if len(noDiffProjects) > 0 {
+	if hasDiffProjects && out.DiffTotalMonthlyCost != nil && out.DiffTotalMonthlyCost.Abs().GreaterThan(decimal.Zero) {
 		s += "──────────────────────────────────\n"
-		s += fmt.Sprintf("\nThe following projects have no cost estimate changes: %s", strings.Join(noDiffProjects, ", "))
-		s += fmt.Sprintf("\nRun the following command to see their breakdown: %s", ui.PrimaryString("infracost breakdown --path=/path/to/code"))
-		s += "\n\n"
+		s += fmt.Sprintf("Infracost estimate: %s\n\n", formatCostChangeSentence(out.Currency, out.PastTotalMonthlyCost, out.TotalMonthlyCost, false))
+		s += tableForDiff(out, opts)
+		s += "\n"
 	}
 
-	s += "──────────────────────────────────\n"
-	if len(noDiffProjects) != len(out.Projects) {
-		s += fmt.Sprintf("Key: %s changed, %s added, %s removed\n",
-			opChar(UPDATED),
-			opChar(ADDED),
-			opChar(REMOVED),
-		)
+	if len(noDiffProjects) > 0 {
+		if !hasDiffProjects && len(erroredProjects) > 0 {
+			s += "──────────────────────────────────\n"
+		}
+
+		if opts.ShowSkipped {
+			s += fmt.Sprintf("The following projects have no cost estimate changes: %s", strings.Join(noDiffProjects, ", "))
+			s += fmt.Sprintf("\nRun the following command to see their breakdown: %s", ui.PrimaryString("infracost breakdown --path=/path/to/code"))
+		} else {
+			s += fmt.Sprintf("%s had no cost estimate changes, rerun with --show-skipped to see details", english.Plural(len(noDiffProjects), "project", "projects"))
+		}
+
+		s += "\n\n"
+		s += "──────────────────────────────────"
 	}
 
 	unsupportedMsg := out.summaryMessage(opts.ShowSkipped)
 	if unsupportedMsg != "" {
-		if len(noDiffProjects) != len(out.Projects) {
-			s += "\n"
-		}
+		s += "\n"
 		s += unsupportedMsg
 	}
 
 	return []byte(s), nil
+}
+
+func tableForDiff(out Root, opts Options) string {
+	t := table.NewWriter()
+	t.SetStyle(table.StyleBold)
+	t.Style().Format.Header = text.FormatDefault
+	t.AppendHeader(table.Row{
+		"Project",
+		"Previous",
+		"New",
+		"Diff",
+	})
+
+	t.SetColumnConfigs([]table.ColumnConfig{
+		{Name: "Project", WidthMin: 50},
+		{Name: "Previous", WidthMin: 10, Align: text.AlignRight},
+		{Name: "New", WidthMin: 10, Align: text.AlignRight},
+		{Name: "Diff", WidthMin: 10},
+	})
+
+	for _, project := range out.Projects {
+		if !showProject(project, opts) {
+			continue
+		}
+
+		t.AppendRow(
+			table.Row{
+				truncateMiddle(project.Name, 64, "..."),
+				formatCost(out.Currency, project.PastBreakdown.TotalMonthlyCost),
+				formatCost(out.Currency, project.Breakdown.TotalMonthlyCost),
+				formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyCost, project.Breakdown.TotalMonthlyCost, false),
+			},
+		)
+
+	}
+
+	return t.Render()
 }
 
 func resourceToDiff(currency string, diffResource Resource, oldResource *Resource, newResource *Resource, isTopLevel bool) string {

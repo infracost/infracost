@@ -136,3 +136,27 @@ func truncateMiddle(s string, maxLen int, fill string) string {
 
 	return string(truncated)
 }
+
+func showProject(p Project, opts Options) bool {
+	if p.Metadata.HasErrors() {
+		return false
+	}
+
+	if opts.ShowOnlyChanges {
+		// only return true if the project has code changes so the table can also show
+		// project that have cost changes.
+		if p.Metadata.VCSCodeChanged != nil && *p.Metadata.VCSCodeChanged {
+			return true
+		}
+	}
+
+	if opts.ShowAllProjects {
+		return true
+	}
+
+	if p.Diff == nil || len(p.Diff.Resources) == 0 { // has no diff
+		return false
+	}
+
+	return true // has diff
+}

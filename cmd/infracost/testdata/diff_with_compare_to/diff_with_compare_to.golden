@@ -1,3 +1,4 @@
+──────────────────────────────────
 Project: infracost/infracost/cmd/infracost/testdata/diff_with_compare_to
 
 ~ aws_instance.web_app
@@ -31,6 +32,15 @@ Percent: -36%
 
 ──────────────────────────────────
 Key: ~ changed, + added, - removed
+
+──────────────────────────────────
+Infracost estimate: monthly cost will decrease by $743 (-36%) ↓
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━┓
+┃ Project                                                         ┃ Previous   ┃ New        ┃ Diff            ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infracost/testdata/diff_with_compare_to ┃     $2,046 ┃     $1,303 ┃ -$742.64 (-36%) ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━┛
 
 1 cloud resource was detected:
 ∙ 1 was estimated, it includes usage-based costs, see https://infracost.io/usage-file

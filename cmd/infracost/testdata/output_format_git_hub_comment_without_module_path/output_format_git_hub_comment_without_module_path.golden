@@ -54,13 +54,11 @@ Amount:  $0.00 ($41 → $41)
 Percent: 0%
 
 ──────────────────────────────────
-
-The following projects have no cost estimate changes: same_name_plan (Module path: dev)
-Run the following command to see their breakdown: infracost breakdown --path=/path/to/code
-
-──────────────────────────────────
 Key: ~ changed, + added, - removed
 
+1 project had no cost estimate changes, rerun with --show-skipped to see details
+
+──────────────────────────────────
 ```
 </details>
 

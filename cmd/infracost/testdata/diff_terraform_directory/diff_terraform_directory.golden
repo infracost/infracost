@@ -1,3 +1,4 @@
+──────────────────────────────────
 Project: infracost/infracost/examples/terraform
 
 + aws_instance.web_app
@@ -39,6 +40,15 @@ Amount:  +$743 ($0.00 → $743)
 
 ──────────────────────────────────
 Key: ~ changed, + added, - removed
+
+──────────────────────────────────
+Infracost estimate: monthly cost will increase by $743 ↑
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Previous   ┃ New        ┃ Diff       ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ infracost/infracost/examples/terraform             ┃      $0.00 ┃       $743 ┃ +$743      ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 2 cloud resources were detected:
 ∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
