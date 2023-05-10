@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"encoding/json"
 	"fmt"
+	"github.com/infracost/infracost/internal/providers/idem"
 	"os"
 	"path/filepath"
 	"sync"
@@ -88,6 +89,9 @@ func Detect(ctx *config.ProjectContext, includePastResources bool) (schema.Provi
 		return terraform.NewStateJSONProvider(ctx, includePastResources), nil
 	case "cloudformation":
 		return cloudformation.NewTemplateProvider(ctx, includePastResources), nil
+	case "idem":
+		return idem.NewTemplateProvider(ctx, includePastResources), nil
+
 	}
 
 	return nil, fmt.Errorf("could not detect path type for '%s'", path)
@@ -116,6 +120,10 @@ func validateProjectForHCL(ctx *config.ProjectContext) error {
 }
 
 func DetectProjectType(path string, forceCLI bool) string {
+	if isIdemJson(path) {
+		return "idem"
+	}
+
 	if isCloudFormationTemplate(path) {
 		return "cloudformation"
 	}
@@ -168,6 +176,28 @@ func isTerraformPlanJSON(path string) bool {
 	}
 
 	return jsonFormat.FormatVersion != "" && jsonFormat.PlannedValues != nil
+}
+
+func isIdemJson(path string) bool {
+	b, err := os.ReadFile(path)
+	if err != nil {
+		return false
+	}
+
+	type jsonFormat struct {
+		Tag      string      `json:"tag"`
+		Name     string      `json:"name"`
+		NewState interface{} `json:"new_state"`
+		OldState interface{} `json:"old_state"`
+	}
+
+	var jsonMap map[string]jsonFormat
+
+	err = json.Unmarshal(b, &jsonMap)
+	if err != nil {
+		return false
+	}
+	return true
 }
 
 func isTerraformStateJSON(path string) bool {
