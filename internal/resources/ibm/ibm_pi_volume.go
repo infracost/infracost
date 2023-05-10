@@ -1,6 +1,8 @@
 package ibm
 
 import (
+	"fmt"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
@@ -68,7 +70,7 @@ func (r *IbmPiVolume) BuildResource() *schema.Resource {
 	if r.VolumePool != "" {
 		// How am I supposed to guess?
 		costComponent := &schema.CostComponent{
-			Name:            "Price dependent upon volume pool settings",
+			Name:            fmt.Sprintf("Volume pool (%d GB, %s) Price dependent on volume pool settings", r.Size, r.Name),
 			Unit:            "Gigabyte Instance Hours",
 			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: q,
@@ -86,7 +88,7 @@ func (r *IbmPiVolume) BuildResource() *schema.Resource {
 	} else if r.AffinityPolicy == "affinity" {
 		// How am I supposed to guess?
 		costComponent := &schema.CostComponent{
-			Name:            "Price dependent upon affinity settings",
+			Name:            fmt.Sprintf("Volume (%d GB, %s) Price dependent on affinity settings", r.Size, r.Name),
 			Unit:            "Gigabyte Instance Hours",
 			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: q,
@@ -104,7 +106,7 @@ func (r *IbmPiVolume) BuildResource() *schema.Resource {
 	} else if r.Type == "tier1" || r.Type == "tier3" || r.Type == "standard" || r.Type == "ssd" {
 
 		costComponent := &schema.CostComponent{
-			Name:            "Price dependent upon affinity settings",
+			Name:            fmt.Sprintf("Volume (%d GB, %s, %s)", r.Size, r.Type, r.Name),
 			Unit:            "Gigabyte Instance Hours",
 			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: q,

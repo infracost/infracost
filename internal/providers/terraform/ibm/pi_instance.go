@@ -75,6 +75,7 @@ func newPiInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	memory := d.Get("pi_memory").Float()
 	storageType := d.Get("pi_storage_type").String()
 	profile := d.Get("pi_sap_profile_id").String()
+	name := d.Get("pi_instance_name").String()
 
 	var os int64 = -1
 	var isLegacyIBMiImageVersion bool
@@ -106,6 +107,7 @@ func newPiInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 	configuration["region"] = region
 	configuration["storageType"] = storageType
 	configuration["image"] = imageName
+	configuration["name"] = name
 
 	if profile != "" {
 		configuration["profile"] = profile

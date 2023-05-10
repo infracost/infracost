@@ -31,10 +31,19 @@ func newIbmPiVolume(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 	configuration["region"] = region
 	configuration["profile"] = r.Type
 	configuration["capacity"] = r.Size
-	configuration["volume_pool"] = r.VolumePool
-	configuration["affinity"] = r.AffinityPolicy
-	configuration["affinity_instance"] = r.AffinityInstance
-	configuration["affinity_volume"] = r.AffinityVolume
+
+	if r.VolumePool != "" {
+		configuration["volume_pool"] = r.VolumePool
+	}
+	if r.AffinityPolicy != "" {
+		configuration["affinity"] = r.AffinityPolicy
+	}
+	if r.AffinityInstance != "" {
+		configuration["affinity_instance"] = r.AffinityInstance
+	}
+	if r.AffinityVolume != "" {
+		configuration["affinity_volume"] = r.AffinityVolume
+	}
 
 	SetCatalogMetadata(d, d.Type, configuration)
 
