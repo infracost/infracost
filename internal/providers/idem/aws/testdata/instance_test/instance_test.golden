@@ -1,0 +1,17 @@
+
+ Name                                                      Monthly Qty  Unit                  Monthly Cost 
+                                                                                                           
+ create_instance                                                                                           
+ ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)               300  hours                        $3.48 
+ ├─ root_device_name                                                                                       
+ │  └─ Storage (general purpose SSD, gp2)                            8  GB                           $0.80 
+ ├─ ebs_block_device[0]                                                                                    
+ │  ├─ Storage (magnetic)                                          200  GB                          $10.00 
+ │  └─ I/O requests                                   Monthly cost depends on usage: $0.05 per 1M request  
+ └─ ebs_block_device[1]                                                                                    
+    ├─ Storage (magnetic)                                          200  GB                          $10.00 
+    └─ I/O requests                                   Monthly cost depends on usage: $0.05 per 1M request  
+                                                                                                           
+ OVERALL TOTAL                                                                                      $24.28 
+──────────────────────────────────
+No cloud resources were detected

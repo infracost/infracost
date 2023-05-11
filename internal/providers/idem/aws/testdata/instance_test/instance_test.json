@@ -1,0 +1,304 @@
+{
+  "aws.ec2.volume_|-ec2_volume_|-some-volume-ARN_|-present": {
+    "tag": "aws.ec2.volume_|-ec2_volume_|-some-volume-ARN_|-present",
+    "name": "some-volume-ARN",
+    "__id__": "ec2_volume",
+    "changes": {
+      "new": {
+        "name": "some-volume-ARN",
+        "availability_zone": "us-west-2a",
+        "encrypted": true,
+        "size": 200,
+        "snapshot_id": "some-snapshot-ARN",
+        "volume_type": "standard",
+        "tags": [
+          {
+            "Key": "name",
+            "Value": "some-volume-ARN"
+          }
+        ],
+        "resource_id": "resource_id_known_after_present"
+      }
+    },
+    "new_state": {
+      "name": "some-volume-ARN",
+      "availability_zone": "us-west-2a",
+      "encrypted": true,
+      "size": 200,
+      "snapshot_id": "some-snapshot-ARN",
+      "volume_type": "standard",
+      "tags": [
+        {
+          "Key": "name",
+          "Value": "some-volume-ARN"
+        }
+      ],
+      "resource_id": "resource_id_known_after_present"
+    },
+    "old_state": {
+      "name": "some-volume-ARN",
+      "availability_zone": "us-west-2a",
+      "encrypted": true,
+      "size": 200,
+      "snapshot_id": "some-snapshot-ARN",
+      "volume_type": "standard",
+      "tags": [
+        {
+          "Key": "name",
+          "Value": "some-volume-ARN"
+        }
+      ],
+      "resource_id": "resource_id_known_after_present"
+    },
+    "comment": [
+      "Would create aws.ec2.volume 'some-volume-ARN'"
+    ],
+    "rerun_data": null,
+    "result": true,
+    "esm_tag": "aws.ec2.volume_|-ec2_volume_|-some-volume-ARN_|-",
+    "__run_num": 4,
+    "total_seconds": 1.224289,
+    "sls_meta": {
+      "SLS": {},
+      "ID_DECS": {}
+    },
+    "ref": "states.aws.ec2.volume.present",
+    "acct_details": {
+      "attribute_value": "123456789012",
+      "attribute_key": "Account",
+      "provider": "AWS",
+      "region_name": "us-west-2"
+    }
+  },
+  "aws.ec2.network_interface_|-my_network_interface_|-my_network_interface_|-present": {
+    "tag": "aws.ec2.network_interface_|-my_network_interface_|-my_network_interface_|-present",
+    "name": "my_network_interface",
+    "__id__": "my_network_interface",
+    "changes": {
+      "new": {
+        "name": "my_network_interface",
+        "subnet_id": "fake-subnet",
+        "resource_id": null,
+        "client_token": null,
+        "description": null,
+        "groups": null,
+        "interface_type": null,
+        "default_ipv6_address": null,
+        "primary_ip_address": null,
+        "private_ip_addresses": null,
+        "ipv4_address_count": null,
+        "ipv4_prefix_count": null,
+        "ipv4_prefixes": null,
+        "ipv6_addresses": null,
+        "ipv6_address_count": null,
+        "ipv6_prefix_count": null,
+        "ipv6_prefixes": null,
+        "tags": null,
+        "availability_zone": null,
+        "mac_address": null,
+        "outpost_arn": null,
+        "owner_id": null,
+        "private_dns_name": null,
+        "requester_id": null,
+        "requester_managed": null,
+        "source_dest_check": null,
+        "status": null,
+        "vpc_id": null,
+        "deny_all_igw_traffic": null,
+        "ipv6_native": null,
+        "allocation_id": null,
+        "ip_owner_id": null,
+        "public_dns_name": null,
+        "public_ip": null,
+        "customer_owned_ip": null,
+        "carrier_ip": null,
+        "attachment_id": null,
+        "delete_on_termination": null,
+        "device_index": null,
+        "network_card_index": null,
+        "ena_srd_enabled": null,
+        "ena_srd_udp_enabled": null
+      }
+    },
+    "new_state": {
+      "name": "my_network_interface",
+      "subnet_id": "fake-subnet",
+      "resource_id": null,
+      "client_token": null,
+      "description": null,
+      "groups": null,
+      "interface_type": null,
+      "default_ipv6_address": null,
+      "primary_ip_address": null,
+      "private_ip_addresses": null,
+      "ipv4_address_count": null,
+      "ipv4_prefix_count": null,
+      "ipv4_prefixes": null,
+      "ipv6_addresses": null,
+      "ipv6_address_count": null,
+      "ipv6_prefix_count": null,
+      "ipv6_prefixes": null,
+      "tags": null,
+      "availability_zone": null,
+      "mac_address": null,
+      "outpost_arn": null,
+      "owner_id": null,
+      "private_dns_name": null,
+      "requester_id": null,
+      "requester_managed": null,
+      "source_dest_check": null,
+      "status": null,
+      "vpc_id": null,
+      "deny_all_igw_traffic": null,
+      "ipv6_native": null,
+      "allocation_id": null,
+      "ip_owner_id": null,
+      "public_dns_name": null,
+      "public_ip": null,
+      "customer_owned_ip": null,
+      "carrier_ip": null,
+      "attachment_id": null,
+      "delete_on_termination": null,
+      "device_index": null,
+      "network_card_index": null,
+      "ena_srd_enabled": null,
+      "ena_srd_udp_enabled": null
+    },
+    "old_state": null,
+    "comment": [
+      "Would create aws.ec2.network_interface 'my_network_interface'"
+    ],
+    "rerun_data": null,
+    "result": true,
+    "esm_tag": "aws.ec2.network_interface_|-my_network_interface_|-my_network_interface_|-",
+    "__run_num": 6,
+    "total_seconds": 0.279391,
+    "sls_meta": {
+      "SLS": {},
+      "ID_DECS": {}
+    },
+    "ref": "states.aws.ec2.network_interface.present",
+    "acct_details": {
+      "attribute_value": "123456789012",
+      "attribute_key": "Account",
+      "provider": "AWS",
+      "region_name": "us-west-2"
+    }
+  },
+  "aws.ec2.instance_|-create_instance_|-create_instance_|-present": {
+    "tag": "aws.ec2.instance_|-create_instance_|-create_instance_|-present",
+    "name": "create_instance",
+    "__id__": "create_instance",
+    "changes": {
+      "new": {
+        "name": "create_instance",
+        "image_id": "fake-ami",
+        "instance_type": "c3.large",
+        "subnet_id": "fake-subnet",
+        "network_interfaces": [
+          {
+            "network_interface_id": null,
+            "device_index": 123,
+            "network_card_index": 123
+          }
+        ],
+        "running": true,
+        "tags": {
+          "Name": "test-idem-cloud-demo"
+        },
+        "client_token": "optional-idempotence-token",
+        "block_device_mappings": [
+          {
+            "device_name": "/dev/sdh"
+          },
+          {
+            "volume_id": "resource_id_known_after_present"
+          },
+          {
+            "delete_on_termination": true
+          }
+        ]
+      }
+    },
+    "new_state": {
+      "name": "create_instance",
+      "image_id": "fake-ami",
+      "instance_type": "t2.micro",
+      "subnet_id": "fake-subnet",
+      "network_interfaces": [
+        {
+          "network_interface_id": null,
+          "device_index": 123,
+          "network_card_index": 123
+        }
+      ],
+      "running": true,
+      "tags": {
+        "Name": "test-idem-cloud-demo"
+      },
+      "client_token": "optional-idempotence-token",
+      "block_device_mappings": [
+        {
+          "device_name": "/dev/sdh",
+          "volume_id": "resource_id_known_after_present",
+          "delete_on_termination": true
+        },
+        {
+          "device_name": "/dev/sdk",
+          "volume_id": "resource_id_known_after_present",
+          "delete_on_termination": true
+        }
+      ]
+    },
+    "old_state": {
+      "name": "create_instance",
+      "image_id": "fake-ami",
+      "instance_type": "c3.large",
+      "subnet_id": "fake-subnet",
+      "network_interfaces": [
+        {
+          "network_interface_id": null,
+          "device_index": 123,
+          "network_card_index": 123
+        }
+      ],
+      "running": true,
+      "tags": {
+        "Name": "test-idem-cloud-demo"
+      },
+      "client_token": "optional-idempotence-token",
+      "block_device_mappings": [
+        {
+          "device_name": "/dev/sdh",
+          "volume_id": "resource_id_known_after_present",
+          "delete_on_termination": true
+        },
+        {
+          "device_name": "/dev/sdk",
+          "volume_id": "resource_id_known_after_present",
+          "delete_on_termination": true
+        }
+      ]
+    },
+    "comment": [
+      "Could not find Instance for 'create_instance' with existing idempotence token 'optional-idempotence-token'",
+      "Would create aws.ec2.instance 'create_instance'"
+    ],
+    "rerun_data": null,
+    "result": true,
+    "esm_tag": "aws.ec2.instance_|-create_instance_|-create_instance_|-",
+    "__run_num": 7,
+    "total_seconds": 0.615211,
+    "sls_meta": {
+      "SLS": {},
+      "ID_DECS": {}
+    },
+    "ref": "states.aws.ec2.instance.present",
+    "acct_details": {
+      "attribute_value": "123456789012",
+      "attribute_key": "Account",
+      "provider": "AWS",
+      "region_name": "us-west-2"
+    }
+  }
+}
