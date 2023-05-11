@@ -1,0 +1,592 @@
+{
+  "aws.ec2.volume_|-ec2_volume_|-some-volume-ARN_|-present": {
+    "tag": "aws.ec2.volume_|-ec2_volume_|-some-volume-ARN_|-present",
+    "name": "some-volume-ARN",
+    "__id__": "ec2_volume",
+    "changes": {
+      "new": {
+        "name": "some-volume-ARN",
+        "availability_zone": "us-west-2a",
+        "encrypted": true,
+        "size": 200,
+        "snapshot_id": "some-snapshot-ARN",
+        "volume_type": "standard",
+        "tags": [
+          {
+            "Key": "name",
+            "Value": "some-volume-ARN"
+          }
+        ],
+        "resource_id": "resource_id_known_after_present"
+      }
+    },
+    "new_state": {
+      "name": "some-volume-ARN",
+      "availability_zone": "us-west-2a",
+      "encrypted": true,
+      "size": 200,
+      "snapshot_id": "some-snapshot-ARN",
+      "volume_type": "standard",
+      "tags": [
+        {
+          "Key": "name",
+          "Value": "some-volume-ARN"
+        }
+      ],
+      "resource_id": "resource_id_known_after_present"
+    },
+    "old_state": {
+      "name": "some-volume-ARN",
+      "availability_zone": "us-west-2a",
+      "encrypted": true,
+      "size": 200,
+      "snapshot_id": "some-snapshot-ARN",
+      "volume_type": "standard",
+      "tags": [
+        {
+          "Key": "name",
+          "Value": "some-volume-ARN"
+        }
+      ],
+      "resource_id": "resource_id_known_after_present"
+    },
+    "comment": [
+      "Would create aws.ec2.volume 'some-volume-ARN'"
+    ],
+    "rerun_data": null,
+    "result": true,
+    "esm_tag": "aws.ec2.volume_|-ec2_volume_|-some-volume-ARN_|-",
+    "__run_num": 4,
+    "total_seconds": 1.224289,
+    "sls_meta": {
+      "SLS": {},
+      "ID_DECS": {}
+    },
+    "ref": "states.aws.ec2.volume.present",
+    "acct_details": {
+      "attribute_value": "123456789012",
+      "attribute_key": "Account",
+      "provider": "AWS",
+      "region_name": "us-west-2"
+    }
+  },
+  "aws.ec2.network_interface_|-my_network_interface_|-my_network_interface_|-present": {
+    "tag": "aws.ec2.network_interface_|-my_network_interface_|-my_network_interface_|-present",
+    "name": "my_network_interface",
+    "__id__": "my_network_interface",
+    "changes": {
+      "new": {
+        "name": "my_network_interface",
+        "subnet_id": "subnet-01f45e24f4cbd7939f",
+        "resource_id": null,
+        "client_token": null,
+        "description": null,
+        "groups": null,
+        "interface_type": null,
+        "default_ipv6_address": null,
+        "primary_ip_address": null,
+        "private_ip_addresses": null,
+        "ipv4_address_count": null,
+        "ipv4_prefix_count": null,
+        "ipv4_prefixes": null,
+        "ipv6_addresses": null,
+        "ipv6_address_count": null,
+        "ipv6_prefix_count": null,
+        "ipv6_prefixes": null,
+        "tags": null,
+        "availability_zone": null,
+        "mac_address": null,
+        "outpost_arn": null,
+        "owner_id": null,
+        "private_dns_name": null,
+        "requester_id": null,
+        "requester_managed": null,
+        "source_dest_check": null,
+        "status": null,
+        "vpc_id": null,
+        "deny_all_igw_traffic": null,
+        "ipv6_native": null,
+        "allocation_id": null,
+        "ip_owner_id": null,
+        "public_dns_name": null,
+        "public_ip": null,
+        "customer_owned_ip": null,
+        "carrier_ip": null,
+        "attachment_id": null,
+        "delete_on_termination": null,
+        "device_index": null,
+        "network_card_index": null,
+        "ena_srd_enabled": null,
+        "ena_srd_udp_enabled": null
+      }
+    },
+    "new_state": {
+      "name": "my_network_interface",
+      "subnet_id": "subnet-01f45e24f4cbd7939f",
+      "resource_id": null,
+      "client_token": null,
+      "description": null,
+      "groups": null,
+      "interface_type": null,
+      "default_ipv6_address": null,
+      "primary_ip_address": null,
+      "private_ip_addresses": null,
+      "ipv4_address_count": null,
+      "ipv4_prefix_count": null,
+      "ipv4_prefixes": null,
+      "ipv6_addresses": null,
+      "ipv6_address_count": null,
+      "ipv6_prefix_count": null,
+      "ipv6_prefixes": null,
+      "tags": null,
+      "availability_zone": null,
+      "mac_address": null,
+      "outpost_arn": null,
+      "owner_id": null,
+      "private_dns_name": null,
+      "requester_id": null,
+      "requester_managed": null,
+      "source_dest_check": null,
+      "status": null,
+      "vpc_id": null,
+      "deny_all_igw_traffic": null,
+      "ipv6_native": null,
+      "allocation_id": null,
+      "ip_owner_id": null,
+      "public_dns_name": null,
+      "public_ip": null,
+      "customer_owned_ip": null,
+      "carrier_ip": null,
+      "attachment_id": null,
+      "delete_on_termination": null,
+      "device_index": null,
+      "network_card_index": null,
+      "ena_srd_enabled": null,
+      "ena_srd_udp_enabled": null
+    },
+    "old_state": null,
+    "comment": [
+      "Would create aws.ec2.network_interface 'my_network_interface'"
+    ],
+    "rerun_data": null,
+    "result": true,
+    "esm_tag": "aws.ec2.network_interface_|-my_network_interface_|-my_network_interface_|-",
+    "__run_num": 6,
+    "total_seconds": 0.279391,
+    "sls_meta": {
+      "SLS": {},
+      "ID_DECS": {}
+    },
+    "ref": "states.aws.ec2.network_interface.present",
+    "acct_details": {
+      "attribute_value": "123456789012",
+      "attribute_key": "Account",
+      "provider": "AWS",
+      "region_name": "us-west-2"
+    }
+  },
+  "aws.ec2.instance_|-create_instance_|-create_instance_|-present": {
+    "tag": "aws.ec2.instance_|-create_instance_|-create_instance_|-present",
+    "name": "create_instance",
+    "__id__": "create_instance",
+    "changes": {
+      "new": {
+        "name": "create_instance",
+        "image_id": "ami-05ef2a3dc2b698863",
+        "instance_type": "c3.large",
+        "subnet_id": "subnet-01f45e24f4cbd7939f",
+        "network_interfaces": [
+          {
+            "network_interface_id": null,
+            "device_index": 123,
+            "network_card_index": 123
+          }
+        ],
+        "running": true,
+        "tags": {
+          "Name": "test-idem-cloud-demo"
+        },
+        "client_token": "optional-idempotence-token",
+        "block_device_mappings": [
+          {
+            "device_name": "/dev/sdh"
+          },
+          {
+            "volume_id": "resource_id_known_after_present"
+          },
+          {
+            "delete_on_termination": true
+          }
+        ],
+        "bootstrap": [
+          {
+            "heist_manager": "salt.minion"
+          }
+        ]
+      }
+    },
+    "new_state": {
+      "name": "create_instance",
+      "image_id": "ami-05ef2a3dc2b698863",
+      "instance_type": "t2.micro",
+      "subnet_id": "subnet-01f45e24f4cbd7939f",
+      "network_interfaces": [
+        {
+          "network_interface_id": null,
+          "device_index": 123,
+          "network_card_index": 123
+        }
+      ],
+      "running": true,
+      "tags": {
+        "Name": "test-idem-cloud-demo"
+      },
+      "client_token": "optional-idempotence-token",
+      "block_device_mappings": [
+        {
+          "device_name": "/dev/sdh",
+          "volume_id": "resource_id_known_after_present",
+          "delete_on_termination": true
+        },
+        {
+          "device_name": "/dev/sdk",
+          "volume_id": "resource_id_known_after_present",
+          "delete_on_termination": true
+        }
+      ],
+      "bootstrap": [
+        {
+          "heist_manager": "salt.minion"
+        }
+      ]
+    },
+    "old_state": {
+      "name": "create_instance",
+      "image_id": "ami-05ef2a3dc2b698863",
+      "instance_type": "c3.large",
+      "subnet_id": "subnet-01f45e24f4cbd7939f",
+      "network_interfaces": [
+        {
+          "network_interface_id": null,
+          "device_index": 123,
+          "network_card_index": 123
+        }
+      ],
+      "running": true,
+      "tags": {
+        "Name": "test-idem-cloud-demo"
+      },
+      "client_token": "optional-idempotence-token",
+      "block_device_mappings": [
+        {
+          "device_name": "/dev/sdh",
+          "volume_id": "resource_id_known_after_present",
+          "delete_on_termination": true
+        },
+        {
+          "device_name": "/dev/sdk",
+          "volume_id": "resource_id_known_after_present",
+          "delete_on_termination": true
+        }
+      ],
+      "bootstrap": [
+        {
+          "heist_manager": "salt.minion"
+        }
+      ]
+    },
+    "comment": [
+      "Could not find Instance for 'create_instance' with existing idempotence token 'optional-idempotence-token'",
+      "Would create aws.ec2.instance 'create_instance'"
+    ],
+    "rerun_data": null,
+    "result": true,
+    "esm_tag": "aws.ec2.instance_|-create_instance_|-create_instance_|-",
+    "__run_num": 7,
+    "total_seconds": 0.615211,
+    "sls_meta": {
+      "SLS": {},
+      "ID_DECS": {}
+    },
+    "ref": "states.aws.ec2.instance.present",
+    "acct_details": {
+      "attribute_value": "123456789012",
+      "attribute_key": "Account",
+      "provider": "AWS",
+      "region_name": "us-west-2"
+    }
+  },
+  "aws.ec2.security_group_|-elasticache-idem-sre-demo.aws_security_group.elasticache-sg_|-elasticache-idem-test-elasticache-idem-sre-demo_|-present": {
+    "tag": "aws.ec2.security_group_|-elasticache-idem-sre-demo.aws_security_group.elasticache-sg_|-elasticache-idem-test-elasticache-idem-sre-demo_|-present",
+    "name": "elasticache-idem-test-elasticache-idem-sre-demo",
+    "__id__": "elasticache-idem-sre-demo.aws_security_group.elasticache-sg",
+    "changes": {
+      "new": {
+        "name": "elasticache-idem-test-elasticache-idem-sre-demo",
+        "description": "For elasticache cluster elasticache-idem-sre-demo in env idem-test",
+        "vpc_id": "vpc-0ce46fsf1fsfb1c19c652",
+        "resource_id": "resource_id_known_after_present"
+      }
+    },
+    "new_state": {
+      "name": "elasticache-idem-test-elasticache-idem-sre-demo",
+      "description": "For elasticache cluster elasticache-idem-sre-demo in env idem-test",
+      "vpc_id": "vpc-0ce46fsf1fsfb1c19c652",
+      "resource_id": "resource_id_known_after_present"
+    },
+    "old_state": null,
+    "comment": [
+      "Would create aws.ec2.security_group elasticache-idem-test-elasticache-idem-sre-demo"
+    ],
+    "rerun_data": null,
+    "result": true,
+    "esm_tag": "aws.ec2.security_group_|-elasticache-idem-sre-demo.aws_security_group.elasticache-sg_|-elasticache-idem-test-elasticache-idem-sre-demo_|-",
+    "__run_num": 4,
+    "total_seconds": 1.1125,
+    "sls_meta": {
+      "SLS": {},
+      "ID_DECS": {}
+    },
+    "ref": "states.aws.ec2.security_group.present",
+    "acct_details": {
+      "attribute_value": "123456789012",
+      "attribute_key": "Account",
+      "provider": "AWS",
+      "region_name": "us-west-2"
+    }
+  },
+  "aws.ec2.security_group_rule_|-elasticache-idem-sre-demo.aws_security_group_rule.elasticache-sg-1_|-elasticache-idem-sre-demo.aws_security_group_rule.elasticache-sg-1_|-present": {
+    "tag": "aws.ec2.security_group_rule_|-elasticache-idem-sre-demo.aws_security_group_rule.elasticache-sg-1_|-elasticache-idem-sre-demo.aws_security_group_rule.elasticache-sg-1_|-present",
+    "name": "elasticache-idem-sre-demo.aws_security_group_rule.elasticache-sg-1",
+    "__id__": "elasticache-idem-sre-demo.aws_security_group_rule.elasticache-sg-1",
+    "changes": {
+      "new": {
+        "name": "elasticache-idem-sre-demo.aws_security_group_rule.elasticache-sg-1",
+        "group_id": "resource_id_known_after_present",
+        "ip_protocol": "tcp",
+        "from_port": 6379,
+        "to_port": 6379,
+        "is_egress": false,
+        "cidr_ipv4": "192.10.0.0/16",
+        "tags": {},
+        "resource_id": "resource_id_known_after_present"
+      }
+    },
+    "new_state": {
+      "name": "elasticache-idem-sre-demo.aws_security_group_rule.elasticache-sg-1",
+      "group_id": "resource_id_known_after_present",
+      "ip_protocol": "tcp",
+      "from_port": 6379,
+      "to_port": 6379,
+      "is_egress": false,
+      "cidr_ipv4": "192.10.0.0/16",
+      "tags": {},
+      "resource_id": "resource_id_known_after_present"
+    },
+    "old_state": null,
+    "comment": [
+      "Would create aws.ec2.security_group_rule 'elasticache-idem-sre-demo.aws_security_group_rule.elasticache-sg-1'"
+    ],
+    "rerun_data": null,
+    "result": true,
+    "esm_tag": "aws.ec2.security_group_rule_|-elasticache-idem-sre-demo.aws_security_group_rule.elasticache-sg-1_|-elasticache-idem-sre-demo.aws_security_group_rule.elasticache-sg-1_|-",
+    "__run_num": 6,
+    "total_seconds": 0.665208,
+    "sls_meta": {
+      "SLS": {},
+      "ID_DECS": {}
+    },
+    "ref": "states.aws.ec2.security_group_rule.present",
+    "acct_details": {
+      "attribute_value": "123456789012",
+      "attribute_key": "Account",
+      "provider": "AWS",
+      "region_name": "us-west-2"
+    }
+  },
+  "aws.elasticache.replication_group_|-elasticache-idem-sre-demo.aws_elasticache_replication_group.this-0_|-elasticache-idem-sre-demo_|-present": {
+    "tag": "aws.elasticache.replication_group_|-elasticache-idem-sre-demo.aws_elasticache_replication_group.this-0_|-elasticache-idem-sre-demo_|-present",
+    "name": "elasticache-idem-sre-demo",
+    "__id__": "elasticache-idem-sre-demo.aws_elasticache_replication_group.this-0",
+    "changes": {
+      "new": {
+        "name": "elasticache-idem-sre-demo",
+        "replication_group_id": "elasticache-idem-sre-demo",
+        "replication_group_description": "elasticache-idem-sre-demo replication group",
+        "engine": "Redis",
+        "cache_node_type": "cache.t2.micro",
+        "cache_subnet_group_name": "elasticache-subnet-group-idem-sre-demo",
+        "security_group_ids": [
+          "resource_id_known_after_present"
+        ],
+        "automatic_failover_enabled": true,
+        "num_node_groups": 1,
+        "replicas_per_node_group": 2,
+        "engine_version": "6.2",
+        "cache_parameter_group_name": "elasticache-paramter-group-idem-sre-demo-terraform",
+        "preferred_maintenance_window": "mon:07:07-mon:08:07",
+        "port": 6379,
+        "snapshot_retention_limit": 7,
+        "snapshot_window": "05:30-06:30",
+        "transit_encryption_enabled": true,
+        "at_rest_encryption_enabled": true,
+        "resource_id": "resource_id_known_after_present"
+      }
+    },
+    "new_state": {
+      "name": "elasticache-idem-sre-demo",
+      "replication_group_id": "elasticache-idem-sre-demo",
+      "replication_group_description": "elasticache-idem-sre-demo replication group",
+      "engine": "Redis",
+      "cache_node_type": "cache.t2.micro",
+      "cache_subnet_group_name": "elasticache-subnet-group-idem-sre-demo",
+      "security_group_ids": [
+        "resource_id_known_after_present"
+      ],
+      "automatic_failover_enabled": true,
+      "num_node_groups": 1,
+      "replicas_per_node_group": 2,
+      "engine_version": "6.2",
+      "cache_parameter_group_name": "elasticache-paramter-group-idem-sre-demo-terraform",
+      "preferred_maintenance_window": "mon:07:07-mon:08:07",
+      "port": 6379,
+      "snapshot_retention_limit": 7,
+      "snapshot_window": "05:30-06:30",
+      "transit_encryption_enabled": true,
+      "at_rest_encryption_enabled": true,
+      "resource_id": "resource_id_known_after_present"
+    },
+    "old_state": null,
+    "comment": [
+      "Would create aws.elasticache.replication_group 'elasticache-idem-sre-demo'"
+    ],
+    "rerun_data": null,
+    "result": true,
+    "esm_tag": "aws.elasticache.replication_group_|-elasticache-idem-sre-demo.aws_elasticache_replication_group.this-0_|-elasticache-idem-sre-demo_|-",
+    "__run_num": 7,
+    "total_seconds": 0.229489,
+    "sls_meta": {
+      "SLS": {},
+      "ID_DECS": {}
+    },
+    "ref": "states.aws.elasticache.replication_group.present",
+    "acct_details": {
+      "attribute_value": "123456789012",
+      "attribute_key": "Account",
+      "provider": "AWS",
+      "region_name": "us-west-2"
+    }
+  },
+  "aws.ec2.nat_gateway_|-elasticache-idem-sre-demo.my-nat-gateway_|-elasticache-idem-sre-demo.my-nat-gateway_|-present": {
+    "sls_|-elasticache-idem-sre-demo_|-elasticache-idem-sre-demo_|-run": {
+      "tag": "sls_|-elasticache-idem-sre-demo_|-elasticache-idem-sre-demo_|-run",
+      "name": "elasticache-idem-sre-demo",
+      "__id__": "elasticache-idem-sre-demo",
+      "changes": {},
+      "new_state": {
+        "Status": "Added 1 states to be run.",
+        "is_sls_run": true
+      },
+      "old_state": null,
+      "comment": [],
+      "rerun_data": null,
+      "result": true,
+      "esm_tag": "sls_|-elasticache-idem-sre-demo_|-elasticache-idem-sre-demo_|-",
+      "__run_num": 1,
+      "start_time": "2023-03-17 17:35:18.489045",
+      "total_seconds": 0.020286,
+      "sls_meta": {
+        "SLS": {},
+        "ID_DECS": {}
+      },
+      "ref": "states.sls.run",
+      "acct_details": {}
+    },
+    "tag": "aws.ec2.nat_gateway_|-elasticache-idem-sre-demo.my-nat-gateway_|-elasticache-idem-sre-demo.my-nat-gateway_|-present",
+    "name": "elasticache-idem-sre-demo.my-nat-gateway",
+    "__id__": "elasticache-idem-sre-demo.my-nat-gateway",
+    "changes": {
+      "new": {
+        "subnet_id": "subnet-01f45e24f4cbd7939f",
+        "name": "elasticache-idem-sre-demo.my-nat-gateway",
+        "tags": {
+          "Name": "test-nat-gateway"
+        },
+        "connectivity_type": "private",
+        "resource_id": "resource_id_known_after_present"
+      }
+    },
+    "new_state": {
+      "subnet_id": "subnet-01f45e24f4cbd7939f",
+      "name": "elasticache-idem-sre-demo.my-nat-gateway",
+      "tags": {
+        "Name": "test-nat-gateway"
+      },
+      "connectivity_type": "private",
+      "resource_id": "resource_id_known_after_present"
+    },
+    "old_state": null,
+    "comment": [
+      "Would create aws.ec2.nat_gateway 'elasticache-idem-sre-demo.my-nat-gateway'"
+    ],
+    "rerun_data": null,
+    "result": true,
+    "esm_tag": "aws.ec2.nat_gateway_|-elasticache-idem-sre-demo.my-nat-gateway_|-elasticache-idem-sre-demo.my-nat-gateway_|-",
+    "__run_num": 2,
+    "total_seconds": 0.265825,
+    "sls_meta": {
+      "SLS": {},
+      "ID_DECS": {}
+    },
+    "ref": "states.aws.ec2.nat_gateway.present",
+    "acct_details": {
+      "attribute_value": "123456789012",
+      "attribute_key": "Account",
+      "provider": "AWS",
+      "region_name": "us-west-2"
+    }
+  },
+  "aws.s3.bucket_|-aws_s3_bucket.bucket_|-idem-test_|-present": {
+    "tag": "aws.s3.bucket_|-aws_s3_bucket.bucket_|-idem-test_|-present",
+    "name": "idem-test",
+    "__id__": "aws_s3_bucket.bucket",
+    "changes": {
+      "new": {
+        "acl": "private",
+        "name": "idem-test",
+        "create_bucket_configuration": {
+          "LocationConstraint": "us-west-2"
+        },
+        "resource_id": "resource_id_known_after_present"
+      }
+    },
+    "new_state": {
+      "acl": "private",
+      "name": "idem-test",
+      "create_bucket_configuration": {
+        "LocationConstraint": "us-west-2"
+      },
+      "resource_id": "resource_id_known_after_present"
+    },
+    "old_state": null,
+    "comment": [
+      "Would create aws.s3.bucket 'idem-test'"
+    ],
+    "rerun_data": null,
+    "result": true,
+    "esm_tag": "aws.s3.bucket_|-aws_s3_bucket.bucket_|-idem-test_|-",
+    "__run_num": 1,
+    "total_seconds": 1.125566,
+    "sls_meta": {
+      "SLS": {},
+      "ID_DECS": {}
+    },
+    "ref": "states.aws.s3.bucket.present",
+    "acct_details": {
+      "attribute_value": "123456789012",
+      "attribute_key": "Account",
+      "provider": "AWS",
+      "region_name": "us-west-2"
+    }
+  }
+}
