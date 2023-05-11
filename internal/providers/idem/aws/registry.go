@@ -43,7 +43,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	// GetElastiCacheClusterItem(),
 	GetElastiCacheReplicationGroupItem(),
 	// GetElasticsearchDomainRegistryItem(),
-	// GetELBRegistryItem(),
+	GetELBRegistryItem(),
 	// GetFSXWindowsFSRegistryItem(),
 	GetInstanceRegistryItem(),
 	// GetLambdaFunctionRegistryItem(),
