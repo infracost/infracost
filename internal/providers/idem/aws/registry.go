@@ -35,7 +35,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	// GetEC2ClientVPNNetworkAssociationRegistryItem(),
 	// GetEC2TrafficMirroSessionRegistryItem(),
 	// GetEC2TransitGatewayPeeringAttachmentRegistryItem(),
-	// GetEC2TransitGatewayVpcAttachmentRegistryItem(),
+	GetEC2TransitGatewayVpcAttachmentRegistryItem(),
 	// GetECRRegistryItem(),
 	// GetECSServiceRegistryItem(),
 	// GetEFSFileSystemRegistryItem(),
