@@ -1,0 +1,5 @@
+version: 0.1
+resource_usage:
+  create_instance:
+    monthly_hrs: 300
+    vcpu_count: 2

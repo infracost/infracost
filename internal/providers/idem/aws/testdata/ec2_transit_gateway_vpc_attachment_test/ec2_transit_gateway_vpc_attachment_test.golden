@@ -1,0 +1,11 @@
+
+ Name                               Monthly Qty  Unit            Monthly Cost 
+                                                                              
+ test_transit_gateway_attachment                                              
+ ├─ Transit gateway attachment              730  hours                 $36.50 
+ └─ Data processed                Monthly cost depends on usage: $0.02 per GB 
+                                                                              
+ OVERALL TOTAL                                                         $36.50 
+──────────────────────────────────
+1 cloud resource was detected:
+∙ 1 was estimated
