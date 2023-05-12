@@ -1,0 +1,5 @@
+version: 0.1
+resource_usage:
+  config_recorder:
+    monthly_config_items: 1000
+    monthly_custom_config_items: 2000

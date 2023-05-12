@@ -1,0 +1,58 @@
+{
+    "aws.elb.load_balancer_|-test_load-balancer_name_|-test_load-balancer_name_|-present": {
+        "tag": "aws.elb.load_balancer_|-test_load-balancer_name_|-test_load-balancer_name_|-present",
+        "name": "my-load-balancer",
+        "__id__": "test_load-balancer_name",
+        "changes": {
+            "new": {
+                "name": "my-load-balancer",
+                "subnets": [
+                    "subnet-15aaab61"
+                ],
+                "security_groups": [
+                    "sg-a61988c3"
+                ],
+                "scheme": "internal",
+                "tags": {
+                    "name": "load-balancer-name"
+                },
+                "resource_id": "resource_id_known_after_present"
+            }
+        },
+        "new_state": {
+            "name": "my-load-balancer",
+            "subnets": [
+                "subnet-15aaab61"
+            ],
+            "security_groups": [
+                "sg-a61988c3"
+            ],
+            "scheme": "internal",
+            "tags": {
+                "name": "load-balancer-name"
+            },
+            "resource_id": "resource_id_known_after_present"
+        },
+        "old_state": null,
+        "comment": [
+            "Would create aws.elb.load_balancer 'my-load-balancer'"
+        ],
+        "rerun_data": null,
+        "result": true,
+        "esm_tag": "aws.elb.load_balancer_|-test_load-balancer_name_|-test_load-balancer_name_|-",
+        "__run_num": 1,
+        "start_time": "2023-05-11 14:44:22.162197",
+        "total_seconds": 1.230388,
+        "sls_meta": {
+            "SLS": {},
+            "ID_DECS": {}
+        },
+        "ref": "states.aws.elb.load_balancer.present",
+        "acct_details": {
+            "attribute_value": "740563969943",
+            "attribute_key": "Account",
+            "provider": "AWS",
+            "region_name": "us-west-2"
+        }
+    }
+}
