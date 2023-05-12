@@ -45,6 +45,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	// GetElasticsearchDomainRegistryItem(),
 	GetELBRegistryItem(),
 	// GetFSXWindowsFSRegistryItem(),
+	GetFlowLogRegistryItem(),
 	GetInstanceRegistryItem(),
 	// GetLambdaFunctionRegistryItem(),
 	// GetLBRegistryItem(),
