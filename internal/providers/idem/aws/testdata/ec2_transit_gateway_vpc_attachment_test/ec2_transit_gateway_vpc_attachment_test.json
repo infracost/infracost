@@ -1,0 +1,49 @@
+{
+    "aws.ec2.transit_gateway_vpc_attachment_|-test_transit_gateway_attachment_|-test_transit_gateway_attachment_|-present": {
+        "tag": "aws.ec2.transit_gateway_vpc_attachment_|-test_transit_gateway_attachment_|-test_transit_gateway_attachment_|-present",
+        "name": "test_transit_gateway_attachment",
+        "__id__": "test_transit_gateway_attachment",
+        "changes": {
+            "new": {
+                "name": "test_transit_gateway_attachment",
+                "transit_gateway": "tgw-123456",
+                "vpc_id": "vpc-123456",
+                "subnet_ids": [
+                    "subnet-123456",
+                    "subnet-654321"
+                ],
+                "resource_id": "resource_id_known_after_present"
+            }
+        },
+        "new_state": {
+            "name": "test_transit_gateway_attachment",
+            "transit_gateway": "tgw-123456",
+            "vpc_id": "vpc-123456",
+            "subnet_ids": [
+                "subnet-123456",
+                "subnet-654321"
+            ],
+            "resource_id": "resource_id_known_after_present"
+        },
+        "old_state": null,
+        "comment": [
+            "Would create aws.ec2.transit_gateway_vpc_attachment test_transit_gateway_attachment"
+        ],
+        "rerun_data": null,
+        "result": true,
+        "esm_tag": "aws.ec2.transit_gateway_vpc_attachment_|-test_transit_gateway_attachment_|-test_transit_gateway_attachment_|-",
+        "__run_num": 1,
+        "total_seconds": 1.93189,
+        "sls_meta": {
+            "SLS": {},
+            "ID_DECS": {}
+        },
+        "ref": "states.aws.ec2.transit_gateway_vpc_attachment.present",
+        "acct_details": {
+            "attribute_value": "123456789012",
+            "attribute_key": "Account",
+            "provider": "AWS",
+            "region_name": "us-west-2"
+        }
+    }
+}
