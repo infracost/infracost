@@ -1,0 +1,19 @@
+
+ Name                           Monthly Qty  Unit            Monthly Cost 
+                                                                          
+ aws_eip.nat_eip                                                          
+ └─ IP address (if unused)              730  hours                  $3.65 
+                                                                          
+ aws_nat_gateway.nat_gateway                                              
+ ├─ NAT gateway                         730  hours                  $0.00 
+ └─ Data processed            Monthly cost depends on usage: $0.00 per GB 
+                                                                          
+ OVERALL TOTAL                                                      $3.65 
+──────────────────────────────────
+2 cloud resources were detected:
+∙ 2 were estimated, 1 of which usage-based costs, see https://infracost.io/usage-file
+Logs:
+
+level=warning msg="Multiple products with prices found for aws_eip.nat_eip IP address (if unused), using the first product"
+level=warning msg="No products found for aws_nat_gateway.nat_gateway Data processed, using 0.00"
+level=warning msg="No products found for aws_nat_gateway.nat_gateway NAT gateway, using 0.00"

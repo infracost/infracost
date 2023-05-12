@@ -1,0 +1,10 @@
+
+ Name              Monthly Qty  Unit      Monthly Cost 
+                                                       
+ certificate-test                                      
+ └─ Certificate              1  requests         $0.75 
+                                                       
+ OVERALL TOTAL                                   $0.75 
+──────────────────────────────────
+1 cloud resource was detected:
+∙ 1 was estimated
