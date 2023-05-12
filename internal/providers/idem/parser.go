@@ -119,16 +119,23 @@ func (p *Parser) parseResourceData(parsed gjson.Result, parsePrior bool) map[str
 		if t == "" {
 			return true
 		}
-		v := r.Get("new_state")
+		var val gjson.Result
+
 		if parsePrior {
-			v = r.Get("old_state")
+			val = r.Get("old_state")
+		} else {
+			val = r.Get("new_state")
 		}
 
-		v = schema.AddRawValue(v, "region", r.Get("acct_details.region_name").String())
+		if val.Type == gjson.Null {
+			return true
+		}
 
-		tags := parseTags(t, v)
+		val = schema.AddRawValue(val, "region", r.Get("acct_details.region_name").String())
 
-		resources[addr] = schema.NewResourceData(t, provider, addr, tags, v)
+		tags := parseTags(t, val)
+
+		resources[addr] = schema.NewResourceData(t, provider, addr, tags, val)
 		return true
 	})
 
