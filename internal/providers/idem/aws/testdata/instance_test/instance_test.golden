@@ -14,4 +14,8 @@
                                                                                                            
  OVERALL TOTAL                                                                                      $24.28 
 ──────────────────────────────────
-No cloud resources were detected
+3 cloud resources were detected:
+∙ 1 was estimated
+∙ 2 are not supported yet, see https://infracost.io/requested-resources:
+  ∙ 1 x states.aws.ec2.network_interface.present
+  ∙ 1 x states.aws.ec2.volume.present
