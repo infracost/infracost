@@ -1,0 +1,11 @@
+
+ Name                  Monthly Qty  Unit  Monthly Cost 
+                                                       
+ fargate01                                             
+ ├─ Per GB per hour              1  GB           $3.24 
+ └─ Per vCPU per hour            1  CPU         $29.55 
+                                                       
+ OVERALL TOTAL                                  $32.80 
+──────────────────────────────────
+1 cloud resource was detected:
+∙ 1 was estimated
