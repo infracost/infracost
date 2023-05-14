@@ -1,0 +1,60 @@
+{
+    "aws.efs.file_system_|-demo101_|-demo101_|-present": {
+        "tag": "aws.efs.file_system_|-demo101_|-demo101_|-present",
+        "name": "efs-name",
+        "__id__": "demo101",
+        "changes": {
+            "new": {
+                "name": "efs-name",
+                "performance_mode": "generalPurpose",
+                "encrypted": true,
+                "kms_key_id": "arn:aws:kms:us-west-1:5xxxxxx:key/597f1c02-94dc-4c88-9088-f9aca5e39cf7",
+                "creation_token": "xxx",
+                "throughput_mode": "bursting",
+                "provisioned_throughput_in_mibps": 500.0,
+                "availability_zone_name": "us-west-1b",
+                "backup": true,
+                "tags": {
+                    "Name": "efs-name"
+                },
+                "resource_id": "resource_id_known_after_present"
+            }
+        },
+        "new_state": {
+            "name": "efs-name",
+            "performance_mode": "generalPurpose",
+            "encrypted": true,
+            "kms_key_id": "arn:aws:kms:us-west-1:5xxxxxx:key/597f1c02-94dc-4c88-9088-f9aca5e39cf7",
+            "creation_token": "xxx",
+            "throughput_mode": "bursting",
+            "provisioned_throughput_in_mibps": 500.0,
+            "availability_zone_name": "us-west-1b",
+            "backup": true,
+            "tags": {
+                "Name": "efs-name"
+            },
+            "resource_id": "resource_id_known_after_present"
+        },
+        "old_state": null,
+        "comment": [
+            "Would create aws.efs.file_system 'efs-name'"
+        ],
+        "rerun_data": null,
+        "result": true,
+        "esm_tag": "aws.efs.file_system_|-demo101_|-demo101_|-",
+        "__run_num": 1,
+        "start_time": "2023-05-13 17:27:28.298364",
+        "total_seconds": 1.548833,
+        "sls_meta": {
+            "SLS": {},
+            "ID_DECS": {}
+        },
+        "ref": "states.aws.efs.file_system.present",
+        "acct_details": {
+            "attribute_value": "746014882121",
+            "attribute_key": "Account",
+            "provider": "AWS",
+            "region_name": "us-west-2"
+        }
+    }
+}
