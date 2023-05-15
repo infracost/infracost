@@ -1,0 +1,62 @@
+{
+    "aws.kms.key_|-idem_test_aws_kms_key_|-idem_test_aws_kms_key_|-present": {
+        "tag": "aws.kms.key_|-idem_test_aws_kms_key_|-idem_test_aws_kms_key_|-present",
+        "name": "idem_test_kms_key",
+        "__id__": "idem_test_aws_kms_key",
+        "changes": {
+            "new": {
+                "name": "idem_test_kms_key",
+                "resource_id": "key-idem_test_kms_key-resource_id",
+                "arn": "key-idem_test_kms_key-arn",
+                "description": "AWS KMS KEY",
+                "key_usage": "ENCRYPT_DECRYPT",
+                "key_spec": "SYMMETRIC_DEFAULT",
+                "origin": "AWS_KMS",
+                "multi_region": false,
+                "policy": "{\"Statement\": [{\"Action\": [\"kms:*\"], \"Effect\": \"Allow\", \"Principal\": {\"AWS\": \"arn:aws:iam::111122223333:root\"}, \"Resource\": \"*\", \"Sid\": \"EnableIAMUserPermissions\"}], \"Version\": \"2012-10-17\"}",
+                "bypass_policy_lockout_safety_check": false,
+                "enable_key_rotation": false,
+                "tags": {
+                    "provider": "idem"
+                }
+            }
+        },
+        "new_state": {
+            "name": "idem_test_kms_key",
+            "resource_id": "key-idem_test_kms_key-resource_id",
+            "arn": "key-idem_test_kms_key-arn",
+            "description": "AWS KMS KEY",
+            "key_usage": "ENCRYPT_DECRYPT",
+            "key_spec": "SYMMETRIC_DEFAULT",
+            "origin": "AWS_KMS",
+            "multi_region": false,
+            "policy": "{\"Statement\": [{\"Action\": [\"kms:*\"], \"Effect\": \"Allow\", \"Principal\": {\"AWS\": \"arn:aws:iam::111122223333:root\"}, \"Resource\": \"*\", \"Sid\": \"EnableIAMUserPermissions\"}], \"Version\": \"2012-10-17\"}",
+            "bypass_policy_lockout_safety_check": false,
+            "enable_key_rotation": false,
+            "tags": {
+                "provider": "idem"
+            }
+        },
+        "old_state": null,
+        "comment": [
+            "Would create aws.kms.key idem_test_kms_key"
+        ],
+        "rerun_data": null,
+        "result": true,
+        "esm_tag": "aws.kms.key_|-idem_test_aws_kms_key_|-idem_test_aws_kms_key_|-",
+        "__run_num": 1,
+        "start_time": "2023-05-12 17:24:29.512421",
+        "total_seconds": 1.581187,
+        "sls_meta": {
+            "SLS": {},
+            "ID_DECS": {}
+        },
+        "ref": "states.aws.kms.key.present",
+        "acct_details": {
+            "attribute_value": "746014882121",
+            "attribute_key": "Account",
+            "provider": "AWS",
+            "region_name": "us-west-2"
+        }
+    }
+}

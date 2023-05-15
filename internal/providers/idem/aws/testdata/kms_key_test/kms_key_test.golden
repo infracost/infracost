@@ -1,0 +1,13 @@
+
+ Name                                       Monthly Qty  Unit                    Monthly Cost 
+                                                                                              
+ idem_test_kms_key                                                                            
+ ├─ Customer master key                               1  months                         $1.00 
+ ├─ Requests                          Monthly cost depends on usage: $0.03 per 10k requests   
+ ├─ ECC GenerateDataKeyPair requests  Monthly cost depends on usage: $0.10 per 10k requests   
+ └─ RSA GenerateDataKeyPair requests  Monthly cost depends on usage: $0.10 per 10k requests   
+                                                                                              
+ OVERALL TOTAL                                                                          $1.00 
+──────────────────────────────────
+1 cloud resource was detected:
+∙ 1 was estimated

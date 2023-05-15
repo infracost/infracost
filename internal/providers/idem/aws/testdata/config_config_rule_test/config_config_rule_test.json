@@ -1,0 +1,91 @@
+{
+    "aws.config.rule_|-ec2-instance-no-public-ip_|-ec2-instance-no-public-ip_|-present": {
+        "tag": "aws.config.rule_|-ec2-instance-no-public-ip_|-ec2-instance-no-public-ip_|-present",
+        "name": "ec2-instance-no-public-ip",
+        "__id__": "ec2-instance-no-public-ip",
+        "changes": {
+            "old": {
+                "tags": {
+                    "name": "ec2-instance-no-public-ip"
+                },
+                "scope": {
+                    "ComplianceResourceTypes": []
+                }
+            },
+            "new": {
+                "tags": {
+                    "ENV": "Test",
+                    "Service": "TestService"
+                },
+                "scope": {
+                    "ComplianceResourceTypes": [
+                        "AWS::EC2::Host"
+                    ]
+                }
+            }
+        },
+        "new_state": {
+            "name": "ec2-instance-no-public-ip",
+            "resource_id": "ec2-instance-no-public-ip",
+            "tags": {
+                "ENV": "Test",
+                "Service": "TestService"
+            },
+            "config_rule_name": "ec2-instance-no-public-ip",
+            "config_rule_arn": "arn:aws:config:us-west-2:746014882121:config-rule/config-rule-qsjvdi",
+            "config_rule_id": "config-rule-qsjvdi",
+            "scope": {
+                "ComplianceResourceTypes": [
+                    "AWS::EC2::Instance",
+                    "AWS::EC2::Host"
+                ]
+            },
+            "source": {
+                "Owner": "AWS",
+                "SourceIdentifier": "EC2_INSTANCE_NO_PUBLIC_IP"
+            },
+            "config_rule_state": "ACTIVE"
+        },
+        "old_state": {
+            "name": "ec2-instance-no-public-ip",
+            "resource_id": "ec2-instance-no-public-ip",
+            "tags": {
+                "name": "ec2-instance-no-public-ip"
+            },
+            "config_rule_name": "ec2-instance-no-public-ip",
+            "config_rule_arn": "arn:aws:config:us-west-2:746014882121:config-rule/config-rule-qsjvdi",
+            "config_rule_id": "config-rule-qsjvdi",
+            "scope": {
+                "ComplianceResourceTypes": [
+                    "AWS::EC2::Instance"
+                ]
+            },
+            "source": {
+                "Owner": "AWS",
+                "SourceIdentifier": "EC2_INSTANCE_NO_PUBLIC_IP"
+            },
+            "config_rule_state": "ACTIVE"
+        },
+        "comment": [
+            "Updated scope: {'ComplianceResourceTypes': ['AWS::EC2::Instance', 'AWS::EC2::Host']}",
+            "Would update tags: Add {'ENV': 'Test', 'Service': 'TestService'} Remove {'name': 'ec2-instance-no-public-ip'}"
+        ],
+        "rerun_data": null,
+        "result": true,
+        "esm_tag": "aws.config.rule_|-ec2-instance-no-public-ip_|-ec2-instance-no-public-ip_|-",
+        "__run_num": 1,
+        "start_time": "2023-05-12 13:18:44.460945",
+        "total_seconds": 3.170316,
+        "sls_meta": {
+            "SLS": {},
+            "ID_DECS": {}
+        },
+        "ref": "states.aws.config.rule.present",
+        "acct_details": {
+            "attribute_value": "746014882121",
+            "attribute_key": "Account",
+            "provider": "AWS",
+            "region_name": "us-west-2"
+        }
+    }
+}

@@ -1,0 +1,54 @@
+{
+    "aws.config.config_recorder_|-aws-config-recorder_|-aws-config-recorder_|-present": {
+        "tag": "aws.config.config_recorder_|-aws-config-recorder_|-aws-config-recorder_|-present",
+        "name": "config_recorder",
+        "__id__": "aws-config-recorder",
+        "changes": {
+            "new": {
+                "name": "config_recorder",
+                "role_arn": "arn:aws:iam::012345678912:role/aws-service-role/config.amazonaws.com/AWSServiceRoleForConfig",
+                "recording_group": {
+                    "allSupported": true,
+                    "includeGlobalResourceTypes": true,
+                    "resourceTypes": [
+                        "AWS::ApiGateway::Stage"
+                    ]
+                },
+                "resource_id": "resource_id_known_after_present"
+            }
+        },
+        "new_state": {
+            "name": "config_recorder",
+            "role_arn": "arn:aws:iam::012345678912:role/aws-service-role/config.amazonaws.com/AWSServiceRoleForConfig",
+            "recording_group": {
+                "allSupported": true,
+                "includeGlobalResourceTypes": true,
+                "resourceTypes": [
+                    "AWS::ApiGateway::Stage"
+                ]
+            },
+            "resource_id": "resource_id_known_after_present"
+        },
+        "old_state": null,
+        "comment": [
+            "Would create aws.config.config_recorder 'config_recorder'"
+        ],
+        "rerun_data": null,
+        "result": true,
+        "esm_tag": "aws.config.config_recorder_|-aws-config-recorder_|-aws-config-recorder_|-",
+        "__run_num": 1,
+        "start_time": "2023-05-12 13:05:22.771362",
+        "total_seconds": 1.5639,
+        "sls_meta": {
+            "SLS": {},
+            "ID_DECS": {}
+        },
+        "ref": "states.aws.config.config_recorder.present",
+        "acct_details": {
+            "attribute_value": "746014882121",
+            "attribute_key": "Account",
+            "provider": "AWS",
+            "region_name": "us-west-2"
+        }
+    }
+}
