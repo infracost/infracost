@@ -95,11 +95,10 @@ func NewInstance(d *schema.ResourceData) schema.CoreResource {
 		IOPS:    d.Get("root_block_device.0.iops").Int(),
 	}
 
+	// root_block_device is not supported by idem-aws
 	//if d.Get("root_block_device.0.volume_size").Type != gjson.Null {
 	//	a.RootBlockDevice.Size = intPtr(d.Get("root_block_device.0.volume_size").Int())
 	//}
-	//
-	//ebsBlockDeviceRef := d.References("ebs_block_device.#.volume_id")
 
 	ebsBlockDeviceRef := d.References("states.aws.ec2.volume.present:block_device_mappings.#.volume_id")
 
@@ -114,26 +113,31 @@ func NewInstance(d *schema.ResourceData) schema.CoreResource {
 		// Check if there's a reference for this EBS volume
 		// If there is then we shouldn't add as a subresource since
 		// the cost will be added against the volume resource.
-		//if len(ebsBlockDeviceRef) > i && ebsBlockDeviceRef[i].Get("resource_id").String() == data.Get("volume_id").String() {
-		//	delete(ltEBSBlockDevices, deviceName)
-		//
-		//	continue
-		//}
+		var ebsRefFound = false
+		for _, element := range ebsBlockDeviceRef {
+			if element.Get("resource_id").String() == data.Get("volume_id").String() {
+				ebsRefFound = true
+				break
+			}
+		}
+		if ebsRefFound {
+			continue
+		}
 
 		// Instance can override individual Launch Template's values based on device
 		// name.
 		volumeType := ltDevice.Type
-		if v := ebsBlockDeviceRef[i].Get("volume_type"); v.Exists() {
+		if v := data.Get("volume_type"); v.Exists() {
 			volumeType = v.String()
 		}
 
 		volumeSize := ltDevice.Size
-		if v := ebsBlockDeviceRef[i].Get("size"); v.Exists() {
+		if v := data.Get("size"); v.Exists() {
 			volumeSize = intPtr(v.Int())
 		}
 
 		iops := ltDevice.IOPS
-		if v := ebsBlockDeviceRef[i].Get("iops"); v.Exists() {
+		if v := data.Get("iops"); v.Exists() {
 			iops = v.Int()
 		}
 
