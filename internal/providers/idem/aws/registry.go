@@ -73,6 +73,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	// GetNewEKSFargateProfileItem(),
 	GetNewEKSClusterItem(),
 	GetNewKMSKeyRegistryItem(),
+	GetWAFv2WebACLRegistryItem(),
 	// GetNewKMSExternalKeyRegistryItem(),
 	// GetVPNConnectionRegistryItem(),
 	// GetVpcEndpointRegistryItem(),
