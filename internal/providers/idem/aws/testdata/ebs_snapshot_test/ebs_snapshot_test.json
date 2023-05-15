@@ -1,0 +1,214 @@
+{
+  "aws.ec2.volume_|-ec2_volume_test_|-ec2_volume_test_|-present": {
+    "tag": "aws.ec2.volume_|-ec2_volume_test_|-ec2_volume_test_|-present",
+    "name": "volume-test",
+    "__id__": "ec2_volume_test",
+    "changes": {
+      "new": {
+        "name": "volume-test",
+        "availability_zone": "us-east-1a",
+        "encrypted": true,
+        "size": 10,
+        "volume_type": "standard",
+        "tags": [
+          {
+            "Key": "name",
+            "Value": "volume-test"
+          }
+        ],
+        "resource_id": "vol_12345"
+      }
+    },
+    "new_state": {
+      "name": "volume-test",
+      "availability_zone": "us-east-1a",
+      "encrypted": true,
+      "size": 10,
+      "volume_type": "standard",
+      "tags": [
+        {
+          "Key": "name",
+          "Value": "volume-test"
+        }
+      ],
+      "resource_id": "vol_12345"
+    },
+    "old_state": "us-east-1",
+    "comment": [
+      "Would create aws.ec2.volume 'volume-test'"
+    ],
+    "rerun_data": "us-east-1",
+    "result": true,
+    "esm_tag": "aws.ec2.volume_|-ec2_volume_test_|-ec2_volume_test_|-",
+    "__run_num": 1,
+    "start_time": "2023-05-15 15:53:58.982954",
+    "total_seconds": 43.089002,
+    "sls_meta": {
+      "SLS": {},
+      "ID_DECS": {}
+    },
+    "ref": "states.aws.ec2.volume.present",
+    "acct_details": {
+      "attribute_value": "1234567",
+      "attribute_key": "Account",
+      "provider": "AWS",
+      "region_name": "us-east-1"
+    }
+  },
+  "aws.ec2.volume_|-ec2_volume_test2_|-ec2_volume_test2_|-present": {
+    "tag": "aws.ec2.volume_|-ec2_volume_test2_|-ec2_volume_test2_|-present",
+    "name": "volume-test2",
+    "__id__": "ec2_volume_test2",
+    "changes": {
+      "new": {
+        "name": "volume-test2",
+        "availability_zone": "us-east-1a",
+        "encrypted": true,
+        "size": 30,
+        "volume_type": "standard",
+        "tags": [
+          {
+            "Key": "name",
+            "Value": "volume-test2"
+          }
+        ],
+        "resource_id": "resource_id_known_after_present"
+      }
+    },
+    "new_state": {
+      "name": "volume-test2",
+      "availability_zone": "us-east-1a",
+      "encrypted": true,
+      "size": 30,
+      "volume_type": "standard",
+      "tags": [
+        {
+          "Key": "name",
+          "Value": "volume-test2"
+        }
+      ],
+      "resource_id": "resource_id_known_after_present"
+    },
+    "old_state": "us-east-1",
+    "comment": [
+      "Would create aws.ec2.volume 'volume-test2'"
+    ],
+    "rerun_data": "us-east-1",
+    "result": true,
+    "esm_tag": "aws.ec2.volume_|-ec2_volume_test2_|-ec2_volume_test2_|-",
+    "__run_num": 2,
+    "start_time": "2023-05-15 15:53:58.985030",
+    "total_seconds": 43.102637,
+    "sls_meta": {
+      "SLS": {},
+      "ID_DECS": {}
+    },
+    "ref": "states.aws.ec2.volume.present",
+    "acct_details": {
+      "attribute_value": "1234567",
+      "attribute_key": "Account",
+      "provider": "AWS",
+      "region_name": "us-east-1"
+    }
+  },
+  "aws.ec2.snapshot_|-ec2_snapshot_test_|-ec2_snapshot_test_|-present": {
+    "tag": "aws.ec2.snapshot_|-ec2_snapshot_test_|-ec2_snapshot_test_|-present",
+    "name": "snapshot-123",
+    "__id__": "ec2_snapshot_test",
+    "changes": {
+      "new": {
+        "name": "snapshot-123",
+        "volume_id": "vol_12345",
+        "tags": [
+          {
+            "Key": "name",
+            "Value": "ONE"
+          }
+        ],
+        "resource_id": "resource_id_known_after_present"
+      }
+    },
+    "new_state": {
+      "name": "snapshot-123",
+      "volume_id": "vol_12345",
+      "tags": [
+        {
+          "Key": "name",
+          "Value": "ONE"
+        }
+      ],
+      "resource_id": "resource_id_known_after_present"
+    },
+    "old_state": "us-east-1",
+    "comment": [
+      "Would create aws.ec2.snapshot 'snapshot-123'"
+    ],
+    "rerun_data": "us-east-1",
+    "result": true,
+    "esm_tag": "aws.ec2.snapshot_|-ec2_snapshot_test_|-ec2_snapshot_test_|-",
+    "__run_num": 3,
+    "start_time": "2023-05-15 15:54:42.090560",
+    "total_seconds": 42.103416,
+    "sls_meta": {
+      "SLS": {},
+      "ID_DECS": {}
+    },
+    "ref": "states.aws.ec2.snapshot.present",
+    "acct_details": {
+      "attribute_value": "1234567",
+      "attribute_key": "Account",
+      "provider": "AWS",
+      "region_name": "us-east-1"
+    }
+  },
+  "aws.ec2.snapshot_|-ec2_snapshot_test2_|-ec2_snapshot_test2_|-present": {
+    "tag": "aws.ec2.snapshot_|-ec2_snapshot_test2_|-ec2_snapshot_test2_|-present",
+    "name": "snapshot-123-fake",
+    "__id__": "ec2_snapshot_test2",
+    "changes": {
+      "new": {
+        "name": "snapshot-123-fake",
+        "volume_id": "resource_id_known_after_present",
+        "tags": [
+          {
+            "Key": "name",
+            "Value": "ONE"
+          }
+        ],
+        "resource_id": "resource_id_known_after_present"
+      }
+    },
+    "new_state": {
+      "name": "snapshot-123-fake",
+      "volume_id": "resource_id_known_after_present",
+      "tags": [
+        {
+          "Key": "name",
+          "Value": "ONE"
+        }
+      ],
+      "resource_id": "resource_id_known_after_present"
+    },
+    "old_state": "us-east-1",
+    "comment": [
+      "Would create aws.ec2.snapshot 'snapshot-123-fake'"
+    ],
+    "rerun_data": "us-east-1",
+    "result": true,
+    "esm_tag": "aws.ec2.snapshot_|-ec2_snapshot_test2_|-ec2_snapshot_test2_|-",
+    "__run_num": 4,
+    "start_time": "2023-05-15 15:54:42.091894",
+    "total_seconds": 42.099706,
+    "sls_meta": {
+      "SLS": {},
+      "ID_DECS": {}
+    },
+    "ref": "states.aws.ec2.snapshot.present",
+    "acct_details": {
+      "attribute_value": "12345678",
+      "attribute_key": "Account",
+      "provider": "AWS",
+      "region_name": "us-east-1"
+    }
+  }
+}
