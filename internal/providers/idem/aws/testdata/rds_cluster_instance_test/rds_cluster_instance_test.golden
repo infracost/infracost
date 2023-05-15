@@ -1,0 +1,32 @@
+
+ Name                                                                       Monthly Qty  Unit   Monthly Cost 
+                                                                                                             
+ aws_rds_cluster_instance.cluster_instance_1yr_all_upfront                                                   
+ └─ Database instance (reserved, db.r5.large)                                       730  hours         $0.00 
+                                                                                                             
+ aws_rds_cluster_instance.cluster_instance_1yr_no_upfront                                                    
+ └─ Database instance (reserved, db.r5.large)                                       730  hours       $138.70 
+                                                                                                             
+ aws_rds_cluster_instance.cluster_instance_1yr_partial_upfront                                               
+ └─ Database instance (reserved, db.r5.large)                                       730  hours        $58.91 
+                                                                                                             
+ aws_rds_cluster_instance.cluster_instance_3yr_all_upfront                                                   
+ └─ Database instance (reserved, db.r5.large)                                       730  hours         $0.00 
+                                                                                                             
+ aws_rds_cluster_instance.cluster_instance_3yr_partial_upfront                                               
+ └─ Database instance (reserved, db.r5.large)                                       730  hours        $39.27 
+                                                                                                             
+ aws_rds_cluster_instance.cluster_instance_performance_insights_with_usage                                   
+ └─ Database instance (on-demand, db.r5.large)                                      730  hours       $211.70 
+                                                                                                             
+ aws_rds_cluster_instance.cluster_instance_t3                                                                
+ └─ Database instance (on-demand, db.r5.large)                                      730  hours       $211.70 
+                                                                                                             
+ OVERALL TOTAL                                                                                       $660.29 
+──────────────────────────────────
+7 cloud resources were detected:
+∙ 7 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+Logs:
+
+level=warning msg="Multiple products with prices found for aws_rds_cluster_instance.cluster_instance_performance_insights_with_usage Database instance (on-demand, db.r5.large), using the first product"
+level=warning msg="Multiple products with prices found for aws_rds_cluster_instance.cluster_instance_t3 Database instance (on-demand, db.r5.large), using the first product"

@@ -39,7 +39,7 @@
         },
         "ref": "states.aws.ec2.elastic_ip.present",
         "acct_details": {
-            "attribute_value": "000954396075",
+            "attribute_value": "fake-account-id",
             "attribute_key": "Account",
             "provider": "AWS",
             "region_name": null
@@ -81,7 +81,7 @@
         },
         "ref": "states.aws.ec2.nat_gateway.present",
         "acct_details": {
-            "attribute_value": "000954396075",
+            "attribute_value": "fake-account-id",
             "attribute_key": "Account",
             "provider": "AWS",
             "region_name": null
