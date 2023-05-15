@@ -1,0 +1,15 @@
+
+ Name                        Monthly Qty  Unit                  Monthly Cost 
+                                                                             
+ volume-test                                                                 
+ ├─ Storage (magnetic)                10  GB                           $0.50 
+ └─ I/O requests        Monthly cost depends on usage: $0.05 per 1M request  
+                                                                             
+ volume-test2                                                                
+ ├─ Storage (magnetic)                30  GB                           $1.50 
+ └─ I/O requests                       1  1M request                   $0.05 
+                                                                             
+ OVERALL TOTAL                                                         $2.05 
+──────────────────────────────────
+2 cloud resources were detected:
+∙ 2 were estimated
