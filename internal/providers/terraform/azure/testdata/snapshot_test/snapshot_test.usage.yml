@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  azurerm_snapshot.example_usage[*]:
+    storage_gb: 300

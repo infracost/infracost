@@ -153,6 +153,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getNetworkConnectionMonitorRegistryItem(),
 	getServiceBusNamespaceRegistryItem(),
 	getLogicAppStandardRegistryItem(),
+	getImageRegistryItem(),
+	getSnapshotRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
