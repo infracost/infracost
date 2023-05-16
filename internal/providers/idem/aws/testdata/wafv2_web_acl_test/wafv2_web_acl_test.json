@@ -1,0 +1,126 @@
+{
+    "aws.wafv2.web_acl_|-idem_test_aws_wafv2_web_acl_|-idem_test_aws_wafv2_web_acl_|-present": {
+        "tag": "aws.wafv2.web_acl_|-idem_test_aws_wafv2_web_acl_|-idem_test_aws_wafv2_web_acl_|-present",
+        "name": "idem_test_web_acl",
+        "__id__": "idem_test_aws_wafv2_web_acl",
+        "changes": {
+            "new": {
+                "name": "idem_test_web_acl",
+                "scope": "REGIONAL",
+                "default_action": {
+                    "Allow": {
+                        "CustomRequestHandling": {
+                            "InsertHeaders": [
+                                {
+                                    "Name": "idem-test-header-name",
+                                    "Value": "idem-test-header-value"
+                                }
+                            ]
+                        }
+                    }
+                },
+                "visibility_config": {
+                    "SampledRequestsEnabled": false,
+                    "CloudWatchMetricsEnabled": true,
+                    "MetricName": "idem-test-metric"
+                },
+                "description": "My WAFv2 Web ACL",
+                "rules": [
+                    {
+                        "Name": "AWS-AWSManagedRulesBotControlRuleSet",
+                        "Priority": 1,
+                        "Statement": {
+                            "ManagedRuleGroupStatement": {
+                                "Name": "AWSManagedRulesBotControlRuleSet",
+                                "VendorName": "AWS"
+                            }
+                        },
+                        "Action": {
+                            "OverrideAction": {
+                                "None": null
+                            }
+                        },
+                        "VisibilityConfig": {
+                            "SampledRequestsEnabled": false,
+                            "CloudWatchMetricsEnabled": true,
+                            "MetricName": "idem-test-metric"
+                        }
+                    }
+                ],
+                "tags": {
+                    "provider": "idem"
+                },
+                "resource_id": "resource_id_known_after_present"
+            }
+        },
+        "new_state": {
+            "name": "idem_test_web_acl",
+            "scope": "REGIONAL",
+            "default_action": {
+                "Allow": {
+                    "CustomRequestHandling": {
+                        "InsertHeaders": [
+                            {
+                                "Name": "idem-test-header-name",
+                                "Value": "idem-test-header-value"
+                            }
+                        ]
+                    }
+                }
+            },
+            "visibility_config": {
+                "SampledRequestsEnabled": false,
+                "CloudWatchMetricsEnabled": true,
+                "MetricName": "idem-test-metric"
+            },
+            "description": "My WAFv2 Web ACL",
+            "rules": [
+                {
+                    "Name": "AWS-AWSManagedRulesBotControlRuleSet",
+                    "Priority": 1,
+                    "Statement": {
+                        "ManagedRuleGroupStatement": {
+                            "Name": "AWSManagedRulesBotControlRuleSet",
+                            "VendorName": "AWS"
+                        }
+                    },
+                    "Action": {
+                        "OverrideAction": {
+                            "None": null
+                        }
+                    },
+                    "VisibilityConfig": {
+                        "SampledRequestsEnabled": false,
+                        "CloudWatchMetricsEnabled": true,
+                        "MetricName": "idem-test-metric"
+                    }
+                }
+            ],
+            "tags": {
+                "provider": "idem"
+            },
+            "resource_id": "resource_id_known_after_present"
+        },
+        "old_state": null,
+        "comment": [
+            "Would create aws.wafv2.web_acl idem_test_web_acl"
+        ],
+        "rerun_data": null,
+        "result": true,
+        "esm_tag": "aws.wafv2.web_acl_|-idem_test_aws_wafv2_web_acl_|-idem_test_aws_wafv2_web_acl_|-",
+        "__run_num": 1,
+        "start_time": "2023-05-15 12:27:33.838570",
+        "total_seconds": 1.288612,
+        "sls_meta": {
+            "SLS": {},
+            "ID_DECS": {}
+        },
+        "ref": "states.aws.wafv2.web_acl.present",
+        "acct_details": {
+            "attribute_value": "746014882121",
+            "attribute_key": "Account",
+            "provider": "AWS",
+            "region_name": "us-west-2"
+        }
+    }
+}
