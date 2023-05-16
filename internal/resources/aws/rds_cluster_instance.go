@@ -16,6 +16,7 @@ type RDSClusterInstance struct {
 	Region                                       string
 	InstanceClass                                string
 	Engine                                       string
+	IOOptimized                                  bool
 	PerformanceInsightsEnabled                   bool
 	PerformanceInsightsLongTermRetention         bool
 	MonthlyCPUCreditHrs                          *int64  `infracost_usage:"monthly_cpu_credit_hrs"`
@@ -58,6 +59,16 @@ func (r *RDSClusterInstance) BuildResource() *schema.Resource {
 		purchaseOptionLabel = "reserved"
 	}
 
+	// Example usage types for Aurora
+	// InstanceUsage:db.t3.medium
+	// InstanceUsageIOOptimized:db.t3.medium
+	// EU-InstanceUsage:db.t3.medium
+	// EU-InstanceUsageIOOptimized:db.t3.medium
+	usageTypeFilter := "/InstanceUsage:/"
+	if r.IOOptimized {
+		usageTypeFilter = "/InstanceUsageIOOptimized:/"
+	}
+
 	costComponents := []*schema.CostComponent{
 		{
 			Name:           fmt.Sprintf("Database instance (%s, %s)", purchaseOptionLabel, r.InstanceClass),
@@ -72,6 +83,7 @@ func (r *RDSClusterInstance) BuildResource() *schema.Resource {
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "instanceType", Value: strPtr(r.InstanceClass)},
 					{Key: "databaseEngine", Value: strPtr(databaseEngine)},
+					{Key: "usagetype", ValueRegex: strPtr(usageTypeFilter)},
 				},
 			},
 			PriceFilter: priceFilter,

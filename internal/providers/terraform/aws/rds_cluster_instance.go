@@ -20,6 +20,7 @@ func NewRDSClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schema.
 		Address:                              d.Address,
 		Region:                               d.Get("region").String(),
 		InstanceClass:                        d.Get("instance_class").String(),
+		IOOptimized:                          false, // IO Optimized isn't supported by terraform yet
 		Engine:                               d.Get("engine").String(),
 		PerformanceInsightsEnabled:           piEnabled,
 		PerformanceInsightsLongTermRetention: piLongTerm,
