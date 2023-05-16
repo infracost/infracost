@@ -1,0 +1,232 @@
+{
+    "aws.cloudfront.distribution_|-E2QWRUHAPOMQZL_|-E2QWRUHAPOMQZL_|-present": {
+        "tag": "aws.cloudfront.distribution_|-E2QWRUHAPOMQZL_|-E2QWRUHAPOMQZL_|-present",
+        "name": "E2QWRUHAPOMQZL",
+        "__id__": "E2QWRUHAPOMQZL",
+        "changes": {
+            "new": {
+                "name": "E2QWRUHAPOMQZL",
+                "caller_reference": "7c0ca447-479b-48b2-9260-bc7a4de63478",
+                "origins": {
+                    "Items": [
+                        {
+                            "ConnectionAttempts": 3,
+                            "ConnectionTimeout": 10,
+                            "CustomHeaders": {
+                                "Quantity": 0
+                            },
+                            "DomainName": "idem-test-distribution-bucket.s3.us-east-1.amazonaws.com",
+                            "Id": "idem-test-distribution-bucket.s3.us-east-1.amazonaws.com",
+                            "OriginPath": "",
+                            "OriginShield": {
+                                "Enabled": false
+                            },
+                            "S3OriginConfig": {
+                                "OriginAccessIdentity": ""
+                            }
+                        }
+                    ],
+                    "Quantity": 1
+                },
+                "default_cache_behaviour": {
+                    "AllowedMethods": {
+                        "CachedMethods": {
+                            "Items": [
+                                "HEAD",
+                                "GET"
+                            ],
+                            "Quantity": 2
+                        },
+                        "Items": [
+                            "HEAD",
+                            "GET"
+                        ],
+                        "Quantity": 2
+                    },
+                    "CachePolicyId": "6583eea-f89d-4fab-e63d-7e88ee58f6",
+                    "Compress": true,
+                    "FieldLevelEncryptionId": "",
+                    "FunctionAssociations": {
+                        "Quantity": 0
+                    },
+                    "LambdaFunctionAssociations": {
+                        "Quantity": 0
+                    },
+                    "SmoothStreaming": false,
+                    "TargetOriginId": "idem-test-distribution-bucket.s3.us-east-1.amazonaws.com",
+                    "TrustedKeyGroups": {
+                        "Enabled": false,
+                        "Quantity": 0
+                    },
+                    "TrustedSigners": {
+                        "Enabled": false,
+                        "Quantity": 0
+                    },
+                    "ViewerProtocolPolicy": "redirect-to-https"
+                },
+                "comment": "",
+                "logging": {
+                    "Enabled": true,
+                    "IncludeCookies": true,
+                    "Bucket": "idem-test-distribution-bucket",
+                    "Prefix": "distribution"
+                },
+                "enabled": false,
+                "viewer_certificate": {
+                    "CertificateSource": "cloudfront",
+                    "CloudFrontDefaultCertificate": true,
+                    "MinimumProtocolVersion": "TLSv1",
+                    "SSLSupportMethod": "vip"
+                },
+                "aliases": {
+                    "Quantity": 0
+                },
+                "price_class": "PriceClass_All",
+                "origin_groups": {
+                    "Quantity": 0
+                },
+                "cache_behaviors": {
+                    "Quantity": 0
+                },
+                "custom_error_responses": {
+                    "Quantity": 0
+                },
+                "restrictions": {
+                    "GeoRestriction": {
+                        "Quantity": 0,
+                        "RestrictionType": "none"
+                    }
+                },
+                "web_acl_id": "",
+                "http_version": "http2",
+                "is_ipv6_enabled": true,
+                "tags": {
+                    "Name": "idem-test"
+                },
+                "resource_id": "resource_id_known_after_present"
+            }
+        },
+        "new_state": {
+            "name": "E2QWRUHAPOMQZL",
+            "caller_reference": "7c0ca447-479b-48b2-9260-bc7a4de63478",
+            "origins": {
+                "Items": [
+                    {
+                        "ConnectionAttempts": 3,
+                        "ConnectionTimeout": 10,
+                        "CustomHeaders": {
+                            "Quantity": 0
+                        },
+                        "DomainName": "idem-test-distribution-bucket.s3.us-east-1.amazonaws.com",
+                        "Id": "idem-test-distribution-bucket.s3.us-east-1.amazonaws.com",
+                        "OriginPath": "",
+                        "OriginShield": {
+                            "Enabled": false
+                        },
+                        "S3OriginConfig": {
+                            "OriginAccessIdentity": ""
+                        }
+                    }
+                ],
+                "Quantity": 1
+            },
+            "default_cache_behaviour": {
+                "AllowedMethods": {
+                    "CachedMethods": {
+                        "Items": [
+                            "HEAD",
+                            "GET"
+                        ],
+                        "Quantity": 2
+                    },
+                    "Items": [
+                        "HEAD",
+                        "GET"
+                    ],
+                    "Quantity": 2
+                },
+                "CachePolicyId": "6583eea-f89d-4fab-e63d-7e88ee58f6",
+                "Compress": true,
+                "FieldLevelEncryptionId": "",
+                "FunctionAssociations": {
+                    "Quantity": 0
+                },
+                "LambdaFunctionAssociations": {
+                    "Quantity": 0
+                },
+                "SmoothStreaming": false,
+                "TargetOriginId": "idem-test-distribution-bucket.s3.us-east-1.amazonaws.com",
+                "TrustedKeyGroups": {
+                    "Enabled": false,
+                    "Quantity": 0
+                },
+                "TrustedSigners": {
+                    "Enabled": false,
+                    "Quantity": 0
+                },
+                "ViewerProtocolPolicy": "redirect-to-https"
+            },
+            "comment": "",
+            "logging": {
+                "Enabled": true,
+                "IncludeCookies": true,
+                "Bucket": "idem-test-distribution-bucket",
+                "Prefix": "distribution"
+            },
+            "enabled": false,
+            "viewer_certificate": {
+                "CertificateSource": "cloudfront",
+                "CloudFrontDefaultCertificate": true,
+                "MinimumProtocolVersion": "TLSv1",
+                "SSLSupportMethod": "vip"
+            },
+            "aliases": {
+                "Quantity": 0
+            },
+            "price_class": "PriceClass_All",
+            "origin_groups": {
+                "Quantity": 0
+            },
+            "cache_behaviors": {
+                "Quantity": 0
+            },
+            "custom_error_responses": {
+                "Quantity": 0
+            },
+            "restrictions": {
+                "GeoRestriction": {
+                    "Quantity": 0,
+                    "RestrictionType": "none"
+                }
+            },
+            "web_acl_id": "",
+            "http_version": "http2",
+            "is_ipv6_enabled": true,
+            "tags": {
+                "Name": "idem-test"
+            },
+            "resource_id": "resource_id_known_after_present"
+        },
+        "old_state": null,
+        "comment": [
+            "Would create aws.cloudfront.distribution 'E2QWRUHAPOMQZL'"
+        ],
+        "rerun_data": null,
+        "result": true,
+        "esm_tag": "aws.cloudfront.distribution_|-E2QWRUHAPOMQZL_|-E2QWRUHAPOMQZL_|-",
+        "__run_num": 1,
+        "start_time": "2023-05-16 13:30:02.532909",
+        "total_seconds": 1.598241,
+        "sls_meta": {
+            "SLS": {},
+            "ID_DECS": {}
+        },
+        "ref": "states.aws.cloudfront.distribution.present",
+        "acct_details": {
+            "attribute_value": "746014882121",
+            "attribute_key": "Account",
+            "provider": "AWS",
+            "region_name": "us-west-2"
+        }
+    }
+}
