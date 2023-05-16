@@ -194,9 +194,12 @@ func (m *ModuleLoader) loadModules(path string, prefix string) ([]*ManifestModul
 					return err
 				}
 
-				manifestMu.Lock()
-				manifestModules = append(manifestModules, metadata)
-				manifestMu.Unlock()
+				// only include non-local modules in the manifest since we don't want to cache local ones.
+				if !m.isLocalModule(moduleCall) {
+					manifestMu.Lock()
+					manifestModules = append(manifestModules, metadata)
+					manifestMu.Unlock()
+				}
 
 				moduleDir := filepath.Join(m.cachePath, metadata.Dir)
 				nestedManifestModules, err := m.loadModules(moduleDir, metadata.Key+".")
