@@ -13,9 +13,9 @@ func GetEFSFileSystemRegistryItem() *schema.RegistryItem {
 }
 func NewEFSFileSystem(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	r := &aws.EFSFileSystem{
-		Address:                     d.Address,
-		Region:                      d.Get("region").String(),
-		HasLifecyclePolicy:          len(d.Get("lifecycle_policy").Array()) > 0,
+		Address: d.Address,
+		Region:  d.Get("region").String(),
+		//HasLifecyclePolicy:          len(d.Get("lifecycle_policy").Array()) > 0, # lifecycle_policy  is not supported in idem-aws, currently
 		AvailabilityZoneName:        d.Get("availability_zone_name").String(),
 		ProvisionedThroughputInMBps: d.Get("provisioned_throughput_in_mibps").Float(),
 	}
