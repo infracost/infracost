@@ -10,7 +10,7 @@ func GetWAFv2WebACLRegistryItem() *schema.RegistryItem {
 		Name:  "states.aws.wafv2.web_acl.present",
 		RFunc: NewWAFv2WebACL,
 		Notes: []string{
-			"Seller fees for Managed Rule Groups from AWS Marketplace are not included. Bot Control is not supported by Terraform.",
+			"Seller fees for Managed Rule Groups from AWS Marketplace are not included. Bot Control is not supported by Idem.",
 		},
 	}
 }
