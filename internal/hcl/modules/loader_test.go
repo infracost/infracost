@@ -52,11 +52,6 @@ func TestNestedModules(t *testing.T) {
 
 	testLoaderE2E(t, "./testdata/nested_modules", []*ManifestModule{
 		{
-			Key:    "local-module",
-			Source: "./modules/local-module",
-			Dir:    "modules/local-module",
-		},
-		{
 			Key:     "registry-module",
 			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
 			Version: "3.4.0",
@@ -77,11 +72,6 @@ func TestNestedModules(t *testing.T) {
 			Key:    "git-module-different-name",
 			Source: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git",
 			Dir:    ".infracost/terraform_modules/9740179dc58fea6ce4a32fdc5b4e0839",
-		},
-		{
-			Key:    "local-module.nested-local-module",
-			Source: "./nested-local-module",
-			Dir:    "modules/local-module/nested-local-module",
 		},
 		{
 			Key:     "local-module.nested-registry-module",
@@ -190,11 +180,6 @@ func TestWithCachedModules(t *testing.T) {
 
 	testLoaderE2E(t, "./testdata/with_cached_modules", []*ManifestModule{
 		{
-			Key:    "local-module",
-			Source: "./modules/local-module",
-			Dir:    "modules/local-module",
-		},
-		{
 			Key:     "registry-module",
 			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
 			Version: "3.4.0",
@@ -262,11 +247,6 @@ func TestMultiProject(t *testing.T) {
 	wg.Wait()
 	assertModulesEqual(t, moduleLoader, filepath.Join(path, "prod"), []*ManifestModule{
 		{
-			Key:    "local-module",
-			Source: "../modules/local-module",
-			Dir:    "modules/local-module",
-		},
-		{
 			Key:     "registry-module",
 			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
 			Version: "3.4.0",
@@ -289,11 +269,6 @@ func TestMultiProject(t *testing.T) {
 			Dir:    ".infracost/terraform_modules/9740179dc58fea6ce4a32fdc5b4e0839",
 		},
 		{
-			Key:    "local-module.nested-local-module",
-			Source: "./nested-local-module",
-			Dir:    "modules/local-module/nested-local-module",
-		},
-		{
 			Key:     "local-module.nested-registry-module",
 			Source:  "registry.terraform.io/terraform-aws-modules/sns/aws",
 			Version: "3.1.0",
@@ -313,11 +288,6 @@ func TestMultiProject(t *testing.T) {
 	})
 
 	assertModulesEqual(t, moduleLoader, filepath.Join(path, "dev"), []*ManifestModule{
-		{
-			Key:    "local-module",
-			Source: "../modules/local-module",
-			Dir:    "modules/local-module",
-		},
 		{
 			Key:     "registry-module",
 			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
@@ -344,11 +314,6 @@ func TestMultiProject(t *testing.T) {
 			Key:    "another-git-module-only-in-dev",
 			Source: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git",
 			Dir:    ".infracost/terraform_modules/9740179dc58fea6ce4a32fdc5b4e0839",
-		},
-		{
-			Key:    "local-module.nested-local-module",
-			Source: "./nested-local-module",
-			Dir:    "modules/local-module/nested-local-module",
 		},
 		{
 			Key:     "local-module.nested-registry-module",
