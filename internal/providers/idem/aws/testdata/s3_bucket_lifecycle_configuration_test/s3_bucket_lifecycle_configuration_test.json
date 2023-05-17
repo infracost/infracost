@@ -1,0 +1,110 @@
+{
+    "aws.s3.bucket_lifecycle_|-idem_test_aws_s3_bucket_lifecycle_|-idem_test_aws_s3_bucket_lifecycle_|-present": {
+        "tag": "aws.s3.bucket_lifecycle_|-idem_test_aws_s3_bucket_lifecycle_|-idem_test_aws_s3_bucket_lifecycle_|-present",
+        "name": "value",
+        "__id__": "idem_test_aws_s3_bucket_lifecycle",
+        "changes": {
+            "new": {
+                "name": "value",
+                "bucket": "value",
+                "lifecycle_configuration": {
+                    "Rules": [
+                        {
+                            "ID": "str",
+                            "Status": "Enabled",
+                            "Filter": {
+                                "Prefix": ""
+                            },
+                            "Expiration": {
+                                "Date": "datetime(2015, 1, 1)",
+                                "Days": 123,
+                                "ExpiredObjectDeleteMarker": true
+                            },
+                            "Transition": {
+                                "Date": "datetime(2015, 1, 1)",
+                                "Days": 123,
+                                "StorageClass": "GLACIER"
+                            },
+                            "NoncurrentVersionTransitions": [
+                                {
+                                    "NoncurrentDays": 123,
+                                    "StorageClass": "GLACIER",
+                                    "NewerNoncurrentVersions": 123
+                                }
+                            ],
+                            "NoncurrentVersionExpiration": {
+                                "NoncurrentDays": 123,
+                                "NewerNoncurrentVersions": 123
+                            },
+                            "AbortIncompleteMultipartUpload": {
+                                "DaysAfterInitiation": 123
+                            }
+                        }
+                    ]
+                },
+                "resource_id": "resource_id_known_after_present"
+            }
+        },
+        "new_state": {
+            "name": "value",
+            "bucket": "value",
+            "lifecycle_configuration": {
+                "Rules": [
+                    {
+                        "ID": "str",
+                        "Status": "Enabled",
+                        "Filter": {
+                            "Prefix": ""
+                        },
+                        "Expiration": {
+                            "Date": "datetime(2015, 1, 1)",
+                            "Days": 123,
+                            "ExpiredObjectDeleteMarker": true
+                        },
+                        "Transition": {
+                            "Date": "datetime(2015, 1, 1)",
+                            "Days": 123,
+                            "StorageClass": "GLACIER"
+                        },
+                        "NoncurrentVersionTransitions": [
+                            {
+                                "NoncurrentDays": 123,
+                                "StorageClass": "GLACIER",
+                                "NewerNoncurrentVersions": 123
+                            }
+                        ],
+                        "NoncurrentVersionExpiration": {
+                            "NoncurrentDays": 123,
+                            "NewerNoncurrentVersions": 123
+                        },
+                        "AbortIncompleteMultipartUpload": {
+                            "DaysAfterInitiation": 123
+                        }
+                    }
+                ]
+            },
+            "resource_id": "resource_id_known_after_present"
+        },
+        "old_state": null,
+        "comment": [
+            "Would create aws.s3.bucket_lifecycle 'value'"
+        ],
+        "rerun_data": null,
+        "result": true,
+        "esm_tag": "aws.s3.bucket_lifecycle_|-idem_test_aws_s3_bucket_lifecycle_|-idem_test_aws_s3_bucket_lifecycle_|-",
+        "__run_num": 1,
+        "start_time": "2023-05-17 11:40:25.435883",
+        "total_seconds": 1.446433,
+        "sls_meta": {
+            "SLS": {},
+            "ID_DECS": {}
+        },
+        "ref": "states.aws.s3.bucket_lifecycle.present",
+        "acct_details": {
+            "attribute_value": "746014882121",
+            "attribute_key": "Account",
+            "provider": "AWS",
+            "region_name": "us-west-2"
+        }
+    }
+}

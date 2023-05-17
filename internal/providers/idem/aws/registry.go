@@ -62,6 +62,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	// GetRoute53RecordRegistryItem(),
 	// GetRoute53ZoneRegistryItem(),
 	GetS3BucketRegistryItem(),
+	GetS3BucketLifecycleConfigurationRegistryItem(),
 	// GetS3BucketAnalyticsConfigurationRegistryItem(),
 	// GetS3BucketInventoryRegistryItem(),
 	// GetSecretsManagerSecret(),
