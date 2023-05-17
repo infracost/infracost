@@ -42,6 +42,7 @@ func NewDBInstance(d *schema.ResourceData) schema.CoreResource {
 		BackupRetentionPeriod:                d.Get("backup_retention_period").Int(),
 		IOPS:                                 iops,
 		StorageType:                          storageType,
+		IOOptimized:                          false, // IO Optimized isn't supported by terraform yet
 		PerformanceInsightsEnabled:           piEnabled,
 		PerformanceInsightsLongTermRetention: piLongTerm,
 	}

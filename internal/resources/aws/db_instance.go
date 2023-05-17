@@ -18,6 +18,7 @@ type DBInstance struct {
 	LicenseModel                                 string
 	StorageType                                  string
 	BackupRetentionPeriod                        int64
+	IOOptimized                                  bool
 	PerformanceInsightsEnabled                   bool
 	PerformanceInsightsLongTermRetention         bool
 	MultiAZ                                      bool
@@ -153,6 +154,22 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 		instanceAttributeFilters = append(instanceAttributeFilters, &schema.AttributeFilter{
 			Key:   "licenseModel",
 			Value: strPtr(licenseModel),
+		})
+	}
+	if strings.HasPrefix(databaseEngine, "Aurora") {
+		// Example usage types for Aurora
+		// InstanceUsage:db.t3.medium
+		// InstanceUsageIOOptimized:db.t3.medium
+		// EU-InstanceUsage:db.t3.medium
+		// EU-InstanceUsageIOOptimized:db.t3.medium
+		usageTypeFilter := "/InstanceUsage:/"
+		if r.IOOptimized {
+			usageTypeFilter = "/InstanceUsageIOOptimized:/"
+		}
+
+		instanceAttributeFilters = append(instanceAttributeFilters, &schema.AttributeFilter{
+			Key:        "usagetype",
+			ValueRegex: strPtr(usageTypeFilter),
 		})
 	}
 
