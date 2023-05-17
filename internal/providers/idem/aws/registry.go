@@ -39,7 +39,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	// GetECRRegistryItem(),
 	// GetECSServiceRegistryItem(),
 	GetEFSFileSystemRegistryItem(),
-	// GetEIPRegistryItem(),
+	GetEIPRegistryItem(),
 	// GetElastiCacheClusterItem(),
 	GetElastiCacheReplicationGroupItem(),
 	// GetElasticsearchDomainRegistryItem(),
