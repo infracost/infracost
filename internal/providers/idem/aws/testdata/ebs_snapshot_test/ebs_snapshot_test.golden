@@ -1,0 +1,29 @@
+
+ Name                                                            Monthly Qty  Unit                        Monthly Cost 
+                                                                                                                       
+ snapshot-123                                                                                                          
+ ├─ EBS snapshot storage                                                  30  GB                                 $1.50 
+ ├─ Fast snapshot restore                                Monthly cost depends on usage: $0.75 per DSU-hours            
+ ├─ ListChangedBlocks & ListSnapshotBlocks API requests  Monthly cost depends on usage: $0.0006 per 1k requests        
+ ├─ GetSnapshotBlock API requests                        Monthly cost depends on usage: $0.003 per 1k SnapshotAPIUnits 
+ └─ PutSnapshotBlock API requests                        Monthly cost depends on usage: $0.006 per 1k SnapshotAPIUnits 
+                                                                                                                       
+ snapshot-123-fake                                                                                                     
+ ├─ EBS snapshot storage                                                  30  GB                                 $1.50 
+ ├─ Fast snapshot restore                                                100  DSU-hours                         $75.00 
+ ├─ ListChangedBlocks & ListSnapshotBlocks API requests                1,000  1k requests                        $0.60 
+ ├─ GetSnapshotBlock API requests                                        100  1k SnapshotAPIUnits                $0.30 
+ └─ PutSnapshotBlock API requests                                        100  1k SnapshotAPIUnits                $0.60 
+                                                                                                                       
+ volume-test                                                                                                           
+ ├─ Storage (magnetic)                                                    10  GB                                 $0.50 
+ └─ I/O requests                                         Monthly cost depends on usage: $0.05 per 1M request           
+                                                                                                                       
+ volume-test2                                                                                                          
+ ├─ Storage (magnetic)                                                    30  GB                                 $1.50 
+ └─ I/O requests                                         Monthly cost depends on usage: $0.05 per 1M request           
+                                                                                                                       
+ OVERALL TOTAL                                                                                                  $81.50 
+──────────────────────────────────
+4 cloud resources were detected:
+∙ 4 were estimated

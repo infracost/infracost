@@ -1,0 +1,72 @@
+{
+  "aws.acm.certificate_manager_|-certificate-test_|-certificate-test_|-present": {
+    "tag": "aws.acm.certificate_manager_|-certificate-test_|-certificate-test_|-present",
+    "name": "certificate-test",
+    "__id__": "certificate-test",
+    "changes": {
+      "new": {
+        "name": "certificate-test",
+        "domain_name": "private-ca.com",
+        "validation_method": "DNS",
+        "subject_alternative_names": [
+          "www.example.net"
+        ],
+        "idempotency_token": "ExampleIdempotancyToken",
+        "domain_validation_options": [
+          {
+            "domain_name": "testing.example.com",
+            "validation_domain": "example.com"
+          }
+        ],
+        "options": {
+          "CertificateTransparencyLoggingPreference": "DISABLED"
+        },
+        "certificate_authority_arn": "arn:aws:acm-pca:us-east-1:123456789012:certificate-authority/12345678-1234-1234-1234-123456789012",
+        "tags": {},
+        "resource_id": "resource_id_known_after_present"
+      }
+    },
+    "new_state": {
+      "name": "certificate-test",
+      "domain_name": "private-ca.com",
+      "validation_method": "DNS",
+      "subject_alternative_names": [
+        "www.example.net"
+      ],
+      "idempotency_token": "ExampleIdempotancyToken",
+      "domain_validation_options": [
+        {
+          "domain_name": "testing.example.com",
+          "validation_domain": "example.com"
+        }
+      ],
+      "options": {
+        "CertificateTransparencyLoggingPreference": "DISABLED"
+      },
+      "certificate_authority_arn": "arn:aws:acm-pca:us-east-1:123456789012:certificate-authority/12345678-1234-1234-1234-123456789012",
+      "tags": {},
+      "resource_id": "resource_id_known_after_present"
+    },
+    "old_state": null,
+    "comment": [
+      "Would create aws.acm.certificate_manager 'certificate-test'"
+    ],
+    "rerun_data": null,
+    "result": true,
+    "esm_tag": "aws.acm.certificate_manager_|-certificate-test_|-certificate-test_|-",
+    "__run_num": 1,
+    "start_time": "2023-05-12 15:59:25.040201",
+    "total_seconds": 27.315334,
+    "sls_meta": {
+      "SLS": {},
+      "ID_DECS": {}
+    },
+    "ref": "states.aws.acm.certificate_manager.present",
+    "acct_details": {
+      "attribute_value": "fake-account-id",
+      "attribute_key": "Account",
+      "provider": "AWS",
+      "region_name": "us-east-1"
+    }
+  }
+}

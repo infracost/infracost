@@ -1,0 +1,442 @@
+{
+  "aws.rds.db_cluster_|-db-cluster-1_|-db-cluster-1_|-present": {
+    "tag": "aws.rds.db_cluster_|-db-cluster-1_|-db-cluster-1_|-present",
+    "name": "db-cluster-1",
+    "__id__": "db-cluster-1",
+    "changes": {
+      "new": {
+        "name": "db-cluster-1",
+        "availability_zones": [
+          "us-east-2b",
+          "us-east-2c",
+          "us-east-2a"
+        ],
+        "backup_retention_period": 7,
+        "database_name": "dbname123",
+        "db_cluster_parameter_group_name": "default.aurora-postgresql12",
+        "vpc_security_group_ids": [
+          "sg-45fg34343g"
+        ],
+        "engine": "aurora-postgresql",
+        "engine_version": "12.7",
+        "port": 5432,
+        "master_username": "postgres",
+        "master_user_password": "abcd1234",
+        "preferred_backup_window": "07:41-08:11",
+        "preferred_maintenance_window": "sat:09:29-sat:09:59",
+        "tags": {
+          "name": "value"
+        },
+        "storage_encrypted": true,
+        "kms_key_id": "fake-kms-key-id",
+        "engine_mode": "provisioned",
+        "deletion_protection": false,
+        "copy_tags_to_snapshot": true,
+        "resource_id": "resource_id_known_after_present"
+      }
+    },
+    "new_state": {
+      "name": "db-cluster-1",
+      "availability_zones": [
+        "us-east-2b",
+        "us-east-2c",
+        "us-east-2a"
+      ],
+      "backup_retention_period": 7,
+      "database_name": "dbname123",
+      "db_cluster_parameter_group_name": "default.aurora-postgresql12",
+      "vpc_security_group_ids": [
+        "sg-45fg34343g"
+      ],
+      "engine": "aurora-postgresql",
+      "engine_version": "12.7",
+      "port": 5432,
+      "master_username": "postgres",
+      "master_user_password": "abcd1234",
+      "preferred_backup_window": "07:41-08:11",
+      "preferred_maintenance_window": "sat:09:29-sat:09:59",
+      "tags": {
+        "name": "value"
+      },
+      "storage_encrypted": true,
+      "kms_key_id": "arn:aws:kms:us-east-2:012345678910:key/e1234eke-8ffa-40d7-agh9-42f65vv8l0a1",
+      "engine_mode": "provisioned",
+      "deletion_protection": false,
+      "copy_tags_to_snapshot": true,
+      "resource_id": "resource_id_known_after_present"
+    },
+    "old_state": null,
+    "comment": [
+      "Would create aws.rds.db_cluster 'db-cluster-1'"
+    ],
+    "rerun_data": null,
+    "result": true,
+    "esm_tag": "aws.rds.db_cluster_|-db-cluster-1_|-db-cluster-1_|-",
+    "__run_num": 1,
+    "start_time": "2023-05-14 12:13:32.566198",
+    "total_seconds": 1.01395,
+    "sls_meta": {
+      "SLS": {},
+      "ID_DECS": {}
+    },
+    "ref": "states.aws.rds.db_cluster.present",
+    "acct_details": {
+      "attribute_value": "123456789012",
+      "attribute_key": "Account",
+      "provider": "AWS",
+      "region_name": "us-west-2"
+    }
+  },
+  "aws.rds.db_cluster_|-my_sql_serverless_|-my_sql_serverless_|-present": {
+    "tag": "aws.rds.db_cluster_|-my_sql_serverless_|-my_sql_serverless_|-present",
+    "name": "my_sql_serverless",
+    "__id__": "my_sql_serverless",
+    "changes": {
+      "new": {
+        "name": "my_sql_serverless",
+        "availability_zones": [
+          "us-east-2b",
+          "us-east-2c",
+          "us-east-2a"
+        ],
+        "backup_retention_period": 7,
+        "database_name": "dbname123",
+        "db_cluster_parameter_group_name": "default.aurora-postgresql12",
+        "vpc_security_group_ids": [
+          "sg-45fg34343g"
+        ],
+        "engine": "aurora-postgresql",
+        "engine_version": "12.7",
+        "port": 5432,
+        "master_username": "postgres",
+        "master_user_password": "abcd1234",
+        "preferred_backup_window": "07:41-08:11",
+        "preferred_maintenance_window": "sat:09:29-sat:09:59",
+        "tags": {
+          "name": "value"
+        },
+        "storage_encrypted": true,
+        "kms_key_id": "fake-kms-key-id",
+        "engine_mode": "provisioned",
+        "deletion_protection": false,
+        "copy_tags_to_snapshot": true,
+        "resource_id": "resource_id_known_after_present"
+      }
+    },
+    "new_state": {
+      "name": "my_sql_serverless",
+      "availability_zones": [
+        "us-east-2b",
+        "us-east-2c",
+        "us-east-2a"
+      ],
+      "backup_retention_period": 7,
+      "database_name": "dbname123",
+      "db_cluster_parameter_group_name": "default.aurora-postgresql12",
+      "vpc_security_group_ids": [
+        "sg-45fg34343g"
+      ],
+      "engine": "aurora-postgresql",
+      "engine_version": "12.7",
+      "port": 5432,
+      "master_username": "postgres",
+      "master_user_password": "abcd1234",
+      "preferred_backup_window": "07:41-08:11",
+      "preferred_maintenance_window": "sat:09:29-sat:09:59",
+      "tags": {
+        "name": "value"
+      },
+      "storage_encrypted": true,
+      "kms_key_id": "arn:aws:kms:us-east-2:012345678910:key/e1234eke-8ffa-40d7-agh9-42f65vv8l0a1",
+      "engine_mode": "provisioned",
+      "deletion_protection": false,
+      "copy_tags_to_snapshot": true,
+      "resource_id": "resource_id_known_after_present"
+    },
+    "old_state": null,
+    "comment": [
+      "Would create aws.rds.db_cluster 'my_sql_serverless'"
+    ],
+    "rerun_data": null,
+    "result": true,
+    "esm_tag": "aws.rds.db_cluster_|-my_sql_serverless_|-my_sql_serverless_|-",
+    "__run_num": 1,
+    "start_time": "2023-05-14 12:13:32.566198",
+    "total_seconds": 1.01395,
+    "sls_meta": {
+      "SLS": {},
+      "ID_DECS": {}
+    },
+    "ref": "states.aws.rds.db_cluster.present",
+    "acct_details": {
+      "attribute_value": "123456789012",
+      "attribute_key": "Account",
+      "provider": "AWS",
+      "region_name": "us-west-2"
+    }
+  },
+  "aws.rds.db_cluster_|-postgres_serverlessWithBackup_|-postgres_serverlessWithBackup_|-present": {
+    "tag": "aws.rds.db_cluster_|-postgres_serverlessWithBackup_|-postgres_serverlessWithBackup_|-present",
+    "name": "postgres_serverlessWithBackup",
+    "__id__": "postgres_serverlessWithBackup",
+    "changes": {
+      "new": {
+        "name": "postgres_serverlessWithBackup",
+        "availability_zones": [
+          "us-east-2b",
+          "us-east-2c",
+          "us-east-2a"
+        ],
+        "backup_retention_period": 7,
+        "database_name": "dbname123",
+        "db_cluster_parameter_group_name": "default.aurora-postgresql12",
+        "vpc_security_group_ids": [
+          "sg-45fg34343g"
+        ],
+        "engine": "aurora-postgresql",
+        "engine_version": "12.7",
+        "port": 5432,
+        "master_username": "postgres",
+        "master_user_password": "abcd1234",
+        "preferred_backup_window": "07:41-08:11",
+        "preferred_maintenance_window": "sat:09:29-sat:09:59",
+        "tags": {
+          "name": "value"
+        },
+        "storage_encrypted": true,
+        "kms_key_id": "fake-kms-key-id",
+        "engine_mode": "provisioned",
+        "deletion_protection": false,
+        "copy_tags_to_snapshot": true,
+        "resource_id": "resource_id_known_after_present"
+      }
+    },
+    "new_state": {
+      "name": "postgres_serverlessWithBackup",
+      "availability_zones": [
+        "us-east-2b",
+        "us-east-2c",
+        "us-east-2a"
+      ],
+      "backup_retention_period": 7,
+      "database_name": "dbname123",
+      "db_cluster_parameter_group_name": "default.aurora-postgresql12",
+      "vpc_security_group_ids": [
+        "sg-45fg34343g"
+      ],
+      "engine": "aurora-postgresql",
+      "engine_version": "12.7",
+      "port": 5432,
+      "master_username": "postgres",
+      "master_user_password": "abcd1234",
+      "preferred_backup_window": "07:41-08:11",
+      "preferred_maintenance_window": "sat:09:29-sat:09:59",
+      "tags": {
+        "name": "value"
+      },
+      "storage_encrypted": true,
+      "kms_key_id": "arn:aws:kms:us-east-2:012345678910:key/e1234eke-8ffa-40d7-agh9-42f65vv8l0a1",
+      "engine_mode": "provisioned",
+      "deletion_protection": false,
+      "copy_tags_to_snapshot": true,
+      "resource_id": "resource_id_known_after_present"
+    },
+    "old_state": null,
+    "comment": [
+      "Would create aws.rds.db_cluster 'postgres_serverlessWithBackup'"
+    ],
+    "rerun_data": null,
+    "result": true,
+    "esm_tag": "aws.rds.db_cluster_|-postgres_serverlessWithBackup_|-postgres_serverlessWithBackup_|-",
+    "__run_num": 1,
+    "start_time": "2023-05-14 12:13:32.566198",
+    "total_seconds": 1.01395,
+    "sls_meta": {
+      "SLS": {},
+      "ID_DECS": {}
+    },
+    "ref": "states.aws.rds.db_cluster.present",
+    "acct_details": {
+      "attribute_value": "123456789012",
+      "attribute_key": "Account",
+      "provider": "AWS",
+      "region_name": "us-west-2"
+    }
+  },
+  "aws.rds.db_cluster_|-postgres_serverlessWithExport_|-postgres_serverlessWithExport_|-present": {
+    "tag": "aws.rds.db_cluster_|-postgres_serverlessWithExport_|-postgres_serverlessWithExport_|-present",
+    "name": "postgres_serverlessWithExport",
+    "__id__": "postgres_serverlessWithExport",
+    "changes": {
+      "new": {
+        "name": "postgres_serverlessWithExport",
+        "availability_zones": [
+          "us-east-2b",
+          "us-east-2c",
+          "us-east-2a"
+        ],
+        "backup_retention_period": 7,
+        "database_name": "dbname123",
+        "db_cluster_parameter_group_name": "default.aurora-postgresql12",
+        "vpc_security_group_ids": [
+          "sg-45fg34343g"
+        ],
+        "engine": "aurora-postgresql",
+        "engine_version": "12.7",
+        "port": 5432,
+        "master_username": "postgres",
+        "master_user_password": "abcd1234",
+        "preferred_backup_window": "07:41-08:11",
+        "preferred_maintenance_window": "sat:09:29-sat:09:59",
+        "tags": {
+          "name": "value"
+        },
+        "storage_encrypted": true,
+        "kms_key_id": "fake-kms-key-id",
+        "engine_mode": "provisioned",
+        "deletion_protection": false,
+        "copy_tags_to_snapshot": true,
+        "resource_id": "resource_id_known_after_present"
+      }
+    },
+    "new_state": {
+      "name": "postgres_serverlessWithExport",
+      "availability_zones": [
+        "us-east-2b",
+        "us-east-2c",
+        "us-east-2a"
+      ],
+      "backup_retention_period": 7,
+      "database_name": "dbname123",
+      "db_cluster_parameter_group_name": "default.aurora-postgresql12",
+      "vpc_security_group_ids": [
+        "sg-45fg34343g"
+      ],
+      "engine": "aurora-postgresql",
+      "engine_version": "12.7",
+      "port": 5432,
+      "master_username": "postgres",
+      "master_user_password": "abcd1234",
+      "preferred_backup_window": "07:41-08:11",
+      "preferred_maintenance_window": "sat:09:29-sat:09:59",
+      "tags": {
+        "name": "value"
+      },
+      "storage_encrypted": true,
+      "kms_key_id": "arn:aws:kms:us-east-2:012345678910:key/e1234eke-8ffa-40d7-agh9-42f65vv8l0a1",
+      "engine_mode": "provisioned",
+      "deletion_protection": false,
+      "copy_tags_to_snapshot": true,
+      "resource_id": "resource_id_known_after_present"
+    },
+    "old_state": null,
+    "comment": [
+      "Would create aws.rds.db_cluster 'postgres_serverlessWithExport'"
+    ],
+    "rerun_data": null,
+    "result": true,
+    "esm_tag": "aws.rds.db_cluster_|-postgres_serverlessWithExport_|-postgres_serverlessWithExport_|-",
+    "__run_num": 1,
+    "start_time": "2023-05-14 12:13:32.566198",
+    "total_seconds": 1.01395,
+    "sls_meta": {
+      "SLS": {},
+      "ID_DECS": {}
+    },
+    "ref": "states.aws.rds.db_cluster.present",
+    "acct_details": {
+      "attribute_value": "123456789012",
+      "attribute_key": "Account",
+      "provider": "AWS",
+      "region_name": "us-west-2"
+    }
+  },
+  "aws.rds.db_cluster_|-mysql_backtrack_|-mysql_backtrack_|-present": {
+    "tag": "aws.rds.db_cluster_|-mysql_backtrack_|-mysql_backtrack_|-present",
+    "name": "mysql_backtrack",
+    "__id__": "mysql_backtrack",
+    "changes": {
+      "new": {
+        "name": "mysql_backtrack",
+        "availability_zones": [
+          "us-east-2b",
+          "us-east-2c",
+          "us-east-2a"
+        ],
+        "backup_retention_period": 7,
+        "database_name": "dbname123",
+        "db_cluster_parameter_group_name": "default.aurora-postgresql12",
+        "vpc_security_group_ids": [
+          "sg-45fg34343g"
+        ],
+        "engine": "aurora-postgresql",
+        "engine_version": "12.7",
+        "port": 5432,
+        "master_username": "postgres",
+        "master_user_password": "abcd1234",
+        "preferred_backup_window": "07:41-08:11",
+        "preferred_maintenance_window": "sat:09:29-sat:09:59",
+        "tags": {
+          "name": "value"
+        },
+        "storage_encrypted": true,
+        "kms_key_id": "fake-kms-key-id",
+        "engine_mode": "provisioned",
+        "deletion_protection": false,
+        "copy_tags_to_snapshot": true,
+        "resource_id": "resource_id_known_after_present"
+      }
+    },
+    "new_state": {
+      "name": "mysql_backtrack",
+      "availability_zones": [
+        "us-east-2b",
+        "us-east-2c",
+        "us-east-2a"
+      ],
+      "backup_retention_period": 7,
+      "database_name": "dbname123",
+      "db_cluster_parameter_group_name": "default.aurora-postgresql12",
+      "vpc_security_group_ids": [
+        "sg-45fg34343g"
+      ],
+      "engine": "aurora-postgresql",
+      "engine_version": "12.7",
+      "port": 5432,
+      "master_username": "postgres",
+      "master_user_password": "abcd1234",
+      "preferred_backup_window": "07:41-08:11",
+      "preferred_maintenance_window": "sat:09:29-sat:09:59",
+      "tags": {
+        "name": "value"
+      },
+      "storage_encrypted": true,
+      "kms_key_id": "arn:aws:kms:us-east-2:012345678910:key/e1234eke-8ffa-40d7-agh9-42f65vv8l0a1",
+      "engine_mode": "provisioned",
+      "deletion_protection": false,
+      "copy_tags_to_snapshot": true,
+      "resource_id": "resource_id_known_after_present"
+    },
+    "old_state": null,
+    "comment": [
+      "Would create aws.rds.db_cluster 'mysql_backtrack'"
+    ],
+    "rerun_data": null,
+    "result": true,
+    "esm_tag": "aws.rds.db_cluster_|-mysql_backtrack_|-mysql_backtrack_|-",
+    "__run_num": 1,
+    "start_time": "2023-05-14 12:13:32.566198",
+    "total_seconds": 1.01395,
+    "sls_meta": {
+      "SLS": {},
+      "ID_DECS": {}
+    },
+    "ref": "states.aws.rds.db_cluster.present",
+    "acct_details": {
+      "attribute_value": "123456789012",
+      "attribute_key": "Account",
+      "provider": "AWS",
+      "region_name": "us-west-2"
+    }
+  }
+}

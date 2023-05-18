@@ -1,0 +1,12 @@
+
+ Name               Monthly Qty  Unit         Monthly Cost 
+                                                           
+ idem_test_web_acl                                         
+ ├─ Web ACL usage             1  months              $5.00 
+ ├─ Rules                    15  rules              $15.00 
+ └─ Requests                  1  1M requests         $0.60 
+                                                           
+ OVERALL TOTAL                                      $20.60 
+──────────────────────────────────
+1 cloud resource was detected:
+∙ 1 was estimated
