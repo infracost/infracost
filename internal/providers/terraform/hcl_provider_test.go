@@ -176,6 +176,9 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 			},
 			warnings: []hcl.WarningCode{hcl.WarningMissingVars},
 		},
+		{
+			name: "shows correct duplicate variable warning",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
