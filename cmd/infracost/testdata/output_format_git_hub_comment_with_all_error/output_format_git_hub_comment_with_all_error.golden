@@ -6,10 +6,11 @@
 
 ```
 ──────────────────────────────────
-The following projects could not be evaluated: 
-infracost/infracost/examples/terraform
-Run the following command to see more details: infracost breakdown --path=/path/to/code
+Project: infracost/infracost/examples/terraform
+Errors:
+  No valid terraform files found given path, try a different directory
 
+──────────────────────────────────
 
 No cloud resources were detected
 ```

@@ -56,11 +56,16 @@ Monthly cost change for infracost/infracost/cmd/infracost/testdata/breakdown_mul
 Amount:  +$1,303 ($0.00 → $1,303)
 
 ──────────────────────────────────
-Key: ~ changed, + added, - removed
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_multi_project_with_error/dev
+Module path: dev
+Errors:
+  Error loading Terraform modules:
+    failed to inspect module path testdata/breakdown_multi_project_with_error/dev diag:
+      Invalid block definition:
+        Either a quoted string block label or an opening brace ("{") is expected here. (and 1 other messages)
 
-The following projects could not be evaluated: 
-infracost/infracost/cmd/infracost/testdata/breakdown_multi_project_with_error/dev (Module path: dev)
-Run the following command to see more details: infracost breakdown --path=/path/to/code
+──────────────────────────────────
+Key: ~ changed, + added, - removed
 
 ──────────────────────────────────
 Infracost estimate: monthly cost will increase by $1,303 ↑

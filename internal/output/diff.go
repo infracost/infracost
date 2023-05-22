@@ -24,12 +24,12 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 	s := ""
 
 	noDiffProjects := make([]string, 0)
-	erroredProjects := make([]string, 0)
+	erroredProjects := make(Projects, 0)
 
 	s += "──────────────────────────────────\n"
 	for _, project := range out.Projects {
 		if project.Metadata.HasErrors() {
-			erroredProjects = append(erroredProjects, project.LabelWithMetadata())
+			erroredProjects = append(erroredProjects, project)
 			continue
 		}
 
@@ -43,25 +43,7 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 			continue
 		}
 
-		s += fmt.Sprintf("%s %s\n",
-			ui.BoldString("Project:"),
-			project.Label(),
-		)
-
-		if project.Metadata.TerraformModulePath != "" {
-			s += fmt.Sprintf("%s %s\n",
-				ui.BoldString("Module path:"),
-				project.Metadata.TerraformModulePath,
-			)
-		}
-
-		if project.Metadata.WorkspaceLabel() != "" {
-			s += fmt.Sprintf("%s %s\n",
-				ui.BoldString("Workspace:"),
-				project.Metadata.WorkspaceLabel(),
-			)
-		}
-
+		s += projectTitle(project)
 		s += "\n"
 
 		for _, diffResource := range project.Diff.Resources {
@@ -100,6 +82,15 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 		s += "──────────────────────────────────\n"
 	}
 
+	if len(erroredProjects) > 0 {
+		for _, project := range erroredProjects {
+			s += projectTitle(project)
+			s += erroredProject(project)
+
+			s += "\n──────────────────────────────────\n"
+		}
+	}
+
 	hasDiffProjects := len(noDiffProjects)+len(erroredProjects) != len(out.Projects)
 
 	if hasDiffProjects {
@@ -108,15 +99,6 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 			opChar(ADDED),
 			opChar(REMOVED),
 		)
-		s += "\n\n"
-	}
-
-	if len(erroredProjects) > 0 {
-		s += "The following projects could not be evaluated: \n"
-		for _, project := range erroredProjects {
-			s += project + "\n"
-		}
-		s += fmt.Sprintf("Run the following command to see more details: %s", ui.PrimaryString("infracost breakdown --path=/path/to/code"))
 		s += "\n\n"
 	}
 
@@ -150,6 +132,29 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 	}
 
 	return []byte(s), nil
+}
+
+func projectTitle(project Project) string {
+	s := fmt.Sprintf("%s %s\n",
+		ui.BoldString("Project:"),
+		project.Label(),
+	)
+
+	if project.Metadata.TerraformModulePath != "" {
+		s += fmt.Sprintf("%s %s\n",
+			ui.BoldString("Module path:"),
+			project.Metadata.TerraformModulePath,
+		)
+	}
+
+	if project.Metadata.WorkspaceLabel() != "" {
+		s += fmt.Sprintf("%s %s\n",
+			ui.BoldString("Workspace:"),
+			project.Metadata.WorkspaceLabel(),
+		)
+	}
+
+	return s
 }
 
 func tableForDiff(out Root, opts Options) string {
