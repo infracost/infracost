@@ -355,6 +355,19 @@ func TestBreakdownTerragruntGetEnv(t *testing.T) {
 		os.Unsetenv("CUSTOM_OS_VAR_PROD")
 	}()
 
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())}, nil)
+}
+
+func TestBreakdownTerragruntGetEnvWithWhitelist(t *testing.T) {
+	os.Setenv("UNSAFE_VAR", "test")
+	os.Setenv("SAFE_VAR", "test-prod")
+	os.Setenv("INFRACOST_SAFE_ENVS", "TEST,SAFE_VAR,FOO")
+	defer func() {
+		os.Unsetenv("UNSAFE_VAR")
+		os.Unsetenv("SAFE_VAR")
+	}()
+
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())}, nil)
 }
 
 func TestBreakdownTerragruntHCLDepsOutputMocked(t *testing.T) {

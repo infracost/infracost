@@ -75,20 +75,41 @@ func NewTerragruntHCLProvider(ctx *config.ProjectContext, includePastResources b
 		includePastResources: includePastResources,
 		outputs:              map[string]cty.Value{},
 		excludedPaths:        ctx.ProjectConfig.ExcludePaths,
-		env:                  parseEnvironmentVariables(os.Environ()),
+		env:                  getEnvVars(),
 		sourceCache:          map[string]string{},
 		logger:               logger,
 	}
 }
 
-func parseEnvironmentVariables(environment []string) map[string]string {
+func getEnvVars() map[string]string {
+	environment := os.Environ()
 	environmentMap := make(map[string]string)
+
+	var filterSafe bool
+	safe := make(map[string]struct{})
+	if v, ok := os.LookupEnv("INFRACOST_SAFE_ENVS"); ok {
+		filterSafe = true
+
+		keys := strings.Split(v, ",")
+		for _, key := range keys {
+			safe[strings.ToLower(strings.TrimSpace(key))] = struct{}{}
+		}
+	}
 
 	for i := 0; i < len(environment); i++ {
 		variableSplit := strings.SplitN(environment[i], "=", 2)
 
-		if len(variableSplit) == 2 {
-			environmentMap[strings.TrimSpace(variableSplit[0])] = variableSplit[1]
+		if len(variableSplit) != 2 {
+			continue
+		}
+
+		name := strings.TrimSpace(variableSplit[0])
+		if !filterSafe {
+			environmentMap[name] = variableSplit[1]
+		}
+
+		if _, ok := safe[strings.ToLower(name)]; ok {
+			environmentMap[name] = variableSplit[1]
 		}
 	}
 
