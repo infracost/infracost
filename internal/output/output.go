@@ -3,8 +3,8 @@ package output
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
-	"github.com/pkg/errors"
 	"os"
 	"regexp"
 	"sort"
@@ -314,6 +314,9 @@ type GuardrailEvent struct {
 
 	// BlockPR indicated whether this guardrail event should return a failure blocking the PR
 	BlockPR bool `json:"blockPr"`
+
+	// UnblockedAt indicates when the event was unblocked in Infracost Cloud.
+	UnblockedAt *string `json:"unblockedAt"`
 }
 
 // LoadGuardrailCheck reads the file at the path  into a GuardrailCheck struct.
@@ -366,6 +369,59 @@ func (g GuardrailCheck) BlockingFailures() GuardrailFailures {
 		}
 	}
 	return failures
+}
+
+// WarningFailures returns a list of failures that don't block the PR but are advisory.
+func (g GuardrailCheck) WarningFailures() GuardrailFailures {
+	var failures GuardrailFailures
+	for _, event := range g.GuardrailEvents {
+		if !event.BlockPR && event.PRComment && event.UnblockedAt == nil {
+			failures = append(failures, event.TriggerReason)
+		}
+	}
+	return failures
+}
+
+// UnblockedFailures returns a list of failures that have been unblocked in infracost cloud.
+func (g GuardrailCheck) UnblockedFailures() GuardrailFailures {
+	var failures GuardrailFailures
+	for _, event := range g.GuardrailEvents {
+		if event.PRComment && event.UnblockedAt != nil {
+			failures = append(failures, event.TriggerReason)
+		}
+	}
+	return failures
+}
+
+// IsBlocking returns if the GuardrailCheck has any Blocking failures.
+func (g GuardrailCheck) IsBlocking() bool {
+	return len(g.BlockingFailures()) > 0
+}
+
+// IsUnblocked returns if the GuardrailCheck has been unblocked from Infracost Cloud.
+func (g GuardrailCheck) IsUnblocked() bool {
+	if g.IsBlocking() {
+		return false
+	}
+
+	if len(g.WarningFailures()) > 0 {
+		return false
+	}
+
+	return true
+}
+
+// Title returns a short description of the check with an emoji.
+func (g GuardrailCheck) Title() string {
+	if g.IsBlocking() {
+		return "❌ Guardrails triggered (needs action)"
+	}
+
+	if g.IsUnblocked() {
+		return "✅ Guardrails passed"
+	}
+
+	return "⚠️ Guardrails triggered"
 }
 
 // GuardrailFailures defines a list of guardrail failures that were returned from infracost cloud.

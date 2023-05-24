@@ -371,13 +371,22 @@ var CommentMarkdownWithHTMLTemplate = `
 {{- if .Options.GuardrailCheck.Comment }}
 	{{- if gt (len .Options.GuardrailCheck.CommentableFailures) 0 }}
 		<details>
-			<summary><strong>❌ Guardrail checks failed</strong></summary>
-				{{ range $v, $f := .Options.GuardrailCheck.CommentableFailures}}
-> - {{ $f }}
+			<summary><strong>{{ .Options.GuardrailCheck.Title }}</strong></summary>
+				{{- if .Options.GuardrailCheck.IsBlocking }}
+This change is blocked, either reduce the costs or wait for an admin to review and unblock it.
+				{{- end }}
+				{{ range $v, $f := .Options.GuardrailCheck.BlockingFailures}}
+> - <b>Blocked</b>: {{ $f }}
+				{{- end}}
+				{{- range $v, $f := .Options.GuardrailCheck.WarningFailures}}
+> - <b>Warning</b>: {{ $f }}
+				{{- end}}
+				{{- range $v, $f := .Options.GuardrailCheck.UnblockedFailures}}
+> - <b>Unblocked</b>: {{ $f }}
 				{{- end}}
 		</details>
 	{{ else }}
-<strong>✅ Guardrail checks passed</strong>
+<strong>✅ Guardrails passed</strong>
 	{{- end }}
 {{- end }}
 {{- if .MarkdownOptions.WillUpdate }}
