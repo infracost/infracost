@@ -3,7 +3,6 @@ provider "aws" {
   skip_credentials_validation = true
   skip_metadata_api_check     = true
   skip_requesting_account_id  = true
-  skip_get_ec2_platforms      = true
   skip_region_validation      = true
   access_key                  = "mock_access_key"
   secret_key                  = "mock_secret_key"
@@ -45,6 +44,11 @@ resource "aws_kinesis_firehose_delivery_stream" "withAllTags" {
       security_group_ids = ["fake"]
       subnet_ids         = ["fake", "fake1"]
       role_arn           = aws_iam_role.firehose.arn
+    }
+
+    s3_configuration {
+      role_arn   = aws_iam_role.firehose.arn
+      bucket_arn = aws_s3_bucket.bucket.arn
     }
   }
 }
@@ -95,6 +99,11 @@ resource "aws_kinesis_firehose_delivery_stream" "EnabledFalse" {
       subnet_ids         = ["fake", "fake1"]
       role_arn           = aws_iam_role.firehose.arn
     }
+
+    s3_configuration {
+      role_arn   = aws_iam_role.firehose.arn
+      bucket_arn = aws_s3_bucket.bucket.arn
+    }
   }
 }
 
@@ -140,6 +149,11 @@ resource "aws_kinesis_firehose_delivery_stream" "withoutUsage" {
       security_group_ids = ["fake"]
       subnet_ids         = ["fake", "fake1"]
       role_arn           = aws_iam_role.firehose.arn
+    }
+
+    s3_configuration {
+      role_arn   = aws_iam_role.firehose.arn
+      bucket_arn = aws_s3_bucket.bucket.arn
     }
   }
 }
@@ -204,6 +218,11 @@ resource "aws_kinesis_firehose_delivery_stream" "with_dynamic_subnet" {
         aws_subnet.test2.id
       ]
       role_arn = aws_iam_role.firehose.arn
+    }
+
+    s3_configuration {
+      role_arn   = aws_iam_role.firehose.arn
+      bucket_arn = aws_s3_bucket.bucket.arn
     }
   }
 }
