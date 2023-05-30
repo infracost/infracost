@@ -1029,7 +1029,7 @@ func (b *Block) NameLabel() string {
 
 var (
 	countRegex   = regexp.MustCompile(`\[(\d+)\]$`)
-	foreachRegex = regexp.MustCompile(`\["(\w+)"\]$`)
+	foreachRegex = regexp.MustCompile(`\["(.*)"\]$`)
 )
 
 // Index returns the count index of the block using the name label.
