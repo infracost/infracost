@@ -137,11 +137,19 @@ resource "aws_wafv2_web_acl" "my_waf" {
         name        = "AWSManagedRulesCommonRuleSet"
         vendor_name = "AWS"
 
-        excluded_rule {
+        rule_action_override {
+          action_to_use {
+            count {}
+          }
+
           name = "SizeRestrictions_QUERYSTRING"
         }
 
-        excluded_rule {
+        rule_action_override {
+          action_to_use {
+            count {}
+          }
+
           name = "NoUserAgent_HEADER"
         }
 
@@ -172,12 +180,20 @@ resource "aws_wafv2_web_acl" "my_waf" {
       rule_group_reference_statement {
         arn = aws_wafv2_rule_group.example.arn
 
-        excluded_rule {
-          name = "rule-to-exclude-b"
+        rule_action_override {
+          action_to_use {
+            count {}
+          }
+
+          name = "rule-to-override-a"
         }
 
-        excluded_rule {
-          name = "rule-to-exclude-a"
+        rule_action_override {
+          action_to_use {
+            count {}
+          }
+
+          name = "rule-to-override-b"
         }
       }
     }
@@ -245,11 +261,19 @@ resource "aws_wafv2_web_acl" "my_waf_no_usage" {
         name        = "AWSManagedRulesCommonRuleSet"
         vendor_name = "AWS"
 
-        excluded_rule {
+        rule_action_override {
+          action_to_use {
+            count {}
+          }
+
           name = "SizeRestrictions_QUERYSTRING"
         }
 
-        excluded_rule {
+        rule_action_override {
+          action_to_use {
+            count {}
+          }
+
           name = "NoUserAgent_HEADER"
         }
 
@@ -280,12 +304,20 @@ resource "aws_wafv2_web_acl" "my_waf_no_usage" {
       rule_group_reference_statement {
         arn = aws_wafv2_rule_group.example.arn
 
-        excluded_rule {
-          name = "rule-to-exclude-b"
+        rule_action_override {
+          action_to_use {
+            count {}
+          }
+
+          name = "SizeRestrictions_QUERYSTRING"
         }
 
-        excluded_rule {
-          name = "rule-to-exclude-a"
+        rule_action_override {
+          action_to_use {
+            count {}
+          }
+
+          name = "NoUserAgent_HEADER"
         }
       }
     }
