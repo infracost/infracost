@@ -9,10 +9,10 @@ provider "aws" {
 }
 
 resource "aws_elasticache_replication_group" "cluster" {
-  replication_group_description = "This Replication Group"
-  replication_group_id          = "tf-rep-group-1"
-  automatic_failover_enabled    = true
-  node_type                     = "cache.m4.large"
+  description                = "This Replication Group"
+  replication_group_id       = "tf-rep-group-1"
+  automatic_failover_enabled = true
+  node_type                  = "cache.m4.large"
 
   engine = "redis"
 
@@ -21,19 +21,19 @@ resource "aws_elasticache_replication_group" "cluster" {
 }
 
 resource "aws_elasticache_replication_group" "non-cluster" {
-  replication_group_description = "This Replication Group"
-  replication_group_id          = "tf-rep-group-2"
+  description          = "This Replication Group"
+  replication_group_id = "tf-rep-group-2"
 
   engine = "redis"
 
-  node_type             = "cache.r5.4xlarge"
-  number_cache_clusters = 3
+  node_type          = "cache.r5.4xlarge"
+  num_cache_clusters = 3
 }
 
 resource "aws_elasticache_replication_group" "non-cluster-snapshot" {
-  replication_group_description = "This Replication Group"
-  replication_group_id          = "tf-rep-group-3"
-  snapshot_retention_limit      = 2
+  description              = "This Replication Group"
+  replication_group_id     = "tf-rep-group-3"
+  snapshot_retention_limit = 2
 
   engine = "redis"
 
@@ -41,35 +41,11 @@ resource "aws_elasticache_replication_group" "non-cluster-snapshot" {
   num_cache_clusters = 3
 }
 
-resource "aws_elasticache_replication_group" "cluster-deprecated-attribs" {
-  replication_group_description = "This Replication Group"
-  replication_group_id          = "tf-rep-group-4"
-  automatic_failover_enabled    = true
-  node_type                     = "cache.m4.large"
-
-  engine = "redis"
-
-  cluster_mode {
-    num_node_groups         = 4
-    replicas_per_node_group = 3
-  }
-}
-
-resource "aws_elasticache_replication_group" "non-cluster-deprecated-attribs" {
-  replication_group_description = "This Replication Group"
-  replication_group_id          = "tf-rep-group-5"
-
-  engine = "redis"
-
-  node_type             = "cache.r5.4xlarge"
-  number_cache_clusters = 3
-}
-
 resource "aws_elasticache_replication_group" "cluster-autoscale" {
-  replication_group_description = "This Replication Group"
-  replication_group_id          = "tf-rep-group-6"
-  automatic_failover_enabled    = true
-  node_type                     = "cache.m4.large"
+  description                = "This Replication Group"
+  replication_group_id       = "tf-rep-group-4"
+  automatic_failover_enabled = true
+  node_type                  = "cache.m4.large"
 
   engine = "redis"
 
@@ -94,10 +70,10 @@ resource "aws_appautoscaling_target" "autoscale_replicas" {
 }
 
 resource "aws_elasticache_replication_group" "cluster-autoscale-usage" {
-  replication_group_description = "This Replication Group"
-  replication_group_id          = "tf-rep-group-7"
-  automatic_failover_enabled    = true
-  node_type                     = "cache.m4.large"
+  description                = "This Replication Group"
+  replication_group_id       = "tf-rep-group-7"
+  automatic_failover_enabled = true
+  node_type                  = "cache.m4.large"
 
   engine = "redis"
 
@@ -114,11 +90,11 @@ resource "aws_appautoscaling_target" "autoscale_node_groups_usage" {
 }
 
 resource "aws_elasticache_replication_group" "cluster_reserved" {
-  replication_group_description = "This Replication Group"
-  replication_group_id          = "tf-rep-group-2"
+  description          = "This Replication Group"
+  replication_group_id = "tf-rep-group-2"
 
   engine = "redis"
 
-  node_type             = "cache.m6g.12xlarge"
-  number_cache_clusters = 3
+  node_type          = "cache.m6g.12xlarge"
+  num_cache_clusters = 3
 }

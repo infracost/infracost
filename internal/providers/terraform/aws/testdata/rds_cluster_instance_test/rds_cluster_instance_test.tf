@@ -11,6 +11,7 @@ provider "aws" {
 resource "aws_rds_cluster" "default" {
   cluster_identifier = "aurora-cluster-demo"
   availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  engine             = "aurora-mysql"
   database_name      = "mydb"
   master_username    = "foo"
   master_password    = "barbut8chars"
@@ -27,6 +28,7 @@ resource "aws_rds_cluster_instance" "cluster_instance" {
 resource "aws_rds_cluster" "default_t3" {
   cluster_identifier = "aurora-cluster-demo"
   availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
+  engine             = "aurora-mysql"
   database_name      = "mydb"
   master_username    = "foo"
   master_password    = "barbut8chars"

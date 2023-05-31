@@ -79,7 +79,7 @@ func calcLaunchType(d *schema.ResourceData) string {
 		cluster := clusterRefs[0]
 
 		// check the cluster for a default capacity provider
-
+		// for terraform-provider-aws v4
 		if defaultStrategies := cluster.Get("default_capacity_provider_strategy").Array(); len(defaultStrategies) > 0 {
 			launchType = getCapacityProviderLaunchType(defaultStrategies)
 			if launchType == "FARGATE" {
