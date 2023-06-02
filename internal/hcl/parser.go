@@ -7,6 +7,7 @@ import (
 	"path"
 	"path/filepath"
 	"runtime/debug"
+	"sort"
 	"strings"
 
 	"github.com/hashicorp/hcl/v2"
@@ -553,6 +554,11 @@ func loadDirectory(logger *logrus.Entry, fullPath string, stopOnHCLError bool) (
 	for filename, f := range hclParser.Files() {
 		files = append(files, file{hclFile: f, path: filename})
 	}
+
+	// sort files by path to ensure consistent ordering
+	sort.Slice(files, func(i, j int) bool {
+		return files[i].path < files[j].path
+	})
 
 	return files, nil
 }
