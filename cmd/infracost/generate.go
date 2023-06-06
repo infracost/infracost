@@ -75,9 +75,14 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 		ui.PrintWarningf(cmd.ErrOrStderr(), "could not fetch git metadata err: %s, default template variables will be blank", err)
 	}
 
-	parser := template.NewParser(repoPath, map[string]interface{}{
-		"branch": m.Branch.Name,
-	})
+	variables := template.Variables{
+		Branch: m.Branch.Name,
+	}
+	if m.PullRequest != nil {
+		variables.BaseBranch = m.PullRequest.BaseBranch
+	}
+
+	parser := template.NewParser(repoPath, variables)
 	if g.template != "" {
 		err := parser.Compile(g.template, out)
 		if err != nil {

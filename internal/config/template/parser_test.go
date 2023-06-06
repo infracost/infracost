@@ -14,8 +14,8 @@ import (
 
 func TestParser_Compile(t *testing.T) {
 	tests := []struct {
-		name string
-		data map[string]interface{}
+		name      string
+		variables Variables
 	}{
 		{
 			name: "different env dirs",
@@ -37,8 +37,9 @@ func TestParser_Compile(t *testing.T) {
 		},
 		{
 			name: "with top level template data",
-			data: map[string]interface{}{
-				"branch": "test",
+			variables: Variables{
+				Branch:     "test",
+				BaseBranch: "master",
 			},
 		},
 	}
@@ -51,7 +52,7 @@ func TestParser_Compile(t *testing.T) {
 			f, err := os.Open(golden)
 			require.NoError(t, err)
 
-			p := NewParser(testDataPath, tt.data)
+			p := NewParser(testDataPath, tt.variables)
 
 			wr := &bytes.Buffer{}
 			err = p.CompileFromFile(input, wr)
