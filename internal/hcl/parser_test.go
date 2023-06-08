@@ -809,7 +809,7 @@ resource "test_resource" "static" {
 }
 
 resource "test_resource_two" "test" {
-  for_each        = test_resource.test 
+  for_each        = test_resource.test
   inherited_id    = each.value.id
   inherited_attr  = each.value.another_attr
 }
@@ -860,7 +860,7 @@ module "test" {
 }
 
 resource "test_two" "test" {
-  for_each        = module.test 
+  for_each        = module.test
   inherited_id    = each.value.id
   inherited_attr  = each.value.mod_result
 }
@@ -1182,4 +1182,37 @@ func valueToBytes(t *testing.T, v cty.Value) []byte {
 	require.NoError(t, err)
 
 	return b
+}
+
+func Test_CountOutOfOrder(t *testing.T) {
+	path := createTestFile("test.tf", `
+
+resource "test_resource" "first" {
+	count = length(test_resource.second)
+}
+
+resource "test_resource" "second" {
+  count = 2
+}
+`)
+
+	logger := newDiscardLogger()
+	loader := modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{})
+	parsers, err := LoadParsers(filepath.Dir(path), loader, nil, logger)
+	require.NoError(t, err)
+	module, err := parsers[0].ParseDirectory()
+	require.NoError(t, err)
+
+	blocks := module.Blocks
+	resources := blocks.OfType("resource")
+	labels := make([]string, len(resources))
+	for i, resource := range resources {
+		labels[i] = resource.Label()
+	}
+	assert.ElementsMatch(t, []string{
+		`test_resource.first[0]`,
+		`test_resource.first[1]`,
+		`test_resource.second[0]`,
+		`test_resource.second[1]`,
+	}, labels)
 }
