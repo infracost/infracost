@@ -133,6 +133,11 @@ func NewEvaluator(
 	ctx.SetByDot(cty.StringVal(modulePath), "path.module")
 	ctx.SetByDot(cty.StringVal(filepath.Join(workingDir, module.RootPath)), "path.cwd")
 
+	// set the availability zones to a default length of 3
+	ctx.SetByDot(cty.ObjectVal(map[string]cty.Value{
+		"names": cty.ListVal([]cty.Value{cty.StringVal("az-mock-1"), cty.StringVal("az-mock-2"), cty.StringVal("az-mock-3")}),
+	}), "data.aws_availability_zones.available")
+
 	for _, b := range module.Blocks {
 		b.SetContext(ctx.NewChild())
 	}
