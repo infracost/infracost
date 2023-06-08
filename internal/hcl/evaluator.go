@@ -537,11 +537,23 @@ func shouldExpandBlock(block *Block) bool {
 }
 
 func (e *Evaluator) expandBlockCounts(blocks Blocks) Blocks {
-	var countFiltered Blocks
+	var expanded Blocks
+	var haveChanged = make(map[string]*Block)
 	for _, block := range blocks {
 		countAttr := block.GetAttribute("count")
-		if countAttr == nil || !block.ShouldExpand() {
-			countFiltered = append(countFiltered, block)
+		if countAttr == nil {
+			expanded = append(expanded, block)
+			continue
+		}
+
+		if block.IsCountExpanded() || !shouldExpandBlock(block) {
+			parent := block.parent.GetAttribute("count")
+			if !parent.HasChanged() {
+				expanded = append(expanded, block)
+			} else {
+				haveChanged[block.parent.FullName()] = block.parent
+			}
+
 			continue
 		}
 
@@ -561,14 +573,24 @@ func (e *Evaluator) expandBlockCounts(blocks Blocks) Blocks {
 			c, _ := gocty.ToCtyValue(i, cty.Number)
 			clone := e.blockBuilder.CloneBlock(block, c)
 
-			countFiltered = append(countFiltered, clone)
+			expanded = append(expanded, clone)
 			vals[i] = clone.Values()
 		}
 
 		e.ctx.SetByDot(cty.TupleVal(vals), block.Reference().String())
 	}
 
-	return countFiltered
+	if len(haveChanged) > 0 {
+		var changes = make(Blocks, 0, len(haveChanged))
+		for _, block := range haveChanged {
+			changes = append(changes, block)
+		}
+
+		counts := e.expandBlockCounts(changes)
+		return append(expanded, counts...)
+	}
+
+	return expanded
 }
 
 func (e *Evaluator) evaluateVariable(b *Block) (cty.Value, error) {
