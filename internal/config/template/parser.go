@@ -8,6 +8,7 @@ import (
 	"strings"
 	"text/template"
 
+	jsoniter "github.com/json-iterator/go"
 	"github.com/pkg/errors"
 	pathToRegexp "github.com/soongo/path-to-regexp"
 )
@@ -16,19 +17,27 @@ var (
 	defaultInfracostTmplName = "infracost.yml.tmpl"
 )
 
+// Variables hold the global variables that are passed into any template that the Parser evaluates.
+type Variables struct {
+	Branch     string
+	BaseBranch string
+}
+
 // Parser is the representation of an initialized Infracost template parser.
 // It exposes custom template functions to the user which can act on Parser.repoDir
 // or in isolation.
 type Parser struct {
-	repoDir  string
-	template *template.Template
+	repoDir   string
+	template  *template.Template
+	variables Variables
 }
 
 // NewParser returns a safely initialized Infracost template parser, this builds the underlying template with the
-// Parser functions and sets the underlying default template name.
-func NewParser(repoDir string) *Parser {
+// Parser functions and sets the underlying default template name. Default variables can be passed to the parser which
+// will be passed to the template on execution.
+func NewParser(repoDir string, variables Variables) *Parser {
 	absRepoDir, _ := filepath.Abs(repoDir)
-	p := Parser{repoDir: absRepoDir}
+	p := Parser{repoDir: absRepoDir, variables: variables}
 	t := template.New(defaultInfracostTmplName).Funcs(template.FuncMap{
 		"base":       p.base,
 		"stem":       p.stem,
@@ -62,7 +71,7 @@ func (p *Parser) CompileFromFile(templatePath string, wr io.Writer) error {
 		return fmt.Errorf("could not parse template path: %s err: %w", templatePath, err)
 	}
 
-	err = t.Execute(wr, nil)
+	err = t.Execute(wr, p.variables)
 	if err != nil {
 		return fmt.Errorf("could not execute template: %s err: %w", templatePath, err)
 	}
@@ -82,7 +91,7 @@ func (p *Parser) Compile(template string, wr io.Writer) error {
 		return fmt.Errorf("could not parse template: %q err: %w", template, err)
 	}
 
-	err = t.Execute(wr, nil)
+	err = t.Execute(wr, p.variables)
 	if err != nil {
 		return fmt.Errorf("could not execute template: %q err: %w", template, err)
 	}
@@ -187,10 +196,19 @@ func (p *Parser) matchPaths(pattern string) []map[interface{}]interface{} {
 		rel, _ := filepath.Rel(p.repoDir, path)
 		res, _ := match(rel)
 		if res != nil {
-			params := make(map[interface{}]interface{}, len(res.Params)+2)
+			var out map[string]interface{}
+			params := make(map[interface{}]interface{})
+
+			b, _ := jsoniter.Marshal(p.variables)
+			_ = jsoniter.Unmarshal(b, &out)
+
+			for k, v := range out {
+				params[k] = v
+			}
 			for k, v := range res.Params {
 				params[k] = v
 			}
+
 			params["_path"] = rel
 			dir := filepath.Dir(rel)
 			params["_dir"] = dir

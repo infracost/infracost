@@ -14,7 +14,8 @@ import (
 
 func TestParser_Compile(t *testing.T) {
 	tests := []struct {
-		name string
+		name      string
+		variables Variables
 	}{
 		{
 			name: "different env dirs",
@@ -34,6 +35,13 @@ func TestParser_Compile(t *testing.T) {
 		{
 			name: "with string manipulation functions",
 		},
+		{
+			name: "with top level template data",
+			variables: Variables{
+				Branch:     "test",
+				BaseBranch: "master",
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -44,7 +52,7 @@ func TestParser_Compile(t *testing.T) {
 			f, err := os.Open(golden)
 			require.NoError(t, err)
 
-			p := NewParser(testDataPath)
+			p := NewParser(testDataPath, tt.variables)
 
 			wr := &bytes.Buffer{}
 			err = p.CompileFromFile(input, wr)
