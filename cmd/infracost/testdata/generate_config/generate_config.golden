@@ -9,3 +9,4 @@ projects:
       name: prod
       terraform_var_files:
         - environment/prod/terraform.tfvars
+
