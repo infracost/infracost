@@ -7,6 +7,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/alecthomas/jsonschema"
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/shopspring/decimal"
 	"os"
@@ -15,8 +16,9 @@ import (
 )
 
 func main() {
-	var c config
+	var c cmdConfig
 	flag.StringVar(&c.Filename, "out-file", "", "The file to write with the generated JSON schema.")
+	flag.StringVar(&c.Schema, "schema", "output", "The schema to write, 'output' (default) or 'config'")
 	flag.Parse()
 
 	if flag.NFlag() == 0 {
@@ -29,15 +31,25 @@ func main() {
 	}
 
 	c.Filename = strings.ToLower(c.Filename)
+	var b []byte
+	var err error
 
-	b, err := generateJSONSchema()
+	switch c.Schema {
+	case "output":
+		b, err = generateOutputJSONSchema()
+	case "config":
+		b, err = generateConfigFileJSONSchema()
+	default:
+		err = fmt.Errorf("Unknown schema, expected output or config:  %s", c.Schema)
+	}
+
 	if err != nil {
-		exitWithErr(fmt.Errorf("Error generating files for resource:\n%w", err))
+		exitWithErr(fmt.Errorf("Error generating JSON schema:\n%w", err))
 	}
 
 	err = writeOutput(c, b)
 	if err != nil {
-		exitWithErr(fmt.Errorf("Error generating files for resource:\n%w", err))
+		exitWithErr(fmt.Errorf("Error writing file:\n%w", err))
 	}
 }
 
@@ -50,7 +62,7 @@ func typeMapper(i reflect.Type) *jsonschema.Type {
 	return nil
 }
 
-func generateJSONSchema() ([]byte, error) {
+func generateOutputJSONSchema() ([]byte, error) {
 	schemaReflector := &jsonschema.Reflector{
 		TypeMapper: typeMapper,
 	}
@@ -100,12 +112,28 @@ func subresourcesType() (*jsonschema.Type, error) {
 	return subschema.Definitions["Resource"], nil
 }
 
-func writeOutput(c config, data []byte) error {
+func generateConfigFileJSONSchema() ([]byte, error) {
+	schemaReflector := &jsonschema.Reflector{
+		TypeMapper: typeMapper,
+	}
+
+	schema := schemaReflector.Reflect(&config.ConfigFileSpec{})
+
+	b, err := json.MarshalIndent(schema, "", "  ")
+	if err != nil {
+		return nil, err
+	}
+
+	return b, nil
+}
+
+func writeOutput(c cmdConfig, data []byte) error {
 	return os.WriteFile(c.Filename, data, 0600)
 }
 
-type config struct {
+type cmdConfig struct {
 	Filename string
+	Schema   string
 }
 
 func exitWithErr(err error) {

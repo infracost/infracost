@@ -20,6 +20,7 @@ run:
 
 jsonschema:
 	go run ./cmd/jsonschema/main.go --out-file ./schema/infracost.schema.json
+	go run ./cmd/jsonschema/main.go --out-file ./schema/config.schema.json --schema config
 
 build:
 	CGO_ENABLED=0 go build $(BUILD_FLAGS) -o build/$(BINARY) $(PKG)
