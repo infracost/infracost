@@ -27,20 +27,20 @@ type Project struct {
 	ConfigSha string `yaml:"config_sha,omitempty"  ignored:"true"`
 	// Path to the Terraform directory or JSON/plan file.
 	// A path can be repeated with different parameters, e.g. for multiple workspaces.
-	Path string `yaml:"path,omitempty" ignored:"true"`
+	Path string `yaml:"path" ignored:"true"`
 	// ExcludePaths defines a list of directories that the provider should ignore.
 	ExcludePaths []string `yaml:"exclude_paths,omitempty" ignored:"true"`
 	// DependencyPaths is a list of any paths that this project depends on. These paths are relative to the
 	// config file and NOT the project.
-	DependencyPaths []string `yaml:"dependency_paths"`
+	DependencyPaths []string `yaml:"dependency_paths,omitempty"`
 	// IncludeAllPaths tells autodetect to use all folders with valid project files.
 	IncludeAllPaths bool `yaml:"include_all_paths,omitempty" ignored:"true"`
 	// Name is a user defined name for the project
 	Name string `yaml:"name,omitempty" ignored:"true"`
 	// TerraformVarFiles is any var files that are to be used with the project.
-	TerraformVarFiles []string `yaml:"terraform_var_files"`
+	TerraformVarFiles []string `yaml:"terraform_var_files,omitempty"`
 	// TerraformVars is a slice of input vars that are to be used with the project.
-	TerraformVars map[string]string `yaml:"terraform_vars"`
+	TerraformVars map[string]string `yaml:"terraform_vars,omitempty"`
 	// TerraformForceCLI will run a project by calling out to the terraform/terragrunt binary to generate a plan JSON file.
 	TerraformForceCLI bool `yaml:"terraform_force_cli,omitempty"`
 	// TerraformPlanFlags are flags to pass to terraform plan with Terraform directory paths
@@ -58,7 +58,7 @@ type Project struct {
 	// Only applicable for terraform cloud/enterprise users.
 	TerraformCloudToken string `yaml:"terraform_cloud_token,omitempty" envconfig:"TERRAFORM_CLOUD_TOKEN"`
 	// TerragruntFlags set additional flags that should be passed to terragrunt.
-	TerragruntFlags string `envconfig:"TERRAGRUNT_FLAGS"`
+	TerragruntFlags string `yaml:"terragrunt_flags,omitempty" envconfig:"TERRAGRUNT_FLAGS"`
 	// UsageFile is the full path to usage file that specifies values for usage-based resources
 	UsageFile string `yaml:"usage_file,omitempty" ignored:"true"`
 	// TerraformUseState sets if the users wants to use the terraform state for infracost ops.
@@ -166,7 +166,7 @@ func (c *Config) RepoPath() string {
 }
 
 func (c *Config) LoadFromConfigFile(path string, cmd *cobra.Command) error {
-	cfgFile, err := loadConfigFile(path)
+	cfgFile, err := LoadConfigFile(path)
 	if err != nil {
 		return err
 	}
