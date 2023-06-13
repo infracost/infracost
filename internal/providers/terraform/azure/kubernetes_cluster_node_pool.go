@@ -24,13 +24,14 @@ func NewAzureRMKubernetesClusterNodePool(d *schema.ResourceData, u *schema.Usage
 	region := lookupRegion(d, []string{"kubernetes_cluster_id"})
 
 	nodeCount := decimal.NewFromInt(1)
-	if d.Get("node_count").Type != gjson.Null {
-		nodeCount = decimal.NewFromInt(d.Get("node_count").Int())
-	}
 
 	// if the node count is not set explicitly let's take the min_count.
-	if d.Get("min_count").Type != gjson.Null && nodeCount.Equal(decimal.NewFromInt(1)) {
+	if d.Get("min_count").Type != gjson.Null {
 		nodeCount = decimal.NewFromInt(d.Get("min_count").Int())
+	}
+
+	if d.Get("node_count").Type != gjson.Null {
+		nodeCount = decimal.NewFromInt(d.Get("node_count").Int())
 	}
 
 	if u != nil && u.Get("nodes").Exists() {
