@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"fmt"
 	"github.com/infracost/infracost/internal/config"
 	"gopkg.in/yaml.v2"
 	"io"
@@ -81,14 +82,12 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 	if g.template != "" {
 		err := parser.Compile(g.template, &buf)
 		if err != nil {
-			ui.PrintErrorf(cmd.ErrOrStderr(), "Could not compile template error: %s", err)
-			return nil
+			return err
 		}
 	} else {
 		err := parser.CompileFromFile(g.templatePath, &buf)
 		if err != nil {
-			ui.PrintErrorf(cmd.ErrOrStderr(), "Could not compile template error: %s", err)
-			return nil
+			return err
 		}
 	}
 
@@ -98,8 +97,7 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 		var err error
 		out, err = os.Create(g.outFile)
 		if err != nil {
-			ui.PrintErrorf(cmd.ErrOrStderr(), "Could not create out file %s %s", g.outFile, err)
-			return nil
+			return fmt.Errorf("could not create out file %s: %s", g.outFile, err)
 		}
 	}
 
@@ -108,7 +106,7 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 
 	_, err = buf.WriteTo(out)
 	if err != nil {
-		ui.PrintErrorf(cmd.ErrOrStderr(), "Could not write file %s %s", g.outFile, err)
+		return fmt.Errorf("could not write file %s: %s", g.outFile, err)
 	}
 
 	cmd.Printf("\n")
@@ -126,12 +124,11 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 		// not to stutter the errors we should check here for
 		// our custom error type.
 		if _, ok := err.(*config.YamlError); ok {
-			ui.PrintWarningf(cmd.ErrOrStderr(), "Invalid config file: %s", err)
-			return nil
+			return fmt.Errorf("invalid config file: %s", err)
 		}
 
 		// if we receive a caught panic error, wrap the message in something more user-friendly
-		ui.PrintWarningf(cmd.ErrOrStderr(), "Could not validate generated config file: %s: %s", config.ErrorInvalidConfigFile, err)
+		return fmt.Errorf("could not validate generated config file, check file syntax: %s", err)
 	}
 
 	return nil
