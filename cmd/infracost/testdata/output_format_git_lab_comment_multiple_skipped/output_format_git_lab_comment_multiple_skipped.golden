@@ -1,36 +1,26 @@
 
-💰 Infracost estimate: **monthly cost will increase by $1,402 (+1,152%) 📈**
+💰 Infracost estimate: **monthly cost will increase by $1,402 📈**
 <table>
   <thead>
     <td>Project</td>
-    <td>Previous</td>
-    <td>New</td>
-    <td>Diff</td>
+    <td>Cost change</td>
+    <td>New monthly cost</td>
   </thead>
   <tbody>
     <tr>
       <td>infracost/infracost/cmd/infracost/testdata</td>
-      <td align="right">$0</td>
-      <td align="right">$1,361</td>
       <td>+$1,361</td>
+      <td align="right">$1,361</td>
     </tr>
     <tr>
       <td>infracost/infracost/cmd/infraco...data/terraform_v0.14_plan.json</td>
-      <td align="right">$41</td>
-      <td align="right">$81</td>
       <td>+$41 (+100%)</td>
-    </tr>
-    <tr>
-      <td>All projects</td>
-      <td align="right">$122</td>
-      <td align="right">$1,524</td>
-      <td>+$1,402 (+1,152%)</td>
+      <td align="right">$81</td>
     </tr>
   </tbody>
 </table>
 
 2 projects have no cost estimate changes.
-
 <details>
 <summary><strong>Infracost output</strong></summary>
 
@@ -221,7 +211,7 @@ Percent: +100%
 Key: ~ changed, + added, - removed
 
 ──────────────────────────────────
-Infracost estimate: monthly cost will increase by $1,402 (+1,152%) ↑
+Infracost estimate: monthly cost will increase by $1,402 ↑
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                                          ┃ Previous   ┃ New        ┃ Diff         ┃

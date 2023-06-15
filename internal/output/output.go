@@ -248,6 +248,7 @@ type SummaryOptions struct {
 
 type Options struct {
 	DashboardEndpoint string
+	DashboardURL      string
 	NoColor           bool
 	ShowSkipped       bool
 	ShowAllProjects   bool

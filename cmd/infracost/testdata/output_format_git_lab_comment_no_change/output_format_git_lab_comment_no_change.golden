@@ -1,30 +1,3 @@
 
 💰 Infracost estimate: **monthly cost will not change**
-<table>
-  <thead>
-    <td>Project</td>
-    <td>Previous</td>
-    <td>New</td>
-    <td>Diff</td>
-  </thead>
-  <tbody>
-    <tr>
-      <td>infracost/infracost/cmd/infraco...aform_v0.14_nochange_plan.json</td>
-      <td align="right">$41</td>
-      <td align="right">$41</td>
-      <td>$0</td>
-    </tr>
-  </tbody>
-</table>
-
-<details>
-<summary><strong>Infracost output</strong></summary>
-
-```
-──────────────────────────────────
-1 project had no cost estimate changes, rerun with --show-skipped to see details
-
-──────────────────────────────────
-```
-</details>
 

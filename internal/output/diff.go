@@ -176,7 +176,7 @@ func tableForDiff(out Root, opts Options) string {
 	})
 
 	for _, project := range out.Projects {
-		if !showProject(project, opts) {
+		if !showProject(project, opts, false) {
 			continue
 		}
 

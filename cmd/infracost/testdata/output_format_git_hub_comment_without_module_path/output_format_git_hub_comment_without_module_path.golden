@@ -3,28 +3,19 @@
 <table>
   <thead>
     <td>Project</td>
-    <td>Previous</td>
-    <td>New</td>
-    <td>Diff</td>
+    <td>Cost change</td>
+    <td>New monthly cost</td>
   </thead>
   <tbody>
     <tr>
       <td>different_name_plan</td>
-      <td align="right">$41</td>
-      <td align="right">$41</td>
       <td>$0</td>
-    </tr>
-    <tr>
-      <td>All projects</td>
       <td align="right">$41</td>
-      <td align="right">$41</td>
-      <td>$0</td>
     </tr>
   </tbody>
 </table>
 
 1 project has no cost estimate changes.
-
 <details>
 <summary><strong>Infracost output</strong></summary>
 

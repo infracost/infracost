@@ -137,8 +137,8 @@ func truncateMiddle(s string, maxLen int, fill string) string {
 	return string(truncated)
 }
 
-func showProject(p Project, opts Options) bool {
-	if p.Metadata.HasErrors() {
+func showProject(p Project, opts Options, showError bool) bool {
+	if p.Metadata.HasErrors() && showError {
 		return false
 	}
 

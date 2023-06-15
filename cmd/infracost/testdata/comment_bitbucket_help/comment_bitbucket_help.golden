@@ -28,6 +28,7 @@ FLAGS
       --pull-request int              Pull request number to post comment on
       --repo string                   Repository in format workspace/repo
       --show-all-projects             Show all projects in the table of the comment output
+      --show-skipped                  List unsupported and free resources
       --tag string                    Customize special text used to detect comments posted by Infracost (placed at the bottom of a comment)
 
 GLOBAL FLAGS

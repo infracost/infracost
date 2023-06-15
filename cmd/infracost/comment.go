@@ -44,11 +44,14 @@ func commentCmd(ctx *config.RunContext) *cobra.Command {
 		subCmd.Flags().StringArray("policy-path", nil, "Path to Infracost policy files, glob patterns need quotes (experimental)")
 		subCmd.Flags().Bool("show-all-projects", false, "Show all projects in the table of the comment output")
 		subCmd.Flags().Bool("show-changed", false, "Show only projects in the table that have code changes")
+		subCmd.Flags().Bool("show-skipped", false, "List unsupported and free resources")
 		_ = subCmd.Flags().MarkHidden("show-changed")
 		subCmd.Flags().Bool("skip-no-diff", false, "Skip posting comment if there are no resource changes. Only applies to update, hide-and-new, and delete-and-new behaviors")
 		_ = subCmd.Flags().MarkHidden("skip-no-diff")
 		subCmd.Flags().String("guardrail-check-path", "", "Path to Infracost guardrail data (experimental)")
 		_ = subCmd.Flags().MarkHidden("guardrail-check-path")
+		subCmd.Flags().String("dashboard-url", "", "The Infracost Cloud dashboard URL for the PR")
+		_ = subCmd.Flags().MarkHidden("dashboard-url")
 	}
 
 	cmd.AddCommand(cmds...)
@@ -109,12 +112,13 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 	opts := output.Options{
 		DashboardEndpoint: ctx.Config.DashboardEndpoint,
 		NoColor:           ctx.Config.NoColor,
-		ShowSkipped:       true,
 		PolicyChecks:      policyChecks,
 		GuardrailCheck:    guardrailCheck,
 	}
 	opts.ShowAllProjects, _ = cmd.Flags().GetBool("show-all-projects")
 	opts.ShowOnlyChanges, _ = cmd.Flags().GetBool("show-changed")
+	opts.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
+	opts.DashboardURL, _ = cmd.Flags().GetString("dashboard-url")
 
 	b, err := output.ToMarkdown(combined, opts, mdOpts)
 	if err != nil {

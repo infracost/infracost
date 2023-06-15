@@ -1,18 +1,17 @@
 
-## Infracost estimate: **monthly cost will decrease by $3,364 (-42%) ↓**
 
-| **Project** | **Module path** | **Previous** | **New** | **Diff** |
-| ----------- | ---------- | -----------: | ------: | -------- |
-| my first project |  | $1,303 | $743 | -$560.64 (-43%) |
-| my first project again |  | $1,303 | $743 | -$560.64 (-43%) |
-| my terragrunt multi project | prod | $1,308 | $748 | -$560.64 (-43%) |
-| my terragrunt prod project |  | $1,308 | $748 | -$560.64 (-43%) |
-| my terragrunt workspace | prod | $1,308 | $748 | -$560.64 (-43%) |
-| my workspace project |  | $1,303 | $743 | -$560.64 (-43%) |
-| **All projects** | | **$7,991** | **$4,627** | **-$3,363.84 (-42%)** |
+## Infracost estimate: **monthly cost will decrease by $3,364 ↓**
+
+| **Project** | **Module path** | **Cost change** | **New monthly cost** |
+| ----------- | ---------- | --------------: | -------------------- |
+| my first project |  | -$560.64 (-43%) | $743 |
+| my first project again |  | -$560.64 (-43%) | $743 |
+| my terragrunt multi project | prod | -$560.64 (-43%) | $748 |
+| my terragrunt prod project |  | -$560.64 (-43%) | $748 |
+| my terragrunt workspace | prod | -$560.64 (-43%) | $748 |
+| my workspace project |  | -$560.64 (-43%) | $743 |
 
 3 projects have no cost estimate changes.
-
 **Infracost output:**
 
 ```
@@ -102,7 +101,7 @@ Percent: -43%
 Key: ~ changed, + added, - removed
 
 ──────────────────────────────────
-Infracost estimate: monthly cost will decrease by $3,364 (-42%) ↓
+Infracost estimate: monthly cost will decrease by $3,364 ↓
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Previous   ┃ New        ┃ Diff            ┃

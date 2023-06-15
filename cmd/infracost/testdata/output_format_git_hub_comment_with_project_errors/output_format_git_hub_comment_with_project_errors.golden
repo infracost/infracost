@@ -3,28 +3,19 @@
 <table>
   <thead>
     <td>Project</td>
-    <td>Previous</td>
-    <td>New</td>
-    <td>Diff</td>
+    <td>Cost change</td>
+    <td>New monthly cost</td>
   </thead>
   <tbody>
     <tr>
       <td>infracost/infracost/cmd/infraco..._multi_project_with_error/prod</td>
-      <td align="right">$0</td>
-      <td align="right">$1,303</td>
       <td>+$1,303</td>
-    </tr>
-    <tr>
-      <td>All projects</td>
-      <td align="right">$0</td>
       <td align="right">$1,303</td>
-      <td>+$1,303</td>
     </tr>
   </tbody>
 </table>
 
 1 project could not be evaluated.
-
 <details>
 <summary><strong>Infracost output</strong></summary>
 

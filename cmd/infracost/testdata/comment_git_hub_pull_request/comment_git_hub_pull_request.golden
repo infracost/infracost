@@ -1,22 +1,19 @@
 
-💰 Infracost estimate: **monthly cost will increase by $41 (+100%) 📈**
+💰 Infracost estimate: **monthly cost will increase by $41 📈**
 <table>
   <thead>
     <td>Project</td>
-    <td>Previous</td>
-    <td>New</td>
-    <td>Diff</td>
+    <td>Cost change</td>
+    <td>New monthly cost</td>
   </thead>
   <tbody>
     <tr>
       <td>infracost/infracost/cmd/infraco...data/terraform_v0.14_plan.json</td>
-      <td align="right">$41</td>
-      <td align="right">$81</td>
       <td>+$41 (+100%)</td>
+      <td align="right">$81</td>
     </tr>
   </tbody>
 </table>
-
 <details>
 <summary><strong>Infracost output</strong></summary>
 
@@ -125,7 +122,7 @@ Percent: +100%
 Key: ~ changed, + added, - removed
 
 ──────────────────────────────────
-Infracost estimate: monthly cost will increase by $41 (+100%) ↑
+Infracost estimate: monthly cost will increase by $41 ↑
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                                          ┃ Previous   ┃ New        ┃ Diff         ┃
@@ -135,20 +132,11 @@ Infracost estimate: monthly cost will increase by $41 (+100%) ↑
 
 26 cloud resources were detected:
 ∙ 14 were estimated, 10 of which include usage-based costs, see https://infracost.io/usage-file
-∙ 12 were free:
-  ∙ 2 x aws_db_option_group
-  ∙ 2 x aws_db_parameter_group
-  ∙ 2 x aws_db_subnet_group
-  ∙ 2 x aws_default_vpc
-  ∙ 2 x aws_iam_role
-  ∙ 2 x aws_iam_role_policy_attachment
+∙ 12 were free, rerun with --show-skipped to see details
 ```
 </details>
-
-This comment will be updated when the cost estimate changes.
-
 <sub>
-  Is this comment useful? <a href="https://dashboard.infracost.io/feedback/redirect?runId=&value=yes" rel="noopener noreferrer" target="_blank">Yes</a>, <a href="https://dashboard.infracost.io/feedback/redirect?runId=&value=no" rel="noopener noreferrer" target="_blank">No</a>, <a href="https://dashboard.infracost.io/feedback/redirect?runId=&value=other" rel="noopener noreferrer" target="_blank">Other</a>
+  This comment will be updated when the cost estimate changes.
 </sub>
 
 Comment not posted to GitHub (--dry-run was specified)

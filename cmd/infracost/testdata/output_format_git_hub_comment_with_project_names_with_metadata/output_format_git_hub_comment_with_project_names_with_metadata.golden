@@ -1,74 +1,58 @@
 
-💰 Infracost estimate: **monthly cost will decrease by $2,241 (-42%) 📉**
+💰 Infracost estimate: **monthly cost will decrease by $2,241 📉**
 <table>
   <thead>
     <td>Project</td>
     <td>Module path</td>
     <td>Workspace</td>
-    <td>Previous</td>
-    <td>New</td>
-    <td>Diff</td>
+    <td>Cost change</td>
+    <td>New monthly cost</td>
   </thead>
   <tbody>
     <tr>
       <td>my terragrunt project</td>
       <td>dev</td>
       <td></td>
-      <td align="right">$51</td>
-      <td align="right">$52</td>
       <td>+$0.88 (+2%)</td>
+      <td align="right">$52</td>
     </tr>
     <tr>
       <td>my terragrunt project</td>
       <td>dev</td>
       <td>ws2</td>
-      <td align="right">$51</td>
-      <td align="right">$52</td>
       <td>+$0.88 (+2%)</td>
+      <td align="right">$52</td>
     </tr>
     <tr>
       <td>my terragrunt project</td>
       <td>prod</td>
       <td></td>
-      <td align="right">$1,308</td>
-      <td align="right">$748</td>
       <td>-$560.64 (-43%)</td>
+      <td align="right">$748</td>
     </tr>
     <tr>
       <td>my terragrunt project</td>
       <td>prod</td>
       <td>ws2</td>
-      <td align="right">$1,308</td>
-      <td align="right">$748</td>
       <td>-$560.64 (-43%)</td>
+      <td align="right">$748</td>
     </tr>
     <tr>
       <td>my tf project</td>
       <td></td>
       <td></td>
-      <td align="right">$1,303</td>
-      <td align="right">$743</td>
       <td>-$560.64 (-43%)</td>
+      <td align="right">$743</td>
     </tr>
     <tr>
       <td>my tf project</td>
       <td></td>
       <td>my tf workspace</td>
-      <td align="right">$1,303</td>
-      <td align="right">$743</td>
       <td>-$560.64 (-43%)</td>
-    </tr>
-    <tr>
-      <td>All projects</td>
-      <td></td>
-      <td></td>
-      <td align="right">$5,325</td>
-      <td align="right">$3,084</td>
-      <td>-$2,240.81 (-42%)</td>
+      <td align="right">$743</td>
     </tr>
   </tbody>
 </table>
-
 <details>
 <summary><strong>Infracost output</strong></summary>
 
@@ -168,7 +152,7 @@ Percent: -43%
 Key: ~ changed, + added, - removed
 
 ──────────────────────────────────
-Infracost estimate: monthly cost will decrease by $2,241 (-42%) ↓
+Infracost estimate: monthly cost will decrease by $2,241 ↓
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Previous   ┃ New        ┃ Diff            ┃
