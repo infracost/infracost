@@ -6,5 +6,11 @@ Project: infracost/infracost/cmd/infracost/testdata/hclmodule_output_counts
 ──────────────────────────────────
 No cloud resources were detected
 
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                                          ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infraco...stdata/hclmodule_output_counts ┃ $0.00        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+
 Err:
 

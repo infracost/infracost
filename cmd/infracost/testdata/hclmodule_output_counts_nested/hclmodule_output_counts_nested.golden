@@ -6,5 +6,11 @@ Project: infracost/infracost/cmd/infracost/testdata/hclmodule_output_counts_nest
 ──────────────────────────────────
 No cloud resources were detected
 
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                                          ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infraco...hclmodule_output_counts_nested ┃ $0.00        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+
 Err:
 

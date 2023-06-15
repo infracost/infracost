@@ -21,5 +21,11 @@ Project: infracost/infracost/cmd/infracost/testdata/express_route_gateway_plan.j
   ∙ 1 x azurerm_express_route_circuit_peering
   ∙ 1 x azurerm_express_route_port
 
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                                          ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infraco...xpress_route_gateway_plan.json ┃ $343         ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+
 Err:
 

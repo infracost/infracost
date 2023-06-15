@@ -23,3 +23,9 @@ Project: infracost/infracost/cmd/infracost/testdata
  └─ Duration                                             25,000,000  GB-seconds        $416.67 
                                                                                                
  OVERALL TOTAL                                                                       $1,361.31 
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infracost/testdata         ┃ $1,361       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛

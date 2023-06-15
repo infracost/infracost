@@ -111,5 +111,12 @@ Module path: prod
 ∙ 14 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 38 were free, rerun with --show-skipped to see details
 
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                                          ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infraco...ata/hclmulti_project_infra/dev ┃ $112         ┃
+┃ infracost/infracost/cmd/infraco...ta/hclmulti_project_infra/prod ┃ $152         ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+
 Err:
 

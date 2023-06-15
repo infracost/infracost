@@ -16,5 +16,11 @@ Project: infracost/infracost/cmd/infracost/testdata/breakdown_with_nested_foreac
 ∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 6 were free, rerun with --show-skipped to see details
 
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                                          ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infraco.../breakdown_with_nested_foreach ┃ $66          ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+
 Err:
 

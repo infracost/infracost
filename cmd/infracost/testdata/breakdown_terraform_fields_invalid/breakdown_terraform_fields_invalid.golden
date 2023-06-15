@@ -27,6 +27,12 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
 5 cloud resources were detected:
 ∙ 5 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                                      ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infracost/testdata/example_plan.json ┃ $1,361       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+
 Err:
 Warning: Invalid field 'invalid' specified, valid fields are: [price monthlyQuantity unit hourlyCost monthlyCost] or 'all' to include all fields
 

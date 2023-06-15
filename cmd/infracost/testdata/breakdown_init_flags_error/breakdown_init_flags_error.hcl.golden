@@ -20,6 +20,12 @@ Project: infracost/infracost/cmd/infracost/testdata/breakdown_init_flags_error
 2 cloud resources were detected:
 ∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                                          ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infraco...ata/breakdown_init_flags_error ┃ $743         ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+
 Err:
 Warning: Flag terraform-init-flags is deprecated and only compatible with --terraform-force-cli.
 
