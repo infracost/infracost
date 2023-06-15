@@ -27,28 +27,28 @@
       <td>my terragrunt project</td>
       <td>prod</td>
       <td></td>
-      <td>-$560.64 (-43%)</td>
+      <td>-$561 (-43%)</td>
       <td align="right">$748</td>
     </tr>
     <tr>
       <td>my terragrunt project</td>
       <td>prod</td>
       <td>ws2</td>
-      <td>-$560.64 (-43%)</td>
+      <td>-$561 (-43%)</td>
       <td align="right">$748</td>
     </tr>
     <tr>
       <td>my tf project</td>
       <td></td>
       <td></td>
-      <td>-$560.64 (-43%)</td>
+      <td>-$561 (-43%)</td>
       <td align="right">$743</td>
     </tr>
     <tr>
       <td>my tf project</td>
       <td></td>
       <td>my tf workspace</td>
-      <td>-$560.64 (-43%)</td>
+      <td>-$561 (-43%)</td>
       <td align="right">$743</td>
     </tr>
   </tbody>
@@ -151,22 +151,20 @@ Percent: -43%
 ──────────────────────────────────
 Key: ~ changed, + added, - removed
 
-──────────────────────────────────
-Infracost estimate: monthly cost will decrease by $2,241 ↓
-
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Previous   ┃ New        ┃ Diff            ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━┫
-┃ my terragrunt project                              ┃        $51 ┃        $52 ┃ +$0.88 (+2%)    ┃
-┃ my terragrunt project                              ┃     $1,308 ┃       $748 ┃ -$560.64 (-43%) ┃
-┃ my terragrunt project                              ┃        $51 ┃        $52 ┃ +$0.88 (+2%)    ┃
-┃ my terragrunt project                              ┃     $1,308 ┃       $748 ┃ -$560.64 (-43%) ┃
-┃ my tf project                                      ┃     $1,303 ┃       $743 ┃ -$560.64 (-43%) ┃
-┃ my tf project                                      ┃     $1,303 ┃       $743 ┃ -$560.64 (-43%) ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━┛
-
 12 cloud resources were detected:
 ∙ 12 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+
+Infracost estimate: monthly cost will decrease by $2,241 ↓
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Cost change  ┃ New monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━┫
+┃ my terragrunt project                              ┃ +$0.88 (+2%) ┃ $52              ┃
+┃ my terragrunt project                              ┃ -$561 (-43%) ┃ $748             ┃
+┃ my terragrunt project                              ┃ +$0.88 (+2%) ┃ $52              ┃
+┃ my terragrunt project                              ┃ -$561 (-43%) ┃ $748             ┃
+┃ my tf project                                      ┃ -$561 (-43%) ┃ $743             ┃
+┃ my tf project                                      ┃ -$561 (-43%) ┃ $743             ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━┛
 ```
 </details>
 
