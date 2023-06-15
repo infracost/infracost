@@ -176,7 +176,7 @@ func (c *Config) CachePath() string {
 
 	// now let's try to traverse the parent directories outside the working directory.
 	// We don't do this initially as this causing path problems when the cache directory
-	// is created by concurrently running project.
+	// is created by concurrently running projects.
 	abs, err := filepath.Abs(dir)
 	if err == nil {
 		if s := c.cachePath(abs); s != "" {

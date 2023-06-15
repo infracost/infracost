@@ -139,17 +139,17 @@ func TestConfig_CachePath(t *testing.T) {
 		expected string
 	}{
 		{
-			name:     "with no .infracost directory",
+			name:     "should return the root directory with no .infracost directory in either the root or parent directories",
 			path:     "testdata/no_cache_init",
 			expected: "testdata/no_cache_init",
 		},
 		{
-			name:     "with parent cache",
+			name:     "should return the parent directory with an infracost cache in the parent directory",
 			path:     "testdata/parent_cache_path/parent/child",
 			expected: "testdata/parent_cache_path/parent",
 		},
 		{
-			name:     "with root cache path",
+			name:     "should return the root directory path with an infracost cache in the root directory",
 			path:     "testdata/root_cache_path/parent/child",
 			expected: "testdata/root_cache_path/parent/child",
 		},
