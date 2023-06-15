@@ -165,6 +165,45 @@ func (c *Config) RepoPath() string {
 	return c.RootPath
 }
 
+// CachePath finds path which contains the .infracost directory. It traverses parent directories until a .infracost
+// folder is found. If no .infracost folders exist then CachePath uses the current wd.
+func (c *Config) CachePath() string {
+	dir := c.RepoPath()
+
+	if s := c.cachePath(dir); s != "" {
+		return s
+	}
+
+	// now let's try to traverse the parent directories outside the working directory.
+	// We don't do this initially as this causing path problems when the cache directory
+	// is created by concurrently running projects.
+	abs, err := filepath.Abs(dir)
+	if err == nil {
+		if s := c.cachePath(abs); s != "" {
+			return s
+		}
+	}
+
+	return dir
+}
+
+func (c *Config) cachePath(dir string) string {
+	for {
+		cachePath := filepath.Join(dir, InfracostDir)
+		if _, err := os.Stat(cachePath); err == nil {
+			return filepath.Dir(cachePath)
+		}
+
+		parentDir := filepath.Dir(dir)
+		if parentDir == dir {
+			break
+		}
+		dir = parentDir
+	}
+
+	return ""
+}
+
 func (c *Config) LoadFromConfigFile(path string, cmd *cobra.Command) error {
 	cfgFile, err := LoadConfigFile(path)
 	if err != nil {
