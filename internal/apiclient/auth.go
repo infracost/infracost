@@ -45,9 +45,11 @@ func (a AuthClient) Login(contextVals map[string]interface{}) (string, string, e
 
 	startURL := fmt.Sprintf("%s/login?%s", a.Host, q.Encode())
 
-	fmt.Println("\nIf the redirect doesn't work, use this URL:")
-	fmt.Printf("\n%s\n\n", startURL)
-	fmt.Printf("Waiting...\n\n")
+	fmt.Println("\nIf the redirect doesn't work, either:")
+	fmt.Println("- Use this URL:")
+	fmt.Printf("    %s\n", startURL)
+	fmt.Println("\n- Or log in/sign up at https://dashboard.infracost.io, copy your API key\n    from Org Settings and run `infracost configure set api_key MY_KEY`")
+	fmt.Printf("\nWaiting...\n\n")
 
 	_ = browser.OpenURL(startURL)
 
@@ -120,7 +122,7 @@ func (a AuthClient) startCallbackServer(listener net.Listener, generatedState st
 	}
 
 	if resp.apiKey == "" || resp.err != nil {
-		return "", "", fmt.Errorf("Authentication failed. Please check your API token on %s", ui.LinkString("https://infracost.io"))
+		return "", "", fmt.Errorf("Authentication failed. Please get your API token from %s", ui.LinkString("https://dashboard.infracost.io"))
 	}
 
 	return resp.apiKey, "", nil
