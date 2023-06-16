@@ -459,6 +459,12 @@
 ∙ 56 were estimated
 ∙ 1 was free:
   ∙ 1 x azurerm_resource_group
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ TestAzureStorageAccountGoldenFile                  ┃ $14,182,476  ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 Logs:
 
 level=warning msg="Skipping resource azurerm_storage_account.unsupported. BlockBlobStorage Premium doesn't support GRS redundancy"

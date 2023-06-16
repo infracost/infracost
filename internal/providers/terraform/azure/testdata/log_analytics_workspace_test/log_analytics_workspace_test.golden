@@ -126,6 +126,12 @@
   ∙ 1 x azurerm_sentinel_data_connector_azure_advanced_threat_protection
 ∙ 4 are not supported yet, see https://infracost.io/requested-resources:
   ∙ 4 x azurerm_log_analytics_workspace
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ TestLogAnalyticsWorkspaceGoldenFile                ┃ $22,990      ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 Logs:
 
 level=warning msg="skipping azurerm_log_analytics_workspace.unsupported_legacy_workspace[\"PerNode\"] as it uses legacy pricing options"

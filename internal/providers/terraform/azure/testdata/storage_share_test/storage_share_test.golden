@@ -136,6 +136,12 @@
   ∙ 1 x azurerm_resource_group
 ∙ 1 is not supported yet, see https://infracost.io/requested-resources:
   ∙ 1 x azurerm_storage_share
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ TestStorageShare                                   ┃ $946,945     ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 Logs:
 
 level=warning msg="Skipping resource azurerm_storage_share.unsupported. Premium access tier is only supported for FileStorage accounts"
