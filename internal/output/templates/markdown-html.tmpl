@@ -53,25 +53,25 @@
 
 {{- if .Options.PolicyChecks.Enabled }}
 	{{- if gt (len .Options.PolicyChecks.Failures) 0 }}
-		<details>
-			<summary><strong>❌ Policy checks failed</strong></summary>
+<details>
+<summary><strong>❌ Policy checks failed</strong></summary>
 				{{ range $v, $f := .Options.PolicyChecks.Failures}}
 > - {{ $f }}
 				{{- end}}
-		</details>
+</details>
 	{{ else }}
-		<details>
-			<summary><strong>✅ Policy checks passed</strong></summary>
+<details>
+<summary><strong>✅ Policy checks passed</strong></summary>
 			{{ range $v, $f := .Options.PolicyChecks.Passed}}
 > - {{ $f }}
 			{{- end}}
-		</details>
+</details>
 	{{- end }}
 {{- end }}
 {{- if .Options.GuardrailCheck.Comment }}
 	{{- if gt (len .Options.GuardrailCheck.CommentableFailures) 0 }}
-		<details>
-			<summary><strong>{{ .Options.GuardrailCheck.Title }}</strong></summary>
+<details>
+<summary><strong>{{ .Options.GuardrailCheck.Title }}</strong></summary>
 				{{- if .Options.GuardrailCheck.IsBlocking }}
 This change is blocked, either reduce the costs or wait for an admin to review and unblock it.
 				{{- end }}
@@ -84,22 +84,19 @@ This change is blocked, either reduce the costs or wait for an admin to review a
 				{{- range $v, $f := .Options.GuardrailCheck.UnblockedFailures}}
 > - <b>Unblocked</b>: {{ $f }}
 				{{- end}}
-		</details>
+</details>
 	{{ else }}
 <strong>✅ Guardrails passed</strong>
 	{{- end }}
-
-  {{- if .Options.DashboardURL}}
-<a href="{{ .Options.DashboardURL }}" rel="noopener noreferrer" target="_blank">View in Infracost Cloud</a>
-  {{- end }}
+{{- end }}
+<sub>
+{{- if .Root.CloudURL }}
+  <a href="{{ .Root.CloudURL }}" rel="noopener noreferrer" target="_blank">View in Infracost Cloud. </a>
 {{- end }}
 {{- if .MarkdownOptions.WillUpdate }}
-<sub>
   This comment will be updated when the cost estimate changes.
-</sub>
 {{- end}}
 {{- if .MarkdownOptions.WillReplace }}
-<sub>
   This comment will be replaced when the cost estimate changes
-</sub>
 {{- end}}
+</sub>

@@ -50,8 +50,6 @@ func commentCmd(ctx *config.RunContext) *cobra.Command {
 		_ = subCmd.Flags().MarkHidden("skip-no-diff")
 		subCmd.Flags().String("guardrail-check-path", "", "Path to Infracost guardrail data (experimental)")
 		_ = subCmd.Flags().MarkHidden("guardrail-check-path")
-		subCmd.Flags().String("dashboard-url", "", "The Infracost Cloud dashboard URL for the PR")
-		_ = subCmd.Flags().MarkHidden("dashboard-url")
 	}
 
 	cmd.AddCommand(cmds...)
@@ -85,7 +83,8 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 			ui.PrintWarning(cmd.ErrOrStderr(), "Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
 		} else {
 			combined.Metadata.InfracostCommand = "comment"
-			combined.RunID, combined.ShareURL, guardrailCheck = shareCombinedRun(ctx, combined, inputs)
+			result := shareCombinedRun(ctx, combined, inputs)
+			combined.RunID, combined.ShareURL, combined.CloudURL, guardrailCheck = result.RunID, result.ShareURL, result.CloudURL, result.GuardrailCheck
 		}
 	}
 
@@ -118,7 +117,6 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 	opts.ShowAllProjects, _ = cmd.Flags().GetBool("show-all-projects")
 	opts.ShowOnlyChanges, _ = cmd.Flags().GetBool("show-changed")
 	opts.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
-	opts.DashboardURL, _ = cmd.Flags().GetString("dashboard-url")
 
 	b, err := output.ToMarkdown(combined, opts, mdOpts)
 	if err != nil {
