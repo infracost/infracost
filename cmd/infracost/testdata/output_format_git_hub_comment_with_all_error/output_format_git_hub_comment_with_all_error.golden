@@ -1,18 +1,5 @@
 
 💰 Infracost estimate: **monthly cost will not change**
-
-<details>
-<summary><strong>Infracost output</strong></summary>
-
-```
-──────────────────────────────────
-Project: infracost/infracost/examples/terraform
-Errors:
-  No valid terraform files found given path, try a different directory
-
-──────────────────────────────────
-
-No cloud resources were detected
-```
-</details>
+<sub>
+</sub>
 

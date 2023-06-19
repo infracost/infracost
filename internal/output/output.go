@@ -25,6 +25,7 @@ type Root struct {
 	Metadata             Metadata         `json:"metadata"`
 	RunID                string           `json:"runId,omitempty"`
 	ShareURL             string           `json:"shareUrl,omitempty"`
+	CloudURL             string           `json:"cloudUrl,omitempty"`
 	Currency             string           `json:"currency"`
 	Projects             Projects         `json:"projects"`
 	TotalHourlyCost      *decimal.Decimal `json:"totalHourlyCost"`

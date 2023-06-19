@@ -2,13 +2,14 @@ package main
 
 import (
 	"fmt"
-	"github.com/infracost/infracost/internal/logging"
-	"github.com/infracost/infracost/internal/ui"
+
 	"github.com/spf13/cobra"
 
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/output"
+	"github.com/infracost/infracost/internal/ui"
 )
 
 func uploadCmd(ctx *config.RunContext) *cobra.Command {
@@ -49,7 +50,7 @@ See https://infracost.io/docs/features/cli_commands/#upload-runs`,
 				return fmt.Errorf("failed to upload to Infracost Cloud: %w", err)
 			}
 
-			root.RunID, root.ShareURL = result.RunID, result.ShareURL
+			root.RunID, root.ShareURL, root.CloudURL = result.RunID, result.ShareURL, result.CloudURL
 
 			if root.ShareURL != "" {
 				cmd.Println("Share this cost estimate: ", ui.LinkString(root.ShareURL))

@@ -1,48 +1,36 @@
 
-💰 Infracost estimate: **monthly cost will increase by $1,402 (+1,152%) 📈**
+💰 Infracost estimate: **monthly cost will increase by $1,402 📈**
 <table>
   <thead>
     <td>Project</td>
-    <td>Previous</td>
-    <td>New</td>
-    <td>Diff</td>
+    <td>Cost change</td>
+    <td>New monthly cost</td>
   </thead>
   <tbody>
     <tr>
       <td>infracost/infracost/cmd/infracost/testdata</td>
-      <td align="right">$0</td>
-      <td align="right">$1,361</td>
       <td>+$1,361</td>
+      <td align="right">$1,361</td>
     </tr>
     <tr>
       <td>infracost/infracost/cmd/infraco...aform_v0.14_nochange_plan.json</td>
-      <td align="right">$41</td>
-      <td align="right">$41</td>
       <td>$0</td>
+      <td align="right">$41</td>
     </tr>
     <tr>
       <td>infracost/infracost/cmd/infraco...aform_v0.14_nochange_plan.json</td>
-      <td align="right">$41</td>
-      <td align="right">$41</td>
       <td>$0</td>
+      <td align="right">$41</td>
     </tr>
     <tr>
       <td>infracost/infracost/cmd/infraco...data/terraform_v0.14_plan.json</td>
-      <td align="right">$41</td>
-      <td align="right">$81</td>
       <td>+$41 (+100%)</td>
-    </tr>
-    <tr>
-      <td>All projects</td>
-      <td align="right">$122</td>
-      <td align="right">$1,524</td>
-      <td>+$1,402 (+1,152%)</td>
+      <td align="right">$81</td>
     </tr>
   </tbody>
 </table>
 
 2 projects have no cost estimate changes.
-
 <details>
 <summary><strong>Infracost output</strong></summary>
 
@@ -231,24 +219,24 @@ Percent: +100%
 
 ──────────────────────────────────
 Key: ~ changed, + added, - removed
-
-──────────────────────────────────
-Infracost estimate: monthly cost will increase by $1,402 (+1,152%) ↑
-
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                                          ┃ Previous   ┃ New        ┃ Diff         ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infracost/testdata                       ┃      $0.00 ┃     $1,361 ┃ +$1,361      ┃
-┃ infracost/infracost/cmd/infraco...data/terraform_v0.14_plan.json ┃        $41 ┃        $81 ┃ +$41 (+100%) ┃
-┃ infracost/infracost/cmd/infraco...aform_v0.14_nochange_plan.json ┃        $41 ┃        $41 ┃ $0           ┃
-┃ infracost/infracost/cmd/infraco...aform_v0.14_nochange_plan.json ┃        $41 ┃        $41 ┃ $0           ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 2 projects had no cost estimate changes, rerun with --show-skipped to see details
 
 ──────────────────────────────────
 26 cloud resources were detected:
 ∙ 14 were estimated, 10 of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 12 were free, rerun with --show-skipped to see details
+
+Infracost estimate: monthly cost will increase by $1,402 ↑
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
+┃ Project                                                          ┃ Cost change  ┃ New monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infracost/testdata                       ┃      +$1,361 ┃ $1,361           ┃
+┃ infracost/infracost/cmd/infraco...data/terraform_v0.14_plan.json ┃ +$41 (+100%) ┃ $81              ┃
+┃ infracost/infracost/cmd/infraco...aform_v0.14_nochange_plan.json ┃           $0 ┃ $41              ┃
+┃ infracost/infracost/cmd/infraco...aform_v0.14_nochange_plan.json ┃           $0 ┃ $41              ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━┛
 ```
 </details>
+<sub>
+</sub>
 

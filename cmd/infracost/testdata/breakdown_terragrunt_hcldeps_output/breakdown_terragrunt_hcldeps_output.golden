@@ -73,6 +73,15 @@ Module path: stag
 6 cloud resources were detected:
 ∙ 6 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                                          ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infraco..._terragrunt_hcldeps_output/dev ┃ $65          ┃
+┃ infracost/infracost/cmd/infraco...terragrunt_hcldeps_output/prod ┃ $748         ┃
+┃ infracost/infracost/cmd/infraco...erragrunt_hcldeps_output/prod2 ┃ $748         ┃
+┃ infracost/infracost/cmd/infraco...terragrunt_hcldeps_output/stag ┃ $0.00        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+
 Err:
 
 

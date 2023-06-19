@@ -279,6 +279,9 @@ func Combine(inputs []ReportInput) (Root, error) {
 	combined.TimeGenerated = time.Now().UTC()
 	combined.Summary = MergeSummaries(summaries)
 	combined.Metadata = metadata
+	if len(inputs) > 0 {
+		combined.CloudURL = inputs[len(inputs)-1].Root.CloudURL
+	}
 
 	if invalidMetadata {
 		return combined, clierror.NewWarningF(

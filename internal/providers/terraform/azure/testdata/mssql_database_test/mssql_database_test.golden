@@ -123,6 +123,12 @@
 ∙ 2 were free:
   ∙ 1 x azurerm_resource_group
   ∙ 1 x azurerm_sql_server
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ TestMSSQLDatabase                                  ┃ $31,570      ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 Logs:
 
 level=warning msg="'Multiple products found' are safe to ignore for 'Compute (provisioned, BC_Gen5_8)' due to limitations in the Azure API."

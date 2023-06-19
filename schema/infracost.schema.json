@@ -393,6 +393,9 @@
         "shareUrl": {
           "type": "string"
         },
+        "cloudUrl": {
+          "type": "string"
+        },
         "currency": {
           "type": "string"
         },

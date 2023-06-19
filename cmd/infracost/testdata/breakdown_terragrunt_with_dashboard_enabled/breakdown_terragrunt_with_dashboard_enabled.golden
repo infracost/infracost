@@ -46,5 +46,12 @@ Module path: prod
 
 Share this cost estimate: https://dashboard.infracost.io/share/REPLACED_SHARE_CODE
 
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ infracost/infracost/examples/terragrunt/dev        ┃ $52          ┃
+┃ infracost/infracost/examples/terragrunt/prod       ┃ $748         ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+
 Err:
 

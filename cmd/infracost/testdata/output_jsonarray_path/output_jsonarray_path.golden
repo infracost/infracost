@@ -145,3 +145,11 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_nochange_pla
 26 cloud resources were detected:
 ∙ 14 were estimated, 10 of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 12 were free, rerun with --show-skipped to see details
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                                          ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infracost/testdata                       ┃ $1,361       ┃
+┃ infracost/infracost/cmd/infraco...data/terraform_v0.14_plan.json ┃ $81          ┃
+┃ infracost/infracost/cmd/infraco...aform_v0.14_nochange_plan.json ┃ $41          ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛

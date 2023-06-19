@@ -99,13 +99,6 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 			opChar(ADDED),
 			opChar(REMOVED),
 		)
-		s += "\n\n"
-	}
-
-	if hasDiffProjects && out.DiffTotalMonthlyCost != nil && out.DiffTotalMonthlyCost.Abs().GreaterThan(decimal.Zero) {
-		s += "──────────────────────────────────\n"
-		s += fmt.Sprintf("Infracost estimate: %s\n\n", formatCostChangeSentence(out.Currency, out.PastTotalMonthlyCost, out.TotalMonthlyCost, false))
-		s += tableForDiff(out, opts)
 		s += "\n"
 	}
 
@@ -129,6 +122,12 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 	if unsupportedMsg != "" {
 		s += "\n"
 		s += unsupportedMsg
+	}
+
+	if hasDiffProjects && out.DiffTotalMonthlyCost != nil && out.DiffTotalMonthlyCost.Abs().GreaterThan(decimal.Zero) {
+		s += "\n\n"
+		s += fmt.Sprintf("Infracost estimate: %s\n", formatCostChangeSentence(out.Currency, out.PastTotalMonthlyCost, out.TotalMonthlyCost, false))
+		s += tableForDiff(out, opts)
 	}
 
 	return []byte(s), nil
@@ -163,29 +162,26 @@ func tableForDiff(out Root, opts Options) string {
 	t.Style().Format.Header = text.FormatDefault
 	t.AppendHeader(table.Row{
 		"Project",
-		"Previous",
-		"New",
-		"Diff",
+		"Cost change",
+		"New monthly cost",
 	})
 
 	t.SetColumnConfigs([]table.ColumnConfig{
 		{Name: "Project", WidthMin: 50},
-		{Name: "Previous", WidthMin: 10, Align: text.AlignRight},
-		{Name: "New", WidthMin: 10, Align: text.AlignRight},
-		{Name: "Diff", WidthMin: 10},
+		{Name: "Cost change", WidthMin: 10, Align: text.AlignRight},
+		{Name: "New monthly cost", WidthMin: 10},
 	})
 
 	for _, project := range out.Projects {
-		if !showProject(project, opts) {
+		if !showProject(project, opts, false) {
 			continue
 		}
 
 		t.AppendRow(
 			table.Row{
 				truncateMiddle(project.Name, 64, "..."),
-				formatCost(out.Currency, project.PastBreakdown.TotalMonthlyCost),
-				formatCost(out.Currency, project.Breakdown.TotalMonthlyCost),
 				formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyCost, project.Breakdown.TotalMonthlyCost, false),
+				formatCost(out.Currency, project.Breakdown.TotalMonthlyCost),
 			},
 		)
 

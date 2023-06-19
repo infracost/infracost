@@ -213,6 +213,12 @@
   ∙ 1 x azurerm_resource_group
   ∙ 1 x azurerm_subnet
   ∙ 1 x azurerm_virtual_network
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ TestRecoveryServicesVault                          ┃ $1,549       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 Logs:
 
 level=warning msg="Multiple products with prices found for azurerm_backup_protected_vm.large[\"policy-GeoRedundant-RS0-false\"] GRS data stored, using the first product"

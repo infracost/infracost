@@ -53,6 +53,12 @@
   ∙ 1 x azurerm_resource_group
 ∙ 1 is not supported yet, see https://infracost.io/requested-resources:
   ∙ 1 x azurerm_cosmosdb_table
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ TestAzureRMCosmosDBTableGoldenFile                 ┃ $5,156       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 Logs:
 
 level=warning msg="Skipping resource azurerm_cosmosdb_table.account-in-another-module as its 'account_name' property could not be found."

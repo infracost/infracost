@@ -29,18 +29,16 @@ Percent: +75%
 ──────────────────────────────────
 Key: ~ changed, + added, - removed
 
-──────────────────────────────────
-Infracost estimate: monthly cost will increase by $350 (+29%) ↑
-
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━┓
-┃ Project                                                          ┃ Previous   ┃ New        ┃ Diff            ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...ith_config_file_compare_to/dev ┃       $462 ┃       $252 ┃ -$210.24 (-45%) ┃
-┃ infracost/infracost/cmd/infraco...th_config_file_compare_to/prod ┃       $743 ┃     $1,303 ┃ +$561 (+75%)    ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━┛
-
 2 cloud resources were detected:
 ∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+
+Infracost estimate: monthly cost will increase by $350 ↑
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
+┃ Project                                                          ┃ Cost change  ┃ New monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infraco...ith_config_file_compare_to/dev ┃ -$210 (-45%) ┃ $252             ┃
+┃ infracost/infracost/cmd/infraco...th_config_file_compare_to/prod ┃ +$561 (+75%) ┃ $1,303           ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━┛
 
 Err:
 

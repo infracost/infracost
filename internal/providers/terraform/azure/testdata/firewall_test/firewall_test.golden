@@ -18,13 +18,13 @@
  └─ Data processed                                    10,000  GB                     $160.00 
                                                                                              
  azurerm_firewall.standard_virtual_hub                                                       
- ├─ Deployment (Secured Virtual Hub)                     730  hours                  $912.50 
- └─ Data processed                                    20,000  GB                     $320.00 
+ ├─ Deployment (Secured Virtual Hub)                     730  hours                    $0.00 
+ └─ Data processed                                    20,000  GB                       $0.00 
                                                                                              
  azurerm_public_ip.example                                                                   
  └─ IP address (static)                                  730  hours                    $3.65 
                                                                                              
- OVERALL TOTAL                                                                     $6,256.15 
+ OVERALL TOTAL                                                                     $5,023.65 
 ──────────────────────────────────
 11 cloud resources were detected:
 ∙ 6 were estimated, 5 of which include usage-based costs, see https://infracost.io/usage-file
@@ -34,3 +34,9 @@
   ∙ 1 x azurerm_virtual_hub
   ∙ 1 x azurerm_virtual_network
   ∙ 1 x azurerm_virtual_wan
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ TestAzureRMFirewall                                ┃ $5,024       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛

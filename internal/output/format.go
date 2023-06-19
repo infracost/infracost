@@ -24,7 +24,7 @@ func formatCost(currency string, d *decimal.Decimal) string {
 		return "-"
 	}
 
-	if d.GreaterThanOrEqual(decimal.NewFromInt(int64(roundCostsAbove))) {
+	if d.Abs().GreaterThanOrEqual(decimal.NewFromInt(int64(roundCostsAbove))) {
 		return formatWholeDecimalCurrency(currency, *d)
 	}
 	return formatRoundedDecimalCurrency(currency, *d)
@@ -137,8 +137,8 @@ func truncateMiddle(s string, maxLen int, fill string) string {
 	return string(truncated)
 }
 
-func showProject(p Project, opts Options) bool {
-	if p.Metadata.HasErrors() {
+func showProject(p Project, opts Options, showError bool) bool {
+	if p.Metadata.HasErrors() && showError {
 		return false
 	}
 

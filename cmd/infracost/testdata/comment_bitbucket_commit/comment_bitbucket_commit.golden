@@ -1,10 +1,10 @@
 
-## Infracost estimate: **monthly cost will increase by $41 (+100%) ↑**
 
-| **Project** | **Previous** | **New** | **Diff** |
-| ----------- | -----------: | ------: | -------- |
-| infracost/infracost/cmd/infraco...data/terraform_v0.14_plan.json | $41 | $81 | +$41 (+100%) |
+## Infracost estimate: **monthly cost will increase by $41 ↑**
 
+| **Project** | **Cost change** | **New monthly cost** |
+| ----------- | --------------: | -------------------- |
+| infracost/infracost/cmd/infraco...data/terraform_v0.14_plan.json | +$41 (+100%) | $81 |
 **Infracost output:**
 
 ```
@@ -111,25 +111,16 @@ Percent: +100%
 ──────────────────────────────────
 Key: ~ changed, + added, - removed
 
-──────────────────────────────────
-Infracost estimate: monthly cost will increase by $41 (+100%) ↑
-
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                                          ┃ Previous   ┃ New        ┃ Diff         ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...data/terraform_v0.14_plan.json ┃        $41 ┃        $81 ┃ +$41 (+100%) ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
-
 26 cloud resources were detected:
 ∙ 14 were estimated, 10 of which include usage-based costs, see https://infracost.io/usage-file
-∙ 12 were free:
-  ∙ 2 x aws_db_option_group
-  ∙ 2 x aws_db_parameter_group
-  ∙ 2 x aws_db_subnet_group
-  ∙ 2 x aws_default_vpc
-  ∙ 2 x aws_iam_role
-  ∙ 2 x aws_iam_role_policy_attachment
+∙ 12 were free, rerun with --show-skipped to see details
+
+Infracost estimate: monthly cost will increase by $41 ↑
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
+┃ Project                                                          ┃ Cost change  ┃ New monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infraco...data/terraform_v0.14_plan.json ┃ +$41 (+100%) ┃ $81              ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━┛
 ```
-Is this comment useful? [Yes](https://dashboard.infracost.io/feedback/redirect?runId=&value=yes), [No](https://dashboard.infracost.io/feedback/redirect?runId=&value=no), [Other](https://dashboard.infracost.io/feedback/redirect?runId=&value=other)
 
 Comment not posted to Bitbucket (--dry-run was specified)

@@ -80,6 +80,11 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 		s += "\n──────────────────────────────────\n" + summaryMsg
 	}
 
+	if len(out.Projects) > 0 {
+		s += "\n\n"
+		s += breakdownSummaryTable(out, opts)
+	}
+
 	return []byte(s), nil
 }
 
@@ -336,4 +341,31 @@ func filterZeroValResources(resources []Resource, resourceName string) []Resourc
 		filteredResources = append(filteredResources, r)
 	}
 	return filteredResources
+}
+
+func breakdownSummaryTable(out Root, opts Options) string {
+	t := table.NewWriter()
+	t.SetStyle(table.StyleBold)
+	t.Style().Format.Header = text.FormatDefault
+	t.AppendHeader(table.Row{
+		"Project",
+		"Monthly cost",
+	})
+
+	t.SetColumnConfigs([]table.ColumnConfig{
+		{Name: "Project", WidthMin: 50},
+		{Name: "Monthly cost", WidthMin: 10},
+	})
+
+	for _, project := range out.Projects {
+		t.AppendRow(
+			table.Row{
+				truncateMiddle(project.Name, 64, "..."),
+				formatCost(out.Currency, project.Breakdown.TotalMonthlyCost),
+			},
+		)
+
+	}
+
+	return t.Render()
 }

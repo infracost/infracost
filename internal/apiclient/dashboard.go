@@ -25,6 +25,7 @@ type CreateAPIKeyResponse struct {
 type AddRunResponse struct {
 	RunID          string `json:"id"`
 	ShareURL       string `json:"shareUrl"`
+	CloudURL       string `json:"cloudUrl"`
 	GuardrailCheck output.GuardrailCheck
 }
 

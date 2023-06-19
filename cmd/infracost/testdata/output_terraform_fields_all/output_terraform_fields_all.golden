@@ -55,3 +55,10 @@ Project: infracost/infracost/cmd/infracost/testdata/azure_firewall_plan.json
  Project total                                                                                                $4,018.65 
 
  OVERALL TOTAL                                                                                                $5,379.96 
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                                          ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infracost/testdata                       ┃ $1,361       ┃
+┃ infracost/infracost/cmd/infraco...tdata/azure_firewall_plan.json ┃ $4,019       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛

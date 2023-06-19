@@ -313,6 +313,9 @@ func loadResources(t *testing.T, pName string, tfProject TerraformProject, runCt
 	require.NoError(t, err)
 
 	for _, project := range projects {
+		project.Name = strings.ReplaceAll(project.Name, tfdir, t.Name())
+		project.Name = strings.ReplaceAll(project.Name, "/Terraform_CLI", "")
+		project.Name = strings.ReplaceAll(project.Name, "/HCL", "")
 		project.BuildResources(schema.UsageMap{})
 	}
 
