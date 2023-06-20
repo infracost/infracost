@@ -4,5 +4,5 @@ Logs:
 level=info msg="Estimate uploaded to Infracost Cloud"
 level=info msg="1 guardrail checked"
 level=info msg="Creating new comment"
-level=warning msg=">\\n<strong>✅ Guardrails passed</strong>\\n<sub>\\n</sub>\\n\"}\n"
+level=warning msg=">\\n<strong>✅ Guardrails passed</strong>\\n\"}\n"
 level=info msg="Created new comment: "

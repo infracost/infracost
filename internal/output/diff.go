@@ -5,7 +5,6 @@ import (
 	"strings"
 
 	"github.com/dustin/go-humanize"
-	"github.com/dustin/go-humanize/english"
 	"github.com/fatih/color"
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
@@ -102,17 +101,13 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 		s += "\n"
 	}
 
-	if len(noDiffProjects) > 0 {
+	if len(noDiffProjects) > 0 && opts.ShowSkipped {
 		if !hasDiffProjects && len(erroredProjects) > 0 {
 			s += "──────────────────────────────────\n"
 		}
 
-		if opts.ShowSkipped {
-			s += fmt.Sprintf("The following projects have no cost estimate changes: %s", strings.Join(noDiffProjects, ", "))
-			s += fmt.Sprintf("\nRun the following command to see their breakdown: %s", ui.PrimaryString("infracost breakdown --path=/path/to/code"))
-		} else {
-			s += fmt.Sprintf("%s had no cost estimate changes, rerun with --show-skipped to see details", english.Plural(len(noDiffProjects), "project", "projects"))
-		}
+		s += fmt.Sprintf("The following projects have no cost estimate changes: %s", strings.Join(noDiffProjects, ", "))
+		s += fmt.Sprintf("\nRun the following command to see their breakdown: %s", ui.PrimaryString("infracost breakdown --path=/path/to/code"))
 
 		s += "\n\n"
 		s += "──────────────────────────────────"
