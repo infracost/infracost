@@ -21,9 +21,7 @@
 
 ```
 ──────────────────────────────────
-2 projects had no cost estimate changes, rerun with --show-skipped to see details
 
-──────────────────────────────────
 3 cloud resources were detected:
 ∙ 3 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 ```
@@ -36,8 +34,6 @@ This change is blocked, either reduce the costs or wait for an admin to review a
 > - <b>Warning</b>: Some non-blocking reason
 </details>
 	
-<sub>
-</sub>
 
 Comment not posted to GitHub (--dry-run was specified)
 

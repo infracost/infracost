@@ -99,9 +99,7 @@ Percent: -43%
 
 ──────────────────────────────────
 Key: ~ changed, + added, - removed
-3 projects had no cost estimate changes, rerun with --show-skipped to see details
 
-──────────────────────────────────
 18 cloud resources were detected:
 ∙ 18 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 
