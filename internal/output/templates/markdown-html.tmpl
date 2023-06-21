@@ -8,7 +8,7 @@
       <td align="right">{{ formatCost .Cost }}</td>
     </tr>
 {{- end}}
-💰 Infracost estimate: **{{ formatCostChangeSentence .Root.Currency .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost true }}**
+<p>💰 Infracost estimate: <b>{{ formatCostChangeSentence .Root.Currency .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost true }}</b></p>
 {{- if displayTable  }}
 <table>
   <thead>
@@ -85,21 +85,14 @@ This change is blocked, either reduce the costs or wait for an admin to review a
 > - <b>Unblocked</b>: {{ $f }}
 				{{- end}}
 </details>
-	{{ else }}
-<strong>✅ Guardrails passed</strong>
+	{{- else }}
+<p><strong>✅ Guardrails passed</strong></p>
 	{{- end }}
 {{- end }}
 {{- if displaySub  }}
-<br/><br/>
 <sub>
-{{- if .Root.CloudURL }}
-  <a href="{{ .Root.CloudURL }}" rel="noopener noreferrer" target="_blank">View in Infracost Cloud. </a>
-{{- end }}
-{{- if .MarkdownOptions.WillUpdate }}
-  This comment will be updated when the cost estimate changes.
-{{- end}}
-{{- if .MarkdownOptions.WillReplace }}
-  This comment will be replaced when the cost estimate changes
-{{- end}}
+{{- if .Root.CloudURL }}<a href="{{ .Root.CloudURL }}" rel="noopener noreferrer" target="_blank">View in Infracost Cloud. </a>{{- end }}
+{{- if .MarkdownOptions.WillUpdate }}This comment will be updated when the cost estimate changes.{{- end}}
+{{- if .MarkdownOptions.WillReplace }}This comment will be replaced when the cost estimate changes{{- end}}
 </sub>
 {{- end }}

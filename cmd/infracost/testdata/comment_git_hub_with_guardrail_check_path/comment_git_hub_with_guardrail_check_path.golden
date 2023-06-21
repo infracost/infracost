@@ -1,5 +1,5 @@
 
-💰 Infracost estimate: **monthly cost will not change**
+<p>💰 Infracost estimate: <b>monthly cost will not change</b></p>
 <table>
   <thead>
     <td>Project</td>
@@ -33,7 +33,6 @@ This change is blocked, either reduce the costs or wait for an admin to review a
 > - <b>Blocked</b>: Some blocking reason
 > - <b>Warning</b>: Some non-blocking reason
 </details>
-	
 
 Comment not posted to GitHub (--dry-run was specified)
 
