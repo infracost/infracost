@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/infracost/infracost/internal/apiclient"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"strconv"
 
@@ -76,6 +78,17 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 
 	combined.IsCIRun = ctx.IsCIRun()
 
+	if ctx.IsCloudUploadEnabled() && ctx.Config.TagPolicyAPIEndpoint != "" {
+		tagPolicyClient := apiclient.NewTagPolicyAPIClient(ctx)
+		tagPolicies, err := tagPolicyClient.CheckTagPolicies(ctx, combined)
+		if err != nil {
+			log.WithError(err).Error("Failed to check tag policies")
+		}
+
+		combined.TagPolicies = tagPolicies
+	}
+	tagPolicyCheck := output.NewTagPolicyChecks(combined.TagPolicies)
+
 	var guardrailCheck output.GuardrailCheck
 	dryRun, _ := cmd.Flags().GetBool("dry-run")
 	if ctx.IsCloudUploadEnabled() && !dryRun {
@@ -112,6 +125,7 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 		DashboardEndpoint: ctx.Config.DashboardEndpoint,
 		NoColor:           ctx.Config.NoColor,
 		PolicyChecks:      policyChecks,
+		TagPolicyCheck:    tagPolicyCheck,
 		GuardrailCheck:    guardrailCheck,
 	}
 	opts.ShowAllProjects, _ = cmd.Flags().GetBool("show-all-projects")
@@ -128,6 +142,9 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 	}
 	if len(guardrailCheck.BlockingFailures()) > 0 {
 		return b, hasDiff, guardrailCheck.BlockingFailures()
+	}
+	if len(tagPolicyCheck.FailingTagPolicies) > 0 {
+		return b, hasDiff, tagPolicyCheck
 	}
 
 	return b, hasDiff, nil

@@ -1,6 +1,7 @@
 package main_test
 
 import (
+	_ "embed"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -73,6 +74,37 @@ func TestCommentGitHubWithGuardrailCheckPath(t *testing.T) {
 			"--dry-run",
 			"--guardrail-check-path", path.Join(dir, "./guardrailCheck.json")},
 		nil)
+}
+
+//go:embed testdata/comment_git_hub_with_tag_policy_checks/tagPolicyResponse.json
+var commentGitHubWithTagPolicyChecksTagPolicyResponse string
+
+func TestCommentGitHubWithTagPolicyChecks(t *testing.T) {
+	tagPolicyApi := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintln(w, commentGitHubWithTagPolicyChecksTagPolicyResponse)
+	}))
+	defer tagPolicyApi.Close()
+
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"comment",
+			"github",
+			"--github-token", "abc",
+			"--repo", "test/test",
+			"--commit", "5",
+			"--show-changed",
+			"--path", "./testdata/changes.json",
+			"--dry-run"},
+		&GoldenFileOptions{
+			Env: map[string]string{
+				"INFRACOST_TAG_POLICY_API_ENDPOINT": tagPolicyApi.URL,
+			},
+		},
+		func(c *config.RunContext) {
+			t := true
+			c.Config.EnableCloudUpload = &t
+		},
+	)
 }
 
 var ghZeroCommentsResponse = `{ "data": { "repository": { "pullRequest": { "comments": { "nodes": [], "pageInfo": { "endCursor": "abc", "hasNextPage": false }}}}}}`

@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/spf13/cobra"
 
@@ -44,6 +45,17 @@ See https://infracost.io/docs/features/cli_commands/#upload-runs`,
 				return fmt.Errorf("could not load input file %s err: %w", path, err)
 			}
 
+			if ctx.Config.TagPolicyAPIEndpoint != "" {
+				tagPolicyClient := apiclient.NewTagPolicyAPIClient(ctx)
+				tagPolicies, err := tagPolicyClient.CheckTagPolicies(ctx, root)
+				if err != nil {
+					log.WithError(err).Error("Failed to check tag policies")
+				}
+
+				root.TagPolicies = tagPolicies
+			}
+			tagPolicyCheck := output.NewTagPolicyChecks(root.TagPolicies)
+
 			dashboardClient := apiclient.NewDashboardAPIClient(ctx)
 			result, err := dashboardClient.AddRun(ctx, root)
 			if err != nil {
@@ -64,6 +76,10 @@ See https://infracost.io/docs/features/cli_commands/#upload-runs`,
 
 			if len(result.GuardrailCheck.BlockingFailures()) > 0 {
 				return result.GuardrailCheck.BlockingFailures()
+			}
+
+			if len(tagPolicyCheck.FailingTagPolicies) > 0 {
+				return tagPolicyCheck
 			}
 
 			return nil
