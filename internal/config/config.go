@@ -100,6 +100,9 @@ type Config struct {
 	AzureOverrideRegion  string `envconfig:"AZURE_OVERRIDE_REGION"`
 	GoogleOverrideRegion string `envconfig:"GOOGLE_OVERRIDE_REGION"`
 
+	// TerraformSourceMap replaces any source URL with the provided value.
+	TerraformSourceMap TerraformSourceMap `envconfig:"TERRAFORM_SOURCE_MAP"`
+
 	// Org settings
 	EnableCloudForOrganization bool
 

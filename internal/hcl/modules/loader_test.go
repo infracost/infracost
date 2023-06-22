@@ -16,7 +16,7 @@ import (
 	sync2 "github.com/infracost/infracost/internal/sync"
 )
 
-func testLoaderE2E(t *testing.T, path string, expectedModules []*ManifestModule, cleanup bool) {
+func testLoaderE2E(t *testing.T, path string, expectedModules []*ManifestModule, sourceMap config.TerraformSourceMap, cleanup bool) {
 	if cleanup {
 		err := os.RemoveAll(filepath.Join(path, config.InfracostDir))
 		assert.NoError(t, err)
@@ -25,7 +25,7 @@ func testLoaderE2E(t *testing.T, path string, expectedModules []*ManifestModule,
 	logger := logrus.New()
 	logger.SetOutput(io.Discard)
 
-	moduleLoader := NewModuleLoader(path, &CredentialsSource{FetchToken: credentials.FindTerraformCloudToken}, logrus.NewEntry(logger), &sync2.KeyMutex{})
+	moduleLoader := NewModuleLoader(path, &CredentialsSource{FetchToken: credentials.FindTerraformCloudToken}, sourceMap, logrus.NewEntry(logger), &sync2.KeyMutex{})
 
 	manifest, err := moduleLoader.Load(path)
 	if !assert.NoError(t, err) {
@@ -90,7 +90,7 @@ func TestNestedModules(t *testing.T) {
 			Version: "3.4.0",
 			Dir:     ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
 		},
-	}, true)
+	}, config.TerraformSourceMap{}, true)
 }
 
 func TestSubmodules(t *testing.T) {
@@ -116,7 +116,7 @@ func TestSubmodules(t *testing.T) {
 			Source: "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git//modules/zones",
 			Dir:    ".infracost/terraform_modules/03c49f2fce2b8552355561b7ac4f2c94/modules/zones",
 		},
-	}, true)
+	}, nil, true)
 }
 
 func TestModuleMultipleUses(t *testing.T) {
@@ -137,7 +137,7 @@ func TestModuleMultipleUses(t *testing.T) {
 			Version: "3.4.0",
 			Dir:     ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
 		},
-	}, true)
+	}, config.TerraformSourceMap{}, true)
 }
 
 func TestModuleMultipleUsesMissingManifest(t *testing.T) {
@@ -161,7 +161,7 @@ func TestModuleMultipleUsesMissingManifest(t *testing.T) {
 	}
 
 	// Run first time to download modules
-	testLoaderE2E(t, "./testdata/module_multiple_uses", expectedModules, true)
+	testLoaderE2E(t, "./testdata/module_multiple_uses", expectedModules, config.TerraformSourceMap{}, true)
 
 	// Remove the manifest file to test we can still work with broken manifests
 	err := os.Remove("./testdata/module_multiple_uses/.infracost/terraform_modules/manifest.json")
@@ -170,7 +170,7 @@ func TestModuleMultipleUsesMissingManifest(t *testing.T) {
 	}
 
 	// Re-run without cleaning up the modules directory
-	testLoaderE2E(t, "./testdata/module_multiple_uses", expectedModules, false)
+	testLoaderE2E(t, "./testdata/module_multiple_uses", expectedModules, config.TerraformSourceMap{}, false)
 }
 
 func TestWithCachedModules(t *testing.T) {
@@ -190,7 +190,7 @@ func TestWithCachedModules(t *testing.T) {
 			Source: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git",
 			Dir:    ".infracost/terraform_modules/9740179dc58fea6ce4a32fdc5b4e0839",
 		},
-	}, false)
+	}, config.TerraformSourceMap{}, false)
 
 	// Check that the modules were not overwritten
 	regModContents, err := os.ReadFile("./testdata/with_cached_modules/.infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b/main.tf")
@@ -219,7 +219,7 @@ func TestMultiProject(t *testing.T) {
 	logger := logrus.New()
 	logger.SetOutput(io.Discard)
 
-	moduleLoader := NewModuleLoader(path, &CredentialsSource{FetchToken: credentials.FindTerraformCloudToken}, logrus.NewEntry(logger), &sync2.KeyMutex{})
+	moduleLoader := NewModuleLoader(path, &CredentialsSource{FetchToken: credentials.FindTerraformCloudToken}, config.TerraformSourceMap{}, logrus.NewEntry(logger), &sync2.KeyMutex{})
 
 	wg := &sync.WaitGroup{}
 	wg.Add(3)
@@ -374,6 +374,52 @@ func TestMultiProject(t *testing.T) {
 			Dir:     "with_existing_terraform_mods/.terraform/modules/registry-module",
 		},
 	})
+}
+
+func TestWithSourceMap(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping test in short mode")
+	}
+
+	sourceMap := config.TerraformSourceMap{
+		"terraform-aws-modules/ec2-instance/aws":                                                  "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git?ref=v4.5.0",
+		"git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git":            "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+		"git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git?ref=v4.4.0": "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git?ref=v4.3.0",
+		"terraform-aws-modules/route53/aws":                                                       "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git",
+	}
+
+	testLoaderE2E(t, "./testdata/modules_with_source_map", []*ManifestModule{
+		{
+			Key:     "registry-module",
+			Source:  "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git?ref=v4.5.0",
+			Version: "",
+			Dir:     ".infracost/terraform_modules/90ed96c30cb769e39bbe5a2686ca87d1",
+		},
+		{
+			Key:     "git-module-with-ref",
+			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			Version: "4.5.0",
+			Dir:     ".infracost/terraform_modules/571e67fb2167bf68f1bcb139b0a396cb",
+		},
+		{
+			Key:     "git-module-with-mapped-ref",
+			Source:  "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git?ref=v4.3.0",
+			Version: "",
+			Dir:     ".infracost/terraform_modules/1bef96b2e0948432531cc6631d07dee4",
+		},
+		{
+			Key:     "git-module-not-replaced",
+			Source:  "git::https://github.com/terraform-aws-modules/terraform-aws-sns.git",
+			Version: "",
+			Dir:     ".infracost/terraform_modules/db69103dcf4b9586b710a97de31750bd",
+		},
+		{
+			Key:     "registry-module-with-submodule",
+			Source:  "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git//modules/zones",
+			Version: "",
+			Dir:     ".infracost/terraform_modules/5a4a225178eed58c86a47cd2229ec923/modules/zones",
+		},
+	}, sourceMap, true)
 }
 
 func assertModulesEqual(t *testing.T, moduleLoader *ModuleLoader, path string, expectedModules []*ManifestModule) {

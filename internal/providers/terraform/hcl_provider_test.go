@@ -191,7 +191,7 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 
 			parsers, err := hcl.LoadParsers(
 				testPath,
-				modules.NewModuleLoader(testPath, nil, entry, &sync.KeyMutex{}),
+				modules.NewModuleLoader(testPath, nil, config.TerraformSourceMap{}, entry, &sync.KeyMutex{}),
 				nil,
 				entry,
 				hcl.OptionWithBlockBuilder(
