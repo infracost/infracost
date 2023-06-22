@@ -14,9 +14,6 @@
         {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
       {{- end }}
     {{- end }}
-    {{- if .ProjectCounts }}
-{{ .ProjectCounts }}
-    {{- end }}
   {{- else }}
     {{- range .Root.Projects }}
       {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}

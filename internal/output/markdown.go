@@ -4,10 +4,8 @@ import (
 	"bufio"
 	"bytes"
 	"embed"
-	"fmt"
 	"path/filepath"
 	"sort"
-	"strings"
 	"text/template"
 	"unicode/utf8"
 
@@ -121,28 +119,6 @@ type MarkdownCtx struct {
 	DiffOutput                   string
 	Options                      Options
 	MarkdownOptions              MarkdownOptions
-}
-
-// ProjectCounts returns a string that represents additional information about missing/errored projects.
-func (m MarkdownCtx) ProjectCounts() string {
-	out := ""
-	if m.SkippedProjectCount == 1 {
-		out += "1 project has no cost estimate changes, "
-	} else if m.SkippedProjectCount > 0 {
-		out += fmt.Sprintf("%d projects have no cost estimate changes, ", m.SkippedProjectCount)
-	}
-
-	if m.ErroredProjectCount == 1 {
-		out += "1 project could not be evaluated"
-	} else if m.ErroredProjectCount > 0 {
-		out += fmt.Sprintf("%d projects could not be evaluated, ", m.ErroredProjectCount)
-	}
-
-	if out == "" {
-		return out
-	}
-
-	return "\n" + strings.TrimSuffix(out, ", ") + "."
 }
 
 func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, error) {

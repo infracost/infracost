@@ -10,8 +10,6 @@
 | my terragrunt prod project |  | -$561 (-43%) | $748 |
 | my terragrunt workspace | prod | -$561 (-43%) | $748 |
 | my workspace project |  | -$561 (-43%) | $743 |
-
-3 projects have no cost estimate changes.
 **Infracost output:**
 
 ```
