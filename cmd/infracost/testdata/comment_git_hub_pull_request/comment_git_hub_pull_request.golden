@@ -1,5 +1,5 @@
 
-💰 Infracost estimate: **monthly cost will increase by $41 📈**
+<p>💰 Infracost estimate: <b>monthly cost will increase by $41 📈</b></p>
 <table>
   <thead>
     <td>Project</td>
@@ -133,9 +133,7 @@ Infracost estimate: monthly cost will increase by $41 ↑
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━┛
 ```
 </details>
-<br/><br/>
-<sub>
-  This comment will be updated when the cost estimate changes.
+<sub>This comment will be updated when the cost estimate changes.
 </sub>
 
 Comment not posted to GitHub (--dry-run was specified)
