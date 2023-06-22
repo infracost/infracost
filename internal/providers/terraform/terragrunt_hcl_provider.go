@@ -326,6 +326,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 		TerraformCliArgs:           []string{tgcli.CMD_TERRAGRUNT_INFO},
 		Env:                        p.env,
 		IgnoreExternalDependencies: true,
+		SourceMap:                  p.ctx.RunContext.Config.TerraformSourceMap,
 		RunTerragrunt: func(opts *tgoptions.TerragruntOptions) (err error) {
 			defer func() {
 				unexpectedErr := recover()

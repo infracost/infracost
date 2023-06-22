@@ -14,6 +14,7 @@ import (
 	"github.com/zclconf/go-cty/cty"
 	ctyJson "github.com/zclconf/go-cty/cty/json"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/hcl/modules"
 	"github.com/infracost/infracost/internal/sync"
 )
@@ -51,7 +52,7 @@ data "cats_cat" "the-cats-mother" {
 `)
 
 	logger := newDiscardLogger()
-	loader := modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{})
+	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 	parsers, err := LoadParsers(filepath.Dir(path), loader, nil, logger)
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
@@ -145,7 +146,7 @@ output "loadbalancer"  {
 `)
 
 	logger := newDiscardLogger()
-	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{}), logger)
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -218,7 +219,7 @@ output "exp2" {
 `)
 
 	logger := newDiscardLogger()
-	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{}), logger)
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -265,7 +266,7 @@ output "instances" {
 `)
 
 	logger := newDiscardLogger()
-	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{}), logger)
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -304,7 +305,7 @@ resource "other_resource" "test" {
 `)
 
 	logger := newDiscardLogger()
-	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{}), logger)
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -349,7 +350,7 @@ output "attr_not_exists" {
 `)
 
 	logger := newDiscardLogger()
-	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{}), logger)
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -389,7 +390,7 @@ resource "other_resource" "test" {
 `)
 
 	logger := newDiscardLogger()
-	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{}), logger)
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -441,7 +442,7 @@ output "serviceendpoint_principals" {
 `)
 
 	logger := newDiscardLogger()
-	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{}), logger)
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -479,7 +480,7 @@ output "val" {
 `)
 
 	logger := newDiscardLogger()
-	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{}), logger)
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -497,7 +498,7 @@ func Test_SetsHasChangesOnMod(t *testing.T) {
 	path := createTestFile("test.tf", `variable "foo" {}`)
 
 	logger := newDiscardLogger()
-	parser := newParser(RootPath{Path: filepath.Dir(path), HasChanges: true}, modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{}), logger)
+	parser := newParser(RootPath{Path: filepath.Dir(path), HasChanges: true}, modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -519,7 +520,7 @@ output "val" {
 `)
 
 	logger := newDiscardLogger()
-	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{}), logger)
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -559,7 +560,7 @@ output "mod_result" {
 
 	logger := newDiscardLogger()
 	dir := filepath.Dir(path)
-	loader := modules.NewModuleLoader(dir, nil, logger, &sync.KeyMutex{})
+	loader := modules.NewModuleLoader(dir, nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 	parsers, err := LoadParsers(path, loader, nil, logger)
 	require.NoError(t, err)
 	rootModule, err := parsers[0].ParseDirectory()
@@ -619,7 +620,7 @@ output "mod_result" {
 	)
 
 	logger := newDiscardLogger()
-	loader := modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{})
+	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 	parsers, err := LoadParsers(path, loader, nil, logger)
 	require.NoError(t, err)
 	rootModule, err := parsers[0].ParseDirectory()
@@ -673,7 +674,7 @@ resource "aws_instance" "my_instance" {
 `)
 
 	logger := newDiscardLogger()
-	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{}), logger)
+	parser := newParser(RootPath{Path: filepath.Dir(path)}, modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -816,7 +817,7 @@ resource "test_resource_two" "test" {
 `)
 
 	logger := newDiscardLogger()
-	loader := modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{})
+	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 	parsers, err := LoadParsers(filepath.Dir(path), loader, nil, logger)
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
@@ -878,7 +879,7 @@ output "mod_result" {
 	)
 
 	logger := newDiscardLogger()
-	loader := modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{})
+	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 	parsers, err := LoadParsers(path, loader, nil, logger)
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
@@ -1026,7 +1027,7 @@ output "mod_result" {
 	)
 
 	logger := newDiscardLogger()
-	loader := modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{})
+	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 	parsers, err := LoadParsers(path, loader, nil, logger)
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
@@ -1103,7 +1104,7 @@ resource "dynamic" "resource" {
 	)
 
 	logger := newDiscardLogger()
-	loader := modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{})
+	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 	parsers, err := LoadParsers(path, loader, nil, logger)
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
@@ -1163,7 +1164,7 @@ resource "azurerm_linux_function_app" "function" {
 	)
 
 	logger := newDiscardLogger()
-	loader := modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{})
+	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 	parsers, err := LoadParsers(filepath.Dir(path), loader, nil, logger)
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
@@ -1209,7 +1210,7 @@ resource "test_resource" "second" {
 `)
 
 	logger := newDiscardLogger()
-	loader := modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{})
+	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 	parsers, err := LoadParsers(filepath.Dir(path), loader, nil, logger)
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()

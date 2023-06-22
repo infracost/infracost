@@ -141,7 +141,7 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 			initialPath = abs
 		}
 	}
-	loader := modules.NewModuleLoader(cachePath, credsSource, logger, ctx.RunContext.ModuleMutex)
+	loader := modules.NewModuleLoader(cachePath, credsSource, ctx.RunContext.Config.TerraformSourceMap, logger, ctx.RunContext.ModuleMutex)
 	parsers, err := hcl.LoadParsers(
 		initialPath,
 		loader,
