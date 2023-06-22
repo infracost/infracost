@@ -417,10 +417,7 @@ func TestBreakdownTerragruntExtraArgs(t *testing.T) {
 }
 
 func TestBreakdownTerragruntSourceMap(t *testing.T) {
-	os.Setenv("INFRACOST_TERRAFORM_SOURCE_MAP", "git::https://github.com/someorg/terraform_modules.git=../../../../examples")
-	defer func() {
-		os.Unsetenv("INFRACOST_TERRAFORM_SOURCE_MAP")
-	}()
+	t.Setenv("INFRACOST_TERRAFORM_SOURCE_MAP", "git::https://github.com/someorg/terraform_modules.git=../../../../examples")
 
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())}, nil)
 }
