@@ -83,7 +83,7 @@ func convertOutputResources(outResources []Resource) []*schema.Resource {
 			SubResources:   convertOutputResources(resource.SubResources),
 			HourlyCost:     resource.HourlyCost,
 			MonthlyCost:    resource.MonthlyCost,
-			ResourceType:   resource.ResourceType(),
+			ResourceType:   resource.ResourceType,
 		}
 	}
 
@@ -205,6 +205,7 @@ type ActualCosts struct {
 
 type Resource struct {
 	Name           string                 `json:"name"`
+	ResourceType   string                 `json:"resourceType"`
 	Tags           map[string]string      `json:"tags,omitempty"`
 	Metadata       map[string]interface{} `json:"metadata"`
 	HourlyCost     *decimal.Decimal       `json:"hourlyCost"`
@@ -212,16 +213,6 @@ type Resource struct {
 	CostComponents []CostComponent        `json:"costComponents,omitempty"`
 	ActualCosts    []ActualCosts          `json:"actualCosts,omitempty"`
 	SubResources   []Resource             `json:"subresources,omitempty"`
-}
-
-func (r Resource) ResourceType() string {
-	pieces := strings.Split(r.Name, ".")
-
-	if len(pieces) >= 2 {
-		return pieces[len(pieces)-2]
-	}
-
-	return r.Name
 }
 
 type Summary struct {
@@ -492,6 +483,7 @@ func outputResource(r *schema.Resource) Resource {
 
 	return Resource{
 		Name:           r.Name,
+		ResourceType:   getResourceType(r.Name),
 		Metadata:       metadata,
 		Tags:           r.Tags,
 		HourlyCost:     r.HourlyCost,
@@ -500,6 +492,16 @@ func outputResource(r *schema.Resource) Resource {
 		ActualCosts:    actualCosts,
 		SubResources:   subresources,
 	}
+}
+
+func getResourceType(name string) string {
+	pieces := strings.Split(name, ".")
+
+	if len(pieces) >= 2 {
+		return pieces[len(pieces)-2]
+	}
+
+	return name
 }
 
 func outputCostComponents(costComponents []*schema.CostComponent) []CostComponent {

@@ -482,8 +482,9 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 		Index:         block.Index(),
 		SchemaVersion: 0,
 		InfracostMetadata: map[string]interface{}{
-			"filename": block.Filename,
-			"calls":    block.CallDetails(),
+			"filename":   block.Filename,
+			"lineNumber": block.Line,
+			"calls":      block.CallDetails(),
 		},
 	}
 

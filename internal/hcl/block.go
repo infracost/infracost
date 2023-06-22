@@ -260,6 +260,7 @@ type Block struct {
 	attributes []*Attribute
 
 	Filename string
+	Line     int
 }
 
 // BlockBuilder handles generating new Blocks as part of the parsing and evaluation process.
@@ -288,6 +289,7 @@ func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.B
 
 		block := &Block{
 			Filename:    filename,
+			Line:        body.SrcRange.Start.Line,
 			context:     ctx,
 			hclBlock:    hclBlock,
 			moduleBlock: moduleBlock,

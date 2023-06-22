@@ -310,12 +310,16 @@
     "Resource": {
       "required": [
         "name",
+        "resourceType",
         "metadata",
         "hourlyCost",
         "monthlyCost"
       ],
       "properties": {
         "name": {
+          "type": "string"
+        },
+        "resourceType": {
           "type": "string"
         },
         "tags": {
@@ -438,12 +442,16 @@
     "Subresource": {
       "required": [
         "name",
+        "resourceType",
         "metadata",
         "hourlyCost",
         "monthlyCost"
       ],
       "properties": {
         "name": {
+          "type": "string"
+        },
+        "resourceType": {
           "type": "string"
         },
         "tags": {
