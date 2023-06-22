@@ -1260,7 +1260,7 @@ data "google_compute_zones" "us" {
 `)
 
 	logger := newDiscardLogger()
-	loader := modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{})
+	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 	parsers, err := LoadParsers(filepath.Dir(path), loader, nil, logger)
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
@@ -1303,7 +1303,7 @@ data "aws_availability_zones" "eu" {
 `)
 
 	logger := newDiscardLogger()
-	loader := modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{})
+	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 	parsers, err := LoadParsers(filepath.Dir(path), loader, nil, logger)
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
@@ -1328,7 +1328,7 @@ resource "random_shuffle" "one" {
 
 resource "random_shuffle" "two" {
   input        = ["a", "b", "c"]
-  result_count = 2 
+  result_count = 2
 }
 
 resource "random_shuffle" "nil" {
@@ -1337,7 +1337,7 @@ resource "random_shuffle" "nil" {
 
 resource "random_shuffle" "large" {
   input        = ["a", "b", "c"]
-  result_count = 5 
+  result_count = 5
 }
 
 resource "random_shuffle" "bad" {
@@ -1346,7 +1346,7 @@ resource "random_shuffle" "bad" {
 `)
 
 	logger := newDiscardLogger()
-	loader := modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{})
+	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 	parsers, err := LoadParsers(filepath.Dir(path), loader, nil, logger)
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
