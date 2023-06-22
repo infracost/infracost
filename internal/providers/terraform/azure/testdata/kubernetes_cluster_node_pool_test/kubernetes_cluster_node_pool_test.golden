@@ -21,7 +21,7 @@
     └─ Storage (P10, LRS)                                                          1  months        $19.71 
                                                                                                            
  azurerm_kubernetes_cluster_node_pool.usage_basic_A2                                                       
- ├─ Instance usage (pay as you go, Basic_A2)                                   1,460  hours        $115.34 
+ ├─ Instance usage (pay as you go, Basic_A2)                                     900  hours         $71.10 
  └─ os_disk                                                                                                
     └─ Storage (P10, LRS)                                                          2  months        $39.42 
                                                                                                            
@@ -33,7 +33,7 @@
  └─ os_disk                                                                                                
     └─ Storage (P10, LRS)                                                          1  months        $19.71 
                                                                                                            
- OVERALL TOTAL                                                                                   $1,037.33 
+ OVERALL TOTAL                                                                                     $993.09 
 ──────────────────────────────────
 8 cloud resources were detected:
 ∙ 7 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
@@ -43,5 +43,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMKubernetesClusterNodePoolGoldenFile     ┃ $1,037       ┃
+┃ TestAzureRMKubernetesClusterNodePoolGoldenFile     ┃ $993         ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛

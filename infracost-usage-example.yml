@@ -979,10 +979,12 @@ resource_usage:
       monthly_data_processed_gb: 100 # Monthly inbound and outbound data processed in GB.
 
     default_node_pool:
-      nodes: 2 # Node count for the default node pool.
+      nodes: 2         # Node count for the default node pool.
+      monthly_hrs: 730 # Monthly hours for the default node pool.
 
   azurerm_kubernetes_cluster_node_pool.my_node_pool:
-    nodes: 3 # Node count for the node pool.
+    nodes: 3         # Node count for the node pool.
+    monthly_hrs: 450 # Monthly hours for the default node pool.
 
   azurerm_container_registry.my_registry:
     storage_gb: 150
