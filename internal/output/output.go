@@ -384,9 +384,9 @@ func (r TagPolicyResource) Failures() []string {
 		var tags []string
 		for i, tag := range r.MissingMandatoryTags {
 			if i > 1 && i == len(r.MissingMandatoryTags) {
-				tags = append(tags, fmt.Sprintf("and `%s`", tag))
+				tags = append(tags, fmt.Sprintf("and \"%s\"", tag))
 			} else {
-				tags = append(tags, fmt.Sprintf("`%s`", tag))
+				tags = append(tags, fmt.Sprintf("\"%s\"", tag))
 			}
 		}
 		f = append(f, fmt.Sprintf("should have mandatory tags: %s", strings.Join(tags, ", ")))
@@ -394,10 +394,14 @@ func (r TagPolicyResource) Failures() []string {
 
 	for _, invalidTag := range r.InvalidTags {
 		if len(invalidTag.ValidValues) > 0 {
-			f = append(f, fmt.Sprintf("should have a valid value for `%s` tag: %s", invalidTag.Key, strings.Join(invalidTag.ValidValues, ", ")))
+			var validValues []string
+			for _, value := range invalidTag.ValidValues {
+				validValues = append(validValues, fmt.Sprintf("\"%s\"", value))
+			}
+			f = append(f, fmt.Sprintf("should have a valid value for \"%s\" tag: %s", invalidTag.Key, strings.Join(validValues, ", ")))
 		}
 		if invalidTag.ValidRegex != "" {
-			f = append(f, fmt.Sprintf("should have a valid value for `%s` tag: must match regex `%s`", invalidTag.Key, invalidTag.ValidRegex))
+			f = append(f, fmt.Sprintf("should have a valid value for \"%s\" tag: must match regex <code>%s</code>", invalidTag.Key, invalidTag.ValidRegex))
 		}
 	}
 

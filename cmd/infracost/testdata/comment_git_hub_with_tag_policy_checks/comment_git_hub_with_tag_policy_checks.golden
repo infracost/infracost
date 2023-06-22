@@ -1,5 +1,5 @@
 
-💰 Infracost estimate: **monthly cost will not change**
+<p>💰 Infracost estimate: <b>monthly cost will not change</b></p>
 <table>
   <thead>
     <td>Project</td>
@@ -14,8 +14,6 @@
     </tr>
   </tbody>
 </table>
-
-1 project has no cost estimate changes.
 <details>
 <summary><strong>Infracost output</strong></summary>
 
@@ -34,15 +32,15 @@
       <td>File:line</td>
     </thead>
     <tr>
-      <th colspan="2"><b>Failing Tag Policy</b> This should show as a failure</th>
+      <th colspan="2"><b>Failing Tag Policy</b>: This should show as a failure</th>
     </tr>
     <tr>
       <td>
         <code>module.hosted_cloud_pricing_api.aws_s3_bucket.cloud_pricing_api_db_data</code>
         in projects my-prod-project, my-dev-project
         <ul>
-          <li>should have mandatory tags: `Environment`, `Team`</li>
-          <li>should have a valid value for `Team` tag: Ops, Frontend team, Backend team</li>
+          <li>should have mandatory tags: "Environment", "Team"</li>
+          <li>should have a valid value for "Team" tag: "Ops", "Frontend team", "Backend team"</li>
         </ul>
       </td>
       <td>
@@ -53,7 +51,7 @@
       <td>
         <code>module.dashboard.aws_dynamodb_table.sessions</code>
         in project my-prod-project
-        should have a valid value for `Team` tag: Ops, Frontend team, Backend team
+        should have a valid value for "Team" tag: "Ops", "Frontend team", "Backend team"
       </td>
       <td>
         dev/main.tf:23
@@ -63,7 +61,7 @@
       <td>
         <code>module.us-east-1-dashboard.aws_db_instance.dashboard</code>
         in project my-prod-project
-        should have a valid value for `ServiceCode` tag: must match regex `\[A-Z\]{3}-Id`
+        should have a valid value for "ServiceCode" tag: must match regex <code>\[A-Z\]{3}-Id</code>
       </td>
       <td>
         prod/us-east-1/dashboard/instances.tf:395
@@ -79,13 +77,13 @@
       <td>File:line</td>
     </thead>
     <tr>
-      <th colspan="2"><b>Warning Tag Policy</b> This should show as a warning</th>
+      <th colspan="2"><b>Warning Tag Policy</b>: This should show as a warning</th>
     </tr>
     <tr>
       <td>
         <code>aws</code>
         in project my-prod-project
-        should have mandatory tags: `Environment`, `Team`
+        should have mandatory tags: "Environment", "Team"
       </td>
       <td>
         dev/main.tf:5
@@ -101,3 +99,17 @@
 </details>
 
 Comment not posted to GitHub (--dry-run was specified)
+
+
+Err:
+Error: Tag policy check failed:
+
+  Failing Tag Policy: This should show as a failure
+    module.hosted_cloud_pricing_api.aws_s3_bucket.cloud_pricing_api_db_data in project(s) my-prod-project, my-dev-project
+    - should have mandatory tags: "Environment", "Team"
+    - should have a valid value for "Team" tag: "Ops", "Frontend team", "Backend team"
+    module.dashboard.aws_dynamodb_table.sessions in project(s) my-prod-project
+    - should have a valid value for "Team" tag: "Ops", "Frontend team", "Backend team"
+    module.us-east-1-dashboard.aws_db_instance.dashboard in project(s) my-prod-project
+    - should have a valid value for "ServiceCode" tag: must match regex <code>\[A-Z\]{3}-Id</code>
+
