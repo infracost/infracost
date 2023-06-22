@@ -133,11 +133,6 @@ func NewEvaluator(
 	ctx.SetByDot(cty.StringVal(modulePath), "path.module")
 	ctx.SetByDot(cty.StringVal(filepath.Join(workingDir, module.RootPath)), "path.cwd")
 
-	// set the availability zones to a default length of 3
-	ctx.SetByDot(cty.ObjectVal(map[string]cty.Value{
-		"names": cty.ListVal([]cty.Value{cty.StringVal("az-mock-1"), cty.StringVal("az-mock-2"), cty.StringVal("az-mock-3")}),
-	}), "data.aws_availability_zones.available")
-
 	for _, b := range module.Blocks {
 		b.SetContext(ctx.NewChild())
 	}
@@ -284,7 +279,11 @@ func (e *Evaluator) evaluateStep(i int) {
 
 	e.ctx.Set(e.getValuesByBlockType("variable"), "var")
 	e.ctx.Set(e.getValuesByBlockType("locals"), "local")
-	e.ctx.Set(e.getValuesByBlockType("provider"), "provider")
+
+	providers := e.getValuesByBlockType("provider")
+	for key, provider := range providers.AsValueMap() {
+		e.ctx.Set(provider, key)
+	}
 
 	resources := e.getValuesByBlockType("resource")
 	for key, resource := range resources.AsValueMap() {
@@ -675,7 +674,14 @@ func (e *Evaluator) getValuesByBlockType(blockType string) cty.Value {
 
 				values[key] = val
 			}
-		case "provider", "module":
+		case "provider":
+			provider := b.Label()
+			if provider == "" {
+				continue
+			}
+
+			values[provider] = e.evaluateProvider(b, values)
+		case "module":
 			if b.Label() == "" {
 				continue
 			}
@@ -694,6 +700,35 @@ func (e *Evaluator) getValuesByBlockType(blockType string) cty.Value {
 	}
 
 	return cty.ObjectVal(values)
+}
+func (e *Evaluator) evaluateProvider(b *Block, values map[string]cty.Value) cty.Value {
+	provider := b.Label()
+	v, exists := values[provider]
+
+	alias := b.GetAttribute("alias")
+	if alias == nil && exists {
+		return mergeObjects(v, b.Values())
+	}
+
+	if alias == nil {
+		return b.Values()
+	}
+
+	var str string
+	err := gocty.FromCtyValue(alias.Value(), &str)
+	if err != nil {
+		return cty.ObjectVal(values)
+	}
+
+	if !exists {
+		return cty.ObjectVal(map[string]cty.Value{
+			str: b.Values(),
+		})
+	}
+
+	ob := v.AsValueMap()
+	ob[str] = b.Values()
+	return cty.ObjectVal(ob)
 }
 
 func (e *Evaluator) evaluateResource(b *Block, values map[string]cty.Value) cty.Value {

@@ -1184,6 +1184,18 @@ func valueToBytes(t *testing.T, v cty.Value) []byte {
 	return b
 }
 
+func assertBlockEqualsJSON(t *testing.T, expected string, actual cty.Value, remove ...string) {
+	t.Helper()
+
+	vals := actual.AsValueMap()
+	for _, s := range remove {
+		delete(vals, s)
+	}
+
+	b := valueToBytes(t, cty.ObjectVal(vals))
+	assert.JSONEq(t, expected, string(b))
+}
+
 func Test_CountOutOfOrder(t *testing.T) {
 	path := createTestFile("test.tf", `
 
@@ -1215,4 +1227,159 @@ resource "test_resource" "second" {
 		`test_resource.second[0]`,
 		`test_resource.second[1]`,
 	}, labels)
+}
+
+func Test_ProvideMockZonesForGCPDataBlock(t *testing.T) {
+	path := createTestFile("test.tf", `
+provider "google" {
+  credentials = "{\"type\":\"service_account\"}"
+  region      = "europe-west2"
+}
+
+provider "google" {
+  credentials = "{\"type\":\"service_account\"}"
+  region      = "us-east1"
+  alias       = "east1"
+}
+
+variable "regions" {
+  default = ["us-east4", "me-central1"]
+}
+
+data "google_compute_zones" "variable" {
+  for_each = toset(var.regions)
+  region   = each.value
+}
+
+data "google_compute_zones" "eu" {}
+
+data "google_compute_zones" "us" {
+	provider = google.east1
+}
+`)
+
+	logger := newDiscardLogger()
+	loader := modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{})
+	parsers, err := LoadParsers(filepath.Dir(path), loader, nil, logger)
+	require.NoError(t, err)
+	module, err := parsers[0].ParseDirectory()
+	require.NoError(t, err)
+
+	blocks := module.Blocks
+	eu := blocks.Matching(BlockMatcher{Label: "google_compute_zones.eu", Type: "data"})
+	b := valueToBytes(t, eu.Values())
+	assert.JSONEq(t, `{"names":["europe-west2-a","europe-west2-b","europe-west2-c"]}`, string(b))
+
+	us := blocks.Matching(BlockMatcher{Label: "google_compute_zones.us", Type: "data"})
+	b = valueToBytes(t, us.Values())
+	assert.JSONEq(t, `{"names":["us-east1-b","us-east1-c","us-east1-d"]}`, string(b))
+
+	us4 := blocks.Matching(BlockMatcher{Label: `google_compute_zones.variable["us-east4"]`, Type: "data"})
+	b = valueToBytes(t, us4.Values())
+	assert.JSONEq(t, `{"names":["us-east4-a","us-east4-b","us-east4-c"]}`, string(b))
+
+	me := blocks.Matching(BlockMatcher{Label: `google_compute_zones.variable["me-central1"]`, Type: "data"})
+	b = valueToBytes(t, me.Values())
+	assert.JSONEq(t, `{"names":["me-central1-a","me-central1-b","me-central1-c"]}`, string(b))
+}
+
+func Test_ProvideMockZonesForAWSDataBlock(t *testing.T) {
+	path := createTestFile("test.tf", `
+provider "aws" {
+  region                      = "us-east-1"
+}
+
+provider "aws" {
+  alias 					  = "eu"
+  region                      = "eu-west-2"
+}
+
+data "aws_availability_zones" "us" {}
+
+data "aws_availability_zones" "eu" {
+	provider = aws.eu
+}
+`)
+
+	logger := newDiscardLogger()
+	loader := modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{})
+	parsers, err := LoadParsers(filepath.Dir(path), loader, nil, logger)
+	require.NoError(t, err)
+	module, err := parsers[0].ParseDirectory()
+	require.NoError(t, err)
+
+	blocks := module.Blocks
+	eu := blocks.Matching(BlockMatcher{Label: "aws_availability_zones.eu", Type: "data"})
+	b := valueToBytes(t, eu.Values())
+	assert.JSONEq(t, `{"group_names":["eu-west-2","eu-west-2","eu-west-2","eu-west-2-wl1","eu-west-2-wl1"],"id":"eu-west-2","names":["eu-west-2a","eu-west-2b","eu-west-2c","eu-west-2-wl1-lon-wlz-1","eu-west-2-wl1-man-wlz-1"],"zone_ids":["euw2-az2","euw2-az3","euw2-az1","euw2-wl1-lon-wlz1","euw2-wl1-man-wlz1"]}`, string(b))
+
+	us := blocks.Matching(BlockMatcher{Label: "aws_availability_zones.us", Type: "data"})
+	b = valueToBytes(t, us.Values())
+	assert.JSONEq(t, `{"group_names":["us-east-1","us-east-1","us-east-1","us-east-1","us-east-1","us-east-1","us-east-1-atl-1","us-east-1-bos-1","us-east-1-bue-1","us-east-1-chi-1","us-east-1-dfw-1","us-east-1-iah-1","us-east-1-lim-1","us-east-1-mci-1","us-east-1-mia-1","us-east-1-msp-1","us-east-1-nyc-1","us-east-1-phl-1","us-east-1-qro-1","us-east-1-scl-1","us-east-1-wl1","us-east-1-wl1","us-east-1-wl1","us-east-1-wl1","us-east-1-wl1","us-east-1-wl1","us-east-1-wl1","us-east-1-wl1","us-east-1-wl1","us-east-1-wl1","us-east-1-wl1","us-east-1-wl1","us-east-1-wl1"],"id":"us-east-1","names":["us-east-1a","us-east-1b","us-east-1c","us-east-1d","us-east-1e","us-east-1f","us-east-1-atl-1a","us-east-1-bos-1a","us-east-1-bue-1a","us-east-1-chi-1a","us-east-1-dfw-1a","us-east-1-iah-1a","us-east-1-lim-1a","us-east-1-mci-1a","us-east-1-mia-1a","us-east-1-msp-1a","us-east-1-nyc-1a","us-east-1-phl-1a","us-east-1-qro-1a","us-east-1-scl-1a","us-east-1-wl1-atl-wlz-1","us-east-1-wl1-bna-wlz-1","us-east-1-wl1-bos-wlz-1","us-east-1-wl1-chi-wlz-1","us-east-1-wl1-clt-wlz-1","us-east-1-wl1-dfw-wlz-1","us-east-1-wl1-dtw-wlz-1","us-east-1-wl1-iah-wlz-1","us-east-1-wl1-mia-wlz-1","us-east-1-wl1-msp-wlz-1","us-east-1-wl1-nyc-wlz-1","us-east-1-wl1-tpa-wlz-1","us-east-1-wl1-was-wlz-1"],"zone_ids":["use1-az6","use1-az1","use1-az2","use1-az4","use1-az3","use1-az5","use1-atl1-az1","use1-bos1-az1","use1-bue1-az1","use1-chi1-az1","use1-dfw1-az1","use1-iah1-az1","use1-lim1-az1","use1-mci1-az1","use1-mia1-az1","use1-msp1-az1","use1-nyc1-az1","use1-phl1-az1","use1-qro1-az1","use1-scl1-az1","use1-wl1-atl-wlz1","use1-wl1-bna-wlz1","use1-wl1-bos-wlz1","use1-wl1-chi-wlz1","use1-wl1-clt-wlz1","use1-wl1-dfw-wlz1","use1-wl1-dtw-wlz1","use1-wl1-iah-wlz1","use1-wl1-mia-wlz1","use1-wl1-msp-wlz1","use1-wl1-nyc-wlz1","use1-wl1-tpa-wlz1","use1-wl1-was-wlz1"]}`, string(b))
+}
+
+func Test_RandomShuffleSetsResult(t *testing.T) {
+	path := createTestFile("test.tf", `
+resource "random_shuffle" "one" {
+  input        = ["a", "b", "c"]
+  result_count = 1
+}
+
+resource "random_shuffle" "two" {
+  input        = ["a", "b", "c"]
+  result_count = 2 
+}
+
+resource "random_shuffle" "nil" {
+  input        = ["a", "b", "c"]
+}
+
+resource "random_shuffle" "large" {
+  input        = ["a", "b", "c"]
+  result_count = 5 
+}
+
+resource "random_shuffle" "bad" {
+  input        = 3
+}
+`)
+
+	logger := newDiscardLogger()
+	loader := modules.NewModuleLoader(filepath.Dir(path), nil, logger, &sync.KeyMutex{})
+	parsers, err := LoadParsers(filepath.Dir(path), loader, nil, logger)
+	require.NoError(t, err)
+	module, err := parsers[0].ParseDirectory()
+	require.NoError(t, err)
+
+	blocks := module.Blocks
+	assertBlockEqualsJSON(
+		t,
+		`{"input":["a","b","c"],"result":["a"],"result_count":1}`,
+		blocks.Matching(BlockMatcher{Label: "random_shuffle.one", Type: "resource"}).Values(),
+		"id", "arn", "self_link", "name",
+	)
+	assertBlockEqualsJSON(
+		t,
+		`{"input":["a","b","c"],"result":["a", "b"],"result_count":2}`,
+		blocks.Matching(BlockMatcher{Label: "random_shuffle.two", Type: "resource"}).Values(),
+		"id", "arn", "self_link", "name",
+	)
+	assertBlockEqualsJSON(
+		t,
+		`{"input":["a","b","c"],"result":["a", "b", "c"]}`,
+		blocks.Matching(BlockMatcher{Label: "random_shuffle.nil", Type: "resource"}).Values(),
+		"id", "arn", "self_link", "name",
+	)
+	assertBlockEqualsJSON(
+		t,
+		`{"input":["a","b","c"],"result":["a", "b", "c"],"result_count":5}`,
+		blocks.Matching(BlockMatcher{Label: "random_shuffle.large", Type: "resource"}).Values(),
+		"id", "arn", "self_link", "name",
+	)
+	assertBlockEqualsJSON(
+		t,
+		`{"input":3}`,
+		blocks.Matching(BlockMatcher{Label: "random_shuffle.bad", Type: "resource"}).Values(),
+		"id", "arn", "self_link", "name",
+	)
 }
