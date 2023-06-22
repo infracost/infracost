@@ -41,7 +41,7 @@
         <code>module.hosted_cloud_pricing_api.aws_s3_bucket.cloud_pricing_api_db_data</code>
         in projects my-prod-project, my-dev-project
         <ul>
-          <li>should have mandataory tags: `Environment`, `Team`</li>
+          <li>should have mandatory tags: `Environment`, `Team`</li>
           <li>should have a valid value for `Team` tag: Ops, Frontend team, Backend team</li>
         </ul>
       </td>
@@ -85,7 +85,7 @@
       <td>
         <code>aws</code>
         in project my-prod-project
-        should have mandataory tags: `Environment`, `Team`
+        should have mandatory tags: `Environment`, `Team`
       </td>
       <td>
         dev/main.tf:5

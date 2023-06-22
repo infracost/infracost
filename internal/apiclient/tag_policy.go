@@ -42,8 +42,8 @@ func (c *TagPolicyAPIClient) CheckTagPolicies(ctx *config.RunContext, out output
 				resources {
 					address
 					type
-	               	path
-	               	line
+					path
+					line
 					projectNames
 					missingMandatoryTags
 					invalidTags {

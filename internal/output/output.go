@@ -389,7 +389,7 @@ func (r TagPolicyResource) Failures() []string {
 				tags = append(tags, fmt.Sprintf("`%s`", tag))
 			}
 		}
-		f = append(f, fmt.Sprintf("should have mandataory tags: %s", strings.Join(tags, ", ")))
+		f = append(f, fmt.Sprintf("should have mandatory tags: %s", strings.Join(tags, ", ")))
 	}
 
 	for _, invalidTag := range r.InvalidTags {

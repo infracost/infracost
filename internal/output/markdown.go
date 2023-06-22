@@ -6,6 +6,7 @@ import (
 	"embed"
 	"path/filepath"
 	"sort"
+	"strings"
 	"text/template"
 	"unicode/utf8"
 
