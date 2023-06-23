@@ -2,9 +2,7 @@ version: 0.1
 resource_usage:
   azurerm_kubernetes_cluster.usage_ephemeral:
     load_balancer:
-      monthly_data_processed_gb: 100 
+      monthly_data_processed_gb: 100
     default_node_pool:
       nodes: 2
-    
-    
-      
+      monthly_hrs: 450

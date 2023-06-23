@@ -31,13 +31,13 @@
  azurerm_kubernetes_cluster.usage_ephemeral                                               
  ├─ Uptime SLA                                                  730  hours         $73.00 
  ├─ default_node_pool                                                                     
- │  └─ Instance usage (pay as you go, Standard_D2_v2)         1,460  hours        $213.16 
+ │  └─ Instance usage (pay as you go, Standard_D2_v2)           900  hours        $131.40 
  ├─ Load Balancer                                                                         
  │  └─ Data processed                                           100  GB             $0.50 
  └─ DNS                                                                                   
     └─ Hosted zone                                                1  months         $0.50 
                                                                                           
- OVERALL TOTAL                                                                  $1,949.49 
+ OVERALL TOTAL                                                                  $1,867.73 
 ──────────────────────────────────
 6 cloud resources were detected:
 ∙ 5 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
@@ -47,5 +47,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMKubernetesClusterGoldenFile             ┃ $1,949       ┃
+┃ TestAzureRMKubernetesClusterGoldenFile             ┃ $1,868       ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
