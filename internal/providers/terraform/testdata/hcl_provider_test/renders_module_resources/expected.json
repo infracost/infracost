@@ -25,7 +25,9 @@
                   "blockName": "aws_vpn_connection.example"
                 }
               ],
-              "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf"
+              "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf",
+              "startLine": 13,
+              "endLine": 17
             }
           }
         ],
@@ -53,7 +55,9 @@
                       "blockName": "aws_ec2_transit_gateway.example"
                     }
                   ],
-                  "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf"
+                  "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf",
+                  "startLine": 1,
+                  "endLine": 1
                 }
               },
               {
@@ -80,7 +84,9 @@
                       "blockName": "aws_customer_gateway.example"
                     }
                   ],
-                  "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf"
+                  "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf",
+                  "startLine": 3,
+                  "endLine": 7
                 }
               }
             ],
@@ -113,7 +119,9 @@
                 "blockName": "aws_vpn_connection.example"
               }
             ],
-            "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf"
+            "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf",
+            "startLine": 13,
+            "endLine": 17
           }
         }
       ],
@@ -141,7 +149,9 @@
                     "blockName": "aws_ec2_transit_gateway.example"
                   }
                 ],
-                "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf"
+                "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf",
+                "startLine": 1,
+                "endLine": 1
               }
             },
             {
@@ -168,7 +178,9 @@
                     "blockName": "aws_customer_gateway.example"
                   }
                 ],
-                "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf"
+                "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf",
+                "startLine": 3,
+                "endLine": 7
               }
             }
           ],

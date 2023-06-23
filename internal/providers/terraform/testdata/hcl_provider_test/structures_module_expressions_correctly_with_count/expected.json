@@ -42,7 +42,9 @@
                       "blockName": "aws_ecs_task_definition.ecs_task"
                     }
                   ],
-                  "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf"
+                  "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
+                  "startLine": 6,
+                  "endLine": 30
                 }
               },
               {
@@ -71,7 +73,9 @@
                       "blockName": "aws_ecs_service.ecs_service"
                     }
                   ],
-                  "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf"
+                  "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
+                  "startLine": 32,
+                  "endLine": 39
                 }
               }
             ],
@@ -118,7 +122,9 @@
                           "blockName": "aws_ecs_task_definition.ecs_task"
                         }
                       ],
-                      "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf"
+                      "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf",
+                      "startLine": 6,
+                      "endLine": 30
                     }
                   },
                   {
@@ -151,7 +157,9 @@
                           "blockName": "aws_ecs_service.ecs_service"
                         }
                       ],
-                      "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf"
+                      "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf",
+                      "startLine": 32,
+                      "endLine": 39
                     }
                   }
                 ],
@@ -203,7 +211,9 @@
                     "blockName": "aws_ecs_task_definition.ecs_task"
                   }
                 ],
-                "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf"
+                "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
+                "startLine": 6,
+                "endLine": 30
               }
             },
             {
@@ -232,7 +242,9 @@
                     "blockName": "aws_ecs_service.ecs_service"
                   }
                 ],
-                "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf"
+                "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
+                "startLine": 32,
+                "endLine": 39
               }
             }
           ],
@@ -279,7 +291,9 @@
                         "blockName": "aws_ecs_task_definition.ecs_task"
                       }
                     ],
-                    "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf"
+                    "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf",
+                    "startLine": 6,
+                    "endLine": 30
                   }
                 },
                 {
@@ -312,7 +326,9 @@
                         "blockName": "aws_ecs_service.ecs_service"
                       }
                     ],
-                    "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf"
+                    "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf",
+                    "startLine": 32,
+                    "endLine": 39
                   }
                 }
               ],

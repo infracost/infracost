@@ -259,8 +259,9 @@ type Block struct {
 	newMock    func(attr *Attribute) cty.Value
 	attributes []*Attribute
 
-	Filename string
-	Line     int
+	Filename  string
+	StartLine int
+	EndLine   int
 }
 
 // BlockBuilder handles generating new Blocks as part of the parsing and evaluation process.
@@ -289,7 +290,8 @@ func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.B
 
 		block := &Block{
 			Filename:    filename,
-			Line:        body.SrcRange.Start.Line,
+			StartLine:   body.SrcRange.Start.Line,
+			EndLine:     body.SrcRange.End.Line,
 			context:     ctx,
 			hclBlock:    hclBlock,
 			moduleBlock: moduleBlock,
@@ -310,6 +312,9 @@ func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.B
 		b.Logger.Debugf("error loading partial content from hcl file %s", diag.Error())
 
 		block := &Block{
+			Filename:    filename,
+			StartLine:   hclBlock.DefRange.Start.Line,
+			EndLine:     hclBlock.DefRange.End.Line,
 			context:     ctx,
 			hclBlock:    hclBlock,
 			moduleBlock: moduleBlock,
@@ -328,6 +333,9 @@ func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.B
 	}
 
 	block := &Block{
+		Filename:    filename,
+		StartLine:   hclBlock.DefRange.Start.Line,
+		EndLine:     hclBlock.DefRange.End.Line,
 		context:     ctx,
 		hclBlock:    hclBlock,
 		moduleBlock: moduleBlock,

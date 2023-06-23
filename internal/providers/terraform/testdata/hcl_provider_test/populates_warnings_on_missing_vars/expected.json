@@ -23,7 +23,9 @@
                   "blockName": "aws_eip.eip"
                 }
               ],
-              "filename": "testdata/hcl_provider_test/populates_warnings_on_missing_vars/main.tf"
+              "filename": "testdata/hcl_provider_test/populates_warnings_on_missing_vars/main.tf",
+              "startLine": 35,
+              "endLine": 37
             }
           }
         ]
@@ -51,7 +53,9 @@
                 "blockName": "aws_eip.eip"
               }
             ],
-            "filename": "testdata/hcl_provider_test/populates_warnings_on_missing_vars/main.tf"
+            "filename": "testdata/hcl_provider_test/populates_warnings_on_missing_vars/main.tf",
+            "startLine": 35,
+            "endLine": 37
           }
         }
       ]

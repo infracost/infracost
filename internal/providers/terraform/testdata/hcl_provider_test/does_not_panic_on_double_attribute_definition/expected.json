@@ -23,7 +23,9 @@
                   "blockName": "aws_eip.invalid_eip"
                 }
               ],
-              "filename": "testdata/hcl_provider_test/does_not_panic_on_double_attribute_definition/main.tf"
+              "filename": "testdata/hcl_provider_test/does_not_panic_on_double_attribute_definition/main.tf",
+              "startLine": 9,
+              "endLine": 15
             }
           }
         ]
@@ -51,7 +53,9 @@
                 "blockName": "aws_eip.invalid_eip"
               }
             ],
-            "filename": "testdata/hcl_provider_test/does_not_panic_on_double_attribute_definition/main.tf"
+            "filename": "testdata/hcl_provider_test/does_not_panic_on_double_attribute_definition/main.tf",
+            "startLine": 9,
+            "endLine": 15
           }
         }
       ]
