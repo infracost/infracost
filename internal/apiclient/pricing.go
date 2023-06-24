@@ -83,6 +83,7 @@ func NewPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
 			endpoint:   ctx.Config.PricingAPIEndpoint,
 			apiKey:     ctx.Config.APIKey,
 			uuid:       ctx.UUID(),
+			cache:      NewCache(),
 		},
 		Currency:       currency,
 		EventsDisabled: ctx.Config.EventsDisabled,
@@ -120,14 +121,40 @@ func (c *PricingAPIClient) RunQueries(r *schema.Resource) ([]PriceQueryResult, e
 		return []PriceQueryResult{}, nil
 	}
 
+	results := make([]PriceQueryResult, 0, len(queries))
+
+	uncachedQueries := make([]GraphQLQuery, 0, len(queries))
+	uncachedKeys := make([]PriceQueryKey, 0, len(queries))
+
+	for i, q := range queries {
+		cachedResult, ok := c.cache.Lookup(q)
+		if ok {
+			log.Debugf("Using cached pricing details for %s", keys[i].Resource.Name)
+			results = append(results, PriceQueryResult{keys[i], cachedResult})
+		} else {
+			uncachedQueries = append(uncachedQueries, q)
+			uncachedKeys = append(uncachedKeys, keys[i])
+		}
+	}
+
 	log.Debugf("Getting pricing details from %s for %s", c.endpoint, r.Name)
 
-	results, err := c.doQueries(queries)
+	uncachedRawResults, err := c.doQueries(uncachedQueries)
 	if err != nil {
 		return []PriceQueryResult{}, err
 	}
 
-	return c.zipQueryResults(keys, results), nil
+	fmt.Printf("%d cached results\n", len(results))
+	fmt.Printf("%d uncached results\n", len(uncachedRawResults))
+
+	for i, r := range uncachedRawResults {
+		c.cache.Add(uncachedQueries[i], r)
+	}
+
+	uncachedResults := c.zipQueryResults(uncachedKeys, uncachedRawResults)
+	results = append(results, uncachedResults...)
+
+	return results, nil
 }
 
 func (c *PricingAPIClient) buildQuery(product *schema.ProductFilter, price *schema.PriceFilter) GraphQLQuery {

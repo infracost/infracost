@@ -214,6 +214,7 @@ require (
 	github.com/iancoleman/orderedmap v0.2.0 // indirect
 	github.com/klauspost/compress v1.15.11 // indirect
 	github.com/mitchellh/go-testing-interface v1.14.1 // indirect
+	github.com/mitchellh/hashstructure/v2 v2.0.2
 	github.com/open-policy-agent/opa v0.46.1
 	github.com/otiai10/copy v1.7.0
 	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0 // indirect

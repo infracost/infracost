@@ -21,6 +21,7 @@ type APIClient struct {
 	endpoint   string
 	apiKey     string
 	uuid       uuid.UUID
+	cache      *Cache
 }
 
 type GraphQLQuery struct {
