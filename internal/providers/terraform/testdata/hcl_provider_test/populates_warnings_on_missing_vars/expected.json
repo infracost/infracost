@@ -23,6 +23,7 @@
                   "blockName": "aws_eip.eip"
                 }
               ],
+              "checksum": "1fb662b3c7c7c679e24703c6a9d5b744880074ac",
               "filename": "testdata/hcl_provider_test/populates_warnings_on_missing_vars/main.tf",
               "startLine": 35,
               "endLine": 37
@@ -53,6 +54,7 @@
                 "blockName": "aws_eip.eip"
               }
             ],
+            "checksum": "1fb662b3c7c7c679e24703c6a9d5b744880074ac",
             "filename": "testdata/hcl_provider_test/populates_warnings_on_missing_vars/main.tf",
             "startLine": 35,
             "endLine": 37

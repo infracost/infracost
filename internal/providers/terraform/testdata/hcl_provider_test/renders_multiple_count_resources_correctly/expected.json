@@ -23,6 +23,7 @@
                   "blockName": "aws_eip.test"
                 }
               ],
+              "checksum": "bf21a9e8fbc5a3846fb05b4fa0859e0917b2202f",
               "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf",
               "startLine": 9,
               "endLine": 11
@@ -46,6 +47,7 @@
                   "blockName": "aws_eip.test"
                 }
               ],
+              "checksum": "bf21a9e8fbc5a3846fb05b4fa0859e0917b2202f",
               "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf",
               "startLine": 9,
               "endLine": 11
@@ -66,6 +68,7 @@
                   "blockName": "aws_eip.constant_string"
                 }
               ],
+              "checksum": "bf21a9e8fbc5a3846fb05b4fa0859e0917b2202f",
               "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf",
               "startLine": 13,
               "endLine": 15
@@ -101,6 +104,7 @@
                       "blockName": "aws_autoscaling_group.test"
                     }
                   ],
+                  "checksum": "d936d796b4beca284225cc30440634d466eed341",
                   "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
                   "startLine": 10,
                   "endLine": 16
@@ -132,6 +136,7 @@
                       "blockName": "aws_autoscaling_group.test"
                     }
                   ],
+                  "checksum": "868d7113c3551bbc49703eb015ce9ba558771f1d",
                   "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
                   "startLine": 10,
                   "endLine": 16
@@ -163,6 +168,7 @@
                       "blockName": "aws_autoscaling_group.test"
                     }
                   ],
+                  "checksum": "0478dbdb435373e820e760035b6883a101a1f42b",
                   "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
                   "startLine": 10,
                   "endLine": 16
@@ -192,6 +198,7 @@
                       "blockName": "aws_launch_configuration.test"
                     }
                   ],
+                  "checksum": "4ace851b58be96917985b73fca75b03f13b49918",
                   "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
                   "startLine": 18,
                   "endLine": 22
@@ -221,6 +228,7 @@
                       "blockName": "aws_launch_configuration.test"
                     }
                   ],
+                  "checksum": "60fb1508801dc20e1e61db263d43bbb349cb78f9",
                   "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
                   "startLine": 18,
                   "endLine": 22
@@ -250,6 +258,7 @@
                       "blockName": "aws_launch_configuration.test"
                     }
                   ],
+                  "checksum": "42a6d48fc2d21a96e45c4ef66adb390c40986aeb",
                   "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
                   "startLine": 18,
                   "endLine": 22
@@ -283,6 +292,7 @@
                 "blockName": "aws_eip.test"
               }
             ],
+            "checksum": "bf21a9e8fbc5a3846fb05b4fa0859e0917b2202f",
             "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf",
             "startLine": 9,
             "endLine": 11
@@ -306,6 +316,7 @@
                 "blockName": "aws_eip.test"
               }
             ],
+            "checksum": "bf21a9e8fbc5a3846fb05b4fa0859e0917b2202f",
             "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf",
             "startLine": 9,
             "endLine": 11
@@ -326,6 +337,7 @@
                 "blockName": "aws_eip.constant_string"
               }
             ],
+            "checksum": "bf21a9e8fbc5a3846fb05b4fa0859e0917b2202f",
             "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf",
             "startLine": 13,
             "endLine": 15
@@ -361,6 +373,7 @@
                     "blockName": "aws_autoscaling_group.test"
                   }
                 ],
+                "checksum": "d936d796b4beca284225cc30440634d466eed341",
                 "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
                 "startLine": 10,
                 "endLine": 16
@@ -392,6 +405,7 @@
                     "blockName": "aws_autoscaling_group.test"
                   }
                 ],
+                "checksum": "868d7113c3551bbc49703eb015ce9ba558771f1d",
                 "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
                 "startLine": 10,
                 "endLine": 16
@@ -423,6 +437,7 @@
                     "blockName": "aws_autoscaling_group.test"
                   }
                 ],
+                "checksum": "0478dbdb435373e820e760035b6883a101a1f42b",
                 "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
                 "startLine": 10,
                 "endLine": 16
@@ -452,6 +467,7 @@
                     "blockName": "aws_launch_configuration.test"
                   }
                 ],
+                "checksum": "4ace851b58be96917985b73fca75b03f13b49918",
                 "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
                 "startLine": 18,
                 "endLine": 22
@@ -481,6 +497,7 @@
                     "blockName": "aws_launch_configuration.test"
                   }
                 ],
+                "checksum": "60fb1508801dc20e1e61db263d43bbb349cb78f9",
                 "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
                 "startLine": 18,
                 "endLine": 22
@@ -510,6 +527,7 @@
                     "blockName": "aws_launch_configuration.test"
                   }
                 ],
+                "checksum": "42a6d48fc2d21a96e45c4ef66adb390c40986aeb",
                 "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
                 "startLine": 18,
                 "endLine": 22

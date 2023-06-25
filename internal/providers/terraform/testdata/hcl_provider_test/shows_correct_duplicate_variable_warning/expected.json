@@ -35,6 +35,7 @@
                   "blockName": "aws_instance.web_app"
                 }
               ],
+              "checksum": "eeecb40d51aec0fdc1006add707d08dd506f64ea",
               "filename": "testdata/hcl_provider_test/shows_correct_duplicate_variable_warning/main.tf",
               "startLine": 13,
               "endLine": 27
@@ -77,6 +78,7 @@
                 "blockName": "aws_instance.web_app"
               }
             ],
+            "checksum": "eeecb40d51aec0fdc1006add707d08dd506f64ea",
             "filename": "testdata/hcl_provider_test/shows_correct_duplicate_variable_warning/main.tf",
             "startLine": 13,
             "endLine": 27

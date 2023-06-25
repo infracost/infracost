@@ -1,6 +1,8 @@
 package terraform
 
 import (
+	"crypto/sha1" //#nosec
+	"encoding/hex"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -11,6 +13,7 @@ import (
 	"strings"
 	"sync"
 
+	jsoniter "github.com/json-iterator/go"
 	log "github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
@@ -474,6 +477,9 @@ func (p *HCLProvider) marshalModule(module *hcl.Module) ModuleOut {
 }
 
 func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
+	jsonValues := marshalAttributeValues(block.Type(), block.Values())
+	p.marshalBlock(block, jsonValues)
+
 	planned := ResourceJSON{
 		Address:       block.FullName(),
 		Mode:          "managed",
@@ -486,6 +492,7 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 			"startLine": block.StartLine,
 			"endLine":   block.EndLine,
 			"calls":     block.CallDetails(),
+			"checksum":  generateChecksum(jsonValues),
 		},
 	}
 
@@ -500,9 +507,6 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 			Actions: []string{"create"},
 		},
 	}
-
-	jsonValues := marshalAttributeValues(block.Type(), block.Values())
-	p.marshalBlock(block, jsonValues)
 
 	planned.Values = jsonValues
 	changes.Change.After = jsonValues
@@ -600,6 +604,28 @@ func (p *HCLProvider) countReferences(block *hcl.Block) *countExpression {
 	}
 
 	return nil
+}
+
+var ignoredAttrs = map[string]bool{"arn": true, "id": true, "name": true, "self_link": true}
+var checksumMarshaller = jsoniter.ConfigCompatibleWithStandardLibrary
+
+func generateChecksum(value map[string]interface{}) string {
+	filtered := make(map[string]interface{})
+	for k, v := range value {
+		if !ignoredAttrs[k] {
+			filtered[k] = v
+		}
+	}
+
+	serialized, err := checksumMarshaller.Marshal(filtered)
+	if err != nil {
+		return ""
+	}
+
+	h := sha1.New()
+	h.Write(serialized)
+
+	return hex.EncodeToString(h.Sum(nil))
 }
 
 func blockToReferences(block *hcl.Block) map[string]interface{} {
