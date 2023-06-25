@@ -35,7 +35,7 @@
                   "blockName": "aws_instance.web_app"
                 }
               ],
-              "checksum": "eeecb40d51aec0fdc1006add707d08dd506f64ea",
+              "checksum": "e529ad309bb6d647fae2d2854bc0d7f04a7888eceb9580ac224d15cc3384a825",
               "filename": "testdata/hcl_provider_test/shows_correct_duplicate_variable_warning/main.tf",
               "startLine": 13,
               "endLine": 27
@@ -78,7 +78,7 @@
                 "blockName": "aws_instance.web_app"
               }
             ],
-            "checksum": "eeecb40d51aec0fdc1006add707d08dd506f64ea",
+            "checksum": "e529ad309bb6d647fae2d2854bc0d7f04a7888eceb9580ac224d15cc3384a825",
             "filename": "testdata/hcl_provider_test/shows_correct_duplicate_variable_warning/main.tf",
             "startLine": 13,
             "endLine": 27

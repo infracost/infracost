@@ -1,7 +1,7 @@
 package terraform
 
 import (
-	"crypto/sha1" //#nosec
+	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
 	"flag"
@@ -622,7 +622,7 @@ func generateChecksum(value map[string]interface{}) string {
 		return ""
 	}
 
-	h := sha1.New()
+	h := sha256.New()
 	h.Write(serialized)
 
 	return hex.EncodeToString(h.Sum(nil))

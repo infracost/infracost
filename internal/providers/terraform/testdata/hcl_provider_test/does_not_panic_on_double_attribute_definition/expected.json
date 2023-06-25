@@ -23,7 +23,7 @@
                   "blockName": "aws_eip.invalid_eip"
                 }
               ],
-              "checksum": "1fb662b3c7c7c679e24703c6a9d5b744880074ac",
+              "checksum": "7cbe8ebfd37a12e445ee9d8208cd03624611c7dba04c94fc3a9bc9834494e141",
               "filename": "testdata/hcl_provider_test/does_not_panic_on_double_attribute_definition/main.tf",
               "startLine": 9,
               "endLine": 15
@@ -54,7 +54,7 @@
                 "blockName": "aws_eip.invalid_eip"
               }
             ],
-            "checksum": "1fb662b3c7c7c679e24703c6a9d5b744880074ac",
+            "checksum": "7cbe8ebfd37a12e445ee9d8208cd03624611c7dba04c94fc3a9bc9834494e141",
             "filename": "testdata/hcl_provider_test/does_not_panic_on_double_attribute_definition/main.tf",
             "startLine": 9,
             "endLine": 15
