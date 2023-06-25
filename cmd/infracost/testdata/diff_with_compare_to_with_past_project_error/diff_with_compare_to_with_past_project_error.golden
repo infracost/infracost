@@ -74,7 +74,6 @@
             "subresources": [
               {
                 "name": "root_block_device",
-                "resourceType": "root_block_device",
                 "metadata": {},
                 "hourlyCost": "0.00684931506849315",
                 "monthlyCost": "5",
@@ -92,7 +91,6 @@
               },
               {
                 "name": "ebs_block_device[0]",
-                "resourceType": "ebs_block_device[0]",
                 "metadata": {},
                 "hourlyCost": "0.242465753424657529",
                 "monthlyCost": "177",
@@ -145,7 +143,6 @@
             "subresources": [
               {
                 "name": "root_block_device",
-                "resourceType": "root_block_device",
                 "metadata": {},
                 "hourlyCost": "0.00684931506849315",
                 "monthlyCost": "5",
@@ -163,7 +160,6 @@
               },
               {
                 "name": "ebs_block_device[0]",
-                "resourceType": "ebs_block_device[0]",
                 "metadata": {},
                 "hourlyCost": "0.242465753424657529",
                 "monthlyCost": "177",

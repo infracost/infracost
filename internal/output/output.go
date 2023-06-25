@@ -205,7 +205,7 @@ type ActualCosts struct {
 
 type Resource struct {
 	Name           string                 `json:"name"`
-	ResourceType   string                 `json:"resourceType"`
+	ResourceType   string                 `json:"resourceType,omitempty"`
 	Tags           map[string]string      `json:"tags,omitempty"`
 	Metadata       map[string]interface{} `json:"metadata"`
 	HourlyCost     *decimal.Decimal       `json:"hourlyCost"`
@@ -483,7 +483,7 @@ func outputResource(r *schema.Resource) Resource {
 
 	return Resource{
 		Name:           r.Name,
-		ResourceType:   getResourceType(r.Name),
+		ResourceType:   r.ResourceType,
 		Metadata:       metadata,
 		Tags:           r.Tags,
 		HourlyCost:     r.HourlyCost,
@@ -492,16 +492,6 @@ func outputResource(r *schema.Resource) Resource {
 		ActualCosts:    actualCosts,
 		SubResources:   subresources,
 	}
-}
-
-func getResourceType(name string) string {
-	pieces := strings.Split(name, ".")
-
-	if len(pieces) >= 2 {
-		return pieces[len(pieces)-2]
-	}
-
-	return name
 }
 
 func outputCostComponents(costComponents []*schema.CostComponent) []CostComponent {

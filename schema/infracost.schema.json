@@ -310,7 +310,6 @@
     "Resource": {
       "required": [
         "name",
-        "resourceType",
         "metadata",
         "hourlyCost",
         "monthlyCost"
@@ -442,7 +441,6 @@
     "Subresource": {
       "required": [
         "name",
-        "resourceType",
         "metadata",
         "hourlyCost",
         "monthlyCost"

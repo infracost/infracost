@@ -20,6 +20,7 @@
         "resources": [
           {
             "name": "aws_instance.web_app",
+            "resourceType": "aws_instance",
             "metadata": {},
             "hourlyCost": "1.017315068493150679",
             "monthlyCost": "742.64",
@@ -82,6 +83,7 @@
           },
           {
             "name": "aws_instance.web_app2",
+            "resourceType": "aws_instance",
             "metadata": {},
             "hourlyCost": "1.785315068493150679",
             "monthlyCost": "1303.28",
@@ -150,6 +152,7 @@
         "resources": [
           {
             "name": "aws_instance.web_app",
+            "resourceType": "aws_instance",
             "metadata": {},
             "hourlyCost": "1.017315068493150679",
             "monthlyCost": "742.64",
@@ -212,6 +215,7 @@
           },
           {
             "name": "aws_instance.web_app2",
+            "resourceType": "aws_instance",
             "metadata": {},
             "hourlyCost": "1.785315068493150679",
             "monthlyCost": "1303.28",
