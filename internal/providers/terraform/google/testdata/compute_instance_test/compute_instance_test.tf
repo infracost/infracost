@@ -259,7 +259,7 @@ resource "google_compute_instance" "custom_n2" {
 
 resource "google_compute_instance" "custom_n2d" {
   name         = "custom_n2d"
-  machine_type = "n2d-custom-6-20480"
+  machine_type = "n2d-custom-4-20480"
   zone         = "us-central1-a"
 
   boot_disk {
