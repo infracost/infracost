@@ -2,10 +2,11 @@ package azure
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -24,12 +25,12 @@ func NewAzureRMFirewall(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 
 	skuTier := "Standard"
 	if d.Get("sku_tier").Type != gjson.Null {
-		skuTier = d.Get("sku_tier").String()
+		skuTier = cases.Title(language.English).String(d.Get("sku_tier").String())
 	}
 
 	if len(d.Get("virtual_hub").Array()) > 0 {
-		if strings.ToLower(skuTier) == "standard" {
-			skuTier = "Secured Virtual Hub"
+		if skuTier == "Standard" {
+			skuTier = "Standard Secure Virtual Hub"
 		} else {
 			skuTier = fmt.Sprintf("%s Secured Virtual Hub", skuTier)
 		}
