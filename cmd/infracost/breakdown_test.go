@@ -329,6 +329,16 @@ func TestBreakdownTerragruntWithDashboardEnabled(t *testing.T) {
 	})
 }
 
+func TestBreakdownTerragruntWithMockedFunctions(t *testing.T) {
+	GoldenFileCommandTest(t,
+		testutil.CalcGoldenFileTestdataDirName(), []string{
+			"breakdown",
+			"--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+		}, &GoldenFileOptions{
+			RunTerraformCLI: false,
+		})
+}
+
 func TestBreakdownTerragruntHCLSingle(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terragrunt/prod"}, nil)
 }
