@@ -455,10 +455,12 @@
                                                                                                                        
  OVERALL TOTAL                                                                                          $14,182,475.61 
 ──────────────────────────────────
-57 cloud resources were detected:
+58 cloud resources were detected:
 ∙ 56 were estimated
 ∙ 1 was free:
   ∙ 1 x azurerm_resource_group
+∙ 1 is not supported yet, see https://infracost.io/requested-resources:
+  ∙ 1 x azurerm_storage_account
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃
