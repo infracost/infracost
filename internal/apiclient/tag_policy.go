@@ -41,7 +41,7 @@ func (c *TagPolicyAPIClient) CheckTagPolicies(ctx *config.RunContext, out output
 				blockPr
 				resources {
 					address
-					type
+					resourceType
 					path
 					line
 					projectNames
