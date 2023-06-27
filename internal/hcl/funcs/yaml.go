@@ -8,6 +8,12 @@ import (
 	"github.com/zclconf/go-cty/cty/function"
 )
 
+// YAMLDecodeFunc is an Infracost specific version of the yaml.YAMLDecodeFunc
+// which handles Infracost mocked return values. If the argument passed to YAMLDecodeFunc
+// is an Infracost mock (e.g. a string with value mock-value) then we return a mocked object
+// that can be used in the HCL evaluation loop. This means we get less unwanted nil values when
+// evaluating HCL files. This is especially important when evaluating Terragrunt HCL files
+// as unexpected nils cause program termination.
 var YAMLDecodeFunc = function.New(&function.Spec{
 	Params: []function.Parameter{
 		{

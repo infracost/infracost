@@ -8,6 +8,12 @@ import (
 	"github.com/zclconf/go-cty/cty/json"
 )
 
+// JSONDecodeFunc is an Infracost specific version of the json.JSONDecodeFunc
+// which handles Infracost mocked return values. If the argument passed to JSONDecodeFunc
+// is an Infracost mock (e.g. a string with value mock-value) then we return a mocked object
+// that can be used in the HCL evaluation loop. This means we get less unwanted nil values when
+// evaluating HCL files. This is especially important when evaluating Terragrunt HCL files
+// as unexpected nils cause program termination.
 var JSONDecodeFunc = function.New(&function.Spec{
 	Description: `Parses the given string as JSON and returns a value corresponding to what the JSON document describes.`,
 	Params: []function.Parameter{
