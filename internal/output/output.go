@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/shopspring/decimal"
+	"github.com/tidwall/gjson"
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
@@ -78,12 +79,14 @@ func convertOutputResources(outResources []Resource) []*schema.Resource {
 	for i, resource := range outResources {
 		resources[i] = &schema.Resource{
 			Name:           resource.Name,
+			Metadata:       convertMetadata(resource.Metadata),
 			CostComponents: convertCostComponents(resource.CostComponents),
 			ActualCosts:    convertActualCosts(resource.ActualCosts),
 			SubResources:   convertOutputResources(resource.SubResources),
+			Tags:           resource.Tags,
 			HourlyCost:     resource.HourlyCost,
 			MonthlyCost:    resource.MonthlyCost,
-			ResourceType:   resource.ResourceType(),
+			ResourceType:   resource.ResourceType,
 		}
 	}
 
@@ -126,6 +129,18 @@ func convertActualCosts(outActualCosts []ActualCosts) []*schema.ActualCosts {
 	}
 
 	return actualCosts
+}
+
+func convertMetadata(metadata map[string]interface{}) map[string]gjson.Result {
+	result := make(map[string]gjson.Result)
+	for k, v := range metadata {
+		jsonBytes, err := json.Marshal(v)
+		if err == nil {
+			result[k] = gjson.ParseBytes(jsonBytes)
+		}
+	}
+
+	return result
 }
 
 type Projects []Project
@@ -205,6 +220,7 @@ type ActualCosts struct {
 
 type Resource struct {
 	Name           string                 `json:"name"`
+	ResourceType   string                 `json:"resourceType,omitempty"`
 	Tags           map[string]string      `json:"tags,omitempty"`
 	Metadata       map[string]interface{} `json:"metadata"`
 	HourlyCost     *decimal.Decimal       `json:"hourlyCost"`
@@ -212,16 +228,6 @@ type Resource struct {
 	CostComponents []CostComponent        `json:"costComponents,omitempty"`
 	ActualCosts    []ActualCosts          `json:"actualCosts,omitempty"`
 	SubResources   []Resource             `json:"subresources,omitempty"`
-}
-
-func (r Resource) ResourceType() string {
-	pieces := strings.Split(r.Name, ".")
-
-	if len(pieces) >= 2 {
-		return pieces[len(pieces)-2]
-	}
-
-	return r.Name
 }
 
 type Summary struct {
@@ -492,6 +498,7 @@ func outputResource(r *schema.Resource) Resource {
 
 	return Resource{
 		Name:           r.Name,
+		ResourceType:   r.ResourceType,
 		Metadata:       metadata,
 		Tags:           r.Tags,
 		HourlyCost:     r.HourlyCost,

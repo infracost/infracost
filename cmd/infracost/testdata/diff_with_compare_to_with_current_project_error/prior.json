@@ -25,6 +25,7 @@
         "resources": [
           {
             "name": "aws_instance.web_app",
+            "resourceType": "aws_instance",
             "metadata": {
               "calls": [
                 {
@@ -101,6 +102,7 @@
         "resources": [
           {
             "name": "aws_instance.web_app",
+            "resourceType": "aws_instance",
             "metadata": {
               "calls": [
                 {
@@ -201,6 +203,7 @@
         "resources": [
           {
             "name": "aws_instance.web_app",
+            "resourceType": "aws_instance",
             "metadata": {
               "calls": [
                 {
@@ -277,6 +280,7 @@
         "resources": [
           {
             "name": "aws_instance.web_app",
+            "resourceType": "aws_instance",
             "metadata": {
               "calls": [
                 {

@@ -318,6 +318,9 @@
         "name": {
           "type": "string"
         },
+        "resourceType": {
+          "type": "string"
+        },
         "tags": {
           "patternProperties": {
             ".*": {
@@ -444,6 +447,9 @@
       ],
       "properties": {
         "name": {
+          "type": "string"
+        },
+        "resourceType": {
           "type": "string"
         },
         "tags": {

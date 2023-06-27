@@ -42,7 +42,10 @@
                       "blockName": "aws_ecs_task_definition.ecs_task"
                     }
                   ],
-                  "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf"
+                  "checksum": "40f6429fb6ec11b145e9c44865ec17c1944c1a7cef0db118096f13cf29bfb8b0",
+                  "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
+                  "startLine": 6,
+                  "endLine": 30
                 }
               },
               {
@@ -71,7 +74,10 @@
                       "blockName": "aws_ecs_service.ecs_service"
                     }
                   ],
-                  "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf"
+                  "checksum": "d3c2ce2c95dae9abc092f37146b8a5dab40afe96a7f613811fdf696174d90fe1",
+                  "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
+                  "startLine": 32,
+                  "endLine": 39
                 }
               }
             ],
@@ -118,7 +124,10 @@
                           "blockName": "aws_ecs_task_definition.ecs_task"
                         }
                       ],
-                      "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf"
+                      "checksum": "57c875c1fc903c5f6d5f63abde5e3c5b3ee2f368b7ce79f7eed17a16d710c658",
+                      "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf",
+                      "startLine": 6,
+                      "endLine": 30
                     }
                   },
                   {
@@ -151,7 +160,10 @@
                           "blockName": "aws_ecs_service.ecs_service"
                         }
                       ],
-                      "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf"
+                      "checksum": "24062f2b3bf4a6d41ca253d8e735ae757ee8886f2dd946e746fe87ca2763919f",
+                      "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf",
+                      "startLine": 32,
+                      "endLine": 39
                     }
                   }
                 ],
@@ -203,7 +215,10 @@
                     "blockName": "aws_ecs_task_definition.ecs_task"
                   }
                 ],
-                "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf"
+                "checksum": "40f6429fb6ec11b145e9c44865ec17c1944c1a7cef0db118096f13cf29bfb8b0",
+                "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
+                "startLine": 6,
+                "endLine": 30
               }
             },
             {
@@ -232,7 +247,10 @@
                     "blockName": "aws_ecs_service.ecs_service"
                   }
                 ],
-                "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf"
+                "checksum": "d3c2ce2c95dae9abc092f37146b8a5dab40afe96a7f613811fdf696174d90fe1",
+                "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
+                "startLine": 32,
+                "endLine": 39
               }
             }
           ],
@@ -279,7 +297,10 @@
                         "blockName": "aws_ecs_task_definition.ecs_task"
                       }
                     ],
-                    "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf"
+                    "checksum": "57c875c1fc903c5f6d5f63abde5e3c5b3ee2f368b7ce79f7eed17a16d710c658",
+                    "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf",
+                    "startLine": 6,
+                    "endLine": 30
                   }
                 },
                 {
@@ -312,7 +333,10 @@
                         "blockName": "aws_ecs_service.ecs_service"
                       }
                     ],
-                    "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf"
+                    "checksum": "24062f2b3bf4a6d41ca253d8e735ae757ee8886f2dd946e746fe87ca2763919f",
+                    "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf",
+                    "startLine": 32,
+                    "endLine": 39
                   }
                 }
               ],

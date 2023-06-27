@@ -23,7 +23,10 @@
                   "blockName": "aws_eip.eip"
                 }
               ],
-              "filename": "testdata/hcl_provider_test/populates_warnings_on_missing_vars/main.tf"
+              "checksum": "7cbe8ebfd37a12e445ee9d8208cd03624611c7dba04c94fc3a9bc9834494e141",
+              "filename": "testdata/hcl_provider_test/populates_warnings_on_missing_vars/main.tf",
+              "startLine": 35,
+              "endLine": 37
             }
           }
         ]
@@ -51,7 +54,10 @@
                 "blockName": "aws_eip.eip"
               }
             ],
-            "filename": "testdata/hcl_provider_test/populates_warnings_on_missing_vars/main.tf"
+            "checksum": "7cbe8ebfd37a12e445ee9d8208cd03624611c7dba04c94fc3a9bc9834494e141",
+            "filename": "testdata/hcl_provider_test/populates_warnings_on_missing_vars/main.tf",
+            "startLine": 35,
+            "endLine": 37
           }
         }
       ]

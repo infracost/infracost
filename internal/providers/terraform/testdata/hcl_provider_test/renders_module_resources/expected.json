@@ -25,7 +25,10 @@
                   "blockName": "aws_vpn_connection.example"
                 }
               ],
-              "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf"
+              "checksum": "f83704925dfcc9e2daae865e0a1c1ecb29e9809bd8900126bab803539889f89f",
+              "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf",
+              "startLine": 13,
+              "endLine": 17
             }
           }
         ],
@@ -53,7 +56,10 @@
                       "blockName": "aws_ec2_transit_gateway.example"
                     }
                   ],
-                  "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf"
+                  "checksum": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+                  "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf",
+                  "startLine": 1,
+                  "endLine": 1
                 }
               },
               {
@@ -80,7 +86,10 @@
                       "blockName": "aws_customer_gateway.example"
                     }
                   ],
-                  "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf"
+                  "checksum": "875b67acb222fc57afc61092a04721406bdbef2b9b116e2ebe24529469c8be1e",
+                  "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf",
+                  "startLine": 3,
+                  "endLine": 7
                 }
               }
             ],
@@ -113,7 +122,10 @@
                 "blockName": "aws_vpn_connection.example"
               }
             ],
-            "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf"
+            "checksum": "f83704925dfcc9e2daae865e0a1c1ecb29e9809bd8900126bab803539889f89f",
+            "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf",
+            "startLine": 13,
+            "endLine": 17
           }
         }
       ],
@@ -141,7 +153,10 @@
                     "blockName": "aws_ec2_transit_gateway.example"
                   }
                 ],
-                "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf"
+                "checksum": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+                "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf",
+                "startLine": 1,
+                "endLine": 1
               }
             },
             {
@@ -168,7 +183,10 @@
                     "blockName": "aws_customer_gateway.example"
                   }
                 ],
-                "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf"
+                "checksum": "875b67acb222fc57afc61092a04721406bdbef2b9b116e2ebe24529469c8be1e",
+                "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf",
+                "startLine": 3,
+                "endLine": 7
               }
             }
           ],
