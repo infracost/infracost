@@ -6,6 +6,7 @@ import (
 	"embed"
 	"path/filepath"
 	"sort"
+	"strings"
 	"text/template"
 	"unicode/utf8"
 
@@ -222,6 +223,7 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 			}
 			return placeholders
 		},
+		"stringsJoin":    strings.Join,
 		"truncateMiddle": truncateMiddle,
 	})
 	_, err := tmpl.ParseFS(templatesFS, filepath.Join("templates", filename))

@@ -1,3 +1,41 @@
+{{- define "tagPolicyTable" }}
+  <table>
+    <thead>
+      <td>Policy Issue</td>
+      <td>File:line</td>
+    </thead>
+  {{- range . }}
+    <tr>
+      <th colspan="2"><b>{{ .Name }}</b>: {{ .Message }}</th>
+    </tr>
+    {{- range .Resources }}
+    <tr>
+      <td>
+        <code>{{ .Address}}</code>
+      {{- if gt (len .ProjectNames) 1 }}
+        in projects {{ stringsJoin .ProjectNames ", " }}
+      {{- else }}
+        in project {{ index .ProjectNames 0 }}
+      {{- end }}
+      {{- if gt (len .Failures) 1 }}
+        <ul>
+        {{- range .Failures }}
+          <li>{{ . }}</li>
+        {{- end }}
+        </ul>
+      {{- else }}
+        {{ index .Failures 0 }}
+      {{- end }}
+      </td>
+      <td>
+        {{ .Path }}{{- if .Line }}:{{ .Line }}{{- end }}
+      </td>
+    </tr>
+    {{- end }}
+  {{- end }}
+  </table>
+{{- end }}
+
 {{- define "summaryRow"}}
     <tr>
       <td>{{ truncateMiddle .Name 64 "..." }}</td>
@@ -65,6 +103,29 @@
 </details>
 	{{- end }}
 {{- end }}
+{{- if gt (len .Options.TagPolicyCheck.FailingTagPolicies) 0 }}
+<details>
+  <summary><strong>❌ Tag policy check failed</strong></summary>
+  {{- template "tagPolicyTable" .Options.TagPolicyCheck.FailingTagPolicies }}
+</details>
+{{- end }}
+{{- if gt (len .Options.TagPolicyCheck.WarningTagPolicies) 0 }}
+<details>
+  <summary><strong>🟡 Tag policy warnings</strong></summary>
+  {{- template "tagPolicyTable" .Options.TagPolicyCheck.WarningTagPolicies }}
+</details>
+{{- end }}
+{{- if gt (len .Options.TagPolicyCheck.PassingTagPolicies) 0 }}
+<details>
+  <summary><strong>✅ Tag policies passed</strong></summary>
+  <ul>
+  {{- range .Options.TagPolicyCheck.PassingTagPolicies }}
+    <li><b>{{ .Name }}</b> {{ .Message }}</li>
+  {{- end }}
+  </ul>
+</details>
+{{- end }}
+
 {{- if .Options.GuardrailCheck.Comment }}
 	{{- if gt (len .Options.GuardrailCheck.CommentableFailures) 0 }}
 <details>

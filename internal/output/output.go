@@ -29,6 +29,7 @@ type Root struct {
 	CloudURL             string           `json:"cloudUrl,omitempty"`
 	Currency             string           `json:"currency"`
 	Projects             Projects         `json:"projects"`
+	TagPolicies          []TagPolicy      `json:"tagPolicies,omitempty"`
 	TotalHourlyCost      *decimal.Decimal `json:"totalHourlyCost"`
 	TotalMonthlyCost     *decimal.Decimal `json:"totalMonthlyCost"`
 	PastTotalHourlyCost  *decimal.Decimal `json:"pastTotalHourlyCost"`
@@ -39,6 +40,33 @@ type Root struct {
 	Summary              *Summary         `json:"summary"`
 	FullSummary          *Summary         `json:"-"`
 	IsCIRun              bool             `json:"-"`
+}
+
+// TagPolicy holds information if a given run has applicable tag policy checks.
+// This struct is returned from the tag policies API and used to create tag policy outputs.
+type TagPolicy struct {
+	Name        string              `json:"name"`
+	TagPolicyID string              `json:"tagPolicyId"`
+	Message     string              `json:"message"`
+	PrComment   bool                `json:"prComment"`
+	BlockPr     bool                `json:"blockPr"`
+	Resources   []TagPolicyResource `json:"resources"`
+}
+
+type TagPolicyResource struct {
+	Address              string                `json:"address"`
+	ResourceType         string                `json:"resourceType"`
+	Path                 string                `json:"path"`
+	Line                 int                   `json:"line"`
+	ProjectNames         []string              `json:"projectNames"`
+	MissingMandatoryTags []string              `json:"missingMandatoryTags"`
+	InvalidTags          []TagPolicyInvalidTag `json:"invalidTags"`
+}
+
+type TagPolicyInvalidTag struct {
+	Key         string   `json:"key"`
+	ValidValues []string `json:"validValues"`
+	ValidRegex  string   `json:"validRegex"`
 }
 
 type Project struct {
@@ -262,6 +290,7 @@ type Options struct {
 	Fields            []string
 	IncludeHTML       bool
 	PolicyChecks      PolicyCheck
+	TagPolicyCheck    TagPolicyCheck
 	GuardrailCheck    GuardrailCheck
 	diffMsg           string
 	CurrencyFormat    string
@@ -296,6 +325,87 @@ func (p PolicyCheckFailures) Error() string {
 	}
 
 	return out.String()
+}
+
+// TagPolicyCheck holds information if a given run has any tag policies enabled.
+// This struct is used in templates to create useful cost policy outputs.
+type TagPolicyCheck struct {
+	FailingTagPolicies []TagPolicy
+	WarningTagPolicies []TagPolicy
+	PassingTagPolicies []TagPolicy
+}
+
+func NewTagPolicyChecks(tps []TagPolicy) TagPolicyCheck {
+	tpc := TagPolicyCheck{}
+
+	for _, tp := range tps {
+		if !tp.PrComment {
+			continue
+		}
+
+		if len(tp.Resources) == 0 {
+			tpc.PassingTagPolicies = append(tpc.PassingTagPolicies, tp)
+			continue
+		}
+
+		if tp.BlockPr {
+			tpc.FailingTagPolicies = append(tpc.FailingTagPolicies, tp)
+		} else {
+			tpc.WarningTagPolicies = append(tpc.WarningTagPolicies, tp)
+		}
+	}
+
+	return tpc
+}
+
+func (tpc TagPolicyCheck) Error() string {
+	if len(tpc.FailingTagPolicies) == 0 {
+		return ""
+	}
+
+	out := bytes.NewBuffer([]byte("Tag policy check failed:\n"))
+
+	for _, tp := range tpc.FailingTagPolicies {
+		fmt.Fprintf(out, "\n  %s: %s\n", tp.Name, tp.Message)
+		for _, r := range tp.Resources {
+			fmt.Fprintf(out, "    %s in project(s) %s\n", r.Address, strings.Join(r.ProjectNames, ", "))
+			for _, f := range r.Failures() {
+				fmt.Fprintf(out, "    - %s\n", f)
+			}
+		}
+	}
+
+	return out.String()
+}
+
+func (r TagPolicyResource) Failures() []string {
+	var f []string
+	if len(r.MissingMandatoryTags) > 0 {
+		var tags []string
+		for i, tag := range r.MissingMandatoryTags {
+			if i > 1 && i == len(r.MissingMandatoryTags) {
+				tags = append(tags, fmt.Sprintf("and \"%s\"", tag))
+			} else {
+				tags = append(tags, fmt.Sprintf("\"%s\"", tag))
+			}
+		}
+		f = append(f, fmt.Sprintf("should have mandatory tags: %s", strings.Join(tags, ", ")))
+	}
+
+	for _, invalidTag := range r.InvalidTags {
+		if len(invalidTag.ValidValues) > 0 {
+			var validValues []string
+			for _, value := range invalidTag.ValidValues {
+				validValues = append(validValues, fmt.Sprintf("\"%s\"", value))
+			}
+			f = append(f, fmt.Sprintf("should have a valid value for \"%s\" tag: %s", invalidTag.Key, strings.Join(validValues, ", ")))
+		}
+		if invalidTag.ValidRegex != "" {
+			f = append(f, fmt.Sprintf("should have a valid value for \"%s\" tag: must match regex <code>%s</code>", invalidTag.Key, invalidTag.ValidRegex))
+		}
+	}
+
+	return f
 }
 
 // GuardrailCheck holds information if a given run has applicable guardrail checks.
