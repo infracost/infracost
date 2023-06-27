@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/shopspring/decimal"
+	"github.com/tidwall/gjson"
 
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
@@ -78,9 +79,11 @@ func convertOutputResources(outResources []Resource) []*schema.Resource {
 	for i, resource := range outResources {
 		resources[i] = &schema.Resource{
 			Name:           resource.Name,
+			Metadata:       convertMetadata(resource.Metadata),
 			CostComponents: convertCostComponents(resource.CostComponents),
 			ActualCosts:    convertActualCosts(resource.ActualCosts),
 			SubResources:   convertOutputResources(resource.SubResources),
+			Tags:           resource.Tags,
 			HourlyCost:     resource.HourlyCost,
 			MonthlyCost:    resource.MonthlyCost,
 			ResourceType:   resource.ResourceType,
@@ -126,6 +129,18 @@ func convertActualCosts(outActualCosts []ActualCosts) []*schema.ActualCosts {
 	}
 
 	return actualCosts
+}
+
+func convertMetadata(metadata map[string]interface{}) map[string]gjson.Result {
+	result := make(map[string]gjson.Result)
+	for k, v := range metadata {
+		jsonBytes, err := json.Marshal(v)
+		if err == nil {
+			result[k] = gjson.ParseBytes(jsonBytes)
+		}
+	}
+
+	return result
 }
 
 type Projects []Project
