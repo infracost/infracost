@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"bytes"
 	"embed"
-	"path/filepath"
 	"sort"
 	"strings"
 	"text/template"
@@ -226,7 +225,7 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 		"stringsJoin":    strings.Join,
 		"truncateMiddle": truncateMiddle,
 	})
-	_, err := tmpl.ParseFS(templatesFS, filepath.Join("templates", filename))
+	_, err := tmpl.ParseFS(templatesFS, "templates/"+filename)
 	if err != nil {
 		return []byte{}, err
 	}
