@@ -727,6 +727,9 @@ func (e *Evaluator) evaluateProvider(b *Block, values map[string]cty.Value) cty.
 	}
 
 	ob := v.AsValueMap()
+	if ob == nil {
+		ob = make(map[string]cty.Value)
+	}
 	ob[str] = b.Values()
 	return cty.ObjectVal(ob)
 }
