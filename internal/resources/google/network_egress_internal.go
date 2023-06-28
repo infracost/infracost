@@ -3,8 +3,9 @@ package google
 import (
 	"fmt"
 
-	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 type NetworkEgressUsage struct {
@@ -172,6 +173,14 @@ func (r *ContainerRegistryNetworkEgressUsage) BuildResource() *schema.Resource {
 	if r.SameContinent != nil {
 		quantity = decimalPtr(decimal.NewFromFloat(*r.SameContinent))
 	}
+
+	var startUsage *string
+	continent := regionToContinent(r.Region)
+	// Northern America has two prices, the first is free so we need to use the start usage to 1 to avoid 0.00 prices.
+	if continent == "Northern America" {
+		startUsage = strPtr("1")
+	}
+
 	resource.CostComponents = append(resource.CostComponents, &schema.CostComponent{
 		Name:            fmt.Sprintf("%s in same continent", r.PrefixName),
 		Unit:            "GB",
@@ -182,8 +191,12 @@ func (r *ContainerRegistryNetworkEgressUsage) BuildResource() *schema.Resource {
 			Region:     strPtr("global"),
 			Service:    strPtr("Cloud Storage"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "description", Value: strPtr("Networking Traffic Egress GCP Inter Region within Europe")},
+				{Key: "description", Value: strPtr(fmt.Sprintf("Networking Traffic Egress GCP Inter Region within %s", continent))},
+				{Key: "resourceGroup", Value: strPtr("InterregionEgress")},
 			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			StartUsageAmount: startUsage,
 		},
 	})
 

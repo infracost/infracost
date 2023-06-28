@@ -9,12 +9,15 @@ import (
 
 func getAzureRMStorageAccountRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_storage_account",
-		RFunc: newAzureRMStorageAccount,
+		Name:      "azurerm_storage_account",
+		CoreRFunc: newAzureRMStorageAccount,
+		CustomRefIDFunc: func(d *schema.ResourceData) []string {
+			return []string{d.Get("name").String()}
+		},
 	}
 }
 
-func newAzureRMStorageAccount(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newAzureRMStorageAccount(d *schema.ResourceData) schema.CoreResource {
 	region := lookupRegion(d, []string{})
 
 	accountKind := "StorageV2"
@@ -42,7 +45,7 @@ func newAzureRMStorageAccount(d *schema.ResourceData, u *schema.UsageData) *sche
 		nfsv3 = d.Get("nfsv3_enabled").Bool()
 	}
 
-	r := &azure.StorageAccount{
+	return &azure.StorageAccount{
 		Address:                d.Address,
 		Region:                 region,
 		AccessTier:             accessTier,
@@ -51,7 +54,4 @@ func newAzureRMStorageAccount(d *schema.ResourceData, u *schema.UsageData) *sche
 		AccountTier:            accountTier,
 		NFSv3:                  nfsv3,
 	}
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
 }

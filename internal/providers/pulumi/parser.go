@@ -59,7 +59,7 @@ func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *sc
 	}
 }
 
-func (p *Parser) parsePreviewDigest(t display.PreviewDigest, usage map[string]*schema.UsageData, rawValues gjson.Result) ([]*schema.Resource, []*schema.Resource, error) {
+func (p *Parser) parsePreviewDigest(t display.PreviewDigest, usage schema.UsageMap, rawValues gjson.Result) ([]*schema.Resource, []*schema.Resource, error) {
 	baseResources := p.loadUsageFileResources(usage)
 
 	var resources []*schema.Resource
@@ -91,7 +91,7 @@ func (p *Parser) parsePreviewDigest(t display.PreviewDigest, usage map[string]*s
 		tags := parseTags(resourceType, rawValues)
 		var usageData *schema.UsageData
 
-		if ud := usage[name]; ud != nil {
+		if ud := usage.Get(name); ud != nil {
 			usageData = ud
 		}
 
@@ -99,7 +99,7 @@ func (p *Parser) parsePreviewDigest(t display.PreviewDigest, usage map[string]*s
 		refResources[name] = resourceData
 		// You have to load this in the loop so it will find the resources.
 		p.parseReferences(refResources, rawValues)
-		p.loadInfracostProviderUsageData(usage, refResources)
+		// p.loadInfracostProviderUsageData(usage, refResources)
 		if r := p.createResource(resourceData, usageData); r != nil {
 			if step.Op == "same" {
 				pastResources = append(pastResources, r)
@@ -111,10 +111,10 @@ func (p *Parser) parsePreviewDigest(t display.PreviewDigest, usage map[string]*s
 	return pastResources, resources, nil
 }
 
-func (p *Parser) loadUsageFileResources(u map[string]*schema.UsageData) []*schema.Resource {
+func (p *Parser) loadUsageFileResources(u schema.UsageMap) []*schema.Resource {
 	resources := make([]*schema.Resource, 0)
 
-	for k, v := range u {
+	for k, v := range u.Data() {
 		for _, t := range GetUsageOnlyResources() {
 			if strings.HasPrefix(k, fmt.Sprintf("%s.", t)) {
 				d := schema.NewResourceData(t, "global", k, map[string]string{}, gjson.Result{})
@@ -155,7 +155,7 @@ func parseRegion(resourceType string, v map[string]string) string {
 	}
 }
 
-func (p *Parser) loadInfracostProviderUsageData(u map[string]*schema.UsageData, resData map[string]*schema.ResourceData) {
+func (p *Parser) loadInfracostProviderUsageData(u schema.UsageMap, resData map[string]*schema.ResourceData) {
 	log.Debugf("Loading usage data from Infracost provider resources")
 
 	for _, d := range resData {
@@ -163,8 +163,10 @@ func (p *Parser) loadInfracostProviderUsageData(u map[string]*schema.UsageData, 
 			p.ctx.SetContextValue("terraformInfracostProviderEnabled", true)
 
 			for _, ref := range d.References("resources") {
-				if _, ok := u[ref.Address]; !ok {
-					u[ref.Address] = schema.NewUsageData(ref.Address, convertToUsageAttributes(d.RawValues))
+				address := ref.Address
+				resource := u.Get(address)
+				if resource == nil {
+					u.Data()[address] = schema.NewUsageData(ref.Address, convertToUsageAttributes(d.RawValues))
 				} else {
 					log.Debugf("Skipping loading usage for resource %s since it has already been defined", ref.Address)
 				}

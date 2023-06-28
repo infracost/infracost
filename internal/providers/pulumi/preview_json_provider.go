@@ -37,7 +37,7 @@ func (p *PreviewJSONProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 	// no op
 }
 
-func (p *PreviewJSONProvider) LoadResources(usage map[string]*schema.UsageData) ([]*schema.Project, error) {
+func (p *PreviewJSONProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, error) {
 	b, err := os.ReadFile(p.Path)
 	if err != nil {
 		return []*schema.Project{}, errors.Wrap(err, "Error reading Pulumi preview JSON file")

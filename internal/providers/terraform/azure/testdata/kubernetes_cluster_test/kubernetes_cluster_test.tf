@@ -30,7 +30,7 @@ resource "azurerm_kubernetes_cluster" "paid_D2SV2_3nc_128gb" {
   location            = "eastus"
   resource_group_name = azurerm_resource_group.example.name
   dns_prefix          = "exampleaks1"
-  sku_tier            = "Paid"
+  sku_tier            = "Standard"
 
   default_node_pool {
     name            = "default"
@@ -49,7 +49,7 @@ resource "azurerm_kubernetes_cluster" "min_count" {
   location            = "eastus"
   resource_group_name = azurerm_resource_group.example.name
   dns_prefix          = "exampleaks1"
-  sku_tier            = "Paid"
+  sku_tier            = "Standard"
 
   default_node_pool {
     name            = "default"
@@ -68,7 +68,7 @@ resource "azurerm_kubernetes_cluster" "paid_5nc_32gb" {
   location            = "eastus"
   resource_group_name = azurerm_resource_group.example.name
   dns_prefix          = "exampleaks1"
-  sku_tier            = "Paid"
+  sku_tier            = "Standard"
 
   default_node_pool {
     name            = "default"
@@ -87,7 +87,7 @@ resource "azurerm_kubernetes_cluster" "usage_ephemeral" {
   location                         = "eastus"
   resource_group_name              = azurerm_resource_group.example.name
   dns_prefix                       = "exampleaks1"
-  sku_tier                         = "Paid"
+  sku_tier                         = "Standard"
   http_application_routing_enabled = true
 
   network_profile {

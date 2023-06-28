@@ -42,6 +42,12 @@ resource "aws_autoscaling_group" "asg_lc_min_size" {
   min_size             = 2
 }
 
+resource "aws_autoscaling_group" "asg_lc_min_size_name_ref" {
+  launch_configuration = aws_launch_configuration.lc_basic.name
+  max_size             = 3
+  min_size             = 2
+}
+
 resource "aws_autoscaling_group" "asg_lc_min_size_zero" {
   launch_configuration = aws_launch_configuration.lc_basic.id
   max_size             = 3

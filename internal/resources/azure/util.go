@@ -26,6 +26,10 @@ func decimalPtr(d decimal.Decimal) *decimal.Decimal {
 	return &d
 }
 
+func int32Ptr(i int32) *int32 {
+	return &i
+}
+
 func floatPtrToDecimalPtr(f *float64) *decimal.Decimal {
 	if f == nil {
 		return nil

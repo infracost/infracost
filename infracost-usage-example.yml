@@ -1081,8 +1081,16 @@ resource_usage:
     monthly_inbound_data_processed_gb: 100 # Monthly inbound data processed in GB.
     monthly_outbound_data_processed_gb: 100 # Monthly outbound data processed in GB.
 
+  azurerm_recovery_services_vault.my_vault:
+    azurerm_backup_protected_vm.my_vm: # Any protected VMs that come under this vault can be configured with the following
+      disk_utilization_gb: 300 # Total size in GB of the data that will be backed up into the recovery service vault. Defaults to the entire storage capacity of the VM.
+      additional_backup_retention_gb: 100 # Total size in GB of the additional data stored by this VM because of retention rules.
+
   azurerm_search_service.my_service:
     monthly_images_extracted: 1000000 # Monthly number of extracted images
+
+  azurerm_signalr_service.my_service:
+    monthly_additional_messages: 1000000 # Monthly number of messages above the included 1M per unit per day
 
   azurerm_storage_account.my_account:
     data_at_rest_storage_gb: 10000                        # Total size of Data at Rest in GB (File storage).
@@ -1099,6 +1107,22 @@ resource_usage:
     monthly_data_retrieval_gb: 1000                       # Monthly number of data retrieval in GB.
     monthly_data_write_gb: 1000                           # Monthly number of data write in GB.
     blob_index_tags: 100000                               # Total number of Blob indexes.
+
+  azurerm_storage_queue.my_queue:
+    monthly_storage_gb: 1000000                       # Monthly amount of storage used in GB.
+    monthly_class_1_operations: 10000                 # Monthly number of Class 1 operations
+    monthly_class_2_operations: 1000000               # Monthly number of Class 2 operations
+    monthly_geo_replication_data_transfer_gb: 1000000 # Monthly amount of Geo-replication data transfer in GB
+
+  azurerm_storage_share.my_share:
+    storage_gb: 1000000                # Total size of storage in GB. Overrides any provided `quota`.
+    monthly_write_operations: 1000000  # Monthly number of Write operations.
+    monthly_list_operations: 1000000   # Monthly number of List and Create Container operations.
+    monthly_read_operations: 100000    # Monthly number of Read operations.
+    monthly_other_operations: 1000000  # Monthly number of All other operations.
+    monthly_data_retrieval_gb: 1000    # Monthly number of data retrieval in GB.
+    snapshots_storage_gb: 10000        # Total size of Snapshots in GB
+    metadata_at_rest_storage_gb: 10000 # Total size of Metadata in GB
 
   azurerm_sql_database.my_database:
     monthly_vcore_hours: 600             # Monthly number of used vCore-hours for serverless compute.
@@ -1134,6 +1158,10 @@ resource_usage:
     dataflow_standard_instances: 1 # Number of Data Flow standard instances.
     dataflow_standard_vcores: 12 # Number of Data Flow standard vCores.
     monthly_dataflow_standard_hours: 1 # Monthly number of Data Flow standard hours (this is multiplied by the number of instances and vCores).
+
+  azurerm_traffic_manager_profile.my_profile:
+    monthly_dns_queries: 100000 # Monthly number of DNS queries
+    monthly_traffic_view_data_points: 100000 # Monthly number of Traffic View data points processes
 
   azurerm_virtual_hub.my_virtual_hub:
     monthly_data_processed_gb: 10 # Monthly data processed by the Virtual WAN Hub in GB

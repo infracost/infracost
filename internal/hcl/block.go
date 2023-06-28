@@ -428,6 +428,10 @@ func SetUUIDAttributes(moduleBlock *Block, block *hcl.Block) {
 				body.Attributes["id"] = newUniqueAttribute("id", withCount, withEach)
 			}
 
+			if _, ok := body.Attributes["name"]; !ok {
+				body.Attributes["name"] = newUniqueAttribute("name", withCount, withEach)
+			}
+
 			if _, ok := body.Attributes["arn"]; !ok {
 				body.Attributes["arn"] = newArnAttribute("arn", withCount, withEach)
 			}

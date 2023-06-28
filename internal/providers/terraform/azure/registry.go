@@ -134,6 +134,16 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getMonitorScheduledQueryRulesAlertRegistryItem(),
 	getMonitorScheduledQueryRulesAlertV2RegistryItem(),
 	getApplicationInsightsStandardWebTestRegistryItem(),
+	getRecoveryServicesVaultRegistryItem(),
+	getBackupProtectedVmRegistryItem(),
+	getStorageQueueRegistryItem(),
+	getStorageShareRegistryItem(),
+	getLogicAppIntegrationAccountRegistryItem(),
+	getSignalRServiceRegistryItem(),
+	getTrafficManagerProfileRegistryItem(),
+	getTrafficManagerAzureEndpointRegistryItem(),
+	getTrafficManagerExternalEndpointRegistryItem(),
+	getTrafficManagerNestedEndpointRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -454,6 +464,10 @@ var FreeResources = []string{
 	"azurerm_shared_image",
 	"azurerm_shared_image_gallery",
 
+	// Azure SignalR
+	"azurerm_signalr_service_network_acl",
+	"azurerm_signalr_shared_private_link",
+
 	// Azure SQL
 	"azurerm_sql_failover_group",
 	"azurerm_sql_firewall_rule",
@@ -481,9 +495,19 @@ var FreeResources = []string{
 	"azurerm_mssql_virtual_network_rule",
 
 	// Azure Storage
+	"azurerm_storage_account_customer_managed_key",
+	"azurerm_storage_account_local_user",
+	"azurerm_storage_account_network_rules",
+	"azurerm_storage_blob",
 	"azurerm_storage_blob_inventory_policy",
 	"azurerm_storage_container",
+	"azurerm_storage_data_lake_gen2_path",
 	"azurerm_storage_management_policy",
+	"azurerm_storage_object_replication",
+	"azurerm_storage_share_directory",
+	"azurerm_storage_share_file",
+	"azurerm_storage_sync_cloud_endpoint",
+	"azurerm_storage_sync_group",
 	"azurerm_storage_table_entity",
 
 	// Azure Virtual Desktop

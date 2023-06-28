@@ -8,6 +8,7 @@ import (
 
 	"github.com/infracost/infracost/internal/config/template"
 	"github.com/infracost/infracost/internal/ui"
+	"github.com/infracost/infracost/internal/vcs"
 )
 
 type generateConfigCommand struct {
@@ -23,9 +24,11 @@ func newGenerateConfigCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "config",
 		Short: "Generate Infracost config file from a template file",
-		Long:  "Generate Infracost config file from a template file",
+		Long: `Generate Infracost config file from a template file. See docs for template examples and syntax:
+
+  https://www.infracost.io/docs/features/config_file/#template-syntax`,
 		Example: `
-      infracost generate config --repo-path . --template-path infracost.yml.tmpl
+      infracost generate config --repo-path . --template-path infracost.yml.tmpl --out-file infracost.yml
       `,
 		ValidArgs: []string{"--", "-"},
 		RunE:      gen.run,
@@ -67,7 +70,14 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	parser := template.NewParser(repoPath)
+	m, err := vcs.MetadataFetcher.Get(repoPath, nil)
+	if err != nil {
+		ui.PrintWarningf(cmd.ErrOrStderr(), "could not fetch git metadata err: %s, default template variables will be blank", err)
+	}
+
+	parser := template.NewParser(repoPath, map[string]interface{}{
+		"branch": m.Branch.Name,
+	})
 	if g.template != "" {
 		err := parser.Compile(g.template, out)
 		if err != nil {
@@ -77,7 +87,7 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	err := parser.CompileFromFile(g.templatePath, out)
+	err = parser.CompileFromFile(g.templatePath, out)
 	if err != nil {
 		ui.PrintErrorf(cmd.ErrOrStderr(), "Could not compile template error: %s", err)
 	}

@@ -26,7 +26,9 @@ func NewAzureRMKubernetesCluster(d *schema.ResourceData, u *schema.UsageData) *s
 		skuTier = d.Get("sku_tier").String()
 	}
 
-	if strings.ToLower(skuTier) == "paid" {
+	// Azure switched from "Paid" to "Standard" in API version 2023-02-01
+	// (Terraform Azure provider version v3.51.0)
+	if contains([]string{"paid", "standard"}, strings.ToLower(skuTier)) {
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:           "Uptime SLA",
 			Unit:           "hours",

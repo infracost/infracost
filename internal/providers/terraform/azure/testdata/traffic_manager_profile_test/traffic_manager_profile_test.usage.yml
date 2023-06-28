@@ -1,0 +1,5 @@
+version: 0.1
+resource_usage:
+  azurerm_traffic_manager_profile.example_with_usage:
+    monthly_dns_queries: 1234567890
+    monthly_traffic_view_data_points: 12345678

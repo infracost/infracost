@@ -20,7 +20,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "basic_a2" {
     ip_configuration {
       name      = "internal"
       primary   = true
-      subnet_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/testrg/providers/Microsoft.Network/subnets/fakesubnet"
+      subnet_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/testrg/providers/Microsoft.Network/virtualNetworks/test1/subnets/fakesubnet"
     }
   }
 
@@ -54,7 +54,7 @@ resource "azurerm_windows_virtual_machine_scale_set" "basic_a2_usage" {
     ip_configuration {
       name      = "internal"
       primary   = true
-      subnet_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/testrg/providers/Microsoft.Network/subnets/fakesubnet"
+      subnet_id = "/subscriptions/00000000-0000-0000-0000-000000000000/resourceGroups/testrg/providers/Microsoft.Network/virtualNetworks/test1/subnets/fakesubnet"
     }
   }
 
