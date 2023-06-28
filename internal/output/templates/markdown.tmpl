@@ -1,0 +1,56 @@
+{{- define "summaryRow"}}
+| {{ truncateMiddle .Name 64 "..." }}{{- range .MetadataFields }} | {{ . }} {{- end }} | {{ formatCostChange .PastCost .Cost }} | {{ formatCost .Cost }} |
+{{- end }}
+
+## Infracost estimate: **{{ formatCostChangeSentence .Root.Currency .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost false }}**
+{{- if displayTable }}
+
+| **Project**{{- range metadataHeaders }} | **{{ . }}** {{- end }} | **Cost change** | **New monthly cost** |
+| -----------{{- range metadataHeaders }} | ---------- {{- end }} | --------------: | -------------------- |
+
+  {{- if gt (len .Root.Projects) 1  }}
+    {{- range .Root.Projects }}
+      {{- if showProject . }}
+        {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
+      {{- end }}
+    {{- end }}
+  {{- else }}
+    {{- range .Root.Projects }}
+      {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
+    {{- end }}
+  {{- end }}
+{{- end }}
+
+{{- if displayOutput  }}
+**Infracost output:**
+
+```
+{{ .DiffOutput }}
+```
+{{- end }}
+
+{{- if .Options.PolicyChecks.Enabled }}
+	{{- if gt (len .Options.PolicyChecks.Failures) 0 }}
+**Policy checks failed:**
+```
+				{{ range $v, $f := .Options.PolicyChecks.Failures}}
+> {{ $f }}
+				{{- end}}
+```
+	{{ else }}
+**Policy checks passed:**
+```
+			{{ range $v, $f := .Options.PolicyChecks.Passed}}
+> {{ $f }}
+			{{- end}}
+```
+	{{- end }}
+{{- end }}
+{{- if .MarkdownOptions.WillUpdate }}
+
+This comment will be updated when the cost estimate changes.
+{{- end }}
+{{- if .MarkdownOptions.WillReplace }}
+
+This comment will be replaced when the cost estimate changes
+{{- end }}

@@ -1,3 +1,4 @@
+──────────────────────────────────
 Project: infracost/infracost/examples/terragrunt/dev
 Module path: dev
 
@@ -84,6 +85,14 @@ Key: ~ changed, + added, - removed
 
 4 cloud resources were detected:
 ∙ 4 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+
+Infracost estimate: monthly cost will increase by $800 ↑
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Cost change ┃ New monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━┫
+┃ infracost/infracost/examples/terragrunt/dev        ┃        +$52 ┃ $52              ┃
+┃ infracost/infracost/examples/terragrunt/prod       ┃       +$748 ┃ $748             ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━┛
 
 Err:
 

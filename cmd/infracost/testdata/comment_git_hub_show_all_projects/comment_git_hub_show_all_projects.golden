@@ -1,40 +1,29 @@
 
-💰 Infracost estimate: **monthly cost will increase by $41 (+50%) 📈**
+<p>💰 Infracost estimate: <b>monthly cost will increase by $41 📈</b></p>
 <table>
   <thead>
     <td>Project</td>
-    <td>Previous</td>
-    <td>New</td>
-    <td>Diff</td>
+    <td>Cost change</td>
+    <td>New monthly cost</td>
   </thead>
   <tbody>
     <tr>
       <td>infracost/infracost/cmd/infraco...aform_v0.14_nochange_plan.json</td>
-      <td align="right">$41</td>
-      <td align="right">$41</td>
       <td>$0</td>
+      <td align="right">$41</td>
     </tr>
     <tr>
       <td>infracost/infracost/cmd/infraco...data/terraform_v0.14_plan.json</td>
-      <td align="right">$41</td>
-      <td align="right">$81</td>
       <td>+$41 (+100%)</td>
-    </tr>
-    <tr>
-      <td>All projects</td>
       <td align="right">$81</td>
-      <td align="right">$122</td>
-      <td>+$41 (+50%)</td>
     </tr>
   </tbody>
 </table>
-
-1 project has no cost estimate changes.
-
 <details>
 <summary><strong>Infracost output</strong></summary>
 
 ```
+──────────────────────────────────
 Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
 
 + aws_instance.instance_2
@@ -135,27 +124,20 @@ Amount:  +$41 ($41 → $81)
 Percent: +100%
 
 ──────────────────────────────────
-
-The following projects have no cost estimate changes: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_nochange_plan.json
-Run the following command to see their breakdown: infracost breakdown --path=/path/to/code
-
-──────────────────────────────────
 Key: ~ changed, + added, - removed
 
 26 cloud resources were detected:
 ∙ 14 were estimated, 10 of which include usage-based costs, see https://infracost.io/usage-file
-∙ 12 were free:
-  ∙ 2 x aws_db_option_group
-  ∙ 2 x aws_db_parameter_group
-  ∙ 2 x aws_db_subnet_group
-  ∙ 2 x aws_default_vpc
-  ∙ 2 x aws_iam_role
-  ∙ 2 x aws_iam_role_policy_attachment
+∙ 12 were free, rerun with --show-skipped to see details
+
+Infracost estimate: monthly cost will increase by $41 ↑
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
+┃ Project                                                          ┃ Cost change  ┃ New monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infraco...data/terraform_v0.14_plan.json ┃ +$41 (+100%) ┃ $81              ┃
+┃ infracost/infracost/cmd/infraco...aform_v0.14_nochange_plan.json ┃           $0 ┃ $41              ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━┛
 ```
 </details>
-
-<sub>
-  Is this comment useful? <a href="https://dashboard.infracost.io/feedback/redirect?runId=&value=yes" rel="noopener noreferrer" target="_blank">Yes</a>, <a href="https://dashboard.infracost.io/feedback/redirect?runId=&value=no" rel="noopener noreferrer" target="_blank">No</a>, <a href="https://dashboard.infracost.io/feedback/redirect?runId=&value=other" rel="noopener noreferrer" target="_blank">Other</a>
-</sub>
 
 Comment not posted to GitHub (--dry-run was specified)

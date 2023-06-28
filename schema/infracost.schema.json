@@ -318,6 +318,9 @@
         "name": {
           "type": "string"
         },
+        "resourceType": {
+          "type": "string"
+        },
         "tags": {
           "patternProperties": {
             ".*": {
@@ -393,6 +396,9 @@
         "shareUrl": {
           "type": "string"
         },
+        "cloudUrl": {
+          "type": "string"
+        },
         "currency": {
           "type": "string"
         },
@@ -400,6 +406,13 @@
           "items": {
             "$schema": "http://json-schema.org/draft-04/schema#",
             "$ref": "#/definitions/Project"
+          },
+          "type": "array"
+        },
+        "tagPolicies": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/TagPolicy"
           },
           "type": "array"
         },
@@ -441,6 +454,9 @@
       ],
       "properties": {
         "name": {
+          "type": "string"
+        },
+        "resourceType": {
           "type": "string"
         },
         "tags": {
@@ -532,6 +548,111 @@
             }
           },
           "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "TagPolicy": {
+      "required": [
+        "name",
+        "tagPolicyId",
+        "message",
+        "prComment",
+        "blockPr",
+        "resources"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "tagPolicyId": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "prComment": {
+          "type": "boolean"
+        },
+        "blockPr": {
+          "type": "boolean"
+        },
+        "resources": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/TagPolicyResource"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "TagPolicyInvalidTag": {
+      "required": [
+        "key",
+        "validValues",
+        "validRegex"
+      ],
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "validValues": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "validRegex": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "TagPolicyResource": {
+      "required": [
+        "address",
+        "resourceType",
+        "path",
+        "line",
+        "projectNames",
+        "missingMandatoryTags",
+        "invalidTags"
+      ],
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "resourceType": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "line": {
+          "type": "integer"
+        },
+        "projectNames": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "missingMandatoryTags": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "invalidTags": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/TagPolicyInvalidTag"
+          },
+          "type": "array"
         }
       },
       "additionalProperties": false,

@@ -110,7 +110,7 @@ func NewEvaluator(
 	logger *logrus.Entry,
 ) *Evaluator {
 	ctx := NewContext(&hcl.EvalContext{
-		Functions: expFunctions(module.RootPath, logger),
+		Functions: ExpFunctions(module.RootPath, logger),
 	}, nil, logger)
 
 	if visitedModules == nil {
@@ -279,7 +279,11 @@ func (e *Evaluator) evaluateStep(i int) {
 
 	e.ctx.Set(e.getValuesByBlockType("variable"), "var")
 	e.ctx.Set(e.getValuesByBlockType("locals"), "local")
-	e.ctx.Set(e.getValuesByBlockType("provider"), "provider")
+
+	providers := e.getValuesByBlockType("provider")
+	for key, provider := range providers.AsValueMap() {
+		e.ctx.Set(provider, key)
+	}
 
 	resources := e.getValuesByBlockType("resource")
 	for key, resource := range resources.AsValueMap() {
@@ -532,11 +536,23 @@ func shouldExpandBlock(block *Block) bool {
 }
 
 func (e *Evaluator) expandBlockCounts(blocks Blocks) Blocks {
-	var countFiltered Blocks
+	var expanded Blocks
+	var haveChanged = make(map[string]*Block)
 	for _, block := range blocks {
 		countAttr := block.GetAttribute("count")
-		if countAttr == nil || !block.ShouldExpand() {
-			countFiltered = append(countFiltered, block)
+		if countAttr == nil {
+			expanded = append(expanded, block)
+			continue
+		}
+
+		if block.IsCountExpanded() || !shouldExpandBlock(block) {
+			parent := block.parent.GetAttribute("count")
+			if !parent.HasChanged() {
+				expanded = append(expanded, block)
+			} else {
+				haveChanged[block.parent.FullName()] = block.parent
+			}
+
 			continue
 		}
 
@@ -556,14 +572,24 @@ func (e *Evaluator) expandBlockCounts(blocks Blocks) Blocks {
 			c, _ := gocty.ToCtyValue(i, cty.Number)
 			clone := e.blockBuilder.CloneBlock(block, c)
 
-			countFiltered = append(countFiltered, clone)
+			expanded = append(expanded, clone)
 			vals[i] = clone.Values()
 		}
 
 		e.ctx.SetByDot(cty.TupleVal(vals), block.Reference().String())
 	}
 
-	return countFiltered
+	if len(haveChanged) > 0 {
+		var changes = make(Blocks, 0, len(haveChanged))
+		for _, block := range haveChanged {
+			changes = append(changes, block)
+		}
+
+		counts := e.expandBlockCounts(changes)
+		return append(expanded, counts...)
+	}
+
+	return expanded
 }
 
 func (e *Evaluator) evaluateVariable(b *Block) (cty.Value, error) {
@@ -648,7 +674,14 @@ func (e *Evaluator) getValuesByBlockType(blockType string) cty.Value {
 
 				values[key] = val
 			}
-		case "provider", "module":
+		case "provider":
+			provider := b.Label()
+			if provider == "" {
+				continue
+			}
+
+			values[provider] = e.evaluateProvider(b, values)
+		case "module":
 			if b.Label() == "" {
 				continue
 			}
@@ -667,6 +700,38 @@ func (e *Evaluator) getValuesByBlockType(blockType string) cty.Value {
 	}
 
 	return cty.ObjectVal(values)
+}
+func (e *Evaluator) evaluateProvider(b *Block, values map[string]cty.Value) cty.Value {
+	provider := b.Label()
+	v, exists := values[provider]
+
+	alias := b.GetAttribute("alias")
+	if alias == nil && exists {
+		return mergeObjects(v, b.Values())
+	}
+
+	if alias == nil {
+		return b.Values()
+	}
+
+	var str string
+	err := gocty.FromCtyValue(alias.Value(), &str)
+	if err != nil {
+		return cty.ObjectVal(values)
+	}
+
+	if !exists {
+		return cty.ObjectVal(map[string]cty.Value{
+			str: b.Values(),
+		})
+	}
+
+	ob := v.AsValueMap()
+	if ob == nil {
+		ob = make(map[string]cty.Value)
+	}
+	ob[str] = b.Values()
+	return cty.ObjectVal(ob)
 }
 
 func (e *Evaluator) evaluateResource(b *Block, values map[string]cty.Value) cty.Value {
@@ -852,9 +917,9 @@ func (e *Evaluator) loadModules(lastContext hcl.EvalContext) {
 	}
 }
 
-// expFunctions returns the set of functions that should be used to when evaluating
+// ExpFunctions returns the set of functions that should be used to when evaluating
 // expressions in the receiving scope.
-func expFunctions(baseDir string, logger *logrus.Entry) map[string]function.Function {
+func ExpFunctions(baseDir string, logger *logrus.Entry) map[string]function.Function {
 	return map[string]function.Function{
 		"abs":              stdlib.AbsoluteFunc,
 		"abspath":          funcs.AbsPathFunc,
@@ -900,7 +965,7 @@ func expFunctions(baseDir string, logger *logrus.Entry) map[string]function.Func
 		"indent":           stdlib.IndentFunc,
 		"index":            funcs.IndexFunc, // stdlib.IndexFunc is not compatible
 		"join":             stdlib.JoinFunc,
-		"jsondecode":       stdlib.JSONDecodeFunc,
+		"jsondecode":       funcs.JSONDecodeFunc,
 		"jsonencode":       stdlib.JSONEncodeFunc,
 		"keys":             stdlib.KeysFunc,
 		"length":           funcs.LengthFunc,
@@ -958,7 +1023,7 @@ func expFunctions(baseDir string, logger *logrus.Entry) map[string]function.Func
 		"uuid":             funcs.UUIDFunc,
 		"uuidv5":           funcs.UUIDV5Func,
 		"values":           stdlib.ValuesFunc,
-		"yamldecode":       yaml.YAMLDecodeFunc,
+		"yamldecode":       funcs.YAMLDecodeFunc,
 		"yamlencode":       yaml.YAMLEncodeFunc,
 		"zipmap":           stdlib.ZipmapFunc,
 	}

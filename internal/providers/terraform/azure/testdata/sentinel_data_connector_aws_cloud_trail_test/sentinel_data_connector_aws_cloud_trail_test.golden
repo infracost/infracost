@@ -29,3 +29,9 @@
   ∙ 2 x azurerm_sentinel_data_connector_aws_cloud_trail
   ∙ 1 x azurerm_log_analytics_solution
   ∙ 1 x azurerm_resource_group
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ TestSentinelDataConnectorAwsCloudTrail             ┃ $0.00        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛

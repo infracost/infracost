@@ -1,61 +1,85 @@
 
- Name                                                                      Monthly Qty  Unit              Monthly Cost 
-                                                                                                                       
- aws_elastic_beanstalk_environment.my_eb_environment                                                                   
- ├─ aws_launch_configuration                                                                                           
- │  ├─ Instance usage (Linux/UNIX, on-demand, t3.small)                            730  hours                   $17.74 
- │  └─ aws_ebs_volume                                                                                                  
- │     └─ Storage (general purpose SSD, gp2)                                         8  GB                       $0.88 
- └─ aws_loadbalancer                                                                                                   
-    ├─ Network load balancer                                                       730  hours                   $18.40 
-    └─ Load balancer capacity units                                     Monthly cost depends on usage: $4.38 per LCU   
-                                                                                                                       
- aws_elastic_beanstalk_environment.my_eb_environment_with_rds                                                          
- ├─ aws_launch_configuration                                                                                           
- │  ├─ Instance usage (Linux/UNIX, on-demand, t3.small)                          1,460  hours                   $35.48 
- │  └─ aws_ebs_volume                                                                                                  
- │     └─ Storage (general purpose SSD, gp2)                                        16  GB                       $1.76 
- ├─ aws_db_instance                                                                                                    
- │  ├─ Database instance (on-demand, Multi-AZ, db.m6g.xlarge)                      730  hours                  $513.92 
- │  ├─ Storage (general purpose SSD, gp2)                                          100  GB                      $25.30 
- │  └─ Additional backup storage                                                 1,000  GB                      $95.00 
- └─ aws_loadbalancer                                                                                                   
-    ├─ Network load balancer                                                       730  hours                   $18.40 
-    └─ Load balancer capacity units                                            34.2465  LCU                    $150.00 
-                                                                                                                       
- aws_elastic_beanstalk_environment.my_eb_environment_with_rds_no_usage                                                 
- ├─ aws_launch_configuration                                                                                           
- │  ├─ Instance usage (Linux/UNIX, on-demand, t3.large)                          1,460  hours                  $142.20 
- │  └─ aws_ebs_volume                                                                                                  
- │     └─ Storage (general purpose SSD, gp2)                                        16  GB                       $1.76 
- ├─ aws_db_instance                                                                                                    
- │  ├─ Database instance (on-demand, Multi-AZ, db.m6g.xlarge)                      730  hours                  $513.92 
- │  └─ Storage (general purpose SSD, gp2)                                           20  GB                       $5.06 
- ├─ aws_cloudwatch_log_group                                                                                           
- │  ├─ Data ingested                                                    Monthly cost depends on usage: $0.57 per GB    
- │  ├─ Archival Storage                                                 Monthly cost depends on usage: $0.03 per GB    
- │  └─ Insights queries data scanned                                    Monthly cost depends on usage: $0.0057 per GB  
- └─ aws_loadbalancer                                                                                                   
-    ├─ Network load balancer                                                       730  hours                   $18.40 
-    └─ Load balancer capacity units                                     Monthly cost depends on usage: $4.38 per LCU   
-                                                                                                                       
- aws_elastic_beanstalk_environment.my_eb_environment_with_usage                                                        
- ├─ aws_launch_configuration                                                                                           
- │  ├─ Instance usage (Linux/UNIX, on-demand, c4.large)                          2,920  hours                  $362.08 
- │  └─ aws_ebs_volume                                                                                                  
- │     ├─ Storage (provisioned IOPS SSD, io1)                                       32  GB                       $4.42 
- │     └─ Provisioned IOPS                                                       1,200  IOPS                    $86.40 
- ├─ aws_cloudwatch_log_group                                                                                           
- │  ├─ Data ingested                                                             1,000  GB                     $570.00 
- │  ├─ Archival Storage                                                          1,000  GB                      $30.00 
- │  └─ Insights queries data scanned                                               200  GB                       $1.14 
- └─ aws_elb                                                                                                            
-    ├─ Classic load balancer                                                       730  hours                   $20.44 
-    └─ Data processed                                                           10,000  GB                      $80.00 
-                                                                                                                       
- OVERALL TOTAL                                                                                               $2,712.69 
+ Name                                                                       Monthly Qty  Unit              Monthly Cost 
+                                                                                                                        
+ aws_elastic_beanstalk_environment.my_eb_environment                                                                    
+ ├─ aws_launch_configuration                                                                                            
+ │  ├─ Instance usage (Linux/UNIX, on-demand, t3.small)                             730  hours                   $16.64 
+ │  └─ aws_ebs_volume                                                                                                   
+ │     └─ Storage (general purpose SSD, gp2)                                          8  GB                       $0.88 
+ └─ aws_loadbalancer                                                                                                    
+    ├─ Network load balancer                                                        730  hours                   $18.40 
+    └─ Load balancer capacity units                                      Monthly cost depends on usage: $4.38 per LCU   
+                                                                                                                        
+ aws_elastic_beanstalk_environment.my_eb_environment_asg_instance_type                                                  
+ ├─ aws_launch_configuration                                                                                            
+ │  ├─ Instance usage (Linux/UNIX, on-demand, t3a.large)                            730  hours                   $59.57 
+ │  └─ aws_ebs_volume                                                                                                   
+ │     └─ Storage (general purpose SSD, gp2)                                          8  GB                       $0.88 
+ └─ aws_loadbalancer                                                                                                    
+    ├─ Network load balancer                                                        730  hours                   $18.40 
+    └─ Load balancer capacity units                                      Monthly cost depends on usage: $4.38 per LCU   
+                                                                                                                        
+ aws_elastic_beanstalk_environment.my_eb_environment_asg_instance_types                                                 
+ ├─ aws_launch_configuration                                                                                            
+ │  ├─ Instance usage (Linux/UNIX, on-demand, t3a.xlarge)                           730  hours                  $119.14 
+ │  └─ aws_ebs_volume                                                                                                   
+ │     └─ Storage (general purpose SSD, gp2)                                          8  GB                       $0.88 
+ └─ aws_loadbalancer                                                                                                    
+    ├─ Network load balancer                                                        730  hours                   $18.40 
+    └─ Load balancer capacity units                                      Monthly cost depends on usage: $4.38 per LCU   
+                                                                                                                        
+ aws_elastic_beanstalk_environment.my_eb_environment_with_rds                                                           
+ ├─ aws_launch_configuration                                                                                            
+ │  ├─ Instance usage (Linux/UNIX, on-demand, t3.small)                           1,460  hours                   $33.29 
+ │  └─ aws_ebs_volume                                                                                                   
+ │     └─ Storage (general purpose SSD, gp2)                                         16  GB                       $1.76 
+ ├─ aws_db_instance                                                                                                     
+ │  ├─ Database instance (on-demand, Multi-AZ, db.m6g.xlarge)                       730  hours                  $513.92 
+ │  ├─ Storage (general purpose SSD, gp2)                                           100  GB                      $25.30 
+ │  └─ Additional backup storage                                                  1,000  GB                      $95.00 
+ └─ aws_loadbalancer                                                                                                    
+    ├─ Network load balancer                                                        730  hours                   $18.40 
+    └─ Load balancer capacity units                                             34.2465  LCU                    $150.00 
+                                                                                                                        
+ aws_elastic_beanstalk_environment.my_eb_environment_with_rds_no_usage                                                  
+ ├─ aws_launch_configuration                                                                                            
+ │  ├─ Instance usage (Linux/UNIX, on-demand, t3.large)                           1,460  hours                  $133.15 
+ │  └─ aws_ebs_volume                                                                                                   
+ │     └─ Storage (general purpose SSD, gp2)                                         16  GB                       $1.76 
+ ├─ aws_db_instance                                                                                                     
+ │  ├─ Database instance (on-demand, Multi-AZ, db.m6g.xlarge)                       730  hours                  $513.92 
+ │  └─ Storage (general purpose SSD, gp2)                                            20  GB                       $5.06 
+ ├─ aws_cloudwatch_log_group                                                                                            
+ │  ├─ Data ingested                                                     Monthly cost depends on usage: $0.57 per GB    
+ │  ├─ Archival Storage                                                  Monthly cost depends on usage: $0.03 per GB    
+ │  └─ Insights queries data scanned                                     Monthly cost depends on usage: $0.0057 per GB  
+ └─ aws_loadbalancer                                                                                                    
+    ├─ Network load balancer                                                        730  hours                   $18.40 
+    └─ Load balancer capacity units                                      Monthly cost depends on usage: $4.38 per LCU   
+                                                                                                                        
+ aws_elastic_beanstalk_environment.my_eb_environment_with_usage                                                         
+ ├─ aws_launch_configuration                                                                                            
+ │  ├─ Instance usage (Linux/UNIX, on-demand, c4.large)                           2,920  hours                  $329.96 
+ │  └─ aws_ebs_volume                                                                                                   
+ │     ├─ Storage (provisioned IOPS SSD, io1)                                        32  GB                       $4.42 
+ │     └─ Provisioned IOPS                                                        1,200  IOPS                    $86.40 
+ ├─ aws_cloudwatch_log_group                                                                                            
+ │  ├─ Data ingested                                                              1,000  GB                     $570.00 
+ │  ├─ Archival Storage                                                           1,000  GB                      $30.00 
+ │  └─ Insights queries data scanned                                                200  GB                       $1.14 
+ └─ aws_elb                                                                                                             
+    ├─ Classic load balancer                                                        730  hours                   $20.44 
+    └─ Data processed                                                            10,000  GB                      $80.00 
+                                                                                                                        
+ OVERALL TOTAL                                                                                                $2,885.48 
 ──────────────────────────────────
-5 cloud resources were detected:
-∙ 4 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+7 cloud resources were detected:
+∙ 6 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 1 was free:
   ∙ 1 x aws_elastic_beanstalk_application
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ TestElasticBeanstalkEnvironmentGoldenFile          ┃ $2,885       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛

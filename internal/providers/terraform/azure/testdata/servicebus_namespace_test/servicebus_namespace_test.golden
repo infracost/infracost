@@ -1,0 +1,65 @@
+
+ Name                                                                              Monthly Qty  Unit                    Monthly Cost 
+                                                                                                                                     
+ azurerm_servicebus_namespace.servicebus_namespace["Basic.0"]                                                                        
+ └─ Messaging operations                                                     Monthly cost depends on usage: $0.05 per 1M operations  
+                                                                                                                                     
+ azurerm_servicebus_namespace.servicebus_namespace["Premium.1"]                                                                      
+ └─ Messaging units                                                                          1  units                        $677.08 
+                                                                                                                                     
+ azurerm_servicebus_namespace.servicebus_namespace["Premium.16"]                                                                     
+ └─ Messaging units                                                                         16  units                     $10,833.20 
+                                                                                                                                     
+ azurerm_servicebus_namespace.servicebus_namespace["Premium.2"]                                                                      
+ └─ Messaging units                                                                          2  units                      $1,354.15 
+                                                                                                                                     
+ azurerm_servicebus_namespace.servicebus_namespace["Premium.4"]                                                                      
+ └─ Messaging units                                                                          4  units                      $2,708.30 
+                                                                                                                                     
+ azurerm_servicebus_namespace.servicebus_namespace["Premium.8"]                                                                      
+ └─ Messaging units                                                                          8  units                      $5,416.60 
+                                                                                                                                     
+ azurerm_servicebus_namespace.servicebus_namespace["Standard.0"]                                                                     
+ ├─ Base charge                                                                            730  hours                          $9.81 
+ ├─ Messaging operations (13M-100M)                                          Monthly cost depends on usage: $0.80 per 1M operations  
+ └─ Brokered connections (1K-100K)                                           Monthly cost depends on usage: $0.03 per connections    
+                                                                                                                                     
+ azurerm_servicebus_namespace.servicebus_namespace_with_usage["Basic.0"]                                                             
+ └─ Messaging operations                                                                 1,000  1M operations                 $50.00 
+                                                                                                                                     
+ azurerm_servicebus_namespace.servicebus_namespace_with_usage["Premium.1"]                                                           
+ └─ Messaging units                                                                          1  units                        $677.08 
+                                                                                                                                     
+ azurerm_servicebus_namespace.servicebus_namespace_with_usage["Premium.16"]                                                          
+ └─ Messaging units                                                                         16  units                     $10,833.20 
+                                                                                                                                     
+ azurerm_servicebus_namespace.servicebus_namespace_with_usage["Premium.2"]                                                           
+ └─ Messaging units                                                                          2  units                      $1,354.15 
+                                                                                                                                     
+ azurerm_servicebus_namespace.servicebus_namespace_with_usage["Premium.4"]                                                           
+ └─ Messaging units                                                                          4  units                      $2,708.30 
+                                                                                                                                     
+ azurerm_servicebus_namespace.servicebus_namespace_with_usage["Premium.8"]                                                           
+ └─ Messaging units                                                                          8  units                      $5,416.60 
+                                                                                                                                     
+ azurerm_servicebus_namespace.servicebus_namespace_with_usage["Standard.0"]                                                          
+ ├─ Base charge                                                                            730  hours                          $9.81 
+ ├─ Messaging operations (13M-100M)                                                         87  1M operations                 $69.60 
+ ├─ Messaging operations (100M-2,500M)                                                   2,400  1M operations              $1,200.00 
+ ├─ Messaging operations (over 2,500M)                                                     500  1M operations                $100.00 
+ ├─ Brokered connections (1K-100K)                                                      99,000  connections                $2,970.00 
+ ├─ Brokered connections (100K-500K)                                                   400,000  connections                $6,000.00 
+ └─ Brokered connections (over 500K)                                                   500,000  connections               $12,500.00 
+                                                                                                                                     
+ OVERALL TOTAL                                                                                                            $64,887.87 
+──────────────────────────────────
+15 cloud resources were detected:
+∙ 14 were estimated
+∙ 1 was free:
+  ∙ 1 x azurerm_resource_group
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ TestServiceBusNamespace                            ┃ $64,888      ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛

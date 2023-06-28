@@ -67,9 +67,10 @@ func (r *MQBroker) instanceUsageCostComponent() *schema.CostComponent {
 			Service:       strPtr("AmazonMQ"),
 			ProductFamily: strPtr("Broker Instances"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", r.HostInstanceType))},
-				{Key: "brokerEngine", ValueRegex: strPtr(fmt.Sprintf("/%s/i", r.EngineType))},
-				{Key: "deploymentOption", ValueRegex: strPtr(fmt.Sprintf("/%s/i", deploymentOption))},
+				{Key: "usagetype", ValueRegex: regexPtr(r.HostInstanceType)},
+				{Key: "brokerEngine", ValueRegex: regexPtr(r.EngineType)},
+				{Key: "deploymentOption", ValueRegex: regexPtr(deploymentOption)},
+				{Key: "operation", ValueRegex: regexPtr("CreateBroker")},
 			},
 		},
 	}

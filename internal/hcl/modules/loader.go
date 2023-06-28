@@ -4,6 +4,7 @@ import (
 	"crypto/md5" //nolint
 	"errors"
 	"fmt"
+	"net/url"
 	"os"
 	"path"
 	"path/filepath"
@@ -16,6 +17,7 @@ import (
 	"github.com/sirupsen/logrus"
 	"golang.org/x/sync/errgroup"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	intSync "github.com/infracost/infracost/internal/sync"
 	"github.com/infracost/infracost/internal/ui"
@@ -47,6 +49,7 @@ type ModuleLoader struct {
 	cachePath string
 	cache     *Cache
 	sync      *intSync.KeyMutex
+	sourceMap config.TerraformSourceMap
 
 	packageFetcher *PackageFetcher
 	registryLoader *RegistryLoader
@@ -54,7 +57,7 @@ type ModuleLoader struct {
 }
 
 // NewModuleLoader constructs a new module loader
-func NewModuleLoader(cachePath string, credentialsSource *CredentialsSource, logger *logrus.Entry, moduleSync *intSync.KeyMutex) *ModuleLoader {
+func NewModuleLoader(cachePath string, credentialsSource *CredentialsSource, sourceMap config.TerraformSourceMap, logger *logrus.Entry, moduleSync *intSync.KeyMutex) *ModuleLoader {
 	fetcher := NewPackageFetcher(logger)
 	// we need to have a disco for each project that has defined credentials
 	d := NewDisco(credentialsSource, logger)
@@ -62,6 +65,7 @@ func NewModuleLoader(cachePath string, credentialsSource *CredentialsSource, log
 	m := &ModuleLoader{
 		cachePath:      cachePath,
 		cache:          NewCache(d, logger),
+		sourceMap:      sourceMap,
 		packageFetcher: fetcher,
 		logger:         logger,
 		sync:           moduleSync,
@@ -194,9 +198,12 @@ func (m *ModuleLoader) loadModules(path string, prefix string) ([]*ManifestModul
 					return err
 				}
 
-				manifestMu.Lock()
-				manifestModules = append(manifestModules, metadata)
-				manifestMu.Unlock()
+				// only include non-local modules in the manifest since we don't want to cache local ones.
+				if !m.isLocalModule(metadata.Source) {
+					manifestMu.Lock()
+					manifestModules = append(manifestModules, metadata)
+					manifestMu.Unlock()
+				}
 
 				moduleDir := filepath.Join(m.cachePath, metadata.Dir)
 				nestedManifestModules, err := m.loadModules(moduleDir, metadata.Key+".")
@@ -231,6 +238,16 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 	key := prefix + moduleCall.Name
 	source := moduleCall.Source
 
+	mappedSource, err := mapSource(m.sourceMap, source)
+	if err != nil {
+		return nil, err
+	}
+
+	if mappedSource != source {
+		m.logger.Debugf("remapping module source %s to %s", source, mappedSource)
+		source = mappedSource
+	}
+
 	manifestModule, err := m.cache.lookupModule(key, moduleCall)
 	if err == nil {
 		m.logger.Debugf("module %s already loaded", key)
@@ -253,7 +270,7 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 		Source: source,
 	}
 
-	if m.isLocalModule(moduleCall) {
+	if m.isLocalModule(source) {
 		dir, err := filepath.Rel(m.cachePath, filepath.Join(parentPath, source))
 		if err != nil {
 			return nil, err
@@ -324,11 +341,11 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 
 // isLocalModule checks if the module is a local module by checking
 // if the module source starts with any known local prefixes
-func (m *ModuleLoader) isLocalModule(moduleCall *tfconfig.ModuleCall) bool {
-	return strings.HasPrefix(moduleCall.Source, "./") ||
-		strings.HasPrefix(moduleCall.Source, "../") ||
-		strings.HasPrefix(moduleCall.Source, ".\\") ||
-		strings.HasPrefix(moduleCall.Source, "..\\")
+func (m *ModuleLoader) isLocalModule(source string) bool {
+	return strings.HasPrefix(source, "./") ||
+		strings.HasPrefix(source, "../") ||
+		strings.HasPrefix(source, ".\\") ||
+		strings.HasPrefix(source, "..\\")
 }
 
 func splitModuleSubDir(moduleSource string) (string, string, error) {
@@ -346,6 +363,43 @@ func joinModuleSubDir(moduleAddr string, submodulePath string) string {
 	}
 
 	return moduleAddr
+}
+
+// mapSource maps the module source to a new source if it is in the source map
+// otherwise it returns the original source
+// It works in the same way as the TERRAGRUNT_SOURCE_MAP environment variable
+// except it will first try to match with query params, and then falls back
+// to matching without query params.
+func mapSource(sourceMap config.TerraformSourceMap, source string) (string, error) {
+	if sourceMap == nil {
+		return source, nil
+	}
+
+	moduleAddr, submodulePath, err := splitModuleSubDir(source)
+	if err != nil {
+		return source, err
+	}
+
+	// Check if we can match the module address with the query params
+	mapped, ok := sourceMap[moduleAddr]
+	if ok {
+		return joinModuleSubDir(mapped, submodulePath), nil
+	}
+
+	// If we can't match with the query params, strip them and try again
+	parsedURL, err := url.Parse(moduleAddr)
+	if err != nil {
+		return source, err
+	}
+	parsedURL.RawQuery = ""
+	parsedModuleAddr := parsedURL.String()
+
+	mapped, ok = sourceMap[parsedModuleAddr]
+	if ok {
+		return joinModuleSubDir(mapped, submodulePath), nil
+	}
+
+	return source, nil
 }
 
 func getProcessCount() int {

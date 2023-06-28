@@ -1,18 +1,30 @@
 
- Name                                  Monthly Qty  Unit   Monthly Cost 
-                                                                        
- azurerm_redis_cache.basic_c2                                           
- └─ Cache usage (Basic_C4)                     730  hours       $153.30 
-                                                                        
- azurerm_redis_cache.premium_p1                                         
- └─ Cache usage (Premium_P1, 6 nodes)        4,380  hours     $2,430.90 
-                                                                        
- azurerm_redis_cache.standard_c3                                        
- └─ Cache usage (Standard_C3)                1,460  hours       $657.00 
-                                                                        
- OVERALL TOTAL                                                $3,241.20 
+ Name                                                 Monthly Qty  Unit   Monthly Cost 
+                                                                                       
+ azurerm_redis_cache.basic_c2                                                          
+ └─ Cache usage (Basic_C4)                                      1  nodes       $153.30 
+                                                                                       
+ azurerm_redis_cache.premium_p1                                                        
+ └─ Cache usage (Premium_P1)                                    6  nodes     $1,215.45 
+                                                                                       
+ azurerm_redis_cache.premium_p2_replicas_per_master                                    
+ └─ Cache usage (Premium_P2)                                    9  nodes     $3,646.35 
+                                                                                       
+ azurerm_redis_cache.premium_p3_replicas_per_primary                                   
+ └─ Cache usage (Premium_P3)                                   12  nodes     $9,719.22 
+                                                                                       
+ azurerm_redis_cache.standard_c3                                                       
+ └─ Cache usage (Standard_C3)                                   2  nodes       $328.50 
+                                                                                       
+ OVERALL TOTAL                                                              $15,062.82 
 ──────────────────────────────────
-4 cloud resources were detected:
-∙ 3 were estimated
+6 cloud resources were detected:
+∙ 5 were estimated
 ∙ 1 was free:
   ∙ 1 x azurerm_resource_group
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ TestAzureRedisCacheGoldenFile                      ┃ $15,063      ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛

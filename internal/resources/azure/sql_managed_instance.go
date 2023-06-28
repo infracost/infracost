@@ -14,6 +14,7 @@ const (
 	sqlMIProductFamily = "Databases"
 )
 
+// *** this resource is deprecated in v3.0 of AzureRM provider and will be removed in v4.0 ***
 // SQLManagedInstance struct represents an azure Sql Managed Instance.
 //
 // # SQLManagedInstance currently only Gen5 database instance
@@ -169,6 +170,7 @@ func (r *SQLManagedInstance) sqlMILicenseCostComponent() *schema.CostComponent {
 			ProductFamily: strPtr(sqlMIProductFamily),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("SQL Managed Instance General Purpose - SQL License")},
+				{Key: "meterName", Value: strPtr("vCore")},
 			},
 		},
 		PriceFilter: priceFilterConsumption,

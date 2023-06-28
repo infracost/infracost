@@ -176,6 +176,9 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 			},
 			warnings: []hcl.WarningCode{hcl.WarningMissingVars},
 		},
+		{
+			name: "shows correct duplicate variable warning",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -188,7 +191,7 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 
 			parsers, err := hcl.LoadParsers(
 				testPath,
-				modules.NewModuleLoader(testPath, nil, entry, &sync.KeyMutex{}),
+				modules.NewModuleLoader(testPath, nil, config.TerraformSourceMap{}, entry, &sync.KeyMutex{}),
 				nil,
 				entry,
 				hcl.OptionWithBlockBuilder(

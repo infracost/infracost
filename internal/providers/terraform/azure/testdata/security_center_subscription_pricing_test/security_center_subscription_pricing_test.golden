@@ -1,0 +1,107 @@
+
+ Name                                                                                                              Monthly Qty  Unit                      Monthly Cost 
+                                                                                                                                                                       
+ azurerm_security_center_subscription_pricing.default_resource_type_example                                                                                            
+ ├─ Defender for servers, plan 1                                                                            Monthly cost depends on usage: $4.91 per server            
+ └─ Defender for servers, plan 2                                                                            Monthly cost depends on usage: $14.60 per server           
+                                                                                                                                                                       
+ azurerm_security_center_subscription_pricing.standard_example["AppServices"]                                                                                          
+ └─ Defender for app service                                                                                Monthly cost depends on usage: $14.60 per node             
+                                                                                                                                                                       
+ azurerm_security_center_subscription_pricing.standard_example["Arm"]                                                                                                  
+ └─ Defender for ARM                                                                                        Monthly cost depends on usage: $4.00 per 1M API calls      
+                                                                                                                                                                       
+ azurerm_security_center_subscription_pricing.standard_example["ContainerRegistry"]                                                                                    
+ └─ Defender for container registries                                                                       Monthly cost depends on usage: $0.29 per image             
+                                                                                                                                                                       
+ azurerm_security_center_subscription_pricing.standard_example["Containers"]                                                                                           
+ └─ Defender for containers                                                                                 Monthly cost depends on usage: $6.87 per vCore             
+                                                                                                                                                                       
+ azurerm_security_center_subscription_pricing.standard_example["CosmosDbs"]                                                                                            
+ └─ Defender for Cosmos DB                                                                                  Monthly cost depends on usage: $0.88 per RU/s x 100        
+                                                                                                                                                                       
+ azurerm_security_center_subscription_pricing.standard_example["Dns"]                                                                                                  
+ └─ Defender for DNS                                                                                        Monthly cost depends on usage: $0.70 per 1M queries        
+                                                                                                                                                                       
+ azurerm_security_center_subscription_pricing.standard_example["KeyVaults"]                                                                                            
+ └─ Defender for Key Vault                                                                                  Monthly cost depends on usage: $0.02 per 10K transactions  
+                                                                                                                                                                       
+ azurerm_security_center_subscription_pricing.standard_example["KubernetesService"]                                                                                    
+ └─ Defender for kubernetes                                                                                 Monthly cost depends on usage: $1.96 per core              
+                                                                                                                                                                       
+ azurerm_security_center_subscription_pricing.standard_example["OpenSourceRelationalDatabases"]                                                                        
+ ├─ Defender for MySQL                                                                                      Monthly cost depends on usage: $15.00 per instance         
+ ├─ Defender for PostgreSQL                                                                                 Monthly cost depends on usage: $15.00 per instance         
+ └─ Defender for MariaDB                                                                                    Monthly cost depends on usage: $14.75 per instance         
+                                                                                                                                                                       
+ azurerm_security_center_subscription_pricing.standard_example["SqlServerVirtualMachines"]                                                                             
+ └─ Defender for SQL, Azure-connected                                                                       Monthly cost depends on usage: $15.00 per instance         
+                                                                                                                                                                       
+ azurerm_security_center_subscription_pricing.standard_example["SqlServers"]                                                                                           
+ └─ Defender for SQL, outside Azure                                                                         Monthly cost depends on usage: $10.95 per vCore            
+                                                                                                                                                                       
+ azurerm_security_center_subscription_pricing.standard_example["StorageAccounts"]                                                                                      
+ └─ Defender for storage                                                                                    Monthly cost depends on usage: $9.78 per storage account   
+                                                                                                                                                                       
+ azurerm_security_center_subscription_pricing.standard_example["VirtualMachines"]                                                                                      
+ ├─ Defender for servers, plan 1                                                                            Monthly cost depends on usage: $4.91 per server            
+ └─ Defender for servers, plan 2                                                                            Monthly cost depends on usage: $14.60 per server           
+                                                                                                                                                                       
+ azurerm_security_center_subscription_pricing.standard_example_with_usage["AppServices"]                                                                               
+ └─ Defender for app service                                                                                                12  node                           $175.20 
+                                                                                                                                                                       
+ azurerm_security_center_subscription_pricing.standard_example_with_usage["Arm"]                                                                                       
+ └─ Defender for ARM                                                                                                        14  1M API calls                    $56.00 
+                                                                                                                                                                       
+ azurerm_security_center_subscription_pricing.standard_example_with_usage["ContainerRegistry"]                                                                         
+ └─ Defender for container registries                                                                                       17  image                            $4.93 
+                                                                                                                                                                       
+ azurerm_security_center_subscription_pricing.standard_example_with_usage["Containers"]                                                                                
+ └─ Defender for containers                                                                                                  3  vCore                           $20.61 
+                                                                                                                                                                       
+ azurerm_security_center_subscription_pricing.standard_example_with_usage["CosmosDbs"]                                                                                 
+ └─ Defender for Cosmos DB                                                                                                   9  RU/s x 100                       $7.88 
+                                                                                                                                                                       
+ azurerm_security_center_subscription_pricing.standard_example_with_usage["Dns"]                                                                                       
+ └─ Defender for DNS                                                                                                        15  1M queries                      $10.50 
+                                                                                                                                                                       
+ azurerm_security_center_subscription_pricing.standard_example_with_usage["KeyVaults"]                                                                                 
+ └─ Defender for Key Vault                                                                                                  13  10K transactions                 $0.26 
+                                                                                                                                                                       
+ azurerm_security_center_subscription_pricing.standard_example_with_usage["KubernetesService"]                                                                         
+ └─ Defender for kubernetes                                                                                                 16  core                            $31.30 
+                                                                                                                                                                       
+ azurerm_security_center_subscription_pricing.standard_example_with_usage["OpenSourceRelationalDatabases"]                                                             
+ ├─ Defender for MySQL                                                                                                       6  instance                        $90.00 
+ ├─ Defender for PostgreSQL                                                                                                  7  instance                       $105.00 
+ └─ Defender for MariaDB                                                                                                     8  instance                       $117.97 
+                                                                                                                                                                       
+ azurerm_security_center_subscription_pricing.standard_example_with_usage["SqlServerVirtualMachines"]                                                                  
+ └─ Defender for SQL, Azure-connected                                                                                        4  instance                        $60.00 
+                                                                                                                                                                       
+ azurerm_security_center_subscription_pricing.standard_example_with_usage["SqlServers"]                                                                                
+ └─ Defender for SQL, outside Azure                                                                                          5  vCore                           $54.75 
+                                                                                                                                                                       
+ azurerm_security_center_subscription_pricing.standard_example_with_usage["StorageAccounts"]                                                                           
+ └─ Defender for storage                                                                                                    11  storage account                $107.60 
+                                                                                                                                                                       
+ azurerm_security_center_subscription_pricing.standard_example_with_usage["VirtualMachines"]                                                                           
+ ├─ Defender for servers, plan 1                                                                                             1  server                           $4.91 
+ └─ Defender for servers, plan 2                                                                                             2  server                          $29.20 
+                                                                                                                                                                       
+ OVERALL TOTAL                                                                                                                                                 $876.11 
+──────────────────────────────────
+30 cloud resources were detected:
+∙ 29 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 1 was free:
+  ∙ 1 x azurerm_security_center_subscription_pricing
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ TestSecurityCenterSubscriptionPricing              ┃ $876         ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+Logs:
+
+level=warning msg="Skipping resource azurerm_security_center_subscription_pricing.standard_example[\"CloudPosture\"]. Unknown resource tyoe  'CloudPosture'"
+level=warning msg="Skipping resource azurerm_security_center_subscription_pricing.standard_example_with_usage[\"CloudPosture\"]. Unknown resource tyoe  'CloudPosture'"

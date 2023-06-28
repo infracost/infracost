@@ -99,7 +99,7 @@ func (p *Parser) parsePreviewDigest(t display.PreviewDigest, usage schema.UsageM
 		refResources[name] = resourceData
 		// You have to load this in the loop so it will find the resources.
 		p.parseReferences(refResources, rawValues)
-		// p.loadInfracostProviderUsageData(usage, refResources)
+		p.loadInfracostProviderUsageData(usage, refResources)
 		if r := p.createResource(resourceData, usageData); r != nil {
 			if step.Op == "same" {
 				pastResources = append(pastResources, r)

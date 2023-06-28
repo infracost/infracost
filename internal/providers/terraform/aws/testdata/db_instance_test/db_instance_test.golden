@@ -16,6 +16,24 @@
  ├─ Storage (general purpose SSD, gp2)                                     20  GB                             $2.30 
  └─ Additional backup storage                               Monthly cost depends on usage: $0.021 per GB            
                                                                                                                     
+ aws_db_instance.gp3["above_high_baseline"]                                                                         
+ ├─ Database instance (on-demand, Single-AZ, db.t4g.small)                730  hours                         $23.36 
+ ├─ Storage (general purpose SSD, gp3)                                    400  GB                            $46.00 
+ └─ Provisioned GP3 IOPS (above 12,000)                                 2,000  IOPS                          $40.00 
+                                                                                                                    
+ aws_db_instance.gp3["above_low_baseline"]                                                                          
+ ├─ Database instance (on-demand, Single-AZ, db.t4g.small)                730  hours                         $23.36 
+ ├─ Storage (general purpose SSD, gp3)                                     20  GB                             $2.30 
+ └─ Provisioned GP3 IOPS (above 3,000)                                  1,000  IOPS                          $20.00 
+                                                                                                                    
+ aws_db_instance.gp3["below_high_baseline"]                                                                         
+ ├─ Database instance (on-demand, Single-AZ, db.t4g.small)                730  hours                         $23.36 
+ └─ Storage (general purpose SSD, gp3)                                    400  GB                            $46.00 
+                                                                                                                    
+ aws_db_instance.gp3["below_low_baseline"]                                                                          
+ ├─ Database instance (on-demand, Single-AZ, db.t4g.small)                730  hours                         $23.36 
+ └─ Storage (general purpose SSD, gp3)                                     20  GB                             $2.30 
+                                                                                                                    
  aws_db_instance.mariadb                                                                                            
  ├─ Database instance (on-demand, Single-AZ, db.t3.large)                 730  hours                         $99.28 
  ├─ Storage (general purpose SSD, gp2)                                     20  GB                             $2.30 
@@ -173,7 +191,13 @@
  ├─ Storage (general purpose SSD, gp2)                                     20  GB                             $2.30 
  └─ Additional backup storage                                           1,000  GB                            $95.00 
                                                                                                                     
- OVERALL TOTAL                                                                                            $7,541.23 
+ OVERALL TOTAL                                                                                            $7,791.27 
 ──────────────────────────────────
-37 cloud resources were detected:
-∙ 37 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+41 cloud resources were detected:
+∙ 41 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ TestDBInstanceGoldenFile                           ┃ $7,791       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛

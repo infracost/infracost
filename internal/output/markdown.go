@@ -3,7 +3,7 @@ package output
 import (
 	"bufio"
 	"bytes"
-	"fmt"
+	"embed"
 	"sort"
 	"strings"
 	"text/template"
@@ -15,6 +15,9 @@ import (
 
 	"github.com/infracost/infracost/internal/ui"
 )
+
+//go:embed templates/*
+var templatesFS embed.FS
 
 func formatMarkdownCostChange(currency string, pastCost, cost *decimal.Decimal, skipPlusMinus bool) string {
 	if pastCost != nil && pastCost.Equals(*cost) {
@@ -58,14 +61,22 @@ func formatCostChangeSentence(currency string, pastCost, cost *decimal.Decimal, 
 		down = "↓"
 	}
 
-	if pastCost != nil {
-		if pastCost.Equals(*cost) {
-			return "monthly cost will not change"
-		} else if pastCost.GreaterThan(*cost) {
-			return "monthly cost will decrease by " + formatMarkdownCostChange(currency, pastCost, cost, true) + " " + down
-		}
+	if pastCost == nil {
+		return "monthly cost will increase by " + formatCost(currency, cost) + " " + up
 	}
-	return "monthly cost will increase by " + formatMarkdownCostChange(currency, pastCost, cost, true) + " " + up
+
+	diff := cost.Sub(*pastCost).Abs()
+	change := formatCost(currency, &diff)
+
+	if pastCost.Equals(*cost) {
+		return "monthly cost will not change"
+	}
+
+	if pastCost.GreaterThan(*cost) {
+		return "monthly cost will decrease by " + change + " " + down
+	}
+
+	return "monthly cost will increase by " + change + " " + up
 }
 
 func calculateMetadataToDisplay(projects []Project) (hasModulePath bool, hasWorkspace bool) {
@@ -110,32 +121,6 @@ type MarkdownCtx struct {
 	MarkdownOptions              MarkdownOptions
 }
 
-// ProjectCounts returns a string that represents additional information about missing/errored projects.
-func (m MarkdownCtx) ProjectCounts() string {
-	out := ""
-	if m.SkippedUnchangedProjectCount == 1 {
-		out += "1 project has no code changes, "
-	} else if m.SkippedUnchangedProjectCount > 0 {
-		out += fmt.Sprintf("%d projects have no code changes, ", m.SkippedUnchangedProjectCount)
-	} else if m.SkippedProjectCount == 1 {
-		out += "1 project has no cost estimate changes, "
-	} else if m.SkippedProjectCount > 0 {
-		out += fmt.Sprintf("%d projects have no cost estimate changes, ", m.SkippedProjectCount)
-	}
-
-	if m.ErroredProjectCount == 1 {
-		out += "1 project could not be evaluated"
-	} else if m.ErroredProjectCount > 0 {
-		out += fmt.Sprintf("%d projects could not be evaluated, ", m.ErroredProjectCount)
-	}
-
-	if out == "" {
-		return out
-	}
-
-	return "\n" + strings.TrimSuffix(out, ", ") + "."
-}
-
 func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, error) {
 	var diffMsg string
 
@@ -155,7 +140,12 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 	var buf bytes.Buffer
 	bufw := bufio.NewWriter(&buf)
 
-	tmpl := template.New("base")
+	filename := "markdown-html.tmpl"
+	if markdownOpts.BasicSyntax {
+		filename = "markdown.tmpl"
+	}
+
+	tmpl := template.New(filename)
 	tmpl.Funcs(sprig.TxtFuncMap())
 	tmpl.Funcs(template.FuncMap{
 		"formatCost": func(d *decimal.Decimal) string {
@@ -169,37 +159,38 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 		},
 		"formatCostChangeSentence": formatCostChangeSentence,
 		"showProject": func(p Project) bool {
-			if p.Metadata.HasErrors() {
-				return false
-			}
-
-			if opts.ShowOnlyChanges {
-				// only return true if the project has code changes so the table can also show
-				// project that have cost changes.
-				if p.Metadata.VCSCodeChanged != nil && *p.Metadata.VCSCodeChanged {
-					return true
-				}
-			}
-
-			if opts.ShowAllProjects {
+			return showProject(p, opts, false)
+		},
+		"displaySub": func() bool {
+			if out.CloudURL != "" {
 				return true
 			}
 
-			if p.Diff == nil || len(p.Diff.Resources) == 0 { // has no diff
-				return false
-			}
-
-			return true // has diff
+			return markdownOpts.WillUpdate || markdownOpts.WillReplace
 		},
-		"validProjects": func() Projects {
+		"displayTable": func() bool {
 			var valid Projects
 			for _, project := range out.Projects {
-				if !project.Metadata.HasErrors() {
+				if showProject(project, opts, false) {
 					valid = append(valid, project)
 				}
 			}
 
-			return valid
+			return len(valid) > 0
+		},
+		"displayOutput": func() bool {
+			if markdownOpts.OmitDetails {
+				return false
+			}
+
+			var valid Projects
+			for _, project := range out.Projects {
+				if showProject(project, opts, true) {
+					valid = append(valid, project)
+				}
+			}
+
+			return len(valid) > 0
 		},
 		"metadataHeaders": func() []string {
 			headers := []string{}
@@ -231,14 +222,10 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 			}
 			return placeholders
 		},
+		"stringsJoin":    strings.Join,
 		"truncateMiddle": truncateMiddle,
 	})
-
-	t := CommentMarkdownWithHTMLTemplate
-	if markdownOpts.BasicSyntax {
-		t = CommentMarkdownTemplate
-	}
-	tmpl, err := tmpl.Parse(t)
+	_, err := tmpl.ParseFS(templatesFS, "templates/"+filename)
 	if err != nil {
 		return []byte{}, err
 	}

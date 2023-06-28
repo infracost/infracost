@@ -1,6 +1,8 @@
 package terraform
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"flag"
 	"fmt"
@@ -11,11 +13,14 @@ import (
 	"strings"
 	"sync"
 
+	jsoniter "github.com/json-iterator/go"
 	log "github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 	ctyJson "github.com/zclconf/go-cty/cty/json"
 
+	"github.com/infracost/infracost/internal/apiclient"
+	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/hcl/modules"
@@ -131,9 +136,9 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 	runCtx := ctx.RunContext
 	locatorConfig := &hcl.ProjectLocatorConfig{ExcludedSubDirs: ctx.ProjectConfig.ExcludePaths, ChangedObjects: runCtx.VCSMetadata.Commit.ChangedObjects, UseAllPaths: ctx.ProjectConfig.IncludeAllPaths}
 
-	wd := ctx.RunContext.Config.RepoPath()
+	cachePath := ctx.RunContext.Config.CachePath()
 	initialPath := ctx.ProjectConfig.Path
-	if filepath.IsAbs(wd) {
+	if filepath.IsAbs(cachePath) {
 		abs, err := filepath.Abs(initialPath)
 		if err != nil {
 			logger.WithError(err).Warnf("could not make project path absolute to match provided --config-file/--path path absolute, this will result in module loading failures")
@@ -141,8 +146,7 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 			initialPath = abs
 		}
 	}
-
-	loader := modules.NewModuleLoader(wd, credsSource, logger, ctx.RunContext.ModuleMutex)
+	loader := modules.NewModuleLoader(cachePath, credsSource, ctx.RunContext.Config.TerraformSourceMap, logger, ctx.RunContext.ModuleMutex)
 	parsers, err := hcl.LoadParsers(
 		initialPath,
 		loader,
@@ -342,10 +346,18 @@ func (p *HCLProvider) Modules() []HCLProject {
 					fmt.Fprintf(os.Stderr, "Detected Terraform project at %s\n", ui.DisplayPath(parser.Path()))
 				}
 
-				module, err := parser.ParseDirectory()
+				module, modErr := parser.ParseDirectory()
+				if modErr != nil {
+					if v, ok := modErr.(*clierror.PanicError); ok {
+						err := apiclient.ReportCLIError(p.ctx.RunContext, v, false)
+						if err != nil {
+							p.logger.WithError(err).Debug("error sending unexpected runtime error")
+						}
+					}
+				}
 
 				mu.Lock()
-				mods = append(mods, HCLProject{Module: module, Error: err})
+				mods = append(mods, HCLProject{Module: module, Error: modErr})
 				mu.Unlock()
 			}
 		}()
@@ -475,6 +487,9 @@ func (p *HCLProvider) marshalModule(module *hcl.Module) ModuleOut {
 }
 
 func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
+	jsonValues := marshalAttributeValues(block.Type(), block.Values())
+	p.marshalBlock(block, jsonValues)
+
 	planned := ResourceJSON{
 		Address:       block.FullName(),
 		Mode:          "managed",
@@ -483,8 +498,11 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 		Index:         block.Index(),
 		SchemaVersion: 0,
 		InfracostMetadata: map[string]interface{}{
-			"filename": block.Filename,
-			"calls":    block.CallDetails(),
+			"filename":  block.Filename,
+			"startLine": block.StartLine,
+			"endLine":   block.EndLine,
+			"calls":     block.CallDetails(),
+			"checksum":  generateChecksum(jsonValues),
 		},
 	}
 
@@ -499,9 +517,6 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 			Actions: []string{"create"},
 		},
 	}
-
-	jsonValues := marshalAttributeValues(block.Type(), block.Values())
-	p.marshalBlock(block, jsonValues)
 
 	planned.Values = jsonValues
 	changes.Change.After = jsonValues
@@ -599,6 +614,28 @@ func (p *HCLProvider) countReferences(block *hcl.Block) *countExpression {
 	}
 
 	return nil
+}
+
+var ignoredAttrs = map[string]bool{"arn": true, "id": true, "name": true, "self_link": true}
+var checksumMarshaller = jsoniter.ConfigCompatibleWithStandardLibrary
+
+func generateChecksum(value map[string]interface{}) string {
+	filtered := make(map[string]interface{})
+	for k, v := range value {
+		if !ignoredAttrs[k] {
+			filtered[k] = v
+		}
+	}
+
+	serialized, err := checksumMarshaller.Marshal(filtered)
+	if err != nil {
+		return ""
+	}
+
+	h := sha256.New()
+	h.Write(serialized)
+
+	return hex.EncodeToString(h.Sum(nil))
 }
 
 func blockToReferences(block *hcl.Block) map[string]interface{} {

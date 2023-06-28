@@ -25,6 +25,7 @@ type CreateAPIKeyResponse struct {
 type AddRunResponse struct {
 	RunID          string `json:"id"`
 	ShareURL       string `json:"shareUrl"`
+	CloudURL       string `json:"cloudUrl"`
 	GuardrailCheck output.GuardrailCheck
 }
 
@@ -60,9 +61,7 @@ func NewDashboardAPIClient(ctx *config.RunContext) *DashboardAPIClient {
 	}
 }
 
-func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (AddRunResponse, error) {
-	response := AddRunResponse{}
-
+func newRunInput(ctx *config.RunContext, out output.Root) (*runInput, error) {
 	projectResultInputs := make([]projectResultInput, len(out.Projects))
 	for i, project := range out.Projects {
 		projectResultInputs[i] = projectResultInput{
@@ -80,12 +79,12 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (Ad
 	var metadata map[string]interface{}
 	b, err := json.Marshal(out.Metadata)
 	if err != nil {
-		return response, fmt.Errorf("dashboard client failed to marshal output metadata %w", err)
+		return nil, fmt.Errorf("dashboard client failed to marshal output metadata %w", err)
 	}
 
 	err = json.Unmarshal(b, &metadata)
 	if err != nil {
-		return response, fmt.Errorf("dashboard client failed to unmarshal output metadata %w", err)
+		return nil, fmt.Errorf("dashboard client failed to unmarshal output metadata %w", err)
 	}
 
 	ctxValues["repoMetadata"] = metadata
@@ -100,13 +99,24 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (Ad
 		ctxValues["command"] = "comment"
 	}
 
+	return &runInput{
+		ProjectResults: projectResultInputs,
+		Currency:       out.Currency,
+		TimeGenerated:  out.TimeGenerated.UTC(),
+		Metadata:       ctxValues,
+	}, nil
+}
+
+func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (AddRunResponse, error) {
+	response := AddRunResponse{}
+
+	ri, err := newRunInput(ctx, out)
+	if err != nil {
+		return response, err
+	}
+
 	v := map[string]interface{}{
-		"run": runInput{
-			ProjectResults: projectResultInputs,
-			Currency:       out.Currency,
-			TimeGenerated:  out.TimeGenerated.UTC(),
-			Metadata:       ctxValues,
-		},
+		"run": *ri,
 	}
 
 	q := `

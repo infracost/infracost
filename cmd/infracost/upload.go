@@ -2,13 +2,15 @@ package main
 
 import (
 	"fmt"
-	"github.com/infracost/infracost/internal/logging"
-	"github.com/infracost/infracost/internal/ui"
+	log "github.com/sirupsen/logrus"
+
 	"github.com/spf13/cobra"
 
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/output"
+	"github.com/infracost/infracost/internal/ui"
 )
 
 func uploadCmd(ctx *config.RunContext) *cobra.Command {
@@ -43,13 +45,24 @@ See https://infracost.io/docs/features/cli_commands/#upload-runs`,
 				return fmt.Errorf("could not load input file %s err: %w", path, err)
 			}
 
+			if ctx.Config.TagPolicyAPIEndpoint != "" {
+				tagPolicyClient := apiclient.NewTagPolicyAPIClient(ctx)
+				tagPolicies, err := tagPolicyClient.CheckTagPolicies(ctx, root)
+				if err != nil {
+					log.WithError(err).Error("Failed to check tag policies")
+				}
+
+				root.TagPolicies = tagPolicies
+			}
+			tagPolicyCheck := output.NewTagPolicyChecks(root.TagPolicies)
+
 			dashboardClient := apiclient.NewDashboardAPIClient(ctx)
 			result, err := dashboardClient.AddRun(ctx, root)
 			if err != nil {
 				return fmt.Errorf("failed to upload to Infracost Cloud: %w", err)
 			}
 
-			root.RunID, root.ShareURL = result.RunID, result.ShareURL
+			root.RunID, root.ShareURL, root.CloudURL = result.RunID, result.ShareURL, result.CloudURL
 
 			if root.ShareURL != "" {
 				cmd.Println("Share this cost estimate: ", ui.LinkString(root.ShareURL))
@@ -63,6 +76,10 @@ See https://infracost.io/docs/features/cli_commands/#upload-runs`,
 
 			if len(result.GuardrailCheck.BlockingFailures()) > 0 {
 				return result.GuardrailCheck.BlockingFailures()
+			}
+
+			if len(tagPolicyCheck.FailingTagPolicies) > 0 {
+				return tagPolicyCheck
 			}
 
 			return nil

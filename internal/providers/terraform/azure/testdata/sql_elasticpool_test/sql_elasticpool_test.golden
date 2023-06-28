@@ -19,6 +19,12 @@
 ∙ 2 were free:
   ∙ 1 x azurerm_resource_group
   ∙ 1 x azurerm_sql_server
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ TestSQLElasticPool                                 ┃ $3,469       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 Logs:
 
 level=warning msg="Multiple products with prices found for azurerm_sql_elasticpool.premium_500 Compute (Premium, 500 DTUs), using the first product"

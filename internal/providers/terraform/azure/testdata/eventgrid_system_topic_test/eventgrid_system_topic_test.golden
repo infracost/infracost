@@ -1,0 +1,29 @@
+
+ Name                                                 Monthly Qty  Unit                      Monthly Cost 
+                                                                                                          
+ azurerm_eventgrid_system_topic.with_usage                                                                
+ └─ Operations                                                  8  100k operations                  $0.48 
+                                                                                                          
+ azurerm_eventgrid_system_topic.without_usage                                                             
+ └─ Operations                                 Monthly cost depends on usage: $0.06 per 100k operations   
+                                                                                                          
+ azurerm_storage_account.example                                                                          
+ ├─ Capacity                                   Monthly cost depends on usage: $0.0196 per GB              
+ ├─ Write operations                           Monthly cost depends on usage: $0.054 per 10k operations   
+ ├─ List and create container operations       Monthly cost depends on usage: $0.054 per 10k operations   
+ ├─ Read operations                            Monthly cost depends on usage: $0.0043 per 10k operations  
+ ├─ All other operations                       Monthly cost depends on usage: $0.0043 per 10k operations  
+ └─ Blob index                                 Monthly cost depends on usage: $0.039 per 10k tags         
+                                                                                                          
+ OVERALL TOTAL                                                                                      $0.48 
+──────────────────────────────────
+4 cloud resources were detected:
+∙ 3 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 1 was free:
+  ∙ 1 x azurerm_resource_group
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ TestEventgridSystemTopic                           ┃ $0.48        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛

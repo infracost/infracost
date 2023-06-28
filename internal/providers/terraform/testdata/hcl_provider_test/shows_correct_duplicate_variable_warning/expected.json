@@ -1,0 +1,152 @@
+{
+  "format_version": "1.0",
+  "terraform_version": "1.1.0",
+  "prior_state": {
+    "values": {
+      "root_module": {
+        "resources": [
+          {
+            "address": "aws_instance.web_app",
+            "mode": "managed",
+            "type": "aws_instance",
+            "name": "web_app",
+            "schema_version": 0,
+            "values": {
+              "ami": "ami-674cbc1e",
+              "ebs_block_device": [
+                {
+                  "device_name": "my_data",
+                  "iops": 800,
+                  "volume_size": 1000,
+                  "volume_type": "io1"
+                }
+              ],
+              "instance_type": "m5.4xlarge",
+              "root_block_device": [
+                {
+                  "volume_size": 50
+                }
+              ]
+            },
+            "infracost_metadata": {
+              "calls": [
+                {
+                  "filename": "testdata/hcl_provider_test/shows_correct_duplicate_variable_warning/main.tf",
+                  "blockName": "aws_instance.web_app"
+                }
+              ],
+              "checksum": "e529ad309bb6d647fae2d2854bc0d7f04a7888eceb9580ac224d15cc3384a825",
+              "filename": "testdata/hcl_provider_test/shows_correct_duplicate_variable_warning/main.tf",
+              "startLine": 13,
+              "endLine": 27
+            }
+          }
+        ]
+      }
+    }
+  },
+  "planned_values": {
+    "root_module": {
+      "resources": [
+        {
+          "address": "aws_instance.web_app",
+          "mode": "managed",
+          "type": "aws_instance",
+          "name": "web_app",
+          "schema_version": 0,
+          "values": {
+            "ami": "ami-674cbc1e",
+            "ebs_block_device": [
+              {
+                "device_name": "my_data",
+                "iops": 800,
+                "volume_size": 1000,
+                "volume_type": "io1"
+              }
+            ],
+            "instance_type": "m5.4xlarge",
+            "root_block_device": [
+              {
+                "volume_size": 50
+              }
+            ]
+          },
+          "infracost_metadata": {
+            "calls": [
+              {
+                "filename": "testdata/hcl_provider_test/shows_correct_duplicate_variable_warning/main.tf",
+                "blockName": "aws_instance.web_app"
+              }
+            ],
+            "checksum": "e529ad309bb6d647fae2d2854bc0d7f04a7888eceb9580ac224d15cc3384a825",
+            "filename": "testdata/hcl_provider_test/shows_correct_duplicate_variable_warning/main.tf",
+            "startLine": 13,
+            "endLine": 27
+          }
+        }
+      ]
+    }
+  },
+  "configuration": {
+    "provider_config": {
+      "aws": {
+        "name": "aws",
+        "expressions": {
+          "region": {
+            "constant_value": "us-east-1"
+          }
+        }
+      }
+    },
+    "root_module": {
+      "resources": [
+        {
+          "address": "aws_instance.web_app",
+          "mode": "managed",
+          "type": "aws_instance",
+          "name": "web_app",
+          "provider_config_key": "aws",
+          "expressions": {
+            "instance_type": {
+              "references": [
+                "var.instance_type"
+              ]
+            }
+          },
+          "schema_version": 0
+        }
+      ]
+    }
+  },
+  "infracost_resource_changes": [
+    {
+      "address": "aws_instance.web_app",
+      "mode": "managed",
+      "type": "aws_instance",
+      "name": "web_app",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "ami": "ami-674cbc1e",
+          "ebs_block_device": [
+            {
+              "device_name": "my_data",
+              "iops": 800,
+              "volume_size": 1000,
+              "volume_type": "io1"
+            }
+          ],
+          "instance_type": "m5.4xlarge",
+          "root_block_device": [
+            {
+              "volume_size": 50
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

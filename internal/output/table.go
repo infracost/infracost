@@ -30,42 +30,11 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 			s += "──────────────────────────────────\n"
 		}
 
-		s += fmt.Sprintf("%s %s\n",
-			ui.BoldString("Project:"),
-			project.Label(),
-		)
-
-		if project.Metadata.TerraformModulePath != "" {
-			s += fmt.Sprintf("%s %s\n",
-				ui.BoldString("Module path:"),
-				project.Metadata.TerraformModulePath,
-			)
-		}
-
-		if project.Metadata.WorkspaceLabel() != "" {
-			s += fmt.Sprintf("%s %s\n",
-				ui.BoldString("Workspace:"),
-				project.Metadata.WorkspaceLabel(),
-			)
-		}
-
+		s += projectTitle(project)
 		s += "\n"
 
 		if project.Metadata.HasErrors() {
-			s += ui.BoldString("Errors:") + "\n"
-
-			for _, diag := range project.Metadata.Errors {
-				pieces := strings.Split(diag.Message, ": ")
-				for x, piece := range pieces {
-					s += strings.Repeat("  ", x+1) + piece
-
-					if len(pieces)-1 == x {
-						s += "\n"
-					} else {
-						s += ":\n"
-					}
-				}
-			}
+			s += erroredProject(project)
 
 			if len(out.Projects) == 1 {
 				s += "\n"
@@ -111,7 +80,31 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 		s += "\n──────────────────────────────────\n" + summaryMsg
 	}
 
+	if len(out.Projects) > 0 {
+		s += "\n\n"
+		s += breakdownSummaryTable(out, opts)
+	}
+
 	return []byte(s), nil
+}
+
+func erroredProject(project Project) string {
+	s := ui.BoldString("Errors:") + "\n"
+
+	for _, diag := range project.Metadata.Errors {
+		pieces := strings.Split(diag.Message, ": ")
+		for x, piece := range pieces {
+			s += strings.Repeat("  ", x+1) + piece
+
+			if len(pieces)-1 == x {
+				s += "\n"
+			} else {
+				s += ":\n"
+			}
+		}
+	}
+
+	return s
 }
 
 func tableForBreakdown(currency string, breakdown Breakdown, fields []string, includeTotal bool) string {
@@ -348,4 +341,31 @@ func filterZeroValResources(resources []Resource, resourceName string) []Resourc
 		filteredResources = append(filteredResources, r)
 	}
 	return filteredResources
+}
+
+func breakdownSummaryTable(out Root, opts Options) string {
+	t := table.NewWriter()
+	t.SetStyle(table.StyleBold)
+	t.Style().Format.Header = text.FormatDefault
+	t.AppendHeader(table.Row{
+		"Project",
+		"Monthly cost",
+	})
+
+	t.SetColumnConfigs([]table.ColumnConfig{
+		{Name: "Project", WidthMin: 50},
+		{Name: "Monthly cost", WidthMin: 10},
+	})
+
+	for _, project := range out.Projects {
+		t.AppendRow(
+			table.Row{
+				truncateMiddle(project.Name, 64, "..."),
+				formatCost(out.Currency, project.Breakdown.TotalMonthlyCost),
+			},
+		)
+
+	}
+
+	return t.Render()
 }

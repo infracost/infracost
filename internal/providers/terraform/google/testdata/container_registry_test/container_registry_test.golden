@@ -6,7 +6,18 @@
  ├─ Object adds, bucket/object list (class A)                                      Monthly cost depends on usage: $0.05 per 10k operations    
  ├─ Object gets, retrieve bucket/object metadata (class B)                         Monthly cost depends on usage: $0.004 per 10k operations   
  └─ Network egress                                                                                                                            
-    ├─ Data transfer in same continent                                             Monthly cost depends on usage: $0.01 per GB                
+    ├─ Data transfer in same continent                                             Monthly cost depends on usage: $0.02 per GB                
+    ├─ Data transfer to worldwide excluding Asia, Australia (first 1TB)            Monthly cost depends on usage: $0.12 per GB                
+    ├─ Data transfer to Asia excluding China, but including Hong Kong (first 1TB)  Monthly cost depends on usage: $0.12 per GB                
+    ├─ Data transfer to China excluding Hong Kong (first 1TB)                      Monthly cost depends on usage: $0.23 per GB                
+    └─ Data transfer to Australia (first 1TB)                                      Monthly cost depends on usage: $0.19 per GB                
+                                                                                                                                              
+ google_container_registry.my_registry_asia                                                                                                   
+ ├─ Storage (standard)                                                             Monthly cost depends on usage: $0.026 per GiB              
+ ├─ Object adds, bucket/object list (class A)                                      Monthly cost depends on usage: $0.05 per 10k operations    
+ ├─ Object gets, retrieve bucket/object metadata (class B)                         Monthly cost depends on usage: $0.004 per 10k operations   
+ └─ Network egress                                                                                                                            
+    ├─ Data transfer in same continent                                             Monthly cost depends on usage: $0.08 per GB                
     ├─ Data transfer to worldwide excluding Asia, Australia (first 1TB)            Monthly cost depends on usage: $0.12 per GB                
     ├─ Data transfer to Asia excluding China, but including Hong Kong (first 1TB)  Monthly cost depends on usage: $0.12 per GB                
     ├─ Data transfer to China excluding Hong Kong (first 1TB)                      Monthly cost depends on usage: $0.23 per GB                
@@ -17,7 +28,7 @@
  ├─ Object adds, bucket/object list (class A)                                                       4  10k operations                   $0.20 
  ├─ Object gets, retrieve bucket/object metadata (class B)                                          2  10k operations                   $0.01 
  └─ Network egress                                                                                                                            
-    ├─ Data transfer in same continent                                                            550  GB                               $5.50 
+    ├─ Data transfer in same continent                                                            550  GB                              $11.00 
     ├─ Data transfer to worldwide excluding Asia, Australia (first 1TB)                         1,024  GB                             $122.88 
     ├─ Data transfer to worldwide excluding Asia, Australia (next 9TB)                          9,216  GB                           $1,013.76 
     ├─ Data transfer to worldwide excluding Asia, Australia (over 10TB)                         2,260  GB                             $180.80 
@@ -26,7 +37,13 @@
     ├─ Data transfer to China excluding Hong Kong (first 1TB)                                      50  GB                              $11.50 
     └─ Data transfer to Australia (first 1TB)                                                     250  GB                              $47.50 
                                                                                                                                               
- OVERALL TOTAL                                                                                                                      $1,561.29 
+ OVERALL TOTAL                                                                                                                      $1,566.79 
 ──────────────────────────────────
-2 cloud resources were detected:
-∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+3 cloud resources were detected:
+∙ 3 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ TestContainerRegistryGoldenFile                    ┃ $1,567       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛

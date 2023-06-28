@@ -7,9 +7,11 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/fatih/color"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
 	"github.com/sirupsen/logrus"
+	"github.com/spf13/cobra"
 
 	"github.com/infracost/infracost/internal/logging"
 )
@@ -25,20 +27,20 @@ type Project struct {
 	ConfigSha string `yaml:"config_sha,omitempty"  ignored:"true"`
 	// Path to the Terraform directory or JSON/plan file.
 	// A path can be repeated with different parameters, e.g. for multiple workspaces.
-	Path string `yaml:"path,omitempty" ignored:"true"`
+	Path string `yaml:"path" ignored:"true"`
 	// ExcludePaths defines a list of directories that the provider should ignore.
 	ExcludePaths []string `yaml:"exclude_paths,omitempty" ignored:"true"`
 	// DependencyPaths is a list of any paths that this project depends on. These paths are relative to the
 	// config file and NOT the project.
-	DependencyPaths []string `yaml:"dependency_paths"`
+	DependencyPaths []string `yaml:"dependency_paths,omitempty"`
 	// IncludeAllPaths tells autodetect to use all folders with valid project files.
 	IncludeAllPaths bool `yaml:"include_all_paths,omitempty" ignored:"true"`
 	// Name is a user defined name for the project
 	Name string `yaml:"name,omitempty" ignored:"true"`
 	// TerraformVarFiles is any var files that are to be used with the project.
-	TerraformVarFiles []string `yaml:"terraform_var_files"`
+	TerraformVarFiles []string `yaml:"terraform_var_files,omitempty"`
 	// TerraformVars is a slice of input vars that are to be used with the project.
-	TerraformVars map[string]string `yaml:"terraform_vars"`
+	TerraformVars map[string]string `yaml:"terraform_vars,omitempty"`
 	// TerraformForceCLI will run a project by calling out to the terraform/terragrunt binary to generate a plan JSON file.
 	TerraformForceCLI bool `yaml:"terraform_force_cli,omitempty"`
 	// TerraformPlanFlags are flags to pass to terraform plan with Terraform directory paths
@@ -56,7 +58,7 @@ type Project struct {
 	// Only applicable for terraform cloud/enterprise users.
 	TerraformCloudToken string `yaml:"terraform_cloud_token,omitempty" envconfig:"TERRAFORM_CLOUD_TOKEN"`
 	// TerragruntFlags set additional flags that should be passed to terragrunt.
-	TerragruntFlags string `envconfig:"TERRAGRUNT_FLAGS"`
+	TerragruntFlags string `yaml:"terragrunt_flags,omitempty" envconfig:"TERRAGRUNT_FLAGS"`
 	// UsageFile is the full path to usage file that specifies values for usage-based resources
 	UsageFile string `yaml:"usage_file,omitempty" ignored:"true"`
 	// TerraformUseState sets if the users wants to use the terraform state for infracost ops.
@@ -83,6 +85,7 @@ type Config struct {
 	UsageAPIEndpoint          string `yaml:"usage_api_endpoint,omitempty" envconfig:"USAGE_API_ENDPOINT"`
 	UsageActualCosts          bool   `yaml:"usage_actual_costs,omitempty" envconfig:"USAGE_ACTUAL_COSTS"`
 	PolicyAPIEndpoint         string `yaml:"policy_api_endpoint" envconfig:"POLICY_API_ENDPOINT"`
+	TagPolicyAPIEndpoint      string `yaml:"tag_policy_api_endpoint,omitempty" envconfig:"TAG_POLICY_API_ENDPOINT"`
 	EnableDashboard           bool   `yaml:"enable_dashboard,omitempty" envconfig:"ENABLE_DASHBOARD"`
 	EnableCloud               *bool  `yaml:"enable_cloud,omitempty" envconfig:"ENABLE_CLOUD"`
 	EnableCloudUpload         *bool  `yaml:"enable_cloud,omitempty" envconfig:"ENABLE_CLOUD_UPLOAD"`
@@ -97,6 +100,9 @@ type Config struct {
 	AWSOverrideRegion    string `envconfig:"AWS_OVERRIDE_REGION"`
 	AzureOverrideRegion  string `envconfig:"AZURE_OVERRIDE_REGION"`
 	GoogleOverrideRegion string `envconfig:"GOOGLE_OVERRIDE_REGION"`
+
+	// TerraformSourceMap replaces any source URL with the provided value.
+	TerraformSourceMap TerraformSourceMap `envconfig:"TERRAFORM_SOURCE_MAP"`
 
 	// Org settings
 	EnableCloudForOrganization bool
@@ -163,16 +169,60 @@ func (c *Config) RepoPath() string {
 	return c.RootPath
 }
 
-func (c *Config) LoadFromConfigFile(path string) error {
-	cfgFile, err := loadConfigFile(path)
+// CachePath finds path which contains the .infracost directory. It traverses parent directories until a .infracost
+// folder is found. If no .infracost folders exist then CachePath uses the current wd.
+func (c *Config) CachePath() string {
+	dir := c.RepoPath()
+
+	if s := c.cachePath(dir); s != "" {
+		return s
+	}
+
+	// now let's try to traverse the parent directories outside the working directory.
+	// We don't do this initially as this causing path problems when the cache directory
+	// is created by concurrently running projects.
+	abs, err := filepath.Abs(dir)
+	if err == nil {
+		if s := c.cachePath(abs); s != "" {
+			return s
+		}
+	}
+
+	return dir
+}
+
+func (c *Config) cachePath(dir string) string {
+	for {
+		cachePath := filepath.Join(dir, InfracostDir)
+		if _, err := os.Stat(cachePath); err == nil {
+			return filepath.Dir(cachePath)
+		}
+
+		parentDir := filepath.Dir(dir)
+		if parentDir == dir {
+			break
+		}
+		dir = parentDir
+	}
+
+	return ""
+}
+
+func (c *Config) LoadFromConfigFile(path string, cmd *cobra.Command) error {
+	cfgFile, err := LoadConfigFile(path)
 	if err != nil {
 		return err
 	}
 
 	c.Projects = cfgFile.Projects
 
-	// Reload the environment to overwrite any of the config file configs
+	// Reload the environment and global flags to overwrite any of the config file configs
 	err = c.LoadFromEnv()
+	if err != nil {
+		return err
+	}
+
+	err = c.LoadGlobalFlags(cmd)
 	if err != nil {
 		return err
 	}
@@ -293,6 +343,31 @@ func (c *Config) loadEnvVars() error {
 
 	for _, project := range c.Projects {
 		err = envconfig.Process("INFRACOST", project)
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+func (c *Config) LoadGlobalFlags(cmd *cobra.Command) error {
+	if cmd.Flags().Changed("no-color") {
+		c.NoColor, _ = cmd.Flags().GetBool("no-color")
+	}
+	color.NoColor = c.NoColor
+
+	if cmd.Flags().Changed("log-level") {
+		c.LogLevel, _ = cmd.Flags().GetString("log-level")
+		err := logging.ConfigureBaseLogger(c)
+		if err != nil {
+			return err
+		}
+	}
+
+	if cmd.Flags().Changed("debug-report") {
+		c.DebugReport, _ = cmd.Flags().GetBool("debug-report")
+		err := logging.ConfigureBaseLogger(c)
 		if err != nil {
 			return err
 		}

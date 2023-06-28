@@ -1,6 +1,7 @@
 package main_test
 
 import (
+	_ "embed"
 	"fmt"
 	"github.com/infracost/infracost/internal/config"
 	"net/http"
@@ -178,6 +179,68 @@ func TestUploadWithBlockingGuardrailFailure(t *testing.T) {
 			c.Config.DashboardAPIEndpoint = ts.URL
 			f := false
 			c.Config.EnableCloud = &f // Should still upload even though we've disabled cloud
+		},
+	)
+}
+
+//go:embed testdata/upload_with_blocking_tag_policy_failure/tagPolicyResponse.json
+var uploadWithBlockingTagPolicyFailureResponse string
+
+func TestUploadWithBlockingTagPolicyFailure(t *testing.T) {
+	tagPolicyApi := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintln(w, uploadWithBlockingTagPolicyFailureResponse)
+	}))
+	defer tagPolicyApi.Close()
+
+	dashboardApi := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, `[{"data": {"addRun":{
+			"id":"d92e0196-e5b0-449b-85c9-5733f6643c2f",
+			"shareUrl":"",
+			"organization":{"id":"767", "name":"tim"}
+		}}}]`)
+	}))
+	defer dashboardApi.Close()
+
+	GoldenFileCommandTest(t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{"upload", "--path", "./testdata/example_out.json", "--log-level", "info"},
+		&GoldenFileOptions{
+			CaptureLogs: true,
+		},
+		func(c *config.RunContext) {
+			c.Config.DashboardAPIEndpoint = dashboardApi.URL
+			c.Config.TagPolicyAPIEndpoint = tagPolicyApi.URL
+		},
+	)
+}
+
+//go:embed testdata/upload_with_tag_policy_warning/tagPolicyResponse.json
+var uploadWithTagPolicyWarningResponse string
+
+func TestUploadWithTagPolicyWarning(t *testing.T) {
+	tagPolicyApi := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = fmt.Fprintln(w, uploadWithTagPolicyWarningResponse)
+	}))
+	defer tagPolicyApi.Close()
+
+	dashboardApi := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, `[{"data": {"addRun":{
+			"id":"d92e0196-e5b0-449b-85c9-5733f6643c2f",
+			"shareUrl":"",
+			"organization":{"id":"767", "name":"tim"}
+		}}}]`)
+	}))
+	defer dashboardApi.Close()
+
+	GoldenFileCommandTest(t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{"upload", "--path", "./testdata/example_out.json", "--log-level", "info"},
+		&GoldenFileOptions{
+			CaptureLogs: true,
+		},
+		func(c *config.RunContext) {
+			c.Config.DashboardAPIEndpoint = dashboardApi.URL
+			c.Config.TagPolicyAPIEndpoint = tagPolicyApi.URL
 		},
 	)
 }

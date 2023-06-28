@@ -139,7 +139,6 @@ provider "aws" {
   skip_credentials_validation = true
   skip_metadata_api_check     = true
   skip_requesting_account_id  = true
-  skip_get_ec2_platforms      = true
   skip_region_validation      = true
   access_key                  = "mock_access_key"
   secret_key                  = "mock_secret_key"
@@ -187,9 +186,9 @@ ok      github.com/infracost/infracost/internal/providers/terraform/aws       7.
 The `PASS` message tells us that it worked successfully. The provided `-update` flag wrote the test output to the golden file. If we open `internal/providers/terraform/aws/testdata/transfer_server_test/transfer_server_test.golden` file we should see this:
 
 ```
- Name  Monthly Qty  Unit  Monthly Cost 
-                                       
- OVERALL TOTAL                   $0.00 
+ Name  Monthly Qty  Unit  Monthly Cost
+
+ OVERALL TOTAL                   $0.00
 ──────────────────────────────────
 1 cloud resource was detected:
 ∙ 1 was estimated, 1 includes usage-based costs, see https://infracost.io/usage-file
@@ -429,7 +428,7 @@ SELECT DISTINCT "service", "productFamily", "attributes" FROM products WHERE "ve
 ```
 
 ```
-   service   |     productFamily     |                                                                                                                                        attributes                                                                                                                                        
+   service   |     productFamily     |                                                                                                                                        attributes
 -------------+-----------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  AWSTransfer | AWS Transfer Family   | {"data": "FTPS-None", "endpoint": "FTPS-Protocol-Hours", "location": "US East (N. Virginia)", "operation": "FTPS:S3", "usagetype": "USE1-ProtocolHours", "regionCode": "us-east-1", "servicecode": "AWSTransfer", "servicename": "AWS Transfer Family", "locationType": "AWS Region"}
  AWSTransfer | AWS Transfer Family   | {"data": "SFTP-Download-EFS", "endpoint": "SFTP-None-EFS", "location": "US East (N. Virginia)", "operation": "SFTP:EFS", "usagetype": "USE1-DownloadBytes", "regionCode": "us-east-1", "servicecode": "AWSTransfer", "servicename": "AWS Transfer Family", "locationType": "AWS Region"}
@@ -485,7 +484,7 @@ SELECT DISTINCT "service", "productFamily", "attributes"->>'data' AS data, "attr
 ```
 
 ```
-   service   |     productFamily     |        data         | operation |     usagetype      |                                                                                                                                                                                                               prices                                                                                                                                                                                                               
+   service   |     productFamily     |        data         | operation |     usagetype      |                                                                                                                                                                                                               prices
 -------------+-----------------------+---------------------+-----------+--------------------+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
  AWSTransfer | AWS Transfer Family   | FTP-Download-Bytes  | FTP:S3    | USE1-DownloadBytes | {"3ee6535426a0bf75d16267a394ee64c0-dcaa14181f6c95f2f4f3e4ccf3fee63a": [{"USD": "0.0400000000", "unit": "GigaBytes", "priceHash": "3ee6535426a0bf75d16267a394ee64c0-dcaa14181f6c95f2f4f3e4ccf3fee63a", "description": "$0.04 per GigaByte downloaded over FTP from S3 in US East (N. Virginia)", "endUsageAmount": "Inf", "purchaseOption": "on_demand", "startUsageAmount": "0", "effectiveDateStart": "2021-11-01T00:00:00Z"}]}
  AWSTransfer | AWS Transfer Family   | FTP-None            | FTP:S3    | USE1-ProtocolHours | {"1e3ef5c6622041fcc4988e4258d5fc04-e7eda77c4cf52b2a5e814c7059c2e4c8": [{"USD": "0.3000000000", "unit": "Hourly", "priceHash": "1e3ef5c6622041fcc4988e4258d5fc04-e7eda77c4cf52b2a5e814c7059c2e4c8", "description": "$0.3 per Hour for FTP in US East (N. Virginia)", "endUsageAmount": "Inf", "purchaseOption": "on_demand", "startUsageAmount": "0", "effectiveDateStart": "2021-11-01T00:00:00Z"}]}
@@ -1140,7 +1139,7 @@ Sometimes you need access to a resource that refers to the resource you're addin
 			Name:                "aws_ebs_volume",
 			RFunc:               NewEBSVolume,
 			// This only works if aws_ebs_snapshot has defined "volume_id" as a ReferenceAttribute
-			ReferenceAttributes: []string{"aws_ebs_snapshot.volume_id"}, 
+			ReferenceAttributes: []string{"aws_ebs_snapshot.volume_id"},
 		}
 	}
 
@@ -1189,7 +1188,7 @@ By default, references are matched using an AWS ARN or the id field (`d.Get("id"
 	}
 ```
 
-### Google zone mappings 
+### Google zone mappings
 
 If the resource has a `zone` key, if they have a zone key, use this logic to get the region:
 
@@ -1286,7 +1285,7 @@ Every so often cloud providers add locations/regions to their cloud infrastructu
 
 #### AWS
 
-Common usage structs are defined in the [`internal/resources/aws/util.go`](../internal/resources/aws/util.go) file. You'll need to update: 
+Common usage structs are defined in the [`internal/resources/aws/util.go`](../internal/resources/aws/util.go) file. You'll need to update:
 
 ```go
 var RegionMapping = map[string]string{
@@ -1319,7 +1318,7 @@ var RegionUsageSchema = []*schema.UsageItem{
 
 #### Google
 
-Common usage structs are defined in the [`internal/resources/google/util.go`](../internal/resources/google/util.go) file. You'll need to update: 
+Common usage structs are defined in the [`internal/resources/google/util.go`](../internal/resources/google/util.go) file. You'll need to update:
 
 ```go
 type RegionsUsage struct {

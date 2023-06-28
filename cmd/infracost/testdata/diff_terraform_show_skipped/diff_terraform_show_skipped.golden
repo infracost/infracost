@@ -1,3 +1,4 @@
+──────────────────────────────────
 Project: infracost/infracost/cmd/infracost/testdata/express_route_gateway_plan.json
 
 + azurerm_express_route_connection.express_route_conn
@@ -28,6 +29,13 @@ Key: ~ changed, + added, - removed
   ∙ 1 x azurerm_express_route_circuit
   ∙ 1 x azurerm_express_route_circuit_peering
   ∙ 1 x azurerm_express_route_port
+
+Infracost estimate: monthly cost will increase by $343 ↑
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
+┃ Project                                                          ┃ Cost change ┃ New monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infraco...xpress_route_gateway_plan.json ┃       +$343 ┃ $343             ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━┛
 
 Err:
 

@@ -3,7 +3,6 @@ provider "aws" {
   skip_credentials_validation = true
   skip_metadata_api_check     = true
   skip_requesting_account_id  = true
-  skip_get_ec2_platforms      = true
   skip_region_validation      = true
   access_key                  = "mock_access_key"
   secret_key                  = "mock_secret_key"
@@ -15,9 +14,13 @@ resource "aws_msk_cluster" "cluster-2-nodes" {
   number_of_broker_nodes = 2
   broker_node_group_info {
     client_subnets  = []
-    ebs_volume_size = 500
     instance_type   = "kafka.t3.small"
     security_groups = []
+    storage_info {
+      ebs_storage_info {
+        volume_size = 500
+      }
+    }
   }
 }
 
@@ -27,9 +30,13 @@ resource "aws_msk_cluster" "cluster-4-nodes" {
   number_of_broker_nodes = 4
   broker_node_group_info {
     client_subnets  = []
-    ebs_volume_size = 1000
     instance_type   = "kafka.m5.24xlarge"
     security_groups = []
+    storage_info {
+      ebs_storage_info {
+        volume_size = 1000
+      }
+    }
   }
 }
 
@@ -47,9 +54,13 @@ resource "aws_msk_cluster" "cluster-autoscaling" {
   number_of_broker_nodes = 2
   broker_node_group_info {
     client_subnets  = []
-    ebs_volume_size = 1000
     instance_type   = "kafka.t3.small"
     security_groups = []
+    storage_info {
+      ebs_storage_info {
+        volume_size = 1000
+      }
+    }
   }
 }
 
@@ -67,8 +78,12 @@ resource "aws_msk_cluster" "cluster-autoscaling-usage" {
   number_of_broker_nodes = 2
   broker_node_group_info {
     client_subnets  = []
-    ebs_volume_size = 1000
     instance_type   = "kafka.t3.small"
     security_groups = []
+    storage_info {
+      ebs_storage_info {
+        volume_size = 1000
+      }
+    }
   }
 }

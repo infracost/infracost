@@ -40,7 +40,7 @@ func NewAzureRMKubernetesCluster(d *schema.ResourceData, u *schema.UsageData) *s
 				Service:       strPtr("Azure Kubernetes Service"),
 				ProductFamily: strPtr("Compute"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "skuName", Value: strPtr("Standard")},
+					{Key: "meterName", Value: strPtr("Standard Uptime SLA")},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
@@ -59,14 +59,16 @@ func NewAzureRMKubernetesCluster(d *schema.ResourceData, u *schema.UsageData) *s
 		nodeCount = decimal.NewFromInt(d.Get("default_node_pool.0.min_count").Int())
 	}
 
+	var defaultNodeUsage *schema.UsageData
 	if u != nil {
-		if v, ok := u.Get("default_node_pool").Map()["nodes"]; ok {
-			nodeCount = decimal.NewFromInt(v.Int())
+		defaultNodeUsage = schema.NewUsageData("default_node_pool", u.Get("default_node_pool").Map())
+		if defaultNodeUsage.Get("nodes").Exists() {
+			nodeCount = decimal.NewFromInt(defaultNodeUsage.Get("nodes").Int())
 		}
 	}
 
 	subResources = []*schema.Resource{
-		aksClusterNodePool("default_node_pool", region, d.Get("default_node_pool.0"), nodeCount, u),
+		aksClusterNodePool("default_node_pool", region, d.Get("default_node_pool.0"), nodeCount, defaultNodeUsage),
 	}
 
 	if d.Get("network_profile.0.load_balancer_sku").Type != gjson.Null {

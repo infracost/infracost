@@ -113,10 +113,19 @@
                                                                                                                                 
  OVERALL TOTAL                                                                                                        $1,802.53 
 ──────────────────────────────────
-19 cloud resources were detected:
+21 cloud resources were detected:
 ∙ 18 were estimated
 ∙ 1 was free:
   ∙ 1 x azurerm_resource_group
+∙ 2 are not supported yet, see https://infracost.io/requested-resources:
+  ∙ 1 x azurerm_storage_account
+  ∙ 1 x azurerm_storage_queue
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ TestStorageQueue                                   ┃ $1,803       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 Logs:
 
 level=warning msg="Skipping resource azurerm_storage_account.unsupported. Storage Standard doesn't support GZRS redundancy"

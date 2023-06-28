@@ -69,7 +69,16 @@
         "resources": [
           {
             "name": "aws_instance.web_app",
-            "metadata": {},
+            "resourceType": "aws_instance",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_instance.web_app",
+                  "filename": "prod/main.tf"
+                }
+              ],
+              "filename": "prod/main.tf"
+            },
             "hourlyCost": "0.633315068493150679",
             "monthlyCost": "462.32",
             "costComponents": [
@@ -137,7 +146,19 @@
         "resources": [
           {
             "name": "aws_instance.web_app",
-            "metadata": {},
+            "resourceType": "aws_instance",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_instance.web_app",
+                  "filename": "testdata/diff_with_compare_to_with_current_and_past_project_error/prod/main.tf"
+                }
+              ],
+              "checksum": "19795a60f4adbabf8e1f0bbaa064d7455db29aa70a0710eaf949e73512b45fd3",
+              "endLine": 23,
+              "filename": "testdata/diff_with_compare_to_with_current_and_past_project_error/prod/main.tf",
+              "startLine": 9
+            },
             "hourlyCost": "0.633315068493150679",
             "monthlyCost": "462.32",
             "costComponents": [

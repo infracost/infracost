@@ -29,6 +29,7 @@
         "resources": [
           {
             "name": "aws_instance.web_app",
+            "resourceType": "aws_instance",
             "metadata": {},
             "hourlyCost": "1.017315068493150679",
             "monthlyCost": "742.64",
@@ -46,6 +47,7 @@
             "subresources": [
               {
                 "name": "root_block_device",
+                "resourceType": "root_block_device",
                 "metadata": {},
                 "hourlyCost": "0.00684931506849315",
                 "monthlyCost": "5",
@@ -63,6 +65,7 @@
               },
               {
                 "name": "ebs_block_device[0]",
+                "resourceType": "ebs_block_device[0]",
                 "metadata": {},
                 "hourlyCost": "0.242465753424657529",
                 "monthlyCost": "177",
@@ -91,6 +94,7 @@
           },
           {
             "name": "aws_instance.zero_cost_instance",
+            "resourceType": "aws_instance",
             "metadata": {},
             "hourlyCost": "0.249315068493150679",
             "monthlyCost": "182",
@@ -108,6 +112,7 @@
             "subresources": [
               {
                 "name": "root_block_device",
+                "resourceType": "root_block_device",
                 "metadata": {},
                 "hourlyCost": "0.00684931506849315",
                 "monthlyCost": "5",
@@ -125,6 +130,7 @@
               },
               {
                 "name": "ebs_block_device[0]",
+                "resourceType": "ebs_block_device[0]",
                 "metadata": {},
                 "hourlyCost": "0.242465753424657529",
                 "monthlyCost": "177",
@@ -153,6 +159,7 @@
           },
           {
             "name": "aws_lambda_function.hello_world",
+            "resourceType": "aws_lambda_function",
             "metadata": {},
             "hourlyCost": "0.59817465753424657534316749",
             "monthlyCost": "436.6675",
@@ -179,6 +186,7 @@
           },
           {
             "name": "aws_lambda_function.zero_cost_lambda",
+            "resourceType": "aws_lambda_function",
             "metadata": {},
             "hourlyCost": "0",
             "monthlyCost": "0",
@@ -205,12 +213,14 @@
           },
           {
             "name": "aws_s3_bucket.usage",
+            "resourceType": "aws_s3_bucket",
             "metadata": {},
             "hourlyCost": "0",
             "monthlyCost": "0",
             "subresources": [
               {
                 "name": "Standard",
+                "resourceType": "Standard",
                 "metadata": {},
                 "hourlyCost": "0",
                 "monthlyCost": "0",
@@ -272,6 +282,7 @@
         "resources": [
           {
             "name": "aws_instance.web_app",
+            "resourceType": "aws_instance",
             "metadata": {},
             "hourlyCost": "1.017315068493150679",
             "monthlyCost": "742.64",
@@ -289,6 +300,7 @@
             "subresources": [
               {
                 "name": "root_block_device",
+                "resourceType": "root_block_device",
                 "metadata": {},
                 "hourlyCost": "0.00684931506849315",
                 "monthlyCost": "5",
@@ -306,6 +318,7 @@
               },
               {
                 "name": "ebs_block_device[0]",
+                "resourceType": "ebs_block_device[0]",
                 "metadata": {},
                 "hourlyCost": "0.242465753424657529",
                 "monthlyCost": "177",
@@ -334,6 +347,7 @@
           },
           {
             "name": "aws_instance.zero_cost_instance",
+            "resourceType": "aws_instance",
             "metadata": {},
             "hourlyCost": "0.249315068493150679",
             "monthlyCost": "182",
@@ -351,6 +365,7 @@
             "subresources": [
               {
                 "name": "root_block_device",
+                "resourceType": "root_block_device",
                 "metadata": {},
                 "hourlyCost": "0.00684931506849315",
                 "monthlyCost": "5",
@@ -368,6 +383,7 @@
               },
               {
                 "name": "ebs_block_device[0]",
+                "resourceType": "ebs_block_device[0]",
                 "metadata": {},
                 "hourlyCost": "0.242465753424657529",
                 "monthlyCost": "177",
@@ -396,6 +412,7 @@
           },
           {
             "name": "aws_lambda_function.hello_world",
+            "resourceType": "aws_lambda_function",
             "metadata": {},
             "hourlyCost": "0.59817465753424657534316749",
             "monthlyCost": "436.6675",
@@ -422,6 +439,7 @@
           },
           {
             "name": "aws_lambda_function.zero_cost_lambda",
+            "resourceType": "aws_lambda_function",
             "metadata": {},
             "hourlyCost": "0",
             "monthlyCost": "0",
@@ -448,12 +466,14 @@
           },
           {
             "name": "aws_s3_bucket.usage",
+            "resourceType": "aws_s3_bucket",
             "metadata": {},
             "hourlyCost": "0",
             "monthlyCost": "0",
             "subresources": [
               {
                 "name": "Standard",
+                "resourceType": "Standard",
                 "metadata": {},
                 "hourlyCost": "0",
                 "monthlyCost": "0",
@@ -531,6 +551,7 @@
         "resources": [
           {
             "name": "azurerm_firewall.non_usage",
+            "resourceType": "azurerm_firewall",
             "metadata": {},
             "hourlyCost": "1.25",
             "monthlyCost": "912.5",
@@ -557,6 +578,7 @@
           },
           {
             "name": "azurerm_firewall.premium",
+            "resourceType": "azurerm_firewall",
             "metadata": {},
             "hourlyCost": "0.875",
             "monthlyCost": "638.75",
@@ -583,6 +605,7 @@
           },
           {
             "name": "azurerm_firewall.premium_virtual_hub",
+            "resourceType": "azurerm_firewall",
             "metadata": {},
             "hourlyCost": "0.875",
             "monthlyCost": "638.75",
@@ -609,6 +632,7 @@
           },
           {
             "name": "azurerm_firewall.standard",
+            "resourceType": "azurerm_firewall",
             "metadata": {},
             "hourlyCost": "1.25",
             "monthlyCost": "912.5",
@@ -635,6 +659,7 @@
           },
           {
             "name": "azurerm_firewall.standard_virtual_hub",
+            "resourceType": "azurerm_firewall",
             "metadata": {},
             "hourlyCost": "1.25",
             "monthlyCost": "912.5",
@@ -661,6 +686,7 @@
           },
           {
             "name": "azurerm_public_ip.example",
+            "resourceType": "azurerm_public_ip",
             "metadata": {},
             "hourlyCost": "0.005",
             "monthlyCost": "3.65",
@@ -684,6 +710,7 @@
         "resources": [
           {
             "name": "azurerm_firewall.non_usage",
+            "resourceType": "azurerm_firewall",
             "metadata": {},
             "hourlyCost": "1.25",
             "monthlyCost": "912.5",
@@ -710,6 +737,7 @@
           },
           {
             "name": "azurerm_firewall.premium",
+            "resourceType": "azurerm_firewall",
             "metadata": {},
             "hourlyCost": "0.875",
             "monthlyCost": "638.75",
@@ -736,6 +764,7 @@
           },
           {
             "name": "azurerm_firewall.premium_virtual_hub",
+            "resourceType": "azurerm_firewall",
             "metadata": {},
             "hourlyCost": "0.875",
             "monthlyCost": "638.75",
@@ -762,6 +791,7 @@
           },
           {
             "name": "azurerm_firewall.standard",
+            "resourceType": "azurerm_firewall",
             "metadata": {},
             "hourlyCost": "1.25",
             "monthlyCost": "912.5",
@@ -788,6 +818,7 @@
           },
           {
             "name": "azurerm_firewall.standard_virtual_hub",
+            "resourceType": "azurerm_firewall",
             "metadata": {},
             "hourlyCost": "1.25",
             "monthlyCost": "912.5",
@@ -814,6 +845,7 @@
           },
           {
             "name": "azurerm_public_ip.example",
+            "resourceType": "azurerm_public_ip",
             "metadata": {},
             "hourlyCost": "0.005",
             "monthlyCost": "3.65",

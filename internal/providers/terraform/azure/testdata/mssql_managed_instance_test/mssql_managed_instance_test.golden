@@ -1,0 +1,36 @@
+
+ Name                                        Monthly Qty  Unit              Monthly Cost 
+                                                                                         
+ azurerm_mssql_managed_instance.example                                                  
+ ├─ Compute (GP_GEN5 4 cores)                        730  hours                  $488.92 
+ ├─ Additional Storage                                32  GB                       $4.38 
+ ├─ PITR backup storage (LRS)                        100  GB                      $11.90 
+ ├─ SQL license                                    2,920  vCore-hours            $291.90 
+ └─ LTR backup storage (LRS)                           5  GB                       $0.15 
+                                                                                         
+ azurerm_mssql_managed_instance.example2                                                 
+ ├─ Compute (GP_GEN5 16 cores)                       730  hours                $1,955.69 
+ ├─ Additional Storage                                32  GB                       $4.38 
+ ├─ PITR backup storage (LRS)             Monthly cost depends on usage: $0.12 per GB    
+ └─ LTR backup storage (LRS)              Monthly cost depends on usage: $0.0298 per GB  
+                                                                                         
+ azurerm_mssql_managed_instance.example3                                                 
+ ├─ Compute (BC_GEN5 40 cores)                       730  hours                $9,778.47 
+ ├─ Additional Storage                                32  GB                       $4.38 
+ ├─ PITR backup storage (ZRS)                        100  GB                      $14.90 
+ └─ LTR backup storage (ZRS)                         100  GB                       $3.72 
+                                                                                         
+ OVERALL TOTAL                                                                $12,558.78 
+──────────────────────────────────
+6 cloud resources were detected:
+∙ 3 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 3 were free:
+  ∙ 1 x azurerm_resource_group
+  ∙ 1 x azurerm_subnet
+  ∙ 1 x azurerm_virtual_network
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ TestMSSQLManagedInstance                           ┃ $12,559      ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛

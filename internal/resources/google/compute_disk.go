@@ -11,6 +11,9 @@ type ComputeDisk struct {
 	Region  string
 	Type    string
 	Size    float64
+
+	// applicable for pd-extreme and hyperdisk-extreme
+	IOPS int64
 }
 
 // ComputeDiskUsageSchema defines a list which represents the usage schema of ComputeDisk.
@@ -28,6 +31,10 @@ func (r *ComputeDisk) PopulateUsage(u *schema.UsageData) {
 func (r *ComputeDisk) BuildResource() *schema.Resource {
 	costComponents := []*schema.CostComponent{
 		computeDiskCostComponent(r.Region, r.Type, r.Size, 1),
+	}
+
+	if r.Type == "pd-extreme" || r.Type == "hyperdisk-extreme" {
+		costComponents = append(costComponents, computeDiskIOPSCostComponent(r.Region, r.Type, r.Size, 1, r.IOPS))
 	}
 
 	return &schema.Resource{

@@ -3,7 +3,6 @@ provider "aws" {
   skip_credentials_validation = true
   skip_metadata_api_check     = true
   skip_requesting_account_id  = true
-  skip_get_ec2_platforms      = true
   skip_region_validation      = true
   access_key                  = "mock_access_key"
   secret_key                  = "mock_secret_key"
@@ -62,7 +61,6 @@ resource "aws_elastic_beanstalk_environment" "my_eb_environment_with_usage" {
     name      = "RootVolumeIOPS"
     value     = 300
   }
-
 }
 
 resource "aws_elastic_beanstalk_environment" "my_eb_environment" {
@@ -93,7 +91,6 @@ resource "aws_elastic_beanstalk_environment" "my_eb_environment" {
     name      = "LoadBalancerType"
     value     = "network"
   }
-
 }
 
 resource "aws_elastic_beanstalk_environment" "my_eb_environment_with_rds" {
@@ -148,7 +145,6 @@ resource "aws_elastic_beanstalk_environment" "my_eb_environment_with_rds" {
     name      = "DBAllocatedStorage"
     value     = 100
   }
-
 }
 
 resource "aws_elastic_beanstalk_environment" "my_eb_environment_with_rds_no_usage" {
@@ -203,5 +199,33 @@ resource "aws_elastic_beanstalk_environment" "my_eb_environment_with_rds_no_usag
     name      = "StreamLogs"
     value     = true
   }
+}
 
+resource "aws_elastic_beanstalk_environment" "my_eb_environment_asg_instance_type" {
+  name        = "eb_environment_asg"
+  application = aws_elastic_beanstalk_application.my_eb_application.name
+
+  setting {
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "InstanceType"
+    value     = "t3a.large"
+  }
+}
+
+resource "aws_elastic_beanstalk_environment" "my_eb_environment_asg_instance_types" {
+  name        = "eb_environment_asg"
+  application = aws_elastic_beanstalk_application.my_eb_application.name
+
+  setting {
+    namespace = "aws:autoscaling:launchconfiguration"
+    name      = "InstanceType"
+    value     = "t3a.large"
+  }
+
+  // This should override the `InstanceType` setting
+  setting {
+    namespace = "aws:ec2:instances"
+    name      = "InstanceTypes"
+    value     = "t3a.xlarge"
+  }
 }

@@ -1,0 +1,31 @@
+
+ Name                                              Monthly Qty  Unit                      Monthly Cost 
+                                                                                                       
+ azurerm_managed_disk.example                                                                          
+ ├─ Storage (S10, LRS)                                       1  months                           $5.89 
+ └─ Disk operations                         Monthly cost depends on usage: $0.0005 per 10k operations  
+                                                                                                       
+ azurerm_snapshot.example["managed"]                                                                   
+ └─ Storage                                                 70  GB                               $3.50 
+                                                                                                       
+ azurerm_snapshot.example["source"]                                                                    
+ └─ Storage                                                 20  GB                               $1.00 
+                                                                                                       
+ azurerm_snapshot.example_usage["managed"]                                                             
+ └─ Storage                                                300  GB                              $15.00 
+                                                                                                       
+ azurerm_snapshot.example_usage["source"]                                                              
+ └─ Storage                                                300  GB                              $15.00 
+                                                                                                       
+ OVERALL TOTAL                                                                                  $40.39 
+──────────────────────────────────
+6 cloud resources were detected:
+∙ 5 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 1 was free:
+  ∙ 1 x azurerm_resource_group
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ TestSnapshot                                       ┃ $40          ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛

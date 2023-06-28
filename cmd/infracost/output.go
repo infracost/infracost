@@ -146,7 +146,8 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 				if ctx.Config.IsSelfHosted() {
 					ui.PrintWarning(cmd.ErrOrStderr(), "Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
 				} else {
-					combined.RunID, combined.ShareURL, _ = shareCombinedRun(ctx, combined, inputs)
+					result := shareCombinedRun(ctx, combined, inputs)
+					combined.RunID, combined.ShareURL, combined.CloudURL = result.RunID, result.ShareURL, result.CloudURL
 				}
 			}
 
@@ -192,7 +193,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 	return cmd
 }
 
-func shareCombinedRun(ctx *config.RunContext, combined output.Root, inputs []output.ReportInput) (string, string, output.GuardrailCheck) {
+func shareCombinedRun(ctx *config.RunContext, combined output.Root, inputs []output.ReportInput) apiclient.AddRunResponse {
 	combinedRunIds := []string{}
 	for _, input := range inputs {
 		if id := input.Root.RunID; id != "" {
@@ -207,7 +208,7 @@ func shareCombinedRun(ctx *config.RunContext, combined output.Root, inputs []out
 		log.WithError(err).Error("Failed to upload to Infracost Cloud")
 	}
 
-	return result.RunID, result.ShareURL, result.GuardrailCheck
+	return result
 }
 
 func contains(arr []string, e string) bool {

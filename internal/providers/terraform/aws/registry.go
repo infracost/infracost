@@ -54,6 +54,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getElastiCacheClusterItem(),
 	getElastiCacheReplicationGroupItem(),
 	getElasticsearchDomainRegistryItem(),
+	getOpensearchDomainRegistryItem(),
 	getELBRegistryItem(),
 	getFlowLogRegistryItem(),
 	getFSxOpenZFSFSRegistryItem(),
@@ -116,12 +117,30 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 
 // FreeResources grouped alphabetically
 var FreeResources = []string{
+	// AWS Access Analyzer
+	"aws_accessanalyzer_analyzer",
+	"aws_accessanalyzer_archive_rule",
+
+	// AWS Account
+	"aws_account_alternate_contact",
+
 	// AWS Application Auto Scaling
 	"aws_appautoscaling_policy",
 	"aws_appautoscaling_scheduled_action",
 
 	// AWS Certificate Manager
 	"aws_acm_certificate_validation",
+	"aws_acmpca_permission",
+	"aws_acmpca_policy",
+
+	// AWS AMI
+	"aws_ami_launch_permission",
+
+	// AWS Amplify
+	"aws_amplify_backend_environment",
+	"aws_amplify_branch",
+	"aws_amplify_domain_association",
+	"aws_amplify_webhook",
 
 	// AWS API Gateway Rest APIs
 	"aws_api_gateway_account",
@@ -133,14 +152,17 @@ var FreeResources = []string{
 	"aws_api_gateway_documentation_part",
 	"aws_api_gateway_documentation_version",
 	"aws_api_gateway_domain_name",
-	"aws_api_gateway_response",
+	"aws_api_gateway_gateway_response",
 	"aws_api_gateway_integration",
+	"aws_api_gateway_integration_response",
 	"aws_api_gateway_method",
 	"aws_api_gateway_method_response",
 	"aws_api_gateway_method_settings",
 	"aws_api_gateway_model",
 	"aws_api_gateway_request_validator",
 	"aws_api_gateway_resource",
+	"aws_api_gateway_response",
+	"aws_api_gateway_rest_api_policy",
 	"aws_api_gateway_usage_plan",
 	"aws_api_gateway_usage_plan_key",
 	"aws_api_gateway_vpc_link",
@@ -157,6 +179,26 @@ var FreeResources = []string{
 	"aws_apigatewayv2_route_response",
 	"aws_apigatewayv2_stage",
 	"aws_apigatewayv2_vpc_link",
+
+	// AWS AppConfig
+	"aws_appconfig_extension",
+	"aws_appconfig_extension_association",
+	"aws_appconfig_hosted_configuration_version",
+
+	// AWS AppFlow
+	"aws_appflow_connector_profile",
+
+	// AWS AppIntegrations
+	"aws_appintegrations_event_integration",
+
+	// AWS AppMesh
+	"aws_appmesh_gateway_route",
+	"aws_appmesh_mesh",
+	"aws_appmesh_route",
+	"aws_appmesh_virtual_gateway",
+	"aws_appmesh_virtual_node",
+	"aws_appmesh_virtual_router",
+	"aws_appmesh_virtual_service",
 
 	// AWS Backup
 	"aws_backup_global_settings",
@@ -214,8 +256,20 @@ var FreeResources = []string{
 	"aws_config_delivery_channel",
 	"aws_config_remediation_configuration",
 
+	// AWS EC2
+	"aws_autoscaling_attachment",
+	"aws_autoscaling_group_tag",
+	"aws_autoscaling_lifecycle_hook",
+	"aws_autoscaling_notification",
+	"aws_autoscaling_policy",
+	"aws_placement_group",
+
 	// AWS ECR
 	"aws_ecr_repository_policy",
+
+	// AWS EKS
+	"aws_eks_addon",
+	"aws_eks_identity_provider_config",
 
 	// AWS Elastic Beanstalk
 	"aws_elastic_beanstalk_application",
@@ -251,6 +305,9 @@ var FreeResources = []string{
 	"aws_elasticache_parameter_group",
 	"aws_elasticache_security_group",
 	"aws_elasticache_subnet_group",
+	"aws_elasticache_user",
+	"aws_elasticache_user_group",
+	"aws_elasticache_user_group_association",
 
 	// "AWS Global Accelerator Listener
 	"aws_globalaccelerator_listener",
@@ -343,6 +400,7 @@ var FreeResources = []string{
 	"aws_ebs_encryption_by_default",
 	"aws_ebs_default_kms_key",
 	"aws_elasticsearch_domain_policy",
+	"aws_opensearch_domain_policy",
 	"aws_key_pair",
 	"aws_launch_configuration",
 	"aws_launch_template",
@@ -374,12 +432,20 @@ var FreeResources = []string{
 	"aws_s3_access_point",
 	"aws_s3_account_public_access_block",
 	"aws_s3_bucket_acl",
+	"aws_s3_bucket_cors_configuration",
+	"aws_s3_bucket_intelligent_tiering_configuration",
+	"aws_s3_bucket_logging",
 	"aws_s3_bucket_metric",
 	"aws_s3_bucket_notification",
 	"aws_s3_bucket_object", // Costs are shown at the bucket level
+	"aws_s3_bucket_object_lock_configuration",
 	"aws_s3_bucket_ownership_controls",
 	"aws_s3_bucket_policy",
 	"aws_s3_bucket_public_access_block",
+	"aws_s3_bucket_replication_configuration",
+	"aws_s3_bucket_server_side_encryption_configuration",
+	"aws_s3_bucket_versioning",
+	"aws_s3_bucket_website_configuration",
 
 	// AWS Secrets Manager
 	"aws_secretsmanager_secret_policy",

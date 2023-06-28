@@ -7,6 +7,7 @@ import (
 	"path"
 	"path/filepath"
 	"runtime/debug"
+	"sort"
 	"strings"
 
 	"github.com/hashicorp/hcl/v2"
@@ -466,9 +467,16 @@ func (p *Parser) loadVarFile(filename string) (map[string]cty.Value, error) {
 
 	variableFile, diags := parseFunc(filename)
 	if diags.HasErrors() {
-		p.logger.WithError(errors.New(diags.Error())).Debugf("could not parse supplied var file %s", filename)
+		// Check the diagnostics aren't all just Attribute Errors.
+		// We can safely ignore these Attribute errors and continue to get the raw attributes.
+		// The first value for the variable will be used.
+		if areDiagnosticsAttributeErrors(diags) {
+			p.logger.WithError(errors.New(diags.Error())).Debugf("duplicate variables detected parsing file %s, using the first values defined", filename)
+		} else {
+			p.logger.WithError(errors.New(diags.Error())).Debugf("could not parse supplied var file %s", filename)
 
-		return inputVars, nil
+			return inputVars, nil
+		}
 	}
 
 	attrs, _ := variableFile.Body.JustAttributes()
@@ -486,6 +494,16 @@ func (p *Parser) loadVarFile(filename string) (map[string]cty.Value, error) {
 
 	p.logger.WithFields(fields).Debugf("adding input vars from file %s", filename)
 	return inputVars, nil
+}
+
+func areDiagnosticsAttributeErrors(diags hcl.Diagnostics) bool {
+	for _, diag := range diags {
+		if diag.Summary != "Attribute redefined" {
+			return false
+		}
+	}
+
+	return true
 }
 
 type file struct {
@@ -536,6 +554,11 @@ func loadDirectory(logger *logrus.Entry, fullPath string, stopOnHCLError bool) (
 	for filename, f := range hclParser.Files() {
 		files = append(files, file{hclFile: f, path: filename})
 	}
+
+	// sort files by path to ensure consistent ordering
+	sort.Slice(files, func(i, j int) bool {
+		return files[i].path < files[j].path
+	})
 
 	return files, nil
 }

@@ -35,4 +35,3 @@ variable "image_" {}
 resource "aws_eip" "eip" {
   network_interface = "test"
 }
-

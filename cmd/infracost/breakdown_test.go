@@ -329,6 +329,16 @@ func TestBreakdownTerragruntWithDashboardEnabled(t *testing.T) {
 	})
 }
 
+func TestBreakdownTerragruntWithMockedFunctions(t *testing.T) {
+	GoldenFileCommandTest(t,
+		testutil.CalcGoldenFileTestdataDirName(), []string{
+			"breakdown",
+			"--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+		}, &GoldenFileOptions{
+			RunTerraformCLI: false,
+		})
+}
+
 func TestBreakdownTerragruntHCLSingle(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terragrunt/prod"}, nil)
 }
@@ -355,6 +365,19 @@ func TestBreakdownTerragruntGetEnv(t *testing.T) {
 		os.Unsetenv("CUSTOM_OS_VAR_PROD")
 	}()
 
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())}, nil)
+}
+
+func TestBreakdownTerragruntGetEnvWithWhitelist(t *testing.T) {
+	os.Setenv("UNSAFE_VAR", "test")
+	os.Setenv("SAFE_VAR", "test-prod")
+	os.Setenv("INFRACOST_SAFE_ENVS", "TEST,SAFE_VAR,FOO")
+	defer func() {
+		os.Unsetenv("UNSAFE_VAR")
+		os.Unsetenv("SAFE_VAR")
+	}()
+
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())}, nil)
 }
 
 func TestBreakdownTerragruntHCLDepsOutputMocked(t *testing.T) {
@@ -400,6 +423,12 @@ func TestBreakdownTerragruntIAMRoles(t *testing.T) {
 }
 
 func TestBreakdownTerragruntExtraArgs(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())}, nil)
+}
+
+func TestBreakdownTerragruntSourceMap(t *testing.T) {
+	t.Setenv("INFRACOST_TERRAFORM_SOURCE_MAP", "git::https://github.com/someorg/terraform_modules.git=../../../../examples")
+
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())}, nil)
 }
 

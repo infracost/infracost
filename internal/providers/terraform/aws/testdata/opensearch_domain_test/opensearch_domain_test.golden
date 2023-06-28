@@ -1,0 +1,28 @@
+
+ Name                                                         Monthly Qty  Unit   Monthly Cost 
+                                                                                               
+ aws_opensearch_domain.gp2                                                                     
+ ├─ Instance (on-demand, c4.2xlarge.search)                         2,190  hours     $1,285.53 
+ ├─ Storage (gp2)                                                     400  GB           $54.00 
+ ├─ Dedicated master (on-demand, c4.8xlarge.search)                   730  hours     $1,713.31 
+ └─ UltraWarm instance (on-demand, ultrawarm1.medium.search)        1,460  hours       $347.48 
+                                                                                               
+ aws_opensearch_domain.io1                                                                     
+ ├─ Instance (on-demand, c4.2xlarge.search)                         2,190  hours     $1,285.53 
+ ├─ Storage (io1)                                                   1,000  GB          $169.00 
+ └─ Storage IOPS (io1)                                                 10  IOPS          $0.88 
+                                                                                               
+ aws_opensearch_domain.std                                                                     
+ ├─ Instance (on-demand, c4.2xlarge.search)                         2,190  hours     $1,285.53 
+ └─ Storage (standard)                                                123  GB            $8.24 
+                                                                                               
+ OVERALL TOTAL                                                                       $6,149.50 
+──────────────────────────────────
+3 cloud resources were detected:
+∙ 3 were estimated
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ TestOpensearchDomain                               ┃ $6,150       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛

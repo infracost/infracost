@@ -2,10 +2,11 @@ package azure
 
 import (
 	"fmt"
+	"sort"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
-	"sort"
 )
 
 // MonitorActionGroup struct represents an Azure Monitor Action Group.
@@ -236,13 +237,10 @@ func (r *MonitorActionGroup) smsMessageCostComponent(countryCode int, count int,
 
 func (r *MonitorActionGroup) voiceCallsCostComponent(countryCode int, count int, quantity *int64) *schema.CostComponent {
 	var meterName string
-	var startUsageAmount string
 	if countryCode == 1 {
 		meterName = "Voice Calls"
-		startUsageAmount = "10" // the first 10 US calls are free
 	} else {
 		meterName = fmt.Sprintf("Voice Calls Voice Call Country Code %d", countryCode)
-		startUsageAmount = "0"
 	}
 
 	return &schema.CostComponent{
@@ -261,7 +259,7 @@ func (r *MonitorActionGroup) voiceCallsCostComponent(countryCode int, count int,
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
-			StartUsageAmount: strPtr(startUsageAmount),
+			StartUsageAmount: strPtr("10"),
 		},
 	}
 }

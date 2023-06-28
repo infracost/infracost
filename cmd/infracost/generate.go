@@ -1,6 +1,10 @@
 package main
 
 import (
+	"bytes"
+	"fmt"
+	"github.com/infracost/infracost/internal/config"
+	"gopkg.in/yaml.v2"
 	"io"
 	"os"
 
@@ -60,37 +64,73 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 		repoPath = g.repoPath
 	}
 
-	var out io.Writer = cmd.OutOrStderr()
-	if g.outFile != "" {
-		var err error
-		out, err = os.Create(g.outFile)
-		if err != nil {
-			ui.PrintErrorf(cmd.ErrOrStderr(), "Could not create out file %s %s", g.outFile, err)
-			return nil
-		}
-	}
+	var buf bytes.Buffer
 
 	m, err := vcs.MetadataFetcher.Get(repoPath, nil)
 	if err != nil {
 		ui.PrintWarningf(cmd.ErrOrStderr(), "could not fetch git metadata err: %s, default template variables will be blank", err)
 	}
 
-	parser := template.NewParser(repoPath, map[string]interface{}{
-		"branch": m.Branch.Name,
-	})
+	variables := template.Variables{
+		Branch: m.Branch.Name,
+	}
+	if m.PullRequest != nil {
+		variables.BaseBranch = m.PullRequest.BaseBranch
+	}
+
+	parser := template.NewParser(repoPath, variables)
 	if g.template != "" {
-		err := parser.Compile(g.template, out)
+		err := parser.Compile(g.template, &buf)
 		if err != nil {
-			ui.PrintErrorf(cmd.ErrOrStderr(), "Could not compile template error: %s", err)
+			return err
+		}
+	} else {
+		err := parser.CompileFromFile(g.templatePath, &buf)
+		if err != nil {
+			return err
+		}
+	}
+
+	// Write the generated YAML
+	var out io.Writer = cmd.OutOrStderr()
+	if g.outFile != "" {
+		var err error
+		out, err = os.Create(g.outFile)
+		if err != nil {
+			return fmt.Errorf("could not create out file %s: %s", g.outFile, err)
+		}
+	}
+
+	// save the contents of the buffer for validation since WriteTo drains the buffer
+	bufStr := buf.String()
+
+	_, err = buf.WriteTo(out)
+	if err != nil {
+		return fmt.Errorf("could not write file %s: %s", g.outFile, err)
+	}
+
+	cmd.Printf("\n")
+
+	// Validate the generated YAML
+	content := []byte(os.ExpandEnv(bufStr))
+
+	var cfgFile config.ConfigFileSpec
+
+	err = yaml.Unmarshal(content, &cfgFile)
+	if err != nil {
+		// we have to make this custom error type checking here
+		// as indentations cause the yaml.Unmarshal to panic
+		// it catches the panic and returns an error but in order
+		// not to stutter the errors we should check here for
+		// our custom error type.
+		if _, ok := err.(*config.YamlError); ok {
+			return fmt.Errorf("invalid config file: %s", err)
 		}
 
-		return nil
+		// if we receive a caught panic error, wrap the message in something more user-friendly
+		return fmt.Errorf("could not validate generated config file, check file syntax: %s", err)
 	}
 
-	err = parser.CompileFromFile(g.templatePath, out)
-	if err != nil {
-		ui.PrintErrorf(cmd.ErrOrStderr(), "Could not compile template error: %s", err)
-	}
 	return nil
 }
 

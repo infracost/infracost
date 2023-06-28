@@ -1,0 +1,111 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "$ref": "#/definitions/ConfigFileSpec",
+  "definitions": {
+    "ConfigFileSpec": {
+      "required": [
+        "version",
+        "projects"
+      ],
+      "properties": {
+        "version": {
+          "type": "string"
+        },
+        "projects": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/Project"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "Project": {
+      "required": [
+        "path"
+      ],
+      "properties": {
+        "config_sha": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "exclude_paths": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "dependency_paths": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "include_all_paths": {
+          "type": "boolean"
+        },
+        "name": {
+          "type": "string"
+        },
+        "terraform_var_files": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "terraform_vars": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "terraform_force_cli": {
+          "type": "boolean"
+        },
+        "terraform_plan_flags": {
+          "type": "string"
+        },
+        "terraform_init_flags": {
+          "type": "string"
+        },
+        "terraform_binary": {
+          "type": "string"
+        },
+        "terraform_workspace": {
+          "type": "string"
+        },
+        "terraform_cloud_host": {
+          "type": "string"
+        },
+        "terraform_cloud_token": {
+          "type": "string"
+        },
+        "terragrunt_flags": {
+          "type": "string"
+        },
+        "usage_file": {
+          "type": "string"
+        },
+        "terraform_use_state": {
+          "type": "boolean"
+        },
+        "env": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    }
+  }
+}

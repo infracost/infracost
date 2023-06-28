@@ -1,0 +1,60 @@
+
+ Name                                                                         Monthly Qty  Unit                      Monthly Cost 
+                                                                                                                                  
+ azurerm_logic_app_standard.logic_app_standard["WS1"]                                                                             
+ ├─ Workflow vCore (WS1)                                                                1  vCore                          $143.96 
+ ├─ Workflow memory (WS1)                                                             3.5  GB                              $36.03 
+ ├─ Standard connectors                                                Monthly cost depends on usage: $0.000125 per calls         
+ └─ Enterprise connectors                                              Monthly cost depends on usage: $0.001 per calls            
+                                                                                                                                  
+ azurerm_logic_app_standard.logic_app_standard["WS2"]                                                                             
+ ├─ Workflow vCore (WS2)                                                                2  vCore                          $287.91 
+ ├─ Workflow memory (WS2)                                                               7  GB                              $72.05 
+ ├─ Standard connectors                                                Monthly cost depends on usage: $0.000125 per calls         
+ └─ Enterprise connectors                                              Monthly cost depends on usage: $0.001 per calls            
+                                                                                                                                  
+ azurerm_logic_app_standard.logic_app_standard["WS3"]                                                                             
+ ├─ Workflow vCore (WS3)                                                                4  vCore                          $575.82 
+ ├─ Workflow memory (WS3)                                                              14  GB                             $144.10 
+ ├─ Standard connectors                                                Monthly cost depends on usage: $0.000125 per calls         
+ └─ Enterprise connectors                                              Monthly cost depends on usage: $0.001 per calls            
+                                                                                                                                  
+ azurerm_logic_app_standard.logic_app_standard_unknown_sku                                                                        
+ ├─ Workflow vCore (unknown SKU)                                       Monthly cost depends on usage: $143.96 per vCore           
+ ├─ Workflow memory (unknown SKU)                                      Monthly cost depends on usage: $10.29 per GB               
+ ├─ Standard connectors                                                Monthly cost depends on usage: $0.000125 per calls         
+ └─ Enterprise connectors                                              Monthly cost depends on usage: $0.001 per calls            
+                                                                                                                                  
+ azurerm_logic_app_standard.logic_app_standard_unknown_sku_with_usage                                                             
+ ├─ Workflow vCore (WS1)                                                                1  vCore                          $143.96 
+ ├─ Workflow memory (WS1)                                                             3.5  GB                              $36.03 
+ ├─ Standard connectors                                                         2,000,000  calls                          $250.00 
+ └─ Enterprise connectors                                                       1,000,000  calls                        $1,000.00 
+                                                                                                                                  
+ azurerm_logic_app_standard.logic_app_standard_with_usage                                                                         
+ ├─ Workflow vCore (WS1)                                                                1  vCore                          $143.96 
+ ├─ Workflow memory (WS1)                                                             3.5  GB                              $36.03 
+ ├─ Standard connectors                                                         2,000,000  calls                          $250.00 
+ └─ Enterprise connectors                                                       1,000,000  calls                        $1,000.00 
+                                                                                                                                  
+ azurerm_storage_account.storage_account                                                                                          
+ ├─ Capacity                                                           Monthly cost depends on usage: $0.0196 per GB              
+ ├─ Write operations                                                   Monthly cost depends on usage: $0.054 per 10k operations   
+ ├─ List and create container operations                               Monthly cost depends on usage: $0.054 per 10k operations   
+ ├─ Read operations                                                    Monthly cost depends on usage: $0.0043 per 10k operations  
+ ├─ All other operations                                               Monthly cost depends on usage: $0.0043 per 10k operations  
+ └─ Blob index                                                         Monthly cost depends on usage: $0.039 per 10k tags         
+                                                                                                                                  
+ OVERALL TOTAL                                                                                                          $4,119.83 
+──────────────────────────────────
+11 cloud resources were detected:
+∙ 7 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 4 were free:
+  ∙ 3 x azurerm_app_service_plan
+  ∙ 1 x azurerm_resource_group
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ TestLogicAppStandard                               ┃ $4,120       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛

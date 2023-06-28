@@ -1,0 +1,21 @@
+
+ Name                                                    Monthly Qty  Unit                Monthly Cost 
+                                                                                                       
+ azurerm_network_watcher.network_watcher                                                               
+ └─ Network diagnostic tool (over 1,000 checks)      Monthly cost depends on usage: $0.001 per checks  
+                                                                                                       
+ azurerm_network_watcher.network_watcher_with_usage                                                    
+ └─ Network diagnostic tool (over 1,000 checks)                9,000  checks                     $9.00 
+                                                                                                       
+ OVERALL TOTAL                                                                                   $9.00 
+──────────────────────────────────
+3 cloud resources were detected:
+∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 1 was free:
+  ∙ 1 x azurerm_resource_group
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ TestNetworkWatcher                                 ┃ $9           ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛

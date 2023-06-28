@@ -3,8 +3,8 @@ package output
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
-	"github.com/pkg/errors"
 	"os"
 	"regexp"
 	"sort"
@@ -12,10 +12,12 @@ import (
 	"time"
 
 	"github.com/infracost/infracost/internal/providers/pulumi"
+	"github.com/shopspring/decimal"
+	"github.com/tidwall/gjson"
+
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/infracost/infracost/internal/usage"
-	"github.com/shopspring/decimal"
 )
 
 var outputVersion = "0.2"
@@ -25,8 +27,10 @@ type Root struct {
 	Metadata             Metadata         `json:"metadata"`
 	RunID                string           `json:"runId,omitempty"`
 	ShareURL             string           `json:"shareUrl,omitempty"`
+	CloudURL             string           `json:"cloudUrl,omitempty"`
 	Currency             string           `json:"currency"`
 	Projects             Projects         `json:"projects"`
+	TagPolicies          []TagPolicy      `json:"tagPolicies,omitempty"`
 	TotalHourlyCost      *decimal.Decimal `json:"totalHourlyCost"`
 	TotalMonthlyCost     *decimal.Decimal `json:"totalMonthlyCost"`
 	PastTotalHourlyCost  *decimal.Decimal `json:"pastTotalHourlyCost"`
@@ -37,6 +41,33 @@ type Root struct {
 	Summary              *Summary         `json:"summary"`
 	FullSummary          *Summary         `json:"-"`
 	IsCIRun              bool             `json:"-"`
+}
+
+// TagPolicy holds information if a given run has applicable tag policy checks.
+// This struct is returned from the tag policies API and used to create tag policy outputs.
+type TagPolicy struct {
+	Name        string              `json:"name"`
+	TagPolicyID string              `json:"tagPolicyId"`
+	Message     string              `json:"message"`
+	PrComment   bool                `json:"prComment"`
+	BlockPr     bool                `json:"blockPr"`
+	Resources   []TagPolicyResource `json:"resources"`
+}
+
+type TagPolicyResource struct {
+	Address              string                `json:"address"`
+	ResourceType         string                `json:"resourceType"`
+	Path                 string                `json:"path"`
+	Line                 int                   `json:"line"`
+	ProjectNames         []string              `json:"projectNames"`
+	MissingMandatoryTags []string              `json:"missingMandatoryTags"`
+	InvalidTags          []TagPolicyInvalidTag `json:"invalidTags"`
+}
+
+type TagPolicyInvalidTag struct {
+	Key         string   `json:"key"`
+	ValidValues []string `json:"validValues"`
+	ValidRegex  string   `json:"validRegex"`
 }
 
 type Project struct {
@@ -77,12 +108,14 @@ func convertOutputResources(outResources []Resource) []*schema.Resource {
 	for i, resource := range outResources {
 		resources[i] = &schema.Resource{
 			Name:           resource.Name,
+			Metadata:       convertMetadata(resource.Metadata),
 			CostComponents: convertCostComponents(resource.CostComponents),
 			ActualCosts:    convertActualCosts(resource.ActualCosts),
 			SubResources:   convertOutputResources(resource.SubResources),
+			Tags:           resource.Tags,
 			HourlyCost:     resource.HourlyCost,
 			MonthlyCost:    resource.MonthlyCost,
-			ResourceType:   resource.ResourceType(),
+			ResourceType:   resource.ResourceType,
 		}
 	}
 
@@ -125,6 +158,18 @@ func convertActualCosts(outActualCosts []ActualCosts) []*schema.ActualCosts {
 	}
 
 	return actualCosts
+}
+
+func convertMetadata(metadata map[string]interface{}) map[string]gjson.Result {
+	result := make(map[string]gjson.Result)
+	for k, v := range metadata {
+		jsonBytes, err := json.Marshal(v)
+		if err == nil {
+			result[k] = gjson.ParseBytes(jsonBytes)
+		}
+	}
+
+	return result
 }
 
 type Projects []Project
@@ -204,6 +249,7 @@ type ActualCosts struct {
 
 type Resource struct {
 	Name           string                 `json:"name"`
+	ResourceType   string                 `json:"resourceType,omitempty"`
 	Tags           map[string]string      `json:"tags,omitempty"`
 	Metadata       map[string]interface{} `json:"metadata"`
 	HourlyCost     *decimal.Decimal       `json:"hourlyCost"`
@@ -211,16 +257,6 @@ type Resource struct {
 	CostComponents []CostComponent        `json:"costComponents,omitempty"`
 	ActualCosts    []ActualCosts          `json:"actualCosts,omitempty"`
 	SubResources   []Resource             `json:"subresources,omitempty"`
-}
-
-func (r Resource) ResourceType() string {
-	pieces := strings.Split(r.Name, ".")
-
-	if len(pieces) >= 2 {
-		return pieces[len(pieces)-2]
-	}
-
-	return r.Name
 }
 
 type Summary struct {
@@ -255,6 +291,7 @@ type Options struct {
 	Fields            []string
 	IncludeHTML       bool
 	PolicyChecks      PolicyCheck
+	TagPolicyCheck    TagPolicyCheck
 	GuardrailCheck    GuardrailCheck
 	diffMsg           string
 	CurrencyFormat    string
@@ -291,6 +328,87 @@ func (p PolicyCheckFailures) Error() string {
 	return out.String()
 }
 
+// TagPolicyCheck holds information if a given run has any tag policies enabled.
+// This struct is used in templates to create useful cost policy outputs.
+type TagPolicyCheck struct {
+	FailingTagPolicies []TagPolicy
+	WarningTagPolicies []TagPolicy
+	PassingTagPolicies []TagPolicy
+}
+
+func NewTagPolicyChecks(tps []TagPolicy) TagPolicyCheck {
+	tpc := TagPolicyCheck{}
+
+	for _, tp := range tps {
+		if !tp.PrComment {
+			continue
+		}
+
+		if len(tp.Resources) == 0 {
+			tpc.PassingTagPolicies = append(tpc.PassingTagPolicies, tp)
+			continue
+		}
+
+		if tp.BlockPr {
+			tpc.FailingTagPolicies = append(tpc.FailingTagPolicies, tp)
+		} else {
+			tpc.WarningTagPolicies = append(tpc.WarningTagPolicies, tp)
+		}
+	}
+
+	return tpc
+}
+
+func (tpc TagPolicyCheck) Error() string {
+	if len(tpc.FailingTagPolicies) == 0 {
+		return ""
+	}
+
+	out := bytes.NewBuffer([]byte("Tag policy check failed:\n"))
+
+	for _, tp := range tpc.FailingTagPolicies {
+		fmt.Fprintf(out, "\n  %s: %s\n", tp.Name, tp.Message)
+		for _, r := range tp.Resources {
+			fmt.Fprintf(out, "    %s in project(s) %s\n", r.Address, strings.Join(r.ProjectNames, ", "))
+			for _, f := range r.Failures() {
+				fmt.Fprintf(out, "    - %s\n", f)
+			}
+		}
+	}
+
+	return out.String()
+}
+
+func (r TagPolicyResource) Failures() []string {
+	var f []string
+	if len(r.MissingMandatoryTags) > 0 {
+		var tags []string
+		for i, tag := range r.MissingMandatoryTags {
+			if i > 1 && i == len(r.MissingMandatoryTags) {
+				tags = append(tags, fmt.Sprintf("and \"%s\"", tag))
+			} else {
+				tags = append(tags, fmt.Sprintf("\"%s\"", tag))
+			}
+		}
+		f = append(f, fmt.Sprintf("should have mandatory tags: %s", strings.Join(tags, ", ")))
+	}
+
+	for _, invalidTag := range r.InvalidTags {
+		if len(invalidTag.ValidValues) > 0 {
+			var validValues []string
+			for _, value := range invalidTag.ValidValues {
+				validValues = append(validValues, fmt.Sprintf("\"%s\"", value))
+			}
+			f = append(f, fmt.Sprintf("should have a valid value for \"%s\" tag: %s", invalidTag.Key, strings.Join(validValues, ", ")))
+		}
+		if invalidTag.ValidRegex != "" {
+			f = append(f, fmt.Sprintf("should have a valid value for \"%s\" tag: must match regex <code>%s</code>", invalidTag.Key, invalidTag.ValidRegex))
+		}
+	}
+
+	return f
+}
+
 // GuardrailCheck holds information if a given run has applicable guardrail checks.
 // This struct is used to create guardrail outputs.
 type GuardrailCheck struct {
@@ -314,6 +432,9 @@ type GuardrailEvent struct {
 
 	// BlockPR indicated whether this guardrail event should return a failure blocking the PR
 	BlockPR bool `json:"blockPr"`
+
+	// UnblockedAt indicates when the event was unblocked in Infracost Cloud.
+	UnblockedAt *string `json:"unblockedAt"`
 }
 
 // LoadGuardrailCheck reads the file at the path  into a GuardrailCheck struct.
@@ -366,6 +487,59 @@ func (g GuardrailCheck) BlockingFailures() GuardrailFailures {
 		}
 	}
 	return failures
+}
+
+// WarningFailures returns a list of failures that don't block the PR but are advisory.
+func (g GuardrailCheck) WarningFailures() GuardrailFailures {
+	var failures GuardrailFailures
+	for _, event := range g.GuardrailEvents {
+		if !event.BlockPR && event.PRComment && event.UnblockedAt == nil {
+			failures = append(failures, event.TriggerReason)
+		}
+	}
+	return failures
+}
+
+// UnblockedFailures returns a list of failures that have been unblocked in infracost cloud.
+func (g GuardrailCheck) UnblockedFailures() GuardrailFailures {
+	var failures GuardrailFailures
+	for _, event := range g.GuardrailEvents {
+		if event.PRComment && event.UnblockedAt != nil {
+			failures = append(failures, event.TriggerReason)
+		}
+	}
+	return failures
+}
+
+// IsBlocking returns if the GuardrailCheck has any Blocking failures.
+func (g GuardrailCheck) IsBlocking() bool {
+	return len(g.BlockingFailures()) > 0
+}
+
+// IsUnblocked returns if the GuardrailCheck has been unblocked from Infracost Cloud.
+func (g GuardrailCheck) IsUnblocked() bool {
+	if g.IsBlocking() {
+		return false
+	}
+
+	if len(g.WarningFailures()) > 0 {
+		return false
+	}
+
+	return true
+}
+
+// Title returns a short description of the check with an emoji.
+func (g GuardrailCheck) Title() string {
+	if g.IsBlocking() {
+		return "❌ Guardrails triggered (needs action)"
+	}
+
+	if g.IsUnblocked() {
+		return "✅ Guardrails passed"
+	}
+
+	return "⚠️ Guardrails triggered"
 }
 
 // GuardrailFailures defines a list of guardrail failures that were returned from infracost cloud.
@@ -435,6 +609,7 @@ func outputResource(r *schema.Resource) Resource {
 
 	return Resource{
 		Name:           r.Name,
+		ResourceType:   r.ResourceType,
 		Metadata:       metadata,
 		Tags:           r.Tags,
 		HourlyCost:     r.HourlyCost,

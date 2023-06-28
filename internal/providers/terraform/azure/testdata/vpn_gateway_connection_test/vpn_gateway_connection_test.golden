@@ -17,3 +17,9 @@
   ∙ 1 x azurerm_virtual_wan
 ∙ 1 is not supported yet, see https://infracost.io/requested-resources:
   ∙ 1 x azurerm_vpn_site
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ TestVpnGatewayConnectionGoldenFile                 ┃ $300         ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛

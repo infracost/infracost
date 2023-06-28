@@ -1,0 +1,23 @@
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_get_env_with_whitelist
+
+Errors:
+  Error processing module at 'REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_get_env_with_whitelist/dev/terragrunt.hcl'. How this module was found:
+    Terragrunt config file found in a subdirectory of testdata/breakdown_terragrunt_get_env_with_whitelist. Underlying error:
+      REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_get_env_with_whitelist/dev/terragrunt.hcl:6,9-17:
+        Error in function call; Call to function "get_env" failed:
+          EnvVarNotFound:
+            Required environment variable UNSAFE_VAR - not found.
+
+ OVERALL TOTAL       $0.00 
+──────────────────────────────────
+No cloud resources were detected
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                                          ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infraco...ragrunt_get_env_with_whitelist ┃ $0.00        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+
+Err:
+
+

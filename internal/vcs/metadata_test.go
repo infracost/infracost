@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -83,6 +84,76 @@ func Test_urlStringToRemote(t *testing.T) {
 			}
 		})
 	}
+}
+func Test_metadataFetcher_GetAzureMetadata(t *testing.T) {
+	tmp := t.TempDir()
+	mux := &http.ServeMux{}
+	mux.HandleFunc("/_apis/git/repositories/myrepo/pullRequests/456", func(w http.ResponseWriter, r *http.Request) {
+		t.Helper()
+
+		assert.Equal(t, "Basic YXpkbzp0ZXN0LXRva2Vu", r.Header.Get("Authorization"))
+		_, err := w.Write([]byte(`{
+			"title": "pr title",
+			"createdBy": { "uniqueName": "test-user" }
+		}`))
+		assert.NoError(t, err)
+	})
+
+	s := httptest.NewServer(mux)
+	defer s.Close()
+
+	_, lastCommit := createLocalRepoWithCommits(t, tmp)
+	t.Setenv("GITHUB_ACTIONS", "")
+	t.Setenv("BUILD_REPOSITORY_PROVIDER", "tfsgit")
+	t.Setenv("BUILD_REPOSITORY_URI", "https://user@dev.azure.com/org/project/_git/myrepo")
+	t.Setenv("BUILD_BUILDID", "123")
+	t.Setenv("SYSTEM_PULLREQUEST_PULLREQUESTID", "456")
+	t.Setenv("SYSTEM_PULLREQUEST_SOURCEREPOSITORYURI", "https://user@dev.azure.com/org/project/_git/myrepo")
+	t.Setenv("SYSTEM_PULLREQUEST_SOURCEBRANCH", "test")
+	t.Setenv("SYSTEM_PULLREQUEST_TARGETBRANCH", "main")
+	t.Setenv("SYSTEM_ACCESSTOKEN", "test-token")
+	t.Setenv("SYSTEM_COLLECTIONURI", fmt.Sprintf("%s/", s.URL))
+	t.Setenv("BUILD_REPOSITORY_ID", "myrepo")
+
+	test := false
+	m := metadataFetcher{
+		mu:     &sync.KeyMutex{},
+		client: &http.Client{Timeout: time.Second * 5},
+		test:   &test,
+	}
+
+	actual, err := m.Get(tmp, nil)
+	assert.NoError(t, err)
+	assert.Equal(t, Metadata{
+		Remote: Remote{
+			Host: "dev.azure.com",
+			Name: "org/project/myrepo",
+			URL:  "https://dev.azure.com/org/project/_git/myrepo",
+		},
+		Branch: Branch{
+			Name: "master",
+		},
+		Commit: Commit{
+			SHA:         lastCommit.Hash.String(),
+			AuthorName:  lastCommit.Author.Name,
+			AuthorEmail: lastCommit.Author.Email,
+			Time:        lastCommit.Author.When,
+			Message:     lastCommit.Message,
+			ChangedObjects: []string{
+				filepath.Join(tmp, "added-file"),
+			},
+		},
+		PullRequest: &PullRequest{
+			ID:           "456",
+			Title:        "pr title",
+			Author:       "test-user",
+			VCSProvider:  "azure_devops_tfsgit",
+			SourceBranch: "test",
+			BaseBranch:   "main",
+			URL:          "https://dev.azure.com/org/project/_git/myrepo/pullrequest/456",
+		},
+		Pipeline: &Pipeline{ID: "123"},
+	}, actual)
 }
 
 func Test_metadataFetcher_GetLocalMetadata(t *testing.T) {

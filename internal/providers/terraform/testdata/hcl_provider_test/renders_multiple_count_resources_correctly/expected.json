@@ -23,7 +23,10 @@
                   "blockName": "aws_eip.test"
                 }
               ],
-              "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf"
+              "checksum": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+              "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf",
+              "startLine": 9,
+              "endLine": 11
             }
           },
           {
@@ -44,7 +47,10 @@
                   "blockName": "aws_eip.test"
                 }
               ],
-              "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf"
+              "checksum": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+              "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf",
+              "startLine": 9,
+              "endLine": 11
             }
           },
           {
@@ -62,7 +68,10 @@
                   "blockName": "aws_eip.constant_string"
                 }
               ],
-              "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf"
+              "checksum": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+              "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf",
+              "startLine": 13,
+              "endLine": 15
             }
           }
         ],
@@ -95,7 +104,10 @@
                       "blockName": "aws_autoscaling_group.test"
                     }
                   ],
-                  "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf"
+                  "checksum": "f0c87793d3c6b4b19ccf1b6a7eccf106b9b3cfdafec8f16359727dd53edd6865",
+                  "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
+                  "startLine": 10,
+                  "endLine": 16
                 }
               },
               {
@@ -124,7 +136,10 @@
                       "blockName": "aws_autoscaling_group.test"
                     }
                   ],
-                  "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf"
+                  "checksum": "1f8d5081c67ded1bb0dd45d54ff0f03cb1eab281def132caa8cf184956110224",
+                  "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
+                  "startLine": 10,
+                  "endLine": 16
                 }
               },
               {
@@ -153,7 +168,10 @@
                       "blockName": "aws_autoscaling_group.test"
                     }
                   ],
-                  "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf"
+                  "checksum": "e48b291e338bee88019756aaced62776e1e35cf1deef934992bd94baa3ffc1b0",
+                  "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
+                  "startLine": 10,
+                  "endLine": 16
                 }
               },
               {
@@ -180,7 +198,10 @@
                       "blockName": "aws_launch_configuration.test"
                     }
                   ],
-                  "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf"
+                  "checksum": "b51f3e0ff3b94ec8d014a47c671c0ca9ffdb2a6dea6af555f3a48b6800f51267",
+                  "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
+                  "startLine": 18,
+                  "endLine": 22
                 }
               },
               {
@@ -207,7 +228,10 @@
                       "blockName": "aws_launch_configuration.test"
                     }
                   ],
-                  "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf"
+                  "checksum": "8dd75533fed604af2ca138b7a243c4b8babc937412de7bf6151013924f59f165",
+                  "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
+                  "startLine": 18,
+                  "endLine": 22
                 }
               },
               {
@@ -234,7 +258,10 @@
                       "blockName": "aws_launch_configuration.test"
                     }
                   ],
-                  "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf"
+                  "checksum": "e31b984f3a1a32d61f47736f70b8769109b8fa1cd88ed954ac1626a9023ed764",
+                  "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
+                  "startLine": 18,
+                  "endLine": 22
                 }
               }
             ],
@@ -265,7 +292,10 @@
                 "blockName": "aws_eip.test"
               }
             ],
-            "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf"
+            "checksum": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+            "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf",
+            "startLine": 9,
+            "endLine": 11
           }
         },
         {
@@ -286,7 +316,10 @@
                 "blockName": "aws_eip.test"
               }
             ],
-            "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf"
+            "checksum": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+            "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf",
+            "startLine": 9,
+            "endLine": 11
           }
         },
         {
@@ -304,7 +337,10 @@
                 "blockName": "aws_eip.constant_string"
               }
             ],
-            "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf"
+            "checksum": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+            "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/main.tf",
+            "startLine": 13,
+            "endLine": 15
           }
         }
       ],
@@ -337,7 +373,10 @@
                     "blockName": "aws_autoscaling_group.test"
                   }
                 ],
-                "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf"
+                "checksum": "f0c87793d3c6b4b19ccf1b6a7eccf106b9b3cfdafec8f16359727dd53edd6865",
+                "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
+                "startLine": 10,
+                "endLine": 16
               }
             },
             {
@@ -366,7 +405,10 @@
                     "blockName": "aws_autoscaling_group.test"
                   }
                 ],
-                "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf"
+                "checksum": "1f8d5081c67ded1bb0dd45d54ff0f03cb1eab281def132caa8cf184956110224",
+                "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
+                "startLine": 10,
+                "endLine": 16
               }
             },
             {
@@ -395,7 +437,10 @@
                     "blockName": "aws_autoscaling_group.test"
                   }
                 ],
-                "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf"
+                "checksum": "e48b291e338bee88019756aaced62776e1e35cf1deef934992bd94baa3ffc1b0",
+                "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
+                "startLine": 10,
+                "endLine": 16
               }
             },
             {
@@ -422,7 +467,10 @@
                     "blockName": "aws_launch_configuration.test"
                   }
                 ],
-                "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf"
+                "checksum": "b51f3e0ff3b94ec8d014a47c671c0ca9ffdb2a6dea6af555f3a48b6800f51267",
+                "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
+                "startLine": 18,
+                "endLine": 22
               }
             },
             {
@@ -449,7 +497,10 @@
                     "blockName": "aws_launch_configuration.test"
                   }
                 ],
-                "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf"
+                "checksum": "8dd75533fed604af2ca138b7a243c4b8babc937412de7bf6151013924f59f165",
+                "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
+                "startLine": 18,
+                "endLine": 22
               }
             },
             {
@@ -476,7 +527,10 @@
                     "blockName": "aws_launch_configuration.test"
                   }
                 ],
-                "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf"
+                "checksum": "e31b984f3a1a32d61f47736f70b8769109b8fa1cd88ed954ac1626a9023ed764",
+                "filename": "testdata/hcl_provider_test/renders_multiple_count_resources_correctly/modules/autoscaling/main.tf",
+                "startLine": 18,
+                "endLine": 22
               }
             }
           ],

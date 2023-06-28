@@ -937,6 +937,12 @@ resource_usage:
   azurerm_dns_txt_record.my_txt_record:
     monthly_queries: 11500000000  # Monthly number of DNS queries
 
+  azurerm_eventgrid_topic.my_topic:
+    monthly_operations: 100000  # Monthly number of operations above the free 100k operation limit.
+
+  azurerm_eventgrid_system_topic.my_topic:
+    monthly_operations: 100000  # Monthly number of operations above the free 100k operation limit.
+
   azurerm_eventhub_namespace.my_event_hub:
     monthly_ingress_events: 100000000 # Monthly number of ingress events, only applicable for Basic and Standard namespaces.
     retention_storage_gb: 10000       # Total data stored for retention in GB, used to calculate Extended Retention costs, only applicable for Dedicated namespaces.
@@ -973,10 +979,12 @@ resource_usage:
       monthly_data_processed_gb: 100 # Monthly inbound and outbound data processed in GB.
 
     default_node_pool:
-      nodes: 2 # Node count for the default node pool.
+      nodes: 2         # Node count for the default node pool.
+      monthly_hrs: 730 # Monthly hours for the default node pool.
 
   azurerm_kubernetes_cluster_node_pool.my_node_pool:
-    nodes: 3 # Node count for the node pool.
+    nodes: 3         # Node count for the node pool.
+    monthly_hrs: 450 # Monthly hours for the default node pool.
 
   azurerm_container_registry.my_registry:
     storage_gb: 150
@@ -991,10 +999,18 @@ resource_usage:
   azurerm_iothub_dps.my_iothub_dps:
     monthly_operations: 10000 # Monthly number of device provisioning operations
 
+  azurerm_image.my_image:
+    storage_gb: 1000 # Total size of image storage in GB.
+
   azurerm_linux_virtual_machine.my_linux_vm:
     monthly_hrs: 450 # Monthly number of hours the instance ran for.
     os_disk:
       monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB.
+
+  azurerm_logic_app_standard.my_logic_app_standard:
+    sku: WS1                                    # Sets the SKU if it cannot be detected from the App Service Plan
+    monthly_standard_connector_calls: 1000000   # Monthly number of Standard Connector calls.
+    monthly_enterprise_connector_calls: 1000000 # Monthly number of Enterprise Connector calls.
 
   azurerm_key_vault_certificate.my_certificate:
     monthly_certificate_renewal_requests: 100    # Monthly number of certificate renewal requests.
@@ -1035,6 +1051,10 @@ resource_usage:
     backup_storage_gb: 500               # Number of GBs used by Point-In-Time Restore (PITR) backup storage.
     extra_data_storage_gb: 250           # Override number of GBs used by extra data storage.
 
+  azurerm_mssql_managed_instance.my_database:
+    backup_storage_gb: 100            # Number of GBs used by Point-In-Time Restore (PITR) backup storage.
+    long_term_retention_storage_gb: 5 # Number of GBs used by long-term retention backup storage.
+
   azurerm_mysql_flexible_server.my_flexible_server:
     additional_backup_storage_gb: 5000 # Additional backup storage in GB. If geo-redundancy is enabled, you should set this to twice the required storage capacity.
 
@@ -1043,6 +1063,15 @@ resource_usage:
 
   azurerm_nat_gateway.my_gateway:
     monthly_data_processed_gb: 10 # Monthly data processed by the NAT Gateway in GB.
+
+  azurerm_network_watcher.my_watcher:
+    monthly_diagnostic_checks: 10000 # Monthly number of diagnostic API calls.
+
+  azurerm_network_watcher_flow_log.my_flow_log:
+    monthly_logs_collected_gb: 100 # Monthly amount of logs collected in GB.
+
+  azurerm_network_connection_monitor.my_connection_monitor:
+    tests: 100000 # Overrides the number of tests done in the connection monitor
 
   azurerm_virtual_network_peering.my_peering:
     monthly_data_transfer_gb: 100 # Monthly inbound/outbound data transferred by the VNET peering in GB.
@@ -1089,8 +1118,33 @@ resource_usage:
   azurerm_search_service.my_service:
     monthly_images_extracted: 1000000 # Monthly number of extracted images
 
+  azurerm_security_center_subscription_pricing.my_subscription_pricing:
+    cosmosdb_request_units: 100 # Average number of RUs/hour for Microsoft Defender for Azure Cosmos DB. Applied when resource_type = CosmosDbs.
+    monthly_app_service_nodes: 10 # Monthly number of App Service nodes for Microsoft Defender for App Service. Applied when resource_type = AppServices.
+    monthly_arm_api_calls: 10000000 # Monthly number of API calls for Microsoft Defender for ARM. Applied when resource_type = Arm.
+    monthly_container_registry_images: 10 # Monthly number of images for Microsoft Defender for Container Registries. Applied when resource_type = ContainerRegistry.
+    monthly_containers_vcores: 20 # Monthly number of vCores for Microsoft Defender for Containers. Applied when resource_type = Containers.
+    monthly_dns_queries: 10000000 # Monthly number of queries for Microsoft Defender for DNS. Applied when resource_type = Dns.
+    monthly_key_vault_transactions: 1000000 # Monthly number of transactions for Microsoft Defender for Key Vault. Applied when resource_type = KeyVaults.
+    monthly_kubernetes_cores: 10 # Monthly number of cores for Microsoft Defender for Kubernetes. Applied when resource_type = KubernetesService.
+    monthly_mariadb_instances: 10 # Monthly number of instances for Microsoft Defender for MariaDB. Applied when resource_type = OpenSourceRelationalDatabases.
+    monthly_mysql_instances: 10 # Monthly number of instances for Microsoft Defender for MySQL. Applied when resource_type = OpenSourceRelationalDatabases.
+    monthly_postgresql_instances: 10 # Monthly number of instances for Microsoft Defender for PostgreSQL. Applied when resource_type = OpenSourceRelationalDatabases.
+    monthly_servers_plan_1_nodes: 10 # Monthly number of servers for Microsoft Defender for Servers Plan 1. Applied when resource_type = VirtualMachines.
+    monthly_servers_plan_2_nodes: 10 # Monthly number of servers for Microsoft Defender for Servers Plan 2. Applied when resource_type = VirtualMachines.
+    monthly_sql_azure_connected_instances: 10 # Monthly number of instances for Microsoft Defender for SQL on Azure-connected databases. Applied when resource_type = SqlServerVirtualMachines.
+    monthly_sql_outside_azure_vcores: 20 # Monthly number of vCores for Microsoft Defender for SQL outside Azure. Applied when resource_type = SqlServers.
+    monthly_storage_accounts: 1 # Monthly number of storage accounts for Microsoft Defender for Storage. Applied when resource_type = StorageAccounts.
+
+  azurerm_servicebus_namespace.my_servicebus_namespace:
+    monthly_messaging_operations: 3000000000 # Monthly number of messaging operations, used for Standard tier only
+    monthly_brokered_connections: 1000000 # Monthly number of brokered connections, used for Standard tier only
+
   azurerm_signalr_service.my_service:
     monthly_additional_messages: 1000000 # Monthly number of messages above the included 1M per unit per day
+
+  azurerm_snapshot.my_snapshot:
+    storage_gb: 1000 # Total size of snapshot disk in GB.
 
   azurerm_storage_account.my_account:
     data_at_rest_storage_gb: 10000                        # Total size of Data at Rest in GB (File storage).

@@ -1,0 +1,17 @@
+version: 0.1
+
+projects:
+    - name: dev
+      terraform_var_files:
+        - environment/dev/terraform.tfvars
+    - name: prod
+      terraform_var_files:
+        - environment/prod/terraform.tfvars
+
+
+Err:
+Error: invalid config file: config file is invalid, see https://infracost.io/config-file for valid options:
+	project config at index 0 was invalid:
+		project must have a valid path definition
+	project config at index 1 was invalid:
+		project must have a valid path definition

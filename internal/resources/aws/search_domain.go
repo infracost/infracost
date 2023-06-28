@@ -10,7 +10,27 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-type ElasticsearchDomain struct {
+// SearchDomain struct represents a managed search domain for both Amazon OpenSearch Service
+// (formerly known as Amazon Elasticsearch Service) and AWS Elasticsearch Domain. These services
+// provide fully managed search and analytics engines based on Elasticsearch and OpenSearch,
+// respectively, allowing you to easily deploy, secure, and scale search solutions.
+//
+// Amazon OpenSearch Service and AWS Elasticsearch Domain offer a variety of instance types and
+// configurations to accommodate different workloads, including dedicated master nodes, warm nodes,
+// and EBS storage options. The pricing depends on the chosen instance types, instance counts,
+// storage options, and additional features.
+//
+// For more information about Amazon OpenSearch Service and AWS Elasticsearch Domain functionality
+// and pricing, refer to the following links:
+//
+// Amazon OpenSearch Service:
+// Resource information: https://aws.amazon.com/opensearch-service/
+// Pricing information: https://aws.amazon.com/opensearch-service/pricing/
+//
+// AWS Elasticsearch Domain:
+// Resource information: https://aws.amazon.com/elasticsearch-service/
+// Pricing information: https://aws.amazon.com/elasticsearch-service/pricing/
+type SearchDomain struct {
 	Address              string
 	Region               string
 	ClusterInstanceType  string
@@ -32,11 +52,11 @@ type ElasticsearchDomain struct {
 
 var ElasticsearchDomainUsageSchema = []*schema.UsageItem{}
 
-func (r *ElasticsearchDomain) PopulateUsage(u *schema.UsageData) {
+func (r *SearchDomain) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-func (r *ElasticsearchDomain) BuildResource() *schema.Resource {
+func (r *SearchDomain) BuildResource() *schema.Resource {
 	defaultClusterInstanceType := "m4.large.elasticsearch"
 
 	instanceType := defaultClusterInstanceType
@@ -213,7 +233,7 @@ func (r *ElasticsearchDomain) BuildResource() *schema.Resource {
 	}
 }
 
-func (r *ElasticsearchDomain) opensearchifyClusterInstanceType(instanceType string) *string {
+func (r *SearchDomain) opensearchifyClusterInstanceType(instanceType string) *string {
 	s := strings.Replace(instanceType, ".elasticsearch", ".search", 1)
 	return &s
 }

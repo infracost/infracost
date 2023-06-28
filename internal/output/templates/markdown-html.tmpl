@@ -1,0 +1,156 @@
+{{- define "tagPolicyTable" }}
+  <table>
+    <thead>
+      <td>Policy Issue</td>
+      <td>File:line</td>
+    </thead>
+  {{- range . }}
+    <tr>
+      <th colspan="2"><b>{{ .Name }}</b>: {{ .Message }}</th>
+    </tr>
+    {{- range .Resources }}
+    <tr>
+      <td>
+        <code>{{ .Address}}</code>
+      {{- if gt (len .ProjectNames) 1 }}
+        in projects {{ stringsJoin .ProjectNames ", " }}
+      {{- else }}
+        in project {{ index .ProjectNames 0 }}
+      {{- end }}
+      {{- if gt (len .Failures) 1 }}
+        <ul>
+        {{- range .Failures }}
+          <li>{{ . }}</li>
+        {{- end }}
+        </ul>
+      {{- else }}
+        {{ index .Failures 0 }}
+      {{- end }}
+      </td>
+      <td>
+        {{ .Path }}{{- if .Line }}:{{ .Line }}{{- end }}
+      </td>
+    </tr>
+    {{- end }}
+  {{- end }}
+  </table>
+{{- end }}
+
+{{- define "summaryRow"}}
+    <tr>
+      <td>{{ truncateMiddle .Name 64 "..." }}</td>
+  {{- range .MetadataFields }}
+      <td>{{ truncateMiddle . 64 "..." }}</td>
+  {{- end }}
+      <td>{{ formatCostChange .PastCost .Cost }}</td>
+      <td align="right">{{ formatCost .Cost }}</td>
+    </tr>
+{{- end}}
+<p>💰 Infracost estimate: <b>{{ formatCostChangeSentence .Root.Currency .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost true }}</b></p>
+{{- if displayTable  }}
+<table>
+  <thead>
+    <td>Project</td>
+  {{- range metadataHeaders }}
+    <td>{{ . }}</td>
+  {{- end }}
+    <td>Cost change</td>
+    <td>New monthly cost</td>
+  </thead>
+  {{- if gt (len .Root.Projects) 1  }}
+  <tbody>
+    {{- range .Root.Projects }}
+      {{- if showProject . }}
+        {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
+      {{- end }}
+    {{- end }}
+  </tbody>
+</table>
+  {{- else }}
+  <tbody>
+  {{- range .Root.Projects }}
+    {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
+  {{- end }}
+  </tbody>
+</table>
+  {{- end }}
+{{- end }}
+
+{{- if displayOutput  }}
+<details>
+<summary><strong>Infracost output</strong></summary>
+
+```
+{{ .DiffOutput }}
+```
+</details>
+{{- end }}
+
+{{- if .Options.PolicyChecks.Enabled }}
+	{{- if gt (len .Options.PolicyChecks.Failures) 0 }}
+<details>
+<summary><strong>❌ Policy checks failed</strong></summary>
+				{{ range $v, $f := .Options.PolicyChecks.Failures}}
+> - {{ $f }}
+				{{- end}}
+</details>
+	{{ else }}
+<details>
+<summary><strong>✅ Policy checks passed</strong></summary>
+			{{ range $v, $f := .Options.PolicyChecks.Passed}}
+> - {{ $f }}
+			{{- end}}
+</details>
+	{{- end }}
+{{- end }}
+{{- if gt (len .Options.TagPolicyCheck.FailingTagPolicies) 0 }}
+<details>
+  <summary><strong>❌ Tag policy check failed</strong></summary>
+  {{- template "tagPolicyTable" .Options.TagPolicyCheck.FailingTagPolicies }}
+</details>
+{{- end }}
+{{- if gt (len .Options.TagPolicyCheck.WarningTagPolicies) 0 }}
+<details>
+  <summary><strong>🟡 Tag policy warnings</strong></summary>
+  {{- template "tagPolicyTable" .Options.TagPolicyCheck.WarningTagPolicies }}
+</details>
+{{- end }}
+{{- if gt (len .Options.TagPolicyCheck.PassingTagPolicies) 0 }}
+<details>
+  <summary><strong>✅ Tag policies passed</strong></summary>
+  <ul>
+  {{- range .Options.TagPolicyCheck.PassingTagPolicies }}
+    <li><b>{{ .Name }}</b> {{ .Message }}</li>
+  {{- end }}
+  </ul>
+</details>
+{{- end }}
+
+{{- if .Options.GuardrailCheck.Comment }}
+	{{- if gt (len .Options.GuardrailCheck.CommentableFailures) 0 }}
+<details>
+<summary><strong>{{ .Options.GuardrailCheck.Title }}</strong></summary>
+				{{- if .Options.GuardrailCheck.IsBlocking }}
+This change is blocked, either reduce the costs or wait for an admin to review and unblock it.
+				{{- end }}
+				{{ range $v, $f := .Options.GuardrailCheck.BlockingFailures}}
+> - <b>Blocked</b>: {{ $f }}
+				{{- end}}
+				{{- range $v, $f := .Options.GuardrailCheck.WarningFailures}}
+> - <b>Warning</b>: {{ $f }}
+				{{- end}}
+				{{- range $v, $f := .Options.GuardrailCheck.UnblockedFailures}}
+> - <b>Unblocked</b>: {{ $f }}
+				{{- end}}
+</details>
+	{{- else }}
+<p><strong>✅ Guardrails passed</strong></p>
+	{{- end }}
+{{- end }}
+{{- if displaySub  }}
+<sub>
+{{- if .Root.CloudURL }}<a href="{{ .Root.CloudURL }}" rel="noopener noreferrer" target="_blank">View in Infracost Cloud. </a>{{- end }}
+{{- if .MarkdownOptions.WillUpdate }}This comment will be updated when the cost estimate changes.{{- end}}
+{{- if .MarkdownOptions.WillReplace }}This comment will be replaced when the cost estimate changes{{- end}}
+</sub>
+{{- end }}

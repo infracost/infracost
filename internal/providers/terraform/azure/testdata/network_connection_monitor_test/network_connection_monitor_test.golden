@@ -1,0 +1,33 @@
+
+ Name                                                                                          Monthly Qty  Unit                Monthly Cost 
+                                                                                                                                             
+ azurerm_network_connection_monitor.connection_monitor["12-tests"]                                                                           
+ └─ Tests (10-240,010)                                                                                   2  tests                      $0.60 
+                                                                                                                                             
+ azurerm_network_connection_monitor.connection_monitor["multiple-test-groups-1-disabled"]                                                    
+ └─ Tests (10-240,010)                                                                                   2  tests                      $0.60 
+                                                                                                                                             
+ azurerm_network_connection_monitor.connection_monitor["multiple-test-groups-18-tests"]                                                      
+ └─ Tests (10-240,010)                                                                                   8  tests                      $2.40 
+                                                                                                                                             
+ azurerm_network_connection_monitor.connection_monitor_with_usage                                                                            
+ ├─ Tests (10-240,010)                                                                             240,000  tests                 $72,000.00 
+ ├─ Tests (240,010-750,010)                                                                        510,000  tests                 $50,994.90 
+ ├─ Tests (750,010-1,000,010)                                                                      250,000  tests                 $12,502.50 
+ └─ Tests (1,000,010+)                                                                             999,990  tests                 $20,009.80 
+                                                                                                                                             
+ azurerm_network_watcher.network_watcher                                                                                                     
+ └─ Network diagnostic tool (over 1,000 checks)                                            Monthly cost depends on usage: $0.001 per checks  
+                                                                                                                                             
+ OVERALL TOTAL                                                                                                                   $155,510.80 
+──────────────────────────────────
+7 cloud resources were detected:
+∙ 6 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 1 was free:
+  ∙ 1 x azurerm_resource_group
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ TestNetworkConnectionMonitor                       ┃ $155,511     ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛

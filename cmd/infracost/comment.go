@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/infracost/infracost/internal/apiclient"
+	log "github.com/sirupsen/logrus"
 	"os"
 	"strconv"
 
@@ -44,6 +46,7 @@ func commentCmd(ctx *config.RunContext) *cobra.Command {
 		subCmd.Flags().StringArray("policy-path", nil, "Path to Infracost policy files, glob patterns need quotes (experimental)")
 		subCmd.Flags().Bool("show-all-projects", false, "Show all projects in the table of the comment output")
 		subCmd.Flags().Bool("show-changed", false, "Show only projects in the table that have code changes")
+		subCmd.Flags().Bool("show-skipped", false, "List unsupported and free resources")
 		_ = subCmd.Flags().MarkHidden("show-changed")
 		subCmd.Flags().Bool("skip-no-diff", false, "Skip posting comment if there are no resource changes. Only applies to update, hide-and-new, and delete-and-new behaviors")
 		_ = subCmd.Flags().MarkHidden("skip-no-diff")
@@ -75,6 +78,17 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 
 	combined.IsCIRun = ctx.IsCIRun()
 
+	if ctx.IsCloudUploadEnabled() && ctx.Config.TagPolicyAPIEndpoint != "" {
+		tagPolicyClient := apiclient.NewTagPolicyAPIClient(ctx)
+		tagPolicies, err := tagPolicyClient.CheckTagPolicies(ctx, combined)
+		if err != nil {
+			log.WithError(err).Error("Failed to check tag policies")
+		}
+
+		combined.TagPolicies = tagPolicies
+	}
+	tagPolicyCheck := output.NewTagPolicyChecks(combined.TagPolicies)
+
 	var guardrailCheck output.GuardrailCheck
 	dryRun, _ := cmd.Flags().GetBool("dry-run")
 	if ctx.IsCloudUploadEnabled() && !dryRun {
@@ -82,7 +96,8 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 			ui.PrintWarning(cmd.ErrOrStderr(), "Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
 		} else {
 			combined.Metadata.InfracostCommand = "comment"
-			combined.RunID, combined.ShareURL, guardrailCheck = shareCombinedRun(ctx, combined, inputs)
+			result := shareCombinedRun(ctx, combined, inputs)
+			combined.RunID, combined.ShareURL, combined.CloudURL, guardrailCheck = result.RunID, result.ShareURL, result.CloudURL, result.GuardrailCheck
 		}
 	}
 
@@ -109,12 +124,13 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 	opts := output.Options{
 		DashboardEndpoint: ctx.Config.DashboardEndpoint,
 		NoColor:           ctx.Config.NoColor,
-		ShowSkipped:       true,
 		PolicyChecks:      policyChecks,
+		TagPolicyCheck:    tagPolicyCheck,
 		GuardrailCheck:    guardrailCheck,
 	}
 	opts.ShowAllProjects, _ = cmd.Flags().GetBool("show-all-projects")
 	opts.ShowOnlyChanges, _ = cmd.Flags().GetBool("show-changed")
+	opts.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
 
 	b, err := output.ToMarkdown(combined, opts, mdOpts)
 	if err != nil {
@@ -126,6 +142,9 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 	}
 	if len(guardrailCheck.BlockingFailures()) > 0 {
 		return b, hasDiff, guardrailCheck.BlockingFailures()
+	}
+	if len(tagPolicyCheck.FailingTagPolicies) > 0 {
+		return b, hasDiff, tagPolicyCheck
 	}
 
 	return b, hasDiff, nil

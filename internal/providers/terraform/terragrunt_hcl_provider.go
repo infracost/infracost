@@ -30,6 +30,7 @@ import (
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
+	"github.com/zclconf/go-cty/cty/function"
 	"github.com/zclconf/go-cty/cty/gocty"
 	ctyJson "github.com/zclconf/go-cty/cty/json"
 
@@ -75,20 +76,41 @@ func NewTerragruntHCLProvider(ctx *config.ProjectContext, includePastResources b
 		includePastResources: includePastResources,
 		outputs:              map[string]cty.Value{},
 		excludedPaths:        ctx.ProjectConfig.ExcludePaths,
-		env:                  parseEnvironmentVariables(os.Environ()),
+		env:                  getEnvVars(),
 		sourceCache:          map[string]string{},
 		logger:               logger,
 	}
 }
 
-func parseEnvironmentVariables(environment []string) map[string]string {
+func getEnvVars() map[string]string {
+	environment := os.Environ()
 	environmentMap := make(map[string]string)
+
+	var filterSafe bool
+	safe := make(map[string]struct{})
+	if v, ok := os.LookupEnv("INFRACOST_SAFE_ENVS"); ok {
+		filterSafe = true
+
+		keys := strings.Split(v, ",")
+		for _, key := range keys {
+			safe[strings.ToLower(strings.TrimSpace(key))] = struct{}{}
+		}
+	}
 
 	for i := 0; i < len(environment); i++ {
 		variableSplit := strings.SplitN(environment[i], "=", 2)
 
-		if len(variableSplit) == 2 {
-			environmentMap[strings.TrimSpace(variableSplit[0])] = variableSplit[1]
+		if len(variableSplit) != 2 {
+			continue
+		}
+
+		name := strings.TrimSpace(variableSplit[0])
+		if !filterSafe {
+			environmentMap[name] = variableSplit[1]
+		}
+
+		if _, ok := safe[strings.ToLower(name)]; ok {
+			environmentMap[name] = variableSplit[1]
 		}
 	}
 
@@ -282,7 +304,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 	terragruntConfigPath := tgconfig.GetDefaultConfigPath(p.Path)
 
 	terragruntCacheDir := filepath.Join(config.InfracostDir, ".terragrunt-cache")
-	terragruntDownloadDir := filepath.Join(p.ctx.RunContext.Config.RepoPath(), terragruntCacheDir)
+	terragruntDownloadDir := filepath.Join(p.ctx.RunContext.Config.CachePath(), terragruntCacheDir)
 	err := os.MkdirAll(terragruntDownloadDir, os.ModePerm)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to create download directories for terragrunt in working directory: %w", err)
@@ -292,7 +314,6 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 	var workingDirsToEstimate []*terragruntWorkingDirInfo
 
 	tgLog := p.logger.WithFields(log.Fields{"library": "terragrunt"})
-
 	terragruntOptions := &tgoptions.TerragruntOptions{
 		TerragruntConfigPath:       terragruntConfigPath,
 		Logger:                     tgLog,
@@ -305,6 +326,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 		TerraformCliArgs:           []string{tgcli.CMD_TERRAGRUNT_INFO},
 		Env:                        p.env,
 		IgnoreExternalDependencies: true,
+		SourceMap:                  p.ctx.RunContext.Config.TerraformSourceMap,
 		RunTerragrunt: func(opts *tgoptions.TerragruntOptions) (err error) {
 			defer func() {
 				unexpectedErr := recover()
@@ -327,6 +349,14 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 			}
 
 			return
+		},
+		Functions: func(baseDir string) map[string]function.Function {
+			funcs := hcl.ExpFunctions(baseDir, p.logger)
+
+			funcs["run_cmd"] = mockSliceFuncStaticReturn(cty.StringVal("mock-run_cmd"))
+			funcs["sops_decrypt_file"] = mockSliceFuncStaticReturn(cty.StringVal("mock"))
+
+			return funcs
 		},
 		Parallelism: 1,
 	}
@@ -1030,7 +1060,10 @@ func (p *TerragruntHCLProvider) downloadTerraformSourceIfNecessary(terraformSour
 		return err
 	}
 
-	currentVersion := terraformSource.EncodeSourceVersion()
+	currentVersion, err := terraformSource.EncodeSourceVersion()
+	if err != nil {
+		return fmt.Errorf("could not encode source version: %w", err)
+	}
 	// if source versions are different, create file to run init
 	// https://github.com/gruntwork-io/terragrunt/issues/1921
 	if previousVersion != currentVersion {
@@ -1129,9 +1162,12 @@ func (p *TerragruntHCLProvider) alreadyHaveLatestCode(terraformSource *tfsource.
 		return false, nil
 	}
 
-	currentVersion := terraformSource.EncodeSourceVersion()
-	previousVersion, err := p.readVersionFile(terraformSource)
+	currentVersion, err := terraformSource.EncodeSourceVersion()
+	if err != nil {
+		return false, fmt.Errorf("could not encode source version: %w", err)
+	}
 
+	previousVersion, err := p.readVersionFile(terraformSource)
 	if err != nil {
 		return false, err
 	}
@@ -1159,7 +1195,7 @@ func createStackForTerragruntConfigPaths(path string, terragruntConfigPaths []st
 		return nil, tgerrors.WithStackTrace(tgconfigstack.NoTerraformModulesFound)
 	}
 
-	modules, err := tgconfigstack.ResolveTerraformModules(terragruntConfigPaths, terragruntOptions, howThesePathsWereFound)
+	modules, err := tgconfigstack.ResolveTerraformModules(terragruntConfigPaths, terragruntOptions, nil, howThesePathsWereFound)
 	if err != nil {
 		return nil, err
 	}
@@ -1251,4 +1287,14 @@ func getCleanedTargetConfigPath(configPath string, workingPath string) string {
 		targetConfig = tgconfig.GetDefaultConfigPath(targetConfig)
 	}
 	return util.CleanPath(targetConfig)
+}
+
+func mockSliceFuncStaticReturn(val cty.Value) function.Function {
+	return function.New(&function.Spec{
+		VarParam: &function.Parameter{Type: cty.String},
+		Type:     function.StaticReturnType(cty.String),
+		Impl: func(args []cty.Value, retType cty.Type) (cty.Value, error) {
+			return val, nil
+		},
+	})
 }

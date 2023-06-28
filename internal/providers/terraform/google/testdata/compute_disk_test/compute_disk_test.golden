@@ -1,40 +1,62 @@
 
- Name                                           Monthly Qty  Unit  Monthly Cost 
-                                                                                
- google_compute_disk.image_disk_size                                            
- └─ Standard provisioned storage (pd-standard)           30  GB           $1.20 
-                                                                                
- google_compute_disk.image_source_image                                         
- └─ Standard provisioned storage (pd-standard)           30  GB           $1.20 
-                                                                                
- google_compute_disk.image_source_snapshot                                      
- └─ Standard provisioned storage (pd-standard)           20  GB           $0.80 
-                                                                                
- google_compute_disk.size                                                       
- └─ Standard provisioned storage (pd-standard)           20  GB           $0.80 
-                                                                                
- google_compute_disk.snapshot_source_disk                                       
- └─ Standard provisioned storage (pd-standard)           20  GB           $0.80 
-                                                                                
- google_compute_disk.ssd_default                                                
- └─ SSD provisioned storage (pd-ssd)                    100  GB          $17.00 
-                                                                                
- google_compute_disk.standard_default                                           
- └─ Standard provisioned storage (pd-standard)          500  GB          $20.00 
-                                                                                
- google_compute_image.image_disk_size                                           
- └─ Storage                                              30  GB           $1.50 
-                                                                                
- google_compute_image.image_source_image                                        
- └─ Storage                                              30  GB           $1.50 
-                                                                                
- google_compute_image.image_source_snapshot                                     
- └─ Storage                                              20  GB           $1.00 
-                                                                                
- google_compute_snapshot.snapshot_source_disk                                   
- └─ Storage                                              20  GB           $0.52 
-                                                                                
- OVERALL TOTAL                                                           $46.32 
+ Name                                                  Monthly Qty  Unit  Monthly Cost 
+                                                                                       
+ google_compute_disk.extreme_default                                                   
+ ├─ Extreme provisioned storage (pd-extreme)                 1,000  GB         $125.00 
+ └─ Provisioned IOPS                                       100,000  IOPS     $6,500.00 
+                                                                                       
+ google_compute_disk.extreme_size_iops                                                 
+ ├─ Extreme provisioned storage (pd-extreme)                    40  GB           $5.00 
+ └─ Provisioned IOPS                                         5,000  IOPS       $325.00 
+                                                                                       
+ google_compute_disk.hyperdisk_default                                                 
+ ├─ Hyperdisk provisioned storage (hyperdisk-extreme)        1,000  GB         $125.00 
+ └─ Provisioned IOPS                                       350,000  IOPS    $11,200.00 
+                                                                                       
+ google_compute_disk.hyperdisk_size_iops                                               
+ ├─ Hyperdisk provisioned storage (hyperdisk-extreme)          128  GB          $16.00 
+ └─ Provisioned IOPS                                        20,000  IOPS       $640.00 
+                                                                                       
+ google_compute_disk.image_disk_size                                                   
+ └─ Standard provisioned storage (pd-standard)                  30  GB           $1.20 
+                                                                                       
+ google_compute_disk.image_source_image                                                
+ └─ Standard provisioned storage (pd-standard)                  30  GB           $1.20 
+                                                                                       
+ google_compute_disk.image_source_snapshot                                             
+ └─ Standard provisioned storage (pd-standard)                  20  GB           $0.80 
+                                                                                       
+ google_compute_disk.size                                                              
+ └─ Standard provisioned storage (pd-standard)                  20  GB           $0.80 
+                                                                                       
+ google_compute_disk.snapshot_source_disk                                              
+ └─ Standard provisioned storage (pd-standard)                  20  GB           $0.80 
+                                                                                       
+ google_compute_disk.ssd_default                                                       
+ └─ SSD provisioned storage (pd-ssd)                           100  GB          $17.00 
+                                                                                       
+ google_compute_disk.standard_default                                                  
+ └─ Standard provisioned storage (pd-standard)                 500  GB          $20.00 
+                                                                                       
+ google_compute_image.image_disk_size                                                  
+ └─ Storage                                                     30  GB           $1.50 
+                                                                                       
+ google_compute_image.image_source_image                                               
+ └─ Storage                                                     30  GB           $1.50 
+                                                                                       
+ google_compute_image.image_source_snapshot                                            
+ └─ Storage                                                     20  GB           $1.00 
+                                                                                       
+ google_compute_snapshot.snapshot_source_disk                                          
+ └─ Storage                                                     20  GB           $0.52 
+                                                                                       
+ OVERALL TOTAL                                                              $18,982.32 
 ──────────────────────────────────
-11 cloud resources were detected:
-∙ 11 were estimated, 4 of which include usage-based costs, see https://infracost.io/usage-file
+15 cloud resources were detected:
+∙ 15 were estimated, 4 of which include usage-based costs, see https://infracost.io/usage-file
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ TestComputeDiskGoldenFile                          ┃ $18,982      ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛

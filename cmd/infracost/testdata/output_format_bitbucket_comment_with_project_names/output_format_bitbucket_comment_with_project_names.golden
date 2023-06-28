@@ -1,21 +1,19 @@
 
-## Infracost estimate: **monthly cost will decrease by $3,364 (-42%) ↓**
 
-| **Project** | **Module path** | **Previous** | **New** | **Diff** |
-| ----------- | ---------- | -----------: | ------: | -------- |
-| my first project |  | $1,303 | $743 | -$560.64 (-43%) |
-| my first project again |  | $1,303 | $743 | -$560.64 (-43%) |
-| my terragrunt multi project | prod | $1,308 | $748 | -$560.64 (-43%) |
-| my terragrunt prod project |  | $1,308 | $748 | -$560.64 (-43%) |
-| my terragrunt workspace | prod | $1,308 | $748 | -$560.64 (-43%) |
-| my workspace project |  | $1,303 | $743 | -$560.64 (-43%) |
-| **All projects** | | **$7,991** | **$4,627** | **-$3,363.84 (-42%)** |
+## Infracost estimate: **monthly cost will decrease by $3,364 ↓**
 
-3 projects have no cost estimate changes.
-
+| **Project** | **Module path** | **Cost change** | **New monthly cost** |
+| ----------- | ---------- | --------------: | -------------------- |
+| my first project |  | -$561 (-43%) | $743 |
+| my first project again |  | -$561 (-43%) | $743 |
+| my terragrunt multi project | prod | -$561 (-43%) | $748 |
+| my terragrunt prod project |  | -$561 (-43%) | $748 |
+| my terragrunt workspace | prod | -$561 (-43%) | $748 |
+| my workspace project |  | -$561 (-43%) | $743 |
 **Infracost output:**
 
 ```
+──────────────────────────────────
 Project: my first project
 
 ~ aws_instance.web_app
@@ -98,14 +96,21 @@ Amount:  -$561 ($1,303 → $743)
 Percent: -43%
 
 ──────────────────────────────────
-
-The following projects have no cost estimate changes: my terragrunt dev project, my terragrunt multi project (Module path: dev), my terragrunt workspace (Module path: dev, Workspace: ws2)
-Run the following command to see their breakdown: infracost breakdown --path=/path/to/code
-
-──────────────────────────────────
 Key: ~ changed, + added, - removed
 
 18 cloud resources were detected:
 ∙ 18 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+
+Infracost estimate: monthly cost will decrease by $3,364 ↓
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Cost change  ┃ New monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━┫
+┃ my first project                                   ┃ -$561 (-43%) ┃ $743             ┃
+┃ my first project again                             ┃ -$561 (-43%) ┃ $743             ┃
+┃ my terragrunt multi project                        ┃ -$561 (-43%) ┃ $748             ┃
+┃ my terragrunt prod project                         ┃ -$561 (-43%) ┃ $748             ┃
+┃ my terragrunt workspace                            ┃ -$561 (-43%) ┃ $748             ┃
+┃ my workspace project                               ┃ -$561 (-43%) ┃ $743             ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━┛
 ```
 

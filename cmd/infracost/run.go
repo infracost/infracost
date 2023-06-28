@@ -134,7 +134,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 			log.WithError(err).Error("Failed to upload to Infracost Cloud")
 		}
 
-		r.RunID, r.ShareURL = result.RunID, result.ShareURL
+		r.RunID, r.ShareURL, r.CloudURL = result.RunID, result.ShareURL, result.CloudURL
 	} else {
 		log.Debug("Skipping sending project results since Infracost Cloud upload is not enabled.")
 	}
@@ -757,7 +757,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 
 	if hasConfigFile {
 		cfgFilePath, _ := cmd.Flags().GetString("config-file")
-		err := cfg.LoadFromConfigFile(cfgFilePath)
+		err := cfg.LoadFromConfigFile(cfgFilePath, cmd)
 
 		if err != nil {
 			return err

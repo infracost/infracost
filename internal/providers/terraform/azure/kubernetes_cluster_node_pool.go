@@ -24,13 +24,14 @@ func NewAzureRMKubernetesClusterNodePool(d *schema.ResourceData, u *schema.Usage
 	region := lookupRegion(d, []string{"kubernetes_cluster_id"})
 
 	nodeCount := decimal.NewFromInt(1)
-	if d.Get("node_count").Type != gjson.Null {
-		nodeCount = decimal.NewFromInt(d.Get("node_count").Int())
-	}
 
 	// if the node count is not set explicitly let's take the min_count.
-	if d.Get("min_count").Type != gjson.Null && nodeCount.Equal(decimal.NewFromInt(1)) {
+	if d.Get("min_count").Type != gjson.Null {
 		nodeCount = decimal.NewFromInt(d.Get("min_count").Int())
+	}
+
+	if d.Get("node_count").Type != gjson.Null {
+		nodeCount = decimal.NewFromInt(d.Get("node_count").Int())
 	}
 
 	if u != nil && u.Get("nodes").Exists() {
@@ -48,7 +49,29 @@ func aksClusterNodePool(name, region string, n gjson.Result, nodeCount decimal.D
 		Name: name,
 	}
 	instanceType := n.Get("vm_size").String()
-	costComponents = append(costComponents, linuxVirtualMachineCostComponent(region, instanceType, nil))
+
+	var monthlyHours *float64
+	if u != nil && u.Get("monthly_hrs").Exists() {
+		monthlyHours = u.GetFloat("monthly_hrs")
+	}
+
+	os := "Linux"
+	if n.Get("os_type").Type != gjson.Null {
+		os = n.Get("os_type").String()
+	}
+
+	if n.Get("os_sku").Type != gjson.Null {
+		if strings.HasPrefix(strings.ToLower(n.Get("os_sku").String()), "windows") {
+			os = "Windows"
+		}
+	}
+
+	if strings.EqualFold(os, "windows") {
+		costComponents = append(costComponents, windowsVirtualMachineCostComponent(region, instanceType, "None", monthlyHours))
+	} else {
+		costComponents = append(costComponents, linuxVirtualMachineCostComponent(region, instanceType, monthlyHours))
+	}
+
 	mainResource.CostComponents = costComponents
 	schema.MultiplyQuantities(mainResource, nodeCount)
 
