@@ -1,0 +1,17 @@
+
+Err:
+Error: Tag policy check failed:
+
+  Failing Tag Policy: This should show as a failure
+    module.hosted_cloud_pricing_api.aws_s3_bucket.cloud_pricing_api_db_data in project(s) my-prod-project, my-dev-project
+    - should have mandatory tags: "Environment", "Team"
+    - should have a valid value for "Team" tag: "Ops", "Frontend team", "Backend team"
+    module.dashboard.aws_dynamodb_table.sessions in project(s) my-prod-project
+    - should have a valid value for "Team" tag: "Ops", "Frontend team", "Backend team"
+    module.us-east-1-dashboard.aws_db_instance.dashboard in project(s) my-prod-project
+    - should have a valid value for "ServiceCode" tag: must match regex <code>\[A-Z\]{3}-Id</code>
+
+
+Logs:
+level=info msg="4 tag policies checked"
+level=info msg="Estimate uploaded to organization 'tim' in Infracost Cloud"

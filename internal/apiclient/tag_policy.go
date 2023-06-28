@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/output"
+	log "github.com/sirupsen/logrus"
 )
 
 type TagPolicyAPIClient struct {
@@ -80,5 +81,19 @@ func (c *TagPolicyAPIClient) CheckTagPolicies(ctx *config.RunContext, out output
 	if err != nil {
 		return nil, fmt.Errorf("failed to unmarshal tag policies %w", err)
 	}
+
+	if len(tagPolicies.TagPolicies) > 0 {
+		checkedStr := "tag policy"
+		if len(tagPolicies.TagPolicies) > 1 {
+			checkedStr = "tag policies"
+		}
+		tagPolicyMsg := fmt.Sprintf(`%d %s checked`, len(tagPolicies.TagPolicies), checkedStr)
+		if ctx.Config.IsLogging() {
+			log.Info(tagPolicyMsg)
+		} else {
+			fmt.Fprintf(ctx.ErrWriter, "%s\n", tagPolicyMsg)
+		}
+	}
+
 	return tagPolicies.TagPolicies, nil
 }
