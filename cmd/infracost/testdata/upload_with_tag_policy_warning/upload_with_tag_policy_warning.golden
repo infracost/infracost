@@ -1,0 +1,4 @@
+
+Logs:
+level=info msg="3 tag policies checked"
+level=info msg="Estimate uploaded to organization 'tim' in Infracost Cloud"
