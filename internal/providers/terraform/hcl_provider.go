@@ -19,6 +19,8 @@ import (
 	"github.com/zclconf/go-cty/cty/gocty"
 	ctyJson "github.com/zclconf/go-cty/cty/json"
 
+	"github.com/infracost/infracost/internal/apiclient"
+	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/hcl/modules"
@@ -344,10 +346,18 @@ func (p *HCLProvider) Modules() []HCLProject {
 					fmt.Fprintf(os.Stderr, "Detected Terraform project at %s\n", ui.DisplayPath(parser.Path()))
 				}
 
-				module, err := parser.ParseDirectory()
+				module, modErr := parser.ParseDirectory()
+				if modErr != nil {
+					if v, ok := modErr.(*clierror.PanicError); ok {
+						err := apiclient.ReportCLIError(p.ctx.RunContext, v, false)
+						if err != nil {
+							p.logger.WithError(err).Debug("error sending unexpected runtime error")
+						}
+					}
+				}
 
 				mu.Lock()
-				mods = append(mods, HCLProject{Module: module, Error: err})
+				mods = append(mods, HCLProject{Module: module, Error: modErr})
 				mu.Unlock()
 			}
 		}()

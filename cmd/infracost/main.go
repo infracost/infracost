@@ -281,7 +281,7 @@ func handleCLIError(ctx *config.RunContext, cliErr error) {
 
 	err := apiclient.ReportCLIError(ctx, cliErr, true)
 	if err != nil {
-		logging.Logger.WithError(err).Warn("error reporting CLI error")
+		logging.Logger.WithError(err).Debug("error reporting CLI error")
 	}
 }
 
@@ -290,7 +290,7 @@ func handleUnexpectedErr(ctx *config.RunContext, err error) {
 
 	err = apiclient.ReportCLIError(ctx, err, false)
 	if err != nil {
-		logging.Logger.WithError(err).Warn("error sending unexpected runtime error")
+		logging.Logger.WithError(err).Debug("error sending unexpected runtime error")
 	}
 }
 
