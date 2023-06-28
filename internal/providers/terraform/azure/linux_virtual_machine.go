@@ -67,7 +67,7 @@ func linuxVirtualMachineCostComponent(region string, instanceType string, monthl
 	}
 
 	return &schema.CostComponent{
-		Name:            fmt.Sprintf("Instance usage (%s, %s)", purchaseOptionLabel, instanceType),
+		Name:            fmt.Sprintf("Instance usage (Linux, %s, %s)", purchaseOptionLabel, instanceType),
 		Unit:            "hours",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: decimalPtr(qty),

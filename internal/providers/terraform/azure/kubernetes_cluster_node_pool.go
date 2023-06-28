@@ -55,7 +55,23 @@ func aksClusterNodePool(name, region string, n gjson.Result, nodeCount decimal.D
 		monthlyHours = u.GetFloat("monthly_hrs")
 	}
 
-	costComponents = append(costComponents, linuxVirtualMachineCostComponent(region, instanceType, monthlyHours))
+	os := "Linux"
+	if n.Get("os_type").Type != gjson.Null {
+		os = n.Get("os_type").String()
+	}
+
+	if n.Get("os_sku").Type != gjson.Null {
+		if strings.HasPrefix(strings.ToLower(n.Get("os_sku").String()), "windows") {
+			os = "Windows"
+		}
+	}
+
+	if strings.EqualFold(os, "windows") {
+		costComponents = append(costComponents, windowsVirtualMachineCostComponent(region, instanceType, "None", monthlyHours))
+	} else {
+		costComponents = append(costComponents, linuxVirtualMachineCostComponent(region, instanceType, monthlyHours))
+	}
+
 	mainResource.CostComponents = costComponents
 	schema.MultiplyQuantities(mainResource, nodeCount)
 

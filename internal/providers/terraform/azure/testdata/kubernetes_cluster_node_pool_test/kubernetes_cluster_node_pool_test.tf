@@ -66,3 +66,18 @@ resource "azurerm_kubernetes_cluster_node_pool" "zero_min_count_default_node_cou
   min_count             = 0
   max_count             = 3
 }
+
+resource "azurerm_kubernetes_cluster_node_pool" "windows" {
+  name                  = "internal"
+  kubernetes_cluster_id = azurerm_kubernetes_cluster.example.id
+  vm_size               = "Basic_A2"
+  os_type               = "Windows"
+}
+
+resource "azurerm_kubernetes_cluster_node_pool" "windows_sku" {
+  name                  = "internal"
+  kubernetes_cluster_id = azurerm_kubernetes_cluster.example.id
+  vm_size               = "Standard_DS2_v2"
+  os_sku                = "Windows2022"
+}
+

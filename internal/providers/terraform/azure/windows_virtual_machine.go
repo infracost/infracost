@@ -72,7 +72,7 @@ func windowsVirtualMachineCostComponent(region string, instanceType string, lice
 	}
 
 	return &schema.CostComponent{
-		Name:            fmt.Sprintf("Instance usage (%s, %s)", purchaseOptionLabel, instanceType),
+		Name:            fmt.Sprintf("Instance usage (Windows, %s, %s)", purchaseOptionLabel, instanceType),
 		Unit:            "hours",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: decimalPtr(qty),
