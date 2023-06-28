@@ -26,7 +26,6 @@ func newElasticBeanstalkEnvironment(d *schema.ResourceData, u *schema.UsageData)
 	lc := &aws.LaunchConfiguration{
 		Address: "aws_launch_configuration",
 		Region:  region,
-		Tenancy: "dedicated",
 	}
 
 	volume := &aws.EBSVolume{
@@ -58,6 +57,11 @@ func newElasticBeanstalkEnvironment(d *schema.ResourceData, u *schema.UsageData)
 		switch setting.Get("name").String() {
 		case "InstanceTypes":
 			lc.InstanceType = setting.Get("value").String()
+		case "InstanceType":
+			// InstanceType is deprecated, so we only use it if InstanceTypes is not set
+			if lc.InstanceType == "" {
+				lc.InstanceType = setting.Get("value").String()
+			}
 		case "MinSize":
 			lc.InstanceCount = intPtr(setting.Get("value").Int())
 		case "RootVolumeSize":
