@@ -26,39 +26,44 @@ func NewAzureRMRedisCache(d *schema.ResourceData, u *schema.UsageData) *schema.R
 	sku := family + capacity
 	productName := fmt.Sprintf("Azure Redis Cache %s", skuName)
 
-	nodes := map[string]int64{
+	nodesPerShard := map[string]int64{
 		"basic":    1,
 		"standard": 2,
 		"premium":  2,
 	}[strings.ToLower(skuName)]
 
-	componentName := fmt.Sprintf("Cache usage (%s_%s%s", skuName, family, capacity)
+	shards := int64(1)
 
-	if strings.ToLower(skuName) == "premium" {
-		if d.Get("replicas_per_master").Type != gjson.Null {
-			nodes = 1 + d.Get("replicas_per_master").Int()
-		}
-
+	if strings.EqualFold(skuName, "premium") {
 		if d.Get("shard_count").Type != gjson.Null {
-			nodes = 2 * d.Get("shard_count").Int()
+			shards = d.Get("shard_count").Int()
 		}
 
-		nodesName := "node"
-		if nodes > 1 {
-			nodesName += "s"
+		if d.Get("replicas_per_primary").Type != gjson.Null {
+			nodesPerShard = 1 + d.Get("replicas_per_primary").Int()
+		} else if d.Get("replicas_per_master").Type != gjson.Null {
+			nodesPerShard = 1 + d.Get("replicas_per_master").Int()
 		}
+	}
 
-		componentName = fmt.Sprintf("%s, %v %s", componentName, nodes, nodesName)
+	nodes := shards * nodesPerShard
+
+	// Standard and Premium caches are billed per 2 nodes
+	qty := decimal.NewFromInt(nodes)
+	mul := schema.HourToMonthUnitMultiplier
+	if strings.EqualFold(skuName, "standard") || strings.EqualFold(skuName, "premium") {
+		qty = qty.Div(decimal.NewFromInt(2))
+		mul = mul.Div(decimal.NewFromInt(2))
 	}
 
 	return &schema.Resource{
 		Name: d.Address,
 		CostComponents: []*schema.CostComponent{
 			{
-				Name:           componentName + ")",
-				Unit:           "hours",
-				UnitMultiplier: decimal.NewFromInt(1),
-				HourlyQuantity: decimalPtr(decimal.NewFromInt(nodes)),
+				Name:           fmt.Sprintf("Cache usage (%s_%s%s)", skuName, family, capacity),
+				Unit:           "nodes",
+				UnitMultiplier: mul,
+				HourlyQuantity: decimalPtr(qty),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("azure"),
 					Region:        strPtr(region),
