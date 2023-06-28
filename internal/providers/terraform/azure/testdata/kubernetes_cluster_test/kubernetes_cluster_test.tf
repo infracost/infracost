@@ -105,3 +105,23 @@ resource "azurerm_kubernetes_cluster" "usage_ephemeral" {
   }
 }
 
+resource "azurerm_kubernetes_cluster" "windows" {
+  name                = "example-aks1"
+  location            = "eastus"
+  resource_group_name = azurerm_resource_group.example.name
+  dns_prefix          = "exampleaks1"
+  sku_tier            = "Standard"
+
+  default_node_pool {
+    name            = "default"
+    node_count      = 5
+    vm_size         = "Standard_D2_v2"
+    os_disk_size_gb = 32
+    os_sku          = "Windows2022"
+  }
+
+  identity {
+    type = "SystemAssigned"
+  }
+}
+
