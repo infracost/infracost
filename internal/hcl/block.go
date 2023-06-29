@@ -272,22 +272,13 @@ type BlockBuilder struct {
 }
 
 // NewBlock returns a Block with Context and child Blocks initialised.
-func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.Block, ctx *Context, moduleBlock *Block) *Block {
+func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.Block, ctx *Context, parent *Block, moduleBlock *Block) *Block {
 	if ctx == nil {
 		ctx = NewContext(&hcl.EvalContext{}, nil, b.Logger)
 	}
 
 	isLoggingVerbose := strings.TrimSpace(os.Getenv("INFRACOST_HCL_DEBUG_VERBOSE")) == "true"
-	var children Blocks
 	if body, ok := hclBlock.Body.(*hclsyntax.Body); ok {
-		for _, bb := range body.Blocks {
-			children = append(children, b.NewBlock(filename, rootPath, bb.AsHCLBlock(), ctx, moduleBlock))
-		}
-
-		for _, f := range b.SetAttributes {
-			f(moduleBlock, hclBlock)
-		}
-
 		block := &Block{
 			Filename:    filename,
 			StartLine:   body.SrcRange.Start.Line,
@@ -296,10 +287,20 @@ func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.B
 			hclBlock:    hclBlock,
 			moduleBlock: moduleBlock,
 			rootPath:    rootPath,
-			childBlocks: children,
+			childBlocks: make(Blocks, len(body.Blocks)),
 			verbose:     isLoggingVerbose,
 			newMock:     b.MockFunc,
+			parent:      parent,
 		}
+
+		for i, bb := range body.Blocks {
+			block.childBlocks[i] = b.NewBlock(filename, rootPath, bb.AsHCLBlock(), ctx, block, moduleBlock)
+		}
+
+		for _, f := range b.SetAttributes {
+			f(moduleBlock, hclBlock)
+		}
+
 		block.setLogger(b.Logger)
 
 		return block
@@ -319,17 +320,12 @@ func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.B
 			hclBlock:    hclBlock,
 			moduleBlock: moduleBlock,
 			rootPath:    rootPath,
-			childBlocks: children,
 			verbose:     isLoggingVerbose,
 			newMock:     b.MockFunc,
 		}
 		block.setLogger(b.Logger)
 
 		return block
-	}
-
-	for _, hb := range content.Blocks {
-		children = append(children, b.NewBlock(filename, rootPath, hb, ctx, moduleBlock))
 	}
 
 	block := &Block{
@@ -340,9 +336,13 @@ func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.B
 		hclBlock:    hclBlock,
 		moduleBlock: moduleBlock,
 		rootPath:    rootPath,
-		childBlocks: children,
+		childBlocks: make(Blocks, len(content.Blocks)),
 		verbose:     isLoggingVerbose,
 		newMock:     b.MockFunc,
+	}
+
+	for i, hb := range content.Blocks {
+		block.childBlocks[i] = b.NewBlock(filename, rootPath, hb, ctx, block, moduleBlock)
 	}
 
 	block.setLogger(b.Logger)
@@ -361,7 +361,7 @@ func (b BlockBuilder) CloneBlock(block *Block, index cty.Value) *Block {
 
 	cloneHCL := *block.hclBlock
 
-	clone := b.NewBlock(block.Filename, block.rootPath, &cloneHCL, childCtx, block.moduleBlock)
+	clone := b.NewBlock(block.Filename, block.rootPath, &cloneHCL, childCtx, block, block.moduleBlock)
 	if len(clone.hclBlock.Labels) > 0 {
 		position := len(clone.hclBlock.Labels) - 1
 		labels := make([]string, len(clone.hclBlock.Labels))
@@ -390,7 +390,6 @@ func (b BlockBuilder) CloneBlock(block *Block, index cty.Value) *Block {
 	clone.expanded = true
 	block.cloneIndex++
 
-	clone.parent = block
 	return clone
 }
 
@@ -414,7 +413,7 @@ func (b BlockBuilder) BuildModuleBlocks(block *Block, modulePath string, rootPat
 		}
 
 		for _, fileBlock := range fileBlocks {
-			blocks = append(blocks, b.NewBlock(file.path, rootPath, fileBlock, moduleCtx, block))
+			blocks = append(blocks, b.NewBlock(file.path, rootPath, fileBlock, moduleCtx, nil, block))
 		}
 	}
 
@@ -970,7 +969,8 @@ func (b *Block) values() cty.Value {
 // out full names of Blocks to stdout or a file.
 func (b *Block) Reference() *Reference {
 	var parts []string
-	if b.Type() != "resource" {
+
+	if b.Type() != "resource" || b.parent != nil {
 		parts = append(parts, b.Type())
 	}
 
