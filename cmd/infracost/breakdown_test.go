@@ -1,6 +1,7 @@
 package main_test
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
@@ -56,7 +57,10 @@ func TestBreakdownFormatJsonWithWarnings(t *testing.T) {
 			"--format", "json",
 			"--path", dir,
 		},
-		&GoldenFileOptions{CaptureLogs: true},
+		&GoldenFileOptions{
+			CaptureLogs: true,
+			IsJSON:      true,
+		},
 	)
 }
 
@@ -101,7 +105,10 @@ func TestBreakdownConfigFile(t *testing.T) {
 			"breakdown",
 			"--config-file", path.Join(dir, "infracost.yml"),
 			"--format", "json",
-		}, nil,
+		},
+		&GoldenFileOptions{
+			IsJSON: true,
+		},
 	)
 }
 
@@ -238,6 +245,27 @@ func TestBreakdownTerraformOutFileJSON(t *testing.T) {
 	outputPath := filepath.Join(t.TempDir(), "infracost_output.json")
 
 	GoldenFileCommandTest(t, testdataName, []string{"breakdown", "--path", "./testdata/example_plan.json", "--format", "json", "--out-file", outputPath}, nil)
+
+	// prettify the output
+	file, err := os.ReadFile(outputPath)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	data := map[string]interface{}{}
+	err = json.Unmarshal(file, &data)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	pretty, _ := json.MarshalIndent(data, "", "  ")
+	err = os.WriteFile(outputPath, pretty, 0644)
+	if err != nil {
+		t.Error(err)
+		return
+	}
 
 	actual, err := os.ReadFile(outputPath)
 	require.Nil(t, err)
@@ -749,7 +777,10 @@ func TestBreakdownMultiProjectWithErrorOutputJSON(t *testing.T) {
 			dir,
 			"--format",
 			"json",
-		}, &GoldenFileOptions{CaptureLogs: true},
+		}, &GoldenFileOptions{
+			CaptureLogs: true,
+			IsJSON:      true,
+		},
 	)
 }
 
