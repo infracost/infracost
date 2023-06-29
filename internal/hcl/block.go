@@ -248,11 +248,13 @@ type Block struct {
 	expanded bool
 	// cloneIndex represents the index of the parent that this Block has been cloned from
 	cloneIndex int
-	// parent is the block that the block was cloned from
-	parent *Block
+	// original is the block that the block was cloned from
+	original *Block
 	// childBlocks holds information about any child Blocks that the Block may have. This can be empty.
 	// See Block docs for more information about child Blocks.
 	childBlocks Blocks
+	// parent is the parent block if this is a child block.
+	parent *Block
 	// verbose determines whether the block uses verbose debug logging.
 	verbose    bool
 	logger     *logrus.Entry
@@ -279,6 +281,10 @@ func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.B
 
 	isLoggingVerbose := strings.TrimSpace(os.Getenv("INFRACOST_HCL_DEBUG_VERBOSE")) == "true"
 	if body, ok := hclBlock.Body.(*hclsyntax.Body); ok {
+		for _, f := range b.SetAttributes {
+			f(moduleBlock, hclBlock)
+		}
+
 		block := &Block{
 			Filename:    filename,
 			StartLine:   body.SrcRange.Start.Line,
@@ -295,10 +301,6 @@ func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.B
 
 		for i, bb := range body.Blocks {
 			block.childBlocks[i] = b.NewBlock(filename, rootPath, bb.AsHCLBlock(), ctx, block, moduleBlock)
-		}
-
-		for _, f := range b.SetAttributes {
-			f(moduleBlock, hclBlock)
 		}
 
 		block.setLogger(b.Logger)
@@ -361,7 +363,7 @@ func (b BlockBuilder) CloneBlock(block *Block, index cty.Value) *Block {
 
 	cloneHCL := *block.hclBlock
 
-	clone := b.NewBlock(block.Filename, block.rootPath, &cloneHCL, childCtx, block, block.moduleBlock)
+	clone := b.NewBlock(block.Filename, block.rootPath, &cloneHCL, childCtx, block.parent, block.moduleBlock)
 	if len(clone.hclBlock.Labels) > 0 {
 		position := len(clone.hclBlock.Labels) - 1
 		labels := make([]string, len(clone.hclBlock.Labels))
@@ -390,6 +392,7 @@ func (b BlockBuilder) CloneBlock(block *Block, index cty.Value) *Block {
 	clone.expanded = true
 	block.cloneIndex++
 
+	clone.original = block
 	return clone
 }
 

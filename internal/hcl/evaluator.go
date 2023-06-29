@@ -459,11 +459,11 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 		}
 
 		if block.IsCountExpanded() || !block.IsForEachReferencedExpanded(blocks) || !shouldExpandBlock(block) {
-			parent := block.parent.GetAttribute("for_each")
-			if !parent.HasChanged() {
+			original := block.original.GetAttribute("for_each")
+			if !original.HasChanged() {
 				expanded = append(expanded, block)
 			} else {
-				haveChanged[block.parent.FullName()] = block.parent
+				haveChanged[block.original.FullName()] = block.original
 			}
 
 			continue
@@ -546,11 +546,11 @@ func (e *Evaluator) expandBlockCounts(blocks Blocks) Blocks {
 		}
 
 		if block.IsCountExpanded() || !shouldExpandBlock(block) {
-			parent := block.parent.GetAttribute("count")
-			if !parent.HasChanged() {
+			original := block.original.GetAttribute("count")
+			if !original.HasChanged() {
 				expanded = append(expanded, block)
 			} else {
-				haveChanged[block.parent.FullName()] = block.parent
+				haveChanged[block.original.FullName()] = block.original
 			}
 
 			continue
