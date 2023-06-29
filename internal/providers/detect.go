@@ -261,11 +261,7 @@ func isPulumiPreviewJSON(path string) bool {
 	var jsonFormat display.PreviewDigest
 
 	err = json.Unmarshal(b, &jsonFormat)
-	if err != nil {
-		return false
-	}
-
-	return true
+	return err == nil
 }
 
 // goformation lib is not threadsafe, so we run this check synchronously
