@@ -19,7 +19,15 @@
         "type": "terraform_dir",
         "configSha": "1234",
         "terraformModulePath": "dev",
-        "vcsSubPath": "cmd/infracost/testdata/breakdown_config_file/dev"
+        "vcsSubPath": "cmd/infracost/testdata/breakdown_config_file/dev",
+        "providers": [
+          {
+            "name": "aws",
+            "filename": "testdata/breakdown_config_file/dev/main.tf",
+            "startLine": 1,
+            "endLine": 7
+          }
+        ]
       },
       "pastBreakdown": {
         "resources": [],

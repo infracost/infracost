@@ -17,7 +17,15 @@
       "metadata": {
         "path": "testdata/diff_with_compare_to_format_json",
         "type": "terraform_dir",
-        "vcsSubPath": "cmd/infracost/testdata/diff_with_compare_to_format_json"
+        "vcsSubPath": "cmd/infracost/testdata/diff_with_compare_to_format_json",
+        "providers": [
+          {
+            "name": "aws",
+            "filename": "testdata/diff_with_compare_to_format_json/main.tf",
+            "startLine": 1,
+            "endLine": 7
+          }
+        ]
       },
       "pastBreakdown": {
         "resources": [

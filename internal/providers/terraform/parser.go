@@ -128,13 +128,13 @@ func (p *Parser) populateUsageData(resData map[string]*schema.ResourceData, usag
 	}
 }
 
-func (p *Parser) parseJSON(j []byte, usage schema.UsageMap) ([]*schema.PartialResource, []*schema.PartialResource, error) {
+func (p *Parser) parseJSON(j []byte, usage schema.UsageMap) ([]*schema.PartialResource, []*schema.PartialResource, []schema.ProviderMetadata, error) {
 	baseResources := p.loadUsageFileResources(usage)
 
 	j, _ = StripSetupTerraformWrapper(j)
 
 	if !gjson.ValidBytes(j) {
-		return baseResources, baseResources, errors.New("invalid JSON")
+		return baseResources, baseResources, nil, errors.New("invalid JSON")
 	}
 
 	parsed := gjson.ParseBytes(j)
@@ -144,26 +144,55 @@ func (p *Parser) parseJSON(j []byte, usage schema.UsageMap) ([]*schema.PartialRe
 	conf := parsed.Get("configuration.root_module")
 	vars := parsed.Get("variables")
 
+	providerMetadata := parseProviderConfig(providerConf)
+
 	resources := p.parseJSONResources(false, baseResources, usage, parsed, providerConf, conf, vars)
 	if !p.includePastResources {
-		return nil, resources, nil
+		return nil, resources, providerMetadata, nil
 	}
 
 	if !parsed.Get("prior_state").Exists() {
-		return nil, resources, nil
+		return nil, resources, providerMetadata, nil
 	}
 
 	// Check if the prior state is the same as the planned state
 	// and if so we can just return pointers to the same resources
 	if gjsonEqual(parsed.Get("prior_state.values.root_module"), parsed.Get("planned_values.root_module")) {
-		return resources, resources, nil
+		return resources, resources, providerMetadata, nil
 	}
 
 	pastResources := p.parseJSONResources(true, baseResources, usage, parsed, providerConf, conf, vars)
 	resourceChanges := parsed.Get("resource_changes").Array()
 	pastResources = stripNonTargetResources(pastResources, resources, resourceChanges)
 
-	return pastResources, resources, nil
+	return pastResources, resources, providerMetadata, nil
+}
+
+func parseProviderConfig(providerConf gjson.Result) []schema.ProviderMetadata {
+	var metadatas []schema.ProviderMetadata
+
+	for _, conf := range providerConf.Map() {
+		md := schema.ProviderMetadata{
+			Name:      conf.Get("name").String(),
+			Filename:  conf.Get("infracost_metadata.filename").String(),
+			StartLine: conf.Get("infracost_metadata.start_line").Int(),
+			EndLine:   conf.Get("infracost_metadata.end_line").Int(),
+		}
+
+		for _, defaultTags := range conf.Get("expressions.default_tags").Array() {
+			if md.DefaultTags == nil {
+				md.DefaultTags = make(map[string]string)
+			}
+
+			for key, value := range defaultTags.Get("tags.constant_value").Map() {
+				md.DefaultTags[key] = value.String()
+			}
+		}
+
+		metadatas = append(metadatas, md)
+	}
+
+	return metadatas
 }
 
 // StripSetupTerraformWrapper removes any output added from the setup-terraform

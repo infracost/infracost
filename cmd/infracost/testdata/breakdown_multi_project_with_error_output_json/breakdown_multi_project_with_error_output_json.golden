@@ -18,7 +18,15 @@
         "path": "testdata/breakdown_multi_project_with_error_output_json/dev",
         "type": "terraform_dir",
         "terraformModulePath": "dev",
-        "vcsSubPath": "cmd/infracost/testdata/breakdown_multi_project_with_error_output_json/dev"
+        "vcsSubPath": "cmd/infracost/testdata/breakdown_multi_project_with_error_output_json/dev",
+        "providers": [
+          {
+            "name": "aws",
+            "filename": "testdata/breakdown_multi_project_with_error_output_json/dev/main.tf",
+            "startLine": 1,
+            "endLine": 7
+          }
+        ]
       },
       "pastBreakdown": {
         "resources": [
@@ -201,7 +209,15 @@
         "path": "testdata/breakdown_multi_project_with_error_output_json/prod",
         "type": "terraform_dir",
         "terraformModulePath": "prod",
-        "vcsSubPath": "cmd/infracost/testdata/breakdown_multi_project_with_error_output_json/prod"
+        "vcsSubPath": "cmd/infracost/testdata/breakdown_multi_project_with_error_output_json/prod",
+        "providers": [
+          {
+            "name": "aws",
+            "filename": "testdata/breakdown_multi_project_with_error_output_json/prod/main.tf",
+            "startLine": 1,
+            "endLine": 7
+          }
+        ]
       },
       "pastBreakdown": {
         "resources": [

@@ -26,6 +26,14 @@
               "variable.not_provided"
             ]
           }
+        ],
+        "providers": [
+          {
+            "name": "aws",
+            "filename": "testdata/breakdown_format_json_with_warnings/main.tf",
+            "startLine": 1,
+            "endLine": 7
+          }
         ]
       },
       "pastBreakdown": {

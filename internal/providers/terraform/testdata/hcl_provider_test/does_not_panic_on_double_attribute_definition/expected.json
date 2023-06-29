@@ -90,6 +90,11 @@
           "region": {
             "constant_value": "us-east-1"
           }
+        },
+        "infracost_metadata": {
+          "end_line":7,
+          "filename":"testdata/hcl_provider_test/does_not_panic_on_double_attribute_definition/main.tf",
+          "start_line":1
         }
       }
     },

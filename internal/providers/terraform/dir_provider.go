@@ -183,10 +183,12 @@ func (p *DirProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, e
 		project := schema.NewProject(name, metadata)
 
 		parser := NewParser(p.ctx, p.includePastResources)
-		pastpartialResources, partialResources, err := parser.parseJSON(j, usage)
+		pastpartialResources, partialResources, providerMetadatas, err := parser.parseJSON(j, usage)
 		if err != nil {
 			return projects, errors.Wrap(err, "Error parsing Terraform JSON")
 		}
+
+		project.AddProviderMetadata(providerMetadatas)
 
 		project.HasDiff = !p.UseState
 		if project.HasDiff {

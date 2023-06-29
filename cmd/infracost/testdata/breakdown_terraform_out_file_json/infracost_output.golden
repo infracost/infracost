@@ -550,6 +550,11 @@
       },
       "metadata": {
         "path": "./testdata/example_plan.json",
+        "providers": [
+          {
+            "name": "aws"
+          }
+        ],
         "type": "terraform_plan_json",
         "vcsSubPath": "cmd/infracost/testdata/example_plan.json"
       },

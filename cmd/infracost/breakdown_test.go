@@ -261,7 +261,7 @@ func TestBreakdownTerraformOutFileJSON(t *testing.T) {
 	}
 
 	pretty, _ := json.MarshalIndent(data, "", "  ")
-	err = os.WriteFile(outputPath, pretty, 0644)
+	err = os.WriteFile(outputPath, pretty, 0600)
 	if err != nil {
 		t.Error(err)
 		return
@@ -682,6 +682,21 @@ func TestBreakdownWithActualCosts(t *testing.T) {
 		func(c *config.RunContext) {
 			c.Config.UsageAPIEndpoint = ts.URL
 			c.Config.UsageActualCosts = true
+		},
+	)
+}
+
+func TestBreakdownWithDefaultTags(t *testing.T) {
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+			"--format", "json",
+		},
+		&GoldenFileOptions{
+			IsJSON: true,
 		},
 	)
 }
