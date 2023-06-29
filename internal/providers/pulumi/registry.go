@@ -28,11 +28,9 @@ func GetResourceRegistryMap() *ResourceRegistryMap {
 		}
 		for _, registryItem := range createFreeResources(aws.FreeResources, GetDefaultRefIDFunc) {
 			resourceRegistryMap[registryItem.Name] = registryItem
-			resourceRegistryMap[registryItem.Name].DefaultRefIDFunc = GetDefaultRefIDFunc
 		}
 		for _, registryItem := range createFreeResources(types.PulumiFreeResources, GetDefaultRefIDFunc) {
 			resourceRegistryMap[registryItem.Name] = registryItem
-			resourceRegistryMap[registryItem.Name].DefaultRefIDFunc = GetDefaultRefIDFunc
 		}
 	})
 

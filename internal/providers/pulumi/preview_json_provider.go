@@ -62,11 +62,11 @@ func (p *PreviewJSONProvider) LoadResources(usage schema.UsageMap) ([]*schema.Pr
 		return []*schema.Project{project}, errors.Wrap(err, "Error parsing Pulumi preview JSON file")
 	}
 
-	project.PastResources = pastResources
-	project.Resources = resources
+	project.PartialPastResources = pastResources
+	project.PartialResources = resources
 
 	if !p.includePastResources {
-		project.PastResources = nil
+		project.PartialPastResources = nil
 	}
 
 	return []*schema.Project{project}, nil

@@ -23,47 +23,62 @@ func NewParser(ctx *config.ProjectContext) *Parser {
 	return &Parser{ctx}
 }
 
-func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func (p *Parser) createPartialResource(d *schema.ResourceData, u *schema.UsageData) *schema.PartialResource {
 	registryMap := GetResourceRegistryMap()
 
 	if registryItem, ok := (*registryMap)[d.Type]; ok {
 		if registryItem.NoPrice {
-			return &schema.Resource{
-				Name:         d.Address,
-				ResourceType: d.Type,
-				Tags:         d.Tags,
-				IsSkipped:    true,
-				NoPrice:      true,
-				SkipMessage:  "Free resource.",
+			return &schema.PartialResource{
+				ResourceData: d,
+				Resource: &schema.Resource{
+					Name:         d.Address,
+					ResourceType: d.Type,
+					Tags:         d.Tags,
+					IsSkipped:    true,
+					NoPrice:      true,
+					SkipMessage:  "Free resource.",
+				},
 			}
 		}
 
-		res := registryItem.RFunc(d, u)
-		if res != nil {
-			res.ResourceType = d.Type
-			// TODO: Figure out how to set tags.  For now, have the RFunc set them.
-			// res.Tags = d.Tags
-			if u != nil {
-				res.EstimationSummary = u.CalcEstimationSummary()
+		// Use the CoreRFunc to generate a CoreResource if possible.  This is
+		// the new/preferred way to create provider-agnostic resources that
+		// support advanced features such as Infracost Cloud usage estimates
+		// and actual costs.
+		if registryItem.CoreRFunc != nil {
+			coreRes := registryItem.CoreRFunc(d)
+			if coreRes != nil {
+				return &schema.PartialResource{ResourceData: d, CoreResource: coreRes}
 			}
-			return res
+		} else {
+			res := registryItem.RFunc(d, u)
+			if res != nil {
+				if u != nil {
+					res.EstimationSummary = u.CalcEstimationSummary()
+				}
+
+				return &schema.PartialResource{ResourceData: d, Resource: res}
+			}
 		}
 	}
 
-	return &schema.Resource{
-		Name:         d.Address,
-		ResourceType: d.Type,
-		Tags:         d.Tags,
-		IsSkipped:    true,
-		SkipMessage:  "This resource is not currently supported",
+	return &schema.PartialResource{
+		ResourceData: d,
+		Resource: &schema.Resource{
+			Name:         d.Address,
+			ResourceType: d.Type,
+			Tags:         d.Tags,
+			IsSkipped:    true,
+			SkipMessage:  "This resource is not currently supported",
+		},
 	}
 }
 
-func (p *Parser) parsePreviewDigest(t display.PreviewDigest, usage schema.UsageMap, rawValues gjson.Result) ([]*schema.Resource, []*schema.Resource, error) {
+func (p *Parser) parsePreviewDigest(t display.PreviewDigest, usage schema.UsageMap, rawValues gjson.Result) ([]*schema.PartialResource, []*schema.PartialResource, error) {
 	baseResources := p.loadUsageFileResources(usage)
 
-	var resources []*schema.Resource
-	var pastResources []*schema.Resource
+	var resources []*schema.PartialResource
+	var pastResources []*schema.PartialResource
 	resources = append(resources, baseResources...)
 	refResources := make(map[string]*schema.ResourceData)
 
@@ -100,7 +115,7 @@ func (p *Parser) parsePreviewDigest(t display.PreviewDigest, usage schema.UsageM
 		// You have to load this in the loop so it will find the resources.
 		p.parseReferences(refResources, rawValues)
 		p.loadInfracostProviderUsageData(usage, refResources)
-		if r := p.createResource(resourceData, usageData); r != nil {
+		if r := p.createPartialResource(resourceData, usageData); r != nil {
 			if step.Op == "same" {
 				pastResources = append(pastResources, r)
 			} else if step.Op == "create" {
@@ -108,17 +123,18 @@ func (p *Parser) parsePreviewDigest(t display.PreviewDigest, usage schema.UsageM
 			}
 		}
 	}
+
 	return pastResources, resources, nil
 }
 
-func (p *Parser) loadUsageFileResources(u schema.UsageMap) []*schema.Resource {
-	resources := make([]*schema.Resource, 0)
+func (p *Parser) loadUsageFileResources(u schema.UsageMap) []*schema.PartialResource {
+	resources := make([]*schema.PartialResource, 0)
 
 	for k, v := range u.Data() {
 		for _, t := range GetUsageOnlyResources() {
 			if strings.HasPrefix(k, fmt.Sprintf("%s.", t)) {
 				d := schema.NewResourceData(t, "global", k, map[string]string{}, gjson.Result{})
-				if r := p.createResource(d, v); r != nil {
+				if r := p.createPartialResource(d, v); r != nil {
 					resources = append(resources, r)
 				}
 			}
