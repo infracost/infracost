@@ -143,6 +143,10 @@ type Project struct {
 }
 
 func (p *Project) AddProviderMetadata(metadatas []ProviderMetadata) {
+	if p.Metadata == nil {
+		p.Metadata = &ProjectMetadata{}
+	}
+
 	p.Metadata.Providers = metadatas
 }
 
