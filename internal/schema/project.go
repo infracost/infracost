@@ -40,16 +40,25 @@ func (p *ProjectDiag) Error() string {
 }
 
 type ProjectMetadata struct {
-	Path                string        `json:"path"`
-	Type                string        `json:"type"`
-	ConfigSha           string        `json:"configSha,omitempty"`
-	TerraformModulePath string        `json:"terraformModulePath,omitempty"`
-	TerraformWorkspace  string        `json:"terraformWorkspace,omitempty"`
-	VCSSubPath          string        `json:"vcsSubPath,omitempty"`
-	VCSCodeChanged      *bool         `json:"vcsCodeChanged,omitempty"`
-	Errors              []ProjectDiag `json:"errors,omitempty"`
-	Warnings            []ProjectDiag `json:"warnings,omitempty"`
-	Policies            Policies      `json:"policies,omitempty"`
+	Path                string             `json:"path"`
+	Type                string             `json:"type"`
+	ConfigSha           string             `json:"configSha,omitempty"`
+	TerraformModulePath string             `json:"terraformModulePath,omitempty"`
+	TerraformWorkspace  string             `json:"terraformWorkspace,omitempty"`
+	VCSSubPath          string             `json:"vcsSubPath,omitempty"`
+	VCSCodeChanged      *bool              `json:"vcsCodeChanged,omitempty"`
+	Errors              []ProjectDiag      `json:"errors,omitempty"`
+	Warnings            []ProjectDiag      `json:"warnings,omitempty"`
+	Policies            Policies           `json:"policies,omitempty"`
+	Providers           []ProviderMetadata `json:"providers,omitempty"`
+}
+
+type ProviderMetadata struct {
+	Name        string            `json:"name,omitempty"`
+	DefaultTags map[string]string `json:"defaultTags,omitempty"`
+	Filename    string            `json:"filename,omitempty"`
+	StartLine   int64             `json:"startLine,omitempty"`
+	EndLine     int64             `json:"endLine,omitempty"`
 }
 
 // AddError pushes the provided error onto the metadata list. It does a naive conversion to ProjectDiag
@@ -131,6 +140,14 @@ type Project struct {
 	Resources            []*Resource
 	Diff                 []*Resource
 	HasDiff              bool
+}
+
+func (p *Project) AddProviderMetadata(metadatas []ProviderMetadata) {
+	if p.Metadata == nil {
+		p.Metadata = &ProjectMetadata{}
+	}
+
+	p.Metadata.Providers = metadatas
 }
 
 func NewProject(name string, metadata *ProjectMetadata) *Project {

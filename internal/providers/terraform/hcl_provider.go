@@ -224,12 +224,14 @@ func (p *HCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, e
 func (p *HCLProvider) parseResources(parsed HCLProject, usage schema.UsageMap) *schema.Project {
 	project := p.newProject(parsed)
 
-	partialPastResources, partialResources, err := p.planJSONParser.parseJSON(parsed.JSON, usage)
+	partialPastResources, partialResources, providerMetadatas, err := p.planJSONParser.parseJSON(parsed.JSON, usage)
 	if err != nil {
 		project.Metadata.AddErrorWithCode(err, schema.DiagJSONParsingFailure)
 
 		return project
 	}
+
+	project.AddProviderMetadata(providerMetadatas)
 
 	project.PartialPastResources = partialPastResources
 	project.PartialResources = partialResources
@@ -582,9 +584,43 @@ func (p *HCLProvider) marshalProviderBlock(block *hcl.Block) string {
 				"constant_value": region,
 			},
 		},
+		InfracostMetadata: map[string]interface{}{
+			"filename":   block.Filename,
+			"start_line": block.StartLine,
+			"end_line":   block.EndLine,
+		},
+	}
+
+	defaultTags := p.marshalDefaultTagsBlock(block)
+	if defaultTags != nil {
+		p.schema.Configuration.ProviderConfig[name].Expressions["default_tags"] = []map[string]interface{}{defaultTags}
 	}
 
 	return name
+}
+
+func (p *HCLProvider) marshalDefaultTagsBlock(providerBlock *hcl.Block) map[string]interface{} {
+	b := providerBlock.GetChildBlock("default_tags")
+	if b == nil {
+		return nil
+	}
+
+	marshalledTags := make(map[string]interface{})
+
+	tags := b.GetAttribute("tags")
+	if tags == nil {
+		return marshalledTags
+	}
+
+	for tag, val := range tags.Value().AsValueMap() {
+		marshalledTags[tag] = val.AsString()
+	}
+
+	return map[string]interface{}{
+		"tags": map[string]interface{}{
+			"constant_value": marshalledTags,
+		},
+	}
 }
 
 func (p *HCLProvider) countReferences(block *hcl.Block) *countExpression {
@@ -812,8 +848,9 @@ type ModuleOut struct {
 }
 
 type ProviderConfig struct {
-	Name        string                 `json:"name"`
-	Expressions map[string]interface{} `json:"expressions,omitempty"`
+	Name              string                 `json:"name"`
+	Expressions       map[string]interface{} `json:"expressions,omitempty"`
+	InfracostMetadata map[string]interface{} `json:"infracost_metadata"`
 }
 
 type ResourceData struct {

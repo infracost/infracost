@@ -302,6 +302,39 @@
             "$ref": "#/definitions/Policy"
           },
           "type": "array"
+        },
+        "providers": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/ProviderMetadata"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "ProviderMetadata": {
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "defaultTags": {
+          "patternProperties": {
+            ".*": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "filename": {
+          "type": "string"
+        },
+        "startLine": {
+          "type": "integer"
+        },
+        "endLine": {
+          "type": "integer"
         }
       },
       "additionalProperties": false,

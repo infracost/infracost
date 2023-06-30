@@ -85,10 +85,12 @@ func (p *PlanJSONProvider) LoadResourcesFromSrc(usage schema.UsageMap, j []byte,
 	project := schema.NewProject(name, metadata)
 	parser := NewParser(p.ctx, p.includePastResources)
 
-	partialPastResources, partialResources, err := parser.parseJSON(j, usage)
+	partialPastResources, partialResources, providerMetadatas, err := parser.parseJSON(j, usage)
 	if err != nil {
 		return project, fmt.Errorf("Error parsing Terraform plan JSON file %w", err)
 	}
+
+	project.AddProviderMetadata(providerMetadatas)
 
 	project.PartialPastResources = partialPastResources
 	project.PartialResources = partialResources
