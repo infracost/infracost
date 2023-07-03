@@ -1,0 +1,187 @@
+{
+  "version": "0.2",
+  "metadata": {
+    "infracostCommand": "breakdown",
+    "vcsBranch": "stub-branch",
+    "vcsCommitSha": "stub-sha",
+    "vcsCommitAuthorName": "stub-author",
+    "vcsCommitAuthorEmail": "stub@stub.com",
+    "vcsCommitTimestamp": "REPLACED_TIME",
+    "vcsCommitMessage": "stub-message",
+    "vcsRepositoryUrl": "https://github.com/infracost/infracost"
+  },
+  "currency": "USD",
+  "projects": [
+    {
+      "name": "infracost/infracost/cmd/infracost/testdata/breakdown_with_default_tags",
+      "metadata": {
+        "path": "testdata/breakdown_with_default_tags",
+        "type": "terraform_dir",
+        "vcsSubPath": "cmd/infracost/testdata/breakdown_with_default_tags",
+        "providers": [
+          {
+            "name": "aws",
+            "defaultTags": {
+              "Environment": "Test",
+              "Owner": "TFProviders",
+              "Project": "TestProject",
+              "SomeBool": "true",
+              "SomeFloat": "1.1",
+              "SomeNumber": "1"
+            },
+            "filename": "testdata/breakdown_with_default_tags/main.tf",
+            "startLine": 1,
+            "endLine": 18
+          }
+        ]
+      },
+      "pastBreakdown": {
+        "resources": [
+          {
+            "name": "aws_lambda_function.hello_world",
+            "resourceType": "aws_lambda_function",
+            "tags": {
+              "Project": "LambdaTestProject",
+              "lambdaTag": "hello"
+            },
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_lambda_function.hello_world",
+                  "filename": "testdata/breakdown_with_default_tags/main.tf"
+                }
+              ],
+              "checksum": "e33830cc9be4d99146eece690c1c28ee61658f6528580210224ed26304df340d",
+              "endLine": 30,
+              "filename": "testdata/breakdown_with_default_tags/main.tf",
+              "startLine": 20
+            },
+            "hourlyCost": null,
+            "monthlyCost": null,
+            "costComponents": [
+              {
+                "name": "Requests",
+                "unit": "1M requests",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.2",
+                "hourlyCost": null,
+                "monthlyCost": null
+              },
+              {
+                "name": "Ephemeral storage",
+                "unit": "GB-seconds",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000000309",
+                "hourlyCost": null,
+                "monthlyCost": null
+              },
+              {
+                "name": "Duration (first 6B)",
+                "unit": "GB-seconds",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000166667",
+                "hourlyCost": null,
+                "monthlyCost": null
+              }
+            ]
+          }
+        ],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
+      },
+      "breakdown": {
+        "resources": [
+          {
+            "name": "aws_lambda_function.hello_world",
+            "resourceType": "aws_lambda_function",
+            "tags": {
+              "Project": "LambdaTestProject",
+              "lambdaTag": "hello"
+            },
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_lambda_function.hello_world",
+                  "filename": "testdata/breakdown_with_default_tags/main.tf"
+                }
+              ],
+              "checksum": "e33830cc9be4d99146eece690c1c28ee61658f6528580210224ed26304df340d",
+              "endLine": 30,
+              "filename": "testdata/breakdown_with_default_tags/main.tf",
+              "startLine": 20
+            },
+            "hourlyCost": null,
+            "monthlyCost": null,
+            "costComponents": [
+              {
+                "name": "Requests",
+                "unit": "1M requests",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.2",
+                "hourlyCost": null,
+                "monthlyCost": null
+              },
+              {
+                "name": "Ephemeral storage",
+                "unit": "GB-seconds",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000000309",
+                "hourlyCost": null,
+                "monthlyCost": null
+              },
+              {
+                "name": "Duration (first 6B)",
+                "unit": "GB-seconds",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000166667",
+                "hourlyCost": null,
+                "monthlyCost": null
+              }
+            ]
+          }
+        ],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
+      },
+      "diff": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
+      },
+      "summary": {
+        "totalDetectedResources": 1,
+        "totalSupportedResources": 1,
+        "totalUnsupportedResources": 0,
+        "totalUsageBasedResources": 1,
+        "totalNoPriceResources": 0,
+        "unsupportedResourceCounts": {},
+        "noPriceResourceCounts": {}
+      }
+    }
+  ],
+  "totalHourlyCost": "0",
+  "totalMonthlyCost": "0",
+  "pastTotalHourlyCost": "0",
+  "pastTotalMonthlyCost": "0",
+  "diffTotalHourlyCost": "0",
+  "diffTotalMonthlyCost": "0",
+  "timeGenerated": "REPLACED_TIME",
+  "summary": {
+    "totalDetectedResources": 1,
+    "totalSupportedResources": 1,
+    "totalUnsupportedResources": 0,
+    "totalUsageBasedResources": 1,
+    "totalNoPriceResources": 0,
+    "unsupportedResourceCounts": {},
+    "noPriceResourceCounts": {}
+  }
+}
+
+Err:
+

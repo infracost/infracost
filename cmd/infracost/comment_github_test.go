@@ -107,6 +107,26 @@ func TestCommentGitHubWithTagPolicyChecks(t *testing.T) {
 	)
 }
 
+func TestCommentGitHubWithTagPolicyCheckMerge(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"comment",
+			"github",
+			"--github-token", "abc",
+			"--repo", "test/test",
+			"--commit", "5",
+			"--show-changed",
+			"--path", "./testdata/comment_git_hub_with_tag_policy_check_merge/infracost1.json",
+			"--path", "./testdata/comment_git_hub_with_tag_policy_check_merge/infracost2.json",
+			"--dry-run"},
+		nil,
+		func(c *config.RunContext) {
+			t := true
+			c.Config.EnableCloudUpload = &t
+		},
+	)
+}
+
 var ghZeroCommentsResponse = `{ "data": { "repository": { "pullRequest": { "comments": { "nodes": [], "pageInfo": { "endCursor": "abc", "hasNextPage": false }}}}}}`
 var ghOneMatchingCommentResponse = `{ "data": { "repository": { "pullRequest": { "comments": { "nodes": [ 
             { "id": "123", "body": "infracomment body here, followed by tag: [//]: <> (infracost-comment)" }

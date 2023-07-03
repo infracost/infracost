@@ -63,7 +63,15 @@
         "path": "testdata/diff_with_compare_to_with_current_and_past_project_error/prod",
         "type": "terraform_dir",
         "terraformModulePath": "prod",
-        "vcsSubPath": "cmd/infracost/testdata/diff_with_compare_to_with_current_and_past_project_error/prod"
+        "vcsSubPath": "cmd/infracost/testdata/diff_with_compare_to_with_current_and_past_project_error/prod",
+        "providers": [
+          {
+            "name": "aws",
+            "filename": "testdata/diff_with_compare_to_with_current_and_past_project_error/prod/main.tf",
+            "startLine": 1,
+            "endLine": 7
+          }
+        ]
       },
       "pastBreakdown": {
         "resources": [

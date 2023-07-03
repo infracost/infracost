@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"math/big"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -224,12 +225,14 @@ func (p *HCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, e
 func (p *HCLProvider) parseResources(parsed HCLProject, usage schema.UsageMap) *schema.Project {
 	project := p.newProject(parsed)
 
-	partialPastResources, partialResources, err := p.planJSONParser.parseJSON(parsed.JSON, usage)
+	partialPastResources, partialResources, providerMetadatas, err := p.planJSONParser.parseJSON(parsed.JSON, usage)
 	if err != nil {
 		project.Metadata.AddErrorWithCode(err, schema.DiagJSONParsingFailure)
 
 		return project
 	}
+
+	project.AddProviderMetadata(providerMetadatas)
 
 	project.PartialPastResources = partialPastResources
 	project.PartialResources = partialResources
@@ -582,9 +585,79 @@ func (p *HCLProvider) marshalProviderBlock(block *hcl.Block) string {
 				"constant_value": region,
 			},
 		},
+		InfracostMetadata: map[string]interface{}{
+			"filename":   block.Filename,
+			"start_line": block.StartLine,
+			"end_line":   block.EndLine,
+		},
+	}
+
+	defaultTags := p.marshalDefaultTagsBlock(block)
+	if defaultTags != nil {
+		p.schema.Configuration.ProviderConfig[name].Expressions["default_tags"] = []map[string]interface{}{defaultTags}
 	}
 
 	return name
+}
+
+func (p *HCLProvider) marshalDefaultTagsBlock(providerBlock *hcl.Block) map[string]interface{} {
+	b := providerBlock.GetChildBlock("default_tags")
+	if b == nil {
+		return nil
+	}
+
+	marshalledTags := make(map[string]interface{})
+
+	tags := b.GetAttribute("tags")
+	if tags == nil {
+		return marshalledTags
+	}
+
+	for tag, val := range tags.Value().AsValueMap() {
+		if !val.IsKnown() {
+			p.logger.Debugf("tag %s has unknown value, cannot marshal", tag)
+			continue
+		}
+
+		if val.Type().Equals(cty.Bool) {
+			var tagValue bool
+			err := gocty.FromCtyValue(val, &tagValue)
+			if err != nil {
+				p.logger.WithError(err).Debugf("could not marshal tag %s to bool value", tag)
+				continue
+			}
+
+			marshalledTags[tag] = fmt.Sprintf("%t", tagValue)
+			continue
+		}
+
+		if val.Type() == cty.Number {
+			var tagValue big.Float
+			err := gocty.FromCtyValue(val, &tagValue)
+			if err != nil {
+				p.logger.WithError(err).Debugf("could not marshal tag %s to number value", tag)
+				continue
+			}
+
+			marshalledTags[tag] = tagValue.String()
+			continue
+		}
+
+		var tagValue string
+		err := gocty.FromCtyValue(val, &tagValue)
+		if err != nil {
+			p.logger.WithError(err).Debugf("could not marshal tag %s to string value", tag)
+			continue
+		}
+
+		marshalledTags[tag] = tagValue
+	}
+
+	return map[string]interface{}{
+		"tags": map[string]interface{}{
+			"constant_value": marshalledTags,
+		},
+	}
 }
 
 func (p *HCLProvider) countReferences(block *hcl.Block) *countExpression {
@@ -812,8 +885,9 @@ type ModuleOut struct {
 }
 
 type ProviderConfig struct {
-	Name        string                 `json:"name"`
-	Expressions map[string]interface{} `json:"expressions,omitempty"`
+	Name              string                 `json:"name"`
+	Expressions       map[string]interface{} `json:"expressions,omitempty"`
+	InfracostMetadata map[string]interface{} `json:"infracost_metadata"`
 }
 
 type ResourceData struct {

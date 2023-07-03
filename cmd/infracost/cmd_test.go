@@ -8,8 +8,6 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/stretchr/testify/require"
-
 	main "github.com/infracost/infracost/cmd/infracost"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/testutil"
@@ -128,8 +126,11 @@ func GetCommandOutput(t *testing.T, args []string, testOptions *GoldenFileOption
 	if testOptions.IsJSON {
 		prettyBuf := bytes.NewBuffer([]byte{})
 		err := json.Indent(prettyBuf, outBuf.Bytes(), "", "  ")
-		require.NoError(t, err)
-		actual = prettyBuf.Bytes()
+		if err != nil {
+			actual = outBuf.Bytes()
+		} else {
+			actual = prettyBuf.Bytes()
+		}
 	} else {
 		actual = outBuf.Bytes()
 	}

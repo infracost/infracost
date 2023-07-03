@@ -150,6 +150,7 @@ func TestDiffWithCompareToFormatJSON(t *testing.T) {
 			"json",
 		}, &GoldenFileOptions{
 			RunTerraformCLI: true,
+			IsJSON:          true,
 		},
 	)
 }
