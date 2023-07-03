@@ -199,6 +199,7 @@ func Combine(inputs []ReportInput) (Root, error) {
 
 	projects := make([]Project, 0)
 	summaries := make([]*Summary, 0, len(inputs))
+	var tagPolicies []TagPolicy
 	currency := ""
 
 	var metadata Metadata
@@ -214,6 +215,10 @@ func Combine(inputs []ReportInput) (Root, error) {
 		projects = append(projects, input.Root.Projects...)
 
 		summaries = append(summaries, input.Root.Summary)
+
+		if len(input.Root.TagPolicies) > 0 {
+			tagPolicies = append(tagPolicies, input.Root.TagPolicies...)
+		}
 
 		if input.Root.TotalHourlyCost != nil {
 			if totalHourlyCost == nil {
@@ -279,6 +284,7 @@ func Combine(inputs []ReportInput) (Root, error) {
 	combined.TimeGenerated = time.Now().UTC()
 	combined.Summary = MergeSummaries(summaries)
 	combined.Metadata = metadata
+	combined.TagPolicies = mergeTagPolicies(tagPolicies)
 	if len(inputs) > 0 {
 		combined.CloudURL = inputs[len(inputs)-1].Root.CloudURL
 	}
@@ -292,6 +298,30 @@ func Combine(inputs []ReportInput) (Root, error) {
 	}
 
 	return combined, nil
+}
+
+func mergeTagPolicies(tagPolicies []TagPolicy) []TagPolicy {
+	// gather and merge tag policies by name
+	tpMap := map[string]TagPolicy{}
+	for _, tp := range tagPolicies {
+		if existingTp, ok := tpMap[tp.Name]; ok {
+			tp.PrComment = existingTp.PrComment || tp.PrComment
+			tp.BlockPr = existingTp.BlockPr || tp.BlockPr
+			tp.Resources = append(existingTp.Resources, tp.Resources...)
+		}
+		tpMap[tp.Name] = tp
+	}
+
+	tpMerged := make([]TagPolicy, 0, len(tpMap))
+	// use the original tagPolicies array to iterate over the map so the order is preserved
+	for _, tp := range tagPolicies {
+		if mergedTp, ok := tpMap[tp.Name]; ok {
+			tpMerged = append(tpMerged, mergedTp)
+			delete(tpMap, tp.Name)
+		}
+	}
+
+	return tpMerged
 }
 
 func checkCurrency(inputCurrency, fileCurrency string) (string, error) {

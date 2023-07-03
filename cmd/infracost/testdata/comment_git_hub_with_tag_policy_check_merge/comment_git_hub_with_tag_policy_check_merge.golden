@@ -1,0 +1,91 @@
+
+<p>💰 Infracost estimate: <b>monthly cost will not change</b></p>
+<table>
+  <thead>
+    <td>Project</td>
+    <td>Cost change</td>
+    <td>New monthly cost</td>
+  </thead>
+  <tbody>
+    <tr>
+      <td>infracost 1 dev</td>
+      <td>$0</td>
+      <td align="right">$566</td>
+    </tr>
+    <tr>
+      <td>infracost 2 dev</td>
+      <td>$0</td>
+      <td align="right">$566</td>
+    </tr>
+  </tbody>
+</table>
+<details>
+<summary><strong>Infracost output</strong></summary>
+
+```
+──────────────────────────────────
+
+6 cloud resources were detected:
+∙ 6 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+```
+</details>
+<details>
+  <summary><strong>❌ Tag policy check failed</strong></summary>
+  <table>
+    <thead>
+      <td>Policy Issue</td>
+      <td>File:line</td>
+    </thead>
+    <tr>
+      <th colspan="2"><b>Failing Tag Policy</b>: This should show as a failure</th>
+    </tr>
+    <tr>
+      <td>
+        <code>infracost1.s3.bucket</code>
+        in projects my-prod-project, my-dev-project
+        <ul>
+          <li>should have mandatory tags: "Environment", "Team"</li>
+          <li>should have a valid value for "Team" tag: "Ops", "Frontend team", "Backend team"</li>
+        </ul>
+      </td>
+      <td>
+        dev/main.tf:14
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <code>infracost2.s3.bucket</code>
+        in projects my-prod-project, my-dev-project
+        <ul>
+          <li>should have mandatory tags: "Environment", "Team"</li>
+          <li>should have a valid value for "Team" tag: "Ops", "Frontend team", "Backend team"</li>
+        </ul>
+      </td>
+      <td>
+        dev/main.tf:14
+      </td>
+    </tr>
+  </table>
+</details>
+<details>
+  <summary><strong>✅ Tag policies passed</strong></summary>
+  <ul>
+    <li><b>Passing Tag Policy 1</b> This should show as passing, it's in both files.</li>
+    <li><b>Passing Tag Policy 2</b> This should show as passing.  It's only in the second file</li>
+  </ul>
+</details>
+
+Comment not posted to GitHub (--dry-run was specified)
+
+
+Err:
+Error: Tag policy check failed:
+
+  Failing Tag Policy: This should show as a failure
+    infracost1.s3.bucket in project(s) my-prod-project, my-dev-project
+    - should have mandatory tags: "Environment", "Team"
+    - should have a valid value for "Team" tag: "Ops", "Frontend team", "Backend team"
+    infracost2.s3.bucket in project(s) my-prod-project, my-dev-project
+    - should have mandatory tags: "Environment", "Team"
+    - should have a valid value for "Team" tag: "Ops", "Frontend team", "Backend team"
+
