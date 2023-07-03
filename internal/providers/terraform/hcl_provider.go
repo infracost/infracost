@@ -613,7 +613,31 @@ func (p *HCLProvider) marshalDefaultTagsBlock(providerBlock *hcl.Block) map[stri
 	}
 
 	for tag, val := range tags.Value().AsValueMap() {
-		marshalledTags[tag] = val.AsString()
+		if !val.IsKnown() {
+			p.logger.Debugf("tag %s has unknown value, cannot marshal", tag)
+			continue
+		}
+
+		if val.Type().Equals(cty.Bool) {
+			var tagValue bool
+			err := gocty.FromCtyValue(val, &tagValue)
+			if err != nil {
+				p.logger.WithError(err).Debugf("could not marshal tag %s to bool value", tag)
+				continue
+			}
+
+			marshalledTags[tag] = fmt.Sprintf("%t", tagValue)
+			continue
+		}
+
+		var tagValue string
+		err := gocty.FromCtyValue(val, &tagValue)
+		if err != nil {
+			p.logger.WithError(err).Debugf("could not marshal tag %s to string value", tag)
+			continue
+		}
+
+		marshalledTags[tag] = tagValue
 	}
 
 	return map[string]interface{}{
