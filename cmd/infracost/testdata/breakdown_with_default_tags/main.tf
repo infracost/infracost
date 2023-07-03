@@ -11,6 +11,8 @@ provider "aws" {
       Owner       = "TFProviders"
       Project     = "TestProject"
       SomeBool    = true
+      SomeNumber  = 1
+      SomeFloat   = 1.1
     }
   }
 }

@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"math/big"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -627,6 +628,18 @@ func (p *HCLProvider) marshalDefaultTagsBlock(providerBlock *hcl.Block) map[stri
 			}
 
 			marshalledTags[tag] = fmt.Sprintf("%t", tagValue)
+			continue
+		}
+
+		if val.Type() == cty.Number {
+			var tagValue big.Float
+			err := gocty.FromCtyValue(val, &tagValue)
+			if err != nil {
+				p.logger.WithError(err).Debugf("could not marshal tag %s to number value", tag)
+				continue
+			}
+
+			marshalledTags[tag] = tagValue.String()
 			continue
 		}
 

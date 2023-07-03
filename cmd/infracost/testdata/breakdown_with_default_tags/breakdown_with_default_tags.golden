@@ -25,11 +25,13 @@
               "Environment": "Test",
               "Owner": "TFProviders",
               "Project": "TestProject",
-              "SomeBool": "true"
+              "SomeBool": "true",
+              "SomeFloat": "1.1",
+              "SomeNumber": "1"
             },
             "filename": "testdata/breakdown_with_default_tags/main.tf",
             "startLine": 1,
-            "endLine": 16
+            "endLine": 18
           }
         ]
       },
@@ -50,9 +52,9 @@
                 }
               ],
               "checksum": "e33830cc9be4d99146eece690c1c28ee61658f6528580210224ed26304df340d",
-              "endLine": 28,
+              "endLine": 30,
               "filename": "testdata/breakdown_with_default_tags/main.tf",
-              "startLine": 18
+              "startLine": 20
             },
             "hourlyCost": null,
             "monthlyCost": null,
@@ -107,9 +109,9 @@
                 }
               ],
               "checksum": "e33830cc9be4d99146eece690c1c28ee61658f6528580210224ed26304df340d",
-              "endLine": 28,
+              "endLine": 30,
               "filename": "testdata/breakdown_with_default_tags/main.tf",
-              "startLine": 18
+              "startLine": 20
             },
             "hourlyCost": null,
             "monthlyCost": null,
