@@ -36,7 +36,7 @@ func TestTerraformPlanScanner_ScanPlan(t *testing.T) {
 							"Type": "gp3"
 						  }
 						},
-						"suggested": "gp3"						
+						"suggested": "gp3"
 					}
 				]
 			}`))
@@ -56,17 +56,17 @@ func TestTerraformPlanScanner_ScanPlan(t *testing.T) {
 	newCost := decimal.NewFromInt(5)
 
 	var called int
-	ps := scan.NewTerraformPlanScanner(runCtx, newDiscardLogger(), func(ctx *config.RunContext, c *apiclient.PricingAPIClient, r *schema.Resource) error {
+	ps := scan.NewTerraformPlanScanner(runCtx, newDiscardLogger(), func(ctx *config.RunContext, c *apiclient.PricingAPIClient, resources []*schema.Resource) error {
 		t.Helper()
 
 		if called == 0 {
-			component := r.SubResources[0].CostComponents[0]
+			component := resources[0].SubResources[0].CostComponents[0]
 			assert.Contains(t, component.Name, "gp2")
 			component.SetPrice(baseCost)
 		}
 
 		if called == 1 {
-			component := r.SubResources[0].CostComponents[0]
+			component := resources[0].SubResources[0].CostComponents[0]
 			assert.Contains(t, component.Name, "gp3")
 			component.SetPrice(newCost)
 		}

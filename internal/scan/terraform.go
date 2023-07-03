@@ -18,7 +18,7 @@ import (
 
 // GetPricesFunc fetches a price for the given resource r using client c.
 // This interface is extracted to avoid circular deps and ease of testing.
-type GetPricesFunc func(ctx *config.RunContext, c *apiclient.PricingAPIClient, r *schema.Resource) error
+type GetPricesFunc func(ctx *config.RunContext, c *apiclient.PricingAPIClient, resources []*schema.Resource) error
 
 // TerraformPlanScanner scans a plan for Infracost Cloud cost optimizations. These optimizations are provided by the
 // policy API and the scanner links any suggestions to raw resources. It attempts to find cost estimates for any
@@ -182,7 +182,7 @@ func (s *TerraformPlanScanner) buildResource(coreResource schema.CoreResource, u
 	coreResource.PopulateUsage(usage)
 	r := coreResource.BuildResource()
 
-	err := s.getPrices(s.ctx, s.pricingAPIClient, r)
+	err := s.getPrices(s.ctx, s.pricingAPIClient, []*schema.Resource{r})
 	if err != nil {
 		return nil, fmt.Errorf("could not fetch prices for core resource %s %w", coreResource.CoreType(), err)
 	}
