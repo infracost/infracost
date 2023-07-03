@@ -10,6 +10,7 @@ provider "aws" {
       Environment = "Test"
       Owner       = "TFProviders"
       Project     = "TestProject"
+      SomeBool    = true
     }
   }
 }
