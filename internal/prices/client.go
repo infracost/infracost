@@ -1,19 +1,13 @@
-package apiclient
+package prices
 
 import (
-	"crypto/tls"
-	"crypto/x509"
 	"fmt"
-	"net/http"
-	"os"
 
-	"github.com/hashicorp/go-retryablehttp"
-
+	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
 
-	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
 
@@ -23,8 +17,12 @@ var (
 	}
 )
 
+type PricingClient interface {
+}
+
 type PricingAPIClient struct {
-	APIClient
+	apiclient.APIClient
+
 	Currency       string
 	EventsDisabled bool
 }
@@ -45,45 +43,8 @@ func NewPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
 		currency = "USD"
 	}
 
-	tlsConfig := tls.Config{} // nolint: gosec
-
-	if ctx.Config.TLSCACertFile != "" {
-		rootCAs, _ := x509.SystemCertPool()
-		if rootCAs == nil {
-			rootCAs = x509.NewCertPool()
-		}
-
-		caCerts, err := os.ReadFile(ctx.Config.TLSCACertFile)
-		if err != nil {
-			log.Errorf("Error reading CA cert file %s: %v", ctx.Config.TLSCACertFile, err)
-		} else {
-			ok := rootCAs.AppendCertsFromPEM(caCerts)
-
-			if !ok {
-				log.Warningf("No CA certs appended, only using system certs")
-			} else {
-				log.Debugf("Loaded CA certs from %s", ctx.Config.TLSCACertFile)
-			}
-		}
-
-		tlsConfig.RootCAs = rootCAs
-	}
-
-	if ctx.Config.TLSInsecureSkipVerify != nil {
-		tlsConfig.InsecureSkipVerify = *ctx.Config.TLSInsecureSkipVerify // nolint: gosec
-	}
-
-	client := retryablehttp.NewClient()
-	client.Logger = &LeveledLogger{Logger: logging.Logger.WithField("library", "retryablehttp")}
-	client.HTTPClient.Transport.(*http.Transport).TLSClientConfig = &tlsConfig
-
 	return &PricingAPIClient{
-		APIClient: APIClient{
-			httpClient: client.StandardClient(),
-			endpoint:   ctx.Config.PricingAPIEndpoint,
-			apiKey:     ctx.Config.APIKey,
-			uuid:       ctx.UUID(),
-		},
+		APIClient:      apiclient.NewTLSEnabledClient(ctx),
 		Currency:       currency,
 		EventsDisabled: ctx.Config.EventsDisabled,
 	}
@@ -116,11 +77,11 @@ func (c *PricingAPIClient) RunQueries(r *schema.Resource) ([]PriceQueryResult, e
 	keys, queries := c.batchQueries(r)
 
 	if len(queries) == 0 {
-		log.Debugf("Skipping getting pricing details for %s since there are no queries to run", r.Name)
+		logging.Logger.Debugf("Skipping getting pricing details for %s since there are no queries to run", r.Name)
 		return []PriceQueryResult{}, nil
 	}
 
-	log.Debugf("Getting pricing details from %s for %s", c.endpoint, r.Name)
+	logging.Logger.Debugf("Getting pricing details for %s", r.Name)
 
 	results, err := c.DoQueries(queries)
 	if err != nil {
@@ -130,7 +91,7 @@ func (c *PricingAPIClient) RunQueries(r *schema.Resource) ([]PriceQueryResult, e
 	return c.zipQueryResults(keys, results), nil
 }
 
-func (c *PricingAPIClient) buildQuery(product *schema.ProductFilter, price *schema.PriceFilter) GraphQLQuery {
+func (c *PricingAPIClient) buildQuery(product *schema.ProductFilter, price *schema.PriceFilter) apiclient.GraphQLQuery {
 	v := map[string]interface{}{}
 	v["productFilter"] = product
 	v["priceFilter"] = price
@@ -146,14 +107,14 @@ func (c *PricingAPIClient) buildQuery(product *schema.ProductFilter, price *sche
 		}
 	`, c.Currency)
 
-	return GraphQLQuery{query, v}
+	return apiclient.GraphQLQuery{query, v}
 }
 
 // Batch all the queries for this resource so we can use one GraphQL call.
 // Use PriceQueryKeys to keep track of which query maps to which sub-resource and price component.
-func (c *PricingAPIClient) batchQueries(r *schema.Resource) ([]PriceQueryKey, []GraphQLQuery) {
+func (c *PricingAPIClient) batchQueries(r *schema.Resource) ([]PriceQueryKey, []apiclient.GraphQLQuery) {
 	keys := make([]PriceQueryKey, 0)
-	queries := make([]GraphQLQuery, 0)
+	queries := make([]apiclient.GraphQLQuery, 0)
 
 	for _, component := range r.CostComponents {
 		keys = append(keys, PriceQueryKey{r, component})

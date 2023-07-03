@@ -40,7 +40,7 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 				s += "\n"
 			}
 		} else {
-			tableOut := tableForBreakdown(out.Currency, *project.Breakdown, opts.Fields, includeProjectTotals)
+			tableOut := tableForBreakdown(project.Metadata.Type, out.Currency, *project.Breakdown, opts.Fields, includeProjectTotals)
 
 			// Get the last table length so we can align the overall total with it
 			if i == len(out.Projects)-1 {
@@ -107,7 +107,7 @@ func erroredProject(project Project) string {
 	return s
 }
 
-func tableForBreakdown(currency string, breakdown Breakdown, fields []string, includeTotal bool) string {
+func tableForBreakdown(projectType string, currency string, breakdown Breakdown, fields []string, includeTotal bool) string {
 	t := table.NewWriter()
 	t.Style().Options.DrawBorder = false
 	t.Style().Options.SeparateColumns = false

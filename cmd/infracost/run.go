@@ -50,6 +50,8 @@ func addRunFlags(cmd *cobra.Command) {
 
 	cmd.Flags().String("config-file", "", "Path to Infracost config file. Cannot be used with path, terraform* or usage-file flags")
 	cmd.Flags().String("usage-file", "", "Path to Infracost usage file that specifies values for usage-based resources")
+	cmd.Flags().String("k8s-file", "", "Path to the file which specifies your kubernetes unit pricing")
+	cmd.Flags().StringSlice("helm-values-file", nil, "Path to the file which specifies the helm input values for your helm project")
 
 	cmd.Flags().String("project-name", "", "Name of project in the output. Defaults to path or git repo name")
 
@@ -448,7 +450,8 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 	defer spinner.Fail()
 
 	for _, project := range projects {
-		if err := prices.PopulatePrices(r.runCtx, project); err != nil {
+		err := prices.PopulatePrices(ctx, project)
+		if err != nil {
 			spinner.Fail()
 			r.cmd.PrintErrln()
 
@@ -474,8 +477,8 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 
 			return nil, err
 		}
-		schema.CalculateCosts(project)
 
+		schema.CalculateCosts(project)
 		project.CalculateDiff()
 	}
 
@@ -742,6 +745,8 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 		tfVars, _ := cmd.Flags().GetStringSlice("terraform-var")
 		projectCfg.TerraformVars = tfVarsToMap(tfVars)
 		projectCfg.UsageFile, _ = cmd.Flags().GetString("usage-file")
+		projectCfg.K8sFile, _ = cmd.Flags().GetString("k8s-file")
+		projectCfg.HelmValuesFiles, _ = cmd.Flags().GetStringSlice("helm-values-file")
 		projectCfg.Name, _ = cmd.Flags().GetString("project-name")
 		projectCfg.TerraformForceCLI, _ = cmd.Flags().GetBool("terraform-force-cli")
 		projectCfg.TerraformPlanFlags, _ = cmd.Flags().GetString("terraform-plan-flags")

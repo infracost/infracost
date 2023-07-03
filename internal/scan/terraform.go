@@ -18,27 +18,25 @@ import (
 
 // GetPricesFunc fetches a price for the given resource r using client c.
 // This interface is extracted to avoid circular deps and ease of testing.
-type GetPricesFunc func(ctx *config.RunContext, c *apiclient.PricingAPIClient, r *schema.Resource) error
+type GetPricesFunc func(r *schema.Resource) error
 
 // TerraformPlanScanner scans a plan for Infracost Cloud cost optimizations. These optimizations are provided by the
 // policy API and the scanner links any suggestions to raw resources. It attempts to find cost estimates for any
 // policies that are found.
 type TerraformPlanScanner struct {
-	pricingAPIClient *apiclient.PricingAPIClient
-	policyAPIClient  apiclient.PolicyClient
-	logger           *log.Entry
-	ctx              *config.RunContext
-	getPrices        GetPricesFunc
+	policyAPIClient apiclient.PolicyClient
+	logger          *log.Entry
+	ctx             *config.RunContext
+	getPrices       GetPricesFunc
 }
 
 // NewTerraformPlanScanner returns an initialised TerraformPlanScanner.
 func NewTerraformPlanScanner(ctx *config.RunContext, logger *log.Entry, getPrices GetPricesFunc) *TerraformPlanScanner {
 	return &TerraformPlanScanner{
-		pricingAPIClient: apiclient.NewPricingAPIClient(ctx),
-		policyAPIClient:  apiclient.NewPolicyClient(ctx.Config, logger),
-		logger:           logger,
-		ctx:              ctx,
-		getPrices:        getPrices,
+		policyAPIClient: apiclient.NewPolicyClient(ctx.Config, logger),
+		logger:          logger,
+		ctx:             ctx,
+		getPrices:       getPrices,
 	}
 }
 
@@ -182,7 +180,7 @@ func (s *TerraformPlanScanner) buildResource(coreResource schema.CoreResource, u
 	coreResource.PopulateUsage(usage)
 	r := coreResource.BuildResource()
 
-	err := s.getPrices(s.ctx, s.pricingAPIClient, r)
+	err := s.getPrices(r)
 	if err != nil {
 		return nil, fmt.Errorf("could not fetch prices for core resource %s %w", coreResource.CoreType(), err)
 	}

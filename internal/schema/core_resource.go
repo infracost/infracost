@@ -87,7 +87,9 @@ func BuildResource(partial *PartialResource, fetchedUsage *UsageData) *Resource 
 	}
 
 	res.ResourceType = partial.ResourceData.Type
-	res.Tags = partial.ResourceData.Tags
+	if res.Tags == nil {
+		res.Tags = partial.ResourceData.Tags
+	}
 	res.Metadata = partial.ResourceData.Metadata
 	return res
 }

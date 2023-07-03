@@ -24,11 +24,12 @@
             "defaultTags": {
               "Environment": "Test",
               "Owner": "TFProviders",
-              "Project": "TestProject"
+              "Project": "TestProject",
+              "SomeBool": "true"
             },
             "filename": "testdata/breakdown_with_default_tags/main.tf",
             "startLine": 1,
-            "endLine": 15
+            "endLine": 16
           }
         ]
       },
@@ -49,9 +50,9 @@
                 }
               ],
               "checksum": "e33830cc9be4d99146eece690c1c28ee61658f6528580210224ed26304df340d",
-              "endLine": 27,
+              "endLine": 28,
               "filename": "testdata/breakdown_with_default_tags/main.tf",
-              "startLine": 17
+              "startLine": 18
             },
             "hourlyCost": null,
             "monthlyCost": null,
@@ -106,9 +107,9 @@
                 }
               ],
               "checksum": "e33830cc9be4d99146eece690c1c28ee61658f6528580210224ed26304df340d",
-              "endLine": 27,
+              "endLine": 28,
               "filename": "testdata/breakdown_with_default_tags/main.tf",
-              "startLine": 17
+              "startLine": 18
             },
             "hourlyCost": null,
             "monthlyCost": null,
