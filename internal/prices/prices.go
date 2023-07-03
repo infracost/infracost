@@ -12,6 +12,8 @@ import (
 	"github.com/tidwall/gjson"
 )
 
+var batchSize = 10
+
 func PopulatePrices(ctx *config.RunContext, project *schema.Project) error {
 	resources := project.AllResources()
 
@@ -37,22 +39,25 @@ func GetPricesConcurrent(ctx *config.RunContext, c *apiclient.PricingAPIClient, 
 	if numWorkers > 16 {
 		numWorkers = 16
 	}
-	numJobs := len(resources)
-	jobs := make(chan *schema.Resource, numJobs)
+
+	reqs := c.BatchRequests(resources, batchSize)
+
+	numJobs := len(reqs)
+	jobs := make(chan apiclient.BatchRequest, numJobs)
 	resultErrors := make(chan error, numJobs)
 
 	// Fire up the workers
 	for i := 0; i < numWorkers; i++ {
-		go func(jobs <-chan *schema.Resource, resultErrors chan<- error) {
-			for r := range jobs {
-				err := GetPrices(ctx, c, r)
+		go func(jobs <-chan apiclient.BatchRequest, resultErrors chan<- error) {
+			for req := range jobs {
+				err := GetPrices(ctx, c, req)
 				resultErrors <- err
 			}
 		}(jobs, resultErrors)
 	}
 
 	// Feed the workers the jobs of getting prices
-	for _, r := range resources {
+	for _, r := range reqs {
 		jobs <- r
 	}
 
@@ -66,12 +71,8 @@ func GetPricesConcurrent(ctx *config.RunContext, c *apiclient.PricingAPIClient, 
 	return nil
 }
 
-func GetPrices(ctx *config.RunContext, c *apiclient.PricingAPIClient, r *schema.Resource) error {
-	if r.IsSkipped {
-		return nil
-	}
-
-	results, err := c.RunQueries(r)
+func GetPrices(ctx *config.RunContext, c *apiclient.PricingAPIClient, req apiclient.BatchRequest) error {
+	results, err := c.PerformRequest(req)
 	if err != nil {
 		return err
 	}

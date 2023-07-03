@@ -24,7 +24,7 @@ type PlanJSONProvider struct {
 func NewPlanJSONProvider(ctx *config.ProjectContext, includePastResources bool) *PlanJSONProvider {
 	var scanner *scan.TerraformPlanScanner
 	if ctx.RunContext.Config.PolicyAPIEndpoint != "" {
-		scanner = scan.NewTerraformPlanScanner(ctx.RunContext, ctx.Logger(), prices.GetPrices)
+		scanner = scan.NewTerraformPlanScanner(ctx.RunContext, ctx.Logger(), prices.GetPricesConcurrent)
 	}
 
 	return &PlanJSONProvider{
