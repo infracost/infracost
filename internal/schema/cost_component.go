@@ -4,6 +4,10 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+var (
+	DecimalOne = decimal.NewFromInt(1)
+)
+
 type CostComponent struct {
 	Name           string
 	Unit           string

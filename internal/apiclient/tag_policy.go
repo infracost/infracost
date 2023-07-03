@@ -3,9 +3,10 @@ package apiclient
 import (
 	"encoding/json"
 	"fmt"
+
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/output"
-	log "github.com/sirupsen/logrus"
 )
 
 type TagPolicyAPIClient struct {
@@ -60,7 +61,7 @@ func (c *TagPolicyAPIClient) CheckTagPolicies(ctx *config.RunContext, out output
 	v := map[string]interface{}{
 		"run": *ri,
 	}
-	results, err := c.doQueries([]GraphQLQuery{{q, v}})
+	results, err := c.DoQueries([]GraphQLQuery{{q, v}})
 	if err != nil {
 		return nil, fmt.Errorf("query failed when checking tag policies %w", err)
 	}
@@ -89,7 +90,7 @@ func (c *TagPolicyAPIClient) CheckTagPolicies(ctx *config.RunContext, out output
 		}
 		tagPolicyMsg := fmt.Sprintf(`%d %s checked`, len(tagPolicies.TagPolicies), checkedStr)
 		if ctx.Config.IsLogging() {
-			log.Info(tagPolicyMsg)
+			logging.Logger.Info(tagPolicyMsg)
 		} else {
 			fmt.Fprintf(ctx.ErrWriter, "%s\n", tagPolicyMsg)
 		}

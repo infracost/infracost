@@ -880,8 +880,8 @@ func formatCounts(countMap *map[string]int) string {
 	return msg
 }
 
-func hasSupportedTerraformProvider(rType string) bool {
-	return strings.HasPrefix(rType, "aws_") || strings.HasPrefix(rType, "google_") || strings.HasPrefix(rType, "azurerm_")
+func hasSupportedProvider(rType string) bool {
+	return strings.HasPrefix(rType, "k8s.") || strings.HasPrefix(rType, "aws_") || strings.HasPrefix(rType, "google_") || strings.HasPrefix(rType, "azurerm_")
 }
 
 func BuildSummary(resources []*schema.Resource, opts SummaryOptions) (*Summary, error) {
@@ -907,7 +907,7 @@ func BuildSummary(resources []*schema.Resource, opts SummaryOptions) (*Summary, 
 	}
 
 	for _, r := range resources {
-		if !opts.IncludeUnsupportedProviders && !hasSupportedTerraformProvider(r.ResourceType) {
+		if !opts.IncludeUnsupportedProviders && !hasSupportedProvider(r.ResourceType) {
 			continue
 		}
 

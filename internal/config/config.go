@@ -61,6 +61,10 @@ type Project struct {
 	TerragruntFlags string `yaml:"terragrunt_flags,omitempty" envconfig:"TERRAGRUNT_FLAGS"`
 	// UsageFile is the full path to usage file that specifies values for usage-based resources
 	UsageFile string `yaml:"usage_file,omitempty" ignored:"true"`
+	// K8SFile is the full path to the path which contains the kubernetes cost defaults.
+	K8sFile string `yaml:"k8s_file,omitempty" ignored:"true"`
+	// HelmValuesFile are the files which specify helm input values.
+	HelmValuesFiles []string `yaml:"helm_values_files,omitempty" ignored:"true"`
 	// TerraformUseState sets if the users wants to use the terraform state for infracost ops.
 	TerraformUseState bool              `yaml:"terraform_use_state,omitempty" ignored:"true"`
 	Env               map[string]string `yaml:"env,omitempty" ignored:"true"`

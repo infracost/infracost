@@ -100,7 +100,7 @@ func (c *UsageAPIClient) ListActualCosts(vars ActualCostsQueryVariables) ([]Actu
 
 	logging.Logger.Debugf("Getting actual costs from %s for %s", c.endpoint, vars.Address)
 
-	results, err := c.doQueries([]GraphQLQuery{query})
+	results, err := c.DoQueries([]GraphQLQuery{query})
 	if err != nil {
 		return nil, err
 	} else if len(results) > 0 && results[0].Get("errors").Exists() {
@@ -180,7 +180,7 @@ func (c *UsageAPIClient) ListUsageQuantities(vars UsageQuantitiesQueryVariables)
 
 	logging.Logger.Debugf("Getting usage quantities from %s for %s %s %v", c.endpoint, vars.ResourceType, vars.Address, vars.UsageKeys)
 
-	results, err := c.doQueries([]GraphQLQuery{query})
+	results, err := c.DoQueries([]GraphQLQuery{query})
 	if err != nil {
 		return nil, err
 	} else if len(results) > 0 && results[0].Get("errors").Exists() {
@@ -305,7 +305,7 @@ func (c *UsageAPIClient) UploadCloudResourceIDs(vars CloudResourceIDVariables) e
 
 	logging.Logger.Debugf("Uploading cloud resource IDs to %s for %s %s", c.endpoint, vars.RepoURL, vars.ProjectWithWorkspace)
 
-	results, err := c.doQueries([]GraphQLQuery{query})
+	results, err := c.DoQueries([]GraphQLQuery{query})
 	if err != nil {
 		return err
 	} else if len(results) > 0 && results[0].Get("errors").Exists() {

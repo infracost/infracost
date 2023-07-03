@@ -9,11 +9,14 @@ import (
 	"sync"
 
 	"github.com/awslabs/goformation/v4"
+	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
+	"k8s.io/client-go/kubernetes/scheme"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/providers/cloudformation"
+	"github.com/infracost/infracost/internal/providers/k8s"
 	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -53,6 +56,10 @@ func Detect(ctx *config.ProjectContext, includePastResources bool) (schema.Provi
 	projectType := DetectProjectType(path, forceCLI)
 
 	switch projectType {
+	case "k8s_dir":
+		return k8s.NewManifestProvider(path, ctx), nil
+	case "helm_dir":
+		return k8s.NewHelmProvider(path, ctx), nil
 	case "terraform_dir":
 		h, providerErr := terraform.NewHCLProvider(
 			ctx,
@@ -139,11 +146,74 @@ func DetectProjectType(path string, forceCLI bool) string {
 		return "terragrunt_dir"
 	}
 
+	if isK8sDir(path) {
+		return "k8s_dir"
+	}
+
+	if isHelmDir(path) {
+		return "helm_dir"
+	}
+
 	if forceCLI {
 		return "terraform_cli"
 	}
 
 	return "terraform_dir"
+}
+
+func isHelmDir(dir string) bool {
+	info, err := os.Stat(dir)
+	if err != nil || !info.IsDir() {
+		return false
+	}
+
+	chartFile := filepath.Join(dir, "Chart.yaml")
+	if _, err := os.Stat(chartFile); os.IsNotExist(err) {
+		return false
+	}
+
+	templatesDir := filepath.Join(dir, "templates")
+	if _, err := os.Stat(templatesDir); os.IsNotExist(err) {
+		return false
+	}
+
+	return true
+}
+
+func isK8sDir(dir string) bool {
+	decode := scheme.Codecs.UniversalDeserializer().Decode
+	info, err := os.Stat(dir)
+	if err != nil {
+		return false
+	}
+
+	if !info.IsDir() {
+		return k8s.IsYMLFile(info)
+	}
+
+	files, _ := os.ReadDir(dir)
+
+	for _, file := range files {
+		if !k8s.IsYMLFile(file) {
+			continue
+		}
+
+		data, err := os.ReadFile(filepath.Join(dir, file.Name()))
+		if err != nil {
+			continue
+		}
+
+		obj, _, err := decode(data, nil, nil)
+		if err != nil {
+			continue
+		}
+
+		if _, ok := obj.(v1.Object); ok {
+			return true
+		}
+	}
+
+	return false
 }
 
 func isTerraformPlanJSON(path string) bool {
