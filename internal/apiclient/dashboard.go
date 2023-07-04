@@ -126,6 +126,7 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (Ad
 			addRun(run: $run) {
 				id
 				shareUrl
+				cloudUrl
 				organization {
 					id
 					name
@@ -167,6 +168,7 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (Ad
 
 		response.RunID = cloudRun.Get("id").String()
 		response.ShareURL = cloudRun.Get("shareUrl").String()
+		response.CloudURL = cloudRun.Get("cloudUrl").String()
 		response.GuardrailCheck.TotalChecked = cloudRun.Get("guardrailsChecked").Int()
 		response.GuardrailCheck.Comment = cloudRun.Get("guardrailComment").Bool()
 		for _, event := range cloudRun.Get("guardrailEvents").Array() {
