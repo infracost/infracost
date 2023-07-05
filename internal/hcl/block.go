@@ -1209,9 +1209,11 @@ func getRegionFromProvider(b *Block, provider string) string {
 	attr := b.GetAttribute("provider")
 	if attr != nil {
 		v := attr.Value()
-		r := v.GetAttr("region")
-		if !r.IsNull() {
-			region = r
+		if v.Type().IsObjectType() {
+			m := v.AsValueMap()
+			if r, ok := m["region"]; ok {
+				region = r
+			}
 		}
 	}
 
