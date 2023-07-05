@@ -453,6 +453,11 @@ func (p *HCLProvider) marshalModule(module *hcl.Module) ModuleOut {
 		}
 	}
 
+	// sort the modules so we get deterministic output in the json
+	sort.SliceStable(module.Blocks, func(i, j int) bool {
+		return module.Blocks[i].Label() < module.Blocks[j].Label()
+	})
+
 	configResources := map[string]struct{}{}
 	for _, block := range module.Blocks {
 		if block.Type() == "resource" {
@@ -468,6 +473,11 @@ func (p *HCLProvider) marshalModule(module *hcl.Module) ModuleOut {
 			p.schema.InfracostResourceChanges = append(p.schema.InfracostResourceChanges, out.Changes)
 		}
 	}
+
+	// sort the modules so we get deterministic output in the json
+	sort.SliceStable(module.Modules, func(i, j int) bool {
+		return module.Modules[i].Name < module.Modules[j].Name
+	})
 
 	for _, m := range module.Modules {
 		pieces := strings.Split(m.Name, ".")
