@@ -86,7 +86,7 @@ func (p *DirProvider) DisplayType() string {
 func (p *DirProvider) checks() error {
 	binary := p.TerraformBinary
 
-	p.ctx.SetContextValue("terraformBinary", binary)
+	p.ctx.ContextValues.SetValue("terraformBinary", binary)
 
 	_, err := exec.LookPath(binary)
 	if err != nil {
@@ -105,8 +105,8 @@ func (p *DirProvider) checks() error {
 	fullVersion := strings.SplitN(string(out), "\n", 2)[0]
 	version := shortTerraformVersion(fullVersion)
 
-	p.ctx.SetContextValue("terraformFullVersion", fullVersion)
-	p.ctx.SetContextValue("terraformVersion", version)
+	p.ctx.ContextValues.SetValue("terraformFullVersion", fullVersion)
+	p.ctx.ContextValues.SetValue("terraformVersion", version)
 
 	return checkTerraformVersion(version, fullVersion)
 }
@@ -337,7 +337,7 @@ func (p *DirProvider) runPlan(opts *CmdOptions, spinner *ui.Spinner, initOnFail 
 		// If the plan returns this error then Terraform is configured with remote execution mode
 		if isTerraformRemoteExecutionErr(extractedErr) {
 			log.Info("Continuing with Terraform Remote Execution Mode")
-			p.ctx.SetContextValue("terraformRemoteExecutionModeEnabled", true)
+			p.ctx.ContextValues.SetValue("terraformRemoteExecutionModeEnabled", true)
 			planJSON, err = p.runRemotePlan(opts, args)
 		} else if initOnFail && isTerraformInitErr(extractedErr) {
 			spinner.Stop()

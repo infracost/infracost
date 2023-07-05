@@ -27,7 +27,7 @@ func commentAzureReposCmd(ctx *config.RunContext) *cobra.Command {
       infracost comment azure-repos --repo-url https://dev.azure.com/my-org/my-project/_git/my-repo --pull-request 3 --path infracost.json --azure-access-token $AZURE_ACCESS_TOKEN`,
 		ValidArgs: []string{"--", "-"},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx.SetContextValue("platform", "azure-repos")
+			ctx.ContextValues.SetValue("platform", "azure-repos")
 
 			var err error
 
@@ -43,7 +43,7 @@ func commentAzureReposCmd(ctx *config.RunContext) *cobra.Command {
 
 			var commentHandler *comment.CommentHandler
 			if prNumber != 0 {
-				ctx.SetContextValue("targetType", "pull-request")
+				ctx.ContextValues.SetValue("targetType", "pull-request")
 
 				commentHandler, err = comment.NewAzureReposPRHandler(ctx.Context(), repoURL, strconv.Itoa(prNumber), extra)
 				if err != nil {
@@ -59,7 +59,7 @@ func commentAzureReposCmd(ctx *config.RunContext) *cobra.Command {
 				ui.PrintUsage(cmd)
 				return fmt.Errorf("--behavior only supports %s", strings.Join(validCommentAzureReposBehaviors, ", "))
 			}
-			ctx.SetContextValue("behavior", behavior)
+			ctx.ContextValues.SetValue("behavior", behavior)
 
 			paths, _ := cmd.Flags().GetStringArray("path")
 

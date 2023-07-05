@@ -116,7 +116,7 @@ func newRootCmd(ctx *config.RunContext) *cobra.Command {
 		SilenceErrors: true,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			cmd.SilenceUsage = true
-			ctx.SetContextValue("command", cmd.Name())
+			ctx.ContextValues.SetValue("command", cmd.Name())
 			ctx.CMD = cmd.Name()
 			if cmd.Name() == "comment" || (cmd.Parent() != nil && cmd.Parent().Name() == "comment") {
 				ctx.SetIsInfracostComment()
@@ -318,9 +318,9 @@ func loadGlobalFlags(ctx *config.RunContext, cmd *cobra.Command) error {
 		return err
 	}
 
-	ctx.SetContextValue("dashboardEnabled", ctx.Config.EnableDashboard)
-	ctx.SetContextValue("cloudEnabled", ctx.IsCloudEnabled())
-	ctx.SetContextValue("isDefaultPricingAPIEndpoint", ctx.Config.PricingAPIEndpoint == ctx.Config.DefaultPricingAPIEndpoint)
+	ctx.ContextValues.SetValue("dashboardEnabled", ctx.Config.EnableDashboard)
+	ctx.ContextValues.SetValue("cloudEnabled", ctx.IsCloudEnabled())
+	ctx.ContextValues.SetValue("isDefaultPricingAPIEndpoint", ctx.Config.PricingAPIEndpoint == ctx.Config.DefaultPricingAPIEndpoint)
 
 	flagNames := make([]string, 0)
 
@@ -328,7 +328,7 @@ func loadGlobalFlags(ctx *config.RunContext, cmd *cobra.Command) error {
 		flagNames = append(flagNames, f.Name)
 	})
 
-	ctx.SetContextValue("flags", flagNames)
+	ctx.ContextValues.SetValue("flags", flagNames)
 
 	return nil
 }

@@ -34,7 +34,7 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
       infracost comment github --repo my-org/my-repo --commit 2ca7182 --path infracost.json --behavior hide-and-new --github-token $GITHUB_TOKEN`,
 		ValidArgs: []string{"--", "-"},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx.SetContextValue("platform", "github")
+			ctx.ContextValues.SetValue("platform", "github")
 
 			var err error
 
@@ -77,14 +77,14 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 
 			var commentHandler *comment.CommentHandler
 			if prNumber != 0 {
-				ctx.SetContextValue("targetType", "pull-request")
+				ctx.ContextValues.SetValue("targetType", "pull-request")
 
 				commentHandler, err = comment.NewGitHubPRHandler(ctx.Context(), repo, strconv.Itoa(prNumber), extra)
 				if err != nil {
 					return err
 				}
 			} else if commit != "" {
-				ctx.SetContextValue("targetType", "commit")
+				ctx.ContextValues.SetValue("targetType", "commit")
 
 				commentHandler, err = comment.NewGitHubCommitHandler(ctx.Context(), repo, commit, extra)
 				if err != nil {
@@ -100,7 +100,7 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 				ui.PrintUsage(cmd)
 				return fmt.Errorf("--behavior only supports %s", strings.Join(validCommentGitHubBehaviors, ", "))
 			}
-			ctx.SetContextValue("behavior", behavior)
+			ctx.ContextValues.SetValue("behavior", behavior)
 
 			paths, _ := cmd.Flags().GetStringArray("path")
 

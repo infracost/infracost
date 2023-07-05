@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/hashicorp/terraform-config-inspect/tfconfig"
+
 	"github.com/infracost/infracost/internal/config"
 
 	log "github.com/sirupsen/logrus"
@@ -131,7 +132,7 @@ func UsePlanCache(p *DirProvider) bool {
 		return false
 	}
 
-	if _, ok := p.ctx.ContextValues()["terraformRemoteExecutionModeEnabled"]; ok {
+	if _, ok := p.ctx.ContextValues.GetValue("terraformRemoteExecutionModeEnabled"); ok {
 		// remote execution is enabled
 		return false
 	}

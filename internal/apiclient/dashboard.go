@@ -75,7 +75,7 @@ func newRunInput(ctx *config.RunContext, out output.Root) (*runInput, error) {
 		}
 	}
 
-	ctxValues := ctx.ContextValues()
+	ctxValues := ctx.ContextValues.Values()
 
 	var metadata map[string]interface{}
 	b, err := json.Marshal(out.Metadata)
@@ -94,7 +94,7 @@ func newRunInput(ctx *config.RunContext, out output.Root) (*runInput, error) {
 		// Clone the map to cleanup up the "command" key to show "comment".  It is
 		// currently set to the sub comment (e.g. "github")
 		ctxValues = make(map[string]interface{}, len(ctxValues))
-		for k, v := range ctx.ContextValues() {
+		for k, v := range ctx.ContextValues.Values() {
 			ctxValues[k] = v
 		}
 		ctxValues["command"] = "comment"
