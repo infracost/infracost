@@ -626,6 +626,10 @@ type ModuleMetadata struct {
 }
 
 func (b *Block) setLogger(logger *logrus.Entry) {
+	// Use the provided logger as is initially so we avoid a nil pointer in the case where we need to log
+	// an error while calculating b.FullName().
+	b.logger = logger
+
 	blockLogger := logger.WithFields(logrus.Fields{
 		"block_name": b.FullName(),
 	})
