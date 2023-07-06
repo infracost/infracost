@@ -1,6 +1,8 @@
 package hcl
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"os"
 	"regexp"
@@ -8,7 +10,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/google/uuid"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/sirupsen/logrus"
@@ -281,10 +282,6 @@ func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.B
 
 	isLoggingVerbose := strings.TrimSpace(os.Getenv("INFRACOST_HCL_DEBUG_VERBOSE")) == "true"
 	if body, ok := hclBlock.Body.(*hclsyntax.Body); ok {
-		for _, f := range b.SetAttributes {
-			f(moduleBlock, hclBlock)
-		}
-
 		block := &Block{
 			Filename:    filename,
 			StartLine:   body.SrcRange.Start.Line,
@@ -299,11 +296,15 @@ func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.B
 			parent:      parent,
 		}
 
+		block.setLogger(b.Logger)
+
+		for _, f := range b.SetAttributes {
+			f(block.FullName(), moduleBlock, hclBlock)
+		}
+
 		for i, bb := range body.Blocks {
 			block.childBlocks[i] = b.NewBlock(filename, rootPath, bb.AsHCLBlock(), ctx, block, moduleBlock)
 		}
-
-		block.setLogger(b.Logger)
 
 		return block
 	}
@@ -426,50 +427,54 @@ func (b BlockBuilder) BuildModuleBlocks(block *Block, modulePath string, rootPat
 // SetAttributesFunc defines a function that sets required attributes on a hcl.Block.
 // This is done so that identifiers that are normally propagated from a Terraform state/apply
 // are set on the Block. This means they can be used properly in references and outputs.
-type SetAttributesFunc func(moduleBlock *Block, block *hcl.Block)
+type SetAttributesFunc func(address string, moduleBlock *Block, block *hcl.Block)
 
 // SetUUIDAttributes adds commonly used identifiers to the block so that it can be referenced by other
 // blocks in context evaluation. The identifiers are only set if they don't already exist as attributes
 // on the block.
-func SetUUIDAttributes(moduleBlock *Block, block *hcl.Block) {
+func SetUUIDAttributes(address string, moduleBlock *Block, block *hcl.Block) {
 	if body, ok := block.Body.(*hclsyntax.Body); ok {
 		if (block.Type == "resource" || block.Type == "data") && body.Attributes != nil {
+			h := sha256.New()
+			h.Write([]byte(address))
+			addressSha := hex.EncodeToString(h.Sum(nil))
+
 			_, withCount := body.Attributes["count"]
 			_, withEach := body.Attributes["for_each"]
 			if _, ok := body.Attributes["id"]; !ok {
-				body.Attributes["id"] = newUniqueAttribute("id", withCount, withEach)
+				body.Attributes["id"] = newUniqueAttribute(addressSha, "id", withCount, withEach)
 			}
 
 			if _, ok := body.Attributes["name"]; !ok {
-				body.Attributes["name"] = newUniqueAttribute("name", withCount, withEach)
+				body.Attributes["name"] = newUniqueAttribute(addressSha, "name", withCount, withEach)
 			}
 
 			if _, ok := body.Attributes["arn"]; !ok {
-				body.Attributes["arn"] = newArnAttribute("arn", withCount, withEach)
+				body.Attributes["arn"] = newArnAttribute(addressSha, "arn", withCount, withEach)
 			}
 
 			if _, ok := body.Attributes["self_link"]; !ok {
-				body.Attributes["self_link"] = newUniqueAttribute("self_link", withCount, withEach)
+				body.Attributes["self_link"] = newUniqueAttribute(addressSha, "self_link", withCount, withEach)
 			}
 		}
 	}
 }
 
-func newUniqueAttribute(name string, withCount bool, withEach bool) *hclsyntax.Attribute {
+func newUniqueAttribute(addressSha, name string, withCount bool, withEach bool) *hclsyntax.Attribute {
 	// prefix ids with hcl- so they can be identified as fake
 	var exp hclsyntax.Expression = &hclsyntax.LiteralValueExpr{
-		Val: cty.StringVal("hcl-" + uuid.NewString()),
+		Val: cty.StringVal("hcl-" + addressSha),
 	}
 
 	if withCount {
-		e, diags := hclsyntax.ParseExpression([]byte(`"hcl-`+uuid.NewString()+`-${count.index}"`), name, hcl.Pos{})
+		e, diags := hclsyntax.ParseExpression([]byte(`"hcl-`+addressSha+`-${count.index}"`), name, hcl.Pos{})
 		if !diags.HasErrors() {
 			exp = e
 		}
 	}
 
 	if withEach {
-		e, diags := hclsyntax.ParseExpression([]byte(`"hcl-`+uuid.NewString()+`-${each.key}"`), name, hcl.Pos{})
+		e, diags := hclsyntax.ParseExpression([]byte(`"hcl-`+addressSha+`-${each.key}"`), name, hcl.Pos{})
 		if !diags.HasErrors() {
 			exp = e
 		}
@@ -481,12 +486,13 @@ func newUniqueAttribute(name string, withCount bool, withEach bool) *hclsyntax.A
 	}
 }
 
-func newArnAttribute(name string, withCount bool, withEach bool) *hclsyntax.Attribute {
+func newArnAttribute(addressSha, name string, withCount bool, withEach bool) *hclsyntax.Attribute {
+
 	// fakeARN replicates an aws arn string it deliberately leaves the
 	// region section (in between the 3rd and 4th semicolon) blank as
 	// Infracost will try and parse this region later down the line.
 	// Keeping it blank will defer the region to what the provider has defined.
-	fakeARN := fmt.Sprintf("arn:aws:hcl::%s", uuid.NewString())
+	fakeARN := fmt.Sprintf("arn:aws:hcl::%s", addressSha)
 	var exp hclsyntax.Expression = &hclsyntax.LiteralValueExpr{
 		Val: cty.StringVal(fakeARN),
 	}

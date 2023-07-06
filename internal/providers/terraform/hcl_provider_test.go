@@ -25,7 +25,7 @@ import (
 func setMockAttributes(blockAtts map[string]map[string]string) hcl.SetAttributesFunc {
 	count := map[string]int{}
 
-	return func(moduleBlock *hcl.Block, block *hcl2.Block) {
+	return func(address string, moduleBlock *hcl.Block, block *hcl2.Block) {
 		if v, ok := block.Body.(*hclsyntax.Body); ok {
 			body := *v
 			nat := hclsyntax.Attributes{}

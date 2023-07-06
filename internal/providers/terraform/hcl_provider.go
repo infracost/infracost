@@ -453,6 +453,11 @@ func (p *HCLProvider) marshalModule(module *hcl.Module) ModuleOut {
 		}
 	}
 
+	// sort the modules so we get deterministic output in the json
+	sort.SliceStable(module.Blocks, func(i, j int) bool {
+		return module.Blocks[i].Label() < module.Blocks[j].Label()
+	})
+
 	configResources := map[string]struct{}{}
 	for _, block := range module.Blocks {
 		if block.Type() == "resource" {
@@ -468,6 +473,11 @@ func (p *HCLProvider) marshalModule(module *hcl.Module) ModuleOut {
 			p.schema.InfracostResourceChanges = append(p.schema.InfracostResourceChanges, out.Changes)
 		}
 	}
+
+	// sort the modules so we get deterministic output in the json
+	sort.SliceStable(module.Modules, func(i, j int) bool {
+		return module.Modules[i].Name < module.Modules[j].Name
+	})
 
 	for _, m := range module.Modules {
 		pieces := strings.Split(m.Name, ".")
@@ -697,6 +707,9 @@ func (p *HCLProvider) countReferences(block *hcl.Block) *countExpression {
 var ignoredAttrs = map[string]bool{"arn": true, "id": true, "name": true, "self_link": true}
 var checksumMarshaller = jsoniter.ConfigCompatibleWithStandardLibrary
 
+var mockValueRegex = regexp.MustCompile(`[a-zA-Z][a-zA-Z0-9-_]*-mock`)
+var checksumMock = []byte("checksum-mock")
+
 func generateChecksum(value map[string]interface{}) string {
 	filtered := make(map[string]interface{})
 	for k, v := range value {
@@ -709,6 +722,9 @@ func generateChecksum(value map[string]interface{}) string {
 	if err != nil {
 		return ""
 	}
+
+	// mock values aren't always deterministic, so ignore them for the checksum
+	serialized = mockValueRegex.ReplaceAll(serialized, checksumMock)
 
 	h := sha256.New()
 	h.Write(serialized)

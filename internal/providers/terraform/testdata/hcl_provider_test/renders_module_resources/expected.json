@@ -36,33 +36,6 @@
           {
             "resources": [
               {
-                "address": "module.gateway.aws_ec2_transit_gateway.example",
-                "mode": "managed",
-                "type": "aws_ec2_transit_gateway",
-                "name": "example",
-                "schema_version": 0,
-                "values": {
-                  "arn": "t-gw-arn",
-                  "id": "t-gw-id"
-                },
-                "infracost_metadata": {
-                  "calls": [
-                    {
-                      "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf",
-                      "blockName": "module.gateway"
-                    },
-                    {
-                      "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf",
-                      "blockName": "aws_ec2_transit_gateway.example"
-                    }
-                  ],
-                  "checksum": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
-                  "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf",
-                  "startLine": 1,
-                  "endLine": 1
-                }
-              },
-              {
                 "address": "module.gateway.aws_customer_gateway.example",
                 "mode": "managed",
                 "type": "aws_customer_gateway",
@@ -90,6 +63,33 @@
                   "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf",
                   "startLine": 3,
                   "endLine": 7
+                }
+              },
+              {
+                "address": "module.gateway.aws_ec2_transit_gateway.example",
+                "mode": "managed",
+                "type": "aws_ec2_transit_gateway",
+                "name": "example",
+                "schema_version": 0,
+                "values": {
+                  "arn": "t-gw-arn",
+                  "id": "t-gw-id"
+                },
+                "infracost_metadata": {
+                  "calls": [
+                    {
+                      "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf",
+                      "blockName": "module.gateway"
+                    },
+                    {
+                      "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf",
+                      "blockName": "aws_ec2_transit_gateway.example"
+                    }
+                  ],
+                  "checksum": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+                  "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf",
+                  "startLine": 1,
+                  "endLine": 1
                 }
               }
             ],
@@ -133,33 +133,6 @@
         {
           "resources": [
             {
-              "address": "module.gateway.aws_ec2_transit_gateway.example",
-              "mode": "managed",
-              "type": "aws_ec2_transit_gateway",
-              "name": "example",
-              "schema_version": 0,
-              "values": {
-                "arn": "t-gw-arn",
-                "id": "t-gw-id"
-              },
-              "infracost_metadata": {
-                "calls": [
-                  {
-                    "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf",
-                    "blockName": "module.gateway"
-                  },
-                  {
-                    "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf",
-                    "blockName": "aws_ec2_transit_gateway.example"
-                  }
-                ],
-                "checksum": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
-                "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf",
-                "startLine": 1,
-                "endLine": 1
-              }
-            },
-            {
               "address": "module.gateway.aws_customer_gateway.example",
               "mode": "managed",
               "type": "aws_customer_gateway",
@@ -187,6 +160,33 @@
                 "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf",
                 "startLine": 3,
                 "endLine": 7
+              }
+            },
+            {
+              "address": "module.gateway.aws_ec2_transit_gateway.example",
+              "mode": "managed",
+              "type": "aws_ec2_transit_gateway",
+              "name": "example",
+              "schema_version": 0,
+              "values": {
+                "arn": "t-gw-arn",
+                "id": "t-gw-id"
+              },
+              "infracost_metadata": {
+                "calls": [
+                  {
+                    "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf",
+                    "blockName": "module.gateway"
+                  },
+                  {
+                    "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf",
+                    "blockName": "aws_ec2_transit_gateway.example"
+                  }
+                ],
+                "checksum": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+                "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf",
+                "startLine": 1,
+                "endLine": 1
               }
             }
           ],
@@ -216,23 +216,6 @@
       }
     },
     {
-      "address": "module.gateway.aws_ec2_transit_gateway.example",
-      "module_address": "module.gateway",
-      "mode": "managed",
-      "type": "aws_ec2_transit_gateway",
-      "name": "example",
-      "change": {
-        "actions": [
-          "create"
-        ],
-        "before": null,
-        "after": {
-          "arn": "t-gw-arn",
-          "id": "t-gw-id"
-        }
-      }
-    },
-    {
       "address": "module.gateway.aws_customer_gateway.example",
       "module_address": "module.gateway",
       "mode": "managed",
@@ -249,6 +232,23 @@
           "id": "c-gw-id",
           "ip_address": "172.0.0.1",
           "type": "ipsec.1"
+        }
+      }
+    },
+    {
+      "address": "module.gateway.aws_ec2_transit_gateway.example",
+      "module_address": "module.gateway",
+      "mode": "managed",
+      "type": "aws_ec2_transit_gateway",
+      "name": "example",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "arn": "t-gw-arn",
+          "id": "t-gw-id"
         }
       }
     }
@@ -303,17 +303,17 @@
           "module": {
             "resources": [
               {
-                "address": "aws_ec2_transit_gateway.example",
+                "address": "aws_customer_gateway.example",
                 "mode": "managed",
-                "type": "aws_ec2_transit_gateway",
+                "type": "aws_customer_gateway",
                 "name": "example",
                 "provider_config_key": "gateway:aws",
                 "schema_version": 0
               },
               {
-                "address": "aws_customer_gateway.example",
+                "address": "aws_ec2_transit_gateway.example",
                 "mode": "managed",
-                "type": "aws_customer_gateway",
+                "type": "aws_ec2_transit_gateway",
                 "name": "example",
                 "provider_config_key": "gateway:aws",
                 "schema_version": 0
