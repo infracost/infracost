@@ -12,7 +12,7 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-var batchSize = 10
+var batchSize = 5
 
 func PopulatePrices(ctx *config.RunContext, project *schema.Project) error {
 	resources := project.AllResources()
