@@ -114,6 +114,11 @@ func newGitHubAPIClients(ctx context.Context, token string, apiURL string, tlsCo
 		u.Path += "/"
 	}
 
+	// Check if "/api/v3/" already exists in the URL path.
+	if strings.HasSuffix(u.Path, "/api/v3/") {
+		return nil, nil, fmt.Errorf("the /api/v3/ suffix should not be included in the --github-api-url")
+	}
+
 	// Add api to path if it doesn't exist
 	if !strings.HasSuffix(u.Path, "/api/") {
 		u.Path += "api/"
