@@ -1,40 +1,50 @@
 {
   "version": "0.2",
+  "metadata": {
+    "infracostCommand": "breakdown",
+    "vcsBranch": "master",
+    "vcsCommitSha": "b086f035da16a37242ffe5a32d7ab866fd6aded5",
+    "vcsCommitAuthorName": "देवांश वार्ष्णेय",
+    "vcsCommitAuthorEmail": "varshney.devansh614@gmail.com",
+    "vcsCommitTimestamp": "2023-07-06T15:58:53Z",
+    "vcsCommitMessage": "enhance: validate GitHub API URL /api/v3 (#2546)",
+    "vcsRepositoryUrl": "https://github.com/infracost/infracost.git"
+  },
   "currency": "USD",
   "projects": [
     {
       "name": "my first project",
       "metadata": {
-        "path": "../../examples/terraform",
-        "infracostCommand": "breakdown",
+        "path": "./testdata/diff_project_name_no_change/terraform",
         "type": "terraform_dir",
-        "terraformModulePath": "../../../../examples/terraform",
-        "vcsBranch": "feat/add_project_name",
-        "vcsCommitSha": "5347655a3b4e81d0471b7fe1d0891952dbd3b4e7",
-        "vcsCommitAuthorName": "tim775",
-        "vcsCommitAuthorEmail": "52185+tim775@users.noreply.github.com",
-        "vcsCommitTimestamp": "2021-08-27T12:58:42.803571Z",
-        "vcsCommitMessage": "fix: Update --config-file flag conflict error to include --project-name\n",
-        "vcsRepositoryUrl": "git@github.com:infracost/infracost.git",
-        "vcsSubPath": "examples/terraform"
+        "terraformModulePath": "terraform",
+        "vcsSubPath": "cmd/infracost/testdata/diff_project_name_no_change/terraform",
+        "vcsCodeChanged": false,
+        "providers": [
+          {
+            "name": "aws",
+            "filename": "testdata/diff_project_name_no_change/terraform/main.tf",
+            "startLine": 1,
+            "endLine": 7
+          }
+        ]
       },
       "pastBreakdown": {
-        "resources": [],
-        "totalHourlyCost": "0",
-        "totalMonthlyCost": "0"
-      },
-      "breakdown": {
         "resources": [
           {
             "name": "aws_instance.web_app",
+            "resourceType": "aws_instance",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
-                  "filename": "../../examples/terraform/main.tf"
+                  "filename": "testdata/diff_project_name_no_change/terraform/main.tf"
                 }
               ],
-              "filename": "../../examples/terraform/main.tf"
+              "checksum": "e529ad309bb6d647fae2d2854bc0d7f04a7888eceb9580ac224d15cc3384a825",
+              "endLine": 23,
+              "filename": "testdata/diff_project_name_no_change/terraform/main.tf",
+              "startLine": 9
             },
             "hourlyCost": "1.017315068493150679",
             "monthlyCost": "742.64",
@@ -97,14 +107,18 @@
           },
           {
             "name": "aws_lambda_function.hello_world",
+            "resourceType": "aws_lambda_function",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_lambda_function.hello_world",
-                  "filename": "../../examples/terraform/main.tf"
+                  "filename": "testdata/diff_project_name_no_change/terraform/main.tf"
                 }
               ],
-              "filename": "../../examples/terraform/main.tf"
+              "checksum": "60a2f83ce9c8af13318d4885d554022ed5896a97e8c930a156f612b7274eb8cc",
+              "endLine": 32,
+              "filename": "testdata/diff_project_name_no_change/terraform/main.tf",
+              "startLine": 25
             },
             "hourlyCost": null,
             "monthlyCost": null,
@@ -119,7 +133,16 @@
                 "monthlyCost": null
               },
               {
-                "name": "Duration",
+                "name": "Ephemeral storage",
+                "unit": "GB-seconds",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000000309",
+                "hourlyCost": null,
+                "monthlyCost": null
+              },
+              {
+                "name": "Duration (first 6B)",
                 "unit": "GB-seconds",
                 "hourlyQuantity": null,
                 "monthlyQuantity": null,
@@ -133,11 +156,23 @@
         "totalHourlyCost": "1.017315068493150679",
         "totalMonthlyCost": "742.64"
       },
-      "diff": {
+      "breakdown": {
         "resources": [
           {
             "name": "aws_instance.web_app",
-            "metadata": {},
+            "resourceType": "aws_instance",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_instance.web_app",
+                  "filename": "testdata/diff_project_name_no_change/terraform/main.tf"
+                }
+              ],
+              "checksum": "e529ad309bb6d647fae2d2854bc0d7f04a7888eceb9580ac224d15cc3384a825",
+              "endLine": 23,
+              "filename": "testdata/diff_project_name_no_change/terraform/main.tf",
+              "startLine": 9
+            },
             "hourlyCost": "1.017315068493150679",
             "monthlyCost": "742.64",
             "costComponents": [
@@ -199,33 +234,59 @@
           },
           {
             "name": "aws_lambda_function.hello_world",
-            "metadata": {},
-            "hourlyCost": "0",
-            "monthlyCost": "0",
+            "resourceType": "aws_lambda_function",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_lambda_function.hello_world",
+                  "filename": "testdata/diff_project_name_no_change/terraform/main.tf"
+                }
+              ],
+              "checksum": "60a2f83ce9c8af13318d4885d554022ed5896a97e8c930a156f612b7274eb8cc",
+              "endLine": 32,
+              "filename": "testdata/diff_project_name_no_change/terraform/main.tf",
+              "startLine": 25
+            },
+            "hourlyCost": null,
+            "monthlyCost": null,
             "costComponents": [
               {
                 "name": "Requests",
                 "unit": "1M requests",
-                "hourlyQuantity": "0",
-                "monthlyQuantity": "0",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
                 "price": "0.2",
-                "hourlyCost": "0",
-                "monthlyCost": "0"
+                "hourlyCost": null,
+                "monthlyCost": null
               },
               {
-                "name": "Duration",
+                "name": "Ephemeral storage",
                 "unit": "GB-seconds",
-                "hourlyQuantity": "0",
-                "monthlyQuantity": "0",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000000309",
+                "hourlyCost": null,
+                "monthlyCost": null
+              },
+              {
+                "name": "Duration (first 6B)",
+                "unit": "GB-seconds",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
                 "price": "0.0000166667",
-                "hourlyCost": "0",
-                "monthlyCost": "0"
+                "hourlyCost": null,
+                "monthlyCost": null
               }
             ]
           }
         ],
         "totalHourlyCost": "1.017315068493150679",
         "totalMonthlyCost": "742.64"
+      },
+      "diff": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
       },
       "summary": {
         "totalDetectedResources": 2,
@@ -240,36 +301,36 @@
     {
       "name": "my first project again",
       "metadata": {
-        "path": "../../examples/terraform",
-        "infracostCommand": "breakdown",
+        "path": "./testdata/diff_project_name_no_change/terraform",
         "type": "terraform_dir",
-        "terraformModulePath": "../../../../examples/terraform",
-        "vcsBranch": "feat/add_project_name",
-        "vcsCommitSha": "5347655a3b4e81d0471b7fe1d0891952dbd3b4e7",
-        "vcsCommitAuthorName": "tim775",
-        "vcsCommitAuthorEmail": "52185+tim775@users.noreply.github.com",
-        "vcsCommitTimestamp": "2021-08-27T12:58:42.803571Z",
-        "vcsCommitMessage": "fix: Update --config-file flag conflict error to include --project-name\n",
-        "vcsRepositoryUrl": "git@github.com:infracost/infracost.git",
-        "vcsSubPath": "examples/terraform"
+        "terraformModulePath": "terraform",
+        "vcsSubPath": "cmd/infracost/testdata/diff_project_name_no_change/terraform",
+        "vcsCodeChanged": false,
+        "providers": [
+          {
+            "name": "aws",
+            "filename": "testdata/diff_project_name_no_change/terraform/main.tf",
+            "startLine": 1,
+            "endLine": 7
+          }
+        ]
       },
       "pastBreakdown": {
-        "resources": [],
-        "totalHourlyCost": "0",
-        "totalMonthlyCost": "0"
-      },
-      "breakdown": {
         "resources": [
           {
             "name": "aws_instance.web_app",
+            "resourceType": "aws_instance",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
-                  "filename": "../../examples/terraform/main.tf"
+                  "filename": "testdata/diff_project_name_no_change/terraform/main.tf"
                 }
               ],
-              "filename": "../../examples/terraform/main.tf"
+              "checksum": "e529ad309bb6d647fae2d2854bc0d7f04a7888eceb9580ac224d15cc3384a825",
+              "endLine": 23,
+              "filename": "testdata/diff_project_name_no_change/terraform/main.tf",
+              "startLine": 9
             },
             "hourlyCost": "1.017315068493150679",
             "monthlyCost": "742.64",
@@ -332,14 +393,18 @@
           },
           {
             "name": "aws_lambda_function.hello_world",
+            "resourceType": "aws_lambda_function",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_lambda_function.hello_world",
-                  "filename": "../../examples/terraform/main.tf"
+                  "filename": "testdata/diff_project_name_no_change/terraform/main.tf"
                 }
               ],
-              "filename": "../../examples/terraform/main.tf"
+              "checksum": "60a2f83ce9c8af13318d4885d554022ed5896a97e8c930a156f612b7274eb8cc",
+              "endLine": 32,
+              "filename": "testdata/diff_project_name_no_change/terraform/main.tf",
+              "startLine": 25
             },
             "hourlyCost": null,
             "monthlyCost": null,
@@ -354,7 +419,16 @@
                 "monthlyCost": null
               },
               {
-                "name": "Duration",
+                "name": "Ephemeral storage",
+                "unit": "GB-seconds",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000000309",
+                "hourlyCost": null,
+                "monthlyCost": null
+              },
+              {
+                "name": "Duration (first 6B)",
                 "unit": "GB-seconds",
                 "hourlyQuantity": null,
                 "monthlyQuantity": null,
@@ -368,11 +442,23 @@
         "totalHourlyCost": "1.017315068493150679",
         "totalMonthlyCost": "742.64"
       },
-      "diff": {
+      "breakdown": {
         "resources": [
           {
             "name": "aws_instance.web_app",
-            "metadata": {},
+            "resourceType": "aws_instance",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_instance.web_app",
+                  "filename": "testdata/diff_project_name_no_change/terraform/main.tf"
+                }
+              ],
+              "checksum": "e529ad309bb6d647fae2d2854bc0d7f04a7888eceb9580ac224d15cc3384a825",
+              "endLine": 23,
+              "filename": "testdata/diff_project_name_no_change/terraform/main.tf",
+              "startLine": 9
+            },
             "hourlyCost": "1.017315068493150679",
             "monthlyCost": "742.64",
             "costComponents": [
@@ -434,27 +520,48 @@
           },
           {
             "name": "aws_lambda_function.hello_world",
-            "metadata": {},
-            "hourlyCost": "0",
-            "monthlyCost": "0",
+            "resourceType": "aws_lambda_function",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_lambda_function.hello_world",
+                  "filename": "testdata/diff_project_name_no_change/terraform/main.tf"
+                }
+              ],
+              "checksum": "60a2f83ce9c8af13318d4885d554022ed5896a97e8c930a156f612b7274eb8cc",
+              "endLine": 32,
+              "filename": "testdata/diff_project_name_no_change/terraform/main.tf",
+              "startLine": 25
+            },
+            "hourlyCost": null,
+            "monthlyCost": null,
             "costComponents": [
               {
                 "name": "Requests",
                 "unit": "1M requests",
-                "hourlyQuantity": "0",
-                "monthlyQuantity": "0",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
                 "price": "0.2",
-                "hourlyCost": "0",
-                "monthlyCost": "0"
+                "hourlyCost": null,
+                "monthlyCost": null
               },
               {
-                "name": "Duration",
+                "name": "Ephemeral storage",
                 "unit": "GB-seconds",
-                "hourlyQuantity": "0",
-                "monthlyQuantity": "0",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000000309",
+                "hourlyCost": null,
+                "monthlyCost": null
+              },
+              {
+                "name": "Duration (first 6B)",
+                "unit": "GB-seconds",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
                 "price": "0.0000166667",
-                "hourlyCost": "0",
-                "monthlyCost": "0"
+                "hourlyCost": null,
+                "monthlyCost": null
               }
             ]
           }
@@ -462,6 +569,11 @@
         "totalHourlyCost": "1.017315068493150679",
         "totalMonthlyCost": "742.64"
       },
+      "diff": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
+      },
       "summary": {
         "totalDetectedResources": 2,
         "totalSupportedResources": 2,
@@ -475,36 +587,27 @@
     {
       "name": "my terragrunt multi project",
       "metadata": {
-        "path": "./terragrunt/dev",
-        "infracostCommand": "breakdown",
+        "path": "testdata/diff_project_name_no_change/terragrunt-multi/dev",
         "type": "terragrunt_dir",
-        "terraformModulePath": "terragrunt/dev",
-        "vcsBranch": "feat/add_project_name",
-        "vcsCommitSha": "5347655a3b4e81d0471b7fe1d0891952dbd3b4e7",
-        "vcsCommitAuthorName": "tim775",
-        "vcsCommitAuthorEmail": "52185+tim775@users.noreply.github.com",
-        "vcsCommitTimestamp": "2021-08-27T12:58:42.803571Z",
-        "vcsCommitMessage": "fix: Update --config-file flag conflict error to include --project-name\n",
-        "vcsRepositoryUrl": "git@github.com:infracost/infracost.git",
-        "vcsSubPath": "examples/terragrunt/dev"
+        "terraformModulePath": "terragrunt-multi/dev",
+        "vcsSubPath": "cmd/infracost/testdata/diff_project_name_no_change/terragrunt-multi/dev"
       },
       "pastBreakdown": {
-        "resources": [],
-        "totalHourlyCost": "0",
-        "totalMonthlyCost": "0"
-      },
-      "breakdown": {
         "resources": [
           {
             "name": "aws_instance.web_app",
+            "resourceType": "aws_instance",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
-                  "filename": "../../examples/terragrunt/.infracost/.terragrunt-cache/9sp1RHHyzfNIErrmH27_wOIIalU/--MlH-MC2An3bk6sQJ14E5NuivU/modules/example/main.tf"
+                  "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/SSUFduppKQqVLZK3JbqrjP9IyjY/mc0ezKI814pxHEbk2Yr-qO4jFM0/modules/example/main.tf"
                 }
               ],
-              "filename": "../../examples/terragrunt/.infracost/.terragrunt-cache/9sp1RHHyzfNIErrmH27_wOIIalU/--MlH-MC2An3bk6sQJ14E5NuivU/modules/example/main.tf"
+              "checksum": "9d5686abb1504e7ea06a56c2c1997956424fb39d74039eee65d9fe33e848656e",
+              "endLine": 40,
+              "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/SSUFduppKQqVLZK3JbqrjP9IyjY/mc0ezKI814pxHEbk2Yr-qO4jFM0/modules/example/main.tf",
+              "startLine": 26
             },
             "hourlyCost": "0.0711890410958904115",
             "monthlyCost": "51.968",
@@ -567,14 +670,18 @@
           },
           {
             "name": "aws_lambda_function.hello_world",
+            "resourceType": "aws_lambda_function",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_lambda_function.hello_world",
-                  "filename": "../../examples/terragrunt/.infracost/.terragrunt-cache/9sp1RHHyzfNIErrmH27_wOIIalU/--MlH-MC2An3bk6sQJ14E5NuivU/modules/example/main.tf"
+                  "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/SSUFduppKQqVLZK3JbqrjP9IyjY/mc0ezKI814pxHEbk2Yr-qO4jFM0/modules/example/main.tf"
                 }
               ],
-              "filename": "../../examples/terragrunt/.infracost/.terragrunt-cache/9sp1RHHyzfNIErrmH27_wOIIalU/--MlH-MC2An3bk6sQJ14E5NuivU/modules/example/main.tf"
+              "checksum": "eb537a4b85bd5ec02439f7e4c8efe78c79f0e9b92a338e9566df0595f4935344",
+              "endLine": 49,
+              "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/SSUFduppKQqVLZK3JbqrjP9IyjY/mc0ezKI814pxHEbk2Yr-qO4jFM0/modules/example/main.tf",
+              "startLine": 42
             },
             "hourlyCost": null,
             "monthlyCost": null,
@@ -589,7 +696,16 @@
                 "monthlyCost": null
               },
               {
-                "name": "Duration",
+                "name": "Ephemeral storage",
+                "unit": "GB-seconds",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000000309",
+                "hourlyCost": null,
+                "monthlyCost": null
+              },
+              {
+                "name": "Duration (first 6B)",
                 "unit": "GB-seconds",
                 "hourlyQuantity": null,
                 "monthlyQuantity": null,
@@ -603,11 +719,23 @@
         "totalHourlyCost": "0.0711890410958904115",
         "totalMonthlyCost": "51.968"
       },
-      "diff": {
+      "breakdown": {
         "resources": [
           {
             "name": "aws_instance.web_app",
-            "metadata": {},
+            "resourceType": "aws_instance",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_instance.web_app",
+                  "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/SSUFduppKQqVLZK3JbqrjP9IyjY/mc0ezKI814pxHEbk2Yr-qO4jFM0/modules/example/main.tf"
+                }
+              ],
+              "checksum": "9d5686abb1504e7ea06a56c2c1997956424fb39d74039eee65d9fe33e848656e",
+              "endLine": 40,
+              "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/SSUFduppKQqVLZK3JbqrjP9IyjY/mc0ezKI814pxHEbk2Yr-qO4jFM0/modules/example/main.tf",
+              "startLine": 26
+            },
             "hourlyCost": "0.0711890410958904115",
             "monthlyCost": "51.968",
             "costComponents": [
@@ -669,147 +797,18 @@
           },
           {
             "name": "aws_lambda_function.hello_world",
-            "metadata": {},
-            "hourlyCost": "0",
-            "monthlyCost": "0",
-            "costComponents": [
-              {
-                "name": "Requests",
-                "unit": "1M requests",
-                "hourlyQuantity": "0",
-                "monthlyQuantity": "0",
-                "price": "0.2",
-                "hourlyCost": "0",
-                "monthlyCost": "0"
-              },
-              {
-                "name": "Duration",
-                "unit": "GB-seconds",
-                "hourlyQuantity": "0",
-                "monthlyQuantity": "0",
-                "price": "0.0000166667",
-                "hourlyCost": "0",
-                "monthlyCost": "0"
-              }
-            ]
-          }
-        ],
-        "totalHourlyCost": "0.0711890410958904115",
-        "totalMonthlyCost": "51.968"
-      },
-      "summary": {
-        "totalDetectedResources": 2,
-        "totalSupportedResources": 2,
-        "totalUnsupportedResources": 0,
-        "totalUsageBasedResources": 2,
-        "totalNoPriceResources": 0,
-        "unsupportedResourceCounts": {},
-        "noPriceResourceCounts": {}
-      }
-    },
-    {
-      "name": "my terragrunt multi project",
-      "metadata": {
-        "path": "./terragrunt/prod",
-        "infracostCommand": "breakdown",
-        "type": "terragrunt_dir",
-        "terraformModulePath": "terragrunt/prod",
-        "vcsBranch": "feat/add_project_name",
-        "vcsCommitSha": "5347655a3b4e81d0471b7fe1d0891952dbd3b4e7",
-        "vcsCommitAuthorName": "tim775",
-        "vcsCommitAuthorEmail": "52185+tim775@users.noreply.github.com",
-        "vcsCommitTimestamp": "2021-08-27T12:58:42.803571Z",
-        "vcsCommitMessage": "fix: Update --config-file flag conflict error to include --project-name\n",
-        "vcsRepositoryUrl": "git@github.com:infracost/infracost.git",
-        "vcsSubPath": "examples/terragrunt/prod"
-      },
-      "pastBreakdown": {
-        "resources": [],
-        "totalHourlyCost": "0",
-        "totalMonthlyCost": "0"
-      },
-      "breakdown": {
-        "resources": [
-          {
-            "name": "aws_instance.web_app",
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "aws_instance.web_app",
-                  "filename": "../../examples/terragrunt/.infracost/.terragrunt-cache/O0YQQk6I7evoBoxn0T-w3l60CCQ/--MlH-MC2An3bk6sQJ14E5NuivU/modules/example/main.tf"
-                }
-              ],
-              "filename": "../../examples/terragrunt/.infracost/.terragrunt-cache/O0YQQk6I7evoBoxn0T-w3l60CCQ/--MlH-MC2An3bk6sQJ14E5NuivU/modules/example/main.tf"
-            },
-            "hourlyCost": "1.024164383561643829",
-            "monthlyCost": "747.64",
-            "costComponents": [
-              {
-                "name": "Instance usage (Linux/UNIX, on-demand, m5.4xlarge)",
-                "unit": "hours",
-                "hourlyQuantity": "1",
-                "monthlyQuantity": "730",
-                "price": "0.768",
-                "hourlyCost": "0.768",
-                "monthlyCost": "560.64"
-              }
-            ],
-            "subresources": [
-              {
-                "name": "root_block_device",
-                "metadata": {},
-                "hourlyCost": "0.0136986301369863",
-                "monthlyCost": "10",
-                "costComponents": [
-                  {
-                    "name": "Storage (general purpose SSD, gp2)",
-                    "unit": "GB",
-                    "hourlyQuantity": "0.136986301369863",
-                    "monthlyQuantity": "100",
-                    "price": "0.1",
-                    "hourlyCost": "0.0136986301369863",
-                    "monthlyCost": "10"
-                  }
-                ]
-              },
-              {
-                "name": "ebs_block_device[0]",
-                "metadata": {},
-                "hourlyCost": "0.242465753424657529",
-                "monthlyCost": "177",
-                "costComponents": [
-                  {
-                    "name": "Storage (provisioned IOPS SSD, io1)",
-                    "unit": "GB",
-                    "hourlyQuantity": "1.3698630136986301",
-                    "monthlyQuantity": "1000",
-                    "price": "0.125",
-                    "hourlyCost": "0.1712328767123287625",
-                    "monthlyCost": "125"
-                  },
-                  {
-                    "name": "Provisioned IOPS",
-                    "unit": "IOPS",
-                    "hourlyQuantity": "1.0958904109589041",
-                    "monthlyQuantity": "800",
-                    "price": "0.065",
-                    "hourlyCost": "0.0712328767123287665",
-                    "monthlyCost": "52"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "name": "aws_lambda_function.hello_world",
+            "resourceType": "aws_lambda_function",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_lambda_function.hello_world",
-                  "filename": "../../examples/terragrunt/.infracost/.terragrunt-cache/O0YQQk6I7evoBoxn0T-w3l60CCQ/--MlH-MC2An3bk6sQJ14E5NuivU/modules/example/main.tf"
+                  "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/SSUFduppKQqVLZK3JbqrjP9IyjY/mc0ezKI814pxHEbk2Yr-qO4jFM0/modules/example/main.tf"
                 }
               ],
-              "filename": "../../examples/terragrunt/.infracost/.terragrunt-cache/O0YQQk6I7evoBoxn0T-w3l60CCQ/--MlH-MC2An3bk6sQJ14E5NuivU/modules/example/main.tf"
+              "checksum": "eb537a4b85bd5ec02439f7e4c8efe78c79f0e9b92a338e9566df0595f4935344",
+              "endLine": 49,
+              "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/SSUFduppKQqVLZK3JbqrjP9IyjY/mc0ezKI814pxHEbk2Yr-qO4jFM0/modules/example/main.tf",
+              "startLine": 42
             },
             "hourlyCost": null,
             "monthlyCost": null,
@@ -824,7 +823,16 @@
                 "monthlyCost": null
               },
               {
-                "name": "Duration",
+                "name": "Ephemeral storage",
+                "unit": "GB-seconds",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000000309",
+                "hourlyCost": null,
+                "monthlyCost": null
+              },
+              {
+                "name": "Duration (first 6B)",
                 "unit": "GB-seconds",
                 "hourlyQuantity": null,
                 "monthlyQuantity": null,
@@ -835,14 +843,49 @@
             ]
           }
         ],
-        "totalHourlyCost": "1.024164383561643829",
-        "totalMonthlyCost": "747.64"
+        "totalHourlyCost": "0.0711890410958904115",
+        "totalMonthlyCost": "51.968"
       },
       "diff": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
+      },
+      "summary": {
+        "totalDetectedResources": 2,
+        "totalSupportedResources": 2,
+        "totalUnsupportedResources": 0,
+        "totalUsageBasedResources": 2,
+        "totalNoPriceResources": 0,
+        "unsupportedResourceCounts": {},
+        "noPriceResourceCounts": {}
+      }
+    },
+    {
+      "name": "my terragrunt multi project",
+      "metadata": {
+        "path": "testdata/diff_project_name_no_change/terragrunt-multi/prod",
+        "type": "terragrunt_dir",
+        "terraformModulePath": "terragrunt-multi/prod",
+        "vcsSubPath": "cmd/infracost/testdata/diff_project_name_no_change/terragrunt-multi/prod"
+      },
+      "pastBreakdown": {
         "resources": [
           {
             "name": "aws_instance.web_app",
-            "metadata": {},
+            "resourceType": "aws_instance",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_instance.web_app",
+                  "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/qv6CeeSib8SPzF2TvGApNnA6-HM/mc0ezKI814pxHEbk2Yr-qO4jFM0/modules/example/main.tf"
+                }
+              ],
+              "checksum": "68a408f4bf19420a57d0faab69d346b9c160280a7d3c172938837f9744a288c9",
+              "endLine": 40,
+              "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/qv6CeeSib8SPzF2TvGApNnA6-HM/mc0ezKI814pxHEbk2Yr-qO4jFM0/modules/example/main.tf",
+              "startLine": 26
+            },
             "hourlyCost": "1.024164383561643829",
             "monthlyCost": "747.64",
             "costComponents": [
@@ -904,33 +947,186 @@
           },
           {
             "name": "aws_lambda_function.hello_world",
-            "metadata": {},
-            "hourlyCost": "0",
-            "monthlyCost": "0",
+            "resourceType": "aws_lambda_function",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_lambda_function.hello_world",
+                  "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/qv6CeeSib8SPzF2TvGApNnA6-HM/mc0ezKI814pxHEbk2Yr-qO4jFM0/modules/example/main.tf"
+                }
+              ],
+              "checksum": "60a2f83ce9c8af13318d4885d554022ed5896a97e8c930a156f612b7274eb8cc",
+              "endLine": 49,
+              "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/qv6CeeSib8SPzF2TvGApNnA6-HM/mc0ezKI814pxHEbk2Yr-qO4jFM0/modules/example/main.tf",
+              "startLine": 42
+            },
+            "hourlyCost": null,
+            "monthlyCost": null,
             "costComponents": [
               {
                 "name": "Requests",
                 "unit": "1M requests",
-                "hourlyQuantity": "0",
-                "monthlyQuantity": "0",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
                 "price": "0.2",
-                "hourlyCost": "0",
-                "monthlyCost": "0"
+                "hourlyCost": null,
+                "monthlyCost": null
               },
               {
-                "name": "Duration",
+                "name": "Ephemeral storage",
                 "unit": "GB-seconds",
-                "hourlyQuantity": "0",
-                "monthlyQuantity": "0",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000000309",
+                "hourlyCost": null,
+                "monthlyCost": null
+              },
+              {
+                "name": "Duration (first 6B)",
+                "unit": "GB-seconds",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
                 "price": "0.0000166667",
-                "hourlyCost": "0",
-                "monthlyCost": "0"
+                "hourlyCost": null,
+                "monthlyCost": null
               }
             ]
           }
         ],
         "totalHourlyCost": "1.024164383561643829",
         "totalMonthlyCost": "747.64"
+      },
+      "breakdown": {
+        "resources": [
+          {
+            "name": "aws_instance.web_app",
+            "resourceType": "aws_instance",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_instance.web_app",
+                  "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/qv6CeeSib8SPzF2TvGApNnA6-HM/mc0ezKI814pxHEbk2Yr-qO4jFM0/modules/example/main.tf"
+                }
+              ],
+              "checksum": "68a408f4bf19420a57d0faab69d346b9c160280a7d3c172938837f9744a288c9",
+              "endLine": 40,
+              "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/qv6CeeSib8SPzF2TvGApNnA6-HM/mc0ezKI814pxHEbk2Yr-qO4jFM0/modules/example/main.tf",
+              "startLine": 26
+            },
+            "hourlyCost": "1.024164383561643829",
+            "monthlyCost": "747.64",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, m5.4xlarge)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.768",
+                "hourlyCost": "0.768",
+                "monthlyCost": "560.64"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.0136986301369863",
+                "monthlyCost": "10",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.136986301369863",
+                    "monthlyQuantity": "100",
+                    "price": "0.1",
+                    "hourlyCost": "0.0136986301369863",
+                    "monthlyCost": "10"
+                  }
+                ]
+              },
+              {
+                "name": "ebs_block_device[0]",
+                "metadata": {},
+                "hourlyCost": "0.242465753424657529",
+                "monthlyCost": "177",
+                "costComponents": [
+                  {
+                    "name": "Storage (provisioned IOPS SSD, io1)",
+                    "unit": "GB",
+                    "hourlyQuantity": "1.3698630136986301",
+                    "monthlyQuantity": "1000",
+                    "price": "0.125",
+                    "hourlyCost": "0.1712328767123287625",
+                    "monthlyCost": "125"
+                  },
+                  {
+                    "name": "Provisioned IOPS",
+                    "unit": "IOPS",
+                    "hourlyQuantity": "1.0958904109589041",
+                    "monthlyQuantity": "800",
+                    "price": "0.065",
+                    "hourlyCost": "0.0712328767123287665",
+                    "monthlyCost": "52"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "aws_lambda_function.hello_world",
+            "resourceType": "aws_lambda_function",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_lambda_function.hello_world",
+                  "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/qv6CeeSib8SPzF2TvGApNnA6-HM/mc0ezKI814pxHEbk2Yr-qO4jFM0/modules/example/main.tf"
+                }
+              ],
+              "checksum": "60a2f83ce9c8af13318d4885d554022ed5896a97e8c930a156f612b7274eb8cc",
+              "endLine": 49,
+              "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/qv6CeeSib8SPzF2TvGApNnA6-HM/mc0ezKI814pxHEbk2Yr-qO4jFM0/modules/example/main.tf",
+              "startLine": 42
+            },
+            "hourlyCost": null,
+            "monthlyCost": null,
+            "costComponents": [
+              {
+                "name": "Requests",
+                "unit": "1M requests",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.2",
+                "hourlyCost": null,
+                "monthlyCost": null
+              },
+              {
+                "name": "Ephemeral storage",
+                "unit": "GB-seconds",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000000309",
+                "hourlyCost": null,
+                "monthlyCost": null
+              },
+              {
+                "name": "Duration (first 6B)",
+                "unit": "GB-seconds",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000166667",
+                "hourlyCost": null,
+                "monthlyCost": null
+              }
+            ]
+          }
+        ],
+        "totalHourlyCost": "1.024164383561643829",
+        "totalMonthlyCost": "747.64"
+      },
+      "diff": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
       },
       "summary": {
         "totalDetectedResources": 2,
@@ -945,36 +1141,27 @@
     {
       "name": "my terragrunt prod project",
       "metadata": {
-        "path": "./terragrunt/prod",
-        "infracostCommand": "breakdown",
+        "path": "testdata/diff_project_name_no_change/terragrunt/prod",
         "type": "terragrunt_dir",
         "terraformModulePath": "terragrunt/prod",
-        "vcsBranch": "feat/add_project_name",
-        "vcsCommitSha": "5347655a3b4e81d0471b7fe1d0891952dbd3b4e7",
-        "vcsCommitAuthorName": "tim775",
-        "vcsCommitAuthorEmail": "52185+tim775@users.noreply.github.com",
-        "vcsCommitTimestamp": "2021-08-27T12:58:42.803571Z",
-        "vcsCommitMessage": "fix: Update --config-file flag conflict error to include --project-name\n",
-        "vcsRepositoryUrl": "git@github.com:infracost/infracost.git",
-        "vcsSubPath": "examples/terragrunt/prod"
+        "vcsSubPath": "cmd/infracost/testdata/diff_project_name_no_change/terragrunt/prod"
       },
       "pastBreakdown": {
-        "resources": [],
-        "totalHourlyCost": "0",
-        "totalMonthlyCost": "0"
-      },
-      "breakdown": {
         "resources": [
           {
             "name": "aws_instance.web_app",
+            "resourceType": "aws_instance",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
-                  "filename": "../../examples/terragrunt/prod/.infracost/.terragrunt-cache/O0YQQk6I7evoBoxn0T-w3l60CCQ/--MlH-MC2An3bk6sQJ14E5NuivU/modules/example/main.tf"
+                  "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/K2CJj3TU9fVHlzim-7ZCa7SxeeI/dsdngviGp9c17YK3sAVr4Qwe1ic/modules/example/main.tf"
                 }
               ],
-              "filename": "../../examples/terragrunt/prod/.infracost/.terragrunt-cache/O0YQQk6I7evoBoxn0T-w3l60CCQ/--MlH-MC2An3bk6sQJ14E5NuivU/modules/example/main.tf"
+              "checksum": "68a408f4bf19420a57d0faab69d346b9c160280a7d3c172938837f9744a288c9",
+              "endLine": 40,
+              "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/K2CJj3TU9fVHlzim-7ZCa7SxeeI/dsdngviGp9c17YK3sAVr4Qwe1ic/modules/example/main.tf",
+              "startLine": 26
             },
             "hourlyCost": "1.024164383561643829",
             "monthlyCost": "747.64",
@@ -1037,14 +1224,18 @@
           },
           {
             "name": "aws_lambda_function.hello_world",
+            "resourceType": "aws_lambda_function",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_lambda_function.hello_world",
-                  "filename": "../../examples/terragrunt/prod/.infracost/.terragrunt-cache/O0YQQk6I7evoBoxn0T-w3l60CCQ/--MlH-MC2An3bk6sQJ14E5NuivU/modules/example/main.tf"
+                  "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/K2CJj3TU9fVHlzim-7ZCa7SxeeI/dsdngviGp9c17YK3sAVr4Qwe1ic/modules/example/main.tf"
                 }
               ],
-              "filename": "../../examples/terragrunt/prod/.infracost/.terragrunt-cache/O0YQQk6I7evoBoxn0T-w3l60CCQ/--MlH-MC2An3bk6sQJ14E5NuivU/modules/example/main.tf"
+              "checksum": "60a2f83ce9c8af13318d4885d554022ed5896a97e8c930a156f612b7274eb8cc",
+              "endLine": 49,
+              "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/K2CJj3TU9fVHlzim-7ZCa7SxeeI/dsdngviGp9c17YK3sAVr4Qwe1ic/modules/example/main.tf",
+              "startLine": 42
             },
             "hourlyCost": null,
             "monthlyCost": null,
@@ -1059,7 +1250,16 @@
                 "monthlyCost": null
               },
               {
-                "name": "Duration",
+                "name": "Ephemeral storage",
+                "unit": "GB-seconds",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000000309",
+                "hourlyCost": null,
+                "monthlyCost": null
+              },
+              {
+                "name": "Duration (first 6B)",
                 "unit": "GB-seconds",
                 "hourlyQuantity": null,
                 "monthlyQuantity": null,
@@ -1073,11 +1273,23 @@
         "totalHourlyCost": "1.024164383561643829",
         "totalMonthlyCost": "747.64"
       },
-      "diff": {
+      "breakdown": {
         "resources": [
           {
             "name": "aws_instance.web_app",
-            "metadata": {},
+            "resourceType": "aws_instance",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_instance.web_app",
+                  "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/K2CJj3TU9fVHlzim-7ZCa7SxeeI/dsdngviGp9c17YK3sAVr4Qwe1ic/modules/example/main.tf"
+                }
+              ],
+              "checksum": "68a408f4bf19420a57d0faab69d346b9c160280a7d3c172938837f9744a288c9",
+              "endLine": 40,
+              "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/K2CJj3TU9fVHlzim-7ZCa7SxeeI/dsdngviGp9c17YK3sAVr4Qwe1ic/modules/example/main.tf",
+              "startLine": 26
+            },
             "hourlyCost": "1.024164383561643829",
             "monthlyCost": "747.64",
             "costComponents": [
@@ -1139,33 +1351,59 @@
           },
           {
             "name": "aws_lambda_function.hello_world",
-            "metadata": {},
-            "hourlyCost": "0",
-            "monthlyCost": "0",
+            "resourceType": "aws_lambda_function",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_lambda_function.hello_world",
+                  "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/K2CJj3TU9fVHlzim-7ZCa7SxeeI/dsdngviGp9c17YK3sAVr4Qwe1ic/modules/example/main.tf"
+                }
+              ],
+              "checksum": "60a2f83ce9c8af13318d4885d554022ed5896a97e8c930a156f612b7274eb8cc",
+              "endLine": 49,
+              "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/K2CJj3TU9fVHlzim-7ZCa7SxeeI/dsdngviGp9c17YK3sAVr4Qwe1ic/modules/example/main.tf",
+              "startLine": 42
+            },
+            "hourlyCost": null,
+            "monthlyCost": null,
             "costComponents": [
               {
                 "name": "Requests",
                 "unit": "1M requests",
-                "hourlyQuantity": "0",
-                "monthlyQuantity": "0",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
                 "price": "0.2",
-                "hourlyCost": "0",
-                "monthlyCost": "0"
+                "hourlyCost": null,
+                "monthlyCost": null
               },
               {
-                "name": "Duration",
+                "name": "Ephemeral storage",
                 "unit": "GB-seconds",
-                "hourlyQuantity": "0",
-                "monthlyQuantity": "0",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000000309",
+                "hourlyCost": null,
+                "monthlyCost": null
+              },
+              {
+                "name": "Duration (first 6B)",
+                "unit": "GB-seconds",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
                 "price": "0.0000166667",
-                "hourlyCost": "0",
-                "monthlyCost": "0"
+                "hourlyCost": null,
+                "monthlyCost": null
               }
             ]
           }
         ],
         "totalHourlyCost": "1.024164383561643829",
         "totalMonthlyCost": "747.64"
+      },
+      "diff": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
       },
       "summary": {
         "totalDetectedResources": 2,
@@ -1180,36 +1418,27 @@
     {
       "name": "my terragrunt dev project",
       "metadata": {
-        "path": "./terragrunt/dev",
-        "infracostCommand": "breakdown",
+        "path": "testdata/diff_project_name_no_change/terragrunt/dev",
         "type": "terragrunt_dir",
         "terraformModulePath": "terragrunt/dev",
-        "vcsBranch": "feat/add_project_name",
-        "vcsCommitSha": "5347655a3b4e81d0471b7fe1d0891952dbd3b4e7",
-        "vcsCommitAuthorName": "tim775",
-        "vcsCommitAuthorEmail": "52185+tim775@users.noreply.github.com",
-        "vcsCommitTimestamp": "2021-08-27T12:58:42.803571Z",
-        "vcsCommitMessage": "fix: Update --config-file flag conflict error to include --project-name\n",
-        "vcsRepositoryUrl": "git@github.com:infracost/infracost.git",
-        "vcsSubPath": "examples/terragrunt/dev"
+        "vcsSubPath": "cmd/infracost/testdata/diff_project_name_no_change/terragrunt/dev"
       },
       "pastBreakdown": {
-        "resources": [],
-        "totalHourlyCost": "0",
-        "totalMonthlyCost": "0"
-      },
-      "breakdown": {
         "resources": [
           {
             "name": "aws_instance.web_app",
+            "resourceType": "aws_instance",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
-                  "filename": "../../examples/terragrunt/dev/.infracost/.terragrunt-cache/9sp1RHHyzfNIErrmH27_wOIIalU/--MlH-MC2An3bk6sQJ14E5NuivU/modules/example/main.tf"
+                  "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/RkQZ6X-AJ9AGiIBOUSYN7Cv7FGo/dsdngviGp9c17YK3sAVr4Qwe1ic/modules/example/main.tf"
                 }
               ],
-              "filename": "../../examples/terragrunt/dev/.infracost/.terragrunt-cache/9sp1RHHyzfNIErrmH27_wOIIalU/--MlH-MC2An3bk6sQJ14E5NuivU/modules/example/main.tf"
+              "checksum": "9d5686abb1504e7ea06a56c2c1997956424fb39d74039eee65d9fe33e848656e",
+              "endLine": 40,
+              "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/RkQZ6X-AJ9AGiIBOUSYN7Cv7FGo/dsdngviGp9c17YK3sAVr4Qwe1ic/modules/example/main.tf",
+              "startLine": 26
             },
             "hourlyCost": "0.0711890410958904115",
             "monthlyCost": "51.968",
@@ -1272,14 +1501,18 @@
           },
           {
             "name": "aws_lambda_function.hello_world",
+            "resourceType": "aws_lambda_function",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_lambda_function.hello_world",
-                  "filename": "../../examples/terragrunt/dev/.infracost/.terragrunt-cache/9sp1RHHyzfNIErrmH27_wOIIalU/--MlH-MC2An3bk6sQJ14E5NuivU/modules/example/main.tf"
+                  "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/RkQZ6X-AJ9AGiIBOUSYN7Cv7FGo/dsdngviGp9c17YK3sAVr4Qwe1ic/modules/example/main.tf"
                 }
               ],
-              "filename": "../../examples/terragrunt/dev/.infracost/.terragrunt-cache/9sp1RHHyzfNIErrmH27_wOIIalU/--MlH-MC2An3bk6sQJ14E5NuivU/modules/example/main.tf"
+              "checksum": "eb537a4b85bd5ec02439f7e4c8efe78c79f0e9b92a338e9566df0595f4935344",
+              "endLine": 49,
+              "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/RkQZ6X-AJ9AGiIBOUSYN7Cv7FGo/dsdngviGp9c17YK3sAVr4Qwe1ic/modules/example/main.tf",
+              "startLine": 42
             },
             "hourlyCost": null,
             "monthlyCost": null,
@@ -1294,7 +1527,16 @@
                 "monthlyCost": null
               },
               {
-                "name": "Duration",
+                "name": "Ephemeral storage",
+                "unit": "GB-seconds",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000000309",
+                "hourlyCost": null,
+                "monthlyCost": null
+              },
+              {
+                "name": "Duration (first 6B)",
                 "unit": "GB-seconds",
                 "hourlyQuantity": null,
                 "monthlyQuantity": null,
@@ -1308,11 +1550,23 @@
         "totalHourlyCost": "0.0711890410958904115",
         "totalMonthlyCost": "51.968"
       },
-      "diff": {
+      "breakdown": {
         "resources": [
           {
             "name": "aws_instance.web_app",
-            "metadata": {},
+            "resourceType": "aws_instance",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_instance.web_app",
+                  "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/RkQZ6X-AJ9AGiIBOUSYN7Cv7FGo/dsdngviGp9c17YK3sAVr4Qwe1ic/modules/example/main.tf"
+                }
+              ],
+              "checksum": "9d5686abb1504e7ea06a56c2c1997956424fb39d74039eee65d9fe33e848656e",
+              "endLine": 40,
+              "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/RkQZ6X-AJ9AGiIBOUSYN7Cv7FGo/dsdngviGp9c17YK3sAVr4Qwe1ic/modules/example/main.tf",
+              "startLine": 26
+            },
             "hourlyCost": "0.0711890410958904115",
             "monthlyCost": "51.968",
             "costComponents": [
@@ -1374,33 +1628,59 @@
           },
           {
             "name": "aws_lambda_function.hello_world",
-            "metadata": {},
-            "hourlyCost": "0",
-            "monthlyCost": "0",
+            "resourceType": "aws_lambda_function",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_lambda_function.hello_world",
+                  "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/RkQZ6X-AJ9AGiIBOUSYN7Cv7FGo/dsdngviGp9c17YK3sAVr4Qwe1ic/modules/example/main.tf"
+                }
+              ],
+              "checksum": "eb537a4b85bd5ec02439f7e4c8efe78c79f0e9b92a338e9566df0595f4935344",
+              "endLine": 49,
+              "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/RkQZ6X-AJ9AGiIBOUSYN7Cv7FGo/dsdngviGp9c17YK3sAVr4Qwe1ic/modules/example/main.tf",
+              "startLine": 42
+            },
+            "hourlyCost": null,
+            "monthlyCost": null,
             "costComponents": [
               {
                 "name": "Requests",
                 "unit": "1M requests",
-                "hourlyQuantity": "0",
-                "monthlyQuantity": "0",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
                 "price": "0.2",
-                "hourlyCost": "0",
-                "monthlyCost": "0"
+                "hourlyCost": null,
+                "monthlyCost": null
               },
               {
-                "name": "Duration",
+                "name": "Ephemeral storage",
                 "unit": "GB-seconds",
-                "hourlyQuantity": "0",
-                "monthlyQuantity": "0",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000000309",
+                "hourlyCost": null,
+                "monthlyCost": null
+              },
+              {
+                "name": "Duration (first 6B)",
+                "unit": "GB-seconds",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
                 "price": "0.0000166667",
-                "hourlyCost": "0",
-                "monthlyCost": "0"
+                "hourlyCost": null,
+                "monthlyCost": null
               }
             ]
           }
         ],
         "totalHourlyCost": "0.0711890410958904115",
         "totalMonthlyCost": "51.968"
+      },
+      "diff": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
       },
       "summary": {
         "totalDetectedResources": 2,
@@ -1415,37 +1695,37 @@
     {
       "name": "my workspace project",
       "metadata": {
-        "path": "../../examples/terraform",
-        "infracostCommand": "breakdown",
+        "path": "./testdata/diff_project_name_no_change/terraform",
         "type": "terraform_dir",
-        "terraformModulePath": "../../../../examples/terraform",
+        "terraformModulePath": "terraform",
         "terraformWorkspace": "ws1",
-        "vcsBranch": "feat/add_project_name",
-        "vcsCommitSha": "5347655a3b4e81d0471b7fe1d0891952dbd3b4e7",
-        "vcsCommitAuthorName": "tim775",
-        "vcsCommitAuthorEmail": "52185+tim775@users.noreply.github.com",
-        "vcsCommitTimestamp": "2021-08-27T12:58:42.803571Z",
-        "vcsCommitMessage": "fix: Update --config-file flag conflict error to include --project-name\n",
-        "vcsRepositoryUrl": "git@github.com:infracost/infracost.git",
-        "vcsSubPath": "examples/terraform"
+        "vcsSubPath": "cmd/infracost/testdata/diff_project_name_no_change/terraform",
+        "vcsCodeChanged": false,
+        "providers": [
+          {
+            "name": "aws",
+            "filename": "testdata/diff_project_name_no_change/terraform/main.tf",
+            "startLine": 1,
+            "endLine": 7
+          }
+        ]
       },
       "pastBreakdown": {
-        "resources": [],
-        "totalHourlyCost": "0",
-        "totalMonthlyCost": "0"
-      },
-      "breakdown": {
         "resources": [
           {
             "name": "aws_instance.web_app",
+            "resourceType": "aws_instance",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
-                  "filename": "../../examples/terraform/main.tf"
+                  "filename": "testdata/diff_project_name_no_change/terraform/main.tf"
                 }
               ],
-              "filename": "../../examples/terraform/main.tf"
+              "checksum": "e529ad309bb6d647fae2d2854bc0d7f04a7888eceb9580ac224d15cc3384a825",
+              "endLine": 23,
+              "filename": "testdata/diff_project_name_no_change/terraform/main.tf",
+              "startLine": 9
             },
             "hourlyCost": "1.017315068493150679",
             "monthlyCost": "742.64",
@@ -1508,14 +1788,18 @@
           },
           {
             "name": "aws_lambda_function.hello_world",
+            "resourceType": "aws_lambda_function",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_lambda_function.hello_world",
-                  "filename": "../../examples/terraform/main.tf"
+                  "filename": "testdata/diff_project_name_no_change/terraform/main.tf"
                 }
               ],
-              "filename": "../../examples/terraform/main.tf"
+              "checksum": "60a2f83ce9c8af13318d4885d554022ed5896a97e8c930a156f612b7274eb8cc",
+              "endLine": 32,
+              "filename": "testdata/diff_project_name_no_change/terraform/main.tf",
+              "startLine": 25
             },
             "hourlyCost": null,
             "monthlyCost": null,
@@ -1530,7 +1814,16 @@
                 "monthlyCost": null
               },
               {
-                "name": "Duration",
+                "name": "Ephemeral storage",
+                "unit": "GB-seconds",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000000309",
+                "hourlyCost": null,
+                "monthlyCost": null
+              },
+              {
+                "name": "Duration (first 6B)",
                 "unit": "GB-seconds",
                 "hourlyQuantity": null,
                 "monthlyQuantity": null,
@@ -1544,11 +1837,23 @@
         "totalHourlyCost": "1.017315068493150679",
         "totalMonthlyCost": "742.64"
       },
-      "diff": {
+      "breakdown": {
         "resources": [
           {
             "name": "aws_instance.web_app",
-            "metadata": {},
+            "resourceType": "aws_instance",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_instance.web_app",
+                  "filename": "testdata/diff_project_name_no_change/terraform/main.tf"
+                }
+              ],
+              "checksum": "e529ad309bb6d647fae2d2854bc0d7f04a7888eceb9580ac224d15cc3384a825",
+              "endLine": 23,
+              "filename": "testdata/diff_project_name_no_change/terraform/main.tf",
+              "startLine": 9
+            },
             "hourlyCost": "1.017315068493150679",
             "monthlyCost": "742.64",
             "costComponents": [
@@ -1610,27 +1915,48 @@
           },
           {
             "name": "aws_lambda_function.hello_world",
-            "metadata": {},
-            "hourlyCost": "0",
-            "monthlyCost": "0",
+            "resourceType": "aws_lambda_function",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_lambda_function.hello_world",
+                  "filename": "testdata/diff_project_name_no_change/terraform/main.tf"
+                }
+              ],
+              "checksum": "60a2f83ce9c8af13318d4885d554022ed5896a97e8c930a156f612b7274eb8cc",
+              "endLine": 32,
+              "filename": "testdata/diff_project_name_no_change/terraform/main.tf",
+              "startLine": 25
+            },
+            "hourlyCost": null,
+            "monthlyCost": null,
             "costComponents": [
               {
                 "name": "Requests",
                 "unit": "1M requests",
-                "hourlyQuantity": "0",
-                "monthlyQuantity": "0",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
                 "price": "0.2",
-                "hourlyCost": "0",
-                "monthlyCost": "0"
+                "hourlyCost": null,
+                "monthlyCost": null
               },
               {
-                "name": "Duration",
+                "name": "Ephemeral storage",
                 "unit": "GB-seconds",
-                "hourlyQuantity": "0",
-                "monthlyQuantity": "0",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000000309",
+                "hourlyCost": null,
+                "monthlyCost": null
+              },
+              {
+                "name": "Duration (first 6B)",
+                "unit": "GB-seconds",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
                 "price": "0.0000166667",
-                "hourlyCost": "0",
-                "monthlyCost": "0"
+                "hourlyCost": null,
+                "monthlyCost": null
               }
             ]
           }
@@ -1638,6 +1964,11 @@
         "totalHourlyCost": "1.017315068493150679",
         "totalMonthlyCost": "742.64"
       },
+      "diff": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
+      },
       "summary": {
         "totalDetectedResources": 2,
         "totalSupportedResources": 2,
@@ -1651,37 +1982,28 @@
     {
       "name": "my terragrunt workspace",
       "metadata": {
-        "path": "./terragrunt/dev",
-        "infracostCommand": "breakdown",
+        "path": "testdata/diff_project_name_no_change/terragrunt-multi/dev",
         "type": "terragrunt_dir",
-        "terraformModulePath": "terragrunt/dev",
+        "terraformModulePath": "terragrunt-multi/dev",
         "terraformWorkspace": "ws2",
-        "vcsBranch": "feat/add_project_name",
-        "vcsCommitSha": "5347655a3b4e81d0471b7fe1d0891952dbd3b4e7",
-        "vcsCommitAuthorName": "tim775",
-        "vcsCommitAuthorEmail": "52185+tim775@users.noreply.github.com",
-        "vcsCommitTimestamp": "2021-08-27T12:58:42.803571Z",
-        "vcsCommitMessage": "fix: Update --config-file flag conflict error to include --project-name\n",
-        "vcsRepositoryUrl": "git@github.com:infracost/infracost.git",
-        "vcsSubPath": "examples/terragrunt/dev"
+        "vcsSubPath": "cmd/infracost/testdata/diff_project_name_no_change/terragrunt-multi/dev"
       },
       "pastBreakdown": {
-        "resources": [],
-        "totalHourlyCost": "0",
-        "totalMonthlyCost": "0"
-      },
-      "breakdown": {
         "resources": [
           {
             "name": "aws_instance.web_app",
+            "resourceType": "aws_instance",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
-                  "filename": "../../examples/terragrunt/.infracost/.terragrunt-cache/9sp1RHHyzfNIErrmH27_wOIIalU/--MlH-MC2An3bk6sQJ14E5NuivU/modules/example/main.tf"
+                  "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/SSUFduppKQqVLZK3JbqrjP9IyjY/mc0ezKI814pxHEbk2Yr-qO4jFM0/modules/example/main.tf"
                 }
               ],
-              "filename": "../../examples/terragrunt/.infracost/.terragrunt-cache/9sp1RHHyzfNIErrmH27_wOIIalU/--MlH-MC2An3bk6sQJ14E5NuivU/modules/example/main.tf"
+              "checksum": "9d5686abb1504e7ea06a56c2c1997956424fb39d74039eee65d9fe33e848656e",
+              "endLine": 40,
+              "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/SSUFduppKQqVLZK3JbqrjP9IyjY/mc0ezKI814pxHEbk2Yr-qO4jFM0/modules/example/main.tf",
+              "startLine": 26
             },
             "hourlyCost": "0.0711890410958904115",
             "monthlyCost": "51.968",
@@ -1744,14 +2066,18 @@
           },
           {
             "name": "aws_lambda_function.hello_world",
+            "resourceType": "aws_lambda_function",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_lambda_function.hello_world",
-                  "filename": "../../examples/terragrunt/.infracost/.terragrunt-cache/9sp1RHHyzfNIErrmH27_wOIIalU/--MlH-MC2An3bk6sQJ14E5NuivU/modules/example/main.tf"
+                  "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/SSUFduppKQqVLZK3JbqrjP9IyjY/mc0ezKI814pxHEbk2Yr-qO4jFM0/modules/example/main.tf"
                 }
               ],
-              "filename": "../../examples/terragrunt/.infracost/.terragrunt-cache/9sp1RHHyzfNIErrmH27_wOIIalU/--MlH-MC2An3bk6sQJ14E5NuivU/modules/example/main.tf"
+              "checksum": "eb537a4b85bd5ec02439f7e4c8efe78c79f0e9b92a338e9566df0595f4935344",
+              "endLine": 49,
+              "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/SSUFduppKQqVLZK3JbqrjP9IyjY/mc0ezKI814pxHEbk2Yr-qO4jFM0/modules/example/main.tf",
+              "startLine": 42
             },
             "hourlyCost": null,
             "monthlyCost": null,
@@ -1766,7 +2092,16 @@
                 "monthlyCost": null
               },
               {
-                "name": "Duration",
+                "name": "Ephemeral storage",
+                "unit": "GB-seconds",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000000309",
+                "hourlyCost": null,
+                "monthlyCost": null
+              },
+              {
+                "name": "Duration (first 6B)",
                 "unit": "GB-seconds",
                 "hourlyQuantity": null,
                 "monthlyQuantity": null,
@@ -1780,11 +2115,23 @@
         "totalHourlyCost": "0.0711890410958904115",
         "totalMonthlyCost": "51.968"
       },
-      "diff": {
+      "breakdown": {
         "resources": [
           {
             "name": "aws_instance.web_app",
-            "metadata": {},
+            "resourceType": "aws_instance",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_instance.web_app",
+                  "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/SSUFduppKQqVLZK3JbqrjP9IyjY/mc0ezKI814pxHEbk2Yr-qO4jFM0/modules/example/main.tf"
+                }
+              ],
+              "checksum": "9d5686abb1504e7ea06a56c2c1997956424fb39d74039eee65d9fe33e848656e",
+              "endLine": 40,
+              "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/SSUFduppKQqVLZK3JbqrjP9IyjY/mc0ezKI814pxHEbk2Yr-qO4jFM0/modules/example/main.tf",
+              "startLine": 26
+            },
             "hourlyCost": "0.0711890410958904115",
             "monthlyCost": "51.968",
             "costComponents": [
@@ -1846,148 +2193,18 @@
           },
           {
             "name": "aws_lambda_function.hello_world",
-            "metadata": {},
-            "hourlyCost": "0",
-            "monthlyCost": "0",
-            "costComponents": [
-              {
-                "name": "Requests",
-                "unit": "1M requests",
-                "hourlyQuantity": "0",
-                "monthlyQuantity": "0",
-                "price": "0.2",
-                "hourlyCost": "0",
-                "monthlyCost": "0"
-              },
-              {
-                "name": "Duration",
-                "unit": "GB-seconds",
-                "hourlyQuantity": "0",
-                "monthlyQuantity": "0",
-                "price": "0.0000166667",
-                "hourlyCost": "0",
-                "monthlyCost": "0"
-              }
-            ]
-          }
-        ],
-        "totalHourlyCost": "0.0711890410958904115",
-        "totalMonthlyCost": "51.968"
-      },
-      "summary": {
-        "totalDetectedResources": 2,
-        "totalSupportedResources": 2,
-        "totalUnsupportedResources": 0,
-        "totalUsageBasedResources": 2,
-        "totalNoPriceResources": 0,
-        "unsupportedResourceCounts": {},
-        "noPriceResourceCounts": {}
-      }
-    },
-    {
-      "name": "my terragrunt workspace",
-      "metadata": {
-        "path": "./terragrunt/prod",
-        "infracostCommand": "breakdown",
-        "type": "terragrunt_dir",
-        "terraformModulePath": "terragrunt/prod",
-        "terraformWorkspace": "ws2",
-        "vcsBranch": "feat/add_project_name",
-        "vcsCommitSha": "5347655a3b4e81d0471b7fe1d0891952dbd3b4e7",
-        "vcsCommitAuthorName": "tim775",
-        "vcsCommitAuthorEmail": "52185+tim775@users.noreply.github.com",
-        "vcsCommitTimestamp": "2021-08-27T12:58:42.803571Z",
-        "vcsCommitMessage": "fix: Update --config-file flag conflict error to include --project-name\n",
-        "vcsRepositoryUrl": "git@github.com:infracost/infracost.git",
-        "vcsSubPath": "examples/terragrunt/prod"
-      },
-      "pastBreakdown": {
-        "resources": [],
-        "totalHourlyCost": "0",
-        "totalMonthlyCost": "0"
-      },
-      "breakdown": {
-        "resources": [
-          {
-            "name": "aws_instance.web_app",
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "aws_instance.web_app",
-                  "filename": "../../examples/terragrunt/.infracost/.terragrunt-cache/O0YQQk6I7evoBoxn0T-w3l60CCQ/--MlH-MC2An3bk6sQJ14E5NuivU/modules/example/main.tf"
-                }
-              ],
-              "filename": "../../examples/terragrunt/.infracost/.terragrunt-cache/O0YQQk6I7evoBoxn0T-w3l60CCQ/--MlH-MC2An3bk6sQJ14E5NuivU/modules/example/main.tf"
-            },
-            "hourlyCost": "1.024164383561643829",
-            "monthlyCost": "747.64",
-            "costComponents": [
-              {
-                "name": "Instance usage (Linux/UNIX, on-demand, m5.4xlarge)",
-                "unit": "hours",
-                "hourlyQuantity": "1",
-                "monthlyQuantity": "730",
-                "price": "0.768",
-                "hourlyCost": "0.768",
-                "monthlyCost": "560.64"
-              }
-            ],
-            "subresources": [
-              {
-                "name": "root_block_device",
-                "metadata": {},
-                "hourlyCost": "0.0136986301369863",
-                "monthlyCost": "10",
-                "costComponents": [
-                  {
-                    "name": "Storage (general purpose SSD, gp2)",
-                    "unit": "GB",
-                    "hourlyQuantity": "0.136986301369863",
-                    "monthlyQuantity": "100",
-                    "price": "0.1",
-                    "hourlyCost": "0.0136986301369863",
-                    "monthlyCost": "10"
-                  }
-                ]
-              },
-              {
-                "name": "ebs_block_device[0]",
-                "metadata": {},
-                "hourlyCost": "0.242465753424657529",
-                "monthlyCost": "177",
-                "costComponents": [
-                  {
-                    "name": "Storage (provisioned IOPS SSD, io1)",
-                    "unit": "GB",
-                    "hourlyQuantity": "1.3698630136986301",
-                    "monthlyQuantity": "1000",
-                    "price": "0.125",
-                    "hourlyCost": "0.1712328767123287625",
-                    "monthlyCost": "125"
-                  },
-                  {
-                    "name": "Provisioned IOPS",
-                    "unit": "IOPS",
-                    "hourlyQuantity": "1.0958904109589041",
-                    "monthlyQuantity": "800",
-                    "price": "0.065",
-                    "hourlyCost": "0.0712328767123287665",
-                    "monthlyCost": "52"
-                  }
-                ]
-              }
-            ]
-          },
-          {
-            "name": "aws_lambda_function.hello_world",
+            "resourceType": "aws_lambda_function",
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_lambda_function.hello_world",
-                  "filename": "../../examples/terragrunt/.infracost/.terragrunt-cache/O0YQQk6I7evoBoxn0T-w3l60CCQ/--MlH-MC2An3bk6sQJ14E5NuivU/modules/example/main.tf"
+                  "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/SSUFduppKQqVLZK3JbqrjP9IyjY/mc0ezKI814pxHEbk2Yr-qO4jFM0/modules/example/main.tf"
                 }
               ],
-              "filename": "../../examples/terragrunt/.infracost/.terragrunt-cache/O0YQQk6I7evoBoxn0T-w3l60CCQ/--MlH-MC2An3bk6sQJ14E5NuivU/modules/example/main.tf"
+              "checksum": "eb537a4b85bd5ec02439f7e4c8efe78c79f0e9b92a338e9566df0595f4935344",
+              "endLine": 49,
+              "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/SSUFduppKQqVLZK3JbqrjP9IyjY/mc0ezKI814pxHEbk2Yr-qO4jFM0/modules/example/main.tf",
+              "startLine": 42
             },
             "hourlyCost": null,
             "monthlyCost": null,
@@ -2002,7 +2219,16 @@
                 "monthlyCost": null
               },
               {
-                "name": "Duration",
+                "name": "Ephemeral storage",
+                "unit": "GB-seconds",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000000309",
+                "hourlyCost": null,
+                "monthlyCost": null
+              },
+              {
+                "name": "Duration (first 6B)",
                 "unit": "GB-seconds",
                 "hourlyQuantity": null,
                 "monthlyQuantity": null,
@@ -2013,14 +2239,50 @@
             ]
           }
         ],
-        "totalHourlyCost": "1.024164383561643829",
-        "totalMonthlyCost": "747.64"
+        "totalHourlyCost": "0.0711890410958904115",
+        "totalMonthlyCost": "51.968"
       },
       "diff": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
+      },
+      "summary": {
+        "totalDetectedResources": 2,
+        "totalSupportedResources": 2,
+        "totalUnsupportedResources": 0,
+        "totalUsageBasedResources": 2,
+        "totalNoPriceResources": 0,
+        "unsupportedResourceCounts": {},
+        "noPriceResourceCounts": {}
+      }
+    },
+    {
+      "name": "my terragrunt workspace",
+      "metadata": {
+        "path": "testdata/diff_project_name_no_change/terragrunt-multi/prod",
+        "type": "terragrunt_dir",
+        "terraformModulePath": "terragrunt-multi/prod",
+        "terraformWorkspace": "ws2",
+        "vcsSubPath": "cmd/infracost/testdata/diff_project_name_no_change/terragrunt-multi/prod"
+      },
+      "pastBreakdown": {
         "resources": [
           {
             "name": "aws_instance.web_app",
-            "metadata": {},
+            "resourceType": "aws_instance",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_instance.web_app",
+                  "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/qv6CeeSib8SPzF2TvGApNnA6-HM/mc0ezKI814pxHEbk2Yr-qO4jFM0/modules/example/main.tf"
+                }
+              ],
+              "checksum": "68a408f4bf19420a57d0faab69d346b9c160280a7d3c172938837f9744a288c9",
+              "endLine": 40,
+              "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/qv6CeeSib8SPzF2TvGApNnA6-HM/mc0ezKI814pxHEbk2Yr-qO4jFM0/modules/example/main.tf",
+              "startLine": 26
+            },
             "hourlyCost": "1.024164383561643829",
             "monthlyCost": "747.64",
             "costComponents": [
@@ -2082,33 +2344,186 @@
           },
           {
             "name": "aws_lambda_function.hello_world",
-            "metadata": {},
-            "hourlyCost": "0",
-            "monthlyCost": "0",
+            "resourceType": "aws_lambda_function",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_lambda_function.hello_world",
+                  "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/qv6CeeSib8SPzF2TvGApNnA6-HM/mc0ezKI814pxHEbk2Yr-qO4jFM0/modules/example/main.tf"
+                }
+              ],
+              "checksum": "60a2f83ce9c8af13318d4885d554022ed5896a97e8c930a156f612b7274eb8cc",
+              "endLine": 49,
+              "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/qv6CeeSib8SPzF2TvGApNnA6-HM/mc0ezKI814pxHEbk2Yr-qO4jFM0/modules/example/main.tf",
+              "startLine": 42
+            },
+            "hourlyCost": null,
+            "monthlyCost": null,
             "costComponents": [
               {
                 "name": "Requests",
                 "unit": "1M requests",
-                "hourlyQuantity": "0",
-                "monthlyQuantity": "0",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
                 "price": "0.2",
-                "hourlyCost": "0",
-                "monthlyCost": "0"
+                "hourlyCost": null,
+                "monthlyCost": null
               },
               {
-                "name": "Duration",
+                "name": "Ephemeral storage",
                 "unit": "GB-seconds",
-                "hourlyQuantity": "0",
-                "monthlyQuantity": "0",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000000309",
+                "hourlyCost": null,
+                "monthlyCost": null
+              },
+              {
+                "name": "Duration (first 6B)",
+                "unit": "GB-seconds",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
                 "price": "0.0000166667",
-                "hourlyCost": "0",
-                "monthlyCost": "0"
+                "hourlyCost": null,
+                "monthlyCost": null
               }
             ]
           }
         ],
         "totalHourlyCost": "1.024164383561643829",
         "totalMonthlyCost": "747.64"
+      },
+      "breakdown": {
+        "resources": [
+          {
+            "name": "aws_instance.web_app",
+            "resourceType": "aws_instance",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_instance.web_app",
+                  "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/qv6CeeSib8SPzF2TvGApNnA6-HM/mc0ezKI814pxHEbk2Yr-qO4jFM0/modules/example/main.tf"
+                }
+              ],
+              "checksum": "68a408f4bf19420a57d0faab69d346b9c160280a7d3c172938837f9744a288c9",
+              "endLine": 40,
+              "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/qv6CeeSib8SPzF2TvGApNnA6-HM/mc0ezKI814pxHEbk2Yr-qO4jFM0/modules/example/main.tf",
+              "startLine": 26
+            },
+            "hourlyCost": "1.024164383561643829",
+            "monthlyCost": "747.64",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, m5.4xlarge)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.768",
+                "hourlyCost": "0.768",
+                "monthlyCost": "560.64"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.0136986301369863",
+                "monthlyCost": "10",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.136986301369863",
+                    "monthlyQuantity": "100",
+                    "price": "0.1",
+                    "hourlyCost": "0.0136986301369863",
+                    "monthlyCost": "10"
+                  }
+                ]
+              },
+              {
+                "name": "ebs_block_device[0]",
+                "metadata": {},
+                "hourlyCost": "0.242465753424657529",
+                "monthlyCost": "177",
+                "costComponents": [
+                  {
+                    "name": "Storage (provisioned IOPS SSD, io1)",
+                    "unit": "GB",
+                    "hourlyQuantity": "1.3698630136986301",
+                    "monthlyQuantity": "1000",
+                    "price": "0.125",
+                    "hourlyCost": "0.1712328767123287625",
+                    "monthlyCost": "125"
+                  },
+                  {
+                    "name": "Provisioned IOPS",
+                    "unit": "IOPS",
+                    "hourlyQuantity": "1.0958904109589041",
+                    "monthlyQuantity": "800",
+                    "price": "0.065",
+                    "hourlyCost": "0.0712328767123287665",
+                    "monthlyCost": "52"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "aws_lambda_function.hello_world",
+            "resourceType": "aws_lambda_function",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_lambda_function.hello_world",
+                  "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/qv6CeeSib8SPzF2TvGApNnA6-HM/mc0ezKI814pxHEbk2Yr-qO4jFM0/modules/example/main.tf"
+                }
+              ],
+              "checksum": "60a2f83ce9c8af13318d4885d554022ed5896a97e8c930a156f612b7274eb8cc",
+              "endLine": 49,
+              "filename": "testdata/diff_project_name_no_change/.infracost/.terragrunt-cache/qv6CeeSib8SPzF2TvGApNnA6-HM/mc0ezKI814pxHEbk2Yr-qO4jFM0/modules/example/main.tf",
+              "startLine": 42
+            },
+            "hourlyCost": null,
+            "monthlyCost": null,
+            "costComponents": [
+              {
+                "name": "Requests",
+                "unit": "1M requests",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.2",
+                "hourlyCost": null,
+                "monthlyCost": null
+              },
+              {
+                "name": "Ephemeral storage",
+                "unit": "GB-seconds",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000000309",
+                "hourlyCost": null,
+                "monthlyCost": null
+              },
+              {
+                "name": "Duration (first 6B)",
+                "unit": "GB-seconds",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000166667",
+                "hourlyCost": null,
+                "monthlyCost": null
+              }
+            ]
+          }
+        ],
+        "totalHourlyCost": "1.024164383561643829",
+        "totalMonthlyCost": "747.64"
+      },
+      "diff": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
       },
       "summary": {
         "totalDetectedResources": 2,
@@ -2123,11 +2538,11 @@
   ],
   "totalHourlyCost": "6.3380054794520547585",
   "totalMonthlyCost": "4626.744",
-  "pastTotalHourlyCost": "0",
-  "pastTotalMonthlyCost": "0",
-  "diffTotalHourlyCost": "6.3380054794520547585",
-  "diffTotalMonthlyCost": "4626.744",
-  "timeGenerated": "2022-06-20T17:06:14.912417-04:00",
+  "pastTotalHourlyCost": "6.3380054794520547585",
+  "pastTotalMonthlyCost": "4626.744",
+  "diffTotalHourlyCost": "0",
+  "diffTotalMonthlyCost": "0",
+  "timeGenerated": "2023-07-06T19:30:07.059415Z",
   "summary": {
     "totalDetectedResources": 18,
     "totalSupportedResources": 18,
