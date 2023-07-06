@@ -4,6 +4,7 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
+	"math"
 	"net/http"
 	"os"
 
@@ -37,6 +38,11 @@ type PriceQueryKey struct {
 type PriceQueryResult struct {
 	PriceQueryKey
 	Result gjson.Result
+}
+
+type BatchRequest struct {
+	keys    []PriceQueryKey
+	queries []GraphQLQuery
 }
 
 func NewPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
@@ -112,24 +118,6 @@ func (c *PricingAPIClient) AddEvent(name string, env map[string]interface{}) err
 	return err
 }
 
-func (c *PricingAPIClient) RunQueries(r *schema.Resource) ([]PriceQueryResult, error) {
-	keys, queries := c.batchQueries(r)
-
-	if len(queries) == 0 {
-		log.Debugf("Skipping getting pricing details for %s since there are no queries to run", r.Name)
-		return []PriceQueryResult{}, nil
-	}
-
-	log.Debugf("Getting pricing details from %s for %s", c.endpoint, r.Name)
-
-	results, err := c.doQueries(queries)
-	if err != nil {
-		return []PriceQueryResult{}, err
-	}
-
-	return c.zipQueryResults(keys, results), nil
-}
-
 func (c *PricingAPIClient) buildQuery(product *schema.ProductFilter, price *schema.PriceFilter) GraphQLQuery {
 	v := map[string]interface{}{}
 	v["productFilter"] = product
@@ -149,25 +137,47 @@ func (c *PricingAPIClient) buildQuery(product *schema.ProductFilter, price *sche
 	return GraphQLQuery{query, v}
 }
 
-// Batch all the queries for this resource so we can use one GraphQL call.
+// Batch all the queries for these resources so we can use less GraphQL requests
 // Use PriceQueryKeys to keep track of which query maps to which sub-resource and price component.
-func (c *PricingAPIClient) batchQueries(r *schema.Resource) ([]PriceQueryKey, []GraphQLQuery) {
+func (c *PricingAPIClient) BatchRequests(resources []*schema.Resource, batchSize int) []BatchRequest {
+	reqs := make([]BatchRequest, 0)
+
 	keys := make([]PriceQueryKey, 0)
 	queries := make([]GraphQLQuery, 0)
 
-	for _, component := range r.CostComponents {
-		keys = append(keys, PriceQueryKey{r, component})
-		queries = append(queries, c.buildQuery(component.ProductFilter, component.PriceFilter))
-	}
-
-	for _, subresource := range r.FlattenedSubResources() {
-		for _, component := range subresource.CostComponents {
-			keys = append(keys, PriceQueryKey{subresource, component})
+	for _, r := range resources {
+		for _, component := range r.CostComponents {
+			keys = append(keys, PriceQueryKey{r, component})
 			queries = append(queries, c.buildQuery(component.ProductFilter, component.PriceFilter))
+		}
+
+		for _, subresource := range r.FlattenedSubResources() {
+			for _, component := range subresource.CostComponents {
+				keys = append(keys, PriceQueryKey{subresource, component})
+				queries = append(queries, c.buildQuery(component.ProductFilter, component.PriceFilter))
+			}
 		}
 	}
 
-	return keys, queries
+	for i := 0; i < len(queries); i += batchSize {
+		keysEnd := int64(math.Min(float64(i+batchSize), float64(len(keys))))
+		queriesEnd := int64(math.Min(float64(i+batchSize), float64(len(queries))))
+
+		reqs = append(reqs, BatchRequest{keys[i:keysEnd], queries[i:queriesEnd]})
+	}
+
+	return reqs
+}
+
+func (c *PricingAPIClient) PerformRequest(req BatchRequest) ([]PriceQueryResult, error) {
+	log.Debugf("Getting pricing details for %d cost components from %s", len(req.queries), c.endpoint)
+
+	results, err := c.doQueries(req.queries)
+	if err != nil {
+		return []PriceQueryResult{}, err
+	}
+
+	return c.zipQueryResults(req.keys, results), nil
 }
 
 func (c *PricingAPIClient) zipQueryResults(k []PriceQueryKey, r []gjson.Result) []PriceQueryResult {

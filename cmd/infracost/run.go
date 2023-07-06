@@ -158,7 +158,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 
 	if format == "diff" || format == "table" {
 		lines := bytes.Count(b, []byte("\n")) + 1
-		runCtx.SetContextValue("lineCount", lines)
+		runCtx.ContextValues.SetValue("lineCount", lines)
 	}
 
 	env := buildRunEnv(runCtx, projectContexts, r)
@@ -223,7 +223,7 @@ func newParallelRunner(cmd *cobra.Command, runCtx *config.RunContext) (*parallel
 	if err != nil {
 		return nil, err
 	}
-	runCtx.SetContextValue("parallelism", parallelism)
+	runCtx.ContextValues.SetValue("parallelism", parallelism)
 
 	numJobs := len(runCtx.Config.Projects)
 
@@ -337,14 +337,14 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 		return nil, clierror.NewCLIError(errors.New(m), "Could not detect path type")
 	}
 
-	ctx.SetContextValue("projectType", provider.Type())
+	ctx.ContextValues.SetValue("projectType", provider.Type())
 
 	projectTypes := []interface{}{}
-	if t, ok := ctx.RunContext.ContextValues()["projectTypes"]; ok {
+	if t, ok := ctx.RunContext.ContextValues.GetValue("projectTypes"); ok {
 		projectTypes = t.([]interface{})
 	}
 	projectTypes = append(projectTypes, provider.Type())
-	ctx.RunContext.SetContextValue("projectTypes", projectTypes)
+	ctx.RunContext.ContextValues.SetValue("projectTypes", projectTypes)
 
 	if r.cmd.Name() == "diff" && provider.Type() == "terraform_state_json" {
 		m := "Cannot use Terraform state JSON with the infracost diff command.\n\n"
@@ -396,7 +396,7 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 			)
 		}
 
-		ctx.SetContextValue("hasUsageFile", true)
+		ctx.ContextValues.SetValue("hasUsageFile", true)
 	} else {
 		usageFile = usage.NewBlankUsageFile()
 	}
@@ -481,7 +481,7 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 
 	t2 := time.Now()
 	taken := t2.Sub(t1).Milliseconds()
-	ctx.SetContextValue("tfProjectRunTimeMs", taken)
+	ctx.ContextValues.SetValue("tfProjectRunTimeMs", taken)
 
 	spinner.Success()
 
@@ -503,7 +503,7 @@ func (r *parallelRunner) uploadCloudResourceIDs(projects []*schema.Project) erro
 		return nil
 	}
 
-	r.runCtx.SetContextValue("uploadedResourceIds", true)
+	r.runCtx.ContextValues.SetValue("uploadedResourceIds", true)
 
 	spinnerOpts := ui.SpinnerOptions{
 		EnableLogging: r.runCtx.Config.IsLogging(),
@@ -580,7 +580,7 @@ func (r *parallelRunner) fetchProjectUsage(projects []*schema.Project) map[*sche
 			logging.Logger.WithError(err).Debugf("failed to retrieve usage data for project %s", project.Name)
 			return nil
 		}
-		r.runCtx.SetContextValue("fetchedUsageData", true)
+		r.runCtx.ContextValues.SetValue("fetchedUsageData", true)
 		projectPtrToUsageMap[project] = usageMap
 	}
 

@@ -4,10 +4,12 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/infracost/infracost/internal/apiclient"
-	log "github.com/sirupsen/logrus"
 	"os"
 	"strconv"
+
+	log "github.com/sirupsen/logrus"
+
+	"github.com/infracost/infracost/internal/apiclient"
 
 	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/rego"
@@ -117,8 +119,8 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 			return nil, hasDiff, err
 		}
 
-		ctx.SetContextValue("passedPolicyCount", len(policyChecks.Passed))
-		ctx.SetContextValue("failedPolicyCount", len(policyChecks.Failures))
+		ctx.ContextValues.SetValue("passedPolicyCount", len(policyChecks.Passed))
+		ctx.ContextValues.SetValue("failedPolicyCount", len(policyChecks.Failures))
 	}
 
 	opts := output.Options{

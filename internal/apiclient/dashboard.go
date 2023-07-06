@@ -75,7 +75,7 @@ func newRunInput(ctx *config.RunContext, out output.Root) (*runInput, error) {
 		}
 	}
 
-	ctxValues := ctx.ContextValues()
+	ctxValues := ctx.ContextValues.Values()
 
 	var metadata map[string]interface{}
 	b, err := json.Marshal(out.Metadata)
@@ -94,7 +94,7 @@ func newRunInput(ctx *config.RunContext, out output.Root) (*runInput, error) {
 		// Clone the map to cleanup up the "command" key to show "comment".  It is
 		// currently set to the sub comment (e.g. "github")
 		ctxValues = make(map[string]interface{}, len(ctxValues))
-		for k, v := range ctx.ContextValues() {
+		for k, v := range ctx.ContextValues.Values() {
 			ctxValues[k] = v
 		}
 		ctxValues["command"] = "comment"
@@ -126,6 +126,7 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (Ad
 			addRun(run: $run) {
 				id
 				shareUrl
+				cloudUrl
 				organization {
 					id
 					name
@@ -167,6 +168,7 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (Ad
 
 		response.RunID = cloudRun.Get("id").String()
 		response.ShareURL = cloudRun.Get("shareUrl").String()
+		response.CloudURL = cloudRun.Get("cloudUrl").String()
 		response.GuardrailCheck.TotalChecked = cloudRun.Get("guardrailsChecked").Int()
 		response.GuardrailCheck.Comment = cloudRun.Get("guardrailComment").Bool()
 		for _, event := range cloudRun.Get("guardrailEvents").Array() {

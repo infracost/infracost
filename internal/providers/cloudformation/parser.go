@@ -24,7 +24,7 @@ func (p *Parser) createResource(d *schema.ResourceData, u *schema.UsageData) *sc
 	registryMap := GetResourceRegistryMap()
 
 	if isAwsChina(d) {
-		p.ctx.SetContextValue("isAWSChina", true)
+		p.ctx.ContextValues.SetValue("isAWSChina", true)
 	}
 
 	if registryItem, ok := (*registryMap)[d.Type]; ok {

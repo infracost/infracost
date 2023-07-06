@@ -160,7 +160,7 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 	}
 	var scanner *scan.TerraformPlanScanner
 	if runCtx.Config.PolicyAPIEndpoint != "" {
-		scanner = scan.NewTerraformPlanScanner(runCtx, ctx.Logger(), prices.GetPrices)
+		scanner = scan.NewTerraformPlanScanner(runCtx, ctx.Logger(), prices.GetPricesConcurrent)
 	}
 
 	return &HCLProvider{
@@ -613,7 +613,12 @@ func (p *HCLProvider) marshalDefaultTagsBlock(providerBlock *hcl.Block) map[stri
 		return marshalledTags
 	}
 
-	for tag, val := range tags.Value().AsValueMap() {
+	value := tags.Value()
+	if !value.IsKnown() || !value.CanIterateElements() {
+		return nil
+	}
+
+	for tag, val := range value.AsValueMap() {
 		if !val.IsKnown() {
 			p.logger.Debugf("tag %s has unknown value, cannot marshal", tag)
 			continue

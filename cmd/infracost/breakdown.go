@@ -32,7 +32,7 @@ func breakdownCmd(ctx *config.RunContext) *cobra.Command {
 				return err
 			}
 
-			ctx.SetContextValue("outputFormat", ctx.Config.Format)
+			ctx.ContextValues.SetValue("outputFormat", ctx.Config.Format)
 
 			err = checkRunConfig(cmd.ErrOrStderr(), ctx.Config)
 			if err != nil {

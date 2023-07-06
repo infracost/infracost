@@ -40,7 +40,7 @@ func (p *Parser) createPartialResource(d *schema.ResourceData, u *schema.UsageDa
 	registryMap := GetResourceRegistryMap()
 
 	for cKey, cValue := range getSpecialContext(d) {
-		p.ctx.SetContextValue(cKey, cValue)
+		p.ctx.ContextValues.SetValue(cKey, cValue)
 	}
 
 	if registryItem, ok := (*registryMap)[d.Type]; ok {

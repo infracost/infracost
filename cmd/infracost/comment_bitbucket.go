@@ -31,7 +31,7 @@ func commentBitbucketCmd(ctx *config.RunContext) *cobra.Command {
       infracost comment bitbucket --repo my-org/my-repo --commit 2ca7182 --path infracost.json --behavior delete-and-new --bitbucket-token $BITBUCKET_TOKEN`,
 		ValidArgs: []string{"--", "-"},
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ctx.SetContextValue("platform", "bitbucket")
+			ctx.ContextValues.SetValue("platform", "bitbucket")
 
 			var err error
 
@@ -52,14 +52,14 @@ func commentBitbucketCmd(ctx *config.RunContext) *cobra.Command {
 
 			var commentHandler *comment.CommentHandler
 			if prNumber != 0 {
-				ctx.SetContextValue("targetType", "pull-request")
+				ctx.ContextValues.SetValue("targetType", "pull-request")
 
 				commentHandler, err = comment.NewBitbucketPRHandler(ctx.Context(), repo, strconv.Itoa(prNumber), extra)
 				if err != nil {
 					return err
 				}
 			} else if commit != "" {
-				ctx.SetContextValue("targetType", "commit")
+				ctx.ContextValues.SetValue("targetType", "commit")
 
 				commentHandler, err = comment.NewBitbucketCommitHandler(ctx.Context(), repo, commit, extra)
 				if err != nil {
@@ -75,7 +75,7 @@ func commentBitbucketCmd(ctx *config.RunContext) *cobra.Command {
 				ui.PrintUsage(cmd)
 				return fmt.Errorf("--behavior only supports %s", strings.Join(validCommentBitbucketBehaviors, ", "))
 			}
-			ctx.SetContextValue("behavior", behavior)
+			ctx.ContextValues.SetValue("behavior", behavior)
 
 			paths, _ := cmd.Flags().GetStringArray("path")
 
