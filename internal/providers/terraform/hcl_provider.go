@@ -707,6 +707,9 @@ func (p *HCLProvider) countReferences(block *hcl.Block) *countExpression {
 var ignoredAttrs = map[string]bool{"arn": true, "id": true, "name": true, "self_link": true}
 var checksumMarshaller = jsoniter.ConfigCompatibleWithStandardLibrary
 
+var mockValueRegex = regexp.MustCompile(`[a-zA-Z][a-zA-Z0-9-_]*-mock`)
+var checksumMock = []byte("checksum-mock")
+
 func generateChecksum(value map[string]interface{}) string {
 	filtered := make(map[string]interface{})
 	for k, v := range value {
@@ -719,6 +722,9 @@ func generateChecksum(value map[string]interface{}) string {
 	if err != nil {
 		return ""
 	}
+
+	// mock values aren't always deterministic, so ignore them for the checksum
+	serialized = mockValueRegex.ReplaceAll(serialized, checksumMock)
 
 	h := sha256.New()
 	h.Write(serialized)
