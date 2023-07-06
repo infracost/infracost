@@ -215,7 +215,7 @@ func (p *Parser) loadUsageFileResources(u schema.UsageMap) []*schema.PartialReso
 	for k, v := range u.Data() {
 		for _, t := range GetUsageOnlyResources() {
 			if strings.HasPrefix(k, fmt.Sprintf("%s.", t)) {
-				d := schema.NewResourceData(t, "global", k, map[string]string{}, gjson.Result{})
+				d := schema.NewResourceData(t, "global", k, nil, gjson.Result{})
 				// set the usage data as a field on the resource data in case it is needed when
 				// processing reference attributes.
 				d.UsageData = v
@@ -333,7 +333,7 @@ func getSpecialContext(d *schema.ResourceData) map[string]interface{} {
 	}
 }
 
-func parseTags(resourceType string, v gjson.Result) map[string]string {
+func parseTags(resourceType string, v gjson.Result) *map[string]string {
 	providerPrefix := getProviderPrefix(resourceType)
 
 	switch providerPrefix {
@@ -345,7 +345,7 @@ func parseTags(resourceType string, v gjson.Result) map[string]string {
 		return google.ParseTags(resourceType, v)
 	default:
 		logging.Logger.Debugf("Unsupported provider %s", providerPrefix)
-		return map[string]string{}
+		return nil
 	}
 }
 

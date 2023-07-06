@@ -70,7 +70,7 @@ func (p *Parser) parseTemplate(t *cloudformation.Template, usage schema.UsageMap
 		tags := map[string]string{} // TODO: Where do I get tags?
 		usageData := usage.Get(name)
 
-		resourceData := schema.NewCFResourceData(d.AWSCloudFormationType(), "aws", name, tags, d)
+		resourceData := schema.NewCFResourceData(d.AWSCloudFormationType(), "aws", name, &tags, d)
 
 		if r := p.createResource(resourceData, usageData); r != nil {
 			resources = append(resources, r)
@@ -86,7 +86,7 @@ func (p *Parser) loadUsageFileResources(u schema.UsageMap) []*schema.Resource {
 	for k, v := range u.Data() {
 		for _, t := range GetUsageOnlyResources() {
 			if strings.HasPrefix(k, fmt.Sprintf("%s.", t)) {
-				d := schema.NewResourceData(t, "global", k, map[string]string{}, gjson.Result{})
+				d := schema.NewResourceData(t, "global", k, nil, gjson.Result{})
 				if r := p.createResource(d, v); r != nil {
 					resources = append(resources, r)
 				}

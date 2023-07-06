@@ -155,6 +155,7 @@
           {
             "name": "aws_instance.web_app",
             "resourceType": "aws_instance",
+            "tags": {},
             "metadata": {
               "calls": [
                 {

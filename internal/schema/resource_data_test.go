@@ -8,7 +8,7 @@ import (
 )
 
 func TestResourceDataEmpty(t *testing.T) {
-	r := NewResourceData("somettype", "someprovider", "some.address", map[string]string{},
+	r := NewResourceData("somettype", "someprovider", "some.address", nil,
 		gjson.Result{
 			Type: gjson.JSON,
 			Raw: `{	

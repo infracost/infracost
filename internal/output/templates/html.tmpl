@@ -148,7 +148,7 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
     </td>
     {{template "emptyTableRows" dict "Fields" $fields}}
   </tr>
-  {{ if .Resource.Tags}}
+  {{ if and .Resource.Tags (len .Resource.Tags)}}
     <tr class="tags">
       <td class="name">
         {{$tags := list}}

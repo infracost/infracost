@@ -34,10 +34,10 @@ func GetResourceRegion(resourceType string, v gjson.Result) string {
 	return ""
 }
 
-func ParseTags(resourceType string, v gjson.Result) map[string]string {
+func ParseTags(resourceType string, v gjson.Result) *map[string]string {
 	tags := make(map[string]string)
 	for k, v := range v.Get("labels").Map() {
 		tags[k] = v.String()
 	}
-	return tags
+	return &tags
 }
