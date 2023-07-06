@@ -21,7 +21,7 @@ type ProjectContext struct {
 	RunContext    *RunContext
 	ProjectConfig *Project
 	logger        *logrus.Entry
-	contextVals   map[string]interface{}
+	ContextValues *ContextValues
 	mu            *sync.RWMutex
 
 	UsingCache bool
@@ -35,42 +35,30 @@ func NewProjectContext(runCtx *RunContext, projectCfg *Project, fields logrus.Fi
 		RunContext:    runCtx,
 		ProjectConfig: projectCfg,
 		logger:        contextLogger,
-		contextVals:   map[string]interface{}{},
+		ContextValues: NewContextValues(map[string]interface{}{}),
 		mu:            &sync.RWMutex{},
 	}
 }
 
-func (p *ProjectContext) Logger() *logrus.Entry {
-	if p.logger == nil {
-		return logging.Logger.WithFields(p.logFields())
+func (c *ProjectContext) Logger() *logrus.Entry {
+	if c.logger == nil {
+		return logging.Logger.WithFields(c.logFields())
 	}
 
-	return p.logger.WithFields(p.logFields())
+	return c.logger.WithFields(c.logFields())
 }
 
-func (p *ProjectContext) logFields() logrus.Fields {
+func (c *ProjectContext) logFields() logrus.Fields {
 	return logrus.Fields{
-		"project_name": p.ProjectConfig.Name,
-		"project_path": p.ProjectConfig.Path,
+		"project_name": c.ProjectConfig.Name,
+		"project_path": c.ProjectConfig.Path,
 	}
-}
-
-func (c *ProjectContext) SetContextValue(key string, value interface{}) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
-	c.contextVals[key] = value
-}
-
-func (c *ProjectContext) ContextValues() map[string]interface{} {
-	c.mu.RLock()
-	defer c.mu.RUnlock()
-	return c.contextVals
 }
 
 func (c *ProjectContext) SetFrom(d ProjectContexter) {
 	m := d.ProjectContext()
 	for k, v := range m {
-		c.SetContextValue(k, v)
+		c.ContextValues.SetValue(k, v)
 	}
 }
 

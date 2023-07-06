@@ -12,26 +12,74 @@ import (
 
 	"github.com/infracost/infracost/internal/logging"
 	intSync "github.com/infracost/infracost/internal/sync"
+	"github.com/infracost/infracost/internal/ui"
 	"github.com/infracost/infracost/internal/vcs"
+	"github.com/infracost/infracost/internal/version"
 
 	"github.com/google/uuid"
 	log "github.com/sirupsen/logrus"
-
-	"github.com/infracost/infracost/internal/ui"
-	"github.com/infracost/infracost/internal/version"
 )
 
+// ContextValues is a type that wraps a map with methods that safely
+// handle concurrent reads and writes.
+type ContextValues struct {
+	values map[string]interface{}
+	mu     *sync.RWMutex
+}
+
+// NewContextValues returns a new instance of ContextValues.
+func NewContextValues(values map[string]interface{}) *ContextValues {
+	return &ContextValues{
+		values: make(map[string]interface{}),
+		mu:     &sync.RWMutex{},
+	}
+}
+
+// GetValue safely retrieves a value from the map.
+// It locks the mutex for reading, deferring the unlock until the method returns.
+// This prevents a race condition if a separate goroutine writes to the map concurrently.
+func (cv *ContextValues) GetValue(key string) (interface{}, bool) {
+	cv.mu.RLock()
+	defer cv.mu.RUnlock()
+
+	value, exists := cv.values[key]
+	return value, exists
+}
+
+// SetValue safely sets a value in the map.
+// It locks the mutex for writing, deferring the unlock until the method returns.
+// This prevents a race condition if separate goroutines read or write to the map concurrently.
+func (cv *ContextValues) SetValue(key string, value interface{}) {
+	cv.mu.Lock()
+	defer cv.mu.Unlock()
+	cv.values[key] = value
+}
+
+// Values safely retrieves a copy of the map.
+// This method locks the mutex for reading, deferring the unlock until the method returns.
+// By returning a copy, this prevents a race condition if separate goroutines read or write to the original map concurrently.
+// However, creating a copy may be expensive for large maps.
+func (cv *ContextValues) Values() map[string]interface{} {
+	cv.mu.RLock()
+	defer cv.mu.RUnlock()
+	copyMap := make(map[string]interface{})
+	for k, v := range cv.values {
+		copyMap[k] = v
+	}
+	return copyMap
+}
+
 type RunContext struct {
-	ctx         context.Context
-	uuid        uuid.UUID
-	Config      *Config
-	State       *State
-	VCSMetadata vcs.Metadata
-	CMD         string
-	contextVals map[string]interface{}
-	mu          *sync.RWMutex
-	ModuleMutex *intSync.KeyMutex
-	StartTime   int64
+	ctx           context.Context
+	uuid          uuid.UUID
+	Config        *Config
+	State         *State
+	VCSMetadata   vcs.Metadata
+	CMD           string
+	ContextValues *ContextValues
+	mu            *sync.RWMutex
+	ModuleMutex   *intSync.KeyMutex
+	StartTime     int64
 
 	isCommentCmd bool
 
@@ -50,35 +98,44 @@ func NewRunContextFromEnv(rootCtx context.Context) (*RunContext, error) {
 	state, _ := LoadState()
 
 	c := &RunContext{
-		ctx:         rootCtx,
-		OutWriter:   os.Stdout,
-		ErrWriter:   os.Stderr,
-		Exit:        os.Exit,
-		uuid:        uuid.New(),
-		Config:      cfg,
-		State:       state,
-		contextVals: map[string]interface{}{},
-		mu:          &sync.RWMutex{},
+		ctx:       rootCtx,
+		OutWriter: os.Stdout,
+		ErrWriter: os.Stderr,
+		Exit:      os.Exit,
+		uuid:      uuid.New(),
+		Config:    cfg,
+		State:     state,
+		ContextValues: NewContextValues(
+			map[string]interface{}{
+				"version":               baseVersion(version.Version),
+				"fullVersion":           version.Version,
+				"isTest":                IsTest(),
+				"isDev":                 IsDev(),
+				"os":                    runtime.GOOS,
+				"ciPlatform":            ciPlatform(),
+				"cliPlatform":           os.Getenv("INFRACOST_CLI_PLATFORM"),
+				"ciScript":              ciScript(),
+				"ciPostCondition":       os.Getenv("INFRACOST_CI_POST_CONDITION"),
+				"ciPercentageThreshold": os.Getenv("INFRACOST_CI_PERCENTAGE_THRESHOLD"),
+			}),
 		ModuleMutex: &intSync.KeyMutex{},
 		StartTime:   time.Now().Unix(),
 	}
-
-	c.loadInitialContextValues()
 
 	return c, nil
 }
 
 func EmptyRunContext() *RunContext {
 	return &RunContext{
-		Config:      &Config{},
-		State:       &State{},
-		contextVals: map[string]interface{}{},
-		mu:          &sync.RWMutex{},
-		ModuleMutex: &intSync.KeyMutex{},
-		StartTime:   time.Now().Unix(),
-		OutWriter:   os.Stdout,
-		ErrWriter:   os.Stderr,
-		Exit:        os.Exit,
+		Config:        &Config{},
+		State:         &State{},
+		ContextValues: NewContextValues(map[string]interface{}{}),
+		mu:            &sync.RWMutex{},
+		ModuleMutex:   &intSync.KeyMutex{},
+		StartTime:     time.Now().Unix(),
+		OutWriter:     os.Stdout,
+		ErrWriter:     os.Stderr,
+		Exit:          os.Exit,
 	}
 }
 
@@ -139,20 +196,8 @@ func (r *RunContext) VCSRepositoryURL() string {
 	return r.VCSMetadata.Remote.URL
 }
 
-func (r *RunContext) SetContextValue(key string, value interface{}) {
-	r.mu.Lock()
-	r.contextVals[key] = value
-	r.mu.Unlock()
-}
-
-func (r *RunContext) ContextValues() map[string]interface{} {
-	r.mu.RLock()
-	defer r.mu.RUnlock()
-	return r.contextVals
-}
-
 func (r *RunContext) GetResourceWarnings() map[string]map[string]int {
-	contextValues := r.ContextValues()
+	contextValues := r.ContextValues.Values()
 
 	if warnings := contextValues["resourceWarnings"]; warnings != nil {
 		return warnings.(map[string]map[string]int)
@@ -162,7 +207,7 @@ func (r *RunContext) GetResourceWarnings() map[string]map[string]int {
 }
 
 func (r *RunContext) SetResourceWarnings(resourceWarnings map[string]map[string]int) {
-	r.SetContextValue("resourceWarnings", resourceWarnings)
+	r.ContextValues.SetValue("resourceWarnings", resourceWarnings)
 }
 
 func (r *RunContext) EventEnv() map[string]interface{} {
@@ -170,7 +215,8 @@ func (r *RunContext) EventEnv() map[string]interface{} {
 }
 
 func (r *RunContext) EventEnvWithProjectContexts(projectContexts []*ProjectContext) map[string]interface{} {
-	env := r.contextVals
+	env := r.ContextValues.Values()
+
 	env["installId"] = r.State.InstallID
 
 	for _, projectContext := range projectContexts {
@@ -178,7 +224,7 @@ func (r *RunContext) EventEnvWithProjectContexts(projectContexts []*ProjectConte
 			continue
 		}
 
-		for k, v := range projectContext.ContextValues() {
+		for k, v := range projectContext.ContextValues.Values() {
 			if _, ok := env[k]; !ok {
 				env[k] = make([]interface{}, 0)
 			}
@@ -189,21 +235,9 @@ func (r *RunContext) EventEnvWithProjectContexts(projectContexts []*ProjectConte
 	return env
 }
 
-func (r *RunContext) loadInitialContextValues() {
-	r.SetContextValue("version", baseVersion(version.Version))
-	r.SetContextValue("fullVersion", version.Version)
-	r.SetContextValue("isTest", IsTest())
-	r.SetContextValue("isDev", IsDev())
-	r.SetContextValue("os", runtime.GOOS)
-	r.SetContextValue("ciPlatform", ciPlatform())
-	r.SetContextValue("cliPlatform", os.Getenv("INFRACOST_CLI_PLATFORM"))
-	r.SetContextValue("ciScript", ciScript())
-	r.SetContextValue("ciPostCondition", os.Getenv("INFRACOST_CI_POST_CONDITION"))
-	r.SetContextValue("ciPercentageThreshold", os.Getenv("INFRACOST_CI_PERCENTAGE_THRESHOLD"))
-}
-
 func (r *RunContext) IsCIRun() bool {
-	return r.contextVals["ciPlatform"] != "" && !IsTest()
+	p, _ := r.ContextValues.GetValue("ciPlatform")
+	return p != "" && !IsTest()
 }
 
 // SetIsInfracostComment identifies that the primary command being run is `infracost comment`

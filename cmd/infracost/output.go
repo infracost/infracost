@@ -79,7 +79,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 
 			format, _ := cmd.Flags().GetString("format")
 			format = strings.ToLower(format)
-			ctx.SetContextValue("outputFormat", format)
+			ctx.ContextValues.SetValue("outputFormat", format)
 
 			if format != "" && !contains(validOutputFormats, format) {
 				ui.PrintUsage(cmd)
@@ -200,7 +200,7 @@ func shareCombinedRun(ctx *config.RunContext, combined output.Root, inputs []out
 			combinedRunIds = append(combinedRunIds, id)
 		}
 	}
-	ctx.SetContextValue("runIds", combinedRunIds)
+	ctx.ContextValues.SetValue("runIds", combinedRunIds)
 
 	dashboardClient := apiclient.NewDashboardAPIClient(ctx)
 	result, err := dashboardClient.AddRun(ctx, combined)
