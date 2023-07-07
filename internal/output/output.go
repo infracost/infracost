@@ -249,7 +249,7 @@ type ActualCosts struct {
 type Resource struct {
 	Name           string                 `json:"name"`
 	ResourceType   string                 `json:"resourceType,omitempty"`
-	Tags           map[string]string      `json:"tags,omitempty"`
+	Tags           *map[string]string     `json:"tags,omitempty"`
 	Metadata       map[string]interface{} `json:"metadata"`
 	HourlyCost     *decimal.Decimal       `json:"hourlyCost"`
 	MonthlyCost    *decimal.Decimal       `json:"monthlyCost"`

@@ -64,6 +64,24 @@ func TestBreakdownFormatJsonWithWarnings(t *testing.T) {
 	)
 }
 
+func TestBreakdownFormatJsonWithTags(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testName,
+		[]string{
+			"breakdown",
+			"--format", "json",
+			"--path", dir,
+		},
+		&GoldenFileOptions{
+			CaptureLogs: true,
+			IsJSON:      true,
+		},
+	)
+}
+
 func TestBreakdownFormatJSONShowSkipped(t *testing.T) {
 	opts := DefaultOptions()
 	opts.IsJSON = true

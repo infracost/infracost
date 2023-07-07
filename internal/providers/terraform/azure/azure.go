@@ -1,6 +1,7 @@
 package azure
 
 import (
+	"github.com/infracost/infracost/internal/providers/terraform/provider_schemas"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/tidwall/gjson"
 )
@@ -23,10 +24,16 @@ func GetResourceRegion(resourceType string, v gjson.Result) string {
 	return ""
 }
 
-func ParseTags(resourceType string, v gjson.Result) map[string]string {
+func ParseTags(resourceType string, r gjson.Result) *map[string]string {
+	_, supportsTags := provider_schemas.AzureTagsSupport[resourceType]
+	rTags := r.Get("tags").Map()
+	if !supportsTags && len(rTags) == 0 {
+		return nil
+	}
+
 	tags := make(map[string]string)
-	for k, v := range v.Get("tags").Map() {
+	for k, v := range rTags {
 		tags[k] = v.String()
 	}
-	return tags
+	return &tags
 }

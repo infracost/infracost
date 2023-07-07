@@ -28,7 +28,7 @@ type Resource struct {
 	NoPrice           bool
 	SkipMessage       string
 	ResourceType      string
-	Tags              map[string]string
+	Tags              *map[string]string
 	UsageSchema       []*UsageItem
 	EstimateUsage     EstimateFunc
 	EstimationSummary map[string]bool

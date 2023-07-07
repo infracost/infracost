@@ -1,0 +1,341 @@
+{
+  "version": "0.2",
+  "metadata": {
+    "infracostCommand": "breakdown",
+    "vcsBranch": "stub-branch",
+    "vcsCommitSha": "stub-sha",
+    "vcsCommitAuthorName": "stub-author",
+    "vcsCommitAuthorEmail": "stub@stub.com",
+    "vcsCommitTimestamp": "REPLACED_TIME",
+    "vcsCommitMessage": "stub-message",
+    "vcsRepositoryUrl": "https://github.com/infracost/infracost"
+  },
+  "currency": "USD",
+  "projects": [
+    {
+      "name": "infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags",
+      "metadata": {
+        "path": "testdata/breakdown_format_json_with_tags",
+        "type": "terraform_dir",
+        "vcsSubPath": "cmd/infracost/testdata/breakdown_format_json_with_tags",
+        "providers": [
+          {
+            "name": "aws",
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "filename": "testdata/breakdown_format_json_with_tags/main.tf",
+            "startLine": 1,
+            "endLine": 14
+          }
+        ]
+      },
+      "pastBreakdown": {
+        "resources": [
+          {
+            "name": "aws_sns_topic_subscription.sns_topic_noTags",
+            "resourceType": "aws_sns_topic_subscription",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_sns_topic_subscription.sns_topic_noTags",
+                  "filename": "testdata/breakdown_format_json_with_tags/main.tf"
+                }
+              ],
+              "checksum": "10a6feecf428a263eb621089fa1ea9ed6d36c1210906f87b858471b7efc01de0",
+              "endLine": 20,
+              "filename": "testdata/breakdown_format_json_with_tags/main.tf",
+              "startLine": 16
+            },
+            "hourlyCost": null,
+            "monthlyCost": null,
+            "costComponents": [
+              {
+                "name": "HTTP notifications",
+                "unit": "1M notifications",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.6",
+                "hourlyCost": null,
+                "monthlyCost": null
+              }
+            ]
+          },
+          {
+            "name": "aws_sns_topic_subscription.sns_topic_withTags",
+            "resourceType": "aws_sns_topic_subscription",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "sns-def",
+              "ResourceTag": "sns-ghi"
+            },
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_sns_topic_subscription.sns_topic_withTags",
+                  "filename": "testdata/breakdown_format_json_with_tags/main.tf"
+                }
+              ],
+              "checksum": "6e3eb9c41d083d305c807ea3fa31a2d94182d1d406f25d249bf3cf2eb27208d5",
+              "endLine": 30,
+              "filename": "testdata/breakdown_format_json_with_tags/main.tf",
+              "startLine": 22
+            },
+            "hourlyCost": null,
+            "monthlyCost": null,
+            "costComponents": [
+              {
+                "name": "HTTP notifications",
+                "unit": "1M notifications",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.6",
+                "hourlyCost": null,
+                "monthlyCost": null
+              }
+            ]
+          },
+          {
+            "name": "aws_sqs_queue.sqs_noTags",
+            "resourceType": "aws_sqs_queue",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_sqs_queue.sqs_noTags",
+                  "filename": "testdata/breakdown_format_json_with_tags/main.tf"
+                }
+              ],
+              "checksum": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+              "endLine": 34,
+              "filename": "testdata/breakdown_format_json_with_tags/main.tf",
+              "startLine": 32
+            },
+            "hourlyCost": null,
+            "monthlyCost": null,
+            "costComponents": [
+              {
+                "name": "Requests",
+                "unit": "1M requests",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.4",
+                "hourlyCost": null,
+                "monthlyCost": null
+              }
+            ]
+          },
+          {
+            "name": "aws_sqs_queue.sqs_withTags",
+            "resourceType": "aws_sqs_queue",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "sqs-def",
+              "ResourceTag": "sqs-hi"
+            },
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_sqs_queue.sqs_withTags",
+                  "filename": "testdata/breakdown_format_json_with_tags/main.tf"
+                }
+              ],
+              "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
+              "endLine": 43,
+              "filename": "testdata/breakdown_format_json_with_tags/main.tf",
+              "startLine": 36
+            },
+            "hourlyCost": null,
+            "monthlyCost": null,
+            "costComponents": [
+              {
+                "name": "Requests",
+                "unit": "1M requests",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.4",
+                "hourlyCost": null,
+                "monthlyCost": null
+              }
+            ]
+          }
+        ],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
+      },
+      "breakdown": {
+        "resources": [
+          {
+            "name": "aws_sns_topic_subscription.sns_topic_noTags",
+            "resourceType": "aws_sns_topic_subscription",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_sns_topic_subscription.sns_topic_noTags",
+                  "filename": "testdata/breakdown_format_json_with_tags/main.tf"
+                }
+              ],
+              "checksum": "10a6feecf428a263eb621089fa1ea9ed6d36c1210906f87b858471b7efc01de0",
+              "endLine": 20,
+              "filename": "testdata/breakdown_format_json_with_tags/main.tf",
+              "startLine": 16
+            },
+            "hourlyCost": null,
+            "monthlyCost": null,
+            "costComponents": [
+              {
+                "name": "HTTP notifications",
+                "unit": "1M notifications",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.6",
+                "hourlyCost": null,
+                "monthlyCost": null
+              }
+            ]
+          },
+          {
+            "name": "aws_sns_topic_subscription.sns_topic_withTags",
+            "resourceType": "aws_sns_topic_subscription",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "sns-def",
+              "ResourceTag": "sns-ghi"
+            },
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_sns_topic_subscription.sns_topic_withTags",
+                  "filename": "testdata/breakdown_format_json_with_tags/main.tf"
+                }
+              ],
+              "checksum": "6e3eb9c41d083d305c807ea3fa31a2d94182d1d406f25d249bf3cf2eb27208d5",
+              "endLine": 30,
+              "filename": "testdata/breakdown_format_json_with_tags/main.tf",
+              "startLine": 22
+            },
+            "hourlyCost": null,
+            "monthlyCost": null,
+            "costComponents": [
+              {
+                "name": "HTTP notifications",
+                "unit": "1M notifications",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.6",
+                "hourlyCost": null,
+                "monthlyCost": null
+              }
+            ]
+          },
+          {
+            "name": "aws_sqs_queue.sqs_noTags",
+            "resourceType": "aws_sqs_queue",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_sqs_queue.sqs_noTags",
+                  "filename": "testdata/breakdown_format_json_with_tags/main.tf"
+                }
+              ],
+              "checksum": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+              "endLine": 34,
+              "filename": "testdata/breakdown_format_json_with_tags/main.tf",
+              "startLine": 32
+            },
+            "hourlyCost": null,
+            "monthlyCost": null,
+            "costComponents": [
+              {
+                "name": "Requests",
+                "unit": "1M requests",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.4",
+                "hourlyCost": null,
+                "monthlyCost": null
+              }
+            ]
+          },
+          {
+            "name": "aws_sqs_queue.sqs_withTags",
+            "resourceType": "aws_sqs_queue",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "sqs-def",
+              "ResourceTag": "sqs-hi"
+            },
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_sqs_queue.sqs_withTags",
+                  "filename": "testdata/breakdown_format_json_with_tags/main.tf"
+                }
+              ],
+              "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
+              "endLine": 43,
+              "filename": "testdata/breakdown_format_json_with_tags/main.tf",
+              "startLine": 36
+            },
+            "hourlyCost": null,
+            "monthlyCost": null,
+            "costComponents": [
+              {
+                "name": "Requests",
+                "unit": "1M requests",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.4",
+                "hourlyCost": null,
+                "monthlyCost": null
+              }
+            ]
+          }
+        ],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
+      },
+      "diff": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
+      },
+      "summary": {
+        "totalDetectedResources": 4,
+        "totalSupportedResources": 4,
+        "totalUnsupportedResources": 0,
+        "totalUsageBasedResources": 4,
+        "totalNoPriceResources": 0,
+        "unsupportedResourceCounts": {},
+        "noPriceResourceCounts": {}
+      }
+    }
+  ],
+  "totalHourlyCost": "0",
+  "totalMonthlyCost": "0",
+  "pastTotalHourlyCost": "0",
+  "pastTotalMonthlyCost": "0",
+  "diffTotalHourlyCost": "0",
+  "diffTotalMonthlyCost": "0",
+  "timeGenerated": "REPLACED_TIME",
+  "summary": {
+    "totalDetectedResources": 4,
+    "totalSupportedResources": 4,
+    "totalUnsupportedResources": 0,
+    "totalUsageBasedResources": 4,
+    "totalNoPriceResources": 0,
+    "unsupportedResourceCounts": {},
+    "noPriceResourceCounts": {}
+  }
+}
+
+Err:
+

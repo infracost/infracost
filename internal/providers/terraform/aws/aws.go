@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/providers/terraform/provider_schemas"
 	"strings"
 
 	log "github.com/sirupsen/logrus"
@@ -96,10 +97,21 @@ func GetResourceRegion(resourceType string, v gjson.Result) string {
 	return p[3]
 }
 
-func ParseTags(resourceType string, v gjson.Result) map[string]string {
+func ParseTags(defaultTags *map[string]string, resourceType string, r gjson.Result) *map[string]string {
+	_, supportsTags := provider_schemas.AWSTagsSupport[resourceType]
+	rTags := r.Get("tags").Map()
+	if !supportsTags && len(rTags) == 0 {
+		return nil
+	}
+
 	tags := make(map[string]string)
-	for k, v := range v.Get("tags").Map() {
+	if defaultTags != nil {
+		for k, v := range *defaultTags {
+			tags[k] = v
+		}
+	}
+	for k, v := range rTags {
 		tags[k] = v.String()
 	}
-	return tags
+	return &tags
 }
