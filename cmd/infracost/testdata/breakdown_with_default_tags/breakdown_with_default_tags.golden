@@ -41,7 +41,12 @@
             "name": "aws_lambda_function.hello_world",
             "resourceType": "aws_lambda_function",
             "tags": {
+              "Environment": "Test",
+              "Owner": "TFProviders",
               "Project": "LambdaTestProject",
+              "SomeBool": "true",
+              "SomeFloat": "1.1",
+              "SomeNumber": "1",
               "lambdaTag": "hello"
             },
             "metadata": {
@@ -98,7 +103,12 @@
             "name": "aws_lambda_function.hello_world",
             "resourceType": "aws_lambda_function",
             "tags": {
+              "Environment": "Test",
+              "Owner": "TFProviders",
               "Project": "LambdaTestProject",
+              "SomeBool": "true",
+              "SomeFloat": "1.1",
+              "SomeNumber": "1",
               "lambdaTag": "hello"
             },
             "metadata": {
