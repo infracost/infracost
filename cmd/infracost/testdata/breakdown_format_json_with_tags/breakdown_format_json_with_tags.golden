@@ -66,6 +66,7 @@
             "name": "aws_sns_topic_subscription.sns_topic_withTags",
             "resourceType": "aws_sns_topic_subscription",
             "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "sns-def",
               "ResourceTag": "sns-ghi"
             },
@@ -98,7 +99,10 @@
           {
             "name": "aws_sqs_queue.sqs_noTags",
             "resourceType": "aws_sqs_queue",
-            "tags": {},
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
             "metadata": {
               "calls": [
                 {
@@ -129,6 +133,7 @@
             "name": "aws_sqs_queue.sqs_withTags",
             "resourceType": "aws_sqs_queue",
             "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "sqs-def",
               "ResourceTag": "sqs-hi"
             },
@@ -197,6 +202,7 @@
             "name": "aws_sns_topic_subscription.sns_topic_withTags",
             "resourceType": "aws_sns_topic_subscription",
             "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "sns-def",
               "ResourceTag": "sns-ghi"
             },
@@ -229,7 +235,10 @@
           {
             "name": "aws_sqs_queue.sqs_noTags",
             "resourceType": "aws_sqs_queue",
-            "tags": {},
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
             "metadata": {
               "calls": [
                 {
@@ -260,6 +269,7 @@
             "name": "aws_sqs_queue.sqs_withTags",
             "resourceType": "aws_sqs_queue",
             "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "sqs-def",
               "ResourceTag": "sqs-hi"
             },

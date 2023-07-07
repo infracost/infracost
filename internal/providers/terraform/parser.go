@@ -300,7 +300,8 @@ func (p *Parser) parseResourceData(isState bool, providerConf, planVals gjson.Re
 
 		v = schema.AddRawValue(v, "region", region)
 
-		tags := parseTags(t, v)
+		defaultTags := parseDefaultTags(providerConf, resConf)
+		tags := parseTags(defaultTags, t, v)
 
 		data := schema.NewResourceData(t, provider, addr, tags, v)
 		data.Metadata = r.Get("infracost_metadata").Map()
@@ -333,12 +334,30 @@ func getSpecialContext(d *schema.ResourceData) map[string]interface{} {
 	}
 }
 
-func parseTags(resourceType string, v gjson.Result) *map[string]string {
+func parseDefaultTags(providerConf, resConf gjson.Result) *map[string]string {
+	// this only works for aws, we'll need to review when other providers support default tags
+	providerKey := parseProviderKey(resConf)
+	dTagsArray := providerConf.Get(fmt.Sprintf("%s.expressions.default_tags", gjsonEscape(providerKey))).Array()
+	if len(dTagsArray) == 0 {
+		return nil
+	}
+
+	defaultTags := make(map[string]string)
+	for _, dTags := range dTagsArray {
+		for k, v := range dTags.Get("tags.constant_value").Map() {
+			defaultTags[k] = v.String()
+		}
+	}
+
+	return &defaultTags
+}
+
+func parseTags(defaultTags *map[string]string, resourceType string, v gjson.Result) *map[string]string {
 	providerPrefix := getProviderPrefix(resourceType)
 
 	switch providerPrefix {
 	case "aws":
-		return aws.ParseTags(resourceType, v)
+		return aws.ParseTags(defaultTags, resourceType, v)
 	case "azurerm":
 		return azure.ParseTags(resourceType, v)
 	case "google":
