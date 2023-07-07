@@ -6,39 +6,39 @@ import (
 )
 
 //go:embed aws.tags.json
-var awsTagsJson []byte
+var awsTagsJSON []byte
 
 //go:embed aws.tags_all.json
-var awsTagsAllJson []byte
+var awsTagsAllJSON []byte
 
 //go:embed azurerm.tags.json
-var azurermTagsJson []byte
+var azurermTagsJSON []byte
 
 //go:embed google.labels.json
-var googleLabelsJson []byte
+var googleLabelsJSON []byte
 
-var AwsTagsSupport map[string]bool
-var AwsTagsAllSupport map[string]bool
+var AWSTagsSupport map[string]bool
+var AWSTagsAllSupport map[string]bool
 var AzureTagsSupport map[string]bool
 var GoogleLabelsSupport map[string]bool
 
 func init() {
-	err := json.Unmarshal(awsTagsJson, &AwsTagsSupport)
+	err := json.Unmarshal(awsTagsJSON, &AWSTagsSupport)
 	if err != nil {
 		panic(err)
 	}
 
-	err = json.Unmarshal(awsTagsAllJson, &AwsTagsAllSupport)
+	err = json.Unmarshal(awsTagsAllJSON, &AWSTagsAllSupport)
 	if err != nil {
 		panic(err)
 	}
 
-	err = json.Unmarshal(azurermTagsJson, &AzureTagsSupport)
+	err = json.Unmarshal(azurermTagsJSON, &AzureTagsSupport)
 	if err != nil {
 		panic(err)
 	}
 
-	err = json.Unmarshal(googleLabelsJson, &GoogleLabelsSupport)
+	err = json.Unmarshal(googleLabelsJSON, &GoogleLabelsSupport)
 	if err != nil {
 		panic(err)
 	}

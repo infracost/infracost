@@ -98,7 +98,7 @@ func GetResourceRegion(resourceType string, v gjson.Result) string {
 }
 
 func ParseTags(defaultTags *map[string]string, resourceType string, r gjson.Result) *map[string]string {
-	_, supportsTags := provider_schemas.AwsTagsSupport[resourceType]
+	_, supportsTags := provider_schemas.AWSTagsSupport[resourceType]
 	rTags := r.Get("tags").Map()
 	if !supportsTags && len(rTags) == 0 {
 		return nil
