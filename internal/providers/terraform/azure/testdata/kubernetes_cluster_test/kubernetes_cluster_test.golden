@@ -5,7 +5,7 @@
  └─ default_node_pool                                                                             
     ├─ Instance usage (Linux, pay as you go, Standard_D2_v2)            730  hours        $106.58 
     └─ os_disk                                                                                    
-       └─ Storage (P10, LRS)                                              1  months        $19.71 
+       └─ Storage (S10, LRS)                                              1  months         $5.89 
                                                                                                   
  azurerm_kubernetes_cluster.min_count                                                             
  ├─ Uptime SLA                                                          730  hours         $73.00 
@@ -19,7 +19,7 @@
  └─ default_node_pool                                                                             
     ├─ Instance usage (Linux, pay as you go, Standard_D2_v2)          3,650  hours        $532.90 
     └─ os_disk                                                                                    
-       └─ Storage (P4, LRS)                                               5  months        $26.40 
+       └─ Storage (S4, LRS)                                               5  months         $7.68 
                                                                                                   
  azurerm_kubernetes_cluster.paid_D2SV2_3nc_128gb                                                  
  ├─ Uptime SLA                                                          730  hours         $73.00 
@@ -42,9 +42,9 @@
  └─ default_node_pool                                                                             
     ├─ Instance usage (Windows, pay as you go, Standard_D2_v2)        3,650  hours        $919.80 
     └─ os_disk                                                                                    
-       └─ Storage (P4, LRS)                                               5  months        $26.40 
+       └─ Storage (S4, LRS)                                               5  months         $7.68 
                                                                                                   
- OVERALL TOTAL                                                                          $2,886.93 
+ OVERALL TOTAL                                                                          $2,835.67 
 ──────────────────────────────────
 7 cloud resources were detected:
 ∙ 6 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
@@ -54,5 +54,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMKubernetesClusterGoldenFile             ┃ $2,887       ┃
+┃ TestAzureRMKubernetesClusterGoldenFile             ┃ $2,836       ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
