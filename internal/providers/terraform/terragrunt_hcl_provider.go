@@ -230,6 +230,14 @@ func (p *TerragruntHCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.
 
 	wg.Wait()
 	sort.Slice(allProjects, func(i, j int) bool {
+		if allProjects[i].Metadata == nil {
+			return false
+		}
+
+		if allProjects[j].Metadata == nil {
+			return true
+		}
+
 		return allProjects[i].Metadata.TerraformModulePath < allProjects[j].Metadata.TerraformModulePath
 	})
 
