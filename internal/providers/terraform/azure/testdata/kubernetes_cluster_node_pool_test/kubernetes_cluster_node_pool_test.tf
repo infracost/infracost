@@ -84,5 +84,5 @@ resource "azurerm_kubernetes_cluster_node_pool" "windows_sku" {
 resource "azurerm_kubernetes_cluster_node_pool" "non_premium" {
   name                  = "internal"
   kubernetes_cluster_id = azurerm_kubernetes_cluster.example.id
-  vm_size               = "Standard_D2_v31"
+  vm_size               = "Standard_D2_v3"
 }
