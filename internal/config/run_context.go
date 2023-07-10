@@ -30,7 +30,7 @@ type ContextValues struct {
 // NewContextValues returns a new instance of ContextValues.
 func NewContextValues(values map[string]interface{}) *ContextValues {
 	return &ContextValues{
-		values: make(map[string]interface{}),
+		values: values,
 		mu:     &sync.RWMutex{},
 	}
 }
