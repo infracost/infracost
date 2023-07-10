@@ -531,12 +531,12 @@ func (b *Block) InjectBlock(block *Block, name string) {
 	b.childBlocks = append(b.childBlocks, block)
 }
 
-// RemoveBlocks removes all the child Blocks of type name.
-func (b *Block) RemoveBlocks(name string) {
+// RemoveDynamicBlocks removes all the child Blocks of type name that have a parent of type "dynamic".
+func (b *Block) RemoveDynamicBlocks(name string) {
 	var filtered Blocks
 
 	for _, block := range b.childBlocks {
-		if block.Type() != name {
+		if block.Type() != name || block.parent.Type() != "dynamic" {
 			filtered = append(filtered, block)
 		}
 	}

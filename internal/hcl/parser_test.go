@@ -1088,6 +1088,11 @@ module "reload" {
 variable "input" {}
 
 resource "dynamic" "resource" {
+  child_block {
+    foo   = "10.0.2.0"
+    bar = "existing_child_block_should_be_kept"
+  }
+
   dynamic "child_block" {
     for_each = {
     	for i in var.input : i.ip => i
@@ -1124,11 +1129,12 @@ resource "dynamic" "resource" {
 
 	assert.JSONEq(
 		t,
-		values,
 		`[
+			{"foo":"10.0.2.0", "bar":"existing_child_block_should_be_kept"},		
 			{"foo":"10.0.0.0","bar":"input-mock"},
 			{"foo":"10.0.1.0","bar":"input-mock"}
 		]`,
+		values,
 	)
 
 }
