@@ -11,6 +11,9 @@ var awsTagsJSON []byte
 //go:embed aws.tags_all.json
 var awsTagsAllJSON []byte
 
+//go:embed aws.tag_block.json
+var awsTagBlockJSON []byte
+
 //go:embed azurerm.tags.json
 var azurermTagsJSON []byte
 
@@ -19,6 +22,7 @@ var googleLabelsJSON []byte
 
 var AWSTagsSupport map[string]bool
 var AWSTagsAllSupport map[string]bool
+var AWSTagBlockSupport map[string]bool
 var AzureTagsSupport map[string]bool
 var GoogleLabelsSupport map[string]bool
 
@@ -29,6 +33,11 @@ func init() {
 	}
 
 	err = json.Unmarshal(awsTagsAllJSON, &AWSTagsAllSupport)
+	if err != nil {
+		panic(err)
+	}
+
+	err = json.Unmarshal(awsTagBlockJSON, &AWSTagBlockSupport)
 	if err != nil {
 		panic(err)
 	}

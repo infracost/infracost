@@ -1,0 +1,4 @@
+{
+  "aws_autoscaling_group": true,
+  "aws_autoscaling_group_tag": true
+}

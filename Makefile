@@ -27,6 +27,7 @@ tagschema:
 	terraform init && \
 	terraform providers schema -json | jq '.provider_schemas."registry.terraform.io/hashicorp/aws".resource_schemas | to_entries | map(select(.value.block.attributes.tags)) | from_entries | with_entries(.value = true)' > aws.tags.json && \
 	terraform providers schema -json | jq '.provider_schemas."registry.terraform.io/hashicorp/aws".resource_schemas | to_entries | map(select(.value.block.attributes.tags_all)) | from_entries | with_entries(.value = true)' > aws.tags_all.json && \
+	terraform providers schema -json | jq '.provider_schemas."registry.terraform.io/hashicorp/aws".resource_schemas | to_entries | map(select(.value.block.block_types.tag)) | from_entries | with_entries(.value = true)' > aws.tag_block.json && \
 	terraform providers schema -json | jq '.provider_schemas."registry.terraform.io/hashicorp/azurerm".resource_schemas | to_entries | map(select(.value.block.attributes.tags)) | from_entries | with_entries(.value = true)' > azurerm.tags.json && \
 	terraform providers schema -json | jq '.provider_schemas."registry.terraform.io/hashicorp/google".resource_schemas | to_entries | map(select(.value.block.attributes.labels)) | from_entries | with_entries(.value = true)' > google.labels.json
 
