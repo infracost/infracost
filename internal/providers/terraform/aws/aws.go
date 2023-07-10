@@ -105,7 +105,8 @@ func ParseTags(defaultTags *map[string]string, resourceType string, r gjson.Resu
 	}
 
 	tags := make(map[string]string)
-	if defaultTags != nil {
+	_, supportsDefaultTags := provider_schemas.AWSTagsAllSupport[resourceType]
+	if supportsDefaultTags && defaultTags != nil {
 		for k, v := range *defaultTags {
 			tags[k] = v
 		}
