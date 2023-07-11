@@ -47,6 +47,8 @@ func NewParser(repoDir string, variables Variables) *Parser {
 		"contains":   p.contains,
 		"pathExists": p.pathExists,
 		"matchPaths": p.matchPaths,
+		"list":       p.list,
+		"relPath":    p.relPath,
 	})
 	p.template = t
 
@@ -220,4 +222,27 @@ func (p *Parser) matchPaths(pattern string) []map[interface{}]interface{} {
 	})
 
 	return matches
+}
+
+// list is a useful function for creating an arbitrary array of values which can be
+// looped over in a template. For example:
+//
+//	$my_list = list "foo" "bar"
+//	{{- range $my_list }}
+//		{{ . }}
+//	{{- end }}
+func (p *Parser) list(v ...interface{}) []interface{} {
+	return v
+}
+
+// relPath returns a relative path that is lexically equivalent to targpath when
+// joined to basepath with an intervening separator. If there is an error returning the
+// relative path we panic so that the error is show when executing the template.
+func (p *Parser) relPath(basepath string, tarpath string) string {
+	rel, err := filepath.Rel(basepath, tarpath)
+	if err != nil {
+		panic(err)
+	}
+
+	return rel
 }
