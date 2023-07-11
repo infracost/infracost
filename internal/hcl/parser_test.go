@@ -53,7 +53,7 @@ data "cats_cat" "the-cats-mother" {
 
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
-	parsers, err := LoadParsers(filepath.Dir(path), loader, nil, logger)
+	parsers, err := LoadParsers(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{}), filepath.Dir(path), loader, nil, logger)
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -561,7 +561,7 @@ output "mod_result" {
 	logger := newDiscardLogger()
 	dir := filepath.Dir(path)
 	loader := modules.NewModuleLoader(dir, nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
-	parsers, err := LoadParsers(path, loader, nil, logger)
+	parsers, err := LoadParsers(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{}), path, loader, nil, logger)
 	require.NoError(t, err)
 	rootModule, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -621,7 +621,7 @@ output "mod_result" {
 
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
-	parsers, err := LoadParsers(path, loader, nil, logger)
+	parsers, err := LoadParsers(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{}), path, loader, nil, logger)
 	require.NoError(t, err)
 	rootModule, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -818,7 +818,7 @@ resource "test_resource_two" "test" {
 
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
-	parsers, err := LoadParsers(filepath.Dir(path), loader, nil, logger)
+	parsers, err := LoadParsers(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{}), filepath.Dir(path), loader, nil, logger)
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -880,7 +880,7 @@ output "mod_result" {
 
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
-	parsers, err := LoadParsers(path, loader, nil, logger)
+	parsers, err := LoadParsers(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{}), path, loader, nil, logger)
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -1028,7 +1028,7 @@ output "mod_result" {
 
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
-	parsers, err := LoadParsers(path, loader, nil, logger)
+	parsers, err := LoadParsers(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{}), path, loader, nil, logger)
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -1105,7 +1105,7 @@ resource "dynamic" "resource" {
 
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
-	parsers, err := LoadParsers(path, loader, nil, logger)
+	parsers, err := LoadParsers(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{}), path, loader, nil, logger)
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -1165,7 +1165,7 @@ resource "azurerm_linux_function_app" "function" {
 
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
-	parsers, err := LoadParsers(filepath.Dir(path), loader, nil, logger)
+	parsers, err := LoadParsers(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{}), filepath.Dir(path), loader, nil, logger)
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -1211,7 +1211,7 @@ resource "test_resource" "second" {
 
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
-	parsers, err := LoadParsers(filepath.Dir(path), loader, nil, logger)
+	parsers, err := LoadParsers(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{}), filepath.Dir(path), loader, nil, logger)
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -1261,7 +1261,7 @@ data "google_compute_zones" "us" {
 
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
-	parsers, err := LoadParsers(filepath.Dir(path), loader, nil, logger)
+	parsers, err := LoadParsers(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{}), filepath.Dir(path), loader, nil, logger)
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -1312,7 +1312,7 @@ data "aws_availability_zones" "ne" {
 
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
-	parsers, err := LoadParsers(filepath.Dir(path), loader, nil, logger)
+	parsers, err := LoadParsers(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{}), filepath.Dir(path), loader, nil, logger)
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -1359,7 +1359,7 @@ resource "random_shuffle" "bad" {
 
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
-	parsers, err := LoadParsers(filepath.Dir(path), loader, nil, logger)
+	parsers, err := LoadParsers(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{}), filepath.Dir(path), loader, nil, logger)
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)

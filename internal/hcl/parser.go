@@ -16,6 +16,7 @@ import (
 	"github.com/zclconf/go-cty/cty"
 
 	"github.com/infracost/infracost/internal/clierror"
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/extclient"
 	"github.com/infracost/infracost/internal/hcl/modules"
 	"github.com/infracost/infracost/internal/logging"
@@ -44,6 +45,14 @@ func OptionWithTFVarsPaths(paths []string) Option {
 		}
 
 		p.tfvarsPaths = filenames
+	}
+}
+
+// OptionWithModuleSuffix sets an optional module suffix which will be added to the Module after it has finished parsing
+// this can be used to augment auto-detected project path names and metadata.
+func OptionWithModuleSuffix(suffix string) Option {
+	return func(p *Parser) {
+		p.moduleSuffix = suffix
 	}
 }
 
@@ -202,12 +211,13 @@ type Parser struct {
 	remoteVariablesLoader *RemoteVariablesLoader
 	logger                *logrus.Entry
 	hasChanges            bool
+	moduleSuffix          string
 }
 
 // LoadParsers inits a list of Parser with the provided option and initialPath. LoadParsers locates Terraform files
 // in the given initialPath and returns a Parser for each directory it locates a Terraform project within. If
 // the initialPath contains Terraform files at the top level parsers will be len 1.
-func LoadParsers(initialPath string, loader *modules.ModuleLoader, locatorConfig *ProjectLocatorConfig, logger *logrus.Entry, options ...Option) ([]*Parser, error) {
+func LoadParsers(ctx *config.ProjectContext, initialPath string, loader *modules.ModuleLoader, locatorConfig *ProjectLocatorConfig, logger *logrus.Entry, options ...Option) ([]*Parser, error) {
 	pl := NewProjectLocator(logger, locatorConfig)
 	rootPaths := pl.FindRootModules(initialPath)
 	if len(rootPaths) == 0 && len(locatorConfig.ChangedObjects) > 0 {
@@ -216,6 +226,30 @@ func LoadParsers(initialPath string, loader *modules.ModuleLoader, locatorConfig
 
 	if len(rootPaths) == 0 {
 		return nil, fmt.Errorf("No valid Terraform files found at path %s, try a different directory", initialPath)
+	}
+
+	if ctx.RunContext.Config.ConfigFilePath == "" && len(ctx.ProjectConfig.TerraformVarFiles) == 0 {
+		var parsers []*Parser
+		for _, rootPath := range rootPaths {
+			if len(rootPath.TerraformVarFiles) > 1 {
+				sort.Strings(rootPath.TerraformVarFiles)
+
+				for _, varFile := range rootPath.TerraformVarFiles {
+					ops := append(options, OptionWithTFVarsPaths([]string{varFile}), OptionWithModuleSuffix(strings.TrimSuffix(strings.TrimSuffix(varFile, ".json"), ".tfvars"))) // nolint: gocritic
+					parsers = append(parsers, newParser(rootPath, loader, logger, ops...))
+				}
+
+				continue
+			}
+
+			if len(rootPath.TerraformVarFiles) == 1 {
+				options = append(options, OptionWithTFVarsPaths(rootPath.TerraformVarFiles))
+			}
+
+			parsers = append(parsers, newParser(rootPath, loader, logger, options...))
+		}
+
+		return parsers, nil
 	}
 
 	var parsers = make([]*Parser, len(rootPaths))
@@ -353,6 +387,8 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 	}
 
 	root.HasChanges = p.hasChanges
+	root.TerraformVarsPaths = p.tfvarsPaths
+	root.ModuleSuffix = p.moduleSuffix
 	return root, nil
 }
 

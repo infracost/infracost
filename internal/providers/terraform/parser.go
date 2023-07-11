@@ -2,7 +2,7 @@ package terraform
 
 import (
 	"bytes"
-	"encoding/json"
+	stdJson "encoding/json"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -845,14 +845,14 @@ func gjsonEqual(a, b gjson.Result) bool {
 	var err error
 
 	var aOut bytes.Buffer
-	err = json.Compact(&aOut, []byte(a.Raw))
+	err = stdJson.Compact(&aOut, []byte(a.Raw))
 	if err != nil {
 		logging.Logger.Debugf("error indenting JSON: %s", err)
 		return false
 	}
 
 	var bOut bytes.Buffer
-	err = json.Compact(&bOut, []byte(b.Raw))
+	err = stdJson.Compact(&bOut, []byte(b.Raw))
 	if err != nil {
 		logging.Logger.Debugf("error indenting JSON: %s", err)
 		return false
