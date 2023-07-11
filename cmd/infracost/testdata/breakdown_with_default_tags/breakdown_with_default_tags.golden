@@ -46,7 +46,8 @@
               "Project": "TestProject-var",
               "SomeDynamicBool": "true",
               "SomeDynamicFloat": "1.1",
-              "SomeDynamicNumber": "1"
+              "SomeDynamicNumber": "1",
+              "asgTag": "locasgtag"
             },
             "metadata": {
               "calls": [
@@ -55,7 +56,7 @@
                   "filename": "testdata/breakdown_with_default_tags/main.tf"
                 }
               ],
-              "checksum": "55255131d273d807964ccecbfa27d5d91c77b6a6f80949519cb83da946028275",
+              "checksum": "ea064bbcbd559c213f0baf5b0c3793ca2041f3a3e07160e5ac4472b06d1ccf35",
               "endLine": 100,
               "filename": "testdata/breakdown_with_default_tags/main.tf",
               "startLine": 75
@@ -190,7 +191,8 @@
               "Project": "TestProject-var",
               "SomeDynamicBool": "true",
               "SomeDynamicFloat": "1.1",
-              "SomeDynamicNumber": "1"
+              "SomeDynamicNumber": "1",
+              "asgTag": "locasgtag"
             },
             "metadata": {
               "calls": [
@@ -199,7 +201,7 @@
                   "filename": "testdata/breakdown_with_default_tags/main.tf"
                 }
               ],
-              "checksum": "55255131d273d807964ccecbfa27d5d91c77b6a6f80949519cb83da946028275",
+              "checksum": "ea064bbcbd559c213f0baf5b0c3793ca2041f3a3e07160e5ac4472b06d1ccf35",
               "endLine": 100,
               "filename": "testdata/breakdown_with_default_tags/main.tf",
               "startLine": 75

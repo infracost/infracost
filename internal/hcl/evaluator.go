@@ -397,7 +397,7 @@ func (e *Evaluator) expandDynamicBlock(b *Block) {
 		blockName := sub.TypeLabel()
 		// Remove all the child blocks with the blockName so that we don't inject the expanded blocks twice.
 		// This could happen if a module "reloads" and the input variables change.
-		b.RemoveBlocks(blockName)
+		b.RemoveDynamicBlocks(blockName)
 
 		expanded := e.expandBlockForEaches([]*Block{sub})
 		for _, ex := range expanded {
