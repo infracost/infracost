@@ -1,0 +1,7 @@
+version: 0.1
+
+projects:
+  - path: .
+    name: prod
+  - path: .
+    name: dev
