@@ -28,18 +28,6 @@
             "filename": "testdata/breakdown_format_json_with_tags/main.tf",
             "startLine": 1,
             "endLine": 14
-          },
-          {
-            "name": "azurerm",
-            "filename": "testdata/breakdown_format_json_with_tags/main.tf",
-            "startLine": 64,
-            "endLine": 67
-          },
-          {
-            "name": "google",
-            "filename": "testdata/breakdown_format_json_with_tags/main.tf",
-            "startLine": 45,
-            "endLine": 48
           }
         ]
       },
@@ -173,134 +161,10 @@
                 "monthlyCost": null
               }
             ]
-          },
-          {
-            "name": "azurerm_redis_cache.arc1",
-            "resourceType": "azurerm_redis_cache",
-            "tags": {
-              "AzureLabel": "azure-tag"
-            },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "azurerm_redis_cache.arc1",
-                  "filename": "testdata/breakdown_format_json_with_tags/main.tf"
-                }
-              ],
-              "checksum": "eb5984ee4c26abd5e6d42df874f260985032d4a04624fccde27c07cc9eb1c14c",
-              "endLine": 84,
-              "filename": "testdata/breakdown_format_json_with_tags/main.tf",
-              "startLine": 74
-            },
-            "hourlyCost": "0.45",
-            "monthlyCost": "328.5",
-            "costComponents": [
-              {
-                "name": "Cache usage (Standard_C3)",
-                "unit": "nodes",
-                "hourlyQuantity": "0.0027397260273973",
-                "monthlyQuantity": "2",
-                "price": "164.25",
-                "hourlyCost": "0.45",
-                "monthlyCost": "328.5"
-              }
-            ]
-          },
-          {
-            "name": "azurerm_redis_cache.arc2",
-            "resourceType": "azurerm_redis_cache",
-            "tags": {},
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "azurerm_redis_cache.arc2",
-                  "filename": "testdata/breakdown_format_json_with_tags/main.tf"
-                }
-              ],
-              "checksum": "d25f4ccac9d918c85ea0c9781195cf5f3576147b9465ad2136a42b1a15cc8ed3",
-              "endLine": 93,
-              "filename": "testdata/breakdown_format_json_with_tags/main.tf",
-              "startLine": 86
-            },
-            "hourlyCost": "0.45",
-            "monthlyCost": "328.5",
-            "costComponents": [
-              {
-                "name": "Cache usage (Standard_C3)",
-                "unit": "nodes",
-                "hourlyQuantity": "0.0027397260273973",
-                "monthlyQuantity": "2",
-                "price": "164.25",
-                "hourlyCost": "0.45",
-                "monthlyCost": "328.5"
-              }
-            ]
-          },
-          {
-            "name": "google_compute_disk.gcd1",
-            "resourceType": "google_compute_disk",
-            "tags": {
-              "GoogleLabel": "compute-disk-label"
-            },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "google_compute_disk.gcd1",
-                  "filename": "testdata/breakdown_format_json_with_tags/main.tf"
-                }
-              ],
-              "checksum": "167438a6d3e64b8f75d1c0f7dcbf733ed65c24b40ce19d9d05c7c42ea070c947",
-              "endLine": 57,
-              "filename": "testdata/breakdown_format_json_with_tags/main.tf",
-              "startLine": 50
-            },
-            "hourlyCost": "0.027397260273972604",
-            "monthlyCost": "20",
-            "costComponents": [
-              {
-                "name": "Standard provisioned storage (pd-standard)",
-                "unit": "GB",
-                "hourlyQuantity": "0.6849315068493151",
-                "monthlyQuantity": "500",
-                "price": "0.04",
-                "hourlyCost": "0.027397260273972604",
-                "monthlyCost": "20"
-              }
-            ]
-          },
-          {
-            "name": "google_compute_disk.gcd2",
-            "resourceType": "google_compute_disk",
-            "tags": {},
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "google_compute_disk.gcd2",
-                  "filename": "testdata/breakdown_format_json_with_tags/main.tf"
-                }
-              ],
-              "checksum": "37baa7cee7077135d1b2f8c8d323cb484fcbd5be11d5fe3caafe1783113d98a4",
-              "endLine": 62,
-              "filename": "testdata/breakdown_format_json_with_tags/main.tf",
-              "startLine": 59
-            },
-            "hourlyCost": "0.02328767123287671",
-            "monthlyCost": "17",
-            "costComponents": [
-              {
-                "name": "SSD provisioned storage (pd-ssd)",
-                "unit": "GB",
-                "hourlyQuantity": "0.136986301369863",
-                "monthlyQuantity": "100",
-                "price": "0.17",
-                "hourlyCost": "0.02328767123287671",
-                "monthlyCost": "17"
-              }
-            ]
           }
         ],
-        "totalHourlyCost": "0.950684931506849314",
-        "totalMonthlyCost": "694"
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
       },
       "breakdown": {
         "resources": [
@@ -432,134 +296,10 @@
                 "monthlyCost": null
               }
             ]
-          },
-          {
-            "name": "azurerm_redis_cache.arc1",
-            "resourceType": "azurerm_redis_cache",
-            "tags": {
-              "AzureLabel": "azure-tag"
-            },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "azurerm_redis_cache.arc1",
-                  "filename": "testdata/breakdown_format_json_with_tags/main.tf"
-                }
-              ],
-              "checksum": "eb5984ee4c26abd5e6d42df874f260985032d4a04624fccde27c07cc9eb1c14c",
-              "endLine": 84,
-              "filename": "testdata/breakdown_format_json_with_tags/main.tf",
-              "startLine": 74
-            },
-            "hourlyCost": "0.45",
-            "monthlyCost": "328.5",
-            "costComponents": [
-              {
-                "name": "Cache usage (Standard_C3)",
-                "unit": "nodes",
-                "hourlyQuantity": "0.0027397260273973",
-                "monthlyQuantity": "2",
-                "price": "164.25",
-                "hourlyCost": "0.45",
-                "monthlyCost": "328.5"
-              }
-            ]
-          },
-          {
-            "name": "azurerm_redis_cache.arc2",
-            "resourceType": "azurerm_redis_cache",
-            "tags": {},
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "azurerm_redis_cache.arc2",
-                  "filename": "testdata/breakdown_format_json_with_tags/main.tf"
-                }
-              ],
-              "checksum": "d25f4ccac9d918c85ea0c9781195cf5f3576147b9465ad2136a42b1a15cc8ed3",
-              "endLine": 93,
-              "filename": "testdata/breakdown_format_json_with_tags/main.tf",
-              "startLine": 86
-            },
-            "hourlyCost": "0.45",
-            "monthlyCost": "328.5",
-            "costComponents": [
-              {
-                "name": "Cache usage (Standard_C3)",
-                "unit": "nodes",
-                "hourlyQuantity": "0.0027397260273973",
-                "monthlyQuantity": "2",
-                "price": "164.25",
-                "hourlyCost": "0.45",
-                "monthlyCost": "328.5"
-              }
-            ]
-          },
-          {
-            "name": "google_compute_disk.gcd1",
-            "resourceType": "google_compute_disk",
-            "tags": {
-              "GoogleLabel": "compute-disk-label"
-            },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "google_compute_disk.gcd1",
-                  "filename": "testdata/breakdown_format_json_with_tags/main.tf"
-                }
-              ],
-              "checksum": "167438a6d3e64b8f75d1c0f7dcbf733ed65c24b40ce19d9d05c7c42ea070c947",
-              "endLine": 57,
-              "filename": "testdata/breakdown_format_json_with_tags/main.tf",
-              "startLine": 50
-            },
-            "hourlyCost": "0.027397260273972604",
-            "monthlyCost": "20",
-            "costComponents": [
-              {
-                "name": "Standard provisioned storage (pd-standard)",
-                "unit": "GB",
-                "hourlyQuantity": "0.6849315068493151",
-                "monthlyQuantity": "500",
-                "price": "0.04",
-                "hourlyCost": "0.027397260273972604",
-                "monthlyCost": "20"
-              }
-            ]
-          },
-          {
-            "name": "google_compute_disk.gcd2",
-            "resourceType": "google_compute_disk",
-            "tags": {},
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "google_compute_disk.gcd2",
-                  "filename": "testdata/breakdown_format_json_with_tags/main.tf"
-                }
-              ],
-              "checksum": "37baa7cee7077135d1b2f8c8d323cb484fcbd5be11d5fe3caafe1783113d98a4",
-              "endLine": 62,
-              "filename": "testdata/breakdown_format_json_with_tags/main.tf",
-              "startLine": 59
-            },
-            "hourlyCost": "0.02328767123287671",
-            "monthlyCost": "17",
-            "costComponents": [
-              {
-                "name": "SSD provisioned storage (pd-ssd)",
-                "unit": "GB",
-                "hourlyQuantity": "0.136986301369863",
-                "monthlyQuantity": "100",
-                "price": "0.17",
-                "hourlyCost": "0.02328767123287671",
-                "monthlyCost": "17"
-              }
-            ]
           }
         ],
-        "totalHourlyCost": "0.950684931506849314",
-        "totalMonthlyCost": "694"
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
       },
       "diff": {
         "resources": [],
@@ -567,35 +307,31 @@
         "totalMonthlyCost": "0"
       },
       "summary": {
-        "totalDetectedResources": 9,
-        "totalSupportedResources": 8,
+        "totalDetectedResources": 4,
+        "totalSupportedResources": 4,
         "totalUnsupportedResources": 0,
         "totalUsageBasedResources": 4,
-        "totalNoPriceResources": 1,
+        "totalNoPriceResources": 0,
         "unsupportedResourceCounts": {},
-        "noPriceResourceCounts": {
-          "azurerm_resource_group": 1
-        }
+        "noPriceResourceCounts": {}
       }
     }
   ],
-  "totalHourlyCost": "0.950684931506849314",
-  "totalMonthlyCost": "694",
-  "pastTotalHourlyCost": "0.950684931506849314",
-  "pastTotalMonthlyCost": "694",
+  "totalHourlyCost": "0",
+  "totalMonthlyCost": "0",
+  "pastTotalHourlyCost": "0",
+  "pastTotalMonthlyCost": "0",
   "diffTotalHourlyCost": "0",
   "diffTotalMonthlyCost": "0",
   "timeGenerated": "REPLACED_TIME",
   "summary": {
-    "totalDetectedResources": 9,
-    "totalSupportedResources": 8,
+    "totalDetectedResources": 4,
+    "totalSupportedResources": 4,
     "totalUnsupportedResources": 0,
     "totalUsageBasedResources": 4,
-    "totalNoPriceResources": 1,
+    "totalNoPriceResources": 0,
     "unsupportedResourceCounts": {},
-    "noPriceResourceCounts": {
-      "azurerm_resource_group": 1
-    }
+    "noPriceResourceCounts": {}
   }
 }
 
