@@ -2,7 +2,6 @@ package terraform
 
 import (
 	"bufio"
-	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"

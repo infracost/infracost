@@ -189,7 +189,9 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 			logger.SetOutput(io.Discard)
 			entry := logrus.NewEntry(logger)
 
+			ctx := config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{})
 			parsers, err := hcl.LoadParsers(
+				ctx,
 				testPath,
 				modules.NewModuleLoader(testPath, nil, config.TerraformSourceMap{}, entry, &sync.KeyMutex{}),
 				nil,
@@ -208,7 +210,7 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 			p := HCLProvider{
 				parsers: parsers,
 				logger:  entry,
-				ctx:     &config.ProjectContext{RunContext: &config.RunContext{Config: &config.Config{}}},
+				ctx:     ctx,
 			}
 			got := p.LoadPlanJSONs()
 			require.NoError(t, err)
