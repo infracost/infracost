@@ -1,12 +1,10 @@
 {{- define "policyOutputTable" }}
-  {{ if .Failure }}
-### {{ .Name }} ❌ (needs action) ###
-  {{ else if .Warning }}
-### {{ .Name }} ⚠️ (warning) ###
-  {{ else }}
-### {{ .Name }} ✅ (passed) ###
-  {{ end }}
   {{- if or .Failure .Warning }}
+    {{ if .Failure }}
+### ❌ {{ .Name }} (needs action) ###
+    {{ else }}
+### ⚠️ {{ .Name }} (warning) ###
+    {{ end }}
     {{ if .Message }}
 {{ .Message }}
     {{ end }}

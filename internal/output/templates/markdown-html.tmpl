@@ -1,12 +1,11 @@
 {{- define "policyOutputTable" }}
-  {{- if .Failure }}
-    <h4><b>{{ .Name }}</b> ❌ (needs action)</h4>
-  {{- else if .Warning }}
-    <h4><b>{{ .Name }}</b> ⚠️ (warning)</h4>
-  {{- else }}
-    <h4><b>{{ .Name }}</b> ✅ (passed)</h4>
-  {{- end }}
   {{- if or .Failure .Warning }}
+    {{- if .Failure }}
+      <h4>❌ <b>{{ .Name }}</b> (needs action)</h4>
+    {{- else }}
+      <h4>⚠️ <b>{{ .Name }}</b> (warning)</h4>
+    {{- end }}
+
     <table>
       {{- if .Message }}
         <tr>

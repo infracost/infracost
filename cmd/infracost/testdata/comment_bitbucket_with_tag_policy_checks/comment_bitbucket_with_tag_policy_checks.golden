@@ -2,9 +2,9 @@
 
 ## Infracost estimate: **monthly cost will not change**
 ## ❌ Policies failed (needs action) ##
-  
-### Failing Tag Policy ❌ (needs action) ###
-  
+    
+### ❌ Failing Tag Policy (needs action) ###
+    
     
 This should show as a failure
     
@@ -34,9 +34,9 @@ This should show as a failure
 > * Invalid value, `ServiceCode` must match regex: `\[A-Z\]{3}-Id`
 >
 > in project `my-prod-project`
-  
-### Warning Tag Policy ⚠️ (warning) ###
-  
+    
+### ⚠️ Warning Tag Policy (warning) ###
+    
     
 This should show as a warning
     
@@ -46,9 +46,6 @@ This should show as a warning
 > * Missing mandatory tags: `Environment`, `Team`
 >
 > in project `my-prod-project`
-  
-### Passing Tag Policy ✅ (passed) ###
-  
 
 This comment will be updated when the cost estimate changes.
 

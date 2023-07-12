@@ -31,7 +31,8 @@
 </details>
   <details>
       <summary><strong>❌ Policies failed (needs action)</strong></summary>
-    <h4><b>Failing Tag Policy</b> ❌ (needs action)</h4>
+      <h4>❌ <b>Failing Tag Policy</b> (needs action)</h4>
+
     <table>
         <tr>
           <td>
@@ -57,8 +58,6 @@ in projects `my-prod-project`, `my-dev-project`
   
 </td></tr>
     </table>
-    <h4><b>Passing Tag Policy 1</b> ✅ (passed)</h4>
-    <h4><b>Passing Tag Policy 2</b> ✅ (passed)</h4>
   </details>
 
 Comment not posted to GitHub (--dry-run was specified)
