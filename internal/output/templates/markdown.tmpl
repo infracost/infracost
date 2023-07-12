@@ -30,6 +30,10 @@
         {{- end }}
       {{- end}}
     {{- end}}
+    {{- if .TruncatedCount }}
+
+> ... and {{ .TruncatedCount }} more. View in Infracost Cloud.</p>
+    {{- end}}
   {{- end }}
 {{- end }}
 

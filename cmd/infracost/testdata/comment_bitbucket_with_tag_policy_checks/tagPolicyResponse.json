@@ -103,6 +103,76 @@
                   "validRegex": "\\[A-Z\\]{3}-Id"
                 }
               ]
+            },
+            {
+              "address": "module.us-east-1-dashboard.aws_db_instance.dashboard_0",
+              "type": "aws_db_instance",
+              "projectNames": [ "my-X-project" ],
+              "missingMandatoryTags": ["A"],
+              "invalidTags": []
+            },
+            {
+              "address": "module.us-east-1-dashboard.aws_db_instance.dashboard_1",
+              "type": "aws_db_instance",
+              "projectNames": [ "my-X-project" ],
+              "missingMandatoryTags": ["A"],
+              "invalidTags": []
+            },
+            {
+              "address": "module.us-east-1-dashboard.aws_db_instance.dashboard_2",
+              "type": "aws_db_instance",
+              "projectNames": [ "my-X-project" ],
+              "missingMandatoryTags": ["A"],
+              "invalidTags": []
+            },
+            {
+              "address": "module.us-east-1-dashboard.aws_db_instance.dashboard_3",
+              "type": "aws_db_instance",
+              "projectNames": [ "my-X-project" ],
+              "missingMandatoryTags": ["A"],
+              "invalidTags": []
+            },
+            {
+              "address": "module.us-east-1-dashboard.aws_db_instance.dashboard_4",
+              "type": "aws_db_instance",
+              "projectNames": [ "my-X-project" ],
+              "missingMandatoryTags": ["A"],
+              "invalidTags": []
+            },
+            {
+              "address": "module.us-east-1-dashboard.aws_db_instance.dashboard_5",
+              "type": "aws_db_instance",
+              "projectNames": [ "my-X-project" ],
+              "missingMandatoryTags": ["A"],
+              "invalidTags": []
+            },
+            {
+              "address": "module.us-east-1-dashboard.aws_db_instance.dashboard_6",
+              "type": "aws_db_instance",
+              "projectNames": [ "my-X-project" ],
+              "missingMandatoryTags": ["A"],
+              "invalidTags": []
+            },
+            {
+              "address": "module.us-east-1-dashboard.aws_db_instance.dashboard_7",
+              "type": "aws_db_instance",
+              "projectNames": [ "my-X-project" ],
+              "missingMandatoryTags": ["A"],
+              "invalidTags": []
+            },
+            {
+              "address": "module.us-east-1-dashboard.aws_db_instance.dashboard_8",
+              "type": "aws_db_instance",
+              "projectNames": [ "my-X-project" ],
+              "missingMandatoryTags": ["A"],
+              "invalidTags": []
+            },
+            {
+              "address": "module.us-east-1-dashboard.aws_db_instance.dashboard_9",
+              "type": "aws_db_instance",
+              "projectNames": [ "my-X-project" ],
+              "missingMandatoryTags": ["A"],
+              "invalidTags": []
             }
           ]
         },

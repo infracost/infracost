@@ -310,6 +310,7 @@ type PolicyCheckOutput struct {
 	Message         string
 	Details         []string
 	ResourceDetails []PolicyCheckResourceDetails
+	TruncatedCount  int
 }
 
 type PolicyCheckResourceDetails struct {
@@ -404,6 +405,8 @@ func NewPolicyOutput(pc PolicyCheck, tpc TagPolicyCheck) PolicyOutput {
 	return po
 }
 
+var maxTagPolicyResourceDetails = 10
+
 func newTagPolicyCheckOutput(tp TagPolicy) PolicyCheckOutput {
 	// group resources by address so we can show a single block with all project/violation permutations.
 	rdMap := make(map[string]PolicyCheckResourceDetails, len(tp.Resources))
@@ -458,12 +461,20 @@ func newTagPolicyCheckOutput(tp TagPolicy) PolicyCheckOutput {
 		}
 	}
 
+	tc := 0
+	if len(resourceDetails) > maxTagPolicyResourceDetails {
+		// truncate the list of resources so we don't go over the size limit of comments
+		tc = len(resourceDetails) - maxTagPolicyResourceDetails
+		resourceDetails = resourceDetails[:maxTagPolicyResourceDetails]
+	}
+
 	return PolicyCheckOutput{
 		Name:            tp.Name,
 		Message:         tp.Message,
 		Failure:         failure,
 		Warning:         warning,
 		ResourceDetails: resourceDetails,
+		TruncatedCount:  tc,
 	}
 }
 

@@ -161,6 +161,9 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 		"showProject": func(p Project) bool {
 			return showProject(p, opts, false)
 		},
+		"cloudURL": func() string {
+			return out.CloudURL
+		},
 		"displaySub": func() bool {
 			if out.CloudURL != "" {
 				return true

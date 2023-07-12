@@ -34,6 +34,50 @@ This should show as a failure
 > * Invalid value, `ServiceCode` must match regex: `\[A-Z\]{3}-Id`
 >
 > in project `my-prod-project`
+
+> **module.us-east-1-dashboard.aws_db_instance.dashboard_0**
+>
+> * Missing mandatory tags: `A`
+>
+> in project `my-X-project`
+
+> **module.us-east-1-dashboard.aws_db_instance.dashboard_1**
+>
+> * Missing mandatory tags: `A`
+>
+> in project `my-X-project`
+
+> **module.us-east-1-dashboard.aws_db_instance.dashboard_2**
+>
+> * Missing mandatory tags: `A`
+>
+> in project `my-X-project`
+
+> **module.us-east-1-dashboard.aws_db_instance.dashboard_3**
+>
+> * Missing mandatory tags: `A`
+>
+> in project `my-X-project`
+
+> **module.us-east-1-dashboard.aws_db_instance.dashboard_4**
+>
+> * Missing mandatory tags: `A`
+>
+> in project `my-X-project`
+
+> **module.us-east-1-dashboard.aws_db_instance.dashboard_5**
+>
+> * Missing mandatory tags: `A`
+>
+> in project `my-X-project`
+
+> **module.us-east-1-dashboard.aws_db_instance.dashboard_6**
+>
+> * Missing mandatory tags: `A`
+>
+> in project `my-X-project`
+
+> ... and 3 more. View in Infracost Cloud.</p>
     
 ### ⚠️ Warning Tag Policy (warning) ###
     
@@ -68,4 +112,24 @@ Error: Tag policy check failed:
     - should have a valid value for "Team" tag: "Ops", "Frontend team", "Backend team"
     module.us-east-1-dashboard.aws_db_instance.dashboard in project(s) my-prod-project
     - should have a valid value for "ServiceCode" tag: must match regex <code>\[A-Z\]{3}-Id</code>
+    module.us-east-1-dashboard.aws_db_instance.dashboard_0 in project(s) my-X-project
+    - should have mandatory tags: "A"
+    module.us-east-1-dashboard.aws_db_instance.dashboard_1 in project(s) my-X-project
+    - should have mandatory tags: "A"
+    module.us-east-1-dashboard.aws_db_instance.dashboard_2 in project(s) my-X-project
+    - should have mandatory tags: "A"
+    module.us-east-1-dashboard.aws_db_instance.dashboard_3 in project(s) my-X-project
+    - should have mandatory tags: "A"
+    module.us-east-1-dashboard.aws_db_instance.dashboard_4 in project(s) my-X-project
+    - should have mandatory tags: "A"
+    module.us-east-1-dashboard.aws_db_instance.dashboard_5 in project(s) my-X-project
+    - should have mandatory tags: "A"
+    module.us-east-1-dashboard.aws_db_instance.dashboard_6 in project(s) my-X-project
+    - should have mandatory tags: "A"
+    module.us-east-1-dashboard.aws_db_instance.dashboard_7 in project(s) my-X-project
+    - should have mandatory tags: "A"
+    module.us-east-1-dashboard.aws_db_instance.dashboard_8 in project(s) my-X-project
+    - should have mandatory tags: "A"
+    module.us-east-1-dashboard.aws_db_instance.dashboard_9 in project(s) my-X-project
+    - should have mandatory tags: "A"
 

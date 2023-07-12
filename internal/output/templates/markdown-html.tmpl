@@ -5,7 +5,6 @@
     {{- else }}
       <h4>⚠️ <b>{{ .Name }}</b> (warning)</h4>
     {{- end }}
-
     <table>
       {{- if .Message }}
         <tr>
@@ -40,6 +39,13 @@ in project `{{ index .ProjectNames 0 }}`
   {{ "" }}
 {{- end }}
 </td>{{- /* This td needs to be left aligned to work properly. */ -}}
+        </tr>
+      {{- end}}
+      {{- if .TruncatedCount }}
+        <tr>
+          <td>
+            <p>... and {{ .TruncatedCount }} more. {{ if cloudURL }}<a href="{{ cloudURL }}" rel="noopener noreferrer" target="_blank">View in Infracost Cloud.</a>{{- end }}</p>
+          </td>
         </tr>
       {{- end}}
     </table>
