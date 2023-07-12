@@ -289,11 +289,118 @@ type Options struct {
 	ShowOnlyChanges   bool
 	Fields            []string
 	IncludeHTML       bool
-	PolicyChecks      PolicyCheck
-	TagPolicyCheck    TagPolicyCheck
+	PolicyOutput      PolicyOutput
 	GuardrailCheck    GuardrailCheck
 	diffMsg           string
 	CurrencyFormat    string
+}
+
+// PolicyOutput holds normalized PolicyCheck and TagPolicyCheck data so it can be output in
+// a uniform "Policies" section of the infracost comment.
+type PolicyOutput struct {
+	HasFailures bool
+	HasWarnings bool
+	Checks      []PolicyCheckOutput
+}
+
+type PolicyCheckOutput struct {
+	Name            string
+	Failure         bool
+	Warning         bool
+	Message         string
+	Details         []string
+	ResourceDetails []PolicyCheckResourceDetails
+}
+
+type PolicyCheckResourceDetails struct {
+	Address      string
+	ResourceType string
+	Path         string
+	Line         int
+	ProjectNames []string
+	Details      []string
+}
+
+// NewPolicyOutput normalizes a PolicyCheck and a TagPolicyCheck into a PolicyOutput suitable
+// for use in the output markdown template.
+func NewPolicyOutput(pc PolicyCheck, tpc TagPolicyCheck) PolicyOutput {
+	po := PolicyOutput{}
+
+	if pc.Enabled && len(pc.Failures) > 0 {
+		po.HasFailures = true
+		po.Checks = append(po.Checks, PolicyCheckOutput{
+			Name:    "Cost policy failed",
+			Failure: true,
+			Details: pc.Failures,
+		})
+	}
+
+	for _, tagPolicy := range tpc.FailingTagPolicies {
+		po.HasFailures = true
+		po.Checks = append(po.Checks, newTagPolicyCheckOutput(tagPolicy))
+	}
+
+	for _, tagPolicy := range tpc.WarningTagPolicies {
+		po.HasWarnings = true
+		po.Checks = append(po.Checks, newTagPolicyCheckOutput(tagPolicy))
+	}
+
+	for _, tagPolicy := range tpc.PassingTagPolicies {
+		po.Checks = append(po.Checks, newTagPolicyCheckOutput(tagPolicy))
+	}
+
+	if pc.Enabled && len(pc.Passed) > 0 {
+		po.Checks = append(po.Checks, PolicyCheckOutput{
+			Name:    "Cost policy passed",
+			Details: pc.Passed,
+		})
+	}
+
+	return po
+}
+
+func newTagPolicyCheckOutput(tp TagPolicy) PolicyCheckOutput {
+	var rd []PolicyCheckResourceDetails
+
+	for _, r := range tp.Resources {
+		var details []string
+		if len(r.MissingMandatoryTags) > 0 {
+			details = append(details, fmt.Sprintf("Missing mandatory tags: `%s`", strings.Join(r.MissingMandatoryTags, "`, `")))
+		}
+
+		for _, it := range r.InvalidTags {
+			if len(it.ValidValues) > 0 {
+				details = append(details, fmt.Sprintf("Invalid value, `%s` must be one of: `%s`", it.Key, strings.Join(it.ValidValues, "`, `")))
+			} else if it.ValidRegex != "" {
+				details = append(details, fmt.Sprintf("Invalid value, `%s` must match regex: `%s`", it.Key, it.ValidRegex))
+			}
+		}
+
+		rd = append(rd, PolicyCheckResourceDetails{
+			Address:      r.Address,
+			ResourceType: r.ResourceType,
+			Path:         r.Path,
+			Line:         r.Line,
+			ProjectNames: r.ProjectNames,
+			Details:      details,
+		})
+	}
+
+	var failure, warning bool
+	if len(tp.Resources) > 0 {
+		warning = true
+		if tp.BlockPr {
+			failure = true
+		}
+	}
+
+	return PolicyCheckOutput{
+		Name:            tp.Name,
+		Message:         tp.Message,
+		Failure:         failure,
+		Warning:         warning,
+		ResourceDetails: rd,
+	}
 }
 
 // PolicyCheck holds information if a given run has any policy checks enabled.
