@@ -134,10 +134,13 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 	opts.ShowOnlyChanges, _ = cmd.Flags().GetBool("show-changed")
 	opts.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
 
-	b, err := output.ToMarkdown(combined, opts, mdOpts)
+	b, err, originalSize, newSize := output.ToMarkdown(combined, opts, mdOpts)
 	if err != nil {
 		return nil, hasDiff, err
 	}
+
+	ctx.ContextValues.SetValue("truncated", originalSize != newSize)
+	ctx.ContextValues.SetValue("originalLength", originalSize)
 
 	if policyChecks.HasFailed() {
 		return b, hasDiff, policyChecks.Failures

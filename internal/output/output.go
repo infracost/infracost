@@ -293,6 +293,7 @@ type Options struct {
 	TagPolicyCheck    TagPolicyCheck
 	GuardrailCheck    GuardrailCheck
 	diffMsg           string
+	originalSize      int
 	CurrencyFormat    string
 }
 
