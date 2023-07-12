@@ -5,7 +5,6 @@ import (
 	"bytes"
 	"fmt"
 	"html/template"
-	"path/filepath"
 	"strings"
 
 	"github.com/shopspring/decimal"
@@ -58,7 +57,7 @@ func ToHTML(out Root, opts Options) ([]byte, error) {
 			return p.Metadata.WorkspaceLabel()
 		},
 	})
-	_, err := tmpl.ParseFS(templatesFS, filepath.Join("templates", "html.tmpl"))
+	_, err := tmpl.ParseFS(templatesFS, "templates/html.tmpl")
 	if err != nil {
 		return []byte{}, err
 	}
