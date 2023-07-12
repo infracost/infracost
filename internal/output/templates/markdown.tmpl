@@ -17,18 +17,20 @@
     {{- range .ResourceDetails }}
 
 > **{{ .Address }}** {{- if .Path }} at `{{ .Path }}{{- if .Line }}:{{ .Line }}{{- end}}`{{- end}}
-      {{- range .Details }}
+      {{- range .Violations }}
+        {{- range .Details }}
 >
 > * {{ . }}
-      {{- end}}
+        {{- end}}
 
-      {{- if gt (len .ProjectNames) 1 }}
+        {{- if gt (len .ProjectNames) 1 }}
 >
 > in projects `{{ stringsJoin .ProjectNames "`, `" }}`
-      {{- else }}
+        {{- else }}
 >
 > in project `{{ index .ProjectNames 0 }}`
-      {{- end }}
+        {{- end }}
+      {{- end}}
     {{- end}}
   {{- end }}
 {{- end }}

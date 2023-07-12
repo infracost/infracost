@@ -43,20 +43,18 @@
 **infracost1.s3.bucket** at `dev/main.tf:14`
 * Missing mandatory tags: `Environment`, `Team`
 * Invalid value, `Team` must be one of: `Ops`, `Frontend team`, `Backend team`
-
-
+  
 in projects `my-prod-project`, `my-dev-project`
-
+  
 </td></tr>
         <tr><td>
 
 **infracost2.s3.bucket** at `dev/main.tf:14`
 * Missing mandatory tags: `Environment`, `Team`
 * Invalid value, `Team` must be one of: `Ops`, `Frontend team`, `Backend team`
-
-
+  
 in projects `my-prod-project`, `my-dev-project`
-
+  
 </td></tr>
     </table>
     <h4><b>Passing Tag Policy 1</b> ✅ (passed)</h4>

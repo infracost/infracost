@@ -28,16 +28,18 @@
 <td>
 
 **{{ .Address }}** {{- if .Path }} at `{{ .Path }}{{- if .Line }}:{{ .Line }}{{- end}}`{{- end}}
-{{- range .Details }}
+{{- range .Violations }}
+  {{- range .Details }}
 * {{ . }}
-{{- end}}
-
-{{ if gt (len .ProjectNames) 1 }}
+  {{- end}}
+  {{ "" }}
+  {{- if gt (len .ProjectNames) 1 }}
 in projects `{{ stringsJoin .ProjectNames "`, `" }}`
-{{- else }}
+  {{- else }}
 in project `{{ index .ProjectNames 0 }}`
+  {{- end }}
+  {{ "" }}
 {{- end }}
-
 </td>{{- /* This td needs to be left aligned to work properly. */ -}}
         </tr>
       {{- end}}

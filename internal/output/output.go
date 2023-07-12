@@ -317,8 +317,53 @@ type PolicyCheckResourceDetails struct {
 	ResourceType string
 	Path         string
 	Line         int
-	ProjectNames []string
+	Violations   []PolicyCheckViolations
+}
+
+type PolicyCheckViolations struct {
 	Details      []string
+	ProjectNames []string
+}
+
+// merge combines any Violations with identicals Details for two PolicyCheckResourceDetails
+func mergeViolations(violations, otherViolations []PolicyCheckViolations) []PolicyCheckViolations {
+	vMap := map[string]PolicyCheckViolations{}
+	for _, v := range violations {
+		vMap[strings.Join(v.Details, "")] = v
+	}
+
+	// merge violations with identical details
+	for _, otherV := range otherViolations {
+		key := strings.Join(otherV.Details, "")
+
+		if v, ok := vMap[key]; ok {
+			v.ProjectNames = append(v.ProjectNames, otherV.ProjectNames...)
+			sort.Strings(v.ProjectNames)
+			vMap[key] = v
+		} else {
+			vMap[key] = otherV
+		}
+	}
+
+	// preserve output order
+	var vMerged = make([]PolicyCheckViolations, 0, len(vMap))
+	for _, v := range violations {
+		key := strings.Join(v.Details, "")
+		if mergedV, ok := vMap[key]; ok {
+			vMerged = append(vMerged, mergedV)
+			delete(vMap, key)
+		}
+	}
+
+	for _, otherV := range otherViolations {
+		key := strings.Join(otherV.Details, "")
+		if mergedV, ok := vMap[key]; ok {
+			vMerged = append(vMerged, mergedV)
+			delete(vMap, key)
+		}
+	}
+
+	return vMerged
 }
 
 // NewPolicyOutput normalizes a PolicyCheck and a TagPolicyCheck into a PolicyOutput suitable
@@ -360,7 +405,8 @@ func NewPolicyOutput(pc PolicyCheck, tpc TagPolicyCheck) PolicyOutput {
 }
 
 func newTagPolicyCheckOutput(tp TagPolicy) PolicyCheckOutput {
-	var rd []PolicyCheckResourceDetails
+	// group resources by address so we can show a single block with all project/violation permutations.
+	rdMap := make(map[string]PolicyCheckResourceDetails, len(tp.Resources))
 
 	for _, r := range tp.Resources {
 		var details []string
@@ -376,14 +422,23 @@ func newTagPolicyCheckOutput(tp TagPolicy) PolicyCheckOutput {
 			}
 		}
 
-		rd = append(rd, PolicyCheckResourceDetails{
+		rd := PolicyCheckResourceDetails{
 			Address:      r.Address,
 			ResourceType: r.ResourceType,
 			Path:         r.Path,
 			Line:         r.Line,
-			ProjectNames: r.ProjectNames,
-			Details:      details,
-		})
+			Violations: []PolicyCheckViolations{{
+				ProjectNames: r.ProjectNames,
+				Details:      details,
+			}},
+		}
+
+		if existingRd, ok := rdMap[r.Address]; ok {
+			existingRd.Violations = mergeViolations(existingRd.Violations, rd.Violations)
+			rdMap[r.Address] = existingRd
+		} else {
+			rdMap[r.Address] = rd
+		}
 	}
 
 	var failure, warning bool
@@ -394,12 +449,21 @@ func newTagPolicyCheckOutput(tp TagPolicy) PolicyCheckOutput {
 		}
 	}
 
+	// preserve resource order
+	resourceDetails := make([]PolicyCheckResourceDetails, 0, len(rdMap))
+	for _, r := range tp.Resources {
+		if rd, ok := rdMap[r.Address]; ok {
+			resourceDetails = append(resourceDetails, rd)
+			delete(rdMap, r.Address)
+		}
+	}
+
 	return PolicyCheckOutput{
 		Name:            tp.Name,
 		Message:         tp.Message,
 		Failure:         failure,
 		Warning:         warning,
-		ResourceDetails: rd,
+		ResourceDetails: resourceDetails,
 	}
 }
 

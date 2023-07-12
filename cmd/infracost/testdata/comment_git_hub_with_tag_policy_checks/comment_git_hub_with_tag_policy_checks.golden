@@ -38,28 +38,30 @@
 **module.hosted_cloud_pricing_api.aws_s3_bucket.cloud_pricing_api_db_data** at `dev/main.tf:14`
 * Missing mandatory tags: `Environment`, `Team`
 * Invalid value, `Team` must be one of: `Ops`, `Frontend team`, `Backend team`
-
-
-in projects `my-prod-project`, `my-dev-project`
-
+  
+in projects `my-dev-project`, `my-other-project-with-same-violations`, `my-prod-project`
+  
+* Missing mandatory tags: `Environment`, `Team`
+* Invalid value, `Team` must be one of: `Ops`, `Frontstart team`, `Backstart team`
+  
+in project `my-other-project-with-different-violations`
+  
 </td></tr>
         <tr><td>
 
 **module.dashboard.aws_dynamodb_table.sessions** at `dev/main.tf:23`
 * Invalid value, `Team` must be one of: `Ops`, `Frontend team`, `Backend team`
-
-
+  
 in project `my-prod-project`
-
+  
 </td></tr>
         <tr><td>
 
 **module.us-east-1-dashboard.aws_db_instance.dashboard** at `prod/us-east-1/dashboard/instances.tf:395`
 * Invalid value, `ServiceCode` must match regex: `\[A-Z\]{3}-Id`
-
-
+  
 in project `my-prod-project`
-
+  
 </td></tr>
     </table>
     <h4><b>Warning Tag Policy</b> ⚠️ (warning)</h4>
@@ -73,10 +75,9 @@ in project `my-prod-project`
 
 **aws** at `dev/main.tf:5`
 * Missing mandatory tags: `Environment`, `Team`
-
-
+  
 in project `my-prod-project`
-
+  
 </td></tr>
     </table>
     <h4><b>Passing Tag Policy</b> ✅ (passed)</h4>
@@ -89,9 +90,15 @@ Err:
 Error: Tag policy check failed:
 
   Failing Tag Policy: This should show as a failure
-    module.hosted_cloud_pricing_api.aws_s3_bucket.cloud_pricing_api_db_data in project(s) my-prod-project, my-dev-project
+    module.hosted_cloud_pricing_api.aws_s3_bucket.cloud_pricing_api_db_data in project(s) my-dev-project, my-other-project-with-same-violations
     - should have mandatory tags: "Environment", "Team"
     - should have a valid value for "Team" tag: "Ops", "Frontend team", "Backend team"
+    module.hosted_cloud_pricing_api.aws_s3_bucket.cloud_pricing_api_db_data in project(s) my-other-project-with-same-violations
+    - should have mandatory tags: "Environment", "Team"
+    - should have a valid value for "Team" tag: "Ops", "Frontend team", "Backend team"
+    module.hosted_cloud_pricing_api.aws_s3_bucket.cloud_pricing_api_db_data in project(s) my-other-project-with-different-violations
+    - should have mandatory tags: "Environment", "Team"
+    - should have a valid value for "Team" tag: "Ops", "Frontstart team", "Backstart team"
     module.dashboard.aws_dynamodb_table.sessions in project(s) my-prod-project
     - should have a valid value for "Team" tag: "Ops", "Frontend team", "Backend team"
     module.us-east-1-dashboard.aws_db_instance.dashboard in project(s) my-prod-project
