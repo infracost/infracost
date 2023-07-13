@@ -20,13 +20,15 @@
               "calls": [
                 {
                   "filename": "testdata/hcl_provider_test/populates_warnings_on_missing_vars/main.tf",
-                  "blockName": "aws_eip.eip"
+                  "blockName": "aws_eip.eip",
+                  "startLine": 35,
+                  "endLine": 37
                 }
               ],
               "checksum": "7cbe8ebfd37a12e445ee9d8208cd03624611c7dba04c94fc3a9bc9834494e141",
+              "endLine": 37,
               "filename": "testdata/hcl_provider_test/populates_warnings_on_missing_vars/main.tf",
-              "startLine": 35,
-              "endLine": 37
+              "startLine": 35
             }
           }
         ]
@@ -51,14 +53,45 @@
             "calls": [
               {
                 "filename": "testdata/hcl_provider_test/populates_warnings_on_missing_vars/main.tf",
-                "blockName": "aws_eip.eip"
+                "blockName": "aws_eip.eip",
+                "startLine": 35,
+                "endLine": 37
               }
             ],
             "checksum": "7cbe8ebfd37a12e445ee9d8208cd03624611c7dba04c94fc3a9bc9834494e141",
+            "endLine": 37,
             "filename": "testdata/hcl_provider_test/populates_warnings_on_missing_vars/main.tf",
-            "startLine": 35,
-            "endLine": 37
+            "startLine": 35
           }
+        }
+      ]
+    }
+  },
+  "configuration": {
+    "provider_config": {
+      "aws": {
+        "name": "aws",
+        "expressions": {
+          "region": {
+            "constant_value": "us-east-1"
+          }
+        },
+        "infracost_metadata": {
+          "end_line": 7,
+          "filename": "testdata/hcl_provider_test/populates_warnings_on_missing_vars/main.tf",
+          "start_line": 1
+        }
+      }
+    },
+    "root_module": {
+      "resources": [
+        {
+          "address": "aws_eip.eip",
+          "mode": "managed",
+          "type": "aws_eip",
+          "name": "eip",
+          "provider_config_key": "aws",
+          "schema_version": 0
         }
       ]
     }
@@ -81,34 +114,5 @@
         }
       }
     }
-  ],
-  "configuration": {
-    "provider_config": {
-      "aws": {
-        "name": "aws",
-        "expressions": {
-          "region": {
-            "constant_value": "us-east-1"
-          }
-        },
-        "infracost_metadata": {
-          "end_line":7,
-          "filename":"testdata/hcl_provider_test/populates_warnings_on_missing_vars/main.tf",
-          "start_line":1
-        }
-      }
-    },
-    "root_module": {
-      "resources": [
-        {
-          "address": "aws_eip.eip",
-          "mode": "managed",
-          "type": "aws_eip",
-          "name": "eip",
-          "provider_config_key": "aws",
-          "schema_version": 0
-        }
-      ]
-    }
-  }
+  ]
 }

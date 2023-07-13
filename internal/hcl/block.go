@@ -629,6 +629,8 @@ func (b *Block) HasModuleBlock() bool {
 type ModuleMetadata struct {
 	Filename  string `json:"filename"`
 	BlockName string `json:"blockName"`
+	StartLine int    `json:"startLine,omitempty"`
+	EndLine   int    `json:"endLine,omitempty"`
 }
 
 func (b *Block) setLogger(logger *logrus.Entry) {
@@ -654,6 +656,8 @@ func (b *Block) CallDetails() []ModuleMetadata {
 		meta = append(meta, ModuleMetadata{
 			Filename:  block.Filename,
 			BlockName: stripCount(block.LocalName()),
+			StartLine: block.StartLine,
+			EndLine:   block.EndLine,
 		})
 
 		if block.moduleBlock == nil {

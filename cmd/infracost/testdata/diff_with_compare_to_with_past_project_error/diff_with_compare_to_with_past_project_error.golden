@@ -155,7 +155,9 @@
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
-                  "filename": "testdata/diff_with_compare_to_with_past_project_error/prod/main.tf"
+                  "endLine": 23,
+                  "filename": "testdata/diff_with_compare_to_with_past_project_error/prod/main.tf",
+                  "startLine": 9
                 }
               ],
               "checksum": "e529ad309bb6d647fae2d2854bc0d7f04a7888eceb9580ac224d15cc3384a825",

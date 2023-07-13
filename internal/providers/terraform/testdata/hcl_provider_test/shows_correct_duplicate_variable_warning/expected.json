@@ -32,13 +32,15 @@
               "calls": [
                 {
                   "filename": "testdata/hcl_provider_test/shows_correct_duplicate_variable_warning/main.tf",
-                  "blockName": "aws_instance.web_app"
+                  "blockName": "aws_instance.web_app",
+                  "startLine": 13,
+                  "endLine": 27
                 }
               ],
               "checksum": "e529ad309bb6d647fae2d2854bc0d7f04a7888eceb9580ac224d15cc3384a825",
+              "endLine": 27,
               "filename": "testdata/hcl_provider_test/shows_correct_duplicate_variable_warning/main.tf",
-              "startLine": 13,
-              "endLine": 27
+              "startLine": 13
             }
           }
         ]
@@ -75,13 +77,15 @@
             "calls": [
               {
                 "filename": "testdata/hcl_provider_test/shows_correct_duplicate_variable_warning/main.tf",
-                "blockName": "aws_instance.web_app"
+                "blockName": "aws_instance.web_app",
+                "startLine": 13,
+                "endLine": 27
               }
             ],
             "checksum": "e529ad309bb6d647fae2d2854bc0d7f04a7888eceb9580ac224d15cc3384a825",
+            "endLine": 27,
             "filename": "testdata/hcl_provider_test/shows_correct_duplicate_variable_warning/main.tf",
-            "startLine": 13,
-            "endLine": 27
+            "startLine": 13
           }
         }
       ]
@@ -97,9 +101,9 @@
           }
         },
         "infracost_metadata": {
-          "end_line":7,
-          "filename":"testdata/hcl_provider_test/shows_correct_duplicate_variable_warning/main.tf",
-          "start_line":1
+          "end_line": 7,
+          "filename": "testdata/hcl_provider_test/shows_correct_duplicate_variable_warning/main.tf",
+          "start_line": 1
         }
       }
     },

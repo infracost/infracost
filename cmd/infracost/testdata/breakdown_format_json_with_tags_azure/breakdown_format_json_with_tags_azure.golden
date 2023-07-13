@@ -39,7 +39,9 @@
               "calls": [
                 {
                   "blockName": "azurerm_redis_cache.arc1",
-                  "filename": "testdata/breakdown_format_json_with_tags_azure/main.tf"
+                  "endLine": 21,
+                  "filename": "testdata/breakdown_format_json_with_tags_azure/main.tf",
+                  "startLine": 11
                 }
               ],
               "checksum": "eb5984ee4c26abd5e6d42df874f260985032d4a04624fccde27c07cc9eb1c14c",
@@ -69,7 +71,9 @@
               "calls": [
                 {
                   "blockName": "azurerm_redis_cache.arc2",
-                  "filename": "testdata/breakdown_format_json_with_tags_azure/main.tf"
+                  "endLine": 30,
+                  "filename": "testdata/breakdown_format_json_with_tags_azure/main.tf",
+                  "startLine": 23
                 }
               ],
               "checksum": "d25f4ccac9d918c85ea0c9781195cf5f3576147b9465ad2136a42b1a15cc8ed3",
@@ -107,7 +111,9 @@
               "calls": [
                 {
                   "blockName": "azurerm_redis_cache.arc1",
-                  "filename": "testdata/breakdown_format_json_with_tags_azure/main.tf"
+                  "endLine": 21,
+                  "filename": "testdata/breakdown_format_json_with_tags_azure/main.tf",
+                  "startLine": 11
                 }
               ],
               "checksum": "eb5984ee4c26abd5e6d42df874f260985032d4a04624fccde27c07cc9eb1c14c",
@@ -137,7 +143,9 @@
               "calls": [
                 {
                   "blockName": "azurerm_redis_cache.arc2",
-                  "filename": "testdata/breakdown_format_json_with_tags_azure/main.tf"
+                  "endLine": 30,
+                  "filename": "testdata/breakdown_format_json_with_tags_azure/main.tf",
+                  "startLine": 23
                 }
               ],
               "checksum": "d25f4ccac9d918c85ea0c9781195cf5f3576147b9465ad2136a42b1a15cc8ed3",

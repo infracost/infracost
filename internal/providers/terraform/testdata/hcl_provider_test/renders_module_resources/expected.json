@@ -22,13 +22,15 @@
               "calls": [
                 {
                   "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf",
-                  "blockName": "aws_vpn_connection.example"
+                  "blockName": "aws_vpn_connection.example",
+                  "startLine": 13,
+                  "endLine": 17
                 }
               ],
               "checksum": "f83704925dfcc9e2daae865e0a1c1ecb29e9809bd8900126bab803539889f89f",
+              "endLine": 17,
               "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf",
-              "startLine": 13,
-              "endLine": 17
+              "startLine": 13
             }
           }
         ],
@@ -52,17 +54,21 @@
                   "calls": [
                     {
                       "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf",
-                      "blockName": "module.gateway"
+                      "blockName": "module.gateway",
+                      "startLine": 9,
+                      "endLine": 11
                     },
                     {
                       "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf",
-                      "blockName": "aws_customer_gateway.example"
+                      "blockName": "aws_customer_gateway.example",
+                      "startLine": 3,
+                      "endLine": 7
                     }
                   ],
                   "checksum": "875b67acb222fc57afc61092a04721406bdbef2b9b116e2ebe24529469c8be1e",
+                  "endLine": 7,
                   "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf",
-                  "startLine": 3,
-                  "endLine": 7
+                  "startLine": 3
                 }
               },
               {
@@ -79,17 +85,21 @@
                   "calls": [
                     {
                       "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf",
-                      "blockName": "module.gateway"
+                      "blockName": "module.gateway",
+                      "startLine": 9,
+                      "endLine": 11
                     },
                     {
                       "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf",
-                      "blockName": "aws_ec2_transit_gateway.example"
+                      "blockName": "aws_ec2_transit_gateway.example",
+                      "startLine": 1,
+                      "endLine": 1
                     }
                   ],
                   "checksum": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+                  "endLine": 1,
                   "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf",
-                  "startLine": 1,
-                  "endLine": 1
+                  "startLine": 1
                 }
               }
             ],
@@ -119,13 +129,15 @@
             "calls": [
               {
                 "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf",
-                "blockName": "aws_vpn_connection.example"
+                "blockName": "aws_vpn_connection.example",
+                "startLine": 13,
+                "endLine": 17
               }
             ],
             "checksum": "f83704925dfcc9e2daae865e0a1c1ecb29e9809bd8900126bab803539889f89f",
+            "endLine": 17,
             "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf",
-            "startLine": 13,
-            "endLine": 17
+            "startLine": 13
           }
         }
       ],
@@ -149,17 +161,21 @@
                 "calls": [
                   {
                     "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf",
-                    "blockName": "module.gateway"
+                    "blockName": "module.gateway",
+                    "startLine": 9,
+                    "endLine": 11
                   },
                   {
                     "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf",
-                    "blockName": "aws_customer_gateway.example"
+                    "blockName": "aws_customer_gateway.example",
+                    "startLine": 3,
+                    "endLine": 7
                   }
                 ],
                 "checksum": "875b67acb222fc57afc61092a04721406bdbef2b9b116e2ebe24529469c8be1e",
+                "endLine": 7,
                 "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf",
-                "startLine": 3,
-                "endLine": 7
+                "startLine": 3
               }
             },
             {
@@ -176,23 +192,98 @@
                 "calls": [
                   {
                     "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf",
-                    "blockName": "module.gateway"
+                    "blockName": "module.gateway",
+                    "startLine": 9,
+                    "endLine": 11
                   },
                   {
                     "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf",
-                    "blockName": "aws_ec2_transit_gateway.example"
+                    "blockName": "aws_ec2_transit_gateway.example",
+                    "startLine": 1,
+                    "endLine": 1
                   }
                 ],
                 "checksum": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+                "endLine": 1,
                 "filename": "testdata/hcl_provider_test/renders_module_resources/module/gateway/main.tf",
-                "startLine": 1,
-                "endLine": 1
+                "startLine": 1
               }
             }
           ],
           "address": "module.gateway"
         }
       ]
+    }
+  },
+  "configuration": {
+    "provider_config": {
+      "aws": {
+        "name": "aws",
+        "expressions": {
+          "region": {
+            "constant_value": "us-east-1"
+          }
+        },
+        "infracost_metadata": {
+          "end_line": 7,
+          "filename": "testdata/hcl_provider_test/renders_module_resources/main.tf",
+          "start_line": 1
+        }
+      }
+    },
+    "root_module": {
+      "resources": [
+        {
+          "address": "aws_vpn_connection.example",
+          "mode": "managed",
+          "type": "aws_vpn_connection",
+          "name": "example",
+          "provider_config_key": "aws",
+          "expressions": {
+            "customer_gateway_id": {
+              "references": [
+                "module.gateway.aws_customer_gateway_id"
+              ]
+            },
+            "transit_gateway_id": {
+              "references": [
+                "module.gateway.aws_ec2_transit_gateway_id"
+              ]
+            },
+            "type": {
+              "references": [
+                "module.gateway.aws_customer_gateway_type"
+              ]
+            }
+          },
+          "schema_version": 0
+        }
+      ],
+      "module_calls": {
+        "gateway": {
+          "source": "./module/gateway",
+          "module": {
+            "resources": [
+              {
+                "address": "aws_customer_gateway.example",
+                "mode": "managed",
+                "type": "aws_customer_gateway",
+                "name": "example",
+                "provider_config_key": "gateway:aws",
+                "schema_version": 0
+              },
+              {
+                "address": "aws_ec2_transit_gateway.example",
+                "mode": "managed",
+                "type": "aws_ec2_transit_gateway",
+                "name": "example",
+                "provider_config_key": "gateway:aws",
+                "schema_version": 0
+              }
+            ]
+          }
+        }
+      }
     }
   },
   "infracost_resource_changes": [
@@ -252,76 +343,5 @@
         }
       }
     }
-  ],
-  "configuration": {
-    "provider_config": {
-      "aws": {
-        "name": "aws",
-        "expressions": {
-          "region": {
-            "constant_value": "us-east-1"
-          }
-        },
-        "infracost_metadata": {
-          "end_line":7,
-          "filename":"testdata/hcl_provider_test/renders_module_resources/main.tf",
-          "start_line":1
-        }
-      }
-    },
-    "root_module": {
-      "resources": [
-        {
-          "address": "aws_vpn_connection.example",
-          "mode": "managed",
-          "type": "aws_vpn_connection",
-          "name": "example",
-          "provider_config_key": "aws",
-          "expressions": {
-            "customer_gateway_id": {
-              "references": [
-                "module.gateway.aws_customer_gateway_id"
-              ]
-            },
-            "transit_gateway_id": {
-              "references": [
-                "module.gateway.aws_ec2_transit_gateway_id"
-              ]
-            },
-            "type": {
-              "references": [
-                "module.gateway.aws_customer_gateway_type"
-              ]
-            }
-          },
-          "schema_version": 0
-        }
-      ],
-      "module_calls": {
-        "gateway": {
-          "source": "./module/gateway",
-          "module": {
-            "resources": [
-              {
-                "address": "aws_customer_gateway.example",
-                "mode": "managed",
-                "type": "aws_customer_gateway",
-                "name": "example",
-                "provider_config_key": "gateway:aws",
-                "schema_version": 0
-              },
-              {
-                "address": "aws_ec2_transit_gateway.example",
-                "mode": "managed",
-                "type": "aws_ec2_transit_gateway",
-                "name": "example",
-                "provider_config_key": "gateway:aws",
-                "schema_version": 0
-              }
-            ]
-          }
-        }
-      }
-    }
-  }
+  ]
 }

@@ -40,7 +40,9 @@
               "calls": [
                 {
                   "blockName": "aws_sns_topic_subscription.sns_topic_noTags",
-                  "filename": "testdata/breakdown_format_json_with_tags/main.tf"
+                  "endLine": 20,
+                  "filename": "testdata/breakdown_format_json_with_tags/main.tf",
+                  "startLine": 16
                 }
               ],
               "checksum": "10a6feecf428a263eb621089fa1ea9ed6d36c1210906f87b858471b7efc01de0",
@@ -71,7 +73,9 @@
               "calls": [
                 {
                   "blockName": "aws_sns_topic_subscription.sns_topic_withTags",
-                  "filename": "testdata/breakdown_format_json_with_tags/main.tf"
+                  "endLine": 30,
+                  "filename": "testdata/breakdown_format_json_with_tags/main.tf",
+                  "startLine": 22
                 }
               ],
               "checksum": "6e3eb9c41d083d305c807ea3fa31a2d94182d1d406f25d249bf3cf2eb27208d5",
@@ -102,7 +106,9 @@
               "calls": [
                 {
                   "blockName": "aws_sqs_queue.sqs_noTags",
-                  "filename": "testdata/breakdown_format_json_with_tags/main.tf"
+                  "endLine": 34,
+                  "filename": "testdata/breakdown_format_json_with_tags/main.tf",
+                  "startLine": 32
                 }
               ],
               "checksum": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
@@ -134,7 +140,9 @@
               "calls": [
                 {
                   "blockName": "aws_sqs_queue.sqs_withTags",
-                  "filename": "testdata/breakdown_format_json_with_tags/main.tf"
+                  "endLine": 43,
+                  "filename": "testdata/breakdown_format_json_with_tags/main.tf",
+                  "startLine": 36
                 }
               ],
               "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
@@ -167,7 +175,9 @@
               "calls": [
                 {
                   "blockName": "aws_sns_topic_subscription.sns_topic_noTags",
-                  "filename": "testdata/breakdown_format_json_with_tags/main.tf"
+                  "endLine": 20,
+                  "filename": "testdata/breakdown_format_json_with_tags/main.tf",
+                  "startLine": 16
                 }
               ],
               "checksum": "10a6feecf428a263eb621089fa1ea9ed6d36c1210906f87b858471b7efc01de0",
@@ -198,7 +208,9 @@
               "calls": [
                 {
                   "blockName": "aws_sns_topic_subscription.sns_topic_withTags",
-                  "filename": "testdata/breakdown_format_json_with_tags/main.tf"
+                  "endLine": 30,
+                  "filename": "testdata/breakdown_format_json_with_tags/main.tf",
+                  "startLine": 22
                 }
               ],
               "checksum": "6e3eb9c41d083d305c807ea3fa31a2d94182d1d406f25d249bf3cf2eb27208d5",
@@ -229,7 +241,9 @@
               "calls": [
                 {
                   "blockName": "aws_sqs_queue.sqs_noTags",
-                  "filename": "testdata/breakdown_format_json_with_tags/main.tf"
+                  "endLine": 34,
+                  "filename": "testdata/breakdown_format_json_with_tags/main.tf",
+                  "startLine": 32
                 }
               ],
               "checksum": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
@@ -261,7 +275,9 @@
               "calls": [
                 {
                   "blockName": "aws_sqs_queue.sqs_withTags",
-                  "filename": "testdata/breakdown_format_json_with_tags/main.tf"
+                  "endLine": 43,
+                  "filename": "testdata/breakdown_format_json_with_tags/main.tf",
+                  "startLine": 36
                 }
               ],
               "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",

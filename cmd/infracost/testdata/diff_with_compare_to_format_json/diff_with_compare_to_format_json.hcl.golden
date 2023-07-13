@@ -167,7 +167,9 @@
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
-                  "filename": "testdata/diff_with_compare_to_format_json/main.tf"
+                  "endLine": 23,
+                  "filename": "testdata/diff_with_compare_to_format_json/main.tf",
+                  "startLine": 9
                 }
               ],
               "checksum": "3326e79d502305b9e1f50ad5efedb7528b9e59ded094785b1ca91c6f88812fa5",
