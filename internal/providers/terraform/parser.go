@@ -5,6 +5,7 @@ import (
 	stdJson "encoding/json"
 	"fmt"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -191,6 +192,11 @@ func parseProviderConfig(providerConf gjson.Result) []schema.ProviderMetadata {
 
 		metadatas = append(metadatas, md)
 	}
+
+	// Sort the metadata by name so any outputted JSON is deterministic
+	sort.Slice(metadatas, func(i, j int) bool {
+		return metadatas[i].Name < metadatas[j].Name
+	})
 
 	return metadatas
 }
