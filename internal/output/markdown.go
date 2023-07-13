@@ -121,7 +121,15 @@ type MarkdownCtx struct {
 	MarkdownOptions              MarkdownOptions
 }
 
-func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, error) {
+// MarkdownOutput holds the message converted to markdown with additional
+// information about its length.
+type MarkdownOutput struct {
+	Msg             []byte
+	RuneLen         int
+	OriginalMsgSize int
+}
+
+func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) (MarkdownOutput, error) {
 	var diffMsg string
 
 	if opts.diffMsg != "" {
@@ -129,7 +137,7 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 	} else {
 		diff, err := ToDiff(out, opts)
 		if err != nil {
-			return nil, errors.Wrap(err, "Failed to generate diff")
+			return MarkdownOutput{}, errors.Wrap(err, "Failed to generate diff")
 		}
 
 		diffMsg = ui.StripColor(string(diff))
@@ -227,7 +235,7 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 	})
 	_, err := tmpl.ParseFS(templatesFS, "templates/"+filename)
 	if err != nil {
-		return []byte{}, err
+		return MarkdownOutput{}, err
 	}
 
 	skippedProjectCount := 0
@@ -266,25 +274,32 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 		Options:                      opts,
 		MarkdownOptions:              markdownOpts})
 	if err != nil {
-		return []byte{}, err
+		return MarkdownOutput{}, err
 	}
 
 	bufw.Flush()
 	msg := buf.Bytes()
 
 	msgByteLength := len(msg)
+	msgRuneLength := utf8.RuneCount(msg)
+
+	originalSize := msgRuneLength
+	if opts.originalSize > 0 {
+		originalSize = opts.originalSize
+	}
+
 	if markdownOpts.MaxMessageSize > 0 && msgByteLength > markdownOpts.MaxMessageSize {
-		msgRuneLength := utf8.RuneCount(msg)
 		// truncation relies on rune length
 		q := float64(msgRuneLength) / float64(msgByteLength)
 		truncateLength := msgRuneLength - int(q*float64(markdownOpts.MaxMessageSize))
 		newLength := utf8.RuneCountInString(diffMsg) - truncateLength - 1000
 
 		opts.diffMsg = truncateMiddle(diffMsg, newLength, "\n\n...(truncated due to message size limit)...\n\n")
+		opts.originalSize = msgRuneLength
 		return ToMarkdown(out, opts, markdownOpts)
 	}
 
-	return msg, nil
+	return MarkdownOutput{Msg: msg, RuneLen: msgRuneLength, OriginalMsgSize: originalSize}, nil
 }
 
 func hasCodeChanges(options Options, project Project) bool {
