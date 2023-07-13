@@ -1,3 +1,42 @@
+{{- define "policyOutputTable" }}
+  {{- if or .Failure .Warning }}
+    {{ if .Failure }}
+### ❌ {{ .Name }} (needs action) ###
+    {{ else }}
+### ⚠️ {{ .Name }} (warning) ###
+    {{ end }}
+    {{ if .Message }}
+{{ .Message }}
+    {{ end }}
+    {{- range .Details }}
+> {{ . }}
+
+    {{ end}}
+    {{- range .ResourceDetails }}
+
+> **{{ .Address }}** {{- if .Path }} at `{{ .Path }}{{- if .Line }}:{{ .Line }}{{- end}}`{{- end}}
+      {{- range .Violations }}
+        {{- range .Details }}
+>
+> * {{ . }}
+        {{- end}}
+
+        {{- if gt (len .ProjectNames) 1 }}
+>
+> in projects `{{ stringsJoin .ProjectNames "`, `" }}`
+        {{- else }}
+>
+> in project `{{ index .ProjectNames 0 }}`
+        {{- end }}
+      {{- end}}
+    {{- end}}
+    {{- if .TruncatedCount }}
+
+> ... and {{ .TruncatedCount }} more. View in Infracost Cloud.</p>
+    {{- end}}
+  {{- end }}
+{{- end }}
+
 {{- define "summaryRow"}}
 | {{ truncateMiddle .Name 64 "..." }}{{- range .MetadataFields }} | {{ . }} {{- end }} | {{ formatCostChange .PastCost .Cost }} | {{ formatCost .Cost }} |
 {{- end }}
@@ -29,23 +68,19 @@
 ```
 {{- end }}
 
-{{- if .Options.PolicyChecks.Enabled }}
-	{{- if gt (len .Options.PolicyChecks.Failures) 0 }}
-**Policy checks failed:**
-```
-				{{ range $v, $f := .Options.PolicyChecks.Failures}}
-> {{ $f }}
-				{{- end}}
-```
-	{{ else }}
-**Policy checks passed:**
-```
-			{{ range $v, $f := .Options.PolicyChecks.Passed}}
-> {{ $f }}
-			{{- end}}
-```
-	{{- end }}
-{{- end }}
+{{- if gt (len .Options.PolicyOutput.Checks) 0 }}
+  {{- if .Options.PolicyOutput.HasFailures }}
+## ❌ Policies failed (needs action) ##
+  {{- else if .Options.PolicyOutput.HasWarnings }}
+## ⚠️ Policies warning ##
+  {{- else }}
+## ✅ Policies passed ##
+  {{- end }}
+  {{- range .Options.PolicyOutput.Checks }}
+    {{- template "policyOutputTable" . }}
+  {{- end}}
+{{- end}}
+
 {{- if .MarkdownOptions.WillUpdate }}
 
 This comment will be updated when the cost estimate changes.

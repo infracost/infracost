@@ -1,39 +1,55 @@
-{{- define "tagPolicyTable" }}
-  <table>
-    <thead>
-      <td>Policy Issue</td>
-      <td>File:line</td>
-    </thead>
-  {{- range . }}
-    <tr>
-      <th colspan="2"><b>{{ .Name }}</b>: {{ .Message }}</th>
-    </tr>
-    {{- range .Resources }}
-    <tr>
-      <td>
-        <code>{{ .Address}}</code>
-      {{- if gt (len .ProjectNames) 1 }}
-        in projects {{ stringsJoin .ProjectNames ", " }}
-      {{- else }}
-        in project {{ index .ProjectNames 0 }}
-      {{- end }}
-      {{- if gt (len .Failures) 1 }}
-        <ul>
-        {{- range .Failures }}
-          <li>{{ . }}</li>
-        {{- end }}
-        </ul>
-      {{- else }}
-        {{ index .Failures 0 }}
-      {{- end }}
-      </td>
-      <td>
-        {{ .Path }}{{- if .Line }}:{{ .Line }}{{- end }}
-      </td>
-    </tr>
+{{- define "policyOutputTable" }}
+  {{- if or .Failure .Warning }}
+    {{- if .Failure }}
+      <h4>❌ <b>{{ .Name }}</b> (needs action)</h4>
+    {{- else }}
+      <h4>⚠️ <b>{{ .Name }}</b> (warning)</h4>
     {{- end }}
+    <table>
+      {{- if .Message }}
+        <tr>
+          <td>
+            <p>{{ .Message }}</p>
+          </td>
+        </tr>
+      {{- end }}
+      {{- range .Details }}
+        <tr>
+          <td>
+            <p>{{ . }}</p>
+          </td>
+        </tr>
+      {{- end}}
+      {{- range .ResourceDetails }}
+        <tr>
+{{- /* This td and markdown need to be left aligned to work properly. */ -}}
+<td>
+
+**{{ .Address }}** {{- if .Path }} at `{{ .Path }}{{- if .Line }}:{{ .Line }}{{- end}}`{{- end}}
+{{- range .Violations }}
+  {{- range .Details }}
+* {{ . }}
+  {{- end}}
+  {{ "" }}
+  {{- if gt (len .ProjectNames) 1 }}
+in projects `{{ stringsJoin .ProjectNames "`, `" }}`
+  {{- else }}
+in project `{{ index .ProjectNames 0 }}`
   {{- end }}
-  </table>
+  {{ "" }}
+{{- end }}
+</td>{{- /* This td needs to be left aligned to work properly. */ -}}
+        </tr>
+      {{- end}}
+      {{- if .TruncatedCount }}
+        <tr>
+          <td>
+            <p>... and {{ .TruncatedCount }} more. {{ if cloudURL }}<a href="{{ cloudURL }}" rel="noopener noreferrer" target="_blank">View in Infracost Cloud.</a>{{- end }}</p>
+          </td>
+        </tr>
+      {{- end}}
+    </table>
+  {{- end }}
 {{- end }}
 
 {{- define "summaryRow"}}
@@ -86,45 +102,20 @@
 </details>
 {{- end }}
 
-{{- if .Options.PolicyChecks.Enabled }}
-	{{- if gt (len .Options.PolicyChecks.Failures) 0 }}
-<details>
-<summary><strong>❌ Policy checks failed</strong></summary>
-				{{ range $v, $f := .Options.PolicyChecks.Failures}}
-> - {{ $f }}
-				{{- end}}
-</details>
-	{{ else }}
-<details>
-<summary><strong>✅ Policy checks passed</strong></summary>
-			{{ range $v, $f := .Options.PolicyChecks.Passed}}
-> - {{ $f }}
-			{{- end}}
-</details>
-	{{- end }}
-{{- end }}
-{{- if gt (len .Options.TagPolicyCheck.FailingTagPolicies) 0 }}
-<details>
-  <summary><strong>❌ Tag policy check failed</strong></summary>
-  {{- template "tagPolicyTable" .Options.TagPolicyCheck.FailingTagPolicies }}
-</details>
-{{- end }}
-{{- if gt (len .Options.TagPolicyCheck.WarningTagPolicies) 0 }}
-<details>
-  <summary><strong>🟡 Tag policy warnings</strong></summary>
-  {{- template "tagPolicyTable" .Options.TagPolicyCheck.WarningTagPolicies }}
-</details>
-{{- end }}
-{{- if gt (len .Options.TagPolicyCheck.PassingTagPolicies) 0 }}
-<details>
-  <summary><strong>✅ Tag policies passed</strong></summary>
-  <ul>
-  {{- range .Options.TagPolicyCheck.PassingTagPolicies }}
-    <li><b>{{ .Name }}</b> {{ .Message }}</li>
-  {{- end }}
-  </ul>
-</details>
-{{- end }}
+{{- if gt (len .Options.PolicyOutput.Checks) 0 }}
+  <details>
+    {{- if .Options.PolicyOutput.HasFailures }}
+      <summary><strong>❌ Policies failed (needs action)</strong></summary>
+    {{- else if .Options.PolicyOutput.HasWarnings }}
+      <summary><strong>⚠️ Policies warning</strong></summary>
+    {{- else }}
+      <summary><strong>✅ Policies passed</strong></summary>
+    {{- end }}
+    {{- range .Options.PolicyOutput.Checks }}
+      {{- template "policyOutputTable" . }}
+    {{- end}}
+  </details>
+{{- end}}
 
 {{- if .Options.GuardrailCheck.Comment }}
 	{{- if gt (len .Options.GuardrailCheck.CommentableFailures) 0 }}

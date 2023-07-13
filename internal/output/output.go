@@ -289,12 +289,194 @@ type Options struct {
 	ShowOnlyChanges   bool
 	Fields            []string
 	IncludeHTML       bool
-	PolicyChecks      PolicyCheck
-	TagPolicyCheck    TagPolicyCheck
+	PolicyOutput      PolicyOutput
 	GuardrailCheck    GuardrailCheck
 	diffMsg           string
 	originalSize      int
 	CurrencyFormat    string
+}
+
+// PolicyOutput holds normalized PolicyCheck and TagPolicyCheck data so it can be output in
+// a uniform "Policies" section of the infracost comment.
+type PolicyOutput struct {
+	HasFailures bool
+	HasWarnings bool
+	Checks      []PolicyCheckOutput
+}
+
+type PolicyCheckOutput struct {
+	Name            string
+	Failure         bool
+	Warning         bool
+	Message         string
+	Details         []string
+	ResourceDetails []PolicyCheckResourceDetails
+	TruncatedCount  int
+}
+
+type PolicyCheckResourceDetails struct {
+	Address      string
+	ResourceType string
+	Path         string
+	Line         int
+	Violations   []PolicyCheckViolations
+}
+
+type PolicyCheckViolations struct {
+	Details      []string
+	ProjectNames []string
+}
+
+// merge combines any Violations with identicals Details for two PolicyCheckResourceDetails
+func mergeViolations(violations, otherViolations []PolicyCheckViolations) []PolicyCheckViolations {
+	vMap := map[string]PolicyCheckViolations{}
+	for _, v := range violations {
+		vMap[strings.Join(v.Details, "")] = v
+	}
+
+	// merge violations with identical details
+	for _, otherV := range otherViolations {
+		key := strings.Join(otherV.Details, "")
+
+		if v, ok := vMap[key]; ok {
+			v.ProjectNames = append(v.ProjectNames, otherV.ProjectNames...)
+			sort.Strings(v.ProjectNames)
+			vMap[key] = v
+		} else {
+			vMap[key] = otherV
+		}
+	}
+
+	// preserve output order
+	var vMerged = make([]PolicyCheckViolations, 0, len(vMap))
+	for _, v := range violations {
+		key := strings.Join(v.Details, "")
+		if mergedV, ok := vMap[key]; ok {
+			vMerged = append(vMerged, mergedV)
+			delete(vMap, key)
+		}
+	}
+
+	for _, otherV := range otherViolations {
+		key := strings.Join(otherV.Details, "")
+		if mergedV, ok := vMap[key]; ok {
+			vMerged = append(vMerged, mergedV)
+			delete(vMap, key)
+		}
+	}
+
+	return vMerged
+}
+
+// NewPolicyOutput normalizes a PolicyCheck and a TagPolicyCheck into a PolicyOutput suitable
+// for use in the output markdown template.
+func NewPolicyOutput(pc PolicyCheck, tpc TagPolicyCheck) PolicyOutput {
+	po := PolicyOutput{}
+
+	if pc.Enabled && len(pc.Failures) > 0 {
+		po.HasFailures = true
+		po.Checks = append(po.Checks, PolicyCheckOutput{
+			Name:    "Cost policy failed",
+			Failure: true,
+			Details: pc.Failures,
+		})
+	}
+
+	for _, tagPolicy := range tpc.FailingTagPolicies {
+		po.HasFailures = true
+		po.Checks = append(po.Checks, newTagPolicyCheckOutput(tagPolicy))
+	}
+
+	for _, tagPolicy := range tpc.WarningTagPolicies {
+		po.HasWarnings = true
+		po.Checks = append(po.Checks, newTagPolicyCheckOutput(tagPolicy))
+	}
+
+	for _, tagPolicy := range tpc.PassingTagPolicies {
+		po.Checks = append(po.Checks, newTagPolicyCheckOutput(tagPolicy))
+	}
+
+	if pc.Enabled && len(pc.Passed) > 0 {
+		po.Checks = append(po.Checks, PolicyCheckOutput{
+			Name:    "Cost policy passed",
+			Details: pc.Passed,
+		})
+	}
+
+	return po
+}
+
+var maxTagPolicyResourceDetails = 10
+
+func newTagPolicyCheckOutput(tp TagPolicy) PolicyCheckOutput {
+	// group resources by address so we can show a single block with all project/violation permutations.
+	rdMap := make(map[string]PolicyCheckResourceDetails, len(tp.Resources))
+
+	for _, r := range tp.Resources {
+		var details []string
+		if len(r.MissingMandatoryTags) > 0 {
+			details = append(details, fmt.Sprintf("Missing mandatory tags: `%s`", strings.Join(r.MissingMandatoryTags, "`, `")))
+		}
+
+		for _, it := range r.InvalidTags {
+			if len(it.ValidValues) > 0 {
+				details = append(details, fmt.Sprintf("Invalid value, `%s` must be one of: `%s`", it.Key, strings.Join(it.ValidValues, "`, `")))
+			} else if it.ValidRegex != "" {
+				details = append(details, fmt.Sprintf("Invalid value, `%s` must match regex: `%s`", it.Key, it.ValidRegex))
+			}
+		}
+
+		rd := PolicyCheckResourceDetails{
+			Address:      r.Address,
+			ResourceType: r.ResourceType,
+			Path:         r.Path,
+			Line:         r.Line,
+			Violations: []PolicyCheckViolations{{
+				ProjectNames: r.ProjectNames,
+				Details:      details,
+			}},
+		}
+
+		if existingRd, ok := rdMap[r.Address]; ok {
+			existingRd.Violations = mergeViolations(existingRd.Violations, rd.Violations)
+			rdMap[r.Address] = existingRd
+		} else {
+			rdMap[r.Address] = rd
+		}
+	}
+
+	var failure, warning bool
+	if len(tp.Resources) > 0 {
+		warning = true
+		if tp.BlockPr {
+			failure = true
+		}
+	}
+
+	// preserve resource order
+	resourceDetails := make([]PolicyCheckResourceDetails, 0, len(rdMap))
+	for _, r := range tp.Resources {
+		if rd, ok := rdMap[r.Address]; ok {
+			resourceDetails = append(resourceDetails, rd)
+			delete(rdMap, r.Address)
+		}
+	}
+
+	tc := 0
+	if len(resourceDetails) > maxTagPolicyResourceDetails {
+		// truncate the list of resources so we don't go over the size limit of comments
+		tc = len(resourceDetails) - maxTagPolicyResourceDetails
+		resourceDetails = resourceDetails[:maxTagPolicyResourceDetails]
+	}
+
+	return PolicyCheckOutput{
+		Name:            tp.Name,
+		Message:         tp.Message,
+		Failure:         failure,
+		Warning:         warning,
+		ResourceDetails: resourceDetails,
+		TruncatedCount:  tc,
+	}
 }
 
 // PolicyCheck holds information if a given run has any policy checks enabled.

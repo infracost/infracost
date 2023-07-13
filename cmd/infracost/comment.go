@@ -126,8 +126,7 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 	opts := output.Options{
 		DashboardEndpoint: ctx.Config.DashboardEndpoint,
 		NoColor:           ctx.Config.NoColor,
-		PolicyChecks:      policyChecks,
-		TagPolicyCheck:    tagPolicyCheck,
+		PolicyOutput:      output.NewPolicyOutput(policyChecks, tagPolicyCheck),
 		GuardrailCheck:    guardrailCheck,
 	}
 	opts.ShowAllProjects, _ = cmd.Flags().GetBool("show-all-projects")
