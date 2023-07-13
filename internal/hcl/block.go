@@ -812,15 +812,23 @@ func (b *Block) GetAttributes() []*Attribute {
 	}
 
 	hclAttributes := b.getHCLAttributes()
-	var attributes = make([]*Attribute, 0, len(hclAttributes))
-	for _, attr := range hclAttributes {
+
+	// Sort the attributes so the order is deterministic
+	keys := make([]string, 0, len(hclAttributes))
+	for k := range hclAttributes {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	var attributes = make([]*Attribute, 0, len(keys))
+	for _, k := range keys {
 		attributes = append(attributes, &Attribute{
 			newMock: b.newMock,
-			HCLAttr: attr,
+			HCLAttr: hclAttributes[k],
 			Ctx:     b.context,
 			Verbose: b.verbose,
 			Logger: b.logger.WithFields(logrus.Fields{
-				"attribute_name": attr.Name,
+				"attribute_name": hclAttributes[k].Name,
 			}),
 		})
 	}
