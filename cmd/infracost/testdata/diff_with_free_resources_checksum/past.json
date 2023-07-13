@@ -1,0 +1,302 @@
+{
+  "version": "0.2",
+  "metadata": {
+    "infracostCommand": "breakdown",
+    "vcsBranch": "stub-branch",
+    "vcsCommitSha": "stub-sha",
+    "vcsCommitAuthorName": "stub-author",
+    "vcsCommitAuthorEmail": "stub@stub.com",
+    "vcsCommitTimestamp": "2022-06-20T10:54:52.476526-04:00",
+    "vcsCommitMessage": "stub-message",
+    "vcsRepositoryUrl": "https://github.com/infracost/infracost"
+  },
+  "currency": "USD",
+  "projects": [
+    {
+      "name": "infracost/infracost/cmd/infracost/testdata/diff_with_free_resources_checksum",
+      "metadata": {
+        "path": "testdata/diff_with_free_resources_checksum",
+        "type": "terraform_dir",
+        "vcsSubPath": "cmd/infracost/testdata/diff_with_free_resources_checksum",
+        "providers": [
+          {
+            "name": "aws",
+            "filename": "testdata/diff_with_free_resources_checksum/main.tf",
+            "startLine": 1,
+            "endLine": 7
+          }
+        ]
+      },
+      "pastBreakdown": {
+        "resources": [
+          {
+            "name": "aws_instance.web_app",
+            "resourceType": "aws_instance",
+            "tags": {},
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_instance.web_app",
+                  "filename": "testdata/diff_with_free_resources_checksum/main.tf"
+                }
+              ],
+              "checksum": "e529ad309bb6d647fae2d2854bc0d7f04a7888eceb9580ac224d15cc3384a825",
+              "endLine": 23,
+              "filename": "testdata/diff_with_free_resources_checksum/main.tf",
+              "startLine": 9
+            },
+            "hourlyCost": "1.017315068493150679",
+            "monthlyCost": "742.64",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, m5.4xlarge)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.768",
+                "hourlyCost": "0.768",
+                "monthlyCost": "560.64"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.00684931506849315",
+                "monthlyCost": "5",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.0684931506849315",
+                    "monthlyQuantity": "50",
+                    "price": "0.1",
+                    "hourlyCost": "0.00684931506849315",
+                    "monthlyCost": "5"
+                  }
+                ]
+              },
+              {
+                "name": "ebs_block_device[0]",
+                "metadata": {},
+                "hourlyCost": "0.242465753424657529",
+                "monthlyCost": "177",
+                "costComponents": [
+                  {
+                    "name": "Storage (provisioned IOPS SSD, io1)",
+                    "unit": "GB",
+                    "hourlyQuantity": "1.3698630136986301",
+                    "monthlyQuantity": "1000",
+                    "price": "0.125",
+                    "hourlyCost": "0.1712328767123287625",
+                    "monthlyCost": "125"
+                  },
+                  {
+                    "name": "Provisioned IOPS",
+                    "unit": "IOPS",
+                    "hourlyQuantity": "1.0958904109589041",
+                    "monthlyQuantity": "800",
+                    "price": "0.065",
+                    "hourlyCost": "0.0712328767123287665",
+                    "monthlyCost": "52"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "freeResources": [
+          {
+            "name": "aws_codebuild_webhook.example",
+            "resourceType": "aws_codebuild_webhook",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_codebuild_webhook.example",
+                  "filename": "testdata/diff_with_free_resources_checksum/main.tf"
+                }
+              ],
+              "checksum": "9489cd283d372cbf740f1f5c8c50e08ce739a871215b7b29001436c17fb8aa88",
+              "endLine": 70,
+              "filename": "testdata/diff_with_free_resources_checksum/main.tf",
+              "startLine": 56
+            }
+          },
+          {
+            "name": "aws_codepipeline.codepipeline",
+            "resourceType": "aws_codepipeline",
+            "tags": {},
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_codepipeline.codepipeline",
+                  "filename": "testdata/diff_with_free_resources_checksum/main.tf"
+                }
+              ],
+              "checksum": "61ffec20ce052ebba3b574712c43bb5381b373f7c1b99c6b00b955940a524885",
+              "endLine": 53,
+              "filename": "testdata/diff_with_free_resources_checksum/main.tf",
+              "startLine": 26
+            }
+          }
+        ],
+        "totalHourlyCost": "1.017315068493150679",
+        "totalMonthlyCost": "742.64"
+      },
+      "breakdown": {
+        "resources": [
+          {
+            "name": "aws_instance.web_app",
+            "resourceType": "aws_instance",
+            "tags": {},
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_instance.web_app",
+                  "filename": "testdata/diff_with_free_resources_checksum/main.tf"
+                }
+              ],
+              "checksum": "e529ad309bb6d647fae2d2854bc0d7f04a7888eceb9580ac224d15cc3384a825",
+              "endLine": 23,
+              "filename": "testdata/diff_with_free_resources_checksum/main.tf",
+              "startLine": 9
+            },
+            "hourlyCost": "1.017315068493150679",
+            "monthlyCost": "742.64",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, m5.4xlarge)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.768",
+                "hourlyCost": "0.768",
+                "monthlyCost": "560.64"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.00684931506849315",
+                "monthlyCost": "5",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.0684931506849315",
+                    "monthlyQuantity": "50",
+                    "price": "0.1",
+                    "hourlyCost": "0.00684931506849315",
+                    "monthlyCost": "5"
+                  }
+                ]
+              },
+              {
+                "name": "ebs_block_device[0]",
+                "metadata": {},
+                "hourlyCost": "0.242465753424657529",
+                "monthlyCost": "177",
+                "costComponents": [
+                  {
+                    "name": "Storage (provisioned IOPS SSD, io1)",
+                    "unit": "GB",
+                    "hourlyQuantity": "1.3698630136986301",
+                    "monthlyQuantity": "1000",
+                    "price": "0.125",
+                    "hourlyCost": "0.1712328767123287625",
+                    "monthlyCost": "125"
+                  },
+                  {
+                    "name": "Provisioned IOPS",
+                    "unit": "IOPS",
+                    "hourlyQuantity": "1.0958904109589041",
+                    "monthlyQuantity": "800",
+                    "price": "0.065",
+                    "hourlyCost": "0.0712328767123287665",
+                    "monthlyCost": "52"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "freeResources": [
+          {
+            "name": "aws_codebuild_webhook.example",
+            "resourceType": "aws_codebuild_webhook",
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_codebuild_webhook.example",
+                  "filename": "testdata/diff_with_free_resources_checksum/main.tf"
+                }
+              ],
+              "checksum": "9489cd283d372cbf740f1f5c8c50e08ce739a871215b7b29001436c17fb8aa88",
+              "endLine": 70,
+              "filename": "testdata/diff_with_free_resources_checksum/main.tf",
+              "startLine": 56
+            }
+          },
+          {
+            "name": "aws_codepipeline.codepipeline",
+            "resourceType": "aws_codepipeline",
+            "tags": {},
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_codepipeline.codepipeline",
+                  "filename": "testdata/diff_with_free_resources_checksum/main.tf"
+                }
+              ],
+              "checksum": "61ffec20ce052ebba3b574712c43bb5381b373f7c1b99c6b00b955940a524885",
+              "endLine": 53,
+              "filename": "testdata/diff_with_free_resources_checksum/main.tf",
+              "startLine": 26
+            }
+          }
+        ],
+        "totalHourlyCost": "1.017315068493150679",
+        "totalMonthlyCost": "742.64"
+      },
+      "diff": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
+      },
+      "summary": {
+        "totalDetectedResources": 3,
+        "totalSupportedResources": 1,
+        "totalUnsupportedResources": 1,
+        "totalUsageBasedResources": 1,
+        "totalNoPriceResources": 1,
+        "unsupportedResourceCounts": {
+          "aws_codepipeline": 1
+        },
+        "noPriceResourceCounts": {
+          "aws_codebuild_webhook": 1
+        }
+      }
+    }
+  ],
+  "totalHourlyCost": "1.017315068493150679",
+  "totalMonthlyCost": "742.64",
+  "pastTotalHourlyCost": "1.017315068493150679",
+  "pastTotalMonthlyCost": "742.64",
+  "diffTotalHourlyCost": "0",
+  "diffTotalMonthlyCost": "0",
+  "timeGenerated": "2022-06-20T10:54:52.476526-04:00",
+  "summary": {
+    "totalDetectedResources": 3,
+    "totalSupportedResources": 1,
+    "totalUnsupportedResources": 1,
+    "totalUsageBasedResources": 1,
+    "totalNoPriceResources": 1,
+    "unsupportedResourceCounts": {
+      "aws_codepipeline": 1
+    },
+    "noPriceResourceCounts": {
+      "aws_codebuild_webhook": 1
+    }
+  }
+}

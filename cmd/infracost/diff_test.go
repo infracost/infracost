@@ -9,6 +9,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/testutil"
 )
 
@@ -274,4 +275,20 @@ func TestDiffTerraform_v0_12(t *testing.T) {
 
 func TestDiffTerraform_v0_14(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"diff", "--path", "./testdata/terraform_v0.14_plan.json"}, nil)
+}
+
+func TestDiffWithFreeResourcesChecksum(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"diff",
+			"--compare-to", filepath.Join(dir, "past.json"),
+			"--path", dir,
+			"--format", "json",
+		}, &GoldenFileOptions{IsJSON: true}, func(ctx *config.RunContext) {
+			ctx.Config.TagPoliciesEnabled = true
+		})
 }

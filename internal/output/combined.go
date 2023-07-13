@@ -19,6 +19,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/infracost/infracost/internal/clierror"
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 )
 
@@ -110,7 +111,7 @@ func LoadPaths(paths []string) ([]ReportInput, error) {
 // Each project in current Root will have all past resources overwritten with the matching projects
 // in the prior Root. If we can't find a matching project then we assume that the project
 // has been newly created and will show a 100% increase in the output Root.
-func CompareTo(current, prior Root) (Root, error) {
+func CompareTo(c *config.Config, current, prior Root) (Root, error) {
 	priorProjects := make(map[string]*schema.Project)
 	for _, p := range prior.Projects {
 		if _, ok := priorProjects[p.LabelWithMetadata()]; ok {
@@ -164,7 +165,7 @@ func CompareTo(current, prior Root) (Root, error) {
 
 	sort.Sort(schemaProjects)
 
-	out, err := ToOutputFormat(schemaProjects)
+	out, err := ToOutputFormat(c, schemaProjects)
 	if err != nil {
 		return out, err
 	}

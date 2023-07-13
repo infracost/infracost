@@ -33,6 +33,7 @@ type QueryCLISettingsResponse struct {
 	CloudEnabled       bool `json:"cloudEnabled"`
 	ActualCostsEnabled bool `json:"actualCostsEnabled"`
 	UsageAPIEnabled    bool `json:"usageApiEnabled"`
+	TagsAPIEnabled     bool `json:"tagsApiEnabled"`
 }
 
 type runInput struct {
@@ -213,6 +214,7 @@ func (c *DashboardAPIClient) QueryCLISettings() (QueryCLISettingsResponse, error
             	cloudEnabled
 				actualCostsEnabled
 				usageApiEnabled
+				tagsApiEnabled
         	}
     	}
 	`
@@ -229,6 +231,7 @@ func (c *DashboardAPIClient) QueryCLISettings() (QueryCLISettingsResponse, error
 		response.CloudEnabled = results[0].Get("data.cliSettings.cloudEnabled").Bool()
 		response.ActualCostsEnabled = results[0].Get("data.cliSettings.actualCostsEnabled").Bool()
 		response.UsageAPIEnabled = results[0].Get("data.cliSettings.usageApiEnabled").Bool()
+		response.TagsAPIEnabled = results[0].Get("data.cliSettings.tagsApiEnabled").Bool()
 	}
 	return response, nil
 }

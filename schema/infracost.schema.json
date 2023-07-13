@@ -44,6 +44,12 @@
           },
           "type": "array"
         },
+        "freeResources": {
+          "items": {
+            "$ref": "#/definitions/Resource"
+          },
+          "type": "array"
+        },
         "totalHourlyCost": {
           "type": ["string", "null"]
         },
@@ -343,9 +349,7 @@
     "Resource": {
       "required": [
         "name",
-        "metadata",
-        "hourlyCost",
-        "monthlyCost"
+        "metadata"
       ],
       "properties": {
         "name": {
@@ -481,9 +485,7 @@
     "Subresource": {
       "required": [
         "name",
-        "metadata",
-        "hourlyCost",
-        "monthlyCost"
+        "metadata"
       ],
       "properties": {
         "name": {

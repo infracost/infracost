@@ -14,6 +14,7 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/infracost/infracost/internal/usage"
@@ -85,12 +86,12 @@ type Project struct {
 func (p Project) ToSchemaProject() *schema.Project {
 	var pastResources []*schema.Resource
 	if p.PastBreakdown != nil {
-		pastResources = convertOutputResources(p.PastBreakdown.Resources)
+		pastResources = append(convertOutputResources(p.PastBreakdown.Resources, false), convertOutputResources(p.PastBreakdown.FreeResources, true)...)
 	}
 
 	var resources []*schema.Resource
 	if p.Breakdown != nil {
-		resources = convertOutputResources(p.Breakdown.Resources)
+		resources = append(convertOutputResources(p.Breakdown.Resources, false), convertOutputResources(p.Breakdown.FreeResources, true)...)
 	}
 
 	return &schema.Project{
@@ -101,16 +102,17 @@ func (p Project) ToSchemaProject() *schema.Project {
 	}
 }
 
-func convertOutputResources(outResources []Resource) []*schema.Resource {
+func convertOutputResources(outResources []Resource, skip bool) []*schema.Resource {
 	resources := make([]*schema.Resource, len(outResources))
 
 	for i, resource := range outResources {
 		resources[i] = &schema.Resource{
 			Name:           resource.Name,
+			IsSkipped:      skip,
 			Metadata:       convertMetadata(resource.Metadata),
 			CostComponents: convertCostComponents(resource.CostComponents),
 			ActualCosts:    convertActualCosts(resource.ActualCosts),
-			SubResources:   convertOutputResources(resource.SubResources),
+			SubResources:   convertOutputResources(resource.SubResources, skip),
 			Tags:           resource.Tags,
 			HourlyCost:     resource.HourlyCost,
 			MonthlyCost:    resource.MonthlyCost,
@@ -225,6 +227,7 @@ func (p *Project) LabelWithMetadata() string {
 
 type Breakdown struct {
 	Resources        []Resource       `json:"resources"`
+	FreeResources    []Resource       `json:"freeResources,omitempty"`
 	TotalHourlyCost  *decimal.Decimal `json:"totalHourlyCost"`
 	TotalMonthlyCost *decimal.Decimal `json:"totalMonthlyCost"`
 }
@@ -251,8 +254,8 @@ type Resource struct {
 	ResourceType   string                 `json:"resourceType,omitempty"`
 	Tags           *map[string]string     `json:"tags,omitempty"`
 	Metadata       map[string]interface{} `json:"metadata"`
-	HourlyCost     *decimal.Decimal       `json:"hourlyCost"`
-	MonthlyCost    *decimal.Decimal       `json:"monthlyCost"`
+	HourlyCost     *decimal.Decimal       `json:"hourlyCost,omitempty"`
+	MonthlyCost    *decimal.Decimal       `json:"monthlyCost,omitempty"`
 	CostComponents []CostComponent        `json:"costComponents,omitempty"`
 	ActualCosts    []ActualCosts          `json:"actualCosts,omitempty"`
 	SubResources   []Resource             `json:"subresources,omitempty"`
@@ -568,27 +571,33 @@ type MarkdownOptions struct {
 	MaxMessageSize      int
 }
 
-func outputBreakdown(resources []*schema.Resource) *Breakdown {
-	arr := make([]Resource, 0, len(resources))
+func outputBreakdown(c *config.Config, resources []*schema.Resource) *Breakdown {
+	supportedResources := make([]Resource, 0, len(resources))
+	freeResources := make([]Resource, 0, len(resources))
 
 	for _, r := range resources {
 		if r.IsSkipped {
+			if c.TagPoliciesEnabled {
+				freeResources = append(freeResources, newResource(r, nil, nil, nil))
+			}
+
 			continue
 		}
-		arr = append(arr, outputResource(r))
+		supportedResources = append(supportedResources, outputResource(r))
 	}
 
-	sortResources(arr, "")
+	sortResources(supportedResources, "")
+	sortResources(freeResources, "")
 
-	totalMonthlyCost, totalHourlyCost := calculateTotalCosts(arr)
+	totalMonthlyCost, totalHourlyCost := calculateTotalCosts(supportedResources)
 
 	return &Breakdown{
-		Resources:        arr,
+		Resources:        supportedResources,
+		FreeResources:    freeResources,
 		TotalHourlyCost:  totalMonthlyCost,
 		TotalMonthlyCost: totalHourlyCost,
 	}
 }
-
 func outputResource(r *schema.Resource) Resource {
 	comps := outputCostComponents(r.CostComponents)
 
@@ -599,6 +608,10 @@ func outputResource(r *schema.Resource) Resource {
 		subresources = append(subresources, outputResource(s))
 	}
 
+	return newResource(r, comps, actualCosts, subresources)
+}
+
+func newResource(r *schema.Resource, comps []CostComponent, actualCosts []ActualCosts, subresources []Resource) Resource {
 	metadata := make(map[string]interface{})
 	if r.Metadata != nil {
 		for k, v := range r.Metadata {
@@ -648,7 +661,7 @@ func outputActualCosts(actualCosts []*schema.ActualCosts) []ActualCosts {
 	return acs
 }
 
-func ToOutputFormat(projects []*schema.Project) (Root, error) {
+func ToOutputFormat(c *config.Config, projects []*schema.Project) (Root, error) {
 	var totalMonthlyCost, totalHourlyCost,
 		pastTotalMonthlyCost, pastTotalHourlyCost,
 		diffTotalMonthlyCost, diffTotalHourlyCost *decimal.Decimal
@@ -660,7 +673,7 @@ func ToOutputFormat(projects []*schema.Project) (Root, error) {
 	for _, project := range projects {
 		var pastBreakdown, breakdown, diff *Breakdown
 
-		breakdown = outputBreakdown(project.Resources)
+		breakdown = outputBreakdown(c, project.Resources)
 
 		if breakdown != nil {
 			if breakdown.TotalHourlyCost != nil {
@@ -679,8 +692,8 @@ func ToOutputFormat(projects []*schema.Project) (Root, error) {
 		}
 
 		if project.HasDiff {
-			pastBreakdown = outputBreakdown(project.PastResources)
-			diff = outputBreakdown(project.Diff)
+			pastBreakdown = outputBreakdown(c, project.PastResources)
+			diff = outputBreakdown(c, project.Diff)
 
 			if pastBreakdown != nil {
 				if pastBreakdown.TotalHourlyCost != nil {
