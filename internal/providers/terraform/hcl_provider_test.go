@@ -215,6 +215,15 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 			got := p.LoadPlanJSONs()
 			require.NoError(t, err)
 
+			root := got[0]
+
+			// uncomment and run `make test` to update the expectations
+			// var prettyJSON bytes.Buffer
+			// err = json2.Indent(&prettyJSON, root.JSON, "", "  ")
+			// assert.NoError(t, err)
+			// err = os.WriteFile(path.Join(testPath, "expected.json"), append(prettyJSON.Bytes(), "\n"...), 0600)
+			// assert.NoError(t, err)
+
 			tmpl, err := template.ParseFiles(path.Join(testPath, "expected.json"))
 			require.NoError(t, err)
 
@@ -223,7 +232,6 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 			require.NoError(t, err)
 
 			expected := exp.String()
-			root := got[0]
 			actual := string(root.JSON)
 			assert.JSONEq(t, expected, actual)
 

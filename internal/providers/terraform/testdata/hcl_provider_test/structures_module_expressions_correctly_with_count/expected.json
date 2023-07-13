@@ -26,17 +26,21 @@
                   "calls": [
                     {
                       "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/main.tf",
-                      "blockName": "module.module1"
+                      "blockName": "module.module1",
+                      "startLine": 9,
+                      "endLine": 12
                     },
                     {
                       "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
-                      "blockName": "aws_ecs_service.ecs_service"
+                      "blockName": "aws_ecs_service.ecs_service",
+                      "startLine": 32,
+                      "endLine": 39
                     }
                   ],
                   "checksum": "d3c2ce2c95dae9abc092f37146b8a5dab40afe96a7f613811fdf696174d90fe1",
+                  "endLine": 39,
                   "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
-                  "startLine": 32,
-                  "endLine": 39
+                  "startLine": 32
                 }
               },
               {
@@ -67,17 +71,21 @@
                   "calls": [
                     {
                       "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/main.tf",
-                      "blockName": "module.module1"
+                      "blockName": "module.module1",
+                      "startLine": 9,
+                      "endLine": 12
                     },
                     {
                       "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
-                      "blockName": "aws_ecs_task_definition.ecs_task"
+                      "blockName": "aws_ecs_task_definition.ecs_task",
+                      "startLine": 6,
+                      "endLine": 30
                     }
                   ],
                   "checksum": "40f6429fb6ec11b145e9c44865ec17c1944c1a7cef0db118096f13cf29bfb8b0",
+                  "endLine": 30,
                   "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
-                  "startLine": 6,
-                  "endLine": 30
+                  "startLine": 6
                 }
               }
             ],
@@ -104,21 +112,27 @@
                       "calls": [
                         {
                           "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/main.tf",
-                          "blockName": "module.module1"
+                          "blockName": "module.module1",
+                          "startLine": 9,
+                          "endLine": 12
                         },
                         {
                           "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
-                          "blockName": "module.module2"
+                          "blockName": "module.module2",
+                          "startLine": 41,
+                          "endLine": 44
                         },
                         {
                           "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf",
-                          "blockName": "aws_ecs_service.ecs_service"
+                          "blockName": "aws_ecs_service.ecs_service",
+                          "startLine": 32,
+                          "endLine": 39
                         }
                       ],
                       "checksum": "24062f2b3bf4a6d41ca253d8e735ae757ee8886f2dd946e746fe87ca2763919f",
+                      "endLine": 39,
                       "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf",
-                      "startLine": 32,
-                      "endLine": 39
+                      "startLine": 32
                     }
                   },
                   {
@@ -149,21 +163,27 @@
                       "calls": [
                         {
                           "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/main.tf",
-                          "blockName": "module.module1"
+                          "blockName": "module.module1",
+                          "startLine": 9,
+                          "endLine": 12
                         },
                         {
                           "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
-                          "blockName": "module.module2"
+                          "blockName": "module.module2",
+                          "startLine": 41,
+                          "endLine": 44
                         },
                         {
                           "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf",
-                          "blockName": "aws_ecs_task_definition.ecs_task"
+                          "blockName": "aws_ecs_task_definition.ecs_task",
+                          "startLine": 6,
+                          "endLine": 30
                         }
                       ],
                       "checksum": "57c875c1fc903c5f6d5f63abde5e3c5b3ee2f368b7ce79f7eed17a16d710c658",
+                      "endLine": 30,
                       "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf",
-                      "startLine": 6,
-                      "endLine": 30
+                      "startLine": 6
                     }
                   }
                 ],
@@ -199,17 +219,21 @@
                 "calls": [
                   {
                     "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/main.tf",
-                    "blockName": "module.module1"
+                    "blockName": "module.module1",
+                    "startLine": 9,
+                    "endLine": 12
                   },
                   {
                     "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
-                    "blockName": "aws_ecs_service.ecs_service"
+                    "blockName": "aws_ecs_service.ecs_service",
+                    "startLine": 32,
+                    "endLine": 39
                   }
                 ],
                 "checksum": "d3c2ce2c95dae9abc092f37146b8a5dab40afe96a7f613811fdf696174d90fe1",
+                "endLine": 39,
                 "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
-                "startLine": 32,
-                "endLine": 39
+                "startLine": 32
               }
             },
             {
@@ -240,17 +264,21 @@
                 "calls": [
                   {
                     "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/main.tf",
-                    "blockName": "module.module1"
+                    "blockName": "module.module1",
+                    "startLine": 9,
+                    "endLine": 12
                   },
                   {
                     "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
-                    "blockName": "aws_ecs_task_definition.ecs_task"
+                    "blockName": "aws_ecs_task_definition.ecs_task",
+                    "startLine": 6,
+                    "endLine": 30
                   }
                 ],
                 "checksum": "40f6429fb6ec11b145e9c44865ec17c1944c1a7cef0db118096f13cf29bfb8b0",
+                "endLine": 30,
                 "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
-                "startLine": 6,
-                "endLine": 30
+                "startLine": 6
               }
             }
           ],
@@ -277,21 +305,27 @@
                     "calls": [
                       {
                         "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/main.tf",
-                        "blockName": "module.module1"
+                        "blockName": "module.module1",
+                        "startLine": 9,
+                        "endLine": 12
                       },
                       {
                         "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
-                        "blockName": "module.module2"
+                        "blockName": "module.module2",
+                        "startLine": 41,
+                        "endLine": 44
                       },
                       {
                         "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf",
-                        "blockName": "aws_ecs_service.ecs_service"
+                        "blockName": "aws_ecs_service.ecs_service",
+                        "startLine": 32,
+                        "endLine": 39
                       }
                     ],
                     "checksum": "24062f2b3bf4a6d41ca253d8e735ae757ee8886f2dd946e746fe87ca2763919f",
+                    "endLine": 39,
                     "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf",
-                    "startLine": 32,
-                    "endLine": 39
+                    "startLine": 32
                   }
                 },
                 {
@@ -322,21 +356,27 @@
                     "calls": [
                       {
                         "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/main.tf",
-                        "blockName": "module.module1"
+                        "blockName": "module.module1",
+                        "startLine": 9,
+                        "endLine": 12
                       },
                       {
                         "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/main.tf",
-                        "blockName": "module.module2"
+                        "blockName": "module.module2",
+                        "startLine": 41,
+                        "endLine": 44
                       },
                       {
                         "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf",
-                        "blockName": "aws_ecs_task_definition.ecs_task"
+                        "blockName": "aws_ecs_task_definition.ecs_task",
+                        "startLine": 6,
+                        "endLine": 30
                       }
                     ],
                     "checksum": "57c875c1fc903c5f6d5f63abde5e3c5b3ee2f368b7ce79f7eed17a16d710c658",
+                    "endLine": 30,
                     "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/modules/module1/modules/module2/main.tf",
-                    "startLine": 6,
-                    "endLine": 30
+                    "startLine": 6
                   }
                 }
               ],
@@ -345,6 +385,111 @@
           ]
         }
       ]
+    }
+  },
+  "configuration": {
+    "provider_config": {
+      "aws": {
+        "name": "aws",
+        "expressions": {
+          "region": {
+            "constant_value": "us-east-1"
+          }
+        },
+        "infracost_metadata": {
+          "end_line": 7,
+          "filename": "testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/main.tf",
+          "start_line": 1
+        }
+      }
+    },
+    "root_module": {
+      "module_calls": {
+        "module1": {
+          "source": "./modules/module1",
+          "module": {
+            "resources": [
+              {
+                "address": "aws_ecs_service.ecs_service",
+                "mode": "managed",
+                "type": "aws_ecs_service",
+                "name": "ecs_service",
+                "provider_config_key": "module1:aws",
+                "expressions": {
+                  "task_definition": {
+                    "references": [
+                      "aws_ecs_task_definition.ecs_task",
+                      "aws_ecs_task_definition.ecs_task"
+                    ]
+                  }
+                },
+                "schema_version": 0,
+                "count_expression": {
+                  "references": [
+                    "var.enabled"
+                  ]
+                }
+              },
+              {
+                "address": "aws_ecs_task_definition.ecs_task",
+                "mode": "managed",
+                "type": "aws_ecs_task_definition",
+                "name": "ecs_task",
+                "provider_config_key": "module1:aws",
+                "schema_version": 0,
+                "count_expression": {
+                  "references": [
+                    "var.enabled"
+                  ]
+                }
+              }
+            ],
+            "module_calls": {
+              "module2": {
+                "source": "./modules/module2",
+                "module": {
+                  "resources": [
+                    {
+                      "address": "aws_ecs_service.ecs_service",
+                      "mode": "managed",
+                      "type": "aws_ecs_service",
+                      "name": "ecs_service",
+                      "provider_config_key": "module2:aws",
+                      "expressions": {
+                        "task_definition": {
+                          "references": [
+                            "aws_ecs_task_definition.ecs_task",
+                            "aws_ecs_task_definition.ecs_task"
+                          ]
+                        }
+                      },
+                      "schema_version": 0,
+                      "count_expression": {
+                        "references": [
+                          "var.enabled"
+                        ]
+                      }
+                    },
+                    {
+                      "address": "aws_ecs_task_definition.ecs_task",
+                      "mode": "managed",
+                      "type": "aws_ecs_task_definition",
+                      "name": "ecs_task",
+                      "provider_config_key": "module2:aws",
+                      "schema_version": 0,
+                      "count_expression": {
+                        "references": [
+                          "var.enabled"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "infracost_resource_changes": [
@@ -454,110 +599,5 @@
         }
       }
     }
-  ],
-  "configuration": {
-    "provider_config": {
-      "aws": {
-        "name": "aws",
-        "expressions": {
-          "region": {
-            "constant_value": "us-east-1"
-          }
-        },
-        "infracost_metadata": {
-          "end_line":7,
-          "filename":"testdata/hcl_provider_test/structures_module_expressions_correctly_with_count/main.tf",
-          "start_line":1
-        }
-      }
-    },
-    "root_module": {
-      "module_calls": {
-        "module1": {
-          "source": "./modules/module1",
-          "module": {
-            "resources": [
-              {
-                "address": "aws_ecs_service.ecs_service",
-                "mode": "managed",
-                "type": "aws_ecs_service",
-                "name": "ecs_service",
-                "provider_config_key": "module1:aws",
-                "expressions": {
-                  "task_definition": {
-                    "references": [
-                      "aws_ecs_task_definition.ecs_task",
-                      "aws_ecs_task_definition.ecs_task"
-                    ]
-                  }
-                },
-                "schema_version": 0,
-                "count_expression": {
-                  "references": [
-                    "var.enabled"
-                  ]
-                }
-              },
-              {
-                "address": "aws_ecs_task_definition.ecs_task",
-                "mode": "managed",
-                "type": "aws_ecs_task_definition",
-                "name": "ecs_task",
-                "provider_config_key": "module1:aws",
-                "schema_version": 0,
-                "count_expression": {
-                  "references": [
-                    "var.enabled"
-                  ]
-                }
-              }
-            ],
-            "module_calls": {
-              "module2": {
-                "source": "./modules/module2",
-                "module": {
-                  "resources": [
-                    {
-                      "address": "aws_ecs_service.ecs_service",
-                      "mode": "managed",
-                      "type": "aws_ecs_service",
-                      "name": "ecs_service",
-                      "provider_config_key": "module2:aws",
-                      "expressions": {
-                        "task_definition": {
-                          "references": [
-                            "aws_ecs_task_definition.ecs_task",
-                            "aws_ecs_task_definition.ecs_task"
-                          ]
-                        }
-                      },
-                      "schema_version": 0,
-                      "count_expression": {
-                        "references": [
-                          "var.enabled"
-                        ]
-                      }
-                    },
-                    {
-                      "address": "aws_ecs_task_definition.ecs_task",
-                      "mode": "managed",
-                      "type": "aws_ecs_task_definition",
-                      "name": "ecs_task",
-                      "provider_config_key": "module2:aws",
-                      "schema_version": 0,
-                      "count_expression": {
-                        "references": [
-                          "var.enabled"
-                        ]
-                      }
-                    }
-                  ]
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-  }
+  ]
 }
