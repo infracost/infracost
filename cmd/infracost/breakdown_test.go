@@ -82,6 +82,42 @@ func TestBreakdownFormatJsonWithTags(t *testing.T) {
 	)
 }
 
+func TestBreakdownFormatJsonWithTagsAzure(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testName,
+		[]string{
+			"breakdown",
+			"--format", "json",
+			"--path", dir,
+		},
+		&GoldenFileOptions{
+			CaptureLogs: true,
+			IsJSON:      true,
+		},
+	)
+}
+
+func TestBreakdownFormatJsonWithTagsGoogle(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testName,
+		[]string{
+			"breakdown",
+			"--format", "json",
+			"--path", dir,
+		},
+		&GoldenFileOptions{
+			CaptureLogs: true,
+			IsJSON:      true,
+		},
+	)
+}
+
 func TestBreakdownFormatJSONShowSkipped(t *testing.T) {
 	opts := DefaultOptions()
 	opts.IsJSON = true
