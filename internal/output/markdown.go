@@ -121,7 +121,15 @@ type MarkdownCtx struct {
 	MarkdownOptions              MarkdownOptions
 }
 
-func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, error, int, int) {
+// MarkdownOutput holds the message converted to markdown with additional
+// information about its length.
+type MarkdownOutput struct {
+	Msg             []byte
+	RuneLen         int
+	OriginalMsgSize int
+}
+
+func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) (MarkdownOutput, error) {
 	var diffMsg string
 
 	if opts.diffMsg != "" {
@@ -129,7 +137,7 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 	} else {
 		diff, err := ToDiff(out, opts)
 		if err != nil {
-			return nil, errors.Wrap(err, "Failed to generate diff"), 0, 0
+			return MarkdownOutput{}, errors.Wrap(err, "Failed to generate diff")
 		}
 
 		diffMsg = ui.StripColor(string(diff))
@@ -227,7 +235,7 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 	})
 	_, err := tmpl.ParseFS(templatesFS, "templates/"+filename)
 	if err != nil {
-		return []byte{}, err, 0, 0
+		return MarkdownOutput{}, err
 	}
 
 	skippedProjectCount := 0
@@ -266,7 +274,7 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 		Options:                      opts,
 		MarkdownOptions:              markdownOpts})
 	if err != nil {
-		return []byte{}, err, 0, 0
+		return MarkdownOutput{}, err
 	}
 
 	bufw.Flush()
@@ -275,11 +283,9 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 	msgByteLength := len(msg)
 	msgRuneLength := utf8.RuneCount(msg)
 
-	var originalSize int
+	originalSize := msgRuneLength
 	if opts.originalSize > 0 {
 		originalSize = opts.originalSize
-	} else {
-		originalSize = msgRuneLength
 	}
 
 	if markdownOpts.MaxMessageSize > 0 && msgByteLength > markdownOpts.MaxMessageSize {
@@ -293,7 +299,7 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) ([]byte, e
 		return ToMarkdown(out, opts, markdownOpts)
 	}
 
-	return msg, nil, originalSize, msgRuneLength
+	return MarkdownOutput{Msg: msg, RuneLen: msgRuneLength, OriginalMsgSize: originalSize}, nil
 }
 
 func hasCodeChanges(options Options, project Project) bool {

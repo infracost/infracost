@@ -365,13 +365,17 @@ func FormatOutput(format string, r Root, opts Options) ([]byte, error) {
 	case "diff":
 		b, err = ToDiff(r, opts)
 	case "github-comment":
-		b, err, _, _ = ToMarkdown(r, opts, MarkdownOptions{MaxMessageSize: GitHubMaxMessageSize})
+		out, error := ToMarkdown(r, opts, MarkdownOptions{MaxMessageSize: GitHubMaxMessageSize})
+		b, err = out.Msg, error
 	case "gitlab-comment", "azure-repos-comment":
-		b, err, _, _ = ToMarkdown(r, opts, MarkdownOptions{})
+		out, error := ToMarkdown(r, opts, MarkdownOptions{})
+		b, err = out.Msg, error
 	case "bitbucket-comment":
-		b, err, _, _ = ToMarkdown(r, opts, MarkdownOptions{BasicSyntax: true})
+		out, error := ToMarkdown(r, opts, MarkdownOptions{BasicSyntax: true})
+		b, err = out.Msg, error
 	case "bitbucket-comment-summary":
-		b, err, _, _ = ToMarkdown(r, opts, MarkdownOptions{BasicSyntax: true, OmitDetails: true})
+		out, error := ToMarkdown(r, opts, MarkdownOptions{BasicSyntax: true, OmitDetails: true})
+		b, err = out.Msg, error
 	case "slack-message":
 		b, err = ToSlackMessage(r, opts)
 	default:
