@@ -37,7 +37,9 @@
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
-                  "filename": "testdata/breakdown_with_free_resources_checksum/main.tf"
+                  "endLine": 23,
+                  "filename": "testdata/breakdown_with_free_resources_checksum/main.tf",
+                  "startLine": 9
                 }
               ],
               "checksum": "e529ad309bb6d647fae2d2854bc0d7f04a7888eceb9580ac224d15cc3384a825",
@@ -113,7 +115,9 @@
               "calls": [
                 {
                   "blockName": "aws_codebuild_webhook.example",
-                  "filename": "testdata/breakdown_with_free_resources_checksum/main.tf"
+                  "endLine": 70,
+                  "filename": "testdata/breakdown_with_free_resources_checksum/main.tf",
+                  "startLine": 56
                 }
               ],
               "checksum": "9489cd283d372cbf740f1f5c8c50e08ce739a871215b7b29001436c17fb8aa88",
@@ -130,7 +134,9 @@
               "calls": [
                 {
                   "blockName": "aws_codepipeline.codepipeline",
-                  "filename": "testdata/breakdown_with_free_resources_checksum/main.tf"
+                  "endLine": 53,
+                  "filename": "testdata/breakdown_with_free_resources_checksum/main.tf",
+                  "startLine": 26
                 }
               ],
               "checksum": "61ffec20ce052ebba3b574712c43bb5381b373f7c1b99c6b00b955940a524885",
@@ -153,7 +159,9 @@
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
-                  "filename": "testdata/breakdown_with_free_resources_checksum/main.tf"
+                  "endLine": 23,
+                  "filename": "testdata/breakdown_with_free_resources_checksum/main.tf",
+                  "startLine": 9
                 }
               ],
               "checksum": "e529ad309bb6d647fae2d2854bc0d7f04a7888eceb9580ac224d15cc3384a825",
@@ -229,7 +237,9 @@
               "calls": [
                 {
                   "blockName": "aws_codebuild_webhook.example",
-                  "filename": "testdata/breakdown_with_free_resources_checksum/main.tf"
+                  "endLine": 70,
+                  "filename": "testdata/breakdown_with_free_resources_checksum/main.tf",
+                  "startLine": 56
                 }
               ],
               "checksum": "9489cd283d372cbf740f1f5c8c50e08ce739a871215b7b29001436c17fb8aa88",
@@ -246,7 +256,9 @@
               "calls": [
                 {
                   "blockName": "aws_codepipeline.codepipeline",
-                  "filename": "testdata/breakdown_with_free_resources_checksum/main.tf"
+                  "endLine": 53,
+                  "filename": "testdata/breakdown_with_free_resources_checksum/main.tf",
+                  "startLine": 26
                 }
               ],
               "checksum": "61ffec20ce052ebba3b574712c43bb5381b373f7c1b99c6b00b955940a524885",
