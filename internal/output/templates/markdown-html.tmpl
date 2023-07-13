@@ -103,18 +103,20 @@ in project `{{ index .ProjectNames 0 }}`
 {{- end }}
 
 {{- if gt (len .Options.PolicyOutput.Checks) 0 }}
-  <details>
-    {{- if .Options.PolicyOutput.HasFailures }}
-      <summary><strong>❌ Policies failed (needs action)</strong></summary>
-    {{- else if .Options.PolicyOutput.HasWarnings }}
-      <summary><strong>⚠️ Policies warning</strong></summary>
-    {{- else }}
-      <summary><strong>✅ Policies passed</strong></summary>
-    {{- end }}
-    {{- range .Options.PolicyOutput.Checks }}
-      {{- template "policyOutputTable" . }}
-    {{- end}}
-  </details>
+  {{- if or .Options.PolicyOutput.HasFailures .Options.PolicyOutput.HasWarnings }}
+    <details>
+      {{- if .Options.PolicyOutput.HasFailures }}
+        <summary><strong>❌ Policies failed (needs action)</strong></summary>
+      {{- else }}
+        <summary><strong>⚠️ Policies warning</strong></summary>
+      {{- end }}
+      {{- range .Options.PolicyOutput.Checks }}
+        {{- template "policyOutputTable" . }}
+      {{- end}}
+    </details>
+  {{- else }}
+    <p><strong>✅ Policies passed</strong></p>
+  {{- end }}
 {{- end}}
 
 {{- if .Options.GuardrailCheck.Comment }}
