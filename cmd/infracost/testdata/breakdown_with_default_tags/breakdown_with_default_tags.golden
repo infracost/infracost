@@ -53,7 +53,9 @@
               "calls": [
                 {
                   "blockName": "aws_autoscaling_group.asg",
-                  "filename": "testdata/breakdown_with_default_tags/main.tf"
+                  "endLine": 100,
+                  "filename": "testdata/breakdown_with_default_tags/main.tf",
+                  "startLine": 75
                 }
               ],
               "checksum": "ea064bbcbd559c213f0baf5b0c3793ca2041f3a3e07160e5ac4472b06d1ccf35",
@@ -136,7 +138,9 @@
               "calls": [
                 {
                   "blockName": "aws_lambda_function.hello_world",
-                  "filename": "testdata/breakdown_with_default_tags/main.tf"
+                  "endLine": 32,
+                  "filename": "testdata/breakdown_with_default_tags/main.tf",
+                  "startLine": 22
                 }
               ],
               "checksum": "e33830cc9be4d99146eece690c1c28ee61658f6528580210224ed26304df340d",
@@ -196,7 +200,9 @@
               "calls": [
                 {
                   "blockName": "aws_autoscaling_group.asg",
-                  "filename": "testdata/breakdown_with_default_tags/main.tf"
+                  "endLine": 100,
+                  "filename": "testdata/breakdown_with_default_tags/main.tf",
+                  "startLine": 75
                 }
               ],
               "checksum": "ea064bbcbd559c213f0baf5b0c3793ca2041f3a3e07160e5ac4472b06d1ccf35",
@@ -279,7 +285,9 @@
               "calls": [
                 {
                   "blockName": "aws_lambda_function.hello_world",
-                  "filename": "testdata/breakdown_with_default_tags/main.tf"
+                  "endLine": 32,
+                  "filename": "testdata/breakdown_with_default_tags/main.tf",
+                  "startLine": 22
                 }
               ],
               "checksum": "e33830cc9be4d99146eece690c1c28ee61658f6528580210224ed26304df340d",

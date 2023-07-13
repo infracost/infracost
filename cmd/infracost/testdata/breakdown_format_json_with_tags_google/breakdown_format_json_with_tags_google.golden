@@ -39,7 +39,9 @@
               "calls": [
                 {
                   "blockName": "google_compute_disk.gcd1",
-                  "filename": "testdata/breakdown_format_json_with_tags_google/main.tf"
+                  "endLine": 13,
+                  "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
+                  "startLine": 6
                 }
               ],
               "checksum": "167438a6d3e64b8f75d1c0f7dcbf733ed65c24b40ce19d9d05c7c42ea070c947",
@@ -69,7 +71,9 @@
               "calls": [
                 {
                   "blockName": "google_compute_disk.gcd2",
-                  "filename": "testdata/breakdown_format_json_with_tags_google/main.tf"
+                  "endLine": 18,
+                  "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
+                  "startLine": 15
                 }
               ],
               "checksum": "37baa7cee7077135d1b2f8c8d323cb484fcbd5be11d5fe3caafe1783113d98a4",
@@ -107,7 +111,9 @@
               "calls": [
                 {
                   "blockName": "google_compute_disk.gcd1",
-                  "filename": "testdata/breakdown_format_json_with_tags_google/main.tf"
+                  "endLine": 13,
+                  "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
+                  "startLine": 6
                 }
               ],
               "checksum": "167438a6d3e64b8f75d1c0f7dcbf733ed65c24b40ce19d9d05c7c42ea070c947",
@@ -137,7 +143,9 @@
               "calls": [
                 {
                   "blockName": "google_compute_disk.gcd2",
-                  "filename": "testdata/breakdown_format_json_with_tags_google/main.tf"
+                  "endLine": 18,
+                  "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
+                  "startLine": 15
                 }
               ],
               "checksum": "37baa7cee7077135d1b2f8c8d323cb484fcbd5be11d5fe3caafe1783113d98a4",
