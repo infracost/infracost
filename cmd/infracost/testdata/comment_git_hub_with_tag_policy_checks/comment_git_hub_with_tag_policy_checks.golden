@@ -24,8 +24,8 @@
 ∙ 3 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 ```
 </details>
-  <details>
-      <summary><strong>❌ Policies failed (needs action)</strong></summary>
+    <details>
+        <summary><strong>❌ Policies failed (needs action)</strong></summary>
       <h4>❌ <b>Failing Tag Policy</b> (needs action)</h4>
     <table>
         <tr>
@@ -141,7 +141,7 @@ in project `my-prod-project`
   
 </td></tr>
     </table>
-  </details>
+    </details>
 
 Comment not posted to GitHub (--dry-run was specified)
 

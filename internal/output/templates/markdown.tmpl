@@ -69,16 +69,18 @@
 {{- end }}
 
 {{- if gt (len .Options.PolicyOutput.Checks) 0 }}
-  {{- if .Options.PolicyOutput.HasFailures }}
+  {{- if or .Options.PolicyOutput.HasFailures .Options.PolicyOutput.HasWarnings }}
+    {{- if .Options.PolicyOutput.HasFailures }}
 ## ❌ Policies failed (needs action) ##
-  {{- else if .Options.PolicyOutput.HasWarnings }}
+    {{- else }}
 ## ⚠️ Policies warning ##
+    {{- end }}
+    {{- range .Options.PolicyOutput.Checks }}
+      {{- template "policyOutputTable" . }}
+    {{- end}}
   {{- else }}
 ## ✅ Policies passed ##
   {{- end }}
-  {{- range .Options.PolicyOutput.Checks }}
-    {{- template "policyOutputTable" . }}
-  {{- end}}
 {{- end}}
 
 {{- if .MarkdownOptions.WillUpdate }}
