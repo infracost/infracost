@@ -176,9 +176,7 @@
                 "unit": "GB-seconds"
               }
             ],
-            "hourlyCost": null,
             "metadata": {},
-            "monthlyCost": null,
             "name": "aws_lambda_function.hello_world",
             "resourceType": "aws_lambda_function",
             "tags": {}
@@ -213,17 +211,13 @@
                 "unit": "GB-seconds"
               }
             ],
-            "hourlyCost": null,
             "metadata": {},
-            "monthlyCost": null,
             "name": "aws_lambda_function.zero_cost_lambda",
             "resourceType": "aws_lambda_function",
             "tags": {}
           },
           {
-            "hourlyCost": null,
             "metadata": {},
-            "monthlyCost": null,
             "name": "aws_s3_bucket.usage",
             "resourceType": "aws_s3_bucket",
             "subresources": [
@@ -275,9 +269,7 @@
                     "unit": "GB"
                   }
                 ],
-                "hourlyCost": null,
                 "metadata": {},
-                "monthlyCost": null,
                 "name": "Standard"
               }
             ],

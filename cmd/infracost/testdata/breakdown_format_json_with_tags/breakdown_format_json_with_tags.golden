@@ -48,8 +48,6 @@
               "filename": "testdata/breakdown_format_json_with_tags/main.tf",
               "startLine": 16
             },
-            "hourlyCost": null,
-            "monthlyCost": null,
             "costComponents": [
               {
                 "name": "HTTP notifications",
@@ -81,8 +79,6 @@
               "filename": "testdata/breakdown_format_json_with_tags/main.tf",
               "startLine": 22
             },
-            "hourlyCost": null,
-            "monthlyCost": null,
             "costComponents": [
               {
                 "name": "HTTP notifications",
@@ -114,8 +110,6 @@
               "filename": "testdata/breakdown_format_json_with_tags/main.tf",
               "startLine": 32
             },
-            "hourlyCost": null,
-            "monthlyCost": null,
             "costComponents": [
               {
                 "name": "Requests",
@@ -148,8 +142,6 @@
               "filename": "testdata/breakdown_format_json_with_tags/main.tf",
               "startLine": 36
             },
-            "hourlyCost": null,
-            "monthlyCost": null,
             "costComponents": [
               {
                 "name": "Requests",
@@ -183,8 +175,6 @@
               "filename": "testdata/breakdown_format_json_with_tags/main.tf",
               "startLine": 16
             },
-            "hourlyCost": null,
-            "monthlyCost": null,
             "costComponents": [
               {
                 "name": "HTTP notifications",
@@ -216,8 +206,6 @@
               "filename": "testdata/breakdown_format_json_with_tags/main.tf",
               "startLine": 22
             },
-            "hourlyCost": null,
-            "monthlyCost": null,
             "costComponents": [
               {
                 "name": "HTTP notifications",
@@ -249,8 +237,6 @@
               "filename": "testdata/breakdown_format_json_with_tags/main.tf",
               "startLine": 32
             },
-            "hourlyCost": null,
-            "monthlyCost": null,
             "costComponents": [
               {
                 "name": "Requests",
@@ -283,8 +269,6 @@
               "filename": "testdata/breakdown_format_json_with_tags/main.tf",
               "startLine": 36
             },
-            "hourlyCost": null,
-            "monthlyCost": null,
             "costComponents": [
               {
                 "name": "Requests",

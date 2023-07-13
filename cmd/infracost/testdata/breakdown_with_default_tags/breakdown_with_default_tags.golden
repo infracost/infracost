@@ -144,8 +144,6 @@
               "filename": "testdata/breakdown_with_default_tags/main.tf",
               "startLine": 22
             },
-            "hourlyCost": null,
-            "monthlyCost": null,
             "costComponents": [
               {
                 "name": "Requests",
@@ -289,8 +287,6 @@
               "filename": "testdata/breakdown_with_default_tags/main.tf",
               "startLine": 22
             },
-            "hourlyCost": null,
-            "monthlyCost": null,
             "costComponents": [
               {
                 "name": "Requests",

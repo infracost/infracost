@@ -111,13 +111,13 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		}
 	}
 
-	r, err := output.ToOutputFormat(projects)
+	r, err := output.ToOutputFormat(runCtx.Config, projects)
 	if err != nil {
 		return err
 	}
 
 	if pr.prior != nil {
-		r, err = output.CompareTo(r, *pr.prior)
+		r, err = output.CompareTo(runCtx.Config, r, *pr.prior)
 		if err != nil {
 			return err
 		}

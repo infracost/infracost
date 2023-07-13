@@ -261,6 +261,11 @@ func loadCloudSettings(ctx *config.RunContext) {
 		ctx.Config.UsageActualCosts = true
 		logging.Logger.Info("Enabled actual costs")
 	}
+
+	if result.TagsAPIEnabled {
+		ctx.Config.TagPoliciesEnabled = true
+		logging.Logger.Info("Enabled tag policies")
+	}
 }
 
 func checkAPIKey(apiKey string, apiEndpoint string, defaultEndpoint string) error {

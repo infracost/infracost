@@ -53,6 +53,7 @@ func (p *Parser) createPartialResource(d *schema.ResourceData, u *schema.UsageDa
 					IsSkipped:   true,
 					NoPrice:     true,
 					SkipMessage: "Free resource.",
+					Metadata:    d.Metadata,
 				},
 				CloudResourceIDs: registryItem.CloudResourceIDFunc(d),
 			}
@@ -85,6 +86,7 @@ func (p *Parser) createPartialResource(d *schema.ResourceData, u *schema.UsageDa
 			Name:        d.Address,
 			IsSkipped:   true,
 			SkipMessage: "This resource is not currently supported",
+			Metadata:    d.Metadata,
 		},
 	}
 }

@@ -890,3 +890,18 @@ func TestBreakdownAutoWithMultiVarfileProjects(t *testing.T) {
 			"--path", dir,
 		}, nil)
 }
+
+func TestBreakdownWithFreeResourcesChecksum(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", dir,
+			"--format", "json",
+		}, &GoldenFileOptions{IsJSON: true}, func(ctx *config.RunContext) {
+			ctx.Config.TagPoliciesEnabled = true
+		})
+}
