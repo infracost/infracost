@@ -33,19 +33,21 @@ type ContainerNodeConfig struct {
 // computeCostComponent returns a cost component for Compute instance usage.
 func computeCostComponents(region, machineType string, purchaseOption string, instanceCount int64, monthlyHours *float64) ([]*schema.CostComponent, error) {
 	if strings.HasPrefix(strings.ToLower(machineType), "e2-custom") {
-		return nil, errors.New("Infracost currently does not support E2 custom instances")
+		return nil, errors.New("infracost currently does not support E2 custom instances")
 	}
 
 	sustainedUseDiscount := 0.0
 	fixPurchaseOption := ""
 
-	if strings.ToLower(purchaseOption) == "on_demand" {
+	if strings.ToLower(purchaseOption) == "on_demand" && monthlyHours != nil {
 		fixPurchaseOption = "OnDemand"
 		switch strings.ToLower(strings.Split(machineType, "-")[0]) {
 		case "c2", "n2", "n2d":
-			sustainedUseDiscount = 0.2
+			sustainedUseDiscount = getSustainedUseDiscount(monthlyHours, []float64{0, 0.25, 0.50, 0.75}, []float64{1.0, 0.8678, 0.733, 0.6}, []float64{0.2088, 0.1811, 0.1530, 0.1252})
 		case "custom", "n1", "f1", "g1", "m1":
-			sustainedUseDiscount = 0.3
+			sustainedUseDiscount = getSustainedUseDiscount(monthlyHours, []float64{0, 0.25, 0.50, 0.75}, []float64{1.0, 0.80, 0.60, 0.40}, []float64{0.0475, 0.0380, 0.0285, 0.0190})
+		default:
+			return nil, errors.New("unsupported machine type for sustained use discount")
 		}
 	}
 
@@ -110,12 +112,12 @@ func computeCostComponents(region, machineType string, purchaseOption string, in
 
 		cores, err := strconv.ParseInt(strCPUAmount, 10, 64)
 		if err != nil {
-			return nil, fmt.Errorf("Could not parse the custom number of cores for %s", machineType)
+			return nil, fmt.Errorf("could not parse the custom number of cores for %s", machineType)
 		}
 
 		memMB, err := strconv.ParseInt(strRAMAmount, 10, 64)
 		if err != nil {
-			return nil, fmt.Errorf("Could not parse the custom amount of RAM for %s", machineType)
+			return nil, fmt.Errorf("could not parse the custom amount of RAM for %s", machineType)
 		}
 		memGB := float64(memMB) / 1024.0
 
@@ -200,6 +202,37 @@ func computeCostComponents(region, machineType string, purchaseOption string, in
 		return costComponents, nil
 	}
 
+}
+
+func getSustainedUseDiscount(monthlyHours *float64, thresholds []float64, rates []float64, incrementalRates []float64) float64 {
+	// Assume 730 hours(max) if monthly_hrs is not set
+	if *monthlyHours == 0 {
+		*monthlyHours = 730.0
+	}
+	totalHoursInMonth := 730.0
+	totalDiscount := 0.0
+	remainingHours := *monthlyHours
+
+	for i, threshold := range thresholds {
+		thresholdHours := threshold * totalHoursInMonth
+		if remainingHours <= thresholdHours {
+			totalDiscount += remainingHours * rates[i] * incrementalRates[i]
+			remainingHours = 0
+			break
+		} else {
+			totalDiscount += thresholdHours * rates[i] * incrementalRates[i]
+			remainingHours -= thresholdHours
+		}
+	}
+
+	if remainingHours > 0 && len(rates) > 0 && len(incrementalRates) > 0 {
+		totalDiscount += remainingHours * rates[len(rates)-1] * incrementalRates[len(incrementalRates)-1]
+	}
+
+	// Convert totalDiscount to a percentage of the total potential cost
+	totalDiscountPercent := totalDiscount / (*monthlyHours * rates[0]) * 100
+
+	return totalDiscountPercent
 }
 
 // bootDiskCostComponent returns a cost component for Boot Disk storage for
