@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"os"
 	"path/filepath"
 	"strings"
 	"text/template"
@@ -49,6 +50,7 @@ func NewParser(repoDir string, variables Variables) *Parser {
 		"matchPaths": p.matchPaths,
 		"list":       p.list,
 		"relPath":    p.relPath,
+		"isDir":      p.isDir,
 	})
 	p.template = t
 
@@ -245,4 +247,15 @@ func (p *Parser) relPath(basepath string, tarpath string) string {
 	}
 
 	return rel
+}
+
+// isDir returns is path points to a directory.
+func (p *Parser) isDir(path string) bool {
+	fullPath := filepath.Join(p.repoDir, path)
+	info, err := os.Stat(fullPath)
+	if err != nil {
+		return false
+	}
+
+	return info.IsDir()
 }
