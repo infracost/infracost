@@ -224,12 +224,17 @@ func (p *HCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, e
 
 	// TODO: Alistair - temporary
 	// dump the plan JSONs to a file
-	var jsonBytes []byte
+
+	var planJSONs []interface{}
 	for _, j := range jsons {
-		jsonBytes = append(jsonBytes, j.JSON...)
+		var s interface{}
+		_ = json.Unmarshal(j.JSON, &s)
+		planJSONs = append(planJSONs, s)
 	}
 
-	filename := fmt.Sprintf(".infracost/plan-%s.json", p.ctx.RunContext.UUID())
+	jsonBytes, err := json.Marshal(planJSONs)
+
+	filename := fmt.Sprintf(".infracost/plan-%s-%s.json", p.ctx.RunContext.UUID(), projects[0].Name)
 	f, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
 	if err != nil {
 		return nil, err
