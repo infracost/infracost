@@ -1003,7 +1003,7 @@ func ExpFunctions(baseDir string, logger *logrus.Entry) map[string]function.Func
 		"split":            stdlib.SplitFunc,
 		"strrev":           stdlib.ReverseFunc,
 		"substr":           stdlib.SubstrFunc,
-		"timestamp":        funcs.TimestampFunc,
+		"timestamp":        funcs.MockTimestampFunc, // We want to return a deterministic value each time
 		"timeadd":          stdlib.TimeAddFunc,
 		"title":            stdlib.TitleFunc,
 		"tostring":         funcs.MakeToFunc(cty.String),
