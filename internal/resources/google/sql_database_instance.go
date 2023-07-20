@@ -246,6 +246,15 @@ func (r *SQLDatabaseInstance) availabilityTypeDescName() string {
 	return availabilityTypeNames[r.AvailabilityType]
 }
 
+func (r *SQLDatabaseInstance) diskTypeDescName() string {
+	diskTypeDescs := map[string]string{
+		"PD_SSD": "Standard storage",
+		"PD_HDD": "Low cost storage",
+	}
+
+	return diskTypeDescs[r.DiskType]
+}
+
 func (r *SQLDatabaseInstance) sqlInstanceAvDBTypeToDescription() string {
 	dbTypeString := r.sqlInstanceTypeToDescriptionName()
 	availabilityTypeString := r.availabilityTypeDescName()
@@ -282,7 +291,7 @@ func (r *SQLDatabaseInstance) sqlInstanceStorage() *schema.CostComponent {
 			Service:    strPtr("Cloud SQL"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "resourceGroup", Value: strPtr(diskTypeAPIResourceGroup[diskType])},
-				{Key: "description", ValueRegex: strPtr(fmt.Sprintf("/%s: %s/", r.sqlInstanceTypeToDescriptionName(), r.availabilityTypeDescName()))},
+				{Key: "description", ValueRegex: regexPtr(fmt.Sprintf("%s: %s - %s", r.sqlInstanceTypeToDescriptionName(), r.availabilityTypeDescName(), r.diskTypeDescName()))},
 			},
 		},
 	}
