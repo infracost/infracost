@@ -1,19 +1,3 @@
-Project: infracost/infracost/cmd/infracost/testdata/breakdown_auto_with_multi_varfile_projects/multi-prod
-Module path: multi
-
- Name                                                   Monthly Qty  Unit   Monthly Cost 
-                                                                                         
- aws_instance.web_app                                                                    
- ├─ Instance usage (Linux/UNIX, on-demand, m5.8xlarge)          730  hours     $1,121.28 
- ├─ root_block_device                                                                    
- │  └─ Storage (general purpose SSD, gp2)                        50  GB            $5.00 
- └─ ebs_block_device[0]                                                                  
-    ├─ Storage (provisioned IOPS SSD, io1)                    1,000  GB          $125.00 
-    └─ Provisioned IOPS                                         800  IOPS         $52.00 
-                                                                                         
- Project total                                                                 $1,303.28 
-
-──────────────────────────────────
 Project: infracost/infracost/cmd/infracost/testdata/breakdown_auto_with_multi_varfile_projects/multi-dev
 Module path: multi
 
@@ -28,6 +12,22 @@ Module path: multi
     └─ Provisioned IOPS                                         800  IOPS         $52.00 
                                                                                          
  Project total                                                                   $742.64 
+
+──────────────────────────────────
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_auto_with_multi_varfile_projects/multi-prod
+Module path: multi
+
+ Name                                                   Monthly Qty  Unit   Monthly Cost 
+                                                                                         
+ aws_instance.web_app                                                                    
+ ├─ Instance usage (Linux/UNIX, on-demand, m5.8xlarge)          730  hours     $1,121.28 
+ ├─ root_block_device                                                                    
+ │  └─ Storage (general purpose SSD, gp2)                        50  GB            $5.00 
+ └─ ebs_block_device[0]                                                                  
+    ├─ Storage (provisioned IOPS SSD, io1)                    1,000  GB          $125.00 
+    └─ Provisioned IOPS                                         800  IOPS         $52.00 
+                                                                                         
+ Project total                                                                 $1,303.28 
 
 ──────────────────────────────────
 Project: infracost/infracost/cmd/infracost/testdata/breakdown_auto_with_multi_varfile_projects/single
@@ -53,8 +53,8 @@ Module path: single
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                                          ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...ti_varfile_projects/multi-prod ┃ $1,303       ┃
 ┃ infracost/infracost/cmd/infraco...lti_varfile_projects/multi-dev ┃ $743         ┃
+┃ infracost/infracost/cmd/infraco...ti_varfile_projects/multi-prod ┃ $1,303       ┃
 ┃ infracost/infracost/cmd/infraco..._multi_varfile_projects/single ┃ $1,303       ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 

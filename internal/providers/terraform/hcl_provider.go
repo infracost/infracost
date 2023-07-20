@@ -384,7 +384,11 @@ func (p *HCLProvider) Modules() []HCLProject {
 			return mods[i].Module.Name < mods[j].Module.Name
 		}
 
-		return mods[i].Module.ModulePath < mods[j].Module.ModulePath
+		if mods[i].Module.ModulePath != mods[j].Module.ModulePath {
+			return mods[i].Module.ModulePath < mods[j].Module.ModulePath
+		}
+
+		return mods[i].Module.ModuleSuffix < mods[j].Module.ModuleSuffix
 	})
 
 	return mods
