@@ -10,6 +10,7 @@ import (
 	"runtime/debug"
 
 	"github.com/pkg/errors"
+	"github.com/pkg/profile"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -30,6 +31,12 @@ func init() {
 }
 
 func main() {
+	if os.Getenv("INFRACOST_MEMORY_PROFILE") == "true" {
+		defer profile.Start(profile.MemProfile, profile.ProfilePath(".")).Stop()
+	} else if os.Getenv("INFRACOST_CPU_PROFILE") == "true" {
+		defer profile.Start(profile.CPUProfile, profile.ProfilePath(".")).Stop()
+	}
+
 	Run(nil, nil)
 }
 
