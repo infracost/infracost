@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/shurcooL/graphql"
@@ -53,6 +54,11 @@ func (c *gitlabComment) Less(other Comment) bool {
 // feature for hiding comments.
 func (c *gitlabComment) IsHidden() bool {
 	return false
+}
+
+// ValidAt returns the time the comment was tagged as being valid at
+func (c *gitlabComment) ValidAt() *time.Time {
+	return extractValidAt(c.Body())
 }
 
 // GitLabExtra contains any extra inputs that can be passed to the GitLab comment handlers.
@@ -293,8 +299,8 @@ func (h *gitlabPRHandler) CallHideComment(ctx context.Context, comment Comment) 
 }
 
 // AddMarkdownTag prepends a tag as a markdown comment to the given string.
-func (h *gitlabPRHandler) AddMarkdownTag(s string, tag string) string {
-	return addMarkdownTag(s, tag)
+func (h *gitlabPRHandler) AddMarkdownTag(s, key, value string) (string, error) {
+	return addMarkdownTag(s, key, value)
 }
 
 // gitlabCommitHandler is a PlatformHandler for GitLab commits. It
@@ -542,6 +548,6 @@ func (h *gitlabCommitHandler) CallHideComment(ctx context.Context, comment Comme
 }
 
 // AddMarkdownTag prepends a tag as a markdown comment to the given string.
-func (h *gitlabCommitHandler) AddMarkdownTag(s string, tag string) string {
-	return addMarkdownTag(s, tag)
+func (h *gitlabCommitHandler) AddMarkdownTag(s, key, value string) (string, error) {
+	return addMarkdownTag(s, key, value)
 }

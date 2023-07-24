@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"strconv"
+	"time"
 
 	log "github.com/sirupsen/logrus"
 
@@ -20,6 +21,12 @@ import (
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/ui"
 )
+
+type CommentOutput struct {
+	Body    string
+	HasDiff bool
+	ValidAt *time.Time
+}
 
 func commentCmd(ctx *config.RunContext) *cobra.Command {
 	cmd := &cobra.Command{
@@ -61,22 +68,18 @@ func commentCmd(ctx *config.RunContext) *cobra.Command {
 	return cmd
 }
 
-func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string, mdOpts output.MarkdownOptions) ([]byte, bool, error) {
-	hasDiff := false
-
+func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []string, mdOpts output.MarkdownOptions) (*CommentOutput, error) {
 	inputs, err := output.LoadPaths(paths)
 	if err != nil {
-		return nil, hasDiff, err
+		return nil, err
 	}
 
 	combined, err := output.Combine(inputs)
 	if errors.As(err, &clierror.WarningError{}) {
 		ui.PrintWarningf(cmd.ErrOrStderr(), err.Error())
 	} else if err != nil {
-		return nil, hasDiff, err
+		return nil, err
 	}
-
-	hasDiff = combined.HasDiff()
 
 	combined.IsCIRun = ctx.IsCIRun()
 
@@ -107,7 +110,7 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 	if guardrailCheckPath != "" {
 		guardrailCheck, err = output.LoadGuardrailCheck(guardrailCheckPath)
 		if err != nil {
-			return nil, hasDiff, fmt.Errorf("Error loading %s used by --guardrail-check-path flag. %s", guardrailCheckPath, err)
+			return nil, fmt.Errorf("Error loading %s used by --guardrail-check-path flag. %s", guardrailCheckPath, err)
 		}
 	}
 
@@ -116,7 +119,7 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 	if len(policyPaths) > 0 {
 		policyChecks, err = queryPolicy(policyPaths, combined)
 		if err != nil {
-			return nil, hasDiff, err
+			return nil, err
 		}
 
 		ctx.ContextValues.SetValue("passedPolicyCount", len(policyChecks.Passed))
@@ -133,26 +136,32 @@ func buildCommentBody(cmd *cobra.Command, ctx *config.RunContext, paths []string
 	opts.ShowOnlyChanges, _ = cmd.Flags().GetBool("show-changed")
 	opts.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
 
-	out, err := output.ToMarkdown(combined, opts, mdOpts)
+	md, err := output.ToMarkdown(combined, opts, mdOpts)
 	if err != nil {
-		return nil, hasDiff, err
+		return nil, err
 	}
 
-	b := out.Msg
-	ctx.ContextValues.SetValue("truncated", out.OriginalMsgSize != out.RuneLen)
-	ctx.ContextValues.SetValue("originalLength", out.OriginalMsgSize)
+	b := md.Msg
+	ctx.ContextValues.SetValue("truncated", md.OriginalMsgSize != md.RuneLen)
+	ctx.ContextValues.SetValue("originalLength", md.OriginalMsgSize)
+
+	out := &CommentOutput{
+		Body:    string(b),
+		HasDiff: combined.HasDiff(),
+		ValidAt: &combined.TimeGenerated,
+	}
 
 	if policyChecks.HasFailed() {
-		return b, hasDiff, policyChecks.Failures
+		return out, policyChecks.Failures
 	}
 	if len(guardrailCheck.BlockingFailures()) > 0 {
-		return b, hasDiff, guardrailCheck.BlockingFailures()
+		return out, guardrailCheck.BlockingFailures()
 	}
 	if len(tagPolicyCheck.FailingTagPolicies) > 0 {
-		return b, hasDiff, tagPolicyCheck
+		return out, tagPolicyCheck
 	}
 
-	return b, hasDiff, nil
+	return out, nil
 }
 
 type PRNumber int

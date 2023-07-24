@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
@@ -34,6 +35,11 @@ func (c *azureReposComment) Body() string {
 // of the comment.
 func (c *azureReposComment) Ref() string {
 	return c.href
+}
+
+// ValidAt returns the time the comment was tagged as being valid at
+func (c *azureReposComment) ValidAt() *time.Time {
+	return extractValidAt(c.Body())
 }
 
 // Less compares the comment to another comment and returns true if this
@@ -346,6 +352,6 @@ func (h *azureReposPRHandler) CallHideComment(ctx context.Context, comment Comme
 }
 
 // AddMarkdownTag prepends a tag as a markdown comment to the given string.
-func (h *azureReposPRHandler) AddMarkdownTag(s string, tag string) string {
-	return addMarkdownTag(s, tag)
+func (h *azureReposPRHandler) AddMarkdownTag(s, key, value string) (string, error) {
+	return addMarkdownTag(s, key, value)
 }
