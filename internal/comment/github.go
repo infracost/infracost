@@ -59,6 +59,11 @@ func (c *githubComment) IsHidden() bool {
 	return c.isMinimized
 }
 
+// ValidAt returns the time the comment was tagged as being valid at
+func (c *githubComment) ValidAt() *time.Time {
+	return extractValidAt(c.Body())
+}
+
 // GitHubExtra contains any extra inputs that can be passed to the GitHub comment handlers.
 type GitHubExtra struct {
 	// APIURL is the URL of the GitHub API. This can be set to a custom URL if
@@ -316,8 +321,8 @@ func (h *githubPRHandler) CallHideComment(ctx context.Context, comment Comment) 
 }
 
 // AddMarkdownTag prepends a tag as a markdown comment to the given string.
-func (h *githubPRHandler) AddMarkdownTag(s string, tag string) string {
-	return addMarkdownTag(s, tag)
+func (h *githubPRHandler) AddMarkdownTag(s, key, value string) (string, error) {
+	return addMarkdownTag(s, key, value)
 }
 
 // githubCommitHandler is a PlatformHandler for GitHub commits. It
@@ -500,6 +505,6 @@ func (h *githubCommitHandler) CallHideComment(ctx context.Context, comment Comme
 }
 
 // AddMarkdownTag prepends a tag as a markdown comment to the given string.
-func (h *githubCommitHandler) AddMarkdownTag(s string, tag string) string {
-	return addMarkdownTag(s, tag)
+func (h *githubCommitHandler) AddMarkdownTag(s, key, value string) (string, error) {
+	return addMarkdownTag(s, key, value)
 }

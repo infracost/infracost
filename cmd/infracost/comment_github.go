@@ -104,7 +104,7 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 
 			paths, _ := cmd.Flags().GetStringArray("path")
 
-			body, hasDiff, err := buildCommentBody(cmd, ctx, paths, output.MarkdownOptions{
+			commentOut, err := buildCommentOutput(cmd, ctx, paths, output.MarkdownOptions{
 				WillUpdate:          prNumber != 0 && behavior == "update",
 				WillReplace:         prNumber != 0 && behavior == "delete-and-new",
 				IncludeFeedbackLink: !ctx.Config.IsSelfHosted(),
@@ -129,7 +129,10 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 			if !dryRun {
 				skipNoDiff, _ := cmd.Flags().GetBool("skip-no-diff")
 
-				posted, err := commentHandler.CommentWithBehavior(ctx.Context(), !hasDiff && skipNoDiff, behavior, string(body))
+				posted, err := commentHandler.CommentWithBehavior(ctx.Context(), behavior, commentOut.Body, &comment.CommentOpts{
+					ValidAt:    commentOut.ValidAt,
+					SkipNoDiff: !commentOut.HasDiff && skipNoDiff,
+				})
 				if err != nil {
 					return err
 				}
@@ -146,7 +149,7 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 					cmd.Println("Comment not posted to GitHub (skipped)")
 				}
 			} else {
-				cmd.Println(string(body))
+				cmd.Println(commentOut.Body)
 				cmd.Println("Comment not posted to GitHub (--dry-run was specified)")
 			}
 
