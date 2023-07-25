@@ -87,7 +87,7 @@ func commentAzureReposCmd(ctx *config.RunContext) *cobra.Command {
 			if !dryRun {
 				skipNoDiff, _ := cmd.Flags().GetBool("skip-no-diff")
 
-				posted, err := commentHandler.CommentWithBehavior(ctx.Context(), behavior, commentOut.Body, &comment.CommentOpts{
+				res, err := commentHandler.CommentWithBehavior(ctx.Context(), behavior, commentOut.Body, &comment.CommentOpts{
 					ValidAt:    commentOut.ValidAt,
 					SkipNoDiff: !commentOut.HasDiff && skipNoDiff,
 				})
@@ -101,10 +101,14 @@ func commentAzureReposCmd(ctx *config.RunContext) *cobra.Command {
 					logging.Logger.WithError(err).Error("could not report infracost-comment event")
 				}
 
-				if posted {
+				if res.Posted {
 					cmd.Println("Comment posted to Azure Repos")
 				} else {
-					cmd.Println("Comment not posted to Azure Repos (skipped)")
+					msg := "Comment not posted to Azure Repos"
+					if res.SkipReason != "" {
+						msg += fmt.Sprintf(": %s", res.SkipReason)
+					}
+					cmd.Println(msg)
 				}
 			} else {
 				cmd.Println(commentOut.Body)
