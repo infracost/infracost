@@ -216,7 +216,7 @@ func (h *azureReposPRHandler) CallFindMatchingComments(ctx context.Context, tag 
 		}
 
 		for _, comment := range thread.Comments {
-			if comment.IsDeleted || !strings.Contains(comment.Content, markdownTag(tag)) {
+			if comment.IsDeleted || !hasTagKey(comment.Content, tag) {
 				continue
 			}
 
@@ -351,7 +351,7 @@ func (h *azureReposPRHandler) CallHideComment(ctx context.Context, comment Comme
 	return errors.New("Not implemented")
 }
 
-// AddMarkdownTag prepends a tag as a markdown comment to the given string.
-func (h *azureReposPRHandler) AddMarkdownTag(s, key, value string) (string, error) {
-	return addMarkdownTag(s, key, value)
+// AddMarkdownTags prepends tags as a markdown comment to the given string.
+func (h *azureReposPRHandler) AddMarkdownTags(s string, tags []CommentTag) (string, error) {
+	return addMarkdownTags(s, tags)
 }

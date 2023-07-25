@@ -184,7 +184,7 @@ func (h *gitlabPRHandler) CallFindMatchingComments(ctx context.Context, tag stri
 
 	var matchingComments []Comment
 	for _, comment := range allComments {
-		if strings.Contains(comment.Body(), markdownTag(tag)) {
+		if hasTagKey(comment.Body(), tag) {
 			matchingComments = append(matchingComments, comment)
 		}
 	}
@@ -298,9 +298,9 @@ func (h *gitlabPRHandler) CallHideComment(ctx context.Context, comment Comment) 
 	return errors.New("Not implemented")
 }
 
-// AddMarkdownTag prepends a tag as a markdown comment to the given string.
-func (h *gitlabPRHandler) AddMarkdownTag(s, key, value string) (string, error) {
-	return addMarkdownTag(s, key, value)
+// AddMarkdownTags prepends tags as a markdown comment to the given string.
+func (h *gitlabPRHandler) AddMarkdownTags(s string, tags []CommentTag) (string, error) {
+	return addMarkdownTags(s, tags)
 }
 
 // gitlabCommitHandler is a PlatformHandler for GitLab commits. It
@@ -419,7 +419,7 @@ func (h *gitlabCommitHandler) CallFindMatchingComments(ctx context.Context, tag 
 
 	var matchingComments []Comment
 	for _, comment := range allComments {
-		if strings.Contains(comment.Body(), markdownTag(tag)) {
+		if hasTagKey(comment.Body(), tag) {
 			matchingComments = append(matchingComments, comment)
 		}
 	}
@@ -547,7 +547,7 @@ func (h *gitlabCommitHandler) CallHideComment(ctx context.Context, comment Comme
 	return errors.New("Not implemented")
 }
 
-// AddMarkdownTag prepends a tag as a markdown comment to the given string.
-func (h *gitlabCommitHandler) AddMarkdownTag(s, key, value string) (string, error) {
-	return addMarkdownTag(s, key, value)
+// AddMarkdownTag prepends tags as a markdown comment to the given string.
+func (h *gitlabCommitHandler) AddMarkdownTags(s string, tags []CommentTag) (string, error) {
+	return addMarkdownTags(s, tags)
 }

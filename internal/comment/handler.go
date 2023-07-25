@@ -59,7 +59,7 @@ type PlatformHandler interface {
 	CallHideComment(ctx context.Context, comment Comment) error
 
 	// AddMarkdownTag adds a tag to the given string.
-	AddMarkdownTag(s string, key string, value string) (string, error)
+	AddMarkdownTags(s string, tags []CommentTag) (string, error)
 }
 
 // PostResult is a struct that contains the result of posting a comment.
@@ -92,6 +92,11 @@ func NewCommentHandler(ctx context.Context, platformHandler PlatformHandler, tag
 type CommentOpts struct {
 	ValidAt    *time.Time
 	SkipNoDiff bool
+}
+
+type CommentTag struct {
+	Key   string
+	Value string
 }
 
 // CommentWithBehavior parses the behavior and calls the corresponding *Comment method. Returns
@@ -152,12 +157,21 @@ func (h *CommentHandler) UpdateComment(ctx context.Context, body string, opts *C
 		skipNoDiff = opts.SkipNoDiff
 	}
 
-	bodyWithTags, err := h.PlatformHandler.AddMarkdownTag(body, validAtTagKey, validAt.Format(time.RFC3339))
-	if err != nil {
-		return PostResult{Posted: false}, err
+	tags := []CommentTag{
+		{
+			Key:   h.Tag,
+			Value: "",
+		},
 	}
 
-	bodyWithTags, err = h.PlatformHandler.AddMarkdownTag(bodyWithTags, h.Tag, "")
+	if validAt != nil {
+		tags = append(tags, CommentTag{
+			Key:   validAtTagKey,
+			Value: validAt.Format(time.RFC3339),
+		})
+	}
+
+	bodyWithTags, err := h.PlatformHandler.AddMarkdownTags(body, tags)
 	if err != nil {
 		return PostResult{Posted: false}, err
 	}
@@ -219,12 +233,21 @@ func (h *CommentHandler) NewComment(ctx context.Context, body string, opts *Comm
 		}
 	}
 
-	bodyWithTags, err := h.PlatformHandler.AddMarkdownTag(body, h.Tag, "")
-	if err != nil {
-		return err
+	tags := []CommentTag{
+		{
+			Key:   h.Tag,
+			Value: "",
+		},
 	}
 
-	bodyWithTags, err = h.PlatformHandler.AddMarkdownTag(bodyWithTags, validAtTagKey, validAt.Format(time.RFC3339))
+	if validAt != nil {
+		tags = append(tags, CommentTag{
+			Key:   validAtTagKey,
+			Value: validAt.Format(time.RFC3339),
+		})
+	}
+
+	bodyWithTags, err := h.PlatformHandler.AddMarkdownTags(body, tags)
 	if err != nil {
 		return err
 	}
