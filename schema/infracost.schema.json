@@ -627,11 +627,15 @@
     "TagPolicyInvalidTag": {
       "required": [
         "key",
+        "value",
         "validValues",
         "validRegex"
       ],
       "properties": {
         "key": {
+          "type": "string"
+        },
+        "value": {
           "type": "string"
         },
         "validValues": {

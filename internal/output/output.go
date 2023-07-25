@@ -66,6 +66,7 @@ type TagPolicyResource struct {
 
 type TagPolicyInvalidTag struct {
 	Key         string   `json:"key"`
+	Value       string   `json:"value"`
 	ValidValues []string `json:"validValues"`
 	ValidRegex  string   `json:"validRegex"`
 }
