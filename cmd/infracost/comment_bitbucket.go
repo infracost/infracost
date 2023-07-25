@@ -105,7 +105,7 @@ func commentBitbucketCmd(ctx *config.RunContext) *cobra.Command {
 			if !dryRun {
 				skipNoDiff, _ := cmd.Flags().GetBool("skip-no-diff")
 
-				posted, err := commentHandler.CommentWithBehavior(ctx.Context(), behavior, commentOut.Body, &comment.CommentOpts{
+				res, err := commentHandler.CommentWithBehavior(ctx.Context(), behavior, commentOut.Body, &comment.CommentOpts{
 					ValidAt:    commentOut.ValidAt,
 					SkipNoDiff: !commentOut.HasDiff && skipNoDiff,
 				})
@@ -119,10 +119,14 @@ func commentBitbucketCmd(ctx *config.RunContext) *cobra.Command {
 					logging.Logger.WithError(err).Error("could not report infracost-comment event")
 				}
 
-				if posted {
+				if res.Posted {
 					cmd.Println("Comment posted to Bitbucket")
 				} else {
-					cmd.Println("Comment not posted to Bitbucket (skipped)")
+					msg := "Comment not posted to Bitbucket"
+					if res.SkipReason != "" {
+						msg += fmt.Sprintf(": %s", res.SkipReason)
+					}
+					cmd.Println(msg)
 				}
 			} else {
 				cmd.Println(commentOut.Body)
