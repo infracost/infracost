@@ -37,12 +37,12 @@
 
 **module.hosted_cloud_pricing_api.aws_s3_bucket.cloud_pricing_api_db_data** at `dev/main.tf:14`
 * Missing mandatory tags: `Environment`, `Team`
-* Invalid value, `Team` must be one of: `Ops`, `Frontend team`, `Backend team`
+* `Team` has invalid value `devops`, must be one of: `Ops`, `Frontend team`, `Backend team`
   
 in projects `my-dev-project`, `my-other-project-with-same-violations`, `my-prod-project`
   
 * Missing mandatory tags: `Environment`, `Team`
-* Invalid value, `Team` must be one of: `Ops`, `Frontstart team`, `Backstart team`
+* `Team` has invalid value `devops`, must be one of: `Ops`, `Frontstart team`, `Backstart team`
   
 in project `my-other-project-with-different-violations`
   
@@ -50,7 +50,7 @@ in project `my-other-project-with-different-violations`
         <tr><td>
 
 **module.dashboard.aws_dynamodb_table.sessions** at `dev/main.tf:23`
-* Invalid value, `Team` must be one of: `Ops`, `Frontend team`, `Backend team`
+* `Team` has invalid value `devops`, must be one of: `Ops`, `Frontend team`, `Backend team`
   
 in project `my-prod-project`
   
@@ -58,7 +58,7 @@ in project `my-prod-project`
         <tr><td>
 
 **module.us-east-1-dashboard.aws_db_instance.dashboard** at `prod/us-east-1/dashboard/instances.tf:395`
-* Invalid value, `ServiceCode` must match regex: `\[A-Z\]{3}-Id`
+* `ServiceCode` has invalid value `srv-id`, must match regex `\[A-Z\]{3}-Id`
   
 in project `my-prod-project`
   
@@ -151,36 +151,36 @@ Error: Tag policy check failed:
 
   Failing Tag Policy: This should show as a failure
     module.hosted_cloud_pricing_api.aws_s3_bucket.cloud_pricing_api_db_data in project(s) my-dev-project, my-other-project-with-same-violations
-    - should have mandatory tags: "Environment", "Team"
-    - should have a valid value for "Team" tag: "Ops", "Frontend team", "Backend team"
+    - Missing mandatory tags: `Environment`, `Team`
+    - `Team` has invalid value `devops`, must be one of: `Ops`, `Frontend team`, `Backend team`
     module.hosted_cloud_pricing_api.aws_s3_bucket.cloud_pricing_api_db_data in project(s) my-other-project-with-same-violations
-    - should have mandatory tags: "Environment", "Team"
-    - should have a valid value for "Team" tag: "Ops", "Frontend team", "Backend team"
+    - Missing mandatory tags: `Environment`, `Team`
+    - `Team` has invalid value `devops`, must be one of: `Ops`, `Frontend team`, `Backend team`
     module.hosted_cloud_pricing_api.aws_s3_bucket.cloud_pricing_api_db_data in project(s) my-other-project-with-different-violations
-    - should have mandatory tags: "Environment", "Team"
-    - should have a valid value for "Team" tag: "Ops", "Frontstart team", "Backstart team"
+    - Missing mandatory tags: `Environment`, `Team`
+    - `Team` has invalid value `devops`, must be one of: `Ops`, `Frontstart team`, `Backstart team`
     module.dashboard.aws_dynamodb_table.sessions in project(s) my-prod-project
-    - should have a valid value for "Team" tag: "Ops", "Frontend team", "Backend team"
+    - `Team` has invalid value `devops`, must be one of: `Ops`, `Frontend team`, `Backend team`
     module.us-east-1-dashboard.aws_db_instance.dashboard in project(s) my-prod-project
-    - should have a valid value for "ServiceCode" tag: must match regex <code>\[A-Z\]{3}-Id</code>
+    - `ServiceCode` has invalid value `srv-id`, must match regex `\[A-Z\]{3}-Id`
     module.us-east-1-dashboard.aws_db_instance.dashboard_0 in project(s) my-X-project
-    - should have mandatory tags: "A"
+    - Missing mandatory tags: `A`
     module.us-east-1-dashboard.aws_db_instance.dashboard_1 in project(s) my-X-project
-    - should have mandatory tags: "A"
+    - Missing mandatory tags: `A`
     module.us-east-1-dashboard.aws_db_instance.dashboard_2 in project(s) my-X-project
-    - should have mandatory tags: "A"
+    - Missing mandatory tags: `A`
     module.us-east-1-dashboard.aws_db_instance.dashboard_3 in project(s) my-X-project
-    - should have mandatory tags: "A"
+    - Missing mandatory tags: `A`
     module.us-east-1-dashboard.aws_db_instance.dashboard_4 in project(s) my-X-project
-    - should have mandatory tags: "A"
+    - Missing mandatory tags: `A`
     module.us-east-1-dashboard.aws_db_instance.dashboard_5 in project(s) my-X-project
-    - should have mandatory tags: "A"
+    - Missing mandatory tags: `A`
     module.us-east-1-dashboard.aws_db_instance.dashboard_6 in project(s) my-X-project
-    - should have mandatory tags: "A"
+    - Missing mandatory tags: `A`
     module.us-east-1-dashboard.aws_db_instance.dashboard_7 in project(s) my-X-project
-    - should have mandatory tags: "A"
+    - Missing mandatory tags: `A`
     module.us-east-1-dashboard.aws_db_instance.dashboard_8 in project(s) my-X-project
-    - should have mandatory tags: "A"
+    - Missing mandatory tags: `A`
     module.us-east-1-dashboard.aws_db_instance.dashboard_9 in project(s) my-X-project
-    - should have mandatory tags: "A"
+    - Missing mandatory tags: `A`
 

@@ -49,6 +49,7 @@ func (c *TagPolicyAPIClient) CheckTagPolicies(ctx *config.RunContext, out output
 					missingMandatoryTags
 					invalidTags {
 						key
+						value
 						validValues
 						validRegex
 					}

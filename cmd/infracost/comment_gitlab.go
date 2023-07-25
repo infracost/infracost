@@ -115,7 +115,7 @@ func commentGitLabCmd(ctx *config.RunContext) *cobra.Command {
 				if posted {
 					cmd.Println("Comment posted to GitLab")
 				} else {
-					cmd.Println("Comment not posted to GitHub (GitLab)")
+					cmd.Println("Comment not posted to GitLab (skipped)")
 				}
 			} else {
 				cmd.Println(string(body))
