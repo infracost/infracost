@@ -6,7 +6,7 @@ import (
 	"sort"
 	"time"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/infracost/infracost/internal/logging"
 )
 
 var defaultTag = "infracost-comment"
@@ -125,7 +125,7 @@ func (h *CommentHandler) CommentWithBehavior(ctx context.Context, behavior, body
 
 // matchingComments returns all comments that match the tag.
 func (h *CommentHandler) matchingComments(ctx context.Context) ([]Comment, error) {
-	log.Infof("Finding matching comments for tag %s", h.Tag)
+	logging.Logger.Infof("Finding matching comments for tag %s", h.Tag)
 
 	matchingComments, err := h.PlatformHandler.CallFindMatchingComments(ctx, h.Tag)
 	if err != nil {
@@ -133,9 +133,9 @@ func (h *CommentHandler) matchingComments(ctx context.Context) ([]Comment, error
 	}
 
 	if len(matchingComments) == 1 {
-		log.Info("Found 1 matching comment")
+		logging.Logger.Info("Found 1 matching comment")
 	} else {
-		log.Infof("Found %d matching comments", len(matchingComments))
+		logging.Logger.Infof("Found %d matching comments", len(matchingComments))
 	}
 
 	sort.Slice(matchingComments, func(i, j int) bool {
@@ -186,17 +186,17 @@ func (h *CommentHandler) UpdateComment(ctx context.Context, body string, opts *C
 		latestValidAt := latestMatchingComment.ValidAt()
 		if validAt != nil && latestValidAt != nil && validAt.Before(*latestValidAt) {
 			msg := fmt.Sprintf("Not updating comment since the latest one is newer: %s", latestMatchingComment.Ref())
-			log.Warning(msg)
+			logging.Logger.Warning(msg)
 			return PostResult{Posted: false, SkipReason: msg}, nil
 		}
 
 		if latestMatchingComment.Body() == bodyWithTags {
 			msg := fmt.Sprintf("Not updating comment since the latest one matches exactly: %s", latestMatchingComment.Ref())
-			log.Info(msg)
+			logging.Logger.Info(msg)
 			return PostResult{Posted: false, SkipReason: msg}, nil
 		}
 
-		log.Infof("Updating comment %s", latestMatchingComment.Ref())
+		logging.Logger.Infof("Updating comment %s", latestMatchingComment.Ref())
 
 		err := h.PlatformHandler.CallUpdateComment(ctx, latestMatchingComment, bodyWithTags)
 		if err != nil {
@@ -205,18 +205,18 @@ func (h *CommentHandler) UpdateComment(ctx context.Context, body string, opts *C
 	} else {
 		if skipNoDiff {
 			msg := "Not creating initial comment since there is no resource or cost difference"
-			log.Info(msg)
+			logging.Logger.Info(msg)
 			return PostResult{Posted: false, SkipReason: msg}, nil
 		}
 
-		log.Info("Creating new comment")
+		logging.Logger.Info("Creating new comment")
 
 		comment, err := h.PlatformHandler.CallCreateComment(ctx, bodyWithTags)
 		if err != nil {
 			return PostResult{Posted: false}, h.newPlatformError(err)
 		}
 
-		log.Infof("Created new comment %s", comment.Ref())
+		logging.Logger.Infof("Created new comment %s", comment.Ref())
 	}
 
 	return PostResult{Posted: true}, nil
@@ -229,7 +229,7 @@ func (h *CommentHandler) NewComment(ctx context.Context, body string, opts *Comm
 		validAt = opts.ValidAt
 
 		if opts.SkipNoDiff {
-			log.Warning("SkipNoDiff option is not supported for new comments")
+			logging.Logger.Warning("SkipNoDiff option is not supported for new comments")
 		}
 	}
 
@@ -252,14 +252,14 @@ func (h *CommentHandler) NewComment(ctx context.Context, body string, opts *Comm
 		return err
 	}
 
-	log.Info("Creating new comment")
+	logging.Logger.Info("Creating new comment")
 
 	comment, err := h.PlatformHandler.CallCreateComment(ctx, bodyWithTags)
 	if err != nil {
 		return h.newPlatformError(err)
 	}
 
-	log.Infof("Created new comment: %s", comment.Ref())
+	logging.Logger.Infof("Created new comment: %s", comment.Ref())
 
 	return err
 }
@@ -286,14 +286,14 @@ func (h *CommentHandler) HideAndNewComment(ctx context.Context, body string, opt
 		latestValidAt := latestMatchingComment.ValidAt()
 		if latestValidAt != nil && validAt.Before(*latestValidAt) {
 			msg := fmt.Sprintf("Not adding a new comment since the latest one is newer: %s", latestMatchingComment.Ref())
-			log.Warning(msg)
+			logging.Logger.Warning(msg)
 			return PostResult{Posted: false, SkipReason: msg}, nil
 		}
 	}
 
 	if len(matchingComments) == 0 && skipNoDiff {
 		msg := "Not creating initial comment since there is no resource or cost difference"
-		log.Info(msg)
+		logging.Logger.Info(msg)
 		return PostResult{Posted: false, SkipReason: msg}, nil
 	}
 
@@ -323,19 +323,19 @@ func (h *CommentHandler) hideComments(ctx context.Context, comments []Comment) e
 	hiddenCommentCount := len(comments) - len(visibleComments)
 
 	if hiddenCommentCount == 1 {
-		log.Info("1 comment is already hidden")
+		logging.Logger.Info("1 comment is already hidden")
 	} else if hiddenCommentCount > 0 {
-		log.Infof("%d comments are already hidden", hiddenCommentCount)
+		logging.Logger.Infof("%d comments are already hidden", hiddenCommentCount)
 	}
 
 	if len(visibleComments) == 1 {
-		log.Info("Hiding 1 comment")
+		logging.Logger.Info("Hiding 1 comment")
 	} else {
-		log.Infof("Hiding %d comments", len(visibleComments))
+		logging.Logger.Infof("Hiding %d comments", len(visibleComments))
 	}
 
 	for _, comment := range visibleComments {
-		log.Infof("Hiding comment %s", comment.Ref())
+		logging.Logger.Infof("Hiding comment %s", comment.Ref())
 		err := h.PlatformHandler.CallHideComment(ctx, comment)
 		if err != nil {
 			return h.newPlatformError(err)
@@ -367,14 +367,14 @@ func (h *CommentHandler) DeleteAndNewComment(ctx context.Context, body string, o
 		latestValidAt := latestMatchingComment.ValidAt()
 		if latestValidAt != nil && validAt.Before(*latestValidAt) {
 			msg := fmt.Sprintf("Not adding a new comment since the latest one is newer: %s", latestMatchingComment.Ref())
-			log.Warningf(msg)
+			logging.Logger.Warningf(msg)
 			return PostResult{Posted: false, SkipReason: msg}, nil
 		}
 	}
 
 	if len(matchingComments) == 0 && skipNoDiff {
 		msg := "Not creating initial comment since there is no resource or cost difference"
-		log.Infof(msg)
+		logging.Logger.Infof(msg)
 		return PostResult{Posted: false, SkipReason: msg}, nil
 	}
 
@@ -394,13 +394,13 @@ func (h *CommentHandler) DeleteAndNewComment(ctx context.Context, body string, o
 // deleteComments hides/minimizes all the given comments.
 func (h *CommentHandler) deleteComments(ctx context.Context, comments []Comment) error {
 	if len(comments) == 1 {
-		log.Info("Deleting 1 comment")
+		logging.Logger.Info("Deleting 1 comment")
 	} else {
-		log.Infof("Deleting %d comments", len(comments))
+		logging.Logger.Infof("Deleting %d comments", len(comments))
 	}
 
 	for _, comment := range comments {
-		log.Infof("Deleting comment %s", comment.Ref())
+		logging.Logger.Infof("Deleting comment %s", comment.Ref())
 		err := h.PlatformHandler.CallDeleteComment(ctx, comment)
 		if err != nil {
 			return h.newPlatformError(err)

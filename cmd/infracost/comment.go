@@ -8,9 +8,8 @@ import (
 	"strconv"
 	"time"
 
-	log "github.com/sirupsen/logrus"
-
 	"github.com/infracost/infracost/internal/apiclient"
+	"github.com/infracost/infracost/internal/logging"
 
 	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/rego"
@@ -87,7 +86,7 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 		tagPolicyClient := apiclient.NewTagPolicyAPIClient(ctx)
 		tagPolicies, err := tagPolicyClient.CheckTagPolicies(ctx, combined)
 		if err != nil {
-			log.WithError(err).Error("Failed to check tag policies")
+			logging.Logger.WithError(err).Error("Failed to check tag policies")
 		}
 
 		combined.TagPolicies = tagPolicies
