@@ -30,22 +30,60 @@ type ContainerNodeConfig struct {
 	GuestAccelerators []*ComputeGuestAccelerator
 }
 
+/*
+For the values initialized in the struct below, please refer to the
+
+	sustained-use-discounts section of the GCP Documentation.
+
+size_SUD is set to 4 as the Usage level (% of month) is 4
+
+	to make sure we don't overshoot the array
+*/
+const size_SUD = 4
+
+type SudValues struct {
+	thresholds       [size_SUD]float64
+	rates            [size_SUD]float64
+	incrementalRates [size_SUD]float64
+}
+
 // computeCostComponent returns a cost component for Compute instance usage.
 func computeCostComponents(region, machineType string, purchaseOption string, instanceCount int64, monthlyHours *float64) ([]*schema.CostComponent, error) {
 	if strings.HasPrefix(strings.ToLower(machineType), "e2-custom") {
-		return nil, errors.New("infracost currently does not support E2 custom instances")
+		return nil, errors.New("Infracost currently does not support E2 custom instances")
 	}
 
 	sustainedUseDiscount := 0.0
 	fixPurchaseOption := ""
+	hours, _ := schema.HourToMonthUnitMultiplier.Float64()
 
-	if strings.ToLower(purchaseOption) == "on_demand" && monthlyHours != nil {
+	if monthlyHours != nil {
+		// Assume 730 hours(max) if monthly_hrs is not set
+		if *monthlyHours == 0 {
+			*monthlyHours = 730.0
+		}
+		hours = *monthlyHours
+	}
+
+	VarSudUptoTwenty := SudValues{
+		thresholds:       [size_SUD]float64{0, 0.25, 0.50, 0.75},
+		rates:            [size_SUD]float64{1.0, 0.8678, 0.733, 0.6},
+		incrementalRates: [size_SUD]float64{0.2088, 0.1811, 0.1530, 0.1252},
+	}
+
+	VarSudUptoThirty := SudValues{
+		thresholds:       [size_SUD]float64{0, 0.25, 0.50, 0.75},
+		rates:            [size_SUD]float64{1.0, 0.80, 0.60, 0.40},
+		incrementalRates: [size_SUD]float64{0.0475, 0.0380, 0.0285, 0.0190},
+	}
+
+	if strings.ToLower(purchaseOption) == "on_demand" {
 		fixPurchaseOption = "OnDemand"
 		switch strings.ToLower(strings.Split(machineType, "-")[0]) {
 		case "c2", "n2", "n2d":
-			sustainedUseDiscount = getSustainedUseDiscount(monthlyHours, []float64{0, 0.25, 0.50, 0.75}, []float64{1.0, 0.8678, 0.733, 0.6}, []float64{0.2088, 0.1811, 0.1530, 0.1252})
+			sustainedUseDiscount = getSustainedUseDiscount(hours, VarSudUptoTwenty)
 		case "custom", "n1", "f1", "g1", "m1":
-			sustainedUseDiscount = getSustainedUseDiscount(monthlyHours, []float64{0, 0.25, 0.50, 0.75}, []float64{1.0, 0.80, 0.60, 0.40}, []float64{0.0475, 0.0380, 0.0285, 0.0190})
+			sustainedUseDiscount = getSustainedUseDiscount(hours, VarSudUptoThirty)
 		default:
 			return nil, errors.New("unsupported machine type for sustained use discount")
 		}
@@ -204,33 +242,30 @@ func computeCostComponents(region, machineType string, purchaseOption string, in
 
 }
 
-func getSustainedUseDiscount(monthlyHours *float64, thresholds []float64, rates []float64, incrementalRates []float64) float64 {
-	// Assume 730 hours(max) if monthly_hrs is not set
-	if *monthlyHours == 0 {
-		*monthlyHours = 730.0
-	}
+func getSustainedUseDiscount(hours float64, VarSUD SudValues) float64 {
+
 	totalHoursInMonth := 730.0
 	totalDiscount := 0.0
-	remainingHours := *monthlyHours
+	remainingHours := hours
 
-	for i, threshold := range thresholds {
+	for i, threshold := range VarSUD.thresholds {
 		thresholdHours := threshold * totalHoursInMonth
 		if remainingHours <= thresholdHours {
-			totalDiscount += remainingHours * rates[i] * incrementalRates[i]
+			totalDiscount += remainingHours * VarSUD.rates[i] * VarSUD.incrementalRates[i]
 			remainingHours = 0
 			break
 		} else {
-			totalDiscount += thresholdHours * rates[i] * incrementalRates[i]
+			totalDiscount += thresholdHours * VarSUD.rates[i] * VarSUD.incrementalRates[i]
 			remainingHours -= thresholdHours
 		}
 	}
 
-	if remainingHours > 0 && len(rates) > 0 && len(incrementalRates) > 0 {
-		totalDiscount += remainingHours * rates[len(rates)-1] * incrementalRates[len(incrementalRates)-1]
+	if remainingHours > 0 && len(VarSUD.rates) > 0 && len(VarSUD.incrementalRates) > 0 {
+		totalDiscount += remainingHours * VarSUD.rates[len(VarSUD.rates)-1] * VarSUD.incrementalRates[len(VarSUD.incrementalRates)-1]
 	}
 
 	// Convert totalDiscount to a percentage of the total potential cost
-	totalDiscountPercent := totalDiscount / (*monthlyHours * rates[0]) * 100
+	totalDiscountPercent := totalDiscount / (hours * VarSUD.rates[0]) * 100
 
 	return totalDiscountPercent
 }
