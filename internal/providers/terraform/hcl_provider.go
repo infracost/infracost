@@ -491,7 +491,7 @@ func (p *HCLProvider) marshalModule(module *hcl.Module) ModuleOut {
 	})
 
 	for _, m := range module.Modules {
-		pieces := strings.Split(m.Name, ".")
+		pieces := strings.Split(removeAddressArrayPart(m.Name), ".")
 		modKey := pieces[len(pieces)-1]
 
 		mo := p.marshalModule(m)

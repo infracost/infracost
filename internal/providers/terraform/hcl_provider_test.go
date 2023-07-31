@@ -179,6 +179,9 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 		{
 			name: "shows correct duplicate variable warning",
 		},
+		{
+			name: "builds module configuration correctly with count",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
