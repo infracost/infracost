@@ -32,11 +32,9 @@ type ContainerNodeConfig struct {
 
 /*
 For the values initialized in the struct below, please refer to the
-
 	sustained-use-discounts section of the GCP Documentation.
 
 size_SUD is set to 4 as the Usage level (% of month) is 4
-
 	to make sure we don't overshoot the array
 */
 const size_SUD = 4
@@ -85,7 +83,7 @@ func computeCostComponents(region, machineType string, purchaseOption string, in
 		case "custom", "n1", "f1", "g1", "m1":
 			sustainedUseDiscount = getSustainedUseDiscount(hours, VarSudUptoThirty)
 		default:
-			return nil, errors.New("unsupported machine type for sustained use discount")
+			sustainedUseDiscount = 0.0
 		}
 	}
 
