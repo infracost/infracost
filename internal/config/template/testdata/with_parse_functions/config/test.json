@@ -1,0 +1,8 @@
+{
+  "foo": "bar",
+  "some_json_key": {
+    "values": {
+      "baz": 4
+    }
+  }
+}
