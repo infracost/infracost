@@ -987,6 +987,25 @@ func (b *Block) values() cty.Value {
 		values[attribute.Name()] = attribute.Value()
 	}
 
+	// @TODO this needs to include all blocks in the future. However, we are limiting to just provider blocks just now
+	// as the repercussions for this change could be quite vast. See https://github.com/infracost/infracost/issues/2596 for
+	// more information.
+	if b.Type() == "provider" {
+		for _, child := range b.Children() {
+			key := child.Type()
+			if key == "dynamic" || key == "depends_on" {
+				continue
+			}
+
+			if v, ok := values[key]; ok {
+				list := append(v.AsValueSlice(), child.values())
+				values[key] = cty.ListVal(list)
+			} else {
+				values[key] = cty.ListVal([]cty.Value{child.values()})
+			}
+		}
+	}
+
 	return cty.ObjectVal(values)
 }
 
@@ -1136,9 +1155,26 @@ var (
 	blockValueFuncs = map[string]BlockValueFunc{
 		"data.aws_availability_zones": awsAvailabilityZonesValues,
 		"data.google_compute_zones":   googleComputeZonesValues,
+		"data.aws_default_tags":       awsDefaultTagValues,
 		"resource.random_shuffle":     randomShuffleValues,
 	}
 )
+
+func awsDefaultTagValues(b *Block) cty.Value {
+	defaultTags := getFromProvider(b, "aws", "default_tags")
+	if defaultTags.IsKnown() && defaultTags.CanIterateElements() {
+		tags := defaultTags.AsValueSlice()
+		if len(tags) > 0 {
+			return cty.ObjectVal(map[string]cty.Value{
+				"tags": tags[0].AsValueMap()["tags"],
+			})
+		}
+	}
+
+	return cty.ObjectVal(map[string]cty.Value{
+		"tags": cty.ObjectVal(map[string]cty.Value{}),
+	})
+}
 
 // randomShuffleValues mocks the values returned from resource.random_shuffle
 // https://github.com/hashicorp/terraform-provider-random/blob/main/docs/resources/shuffle.md.
@@ -1222,21 +1258,10 @@ func awsAvailabilityZonesValues(b *Block) cty.Value {
 }
 
 func getRegionFromProvider(b *Block, provider string) string {
-	region := b.context.Get(provider, "region")
-
-	attr := b.GetAttribute("provider")
-	if attr != nil {
-		v := attr.Value()
-		if v.Type().IsObjectType() {
-			m := v.AsValueMap()
-			if r, ok := m["region"]; ok {
-				region = r
-			}
-		}
-	}
+	val := getFromProvider(b, provider, "region")
 
 	var str string
-	err := gocty.FromCtyValue(region, &str)
+	err := gocty.FromCtyValue(val, &str)
 	if err != nil {
 		if provider == "google" {
 			return defaultGCPRegion
@@ -1246,4 +1271,21 @@ func getRegionFromProvider(b *Block, provider string) string {
 	}
 
 	return str
+}
+
+func getFromProvider(b *Block, provider, key string) cty.Value {
+	val := b.context.Get(provider, key)
+
+	attr := b.GetAttribute("provider")
+	if attr != nil {
+		v := attr.Value()
+		if v.Type().IsObjectType() {
+			m := v.AsValueMap()
+			if r, ok := m[key]; ok {
+				val = r
+			}
+		}
+	}
+
+	return val
 }

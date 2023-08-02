@@ -277,20 +277,20 @@ func (e *Evaluator) evaluate(lastContext hcl.EvalContext) {
 func (e *Evaluator) evaluateStep(i int) {
 	e.logger.Debugf("starting context evaluation iteration %d", i+1)
 
-	e.ctx.Set(e.getValuesByBlockType("variable"), "var")
-	e.ctx.Set(e.getValuesByBlockType("locals"), "local")
-
 	providers := e.getValuesByBlockType("provider")
 	for key, provider := range providers.AsValueMap() {
 		e.ctx.Set(provider, key)
 	}
+
+	e.ctx.Set(e.getValuesByBlockType("variable"), "var")
+	e.ctx.Set(e.getValuesByBlockType("data"), "data")
+	e.ctx.Set(e.getValuesByBlockType("locals"), "local")
 
 	resources := e.getValuesByBlockType("resource")
 	for key, resource := range resources.AsValueMap() {
 		e.ctx.Set(resource, key)
 	}
 
-	e.ctx.Set(e.getValuesByBlockType("data"), "data")
 	e.ctx.Set(e.getValuesByBlockType("output"), "output")
 
 	e.evaluateModules()
