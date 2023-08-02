@@ -1416,7 +1416,7 @@ provider "aws" {
 variable "tags" {
   type        = map(string)
   default     = {
-    "foo"          = "bar"
+    "foo" = "bar"
   }
 }
 
@@ -1428,7 +1428,6 @@ locals {
     var.tags
   )
 }
-
 `)
 
 	logger := newDiscardLogger()
