@@ -34,6 +34,27 @@
       "pastBreakdown": {
         "resources": [
           {
+            "name": "aws_autoscaling_group.bar",
+            "resourceType": "aws_autoscaling_group",
+            "tags": {
+              "foo": "bar"
+            },
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_autoscaling_group.bar",
+                  "endLine": 65,
+                  "filename": "testdata/breakdown_format_json_with_tags/main.tf",
+                  "startLine": 45
+                }
+              ],
+              "checksum": "78ad6fe00b08040616d8503e00877f13cab24fa8c7e6c6d1045d7d075e8b5940",
+              "endLine": 65,
+              "filename": "testdata/breakdown_format_json_with_tags/main.tf",
+              "startLine": 45
+            }
+          },
+          {
             "name": "aws_sns_topic_subscription.sns_topic_noTags",
             "resourceType": "aws_sns_topic_subscription",
             "metadata": {
@@ -168,6 +189,27 @@
       },
       "breakdown": {
         "resources": [
+          {
+            "name": "aws_autoscaling_group.bar",
+            "resourceType": "aws_autoscaling_group",
+            "tags": {
+              "foo": "bar"
+            },
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_autoscaling_group.bar",
+                  "endLine": 65,
+                  "filename": "testdata/breakdown_format_json_with_tags/main.tf",
+                  "startLine": 45
+                }
+              ],
+              "checksum": "78ad6fe00b08040616d8503e00877f13cab24fa8c7e6c6d1045d7d075e8b5940",
+              "endLine": 65,
+              "filename": "testdata/breakdown_format_json_with_tags/main.tf",
+              "startLine": 45
+            }
+          },
           {
             "name": "aws_sns_topic_subscription.sns_topic_noTags",
             "resourceType": "aws_sns_topic_subscription",
@@ -307,10 +349,10 @@
         "totalMonthlyCost": "0"
       },
       "summary": {
-        "totalDetectedResources": 4,
-        "totalSupportedResources": 4,
+        "totalDetectedResources": 5,
+        "totalSupportedResources": 5,
         "totalUnsupportedResources": 0,
-        "totalUsageBasedResources": 4,
+        "totalUsageBasedResources": 5,
         "totalNoPriceResources": 0,
         "unsupportedResourceCounts": {},
         "noPriceResourceCounts": {}
@@ -325,10 +367,10 @@
   "diffTotalMonthlyCost": "0",
   "timeGenerated": "REPLACED_TIME",
   "summary": {
-    "totalDetectedResources": 4,
-    "totalSupportedResources": 4,
+    "totalDetectedResources": 5,
+    "totalSupportedResources": 5,
     "totalUnsupportedResources": 0,
-    "totalUsageBasedResources": 4,
+    "totalUsageBasedResources": 5,
     "totalNoPriceResources": 0,
     "unsupportedResourceCounts": {},
     "noPriceResourceCounts": {}
