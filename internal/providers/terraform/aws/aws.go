@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/infracost/infracost/internal/providers/terraform/provider_schemas"
@@ -130,6 +131,10 @@ func ParseTags(defaultTags *map[string]string, resourceType string, r gjson.Resu
 
 			tags[k] = el.Get("value").String()
 		}
+	}
+
+	for k, v := range r.Get("volume_tags").Map() {
+		tags[fmt.Sprintf("volume_tags.%s", k)] = v.String()
 	}
 
 	for k, v := range rTags {
