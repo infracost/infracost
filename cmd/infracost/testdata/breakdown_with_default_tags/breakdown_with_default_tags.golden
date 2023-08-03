@@ -46,8 +46,7 @@
               "Project": "TestProject-var",
               "SomeDynamicBool": "true",
               "SomeDynamicFloat": "1.1",
-              "SomeDynamicNumber": "1",
-              "asgTag": "locasgtag"
+              "SomeDynamicNumber": "1"
             },
             "metadata": {
               "calls": [
@@ -193,8 +192,7 @@
               "Project": "TestProject-var",
               "SomeDynamicBool": "true",
               "SomeDynamicFloat": "1.1",
-              "SomeDynamicNumber": "1",
-              "asgTag": "locasgtag"
+              "SomeDynamicNumber": "1"
             },
             "metadata": {
               "calls": [

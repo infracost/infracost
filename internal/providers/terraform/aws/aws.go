@@ -1,8 +1,9 @@
 package aws
 
 import (
-	"github.com/infracost/infracost/internal/providers/terraform/provider_schemas"
 	"strings"
+
+	"github.com/infracost/infracost/internal/providers/terraform/provider_schemas"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
@@ -118,9 +119,16 @@ func ParseTags(defaultTags *map[string]string, resourceType string, r gjson.Resu
 	if supportsTagBlock {
 		for _, el := range r.Get("tag").Array() {
 			k := el.Get("key").String()
-			if k != "" {
-				tags[k] = el.Get("value").String()
+			if k == "" {
+				continue
 			}
+
+			propagate := el.Get("propagate_at_launch")
+			if propagate.Exists() && !propagate.Bool() {
+				continue
+			}
+
+			tags[k] = el.Get("value").String()
 		}
 	}
 
