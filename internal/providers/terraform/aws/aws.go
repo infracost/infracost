@@ -1,10 +1,7 @@
 package aws
 
 import (
-	"fmt"
 	"strings"
-
-	"github.com/infracost/infracost/internal/providers/terraform/provider_schemas"
 
 	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
@@ -97,48 +94,4 @@ func GetResourceRegion(resourceType string, v gjson.Result) string {
 	}
 
 	return p[3]
-}
-
-func ParseTags(defaultTags *map[string]string, resourceType string, r gjson.Result) *map[string]string {
-	_, supportsTags := provider_schemas.AWSTagsSupport[resourceType]
-	_, supportsTagBlock := provider_schemas.AWSTagBlockSupport[resourceType]
-
-	rTags := r.Get("tags").Map()
-	if !supportsTags && !supportsTagBlock && len(rTags) == 0 {
-		return nil
-	}
-
-	tags := make(map[string]string)
-
-	_, supportsDefaultTags := provider_schemas.AWSTagsAllSupport[resourceType]
-	if supportsDefaultTags && defaultTags != nil {
-		for k, v := range *defaultTags {
-			tags[k] = v
-		}
-	}
-
-	if supportsTagBlock {
-		for _, el := range r.Get("tag").Array() {
-			k := el.Get("key").String()
-			if k == "" {
-				continue
-			}
-
-			propagate := el.Get("propagate_at_launch")
-			if propagate.Exists() && !propagate.Bool() {
-				continue
-			}
-
-			tags[k] = el.Get("value").String()
-		}
-	}
-
-	for k, v := range r.Get("volume_tags").Map() {
-		tags[fmt.Sprintf("volume_tags.%s", k)] = v.String()
-	}
-
-	for k, v := range rTags {
-		tags[k] = v.String()
-	}
-	return &tags
 }
