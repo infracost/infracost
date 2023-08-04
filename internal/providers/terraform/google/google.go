@@ -1,9 +1,10 @@
 package google
 
 import (
+	"github.com/tidwall/gjson"
+
 	"github.com/infracost/infracost/internal/providers/terraform/provider_schemas"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/tidwall/gjson"
 )
 
 var DefaultProviderRegion = "us-central1"
@@ -35,8 +36,8 @@ func GetResourceRegion(resourceType string, v gjson.Result) string {
 	return ""
 }
 
-func ParseTags(resourceType string, r gjson.Result) *map[string]string {
-	_, supportsTags := provider_schemas.GoogleLabelsSupport[resourceType]
+func ParseTags(r *schema.ResourceData) *map[string]string {
+	_, supportsTags := provider_schemas.GoogleLabelsSupport[r.Type]
 	rLabels := r.Get("labels").Map()
 	if !supportsTags && len(rLabels) == 0 {
 		return nil
