@@ -595,7 +595,9 @@
         "message",
         "prComment",
         "blockPr",
-        "resources"
+        "resources",
+        "totalDetectedResources",
+        "totalTaggableResources"
       ],
       "properties": {
         "name": {
@@ -619,6 +621,12 @@
             "$ref": "#/definitions/TagPolicyResource"
           },
           "type": "array"
+        },
+        "totalDetectedResources": {
+          "type": "integer"
+        },
+        "totalTaggableResources": {
+          "type": "integer"
         }
       },
       "additionalProperties": false,
