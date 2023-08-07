@@ -352,7 +352,21 @@ func (e *Evaluator) evaluateModules() {
 		if v := moduleCall.Module.Key(); v != nil {
 			e.ctx.Set(outputs, "module", stripCount(moduleCall.Name), *v)
 		} else if v := moduleCall.Module.Index(); v != nil {
-			e.ctx.Set(outputs, "module", stripCount(moduleCall.Name), fmt.Sprintf("%d", *v))
+			existing := e.ctx.Get("module", stripCount(moduleCall.Name))
+
+			var list []cty.Value
+			if isList(existing) {
+				list = existing.AsValueSlice()
+			}
+
+			// Pad the list if the index is greater than the current length.
+			for int64(len(list)) <= *v {
+				list = append(list, cty.DynamicVal)
+			}
+
+			list[*v] = outputs
+
+			e.ctx.Set(cty.TupleVal(list), "module", stripCount(moduleCall.Name))
 		} else {
 			e.ctx.Set(outputs, "module", moduleCall.Name)
 		}
@@ -1048,5 +1062,4 @@ func ExpFunctions(baseDir string, logger *logrus.Entry) map[string]function.Func
 		"yamlencode":       yaml.YAMLEncodeFunc,
 		"zipmap":           stdlib.ZipmapFunc,
 	}
-
 }

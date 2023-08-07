@@ -160,6 +160,10 @@ func (blocks Blocks) Matching(pattern BlockMatcher) *Block {
 		search = blocks.OfType(pattern.Type)
 	}
 
+	if pattern.Label == "" && len(search) > 0 {
+		return search[0]
+	}
+
 	for _, block := range search {
 		label := block.Label()
 		if pattern.StripCount {
@@ -169,10 +173,6 @@ func (blocks Blocks) Matching(pattern BlockMatcher) *Block {
 		if pattern.Label == label {
 			return block
 		}
-	}
-
-	if len(search) > 0 {
-		return search[0]
 	}
 
 	return nil
@@ -571,7 +571,7 @@ func (b *Block) IsForEachReferencedExpanded(moduleBlocks Blocks) bool {
 
 	label := r.String()
 	if blockType == "module" {
-		label = r.typeLabel
+		label = r.nameLabel
 	}
 
 	referenced := moduleBlocks.Matching(BlockMatcher{
