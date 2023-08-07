@@ -46,12 +46,14 @@ type Root struct {
 // TagPolicy holds information if a given run has applicable tag policy checks.
 // This struct is returned from the tag policies API and used to create tag policy outputs.
 type TagPolicy struct {
-	Name        string              `json:"name"`
-	TagPolicyID string              `json:"tagPolicyId"`
-	Message     string              `json:"message"`
-	PrComment   bool                `json:"prComment"`
-	BlockPr     bool                `json:"blockPr"`
-	Resources   []TagPolicyResource `json:"resources"`
+	Name                   string              `json:"name"`
+	TagPolicyID            string              `json:"tagPolicyId"`
+	Message                string              `json:"message"`
+	PrComment              bool                `json:"prComment"`
+	BlockPr                bool                `json:"blockPr"`
+	Resources              []TagPolicyResource `json:"resources"`
+	TotalDetectedResources int                 `json:"totalDetectedResources"`
+	TotalTaggableResources int                 `json:"totalTaggableResources"`
 }
 
 type TagPolicyResource struct {
