@@ -76,13 +76,13 @@ func NewTerragruntHCLProvider(ctx *config.ProjectContext, includePastResources b
 		includePastResources: includePastResources,
 		outputs:              map[string]cty.Value{},
 		excludedPaths:        ctx.ProjectConfig.ExcludePaths,
-		env:                  getEnvVars(),
+		env:                  getEnvVars(ctx),
 		sourceCache:          map[string]string{},
 		logger:               logger,
 	}
 }
 
-func getEnvVars() map[string]string {
+func getEnvVars(ctx *config.ProjectContext) map[string]string {
 	environment := os.Environ()
 	environmentMap := make(map[string]string)
 
@@ -111,6 +111,16 @@ func getEnvVars() map[string]string {
 
 		if _, ok := safe[strings.ToLower(name)]; ok {
 			environmentMap[name] = variableSplit[1]
+		}
+	}
+
+	for k, v := range ctx.ProjectConfig.Env {
+		if !filterSafe {
+			environmentMap[k] = v
+		}
+
+		if _, ok := safe[strings.ToLower(k)]; ok {
+			environmentMap[k] = v
 		}
 	}
 

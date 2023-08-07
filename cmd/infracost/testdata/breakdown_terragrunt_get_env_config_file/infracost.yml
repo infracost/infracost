@@ -1,0 +1,10 @@
+version: 0.1
+projects:
+    - name: dev
+      path: "./testdata/breakdown_terragrunt_get_env_config_file"
+      env:
+        ENV: dev
+    - name: prod
+      path: "./testdata/breakdown_terragrunt_get_env_config_file"
+      env:
+        ENV: prod
