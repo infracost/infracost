@@ -237,7 +237,7 @@
         "totalMonthlyCost": "0"
       },
       "summary": {
-        "totalDetectedResources": 2,
+        "totalDetectedResources": 3,
         "totalSupportedResources": 1,
         "totalUnsupportedResources": 1,
         "totalUsageBasedResources": 1,
