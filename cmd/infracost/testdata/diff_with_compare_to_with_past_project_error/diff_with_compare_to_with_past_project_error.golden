@@ -43,10 +43,10 @@
       },
       "diff": null,
       "summary": {
-        "totalDetectedResources": 0,
-        "totalSupportedResources": 0,
+        "totalDetectedResources": 1,
+        "totalSupportedResources": 1,
         "totalUnsupportedResources": 0,
-        "totalUsageBasedResources": 0,
+        "totalUsageBasedResources": 1,
         "totalNoPriceResources": 0,
         "unsupportedResourceCounts": {},
         "noPriceResourceCounts": {}
