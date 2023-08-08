@@ -241,11 +241,13 @@
         "totalSupportedResources": 1,
         "totalUnsupportedResources": 1,
         "totalUsageBasedResources": 1,
-        "totalNoPriceResources": 0,
+        "totalNoPriceResources": 1,
         "unsupportedResourceCounts": {
           "aws_codepipeline": 1
         },
-        "noPriceResourceCounts": {}
+        "noPriceResourceCounts": {
+          "aws_codebuild_webhook": 1
+        }
       }
     }
   ],
