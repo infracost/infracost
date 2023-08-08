@@ -68,3 +68,17 @@ resource "aws_codebuild_webhook" "example" {
     }
   }
 }
+
+
+resource "aws_appautoscaling_policy" "dynamodb_table_read_policy" {
+  name        = "DynamoDBReadCapacityUtilization"
+  policy_type = "TargetTrackingScaling"
+
+  target_tracking_scaling_policy_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "DynamoDBReadCapacityUtilization"
+    }
+
+    target_value = 70
+  }
+}

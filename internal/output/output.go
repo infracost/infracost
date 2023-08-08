@@ -751,7 +751,7 @@ func outputBreakdown(c *config.Config, resources []*schema.Resource) *Breakdown 
 
 	for _, r := range resources {
 		if r.IsSkipped {
-			if c.TagPoliciesEnabled {
+			if c.TagPoliciesEnabled && r.Tags != nil {
 				freeResources = append(freeResources, newResource(r, nil, nil, nil))
 			}
 
