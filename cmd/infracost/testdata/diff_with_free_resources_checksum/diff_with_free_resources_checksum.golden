@@ -107,22 +107,6 @@
         ],
         "freeResources": [
           {
-            "name": "aws_codebuild_webhook.example",
-            "resourceType": "aws_codebuild_webhook",
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "aws_codebuild_webhook.example",
-                  "filename": "testdata/diff_with_free_resources_checksum/main.tf"
-                }
-              ],
-              "checksum": "9489cd283d372cbf740f1f5c8c50e08ce739a871215b7b29001436c17fb8aa88",
-              "endLine": 70,
-              "filename": "testdata/diff_with_free_resources_checksum/main.tf",
-              "startLine": 56
-            }
-          },
-          {
             "name": "aws_codepipeline.codepipeline",
             "resourceType": "aws_codepipeline",
             "tags": {},
@@ -225,24 +209,6 @@
         ],
         "freeResources": [
           {
-            "name": "aws_codebuild_webhook.example",
-            "resourceType": "aws_codebuild_webhook",
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "aws_codebuild_webhook.example",
-                  "endLine": 70,
-                  "filename": "testdata/diff_with_free_resources_checksum/main.tf",
-                  "startLine": 56
-                }
-              ],
-              "checksum": "9489cd283d372cbf740f1f5c8c50e08ce739a871215b7b29001436c17fb8aa88",
-              "endLine": 70,
-              "filename": "testdata/diff_with_free_resources_checksum/main.tf",
-              "startLine": 56
-            }
-          },
-          {
             "name": "aws_codepipeline.codepipeline",
             "resourceType": "aws_codepipeline",
             "tags": {},
@@ -271,13 +237,12 @@
         "totalMonthlyCost": "0"
       },
       "summary": {
-        "totalDetectedResources": 3,
+        "totalDetectedResources": 2,
         "totalSupportedResources": 1,
-        "totalUnsupportedResources": 2,
+        "totalUnsupportedResources": 1,
         "totalUsageBasedResources": 1,
         "totalNoPriceResources": 0,
         "unsupportedResourceCounts": {
-          "aws_codebuild_webhook": 1,
           "aws_codepipeline": 1
         },
         "noPriceResourceCounts": {}
