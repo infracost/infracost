@@ -83,8 +83,7 @@ func GetCommandOutput(t *testing.T, args []string, testOptions *GoldenFileOption
 	}
 
 	for k, v := range testOptions.Env {
-		os.Setenv(k, v)
-		defer os.Unsetenv(k)
+		t.Setenv(k, v)
 	}
 
 	// Fix the VCS repo URL so the golden files don't fail on forks
