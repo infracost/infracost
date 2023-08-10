@@ -82,6 +82,18 @@ func parseAutoScalingTags(tags map[string]string, r *schema.ResourceData) {
 }
 
 func parseInstanceTags(tags map[string]string, r *schema.ResourceData) {
+	if rbd := r.Get("root_block_device"); rbd.Exists() {
+		for k, v := range rbd.Get("0.tags").Map() {
+			tags[fmt.Sprintf("root_block_device.%s", k)] = v.String()
+		}
+	}
+
+	for i, vol := range r.Get("ebs_block_device").Array() {
+		for k, v := range vol.Get("tags").Map() {
+			tags[fmt.Sprintf("ebs_block_device[%d].%s", i, k)] = v.String()
+		}
+	}
+
 	for k, v := range r.Get("volume_tags").Map() {
 		tags[fmt.Sprintf("volume_tags.%s", k)] = v.String()
 	}

@@ -178,3 +178,25 @@ resource "aws_autoscaling_group" "launch_template" {
   }
 }
 
+resource "aws_instance" "web_app_block_tags" {
+  ami           = "ami-674cbc1e"
+  instance_type = "m5.4xlarge"
+
+  root_block_device {
+    volume_size = 50
+    tags = {
+      "foo" = "rbd"
+    }
+  }
+
+  ebs_block_device {
+    device_name = "my_data"
+    volume_type = "io1"
+    volume_size = 1000
+    iops        = 800
+
+    tags = {
+      "foo" = "ebd"
+    }
+  }
+}
