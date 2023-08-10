@@ -79,6 +79,8 @@ func TestBreakdownFormatJsonWithTags(t *testing.T) {
 		&GoldenFileOptions{
 			CaptureLogs: true,
 			IsJSON:      true,
+		}, func(ctx *config.RunContext) {
+			ctx.Config.TagPoliciesEnabled = true
 		},
 	)
 }

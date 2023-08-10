@@ -15,6 +15,15 @@ type parseTagFunc func(baseTags map[string]string, r *schema.ResourceData)
 var tagProviders = map[string]parseTagFunc{
 	"aws_instance":          parseInstanceTags,
 	"aws_autoscaling_group": parseAutoScalingTags,
+	"aws_launch_template":   parseLaunchTemplateTags,
+}
+
+func parseLaunchTemplateTags(tags map[string]string, r *schema.ResourceData) {
+	for _, s := range r.Get("tag_specifications").Array() {
+		for k, v := range s.Get("tags").Map() {
+			tags[fmt.Sprintf("tag_specifications.%s", k)] = v.String()
+		}
+	}
 }
 
 func ParseTags(defaultTags *map[string]string, r *schema.ResourceData) *map[string]string {
@@ -63,7 +72,7 @@ func ParseTags(defaultTags *map[string]string, r *schema.ResourceData) *map[stri
 }
 
 func parseAutoScalingTags(tags map[string]string, r *schema.ResourceData) {
-	tagSpecifications(r, func(resourceType string, specs map[string]gjson.Result) {
+	referencedTagSpecifications(r, func(resourceType string, specs map[string]gjson.Result) {
 		if resourceType == "instance" {
 			for k, v := range specs {
 				tags[k] = v.String()
@@ -77,7 +86,7 @@ func parseInstanceTags(tags map[string]string, r *schema.ResourceData) {
 		tags[fmt.Sprintf("volume_tags.%s", k)] = v.String()
 	}
 
-	tagSpecifications(r, func(resourceType string, specs map[string]gjson.Result) {
+	referencedTagSpecifications(r, func(resourceType string, specs map[string]gjson.Result) {
 		if resourceType == "instance" {
 			for k, v := range specs {
 				tags[k] = v.String()
@@ -92,7 +101,7 @@ func parseInstanceTags(tags map[string]string, r *schema.ResourceData) {
 	})
 }
 
-func tagSpecifications(r *schema.ResourceData, f func(resourceType string, specs map[string]gjson.Result)) {
+func referencedTagSpecifications(r *schema.ResourceData, f func(resourceType string, specs map[string]gjson.Result)) {
 	for key, data := range r.ReferencesMap {
 		if strings.HasPrefix(key, "launch_template") {
 			launchTemplate := data[0]

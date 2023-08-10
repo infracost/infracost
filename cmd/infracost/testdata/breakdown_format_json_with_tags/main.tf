@@ -143,6 +143,13 @@ resource "aws_launch_template" "example" {
       "flip" = "flop"
     }
   }
+
+  tag_specifications {
+    resource_type = "capacity-reservation"
+    tags = {
+      "no" = "cap"
+    }
+  }
 }
 
 resource "aws_autoscaling_group" "launch_template" {
