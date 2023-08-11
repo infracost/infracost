@@ -108,10 +108,11 @@ func NewEvaluator(
 	blockBuilder BlockBuilder,
 	spinFunc ui.SpinnerFunc,
 	logger *logrus.Entry,
+	parentContext *Context,
 ) *Evaluator {
 	ctx := NewContext(&hcl.EvalContext{
 		Functions: ExpFunctions(module.RootPath, logger),
-	}, nil, logger)
+	}, parentContext, logger)
 
 	if visitedModules == nil {
 		visitedModules = make(map[string]map[string]cty.Value)
@@ -313,6 +314,17 @@ func (e *Evaluator) evaluateModules() {
 
 		e.visitedModules[fullName] = vars
 
+		// create a parent context which will be passed to any submodules. This will only
+		// contain the context values for the provider block as this is the only context
+		// values that should be "inherited".
+		parentContext := NewContext(&hcl.EvalContext{
+			Functions: ExpFunctions(e.module.RootPath, e.logger),
+		}, nil, e.logger)
+		providers := e.getValuesByBlockType("provider")
+		for key, provider := range providers.AsValueMap() {
+			parentContext.Set(provider, key)
+		}
+
 		moduleEvaluator := NewEvaluator(
 			Module{
 				Name:       fullName,
@@ -332,6 +344,7 @@ func (e *Evaluator) evaluateModules() {
 			e.blockBuilder,
 			nil,
 			e.logger,
+			parentContext,
 		)
 
 		moduleCall.Module, _ = moduleEvaluator.Run()
