@@ -1,0 +1,44 @@
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_with_data_blocks_in_submod
+
+ Name                                                        Monthly Qty  Unit   Monthly Cost 
+                                                                                              
+ module.vpc.aws_eip.available["eu-central-1-ham-1a"]                                          
+ └─ IP address (if unused)                                           730  hours         $3.65 
+                                                                                              
+ module.vpc.aws_eip.available["eu-central-1-waw-1a"]                                          
+ └─ IP address (if unused)                                           730  hours         $3.65 
+                                                                                              
+ module.vpc.aws_eip.available["eu-central-1-wl1-ber-wlz-1"]                                   
+ └─ IP address (if unused)                                           730  hours         $3.65 
+                                                                                              
+ module.vpc.aws_eip.available["eu-central-1-wl1-dtm-wlz-1"]                                   
+ └─ IP address (if unused)                                           730  hours         $3.65 
+                                                                                              
+ module.vpc.aws_eip.available["eu-central-1-wl1-muc-wlz-1"]                                   
+ └─ IP address (if unused)                                           730  hours         $3.65 
+                                                                                              
+ module.vpc.aws_eip.available["eu-central-1a"]                                                
+ └─ IP address (if unused)                                           730  hours         $3.65 
+                                                                                              
+ module.vpc.aws_eip.available["eu-central-1b"]                                                
+ └─ IP address (if unused)                                           730  hours         $3.65 
+                                                                                              
+ module.vpc.aws_eip.available["eu-central-1c"]                                                
+ └─ IP address (if unused)                                           730  hours         $3.65 
+                                                                                              
+ module.vpc.aws_eip.current["eu-central-1"]                                                   
+ └─ IP address (if unused)                                           730  hours         $3.65 
+                                                                                              
+ OVERALL TOTAL                                                                         $32.85 
+──────────────────────────────────
+9 cloud resources were detected:
+∙ 9 were estimated
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                                          ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infraco...own_with_data_blocks_in_submod ┃ $33          ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+
+Err:
+

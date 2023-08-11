@@ -1155,10 +1155,17 @@ var (
 	blockValueFuncs = map[string]BlockValueFunc{
 		"data.aws_availability_zones": awsAvailabilityZonesValues,
 		"data.google_compute_zones":   googleComputeZonesValues,
+		"data.aws_region":             awsCurrentRegion,
 		"data.aws_default_tags":       awsDefaultTagValues,
 		"resource.random_shuffle":     randomShuffleValues,
 	}
 )
+
+func awsCurrentRegion(b *Block) cty.Value {
+	return cty.ObjectVal(map[string]cty.Value{
+		"name": cty.StringVal(getRegionFromProvider(b, "aws")),
+	})
+}
 
 func awsDefaultTagValues(b *Block) cty.Value {
 	defaultTags := getFromProvider(b, "aws", "default_tags")
