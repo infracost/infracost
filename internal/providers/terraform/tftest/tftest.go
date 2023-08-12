@@ -1,3 +1,6 @@
+//go:build test
+// +build test
+
 package tftest
 
 import (
@@ -15,6 +18,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/infracost/infracost/internal/output"
+	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/usage"
 
 	"github.com/pkg/errors"
@@ -25,8 +29,6 @@ import (
 	"github.com/infracost/infracost/internal/prices"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/testutil"
-
-	"github.com/infracost/infracost/internal/providers/terraform"
 )
 
 var tfProviders = `
@@ -143,11 +145,11 @@ func installPlugins() error {
 		os.Setenv("TF_PLUGIN_CACHE_DIR", pluginCache)
 	}
 
-	opts := &terraform.CmdOptions{
+	opts := &CmdOptions{
 		Dir: tfdir,
 	}
 
-	_, err = terraform.Cmd(opts, "init", "-no-color")
+	_, err = Cmd(opts, "init", "-no-color")
 	if err != nil {
 		return errors.Wrap(err, "Error initializing Terraform working directory")
 	}
@@ -158,7 +160,7 @@ func installPlugins() error {
 func generatePlanJSON(t *testing.T, tfdir string, requiresInit bool) string {
 	t.Helper()
 
-	opts := &terraform.CmdOptions{
+	opts := &CmdOptions{
 		Dir: tfdir,
 	}
 
@@ -166,10 +168,10 @@ func generatePlanJSON(t *testing.T, tfdir string, requiresInit bool) string {
 	require.NoError(t, err, "error creating temp dir")
 
 	if requiresInit {
-		_, err = terraform.Cmd(opts, "init", "-input=false", "-no-color", "-upgrade")
+		_, err = Cmd(opts, "init", "-input=false", "-no-color", "-upgrade")
 		msgs := []string{"error running terraform init"}
-		if err != nil && err.(*terraform.CmdError) != nil {
-			msgs = append(msgs, string(err.(*terraform.CmdError).Stderr))
+		if err != nil && err.(*CmdError) != nil {
+			msgs = append(msgs, string(err.(*CmdError).Stderr))
 		}
 		require.NoError(t, err, msgs)
 	}
@@ -177,17 +179,17 @@ func generatePlanJSON(t *testing.T, tfdir string, requiresInit bool) string {
 	planFile := filepath.Join(tmpDir, "tfplan.binary")
 	defer os.Remove(planFile)
 
-	_, err = terraform.Cmd(opts, "plan", "-input=false", "-lock=false", "-no-color", fmt.Sprintf("-out=%s", planFile))
+	_, err = Cmd(opts, "plan", "-input=false", "-lock=false", "-no-color", fmt.Sprintf("-out=%s", planFile))
 	msgs := []string{"error running terraform plan"}
-	if err != nil && err.(*terraform.CmdError) != nil {
-		msgs = append(msgs, string(err.(*terraform.CmdError).Stderr))
+	if err != nil && err.(*CmdError) != nil {
+		msgs = append(msgs, string(err.(*CmdError).Stderr))
 	}
 	require.NoError(t, err, msgs)
 
-	out, err := terraform.Cmd(opts, "show", "-no-color", "-json", planFile)
+	out, err := Cmd(opts, "show", "-no-color", "-json", planFile)
 	msgs = []string{"error running terraform show"}
-	if err != nil && err.(*terraform.CmdError) != nil {
-		msgs = append(msgs, string(err.(*terraform.CmdError).Stderr))
+	if err != nil && err.(*CmdError) != nil {
+		msgs = append(msgs, string(err.(*CmdError).Stderr))
 	}
 	require.NoError(t, err, msgs)
 

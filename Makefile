@@ -3,6 +3,7 @@ PKG := github.com/infracost/infracost/cmd/infracost
 VERSION := $(shell scripts/get_version.sh HEAD $(NO_DIRTY))
 LD_FLAGS := -ldflags="-X 'github.com/infracost/infracost/internal/version.Version=$(VERSION)'"
 BUILD_FLAGS := $(LD_FLAGS) -v
+TEST_FLAGS := $(LD_FLAGS) -tags=test
 
 DEV_ENV := dev
 ifdef INFRACOST_ENV
@@ -67,60 +68,60 @@ clean:
 
 # Run only short unit tests
 test:
-	INFRACOST_LOG_LEVEL=warn go test -short $(LD_FLAGS) ./... $(or $(ARGS), -v -cover)
+	INFRACOST_LOG_LEVEL=warn go test -short $(TEST_FLAGS) ./... $(or $(ARGS), -v -cover)
 
 # Run all tests
 test_all:
-	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./... $(or $(ARGS), -v -cover)
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(TEST_FLAGS) ./... $(or $(ARGS), -v -cover)
 
 # Run unit tests and shared integration tests
 test_shared_int:
-	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) \
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(TEST_FLAGS) \
 		$(shell go list ./... | grep -v ./internal/providers/terraform/aws | grep -v ./internal/providers/terraform/google | grep -v ./internal/providers/terraform/azure) \
 		$(or $(ARGS), -v -cover)
 
 test_cmd:
-	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./cmd/infracost $(or $(ARGS), -v -cover)
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(TEST_FLAGS) ./cmd/infracost $(or $(ARGS), -v -cover)
 
 test_update_cmd:
-	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./cmd/infracost $(or $(ARGS), -update -v -cover)
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(TEST_FLAGS) ./cmd/infracost $(or $(ARGS), -update -v -cover)
 
 test_usage:
-	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/usage $(or $(ARGS), -v -cover)
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(TEST_FLAGS) ./internal/usage $(or $(ARGS), -v -cover)
 
 test_update_usage:
-	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/usage $(or $(ARGS), -update -v -cover)
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(TEST_FLAGS) ./internal/usage $(or $(ARGS), -update -v -cover)
 
 # Run AWS resource tests
 test_aws:
-	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/aws $(or $(ARGS), -v -cover)
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(TEST_FLAGS) ./internal/providers/terraform/aws $(or $(ARGS), -v -cover)
 
 # Run Google resource tests
 test_google:
-	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/google $(or $(ARGS), -v -cover)
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(TEST_FLAGS) ./internal/providers/terraform/google $(or $(ARGS), -v -cover)
 
 # Run Azure resource tests
 test_azure:
-	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/azure $(or $(ARGS), -v -cover)
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(TEST_FLAGS) ./internal/providers/terraform/azure $(or $(ARGS), -v -cover)
 
 # Update AWS golden files tests
 test_update:
-	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/... $(or $(ARGS), -update -v -cover)
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(TEST_FLAGS) ./internal/providers/... $(or $(ARGS), -update -v -cover)
 
 # Update golden files tests
 test_update_aws:
-	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/aws $(or $(ARGS), -update -v -cover)
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(TEST_FLAGS) ./internal/providers/terraform/aws $(or $(ARGS), -update -v -cover)
 
 # Update Google golden files tests
 test_update_google:
-	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/google $(or $(ARGS), -update -v -cover)
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(TEST_FLAGS) ./internal/providers/terraform/google $(or $(ARGS), -update -v -cover)
 
 # Update Azure golden files tests
 test_update_azure:
-	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/azure $(or $(ARGS), -update -v -cover)
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(TEST_FLAGS) ./internal/providers/terraform/azure $(or $(ARGS), -update -v -cover)
 
 fmt:
-	go fmt ./...
+	gofmt -s -w -l .
 	@find . -path '*/.*' -prune -o -name '*_with_error.tf' -prune -o -name '*.tf' -type f -print0 | xargs -0 -L1 bash -c '! test "$$(tail -c 1 "$$0")" || (echo >> "$$0" && echo "Terminating newline added to $$0")'
 	find . -path '*/.*' -prune -o -name '*_with_error.tf' -prune -o -name '*.tf' -exec terraform fmt {} +;
 

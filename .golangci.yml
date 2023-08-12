@@ -1,3 +1,6 @@
+run:
+  build-tags:
+    - test
 linters:
   disable-all: true
   enable:
