@@ -4,7 +4,6 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	stdJson "encoding/json"
-	"flag"
 	"fmt"
 	"math/big"
 	"os"
@@ -51,63 +50,17 @@ type HCLProviderConfig struct {
 	CacheParsingModules bool
 }
 
-type flagStringSlice []string
-
-func (v *flagStringSlice) String() string { return "" }
-func (v *flagStringSlice) Set(raw string) error {
-	*v = append(*v, raw)
-	return nil
-}
-
-type vars struct {
-	files []string
-	vars  []string
-}
-
-var spaceReg = regexp.MustCompile(`\s+`)
-
-func varsFromPlanFlags(planFlags string) (vars, error) {
-	f := flag.NewFlagSet("", flag.ContinueOnError)
-
-	var fs flagStringSlice
-	var vs flagStringSlice
-
-	f.Var(&vs, "var", "")
-	f.Var(&fs, "var-file", "")
-	err := f.Parse(spaceReg.Split(planFlags, -1))
-	if err != nil {
-		return vars{}, err
-	}
-
-	return vars{
-		files: fs,
-		vars:  vs,
-	}, nil
-}
-
 // NewHCLProvider returns a HCLProvider with a hcl.Parser initialised using the config.ProjectContext.
-// It will use input flags from either the terraform-plan-flags or top level var and var-file flags to
-// set input vars and files on the underlying hcl.Parser.
+// It will use input flags from var and var-file flags to set input vars and files on the underlying hcl.Parser.
 func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts ...hcl.Option) (*HCLProvider, error) {
 	if config == nil {
 		config = &HCLProviderConfig{}
 	}
 
-	v, err := varsFromPlanFlags(ctx.ProjectConfig.TerraformPlanFlags)
-	if err != nil {
-		return nil, fmt.Errorf("could not parse vars from plan flags %w", err)
-	}
-
 	options := []hcl.Option{hcl.OptionWithTFEnvVars(ctx.ProjectConfig.Env)}
 
-	if len(v.vars) > 0 {
-		withPlanFlagVars := hcl.OptionWithPlanFlagVars(v.vars)
-		options = append(options, withPlanFlagVars)
-	}
-
-	v.files = append(v.files, ctx.ProjectConfig.TerraformVarFiles...)
-	if len(v.files) > 0 {
-		withFiles := hcl.OptionWithTFVarsPaths(v.files)
+	if len(ctx.ProjectConfig.TerraformVarFiles) > 0 {
+		withFiles := hcl.OptionWithTFVarsPaths(ctx.ProjectConfig.TerraformVarFiles)
 		options = append(options, withFiles)
 	}
 

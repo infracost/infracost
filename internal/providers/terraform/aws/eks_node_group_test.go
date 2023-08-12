@@ -5,7 +5,6 @@ import (
 
 	"github.com/shopspring/decimal"
 
-	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/testutil"
 
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
@@ -64,5 +63,5 @@ func TestEKSNodeGroup_spot(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.UsageMap{}, resourceChecks)
+	tftest.ResourceTests(t, tf, resourceChecks, tftest.ResourceTestOptions{})
 }

@@ -12,5 +12,5 @@ func TestSnapshot(t *testing.T) {
 		t.Skip("skipping test in short mode")
 	}
 
-	tftest.GoldenFileResourceTestsWithOpts(t, "snapshot_test", &tftest.GoldenFileOptions{IgnoreCLI: true})
+	tftest.GoldenFileResourceTestsWithOpts(t, "snapshot_test", &tftest.GoldenFileOptions{IgnorePlanJSON: true})
 }

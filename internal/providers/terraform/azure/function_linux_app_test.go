@@ -14,8 +14,8 @@ func TestAzureRMLinuxAppFunctionGoldenFile(t *testing.T) {
 	}
 
 	opts := tftest.DefaultGoldenFileOptions()
-	// ignore the CLI as the Terraform provider cannot traverse the each.value references correctly
+	// ignore the Terraform Plan JSON as the Terraform cannot traverse the each.value references correctly
 	// meaning that the HCL provider is more accurate here.
-	opts.IgnoreCLI = true
+	opts.IgnorePlanJSON = true
 	tftest.GoldenFileResourceTestsWithOpts(t, "function_linux_app_test", opts)
 }

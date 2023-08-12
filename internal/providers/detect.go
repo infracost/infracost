@@ -1,7 +1,6 @@
 package providers
 
 import (
-	"archive/zip"
 	"encoding/json"
 	"fmt"
 	"os"
@@ -49,8 +48,7 @@ func Detect(ctx *config.ProjectContext, includePastResources bool) (schema.Provi
 		return nil, fmt.Errorf("No such file or directory %s", path)
 	}
 
-	forceCLI := ctx.ProjectConfig.TerraformForceCLI
-	projectType := DetectProjectType(path, forceCLI)
+	projectType := DetectProjectType(path)
 
 	switch projectType {
 	case "terraform_dir":
@@ -64,26 +62,11 @@ func Detect(ctx *config.ProjectContext, includePastResources bool) (schema.Provi
 			return nil, providerErr
 		}
 
-		if err := validateProjectForHCL(ctx); err != nil {
-			return h, err
-		}
-
 		return h, nil
 	case "terragrunt_dir":
-		h := terraform.NewTerragruntHCLProvider(ctx, includePastResources)
-		if err := validateProjectForHCL(ctx); err != nil {
-			return h, err
-		}
-
-		return h, nil
+		return terraform.NewTerragruntHCLProvider(ctx, includePastResources), nil
 	case "terraform_plan_json":
 		return terraform.NewPlanJSONProvider(ctx, includePastResources), nil
-	case "terraform_plan_binary":
-		return terraform.NewPlanProvider(ctx, includePastResources), nil
-	case "terraform_cli":
-		return terraform.NewDirProvider(ctx, includePastResources), nil
-	case "terragrunt_cli":
-		return terraform.NewTerragruntProvider(ctx, includePastResources), nil
 	case "terraform_state_json":
 		return terraform.NewStateJSONProvider(ctx, includePastResources), nil
 	case "cloudformation":
@@ -93,29 +76,7 @@ func Detect(ctx *config.ProjectContext, includePastResources bool) (schema.Provi
 	return nil, fmt.Errorf("could not detect path type for '%s'", path)
 }
 
-func validateProjectForHCL(ctx *config.ProjectContext) error {
-	if ctx.ProjectConfig.TerraformInitFlags != "" {
-		return &ValidationError{
-			warn: "Flag terraform-init-flags is deprecated and only compatible with --terraform-force-cli.",
-		}
-	}
-
-	if ctx.ProjectConfig.TerraformPlanFlags != "" {
-		return &ValidationError{
-			warn: "Flag terraform-plan-flags is deprecated and only compatible with --terraform-force-cli. If you want to pass Terraform variables use the --terraform-vars or --terraform-var-file flag.",
-		}
-	}
-
-	if ctx.ProjectConfig.TerraformUseState {
-		return &ValidationError{
-			warn: "Flag terraform-use-state is deprecated and only compatible with --terraform-force-cli.",
-		}
-	}
-
-	return nil
-}
-
-func DetectProjectType(path string, forceCLI bool) string {
+func DetectProjectType(path string) string {
 	if isCloudFormationTemplate(path) {
 		return "cloudformation"
 	}
@@ -128,19 +89,8 @@ func DetectProjectType(path string, forceCLI bool) string {
 		return "terraform_state_json"
 	}
 
-	if isTerraformPlan(path) {
-		return "terraform_plan_binary"
-	}
-
 	if isTerragruntNestedDir(path, 5) {
-		if forceCLI {
-			return "terragrunt_cli"
-		}
 		return "terragrunt_dir"
-	}
-
-	if forceCLI {
-		return "terraform_cli"
 	}
 
 	return "terraform_dir"
@@ -192,24 +142,6 @@ func isTerraformStateJSON(path string) bool {
 	}
 
 	return jsonFormat.FormatVersion != "" && jsonFormat.Values != nil
-}
-
-func isTerraformPlan(path string) bool {
-	r, err := zip.OpenReader(path)
-	if err != nil {
-		return false
-	}
-	defer r.Close()
-
-	var planFile *zip.File
-	for _, file := range r.File {
-		if file.Name == "tfplan" {
-			planFile = file
-			break
-		}
-	}
-
-	return planFile != nil
 }
 
 func isTerragruntDir(path string) bool {

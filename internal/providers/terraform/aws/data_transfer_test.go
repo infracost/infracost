@@ -87,5 +87,5 @@ func TestChinaDataTransfer(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, usage, resourceChecks)
+	tftest.ResourceTests(t, tf, resourceChecks, tftest.ResourceTestOptions{UsageData: usage})
 }

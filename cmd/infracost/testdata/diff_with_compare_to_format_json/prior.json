@@ -8,8 +8,7 @@
         "path": "testdata/diff_with_compare_to_format_json",
         "type": "terraform_dir",
         "vcsRepositoryUrl": "git@github.com:infracost/infracost.git",
-        "vcsSubPath": "cmd/infracost/testdata/diff_with_compare_to_format_json",
-        "terraformWorkspace": "default"
+        "vcsSubPath": "cmd/infracost/testdata/diff_with_compare_to_format_json"
       },
       "pastBreakdown": {
         "resources": [],

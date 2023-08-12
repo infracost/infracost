@@ -15,7 +15,7 @@ func TestHCLMultiProjectInfra(t *testing.T) {
 
 	t.Run("rel path", func(t *testing.T) {
 		GoldenFileCommandTest(t, name,
-			[]string{"breakdown", "--config-file", path.Join("./testdata", name, "infracost.config.yml")},
+			[]string{"breakdown", "--config-file", path.Join("./testdata", name, "infracost.config.yml"), "--show-skipped"},
 			nil)
 	})
 
@@ -106,7 +106,7 @@ func TestHCLModuleRelativeFilesets(t *testing.T) {
 			"breakdown",
 			"--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
 		}, &GoldenFileOptions{
-			RunTerraformCLI: true,
+			RunTerraformPlan: true,
 		},
 	)
 }
