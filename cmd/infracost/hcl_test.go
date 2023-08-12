@@ -15,7 +15,7 @@ func TestHCLMultiProjectInfra(t *testing.T) {
 
 	t.Run("rel path", func(t *testing.T) {
 		GoldenFileCommandTest(t, name,
-			[]string{"breakdown", "--config-file", path.Join("./testdata", name, "infracost.config.yml"), "--show-skipped"},
+			[]string{"breakdown", "--config-file", path.Join("./testdata", name, "infracost.config.yml")},
 			nil)
 	})
 
