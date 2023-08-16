@@ -43,8 +43,9 @@ import (
 // concurrency safe downloading.
 var terragruntSourceLock = infSync.KeyMutex{}
 
-// terragruntDownloadedDirs is used to ensure sources are only downloaded once. Use terragruntSourceLock
-// for concurrency safety.
+// terragruntDownloadedDirs is used to ensure sources are only downloaded once. This is needed
+// because the call to util.CopyFolderContents in tgcli.DownloadTerraformSource seems to be mucking
+// up the cache directory unnecessarily.  If that is fixed we can remove this.
 var terragruntDownloadedDirs = sync.Map{}
 
 type panicError struct {
