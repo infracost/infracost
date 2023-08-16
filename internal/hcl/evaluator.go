@@ -637,10 +637,18 @@ func (e *Evaluator) convertType(b *Block, val cty.Value, attrType *Attribute) (c
 		return val, nil
 	}
 
-	ty, diag := typeexpr.TypeConstraint(attrType.HCLAttr.Expr)
+	ty, def, diag := typeexpr.TypeConstraintWithDefaults(attrType.HCLAttr.Expr)
 	if diag.HasErrors() {
 		e.logger.WithError(diag).Debugf("error trying to convert variable %s to type %s", b.Label(), attrType.AsString())
 		return val, nil
+	}
+
+	// Check if default values exist for the variable type definition. If they do, we
+	// merge these defaults with any existing values. This ensures that variables
+	// with optional types that have default values e.g., optional(string, "foo")
+	// are fully resolved.
+	if def != nil {
+		val = mergeObjects(cty.ObjectVal(def.DefaultValues), val)
 	}
 	return convert.Convert(val, ty)
 }
