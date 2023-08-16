@@ -45,7 +45,7 @@ var terragruntSourceLock = infSync.KeyMutex{}
 
 // terragruntDownloadedDirs is used to ensure sources are only downloaded once. Use terragruntSourceLock
 // for concurrency safety.
-var terragruntDownloadedDirs = map[string]bool{}
+var terragruntDownloadedDirs = sync.Map{}
 
 type panicError struct {
 	msg string
@@ -645,7 +645,7 @@ func downloadSourceOnce(sourceURL string, opts *tgoptions.TerragruntOptions, ter
 	unlock := terragruntSourceLock.Lock(dir)
 	defer unlock()
 
-	if alreadyDownloaded := terragruntDownloadedDirs[dir]; alreadyDownloaded {
+	if _, alreadyDownloaded := terragruntDownloadedDirs.Load(dir); alreadyDownloaded {
 		return source.WorkingDir, nil
 	}
 
@@ -654,7 +654,7 @@ func downloadSourceOnce(sourceURL string, opts *tgoptions.TerragruntOptions, ter
 		return "", err
 	}
 
-	terragruntDownloadedDirs[dir] = true
+	terragruntDownloadedDirs.Store(dir, true)
 
 	return source.WorkingDir, nil
 }
