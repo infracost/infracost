@@ -6,6 +6,7 @@ variable "var1" {
   type = object({
     attr1 = string
     attr2 = optional(string)
+    attr3 = optional(string, "value3")
   })
 
   default = {
@@ -31,3 +32,8 @@ resource "aws_eip" "test1" {
 resource "aws_eip" "test2" {
   count = var.var2.attr1 == "value2" ? 2 : 1
 }
+
+resource "aws_eip" "test3" {
+  count = var.var1.attr3 == "value3" ? 2 : 1
+}
+
