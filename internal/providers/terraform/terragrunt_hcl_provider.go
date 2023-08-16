@@ -43,6 +43,11 @@ import (
 // concurrency safe downloading.
 var terragruntSourceLock = infSync.KeyMutex{}
 
+// terragruntDownloadedDirs is used to ensure sources are only downloaded once. This is needed
+// because the call to util.CopyFolderContents in tgcli.DownloadTerraformSource seems to be mucking
+// up the cache directory unnecessarily.  If that is fixed we can remove this.
+var terragruntDownloadedDirs = sync.Map{}
+
 type panicError struct {
 	msg string
 }
@@ -554,29 +559,15 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 		return
 	}
 	if sourceURL != "" {
-		source, err := tfsource.NewTerraformSource(sourceURL, opts.DownloadDir, opts.WorkingDir, opts.Logger)
-		if err != nil {
-			info.error = err
-			return
-		}
-
-		// make the source download directory absolute so that we lock on a consistent key.
-		dir := source.DownloadDir
-		if v, err := filepath.Abs(dir); err == nil {
-			dir = v
-		}
-
-		unlock := terragruntSourceLock.Lock(dir)
-		updatedTerragruntOptions, err := tgcli.DownloadTerraformSource(sourceURL, opts, terragruntConfig)
-		unlock()
+		updatedWorkingDir, err := downloadSourceOnce(sourceURL, opts, terragruntConfig)
 
 		if err != nil {
 			info.error = err
 			return
 		}
 
-		if updatedTerragruntOptions != nil && updatedTerragruntOptions.WorkingDir != "" {
-			info = &terragruntWorkingDirInfo{configDir: opts.WorkingDir, workingDir: updatedTerragruntOptions.WorkingDir}
+		if updatedWorkingDir != "" {
+			info = &terragruntWorkingDirInfo{configDir: opts.WorkingDir, workingDir: updatedWorkingDir}
 		}
 	}
 
@@ -637,6 +628,36 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 
 	info.provider = h
 	return info
+}
+
+// downloadSourceOnce thread-safely makes sure the sourceURL is only downloaded once
+func downloadSourceOnce(sourceURL string, opts *tgoptions.TerragruntOptions, terragruntConfig *tgconfig.TerragruntConfig) (string, error) {
+	source, err := tfsource.NewTerraformSource(sourceURL, opts.DownloadDir, opts.WorkingDir, opts.Logger)
+	if err != nil {
+		return "", err
+	}
+
+	// make the source download directory absolute so that we lock on a consistent key.
+	dir := source.DownloadDir
+	if v, err := filepath.Abs(dir); err == nil {
+		dir = v
+	}
+
+	unlock := terragruntSourceLock.Lock(dir)
+	defer unlock()
+
+	if _, alreadyDownloaded := terragruntDownloadedDirs.Load(dir); alreadyDownloaded {
+		return source.WorkingDir, nil
+	}
+
+	_, err = tgcli.DownloadTerraformSource(sourceURL, opts, terragruntConfig)
+	if err != nil {
+		return "", err
+	}
+
+	terragruntDownloadedDirs.Store(dir, true)
+
+	return source.WorkingDir, nil
 }
 
 func buildExcludedPathsMatcher(fullPath string, excludedDirs []string) func(string) bool {
