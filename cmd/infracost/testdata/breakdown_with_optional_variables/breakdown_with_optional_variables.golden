@@ -20,15 +20,21 @@ Project: infracost/infracost/cmd/infracost/testdata/breakdown_with_optional_vari
  aws_eip.test3[1]                                            
  └─ IP address (if unused)          730  hours         $3.65 
                                                              
- OVERALL TOTAL                                        $21.90 
+ aws_eip.test4[0]                                            
+ └─ IP address (if unused)          730  hours         $3.65 
+                                                             
+ aws_eip.test4[1]                                            
+ └─ IP address (if unused)          730  hours         $3.65 
+                                                             
+ OVERALL TOTAL                                        $29.20 
 ──────────────────────────────────
-6 cloud resources were detected:
-∙ 6 were estimated
+8 cloud resources were detected:
+∙ 8 were estimated
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                                          ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...akdown_with_optional_variables ┃ $22          ┃
+┃ infracost/infracost/cmd/infraco...akdown_with_optional_variables ┃ $29          ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 
 Err:
