@@ -648,7 +648,7 @@ func (e *Evaluator) convertType(b *Block, val cty.Value, attrType *Attribute) (c
 	// with optional types that have default values e.g., optional(string, "foo")
 	// are fully resolved.
 	if def != nil {
-		val = mergeObjects(cty.ObjectVal(def.DefaultValues), val)
+		val = def.Apply(val)
 	}
 	return convert.Convert(val, ty)
 }
