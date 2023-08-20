@@ -787,10 +787,8 @@ func outputResource(r *schema.Resource) Resource {
 
 func newResource(r *schema.Resource, comps []CostComponent, actualCosts []ActualCosts, subresources []Resource) Resource {
 	metadata := make(map[string]interface{})
-	if r.Metadata != nil {
-		for k, v := range r.Metadata {
-			metadata[k] = v.Value()
-		}
+	for k, v := range r.Metadata {
+		metadata[k] = v.Value()
 	}
 
 	return Resource{
