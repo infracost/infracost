@@ -261,7 +261,6 @@ func getSustainedUseDiscount(hours float64, rates sudRates) float64 {
 		// If the remaining hours are less than the threshold, add them and then we are done
 		if remainingHours <= thresholdHours {
 			ratedHours += remainingHours * rates.rates[index]
-			remainingHours = 0
 			break
 		}
 
