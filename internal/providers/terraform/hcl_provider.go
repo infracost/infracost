@@ -297,13 +297,13 @@ func (p *HCLProvider) LoadPlanJSONs() []HCLProject {
 
 	for i, module := range mods {
 		if module.Error == nil {
-			b, err := p.modulesToPlanJSON(module.Module)
-			if err != nil {
-				module.Error = err
-			} else {
-				module.JSON = b
+			module.JSON, module.Error = p.modulesToPlanJSON(module.Module)
+			if os.Getenv("INFRACOST_JSON_DUMP") == "true" {
+				err := os.WriteFile(fmt.Sprintf("%s-out.json", strings.ReplaceAll(module.Module.ModulePath, "/", "-")), module.JSON, os.ModePerm)
+				if err != nil {
+					p.logger.WithError(err).Debug("failed to write to json dump")
+				}
 			}
-
 		}
 
 		jsons[i] = module
@@ -384,7 +384,11 @@ func (p *HCLProvider) Modules() []HCLProject {
 			return mods[i].Module.Name < mods[j].Module.Name
 		}
 
-		return mods[i].Module.ModulePath < mods[j].Module.ModulePath
+		if mods[i].Module.ModulePath != mods[j].Module.ModulePath {
+			return mods[i].Module.ModulePath < mods[j].Module.ModulePath
+		}
+
+		return mods[i].Module.ModuleSuffix < mods[j].Module.ModuleSuffix
 	})
 
 	return mods
@@ -487,7 +491,7 @@ func (p *HCLProvider) marshalModule(module *hcl.Module) ModuleOut {
 	})
 
 	for _, m := range module.Modules {
-		pieces := strings.Split(m.Name, ".")
+		pieces := strings.Split(removeAddressArrayPart(m.Name), ".")
 		modKey := pieces[len(pieces)-1]
 
 		mo := p.marshalModule(m)

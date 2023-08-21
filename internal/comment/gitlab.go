@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/pkg/errors"
 	"github.com/shurcooL/graphql"
@@ -53,6 +54,11 @@ func (c *gitlabComment) Less(other Comment) bool {
 // feature for hiding comments.
 func (c *gitlabComment) IsHidden() bool {
 	return false
+}
+
+// ValidAt returns the time the comment was tagged as being valid at
+func (c *gitlabComment) ValidAt() *time.Time {
+	return extractValidAt(c.Body())
 }
 
 // GitLabExtra contains any extra inputs that can be passed to the GitLab comment handlers.
@@ -178,7 +184,7 @@ func (h *gitlabPRHandler) CallFindMatchingComments(ctx context.Context, tag stri
 
 	var matchingComments []Comment
 	for _, comment := range allComments {
-		if strings.Contains(comment.Body(), markdownTag(tag)) {
+		if hasTagKey(comment.Body(), tag) {
 			matchingComments = append(matchingComments, comment)
 		}
 	}
@@ -292,9 +298,9 @@ func (h *gitlabPRHandler) CallHideComment(ctx context.Context, comment Comment) 
 	return errors.New("Not implemented")
 }
 
-// AddMarkdownTag prepends a tag as a markdown comment to the given string.
-func (h *gitlabPRHandler) AddMarkdownTag(s string, tag string) string {
-	return addMarkdownTag(s, tag)
+// AddMarkdownTags prepends tags as a markdown comment to the given string.
+func (h *gitlabPRHandler) AddMarkdownTags(s string, tags []CommentTag) (string, error) {
+	return addMarkdownTags(s, tags)
 }
 
 // gitlabCommitHandler is a PlatformHandler for GitLab commits. It
@@ -413,7 +419,7 @@ func (h *gitlabCommitHandler) CallFindMatchingComments(ctx context.Context, tag 
 
 	var matchingComments []Comment
 	for _, comment := range allComments {
-		if strings.Contains(comment.Body(), markdownTag(tag)) {
+		if hasTagKey(comment.Body(), tag) {
 			matchingComments = append(matchingComments, comment)
 		}
 	}
@@ -541,7 +547,7 @@ func (h *gitlabCommitHandler) CallHideComment(ctx context.Context, comment Comme
 	return errors.New("Not implemented")
 }
 
-// AddMarkdownTag prepends a tag as a markdown comment to the given string.
-func (h *gitlabCommitHandler) AddMarkdownTag(s string, tag string) string {
-	return addMarkdownTag(s, tag)
+// AddMarkdownTag prepends tags as a markdown comment to the given string.
+func (h *gitlabCommitHandler) AddMarkdownTags(s string, tags []CommentTag) (string, error) {
+	return addMarkdownTags(s, tags)
 }

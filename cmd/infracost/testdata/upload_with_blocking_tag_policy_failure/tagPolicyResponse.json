@@ -26,7 +26,8 @@
                     "Ops",
                     "Frontend team",
                     "Backend team"
-                  ]
+                  ],
+                  "value": "devops"
                 }
               ]
             },
@@ -44,7 +45,8 @@
                     "Ops",
                     "Frontend team",
                     "Backend team"
-                  ]
+                  ],
+                  "value": "devops"
                 }
               ]
             },
@@ -58,7 +60,8 @@
               "invalidTags": [
                 {
                   "key": "ServiceCode",
-                  "validRegex": "\\[A-Z\\]{3}-Id"
+                  "validRegex": "\\[A-Z\\]{3}-Id",
+                  "value": "srv-id"
                 }
               ]
             }

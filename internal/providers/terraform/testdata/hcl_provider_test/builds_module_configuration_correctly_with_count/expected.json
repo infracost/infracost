@@ -1,0 +1,205 @@
+{
+  "format_version": "1.0",
+  "terraform_version": "1.1.0",
+  "prior_state": {
+    "values": {
+      "root_module": {
+        "child_modules": [
+          {
+            "address": "module.gateway_test",
+            "child_modules": [
+              {
+                "resources": [
+                  {
+                    "address": "module.gateway_test.module.gateway_proxy[0].aws_customer_gateway.example",
+                    "mode": "managed",
+                    "type": "aws_customer_gateway",
+                    "name": "example",
+                    "schema_version": 0,
+                    "values": {
+                      "bgp_asn": 65000,
+                      "ip_address": "172.0.0.1",
+                      "tags": {
+                        "Name": "name-b",
+                        "resource_tag": "tag"
+                      },
+                      "type": "ipsec.1"
+                    },
+                    "infracost_metadata": {
+                      "calls": [
+                        {
+                          "filename": "testdata/hcl_provider_test/builds_module_configuration_correctly_with_count/main.tf",
+                          "blockName": "module.gateway_test",
+                          "startLine": 15,
+                          "endLine": 17
+                        },
+                        {
+                          "filename": "testdata/hcl_provider_test/builds_module_configuration_correctly_with_count/module/gateway_proxy/main.tf",
+                          "blockName": "module.gateway_proxy",
+                          "startLine": 5,
+                          "endLine": 13
+                        },
+                        {
+                          "filename": "testdata/hcl_provider_test/builds_module_configuration_correctly_with_count/module/gateway/main.tf",
+                          "blockName": "aws_customer_gateway.example",
+                          "startLine": 12,
+                          "endLine": 18
+                        }
+                      ],
+                      "checksum": "d24cafbbebdccfee9553dd5da467372400f5915eec04885252911859209ab368",
+                      "endLine": 18,
+                      "filename": "testdata/hcl_provider_test/builds_module_configuration_correctly_with_count/module/gateway/main.tf",
+                      "startLine": 12
+                    }
+                  }
+                ],
+                "address": "module.gateway_test.module.gateway_proxy[0]"
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "planned_values": {
+    "root_module": {
+      "child_modules": [
+        {
+          "address": "module.gateway_test",
+          "child_modules": [
+            {
+              "resources": [
+                {
+                  "address": "module.gateway_test.module.gateway_proxy[0].aws_customer_gateway.example",
+                  "mode": "managed",
+                  "type": "aws_customer_gateway",
+                  "name": "example",
+                  "schema_version": 0,
+                  "values": {
+                    "bgp_asn": 65000,
+                    "ip_address": "172.0.0.1",
+                    "tags": {
+                      "Name": "name-b",
+                      "resource_tag": "tag"
+                    },
+                    "type": "ipsec.1"
+                  },
+                  "infracost_metadata": {
+                    "calls": [
+                      {
+                        "filename": "testdata/hcl_provider_test/builds_module_configuration_correctly_with_count/main.tf",
+                        "blockName": "module.gateway_test",
+                        "startLine": 15,
+                        "endLine": 17
+                      },
+                      {
+                        "filename": "testdata/hcl_provider_test/builds_module_configuration_correctly_with_count/module/gateway_proxy/main.tf",
+                        "blockName": "module.gateway_proxy",
+                        "startLine": 5,
+                        "endLine": 13
+                      },
+                      {
+                        "filename": "testdata/hcl_provider_test/builds_module_configuration_correctly_with_count/module/gateway/main.tf",
+                        "blockName": "aws_customer_gateway.example",
+                        "startLine": 12,
+                        "endLine": 18
+                      }
+                    ],
+                    "checksum": "d24cafbbebdccfee9553dd5da467372400f5915eec04885252911859209ab368",
+                    "endLine": 18,
+                    "filename": "testdata/hcl_provider_test/builds_module_configuration_correctly_with_count/module/gateway/main.tf",
+                    "startLine": 12
+                  }
+                }
+              ],
+              "address": "module.gateway_test.module.gateway_proxy[0]"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "configuration": {
+    "provider_config": {
+      "aws": {
+        "name": "aws",
+        "expressions": {
+          "default_tags": [
+            {
+              "tags": {
+                "constant_value": {
+                  "Version": "1.0.0"
+                }
+              }
+            }
+          ],
+          "region": {
+            "constant_value": "us-east-1"
+          }
+        },
+        "infracost_metadata": {
+          "end_line": 13,
+          "filename": "testdata/hcl_provider_test/builds_module_configuration_correctly_with_count/main.tf",
+          "start_line": 1
+        }
+      }
+    },
+    "root_module": {
+      "module_calls": {
+        "gateway_test": {
+          "source": "./module/gateway_proxy",
+          "module": {
+            "module_calls": {
+              "gateway_proxy": {
+                "source": "./../gateway",
+                "module": {
+                  "resources": [
+                    {
+                      "address": "aws_customer_gateway.example",
+                      "mode": "managed",
+                      "type": "aws_customer_gateway",
+                      "name": "example",
+                      "provider_config_key": "gateway_proxy[0]:aws",
+                      "expressions": {
+                        "tags": {
+                          "references": [
+                            "locals.tags"
+                          ]
+                        }
+                      },
+                      "schema_version": 0
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "infracost_resource_changes": [
+    {
+      "address": "module.gateway_test.module.gateway_proxy[0].aws_customer_gateway.example",
+      "module_address": "module.gateway_test.module.gateway_proxy[0]",
+      "mode": "managed",
+      "type": "aws_customer_gateway",
+      "name": "example",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "bgp_asn": 65000,
+          "ip_address": "172.0.0.1",
+          "tags": {
+            "Name": "name-b",
+            "resource_tag": "tag"
+          },
+          "type": "ipsec.1"
+        }
+      }
+    }
+  ]
+}

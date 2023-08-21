@@ -107,11 +107,13 @@ require (
 	github.com/hashicorp/terraform-svchost v0.1.0
 	github.com/maruel/panicparse/v2 v2.3.1
 	github.com/pkg/browser v0.0.0-20201207095918-0426ae3fba23
+	github.com/pkg/profile v1.2.1
 	github.com/pterm/pterm v0.12.62
 	github.com/shurcooL/githubv4 v0.0.0-20220115235240-a14260e6f8a2
 	github.com/shurcooL/graphql v0.0.0-20200928012149-18c5c3165e3a
 	github.com/soongo/path-to-regexp v1.6.4
 	github.com/withfig/autocomplete-tools/packages/cobra v1.2.0
+	github.com/xanzy/go-gitlab v0.86.0
 	golang.org/x/oauth2 v0.6.0
 )
 
@@ -207,7 +209,6 @@ require (
 	github.com/urfave/cli v1.22.3 // indirect
 	github.com/vmihailenco/msgpack/v4 v4.3.12 // indirect
 	github.com/vmihailenco/tagparser v0.1.1 // indirect
-	github.com/xanzy/go-gitlab v0.86.0 // indirect
 	github.com/xanzy/ssh-agent v0.3.1 // indirect
 	github.com/xo/terminfo v0.0.0-20220910002029-abceb7e1c41e // indirect
 	go.mozilla.org/gopgagent v0.0.0-20170926210634-4d7ea76ff71a // indirect
@@ -265,4 +266,4 @@ replace github.com/jedib0t/go-pretty/v6 => github.com/aliscott/go-pretty/v6 v6.1
 
 replace github.com/spf13/cobra => github.com/spf13/cobra v1.4.0
 
-replace github.com/gruntwork-io/terragrunt => github.com/infracost/terragrunt v0.47.1-0.20230627084705-f27e16c7e6bd
+replace github.com/gruntwork-io/terragrunt => github.com/infracost/terragrunt v0.47.1-0.20230808085620-a0a234c63878

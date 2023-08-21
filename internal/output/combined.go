@@ -172,13 +172,13 @@ func CompareTo(c *config.Config, current, prior Root) (Root, error) {
 
 	// preserve the summary from the original run
 	currentProjects := make(map[string]Project)
-	for _, p := range prior.Projects {
+	for _, p := range current.Projects {
 		currentProjects[p.LabelWithMetadata()] = p
 	}
-	for _, outP := range out.Projects {
-		if v, ok := currentProjects[outP.LabelWithMetadata()]; ok {
-			outP.Summary = v.Summary
-			outP.fullSummary = v.fullSummary
+	for i := range out.Projects {
+		if v, ok := currentProjects[out.Projects[i].LabelWithMetadata()]; ok {
+			out.Projects[i].Summary = v.Summary
+			out.Projects[i].fullSummary = v.fullSummary
 		}
 	}
 
@@ -191,6 +191,7 @@ func CompareTo(c *config.Config, current, prior Root) (Root, error) {
 func Combine(inputs []ReportInput) (Root, error) {
 	var combined Root
 
+	var lastestGeneratedAt time.Time
 	var totalHourlyCost *decimal.Decimal
 	var totalMonthlyCost *decimal.Decimal
 	var pastTotalHourlyCost *decimal.Decimal
@@ -216,6 +217,10 @@ func Combine(inputs []ReportInput) (Root, error) {
 		projects = append(projects, input.Root.Projects...)
 
 		summaries = append(summaries, input.Root.Summary)
+
+		if input.Root.TimeGenerated.After(lastestGeneratedAt) {
+			lastestGeneratedAt = input.Root.TimeGenerated
+		}
 
 		if len(input.Root.TagPolicies) > 0 {
 			tagPolicies = append(tagPolicies, input.Root.TagPolicies...)
@@ -282,7 +287,7 @@ func Combine(inputs []ReportInput) (Root, error) {
 	combined.PastTotalMonthlyCost = pastTotalMonthlyCost
 	combined.DiffTotalHourlyCost = diffTotalHourlyCost
 	combined.DiffTotalMonthlyCost = diffTotalMonthlyCost
-	combined.TimeGenerated = time.Now().UTC()
+	combined.TimeGenerated = lastestGeneratedAt
 	combined.Summary = MergeSummaries(summaries)
 	combined.Metadata = metadata
 	combined.TagPolicies = mergeTagPolicies(tagPolicies)

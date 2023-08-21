@@ -1,0 +1,8 @@
+version: 0.1
+
+projects:
+  - path: .
+    name: "test"
+    env:
+      baz: 4
+      fip: three

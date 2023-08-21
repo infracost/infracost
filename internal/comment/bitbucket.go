@@ -8,8 +8,10 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
@@ -57,6 +59,11 @@ func (c *bitbucketComment) Less(other Comment) bool {
 // feature for hiding comments.
 func (c *bitbucketComment) IsHidden() bool {
 	return false
+}
+
+// ValidAt returns the time the comment was tagged as being valid at
+func (c *bitbucketComment) ValidAt() *time.Time {
+	return bitbucketExtractValidAt(c.Body())
 }
 
 // BitbucketExtra contains any extra inputs that can be passed to the Bitbucket
@@ -329,10 +336,10 @@ func (h *bitbucketPRHandler) CallHideComment(ctx context.Context, comment Commen
 	return errors.New("Not implemented")
 }
 
-// AddMarkdownTag appends a tag to the end of the given string. Bitbucket
+// AddMarkdownTag appends tags to the end of the given string. Bitbucket
 // doesn't support markdown comments.
-func (h *bitbucketPRHandler) AddMarkdownTag(s string, tag string) string {
-	return fmt.Sprintf("%s%s", s, bitbucketMarkdownTag(tag))
+func (h *bitbucketPRHandler) AddMarkdownTags(s string, tags []CommentTag) (string, error) {
+	return bitbucketAddMarkdownTags(s, tags)
 }
 
 // bitbucketCommitHandler is a PlatformHandler for Bitbucket commits. It
@@ -413,7 +420,7 @@ func (h *bitbucketCommitHandler) CallFindMatchingComments(ctx context.Context, t
 		}
 
 		for _, c := range resData.Comments {
-			if c.IsDeleted || !strings.Contains(c.Content.Raw, bitbucketMarkdownTag(tag)) {
+			if c.IsDeleted || !bitbucketHasTagKey(c.Content.Raw, tag) {
 				continue
 			}
 
@@ -534,10 +541,10 @@ func (h *bitbucketCommitHandler) CallHideComment(ctx context.Context, comment Co
 	return errors.New("Not implemented")
 }
 
-// AddMarkdownTag appends a tag to the end of the given string. Bitbucket
+// AddMarkdownTag appends tags to the end of the given string. Bitbucket
 // doesn't support markdown comments.
-func (h *bitbucketCommitHandler) AddMarkdownTag(s string, tag string) string {
-	return fmt.Sprintf("%s%s", s, bitbucketMarkdownTag(tag))
+func (h *bitbucketCommitHandler) AddMarkdownTags(s string, tags []CommentTag) (string, error) {
+	return bitbucketAddMarkdownTags(s, tags)
 }
 
 // bitbucketServerAPIComment represents Bitbucket Server API comment.
@@ -567,7 +574,7 @@ func (a *bitbucketServerAPIActivity) Match(tag string) bool {
 	return a.Action == "COMMENTED" &&
 		a.CommentAction == "ADDED" &&
 		a.CommentAnchor == nil &&
-		strings.Contains(a.Comment.Text, bitbucketMarkdownTag(tag))
+		bitbucketHasTagKey(a.Comment.Text, tag)
 }
 
 // bitbucketServerPRHandler is a PlatformHandler for Bitbucket Server pull requests.
@@ -756,10 +763,10 @@ func (h *bitbucketServerPRHandler) CallHideComment(ctx context.Context, comment 
 	return errors.New("Not implemented")
 }
 
-// AddMarkdownTag appends a tag to the end of the given string. Bitbucket
+// AddMarkdownTag appends tags to the end of the given string. Bitbucket
 // doesn't support markdown comments.
-func (h *bitbucketServerPRHandler) AddMarkdownTag(s string, tag string) string {
-	return fmt.Sprintf("%s%s", s, bitbucketMarkdownTag(tag))
+func (h *bitbucketServerPRHandler) AddMarkdownTags(s string, tags []CommentTag) (string, error) {
+	return bitbucketAddMarkdownTags(s, tags)
 }
 
 // fetchComment calls the Bitbucket Server API to retrieve a single comment.
@@ -796,6 +803,57 @@ func (h *bitbucketServerPRHandler) fetchServerComment(commentURL string) (*bitbu
 	return &resData, nil
 }
 
-func bitbucketMarkdownTag(tag string) string {
-	return fmt.Sprintf("\n\n*(%s)*", tag)
+func bitbucketAddMarkdownTags(s string, tags []CommentTag) (string, error) {
+	combined, err := combineTags(tags)
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%s\n\n*(%s)*", s, combined), nil
+}
+
+// bitbucketHasTagKey returns true if the given body contains a tag with the given key.
+func bitbucketHasTagKey(body, key string) bool {
+	pattern := fmt.Sprintf(`\*\([^)]*\s*%s[=,\)]+`, key)
+
+	re, err := regexp.Compile(pattern)
+	if err != nil {
+		return false
+	}
+
+	match := re.FindString(body)
+	return match != ""
+}
+
+// bitbucketExtractTagValue extracts the value of a tag from the given body.
+// It returns an empty string if the tag is not found.
+func bitbucketExtractTagValue(body, key string) string {
+	pattern := fmt.Sprintf(`\*\([^)]*\s*%s=([^,\)]+)`, key)
+	re, err := regexp.Compile(pattern)
+	if err != nil {
+		return ""
+	}
+
+	matches := re.FindStringSubmatch(body)
+	if len(matches) != 2 {
+		return ""
+	}
+
+	return matches[1]
+}
+
+// bitbucketExtractValidAt extract the validAt time from valid-at tag
+// which found in the comment body
+func bitbucketExtractValidAt(body string) *time.Time {
+	validAt := bitbucketExtractTagValue(body, validAtTagKey)
+	if validAt == "" {
+		return nil
+	}
+
+	t, err := time.Parse(time.RFC3339, validAt)
+	if err != nil {
+		return nil
+	}
+
+	return &t
 }

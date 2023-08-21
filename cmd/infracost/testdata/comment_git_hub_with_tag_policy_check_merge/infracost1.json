@@ -128,7 +128,8 @@
                 "Ops",
                 "Frontend team",
                 "Backend team"
-              ]
+              ],
+              "value": "devops"
             }
           ]
         }

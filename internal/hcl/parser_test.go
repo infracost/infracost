@@ -1402,3 +1402,50 @@ resource "random_shuffle" "bad" {
 		"id", "arn", "self_link", "name",
 	)
 }
+
+func Test_LocalsMergeWithDataTags(t *testing.T) {
+	path := createTestFile("test.tf", `
+provider "aws" {
+ default_tags {
+   tags = {
+     Environment = "Test"
+   }
+ }
+}
+
+variable "tags" {
+  type        = map(string)
+  default     = {
+    "foo" = "bar"
+  }
+}
+
+data "aws_default_tags" "current" {}
+
+locals {
+  asg_tags = merge(
+    data.aws_default_tags.current.tags,
+    var.tags
+  )
+}
+`)
+
+	logger := newDiscardLogger()
+	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
+	parsers, err := LoadParsers(
+		config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{}),
+		filepath.Dir(path),
+		loader,
+		nil,
+		logger)
+	require.NoError(t, err)
+	module, err := parsers[0].ParseDirectory()
+	require.NoError(t, err)
+
+	blocks := module.Blocks
+	assertBlockEqualsJSON(
+		t,
+		`{"asg_tags":{"foo":"bar","Environment":"Test"}}`,
+		blocks.Matching(BlockMatcher{Type: "locals"}).Values(),
+	)
+}

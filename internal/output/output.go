@@ -46,12 +46,14 @@ type Root struct {
 // TagPolicy holds information if a given run has applicable tag policy checks.
 // This struct is returned from the tag policies API and used to create tag policy outputs.
 type TagPolicy struct {
-	Name        string              `json:"name"`
-	TagPolicyID string              `json:"tagPolicyId"`
-	Message     string              `json:"message"`
-	PrComment   bool                `json:"prComment"`
-	BlockPr     bool                `json:"blockPr"`
-	Resources   []TagPolicyResource `json:"resources"`
+	Name                   string              `json:"name"`
+	TagPolicyID            string              `json:"tagPolicyId"`
+	Message                string              `json:"message"`
+	PrComment              bool                `json:"prComment"`
+	BlockPr                bool                `json:"blockPr"`
+	Resources              []TagPolicyResource `json:"resources"`
+	TotalDetectedResources int                 `json:"totalDetectedResources"`
+	TotalTaggableResources int                 `json:"totalTaggableResources"`
 }
 
 type TagPolicyResource struct {
@@ -66,6 +68,7 @@ type TagPolicyResource struct {
 
 type TagPolicyInvalidTag struct {
 	Key         string   `json:"key"`
+	Value       string   `json:"value"`
 	ValidValues []string `json:"validValues"`
 	ValidRegex  string   `json:"validRegex"`
 }
@@ -416,19 +419,6 @@ func newTagPolicyCheckOutput(tp TagPolicy) PolicyCheckOutput {
 	rdMap := make(map[string]PolicyCheckResourceDetails, len(tp.Resources))
 
 	for _, r := range tp.Resources {
-		var details []string
-		if len(r.MissingMandatoryTags) > 0 {
-			details = append(details, fmt.Sprintf("Missing mandatory tags: `%s`", strings.Join(r.MissingMandatoryTags, "`, `")))
-		}
-
-		for _, it := range r.InvalidTags {
-			if len(it.ValidValues) > 0 {
-				details = append(details, fmt.Sprintf("Invalid value, `%s` must be one of: `%s`", it.Key, strings.Join(it.ValidValues, "`, `")))
-			} else if it.ValidRegex != "" {
-				details = append(details, fmt.Sprintf("Invalid value, `%s` must match regex: `%s`", it.Key, it.ValidRegex))
-			}
-		}
-
 		rd := PolicyCheckResourceDetails{
 			Address:      r.Address,
 			ResourceType: r.ResourceType,
@@ -436,7 +426,7 @@ func newTagPolicyCheckOutput(tp TagPolicy) PolicyCheckOutput {
 			Line:         r.Line,
 			Violations: []PolicyCheckViolations{{
 				ProjectNames: r.ProjectNames,
-				Details:      details,
+				Details:      r.Failures(),
 			}},
 		}
 
@@ -568,26 +558,27 @@ func (r TagPolicyResource) Failures() []string {
 	var f []string
 	if len(r.MissingMandatoryTags) > 0 {
 		var tags []string
-		for i, tag := range r.MissingMandatoryTags {
-			if i > 1 && i == len(r.MissingMandatoryTags) {
-				tags = append(tags, fmt.Sprintf("and \"%s\"", tag))
-			} else {
-				tags = append(tags, fmt.Sprintf("\"%s\"", tag))
-			}
+		for _, tag := range r.MissingMandatoryTags {
+			tags = append(tags, fmt.Sprintf("`%s`", tag))
 		}
-		f = append(f, fmt.Sprintf("should have mandatory tags: %s", strings.Join(tags, ", ")))
+		f = append(f, fmt.Sprintf("Missing mandatory tags: %s", strings.Join(tags, ", ")))
 	}
 
 	for _, invalidTag := range r.InvalidTags {
+		value := ""
+		if invalidTag.Value != "" {
+			value = fmt.Sprintf(" `%s`", invalidTag.Value)
+		}
+
 		if len(invalidTag.ValidValues) > 0 {
 			var validValues []string
 			for _, value := range invalidTag.ValidValues {
-				validValues = append(validValues, fmt.Sprintf("\"%s\"", value))
+				validValues = append(validValues, fmt.Sprintf("`%s`", value))
 			}
-			f = append(f, fmt.Sprintf("should have a valid value for \"%s\" tag: %s", invalidTag.Key, strings.Join(validValues, ", ")))
+			f = append(f, fmt.Sprintf("`%s` has invalid value%s, must be one of: %s", invalidTag.Key, value, strings.Join(validValues, ", ")))
 		}
 		if invalidTag.ValidRegex != "" {
-			f = append(f, fmt.Sprintf("should have a valid value for \"%s\" tag: must match regex <code>%s</code>", invalidTag.Key, invalidTag.ValidRegex))
+			f = append(f, fmt.Sprintf("`%s` has invalid value%s, must match regex `%s`", invalidTag.Key, value, invalidTag.ValidRegex))
 		}
 	}
 
@@ -760,7 +751,7 @@ func outputBreakdown(c *config.Config, resources []*schema.Resource) *Breakdown 
 
 	for _, r := range resources {
 		if r.IsSkipped {
-			if c.TagPoliciesEnabled {
+			if c.TagPoliciesEnabled && r.Tags != nil {
 				freeResources = append(freeResources, newResource(r, nil, nil, nil))
 			}
 
@@ -796,10 +787,8 @@ func outputResource(r *schema.Resource) Resource {
 
 func newResource(r *schema.Resource, comps []CostComponent, actualCosts []ActualCosts, subresources []Resource) Resource {
 	metadata := make(map[string]interface{})
-	if r.Metadata != nil {
-		for k, v := range r.Metadata {
-			metadata[k] = v.Value()
-		}
+	for k, v := range r.Metadata {
+		metadata[k] = v.Value()
 	}
 
 	return Resource{

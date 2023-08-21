@@ -1,0 +1,9 @@
+version: 0.1
+
+projects:
+  - path: ./testdata/breakdown_terragrunt_with_remote_source/submod-ref1
+  - path: ./testdata/breakdown_terragrunt_with_remote_source/submod-ref1-2
+  - path: ./testdata/breakdown_terragrunt_with_remote_source/submod-ref3
+  - path: ./testdata/breakdown_terragrunt_with_remote_source/ref1
+  - path: ./testdata/breakdown_terragrunt_with_remote_source/ref1-submod
+  - path: ./testdata/breakdown_terragrunt_with_remote_source/ref2

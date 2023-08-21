@@ -394,6 +394,10 @@ func IsDev() bool {
 }
 
 func loadDotEnv() error {
+	if os.Getenv("INFRACOST_DISABLE_ENVFILE") == "true" {
+		return nil
+	}
+
 	envLocalPath := filepath.Join(RootDir(), ".env.local")
 	if FileExists(envLocalPath) {
 		err := godotenv.Load(envLocalPath)

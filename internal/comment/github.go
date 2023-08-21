@@ -59,6 +59,11 @@ func (c *githubComment) IsHidden() bool {
 	return c.isMinimized
 }
 
+// ValidAt returns the time the comment was tagged as being valid at
+func (c *githubComment) ValidAt() *time.Time {
+	return extractValidAt(c.Body())
+}
+
 // GitHubExtra contains any extra inputs that can be passed to the GitHub comment handlers.
 type GitHubExtra struct {
 	// APIURL is the URL of the GitHub API. This can be set to a custom URL if
@@ -237,7 +242,7 @@ func (h *githubPRHandler) CallFindMatchingComments(ctx context.Context, tag stri
 
 	var matchingComments []Comment
 	for _, comment := range allComments {
-		if strings.Contains(comment.Body(), markdownTag(tag)) {
+		if hasTagKey(comment.Body(), tag) {
 			matchingComments = append(matchingComments, comment)
 		}
 	}
@@ -315,9 +320,9 @@ func (h *githubPRHandler) CallHideComment(ctx context.Context, comment Comment) 
 	return h.v4client.Mutate(ctx, &m, input, nil)
 }
 
-// AddMarkdownTag prepends a tag as a markdown comment to the given string.
-func (h *githubPRHandler) AddMarkdownTag(s string, tag string) string {
-	return addMarkdownTag(s, tag)
+// AddMarkdownTags prepends tags as a markdown comment to the given string.
+func (h *githubPRHandler) AddMarkdownTags(s string, tags []CommentTag) (string, error) {
+	return addMarkdownTags(s, tags)
 }
 
 // githubCommitHandler is a PlatformHandler for GitHub commits. It
@@ -419,7 +424,7 @@ func (h *githubCommitHandler) CallFindMatchingComments(ctx context.Context, tag 
 
 	var matchingComments []Comment
 	for _, comment := range allComments {
-		if strings.Contains(comment.Body(), markdownTag(tag)) {
+		if hasTagKey(comment.Body(), tag) {
 			matchingComments = append(matchingComments, comment)
 		}
 	}
@@ -499,7 +504,7 @@ func (h *githubCommitHandler) CallHideComment(ctx context.Context, comment Comme
 	return h.v4client.Mutate(ctx, &m, input, nil)
 }
 
-// AddMarkdownTag prepends a tag as a markdown comment to the given string.
-func (h *githubCommitHandler) AddMarkdownTag(s string, tag string) string {
-	return addMarkdownTag(s, tag)
+// AddMarkdownTag prepends tags as a markdown comment to the given string.
+func (h *githubCommitHandler) AddMarkdownTags(s string, tags []CommentTag) (string, error) {
+	return addMarkdownTags(s, tags)
 }

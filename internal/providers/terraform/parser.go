@@ -111,6 +111,8 @@ func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.Par
 	resData := p.parseResourceData(isState, providerConf, vals, conf, vars)
 
 	p.parseReferences(resData, conf)
+	p.parseTags(resData, providerConf, conf)
+
 	p.stripDataResources(resData)
 	p.populateUsageData(resData, usage)
 
@@ -308,10 +310,7 @@ func (p *Parser) parseResourceData(isState bool, providerConf, planVals gjson.Re
 
 		v = schema.AddRawValue(v, "region", region)
 
-		defaultTags := parseDefaultTags(providerConf, resConf)
-		tags := parseTags(defaultTags, t, v)
-
-		data := schema.NewResourceData(t, provider, addr, tags, v)
+		data := schema.NewResourceData(t, provider, addr, nil, v)
 		data.Metadata = r.Get("infracost_metadata").Map()
 		resources[addr] = data
 	}
@@ -358,22 +357,6 @@ func parseDefaultTags(providerConf, resConf gjson.Result) *map[string]string {
 	}
 
 	return &defaultTags
-}
-
-func parseTags(defaultTags *map[string]string, resourceType string, v gjson.Result) *map[string]string {
-	providerPrefix := getProviderPrefix(resourceType)
-
-	switch providerPrefix {
-	case "aws":
-		return aws.ParseTags(defaultTags, resourceType, v)
-	case "azurerm":
-		return azure.ParseTags(resourceType, v)
-	case "google":
-		return google.ParseTags(resourceType, v)
-	default:
-		logging.Logger.Debugf("Unsupported provider %s", providerPrefix)
-		return nil
-	}
 }
 
 func overrideRegion(addr string, resourceType string, config *config.Config) string {
@@ -646,6 +629,28 @@ func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, co
 	}
 
 	return found
+}
+
+func (p *Parser) parseTags(data map[string]*schema.ResourceData, providerConf gjson.Result, conf gjson.Result) {
+	for _, resourceData := range data {
+		providerPrefix := getProviderPrefix(resourceData.Type)
+		var tags *map[string]string
+		switch providerPrefix {
+		case "aws":
+			resConf := getConfJSON(conf, resourceData.Address)
+			defaultTags := parseDefaultTags(providerConf, resConf)
+
+			tags = aws.ParseTags(defaultTags, resourceData)
+		case "azurerm":
+			tags = azure.ParseTags(resourceData)
+		case "google":
+			tags = google.ParseTags(resourceData)
+		default:
+			logging.Logger.Debugf("Unsupported provider %s", providerPrefix)
+		}
+
+		resourceData.Tags = tags
+	}
 }
 
 func getConfJSON(conf gjson.Result, addr string) gjson.Result {

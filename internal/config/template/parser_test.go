@@ -51,6 +51,9 @@ func TestParser_Compile(t *testing.T) {
 		{
 			name: "with is dir",
 		},
+		{
+			name: "with parse functions",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

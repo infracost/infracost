@@ -379,6 +379,7 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 		p.blockBuilder,
 		p.newSpinner,
 		p.logger,
+		nil,
 	)
 
 	root, err := evaluator.Run()

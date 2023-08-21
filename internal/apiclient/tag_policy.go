@@ -40,6 +40,8 @@ func (c *TagPolicyAPIClient) CheckTagPolicies(ctx *config.RunContext, out output
 				message
 				prComment
 				blockPr
+				totalDetectedResources
+				totalTaggableResources
 				resources {
 					address
 					resourceType
@@ -49,6 +51,7 @@ func (c *TagPolicyAPIClient) CheckTagPolicies(ctx *config.RunContext, out output
 					missingMandatoryTags
 					invalidTags {
 						key
+						value
 						validValues
 						validRegex
 					}
