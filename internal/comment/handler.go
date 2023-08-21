@@ -101,26 +101,47 @@ type CommentTag struct {
 // CommentWithBehavior parses the behavior and calls the corresponding *Comment method. Returns
 // boolean indicating if the comment was actually posted.
 func (h *CommentHandler) CommentWithBehavior(ctx context.Context, behavior, body string, opts *CommentOpts) (PostResult, error) {
-	var result = PostResult{Posted: false}
+	var result PostResult
 	var err error
 
-	switch behavior {
-	case "update":
-		result, err = h.UpdateComment(ctx, body, opts)
-	case "new":
-		err = h.NewComment(ctx, body, opts)
+	backoff := time.Second
+
+	const maxRetries = 5
+	for i := 0; i < maxRetries; i++ {
+		result, err = h.commentWithBehaviour(ctx, behavior, body, opts)
 		if err == nil {
-			result = PostResult{Posted: true}
+			return result, nil
 		}
-	case "hide-and-new":
-		result, err = h.HideAndNewComment(ctx, body, opts)
-	case "delete-and-new":
-		result, err = h.DeleteAndNewComment(ctx, body, opts)
-	default:
-		return result, fmt.Errorf("Unable to perform unknown behavior: %v", behavior)
+
+		if i == maxRetries-1 {
+			break
+		}
+
+		logging.Logger.WithError(err).Debugf("received an error trying to post comment pausing %d seconds then will retry", backoff.Seconds())
+		time.Sleep(backoff)
+		backoff *= 2
 	}
 
 	return result, err
+}
+func (h *CommentHandler) commentWithBehaviour(ctx context.Context, behavior string, body string, opts *CommentOpts) (PostResult, error) {
+	switch behavior {
+	case "update":
+		return h.UpdateComment(ctx, body, opts)
+	case "new":
+		err := h.NewComment(ctx, body, opts)
+		if err != nil {
+			return PostResult{Posted: false}, err
+		}
+
+		return PostResult{Posted: true}, nil
+	case "hide-and-new":
+		return h.HideAndNewComment(ctx, body, opts)
+	case "delete-and-new":
+		return h.DeleteAndNewComment(ctx, body, opts)
+	}
+
+	return PostResult{Posted: false}, nil
 }
 
 // matchingComments returns all comments that match the tag.
