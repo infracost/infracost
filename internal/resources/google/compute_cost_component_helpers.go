@@ -32,17 +32,18 @@ type ContainerNodeConfig struct {
 
 /*
 For the values initialized in the struct below, please refer to the
+
 	sustained-use-discounts section of the GCP Documentation.
 
 size_SUD is set to 4 as the Usage level (% of month) is 4
+
 	to make sure we don't overshoot the array
 */
-const size_SUD = 4
+const sudRateSize = 4
 
-type SudValues struct {
-	thresholds       [size_SUD]float64
-	rates            [size_SUD]float64
-	incrementalRates [size_SUD]float64
+type sudRates struct {
+	thresholds [sudRateSize]float64
+	rates      [sudRateSize]float64
 }
 
 // computeCostComponent returns a cost component for Compute instance usage.
@@ -63,25 +64,23 @@ func computeCostComponents(region, machineType string, purchaseOption string, in
 		hours = *monthlyHours
 	}
 
-	VarSudUptoTwenty := SudValues{
-		thresholds:       [size_SUD]float64{0, 0.25, 0.50, 0.75},
-		rates:            [size_SUD]float64{1.0, 0.8678, 0.733, 0.6},
-		incrementalRates: [size_SUD]float64{0.2088, 0.1811, 0.1530, 0.1252},
+	sudRate20 := sudRates{
+		thresholds: [sudRateSize]float64{0, 0.25, 0.50, 0.75},
+		rates:      [sudRateSize]float64{1.0, 0.8678, 0.733, 0.6},
 	}
 
-	VarSudUptoThirty := SudValues{
-		thresholds:       [size_SUD]float64{0, 0.25, 0.50, 0.75},
-		rates:            [size_SUD]float64{1.0, 0.80, 0.60, 0.40},
-		incrementalRates: [size_SUD]float64{0.0475, 0.0380, 0.0285, 0.0190},
+	sudRate30 := sudRates{
+		thresholds: [sudRateSize]float64{0, 0.25, 0.50, 0.75},
+		rates:      [sudRateSize]float64{1.0, 0.80, 0.60, 0.40},
 	}
 
 	if strings.ToLower(purchaseOption) == "on_demand" {
 		fixPurchaseOption = "OnDemand"
 		switch strings.ToLower(strings.Split(machineType, "-")[0]) {
 		case "c2", "n2", "n2d":
-			sustainedUseDiscount = getSustainedUseDiscount(hours, VarSudUptoTwenty)
+			sustainedUseDiscount = getSustainedUseDiscount(hours, sudRate20)
 		case "custom", "n1", "f1", "g1", "m1":
-			sustainedUseDiscount = getSustainedUseDiscount(hours, VarSudUptoThirty)
+			sustainedUseDiscount = getSustainedUseDiscount(hours, sudRate30)
 		default:
 			sustainedUseDiscount = 0.0
 		}
@@ -240,32 +239,40 @@ func computeCostComponents(region, machineType string, purchaseOption string, in
 
 }
 
-func getSustainedUseDiscount(hours float64, VarSUD SudValues) float64 {
+func getSustainedUseDiscount(hours float64, rates sudRates) float64 {
+	totalHoursInMonth, _ := schema.HourToMonthUnitMultiplier.Float64()
 
-	totalHoursInMonth := 730.0
-	totalDiscount := 0.0
+	// Keep track of how many hours we have remaining after each threshold is applied
 	remainingHours := hours
 
-	for i, threshold := range VarSUD.thresholds {
-		thresholdHours := threshold * totalHoursInMonth
+	// Keep track of the total hours that are charged for
+	ratedHours := 0.0
+
+	index := 0
+	for remainingHours > 0 {
+		// Calculate the percentage of the month that is covered by the current threshold
+		lastThreshold := 0.0
+		if index > 0 {
+			lastThreshold = rates.thresholds[index-1]
+		}
+
+		thresholdHours := (rates.thresholds[index] - lastThreshold) * totalHoursInMonth
+
+		// If the remaining hours are less than the threshold, add them and then we are done
 		if remainingHours <= thresholdHours {
-			totalDiscount += remainingHours * VarSUD.rates[i] * VarSUD.incrementalRates[i]
+			ratedHours += remainingHours * rates.rates[index]
 			remainingHours = 0
 			break
-		} else {
-			totalDiscount += thresholdHours * VarSUD.rates[i] * VarSUD.incrementalRates[i]
-			remainingHours -= thresholdHours
 		}
+
+		// Otherwise, add the discount for the current threshold and continue
+		ratedHours += thresholdHours * rates.rates[index]
+		remainingHours -= thresholdHours
+		index++
 	}
 
-	if remainingHours > 0 && len(VarSUD.rates) > 0 && len(VarSUD.incrementalRates) > 0 {
-		totalDiscount += remainingHours * VarSUD.rates[len(VarSUD.rates)-1] * VarSUD.incrementalRates[len(VarSUD.incrementalRates)-1]
-	}
-
-	// Convert totalDiscount to a percentage of the total potential cost
-	totalDiscountPercent := totalDiscount / (hours * VarSUD.rates[0]) * 100
-
-	return totalDiscountPercent
+	// Return the average discount over the hours the instance is running
+	return 1 - (ratedHours / hours)
 }
 
 // bootDiskCostComponent returns a cost component for Boot Disk storage for
