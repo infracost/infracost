@@ -249,7 +249,7 @@ func getSustainedUseDiscount(hours float64, rates sudRates) float64 {
 	ratedHours := 0.0
 
 	index := 0
-	for remainingHours > 0 {
+	for remainingHours > 0 && index < len(rates.rates) {
 		// Calculate the percentage of the month that is covered by the current threshold
 		lastThreshold := 0.0
 		if index > 0 {
@@ -259,7 +259,7 @@ func getSustainedUseDiscount(hours float64, rates sudRates) float64 {
 		thresholdHours := (rates.thresholds[index] - lastThreshold) * totalHoursInMonth
 
 		// If the remaining hours are less than the threshold, add them and then we are done
-		if remainingHours <= thresholdHours || index >= len(rates.rates)-1 {
+		if remainingHours <= thresholdHours {
 			ratedHours += remainingHours * rates.rates[index]
 			remainingHours = 0
 			break
