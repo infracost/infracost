@@ -14,8 +14,9 @@ import (
 )
 
 var (
-	missingAttributeDiagnostic   = "Unsupported attribute"
-	valueIsNonIterableDiagnostic = "Iteration over non-iterable value"
+	missingAttributeDiagnostic        = "Unsupported attribute"
+	valueIsNonIterableDiagnostic      = "Iteration over non-iterable value"
+	invalidFunctionArgumentDiagnostic = "Invalid function argument"
 )
 
 // Attribute provides a wrapper struct around hcl.Attribute it provides
@@ -202,6 +203,34 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 
 					list := cty.TupleVal([]cty.Value{val})
 					traverseVarAndSetCtx(ctx, traversal, list)
+				}
+			}
+
+			if d.Summary == invalidFunctionArgumentDiagnostic {
+				badVariables := d.Expression.Variables()
+				shouldRetry = true
+
+				// Parse out the friendly name of the variable from the diagnostic message.
+				pp := strings.Split(d.Detail, ":")
+				friendlyName := strings.Trim(strings.TrimSuffix(pp[len(pp)-1], "required."), " ")
+
+				for _, traversal := range badVariables {
+					// let's first try and find the actual value for this bad variable.
+					// If it has an actual value let's use that to pass into the list.
+					val, _ := traversal.TraverseAbs(ctx)
+					if val.IsNull() {
+						val = mockedVal
+					}
+
+					if strings.HasPrefix(friendlyName, "list of") {
+						val = cty.ListVal([]cty.Value{val})
+					} else if strings.HasPrefix(friendlyName, "set of") {
+						val = cty.SetVal([]cty.Value{val})
+					} else if friendlyName == "tuple" {
+						val = cty.TupleVal([]cty.Value{val})
+					}
+
+					traverseVarAndSetCtx(ctx, traversal, val)
 				}
 			}
 
