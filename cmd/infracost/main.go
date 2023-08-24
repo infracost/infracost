@@ -91,6 +91,10 @@ func Run(modifyCtx func(*config.RunContext), args *[]string) {
 	}
 
 	appErr = rootCmd.Execute()
+	err = apiclient.GetPricingAPIClient(ctx).FlushCache()
+	if err != nil {
+		logging.Logger.WithError(err).Debug("could not flush pricing API cache to filesystem")
+	}
 }
 
 type debugWriter struct {

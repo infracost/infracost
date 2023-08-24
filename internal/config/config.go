@@ -79,6 +79,8 @@ type Config struct {
 
 	APIKey                    string `envconfig:"API_KEY"`
 	PricingAPIEndpoint        string `yaml:"pricing_api_endpoint,omitempty" envconfig:"PRICING_API_ENDPOINT"`
+	PricingCacheDisabled      bool   `yaml:"pricing_cache_disabled" envconfig:"PRICING_CACHE_DISABLED"`
+	PricingCacheObjectSize    int    `yaml:"pricing_cache_object_size" envconfig:"PRICING_CACHE_OBJECT_SIZE"`
 	DefaultPricingAPIEndpoint string `yaml:"default_pricing_api_endpoint,omitempty" envconfig:"DEFAULT_PRICING_API_ENDPOINT"`
 	DashboardAPIEndpoint      string `yaml:"dashboard_api_endpoint,omitempty" envconfig:"DASHBOARD_API_ENDPOINT"`
 	DashboardEndpoint         string `yaml:"dashboard_endpoint,omitempty" envconfig:"DASHBOARD_ENDPOINT"`
