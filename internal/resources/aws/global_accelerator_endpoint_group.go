@@ -61,6 +61,7 @@ var regionCodeMapping = map[string]string{
 	"eu-south-1":      "EU",
 	"eu-west-3":       "EU",
 	"eu-north-1":      "EU",
+	"il-central-1":    "EU",
 	"ap-east-1":       "AP",
 	"ap-northeast-1":  "AP",
 	"ap-northeast-2":  "AP",
