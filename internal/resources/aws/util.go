@@ -126,6 +126,7 @@ var RegionMapping = map[string]string{
 	"eu-south-2":      "EU (Spain)",
 	"eu-west-3":       "EU (Paris)",
 	"eu-north-1":      "EU (Stockholm)",
+	"il-central-1":    "Israel (Tel Aviv)",
 	"ap-east-1":       "Asia Pacific (Hong Kong)",
 	"ap-northeast-1":  "Asia Pacific (Tokyo)",
 	"ap-northeast-2":  "Asia Pacific (Seoul)",

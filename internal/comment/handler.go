@@ -117,7 +117,7 @@ func (h *CommentHandler) CommentWithBehavior(ctx context.Context, behavior, body
 			break
 		}
 
-		logging.Logger.WithError(err).Debugf("received an error trying to post comment pausing %2f seconds then will retry", backoff.Seconds())
+		logging.Logger.WithError(err).Debugf("received an error trying to post comment pausing %v seconds then will retry", backoff.Seconds())
 		time.Sleep(backoff)
 		backoff *= 2
 	}

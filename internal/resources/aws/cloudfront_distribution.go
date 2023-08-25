@@ -441,6 +441,7 @@ var regionShieldMapping = map[string]string{
 	"eu-south-1":      "europe",
 	"eu-west-3":       "europe",
 	"eu-north-1":      "europe",
+	"il-central-1":    "europe",
 	"ap-northeast-1":  "japan",
 	"ap-northeast-2":  "south_korea",
 	"ap-southeast-1":  "singapore",
