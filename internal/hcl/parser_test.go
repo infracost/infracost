@@ -1130,7 +1130,7 @@ resource "dynamic" "resource" {
 	assert.JSONEq(
 		t,
 		`[
-			{"foo":"10.0.2.0", "bar":"existing_child_block_should_be_kept"},		
+			{"foo":"10.0.2.0", "bar":"existing_child_block_should_be_kept"},
 			{"foo":"10.0.0.0","bar":"input-mock"},
 			{"foo":"10.0.1.0","bar":"input-mock"}
 		]`,
@@ -1326,7 +1326,7 @@ data "aws_availability_zones" "ne" {
 	blocks := module.Blocks
 	eu := blocks.Matching(BlockMatcher{Label: "aws_availability_zones.eu", Type: "data"})
 	b := valueToBytes(t, eu.Values())
-	assert.JSONEq(t, `{"group_names":["eu-west-2","eu-west-2","eu-west-2","eu-west-2-wl1","eu-west-2-wl1"],"id":"eu-west-2","names":["eu-west-2a","eu-west-2b","eu-west-2c","eu-west-2-wl1-lon-wlz-1","eu-west-2-wl1-man-wlz-1"],"zone_ids":["euw2-az2","euw2-az3","euw2-az1","euw2-wl1-lon-wlz1","euw2-wl1-man-wlz1"]}`, string(b))
+	assert.JSONEq(t, `{"group_names":["eu-west-2","eu-west-2","eu-west-2","eu-west-2-wl1","eu-west-2-wl1","eu-west-2-wl2"],"id":"eu-west-2","names":["eu-west-2a","eu-west-2b","eu-west-2c","eu-west-2-wl1-lon-wlz-1","eu-west-2-wl1-man-wlz-1","eu-west-2-wl2-man-wlz-1"],"zone_ids":["euw2-az2","euw2-az3","euw2-az1","euw2-wl1-lon-wlz1","euw2-wl1-man-wlz1","euw2-wl2-man-wlz1"]}`, string(b))
 
 	us := blocks.Matching(BlockMatcher{Label: "aws_availability_zones.us", Type: "data"})
 	b = valueToBytes(t, us.Values())
