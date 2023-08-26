@@ -25,6 +25,3 @@
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
 ┃ TestSQLElasticPool                                 ┃ $3,469       ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
-Logs:
-
-level=warning msg="Multiple products with prices found for azurerm_sql_elasticpool.premium_500 Compute (Premium, 500 DTUs), using the first product"
