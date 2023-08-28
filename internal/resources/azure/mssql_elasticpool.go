@@ -108,11 +108,17 @@ func (r *MSSQLElasticPool) dtuCostComponents() []*schema.CostComponent {
 			// so we need to convert the price per day to price per hour.
 			UnitMultiplier:  schema.DayToMonthUnitMultiplier,
 			MonthlyQuantity: decimalPtr(schema.DaysInMonth),
-			ProductFilter: r.productFilter([]*schema.AttributeFilter{
-				{Key: "productName", ValueRegex: regexPtr(productName)},
-				{Key: "skuName", Value: strPtr(fmt.Sprintf("%d DTU Pack", dtuCapacity))},
-				{Key: "meterName", Value: strPtr("eDTUs")},
-			}),
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr(vendorName),
+				Region:        strPtr(r.Region),
+				Service:       strPtr("SQL Database"),
+				ProductFamily: strPtr("Databases"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "productName", Value: strPtr(productName)},
+					{Key: "skuName", Value: strPtr(fmt.Sprintf("%d DTU Pack", dtuCapacity))},
+					{Key: "meterName", Value: strPtr("eDTUs")},
+				},
+			},
 			PriceFilter: priceFilterConsumption,
 		},
 	}
