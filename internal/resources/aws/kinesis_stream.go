@@ -38,10 +38,19 @@ func (r *KinesisStream) PopulateUsage(u *schema.UsageData) {
 // BuildResource builds a schema.Resource from a valid KinesisStream struct.
 // This method is called after the resource is initialised by an IaC provider.
 // See providers folder for more information.
+
+// Set some vars that come from the pricing api
+var OnDemandStreamName string = "ON_DEMAND"
+var ProvisionedStreamName string = "PROVISIONED"
+
 func (r *KinesisStream) BuildResource() *schema.Resource {
-	costComponents := []*schema.CostComponent{
-		// TODO: add cost components
-		r.onDemandStreamCostComponent(),
+	costComponents := []*schema.CostComponent{}
+
+	// Depending on the stream mode, we will have different cost components
+	if r.StreamMode == OnDemandStreamName {
+		costComponents = append(costComponents, r.onDemandStreamCostComponent())
+	} else if r.StreamMode == ProvisionedStreamName {
+		costComponents = append(costComponents, r.provisionedStreamCostComponent())
 	}
 
 	return &schema.Resource{
@@ -53,7 +62,7 @@ func (r *KinesisStream) BuildResource() *schema.Resource {
 
 func (r *KinesisStream) onDemandStreamCostComponent() *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:           r.StreamMode,
+		Name:           OnDemandStreamName,
 		Unit:           "hours",
 		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
@@ -65,6 +74,29 @@ func (r *KinesisStream) onDemandStreamCostComponent() *schema.CostComponent {
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "usagetype", Value: strPtr("OnDemand-StreamHour")},
 				{Key: "operation", Value: strPtr("OnDemandStreamHr")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("on_demand"),
+		},
+	}
+}
+
+// TODO - this is not working yet
+func (r *KinesisStream) provisionedStreamCostComponent() *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:           ProvisionedStreamName,
+		Unit:           "hours",
+		UnitMultiplier: decimal.NewFromInt(1),
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("AmazonKinesis"),
+			ProductFamily: strPtr("Kinesis Streams"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", Value: strPtr("Extended-ShardHour")},
+				{Key: "operation", Value: strPtr("shardHourStorage")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

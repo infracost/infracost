@@ -10,10 +10,20 @@ provider "aws" {
 
 # Add example resources for KinesisStream below
 
-resource "aws_kinesis_stream" "test_stream" {
-  name             = "terraform-kinesis-test"
+resource "aws_kinesis_stream" "test_stream_on_demand" {
+  name             = "terraform-kinesis-test-od"
   stream_mode_details {
     stream_mode = "ON_DEMAND"
+  }
+  tags = {
+    Environment = "test"
+  }
+}
+
+resource "aws_kinesis_stream" "test_stream_provisioned" {
+  name             = "terraform-kinesis-test-pr"
+  stream_mode_details {
+    stream_mode = "PROVISIONED"
   }
   tags = {
     Environment = "test"

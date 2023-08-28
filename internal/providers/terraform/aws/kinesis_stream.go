@@ -1,8 +1,6 @@
 package aws
 
 import (
-	"fmt"
-
 	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -17,7 +15,6 @@ func getKinesisStreamRegistryItem() *schema.RegistryItem {
 func newKinesisStream(d *schema.ResourceData) schema.CoreResource {
 	region := d.Get("region").String()
 	StreamMode := d.Get("stream_mode_details.0.stream_mode").String()
-	fmt.Println(StreamMode)
 	return &aws.KinesisStream{
 		Address:    d.Address,
 		Region:     region,
