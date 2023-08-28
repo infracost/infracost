@@ -1,4 +1,7 @@
-package terraform
+//go:build test
+// +build test
+
+package tftest
 
 import (
 	"bufio"

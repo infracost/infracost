@@ -11,6 +11,7 @@ func TestAzureRMAppServiceCustomHostnameBinding(t *testing.T) {
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
-
-	tftest.GoldenFileResourceTests(t, "app_service_custom_hostname_binding_test")
+	opts := tftest.DefaultGoldenFileOptions()
+	opts.RequiresInit = true
+	tftest.GoldenFileResourceTestsWithOpts(t, "app_service_custom_hostname_binding_test", opts)
 }

@@ -65,18 +65,6 @@
           },
           "type": "object"
         },
-        "terraform_force_cli": {
-          "type": "boolean"
-        },
-        "terraform_plan_flags": {
-          "type": "string"
-        },
-        "terraform_init_flags": {
-          "type": "string"
-        },
-        "terraform_binary": {
-          "type": "string"
-        },
         "terraform_workspace": {
           "type": "string"
         },
@@ -86,14 +74,8 @@
         "terraform_cloud_token": {
           "type": "string"
         },
-        "terragrunt_flags": {
-          "type": "string"
-        },
         "usage_file": {
           "type": "string"
-        },
-        "terraform_use_state": {
-          "type": "boolean"
         },
         "env": {
           "patternProperties": {

@@ -21,5 +21,7 @@ func TestAzureRMLoadBalancerOutboundRuleV2GoldenFile(t *testing.T) {
 		t.Skip("skipping test in short mode")
 	}
 
-	tftest.GoldenFileResourceTests(t, "lb_outbound_rule_v2_test")
+	opts := tftest.DefaultGoldenFileOptions()
+	opts.RequiresInit = true
+	tftest.GoldenFileResourceTestsWithOpts(t, "lb_outbound_rule_v2_test", opts)
 }

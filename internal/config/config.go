@@ -41,14 +41,6 @@ type Project struct {
 	TerraformVarFiles []string `yaml:"terraform_var_files,omitempty"`
 	// TerraformVars is a slice of input vars that are to be used with the project.
 	TerraformVars map[string]string `yaml:"terraform_vars,omitempty"`
-	// TerraformForceCLI will run a project by calling out to the terraform/terragrunt binary to generate a plan JSON file.
-	TerraformForceCLI bool `yaml:"terraform_force_cli,omitempty"`
-	// TerraformPlanFlags are flags to pass to terraform plan with Terraform directory paths
-	TerraformPlanFlags string `yaml:"terraform_plan_flags,omitempty" ignored:"true"`
-	// TerraformInitFlags are flags to pass to terraform init
-	TerraformInitFlags string `yaml:"terraform_init_flags,omitempty" ignored:"true"`
-	// TerraformBinary is an optional field used to change the path to the terraform or terragrunt binary
-	TerraformBinary string `yaml:"terraform_binary,omitempty" envconfig:"TERRAFORM_BINARY"`
 	// TerraformWorkspace is an optional field used to set the Terraform workspace
 	TerraformWorkspace string `yaml:"terraform_workspace,omitempty" envconfig:"TERRAFORM_WORKSPACE"`
 	// TerraformCloudHost is used to override the default app.terraform.io backend host. Only applicable for
@@ -57,13 +49,9 @@ type Project struct {
 	// TerraformCloudToken sets the Team API Token or User API Token so infracost can use it to access the plan.
 	// Only applicable for terraform cloud/enterprise users.
 	TerraformCloudToken string `yaml:"terraform_cloud_token,omitempty" envconfig:"TERRAFORM_CLOUD_TOKEN"`
-	// TerragruntFlags set additional flags that should be passed to terragrunt.
-	TerragruntFlags string `yaml:"terragrunt_flags,omitempty" envconfig:"TERRAGRUNT_FLAGS"`
 	// UsageFile is the full path to usage file that specifies values for usage-based resources
-	UsageFile string `yaml:"usage_file,omitempty" ignored:"true"`
-	// TerraformUseState sets if the users wants to use the terraform state for infracost ops.
-	TerraformUseState bool              `yaml:"terraform_use_state,omitempty" ignored:"true"`
-	Env               map[string]string `yaml:"env,omitempty" ignored:"true"`
+	UsageFile string            `yaml:"usage_file,omitempty" ignored:"true"`
+	Env       map[string]string `yaml:"env,omitempty" ignored:"true"`
 }
 
 type Config struct {

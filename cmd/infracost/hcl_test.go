@@ -106,7 +106,7 @@ func TestHCLModuleRelativeFilesets(t *testing.T) {
 			"breakdown",
 			"--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
 		}, &GoldenFileOptions{
-			RunTerraformCLI: true,
+			RunTerraformPlan: true,
 		},
 	)
 }

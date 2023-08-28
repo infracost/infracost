@@ -6,7 +6,6 @@ import (
 	"github.com/shopspring/decimal"
 
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
-	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/testutil"
 )
 
@@ -16,6 +15,7 @@ func TestAutoscalingGroup(t *testing.T) {
 	}
 
 	opts := tftest.DefaultGoldenFileOptions()
+	opts.RequiresInit = true
 	opts.CaptureLogs = true
 	tftest.GoldenFileResourceTestsWithOpts(t, "autoscaling_group_test", opts)
 }
@@ -30,12 +30,12 @@ func TestAutoscalingGroup_spot(t *testing.T) {
 	resource "aws_launch_template" "lt_spot" {
 		image_id      = "fake_ami"
 		instance_type = "t3.medium"
-	
+
 		instance_market_options {
 			market_type = "spot"
 		}
 	}
-	
+
 	resource "aws_autoscaling_group" "asg_lt_spot" {
 		launch_template {
 			id = aws_launch_template.lt_spot.id
@@ -45,24 +45,24 @@ func TestAutoscalingGroup_spot(t *testing.T) {
 		max_size         = 3
 		min_size         = 1
 	}
-	
+
 	resource "aws_launch_template" "lt_mixed_instance_spot" {
 		image_id      = "fake_ami"
 		instance_type = "t3.medium"
 	}
-	
+
 	resource "aws_autoscaling_group" "asg_mixed_instance_spot" {
 		desired_capacity = 6
 		max_size         = 10
 		min_size         = 1
-	
+
 		mixed_instances_policy {
 			launch_template {
 				launch_template_specification {
 					launch_template_id = aws_launch_template.lt_mixed_instance_spot.id
 				}
 			}
-	
+
 			instances_distribution {
 				on_demand_base_capacity                  = 2
 				on_demand_percentage_above_base_capacity = 50
@@ -119,5 +119,5 @@ func TestAutoscalingGroup_spot(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTests(t, tf, schema.UsageMap{}, resourceChecks)
+	tftest.ResourceTests(t, tf, resourceChecks, tftest.ResourceTestOptions{})
 }

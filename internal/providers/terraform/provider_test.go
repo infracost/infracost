@@ -4,7 +4,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/testutil"
 
 	"github.com/infracost/infracost/internal/providers/terraform/tftest"
@@ -43,7 +42,7 @@ func TestLoadResources_rootModule(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTestsForTerraformProject(t, project, schema.UsageMap{}, resourceChecks)
+	tftest.ResourceTestsForTerraformProject(t, project, resourceChecks, tftest.ResourceTestOptions{})
 }
 
 func TestLoadResources_nestedModule(t *testing.T) {
@@ -98,5 +97,5 @@ func TestLoadResources_nestedModule(t *testing.T) {
 		},
 	}
 
-	tftest.ResourceTestsForTerraformProject(t, project, schema.UsageMap{}, resourceChecks)
+	tftest.ResourceTestsForTerraformProject(t, project, resourceChecks, tftest.ResourceTestOptions{RequiresInit: true})
 }

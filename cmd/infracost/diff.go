@@ -124,11 +124,7 @@ func runCompare(cmd *cobra.Command, ctx *config.RunContext, current output.Root)
 
 func checkDiffConfig(cfg *config.Config) error {
 	for _, projectConfig := range cfg.Projects {
-		if projectConfig.TerraformUseState {
-			return errors.New("terraform_use_state cannot be used with `infracost diff` as the Terraform state only contains the current state")
-		}
-
-		projectType := providers.DetectProjectType(projectConfig.Path, projectConfig.TerraformForceCLI)
+		projectType := providers.DetectProjectType(projectConfig.Path)
 		if (projectType == "terraform_dir" || projectType == "terragrunt_dir") && cfg.CompareTo == "" {
 			examplePath := "/code"
 			if projectConfig.Path != "" {

@@ -9,7 +9,6 @@ import (
 	"runtime/debug"
 	"sort"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/Rhymond/go-money"
@@ -53,9 +52,6 @@ func addRunFlags(cmd *cobra.Command) {
 
 	cmd.Flags().String("project-name", "", "Name of project in the output. Defaults to path or git repo name")
 
-	cmd.Flags().Bool("terraform-force-cli", false, "Generate the Terraform plan JSON using the Terraform CLI. This may require cloud credentials")
-	cmd.Flags().String("terraform-plan-flags", "", "Flags to pass to 'terraform plan'. Applicable with --terraform-force-cli")
-	cmd.Flags().String("terraform-init-flags", "", "Flags to pass to 'terraform init'. Applicable with --terraform-force-cli")
 	cmd.Flags().String("terraform-workspace", "", "Terraform workspace to use. Applicable when path is a Terraform directory")
 
 	cmd.Flags().StringSlice("exclude-path", nil, "Paths of directories to exclude, glob patterns need quotes")
@@ -72,11 +68,6 @@ func addRunFlags(cmd *cobra.Command) {
 	_ = cmd.MarkFlagFilename("path", "json", "tf")
 	_ = cmd.MarkFlagFilename("config-file", "yml")
 	_ = cmd.MarkFlagFilename("usage-file", "yml")
-
-	_ = cmd.Flags().MarkHidden("terraform-force-cli")
-	// These are deprecated and will show a warning if used without --terraform-force-cli
-	_ = cmd.Flags().MarkHidden("terraform-plan-flags")
-	_ = cmd.Flags().MarkHidden("terraform-init-flags")
 }
 
 func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
@@ -192,23 +183,12 @@ type projectOutput struct {
 type parallelRunner struct {
 	cmd         *cobra.Command
 	runCtx      *config.RunContext
-	pathMuxs    map[string]*sync.Mutex
 	prior       *output.Root
 	parallelism int
 	numJobs     int
 }
 
 func newParallelRunner(cmd *cobra.Command, runCtx *config.RunContext) (*parallelRunner, error) {
-	// Create a mutex for each path, so we can synchronize the runs of any
-	// projects that have the same path. This is necessary because Terraform
-	// can't run multiple operations in parallel on the same path.
-	pathMuxs := map[string]*sync.Mutex{}
-	for _, projectCfg := range runCtx.Config.Projects {
-		if projectCfg.TerraformForceCLI {
-			pathMuxs[projectCfg.Path] = &sync.Mutex{}
-		}
-	}
-
 	var prior *output.Root
 	if runCtx.Config.CompareTo != "" {
 		snapshot, err := output.Load(runCtx.Config.CompareTo)
@@ -247,7 +227,6 @@ func newParallelRunner(cmd *cobra.Command, runCtx *config.RunContext) (*parallel
 		numJobs:     numJobs,
 		runCtx:      runCtx,
 		cmd:         cmd,
-		pathMuxs:    pathMuxs,
 		prior:       prior,
 	}, nil
 }
@@ -316,12 +295,6 @@ func (r *parallelRunner) run() ([]projectResult, error) {
 }
 
 func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectOutput, error) {
-	mux := r.pathMuxs[ctx.ProjectConfig.Path]
-	if mux != nil {
-		mux.Lock()
-		defer mux.Unlock()
-	}
-
 	provider, err := providers.Detect(ctx, r.prior == nil)
 	var warn *string
 	if v, ok := err.(*providers.ValidationError); ok {
@@ -718,10 +691,8 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	hasProjectFlags := (hasPathFlag ||
 		cmd.Flags().Changed("usage-file") ||
 		cmd.Flags().Changed("project-name") ||
-		cmd.Flags().Changed("terraform-plan-flags") ||
 		cmd.Flags().Changed("terraform-var-file") ||
 		cmd.Flags().Changed("terraform-var") ||
-		cmd.Flags().Changed("terraform-init-flags") ||
 		cmd.Flags().Changed("terraform-workspace"))
 
 	if hasConfigFile && hasProjectFlags {
@@ -743,10 +714,6 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 		projectCfg.TerraformVars = tfVarsToMap(tfVars)
 		projectCfg.UsageFile, _ = cmd.Flags().GetString("usage-file")
 		projectCfg.Name, _ = cmd.Flags().GetString("project-name")
-		projectCfg.TerraformForceCLI, _ = cmd.Flags().GetBool("terraform-force-cli")
-		projectCfg.TerraformPlanFlags, _ = cmd.Flags().GetString("terraform-plan-flags")
-		projectCfg.TerraformInitFlags, _ = cmd.Flags().GetString("terraform-init-flags")
-		projectCfg.TerraformUseState, _ = cmd.Flags().GetBool("terraform-use-state")
 		projectCfg.ExcludePaths, _ = cmd.Flags().GetStringSlice("exclude-path")
 		projectCfg.IncludeAllPaths, _ = cmd.Flags().GetBool("include-all-paths")
 
@@ -764,17 +731,6 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 		}
 
 		cfg.ConfigFilePath = cfgFilePath
-
-		if forceCLI, _ := cmd.Flags().GetBool("terraform-force-cli"); forceCLI {
-			for _, p := range cfg.Projects {
-				p.TerraformForceCLI = true
-			}
-		}
-		if useState, _ := cmd.Flags().GetBool("terraform-use-state"); useState {
-			for _, p := range cfg.Projects {
-				p.TerraformUseState = true
-			}
-		}
 	}
 
 	cfg.NoCache, _ = cmd.Flags().GetBool("no-cache")

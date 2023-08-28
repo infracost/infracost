@@ -19,7 +19,7 @@ var (
 	projectPathRegex = regexp.MustCompile(`(Project: .*) \(.*/infracost/examples/.*\)`)
 	versionRegex     = regexp.MustCompile(`Infracost v.*`)
 	panicRegex       = regexp.MustCompile(`runtime\serror:([\w\d\n\r\[\]\:\/\.\\(\)\+\,\{\}\*\@\s\?]*)Environment`)
-	pathRegex        = regexp.MustCompile(`(/.*/)(infracost/infracost/cmd/infracost/testdata/.*)`)
+	pathRegex        = regexp.MustCompile(`(/[\w-/]*/)(infracost/cmd/infracost/testdata/.*)`)
 )
 
 type GoldenFileOptions = struct {
@@ -27,10 +27,10 @@ type GoldenFileOptions = struct {
 	CaptureLogs bool
 	IsJSON      bool
 	Env         map[string]string
-	// RunTerraformCLI sets the cmd test to also run the cmd with --terraform-force-cli set
-	RunTerraformCLI bool
-	// OnlyRunTerraformCLI sets the cmd test to only run cmd with --terraform-force-cli set and ignores the HCL parsing.
-	OnlyRunTerraformCLI bool
+	// RunTerraformPlan sets the cmd test to generate a Terraform plan and run against that.
+	RunTerraformPlan bool
+	// OnlyRunTerraformPlan sets the cmd test to only run against a Terraform plan and ignores the HCL parsing.
+	OnlyRunTerraformPlan bool
 }
 
 func DefaultOptions() *GoldenFileOptions {
@@ -42,19 +42,15 @@ func DefaultOptions() *GoldenFileOptions {
 }
 
 func GoldenFileCommandTest(t *testing.T, testName string, args []string, testOptions *GoldenFileOptions, ctxOptions ...func(ctx *config.RunContext)) {
-	if testOptions == nil || !testOptions.OnlyRunTerraformCLI {
+	if testOptions == nil || !testOptions.OnlyRunTerraformPlan {
 		t.Run("HCL", func(t *testing.T) {
 			goldenFileCommandTest(t, testName, args, testOptions, true, ctxOptions...)
 		})
 	}
 
-	if testOptions != nil && (testOptions.RunTerraformCLI || testOptions.OnlyRunTerraformCLI) {
+	if testOptions != nil && (testOptions.RunTerraformPlan || testOptions.OnlyRunTerraformPlan) {
 		t.Run("CLI", func(t *testing.T) {
-			tfCLIArgs := make([]string, len(args)+2)
-			copy(tfCLIArgs, args)
-			tfCLIArgs[len(args)] = "--terraform-force-cli"
-			tfCLIArgs[len(args)+1] = "true"
-			goldenFileCommandTest(t, testName, tfCLIArgs, testOptions, false, ctxOptions...)
+			goldenFileCommandTest(t, testName, args, testOptions, false, ctxOptions...)
 		})
 	}
 }

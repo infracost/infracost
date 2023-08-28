@@ -27,13 +27,10 @@ func TestConfigLoadFromConfigFile(t *testing.T) {
 projects:
   - path: path/to/my_terraform
   - path: path/to/my_terraform_two
-    terraform_plan_flags: "-var-file=prod.tfvars -var-file=us-east.tfvars"
-    terraform_binary: "~/bin/terraform"
     terraform_workspace: "development"
     terraform_cloud_host: "cloud_host"
     terraform_cloud_token: "cloud_token"
     usage_file: "usage/file"
-    terraform_use_state: true
 `),
 			expected: []*Project{
 				{
@@ -41,13 +38,10 @@ projects:
 				},
 				{
 					Path:                "path/to/my_terraform_two",
-					TerraformPlanFlags:  "-var-file=prod.tfvars -var-file=us-east.tfvars",
-					TerraformBinary:     "~/bin/terraform",
 					TerraformWorkspace:  "development",
 					TerraformCloudHost:  "cloud_host",
 					TerraformCloudToken: "cloud_token",
 					UsageFile:           "usage/file",
-					TerraformUseState:   true,
 				},
 			},
 		},
