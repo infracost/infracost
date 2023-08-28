@@ -42,6 +42,18 @@ func TestParser_Compile(t *testing.T) {
 				BaseBranch: "master",
 			},
 		},
+		{
+			name: "with rel paths",
+		},
+		{
+			name: "with list",
+		},
+		{
+			name: "with is dir",
+		},
+		{
+			name: "with parse functions",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

@@ -3,7 +3,6 @@ package terraform
 // Contents of this file were copied from github.com/gruntwork-io/terragrunt
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"

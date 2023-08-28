@@ -34,7 +34,12 @@ type Module struct {
 	Parent   *Module
 	Warnings []Warning
 
-	HasChanges bool
+	HasChanges         bool
+	TerraformVarsPaths []string
+
+	// ModuleSuffix is a unique name that can be optionally appended to the Module's project name.
+	// This is only applicable to root modules.
+	ModuleSuffix string
 }
 
 // Index returns the count index of the Module using the name.

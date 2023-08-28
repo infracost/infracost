@@ -1,0 +1,8 @@
+version: 0.1
+
+projects:
+{{- $envs := list "prod" "dev"}}
+{{- range $envs }}
+      - path: .
+        name: {{ . }}
+{{- end }}

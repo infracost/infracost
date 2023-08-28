@@ -48,13 +48,13 @@ var awsZones = map[string]cty.Value{
 	"ap-southeast-1": cty.ObjectVal(map[string]cty.Value{
 		"id":          cty.StringVal("ap-southeast-1"),
 		"names":       cty.ListVal([]cty.Value{cty.StringVal("ap-southeast-1a"), cty.StringVal("ap-southeast-1b"), cty.StringVal("ap-southeast-1c"), cty.StringVal("ap-southeast-1-bkk-1a"), cty.StringVal("ap-southeast-1-mnl-1a")}),
-		"zone_ids":    cty.ListVal([]cty.Value{cty.StringVal("apse1-az1"), cty.StringVal("apse1-az2"), cty.StringVal("apse1-az3"), cty.StringVal("apse1-bkk1-az1"), cty.StringVal("apse1-mnl1-az1")}),
+		"zone_ids":    cty.ListVal([]cty.Value{cty.StringVal("apse1-az2"), cty.StringVal("apse1-az1"), cty.StringVal("apse1-az3"), cty.StringVal("apse1-bkk1-az1"), cty.StringVal("apse1-mnl1-az1")}),
 		"group_names": cty.ListVal([]cty.Value{cty.StringVal("ap-southeast-1"), cty.StringVal("ap-southeast-1"), cty.StringVal("ap-southeast-1"), cty.StringVal("ap-southeast-1-bkk-1"), cty.StringVal("ap-southeast-1-mnl-1")}),
 	}),
 	"ap-southeast-2": cty.ObjectVal(map[string]cty.Value{
 		"id":          cty.StringVal("ap-southeast-2"),
 		"names":       cty.ListVal([]cty.Value{cty.StringVal("ap-southeast-2a"), cty.StringVal("ap-southeast-2b"), cty.StringVal("ap-southeast-2c"), cty.StringVal("ap-southeast-2-akl-1a"), cty.StringVal("ap-southeast-2-per-1a")}),
-		"zone_ids":    cty.ListVal([]cty.Value{cty.StringVal("apse2-az1"), cty.StringVal("apse2-az3"), cty.StringVal("apse2-az2"), cty.StringVal("apse2-akl1-az1"), cty.StringVal("apse2-per1-az1")}),
+		"zone_ids":    cty.ListVal([]cty.Value{cty.StringVal("apse2-az3"), cty.StringVal("apse2-az1"), cty.StringVal("apse2-az2"), cty.StringVal("apse2-akl1-az1"), cty.StringVal("apse2-per1-az1")}),
 		"group_names": cty.ListVal([]cty.Value{cty.StringVal("ap-southeast-2"), cty.StringVal("ap-southeast-2"), cty.StringVal("ap-southeast-2"), cty.StringVal("ap-southeast-2-akl-1"), cty.StringVal("ap-southeast-2-per-1")}),
 	}),
 	"ap-southeast-3": cty.ObjectVal(map[string]cty.Value{
@@ -113,15 +113,21 @@ var awsZones = map[string]cty.Value{
 	}),
 	"eu-west-2": cty.ObjectVal(map[string]cty.Value{
 		"id":          cty.StringVal("eu-west-2"),
-		"names":       cty.ListVal([]cty.Value{cty.StringVal("eu-west-2a"), cty.StringVal("eu-west-2b"), cty.StringVal("eu-west-2c"), cty.StringVal("eu-west-2-wl1-lon-wlz-1"), cty.StringVal("eu-west-2-wl1-man-wlz-1")}),
-		"zone_ids":    cty.ListVal([]cty.Value{cty.StringVal("euw2-az2"), cty.StringVal("euw2-az3"), cty.StringVal("euw2-az1"), cty.StringVal("euw2-wl1-lon-wlz1"), cty.StringVal("euw2-wl1-man-wlz1")}),
-		"group_names": cty.ListVal([]cty.Value{cty.StringVal("eu-west-2"), cty.StringVal("eu-west-2"), cty.StringVal("eu-west-2"), cty.StringVal("eu-west-2-wl1"), cty.StringVal("eu-west-2-wl1")}),
+		"names":       cty.ListVal([]cty.Value{cty.StringVal("eu-west-2a"), cty.StringVal("eu-west-2b"), cty.StringVal("eu-west-2c"), cty.StringVal("eu-west-2-wl1-lon-wlz-1"), cty.StringVal("eu-west-2-wl1-man-wlz-1"), cty.StringVal("eu-west-2-wl2-man-wlz-1")}),
+		"zone_ids":    cty.ListVal([]cty.Value{cty.StringVal("euw2-az2"), cty.StringVal("euw2-az3"), cty.StringVal("euw2-az1"), cty.StringVal("euw2-wl1-lon-wlz1"), cty.StringVal("euw2-wl1-man-wlz1"), cty.StringVal("euw2-wl2-man-wlz1")}),
+		"group_names": cty.ListVal([]cty.Value{cty.StringVal("eu-west-2"), cty.StringVal("eu-west-2"), cty.StringVal("eu-west-2"), cty.StringVal("eu-west-2-wl1"), cty.StringVal("eu-west-2-wl1"), cty.StringVal("eu-west-2-wl2")}),
 	}),
 	"eu-west-3": cty.ObjectVal(map[string]cty.Value{
 		"id":          cty.StringVal("eu-west-3"),
 		"names":       cty.ListVal([]cty.Value{cty.StringVal("eu-west-3a"), cty.StringVal("eu-west-3b"), cty.StringVal("eu-west-3c")}),
 		"zone_ids":    cty.ListVal([]cty.Value{cty.StringVal("euw3-az1"), cty.StringVal("euw3-az2"), cty.StringVal("euw3-az3")}),
 		"group_names": cty.ListVal([]cty.Value{cty.StringVal("eu-west-3"), cty.StringVal("eu-west-3"), cty.StringVal("eu-west-3")}),
+	}),
+	"il-central-1": cty.ObjectVal(map[string]cty.Value{
+		"id":          cty.StringVal("il-central-1"),
+		"names":       cty.ListVal([]cty.Value{cty.StringVal("il-central-1a"), cty.StringVal("il-central-1b"), cty.StringVal("il-central-1c")}),
+		"zone_ids":    cty.ListVal([]cty.Value{cty.StringVal("ilc1-az1"), cty.StringVal("ilc1-az2"), cty.StringVal("ilc1-az3")}),
+		"group_names": cty.ListVal([]cty.Value{cty.StringVal("il-central-1"), cty.StringVal("il-central-1"), cty.StringVal("il-central-1")}),
 	}),
 	"me-central-1": cty.ObjectVal(map[string]cty.Value{
 		"id":          cty.StringVal("me-central-1"),
@@ -161,8 +167,8 @@ var awsZones = map[string]cty.Value{
 	}),
 	"us-west-2": cty.ObjectVal(map[string]cty.Value{
 		"id":          cty.StringVal("us-west-2"),
-		"names":       cty.ListVal([]cty.Value{cty.StringVal("us-west-2a"), cty.StringVal("us-west-2b"), cty.StringVal("us-west-2c"), cty.StringVal("us-west-2d"), cty.StringVal("us-west-2-den-1a"), cty.StringVal("us-west-2-las-1a"), cty.StringVal("us-west-2-lax-1a"), cty.StringVal("us-west-2-lax-1b"), cty.StringVal("us-west-2-pdx-1a"), cty.StringVal("us-west-2-phx-1a"), cty.StringVal("us-west-2-sea-1a"), cty.StringVal("us-west-2-wl1-den-wlz-1"), cty.StringVal("us-west-2-wl1-las-wlz-1"), cty.StringVal("us-west-2-wl1-lax-wlz-1"), cty.StringVal("us-west-2-wl1-phx-wlz-1"), cty.StringVal("us-west-2-wl1-sea-wlz-1"), cty.StringVal("us-west-2-wl1-sfo-wlz-1")}),
-		"zone_ids":    cty.ListVal([]cty.Value{cty.StringVal("usw2-az2"), cty.StringVal("usw2-az1"), cty.StringVal("usw2-az3"), cty.StringVal("usw2-az4"), cty.StringVal("usw2-den1-az1"), cty.StringVal("usw2-las1-az1"), cty.StringVal("usw2-lax1-az1"), cty.StringVal("usw2-lax1-az2"), cty.StringVal("usw2-pdx1-az1"), cty.StringVal("usw2-phx1-az1"), cty.StringVal("usw2-sea1-az1"), cty.StringVal("usw2-wl1-den-wlz1"), cty.StringVal("usw2-wl1-las-wlz1"), cty.StringVal("usw2-wl1-lax-wlz1"), cty.StringVal("usw2-wl1-phx-wlz1"), cty.StringVal("usw2-wl1-sea-wlz1"), cty.StringVal("usw2-wl1-sfo-wlz1")}),
-		"group_names": cty.ListVal([]cty.Value{cty.StringVal("us-west-2"), cty.StringVal("us-west-2"), cty.StringVal("us-west-2"), cty.StringVal("us-west-2"), cty.StringVal("us-west-2-den-1"), cty.StringVal("us-west-2-las-1"), cty.StringVal("us-west-2-lax-1"), cty.StringVal("us-west-2-lax-1"), cty.StringVal("us-west-2-pdx-1"), cty.StringVal("us-west-2-phx-1"), cty.StringVal("us-west-2-sea-1"), cty.StringVal("us-west-2-wl1"), cty.StringVal("us-west-2-wl1"), cty.StringVal("us-west-2-wl1"), cty.StringVal("us-west-2-wl1"), cty.StringVal("us-west-2-wl1"), cty.StringVal("us-west-2-wl1")}),
+		"names":       cty.ListVal([]cty.Value{cty.StringVal("us-west-2a"), cty.StringVal("us-west-2b"), cty.StringVal("us-west-2c"), cty.StringVal("us-west-2d"), cty.StringVal("us-west-2-den-1a"), cty.StringVal("us-west-2-las-1a"), cty.StringVal("us-west-2-lax-1a"), cty.StringVal("us-west-2-lax-1b"), cty.StringVal("us-west-2-pdx-1a"), cty.StringVal("us-west-2-phx-2a"), cty.StringVal("us-west-2-sea-1a"), cty.StringVal("us-west-2-wl1-den-wlz-1"), cty.StringVal("us-west-2-wl1-las-wlz-1"), cty.StringVal("us-west-2-wl1-lax-wlz-1"), cty.StringVal("us-west-2-wl1-phx-wlz-1"), cty.StringVal("us-west-2-wl1-sea-wlz-1"), cty.StringVal("us-west-2-wl1-sfo-wlz-1")}),
+		"zone_ids":    cty.ListVal([]cty.Value{cty.StringVal("usw2-az2"), cty.StringVal("usw2-az1"), cty.StringVal("usw2-az3"), cty.StringVal("usw2-az4"), cty.StringVal("usw2-den1-az1"), cty.StringVal("usw2-las1-az1"), cty.StringVal("usw2-lax1-az1"), cty.StringVal("usw2-lax1-az2"), cty.StringVal("usw2-pdx1-az1"), cty.StringVal("usw2-phx2-az1"), cty.StringVal("usw2-sea1-az1"), cty.StringVal("usw2-wl1-den-wlz1"), cty.StringVal("usw2-wl1-las-wlz1"), cty.StringVal("usw2-wl1-lax-wlz1"), cty.StringVal("usw2-wl1-phx-wlz1"), cty.StringVal("usw2-wl1-sea-wlz1"), cty.StringVal("usw2-wl1-sfo-wlz1")}),
+		"group_names": cty.ListVal([]cty.Value{cty.StringVal("us-west-2"), cty.StringVal("us-west-2"), cty.StringVal("us-west-2"), cty.StringVal("us-west-2"), cty.StringVal("us-west-2-den-1"), cty.StringVal("us-west-2-las-1"), cty.StringVal("us-west-2-lax-1"), cty.StringVal("us-west-2-lax-1"), cty.StringVal("us-west-2-pdx-1"), cty.StringVal("us-west-2-phx-2"), cty.StringVal("us-west-2-sea-1"), cty.StringVal("us-west-2-wl1"), cty.StringVal("us-west-2-wl1"), cty.StringVal("us-west-2-wl1"), cty.StringVal("us-west-2-wl1"), cty.StringVal("us-west-2-wl1"), cty.StringVal("us-west-2-wl1")}),
 	}),
 }

@@ -7,6 +7,12 @@
  ├─ Dedicated master (on-demand, c4.8xlarge.elasticsearch)                   730  hours     $1,713.31 
  └─ UltraWarm instance (on-demand, ultrawarm1.medium.elasticsearch)        1,460  hours       $347.48 
                                                                                                       
+ aws_elasticsearch_domain.gp3                                                                         
+ ├─ Instance (on-demand, c4.2xlarge.elasticsearch)                         2,190  hours     $1,285.53 
+ ├─ Storage (gp3)                                                            400  GB           $48.80 
+ ├─ Dedicated master (on-demand, c4.8xlarge.elasticsearch)                   730  hours     $1,713.31 
+ └─ UltraWarm instance (on-demand, ultrawarm1.medium.elasticsearch)        1,460  hours       $347.48 
+                                                                                                      
  aws_elasticsearch_domain.io1                                                                         
  ├─ Instance (on-demand, c4.2xlarge.elasticsearch)                         2,190  hours     $1,285.53 
  ├─ Storage (io1)                                                          1,000  GB          $169.00 
@@ -16,13 +22,13 @@
  ├─ Instance (on-demand, c4.2xlarge.elasticsearch)                         2,190  hours     $1,285.53 
  └─ Storage (standard)                                                       123  GB            $8.24 
                                                                                                       
- OVERALL TOTAL                                                                              $6,149.50 
+ OVERALL TOTAL                                                                              $9,544.62 
 ──────────────────────────────────
-3 cloud resources were detected:
-∙ 3 were estimated
+4 cloud resources were detected:
+∙ 4 were estimated
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestElasticsearchDomain                            ┃ $6,150       ┃
+┃ TestElasticsearchDomain                            ┃ $9,545       ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛

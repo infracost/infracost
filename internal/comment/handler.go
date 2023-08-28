@@ -3,12 +3,14 @@ package comment
 import (
 	"context"
 	"fmt"
-	"github.com/fatih/color"
-	log "github.com/sirupsen/logrus"
 	"sort"
+	"time"
+
+	"github.com/infracost/infracost/internal/logging"
 )
 
 var defaultTag = "infracost-comment"
+var validAtTagKey = "valid-at"
 
 // Comment is an interface that represents a comment on any platform. It wraps
 // the platform specific comment structures and is used to abstract the
@@ -26,6 +28,10 @@ type Comment interface {
 
 	// IsHidden returns true if the comment is hidden or minimized.
 	IsHidden() bool
+
+	// ValidAt returns the time at which the comment is valid.
+	// This is used to determine if a comment should be updated or not.
+	ValidAt() *time.Time
 }
 
 // PlatformHandler is an interface that represents a platform specific handler.
@@ -52,7 +58,15 @@ type PlatformHandler interface {
 	CallHideComment(ctx context.Context, comment Comment) error
 
 	// AddMarkdownTag adds a tag to the given string.
-	AddMarkdownTag(s string, tag string) string
+	AddMarkdownTags(s string, tags []CommentTag) (string, error)
+}
+
+// PostResult is a struct that contains the result of posting a comment.
+type PostResult = struct {
+	// Posted is true if the comment was actually posted.
+	Posted bool
+	// SkipReason is the reason why the comment was not posted.
+	SkipReason string
 }
 
 // CommentHandler contains the logic for finding, creating, updating and deleting comments
@@ -74,34 +88,66 @@ func NewCommentHandler(ctx context.Context, platformHandler PlatformHandler, tag
 	}
 }
 
+type CommentOpts struct {
+	ValidAt    *time.Time
+	SkipNoDiff bool
+}
+
+type CommentTag struct {
+	Key   string
+	Value string
+}
+
 // CommentWithBehavior parses the behavior and calls the corresponding *Comment method. Returns
 // boolean indicating if the comment was actually posted.
-func (h *CommentHandler) CommentWithBehavior(ctx context.Context, skipNoDiff bool, behavior, body string) (bool, error) {
-	var commentPosted bool
+func (h *CommentHandler) CommentWithBehavior(ctx context.Context, behavior, body string, opts *CommentOpts) (PostResult, error) {
+	var result PostResult
 	var err error
 
-	switch behavior {
-	case "update":
-		commentPosted, err = h.UpdateComment(ctx, skipNoDiff, body)
-	case "new":
-		err = h.NewComment(ctx, body)
+	backoff := time.Second
+
+	const maxRetries = 5
+	for i := 0; i < maxRetries; i++ {
+		result, err = h.commentWithBehaviour(ctx, behavior, body, opts)
 		if err == nil {
-			commentPosted = true
+			return result, nil
 		}
-	case "hide-and-new":
-		commentPosted, err = h.HideAndNewComment(ctx, skipNoDiff, body)
-	case "delete-and-new":
-		commentPosted, err = h.DeleteAndNewComment(ctx, skipNoDiff, body)
-	default:
-		return commentPosted, fmt.Errorf("Unable to perform unknown behavior: %v", behavior)
+
+		if i == maxRetries-1 {
+			break
+		}
+
+		logging.Logger.WithError(err).Debugf("received an error trying to post comment pausing %v seconds then will retry", backoff.Seconds())
+
+		time.Sleep(backoff)
+		backoff *= 2
 	}
 
-	return commentPosted, err
+	return result, err
+}
+func (h *CommentHandler) commentWithBehaviour(ctx context.Context, behavior string, body string, opts *CommentOpts) (PostResult, error) {
+	switch behavior {
+	case "update":
+		return h.UpdateComment(ctx, body, opts)
+	case "new":
+		err := h.NewComment(ctx, body, opts)
+		if err != nil {
+			return PostResult{Posted: false}, err
+		}
+
+		return PostResult{Posted: true}, nil
+	case "hide-and-new":
+		return h.HideAndNewComment(ctx, body, opts)
+	case "delete-and-new":
+		return h.DeleteAndNewComment(ctx, body, opts)
+	}
+
+	return PostResult{Posted: false}, nil
 }
 
 // matchingComments returns all comments that match the tag.
 func (h *CommentHandler) matchingComments(ctx context.Context) ([]Comment, error) {
-	log.Infof("Finding matching comments for tag %s", h.Tag)
+	logging.Logger.Infof("Finding matching comments for tag %s", h.Tag)
 
 	matchingComments, err := h.PlatformHandler.CallFindMatchingComments(ctx, h.Tag)
 	if err != nil {
@@ -109,112 +155,181 @@ func (h *CommentHandler) matchingComments(ctx context.Context) ([]Comment, error
 	}
 
 	if len(matchingComments) == 1 {
-		log.Info("Found 1 matching comment")
+		logging.Logger.Info("Found 1 matching comment")
 	} else {
-		log.Infof("Found %d matching comments", len(matchingComments))
-	}
-
-	return matchingComments, nil
-}
-
-// LatestMatchingComment returns the latest matching comment.
-func (h *CommentHandler) LatestMatchingComment(ctx context.Context) (Comment, error) {
-	matchingComments, err := h.matchingComments(ctx)
-	if err != nil {
-		return nil, err
+		logging.Logger.Infof("Found %d matching comments", len(matchingComments))
 	}
 
 	sort.Slice(matchingComments, func(i, j int) bool {
 		return matchingComments[i].Less(matchingComments[j])
 	})
 
-	if len(matchingComments) == 0 {
-		return nil, nil
-	}
-
-	return matchingComments[len(matchingComments)-1], nil
+	return matchingComments, nil
 }
 
-// UpdateComment updates the comment with the given body. Returns boolean indicating if the comment was actually posted.
-func (h *CommentHandler) UpdateComment(ctx context.Context, skipNoDiff bool, body string) (bool, error) {
-	bodyWithTag := h.PlatformHandler.AddMarkdownTag(body, h.Tag)
+// UpdateComment updates the comment with the given body. Returns a PostResult indicating
+// if the comment was actually posted and the reason why it was not posted.
+func (h *CommentHandler) UpdateComment(ctx context.Context, body string, opts *CommentOpts) (PostResult, error) {
+	var validAt *time.Time
+	var skipNoDiff bool
 
-	latestMatchingComment, err := h.LatestMatchingComment(ctx)
-	if err != nil {
-		return false, err
+	if opts != nil {
+		validAt = opts.ValidAt
+		skipNoDiff = opts.SkipNoDiff
 	}
 
-	if latestMatchingComment != nil {
-		if latestMatchingComment.Body() == bodyWithTag {
-			log.Infof("Not updating comment since the latest one matches exactly: %s", color.HiBlueString(latestMatchingComment.Ref()))
-			return false, nil
+	tags := []CommentTag{
+		{
+			Key:   h.Tag,
+			Value: "",
+		},
+	}
+
+	if validAt != nil {
+		tags = append(tags, CommentTag{
+			Key:   validAtTagKey,
+			Value: validAt.Format(time.RFC3339),
+		})
+	}
+
+	bodyWithTags, err := h.PlatformHandler.AddMarkdownTags(body, tags)
+	if err != nil {
+		return PostResult{Posted: false}, err
+	}
+
+	matchingComments, err := h.matchingComments(ctx)
+	if err != nil {
+		return PostResult{Posted: false}, err
+	}
+
+	if len(matchingComments) > 0 {
+		latestMatchingComment := matchingComments[len(matchingComments)-1]
+
+		latestValidAt := latestMatchingComment.ValidAt()
+		if validAt != nil && latestValidAt != nil && validAt.Before(*latestValidAt) {
+			msg := fmt.Sprintf("Not updating comment since the latest one is newer: %s", latestMatchingComment.Ref())
+			logging.Logger.Warning(msg)
+			return PostResult{Posted: false, SkipReason: msg}, nil
 		}
 
-		log.Infof("Updating comment %s", color.HiBlueString(latestMatchingComment.Ref()))
+		if latestMatchingComment.Body() == bodyWithTags {
+			msg := fmt.Sprintf("Not updating comment since the latest one matches exactly: %s", latestMatchingComment.Ref())
+			logging.Logger.Info(msg)
+			return PostResult{Posted: false, SkipReason: msg}, nil
+		}
 
-		err := h.PlatformHandler.CallUpdateComment(ctx, latestMatchingComment, bodyWithTag)
+		logging.Logger.Infof("Updating comment %s", latestMatchingComment.Ref())
+
+		err := h.PlatformHandler.CallUpdateComment(ctx, latestMatchingComment, bodyWithTags)
 		if err != nil {
-			return false, h.newPlatformError(err)
+			return PostResult{Posted: false}, h.newPlatformError(err)
 		}
 	} else {
 		if skipNoDiff {
-			log.Infof("Not creating initial comment since there is no resource or cost difference")
-			return false, nil
+			msg := "Not creating initial comment since there is no resource or cost difference"
+			logging.Logger.Info(msg)
+			return PostResult{Posted: false, SkipReason: msg}, nil
 		}
 
-		log.Info("Creating new comment")
+		logging.Logger.Info("Creating new comment")
 
-		comment, err := h.PlatformHandler.CallCreateComment(ctx, bodyWithTag)
+		comment, err := h.PlatformHandler.CallCreateComment(ctx, bodyWithTags)
 		if err != nil {
-			return false, h.newPlatformError(err)
+			return PostResult{Posted: false}, h.newPlatformError(err)
 		}
 
-		log.Infof("Created new comment %s", color.HiBlueString(comment.Ref()))
+		logging.Logger.Infof("Created new comment %s", comment.Ref())
 	}
 
-	return true, nil
+	return PostResult{Posted: true}, nil
 }
 
 // NewComment creates a new comment with the given body.
-func (h *CommentHandler) NewComment(ctx context.Context, body string) error {
-	bodyWithTag := h.PlatformHandler.AddMarkdownTag(body, h.Tag)
+func (h *CommentHandler) NewComment(ctx context.Context, body string, opts *CommentOpts) error {
+	var validAt *time.Time
+	if opts != nil {
+		validAt = opts.ValidAt
 
-	log.Info("Creating new comment")
+		if opts.SkipNoDiff {
+			logging.Logger.Warning("SkipNoDiff option is not supported for new comments")
+		}
+	}
 
-	comment, err := h.PlatformHandler.CallCreateComment(ctx, bodyWithTag)
+	tags := []CommentTag{
+		{
+			Key:   h.Tag,
+			Value: "",
+		},
+	}
+
+	if validAt != nil {
+		tags = append(tags, CommentTag{
+			Key:   validAtTagKey,
+			Value: validAt.Format(time.RFC3339),
+		})
+	}
+
+	bodyWithTags, err := h.PlatformHandler.AddMarkdownTags(body, tags)
+	if err != nil {
+		return err
+	}
+
+	logging.Logger.Info("Creating new comment")
+
+	comment, err := h.PlatformHandler.CallCreateComment(ctx, bodyWithTags)
 	if err != nil {
 		return h.newPlatformError(err)
 	}
 
-	log.Infof("Created new comment: %s", color.HiBlueString(comment.Ref()))
+	logging.Logger.Infof("Created new comment: %s", comment.Ref())
 
 	return err
 }
 
 // HideAndNewComment hides/minimizes all existing matching comment and creates a new one with the given body. Returns
-// // boolean indicating if the comment was actually posted.
-func (h *CommentHandler) HideAndNewComment(ctx context.Context, skipNoDiff bool, body string) (bool, error) {
+// a PostResult indicating if the comment was actually posted and the reason why it was not posted.
+func (h *CommentHandler) HideAndNewComment(ctx context.Context, body string, opts *CommentOpts) (PostResult, error) {
+	var validAt *time.Time
+	var skipNoDiff bool
+
+	if opts != nil {
+		validAt = opts.ValidAt
+		skipNoDiff = opts.SkipNoDiff
+	}
+
 	matchingComments, err := h.matchingComments(ctx)
 	if err != nil {
-		return false, err
+		return PostResult{Posted: false}, err
+	}
+
+	if len(matchingComments) > 0 && validAt != nil {
+		latestMatchingComment := matchingComments[len(matchingComments)-1]
+
+		latestValidAt := latestMatchingComment.ValidAt()
+		if latestValidAt != nil && validAt.Before(*latestValidAt) {
+			msg := fmt.Sprintf("Not adding a new comment since the latest one is newer: %s", latestMatchingComment.Ref())
+			logging.Logger.Warning(msg)
+			return PostResult{Posted: false, SkipReason: msg}, nil
+		}
 	}
 
 	if len(matchingComments) == 0 && skipNoDiff {
-		log.Infof("Not creating initial comment since there is no resource or cost difference")
-		return false, nil
+		msg := "Not creating initial comment since there is no resource or cost difference"
+		logging.Logger.Info(msg)
+		return PostResult{Posted: false, SkipReason: msg}, nil
 	}
 
 	err = h.hideComments(ctx, matchingComments)
 	if err != nil {
-		return false, err
+		return PostResult{Posted: false}, err
 	}
 
-	err = h.NewComment(ctx, body)
+	err = h.NewComment(ctx, body, opts)
 	if err != nil {
-		return false, err
+		return PostResult{Posted: false}, err
 	}
 
-	return true, nil
+	return PostResult{Posted: true}, nil
 }
 
 // hideComments hides/minimizes all the given comments.
@@ -230,19 +345,19 @@ func (h *CommentHandler) hideComments(ctx context.Context, comments []Comment) e
 	hiddenCommentCount := len(comments) - len(visibleComments)
 
 	if hiddenCommentCount == 1 {
-		log.Info("1 comment is already hidden")
+		logging.Logger.Info("1 comment is already hidden")
 	} else if hiddenCommentCount > 0 {
-		log.Infof("%d comments are already hidden", hiddenCommentCount)
+		logging.Logger.Infof("%d comments are already hidden", hiddenCommentCount)
 	}
 
 	if len(visibleComments) == 1 {
-		log.Info("Hiding 1 comment")
+		logging.Logger.Info("Hiding 1 comment")
 	} else {
-		log.Infof("Hiding %d comments", len(visibleComments))
+		logging.Logger.Infof("Hiding %d comments", len(visibleComments))
 	}
 
 	for _, comment := range visibleComments {
-		log.Infof("Hiding comment %s", color.HiBlueString(comment.Ref()))
+		logging.Logger.Infof("Hiding comment %s", comment.Ref())
 		err := h.PlatformHandler.CallHideComment(ctx, comment)
 		if err != nil {
 			return h.newPlatformError(err)
@@ -253,41 +368,61 @@ func (h *CommentHandler) hideComments(ctx context.Context, comments []Comment) e
 }
 
 // DeleteAndNewComment deletes all existing matching comments and creates a new one with the given body. Returns
-// boolean indicating if the comment was actually posted.
-func (h *CommentHandler) DeleteAndNewComment(ctx context.Context, skipNoDiff bool, body string) (bool, error) {
+// a PostResult indicating if the comment was actually posted and the reason why it was not posted.
+func (h *CommentHandler) DeleteAndNewComment(ctx context.Context, body string, opts *CommentOpts) (PostResult, error) {
+	var validAt *time.Time
+	var skipNoDiff bool
+
+	if opts != nil {
+		validAt = opts.ValidAt
+		skipNoDiff = opts.SkipNoDiff
+	}
+
 	matchingComments, err := h.matchingComments(ctx)
 	if err != nil {
-		return false, err
+		return PostResult{Posted: false}, err
+	}
+
+	if len(matchingComments) > 0 && validAt != nil {
+		latestMatchingComment := matchingComments[len(matchingComments)-1]
+
+		latestValidAt := latestMatchingComment.ValidAt()
+		if latestValidAt != nil && validAt.Before(*latestValidAt) {
+			msg := fmt.Sprintf("Not adding a new comment since the latest one is newer: %s", latestMatchingComment.Ref())
+			logging.Logger.Warningf(msg)
+			return PostResult{Posted: false, SkipReason: msg}, nil
+		}
 	}
 
 	if len(matchingComments) == 0 && skipNoDiff {
-		log.Infof("Not creating initial comment since there is no resource or cost difference")
-		return false, nil
+		msg := "Not creating initial comment since there is no resource or cost difference"
+		logging.Logger.Infof(msg)
+		return PostResult{Posted: false, SkipReason: msg}, nil
 	}
 
 	err = h.deleteComments(ctx, matchingComments)
 	if err != nil {
-		return false, err
+		return PostResult{Posted: false}, err
 	}
 
-	err = h.NewComment(ctx, body)
+	err = h.NewComment(ctx, body, opts)
 	if err != nil {
-		return false, err
+		return PostResult{Posted: false}, err
 	}
 
-	return true, nil
+	return PostResult{Posted: true}, nil
 }
 
 // deleteComments hides/minimizes all the given comments.
 func (h *CommentHandler) deleteComments(ctx context.Context, comments []Comment) error {
 	if len(comments) == 1 {
-		log.Info("Deleting 1 comment")
+		logging.Logger.Info("Deleting 1 comment")
 	} else {
-		log.Infof("Deleting %d comments", len(comments))
+		logging.Logger.Infof("Deleting %d comments", len(comments))
 	}
 
 	for _, comment := range comments {
-		log.Infof("Deleting comment %s", color.HiBlueString(comment.Ref()))
+		logging.Logger.Infof("Deleting comment %s", comment.Ref())
 		err := h.PlatformHandler.CallDeleteComment(ctx, comment)
 		if err != nil {
 			return h.newPlatformError(err)

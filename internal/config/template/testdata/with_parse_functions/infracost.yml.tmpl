@@ -1,0 +1,14 @@
+version: 0.1
+
+{{ $json := parseJson (readFile "config/test.json") }}
+{{ $yaml := parseYaml (readFile "config/test.yaml") }}
+projects:
+  - path: .
+    name: "test"
+    env:
+    {{- range $key, $value := $json.some_json_key.values }}
+      {{ $key }}: {{ $value }}
+    {{- end }}
+    {{- range $key, $value := $yaml.some_key.values }}
+      {{ $key }}: {{ $value }}
+    {{- end }}

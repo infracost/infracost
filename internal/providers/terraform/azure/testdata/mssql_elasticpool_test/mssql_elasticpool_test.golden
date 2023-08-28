@@ -56,4 +56,3 @@ level=warning msg="Multiple products with prices found for azurerm_mssql_elastic
 level=warning msg="Multiple products with prices found for azurerm_mssql_elasticpool.gp_gen5_zone_no_license Compute (GP_Gen5, 4 vCore), using the first product"
 level=warning msg="Multiple products with prices found for azurerm_mssql_elasticpool.gp_gen5_zone_redundant Compute (GP_Gen5, 4 vCore), using the first product"
 level=warning msg="Multiple products with prices found for azurerm_mssql_elasticpool.gp_gen5_zone_redundant Zone redundancy (GP_Gen5, 4 vCore), using the first product"
-level=warning msg="Multiple products with prices found for azurerm_mssql_elasticpool.premium_500 Compute (Premium, 500 DTUs), using the first product"

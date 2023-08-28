@@ -108,10 +108,11 @@ func NewEvaluator(
 	blockBuilder BlockBuilder,
 	spinFunc ui.SpinnerFunc,
 	logger *logrus.Entry,
+	parentContext *Context,
 ) *Evaluator {
 	ctx := NewContext(&hcl.EvalContext{
 		Functions: ExpFunctions(module.RootPath, logger),
-	}, nil, logger)
+	}, parentContext, logger)
 
 	if visitedModules == nil {
 		visitedModules = make(map[string]map[string]cty.Value)
@@ -277,20 +278,20 @@ func (e *Evaluator) evaluate(lastContext hcl.EvalContext) {
 func (e *Evaluator) evaluateStep(i int) {
 	e.logger.Debugf("starting context evaluation iteration %d", i+1)
 
-	e.ctx.Set(e.getValuesByBlockType("variable"), "var")
-	e.ctx.Set(e.getValuesByBlockType("locals"), "local")
-
 	providers := e.getValuesByBlockType("provider")
 	for key, provider := range providers.AsValueMap() {
 		e.ctx.Set(provider, key)
 	}
+
+	e.ctx.Set(e.getValuesByBlockType("variable"), "var")
+	e.ctx.Set(e.getValuesByBlockType("data"), "data")
+	e.ctx.Set(e.getValuesByBlockType("locals"), "local")
 
 	resources := e.getValuesByBlockType("resource")
 	for key, resource := range resources.AsValueMap() {
 		e.ctx.Set(resource, key)
 	}
 
-	e.ctx.Set(e.getValuesByBlockType("data"), "data")
 	e.ctx.Set(e.getValuesByBlockType("output"), "output")
 
 	e.evaluateModules()
@@ -313,6 +314,17 @@ func (e *Evaluator) evaluateModules() {
 
 		e.visitedModules[fullName] = vars
 
+		// create a parent context which will be passed to any submodules. This will only
+		// contain the context values for the provider block as this is the only context
+		// values that should be "inherited".
+		parentContext := NewContext(&hcl.EvalContext{
+			Functions: ExpFunctions(e.module.RootPath, e.logger),
+		}, nil, e.logger)
+		providers := e.getValuesByBlockType("provider")
+		for key, provider := range providers.AsValueMap() {
+			parentContext.Set(provider, key)
+		}
+
 		moduleEvaluator := NewEvaluator(
 			Module{
 				Name:       fullName,
@@ -332,6 +344,7 @@ func (e *Evaluator) evaluateModules() {
 			e.blockBuilder,
 			nil,
 			e.logger,
+			parentContext,
 		)
 
 		moduleCall.Module, _ = moduleEvaluator.Run()
@@ -397,7 +410,7 @@ func (e *Evaluator) expandDynamicBlock(b *Block) {
 		blockName := sub.TypeLabel()
 		// Remove all the child blocks with the blockName so that we don't inject the expanded blocks twice.
 		// This could happen if a module "reloads" and the input variables change.
-		b.RemoveBlocks(blockName)
+		b.RemoveDynamicBlocks(blockName)
 
 		expanded := e.expandBlockForEaches([]*Block{sub})
 		for _, ex := range expanded {
@@ -624,10 +637,18 @@ func (e *Evaluator) convertType(b *Block, val cty.Value, attrType *Attribute) (c
 		return val, nil
 	}
 
-	ty, diag := typeexpr.TypeConstraint(attrType.HCLAttr.Expr)
+	ty, def, diag := typeexpr.TypeConstraintWithDefaults(attrType.HCLAttr.Expr)
 	if diag.HasErrors() {
 		e.logger.WithError(diag).Debugf("error trying to convert variable %s to type %s", b.Label(), attrType.AsString())
 		return val, nil
+	}
+
+	// Check if default values exist for the variable type definition. If they do, we
+	// merge these defaults with any existing values. This ensures that variables
+	// with optional types that have default values e.g., optional(string, "foo")
+	// are fully resolved.
+	if def != nil {
+		val = def.Apply(val)
 	}
 	return convert.Convert(val, ty)
 }
@@ -1003,7 +1024,7 @@ func ExpFunctions(baseDir string, logger *logrus.Entry) map[string]function.Func
 		"split":            stdlib.SplitFunc,
 		"strrev":           stdlib.ReverseFunc,
 		"substr":           stdlib.SubstrFunc,
-		"timestamp":        funcs.TimestampFunc,
+		"timestamp":        funcs.MockTimestampFunc, // We want to return a deterministic value each time
 		"timeadd":          stdlib.TimeAddFunc,
 		"title":            stdlib.TitleFunc,
 		"tostring":         funcs.MakeToFunc(cty.String),

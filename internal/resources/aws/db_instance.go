@@ -156,6 +156,12 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 			Value: strPtr(licenseModel),
 		})
 	}
+	if databaseEngine == "Oracle" {
+		instanceAttributeFilters = append(instanceAttributeFilters, &schema.AttributeFilter{
+			Key:   "deploymentModel",
+			Value: strPtr(""),
+		})
+	}
 	if strings.HasPrefix(databaseEngine, "Aurora") {
 		// Example usage types for Aurora
 		// InstanceUsage:db.t3.medium
@@ -198,7 +204,11 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 	}
 
 	if storageType == "gp3" {
-		storageFilters = append(storageFilters, &schema.AttributeFilter{Key: "usagetype", ValueRegex: strPtr("/\\-RDS\\:GP3\\-Storage$/")})
+		if deploymentOption == "Multi-AZ" {
+			storageFilters = append(storageFilters, &schema.AttributeFilter{Key: "usagetype", ValueRegex: strPtr("/\\-RDS\\:Multi\\-AZ\\-GP3\\-Storage$/")})
+		} else {
+			storageFilters = append(storageFilters, &schema.AttributeFilter{Key: "usagetype", ValueRegex: strPtr("/\\-RDS\\:GP3\\-Storage$/")})
+		}
 	}
 
 	costComponents := []*schema.CostComponent{
@@ -267,6 +277,11 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 			if iopsVal.GreaterThan(baseline) {
 				over := iopsVal.Sub(baseline)
 
+				usageType := strPtr("/\\-RDS\\:GP3\\-PIOPS$/")
+				if deploymentOption == "Multi-AZ" {
+					usageType = strPtr("/\\-RDS\\:Multi\\-AZ\\-GP3\\-PIOPS$/")
+				}
+
 				costComponents = append(costComponents, &schema.CostComponent{
 					Name:            fmt.Sprintf("Provisioned GP3 IOPS (above %s)", baselineStr),
 					Unit:            "IOPS",
@@ -281,7 +296,7 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 							{Key: "deploymentOption", Value: strPtr(deploymentOption)},
 							{Key: "groupDescription", Value: strPtr(iopsDescription)},
 							{Key: "databaseEngine", Value: strPtr("Any")},
-							{Key: "usagetype", ValueRegex: strPtr("/\\-RDS\\:GP3\\-PIOPS$/")},
+							{Key: "usagetype", ValueRegex: usageType},
 						},
 					},
 				})

@@ -91,7 +91,7 @@ func runCompare(cmd *cobra.Command, ctx *config.RunContext, current output.Root)
 		return fmt.Errorf("Error loading %s used by --compare-to flag. %s", ctx.Config.CompareTo, err)
 	}
 
-	combined, err := output.CompareTo(current, prior)
+	combined, err := output.CompareTo(ctx.Config, current, prior)
 	if err != nil {
 		return err
 	}

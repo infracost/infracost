@@ -15,6 +15,7 @@ import (
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/infracost/infracost/internal/usage"
@@ -46,12 +47,14 @@ type Root struct {
 // TagPolicy holds information if a given run has applicable tag policy checks.
 // This struct is returned from the tag policies API and used to create tag policy outputs.
 type TagPolicy struct {
-	Name        string              `json:"name"`
-	TagPolicyID string              `json:"tagPolicyId"`
-	Message     string              `json:"message"`
-	PrComment   bool                `json:"prComment"`
-	BlockPr     bool                `json:"blockPr"`
-	Resources   []TagPolicyResource `json:"resources"`
+	Name                   string              `json:"name"`
+	TagPolicyID            string              `json:"tagPolicyId"`
+	Message                string              `json:"message"`
+	PrComment              bool                `json:"prComment"`
+	BlockPr                bool                `json:"blockPr"`
+	Resources              []TagPolicyResource `json:"resources"`
+	TotalDetectedResources int                 `json:"totalDetectedResources"`
+	TotalTaggableResources int                 `json:"totalTaggableResources"`
 }
 
 type TagPolicyResource struct {
@@ -66,6 +69,7 @@ type TagPolicyResource struct {
 
 type TagPolicyInvalidTag struct {
 	Key         string   `json:"key"`
+	Value       string   `json:"value"`
 	ValidValues []string `json:"validValues"`
 	ValidRegex  string   `json:"validRegex"`
 }
@@ -86,12 +90,12 @@ type Project struct {
 func (p Project) ToSchemaProject() *schema.Project {
 	var pastResources []*schema.Resource
 	if p.PastBreakdown != nil {
-		pastResources = convertOutputResources(p.PastBreakdown.Resources)
+		pastResources = append(convertOutputResources(p.PastBreakdown.Resources, false), convertOutputResources(p.PastBreakdown.FreeResources, true)...)
 	}
 
 	var resources []*schema.Resource
 	if p.Breakdown != nil {
-		resources = convertOutputResources(p.Breakdown.Resources)
+		resources = append(convertOutputResources(p.Breakdown.Resources, false), convertOutputResources(p.Breakdown.FreeResources, true)...)
 	}
 
 	return &schema.Project{
@@ -102,16 +106,17 @@ func (p Project) ToSchemaProject() *schema.Project {
 	}
 }
 
-func convertOutputResources(outResources []Resource) []*schema.Resource {
+func convertOutputResources(outResources []Resource, skip bool) []*schema.Resource {
 	resources := make([]*schema.Resource, len(outResources))
 
 	for i, resource := range outResources {
 		resources[i] = &schema.Resource{
 			Name:           resource.Name,
+			IsSkipped:      skip,
 			Metadata:       convertMetadata(resource.Metadata),
 			CostComponents: convertCostComponents(resource.CostComponents),
 			ActualCosts:    convertActualCosts(resource.ActualCosts),
-			SubResources:   convertOutputResources(resource.SubResources),
+			SubResources:   convertOutputResources(resource.SubResources, skip),
 			Tags:           resource.Tags,
 			HourlyCost:     resource.HourlyCost,
 			MonthlyCost:    resource.MonthlyCost,
@@ -226,6 +231,7 @@ func (p *Project) LabelWithMetadata() string {
 
 type Breakdown struct {
 	Resources        []Resource       `json:"resources"`
+	FreeResources    []Resource       `json:"freeResources,omitempty"`
 	TotalHourlyCost  *decimal.Decimal `json:"totalHourlyCost"`
 	TotalMonthlyCost *decimal.Decimal `json:"totalMonthlyCost"`
 }
@@ -250,10 +256,10 @@ type ActualCosts struct {
 type Resource struct {
 	Name           string                 `json:"name"`
 	ResourceType   string                 `json:"resourceType,omitempty"`
-	Tags           map[string]string      `json:"tags,omitempty"`
+	Tags           *map[string]string     `json:"tags,omitempty"`
 	Metadata       map[string]interface{} `json:"metadata"`
-	HourlyCost     *decimal.Decimal       `json:"hourlyCost"`
-	MonthlyCost    *decimal.Decimal       `json:"monthlyCost"`
+	HourlyCost     *decimal.Decimal       `json:"hourlyCost,omitempty"`
+	MonthlyCost    *decimal.Decimal       `json:"monthlyCost,omitempty"`
 	CostComponents []CostComponent        `json:"costComponents,omitempty"`
 	ActualCosts    []ActualCosts          `json:"actualCosts,omitempty"`
 	SubResources   []Resource             `json:"subresources,omitempty"`
@@ -290,11 +296,181 @@ type Options struct {
 	ShowOnlyChanges   bool
 	Fields            []string
 	IncludeHTML       bool
-	PolicyChecks      PolicyCheck
-	TagPolicyCheck    TagPolicyCheck
+	PolicyOutput      PolicyOutput
 	GuardrailCheck    GuardrailCheck
 	diffMsg           string
+	originalSize      int
 	CurrencyFormat    string
+}
+
+// PolicyOutput holds normalized PolicyCheck and TagPolicyCheck data so it can be output in
+// a uniform "Policies" section of the infracost comment.
+type PolicyOutput struct {
+	HasFailures bool
+	HasWarnings bool
+	Checks      []PolicyCheckOutput
+}
+
+type PolicyCheckOutput struct {
+	Name            string
+	Failure         bool
+	Warning         bool
+	Message         string
+	Details         []string
+	ResourceDetails []PolicyCheckResourceDetails
+	TruncatedCount  int
+}
+
+type PolicyCheckResourceDetails struct {
+	Address      string
+	ResourceType string
+	Path         string
+	Line         int
+	Violations   []PolicyCheckViolations
+}
+
+type PolicyCheckViolations struct {
+	Details      []string
+	ProjectNames []string
+}
+
+// merge combines any Violations with identicals Details for two PolicyCheckResourceDetails
+func mergeViolations(violations, otherViolations []PolicyCheckViolations) []PolicyCheckViolations {
+	vMap := map[string]PolicyCheckViolations{}
+	for _, v := range violations {
+		vMap[strings.Join(v.Details, "")] = v
+	}
+
+	// merge violations with identical details
+	for _, otherV := range otherViolations {
+		key := strings.Join(otherV.Details, "")
+
+		if v, ok := vMap[key]; ok {
+			v.ProjectNames = append(v.ProjectNames, otherV.ProjectNames...)
+			sort.Strings(v.ProjectNames)
+			vMap[key] = v
+		} else {
+			vMap[key] = otherV
+		}
+	}
+
+	// preserve output order
+	var vMerged = make([]PolicyCheckViolations, 0, len(vMap))
+	for _, v := range violations {
+		key := strings.Join(v.Details, "")
+		if mergedV, ok := vMap[key]; ok {
+			vMerged = append(vMerged, mergedV)
+			delete(vMap, key)
+		}
+	}
+
+	for _, otherV := range otherViolations {
+		key := strings.Join(otherV.Details, "")
+		if mergedV, ok := vMap[key]; ok {
+			vMerged = append(vMerged, mergedV)
+			delete(vMap, key)
+		}
+	}
+
+	return vMerged
+}
+
+// NewPolicyOutput normalizes a PolicyCheck and a TagPolicyCheck into a PolicyOutput suitable
+// for use in the output markdown template.
+func NewPolicyOutput(pc PolicyCheck, tpc TagPolicyCheck) PolicyOutput {
+	po := PolicyOutput{}
+
+	if pc.Enabled && len(pc.Failures) > 0 {
+		po.HasFailures = true
+		po.Checks = append(po.Checks, PolicyCheckOutput{
+			Name:    "Cost policy failed",
+			Failure: true,
+			Details: pc.Failures,
+		})
+	}
+
+	for _, tagPolicy := range tpc.FailingTagPolicies {
+		po.HasFailures = true
+		po.Checks = append(po.Checks, newTagPolicyCheckOutput(tagPolicy))
+	}
+
+	for _, tagPolicy := range tpc.WarningTagPolicies {
+		po.HasWarnings = true
+		po.Checks = append(po.Checks, newTagPolicyCheckOutput(tagPolicy))
+	}
+
+	for _, tagPolicy := range tpc.PassingTagPolicies {
+		po.Checks = append(po.Checks, newTagPolicyCheckOutput(tagPolicy))
+	}
+
+	if pc.Enabled && len(pc.Passed) > 0 {
+		po.Checks = append(po.Checks, PolicyCheckOutput{
+			Name:    "Cost policy passed",
+			Details: pc.Passed,
+		})
+	}
+
+	return po
+}
+
+var maxTagPolicyResourceDetails = 10
+
+func newTagPolicyCheckOutput(tp TagPolicy) PolicyCheckOutput {
+	// group resources by address so we can show a single block with all project/violation permutations.
+	rdMap := make(map[string]PolicyCheckResourceDetails, len(tp.Resources))
+
+	for _, r := range tp.Resources {
+		rd := PolicyCheckResourceDetails{
+			Address:      r.Address,
+			ResourceType: r.ResourceType,
+			Path:         r.Path,
+			Line:         r.Line,
+			Violations: []PolicyCheckViolations{{
+				ProjectNames: r.ProjectNames,
+				Details:      r.Failures(),
+			}},
+		}
+
+		if existingRd, ok := rdMap[r.Address]; ok {
+			existingRd.Violations = mergeViolations(existingRd.Violations, rd.Violations)
+			rdMap[r.Address] = existingRd
+		} else {
+			rdMap[r.Address] = rd
+		}
+	}
+
+	var failure, warning bool
+	if len(tp.Resources) > 0 {
+		warning = true
+		if tp.BlockPr {
+			failure = true
+		}
+	}
+
+	// preserve resource order
+	resourceDetails := make([]PolicyCheckResourceDetails, 0, len(rdMap))
+	for _, r := range tp.Resources {
+		if rd, ok := rdMap[r.Address]; ok {
+			resourceDetails = append(resourceDetails, rd)
+			delete(rdMap, r.Address)
+		}
+	}
+
+	tc := 0
+	if len(resourceDetails) > maxTagPolicyResourceDetails {
+		// truncate the list of resources so we don't go over the size limit of comments
+		tc = len(resourceDetails) - maxTagPolicyResourceDetails
+		resourceDetails = resourceDetails[:maxTagPolicyResourceDetails]
+	}
+
+	return PolicyCheckOutput{
+		Name:            tp.Name,
+		Message:         tp.Message,
+		Failure:         failure,
+		Warning:         warning,
+		ResourceDetails: resourceDetails,
+		TruncatedCount:  tc,
+	}
 }
 
 // PolicyCheck holds information if a given run has any policy checks enabled.
@@ -383,26 +559,27 @@ func (r TagPolicyResource) Failures() []string {
 	var f []string
 	if len(r.MissingMandatoryTags) > 0 {
 		var tags []string
-		for i, tag := range r.MissingMandatoryTags {
-			if i > 1 && i == len(r.MissingMandatoryTags) {
-				tags = append(tags, fmt.Sprintf("and \"%s\"", tag))
-			} else {
-				tags = append(tags, fmt.Sprintf("\"%s\"", tag))
-			}
+		for _, tag := range r.MissingMandatoryTags {
+			tags = append(tags, fmt.Sprintf("`%s`", tag))
 		}
-		f = append(f, fmt.Sprintf("should have mandatory tags: %s", strings.Join(tags, ", ")))
+		f = append(f, fmt.Sprintf("Missing mandatory tags: %s", strings.Join(tags, ", ")))
 	}
 
 	for _, invalidTag := range r.InvalidTags {
+		value := ""
+		if invalidTag.Value != "" {
+			value = fmt.Sprintf(" `%s`", invalidTag.Value)
+		}
+
 		if len(invalidTag.ValidValues) > 0 {
 			var validValues []string
 			for _, value := range invalidTag.ValidValues {
-				validValues = append(validValues, fmt.Sprintf("\"%s\"", value))
+				validValues = append(validValues, fmt.Sprintf("`%s`", value))
 			}
-			f = append(f, fmt.Sprintf("should have a valid value for \"%s\" tag: %s", invalidTag.Key, strings.Join(validValues, ", ")))
+			f = append(f, fmt.Sprintf("`%s` has invalid value%s, must be one of: %s", invalidTag.Key, value, strings.Join(validValues, ", ")))
 		}
 		if invalidTag.ValidRegex != "" {
-			f = append(f, fmt.Sprintf("should have a valid value for \"%s\" tag: must match regex <code>%s</code>", invalidTag.Key, invalidTag.ValidRegex))
+			f = append(f, fmt.Sprintf("`%s` has invalid value%s, must match regex `%s`", invalidTag.Key, value, invalidTag.ValidRegex))
 		}
 	}
 
@@ -569,27 +746,33 @@ type MarkdownOptions struct {
 	MaxMessageSize      int
 }
 
-func outputBreakdown(resources []*schema.Resource) *Breakdown {
-	arr := make([]Resource, 0, len(resources))
+func outputBreakdown(c *config.Config, resources []*schema.Resource) *Breakdown {
+	supportedResources := make([]Resource, 0, len(resources))
+	freeResources := make([]Resource, 0, len(resources))
 
 	for _, r := range resources {
 		if r.IsSkipped {
+			if c.TagPoliciesEnabled && r.Tags != nil {
+				freeResources = append(freeResources, newResource(r, nil, nil, nil))
+			}
+
 			continue
 		}
-		arr = append(arr, outputResource(r))
+		supportedResources = append(supportedResources, outputResource(r))
 	}
 
-	sortResources(arr, "")
+	sortResources(supportedResources, "")
+	sortResources(freeResources, "")
 
-	totalMonthlyCost, totalHourlyCost := calculateTotalCosts(arr)
+	totalMonthlyCost, totalHourlyCost := calculateTotalCosts(supportedResources)
 
 	return &Breakdown{
-		Resources:        arr,
+		Resources:        supportedResources,
+		FreeResources:    freeResources,
 		TotalHourlyCost:  totalMonthlyCost,
 		TotalMonthlyCost: totalHourlyCost,
 	}
 }
-
 func outputResource(r *schema.Resource) Resource {
 	comps := outputCostComponents(r.CostComponents)
 
@@ -600,11 +783,13 @@ func outputResource(r *schema.Resource) Resource {
 		subresources = append(subresources, outputResource(s))
 	}
 
+	return newResource(r, comps, actualCosts, subresources)
+}
+
+func newResource(r *schema.Resource, comps []CostComponent, actualCosts []ActualCosts, subresources []Resource) Resource {
 	metadata := make(map[string]interface{})
-	if r.Metadata != nil {
-		for k, v := range r.Metadata {
-			metadata[k] = v.Value()
-		}
+	for k, v := range r.Metadata {
+		metadata[k] = v.Value()
 	}
 
 	return Resource{
@@ -649,7 +834,7 @@ func outputActualCosts(actualCosts []*schema.ActualCosts) []ActualCosts {
 	return acs
 }
 
-func ToOutputFormat(projects []*schema.Project) (Root, error) {
+func ToOutputFormat(c *config.Config, projects []*schema.Project) (Root, error) {
 	var totalMonthlyCost, totalHourlyCost,
 		pastTotalMonthlyCost, pastTotalHourlyCost,
 		diffTotalMonthlyCost, diffTotalHourlyCost *decimal.Decimal
@@ -661,7 +846,7 @@ func ToOutputFormat(projects []*schema.Project) (Root, error) {
 	for _, project := range projects {
 		var pastBreakdown, breakdown, diff *Breakdown
 
-		breakdown = outputBreakdown(project.Resources)
+		breakdown = outputBreakdown(c, project.Resources)
 
 		if breakdown != nil {
 			if breakdown.TotalHourlyCost != nil {
@@ -680,8 +865,8 @@ func ToOutputFormat(projects []*schema.Project) (Root, error) {
 		}
 
 		if project.HasDiff {
-			pastBreakdown = outputBreakdown(project.PastResources)
-			diff = outputBreakdown(project.Diff)
+			pastBreakdown = outputBreakdown(c, project.PastResources)
+			diff = outputBreakdown(c, project.Diff)
 
 			if pastBreakdown != nil {
 				if pastBreakdown.TotalHourlyCost != nil {

@@ -79,7 +79,8 @@
                 "monthlyCost": "177",
                 "name": "ebs_block_device[0]"
               }
-            ]
+            ],
+            "tags": {}
           },
           {
             "costComponents": [
@@ -142,7 +143,8 @@
                 "monthlyCost": "177",
                 "name": "ebs_block_device[0]"
               }
-            ]
+            ],
+            "tags": {}
           },
           {
             "costComponents": [
@@ -174,11 +176,10 @@
                 "unit": "GB-seconds"
               }
             ],
-            "hourlyCost": null,
             "metadata": {},
-            "monthlyCost": null,
             "name": "aws_lambda_function.hello_world",
-            "resourceType": "aws_lambda_function"
+            "resourceType": "aws_lambda_function",
+            "tags": {}
           },
           {
             "costComponents": [
@@ -210,16 +211,13 @@
                 "unit": "GB-seconds"
               }
             ],
-            "hourlyCost": null,
             "metadata": {},
-            "monthlyCost": null,
             "name": "aws_lambda_function.zero_cost_lambda",
-            "resourceType": "aws_lambda_function"
+            "resourceType": "aws_lambda_function",
+            "tags": {}
           },
           {
-            "hourlyCost": null,
             "metadata": {},
-            "monthlyCost": null,
             "name": "aws_s3_bucket.usage",
             "resourceType": "aws_s3_bucket",
             "subresources": [
@@ -271,12 +269,11 @@
                     "unit": "GB"
                   }
                 ],
-                "hourlyCost": null,
                 "metadata": {},
-                "monthlyCost": null,
                 "name": "Standard"
               }
-            ]
+            ],
+            "tags": {}
           }
         ],
         "totalHourlyCost": "2.034630136986301358",
@@ -345,7 +342,8 @@
                 "monthlyCost": "177",
                 "name": "ebs_block_device[0]"
               }
-            ]
+            ],
+            "tags": {}
           },
           {
             "costComponents": [
@@ -408,7 +406,8 @@
                 "monthlyCost": "177",
                 "name": "ebs_block_device[0]"
               }
-            ]
+            ],
+            "tags": {}
           },
           {
             "costComponents": [
@@ -444,7 +443,8 @@
             "metadata": {},
             "monthlyCost": "0",
             "name": "aws_lambda_function.hello_world",
-            "resourceType": "aws_lambda_function"
+            "resourceType": "aws_lambda_function",
+            "tags": {}
           },
           {
             "costComponents": [
@@ -480,7 +480,8 @@
             "metadata": {},
             "monthlyCost": "0",
             "name": "aws_lambda_function.zero_cost_lambda",
-            "resourceType": "aws_lambda_function"
+            "resourceType": "aws_lambda_function",
+            "tags": {}
           },
           {
             "hourlyCost": "0",
@@ -542,7 +543,8 @@
                 "monthlyCost": "0",
                 "name": "Standard"
               }
-            ]
+            ],
+            "tags": {}
           }
         ],
         "totalHourlyCost": "2.034630136986301358",

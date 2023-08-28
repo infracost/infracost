@@ -86,10 +86,11 @@ type Config struct {
 	UsageActualCosts          bool   `yaml:"usage_actual_costs,omitempty" envconfig:"USAGE_ACTUAL_COSTS"`
 	PolicyAPIEndpoint         string `yaml:"policy_api_endpoint" envconfig:"POLICY_API_ENDPOINT"`
 	TagPolicyAPIEndpoint      string `yaml:"tag_policy_api_endpoint,omitempty" envconfig:"TAG_POLICY_API_ENDPOINT"`
-	EnableDashboard           bool   `yaml:"enable_dashboard,omitempty" envconfig:"ENABLE_DASHBOARD"`
-	EnableCloud               *bool  `yaml:"enable_cloud,omitempty" envconfig:"ENABLE_CLOUD"`
-	EnableCloudUpload         *bool  `yaml:"enable_cloud,omitempty" envconfig:"ENABLE_CLOUD_UPLOAD"`
-	DisableHCLParsing         bool   `yaml:"disable_hcl_parsing,omitempty" envconfig:"DISABLE_HCL_PARSING"`
+	TagPoliciesEnabled        bool
+	EnableDashboard           bool  `yaml:"enable_dashboard,omitempty" envconfig:"ENABLE_DASHBOARD"`
+	EnableCloud               *bool `yaml:"enable_cloud,omitempty" envconfig:"ENABLE_CLOUD"`
+	EnableCloudUpload         *bool `yaml:"enable_cloud_upload,omitempty" envconfig:"ENABLE_CLOUD_UPLOAD"`
+	DisableHCLParsing         bool  `yaml:"disable_hcl_parsing,omitempty" envconfig:"DISABLE_HCL_PARSING"`
 
 	TLSInsecureSkipVerify *bool  `envconfig:"TLS_INSECURE_SKIP_VERIFY"`
 	TLSCACertFile         string `envconfig:"TLS_CA_CERT_FILE"`
@@ -393,6 +394,10 @@ func IsDev() bool {
 }
 
 func loadDotEnv() error {
+	if os.Getenv("INFRACOST_DISABLE_ENVFILE") == "true" {
+		return nil
+	}
+
 	envLocalPath := filepath.Join(RootDir(), ".env.local")
 	if FileExists(envLocalPath) {
 		err := godotenv.Load(envLocalPath)

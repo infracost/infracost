@@ -155,11 +155,14 @@
           {
             "name": "aws_instance.web_app",
             "resourceType": "aws_instance",
+            "tags": {},
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
-                  "filename": "testdata/diff_with_compare_to_with_current_and_past_project_error/prod/main.tf"
+                  "endLine": 23,
+                  "filename": "testdata/diff_with_compare_to_with_current_and_past_project_error/prod/main.tf",
+                  "startLine": 9
                 }
               ],
               "checksum": "19795a60f4adbabf8e1f0bbaa064d7455db29aa70a0710eaf949e73512b45fd3",

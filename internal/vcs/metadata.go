@@ -21,6 +21,7 @@ import (
 	githttp "github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
+	"github.com/xanzy/go-gitlab"
 
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/sync"
@@ -376,7 +377,7 @@ func (f *metadataFetcher) getGitlabMetadata(path string, gitDiffTarget *string) 
 		VCSProvider:  "gitlab",
 		ID:           getEnv("CI_MERGE_REQUEST_IID"),
 		Title:        getEnv("CI_MERGE_REQUEST_TITLE"),
-		Author:       getEnv("CI_COMMIT_AUTHOR"),
+		Author:       f.getGitlabPullRequestAuthor(),
 		SourceBranch: getEnv("CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"),
 		BaseBranch:   getEnv("CI_MERGE_REQUEST_TARGET_BRANCH_NAME"),
 		URL:          getEnv("CI_PROJECT_URL") + "/merge_requests/" + getEnv("CI_MERGE_REQUEST_IID"),
@@ -893,6 +894,59 @@ func (f *metadataFetcher) getAtlantisMetadata(path string, gitDiffTarget *string
 	}
 
 	return m, nil
+}
+
+func (f *metadataFetcher) getGitlabPullRequestAuthor() string {
+	author := getEnv("CI_COMMIT_AUTHOR")
+
+	token := os.Getenv("GITLAB_TOKEN")
+	if token == "" {
+		return author
+	}
+
+	client, err := gitlab.NewClient(os.Getenv("GITLAB_TOKEN"), f.gitlabClientOps()...)
+	if err != nil {
+		logging.Logger.WithError(err).Debug("failed to init gitlab client, returning commit author")
+		return author
+	}
+
+	projectID := os.Getenv("CI_PROJECT_ID")
+	mergeRequestID := os.Getenv("CI_MERGE_REQUEST_IID")
+	id, err := strconv.Atoi(mergeRequestID)
+	if err != nil {
+		logging.Logger.WithError(err).Debugf("failed to convert gitlab merge request iid %q to int, returning commit author", mergeRequestID)
+		return author
+	}
+
+	mergeRequest, _, err := client.MergeRequests.GetMergeRequest(projectID, id, nil)
+	if err != nil {
+		logging.Logger.WithError(err).Debugf("failed to lookup gitlab merge request '%d' for project %q, returning commit author", id, projectID)
+		return author
+	}
+
+	if mergeRequest.Author == nil {
+		logging.Logger.Debugf("get merge request '%d' for project %q returned nil author, returning commit author", id, projectID)
+		return author
+	}
+
+	return mergeRequest.Author.Username
+}
+
+func (f *metadataFetcher) gitlabClientOps() []gitlab.ClientOptionFunc {
+	var ops []gitlab.ClientOptionFunc
+	v := os.Getenv("CI_API_V4_URL")
+	if v == "" {
+		return ops
+	}
+
+	u, err := url.Parse(v)
+	if err != nil {
+		logging.Logger.WithError(err).Debugf("could not parse %q as a valid URL", v)
+		return ops
+	}
+
+	ops = append(ops, gitlab.WithBaseURL(fmt.Sprintf("%s://%s", u.Scheme, u.Host)))
+	return ops
 }
 
 func vcsProviderFromHost(host string) string {

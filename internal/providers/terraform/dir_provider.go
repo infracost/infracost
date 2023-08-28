@@ -2,7 +2,6 @@ package terraform
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"net/url"
 	"os"

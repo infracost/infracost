@@ -156,6 +156,80 @@ func Test_metadataFetcher_GetAzureMetadata(t *testing.T) {
 	}, actual)
 }
 
+func Test_metadataFetcher_GetGitlabMetadata(t *testing.T) {
+	tmp := t.TempDir()
+	mux := &http.ServeMux{}
+	token := "dummytoken"
+	username := "apiusername"
+	mux.HandleFunc("/api/v4/projects/123/merge_requests/54", func(w http.ResponseWriter, r *http.Request) {
+		t.Helper()
+
+		assert.Equal(t, token, r.Header.Get("Private-Token"))
+		_, err := w.Write([]byte(fmt.Sprintf(`{
+			"author": {
+				"username": %q
+			}
+		}`, username)))
+		assert.NoError(t, err)
+	})
+
+	s := httptest.NewServer(mux)
+	defer s.Close()
+
+	_, lastCommit := createLocalRepoWithCommits(t, tmp)
+	t.Setenv("GITHUB_ACTIONS", "")
+	t.Setenv("GITLAB_TOKEN", token)
+	t.Setenv("CI_API_V4_URL", s.URL+"/api/v4")
+	t.Setenv("CI_PROJECT_ID", "123")
+	t.Setenv("CI_MERGE_REQUEST_IID", "54")
+	t.Setenv("GITLAB_CI", "true")
+	t.Setenv("CI_PROJECT_URL", "https://gitlab.com/my-project")
+	t.Setenv("CI_MERGE_REQUEST_TITLE", "pr title")
+	t.Setenv("CI_MERGE_REQUEST_SOURCE_BRANCH_NAME", "test")
+	t.Setenv("CI_MERGE_REQUEST_TARGET_BRANCH_NAME", "main")
+	t.Setenv("CI_PIPELINE_ID", "123")
+
+	test := false
+	m := metadataFetcher{
+		mu:     &sync.KeyMutex{},
+		client: &http.Client{Timeout: time.Second * 5},
+		test:   &test,
+	}
+
+	actual, err := m.Get(tmp, nil)
+	assert.NoError(t, err)
+	assert.Equal(t, Metadata{
+		Remote: Remote{
+			Host: "gitlab.com",
+			Name: "my-project",
+			URL:  "https://gitlab.com/my-project",
+		},
+		Branch: Branch{
+			Name: "master",
+		},
+		Commit: Commit{
+			SHA:         lastCommit.Hash.String(),
+			AuthorName:  lastCommit.Author.Name,
+			AuthorEmail: lastCommit.Author.Email,
+			Time:        lastCommit.Author.When,
+			Message:     lastCommit.Message,
+			ChangedObjects: []string{
+				filepath.Join(tmp, "added-file"),
+			},
+		},
+		PullRequest: &PullRequest{
+			ID:           "54",
+			Title:        "pr title",
+			Author:       username,
+			VCSProvider:  "gitlab",
+			SourceBranch: "test",
+			BaseBranch:   "main",
+			URL:          "https://gitlab.com/my-project/merge_requests/54",
+		},
+		Pipeline: &Pipeline{ID: "123"},
+	}, actual)
+}
+
 func Test_metadataFetcher_GetLocalMetadata(t *testing.T) {
 	tmp := t.TempDir()
 	_, lastCommit := createLocalRepoWithCommits(t, tmp)

@@ -271,7 +271,7 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 	}
 
 	if m.isLocalModule(source) {
-		dir, err := filepath.Rel(m.cachePath, filepath.Join(parentPath, source))
+		dir, err := m.cachePathRel(filepath.Join(parentPath, source))
 		if err != nil {
 			return nil, err
 		}
@@ -293,7 +293,7 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 	unlock := m.sync.Lock(moduleAddr)
 	defer unlock()
 
-	moduleDownloadDir, err := filepath.Rel(m.cachePath, dest)
+	moduleDownloadDir, err := m.cachePathRel(dest)
 	if err != nil {
 		return nil, err
 	}
@@ -337,6 +337,28 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 	}
 
 	return manifestModule, nil
+}
+
+func (m *ModuleLoader) cachePathRel(targetPath string) (string, error) {
+	rel, relerr := filepath.Rel(m.cachePath, targetPath)
+	if relerr == nil {
+		return rel, nil
+	}
+
+	// try converting to absolute paths
+	absCachePath, abserr := filepath.Abs(m.cachePath)
+	if abserr != nil {
+		return "", relerr
+	}
+
+	absTargetPath, abserr := filepath.Abs(targetPath)
+	if abserr != nil {
+		if abserr != nil {
+			return "", relerr
+		}
+	}
+
+	return filepath.Rel(absCachePath, absTargetPath)
 }
 
 // isLocalModule checks if the module is a local module by checking

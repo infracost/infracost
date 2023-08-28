@@ -1,0 +1,7 @@
+version: 0.1
+
+projects:
+  - path: prod/west
+    name: prod-west
+    terraform_var_files:
+      - ../../global.tfvars

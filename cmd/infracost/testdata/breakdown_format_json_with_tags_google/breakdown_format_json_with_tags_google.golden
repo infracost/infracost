@@ -1,0 +1,209 @@
+{
+  "version": "0.2",
+  "metadata": {
+    "infracostCommand": "breakdown",
+    "vcsBranch": "stub-branch",
+    "vcsCommitSha": "stub-sha",
+    "vcsCommitAuthorName": "stub-author",
+    "vcsCommitAuthorEmail": "stub@stub.com",
+    "vcsCommitTimestamp": "REPLACED_TIME",
+    "vcsCommitMessage": "stub-message",
+    "vcsRepositoryUrl": "https://github.com/infracost/infracost"
+  },
+  "currency": "USD",
+  "projects": [
+    {
+      "name": "infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags_google",
+      "metadata": {
+        "path": "testdata/breakdown_format_json_with_tags_google",
+        "type": "terraform_dir",
+        "vcsSubPath": "cmd/infracost/testdata/breakdown_format_json_with_tags_google",
+        "providers": [
+          {
+            "name": "google",
+            "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
+            "startLine": 1,
+            "endLine": 4
+          }
+        ]
+      },
+      "pastBreakdown": {
+        "resources": [
+          {
+            "name": "google_compute_disk.gcd1",
+            "resourceType": "google_compute_disk",
+            "tags": {
+              "GoogleLabel": "compute-disk-label"
+            },
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "google_compute_disk.gcd1",
+                  "endLine": 13,
+                  "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
+                  "startLine": 6
+                }
+              ],
+              "checksum": "167438a6d3e64b8f75d1c0f7dcbf733ed65c24b40ce19d9d05c7c42ea070c947",
+              "endLine": 13,
+              "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
+              "startLine": 6
+            },
+            "hourlyCost": "0.027397260273972604",
+            "monthlyCost": "20",
+            "costComponents": [
+              {
+                "name": "Standard provisioned storage (pd-standard)",
+                "unit": "GB",
+                "hourlyQuantity": "0.6849315068493151",
+                "monthlyQuantity": "500",
+                "price": "0.04",
+                "hourlyCost": "0.027397260273972604",
+                "monthlyCost": "20"
+              }
+            ]
+          },
+          {
+            "name": "google_compute_disk.gcd2",
+            "resourceType": "google_compute_disk",
+            "tags": {},
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "google_compute_disk.gcd2",
+                  "endLine": 18,
+                  "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
+                  "startLine": 15
+                }
+              ],
+              "checksum": "37baa7cee7077135d1b2f8c8d323cb484fcbd5be11d5fe3caafe1783113d98a4",
+              "endLine": 18,
+              "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
+              "startLine": 15
+            },
+            "hourlyCost": "0.02328767123287671",
+            "monthlyCost": "17",
+            "costComponents": [
+              {
+                "name": "SSD provisioned storage (pd-ssd)",
+                "unit": "GB",
+                "hourlyQuantity": "0.136986301369863",
+                "monthlyQuantity": "100",
+                "price": "0.17",
+                "hourlyCost": "0.02328767123287671",
+                "monthlyCost": "17"
+              }
+            ]
+          }
+        ],
+        "totalHourlyCost": "0.050684931506849314",
+        "totalMonthlyCost": "37"
+      },
+      "breakdown": {
+        "resources": [
+          {
+            "name": "google_compute_disk.gcd1",
+            "resourceType": "google_compute_disk",
+            "tags": {
+              "GoogleLabel": "compute-disk-label"
+            },
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "google_compute_disk.gcd1",
+                  "endLine": 13,
+                  "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
+                  "startLine": 6
+                }
+              ],
+              "checksum": "167438a6d3e64b8f75d1c0f7dcbf733ed65c24b40ce19d9d05c7c42ea070c947",
+              "endLine": 13,
+              "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
+              "startLine": 6
+            },
+            "hourlyCost": "0.027397260273972604",
+            "monthlyCost": "20",
+            "costComponents": [
+              {
+                "name": "Standard provisioned storage (pd-standard)",
+                "unit": "GB",
+                "hourlyQuantity": "0.6849315068493151",
+                "monthlyQuantity": "500",
+                "price": "0.04",
+                "hourlyCost": "0.027397260273972604",
+                "monthlyCost": "20"
+              }
+            ]
+          },
+          {
+            "name": "google_compute_disk.gcd2",
+            "resourceType": "google_compute_disk",
+            "tags": {},
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "google_compute_disk.gcd2",
+                  "endLine": 18,
+                  "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
+                  "startLine": 15
+                }
+              ],
+              "checksum": "37baa7cee7077135d1b2f8c8d323cb484fcbd5be11d5fe3caafe1783113d98a4",
+              "endLine": 18,
+              "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
+              "startLine": 15
+            },
+            "hourlyCost": "0.02328767123287671",
+            "monthlyCost": "17",
+            "costComponents": [
+              {
+                "name": "SSD provisioned storage (pd-ssd)",
+                "unit": "GB",
+                "hourlyQuantity": "0.136986301369863",
+                "monthlyQuantity": "100",
+                "price": "0.17",
+                "hourlyCost": "0.02328767123287671",
+                "monthlyCost": "17"
+              }
+            ]
+          }
+        ],
+        "totalHourlyCost": "0.050684931506849314",
+        "totalMonthlyCost": "37"
+      },
+      "diff": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
+      },
+      "summary": {
+        "totalDetectedResources": 2,
+        "totalSupportedResources": 2,
+        "totalUnsupportedResources": 0,
+        "totalUsageBasedResources": 0,
+        "totalNoPriceResources": 0,
+        "unsupportedResourceCounts": {},
+        "noPriceResourceCounts": {}
+      }
+    }
+  ],
+  "totalHourlyCost": "0.050684931506849314",
+  "totalMonthlyCost": "37",
+  "pastTotalHourlyCost": "0.050684931506849314",
+  "pastTotalMonthlyCost": "37",
+  "diffTotalHourlyCost": "0",
+  "diffTotalMonthlyCost": "0",
+  "timeGenerated": "REPLACED_TIME",
+  "summary": {
+    "totalDetectedResources": 2,
+    "totalSupportedResources": 2,
+    "totalUnsupportedResources": 0,
+    "totalUsageBasedResources": 0,
+    "totalNoPriceResources": 0,
+    "unsupportedResourceCounts": {},
+    "noPriceResourceCounts": {}
+  }
+}
+
+Err:
+

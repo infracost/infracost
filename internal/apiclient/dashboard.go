@@ -33,6 +33,7 @@ type QueryCLISettingsResponse struct {
 	CloudEnabled       bool `json:"cloudEnabled"`
 	ActualCostsEnabled bool `json:"actualCostsEnabled"`
 	UsageAPIEnabled    bool `json:"usageApiEnabled"`
+	TagsAPIEnabled     bool `json:"tagsApiEnabled"`
 }
 
 type runInput struct {
@@ -89,14 +90,7 @@ func newRunInput(ctx *config.RunContext, out output.Root) (*runInput, error) {
 	}
 
 	ctxValues["repoMetadata"] = metadata
-
 	if ctx.IsInfracostComment() {
-		// Clone the map to cleanup up the "command" key to show "comment".  It is
-		// currently set to the sub comment (e.g. "github")
-		ctxValues = make(map[string]interface{}, len(ctxValues))
-		for k, v := range ctx.ContextValues.Values() {
-			ctxValues[k] = v
-		}
 		ctxValues["command"] = "comment"
 	}
 
@@ -213,6 +207,7 @@ func (c *DashboardAPIClient) QueryCLISettings() (QueryCLISettingsResponse, error
             	cloudEnabled
 				actualCostsEnabled
 				usageApiEnabled
+				tagsApiEnabled
         	}
     	}
 	`
@@ -229,6 +224,7 @@ func (c *DashboardAPIClient) QueryCLISettings() (QueryCLISettingsResponse, error
 		response.CloudEnabled = results[0].Get("data.cliSettings.cloudEnabled").Bool()
 		response.ActualCostsEnabled = results[0].Get("data.cliSettings.actualCostsEnabled").Bool()
 		response.UsageAPIEnabled = results[0].Get("data.cliSettings.usageApiEnabled").Bool()
+		response.TagsAPIEnabled = results[0].Get("data.cliSettings.tagsApiEnabled").Bool()
 	}
 	return response, nil
 }

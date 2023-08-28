@@ -33,11 +33,14 @@
           {
             "name": "aws_instance.web_app",
             "resourceType": "aws_instance",
+            "tags": {},
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
-                  "filename": "testdata/breakdown_multi_project_with_error_output_json/dev/main.tf"
+                  "endLine": 22,
+                  "filename": "testdata/breakdown_multi_project_with_error_output_json/dev/main.tf",
+                  "startLine": 8
                 }
               ],
               "checksum": "19795a60f4adbabf8e1f0bbaa064d7455db29aa70a0710eaf949e73512b45fd3",
@@ -113,11 +116,14 @@
           {
             "name": "aws_instance.web_app",
             "resourceType": "aws_instance",
+            "tags": {},
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
-                  "filename": "testdata/breakdown_multi_project_with_error_output_json/dev/main.tf"
+                  "endLine": 22,
+                  "filename": "testdata/breakdown_multi_project_with_error_output_json/dev/main.tf",
+                  "startLine": 8
                 }
               ],
               "checksum": "19795a60f4adbabf8e1f0bbaa064d7455db29aa70a0710eaf949e73512b45fd3",
@@ -224,11 +230,14 @@
           {
             "name": "aws_instance.web_app",
             "resourceType": "aws_instance",
+            "tags": {},
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
-                  "filename": "testdata/breakdown_multi_project_with_error_output_json/prod/main.tf"
+                  "endLine": 23,
+                  "filename": "testdata/breakdown_multi_project_with_error_output_json/prod/main.tf",
+                  "startLine": 9
                 }
               ],
               "checksum": "3326e79d502305b9e1f50ad5efedb7528b9e59ded094785b1ca91c6f88812fa5",
@@ -304,11 +313,14 @@
           {
             "name": "aws_instance.web_app",
             "resourceType": "aws_instance",
+            "tags": {},
             "metadata": {
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
-                  "filename": "testdata/breakdown_multi_project_with_error_output_json/prod/main.tf"
+                  "endLine": 23,
+                  "filename": "testdata/breakdown_multi_project_with_error_output_json/prod/main.tf",
+                  "startLine": 9
                 }
               ],
               "checksum": "3326e79d502305b9e1f50ad5efedb7528b9e59ded094785b1ca91c6f88812fa5",

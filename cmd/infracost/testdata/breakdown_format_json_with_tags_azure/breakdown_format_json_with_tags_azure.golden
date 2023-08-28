@@ -1,0 +1,213 @@
+{
+  "version": "0.2",
+  "metadata": {
+    "infracostCommand": "breakdown",
+    "vcsBranch": "stub-branch",
+    "vcsCommitSha": "stub-sha",
+    "vcsCommitAuthorName": "stub-author",
+    "vcsCommitAuthorEmail": "stub@stub.com",
+    "vcsCommitTimestamp": "REPLACED_TIME",
+    "vcsCommitMessage": "stub-message",
+    "vcsRepositoryUrl": "https://github.com/infracost/infracost"
+  },
+  "currency": "USD",
+  "projects": [
+    {
+      "name": "infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags_azure",
+      "metadata": {
+        "path": "testdata/breakdown_format_json_with_tags_azure",
+        "type": "terraform_dir",
+        "vcsSubPath": "cmd/infracost/testdata/breakdown_format_json_with_tags_azure",
+        "providers": [
+          {
+            "name": "azurerm",
+            "filename": "testdata/breakdown_format_json_with_tags_azure/main.tf",
+            "startLine": 1,
+            "endLine": 4
+          }
+        ]
+      },
+      "pastBreakdown": {
+        "resources": [
+          {
+            "name": "azurerm_redis_cache.arc1",
+            "resourceType": "azurerm_redis_cache",
+            "tags": {
+              "AzureLabel": "azure-tag"
+            },
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "azurerm_redis_cache.arc1",
+                  "endLine": 21,
+                  "filename": "testdata/breakdown_format_json_with_tags_azure/main.tf",
+                  "startLine": 11
+                }
+              ],
+              "checksum": "eb5984ee4c26abd5e6d42df874f260985032d4a04624fccde27c07cc9eb1c14c",
+              "endLine": 21,
+              "filename": "testdata/breakdown_format_json_with_tags_azure/main.tf",
+              "startLine": 11
+            },
+            "hourlyCost": "0.45",
+            "monthlyCost": "328.5",
+            "costComponents": [
+              {
+                "name": "Cache usage (Standard_C3)",
+                "unit": "nodes",
+                "hourlyQuantity": "0.0027397260273973",
+                "monthlyQuantity": "2",
+                "price": "164.25",
+                "hourlyCost": "0.45",
+                "monthlyCost": "328.5"
+              }
+            ]
+          },
+          {
+            "name": "azurerm_redis_cache.arc2",
+            "resourceType": "azurerm_redis_cache",
+            "tags": {},
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "azurerm_redis_cache.arc2",
+                  "endLine": 30,
+                  "filename": "testdata/breakdown_format_json_with_tags_azure/main.tf",
+                  "startLine": 23
+                }
+              ],
+              "checksum": "d25f4ccac9d918c85ea0c9781195cf5f3576147b9465ad2136a42b1a15cc8ed3",
+              "endLine": 30,
+              "filename": "testdata/breakdown_format_json_with_tags_azure/main.tf",
+              "startLine": 23
+            },
+            "hourlyCost": "0.45",
+            "monthlyCost": "328.5",
+            "costComponents": [
+              {
+                "name": "Cache usage (Standard_C3)",
+                "unit": "nodes",
+                "hourlyQuantity": "0.0027397260273973",
+                "monthlyQuantity": "2",
+                "price": "164.25",
+                "hourlyCost": "0.45",
+                "monthlyCost": "328.5"
+              }
+            ]
+          }
+        ],
+        "totalHourlyCost": "0.9",
+        "totalMonthlyCost": "657"
+      },
+      "breakdown": {
+        "resources": [
+          {
+            "name": "azurerm_redis_cache.arc1",
+            "resourceType": "azurerm_redis_cache",
+            "tags": {
+              "AzureLabel": "azure-tag"
+            },
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "azurerm_redis_cache.arc1",
+                  "endLine": 21,
+                  "filename": "testdata/breakdown_format_json_with_tags_azure/main.tf",
+                  "startLine": 11
+                }
+              ],
+              "checksum": "eb5984ee4c26abd5e6d42df874f260985032d4a04624fccde27c07cc9eb1c14c",
+              "endLine": 21,
+              "filename": "testdata/breakdown_format_json_with_tags_azure/main.tf",
+              "startLine": 11
+            },
+            "hourlyCost": "0.45",
+            "monthlyCost": "328.5",
+            "costComponents": [
+              {
+                "name": "Cache usage (Standard_C3)",
+                "unit": "nodes",
+                "hourlyQuantity": "0.0027397260273973",
+                "monthlyQuantity": "2",
+                "price": "164.25",
+                "hourlyCost": "0.45",
+                "monthlyCost": "328.5"
+              }
+            ]
+          },
+          {
+            "name": "azurerm_redis_cache.arc2",
+            "resourceType": "azurerm_redis_cache",
+            "tags": {},
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "azurerm_redis_cache.arc2",
+                  "endLine": 30,
+                  "filename": "testdata/breakdown_format_json_with_tags_azure/main.tf",
+                  "startLine": 23
+                }
+              ],
+              "checksum": "d25f4ccac9d918c85ea0c9781195cf5f3576147b9465ad2136a42b1a15cc8ed3",
+              "endLine": 30,
+              "filename": "testdata/breakdown_format_json_with_tags_azure/main.tf",
+              "startLine": 23
+            },
+            "hourlyCost": "0.45",
+            "monthlyCost": "328.5",
+            "costComponents": [
+              {
+                "name": "Cache usage (Standard_C3)",
+                "unit": "nodes",
+                "hourlyQuantity": "0.0027397260273973",
+                "monthlyQuantity": "2",
+                "price": "164.25",
+                "hourlyCost": "0.45",
+                "monthlyCost": "328.5"
+              }
+            ]
+          }
+        ],
+        "totalHourlyCost": "0.9",
+        "totalMonthlyCost": "657"
+      },
+      "diff": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
+      },
+      "summary": {
+        "totalDetectedResources": 3,
+        "totalSupportedResources": 2,
+        "totalUnsupportedResources": 0,
+        "totalUsageBasedResources": 0,
+        "totalNoPriceResources": 1,
+        "unsupportedResourceCounts": {},
+        "noPriceResourceCounts": {
+          "azurerm_resource_group": 1
+        }
+      }
+    }
+  ],
+  "totalHourlyCost": "0.9",
+  "totalMonthlyCost": "657",
+  "pastTotalHourlyCost": "0.9",
+  "pastTotalMonthlyCost": "657",
+  "diffTotalHourlyCost": "0",
+  "diffTotalMonthlyCost": "0",
+  "timeGenerated": "REPLACED_TIME",
+  "summary": {
+    "totalDetectedResources": 3,
+    "totalSupportedResources": 2,
+    "totalUnsupportedResources": 0,
+    "totalUsageBasedResources": 0,
+    "totalNoPriceResources": 1,
+    "unsupportedResourceCounts": {},
+    "noPriceResourceCounts": {
+      "azurerm_resource_group": 1
+    }
+  }
+}
+
+Err:
+

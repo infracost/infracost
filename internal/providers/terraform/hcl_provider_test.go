@@ -25,7 +25,7 @@ import (
 func setMockAttributes(blockAtts map[string]map[string]string) hcl.SetAttributesFunc {
 	count := map[string]int{}
 
-	return func(moduleBlock *hcl.Block, block *hcl2.Block) {
+	return func(address string, moduleBlock *hcl.Block, block *hcl2.Block) {
 		if v, ok := block.Body.(*hclsyntax.Body); ok {
 			body := *v
 			nat := hclsyntax.Attributes{}
@@ -179,6 +179,9 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 		{
 			name: "shows correct duplicate variable warning",
 		},
+		{
+			name: "builds module configuration correctly with count",
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
@@ -189,7 +192,9 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 			logger.SetOutput(io.Discard)
 			entry := logrus.NewEntry(logger)
 
+			ctx := config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{})
 			parsers, err := hcl.LoadParsers(
+				ctx,
 				testPath,
 				modules.NewModuleLoader(testPath, nil, config.TerraformSourceMap{}, entry, &sync.KeyMutex{}),
 				nil,
@@ -208,10 +213,19 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 			p := HCLProvider{
 				parsers: parsers,
 				logger:  entry,
-				ctx:     &config.ProjectContext{RunContext: &config.RunContext{Config: &config.Config{}}},
+				ctx:     ctx,
 			}
 			got := p.LoadPlanJSONs()
 			require.NoError(t, err)
+
+			root := got[0]
+
+			// uncomment and run `make test` to update the expectations
+			// var prettyJSON bytes.Buffer
+			// err = json2.Indent(&prettyJSON, root.JSON, "", "  ")
+			// assert.NoError(t, err)
+			// err = os.WriteFile(path.Join(testPath, "expected.json"), append(prettyJSON.Bytes(), "\n"...), 0600)
+			// assert.NoError(t, err)
 
 			tmpl, err := template.ParseFiles(path.Join(testPath, "expected.json"))
 			require.NoError(t, err)
@@ -221,7 +235,6 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 			require.NoError(t, err)
 
 			expected := exp.String()
-			root := got[0]
 			actual := string(root.JSON)
 			assert.JSONEq(t, expected, actual)
 

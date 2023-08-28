@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"os/exec"
 	"path"
 	"path/filepath"
 	"strings"
@@ -47,6 +48,62 @@ func TestBreakdownFormatJSON(t *testing.T) {
 }
 
 func TestBreakdownFormatJsonWithWarnings(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testName,
+		[]string{
+			"breakdown",
+			"--format", "json",
+			"--path", dir,
+		},
+		&GoldenFileOptions{
+			CaptureLogs: true,
+			IsJSON:      true,
+		},
+	)
+}
+
+func TestBreakdownFormatJsonWithTags(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testName,
+		[]string{
+			"breakdown",
+			"--format", "json",
+			"--path", dir,
+		},
+		&GoldenFileOptions{
+			CaptureLogs: true,
+			IsJSON:      true,
+		}, func(ctx *config.RunContext) {
+			ctx.Config.TagPoliciesEnabled = true
+		},
+	)
+}
+
+func TestBreakdownFormatJsonWithTagsAzure(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testName,
+		[]string{
+			"breakdown",
+			"--format", "json",
+			"--path", dir,
+		},
+		&GoldenFileOptions{
+			CaptureLogs: true,
+			IsJSON:      true,
+		},
+	)
+}
+
+func TestBreakdownFormatJsonWithTagsGoogle(t *testing.T) {
 	testName := testutil.CalcGoldenFileTestdataDirName()
 	dir := path.Join("./testdata", testName)
 	GoldenFileCommandTest(
@@ -337,6 +394,79 @@ func TestBreakdownTerragrunt(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", "../../examples/terragrunt"}, nil)
 }
 
+func TestBreakdownTerragruntWithRemoteSource(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	cacheDir := filepath.Join(dir, ".infracost")
+	require.NoError(t, os.RemoveAll(cacheDir))
+
+	GoldenFileCommandTest(
+		t,
+		testName,
+		[]string{
+			"breakdown",
+			"--config-file", filepath.Join(dir, "infracost.yml"),
+		},
+		nil)
+
+	dirs, err := getGitBranchesInDirs(filepath.Join(cacheDir, ".terragrunt-cache"))
+	assert.NoError(t, err)
+
+	// check that there are 4 directories in the download directory as 2 of the 6 projects use the same ref.
+	require.Len(t, dirs, 4)
+	assert.Equal(t, dirs["nY--fMGWRYoen8N6OqfdCB8CBnc"], "1f94a2fd07b3e29deea4706b5d2fdc68c1d02aad")
+	assert.Equal(t, dirs["F_iCrGgnzJEf5w4HUBrbeCRMQo0"], "b6fa04f65bdcb26869215fb840f5ee088a096bc8")
+	assert.Equal(t, dirs["KaCyCQXaN6-S634qsDqQ2wwYENc"], "74725d6e91aa91d7283642b7ed3316d12f271212")
+	assert.Equal(t, dirs["vo8pQqWUeCu_1_TBy7LGvx51SW0"], "master")
+}
+
+func getGitRef(dir string) (string, error) {
+	cmd := exec.Command("git", "rev-parse", "--abbrev-ref", "HEAD")
+	cmd.Dir = dir
+	output, err := cmd.Output()
+	if err != nil {
+		return "", err
+	}
+
+	branch := strings.TrimRight(string(output), "\n")
+
+	if branch == "HEAD" {
+		// in detached head state, get the commit hash
+		cmd := exec.Command("git", "rev-parse", "HEAD")
+		cmd.Dir = dir
+		output, err = cmd.Output()
+		if err != nil {
+			return "", err
+		}
+		branch = strings.TrimRight(string(output), "\n")
+	}
+
+	return branch, nil
+}
+
+func getGitBranchesInDirs(root string) (map[string]string, error) {
+	var dirs = make(map[string]string)
+	err := filepath.Walk(root, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			return err
+		}
+
+		if info.IsDir() && filepath.Base(path) == ".git" {
+			dir := filepath.Dir(path)
+			branch, err := getGitRef(dir)
+			if err != nil {
+				return err
+			}
+
+			dirs[filepath.Base(dir)] = branch
+			return filepath.SkipDir
+		}
+		return nil
+	})
+
+	return dirs, err
+}
+
 func TestBreakdownTerragruntWithProjectError(t *testing.T) {
 	t.Skip()
 
@@ -403,9 +533,24 @@ func TestBreakdownTerragruntGetEnvWithWhitelist(t *testing.T) {
 	defer func() {
 		os.Unsetenv("UNSAFE_VAR")
 		os.Unsetenv("SAFE_VAR")
+		os.Unsetenv("INFRACOST_SAFE_ENVS")
 	}()
 
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())}, nil)
+}
+
+func TestBreakdownTerragruntGetEnvConfigFile(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--config-file", path.Join(dir, "infracost.yml"),
+		},
+		nil,
+	)
 }
 
 func TestBreakdownTerragruntHCLDepsOutputMocked(t *testing.T) {
@@ -823,4 +968,43 @@ func TestBreakdownWithLocalPathDataBlock(t *testing.T) {
 			"--path", dir,
 		}, &GoldenFileOptions{CaptureLogs: true},
 	)
+}
+
+func TestBreakdownAutoWithMultiVarfileProjects(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", dir,
+		}, nil)
+}
+
+func TestBreakdownWithFreeResourcesChecksum(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", dir,
+			"--format", "json",
+		}, &GoldenFileOptions{IsJSON: true}, func(ctx *config.RunContext) {
+			ctx.Config.TagPoliciesEnabled = true
+		})
+}
+
+func TestBreakdownWithDataBlocksInSubmod(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", dir,
+		}, nil)
 }

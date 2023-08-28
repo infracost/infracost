@@ -129,6 +129,14 @@
  ├─ Outbound data transfer to Internet (over 150TB)        3,400  GB         $170.00 
  └─ Outbound data transfer to other regions                  750  GB          $15.00 
                                                                                      
+ aws_data_transfer.il-central-1                                                      
+ ├─ Intra-region data transfer                             2,000  GB          $20.00 
+ ├─ Outbound data transfer to Internet (first 10TB)       10,240  GB       $1,126.40 
+ ├─ Outbound data transfer to Internet (next 40TB)        40,960  GB       $3,481.60 
+ ├─ Outbound data transfer to Internet (next 100TB)      102,400  GB       $7,884.80 
+ ├─ Outbound data transfer to Internet (over 150TB)        3,400  GB         $187.00 
+ └─ Outbound data transfer to other regions                  750  GB          $60.00 
+                                                                                     
  aws_data_transfer.me-south-1                                                        
  ├─ Intra-region data transfer                             2,000  GB          $20.00 
  ├─ Outbound data transfer to Internet (first 10TB)       10,240  GB       $1,198.08 
@@ -202,13 +210,13 @@
  ├─ Outbound data transfer to Internet (over 150TB)        3,400  GB         $170.00 
  └─ Outbound data transfer to other regions                  750  GB          $15.00 
                                                                                      
- OVERALL TOTAL                                                           $338,478.51 
+ OVERALL TOTAL                                                           $351,238.31 
 ──────────────────────────────────
-25 cloud resources were detected:
-∙ 25 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+26 cloud resources were detected:
+∙ 26 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestDataTransferGoldenFile                         ┃ $338,479     ┃
+┃ TestDataTransferGoldenFile                         ┃ $351,238     ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛

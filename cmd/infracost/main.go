@@ -8,8 +8,10 @@ import (
 	stdLog "log"
 	"os"
 	"runtime/debug"
+	"strings"
 
 	"github.com/pkg/errors"
+	"github.com/pkg/profile"
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -30,6 +32,12 @@ func init() {
 }
 
 func main() {
+	if os.Getenv("INFRACOST_MEMORY_PROFILE") == "true" {
+		defer profile.Start(profile.MemProfile, profile.ProfilePath(".")).Stop()
+	} else if os.Getenv("INFRACOST_CPU_PROFILE") == "true" {
+		defer profile.Start(profile.CPUProfile, profile.ProfilePath(".")).Stop()
+	}
+
 	Run(nil, nil)
 }
 
@@ -261,6 +269,14 @@ func loadCloudSettings(ctx *config.RunContext) {
 		ctx.Config.UsageActualCosts = true
 		logging.Logger.Info("Enabled actual costs")
 	}
+
+	if result.TagsAPIEnabled && ctx.Config.TagPolicyAPIEndpoint == "" {
+		ctx.Config.TagPolicyAPIEndpoint = ctx.Config.DashboardAPIEndpoint
+	}
+	if ctx.Config.TagPolicyAPIEndpoint != "" {
+		ctx.Config.TagPoliciesEnabled = true
+		logging.Logger.Info("Enabled tag policies")
+	}
 }
 
 func checkAPIKey(apiKey string, apiEndpoint string, defaultEndpoint string) error {
@@ -274,9 +290,21 @@ func checkAPIKey(apiKey string, apiEndpoint string, defaultEndpoint string) erro
 	return nil
 }
 
+var ignoredErrors = []string{
+	"Tag policy check failed",
+	"Policy check failed",
+	"Guardrail check failed",
+}
+
 func handleCLIError(ctx *config.RunContext, cliErr error) {
 	if cliErr.Error() != "" {
 		ui.PrintError(ctx.ErrWriter, cliErr.Error())
+	}
+
+	for _, pattern := range ignoredErrors {
+		if strings.Contains(cliErr.Error(), pattern) {
+			return
+		}
 	}
 
 	err := apiclient.ReportCLIError(ctx, cliErr, true)

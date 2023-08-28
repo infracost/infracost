@@ -2,7 +2,6 @@ package terraform
 
 import (
 	"bufio"
-	"encoding/json"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -22,11 +21,9 @@ import (
 	"github.com/gruntwork-io/terragrunt/options"
 	tgoptions "github.com/gruntwork-io/terragrunt/options"
 	"github.com/gruntwork-io/terragrunt/util"
-	"github.com/hashicorp/go-getter"
 	hcl2 "github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/gohcl"
 	"github.com/hashicorp/hcl/v2/hclparse"
-	"github.com/otiai10/copy"
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
@@ -38,10 +35,18 @@ import (
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/schema"
+	infSync "github.com/infracost/infracost/internal/sync"
 	"github.com/infracost/infracost/internal/ui"
 )
 
-const terragruntSourceVersionFile = ".terragrunt-source-version"
+// terragruntSourceLock is the global lock which works across TerragrunHCLProviders to provide
+// concurrency safe downloading.
+var terragruntSourceLock = infSync.KeyMutex{}
+
+// terragruntDownloadedDirs is used to ensure sources are only downloaded once. This is needed
+// because the call to util.CopyFolderContents in tgcli.DownloadTerraformSource seems to be mucking
+// up the cache directory unnecessarily.  If that is fixed we can remove this.
+var terragruntDownloadedDirs = sync.Map{}
 
 type panicError struct {
 	msg string
@@ -76,13 +81,13 @@ func NewTerragruntHCLProvider(ctx *config.ProjectContext, includePastResources b
 		includePastResources: includePastResources,
 		outputs:              map[string]cty.Value{},
 		excludedPaths:        ctx.ProjectConfig.ExcludePaths,
-		env:                  getEnvVars(),
+		env:                  getEnvVars(ctx),
 		sourceCache:          map[string]string{},
 		logger:               logger,
 	}
 }
 
-func getEnvVars() map[string]string {
+func getEnvVars(ctx *config.ProjectContext) map[string]string {
 	environment := os.Environ()
 	environmentMap := make(map[string]string)
 
@@ -111,6 +116,16 @@ func getEnvVars() map[string]string {
 
 		if _, ok := safe[strings.ToLower(name)]; ok {
 			environmentMap[name] = variableSplit[1]
+		}
+	}
+
+	for k, v := range ctx.ProjectConfig.Env {
+		if !filterSafe {
+			environmentMap[k] = v
+		}
+
+		if _, ok := safe[strings.ToLower(k)]; ok {
+			environmentMap[k] = v
 		}
 	}
 
@@ -230,6 +245,14 @@ func (p *TerragruntHCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.
 
 	wg.Wait()
 	sort.Slice(allProjects, func(i, j int) bool {
+		if allProjects[i].Metadata == nil {
+			return false
+		}
+
+		if allProjects[j].Metadata == nil {
+			return true
+		}
+
 		return allProjects[i].Metadata.TerraformModulePath < allProjects[j].Metadata.TerraformModulePath
 	})
 
@@ -536,14 +559,15 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 		return
 	}
 	if sourceURL != "" {
-		updatedTerragruntOptions, err := p.downloadTerraformSource(sourceURL, opts, terragruntConfig)
+		updatedWorkingDir, err := downloadSourceOnce(sourceURL, opts, terragruntConfig)
+
 		if err != nil {
 			info.error = err
 			return
 		}
 
-		if updatedTerragruntOptions != nil && updatedTerragruntOptions.WorkingDir != "" {
-			info = &terragruntWorkingDirInfo{configDir: opts.WorkingDir, workingDir: updatedTerragruntOptions.WorkingDir}
+		if updatedWorkingDir != "" {
+			info = &terragruntWorkingDirInfo{configDir: opts.WorkingDir, workingDir: updatedWorkingDir}
 		}
 	}
 
@@ -604,6 +628,36 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 
 	info.provider = h
 	return info
+}
+
+// downloadSourceOnce thread-safely makes sure the sourceURL is only downloaded once
+func downloadSourceOnce(sourceURL string, opts *tgoptions.TerragruntOptions, terragruntConfig *tgconfig.TerragruntConfig) (string, error) {
+	source, err := tfsource.NewTerraformSource(sourceURL, opts.DownloadDir, opts.WorkingDir, opts.Logger)
+	if err != nil {
+		return "", err
+	}
+
+	// make the source download directory absolute so that we lock on a consistent key.
+	dir := source.DownloadDir
+	if v, err := filepath.Abs(dir); err == nil {
+		dir = v
+	}
+
+	unlock := terragruntSourceLock.Lock(dir)
+	defer unlock()
+
+	if _, alreadyDownloaded := terragruntDownloadedDirs.Load(dir); alreadyDownloaded {
+		return source.WorkingDir, nil
+	}
+
+	_, err = tgcli.DownloadTerraformSource(sourceURL, opts, terragruntConfig)
+	if err != nil {
+		return "", err
+	}
+
+	terragruntDownloadedDirs.Store(dir, true)
+
+	return source.WorkingDir, nil
 }
 
 func buildExcludedPathsMatcher(fullPath string, excludedDirs []string) func(string) bool {
@@ -924,263 +978,6 @@ func generateTypeFromValuesMap(valMap map[string]cty.Value) cty.Type {
 		outType[k] = v.Type()
 	}
 	return cty.Object(outType)
-}
-
-// 1. Download the given source URL, which should use Terraform's module source syntax, into a temporary folder
-// 2. Check if module directory exists in temporary folder
-// 3. Copy the contents of terragruntOptions.WorkingDir into the temporary folder.
-// 4. Set terragruntOptions.WorkingDir to the temporary folder.
-//
-// See the NewTerraformSource method for how we determine the temporary folder so we can reuse it across multiple
-// runs of Terragrunt to avoid downloading everything from scratch every time.
-// Copied from github.com/gruntwork-io/terragrunt
-func (p *TerragruntHCLProvider) downloadTerraformSource(source string, terragruntOptions *tgoptions.TerragruntOptions, terragruntConfig *tgconfig.TerragruntConfig) (*tgoptions.TerragruntOptions, error) {
-	terraformSource, err := tfsource.NewTerraformSource(source, terragruntOptions.DownloadDir, terragruntOptions.WorkingDir, terragruntOptions.Logger)
-	if err != nil {
-		return nil, err
-	}
-
-	if err := p.downloadTerraformSourceIfNecessary(terraformSource, terragruntOptions, terragruntConfig); err != nil {
-		return nil, err
-	}
-
-	if _, ok := p.sourceCache[terraformSource.CanonicalSourceURL.String()]; !ok {
-		terragruntOptions.Logger.Debugf("Adding %s to the source cache", terraformSource.CanonicalSourceURL.String())
-		p.sourceCache[terraformSource.CanonicalSourceURL.String()] = terraformSource.DownloadDir
-	}
-
-	terragruntOptions.Logger.Debugf("Copying files from %s into %s", terragruntOptions.WorkingDir, terraformSource.WorkingDir)
-	var includeInCopy []string
-	if terragruntConfig.Terraform != nil && terragruntConfig.Terraform.IncludeInCopy != nil {
-		includeInCopy = *terragruntConfig.Terraform.IncludeInCopy
-	}
-	if err := util.CopyFolderContents(terragruntOptions.WorkingDir, terraformSource.WorkingDir, tgcli.MODULE_MANIFEST_NAME, includeInCopy); err != nil {
-		return nil, err
-	}
-
-	updatedTerragruntOptions := terragruntOptions.Clone(terragruntOptions.TerragruntConfigPath)
-
-	terragruntOptions.Logger.Debugf("Setting working directory to %s", terraformSource.WorkingDir)
-	updatedTerragruntOptions.WorkingDir = terraformSource.WorkingDir
-
-	return updatedTerragruntOptions, nil
-}
-
-// copyLocalSource copies the contents of a previously downloaded source folder into the destination folder
-func (p *TerragruntHCLProvider) copyLocalSource(prevDest string, dest string, terragruntOptions *tgoptions.TerragruntOptions) error {
-	err := os.MkdirAll(dest, os.ModePerm)
-	if err != nil {
-		return fmt.Errorf("failed to create directory '%s': %w", dest, err)
-	}
-
-	// Skip dotfiles and, but keep:
-	// 1. Terraform lock files - these are normally committed to source control
-	// 2. .terragrunt-source-version files - these are used to determine if the source has changed
-	// 3. .infracost dir - this contains any cached third party modules. We can remove this when we move this directory to the root path
-	opt := copy.Options{
-		Skip: func(src string) (bool, error) {
-			base := filepath.Base(src)
-			if base == util.TerraformLockFile || base == terragruntSourceVersionFile || base == config.InfracostDir {
-				return false, nil
-			}
-
-			return strings.HasPrefix(base, "."), nil
-		},
-		OnSymlink: func(src string) copy.SymlinkAction {
-			return copy.Shallow
-		},
-	}
-
-	err = copy.Copy(prevDest, dest, opt)
-	if err != nil {
-		return fmt.Errorf("failed to copy source from '%s' to '%s': %w", prevDest, dest, err)
-	}
-
-	return nil
-}
-
-// Download the specified TerraformSource if the latest code hasn't already been downloaded.
-// Copied from github.com/gruntwork-io/terragrunt
-func (p *TerragruntHCLProvider) downloadTerraformSourceIfNecessary(terraformSource *tfsource.TerraformSource, terragruntOptions *tgoptions.TerragruntOptions, terragruntConfig *tgconfig.TerragruntConfig) error {
-	alreadyLatest, err := p.alreadyHaveLatestCode(terraformSource, terragruntOptions)
-	if err != nil {
-		return err
-	}
-
-	if alreadyLatest {
-		if err := p.validateWorkingDir(terraformSource); err != nil {
-			return err
-		}
-		terragruntOptions.Logger.Debugf("Terraform files in %s are up to date. Will not download again.", terraformSource.WorkingDir)
-		return nil
-	}
-
-	var previousVersion = ""
-	// read previous source version
-	// https://github.com/gruntwork-io/terragrunt/issues/1921
-	if util.FileExists(terraformSource.VersionFile) {
-		previousVersion, err = p.readVersionFile(terraformSource)
-		if err != nil {
-			return err
-		}
-	}
-
-	// Check if the directory has already been downloaded during this run and is in the source cache
-	// If so, we can just copy the files from the previous download to avoid downloading again
-	if prevDownloadDir, ok := p.sourceCache[terraformSource.CanonicalSourceURL.String()]; ok {
-		terragruntOptions.Logger.Debugf("Source files have already been downloading. Copying files from %s into %s", prevDownloadDir, terraformSource.DownloadDir)
-		err := p.copyLocalSource(prevDownloadDir, terraformSource.DownloadDir, terragruntOptions)
-		if err != nil {
-			terragruntOptions.Logger.Debugf("Failed to copy local source from %s to %s: %v. Will try to redownload", prevDownloadDir, terraformSource.DownloadDir, err)
-		} else {
-			terragruntOptions.Logger.Debugf("Successfully copied files from %s to %s. Will not download again", prevDownloadDir, terraformSource.DownloadDir)
-			return nil
-		}
-	}
-
-	// When downloading source, we need to process any hooks waiting on `init-from-module`. Therefore, we clone the
-	// options struct, set the command to the value the hooks are expecting, and run the download action surrounded by
-	// before and after hooks (if any).
-	// terragruntOptionsForDownload := terragruntOptions.Clone(terragruntOptions.TerragruntConfigPath)
-	// terragruntOptionsForDownload.TerraformCommand = tgcli.CMD_INIT_FROM_MODULE
-	// downloadErr := runActionWithHooks("download source", terragruntOptionsForDownload, terragruntConfig, func() error {
-	//	return downloadSource(terraformSource, terragruntOptions, terragruntConfig)
-	// })
-	downloadErr := p.downloadSource(terraformSource, terragruntOptions, terragruntConfig)
-
-	if downloadErr != nil {
-		return downloadErr
-	}
-
-	if err := terraformSource.WriteVersionFile(); err != nil {
-		return err
-	}
-
-	if err := p.validateWorkingDir(terraformSource); err != nil {
-		return err
-	}
-
-	currentVersion, err := terraformSource.EncodeSourceVersion()
-	if err != nil {
-		return fmt.Errorf("could not encode source version: %w", err)
-	}
-	// if source versions are different, create file to run init
-	// https://github.com/gruntwork-io/terragrunt/issues/1921
-	if previousVersion != currentVersion {
-		initFile := util.JoinPath(terraformSource.WorkingDir, ".terragrunt-init-required")
-		f, createErr := os.Create(initFile)
-		if createErr != nil {
-			return createErr
-		}
-		defer f.Close()
-	}
-
-	return nil
-}
-
-// Download the code from the Canonical Source URL into the Download Folder using the go-getter library
-// Copied from github.com/gruntwork-io/terragrunt
-func (p *TerragruntHCLProvider) downloadSource(terraformSource *tfsource.TerraformSource, terragruntOptions *tgoptions.TerragruntOptions, terragruntConfig *tgconfig.TerragruntConfig) error {
-	terragruntOptions.Logger.Debugf("Downloading Terraform configurations from %s into %s", terraformSource.CanonicalSourceURL, terraformSource.DownloadDir)
-
-	if err := getter.GetAny(terraformSource.DownloadDir, terraformSource.CanonicalSourceURL.String(), p.updateGetters(terragruntConfig)); err != nil {
-		return tgerrors.WithStackTrace(err)
-	}
-
-	return nil
-}
-
-// updateGetters returns the customized go-getter interfaces that Terragrunt relies on. Specifically:
-//   - Local file path getter is updated to copy the files instead of creating symlinks, which is what go-getter defaults
-//     to.
-//   - Include the customized getter for fetching sources from the Terraform Registry.
-//
-// This creates a closure that returns a function so that we have access to the terragrunt configuration, which is
-// necessary for customizing the behavior of the file getter.
-// Copied from github.com/gruntwork-io/terragrunt
-func (p *TerragruntHCLProvider) updateGetters(terragruntConfig *tgconfig.TerragruntConfig) func(*getter.Client) error {
-	return func(client *getter.Client) error {
-		// We copy all the default getters from the go-getter library, but replace the "file" getter. We shallow clone the
-		// getter map here rather than using getter.Getters directly because (a) we shouldn't change the original,
-		// globally-shared getter.Getters map and (b) Terragrunt may run this code from many goroutines concurrently during
-		// xxx-all calls, so creating a new map each time ensures we don't a "concurrent map writes" error.
-		client.Getters = map[string]getter.Getter{}
-		for getterName, getterValue := range getter.Getters {
-			if getterName == "file" {
-				var includeInCopy []string
-				if terragruntConfig.Terraform != nil && terragruntConfig.Terraform.IncludeInCopy != nil {
-					includeInCopy = *terragruntConfig.Terraform.IncludeInCopy
-				}
-				client.Getters[getterName] = &tgcli.FileCopyGetter{IncludeInCopy: includeInCopy}
-			} else {
-				client.Getters[getterName] = getterValue
-			}
-		}
-
-		// Load in custom getters that are only supported in Terragrunt
-		client.Getters["tfr"] = &TerraformRegistryGetter{}
-
-		return nil
-	}
-}
-
-// Check if working terraformSource.WorkingDir exists and is directory
-// Copied from github.com/gruntwork-io/terragrunt
-func (p *TerragruntHCLProvider) validateWorkingDir(terraformSource *tfsource.TerraformSource) error {
-	workingLocalDir := strings.ReplaceAll(terraformSource.WorkingDir, terraformSource.DownloadDir+filepath.FromSlash("/"), "")
-	if util.IsFile(terraformSource.WorkingDir) {
-		return tgcli.WorkingDirNotDir{Dir: workingLocalDir, Source: terraformSource.CanonicalSourceURL.String()}
-	}
-	if !util.IsDir(terraformSource.WorkingDir) {
-		return tgcli.WorkingDirNotFound{Dir: workingLocalDir, Source: terraformSource.CanonicalSourceURL.String()}
-	}
-
-	return nil
-}
-
-// Returns true if the specified TerraformSource, of the exact same version, has already been downloaded into the
-// DownloadFolder. This helps avoid downloading the same code multiple times. Note that if the TerraformSource points
-// to a local file path, we assume the user is doing local development and always return false to ensure the latest
-// code is downloaded (or rather, copied) every single time. See the ProcessTerraformSource method for more info.
-// Copied from github.com/gruntwork-io/terragrunt
-func (p *TerragruntHCLProvider) alreadyHaveLatestCode(terraformSource *tfsource.TerraformSource, terragruntOptions *tgoptions.TerragruntOptions) (bool, error) {
-	if tfsource.IsLocalSource(terraformSource.CanonicalSourceURL) ||
-		!util.FileExists(terraformSource.DownloadDir) ||
-		!util.FileExists(terraformSource.WorkingDir) ||
-		!util.FileExists(terraformSource.VersionFile) {
-
-		return false, nil
-	}
-
-	tfFiles, err := filepath.Glob(fmt.Sprintf("%s/*.tf", terraformSource.WorkingDir))
-	if err != nil {
-		return false, tgerrors.WithStackTrace(err)
-	}
-
-	if len(tfFiles) == 0 {
-		terragruntOptions.Logger.Debugf("Working dir %s exists but contains no Terraform files, so assuming code needs to be downloaded again.", terraformSource.WorkingDir)
-		return false, nil
-	}
-
-	currentVersion, err := terraformSource.EncodeSourceVersion()
-	if err != nil {
-		return false, fmt.Errorf("could not encode source version: %w", err)
-	}
-
-	previousVersion, err := p.readVersionFile(terraformSource)
-	if err != nil {
-		return false, err
-	}
-
-	return previousVersion == currentVersion, nil
-}
-
-// Return the version number stored in the DownloadDir. This version number can be used to check if the Terraform code
-// that has already been downloaded is the same as the version the user is currently requesting. The version number is
-// calculated using the encodeSourceVersion method.
-// Copied from github.com/gruntwork-io/terragrunt
-func (p *TerragruntHCLProvider) readVersionFile(terraformSource *tfsource.TerraformSource) (string, error) {
-	return util.ReadFileAsString(terraformSource.VersionFile)
 }
 
 type terragruntDependency struct {

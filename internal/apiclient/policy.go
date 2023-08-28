@@ -137,11 +137,16 @@ func resourceDataToPolicySchema(d schema.ResourceData, parentRefs map[string]str
 		}
 	}
 
+	var tags map[string]string
+	if d.Tags != nil {
+		tags = *d.Tags
+	}
+
 	return policyResourceSchema{
 		Type:         d.Type,
 		ProviderName: d.ProviderName,
 		Address:      d.Address,
-		Tags:         d.Tags,
+		Tags:         tags,
 		Values:       []byte(d.RawValues.Raw),
 		References:   refs,
 	}

@@ -11,7 +11,7 @@ type ResourceData struct {
 	Type          string
 	ProviderName  string
 	Address       string
-	Tags          map[string]string
+	Tags          *map[string]string
 	RawValues     gjson.Result
 	ReferencesMap map[string][]*ResourceData
 	CFResource    cloudformation.Resource
@@ -20,7 +20,7 @@ type ResourceData struct {
 	pulumiUrn     string
 }
 
-func NewResourceData(resourceType string, providerName string, address string, tags map[string]string, rawValues gjson.Result) *ResourceData {
+func NewResourceData(resourceType string, providerName string, address string, tags *map[string]string, rawValues gjson.Result) *ResourceData {
 	return &ResourceData{
 		Type:          resourceType,
 		ProviderName:  providerName,
@@ -33,7 +33,7 @@ func NewResourceData(resourceType string, providerName string, address string, t
 	}
 }
 
-func NewCFResourceData(resourceType string, providerName string, address string, tags map[string]string, cfResource cloudformation.Resource) *ResourceData {
+func NewCFResourceData(resourceType string, providerName string, address string, tags *map[string]string, cfResource cloudformation.Resource) *ResourceData {
 	return &ResourceData{
 		Type:          resourceType,
 		ProviderName:  providerName,

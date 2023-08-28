@@ -1,0 +1,11 @@
+version: 0.1
+
+projects:
+{{- range $project := matchPaths ":name/:region/main.tf" }}
+      - path: {{ $project.name }}/{{ $project.region }}
+        name: {{ $project.name }}-{{ $project.region }}
+        terraform_var_files:
+        {{- if pathExists "." "global.tfvars"}}
+          - {{ relPath $project._dir "global.tfvars" }}
+        {{- end}}
+{{- end }}

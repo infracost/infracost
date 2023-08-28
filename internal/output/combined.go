@@ -19,6 +19,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/infracost/infracost/internal/clierror"
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 )
 
@@ -110,7 +111,7 @@ func LoadPaths(paths []string) ([]ReportInput, error) {
 // Each project in current Root will have all past resources overwritten with the matching projects
 // in the prior Root. If we can't find a matching project then we assume that the project
 // has been newly created and will show a 100% increase in the output Root.
-func CompareTo(current, prior Root) (Root, error) {
+func CompareTo(c *config.Config, current, prior Root) (Root, error) {
 	priorProjects := make(map[string]*schema.Project)
 	for _, p := range prior.Projects {
 		if _, ok := priorProjects[p.LabelWithMetadata()]; ok {
@@ -164,20 +165,20 @@ func CompareTo(current, prior Root) (Root, error) {
 
 	sort.Sort(schemaProjects)
 
-	out, err := ToOutputFormat(schemaProjects)
+	out, err := ToOutputFormat(c, schemaProjects)
 	if err != nil {
 		return out, err
 	}
 
 	// preserve the summary from the original run
 	currentProjects := make(map[string]Project)
-	for _, p := range prior.Projects {
+	for _, p := range current.Projects {
 		currentProjects[p.LabelWithMetadata()] = p
 	}
-	for _, outP := range out.Projects {
-		if v, ok := currentProjects[outP.LabelWithMetadata()]; ok {
-			outP.Summary = v.Summary
-			outP.fullSummary = v.fullSummary
+	for i := range out.Projects {
+		if v, ok := currentProjects[out.Projects[i].LabelWithMetadata()]; ok {
+			out.Projects[i].Summary = v.Summary
+			out.Projects[i].fullSummary = v.fullSummary
 		}
 	}
 
@@ -190,6 +191,7 @@ func CompareTo(current, prior Root) (Root, error) {
 func Combine(inputs []ReportInput) (Root, error) {
 	var combined Root
 
+	var lastestGeneratedAt time.Time
 	var totalHourlyCost *decimal.Decimal
 	var totalMonthlyCost *decimal.Decimal
 	var pastTotalHourlyCost *decimal.Decimal
@@ -215,6 +217,10 @@ func Combine(inputs []ReportInput) (Root, error) {
 		projects = append(projects, input.Root.Projects...)
 
 		summaries = append(summaries, input.Root.Summary)
+
+		if input.Root.TimeGenerated.After(lastestGeneratedAt) {
+			lastestGeneratedAt = input.Root.TimeGenerated
+		}
 
 		if len(input.Root.TagPolicies) > 0 {
 			tagPolicies = append(tagPolicies, input.Root.TagPolicies...)
@@ -281,7 +287,7 @@ func Combine(inputs []ReportInput) (Root, error) {
 	combined.PastTotalMonthlyCost = pastTotalMonthlyCost
 	combined.DiffTotalHourlyCost = diffTotalHourlyCost
 	combined.DiffTotalMonthlyCost = diffTotalMonthlyCost
-	combined.TimeGenerated = time.Now().UTC()
+	combined.TimeGenerated = lastestGeneratedAt
 	combined.Summary = MergeSummaries(summaries)
 	combined.Metadata = metadata
 	combined.TagPolicies = mergeTagPolicies(tagPolicies)
@@ -365,13 +371,17 @@ func FormatOutput(format string, r Root, opts Options) ([]byte, error) {
 	case "diff":
 		b, err = ToDiff(r, opts)
 	case "github-comment":
-		b, err = ToMarkdown(r, opts, MarkdownOptions{MaxMessageSize: GitHubMaxMessageSize})
+		out, error := ToMarkdown(r, opts, MarkdownOptions{MaxMessageSize: GitHubMaxMessageSize})
+		b, err = out.Msg, error
 	case "gitlab-comment", "azure-repos-comment":
-		b, err = ToMarkdown(r, opts, MarkdownOptions{})
+		out, error := ToMarkdown(r, opts, MarkdownOptions{})
+		b, err = out.Msg, error
 	case "bitbucket-comment":
-		b, err = ToMarkdown(r, opts, MarkdownOptions{BasicSyntax: true})
+		out, error := ToMarkdown(r, opts, MarkdownOptions{BasicSyntax: true})
+		b, err = out.Msg, error
 	case "bitbucket-comment-summary":
-		b, err = ToMarkdown(r, opts, MarkdownOptions{BasicSyntax: true, OmitDetails: true})
+		out, error := ToMarkdown(r, opts, MarkdownOptions{BasicSyntax: true, OmitDetails: true})
+		b, err = out.Msg, error
 	case "slack-message":
 		b, err = ToSlackMessage(r, opts)
 	default:

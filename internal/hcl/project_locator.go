@@ -22,7 +22,8 @@ type ProjectLocator struct {
 	useAllPaths    bool
 	logger         *logrus.Entry
 
-	basePath string
+	basePath           string
+	discoveredVarFiles map[string][]string
 }
 
 // ProjectLocatorConfig provides configuration options on how the locator functions.
@@ -36,18 +37,20 @@ type ProjectLocatorConfig struct {
 func NewProjectLocator(logger *logrus.Entry, config *ProjectLocatorConfig) *ProjectLocator {
 	if config != nil {
 		return &ProjectLocator{
-			modules:        make(map[string]struct{}),
-			moduleCalls:    make(map[string][]string),
-			excludedDirs:   config.ExcludedSubDirs,
-			changedObjects: config.ChangedObjects,
-			logger:         logger,
-			useAllPaths:    config.UseAllPaths,
+			modules:            make(map[string]struct{}),
+			moduleCalls:        make(map[string][]string),
+			discoveredVarFiles: make(map[string][]string),
+			excludedDirs:       config.ExcludedSubDirs,
+			changedObjects:     config.ChangedObjects,
+			logger:             logger,
+			useAllPaths:        config.UseAllPaths,
 		}
 	}
 
 	return &ProjectLocator{
-		modules: make(map[string]struct{}),
-		logger:  logger,
+		modules:            make(map[string]struct{}),
+		discoveredVarFiles: make(map[string][]string),
+		logger:             logger,
 	}
 }
 
@@ -128,6 +131,8 @@ type RootPath struct {
 	// This will show as true if one or more files/directories have changed in the Path, and also if
 	// and local modules that are used by this project have changes.
 	HasChanges bool
+	// TerraformVarFiles are a list of any .tfvars or .tfvars.json files found at the root level.
+	TerraformVarFiles []string
 }
 
 // FindRootModules returns a list of all directories that contain a full Terraform project under the given fullPath.
@@ -154,8 +159,9 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 		}
 
 		projects = append(projects, RootPath{
-			Path:       dir,
-			HasChanges: p.hasChanges(dir),
+			Path:              dir,
+			HasChanges:        p.hasChanges(dir),
+			TerraformVarFiles: p.discoveredVarFiles[dir],
 		})
 	}
 
@@ -193,19 +199,31 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) []string {
 		}
 
 		var parseFunc func(filename string) (*hcl.File, hcl.Diagnostics)
-		if strings.HasSuffix(info.Name(), ".tf") {
+		name := info.Name()
+		if strings.HasSuffix(name, ".tf") {
 			parseFunc = hclParser.ParseHCLFile
 		}
 
-		if strings.HasSuffix(info.Name(), ".tf.json") {
+		if strings.HasSuffix(name, ".tf.json") {
 			parseFunc = hclParser.ParseJSONFile
+		}
+
+		if strings.HasSuffix(name, ".tfvars") || strings.HasSuffix(name, ".tfvars.json") {
+			v, ok := p.discoveredVarFiles[fullPath]
+			if !ok {
+				v = []string{name}
+			} else {
+				v = append(v, name)
+			}
+
+			p.discoveredVarFiles[fullPath] = v
 		}
 
 		if parseFunc == nil {
 			continue
 		}
 
-		path := filepath.Join(fullPath, info.Name())
+		path := filepath.Join(fullPath, name)
 		_, diag := parseFunc(path)
 		if diag != nil && diag.HasErrors() {
 			p.logger.Debugf("skipping file: %s hcl parsing err: %s", path, diag.Error())

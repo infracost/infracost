@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
+	"os"
 	"path/filepath"
 	"strings"
 	"text/template"
@@ -11,6 +12,7 @@ import (
 	jsoniter "github.com/json-iterator/go"
 	"github.com/pkg/errors"
 	pathToRegexp "github.com/soongo/path-to-regexp"
+	"gopkg.in/yaml.v2"
 )
 
 var (
@@ -47,6 +49,12 @@ func NewParser(repoDir string, variables Variables) *Parser {
 		"contains":   p.contains,
 		"pathExists": p.pathExists,
 		"matchPaths": p.matchPaths,
+		"list":       p.list,
+		"relPath":    p.relPath,
+		"isDir":      p.isDir,
+		"readFile":   p.readFile,
+		"parseJson":  p.parseJson,
+		"parseYaml":  p.parseYaml,
 	})
 	p.template = t
 
@@ -220,4 +228,102 @@ func (p *Parser) matchPaths(pattern string) []map[interface{}]interface{} {
 	})
 
 	return matches
+}
+
+// list is a useful function for creating an arbitrary array of values which can be
+// looped over in a template. For example:
+//
+//	$my_list = list "foo" "bar"
+//	{{- range $my_list }}
+//		{{ . }}
+//	{{- end }}
+func (p *Parser) list(v ...interface{}) []interface{} {
+	return v
+}
+
+// relPath returns a relative path that is lexically equivalent to targpath when
+// joined to basepath with an intervening separator. If there is an error returning the
+// relative path we panic so that the error is show when executing the template.
+func (p *Parser) relPath(basepath string, tarpath string) string {
+	rel, err := filepath.Rel(basepath, tarpath)
+	if err != nil {
+		panic(err)
+	}
+
+	return rel
+}
+
+// isDir returns is path points to a directory.
+func (p *Parser) isDir(path string) bool {
+	fullPath := filepath.Join(p.repoDir, path)
+	info, err := os.Stat(fullPath)
+	if err != nil {
+		return false
+	}
+
+	return info.IsDir()
+}
+
+// readFile reads the named file and returns the contents.
+func (p *Parser) readFile(path string) string {
+	if !isSubdirectory(p.repoDir, path) {
+		panic(fmt.Sprintf("%q must be within the repository root %q", path, filepath.Base(p.repoDir)))
+	}
+
+	fullPath := filepath.Join(p.repoDir, path)
+	b, err := os.ReadFile(fullPath)
+	if err != nil {
+		panic(err)
+	}
+
+	return string(b)
+}
+
+// parseYaml decodes provided yaml contents and assigns decoded values into a
+// generic out value. This can be used as a simple object in the templates.
+func (p *Parser) parseYaml(contents string) map[string]interface{} {
+	var out map[string]interface{}
+	err := yaml.Unmarshal([]byte(contents), &out)
+	if err != nil {
+		panic(err)
+	}
+
+	return out
+}
+
+// parseJson decodes the provided json contents and assigns decoded values into a
+// generic out value. This can be used as a simple object in the templates.
+func (p *Parser) parseJson(contents string) map[string]interface{} {
+	var out map[string]interface{}
+	err := jsoniter.Unmarshal([]byte(contents), &out)
+	if err != nil {
+		panic(err)
+	}
+
+	return out
+}
+
+func isSubdirectory(base, target string) bool {
+	full := filepath.Join(base, target)
+	fileInfo, err := os.Lstat(full)
+	if err != nil {
+		return false
+	}
+
+	absBasePath, err := filepath.Abs(base)
+	if err != nil {
+		return false
+	}
+
+	absTargetPath, err := filepath.Abs(full)
+	if err != nil {
+		return false
+	}
+
+	relPath, err := filepath.Rel(absBasePath, absTargetPath)
+	if err != nil {
+		return false
+	}
+
+	return !strings.HasPrefix(relPath, "..") && fileInfo.Mode()&os.ModeSymlink == 0
 }

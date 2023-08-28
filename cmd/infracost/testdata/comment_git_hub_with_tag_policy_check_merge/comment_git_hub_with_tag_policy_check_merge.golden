@@ -29,51 +29,35 @@
 ∙ 6 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 ```
 </details>
-<details>
-  <summary><strong>❌ Tag policy check failed</strong></summary>
-  <table>
-    <thead>
-      <td>Policy Issue</td>
-      <td>File:line</td>
-    </thead>
-    <tr>
-      <th colspan="2"><b>Failing Tag Policy</b>: This should show as a failure</th>
-    </tr>
-    <tr>
-      <td>
-        <code>infracost1.s3.bucket</code>
-        in projects my-prod-project, my-dev-project
-        <ul>
-          <li>should have mandatory tags: "Environment", "Team"</li>
-          <li>should have a valid value for "Team" tag: "Ops", "Frontend team", "Backend team"</li>
-        </ul>
-      </td>
-      <td>
-        dev/main.tf:14
-      </td>
-    </tr>
-    <tr>
-      <td>
-        <code>infracost2.s3.bucket</code>
-        in projects my-prod-project, my-dev-project
-        <ul>
-          <li>should have mandatory tags: "Environment", "Team"</li>
-          <li>should have a valid value for "Team" tag: "Ops", "Frontend team", "Backend team"</li>
-        </ul>
-      </td>
-      <td>
-        dev/main.tf:14
-      </td>
-    </tr>
-  </table>
-</details>
-<details>
-  <summary><strong>✅ Tag policies passed</strong></summary>
-  <ul>
-    <li><b>Passing Tag Policy 1</b> This should show as passing, it's in both files.</li>
-    <li><b>Passing Tag Policy 2</b> This should show as passing.  It's only in the second file</li>
-  </ul>
-</details>
+    <details>
+        <summary><strong>❌ Policies failed (needs action)</strong></summary>
+      <h4>❌ <b>Failing Tag Policy</b> (needs action)</h4>
+    <table>
+        <tr>
+          <td>
+            <p>This should show as a failure</p>
+          </td>
+        </tr>
+        <tr><td>
+
+**infracost1.s3.bucket** at `dev/main.tf:14`
+* Missing mandatory tags: `Environment`, `Team`
+* `Team` has invalid value `devops`, must be one of: `Ops`, `Frontend team`, `Backend team`
+  
+in projects `my-prod-project`, `my-dev-project`
+  
+</td></tr>
+        <tr><td>
+
+**infracost2.s3.bucket** at `dev/main.tf:14`
+* Missing mandatory tags: `Environment`, `Team`
+* `Team` has invalid value `devops`, must be one of: `Ops`, `Frontend team`, `Backend team`
+  
+in projects `my-prod-project`, `my-dev-project`
+  
+</td></tr>
+    </table>
+    </details>
 
 Comment not posted to GitHub (--dry-run was specified)
 
@@ -83,9 +67,9 @@ Error: Tag policy check failed:
 
   Failing Tag Policy: This should show as a failure
     infracost1.s3.bucket in project(s) my-prod-project, my-dev-project
-    - should have mandatory tags: "Environment", "Team"
-    - should have a valid value for "Team" tag: "Ops", "Frontend team", "Backend team"
+    - Missing mandatory tags: `Environment`, `Team`
+    - `Team` has invalid value `devops`, must be one of: `Ops`, `Frontend team`, `Backend team`
     infracost2.s3.bucket in project(s) my-prod-project, my-dev-project
-    - should have mandatory tags: "Environment", "Team"
-    - should have a valid value for "Team" tag: "Ops", "Frontend team", "Backend team"
+    - Missing mandatory tags: `Environment`, `Team`
+    - `Team` has invalid value `devops`, must be one of: `Ops`, `Frontend team`, `Backend team`
 

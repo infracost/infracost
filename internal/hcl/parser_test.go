@@ -53,7 +53,7 @@ data "cats_cat" "the-cats-mother" {
 
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
-	parsers, err := LoadParsers(filepath.Dir(path), loader, nil, logger)
+	parsers, err := LoadParsers(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{}), filepath.Dir(path), loader, nil, logger)
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -561,7 +561,7 @@ output "mod_result" {
 	logger := newDiscardLogger()
 	dir := filepath.Dir(path)
 	loader := modules.NewModuleLoader(dir, nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
-	parsers, err := LoadParsers(path, loader, nil, logger)
+	parsers, err := LoadParsers(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{}), path, loader, nil, logger)
 	require.NoError(t, err)
 	rootModule, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -621,7 +621,7 @@ output "mod_result" {
 
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
-	parsers, err := LoadParsers(path, loader, nil, logger)
+	parsers, err := LoadParsers(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{}), path, loader, nil, logger)
 	require.NoError(t, err)
 	rootModule, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -818,7 +818,7 @@ resource "test_resource_two" "test" {
 
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
-	parsers, err := LoadParsers(filepath.Dir(path), loader, nil, logger)
+	parsers, err := LoadParsers(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{}), filepath.Dir(path), loader, nil, logger)
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -880,7 +880,7 @@ output "mod_result" {
 
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
-	parsers, err := LoadParsers(path, loader, nil, logger)
+	parsers, err := LoadParsers(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{}), path, loader, nil, logger)
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -1028,7 +1028,7 @@ output "mod_result" {
 
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
-	parsers, err := LoadParsers(path, loader, nil, logger)
+	parsers, err := LoadParsers(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{}), path, loader, nil, logger)
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -1088,6 +1088,11 @@ module "reload" {
 variable "input" {}
 
 resource "dynamic" "resource" {
+  child_block {
+    foo   = "10.0.2.0"
+    bar = "existing_child_block_should_be_kept"
+  }
+
   dynamic "child_block" {
     for_each = {
     	for i in var.input : i.ip => i
@@ -1105,7 +1110,7 @@ resource "dynamic" "resource" {
 
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
-	parsers, err := LoadParsers(path, loader, nil, logger)
+	parsers, err := LoadParsers(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{}), path, loader, nil, logger)
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -1124,11 +1129,12 @@ resource "dynamic" "resource" {
 
 	assert.JSONEq(
 		t,
-		values,
 		`[
+			{"foo":"10.0.2.0", "bar":"existing_child_block_should_be_kept"},
 			{"foo":"10.0.0.0","bar":"input-mock"},
 			{"foo":"10.0.1.0","bar":"input-mock"}
 		]`,
+		values,
 	)
 
 }
@@ -1165,7 +1171,7 @@ resource "azurerm_linux_function_app" "function" {
 
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
-	parsers, err := LoadParsers(filepath.Dir(path), loader, nil, logger)
+	parsers, err := LoadParsers(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{}), filepath.Dir(path), loader, nil, logger)
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -1211,7 +1217,7 @@ resource "test_resource" "second" {
 
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
-	parsers, err := LoadParsers(filepath.Dir(path), loader, nil, logger)
+	parsers, err := LoadParsers(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{}), filepath.Dir(path), loader, nil, logger)
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -1261,7 +1267,7 @@ data "google_compute_zones" "us" {
 
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
-	parsers, err := LoadParsers(filepath.Dir(path), loader, nil, logger)
+	parsers, err := LoadParsers(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{}), filepath.Dir(path), loader, nil, logger)
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -1312,7 +1318,7 @@ data "aws_availability_zones" "ne" {
 
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
-	parsers, err := LoadParsers(filepath.Dir(path), loader, nil, logger)
+	parsers, err := LoadParsers(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{}), filepath.Dir(path), loader, nil, logger)
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -1320,7 +1326,7 @@ data "aws_availability_zones" "ne" {
 	blocks := module.Blocks
 	eu := blocks.Matching(BlockMatcher{Label: "aws_availability_zones.eu", Type: "data"})
 	b := valueToBytes(t, eu.Values())
-	assert.JSONEq(t, `{"group_names":["eu-west-2","eu-west-2","eu-west-2","eu-west-2-wl1","eu-west-2-wl1"],"id":"eu-west-2","names":["eu-west-2a","eu-west-2b","eu-west-2c","eu-west-2-wl1-lon-wlz-1","eu-west-2-wl1-man-wlz-1"],"zone_ids":["euw2-az2","euw2-az3","euw2-az1","euw2-wl1-lon-wlz1","euw2-wl1-man-wlz1"]}`, string(b))
+	assert.JSONEq(t, `{"group_names":["eu-west-2","eu-west-2","eu-west-2","eu-west-2-wl1","eu-west-2-wl1","eu-west-2-wl2"],"id":"eu-west-2","names":["eu-west-2a","eu-west-2b","eu-west-2c","eu-west-2-wl1-lon-wlz-1","eu-west-2-wl1-man-wlz-1","eu-west-2-wl2-man-wlz-1"],"zone_ids":["euw2-az2","euw2-az3","euw2-az1","euw2-wl1-lon-wlz1","euw2-wl1-man-wlz1","euw2-wl2-man-wlz1"]}`, string(b))
 
 	us := blocks.Matching(BlockMatcher{Label: "aws_availability_zones.us", Type: "data"})
 	b = valueToBytes(t, us.Values())
@@ -1359,7 +1365,7 @@ resource "random_shuffle" "bad" {
 
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
-	parsers, err := LoadParsers(filepath.Dir(path), loader, nil, logger)
+	parsers, err := LoadParsers(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{}), filepath.Dir(path), loader, nil, logger)
 	require.NoError(t, err)
 	module, err := parsers[0].ParseDirectory()
 	require.NoError(t, err)
@@ -1394,5 +1400,52 @@ resource "random_shuffle" "bad" {
 		`{"input":3}`,
 		blocks.Matching(BlockMatcher{Label: "random_shuffle.bad", Type: "resource"}).Values(),
 		"id", "arn", "self_link", "name",
+	)
+}
+
+func Test_LocalsMergeWithDataTags(t *testing.T) {
+	path := createTestFile("test.tf", `
+provider "aws" {
+ default_tags {
+   tags = {
+     Environment = "Test"
+   }
+ }
+}
+
+variable "tags" {
+  type        = map(string)
+  default     = {
+    "foo" = "bar"
+  }
+}
+
+data "aws_default_tags" "current" {}
+
+locals {
+  asg_tags = merge(
+    data.aws_default_tags.current.tags,
+    var.tags
+  )
+}
+`)
+
+	logger := newDiscardLogger()
+	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
+	parsers, err := LoadParsers(
+		config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{}),
+		filepath.Dir(path),
+		loader,
+		nil,
+		logger)
+	require.NoError(t, err)
+	module, err := parsers[0].ParseDirectory()
+	require.NoError(t, err)
+
+	blocks := module.Blocks
+	assertBlockEqualsJSON(
+		t,
+		`{"asg_tags":{"foo":"bar","Environment":"Test"}}`,
+		blocks.Matching(BlockMatcher{Type: "locals"}).Values(),
 	)
 }

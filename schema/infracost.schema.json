@@ -44,6 +44,12 @@
           },
           "type": "array"
         },
+        "freeResources": {
+          "items": {
+            "$ref": "#/definitions/Resource"
+          },
+          "type": "array"
+        },
         "totalHourlyCost": {
           "type": ["string", "null"]
         },
@@ -343,9 +349,7 @@
     "Resource": {
       "required": [
         "name",
-        "metadata",
-        "hourlyCost",
-        "monthlyCost"
+        "metadata"
       ],
       "properties": {
         "name": {
@@ -481,9 +485,7 @@
     "Subresource": {
       "required": [
         "name",
-        "metadata",
-        "hourlyCost",
-        "monthlyCost"
+        "metadata"
       ],
       "properties": {
         "name": {
@@ -593,7 +595,9 @@
         "message",
         "prComment",
         "blockPr",
-        "resources"
+        "resources",
+        "totalDetectedResources",
+        "totalTaggableResources"
       ],
       "properties": {
         "name": {
@@ -617,6 +621,12 @@
             "$ref": "#/definitions/TagPolicyResource"
           },
           "type": "array"
+        },
+        "totalDetectedResources": {
+          "type": "integer"
+        },
+        "totalTaggableResources": {
+          "type": "integer"
         }
       },
       "additionalProperties": false,
@@ -625,11 +635,15 @@
     "TagPolicyInvalidTag": {
       "required": [
         "key",
+        "value",
         "validValues",
         "validRegex"
       ],
       "properties": {
         "key": {
+          "type": "string"
+        },
+        "value": {
           "type": "string"
         },
         "validValues": {

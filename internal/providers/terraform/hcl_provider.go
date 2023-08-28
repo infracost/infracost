@@ -3,7 +3,7 @@ package terraform
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"encoding/json"
+	stdJson "encoding/json"
 	"flag"
 	"fmt"
 	"math/big"
@@ -31,6 +31,8 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
 )
+
+var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 type HCLProvider struct {
 	scanner        *scan.TerraformPlanScanner
@@ -149,6 +151,7 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 	}
 	loader := modules.NewModuleLoader(cachePath, credsSource, ctx.RunContext.Config.TerraformSourceMap, logger, ctx.RunContext.ModuleMutex)
 	parsers, err := hcl.LoadParsers(
+		ctx,
 		initialPath,
 		loader,
 		locatorConfig,
@@ -272,6 +275,10 @@ func (p *HCLProvider) newProject(parsed HCLProject) *schema.Project {
 	name := p.ctx.ProjectConfig.Name
 	if name == "" {
 		name = metadata.GenerateProjectName(p.ctx.RunContext.VCSMetadata.Remote, p.ctx.RunContext.IsCloudEnabled())
+
+		if p.ctx.RunContext.Config.ConfigFilePath == "" && parsed.Module.ModuleSuffix != "" {
+			name += "-" + parsed.Module.ModuleSuffix
+		}
 	}
 
 	return schema.NewProject(name, metadata)
@@ -290,13 +297,13 @@ func (p *HCLProvider) LoadPlanJSONs() []HCLProject {
 
 	for i, module := range mods {
 		if module.Error == nil {
-			b, err := p.modulesToPlanJSON(module.Module)
-			if err != nil {
-				module.Error = err
-			} else {
-				module.JSON = b
+			module.JSON, module.Error = p.modulesToPlanJSON(module.Module)
+			if os.Getenv("INFRACOST_JSON_DUMP") == "true" {
+				err := os.WriteFile(fmt.Sprintf("%s-out.json", strings.ReplaceAll(module.Module.ModulePath, "/", "-")), module.JSON, os.ModePerm)
+				if err != nil {
+					p.logger.WithError(err).Debug("failed to write to json dump")
+				}
 			}
-
 		}
 
 		jsons[i] = module
@@ -377,7 +384,11 @@ func (p *HCLProvider) Modules() []HCLProject {
 			return mods[i].Module.Name < mods[j].Module.Name
 		}
 
-		return mods[i].Module.ModulePath < mods[j].Module.ModulePath
+		if mods[i].Module.ModulePath != mods[j].Module.ModulePath {
+			return mods[i].Module.ModulePath < mods[j].Module.ModulePath
+		}
+
+		return mods[i].Module.ModuleSuffix < mods[j].Module.ModuleSuffix
 	})
 
 	return mods
@@ -430,7 +441,7 @@ func (p *HCLProvider) modulesToPlanJSON(rootModule *hcl.Module) ([]byte, error) 
 	p.schema.PriorState.Values.RootModule = mo.PlanModule
 	p.schema.PlannedValues.RootModule = mo.PlanModule
 
-	b, err := json.MarshalIndent(p.schema, "", "  ")
+	b, err := json.Marshal(p.schema)
 	if err != nil {
 		return nil, fmt.Errorf("error handling built plan json from hcl %w", err)
 	}
@@ -453,6 +464,11 @@ func (p *HCLProvider) marshalModule(module *hcl.Module) ModuleOut {
 		}
 	}
 
+	// sort the modules so we get deterministic output in the json
+	sort.SliceStable(module.Blocks, func(i, j int) bool {
+		return module.Blocks[i].Label() < module.Blocks[j].Label()
+	})
+
 	configResources := map[string]struct{}{}
 	for _, block := range module.Blocks {
 		if block.Type() == "resource" {
@@ -469,8 +485,13 @@ func (p *HCLProvider) marshalModule(module *hcl.Module) ModuleOut {
 		}
 	}
 
+	// sort the modules so we get deterministic output in the json
+	sort.SliceStable(module.Modules, func(i, j int) bool {
+		return module.Modules[i].Name < module.Modules[j].Name
+	})
+
 	for _, m := range module.Modules {
-		pieces := strings.Split(m.Name, ".")
+		pieces := strings.Split(removeAddressArrayPart(m.Name), ".")
 		modKey := pieces[len(pieces)-1]
 
 		mo := p.marshalModule(m)
@@ -770,7 +791,7 @@ func (p *HCLProvider) marshalBlock(block *hcl.Block, jsonValues map[string]inter
 		}
 
 		if v, ok := jsonValues[key]; ok {
-			if _, ok := v.(json.RawMessage); ok {
+			if _, ok := v.(stdJson.RawMessage); ok {
 				p.logger.WithFields(log.Fields{
 					"parent_block": block.LocalName(),
 					"child_block":  b.LocalName(),
@@ -808,7 +829,7 @@ func marshalAttributeValues(blockType string, value cty.Value) map[string]interf
 			continue
 		}
 
-		ret[key] = json.RawMessage(vJSON)
+		ret[key] = stdJson.RawMessage(vJSON)
 	}
 	return ret
 }

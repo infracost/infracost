@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/pkg/errors"
 	"golang.org/x/oauth2"
@@ -34,6 +35,11 @@ func (c *azureReposComment) Body() string {
 // of the comment.
 func (c *azureReposComment) Ref() string {
 	return c.href
+}
+
+// ValidAt returns the time the comment was tagged as being valid at
+func (c *azureReposComment) ValidAt() *time.Time {
+	return extractValidAt(c.Body())
 }
 
 // Less compares the comment to another comment and returns true if this
@@ -210,7 +216,7 @@ func (h *azureReposPRHandler) CallFindMatchingComments(ctx context.Context, tag 
 		}
 
 		for _, comment := range thread.Comments {
-			if comment.IsDeleted || !strings.Contains(comment.Content, markdownTag(tag)) {
+			if comment.IsDeleted || !hasTagKey(comment.Content, tag) {
 				continue
 			}
 
@@ -345,7 +351,7 @@ func (h *azureReposPRHandler) CallHideComment(ctx context.Context, comment Comme
 	return errors.New("Not implemented")
 }
 
-// AddMarkdownTag prepends a tag as a markdown comment to the given string.
-func (h *azureReposPRHandler) AddMarkdownTag(s string, tag string) string {
-	return addMarkdownTag(s, tag)
+// AddMarkdownTags prepends tags as a markdown comment to the given string.
+func (h *azureReposPRHandler) AddMarkdownTags(s string, tags []CommentTag) (string, error) {
+	return addMarkdownTags(s, tags)
 }
