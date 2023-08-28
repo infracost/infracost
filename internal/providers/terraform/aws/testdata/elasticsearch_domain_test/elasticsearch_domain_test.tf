@@ -30,6 +30,28 @@ resource "aws_elasticsearch_domain" "gp2" {
   }
 }
 
+resource "aws_elasticsearch_domain" "gp3" {
+  domain_name           = "example-domain"
+  elasticsearch_version = "1.5"
+
+  cluster_config {
+    instance_type            = "c4.2xlarge.elasticsearch"
+    instance_count           = 3
+    dedicated_master_enabled = true
+    dedicated_master_type    = "c4.8xlarge.elasticsearch"
+    dedicated_master_count   = 1
+    warm_enabled             = true
+    warm_count               = 2
+    warm_type                = "ultrawarm1.medium.elasticsearch"
+  }
+
+  ebs_options {
+    ebs_enabled = true
+    volume_size = 400
+    volume_type = "gp3"
+  }
+}
+
 resource "aws_elasticsearch_domain" "io1" {
   domain_name           = "example-domain"
   elasticsearch_version = "1.5"

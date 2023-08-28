@@ -34,6 +34,11 @@
  ├─ Database instance (on-demand, Single-AZ, db.t4g.small)                730  hours                         $23.36 
  └─ Storage (general purpose SSD, gp3)                                     20  GB                             $2.30 
                                                                                                                     
+ aws_db_instance.gp3["multi_az"]                                                                                    
+ ├─ Database instance (on-demand, Multi-AZ, db.t4g.small)                 730  hours                         $47.45 
+ ├─ Storage (general purpose SSD, gp3)                                    400  GB                            $92.00 
+ └─ Provisioned GP3 IOPS (above 12,000)                                 2,000  IOPS                          $80.00 
+                                                                                                                    
  aws_db_instance.mariadb                                                                                            
  ├─ Database instance (on-demand, Single-AZ, db.t3.large)                 730  hours                         $99.28 
  ├─ Storage (general purpose SSD, gp2)                                     20  GB                             $2.30 
@@ -191,13 +196,13 @@
  ├─ Storage (general purpose SSD, gp2)                                     20  GB                             $2.30 
  └─ Additional backup storage                                           1,000  GB                            $95.00 
                                                                                                                     
- OVERALL TOTAL                                                                                            $7,791.27 
+ OVERALL TOTAL                                                                                            $8,010.72 
 ──────────────────────────────────
-41 cloud resources were detected:
-∙ 41 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+42 cloud resources were detected:
+∙ 42 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestDBInstanceGoldenFile                           ┃ $7,791       ┃
+┃ TestDBInstanceGoldenFile                           ┃ $8,011       ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛

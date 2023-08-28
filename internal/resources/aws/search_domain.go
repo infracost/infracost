@@ -103,6 +103,7 @@ func (r *SearchDomain) BuildResource() *schema.Resource {
 		}
 
 		ebsTypeMap := map[string]string{
+			"gp3":      "GP3",
 			"gp2":      "GP2",
 			"io1":      "PIOPS-Storage",
 			"standard": "Magnetic",

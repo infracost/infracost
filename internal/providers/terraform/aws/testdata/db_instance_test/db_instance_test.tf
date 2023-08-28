@@ -52,18 +52,27 @@ resource "aws_db_instance" "gp3" {
     "below_low_baseline" : {
       storage : 20,
       iops : 2000,
+      multi_az : false
     }
     "above_low_baseline" : {
       storage : 20,
       iops : 4000,
+      multi_az : false
     }
     "below_high_baseline" : {
       storage : 400,
       iops : 11000,
+      multi_az : false
     }
     "above_high_baseline" : {
       storage : 400,
       iops : 14000,
+      multi_az : false
+    }
+    "multi_az" : {
+      storage : 400,
+      iops : 14000,
+      multi_az : true
     }
   }
 
@@ -72,6 +81,7 @@ resource "aws_db_instance" "gp3" {
   storage_type      = "gp3"
   allocated_storage = each.value.storage
   iops              = each.value.iops
+  multi_az          = each.value.multi_az
 }
 
 resource "aws_db_instance" "mysql-iops" {
