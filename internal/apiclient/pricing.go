@@ -181,6 +181,8 @@ func (c *PricingAPIClient) FlushCache() error {
 		return nil
 	}
 
+	logging.Logger.Debugf("writing %d objects to filesystem cache", len(c.cache))
+
 	// we store the cache as a string instead of the gjson.Result so the size is
 	// smaller on the filesystem and gob encoding doesn't have to work as hard.
 	storedCache := map[uint64]string{}
@@ -304,12 +306,17 @@ func (c *PricingAPIClient) PerformRequest(req BatchRequest) ([]PriceQueryResult,
 	// first filter any queries that have been stored in the cache. We don't need to
 	// send requests for these as we already have the results in memory.
 	var serverQueries []pricingQuery
-	if c.cache != nil {
+	if c.cache == nil {
+		serverQueries = queries
+	} else {
+		var hit int
 		for i, query := range queries {
 			c.mu.RLock()
 			v, ok := (*c.cache)[query.hash]
 			c.mu.RUnlock()
 			if ok {
+				logging.Logger.Debugf("cache hit for query hash: %d", query.hash)
+				hit++
 				res[i] = PriceQueryResult{
 					PriceQueryKey: req.keys[i],
 					Result:        v,
@@ -319,6 +326,8 @@ func (c *PricingAPIClient) PerformRequest(req BatchRequest) ([]PriceQueryResult,
 				serverQueries = append(serverQueries, query)
 			}
 		}
+
+		logging.Logger.Debugf("%d/%d queries were built from cache", hit, len(queries))
 	}
 
 	// now we deduplicate the queries, ensuring that a request for a price only happens once.
@@ -344,7 +353,7 @@ func (c *PricingAPIClient) PerformRequest(req BatchRequest) ([]PriceQueryResult,
 	}
 
 	// if the cache is enabled lets store each pricing result returned in the cache.
-	if *c.cache != nil {
+	if c.cache != nil {
 		for i, query := range deduplicatedServerQueries {
 			c.mu.RLock()
 			keyLength := len(*c.cache)
