@@ -8,12 +8,13 @@ provider "aws" {
 
 variable "instance_size" {}
 
+variable "volume_size" {}
 resource "aws_instance" "web_app" {
   ami           = "ami-674cbc1e"
   instance_type = var.instance_size
 
   root_block_device {
-    volume_size = 50
+    volume_size = var.volume_size
   }
 
   ebs_block_device {

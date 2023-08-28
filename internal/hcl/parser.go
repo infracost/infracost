@@ -231,19 +231,34 @@ func LoadParsers(ctx *config.ProjectContext, initialPath string, loader *modules
 	if ctx.RunContext.Config.ConfigFilePath == "" && len(ctx.ProjectConfig.TerraformVarFiles) == 0 {
 		var parsers []*Parser
 		for _, rootPath := range rootPaths {
-			if len(rootPath.TerraformVarFiles) > 1 {
+
+			var varFiles []string
+			var autoVarFiles []string
+			for _, varFile := range rootPath.TerraformVarFiles {
+				if strings.HasSuffix(strings.TrimSuffix(varFile, ".json"), ".auto.tfvars") {
+					autoVarFiles = append(autoVarFiles, varFile)
+					continue
+				}
+
+				varFiles = append(varFiles, varFile)
+			}
+
+			if len(varFiles) > 1 {
 				sort.Strings(rootPath.TerraformVarFiles)
 
-				for _, varFile := range rootPath.TerraformVarFiles {
-					ops := append(options, OptionWithTFVarsPaths([]string{varFile}), OptionWithModuleSuffix(strings.TrimSuffix(strings.TrimSuffix(varFile, ".json"), ".tfvars"))) // nolint: gocritic
-					parsers = append(parsers, newParser(rootPath, loader, logger, ops...))
+				for _, varFile := range varFiles {
+					parsers = append(parsers, newParser(rootPath, loader, logger, append(
+						options,
+						OptionWithTFVarsPaths(append(autoVarFiles, varFile)),
+						OptionWithModuleSuffix(strings.TrimSuffix(strings.TrimSuffix(varFile, ".json"), ".tfvars")),
+					)...))
 				}
 
 				continue
 			}
 
-			if len(rootPath.TerraformVarFiles) == 1 {
-				options = append(options, OptionWithTFVarsPaths(rootPath.TerraformVarFiles))
+			if len(varFiles) == 1 || len(autoVarFiles) > 0 {
+				options = append(options, OptionWithTFVarsPaths(append(varFiles, autoVarFiles...)))
 			}
 
 			parsers = append(parsers, newParser(rootPath, loader, logger, options...))
