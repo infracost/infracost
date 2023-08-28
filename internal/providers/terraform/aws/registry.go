@@ -113,6 +113,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getEC2HostRegistryItem(),
 	getSpotInstanceRequestRegistryItem(),
 	getLambdaProvisionedConcurrencyConfigRegistryItem(),
+	getKinesisStreamRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
