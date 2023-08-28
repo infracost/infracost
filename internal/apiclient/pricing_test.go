@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/mitchellh/hashstructure/v2"
@@ -114,7 +115,7 @@ func TestPricingAPIClient_PerformRequest(t *testing.T) {
 	q := c.buildQuery(cachedProduct, nil)
 	k, err := hashstructure.Hash(q, hashstructure.FormatV2, nil)
 	assert.NoError(t, err)
-	(*c.cache)[k] = gjson.Parse(`{"data":{"products":[{"prices":[{"priceHash":"cached-ee3dd7e4624338037ca6fea0933a662f","USD":"0.1250000000"}]}]}`)
+	c.cache.Add(k, cacheValue{Result: gjson.Parse(`{"data":{"products":[{"prices":[{"priceHash":"cached-ee3dd7e4624338037ca6fea0933a662f","USD":"0.1250000000"}]}]}`), ExpiresAt: time.Now().Add(time.Hour)})
 
 	batches := c.BatchRequests(resources, 100)
 	result, err := c.PerformRequest(batches[0])

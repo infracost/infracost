@@ -13,6 +13,7 @@ import (
 	"time"
 
 	"github.com/hashicorp/go-retryablehttp"
+	lru "github.com/hashicorp/golang-lru/v2"
 	"github.com/mitchellh/hashstructure/v2"
 
 	"github.com/infracost/infracost/internal/config"
@@ -36,10 +37,14 @@ type PricingAPIClient struct {
 	Currency       string
 	EventsDisabled bool
 
-	mu          *sync.RWMutex
-	cache       *map[uint64]gjson.Result
-	objectLimit int
-	cacheFile   string
+	cacheFile string
+
+	cache *lru.TwoQueueCache[uint64, cacheValue]
+}
+
+type cacheValue struct {
+	Result    gjson.Result
+	ExpiresAt time.Time
 }
 
 type PriceQueryKey struct {
@@ -131,46 +136,52 @@ func initCache(ctx *config.RunContext, c *PricingAPIClient) {
 
 	cacheFile := filepath.Join(ctx.Config.CachePath(), config.InfracostDir, "pricing.gob")
 	c.cacheFile = cacheFile
-	cache := loadCacheFromFile(cacheFile)
-	c.cache = &cache
-
-	c.mu = &sync.RWMutex{}
-	c.objectLimit = 200
-	if ctx.Config.PricingCacheObjectSize > 0 {
-		c.objectLimit = ctx.Config.PricingCacheObjectSize
+	cache := loadCacheFromFile(ctx, cacheFile)
+	if cache != nil {
+		c.cache = cache
+		return
 	}
+
+	c.cache = newCache(ctx)
 }
 
-func loadCacheFromFile(cacheFile string) map[uint64]gjson.Result {
-	cache := make(map[uint64]gjson.Result)
-	info, err := os.Stat(cacheFile)
+func newCache(ctx *config.RunContext) *lru.TwoQueueCache[uint64, cacheValue] {
+	objectLimit := 1000
+	if ctx.Config.PricingCacheObjectSize > 0 {
+		objectLimit = ctx.Config.PricingCacheObjectSize
+	}
+	l, _ := lru.New2Q[uint64, cacheValue](objectLimit)
+	return l
+}
+
+func loadCacheFromFile(ctx *config.RunContext, cacheFile string) *lru.TwoQueueCache[uint64, cacheValue] {
+	_, err := os.Stat(cacheFile)
 	if err != nil {
-		return cache
+		return nil
 	}
 
-	// if the cache is older than a day don't use it
-	if info.ModTime().Before(time.Now().AddDate(0, 0, -1)) {
-		return cache
-	}
-
+	var storedCache map[uint64]cacheValue
 	f, err := os.Open(cacheFile)
 	if err != nil {
 		logging.Logger.WithError(err).Debugf("could not load cache file %s", cacheFile)
-		return cache
+		return nil
 	}
 
-	var storedCache map[uint64]string
 	err = gob.NewDecoder(f).Decode(&storedCache)
 	if err != nil {
 		logging.Logger.WithError(err).Debugf("failed to decode cache file %s", cacheFile)
-		return cache
+		return nil
 	}
 
-	for k, raw := range storedCache {
-		cache[k] = gjson.Parse(raw)
+	lr := newCache(ctx)
+	now := time.Now()
+	for k, value := range storedCache {
+		if value.ExpiresAt.After(now) {
+			lr.Add(k, value)
+		}
 	}
 
-	return cache
+	return lr
 }
 
 // FlushCache writes the in memory cache to the filesystem. This allows the cache
@@ -181,21 +192,20 @@ func (c *PricingAPIClient) FlushCache() error {
 		return nil
 	}
 
-	logging.Logger.Debugf("writing %d objects to filesystem cache", len(c.cache))
-
-	// we store the cache as a string instead of the gjson.Result so the size is
-	// smaller on the filesystem and gob encoding doesn't have to work as hard.
-	storedCache := map[uint64]string{}
-	for k, result := range *c.cache {
-		storedCache[k] = result.Raw
-	}
+	logging.Logger.Debugf("writing %d objects to filesystem cache", c.cache.Len())
 
 	f, err := os.OpenFile(c.cacheFile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, os.ModePerm)
 	if err != nil {
 		return err
 	}
 
-	return gob.NewEncoder(f).Encode(storedCache)
+	storedCached := make(map[uint64]cacheValue, c.cache.Len())
+	for _, k := range c.cache.Keys() {
+		v, _ := c.cache.Peek(k)
+		storedCached[k] = v
+	}
+
+	return gob.NewEncoder(f).Encode(storedCached)
 }
 
 func (c *PricingAPIClient) AddEvent(name string, env map[string]interface{}) error {
@@ -311,15 +321,13 @@ func (c *PricingAPIClient) PerformRequest(req BatchRequest) ([]PriceQueryResult,
 	} else {
 		var hit int
 		for i, query := range queries {
-			c.mu.RLock()
-			v, ok := (*c.cache)[query.hash]
-			c.mu.RUnlock()
+			v, ok := c.cache.Get(query.hash)
 			if ok {
 				logging.Logger.Debugf("cache hit for query hash: %d", query.hash)
 				hit++
 				res[i] = PriceQueryResult{
 					PriceQueryKey: req.keys[i],
-					Result:        v,
+					Result:        v.Result,
 					filled:        true,
 				}
 			} else {
@@ -355,18 +363,8 @@ func (c *PricingAPIClient) PerformRequest(req BatchRequest) ([]PriceQueryResult,
 	// if the cache is enabled lets store each pricing result returned in the cache.
 	if c.cache != nil {
 		for i, query := range deduplicatedServerQueries {
-			c.mu.RLock()
-			keyLength := len(*c.cache)
-			c.mu.RUnlock()
-			if keyLength >= c.objectLimit {
-				logging.Logger.Debugf("cache is at object limit of %d, will not add any additional keys to the cache", keyLength)
-				continue
-			}
-
 			if len(resultsFromServer)-1 >= i {
-				c.mu.Lock()
-				(*c.cache)[query.hash] = resultsFromServer[i]
-				c.mu.Unlock()
+				(*c.cache).Add(query.hash, cacheValue{Result: resultsFromServer[i], ExpiresAt: time.Now().Add(time.Hour * 24)})
 			}
 		}
 	}
