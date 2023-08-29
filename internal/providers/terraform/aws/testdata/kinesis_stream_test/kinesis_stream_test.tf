@@ -20,6 +20,17 @@ resource "aws_kinesis_stream" "test_stream_on_demand" {
   }
 }
 
+
+resource "aws_kinesis_stream" "test_stream_on_demand_with_usage" {
+  name             = "terraform-kinesis-test-od-with-usage"
+  stream_mode_details {
+    stream_mode = "ON_DEMAND"
+  }
+  tags = {
+    Environment = "test"
+  }
+}
+
 resource "aws_kinesis_stream" "test_stream_provisioned" {
   name             = "terraform-kinesis-test-pr"
   stream_mode_details {

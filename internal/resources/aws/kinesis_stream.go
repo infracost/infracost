@@ -17,6 +17,14 @@ type KinesisStream struct {
 	Address    string
 	Region     string
 	StreamMode string
+
+	// Usage fields
+	MonthlyOnDemandDataIngestedGB           *float64 `infracost_usage:"monthly_on_demand_data_in_gb"`
+	MonthlyOnDemandDataRetrievalGB          *float64 `infracost_usage:"monthly_on_demand_data_out_gb"`
+	ConsumerApplicationCount                *int64   `infracost_usage:"consumer_application_count"`
+	MonthlyOnDemandEFODataRetrievalGB       *float64 `infracost_usage:"monthly_on_demand_efo_data_out_gb"`
+	MonthlyOnDemandExtendedRetentionByteHrs *float64 `infracost_usage:"monthly_on_demand_extended_retention_byte_hrs"`
+	MonthlyOnDemandLongTermRetentionByteHrs *float64 `infracost_usage:"monthly_on_demand_long_term_retention_byte_hrs"`
 }
 
 // CoreType returns the name of this resource type
@@ -26,7 +34,14 @@ func (r *KinesisStream) CoreType() string {
 
 // UsageSchema defines a list which represents the usage schema of KinesisStream.
 func (r *KinesisStream) UsageSchema() []*schema.UsageItem {
-	return []*schema.UsageItem{}
+	return []*schema.UsageItem{
+		{Key: "monthly_on_demand_data_in_gb", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "monthly_on_demand_data_out_gb", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "consumer_application_count", DefaultValue: 1, ValueType: schema.Int64},
+		{Key: "monthly_on_demand_efo_data_out_gb", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "monthly_on_demand_extended_retention_byte_hrs", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "monthly_on_demand_long_term_retention_byte_hrs", DefaultValue: 0, ValueType: schema.Float64},
+	}
 }
 
 // PopulateUsage parses the u schema.UsageData into the KinesisStream.
@@ -36,7 +51,7 @@ func (r *KinesisStream) PopulateUsage(u *schema.UsageData) {
 }
 
 // BuildResource builds a schema.Resource from a valid KinesisStream struct.
-// This method is called after the resource is initialised by an IaC provider.
+// This method is called after the resource is initialized by an IaC provider.
 // See providers folder for more information.
 
 // Set some vars that come from the pricing api
@@ -45,10 +60,11 @@ var ProvisionedStreamName string = "PROVISIONED"
 
 func (r *KinesisStream) BuildResource() *schema.Resource {
 	costComponents := []*schema.CostComponent{}
-
 	// Depending on the stream mode, we will have different cost components
 	if r.StreamMode == OnDemandStreamName {
 		costComponents = append(costComponents, r.onDemandStreamCostComponent())
+		costComponents = append(costComponents, r.onDemandDataIngestedCostComponent())
+		costComponents = append(costComponents, r.onDemandDataRetrievalCostComponent())
 	} else if r.StreamMode == ProvisionedStreamName {
 		costComponents = append(costComponents, r.provisionedStreamCostComponent())
 	}
@@ -74,6 +90,52 @@ func (r *KinesisStream) onDemandStreamCostComponent() *schema.CostComponent {
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "usagetype", Value: strPtr("OnDemand-StreamHour")},
 				{Key: "operation", Value: strPtr("OnDemandStreamHr")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("on_demand"),
+		},
+	}
+}
+
+func (r *KinesisStream) onDemandDataIngestedCostComponent() *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            "Data ingested",
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: floatPtrToDecimalPtr(r.MonthlyOnDemandDataIngestedGB),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("AmazonKinesis"),
+			ProductFamily: strPtr("Kinesis Streams"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", Value: strPtr("OnDemand-BilledIncomingBytes")},
+				{Key: "operation", Value: strPtr("OnDemandDataIngested")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("on_demand"),
+		},
+	}
+}
+
+// TODO Can we * the UnitMultiplier by ConsumerApplicationCount to get the correct price for multiple consumers?
+// In the test_usage.yaml
+func (r *KinesisStream) onDemandDataRetrievalCostComponent() *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            "Data retrieval",
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: floatPtrToDecimalPtr(r.MonthlyOnDemandDataRetrievalGB),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("AmazonKinesis"),
+			ProductFamily: strPtr("Kinesis Streams"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", Value: strPtr("OnDemand-BilledOutgoingBytes")},
+				{Key: "operation", Value: strPtr("OnDemandDataRetrieval")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
