@@ -17,6 +17,7 @@ type KinesisStream struct {
 	Address    string
 	Region     string
 	StreamMode string
+	ShardCount int64
 
 	// Usage fields
 	MonthlyOnDemandDataIngestedGB      *float64 `infracost_usage:"monthly_on_demand_data_in_gb"`
@@ -125,6 +126,7 @@ func (r *KinesisStream) onDemandDataIngestedCostComponent() *schema.CostComponen
 
 // TODO Can we * the UnitMultiplier by ConsumerApplicationCount to get the correct price for multiple consumers?
 // In the test_usage.yaml
+// See how I did the provisioned stream shard count
 func (r *KinesisStream) onDemandDataRetrievalCostComponent() *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "Data retrieval",
@@ -213,20 +215,19 @@ func (r *KinesisStream) onDemandLongTermRetentionCostComponent() *schema.CostCom
 	}
 }
 
-// TODO - this is not working yet
 func (r *KinesisStream) provisionedStreamCostComponent() *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           ProvisionedStreamName,
 		Unit:           "hours",
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(r.ShardCount)),
 		UnitMultiplier: decimal.NewFromInt(1),
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("aws"),
 			Region:        strPtr(r.Region),
 			Service:       strPtr("AmazonKinesis"),
 			ProductFamily: strPtr("Kinesis Streams"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", Value: strPtr("Extended-ShardHour")},
+				{Key: "usagetype", Value: strPtr("Storage-ShardHour")},
 				{Key: "operation", Value: strPtr("shardHourStorage")},
 			},
 		},

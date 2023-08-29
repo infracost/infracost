@@ -36,6 +36,18 @@ resource "aws_kinesis_stream" "test_stream_provisioned" {
   stream_mode_details {
     stream_mode = "PROVISIONED"
   }
+  shard_count = 1
+  tags = {
+    Environment = "test"
+  }
+}
+
+resource "aws_kinesis_stream" "test_stream_provisioned_with_usage" {
+  name             = "terraform-kinesis-test-with-usage"
+  stream_mode_details {
+    stream_mode = "PROVISIONED"
+  }
+  shard_count = 4
   tags = {
     Environment = "test"
   }

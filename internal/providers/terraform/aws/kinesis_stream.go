@@ -15,9 +15,12 @@ func getKinesisStreamRegistryItem() *schema.RegistryItem {
 func newKinesisStream(d *schema.ResourceData) schema.CoreResource {
 	region := d.Get("region").String()
 	StreamMode := d.Get("stream_mode_details.0.stream_mode").String()
+	ShardCount := d.Get("shard_count").Int()
+
 	return &aws.KinesisStream{
 		Address:    d.Address,
 		Region:     region,
 		StreamMode: StreamMode,
+		ShardCount: ShardCount,
 	}
 }
