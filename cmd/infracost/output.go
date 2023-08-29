@@ -156,7 +156,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 				return err
 			}
 
-			pricingClient := apiclient.NewPricingAPIClient(ctx)
+			pricingClient := apiclient.GetPricingAPIClient(ctx)
 			err = pricingClient.AddEvent("infracost-output", ctx.EventEnv())
 			if err != nil {
 				log.Errorf("Error reporting event: %s", err)

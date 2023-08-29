@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+
 	log "github.com/sirupsen/logrus"
 
 	"github.com/spf13/cobra"
@@ -68,7 +69,7 @@ See https://infracost.io/docs/features/cli_commands/#upload-runs`,
 				cmd.Println("Share this cost estimate: ", ui.LinkString(root.ShareURL))
 			}
 
-			pricingClient := apiclient.NewPricingAPIClient(ctx)
+			pricingClient := apiclient.GetPricingAPIClient(ctx)
 			err = pricingClient.AddEvent("infracost-upload", ctx.EventEnv())
 			if err != nil {
 				logging.Logger.WithError(err).Warn("could not report `infracost-upload` event")

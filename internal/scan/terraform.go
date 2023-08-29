@@ -34,7 +34,7 @@ type TerraformPlanScanner struct {
 // NewTerraformPlanScanner returns an initialised TerraformPlanScanner.
 func NewTerraformPlanScanner(ctx *config.RunContext, logger *log.Entry, getPrices GetPricesFunc) *TerraformPlanScanner {
 	return &TerraformPlanScanner{
-		pricingAPIClient: apiclient.NewPricingAPIClient(ctx),
+		pricingAPIClient: apiclient.GetPricingAPIClient(ctx),
 		policyAPIClient:  apiclient.NewPolicyClient(ctx.Config, logger),
 		logger:           logger,
 		ctx:              ctx,

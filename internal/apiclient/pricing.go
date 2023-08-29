@@ -3,12 +3,18 @@ package apiclient
 import (
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/gob"
 	"fmt"
 	"math"
 	"net/http"
 	"os"
+	"path/filepath"
+	"sync"
+	"time"
 
 	"github.com/hashicorp/go-retryablehttp"
+	lru "github.com/hashicorp/golang-lru/v2"
+	"github.com/mitchellh/hashstructure/v2"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/logging"
@@ -22,12 +28,23 @@ var (
 	excludedEnv = map[string]struct{}{
 		"repoMetadata": {},
 	}
+	pricingClient *PricingAPIClient
+	pricingMu     = &sync.Mutex{}
 )
 
 type PricingAPIClient struct {
 	APIClient
 	Currency       string
 	EventsDisabled bool
+
+	cacheFile string
+
+	cache *lru.TwoQueueCache[uint64, cacheValue]
+}
+
+type cacheValue struct {
+	Result    gjson.Result
+	ExpiresAt time.Time
 }
 
 type PriceQueryKey struct {
@@ -38,6 +55,8 @@ type PriceQueryKey struct {
 type PriceQueryResult struct {
 	PriceQueryKey
 	Result gjson.Result
+
+	filled bool
 }
 
 type BatchRequest struct {
@@ -45,7 +64,18 @@ type BatchRequest struct {
 	queries []GraphQLQuery
 }
 
-func NewPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
+// GetPricingAPIClient initializes and returns an instance of PricingAPIClient
+// using the given RunContext configuration. If an instance of PricingAPIClient
+// has already been created, it will return the existing instance. This is done
+// to ensure that the client cache is global across the application.
+func GetPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
+	pricingMu.Lock()
+	defer pricingMu.Unlock()
+
+	if pricingClient != nil {
+		return pricingClient
+	}
+
 	currency := ctx.Config.Currency
 	if currency == "" {
 		currency = "USD"
@@ -83,7 +113,7 @@ func NewPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
 	client.Logger = &LeveledLogger{Logger: logging.Logger.WithField("library", "retryablehttp")}
 	client.HTTPClient.Transport.(*http.Transport).TLSClientConfig = &tlsConfig
 
-	return &PricingAPIClient{
+	c := &PricingAPIClient{
 		APIClient: APIClient{
 			httpClient: client.StandardClient(),
 			endpoint:   ctx.Config.PricingAPIEndpoint,
@@ -93,6 +123,89 @@ func NewPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
 		Currency:       currency,
 		EventsDisabled: ctx.Config.EventsDisabled,
 	}
+
+	initCache(ctx, c)
+	pricingClient = c
+	return c
+}
+
+func initCache(ctx *config.RunContext, c *PricingAPIClient) {
+	if ctx.Config.PricingCacheDisabled {
+		return
+	}
+
+	cacheFile := filepath.Join(ctx.Config.CachePath(), config.InfracostDir, "pricing.gob")
+	c.cacheFile = cacheFile
+	cache := loadCacheFromFile(ctx, cacheFile)
+	if cache != nil {
+		c.cache = cache
+		return
+	}
+
+	c.cache = newCache(ctx)
+}
+
+func newCache(ctx *config.RunContext) *lru.TwoQueueCache[uint64, cacheValue] {
+	objectLimit := 1000
+	if ctx.Config.PricingCacheObjectSize > 0 {
+		objectLimit = ctx.Config.PricingCacheObjectSize
+	}
+	l, _ := lru.New2Q[uint64, cacheValue](objectLimit)
+	return l
+}
+
+func loadCacheFromFile(ctx *config.RunContext, cacheFile string) *lru.TwoQueueCache[uint64, cacheValue] {
+	_, err := os.Stat(cacheFile)
+	if err != nil {
+		return nil
+	}
+
+	var storedCache map[uint64]cacheValue
+	f, err := os.Open(cacheFile)
+	if err != nil {
+		logging.Logger.WithError(err).Debugf("could not load cache file %s", cacheFile)
+		return nil
+	}
+
+	err = gob.NewDecoder(f).Decode(&storedCache)
+	if err != nil {
+		logging.Logger.WithError(err).Debugf("failed to decode cache file %s", cacheFile)
+		return nil
+	}
+
+	lr := newCache(ctx)
+	now := time.Now()
+	for k, value := range storedCache {
+		if value.ExpiresAt.After(now) {
+			lr.Add(k, value)
+		}
+	}
+
+	return lr
+}
+
+// FlushCache writes the in memory cache to the filesystem. This allows the cache
+// to be persisted between runs. FlushCache should only be called once, at
+// program termination.
+func (c *PricingAPIClient) FlushCache() error {
+	if c.cache == nil {
+		return nil
+	}
+
+	logging.Logger.Debugf("writing %d objects to filesystem cache", c.cache.Len())
+
+	f, err := os.OpenFile(c.cacheFile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, os.ModePerm)
+	if err != nil {
+		return err
+	}
+
+	storedCached := make(map[uint64]cacheValue, c.cache.Len())
+	for _, k := range c.cache.Keys() {
+		v, _ := c.cache.Peek(k)
+		storedCached[k] = v
+	}
+
+	return gob.NewEncoder(f).Encode(storedCached)
 }
 
 func (c *PricingAPIClient) AddEvent(name string, env map[string]interface{}) error {
@@ -137,7 +250,7 @@ func (c *PricingAPIClient) buildQuery(product *schema.ProductFilter, price *sche
 	return GraphQLQuery{query, v}
 }
 
-// Batch all the queries for these resources so we can use less GraphQL requests
+// BatchRequests batches all the queries for these resources so we can use less GraphQL requests
 // Use PriceQueryKeys to keep track of which query maps to which sub-resource and price component.
 func (c *PricingAPIClient) BatchRequests(resources []*schema.Resource, batchSize int) []BatchRequest {
 	reqs := make([]BatchRequest, 0)
@@ -169,26 +282,118 @@ func (c *PricingAPIClient) BatchRequests(resources []*schema.Resource, batchSize
 	return reqs
 }
 
+type pricingQuery struct {
+	hash  uint64
+	query GraphQLQuery
+
+	result gjson.Result
+}
+
+// PerformRequest sends a batch request to the Pricing API endpoint to fetch
+// pricing details for the provided queries. It optimizes the API call by
+// checking a local cache for previous results. If the results of a given query
+// are cached, they are used directly; otherwise, a request to the API is made.
 func (c *PricingAPIClient) PerformRequest(req BatchRequest) ([]PriceQueryResult, error) {
 	log.Debugf("Getting pricing details for %d cost components from %s", len(req.queries), c.endpoint)
+	res := make([]PriceQueryResult, len(req.keys))
+	for i, key := range req.keys {
+		res[i].PriceQueryKey = key
+	}
 
-	results, err := c.doQueries(req.queries)
+	queries := make([]pricingQuery, len(req.queries))
+	for i, query := range req.queries {
+		key, err := hashstructure.Hash(query, hashstructure.FormatV2, nil)
+		if err != nil {
+			logging.Logger.WithError(err).Debugf("failed to hash query %s will use nil hash", query)
+		}
+
+		queries[i] = pricingQuery{
+			hash:  key,
+			query: query,
+		}
+	}
+
+	// first filter any queries that have been stored in the cache. We don't need to
+	// send requests for these as we already have the results in memory.
+	var serverQueries []pricingQuery
+	if c.cache == nil {
+		serverQueries = queries
+	} else {
+		var hit int
+		for i, query := range queries {
+			v, ok := c.cache.Get(query.hash)
+			if ok {
+				logging.Logger.Debugf("cache hit for query hash: %d", query.hash)
+				hit++
+				res[i] = PriceQueryResult{
+					PriceQueryKey: req.keys[i],
+					Result:        v.Result,
+					filled:        true,
+				}
+			} else {
+				serverQueries = append(serverQueries, query)
+			}
+		}
+
+		logging.Logger.Debugf("%d/%d queries were built from cache", hit, len(queries))
+	}
+
+	// now we deduplicate the queries, ensuring that a request for a price only happens once.
+	var deduplicatedServerQueries []pricingQuery
+	seenQueries := map[uint64]bool{}
+	for _, query := range serverQueries {
+		if seenQueries[query.hash] {
+			continue
+		}
+
+		deduplicatedServerQueries = append(deduplicatedServerQueries, query)
+		seenQueries[query.hash] = true
+	}
+
+	// send the deduplicated queries to the pricing API to fetch live prices.
+	rawQueries := make([]GraphQLQuery, len(deduplicatedServerQueries))
+	for i, query := range deduplicatedServerQueries {
+		rawQueries[i] = query.query
+	}
+	resultsFromServer, err := c.doQueries(rawQueries)
 	if err != nil {
 		return []PriceQueryResult{}, err
 	}
 
-	return c.zipQueryResults(req.keys, results), nil
-}
-
-func (c *PricingAPIClient) zipQueryResults(k []PriceQueryKey, r []gjson.Result) []PriceQueryResult {
-	res := make([]PriceQueryResult, 0, len(k))
-
-	for i, k := range k {
-		res = append(res, PriceQueryResult{
-			PriceQueryKey: k,
-			Result:        r[i],
-		})
+	// if the cache is enabled lets store each pricing result returned in the cache.
+	if c.cache != nil {
+		for i, query := range deduplicatedServerQueries {
+			if len(resultsFromServer)-1 >= i {
+				(*c.cache).Add(query.hash, cacheValue{Result: resultsFromServer[i], ExpiresAt: time.Now().Add(time.Hour * 24)})
+			}
+		}
 	}
 
-	return res
+	// now lets match the results from the server to their initial deduplicated queries.
+	for i, result := range resultsFromServer {
+		deduplicatedServerQueries[i].result = result
+	}
+
+	// Then we match deduplicated server queries to the initial list using the unique
+	// query hash to tie a query to it's deduped query.
+	resultMap := make(map[uint64]gjson.Result, len(deduplicatedServerQueries))
+	for _, query := range deduplicatedServerQueries {
+		resultMap[query.hash] = query.result
+	}
+
+	for i, query := range serverQueries {
+		serverQueries[i].result = resultMap[query.hash]
+	}
+
+	// finally let's use the server queries to fill any results that haven't been
+	// already populated from the cache.
+	var x int
+	for i, re := range res {
+		if !re.filled {
+			res[i].Result = serverQueries[x].result
+			x++
+		}
+	}
+
+	return res, nil
 }

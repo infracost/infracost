@@ -113,7 +113,7 @@ func commentBitbucketCmd(ctx *config.RunContext) *cobra.Command {
 					return err
 				}
 
-				pricingClient := apiclient.NewPricingAPIClient(ctx)
+				pricingClient := apiclient.GetPricingAPIClient(ctx)
 				err = pricingClient.AddEvent("infracost-comment", ctx.EventEnv())
 				if err != nil {
 					logging.Logger.WithError(err).Error("could not report infracost-comment event")
