@@ -344,20 +344,22 @@ func (m *ModuleLoader) cachePathRel(targetPath string) (string, error) {
 	if relerr == nil {
 		return rel, nil
 	}
+	m.logger.Infof("Failed to filepath.Rel cache=%s target=%s: %v", m.cachePath, targetPath, relerr)
 
 	// try converting to absolute paths
 	absCachePath, abserr := filepath.Abs(m.cachePath)
 	if abserr != nil {
+		m.logger.Infof("Failed to filepath.Abs cachePath: %v", abserr)
 		return "", relerr
 	}
 
 	absTargetPath, abserr := filepath.Abs(targetPath)
 	if abserr != nil {
-		if abserr != nil {
-			return "", relerr
-		}
+		m.logger.Infof("Failed to filepath.Abs target: %v", abserr)
+		return "", relerr
 	}
 
+	m.logger.Infof("Attempting filepath.Rel on abs paths cache=%s, target=%s", absCachePath, absTargetPath)
 	return filepath.Rel(absCachePath, absTargetPath)
 }
 
