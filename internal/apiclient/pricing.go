@@ -76,6 +76,10 @@ func GetPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
 		return pricingClient
 	}
 
+	if ctx == nil {
+		return nil
+	}
+
 	currency := ctx.Config.Currency
 	if currency == "" {
 		currency = "USD"
@@ -188,6 +192,10 @@ func loadCacheFromFile(ctx *config.RunContext, cacheFile string) *lru.TwoQueueCa
 // to be persisted between runs. FlushCache should only be called once, at
 // program termination.
 func (c *PricingAPIClient) FlushCache() error {
+	if c == nil {
+		return nil
+	}
+
 	if c.cache == nil {
 		return nil
 	}
