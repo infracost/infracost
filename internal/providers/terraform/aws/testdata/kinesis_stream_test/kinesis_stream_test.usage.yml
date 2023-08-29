@@ -3,3 +3,4 @@ resource_usage:
   aws_kinesis_stream.test_stream_on_demand_with_usage:
     monthly_on_demand_data_in_gb: 0.20 # Monthly data ingested by the stream in GB.
     monthly_on_demand_data_out_gb: 0.20 # Monthly data egressed by the stream in GB total, (not per consumer application).
+    monthly_on_demand_efo_data_out_gb: 1.0 # Monthly data egressed by the stream in GB to EFO consumers.

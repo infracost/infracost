@@ -65,6 +65,7 @@ func (r *KinesisStream) BuildResource() *schema.Resource {
 		costComponents = append(costComponents, r.onDemandStreamCostComponent())
 		costComponents = append(costComponents, r.onDemandDataIngestedCostComponent())
 		costComponents = append(costComponents, r.onDemandDataRetrievalCostComponent())
+		costComponents = append(costComponents, r.onDemandEfoDataRetrievalCostComponent())
 	} else if r.StreamMode == ProvisionedStreamName {
 		costComponents = append(costComponents, r.provisionedStreamCostComponent())
 	}
@@ -136,6 +137,28 @@ func (r *KinesisStream) onDemandDataRetrievalCostComponent() *schema.CostCompone
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "usagetype", Value: strPtr("OnDemand-BilledOutgoingBytes")},
 				{Key: "operation", Value: strPtr("OnDemandDataRetrieval")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("on_demand"),
+		},
+	}
+}
+
+func (r *KinesisStream) onDemandEfoDataRetrievalCostComponent() *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            "Enhanced Fan Out (EFO) Data retrieval",
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: floatPtrToDecimalPtr(r.MonthlyOnDemandEFODataRetrievalGB),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("AmazonKinesis"),
+			ProductFamily: strPtr("Kinesis Streams"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", Value: strPtr("OnDemand-BilledOutgoingEFOBytes")},
+				{Key: "operation", Value: strPtr("OnDemandEFODataRetrieval")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
