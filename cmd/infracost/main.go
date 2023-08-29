@@ -39,10 +39,6 @@ func main() {
 	}
 
 	Run(nil, nil)
-	err := apiclient.GetPricingAPIClient(nil).FlushCache()
-	if err != nil {
-		logging.Logger.WithError(err).Debug("could not flush pricing API cache to filesystem")
-	}
 }
 
 // Run starts the Infracost application with the configured cobra cmds.

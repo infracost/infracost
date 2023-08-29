@@ -108,7 +108,7 @@ func runCompare(cmd *cobra.Command, ctx *config.RunContext, current output.Root)
 		return err
 	}
 
-	pricingClient := apiclient.GetPricingAPIClient(ctx)
+	pricingClient := apiclient.NewPricingAPIClient(ctx)
 	err = pricingClient.AddEvent("infracost-run", ctx.EventEnv())
 	if err != nil {
 		logging.Logger.WithError(err).Error("could not report infracost-run event")

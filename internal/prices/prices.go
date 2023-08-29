@@ -17,7 +17,7 @@ var batchSize = 5
 func PopulatePrices(ctx *config.RunContext, project *schema.Project) error {
 	resources := project.AllResources()
 
-	c := apiclient.GetPricingAPIClient(ctx)
+	c := apiclient.NewPricingAPIClient(ctx)
 
 	err := GetPricesConcurrent(ctx, c, resources)
 	if err != nil {

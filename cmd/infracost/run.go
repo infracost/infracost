@@ -163,7 +163,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 
 	env := buildRunEnv(runCtx, projectContexts, r)
 
-	pricingClient := apiclient.GetPricingAPIClient(runCtx)
+	pricingClient := apiclient.NewPricingAPIClient(runCtx)
 	err = pricingClient.AddEvent("infracost-run", env)
 	if err != nil {
 		log.Errorf("Error reporting event: %s", err)

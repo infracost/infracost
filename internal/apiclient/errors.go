@@ -35,6 +35,6 @@ func ReportCLIError(ctx *config.RunContext, cliErr error, replacePath bool) erro
 	d["error"] = errMsg
 	d["stacktrace"] = stacktrace
 
-	c := GetPricingAPIClient(ctx)
+	c := NewPricingAPIClient(ctx)
 	return c.AddEvent("infracost-error", d)
 }

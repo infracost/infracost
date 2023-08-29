@@ -109,7 +109,7 @@ func commentGitLabCmd(ctx *config.RunContext) *cobra.Command {
 					return err
 				}
 
-				pricingClient := apiclient.GetPricingAPIClient(ctx)
+				pricingClient := apiclient.NewPricingAPIClient(ctx)
 				err = pricingClient.AddEvent("infracost-comment", ctx.EventEnv())
 				if err != nil {
 					logging.Logger.WithError(err).Error("could not report infracost-comment event")
