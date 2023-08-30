@@ -6,13 +6,11 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// KinesisStream struct represents <TODO: cloud service short description>.
+// KinesisStream struct represents Kinesis Data Streams a fully managed, serverless streaming data service
 //
-// <TODO: Add any important information about the resource and links to the
-// pricing pages or documentation that might be useful to developers in the future, e.g:>
-//
-// Resource information: https://aws.amazon.com/<PATH/TO/RESOURCE>/
-// Pricing information: https://aws.amazon.com/<PATH/TO/PRICING>/
+// Resource information: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kinesis_stream
+// Pricing information: https://aws.amazon.com/kinesis/data-streams/pricing/
+
 type KinesisStream struct {
 	Address    string
 	Region     string
@@ -142,9 +140,6 @@ func (r *KinesisStream) onDemandDataIngestedCostComponent() *schema.CostComponen
 	}
 }
 
-// TODO Can we * the UnitMultiplier by ConsumerApplicationCount to get the correct price for multiple consumers?
-// In the test_usage.yaml
-// See how I did the provisioned stream shard count
 func (r *KinesisStream) onDemandDataRetrievalCostComponent() *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            "Data retrieval",
