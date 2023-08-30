@@ -20,12 +20,14 @@ type KinesisStream struct {
 	ShardCount int64
 
 	// Usage fields
-	MonthlyOnDemandDataIngestedGB      *float64 `infracost_usage:"monthly_on_demand_data_in_gb"`
-	MonthlyOnDemandDataRetrievalGB     *float64 `infracost_usage:"monthly_on_demand_data_out_gb"`
-	MonthlyOnDemandEFODataRetrievalGB  *float64 `infracost_usage:"monthly_on_demand_efo_data_out_gb"`
-	MonthlyOnDemandExtendedRetentionGb *float64 `infracost_usage:"monthly_on_demand_extended_retention_gb"`
-	MonthlyOnDemandLongTermRetentionGb *float64 `infracost_usage:"monthly_on_demand_long_term_retention_gb"`
-	MonthlyProvisionedPutUnits         *float64 `infracost_usage:"monthly_provisioned_put_units"`
+	MonthlyOnDemandDataIngestedGB         *float64 `infracost_usage:"monthly_on_demand_data_in_gb"`
+	MonthlyOnDemandDataRetrievalGB        *float64 `infracost_usage:"monthly_on_demand_data_out_gb"`
+	MonthlyOnDemandEFODataRetrievalGB     *float64 `infracost_usage:"monthly_on_demand_efo_data_out_gb"`
+	MonthlyOnDemandExtendedRetentionGb    *float64 `infracost_usage:"monthly_on_demand_extended_retention_gb"`
+	MonthlyOnDemandLongTermRetentionGb    *float64 `infracost_usage:"monthly_on_demand_long_term_retention_gb"`
+	MonthlyProvisionedPutUnits            *float64 `infracost_usage:"monthly_provisioned_put_units"`
+	MonthlyProvisionedExtendedRetentionGb *float64 `infracost_usage:"monthly_provisioned_extended_retention_gb"`
+	MonthlyProvisionedLongTermRetentionGb *float64 `infracost_usage:"monthly_provisioned_long_term_retention_gb"`
 }
 
 // CoreType returns the name of this resource type
@@ -42,6 +44,8 @@ func (r *KinesisStream) UsageSchema() []*schema.UsageItem {
 		{Key: "monthly_on_demand_extended_retention_gb", DefaultValue: 0, ValueType: schema.Float64},
 		{Key: "monthly_on_demand_long_term_retention_gb", DefaultValue: 0, ValueType: schema.Float64},
 		{Key: "monthly_provisioned_put_units", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "monthly_provisioned_extended_retention_gb", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "monthly_provisioned_long_term_retention_gb", DefaultValue: 0, ValueType: schema.Float64},
 	}
 }
 
@@ -72,6 +76,8 @@ func (r *KinesisStream) BuildResource() *schema.Resource {
 	} else if r.StreamMode == ProvisionedStreamName {
 		costComponents = append(costComponents, r.provisionedStreamCostComponent())
 		costComponents = append(costComponents, r.provisionedStreamPutUnitsCostComponent())
+		costComponents = append(costComponents, r.provisionedExtendedRetentionCostComponent())
+		costComponents = append(costComponents, r.provisionedLongTermRetentionCostComponent())
 	}
 
 	return &schema.Resource{
@@ -174,7 +180,7 @@ func (r *KinesisStream) onDemandEfoDataRetrievalCostComponent() *schema.CostComp
 
 func (r *KinesisStream) onDemandExtendedRetentionCostComponent() *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:            "Extended retention 24H to 7D)",
+		Name:            "Extended retention (24H to 7D)",
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: floatPtrToDecimalPtr(r.MonthlyOnDemandExtendedRetentionGb),
@@ -196,7 +202,7 @@ func (r *KinesisStream) onDemandExtendedRetentionCostComponent() *schema.CostCom
 
 func (r *KinesisStream) onDemandLongTermRetentionCostComponent() *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:            "Extended retention 7D+",
+		Name:            "Extended retention (7D+)",
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: floatPtrToDecimalPtr(r.MonthlyOnDemandLongTermRetentionGb),
@@ -252,6 +258,51 @@ func (r *KinesisStream) provisionedStreamPutUnitsCostComponent() *schema.CostCom
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "usagetype", Value: strPtr("PutRequestPayloadUnits")},
 				{Key: "operation", Value: strPtr("PutRequest")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("on_demand"),
+		},
+	}
+}
+
+func (r *KinesisStream) provisionedExtendedRetentionCostComponent() *schema.CostComponent {
+	return &schema.CostComponent{
+
+		Name:            "Extended retention (24H to 7D)",
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: floatPtrToDecimalPtr(r.MonthlyProvisionedExtendedRetentionGb),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("AmazonKinesis"),
+			ProductFamily: strPtr("Kinesis Streams"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", Value: strPtr("Extended-ShardHour")},
+				{Key: "operation", Value: strPtr("shardHourStorage")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("on_demand"),
+		},
+	}
+}
+
+func (r *KinesisStream) provisionedLongTermRetentionCostComponent() *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            "Extended retention (7D+)",
+		Unit:            "GB",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: floatPtrToDecimalPtr(r.MonthlyProvisionedLongTermRetentionGb),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("AmazonKinesis"),
+			ProductFamily: strPtr("Kinesis Streams"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", Value: strPtr("LongTermRetention-ByteHrs")},
+				{Key: "operation", Value: strPtr("LongTermRetentionByteHrs")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
