@@ -22,10 +22,10 @@ type KinesisStream struct {
 	// Usage fields
 	MonthlyOnDemandDataIngestedGB      *float64 `infracost_usage:"monthly_on_demand_data_in_gb"`
 	MonthlyOnDemandDataRetrievalGB     *float64 `infracost_usage:"monthly_on_demand_data_out_gb"`
-	ConsumerApplicationCount           *int64   `infracost_usage:"consumer_application_count"`
 	MonthlyOnDemandEFODataRetrievalGB  *float64 `infracost_usage:"monthly_on_demand_efo_data_out_gb"`
 	MonthlyOnDemandExtendedRetentionGb *float64 `infracost_usage:"monthly_on_demand_extended_retention_gb"`
 	MonthlyOnDemandLongTermRetentionGb *float64 `infracost_usage:"monthly_on_demand_long_term_retention_gb"`
+	MonthlyProvisionedPutUnits         *float64 `infracost_usage:"monthly_provisioned_put_units"`
 }
 
 // CoreType returns the name of this resource type
@@ -38,10 +38,10 @@ func (r *KinesisStream) UsageSchema() []*schema.UsageItem {
 	return []*schema.UsageItem{
 		{Key: "monthly_on_demand_data_in_gb", DefaultValue: 0, ValueType: schema.Float64},
 		{Key: "monthly_on_demand_data_out_gb", DefaultValue: 0, ValueType: schema.Float64},
-		{Key: "consumer_application_count", DefaultValue: 1, ValueType: schema.Int64},
 		{Key: "monthly_on_demand_efo_data_out_gb", DefaultValue: 0, ValueType: schema.Float64},
 		{Key: "monthly_on_demand_extended_retention_gb", DefaultValue: 0, ValueType: schema.Float64},
 		{Key: "monthly_on_demand_long_term_retention_gb", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "monthly_provisioned_put_units", DefaultValue: 0, ValueType: schema.Float64},
 	}
 }
 
@@ -71,6 +71,7 @@ func (r *KinesisStream) BuildResource() *schema.Resource {
 		costComponents = append(costComponents, r.onDemandLongTermRetentionCostComponent())
 	} else if r.StreamMode == ProvisionedStreamName {
 		costComponents = append(costComponents, r.provisionedStreamCostComponent())
+		costComponents = append(costComponents, r.provisionedStreamPutUnitsCostComponent())
 	}
 
 	return &schema.Resource{
@@ -229,6 +230,28 @@ func (r *KinesisStream) provisionedStreamCostComponent() *schema.CostComponent {
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "usagetype", Value: strPtr("Storage-ShardHour")},
 				{Key: "operation", Value: strPtr("shardHourStorage")},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("on_demand"),
+		},
+	}
+}
+
+func (r *KinesisStream) provisionedStreamPutUnitsCostComponent() *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:            "Put request unit",
+		Unit:            "units",
+		MonthlyQuantity: floatPtrToDecimalPtr(r.MonthlyProvisionedPutUnits),
+		UnitMultiplier:  decimal.NewFromInt(1),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("aws"),
+			Region:        strPtr(r.Region),
+			Service:       strPtr("AmazonKinesis"),
+			ProductFamily: strPtr("Kinesis Streams"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "usagetype", Value: strPtr("PutRequestPayloadUnits")},
+				{Key: "operation", Value: strPtr("PutRequest")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

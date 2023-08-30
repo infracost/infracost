@@ -6,3 +6,5 @@ resource_usage:
     monthly_on_demand_efo_data_out_gb: 2.0 # Monthly data egressed by the stream in GB to EFO consumers.
     monthly_on_demand_extended_retention_gb: 1.0 # Monthly data stored by the stream in GB that exceeds the 24 hour retention period but is less than 7 days.
     monthly_on_demand_long_term_retention_gb: 1.0 # Monthly data stored by the stream in GB that exceeds the 7 day retention period.
+  aws_kinesis_stream.test_stream_provisioned_with_usage:
+    monthly_provisioned_put_units: 6500000 # Monthly provisioned put units for the stream.
