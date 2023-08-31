@@ -486,17 +486,15 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 
 		value := forEachAttr.Value()
 		if !value.IsNull() && value.IsKnown() && forEachAttr.IsIterable() {
-			typeLabel := block.TypeLabel()
-			nameLabel := block.NameLabel()
-			if block.Type() == "module" {
-				typeLabel = block.Type()
-				nameLabel = block.TypeLabel()
+			labels := block.Labels()
+			if block.Type() != "resource" {
+				labels = append([]string{block.Type()}, labels...)
 			}
 
 			// set the context to an empty object so that we don't have any of the prior unexpanded attributes
 			// like id/arn e.t.c polluting the expansion. Otherwise we can end up with lots of expanded resources
 			// with attribute names e.g. aws_instance.test[id], aws_instance.test[arn].
-			e.ctx.Set(cty.ObjectVal(make(map[string]cty.Value)), typeLabel, nameLabel)
+			e.ctx.Set(cty.ObjectVal(make(map[string]cty.Value)), labels...)
 
 			value.ForEachElement(func(key cty.Value, val cty.Value) bool {
 				clone := e.blockBuilder.CloneBlock(block, key)
@@ -516,7 +514,7 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 				ctx.Set(val, block.TypeLabel(), "value")
 
 				cloneValues := clone.Values()
-				e.ctx.Set(cloneValues, typeLabel, nameLabel, keyStr)
+				e.ctx.Set(cloneValues, append(labels, keyStr)...)
 
 				if v, ok := e.moduleCalls[clone.FullName()]; ok {
 					v.Definition = clone

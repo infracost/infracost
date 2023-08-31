@@ -838,6 +838,62 @@ resource "test_resource_two" "test" {
 	}, labels)
 }
 
+func Test_NestedDataBlockForEach(t *testing.T) {
+	path := createTestFile("test.tf", `
+
+locals {
+  az = {
+    a = {
+      az = "us-east-1a"
+      bz = "w"
+    }
+    b = {
+      az = "us-east-1b"
+      bz = "z"
+    }
+  }
+}
+
+data "test_resource" "test" {
+  for_each = local.az
+  availability_zone       = each.value.az
+  another_attr = "attr-${each.value.bz}"
+}
+
+resource "test_resource" "static" {
+  availability_zone       = "az-static"
+  another_attr = "attr-static"
+}
+
+resource "test_resource_two" "test" {
+  for_each        = data.test_resource.test
+  inherited_id    = each.value.id
+  inherited_attr  = each.value.another_attr
+}
+`)
+
+	logger := newDiscardLogger()
+	loader := modules.NewModuleLoader(filepath.Dir(path), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
+	parsers, err := LoadParsers(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{}), filepath.Dir(path), loader, nil, logger)
+	require.NoError(t, err)
+	module, err := parsers[0].ParseDirectory()
+	require.NoError(t, err)
+
+	blocks := module.Blocks
+	refs := make([]string, len(blocks))
+	for i, b := range blocks {
+		refs[i] = b.Reference().String()
+	}
+	assert.ElementsMatch(t, []string{
+		`locals.`,
+		`data.test_resource.test["a"]`,
+		`data.test_resource.test["b"]`,
+		`test_resource.static`,
+		`test_resource_two.test["a"]`,
+		`test_resource_two.test["b"]`,
+	}, refs)
+}
+
 func Test_ModuleForEaches(t *testing.T) {
 
 	path := createTestFileWithModule(`
