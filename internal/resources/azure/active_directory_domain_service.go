@@ -46,7 +46,7 @@ func activeDirectoryDomainServiceCostComponents(name, region, sku string) []*sch
 			ProductFilter: &schema.ProductFilter{
 				VendorName:    strPtr("azure"),
 				Region:        strPtr(region),
-				Service:       strPtr("Azure Active Directory Domain Services"),
+				Service:       strPtr("Microsoft Entra Domain Services"),
 				ProductFamily: strPtr("Security"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "skuName", Value: strPtr(productType)},
