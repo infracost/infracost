@@ -40,7 +40,6 @@ WORKDIR /app
 
 # Build Application
 COPY . .
-RUN make deps
 RUN NO_DIRTY=true make build
 RUN chmod +x /app/build/infracost
 
