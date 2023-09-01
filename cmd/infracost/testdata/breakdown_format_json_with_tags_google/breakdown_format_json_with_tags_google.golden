@@ -94,10 +94,94 @@
                 "monthlyCost": "17"
               }
             ]
+          },
+          {
+            "name": "google_sql_database_instance.gsdi",
+            "resourceType": "google_sql_database_instance",
+            "tags": {
+              "GoogleSettingsUserLabel": "sql-db-label"
+            },
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "google_sql_database_instance.gsdi",
+                  "endLine": 38,
+                  "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
+                  "startLine": 28
+                }
+              ],
+              "checksum": "7f1731430d3c956e3e11da3378aa13ccb98e19f5889054a196bff8a068ad7d1b",
+              "endLine": 38,
+              "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
+              "startLine": 28
+            },
+            "hourlyCost": "0.022828767123287671",
+            "monthlyCost": "16.665",
+            "costComponents": [
+              {
+                "name": "SQL instance (db-f1-micro, zonal)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.0105",
+                "hourlyCost": "0.0105",
+                "monthlyCost": "7.665"
+              },
+              {
+                "name": "Storage (SSD, zonal)",
+                "unit": "GB",
+                "hourlyQuantity": "0.0136986301369863",
+                "monthlyQuantity": "10",
+                "price": "0.17",
+                "hourlyCost": "0.002328767123287671",
+                "monthlyCost": "1.7"
+              },
+              {
+                "name": "Backups",
+                "unit": "GB",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.08",
+                "hourlyCost": null,
+                "monthlyCost": null
+              },
+              {
+                "name": "IP address (if unused)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.01",
+                "hourlyCost": "0.01",
+                "monthlyCost": "7.3"
+              }
+            ]
           }
         ],
-        "totalHourlyCost": "0.050684931506849314",
-        "totalMonthlyCost": "37"
+        "freeResources": [
+          {
+            "name": "google_monitoring_custom_service.gmcs",
+            "resourceType": "google_monitoring_custom_service",
+            "tags": {
+              "GoogleUserLabel": "monitoring-custom-service-label"
+            },
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "google_monitoring_custom_service.gmcs",
+                  "endLine": 26,
+                  "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
+                  "startLine": 20
+                }
+              ],
+              "checksum": "c08c94c3110cc1279d75209519a2c8446f94b9a2b4f1f37cd79123984a379911",
+              "endLine": 26,
+              "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
+              "startLine": 20
+            }
+          }
+        ],
+        "totalHourlyCost": "0.073513698630136985",
+        "totalMonthlyCost": "53.665"
       },
       "breakdown": {
         "resources": [
@@ -166,10 +250,94 @@
                 "monthlyCost": "17"
               }
             ]
+          },
+          {
+            "name": "google_sql_database_instance.gsdi",
+            "resourceType": "google_sql_database_instance",
+            "tags": {
+              "GoogleSettingsUserLabel": "sql-db-label"
+            },
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "google_sql_database_instance.gsdi",
+                  "endLine": 38,
+                  "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
+                  "startLine": 28
+                }
+              ],
+              "checksum": "7f1731430d3c956e3e11da3378aa13ccb98e19f5889054a196bff8a068ad7d1b",
+              "endLine": 38,
+              "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
+              "startLine": 28
+            },
+            "hourlyCost": "0.022828767123287671",
+            "monthlyCost": "16.665",
+            "costComponents": [
+              {
+                "name": "SQL instance (db-f1-micro, zonal)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.0105",
+                "hourlyCost": "0.0105",
+                "monthlyCost": "7.665"
+              },
+              {
+                "name": "Storage (SSD, zonal)",
+                "unit": "GB",
+                "hourlyQuantity": "0.0136986301369863",
+                "monthlyQuantity": "10",
+                "price": "0.17",
+                "hourlyCost": "0.002328767123287671",
+                "monthlyCost": "1.7"
+              },
+              {
+                "name": "Backups",
+                "unit": "GB",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.08",
+                "hourlyCost": null,
+                "monthlyCost": null
+              },
+              {
+                "name": "IP address (if unused)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.01",
+                "hourlyCost": "0.01",
+                "monthlyCost": "7.3"
+              }
+            ]
           }
         ],
-        "totalHourlyCost": "0.050684931506849314",
-        "totalMonthlyCost": "37"
+        "freeResources": [
+          {
+            "name": "google_monitoring_custom_service.gmcs",
+            "resourceType": "google_monitoring_custom_service",
+            "tags": {
+              "GoogleUserLabel": "monitoring-custom-service-label"
+            },
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "google_monitoring_custom_service.gmcs",
+                  "endLine": 26,
+                  "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
+                  "startLine": 20
+                }
+              ],
+              "checksum": "c08c94c3110cc1279d75209519a2c8446f94b9a2b4f1f37cd79123984a379911",
+              "endLine": 26,
+              "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
+              "startLine": 20
+            }
+          }
+        ],
+        "totalHourlyCost": "0.073513698630136985",
+        "totalMonthlyCost": "53.665"
       },
       "diff": {
         "resources": [],
@@ -177,31 +345,35 @@
         "totalMonthlyCost": "0"
       },
       "summary": {
-        "totalDetectedResources": 2,
-        "totalSupportedResources": 2,
+        "totalDetectedResources": 4,
+        "totalSupportedResources": 3,
         "totalUnsupportedResources": 0,
-        "totalUsageBasedResources": 0,
-        "totalNoPriceResources": 0,
+        "totalUsageBasedResources": 1,
+        "totalNoPriceResources": 1,
         "unsupportedResourceCounts": {},
-        "noPriceResourceCounts": {}
+        "noPriceResourceCounts": {
+          "google_monitoring_custom_service": 1
+        }
       }
     }
   ],
-  "totalHourlyCost": "0.050684931506849314",
-  "totalMonthlyCost": "37",
-  "pastTotalHourlyCost": "0.050684931506849314",
-  "pastTotalMonthlyCost": "37",
+  "totalHourlyCost": "0.073513698630136985",
+  "totalMonthlyCost": "53.665",
+  "pastTotalHourlyCost": "0.073513698630136985",
+  "pastTotalMonthlyCost": "53.665",
   "diffTotalHourlyCost": "0",
   "diffTotalMonthlyCost": "0",
   "timeGenerated": "REPLACED_TIME",
   "summary": {
-    "totalDetectedResources": 2,
-    "totalSupportedResources": 2,
+    "totalDetectedResources": 4,
+    "totalSupportedResources": 3,
     "totalUnsupportedResources": 0,
-    "totalUsageBasedResources": 0,
-    "totalNoPriceResources": 0,
+    "totalUsageBasedResources": 1,
+    "totalNoPriceResources": 1,
     "unsupportedResourceCounts": {},
-    "noPriceResourceCounts": {}
+    "noPriceResourceCounts": {
+      "google_monitoring_custom_service": 1
+    }
   }
 }
 
