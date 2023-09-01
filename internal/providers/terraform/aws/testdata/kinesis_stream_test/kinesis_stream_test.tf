@@ -11,7 +11,7 @@ provider "aws" {
 # Add example resources for KinesisStream below
 
 resource "aws_kinesis_stream" "test_stream_on_demand" {
-  name             = "terraform-kinesis-test-od"
+  name = "terraform-kinesis-test-od"
   stream_mode_details {
     stream_mode = "ON_DEMAND"
   }
@@ -22,7 +22,7 @@ resource "aws_kinesis_stream" "test_stream_on_demand" {
 
 
 resource "aws_kinesis_stream" "test_stream_on_demand_with_usage" {
-  name             = "terraform-kinesis-test-od-with-usage"
+  name = "terraform-kinesis-test-od-with-usage"
   stream_mode_details {
     stream_mode = "ON_DEMAND"
   }
@@ -32,7 +32,7 @@ resource "aws_kinesis_stream" "test_stream_on_demand_with_usage" {
 }
 
 resource "aws_kinesis_stream" "test_stream_provisioned" {
-  name             = "terraform-kinesis-test-pr"
+  name = "terraform-kinesis-test-pr"
   stream_mode_details {
     stream_mode = "PROVISIONED"
   }
@@ -43,7 +43,7 @@ resource "aws_kinesis_stream" "test_stream_provisioned" {
 }
 
 resource "aws_kinesis_stream" "test_stream_provisioned_with_usage" {
-  name             = "terraform-kinesis-test-with-usage"
+  name = "terraform-kinesis-test-with-usage"
   stream_mode_details {
     stream_mode = "PROVISIONED"
   }
