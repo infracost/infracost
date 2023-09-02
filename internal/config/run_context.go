@@ -336,13 +336,14 @@ var ciMap = ciEnvMap{
 		"TS_ENV":               "terraspace",
 	},
 	prefixes: map[string]string{
-		"ATLANTIS_":  "atlantis",
-		"BITBUCKET_": "bitbucket",
-		"CONCOURSE_": "concourse",
-		"SPACELIFT_": "spacelift",
-		"HARNESS_":   "harness",
-		"TERRATEAM_": "terrateam",
-		"KEPTN_":     "keptn",
+		"ATLANTIS_":       "atlantis",
+		"BITBUCKET_":      "bitbucket",
+		"CONCOURSE_":      "concourse",
+		"SPACELIFT_":      "spacelift",
+		"HARNESS_":        "harness",
+		"TERRATEAM_":      "terrateam",
+		"KEPTN_":          "keptn",
+		"CLOUDCONCIERGE_": "cloudconcierge",
 	},
 }
 
