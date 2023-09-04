@@ -67,57 +67,57 @@ clean:
 
 # Run only short unit tests
 test:
-	INFRACOST_LOG_LEVEL=warn go test -short $(LD_FLAGS) ./... $(or $(ARGS), -v -cover)
+	INFRACOST_LOG_LEVEL=warn go test -short $(LD_FLAGS) ./... $(or $(ARGS), -cover)
 
 # Run all tests
 test_all:
-	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./... $(or $(ARGS), -v -cover)
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./... $(or $(ARGS), -cover)
 
 # Run unit tests and shared integration tests
 test_shared_int:
 	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) \
-		$(shell go list ./... | grep -v ./internal/providers/terraform/aws | grep -v ./internal/providers/terraform/google | grep -v ./internal/providers/terraform/azure) \
-		$(or $(ARGS), -v -cover)
+		$(shell go list ./... | grep ./internal/providers/terraform/aws | grep ./internal/providers/terraform/google | grep ./internal/providers/terraform/azure) \
+		$(or $(ARGS), -cover)
 
 test_cmd:
-	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./cmd/infracost $(or $(ARGS), -v -cover)
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./cmd/infracost $(or $(ARGS), -cover)
 
 test_update_cmd:
-	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./cmd/infracost $(or $(ARGS), -update -v -cover)
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./cmd/infracost $(or $(ARGS), -update -cover)
 
 test_usage:
-	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/usage $(or $(ARGS), -v -cover)
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/usage $(or $(ARGS), -cover)
 
 test_update_usage:
-	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/usage $(or $(ARGS), -update -v -cover)
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/usage $(or $(ARGS), -update -cover)
 
 # Run AWS resource tests
 test_aws:
-	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/aws $(or $(ARGS), -v -cover)
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/aws $(or $(ARGS), -cover)
 
 # Run Google resource tests
 test_google:
-	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/google $(or $(ARGS), -v -cover)
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/google $(or $(ARGS), -cover)
 
 # Run Azure resource tests
 test_azure:
-	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/azure $(or $(ARGS), -v -cover)
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/azure $(or $(ARGS), -cover)
 
 # Update AWS golden files tests
 test_update:
-	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/... $(or $(ARGS), -update -v -cover)
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/... $(or $(ARGS), -update -cover)
 
 # Update golden files tests
 test_update_aws:
-	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/aws $(or $(ARGS), -update -v -cover)
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/aws $(or $(ARGS), -update -cover)
 
 # Update Google golden files tests
 test_update_google:
-	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/google $(or $(ARGS), -update -v -cover)
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/google $(or $(ARGS), -update -cover)
 
 # Update Azure golden files tests
 test_update_azure:
-	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/azure $(or $(ARGS), -update -v -cover)
+	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./internal/providers/terraform/azure $(or $(ARGS), -update -cover)
 
 fmt:
 	go fmt ./...
