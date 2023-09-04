@@ -118,6 +118,9 @@ func TestBreakdownFormatJsonWithTagsGoogle(t *testing.T) {
 			CaptureLogs: true,
 			IsJSON:      true,
 		},
+		func(ctx *config.RunContext) {
+			ctx.Config.TagPoliciesEnabled = true
+		},
 	)
 }
 
