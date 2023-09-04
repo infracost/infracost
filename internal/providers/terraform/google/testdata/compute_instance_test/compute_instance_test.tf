@@ -310,17 +310,10 @@ resource "google_compute_instance" "e2_custom" {
   }
 }
 
-// Sustained use discount TWENTY Percentage
-resource "google_compute_instance" "n2_standard_8" {
+resource "google_compute_instance" "sud_20_perc_with_hours" {
   name         = "n2_standard_8"
   machine_type = "n2-standard-8"
-  zone         = "us-central1"
-
-  usage_period {
-    start_time = "2023-08-01T00:00:00Z" // Specify the start time of the discount usage period
-    end_time   = "2023-08-30T23:59:59Z" // Specify the end time of the discount usage period
-    usage      = "470"                  // Specify the monthly hours value (e.g., 730 for 730 hours)
-  }
+  zone         = "us-central1-a"
 
   boot_disk {
     initialize_params {
@@ -333,40 +326,10 @@ resource "google_compute_instance" "n2_standard_8" {
   }
 }
 
-// Sustained use discount THIRTY Percentage
-resource "google_compute_instance" "m1_ultramem_80" {
+resource "google_compute_instance" "sud_30_perc_with_hours" {
   name         = "m1_ultramem_80"
   machine_type = "m1-ultramem-80"
-  zone         = "us-central1"
-
-  usage_period {
-    start_time = "2023-08-01T00:00:01Z" // Specify the start time of the discount usage period
-    end_time   = "2023-08-30T23:59:59Z" // Specify the end time of the discount usage period
-    usage      = "580"                  // Specify the monthly hours value (e.g., 730 for 730 hours)
-  }
-
-  boot_disk {
-    initialize_params {
-      image = "centos-cloud/centos-7"
-    }
-  }
-
-  network_interface {
-    network = "default"
-  }
-}
-
-// Sustained use discount UNSUPPORTED TYPE will set the SUD to ZERO
-resource "google_compute_instance" "t2d_standard_4" {
-  name         = "t2d_standard_4"
-  machine_type = "t2d-standard-4"
-  zone         = "us-central1"
-
-  usage_period {
-    start_time = "2023-08-01T00:00:01Z" // Specify the start time of the discount usage period
-    end_time   = "2023-08-30T23:59:59Z" // Specify the end time of the discount usage period
-    usage      = "390"                  // Specify the monthly hours value (e.g., 730 for 730 hours)
-  }
+  zone         = "us-central1-a"
 
   boot_disk {
     initialize_params {
