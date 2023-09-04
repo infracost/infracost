@@ -4,3 +4,7 @@ resource_usage:
     monthly_hrs: 100
   google_compute_instance.gpu_with_hours:
     monthly_hrs: 100
+  google_compute_instance.sud_20_perc_with_hours:
+    monthly_hours: 470
+  google_compute_instance.sud_30_perc_with_hours:
+    monthly_hours: 580

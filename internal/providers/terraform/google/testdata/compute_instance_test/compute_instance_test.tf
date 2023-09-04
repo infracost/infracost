@@ -309,3 +309,35 @@ resource "google_compute_instance" "e2_custom" {
     network = "default"
   }
 }
+
+resource "google_compute_instance" "sud_20_perc_with_hours" {
+  name         = "n2_standard_8"
+  machine_type = "n2-standard-8"
+  zone         = "us-central1-a"
+
+  boot_disk {
+    initialize_params {
+      image = "centos-cloud/centos-7"
+    }
+  }
+
+  network_interface {
+    network = "default"
+  }
+}
+
+resource "google_compute_instance" "sud_30_perc_with_hours" {
+  name         = "m1_ultramem_80"
+  machine_type = "m1-ultramem-80"
+  zone         = "us-central1-a"
+
+  boot_disk {
+    initialize_params {
+      image = "centos-cloud/centos-7"
+    }
+  }
+
+  network_interface {
+    network = "default"
+  }
+}
