@@ -2,7 +2,7 @@ package provider_schemas
 
 import (
 	_ "embed"
-	"encoding/json"
+	json "github.com/json-iterator/go"
 )
 
 //go:embed aws.tags.json
