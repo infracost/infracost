@@ -383,7 +383,14 @@ func splitModuleSubDir(moduleSource string) (string, string, error) {
 
 func joinModuleSubDir(moduleAddr string, submodulePath string) string {
 	if submodulePath != "" {
-		return fmt.Sprintf("%s//%s", moduleAddr, submodulePath)
+		parsedURL, err := url.Parse(moduleAddr)
+		if err != nil {
+			return fmt.Sprintf("%s//%s", moduleAddr, submodulePath)
+		}
+
+		query := parsedURL.RawQuery
+		parsedURL.RawQuery = ""
+		return fmt.Sprintf("%s//%s?%s", parsedURL.String(), submodulePath, query)
 	}
 
 	return moduleAddr
