@@ -385,7 +385,7 @@ func TestWithSourceMap(t *testing.T) {
 		"terraform-aws-modules/ec2-instance/aws":                                                  "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git?ref=v4.5.0",
 		"git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git":            "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
 		"git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git?ref=v4.4.0": "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git?ref=v4.3.0",
-		"terraform-aws-modules/route53/aws":                                                       "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git",
+		"terraform-aws-modules/route53/aws":                                                       "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git?ref=v2.10.2",
 	}
 
 	testLoaderE2E(t, "./testdata/modules_with_source_map", []*ManifestModule{
@@ -415,9 +415,9 @@ func TestWithSourceMap(t *testing.T) {
 		},
 		{
 			Key:     "registry-module-with-submodule",
-			Source:  "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git//modules/zones",
+			Source:  "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git//modules/zones?ref=v2.10.2",
 			Version: "",
-			Dir:     ".infracost/terraform_modules/5a4a225178eed58c86a47cd2229ec923/modules/zones",
+			Dir:     ".infracost/terraform_modules/5589fb57c5759112a91a6525096fea25/modules/zones",
 		},
 	}, sourceMap, true)
 }
