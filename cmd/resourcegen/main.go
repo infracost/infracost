@@ -60,7 +60,7 @@ func main() {
 
 	assetMap, err := initAssets()
 	if err != nil {
-		exitWithErr(fmt.Errorf("Error reading emded template dir:\n%w", err))
+		exitWithErr(fmt.Errorf("Error reading embed template dir:\n%w", err))
 	}
 
 	written, err := writeFiles(assetMap, c)
