@@ -122,11 +122,15 @@ func getVersionedAppServicePlanSKU(skuName, os string) (string, string, []*schem
 		version = ""
 	}
 
-	formattedSku := strings.TrimSpace(skuName[:2] + " " + version)
+	formattedSku := strings.TrimSpace(skuName[:2] + " ?" + version)
 
-	productName := strings.ReplaceAll(tier+" "+version+" Plan", "  ", " ")
+	productVersion := version
+	if len(version) > 0 && version[0] == 'm' {
+		productVersion = version[1:]
+	}
+	productName := strings.ReplaceAll(tier+" "+productVersion+" Plan", "  ", " ")
 
-	if version == "v3" && os == "linux" {
+	if productVersion == "v3" && os == "linux" {
 		return formattedSku, productName, []*schema.AttributeFilter{
 			{
 				Key:        "armSkuName",
