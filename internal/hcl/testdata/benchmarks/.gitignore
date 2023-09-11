@@ -1,0 +1,14 @@
+# we want to explicitly keep the benchmarks .infracost folder as the benchmark
+# tests are only benchmarks for the parsing/evaluation functionality
+
+!.infracost
+.infracost/terraform_modules/**/.git
+.infracost/terraform_modules/**/.github
+.infracost/terraform_modules/**/Makefile
+.infracost/terraform_modules/**/README.md
+.infracost/terraform_modules/**/LICENSE.md
+.infracost/terraform_modules/**/LICENSE
+.infracost/terraform_modules/**/README.yaml
+.infracost/terraform_modules/**/docs
+.infracost/terraform_modules/**/examples
+.infracost/terraform_modules/**/test

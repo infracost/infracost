@@ -41,6 +41,18 @@ jobs:
           INFRACOST_LOG_LEVEL: info
           INFRACOST_TERRAFORM_CLOUD_TOKEN: ${{ secrets.TERRAFORM_CLOUD_TOKEN }}
 
+      - name: Parser benchmarks
+        run: make parser_benchmarks
+
+      - name: Upload benchmark artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: benchmarks
+          path: |
+            mem.out
+            cpu.out
+            trace.out
+
       - name: Test example works ok from CLI
         run: |
           make run --silent ARGS="breakdown --path examples/terraform --usage-file=examples/terraform/infracost-usage.yml --format json" > infracost-output.json
