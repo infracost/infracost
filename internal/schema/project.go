@@ -43,6 +43,8 @@ type ProjectMetadata struct {
 	Path                string             `json:"path"`
 	Type                string             `json:"type"`
 	ConfigSha           string             `json:"configSha,omitempty"`
+	PolicySha           string             `json:"policySha,omitempty"`
+	PastPolicySha       string             `json:"pastPolicySha,omitempty"`
 	TerraformModulePath string             `json:"terraformModulePath,omitempty"`
 	TerraformWorkspace  string             `json:"terraformWorkspace,omitempty"`
 	VCSSubPath          string             `json:"vcsSubPath,omitempty"`

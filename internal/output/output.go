@@ -97,9 +97,15 @@ func (p Project) ToSchemaProject() *schema.Project {
 		resources = append(convertOutputResources(p.Breakdown.Resources, false), convertOutputResources(p.Breakdown.FreeResources, true)...)
 	}
 
+	var clonedMetadata *schema.ProjectMetadata
+	if p.Metadata != nil {
+		m := *p.Metadata
+		clonedMetadata = &m
+	}
+
 	return &schema.Project{
 		Name:          p.Name,
-		Metadata:      p.Metadata,
+		Metadata:      clonedMetadata,
 		PastResources: pastResources,
 		Resources:     resources,
 	}
