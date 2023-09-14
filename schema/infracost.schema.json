@@ -189,7 +189,10 @@
           "type": "string"
         },
         "resource_attributes": {
-          "additionalProperties": true
+          "type": "string",
+          "media": {
+            "binaryEncoding": "base64"
+          }
         },
         "address": {
           "type": "string"
@@ -275,6 +278,12 @@
           "type": "string"
         },
         "configSha": {
+          "type": "string"
+        },
+        "policySha": {
+          "type": "string"
+        },
+        "pastPolicySha": {
           "type": "string"
         },
         "terraformModulePath": {
