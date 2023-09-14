@@ -6,9 +6,11 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/hashicorp/go-retryablehttp"
 	json "github.com/json-iterator/go"
 
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
 )
 
@@ -19,11 +21,14 @@ type PolicyV2APIClient struct {
 
 // NewPolicyV2APIClient retrieves resource allow-list info from Infracost Cloud and returns a new policy client
 func NewPolicyV2APIClient(ctx *config.RunContext) (*PolicyV2APIClient, error) {
+	client := retryablehttp.NewClient()
+	client.Logger = &LeveledLogger{Logger: logging.Logger.WithField("library", "retryablehttp")}
 	c := PolicyV2APIClient{
 		APIClient: APIClient{
-			endpoint: ctx.Config.TagPolicyAPIEndpoint, // use tag policy api endpoint for now.
-			apiKey:   ctx.Config.APIKey,
-			uuid:     ctx.UUID(),
+			httpClient: client.StandardClient(),
+			endpoint:   ctx.Config.TagPolicyAPIEndpoint, // use tag policy api endpoint for now.
+			apiKey:     ctx.Config.APIKey,
+			uuid:       ctx.UUID(),
 		},
 	}
 
