@@ -140,3 +140,6 @@ tf_fmt_check:
 
 lint:
 	golangci-lint run
+
+parser_benchmarks:
+	go test -bench=. -benchmem -cpuprofile=cpu.out -memprofile=mem.out -trace=trace.out github.com/infracost/infracost/internal/hcl

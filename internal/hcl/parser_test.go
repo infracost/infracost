@@ -1237,7 +1237,7 @@ resource "azurerm_linux_function_app" "function" {
 	assert.Equal(t, "plan-Windows-EP1", name)
 }
 
-func valueToBytes(t *testing.T, v cty.Value) []byte {
+func valueToBytes(t TestingT, v cty.Value) []byte {
 	t.Helper()
 
 	simple := ctyJson.SimpleJSONValue{Value: v}
@@ -1247,9 +1247,13 @@ func valueToBytes(t *testing.T, v cty.Value) []byte {
 	return b
 }
 
-func assertBlockEqualsJSON(t *testing.T, expected string, actual cty.Value, remove ...string) {
-	t.Helper()
+type TestingT interface {
+	Errorf(format string, args ...interface{})
+	FailNow()
+	Helper()
+}
 
+func assertBlockEqualsJSON(t TestingT, expected string, actual cty.Value, remove ...string) {
 	vals := actual.AsValueMap()
 	for _, s := range remove {
 		delete(vals, s)
@@ -1504,4 +1508,33 @@ locals {
 		`{"asg_tags":{"foo":"bar","Environment":"Test"}}`,
 		blocks.Matching(BlockMatcher{Type: "locals"}).Values(),
 	)
+}
+
+func BenchmarkParserEvaluate(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		b.StopTimer()
+		logger := newDiscardLogger()
+		dir := filepath.Dir("./testdata/benchmarks/heavy")
+		source, _ := modules.NewTerraformCredentialsSource(modules.BaseCredentialSet{})
+		loader := modules.NewModuleLoader(dir, source, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
+		parsers, _ := LoadParsers(
+			config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{}),
+			dir,
+			loader,
+			nil,
+			logger)
+		b.StartTimer()
+
+		module, err := parsers[0].ParseDirectory()
+
+		b.StopTimer()
+		require.NoError(b, err)
+		blocks := module.Blocks
+		assertBlockEqualsJSON(
+			b,
+			`{"value": {"context_name":"bastion", "deep_merge_1":"value1-3(double-overwrite)", "deep_merge_2":"value1-3(double-overwrite)"}}`,
+			blocks.Matching(BlockMatcher{Type: "output", Label: "output"}).Values(),
+		)
+		b.StartTimer()
+	}
 }
