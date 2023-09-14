@@ -395,10 +395,18 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 		nil,
 	)
 
-	root, err := evaluator.Run()
+	g := NewGraph(evaluator, p.logger)
+	err = g.Populate()
 	if err != nil {
 		return m, err
 	}
+	g.Walk()
+	root := evaluator.collectModules()
+
+	// root, err := evaluator.Run()
+	// if err != nil {
+	// 	return m, err
+	// }
 
 	root.HasChanges = p.hasChanges
 	root.TerraformVarsPaths = p.tfvarsPaths
