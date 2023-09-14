@@ -97,6 +97,8 @@ func (p Project) ToSchemaProject() *schema.Project {
 		resources = append(convertOutputResources(p.Breakdown.Resources, false), convertOutputResources(p.Breakdown.FreeResources, true)...)
 	}
 
+	// clone the metadata to avoid unexpected effects from a shared pointer since
+	// output.CompareTo may modify Metadata.PolicySha/PastPolicySha
 	var clonedMetadata *schema.ProjectMetadata
 	if p.Metadata != nil {
 		m := *p.Metadata
