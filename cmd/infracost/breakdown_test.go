@@ -1014,7 +1014,7 @@ func TestBreakdownWithDataBlocksInSubmod(t *testing.T) {
 
 func TestBreakdownWithPolicyDataUploadHCL(t *testing.T) {
 	ts := GraphqlTestServer(map[string]string{
-		"policyResourceAllowlist": policyResourceAllowlistGraphQLResponse,
+		"policyResourceAllowList": policyResourceAllowlistGraphQLResponse,
 		"storePolicyResources":    storePolicyResourcesGraphQLResponse,
 	})
 	defer ts.Close()
@@ -1041,7 +1041,7 @@ func TestBreakdownWithPolicyDataUploadHCL(t *testing.T) {
 
 func TestBreakdownWithPolicyDataUploadPlanJson(t *testing.T) {
 	ts := GraphqlTestServer(map[string]string{
-		"policyResourceAllowlist": policyResourceAllowlistGraphQLResponse,
+		"policyResourceAllowList": policyResourceAllowlistGraphQLResponse,
 		"storePolicyResources":    storePolicyResourcesGraphQLResponse,
 	})
 	defer ts.Close()

@@ -295,7 +295,7 @@ func TestDiffWithFreeResourcesChecksum(t *testing.T) {
 
 func TestDiffWithPolicyDataUpload(t *testing.T) {
 	ts := GraphqlTestServer(map[string]string{
-		"policyResourceAllowlist": policyResourceAllowlistGraphQLResponse,
+		"policyResourceAllowList": policyResourceAllowlistGraphQLResponse,
 		"storePolicyResources":    storePolicyResourcesGraphQLResponse,
 	})
 	defer ts.Close()

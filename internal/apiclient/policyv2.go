@@ -12,10 +12,10 @@ import (
 
 type PolicyV2APIClient struct {
 	APIClient
-	allowlist resourceAllowlist
+	allowList resourceAllowList
 }
 
-// NewPolicyV2APIClient retrieves resource allowlist info from Infracost Cloud and returns a new policy client
+// NewPolicyV2APIClient retrieves resource allow-list info from Infracost Cloud and returns a new policy client
 func NewPolicyV2APIClient(ctx *config.RunContext) (*PolicyV2APIClient, error) {
 	c := PolicyV2APIClient{
 		APIClient: APIClient{
@@ -25,11 +25,11 @@ func NewPolicyV2APIClient(ctx *config.RunContext) (*PolicyV2APIClient, error) {
 		},
 	}
 
-	prw, err := c.getPolicyResourceAllowlist()
+	prw, err := c.getPolicyResourceAllowList()
 	if err != nil {
 		return nil, err
 	}
-	c.allowlist = prw
+	c.allowList = prw
 
 	return &c, nil
 }
@@ -150,7 +150,7 @@ func (c *PolicyV2APIClient) filterResources(partials []*schema.PartialResource) 
 	for _, partial := range partials {
 		if partial != nil && partial.ResourceData != nil {
 			rd := partial.ResourceData
-			if f, ok := c.allowlist[rd.Type]; ok {
+			if f, ok := c.allowList[rd.Type]; ok {
 				p2rs = append(p2rs, filterResource(rd, f))
 			}
 		}
@@ -242,12 +242,12 @@ func calcChecksum(rd *schema.ResourceData) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-type resourceAllowlist map[string]map[string]bool
+type resourceAllowList map[string]map[string]bool
 
-func (c *PolicyV2APIClient) getPolicyResourceAllowlist() (resourceAllowlist, error) {
+func (c *PolicyV2APIClient) getPolicyResourceAllowList() (resourceAllowList, error) {
 	q := `
 		query {
-			policyResourceAllowlist {
+			policyResourceAllowList {
 				resourceType
                 allowedKeys
 			}
@@ -257,32 +257,32 @@ func (c *PolicyV2APIClient) getPolicyResourceAllowlist() (resourceAllowlist, err
 
 	results, err := c.doQueries([]GraphQLQuery{{q, v}})
 	if err != nil {
-		return nil, fmt.Errorf("query policyResourceAllowlist failed %w", err)
+		return nil, fmt.Errorf("query policyResourceAllowList failed %w", err)
 	}
 
 	if len(results) > 0 {
 		if results[0].Get("errors").Exists() {
-			return nil, fmt.Errorf("query policyResourceAllowlist failed, received graphql error: %s", results[0].Get("errors").String())
+			return nil, fmt.Errorf("query policyResourceAllowList failed, received graphql error: %s", results[0].Get("errors").String())
 		}
 	}
 
 	data := results[0].Get("data")
 
 	var response struct {
-		Allowlists []struct {
+		AllowLists []struct {
 			Type   string   `json:"resourceType"`
 			Values []string `json:"allowedKeys"`
-		} `json:"policyResourceAllowlist"`
+		} `json:"policyResourceAllowList"`
 	}
 
 	err = json.Unmarshal([]byte(data.Raw), &response)
 	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal policyResourceAllowlist %w", err)
+		return nil, fmt.Errorf("failed to unmarshal policyResourceAllowList %w", err)
 	}
 
-	aw := resourceAllowlist{}
+	aw := resourceAllowList{}
 
-	for _, rtf := range response.Allowlists {
+	for _, rtf := range response.AllowLists {
 		rtfMap := map[string]bool{}
 		for _, v := range rtf.Values {
 			rtfMap[v] = true

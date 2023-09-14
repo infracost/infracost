@@ -191,7 +191,7 @@ func GraphqlTestServer(keyToResponse map[string]string) *httptest.Server {
 }
 
 var policyResourceAllowlistGraphQLResponse = `[{"data": 
-	{"policyResourceAllowlist":[
+	{"policyResourceAllowList":[
 		{"resourceType":"aws_instance","allowedKeys":["ami","ebs_block_device","instance_type","name","root_block_device"]},
 		{"resourceType":"aws_lambda_function","allowedKeys":["memory_size","name","runtime"]},
 		{"resourceType":"aws_dynamodb_table","allowedKeys":["id","arn","memory_size","name","runtime"]}
