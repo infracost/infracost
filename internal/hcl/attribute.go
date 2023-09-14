@@ -43,7 +43,7 @@ type Attribute struct {
 	Ctx *Context
 	// Verbose defines if the attribute should log verbose diagnostics messages to debug.
 	Verbose bool
-	Logger  *logrus.Entry
+	Logger  *logrus.Entry `json:"-"`
 	// newMock generates a mock value for the attribute if it's value is missing.
 	newMock       func(attr *Attribute) cty.Value
 	previousValue cty.Value

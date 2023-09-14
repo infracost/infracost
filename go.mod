@@ -157,7 +157,7 @@ require (
 	github.com/creack/pty v1.1.11 // indirect
 	github.com/dimchansky/utfbom v1.1.1 // indirect
 	github.com/dlclark/regexp2 v1.8.1 // indirect
-	github.com/emirpasic/gods v1.12.0 // indirect
+	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/go-errors/errors v1.0.2-0.20180813162953-d98b870cc4e0 // indirect
 	github.com/go-git/gcfg v1.5.0 // indirect
 	github.com/golang-jwt/jwt/v4 v4.3.0 // indirect
@@ -246,6 +246,7 @@ require (
 	github.com/hashicorp/go-safetemp v1.0.0
 	github.com/hashicorp/go-uuid v1.0.3
 	github.com/hashicorp/go-version v1.6.0
+	github.com/heimdalr/dag v1.3.1
 	github.com/iancoleman/orderedmap v0.2.0 // indirect
 	github.com/klauspost/compress v1.15.11 // indirect
 	github.com/mitchellh/go-testing-interface v1.14.1 // indirect
