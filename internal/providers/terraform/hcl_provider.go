@@ -168,8 +168,7 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 	}
 
 	var policyV2Client *apiclient.PolicyV2APIClient
-	// use TagPolicyAPIEndpoint for PolicyV2 instead of creating a new config variable
-	if runCtx.Config.TagPolicyAPIEndpoint != "" {
+	if runCtx.Config.PolicyV2APIEndpoint != "" {
 		policyV2Client, err = apiclient.NewPolicyV2APIClient(runCtx)
 		if err != nil {
 			logger.WithError(err).Errorf("failed to initialize policyV2 client")

@@ -2,8 +2,9 @@ package terraform
 
 import (
 	"fmt"
-	"github.com/infracost/infracost/internal/apiclient"
 	"os"
+
+	"github.com/infracost/infracost/internal/apiclient"
 
 	"github.com/sirupsen/logrus"
 
@@ -31,8 +32,7 @@ func NewPlanJSONProvider(ctx *config.ProjectContext, includePastResources bool) 
 
 	var policyV2Client *apiclient.PolicyV2APIClient
 	var err error
-	// use TagPolicyAPIEndpoint for PolicyV2 instead of creating a new config variable
-	if ctx.RunContext.Config.TagPolicyAPIEndpoint != "" {
+	if ctx.RunContext.Config.PolicyV2APIEndpoint != "" {
 		policyV2Client, err = apiclient.NewPolicyV2APIClient(ctx.RunContext)
 		if err != nil {
 			ctx.Logger().WithError(err).Errorf("failed to initialize policyV2 client")

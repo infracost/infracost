@@ -1033,8 +1033,7 @@ func TestBreakdownWithPolicyDataUploadHCL(t *testing.T) {
 			CaptureLogs: true,
 			IsJSON:      true,
 		}, func(ctx *config.RunContext) {
-			ctx.Config.TagPoliciesEnabled = true
-			ctx.Config.TagPolicyAPIEndpoint = ts.URL
+			ctx.Config.PolicyV2APIEndpoint = ts.URL
 		},
 	)
 }
@@ -1060,8 +1059,7 @@ func TestBreakdownWithPolicyDataUploadPlanJson(t *testing.T) {
 			CaptureLogs: true,
 			IsJSON:      true,
 		}, func(ctx *config.RunContext) {
-			ctx.Config.TagPoliciesEnabled = true
-			ctx.Config.TagPolicyAPIEndpoint = ts.URL
+			ctx.Config.PolicyV2APIEndpoint = ts.URL
 		},
 	)
 }

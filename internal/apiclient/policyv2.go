@@ -26,7 +26,7 @@ func NewPolicyV2APIClient(ctx *config.RunContext) (*PolicyV2APIClient, error) {
 	c := PolicyV2APIClient{
 		APIClient: APIClient{
 			httpClient: client.StandardClient(),
-			endpoint:   ctx.Config.TagPolicyAPIEndpoint, // use tag policy api endpoint for now.
+			endpoint:   ctx.Config.PolicyV2APIEndpoint,
 			apiKey:     ctx.Config.APIKey,
 			uuid:       ctx.UUID(),
 		},
