@@ -3,9 +3,10 @@ package apiclient
 import (
 	"bytes"
 	"fmt"
-	json "github.com/json-iterator/go"
 	"io"
 	"net/http"
+
+	json "github.com/json-iterator/go"
 
 	"github.com/google/uuid"
 	"github.com/pkg/errors"

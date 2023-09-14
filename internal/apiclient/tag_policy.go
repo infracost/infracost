@@ -2,10 +2,12 @@ package apiclient
 
 import (
 	"fmt"
-	"github.com/infracost/infracost/internal/config"
-	"github.com/infracost/infracost/internal/output"
+
 	json "github.com/json-iterator/go"
 	log "github.com/sirupsen/logrus"
+
+	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/output"
 )
 
 type TagPolicyAPIClient struct {

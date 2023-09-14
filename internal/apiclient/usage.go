@@ -4,11 +4,12 @@ import (
 	"crypto/tls"
 	"crypto/x509"
 	"fmt"
-	json "github.com/json-iterator/go"
 	"net/http"
 	"os"
 	"strings"
 	"time"
+
+	json "github.com/json-iterator/go"
 
 	"github.com/hashicorp/go-cleanhttp"
 	"github.com/tidwall/gjson"

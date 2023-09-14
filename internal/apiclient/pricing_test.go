@@ -1,13 +1,14 @@
 package apiclient
 
 import (
-	json "github.com/json-iterator/go"
 	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
 	"time"
+
+	json "github.com/json-iterator/go"
 
 	"github.com/hashicorp/go-retryablehttp"
 	"github.com/mitchellh/hashstructure/v2"

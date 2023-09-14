@@ -2,8 +2,9 @@ package apiclient
 
 import (
 	"fmt"
-	json "github.com/json-iterator/go"
 	"time"
+
+	json "github.com/json-iterator/go"
 
 	"github.com/pkg/errors"
 	log "github.com/sirupsen/logrus"

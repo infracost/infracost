@@ -4,10 +4,12 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"fmt"
+	"sort"
+
+	json "github.com/json-iterator/go"
+
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
-	json "github.com/json-iterator/go"
-	"sort"
 )
 
 type PolicyV2APIClient struct {
