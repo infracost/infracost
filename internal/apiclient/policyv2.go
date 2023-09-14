@@ -3,10 +3,10 @@ package apiclient
 import (
 	"crypto/sha256"
 	"encoding/hex"
-	"encoding/json"
 	"fmt"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
+	json "github.com/json-iterator/go"
 	"sort"
 )
 

@@ -3,8 +3,8 @@ package apiclient
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"encoding/json"
 	"fmt"
+	json "github.com/json-iterator/go"
 	"net/http"
 	"os"
 	"strings"

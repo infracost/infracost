@@ -2,13 +2,12 @@ package apiclient
 
 import (
 	"bytes"
-	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"time"
 
-	jsoniter "github.com/json-iterator/go"
+	json "github.com/json-iterator/go"
 	"github.com/sirupsen/logrus"
 
 	"github.com/infracost/infracost/internal/config"
@@ -42,7 +41,7 @@ func (r PolicyClient) GetPolicies(toScan []*schema.ResourceData) ([]Policy, erro
 			policySchema = append(policySchema, resourceDataToPolicySchema(*res, map[string]struct{}{}))
 		}
 	}
-	b, err := jsoniter.Marshal(policySchema)
+	b, err := json.Marshal(policySchema)
 	if err != nil {
 		return nil, fmt.Errorf("failed to marshal policy schema to scan %w", err)
 	}

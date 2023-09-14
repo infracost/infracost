@@ -1,7 +1,6 @@
 package scan
 
 import (
-	"encoding/json"
 	"fmt"
 	"reflect"
 	"sort"
@@ -214,7 +213,7 @@ func mergeSuggestionWithResource(schema []byte, suggestedSchema []byte, resource
 		return fmt.Errorf("failed to marshal attributes with suggestions")
 	}
 
-	err = json.Unmarshal(nb, &resource)
+	err = jsoniter.Unmarshal(nb, &resource)
 	if err != nil {
 		return fmt.Errorf("failed to unmarshal attributes with suggestions")
 	}
