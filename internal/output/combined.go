@@ -126,11 +126,13 @@ func CompareTo(c *config.Config, current, prior Root) (Root, error) {
 		scp := p.ToSchemaProject()
 		scp.Diff = scp.Resources
 		scp.PastResources = nil
+		scp.Metadata.PastPolicySha = ""
 		scp.HasDiff = true
 
 		if v, ok := priorProjects[p.LabelWithMetadata()]; ok {
 			if !p.Metadata.HasErrors() && !v.Metadata.HasErrors() {
 				scp.PastResources = v.Resources
+				scp.Metadata.PastPolicySha = v.Metadata.PolicySha
 				scp.Diff = schema.CalculateDiff(scp.PastResources, scp.Resources)
 			}
 
@@ -157,6 +159,7 @@ func CompareTo(c *config.Config, current, prior Root) (Root, error) {
 	for _, scp := range priorProjects {
 		scp.PastResources = scp.Resources
 		scp.Resources = nil
+		scp.Metadata.PolicySha = ""
 		scp.HasDiff = true
 		scp.Diff = schema.CalculateDiff(scp.PastResources, scp.Resources)
 

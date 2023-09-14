@@ -87,6 +87,7 @@ type Config struct {
 	UsageAPIEndpoint          string `yaml:"usage_api_endpoint,omitempty" envconfig:"USAGE_API_ENDPOINT"`
 	UsageActualCosts          bool   `yaml:"usage_actual_costs,omitempty" envconfig:"USAGE_ACTUAL_COSTS"`
 	PolicyAPIEndpoint         string `yaml:"policy_api_endpoint" envconfig:"POLICY_API_ENDPOINT"`
+	PolicyV2APIEndpoint       string `yaml:"policy_v2_api_endpoint,omitempty" envconfig:"POLICY_V2_API_ENDPOINT"`
 	TagPolicyAPIEndpoint      string `yaml:"tag_policy_api_endpoint,omitempty" envconfig:"TAG_POLICY_API_ENDPOINT"`
 	TagPoliciesEnabled        bool
 	EnableDashboard           bool  `yaml:"enable_dashboard,omitempty" envconfig:"ENABLE_DASHBOARD"`

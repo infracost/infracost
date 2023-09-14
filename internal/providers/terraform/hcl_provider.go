@@ -36,6 +36,7 @@ var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 type HCLProvider struct {
 	scanner        *scan.TerraformPlanScanner
+	policyV2Client *apiclient.PolicyV2APIClient
 	parsers        []*hcl.Parser
 	planJSONParser *Parser
 	logger         *log.Entry
@@ -166,8 +167,17 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 		scanner = scan.NewTerraformPlanScanner(runCtx, ctx.Logger(), prices.GetPricesConcurrent)
 	}
 
+	var policyV2Client *apiclient.PolicyV2APIClient
+	if runCtx.Config.PolicyV2APIEndpoint != "" {
+		policyV2Client, err = apiclient.NewPolicyV2APIClient(runCtx)
+		if err != nil {
+			logger.WithError(err).Errorf("failed to initialize policyV2 client")
+		}
+	}
+
 	return &HCLProvider{
 		scanner:        scanner,
+		policyV2Client: policyV2Client,
 		parsers:        parsers,
 		planJSONParser: NewParser(ctx, true),
 		ctx:            ctx,
@@ -219,6 +229,14 @@ func (p *HCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, e
 				p.logger.WithError(err).Debugf("failed to scan Terraform project %s", project.Name)
 			}
 		}
+
+		if p.policyV2Client != nil {
+			err := p.policyV2Client.UploadPolicyData(project)
+			if err != nil {
+				p.logger.WithError(err).Errorf("failed to upload policy data %s", project.Name)
+			}
+		}
+
 		projects[i] = project
 	}
 

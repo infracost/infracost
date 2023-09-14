@@ -3,12 +3,13 @@ package apiclient
 import (
 	"crypto/tls"
 	"crypto/x509"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"os"
 	"strings"
 	"time"
+
+	json "github.com/json-iterator/go"
 
 	"github.com/hashicorp/go-cleanhttp"
 	"github.com/tidwall/gjson"

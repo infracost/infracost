@@ -1011,3 +1011,55 @@ func TestBreakdownWithDataBlocksInSubmod(t *testing.T) {
 			"--path", dir,
 		}, nil)
 }
+
+func TestBreakdownWithPolicyDataUploadHCL(t *testing.T) {
+	ts := GraphqlTestServer(map[string]string{
+		"policyResourceAllowList": policyResourceAllowlistGraphQLResponse,
+		"storePolicyResources":    storePolicyResourcesGraphQLResponse,
+	})
+	defer ts.Close()
+
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testName,
+		[]string{
+			"breakdown",
+			"--format", "json",
+			"--path", dir,
+		},
+		&GoldenFileOptions{
+			CaptureLogs: true,
+			IsJSON:      true,
+		}, func(ctx *config.RunContext) {
+			ctx.Config.PolicyV2APIEndpoint = ts.URL
+		},
+	)
+}
+
+func TestBreakdownWithPolicyDataUploadPlanJson(t *testing.T) {
+	ts := GraphqlTestServer(map[string]string{
+		"policyResourceAllowList": policyResourceAllowlistGraphQLResponse,
+		"storePolicyResources":    storePolicyResourcesGraphQLResponse,
+	})
+	defer ts.Close()
+
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName, "plan.json")
+	GoldenFileCommandTest(
+		t,
+		testName,
+		[]string{
+			"breakdown",
+			"--format", "json",
+			"--path", dir,
+		},
+		&GoldenFileOptions{
+			CaptureLogs: true,
+			IsJSON:      true,
+		}, func(ctx *config.RunContext) {
+			ctx.Config.PolicyV2APIEndpoint = ts.URL
+		},
+	)
+}

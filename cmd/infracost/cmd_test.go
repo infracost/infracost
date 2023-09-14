@@ -3,9 +3,14 @@ package main_test
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"io"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"testing"
 
 	main "github.com/infracost/infracost/cmd/infracost"
@@ -165,3 +170,38 @@ func stripDynamicValues(actual []byte) []byte {
 
 	return actual
 }
+
+func GraphqlTestServer(keyToResponse map[string]string) *httptest.Server {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		bodyBytes, _ := io.ReadAll(r.Body)
+		graphqlQuery := string(bodyBytes)
+
+		response := `[{"errors": "test server unknown request"}]`
+		for k, resp := range keyToResponse {
+			if strings.Contains(graphqlQuery, k) {
+				response = resp
+				break
+			}
+
+		}
+
+		_, _ = fmt.Fprint(w, response)
+	}))
+	return ts
+}
+
+var policyResourceAllowlistGraphQLResponse = `[{"data": 
+	{"policyResourceAllowList":[
+		{"resourceType":"aws_instance","allowedKeys":["ami","ebs_block_device","instance_type","name","root_block_device"]},
+		{"resourceType":"aws_lambda_function","allowedKeys":["memory_size","name","runtime"]},
+		{"resourceType":"aws_dynamodb_table","allowedKeys":["id","arn","memory_size","name","runtime"]}
+	]}
+}]
+`
+
+var storePolicyResourcesGraphQLResponse = `[{"data": 
+	{"storePolicyResources": 
+		{ "sha": "someshastring" }
+	}
+}]
+`

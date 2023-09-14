@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/infracost/infracost/internal/apiclient"
+
 	"github.com/sirupsen/logrus"
 
 	"github.com/infracost/infracost/internal/config"
@@ -18,6 +20,7 @@ type PlanJSONProvider struct {
 	Path                 string
 	includePastResources bool
 	scanner              *scan.TerraformPlanScanner
+	policyV2Client       *apiclient.PolicyV2APIClient
 	logger               *logrus.Entry
 }
 
@@ -27,11 +30,21 @@ func NewPlanJSONProvider(ctx *config.ProjectContext, includePastResources bool) 
 		scanner = scan.NewTerraformPlanScanner(ctx.RunContext, ctx.Logger(), prices.GetPricesConcurrent)
 	}
 
+	var policyV2Client *apiclient.PolicyV2APIClient
+	var err error
+	if ctx.RunContext.Config.PolicyV2APIEndpoint != "" {
+		policyV2Client, err = apiclient.NewPolicyV2APIClient(ctx.RunContext)
+		if err != nil {
+			ctx.Logger().WithError(err).Errorf("failed to initialize policyV2 client")
+		}
+	}
+
 	return &PlanJSONProvider{
 		ctx:                  ctx,
 		Path:                 ctx.ProjectConfig.Path,
 		includePastResources: includePastResources,
 		scanner:              scanner,
+		policyV2Client:       policyV2Client,
 		logger:               ctx.Logger(),
 	}
 }
@@ -99,6 +112,14 @@ func (p *PlanJSONProvider) LoadResourcesFromSrc(usage schema.UsageMap, j []byte,
 		err := p.scanner.ScanPlan(project)
 		if err != nil {
 			p.logger.WithError(err).Debugf("Terraform project %s plan JSON scan failed", project.Name)
+		}
+	}
+
+	// use TagPolicyAPIEndpoint for Policy2 instead of creating a new config variable
+	if p.policyV2Client != nil {
+		err := p.policyV2Client.UploadPolicyData(project)
+		if err != nil {
+			p.logger.WithError(err).Errorf("Terraform project %s failed to upload policy data", project.Name)
 		}
 	}
 

@@ -1,0 +1,670 @@
+{
+  "format_version": "1.0",
+  "terraform_version": "1.1.0-dev",
+  "planned_values": {
+    "root_module": {
+      "resources": [
+        {
+          "address": "aws_appautoscaling_target.autoscale_dynamodb_table_read_target",
+          "mode": "managed",
+          "type": "aws_appautoscaling_target",
+          "name": "autoscale_dynamodb_table_read_target",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "max_capacity": 100,
+            "min_capacity": 5,
+            "resource_id": "table/LiteralTableRef",
+            "scalable_dimension": "dynamodb:table:ReadCapacityUnits",
+            "service_namespace": "dynamodb",
+            "tags": null,
+            "tags_all": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            }
+          },
+          "sensitive_values": {
+            "tags_all": {}
+          }
+        },
+        {
+          "address": "aws_appautoscaling_target.autoscale_dynamodb_table_write_target",
+          "mode": "managed",
+          "type": "aws_appautoscaling_target",
+          "name": "autoscale_dynamodb_table_write_target",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 0,
+          "values": {
+            "max_capacity": 99,
+            "min_capacity": 6,
+            "resource_id": "table/GameScores",
+            "scalable_dimension": "dynamodb:table:WriteCapacityUnits",
+            "service_namespace": "dynamodb",
+            "tags": null,
+            "tags_all": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            }
+          },
+          "sensitive_values": {
+            "tags_all": {}
+          }
+        },
+        {
+          "address": "aws_dynamodb_table.autoscale_dynamodb_table",
+          "mode": "managed",
+          "type": "aws_dynamodb_table",
+          "name": "autoscale_dynamodb_table",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 1,
+          "values": {
+            "attribute": [
+              {
+                "name": "GameTitle",
+                "type": "S"
+              },
+              {
+                "name": "UserId",
+                "type": "S"
+              }
+            ],
+            "billing_mode": "PROVISIONED",
+            "deletion_protection_enabled": null,
+            "global_secondary_index": [],
+            "hash_key": "UserId",
+            "local_secondary_index": [],
+            "name": "GameScores",
+            "range_key": "GameTitle",
+            "read_capacity": 30,
+            "replica": [],
+            "restore_date_time": null,
+            "restore_source_name": null,
+            "restore_to_latest_time": null,
+            "stream_enabled": null,
+            "table_class": null,
+            "tags": null,
+            "tags_all": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "timeouts": null,
+            "write_capacity": 20
+          },
+          "sensitive_values": {
+            "attribute": [
+              {},
+              {}
+            ],
+            "global_secondary_index": [],
+            "local_secondary_index": [],
+            "point_in_time_recovery": [],
+            "replica": [],
+            "server_side_encryption": [],
+            "tags_all": {},
+            "ttl": []
+          }
+        },
+        {
+          "address": "aws_instance.web_app",
+          "mode": "managed",
+          "type": "aws_instance",
+          "name": "web_app",
+          "provider_name": "registry.terraform.io/hashicorp/aws",
+          "schema_version": 1,
+          "values": {
+            "ami": "ami-674cbc1e",
+            "credit_specification": [],
+            "ebs_block_device": [
+              {
+                "delete_on_termination": true,
+                "device_name": "my_data",
+                "iops": 800,
+                "tags": null,
+                "volume_size": 1000,
+                "volume_type": "gp2"
+              }
+            ],
+            "get_password_data": false,
+            "hibernation": null,
+            "instance_type": "m5.4xlarge",
+            "launch_template": [],
+            "root_block_device": [
+              {
+                "delete_on_termination": true,
+                "tags": null,
+                "volume_size": 51
+              }
+            ],
+            "source_dest_check": true,
+            "tags": {
+              "foo": "bar"
+            },
+            "tags_all": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride",
+              "foo": "bar"
+            },
+            "timeouts": null,
+            "user_data_replace_on_change": false,
+            "volume_tags": {
+              "baz": "bat"
+            }
+          },
+          "sensitive_values": {
+            "capacity_reservation_specification": [],
+            "cpu_options": [],
+            "credit_specification": [],
+            "ebs_block_device": [
+              {}
+            ],
+            "enclave_options": [],
+            "ephemeral_block_device": [],
+            "instance_market_options": [],
+            "ipv6_addresses": [],
+            "launch_template": [],
+            "maintenance_options": [],
+            "metadata_options": [],
+            "network_interface": [],
+            "private_dns_name_options": [],
+            "root_block_device": [
+              {}
+            ],
+            "secondary_private_ips": [],
+            "security_groups": [],
+            "tags": {},
+            "tags_all": {},
+            "volume_tags": {},
+            "vpc_security_group_ids": []
+          }
+        }
+      ]
+    }
+  },
+  "resource_changes": [
+    {
+      "address": "aws_appautoscaling_target.autoscale_dynamodb_table_read_target",
+      "mode": "managed",
+      "type": "aws_appautoscaling_target",
+      "name": "autoscale_dynamodb_table_read_target",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "max_capacity": 100,
+          "min_capacity": 5,
+          "resource_id": "table/LiteralTableRef",
+          "scalable_dimension": "dynamodb:table:ReadCapacityUnits",
+          "service_namespace": "dynamodb",
+          "tags": null,
+          "tags_all": {
+            "DefaultNotOverride": "defaultnotoverride",
+            "DefaultOverride": "defaultoverride"
+          }
+        },
+        "after_unknown": {
+          "arn": true,
+          "id": true,
+          "role_arn": true,
+          "tags_all": {}
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "tags_all": {}
+        }
+      }
+    },
+    {
+      "address": "aws_appautoscaling_target.autoscale_dynamodb_table_write_target",
+      "mode": "managed",
+      "type": "aws_appautoscaling_target",
+      "name": "autoscale_dynamodb_table_write_target",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "max_capacity": 99,
+          "min_capacity": 6,
+          "resource_id": "table/GameScores",
+          "scalable_dimension": "dynamodb:table:WriteCapacityUnits",
+          "service_namespace": "dynamodb",
+          "tags": null,
+          "tags_all": {
+            "DefaultNotOverride": "defaultnotoverride",
+            "DefaultOverride": "defaultoverride"
+          }
+        },
+        "after_unknown": {
+          "arn": true,
+          "id": true,
+          "role_arn": true,
+          "tags_all": {}
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "tags_all": {}
+        }
+      }
+    },
+    {
+      "address": "aws_dynamodb_table.autoscale_dynamodb_table",
+      "mode": "managed",
+      "type": "aws_dynamodb_table",
+      "name": "autoscale_dynamodb_table",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "attribute": [
+            {
+              "name": "GameTitle",
+              "type": "S"
+            },
+            {
+              "name": "UserId",
+              "type": "S"
+            }
+          ],
+          "billing_mode": "PROVISIONED",
+          "deletion_protection_enabled": null,
+          "global_secondary_index": [],
+          "hash_key": "UserId",
+          "local_secondary_index": [],
+          "name": "GameScores",
+          "range_key": "GameTitle",
+          "read_capacity": 30,
+          "replica": [],
+          "restore_date_time": null,
+          "restore_source_name": null,
+          "restore_to_latest_time": null,
+          "stream_enabled": null,
+          "table_class": null,
+          "tags": null,
+          "tags_all": {
+            "DefaultNotOverride": "defaultnotoverride",
+            "DefaultOverride": "defaultoverride"
+          },
+          "timeouts": null,
+          "write_capacity": 20
+        },
+        "after_unknown": {
+          "arn": true,
+          "attribute": [
+            {},
+            {}
+          ],
+          "global_secondary_index": [],
+          "id": true,
+          "local_secondary_index": [],
+          "point_in_time_recovery": true,
+          "replica": [],
+          "server_side_encryption": true,
+          "stream_arn": true,
+          "stream_label": true,
+          "stream_view_type": true,
+          "tags_all": {},
+          "ttl": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "attribute": [
+            {},
+            {}
+          ],
+          "global_secondary_index": [],
+          "local_secondary_index": [],
+          "point_in_time_recovery": [],
+          "replica": [],
+          "server_side_encryption": [],
+          "tags_all": {},
+          "ttl": []
+        }
+      }
+    },
+    {
+      "address": "aws_instance.web_app",
+      "mode": "managed",
+      "type": "aws_instance",
+      "name": "web_app",
+      "provider_name": "registry.terraform.io/hashicorp/aws",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "ami": "ami-674cbc1e",
+          "credit_specification": [],
+          "ebs_block_device": [
+            {
+              "delete_on_termination": true,
+              "device_name": "my_data",
+              "iops": 800,
+              "tags": null,
+              "volume_size": 1000,
+              "volume_type": "gp2"
+            }
+          ],
+          "get_password_data": false,
+          "hibernation": null,
+          "instance_type": "m5.4xlarge",
+          "launch_template": [],
+          "root_block_device": [
+            {
+              "delete_on_termination": true,
+              "tags": null,
+              "volume_size": 51
+            }
+          ],
+          "source_dest_check": true,
+          "tags": {
+            "foo": "bar"
+          },
+          "tags_all": {
+            "DefaultNotOverride": "defaultnotoverride",
+            "DefaultOverride": "defaultoverride",
+            "foo": "bar"
+          },
+          "timeouts": null,
+          "user_data_replace_on_change": false,
+          "volume_tags": {
+            "baz": "bat"
+          }
+        },
+        "after_unknown": {
+          "arn": true,
+          "associate_public_ip_address": true,
+          "availability_zone": true,
+          "capacity_reservation_specification": true,
+          "cpu_core_count": true,
+          "cpu_options": true,
+          "cpu_threads_per_core": true,
+          "credit_specification": [],
+          "disable_api_stop": true,
+          "disable_api_termination": true,
+          "ebs_block_device": [
+            {
+              "encrypted": true,
+              "kms_key_id": true,
+              "snapshot_id": true,
+              "throughput": true,
+              "volume_id": true
+            }
+          ],
+          "ebs_optimized": true,
+          "enclave_options": true,
+          "ephemeral_block_device": true,
+          "host_id": true,
+          "host_resource_group_arn": true,
+          "iam_instance_profile": true,
+          "id": true,
+          "instance_initiated_shutdown_behavior": true,
+          "instance_lifecycle": true,
+          "instance_market_options": true,
+          "instance_state": true,
+          "ipv6_address_count": true,
+          "ipv6_addresses": true,
+          "key_name": true,
+          "launch_template": [],
+          "maintenance_options": true,
+          "metadata_options": true,
+          "monitoring": true,
+          "network_interface": true,
+          "outpost_arn": true,
+          "password_data": true,
+          "placement_group": true,
+          "placement_partition_number": true,
+          "primary_network_interface_id": true,
+          "private_dns": true,
+          "private_dns_name_options": true,
+          "private_ip": true,
+          "public_dns": true,
+          "public_ip": true,
+          "root_block_device": [
+            {
+              "device_name": true,
+              "encrypted": true,
+              "iops": true,
+              "kms_key_id": true,
+              "throughput": true,
+              "volume_id": true,
+              "volume_type": true
+            }
+          ],
+          "secondary_private_ips": true,
+          "security_groups": true,
+          "spot_instance_request_id": true,
+          "subnet_id": true,
+          "tags": {},
+          "tags_all": {},
+          "tenancy": true,
+          "user_data": true,
+          "user_data_base64": true,
+          "volume_tags": {},
+          "vpc_security_group_ids": true
+        },
+        "before_sensitive": false,
+        "after_sensitive": {
+          "capacity_reservation_specification": [],
+          "cpu_options": [],
+          "credit_specification": [],
+          "ebs_block_device": [
+            {}
+          ],
+          "enclave_options": [],
+          "ephemeral_block_device": [],
+          "instance_market_options": [],
+          "ipv6_addresses": [],
+          "launch_template": [],
+          "maintenance_options": [],
+          "metadata_options": [],
+          "network_interface": [],
+          "private_dns_name_options": [],
+          "root_block_device": [
+            {}
+          ],
+          "secondary_private_ips": [],
+          "security_groups": [],
+          "tags": {},
+          "tags_all": {},
+          "volume_tags": {},
+          "vpc_security_group_ids": []
+        }
+      }
+    }
+  ],
+  "configuration": {
+    "provider_config": {
+      "aws": {
+        "name": "aws",
+        "expressions": {
+          "access_key": {
+            "constant_value": "mock_access_key"
+          },
+          "default_tags": [
+            {
+              "tags": {
+                "constant_value": {
+                  "DefaultNotOverride": "defaultnotoverride",
+                  "DefaultOverride": "defaultoverride"
+                }
+              }
+            }
+          ],
+          "region": {
+            "constant_value": "us-east-1"
+          },
+          "secret_key": {
+            "constant_value": "mock_secret_key"
+          },
+          "skip_credentials_validation": {
+            "constant_value": true
+          },
+          "skip_requesting_account_id": {
+            "constant_value": true
+          }
+        }
+      }
+    },
+    "root_module": {
+      "resources": [
+        {
+          "address": "aws_appautoscaling_target.autoscale_dynamodb_table_read_target",
+          "mode": "managed",
+          "type": "aws_appautoscaling_target",
+          "name": "autoscale_dynamodb_table_read_target",
+          "provider_config_key": "aws",
+          "expressions": {
+            "max_capacity": {
+              "constant_value": 100
+            },
+            "min_capacity": {
+              "constant_value": 5
+            },
+            "resource_id": {
+              "constant_value": "table/LiteralTableRef"
+            },
+            "scalable_dimension": {
+              "constant_value": "dynamodb:table:ReadCapacityUnits"
+            },
+            "service_namespace": {
+              "constant_value": "dynamodb"
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "aws_appautoscaling_target.autoscale_dynamodb_table_write_target",
+          "mode": "managed",
+          "type": "aws_appautoscaling_target",
+          "name": "autoscale_dynamodb_table_write_target",
+          "provider_config_key": "aws",
+          "expressions": {
+            "max_capacity": {
+              "constant_value": 99
+            },
+            "min_capacity": {
+              "constant_value": 6
+            },
+            "resource_id": {
+              "references": [
+                "aws_dynamodb_table.autoscale_dynamodb_table.name",
+                "aws_dynamodb_table.autoscale_dynamodb_table"
+              ]
+            },
+            "scalable_dimension": {
+              "constant_value": "dynamodb:table:WriteCapacityUnits"
+            },
+            "service_namespace": {
+              "constant_value": "dynamodb"
+            }
+          },
+          "schema_version": 0
+        },
+        {
+          "address": "aws_dynamodb_table.autoscale_dynamodb_table",
+          "mode": "managed",
+          "type": "aws_dynamodb_table",
+          "name": "autoscale_dynamodb_table",
+          "provider_config_key": "aws",
+          "expressions": {
+            "attribute": [
+              {
+                "name": {
+                  "constant_value": "UserId"
+                },
+                "type": {
+                  "constant_value": "S"
+                }
+              },
+              {
+                "name": {
+                  "constant_value": "GameTitle"
+                },
+                "type": {
+                  "constant_value": "S"
+                }
+              }
+            ],
+            "billing_mode": {
+              "constant_value": "PROVISIONED"
+            },
+            "hash_key": {
+              "constant_value": "UserId"
+            },
+            "name": {
+              "constant_value": "GameScores"
+            },
+            "range_key": {
+              "constant_value": "GameTitle"
+            },
+            "read_capacity": {
+              "constant_value": 30
+            },
+            "write_capacity": {
+              "constant_value": 20
+            }
+          },
+          "schema_version": 1
+        },
+        {
+          "address": "aws_instance.web_app",
+          "mode": "managed",
+          "type": "aws_instance",
+          "name": "web_app",
+          "provider_config_key": "aws",
+          "expressions": {
+            "ami": {
+              "constant_value": "ami-674cbc1e"
+            },
+            "ebs_block_device": [
+              {
+                "device_name": {
+                  "constant_value": "my_data"
+                },
+                "iops": {
+                  "constant_value": 800
+                },
+                "volume_size": {
+                  "constant_value": 1000
+                },
+                "volume_type": {
+                  "constant_value": "gp2"
+                }
+              }
+            ],
+            "instance_type": {
+              "constant_value": "m5.4xlarge"
+            },
+            "root_block_device": [
+              {
+                "volume_size": {
+                  "constant_value": 51
+                }
+              }
+            ],
+            "tags": {
+              "constant_value": {
+                "foo": "bar"
+              }
+            },
+            "volume_tags": {
+              "constant_value": {
+                "baz": "bat"
+              }
+            }
+          },
+          "schema_version": 1
+        }
+      ]
+    }
+  }
+}

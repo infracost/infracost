@@ -1,0 +1,226 @@
+{
+  "version": "0.2",
+  "metadata": {
+    "infracostCommand": "breakdown",
+    "vcsBranch": "stub-branch",
+    "vcsCommitSha": "stub-sha",
+    "vcsCommitAuthorName": "stub-author",
+    "vcsCommitAuthorEmail": "stub@stub.com",
+    "vcsCommitTimestamp": "2021-10-11T22:41:00.144866-04:00",
+    "vcsCommitMessage": "stub-message",
+    "vcsRepositoryUrl": "https://github.com/infracost/infracost"
+  },
+  "currency": "USD",
+  "projects": [
+    {
+      "name": "infracost/infracost/cmd/infracost/testdata/diff_with_policy_data_upload",
+      "metadata": {
+        "path": "testdata/diff_with_policy_data_upload",
+        "type": "terraform_dir",
+        "policySha": "someoldshastring",
+        "pastPolicySha": "someoldshastring",
+        "vcsSubPath": "cmd/infracost/testdata/diff_with_policy_data_upload",
+        "providers": [
+          {
+            "name": "aws",
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "filename": "testdata/diff_with_policy_data_upload/main.tf",
+            "startLine": 1,
+            "endLine": 14
+          }
+        ]
+      },
+      "pastBreakdown": {
+        "resources": [
+          {
+            "name": "aws_instance.web_app",
+            "resourceType": "aws_instance",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride",
+              "foo": "bar",
+              "volume_tags.baz": "bat"
+            },
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_instance.web_app",
+                  "endLine": 37,
+                  "filename": "testdata/diff_with_policy_data_upload/main.tf",
+                  "startLine": 16
+                }
+              ],
+              "checksum": "3acb8d7106140c67676ef9dec839a0c530c96b1b14ebf4cc450e39b1a9d092cd",
+              "endLine": 37,
+              "filename": "testdata/diff_with_policy_data_upload/main.tf",
+              "startLine": 16
+            },
+            "hourlyCost": "0.33597260273972602",
+            "monthlyCost": "245.26",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, m5.xlarge)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.192",
+                "hourlyCost": "0.192",
+                "monthlyCost": "140.16"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.00698630136986301",
+                "monthlyCost": "5.1",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.0698630136986301",
+                    "monthlyQuantity": "51",
+                    "price": "0.1",
+                    "hourlyCost": "0.00698630136986301",
+                    "monthlyCost": "5.1"
+                  }
+                ]
+              },
+              {
+                "name": "ebs_block_device[0]",
+                "metadata": {},
+                "hourlyCost": "0.13698630136986301",
+                "monthlyCost": "100",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "1.3698630136986301",
+                    "monthlyQuantity": "1000",
+                    "price": "0.1",
+                    "hourlyCost": "0.13698630136986301",
+                    "monthlyCost": "100"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "totalHourlyCost": "0.33597260273972602",
+        "totalMonthlyCost": "245.26"
+      },
+      "breakdown": {
+        "resources": [
+          {
+            "name": "aws_instance.web_app",
+            "resourceType": "aws_instance",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride",
+              "foo": "bar",
+              "volume_tags.baz": "bat"
+            },
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_instance.web_app",
+                  "endLine": 37,
+                  "filename": "testdata/diff_with_policy_data_upload/main.tf",
+                  "startLine": 16
+                }
+              ],
+              "checksum": "3acb8d7106140c67676ef9dec839a0c530c96b1b14ebf4cc450e39b1a9d092cd",
+              "endLine": 37,
+              "filename": "testdata/diff_with_policy_data_upload/main.tf",
+              "startLine": 16
+            },
+            "hourlyCost": "0.33597260273972602",
+            "monthlyCost": "245.26",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, m5.xlarge)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.192",
+                "hourlyCost": "0.192",
+                "monthlyCost": "140.16"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.00698630136986301",
+                "monthlyCost": "5.1",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.0698630136986301",
+                    "monthlyQuantity": "51",
+                    "price": "0.1",
+                    "hourlyCost": "0.00698630136986301",
+                    "monthlyCost": "5.1"
+                  }
+                ]
+              },
+              {
+                "name": "ebs_block_device[0]",
+                "metadata": {},
+                "hourlyCost": "0.13698630136986301",
+                "monthlyCost": "100",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "1.3698630136986301",
+                    "monthlyQuantity": "1000",
+                    "price": "0.1",
+                    "hourlyCost": "0.13698630136986301",
+                    "monthlyCost": "100"
+                  }
+                ]
+              }
+            ]
+          }
+        ],
+        "totalHourlyCost": "0.33597260273972602",
+        "totalMonthlyCost": "245.26"
+      },
+      "diff": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
+      },
+      "summary": {
+        "totalDetectedResources": 1,
+        "totalSupportedResources": 1,
+        "totalUnsupportedResources": 0,
+        "totalUsageBasedResources": 1,
+        "totalNoPriceResources": 0,
+        "unsupportedResourceCounts": {},
+        "noPriceResourceCounts": {}
+      }
+    }
+  ],
+  "totalHourlyCost": "0.33597260273972602",
+  "totalMonthlyCost": "245.26",
+  "pastTotalHourlyCost": "0.33597260273972602",
+  "pastTotalMonthlyCost": "245.26",
+  "diffTotalHourlyCost": "0",
+  "diffTotalMonthlyCost": "0",
+  "timeGenerated": "2021-10-11T22:41:00.144866-04:00",
+  "summary": {
+    "totalDetectedResources": 1,
+    "totalSupportedResources": 1,
+    "totalUnsupportedResources": 0,
+    "totalUsageBasedResources": 1,
+    "totalNoPriceResources": 0,
+    "unsupportedResourceCounts": {},
+    "noPriceResourceCounts": {}
+  }
+}
