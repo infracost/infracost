@@ -87,10 +87,12 @@ func (c *PolicyV2APIClient) uploadProjectPolicyData(p2rs []policy2Resource) (str
 		return "", fmt.Errorf("query storePolicyResources failed  %w", err)
 	}
 
-	if len(results) > 0 {
-		if results[0].Get("errors").Exists() {
-			return "", fmt.Errorf("query storePolicyResources failed, received graphql error: %s", results[0].Get("errors").String())
-		}
+	if len(results) == 0 {
+		return "", nil
+	}
+
+	if results[0].Get("errors").Exists() {
+		return "", fmt.Errorf("query storePolicyResources failed, received graphql error: %s", results[0].Get("errors").String())
 	}
 
 	data := results[0].Get("data")
@@ -267,10 +269,12 @@ func (c *PolicyV2APIClient) getPolicyResourceAllowList() (resourceAllowList, err
 		return nil, fmt.Errorf("query policyResourceAllowList failed %w", err)
 	}
 
-	if len(results) > 0 {
-		if results[0].Get("errors").Exists() {
-			return nil, fmt.Errorf("query policyResourceAllowList failed, received graphql error: %s", results[0].Get("errors").String())
-		}
+	if len(results) == 0 {
+		return nil, nil
+	}
+
+	if results[0].Get("errors").Exists() {
+		return nil, fmt.Errorf("query policyResourceAllowList failed, received graphql error: %s", results[0].Get("errors").String())
 	}
 
 	data := results[0].Get("data")

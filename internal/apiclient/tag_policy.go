@@ -70,10 +70,12 @@ func (c *TagPolicyAPIClient) CheckTagPolicies(ctx *config.RunContext, out output
 		return nil, fmt.Errorf("query failed when checking tag policies %w", err)
 	}
 
-	if len(results) > 0 {
-		if results[0].Get("errors").Exists() {
-			return nil, fmt.Errorf("query failed when checking tag policies, received graphql error: %s", results[0].Get("errors").String())
-		}
+	if len(results) == 0 {
+		return nil, nil
+	}
+
+	if results[0].Get("errors").Exists() {
+		return nil, fmt.Errorf("query failed when checking tag policies, received graphql error: %s", results[0].Get("errors").String())
 	}
 
 	data := results[0].Get("data")
