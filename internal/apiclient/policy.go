@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 	"time"
 
 	jsoniter "github.com/json-iterator/go"
@@ -53,7 +54,11 @@ func (r PolicyClient) GetPolicies(toScan []*schema.ResourceData) ([]Policy, erro
 	if err != nil {
 		return nil, fmt.Errorf("failed to build request to policy API %w", err)
 	}
-	req.Header.Set("X-Api-Key", r.apiKey)
+	if strings.HasPrefix(r.apiKey, "ics") {
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", r.apiKey))
+	} else {
+		req.Header.Set("X-Api-Key", r.apiKey)
+	}
 
 	res, err := r.client.Do(req)
 	if err != nil {

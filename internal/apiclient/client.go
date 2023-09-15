@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
@@ -81,7 +82,7 @@ func (c *APIClient) doRequest(method string, path string, d interface{}) ([]byte
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return []byte{}, &APIError{err, "Invalid API response"}
+		return []byte{}, &APIError{err, fmt.Sprintf("Invalid API response %s %s", method, path)}
 	}
 
 	if resp.StatusCode != 200 {
@@ -89,7 +90,7 @@ func (c *APIClient) doRequest(method string, path string, d interface{}) ([]byte
 
 		err = json.Unmarshal(respBody, &r)
 		if err != nil {
-			return []byte{}, &APIError{fmt.Errorf(resp.Status), "Invalid API response"}
+			return []byte{}, &APIError{err, fmt.Sprintf("Invalid API response %q %q body: %q", method, path, respBody)}
 		}
 
 		if r.Error == "Invalid API key" {
@@ -108,7 +109,12 @@ func (c *APIClient) AddDefaultHeaders(req *http.Request) {
 
 func (c *APIClient) AddAuthHeaders(req *http.Request) {
 	c.AddDefaultHeaders(req)
-	req.Header.Set("X-Api-Key", c.apiKey)
+	if strings.HasPrefix(c.apiKey, "ics") {
+		req.Header.Set("Authorization", fmt.Sprintf("Bearer %s", c.apiKey))
+	} else {
+		req.Header.Set("X-Api-Key", c.apiKey)
+	}
+
 	if c.uuid != uuid.Nil {
 		req.Header.Set("X-Infracost-Trace-Id", fmt.Sprintf("cli=%s", c.uuid.String()))
 	}
