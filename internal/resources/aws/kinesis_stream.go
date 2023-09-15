@@ -59,10 +59,11 @@ func (r *KinesisStream) UsageSchema() []*schema.UsageItem {
 func (r *KinesisStream) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
+
 // Set some vars that come from the pricing api
 var (
-     onDemandStreamName string = "ON_DEMAND"
-     provisionedStreamName string = "PROVISIONED"
+	onDemandStreamName    string = "ON_DEMAND"
+	provisionedStreamName string = "PROVISIONED"
 )
 
 // BuildResource builds a schema.Resource from a valid KinesisStream struct.
@@ -71,14 +72,15 @@ var (
 func (r *KinesisStream) BuildResource() *schema.Resource {
 	costComponents := []*schema.CostComponent{}
 	// Depending on the stream mode, we will have different cost components
-	if r.StreamMode == OnDemandStreamName {
+	if r.StreamMode == onDemandStreamName {
 		costComponents = append(costComponents, r.onDemandStreamCostComponent())
 		costComponents = append(costComponents, r.onDemandDataIngestedCostComponent())
 		costComponents = append(costComponents, r.onDemandDataRetrievalCostComponent())
 		costComponents = append(costComponents, r.onDemandEfoDataRetrievalCostComponent())
 		costComponents = append(costComponents, r.onDemandExtendedRetentionCostComponent())
 		costComponents = append(costComponents, r.onDemandLongTermRetentionCostComponent())
-	} else if r.StreamMode == ProvisionedStreamName {
+	}
+	if r.StreamMode == provisionedStreamName {
 		costComponents = append(costComponents, r.provisionedStreamCostComponent())
 		costComponents = append(costComponents, r.provisionedStreamPutUnitsCostComponent())
 		costComponents = append(costComponents, r.provisionedExtendedRetentionCostComponent())
@@ -97,7 +99,7 @@ func (r *KinesisStream) BuildResource() *schema.Resource {
 
 func (r *KinesisStream) onDemandStreamCostComponent() *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:           OnDemandStreamName,
+		Name:           onDemandStreamName,
 		Unit:           "hours",
 		UnitMultiplier: decimal.NewFromInt(1),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
@@ -229,7 +231,7 @@ func (r *KinesisStream) onDemandLongTermRetentionCostComponent() *schema.CostCom
 
 func (r *KinesisStream) provisionedStreamCostComponent() *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:           ProvisionedStreamName,
+		Name:           provisionedStreamName,
 		Unit:           "hours",
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(r.ShardCount)),
 		UnitMultiplier: decimal.NewFromInt(1),
