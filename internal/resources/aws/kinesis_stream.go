@@ -59,15 +59,15 @@ func (r *KinesisStream) UsageSchema() []*schema.UsageItem {
 func (r *KinesisStream) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
+// Set some vars that come from the pricing api
+var (
+     onDemandStreamName string = "ON_DEMAND"
+     provisionedStreamName string = "PROVISIONED"
+)
 
 // BuildResource builds a schema.Resource from a valid KinesisStream struct.
 // This method is called after the resource is initialized by an IaC provider.
 // See providers folder for more information.
-
-// Set some vars that come from the pricing api
-var OnDemandStreamName string = "ON_DEMAND"
-var ProvisionedStreamName string = "PROVISIONED"
-
 func (r *KinesisStream) BuildResource() *schema.Resource {
 	costComponents := []*schema.CostComponent{}
 	// Depending on the stream mode, we will have different cost components
