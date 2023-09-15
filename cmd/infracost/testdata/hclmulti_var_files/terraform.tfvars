@@ -1,1 +1,1 @@
-root_vol_size=4000
+root_vol_size = 4000
