@@ -10,7 +10,6 @@ import (
 //
 // Resource information: https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/kinesis_stream
 // Pricing information: https://aws.amazon.com/kinesis/data-streams/pricing/
-
 type KinesisStream struct {
 	Address    string
 	Region     string
