@@ -189,10 +189,7 @@
           "type": "string"
         },
         "resource_attributes": {
-          "type": "string",
-          "media": {
-            "binaryEncoding": "base64"
-          }
+          "additionalProperties": true
         },
         "address": {
           "type": "string"
