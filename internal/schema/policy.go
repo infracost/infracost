@@ -1,7 +1,7 @@
 package schema
 
 import (
-	json "github.com/json-iterator/go"
+	"encoding/json"
 
 	"github.com/shopspring/decimal"
 )
