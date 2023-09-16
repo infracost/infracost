@@ -35,6 +35,7 @@ type QueryCLISettingsResponse struct {
 	ActualCostsEnabled bool `json:"actualCostsEnabled"`
 	UsageAPIEnabled    bool `json:"usageApiEnabled"`
 	TagsAPIEnabled     bool `json:"tagsApiEnabled"`
+	PoliciesAPIEnabled bool `json:"policiesApiEnabled"`
 }
 
 type runInput struct {
@@ -209,6 +210,7 @@ func (c *DashboardAPIClient) QueryCLISettings() (QueryCLISettingsResponse, error
 				actualCostsEnabled
 				usageApiEnabled
 				tagsApiEnabled
+				policiesApiEnabled
         	}
     	}
 	`

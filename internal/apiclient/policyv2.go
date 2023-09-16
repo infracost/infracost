@@ -11,6 +11,7 @@ import (
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/logging"
+	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/schema"
 )
 
@@ -39,6 +40,123 @@ func NewPolicyV2APIClient(ctx *config.RunContext) (*PolicyV2APIClient, error) {
 	c.allowList = prw
 
 	return &c, nil
+}
+
+func (c *PolicyV2APIClient) CheckPolicies(ctx *config.RunContext, out output.Root) ([]output.TagPolicy, []output.FinOpsPolicy, error) {
+	ri, err := newRunInput(ctx, out)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	q := `
+		query($run: RunInput!) {
+			evaluatePolicies(run: $run) {
+				tagPolicyResults {
+					name
+					tagPolicyId
+					message
+					prComment
+					blockPr
+					totalDetectedResources
+					totalTaggableResources
+					resources {
+						address
+						resourceType
+						path
+						line
+						projectNames
+						missingMandatoryTags
+						invalidTags {
+							key
+							value
+							validValues
+							validRegex
+						}
+					}
+				}
+				finopsPolicyResults {
+					name
+					policyId
+					message
+					blockPr
+					prComment
+					totalApplicableResources
+					resources {
+						checksum
+						address
+						resourceType
+						path
+						startLine
+						endLine
+						projectNames
+						issues {
+							attribute
+							value
+							description
+						}
+					}
+				}
+			}
+		}
+	`
+
+	v := map[string]interface{}{
+		"run": *ri,
+	}
+	results, err := c.doQueries([]GraphQLQuery{{q, v}})
+	if err != nil {
+		return nil, nil, fmt.Errorf("query failed when checking tag policies %w", err)
+	}
+
+	if len(results) == 0 {
+		return nil, nil, nil
+	}
+
+	if results[0].Get("errors").Exists() {
+		return nil, nil, fmt.Errorf("query failed when checking tag policies, received graphql error: %s", results[0].Get("errors").String())
+	}
+
+	data := results[0].Get("data")
+
+	var policies = struct {
+		EvaluatePolicies struct {
+			TagPolicies    []output.TagPolicy    `json:"tagPolicyResults"`
+			FinOpsPolicies []output.FinOpsPolicy `json:"finopsPolicyResults"`
+		} `json:"evaluatePolicies"`
+	}{}
+
+	err = json.Unmarshal([]byte(data.Raw), &policies)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to unmarshal tag policies %w", err)
+	}
+
+	if len(policies.EvaluatePolicies.TagPolicies) > 0 {
+		checkedStr := "tag policy"
+		if len(policies.EvaluatePolicies.TagPolicies) > 1 {
+			checkedStr = "tag policies"
+		}
+		msg := fmt.Sprintf(`%d %s checked`, len(policies.EvaluatePolicies.TagPolicies), checkedStr)
+		if ctx.Config.IsLogging() {
+			logging.Logger.Info(msg)
+		} else {
+			fmt.Fprintf(ctx.ErrWriter, "%s\n", msg)
+		}
+	}
+
+	if len(policies.EvaluatePolicies.FinOpsPolicies) > 0 {
+		checkedStr := "finops policy"
+		if len(policies.EvaluatePolicies.FinOpsPolicies) > 1 {
+			checkedStr = "finops policies"
+		}
+		msg := fmt.Sprintf(`%d %s checked`, len(policies.EvaluatePolicies.TagPolicies), checkedStr)
+		if ctx.Config.IsLogging() {
+			logging.Logger.Info(msg)
+		} else {
+			fmt.Fprintf(ctx.ErrWriter, "%s\n", msg)
+		}
+	}
+
+	return policies.EvaluatePolicies.TagPolicies, policies.EvaluatePolicies.FinOpsPolicies, nil
 }
 
 // UploadPolicyData sends a filtered set of a project's resource information to Infracost Cloud and

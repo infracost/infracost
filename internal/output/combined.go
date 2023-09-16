@@ -205,6 +205,7 @@ func Combine(inputs []ReportInput) (Root, error) {
 	projects := make([]Project, 0)
 	summaries := make([]*Summary, 0, len(inputs))
 	var tagPolicies []TagPolicy
+	var finOpsPolicies []FinOpsPolicy
 	currency := ""
 
 	var metadata Metadata
@@ -227,6 +228,10 @@ func Combine(inputs []ReportInput) (Root, error) {
 
 		if len(input.Root.TagPolicies) > 0 {
 			tagPolicies = append(tagPolicies, input.Root.TagPolicies...)
+		}
+
+		if len(input.Root.FinOpsPolicies) > 0 {
+			finOpsPolicies = append(finOpsPolicies, input.Root.FinOpsPolicies...)
 		}
 
 		if input.Root.TotalHourlyCost != nil {
@@ -294,6 +299,7 @@ func Combine(inputs []ReportInput) (Root, error) {
 	combined.Summary = MergeSummaries(summaries)
 	combined.Metadata = metadata
 	combined.TagPolicies = mergeTagPolicies(tagPolicies)
+	combined.FinOpsPolicies = finOpsPolicies
 	if len(inputs) > 0 {
 		combined.CloudURL = inputs[len(inputs)-1].Root.CloudURL
 	}

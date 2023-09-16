@@ -31,6 +31,7 @@ type Root struct {
 	Currency             string           `json:"currency"`
 	Projects             Projects         `json:"projects"`
 	TagPolicies          []TagPolicy      `json:"tagPolicies,omitempty"`
+	FinOpsPolicies       []FinOpsPolicy   `json:"finOpsPolicies,omitempty"`
 	TotalHourlyCost      *decimal.Decimal `json:"totalHourlyCost"`
 	TotalMonthlyCost     *decimal.Decimal `json:"totalMonthlyCost"`
 	PastTotalHourlyCost  *decimal.Decimal `json:"pastTotalHourlyCost"`
@@ -41,6 +42,34 @@ type Root struct {
 	Summary              *Summary         `json:"summary"`
 	FullSummary          *Summary         `json:"-"`
 	IsCIRun              bool             `json:"-"`
+}
+
+type FinOpsPolicy struct {
+	Name                     string                 `json:"name"`
+	PolicyID                 string                 `json:"policyId"`
+	Message                  string                 `json:"message"`
+	PrComment                bool                   `json:"prComment"`
+	BlockPr                  bool                   `json:"blockPr"`
+	Resources                []FinOpsPolicyResource `json:"resources"`
+	TotalApplicableResources int                    `json:"totalApplicableResources"`
+	TotalTaggableResources   int                    `json:"totalTaggableResources"`
+}
+
+type FinOpsPolicyResource struct {
+	Checksum     string                      `json:"checksum"`
+	Address      string                      `json:"address"`
+	ResourceType string                      `json:"resourceType"`
+	Path         string                      `json:"path"`
+	StartLine    int                         `json:"startLine"`
+	EndLine      int                         `json:"endLine"`
+	ProjectNames []string                    `json:"projectNames"`
+	Issues       []FinOpsPolicyResourceIssue `json:"issues"`
+}
+
+type FinOpsPolicyResourceIssue struct {
+	Attribute   string `json:"attribute"`
+	Value       string `json:"value"`
+	Description string `json:"description"`
 }
 
 // TagPolicy holds information if a given run has applicable tag policy checks.
@@ -509,6 +538,63 @@ func (p PolicyCheckFailures) Error() string {
 	}
 
 	return out.String()
+}
+
+type FinOpsPolicyCheck struct {
+	Failing []FinOpsPolicy
+	Warning []FinOpsPolicy
+	Passing []FinOpsPolicy
+}
+
+func NewFinOpsPolicyChecks(fops []FinOpsPolicy) FinOpsPolicyCheck {
+	fopc := FinOpsPolicyCheck{}
+
+	for _, fop := range fops {
+		if !fop.PrComment {
+			continue
+		}
+
+		if len(fop.Resources) == 0 {
+			fopc.Passing = append(fopc.Passing, fop)
+			continue
+		}
+
+		if fop.BlockPr {
+			fopc.Failing = append(fopc.Failing, fop)
+		} else {
+			fopc.Warning = append(fopc.Warning, fop)
+		}
+	}
+
+	return fopc
+}
+
+func (fopc FinOpsPolicyCheck) Error() string {
+	if len(fopc.Failing) == 0 {
+		return ""
+	}
+
+	out := bytes.NewBuffer([]byte("FinOps policy check failed:\n"))
+
+	for _, fop := range fopc.Failing {
+		fmt.Fprintf(out, "\n  %s: %s\n", fop.Name, fop.Message)
+		for _, r := range fop.Resources {
+			fmt.Fprintf(out, "    %s in project(s) %s\n", r.Address, strings.Join(r.ProjectNames, ", "))
+			for _, f := range r.Failures() {
+				fmt.Fprintf(out, "    - %s\n", f)
+			}
+		}
+	}
+
+	return out.String()
+}
+
+func (r FinOpsPolicyResource) Failures() []string {
+	var f []string
+	for _, i := range r.Issues {
+		f = append(f, fmt.Sprintf("'%s' currently set to '%s': %s", i.Attribute, i.Value, i.Description))
+	}
+	return f
 }
 
 // TagPolicyCheck holds information if a given run has any tag policies enabled.
