@@ -99,7 +99,7 @@ Err:
 Error: Tag policy check failed:
 
   Failing Tag Policy: This should show as a failure
-    module.hosted_cloud_pricing_api.aws_s3_bucket.cloud_pricing_api_db_data in project(s) my-dev-project, my-other-project-with-same-violations
+    module.hosted_cloud_pricing_api.aws_s3_bucket.cloud_pricing_api_db_data in project(s) my-prod-project, my-dev-project
     - Missing mandatory tags: `Environment`, `Team`
     - `Team` has invalid value `devops`, must be one of: `Ops`, `Frontend team`, `Backend team`
     module.hosted_cloud_pricing_api.aws_s3_bucket.cloud_pricing_api_db_data in project(s) my-other-project-with-same-violations
