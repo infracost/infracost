@@ -82,16 +82,22 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 
 	combined.IsCIRun = ctx.IsCIRun()
 
-	if ctx.IsCloudUploadEnabled() && ctx.Config.TagPolicyAPIEndpoint != "" {
-		tagPolicyClient := apiclient.NewTagPolicyAPIClient(ctx)
-		tagPolicies, err := tagPolicyClient.CheckTagPolicies(ctx, combined)
+	if ctx.IsCloudUploadEnabled() && ctx.Config.PolicyV2APIEndpoint != "" {
+		policyClient, err := apiclient.NewPolicyV2APIClient(ctx)
 		if err != nil {
-			logging.Logger.WithError(err).Error("Failed to check tag policies")
-		}
+			logging.Logger.WithError(err).Error("Failed to initialize policies client")
+		} else {
+			tagPolicies, finOpsPolicies, err := policyClient.CheckPolicies(ctx, combined)
+			if err != nil {
+				logging.Logger.WithError(err).Error("Failed to check policies")
+			}
 
-		combined.TagPolicies = tagPolicies
+			combined.TagPolicies = tagPolicies
+			combined.FinOpsPolicies = finOpsPolicies
+		}
 	}
 	tagPolicyCheck := output.NewTagPolicyChecks(combined.TagPolicies)
+	finOpsPolicyCheck := output.NewFinOpsPolicyChecks(combined.FinOpsPolicies)
 
 	var guardrailCheck output.GuardrailCheck
 	dryRun, _ := cmd.Flags().GetBool("dry-run")
@@ -155,6 +161,9 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 	}
 	if len(guardrailCheck.BlockingFailures()) > 0 {
 		return out, guardrailCheck.BlockingFailures()
+	}
+	if len(finOpsPolicyCheck.Failing) > 0 {
+		return out, finOpsPolicyCheck
 	}
 	if len(tagPolicyCheck.FailingTagPolicies) > 0 {
 		return out, tagPolicyCheck

@@ -1,0 +1,294 @@
+[
+  {
+    "data": {
+      "evaluatePolicies": {
+        "tagPolicyResults": [
+          {
+            "name": "Failing Tag Policy",
+            "tagPolicyId": "b2bb1189-1120-4efb-925b-9728d9dd8c84",
+            "message": "This should show as a failure",
+            "blockPr": true,
+            "prComment": true,
+            "resources": [
+              {
+                "address": "module.hosted_cloud_pricing_api.aws_s3_bucket.cloud_pricing_api_db_data",
+                "type": "aws_s3_bucket",
+                "path": "dev/main.tf",
+                "line": 14,
+                "projectNames": [
+                  "my-prod-project",
+                  "my-dev-project"
+                ],
+                "missingMandatoryTags": [
+                  "Environment",
+                  "Team"
+                ],
+                "invalidTags": [
+                  {
+                    "key": "Team",
+                    "validValues": [
+                      "Ops",
+                      "Frontend team",
+                      "Backend team"
+                    ],
+                    "value": "devops"
+                  }
+                ]
+              },
+              {
+                "address": "module.hosted_cloud_pricing_api.aws_s3_bucket.cloud_pricing_api_db_data",
+                "type": "aws_s3_bucket",
+                "path": "dev/main.tf",
+                "line": 14,
+                "projectNames": [
+                  "my-other-project-with-same-violations"
+                ],
+                "missingMandatoryTags": [
+                  "Environment",
+                  "Team"
+                ],
+                "invalidTags": [
+                  {
+                    "key": "Team",
+                    "validValues": [
+                      "Ops",
+                      "Frontend team",
+                      "Backend team"
+                    ],
+                    "value": "devops"
+                  }
+                ]
+              },
+              {
+                "address": "module.hosted_cloud_pricing_api.aws_s3_bucket.cloud_pricing_api_db_data",
+                "type": "aws_s3_bucket",
+                "path": "dev/main.tf",
+                "line": 14,
+                "projectNames": [
+                  "my-other-project-with-different-violations"
+                ],
+                "missingMandatoryTags": [
+                  "Environment",
+                  "Team"
+                ],
+                "invalidTags": [
+                  {
+                    "key": "Team",
+                    "validValues": [
+                      "Ops",
+                      "Frontstart team",
+                      "Backstart team"
+                    ],
+                    "value": "devops"
+                  }
+                ]
+              },
+              {
+                "address": "module.dashboard.aws_dynamodb_table.sessions",
+                "type": "aws_dynamodb_table",
+                "path": "dev/main.tf",
+                "line": 23,
+                "projectNames": [
+                  "my-prod-project"
+                ],
+                "missingMandatoryTags": [],
+                "invalidTags": [
+                  {
+                    "key": "Team",
+                    "validValues": [
+                      "Ops",
+                      "Frontend team",
+                      "Backend team"
+                    ],
+                    "value": "devops"
+                  }
+                ]
+              },
+              {
+                "address": "module.us-east-1-dashboard.aws_db_instance.dashboard",
+                "type": "aws_db_instance",
+                "path": "prod/us-east-1/dashboard/instances.tf",
+                "line": 395,
+                "projectNames": [
+                  "my-prod-project"
+                ],
+                "missingMandatoryTags": [],
+                "invalidTags": [
+                  {
+                    "key": "ServiceCode",
+                    "validRegex": "\\[A-Z\\]{3}-Id",
+                    "value": "srv-id"
+                  }
+                ]
+              },
+              {
+                "address": "module.us-east-1-dashboard.aws_db_instance.dashboard_0",
+                "type": "aws_db_instance",
+                "projectNames": [
+                  "my-X-project"
+                ],
+                "missingMandatoryTags": [
+                  "A"
+                ],
+                "invalidTags": []
+              },
+              {
+                "address": "module.us-east-1-dashboard.aws_db_instance.dashboard_1",
+                "type": "aws_db_instance",
+                "projectNames": [
+                  "my-X-project"
+                ],
+                "missingMandatoryTags": [
+                  "A"
+                ],
+                "invalidTags": []
+              },
+              {
+                "address": "module.us-east-1-dashboard.aws_db_instance.dashboard_2",
+                "type": "aws_db_instance",
+                "projectNames": [
+                  "my-X-project"
+                ],
+                "missingMandatoryTags": [
+                  "A"
+                ],
+                "invalidTags": []
+              },
+              {
+                "address": "module.us-east-1-dashboard.aws_db_instance.dashboard_3",
+                "type": "aws_db_instance",
+                "projectNames": [
+                  "my-X-project"
+                ],
+                "missingMandatoryTags": [
+                  "A"
+                ],
+                "invalidTags": []
+              },
+              {
+                "address": "module.us-east-1-dashboard.aws_db_instance.dashboard_4",
+                "type": "aws_db_instance",
+                "projectNames": [
+                  "my-X-project"
+                ],
+                "missingMandatoryTags": [
+                  "A"
+                ],
+                "invalidTags": []
+              },
+              {
+                "address": "module.us-east-1-dashboard.aws_db_instance.dashboard_5",
+                "type": "aws_db_instance",
+                "projectNames": [
+                  "my-X-project"
+                ],
+                "missingMandatoryTags": [
+                  "A"
+                ],
+                "invalidTags": []
+              },
+              {
+                "address": "module.us-east-1-dashboard.aws_db_instance.dashboard_6",
+                "type": "aws_db_instance",
+                "projectNames": [
+                  "my-X-project"
+                ],
+                "missingMandatoryTags": [
+                  "A"
+                ],
+                "invalidTags": []
+              },
+              {
+                "address": "module.us-east-1-dashboard.aws_db_instance.dashboard_7",
+                "type": "aws_db_instance",
+                "projectNames": [
+                  "my-X-project"
+                ],
+                "missingMandatoryTags": [
+                  "A"
+                ],
+                "invalidTags": []
+              },
+              {
+                "address": "module.us-east-1-dashboard.aws_db_instance.dashboard_8",
+                "type": "aws_db_instance",
+                "projectNames": [
+                  "my-X-project"
+                ],
+                "missingMandatoryTags": [
+                  "A"
+                ],
+                "invalidTags": []
+              },
+              {
+                "address": "module.us-east-1-dashboard.aws_db_instance.dashboard_9",
+                "type": "aws_db_instance",
+                "projectNames": [
+                  "my-X-project"
+                ],
+                "missingMandatoryTags": [
+                  "A"
+                ],
+                "invalidTags": []
+              }
+            ]
+          },
+          {
+            "name": "Warning Tag Policy",
+            "tagPolicyId": "c2ab1119-1120-4efb-925b-9728d9dd8c84",
+            "message": "This should show as a warning",
+            "blockPr": false,
+            "prComment": true,
+            "resources": [
+              {
+                "address": "aws",
+                "type": "provider",
+                "path": "dev/main.tf",
+                "line": 5,
+                "projectNames": [
+                  "my-prod-project"
+                ],
+                "missingMandatoryTags": [
+                  "Environment",
+                  "Team"
+                ],
+                "invalidTags": []
+              }
+            ]
+          },
+          {
+            "name": "Passing Tag Policy",
+            "tagPolicyId": "c2ab1119-1120-4efb-925b-9728d9dd8c84",
+            "message": "This should pass",
+            "blockPr": false,
+            "prComment": true,
+            "resources": []
+          },
+          {
+            "name": "Hidden Tag Policy",
+            "tagPolicyId": "c2ab1119-1120-4efb-925b-9728d9dd8c84",
+            "message": "This shouldn't show up at all since commentPr == false",
+            "blockPr": false,
+            "prComment": false,
+            "resources": [
+              {
+                "address": "aws",
+                "type": "provider",
+                "path": "dev/main.tf",
+                "line": 5,
+                "projectNames": [
+                  "my-prod-project"
+                ],
+                "missingMandatoryTags": [
+                  "Environment",
+                  "Team"
+                ],
+                "invalidTags": []
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+]

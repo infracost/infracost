@@ -52,7 +52,6 @@ type FinOpsPolicy struct {
 	BlockPr                  bool                   `json:"blockPr"`
 	Resources                []FinOpsPolicyResource `json:"resources"`
 	TotalApplicableResources int                    `json:"totalApplicableResources"`
-	TotalTaggableResources   int                    `json:"totalTaggableResources"`
 }
 
 type FinOpsPolicyResource struct {

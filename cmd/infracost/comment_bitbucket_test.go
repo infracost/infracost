@@ -2,11 +2,9 @@ package main_test
 
 import (
 	_ "embed"
-	"fmt"
-	"github.com/infracost/infracost/internal/config"
-	"net/http"
-	"net/http/httptest"
 	"testing"
+
+	"github.com/infracost/infracost/internal/config"
 
 	"github.com/infracost/infracost/internal/testutil"
 )
@@ -33,14 +31,15 @@ func TestCommentBitbucketExcludeDetails(t *testing.T) {
 		nil)
 }
 
-//go:embed testdata/comment_bitbucket_with_tag_policy_checks/tagPolicyResponse.json
-var commentBitbucketWithTagPolicyChecksTagPolicyResponse string
+//go:embed testdata/comment_bitbucket_with_tag_policy_checks/policyV2Response.json
+var commentBitbucketWithTagPolicyChecksPolicyV2Response string
 
 func TestCommentBitbucketWithTagPolicyChecks(t *testing.T) {
-	tagPolicyApi := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, _ = fmt.Fprintln(w, commentBitbucketWithTagPolicyChecksTagPolicyResponse)
-	}))
-	defer tagPolicyApi.Close()
+	policyV2Api := GraphqlTestServer(map[string]string{
+		"policyResourceAllowList": policyResourceAllowlistGraphQLResponse,
+		"evaluatePolicies":        commentBitbucketWithTagPolicyChecksPolicyV2Response,
+	})
+	defer policyV2Api.Close()
 
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
 		[]string{
@@ -53,7 +52,38 @@ func TestCommentBitbucketWithTagPolicyChecks(t *testing.T) {
 			"--dry-run"},
 		&GoldenFileOptions{
 			Env: map[string]string{
-				"INFRACOST_TAG_POLICY_API_ENDPOINT": tagPolicyApi.URL,
+				"INFRACOST_POLICY_V2_API_ENDPOINT": policyV2Api.URL,
+			},
+		},
+		func(c *config.RunContext) {
+			t := true
+			c.Config.EnableCloudUpload = &t
+		},
+	)
+}
+
+//go:embed testdata/comment_bitbucket_with_fin_ops_policy_checks/policyV2Response.json
+var commentBitbucketWithFinOpsPolicyChecksPolicyV2Response string
+
+func TestCommentBitbucketWithFinOpsPolicyChecks(t *testing.T) {
+	policyV2Api := GraphqlTestServer(map[string]string{
+		"policyResourceAllowList": policyResourceAllowlistGraphQLResponse,
+		"evaluatePolicies":        commentBitbucketWithFinOpsPolicyChecksPolicyV2Response,
+	})
+	defer policyV2Api.Close()
+
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"comment",
+			"bitbucket",
+			"--bitbucket-token", "abc",
+			"--repo", "test/test",
+			"--pull-request", "5",
+			"--path", "./testdata/changes.json",
+			"--dry-run"},
+		&GoldenFileOptions{
+			Env: map[string]string{
+				"INFRACOST_POLICY_V2_API_ENDPOINT": policyV2Api.URL,
 			},
 		},
 		func(c *config.RunContext) {

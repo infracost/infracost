@@ -76,14 +76,15 @@ func TestCommentGitHubWithGuardrailCheckPath(t *testing.T) {
 		nil)
 }
 
-//go:embed testdata/comment_git_hub_with_tag_policy_checks/tagPolicyResponse.json
-var commentGitHubWithTagPolicyChecksTagPolicyResponse string
+//go:embed testdata/comment_git_hub_with_fin_ops_policy_checks/policyV2Response.json
+var commentGitHubWithFinOpsPolicyChecksTagPolicyResponse string
 
-func TestCommentGitHubWithTagPolicyChecks(t *testing.T) {
-	tagPolicyApi := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, _ = fmt.Fprintln(w, commentGitHubWithTagPolicyChecksTagPolicyResponse)
-	}))
-	defer tagPolicyApi.Close()
+func TestCommentGitHubWithFinOpsPolicyChecks(t *testing.T) {
+	policyV2Api := GraphqlTestServer(map[string]string{
+		"policyResourceAllowList": policyResourceAllowlistGraphQLResponse,
+		"evaluatePolicies":        commentGitHubWithFinOpsPolicyChecksTagPolicyResponse,
+	})
+	defer policyV2Api.Close()
 
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
 		[]string{
@@ -97,7 +98,39 @@ func TestCommentGitHubWithTagPolicyChecks(t *testing.T) {
 			"--dry-run"},
 		&GoldenFileOptions{
 			Env: map[string]string{
-				"INFRACOST_TAG_POLICY_API_ENDPOINT": tagPolicyApi.URL,
+				"INFRACOST_POLICY_V2_API_ENDPOINT": policyV2Api.URL,
+			},
+		},
+		func(c *config.RunContext) {
+			t := true
+			c.Config.EnableCloudUpload = &t
+		},
+	)
+}
+
+//go:embed testdata/comment_git_hub_with_tag_policy_checks/policyV2Response.json
+var commentGitHubWithTagPolicyChecksTagPolicyResponse string
+
+func TestCommentGitHubWithTagPolicyChecks(t *testing.T) {
+	policyV2Api := GraphqlTestServer(map[string]string{
+		"policyResourceAllowList": policyResourceAllowlistGraphQLResponse,
+		"evaluatePolicies":        commentGitHubWithTagPolicyChecksTagPolicyResponse,
+	})
+	defer policyV2Api.Close()
+
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"comment",
+			"github",
+			"--github-token", "abc",
+			"--repo", "test/test",
+			"--commit", "5",
+			"--show-changed",
+			"--path", "./testdata/changes.json",
+			"--dry-run"},
+		&GoldenFileOptions{
+			Env: map[string]string{
+				"INFRACOST_POLICY_V2_API_ENDPOINT": policyV2Api.URL,
 			},
 		},
 		func(c *config.RunContext) {
