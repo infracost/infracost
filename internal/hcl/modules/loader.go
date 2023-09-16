@@ -384,7 +384,7 @@ func splitModuleSubDir(moduleSource string) (string, string, error) {
 func joinModuleSubDir(moduleAddr string, submodulePath string) string {
 	if submodulePath != "" {
 		parsedURL, err := url.Parse(moduleAddr)
-		if err != nil {
+		if err != nil || parsedURL.RawQuery == "" {
 			return fmt.Sprintf("%s//%s", moduleAddr, submodulePath)
 		}
 
