@@ -96,6 +96,113 @@
       "additionalProperties": false,
       "type": "object"
     },
+    "FinOpsPolicy": {
+      "required": [
+        "name",
+        "policyId",
+        "message",
+        "prComment",
+        "blockPr",
+        "resources",
+        "totalApplicableResources"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "policyId": {
+          "type": "string"
+        },
+        "message": {
+          "type": "string"
+        },
+        "prComment": {
+          "type": "boolean"
+        },
+        "blockPr": {
+          "type": "boolean"
+        },
+        "resources": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/FinOpsPolicyResource"
+          },
+          "type": "array"
+        },
+        "totalApplicableResources": {
+          "type": "integer"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "FinOpsPolicyResource": {
+      "required": [
+        "checksum",
+        "address",
+        "resourceType",
+        "path",
+        "startLine",
+        "endLine",
+        "projectNames",
+        "issues"
+      ],
+      "properties": {
+        "checksum": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "resourceType": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string"
+        },
+        "startLine": {
+          "type": "integer"
+        },
+        "endLine": {
+          "type": "integer"
+        },
+        "projectNames": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "issues": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/FinOpsPolicyResourceIssue"
+          },
+          "type": "array"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
+    "FinOpsPolicyResourceIssue": {
+      "required": [
+        "attribute",
+        "value",
+        "description"
+      ],
+      "properties": {
+        "attribute": {
+          "type": "string"
+        },
+        "value": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false,
+      "type": "object"
+    },
     "Metadata": {
       "required": [
         "infracostCommand",
@@ -456,6 +563,13 @@
           "items": {
             "$schema": "http://json-schema.org/draft-04/schema#",
             "$ref": "#/definitions/TagPolicy"
+          },
+          "type": "array"
+        },
+        "finOpsPolicies": {
+          "items": {
+            "$schema": "http://json-schema.org/draft-04/schema#",
+            "$ref": "#/definitions/FinOpsPolicy"
           },
           "type": "array"
         },
