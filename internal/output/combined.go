@@ -299,7 +299,7 @@ func Combine(inputs []ReportInput) (Root, error) {
 	combined.Summary = MergeSummaries(summaries)
 	combined.Metadata = metadata
 	combined.TagPolicies = mergeTagPolicies(tagPolicies)
-	combined.FinOpsPolicies = finOpsPolicies
+	combined.FinOpsPolicies = mergeFinOpsPolicies(finOpsPolicies)
 	if len(inputs) > 0 {
 		combined.CloudURL = inputs[len(inputs)-1].Root.CloudURL
 	}
@@ -337,6 +337,30 @@ func mergeTagPolicies(tagPolicies []TagPolicy) []TagPolicy {
 	}
 
 	return tpMerged
+}
+
+func mergeFinOpsPolicies(finOpsPolicies []FinOpsPolicy) []FinOpsPolicy {
+	// gather and merge tag policies by id
+	fpMap := map[string]FinOpsPolicy{}
+	for _, fp := range finOpsPolicies {
+		if existingFp, ok := fpMap[fp.PolicyID]; ok {
+			fp.PrComment = existingFp.PrComment || fp.PrComment
+			fp.BlockPr = existingFp.BlockPr || fp.BlockPr
+			fp.Resources = append(existingFp.Resources, fp.Resources...)
+		}
+		fpMap[fp.PolicyID] = fp
+	}
+
+	fpMerged := make([]FinOpsPolicy, 0, len(fpMap))
+	// use the original tagPolicies array to iterate over the map so the order is preserved
+	for _, tp := range finOpsPolicies {
+		if mergedTp, ok := fpMap[tp.PolicyID]; ok {
+			fpMerged = append(fpMerged, mergedTp)
+			delete(fpMap, tp.PolicyID)
+		}
+	}
+
+	return fpMerged
 }
 
 func checkCurrency(inputCurrency, fileCurrency string) (string, error) {
