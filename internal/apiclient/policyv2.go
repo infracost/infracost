@@ -148,7 +148,7 @@ func (c *PolicyV2APIClient) CheckPolicies(ctx *config.RunContext, out output.Roo
 		if len(policies.EvaluatePolicies.FinOpsPolicies) > 1 {
 			checkedStr = "finops policies"
 		}
-		msg := fmt.Sprintf(`%d %s checked`, len(policies.EvaluatePolicies.TagPolicies), checkedStr)
+		msg := fmt.Sprintf(`%d %s checked`, len(policies.EvaluatePolicies.FinOpsPolicies), checkedStr)
 		if ctx.Config.IsLogging() {
 			logging.Logger.Info(msg)
 		} else {

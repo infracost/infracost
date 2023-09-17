@@ -3,8 +3,6 @@ package main
 import (
 	"fmt"
 
-	log "github.com/sirupsen/logrus"
-
 	"github.com/spf13/cobra"
 
 	"github.com/infracost/infracost/internal/apiclient"
@@ -46,16 +44,22 @@ See https://infracost.io/docs/features/cli_commands/#upload-runs`,
 				return fmt.Errorf("could not load input file %s err: %w", path, err)
 			}
 
-			if ctx.Config.TagPolicyAPIEndpoint != "" {
-				tagPolicyClient := apiclient.NewTagPolicyAPIClient(ctx)
-				tagPolicies, err := tagPolicyClient.CheckTagPolicies(ctx, root)
+			if ctx.Config.PolicyV2APIEndpoint != "" {
+				policyClient, err := apiclient.NewPolicyV2APIClient(ctx)
 				if err != nil {
-					log.WithError(err).Error("Failed to check tag policies")
-				}
+					logging.Logger.WithError(err).Error("Failed to initialize policies client")
+				} else {
+					tagPolicies, finOpsPolicies, err := policyClient.CheckPolicies(ctx, root)
+					if err != nil {
+						logging.Logger.WithError(err).Error("Failed to check policies")
+					}
 
-				root.TagPolicies = tagPolicies
+					root.TagPolicies = tagPolicies
+					root.FinOpsPolicies = finOpsPolicies
+				}
 			}
 			tagPolicyCheck := output.NewTagPolicyChecks(root.TagPolicies)
+			finOpsPolicyCheck := output.NewFinOpsPolicyChecks(root.FinOpsPolicies)
 
 			dashboardClient := apiclient.NewDashboardAPIClient(ctx)
 			result, err := dashboardClient.AddRun(ctx, root)
@@ -78,7 +82,9 @@ See https://infracost.io/docs/features/cli_commands/#upload-runs`,
 			if len(result.GuardrailCheck.BlockingFailures()) > 0 {
 				return result.GuardrailCheck.BlockingFailures()
 			}
-
+			if len(finOpsPolicyCheck.Failing) > 0 {
+				return finOpsPolicyCheck
+			}
 			if len(tagPolicyCheck.FailingTagPolicies) > 0 {
 				return tagPolicyCheck
 			}

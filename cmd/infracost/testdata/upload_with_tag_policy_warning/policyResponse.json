@@ -1,0 +1,64 @@
+[
+  {
+    "data": {
+      "evaluatePolicies": {
+        "tagPolicyResults": [
+          {
+            "name": "Warning Tag Policy",
+            "tagPolicyId": "c2ab1119-1120-4efb-925b-9728d9dd8c84",
+            "message": "This should show as a warning",
+            "blockPr": false,
+            "prComment": true,
+            "resources": [
+              {
+                "address": "aws",
+                "type": "provider",
+                "path": "dev/main.tf",
+                "line": 5,
+                "projectNames": [
+                  "my-prod-project"
+                ],
+                "missingMandatoryTags": [
+                  "Environment",
+                  "Team"
+                ],
+                "invalidTags": []
+              }
+            ]
+          },
+          {
+            "name": "Passing Tag Policy",
+            "tagPolicyId": "c2ab1119-1120-4efb-925b-9728d9dd8c84",
+            "message": "This should pass",
+            "blockPr": false,
+            "prComment": true,
+            "resources": []
+          },
+          {
+            "name": "Hidden Tag Policy",
+            "tagPolicyId": "c2ab1119-1120-4efb-925b-9728d9dd8c84",
+            "message": "This shouldn't show up at all since commentPr == false",
+            "blockPr": false,
+            "prComment": false,
+            "resources": [
+              {
+                "address": "aws",
+                "type": "provider",
+                "path": "dev/main.tf",
+                "line": 5,
+                "projectNames": [
+                  "my-prod-project"
+                ],
+                "missingMandatoryTags": [
+                  "Environment",
+                  "Team"
+                ],
+                "invalidTags": []
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+]
