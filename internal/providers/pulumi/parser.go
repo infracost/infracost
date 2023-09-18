@@ -239,7 +239,6 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf g
 				refVal := d.RawValues.Get(searchString).Array()[i]
 				// Check ID map
 				idRefs, ok := idMap[refVal.String()]
-				// log.Debugf("idRefs %s, ok %s", idRefs, ok)
 				if ok {
 
 					for _, ref := range idRefs {
