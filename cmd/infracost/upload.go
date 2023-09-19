@@ -49,13 +49,13 @@ See https://infracost.io/docs/features/cli_commands/#upload-runs`,
 				if err != nil {
 					logging.Logger.WithError(err).Error("Failed to initialize policies client")
 				} else {
-					tagPolicies, finOpsPolicies, err := policyClient.CheckPolicies(ctx, root)
+					policies, err := policyClient.CheckPolicies(ctx, root)
 					if err != nil {
 						logging.Logger.WithError(err).Error("Failed to check policies")
 					}
 
-					root.TagPolicies = tagPolicies
-					root.FinOpsPolicies = finOpsPolicies
+					root.TagPolicies = policies.TagPolicies
+					root.FinOpsPolicies = policies.FinOpsPolicies
 				}
 			}
 			tagPolicyCheck := output.NewTagPolicyChecks(root.TagPolicies)

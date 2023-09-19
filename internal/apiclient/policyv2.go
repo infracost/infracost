@@ -42,10 +42,15 @@ func NewPolicyV2APIClient(ctx *config.RunContext) (*PolicyV2APIClient, error) {
 	return &c, nil
 }
 
-func (c *PolicyV2APIClient) CheckPolicies(ctx *config.RunContext, out output.Root) ([]output.TagPolicy, []output.FinOpsPolicy, error) {
+type PolicyOutput struct {
+	TagPolicies    []output.TagPolicy
+	FinOpsPolicies []output.FinOpsPolicy
+}
+
+func (c *PolicyV2APIClient) CheckPolicies(ctx *config.RunContext, out output.Root) (*PolicyOutput, error) {
 	ri, err := newRunInput(ctx, out)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
 	q := `
@@ -105,15 +110,15 @@ func (c *PolicyV2APIClient) CheckPolicies(ctx *config.RunContext, out output.Roo
 	}
 	results, err := c.doQueries([]GraphQLQuery{{q, v}})
 	if err != nil {
-		return nil, nil, fmt.Errorf("query failed when checking tag policies %w", err)
+		return nil, fmt.Errorf("query failed when checking tag policies %w", err)
 	}
 
 	if len(results) == 0 {
-		return nil, nil, nil
+		return nil, nil
 	}
 
 	if results[0].Get("errors").Exists() {
-		return nil, nil, fmt.Errorf("query failed when checking tag policies, received graphql error: %s", results[0].Get("errors").String())
+		return nil, fmt.Errorf("query failed when checking tag policies, received graphql error: %s", results[0].Get("errors").String())
 	}
 
 	data := results[0].Get("data")
@@ -127,7 +132,7 @@ func (c *PolicyV2APIClient) CheckPolicies(ctx *config.RunContext, out output.Roo
 
 	err = json.Unmarshal([]byte(data.Raw), &policies)
 	if err != nil {
-		return nil, nil, fmt.Errorf("failed to unmarshal tag policies %w", err)
+		return nil, fmt.Errorf("failed to unmarshal tag policies %w", err)
 	}
 
 	if len(policies.EvaluatePolicies.TagPolicies) > 0 {
@@ -156,7 +161,7 @@ func (c *PolicyV2APIClient) CheckPolicies(ctx *config.RunContext, out output.Roo
 		}
 	}
 
-	return policies.EvaluatePolicies.TagPolicies, policies.EvaluatePolicies.FinOpsPolicies, nil
+	return &PolicyOutput{policies.EvaluatePolicies.TagPolicies, policies.EvaluatePolicies.FinOpsPolicies}, nil
 }
 
 // UploadPolicyData sends a filtered set of a project's resource information to Infracost Cloud and

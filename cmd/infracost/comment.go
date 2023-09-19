@@ -87,13 +87,13 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 		if err != nil {
 			logging.Logger.WithError(err).Error("Failed to initialize policies client")
 		} else {
-			tagPolicies, finOpsPolicies, err := policyClient.CheckPolicies(ctx, combined)
+			policies, err := policyClient.CheckPolicies(ctx, combined)
 			if err != nil {
 				logging.Logger.WithError(err).Error("Failed to check policies")
 			}
 
-			combined.TagPolicies = tagPolicies
-			combined.FinOpsPolicies = finOpsPolicies
+			combined.TagPolicies = policies.TagPolicies
+			combined.FinOpsPolicies = policies.FinOpsPolicies
 		}
 	}
 	tagPolicyCheck := output.NewTagPolicyChecks(combined.TagPolicies)
