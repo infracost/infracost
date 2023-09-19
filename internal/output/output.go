@@ -591,7 +591,7 @@ func (fopc FinOpsPolicyCheck) Error() string {
 func (r FinOpsPolicyResource) Failures() []string {
 	var f []string
 	for _, i := range r.Issues {
-		f = append(f, fmt.Sprintf("'%s' currently set to '%s': %s", i.Attribute, i.Value, i.Description))
+		f = append(f, fmt.Sprintf("%q currently set to %q: %s", i.Attribute, i.Value, i.Description))
 	}
 	return f
 }
