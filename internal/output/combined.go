@@ -353,10 +353,10 @@ func mergeFinOpsPolicies(finOpsPolicies []FinOpsPolicy) []FinOpsPolicy {
 
 	fpMerged := make([]FinOpsPolicy, 0, len(fpMap))
 	// use the original tagPolicies array to iterate over the map so the order is preserved
-	for _, tp := range finOpsPolicies {
-		if mergedTp, ok := fpMap[tp.PolicyID]; ok {
-			fpMerged = append(fpMerged, mergedTp)
-			delete(fpMap, tp.PolicyID)
+	for _, fp := range finOpsPolicies {
+		if mergedFp, ok := fpMap[fp.PolicyID]; ok {
+			fpMerged = append(fpMerged, mergedFp)
+			delete(fpMap, fp.PolicyID)
 		}
 	}
 
