@@ -1,7 +1,6 @@
 package output
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -530,7 +529,8 @@ func (p PolicyCheckFailures) Error() string {
 		return ""
 	}
 
-	out := bytes.NewBuffer([]byte("Policy check failed:\n\n"))
+	out := &strings.Builder{}
+	out.WriteString("Policy check failed:\n\n")
 
 	for _, e := range p {
 		out.WriteString(" - " + e + "\n")
@@ -573,7 +573,8 @@ func (fopc FinOpsPolicyCheck) Error() string {
 		return ""
 	}
 
-	out := bytes.NewBuffer([]byte("FinOps policy check failed:\n"))
+	out := &strings.Builder{}
+	out.WriteString("FinOps policy check failed:\n")
 
 	for _, fop := range fopc.Failing {
 		fmt.Fprintf(out, "\n  %s: %s\n", fop.Name, fop.Message)
@@ -632,7 +633,8 @@ func (tpc TagPolicyCheck) Error() string {
 		return ""
 	}
 
-	out := bytes.NewBuffer([]byte("Tag policy check failed:\n"))
+	out := &strings.Builder{}
+	out.WriteString("Tag policy check failed:\n")
 
 	for _, tp := range tpc.FailingTagPolicies {
 		fmt.Fprintf(out, "\n  %s: %s\n", tp.Name, tp.Message)
@@ -820,7 +822,8 @@ func (g GuardrailFailures) Error() string {
 		return ""
 	}
 
-	out := bytes.NewBuffer([]byte("Guardrail check failed:\n\n"))
+	out := &strings.Builder{}
+	out.WriteString("Guardrail check failed:\n\n")
 
 	for _, e := range g {
 		out.WriteString(" - " + e + "\n")
