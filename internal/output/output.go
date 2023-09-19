@@ -1,7 +1,6 @@
 package output
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -31,6 +30,7 @@ type Root struct {
 	Currency             string           `json:"currency"`
 	Projects             Projects         `json:"projects"`
 	TagPolicies          []TagPolicy      `json:"tagPolicies,omitempty"`
+	FinOpsPolicies       []FinOpsPolicy   `json:"finOpsPolicies,omitempty"`
 	TotalHourlyCost      *decimal.Decimal `json:"totalHourlyCost"`
 	TotalMonthlyCost     *decimal.Decimal `json:"totalMonthlyCost"`
 	PastTotalHourlyCost  *decimal.Decimal `json:"pastTotalHourlyCost"`
@@ -41,6 +41,33 @@ type Root struct {
 	Summary              *Summary         `json:"summary"`
 	FullSummary          *Summary         `json:"-"`
 	IsCIRun              bool             `json:"-"`
+}
+
+type FinOpsPolicy struct {
+	Name                     string                 `json:"name"`
+	PolicyID                 string                 `json:"policyId"`
+	Message                  string                 `json:"message"`
+	PrComment                bool                   `json:"prComment"`
+	BlockPr                  bool                   `json:"blockPr"`
+	Resources                []FinOpsPolicyResource `json:"resources"`
+	TotalApplicableResources int                    `json:"totalApplicableResources"`
+}
+
+type FinOpsPolicyResource struct {
+	Checksum     string                      `json:"checksum"`
+	Address      string                      `json:"address"`
+	ResourceType string                      `json:"resourceType"`
+	Path         string                      `json:"path"`
+	StartLine    int                         `json:"startLine"`
+	EndLine      int                         `json:"endLine"`
+	ProjectNames []string                    `json:"projectNames"`
+	Issues       []FinOpsPolicyResourceIssue `json:"issues"`
+}
+
+type FinOpsPolicyResourceIssue struct {
+	Attribute   string `json:"attribute"`
+	Value       string `json:"value"`
+	Description string `json:"description"`
 }
 
 // TagPolicy holds information if a given run has applicable tag policy checks.
@@ -384,7 +411,7 @@ func mergeViolations(violations, otherViolations []PolicyCheckViolations) []Poli
 
 // NewPolicyOutput normalizes a PolicyCheck and a TagPolicyCheck into a PolicyOutput suitable
 // for use in the output markdown template.
-func NewPolicyOutput(pc PolicyCheck, tpc TagPolicyCheck) PolicyOutput {
+func NewPolicyOutput(pc PolicyCheck, tpc TagPolicyCheck, fpc FinOpsPolicyCheck) PolicyOutput {
 	po := PolicyOutput{}
 
 	if pc.Enabled && len(pc.Failures) > 0 {
@@ -410,6 +437,20 @@ func NewPolicyOutput(pc PolicyCheck, tpc TagPolicyCheck) PolicyOutput {
 		po.Checks = append(po.Checks, newTagPolicyCheckOutput(tagPolicy))
 	}
 
+	for _, policy := range fpc.Failing {
+		po.HasFailures = true
+		po.Checks = append(po.Checks, newFinOpsPolicyCheckOutput(policy, finOpsOutputOps{failure: true}))
+	}
+
+	for _, policy := range fpc.Warning {
+		po.HasWarnings = true
+		po.Checks = append(po.Checks, newFinOpsPolicyCheckOutput(policy, finOpsOutputOps{warning: true}))
+	}
+
+	for _, policy := range fpc.Passing {
+		po.Checks = append(po.Checks, newFinOpsPolicyCheckOutput(policy, finOpsOutputOps{}))
+	}
+
 	if pc.Enabled && len(pc.Passed) > 0 {
 		po.Checks = append(po.Checks, PolicyCheckOutput{
 			Name:    "Cost policy passed",
@@ -420,7 +461,49 @@ func NewPolicyOutput(pc PolicyCheck, tpc TagPolicyCheck) PolicyOutput {
 	return po
 }
 
-var maxTagPolicyResourceDetails = 10
+type finOpsOutputOps struct {
+	warning bool
+	failure bool
+}
+
+func newFinOpsPolicyCheckOutput(policy FinOpsPolicy, ops finOpsOutputOps) PolicyCheckOutput {
+	resources := make([]PolicyCheckResourceDetails, len(policy.Resources))
+	for i, resource := range policy.Resources {
+		violations := make([]PolicyCheckViolations, len(resource.Issues))
+		for x, issue := range resource.Issues {
+			violations[x] = PolicyCheckViolations{
+				Details: []string{
+					fmt.Sprintf("%q currently set to %q: %s", issue.Attribute, issue.Value, issue.Description),
+				},
+				ProjectNames: resource.ProjectNames,
+			}
+		}
+		resources[i] = PolicyCheckResourceDetails{
+			Address:      resource.Address,
+			ResourceType: resource.ResourceType,
+			Path:         resource.Path,
+			Line:         resource.StartLine,
+			Violations:   violations,
+		}
+	}
+
+	tc := 0
+	if len(resources) > maxResourceDetails {
+		tc = len(resources) - maxResourceDetails
+		resources = resources[:maxResourceDetails]
+	}
+
+	return PolicyCheckOutput{
+		Name:            policy.Name,
+		Message:         policy.Message,
+		Failure:         ops.failure,
+		Warning:         ops.warning,
+		ResourceDetails: resources,
+		TruncatedCount:  tc,
+	}
+}
+
+var maxResourceDetails = 10
 
 func newTagPolicyCheckOutput(tp TagPolicy) PolicyCheckOutput {
 	// group resources by address so we can show a single block with all project/violation permutations.
@@ -464,10 +547,10 @@ func newTagPolicyCheckOutput(tp TagPolicy) PolicyCheckOutput {
 	}
 
 	tc := 0
-	if len(resourceDetails) > maxTagPolicyResourceDetails {
+	if len(resourceDetails) > maxResourceDetails {
 		// truncate the list of resources so we don't go over the size limit of comments
-		tc = len(resourceDetails) - maxTagPolicyResourceDetails
-		resourceDetails = resourceDetails[:maxTagPolicyResourceDetails]
+		tc = len(resourceDetails) - maxResourceDetails
+		resourceDetails = resourceDetails[:maxResourceDetails]
 	}
 
 	return PolicyCheckOutput{
@@ -502,13 +585,72 @@ func (p PolicyCheckFailures) Error() string {
 		return ""
 	}
 
-	out := bytes.NewBuffer([]byte("Policy check failed:\n\n"))
+	out := &strings.Builder{}
+	out.WriteString("Policy check failed:\n\n")
 
 	for _, e := range p {
 		out.WriteString(" - " + e + "\n")
 	}
 
 	return out.String()
+}
+
+type FinOpsPolicyCheck struct {
+	Failing []FinOpsPolicy
+	Warning []FinOpsPolicy
+	Passing []FinOpsPolicy
+}
+
+func NewFinOpsPolicyChecks(fops []FinOpsPolicy) FinOpsPolicyCheck {
+	fopc := FinOpsPolicyCheck{}
+
+	for _, fop := range fops {
+		if !fop.PrComment {
+			continue
+		}
+
+		if len(fop.Resources) == 0 {
+			fopc.Passing = append(fopc.Passing, fop)
+			continue
+		}
+
+		if fop.BlockPr {
+			fopc.Failing = append(fopc.Failing, fop)
+		} else {
+			fopc.Warning = append(fopc.Warning, fop)
+		}
+	}
+
+	return fopc
+}
+
+func (fopc FinOpsPolicyCheck) Error() string {
+	if len(fopc.Failing) == 0 {
+		return ""
+	}
+
+	out := &strings.Builder{}
+	out.WriteString("FinOps policy check failed:\n")
+
+	for _, fop := range fopc.Failing {
+		fmt.Fprintf(out, "\n  %s: %s\n", fop.Name, fop.Message)
+		for _, r := range fop.Resources {
+			fmt.Fprintf(out, "    %s in project(s) %s\n", r.Address, strings.Join(r.ProjectNames, ", "))
+			for _, f := range r.Failures() {
+				fmt.Fprintf(out, "    - %s\n", f)
+			}
+		}
+	}
+
+	return out.String()
+}
+
+func (r FinOpsPolicyResource) Failures() []string {
+	var f []string
+	for _, i := range r.Issues {
+		f = append(f, fmt.Sprintf("%q currently set to %q: %s", i.Attribute, i.Value, i.Description))
+	}
+	return f
 }
 
 // TagPolicyCheck holds information if a given run has any tag policies enabled.
@@ -547,7 +689,8 @@ func (tpc TagPolicyCheck) Error() string {
 		return ""
 	}
 
-	out := bytes.NewBuffer([]byte("Tag policy check failed:\n"))
+	out := &strings.Builder{}
+	out.WriteString("Tag policy check failed:\n")
 
 	for _, tp := range tpc.FailingTagPolicies {
 		fmt.Fprintf(out, "\n  %s: %s\n", tp.Name, tp.Message)
@@ -735,7 +878,8 @@ func (g GuardrailFailures) Error() string {
 		return ""
 	}
 
-	out := bytes.NewBuffer([]byte("Guardrail check failed:\n\n"))
+	out := &strings.Builder{}
+	out.WriteString("Guardrail check failed:\n\n")
 
 	for _, e := range g {
 		out.WriteString(" - " + e + "\n")

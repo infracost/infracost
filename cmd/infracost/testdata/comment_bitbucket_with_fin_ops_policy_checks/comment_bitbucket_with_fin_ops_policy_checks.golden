@@ -1,0 +1,28 @@
+
+
+## Infracost estimate: **monthly cost will not change**
+## ❌ Policies failed (needs action) ##
+    
+### ❌ Failing FinOps Policy (needs action) ###
+    
+    
+This should show as a failure
+    
+
+> **module.hosted_cloud_pricing_api.aws_s3_bucket.cloud_pricing_api_db_data** at `dev/main.tf:14`
+>
+> * "attribute" currently set to "value": description
+>
+> in projects `my-prod-project`, `my-dev-project`
+
+This comment will be updated when the cost estimate changes.
+
+Comment not posted to Bitbucket (--dry-run was specified)
+
+Err:
+Error: FinOps policy check failed:
+
+  Failing FinOps Policy: This should show as a failure
+    module.hosted_cloud_pricing_api.aws_s3_bucket.cloud_pricing_api_db_data in project(s) my-prod-project, my-dev-project
+    - "attribute" currently set to "value": description
+

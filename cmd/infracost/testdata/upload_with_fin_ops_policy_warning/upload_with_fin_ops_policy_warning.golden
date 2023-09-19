@@ -1,0 +1,4 @@
+
+Logs:
+level=info msg="1 finops policy checked"
+level=info msg="Estimate uploaded to organization 'tim' in Infracost Cloud"

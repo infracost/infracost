@@ -82,16 +82,22 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 
 	combined.IsCIRun = ctx.IsCIRun()
 
-	if ctx.IsCloudUploadEnabled() && ctx.Config.TagPolicyAPIEndpoint != "" {
-		tagPolicyClient := apiclient.NewTagPolicyAPIClient(ctx)
-		tagPolicies, err := tagPolicyClient.CheckTagPolicies(ctx, combined)
+	if ctx.IsCloudUploadEnabled() && ctx.Config.PolicyV2APIEndpoint != "" {
+		policyClient, err := apiclient.NewPolicyV2APIClient(ctx)
 		if err != nil {
-			logging.Logger.WithError(err).Error("Failed to check tag policies")
-		}
+			logging.Logger.WithError(err).Error("Failed to initialize policies client")
+		} else {
+			policies, err := policyClient.CheckPolicies(ctx, combined)
+			if err != nil {
+				logging.Logger.WithError(err).Error("Failed to check policies")
+			}
 
-		combined.TagPolicies = tagPolicies
+			combined.TagPolicies = policies.TagPolicies
+			combined.FinOpsPolicies = policies.FinOpsPolicies
+		}
 	}
 	tagPolicyCheck := output.NewTagPolicyChecks(combined.TagPolicies)
+	finOpsPolicyCheck := output.NewFinOpsPolicyChecks(combined.FinOpsPolicies)
 
 	var guardrailCheck output.GuardrailCheck
 	dryRun, _ := cmd.Flags().GetBool("dry-run")
@@ -128,7 +134,7 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 	opts := output.Options{
 		DashboardEndpoint: ctx.Config.DashboardEndpoint,
 		NoColor:           ctx.Config.NoColor,
-		PolicyOutput:      output.NewPolicyOutput(policyChecks, tagPolicyCheck),
+		PolicyOutput:      output.NewPolicyOutput(policyChecks, tagPolicyCheck, finOpsPolicyCheck),
 		GuardrailCheck:    guardrailCheck,
 	}
 	opts.ShowAllProjects, _ = cmd.Flags().GetBool("show-all-projects")
@@ -155,6 +161,9 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 	}
 	if len(guardrailCheck.BlockingFailures()) > 0 {
 		return out, guardrailCheck.BlockingFailures()
+	}
+	if len(finOpsPolicyCheck.Failing) > 0 {
+		return out, finOpsPolicyCheck
 	}
 	if len(tagPolicyCheck.FailingTagPolicies) > 0 {
 		return out, tagPolicyCheck
@@ -256,4 +265,17 @@ func readPolicyOut(v map[string]interface{}, checks *output.PolicyCheck) {
 	}
 
 	checks.Passed = append(checks.Passed, msg)
+}
+
+func isErrorUnhandled(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	switch err.(type) {
+	case output.PolicyCheckFailures, output.GuardrailFailures, output.TagPolicyCheck, output.FinOpsPolicyCheck:
+		return false
+	}
+
+	return true
 }

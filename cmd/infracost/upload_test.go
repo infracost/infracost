@@ -3,10 +3,11 @@ package main_test
 import (
 	_ "embed"
 	"fmt"
-	"github.com/infracost/infracost/internal/config"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/infracost/infracost/internal/config"
 
 	"github.com/infracost/infracost/internal/testutil"
 )
@@ -183,14 +184,15 @@ func TestUploadWithBlockingGuardrailFailure(t *testing.T) {
 	)
 }
 
-//go:embed testdata/upload_with_blocking_tag_policy_failure/tagPolicyResponse.json
+//go:embed testdata/upload_with_blocking_tag_policy_failure/policyResponse.json
 var uploadWithBlockingTagPolicyFailureResponse string
 
 func TestUploadWithBlockingTagPolicyFailure(t *testing.T) {
-	tagPolicyApi := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, _ = fmt.Fprintln(w, uploadWithBlockingTagPolicyFailureResponse)
-	}))
-	defer tagPolicyApi.Close()
+	policyV2Api := GraphqlTestServer(map[string]string{
+		"policyResourceAllowList": policyResourceAllowlistGraphQLResponse,
+		"evaluatePolicies":        uploadWithBlockingTagPolicyFailureResponse,
+	})
+	defer policyV2Api.Close()
 
 	dashboardApi := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, `[{"data": {"addRun":{
@@ -209,19 +211,20 @@ func TestUploadWithBlockingTagPolicyFailure(t *testing.T) {
 		},
 		func(c *config.RunContext) {
 			c.Config.DashboardAPIEndpoint = dashboardApi.URL
-			c.Config.TagPolicyAPIEndpoint = tagPolicyApi.URL
+			c.Config.PolicyV2APIEndpoint = policyV2Api.URL
 		},
 	)
 }
 
-//go:embed testdata/upload_with_tag_policy_warning/tagPolicyResponse.json
+//go:embed testdata/upload_with_tag_policy_warning/policyResponse.json
 var uploadWithTagPolicyWarningResponse string
 
 func TestUploadWithTagPolicyWarning(t *testing.T) {
-	tagPolicyApi := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, _ = fmt.Fprintln(w, uploadWithTagPolicyWarningResponse)
-	}))
-	defer tagPolicyApi.Close()
+	policyV2Api := GraphqlTestServer(map[string]string{
+		"policyResourceAllowList": policyResourceAllowlistGraphQLResponse,
+		"evaluatePolicies":        uploadWithTagPolicyWarningResponse,
+	})
+	defer policyV2Api.Close()
 
 	dashboardApi := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, `[{"data": {"addRun":{
@@ -240,7 +243,71 @@ func TestUploadWithTagPolicyWarning(t *testing.T) {
 		},
 		func(c *config.RunContext) {
 			c.Config.DashboardAPIEndpoint = dashboardApi.URL
-			c.Config.TagPolicyAPIEndpoint = tagPolicyApi.URL
+			c.Config.PolicyV2APIEndpoint = policyV2Api.URL
+		},
+	)
+}
+
+//go:embed testdata/upload_with_blocking_fin_ops_policy_failure/policyResponse.json
+var uploadWithBlockingFinOpsPolicyFailureResponse string
+
+func TestUploadWithBlockingFinOpsPolicyFailure(t *testing.T) {
+	policyV2Api := GraphqlTestServer(map[string]string{
+		"policyResourceAllowList": policyResourceAllowlistGraphQLResponse,
+		"evaluatePolicies":        uploadWithBlockingFinOpsPolicyFailureResponse,
+	})
+	defer policyV2Api.Close()
+
+	dashboardApi := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, `[{"data": {"addRun":{
+			"id":"d92e0196-e5b0-449b-85c9-5733f6643c2f",
+			"shareUrl":"",
+			"organization":{"id":"767", "name":"tim"}
+		}}}]`)
+	}))
+	defer dashboardApi.Close()
+
+	GoldenFileCommandTest(t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{"upload", "--path", "./testdata/example_out.json", "--log-level", "info"},
+		&GoldenFileOptions{
+			CaptureLogs: true,
+		},
+		func(c *config.RunContext) {
+			c.Config.DashboardAPIEndpoint = dashboardApi.URL
+			c.Config.PolicyV2APIEndpoint = policyV2Api.URL
+		},
+	)
+}
+
+//go:embed testdata/upload_with_fin_ops_policy_warning/policyResponse.json
+var uploadWithFinOpsPolicyWarningResponse string
+
+func TestUploadWithFinOpsPolicyWarning(t *testing.T) {
+	policyV2Api := GraphqlTestServer(map[string]string{
+		"policyResourceAllowList": policyResourceAllowlistGraphQLResponse,
+		"evaluatePolicies":        uploadWithFinOpsPolicyWarningResponse,
+	})
+	defer policyV2Api.Close()
+
+	dashboardApi := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, `[{"data": {"addRun":{
+			"id":"d92e0196-e5b0-449b-85c9-5733f6643c2f",
+			"shareUrl":"",
+			"organization":{"id":"767", "name":"tim"}
+		}}}]`)
+	}))
+	defer dashboardApi.Close()
+
+	GoldenFileCommandTest(t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{"upload", "--path", "./testdata/example_out.json", "--log-level", "info"},
+		&GoldenFileOptions{
+			CaptureLogs: true,
+		},
+		func(c *config.RunContext) {
+			c.Config.DashboardAPIEndpoint = dashboardApi.URL
+			c.Config.PolicyV2APIEndpoint = policyV2Api.URL
 		},
 	)
 }
