@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"sort"
+	"sync"
 
 	"github.com/hashicorp/go-retryablehttp"
 	json "github.com/json-iterator/go"
@@ -17,7 +18,10 @@ import (
 
 type PolicyV2APIClient struct {
 	APIClient
-	allowList resourceAllowList
+
+	allowList     resourceAllowList
+	allowListErr  error
+	allowListOnce sync.Once
 }
 
 // NewPolicyV2APIClient retrieves resource allow-list info from Infracost Cloud and returns a new policy client
@@ -32,12 +36,6 @@ func NewPolicyV2APIClient(ctx *config.RunContext) (*PolicyV2APIClient, error) {
 			uuid:       ctx.UUID(),
 		},
 	}
-
-	prw, err := c.getPolicyResourceAllowList()
-	if err != nil {
-		return nil, err
-	}
-	c.allowList = prw
 
 	return &c, nil
 }
@@ -144,7 +142,10 @@ func (c *PolicyV2APIClient) CheckPolicies(ctx *config.RunContext, out output.Roo
 		if ctx.Config.IsLogging() {
 			logging.Logger.Info(msg)
 		} else {
-			fmt.Fprintf(ctx.ErrWriter, "%s\n", msg)
+			_, err := fmt.Fprintf(ctx.ErrWriter, "%s\n", msg)
+			if err != nil {
+				return nil, fmt.Errorf("failed to write tag policies %w", err)
+			}
 		}
 	}
 
@@ -157,7 +158,10 @@ func (c *PolicyV2APIClient) CheckPolicies(ctx *config.RunContext, out output.Roo
 		if ctx.Config.IsLogging() {
 			logging.Logger.Info(msg)
 		} else {
-			fmt.Fprintf(ctx.ErrWriter, "%s\n", msg)
+			_, err := fmt.Fprintf(ctx.ErrWriter, "%s\n", msg)
+			if err != nil {
+				return nil, fmt.Errorf("failed to write fin ops policies %w", err)
+			}
 		}
 	}
 
@@ -169,6 +173,11 @@ func (c *PolicyV2APIClient) CheckPolicies(ctx *config.RunContext, out output.Roo
 func (c *PolicyV2APIClient) UploadPolicyData(project *schema.Project) error {
 	if project.Metadata == nil {
 		project.Metadata = &schema.ProjectMetadata{}
+	}
+
+	err := c.fetchAllowList()
+	if err != nil {
+		return err
 	}
 
 	filteredResources := c.filterResources(project.PartialResources)
@@ -375,6 +384,18 @@ func calcChecksum(rd *schema.ResourceData) string {
 }
 
 type resourceAllowList map[string]map[string]bool
+
+func (c *PolicyV2APIClient) fetchAllowList() error {
+	c.allowListOnce.Do(func() {
+		prw, err := c.getPolicyResourceAllowList()
+		if err != nil {
+			c.allowListErr = err
+		}
+		c.allowList = prw
+	})
+
+	return c.allowListErr
+}
 
 func (c *PolicyV2APIClient) getPolicyResourceAllowList() (resourceAllowList, error) {
 	q := `
