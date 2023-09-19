@@ -411,7 +411,7 @@ func mergeViolations(violations, otherViolations []PolicyCheckViolations) []Poli
 
 // NewPolicyOutput normalizes a PolicyCheck and a TagPolicyCheck into a PolicyOutput suitable
 // for use in the output markdown template.
-func NewPolicyOutput(pc PolicyCheck, tpc TagPolicyCheck) PolicyOutput {
+func NewPolicyOutput(pc PolicyCheck, tpc TagPolicyCheck, fpc FinOpsPolicyCheck) PolicyOutput {
 	po := PolicyOutput{}
 
 	if pc.Enabled && len(pc.Failures) > 0 {
@@ -437,6 +437,20 @@ func NewPolicyOutput(pc PolicyCheck, tpc TagPolicyCheck) PolicyOutput {
 		po.Checks = append(po.Checks, newTagPolicyCheckOutput(tagPolicy))
 	}
 
+	for _, policy := range fpc.Failing {
+		po.HasFailures = true
+		po.Checks = append(po.Checks, newFinOpsPolicyCheckOutput(policy, finOpsOutputOps{failure: true}))
+	}
+
+	for _, policy := range fpc.Warning {
+		po.HasWarnings = true
+		po.Checks = append(po.Checks, newFinOpsPolicyCheckOutput(policy, finOpsOutputOps{warning: true}))
+	}
+
+	for _, policy := range fpc.Passing {
+		po.Checks = append(po.Checks, newFinOpsPolicyCheckOutput(policy, finOpsOutputOps{}))
+	}
+
 	if pc.Enabled && len(pc.Passed) > 0 {
 		po.Checks = append(po.Checks, PolicyCheckOutput{
 			Name:    "Cost policy passed",
@@ -447,7 +461,49 @@ func NewPolicyOutput(pc PolicyCheck, tpc TagPolicyCheck) PolicyOutput {
 	return po
 }
 
-var maxTagPolicyResourceDetails = 10
+type finOpsOutputOps struct {
+	warning bool
+	failure bool
+}
+
+func newFinOpsPolicyCheckOutput(policy FinOpsPolicy, ops finOpsOutputOps) PolicyCheckOutput {
+	resources := make([]PolicyCheckResourceDetails, len(policy.Resources))
+	for i, resource := range policy.Resources {
+		violations := make([]PolicyCheckViolations, len(resource.Issues))
+		for x, issue := range resource.Issues {
+			violations[x] = PolicyCheckViolations{
+				Details: []string{
+					fmt.Sprintf("%q currently set to %q: %s", issue.Attribute, issue.Value, issue.Description),
+				},
+				ProjectNames: resource.ProjectNames,
+			}
+		}
+		resources[i] = PolicyCheckResourceDetails{
+			Address:      resource.Address,
+			ResourceType: resource.ResourceType,
+			Path:         resource.Path,
+			Line:         resource.StartLine,
+			Violations:   violations,
+		}
+	}
+
+	tc := 0
+	if len(resources) > maxResourceDetails {
+		tc = len(resources) - maxResourceDetails
+		resources = resources[:maxResourceDetails]
+	}
+
+	return PolicyCheckOutput{
+		Name:            policy.Name,
+		Message:         policy.Message,
+		Failure:         ops.failure,
+		Warning:         ops.warning,
+		ResourceDetails: resources,
+		TruncatedCount:  tc,
+	}
+}
+
+var maxResourceDetails = 10
 
 func newTagPolicyCheckOutput(tp TagPolicy) PolicyCheckOutput {
 	// group resources by address so we can show a single block with all project/violation permutations.
@@ -491,10 +547,10 @@ func newTagPolicyCheckOutput(tp TagPolicy) PolicyCheckOutput {
 	}
 
 	tc := 0
-	if len(resourceDetails) > maxTagPolicyResourceDetails {
+	if len(resourceDetails) > maxResourceDetails {
 		// truncate the list of resources so we don't go over the size limit of comments
-		tc = len(resourceDetails) - maxTagPolicyResourceDetails
-		resourceDetails = resourceDetails[:maxTagPolicyResourceDetails]
+		tc = len(resourceDetails) - maxResourceDetails
+		resourceDetails = resourceDetails[:maxResourceDetails]
 	}
 
 	return PolicyCheckOutput{
