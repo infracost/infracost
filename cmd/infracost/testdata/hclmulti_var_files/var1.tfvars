@@ -1,1 +1,1 @@
-instance_type="m5.8xlarge"
+instance_type = "m5.8xlarge"
