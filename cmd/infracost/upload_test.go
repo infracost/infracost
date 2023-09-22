@@ -212,6 +212,7 @@ func TestUploadWithBlockingTagPolicyFailure(t *testing.T) {
 		func(c *config.RunContext) {
 			c.Config.DashboardAPIEndpoint = dashboardApi.URL
 			c.Config.PolicyV2APIEndpoint = policyV2Api.URL
+			c.Config.PoliciesV2Enabled = true
 		},
 	)
 }
@@ -244,6 +245,7 @@ func TestUploadWithTagPolicyWarning(t *testing.T) {
 		func(c *config.RunContext) {
 			c.Config.DashboardAPIEndpoint = dashboardApi.URL
 			c.Config.PolicyV2APIEndpoint = policyV2Api.URL
+			c.Config.PoliciesV2Enabled = true
 		},
 	)
 }
@@ -276,6 +278,7 @@ func TestUploadWithBlockingFinOpsPolicyFailure(t *testing.T) {
 		func(c *config.RunContext) {
 			c.Config.DashboardAPIEndpoint = dashboardApi.URL
 			c.Config.PolicyV2APIEndpoint = policyV2Api.URL
+			c.Config.PoliciesV2Enabled = true
 		},
 	)
 }
@@ -308,6 +311,7 @@ func TestUploadWithFinOpsPolicyWarning(t *testing.T) {
 		func(c *config.RunContext) {
 			c.Config.DashboardAPIEndpoint = dashboardApi.URL
 			c.Config.PolicyV2APIEndpoint = policyV2Api.URL
+			c.Config.PoliciesV2Enabled = true
 		},
 	)
 }
