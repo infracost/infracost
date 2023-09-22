@@ -69,7 +69,7 @@ type FinOpsPolicyResource struct {
 	Path         string                      `json:"path"`
 	StartLine    int                         `json:"startLine"`
 	EndLine      int                         `json:"endLine"`
-	ProjectNames []string                    `json:"projectNames"`
+	ProjectName  string                      `json:"projectName"`
 	Issues       []FinOpsPolicyResourceIssue `json:"issues"`
 	ExclusionID  string                      `json:"exclusionId,omitempty"`
 }
@@ -489,7 +489,7 @@ func newFinOpsPolicyCheckOutput(policy FinOpsPolicy, ops finOpsOutputOps) Policy
 				Details: []string{
 					fmt.Sprintf("%q currently set to %q: %s", issue.Attribute, issue.Value, issue.Description),
 				},
-				ProjectNames: resource.ProjectNames,
+				ProjectNames: []string{resource.ProjectName},
 			}
 		}
 		resources[i] = PolicyCheckResourceDetails{
@@ -652,7 +652,7 @@ func (fopc FinOpsPolicyCheck) Error() string {
 			if r.ExclusionID != "" {
 				continue
 			}
-			fmt.Fprintf(out, "    %s in project(s) %s\n", r.Address, strings.Join(r.ProjectNames, ", "))
+			fmt.Fprintf(out, "    %s in project %s\n", r.Address, r.ProjectName)
 			for _, f := range r.Failures() {
 				fmt.Fprintf(out, "    - %s\n", f)
 			}

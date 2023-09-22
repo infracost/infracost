@@ -91,7 +91,7 @@ func (c *PolicyV2APIClient) CheckPolicies(ctx *config.RunContext, out output.Roo
 						path
 						startLine
 						endLine
-						projectNames
+						projectName
 						issues {
 							attribute
 							value
