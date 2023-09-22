@@ -178,6 +178,9 @@
             "$ref": "#/definitions/FinOpsPolicyResourceIssue"
           },
           "type": "array"
+        },
+        "exclusionId": {
+          "type": "string"
         }
       },
       "additionalProperties": false,

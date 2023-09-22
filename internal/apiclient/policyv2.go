@@ -97,6 +97,7 @@ func (c *PolicyV2APIClient) CheckPolicies(ctx *config.RunContext, out output.Roo
 							value
 							description
 						}
+						exclusionId
 					}
 				}
 			}
