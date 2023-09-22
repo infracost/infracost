@@ -2,6 +2,7 @@ package prices
 
 import (
 	"runtime"
+	"sync"
 
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/config"
@@ -12,7 +13,10 @@ import (
 	"github.com/tidwall/gjson"
 )
 
-var batchSize = 5
+var (
+	batchSize = 5
+	warningMu = &sync.Mutex{}
+)
 
 func PopulatePrices(ctx *config.RunContext, project *schema.Project) error {
 	resources := project.AllResources()
@@ -161,6 +165,9 @@ func setCostComponentPrice(ctx *config.RunContext, currency string, r *schema.Re
 }
 
 func setResourceWarningEvent(ctx *config.RunContext, r *schema.Resource, msg string) {
+	warningMu.Lock()
+	defer warningMu.Unlock()
+
 	warnings := ctx.GetResourceWarnings()
 	if warnings == nil {
 		warnings = make(map[string]map[string]int)
