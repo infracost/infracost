@@ -53,6 +53,15 @@ type FinOpsPolicy struct {
 	TotalApplicableResources int                    `json:"totalApplicableResources"`
 }
 
+func (p *FinOpsPolicy) AllResourcesExcluded() bool {
+	for _, r := range p.Resources {
+		if r.ExclusionId == "" {
+			return false
+		}
+	}
+	return true
+}
+
 type FinOpsPolicyResource struct {
 	Checksum     string                      `json:"checksum"`
 	Address      string                      `json:"address"`
@@ -62,6 +71,7 @@ type FinOpsPolicyResource struct {
 	EndLine      int                         `json:"endLine"`
 	ProjectNames []string                    `json:"projectNames"`
 	Issues       []FinOpsPolicyResourceIssue `json:"issues"`
+	ExclusionId  string                      `json:"exclusionId,omitempty"`
 }
 
 type FinOpsPolicyResourceIssue struct {
@@ -469,6 +479,10 @@ type finOpsOutputOps struct {
 func newFinOpsPolicyCheckOutput(policy FinOpsPolicy, ops finOpsOutputOps) PolicyCheckOutput {
 	resources := make([]PolicyCheckResourceDetails, len(policy.Resources))
 	for i, resource := range policy.Resources {
+		if resource.ExclusionId != "" {
+			continue
+		}
+
 		violations := make([]PolicyCheckViolations, len(resource.Issues))
 		for x, issue := range resource.Issues {
 			violations[x] = PolicyCheckViolations{
@@ -609,7 +623,7 @@ func NewFinOpsPolicyChecks(fops []FinOpsPolicy) FinOpsPolicyCheck {
 			continue
 		}
 
-		if len(fop.Resources) == 0 {
+		if fop.AllResourcesExcluded() {
 			fopc.Passing = append(fopc.Passing, fop)
 			continue
 		}
@@ -635,6 +649,9 @@ func (fopc FinOpsPolicyCheck) Error() string {
 	for _, fop := range fopc.Failing {
 		fmt.Fprintf(out, "\n  %s: %s\n", fop.Name, fop.Message)
 		for _, r := range fop.Resources {
+			if r.ExclusionId != "" {
+				continue
+			}
 			fmt.Fprintf(out, "    %s in project(s) %s\n", r.Address, strings.Join(r.ProjectNames, ", "))
 			for _, f := range r.Failures() {
 				fmt.Fprintf(out, "    - %s\n", f)
