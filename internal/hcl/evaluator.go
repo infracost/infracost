@@ -90,9 +90,10 @@ type Evaluator struct {
 	// workspace is the Terraform workspace that the Evaluator is running within.
 	workspace string
 	// blockBuilder handles generating blocks in the evaluation step.
-	blockBuilder BlockBuilder
-	newSpinner   ui.SpinnerFunc
-	logger       *logrus.Entry
+	blockBuilder   BlockBuilder
+	newSpinner     ui.SpinnerFunc
+	logger         *logrus.Entry
+	filteredBlocks []*Block
 }
 
 // NewEvaluator returns an Evaluator with Context initialised with top level variables.
@@ -162,6 +163,10 @@ func NewEvaluator(
 		newSpinner:     spinFunc,
 		logger:         l,
 	}
+}
+
+func (e *Evaluator) AddFilteredBlocks(blocks ...*Block) {
+	e.filteredBlocks = append(e.filteredBlocks, blocks...)
 }
 
 // MissingVars returns a list of names of the variable blocks with missing input values.
