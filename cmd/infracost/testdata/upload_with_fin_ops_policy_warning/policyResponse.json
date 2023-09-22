@@ -17,10 +17,7 @@
                 "path": "dev/main.tf",
                 "startLine": 14,
                 "endLine:": 15,
-                "projectNames": [
-                  "my-prod-project",
-                  "my-dev-project"
-                ],
+                "projectName": "my-prod-project",
                 "issues": [
                   {
                     "attribute": "attribute",

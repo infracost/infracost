@@ -144,7 +144,7 @@
         "path",
         "startLine",
         "endLine",
-        "projectNames",
+        "projectName",
         "issues"
       ],
       "properties": {
@@ -166,11 +166,8 @@
         "endLine": {
           "type": "integer"
         },
-        "projectNames": {
-          "items": {
-            "type": "string"
-          },
-          "type": "array"
+        "projectName": {
+          "type": "string"
         },
         "issues": {
           "items": {
