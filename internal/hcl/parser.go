@@ -395,14 +395,19 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 		nil,
 	)
 
-	g := NewGraph(evaluator, p.logger)
-	err = g.Populate()
+	// Graph evaluation
+	g, err := NewGraphWithRoot(p.logger)
 	if err != nil {
 		return m, err
 	}
+
+	g.Populate(evaluator)
+	g.ReduceTransitively()
 	g.Walk()
+	evaluator.module.Blocks = evaluator.filteredBlocks
 	root := evaluator.collectModules()
 
+	// Existing evaluation
 	// root, err := evaluator.Run()
 	// if err != nil {
 	// 	return m, err

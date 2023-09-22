@@ -2,6 +2,7 @@ package hcl
 
 import (
 	"strings"
+	"sync"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/rs/zerolog"
@@ -12,6 +13,7 @@ type Context struct {
 	ctx    *hcl.EvalContext
 	parent *Context
 	logger zerolog.Logger
+	mu     sync.Mutex
 }
 
 func NewContext(ctx *hcl.EvalContext, parent *Context, logger zerolog.Logger) *Context {
@@ -23,6 +25,7 @@ func NewContext(ctx *hcl.EvalContext, parent *Context, logger zerolog.Logger) *C
 		ctx:    ctx,
 		parent: parent,
 		logger: logger,
+		mu:     sync.Mutex{},
 	}
 }
 
@@ -80,6 +83,8 @@ func (c *Context) SetByDot(val cty.Value, path string) {
 }
 
 func (c *Context) Set(val cty.Value, parts ...string) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	if len(parts) == 0 {
 		return
 	}
