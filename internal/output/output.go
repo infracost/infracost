@@ -55,7 +55,7 @@ type FinOpsPolicy struct {
 
 func (p *FinOpsPolicy) AllResourcesExcluded() bool {
 	for _, r := range p.Resources {
-		if r.ExclusionId == "" {
+		if r.ExclusionID == "" {
 			return false
 		}
 	}
@@ -71,7 +71,7 @@ type FinOpsPolicyResource struct {
 	EndLine      int                         `json:"endLine"`
 	ProjectNames []string                    `json:"projectNames"`
 	Issues       []FinOpsPolicyResourceIssue `json:"issues"`
-	ExclusionId  string                      `json:"exclusionId,omitempty"`
+	ExclusionID  string                      `json:"exclusionId,omitempty"`
 }
 
 type FinOpsPolicyResourceIssue struct {
@@ -479,7 +479,7 @@ type finOpsOutputOps struct {
 func newFinOpsPolicyCheckOutput(policy FinOpsPolicy, ops finOpsOutputOps) PolicyCheckOutput {
 	resources := make([]PolicyCheckResourceDetails, len(policy.Resources))
 	for i, resource := range policy.Resources {
-		if resource.ExclusionId != "" {
+		if resource.ExclusionID != "" {
 			continue
 		}
 
@@ -649,7 +649,7 @@ func (fopc FinOpsPolicyCheck) Error() string {
 	for _, fop := range fopc.Failing {
 		fmt.Fprintf(out, "\n  %s: %s\n", fop.Name, fop.Message)
 		for _, r := range fop.Resources {
-			if r.ExclusionId != "" {
+			if r.ExclusionID != "" {
 				continue
 			}
 			fmt.Fprintf(out, "    %s in project(s) %s\n", r.Address, strings.Join(r.ProjectNames, ", "))
