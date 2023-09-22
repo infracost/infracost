@@ -274,12 +274,17 @@ func loadCloudSettings(ctx *config.RunContext) {
 		logging.Logger.Info("Enabled actual costs")
 	}
 
-	if result.PoliciesAPIEnabled && ctx.Config.PolicyV2APIEndpoint == "" {
+	if (result.PoliciesAPIEnabled || result.TagsAPIEnabled) && ctx.Config.PolicyV2APIEndpoint == "" {
 		ctx.Config.PolicyV2APIEndpoint = ctx.Config.DashboardAPIEndpoint
-		logging.Logger.Info("Enabled policies API")
+		logging.Logger.Debug("Using default policies V2 endpoint")
 	}
 
-	if result.PoliciesAPIEnabled && result.TagsAPIEnabled {
+	if result.PoliciesAPIEnabled {
+		ctx.Config.PoliciesV2Enabled = true
+		logging.Logger.Info("Enabled policies V2")
+	}
+
+	if result.TagsAPIEnabled {
 		ctx.Config.TagPoliciesEnabled = true
 		logging.Logger.Info("Enabled tag policies")
 	}

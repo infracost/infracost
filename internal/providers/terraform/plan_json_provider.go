@@ -32,7 +32,7 @@ func NewPlanJSONProvider(ctx *config.ProjectContext, includePastResources bool) 
 
 	var policyV2Client *apiclient.PolicyV2APIClient
 	var err error
-	if ctx.RunContext.Config.PolicyV2APIEndpoint != "" {
+	if ctx.RunContext.Config.PoliciesV2Enabled {
 		policyV2Client, err = apiclient.NewPolicyV2APIClient(ctx.RunContext)
 		if err != nil {
 			ctx.Logger().WithError(err).Errorf("failed to initialize policyV2 client")

@@ -168,7 +168,7 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 	}
 
 	var policyV2Client *apiclient.PolicyV2APIClient
-	if runCtx.Config.PolicyV2APIEndpoint != "" {
+	if runCtx.Config.PoliciesV2Enabled {
 		policyV2Client, err = apiclient.NewPolicyV2APIClient(runCtx)
 		if err != nil {
 			logger.WithError(err).Errorf("failed to initialize policyV2 client")

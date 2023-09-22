@@ -230,6 +230,7 @@ func (c *DashboardAPIClient) QueryCLISettings() (QueryCLISettingsResponse, error
 		response.ActualCostsEnabled = results[0].Get("data.cliSettings.actualCostsEnabled").Bool()
 		response.UsageAPIEnabled = results[0].Get("data.cliSettings.usageApiEnabled").Bool()
 		response.TagsAPIEnabled = results[0].Get("data.cliSettings.tagsApiEnabled").Bool()
+		response.PoliciesAPIEnabled = results[0].Get("data.cliSettings.policiesApiEnabled").Bool()
 	}
 	return response, nil
 }
