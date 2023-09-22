@@ -2,83 +2,126 @@ package hcl
 
 import (
 	"fmt"
-	"strings"
+	"sync"
 
 	"github.com/heimdalr/dag"
 	"github.com/sirupsen/logrus"
-	"github.com/zclconf/go-cty/cty"
 )
 
+var visitMu sync.Mutex
+
 type Graph struct {
-	dag       *dag.DAG
-	evaluator *Evaluator
-	logger    *logrus.Entry
+	dag        *dag.DAG
+	logger     *logrus.Entry
+	rootVertex Vertex
 }
 
-func NewGraph(evaluator *Evaluator, logger *logrus.Entry) *Graph {
+type Vertex interface {
+	ID() string
+	Evaluator() *Evaluator
+	References() []string
+	Evaluate() error
+	Expand() ([]*Block, error)
+}
+
+func NewGraph(logger *logrus.Entry) *Graph {
 	return &Graph{
-		dag:       dag.NewDAG(),
-		evaluator: evaluator,
-		logger:    logger,
+		dag:    dag.NewDAG(),
+		logger: logger,
 	}
 }
 
-func (g *Graph) Populate() error {
-	for _, block := range g.evaluator.module.Blocks {
+func NewGraphWithRoot(logger *logrus.Entry) (*Graph, error) {
+	g := NewGraph(logger)
+
+	g.rootVertex = &VertexRoot{}
+
+	err := g.dag.AddVertexByID(g.rootVertex.ID(), g.rootVertex)
+	if err != nil {
+		return nil, fmt.Errorf("error adding vertex: %w", err)
+	}
+
+	return g, nil
+}
+
+func (g *Graph) ReduceTransitively() {
+	g.dag.ReduceTransitively()
+}
+
+func (g *Graph) Populate(evaluator *Evaluator) error {
+	vertexes := []Vertex{}
+
+	for _, block := range evaluator.module.Blocks {
 		switch block.Type() {
 		case "locals":
 			for _, attr := range block.GetAttributes() {
-				err := g.dag.AddVertexByID(fmt.Sprintf("locals.%s", attr.Name()), attr)
-				if err != nil {
-					return err
-				}
+				vertexes = append(vertexes, &VertexLocal{
+					logger:    g.logger,
+					evaluator: evaluator,
+					block:     block,
+					attr:      attr,
+				})
 			}
-		default:
-			err := g.dag.AddVertexByID(block.FullName(), block)
+		case "module":
+			vertexes = append(vertexes, &VertexModule{
+				logger:    g.logger,
+				evaluator: evaluator,
+				block:     block,
+			})
+		case "variable":
+			vertexes = append(vertexes, &VertexVariable{
+				logger:    g.logger,
+				evaluator: evaluator,
+				block:     block,
+			})
+		case "output":
+			vertexes = append(vertexes, &VertexOutput{
+				logger:    g.logger,
+				evaluator: evaluator,
+				block:     block,
+			})
+		case "provider":
+			vertexes = append(vertexes, &VertexProvider{
+				logger:    g.logger,
+				evaluator: evaluator,
+				block:     block,
+			})
+		case "resource":
+			vertexes = append(vertexes, &VertexResource{
+				logger:    g.logger,
+				evaluator: evaluator,
+				block:     block,
+			})
+		case "data":
+			vertexes = append(vertexes, &VertexData{
+				logger:    g.logger,
+				evaluator: evaluator,
+				block:     block,
+			})
+		}
+	}
+
+	for _, vertex := range vertexes {
+		err := g.dag.AddVertexByID(vertex.ID(), vertex)
+		if err != nil {
+			return err
+		}
+	}
+
+	for _, vertex := range vertexes {
+		err := g.dag.AddEdge(g.rootVertex.ID(), vertex.ID())
+		if err != nil {
+			g.logger.Errorf("error adding edge: %s", err)
+		}
+
+		refIds := vertex.References()
+		for _, refId := range refIds {
+			err := g.dag.AddEdge(refId, vertex.ID())
 			if err != nil {
-				return err
+				g.logger.Errorf("error adding edge: %s", err)
 			}
 		}
 	}
-
-	for id, vertex := range g.dag.GetVertices() {
-		switch val := vertex.(type) {
-		case *Attribute:
-			attr := val
-
-			for _, ref := range attr.AllReferences() {
-				err := g.dag.AddEdge(ref.String(), id)
-				if err != nil {
-					g.logger.Errorf("error adding edge: %s", err)
-				}
-			}
-		case *Block:
-			block := val
-
-			for _, attr := range block.GetAttributes() {
-				for _, ref := range attr.AllReferences() {
-					err := g.dag.AddEdge(ref.String(), id)
-					if err != nil {
-						g.logger.Errorf("error adding edge: %s", err)
-					}
-				}
-			}
-
-			for _, childBlock := range block.Children() {
-				for _, attr := range childBlock.GetAttributes() {
-					for _, ref := range attr.AllReferences() {
-						err := g.dag.AddEdge(ref.String(), id)
-						if err != nil {
-							g.logger.Errorf("error adding edge: %s", err)
-						}
-					}
-				}
-			}
-		}
-	}
-
-	j, _ := g.asJSON()
-	g.logger.Debugf("graph: %s", j)
 
 	return nil
 }
@@ -88,121 +131,88 @@ func (g *Graph) asJSON() ([]byte, error) {
 }
 
 func (g *Graph) Walk() {
-	v := NewGraphVisitor(g.evaluator, g.logger)
-	g.dag.DFSWalk(v)
-	g.evaluator.module.Blocks = v.filteredBlocks
+	v := NewGraphVisitor(g.logger)
+
+	flowCallback := func(d *dag.DAG, id string, parentResults []dag.FlowResult) (interface{}, error) {
+		vertex, _ := d.GetVertex(id)
+
+		v.Visit(id, vertex)
+
+		return vertex, nil
+	}
+
+	_, _ = g.dag.DescendantsFlow(g.rootVertex.ID(), nil, flowCallback)
 }
 
 type GraphVisitor struct {
-	evaluator      *Evaluator
-	logger         *logrus.Entry
-	filteredBlocks []*Block
+	logger *logrus.Entry
 }
 
-func NewGraphVisitor(evaluator *Evaluator, logger *logrus.Entry) *GraphVisitor {
+func NewGraphVisitor(logger *logrus.Entry) *GraphVisitor {
 	return &GraphVisitor{
-		evaluator: evaluator,
-		logger:    logger,
+		logger: logger,
 	}
 }
 
-func (v *GraphVisitor) Visit(vertexer dag.Vertexer) {
-	id, vertex := vertexer.Vertex()
-
+func (v *GraphVisitor) Visit(id string, vertex interface{}) {
 	v.logger.Debugf("visiting %s", id)
 
-	ctx := v.evaluator.ctx
+	vert := vertex.(Vertex)
 
-	// Check if this is already in context
-	ctxVal := ctx.Get(id)
-	if !ctxVal.IsNull() {
-		v.logger.Debugf("%s already in context", id)
+	visitMu.Lock()
+	err := vert.Evaluate()
+	visitMu.Unlock()
+	if err != nil {
+		v.logger.WithError(err).Debugf("could not evaluate %s ignoring", id)
 		return
 	}
 
-	switch val := vertex.(type) {
-	case *Attribute:
-		v.visitAttribute(id, val)
-	case *Block:
-		v.visitBlock(id, val)
+	blocks, err := vert.Expand()
+	if err != nil {
+		v.logger.WithError(err).Debugf("could not expand %s ignoring", id)
+		return
+	}
+
+	ve := vert.Evaluator()
+	if ve != nil {
+		vert.Evaluator().AddFilteredBlocks(blocks...)
 	}
 }
 
-func (v *GraphVisitor) visitAttribute(id string, attr *Attribute) {
-	ctx := v.evaluator.ctx
+func referencesForBlock(b *Block) []string {
+	refIds := []string{}
 
-	v.logger.Debugf("adding attribute %s to the evaluation context", id)
-
-	parts := strings.Split(id, ".")
-	if len(parts) > 1 && parts[0] == "locals" {
-		key := fmt.Sprintf("local.%s", strings.Join(parts[1:], "."))
-		ctx.SetByDot(attr.Value(), key)
+	for _, attr := range b.GetAttributes() {
+		for _, ref := range attr.AllReferences() {
+			refId := ref.String()
+			if b.ModuleName() != "" {
+				refId = fmt.Sprintf("%s.%s", b.ModuleName(), refId)
+			}
+			refIds = append(refIds, refId)
+		}
 	}
+
+	for _, childBlock := range b.Children() {
+		for _, attr := range childBlock.GetAttributes() {
+			for _, ref := range attr.AllReferences() {
+				refId := ref.String()
+				if childBlock.ModuleName() != "" {
+					refId = fmt.Sprintf("%s.%s", childBlock.ModuleName(), refId)
+				}
+				refIds = append(refIds, refId)
+			}
+		}
+	}
+
+	return refIds
 }
 
-func (v *GraphVisitor) visitBlock(id string, b *Block) {
-	ctx := v.evaluator.ctx
+func referencesForAttribute(a *Attribute) []string {
+	refIds := []string{}
 
-	switch b.Type() {
-	case "variable": // variables are special in that their value comes from the "default" attribute
-		val, err := v.evaluator.evaluateVariable(b)
-		if err != nil {
-			v.logger.WithError(err).Debugf("could not evaluate variable %s ignoring", b.FullName())
-			return
-		}
-
-		v.logger.Debugf("adding variable %s to the evaluation context", id)
-		key := fmt.Sprintf("var.%s", b.Label())
-		ctx.SetByDot(val, key)
-	case "output":
-		val, err := v.evaluator.evaluateOutput(b)
-		if err != nil {
-			v.logger.WithError(err).Debugf("could not evaluate output %s ignoring", b.FullName())
-			return
-		}
-
-		v.logger.Debugf("adding output %s to the evaluation context", id)
-		key := fmt.Sprintf("output.%s", b.Label())
-		ctx.SetByDot(val, key)
-	case "provider":
-		provider := b.Label()
-		if provider == "" {
-			return
-		}
-
-		ctx.Set(v.evaluator.evaluateProvider(b, map[string]cty.Value{}), id)
-	case "module":
-		if b.Label() == "" {
-			return
-		}
-
-		v.logger.Debugf("adding module %s to the evaluation context", b.Label())
-		ctx.Set(b.Values(), id)
-	case "resource":
-		if len(b.Labels()) < 2 {
-			return
-		}
-
-		val := v.evaluator.evaluateResource(b, map[string]cty.Value{})
-
-		v.logger.Debugf("adding resource %s to the evaluation context", id)
-		ctx.SetByDot(val, id)
-	case "data":
-		if len(b.Labels()) < 2 {
-			return
-		}
-
-		val := v.evaluator.evaluateResource(b, map[string]cty.Value{})
-
-		v.logger.Debugf("adding data %s to the evaluation context", id)
-		key := fmt.Sprintf("data.%s", b.Label())
-		ctx.Set(val, key)
+	for _, ref := range a.AllReferences() {
+		refIds = append(refIds, ref.String())
 	}
 
-	v.logger.Debugf("adding %s to the filtered blocks", id)
-
-	expanded := []*Block{b}
-	expanded = v.evaluator.expandBlockForEaches(expanded)
-	expanded = v.evaluator.expandBlockCounts(expanded)
-	v.filteredBlocks = append(v.filteredBlocks, expanded...)
+	return refIds
 }

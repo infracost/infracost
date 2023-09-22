@@ -1,0 +1,102 @@
+package hcl
+
+import (
+	"fmt"
+
+	"github.com/hashicorp/hcl/v2"
+	"github.com/sirupsen/logrus"
+	"github.com/zclconf/go-cty/cty"
+)
+
+type VertexModule struct {
+	logger    *logrus.Entry
+	evaluator *Evaluator
+	block     *Block
+}
+
+func (v *VertexModule) ID() string {
+	return v.block.FullName()
+}
+
+func (v *VertexModule) Evaluator() *Evaluator {
+	return v.evaluator
+}
+
+func (v *VertexModule) References() []string {
+	return referencesForBlock(v.block)
+}
+
+func (v *VertexModule) Evaluate() error {
+	if v.block.Label() == "" {
+		return fmt.Errorf("module block %s has no label", v.block.FullName())
+	}
+
+	v.logger.Debugf("adding module %s to the evaluation context", v.block.FullName())
+	v.evaluator.ctx.SetByDot(v.block.Values(), v.ID())
+
+	return nil
+}
+
+func (v *VertexModule) Expand() ([]*Block, error) {
+	visitMu.Lock()
+	expanded := []*Block{v.block}
+	expanded = v.evaluator.expandBlockForEaches(expanded)
+	expanded = v.evaluator.expandBlockCounts(expanded)
+
+	moduleEvaluators := map[string]*Evaluator{}
+
+	g, err := NewGraphWithRoot(v.logger)
+	if err != nil {
+		return nil, fmt.Errorf("error creating new graph: %w", err)
+	}
+
+	for _, block := range expanded {
+		modCall, err := v.evaluator.loadModule(block)
+		if err != nil {
+			return nil, fmt.Errorf("error loading module: %w", err)
+		}
+
+		v.evaluator.moduleCalls[block.FullName()] = modCall
+
+		parentContext := NewContext(&hcl.EvalContext{
+			Functions: ExpFunctions(modCall.Module.RootPath, v.evaluator.logger),
+		}, nil, v.evaluator.logger)
+		providers := v.evaluator.getValuesByBlockType("provider")
+		for key, provider := range providers.AsValueMap() {
+			parentContext.Set(provider, key)
+		}
+
+		vars := block.Values().AsValueMap()
+
+		moduleEvaluator := NewEvaluator(
+			*modCall.Module,
+			v.evaluator.workingDir,
+			vars,
+			v.evaluator.moduleMetadata,
+			map[string]map[string]cty.Value{},
+			v.evaluator.workspace,
+			v.evaluator.blockBuilder,
+			nil,
+			v.evaluator.logger,
+			parentContext,
+		)
+		moduleEvaluators[block.FullName()] = moduleEvaluator
+
+		g.Populate(moduleEvaluator)
+	}
+	visitMu.Unlock()
+
+	g.ReduceTransitively()
+	g.Walk()
+
+	visitMu.Lock()
+
+	for fullName, moduleEvaluator := range moduleEvaluators {
+		moduleEvaluator.module.Blocks = moduleEvaluator.filteredBlocks
+		v.evaluator.moduleCalls[fullName].Module = moduleEvaluator.collectModules()
+	}
+
+	visitMu.Unlock()
+
+	return expanded, nil
+}
