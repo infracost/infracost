@@ -1,0 +1,119 @@
+policyResourceAllowList:
+[
+  {
+    "query": "\n\t\tquery {\n\t\t\tpolicyResourceAllowList {\n\t\t\t\tresourceType\n                allowedKeys\n\t\t\t}\n\t\t}\n\t",
+    "variables": {}
+  }
+]
+
+storePolicyResources:
+[
+  {
+    "query": "\n\tmutation($policyResources: [PolicyResourceInput!]!) {\n\t\tstorePolicyResources(policyResources: $policyResources) {\n\t\t\tsha\n\t\t}\n\t}\n\t",
+    "variables": {
+      "policyResources": [
+        {
+          "resourceType": "aws_dynamodb_table",
+          "providerName": "registry.terraform.io/hashicorp/aws",
+          "address": "aws_dynamodb_table.autoscale_dynamodb_table",
+          "tags": [
+            {
+              "key": "DefaultNotOverride",
+              "value": "defaultnotoverride"
+            },
+            {
+              "key": "DefaultOverride",
+              "value": "defaultoverride"
+            }
+          ],
+          "values": [
+            {
+              "key": "name",
+              "value": "GameScores"
+            }
+          ],
+          "references": [
+            {
+              "key": "aws_appautoscaling_target.resource_id",
+              "addresses": [
+                "aws_appautoscaling_target.autoscale_dynamodb_table_write_target"
+              ]
+            }
+          ],
+          "infracostMetadata": {
+            "calls": null,
+            "checksum": "512511b943266a9dfef18b354dcad040c2d529ba447d52d273faa6ae346a72de",
+            "endLine": 0,
+            "filename": "",
+            "startLine": 0
+          }
+        },
+        {
+          "resourceType": "aws_instance",
+          "providerName": "registry.terraform.io/hashicorp/aws",
+          "address": "aws_instance.web_app",
+          "tags": [
+            {
+              "key": "DefaultNotOverride",
+              "value": "defaultnotoverride"
+            },
+            {
+              "key": "DefaultOverride",
+              "value": "defaultoverride"
+            },
+            {
+              "key": "foo",
+              "value": "bar"
+            },
+            {
+              "key": "volume_tags.baz",
+              "value": "bat"
+            }
+          ],
+          "values": [
+            {
+              "key": "ami",
+              "value": "ami-674cbc1e"
+            },
+            {
+              "key": "ebs_block_device",
+              "value": [
+                {
+                  "delete_on_termination": true,
+                  "device_name": "my_data",
+                  "iops": 800,
+                  "tags": null,
+                  "volume_size": 1000,
+                  "volume_type": "gp2"
+                }
+              ]
+            },
+            {
+              "key": "instance_type",
+              "value": "m5.4xlarge"
+            },
+            {
+              "key": "root_block_device",
+              "value": [
+                {
+                  "delete_on_termination": true,
+                  "tags": null,
+                  "volume_size": 51
+                }
+              ]
+            }
+          ],
+          "references": [],
+          "infracostMetadata": {
+            "calls": null,
+            "checksum": "a1c17a5372d0b56215b34af598a205bb8cdc208b82780e3ba2cac92460b26dd7",
+            "endLine": 0,
+            "filename": "",
+            "startLine": 0
+          }
+        }
+      ]
+    }
+  }
+]
+

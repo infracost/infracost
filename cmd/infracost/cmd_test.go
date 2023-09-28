@@ -190,6 +190,34 @@ func GraphqlTestServer(keyToResponse map[string]string) *httptest.Server {
 	return ts
 }
 
+func GraphqlTestServerWithWriter(keyToResponse map[string]string) (*httptest.Server, *bytes.Buffer) {
+	out := bytes.Buffer{}
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		bodyBytes, _ := io.ReadAll(r.Body)
+		graphqlQuery := string(bodyBytes)
+
+		response := `[{"errors": "test server unknown request"}]`
+		for k, resp := range keyToResponse {
+			if strings.Contains(graphqlQuery, k) {
+				_, _ = out.Write([]byte(k + ":\n"))
+				prettyBuf := bytes.NewBuffer([]byte{})
+				err := json.Indent(prettyBuf, bodyBytes, "", "  ")
+				if err != nil {
+					_, _ = out.Write(bodyBytes)
+				} else {
+					_, _ = out.Write(prettyBuf.Bytes())
+				}
+				_, _ = out.Write([]byte("\n\n"))
+				response = resp
+				break
+			}
+		}
+
+		_, _ = fmt.Fprint(w, response)
+	}))
+	return ts, &out
+}
+
 var policyResourceAllowlistGraphQLResponse = `[{"data": 
 	{"policyResourceAllowList":[
 		{"resourceType":"aws_instance","allowedKeys":["ami","ebs_block_device","instance_type","name","root_block_device"]},

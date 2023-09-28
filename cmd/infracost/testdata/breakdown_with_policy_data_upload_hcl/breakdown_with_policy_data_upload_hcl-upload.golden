@@ -1,0 +1,274 @@
+policyResourceAllowList:
+[
+  {
+    "query": "\n\t\tquery {\n\t\t\tpolicyResourceAllowList {\n\t\t\t\tresourceType\n                allowedKeys\n\t\t\t}\n\t\t}\n\t",
+    "variables": {}
+  }
+]
+
+storePolicyResources:
+[
+  {
+    "query": "\n\tmutation($policyResources: [PolicyResourceInput!]!) {\n\t\tstorePolicyResources(policyResources: $policyResources) {\n\t\t\tsha\n\t\t}\n\t}\n\t",
+    "variables": {
+      "policyResources": [
+        {
+          "resourceType": "aws_dynamodb_table",
+          "providerName": "",
+          "address": "aws_dynamodb_table.autoscale_dynamodb_table",
+          "tags": [
+            {
+              "key": "DefaultNotOverride",
+              "value": "defaultnotoverride"
+            },
+            {
+              "key": "DefaultOverride",
+              "value": "defaultoverride"
+            }
+          ],
+          "values": [
+            {
+              "key": "arn",
+              "value": "arn:aws:hcl::a9a24224100410c6047382f36c13aaec0afd95ad2e11ddd2d73e1002876cbbb2"
+            },
+            {
+              "key": "id",
+              "value": "hcl-a9a24224100410c6047382f36c13aaec0afd95ad2e11ddd2d73e1002876cbbb2"
+            },
+            {
+              "key": "name",
+              "value": "GameScores"
+            }
+          ],
+          "references": [
+            {
+              "key": "aws_appautoscaling_target.resource_id",
+              "addresses": [
+                "aws_appautoscaling_target.autoscale_dynamodb_table_write_target"
+              ]
+            }
+          ],
+          "infracostMetadata": {
+            "calls": [
+              {
+                "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
+                "blockName": "aws_dynamodb_table.autoscale_dynamodb_table",
+                "startLine": 39,
+                "endLine": 56
+              }
+            ],
+            "checksum": "fdfe0646f29e06b7e43d6f8ea09a298ca63ab078d56654d90f2dd9c6ab28d96a",
+            "endLine": 56,
+            "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
+            "startLine": 39
+          }
+        },
+        {
+          "resourceType": "aws_instance",
+          "providerName": "",
+          "address": "aws_instance.web_app",
+          "tags": [
+            {
+              "key": "DefaultNotOverride",
+              "value": "defaultnotoverride"
+            },
+            {
+              "key": "DefaultOverride",
+              "value": "defaultoverride"
+            },
+            {
+              "key": "foo",
+              "value": "bar"
+            },
+            {
+              "key": "volume_tags.baz",
+              "value": "bat"
+            }
+          ],
+          "values": [
+            {
+              "key": "ami",
+              "value": "ami-674cbc1e"
+            },
+            {
+              "key": "ebs_block_device",
+              "value": [
+                {
+                  "device_name": "my_data",
+                  "iops": 800,
+                  "volume_size": 1000,
+                  "volume_type": "gp2"
+                }
+              ]
+            },
+            {
+              "key": "instance_type",
+              "value": "m5.4xlarge"
+            },
+            {
+              "key": "name",
+              "value": "hcl-2309b0acdf44f6c54e82016a19dc76479ae165750e0302a540b82591ca020888"
+            },
+            {
+              "key": "root_block_device",
+              "value": [
+                {
+                  "volume_size": 51
+                }
+              ]
+            }
+          ],
+          "references": [],
+          "infracostMetadata": {
+            "calls": [
+              {
+                "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
+                "blockName": "aws_instance.web_app",
+                "startLine": 16,
+                "endLine": 37
+              }
+            ],
+            "checksum": "f5dd035ad27e97bb0e63f5e9794406f76dec425251f3ad09176905bfe8c1b6c5",
+            "endLine": 37,
+            "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
+            "startLine": 16
+          }
+        }
+      ]
+    }
+  }
+]
+
+storePolicyResources:
+[
+  {
+    "query": "\n\tmutation($policyResources: [PolicyResourceInput!]!) {\n\t\tstorePolicyResources(policyResources: $policyResources) {\n\t\t\tsha\n\t\t}\n\t}\n\t",
+    "variables": {
+      "policyResources": [
+        {
+          "resourceType": "aws_dynamodb_table",
+          "providerName": "",
+          "address": "aws_dynamodb_table.autoscale_dynamodb_table",
+          "tags": [
+            {
+              "key": "DefaultNotOverride",
+              "value": "defaultnotoverride"
+            },
+            {
+              "key": "DefaultOverride",
+              "value": "defaultoverride"
+            }
+          ],
+          "values": [
+            {
+              "key": "arn",
+              "value": "arn:aws:hcl::a9a24224100410c6047382f36c13aaec0afd95ad2e11ddd2d73e1002876cbbb2"
+            },
+            {
+              "key": "id",
+              "value": "hcl-a9a24224100410c6047382f36c13aaec0afd95ad2e11ddd2d73e1002876cbbb2"
+            },
+            {
+              "key": "name",
+              "value": "GameScores"
+            }
+          ],
+          "references": [
+            {
+              "key": "aws_appautoscaling_target.resource_id",
+              "addresses": [
+                "aws_appautoscaling_target.autoscale_dynamodb_table_write_target"
+              ]
+            }
+          ],
+          "infracostMetadata": {
+            "calls": [
+              {
+                "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
+                "blockName": "aws_dynamodb_table.autoscale_dynamodb_table",
+                "startLine": 39,
+                "endLine": 56
+              }
+            ],
+            "checksum": "fdfe0646f29e06b7e43d6f8ea09a298ca63ab078d56654d90f2dd9c6ab28d96a",
+            "endLine": 56,
+            "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
+            "startLine": 39
+          }
+        },
+        {
+          "resourceType": "aws_instance",
+          "providerName": "",
+          "address": "aws_instance.web_app",
+          "tags": [
+            {
+              "key": "DefaultNotOverride",
+              "value": "defaultnotoverride"
+            },
+            {
+              "key": "DefaultOverride",
+              "value": "defaultoverride"
+            },
+            {
+              "key": "foo",
+              "value": "bar"
+            },
+            {
+              "key": "volume_tags.baz",
+              "value": "bat"
+            }
+          ],
+          "values": [
+            {
+              "key": "ami",
+              "value": "ami-674cbc1e"
+            },
+            {
+              "key": "ebs_block_device",
+              "value": [
+                {
+                  "device_name": "my_data",
+                  "iops": 800,
+                  "volume_size": 1000,
+                  "volume_type": "gp2"
+                }
+              ]
+            },
+            {
+              "key": "instance_type",
+              "value": "m5.4xlarge"
+            },
+            {
+              "key": "name",
+              "value": "hcl-2309b0acdf44f6c54e82016a19dc76479ae165750e0302a540b82591ca020888"
+            },
+            {
+              "key": "root_block_device",
+              "value": [
+                {
+                  "volume_size": 51
+                }
+              ]
+            }
+          ],
+          "references": [],
+          "infracostMetadata": {
+            "calls": [
+              {
+                "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
+                "blockName": "aws_instance.web_app",
+                "startLine": 16,
+                "endLine": 37
+              }
+            ],
+            "checksum": "f5dd035ad27e97bb0e63f5e9794406f76dec425251f3ad09176905bfe8c1b6c5",
+            "endLine": 37,
+            "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
+            "startLine": 16
+          }
+        }
+      ]
+    }
+  }
+]
+
