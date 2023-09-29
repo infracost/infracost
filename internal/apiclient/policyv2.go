@@ -189,6 +189,8 @@ func (c *PolicyV2APIClient) UploadPolicyData(project *schema.Project) error {
 			return fmt.Errorf("failed to upload filtered partial resources %w", err)
 		}
 		project.Metadata.PolicySha = sha
+	} else {
+		project.Metadata.PolicySha = "0" // set a fake sha so we can tell policy checks actually ran
 	}
 
 	filteredPastResources := c.filterResources(project.PartialPastResources)
@@ -198,6 +200,8 @@ func (c *PolicyV2APIClient) UploadPolicyData(project *schema.Project) error {
 			return fmt.Errorf("failed to upload filtered past partial resources %w", err)
 		}
 		project.Metadata.PastPolicySha = sha
+	} else {
+		project.Metadata.PastPolicySha = "0" // set a fake sha so we can tell policy checks actually ran
 	}
 
 	return nil
