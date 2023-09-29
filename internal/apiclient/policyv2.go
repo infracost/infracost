@@ -379,7 +379,7 @@ func filterValues(rd gjson.Result, allowList map[string]gjson.Result) map[string
 		if allow, ok := allowList[k]; ok {
 			if allow.IsBool() {
 				if allow.Bool() {
-					values[k] = v.Raw
+					values[k] = json.RawMessage(v.Raw)
 				}
 			} else if allow.IsObject() {
 				nestedAllow := allow.Map()
