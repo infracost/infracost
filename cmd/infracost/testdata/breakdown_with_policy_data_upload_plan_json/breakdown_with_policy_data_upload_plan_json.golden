@@ -18,6 +18,7 @@
         "path": "testdata/breakdown_with_policy_data_upload_plan_json/plan.json",
         "type": "terraform_plan_json",
         "policySha": "someshastring",
+        "pastPolicySha": "0",
         "vcsSubPath": "cmd/infracost/testdata/breakdown_with_policy_data_upload_plan_json/plan.json",
         "providers": [
           {
