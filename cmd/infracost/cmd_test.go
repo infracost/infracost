@@ -190,14 +190,142 @@ func GraphqlTestServer(keyToResponse map[string]string) *httptest.Server {
 	return ts
 }
 
-var policyResourceAllowlistGraphQLResponse = `[{"data": 
-	{"policyResourceAllowList":[
-		{"resourceType":"aws_instance","allowedKeys":["ami","ebs_block_device","instance_type","name","root_block_device"]},
-		{"resourceType":"aws_lambda_function","allowedKeys":["memory_size","name","runtime"]},
-		{"resourceType":"aws_dynamodb_table","allowedKeys":["id","arn","memory_size","name","runtime"]}
-	]}
-}]
-`
+func GraphqlTestServerWithWriter(keyToResponse map[string]string) (*httptest.Server, *bytes.Buffer) {
+	out := bytes.Buffer{}
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		bodyBytes, _ := io.ReadAll(r.Body)
+		graphqlQuery := string(bodyBytes)
+
+		response := `[{"errors": "test server unknown request"}]`
+		for k, resp := range keyToResponse {
+			if strings.Contains(graphqlQuery, k) {
+				_, _ = out.Write([]byte(k + ":\n"))
+				prettyBuf := bytes.NewBuffer([]byte{})
+				err := json.Indent(prettyBuf, bodyBytes, "", "  ")
+				if err != nil {
+					_, _ = out.Write(bodyBytes)
+				} else {
+					_, _ = out.Write(prettyBuf.Bytes())
+				}
+				_, _ = out.Write([]byte("\n\n"))
+				response = resp
+				break
+			}
+		}
+
+		_, _ = fmt.Fprint(w, response)
+	}))
+	return ts, &out
+}
+
+var policyResourceAllowlistGraphQLResponse = `[
+  {
+    "data": {
+      "policyResourceAllowList": [
+        {
+          "allowed": {
+            "launch_configuration": true,
+            "launch_template": true
+          },
+          "resourceType": "aws_autoscaling_group"
+        },
+        {
+          "allowed": {
+            "ebs_block_device": {
+              "iops": true,
+              "multi_attach_enabled": true,
+              "volume_type": true
+            },
+            "instance_type": true,
+            "root_block_device": {
+              "iops": true,
+              "multi_attach_enabled": true,
+              "volume_type": true
+            }
+          },
+          "resourceType": "aws_instance"
+        },
+        {
+          "allowed": {
+            "iops": true,
+            "multi_attach_enabled": true,
+            "type": true
+          },
+          "resourceType": "aws_ebs_volume"
+        },
+        {
+          "allowed": {
+            "instance_types": true,
+            "launch_template": {
+              "id": true
+            }
+          },
+          "resourceType": "aws_eks_node_group"
+        },
+        {
+          "allowed": {
+            "block_device_mappings": {
+              "ebs": {
+                "iops": true,
+                "multi_attach_enabled": true,
+                "volume_type": true
+              }
+            },
+            "id": true,
+            "instance_type": true,
+            "name": true
+          },
+          "resourceType": "aws_launch_template"
+        },
+        {
+          "allowed": {
+            "instance_type": true
+          },
+          "resourceType": "aws_launch_configuration"
+        },
+        {
+          "allowed": {
+            "machine_type": true
+          },
+          "resourceType": "google_compute_instance"
+        },
+        {
+          "allowed": {
+            "machine_type": true
+          },
+          "resourceType": "google_compute_instance_template"
+        },
+        {
+          "allowed": {
+            "node_config": {
+              "machine_type": true
+            }
+          },
+          "resourceType": "google_container_node_pool"
+        },
+        {
+          "allowed": {
+            "node_type": true
+          },
+          "resourceType": "google_compute_sole_tenant_node_template"
+        },
+        {
+          "allowed": {
+            "cluster_config": {
+              "master_config": {
+                "machine_type": true
+              },
+              "worker_config": {
+                "machine_type": true
+              }
+            }
+          },
+          "resourceType": "google_dataproc_cluster"
+        }
+      ]
+    }
+  }
+]`
 
 var storePolicyResourcesGraphQLResponse = `[{"data": 
 	{"storePolicyResources": 

@@ -1013,7 +1013,7 @@ func TestBreakdownWithDataBlocksInSubmod(t *testing.T) {
 }
 
 func TestBreakdownWithPolicyDataUploadHCL(t *testing.T) {
-	ts := GraphqlTestServer(map[string]string{
+	ts, uploadWriter := GraphqlTestServerWithWriter(map[string]string{
 		"policyResourceAllowList": policyResourceAllowlistGraphQLResponse,
 		"storePolicyResources":    storePolicyResourcesGraphQLResponse,
 	})
@@ -1037,10 +1037,12 @@ func TestBreakdownWithPolicyDataUploadHCL(t *testing.T) {
 			ctx.Config.PoliciesV2Enabled = true
 		},
 	)
+
+	testutil.AssertGoldenFile(t, path.Join("./testdata", testName, testName+"-upload.golden"), uploadWriter.Bytes())
 }
 
 func TestBreakdownWithPolicyDataUploadPlanJson(t *testing.T) {
-	ts := GraphqlTestServer(map[string]string{
+	ts, uploadWriter := GraphqlTestServerWithWriter(map[string]string{
 		"policyResourceAllowList": policyResourceAllowlistGraphQLResponse,
 		"storePolicyResources":    storePolicyResourcesGraphQLResponse,
 	})
@@ -1064,4 +1066,6 @@ func TestBreakdownWithPolicyDataUploadPlanJson(t *testing.T) {
 			ctx.Config.PoliciesV2Enabled = true
 		},
 	)
+
+	testutil.AssertGoldenFile(t, path.Join("./testdata", testName, testName+"-upload.golden"), uploadWriter.Bytes())
 }

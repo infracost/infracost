@@ -9,6 +9,7 @@ import (
 
 	"github.com/hashicorp/go-retryablehttp"
 	json "github.com/json-iterator/go"
+	"github.com/tidwall/gjson"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/logging"
@@ -16,10 +17,12 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
+var jsonSorted = json.Config{SortMapKeys: true}.Froze()
+
 type PolicyV2APIClient struct {
 	APIClient
 
-	allowList     resourceAllowList
+	allowLists    map[string]allowList
 	allowListErr  error
 	allowListOnce sync.Once
 }
@@ -188,6 +191,8 @@ func (c *PolicyV2APIClient) UploadPolicyData(project *schema.Project) error {
 			return fmt.Errorf("failed to upload filtered partial resources %w", err)
 		}
 		project.Metadata.PolicySha = sha
+	} else {
+		project.Metadata.PolicySha = "0" // set a fake sha so we can tell policy checks actually ran
 	}
 
 	filteredPastResources := c.filterResources(project.PartialPastResources)
@@ -197,6 +202,8 @@ func (c *PolicyV2APIClient) UploadPolicyData(project *schema.Project) error {
 			return fmt.Errorf("failed to upload filtered past partial resources %w", err)
 		}
 		project.Metadata.PastPolicySha = sha
+	} else {
+		project.Metadata.PastPolicySha = "0" // set a fake sha so we can tell policy checks actually ran
 	}
 
 	return nil
@@ -252,11 +259,6 @@ type policy2Tag struct {
 	Value string `json:"value"`
 }
 
-type policy2Value struct {
-	Key   string          `json:"key"`
-	Value json.RawMessage `json:"value"`
-}
-
 type policy2Reference struct {
 	Key       string   `json:"key"`
 	Addresses []string `json:"addresses"`
@@ -267,7 +269,7 @@ type policy2Resource struct {
 	ProviderName string                   `json:"providerName"`
 	Address      string                   `json:"address"`
 	Tags         *[]policy2Tag            `json:"tags,omitempty"`
-	Values       []policy2Value           `json:"values"`
+	Values       json.RawMessage          `json:"values"`
 	References   []policy2Reference       `json:"references"`
 	Metadata     policy2InfracostMetadata `json:"infracostMetadata"`
 }
@@ -292,7 +294,7 @@ func (c *PolicyV2APIClient) filterResources(partials []*schema.PartialResource) 
 	for _, partial := range partials {
 		if partial != nil && partial.ResourceData != nil {
 			rd := partial.ResourceData
-			if f, ok := c.allowList[rd.Type]; ok {
+			if f, ok := c.allowLists[rd.Type]; ok {
 				p2rs = append(p2rs, filterResource(rd, f))
 			}
 		}
@@ -305,7 +307,7 @@ func (c *PolicyV2APIClient) filterResources(partials []*schema.PartialResource) 
 	return p2rs
 }
 
-func filterResource(rd *schema.ResourceData, allowedKeys map[string]bool) policy2Resource {
+func filterResource(rd *schema.ResourceData, al allowList) policy2Resource {
 	var tagsPtr *[]policy2Tag
 	if rd.Tags != nil {
 		tags := make([]policy2Tag, 0, len(*rd.Tags))
@@ -319,15 +321,11 @@ func filterResource(rd *schema.ResourceData, allowedKeys map[string]bool) policy
 		tagsPtr = &tags
 	}
 
-	values := make([]policy2Value, 0, len(allowedKeys))
-	for k, v := range rd.RawValues.Map() {
-		if b, ok := allowedKeys[k]; ok && b {
-			values = append(values, policy2Value{Key: k, Value: []byte(v.Raw)})
-		}
+	// make sure the keys in the values json are sorted so we get consistent policyShas
+	valuesJSON, err := jsonSorted.Marshal(filterValues(rd.RawValues, al))
+	if err != nil {
+		logging.Logger.WithError(err).WithField("address", rd.Address).Warn("Failed to marshal filtered values")
 	}
-	sort.Slice(values, func(i, j int) bool {
-		return values[i].Key < values[j].Key
-	})
 
 	references := make([]policy2Reference, 0, len(rd.ReferencesMap))
 	for k, refRds := range rd.ReferencesMap {
@@ -363,7 +361,7 @@ func filterResource(rd *schema.ResourceData, allowedKeys map[string]bool) policy
 		ProviderName: rd.ProviderName,
 		Address:      rd.Address,
 		Tags:         tagsPtr,
-		Values:       values,
+		Values:       valuesJSON,
 		References:   references,
 		Metadata: policy2InfracostMetadata{
 			Calls:     mdCalls,
@@ -375,6 +373,34 @@ func filterResource(rd *schema.ResourceData, allowedKeys map[string]bool) policy
 	}
 }
 
+func filterValues(rd gjson.Result, allowList map[string]gjson.Result) map[string]interface{} {
+	values := make(map[string]interface{}, len(allowList))
+	for k, v := range rd.Map() {
+		if allow, ok := allowList[k]; ok {
+			if allow.IsBool() {
+				if allow.Bool() {
+					values[k] = json.RawMessage(v.Raw)
+				}
+			} else if allow.IsObject() {
+				nestedAllow := allow.Map()
+				if v.IsArray() {
+					vArray := v.Array()
+					nestedVals := make([]interface{}, 0, len(vArray))
+					for _, el := range vArray {
+						nestedVals = append(nestedVals, filterValues(el, nestedAllow))
+					}
+					values[k] = nestedVals
+				} else {
+					values[k] = filterValues(v, nestedAllow)
+				}
+			} else {
+				logging.Logger.WithField("Key", k).WithField("Type", allow.Type.String()).Warn("Unknown allow type")
+			}
+		}
+	}
+	return values
+}
+
 func calcChecksum(rd *schema.ResourceData) string {
 	h := sha256.New()
 	h.Write([]byte(rd.ProviderName))
@@ -384,7 +410,7 @@ func calcChecksum(rd *schema.ResourceData) string {
 	return hex.EncodeToString(h.Sum(nil))
 }
 
-type resourceAllowList map[string]map[string]bool
+type allowList map[string]gjson.Result
 
 func (c *PolicyV2APIClient) fetchAllowList() error {
 	c.allowListOnce.Do(func() {
@@ -392,18 +418,18 @@ func (c *PolicyV2APIClient) fetchAllowList() error {
 		if err != nil {
 			c.allowListErr = err
 		}
-		c.allowList = prw
+		c.allowLists = prw
 	})
 
 	return c.allowListErr
 }
 
-func (c *PolicyV2APIClient) getPolicyResourceAllowList() (resourceAllowList, error) {
+func (c *PolicyV2APIClient) getPolicyResourceAllowList() (map[string]allowList, error) {
 	q := `
 		query {
 			policyResourceAllowList {
 				resourceType
-                allowedKeys
+                allowed
 			}
 		}
 	`
@@ -426,8 +452,8 @@ func (c *PolicyV2APIClient) getPolicyResourceAllowList() (resourceAllowList, err
 
 	var response struct {
 		AllowLists []struct {
-			Type   string   `json:"resourceType"`
-			Values []string `json:"allowedKeys"`
+			Type    string          `json:"resourceType"`
+			Allowed json.RawMessage `json:"allowed"`
 		} `json:"policyResourceAllowList"`
 	}
 
@@ -436,14 +462,10 @@ func (c *PolicyV2APIClient) getPolicyResourceAllowList() (resourceAllowList, err
 		return nil, fmt.Errorf("failed to unmarshal policyResourceAllowList %w", err)
 	}
 
-	aw := resourceAllowList{}
+	aw := map[string]allowList{}
 
 	for _, rtf := range response.AllowLists {
-		rtfMap := map[string]bool{}
-		for _, v := range rtf.Values {
-			rtfMap[v] = true
-		}
-		aw[rtf.Type] = rtfMap
+		aw[rtf.Type] = gjson.ParseBytes(rtf.Allowed).Map()
 	}
 
 	return aw, nil
