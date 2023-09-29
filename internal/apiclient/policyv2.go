@@ -17,6 +17,8 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
+var jsonSorted = json.Config{SortMapKeys: true}.Froze()
+
 type PolicyV2APIClient struct {
 	APIClient
 
@@ -319,7 +321,11 @@ func filterResource(rd *schema.ResourceData, al allowList) policy2Resource {
 		tagsPtr = &tags
 	}
 
-	values := filterValues(rd.RawValues, al)
+	// make sure the keys in the values json are sorted so we get consistent policyShas
+	valuesJSON, err := jsonSorted.Marshal(filterValues(rd.RawValues, al))
+	if err != nil {
+		logging.Logger.WithError(err).WithField("address", rd.Address).Warn("Failed to marshal filtered values")
+	}
 
 	references := make([]policy2Reference, 0, len(rd.ReferencesMap))
 	for k, refRds := range rd.ReferencesMap {
@@ -355,7 +361,7 @@ func filterResource(rd *schema.ResourceData, al allowList) policy2Resource {
 		ProviderName: rd.ProviderName,
 		Address:      rd.Address,
 		Tags:         tagsPtr,
-		Values:       values,
+		Values:       valuesJSON,
 		References:   references,
 		Metadata: policy2InfracostMetadata{
 			Calls:     mdCalls,
@@ -367,29 +373,23 @@ func filterResource(rd *schema.ResourceData, al allowList) policy2Resource {
 	}
 }
 
-func filterValues(rd gjson.Result, allowList map[string]gjson.Result) json.RawMessage {
-	jsonSorted := json.Config{SortMapKeys: true}.Froze()
-
-	values := make(map[string]json.RawMessage, len(allowList))
+func filterValues(rd gjson.Result, allowList map[string]gjson.Result) map[string]interface{} {
+	values := make(map[string]interface{}, len(allowList))
 	for k, v := range rd.Map() {
 		if allow, ok := allowList[k]; ok {
 			if allow.IsBool() {
 				if allow.Bool() {
-					values[k] = json.RawMessage(v.Raw)
+					values[k] = v.Raw
 				}
 			} else if allow.IsObject() {
 				nestedAllow := allow.Map()
 				if v.IsArray() {
 					vArray := v.Array()
-					nestedVals := make([]json.RawMessage, 0, len(vArray))
+					nestedVals := make([]interface{}, 0, len(vArray))
 					for _, el := range vArray {
 						nestedVals = append(nestedVals, filterValues(el, nestedAllow))
 					}
-					b, err := jsonSorted.Marshal(nestedVals)
-					if err != nil {
-						logging.Logger.WithField("Key", k).WithError(err).Warn("Failed to marshal filtered value array")
-					}
-					values[k] = b
+					values[k] = nestedVals
 				} else {
 					values[k] = filterValues(v, nestedAllow)
 				}
@@ -398,12 +398,7 @@ func filterValues(rd gjson.Result, allowList map[string]gjson.Result) json.RawMe
 			}
 		}
 	}
-
-	b, err := jsonSorted.Marshal(values)
-	if err != nil {
-		logging.Logger.Warn("Failed to marshal filtered values")
-	}
-	return b
+	return values
 }
 
 func calcChecksum(rd *schema.ResourceData) string {
