@@ -12,7 +12,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Set up Go 1.x
         uses: actions/setup-go@v4
         with:
@@ -111,7 +111,7 @@ jobs:
     name: Update Fig autocomplete spec
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Get the new version
         id: version
         run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
