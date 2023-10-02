@@ -9,6 +9,7 @@ import (
 	"path"
 	"path/filepath"
 	"runtime"
+	"sort"
 	"strings"
 	"sync"
 
@@ -54,6 +55,12 @@ type ModuleLoader struct {
 	packageFetcher *PackageFetcher
 	registryLoader *RegistryLoader
 	logger         *logrus.Entry
+}
+
+type SourceMapResult struct {
+	Source   string
+	Version  string
+	RawQuery string
 }
 
 // NewModuleLoader constructs a new module loader
@@ -237,15 +244,21 @@ func (m *ModuleLoader) loadModules(path string, prefix string) ([]*ManifestModul
 func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath string, prefix string) (*ManifestModule, error) {
 	key := prefix + moduleCall.Name
 	source := moduleCall.Source
+	version := moduleCall.Version
 
-	mappedSource, err := mapSource(m.sourceMap, source)
+	mappedResult, err := mapSource(m.sourceMap, source)
 	if err != nil {
 		return nil, err
 	}
 
-	if mappedSource != source {
-		m.logger.Debugf("remapping module source %s to %s", source, mappedSource)
-		source = mappedSource
+	if mappedResult.Source != source {
+		m.logger.Debugf("remapping module source %s to %s", source, mappedResult.Source)
+		source = mappedResult.Source
+	}
+
+	if mappedResult.Version != "" {
+		m.logger.Debugf("remapping module version %s to %s", version, mappedResult.Version)
+		version = mappedResult.Version
 	}
 
 	manifestModule, err := m.cache.lookupModule(key, moduleCall)
@@ -264,12 +277,6 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 	} else {
 		m.logger.Debugf("module %s needs loading: %s", key, err.Error())
 	}
-
-	manifestModule = &ManifestModule{
-		Key:    key,
-		Source: source,
-	}
-
 	if m.isLocalModule(source) {
 		dir, err := m.cachePathRel(filepath.Join(parentPath, source))
 		if err != nil {
@@ -277,8 +284,45 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 		}
 
 		m.logger.Debugf("loading local module %s from %s", key, dir)
-		manifestModule.Dir = path.Clean(dir)
+		return &ManifestModule{
+			Key:    key,
+			Source: source,
+			Dir:    path.Clean(dir),
+		}, nil
+	}
+
+	manifestModule, err = m.loadRegistryModule(key, source, version)
+	if err != nil {
+		return nil, err
+	}
+
+	if manifestModule != nil {
 		return manifestModule, nil
+	}
+
+	// For remote modules that have had their source mapped we need to include
+	// the query params in the source URL.
+	if mappedResult.RawQuery != "" {
+		parsedSourceURL, err := url.Parse(source)
+		if err != nil {
+			return nil, err
+		}
+
+		parsedSourceURL.RawQuery = mappedResult.RawQuery
+		source = parsedSourceURL.String()
+	}
+
+	manifestModule, err = m.loadRemoteModule(key, source)
+	if err != nil {
+		return nil, err
+	}
+
+	return manifestModule, nil
+}
+
+func (m *ModuleLoader) loadRegistryModule(key string, source string, version string) (*ManifestModule, error) {
+	manifestModule := &ManifestModule{
+		Key: key,
 	}
 
 	moduleAddr, submodulePath, err := splitModuleSubDir(source)
@@ -286,26 +330,24 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 		return nil, err
 	}
 
-	hash := fmt.Sprintf("%x", md5.Sum([]byte(moduleAddr+moduleCall.Version))) //nolint
-	dest := filepath.Join(m.downloadDir(), hash)
-
-	// lock the module address so that we don't interact with an incomplete download.
-	unlock := m.sync.Lock(moduleAddr)
-	defer unlock()
-
+	dest := m.downloadDest(moduleAddr, version)
 	moduleDownloadDir, err := m.cachePathRel(dest)
 	if err != nil {
 		return nil, err
 	}
 	manifestModule.Dir = path.Clean(filepath.Join(moduleDownloadDir, submodulePath))
 
-	lookupResult, err := m.registryLoader.lookupModule(moduleAddr, moduleCall.Version)
+	// lock the module address so that we don't interact with an incomplete download.
+	unlock := m.sync.Lock(moduleAddr)
+	defer unlock()
+
+	lookupResult, err := m.registryLoader.lookupModule(moduleAddr, version)
 	if err != nil {
 		return nil, &schema.ProjectDiag{Code: schema.DiagPrivateRegistryModuleDownloadFailure, Message: fmt.Sprintf("Failed to lookup module %q - %s", key, err)}
 	}
 
 	if lookupResult.OK {
-		// The moduleCall.Source might not have the registry hostname if it is using the default registry
+		// The source might not have the registry hostname if it is using the default registry
 		// so we set the source here to the lookup result's source which always includes the registry hostname.
 		manifestModule.Source = joinModuleSubDir(lookupResult.ModuleURL.RawSource, submodulePath)
 		manifestModule.Version = lookupResult.Version
@@ -323,8 +365,30 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 		return manifestModule, nil
 	}
 
-	m.logger.Debugf("Detected %s as remote module", key)
-	m.logger.Debugf("Downloading module %s from remote %s", key, source)
+	return nil, nil
+}
+
+func (m *ModuleLoader) loadRemoteModule(key string, source string) (*ManifestModule, error) {
+	manifestModule := &ManifestModule{
+		Key:    key,
+		Source: source,
+	}
+
+	moduleAddr, submodulePath, err := splitModuleSubDir(source)
+	if err != nil {
+		return nil, err
+	}
+
+	dest := m.downloadDest(moduleAddr, "")
+	moduleDownloadDir, err := m.cachePathRel(dest)
+	if err != nil {
+		return nil, err
+	}
+	manifestModule.Dir = path.Clean(filepath.Join(moduleDownloadDir, submodulePath))
+
+	// lock the module address so that we don't interact with an incomplete download.
+	unlock := m.sync.Lock(moduleAddr)
+	defer unlock()
 
 	_, err = os.Stat(dest)
 	if err == nil {
@@ -337,6 +401,11 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 	}
 
 	return manifestModule, nil
+}
+
+func (m *ModuleLoader) downloadDest(moduleAddr string, version string) string {
+	hash := fmt.Sprintf("%x", md5.Sum([]byte(moduleAddr+version))) //nolint
+	return filepath.Join(m.downloadDir(), hash)
 }
 
 func (m *ModuleLoader) cachePathRel(targetPath string) (string, error) {
@@ -389,48 +458,101 @@ func joinModuleSubDir(moduleAddr string, submodulePath string) string {
 		}
 
 		query := parsedURL.RawQuery
+		if query != "" {
+			query = "?" + query
+		}
+
 		parsedURL.RawQuery = ""
-		return fmt.Sprintf("%s//%s?%s", parsedURL.String(), submodulePath, query)
+		return fmt.Sprintf("%s//%s%s", parsedURL.String(), submodulePath, query)
 	}
 
 	return moduleAddr
 }
 
 // mapSource maps the module source to a new source if it is in the source map
-// otherwise it returns the original source
-// It works in the same way as the TERRAGRUNT_SOURCE_MAP environment variable
-// except it will first try to match with query params, and then falls back
-// to matching without query params.
-func mapSource(sourceMap config.TerraformSourceMap, source string) (string, error) {
+// otherwise it returns the original source. It works similarly to the
+// TERRAGRUNT_SOURCE_MAP environment variable except it matches by prefixes
+// and supports query params. It works by matching the longest prefix first,
+// so the most specific prefix is matched first.
+//
+// It does not support mapping registry versions to git tags since we can't
+// guarantee that the tag is correct - depending on the git repo the version
+// might be prefixed with a 'v' or not.
+func mapSource(sourceMap config.TerraformSourceMap, source string) (SourceMapResult, error) {
+	result := SourceMapResult{
+		Source:   source,
+		Version:  "",
+		RawQuery: "",
+	}
+
 	if sourceMap == nil {
-		return source, nil
+		return result, nil
 	}
 
 	moduleAddr, submodulePath, err := splitModuleSubDir(source)
 	if err != nil {
-		return source, err
+		return SourceMapResult{}, err
 	}
 
-	// Check if we can match the module address with the query params
-	mapped, ok := sourceMap[moduleAddr]
-	if ok {
-		return joinModuleSubDir(mapped, submodulePath), nil
+	destSource := ""
+
+	// sort the sourceMap keys by length so that we can match the longest prefix first
+	// this is important because we want to match the most specific prefix first
+	sourceMapKeys := make([]string, 0, len(sourceMap))
+	for k := range sourceMap {
+		sourceMapKeys = append(sourceMapKeys, k)
 	}
 
-	// If we can't match with the query params, strip them and try again
-	parsedURL, err := url.Parse(moduleAddr)
+	sort.Slice(sourceMapKeys, func(i, j int) bool {
+		return len(sourceMapKeys[i]) > len(sourceMapKeys[j])
+	})
+
+	for _, prefix := range sourceMapKeys {
+		if strings.HasPrefix(moduleAddr, prefix) {
+			withoutPrefix := strings.TrimPrefix(moduleAddr, prefix)
+			mapped := sourceMap[prefix] + withoutPrefix
+			destSource = joinModuleSubDir(mapped, submodulePath)
+			break
+		}
+	}
+
+	// If no result is found
+	if destSource == "" {
+		return result, nil
+	}
+
+	// Merge the query params from the source and dest URLs
+	parsedSourceURL, err := url.Parse(moduleAddr)
 	if err != nil {
-		return source, err
-	}
-	parsedURL.RawQuery = ""
-	parsedModuleAddr := parsedURL.String()
-
-	mapped, ok = sourceMap[parsedModuleAddr]
-	if ok {
-		return joinModuleSubDir(mapped, submodulePath), nil
+		return SourceMapResult{}, err
 	}
 
-	return source, nil
+	parsedDestURL, err := url.Parse(destSource)
+	if err != nil {
+		return SourceMapResult{}, err
+	}
+
+	sourceQuery := parsedSourceURL.Query()
+	destQuery := parsedDestURL.Query()
+
+	for k, v := range sourceQuery {
+		if _, ok := destQuery[k]; !ok {
+			destQuery[k] = v
+		}
+	}
+
+	parsedDestURL.RawQuery = ""
+	result.Source = parsedDestURL.String()
+	result.RawQuery = destQuery.Encode()
+
+	// If the query params have a ref then we should use that as the version
+	// for registry modules.
+	ref := destQuery.Get("ref")
+	if ref != "" {
+		result.Version = strings.TrimPrefix(ref, "v")
+	}
+
+	return result, nil
 }
 
 func getProcessCount() int {
