@@ -1034,7 +1034,7 @@ func TestBreakdownWithPolicyDataUploadHCL(t *testing.T) {
 			IsJSON:      true,
 		}, func(ctx *config.RunContext) {
 			ctx.Config.PolicyV2APIEndpoint = ts.URL
-			ctx.Config.PoliciesV2Enabled = true
+			ctx.Config.PoliciesEnabled = true
 		},
 	)
 
@@ -1063,7 +1063,7 @@ func TestBreakdownWithPolicyDataUploadPlanJson(t *testing.T) {
 			IsJSON:      true,
 		}, func(ctx *config.RunContext) {
 			ctx.Config.PolicyV2APIEndpoint = ts.URL
-			ctx.Config.PoliciesV2Enabled = true
+			ctx.Config.PoliciesEnabled = true
 		},
 	)
 

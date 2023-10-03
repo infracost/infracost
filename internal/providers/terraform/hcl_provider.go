@@ -26,8 +26,6 @@ import (
 	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/hcl/modules"
 	"github.com/infracost/infracost/internal/logging"
-	"github.com/infracost/infracost/internal/prices"
-	"github.com/infracost/infracost/internal/scan"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
 )
@@ -35,8 +33,7 @@ import (
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 type HCLProvider struct {
-	scanner        *scan.TerraformPlanScanner
-	policyV2Client *apiclient.PolicyV2APIClient
+	policyClient   *apiclient.PolicyAPIClient
 	parsers        []*hcl.Parser
 	planJSONParser *Parser
 	logger         *log.Entry
@@ -162,22 +159,17 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 	if err != nil {
 		return nil, err
 	}
-	var scanner *scan.TerraformPlanScanner
-	if runCtx.Config.PolicyAPIEndpoint != "" {
-		scanner = scan.NewTerraformPlanScanner(runCtx, ctx.Logger(), prices.GetPricesConcurrent)
-	}
 
-	var policyV2Client *apiclient.PolicyV2APIClient
-	if runCtx.Config.PoliciesV2Enabled {
-		policyV2Client, err = apiclient.NewPolicyV2APIClient(runCtx)
+	var policyClient *apiclient.PolicyAPIClient
+	if runCtx.Config.PoliciesEnabled {
+		policyClient, err = apiclient.NewPolicyAPIClient(runCtx)
 		if err != nil {
-			logger.WithError(err).Errorf("failed to initialize policyV2 client")
+			logger.WithError(err).Errorf("failed to initialize policy client")
 		}
 	}
 
 	return &HCLProvider{
-		scanner:        scanner,
-		policyV2Client: policyV2Client,
+		policyClient:   policyClient,
 		parsers:        parsers,
 		planJSONParser: NewParser(ctx, true),
 		ctx:            ctx,
@@ -223,15 +215,8 @@ func (p *HCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, e
 			project.Metadata.VCSCodeChanged = &j.Module.HasChanges
 		}
 
-		if p.scanner != nil {
-			err := p.scanner.ScanPlan(project)
-			if err != nil {
-				p.logger.WithError(err).Debugf("failed to scan Terraform project %s", project.Name)
-			}
-		}
-
-		if p.policyV2Client != nil {
-			err := p.policyV2Client.UploadPolicyData(project)
+		if p.policyClient != nil {
+			err := p.policyClient.UploadPolicyData(project)
 			if err != nil {
 				p.logger.WithError(err).Errorf("failed to upload policy data %s", project.Name)
 			}

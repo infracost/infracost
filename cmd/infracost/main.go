@@ -191,7 +191,6 @@ func newRootCmd(ctx *config.RunContext) *cobra.Command {
 	rootCmd.AddCommand(configureCmd(ctx))
 	rootCmd.AddCommand(diffCmd(ctx))
 	rootCmd.AddCommand(breakdownCmd(ctx))
-	rootCmd.AddCommand(scanCommand(ctx))
 	rootCmd.AddCommand(outputCmd(ctx))
 	rootCmd.AddCommand(uploadCmd(ctx))
 	rootCmd.AddCommand(commentCmd(ctx))
@@ -280,7 +279,7 @@ func loadCloudSettings(ctx *config.RunContext) {
 	}
 
 	if result.PoliciesAPIEnabled {
-		ctx.Config.PoliciesV2Enabled = true
+		ctx.Config.PoliciesEnabled = true
 		logging.Logger.Info("Enabled policies V2")
 	}
 
