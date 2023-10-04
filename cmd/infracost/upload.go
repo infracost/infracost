@@ -45,7 +45,7 @@ See https://infracost.io/docs/features/cli_commands/#upload-runs`,
 			}
 
 			if ctx.Config.PolicyV2APIEndpoint != "" {
-				policyClient, err := apiclient.NewPolicyV2APIClient(ctx)
+				policyClient, err := apiclient.NewPolicyAPIClient(ctx)
 				if err != nil {
 					logging.Logger.WithError(err).Error("Failed to initialize policies client")
 				} else {
