@@ -464,6 +464,7 @@ func (e *Evaluator) expandDynamicBlock(b *Block) {
 func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 	var expanded Blocks
 	var haveChanged = make(map[string]*Block)
+
 	for _, block := range blocks {
 		forEachAttr := block.GetAttribute("for_each")
 		if forEachAttr == nil {
@@ -516,13 +517,28 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 				cloneValues := clone.Values()
 				e.ctx.Set(cloneValues, append(labels, keyStr)...)
 
-				if v, ok := e.moduleCalls[clone.FullName()]; ok {
-					v.Definition = clone
+				if clone.Type() == "module" {
+					if v, ok := e.moduleCalls[clone.FullName()]; ok {
+						v.Definition = clone
+					} else {
+						modCall, err := e.loadModule(clone)
+						if err != nil {
+							e.logger.WithError(err).Debugf("failed to create expanded module call, could not load module %s", clone.FullName())
+							return false
+						}
+						e.moduleCalls[clone.FullName()] = modCall
+					}
 				}
+
 				expanded = append(expanded, clone)
 
 				return false
 			})
+
+			if block.Type() == "module" {
+				e.logger.Debugf("deleting module from moduleCalls since it has been expanded %s", block.FullName())
+				delete(e.moduleCalls, block.FullName())
+			}
 		} else {
 			expanded = append(expanded, block)
 		}

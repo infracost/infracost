@@ -518,6 +518,16 @@ func TestBreakdownTerragruntHCLDepsOutput(t *testing.T) {
 	)
 }
 
+func TestBreakdownTerragruntHCLModuleOutputForEach(t *testing.T) {
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{"breakdown", "--path",
+			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())},
+		&GoldenFileOptions{CaptureLogs: true},
+	)
+}
+
 func TestBreakdownTerragruntGetEnv(t *testing.T) {
 	os.Setenv("CUSTOM_OS_VAR", "test")
 	os.Setenv("CUSTOM_OS_VAR_PROD", "test-prod")
