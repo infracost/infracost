@@ -4,7 +4,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func getStorageManagementPolicy() *schema.RegistryItem {
+func getStorageManagementPolicyRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_storage_management_policy",
 		RFunc: newStorageManagementPolicy,

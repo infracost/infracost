@@ -137,7 +137,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getApplicationInsightsStandardWebTestRegistryItem(),
 	getRecoveryServicesVaultRegistryItem(),
 	getBackupProtectedVmRegistryItem(),
-	getStorageManagementPolicy(),
+	getStorageManagementPolicyRegistryItem(),
 	getStorageQueueRegistryItem(),
 	getStorageShareRegistryItem(),
 	getLogicAppIntegrationAccountRegistryItem(),
