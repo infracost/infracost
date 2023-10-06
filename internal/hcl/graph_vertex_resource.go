@@ -54,5 +54,7 @@ func (v *VertexResource) Expand() ([]*Block, error) {
 	expanded = v.evaluator.expandBlockCounts(expanded)
 	expanded = v.evaluator.expandBlockForEaches(expanded)
 
+	v.block.expanded = true
+
 	return expanded, nil
 }
