@@ -7,6 +7,7 @@ import (
 
 	"github.com/heimdalr/dag"
 	"github.com/sirupsen/logrus"
+	"github.com/zclconf/go-cty/cty"
 )
 
 var visitMu sync.Mutex
@@ -136,6 +137,12 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 			}
 		}
 	}
+
+	// Setup initial context
+	evaluator.ctx.Set(cty.ObjectVal(map[string]cty.Value{}), "var")
+	evaluator.ctx.Set(cty.ObjectVal(map[string]cty.Value{}), "data")
+	evaluator.ctx.Set(cty.ObjectVal(map[string]cty.Value{}), "local")
+	evaluator.ctx.Set(cty.ObjectVal(map[string]cty.Value{}), "output")
 
 	// TODO: is there a better way of doing this?
 	// Add the locals block to the list of filtered blocks. These won't get
