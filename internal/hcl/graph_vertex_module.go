@@ -28,11 +28,11 @@ func (v *VertexModule) References() []string {
 
 func (v *VertexModule) Evaluate() error {
 	if v.block.Label() == "" {
-		return fmt.Errorf("module block %s has no label", v.block.FullName())
+		return fmt.Errorf("module block %s has no label", v.ID())
 	}
 
-	v.logger.Debugf("adding module %s to the evaluation context", v.block.FullName())
-	v.evaluator.ctx.SetByDot(v.block.Values(), v.ID())
+	v.logger.Debugf("adding module %s to the evaluation context", v.ID())
+	v.evaluator.ctx.SetByDot(v.block.Values(), v.block.LocalName())
 
 	return nil
 }
