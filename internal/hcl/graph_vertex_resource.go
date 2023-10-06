@@ -48,9 +48,7 @@ func (v *VertexResource) Evaluate() error {
 
 func (v *VertexResource) Expand() ([]*Block, error) {
 	visitMu.Lock()
-	defer func() {
-		visitMu.Unlock()
-	}()
+	defer visitMu.Unlock()
 
 	expanded := []*Block{v.block}
 	expanded = v.evaluator.expandBlockCounts(expanded)
