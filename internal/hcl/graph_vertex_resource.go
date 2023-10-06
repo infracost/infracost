@@ -30,10 +30,18 @@ func (v *VertexResource) Evaluate() error {
 		return fmt.Errorf("resource block %s has no label", v.ID())
 	}
 
-	val := v.evaluator.evaluateResource(v.block, map[string]cty.Value{})
+	var existingVals map[string]cty.Value
+	existingCtx := v.evaluator.ctx.Get(v.block.TypeLabel())
+	if !existingCtx.IsNull() {
+		existingVals = existingCtx.AsValueMap()
+	} else {
+		existingVals = make(map[string]cty.Value)
+	}
+
+	val := v.evaluator.evaluateResource(v.block, existingVals)
 
 	v.logger.Debugf("adding resource %s to the evaluation context", v.ID())
-	v.evaluator.ctx.SetByDot(val, v.ID())
+	v.evaluator.ctx.SetByDot(val, v.block.TypeLabel())
 
 	return nil
 }

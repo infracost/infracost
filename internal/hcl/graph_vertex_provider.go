@@ -37,7 +37,7 @@ func (v *VertexProvider) Evaluate() error {
 		return fmt.Errorf("provider block %s has no label", v.ID())
 	}
 
-	v.evaluator.ctx.Set(v.evaluator.evaluateProvider(v.block, map[string]cty.Value{}), v.ID())
+	v.evaluator.ctx.Set(v.evaluator.evaluateProvider(v.block, map[string]cty.Value{}), v.block.LocalName())
 
 	return nil
 }
