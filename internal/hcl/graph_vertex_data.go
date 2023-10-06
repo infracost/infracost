@@ -33,7 +33,7 @@ func (v *VertexData) Evaluate() error {
 	val := v.evaluator.evaluateResource(v.block, map[string]cty.Value{})
 
 	v.logger.Debugf("adding data %s to the evaluation context", v.ID())
-	key := fmt.Sprintf("data.%s", v.block.Label())
+	key := fmt.Sprintf("data.%s", v.block.LocalName())
 	v.evaluator.ctx.Set(val, key)
 
 	return nil
