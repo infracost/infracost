@@ -137,6 +137,12 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 		}
 	}
 
+	// TODO: is there a better way of doing this?
+	// Add the locals block to the list of filtered blocks. These won't get
+	// added when we walk the graph since locals are evaluated per attribute
+	// and not per block, so we need to make sure this is done here.
+	evaluator.AddFilteredBlocks(evaluator.module.Blocks.OfType("locals")...)
+
 	return nil
 }
 
