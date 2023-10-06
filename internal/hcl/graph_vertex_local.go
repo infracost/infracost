@@ -22,7 +22,7 @@ func (v *VertexLocal) Evaluator() *Evaluator {
 }
 
 func (v *VertexLocal) References() []string {
-	return referencesForAttribute(v.attr)
+	return referencesForAttribute(v.block, v.attr)
 }
 
 func (v *VertexLocal) Evaluate() error {

@@ -403,7 +403,11 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 		return m, err
 	}
 
-	g.Populate(evaluator)
+	err = g.Populate(evaluator)
+	if err != nil {
+		return m, err
+	}
+
 	g.ReduceTransitively()
 	g.Walk()
 	evaluator.module.Blocks = evaluator.filteredBlocks

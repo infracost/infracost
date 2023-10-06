@@ -23,7 +23,7 @@ locals {
 
 resource "aws_instance" "web_app" {
   ami           = "ami-674cbc1e"
-  instance_type = local.instance_type
+  instance_type = module.my-module[0].aws_instance_type
 
   root_block_device {
     volume_size = 50
@@ -45,11 +45,7 @@ resource "aws_lambda_function" "hello_world" {
   handler       = "exports.test"
   runtime       = "nodejs12.x"
   filename      = "function.zip"
-  memory_size   = 1024 # <<<<< Try changing this to 512 to compare costs
-}
-
-output "aws_instance_type" {
-  value = aws_instance.web_app.instance_type
+  memory_size   = 1024
 }
 
 module "my-module" {

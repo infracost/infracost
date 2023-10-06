@@ -13,7 +13,7 @@ type VertexOutput struct {
 }
 
 func (v *VertexOutput) ID() string {
-	return v.block.FullName()
+	return fmt.Sprintf("%s.%s", v.block.ModuleAddress(), v.block.Label())
 }
 
 func (v *VertexOutput) Evaluator() *Evaluator {
