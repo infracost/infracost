@@ -2,6 +2,7 @@ package hcl
 
 import (
 	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/heimdalr/dag"
@@ -115,8 +116,21 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 		}
 
 		refIds := vertex.References()
+
 		for _, refId := range refIds {
-			err := g.dag.AddEdge(refId, vertex.ID())
+			srcId := refId
+
+			// If the reference points to a different module then we want to add
+			// a dependency for that module call
+			if strings.HasPrefix(refId, "module.") {
+				parts := strings.Split(refId, ".")
+				srcId = strings.Join(parts[:2], ".")
+				srcId = stripCount(srcId)
+			}
+
+			g.logger.Debugf("adding edge: %s, %s", srcId, vertex.ID())
+
+			err := g.dag.AddEdge(srcId, vertex.ID())
 			if err != nil {
 				g.logger.Errorf("error adding edge: %s", err)
 			}
@@ -126,7 +140,7 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 	return nil
 }
 
-func (g *Graph) asJSON() ([]byte, error) {
+func (g *Graph) AsJSON() ([]byte, error) {
 	return g.dag.MarshalJSON()
 }
 
@@ -183,36 +197,36 @@ func referencesForBlock(b *Block) []string {
 	refIds := []string{}
 
 	for _, attr := range b.GetAttributes() {
-		for _, ref := range attr.AllReferences() {
-			refId := ref.String()
-			if b.ModuleName() != "" {
-				refId = fmt.Sprintf("%s.%s", b.ModuleName(), refId)
-			}
-			refIds = append(refIds, refId)
-		}
+		refIds = append(refIds, referencesForAttribute(b, attr)...)
 	}
 
 	for _, childBlock := range b.Children() {
-		for _, attr := range childBlock.GetAttributes() {
-			for _, ref := range attr.AllReferences() {
-				refId := ref.String()
-				if childBlock.ModuleName() != "" {
-					refId = fmt.Sprintf("%s.%s", childBlock.ModuleName(), refId)
-				}
-				refIds = append(refIds, refId)
-			}
-		}
+		refIds = append(refIds, referencesForBlock(childBlock)...)
 	}
 
 	return refIds
 }
 
-func referencesForAttribute(a *Attribute) []string {
+func referencesForAttribute(b *Block, a *Attribute) []string {
 	refIds := []string{}
 
 	for _, ref := range a.AllReferences() {
-		refIds = append(refIds, ref.String())
+		refId := ref.String()
+
+		if shouldSkipRef(refId) {
+			continue
+		}
+
+		if b.ModuleName() != "" {
+			refId = fmt.Sprintf("%s.%s", b.ModuleName(), refId)
+		}
+
+		refIds = append(refIds, refId)
 	}
 
 	return refIds
+}
+
+func shouldSkipRef(refId string) bool {
+	return refId == "string." || refId == "count.index"
 }
