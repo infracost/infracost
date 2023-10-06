@@ -40,5 +40,12 @@ func (v *VertexData) Evaluate() error {
 }
 
 func (v *VertexData) Expand() ([]*Block, error) {
-	return []*Block{v.block}, nil
+	visitMu.Lock()
+	defer visitMu.Unlock()
+
+	expanded := []*Block{v.block}
+	expanded = v.evaluator.expandBlockCounts(expanded)
+	expanded = v.evaluator.expandBlockForEaches(expanded)
+
+	return expanded, nil
 }
