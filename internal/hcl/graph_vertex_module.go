@@ -110,6 +110,8 @@ func (v *VertexModule) Expand() ([]*Block, error) {
 		}
 	}
 
+	v.block.expanded = true
+
 	visitMu.Unlock()
 
 	return expanded, nil
