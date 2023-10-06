@@ -82,7 +82,10 @@ func (v *VertexModule) Expand() ([]*Block, error) {
 		)
 		moduleEvaluators[block.FullName()] = moduleEvaluator
 
-		g.Populate(moduleEvaluator)
+		err = g.Populate(moduleEvaluator)
+		if err != nil {
+			return nil, fmt.Errorf("error populating graph: %w", err)
+		}
 	}
 	visitMu.Unlock()
 
@@ -93,7 +96,18 @@ func (v *VertexModule) Expand() ([]*Block, error) {
 
 	for fullName, moduleEvaluator := range moduleEvaluators {
 		moduleEvaluator.module.Blocks = moduleEvaluator.filteredBlocks
-		v.evaluator.moduleCalls[fullName].Module = moduleEvaluator.collectModules()
+
+		modCall := v.evaluator.moduleCalls[fullName]
+		modCall.Module = moduleEvaluator.collectModules()
+
+		outputs := moduleEvaluator.exportOutputs()
+		if val := modCall.Module.Key(); val != nil {
+			v.evaluator.ctx.Set(outputs, "module", stripCount(modCall.Name), *val)
+		} else if val := modCall.Module.Index(); val != nil {
+			v.evaluator.ctx.Set(outputs, "module", stripCount(modCall.Name), fmt.Sprintf("%d", *val))
+		} else {
+			v.evaluator.ctx.Set(outputs, "module", modCall.Name)
+		}
 	}
 
 	visitMu.Unlock()

@@ -24,3 +24,7 @@ resource "aws_instance" "module_web_app" {
     iops        = 800
   }
 }
+
+output "aws_instance_type" {
+  value = "t3.large"
+}
