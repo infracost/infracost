@@ -37,7 +37,18 @@ func (v *VertexProvider) Evaluate() error {
 		return fmt.Errorf("provider block %s has no label", v.ID())
 	}
 
-	v.evaluator.ctx.Set(v.evaluator.evaluateProvider(v.block, map[string]cty.Value{}), v.block.LocalName())
+	var existingVals map[string]cty.Value
+	existingCtx := v.evaluator.ctx.Get(v.block.TypeLabel())
+	if !existingCtx.IsNull() {
+		existingVals = existingCtx.AsValueMap()
+	} else {
+		existingVals = make(map[string]cty.Value)
+	}
+
+	val := v.evaluator.evaluateProvider(v.block, existingVals)
+
+	v.logger.Debugf("adding %s to the evaluation context", v.ID())
+	v.evaluator.ctx.Set(val, v.block.Label())
 
 	return nil
 }
