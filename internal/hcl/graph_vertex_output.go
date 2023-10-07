@@ -13,14 +13,22 @@ type VertexOutput struct {
 }
 
 func (v *VertexOutput) ID() string {
+	if v.block.ModuleName() == "" {
+		return v.block.Label()
+	}
+
 	return fmt.Sprintf("%s.%s", v.block.ModuleAddress(), v.block.Label())
+}
+
+func (v *VertexOutput) ModuleAddress() string {
+	return v.block.ModuleAddress()
 }
 
 func (v *VertexOutput) Evaluator() *Evaluator {
 	return v.evaluator
 }
 
-func (v *VertexOutput) References() []string {
+func (v *VertexOutput) References() []VertexReference {
 	return referencesForBlock(v.block)
 }
 
