@@ -23,11 +23,15 @@ func (v *VertexProvider) ID() string {
 	return id
 }
 
+func (v *VertexProvider) ModuleAddress() string {
+	return v.block.ModuleAddress()
+}
+
 func (v *VertexProvider) Evaluator() *Evaluator {
 	return v.evaluator
 }
 
-func (v *VertexProvider) References() []string {
+func (v *VertexProvider) References() []VertexReference {
 	return referencesForBlock(v.block)
 }
 
