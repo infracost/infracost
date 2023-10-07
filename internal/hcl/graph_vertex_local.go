@@ -17,11 +17,15 @@ func (v *VertexLocal) ID() string {
 	return fmt.Sprintf("%s%s", v.block.FullName(), v.attr.Name())
 }
 
+func (v *VertexLocal) ModuleAddress() string {
+	return v.block.ModuleAddress()
+}
+
 func (v *VertexLocal) Evaluator() *Evaluator {
 	return v.evaluator
 }
 
-func (v *VertexLocal) References() []string {
+func (v *VertexLocal) References() []VertexReference {
 	return referencesForAttribute(v.block, v.attr)
 }
 
