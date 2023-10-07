@@ -409,7 +409,8 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 	g.ReduceTransitively()
 	g.Walk()
 	evaluator.module.Blocks = evaluator.filteredBlocks
-	root := evaluator.collectModules()
+	evaluator.module = *evaluator.collectModules()
+	root := &evaluator.module
 
 	// Existing evaluation
 	// root, err := evaluator.Run()
