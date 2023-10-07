@@ -211,12 +211,25 @@ func (v *GraphVisitor) Visit(id string, vertex interface{}) {
 func referencesForBlock(b *Block) []string {
 	refIds := []string{}
 
+	hasProviderAttr := false
+
 	for _, attr := range b.GetAttributes() {
+		if attr.Name() == "provider" {
+			hasProviderAttr = true
+		}
+
 		refIds = append(refIds, referencesForAttribute(b, attr)...)
 	}
 
 	for _, childBlock := range b.Children() {
 		refIds = append(refIds, referencesForBlock(childBlock)...)
+	}
+
+	if !hasProviderAttr && (b.Type() == "resource" || b.Type() == "data") {
+		providerName := b.Provider()
+		if providerName != "" {
+			refIds = append(refIds, fmt.Sprintf("provider.%s", providerName))
+		}
 	}
 
 	return refIds
@@ -234,6 +247,10 @@ func referencesForAttribute(b *Block, a *Attribute) []string {
 
 		if b.ModuleName() != "" {
 			refId = fmt.Sprintf("%s.%s", b.ModuleName(), refId)
+		}
+
+		if (b.Type() == "resource" || b.Type() == "data") && a.Name() == "provider" {
+			refId = fmt.Sprintf("provider.%s", refId)
 		}
 
 		refIds = append(refIds, refId)
