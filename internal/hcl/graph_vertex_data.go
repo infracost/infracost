@@ -46,6 +46,7 @@ func (v *VertexData) Expand() ([]*Block, error) {
 	expanded := []*Block{v.block}
 	expanded = v.evaluator.expandBlockCounts(expanded)
 	expanded = v.evaluator.expandBlockForEaches(expanded)
+	expanded = v.evaluator.expandDynamicBlocks(expanded...)
 
 	v.block.expanded = true
 
