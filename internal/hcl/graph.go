@@ -111,6 +111,8 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 	}
 
 	for _, vertex := range vertexes {
+		g.logger.Debugf("adding edge: %s, %s", g.rootVertex.ID(), vertex.ID())
+
 		err := g.dag.AddEdge(g.rootVertex.ID(), vertex.ID())
 		if err != nil {
 			g.logger.Errorf("error adding edge: %s", err)
@@ -241,5 +243,5 @@ func referencesForAttribute(b *Block, a *Attribute) []string {
 }
 
 func shouldSkipRef(refId string) bool {
-	return refId == "string." || refId == "count.index"
+	return refId == "count.index" || refId == "each.key" || refId == "each.value" || strings.HasSuffix(refId, ".")
 }

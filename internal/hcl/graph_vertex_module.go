@@ -39,6 +39,7 @@ func (v *VertexModule) Evaluate() error {
 
 func (v *VertexModule) Expand() ([]*Block, error) {
 	visitMu.Lock()
+
 	expanded := []*Block{v.block}
 	expanded = v.evaluator.expandBlockForEaches(expanded)
 	expanded = v.evaluator.expandBlockCounts(expanded)
@@ -55,6 +56,11 @@ func (v *VertexModule) Expand() ([]*Block, error) {
 		if err != nil {
 			return nil, fmt.Errorf("error loading module: %w", err)
 		}
+
+		// TODO: do we need this?
+		// `evaluateModules` sets the module name to this, so we do it
+		// here as well to be consistent
+		modCall.Module.Name = modCall.Definition.FullName()
 
 		v.evaluator.moduleCalls[block.FullName()] = modCall
 
