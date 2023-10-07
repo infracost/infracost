@@ -17,11 +17,15 @@ func (v *VertexResource) ID() string {
 	return v.block.FullName()
 }
 
+func (v *VertexResource) ModuleAddress() string {
+	return v.block.ModuleAddress()
+}
+
 func (v *VertexResource) Evaluator() *Evaluator {
 	return v.evaluator
 }
 
-func (v *VertexResource) References() []string {
+func (v *VertexResource) References() []VertexReference {
 	return referencesForBlock(v.block)
 }
 

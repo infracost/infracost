@@ -2,6 +2,7 @@ package hcl
 
 import (
 	"fmt"
+	"regexp"
 	"strings"
 	"sync"
 
@@ -10,7 +11,10 @@ import (
 	"github.com/zclconf/go-cty/cty"
 )
 
-var visitMu sync.Mutex
+var (
+	visitMu              sync.Mutex
+	addrSplitModuleRegex = regexp.MustCompile(`^((?:module\.[^.]+\.?)+)\.(.*)$`)
+)
 
 type Graph struct {
 	dag        *dag.DAG
@@ -20,10 +24,16 @@ type Graph struct {
 
 type Vertex interface {
 	ID() string
+	ModuleAddress() string
 	Evaluator() *Evaluator
-	References() []string
+	References() []VertexReference
 	Evaluate() error
 	Expand() ([]*Block, error)
+}
+
+type VertexReference struct {
+	ModuleAddress string
+	Key           string
 }
 
 func NewGraph(logger *logrus.Entry) *Graph {
@@ -118,21 +128,44 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 			g.logger.Errorf("error adding edge: %s", err)
 		}
 
-		refIds := vertex.References()
+		for _, ref := range vertex.References() {
+			var srcId string
 
-		for _, refId := range refIds {
-			srcId := refId
+			parts := strings.Split(ref.Key, ".")
+			idx := len(parts)
+
+			// If the reference is to an attribute of a block then we want to
+			// use the block part as the source ID, except for locals where we
+			// want to use the first-level attribute name
+			if strings.HasPrefix(ref.Key, "data.") && len(parts) >= 3 {
+				// Source ID is the first 3 parts or less if the length of parts is less than 3
+				idx = 3
+			} else if len(parts) >= 2 {
+				// resources and outputs don't have a type prefix in the references
+				idx = 2
+			}
+			srcId = strings.Join(parts[:idx], ".")
+
+			// Don't add the module prefix for providers since they are
+			// evaluated in the root module
+			if !strings.HasPrefix(srcId, "provider.") && ref.ModuleAddress != "" {
+				srcId = fmt.Sprintf("%s.%s", ref.ModuleAddress, srcId)
+			}
 
 			// If the reference points to a different module then we want to add
 			// a dependency for that module call
-			if strings.HasPrefix(refId, "module.") {
-				parts := strings.Split(refId, ".")
-				srcId = strings.Join(parts[:2], ".")
-				srcId = stripCount(srcId)
+			if ref.ModuleAddress != vertex.ModuleAddress() {
+				srcId = ref.ModuleAddress
+			}
+
+			// Strip the count/index suffix from the source ID
+			srcId = stripCount(srcId)
+
+			if srcId == vertex.ID() {
+				continue
 			}
 
 			g.logger.Debugf("adding edge: %s, %s", srcId, vertex.ID())
-
 			err := g.dag.AddEdge(srcId, vertex.ID())
 			if err != nil {
 				g.logger.Errorf("error adding edge: %s", err)
@@ -208,8 +241,8 @@ func (v *GraphVisitor) Visit(id string, vertex interface{}) {
 	}
 }
 
-func referencesForBlock(b *Block) []string {
-	refIds := []string{}
+func referencesForBlock(b *Block) []VertexReference {
+	refs := []VertexReference{}
 
 	hasProviderAttr := false
 
@@ -218,47 +251,75 @@ func referencesForBlock(b *Block) []string {
 			hasProviderAttr = true
 		}
 
-		refIds = append(refIds, referencesForAttribute(b, attr)...)
+		refs = append(refs, referencesForAttribute(b, attr)...)
 	}
 
 	for _, childBlock := range b.Children() {
-		refIds = append(refIds, referencesForBlock(childBlock)...)
+		refs = append(refs, referencesForBlock(childBlock)...)
 	}
 
 	if !hasProviderAttr && (b.Type() == "resource" || b.Type() == "data") {
 		providerName := b.Provider()
 		if providerName != "" {
-			refIds = append(refIds, fmt.Sprintf("provider.%s", providerName))
+			refs = append(refs, VertexReference{
+				Key: fmt.Sprintf("provider.%s", providerName),
+			})
 		}
 	}
 
-	return refIds
+	return refs
 }
 
-func referencesForAttribute(b *Block, a *Attribute) []string {
-	refIds := []string{}
+func referencesForAttribute(b *Block, a *Attribute) []VertexReference {
+	refs := []VertexReference{}
 
 	for _, ref := range a.AllReferences() {
-		refId := ref.String()
+		key := ref.String()
 
-		if shouldSkipRef(refId) {
+		if shouldSkipRef(b, a, key) {
 			continue
 		}
 
-		if b.ModuleName() != "" {
-			refId = fmt.Sprintf("%s.%s", b.ModuleName(), refId)
-		}
-
 		if (b.Type() == "resource" || b.Type() == "data") && a.Name() == "provider" {
-			refId = fmt.Sprintf("provider.%s", refId)
+			key = fmt.Sprintf("provider.%s", key)
 		}
 
-		refIds = append(refIds, refId)
+		modAddr := b.ModuleAddress()
+		modPart, otherPart := splitModuleAddr(key)
+
+		if modPart != "" {
+			if modAddr == "" {
+				modAddr = modPart
+			} else {
+				modAddr = fmt.Sprintf("%s.%s", modAddr, modPart)
+			}
+		}
+
+		refs = append(refs, VertexReference{
+			ModuleAddress: modAddr,
+			Key:           otherPart,
+		})
 	}
 
-	return refIds
+	return refs
 }
 
-func shouldSkipRef(refId string) bool {
-	return refId == "count.index" || refId == "each.key" || refId == "each.value" || strings.HasSuffix(refId, ".")
+func shouldSkipRef(block *Block, attr *Attribute, key string) bool {
+	if key == "count.index" || key == "each.key" || key == "each.value" || strings.HasSuffix(key, ".") {
+		return true
+	}
+
+	if block.parent != nil && block.parent.Type() == "variable" && block.Type() == "validation" {
+		return true
+	}
+
+	return false
+}
+
+func splitModuleAddr(address string) (string, string) {
+	matches := addrSplitModuleRegex.FindStringSubmatch(address)
+	if len(matches) == 3 {
+		return matches[1], matches[2]
+	}
+	return "", address
 }
