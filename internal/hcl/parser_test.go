@@ -449,7 +449,7 @@ output "serviceendpoint_principals" {
 
 	blocks := module.Blocks
 
-	output := blocks.Matching(BlockMatcher{Label: "azuread_service_principal", Type: "output"})
+	output := blocks.Matching(BlockMatcher{Label: "serviceendpoint_principals", Type: "output"})
 	require.NotNil(t, output)
 	attr := output.GetAttribute("value")
 	mockedObj := attr.Value()
@@ -681,7 +681,7 @@ resource "aws_instance" "my_instance" {
 
 	blocks := module.Blocks
 
-	resource := blocks.Matching(BlockMatcher{Label: "test", Type: "resource"})
+	resource := blocks.Matching(BlockMatcher{Label: "aws_instance.my_instance", Type: "resource"})
 	require.NotNil(t, resource)
 
 	platformAttr := resource.GetAttribute("platform")
