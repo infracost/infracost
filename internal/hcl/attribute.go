@@ -565,6 +565,8 @@ func (attr *Attribute) referencesFromExpression(expression hcl.Expression) []*Re
 				collectionRef.SetKey(key)
 				refs = append(refs, collectionRef, countRef)
 			}
+
+			refs = append(refs, attr.referencesFromExpression(s.Key)...)
 		default:
 			if ref, err := attr.createDotReferenceFromTraversal(t.Source.Variables()...); err == nil {
 				refs = append(refs, ref)
@@ -575,6 +577,45 @@ func (attr *Attribute) referencesFromExpression(expression hcl.Expression) []*Re
 			key, _ := t.Key.Value(attr.Ctx.Inner())
 			collectionRef.SetKey(key)
 			refs = append(refs, collectionRef, countRef)
+		}
+
+		refs = append(refs, attr.referencesFromExpression(t.Key)...)
+	case *hclsyntax.ForExpr:
+		refs := attr.referencesFromExpression(t.CollExpr)
+		refs = append(refs, attr.referencesFromExpression(t.KeyExpr)...)
+		refs = append(refs, attr.referencesFromExpression(t.ValExpr)...)
+
+		if t.CondExpr != nil {
+			refs = append(refs, attr.referencesFromExpression(t.CondExpr)...)
+		}
+		return refs
+	case *hclsyntax.ObjectConsExpr:
+		for _, item := range t.Items {
+			refs = append(refs, attr.referencesFromExpression(item.KeyExpr)...)
+			refs = append(refs, attr.referencesFromExpression(item.ValueExpr)...)
+		}
+		return refs
+	case *hclsyntax.ObjectConsKeyExpr:
+		refs = append(refs, attr.referencesFromExpression(t.Wrapped)...)
+		return refs
+	case *hclsyntax.SplatExpr:
+		refs = append(refs, attr.referencesFromExpression(t.Source)...)
+		return refs
+	case *hclsyntax.BinaryOpExpr:
+		refs = append(refs, attr.referencesFromExpression(t.LHS)...)
+		refs = append(refs, attr.referencesFromExpression(t.RHS)...)
+		return refs
+	case *hclsyntax.UnaryOpExpr:
+		refs = append(refs, attr.referencesFromExpression(t.Val)...)
+		return refs
+	case *hclsyntax.TemplateJoinExpr:
+		refs = append(refs, attr.referencesFromExpression(t.Tuple)...)
+	case *hclsyntax.ParenthesesExpr:
+		refs = append(refs, attr.referencesFromExpression(t.Expression)...)
+	case *hclsyntax.AnonSymbolExpr:
+		ref, err := attr.createDotReferenceFromTraversal(t.Variables()...)
+		if err == nil {
+			refs = append(refs, ref)
 		}
 	default:
 		attr.Logger.Debugf("could not create references for expression type: %s", t)
