@@ -171,7 +171,7 @@ func (blocks Blocks) Matching(pattern BlockMatcher) *Block {
 		}
 	}
 
-	if len(search) > 0 {
+	if pattern.Label == "" && len(search) > 0 {
 		return search[0]
 	}
 
