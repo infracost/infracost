@@ -476,7 +476,7 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 			continue
 		}
 
-		if block.IsCountExpanded() || !block.IsForEachReferencedExpanded(e.module.Blocks) || !shouldExpandBlock(block) {
+		if block.IsCountExpanded() || !block.IsForEachReferencedExpanded(blocks) || !shouldExpandBlock(block) {
 			original := block.original.GetAttribute("for_each")
 			if !original.HasChanged() {
 				expanded = append(expanded, block)
