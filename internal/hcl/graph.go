@@ -236,7 +236,7 @@ func (v *GraphVisitor) Visit(id string, vertex interface{}) {
 	}
 
 	ve := vert.Evaluator()
-	if ve != nil {
+	if ve != nil && vert.Evaluator() != nil {
 		vert.Evaluator().AddFilteredBlocks(blocks...)
 	}
 }
