@@ -13,7 +13,7 @@ type Context struct {
 	ctx    *hcl.EvalContext
 	parent *Context
 	logger zerolog.Logger
-	mu     sync.Mutex
+	mu     sync.RWMutex
 }
 
 func NewContext(ctx *hcl.EvalContext, parent *Context, logger zerolog.Logger) *Context {
@@ -25,7 +25,7 @@ func NewContext(ctx *hcl.EvalContext, parent *Context, logger zerolog.Logger) *C
 		ctx:    ctx,
 		parent: parent,
 		logger: logger,
-		mu:     sync.Mutex{},
+		mu:     sync.RWMutex{},
 	}
 }
 

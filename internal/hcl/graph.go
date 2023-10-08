@@ -12,7 +12,7 @@ import (
 )
 
 var (
-	visitMu              sync.Mutex
+	visitMu              sync.RWMutex
 	addrSplitModuleRegex = regexp.MustCompile(`^((?:module\.[^.]+\.?)+)\.(.*)$`)
 )
 
