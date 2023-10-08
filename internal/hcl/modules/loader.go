@@ -47,10 +47,11 @@ type ModuleLoader struct {
 	// cachePath is the path to the directory that Infracost will download modules to.
 	// This is normally the top level directory of a multi-project environment, where the
 	// Infracost config file resides or project auto-detection starts from.
-	cachePath string
-	cache     *Cache
-	sync      *intSync.KeyMutex
-	sourceMap config.TerraformSourceMap
+	cachePath           string
+	cache               *Cache
+	tfconfigModuleCache sync.Map
+	sync                *intSync.KeyMutex
+	sourceMap           config.TerraformSourceMap
 
 	packageFetcher *PackageFetcher
 	registryLoader *RegistryLoader
@@ -70,12 +71,13 @@ func NewModuleLoader(cachePath string, credentialsSource *CredentialsSource, sou
 	d := NewDisco(credentialsSource, logger)
 
 	m := &ModuleLoader{
-		cachePath:      cachePath,
-		cache:          NewCache(d, logger),
-		sourceMap:      sourceMap,
-		packageFetcher: fetcher,
-		logger:         logger,
-		sync:           moduleSync,
+		cachePath:           cachePath,
+		cache:               NewCache(d, logger),
+		tfconfigModuleCache: sync.Map{},
+		sourceMap:           sourceMap,
+		packageFetcher:      fetcher,
+		logger:              logger,
+		sync:                moduleSync,
 	}
 
 	m.registryLoader = NewRegistryLoader(fetcher, d, logger)
@@ -182,9 +184,20 @@ func (m *ModuleLoader) Load(path string) (man *Manifest, err error) {
 func (m *ModuleLoader) loadModules(path string, prefix string) ([]*ManifestModule, error) {
 	manifestModules := make([]*ManifestModule, 0)
 
-	module, diags := tfconfig.LoadModule(path)
-	if diags.HasErrors() {
-		return nil, fmt.Errorf("failed to inspect module path %s diag: %w", path, diags.Err())
+	// TODO: can we use a key mutex here?
+	var module *tfconfig.Module
+	value, ok := m.tfconfigModuleCache.Load(path)
+	if ok {
+		module = value.(*tfconfig.Module)
+	} else {
+		var diags tfconfig.Diagnostics
+
+		module, diags = tfconfig.LoadModule(path)
+		if diags.HasErrors() {
+			return nil, fmt.Errorf("failed to inspect module path %s diag: %w", path, diags.Err())
+		}
+
+		m.tfconfigModuleCache.Store(path, module)
 	}
 
 	numJobs := len(module.ModuleCalls)
