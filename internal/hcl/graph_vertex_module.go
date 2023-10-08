@@ -58,6 +58,7 @@ func (v *VertexModule) Expand() ([]*Block, error) {
 	for _, block := range expanded {
 		modCall, err := v.evaluator.loadModule(block)
 		if err != nil {
+			visitMu.Unlock()
 			return nil, fmt.Errorf("error loading module: %w", err)
 		}
 
@@ -94,6 +95,7 @@ func (v *VertexModule) Expand() ([]*Block, error) {
 
 		err = g.Populate(moduleEvaluator)
 		if err != nil {
+			visitMu.Unlock()
 			return nil, fmt.Errorf("error populating graph: %w", err)
 		}
 	}

@@ -834,10 +834,24 @@ func parseKnownModuleRefs(resData map[string]*schema.ResourceData, conf gjson.Re
 		},
 	}
 
+	sources := make(map[string]string)
+
 	for _, d := range resData {
+		modNames := getModuleNames(d.Address)
+
+		p := make([]string, 0, len(modNames))
+		for _, n := range modNames {
+			p = append(p, fmt.Sprintf("module_calls.%s", n))
+		}
+
+		sourceKey := fmt.Sprintf("%s.source", strings.Join(p, ".module."))
+
+		modSource, ok := sources[sourceKey]
+		if !ok {
+			modSource = conf.Get(sourceKey).String()
+		}
+
 		for _, knownRef := range knownRefs {
-			modNames := getModuleNames(d.Address)
-			modSource := getModuleConfJSON(conf, modNames).Get("source").String()
 			matches := strings.HasSuffix(removeAddressArrayPart(d.Address), knownRef.SourceAddrSuffix) && modSource == knownRef.ModuleSource
 
 			if matches {

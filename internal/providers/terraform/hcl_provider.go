@@ -40,7 +40,7 @@ type HCLProvider struct {
 
 	schema *PlanSchema
 	ctx    *config.ProjectContext
-	cache  []HCLProject
+	cache  []*HCLProject
 	config HCLProviderConfig
 }
 
@@ -228,7 +228,7 @@ func (p *HCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, e
 	return projects, nil
 }
 
-func (p *HCLProvider) parseResources(parsed HCLProject, usage schema.UsageMap) *schema.Project {
+func (p *HCLProvider) parseResources(parsed *HCLProject, usage schema.UsageMap) *schema.Project {
 	project := p.newProject(parsed)
 
 	partialPastResources, partialResources, providerMetadatas, err := p.planJSONParser.parseJSON(parsed.JSON, usage)
@@ -246,7 +246,7 @@ func (p *HCLProvider) parseResources(parsed HCLProject, usage schema.UsageMap) *
 	return project
 }
 
-func (p *HCLProvider) newProject(parsed HCLProject) *schema.Project {
+func (p *HCLProvider) newProject(parsed *HCLProject) *schema.Project {
 	metadata := config.DetectProjectMetadata(parsed.Module.RootPath)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
@@ -294,8 +294,8 @@ type HCLProject struct {
 }
 
 // LoadPlanJSONs parses the found directories and return the blocks in Terraform plan JSON format.
-func (p *HCLProvider) LoadPlanJSONs() []HCLProject {
-	var jsons = make([]HCLProject, len(p.parsers))
+func (p *HCLProvider) LoadPlanJSONs() []*HCLProject {
+	var jsons = make([]*HCLProject, len(p.parsers))
 	mods := p.Modules()
 
 	for i, module := range mods {
@@ -318,7 +318,7 @@ func (p *HCLProvider) LoadPlanJSONs() []HCLProject {
 // Modules parses the found directories into hcl modules representing a config tree of Terraform information.
 // Modules returns the raw hcl blocks associated with each found Terraform project. This can be used
 // to fetch raw information like outputs, vars, resources, e.t.c.
-func (p *HCLProvider) Modules() []HCLProject {
+func (p *HCLProvider) Modules() []*HCLProject {
 	if p.cache != nil {
 		return p.cache
 	}
@@ -338,7 +338,7 @@ func (p *HCLProvider) Modules() []HCLProject {
 	}
 
 	ch := make(chan *hcl.Parser, numJobs)
-	mods := make([]HCLProject, 0, numJobs)
+	mods := make([]*HCLProject, 0, numJobs)
 	mu := &sync.Mutex{}
 	wg := &sync.WaitGroup{}
 
@@ -370,7 +370,7 @@ func (p *HCLProvider) Modules() []HCLProject {
 				}
 
 				mu.Lock()
-				mods = append(mods, HCLProject{Module: module, Error: modErr})
+				mods = append(mods, &HCLProject{Module: module, Error: modErr})
 				mu.Unlock()
 			}
 		}()
