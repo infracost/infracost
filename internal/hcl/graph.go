@@ -125,7 +125,7 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 
 		err := g.dag.AddEdge(g.rootVertex.ID(), vertex.ID())
 		if err != nil {
-			g.logger.Errorf("error adding edge: %s", err)
+			g.logger.Debugf("error adding edge: %s", err)
 		}
 
 		for _, ref := range vertex.References() {
@@ -168,7 +168,7 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 			g.logger.Debugf("adding edge: %s, %s", srcId, vertex.ID())
 			err := g.dag.AddEdge(srcId, vertex.ID())
 			if err != nil {
-				g.logger.Errorf("error adding edge: %s", err)
+				g.logger.Debugf("error adding edge: %s", err)
 			}
 		}
 	}
