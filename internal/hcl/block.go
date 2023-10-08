@@ -11,6 +11,7 @@ import (
 	"strings"
 
 	"github.com/hashicorp/hcl/v2"
+	"github.com/hashicorp/hcl/v2/hclparse"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
@@ -274,6 +275,7 @@ type BlockBuilder struct {
 	MockFunc      func(a *Attribute) cty.Value
 	SetAttributes []SetAttributesFunc
 	Logger        *logrus.Entry
+	hclParser     *hclparse.Parser
 }
 
 // NewBlock returns a Block with Context and child Blocks initialised.
@@ -403,7 +405,7 @@ func (b BlockBuilder) CloneBlock(block *Block, index cty.Value) *Block {
 // BuildModuleBlocks loads all the Blocks for the module at the given path
 func (b BlockBuilder) BuildModuleBlocks(block *Block, modulePath string, rootPath string) (Blocks, error) {
 	var blocks Blocks
-	moduleFiles, err := loadDirectory(b.Logger, modulePath, true)
+	moduleFiles, err := loadDirectory(b.hclParser, b.Logger, modulePath, true)
 	if err != nil {
 		return blocks, fmt.Errorf("failed to load module %s: %w", block.Label(), err)
 	}

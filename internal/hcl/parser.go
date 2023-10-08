@@ -9,6 +9,7 @@ import (
 	"runtime/debug"
 	"sort"
 	"strings"
+	"sync"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclparse"
@@ -25,6 +26,8 @@ import (
 
 var (
 	defaultTerraformWorkspaceName = "default"
+	globalHCLParser               = hclparse.NewParser()
+	mu                            = &sync.Mutex{}
 )
 
 type Option func(p *Parser)
@@ -206,6 +209,7 @@ type Parser struct {
 	inputVars             map[string]cty.Value
 	workspaceName         string
 	moduleLoader          *modules.ModuleLoader
+	hclParser             *hclparse.Parser
 	blockBuilder          BlockBuilder
 	newSpinner            ui.SpinnerFunc
 	remoteVariablesLoader *RemoteVariablesLoader
@@ -280,11 +284,14 @@ func newParser(projectRoot RootPath, moduleLoader *modules.ModuleLoader, logger 
 		"parser_path": projectRoot.Path,
 	})
 
+	hclParser := hclparse.NewParser()
+
 	p := &Parser{
 		initialPath:   projectRoot.Path,
 		hasChanges:    projectRoot.HasChanges,
 		workspaceName: defaultTerraformWorkspaceName,
-		blockBuilder:  BlockBuilder{SetAttributes: []SetAttributesFunc{SetUUIDAttributes}, Logger: logger},
+		hclParser:     hclParser,
+		blockBuilder:  BlockBuilder{SetAttributes: []SetAttributesFunc{SetUUIDAttributes}, Logger: logger, hclParser: hclParser},
 		logger:        parserLogger,
 		moduleLoader:  moduleLoader,
 	}
@@ -343,7 +350,7 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 
 	// load the initial root directory into a list of hcl files
 	// at this point these files have no schema associated with them.
-	files, err := loadDirectory(p.logger, p.initialPath, false)
+	files, err := loadDirectory(p.hclParser, p.logger, p.initialPath, false)
 	if err != nil {
 		return m, err
 	}
@@ -585,13 +592,13 @@ type file struct {
 	hclFile *hcl.File
 }
 
-func loadDirectory(logger *logrus.Entry, fullPath string, stopOnHCLError bool) ([]file, error) {
-	hclParser := hclparse.NewParser()
-
+func loadDirectory(hclParser *hclparse.Parser, logger *logrus.Entry, fullPath string, stopOnHCLError bool) ([]file, error) {
 	fileInfos, err := os.ReadDir(fullPath)
 	if err != nil {
 		return nil, err
 	}
+
+	files := make([]file, 0)
 
 	for _, info := range fileInfos {
 		if info.IsDir() {
@@ -613,7 +620,10 @@ func loadDirectory(logger *logrus.Entry, fullPath string, stopOnHCLError bool) (
 		}
 
 		path := filepath.Join(fullPath, info.Name())
-		_, diag := parseFunc(path)
+
+		mu.Lock()
+		f, diag := parseFunc(path)
+		mu.Unlock()
 		if diag != nil && diag.HasErrors() {
 			if stopOnHCLError {
 				return nil, diag
@@ -622,11 +632,8 @@ func loadDirectory(logger *logrus.Entry, fullPath string, stopOnHCLError bool) (
 			logger.Debugf("skipping file: %s hcl parsing err: %s", path, diag.Error())
 			continue
 		}
-	}
 
-	files := make([]file, 0, len(hclParser.Files()))
-	for filename, f := range hclParser.Files() {
-		files = append(files, file{hclFile: f, path: filename})
+		files = append(files, file{hclFile: f, path: path})
 	}
 
 	// sort files by path to ensure consistent ordering
