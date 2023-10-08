@@ -109,7 +109,7 @@ func mergeVars(src cty.Value, parts []string, value cty.Value) cty.Value {
 	data := make(map[string]cty.Value)
 	if src.Type().IsObjectType() && !src.IsNull() && src.LengthInt() > 0 {
 		data = src.AsValueMap()
-		tmp, ok := src.AsValueMap()[parts[0]]
+		tmp, ok := data[parts[0]]
 		if !ok {
 			src = cty.ObjectVal(make(map[string]cty.Value))
 		} else {
