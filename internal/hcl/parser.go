@@ -397,28 +397,32 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 		nil,
 	)
 
+	var root *Module
+
 	// Graph evaluation
-	g, err := NewGraphWithRoot(p.logger)
-	if err != nil {
-		return m, err
+	if os.Getenv("INFRACOST_GRAPH_EVALUATOR") == "true" {
+		g, err := NewGraphWithRoot(p.logger)
+		if err != nil {
+			return m, err
+		}
+
+		err = g.Populate(evaluator)
+		if err != nil {
+			return m, err
+		}
+
+		g.ReduceTransitively()
+		g.Walk()
+		evaluator.module.Blocks = evaluator.filteredBlocks
+		evaluator.module = *evaluator.collectModules()
+		root = &evaluator.module
+	} else {
+		// Existing evaluation
+		root, err = evaluator.Run()
+		if err != nil {
+			return m, err
+		}
 	}
-
-	err = g.Populate(evaluator)
-	if err != nil {
-		return m, err
-	}
-
-	g.ReduceTransitively()
-	g.Walk()
-	evaluator.module.Blocks = evaluator.filteredBlocks
-	evaluator.module = *evaluator.collectModules()
-	root := &evaluator.module
-
-	// Existing evaluation
-	// root, err := evaluator.Run()
-	// if err != nil {
-	// 	return m, err
-	// }
 
 	root.HasChanges = p.hasChanges
 	root.TerraformVarsPaths = p.tfvarsPaths
