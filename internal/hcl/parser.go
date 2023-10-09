@@ -26,7 +26,6 @@ import (
 
 var (
 	defaultTerraformWorkspaceName = "default"
-	globalHCLParser               = hclparse.NewParser()
 	mu                            = &sync.Mutex{}
 )
 
