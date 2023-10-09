@@ -231,7 +231,7 @@ func (p *TerragruntHCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.
 						}
 					}
 
-					metadata := p.newProjectMetadata(projectPath)
+					metadata := p.newProjectMetadata(projectPath, project.Metadata)
 					metadata.Warnings = di.warnings
 					project.Metadata = metadata
 					project.Name = p.generateProjectName(metadata)
@@ -267,7 +267,7 @@ func (p *TerragruntHCLProvider) newErroredProject(di *terragruntWorkingDirInfo) 
 		}
 	}
 
-	metadata := p.newProjectMetadata(projectPath)
+	metadata := p.newProjectMetadata(projectPath, nil)
 
 	if di.error != nil {
 		metadata.AddErrorWithCode(di.error, schema.DiagTerragruntEvaluationFailure)
@@ -284,10 +284,14 @@ func (p *TerragruntHCLProvider) generateProjectName(metadata *schema.ProjectMeta
 	return name
 }
 
-func (p *TerragruntHCLProvider) newProjectMetadata(projectPath string) *schema.ProjectMetadata {
+func (p *TerragruntHCLProvider) newProjectMetadata(projectPath string, originalMetadata *schema.ProjectMetadata) *schema.ProjectMetadata {
 	metadata := config.DetectProjectMetadata(projectPath)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
+	if originalMetadata != nil {
+		metadata.PolicySha = originalMetadata.PolicySha
+		metadata.PastPolicySha = originalMetadata.PastPolicySha
+	}
 
 	return metadata
 }
