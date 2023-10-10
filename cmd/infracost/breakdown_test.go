@@ -1079,3 +1079,32 @@ func TestBreakdownWithPolicyDataUploadPlanJson(t *testing.T) {
 
 	testutil.AssertGoldenFile(t, path.Join("./testdata", testName, testName+"-upload.golden"), uploadWriter.Bytes())
 }
+
+func TestBreakdownWithPolicyDataUploadTerragrunt(t *testing.T) {
+	ts, uploadWriter := GraphqlTestServerWithWriter(map[string]string{
+		"policyResourceAllowList": policyResourceAllowlistGraphQLResponse,
+		"storePolicyResources":    storePolicyResourcesGraphQLResponse,
+	})
+	defer ts.Close()
+
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testName,
+		[]string{
+			"breakdown",
+			"--format", "json",
+			"--path", dir,
+		},
+		&GoldenFileOptions{
+			CaptureLogs: true,
+			IsJSON:      true,
+		}, func(ctx *config.RunContext) {
+			ctx.Config.PolicyV2APIEndpoint = ts.URL
+			ctx.Config.PoliciesEnabled = true
+		},
+	)
+
+	testutil.AssertGoldenFile(t, path.Join("./testdata", testName, testName+"-upload.golden"), stripDynamicValues(uploadWriter.Bytes()))
+}
