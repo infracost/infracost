@@ -13,7 +13,6 @@ import (
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/logging"
-
 	"github.com/infracost/infracost/internal/testutil"
 )
 
@@ -444,9 +443,17 @@ func GuardrailGoldenFileTest(t *testing.T, testName, guardrailEndpointUrl string
 }
 
 type guardrailAddRunResponse struct {
-	GuardrailsChecked int64            `json:"guardrailsChecked"`
-	Comment           bool             `json:"guardrailComment"`
-	Events            []guardrailEvent `json:"guardrailEvents"`
+	GuardrailsChecked int64              `json:"guardrailsChecked"`
+	Comment           bool               `json:"guardrailComment"`
+	Events            []guardrailEvent   `json:"guardrailEvents"`
+	GovernanceResults []GovernanceResult `json:"governanceResults"`
+}
+
+type GovernanceResult struct {
+	Type     string   `json:"govType"`
+	Checked  int64    `json:"checked"`
+	Warnings []string `json:"warnings"`
+	Failures []string `json:"failures"`
 }
 
 type guardrailEvent struct {
@@ -455,13 +462,30 @@ type guardrailEvent struct {
 	BlockPr       bool   `json:"blockPr"`
 }
 
-func guardrailTestEndpoint(gr guardrailAddRunResponse) *httptest.Server {
+func guardrailTestEndpoint(garr guardrailAddRunResponse) *httptest.Server {
+	if garr.GuardrailsChecked > 0 {
+		gr := GovernanceResult{
+			Type:    "guardrail",
+			Checked: garr.GuardrailsChecked,
+		}
+
+		for _, e := range garr.Events {
+			if e.BlockPr {
+				gr.Failures = append(gr.Failures, e.TriggerReason)
+			} else {
+				gr.Warnings = append(gr.Warnings, e.TriggerReason)
+			}
+		}
+
+		garr.GovernanceResults = append(garr.GovernanceResults, gr)
+	}
+
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		bodyBytes, _ := io.ReadAll(r.Body)
 		graphqlQuery := string(bodyBytes)
 
 		if strings.Contains(graphqlQuery, "mutation($run: RunInput!)") {
-			guardrailJson, _ := json.Marshal(gr)
+			guardrailJson, _ := json.Marshal(garr)
 
 			fmt.Fprintf(w, `[{"data": {"addRun":
 				%v

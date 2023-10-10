@@ -100,6 +100,7 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 	finOpsPolicyCheck := output.NewFinOpsPolicyChecks(combined.FinOpsPolicies)
 
 	var guardrailCheck output.GuardrailCheck
+	var governanceFailures output.GovernanceFailures
 	dryRun, _ := cmd.Flags().GetBool("dry-run")
 	if ctx.IsCloudUploadEnabled() && !dryRun {
 		if ctx.Config.IsSelfHosted() {
@@ -107,7 +108,7 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 		} else {
 			combined.Metadata.InfracostCommand = "comment"
 			result := shareCombinedRun(ctx, combined, inputs)
-			combined.RunID, combined.ShareURL, combined.CloudURL, guardrailCheck = result.RunID, result.ShareURL, result.CloudURL, result.GuardrailCheck
+			combined.RunID, combined.ShareURL, combined.CloudURL, guardrailCheck, governanceFailures = result.RunID, result.ShareURL, result.CloudURL, result.GuardrailCheck, result.GovernanceFailures
 		}
 	}
 
@@ -159,8 +160,8 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 	if policyChecks.HasFailed() {
 		return out, policyChecks.Failures
 	}
-	if len(guardrailCheck.BlockingFailures()) > 0 {
-		return out, guardrailCheck.BlockingFailures()
+	if len(governanceFailures) > 0 {
+		return out, governanceFailures
 	}
 	if len(finOpsPolicyCheck.Failing) > 0 {
 		return out, finOpsPolicyCheck
@@ -273,7 +274,7 @@ func isErrorUnhandled(err error) bool {
 	}
 
 	switch err.(type) {
-	case output.PolicyCheckFailures, output.GuardrailFailures, output.TagPolicyCheck, output.FinOpsPolicyCheck:
+	case output.PolicyCheckFailures, output.GovernanceFailures, output.TagPolicyCheck, output.FinOpsPolicyCheck:
 		return false
 	}
 

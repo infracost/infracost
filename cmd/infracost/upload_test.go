@@ -102,16 +102,11 @@ func TestUploadWithCloudDisabled(t *testing.T) {
 }
 
 func TestUploadWithGuardrailSuccess(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, `[{"data": {"addRun":{
-			"id":"d92e0196-e5b0-449b-85c9-5733f6643c2f",
-			"shareUrl":"",
-			"organization":{"id":"767", "name":"tim"},
-			"guardrailsChecked": 2,
-            "guardrailComment": false,
-            "guardrailEvents": []
-		}}}]`)
-	}))
+	ts := guardrailTestEndpoint(guardrailAddRunResponse{
+		GuardrailsChecked: 2,
+		Comment:           false,
+		Events:            []guardrailEvent{},
+	})
 	defer ts.Close()
 
 	GoldenFileCommandTest(t,
@@ -127,20 +122,16 @@ func TestUploadWithGuardrailSuccess(t *testing.T) {
 }
 
 func TestUploadWithGuardrailFailure(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, `[{"data": {"addRun":{
-			"id":"d92e0196-e5b0-449b-85c9-5733f6643c2f",
-			"shareUrl":"",
-			"organization":{"id":"767", "name":"tim"},
-			"guardrailsChecked": 2,
-            "guardrailComment": false,
-            "guardrailEvents": [{
-              "triggerReason": "medical problems",
-              "prComment": false,
-              "blockPr": false,
-			}]
-		}}}]`)
-	}))
+	ts := guardrailTestEndpoint(guardrailAddRunResponse{
+		GuardrailsChecked: 2,
+		Comment:           false,
+		Events: []guardrailEvent{{
+			TriggerReason: "medical problems",
+			PrComment:     false,
+			BlockPr:       false,
+		}},
+	})
+	defer ts.Close()
 	defer ts.Close()
 
 	GoldenFileCommandTest(t,
@@ -156,20 +147,15 @@ func TestUploadWithGuardrailFailure(t *testing.T) {
 }
 
 func TestUploadWithBlockingGuardrailFailure(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, `[{"data": {"addRun":{
-			"id":"d92e0196-e5b0-449b-85c9-5733f6643c2f",
-			"shareUrl":"",
-			"organization":{"id":"767", "name":"tim"},
-			"guardrailsChecked": 2,
-            "guardrailComment": false,
-            "guardrailEvents": [{
-              "triggerReason": "medical problems",
-              "prComment": false,
-              "blockPr": true,
-			}]
-		}}}]`)
-	}))
+	ts := guardrailTestEndpoint(guardrailAddRunResponse{
+		GuardrailsChecked: 2,
+		Comment:           false,
+		Events: []guardrailEvent{{
+			TriggerReason: "medical problems",
+			PrComment:     false,
+			BlockPr:       true,
+		}},
+	})
 	defer ts.Close()
 
 	GoldenFileCommandTest(t,

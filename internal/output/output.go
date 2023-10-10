@@ -886,24 +886,27 @@ func (g GuardrailCheck) Title() string {
 	return "⚠️ Guardrails triggered"
 }
 
-// GuardrailFailures defines a list of guardrail failures that were returned from infracost cloud.
-type GuardrailFailures []string
+// GovernanceFailures defines a list of governance failures that were returned from infracost cloud.
+type GovernanceFailures []string
 
 // Error implements the Error interface returning the failures as a single message that can be used in stderr.
-func (g GuardrailFailures) Error() string {
+func (g GovernanceFailures) Error() string {
 	if len(g) == 0 {
 		return ""
 	}
 
 	out := &strings.Builder{}
-	out.WriteString("Guardrail check failed:\n\n")
+	out.WriteString("Governance check failed:\n\n")
 
-	for _, e := range g {
-		out.WriteString(" - " + e + "\n")
+	for _, f := range g {
+		out.WriteString(fmt.Sprintf(" - %s\n", f))
 	}
 
 	return out.String()
 }
+
+// GuardrailFailures defines a list of guardrail failures that were returned from infracost cloud.
+type GuardrailFailures []string
 
 type MarkdownOptions struct {
 	WillUpdate          bool
