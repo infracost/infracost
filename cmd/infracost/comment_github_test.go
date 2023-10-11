@@ -376,11 +376,19 @@ func TestCommentGitHubGuardrailFailureWithBlock(t *testing.T) {
 	ts := guardrailTestEndpoint(guardrailAddRunResponse{
 		GuardrailsChecked: 1,
 		Comment:           false,
-		Events: []guardrailEvent{{
-			TriggerReason: "Stand by your estimate",
-			PrComment:     false,
-			BlockPr:       true,
-		}},
+		Events: []guardrailEvent{
+			{
+				TriggerReason: "Stand by your estimate",
+				PrComment:     false,
+				BlockPr:       true,
+			},
+			{
+				TriggerReason: "Unblocked ge",
+				PrComment:     false,
+				BlockPr:       false,
+				Unblocked:     true,
+			},
+		},
 	})
 	defer ts.Close()
 
@@ -450,16 +458,18 @@ type guardrailAddRunResponse struct {
 }
 
 type GovernanceResult struct {
-	Type     string   `json:"govType"`
-	Checked  int64    `json:"checked"`
-	Warnings []string `json:"warnings"`
-	Failures []string `json:"failures"`
+	Type      string   `json:"govType"`
+	Checked   int64    `json:"checked"`
+	Warnings  []string `json:"warnings"`
+	Failures  []string `json:"failures"`
+	Unblocked []string `json:"unblocked"`
 }
 
 type guardrailEvent struct {
 	TriggerReason string `json:"triggerReason"`
 	PrComment     bool   `json:"prComment"`
 	BlockPr       bool   `json:"blockPr"`
+	Unblocked     bool   `json:"unblocked"`
 }
 
 func guardrailTestEndpoint(garr guardrailAddRunResponse) *httptest.Server {
@@ -472,6 +482,8 @@ func guardrailTestEndpoint(garr guardrailAddRunResponse) *httptest.Server {
 		for _, e := range garr.Events {
 			if e.BlockPr {
 				gr.Failures = append(gr.Failures, e.TriggerReason)
+			} else if e.Unblocked {
+				gr.Unblocked = append(gr.Unblocked, e.TriggerReason)
 			} else {
 				gr.Warnings = append(gr.Warnings, e.TriggerReason)
 			}

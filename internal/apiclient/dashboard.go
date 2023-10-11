@@ -34,10 +34,11 @@ type AddRunResponse struct {
 }
 
 type GovernanceResult struct {
-	Type     string   `json:"govType"`
-	Checked  int64    `json:"checked"`
-	Warnings []string `json:"warnings"`
-	Failures []string `json:"failures"`
+	Type      string   `json:"govType"`
+	Checked   int64    `json:"checked"`
+	Warnings  []string `json:"warnings"`
+	Failures  []string `json:"failures"`
+	Unblocked []string `json:"unblocked"`
 }
 
 type QueryCLISettingsResponse struct {
@@ -145,6 +146,7 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (Ad
 					checked
 					warnings
 					failures
+					unblocked
 				}
 
 				guardrailsChecked
@@ -206,6 +208,9 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (Ad
 				t = strings.ReplaceAll(t, "policy", "policies")
 			}
 			outputGovernanceMessages(ctx, fmt.Sprintf("%d %s checked", gr.Checked, t))
+			for _, msg := range gr.Unblocked {
+				outputGovernanceMessages(ctx, fmt.Sprintf("%s check unblocked: %s", gr.Type, msg))
+			}
 			for _, msg := range gr.Warnings {
 				outputGovernanceMessages(ctx, fmt.Sprintf("%s check failed: %s", gr.Type, msg))
 			}

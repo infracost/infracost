@@ -10,6 +10,7 @@ Error: Governance check failed:
 Logs:
 level=info msg="Estimate uploaded to Infracost Cloud"
 level=info msg="1 guardrail checked"
+level=info msg="guardrail check unblocked: Unblocked ge"
 level=info msg="guardrail check failed: Stand by your estimate"
 level=info msg="Creating new comment"
 level=info msg="Created new comment: "
