@@ -781,25 +781,19 @@ type GuardrailEvent struct {
 	UnblockedAt *string `json:"unblockedAt"`
 }
 
-// LoadGuardrailCheck reads the file at the path  into a GuardrailCheck struct.
-func LoadGuardrailCheck(path string) (GuardrailCheck, error) {
-	var out GuardrailCheck
+// LoadAdditionalCommentData reads the file at the path  into a string.
+func LoadAdditionalCommentData(path string) (string, error) {
 	_, err := os.Stat(path)
 	if errors.Is(err, os.ErrNotExist) {
-		return out, errors.New("guardrail-check-path does not exist ")
+		return "", errors.New("additional-path does not exist ")
 	}
 
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return out, fmt.Errorf("error reading guardrail check JSON file %w", err)
+		return "", fmt.Errorf("error reading additional comment data file %w", err)
 	}
 
-	err = json.Unmarshal(data, &out)
-	if err != nil {
-		return out, fmt.Errorf("invalid guardrail check JSON file %w", err)
-	}
-
-	return out, nil
+	return string(data), nil
 }
 
 // AllFailures are all the guardrail failures triggered by the run
@@ -915,6 +909,7 @@ type MarkdownOptions struct {
 	OmitDetails         bool
 	BasicSyntax         bool
 	MaxMessageSize      int
+	Additional          string
 }
 
 func outputBreakdown(c *config.Config, resources []*schema.Resource) *Breakdown {

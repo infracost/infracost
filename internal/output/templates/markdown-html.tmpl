@@ -140,6 +140,9 @@ This change is blocked, either reduce the costs or wait for an admin to review a
 <p><strong>✅ Guardrails passed</strong></p>
 	{{- end }}
 {{- end }}
+{{- if .MarkdownOptions.Additional }}
+{{ .MarkdownOptions.Additional }}
+{{- end }}
 {{- if displaySub  }}
 <sub>
 {{- if .Root.CloudURL }}<a href="{{ .Root.CloudURL }}" rel="noopener noreferrer" target="_blank">View in Infracost Cloud. </a>{{- end }}

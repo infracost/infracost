@@ -58,8 +58,8 @@ func commentCmd(ctx *config.RunContext) *cobra.Command {
 		_ = subCmd.Flags().MarkHidden("show-changed")
 		subCmd.Flags().Bool("skip-no-diff", false, "Skip posting comment if there are no resource changes. Only applies to update, hide-and-new, and delete-and-new behaviors")
 		_ = subCmd.Flags().MarkHidden("skip-no-diff")
-		subCmd.Flags().String("guardrail-check-path", "", "Path to Infracost guardrail data (experimental)")
-		_ = subCmd.Flags().MarkHidden("guardrail-check-path")
+		subCmd.Flags().String("additional-path", "", "Path to additional comment text (experimental)")
+		_ = subCmd.Flags().MarkHidden("additional-path")
 	}
 
 	cmd.AddCommand(cmds...)
@@ -100,6 +100,7 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 	finOpsPolicyCheck := output.NewFinOpsPolicyChecks(combined.FinOpsPolicies)
 
 	var guardrailCheck output.GuardrailCheck
+	var additionalCommentData string
 	var governanceFailures output.GovernanceFailures
 	dryRun, _ := cmd.Flags().GetBool("dry-run")
 	if ctx.IsCloudUploadEnabled() && !dryRun {
@@ -112,11 +113,11 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 		}
 	}
 
-	guardrailCheckPath, _ := cmd.Flags().GetString("guardrail-check-path")
-	if guardrailCheckPath != "" {
-		guardrailCheck, err = output.LoadGuardrailCheck(guardrailCheckPath)
+	additionalPath, _ := cmd.Flags().GetString("additional-path")
+	if additionalPath != "" {
+		additionalCommentData, err = output.LoadAdditionalCommentData(additionalPath)
 		if err != nil {
-			return nil, fmt.Errorf("Error loading %s used by --guardrail-check-path flag. %s", guardrailCheckPath, err)
+			return nil, fmt.Errorf("Error loading %s used by --additional-path flag. %s", additionalPath, err)
 		}
 	}
 
@@ -142,6 +143,7 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 	opts.ShowOnlyChanges, _ = cmd.Flags().GetBool("show-changed")
 	opts.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
 
+	mdOpts.Additional = additionalCommentData
 	md, err := output.ToMarkdown(combined, opts, mdOpts)
 	if err != nil {
 		return nil, err

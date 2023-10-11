@@ -82,7 +82,10 @@
 ## ✅ Policies passed ##
   {{- end }}
 {{- end}}
+{{- if .MarkdownOptions.Additional }}
 
+{{ .MarkdownOptions.Additional }}
+{{- end }}
 {{- if .MarkdownOptions.WillUpdate }}
 
 This comment will be updated when the cost estimate changes.

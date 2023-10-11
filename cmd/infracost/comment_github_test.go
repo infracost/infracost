@@ -55,7 +55,7 @@ func TestCommentGitHubWithMissingGuardrailCheckPath(t *testing.T) {
 			"--show-changed",
 			"--path", "./testdata/changes.json",
 			"--dry-run",
-			"--guardrail-check-path", "./does/not/exist.json"},
+			"--additional-path", "./does/not/exist.md"},
 		nil)
 }
 
@@ -71,7 +71,7 @@ func TestCommentGitHubWithGuardrailCheckPath(t *testing.T) {
 			"--show-changed",
 			"--path", "./testdata/changes.json",
 			"--dry-run",
-			"--guardrail-check-path", path.Join(dir, "./guardrailCheck.json")},
+			"--additional-path", path.Join(dir, "./additional-comment.md")},
 		nil)
 }
 
