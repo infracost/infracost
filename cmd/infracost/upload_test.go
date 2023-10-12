@@ -103,9 +103,11 @@ func TestUploadWithCloudDisabled(t *testing.T) {
 
 func TestUploadWithGuardrailSuccess(t *testing.T) {
 	ts := guardrailTestEndpoint(guardrailAddRunResponse{
-		GuardrailsChecked: 2,
-		Comment:           false,
-		Events:            []guardrailEvent{},
+		GovernanceComment: "",
+		GovernanceResults: []GovernanceResult{{
+			Type:    "guardrail",
+			Checked: 2,
+		}},
 	})
 	defer ts.Close()
 
@@ -123,12 +125,13 @@ func TestUploadWithGuardrailSuccess(t *testing.T) {
 
 func TestUploadWithGuardrailFailure(t *testing.T) {
 	ts := guardrailTestEndpoint(guardrailAddRunResponse{
-		GuardrailsChecked: 2,
-		Comment:           false,
-		Events: []guardrailEvent{{
-			TriggerReason: "medical problems",
-			PrComment:     false,
-			BlockPr:       false,
+		GovernanceComment: "",
+		GovernanceResults: []GovernanceResult{{
+			Type:    "guardrail",
+			Checked: 2,
+			Warnings: []string{
+				"medical problems",
+			},
 		}},
 	})
 	defer ts.Close()
@@ -148,12 +151,13 @@ func TestUploadWithGuardrailFailure(t *testing.T) {
 
 func TestUploadWithBlockingGuardrailFailure(t *testing.T) {
 	ts := guardrailTestEndpoint(guardrailAddRunResponse{
-		GuardrailsChecked: 2,
-		Comment:           false,
-		Events: []guardrailEvent{{
-			TriggerReason: "medical problems",
-			PrComment:     false,
-			BlockPr:       true,
+		GovernanceComment: "",
+		GovernanceResults: []GovernanceResult{{
+			Type:    "guardrail",
+			Checked: 2,
+			Failures: []string{
+				"medical problems",
+			},
 		}},
 	})
 	defer ts.Close()

@@ -99,7 +99,6 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 	tagPolicyCheck := output.NewTagPolicyChecks(combined.TagPolicies)
 	finOpsPolicyCheck := output.NewFinOpsPolicyChecks(combined.FinOpsPolicies)
 
-	var guardrailCheck output.GuardrailCheck
 	var additionalCommentData string
 	var governanceFailures output.GovernanceFailures
 	dryRun, _ := cmd.Flags().GetBool("dry-run")
@@ -109,7 +108,8 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 		} else {
 			combined.Metadata.InfracostCommand = "comment"
 			result := shareCombinedRun(ctx, combined, inputs)
-			combined.RunID, combined.ShareURL, combined.CloudURL, guardrailCheck, governanceFailures = result.RunID, result.ShareURL, result.CloudURL, result.GuardrailCheck, result.GovernanceFailures
+			combined.RunID, combined.ShareURL, combined.CloudURL, governanceFailures = result.RunID, result.ShareURL, result.CloudURL, result.GovernanceFailures
+			additionalCommentData = result.GovernanceComment
 		}
 	}
 
@@ -137,7 +137,6 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 		DashboardEndpoint: ctx.Config.DashboardEndpoint,
 		NoColor:           ctx.Config.NoColor,
 		PolicyOutput:      output.NewPolicyOutput(policyChecks, tagPolicyCheck, finOpsPolicyCheck),
-		GuardrailCheck:    guardrailCheck,
 	}
 	opts.ShowAllProjects, _ = cmd.Flags().GetBool("show-all-projects")
 	opts.ShowOnlyChanges, _ = cmd.Flags().GetBool("show-changed")

@@ -341,7 +341,6 @@ type Options struct {
 	Fields            []string
 	IncludeHTML       bool
 	PolicyOutput      PolicyOutput
-	GuardrailCheck    GuardrailCheck
 	diffMsg           string
 	originalSize      int
 	CurrencyFormat    string
@@ -753,34 +752,6 @@ func (r TagPolicyResource) Failures() []string {
 	return f
 }
 
-// GuardrailCheck holds information if a given run has applicable guardrail checks.
-// This struct is used to create guardrail outputs.
-type GuardrailCheck struct {
-	// TotalChecked is the total number of guardrails checked
-	TotalChecked int64 `json:"guardrailsChecked"`
-
-	// Comment indicates that the guardrail status should be reported in the PR
-	// comment (either as a success or as a failure depending on CommentableFailures).
-	Comment bool `json:"guardrailComment"`
-
-	// GuardrailEvents
-	GuardrailEvents []GuardrailEvent `json:"guardrailEvents"`
-}
-
-type GuardrailEvent struct {
-	// TriggerReason details the reason that the guardrail was triggered
-	TriggerReason string `json:"triggerReason"`
-
-	// PRComment indicates whether this guardrail event should be posted in th PR Comment
-	PRComment bool `json:"prComment"`
-
-	// BlockPR indicated whether this guardrail event should return a failure blocking the PR
-	BlockPR bool `json:"blockPr"`
-
-	// UnblockedAt indicates when the event was unblocked in Infracost Cloud.
-	UnblockedAt *string `json:"unblockedAt"`
-}
-
 // LoadAdditionalCommentData reads the file at the path  into a string.
 func LoadAdditionalCommentData(path string) (string, error) {
 	_, err := os.Stat(path)
@@ -794,90 +765,6 @@ func LoadAdditionalCommentData(path string) (string, error) {
 	}
 
 	return string(data), nil
-}
-
-// AllFailures are all the guardrail failures triggered by the run
-func (g GuardrailCheck) AllFailures() GuardrailFailures {
-	var failures GuardrailFailures
-	for _, event := range g.GuardrailEvents {
-		failures = append(failures, event.TriggerReason)
-	}
-	return failures
-}
-
-// CommentableFailures are the failures that should be listed in the PR comment
-func (g GuardrailCheck) CommentableFailures() GuardrailFailures {
-	var failures GuardrailFailures
-	for _, event := range g.GuardrailEvents {
-		if event.PRComment {
-			failures = append(failures, event.TriggerReason)
-		}
-	}
-	return failures
-}
-
-// BlockingFailures is the list of failures causing the CLI to return with a failing (non-zero) error code
-func (g GuardrailCheck) BlockingFailures() GuardrailFailures {
-	var failures GuardrailFailures
-	for _, event := range g.GuardrailEvents {
-		if event.BlockPR {
-			failures = append(failures, event.TriggerReason)
-		}
-	}
-	return failures
-}
-
-// WarningFailures returns a list of failures that don't block the PR but are advisory.
-func (g GuardrailCheck) WarningFailures() GuardrailFailures {
-	var failures GuardrailFailures
-	for _, event := range g.GuardrailEvents {
-		if !event.BlockPR && event.PRComment && event.UnblockedAt == nil {
-			failures = append(failures, event.TriggerReason)
-		}
-	}
-	return failures
-}
-
-// UnblockedFailures returns a list of failures that have been unblocked in infracost cloud.
-func (g GuardrailCheck) UnblockedFailures() GuardrailFailures {
-	var failures GuardrailFailures
-	for _, event := range g.GuardrailEvents {
-		if event.PRComment && event.UnblockedAt != nil {
-			failures = append(failures, event.TriggerReason)
-		}
-	}
-	return failures
-}
-
-// IsBlocking returns if the GuardrailCheck has any Blocking failures.
-func (g GuardrailCheck) IsBlocking() bool {
-	return len(g.BlockingFailures()) > 0
-}
-
-// IsUnblocked returns if the GuardrailCheck has been unblocked from Infracost Cloud.
-func (g GuardrailCheck) IsUnblocked() bool {
-	if g.IsBlocking() {
-		return false
-	}
-
-	if len(g.WarningFailures()) > 0 {
-		return false
-	}
-
-	return true
-}
-
-// Title returns a short description of the check with an emoji.
-func (g GuardrailCheck) Title() string {
-	if g.IsBlocking() {
-		return "❌ Guardrails triggered (needs action)"
-	}
-
-	if g.IsUnblocked() {
-		return "✅ Guardrails passed"
-	}
-
-	return "⚠️ Guardrails triggered"
 }
 
 // GovernanceFailures defines a list of governance failures that were returned from infracost cloud.
@@ -898,9 +785,6 @@ func (g GovernanceFailures) Error() string {
 
 	return out.String()
 }
-
-// GuardrailFailures defines a list of guardrail failures that were returned from infracost cloud.
-type GuardrailFailures []string
 
 type MarkdownOptions struct {
 	WillUpdate          bool

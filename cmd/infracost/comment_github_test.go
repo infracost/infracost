@@ -326,9 +326,11 @@ func TestCommentGitHubDeleteAndNewSkipNoDiffWithInitialComment(t *testing.T) {
 
 func TestCommentGitHubWithNoGuardrailt(t *testing.T) {
 	ts := guardrailTestEndpoint(guardrailAddRunResponse{
-		GuardrailsChecked: 0,
-		Comment:           false,
-		Events:            []guardrailEvent{},
+		GovernanceComment: "",
+		GovernanceResults: []GovernanceResult{{
+			Type:    "guardrail",
+			Checked: 0,
+		}},
 	})
 	defer ts.Close()
 
@@ -337,9 +339,11 @@ func TestCommentGitHubWithNoGuardrailt(t *testing.T) {
 
 func TestCommentGitHubGuardrailSuccessWithoutComment(t *testing.T) {
 	ts := guardrailTestEndpoint(guardrailAddRunResponse{
-		GuardrailsChecked: 1,
-		Comment:           false,
-		Events:            []guardrailEvent{},
+		GovernanceComment: "",
+		GovernanceResults: []GovernanceResult{{
+			Type:    "guardrail",
+			Checked: 1,
+		}},
 	})
 	defer ts.Close()
 
@@ -348,9 +352,11 @@ func TestCommentGitHubGuardrailSuccessWithoutComment(t *testing.T) {
 
 func TestCommentGitHubGuardrailSuccessWithComment(t *testing.T) {
 	ts := guardrailTestEndpoint(guardrailAddRunResponse{
-		GuardrailsChecked: 1,
-		Comment:           true,
-		Events:            []guardrailEvent{},
+		GovernanceComment: "<p><strong>✅ Guardrails passed</strong></p>",
+		GovernanceResults: []GovernanceResult{{
+			Type:    "guardrail",
+			Checked: 1,
+		}},
 	})
 	defer ts.Close()
 
@@ -359,12 +365,17 @@ func TestCommentGitHubGuardrailSuccessWithComment(t *testing.T) {
 
 func TestCommentGitHubGuardrailFailureWithComment(t *testing.T) {
 	ts := guardrailTestEndpoint(guardrailAddRunResponse{
-		GuardrailsChecked: 1,
-		Comment:           true,
-		Events: []guardrailEvent{{
-			TriggerReason: "Stand by your estimate",
-			PrComment:     true,
-			BlockPr:       false,
+		GovernanceComment: `<details>
+<summary><strong>⚠️ Guardrails triggered</strong></summary>
+				
+> - <b>Warning</b>: Stand by your estimate
+</details>`,
+		GovernanceResults: []GovernanceResult{{
+			Type:    "guardrail",
+			Checked: 1,
+			Warnings: []string{
+				"Stand by your estimate",
+			},
 		}},
 	})
 	defer ts.Close()
@@ -374,21 +385,14 @@ func TestCommentGitHubGuardrailFailureWithComment(t *testing.T) {
 
 func TestCommentGitHubGuardrailFailureWithBlock(t *testing.T) {
 	ts := guardrailTestEndpoint(guardrailAddRunResponse{
-		GuardrailsChecked: 1,
-		Comment:           false,
-		Events: []guardrailEvent{
-			{
-				TriggerReason: "Stand by your estimate",
-				PrComment:     false,
-				BlockPr:       true,
-			},
-			{
-				TriggerReason: "Unblocked ge",
-				PrComment:     false,
-				BlockPr:       false,
-				Unblocked:     true,
-			},
-		},
+		GovernanceComment: "",
+		GovernanceResults: []GovernanceResult{{
+			Type:      "guardrail",
+			Failures:  []string{"Stand by your estimate"},
+			Unblocked: []string{"Unblocked ge"},
+			Checked:   1,
+			// Comment:           false,
+		}},
 	})
 	defer ts.Close()
 
@@ -397,12 +401,18 @@ func TestCommentGitHubGuardrailFailureWithBlock(t *testing.T) {
 
 func TestCommentGitHubGuardrailFailureWithCommentAndBlock(t *testing.T) {
 	ts := guardrailTestEndpoint(guardrailAddRunResponse{
-		GuardrailsChecked: 1,
-		Comment:           true,
-		Events: []guardrailEvent{{
-			TriggerReason: "Stand by your estimate",
-			PrComment:     true,
-			BlockPr:       true,
+		GovernanceComment: `<details>
+<summary><strong>❌ Guardrails triggered (needs action)</strong></summary>
+This change is blocked, either reduce the costs or wait for an admin to review and unblock it.
+				
+> - <b>Blocked</b>: Stand by your estimate
+</details>`,
+		GovernanceResults: []GovernanceResult{{
+			Type:    "guardrail",
+			Checked: 1,
+			Failures: []string{
+				"Stand by your estimate",
+			},
 		}},
 	})
 	defer ts.Close()
@@ -412,12 +422,13 @@ func TestCommentGitHubGuardrailFailureWithCommentAndBlock(t *testing.T) {
 
 func TestCommentGitHubGuardrailFailureWithoutCommentOrBlock(t *testing.T) {
 	ts := guardrailTestEndpoint(guardrailAddRunResponse{
-		GuardrailsChecked: 1,
-		Comment:           false,
-		Events: []guardrailEvent{{
-			TriggerReason: "Stand by your estimate",
-			PrComment:     false,
-			BlockPr:       false,
+		GovernanceComment: "",
+		GovernanceResults: []GovernanceResult{{
+			Type:    "guardrail",
+			Checked: 1,
+			Warnings: []string{
+				"Stand by your estimate",
+			},
 		}},
 	})
 	defer ts.Close()
@@ -451,9 +462,7 @@ func GuardrailGoldenFileTest(t *testing.T, testName, guardrailEndpointUrl string
 }
 
 type guardrailAddRunResponse struct {
-	GuardrailsChecked int64              `json:"guardrailsChecked"`
-	Comment           bool               `json:"guardrailComment"`
-	Events            []guardrailEvent   `json:"guardrailEvents"`
+	GovernanceComment string             `json:"governanceComment"`
 	GovernanceResults []GovernanceResult `json:"governanceResults"`
 }
 
@@ -465,33 +474,7 @@ type GovernanceResult struct {
 	Unblocked []string `json:"unblocked"`
 }
 
-type guardrailEvent struct {
-	TriggerReason string `json:"triggerReason"`
-	PrComment     bool   `json:"prComment"`
-	BlockPr       bool   `json:"blockPr"`
-	Unblocked     bool   `json:"unblocked"`
-}
-
 func guardrailTestEndpoint(garr guardrailAddRunResponse) *httptest.Server {
-	if garr.GuardrailsChecked > 0 {
-		gr := GovernanceResult{
-			Type:    "guardrail",
-			Checked: garr.GuardrailsChecked,
-		}
-
-		for _, e := range garr.Events {
-			if e.BlockPr {
-				gr.Failures = append(gr.Failures, e.TriggerReason)
-			} else if e.Unblocked {
-				gr.Unblocked = append(gr.Unblocked, e.TriggerReason)
-			} else {
-				gr.Warnings = append(gr.Warnings, e.TriggerReason)
-			}
-		}
-
-		garr.GovernanceResults = append(garr.GovernanceResults, gr)
-	}
-
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		bodyBytes, _ := io.ReadAll(r.Body)
 		graphqlQuery := string(bodyBytes)
