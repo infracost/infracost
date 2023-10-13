@@ -28,8 +28,8 @@ type AddRunResponse struct {
 	RunID              string `json:"id"`
 	ShareURL           string `json:"shareUrl"`
 	CloudURL           string `json:"cloudUrl"`
-	GuardrailCheck     output.GuardrailCheck
 	GovernanceFailures output.GovernanceFailures
+	GovernanceComment  string             `json:"governanceComment"`
 	GovernanceResults  []GovernanceResult `json:"governanceResults"`
 }
 
@@ -118,7 +118,7 @@ func newRunInput(ctx *config.RunContext, out output.Root) (*runInput, error) {
 	}, nil
 }
 
-func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (AddRunResponse, error) {
+func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root, commentBasicSyntax bool) (AddRunResponse, error) {
 	response := AddRunResponse{}
 
 	ri, err := newRunInput(ctx, out)
@@ -126,12 +126,18 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (Ad
 		return response, err
 	}
 
+	commentFormat := "MARKDOWN_HTML"
+	if commentBasicSyntax {
+		commentFormat = "MARKDOWN"
+	}
+
 	v := map[string]interface{}{
-		"run": *ri,
+		"run":           *ri,
+		"commentFormat": commentFormat,
 	}
 
 	q := `
-	mutation($run: RunInput!) {
+	mutation($run: RunInput!, $commentFormat: CommentFormat!) {
 			addRun(run: $run) {
 				id
 				shareUrl
@@ -149,13 +155,7 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (Ad
 					unblocked
 				}
 
-				guardrailsChecked
-				guardrailComment
-				guardrailEvents {
-					triggerReason
-					prComment
-					blockPr
-				}
+				governanceComment(format: $commentFormat)
 			}
 		}
 	`
@@ -189,25 +189,16 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (Ad
 			return response, fmt.Errorf("failed to unmarshal addRun: %w", err)
 		}
 
-		response.GuardrailCheck.TotalChecked = cloudRun.Get("guardrailsChecked").Int()
-		response.GuardrailCheck.Comment = cloudRun.Get("guardrailComment").Bool()
-		for _, event := range cloudRun.Get("guardrailEvents").Array() {
-			newEvent := output.GuardrailEvent{
-				TriggerReason: event.Get("triggerReason").String(),
-				PRComment:     event.Get("prComment").Bool(),
-				BlockPR:       event.Get("blockPr").Bool(),
-			}
-			response.GuardrailCheck.GuardrailEvents = append(response.GuardrailCheck.GuardrailEvents, newEvent)
-		}
-
 		for _, gr := range response.GovernanceResults {
 			t := gr.Type
-			if gr.Checked != 1 {
-				// pluralize
-				t = strings.ReplaceAll(t, "guardrail", "guardrails")
-				t = strings.ReplaceAll(t, "policy", "policies")
+			if gr.Checked > 0 {
+				if gr.Checked != 1 {
+					// pluralize
+					t = strings.ReplaceAll(t, "guardrail", "guardrails")
+					t = strings.ReplaceAll(t, "policy", "policies")
+				}
+				outputGovernanceMessages(ctx, fmt.Sprintf("%d %s checked", gr.Checked, t))
 			}
-			outputGovernanceMessages(ctx, fmt.Sprintf("%d %s checked", gr.Checked, t))
 			for _, msg := range gr.Unblocked {
 				outputGovernanceMessages(ctx, fmt.Sprintf("%s check unblocked: %s", gr.Type, msg))
 			}

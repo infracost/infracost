@@ -107,7 +107,7 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 			ui.PrintWarning(cmd.ErrOrStderr(), "Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
 		} else {
 			combined.Metadata.InfracostCommand = "comment"
-			result := shareCombinedRun(ctx, combined, inputs)
+			result := shareCombinedRun(ctx, combined, inputs, mdOpts.BasicSyntax)
 			combined.RunID, combined.ShareURL, combined.CloudURL, governanceFailures = result.RunID, result.ShareURL, result.CloudURL, result.GovernanceFailures
 			additionalCommentData = result.GovernanceComment
 		}

@@ -62,7 +62,7 @@ See https://infracost.io/docs/features/cli_commands/#upload-runs`,
 			finOpsPolicyCheck := output.NewFinOpsPolicyChecks(root.FinOpsPolicies)
 
 			dashboardClient := apiclient.NewDashboardAPIClient(ctx)
-			result, err := dashboardClient.AddRun(ctx, root)
+			result, err := dashboardClient.AddRun(ctx, root, false)
 			if err != nil {
 				return fmt.Errorf("failed to upload to Infracost Cloud: %w", err)
 			}

@@ -479,7 +479,7 @@ func guardrailTestEndpoint(garr guardrailAddRunResponse) *httptest.Server {
 		bodyBytes, _ := io.ReadAll(r.Body)
 		graphqlQuery := string(bodyBytes)
 
-		if strings.Contains(graphqlQuery, "mutation($run: RunInput!)") {
+		if strings.Contains(graphqlQuery, "mutation($run: RunInput!, $commentFormat: CommentFormat!)") {
 			guardrailJson, _ := json.Marshal(garr)
 
 			fmt.Fprintf(w, `[{"data": {"addRun":
