@@ -301,8 +301,6 @@ func checkAPIKey(apiKey string, apiEndpoint string, defaultEndpoint string) erro
 }
 
 var ignoredErrors = []string{
-	"Tag policy check failed",
-	"FinOps policy check failed",
 	"Policy check failed",
 	"Governance check failed",
 }
