@@ -96,8 +96,6 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 			combined.FinOpsPolicies = policies.FinOpsPolicies
 		}
 	}
-	tagPolicyCheck := output.NewTagPolicyChecks(combined.TagPolicies)
-	finOpsPolicyCheck := output.NewFinOpsPolicyChecks(combined.FinOpsPolicies)
 
 	var additionalCommentData string
 	var governanceFailures output.GovernanceFailures
@@ -136,7 +134,7 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 	opts := output.Options{
 		DashboardEndpoint: ctx.Config.DashboardEndpoint,
 		NoColor:           ctx.Config.NoColor,
-		PolicyOutput:      output.NewPolicyOutput(policyChecks, tagPolicyCheck, finOpsPolicyCheck),
+		PolicyOutput:      output.NewPolicyOutput(policyChecks),
 	}
 	opts.ShowAllProjects, _ = cmd.Flags().GetBool("show-all-projects")
 	opts.ShowOnlyChanges, _ = cmd.Flags().GetBool("show-changed")
@@ -163,12 +161,6 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 	}
 	if len(governanceFailures) > 0 {
 		return out, governanceFailures
-	}
-	if len(finOpsPolicyCheck.Failing) > 0 {
-		return out, finOpsPolicyCheck
-	}
-	if len(tagPolicyCheck.FailingTagPolicies) > 0 {
-		return out, tagPolicyCheck
 	}
 
 	return out, nil
@@ -275,7 +267,7 @@ func isErrorUnhandled(err error) bool {
 	}
 
 	switch err.(type) {
-	case output.PolicyCheckFailures, output.GovernanceFailures, output.TagPolicyCheck, output.FinOpsPolicyCheck:
+	case output.PolicyCheckFailures, output.GovernanceFailures:
 		return false
 	}
 

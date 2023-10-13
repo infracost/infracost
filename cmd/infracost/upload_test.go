@@ -102,7 +102,7 @@ func TestUploadWithCloudDisabled(t *testing.T) {
 }
 
 func TestUploadWithGuardrailSuccess(t *testing.T) {
-	ts := guardrailTestEndpoint(guardrailAddRunResponse{
+	ts := governanceTestEndpoint(governanceAddRunResponse{
 		GovernanceComment: "",
 		GovernanceResults: []GovernanceResult{{
 			Type:    "guardrail",
@@ -124,7 +124,7 @@ func TestUploadWithGuardrailSuccess(t *testing.T) {
 }
 
 func TestUploadWithGuardrailFailure(t *testing.T) {
-	ts := guardrailTestEndpoint(guardrailAddRunResponse{
+	ts := governanceTestEndpoint(governanceAddRunResponse{
 		GovernanceComment: "",
 		GovernanceResults: []GovernanceResult{{
 			Type:    "guardrail",
@@ -150,7 +150,7 @@ func TestUploadWithGuardrailFailure(t *testing.T) {
 }
 
 func TestUploadWithBlockingGuardrailFailure(t *testing.T) {
-	ts := guardrailTestEndpoint(guardrailAddRunResponse{
+	ts := governanceTestEndpoint(governanceAddRunResponse{
 		GovernanceComment: "",
 		GovernanceResults: []GovernanceResult{{
 			Type:    "guardrail",
@@ -184,13 +184,16 @@ func TestUploadWithBlockingTagPolicyFailure(t *testing.T) {
 	})
 	defer policyV2Api.Close()
 
-	dashboardApi := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, `[{"data": {"addRun":{
-			"id":"d92e0196-e5b0-449b-85c9-5733f6643c2f",
-			"shareUrl":"",
-			"organization":{"id":"767", "name":"tim"}
-		}}}]`)
-	}))
+	dashboardApi := governanceTestEndpoint(governanceAddRunResponse{
+		GovernanceComment: "Tag policy failure",
+		GovernanceResults: []GovernanceResult{{
+			Type:    "tag_policy",
+			Checked: 2,
+			Failures: []string{
+				"should show as failing",
+			},
+		}},
+	})
 	defer dashboardApi.Close()
 
 	GoldenFileCommandTest(t,
@@ -250,13 +253,16 @@ func TestUploadWithBlockingFinOpsPolicyFailure(t *testing.T) {
 	})
 	defer policyV2Api.Close()
 
-	dashboardApi := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, `[{"data": {"addRun":{
-			"id":"d92e0196-e5b0-449b-85c9-5733f6643c2f",
-			"shareUrl":"",
-			"organization":{"id":"767", "name":"tim"}
-		}}}]`)
-	}))
+	dashboardApi := governanceTestEndpoint(governanceAddRunResponse{
+		GovernanceComment: "FinOPs policy failure",
+		GovernanceResults: []GovernanceResult{{
+			Type:    "finops_policy",
+			Checked: 2,
+			Failures: []string{
+				"should show as failing",
+			},
+		}},
+	})
 	defer dashboardApi.Close()
 
 	GoldenFileCommandTest(t,

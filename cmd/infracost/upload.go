@@ -58,8 +58,6 @@ See https://infracost.io/docs/features/cli_commands/#upload-runs`,
 					root.FinOpsPolicies = policies.FinOpsPolicies
 				}
 			}
-			tagPolicyCheck := output.NewTagPolicyChecks(root.TagPolicies)
-			finOpsPolicyCheck := output.NewFinOpsPolicyChecks(root.FinOpsPolicies)
 
 			dashboardClient := apiclient.NewDashboardAPIClient(ctx)
 			result, err := dashboardClient.AddRun(ctx, root, false)
@@ -81,12 +79,6 @@ See https://infracost.io/docs/features/cli_commands/#upload-runs`,
 
 			if len(result.GovernanceFailures) > 0 {
 				return result.GovernanceFailures
-			}
-			if len(finOpsPolicyCheck.Failing) > 0 {
-				return finOpsPolicyCheck
-			}
-			if len(tagPolicyCheck.FailingTagPolicies) > 0 {
-				return tagPolicyCheck
 			}
 
 			return nil

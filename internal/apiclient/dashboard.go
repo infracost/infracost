@@ -190,23 +190,24 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root, com
 		}
 
 		for _, gr := range response.GovernanceResults {
-			t := gr.Type
+			t := strings.ReplaceAll(gr.Type, "_", " ")
 			if gr.Checked > 0 {
+				maybePluralT := t
 				if gr.Checked != 1 {
 					// pluralize
-					t = strings.ReplaceAll(t, "guardrail", "guardrails")
-					t = strings.ReplaceAll(t, "policy", "policies")
+					maybePluralT = strings.ReplaceAll(maybePluralT, "guardrail", "guardrails")
+					maybePluralT = strings.ReplaceAll(maybePluralT, "policy", "policies")
 				}
-				outputGovernanceMessages(ctx, fmt.Sprintf("%d %s checked", gr.Checked, t))
+				outputGovernanceMessages(ctx, fmt.Sprintf("%d %s checked", gr.Checked, maybePluralT))
 			}
 			for _, msg := range gr.Unblocked {
-				outputGovernanceMessages(ctx, fmt.Sprintf("%s check unblocked: %s", gr.Type, msg))
+				outputGovernanceMessages(ctx, fmt.Sprintf("%s check unblocked: %s", t, msg))
 			}
 			for _, msg := range gr.Warnings {
-				outputGovernanceMessages(ctx, fmt.Sprintf("%s check failed: %s", gr.Type, msg))
+				outputGovernanceMessages(ctx, fmt.Sprintf("%s check failed: %s", t, msg))
 			}
 			for _, msg := range gr.Failures {
-				formattedMsg := fmt.Sprintf("%s check failed: %s", gr.Type, msg)
+				formattedMsg := fmt.Sprintf("%s check failed: %s", t, msg)
 				outputGovernanceMessages(ctx, formattedMsg)
 				response.GovernanceFailures = append(response.GovernanceFailures, formattedMsg)
 			}
