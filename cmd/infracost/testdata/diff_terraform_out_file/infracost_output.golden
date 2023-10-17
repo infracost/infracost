@@ -103,7 +103,7 @@ Key: ~ changed, + added, - removed
 5 cloud resources were detected:
 ∙ 5 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 
-Infracost estimate: monthly cost will increase by $1,485 ↑
+Infracost estimate: Monthly cost will increase by $1,485 ↑
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
 ┃ Project                                                      ┃ Cost change ┃ New monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━┫

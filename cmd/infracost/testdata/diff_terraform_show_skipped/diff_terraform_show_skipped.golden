@@ -30,7 +30,7 @@ Key: ~ changed, + added, - removed
   ∙ 1 x azurerm_express_route_circuit_peering
   ∙ 1 x azurerm_express_route_port
 
-Infracost estimate: monthly cost will increase by $343 ↑
+Infracost estimate: Monthly cost will increase by $343 ↑
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
 ┃ Project                                                          ┃ Cost change ┃ New monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━┫

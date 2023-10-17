@@ -1,5 +1,6 @@
 
-<p>💰 Infracost estimate: <b>monthly cost will not change</b></p>
+<h3>Infracost report</h3>
+<h4>💰 Monthly cost will not change</h4>
 <table>
   <thead>
     <td>Project</td>
@@ -15,7 +16,7 @@
   </tbody>
 </table>
 <details>
-<summary><strong>Infracost output</strong></summary>
+<summary>Cost details</summary>
 
 ```
 ──────────────────────────────────
