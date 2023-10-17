@@ -118,17 +118,19 @@ func newRunInput(ctx *config.RunContext, out output.Root) (*runInput, error) {
 	}, nil
 }
 
-func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root, commentBasicSyntax bool) (AddRunResponse, error) {
+type CommentFormat string
+
+var (
+	CommentFormatMarkdownHTML CommentFormat = "MARKDOWN_HTML"
+	CommentFormatMarkdown     CommentFormat = "MARKDOWN"
+)
+
+func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root, commentFormat CommentFormat) (AddRunResponse, error) {
 	response := AddRunResponse{}
 
 	ri, err := newRunInput(ctx, out)
 	if err != nil {
 		return response, err
-	}
-
-	commentFormat := "MARKDOWN_HTML"
-	if commentBasicSyntax {
-		commentFormat = "MARKDOWN"
 	}
 
 	v := map[string]interface{}{

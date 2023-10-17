@@ -129,7 +129,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 
 	if runCtx.IsCloudUploadExplicitlyEnabled() {
 		dashboardClient := apiclient.NewDashboardAPIClient(runCtx)
-		result, err := dashboardClient.AddRun(runCtx, r, false)
+		result, err := dashboardClient.AddRun(runCtx, r, apiclient.CommentFormatMarkdownHTML)
 		if err != nil {
 			log.WithError(err).Error("Failed to upload to Infracost Cloud")
 		}

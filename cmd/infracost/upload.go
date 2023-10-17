@@ -60,7 +60,7 @@ See https://infracost.io/docs/features/cli_commands/#upload-runs`,
 			}
 
 			dashboardClient := apiclient.NewDashboardAPIClient(ctx)
-			result, err := dashboardClient.AddRun(ctx, root, false)
+			result, err := dashboardClient.AddRun(ctx, root, apiclient.CommentFormatMarkdownHTML)
 			if err != nil {
 				return fmt.Errorf("failed to upload to Infracost Cloud: %w", err)
 			}
