@@ -55,7 +55,7 @@ func TestCommentGitHubWithMissingAdditionalCommentPath(t *testing.T) {
 			"--show-changed",
 			"--path", "./testdata/changes.json",
 			"--dry-run",
-			"--additional-path", "./does/not/exist.md"},
+			"--additional-comment-data-path", "./does/not/exist.md"},
 		nil)
 }
 
@@ -71,7 +71,7 @@ func TestCommentGitHubWithAdditionalCommentPath(t *testing.T) {
 			"--show-changed",
 			"--path", "./testdata/changes.json",
 			"--dry-run",
-			"--additional-path", path.Join(dir, "./additional-comment.md")},
+			"--additional-comment-data-path", path.Join(dir, "./additional-comment.md")},
 		nil)
 }
 

@@ -437,7 +437,7 @@ func (p PolicyCheckFailures) Error() string {
 func LoadAdditionalCommentData(path string) (string, error) {
 	_, err := os.Stat(path)
 	if errors.Is(err, os.ErrNotExist) {
-		return "", errors.New("additional-path does not exist ")
+		return "", errors.New("additional-comment-data-path does not exist ")
 	}
 
 	data, err := os.ReadFile(path)
