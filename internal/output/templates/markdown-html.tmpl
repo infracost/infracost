@@ -62,7 +62,8 @@ in project `{{ index .ProjectNames 0 }}`
       <td align="right">{{ formatCost .Cost }}</td>
     </tr>
 {{- end}}
-<p>💰 Infracost estimate: <b>{{ formatCostChangeSentence .Root.Currency .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost true }}</b></p>
+<h3>Infracost report</h3>
+<h4>💰 {{ formatCostChangeSentence .Root.Currency .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost true }}</h4>
 {{- if displayTable  }}
 <table>
   <thead>
@@ -94,7 +95,7 @@ in project `{{ index .ProjectNames 0 }}`
 
 {{- if displayOutput  }}
 <details>
-<summary><strong>Infracost output</strong></summary>
+<summary>Cost details</summary>
 
 ```
 {{ .DiffOutput }}
