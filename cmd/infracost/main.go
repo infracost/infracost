@@ -301,10 +301,8 @@ func checkAPIKey(apiKey string, apiEndpoint string, defaultEndpoint string) erro
 }
 
 var ignoredErrors = []string{
-	"Tag policy check failed",
-	"FinOps policy check failed",
 	"Policy check failed",
-	"Guardrail check failed",
+	"Governance check failed",
 }
 
 func handleCLIError(ctx *config.RunContext, cliErr error) {

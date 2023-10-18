@@ -2,9 +2,9 @@ Comment posted to GitHub
 
 
 Err:
-Error: Guardrail check failed:
+Error: Governance check failed:
 
- - Stand by your estimate
+ - guardrail check failed: Stand by your estimate
 
 
 Logs:

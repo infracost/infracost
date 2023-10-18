@@ -1,6 +1,8 @@
 
 
-## Infracost estimate: **monthly cost will decrease by $3,364 ↓**
+# Infracost report #
+
+## Monthly cost will decrease by $3,364 ↓ ##
 
 | **Project** | **Module path** | **Cost change** | **New monthly cost** |
 | ----------- | ---------- | --------------: | -------------------- |
@@ -10,7 +12,7 @@
 | my terragrunt prod project |  | -$561 (-43%) | $748 |
 | my terragrunt workspace | prod | -$561 (-43%) | $748 |
 | my workspace project |  | -$561 (-43%) | $743 |
-**Infracost output:**
+### Cost details ###
 
 ```
 ──────────────────────────────────
@@ -101,7 +103,7 @@ Key: ~ changed, + added, - removed
 18 cloud resources were detected:
 ∙ 18 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 
-Infracost estimate: monthly cost will decrease by $3,364 ↓
+Infracost estimate: Monthly cost will decrease by $3,364 ↓
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Cost change  ┃ New monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━┫

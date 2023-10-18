@@ -1,12 +1,12 @@
 
 Err:
-Error: FinOps policy check failed:
+Error: Governance check failed:
 
-  Failing FinOps Policy: This should show as a failure
-    module.hosted_cloud_pricing_api.aws_s3_bucket.cloud_pricing_api_db_data in project my-prod-project
-    - "attribute" currently set to "value": description
+ - finops policy check failed: should show as failing
 
 
 Logs:
 level=info msg="1 finops policy checked"
-level=info msg="Estimate uploaded to organization 'tim' in Infracost Cloud"
+level=info msg="Estimate uploaded to Infracost Cloud"
+level=info msg="2 finops policies checked"
+level=info msg="finops policy check failed: should show as failing"

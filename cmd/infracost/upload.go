@@ -58,11 +58,9 @@ See https://infracost.io/docs/features/cli_commands/#upload-runs`,
 					root.FinOpsPolicies = policies.FinOpsPolicies
 				}
 			}
-			tagPolicyCheck := output.NewTagPolicyChecks(root.TagPolicies)
-			finOpsPolicyCheck := output.NewFinOpsPolicyChecks(root.FinOpsPolicies)
 
 			dashboardClient := apiclient.NewDashboardAPIClient(ctx)
-			result, err := dashboardClient.AddRun(ctx, root)
+			result, err := dashboardClient.AddRun(ctx, root, apiclient.CommentFormatMarkdownHTML)
 			if err != nil {
 				return fmt.Errorf("failed to upload to Infracost Cloud: %w", err)
 			}
@@ -79,14 +77,8 @@ See https://infracost.io/docs/features/cli_commands/#upload-runs`,
 				logging.Logger.WithError(err).Warn("could not report `infracost-upload` event")
 			}
 
-			if len(result.GuardrailCheck.BlockingFailures()) > 0 {
-				return result.GuardrailCheck.BlockingFailures()
-			}
-			if len(finOpsPolicyCheck.Failing) > 0 {
-				return finOpsPolicyCheck
-			}
-			if len(tagPolicyCheck.FailingTagPolicies) > 0 {
-				return tagPolicyCheck
+			if len(result.GovernanceFailures) > 0 {
+				return result.GovernanceFailures
 			}
 
 			return nil

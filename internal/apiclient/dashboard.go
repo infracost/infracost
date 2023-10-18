@@ -2,6 +2,7 @@ package apiclient
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	json "github.com/json-iterator/go"
@@ -24,10 +25,20 @@ type CreateAPIKeyResponse struct {
 }
 
 type AddRunResponse struct {
-	RunID          string `json:"id"`
-	ShareURL       string `json:"shareUrl"`
-	CloudURL       string `json:"cloudUrl"`
-	GuardrailCheck output.GuardrailCheck
+	RunID              string `json:"id"`
+	ShareURL           string `json:"shareUrl"`
+	CloudURL           string `json:"cloudUrl"`
+	GovernanceFailures output.GovernanceFailures
+	GovernanceComment  string             `json:"governanceComment"`
+	GovernanceResults  []GovernanceResult `json:"governanceResults"`
+}
+
+type GovernanceResult struct {
+	Type      string   `json:"govType"`
+	Checked   int64    `json:"checked"`
+	Warnings  []string `json:"warnings"`
+	Failures  []string `json:"failures"`
+	Unblocked []string `json:"unblocked"`
 }
 
 type QueryCLISettingsResponse struct {
@@ -107,7 +118,14 @@ func newRunInput(ctx *config.RunContext, out output.Root) (*runInput, error) {
 	}, nil
 }
 
-func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (AddRunResponse, error) {
+type CommentFormat string
+
+var (
+	CommentFormatMarkdownHTML CommentFormat = "MARKDOWN_HTML"
+	CommentFormatMarkdown     CommentFormat = "MARKDOWN"
+)
+
+func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root, commentFormat CommentFormat) (AddRunResponse, error) {
 	response := AddRunResponse{}
 
 	ri, err := newRunInput(ctx, out)
@@ -116,11 +134,12 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (Ad
 	}
 
 	v := map[string]interface{}{
-		"run": *ri,
+		"run":           *ri,
+		"commentFormat": commentFormat,
 	}
 
 	q := `
-	mutation($run: RunInput!) {
+	mutation($run: RunInput!, $commentFormat: CommentFormat!) {
 			addRun(run: $run) {
 				id
 				shareUrl
@@ -129,13 +148,16 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (Ad
 					id
 					name
 				}
-				guardrailsChecked
-				guardrailComment
-				guardrailEvents {
-					triggerReason
-					prComment
-					blockPr
+
+				governanceResults {
+					govType
+					checked
+					warnings
+					failures
+					unblocked
 				}
+
+				governanceComment(format: $commentFormat)
 			}
 		}
 	`
@@ -164,42 +186,44 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root) (Ad
 			fmt.Fprintf(ctx.ErrWriter, "%s\n", successMsg)
 		}
 
-		response.RunID = cloudRun.Get("id").String()
-		response.ShareURL = cloudRun.Get("shareUrl").String()
-		response.CloudURL = cloudRun.Get("cloudUrl").String()
-		response.GuardrailCheck.TotalChecked = cloudRun.Get("guardrailsChecked").Int()
-		response.GuardrailCheck.Comment = cloudRun.Get("guardrailComment").Bool()
-		for _, event := range cloudRun.Get("guardrailEvents").Array() {
-			newEvent := output.GuardrailEvent{
-				TriggerReason: event.Get("triggerReason").String(),
-				PRComment:     event.Get("prComment").Bool(),
-				BlockPR:       event.Get("blockPr").Bool(),
-			}
-			response.GuardrailCheck.GuardrailEvents = append(response.GuardrailCheck.GuardrailEvents, newEvent)
+		err = json.Unmarshal([]byte(cloudRun.Raw), &response)
+		if err != nil {
+			return response, fmt.Errorf("failed to unmarshal addRun: %w", err)
 		}
 
-		if response.GuardrailCheck.TotalChecked > 0 {
-			guardrailStr := "guardrail"
-			if response.GuardrailCheck.TotalChecked > 1 {
-				guardrailStr = "guardrails"
-			}
-			guardrailsMsg := fmt.Sprintf(`%d %s checked`, response.GuardrailCheck.TotalChecked, guardrailStr)
-			if ctx.Config.IsLogging() {
-				log.Info(guardrailsMsg)
-			} else {
-				fmt.Fprintf(ctx.ErrWriter, "%s\n", guardrailsMsg)
-			}
-			for _, f := range response.GuardrailCheck.AllFailures() {
-				failureMsg := fmt.Sprintf(`guardrail check failed: %s`, f)
-				if ctx.Config.IsLogging() {
-					log.Info(failureMsg)
-				} else {
-					fmt.Fprintf(ctx.ErrWriter, " - %s\n", failureMsg)
+		for _, gr := range response.GovernanceResults {
+			t := strings.ReplaceAll(gr.Type, "_", " ")
+			if gr.Checked > 0 {
+				maybePluralT := t
+				if gr.Checked != 1 {
+					// pluralize
+					maybePluralT = strings.ReplaceAll(maybePluralT, "guardrail", "guardrails")
+					maybePluralT = strings.ReplaceAll(maybePluralT, "policy", "policies")
 				}
+				outputGovernanceMessages(ctx, fmt.Sprintf("%d %s checked", gr.Checked, maybePluralT))
+			}
+			for _, msg := range gr.Unblocked {
+				outputGovernanceMessages(ctx, fmt.Sprintf("%s check unblocked: %s", t, msg))
+			}
+			for _, msg := range gr.Warnings {
+				outputGovernanceMessages(ctx, fmt.Sprintf("%s check failed: %s", t, msg))
+			}
+			for _, msg := range gr.Failures {
+				formattedMsg := fmt.Sprintf("%s check failed: %s", t, msg)
+				outputGovernanceMessages(ctx, formattedMsg)
+				response.GovernanceFailures = append(response.GovernanceFailures, formattedMsg)
 			}
 		}
 	}
 	return response, nil
+}
+
+func outputGovernanceMessages(ctx *config.RunContext, msg string) {
+	if ctx.Config.IsLogging() {
+		log.Infof(msg)
+	} else {
+		fmt.Fprintf(ctx.ErrWriter, "%s\n", msg)
+	}
 }
 
 func (c *DashboardAPIClient) QueryCLISettings() (QueryCLISettingsResponse, error) {
