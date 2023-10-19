@@ -2,7 +2,6 @@ package hcl
 
 import (
 	"strings"
-	"sync"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/sirupsen/logrus"
@@ -13,7 +12,6 @@ type Context struct {
 	ctx    *hcl.EvalContext
 	parent *Context
 	logger *logrus.Entry
-	mu     sync.RWMutex
 }
 
 func NewContext(ctx *hcl.EvalContext, parent *Context, logger *logrus.Entry) *Context {
@@ -25,7 +23,6 @@ func NewContext(ctx *hcl.EvalContext, parent *Context, logger *logrus.Entry) *Co
 		ctx:    ctx,
 		parent: parent,
 		logger: logger,
-		mu:     sync.RWMutex{},
 	}
 }
 
@@ -83,8 +80,6 @@ func (c *Context) SetByDot(val cty.Value, path string) {
 }
 
 func (c *Context) Set(val cty.Value, parts ...string) {
-	c.mu.Lock()
-	defer c.mu.Unlock()
 	if len(parts) == 0 {
 		return
 	}
