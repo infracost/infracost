@@ -165,7 +165,11 @@ func NewEvaluator(
 }
 
 func (e *Evaluator) AddFilteredBlocks(blocks ...*Block) {
-	e.filteredBlocks = append(e.filteredBlocks, blocks...)
+	for _, block := range blocks {
+		if block != nil {
+			e.filteredBlocks = append(e.filteredBlocks, block)
+		}
+	}
 }
 
 // MissingVars returns a list of names of the variable blocks with missing input values.
