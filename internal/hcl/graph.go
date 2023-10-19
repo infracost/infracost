@@ -12,23 +12,21 @@ import (
 )
 
 var (
-	visitMu              sync.RWMutex
 	addrSplitModuleRegex = regexp.MustCompile(`^((?:module\.[^.]+\.?)+)\.(.*)$`)
 )
 
 type Graph struct {
-	dag        *dag.DAG
-	logger     *logrus.Entry
-	rootVertex Vertex
+	dag         *dag.DAG
+	logger      *logrus.Entry
+	rootVertex  Vertex
+	vertexMutex *sync.Mutex
 }
 
 type Vertex interface {
 	ID() string
 	ModuleAddress() string
-	Evaluator() *Evaluator
+	Visit(mutex *sync.Mutex) error
 	References() []VertexReference
-	Evaluate() error
-	Expand() ([]*Block, error)
 }
 
 type VertexReference struct {
@@ -36,15 +34,15 @@ type VertexReference struct {
 	Key           string
 }
 
-func NewGraph(logger *logrus.Entry) *Graph {
-	return &Graph{
-		dag:    dag.NewDAG(),
-		logger: logger,
+func NewGraphWithRoot(logger *logrus.Entry, vertexMutex *sync.Mutex) (*Graph, error) {
+	if vertexMutex == nil {
+		vertexMutex = &sync.Mutex{}
 	}
-}
-
-func NewGraphWithRoot(logger *logrus.Entry) (*Graph, error) {
-	g := NewGraph(logger)
+	g := &Graph{
+		dag:         dag.NewDAG(),
+		logger:      logger,
+		vertexMutex: vertexMutex,
+	}
 
 	g.rootVertex = &VertexRoot{}
 
@@ -61,7 +59,7 @@ func (g *Graph) ReduceTransitively() {
 }
 
 func (g *Graph) Populate(evaluator *Evaluator) error {
-	vertexes := []Vertex{}
+	var vertexes []Vertex
 
 	for _, block := range evaluator.module.Blocks {
 		switch block.Type() {
@@ -193,7 +191,7 @@ func (g *Graph) AsJSON() ([]byte, error) {
 }
 
 func (g *Graph) Walk() {
-	v := NewGraphVisitor(g.logger)
+	v := NewGraphVisitor(g.logger, g.vertexMutex)
 
 	flowCallback := func(d *dag.DAG, id string, parentResults []dag.FlowResult) (interface{}, error) {
 		vertex, _ := d.GetVertex(id)
@@ -207,37 +205,24 @@ func (g *Graph) Walk() {
 }
 
 type GraphVisitor struct {
-	logger *logrus.Entry
+	logger      *logrus.Entry
+	vertexMutex *sync.Mutex
 }
 
-func NewGraphVisitor(logger *logrus.Entry) *GraphVisitor {
+func NewGraphVisitor(logger *logrus.Entry, vertexMutex *sync.Mutex) *GraphVisitor {
 	return &GraphVisitor{
-		logger: logger,
+		logger:      logger,
+		vertexMutex: vertexMutex,
 	}
 }
 
 func (v *GraphVisitor) Visit(id string, vertex interface{}) {
-	v.logger.Debugf("visiting %s", id)
+	v.logger.Debugf("visiting vertex %q", id)
 
 	vert := vertex.(Vertex)
-
-	visitMu.Lock()
-	err := vert.Evaluate()
-	visitMu.Unlock()
+	err := vert.Visit(v.vertexMutex)
 	if err != nil {
-		v.logger.WithError(err).Debugf("could not evaluate %s ignoring", id)
-		return
-	}
-
-	blocks, err := vert.Expand()
-	if err != nil {
-		v.logger.WithError(err).Debugf("could not expand %s ignoring", id)
-		return
-	}
-
-	ve := vert.Evaluator()
-	if ve != nil && vert.Evaluator() != nil {
-		vert.Evaluator().AddFilteredBlocks(blocks...)
+		v.logger.WithError(err).Debugf("ignoring vertex %q because an error was encountered", id)
 	}
 }
 
