@@ -204,6 +204,20 @@ func (g *Graph) Walk() {
 	_, _ = g.dag.DescendantsFlow(g.rootVertex.ID(), nil, flowCallback)
 }
 
+func (g *Graph) Run(evaluator *Evaluator) (*Module, error) {
+	err := g.Populate(evaluator)
+	if err != nil {
+		return nil, err
+	}
+
+	g.ReduceTransitively()
+	g.Walk()
+	evaluator.module.Blocks = evaluator.filteredBlocks
+	evaluator.module = *evaluator.collectModules()
+
+	return &evaluator.module, nil
+}
+
 type GraphVisitor struct {
 	logger      *logrus.Entry
 	vertexMutex *sync.Mutex
