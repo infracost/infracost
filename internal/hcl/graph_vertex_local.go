@@ -2,6 +2,7 @@ package hcl
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/sirupsen/logrus"
 )
@@ -21,23 +22,18 @@ func (v *VertexLocal) ModuleAddress() string {
 	return v.block.ModuleAddress()
 }
 
-func (v *VertexLocal) Evaluator() *Evaluator {
-	return v.evaluator
-}
-
 func (v *VertexLocal) References() []VertexReference {
 	return referencesForAttribute(v.block, v.attr)
 }
 
-func (v *VertexLocal) Evaluate() error {
+func (v *VertexLocal) Visit(mutex *sync.Mutex) error {
+	mutex.Lock()
+	defer mutex.Unlock()
+
 	v.logger.Debugf("adding attribute %s to the evaluation context", v.ID())
 
 	key := fmt.Sprintf("local.%s", v.attr.Name())
 	v.evaluator.ctx.SetByDot(v.attr.Value(), key)
 
 	return nil
-}
-
-func (v *VertexLocal) Expand() ([]*Block, error) {
-	return []*Block{}, nil
 }
