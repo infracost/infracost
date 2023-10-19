@@ -2,6 +2,7 @@ package hcl
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
@@ -21,15 +22,29 @@ func (v *VertexResource) ModuleAddress() string {
 	return v.block.ModuleAddress()
 }
 
-func (v *VertexResource) Evaluator() *Evaluator {
-	return v.evaluator
-}
-
 func (v *VertexResource) References() []VertexReference {
 	return referencesForBlock(v.block)
 }
 
-func (v *VertexResource) Evaluate() error {
+func (v *VertexResource) Visit(mutex *sync.Mutex) error {
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	err := v.evaluate()
+	if err != nil {
+		return fmt.Errorf("could not evaluate resource block %q", v.ID())
+	}
+
+	expanded, err := v.expand()
+	if err != nil {
+		return fmt.Errorf("could not expand resource block %q", v.ID())
+	}
+
+	v.evaluator.AddFilteredBlocks(expanded...)
+	return nil
+}
+
+func (v *VertexResource) evaluate() error {
 	if len(v.block.Labels()) < 2 {
 		return fmt.Errorf("resource block %s has no label", v.ID())
 	}
@@ -50,10 +65,7 @@ func (v *VertexResource) Evaluate() error {
 	return nil
 }
 
-func (v *VertexResource) Expand() ([]*Block, error) {
-	visitMu.Lock()
-	defer visitMu.Unlock()
-
+func (v *VertexResource) expand() ([]*Block, error) {
 	expanded := []*Block{v.block}
 	expanded = v.evaluator.expandBlockCounts(expanded)
 	expanded = v.evaluator.expandBlockForEaches(expanded)

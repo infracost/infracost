@@ -401,7 +401,7 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 
 	// Graph evaluation
 	if os.Getenv("INFRACOST_GRAPH_EVALUATOR") == "true" {
-		g, err := NewGraphWithRoot(p.logger)
+		g, err := NewGraphWithRoot(p.logger, nil)
 		if err != nil {
 			return m, err
 		}

@@ -2,6 +2,7 @@ package hcl
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
@@ -27,15 +28,14 @@ func (v *VertexProvider) ModuleAddress() string {
 	return v.block.ModuleAddress()
 }
 
-func (v *VertexProvider) Evaluator() *Evaluator {
-	return v.evaluator
-}
-
 func (v *VertexProvider) References() []VertexReference {
 	return referencesForBlock(v.block)
 }
 
-func (v *VertexProvider) Evaluate() error {
+func (v *VertexProvider) Visit(mutex *sync.Mutex) error {
+	mutex.Lock()
+	defer mutex.Unlock()
+
 	provider := v.block.Label()
 	if provider == "" {
 		return fmt.Errorf("provider block %s has no label", v.ID())
@@ -54,9 +54,7 @@ func (v *VertexProvider) Evaluate() error {
 	v.logger.Debugf("adding %s to the evaluation context", v.ID())
 	v.evaluator.ctx.Set(val, v.block.Label())
 
-	return nil
-}
+	v.evaluator.AddFilteredBlocks(v.block)
 
-func (v *VertexProvider) Expand() ([]*Block, error) {
-	return []*Block{v.block}, nil
+	return nil
 }

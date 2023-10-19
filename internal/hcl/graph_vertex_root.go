@@ -1,5 +1,7 @@
 package hcl
 
+import "sync"
+
 type VertexRoot struct{}
 
 func (v *VertexRoot) ID() string {
@@ -10,18 +12,10 @@ func (v *VertexRoot) ModuleAddress() string {
 	return ""
 }
 
-func (v *VertexRoot) Evaluator() *Evaluator {
-	return nil
-}
-
 func (v *VertexRoot) References() []VertexReference {
 	return []VertexReference{}
 }
 
-func (v *VertexRoot) Evaluate() error {
+func (v *VertexRoot) Visit(mutex *sync.Mutex) error {
 	return nil
-}
-
-func (v *VertexRoot) Expand() ([]*Block, error) {
-	return []*Block{}, nil
 }
