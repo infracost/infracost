@@ -2,6 +2,7 @@ package hcl
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/sirupsen/logrus"
@@ -22,15 +23,29 @@ func (v *VertexModule) ModuleAddress() string {
 	return v.block.ModuleAddress()
 }
 
-func (v *VertexModule) Evaluator() *Evaluator {
-	return v.evaluator
-}
-
 func (v *VertexModule) References() []VertexReference {
 	return referencesForBlock(v.block)
 }
 
-func (v *VertexModule) Evaluate() error {
+func (v *VertexModule) Visit(mutex *sync.Mutex) error {
+	err := v.evaluate(mutex)
+	if err != nil {
+		return fmt.Errorf("could not evaluate module %q", v.ID())
+	}
+
+	expanded, err := v.expand(mutex)
+	if err != nil {
+		return fmt.Errorf("could not expand module %q", v.ID())
+	}
+
+	v.evaluator.AddFilteredBlocks(expanded...)
+	return nil
+}
+
+func (v *VertexModule) evaluate(mutex *sync.Mutex) error {
+	mutex.Lock()
+	defer mutex.Unlock()
+
 	if v.block.Label() == "" {
 		return fmt.Errorf("module block %s has no label", v.ID())
 	}
@@ -41,8 +56,8 @@ func (v *VertexModule) Evaluate() error {
 	return nil
 }
 
-func (v *VertexModule) Expand() ([]*Block, error) {
-	visitMu.Lock()
+func (v *VertexModule) expand(mutex *sync.Mutex) ([]*Block, error) {
+	mutex.Lock()
 
 	expanded := []*Block{v.block}
 	expanded = v.evaluator.expandBlockForEaches(expanded)
@@ -50,7 +65,7 @@ func (v *VertexModule) Expand() ([]*Block, error) {
 
 	moduleEvaluators := map[string]*Evaluator{}
 
-	g, err := NewGraphWithRoot(v.logger)
+	g, err := NewGraphWithRoot(v.logger, mutex)
 	if err != nil {
 		return nil, fmt.Errorf("error creating new graph: %w", err)
 	}
@@ -97,12 +112,12 @@ func (v *VertexModule) Expand() ([]*Block, error) {
 			return nil, fmt.Errorf("error populating graph: %w", err)
 		}
 	}
-	visitMu.Unlock()
+	mutex.Unlock()
 
 	g.ReduceTransitively()
 	g.Walk()
 
-	visitMu.Lock()
+	mutex.Lock()
 
 	for fullName, moduleEvaluator := range moduleEvaluators {
 		moduleEvaluator.module.Blocks = moduleEvaluator.filteredBlocks
@@ -122,7 +137,7 @@ func (v *VertexModule) Expand() ([]*Block, error) {
 
 	v.block.expanded = true
 
-	visitMu.Unlock()
+	mutex.Unlock()
 
 	return expanded, nil
 }

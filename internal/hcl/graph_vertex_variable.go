@@ -2,6 +2,7 @@ package hcl
 
 import (
 	"fmt"
+	"sync"
 
 	"github.com/sirupsen/logrus"
 )
@@ -20,15 +21,14 @@ func (v *VertexVariable) ModuleAddress() string {
 	return v.block.ModuleAddress()
 }
 
-func (v *VertexVariable) Evaluator() *Evaluator {
-	return v.evaluator
-}
-
 func (v *VertexVariable) References() []VertexReference {
 	return referencesForBlock(v.block)
 }
 
-func (v *VertexVariable) Evaluate() error {
+func (v *VertexVariable) Visit(mutex *sync.Mutex) error {
+	mutex.Lock()
+	defer mutex.Unlock()
+
 	val, err := v.evaluator.evaluateVariable(v.block)
 	if err != nil {
 		return fmt.Errorf("could not evaluate variable %s: %w", v.ID(), err)
@@ -38,9 +38,6 @@ func (v *VertexVariable) Evaluate() error {
 	key := fmt.Sprintf("var.%s", v.block.Label())
 	v.evaluator.ctx.SetByDot(val, key)
 
+	v.evaluator.AddFilteredBlocks(v.block)
 	return nil
-}
-
-func (v *VertexVariable) Expand() ([]*Block, error) {
-	return []*Block{v.block}, nil
 }
