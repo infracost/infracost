@@ -845,69 +845,6 @@ func toRelativeTraversal(traversal hcl.Traversal) hcl.Traversal {
 	return ret
 }
 
-func referencesForBlock(b *Block) []VertexReference {
-	refs := []VertexReference{}
-
-	hasProviderAttr := false
-
-	for _, attr := range b.GetAttributes() {
-		if attr.Name() == "provider" {
-			hasProviderAttr = true
-		}
-
-		refs = append(refs, referencesForAttribute(b, attr)...)
-	}
-
-	for _, childBlock := range b.Children() {
-		refs = append(refs, referencesForBlock(childBlock)...)
-	}
-
-	if !hasProviderAttr && (b.Type() == "resource" || b.Type() == "data") {
-		providerName := b.Provider()
-		if providerName != "" {
-			refs = append(refs, VertexReference{
-				Key: fmt.Sprintf("provider.%s", providerName),
-			})
-		}
-	}
-
-	return refs
-}
-
-func referencesForAttribute(b *Block, a *Attribute) []VertexReference {
-	var refs []VertexReference
-
-	for _, ref := range a.AllReferences() {
-		key := ref.String()
-
-		if shouldSkipRef(b, key) {
-			continue
-		}
-
-		if (b.Type() == "resource" || b.Type() == "data") && a.Name() == "provider" {
-			key = fmt.Sprintf("provider.%s", key)
-		}
-
-		modAddr := b.ModuleAddress()
-		modPart, otherPart := splitModuleAddr(key)
-
-		if modPart != "" {
-			if modAddr == "" {
-				modAddr = modPart
-			} else {
-				modAddr = fmt.Sprintf("%s.%s", modAddr, modPart)
-			}
-		}
-
-		refs = append(refs, VertexReference{
-			ModuleAddress: modAddr,
-			Key:           otherPart,
-		})
-	}
-
-	return refs
-}
-
 func shouldSkipRef(block *Block, key string) bool {
 	if key == "count.index" || key == "each.key" || key == "each.value" || strings.HasSuffix(key, ".") {
 		return true
