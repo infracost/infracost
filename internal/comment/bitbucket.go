@@ -152,6 +152,9 @@ func NewBitbucketPRHandler(ctx context.Context, repo string, targetRef string, e
 		}
 	} else {
 		serverRepo := strings.Split(repo, "/")
+		if len(serverRepo) < 2 {
+			return nil, errors.New("Error parsing repo, must have format workspace/repo")
+		}
 
 		if !strings.HasSuffix(extra.ServerURL, "/") {
 			extra.ServerURL += "/"
