@@ -515,6 +515,42 @@ func (attr *Attribute) AllReferences() []*Reference {
 	return attr.referencesFromExpression(attr.HCLAttr.Expr)
 }
 
+// VerticesReferenced traverses all the Expressions used by the attribute to build a
+// list of all the Blocks referenced by the Attribute.
+func (attr *Attribute) VerticesReferenced(b *Block) []VertexReference {
+	var refs []VertexReference
+
+	for _, ref := range attr.AllReferences() {
+		key := ref.String()
+
+		if shouldSkipRef(b, key) {
+			continue
+		}
+
+		if usesProviderConfiguration(b) && attr.Name() == "provider" {
+			key = fmt.Sprintf("provider.%s", key)
+		}
+
+		modAddr := b.ModuleAddress()
+		modPart, otherPart := splitModuleAddr(key)
+
+		if modPart != "" {
+			if modAddr == "" {
+				modAddr = modPart
+			} else {
+				modAddr = fmt.Sprintf("%s.%s", modAddr, modPart)
+			}
+		}
+
+		refs = append(refs, VertexReference{
+			ModuleAddress: modAddr,
+			Key:           otherPart,
+		})
+	}
+
+	return refs
+}
+
 func (attr *Attribute) referencesFromExpression(expression hcl.Expression) []*Reference {
 	if attr == nil {
 		return nil
@@ -798,4 +834,87 @@ func toRelativeTraversal(traversal hcl.Traversal) hcl.Traversal {
 	}
 
 	return ret
+}
+
+func referencesForBlock(b *Block) []VertexReference {
+	refs := []VertexReference{}
+
+	hasProviderAttr := false
+
+	for _, attr := range b.GetAttributes() {
+		if attr.Name() == "provider" {
+			hasProviderAttr = true
+		}
+
+		refs = append(refs, referencesForAttribute(b, attr)...)
+	}
+
+	for _, childBlock := range b.Children() {
+		refs = append(refs, referencesForBlock(childBlock)...)
+	}
+
+	if !hasProviderAttr && (b.Type() == "resource" || b.Type() == "data") {
+		providerName := b.Provider()
+		if providerName != "" {
+			refs = append(refs, VertexReference{
+				Key: fmt.Sprintf("provider.%s", providerName),
+			})
+		}
+	}
+
+	return refs
+}
+
+func referencesForAttribute(b *Block, a *Attribute) []VertexReference {
+	var refs []VertexReference
+
+	for _, ref := range a.AllReferences() {
+		key := ref.String()
+
+		if shouldSkipRef(b, key) {
+			continue
+		}
+
+		if (b.Type() == "resource" || b.Type() == "data") && a.Name() == "provider" {
+			key = fmt.Sprintf("provider.%s", key)
+		}
+
+		modAddr := b.ModuleAddress()
+		modPart, otherPart := splitModuleAddr(key)
+
+		if modPart != "" {
+			if modAddr == "" {
+				modAddr = modPart
+			} else {
+				modAddr = fmt.Sprintf("%s.%s", modAddr, modPart)
+			}
+		}
+
+		refs = append(refs, VertexReference{
+			ModuleAddress: modAddr,
+			Key:           otherPart,
+		})
+	}
+
+	return refs
+}
+
+func shouldSkipRef(block *Block, key string) bool {
+	if key == "count.index" || key == "each.key" || key == "each.value" || strings.HasSuffix(key, ".") {
+		return true
+	}
+
+	if block.parent != nil && block.parent.Type() == "variable" && block.Type() == "validation" {
+		return true
+	}
+
+	return false
+}
+
+func splitModuleAddr(address string) (string, string) {
+	matches := addrSplitModuleRegex.FindStringSubmatch(address)
+	if len(matches) == 3 {
+		return matches[1], matches[2]
+	}
+	return "", address
 }
