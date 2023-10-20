@@ -622,8 +622,17 @@ func (attr *Attribute) referencesFromExpression(expression hcl.Expression) []*Re
 		if err == nil {
 			refs = append(refs, ref)
 		}
+	case *hclsyntax.LiteralValueExpr:
+		attr.Logger.Debug().Msgf("cannot create references from %T as it is a literal value and will not contain refs", t)
 	default:
-		attr.Logger.Debug().Msgf("could not create references for expression type: %s", t)
+		name := fmt.Sprintf("%T", t)
+		if strings.HasPrefix(name, "*hclsyntax") {
+			// if we get here then that means we have encountered an expression type that we don't support.
+			// Adding support for newly added expressions is critical to graph evaluation, so let's log an error.
+			attr.Logger.Error().Msgf("cannot create references for unsupported expression type %q", name)
+		} else {
+			attr.Logger.Debug().Msgf("cannot create references for expression type: %q", name)
+		}
 	}
 
 	return refs
