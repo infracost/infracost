@@ -399,6 +399,9 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 
 	// Graph evaluation
 	if os.Getenv("INFRACOST_GRAPH_EVALUATOR") == "true" {
+		// we use the base logrus log here so that it's consistent with the spinner logs
+		logrus.Info("Building project with experimental graph runner")
+
 		g, err := NewGraphWithRoot(p.logger, nil)
 		if err != nil {
 			return m, err
