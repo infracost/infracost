@@ -48,7 +48,7 @@ func NewGraphWithRoot(logger *logrus.Entry, vertexMutex *sync.Mutex) (*Graph, er
 
 	err := g.dag.AddVertexByID(g.rootVertex.ID(), g.rootVertex)
 	if err != nil {
-		return nil, fmt.Errorf("error adding vertex: %w", err)
+		return nil, fmt.Errorf("error adding vertex %q %w", g.rootVertex.ID(), err)
 	}
 
 	return g, nil
@@ -114,7 +114,7 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 	for _, vertex := range vertexes {
 		err := g.dag.AddVertexByID(vertex.ID(), vertex)
 		if err != nil {
-			return err
+			return fmt.Errorf("error adding vertex %q %w", vertex.ID(), err)
 		}
 	}
 
