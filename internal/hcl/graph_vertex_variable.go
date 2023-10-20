@@ -22,7 +22,7 @@ func (v *VertexVariable) ModuleAddress() string {
 }
 
 func (v *VertexVariable) References() []VertexReference {
-	return referencesForBlock(v.block)
+	return v.block.VerticesReferenced()
 }
 
 func (v *VertexVariable) Visit(mutex *sync.Mutex) error {
