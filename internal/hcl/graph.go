@@ -205,6 +205,8 @@ func (g *Graph) Walk() {
 }
 
 func (g *Graph) Run(evaluator *Evaluator) (*Module, error) {
+	g.logger.Info("Building project with experimental graph runner")
+
 	err := g.Populate(evaluator)
 	if err != nil {
 		return nil, err
