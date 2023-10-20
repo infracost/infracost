@@ -58,17 +58,10 @@ func (v *VertexModule) evaluate(mutex *sync.Mutex) error {
 
 func (v *VertexModule) expand(mutex *sync.Mutex) ([]*Block, error) {
 	mutex.Lock()
-
+	defer mutex.Unlock()
 	expanded := []*Block{v.block}
 	expanded = v.evaluator.expandBlockForEaches(expanded)
 	expanded = v.evaluator.expandBlockCounts(expanded)
-
-	moduleEvaluators := map[string]*Evaluator{}
-
-	g, err := NewGraphWithRoot(v.logger, mutex)
-	if err != nil {
-		return nil, fmt.Errorf("error creating new graph: %w", err)
-	}
 
 	for _, block := range expanded {
 		modCall, err := v.evaluator.loadModule(block)
@@ -105,25 +98,16 @@ func (v *VertexModule) expand(mutex *sync.Mutex) ([]*Block, error) {
 			v.evaluator.logger,
 			parentContext,
 		)
-		moduleEvaluators[block.FullName()] = moduleEvaluator
+		g, err := NewGraphWithRoot(v.logger, nil)
+		if err != nil {
+			return nil, fmt.Errorf("error creating new graph: %w", err)
+		}
 
-		err = g.Populate(moduleEvaluator)
+		v.logger.Debugf("evaluating graph for child module %q", block.FullName())
+		modCall.Module, err = g.Run(moduleEvaluator)
 		if err != nil {
 			return nil, fmt.Errorf("error populating graph: %w", err)
 		}
-	}
-	mutex.Unlock()
-
-	g.ReduceTransitively()
-	g.Walk()
-
-	mutex.Lock()
-
-	for fullName, moduleEvaluator := range moduleEvaluators {
-		moduleEvaluator.module.Blocks = moduleEvaluator.filteredBlocks
-
-		modCall := v.evaluator.moduleCalls[fullName]
-		modCall.Module = moduleEvaluator.collectModules()
 
 		outputs := moduleEvaluator.exportOutputs()
 		if val := modCall.Module.Key(); val != nil {
@@ -136,8 +120,5 @@ func (v *VertexModule) expand(mutex *sync.Mutex) ([]*Block, error) {
 	}
 
 	v.block.expanded = true
-
-	mutex.Unlock()
-
 	return expanded, nil
 }
