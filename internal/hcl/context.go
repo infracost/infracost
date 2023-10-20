@@ -2,7 +2,6 @@ package hcl
 
 import (
 	"strings"
-	"sync"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/rs/zerolog"
@@ -13,7 +12,6 @@ type Context struct {
 	ctx    *hcl.EvalContext
 	parent *Context
 	logger zerolog.Logger
-	mu     sync.RWMutex
 }
 
 func NewContext(ctx *hcl.EvalContext, parent *Context, logger zerolog.Logger) *Context {
