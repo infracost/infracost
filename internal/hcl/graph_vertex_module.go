@@ -59,11 +59,14 @@ func (v *VertexModule) evaluate(mutex *sync.Mutex) error {
 func (v *VertexModule) expand(mutex *sync.Mutex) ([]*Block, error) {
 	mutex.Lock()
 	defer mutex.Unlock()
+	fmt.Printf("expanding module %q\n", v.block.FullName())
 	expanded := []*Block{v.block}
 	expanded = v.evaluator.expandBlockForEaches(expanded)
 	expanded = v.evaluator.expandBlockCounts(expanded)
 
 	for _, block := range expanded {
+		name := block.FullName()
+		fmt.Printf("found expanded module %q\n", name)
 		modCall, err := v.evaluator.loadModule(block)
 		if err != nil {
 			return nil, fmt.Errorf("error loading module: %w", err)
@@ -74,7 +77,7 @@ func (v *VertexModule) expand(mutex *sync.Mutex) ([]*Block, error) {
 		// here as well to be consistent
 		modCall.Module.Name = modCall.Definition.FullName()
 
-		v.evaluator.moduleCalls[block.FullName()] = modCall
+		v.evaluator.moduleCalls[name] = modCall
 
 		parentContext := NewContext(&hcl.EvalContext{
 			Functions: ExpFunctions(modCall.Module.RootPath, v.evaluator.logger),
@@ -103,7 +106,7 @@ func (v *VertexModule) expand(mutex *sync.Mutex) ([]*Block, error) {
 			return nil, fmt.Errorf("error creating new graph: %w", err)
 		}
 
-		v.logger.Debugf("evaluating graph for child module %q", block.FullName())
+		v.logger.Debugf("evaluating graph for child module %q", name)
 		modCall.Module, err = g.Run(moduleEvaluator)
 		if err != nil {
 			return nil, fmt.Errorf("error populating graph: %w", err)

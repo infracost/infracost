@@ -163,6 +163,7 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 	var diag hcl.Diagnostics
 	ctyVal, diag = attr.HCLAttr.Expr.Value(attr.Ctx.Inner())
 	if diag.HasErrors() {
+		fmt.Printf("%s value error %s\n", attr.Name(), diag.Error())
 		mockedVal := cty.StringVal(fmt.Sprintf("%s-mock", attr.Name()))
 		if attr.newMock != nil {
 			mockedVal = attr.newMock(attr)
@@ -295,13 +296,7 @@ func buildObject(traversal hcl.Traversal, value cty.Value, mock cty.Value, i int
 
 	traverser := traversal[i]
 
-	valueMap := make(map[string]cty.Value)
-	if value.CanIterateElements() {
-		vm := value.AsValueMap()
-		if vm != nil {
-			valueMap = vm
-		}
-	}
+	valueMap := value.AsValueMap()
 
 	// traverse splat is a special holding type which means we want to traverse all the attributes on the map.
 	if _, ok := traverser.(hcl.TraverseSplat); ok {
