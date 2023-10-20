@@ -29,7 +29,7 @@ func (v *VertexProvider) ModuleAddress() string {
 }
 
 func (v *VertexProvider) References() []VertexReference {
-	return referencesForBlock(v.block)
+	return v.block.VerticesReferenced()
 }
 
 func (v *VertexProvider) Visit(mutex *sync.Mutex) error {

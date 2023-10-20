@@ -24,7 +24,7 @@ func (v *VertexModule) ModuleAddress() string {
 }
 
 func (v *VertexModule) References() []VertexReference {
-	return referencesForBlock(v.block)
+	return v.block.VerticesReferenced()
 }
 
 func (v *VertexModule) Visit(mutex *sync.Mutex) error {

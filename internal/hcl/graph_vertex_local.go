@@ -23,7 +23,7 @@ func (v *VertexLocal) ModuleAddress() string {
 }
 
 func (v *VertexLocal) References() []VertexReference {
-	return referencesForAttribute(v.block, v.attr)
+	return v.attr.VerticesReferenced(v.block)
 }
 
 func (v *VertexLocal) Visit(mutex *sync.Mutex) error {

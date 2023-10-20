@@ -1027,6 +1027,40 @@ func (b *Block) Reference() *Reference {
 	return ref
 }
 
+// VerticesReferenced traverses the block attributes and child blocks to build a complete
+// list of all the vertices referenced by the Block. We build a special VertexReference
+// if the block uses a provider but doesn't have one referenced. This is because blocks
+// will depend on the default provider to get the correct region data, even if not explicitly
+// referenced as a reference.
+func (b *Block) VerticesReferenced() []VertexReference {
+	var refs []VertexReference
+
+	hasProviderAttr := false
+
+	for _, attr := range b.GetAttributes() {
+		if attr.Name() == "provider" {
+			hasProviderAttr = true
+		}
+
+		refs = append(refs, attr.VerticesReferenced(b)...)
+	}
+
+	for _, childBlock := range b.Children() {
+		refs = append(refs, childBlock.VerticesReferenced()...)
+	}
+
+	if !hasProviderAttr && usesProviderConfiguration(b) {
+		providerName := b.Provider()
+		if providerName != "" {
+			refs = append(refs, VertexReference{
+				Key: fmt.Sprintf("provider.%s", providerName),
+			})
+		}
+	}
+
+	return refs
+}
+
 // LocalName is the name relative to the current module
 func (b *Block) LocalName() string {
 	return b.Reference().String()
@@ -1292,4 +1326,8 @@ func getFromProvider(b *Block, provider, key string) cty.Value {
 	}
 
 	return val
+}
+
+func usesProviderConfiguration(b *Block) bool {
+	return b.Type() == "resource" || b.Type() == "data"
 }
