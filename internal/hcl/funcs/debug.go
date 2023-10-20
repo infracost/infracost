@@ -6,6 +6,7 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/function"
+	ctyJson "github.com/zclconf/go-cty/cty/json"
 )
 
 // PrintArgs prints any number of args to the std out using fmt.
@@ -46,11 +47,17 @@ var PrintArgs = function.New(&function.Spec{
 		return args[1].Type(), nil
 	},
 	Impl: func(args []cty.Value, retType cty.Type) (cty.Value, error) {
-		fmt.Printf("terraform print %q:%s\n", args[0].AsString(), args[1].GoString())
+		fmt.Printf("terraform print %q:%s\n", args[0].AsString(), string(valueToBytes(args[1])))
 
 		return args[1], nil
 	},
 })
+
+func valueToBytes(v cty.Value) []byte {
+	simple := ctyJson.SimpleJSONValue{Value: v}
+	b, _ := simple.MarshalJSON()
+	return b
+}
 
 // LogArgs is identical to PrintArgs but writes the arguments to the Infracost log.
 // This is useful to understand arguments as they change in the module evaluation.
