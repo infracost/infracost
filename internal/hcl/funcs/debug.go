@@ -47,7 +47,6 @@ var PrintArgs = function.New(&function.Spec{
 		return args[1].Type(), nil
 	},
 	Impl: func(args []cty.Value, retType cty.Type) (cty.Value, error) {
-
 		fmt.Printf("terraform print %q:%s\n", args[0].AsString(), string(valueToBytes(args[1])))
 
 		return args[1], nil

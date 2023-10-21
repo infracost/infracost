@@ -163,7 +163,6 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 	var diag hcl.Diagnostics
 	ctyVal, diag = attr.HCLAttr.Expr.Value(attr.Ctx.Inner())
 	if diag.HasErrors() {
-		fmt.Printf("%s value error %s\n", attr.Name(), diag.Error())
 		mockedVal := cty.StringVal(fmt.Sprintf("%s-mock", attr.Name()))
 		if attr.newMock != nil {
 			mockedVal = attr.newMock(attr)

@@ -59,14 +59,12 @@ func (v *VertexModule) evaluate(mutex *sync.Mutex) error {
 func (v *VertexModule) expand(mutex *sync.Mutex) ([]*Block, error) {
 	mutex.Lock()
 	defer mutex.Unlock()
-	fmt.Printf("expanding module %q\n", v.block.FullName())
 	expanded := []*Block{v.block}
 	expanded = v.evaluator.expandBlockForEaches(expanded)
 	expanded = v.evaluator.expandBlockCounts(expanded)
 
 	for _, block := range expanded {
 		name := block.FullName()
-		fmt.Printf("found expanded module %q\n", name)
 		modCall, err := v.evaluator.loadModule(block)
 		if err != nil {
 			return nil, fmt.Errorf("error loading module: %w", err)

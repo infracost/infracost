@@ -482,7 +482,6 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 		}
 
 		if block.IsCountExpanded() || !block.IsForEachReferencedExpanded(blocks) || !shouldExpandBlock(block) {
-			fmt.Printf("%s cannot expand block refs are fucked", block.FullName())
 			original := block.original.GetAttribute("for_each")
 			if !original.HasChanged() {
 				expanded = append(expanded, block)
@@ -496,7 +495,6 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 		e.logger.Debugf("expanding block %s because a for_each attribute was found", block.LocalName())
 
 		value := forEachAttr.Value()
-		fmt.Printf("%s foreach value %s\n", block.FullName(), value.GoString())
 		if !value.IsNull() && value.IsKnown() && forEachAttr.IsIterable() {
 			labels := block.Labels()
 			if block.Type() != "resource" {
