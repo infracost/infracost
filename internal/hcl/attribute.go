@@ -296,6 +296,9 @@ func buildObject(traversal hcl.Traversal, value cty.Value, mock cty.Value, i int
 	traverser := traversal[i]
 
 	valueMap := value.AsValueMap()
+	if valueMap == nil {
+		valueMap = make(map[string]cty.Value)
+	}
 
 	// traverse splat is a special holding type which means we want to traverse all the attributes on the map.
 	if _, ok := traverser.(hcl.TraverseSplat); ok {

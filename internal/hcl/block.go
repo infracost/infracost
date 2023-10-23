@@ -171,7 +171,7 @@ func (blocks Blocks) Matching(pattern BlockMatcher) *Block {
 		}
 	}
 
-	if pattern.Label == "" && len(search) > 0 {
+	if len(search) > 0 {
 		return search[0]
 	}
 
@@ -570,6 +570,9 @@ func (b *Block) IsForEachReferencedExpanded(moduleBlocks Blocks) bool {
 	}
 
 	label := r.String()
+	if blockType == "module" {
+		label = r.typeLabel
+	}
 
 	referenced := moduleBlocks.Matching(BlockMatcher{
 		Type:       blockType,
