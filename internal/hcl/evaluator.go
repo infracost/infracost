@@ -165,6 +165,10 @@ func NewEvaluator(
 	}
 }
 
+func (e *Evaluator) isGraphEvaluator() bool {
+	return os.Getenv("INFRACOST_GRAPH_EVALUATOR") == "true"
+}
+
 func (e *Evaluator) AddFilteredBlocks(blocks ...*Block) {
 	for _, block := range blocks {
 		if block != nil {
@@ -481,7 +485,7 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 			continue
 		}
 
-		if block.IsCountExpanded() || !block.IsForEachReferencedExpanded(blocks) || !shouldExpandBlock(block) {
+		if !e.isGraphEvaluator() && (block.IsCountExpanded() || !block.IsForEachReferencedExpanded(blocks) || !shouldExpandBlock(block)) {
 			original := block.original.GetAttribute("for_each")
 			if !original.HasChanged() {
 				expanded = append(expanded, block)
@@ -581,7 +585,7 @@ func (e *Evaluator) expandBlockCounts(blocks Blocks) Blocks {
 			continue
 		}
 
-		if block.IsCountExpanded() || !shouldExpandBlock(block) {
+		if !e.isGraphEvaluator() && (block.IsCountExpanded() || !shouldExpandBlock(block)) {
 			original := block.original.GetAttribute("count")
 			if !original.HasChanged() {
 				expanded = append(expanded, block)
