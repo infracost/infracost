@@ -34,15 +34,15 @@
               "calls": [
                 {
                   "blockName": "aws_appautoscaling_target.autoscale_dynamodb_table_read_target",
-                  "endLine": 72,
+                  "endLine": 57,
                   "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-                  "startLine": 66
+                  "startLine": 51
                 }
               ],
               "checksum": "1403df4d5fba340338063d429a834b41d778a10f9bf5641d6e8a9b754c4e479a",
-              "endLine": 72,
+              "endLine": 57,
               "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-              "startLine": 66
+              "startLine": 51
             }
           },
           {
@@ -56,15 +56,15 @@
               "calls": [
                 {
                   "blockName": "aws_appautoscaling_target.autoscale_dynamodb_table_write_target",
-                  "endLine": 64,
+                  "endLine": 49,
                   "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-                  "startLine": 58
+                  "startLine": 43
                 }
               ],
               "checksum": "90c5db4e165a29a3abc045e28dfea607059c1614b0c0d7a2cc60711ad2985a65",
-              "endLine": 64,
+              "endLine": 49,
               "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-              "startLine": 58
+              "startLine": 43
             }
           },
           {
@@ -78,15 +78,15 @@
               "calls": [
                 {
                   "blockName": "aws_dynamodb_table.autoscale_dynamodb_table",
-                  "endLine": 56,
+                  "endLine": 41,
                   "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-                  "startLine": 39
+                  "startLine": 24
                 }
               ],
               "checksum": "fdfe0646f29e06b7e43d6f8ea09a298ca63ab078d56654d90f2dd9c6ab28d96a",
-              "endLine": 56,
+              "endLine": 41,
               "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-              "startLine": 39
+              "startLine": 24
             },
             "hourlyCost": "0.0078",
             "monthlyCost": "5.694",
@@ -169,15 +169,15 @@
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
-                  "endLine": 37,
+                  "endLine": 22,
                   "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-                  "startLine": 16
+                  "startLine": 1
                 }
               ],
               "checksum": "f5dd035ad27e97bb0e63f5e9794406f76dec425251f3ad09176905bfe8c1b6c5",
-              "endLine": 37,
+              "endLine": 22,
               "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-              "startLine": 16
+              "startLine": 1
             },
             "hourlyCost": "0.91197260273972602",
             "monthlyCost": "665.74",
@@ -246,15 +246,15 @@
               "calls": [
                 {
                   "blockName": "aws_appautoscaling_target.autoscale_dynamodb_table_read_target",
-                  "endLine": 72,
+                  "endLine": 57,
                   "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-                  "startLine": 66
+                  "startLine": 51
                 }
               ],
               "checksum": "1403df4d5fba340338063d429a834b41d778a10f9bf5641d6e8a9b754c4e479a",
-              "endLine": 72,
+              "endLine": 57,
               "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-              "startLine": 66
+              "startLine": 51
             }
           },
           {
@@ -268,15 +268,15 @@
               "calls": [
                 {
                   "blockName": "aws_appautoscaling_target.autoscale_dynamodb_table_write_target",
-                  "endLine": 64,
+                  "endLine": 49,
                   "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-                  "startLine": 58
+                  "startLine": 43
                 }
               ],
               "checksum": "90c5db4e165a29a3abc045e28dfea607059c1614b0c0d7a2cc60711ad2985a65",
-              "endLine": 64,
+              "endLine": 49,
               "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-              "startLine": 58
+              "startLine": 43
             }
           },
           {
@@ -290,15 +290,15 @@
               "calls": [
                 {
                   "blockName": "aws_dynamodb_table.autoscale_dynamodb_table",
-                  "endLine": 56,
+                  "endLine": 41,
                   "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-                  "startLine": 39
+                  "startLine": 24
                 }
               ],
               "checksum": "fdfe0646f29e06b7e43d6f8ea09a298ca63ab078d56654d90f2dd9c6ab28d96a",
-              "endLine": 56,
+              "endLine": 41,
               "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-              "startLine": 39
+              "startLine": 24
             },
             "hourlyCost": "0.0078",
             "monthlyCost": "5.694",
@@ -381,15 +381,15 @@
               "calls": [
                 {
                   "blockName": "aws_instance.web_app",
-                  "endLine": 37,
+                  "endLine": 22,
                   "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-                  "startLine": 16
+                  "startLine": 1
                 }
               ],
               "checksum": "f5dd035ad27e97bb0e63f5e9794406f76dec425251f3ad09176905bfe8c1b6c5",
-              "endLine": 37,
+              "endLine": 22,
               "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-              "startLine": 16
+              "startLine": 1
             },
             "hourlyCost": "0.91197260273972602",
             "monthlyCost": "665.74",
