@@ -92,7 +92,6 @@ type globalAcceleratorRegionDataTransferUsage struct {
 
 type globalAcceleratorRegionData struct {
 	awsGroupedName                string
-	priceRegion                   string
 	codeRegion                    string
 	monthlyInboundDataTransferGB  *float64
 	monthlyOutboundDataTransferGB *float64
@@ -133,63 +132,54 @@ func (r *GlobalacceleratorEndpointGroup) buildSubresources() []*schema.Resource 
 	regionsData := []*globalAcceleratorRegionData{
 		{
 			awsGroupedName:                "US, Mexico, Canada",
-			priceRegion:                   "United States",
 			codeRegion:                    "NA",
 			monthlyInboundDataTransferGB:  r.MonthlyInboundDataTransferGB.US,
 			monthlyOutboundDataTransferGB: r.MonthlyOutboundDataTransferGB.US,
 		},
 		{
 			awsGroupedName:                "Europe",
-			priceRegion:                   "Europe",
 			codeRegion:                    "EU",
 			monthlyInboundDataTransferGB:  r.MonthlyInboundDataTransferGB.Europe,
 			monthlyOutboundDataTransferGB: r.MonthlyOutboundDataTransferGB.Europe,
 		},
 		{
 			awsGroupedName:                "South Africa, Kenya",
-			priceRegion:                   "South Africa",
 			codeRegion:                    "ZA",
 			monthlyInboundDataTransferGB:  r.MonthlyInboundDataTransferGB.SouthAfrica,
 			monthlyOutboundDataTransferGB: r.MonthlyOutboundDataTransferGB.SouthAfrica,
 		},
 		{
 			awsGroupedName:                "South America",
-			priceRegion:                   "South America",
 			codeRegion:                    "SA",
 			monthlyInboundDataTransferGB:  r.MonthlyInboundDataTransferGB.SouthAmerica,
 			monthlyOutboundDataTransferGB: r.MonthlyOutboundDataTransferGB.SouthAmerica,
 		},
 		{
 			awsGroupedName:                "South Korea",
-			priceRegion:                   "South Korea",
 			codeRegion:                    "KR",
 			monthlyInboundDataTransferGB:  r.MonthlyInboundDataTransferGB.SouthKorea,
 			monthlyOutboundDataTransferGB: r.MonthlyOutboundDataTransferGB.SouthKorea,
 		},
 		{
 			awsGroupedName:                "Middle East",
-			priceRegion:                   "Middle East",
 			codeRegion:                    "ME",
 			monthlyInboundDataTransferGB:  r.MonthlyInboundDataTransferGB.SouthKorea,
 			monthlyOutboundDataTransferGB: r.MonthlyOutboundDataTransferGB.SouthKorea,
 		},
 		{
 			awsGroupedName:                "Australia, New Zealand",
-			priceRegion:                   "Australia",
 			codeRegion:                    "AU",
 			monthlyInboundDataTransferGB:  r.MonthlyInboundDataTransferGB.Australia,
 			monthlyOutboundDataTransferGB: r.MonthlyOutboundDataTransferGB.Australia,
 		},
 		{
 			awsGroupedName:                "Asia Pacific",
-			priceRegion:                   "Asia Pacific",
 			codeRegion:                    "AP",
 			monthlyInboundDataTransferGB:  r.MonthlyInboundDataTransferGB.AsiaPacific,
 			monthlyOutboundDataTransferGB: r.MonthlyOutboundDataTransferGB.AsiaPacific,
 		},
 		{
 			awsGroupedName:                "India, Indonesia, Philippines, Thailand",
-			priceRegion:                   "India",
 			codeRegion:                    "IN",
 			monthlyInboundDataTransferGB:  r.MonthlyInboundDataTransferGB.India,
 			monthlyOutboundDataTransferGB: r.MonthlyOutboundDataTransferGB.India,
