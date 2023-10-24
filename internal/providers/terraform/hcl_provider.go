@@ -212,6 +212,7 @@ func (p *HCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, e
 
 		project := p.parseResources(j, usage)
 		if p.ctx.RunContext.VCSMetadata.HasChanges() {
+			j := j
 			project.Metadata.VCSCodeChanged = &j.Module.HasChanges
 		}
 
