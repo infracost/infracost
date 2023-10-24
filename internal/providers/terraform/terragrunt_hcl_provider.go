@@ -13,13 +13,15 @@ import (
 	"sync"
 	"time"
 
-	tgcli "github.com/gruntwork-io/terragrunt/cli"
-	"github.com/gruntwork-io/terragrunt/cli/tfsource"
+	tgerrors "github.com/gruntwork-io/go-commons/errors"
+	tgcliterraform "github.com/gruntwork-io/terragrunt/cli/commands/terraform"
+	tgcliinfo "github.com/gruntwork-io/terragrunt/cli/commands/terragrunt-info"
+	"github.com/gruntwork-io/terragrunt/codegen"
 	tgconfig "github.com/gruntwork-io/terragrunt/config"
 	tgconfigstack "github.com/gruntwork-io/terragrunt/configstack"
-	tgerrors "github.com/gruntwork-io/terragrunt/errors"
 	"github.com/gruntwork-io/terragrunt/options"
 	tgoptions "github.com/gruntwork-io/terragrunt/options"
+	tfsource "github.com/gruntwork-io/terragrunt/terraform"
 	"github.com/gruntwork-io/terragrunt/util"
 	hcl2 "github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/gohcl"
@@ -44,7 +46,7 @@ import (
 var terragruntSourceLock = infSync.KeyMutex{}
 
 // terragruntDownloadedDirs is used to ensure sources are only downloaded once. This is needed
-// because the call to util.CopyFolderContents in tgcli.DownloadTerraformSource seems to be mucking
+// because the call to util.CopyFolderContents in tgcliterraform.DownloadTerraformSource seems to be mucking
 // up the cache directory unnecessarily.  If that is fixed we can remove this.
 var terragruntDownloadedDirs = sync.Map{}
 
@@ -346,11 +348,11 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 		Logger:                     tgLog,
 		LogLevel:                   log.DebugLevel,
 		ErrWriter:                  tgLog.WriterLevel(log.DebugLevel),
-		MaxFoldersToCheck:          tgoptions.DEFAULT_MAX_FOLDERS_TO_CHECK,
+		MaxFoldersToCheck:          tgoptions.DefaultMaxFoldersToCheck,
 		WorkingDir:                 p.Path,
 		ExcludeDirs:                p.excludedPaths,
 		DownloadDir:                terragruntDownloadDir,
-		TerraformCliArgs:           []string{tgcli.CMD_TERRAGRUNT_INFO},
+		TerraformCliArgs:           []string{tgcliinfo.CommandName},
 		Env:                        p.env,
 		IgnoreExternalDependencies: true,
 		SourceMap:                  p.ctx.RunContext.Config.TerraformSourceMap,
@@ -511,9 +513,6 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 		return
 	}
 
-	terragruntOptionsClone := opts.Clone(opts.TerragruntConfigPath)
-	terragruntOptionsClone.TerraformCommand = tgcli.CMD_TERRAGRUNT_READ_CONFIG
-
 	if terragruntConfig.Skip {
 		opts.Logger.Infof(
 			"Skipping terragrunt module %s due to skip = true.",
@@ -573,6 +572,11 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 		if updatedWorkingDir != "" {
 			info = &terragruntWorkingDirInfo{configDir: opts.WorkingDir, workingDir: updatedWorkingDir}
 		}
+	}
+
+	if err = generateConfig(terragruntConfig, opts, info.workingDir); err != nil {
+		info.error = err
+		return
 	}
 
 	pconfig := *p.ctx.ProjectConfig // clone the projectConfig
@@ -636,7 +640,7 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 
 // downloadSourceOnce thread-safely makes sure the sourceURL is only downloaded once
 func downloadSourceOnce(sourceURL string, opts *tgoptions.TerragruntOptions, terragruntConfig *tgconfig.TerragruntConfig) (string, error) {
-	source, err := tfsource.NewTerraformSource(sourceURL, opts.DownloadDir, opts.WorkingDir, opts.Logger)
+	source, err := tfsource.NewSource(sourceURL, opts.DownloadDir, opts.WorkingDir, terragruntConfig.GenerateConfigs, opts.Logger)
 	if err != nil {
 		return "", err
 	}
@@ -654,7 +658,7 @@ func downloadSourceOnce(sourceURL string, opts *tgoptions.TerragruntOptions, ter
 		return source.WorkingDir, nil
 	}
 
-	_, err = tgcli.DownloadTerraformSource(sourceURL, opts, terragruntConfig)
+	_, err = tgcliterraform.DownloadTerraformSource(sourceURL, opts, terragruntConfig)
 	if err != nil {
 		return "", err
 	}
@@ -662,6 +666,19 @@ func downloadSourceOnce(sourceURL string, opts *tgoptions.TerragruntOptions, ter
 	terragruntDownloadedDirs.Store(dir, true)
 
 	return source.WorkingDir, nil
+}
+
+func generateConfig(terragruntConfig *tgconfig.TerragruntConfig, opts *options.TerragruntOptions, workingDir string) error {
+	unlock := terragruntSourceLock.Lock(opts.DownloadDir)
+	defer unlock()
+
+	for _, config := range terragruntConfig.GenerateConfigs {
+		if err := codegen.WriteToFile(opts, workingDir, config); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }
 
 func buildExcludedPathsMatcher(fullPath string, excludedDirs []string) func(string) bool {
