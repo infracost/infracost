@@ -17,7 +17,7 @@
  ├─ Australia, New Zealand                                                        
  │  └─ Inbound DT-premium fee                     62,340,000  GB    $6,545,700.00 
  ├─ Asia Pacific                                                                  
- │  └─ Inbound DT-premium fee                     62,340,000  GB    $2,680,620.00 
+ │  └─ Inbound DT-premium fee                     62,340,000  GB    $2,057,220.00 
  └─ India, Indonesia, Philippines, Thailand                                       
     └─ Inbound DT-premium fee                     72,340,000  GB    $2,387,220.00 
                                                                                   
@@ -27,7 +27,7 @@
  └─ Asia Pacific                                                                  
     └─ Outbound DT-premium fee                         1,000  GB           $35.00 
                                                                                   
- OVERALL TOTAL                                                     $19,785,050.00 
+ OVERALL TOTAL                                                     $19,161,650.00 
 ──────────────────────────────────
 2 cloud resources were detected:
 ∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
@@ -35,5 +35,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestGlobalAcceleratorEndpointGroup                 ┃ $19,785,050  ┃
+┃ TestGlobalAcceleratorEndpointGroup                 ┃ $19,161,650  ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
