@@ -50,12 +50,14 @@ resource "aws_instance" "ap_northeast_1" {
 
 provider "google" {
   credentials = "{\"type\":\"service_account\"}"
+  project     = "my-project"
   region      = "eu-west2"
   alias       = "eu-west2"
 }
 
 provider "google" {
   credentials = "{\"type\":\"service_account\"}"
+  project     = "my-project"
   region      = "us-central1"
 }
 

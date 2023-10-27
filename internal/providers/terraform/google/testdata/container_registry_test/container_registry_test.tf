@@ -1,11 +1,13 @@
 provider "google" {
   credentials = "{\"type\":\"service_account\"}"
+  project     = "my-project"
   region      = "us-central1"
 }
 
 provider "google" {
   alias       = "asia"
   credentials = "{\"type\":\"service_account\"}"
+  project     = "my-project"
   region      = "asia-northeast1"
 }
 

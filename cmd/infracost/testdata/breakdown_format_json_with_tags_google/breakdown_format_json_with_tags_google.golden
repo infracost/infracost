@@ -23,7 +23,7 @@
             "name": "google",
             "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
             "startLine": 1,
-            "endLine": 4
+            "endLine": 5
           }
         ]
       },
@@ -39,15 +39,15 @@
               "calls": [
                 {
                   "blockName": "google_compute_disk.gcd1",
-                  "endLine": 13,
+                  "endLine": 14,
                   "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
-                  "startLine": 6
+                  "startLine": 7
                 }
               ],
               "checksum": "167438a6d3e64b8f75d1c0f7dcbf733ed65c24b40ce19d9d05c7c42ea070c947",
-              "endLine": 13,
+              "endLine": 14,
               "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
-              "startLine": 6
+              "startLine": 7
             },
             "hourlyCost": "0.027397260273972604",
             "monthlyCost": "20",
@@ -71,15 +71,15 @@
               "calls": [
                 {
                   "blockName": "google_compute_disk.gcd2",
-                  "endLine": 18,
+                  "endLine": 19,
                   "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
-                  "startLine": 15
+                  "startLine": 16
                 }
               ],
               "checksum": "37baa7cee7077135d1b2f8c8d323cb484fcbd5be11d5fe3caafe1783113d98a4",
-              "endLine": 18,
+              "endLine": 19,
               "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
-              "startLine": 15
+              "startLine": 16
             },
             "hourlyCost": "0.02328767123287671",
             "monthlyCost": "17",
@@ -105,15 +105,15 @@
               "calls": [
                 {
                   "blockName": "google_sql_database_instance.gsdi",
-                  "endLine": 38,
+                  "endLine": 39,
                   "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
-                  "startLine": 28
+                  "startLine": 29
                 }
               ],
               "checksum": "7f1731430d3c956e3e11da3378aa13ccb98e19f5889054a196bff8a068ad7d1b",
-              "endLine": 38,
+              "endLine": 39,
               "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
-              "startLine": 28
+              "startLine": 29
             },
             "hourlyCost": "0.022828767123287671",
             "monthlyCost": "16.665",
@@ -168,15 +168,15 @@
               "calls": [
                 {
                   "blockName": "google_monitoring_custom_service.gmcs",
-                  "endLine": 26,
+                  "endLine": 27,
                   "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
-                  "startLine": 20
+                  "startLine": 21
                 }
               ],
               "checksum": "c08c94c3110cc1279d75209519a2c8446f94b9a2b4f1f37cd79123984a379911",
-              "endLine": 26,
+              "endLine": 27,
               "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
-              "startLine": 20
+              "startLine": 21
             }
           }
         ],
@@ -195,15 +195,15 @@
               "calls": [
                 {
                   "blockName": "google_compute_disk.gcd1",
-                  "endLine": 13,
+                  "endLine": 14,
                   "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
-                  "startLine": 6
+                  "startLine": 7
                 }
               ],
               "checksum": "167438a6d3e64b8f75d1c0f7dcbf733ed65c24b40ce19d9d05c7c42ea070c947",
-              "endLine": 13,
+              "endLine": 14,
               "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
-              "startLine": 6
+              "startLine": 7
             },
             "hourlyCost": "0.027397260273972604",
             "monthlyCost": "20",
@@ -227,15 +227,15 @@
               "calls": [
                 {
                   "blockName": "google_compute_disk.gcd2",
-                  "endLine": 18,
+                  "endLine": 19,
                   "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
-                  "startLine": 15
+                  "startLine": 16
                 }
               ],
               "checksum": "37baa7cee7077135d1b2f8c8d323cb484fcbd5be11d5fe3caafe1783113d98a4",
-              "endLine": 18,
+              "endLine": 19,
               "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
-              "startLine": 15
+              "startLine": 16
             },
             "hourlyCost": "0.02328767123287671",
             "monthlyCost": "17",
@@ -261,15 +261,15 @@
               "calls": [
                 {
                   "blockName": "google_sql_database_instance.gsdi",
-                  "endLine": 38,
+                  "endLine": 39,
                   "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
-                  "startLine": 28
+                  "startLine": 29
                 }
               ],
               "checksum": "7f1731430d3c956e3e11da3378aa13ccb98e19f5889054a196bff8a068ad7d1b",
-              "endLine": 38,
+              "endLine": 39,
               "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
-              "startLine": 28
+              "startLine": 29
             },
             "hourlyCost": "0.022828767123287671",
             "monthlyCost": "16.665",
@@ -324,15 +324,15 @@
               "calls": [
                 {
                   "blockName": "google_monitoring_custom_service.gmcs",
-                  "endLine": 26,
+                  "endLine": 27,
                   "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
-                  "startLine": 20
+                  "startLine": 21
                 }
               ],
               "checksum": "c08c94c3110cc1279d75209519a2c8446f94b9a2b4f1f37cd79123984a379911",
-              "endLine": 26,
+              "endLine": 27,
               "filename": "testdata/breakdown_format_json_with_tags_google/main.tf",
-              "startLine": 20
+              "startLine": 21
             }
           }
         ],
