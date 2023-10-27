@@ -1300,11 +1300,13 @@ func Test_ProvideMockZonesForGCPDataBlock(t *testing.T) {
 	path := createTestFile("test.tf", `
 provider "google" {
   credentials = "{\"type\":\"service_account\"}"
+  project     = "my-project"
   region      = "europe-west2"
 }
 
 provider "google" {
   credentials = "{\"type\":\"service_account\"}"
+  project     = "my-project"
   region      = "us-east1"
   alias       = "east1"
 }

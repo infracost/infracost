@@ -1,10 +1,12 @@
 provider "google" {
   credentials = "{\"type\":\"service_account\"}"
+  project     = "my-project"
   region      = "us-central1"
 }
 
 provider "google-beta" {
   credentials = "{\"type\":\"service_account\"}"
+  project     = "my-project"
   region      = "us-central1"
 }
 

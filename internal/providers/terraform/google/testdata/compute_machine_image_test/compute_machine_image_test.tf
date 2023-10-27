@@ -1,16 +1,19 @@
 provider "google-beta" {
   credentials = "{\"type\":\"service_account\"}"
+  project     = "my-project"
   region      = "us-central1"
 }
 
 provider "google" {
   credentials = "{\"type\":\"service_account\"}"
+  project     = "my-project"
   region      = "us-central1"
 }
 
 resource "google_compute_instance" "vm" {
   name         = "vm"
   machine_type = "e2-medium"
+  zone         = "us-central1-a"
 
   boot_disk {
     initialize_params {
