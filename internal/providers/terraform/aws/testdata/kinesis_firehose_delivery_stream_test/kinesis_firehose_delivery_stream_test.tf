@@ -51,6 +51,16 @@ resource "aws_kinesis_firehose_delivery_stream" "withAllTags" {
       bucket_arn = aws_s3_bucket.bucket.arn
     }
   }
+
+  splunk_configuration {
+    hec_endpoint = "fake"
+    hec_token    = "fake"
+
+    s3_configuration {
+      role_arn   = aws_iam_role.firehose.arn
+      bucket_arn = aws_s3_bucket.bucket.arn
+    }
+  }
 }
 resource "aws_s3_bucket" "bucket" {
   bucket = "tf-test-bucket"
@@ -105,11 +115,31 @@ resource "aws_kinesis_firehose_delivery_stream" "EnabledFalse" {
       bucket_arn = aws_s3_bucket.bucket.arn
     }
   }
+
+  splunk_configuration {
+    hec_endpoint = "fake"
+    hec_token    = "fake"
+
+    s3_configuration {
+      role_arn   = aws_iam_role.firehose.arn
+      bucket_arn = aws_s3_bucket.bucket.arn
+    }
+  }
 }
 
 resource "aws_kinesis_firehose_delivery_stream" "onlyDataIngested" {
   name        = "terraform-kinesis-firehose-test-stream"
   destination = "splunk"
+
+  splunk_configuration {
+    hec_endpoint = "fake"
+    hec_token    = "fake"
+
+    s3_configuration {
+      role_arn   = aws_iam_role.firehose.arn
+      bucket_arn = aws_s3_bucket.bucket.arn
+    }
+  }
 }
 
 resource "aws_kinesis_firehose_delivery_stream" "withoutUsage" {
@@ -156,11 +186,31 @@ resource "aws_kinesis_firehose_delivery_stream" "withoutUsage" {
       bucket_arn = aws_s3_bucket.bucket.arn
     }
   }
+
+  splunk_configuration {
+    hec_endpoint = "fake"
+    hec_token    = "fake"
+
+    s3_configuration {
+      role_arn   = aws_iam_role.firehose.arn
+      bucket_arn = aws_s3_bucket.bucket.arn
+    }
+  }
 }
 
 resource "aws_kinesis_firehose_delivery_stream" "forTwoMilGB" {
   name        = "terraform-kinesis-firehose-test-stream"
   destination = "splunk"
+
+  splunk_configuration {
+    hec_endpoint = "fake"
+    hec_token    = "fake"
+
+    s3_configuration {
+      role_arn   = aws_iam_role.firehose.arn
+      bucket_arn = aws_s3_bucket.bucket.arn
+    }
+  }
 }
 
 resource "aws_vpc" "main" {
@@ -219,6 +269,16 @@ resource "aws_kinesis_firehose_delivery_stream" "with_dynamic_subnet" {
       ]
       role_arn = aws_iam_role.firehose.arn
     }
+
+    s3_configuration {
+      role_arn   = aws_iam_role.firehose.arn
+      bucket_arn = aws_s3_bucket.bucket.arn
+    }
+  }
+
+  splunk_configuration {
+    hec_endpoint = "fake"
+    hec_token    = "fake"
 
     s3_configuration {
       role_arn   = aws_iam_role.firehose.arn
