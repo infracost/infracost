@@ -5,12 +5,13 @@ import (
 	"sync"
 
 	"github.com/sirupsen/logrus"
+	"github.com/zclconf/go-cty/cty"
 )
 
 type VertexOutput struct {
-	logger    *logrus.Entry
-	evaluator *Evaluator
-	block     *Block
+	logger        *logrus.Entry
+	moduleConfigs ModuleConfigs
+	block         *Block
 }
 
 func (v *VertexOutput) ID() string {
@@ -32,15 +33,56 @@ func (v *VertexOutput) Visit(mutex *sync.Mutex) error {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	val, err := v.evaluator.evaluateOutput(v.block)
-	if err != nil {
-		return fmt.Errorf("could not evaluate output %s: %w", v.ID(), err)
+	moduleInstances := v.moduleConfigs.Get(v.block.ModuleAddress())
+	if len(moduleInstances) == 0 {
+		return fmt.Errorf("no module instances found for module address %q", v.block.ModuleAddress())
 	}
 
-	v.logger.Debugf("adding output %s to the evaluation context", v.ID())
-	key := fmt.Sprintf("output.%s", v.block.Label())
-	v.evaluator.ctx.SetByDot(val, key)
+	for _, moduleInstance := range moduleInstances {
+		e := moduleInstance.evaluator
+		blockInstance := e.module.Blocks.FindLocalName(v.block.LocalName())
 
-	v.evaluator.AddFilteredBlocks(v.block)
+		if blockInstance == nil {
+			return fmt.Errorf("could not find block %q in module %q", v.ID(), moduleInstance.name)
+		}
+
+		key := fmt.Sprintf("output.%s", blockInstance.Label())
+		val, err := e.evaluateOutput(blockInstance)
+		if err != nil {
+			return fmt.Errorf("could not evaluate output %s: %w", v.ID(), err)
+		}
+
+		v.logger.Debugf("adding output %s to the evaluation context", v.ID())
+		e.ctx.SetByDot(val, key)
+
+		parentEvaluator := moduleInstance.parentEvaluator
+		modCall := moduleInstance.moduleCall
+		if parentEvaluator != nil && modCall != nil {
+
+			var parentKeyParts []string
+			if v := modCall.Module.Key(); v != nil {
+				parentKeyParts = []string{"module", stripCount(modCall.Name), *v}
+			} else if v := modCall.Module.Index(); v != nil {
+				parentKeyParts = []string{"module", stripCount(modCall.Name), fmt.Sprintf("%d", *v)}
+			} else {
+				parentKeyParts = []string{"module", modCall.Name}
+			}
+
+			var existingVals map[string]cty.Value
+			existingCtx := parentEvaluator.ctx.Get(parentKeyParts...)
+			if !existingCtx.IsNull() {
+				existingVals = existingCtx.AsValueMap()
+			} else {
+				existingVals = make(map[string]cty.Value)
+			}
+
+			existingVals[blockInstance.Label()] = val
+
+			parentEvaluator.ctx.Set(cty.ObjectVal(existingVals), parentKeyParts...)
+		}
+
+		e.AddFilteredBlocks(blockInstance)
+	}
+
 	return nil
 }

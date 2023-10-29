@@ -144,6 +144,16 @@ func (blocks Blocks) OfType(t string) Blocks {
 	return results
 }
 
+func (blocks Blocks) FindLocalName(name string) *Block {
+	for _, block := range blocks {
+		if block.LocalName() == name {
+			return block
+		}
+	}
+
+	return nil
+}
+
 // BlockMatcher defines a struct that can be used to filter a list of blocks to a single Block.
 type BlockMatcher struct {
 	Type       string

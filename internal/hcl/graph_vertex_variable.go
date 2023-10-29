@@ -8,9 +8,9 @@ import (
 )
 
 type VertexVariable struct {
-	logger    *logrus.Entry
-	evaluator *Evaluator
-	block     *Block
+	logger        *logrus.Entry
+	moduleConfigs ModuleConfigs
+	block         *Block
 }
 
 func (v *VertexVariable) ID() string {
@@ -29,15 +29,30 @@ func (v *VertexVariable) Visit(mutex *sync.Mutex) error {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	val, err := v.evaluator.evaluateVariable(v.block)
-	if err != nil {
-		return fmt.Errorf("could not evaluate variable %s: %w", v.ID(), err)
+	moduleInstances := v.moduleConfigs.Get(v.block.ModuleAddress())
+	if len(moduleInstances) == 0 {
+		return fmt.Errorf("no module instances found for module address %q", v.block.ModuleAddress())
 	}
 
-	v.logger.Debugf("adding variable %s to the evaluation context", v.ID())
-	key := fmt.Sprintf("var.%s", v.block.Label())
-	v.evaluator.ctx.SetByDot(val, key)
+	for _, moduleInstance := range moduleInstances {
+		e := moduleInstance.evaluator
+		blockInstance := e.module.Blocks.FindLocalName(v.block.LocalName())
 
-	v.evaluator.AddFilteredBlocks(v.block)
+		if blockInstance == nil {
+			return fmt.Errorf("could not find block %q in module %q", v.ID(), moduleInstance.name)
+		}
+
+		val, err := e.evaluateVariable(blockInstance)
+		if err != nil {
+			return fmt.Errorf("could not evaluate variable %s: %w", v.ID(), err)
+		}
+
+		v.logger.Debugf("adding variable %s to the evaluation context", v.ID())
+		key := fmt.Sprintf("var.%s", blockInstance.Label())
+		e.ctx.SetByDot(val, key)
+
+		e.AddFilteredBlocks(blockInstance)
+	}
+
 	return nil
 }

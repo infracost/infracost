@@ -9,9 +9,9 @@ import (
 )
 
 type VertexProvider struct {
-	logger    *logrus.Entry
-	evaluator *Evaluator
-	block     *Block
+	logger        *logrus.Entry
+	moduleConfigs ModuleConfigs
+	block         *Block
 }
 
 func (v *VertexProvider) ID() string {
@@ -41,20 +41,43 @@ func (v *VertexProvider) Visit(mutex *sync.Mutex) error {
 		return fmt.Errorf("provider block %s has no label", v.ID())
 	}
 
-	var existingVals map[string]cty.Value
-	existingCtx := v.evaluator.ctx.Get(v.block.TypeLabel())
-	if !existingCtx.IsNull() {
-		existingVals = existingCtx.AsValueMap()
-	} else {
-		existingVals = make(map[string]cty.Value)
+	moduleInstances := v.moduleConfigs.Get(v.block.ModuleAddress())
+	if len(moduleInstances) == 0 {
+		return fmt.Errorf("no module instances found for module address %q", v.block.ModuleAddress())
 	}
 
-	val := v.evaluator.evaluateProvider(v.block, existingVals)
+	for _, moduleInstance := range moduleInstances {
+		e := moduleInstance.evaluator
 
-	v.logger.Debugf("adding %s to the evaluation context", v.ID())
-	v.evaluator.ctx.Set(val, v.block.Label())
+		alias := v.block.GetAttribute("alias")
 
-	v.evaluator.AddFilteredBlocks(v.block)
+		var blockInstance *Block
+		for _, b := range e.module.Blocks {
+			if b.LocalName() == v.block.LocalName() && alias == b.GetAttribute("alias") {
+				blockInstance = b
+				break
+			}
+		}
+
+		if blockInstance == nil {
+			return fmt.Errorf("could not find block %q in module %q", v.ID(), moduleInstance.name)
+		}
+
+		var existingVals map[string]cty.Value
+		existingCtx := e.ctx.Get(blockInstance.TypeLabel())
+		if !existingCtx.IsNull() {
+			existingVals = existingCtx.AsValueMap()
+		} else {
+			existingVals = make(map[string]cty.Value)
+		}
+
+		val := e.evaluateProvider(blockInstance, existingVals)
+
+		v.logger.Debugf("adding %s to the evaluation context", v.ID())
+		e.ctx.Set(val, blockInstance.Label())
+
+		e.AddFilteredBlocks(blockInstance)
+	}
 
 	return nil
 }

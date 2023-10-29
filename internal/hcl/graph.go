@@ -15,11 +15,37 @@ var (
 	addrSplitModuleRegex = regexp.MustCompile(`^((?:module\.[^.]+\.?)+)\.(.*)$`)
 )
 
+type ModuleConfig struct {
+	name            string
+	moduleCall      *ModuleCall
+	evaluator       *Evaluator
+	parentEvaluator *Evaluator
+}
+
+type ModuleConfigs map[string][]ModuleConfig
+
+func NewModuleConfigs() ModuleConfigs {
+	return make(map[string][]ModuleConfig)
+}
+
+func (m ModuleConfigs) Add(moduleAddress string, moduleConfig ModuleConfig) {
+	if _, ok := m[moduleAddress]; !ok {
+		m[moduleAddress] = []ModuleConfig{}
+	}
+
+	m[moduleAddress] = append(m[moduleAddress], moduleConfig)
+}
+
+func (m ModuleConfigs) Get(moduleAddress string) []ModuleConfig {
+	return m[moduleAddress]
+}
+
 type Graph struct {
-	dag         *dag.DAG
-	logger      *logrus.Entry
-	rootVertex  Vertex
-	vertexMutex *sync.Mutex
+	dag           *dag.DAG
+	logger        *logrus.Entry
+	rootVertex    Vertex
+	vertexMutex   *sync.Mutex
+	moduleConfigs ModuleConfigs
 }
 
 type Vertex interface {
@@ -39,9 +65,10 @@ func NewGraphWithRoot(logger *logrus.Entry, vertexMutex *sync.Mutex) (*Graph, er
 		vertexMutex = &sync.Mutex{}
 	}
 	g := &Graph{
-		dag:         dag.NewDAG(),
-		logger:      logger,
-		vertexMutex: vertexMutex,
+		dag:           dag.NewDAG(),
+		logger:        logger,
+		moduleConfigs: NewModuleConfigs(),
+		vertexMutex:   vertexMutex,
 	}
 
 	g.rootVertex = &VertexRoot{}
@@ -61,57 +88,68 @@ func (g *Graph) ReduceTransitively() {
 func (g *Graph) Populate(evaluator *Evaluator) error {
 	var vertexes []Vertex
 
-	for _, block := range evaluator.module.Blocks {
+	blocks, err := g.loadAllBlocks(evaluator)
+	if err != nil {
+		return err
+	}
+
+	for _, block := range blocks {
 		switch block.Type() {
 		case "locals":
 			for _, attr := range block.GetAttributes() {
 				vertexes = append(vertexes, &VertexLocal{
-					logger:    g.logger,
-					evaluator: evaluator,
-					block:     block,
-					attr:      attr,
+					logger:        g.logger,
+					moduleConfigs: g.moduleConfigs,
+					block:         block,
+					attr:          attr,
 				})
 			}
 		case "module":
-			vertexes = append(vertexes, &VertexModule{
-				logger:    g.logger,
-				evaluator: evaluator,
-				block:     block,
+			vertexes = append(vertexes, &VertexModuleCall{
+				logger:        g.logger,
+				moduleConfigs: g.moduleConfigs,
+				block:         block,
+			})
+			vertexes = append(vertexes, &VertexModuleExit{
+				logger:        g.logger,
+				moduleConfigs: g.moduleConfigs,
+				block:         block,
 			})
 		case "variable":
 			vertexes = append(vertexes, &VertexVariable{
-				logger:    g.logger,
-				evaluator: evaluator,
-				block:     block,
+				logger:        g.logger,
+				moduleConfigs: g.moduleConfigs,
+				block:         block,
 			})
 		case "output":
 			vertexes = append(vertexes, &VertexOutput{
-				logger:    g.logger,
-				evaluator: evaluator,
-				block:     block,
+				logger:        g.logger,
+				moduleConfigs: g.moduleConfigs,
+				block:         block,
 			})
 		case "provider":
 			vertexes = append(vertexes, &VertexProvider{
-				logger:    g.logger,
-				evaluator: evaluator,
-				block:     block,
+				logger:        g.logger,
+				moduleConfigs: g.moduleConfigs,
+				block:         block,
 			})
 		case "resource":
 			vertexes = append(vertexes, &VertexResource{
-				logger:    g.logger,
-				evaluator: evaluator,
-				block:     block,
+				logger:        g.logger,
+				moduleConfigs: g.moduleConfigs,
+				block:         block,
 			})
 		case "data":
 			vertexes = append(vertexes, &VertexData{
-				logger:    g.logger,
-				evaluator: evaluator,
-				block:     block,
+				logger:        g.logger,
+				moduleConfigs: g.moduleConfigs,
+				block:         block,
 			})
 		}
 	}
 
 	for _, vertex := range vertexes {
+		g.logger.Debugf("adding vertex: %s", vertex.ID())
 		err := g.dag.AddVertexByID(vertex.ID(), vertex)
 		if err != nil {
 			return fmt.Errorf("error adding vertex %q %w", vertex.ID(), err)
@@ -119,12 +157,30 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 	}
 
 	for _, vertex := range vertexes {
-		g.logger.Debugf("adding edge: %s, %s", g.rootVertex.ID(), vertex.ID())
+		if vertex.ModuleAddress() == "" {
+			g.logger.Debugf("adding edge: %s, %s", g.rootVertex.ID(), vertex.ID())
 
-		err := g.dag.AddEdge(g.rootVertex.ID(), vertex.ID())
-		if err != nil {
-			g.logger.Debugf("error adding edge: %s", err)
+			err := g.dag.AddEdge(g.rootVertex.ID(), vertex.ID())
+			if err != nil {
+				g.logger.Debugf("error adding edge: %s", err)
+			}
+		} else {
+			g.logger.Debugf("adding edge: %s, %s", fmt.Sprintf("call:%s", vertex.ModuleAddress()), vertex.ID())
+
+			err := g.dag.AddEdge(fmt.Sprintf("call:%s", vertex.ModuleAddress()), vertex.ID())
+			if err != nil {
+				g.logger.Debugf("error adding edge: %s", err)
+			}
+
+			g.logger.Debugf("adding edge: %s, %s", vertex.ID(), vertex.ModuleAddress())
+
+			err = g.dag.AddEdge(vertex.ID(), vertex.ModuleAddress())
+			if err != nil {
+				g.logger.Debugf("error adding edge: %s", err)
+			}
 		}
+
+		// TODO: add an edge from module exit to module call?
 
 		for _, ref := range vertex.References() {
 			var srcId string
@@ -132,14 +188,13 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 			parts := strings.Split(ref.Key, ".")
 			idx := len(parts)
 
-			// If the reference is to an attribute of a block then we want to
-			// use the block part as the source ID, except for locals where we
-			// want to use the first-level attribute name
-			if strings.HasPrefix(ref.Key, "data.") && len(parts) >= 3 {
+			// data references should always have a length of 3
+			// provider references might have a length of 3 (if using an alias) or 2 (if not).
+			if (strings.HasPrefix(ref.Key, "data.") || strings.HasPrefix(ref.Key, "provider.")) && len(parts) >= 3 {
 				// Source ID is the first 3 parts or less if the length of parts is less than 3
 				idx = 3
 			} else if len(parts) >= 2 {
-				// resources and outputs don't have a type prefix in the references
+				// variable, local, resources and output references should all have length 2
 				idx = 2
 			}
 			srcId = strings.Join(parts[:idx], ".")
@@ -147,13 +202,9 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 			// Don't add the module prefix for providers since they are
 			// evaluated in the root module
 			if !strings.HasPrefix(srcId, "provider.") && ref.ModuleAddress != "" {
-				srcId = fmt.Sprintf("%s.%s", ref.ModuleAddress, srcId)
-			}
+				modAddress := stripCount(ref.ModuleAddress)
 
-			// If the reference points to a different module then we want to add
-			// a dependency for that module call
-			if ref.ModuleAddress != vertex.ModuleAddress() {
-				srcId = ref.ModuleAddress
+				srcId = fmt.Sprintf("%s.%s", modAddress, srcId)
 			}
 
 			// Strip the count/index suffix from the source ID
@@ -163,15 +214,49 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 				continue
 			}
 
-			g.logger.Debugf("adding edge: %s, %s", srcId, vertex.ID())
-			err := g.dag.AddEdge(srcId, vertex.ID())
-			if err != nil {
-				g.logger.Debugf("error adding edge: %s", err)
+			// Check if the source vertex exists
+			_, err := g.dag.GetVertex(srcId)
+			if err == nil {
+				g.logger.Debugf("adding edge: %s, %s", srcId, vertex.ID())
+				err := g.dag.AddEdge(srcId, vertex.ID())
+				if err != nil {
+					g.logger.Debugf("error adding edge: %s", err)
+				}
+
+				continue
+			}
+
+			// If the source vertex doesn't exist, it might be a module
+			// output attribute, so we need to check if the module output
+			// exists and add an edge from that to the current vertex
+			// instead.
+			if ref.ModuleAddress != "" {
+				modAddress := stripCount(ref.ModuleAddress)
+
+				srcId = fmt.Sprintf("%s.%s", modAddress, parts[0])
+
+				// Check if the source vertex exists
+				_, err := g.dag.GetVertex(srcId)
+				if err == nil {
+					g.logger.Debugf("adding edge: %s, %s", srcId, vertex.ID())
+					err := g.dag.AddEdge(srcId, vertex.ID())
+					if err != nil {
+						g.logger.Debugf("error adding edge: %s", err)
+					}
+
+					continue
+				}
 			}
 		}
 	}
 
 	// Setup initial context
+	g.moduleConfigs.Add("", ModuleConfig{
+		name:       "",
+		moduleCall: nil,
+		evaluator:  evaluator,
+	})
+
 	evaluator.ctx.Set(cty.ObjectVal(map[string]cty.Value{}), "var")
 	evaluator.ctx.Set(cty.ObjectVal(map[string]cty.Value{}), "data")
 	evaluator.ctx.Set(cty.ObjectVal(map[string]cty.Value{}), "local")
@@ -212,6 +297,7 @@ func (g *Graph) Run(evaluator *Evaluator) (*Module, error) {
 
 	g.ReduceTransitively()
 	g.Walk()
+
 	evaluator.module.Blocks = evaluator.filteredBlocks
 	evaluator.module = *evaluator.collectModules()
 
@@ -238,4 +324,45 @@ func (v *GraphVisitor) Visit(id string, vertex interface{}) {
 	if err != nil {
 		v.logger.WithError(err).Debugf("ignoring vertex %q because an error was encountered", id)
 	}
+}
+
+func (g *Graph) loadAllBlocks(evaluator *Evaluator) ([]*Block, error) {
+	return g.loadBlocksForModule(evaluator)
+}
+
+func (g *Graph) loadBlocksForModule(evaluator *Evaluator) ([]*Block, error) {
+	var blocks []*Block
+
+	for _, block := range evaluator.module.Blocks {
+		blocks = append(blocks, block)
+
+		if block.Type() == "module" {
+			modCall, err := evaluator.loadModule(block)
+			if err != nil {
+				return nil, fmt.Errorf("could not load module %q", block.FullName())
+			}
+
+			moduleEvaluator := NewEvaluator(
+				*modCall.Module,
+				evaluator.workingDir,
+				map[string]cty.Value{},
+				evaluator.moduleMetadata,
+				map[string]map[string]cty.Value{},
+				evaluator.workspace,
+				evaluator.blockBuilder,
+				nil,
+				evaluator.logger,
+				&Context{},
+			)
+
+			modBlocks, err := g.loadBlocksForModule(moduleEvaluator)
+			if err != nil {
+				return nil, fmt.Errorf("could not load blocks for module %q", block.FullName())
+			}
+
+			blocks = append(blocks, modBlocks...)
+		}
+	}
+
+	return blocks, nil
 }
