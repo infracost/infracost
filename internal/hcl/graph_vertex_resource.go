@@ -9,9 +9,9 @@ import (
 )
 
 type VertexResource struct {
-	logger    *logrus.Entry
-	evaluator *Evaluator
-	block     *Block
+	moduleConfigs *ModuleConfigs
+	logger        *logrus.Entry
+	block         *Block
 }
 
 func (v *VertexResource) ID() string {
@@ -30,48 +30,63 @@ func (v *VertexResource) Visit(mutex *sync.Mutex) error {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	err := v.evaluate()
-	if err != nil {
-		return fmt.Errorf("could not evaluate resource block %q", v.ID())
+	moduleInstances := v.moduleConfigs.Get(v.block.ModuleAddress())
+	if len(moduleInstances) == 0 {
+		return fmt.Errorf("no module instances found for module address %q", v.block.ModuleAddress())
 	}
 
-	expanded, err := v.expand()
-	if err != nil {
-		return fmt.Errorf("could not expand resource block %q", v.ID())
+	for _, moduleInstance := range moduleInstances {
+		e := moduleInstance.evaluator
+		blockInstance := e.module.Blocks.FindLocalName(v.block.LocalName())
+
+		if blockInstance == nil {
+			return fmt.Errorf("could not find block %q in module %q", v.ID(), moduleInstance.name)
+		}
+
+		err := v.evaluate(e, blockInstance)
+		if err != nil {
+			return fmt.Errorf("could not evaluate resource block %q", v.ID())
+		}
+
+		expanded, err := v.expand(e, blockInstance)
+		if err != nil {
+			return fmt.Errorf("could not expand resource block %q", v.ID())
+		}
+
+		e.AddFilteredBlocks(expanded...)
 	}
 
-	v.evaluator.AddFilteredBlocks(expanded...)
 	return nil
 }
 
-func (v *VertexResource) evaluate() error {
-	if len(v.block.Labels()) < 2 {
+func (v *VertexResource) evaluate(e *Evaluator, b *Block) error {
+	if len(b.Labels()) < 2 {
 		return fmt.Errorf("resource block %s has no label", v.ID())
 	}
 
 	var existingVals map[string]cty.Value
-	existingCtx := v.evaluator.ctx.Get(v.block.TypeLabel())
+	existingCtx := e.ctx.Get(b.TypeLabel())
 	if !existingCtx.IsNull() {
 		existingVals = existingCtx.AsValueMap()
 	} else {
 		existingVals = make(map[string]cty.Value)
 	}
 
-	val := v.evaluator.evaluateResource(v.block, existingVals)
+	val := e.evaluateResource(b, existingVals)
 
 	v.logger.Debugf("adding resource %s to the evaluation context", v.ID())
-	v.evaluator.ctx.SetByDot(val, v.block.TypeLabel())
+	e.ctx.SetByDot(val, b.TypeLabel())
 
 	return nil
 }
 
-func (v *VertexResource) expand() ([]*Block, error) {
-	expanded := []*Block{v.block}
-	expanded = v.evaluator.expandBlockCounts(expanded)
-	expanded = v.evaluator.expandBlockForEaches(expanded)
-	expanded = v.evaluator.expandDynamicBlocks(expanded...)
+func (v *VertexResource) expand(e *Evaluator, b *Block) ([]*Block, error) {
+	expanded := []*Block{b}
+	expanded = e.expandBlockCounts(expanded)
+	expanded = e.expandBlockForEaches(expanded)
+	expanded = e.expandDynamicBlocks(expanded...)
 
-	v.block.expanded = true
+	b.expanded = true
 
 	return expanded, nil
 }
