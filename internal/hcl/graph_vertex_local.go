@@ -8,10 +8,10 @@ import (
 )
 
 type VertexLocal struct {
-	logger    *logrus.Entry
-	evaluator *Evaluator
-	block     *Block
-	attr      *Attribute
+	logger        *logrus.Entry
+	moduleConfigs *ModuleConfigs
+	block         *Block
+	attr          *Attribute
 }
 
 func (v *VertexLocal) ID() string {
@@ -30,10 +30,33 @@ func (v *VertexLocal) Visit(mutex *sync.Mutex) error {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	v.logger.Debugf("adding attribute %s to the evaluation context", v.ID())
+	moduleInstances := v.moduleConfigs.Get(v.block.ModuleAddress())
+	if len(moduleInstances) == 0 {
+		return fmt.Errorf("no module instances found for module address %q", v.block.ModuleAddress())
+	}
 
-	key := fmt.Sprintf("local.%s", v.attr.Name())
-	v.evaluator.ctx.SetByDot(v.attr.Value(), key)
+	for _, moduleInstance := range moduleInstances {
+		e := moduleInstance.evaluator
+
+		v.logger.Debugf("adding attribute %s to the evaluation context", v.ID())
+
+		var attrInstance *Attribute
+		for _, b := range e.module.Blocks {
+			if b.LocalName() == v.block.LocalName() {
+				attrInstance = b.GetAttribute(v.attr.Name())
+				if attrInstance != nil {
+					break
+				}
+			}
+		}
+
+		if attrInstance == nil {
+			return fmt.Errorf("could not find attribute %q in module %q", v.ID(), moduleInstance.name)
+		}
+
+		key := fmt.Sprintf("local.%s", attrInstance.Name())
+		e.ctx.SetByDot(attrInstance.Value(), key)
+	}
 
 	return nil
 }
