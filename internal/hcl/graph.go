@@ -6,7 +6,7 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/heimdalr/dag"
+	"github.com/dominikbraun/graph"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 )
@@ -41,7 +41,7 @@ func (m ModuleConfigs) Get(moduleAddress string) []ModuleConfig {
 }
 
 type Graph struct {
-	dag           *dag.DAG
+	dag           graph.Graph[string, Vertex]
 	logger        *logrus.Entry
 	rootVertex    Vertex
 	vertexMutex   *sync.Mutex
@@ -64,8 +64,13 @@ func NewGraphWithRoot(logger *logrus.Entry, vertexMutex *sync.Mutex) (*Graph, er
 	if vertexMutex == nil {
 		vertexMutex = &sync.Mutex{}
 	}
+
+	vertexHash := func(v Vertex) string {
+		return v.ID()
+	}
+
 	g := &Graph{
-		dag:           dag.NewDAG(),
+		dag:           graph.New(vertexHash, graph.Directed(), graph.Acyclic()),
 		logger:        logger,
 		moduleConfigs: NewModuleConfigs(),
 		vertexMutex:   vertexMutex,
@@ -73,7 +78,7 @@ func NewGraphWithRoot(logger *logrus.Entry, vertexMutex *sync.Mutex) (*Graph, er
 
 	g.rootVertex = &VertexRoot{}
 
-	err := g.dag.AddVertexByID(g.rootVertex.ID(), g.rootVertex)
+	err := g.dag.AddVertex(g.rootVertex)
 	if err != nil {
 		return nil, fmt.Errorf("error adding vertex %q %w", g.rootVertex.ID(), err)
 	}
@@ -82,7 +87,13 @@ func NewGraphWithRoot(logger *logrus.Entry, vertexMutex *sync.Mutex) (*Graph, er
 }
 
 func (g *Graph) ReduceTransitively() {
-	g.dag.ReduceTransitively()
+	// TODO: handle error
+	transitiveReduction, err := graph.TransitiveReduction(g.dag)
+	if err != nil {
+		g.logger.Warnf("error reducing graph transitively: %s", err)
+	}
+
+	g.dag = transitiveReduction
 }
 
 func (g *Graph) Populate(evaluator *Evaluator) error {
@@ -150,7 +161,7 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 
 	for _, vertex := range vertexes {
 		g.logger.Debugf("adding vertex: %s", vertex.ID())
-		err := g.dag.AddVertexByID(vertex.ID(), vertex)
+		err := g.dag.AddVertex(vertex)
 		if err != nil {
 			return fmt.Errorf("error adding vertex %q %w", vertex.ID(), err)
 		}
@@ -215,7 +226,7 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 			}
 
 			// Check if the source vertex exists
-			_, err := g.dag.GetVertex(srcId)
+			_, err := g.dag.Vertex(srcId)
 			if err == nil {
 				g.logger.Debugf("adding edge: %s, %s", srcId, vertex.ID())
 				err := g.dag.AddEdge(srcId, vertex.ID())
@@ -235,7 +246,7 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 				srcId = fmt.Sprintf("%s.%s", modAddress, parts[0])
 
 				// Check if the source vertex exists
-				_, err := g.dag.GetVertex(srcId)
+				_, err := g.dag.Vertex(srcId)
 				if err == nil {
 					g.logger.Debugf("adding edge: %s, %s", srcId, vertex.ID())
 					err := g.dag.AddEdge(srcId, vertex.ID())
@@ -270,22 +281,19 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 	return nil
 }
 
-func (g *Graph) AsJSON() ([]byte, error) {
-	return g.dag.MarshalJSON()
-}
-
 func (g *Graph) Walk() {
 	v := NewGraphVisitor(g.logger, g.vertexMutex)
 
-	flowCallback := func(d *dag.DAG, id string, parentResults []dag.FlowResult) (interface{}, error) {
-		vertex, _ := d.GetVertex(id)
-
-		v.Visit(id, vertex)
-
-		return vertex, nil
+	sorted, err := graph.TopologicalSort(g.dag)
+	if err != nil {
+		g.logger.Warnf("error sorting graph: %s", err)
 	}
 
-	_, _ = g.dag.DescendantsFlow(g.rootVertex.ID(), nil, flowCallback)
+	for _, id := range sorted {
+		vertex, _ := g.dag.Vertex(id)
+
+		v.Visit(id, vertex)
+	}
 }
 
 func (g *Graph) Run(evaluator *Evaluator) (*Module, error) {
