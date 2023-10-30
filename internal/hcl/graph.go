@@ -165,13 +165,15 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 				g.logger.Debugf("error adding edge: %s", err)
 			}
 		} else {
-			g.logger.Debugf("adding edge: %s, %s", fmt.Sprintf("call:%s", vertex.ModuleAddress()), vertex.ID())
+			// Add the module call edge
+			g.logger.Debugf("adding edge: %s, %s", moduleCallID(vertex.ModuleAddress()), vertex.ID())
 
-			err := g.dag.AddEdge(fmt.Sprintf("call:%s", vertex.ModuleAddress()), vertex.ID())
+			err := g.dag.AddEdge(moduleCallID(vertex.ModuleAddress()), vertex.ID())
 			if err != nil {
 				g.logger.Debugf("error adding edge: %s", err)
 			}
 
+			// Add the module exit edge
 			g.logger.Debugf("adding edge: %s, %s", vertex.ID(), vertex.ModuleAddress())
 
 			err = g.dag.AddEdge(vertex.ID(), vertex.ModuleAddress())
@@ -179,8 +181,6 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 				g.logger.Debugf("error adding edge: %s", err)
 			}
 		}
-
-		// TODO: add an edge from module exit to module call?
 
 		for _, ref := range vertex.References() {
 			var srcId string
@@ -226,10 +226,9 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 				continue
 			}
 
-			// If the source vertex doesn't exist, it might be a module
-			// output attribute, so we need to check if the module output
-			// exists and add an edge from that to the current vertex
-			// instead.
+			// If the source vertex doesn't exist, it might be a module output attribute,
+			// so we need to check if the module output exists and add an edge from that
+			// to the current vertex instead.
 			if ref.ModuleAddress != "" {
 				modAddress := stripCount(ref.ModuleAddress)
 

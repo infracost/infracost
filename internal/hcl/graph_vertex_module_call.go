@@ -9,6 +9,10 @@ import (
 	"github.com/zclconf/go-cty/cty"
 )
 
+func moduleCallID(moduleAddress string) string {
+	return fmt.Sprintf("call:%s", moduleAddress)
+}
+
 type VertexModuleCall struct {
 	logger        *logrus.Entry
 	moduleConfigs ModuleConfigs
@@ -16,7 +20,7 @@ type VertexModuleCall struct {
 }
 
 func (v *VertexModuleCall) ID() string {
-	return fmt.Sprintf("call:%s", v.block.FullName())
+	return moduleCallID(v.block.FullName())
 }
 
 func (v *VertexModuleCall) ModuleAddress() string {
