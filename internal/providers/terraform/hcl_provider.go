@@ -147,7 +147,7 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 			initialPath = abs
 		}
 	}
-	loader := modules.NewModuleLoader(cachePath, credsSource, ctx.RunContext.Config.TerraformSourceMap, logger, ctx.RunContext.ModuleMutex)
+	loader := modules.NewModuleLoader(cachePath, modules.NewSharedHCLParser(), credsSource, ctx.RunContext.Config.TerraformSourceMap, logger, ctx.RunContext.ModuleMutex)
 	parsers, err := hcl.LoadParsers(
 		ctx,
 		initialPath,
@@ -517,7 +517,6 @@ func (p *HCLProvider) marshalModule(module *hcl.Module) ModuleOut {
 func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 	jsonValues := marshalAttributeValues(block.Type(), block.Values())
 	p.marshalBlock(block, jsonValues)
-
 	planned := ResourceJSON{
 		Address:       block.FullName(),
 		Mode:          "managed",
