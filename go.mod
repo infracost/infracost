@@ -270,3 +270,5 @@ replace github.com/jedib0t/go-pretty/v6 => github.com/aliscott/go-pretty/v6 v6.1
 replace github.com/spf13/cobra => github.com/spf13/cobra v1.4.0
 
 replace github.com/gruntwork-io/terragrunt => github.com/infracost/terragrunt v0.47.1-0.20231024180813-b7771cbfb034
+
+replace github.com/heimdalr/dag => github.com/aliscott/dag v1.3.2-0.20231103151926-7eb2a7207ae4

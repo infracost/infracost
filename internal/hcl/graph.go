@@ -168,30 +168,29 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 		}
 	}
 
+	edges := make([]dag.Edge, 0)
+
 	for _, vertex := range vertexes {
 		if vertex.ModuleAddress() == "" {
 			g.logger.Debugf("adding edge: %s, %s", g.rootVertex.ID(), vertex.ID())
-
-			err := g.dag.AddEdge(g.rootVertex.ID(), vertex.ID())
-			if err != nil {
-				g.logger.Debugf("error adding edge: %s", err)
-			}
+			edges = append(edges, dag.Edge{
+				SrcID: g.rootVertex.ID(),
+				DstID: vertex.ID(),
+			})
 		} else {
 			// Add the module call edge
 			g.logger.Debugf("adding edge: %s, %s", moduleCallID(vertex.ModuleAddress()), vertex.ID())
-
-			err := g.dag.AddEdge(moduleCallID(vertex.ModuleAddress()), vertex.ID())
-			if err != nil {
-				g.logger.Debugf("error adding edge: %s", err)
-			}
+			edges = append(edges, dag.Edge{
+				SrcID: moduleCallID(vertex.ModuleAddress()),
+				DstID: vertex.ID(),
+			})
 
 			// Add the module exit edge
 			g.logger.Debugf("adding edge: %s, %s", vertex.ID(), vertex.ModuleAddress())
-
-			err = g.dag.AddEdge(vertex.ID(), vertex.ModuleAddress())
-			if err != nil {
-				g.logger.Debugf("error adding edge: %s", err)
-			}
+			edges = append(edges, dag.Edge{
+				SrcID: vertex.ID(),
+				DstID: vertex.ModuleAddress(),
+			})
 		}
 
 		for _, ref := range vertex.References() {
@@ -230,10 +229,10 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 			_, err := g.dag.GetVertex(srcId)
 			if err == nil {
 				g.logger.Debugf("adding edge: %s, %s", srcId, vertex.ID())
-				err := g.dag.AddEdge(srcId, vertex.ID())
-				if err != nil {
-					g.logger.Debugf("error adding edge: %s", err)
-				}
+				edges = append(edges, dag.Edge{
+					SrcID: srcId,
+					DstID: vertex.ID(),
+				})
 
 				continue
 			}
@@ -250,15 +249,20 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 				_, err := g.dag.GetVertex(srcId)
 				if err == nil {
 					g.logger.Debugf("adding edge: %s, %s", srcId, vertex.ID())
-					err := g.dag.AddEdge(srcId, vertex.ID())
-					if err != nil {
-						g.logger.Debugf("error adding edge: %s", err)
-					}
+					edges = append(edges, dag.Edge{
+						SrcID: srcId,
+						DstID: vertex.ID(),
+					})
 
 					continue
 				}
 			}
 		}
+	}
+
+	err = g.dag.AddEdges(edges)
+	if err != nil {
+		return fmt.Errorf("error adding edges %w", err)
 	}
 
 	// Setup initial context
