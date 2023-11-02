@@ -17,6 +17,7 @@ import (
 	"github.com/zclconf/go-cty/cty/gocty"
 
 	"github.com/infracost/infracost/internal/hcl/funcs"
+	"github.com/infracost/infracost/internal/hcl/modules"
 )
 
 var (
@@ -283,7 +284,7 @@ type BlockBuilder struct {
 	MockFunc      func(a *Attribute) cty.Value
 	SetAttributes []SetAttributesFunc
 	Logger        *logrus.Entry
-	hclParser     *SharedHCLParser
+	hclParser     *modules.SharedHCLParser
 }
 
 // NewBlock returns a Block with Context and child Blocks initialised.

@@ -11,7 +11,6 @@ import (
 	"strings"
 
 	"github.com/hashicorp/hcl/v2"
-	"github.com/hashicorp/hcl/v2/hclparse"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
 
@@ -20,7 +19,6 @@ import (
 	"github.com/infracost/infracost/internal/extclient"
 	"github.com/infracost/infracost/internal/hcl/modules"
 	"github.com/infracost/infracost/internal/logging"
-	"github.com/infracost/infracost/internal/sync"
 	"github.com/infracost/infracost/internal/ui"
 )
 
@@ -198,32 +196,6 @@ func OptionWithSpinner(f ui.SpinnerFunc) Option {
 	}
 }
 
-type SharedHCLParser struct {
-	parser *hclparse.Parser
-	mu     *sync.KeyMutex
-}
-
-func NewSharedHCLParser() *SharedHCLParser {
-	return &SharedHCLParser{
-		parser: hclparse.NewParser(),
-		mu:     &sync.KeyMutex{},
-	}
-}
-
-func (p *SharedHCLParser) ParseHCLFile(filename string) (*hcl.File, hcl.Diagnostics) {
-	unlock := p.mu.Lock(filename)
-	defer unlock()
-
-	return p.parser.ParseHCLFile(filename)
-}
-
-func (p *SharedHCLParser) ParseJSONFile(filename string) (*hcl.File, hcl.Diagnostics) {
-	unlock := p.mu.Lock(filename)
-	defer unlock()
-
-	return p.parser.ParseJSONFile(filename)
-}
-
 // Parser is a tool for parsing terraform templates at a given file system location.
 type Parser struct {
 	initialPath           string
@@ -233,7 +205,7 @@ type Parser struct {
 	inputVars             map[string]cty.Value
 	workspaceName         string
 	moduleLoader          *modules.ModuleLoader
-	hclParser             *SharedHCLParser
+	hclParser             *modules.SharedHCLParser
 	blockBuilder          BlockBuilder
 	newSpinner            ui.SpinnerFunc
 	remoteVariablesLoader *RemoteVariablesLoader
@@ -308,7 +280,7 @@ func newParser(projectRoot RootPath, moduleLoader *modules.ModuleLoader, logger 
 		"parser_path": projectRoot.Path,
 	})
 
-	hclParser := NewSharedHCLParser()
+	hclParser := modules.NewSharedHCLParser()
 
 	p := &Parser{
 		initialPath:   projectRoot.Path,
@@ -611,7 +583,7 @@ type file struct {
 	hclFile *hcl.File
 }
 
-func loadDirectory(hclParser *SharedHCLParser, logger *logrus.Entry, fullPath string, stopOnHCLError bool) ([]file, error) {
+func loadDirectory(hclParser *modules.SharedHCLParser, logger *logrus.Entry, fullPath string, stopOnHCLError bool) ([]file, error) {
 	fileInfos, err := os.ReadDir(fullPath)
 	if err != nil {
 		return nil, err
