@@ -1,7 +1,10 @@
 package aws
 
 import (
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
+	"sort"
 	"strings"
 
 	"github.com/tidwall/gjson"
@@ -39,9 +42,21 @@ func ParseTags(defaultTags *map[string]string, r *schema.ResourceData) *map[stri
 
 	_, supportsDefaultTags := provider_schemas.AWSTagsAllSupport[r.Type]
 	if supportsDefaultTags && defaultTags != nil {
+		keysAndValues := make([]string, 0, len(*defaultTags)*2)
 		for k, v := range *defaultTags {
 			tags[k] = v
+			keysAndValues = append(keysAndValues, k, v)
 		}
+
+		sort.Strings(keysAndValues)
+
+		h := sha256.New()
+		for _, s := range keysAndValues {
+			h.Write([]byte(s))
+		}
+
+		checksum := hex.EncodeToString(h.Sum(nil))
+		r.Metadata["defaultTagsChecksum"] = gjson.Parse(fmt.Sprintf(`"%s"`, checksum))
 	}
 
 	if supportsTagBlock {
