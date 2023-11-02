@@ -30,7 +30,7 @@ func testLoaderE2E(t *testing.T, path string, expectedModules []*ManifestModule,
 
 	logger := zerolog.New(io.Discard)
 
-	moduleLoader := NewModuleLoader(path, &CredentialsSource{FetchToken: credentials.FindTerraformCloudToken}, opts.SourceMap, logger, &sync2.KeyMutex{})
+	moduleLoader := NewModuleLoader(path, NewSharedHCLParser(), &CredentialsSource{FetchToken: credentials.FindTerraformCloudToken}, opts.SourceMap, logger, &sync2.KeyMutex{})
 
 	manifest, err := moduleLoader.Load(path)
 	if !assert.NoError(t, err) {
@@ -244,7 +244,7 @@ func TestMultiProject(t *testing.T) {
 
 	logger := zerolog.New(io.Discard)
 
-	moduleLoader := NewModuleLoader(path, &CredentialsSource{FetchToken: credentials.FindTerraformCloudToken}, config.TerraformSourceMap{}, logger, &sync2.KeyMutex{})
+	moduleLoader := NewModuleLoader(path, NewSharedHCLParser(), &CredentialsSource{FetchToken: credentials.FindTerraformCloudToken}, config.TerraformSourceMap{}, logger, &sync2.KeyMutex{})
 
 	wg := &sync.WaitGroup{}
 	wg.Add(3)

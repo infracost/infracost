@@ -14,6 +14,7 @@ import (
 	"sync"
 
 	getter "github.com/hashicorp/go-getter"
+	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/terraform-config-inspect/tfconfig"
 	"github.com/rs/zerolog"
 	"golang.org/x/sync/errgroup"
@@ -50,6 +51,7 @@ type ModuleLoader struct {
 	cachePath string
 	cache     *Cache
 	sync      *intSync.KeyMutex
+	hclParser *SharedHCLParser
 	sourceMap config.TerraformSourceMap
 
 	packageFetcher *PackageFetcher
@@ -64,7 +66,7 @@ type SourceMapResult struct {
 }
 
 // NewModuleLoader constructs a new module loader
-func NewModuleLoader(cachePath string, credentialsSource *CredentialsSource, sourceMap config.TerraformSourceMap, logger zerolog.Logger, moduleSync *intSync.KeyMutex) *ModuleLoader {
+func NewModuleLoader(cachePath string, hclParser *SharedHCLParser, credentialsSource *CredentialsSource, sourceMap config.TerraformSourceMap, logger zerolog.Logger, moduleSync *intSync.KeyMutex) *ModuleLoader {
 	fetcher := NewPackageFetcher(logger)
 	// we need to have a disco for each project that has defined credentials
 	d := NewDisco(credentialsSource, logger)
@@ -72,6 +74,7 @@ func NewModuleLoader(cachePath string, credentialsSource *CredentialsSource, sou
 	m := &ModuleLoader{
 		cachePath:      cachePath,
 		cache:          NewCache(d, logger),
+		hclParser:      hclParser,
 		sourceMap:      sourceMap,
 		packageFetcher: fetcher,
 		logger:         logger,
@@ -182,9 +185,9 @@ func (m *ModuleLoader) Load(path string) (man *Manifest, err error) {
 func (m *ModuleLoader) loadModules(path string, prefix string) ([]*ManifestModule, error) {
 	manifestModules := make([]*ManifestModule, 0)
 
-	module, diags := tfconfig.LoadModule(path)
-	if diags.HasErrors() {
-		return nil, fmt.Errorf("failed to inspect module path %s diag: %w", path, diags.Err())
+	module, err := m.loadModuleFromPath(path)
+	if err != nil {
+		return nil, err
 	}
 
 	numJobs := len(module.ModuleCalls)
@@ -227,7 +230,7 @@ func (m *ModuleLoader) loadModules(path string, prefix string) ([]*ManifestModul
 		})
 	}
 
-	err := errGroup.Wait()
+	err = errGroup.Wait()
 	if err != nil {
 		return manifestModules, fmt.Errorf("could not load modules for path %s %w", path, err)
 	}
@@ -268,12 +271,12 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 		// Test if we can actually load the module. If not, then we should try re-loading it.
 		// This can happen if the directory the module was downloaded to has been deleted and moved
 		// so the existing manifest.json is out-of-date.
-		_, diags := tfconfig.LoadModule(path.Join(m.cachePath, manifestModule.Dir))
-		if !diags.HasErrors() {
-			return manifestModule, err
+		_, loadModErr := m.loadModuleFromPath(path.Join(m.cachePath, manifestModule.Dir))
+		if loadModErr == nil {
+			return manifestModule, nil
 		}
 
-		m.logger.Debug().Msgf("module %s cannot be loaded, re-loading: %s", key, diags.Err())
+		m.logger.Debug().Msgf("module %s cannot be loaded, re-loading: %s", key, loadModErr)
 	} else {
 		m.logger.Debug().Msgf("module %s needs loading: %s", key, err.Error())
 	}
@@ -318,6 +321,52 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 	}
 
 	return manifestModule, nil
+}
+
+func (m *ModuleLoader) loadModuleFromPath(fullPath string) (*tfconfig.Module, error) {
+	mod := tfconfig.NewModule(fullPath)
+
+	fileInfos, err := os.ReadDir(fullPath)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, info := range fileInfos {
+		if info.IsDir() {
+			continue
+		}
+
+		var parseFunc func(filename string) (*hcl.File, hcl.Diagnostics)
+		if strings.HasSuffix(info.Name(), ".tf") {
+			parseFunc = m.hclParser.ParseHCLFile
+		}
+
+		if strings.HasSuffix(info.Name(), ".tf.json") {
+			parseFunc = m.hclParser.ParseJSONFile
+		}
+
+		// this is not a file we can parse:
+		if parseFunc == nil {
+			continue
+		}
+
+		path := filepath.Join(fullPath, info.Name())
+		f, fileDiag := parseFunc(path)
+		if fileDiag != nil && fileDiag.HasErrors() {
+			return nil, fmt.Errorf("failed to parse file %s diag: %w", path, fileDiag)
+		}
+
+		if f == nil {
+			continue
+		}
+
+		contentDiag := tfconfig.LoadModuleFromFile(f, mod)
+		if contentDiag != nil && contentDiag.HasErrors() {
+			return nil, fmt.Errorf("failed to load module from file %s diag: %w", path, contentDiag)
+		}
+	}
+
+	return mod, nil
 }
 
 func (m *ModuleLoader) loadRegistryModule(key string, source string, version string) (*ManifestModule, error) {
