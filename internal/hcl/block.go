@@ -17,6 +17,7 @@ import (
 	"github.com/zclconf/go-cty/cty/gocty"
 
 	"github.com/infracost/infracost/internal/hcl/funcs"
+	"github.com/infracost/infracost/internal/hcl/modules"
 )
 
 var (
@@ -235,8 +236,10 @@ func (blocks Blocks) Outputs(suppressNil bool) cty.Value {
 //
 // See Attribute for more info about how the values of Blocks are evaluated with their Context and returned.
 type Block struct {
-	// hclBlock is the underlying hcl.Block that has been parsed from a hcl.File
-	hclBlock *hcl.Block
+	// HCLBlock is the underlying hcl.Block that has been parsed from a hcl.File
+	HCLBlock *hcl.Block
+	// UniqueAttrs specifies infracost specific unique attributes that will be appended to the block values.
+	UniqueAttrs map[string]*hcl.Attribute
 	// context is a pointer to the contextual information that can be used when evaluating
 	// the Block and its Attributes.
 	context *Context
@@ -272,6 +275,7 @@ type BlockBuilder struct {
 	MockFunc      func(a *Attribute) cty.Value
 	SetAttributes []SetAttributesFunc
 	Logger        zerolog.Logger
+	HCLParser     *modules.SharedHCLParser
 }
 
 // NewBlock returns a Block with Context and child Blocks initialised.
@@ -287,7 +291,8 @@ func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.B
 			StartLine:   body.SrcRange.Start.Line,
 			EndLine:     body.SrcRange.End.Line,
 			context:     ctx,
-			hclBlock:    hclBlock,
+			UniqueAttrs: map[string]*hcl.Attribute{},
+			HCLBlock:    hclBlock,
 			moduleBlock: moduleBlock,
 			rootPath:    rootPath,
 			childBlocks: make(Blocks, len(body.Blocks)),
@@ -299,7 +304,7 @@ func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.B
 		block.setLogger(b.Logger)
 
 		for _, f := range b.SetAttributes {
-			f(block.FullName(), moduleBlock, hclBlock)
+			f(block)
 		}
 
 		for i, bb := range body.Blocks {
@@ -320,7 +325,8 @@ func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.B
 			StartLine:   hclBlock.DefRange.Start.Line,
 			EndLine:     hclBlock.DefRange.End.Line,
 			context:     ctx,
-			hclBlock:    hclBlock,
+			HCLBlock:    hclBlock,
+			UniqueAttrs: map[string]*hcl.Attribute{},
 			moduleBlock: moduleBlock,
 			rootPath:    rootPath,
 			verbose:     isLoggingVerbose,
@@ -336,7 +342,8 @@ func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.B
 		StartLine:   hclBlock.DefRange.Start.Line,
 		EndLine:     hclBlock.DefRange.End.Line,
 		context:     ctx,
-		hclBlock:    hclBlock,
+		HCLBlock:    hclBlock,
+		UniqueAttrs: map[string]*hcl.Attribute{},
 		moduleBlock: moduleBlock,
 		rootPath:    rootPath,
 		childBlocks: make(Blocks, len(content.Blocks)),
@@ -362,30 +369,30 @@ func (b BlockBuilder) CloneBlock(block *Block, index cty.Value) *Block {
 		childCtx = NewContext(&hcl.EvalContext{}, nil, b.Logger)
 	}
 
-	cloneHCL := *block.hclBlock
+	cloneHCL := *block.HCLBlock
 
 	clone := b.NewBlock(block.Filename, block.rootPath, &cloneHCL, childCtx, block.parent, block.moduleBlock)
-	if len(clone.hclBlock.Labels) > 0 {
-		position := len(clone.hclBlock.Labels) - 1
-		labels := make([]string, len(clone.hclBlock.Labels))
+	if len(clone.HCLBlock.Labels) > 0 {
+		position := len(clone.HCLBlock.Labels) - 1
+		labels := make([]string, len(clone.HCLBlock.Labels))
 		for i := 0; i < len(labels); i++ {
-			labels[i] = clone.hclBlock.Labels[i]
+			labels[i] = clone.HCLBlock.Labels[i]
 		}
 		if index.IsKnown() && !index.IsNull() {
 			switch index.Type() {
 			case cty.Number:
 				f, _ := index.AsBigFloat().Float64()
-				labels[position] = fmt.Sprintf("%s[%d]", clone.hclBlock.Labels[position], int(f))
+				labels[position] = fmt.Sprintf("%s[%d]", clone.HCLBlock.Labels[position], int(f))
 			case cty.String:
-				labels[position] = fmt.Sprintf("%s[%q]", clone.hclBlock.Labels[position], index.AsString())
+				labels[position] = fmt.Sprintf("%s[%q]", clone.HCLBlock.Labels[position], index.AsString())
 			default:
 				b.Logger.Debug().Msgf("Invalid key type in iterable: %#v", index.Type())
-				labels[position] = fmt.Sprintf("%s[%#v]", clone.hclBlock.Labels[position], index)
+				labels[position] = fmt.Sprintf("%s[%#v]", clone.HCLBlock.Labels[position], index)
 			}
 		} else {
-			labels[position] = fmt.Sprintf("%s[%d]", clone.hclBlock.Labels[position], block.cloneIndex)
+			labels[position] = fmt.Sprintf("%s[%d]", clone.HCLBlock.Labels[position], block.cloneIndex)
 		}
-		clone.hclBlock.Labels = labels
+		clone.HCLBlock.Labels = labels
 	}
 
 	indexVal, _ := gocty.ToCtyValue(index, cty.Number)
@@ -400,7 +407,7 @@ func (b BlockBuilder) CloneBlock(block *Block, index cty.Value) *Block {
 // BuildModuleBlocks loads all the Blocks for the module at the given path
 func (b BlockBuilder) BuildModuleBlocks(block *Block, modulePath string, rootPath string) (Blocks, error) {
 	var blocks Blocks
-	moduleFiles, err := loadDirectory(b.Logger, modulePath, true)
+	moduleFiles, err := loadDirectory(b.HCLParser, b.Logger, modulePath, true)
 	if err != nil {
 		return blocks, fmt.Errorf("failed to load module %s: %w", block.Label(), err)
 	}
@@ -427,40 +434,44 @@ func (b BlockBuilder) BuildModuleBlocks(block *Block, modulePath string, rootPat
 // SetAttributesFunc defines a function that sets required attributes on a hcl.Block.
 // This is done so that identifiers that are normally propagated from a Terraform state/apply
 // are set on the Block. This means they can be used properly in references and outputs.
-type SetAttributesFunc func(address string, moduleBlock *Block, block *hcl.Block)
+type SetAttributesFunc func(b *Block)
 
 // SetUUIDAttributes adds commonly used identifiers to the block so that it can be referenced by other
 // blocks in context evaluation. The identifiers are only set if they don't already exist as attributes
 // on the block.
-func SetUUIDAttributes(address string, moduleBlock *Block, block *hcl.Block) {
-	if body, ok := block.Body.(*hclsyntax.Body); ok {
-		if (block.Type == "resource" || block.Type == "data") && body.Attributes != nil {
-			h := sha256.New()
-			h.Write([]byte(address))
-			addressSha := hex.EncodeToString(h.Sum(nil))
+func SetUUIDAttributes(b *Block) {
+	t := b.Type()
+	if t != "resource" && t != "data" {
+		return
+	}
 
-			_, withCount := body.Attributes["count"]
-			_, withEach := body.Attributes["for_each"]
-			if _, ok := body.Attributes["id"]; !ok {
-				body.Attributes["id"] = newUniqueAttribute(addressSha, "id", withCount, withEach)
-			}
+	if body, ok := b.HCLBlock.Body.(*hclsyntax.Body); ok {
+		h := sha256.New()
+		h.Write([]byte(b.FullName()))
+		addressSha := hex.EncodeToString(h.Sum(nil))
 
-			if _, ok := body.Attributes["name"]; !ok {
-				body.Attributes["name"] = newUniqueAttribute(addressSha, "name", withCount, withEach)
-			}
+		_, withCount := body.Attributes["count"]
+		_, withEach := body.Attributes["for_each"]
 
-			if _, ok := body.Attributes["arn"]; !ok {
-				body.Attributes["arn"] = newArnAttribute(addressSha, "arn", withCount, withEach)
-			}
+		if _, ok := body.Attributes["id"]; !ok {
+			b.UniqueAttrs["id"] = newUniqueAttribute(addressSha, "id", withCount, withEach)
+		}
 
-			if _, ok := body.Attributes["self_link"]; !ok {
-				body.Attributes["self_link"] = newUniqueAttribute(addressSha, "self_link", withCount, withEach)
-			}
+		if _, ok := body.Attributes["name"]; !ok {
+			b.UniqueAttrs["name"] = newUniqueAttribute(addressSha, "name", withCount, withEach)
+		}
+
+		if _, ok := body.Attributes["arn"]; !ok {
+			b.UniqueAttrs["arn"] = newArnAttribute(addressSha, "arn", withCount, withEach)
+		}
+
+		if _, ok := body.Attributes["self_link"]; !ok {
+			b.UniqueAttrs["self_link"] = newUniqueAttribute(addressSha, "self_link", withCount, withEach)
 		}
 	}
 }
 
-func newUniqueAttribute(addressSha, name string, withCount bool, withEach bool) *hclsyntax.Attribute {
+func newUniqueAttribute(addressSha, name string, withCount bool, withEach bool) *hcl.Attribute {
 	// prefix ids with hcl- so they can be identified as fake
 	var exp hclsyntax.Expression = &hclsyntax.LiteralValueExpr{
 		Val: cty.StringVal("hcl-" + addressSha),
@@ -480,13 +491,13 @@ func newUniqueAttribute(addressSha, name string, withCount bool, withEach bool) 
 		}
 	}
 
-	return &hclsyntax.Attribute{
+	return &hcl.Attribute{
 		Name: name,
 		Expr: exp,
 	}
 }
 
-func newArnAttribute(addressSha, name string, withCount bool, withEach bool) *hclsyntax.Attribute {
+func newArnAttribute(addressSha, name string, withCount bool, withEach bool) *hcl.Attribute {
 
 	// fakeARN replicates an aws arn string it deliberately leaves the
 	// region section (in between the 3rd and 4th semicolon) blank as
@@ -511,7 +522,7 @@ func newArnAttribute(addressSha, name string, withCount bool, withEach bool) *hc
 		}
 	}
 
-	return &hclsyntax.Attribute{
+	return &hcl.Attribute{
 		Name: name,
 		Expr: exp,
 	}
@@ -521,8 +532,8 @@ func newArnAttribute(addressSha, name string, withCount bool, withEach bool) *hc
 // attributes set as contextual values on the child. In most cases this is because we've expanded
 // the block into further Blocks as part of a count or for_each.
 func (b *Block) InjectBlock(block *Block, name string) {
-	block.hclBlock.Labels = []string{}
-	block.hclBlock.Type = name
+	block.HCLBlock.Labels = []string{}
+	block.HCLBlock.Type = name
 
 	for attrName, attr := range block.AttributesAsMap() {
 		b.context.Root().SetByDot(attr.Value(), fmt.Sprintf("%s.%s.%s", b.Reference().String(), name, attrName))
@@ -764,7 +775,7 @@ func (b *Block) GetChildBlock(name string) *Block {
 //
 // Then "credit_specification" &  "ebs_block_device" would be valid names that could be used to retrieve child Blocks.
 func (b *Block) GetChildBlocks(name string) []*Block {
-	if b == nil || b.hclBlock == nil {
+	if b == nil || b.HCLBlock == nil {
 		return nil
 	}
 
@@ -784,7 +795,7 @@ func (b *Block) HasChild(childElement string) bool {
 
 // Children returns all the child Blocks associated with this Block.
 func (b *Block) Children() Blocks {
-	if b == nil || b.hclBlock == nil {
+	if b == nil || b.HCLBlock == nil {
 		return nil
 	}
 
@@ -805,7 +816,7 @@ func (b *Block) Children() Blocks {
 //
 // ami & instance_type are the Attributes of this Block and credit_specification is a child Block.
 func (b *Block) GetAttributes() []*Attribute {
-	if b == nil || b.hclBlock == nil {
+	if b == nil || b.HCLBlock == nil {
 		return nil
 	}
 
@@ -816,14 +827,30 @@ func (b *Block) GetAttributes() []*Attribute {
 	hclAttributes := b.getHCLAttributes()
 
 	// Sort the attributes so the order is deterministic
-	keys := make([]string, 0, len(hclAttributes))
+	keys := make([]string, 0, len(hclAttributes)+len(b.UniqueAttrs))
 	for k := range hclAttributes {
+		keys = append(keys, k)
+	}
+	for k := range b.UniqueAttrs {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
 
 	var attributes = make([]*Attribute, 0, len(keys))
 	for _, k := range keys {
+		if v, ok := b.UniqueAttrs[k]; ok {
+			attributes = append(attributes, &Attribute{
+				newMock: b.newMock,
+				HCLAttr: v,
+				Ctx:     b.context,
+				Verbose: b.verbose,
+				Logger: b.logger.With().Str(
+					"attribute_name", k,
+				).Logger(),
+			})
+			continue
+		}
+
 		attributes = append(attributes, &Attribute{
 			newMock: b.newMock,
 			HCLAttr: hclAttributes[k],
@@ -907,7 +934,7 @@ func (b *Block) syntheticAttribute(name string, val cty.Value) *Attribute {
 // ami & instance_type are both valid Attribute names that can be used to lookup Block Attributes.
 func (b *Block) GetAttribute(name string) *Attribute {
 	var attr *Attribute
-	if b == nil || b.hclBlock == nil {
+	if b == nil || b.HCLBlock == nil {
 		return attr
 	}
 
@@ -933,15 +960,17 @@ func (b *Block) AttributesAsMap() map[string]*Attribute {
 }
 
 func (b *Block) getHCLAttributes() hcl.Attributes {
-	switch body := b.hclBlock.Body.(type) {
+	switch body := b.HCLBlock.Body.(type) {
 	case *hclsyntax.Body:
 		attributes := make(hcl.Attributes)
 		for _, a := range body.Attributes {
-			attributes[a.Name] = a.AsHCLAttribute()
+			if _, ok := b.UniqueAttrs[a.Name]; !ok {
+				attributes[a.Name] = a.AsHCLAttribute()
+			}
 		}
 		return attributes
 	default:
-		_, body, diag := b.hclBlock.Body.PartialContent(terraformSchemaV012)
+		_, body, diag := b.HCLBlock.Body.PartialContent(terraformSchemaV012)
 		if diag != nil {
 			return nil
 		}
@@ -949,6 +978,12 @@ func (b *Block) getHCLAttributes() hcl.Attributes {
 		if diag != nil {
 			return nil
 		}
+		for k, a := range attrs {
+			if _, ok := b.UniqueAttrs[a.Name]; !ok {
+				delete(attrs, k)
+			}
+		}
+
 		return attrs
 	}
 }
@@ -1062,11 +1097,11 @@ func (b *Block) FullName() string {
 }
 
 func (b *Block) Type() string {
-	return b.hclBlock.Type
+	return b.HCLBlock.Type
 }
 
 func (b *Block) Labels() []string {
-	return b.hclBlock.Labels
+	return b.HCLBlock.Labels
 }
 
 func (b *Block) Context() *Context {
@@ -1119,7 +1154,7 @@ func (b *Block) Key() *string {
 }
 
 func (b *Block) Label() string {
-	return strings.Join(b.hclBlock.Labels, ".")
+	return strings.Join(b.HCLBlock.Labels, ".")
 }
 
 func loadBlocksFromFile(file file, schema *hcl.BodySchema) (hcl.Blocks, error) {
