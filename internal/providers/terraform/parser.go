@@ -811,9 +811,10 @@ func parseKnownModuleRefs(resData map[string]*schema.ResourceData, confLoader *C
 	}
 
 	for _, d := range resData {
+		modNames := getModuleNames(d.Address)
+		modSource := confLoader.GetModuleConfJSON(modNames).Get("source").String()
+
 		for _, knownRef := range knownRefs {
-			modNames := getModuleNames(d.Address)
-			modSource := confLoader.GetModuleConfJSON(modNames).Get("source").String()
 			matches := strings.HasSuffix(removeAddressArrayPart(d.Address), knownRef.SourceAddrSuffix) && modSource == knownRef.ModuleSource
 
 			if matches {
