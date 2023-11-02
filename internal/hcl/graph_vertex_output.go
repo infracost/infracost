@@ -5,7 +5,6 @@ import (
 	"sync"
 
 	"github.com/sirupsen/logrus"
-	"github.com/zclconf/go-cty/cty"
 )
 
 type VertexOutput struct {
@@ -68,17 +67,9 @@ func (v *VertexOutput) Visit(mutex *sync.Mutex) error {
 				parentKeyParts = []string{"module", modCall.Name}
 			}
 
-			var existingVals map[string]cty.Value
-			existingCtx := parentEvaluator.ctx.Get(parentKeyParts...)
-			if !existingCtx.IsNull() {
-				existingVals = existingCtx.AsValueMap()
-			} else {
-				existingVals = make(map[string]cty.Value)
-			}
+			parentKeyParts = append(parentKeyParts, blockInstance.Label())
 
-			existingVals[blockInstance.Label()] = val
-
-			parentEvaluator.ctx.Set(cty.ObjectVal(existingVals), parentKeyParts...)
+			parentEvaluator.ctx.Set(val, parentKeyParts...)
 		}
 
 		e.AddFilteredBlocks(blockInstance)
