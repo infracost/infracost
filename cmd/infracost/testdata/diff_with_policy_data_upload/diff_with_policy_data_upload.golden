@@ -133,6 +133,7 @@
                 }
               ],
               "checksum": "f5dd035ad27e97bb0e63f5e9794406f76dec425251f3ad09176905bfe8c1b6c5",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 37,
               "filename": "testdata/diff_with_policy_data_upload/main.tf",
               "startLine": 16

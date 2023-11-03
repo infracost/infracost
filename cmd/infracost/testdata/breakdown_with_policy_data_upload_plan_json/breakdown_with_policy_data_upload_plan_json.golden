@@ -44,7 +44,9 @@
               "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "defaultoverride"
             },
-            "metadata": {}
+            "metadata": {
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101"
+            }
           },
           {
             "name": "aws_appautoscaling_target.autoscale_dynamodb_table_write_target",
@@ -53,7 +55,9 @@
               "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "defaultoverride"
             },
-            "metadata": {}
+            "metadata": {
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101"
+            }
           },
           {
             "name": "aws_dynamodb_table.autoscale_dynamodb_table",
@@ -62,7 +66,9 @@
               "DefaultNotOverride": "defaultnotoverride",
               "DefaultOverride": "defaultoverride"
             },
-            "metadata": {},
+            "metadata": {
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101"
+            },
             "hourlyCost": "0.0078",
             "monthlyCost": "5.694",
             "costComponents": [
@@ -140,7 +146,9 @@
               "foo": "bar",
               "volume_tags.baz": "bat"
             },
-            "metadata": {},
+            "metadata": {
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101"
+            },
             "hourlyCost": "0.91197260273972602",
             "monthlyCost": "665.74",
             "costComponents": [

@@ -143,6 +143,7 @@
                 }
               ],
               "checksum": "e33830cc9be4d99146eece690c1c28ee61658f6528580210224ed26304df340d",
+              "defaultTagsChecksum": "554cb5bc144f8c4690b6f71b48b5f746dc3141e609f7ab49fabb549fd5fee449",
               "endLine": 32,
               "filename": "testdata/breakdown_with_default_tags/main.tf",
               "startLine": 22
@@ -289,6 +290,7 @@
                 }
               ],
               "checksum": "e33830cc9be4d99146eece690c1c28ee61658f6528580210224ed26304df340d",
+              "defaultTagsChecksum": "554cb5bc144f8c4690b6f71b48b5f746dc3141e609f7ab49fabb549fd5fee449",
               "endLine": 32,
               "filename": "testdata/breakdown_with_default_tags/main.tf",
               "startLine": 22

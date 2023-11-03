@@ -52,6 +52,7 @@
                 }
               ],
               "checksum": "1403df4d5fba340338063d429a834b41d778a10f9bf5641d6e8a9b754c4e479a",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 72,
               "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
               "startLine": 66
@@ -74,6 +75,7 @@
                 }
               ],
               "checksum": "90c5db4e165a29a3abc045e28dfea607059c1614b0c0d7a2cc60711ad2985a65",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 64,
               "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
               "startLine": 58
@@ -96,6 +98,7 @@
                 }
               ],
               "checksum": "fdfe0646f29e06b7e43d6f8ea09a298ca63ab078d56654d90f2dd9c6ab28d96a",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 56,
               "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
               "startLine": 39
@@ -187,6 +190,7 @@
                 }
               ],
               "checksum": "f5dd035ad27e97bb0e63f5e9794406f76dec425251f3ad09176905bfe8c1b6c5",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 37,
               "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
               "startLine": 16
@@ -264,6 +268,7 @@
                 }
               ],
               "checksum": "1403df4d5fba340338063d429a834b41d778a10f9bf5641d6e8a9b754c4e479a",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 72,
               "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
               "startLine": 66
@@ -286,6 +291,7 @@
                 }
               ],
               "checksum": "90c5db4e165a29a3abc045e28dfea607059c1614b0c0d7a2cc60711ad2985a65",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 64,
               "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
               "startLine": 58
@@ -308,6 +314,7 @@
                 }
               ],
               "checksum": "fdfe0646f29e06b7e43d6f8ea09a298ca63ab078d56654d90f2dd9c6ab28d96a",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 56,
               "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
               "startLine": 39
@@ -399,6 +406,7 @@
                 }
               ],
               "checksum": "f5dd035ad27e97bb0e63f5e9794406f76dec425251f3ad09176905bfe8c1b6c5",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 37,
               "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
               "startLine": 16
