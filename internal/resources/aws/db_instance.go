@@ -1,7 +1,7 @@
 package aws
 
 import (
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
@@ -192,7 +192,7 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 		}
 		priceFilter, err = resolver.PriceFilter()
 		if err != nil {
-			log.Warnf(err.Error())
+			log.Warn().Msgf(err.Error())
 		}
 		purchaseOptionLabel = "reserved"
 	}

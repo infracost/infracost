@@ -336,7 +336,7 @@ func getSpecialContext(d *schema.ResourceData) map[string]interface{} {
 	case "google":
 		return google.GetSpecialContext(d)
 	default:
-		logging.Logger.Debugf("Unsupported provider %s", providerPrefix)
+		logging.Logger.Debug().Msgf("Unsupported provider %s", providerPrefix)
 		return map[string]interface{}{}
 	}
 }
@@ -371,11 +371,11 @@ func overrideRegion(addr string, resourceType string, config *config.Config) str
 	case "google":
 		region = config.GoogleOverrideRegion
 	default:
-		logging.Logger.Debugf("Unsupported provider %s", providerPrefix)
+		logging.Logger.Debug().Msgf("Unsupported provider %s", providerPrefix)
 	}
 
 	if region != "" {
-		logging.Logger.Debugf("Overriding region (%s) for %s", region, addr)
+		logging.Logger.Debug().Msgf("Overriding region (%s) for %s", region, addr)
 	}
 
 	return region
@@ -392,7 +392,7 @@ func resourceRegion(resourceType string, v gjson.Result) string {
 	case "google":
 		return google.GetResourceRegion(resourceType, v)
 	default:
-		logging.Logger.Debugf("Unsupported provider %s", providerPrefix)
+		logging.Logger.Debug().Msgf("Unsupported provider %s", providerPrefix)
 		return ""
 	}
 }
@@ -427,7 +427,7 @@ func providerRegion(addr string, providerConf gjson.Result, vars gjson.Result, r
 			// Don't show this log for azurerm users since they have a different method of looking up the region.
 			// A lot of Azure resources get their region from their referenced azurerm_resource_group resource
 			if region != "" && providerPrefix != "azurerm" {
-				logging.Logger.Debugf("Falling back to default region (%s) for %s", region, addr)
+				logging.Logger.Debug().Msgf("Falling back to default region (%s) for %s", region, addr)
 			}
 		}
 	}
@@ -599,14 +599,14 @@ func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, co
 				refData, ok = resData[a]
 
 				if ok {
-					logging.Logger.Debugf("reference specifies a count: using resource %s for %s.%s", a, d.Address, attr)
+					logging.Logger.Debug().Msgf("reference specifies a count: using resource %s for %s.%s", a, d.Address, attr)
 				}
 			} else if containsString(refs, "each.key") {
 				a := fmt.Sprintf("%s[\"%s\"]", refAddr, addressKey(d.Address))
 				refData, ok = resData[a]
 
 				if ok {
-					logging.Logger.Debugf("reference specifies a key: using resource %s for %s.%s", a, d.Address, attr)
+					logging.Logger.Debug().Msgf("reference specifies a key: using resource %s for %s.%s", a, d.Address, attr)
 				}
 			}
 		}
@@ -617,7 +617,7 @@ func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, co
 			refData, ok = resData[a]
 
 			if ok {
-				logging.Logger.Debugf("reference does not specify a count: using resource %s for for %s.%s", a, d.Address, attr)
+				logging.Logger.Debug().Msgf("reference does not specify a count: using resource %s for for %s.%s", a, d.Address, attr)
 			}
 		}
 
@@ -646,7 +646,7 @@ func (p *Parser) parseTags(data map[string]*schema.ResourceData, providerConf gj
 		case "google":
 			tags = google.ParseTags(resourceData)
 		default:
-			logging.Logger.Debugf("Unsupported provider %s", providerPrefix)
+			logging.Logger.Debug().Msgf("Unsupported provider %s", providerPrefix)
 		}
 
 		resourceData.Tags = tags
@@ -860,14 +860,14 @@ func gjsonEqual(a, b gjson.Result) bool {
 	var aOut bytes.Buffer
 	err = stdJson.Compact(&aOut, []byte(a.Raw))
 	if err != nil {
-		logging.Logger.Debugf("error indenting JSON: %s", err)
+		logging.Logger.Debug().Msgf("error indenting JSON: %s", err)
 		return false
 	}
 
 	var bOut bytes.Buffer
 	err = stdJson.Compact(&bOut, []byte(b.Raw))
 	if err != nil {
-		logging.Logger.Debugf("error indenting JSON: %s", err)
+		logging.Logger.Debug().Msgf("error indenting JSON: %s", err)
 		return false
 	}
 

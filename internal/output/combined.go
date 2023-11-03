@@ -16,7 +16,7 @@ import (
 	"github.com/shopspring/decimal"
 	"golang.org/x/mod/semver"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
@@ -433,7 +433,7 @@ func addCurrencyFormat(currencyFormat string) {
 	m := rgx.FindStringSubmatch(currencyFormat)
 
 	if len(m) == 0 {
-		log.Warningf("Invalid currency format: %s", currencyFormat)
+		log.Warn().Msgf("Invalid currency format: %s", currencyFormat)
 		return
 	}
 

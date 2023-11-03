@@ -15,7 +15,7 @@ import (
 	"sync"
 
 	jsoniter "github.com/json-iterator/go"
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 	ctyJson "github.com/zclconf/go-cty/cty/json"
@@ -36,7 +36,7 @@ type HCLProvider struct {
 	policyClient   *apiclient.PolicyAPIClient
 	parsers        []*hcl.Parser
 	planJSONParser *Parser
-	logger         *log.Entry
+	logger         zerolog.Logger
 
 	schema *PlanSchema
 	ctx    *config.ProjectContext
@@ -133,7 +133,7 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 		hcl.OptionWithTerraformWorkspace(localWorkspace),
 	)
 
-	logger := ctx.Logger().WithFields(log.Fields{"provider": "terraform_dir"})
+	logger := ctx.Logger().With().Str("provider", "terraform_dir").Logger()
 	runCtx := ctx.RunContext
 	locatorConfig := &hcl.ProjectLocatorConfig{ExcludedSubDirs: ctx.ProjectConfig.ExcludePaths, ChangedObjects: runCtx.VCSMetadata.Commit.ChangedObjects, UseAllPaths: ctx.ProjectConfig.IncludeAllPaths}
 
@@ -142,7 +142,7 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 	if filepath.IsAbs(cachePath) {
 		abs, err := filepath.Abs(initialPath)
 		if err != nil {
-			logger.WithError(err).Warnf("could not make project path absolute to match provided --config-file/--path path absolute, this will result in module loading failures")
+			logger.Warn().Err(err).Msgf("could not make project path absolute to match provided --config-file/--path path absolute, this will result in module loading failures")
 		} else {
 			initialPath = abs
 		}
@@ -164,7 +164,7 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 	if runCtx.Config.PoliciesEnabled {
 		policyClient, err = apiclient.NewPolicyAPIClient(runCtx)
 		if err != nil {
-			logger.WithError(err).Errorf("failed to initialize policy client")
+			logger.Err(err).Msgf("failed to initialize policy client")
 		}
 	}
 
@@ -190,7 +190,7 @@ func (p *HCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 
 	modulePath, err := filepath.Rel(basePath, metadata.Path)
 	if err == nil && modulePath != "" && modulePath != "." {
-		p.logger.Debugf("calculated relative terraformModulePath for %s from %s", basePath, metadata.Path)
+		p.logger.Debug().Msgf("calculated relative terraformModulePath for %s from %s", basePath, metadata.Path)
 		metadata.TerraformModulePath = modulePath
 	}
 
@@ -219,7 +219,7 @@ func (p *HCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, e
 		if p.policyClient != nil {
 			err := p.policyClient.UploadPolicyData(project)
 			if err != nil {
-				p.logger.WithError(err).Errorf("failed to upload policy data %s", project.Name)
+				p.logger.Err(err).Msgf("failed to upload policy data %s", project.Name)
 			}
 		}
 
@@ -267,7 +267,7 @@ func (p *HCLProvider) newProject(parsed HCLProject) *schema.Project {
 			}
 
 			if p.ctx.RunContext.Config.IsLogging() {
-				logging.Logger.Warn(warning.FriendlyMessage)
+				logging.Logger.Warn().Msg(warning.FriendlyMessage)
 			} else {
 				ui.PrintWarning(p.ctx.RunContext.ErrWriter, warning.FriendlyMessage)
 			}
@@ -305,7 +305,7 @@ func (p *HCLProvider) LoadPlanJSONs() []HCLProject {
 			if os.Getenv("INFRACOST_JSON_DUMP") == "true" {
 				err := os.WriteFile(fmt.Sprintf("%s-out.json", strings.ReplaceAll(module.Module.ModulePath, "/", "-")), module.JSON, os.ModePerm)
 				if err != nil {
-					p.logger.WithError(err).Debug("failed to write to json dump")
+					p.logger.Debug().Err(err).Msg("failed to write to json dump")
 				}
 			}
 		}
@@ -365,7 +365,7 @@ func (p *HCLProvider) Modules() []HCLProject {
 					if v, ok := modErr.(*clierror.PanicError); ok {
 						err := apiclient.ReportCLIError(p.ctx.RunContext, v, false)
 						if err != nil {
-							p.logger.WithError(err).Debug("error sending unexpected runtime error")
+							p.logger.Debug().Err(err).Msg("error sending unexpected runtime error")
 						}
 					}
 				}
@@ -645,7 +645,7 @@ func (p *HCLProvider) marshalDefaultTagsBlock(providerBlock *hcl.Block) map[stri
 
 	for tag, val := range value.AsValueMap() {
 		if !val.IsKnown() {
-			p.logger.Debugf("tag %s has unknown value, cannot marshal", tag)
+			p.logger.Debug().Msgf("tag %s has unknown value, cannot marshal", tag)
 			continue
 		}
 
@@ -653,7 +653,7 @@ func (p *HCLProvider) marshalDefaultTagsBlock(providerBlock *hcl.Block) map[stri
 			var tagValue bool
 			err := gocty.FromCtyValue(val, &tagValue)
 			if err != nil {
-				p.logger.WithError(err).Debugf("could not marshal tag %s to bool value", tag)
+				p.logger.Debug().Err(err).Msgf("could not marshal tag %s to bool value", tag)
 				continue
 			}
 
@@ -665,7 +665,7 @@ func (p *HCLProvider) marshalDefaultTagsBlock(providerBlock *hcl.Block) map[stri
 			var tagValue big.Float
 			err := gocty.FromCtyValue(val, &tagValue)
 			if err != nil {
-				p.logger.WithError(err).Debugf("could not marshal tag %s to number value", tag)
+				p.logger.Debug().Err(err).Msgf("could not marshal tag %s to number value", tag)
 				continue
 			}
 
@@ -676,7 +676,7 @@ func (p *HCLProvider) marshalDefaultTagsBlock(providerBlock *hcl.Block) map[stri
 		var tagValue string
 		err := gocty.FromCtyValue(val, &tagValue)
 		if err != nil {
-			p.logger.WithError(err).Debugf("could not marshal tag %s to string value", tag)
+			p.logger.Debug().Err(err).Msgf("could not marshal tag %s to string value", tag)
 			continue
 		}
 
@@ -796,10 +796,10 @@ func (p *HCLProvider) marshalBlock(block *hcl.Block, jsonValues map[string]inter
 
 		if v, ok := jsonValues[key]; ok {
 			if _, ok := v.(stdJson.RawMessage); ok {
-				p.logger.WithFields(log.Fields{
+				p.logger.Debug().Fields(map[string]interface{}{
 					"parent_block": block.LocalName(),
 					"child_block":  b.LocalName(),
-				}).Debugf("skipping attribute '%s' that has also been declared as a child block", key)
+				}).Msgf("skipping attribute '%s' that has also been declared as a child block", key)
 
 				continue
 			}
@@ -825,7 +825,7 @@ func marshalAttributeValues(blockType string, value cty.Value) map[string]interf
 		var key string
 		err := gocty.FromCtyValue(k, &key)
 		if err != nil {
-			logging.Logger.WithError(err).Debugf("could not convert block map key to string ignoring entry")
+			logging.Logger.Debug().Err(err).Msgf("could not convert block map key to string ignoring entry")
 			continue
 		}
 

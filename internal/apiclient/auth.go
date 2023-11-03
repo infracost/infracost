@@ -9,7 +9,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/pkg/browser"
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 
 	"github.com/infracost/infracost/internal/ui"
 )
@@ -85,21 +85,21 @@ func (a AuthClient) startCallbackServer(listener net.Listener, generatedState st
 			redirectTo := query.Get("redirect_to")
 
 			if state != generatedState {
-				log.Debug("Invalid state received")
+				log.Debug().Msg("Invalid state received")
 				w.WriteHeader(400)
 				return
 			}
 
 			u, err := url.Parse(redirectTo)
 			if err != nil {
-				log.Debug("Unable to parse redirect_to URL")
+				log.Debug().Msg("Unable to parse redirect_to URL")
 				w.WriteHeader(400)
 				return
 			}
 
 			origin := fmt.Sprintf("%s://%s", u.Scheme, u.Host)
 			if origin != a.Host {
-				log.Debug("Invalid redirect_to URL")
+				log.Debug().Msg("Invalid redirect_to URL")
 				w.WriteHeader(400)
 				return
 			}

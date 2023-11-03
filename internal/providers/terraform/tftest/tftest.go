@@ -18,7 +18,7 @@ import (
 	"github.com/infracost/infracost/internal/usage"
 
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/infracost/infracost/internal/config"
@@ -115,7 +115,7 @@ func installPlugins() error {
 
 	err := os.MkdirAll(initCache, os.ModePerm)
 	if err != nil {
-		log.Errorf("Error creating init cache directory: %s", err.Error())
+		log.Error().Msgf("Error creating init cache directory: %s", err.Error())
 	}
 
 	tfdir, err := writeToTmpDir(initCache, project)
@@ -125,7 +125,7 @@ func installPlugins() error {
 
 	err = os.MkdirAll(pluginCache, os.ModePerm)
 	if err != nil {
-		log.Errorf("Error creating plugin cache directory: %s", err.Error())
+		log.Error().Msgf("Error creating plugin cache directory: %s", err.Error())
 	} else {
 		os.Setenv("TF_PLUGIN_CACHE_DIR", pluginCache)
 	}
@@ -306,7 +306,7 @@ func loadResources(t *testing.T, pName string, tfProject TerraformProject, runCt
 	} else {
 		provider = terraform.NewDirProvider(config.NewProjectContext(runCtx, &config.Project{
 			Path: tfdir,
-		}, log.Fields{}), false)
+		}, nil), false)
 	}
 
 	projects, err := provider.LoadResources(usageData)
@@ -360,7 +360,7 @@ func goldenFileSyncTest(t *testing.T, pName, testName string) {
 		},
 	}
 
-	projectCtx := config.NewProjectContext(runCtx, &config.Project{}, log.Fields{})
+	projectCtx := config.NewProjectContext(runCtx, &config.Project{}, nil)
 
 	usageFilePath := filepath.Join("testdata", testName, testName+"_existing_usage.yml")
 	projects := loadResources(t, pName, tfProject, runCtx, schema.UsageMap{})
@@ -399,7 +399,7 @@ func newHCLProvider(t *testing.T, runCtx *config.RunContext, tfdir string) *terr
 
 	projectCtx := config.NewProjectContext(runCtx, &config.Project{
 		Path: tfdir,
-	}, log.Fields{})
+	}, nil)
 
 	provider, err := terraform.NewHCLProvider(projectCtx, &terraform.HCLProviderConfig{SuppressLogging: true})
 	require.NoError(t, err)

@@ -114,7 +114,7 @@ func (m *ProjectMetadata) GenerateProjectName(remote vcs.Remote, dashboardEnable
 	if dashboardEnabled {
 		absPath, err := filepath.Abs(m.Path)
 		if err != nil {
-			logging.Logger.Debugf("Could not get absolute path for %s", m.Path)
+			logging.Logger.Debug().Msgf("Could not get absolute path for %s", m.Path)
 			absPath = m.Path
 		}
 

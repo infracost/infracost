@@ -5,10 +5,11 @@ import (
 	"math"
 	"strings"
 
-	"github.com/infracost/infracost/internal/schema"
+	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
-	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 const Standard = "Standard"
@@ -115,7 +116,7 @@ func managedDiskCostComponents(region, diskType string, diskData gjson.Result, m
 
 	validstorageReplicationType := mapStorageReplicationType(storageReplicationType)
 	if !validstorageReplicationType {
-		log.Warnf("Could not map %s to a valid storage type", storageReplicationType)
+		log.Warn().Msgf("Could not map %s to a valid storage type", storageReplicationType)
 		return nil
 	}
 
@@ -135,13 +136,13 @@ func standardPremiumDiskCostComponents(region string, diskTypePrefix string, sto
 
 	diskName := mapDiskName(diskTypePrefix, requestedSize)
 	if diskTypePrefix == "" {
-		log.Warnf("Could not map disk type %s and size %d to disk name", diskTypePrefix, requestedSize)
+		log.Warn().Msgf("Could not map disk type %s and size %d to disk name", diskTypePrefix, requestedSize)
 		return nil
 	}
 
 	productName, ok := diskProductNameMap[diskTypePrefix]
 	if !ok {
-		log.Warnf("Could not map disk type %s to product name", diskTypePrefix)
+		log.Warn().Msgf("Could not map disk type %s to product name", diskTypePrefix)
 		return nil
 	}
 

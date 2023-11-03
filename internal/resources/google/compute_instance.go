@@ -40,7 +40,7 @@ func (r *ComputeInstance) PopulateUsage(u *schema.UsageData) {
 func (r *ComputeInstance) BuildResource() *schema.Resource {
 	costComponents, err := computeCostComponents(r.Region, r.MachineType, r.PurchaseOption, r.Size, r.MonthlyHours)
 	if err != nil {
-		logging.Logger.Warnf("Skipping resource %s. %s", r.Address, err)
+		logging.Logger.Warn().Msgf("Skipping resource %s. %s", r.Address, err)
 		return nil
 	}
 

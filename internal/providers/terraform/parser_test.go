@@ -4,7 +4,6 @@ import (
 	"testing"
 
 	"github.com/shopspring/decimal"
-	log "github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/tidwall/gjson"
 
@@ -412,7 +411,7 @@ func TestParseJSONResources(t *testing.T) {
 	conf := parsed.Get("configuration.root_module")
 	vars := parsed.Get("variables")
 
-	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, log.Fields{}), true)
+	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, map[string]interface{}{}), true)
 
 	partials := p.parseJSONResources(false, nil, usage, parsed, providerConf, conf, vars)
 	actual := make([]*schema.Resource, len(partials))
@@ -484,7 +483,7 @@ func TestCreateResource(t *testing.T) {
 		},
 	}
 
-	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, log.Fields{}), true)
+	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, map[string]interface{}{}), true)
 
 	for _, test := range tests {
 		partial := p.createPartialResource(test.data, nil)
@@ -664,7 +663,7 @@ func TestParseResourceData(t *testing.T) {
 		"module.module1.aws_nat_gateway.nat2": "eu-west-2",
 	}
 
-	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, log.Fields{}), true)
+	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, map[string]interface{}{}), true)
 	actual := p.parseResourceData(false, providerConf, planVals, conf, vars)
 
 	for k, v := range actual {
@@ -733,7 +732,7 @@ func TestParseReferences_plan(t *testing.T) {
 		}`,
 	}
 
-	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, log.Fields{}), true)
+	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, map[string]interface{}{}), true)
 	p.parseReferences(resData, conf)
 
 	assert.Equal(t, []*schema.ResourceData{vol1}, resData["aws_ebs_snapshot.snapshot1"].References("volume_id"))
@@ -773,7 +772,7 @@ func TestParseReferences_state(t *testing.T) {
 
 	conf := gjson.Result{}
 
-	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, log.Fields{}), true)
+	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, map[string]interface{}{}), true)
 	p.parseReferences(resData, conf)
 
 	assert.Equal(t, []*schema.ResourceData{vol1}, resData["aws_ebs_snapshot.snapshot1"].References("volume_id"))

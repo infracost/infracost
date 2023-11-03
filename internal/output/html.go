@@ -13,7 +13,7 @@ import (
 
 	"github.com/Masterminds/sprig"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 )
 
 func ToHTML(out Root, opts Options) ([]byte, error) {
@@ -38,7 +38,7 @@ func ToHTML(out Root, opts Options) ([]byte, error) {
 				return true
 			}
 
-			log.Info(fmt.Sprintf("Hiding resource with no usage: %s", resourceName))
+			log.Info().Msgf("Hiding resource with no usage: %s", resourceName)
 			return false
 		},
 		"filterZeroValComponents": filterZeroValComponents,

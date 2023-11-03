@@ -6,11 +6,12 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
+	"time"
 
 	"github.com/fatih/color"
 	"github.com/joho/godotenv"
 	"github.com/kelseyhightower/envconfig"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 	"github.com/spf13/cobra"
 
 	"github.com/infracost/infracost/internal/logging"
@@ -133,7 +134,6 @@ type Config struct {
 	EventsDisabled       bool
 	logWriter            io.Writer
 	logDisableTimestamps bool
-	disableReportCaller  bool
 }
 
 func init() {
@@ -233,22 +233,14 @@ func (c *Config) LoadFromConfigFile(path string, cmd *cobra.Command) error {
 	return nil
 }
 
-// DisableReportCaller sets whether the log entry writes the filename to the log line.
-func (c *Config) DisableReportCaller() {
-	c.disableReportCaller = true
-}
-
-// ReportCaller returns if the log entry writes the filename to the log line.
-func (c *Config) ReportCaller() bool {
-	level := c.WriteLevel()
-
-	return level == "debug" && !c.disableReportCaller
-}
-
 // WriteLevel is the log level that the Logger writes to LogWriter.
 func (c *Config) WriteLevel() string {
 	if c.DebugReport {
-		return logrus.DebugLevel.String()
+		return zerolog.LevelDebugValue
+	}
+
+	if c.LogLevel == "" {
+		return zerolog.LevelInfoValue
 	}
 
 	return c.LogLevel
@@ -278,31 +270,6 @@ func (c *Config) SetLogDisableTimestamps(v bool) {
 	c.logDisableTimestamps = v
 }
 
-// LogFormatter returns the log formatting to be used by a Logger.
-func (c *Config) LogFormatter() logrus.Formatter {
-	if c.DebugReport {
-		return &logrus.JSONFormatter{
-			DisableTimestamp: c.logDisableTimestamps,
-			PrettyPrint:      true,
-		}
-	}
-
-	return &logrus.TextFormatter{
-		FullTimestamp:    true,
-		DisableTimestamp: c.logDisableTimestamps,
-		DisableColors:    true,
-		SortingFunc: func(keys []string) {
-			// Put message at the end
-			for i, key := range keys {
-				if key == "msg" && i != len(keys)-1 {
-					keys[i], keys[len(keys)-1] = keys[len(keys)-1], keys[i]
-					break
-				}
-			}
-		},
-	}
-}
-
 // SetLogWriter sets the io.Writer that the logs should be piped to.
 func (c *Config) SetLogWriter(w io.Writer) {
 	c.logWriter = w
@@ -311,7 +278,18 @@ func (c *Config) SetLogWriter(w io.Writer) {
 // LogWriter returns the writer the Logger should use to write logs to.
 // In most cases this should be stderr, but it can also be a file.
 func (c *Config) LogWriter() io.Writer {
-	return c.logWriter
+	return zerolog.NewConsoleWriter(func(w *zerolog.ConsoleWriter) {
+		w.NoColor = true
+		w.TimeFormat = time.RFC3339
+		if c.logDisableTimestamps {
+			w.TimeFormat = ""
+		}
+
+		w.Out = os.Stderr
+		if c.logWriter != nil {
+			w.Out = c.logWriter
+		}
+	})
 }
 
 func (c *Config) LoadFromEnv() error {

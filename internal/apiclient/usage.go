@@ -62,14 +62,14 @@ func NewUsageAPIClient(ctx *config.RunContext) *UsageAPIClient {
 
 		caCerts, err := os.ReadFile(ctx.Config.TLSCACertFile)
 		if err != nil {
-			logging.Logger.WithError(err).Errorf("Error reading CA cert file %s", ctx.Config.TLSCACertFile)
+			logging.Logger.Err(err).Msgf("Error reading CA cert file %s", ctx.Config.TLSCACertFile)
 		} else {
 			ok := rootCAs.AppendCertsFromPEM(caCerts)
 
 			if !ok {
-				logging.Logger.Warningf("No CA certs appended, only using system certs")
+				logging.Logger.Warn().Msg("No CA certs appended, only using system certs")
 			} else {
-				logging.Logger.Debugf("Loaded CA certs from %s", ctx.Config.TLSCACertFile)
+				logging.Logger.Debug().Msgf("Loaded CA certs from %s", ctx.Config.TLSCACertFile)
 			}
 		}
 
@@ -99,7 +99,7 @@ func NewUsageAPIClient(ctx *config.RunContext) *UsageAPIClient {
 func (c *UsageAPIClient) ListActualCosts(vars ActualCostsQueryVariables) ([]ActualCostsResult, error) {
 	query := c.buildActualCostsQuery(vars)
 
-	logging.Logger.Debugf("Getting actual costs from %s for %s", c.endpoint, vars.Address)
+	logging.Logger.Debug().Msgf("Getting actual costs from %s for %s", c.endpoint, vars.Address)
 
 	results, err := c.doQueries([]GraphQLQuery{query})
 	if err != nil {
@@ -179,7 +179,7 @@ func (c *UsageAPIClient) buildActualCostsQuery(vars ActualCostsQueryVariables) G
 func (c *UsageAPIClient) ListUsageQuantities(vars UsageQuantitiesQueryVariables) (map[string]gjson.Result, error) {
 	query := c.buildUsageQuantitiesQuery(vars)
 
-	logging.Logger.Debugf("Getting usage quantities from %s for %s %s %v", c.endpoint, vars.ResourceType, vars.Address, vars.UsageKeys)
+	logging.Logger.Debug().Msgf("Getting usage quantities from %s for %s %s %v", c.endpoint, vars.ResourceType, vars.Address, vars.UsageKeys)
 
 	results, err := c.doQueries([]GraphQLQuery{query})
 	if err != nil {
@@ -289,7 +289,7 @@ type ResourceIDAddress struct {
 // used to calculate usage estimates.
 func (c *UsageAPIClient) UploadCloudResourceIDs(vars CloudResourceIDVariables) error {
 	if len(vars.ResourceIDAddresses) == 0 {
-		logging.Logger.Debugf("No cloud resource IDs to upload for %s %s", vars.RepoURL, vars.ProjectWithWorkspace)
+		logging.Logger.Debug().Msgf("No cloud resource IDs to upload for %s %s", vars.RepoURL, vars.ProjectWithWorkspace)
 		return nil
 	}
 
@@ -304,7 +304,7 @@ func (c *UsageAPIClient) UploadCloudResourceIDs(vars CloudResourceIDVariables) e
 		Variables: interfaceToMap(vars),
 	}
 
-	logging.Logger.Debugf("Uploading cloud resource IDs to %s for %s %s", c.endpoint, vars.RepoURL, vars.ProjectWithWorkspace)
+	logging.Logger.Debug().Msgf("Uploading cloud resource IDs to %s for %s %s", c.endpoint, vars.RepoURL, vars.ProjectWithWorkspace)
 
 	results, err := c.doQueries([]GraphQLQuery{query})
 	if err != nil {
@@ -315,7 +315,7 @@ func (c *UsageAPIClient) UploadCloudResourceIDs(vars CloudResourceIDVariables) e
 
 	newCount := results[0].Get("data.addAddressResourceIds.newCount").Int()
 
-	logging.Logger.WithField("newCount", newCount).Debugf("Uploaded cloud resource IDs to %s for %s %s", c.endpoint, vars.RepoURL, vars.ProjectWithWorkspace)
+	logging.Logger.Debug().Str("newCount", fmt.Sprintf("%d", newCount)).Msgf("Uploaded cloud resource IDs to %s for %s %s", c.endpoint, vars.RepoURL, vars.ProjectWithWorkspace)
 
 	return nil
 }

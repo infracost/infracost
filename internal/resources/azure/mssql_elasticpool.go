@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
-	log "github.com/sirupsen/logrus"
 
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
@@ -163,7 +163,7 @@ func (r *MSSQLElasticPool) computeHoursCostComponents() []*schema.CostComponent 
 	productNameRegex := fmt.Sprintf("/%s - %s/", r.Tier, r.Family)
 	name := fmt.Sprintf("Compute (%s, %d vCore)", r.SKU, cores)
 
-	log.Warnf("'Multiple products found' are safe to ignore for '%s' due to limitations in the Azure API.", name)
+	log.Warn().Msgf("'Multiple products found' are safe to ignore for '%s' due to limitations in the Azure API.", name)
 
 	costComponents := []*schema.CostComponent{
 		{

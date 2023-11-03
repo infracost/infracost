@@ -207,7 +207,6 @@ func ConfigureTestToFailOnLogs(t *testing.T, runCtx *config.RunContext) {
 	runCtx.Config.LogLevel = "warn"
 	runCtx.Config.SetLogDisableTimestamps(true)
 	runCtx.Config.SetLogWriter(io.MultiWriter(os.Stderr, ErrorOnAnyWriter{t}))
-	runCtx.Config.DisableReportCaller()
 
 	err := logging.ConfigureBaseLogger(runCtx.Config)
 	require.Nil(t, err)
@@ -218,7 +217,6 @@ func ConfigureTestToCaptureLogs(t *testing.T, runCtx *config.RunContext) *bytes.
 	runCtx.Config.LogLevel = "warn"
 	runCtx.Config.SetLogDisableTimestamps(true)
 	runCtx.Config.SetLogWriter(io.MultiWriter(os.Stderr, logBuf))
-	runCtx.Config.DisableReportCaller()
 
 	err := logging.ConfigureBaseLogger(runCtx.Config)
 	require.Nil(t, err)

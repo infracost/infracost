@@ -11,6 +11,7 @@ import (
 
 	hcl2 "github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/rs/zerolog"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -188,31 +189,29 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 			pathName := strings.ReplaceAll(strings.ToLower(tt.name), " ", "_")
 			testPath := path.Join("testdata/hcl_provider_test", pathName)
 
-			logger := logrus.New()
-			logger.SetOutput(io.Discard)
-			entry := logrus.NewEntry(logger)
+			logger := zerolog.New(io.Discard)
 
 			ctx := config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{})
 			parsers, err := hcl.LoadParsers(
 				ctx,
 				testPath,
-				modules.NewModuleLoader(testPath, nil, config.TerraformSourceMap{}, entry, &sync.KeyMutex{}),
+				modules.NewModuleLoader(testPath, nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}),
 				nil,
-				entry,
+				logger,
 				hcl.OptionWithBlockBuilder(
 					hcl.BlockBuilder{
 						MockFunc: func(a *hcl.Attribute) cty.Value {
 							return cty.StringVal(fmt.Sprintf("mocked-%s", a.Name()))
 						},
 						SetAttributes: []hcl.SetAttributesFunc{setMockAttributes(tt.attrs)},
-						Logger:        entry,
+						Logger:        logger,
 					},
 				))
 			require.NoError(t, err)
 
 			p := HCLProvider{
 				parsers: parsers,
-				logger:  entry,
+				logger:  logger,
 				ctx:     ctx,
 			}
 			got := p.LoadPlanJSONs()

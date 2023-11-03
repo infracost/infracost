@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
@@ -86,7 +86,7 @@ func (p *PlanProvider) generatePlanJSON() ([]byte, error) {
 	planPath := filepath.Base(p.Path)
 
 	if !IsTerraformDir(dir) {
-		log.Debugf("%s is not a Terraform directory, checking current working directory", dir)
+		log.Debug().Msgf("%s is not a Terraform directory, checking current working directory", dir)
 		dir, err := os.Getwd()
 		if err != nil {
 			return []byte{}, err

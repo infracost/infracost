@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/rs/zerolog"
+
 	"github.com/infracost/infracost/internal/apiclient"
-
-	"github.com/sirupsen/logrus"
-
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
 )
@@ -18,7 +18,7 @@ type PlanJSONProvider struct {
 	Path                 string
 	includePastResources bool
 	policyClient         *apiclient.PolicyAPIClient
-	logger               *logrus.Entry
+	logger               zerolog.Logger
 }
 
 func NewPlanJSONProvider(ctx *config.ProjectContext, includePastResources bool) *PlanJSONProvider {
@@ -27,7 +27,7 @@ func NewPlanJSONProvider(ctx *config.ProjectContext, includePastResources bool) 
 	if ctx.RunContext.Config.PoliciesEnabled {
 		policyClient, err = apiclient.NewPolicyAPIClient(ctx.RunContext)
 		if err != nil {
-			ctx.Logger().WithError(err).Errorf("failed to initialize policy client")
+			logging.Logger.Debug().Err(err).Msgf("failed to initialize policy client")
 		}
 	}
 
@@ -103,7 +103,7 @@ func (p *PlanJSONProvider) LoadResourcesFromSrc(usage schema.UsageMap, j []byte,
 	if p.policyClient != nil {
 		err := p.policyClient.UploadPolicyData(project)
 		if err != nil {
-			p.logger.WithError(err).Errorf("Terraform project %s failed to upload policy data", project.Name)
+			p.logger.Err(err).Msgf("Terraform project %s failed to upload policy data", project.Name)
 		}
 	}
 

@@ -7,7 +7,7 @@ import (
 	"io"
 
 	"github.com/maruel/panicparse/v2/stack"
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 )
 
 // SanitizedError allows errors to be wrapped with a sanitized message for sending upstream
@@ -66,7 +66,7 @@ func (p *PanicError) SanitizedStack() string {
 	sanitizedStack := p.stack
 	sanitizedStack, err := processStack(sanitizedStack)
 	if err != nil {
-		log.Debugf("Could not sanitize stack: %s", err)
+		log.Debug().Msgf("Could not sanitize stack: %s", err)
 	}
 
 	return string(sanitizedStack)

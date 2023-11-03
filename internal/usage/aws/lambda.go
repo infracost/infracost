@@ -5,11 +5,11 @@ import (
 	"context"
 
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 )
 
 func LambdaGetInvocations(ctx context.Context, region string, fn string) (float64, error) {
-	log.Debugf("Querying AWS CloudWatch: AWS/Lambda Invocations (region: %s, FunctionName: %s)", region, fn)
+	log.Debug().Msgf("Querying AWS CloudWatch: AWS/Lambda Invocations (region: %s, FunctionName: %s)", region, fn)
 	stats, err := cloudwatchGetMonthlyStats(ctx, statsRequest{
 		region:    region,
 		namespace: "AWS/Lambda",
@@ -29,7 +29,7 @@ func LambdaGetInvocations(ctx context.Context, region string, fn string) (float6
 }
 
 func LambdaGetDurationAvg(ctx context.Context, region string, fn string) (float64, error) {
-	log.Debugf("Querying AWS CloudWatch: AWS/Lambda Duration (region: %s, FunctionName: %s)", region, fn)
+	log.Debug().Msgf("Querying AWS CloudWatch: AWS/Lambda Duration (region: %s, FunctionName: %s)", region, fn)
 	stats, err := cloudwatchGetMonthlyStats(ctx, statsRequest{
 		region:    region,
 		namespace: "AWS/Lambda",

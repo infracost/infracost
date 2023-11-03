@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
-	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 
 	"github.com/infracost/infracost/internal/resources/aws"
@@ -41,7 +41,7 @@ func NewAutoscalingGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 	} else {
 		instanceCount = d.Get("min_size").Int()
 		if instanceCount == 0 {
-			log.Debugf("Using instance count 1 for %s since no desired_capacity or non-zero min_size is set. To override this set the instance_count attribute for this resource in the Infracost usage file.", a.Address)
+			log.Debug().Msgf("Using instance count 1 for %s since no desired_capacity or non-zero min_size is set. To override this set the instance_count attribute for this resource in the Infracost usage file.", a.Address)
 			instanceCount = 1
 		}
 	}

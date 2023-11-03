@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 
 	"github.com/infracost/infracost/internal/apiclient"
@@ -159,7 +159,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			pricingClient := apiclient.GetPricingAPIClient(ctx)
 			err = pricingClient.AddEvent("infracost-output", ctx.EventEnv())
 			if err != nil {
-				log.Errorf("Error reporting event: %s", err)
+				log.Error().Msgf("Error reporting event: %s", err)
 			}
 
 			if outFile, _ := cmd.Flags().GetString("out-file"); outFile != "" {
@@ -205,7 +205,7 @@ func shareCombinedRun(ctx *config.RunContext, combined output.Root, inputs []out
 	dashboardClient := apiclient.NewDashboardAPIClient(ctx)
 	result, err := dashboardClient.AddRun(ctx, combined, commentFormat)
 	if err != nil {
-		log.WithError(err).Error("Failed to upload to Infracost Cloud")
+		log.Err(err).Msg("Failed to upload to Infracost Cloud")
 	}
 
 	return result

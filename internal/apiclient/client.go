@@ -11,7 +11,7 @@ import (
 
 	"github.com/google/uuid"
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 	"github.com/tidwall/gjson"
 
 	"github.com/infracost/infracost/internal/logging"
@@ -47,7 +47,7 @@ var ErrInvalidAPIKey = errors.New("Invalid API key")
 
 func (c *APIClient) doQueries(queries []GraphQLQuery) ([]gjson.Result, error) {
 	if len(queries) == 0 {
-		log.Debug("Skipping GraphQL request as no queries have been specified")
+		log.Debug().Msg("Skipping GraphQL request as no queries have been specified")
 		return []gjson.Result{}, nil
 	}
 
@@ -56,7 +56,7 @@ func (c *APIClient) doQueries(queries []GraphQLQuery) ([]gjson.Result, error) {
 }
 
 func (c *APIClient) doRequest(method string, path string, d interface{}) ([]byte, error) {
-	logging.Logger.Debugf("'%s' request to '%s' using trace_id: '%s'", method, path, c.uuid.String())
+	logging.Logger.Debug().Msgf("'%s' request to '%s' using trace_id: '%s'", method, path, c.uuid.String())
 
 	reqBody, err := json.Marshal(d)
 	if err != nil {

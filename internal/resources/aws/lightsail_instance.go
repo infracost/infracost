@@ -1,14 +1,13 @@
 package aws
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 
-	"fmt"
-
-	log "github.com/sirupsen/logrus"
-
-	"strings"
+	"github.com/rs/zerolog/log"
 
 	"github.com/shopspring/decimal"
 )
@@ -53,7 +52,7 @@ func (r *LightsailInstance) BuildResource() *schema.Resource {
 
 	specs, ok := bundlePrefixMappings[bundlePrefix]
 	if !ok {
-		log.Warnf("Skipping resource %s. Unrecognized bundle_id %s", r.Address, r.BundleID)
+		log.Warn().Msgf("Skipping resource %s. Unrecognized bundle_id %s", r.Address, r.BundleID)
 		return nil
 	}
 

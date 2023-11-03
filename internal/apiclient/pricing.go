@@ -20,7 +20,7 @@ import (
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 	"github.com/tidwall/gjson"
 )
 
@@ -95,14 +95,14 @@ func GetPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
 
 		caCerts, err := os.ReadFile(ctx.Config.TLSCACertFile)
 		if err != nil {
-			log.Errorf("Error reading CA cert file %s: %v", ctx.Config.TLSCACertFile, err)
+			log.Error().Msgf("Error reading CA cert file %s: %v", ctx.Config.TLSCACertFile, err)
 		} else {
 			ok := rootCAs.AppendCertsFromPEM(caCerts)
 
 			if !ok {
-				log.Warningf("No CA certs appended, only using system certs")
+				log.Warn().Msgf("No CA certs appended, only using system certs")
 			} else {
-				log.Debugf("Loaded CA certs from %s", ctx.Config.TLSCACertFile)
+				log.Debug().Msgf("Loaded CA certs from %s", ctx.Config.TLSCACertFile)
 			}
 		}
 
@@ -114,7 +114,7 @@ func GetPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
 	}
 
 	client := retryablehttp.NewClient()
-	client.Logger = &LeveledLogger{Logger: logging.Logger.WithField("library", "retryablehttp")}
+	client.Logger = &LeveledLogger{Logger: logging.Logger.With().Str("library", "retryablehttp").Logger()}
 	client.HTTPClient.Transport.(*http.Transport).TLSClientConfig = &tlsConfig
 	client.HTTPClient.Timeout = time.Second * 30
 
@@ -168,13 +168,13 @@ func loadCacheFromFile(ctx *config.RunContext, cacheFile string) *lru.TwoQueueCa
 	var storedCache map[uint64]cacheValue
 	f, err := os.Open(cacheFile)
 	if err != nil {
-		logging.Logger.WithError(err).Debugf("could not load cache file %s", cacheFile)
+		logging.Logger.Debug().Err(err).Msgf("could not load cache file %s", cacheFile)
 		return nil
 	}
 
 	err = gob.NewDecoder(f).Decode(&storedCache)
 	if err != nil {
-		logging.Logger.WithError(err).Debugf("failed to decode cache file %s", cacheFile)
+		logging.Logger.Debug().Err(err).Msgf("failed to decode cache file %s", cacheFile)
 		return nil
 	}
 
@@ -201,7 +201,7 @@ func (c *PricingAPIClient) FlushCache() error {
 		return nil
 	}
 
-	logging.Logger.Debugf("writing %d objects to filesystem cache", c.cache.Len())
+	logging.Logger.Debug().Msgf("writing %d objects to filesystem cache", c.cache.Len())
 
 	f, err := os.OpenFile(c.cacheFile, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, os.ModePerm)
 	if err != nil {
@@ -303,7 +303,7 @@ type pricingQuery struct {
 // checking a local cache for previous results. If the results of a given query
 // are cached, they are used directly; otherwise, a request to the API is made.
 func (c *PricingAPIClient) PerformRequest(req BatchRequest) ([]PriceQueryResult, error) {
-	log.Debugf("Getting pricing details for %d cost components from %s", len(req.queries), c.endpoint)
+	log.Debug().Msgf("Getting pricing details for %d cost components from %s", len(req.queries), c.endpoint)
 	res := make([]PriceQueryResult, len(req.keys))
 	for i, key := range req.keys {
 		res[i].PriceQueryKey = key
@@ -313,7 +313,7 @@ func (c *PricingAPIClient) PerformRequest(req BatchRequest) ([]PriceQueryResult,
 	for i, query := range req.queries {
 		key, err := hashstructure.Hash(query, hashstructure.FormatV2, nil)
 		if err != nil {
-			logging.Logger.WithError(err).Debugf("failed to hash query %s will use nil hash", query)
+			logging.Logger.Debug().Err(err).Msgf("failed to hash query %s will use nil hash", query)
 		}
 
 		queries[i] = pricingQuery{
@@ -332,7 +332,7 @@ func (c *PricingAPIClient) PerformRequest(req BatchRequest) ([]PriceQueryResult,
 		for i, query := range queries {
 			v, ok := c.cache.Get(query.hash)
 			if ok {
-				logging.Logger.Debugf("cache hit for query hash: %d", query.hash)
+				logging.Logger.Debug().Msgf("cache hit for query hash: %d", query.hash)
 				hit++
 				res[i] = PriceQueryResult{
 					PriceQueryKey: req.keys[i],
@@ -344,7 +344,7 @@ func (c *PricingAPIClient) PerformRequest(req BatchRequest) ([]PriceQueryResult,
 			}
 		}
 
-		logging.Logger.Debugf("%d/%d queries were built from cache", hit, len(queries))
+		logging.Logger.Debug().Msgf("%d/%d queries were built from cache", hit, len(queries))
 	}
 
 	// now we deduplicate the queries, ensuring that a request for a price only happens once.

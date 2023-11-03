@@ -8,8 +8,8 @@ import (
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 
+	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
-	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
 
@@ -92,7 +92,7 @@ func setCostComponentPrice(ctx *config.RunContext, currency string, r *schema.Re
 	var p decimal.Decimal
 
 	if c.CustomPrice() != nil {
-		log.Debugf("Using user-defined custom price %v for %s %s.", *c.CustomPrice(), r.Name, c.Name)
+		log.Debug().Msgf("Using user-defined custom price %v for %s %s.", *c.CustomPrice(), r.Name, c.Name)
 		c.SetPrice(*c.CustomPrice())
 		return
 	}
@@ -100,19 +100,19 @@ func setCostComponentPrice(ctx *config.RunContext, currency string, r *schema.Re
 	products := res.Get("data.products").Array()
 	if len(products) == 0 {
 		if c.IgnoreIfMissingPrice {
-			log.Debugf("No products found for %s %s, ignoring since IgnoreIfMissingPrice is set.", r.Name, c.Name)
+			log.Debug().Msgf("No products found for %s %s, ignoring since IgnoreIfMissingPrice is set.", r.Name, c.Name)
 			r.RemoveCostComponent(c)
 			return
 		}
 
-		log.Warnf("No products found for %s %s, using 0.00", r.Name, c.Name)
+		log.Warn().Msgf("No products found for %s %s, using 0.00", r.Name, c.Name)
 		setResourceWarningEvent(ctx, r, "No products found")
 		c.SetPrice(decimal.Zero)
 		return
 	}
 
 	if len(products) > 1 {
-		log.Debugf("Multiple products found for %s %s, filtering those with prices", r.Name, c.Name)
+		log.Debug().Msgf("Multiple products found for %s %s, filtering those with prices", r.Name, c.Name)
 	}
 
 	// Some resources may have identical records in CPAPI for the same product
@@ -129,32 +129,32 @@ func setCostComponentPrice(ctx *config.RunContext, currency string, r *schema.Re
 
 	if len(productsWithPrices) == 0 {
 		if c.IgnoreIfMissingPrice {
-			log.Debugf("No prices found for %s %s, ignoring since IgnoreIfMissingPrice is set.", r.Name, c.Name)
+			log.Debug().Msgf("No prices found for %s %s, ignoring since IgnoreIfMissingPrice is set.", r.Name, c.Name)
 			r.RemoveCostComponent(c)
 			return
 		}
 
-		log.Warnf("No prices found for %s %s, using 0.00", r.Name, c.Name)
+		log.Warn().Msgf("No prices found for %s %s, using 0.00", r.Name, c.Name)
 		setResourceWarningEvent(ctx, r, "No prices found")
 		c.SetPrice(decimal.Zero)
 		return
 	}
 
 	if len(productsWithPrices) > 1 {
-		log.Warnf("Multiple products with prices found for %s %s, using the first product", r.Name, c.Name)
+		log.Warn().Msgf("Multiple products with prices found for %s %s, using the first product", r.Name, c.Name)
 		setResourceWarningEvent(ctx, r, "Multiple products found")
 	}
 
 	prices := productsWithPrices[0].Get("prices").Array()
 	if len(prices) > 1 {
-		log.Warnf("Multiple prices found for %s %s, using the first price", r.Name, c.Name)
+		log.Warn().Msgf("Multiple prices found for %s %s, using the first price", r.Name, c.Name)
 		setResourceWarningEvent(ctx, r, "Multiple prices found")
 	}
 
 	var err error
 	p, err = decimal.NewFromString(prices[0].Get(currency).String())
 	if err != nil {
-		log.Warnf("Error converting price to '%v' (using 0.00)  '%v': %s", currency, prices[0].Get(currency).String(), err.Error())
+		log.Warn().Msgf("Error converting price to '%v' (using 0.00)  '%v': %s", currency, prices[0].Get(currency).String(), err.Error())
 		setResourceWarningEvent(ctx, r, "Error converting price")
 		c.SetPrice(decimal.Zero)
 		return
