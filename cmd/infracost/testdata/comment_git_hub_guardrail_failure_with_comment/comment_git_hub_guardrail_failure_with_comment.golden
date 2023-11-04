@@ -1,9 +1,9 @@
 Comment posted to GitHub
 
 Logs:
-level=info msg="Estimate uploaded to Infracost Cloud"
-level=info msg="1 guardrail checked"
-level=info msg="guardrail check failed: Stand by your estimate"
-level=info msg="Creating new comment"
-level=warning msg=">\\n<summary><strong>⚠️ Guardrails triggered</strong></summary>\\n\\t\\t\\t\\t\\n> - <b>Warning</b>: Stand by your estimate\\n</"
-level=info msg="Created new comment: "
+INF Estimate uploaded to Infracost Cloud
+INF 1 guardrail checked
+INF guardrail check failed: Stand by your estimate
+INF Creating new comment
+WRN >\n<summary><strong>⚠️ Guardrails triggered</strong></summary>\n\t\t\t\t\n> - <b>Warning</b>: Stand by your estimate\n</
+INF Created new comment: 

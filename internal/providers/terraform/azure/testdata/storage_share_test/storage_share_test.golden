@@ -144,4 +144,4 @@
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 Logs:
 
-level=warning msg="Skipping resource azurerm_storage_share.unsupported. Premium access tier is only supported for FileStorage accounts"
+WRN Skipping resource azurerm_storage_share.unsupported. Premium access tier is only supported for FileStorage accounts

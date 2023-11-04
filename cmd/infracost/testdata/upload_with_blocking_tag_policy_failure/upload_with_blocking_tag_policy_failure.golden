@@ -6,7 +6,7 @@ Error: Governance check failed:
 
 
 Logs:
-level=info msg="4 tag policies checked"
-level=info msg="Estimate uploaded to Infracost Cloud"
-level=info msg="2 tag policies checked"
-level=info msg="tag policy check failed: should show as failing"
+INF 4 tag policies checked
+INF Estimate uploaded to Infracost Cloud
+INF 2 tag policies checked
+INF tag policy check failed: should show as failing

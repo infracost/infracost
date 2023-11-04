@@ -282,7 +282,7 @@ func (c *Config) LogWriter() io.Writer {
 		w.NoColor = true
 		w.TimeFormat = time.RFC3339
 		if c.logDisableTimestamps {
-			w.TimeFormat = ""
+			w.PartsExclude = []string{"time"}
 		}
 
 		w.Out = os.Stderr

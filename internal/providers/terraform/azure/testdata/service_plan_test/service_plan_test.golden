@@ -826,9 +826,9 @@
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 Logs:
 
-level=warning msg="Multiple prices found for azurerm_service_plan.example[\"Windows.F1.1\"] Instance usage (F1), using the first price"
-level=warning msg="Multiple prices found for azurerm_service_plan.example[\"Windows.F1.2\"] Instance usage (F1), using the first price"
-level=warning msg="Multiple prices found for azurerm_service_plan.example[\"Windows.F1.3\"] Instance usage (F1), using the first price"
-level=warning msg="Multiple prices found for azurerm_service_plan.example[\"WindowsContainer.F1.1\"] Instance usage (F1), using the first price"
-level=warning msg="Multiple prices found for azurerm_service_plan.example[\"WindowsContainer.F1.2\"] Instance usage (F1), using the first price"
-level=warning msg="Multiple prices found for azurerm_service_plan.example[\"WindowsContainer.F1.3\"] Instance usage (F1), using the first price"
+WRN Multiple prices found for azurerm_service_plan.example["Windows.F1.1"] Instance usage (F1), using the first price
+WRN Multiple prices found for azurerm_service_plan.example["Windows.F1.2"] Instance usage (F1), using the first price
+WRN Multiple prices found for azurerm_service_plan.example["Windows.F1.3"] Instance usage (F1), using the first price
+WRN Multiple prices found for azurerm_service_plan.example["WindowsContainer.F1.1"] Instance usage (F1), using the first price
+WRN Multiple prices found for azurerm_service_plan.example["WindowsContainer.F1.2"] Instance usage (F1), using the first price
+WRN Multiple prices found for azurerm_service_plan.example["WindowsContainer.F1.3"] Instance usage (F1), using the first price
