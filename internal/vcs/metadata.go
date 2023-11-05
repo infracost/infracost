@@ -698,10 +698,10 @@ func (f *metadataFetcher) getAzureReposPRInfo() azurePullRequestResponse {
 
 	if res.StatusCode != http.StatusOK {
 		b, _ := io.ReadAll(res.Body)
-		logging.Logger.Debug().Fields(map[string]interface{}{
-			"status_code": res.StatusCode,
-			"response":    string(b),
-		}).Msgf("received non 200 status code from Azure DevOps pull request API call to: '%s'", apiURL)
+		logging.Logger.Debug().
+			Int("status_code", res.StatusCode).
+			Str("response", string(b)).
+			Msgf("received non 200 status code from Azure DevOps pull request API call to: '%s'", apiURL)
 		return out
 	}
 

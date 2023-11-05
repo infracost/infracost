@@ -796,10 +796,10 @@ func (p *HCLProvider) marshalBlock(block *hcl.Block, jsonValues map[string]inter
 
 		if v, ok := jsonValues[key]; ok {
 			if _, ok := v.(stdJson.RawMessage); ok {
-				p.logger.Debug().Fields(map[string]interface{}{
-					"parent_block": block.LocalName(),
-					"child_block":  b.LocalName(),
-				}).Msgf("skipping attribute '%s' that has also been declared as a child block", key)
+				p.logger.Debug().
+					Str("parent_block", block.LocalName()).
+					Str("child_block", b.LocalName()).
+					Msgf("skipping attribute '%s' that has also been declared as a child block", key)
 
 				continue
 			}

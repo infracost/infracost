@@ -30,10 +30,9 @@ type ProjectContext struct {
 }
 
 func NewProjectContext(runCtx *RunContext, projectCfg *Project, logFields interface{}) *ProjectContext {
-	ctx := logging.Logger.With().Fields(map[string]interface{}{
-		"project_name": projectCfg.Name,
-		"project_path": projectCfg.Path,
-	})
+	ctx := logging.Logger.With().
+		Str("project_name", projectCfg.Name).
+		Str("project_path", projectCfg.Path)
 
 	if logFields != nil {
 		switch v := logFields.(type) {

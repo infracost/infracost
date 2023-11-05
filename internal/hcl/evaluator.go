@@ -142,11 +142,11 @@ func NewEvaluator(
 		moduleName = "root"
 	}
 
-	l := logger.With().Fields(map[string]interface{}{
-		"module_name":   moduleName,
-		"module_source": module.Source,
-		"module_path":   module.ModulePath,
-	}).Logger()
+	l := logger.With().
+		Str("module_name", moduleName).
+		Str("module_source", module.Source).
+		Str("module_path", module.ModulePath).
+		Logger()
 
 	return &Evaluator{
 		module:         module,
