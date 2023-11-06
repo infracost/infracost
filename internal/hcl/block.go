@@ -271,6 +271,7 @@ type Block struct {
 	logger     zerolog.Logger
 	newMock    func(attr *Attribute) cty.Value
 	attributes []*Attribute
+	reference  *Reference
 
 	Filename  string
 	StartLine int
@@ -395,7 +396,7 @@ func (b BlockBuilder) CloneBlock(block *Block, index cty.Value) *Block {
 		} else {
 			labels[position] = fmt.Sprintf("%s[%d]", clone.hclBlock.Labels[position], block.cloneIndex)
 		}
-		clone.hclBlock.Labels = labels
+		clone.SetLabels(labels)
 	}
 
 	indexVal, _ := gocty.ToCtyValue(index, cty.Number)
@@ -531,8 +532,8 @@ func newArnAttribute(addressSha, name string, withCount bool, withEach bool) *hc
 // attributes set as contextual values on the child. In most cases this is because we've expanded
 // the block into further Blocks as part of a count or for_each.
 func (b *Block) InjectBlock(block *Block, name string) {
-	block.hclBlock.Labels = []string{}
-	block.hclBlock.Type = name
+	block.SetLabels([]string{})
+	block.SetType(name)
 
 	for attrName, attr := range block.AttributesAsMap() {
 		b.context.Root().SetByDot(attr.Value(), fmt.Sprintf("%s.%s.%s", b.Reference().String(), name, attrName))
@@ -1020,6 +1021,10 @@ func (b *Block) values() cty.Value {
 // Reference returns a Reference to the given Block this can be used to when printing
 // out full names of Blocks to stdout or a file.
 func (b *Block) Reference() *Reference {
+	if b.reference != nil && b.reference.String() != "" {
+		return b.reference
+	}
+
 	var parts []string
 
 	if b.Type() != "resource" || b.parent != nil {
@@ -1032,10 +1037,12 @@ func (b *Block) Reference() *Reference {
 		b.logger.Debug().Err(err).Msgf(
 			"returning empty block reference because we encountered an error generating a new reference",
 		)
-		return &Reference{}
+		ref = &Reference{}
 	}
 
-	return ref
+	b.reference = ref
+
+	return b.reference
 }
 
 // VerticesReferenced traverses the block attributes and child blocks to build a complete
@@ -1109,8 +1116,18 @@ func (b *Block) Type() string {
 	return b.hclBlock.Type
 }
 
+func (b *Block) SetType(t string) {
+	b.reference = nil
+	b.hclBlock.Type = t
+}
+
 func (b *Block) Labels() []string {
 	return b.hclBlock.Labels
+}
+
+func (b *Block) SetLabels(labels []string) {
+	b.reference = nil
+	b.hclBlock.Labels = labels
 }
 
 func (b *Block) Context() *Context {
