@@ -19,7 +19,6 @@ import (
 	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/object"
 	githttp "github.com/go-git/go-git/v5/plumbing/transport/http"
-	"github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 	"github.com/xanzy/go-gitlab"
 
@@ -177,7 +176,7 @@ func buildDefaultPR() *PullRequest {
 
 	provider := strings.ToLower(getEnv("INFRACOST_VCS_PROVIDER"))
 	if _, ok := allowedProviders[provider]; !ok && provider != "" {
-		logging.Logger.Warnf("provided value for INFRACOST_VCS_PROVIDER '%s' is not valid. Setting vcsProvider to an empty string", provider)
+		logging.Logger.Warn().Msgf("provided value for INFRACOST_VCS_PROVIDER '%s' is not valid. Setting vcsProvider to an empty string", provider)
 		provider = ""
 	}
 
@@ -236,7 +235,7 @@ func envToTime(key string) time.Time {
 
 	i, err := strconv.ParseInt(env, 10, 64)
 	if err != nil {
-		logging.Logger.WithError(err).Debugf("could not parse 'INFRACOST_COMMIT_TIMESTAMP' value '%s' as int64 timestamp", env)
+		logging.Logger.Debug().Err(err).Msgf("could not parse 'INFRACOST_COMMIT_TIMESTAMP' value '%s' as int64 timestamp", env)
 		return time.Time{}
 	}
 
@@ -296,59 +295,59 @@ func (f *metadataFetcher) Get(path string, gitDiffTarget *string) (m Metadata, e
 	}()
 
 	if f.isTest() {
-		logging.Logger.Debug("returning stub metadata as Infracost is running in test mode")
+		logging.Logger.Debug().Msg("returning stub metadata as Infracost is running in test mode")
 		return StubMetadata, nil
 	}
 
 	v, ok := lookupEnv("GITHUB_ACTIONS")
 	if ok && v != "" {
-		logging.Logger.Debug("fetching GitHub action VCS metadata")
+		logging.Logger.Debug().Msg("fetching GitHub action VCS metadata")
 		return f.getGithubMetadata(path, gitDiffTarget)
 	}
 
 	_, ok = lookupEnv("GITLAB_CI")
 	if ok {
-		logging.Logger.Debug("fetching Gitlab CI VCS metadata")
+		logging.Logger.Debug().Msg("fetching Gitlab CI VCS metadata")
 		return f.getGitlabMetadata(path, gitDiffTarget)
 	}
 
 	v, ok = lookupEnv("BUILD_REPOSITORY_PROVIDER")
 	if ok {
 		if v == "github" {
-			logging.Logger.Debug("fetching GitHub VCS metadata from Azure DevOps pipeline")
+			logging.Logger.Debug().Msg("fetching GitHub VCS metadata from Azure DevOps pipeline")
 			return f.getAzureReposGithubMetadata(path, gitDiffTarget)
 		}
 
-		logging.Logger.Debug("fetching Azure Repos VCS metadata")
+		logging.Logger.Debug().Msg("fetching Azure Repos VCS metadata")
 		return f.getAzureReposMetadata(path, gitDiffTarget)
 	}
 
 	_, ok = lookupEnv("BITBUCKET_COMMIT")
 	if ok {
-		logging.Logger.Debug("fetching GitHub VCS metadata from Bitbucket pipeline")
+		logging.Logger.Debug().Msg("fetching GitHub VCS metadata from Bitbucket pipeline")
 		return f.getBitbucketMetadata(path, gitDiffTarget)
 	}
 
 	_, ok = lookupEnv("CIRCLECI")
 	if ok {
-		logging.Logger.Debug("fetching GitHub VCS metadata from Circle CI")
+		logging.Logger.Debug().Msg("fetching GitHub VCS metadata from Circle CI")
 		return f.getCircleCIMetadata(path, gitDiffTarget)
 	}
 
 	ok = lookupEnvPrefix("ATLANTIS_")
 	if ok {
-		logging.Logger.Debug("fetching Atlantis VCS metadata")
+		logging.Logger.Debug().Msg("fetching Atlantis VCS metadata")
 		return f.getAtlantisMetadata(path, gitDiffTarget)
 	}
 
-	logging.Logger.Debug("could not detect a specific CI system, fetching local Git metadata")
+	logging.Logger.Debug().Msg("could not detect a specific CI system, fetching local Git metadata")
 	return f.getLocalGitMetadata(path, gitDiffTarget)
 }
 
 func lookupEnvPrefix(name string) bool {
 	for _, k := range os.Environ() {
 		if strings.HasPrefix(k, name) {
-			logging.Logger.Debugf("os env '%s' matched prefix '%s'", k, name)
+			logging.Logger.Debug().Msgf("os env '%s' matched prefix '%s'", k, name)
 			return true
 		}
 	}
@@ -400,7 +399,7 @@ func (f *metadataFetcher) getGithubMetadata(path string, gitDiffTarget *string) 
 	// if the branch name is HEAD this means that we're using a merge commit and need
 	// to fetch the actual commit.
 	if m.Branch.Name == "HEAD" {
-		logging.Logger.Debug("detected merge commit as branch name is HEAD, fetching author commit")
+		logging.Logger.Debug().Msg("detected merge commit as branch name is HEAD, fetching author commit")
 
 		r, err := git.PlainOpenWithOptions(path, &git.PlainOpenOptions{DetectDotGit: true})
 		if err != nil {
@@ -433,7 +432,7 @@ func (f *metadataFetcher) getGithubMetadata(path string, gitDiffTarget *string) 
 		// to clone each time.
 		_, err = os.Stat(clonePath)
 		if err == nil {
-			logging.Logger.Debugf("clone directory '%s' is not empty, opening existing directory", clonePath)
+			logging.Logger.Debug().Msgf("clone directory '%s' is not empty, opening existing directory", clonePath)
 			unlock()
 
 			r, err = git.PlainOpen(clonePath)
@@ -441,7 +440,7 @@ func (f *metadataFetcher) getGithubMetadata(path string, gitDiffTarget *string) 
 				return Metadata{}, fmt.Errorf("could not open previously cloned path %w", err)
 			}
 		} else {
-			logging.Logger.Debugf("cloning author commit into '%s'", clonePath)
+			logging.Logger.Debug().Msgf("cloning author commit into '%s'", clonePath)
 			r, err = git.PlainClone(clonePath, false, &git.CloneOptions{
 				URL:           gjson.GetBytes(event, "repository.clone_url").String(),
 				ReferenceName: plumbing.NewBranchReferenceName(headRef),
@@ -517,7 +516,7 @@ func (f *metadataFetcher) getLocalGitMetadata(path string, gitDiffTarget *string
 	var remote string
 	rem, err := r.Remote("origin")
 	if err != nil {
-		logging.Logger.WithError(err).Debug("failed to ls remotes")
+		logging.Logger.Debug().Err(err).Msg("failed to ls remotes")
 	}
 
 	if rem != nil {
@@ -538,32 +537,32 @@ func (f *metadataFetcher) getFileChanges(path string, r *git.Repository, current
 	changedMap := make(map[string]struct{})
 	tree, err := currentCommit.Tree()
 	if err != nil {
-		logging.Logger.WithError(err).Debug("could not get local git file changes, failed to get the tree of current commit")
+		logging.Logger.Debug().Err(err).Msg("could not get local git file changes, failed to get the tree of current commit")
 		return nil
 	}
 	var nextTree *object.Tree
 	if gitDiffTarget != nil {
 		b, err := r.ResolveRevision(plumbing.Revision(*gitDiffTarget))
 		if err != nil {
-			logging.Logger.WithError(err).Debugf("could not get local git file changes, could not resolve revision to branch %s", *gitDiffTarget)
+			logging.Logger.Debug().Err(err).Msgf("could not get local git file changes, could not resolve revision to branch %s", *gitDiffTarget)
 			return nil
 		}
 
 		previousCommit, err := r.CommitObject(*b)
 		if err != nil {
-			logging.Logger.WithError(err).Debug("could not get local git file changes, failed to get a branch commit to compare the current commit against")
+			logging.Logger.Debug().Err(err).Msg("could not get local git file changes, failed to get a branch commit to compare the current commit against")
 			return nil
 		}
 
 		nextTree, err = previousCommit.Tree()
 		if err != nil {
-			logging.Logger.WithError(err).Debug("could not get local git file changes, failed to get the tree of previous commits")
+			logging.Logger.Debug().Err(err).Msg("could not get local git file changes, failed to get the tree of previous commits")
 			return nil
 		}
 	} else {
 		commitIter, err := r.Log(&git.LogOptions{Order: git.LogOrderCommitterTime})
 		if err != nil {
-			logging.Logger.WithError(err).Debugf("could not get local git file changes, could not call git log using currentCommit hash %s", currentCommit.Hash)
+			logging.Logger.Debug().Err(err).Msgf("could not get local git file changes, could not call git log using currentCommit hash %s", currentCommit.Hash)
 			return nil
 		}
 
@@ -571,20 +570,20 @@ func (f *metadataFetcher) getFileChanges(path string, r *git.Repository, current
 		_, _ = commitIter.Next()
 		previousCommit, err := commitIter.Next()
 		if err != nil {
-			logging.Logger.WithError(err).Debug("could not get local git file changes, failed to get the previous commit to compare the current commit against, this is likely because of a shallow clone in CI")
+			logging.Logger.Debug().Err(err).Msg("could not get local git file changes, failed to get the previous commit to compare the current commit against, this is likely because of a shallow clone in CI")
 			return nil
 		}
 
 		nextTree, err = previousCommit.Tree()
 		if err != nil {
-			logging.Logger.WithError(err).Debug("could not get local git file changes, failed to get the tree of previous commit")
+			logging.Logger.Debug().Err(err).Msg("could not get local git file changes, failed to get the tree of previous commit")
 			return nil
 		}
 	}
 
 	changes, err := tree.Diff(nextTree)
 	if err != nil {
-		logging.Logger.WithError(err).Debug("could not get local git file changes, failed to get the diff between current and previous commit")
+		logging.Logger.Debug().Err(err).Msg("could not get local git file changes, failed to get the diff between current and previous commit")
 		return nil
 	}
 
@@ -619,7 +618,7 @@ func (f *metadataFetcher) getAzureReposMetadata(path string, gitDiffTarget *stri
 	if strings.ToLower(m.Branch.Name) == "head" {
 		err := f.transformAzureDevOpsMergeCommit(path, &m)
 		if err != nil {
-			logging.Logger.WithError(err).Debug("could not transform Azure DevOps merge commit continuing with provided PR values")
+			logging.Logger.Debug().Err(err).Msg("could not transform Azure DevOps merge commit continuing with provided PR values")
 		}
 	}
 
@@ -682,7 +681,7 @@ func (f *metadataFetcher) getAzureReposPRInfo() azurePullRequestResponse {
 	var out azurePullRequestResponse
 	systemAccessToken := strings.TrimSpace(getEnv("SYSTEM_ACCESSTOKEN"))
 	if systemAccessToken == "" {
-		logging.Logger.Debug("skipping fetching pr title and author, the required pipeline variable System.AccessToken was not provided as an env var named SYSTEM_ACCESSTOKEN")
+		logging.Logger.Debug().Msg("skipping fetching pr title and author, the required pipeline variable System.AccessToken was not provided as an env var named SYSTEM_ACCESSTOKEN")
 		return out
 	}
 
@@ -692,23 +691,23 @@ func (f *metadataFetcher) getAzureReposPRInfo() azurePullRequestResponse {
 
 	res, err := f.client.Do(req)
 	if err != nil {
-		logging.Logger.WithError(err).Debugf("could not fetch Azure DevOps pull request information using URL '%s'", apiURL)
+		logging.Logger.Debug().Err(err).Msgf("could not fetch Azure DevOps pull request information using URL '%s'", apiURL)
 		return out
 	}
 	defer res.Body.Close()
 
 	if res.StatusCode != http.StatusOK {
 		b, _ := io.ReadAll(res.Body)
-		logging.Logger.WithFields(logrus.Fields{
-			"status_code": res.StatusCode,
-			"response":    string(b),
-		}).Debugf("received non 200 status code from Azure DevOps pull request API call to: '%s'", apiURL)
+		logging.Logger.Debug().
+			Int("status_code", res.StatusCode).
+			Str("response", string(b)).
+			Msgf("received non 200 status code from Azure DevOps pull request API call to: '%s'", apiURL)
 		return out
 	}
 
 	err = json.NewDecoder(res.Body).Decode(&out)
 	if err != nil {
-		logging.Logger.WithError(err).Debugf("could not decode response body from Azure DevOps pull request API call to '%s'", apiURL)
+		logging.Logger.Debug().Err(err).Msgf("could not decode response body from Azure DevOps pull request API call to '%s'", apiURL)
 	}
 
 	return out
@@ -723,7 +722,7 @@ func (f *metadataFetcher) getAzureReposGithubMetadata(path string, gitDiffTarget
 	if strings.ToLower(m.Branch.Name) == "head" {
 		err := f.transformAzureDevOpsMergeCommit(path, &m)
 		if err != nil {
-			logging.Logger.WithError(err).Debug("could not transform Azure DevOps merge commit continuing with provided PR values")
+			logging.Logger.Debug().Err(err).Msg("could not transform Azure DevOps merge commit continuing with provided PR values")
 		}
 	}
 
@@ -756,7 +755,7 @@ func (f *metadataFetcher) transformAzureDevOpsMergeCommit(path string, m *Metada
 
 	matches := mergeCommitRegxp.FindStringSubmatch(m.Commit.Message)
 	if len(matches) <= 1 {
-		logging.Logger.Debugf("could not find reference to PR commit in merge commit message '%s' using git log strategy", m.Commit.Message)
+		logging.Logger.Debug().Msgf("could not find reference to PR commit in merge commit message '%s' using git log strategy", m.Commit.Message)
 
 		commit, err := f.shiftCommit(path)
 		if err != nil {
@@ -815,7 +814,7 @@ func (f *metadataFetcher) shiftCommit(path string) (Commit, error) {
 			return commitToMetadata(c, nil), nil
 		}
 
-		logging.Logger.Debugf("ignoring commit with msg '%s'", c.Message)
+		logging.Logger.Debug().Msgf("ignoring commit with msg '%s'", c.Message)
 	}
 }
 
@@ -906,7 +905,7 @@ func (f *metadataFetcher) getGitlabPullRequestAuthor() string {
 
 	client, err := gitlab.NewClient(os.Getenv("GITLAB_TOKEN"), f.gitlabClientOps()...)
 	if err != nil {
-		logging.Logger.WithError(err).Debug("failed to init gitlab client, returning commit author")
+		logging.Logger.Debug().Err(err).Msg("failed to init gitlab client, returning commit author")
 		return author
 	}
 
@@ -914,18 +913,18 @@ func (f *metadataFetcher) getGitlabPullRequestAuthor() string {
 	mergeRequestID := os.Getenv("CI_MERGE_REQUEST_IID")
 	id, err := strconv.Atoi(mergeRequestID)
 	if err != nil {
-		logging.Logger.WithError(err).Debugf("failed to convert gitlab merge request iid %q to int, returning commit author", mergeRequestID)
+		logging.Logger.Debug().Err(err).Msgf("failed to convert gitlab merge request iid %q to int, returning commit author", mergeRequestID)
 		return author
 	}
 
 	mergeRequest, _, err := client.MergeRequests.GetMergeRequest(projectID, id, nil)
 	if err != nil {
-		logging.Logger.WithError(err).Debugf("failed to lookup gitlab merge request '%d' for project %q, returning commit author", id, projectID)
+		logging.Logger.Debug().Err(err).Msgf("failed to lookup gitlab merge request '%d' for project %q, returning commit author", id, projectID)
 		return author
 	}
 
 	if mergeRequest.Author == nil {
-		logging.Logger.Debugf("get merge request '%d' for project %q returned nil author, returning commit author", id, projectID)
+		logging.Logger.Debug().Msgf("get merge request '%d' for project %q returned nil author, returning commit author", id, projectID)
 		return author
 	}
 
@@ -941,7 +940,7 @@ func (f *metadataFetcher) gitlabClientOps() []gitlab.ClientOptionFunc {
 
 	u, err := url.Parse(v)
 	if err != nil {
-		logging.Logger.WithError(err).Debugf("could not parse %q as a valid URL", v)
+		logging.Logger.Debug().Err(err).Msgf("could not parse %q as a valid URL", v)
 		return ops
 	}
 
@@ -1074,17 +1073,17 @@ func urlStringToRemote(remote string) Remote {
 		}
 	}
 
-	logging.Logger.WithError(err).Debugf("parsing remote '%s' as SCP string", remote)
+	logging.Logger.Debug().Err(err).Msgf("parsing remote '%s' as SCP string", remote)
 
 	match := scpSyntax.FindAllStringSubmatch(remote, -1)
 	if len(match) == 0 {
-		logging.Logger.Debug("remote did not match SCP regexp")
+		logging.Logger.Debug().Msg("remote did not match SCP regexp")
 		return Remote{}
 	}
 
 	m := match[0]
 	if len(m) < 4 {
-		logging.Logger.Debug("SCP remote was malformed")
+		logging.Logger.Debug().Msg("SCP remote was malformed")
 		return Remote{}
 	}
 

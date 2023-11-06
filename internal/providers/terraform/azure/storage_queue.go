@@ -3,9 +3,10 @@ package azure
 import (
 	"strings"
 
+	"github.com/rs/zerolog/log"
+
 	"github.com/infracost/infracost/internal/resources/azure"
 	"github.com/infracost/infracost/internal/schema"
-	log "github.com/sirupsen/logrus"
 )
 
 func getStorageQueueRegistryItem() *schema.RegistryItem {
@@ -29,7 +30,7 @@ func newStorageQueue(d *schema.ResourceData) schema.CoreResource {
 
 		accountTier := storageAccount.Get("account_tier").String()
 		if strings.EqualFold(accountTier, "premium") {
-			log.Warnf("Skipping resource %s. Storage Queues don't support %s tier", d.Address, accountTier)
+			log.Warn().Msgf("Skipping resource %s. Storage Queues don't support %s tier", d.Address, accountTier)
 			return nil
 		}
 

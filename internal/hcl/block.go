@@ -12,7 +12,7 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 
@@ -258,7 +258,7 @@ type Block struct {
 	parent *Block
 	// verbose determines whether the block uses verbose debug logging.
 	verbose    bool
-	logger     *logrus.Entry
+	logger     zerolog.Logger
 	newMock    func(attr *Attribute) cty.Value
 	attributes []*Attribute
 
@@ -271,7 +271,7 @@ type Block struct {
 type BlockBuilder struct {
 	MockFunc      func(a *Attribute) cty.Value
 	SetAttributes []SetAttributesFunc
-	Logger        *logrus.Entry
+	Logger        zerolog.Logger
 }
 
 // NewBlock returns a Block with Context and child Blocks initialised.
@@ -313,7 +313,7 @@ func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.B
 	// This might be because the *hcl.Block represents a whole file contents.
 	content, _, diag := hclBlock.Body.PartialContent(terraformSchemaV012)
 	if diag != nil && diag.HasErrors() {
-		b.Logger.Debugf("error loading partial content from hcl file %s", diag.Error())
+		b.Logger.Debug().Msgf("error loading partial content from hcl file %s", diag.Error())
 
 		block := &Block{
 			Filename:    filename,
@@ -379,7 +379,7 @@ func (b BlockBuilder) CloneBlock(block *Block, index cty.Value) *Block {
 			case cty.String:
 				labels[position] = fmt.Sprintf("%s[%q]", clone.hclBlock.Labels[position], index.AsString())
 			default:
-				b.Logger.Debugf("Invalid key type in iterable: %#v", index.Type())
+				b.Logger.Debug().Msgf("Invalid key type in iterable: %#v", index.Type())
 				labels[position] = fmt.Sprintf("%s[%#v]", clone.hclBlock.Labels[position], index)
 			}
 		} else {
@@ -413,7 +413,7 @@ func (b BlockBuilder) BuildModuleBlocks(block *Block, modulePath string, rootPat
 		}
 
 		if len(fileBlocks) > 0 {
-			b.Logger.Debugf("Added %d blocks from %s...", len(fileBlocks), fileBlocks[0].DefRange.Filename)
+			b.Logger.Debug().Msgf("Added %d blocks from %s...", len(fileBlocks), fileBlocks[0].DefRange.Filename)
 		}
 
 		for _, fileBlock := range fileBlocks {
@@ -633,14 +633,12 @@ type ModuleMetadata struct {
 	EndLine   int    `json:"endLine,omitempty"`
 }
 
-func (b *Block) setLogger(logger *logrus.Entry) {
+func (b *Block) setLogger(logger zerolog.Logger) {
 	// Use the provided logger as is initially so we avoid a nil pointer in the case where we need to log
 	// an error while calculating b.FullName().
 	b.logger = logger
 
-	blockLogger := logger.WithFields(logrus.Fields{
-		"block_name": b.FullName(),
-	})
+	blockLogger := logger.With().Str("block_name", b.FullName()).Logger()
 
 	b.logger = blockLogger
 }
@@ -831,9 +829,9 @@ func (b *Block) GetAttributes() []*Attribute {
 			HCLAttr: hclAttributes[k],
 			Ctx:     b.context,
 			Verbose: b.verbose,
-			Logger: b.logger.WithFields(logrus.Fields{
-				"attribute_name": hclAttributes[k].Name,
-			}),
+			Logger: b.logger.With().Str(
+				"attribute_name", hclAttributes[k].Name,
+			).Logger(),
 		})
 	}
 
@@ -850,7 +848,7 @@ func (b *Block) loadFileContentsToAttributes(attributes []*Attribute) []*Attribu
 		if attribute.Name() == "filename" {
 			content, err := funcs.File(b.rootPath, attribute.Value())
 			if err != nil {
-				b.logger.WithError(err).Debugf("failed to load %s file contents", b.FullName())
+				b.logger.Debug().Err(err).Msgf("failed to load %s file contents", b.FullName())
 				break
 			}
 
@@ -888,9 +886,9 @@ func (b *Block) syntheticAttribute(name string, val cty.Value) *Attribute {
 		HCLAttr: hclAttr,
 		Ctx:     b.context,
 		Verbose: b.verbose,
-		Logger: b.logger.WithFields(logrus.Fields{
-			"attribute_name": name,
-		}),
+		Logger: b.logger.With().Str(
+			"attribute_name", name,
+		).Logger(),
 	}
 }
 
@@ -1021,7 +1019,7 @@ func (b *Block) Reference() *Reference {
 	parts = append(parts, b.Labels()...)
 	ref, err := newReference(parts)
 	if err != nil {
-		b.logger.WithError(err).Debugf(
+		b.logger.Debug().Err(err).Msgf(
 			"returning empty block reference because we encountered an error generating a new reference",
 		)
 		return &Reference{}
@@ -1208,7 +1206,7 @@ func randomShuffleValues(b *Block) cty.Value {
 	var x = 1
 	err := gocty.FromCtyValue(count, &x)
 	if err != nil {
-		b.logger.WithError(err).Debugf("couldn't load result_count to int for random_shuffle")
+		b.logger.Debug().Err(err).Msgf("couldn't load result_count to int for random_shuffle")
 	}
 
 	if x > len(elements)-1 {
@@ -1240,7 +1238,7 @@ func googleComputeZonesValues(b *Block) cty.Value {
 		if err == nil {
 			region = str
 		} else {
-			b.logger.WithError(err).Debugf("could not parse gcp compute zone region")
+			b.logger.Debug().Err(err).Msgf("could not parse gcp compute zone region")
 		}
 	}
 

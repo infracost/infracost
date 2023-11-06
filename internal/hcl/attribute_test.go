@@ -8,7 +8,7 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclparse"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"github.com/zclconf/go-cty/cty"
@@ -140,15 +140,8 @@ locals {
 	require.False(t, diags.HasErrors(), "diags has unexpected error %s fetching attributes", diags.Error())
 
 	buf := bytes.NewBuffer([]byte{})
-	l := logrus.New()
-	l.SetFormatter(&logrus.TextFormatter{DisableTimestamp: true})
-	l.SetOutput(buf)
-	l.SetLevel(logrus.DebugLevel)
-	logger := logrus.NewEntry(l)
-
-	l2 := logrus.New()
-	l2.SetOutput(io.Discard)
-	discard := logrus.NewEntry(l2)
+	logger := zerolog.New(buf).Level(zerolog.DebugLevel)
+	discard := zerolog.New(io.Discard)
 
 	tag := Attribute{
 		HCLAttr: attrs["transformed_tags"],

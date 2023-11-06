@@ -197,4 +197,4 @@
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 Logs:
 
-level=warning msg="Skipping resource aws_instance.instance1_hostTenancy. Infracost currently does not support host tenancy for AWS EC2 instances without Host ID set up"
+WRN Skipping resource aws_instance.instance1_hostTenancy. Infracost currently does not support host tenancy for AWS EC2 instances without Host ID set up

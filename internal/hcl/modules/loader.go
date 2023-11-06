@@ -15,7 +15,7 @@ import (
 
 	getter "github.com/hashicorp/go-getter"
 	"github.com/hashicorp/terraform-config-inspect/tfconfig"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 	"golang.org/x/sync/errgroup"
 
 	"github.com/infracost/infracost/internal/config"
@@ -54,7 +54,7 @@ type ModuleLoader struct {
 
 	packageFetcher *PackageFetcher
 	registryLoader *RegistryLoader
-	logger         *logrus.Entry
+	logger         zerolog.Logger
 }
 
 type SourceMapResult struct {
@@ -64,7 +64,7 @@ type SourceMapResult struct {
 }
 
 // NewModuleLoader constructs a new module loader
-func NewModuleLoader(cachePath string, credentialsSource *CredentialsSource, sourceMap config.TerraformSourceMap, logger *logrus.Entry, moduleSync *intSync.KeyMutex) *ModuleLoader {
+func NewModuleLoader(cachePath string, credentialsSource *CredentialsSource, sourceMap config.TerraformSourceMap, logger zerolog.Logger, moduleSync *intSync.KeyMutex) *ModuleLoader {
 	fetcher := NewPackageFetcher(logger)
 	// we need to have a disco for each project that has defined credentials
 	d := NewDisco(credentialsSource, logger)
@@ -123,7 +123,7 @@ func (m *ModuleLoader) Load(path string) (man *Manifest, err error) {
 	manifestFilePath := m.manifestFilePath(path)
 	_, err = os.Stat(manifestFilePath)
 	if errors.Is(err, os.ErrNotExist) {
-		m.logger.Debug("No existing module manifest file found")
+		m.logger.Debug().Msg("No existing module manifest file found")
 
 		tfManifestFilePath := m.tfManifestFilePath(path)
 		_, err = os.Stat(tfManifestFilePath)
@@ -145,14 +145,14 @@ func (m *ModuleLoader) Load(path string) (man *Manifest, err error) {
 				return manifest, nil
 			}
 
-			m.logger.WithError(err).Debug("error reading terraform module manifest")
+			m.logger.Debug().Err(err).Msg("error reading terraform module manifest")
 		}
 	} else if err != nil {
-		m.logger.WithError(err).Debug("error checking for existing module manifest")
+		m.logger.Debug().Err(err).Msg("error checking for existing module manifest")
 	} else {
 		manifest, err = readManifest(manifestFilePath)
 		if err != nil {
-			m.logger.WithError(err).Debug("could not read module manifest")
+			m.logger.Debug().Err(err).Msg("could not read module manifest")
 		}
 
 		if manifest.Version != supportedManifestVersion {
@@ -172,7 +172,7 @@ func (m *ModuleLoader) Load(path string) (man *Manifest, err error) {
 
 	err = writeManifest(manifest, manifestFilePath)
 	if err != nil {
-		m.logger.WithError(err).Debug("error writing module manifest")
+		m.logger.Debug().Err(err).Msg("error writing module manifest")
 	}
 
 	return manifest, nil
@@ -252,18 +252,18 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 	}
 
 	if mappedResult.Source != source {
-		m.logger.Debugf("remapping module source %s to %s", source, mappedResult.Source)
+		m.logger.Debug().Msgf("remapping module source %s to %s", source, mappedResult.Source)
 		source = mappedResult.Source
 	}
 
 	if mappedResult.Version != "" {
-		m.logger.Debugf("remapping module version %s to %s", version, mappedResult.Version)
+		m.logger.Debug().Msgf("remapping module version %s to %s", version, mappedResult.Version)
 		version = mappedResult.Version
 	}
 
 	manifestModule, err := m.cache.lookupModule(key, moduleCall)
 	if err == nil {
-		m.logger.Debugf("module %s already loaded", key)
+		m.logger.Debug().Msgf("module %s already loaded", key)
 
 		// Test if we can actually load the module. If not, then we should try re-loading it.
 		// This can happen if the directory the module was downloaded to has been deleted and moved
@@ -273,9 +273,9 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 			return manifestModule, err
 		}
 
-		m.logger.Debugf("module %s cannot be loaded, re-loading: %s", key, diags.Err())
+		m.logger.Debug().Msgf("module %s cannot be loaded, re-loading: %s", key, diags.Err())
 	} else {
-		m.logger.Debugf("module %s needs loading: %s", key, err.Error())
+		m.logger.Debug().Msgf("module %s needs loading: %s", key, err.Error())
 	}
 	if m.isLocalModule(source) {
 		dir, err := m.cachePathRel(filepath.Join(parentPath, source))
@@ -283,7 +283,7 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 			return nil, err
 		}
 
-		m.logger.Debugf("loading local module %s from %s", key, dir)
+		m.logger.Debug().Msgf("loading local module %s from %s", key, dir)
 		return &ManifestModule{
 			Key:    key,
 			Source: source,
@@ -413,22 +413,22 @@ func (m *ModuleLoader) cachePathRel(targetPath string) (string, error) {
 	if relerr == nil {
 		return rel, nil
 	}
-	m.logger.Infof("Failed to filepath.Rel cache=%s target=%s: %v", m.cachePath, targetPath, relerr)
+	m.logger.Info().Msgf("Failed to filepath.Rel cache=%s target=%s: %v", m.cachePath, targetPath, relerr)
 
 	// try converting to absolute paths
 	absCachePath, abserr := filepath.Abs(m.cachePath)
 	if abserr != nil {
-		m.logger.Infof("Failed to filepath.Abs cachePath: %v", abserr)
+		m.logger.Info().Msgf("Failed to filepath.Abs cachePath: %v", abserr)
 		return "", relerr
 	}
 
 	absTargetPath, abserr := filepath.Abs(targetPath)
 	if abserr != nil {
-		m.logger.Infof("Failed to filepath.Abs target: %v", abserr)
+		m.logger.Info().Msgf("Failed to filepath.Abs target: %v", abserr)
 		return "", relerr
 	}
 
-	m.logger.Infof("Attempting filepath.Rel on abs paths cache=%s, target=%s", absCachePath, absTargetPath)
+	m.logger.Info().Msgf("Attempting filepath.Rel on abs paths cache=%s, target=%s", absCachePath, absTargetPath)
 	return filepath.Rel(absCachePath, absTargetPath)
 }
 

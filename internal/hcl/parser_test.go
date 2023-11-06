@@ -8,6 +8,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/rs/zerolog"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -776,10 +777,8 @@ func createTestFileWithModule(contents string, moduleContents string, moduleName
 	return rootPath
 }
 
-func newDiscardLogger() *logrus.Entry {
-	l := logrus.New()
-	l.SetOutput(io.Discard)
-	return l.WithFields(logrus.Fields{})
+func newDiscardLogger() zerolog.Logger {
+	return zerolog.New(io.Discard)
 }
 
 func Test_NestedForEach(t *testing.T) {

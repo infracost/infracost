@@ -10,7 +10,7 @@ import (
 
 	"github.com/shopspring/decimal"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 )
 
 type SQLDatabaseInstance struct {
@@ -82,7 +82,7 @@ func (r *SQLDatabaseInstance) sqlDatabaseInstanceCostComponents(replica bool, na
 		splittedTier := strings.Split(tier, "-")
 		cpu, err := strconv.ParseInt(splittedTier[2], 10, 32)
 		if err != nil {
-			log.Warnf("cpu of tier %s of %s is not parsable", tier, r.Address)
+			log.Warn().Msgf("cpu of tier %s of %s is not parsable", tier, r.Address)
 			return nil
 		}
 		vCPU := decimalPtr(decimal.NewFromInt32(int32(cpu)))
@@ -90,12 +90,12 @@ func (r *SQLDatabaseInstance) sqlDatabaseInstanceCostComponents(replica bool, na
 		costComponents = append(costComponents, r.cpuCostComponent(vCPU))
 
 		if len(splittedTier) < 4 {
-			log.Warnf("tier %s of %s has no ram data", tier, r.Address)
+			log.Warn().Msgf("tier %s of %s has no ram data", tier, r.Address)
 			return nil
 		}
 		ram, err := strconv.ParseInt(splittedTier[3], 10, 32)
 		if err != nil {
-			log.Warnf("ram of tier %s of %s is not parsable", tier, r.Address)
+			log.Warn().Msgf("ram of tier %s of %s is not parsable", tier, r.Address)
 			return nil
 		}
 		memory := decimalPtr(decimal.NewFromInt32(int32(ram)).Div(decimal.NewFromInt(1024)))

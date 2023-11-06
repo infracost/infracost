@@ -95,4 +95,4 @@
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 Logs:
 
-level=warning msg="Skipping resource google_compute_instance.e2_custom. Infracost currently does not support E2 custom instances"
+WRN Skipping resource google_compute_instance.e2_custom. Infracost currently does not support E2 custom instances

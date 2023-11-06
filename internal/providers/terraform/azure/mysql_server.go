@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/rs/zerolog/log"
+
 	"github.com/infracost/infracost/internal/schema"
-	log "github.com/sirupsen/logrus"
 
 	"github.com/shopspring/decimal"
 )
@@ -30,7 +31,7 @@ func NewAzureRMMySQLServer(d *schema.ResourceData, u *schema.UsageData) *schema.
 		family = strings.Split(sku, "_")[1]
 		cores = strings.Split(sku, "_")[2]
 	} else {
-		log.Warnf("Unrecognised MySQL SKU format for resource %s: %s", d.Address, sku)
+		log.Warn().Msgf("Unrecognised MySQL SKU format for resource %s: %s", d.Address, sku)
 		return nil
 	}
 
@@ -41,7 +42,7 @@ func NewAzureRMMySQLServer(d *schema.ResourceData, u *schema.UsageData) *schema.
 	}[tier]
 
 	if tierName == "" {
-		log.Warnf("Unrecognised MySQL tier prefix for resource %s: %s", d.Address, tierName)
+		log.Warn().Msgf("Unrecognised MySQL tier prefix for resource %s: %s", d.Address, tierName)
 		return nil
 	}
 
@@ -49,7 +50,7 @@ func NewAzureRMMySQLServer(d *schema.ResourceData, u *schema.UsageData) *schema.
 	skuName := fmt.Sprintf("%s vCore", cores)
 
 	name := fmt.Sprintf("Compute (%s)", sku)
-	log.Warnf("'Multiple products found' are safe to ignore for '%s' due to limitations in the Azure API.", name)
+	log.Warn().Msgf("'Multiple products found' are safe to ignore for '%s' due to limitations in the Azure API.", name)
 
 	costComponents = append(costComponents, databaseComputeInstance(region, name, serviceName, productNameRegex, skuName))
 

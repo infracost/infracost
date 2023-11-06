@@ -85,11 +85,11 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 	if ctx.IsCloudUploadEnabled() && ctx.Config.PolicyV2APIEndpoint != "" {
 		policyClient, err := apiclient.NewPolicyAPIClient(ctx)
 		if err != nil {
-			logging.Logger.WithError(err).Error("Failed to initialize policies client")
+			logging.Logger.Err(err).Msg("Failed to initialize policies client")
 		} else {
 			policies, err := policyClient.CheckPolicies(ctx, combined)
 			if err != nil {
-				logging.Logger.WithError(err).Error("Failed to check policies")
+				logging.Logger.Err(err).Msg("Failed to check policies")
 			}
 
 			combined.TagPolicies = policies.TagPolicies

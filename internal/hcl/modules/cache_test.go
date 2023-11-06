@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/hashicorp/terraform-config-inspect/tfconfig"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -40,12 +40,10 @@ func TestLookupModule(t *testing.T) {
 		},
 	}
 
-	l := logrus.New()
-	l.SetOutput(io.Discard)
-	logger := logrus.NewEntry(l)
+	logger := zerolog.New(io.Discard)
 
 	cache := &Cache{
-		disco:  NewDisco(nil, logrus.NewEntry(logrus.New())),
+		disco:  NewDisco(nil, logger),
 		logger: logger,
 	}
 

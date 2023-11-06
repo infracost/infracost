@@ -7,7 +7,7 @@ import (
 	"sort"
 
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 
 	"github.com/infracost/infracost/internal/extclient"
@@ -19,7 +19,7 @@ type RemoteVariablesLoader struct {
 	client         *extclient.AuthedAPIClient
 	localWorkspace string
 	newSpinner     ui.SpinnerFunc
-	logger         *log.Entry
+	logger         zerolog.Logger
 }
 
 // RemoteVariablesLoaderOption defines a function that can set properties on an RemoteVariablesLoader.
@@ -84,7 +84,7 @@ func RemoteVariablesLoaderWithSpinner(f ui.SpinnerFunc) RemoteVariablesLoaderOpt
 }
 
 // NewRemoteVariablesLoader constructs a new loader for fetching remote variables.
-func NewRemoteVariablesLoader(client *extclient.AuthedAPIClient, localWorkspace string, logger *log.Entry, opts ...RemoteVariablesLoaderOption) *RemoteVariablesLoader {
+func NewRemoteVariablesLoader(client *extclient.AuthedAPIClient, localWorkspace string, logger zerolog.Logger, opts ...RemoteVariablesLoaderOption) *RemoteVariablesLoader {
 	if localWorkspace == "" {
 		localWorkspace = os.Getenv("TF_WORKSPACE")
 	}
@@ -137,18 +137,18 @@ func (r *RemoteVariablesLoader) Load(blocks Blocks) (map[string]cty.Value, error
 	endpoint := fmt.Sprintf("/api/v2/organizations/%s/workspaces/%s", config.organization, config.workspace)
 	body, err := r.client.Get(endpoint)
 	if err != nil {
-		r.logger.WithError(err).Warnf("could not request Terraform workspace: %s for organization: %s", config.workspace, config.organization)
+		r.logger.Warn().Err(err).Msgf("could not request Terraform workspace: %s for organization: %s", config.workspace, config.organization)
 		return vars, nil
 	}
 
 	var workspaceResponse tfcWorkspaceResponse
 	if json.Unmarshal(body, &workspaceResponse) != nil {
-		r.logger.WithError(err).Warnf("malformed Terraform API response using workspace: %s organization: %s", config.workspace, config.organization)
+		r.logger.Warn().Err(err).Msgf("malformed Terraform API response using workspace: %s organization: %s", config.workspace, config.organization)
 		return vars, nil
 	}
 
 	if workspaceResponse.Data.Attributes.ExecutionMode == "local" {
-		r.logger.Debugf("Terraform workspace %s does use local execution, skipping downloading remote variables", config.workspace)
+		r.logger.Debug().Msgf("Terraform workspace %s does use local execution, skipping downloading remote variables", config.workspace)
 		return vars, nil
 	}
 

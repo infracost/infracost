@@ -3,8 +3,8 @@ package schema
 import (
 	"sort"
 
+	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
-	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 )
 
@@ -77,7 +77,7 @@ func (r *Resource) CalculateCosts() {
 		r.MonthlyCost = &m
 	}
 	if r.NoPrice {
-		log.Debugf("Skipping free resource %s", r.Name)
+		log.Debug().Msgf("Skipping free resource %s", r.Name)
 	}
 }
 

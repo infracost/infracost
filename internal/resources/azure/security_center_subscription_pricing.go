@@ -1,11 +1,13 @@
 package azure
 
 import (
+	"strings"
+
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
-	"strings"
 )
 
 // SecurityCenterSubscriptionPricing struct represents the pricing structure for Microsoft Defender for Cloud.
@@ -106,7 +108,7 @@ func (r *SecurityCenterSubscriptionPricing) BuildResource() *schema.Resource {
 	case "cosmosdbs":
 		costComponents = []*schema.CostComponent{r.addCosmosDBCostComponent()}
 	default:
-		logging.Logger.Warnf("Skipping resource %s. Unknown resource tyoe  '%s'", r.Address, r.ResourceType)
+		logging.Logger.Warn().Msgf("Skipping resource %s. Unknown resource tyoe  '%s'", r.Address, r.ResourceType)
 	}
 
 	return &schema.Resource{

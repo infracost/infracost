@@ -413,7 +413,7 @@ func guestAcceleratorCostComponent(region string, purchaseOption string, guestAc
 		name = "NVIDIA Tesla A100"
 		descPrefix = "Nvidia Tesla A100 GPU"
 	default:
-		logging.Logger.Debugf("skipping cost component because guest_accelerator.type '%s' is not supported", guestAcceleratorType)
+		logging.Logger.Debug().Msgf("skipping cost component because guest_accelerator.type '%s' is not supported", guestAcceleratorType)
 		return nil
 	}
 

@@ -10,7 +10,7 @@ import (
 	"github.com/kballard/go-shellquote"
 
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
@@ -77,7 +77,7 @@ func (p *TerragruntProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 
 	modulePath, err := filepath.Rel(basePath, metadata.Path)
 	if err == nil && modulePath != "" && modulePath != "." {
-		log.Debugf("Calculated relative terraformModulePath for %s from %s", basePath, metadata.Path)
+		log.Debug().Msgf("Calculated relative terraformModulePath for %s from %s", basePath, metadata.Path)
 		metadata.TerraformModulePath = modulePath
 	}
 
@@ -290,7 +290,7 @@ func (p *TerragruntProvider) generatePlanJSONs(projectDirs []terragruntProjectDi
 	defer func() {
 		err := cleanupPlanFiles(projectDirs, planFile)
 		if err != nil {
-			log.Warnf("Error cleaning up plan files: %v", err)
+			log.Warn().Msgf("Error cleaning up plan files: %v", err)
 		}
 	}()
 

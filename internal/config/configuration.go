@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v2"
 )
 
@@ -28,8 +28,7 @@ func loadConfiguration(cfg *Config) error {
 
 	err = cfg.migrateConfiguration()
 	if err != nil {
-		logrus.Debug("Error migrating configuration")
-		logrus.Debug(err)
+		log.Debug().Err(err).Msg("error migrating configuration")
 	}
 
 	cfg.Configuration, err = readConfigurationFileIfExists()

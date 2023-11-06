@@ -32,7 +32,7 @@ func newBackupProtectedVm(d *schema.ResourceData) *azure.BackupProtectedVM {
 	region := lookupRegion(d, []string{"resource_group_name"})
 	vms := d.References("source_vm_id")
 	if len(vms) == 0 {
-		logging.Logger.Warnf("skipping resource %s as cannot find referenced source vm", d.Address)
+		logging.Logger.Warn().Msgf("skipping resource %s as cannot find referenced source vm", d.Address)
 		return nil
 	}
 

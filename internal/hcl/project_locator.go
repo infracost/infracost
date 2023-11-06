@@ -7,7 +7,7 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclparse"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 )
@@ -20,7 +20,7 @@ type ProjectLocator struct {
 	excludedDirs   []string
 	changedObjects []string
 	useAllPaths    bool
-	logger         *logrus.Entry
+	logger         zerolog.Logger
 
 	basePath           string
 	discoveredVarFiles map[string][]string
@@ -34,7 +34,7 @@ type ProjectLocatorConfig struct {
 }
 
 // NewProjectLocator returns safely initialized ProjectLocator.
-func NewProjectLocator(logger *logrus.Entry, config *ProjectLocatorConfig) *ProjectLocator {
+func NewProjectLocator(logger zerolog.Logger, config *ProjectLocatorConfig) *ProjectLocator {
 	if config != nil {
 		return &ProjectLocator{
 			modules:            make(map[string]struct{}),
@@ -144,17 +144,17 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 
 	isSkipped := p.buildSkippedMatcher(fullPath)
 	dirs := p.walkPaths(fullPath, 0)
-	p.logger.Debugf("walking directory at %s returned a list of possible Terraform projects: %+v", fullPath, dirs)
+	p.logger.Debug().Msgf("walking directory at %s returned a list of possible Terraform projects: %+v", fullPath, dirs)
 
 	var projects []RootPath
 	for _, dir := range dirs {
 		if isSkipped(dir) {
-			p.logger.Debugf("skipping directory %s as it is marked as excluded by --exclude-path", dir)
+			p.logger.Debug().Msgf("skipping directory %s as it is marked as excluded by --exclude-path", dir)
 			continue
 		}
 
 		if _, ok := p.modules[dir]; ok && !p.useAllPaths {
-			p.logger.Debugf("skipping directory %s as it has been called as a module", dir)
+			p.logger.Debug().Msgf("skipping directory %s as it has been called as a module", dir)
 			continue
 		}
 
@@ -177,10 +177,10 @@ func (p *ProjectLocator) maxSearchDepth() int {
 }
 
 func (p *ProjectLocator) walkPaths(fullPath string, level int) []string {
-	p.logger.Debugf("walking path %s to discover terraform files", fullPath)
+	p.logger.Debug().Msgf("walking path %s to discover terraform files", fullPath)
 
 	if level >= p.maxSearchDepth() {
-		p.logger.Debugf("exiting parsing directory %s as it is outside the maximum evaluation threshold", fullPath)
+		p.logger.Debug().Msgf("exiting parsing directory %s as it is outside the maximum evaluation threshold", fullPath)
 		return nil
 	}
 
@@ -188,7 +188,7 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) []string {
 
 	fileInfos, err := os.ReadDir(fullPath)
 	if err != nil {
-		p.logger.WithError(err).Warnf("could not get file information for path %s skipping evaluation", fullPath)
+		p.logger.Warn().Err(err).Msgf("could not get file information for path %s skipping evaluation", fullPath)
 		return nil
 	}
 
@@ -226,7 +226,7 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) []string {
 		path := filepath.Join(fullPath, name)
 		_, diag := parseFunc(path)
 		if diag != nil && diag.HasErrors() {
-			p.logger.Debugf("skipping file: %s hcl parsing err: %s", path, diag.Error())
+			p.logger.Debug().Msgf("skipping file: %s hcl parsing err: %s", path, diag.Error())
 			continue
 		}
 	}
@@ -237,7 +237,7 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) []string {
 	for _, file := range files {
 		body, content, diags := file.Body.PartialContent(justProviderBlocks)
 		if diags != nil && diags.HasErrors() {
-			p.logger.WithError(diags).Warnf("skipping building module information for file %s as failed to get partial body contents", file)
+			p.logger.Warn().Err(diags).Msgf("skipping building module information for file %s as failed to get partial body contents", file)
 			continue
 		}
 
@@ -251,19 +251,16 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) []string {
 			a, _ := module.Body.JustAttributes()
 			if src, ok := a["source"]; ok {
 				val, _ := src.Expr.Value(nil)
-				fields := logrus.Fields{
-					"module": strings.Join(module.Labels, "."),
-				}
 
 				if val.Type() != cty.String {
-					p.logger.WithFields(fields).Debugf("got unexpected cty value for module source string in file %s", file)
+					p.logger.Debug().Str("module", strings.Join(module.Labels, ".")).Msgf("got unexpected cty value for module source string in file %s", file)
 					continue
 				}
 
 				var realPath string
 				err := gocty.FromCtyValue(val, &realPath)
 				if err != nil {
-					p.logger.WithError(err).WithFields(fields).Debug("could not read source value of module as string")
+					p.logger.Debug().Err(err).Str("module", strings.Join(module.Labels, ".")).Msg("could not read source value of module as string")
 					continue
 				}
 

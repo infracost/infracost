@@ -20,4 +20,4 @@
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 Logs:
 
-level=warning msg="Using eastus for resource azurerm_mssql_database.blank_server_location as its 'location' property could not be found."
+WRN Using eastus for resource azurerm_mssql_database.blank_server_location as its 'location' property could not be found.

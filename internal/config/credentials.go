@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v2"
 )
 
@@ -23,8 +23,7 @@ func loadCredentials(cfg *Config) error {
 
 	err = cfg.migrateCredentials()
 	if err != nil {
-		logrus.Debug("Error migrating credentials")
-		logrus.Debug(err)
+		log.Debug().Err(err).Msg("Error migrating credentials")
 	}
 
 	cfg.Credentials, err = readCredentialsFileIfExists()

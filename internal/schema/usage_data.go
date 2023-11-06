@@ -361,22 +361,22 @@ func mergeUsage(dst *UsageData, src *UsageData) {
 			var srcJson map[string]interface{}
 			err = json.Unmarshal([]byte(dst.Attributes[key].Raw), &destJson)
 			if err != nil {
-				logging.Logger.WithError(err).Errorf("failed to merge UsageData attributes, could not unmarshal dst attribute key: %q", key)
+				logging.Logger.Err(err).Msgf("failed to merge UsageData attributes, could not unmarshal dst attribute key: %q", key)
 				continue
 			}
 			err = json.Unmarshal([]byte(srcAttr.Raw), &srcJson)
 			if err != nil {
-				logging.Logger.WithError(err).Errorf("failed to merge UsageData attributes, could not unmarshal src attribute key: %q", key)
+				logging.Logger.Err(err).Msgf("failed to merge UsageData attributes, could not unmarshal src attribute key: %q", key)
 				continue
 			}
 			err = mergo.Map(&destJson, srcJson)
 			if err != nil {
-				logging.Logger.WithError(err).Errorf("failed to merge UsageData attributes, could not merge attribute key: %q", key)
+				logging.Logger.Err(err).Msgf("failed to merge UsageData attributes, could not merge attribute key: %q", key)
 				continue
 			}
 			src, err := json.Marshal(destJson)
 			if err != nil {
-				logging.Logger.WithError(err).Errorf("failed to merge UsageData attributes, could not marshal attribute key: %q", key)
+				logging.Logger.Err(err).Msgf("failed to merge UsageData attributes, could not marshal attribute key: %q", key)
 				continue
 			}
 

@@ -30,7 +30,7 @@ type PolicyAPIClient struct {
 // NewPolicyAPIClient retrieves resource allow-list info from Infracost Cloud and returns a new policy client
 func NewPolicyAPIClient(ctx *config.RunContext) (*PolicyAPIClient, error) {
 	client := retryablehttp.NewClient()
-	client.Logger = &LeveledLogger{Logger: logging.Logger.WithField("library", "retryablehttp")}
+	client.Logger = &LeveledLogger{Logger: logging.Logger.With().Str("library", "retryablehttp").Logger()}
 	c := PolicyAPIClient{
 		APIClient: APIClient{
 			httpClient: client.StandardClient(),
@@ -144,7 +144,7 @@ func (c *PolicyAPIClient) CheckPolicies(ctx *config.RunContext, out output.Root)
 		}
 		msg := fmt.Sprintf(`%d %s checked`, len(policies.EvaluatePolicies.TagPolicies), checkedStr)
 		if ctx.Config.IsLogging() {
-			logging.Logger.Info(msg)
+			logging.Logger.Info().Msg(msg)
 		} else {
 			_, err := fmt.Fprintf(ctx.ErrWriter, "%s\n", msg)
 			if err != nil {
@@ -160,7 +160,7 @@ func (c *PolicyAPIClient) CheckPolicies(ctx *config.RunContext, out output.Root)
 		}
 		msg := fmt.Sprintf(`%d %s checked`, len(policies.EvaluatePolicies.FinOpsPolicies), checkedStr)
 		if ctx.Config.IsLogging() {
-			logging.Logger.Info(msg)
+			logging.Logger.Info().Msg(msg)
 		} else {
 			_, err := fmt.Fprintf(ctx.ErrWriter, "%s\n", msg)
 			if err != nil {
@@ -324,7 +324,7 @@ func filterResource(rd *schema.ResourceData, al allowList) policy2Resource {
 	// make sure the keys in the values json are sorted so we get consistent policyShas
 	valuesJSON, err := jsonSorted.Marshal(filterValues(rd.RawValues, al))
 	if err != nil {
-		logging.Logger.WithError(err).WithField("address", rd.Address).Warn("Failed to marshal filtered values")
+		logging.Logger.Warn().Err(err).Str("address", rd.Address).Msg("Failed to marshal filtered values")
 	}
 
 	references := make([]policy2Reference, 0, len(rd.ReferencesMap))
@@ -394,7 +394,7 @@ func filterValues(rd gjson.Result, allowList map[string]gjson.Result) map[string
 					values[k] = filterValues(v, nestedAllow)
 				}
 			} else {
-				logging.Logger.WithField("Key", k).WithField("Type", allow.Type.String()).Warn("Unknown allow type")
+				logging.Logger.Warn().Str("Key", k).Str("Type", allow.Type.String()).Msg("Unknown allow type")
 			}
 		}
 	}

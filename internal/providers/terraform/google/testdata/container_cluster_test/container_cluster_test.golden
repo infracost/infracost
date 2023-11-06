@@ -150,4 +150,4 @@
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 Logs:
 
-level=warning msg="Skipping resource node_pool[0]. Infracost currently does not support E2 custom instances"
+WRN Skipping resource node_pool[0]. Infracost currently does not support E2 custom instances

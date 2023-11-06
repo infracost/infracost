@@ -3,10 +3,11 @@ package aws
 import (
 	"strings"
 
+	"github.com/rs/zerolog/log"
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
-	log "github.com/sirupsen/logrus"
 )
 
 type LaunchConfiguration struct {
@@ -45,7 +46,7 @@ func (a *LaunchConfiguration) PopulateUsage(u *schema.UsageData) {
 
 func (a *LaunchConfiguration) BuildResource() *schema.Resource {
 	if strings.ToLower(a.Tenancy) == "host" {
-		log.Warnf("Skipping resource %s. Infracost currently does not support host tenancy for AWS Launch Configurations", a.Address)
+		log.Warn().Msgf("Skipping resource %s. Infracost currently does not support host tenancy for AWS Launch Configurations", a.Address)
 		return nil
 	} else if strings.ToLower(a.Tenancy) == "dedicated" {
 		a.Tenancy = "Dedicated"

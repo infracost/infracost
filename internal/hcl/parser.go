@@ -12,7 +12,7 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclparse"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 
 	"github.com/infracost/infracost/internal/clierror"
@@ -123,7 +123,7 @@ func OptionWithRawCtyInput(input cty.Value) (op Option) {
 	defer func() {
 		err := recover()
 		if err != nil {
-			logging.Logger.Debugf("recovering from panic using raw input Terraform var %s", err)
+			logging.Logger.Debug().Msgf("recovering from panic using raw input Terraform var %s", err)
 			op = func(p *Parser) {}
 		}
 	}()
@@ -175,9 +175,7 @@ func OptionWithTerraformWorkspace(name string) Option {
 	name = strings.TrimSpace(name)
 	return func(p *Parser) {
 		if name != "" {
-			if p.logger != nil {
-				p.logger.Debugf("setting HCL parser to use user provided Terraform workspace: '%s'", name)
-			}
+			p.logger.Debug().Msgf("setting HCL parser to use user provided Terraform workspace: '%s'", name)
 
 			p.workspaceName = name
 		}
@@ -209,7 +207,7 @@ type Parser struct {
 	blockBuilder          BlockBuilder
 	newSpinner            ui.SpinnerFunc
 	remoteVariablesLoader *RemoteVariablesLoader
-	logger                *logrus.Entry
+	logger                zerolog.Logger
 	hasChanges            bool
 	moduleSuffix          string
 }
@@ -217,7 +215,7 @@ type Parser struct {
 // LoadParsers inits a list of Parser with the provided option and initialPath. LoadParsers locates Terraform files
 // in the given initialPath and returns a Parser for each directory it locates a Terraform project within. If
 // the initialPath contains Terraform files at the top level parsers will be len 1.
-func LoadParsers(ctx *config.ProjectContext, initialPath string, loader *modules.ModuleLoader, locatorConfig *ProjectLocatorConfig, logger *logrus.Entry, options ...Option) ([]*Parser, error) {
+func LoadParsers(ctx *config.ProjectContext, initialPath string, loader *modules.ModuleLoader, locatorConfig *ProjectLocatorConfig, logger zerolog.Logger, options ...Option) ([]*Parser, error) {
 	pl := NewProjectLocator(logger, locatorConfig)
 	rootPaths := pl.FindRootModules(initialPath)
 	if len(rootPaths) == 0 && len(locatorConfig.ChangedObjects) > 0 {
@@ -275,10 +273,10 @@ func LoadParsers(ctx *config.ProjectContext, initialPath string, loader *modules
 	return parsers, nil
 }
 
-func newParser(projectRoot RootPath, moduleLoader *modules.ModuleLoader, logger *logrus.Entry, options ...Option) *Parser {
-	parserLogger := logger.WithFields(logrus.Fields{
-		"parser_path": projectRoot.Path,
-	})
+func newParser(projectRoot RootPath, moduleLoader *modules.ModuleLoader, logger zerolog.Logger, options ...Option) *Parser {
+	parserLogger := logger.With().Str(
+		"parser_path", projectRoot.Path,
+	).Logger()
 
 	p := &Parser{
 		initialPath:   projectRoot.Path,
@@ -293,12 +291,12 @@ func newParser(projectRoot RootPath, moduleLoader *modules.ModuleLoader, logger 
 
 	defaultTfFile := path.Join(projectRoot.Path, "terraform.tfvars")
 	if _, err := os.Stat(defaultTfFile); err == nil {
-		parserLogger.Debugf("using terraform.tfvar file %s", defaultTfFile)
+		parserLogger.Debug().Msgf("using terraform.tfvar file %s", defaultTfFile)
 		defaultVarFiles = append(defaultVarFiles, defaultTfFile)
 	}
 
 	if _, err := os.Stat(defaultTfFile + ".json"); err == nil {
-		parserLogger.Debugf("using terraform.tfvar file %s.json", defaultTfFile)
+		parserLogger.Debug().Msgf("using terraform.tfvar file %s.json", defaultTfFile)
 		defaultVarFiles = append(defaultVarFiles, defaultTfFile+".json")
 	}
 
@@ -307,7 +305,7 @@ func newParser(projectRoot RootPath, moduleLoader *modules.ModuleLoader, logger 
 	for _, info := range infos {
 		name := info.Name()
 		if strings.HasSuffix(name, autoVarsSuffix) || strings.HasSuffix(name, autoVarsSuffix+".json") {
-			parserLogger.Debugf("using auto var file %s", name)
+			parserLogger.Debug().Msgf("using auto var file %s", name)
 			defaultVarFiles = append(defaultVarFiles, path.Join(projectRoot.Path, name))
 		}
 	}
@@ -339,7 +337,7 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 		}
 	}()
 
-	p.logger.Debugf("Beginning parse for directory '%s'...", p.initialPath)
+	p.logger.Debug().Msgf("Beginning parse for directory '%s'...", p.initialPath)
 
 	// load the initial root directory into a list of hcl files
 	// at this point these files have no schema associated with them.
@@ -358,7 +356,7 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 		return m, errors.New("No valid terraform files found given path, try a different directory")
 	}
 
-	p.logger.Debug("Loading TFVars...")
+	p.logger.Debug().Msg("Loading TFVars...")
 	inputVars, err := p.loadVars(blocks, p.tfvarsPaths)
 	if err != nil {
 		return m, err
@@ -370,7 +368,7 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 		return m, fmt.Errorf("Error loading Terraform modules: %w", err)
 	}
 
-	p.logger.Debug("Evaluating expressions...")
+	p.logger.Debug().Msg("Evaluating expressions...")
 	workingDir, err := os.Getwd()
 	if err != nil {
 		return m, fmt.Errorf("Error could not evaluate current working directory %w", err)
@@ -419,12 +417,12 @@ func (p *Parser) parseDirectoryFiles(files []file) (Blocks, error) {
 	for _, file := range files {
 		fileBlocks, err := loadBlocksFromFile(file, nil)
 		if err != nil {
-			p.logger.Debugf("skipping file could not load blocks err: %s", err)
+			p.logger.Debug().Msgf("skipping file could not load blocks err: %s", err)
 			continue
 		}
 
 		if len(fileBlocks) > 0 {
-			p.logger.Debugf("Added %d blocks from %s...", len(fileBlocks), fileBlocks[0].DefRange.Filename)
+			p.logger.Debug().Msgf("Added %d blocks from %s...", len(fileBlocks), fileBlocks[0].DefRange.Filename)
 		}
 
 		for _, fileBlock := range fileBlocks {
@@ -448,7 +446,7 @@ func (p *Parser) loadVars(blocks Blocks, filenames []string) (map[string]cty.Val
 		remoteVars, err := p.remoteVariablesLoader.Load(blocks)
 
 		if err != nil {
-			p.logger.Warnf("could not load vars from Terraform Cloud: %s", err)
+			p.logger.Warn().Msgf("could not load vars from Terraform Cloud: %s", err)
 			return combinedVars, err
 		}
 
@@ -460,7 +458,7 @@ func (p *Parser) loadVars(blocks Blocks, filenames []string) (map[string]cty.Val
 	for _, name := range p.defaultVarFiles {
 		err := p.loadAndCombineVars(name, combinedVars)
 		if err != nil {
-			p.logger.WithError(err).Warnf("could not load vars from auto var file %s", name)
+			p.logger.Warn().Err(err).Msgf("could not load vars from auto var file %s", name)
 			continue
 		}
 	}
@@ -523,9 +521,9 @@ func (p *Parser) loadVarFile(filename string) (map[string]cty.Value, error) {
 		// We can safely ignore these Attribute errors and continue to get the raw attributes.
 		// The first value for the variable will be used.
 		if areDiagnosticsAttributeErrors(diags) {
-			p.logger.WithError(errors.New(diags.Error())).Debugf("duplicate variables detected parsing file %s, using the first values defined", filename)
+			p.logger.Debug().Err(errors.New(diags.Error())).Msgf("duplicate variables detected parsing file %s, using the first values defined", filename)
 		} else {
-			p.logger.WithError(errors.New(diags.Error())).Debugf("could not parse supplied var file %s", filename)
+			p.logger.Debug().Err(errors.New(diags.Error())).Msgf("could not parse supplied var file %s", filename)
 
 			return inputVars, nil
 		}
@@ -533,18 +531,15 @@ func (p *Parser) loadVarFile(filename string) (map[string]cty.Value, error) {
 
 	attrs, _ := variableFile.Body.JustAttributes()
 
-	fields := make(logrus.Fields, len(attrs))
 	for _, attr := range attrs {
 		value, diag := attr.Expr.Value(&hcl.EvalContext{})
 		if diag.HasErrors() {
-			p.logger.WithError(errors.New(diag.Error())).Debugf("problem evaluating input var %s", attr.Name)
+			p.logger.Debug().Err(errors.New(diag.Error())).Msgf("problem evaluating input var %s", attr.Name)
 		}
 
 		inputVars[attr.Name] = value
-		fields[attr.Name] = value
 	}
 
-	p.logger.WithFields(fields).Debugf("adding input vars from file %s", filename)
 	return inputVars, nil
 }
 
@@ -563,7 +558,7 @@ type file struct {
 	hclFile *hcl.File
 }
 
-func loadDirectory(logger *logrus.Entry, fullPath string, stopOnHCLError bool) ([]file, error) {
+func loadDirectory(logger zerolog.Logger, fullPath string, stopOnHCLError bool) ([]file, error) {
 	hclParser := hclparse.NewParser()
 
 	fileInfos, err := os.ReadDir(fullPath)
@@ -597,7 +592,7 @@ func loadDirectory(logger *logrus.Entry, fullPath string, stopOnHCLError bool) (
 				return nil, diag
 			}
 
-			logger.Debugf("skipping file: %s hcl parsing err: %s", path, diag.Error())
+			logger.Debug().Msgf("skipping file: %s hcl parsing err: %s", path, diag.Error())
 			continue
 		}
 	}

@@ -7,10 +7,11 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/rs/zerolog/log"
+	"github.com/tidwall/gjson"
+
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
-	log "github.com/sirupsen/logrus"
-	"github.com/tidwall/gjson"
 )
 
 type ContextEnv struct{}
@@ -270,7 +271,7 @@ func syncResource(projectCtx *config.ProjectContext, resource *schema.Resource, 
 		err := resource.EstimateUsage(ctx, resourceUsageMap)
 		if err != nil {
 			syncResult.EstimationErrors[resource.Name] = err
-			log.Warnf("Error estimating usage for resource %s: %v", resource.Name, err)
+			log.Warn().Msgf("Error estimating usage for resource %s: %v", resource.Name, err)
 		}
 
 		// Merge in the estimated usage

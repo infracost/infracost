@@ -469,4 +469,4 @@
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 Logs:
 
-level=warning msg="Skipping resource azurerm_storage_account.unsupported. BlockBlobStorage Premium doesn't support GRS redundancy"
+WRN Skipping resource azurerm_storage_account.unsupported. BlockBlobStorage Premium doesn't support GRS redundancy

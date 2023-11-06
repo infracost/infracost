@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/rs/zerolog/log"
+
 	"github.com/infracost/infracost/internal/schema"
-	log "github.com/sirupsen/logrus"
 
 	"github.com/shopspring/decimal"
 )
@@ -30,7 +31,7 @@ func NewAzureRMPostrgreSQLServer(d *schema.ResourceData, u *schema.UsageData) *s
 		family = strings.Split(sku, "_")[1]
 		cores = strings.Split(sku, "_")[2]
 	} else {
-		log.Warnf("Unrecognised PostgreSQL SKU format for resource %s: %s", d.Address, sku)
+		log.Warn().Msgf("Unrecognised PostgreSQL SKU format for resource %s: %s", d.Address, sku)
 		return nil
 	}
 
@@ -41,7 +42,7 @@ func NewAzureRMPostrgreSQLServer(d *schema.ResourceData, u *schema.UsageData) *s
 	}[tier]
 
 	if tierName == "" {
-		log.Warnf("Unrecognised PostgreSQL tier prefix for resource %s: %s", d.Address, tierName)
+		log.Warn().Msgf("Unrecognised PostgreSQL tier prefix for resource %s: %s", d.Address, tierName)
 		return nil
 	}
 

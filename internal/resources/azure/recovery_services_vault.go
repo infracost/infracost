@@ -67,7 +67,7 @@ func (r *RecoveryServicesVault) PopulateUsage(u *schema.UsageData) {
 // list of sub resources where the costs are encapsulated.
 func (r *RecoveryServicesVault) BuildResource() *schema.Resource {
 	if len(r.ProtectedVMs) == 0 {
-		logging.Logger.Warnf("recovery services vault %s has been marked as free as no associated protected VMs were found", r.Address)
+		logging.Logger.Warn().Msgf("recovery services vault %s has been marked as free as no associated protected VMs were found", r.Address)
 		return &schema.Resource{Name: r.Address, NoPrice: true}
 	}
 

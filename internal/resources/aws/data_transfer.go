@@ -3,8 +3,8 @@ package aws
 import (
 	"fmt"
 
+	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
-	log "github.com/sirupsen/logrus"
 
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
@@ -46,7 +46,7 @@ func (r *DataTransfer) BuildResource() *schema.Resource {
 	_, ok := RegionMapping[r.Region]
 
 	if !ok {
-		log.Warnf("Skipping resource %s. Could not find mapping for region %s", r.Address, r.Region)
+		log.Warn().Msgf("Skipping resource %s. Could not find mapping for region %s", r.Address, r.Region)
 		return nil
 	}
 

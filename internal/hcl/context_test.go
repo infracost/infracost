@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/hashicorp/hcl/v2"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
@@ -94,12 +94,8 @@ func Test_ContextSetThenImmediateGet(t *testing.T) {
 	assert.Equal(t, "ok", val.AsString())
 }
 
-func newTestLogger() *logrus.Entry {
-	logger := logrus.New()
-	logger.SetOutput(io.Discard)
-	entry := logrus.NewEntry(logger)
-
-	return entry
+func newTestLogger() zerolog.Logger {
+	return zerolog.New(io.Discard)
 }
 
 func Test_ContextSetThenImmediateGetWithChild(t *testing.T) {

@@ -1,7 +1,7 @@
 package google
 
 import (
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 	"github.com/tidwall/gjson"
 
 	"github.com/infracost/infracost/internal/resources/google"
@@ -57,7 +57,7 @@ func newNodePool(address string, d gjson.Result, cluster *schema.ResourceData) *
 	}
 
 	if region == "" {
-		log.Warnf("Skipping resource %s. Unable to determine region", address)
+		log.Warn().Msgf("Skipping resource %s. Unable to determine region", address)
 		return nil
 	}
 

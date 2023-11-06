@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
-	log "github.com/sirupsen/logrus"
 
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
@@ -71,7 +71,7 @@ func (a *Instance) BuildResource() *schema.Resource {
 		if a.HasHost {
 			a.Tenancy = "Host"
 		} else {
-			log.Warnf("Skipping resource %s. Infracost currently does not support host tenancy for AWS EC2 instances without Host ID set up", a.Address)
+			log.Warn().Msgf("Skipping resource %s. Infracost currently does not support host tenancy for AWS EC2 instances without Host ID set up", a.Address)
 			return nil
 		}
 	} else if strings.ToLower(a.Tenancy) == "dedicated" {
@@ -168,7 +168,7 @@ func (a *Instance) computeCostComponent() *schema.CostComponent {
 		osFilterVal = "SUSE"
 	default:
 		if strVal(a.OperatingSystem) != "linux" {
-			log.Warnf("Unrecognized operating system %s, defaulting to Linux/UNIX", strVal(a.OperatingSystem))
+			log.Warn().Msgf("Unrecognized operating system %s, defaulting to Linux/UNIX", strVal(a.OperatingSystem))
 		}
 	}
 
@@ -184,7 +184,7 @@ func (a *Instance) computeCostComponent() *schema.CostComponent {
 		}
 		reservedFilter, err := resolver.PriceFilter()
 		if err != nil {
-			log.Warnf(err.Error())
+			log.Warn().Msgf(err.Error())
 		} else {
 			priceFilter = reservedFilter
 		}

@@ -3,7 +3,7 @@ package aws
 import (
 	"strings"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 	"github.com/tidwall/gjson"
 
 	"github.com/infracost/infracost/internal/schema"
@@ -89,7 +89,7 @@ func GetResourceRegion(resourceType string, v gjson.Result) string {
 	arn := v.Get(arnAttr).String()
 	p := strings.Split(arn, ":")
 	if len(p) < 4 {
-		log.Debugf("Unexpected ARN format for %s", arn)
+		log.Debug().Msgf("Unexpected ARN format for %s", arn)
 		return ""
 	}
 

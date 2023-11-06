@@ -510,7 +510,7 @@ func governanceTestEndpoint(garr governanceAddRunResponse) *httptest.Server {
 		} else {
 			for _, s := range strings.Split(string(bodyBytes), "details") {
 				if strings.Contains(s, "Guardrail") {
-					logging.Logger.Warn(s)
+					logging.Logger.Warn().Msg(s)
 				}
 			}
 			fmt.Fprintln(w, "")

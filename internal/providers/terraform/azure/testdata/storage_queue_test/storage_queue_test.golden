@@ -128,5 +128,5 @@
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 Logs:
 
-level=warning msg="Skipping resource azurerm_storage_account.unsupported. Storage Standard doesn't support GZRS redundancy"
-level=warning msg="Skipping resource azurerm_storage_queue.unsupported. Storage Queues don't support GZRS redundancy"
+WRN Skipping resource azurerm_storage_account.unsupported. Storage Standard doesn't support GZRS redundancy
+WRN Skipping resource azurerm_storage_queue.unsupported. Storage Queues don't support GZRS redundancy

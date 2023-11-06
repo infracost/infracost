@@ -86,7 +86,7 @@ func (r *StorageAccount) PopulateUsage(u *schema.UsageData) {
 // This method is called after the resource is initialized by an IaC provider.
 func (r *StorageAccount) BuildResource() *schema.Resource {
 	if !r.isReplicationTypeSupported() {
-		logging.Logger.Warnf("Skipping resource %s. %s %s doesn't support %s redundancy", r.Address, r.AccountKind, r.AccountTier, r.AccountReplicationType)
+		logging.Logger.Warn().Msgf("Skipping resource %s. %s %s doesn't support %s redundancy", r.Address, r.AccountKind, r.AccountTier, r.AccountReplicationType)
 		return nil
 	}
 

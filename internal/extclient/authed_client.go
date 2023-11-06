@@ -6,11 +6,12 @@ import (
 	"time"
 
 	"github.com/hashicorp/go-retryablehttp"
+
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/logging"
 
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 )
 
 // AuthedAPIClient represents an API client for authorized requests.
@@ -23,7 +24,7 @@ type AuthedAPIClient struct {
 // NewAuthedAPIClient returns a new API client.
 func NewAuthedAPIClient(host, token string) *AuthedAPIClient {
 	client := retryablehttp.NewClient()
-	client.Logger = &apiclient.LeveledLogger{Logger: logging.Logger.WithField("library", "retryablehttp")}
+	client.Logger = &apiclient.LeveledLogger{Logger: logging.Logger.With().Str("library", "retryablehttp").Logger()}
 	client.HTTPClient.Timeout = time.Second * 30
 	return &AuthedAPIClient{
 		host:   host,
@@ -40,7 +41,7 @@ func (a *AuthedAPIClient) SetHost(host string) {
 // Get performs a GET request to provided endpoint.
 func (a *AuthedAPIClient) Get(path string) ([]byte, error) {
 	url := fmt.Sprintf("https://%s%s", a.host, path)
-	log.Debugf("Calling Terraform Cloud API: %s", url)
+	log.Debug().Msgf("Calling Terraform Cloud API: %s", url)
 	req, err := retryablehttp.NewRequest("GET", url, nil)
 	if err != nil {
 		return []byte{}, err

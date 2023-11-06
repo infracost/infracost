@@ -7,7 +7,7 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/convert"
 	"github.com/zclconf/go-cty/cty/gocty"
@@ -43,7 +43,7 @@ type Attribute struct {
 	Ctx *Context
 	// Verbose defines if the attribute should log verbose diagnostics messages to debug.
 	Verbose bool
-	Logger  *logrus.Entry
+	Logger  zerolog.Logger
 	// newMock generates a mock value for the attribute if it's value is missing.
 	newMock       func(attr *Attribute) cty.Value
 	previousValue cty.Value
@@ -74,7 +74,7 @@ func (attr *Attribute) AsInt() int64 {
 		var err error
 		v, err = convert.Convert(v, cty.Number)
 		if err != nil {
-			attr.Logger.WithError(err).Debugf("could not return attribute value of type %s as cty.Number", v.Type())
+			attr.Logger.Debug().Err(err).Msgf("could not return attribute value of type %s as cty.Number", v.Type())
 			return 0
 		}
 	}
@@ -82,7 +82,7 @@ func (attr *Attribute) AsInt() int64 {
 	var i int64
 	err := gocty.FromCtyValue(v, &i)
 	if err != nil {
-		attr.Logger.WithError(err).Debug("could not return attribute value as int64")
+		attr.Logger.Debug().Err(err).Msg("could not return attribute value as int64")
 	}
 
 	return i
@@ -104,7 +104,7 @@ func (attr *Attribute) AsString() string {
 		var err error
 		v, err = convert.Convert(v, cty.String)
 		if err != nil {
-			attr.Logger.WithError(err).Debugf("could not return attribute value of type %s as cty.String", v.Type())
+			attr.Logger.Debug().Err(err).Msgf("could not return attribute value of type %s as cty.String", v.Type())
 			return ""
 		}
 	}
@@ -112,7 +112,7 @@ func (attr *Attribute) AsString() string {
 	var s string
 	err := gocty.FromCtyValue(v, &s)
 	if err != nil {
-		attr.Logger.WithError(err).Debug("could not return attribute value as string")
+		attr.Logger.Debug().Err(err).Msg("could not return attribute value as string")
 	}
 
 	return s
@@ -126,7 +126,7 @@ func (attr *Attribute) Value() cty.Value {
 		return cty.DynamicVal
 	}
 
-	attr.Logger.Debug("fetching attribute value")
+	attr.Logger.Debug().Msg("fetching attribute value")
 	val := attr.value(0)
 	attr.previousValue = val
 
@@ -142,7 +142,7 @@ func (attr *Attribute) HasChanged() (change bool) {
 	defer func() {
 		e := recover()
 		if e != nil {
-			attr.Logger.Debugf("HasChanged panicked with cty.Value comparison %s", e)
+			attr.Logger.Debug().Msgf("HasChanged panicked with cty.Value comparison %s", e)
 			change = true
 		}
 	}()
@@ -156,7 +156,7 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 	defer func() {
 		if err := recover(); err != nil {
 			trace := debug.Stack()
-			attr.Logger.Debugf("could not evaluate value for attr: %s. This is most likely an issue in the underlying hcl/go-cty libraries and can be ignored, but we log the stacktrace for debugging purposes. Err: %s\n%s", attr.Name(), err, trace)
+			attr.Logger.Debug().Msgf("could not evaluate value for attr: %s. This is most likely an issue in the underlying hcl/go-cty libraries and can be ignored, but we log the stacktrace for debugging purposes. Err: %s\n%s", attr.Name(), err, trace)
 		}
 	}()
 
@@ -241,7 +241,7 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 		}
 
 		if attr.Verbose {
-			attr.Logger.Debugf("error diagnostic return from evaluating %s err: %s", attr.HCLAttr.Name, diag.Error())
+			attr.Logger.Debug().Msgf("error diagnostic return from evaluating %s err: %s", attr.HCLAttr.Name, diag.Error())
 		}
 	}
 
@@ -420,7 +420,7 @@ func (attr *Attribute) Equals(val interface{}) bool {
 	if attr.Value().Type() == cty.Number {
 		checkNumber, err := gocty.ToCtyValue(val, cty.Number)
 		if err != nil {
-			attr.Logger.Debugf("Error converting number for equality check. %s", err)
+			attr.Logger.Debug().Msgf("Error converting number for equality check. %s", err)
 			return false
 		}
 		return attr.Value().RawEquals(checkNumber)
@@ -454,13 +454,13 @@ func (attr *Attribute) getIndexValue(part hcl.TraverseIndex) string {
 	case cty.Number:
 		var intVal int
 		if err := gocty.FromCtyValue(part.Key, &intVal); err != nil {
-			attr.Logger.WithError(err).Warn("could not unpack int from block index attr, returning 0")
+			attr.Logger.Warn().Err(err).Msg("could not unpack int from block index attr, returning 0")
 			return "0"
 		}
 
 		return fmt.Sprintf("%d", intVal)
 	default:
-		attr.Logger.Debugf("could not get index value for unsupported cty type %s, returning 0", part.Key.Type())
+		attr.Logger.Debug().Msgf("could not get index value for unsupported cty type %s, returning 0", part.Key.Type())
 		return "0"
 	}
 }
@@ -577,7 +577,7 @@ func (attr *Attribute) referencesFromExpression(expression hcl.Expression) []*Re
 			refs = append(refs, collectionRef, countRef)
 		}
 	default:
-		attr.Logger.Debugf("could not create references for expression type: %s", t)
+		attr.Logger.Debug().Msgf("could not create references for expression type: %s", t)
 	}
 
 	return refs

@@ -47,11 +47,11 @@ See https://infracost.io/docs/features/cli_commands/#upload-runs`,
 			if ctx.Config.PolicyV2APIEndpoint != "" {
 				policyClient, err := apiclient.NewPolicyAPIClient(ctx)
 				if err != nil {
-					logging.Logger.WithError(err).Error("Failed to initialize policies client")
+					logging.Logger.Err(err).Msg("Failed to initialize policies client")
 				} else {
 					policies, err := policyClient.CheckPolicies(ctx, root)
 					if err != nil {
-						logging.Logger.WithError(err).Error("Failed to check policies")
+						logging.Logger.Err(err).Msg("Failed to check policies")
 					}
 
 					root.TagPolicies = policies.TagPolicies
@@ -74,7 +74,7 @@ See https://infracost.io/docs/features/cli_commands/#upload-runs`,
 			pricingClient := apiclient.GetPricingAPIClient(ctx)
 			err = pricingClient.AddEvent("infracost-upload", ctx.EventEnv())
 			if err != nil {
-				logging.Logger.WithError(err).Warn("could not report `infracost-upload` event")
+				logging.Logger.Warn().Err(err).Msg("could not report `infracost-upload` event")
 			}
 
 			if len(result.GovernanceFailures) > 0 {

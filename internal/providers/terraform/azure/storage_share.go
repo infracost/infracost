@@ -35,7 +35,7 @@ func newStorageShare(d *schema.ResourceData) schema.CoreResource {
 		accountReplicationType = storageAccount.Get("account_replication_type").String()
 
 		if strings.EqualFold(accessTier, "premium") && !strings.EqualFold(accountKind, "filestorage") {
-			logging.Logger.Warnf("Skipping resource %s. Premium access tier is only supported for FileStorage accounts", d.Address)
+			logging.Logger.Warn().Msgf("Skipping resource %s. Premium access tier is only supported for FileStorage accounts", d.Address)
 			return nil
 		}
 	}
