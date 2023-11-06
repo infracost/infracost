@@ -3,16 +3,16 @@ package hcl
 import (
 	"fmt"
 	"strings"
-
-	"github.com/zclconf/go-cty/cty"
 )
 
 type Reference struct {
-	blockType Type
-	typeLabel string
-	nameLabel string
-	remainder []string
-	key       string
+	blockType    Type
+	typeLabel    string
+	nameLabel    string
+	remainder    []string
+	key          string
+	asString     string
+	asJSONString string
 }
 
 func newReference(parts []string) (*Reference, error) {
@@ -57,28 +57,13 @@ func newReference(parts []string) (*Reference, error) {
 	return &ref, nil
 }
 
-func (r *Reference) SetKey(key cty.Value) {
-	if !key.IsKnown() {
-		return
-	}
-
-	if key.IsNull() {
-		return
-	}
-
-	switch key.Type() {
-	case cty.Number:
-		f := key.AsBigFloat()
-		f64, _ := f.Float64()
-		r.key = fmt.Sprintf("[%d]", int(f64))
-	case cty.String:
-		r.key = fmt.Sprintf("[%q]", key.AsString())
-	}
-}
-
 // JSONString returns the reference so that it's possible to use in the plan JSON file.
 // This strips any count keys from the reference.
 func (r *Reference) JSONString() string {
+	if r.asJSONString != "" {
+		return r.asJSONString
+	}
+
 	base := fmt.Sprintf("%s.%s", r.typeLabel, r.nameLabel)
 
 	if !r.blockType.removeTypeInReference {
@@ -95,10 +80,16 @@ func (r *Reference) JSONString() string {
 		}
 	}
 
-	return base
+	r.asJSONString = base
+
+	return r.asJSONString
 }
 
 func (r *Reference) String() string {
+	if r.asString != "" {
+		return r.asString
+	}
+
 	base := fmt.Sprintf("%s.%s", r.typeLabel, r.nameLabel)
 
 	if !r.blockType.removeTypeInReference {
@@ -119,7 +110,9 @@ func (r *Reference) String() string {
 		base += "." + rem
 	}
 
-	return base
+	r.asString = base
+
+	return r.asString
 }
 
 type Type struct {
