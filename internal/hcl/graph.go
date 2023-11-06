@@ -167,7 +167,7 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 			// We don't actually mind if blocks are added multiple times
 			// since this helps us support cases like _override.tf files
 			// and in-progress changes.
-			g.logger.WithError(err).Debugf("error adding vertex %q", vertex.ID())
+			g.logger.Debugf("error adding vertex %q %w", vertex.ID(), err)
 		}
 	}
 
