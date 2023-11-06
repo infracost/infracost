@@ -171,26 +171,26 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 		}
 	}
 
-	edges := make([]dag.Edge, 0)
+	edges := make([]dag.EdgeInput, 0)
 
 	for _, vertex := range vertexes {
 		if vertex.ModuleAddress() == "" {
 			g.logger.Debugf("adding edge: %s, %s", g.rootVertex.ID(), vertex.ID())
-			edges = append(edges, dag.Edge{
+			edges = append(edges, dag.EdgeInput{
 				SrcID: g.rootVertex.ID(),
 				DstID: vertex.ID(),
 			})
 		} else {
 			// Add the module call edge
 			g.logger.Debugf("adding edge: %s, %s", moduleCallID(vertex.ModuleAddress()), vertex.ID())
-			edges = append(edges, dag.Edge{
+			edges = append(edges, dag.EdgeInput{
 				SrcID: moduleCallID(vertex.ModuleAddress()),
 				DstID: vertex.ID(),
 			})
 
 			// Add the module exit edge
 			g.logger.Debugf("adding edge: %s, %s", vertex.ID(), vertex.ModuleAddress())
-			edges = append(edges, dag.Edge{
+			edges = append(edges, dag.EdgeInput{
 				SrcID: vertex.ID(),
 				DstID: vertex.ModuleAddress(),
 			})
@@ -232,7 +232,7 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 			_, err := g.dag.GetVertex(srcId)
 			if err == nil {
 				g.logger.Debugf("adding edge: %s, %s", srcId, vertex.ID())
-				edges = append(edges, dag.Edge{
+				edges = append(edges, dag.EdgeInput{
 					SrcID: srcId,
 					DstID: vertex.ID(),
 				})
@@ -252,7 +252,7 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 				_, err := g.dag.GetVertex(srcId)
 				if err == nil {
 					g.logger.Debugf("adding edge: %s, %s", srcId, vertex.ID())
-					edges = append(edges, dag.Edge{
+					edges = append(edges, dag.EdgeInput{
 						SrcID: srcId,
 						DstID: vertex.ID(),
 					})
