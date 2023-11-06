@@ -164,7 +164,10 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 		g.logger.Debugf("adding vertex: %s", vertex.ID())
 		err := g.dag.AddVertexByID(vertex.ID(), vertex)
 		if err != nil {
-			return fmt.Errorf("error adding vertex %q %w", vertex.ID(), err)
+			// We don't actually mind if blocks are added multiple times
+			// since this helps us support cases like _override.tf files
+			// and in-progress changes.
+			g.logger.WithError(err).Debugf("error adding vertex %q", vertex.ID())
 		}
 	}
 
