@@ -1,9 +1,10 @@
 package aws
 
 import (
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 // KinesisStream struct represents Kinesis Data Streams a fully managed, serverless streaming data service
@@ -109,7 +110,7 @@ func (r *KinesisStream) onDemandStreamCostComponent() *schema.CostComponent {
 			Service:       strPtr("AmazonKinesis"),
 			ProductFamily: strPtr("Kinesis Streams"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", Value: strPtr("OnDemand-StreamHour")},
+				{Key: "usagetype", ValueRegex: regexPtr("(^|-)OnDemand-StreamHour")},
 				{Key: "operation", Value: strPtr("OnDemandStreamHr")},
 			},
 		},
@@ -131,7 +132,7 @@ func (r *KinesisStream) onDemandDataIngestedCostComponent() *schema.CostComponen
 			Service:       strPtr("AmazonKinesis"),
 			ProductFamily: strPtr("Kinesis Streams"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", Value: strPtr("OnDemand-BilledIncomingBytes")},
+				{Key: "usagetype", ValueRegex: regexPtr("(^|-)OnDemand-BilledIncomingBytes")},
 				{Key: "operation", Value: strPtr("OnDemandDataIngested")},
 			},
 		},
@@ -153,7 +154,7 @@ func (r *KinesisStream) onDemandDataRetrievalCostComponent() *schema.CostCompone
 			Service:       strPtr("AmazonKinesis"),
 			ProductFamily: strPtr("Kinesis Streams"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", Value: strPtr("OnDemand-BilledOutgoingBytes")},
+				{Key: "usagetype", ValueRegex: regexPtr("(^|-)OnDemand-BilledOutgoingBytes")},
 				{Key: "operation", Value: strPtr("OnDemandDataRetrieval")},
 			},
 		},
@@ -175,7 +176,7 @@ func (r *KinesisStream) onDemandEfoDataRetrievalCostComponent() *schema.CostComp
 			Service:       strPtr("AmazonKinesis"),
 			ProductFamily: strPtr("Kinesis Streams"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", Value: strPtr("OnDemand-BilledOutgoingEFOBytes")},
+				{Key: "usagetype", ValueRegex: regexPtr("(^|-)OnDemand-BilledOutgoingEFOBytes")},
 				{Key: "operation", Value: strPtr("OnDemandEFODataRetrieval")},
 			},
 		},
@@ -197,7 +198,7 @@ func (r *KinesisStream) onDemandExtendedRetentionCostComponent() *schema.CostCom
 			Service:       strPtr("AmazonKinesis"),
 			ProductFamily: strPtr("Kinesis Streams"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", Value: strPtr("OnDemand-ExtendedRetention-ByteHrs")},
+				{Key: "usagetype", ValueRegex: regexPtr("(^|-)OnDemand-ExtendedRetention-ByteHrs")},
 				{Key: "operation", Value: strPtr("OnDemandExtendedRetentionByteHrs")},
 			},
 		},
@@ -219,7 +220,7 @@ func (r *KinesisStream) onDemandLongTermRetentionCostComponent() *schema.CostCom
 			Service:       strPtr("AmazonKinesis"),
 			ProductFamily: strPtr("Kinesis Streams"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", Value: strPtr("OnDemand-LongTermRetention-ByteHrs")},
+				{Key: "usagetype", ValueRegex: regexPtr("(^|-)OnDemand-LongTermRetention-ByteHrs")},
 				{Key: "operation", Value: strPtr("OnDemandLongTermRetentionByteHrs")},
 			},
 		},
@@ -241,7 +242,7 @@ func (r *KinesisStream) provisionedStreamCostComponent() *schema.CostComponent {
 			Service:       strPtr("AmazonKinesis"),
 			ProductFamily: strPtr("Kinesis Streams"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", Value: strPtr("Storage-ShardHour")},
+				{Key: "usagetype", ValueRegex: regexPtr("(^|-)Storage-ShardHour")},
 				{Key: "operation", Value: strPtr("shardHourStorage")},
 			},
 		},
@@ -263,7 +264,7 @@ func (r *KinesisStream) provisionedStreamPutUnitsCostComponent() *schema.CostCom
 			Service:       strPtr("AmazonKinesis"),
 			ProductFamily: strPtr("Kinesis Streams"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", Value: strPtr("PutRequestPayloadUnits")},
+				{Key: "usagetype", ValueRegex: regexPtr("(^|-)PutRequestPayloadUnits")},
 				{Key: "operation", Value: strPtr("PutRequest")},
 			},
 		},
@@ -286,7 +287,7 @@ func (r *KinesisStream) provisionedExtendedRetentionCostComponent() *schema.Cost
 			Service:       strPtr("AmazonKinesis"),
 			ProductFamily: strPtr("Kinesis Streams"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", Value: strPtr("Extended-ShardHour")},
+				{Key: "usagetype", ValueRegex: regexPtr("(^|-)Extended-ShardHour")},
 				{Key: "operation", Value: strPtr("shardHourStorage")},
 			},
 		},
@@ -308,7 +309,7 @@ func (r *KinesisStream) provisionedLongTermRetentionCostComponent() *schema.Cost
 			Service:       strPtr("AmazonKinesis"),
 			ProductFamily: strPtr("Kinesis Streams"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", Value: strPtr("LongTermRetention-ByteHrs")},
+				{Key: "usagetype", ValueRegex: regexPtr("(^|-)LongTermRetention-ByteHrs")},
 				{Key: "operation", Value: strPtr("LongTermRetentionByteHrs")},
 			},
 		},
@@ -330,7 +331,7 @@ func (r *KinesisStream) provisionedLongTermRetrievalCostComponent() *schema.Cost
 			Service:       strPtr("AmazonKinesis"),
 			ProductFamily: strPtr("Kinesis Streams"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", Value: strPtr("LongTermRetention-ReadBytes")},
+				{Key: "usagetype", ValueRegex: regexPtr("(^|-)LongTermRetention-ReadBytes")},
 				{Key: "operation", Value: strPtr("LongTermRetentionDataRetrieval")},
 			},
 		},
@@ -352,7 +353,7 @@ func (r *KinesisStream) provisionedEfoDataRetrievalCostComponent() *schema.CostC
 			Service:       strPtr("AmazonKinesis"),
 			ProductFamily: strPtr("Kinesis Streams"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", Value: strPtr("ReadBytes")},
+				{Key: "usagetype", ValueRegex: regexPtr("(^|-)ReadBytes")},
 				{Key: "operation", Value: strPtr("EnhancedFanoutDataRetrieval")},
 			},
 		},
@@ -374,7 +375,7 @@ func (r *KinesisStream) provisionedEfoConsumersCostComponent() *schema.CostCompo
 			Service:       strPtr("AmazonKinesis"),
 			ProductFamily: strPtr("Kinesis Streams"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", Value: strPtr("EnhancedFanoutHour")},
+				{Key: "usagetype", ValueRegex: regexPtr("(^|-)EnhancedFanoutHour")},
 				{Key: "operation", Value: strPtr("ConsumerHour")},
 			},
 		},
