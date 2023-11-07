@@ -2,9 +2,11 @@ package aws
 
 import (
 	"fmt"
+
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 type DocDBClusterInstance struct {
@@ -72,7 +74,7 @@ func (r *DocDBClusterInstance) BuildResource() *schema.Resource {
 				Service:       strPtr("AmazonDocDB"),
 				ProductFamily: strPtr("Database Storage"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", Value: strPtr("StorageUsage")},
+					{Key: "usagetype", ValueRegex: regexPtr("(^|-)StorageUsage$")},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
@@ -90,7 +92,7 @@ func (r *DocDBClusterInstance) BuildResource() *schema.Resource {
 				Service:       strPtr("AmazonDocDB"),
 				ProductFamily: strPtr("System Operation"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", Value: strPtr("StorageIOUsage")},
+					{Key: "usagetype", ValueRegex: regexPtr("(^|-)StorageIOUsage$")},
 				},
 			},
 		},

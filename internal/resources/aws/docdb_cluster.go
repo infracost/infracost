@@ -54,7 +54,7 @@ func (r *DocDBCluster) backupStorageCostComponent(backupStorage *decimal.Decimal
 			Service:       strPtr("AmazonDocDB"),
 			ProductFamily: strPtr("Storage Snapshot"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", Value: strPtr("BackupUsage")},
+				{Key: "usagetype", ValueRegex: regexPtr("(^|-)BackupUsage$")},
 			},
 		},
 	}
