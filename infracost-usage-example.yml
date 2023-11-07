@@ -7,6 +7,61 @@ resource_type_default_usage:
   aws_lambda_function:
     monthly_requests: 100000 # Monthly requests to the Lambda function.
     request_duration_ms: 500 # Average duration of each request in milliseconds.
+  ibm_container_vpc_cluster: 
+    monthly_instance_hours: 730
+  ibm_container_vpc_worker_pool: 
+    monthly_instance_hours: 730
+  ibm_cos_bucket: 
+    accelerated_archive_capacity: 1000
+    accelerated_archive_restore: 0
+    archive_capacity: 1000
+    archive_restore: 0
+    aspera_egress: 0
+    aspera_ingress: 0
+    class_a_request_count: 10
+    class_b_request_count: 1
+    monthly_average_capacity: 1000
+    monthly_data_retrieval: 1000
+    public_standard_egress: 1
+  ibm_is_flow_log: 
+    transmitted_gb: 100
+  ibm_is_instance: 
+    monthly_instance_hours: 730
+  ibm_is_lb:
+    gigabyte_processed: 5
+    monthly_instance_hours: 730
+  ibm_is_volume: 
+    monthly_instance_hours: 730
+  ibm_is_vpc: 
+    gigabyte_transmitted_outbounds: 5
+  ibm_is_vpn_gateway: 
+    monthly_connection_hours: 730
+    monthly_instance_hours: 730
+  ibm_pi_instance: 
+    cloud_storage_solution: 0
+    db2_web_query: 0
+    epic: 0
+    high_availability: 0
+    monthly_instance_hours: 730
+    rational_dev_studio_licenses: 0
+    storage: 20
+  ibm_pi_volume: 
+    monthly_instance_hours: 730
+  ibm_resource_instance: 
+    appconnect_gigabyte_transmitted_outbounds: 1
+    appconnect_thousand_runs: 1
+    appconnect_vcpu_hours: 730
+    appid_advanced_authentications: 20000
+    appid_authentications: 15000
+    appid_users: 1000
+    kms_key_versions: 10
+    secretsmanager_active_secrets: 400
+    secretsmanager_instance: 1
+  ibm_tg_gateway: 
+    connection: 3
+    data_transfer_global: 1000
+    data_transfer_local: 1000
+
 resource_usage:
   #
   # Terraform AWS resources
