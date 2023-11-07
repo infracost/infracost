@@ -65,8 +65,8 @@ resource "aws_kinesis_stream" "test_stream_provisioned_with_usage" {
 }
 
 resource "aws_kinesis_stream" "use2_test_stream_on_demand" {
-  provider                = aws.ue2
-  name = "use2_terraform-kinesis-test-od"
+  provider = aws.ue2
+  name     = "use2_terraform-kinesis-test-od"
   stream_mode_details {
     stream_mode = "ON_DEMAND"
   }
@@ -77,8 +77,8 @@ resource "aws_kinesis_stream" "use2_test_stream_on_demand" {
 
 
 resource "aws_kinesis_stream" "use2_test_stream_on_demand_with_usage" {
-  provider                = aws.ue2
-  name = "use2_terraform-kinesis-test-od-with-usage"
+  provider = aws.ue2
+  name     = "use2_terraform-kinesis-test-od-with-usage"
   stream_mode_details {
     stream_mode = "ON_DEMAND"
   }
@@ -88,8 +88,8 @@ resource "aws_kinesis_stream" "use2_test_stream_on_demand_with_usage" {
 }
 
 resource "aws_kinesis_stream" "use2_test_stream_provisioned" {
-  provider                = aws.ue2
-  name = "use2_terraform-kinesis-test-pr"
+  provider = aws.ue2
+  name     = "use2_terraform-kinesis-test-pr"
   stream_mode_details {
     stream_mode = "PROVISIONED"
   }
@@ -100,8 +100,8 @@ resource "aws_kinesis_stream" "use2_test_stream_provisioned" {
 }
 
 resource "aws_kinesis_stream" "use2_test_stream_provisioned_with_usage" {
-  provider                = aws.ue2
-  name = "use2_terraform-kinesis-test-with-usage"
+  provider = aws.ue2
+  name     = "use2_terraform-kinesis-test-with-usage"
   stream_mode_details {
     stream_mode = "PROVISIONED"
   }
