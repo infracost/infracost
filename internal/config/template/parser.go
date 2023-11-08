@@ -6,6 +6,7 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 	"text/template"
 
@@ -226,6 +227,30 @@ func (p *Parser) matchPaths(pattern string) []map[interface{}]interface{} {
 
 		return nil
 	})
+
+	// sort the matches by dir
+	sort.Slice(matches, func(i, j int) bool {
+		dirI, okI := matches[i]["_dir"].(string)
+		dirJ, okJ := matches[j]["_dir"].(string)
+		if !okI || !okJ {
+			return false
+		}
+		return dirI < dirJ
+	})
+
+	// mark any directories that are leaf directories
+	for i := 0; i < len(matches); i++ {
+		if (i + 1) >= len(matches) {
+			matches[i]["_isLeafDir"] = true
+			continue
+		}
+
+		currentDir, _ := matches[i]["_dir"].(string)
+		nextDir, _ := matches[i+1]["_dir"].(string)
+		if !strings.HasPrefix(nextDir, currentDir) {
+			matches[i]["_isLeafDir"] = true
+		}
+	}
 
 	return matches
 }
