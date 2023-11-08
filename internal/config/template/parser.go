@@ -159,11 +159,20 @@ func (p *Parser) pathExists(base, path string) bool {
 		}
 
 		rel, _ := filepath.Rel(base, subpath)
-		if rel == path {
-			fileExists = true
+		globs, err := filepath.Glob(path)
+		if err != nil {
+			return err
+		}
 
-			// exit the WalkDir tree evaluation early as we've found the file we're looking for
-			return errors.New("file found")
+		if len(globs) > 0 {
+			for _, glob := range globs {
+				if rel == glob {
+					fileExists = true
+
+					// exit the WalkDir tree evaluation early as we've found the file we're looking for
+					return errors.New("file found")
+				}
+			}
 		}
 
 		return nil
