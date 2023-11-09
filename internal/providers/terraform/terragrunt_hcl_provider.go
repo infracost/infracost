@@ -384,8 +384,8 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 		Functions: func(baseDir string) map[string]function.Function {
 			funcs := hcl.ExpFunctions(baseDir, p.logger)
 
-			funcs["run_cmd"] = mockSliceFuncStaticReturn(cty.StringVal("mock-run_cmd"))
-			funcs["sops_decrypt_file"] = mockSliceFuncStaticReturn(cty.StringVal("mock"))
+			funcs["run_cmd"] = mockSliceFuncStaticReturn(cty.StringVal("run_cmd-mock"))
+			funcs["sops_decrypt_file"] = mockSliceFuncStaticReturn(cty.StringVal("sops_decrypt_file-mock"))
 
 			return funcs
 		},
