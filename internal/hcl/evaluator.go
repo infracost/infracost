@@ -1011,7 +1011,7 @@ func ExpFunctions(baseDir string, logger zerolog.Logger) map[string]function.Fun
 		"matchkeys":        funcs.MatchkeysFunc,
 		"max":              stdlib.MaxFunc,
 		"md5":              funcs.Md5Func,
-		"merge":            stdlib.MergeFunc,
+		"merge":            funcs.MergeFunc,
 		"min":              stdlib.MinFunc,
 		"parseint":         stdlib.ParseIntFunc,
 		"pathexpand":       funcs.PathExpandFunc,
