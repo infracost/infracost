@@ -15,6 +15,7 @@ import (
 
 var (
 	missingAttributeDiagnostic        = "Unsupported attribute"
+	valueDoesNotHaveAnyIndices        = "Invalid index"
 	valueIsNonIterableDiagnostic      = "Iteration over non-iterable value"
 	invalidFunctionArgumentDiagnostic = "Invalid function argument"
 )
@@ -178,7 +179,7 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 			// this is likely from a Terraform attribute that is built from the provider. We then try and build
 			// a mocked attribute so that the module evaluation isn't harmed.
 			var shouldRetry bool
-			if d.Summary == missingAttributeDiagnostic {
+			if d.Summary == missingAttributeDiagnostic || d.Summary == valueDoesNotHaveAnyIndices {
 				badVariables := attr.findBadVariablesFromExpression(attr.HCLAttr.Expr)
 				if badVariables == nil {
 					badVariables = d.Expression.Variables()
@@ -294,7 +295,13 @@ func buildObject(traversal hcl.Traversal, value cty.Value, mock cty.Value, i int
 	}
 
 	traverser := traversal[i]
-	valueMap := value.AsValueMap()
+
+	var valueMap map[string]cty.Value
+
+	if value.IsKnown() && !value.IsNull() && value.CanIterateElements() {
+		valueMap = value.AsValueMap()
+	}
+
 	if valueMap == nil {
 		valueMap = make(map[string]cty.Value)
 	}
@@ -361,13 +368,6 @@ func buildObject(traversal hcl.Traversal, value cty.Value, mock cty.Value, i int
 				}
 				valueMap[v.Name] = cty.TupleVal(items)
 				return cty.ObjectVal(valueMap)
-			}
-
-			next := traversal[i+1]
-			if _, ok := next.(hcl.TraverseIndex); ok {
-				if !isList(vv) {
-					vv = cty.TupleVal([]cty.Value{vv})
-				}
 			}
 
 			valueMap[v.Name] = buildObject(traversal, vv, mock, i+1)
