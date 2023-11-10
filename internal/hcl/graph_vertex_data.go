@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 )
 
 type VertexData struct {
-	logger        *logrus.Entry
+	logger        zerolog.Logger
 	moduleConfigs *ModuleConfigs
 	block         *Block
 }
@@ -74,7 +74,7 @@ func (v *VertexData) evaluate(e *Evaluator, b *Block) error {
 
 	val := e.evaluateResource(b, existingVals)
 
-	v.logger.Debugf("adding data %s to the evaluation context", v.ID())
+	v.logger.Debug().Msgf("adding data %s to the evaluation context", v.ID())
 	e.ctx.SetByDot(val, fmt.Sprintf("data.%s", b.TypeLabel()))
 
 	return nil

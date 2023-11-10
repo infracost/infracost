@@ -4,13 +4,13 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 )
 
 type VertexResource struct {
 	moduleConfigs *ModuleConfigs
-	logger        *logrus.Entry
+	logger        zerolog.Logger
 	block         *Block
 }
 
@@ -74,7 +74,7 @@ func (v *VertexResource) evaluate(e *Evaluator, b *Block) error {
 
 	val := e.evaluateResource(b, existingVals)
 
-	v.logger.Debugf("adding resource %s to the evaluation context", v.ID())
+	v.logger.Debug().Msgf("adding resource %s to the evaluation context", v.ID())
 	e.ctx.SetByDot(val, b.TypeLabel())
 
 	return nil

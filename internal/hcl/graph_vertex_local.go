@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 )
 
 type VertexLocal struct {
-	logger        *logrus.Entry
+	logger        zerolog.Logger
 	moduleConfigs *ModuleConfigs
 	block         *Block
 	attr          *Attribute
@@ -38,7 +38,7 @@ func (v *VertexLocal) Visit(mutex *sync.Mutex) error {
 	for _, moduleInstance := range moduleInstances {
 		e := moduleInstance.evaluator
 
-		v.logger.Debugf("adding attribute %s to the evaluation context", v.ID())
+		v.logger.Debug().Msgf("adding attribute %s to the evaluation context", v.ID())
 
 		var attrInstance *Attribute
 		for _, b := range e.module.Blocks {

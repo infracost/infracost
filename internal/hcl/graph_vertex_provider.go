@@ -4,12 +4,12 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 )
 
 type VertexProvider struct {
-	logger        *logrus.Entry
+	logger        zerolog.Logger
 	moduleConfigs *ModuleConfigs
 	block         *Block
 }
@@ -73,7 +73,7 @@ func (v *VertexProvider) Visit(mutex *sync.Mutex) error {
 
 		val := e.evaluateProvider(blockInstance, existingVals)
 
-		v.logger.Debugf("adding %s to the evaluation context", v.ID())
+		v.logger.Debug().Msgf("adding %s to the evaluation context", v.ID())
 		e.ctx.Set(val, blockInstance.Label())
 
 		e.AddFilteredBlocks(blockInstance)

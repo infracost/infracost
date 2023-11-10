@@ -7,7 +7,7 @@ import (
 	"sync"
 
 	"github.com/heimdalr/dag"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -54,7 +54,7 @@ func (m *ModuleConfigs) Get(moduleAddress string) []ModuleConfig {
 
 type Graph struct {
 	dag           *dag.DAG
-	logger        *logrus.Entry
+	logger        zerolog.Logger
 	rootVertex    Vertex
 	vertexMutex   *sync.Mutex
 	moduleConfigs *ModuleConfigs
@@ -72,7 +72,7 @@ type VertexReference struct {
 	Key           string
 }
 
-func NewGraphWithRoot(logger *logrus.Entry, vertexMutex *sync.Mutex) (*Graph, error) {
+func NewGraphWithRoot(logger zerolog.Logger, vertexMutex *sync.Mutex) (*Graph, error) {
 	if vertexMutex == nil {
 		vertexMutex = &sync.Mutex{}
 	}
@@ -163,13 +163,13 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 	for _, vertex := range vertexes {
 		id := vertex.ID()
 
-		g.logger.Debugf("adding vertex: %s", id)
+		g.logger.Debug().Msgf("adding vertex: %s", id)
 		err := g.dag.AddVertexByID(id, vertex)
 		if err != nil {
 			// We don't actually mind if blocks are added multiple times
 			// since this helps us support cases like _override.tf files
 			// and in-progress changes.
-			g.logger.WithError(err).Debugf("error adding vertex %q", id)
+			g.logger.Debug().Err(err).Msgf("error adding vertex %q", id)
 		}
 	}
 
@@ -180,21 +180,21 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 		modAddr := vertex.ModuleAddress()
 
 		if modAddr == "" {
-			g.logger.Debugf("adding edge: %s, %s", g.rootVertex.ID(), id)
+			g.logger.Debug().Msgf("adding edge: %s, %s", g.rootVertex.ID(), id)
 			edges = append(edges, dag.EdgeInput{
 				SrcID: g.rootVertex.ID(),
 				DstID: id,
 			})
 		} else {
 			// Add the module call edge
-			g.logger.Debugf("adding edge: %s, %s", moduleCallID(modAddr), id)
+			g.logger.Debug().Msgf("adding edge: %s, %s", moduleCallID(modAddr), id)
 			edges = append(edges, dag.EdgeInput{
 				SrcID: moduleCallID(modAddr),
 				DstID: id,
 			})
 
 			// Add the module exit edge
-			g.logger.Debugf("adding edge: %s, %s", id, modAddr)
+			g.logger.Debug().Msgf("adding edge: %s, %s", id, modAddr)
 			edges = append(edges, dag.EdgeInput{
 				SrcID: id,
 				DstID: modAddr,
@@ -236,7 +236,7 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 			// Check if the source vertex exists
 			_, err := g.dag.GetVertex(srcId)
 			if err == nil {
-				g.logger.Debugf("adding edge: %s, %s", srcId, id)
+				g.logger.Debug().Msgf("adding edge: %s, %s", srcId, id)
 				edges = append(edges, dag.EdgeInput{
 					SrcID: srcId,
 					DstID: id,
@@ -256,7 +256,7 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 				// Check if the source vertex exists
 				_, err := g.dag.GetVertex(srcId)
 				if err == nil {
-					g.logger.Debugf("adding edge: %s, %s", srcId, id)
+					g.logger.Debug().Msgf("adding edge: %s, %s", srcId, id)
 					edges = append(edges, dag.EdgeInput{
 						SrcID: srcId,
 						DstID: id,
@@ -328,11 +328,11 @@ func (g *Graph) Run(evaluator *Evaluator) (*Module, error) {
 }
 
 type GraphVisitor struct {
-	logger      *logrus.Entry
+	logger      zerolog.Logger
 	vertexMutex *sync.Mutex
 }
 
-func NewGraphVisitor(logger *logrus.Entry, vertexMutex *sync.Mutex) *GraphVisitor {
+func NewGraphVisitor(logger zerolog.Logger, vertexMutex *sync.Mutex) *GraphVisitor {
 	return &GraphVisitor{
 		logger:      logger,
 		vertexMutex: vertexMutex,
@@ -340,12 +340,12 @@ func NewGraphVisitor(logger *logrus.Entry, vertexMutex *sync.Mutex) *GraphVisito
 }
 
 func (v *GraphVisitor) Visit(id string, vertex interface{}) {
-	v.logger.Debugf("visiting vertex %q", id)
+	v.logger.Debug().Msgf("visiting vertex %q", id)
 
 	vert := vertex.(Vertex)
 	err := vert.Visit(v.vertexMutex)
 	if err != nil {
-		v.logger.WithError(err).Debugf("ignoring vertex %q because an error was encountered", id)
+		v.logger.Debug().Err(err).Msgf("ignoring vertex %q because an error was encountered", id)
 	}
 }
 
