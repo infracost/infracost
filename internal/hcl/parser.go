@@ -13,6 +13,7 @@ import (
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclparse"
 	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 
@@ -459,8 +460,8 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 
 	// Graph evaluation
 	if evaluator.isGraphEvaluator() {
-		// we use the base logrus log here so that it's consistent with the spinner logs
-		logrus.Info("Building project with experimental graph runner")
+		// we use the base zerolog log here so that it's consistent with the spinner logs
+		log.Info().Msgf("Building project with experimental graph runner")
 
 		g, err := NewGraphWithRoot(p.logger, nil)
 		if err != nil {

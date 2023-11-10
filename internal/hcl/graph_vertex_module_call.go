@@ -5,7 +5,7 @@ import (
 	"sync"
 
 	"github.com/hashicorp/hcl/v2"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 )
 
@@ -14,7 +14,7 @@ func moduleCallID(moduleAddress string) string {
 }
 
 type VertexModuleCall struct {
-	logger        *logrus.Entry
+	logger        zerolog.Logger
 	moduleConfigs *ModuleConfigs
 	block         *Block
 }
@@ -69,7 +69,7 @@ func (v *VertexModuleCall) evaluate(e *Evaluator, b *Block, mutex *sync.Mutex) e
 		return fmt.Errorf("module block %s has no label", b.FullName())
 	}
 
-	v.logger.Debugf("adding module %s to the evaluation context", b.FullName())
+	v.logger.Debug().Msgf("adding module %s to the evaluation context", b.FullName())
 	e.ctx.SetByDot(b.Values(), b.LocalName())
 
 	return nil

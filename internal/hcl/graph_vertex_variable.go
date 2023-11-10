@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"sync"
 
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 )
 
 type VertexVariable struct {
-	logger        *logrus.Entry
+	logger        zerolog.Logger
 	moduleConfigs *ModuleConfigs
 	block         *Block
 }
@@ -47,7 +47,7 @@ func (v *VertexVariable) Visit(mutex *sync.Mutex) error {
 			return fmt.Errorf("could not evaluate variable %s: %w", v.ID(), err)
 		}
 
-		v.logger.Debugf("adding variable %s to the evaluation context", v.ID())
+		v.logger.Debug().Msgf("adding variable %s to the evaluation context", v.ID())
 		key := fmt.Sprintf("var.%s", blockInstance.Label())
 		e.ctx.SetByDot(val, key)
 
