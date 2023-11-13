@@ -413,7 +413,7 @@ func TestParseJSONResources(t *testing.T) {
 
 	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, map[string]interface{}{}), true)
 
-	partials := p.parseJSONResources(false, nil, usage, parsed, providerConf, conf, vars)
+	partials := p.parseJSONResources(false, nil, usage, NewConfLoader(conf), parsed, providerConf, vars)
 	actual := make([]*schema.Resource, len(partials))
 	for i, partial := range partials {
 		actual[i] = schema.BuildResource(partial, nil)
@@ -664,7 +664,7 @@ func TestParseResourceData(t *testing.T) {
 	}
 
 	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, map[string]interface{}{}), true)
-	actual := p.parseResourceData(false, providerConf, planVals, conf, vars)
+	actual := p.parseResourceData(false, NewConfLoader(conf), providerConf, planVals, vars)
 
 	for k, v := range actual {
 		assert.Equal(t, expected[k].Address, v.Address)
@@ -733,7 +733,7 @@ func TestParseReferences_plan(t *testing.T) {
 	}
 
 	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, map[string]interface{}{}), true)
-	p.parseReferences(resData, conf)
+	p.parseReferences(resData, NewConfLoader(conf))
 
 	assert.Equal(t, []*schema.ResourceData{vol1}, resData["aws_ebs_snapshot.snapshot1"].References("volume_id"))
 }
@@ -773,7 +773,7 @@ func TestParseReferences_state(t *testing.T) {
 	conf := gjson.Result{}
 
 	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, map[string]interface{}{}), true)
-	p.parseReferences(resData, conf)
+	p.parseReferences(resData, NewConfLoader(conf))
 
 	assert.Equal(t, []*schema.ResourceData{vol1}, resData["aws_ebs_snapshot.snapshot1"].References("volume_id"))
 }
@@ -945,7 +945,7 @@ func TestParseKnownModuleRefs(t *testing.T) {
 	}
 	assert.Nil(t, resData[res.Address].References("launch_template"))
 
-	parseKnownModuleRefs(resData, conf)
+	parseKnownModuleRefs(resData, NewConfLoader(conf))
 
 	assert.NotNil(t, resData[res.Address].References("launch_template"))
 }
