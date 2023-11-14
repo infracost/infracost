@@ -129,7 +129,8 @@ func CompareTo(c *config.Config, current, prior Root) (Root, error) {
 		scp.Metadata.PastPolicySha = ""
 		scp.HasDiff = true
 
-		if v, ok := priorProjects[p.LabelWithMetadata()]; ok {
+		metadata := p.LabelWithMetadata()
+		if v, ok := priorProjects[metadata]; ok {
 			if !p.Metadata.HasErrors() && !v.Metadata.HasErrors() {
 				scp.PastResources = v.Resources
 				scp.Metadata.PastPolicySha = v.Metadata.PolicySha
@@ -150,7 +151,11 @@ func CompareTo(c *config.Config, current, prior Root) (Root, error) {
 				scp.Metadata.Errors = append(scp.Metadata.Errors, pastE)
 			}
 
-			delete(priorProjects, p.LabelWithMetadata())
+			delete(priorProjects, metadata)
+		} else if children := findChildrenOfErroredProject(p, priorProjects); len(children) > 0 {
+			for _, child := range children {
+				delete(priorProjects, child)
+			}
 		}
 
 		schemaProjects = append(schemaProjects, scp)
@@ -189,6 +194,43 @@ func CompareTo(c *config.Config, current, prior Root) (Root, error) {
 	out.FullSummary = current.FullSummary
 	out.Currency = current.Currency
 	return out, nil
+}
+
+// findChildrenOfErroredProject finds all the projects which are a child path of the errored Project p.
+// This is done as sometimes errored Terragrunt evaluation returns the master path of the project
+// rather than the actual Terragrunt projects. This happens when Terragrunt is unable to build
+// a "stack" configuration (the Terragrunt project tree) because of a parsing error.
+//
+// For example if we have the following tree:
+// .
+// └── infra/
+//
+//	├── dev/
+//	│   └── terragrunt.hcl
+//	└── prod/
+//	    └── terragrunt.hcl
+//
+// A valid `breakdown --path infra` will return projects `infra/dev` and `infra/prod`.
+// However, in an errored "stack" state Terragrunt will return a single project at `infra`.
+// We need to find all the child projects of the parent so that we can properly exclude them from the output.
+// Otherwise, these projects will show as "removed" and have an invalid cost decrease.
+//
+// findChildrenOfErroredProject returns a list of strings that represent the paths of the projects
+// to remove from an output list.
+func findChildrenOfErroredProject(p Project, projects map[string]*schema.Project) []string {
+	if !p.Metadata.HasErrors() {
+		return nil
+	}
+
+	metadata := p.LabelWithMetadata()
+	var children []string
+	for key, project := range projects {
+		if strings.HasPrefix(key, metadata) && !project.Metadata.HasErrors() {
+			children = append(children, key)
+		}
+	}
+
+	return children
 }
 
 func Combine(inputs []ReportInput) (Root, error) {

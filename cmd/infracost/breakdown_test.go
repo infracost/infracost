@@ -531,6 +531,21 @@ func TestBreakdownTerragruntHCLModuleOutputForEach(t *testing.T) {
 	)
 }
 
+func TestBreakdownTerragruntDiffProjectError(t *testing.T) {
+	projectPath := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
+
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"diff",
+			"--path", projectPath,
+			"--compare-to", path.Join(projectPath, "prior.json"),
+		},
+		&GoldenFileOptions{CaptureLogs: true},
+	)
+}
+
 func TestBreakdownTerragruntGetEnv(t *testing.T) {
 	os.Setenv("CUSTOM_OS_VAR", "test")
 	os.Setenv("CUSTOM_OS_VAR_PROD", "test-prod")
