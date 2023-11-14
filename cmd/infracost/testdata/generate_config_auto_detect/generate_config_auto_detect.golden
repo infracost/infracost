@@ -1,0 +1,26 @@
+version: 0.1
+
+projects:
+  - path: testdata/generate_config_auto_detect/apps/bar
+    name: testdata-generate_config_auto_detect-apps-bar-
+    terraform_var_files:
+      - terraform.tfvars
+    terraform_workspace: default
+  - path: testdata/generate_config_auto_detect/apps/foo
+    name: testdata-generate_config_auto_detect-apps-foo-dev
+    terraform_var_files:
+      - terraform.tfvars
+      - dev.tfvars
+    terraform_workspace: default
+  - path: testdata/generate_config_auto_detect/apps/foo
+    name: testdata-generate_config_auto_detect-apps-foo-prod
+    terraform_var_files:
+      - terraform.tfvars
+      - prod.tfvars
+    terraform_workspace: default
+  - path: testdata/generate_config_auto_detect/apps/foo
+    name: testdata-generate_config_auto_detect-apps-foo-terraform
+    terraform_var_files:
+      - terraform.tfvars
+    terraform_workspace: default
+
