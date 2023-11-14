@@ -14,6 +14,7 @@ import (
 	"github.com/hashicorp/hcl/v2/hclparse"
 	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
+	"github.com/zclconf/go-cty/cty/gocty"
 
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
@@ -317,6 +318,47 @@ func newParser(projectRoot RootPath, moduleLoader *modules.ModuleLoader, logger 
 	}
 
 	return p
+}
+
+// YAML returns a yaml representation of Parser, that can be used to "explain" the auto-detection functionality.
+func (p *Parser) YAML() string {
+	str := strings.Builder{}
+	str.WriteString(fmt.Sprintf("  - path: %s\n", p.initialPath))
+	if len(p.tfvarsPaths) > 0 || len(p.defaultVarFiles) > 0 {
+		str.WriteString("  terraform_var_files:\n")
+		for _, varFile := range p.defaultVarFiles {
+			str.WriteString(fmt.Sprintf("    - %s\n", varFile))
+		}
+
+		for _, varFile := range p.tfvarsPaths {
+			str.WriteString(fmt.Sprintf("    - %s\n", varFile))
+		}
+	}
+
+	str.WriteString(fmt.Sprintf("    terraform_workspace: %s\n", p.workspaceName))
+
+	if len(p.tfEnvVars) > 0 {
+		str.WriteString("  terraform_vars:\n")
+
+		keys := make([]string, len(p.tfEnvVars), 0)
+		for key := range p.tfEnvVars {
+			keys = append(keys, key)
+		}
+
+		sort.Strings(keys)
+
+		for _, key := range keys {
+			var value string
+			err := gocty.FromCtyValue(p.tfEnvVars[key], &value)
+			if err != nil {
+				continue
+			}
+
+			str.WriteString(fmt.Sprintf("    %s:%s\n", key, value))
+		}
+	}
+
+	return str.String()
 }
 
 // ParseDirectory parses all the terraform files in the initialPath into Blocks and then passes them to an Evaluator

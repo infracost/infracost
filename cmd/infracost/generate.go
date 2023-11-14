@@ -3,14 +3,16 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"github.com/infracost/infracost/internal/config"
-	"gopkg.in/yaml.v2"
 	"io"
 	"os"
 
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v2"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/config/template"
+	"github.com/infracost/infracost/internal/hcl"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/infracost/infracost/internal/vcs"
 )
@@ -47,12 +49,6 @@ func newGenerateConfigCommand() *cobra.Command {
 }
 
 func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
-	if g.templatePath == "" && g.template == "" {
-		ui.PrintErrorf(cmd.ErrOrStderr(), "Please provide an Infracost config template.\n")
-		ui.PrintUsage(cmd)
-		return nil
-	}
-
 	if _, err := os.Stat(g.templatePath); g.templatePath != "" && err != nil {
 		ui.PrintErrorf(cmd.ErrOrStderr(), "Provided template file %q does not exist\n", g.templatePath)
 		ui.PrintUsage(cmd)
@@ -84,10 +80,26 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 		if err != nil {
 			return err
 		}
-	} else {
+	} else if g.templatePath != "" {
 		err := parser.CompileFromFile(g.templatePath, &buf)
 		if err != nil {
 			return err
+		}
+	} else {
+		parsers, err := hcl.LoadParsers(
+			config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, nil),
+			g.repoPath,
+			nil,
+			nil,
+			logging.Logger,
+		)
+		if err != nil {
+			return err
+		}
+
+		buf.WriteString("version: 0.1\n\nprojects:\n")
+		for _, p := range parsers {
+			buf.WriteString(p.YAML())
 		}
 	}
 
