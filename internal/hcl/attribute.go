@@ -188,7 +188,11 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 				shouldRetry = true
 
 				if (attr.Name() == "instances_map") {
-					fmt.Println("badVariables", badVariables)
+					fmt.Println("instances_map badVariables", badVariables)
+				}
+
+				if (attr.Name() == "instances_to_kops_sg_map") {
+					fmt.Println("instances_to_kops_sg_map badVariables", badVariables)
 				}
 
 				for _, traversal := range badVariables {
