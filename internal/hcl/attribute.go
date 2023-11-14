@@ -186,6 +186,11 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 				}
 
 				shouldRetry = true
+
+				if (attr.Name() == "instances_map") {
+					fmt.Println("badVariables", badVariables)
+				}
+
 				for _, traversal := range badVariables {
 					traverseVarAndSetCtx(ctx, traversal, mockedVal)
 				}
