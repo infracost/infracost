@@ -323,15 +323,33 @@ func newParser(projectRoot RootPath, moduleLoader *modules.ModuleLoader, logger 
 // YAML returns a yaml representation of Parser, that can be used to "explain" the auto-detection functionality.
 func (p *Parser) YAML() string {
 	str := strings.Builder{}
-	str.WriteString(fmt.Sprintf("  - path: %s\n", p.initialPath))
+	str.WriteString(fmt.Sprintf("  - path: %s\n    name: %s-%s\n", p.initialPath, strings.ReplaceAll(p.initialPath, "/", "-"), p.moduleSuffix))
 	if len(p.tfvarsPaths) > 0 || len(p.defaultVarFiles) > 0 {
-		str.WriteString("  terraform_var_files:\n")
+		str.WriteString("    terraform_var_files:\n")
+		written := map[string]bool{}
+
 		for _, varFile := range p.defaultVarFiles {
-			str.WriteString(fmt.Sprintf("    - %s\n", varFile))
+			p, err := filepath.Rel(p.initialPath, varFile)
+			if err != nil {
+				continue
+			}
+
+			str.WriteString(fmt.Sprintf("      - %s\n", p))
+			written[varFile] = true
 		}
 
 		for _, varFile := range p.tfvarsPaths {
-			str.WriteString(fmt.Sprintf("    - %s\n", varFile))
+			p, err := filepath.Rel(p.initialPath, varFile)
+			if err != nil {
+				continue
+			}
+
+			if written[varFile] {
+				continue
+			}
+
+			str.WriteString(fmt.Sprintf("      - %s\n", p))
+			written[varFile] = true
 		}
 	}
 
@@ -354,7 +372,7 @@ func (p *Parser) YAML() string {
 				continue
 			}
 
-			str.WriteString(fmt.Sprintf("    %s:%s\n", key, value))
+			str.WriteString(fmt.Sprintf("      %s:%s\n", key, value))
 		}
 	}
 

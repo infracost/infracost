@@ -90,7 +90,7 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 			config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, nil),
 			g.repoPath,
 			nil,
-			nil,
+			&hcl.ProjectLocatorConfig{},
 			logging.Logger,
 		)
 		if err != nil {
