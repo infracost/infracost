@@ -197,7 +197,9 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 
 				for _, traversal := range badVariables {
 					if (attr.Name() == "instances_map") {
-						fmt.Printf("instances_map traversal: %T \n", traversal)
+						for _, t := range traversal {
+							fmt.Printf("instances_map traversal: %T \n", t)
+						}
 					}
 
 					traverseVarAndSetCtx(ctx, traversal, mockedVal)
