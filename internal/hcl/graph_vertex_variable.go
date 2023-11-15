@@ -42,7 +42,14 @@ func (v *VertexVariable) Visit(mutex *sync.Mutex) error {
 			return fmt.Errorf("could not find block %q in module %q", v.ID(), moduleInstance.name)
 		}
 
-		val, err := e.evaluateVariable(blockInstance)
+		// Re-evaluate the input variables for the module instance since the inputs
+		// to the module might have changed
+		inputVars := e.inputVars
+		if moduleInstance.moduleCall != nil {
+			inputVars = moduleInstance.moduleCall.Definition.values().AsValueMap()
+		}
+
+		val, err := e.evaluateVariable(blockInstance, inputVars)
 		if err != nil {
 			return fmt.Errorf("could not evaluate variable %s: %w", v.ID(), err)
 		}

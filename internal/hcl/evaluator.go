@@ -201,7 +201,7 @@ func (e *Evaluator) MissingVars() []string {
 			continue
 		}
 
-		_, v := e.evaluateVariable(block)
+		_, v := e.evaluateVariable(block, e.inputVars)
 		if v == errorNoVarValue {
 			missing = append(missing, fmt.Sprintf("variable.%s", name))
 		}
@@ -631,7 +631,7 @@ func (e *Evaluator) expandBlockCounts(blocks Blocks) Blocks {
 	return expanded
 }
 
-func (e *Evaluator) evaluateVariable(b *Block) (cty.Value, error) {
+func (e *Evaluator) evaluateVariable(b *Block, inputVars map[string]cty.Value) (cty.Value, error) {
 	if b.Label() == "" {
 		return cty.DynamicVal, fmt.Errorf("empty label - cannot resolve")
 	}
@@ -642,7 +642,7 @@ func (e *Evaluator) evaluateVariable(b *Block) (cty.Value, error) {
 	}
 
 	attrType := attributes["type"]
-	if override, exists := e.inputVars[b.Label()]; exists {
+	if override, exists := inputVars[b.Label()]; exists {
 		return e.convertType(b, override, attrType)
 	}
 
@@ -698,7 +698,7 @@ func (e *Evaluator) getValuesByBlockType(blockType string) cty.Value {
 	for _, b := range blocksOfType {
 		switch b.Type() {
 		case "variable": // variables are special in that their value comes from the "default" attribute
-			val, err := e.evaluateVariable(b)
+			val, err := e.evaluateVariable(b, e.inputVars)
 			if err != nil {
 				e.logger.Debug().Err(err).Msgf("could not evaluate variable %s ignoring", b.FullName())
 				continue

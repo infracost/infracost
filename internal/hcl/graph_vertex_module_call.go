@@ -2,6 +2,7 @@ package hcl
 
 import (
 	"fmt"
+	"strings"
 	"sync"
 
 	"github.com/hashicorp/hcl/v2"
@@ -11,6 +12,10 @@ import (
 
 func moduleCallID(moduleAddress string) string {
 	return fmt.Sprintf("call:%s", moduleAddress)
+}
+
+func stripModuleCallPrefix(id string) string {
+	return strings.TrimPrefix(id, "call:")
 }
 
 type VertexModuleCall struct {

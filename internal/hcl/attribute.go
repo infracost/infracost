@@ -544,6 +544,7 @@ func (attr *Attribute) VerticesReferenced(b *Block) []VertexReference {
 
 		refs = append(refs, VertexReference{
 			ModuleAddress: modAddr,
+			AttributeName: attr.Name(),
 			Key:           otherPart,
 		})
 	}

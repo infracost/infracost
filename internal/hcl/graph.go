@@ -69,6 +69,7 @@ type Vertex interface {
 
 type VertexReference struct {
 	ModuleAddress string
+	AttributeName string
 	Key           string
 }
 
@@ -226,20 +227,30 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 				srcId = fmt.Sprintf("%s.%s", modAddress, srcId)
 			}
 
+			dstID := id
+
+			// If the vertex is a module call we should set the edge
+			// to the variable block within the module
+			if _, ok := vertex.(*VertexModuleCall); ok {
+				if ref.AttributeName != "" {
+					dstID = fmt.Sprintf("%s.variable.%s", stripModuleCallPrefix(id), ref.AttributeName)
+				}
+			}
+
 			// Strip the count/index suffix from the source ID
 			srcId = stripCount(srcId)
 
-			if srcId == id {
+			if srcId == dstID {
 				continue
 			}
 
 			// Check if the source vertex exists
 			_, err := g.dag.GetVertex(srcId)
 			if err == nil {
-				g.logger.Debug().Msgf("adding edge: %s, %s", srcId, id)
+				g.logger.Debug().Msgf("adding edge: %s, %s", srcId, dstID)
 				edges = append(edges, dag.EdgeInput{
 					SrcID: srcId,
-					DstID: id,
+					DstID: dstID,
 				})
 
 				continue
@@ -256,10 +267,10 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 				// Check if the source vertex exists
 				_, err := g.dag.GetVertex(srcId)
 				if err == nil {
-					g.logger.Debug().Msgf("adding edge: %s, %s", srcId, id)
+					g.logger.Debug().Msgf("adding edge: %s, %s", srcId, dstID)
 					edges = append(edges, dag.EdgeInput{
 						SrcID: srcId,
-						DstID: id,
+						DstID: dstID,
 					})
 
 					continue
