@@ -294,6 +294,8 @@ func traverseVarAndSetCtx(ctx *hcl.EvalContext, traversal hcl.Traversal, mock ct
 		return
 	}
 
+	fmt.Println("rootName", rootName)
+
 	if rootName == "instance" {
 		fmt.Println("ctx", ctx)
 	}
