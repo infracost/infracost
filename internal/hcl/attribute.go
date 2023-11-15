@@ -173,50 +173,13 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 		}
 
 		ctx := attr.Ctx.Inner()
+		exp := mockFunctionCallArgs(attr.HCLAttr.Expr, diag, mockedVal)
+		val, err := exp.Value(ctx)
+		if !err.HasErrors() {
+			return val
+		}
+
 		for _, d := range diag {
-			// if the expression is a function call we can try and skip the mocking logic and
-			// just find the argument that is causing the issue in the diagnostic. This is
-			// preferable in some cases as modifying the Context with mocked values can
-			// result in unexpected outputs.
-			if fc, ok := attr.HCLAttr.Expr.(*hclsyntax.FunctionCallExpr); ok {
-				newArgs := make([]hclsyntax.Expression, len(fc.Args))
-
-				// loop through the function call args to get the bad expression once we've found
-				// the expression which has a diagnostic let's set it as a literal value so that
-				// when we evaluate the function again we don't have issues any mocked values of
-				// diagnostics.
-				for i, exp := range fc.Args {
-					if exp == d.Expression {
-						// @TODO we can probably improve this by checking the function name and assigning
-						// a correct mockedVal for the given function. e.g. array functions will expect a
-						// list/tuple
-						newArgs[i] = &hclsyntax.LiteralValueExpr{
-							Val: mockedVal,
-						}
-						continue
-					}
-
-					newArgs[i] = exp
-				}
-
-				// assign a new function call with the new args so that we don't modify the
-				// underlying Attribute expression.
-				call := &hclsyntax.FunctionCallExpr{
-					Name:            fc.Name,
-					Args:            newArgs,
-					ExpandFinal:     fc.ExpandFinal,
-					NameRange:       fc.NameRange,
-					OpenParenRange:  fc.OpenParenRange,
-					CloseParenRange: fc.CloseParenRange,
-				}
-
-				// return a value only if we're successful in the expression call. Otherwise, we
-				// should continue on with the mocking logic and try and get a valid output.
-				value, diag := call.Value(ctx)
-				if diag == nil {
-					return value
-				}
-			}
 
 			// if the diagnostic summary indicates that we were the attribute we attempted to fetch is unsupported
 			// this is likely from a Terraform attribute that is built from the provider. We then try and build
@@ -290,6 +253,75 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 	}
 
 	return ctyVal
+}
+
+// mockFunctionCallArgs attempts to resolve remove bad expressions from hclsyntax.FunctionCallExpr args.
+// This function will be called recursively, finding all functions and checking if their args match
+// the bad Expressions listed in the diagnostics. This function, currently, only traverses FunctionCallExpr and ObjectCallExpr.
+// More complex Expressions could be added in the future is we deem this a better way of mocking out values/expressions
+// that cause evaluation to fail.
+func mockFunctionCallArgs(expr hcl.Expression, diagnostics hcl.Diagnostics, mockedVal cty.Value) hclsyntax.Expression {
+	switch t := expr.(type) {
+	case *hclsyntax.FunctionCallExpr:
+		newArgs := make([]hclsyntax.Expression, len(t.Args))
+
+		// loop through the function call args to get the bad expression once we've found
+		// the expression which has a diagnostic let's set it as a literal value so that
+		// when we evaluate the function again we don't have issues any mocked values of
+		// diagnostics.
+		for i, exp := range t.Args {
+			var found bool
+			for _, d := range diagnostics {
+				if exp == d.Expression {
+					// @TODO we can probably improve this by checking the function name and assigning
+					// a correct mockedVal for the given function. e.g. array functions will expect a
+					// list/tuple
+					newArgs[i] = &hclsyntax.LiteralValueExpr{
+						Val: mockedVal,
+					}
+
+					found = true
+					break
+				}
+			}
+
+			if !found {
+				newArgs[i] = mockFunctionCallArgs(exp, diagnostics, mockedVal)
+			}
+		}
+
+		return &hclsyntax.FunctionCallExpr{
+			Name:            t.Name,
+			Args:            newArgs,
+			ExpandFinal:     t.ExpandFinal,
+			NameRange:       t.NameRange,
+			OpenParenRange:  t.OpenParenRange,
+			CloseParenRange: t.CloseParenRange,
+		}
+	case *hclsyntax.ObjectConsExpr:
+		newItems := make([]hclsyntax.ObjectConsItem, len(t.Items))
+		for i, item := range t.Items {
+			newItems[i] = hclsyntax.ObjectConsItem{
+				KeyExpr:   item.KeyExpr,
+				ValueExpr: mockFunctionCallArgs(item.ValueExpr, diagnostics, mockedVal),
+			}
+		}
+
+		return &hclsyntax.ObjectConsExpr{
+			Items:     newItems,
+			SrcRange:  t.SrcRange,
+			OpenRange: t.OpenRange,
+		}
+
+	}
+
+	if v, ok := expr.(hclsyntax.Expression); ok {
+		return v
+	}
+
+	return &hclsyntax.LiteralValueExpr{
+		Val: mockedVal,
+	}
 }
 
 // traverseVarAndSetCtx uses the hcl traversal to build a mocked attribute on the evaluation context.
