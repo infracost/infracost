@@ -375,6 +375,11 @@ func buildObject(traversal hcl.Traversal, value cty.Value, mock cty.Value, i int
 					i, _ := key.AsBigFloat().Int64()
 					items[i] = val
 				}
+
+				if (v.Name == "instances_map") {
+					fmt.Println("instances_map GoString()", vv.GoString())
+				}
+
 				valueMap[v.Name] = cty.TupleVal(items)
 				return cty.ObjectVal(valueMap)
 			}
