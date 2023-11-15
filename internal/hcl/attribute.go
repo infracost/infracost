@@ -290,6 +290,7 @@ func traverseVarAndSetCtx(ctx *hcl.EvalContext, traversal hcl.Traversal, mock ct
 	}
 
 	ctx = findCorrectCtx(ctx, rootName)
+	fmt.Println("ctx", ctx)
 	if ctx == nil {
 		return
 	}
