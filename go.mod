@@ -272,4 +272,4 @@ replace github.com/spf13/cobra => github.com/spf13/cobra v1.4.0
 
 replace github.com/gruntwork-io/terragrunt => github.com/infracost/terragrunt v0.47.1-0.20231103101711-77c5e7d4d795
 
-replace github.com/heimdalr/dag => github.com/aliscott/dag v1.3.2-0.20231106161201-44a6c812224b
+replace github.com/heimdalr/dag => github.com/aliscott/dag v1.3.2-0.20231115114512-4ce18c825f94
