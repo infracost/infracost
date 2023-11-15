@@ -294,6 +294,10 @@ func traverseVarAndSetCtx(ctx *hcl.EvalContext, traversal hcl.Traversal, mock ct
 		return
 	}
 
+	if rootName == "instance" {
+		fmt.Println("ctx", ctx)
+	}
+
 	ob := ctx.Variables[rootName]
 	if ob.IsNull() || !ob.IsKnown() {
 		ob = cty.ObjectVal(make(map[string]cty.Value))
