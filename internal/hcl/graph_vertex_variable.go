@@ -5,6 +5,7 @@ import (
 	"sync"
 
 	"github.com/rs/zerolog"
+	"github.com/zclconf/go-cty/cty"
 )
 
 type VertexVariable struct {
@@ -42,7 +43,21 @@ func (v *VertexVariable) Visit(mutex *sync.Mutex) error {
 			return fmt.Errorf("could not find block %q in module %q", v.ID(), moduleInstance.name)
 		}
 
-		val, err := e.evaluateVariable(blockInstance)
+		// Re-evaluate the matching module input variables for this variable block
+		// to ensure we have the most up-to-date value
+		inputVars := e.inputVars
+
+		if moduleInstance.moduleCall != nil {
+			attrName := v.block.TypeLabel()
+			attr, ok := moduleInstance.moduleCall.Definition.AttributesAsMap()[attrName]
+			if ok {
+				inputVars = map[string]cty.Value{
+					attrName: attr.Value(),
+				}
+			}
+		}
+
+		val, err := e.evaluateVariable(blockInstance, inputVars)
 		if err != nil {
 			return fmt.Errorf("could not evaluate variable %s: %w", v.ID(), err)
 		}

@@ -1531,6 +1531,7 @@ func BenchmarkParserEvaluate(b *testing.B) {
 		b.StopTimer()
 		require.NoError(b, err)
 		blocks := module.Blocks
+
 		assertBlockEqualsJSON(
 			b,
 			`{"value": {"context_name":"bastion", "deep_merge_1":"value1-3(double-overwrite)", "deep_merge_2":"value1-3(double-overwrite)"}}`,
