@@ -199,6 +199,9 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 					if (attr.Name() == "instances_map") {
 						for _, t := range traversal {
 							fmt.Printf("instances_map traversal: %T \n", t)
+							if r, ok := t.(hcl.TraverseRoot); ok {
+								fmt.Println("traversal name", r.Name)
+							}
 						}
 					}
 
@@ -293,8 +296,6 @@ func traverseVarAndSetCtx(ctx *hcl.EvalContext, traversal hcl.Traversal, mock ct
 	if ctx == nil {
 		return
 	}
-
-	fmt.Println("rootName", rootName)
 
 	if rootName == "instance" {
 		fmt.Println("ctx", ctx)
