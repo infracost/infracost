@@ -36,6 +36,10 @@ func newSearchDomain(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 		r.EBSIOPS = floatPtr(d.Get("ebs_options.0.iops").Float())
 	}
 
+	if !d.IsEmpty("ebs_options.0.throughput") {
+		r.EBSThroughput = floatPtr(d.Get("ebs_options.0.throughput").Float())
+	}
+
 	if !d.IsEmpty("cluster_config.0.dedicated_master_count") {
 		r.ClusterDedicatedMasterCount = intPtr(d.Get("cluster_config.0.dedicated_master_count").Int())
 	}
