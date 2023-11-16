@@ -469,7 +469,7 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 			}
 
 			if e, ok := err.(*apiclient.APIError); ok {
-				return nil, fmt.Errorf("%v\n%s", e.Error(), "We have been notified of this issue.")
+				return nil, fmt.Errorf("%v", e.Error())
 			}
 
 			return nil, err
