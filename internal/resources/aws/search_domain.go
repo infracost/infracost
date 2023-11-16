@@ -268,7 +268,7 @@ func (r *SearchDomain) opensearchifyClusterInstanceType(instanceType string) *st
 	return &s
 }
 
-// Calculates billable throughput
+// calculateBillableThroughput calculates billable throughput
 // - 125 MiB/s free for volumes up to 170 GB
 // - +250 MiB/s free for every 3 TB for volumes above 170 GB (storage is rounded up).
 func (r *SearchDomain) calculateBillableThroughput(throughput decimal.Decimal, storage decimal.Decimal) decimal.Decimal {
