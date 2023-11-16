@@ -274,10 +274,8 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 			// If the source vertex doesn't exist, it might be a module output attribute,
 			// so we need to check if the module output exists and add an edge from that
 			// to the current vertex instead.
-			if ref.ModuleAddress != "" {
-				modAddress := stripCount(ref.ModuleAddress)
-
-				srcId = fmt.Sprintf("%s.%s", modAddress, parts[0])
+			if ref.ModuleAddress != "" && stripCount(ref.ModuleAddress) != modAddr {
+				srcId = fmt.Sprintf("%s.%s", stripCount(ref.ModuleAddress), parts[0])
 
 				// Check if the source vertex exists
 				_, err := g.dag.GetVertex(srcId)
