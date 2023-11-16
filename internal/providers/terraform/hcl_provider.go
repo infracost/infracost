@@ -232,17 +232,18 @@ func (p *HCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, e
 func (p *HCLProvider) parseResources(parsed HCLProject, usage schema.UsageMap) *schema.Project {
 	project := p.newProject(parsed)
 
-	partialPastResources, partialResources, providerMetadatas, err := p.planJSONParser.parseJSON(parsed.JSON, usage)
+	parsedConf, err := p.planJSONParser.parseJSON(parsed.JSON, usage)
 	if err != nil {
 		project.Metadata.AddErrorWithCode(err, schema.DiagJSONParsingFailure)
 
 		return project
 	}
 
-	project.AddProviderMetadata(providerMetadatas)
+	project.AddProviderMetadata(parsedConf.ProviderMetadata)
+	project.Metadata.RemoteModuleCalls = parsedConf.RemoteModuleCalls
 
-	project.PartialPastResources = partialPastResources
-	project.PartialResources = partialResources
+	project.PartialPastResources = parsedConf.PastResources
+	project.PartialResources = parsedConf.CurrentResources
 
 	return project
 }
@@ -503,6 +504,7 @@ func (p *HCLProvider) marshalModule(module *hcl.Module) ModuleOut {
 		moduleConfig.ModuleCalls[modKey] = ModuleCall{
 			Source:       m.Source,
 			ModuleConfig: mo.ModuleConfig,
+			SourceUrl:    m.SourceURL,
 		}
 
 		planModule.ChildModules = append(planModule.ChildModules, mo.PlanModule)
@@ -933,6 +935,7 @@ type ResourceData struct {
 type ModuleCall struct {
 	Source       string       `json:"source"`
 	ModuleConfig ModuleConfig `json:"module"`
+	SourceUrl    string       `json:"sourceUrl,omitempty"`
 }
 
 type countExpression struct {

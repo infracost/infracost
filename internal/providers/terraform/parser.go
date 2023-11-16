@@ -133,13 +133,24 @@ func (p *Parser) populateUsageData(resData map[string]*schema.ResourceData, usag
 	}
 }
 
-func (p *Parser) parseJSON(j []byte, usage schema.UsageMap) ([]*schema.PartialResource, []*schema.PartialResource, []schema.ProviderMetadata, error) {
+type ParsedPlanConfiguration struct {
+	PastResources     []*schema.PartialResource
+	CurrentResources  []*schema.PartialResource
+	ProviderMetadata  []schema.ProviderMetadata
+	RemoteModuleCalls []string
+}
+
+func (p *Parser) parseJSON(j []byte, usage schema.UsageMap) (*ParsedPlanConfiguration, error) {
 	baseResources := p.loadUsageFileResources(usage)
 
 	j, _ = StripSetupTerraformWrapper(j)
 
 	if !gjson.ValidBytes(j) {
-		return baseResources, baseResources, nil, errors.New("invalid JSON")
+		return &ParsedPlanConfiguration{
+			PastResources:    baseResources,
+			CurrentResources: baseResources,
+			ProviderMetadata: nil,
+		}, errors.New("invalid JSON")
 	}
 
 	parsed := gjson.ParseBytes(j)
@@ -151,27 +162,78 @@ func (p *Parser) parseJSON(j []byte, usage schema.UsageMap) ([]*schema.PartialRe
 
 	providerMetadata := parseProviderConfig(providerConf)
 	confLoader := NewConfLoader(conf)
-
+	calledRemoteModules := collectModulesSourceUrls(conf.Get("module_calls.*").Array())
 	resources := p.parseJSONResources(false, baseResources, usage, confLoader, parsed, providerConf, vars)
 	if !p.includePastResources {
-		return nil, resources, providerMetadata, nil
+		return &ParsedPlanConfiguration{
+			PastResources:     nil,
+			CurrentResources:  resources,
+			ProviderMetadata:  providerMetadata,
+			RemoteModuleCalls: calledRemoteModules,
+		}, nil
 	}
 
 	if !parsed.Get("prior_state").Exists() {
-		return nil, resources, providerMetadata, nil
+		return &ParsedPlanConfiguration{
+			PastResources:     nil,
+			CurrentResources:  resources,
+			ProviderMetadata:  providerMetadata,
+			RemoteModuleCalls: calledRemoteModules,
+		}, nil
 	}
 
 	// Check if the prior state is the same as the planned state
 	// and if so we can just return pointers to the same resources
 	if gjsonEqual(parsed.Get("prior_state.values.root_module"), parsed.Get("planned_values.root_module")) {
-		return resources, resources, providerMetadata, nil
+		return &ParsedPlanConfiguration{
+			PastResources:     resources,
+			CurrentResources:  resources,
+			ProviderMetadata:  providerMetadata,
+			RemoteModuleCalls: calledRemoteModules,
+		}, nil
 	}
 
 	pastResources := p.parseJSONResources(true, baseResources, usage, confLoader, parsed, providerConf, vars)
 	resourceChanges := parsed.Get("resource_changes").Array()
 	pastResources = stripNonTargetResources(pastResources, resources, resourceChanges)
 
-	return pastResources, resources, providerMetadata, nil
+	return &ParsedPlanConfiguration{
+		PastResources:     pastResources,
+		CurrentResources:  resources,
+		ProviderMetadata:  providerMetadata,
+		RemoteModuleCalls: calledRemoteModules,
+	}, nil
+}
+
+func collectModulesSourceUrls(moduleCalls []gjson.Result) []string {
+	remoteUrls := map[string]bool{}
+
+	for _, call := range moduleCalls {
+		source := call.Get("sourceUrl").String()
+		if ok := remoteUrls[source]; !ok && source != "" {
+			remoteUrls[source] = true
+		}
+
+		if call.Get("module.module_calls").Exists() {
+			for _, source := range collectModulesSourceUrls(call.Get("module.module_calls.*").Array()) {
+				if ok := remoteUrls[source]; !ok {
+					remoteUrls[source] = true
+				}
+			}
+		}
+
+	}
+
+	if len(remoteUrls) == 0 {
+		return nil
+	}
+
+	var urls []string
+	for source := range remoteUrls {
+		urls = append(urls, source)
+	}
+
+	return urls
 }
 
 func parseProviderConfig(providerConf gjson.Result) []schema.ProviderMetadata {

@@ -280,6 +280,15 @@ func (r *RegistryLoader) downloadModule(lookupResult *RegistryLookupResult, dest
 	return r.packageFetcher.fetch(downloadURL, dest)
 }
 
+func (r *RegistryLoader) DownloadLocation(moduleURL RegistryURL, version string) (string, error) {
+	downloadURL, err := r.disco.DownloadLocation(moduleURL, version)
+	if err != nil {
+		return "", fmt.Errorf("could not find download location: %w", err)
+	}
+
+	return downloadURL, nil
+}
+
 // findLatestMatchingVersion returns the latest version from a list of versions that matches the given constraint.
 // The constraints can be in any format that go-version understands, for example: "1.2.0", "~> 1.0", ">= 1.0, < 1.4"
 // If the constraints are empty then the latest version is returned
