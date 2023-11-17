@@ -3,8 +3,10 @@ package modules
 import (
 	"encoding/json"
 	"fmt"
+	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 )
 
 // Manifest is a struct that represents the JSON found in the manifest.json file in the .infracost dir
@@ -18,23 +20,55 @@ type Manifest struct {
 	Modules []*ManifestModule `json:"Modules"`
 }
 
-func (m Manifest) FindModulePath(key string) string {
+func (m Manifest) Get(key string) ManifestModule {
 	for _, module := range m.Modules {
 		if module.Key == key {
 			loc := filepath.Clean(filepath.Join(m.cachePath, module.Dir))
-			return loc
+			return ManifestModule{
+				Key:         module.Key,
+				Source:      module.Source,
+				Version:     module.Version,
+				Dir:         loc,
+				DownloadURL: module.DownloadURL,
+			}
 		}
 	}
 
-	return ""
+	return ManifestModule{}
 }
 
 // ManifestModule represents a single module in the manifest.json file
 type ManifestModule struct {
-	Key     string `json:"Key"`
-	Source  string `json:"Source"`
-	Version string `json:"Version,omitempty"`
-	Dir     string `json:"Dir"`
+	Key         string `json:"Key"`
+	Source      string `json:"Source"`
+	Version     string `json:"Version,omitempty"`
+	Dir         string `json:"Dir"`
+	DownloadURL string
+}
+
+func (m ManifestModule) URL() string {
+	if isLocalModule(m.Source) {
+		return ""
+	}
+
+	remoteSource := m.Source
+
+	if m.DownloadURL != "" {
+		remoteSource = m.DownloadURL
+	}
+
+	remoteSource, _, _ = splitModuleSubDir(remoteSource)
+	remoteSource = strings.TrimPrefix(remoteSource, "git::")
+	remoteSource = strings.TrimPrefix(remoteSource, "gcs::")
+	remoteSource = strings.TrimPrefix(remoteSource, "s3::")
+
+	u, err := url.Parse(remoteSource)
+	if err == nil {
+		u.RawQuery = ""
+		return u.String()
+	}
+
+	return remoteSource
 }
 
 // readManifest reads the manifest file from the given path

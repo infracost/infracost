@@ -428,6 +428,12 @@
             "$ref": "#/definitions/ProviderMetadata"
           },
           "type": "array"
+        },
+        "remoteModuleCalls": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
         }
       },
       "additionalProperties": false,

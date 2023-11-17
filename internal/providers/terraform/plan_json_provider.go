@@ -89,15 +89,15 @@ func (p *PlanJSONProvider) LoadResourcesFromSrc(usage schema.UsageMap, j []byte,
 	project := schema.NewProject(name, metadata)
 	parser := NewParser(p.ctx, p.includePastResources)
 
-	partialPastResources, partialResources, providerMetadatas, err := parser.parseJSON(j, usage)
+	parsedConf, err := parser.parseJSON(j, usage)
 	if err != nil {
 		return project, fmt.Errorf("Error parsing Terraform plan JSON file %w", err)
 	}
 
-	project.AddProviderMetadata(providerMetadatas)
+	project.AddProviderMetadata(parsedConf.ProviderMetadata)
 
-	project.PartialPastResources = partialPastResources
-	project.PartialResources = partialResources
+	project.PartialPastResources = parsedConf.PastResources
+	project.PartialResources = parsedConf.CurrentResources
 
 	// use TagPolicyAPIEndpoint for Policy2 instead of creating a new config variable
 	if p.policyClient != nil {

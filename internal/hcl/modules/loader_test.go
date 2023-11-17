@@ -44,9 +44,10 @@ func testLoaderE2E(t *testing.T, path string, expectedModules []*ManifestModule,
 	expected := []*ManifestModule{}
 	for _, m := range expectedModules {
 		e := &ManifestModule{
-			Key:     m.Key,
-			Source:  m.Source,
-			Version: m.Version,
+			Key:         m.Key,
+			Source:      m.Source,
+			Version:     m.Version,
+			DownloadURL: m.DownloadURL,
 		}
 
 		if !opts.IgnoreDir {
@@ -78,16 +79,18 @@ func TestNestedModules(t *testing.T) {
 
 	testLoaderE2E(t, "./testdata/nested_modules", []*ManifestModule{
 		{
-			Key:     "registry-module",
-			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-			Version: "3.4.0",
-			Dir:     ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			Key:         "registry-module",
+			Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			Version:     "3.4.0",
+			Dir:         ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
 		},
 		{
-			Key:     "registry-module-different-name",
-			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-			Version: "3.4.0",
-			Dir:     ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			Key:         "registry-module-different-name",
+			Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			Version:     "3.4.0",
+			Dir:         ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
 		},
 		{
 			Key:    "git-module",
@@ -100,10 +103,11 @@ func TestNestedModules(t *testing.T) {
 			Dir:    ".infracost/terraform_modules/9740179dc58fea6ce4a32fdc5b4e0839",
 		},
 		{
-			Key:     "local-module.nested-registry-module",
-			Source:  "registry.terraform.io/terraform-aws-modules/sns/aws",
-			Version: "3.1.0",
-			Dir:     ".infracost/terraform_modules/b72552bcaa63a49783f9a735a697c662",
+			Key:         "local-module.nested-registry-module",
+			Source:      "registry.terraform.io/terraform-aws-modules/sns/aws",
+			Version:     "3.1.0",
+			Dir:         ".infracost/terraform_modules/b72552bcaa63a49783f9a735a697c662",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-sns?ref=v3.1.0",
 		},
 		{
 			Key:    "local-module.nested-git-module",
@@ -111,10 +115,11 @@ func TestNestedModules(t *testing.T) {
 			Dir:    ".infracost/terraform_modules/db69103dcf4b9586b710a97de31750bd",
 		},
 		{
-			Key:     "local-module.nested-registry-module-using-same-source",
-			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-			Version: "3.4.0",
-			Dir:     ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			Key:         "local-module.nested-registry-module-using-same-source",
+			Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			Version:     "3.4.0",
+			Dir:         ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
 		},
 	}, TestLoaderE2EOpts{Cleanup: true})
 }
@@ -126,16 +131,18 @@ func TestSubmodules(t *testing.T) {
 
 	testLoaderE2E(t, "./testdata/submodules", []*ManifestModule{
 		{
-			Key:     "registry-submodule",
-			Source:  "registry.terraform.io/terraform-aws-modules/route53/aws//modules/zones",
-			Version: "2.5.0",
-			Dir:     ".infracost/terraform_modules/d1e3bab8b33f57431ace737ccffbf67f/modules/zones",
+			Key:         "registry-submodule",
+			Source:      "registry.terraform.io/terraform-aws-modules/route53/aws//modules/zones",
+			Version:     "2.5.0",
+			Dir:         ".infracost/terraform_modules/d1e3bab8b33f57431ace737ccffbf67f/modules/zones",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-route53?ref=v2.5.0",
 		},
 		{
-			Key:     "registry-submodule-records",
-			Source:  "registry.terraform.io/terraform-aws-modules/route53/aws//modules/records",
-			Version: "2.5.0",
-			Dir:     ".infracost/terraform_modules/d1e3bab8b33f57431ace737ccffbf67f/modules/records",
+			Key:         "registry-submodule-records",
+			Source:      "registry.terraform.io/terraform-aws-modules/route53/aws//modules/records",
+			Version:     "2.5.0",
+			Dir:         ".infracost/terraform_modules/d1e3bab8b33f57431ace737ccffbf67f/modules/records",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-route53?ref=v2.5.0",
 		},
 		{
 			Key:    "git-submodule",
@@ -152,16 +159,18 @@ func TestModuleMultipleUses(t *testing.T) {
 
 	testLoaderE2E(t, "./testdata/module_multiple_uses", []*ManifestModule{
 		{
-			Key:     "registry-module-1",
-			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-			Version: "3.4.0",
-			Dir:     ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			Key:         "registry-module-1",
+			Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			Version:     "3.4.0",
+			Dir:         ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
 		},
 		{
-			Key:     "registry-module-2",
-			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-			Version: "3.4.0",
-			Dir:     ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			Key:         "registry-module-2",
+			Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			Version:     "3.4.0",
+			Dir:         ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
 		},
 	}, TestLoaderE2EOpts{Cleanup: true})
 }
@@ -173,16 +182,18 @@ func TestModuleMultipleUsesMissingManifest(t *testing.T) {
 
 	expectedModules := []*ManifestModule{
 		{
-			Key:     "registry-module-1",
-			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-			Version: "3.4.0",
-			Dir:     ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			Key:         "registry-module-1",
+			Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			Version:     "3.4.0",
+			Dir:         ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
 		},
 		{
-			Key:     "registry-module-2",
-			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-			Version: "3.4.0",
-			Dir:     ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			Key:         "registry-module-2",
+			Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			Version:     "3.4.0",
+			Dir:         ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
 		},
 	}
 
@@ -206,10 +217,11 @@ func TestWithCachedModules(t *testing.T) {
 
 	testLoaderE2E(t, "./testdata/with_cached_modules", []*ManifestModule{
 		{
-			Key:     "registry-module",
-			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-			Version: "3.4.0",
-			Dir:     ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			Key:         "registry-module",
+			Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			Version:     "3.4.0",
+			Dir:         ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
 		},
 		{
 			Key:    "git-module",
@@ -272,16 +284,18 @@ func TestMultiProject(t *testing.T) {
 	wg.Wait()
 	assertModulesEqual(t, moduleLoader, filepath.Join(path, "prod"), []*ManifestModule{
 		{
-			Key:     "registry-module",
-			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-			Version: "3.4.0",
-			Dir:     ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			Key:         "registry-module",
+			Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			Version:     "3.4.0",
+			Dir:         ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
 		},
 		{
-			Key:     "registry-module-different-name",
-			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-			Version: "3.4.0",
-			Dir:     ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			Key:         "registry-module-different-name",
+			Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			Version:     "3.4.0",
+			Dir:         ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
 		},
 		{
 			Key:    "git-module",
@@ -294,10 +308,11 @@ func TestMultiProject(t *testing.T) {
 			Dir:    ".infracost/terraform_modules/9740179dc58fea6ce4a32fdc5b4e0839",
 		},
 		{
-			Key:     "local-module.nested-registry-module",
-			Source:  "registry.terraform.io/terraform-aws-modules/sns/aws",
-			Version: "3.1.0",
-			Dir:     ".infracost/terraform_modules/b72552bcaa63a49783f9a735a697c662",
+			Key:         "local-module.nested-registry-module",
+			Source:      "registry.terraform.io/terraform-aws-modules/sns/aws",
+			Version:     "3.1.0",
+			Dir:         ".infracost/terraform_modules/b72552bcaa63a49783f9a735a697c662",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-sns?ref=v3.1.0",
 		},
 		{
 			Key:    "local-module.nested-git-module",
@@ -305,25 +320,28 @@ func TestMultiProject(t *testing.T) {
 			Dir:    ".infracost/terraform_modules/db69103dcf4b9586b710a97de31750bd",
 		},
 		{
-			Key:     "local-module.nested-registry-module-using-same-source",
-			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-			Version: "3.4.0",
-			Dir:     ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			Key:         "local-module.nested-registry-module-using-same-source",
+			Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			Version:     "3.4.0",
+			Dir:         ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
 		},
 	})
 
 	assertModulesEqual(t, moduleLoader, filepath.Join(path, "dev"), []*ManifestModule{
 		{
-			Key:     "registry-module",
-			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-			Version: "3.4.0",
-			Dir:     ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			Key:         "registry-module",
+			Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			Version:     "3.4.0",
+			Dir:         ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
 		},
 		{
-			Key:     "registry-module-different-name",
-			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-			Version: "3.4.0",
-			Dir:     ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			Key:         "registry-module-different-name",
+			Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			Version:     "3.4.0",
+			Dir:         ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
 		},
 		{
 			Key:    "git-module",
@@ -341,10 +359,11 @@ func TestMultiProject(t *testing.T) {
 			Dir:    ".infracost/terraform_modules/9740179dc58fea6ce4a32fdc5b4e0839",
 		},
 		{
-			Key:     "local-module.nested-registry-module",
-			Source:  "registry.terraform.io/terraform-aws-modules/sns/aws",
-			Version: "3.1.0",
-			Dir:     ".infracost/terraform_modules/b72552bcaa63a49783f9a735a697c662",
+			Key:         "local-module.nested-registry-module",
+			Source:      "registry.terraform.io/terraform-aws-modules/sns/aws",
+			Version:     "3.1.0",
+			Dir:         ".infracost/terraform_modules/b72552bcaa63a49783f9a735a697c662",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-sns?ref=v3.1.0",
 		},
 		{
 			Key:    "local-module.nested-git-module",
@@ -352,10 +371,11 @@ func TestMultiProject(t *testing.T) {
 			Dir:    ".infracost/terraform_modules/db69103dcf4b9586b710a97de31750bd",
 		},
 		{
-			Key:     "local-module.nested-registry-module-using-same-source",
-			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-			Version: "3.4.0",
-			Dir:     ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			Key:         "local-module.nested-registry-module-using-same-source",
+			Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			Version:     "3.4.0",
+			Dir:         ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
 		},
 	})
 
@@ -416,9 +436,10 @@ func TestSourceMapRegistryModule(t *testing.T) {
 			sourceMap: config.TerraformSourceMap{},
 			want: []*ManifestModule{
 				{
-					Key:     "registry-module",
-					Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-					Version: "3.4.0",
+					Key:         "registry-module",
+					Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+					Version:     "3.4.0",
+					DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
 				},
 			},
 		},
@@ -458,9 +479,10 @@ func TestSourceMapRegistryModule(t *testing.T) {
 			},
 			want: []*ManifestModule{
 				{
-					Key:     "registry-module",
-					Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-					Version: "3.4.0",
+					Key:         "registry-module",
+					Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+					Version:     "3.4.0",
+					DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
 				},
 			},
 		},
@@ -471,9 +493,10 @@ func TestSourceMapRegistryModule(t *testing.T) {
 			},
 			want: []*ManifestModule{
 				{
-					Key:     "registry-module",
-					Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-					Version: "3.4.0",
+					Key:         "registry-module",
+					Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+					Version:     "3.4.0",
+					DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
 				},
 			},
 		},
@@ -501,9 +524,10 @@ func TestSourceMapRegistrySubmodule(t *testing.T) {
 			sourceMap: config.TerraformSourceMap{},
 			want: []*ManifestModule{
 				{
-					Key:     "registry-submodule",
-					Source:  "registry.terraform.io/terraform-aws-modules/route53/aws//modules/zones",
-					Version: "2.5.0",
+					Key:         "registry-submodule",
+					Source:      "registry.terraform.io/terraform-aws-modules/route53/aws//modules/zones",
+					Version:     "2.5.0",
+					DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-route53?ref=v2.5.0",
 				},
 			},
 		},
@@ -543,9 +567,10 @@ func TestSourceMapRegistrySubmodule(t *testing.T) {
 			},
 			want: []*ManifestModule{
 				{
-					Key:     "registry-submodule",
-					Source:  "registry.terraform.io/terraform-aws-modules/route53/aws//modules/zones",
-					Version: "2.5.0",
+					Key:         "registry-submodule",
+					Source:      "registry.terraform.io/terraform-aws-modules/route53/aws//modules/zones",
+					Version:     "2.5.0",
+					DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-route53?ref=v2.5.0",
 				},
 			},
 		},
@@ -556,9 +581,10 @@ func TestSourceMapRegistrySubmodule(t *testing.T) {
 			},
 			want: []*ManifestModule{
 				{
-					Key:     "registry-submodule",
-					Source:  "registry.terraform.io/terraform-aws-modules/route53/aws//modules/zones",
-					Version: "2.5.0",
+					Key:         "registry-submodule",
+					Source:      "registry.terraform.io/terraform-aws-modules/route53/aws//modules/zones",
+					Version:     "2.5.0",
+					DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-route53?ref=v2.5.0",
 				},
 			},
 		},
@@ -653,9 +679,10 @@ func TestSourceMapGitModule(t *testing.T) {
 			},
 			want: []*ManifestModule{
 				{
-					Key:     "git-module",
-					Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-					Version: "3.4.0",
+					Key:         "git-module",
+					Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+					Version:     "3.4.0",
+					DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
 				},
 			},
 		},
@@ -750,9 +777,10 @@ func TestSourceMapGitSubmodule(t *testing.T) {
 			},
 			want: []*ManifestModule{
 				{
-					Key:     "git-submodule",
-					Source:  "registry.terraform.io/terraform-aws-modules/route53/aws//modules/zones",
-					Version: "2.5.0",
+					Key:         "git-submodule",
+					Source:      "registry.terraform.io/terraform-aws-modules/route53/aws//modules/zones",
+					Version:     "2.5.0",
+					DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-route53?ref=v2.5.0",
 				},
 			},
 		},
