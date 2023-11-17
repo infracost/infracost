@@ -235,17 +235,18 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 				if ref.AttributeName != "" {
 					dstID = fmt.Sprintf("%s.variable.%s", stripModuleCallPrefix(id), ref.AttributeName)
 				}
-			}
 
-			// Strip the count/index suffix from the source ID
-			srcId = stripCount(srcId)
-
-			if srcId == dstID {
-				continue
+				// Check this vertex exists
+				_, err := g.dag.GetVertex(dstID)
+				if err != nil {
+					g.logger.Debug().Err(err).Msgf("ignoring edge %s, %s because the destination vertex doesn't exist", srcId, dstID)
+					continue
+				}
 			}
 
 			// Check if the source vertex exists
 			_, err := g.dag.GetVertex(srcId)
+
 			if err == nil {
 				g.logger.Debug().Msgf("adding edge: %s, %s", srcId, dstID)
 				edges = append(edges, dag.EdgeInput{
