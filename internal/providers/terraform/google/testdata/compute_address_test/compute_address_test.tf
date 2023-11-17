@@ -23,6 +23,11 @@ resource "google_compute_address" "internal" {
   address_type = "INTERNAL"
 }
 
+resource "google_compute_address" "default_diff_region" {
+  name   = "ipv4-address-default"
+  region = "europe-central2"
+}
+
 resource "google_compute_global_address" "default" {
   name = "global-appserver-ip"
 }
