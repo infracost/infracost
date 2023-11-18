@@ -47,6 +47,7 @@ type HCLProvider struct {
 type HCLProviderConfig struct {
 	SuppressLogging     bool
 	CacheParsingModules bool
+	SkipAutoDetection   bool
 }
 
 type flagStringSlice []string
@@ -135,7 +136,12 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 
 	logger := ctx.Logger().With().Str("provider", "terraform_dir").Logger()
 	runCtx := ctx.RunContext
-	locatorConfig := &hcl.ProjectLocatorConfig{ExcludedSubDirs: ctx.ProjectConfig.ExcludePaths, ChangedObjects: runCtx.VCSMetadata.Commit.ChangedObjects, UseAllPaths: ctx.ProjectConfig.IncludeAllPaths}
+	locatorConfig := &hcl.ProjectLocatorConfig{
+		SkipAutoDetection: config.SkipAutoDetection,
+		ExcludedSubDirs:   ctx.ProjectConfig.ExcludePaths,
+		ChangedObjects:    runCtx.VCSMetadata.Commit.ChangedObjects,
+		UseAllPaths:       ctx.ProjectConfig.IncludeAllPaths,
+	}
 
 	cachePath := ctx.RunContext.Config.CachePath()
 	initialPath := ctx.ProjectConfig.Path
