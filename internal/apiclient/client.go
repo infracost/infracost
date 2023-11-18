@@ -30,17 +30,30 @@ type GraphQLQuery struct {
 	Variables map[string]interface{} `json:"variables"`
 }
 
+var (
+	ErrorCodeExceededQuota = "above_quota"
+)
+
+// APIError defines an api error that is designed to be showed to the user in a
+// output form (comment/stdout/html).
 type APIError struct {
 	err error
-	msg string
+	// Msg defines a human-readable string that is safe to show to the user
+	// to give more context about an error.
+	Msg string
+	// Code is the original StatusCode of the error.
+	Code int
+	// ErrorCode is the internal error code that can accompany errors from different status codes.
+	ErrorCode string
 }
 
 func (e *APIError) Error() string {
-	return fmt.Sprintf("%s: %v", e.msg, e.err.Error())
+	return fmt.Sprintf("%s: %v", e.Msg, e.err.Error())
 }
 
 type APIErrorResponse struct {
-	Error string `json:"error"`
+	Error     string `json:"error"`
+	ErrorCode string `json:"error_code"`
 }
 
 var ErrInvalidAPIKey = errors.New("Invalid API key")
@@ -83,7 +96,7 @@ func (c *APIClient) doRequest(method string, path string, d interface{}) ([]byte
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return []byte{}, &APIError{err, fmt.Sprintf("Invalid API response %s %s", method, path)}
+		return []byte{}, &APIError{err: err, Msg: fmt.Sprintf("Invalid API response %s %s", method, path)}
 	}
 
 	if resp.StatusCode != 200 {
@@ -91,13 +104,17 @@ func (c *APIClient) doRequest(method string, path string, d interface{}) ([]byte
 
 		err = json.Unmarshal(respBody, &r)
 		if err != nil {
-			return []byte{}, &APIError{err, fmt.Sprintf("Invalid API response %q %q body: %q", method, path, respBody)}
+			return []byte{}, &APIError{err: err, Msg: fmt.Sprintf("Invalid API response %q %q body: %q", method, path, respBody), Code: resp.StatusCode}
+		}
+
+		if r.ErrorCode != "" {
+			return []byte{}, &APIError{err: fmt.Errorf("%v %v", resp.Status, r.Error), Msg: r.Error, Code: resp.StatusCode, ErrorCode: r.ErrorCode}
 		}
 
 		if r.Error == "Invalid API key" {
 			return []byte{}, ErrInvalidAPIKey
 		}
-		return []byte{}, &APIError{fmt.Errorf("%v %v", resp.Status, r.Error), "Received error from API"}
+		return []byte{}, &APIError{err: fmt.Errorf("%v %v", resp.Status, r.Error), Msg: "Received error from API", Code: resp.StatusCode}
 	}
 
 	return respBody, nil

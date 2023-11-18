@@ -21,6 +21,7 @@ const (
 	DiagTerragruntModuleEvaluationFailure
 	DiagPrivateModuleDownloadFailure
 	DiagPrivateRegistryModuleDownloadFailure
+	DiagRunQuotaExceeded
 )
 
 // ProjectDiag holds information about all diagnostics associated with a project.
@@ -89,6 +90,19 @@ func (m *ProjectMetadata) AddErrorWithCode(err error, code int) {
 
 func (m *ProjectMetadata) HasErrors() bool {
 	return len(m.Errors) > 0
+}
+
+// IsRunQuotaExceeded checks if any of the project diags are of type "run quota
+// exceeded". If found it returns the associated message with this diag. This
+// should be used when in any output that notifies the user.
+func (m *ProjectMetadata) IsRunQuotaExceeded() (string, bool) {
+	for _, diag := range m.Errors {
+		if diag.Code == DiagRunQuotaExceeded {
+			return diag.Message, true
+		}
+	}
+
+	return "", false
 }
 
 func (m *ProjectMetadata) WorkspaceLabel() string {

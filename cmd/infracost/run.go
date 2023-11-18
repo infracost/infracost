@@ -5,6 +5,7 @@ import (
 	"context"
 	"fmt"
 	"io"
+	"net/http"
 	"os"
 	"runtime/debug"
 	"sort"
@@ -466,6 +467,15 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 					ui.PrimaryString("https://infracost.io/support"),
 					"if you continue having issues.",
 				)
+			}
+
+			var apiErr *apiclient.APIError
+			if errors.As(err, &apiErr) {
+				if apiErr.Code == http.StatusForbidden && apiErr.ErrorCode == apiclient.ErrorCodeExceededQuota {
+					return nil, &schema.ProjectDiag{Code: schema.DiagRunQuotaExceeded, Message: apiErr.Msg}
+				}
+
+				return nil, fmt.Errorf("%v\n%s", apiErr.Error(), "We have been notified of this issue.")
 			}
 
 			return nil, err
