@@ -32,6 +32,7 @@ type GraphQLQuery struct {
 
 var (
 	ErrorCodeExceededQuota = "above_quota"
+	ErrorCodeAPIKeyInvalid = "invalid_api_key"
 )
 
 // APIError defines an api error that is designed to be showed to the user in a
@@ -55,8 +56,6 @@ type APIErrorResponse struct {
 	Error     string `json:"error"`
 	ErrorCode string `json:"error_code"`
 }
-
-var ErrInvalidAPIKey = errors.New("Invalid API key")
 
 func (c *APIClient) doQueries(queries []GraphQLQuery) ([]gjson.Result, error) {
 	if len(queries) == 0 {
@@ -111,9 +110,11 @@ func (c *APIClient) doRequest(method string, path string, d interface{}) ([]byte
 			return []byte{}, &APIError{err: fmt.Errorf("%v %v", resp.Status, r.Error), Msg: r.Error, Code: resp.StatusCode, ErrorCode: r.ErrorCode}
 		}
 
+		// handle legacy cloud pricing apis which don't have the new `error_code` field.
 		if r.Error == "Invalid API key" {
-			return []byte{}, ErrInvalidAPIKey
+			return []byte{}, &APIError{err: fmt.Errorf("%v %v", resp.Status, r.Error), Msg: "Invalid API Key", Code: resp.StatusCode, ErrorCode: ErrorCodeAPIKeyInvalid}
 		}
+
 		return []byte{}, &APIError{err: fmt.Errorf("%v %v", resp.Status, r.Error), Msg: "Received error from API", Code: resp.StatusCode}
 	}
 
