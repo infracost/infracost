@@ -1069,19 +1069,18 @@ func TestBreakdownWithPolicyDataUploadHCL(t *testing.T) {
 	testutil.AssertGoldenFile(t, path.Join("./testdata", testName, testName+"-upload.golden"), uploadWriter.Bytes())
 }
 
-// TODO: fix this case
-// func TestBreakdownWithMockedMerge(t *testing.T) {
-// 	GoldenFileCommandTest(
-// 		t,
-// 		testutil.CalcGoldenFileTestdataDirName(),
-// 		[]string{
-// 			"breakdown",
-// 			"--path",
-// 			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
-// 		},
-// 		nil,
-// 	)
-// }
+func TestBreakdownWithMockedMerge(t *testing.T) {
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path",
+			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+		},
+		nil,
+	)
+}
 
 func TestBreakdownWithPolicyDataUploadPlanJson(t *testing.T) {
 	ts, uploadWriter := GraphqlTestServerWithWriter(map[string]string{

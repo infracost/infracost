@@ -347,6 +347,7 @@ func (e *Evaluator) evaluateModules() {
 				ModulePath: moduleCall.Path,
 				Modules:    nil,
 				Parent:     &e.module,
+				SourceURL:  moduleCall.Module.SourceURL,
 			},
 			e.workingDir,
 			vars,
@@ -884,6 +885,7 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 	}
 
 	var modulePath string
+	var moduleURL string
 
 	if e.moduleMetadata != nil {
 		// if we have module metadata we can parse all the modules as they'll be cached locally!
@@ -893,7 +895,9 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 		key = nestedModReplace.ReplaceAllString(key, ".")
 		key = modArrayPartReplace.ReplaceAllString(key, "")
 
-		modulePath = e.moduleMetadata.FindModulePath(key)
+		module := e.moduleMetadata.Get(key)
+		modulePath = module.Dir
+		moduleURL = module.URL()
 		e.logger.Debug().Msgf("using path '%s' for module '%s' based on key '%s'", modulePath, b.FullName(), key)
 	}
 
@@ -920,6 +924,7 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 		Module: &Module{
 			Name:       b.TypeLabel(),
 			Source:     source,
+			SourceURL:  moduleURL,
 			Blocks:     blocks,
 			RawBlocks:  blocks,
 			RootPath:   e.module.RootPath,

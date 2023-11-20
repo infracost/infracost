@@ -85,3 +85,34 @@ func TestProjectLocator_FindRootModules_WithMultiProjectWithoutProviderBlocks_Ex
 	assert.Contains(t, mods, RootPath{Path: "testdata/project_locator/multi_project_without_provider_blocks/dev"})
 	assert.Contains(t, mods, RootPath{Path: "testdata/project_locator/multi_project_without_provider_blocks/prod"})
 }
+
+func TestProjectLocator_FindRootModules_WithChildTfvarsFile(t *testing.T) {
+	pl := NewProjectLocator(newDiscardLogger(), &ProjectLocatorConfig{})
+	mods := pl.FindRootModules("./testdata/project_locator/multi_project_with_child_terraform_var_files")
+
+	require.Len(t, mods, 3)
+	assert.Contains(t, mods, RootPath{
+		Path: "testdata/project_locator/multi_project_with_child_terraform_var_files/app1",
+		TerraformVarFiles: []string{
+			"defaults.tfvars",
+			"env/prod.tfvars",
+			"env/test.tfvars",
+		},
+	})
+
+	assert.Contains(t, mods, RootPath{
+		Path: "testdata/project_locator/multi_project_with_child_terraform_var_files/app1/app3",
+		TerraformVarFiles: []string{
+			"qa.tfvars",
+		},
+	})
+
+	assert.Contains(t, mods, RootPath{
+		Path: "testdata/project_locator/multi_project_with_child_terraform_var_files/app2",
+		TerraformVarFiles: []string{
+			"env/defaults.tfvars",
+			"env/prod.tfvars",
+			"env/staging.tfvars",
+		},
+	})
+}

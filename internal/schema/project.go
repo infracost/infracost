@@ -53,6 +53,7 @@ type ProjectMetadata struct {
 	Warnings            []ProjectDiag      `json:"warnings,omitempty"`
 	Policies            Policies           `json:"policies,omitempty"`
 	Providers           []ProviderMetadata `json:"providers,omitempty"`
+	RemoteModuleCalls   []string           `json:"remoteModuleCalls,omitempty"`
 }
 
 type ProviderMetadata struct {

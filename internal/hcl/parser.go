@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"runtime/debug"
 	"sort"
 	"strings"
@@ -26,6 +27,17 @@ import (
 
 var (
 	defaultTerraformWorkspaceName = "default"
+	// globalTerraformVarNames is a list of var file naming convention that suggests they are applied
+	// to every project, despite changes in environment.
+	globalTerraformVarNames = []string{
+		"default",
+		"defaults",
+		"global",
+		"globals",
+		"shared",
+	}
+
+	envPrefixRegxp = regexp.MustCompile(`^\w+-`)
 )
 
 type Option func(p *Parser)
@@ -218,8 +230,17 @@ type Parser struct {
 // in the given initialPath and returns a Parser for each directory it locates a Terraform project within. If
 // the initialPath contains Terraform files at the top level parsers will be len 1.
 func LoadParsers(ctx *config.ProjectContext, initialPath string, loader *modules.ModuleLoader, locatorConfig *ProjectLocatorConfig, logger zerolog.Logger, options ...Option) ([]*Parser, error) {
-	pl := NewProjectLocator(logger, locatorConfig)
-	rootPaths := pl.FindRootModules(initialPath)
+	var rootPaths []RootPath
+	if locatorConfig != nil && locatorConfig.SkipAutoDetection {
+		rootPaths = []RootPath{
+			{
+				Path: initialPath,
+			},
+		}
+	} else {
+		pl := NewProjectLocator(logger, locatorConfig)
+		rootPaths = pl.FindRootModules(initialPath)
+	}
 	if len(rootPaths) == 0 && len(locatorConfig.ChangedObjects) > 0 {
 		return nil, nil
 	}
@@ -234,15 +255,34 @@ func LoadParsers(ctx *config.ProjectContext, initialPath string, loader *modules
 
 			var varFiles []string
 			var autoVarFiles []string
+
+			// first remove all the "auto" tfvar files from the list of discovered var files.
+			// These files should not constitute a new "project" as they won't define an
+			// environment but defaults that should be applied across all environments.
 			for _, varFile := range rootPath.TerraformVarFiles {
-				if strings.HasSuffix(strings.TrimSuffix(varFile, ".json"), ".auto.tfvars") {
+				withoutJSONSuffix := strings.TrimSuffix(varFile, ".json")
+
+				if strings.HasSuffix(withoutJSONSuffix, ".auto.tfvars") {
 					autoVarFiles = append(autoVarFiles, varFile)
 					continue
+				}
+
+				for _, name := range globalTerraformVarNames {
+					// check if the var file is a "global" one, this is only applicable if we match a
+					// globalTerraformVarName and these don't have an environment prefix e.g.
+					// defaults.tfvars, global.tfvars are applicable, prod-default.tfvars,
+					// stag-globals are not.
+					if strings.HasSuffix(withoutJSONSuffix, name+".tfvars") && envPrefixRegxp.MatchString(withoutJSONSuffix) {
+						autoVarFiles = append(autoVarFiles, varFile)
+						continue
+					}
 				}
 
 				varFiles = append(varFiles, varFile)
 			}
 
+			// if we have more than 1 var file we should split the projects by var file because there is a high
+			// likelihood that these var files indicate different environments/configuration.
 			if len(varFiles) > 1 {
 				sort.Strings(rootPath.TerraformVarFiles)
 
