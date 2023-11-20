@@ -261,7 +261,7 @@ func LoadParsers(ctx *config.ProjectContext, initialPath string, loader *modules
 			// These files should not constitute a new "project" as they won't define an
 			// environment but defaults that should be applied across all environments.
 			for _, varFile := range rootPath.TerraformVarFiles {
-				withoutJsonSuffix := strings.TrimSuffix(varFile, ".json")
+				withoutJSONSuffix := strings.TrimSuffix(varFile, ".json")
 
 				if strings.HasSuffix(withoutJSONSuffix, ".auto.tfvars") || withoutJSONSuffix == "terraform.tfvars" {
 					autoVarFiles = append(autoVarFiles, varFile)
@@ -273,7 +273,7 @@ func LoadParsers(ctx *config.ProjectContext, initialPath string, loader *modules
 					// globalTerraformVarName and these don't have an environment prefix e.g.
 					// defaults.tfvars, global.tfvars are applicable, prod-default.tfvars,
 					// stag-globals are not.
-					if strings.HasSuffix(withoutJsonSuffix, name+".tfvars") && envPrefixRegxp.MatchString(withoutJsonSuffix) {
+					if strings.HasSuffix(withoutJSONSuffix, name+".tfvars") && envPrefixRegxp.MatchString(withoutJSONSuffix) {
 						autoVarFiles = append(autoVarFiles, varFile)
 						continue
 					}
