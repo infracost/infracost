@@ -256,6 +256,9 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
   </head>
 
   <body>
+    {{- if .RunQuotaExceeded }}
+      <p>{{ .RunQuotaMsg}}</p>
+    {{- else }}
     <div class="metadata">
       <ul>
         <li>
@@ -288,5 +291,6 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
     <div class="warnings">
       <p>{{.SummaryMessage | stripColor | replaceNewLines}}</p>
     </div>
+    {{- end }}
   </body>
 </html>

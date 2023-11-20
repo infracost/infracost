@@ -452,20 +452,28 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 			spinner.Fail()
 			r.cmd.PrintErrln()
 
-			if e := unwrapped(err); errors.Is(e, apiclient.ErrInvalidAPIKey) {
-				return nil, fmt.Errorf("%v\n%s %s %s %s %s\n%s %s.\n%s %s %s",
-					e.Error(),
-					"Please check your",
-					ui.PrimaryString(config.CredentialsFilePath()),
-					"file or",
-					ui.PrimaryString("INFRACOST_API_KEY"),
-					"environment variable.",
-					"If you recently regenerated your API key, you can retrieve it from",
-					ui.PrimaryString(r.runCtx.Config.DashboardEndpoint),
-					"See",
-					ui.PrimaryString("https://infracost.io/support"),
-					"if you continue having issues.",
-				)
+			var apiErr *apiclient.APIError
+			if errors.As(err, &apiErr) {
+				switch apiErr.ErrorCode {
+				case apiclient.ErrorCodeExceededQuota:
+					return nil, &schema.ProjectDiag{Code: schema.DiagRunQuotaExceeded, Message: apiErr.Msg}
+				case apiclient.ErrorCodeAPIKeyInvalid:
+					return nil, fmt.Errorf("%v\n%s %s %s %s %s\n%s %s.\n%s %s %s",
+						apiErr.Msg,
+						"Please check your",
+						ui.PrimaryString(config.CredentialsFilePath()),
+						"file or",
+						ui.PrimaryString("INFRACOST_API_KEY"),
+						"environment variable.",
+						"If you recently regenerated your API key, you can retrieve it from",
+						ui.PrimaryString(r.runCtx.Config.DashboardEndpoint),
+						"See",
+						ui.PrimaryString("https://infracost.io/support"),
+						"if you continue having issues.",
+					)
+				}
+
+				return nil, fmt.Errorf("%v\n%s", apiErr.Error(), "We have been notified of this issue.")
 			}
 
 			return nil, err
@@ -893,15 +901,6 @@ func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectCon
 	}
 
 	return env
-}
-
-func unwrapped(err error) error {
-	e := err
-	for errors.Unwrap(e) != nil {
-		e = errors.Unwrap(e)
-	}
-
-	return e
 }
 
 func newErroredProject(ctx *config.ProjectContext, err error) *projectOutput {

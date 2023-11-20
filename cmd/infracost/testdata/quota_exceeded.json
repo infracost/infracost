@@ -1,0 +1,70 @@
+{
+  "version": "0.2",
+  "metadata": {
+    "infracostCommand": "breakdown",
+    "vcsBranch": "stub-branch",
+    "vcsCommitSha": "stub-sha",
+    "vcsCommitAuthorName": "stub-author",
+    "vcsCommitAuthorEmail": "stub@stub.com",
+    "vcsCommitTimestamp": "2023-11-18T09:40:45Z",
+    "vcsCommitMessage": "stub-message"
+  },
+  "currency": "USD",
+  "projects": [
+    {
+      "name": "infracost/infracost/examples",
+      "metadata": {
+        "path": "examples",
+        "type": "error",
+        "vcsSubPath": "examples",
+        "errors": [
+          {
+            "code": 7,
+            "message": "Infracost free monthly run limit exceeded.",
+            "data": null
+          }
+        ]
+      },
+      "pastBreakdown": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
+      },
+      "breakdown": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
+      },
+      "diff": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
+      },
+      "summary": {
+        "totalDetectedResources": 0,
+        "totalSupportedResources": 0,
+        "totalUnsupportedResources": 0,
+        "totalUsageBasedResources": 0,
+        "totalNoPriceResources": 0,
+        "unsupportedResourceCounts": {},
+        "noPriceResourceCounts": {}
+      }
+    }
+  ],
+  "totalHourlyCost": "0",
+  "totalMonthlyCost": "0",
+  "pastTotalHourlyCost": "0",
+  "pastTotalMonthlyCost": "0",
+  "diffTotalHourlyCost": "0",
+  "diffTotalMonthlyCost": "0",
+  "timeGenerated": "2023-11-20T10:03:20.361686Z",
+  "summary": {
+    "totalDetectedResources": 0,
+    "totalSupportedResources": 0,
+    "totalUnsupportedResources": 0,
+    "totalUsageBasedResources": 0,
+    "totalNoPriceResources": 0,
+    "unsupportedResourceCounts": {},
+    "noPriceResourceCounts": {}
+  }
+}

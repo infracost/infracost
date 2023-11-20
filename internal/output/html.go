@@ -64,11 +64,14 @@ func ToHTML(out Root, opts Options) ([]byte, error) {
 
 	summaryMessage := out.summaryMessage(opts.ShowSkipped)
 
+	msg, exceeded := out.Projects.IsRunQuotaExceeded()
 	err = tmpl.Execute(bufw, struct {
-		Root           Root
-		SummaryMessage string
-		Options        Options
-	}{out, summaryMessage, opts})
+		Root             Root
+		SummaryMessage   string
+		Options          Options
+		RunQuotaExceeded bool
+		RunQuotaMsg      string
+	}{out, summaryMessage, opts, exceeded, msg})
 	if err != nil {
 		return []byte{}, err
 	}

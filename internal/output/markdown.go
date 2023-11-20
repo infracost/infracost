@@ -119,6 +119,7 @@ type MarkdownCtx struct {
 	DiffOutput                   string
 	Options                      Options
 	MarkdownOptions              MarkdownOptions
+	RunQuotaMsg                  string
 }
 
 // MarkdownOutput holds the message converted to markdown with additional
@@ -151,6 +152,11 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) (MarkdownO
 	filename := "markdown-html.tmpl"
 	if markdownOpts.BasicSyntax {
 		filename = "markdown.tmpl"
+	}
+
+	runQuotaMsg, exceeded := out.Projects.IsRunQuotaExceeded()
+	if exceeded {
+		filename = "run-quota-exceeded.tmpl"
 	}
 
 	tmpl := template.New(filename)
@@ -275,7 +281,9 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) (MarkdownO
 		SkippedUnchangedProjectCount: skippedUnchangedProjectCount,
 		DiffOutput:                   diffMsg,
 		Options:                      opts,
-		MarkdownOptions:              markdownOpts})
+		MarkdownOptions:              markdownOpts,
+		RunQuotaMsg:                  runQuotaMsg,
+	})
 	if err != nil {
 		return MarkdownOutput{}, err
 	}

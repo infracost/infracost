@@ -223,6 +223,19 @@ func convertMetadata(metadata map[string]interface{}) map[string]gjson.Result {
 
 type Projects []Project
 
+// IsRunQuotaExceeded checks if any of the project metadata have errored with a
+// "run quota exceeded" error. If found it returns the associated message with
+// this diag. This should be used when in any output that notifies the user.
+func (projects Projects) IsRunQuotaExceeded() (string, bool) {
+	for _, p := range projects {
+		if msg, ok := p.Metadata.IsRunQuotaExceeded(); ok {
+			return msg, true
+		}
+	}
+
+	return "", false
+}
+
 var exampleProjectsRegex = regexp.MustCompile(`^infracost\/(infracost\/examples|example-terraform)\/`)
 
 func (r *Root) ExampleProjectName() string {

@@ -43,6 +43,16 @@ func TestOutputFormatGitHubComment(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--format", "github-comment", "--path", "./testdata/example_out.json", "--path", "./testdata/terraform_v0.14_breakdown.json", "--path", "./testdata/terraform_v0.14_nochange_breakdown.json"}, nil)
 }
 
+func TestOutputQuotaExceededFormatGithub(t *testing.T) {
+	GoldenFileCommandTest(t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"output",
+			"--format", "github-comment",
+			"--path", "./testdata/quota_exceeded.json",
+		}, nil)
+}
+
 func TestOutputFormatGitHubCommentWithAllError(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--format", "github-comment", "--path", "./testdata/errors.json"}, nil)
 }
@@ -166,6 +176,16 @@ func TestOutputTerraformOutFileHTML(t *testing.T) {
 	actual = stripDynamicValues(actual)
 
 	testutil.AssertGoldenFile(t, goldenFilePath, actual)
+}
+
+func TestOutputQuotaExceededFormatHTML(t *testing.T) {
+	GoldenFileCommandTest(t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"output",
+			"--format", "html",
+			"--path", "./testdata/quota_exceeded.json",
+		}, nil)
 }
 
 func TestOutputTerraformOutFileJSON(t *testing.T) {
