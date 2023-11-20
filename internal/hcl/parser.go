@@ -6,6 +6,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"runtime/debug"
 	"sort"
 	"strings"
@@ -26,6 +27,17 @@ import (
 
 var (
 	defaultTerraformWorkspaceName = "default"
+	// globalTerraformVarNames is a list of var file naming convention that suggests they are applied
+	// to every project, despite changes in environment.
+	globalTerraformVarNames = []string{
+		"default",
+		"defaults",
+		"global",
+		"globals",
+		"shared",
+	}
+
+	envPrefixRegxp = regexp.MustCompile(`^\w+-`)
 )
 
 type Option func(p *Parser)
@@ -255,14 +267,15 @@ func LoadParsers(ctx *config.ProjectContext, initialPath string, loader *modules
 					continue
 				}
 
-				if strings.HasSuffix(withoutJsonSuffix, "defaults.tfvars") {
-					autoVarFiles = append(autoVarFiles, varFile)
-					continue
-				}
-
-				if strings.HasSuffix(withoutJsonSuffix, "default.tfvars") {
-					autoVarFiles = append(autoVarFiles, varFile)
-					continue
+				for _, name := range globalTerraformVarNames {
+					// check if the var file is a "global" one, this is only applicable if we match a
+					// globalTerraformVarName and these don't have an environment prefix e.g.
+					// defaults.tfvars, global.tfvars are applicable, prod-default.tfvars,
+					// stag-globals are not.
+					if strings.HasSuffix(withoutJsonSuffix, name+".tfvars") && envPrefixRegxp.MatchString(withoutJsonSuffix) {
+						autoVarFiles = append(autoVarFiles, varFile)
+						continue
+					}
 				}
 
 				varFiles = append(varFiles, varFile)
