@@ -397,6 +397,9 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 		return nil, err
 	}
 
+	// Filter these config files against the exclude paths so Terragrunt doesn't even try to evaluate them
+	terragruntConfigFiles = p.filterExcludedPaths(terragruntConfigFiles)
+
 	var filtered []string
 	for _, file := range terragruntConfigFiles {
 		if !p.isParentTerragruntConfig(file, terragruntConfigFiles) {
@@ -404,8 +407,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 		}
 	}
 
-	// Filter these config files against the exclude paths so Terragrunt doesn't even try to evaluate them
-	terragruntConfigFiles = p.filterExcludedPaths(filtered)
+	terragruntConfigFiles = filtered
 
 	howThesePathsWereFound := fmt.Sprintf("Terragrunt config file found in a subdirectory of %s", terragruntOptions.WorkingDir)
 	s, err := createStackForTerragruntConfigPaths(terragruntOptions.WorkingDir, terragruntConfigFiles, terragruntOptions, howThesePathsWereFound)
@@ -482,7 +484,10 @@ func isChildDirectory(parent, child string) bool {
 }
 
 func (p *TerragruntHCLProvider) filterExcludedPaths(paths []string) []string {
-	isSkipped := buildExcludedPathsMatcher(p.Path, p.excludedPaths)
+	excludedPaths := p.excludedPaths
+	excludedPaths = append(excludedPaths, config.InfracostDir)
+
+	isSkipped := buildExcludedPathsMatcher(p.Path, excludedPaths)
 
 	var filteredPaths []string
 
