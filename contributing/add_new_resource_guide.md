@@ -40,7 +40,7 @@ The steps below describe adding an AWS resource using Terraform IaC provider, bu
 To follow this guide, you will need:
 
 - A working development environment for the Infracost CLI. You can set it up using [this guide](/CONTRIBUTING.md#setting-up-the-development-environment).
-- Access to the Cloud Pricing API database via PostgreSQL. See [this guide](https://github.com/infracost/cloud-pricing-api/blob/master/CONTRIBUTING.md) to set it up locally.
+- Access to the Cloud Pricing API database via PostgreSQL. Contact us in the [Slack channel](https://www.infracost.io/community) if you need access.
 
 ## Glossary
 
@@ -349,7 +349,7 @@ Let's find out how to find the component representation in the Pricing API datab
 
 ### Price search
 
-We'll use the PostgreSQL database and `psql` tool to find the prices for cost components. See [this guide](https://github.com/infracost/cloud-pricing-api/blob/master/CONTRIBUTING.md) to set it up locally.
+We'll use the PostgreSQL database and `psql` tool to find the prices for cost components.
 
 Connect to `cloud_pricing` database that holds all the prices:
 
