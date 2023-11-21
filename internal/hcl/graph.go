@@ -229,18 +229,26 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 
 			dstID := id
 
-			// If the vertex is a module call we should set the edge
-			// to the variable block within the module
+			// If the vertex is a module call and the attribute for the reference isn't a module call
+			// arg (source, count, for_each), etc, then the reference is a module input and points to
+			// a variable block within the module. In that case we should add the edge directly to that
+			// variable block instead of the module call. We need to do this to avoid a circular dependency
+			// where a module input can depend on a module output, e.g:
+			//
+			// module "my_module" {
+			//   source = "./foo"
+			//   foo = module.my_module.bar
+			// }
 			if _, ok := vertex.(*VertexModuleCall); ok {
-				if ref.AttributeName != "" {
+				if ref.AttributeName != "" && attrIsVarInput(ref.AttributeName) {
 					dstID = fmt.Sprintf("%s.variable.%s", stripModuleCallPrefix(id), ref.AttributeName)
-				}
 
-				// Check this vertex exists
-				_, err := g.dag.GetVertex(dstID)
-				if err != nil {
-					g.logger.Debug().Err(err).Msgf("ignoring edge %s, %s because the destination vertex doesn't exist", srcId, dstID)
-					continue
+					// Check this vertex exists
+					_, err := g.dag.GetVertex(dstID)
+					if err != nil {
+						g.logger.Debug().Err(err).Msgf("ignoring edge %s, %s because the destination vertex doesn't exist", srcId, dstID)
+						continue
+					}
 				}
 			}
 

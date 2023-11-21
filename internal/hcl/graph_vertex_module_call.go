@@ -10,12 +10,24 @@ import (
 	"github.com/zclconf/go-cty/cty"
 )
 
+var moduleCallArgs = []string{"source", "version", "for_each", "count", "providers", "depends_on", "lifecycle"}
+
 func moduleCallID(moduleAddress string) string {
 	return fmt.Sprintf("call:%s", moduleAddress)
 }
 
 func stripModuleCallPrefix(id string) string {
 	return strings.TrimPrefix(id, "call:")
+}
+
+func attrIsVarInput(name string) bool {
+	for _, arg := range moduleCallArgs {
+		if name == arg {
+			return false
+		}
+	}
+
+	return true
 }
 
 type VertexModuleCall struct {
