@@ -508,7 +508,11 @@ func (p *TerragruntHCLProvider) filterExcludedPaths(paths []string) []string {
 //     these for further runTerragrunt calls that use the dependency outputs.
 func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions) (info *terragruntWorkingDirInfo) {
 	info = &terragruntWorkingDirInfo{configDir: opts.WorkingDir, workingDir: opts.WorkingDir}
+
+	p.logger.Debug().Msgf("fetching dependency outputs for %s", opts.TerragruntConfigPath)
 	outputs := p.fetchDependencyOutputs(opts)
+	p.logger.Debug().Msgf("completed fetching dependency outputs for %s", opts.TerragruntConfigPath)
+
 	terragruntConfig, err := tgconfig.ParseConfigFile(opts.TerragruntConfigPath, opts, nil, &outputs)
 	if err != nil {
 		info.error = err
@@ -564,18 +568,21 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 		return
 	}
 	if sourceURL != "" {
+		p.logger.Debug().Msgf("downloading source URL %s", sourceURL)
 		updatedWorkingDir, err := downloadSourceOnce(sourceURL, opts, terragruntConfig)
 
 		if err != nil {
 			info.error = err
 			return
 		}
+		p.logger.Debug().Msgf("source URL download complete for %s", sourceURL)
 
 		if updatedWorkingDir != "" {
 			info = &terragruntWorkingDirInfo{configDir: opts.WorkingDir, workingDir: updatedWorkingDir}
 		}
 	}
 
+	p.logger.Debug().Msgf("generating config for %s", opts.TerragruntConfigPath)
 	if err = generateConfig(terragruntConfig, opts, info.workingDir); err != nil {
 		info.error = err
 		return
@@ -618,6 +625,7 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 		return
 	}
 
+	p.logger.Debug().Msgf("evaluating outputs for %s", opts.TerragruntConfigPath)
 	mods := h.Modules()
 	for _, mod := range mods {
 		if mod.Error != nil {

@@ -203,6 +203,8 @@ func (m *ModuleLoader) loadModules(path string, prefix string) ([]*ManifestModul
 	for i := 0; i < getProcessCount(); i++ {
 		errGroup.Go(func() error {
 			for moduleCall := range jobs {
+				m.logger.Debug().Msgf("loading module %s, prefix %s", moduleCall.Name, prefix)
+
 				metadata, err := m.loadModule(moduleCall, path, prefix)
 				if err != nil {
 					return err
@@ -224,6 +226,8 @@ func (m *ModuleLoader) loadModules(path string, prefix string) ([]*ManifestModul
 				manifestMu.Lock()
 				manifestModules = append(manifestModules, nestedManifestModules...)
 				manifestMu.Unlock()
+
+				m.logger.Debug().Msgf("completed loading module %s, prefix %s", moduleCall.Name, prefix)
 			}
 
 			return nil
