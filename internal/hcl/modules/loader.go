@@ -217,6 +217,8 @@ func (m *ModuleLoader) loadModules(path string, prefix string) ([]*ManifestModul
 					manifestMu.Unlock()
 				}
 
+				m.logger.Debug().Msgf("loading nested modules %s, prefix %s", moduleCall.Name, prefix)
+
 				moduleDir := filepath.Join(m.cachePath, metadata.Dir)
 				nestedManifestModules, err := m.loadModules(moduleDir, metadata.Key+".")
 				if err != nil {
