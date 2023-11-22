@@ -203,7 +203,7 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 		}
 
 		for _, ref := range vertex.References() {
-			var srcId string
+			var srcID string
 
 			parts := strings.Split(ref.Key, ".")
 			idx := len(parts)
@@ -217,14 +217,14 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 				// variable, local, resources and output references should all have length 2
 				idx = 2
 			}
-			srcId = strings.Join(parts[:idx], ".")
+			srcID = strings.Join(parts[:idx], ".")
 
 			// Don't add the module prefix for providers since they are
 			// evaluated in the root module
-			if !strings.HasPrefix(srcId, "provider.") && ref.ModuleAddress != "" {
+			if !strings.HasPrefix(srcID, "provider.") && ref.ModuleAddress != "" {
 				modAddress := stripCount(ref.ModuleAddress)
 
-				srcId = fmt.Sprintf("%s.%s", modAddress, srcId)
+				srcID = fmt.Sprintf("%s.%s", modAddress, srcID)
 			}
 
 			dstID := id
@@ -246,25 +246,25 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 					// Check this vertex exists
 					_, err := g.dag.GetVertex(dstID)
 					if err != nil {
-						g.logger.Debug().Err(err).Msgf("ignoring edge %s, %s because the destination vertex doesn't exist", srcId, dstID)
+						g.logger.Debug().Err(err).Msgf("ignoring edge %s, %s because the destination vertex doesn't exist", srcID, dstID)
 						continue
 					}
 				}
 			}
 
 			// Strip the count/index suffix from the source ID
-			srcId = stripCount(srcId)
+			srcID = stripCount(srcID)
 
-			if srcId == dstID {
+			if srcID == dstID {
 				continue
 			}
 
 			// Check if the source vertex exists
-			_, err := g.dag.GetVertex(srcId)
+			_, err := g.dag.GetVertex(srcID)
 			if err == nil {
-				g.logger.Debug().Msgf("adding edge: %s, %s", srcId, dstID)
+				g.logger.Debug().Msgf("adding edge: %s, %s", srcID, dstID)
 				edges = append(edges, dag.EdgeInput{
-					SrcID: srcId,
+					SrcID: srcID,
 					DstID: dstID,
 				})
 
@@ -275,14 +275,14 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 			// so we need to check if the module output exists and add an edge from that
 			// to the current vertex instead.
 			if ref.ModuleAddress != "" && stripCount(ref.ModuleAddress) != modAddr {
-				srcId = fmt.Sprintf("%s.%s", stripCount(ref.ModuleAddress), parts[0])
+				srcID = fmt.Sprintf("%s.%s", stripCount(ref.ModuleAddress), parts[0])
 
 				// Check if the source vertex exists
-				_, err := g.dag.GetVertex(srcId)
+				_, err := g.dag.GetVertex(srcID)
 				if err == nil {
-					g.logger.Debug().Msgf("adding edge: %s, %s", srcId, dstID)
+					g.logger.Debug().Msgf("adding edge: %s, %s", srcID, dstID)
 					edges = append(edges, dag.EdgeInput{
-						SrcID: srcId,
+						SrcID: srcID,
 						DstID: dstID,
 					})
 
