@@ -496,6 +496,11 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 			continue
 		}
 
+		var iterName string
+		if block.Type() == "dynamic" {
+			iterName = e.getIteratorAttrName(block)
+		}
+
 		e.logger.Debug().Msgf("expanding block %s because a for_each attribute was found", block.LocalName())
 
 		value := forEachAttr.Value()
@@ -523,6 +528,15 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 
 				ctx.SetByDot(key, "each.key")
 				ctx.SetByDot(val, "each.value")
+				// If we have an iterName let's also set a child context with this as a prefix.
+				// This enables proper support for dynamic block content generation. Dynamic
+				// blocks can use different names outside the regular "each." to refer to
+				// attributes in the loop expansion see [Evaluator.getIteratorAttrName] for more
+				// info.
+				if iterName != "" {
+					ctx.SetByDot(key, iterName+".key")
+					ctx.SetByDot(val, iterName+".value")
+				}
 
 				ctx.Set(key, block.TypeLabel(), "key")
 				ctx.Set(val, block.TypeLabel(), "value")
@@ -568,6 +582,64 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 	}
 
 	return expanded
+}
+
+// getIteratorAttrName returns the iterator key which is used to set the child
+// context of a dynamic block. Normally, in the context of a for_each expansion
+// we set the child context to have a prefix of "each". This allows correct
+// evaluation of attributes referencing "each.value." or "each.key.". However,
+// dynamic blocks are special cases. Not only can they use "each" in the content block,
+// but they also are able to refer to the dynamic block label, e.g:
+//
+//	 dynamic "setting" {
+//	   for_each = var.settings
+//	   content {
+//	     namespace = setting.value.namespace.
+//			...
+//	   }
+//	 }
+//
+// additionally they have a "iterator" block:
+// https://developer.hashicorp.com/terraform/language/expressions/dynamic-blocks
+// which allow the user to specify a different prefix for a for_each expansion.
+// For example:
+//
+//	  dynamic "foo" {
+//	   for_each = {
+//	      ...
+//	   }
+//	   iterator = device
+//	   content {
+//	     name = device.value.name
+//			...
+//	   }
+//	 }
+//
+// In this case we need to return the iterator name ("device" in the above
+// example) so that we properly set the child context with the correct prefix.
+// Terraform expects the iterator key to be specified by a root name traversal
+// here (note the lack of quotes around the device value for iterator in the
+// above example). This means we can't just do `attr.Value().AsString()` as
+// normal because the actual value returns `UnknownType`. Instead, we need to
+// "pop" the RootName off the expression.
+func (e *Evaluator) getIteratorAttrName(block *Block) string {
+	iterator := block.GetAttribute("iterator")
+	if iterator != nil {
+		travers, diags := hcl.AbsTraversalForExpr(iterator.HCLAttr.Expr)
+		if diags.HasErrors() {
+			e.logger.Debug().Err(diags).Msg("failed to get abs traversal for dynamic block iterator attr")
+			return ""
+		}
+
+		if len(travers) != 1 {
+			e.logger.Debug().Msg("dynamic block iterator had incorrect expression length, unable to retrieve iterator name")
+			return ""
+		}
+
+		return travers.RootName()
+	}
+
+	return block.TypeLabel()
 }
 
 func shouldExpandBlock(block *Block) bool {

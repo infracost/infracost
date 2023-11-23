@@ -1082,6 +1082,19 @@ func TestBreakdownWithMockedMerge(t *testing.T) {
 	)
 }
 
+func TestBreakdownWithDynamicIterator(t *testing.T) {
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path",
+			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+		},
+		nil,
+	)
+}
+
 func TestBreakdownWithPolicyDataUploadPlanJson(t *testing.T) {
 	ts, uploadWriter := GraphqlTestServerWithWriter(map[string]string{
 		"policyResourceAllowList": policyResourceAllowlistGraphQLResponse,
