@@ -137,38 +137,6 @@ func (c *PolicyAPIClient) CheckPolicies(ctx *config.RunContext, out output.Root)
 		return nil, fmt.Errorf("failed to unmarshal tag policies %w", err)
 	}
 
-	if len(policies.EvaluatePolicies.TagPolicies) > 0 {
-		checkedStr := "tag policy"
-		if len(policies.EvaluatePolicies.TagPolicies) > 1 {
-			checkedStr = "tag policies"
-		}
-		msg := fmt.Sprintf(`%d %s checked`, len(policies.EvaluatePolicies.TagPolicies), checkedStr)
-		if ctx.Config.IsLogging() {
-			logging.Logger.Info().Msg(msg)
-		} else {
-			_, err := fmt.Fprintf(ctx.ErrWriter, "%s\n", msg)
-			if err != nil {
-				return nil, fmt.Errorf("failed to write tag policies %w", err)
-			}
-		}
-	}
-
-	if len(policies.EvaluatePolicies.FinOpsPolicies) > 0 {
-		checkedStr := "finops policy"
-		if len(policies.EvaluatePolicies.FinOpsPolicies) > 1 {
-			checkedStr = "finops policies"
-		}
-		msg := fmt.Sprintf(`%d %s checked`, len(policies.EvaluatePolicies.FinOpsPolicies), checkedStr)
-		if ctx.Config.IsLogging() {
-			logging.Logger.Info().Msg(msg)
-		} else {
-			_, err := fmt.Fprintf(ctx.ErrWriter, "%s\n", msg)
-			if err != nil {
-				return nil, fmt.Errorf("failed to write fin ops policies %w", err)
-			}
-		}
-	}
-
 	return &PolicyOutput{policies.EvaluatePolicies.TagPolicies, policies.EvaluatePolicies.FinOpsPolicies}, nil
 }
 
