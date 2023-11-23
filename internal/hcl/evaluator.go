@@ -406,32 +406,78 @@ func (e *Evaluator) expandBlocks(blocks Blocks, lastContext hcl.EvalContext) Blo
 }
 
 func (e *Evaluator) expandDynamicBlocks(blocks ...*Block) Blocks {
+	var newBlocks Blocks
+
 	for _, b := range blocks {
-		e.expandDynamicBlock(b)
+		if b.HasDynamicBlock() {
+			newBlocks = append(newBlocks, e.expandDynamicBlock(b))
+			continue
+		}
+
+		newBlocks = append(newBlocks, b)
 	}
-	return blocks
+
+	return newBlocks
 }
 
-func (e *Evaluator) expandDynamicBlock(b *Block) {
-	for _, sub := range b.Children() {
-		e.expandDynamicBlock(sub)
+func (e *Evaluator) expandDynamicBlock(b *Block) *Block {
+	var newChildBlocks Blocks
+	for _, child := range b.Children() {
+		// if the child block is not a dynamic there is nothing to do
+		// so add it to the newBlocks straight away and continue.
+		if child.Type() != "dynamic" {
+			newChildBlocks = append(newChildBlocks, child)
+			continue
+		}
+
+		e.logger.Debug().Msgf("expanding block %s because a dynamic block was found %s", b.LocalName(), child.LocalName())
+		blockName := child.TypeLabel()
+
+		// for each expanded dynamic block add the generated "content" as a
+		// new child block into the parent block.
+		expanded := e.expandBlockForEaches([]*Block{child})
+		for _, ex := range expanded {
+			content := ex.GetChildBlock("content")
+			if content == nil {
+				continue
+			}
+
+			_ = e.expandDynamicBlocks(content)
+
+			content.SetLabels([]string{})
+			content.SetType(blockName)
+
+			for attrName, attr := range content.AttributesAsMap() {
+				b.context.Root().SetByDot(attr.Value(), fmt.Sprintf("%s.%s.%s", b.Reference().String(), blockName, attrName))
+			}
+
+			newChildBlocks = append(newChildBlocks, content)
+		}
 	}
 
-	for _, sub := range b.Children().OfType("dynamic") {
-		e.logger.Debug().Msgf("expanding block %s because a dynamic block was found %s", b.LocalName(), sub.LocalName())
+	for i, block := range newChildBlocks {
+		newChildBlocks[i] = e.expandDynamicBlock(block)
+	}
 
-		blockName := sub.TypeLabel()
-		// Remove all the child blocks with the blockName so that we don't inject the expanded blocks twice.
-		// This could happen if a module "reloads" and the input variables change.
-		b.RemoveDynamicBlocks(blockName)
-
-		expanded := e.expandBlockForEaches([]*Block{sub})
-		for _, ex := range expanded {
-			if content := ex.GetChildBlock("content"); content != nil {
-				_ = e.expandDynamicBlocks(content)
-				b.InjectBlock(content, blockName)
-			}
-		}
+	return &Block{
+		HCLBlock:    b.HCLBlock,
+		UniqueAttrs: b.UniqueAttrs,
+		context:     b.context,
+		moduleBlock: b.moduleBlock,
+		rootPath:    b.rootPath,
+		expanded:    b.expanded,
+		cloneIndex:  b.cloneIndex,
+		original:    b.original,
+		childBlocks: newChildBlocks,
+		parent:      b.parent,
+		verbose:     b.verbose,
+		logger:      b.logger,
+		newMock:     b.newMock,
+		attributes:  b.attributes,
+		reference:   b.reference,
+		Filename:    b.Filename,
+		StartLine:   b.StartLine,
+		EndLine:     b.EndLine,
 	}
 }
 
