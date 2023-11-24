@@ -1511,6 +1511,79 @@ locals {
 	)
 }
 
+func Test_NestedDynamicBlock(t *testing.T) {
+	path := createTestFile("test.tf", `
+locals {
+    machines = {
+        foo = {
+            name = "name-foo"
+            child_blocks = {
+                "one" = {
+                    name = "one"
+                }
+                "two" = {
+                    name = "two"
+                }
+            }
+        }
+    }
+}
+
+resource "baz" "bat" {
+	test = "test"
+
+    dynamic "block1" {
+        for_each = local.machines
+        content {
+            name = block1.value.name
+			dynamic "block2" {
+				for_each = block1.value.child_blocks
+				content {
+					name = block2.value.name
+				}
+			}
+        }
+    }
+}
+`)
+
+	logger := newDiscardLogger()
+	loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
+	parsers, err := LoadParsers(
+		config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{}),
+		filepath.Dir(path),
+		loader,
+		nil,
+		logger)
+	require.NoError(t, err)
+	module, err := parsers[0].ParseDirectory()
+	require.NoError(t, err)
+
+	blocks := module.Blocks
+	block := blocks.Matching(BlockMatcher{Type: "resource", Label: "baz.bat"})
+	require.Len(t, block.childBlocks.OfType("block1"), 1)
+	block1 := block.childBlocks[0]
+	assertBlockEqualsJSON(
+		t,
+		`{"name":"name-foo"}`,
+		block1.Values(),
+	)
+
+	require.Len(t, block1.childBlocks.OfType("block2"), 2)
+	block2a := block1.childBlocks[0]
+	assertBlockEqualsJSON(
+		t,
+		`{"name":"one"}`,
+		block2a.Values(),
+	)
+	block2b := block1.childBlocks[1]
+	assertBlockEqualsJSON(
+		t,
+		`{"name":"two"}`,
+		block2b.Values(),
+	)
+}
+
 func BenchmarkParserEvaluate(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		b.StopTimer()

@@ -73,5 +73,15 @@ resource "aws_instance" "web_app2" {
       iops        = ebs_block_device.value.options.iops
     }
   }
+
+  dynamic "ebs_block_device" {
+    for_each = {}
+    content {
+      device_name = ebs_block_device.value.name
+      volume_type = "io1"
+      volume_size = ebs_block_device.value.options.volume_size
+      iops        = ebs_block_device.value.options.iops
+    }
+  }
 }
 

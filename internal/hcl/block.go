@@ -539,33 +539,6 @@ func newArnAttribute(addressSha, name string, withCount bool, withEach bool) *hc
 	}
 }
 
-// InjectBlock takes a block and appends it to the Blocks childBlocks with the Block's
-// attributes set as contextual values on the child. In most cases this is because we've expanded
-// the block into further Blocks as part of a count or for_each.
-func (b *Block) InjectBlock(block *Block, name string) {
-	block.SetLabels([]string{})
-	block.SetType(name)
-
-	for attrName, attr := range block.AttributesAsMap() {
-		b.context.Root().SetByDot(attr.Value(), fmt.Sprintf("%s.%s.%s", b.Reference().String(), name, attrName))
-	}
-
-	b.childBlocks = append(b.childBlocks, block)
-}
-
-// RemoveDynamicBlocks removes all the child Blocks of type name that have a parent of type "dynamic".
-func (b *Block) RemoveDynamicBlocks(name string) {
-	var filtered Blocks
-
-	for _, block := range b.childBlocks {
-		if block.Type() != name || block.parent.Type() != "dynamic" {
-			filtered = append(filtered, block)
-		}
-	}
-
-	b.childBlocks = filtered
-}
-
 // IsCountExpanded returns if the Block has been expanded as part of a for_each or count evaluation.
 func (b *Block) IsCountExpanded() bool {
 	return b.expanded
@@ -1181,6 +1154,27 @@ func (b *Block) NameLabel() string {
 		return b.Labels()[1]
 	}
 	return ""
+}
+
+// HasDynamicBlock searches all the nested children of the given block to see if
+// any are type "dynamic". This is used before embarking on dynamic expansion
+// logic.
+func (b *Block) HasDynamicBlock() bool {
+	if b == nil {
+		return false
+	}
+
+	for _, child := range b.Children() {
+		if child.Type() == "dynamic" {
+			return true
+		}
+
+		if child.HasDynamicBlock() {
+			return true
+		}
+	}
+
+	return false
 }
 
 var (
