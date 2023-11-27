@@ -370,6 +370,11 @@ func (f *metadataFetcher) getGitlabMetadata(path string, gitDiffTarget *string) 
 		m.Branch.Name = getEnv("CI_MERGE_REQUEST_SOURCE_BRANCH_NAME")
 	}
 
+	prUrl := ""
+	if getEnv("CI_MERGE_REQUEST_IID") != "" {
+		prUrl = getEnv("CI_PROJECT_URL") + "/merge_requests/" + getEnv("CI_MERGE_REQUEST_IID")
+	}
+
 	m.Remote = urlStringToRemote(getEnv("CI_PROJECT_URL"))
 	m.Pipeline = &Pipeline{ID: getEnv("CI_PIPELINE_ID")}
 	m.PullRequest = &PullRequest{
@@ -379,7 +384,7 @@ func (f *metadataFetcher) getGitlabMetadata(path string, gitDiffTarget *string) 
 		Author:       f.getGitlabPullRequestAuthor(),
 		SourceBranch: getEnv("CI_MERGE_REQUEST_SOURCE_BRANCH_NAME"),
 		BaseBranch:   getEnv("CI_MERGE_REQUEST_TARGET_BRANCH_NAME"),
-		URL:          getEnv("CI_PROJECT_URL") + "/merge_requests/" + getEnv("CI_MERGE_REQUEST_IID"),
+		URL:          prUrl,
 	}
 
 	return m, nil
