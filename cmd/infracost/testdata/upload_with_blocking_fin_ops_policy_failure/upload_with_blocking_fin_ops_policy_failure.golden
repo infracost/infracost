@@ -6,7 +6,6 @@ Error: Governance check failed:
 
 
 Logs:
-INF 1 finops policy checked
 INF Estimate uploaded to Infracost Cloud
 INF 2 finops policies checked
 INF finops policy check failed: should show as failing
