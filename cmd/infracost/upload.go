@@ -49,7 +49,10 @@ See https://infracost.io/docs/features/cli_commands/#upload-runs`,
 				if err != nil {
 					logging.Logger.Err(err).Msg("Failed to initialize policies client")
 				} else {
-					policies, err := policyClient.CheckPolicies(ctx, root)
+					// If there is a PR ID, only check policies on modified resources (onlyDiff = true). It there
+					// isn't a PR ID it must be a base branch run so all resources are checked.
+					onlyDiff := root.Metadata.VCSPullRequestID != ""
+					policies, err := policyClient.CheckPolicies(ctx, root, onlyDiff)
 					if err != nil {
 						logging.Logger.Err(err).Msg("Failed to check policies")
 					}

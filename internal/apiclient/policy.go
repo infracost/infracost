@@ -48,15 +48,15 @@ type PolicyOutput struct {
 	FinOpsPolicies []output.FinOpsPolicy
 }
 
-func (c *PolicyAPIClient) CheckPolicies(ctx *config.RunContext, out output.Root) (*PolicyOutput, error) {
+func (c *PolicyAPIClient) CheckPolicies(ctx *config.RunContext, out output.Root, onlyDiff bool) (*PolicyOutput, error) {
 	ri, err := newRunInput(ctx, out)
 	if err != nil {
 		return nil, err
 	}
 
 	q := `
-		query($run: RunInput!) {
-			evaluatePolicies(run: $run) {
+		query($run: RunInput!, $onlyDiff: Boolean) {
+			evaluatePolicies(run: $run, onlyDiff: $onlyDiff) {
 				tagPolicyResults {
 					name
 					tagPolicyId
@@ -108,7 +108,8 @@ func (c *PolicyAPIClient) CheckPolicies(ctx *config.RunContext, out output.Root)
 	`
 
 	v := map[string]interface{}{
-		"run": *ri,
+		"run":      *ri,
+		"onlyDiff": onlyDiff,
 	}
 	results, err := c.doQueries([]GraphQLQuery{{q, v}})
 	if err != nil {

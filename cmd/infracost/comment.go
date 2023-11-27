@@ -87,7 +87,7 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 		if err != nil {
 			logging.Logger.Err(err).Msg("Failed to initialize policies client")
 		} else {
-			policies, err := policyClient.CheckPolicies(ctx, combined)
+			policies, err := policyClient.CheckPolicies(ctx, combined, true)
 			if err != nil {
 				logging.Logger.Err(err).Msg("Failed to check policies")
 			}
