@@ -48,15 +48,15 @@ type PolicyOutput struct {
 	FinOpsPolicies []output.FinOpsPolicy
 }
 
-func (c *PolicyAPIClient) CheckPolicies(ctx *config.RunContext, out output.Root) (*PolicyOutput, error) {
+func (c *PolicyAPIClient) CheckPolicies(ctx *config.RunContext, out output.Root, onlyDiff bool) (*PolicyOutput, error) {
 	ri, err := newRunInput(ctx, out)
 	if err != nil {
 		return nil, err
 	}
 
 	q := `
-		query($run: RunInput!) {
-			evaluatePolicies(run: $run) {
+		query($run: RunInput!, $onlyDiff: Boolean) {
+			evaluatePolicies(run: $run, onlyDiff: $onlyDiff) {
 				tagPolicyResults {
 					name
 					tagPolicyId
@@ -108,7 +108,8 @@ func (c *PolicyAPIClient) CheckPolicies(ctx *config.RunContext, out output.Root)
 	`
 
 	v := map[string]interface{}{
-		"run": *ri,
+		"run":      *ri,
+		"onlyDiff": onlyDiff,
 	}
 	results, err := c.doQueries([]GraphQLQuery{{q, v}})
 	if err != nil {
@@ -134,39 +135,7 @@ func (c *PolicyAPIClient) CheckPolicies(ctx *config.RunContext, out output.Root)
 
 	err = json.Unmarshal([]byte(data.Raw), &policies)
 	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal tag policies %w", err)
-	}
-
-	if len(policies.EvaluatePolicies.TagPolicies) > 0 {
-		checkedStr := "tag policy"
-		if len(policies.EvaluatePolicies.TagPolicies) > 1 {
-			checkedStr = "tag policies"
-		}
-		msg := fmt.Sprintf(`%d %s checked`, len(policies.EvaluatePolicies.TagPolicies), checkedStr)
-		if ctx.Config.IsLogging() {
-			logging.Logger.Info().Msg(msg)
-		} else {
-			_, err := fmt.Fprintf(ctx.ErrWriter, "%s\n", msg)
-			if err != nil {
-				return nil, fmt.Errorf("failed to write tag policies %w", err)
-			}
-		}
-	}
-
-	if len(policies.EvaluatePolicies.FinOpsPolicies) > 0 {
-		checkedStr := "finops policy"
-		if len(policies.EvaluatePolicies.FinOpsPolicies) > 1 {
-			checkedStr = "finops policies"
-		}
-		msg := fmt.Sprintf(`%d %s checked`, len(policies.EvaluatePolicies.FinOpsPolicies), checkedStr)
-		if ctx.Config.IsLogging() {
-			logging.Logger.Info().Msg(msg)
-		} else {
-			_, err := fmt.Fprintf(ctx.ErrWriter, "%s\n", msg)
-			if err != nil {
-				return nil, fmt.Errorf("failed to write fin ops policies %w", err)
-			}
-		}
+		return nil, fmt.Errorf("failed to unmarshal policies %w", err)
 	}
 
 	return &PolicyOutput{policies.EvaluatePolicies.TagPolicies, policies.EvaluatePolicies.FinOpsPolicies}, nil

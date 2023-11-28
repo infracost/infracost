@@ -6,7 +6,6 @@ Error: Governance check failed:
 
 
 Logs:
-INF 4 tag policies checked
 INF Estimate uploaded to Infracost Cloud
 INF 2 tag policies checked
 INF tag policy check failed: should show as failing
