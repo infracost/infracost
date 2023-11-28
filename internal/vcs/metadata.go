@@ -368,6 +368,9 @@ func (f *metadataFetcher) getGitlabMetadata(path string, gitDiffTarget *string) 
 
 	if m.Branch.Name == "HEAD" {
 		m.Branch.Name = getEnv("CI_MERGE_REQUEST_SOURCE_BRANCH_NAME")
+		if m.Branch.Name == "" {
+			m.Branch.Name = getEnv("CI_COMMIT_BRANCH")
+		}
 	}
 
 	prUrl := ""
