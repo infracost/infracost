@@ -171,7 +171,7 @@ locals {
 resource "azurerm_storage_account" "blockblob" {
   for_each = { for entry in local.blockblob_permutations : "${entry.account_kind}.${entry.account_tier}.${entry.account_replication_type}.${entry.access_tier}" => entry }
 
-  name                     = substr(lower("${each.value.account_kind}${each.value.account_tier}${each.value.account_replication_type}${each.value.access_tier}"), 0, 24)
+  name                     = substr(lower("ic${each.value.account_kind}${each.value.account_tier}${each.value.account_replication_type}${each.value.access_tier}"), 0, 24)
   resource_group_name      = azurerm_resource_group.example.name
   location                 = azurerm_resource_group.example.location
   account_kind             = each.value.account_kind
@@ -183,7 +183,7 @@ resource "azurerm_storage_account" "blockblob" {
 resource "azurerm_storage_account" "blob" {
   for_each = { for entry in local.blob_permutations : "${entry.account_kind}.${entry.account_tier}.${entry.account_replication_type}.${entry.access_tier}" => entry }
 
-  name                     = substr(lower("${each.value.account_kind}${each.value.account_tier}${each.value.account_replication_type}${each.value.access_tier}"), 0, 24)
+  name                     = substr(lower("ic${each.value.account_kind}${each.value.account_tier}${each.value.account_replication_type}${each.value.access_tier}"), 0, 24)
   resource_group_name      = azurerm_resource_group.example.name
   location                 = azurerm_resource_group.example.location
   account_kind             = each.value.account_kind
@@ -195,7 +195,7 @@ resource "azurerm_storage_account" "blob" {
 resource "azurerm_storage_account" "storagev1" {
   for_each = { for entry in local.storagev1_permutations : "${entry.account_kind}.${entry.account_tier}.${entry.account_replication_type}" => entry }
 
-  name                     = substr(lower("${each.value.account_kind}${each.value.account_tier}${each.value.account_replication_type}"), 0, 24)
+  name                     = substr(lower("ic${each.value.account_kind}${each.value.account_tier}${each.value.account_replication_type}"), 0, 24)
   resource_group_name      = azurerm_resource_group.example.name
   location                 = azurerm_resource_group.example.location
   account_kind             = each.value.account_kind
@@ -206,7 +206,7 @@ resource "azurerm_storage_account" "storagev1" {
 resource "azurerm_storage_account" "storagev2" {
   for_each = { for entry in local.storagev2_permutations : "${entry.account_kind}.${entry.account_tier}.${entry.account_replication_type}.${entry.access_tier}" => entry }
 
-  name                     = substr(lower("${each.value.account_kind}${each.value.account_tier}${each.value.account_replication_type}${each.value.access_tier}"), 0, 24)
+  name                     = substr(lower("ic${each.value.account_kind}${each.value.account_tier}${each.value.account_replication_type}${each.value.access_tier}"), 0, 24)
   resource_group_name      = azurerm_resource_group.example.name
   location                 = azurerm_resource_group.example.location
   account_kind             = each.value.account_kind
@@ -218,7 +218,7 @@ resource "azurerm_storage_account" "storagev2" {
 resource "azurerm_storage_account" "file" {
   for_each = { for entry in local.file_permutations : "${entry.account_kind}.${entry.account_tier}.${entry.account_replication_type}.${entry.access_tier}" => entry }
 
-  name                     = substr(lower("${each.value.account_kind}${each.value.account_tier}${each.value.account_replication_type}${each.value.access_tier}"), 0, 24)
+  name                     = substr(lower("ic${each.value.account_kind}${each.value.account_tier}${each.value.account_replication_type}${each.value.access_tier}"), 0, 24)
   resource_group_name      = azurerm_resource_group.example.name
   location                 = azurerm_resource_group.example.location
   account_kind             = each.value.account_kind
@@ -230,7 +230,7 @@ resource "azurerm_storage_account" "file" {
 resource "azurerm_storage_account" "nfsv3" {
   for_each = { for entry in local.nfsv3_permutations : "${entry.account_kind}.${entry.account_tier}.${entry.account_replication_type}.${entry.access_tier}" => entry }
 
-  name                     = substr(lower("${each.value.account_kind}${each.value.account_tier}${each.value.account_replication_type}${each.value.access_tier}"), 0, 24)
+  name                     = substr(lower("ic${each.value.account_kind}${each.value.account_tier}${each.value.account_replication_type}${each.value.access_tier}"), 0, 24)
   resource_group_name      = azurerm_resource_group.example.name
   location                 = azurerm_resource_group.example.location
   account_kind             = each.value.account_kind
@@ -242,7 +242,7 @@ resource "azurerm_storage_account" "nfsv3" {
 
 
 resource "azurerm_storage_account" "unsupported" {
-  name                     = "unsupported"
+  name                     = "icunsupported"
   resource_group_name      = azurerm_resource_group.example.name
   location                 = azurerm_resource_group.example.location
   account_kind             = "BlockBlobStorage"

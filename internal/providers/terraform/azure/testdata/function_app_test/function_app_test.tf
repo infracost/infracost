@@ -50,7 +50,7 @@ resource "azurerm_app_service_plan" "funcApp" {
 }
 
 resource "azurerm_storage_account" "example" {
-  name                     = "functionsapptestsa"
+  name                     = "icfunctionsapptestsa"
   resource_group_name      = azurerm_resource_group.example1.name
   location                 = azurerm_resource_group.example1.location
   account_tier             = "Standard"
