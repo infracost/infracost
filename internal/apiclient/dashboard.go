@@ -139,7 +139,7 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root, com
 	}
 
 	q := `
-	mutation($run: RunInput!, $commentFormat: CommentFormat!) {
+	mutation AddRun($run: RunInput!, $commentFormat: CommentFormat!) {
 			addRun(run: $run) {
 				id
 				shareUrl

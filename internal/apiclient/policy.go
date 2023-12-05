@@ -55,7 +55,7 @@ func (c *PolicyAPIClient) CheckPolicies(ctx *config.RunContext, out output.Root,
 	}
 
 	q := `
-		query($run: RunInput!, $onlyDiff: Boolean) {
+		query EvaluatePolicies($run: RunInput!, $onlyDiff: Boolean) {
 			evaluatePolicies(run: $run, onlyDiff: $onlyDiff) {
 				tagPolicyResults {
 					name
@@ -395,7 +395,7 @@ func (c *PolicyAPIClient) fetchAllowList() error {
 
 func (c *PolicyAPIClient) getPolicyResourceAllowList() (map[string]allowList, error) {
 	q := `
-		query {
+		query GetPolicyResourceAllowList{
 			policyResourceAllowList {
 				resourceType
                 allowed
