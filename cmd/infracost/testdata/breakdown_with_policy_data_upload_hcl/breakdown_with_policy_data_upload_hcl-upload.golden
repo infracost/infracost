@@ -1,7 +1,7 @@
 policyResourceAllowList:
 [
   {
-    "query": "\n\t\tquery {\n\t\t\tpolicyResourceAllowList {\n\t\t\t\tresourceType\n                allowed\n\t\t\t}\n\t\t}\n\t",
+    "query": "\n\t\tquery GetPolicyResourceAllowList{\n\t\t\tpolicyResourceAllowList {\n\t\t\t\tresourceType\n                allowed\n\t\t\t}\n\t\t}\n\t",
     "variables": {}
   }
 ]
