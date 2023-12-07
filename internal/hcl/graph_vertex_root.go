@@ -16,6 +16,6 @@ func (v *VertexRoot) References() []VertexReference {
 	return []VertexReference{}
 }
 
-func (v *VertexRoot) Visit(mutex *sync.Mutex) error {
-	return nil
+func (v *VertexRoot) Visit(mutex *sync.Mutex) (interface{}, error) {
+	return nil, nil
 }

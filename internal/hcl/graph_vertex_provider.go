@@ -32,18 +32,18 @@ func (v *VertexProvider) References() []VertexReference {
 	return v.block.VerticesReferenced()
 }
 
-func (v *VertexProvider) Visit(mutex *sync.Mutex) error {
+func (v *VertexProvider) Visit(mutex *sync.Mutex) (interface{}, error) {
 	mutex.Lock()
 	defer mutex.Unlock()
 
 	provider := v.block.Label()
 	if provider == "" {
-		return fmt.Errorf("provider block %s has no label", v.ID())
+		return nil, fmt.Errorf("provider block %s has no label", v.ID())
 	}
 
 	moduleInstances := v.moduleConfigs.Get(v.block.ModuleAddress())
 	if len(moduleInstances) == 0 {
-		return fmt.Errorf("no module instances found for module address %q", v.block.ModuleAddress())
+		return nil, fmt.Errorf("no module instances found for module address %q", v.block.ModuleAddress())
 	}
 
 	for _, moduleInstance := range moduleInstances {
@@ -60,7 +60,7 @@ func (v *VertexProvider) Visit(mutex *sync.Mutex) error {
 		}
 
 		if blockInstance == nil {
-			return fmt.Errorf("could not find block %q in module %q", v.ID(), moduleInstance.name)
+			return nil, fmt.Errorf("could not find block %q in module %q", v.ID(), moduleInstance.name)
 		}
 
 		var existingVals map[string]cty.Value
@@ -79,5 +79,5 @@ func (v *VertexProvider) Visit(mutex *sync.Mutex) error {
 		e.AddFilteredBlocks(blockInstance)
 	}
 
-	return nil
+	return nil, nil
 }

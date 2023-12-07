@@ -28,13 +28,13 @@ func (v *VertexOutput) References() []VertexReference {
 	return v.block.VerticesReferenced()
 }
 
-func (v *VertexOutput) Visit(mutex *sync.Mutex) error {
+func (v *VertexOutput) Visit(mutex *sync.Mutex) (interface{}, error) {
 	mutex.Lock()
 	defer mutex.Unlock()
 
 	moduleInstances := v.moduleConfigs.Get(v.block.ModuleAddress())
 	if len(moduleInstances) == 0 {
-		return fmt.Errorf("no module instances found for module address %q", v.block.ModuleAddress())
+		return nil, fmt.Errorf("no module instances found for module address %q", v.block.ModuleAddress())
 	}
 
 	for _, moduleInstance := range moduleInstances {
@@ -42,13 +42,13 @@ func (v *VertexOutput) Visit(mutex *sync.Mutex) error {
 		blockInstance := e.module.Blocks.FindLocalName(v.block.LocalName())
 
 		if blockInstance == nil {
-			return fmt.Errorf("could not find block %q in module %q", v.ID(), moduleInstance.name)
+			return nil, fmt.Errorf("could not find block %q in module %q", v.ID(), moduleInstance.name)
 		}
 
 		key := fmt.Sprintf("output.%s", blockInstance.Label())
 		val, err := e.evaluateOutput(blockInstance)
 		if err != nil {
-			return fmt.Errorf("could not evaluate output %s: %w", v.ID(), err)
+			return nil, fmt.Errorf("could not evaluate output %s: %w", v.ID(), err)
 		}
 
 		v.logger.Debug().Msgf("adding output %s to the evaluation context", v.ID())
@@ -75,5 +75,5 @@ func (v *VertexOutput) Visit(mutex *sync.Mutex) error {
 		e.AddFilteredBlocks(blockInstance)
 	}
 
-	return nil
+	return nil, nil
 }

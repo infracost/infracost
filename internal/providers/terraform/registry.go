@@ -86,6 +86,63 @@ func (r *ResourceRegistryMap) GetDefaultRefIDFunc(resourceDataType string) schem
 	}
 }
 
+// CreatePartialResource creates a partial resource based on the given
+// ResourceData and UsageData. If the resource type is found in the registry, it
+// checks if it has NoPrice flag set. If so, it creates a PartialResource with
+// NoPrice set to true. Otherwise, it checks if it has a CoreRFunc (preferred way
+// to create provider-agnostic resources) and uses it to generate a CoreResource
+// if possible. If CoreResource is not available, it uses the RFunc (legacy way)
+// to create a regular Resource. If UsageData is provided, it calculates the
+// estimation summary and adds it to the created resource. Finally, it returns
+// the created PartialResource object.
+func (r *ResourceRegistryMap) CreatePartialResource(d *schema.ResourceData, u *schema.UsageData) *schema.PartialResource {
+	if registryItem, ok := (*r)[d.Type]; ok {
+		if registryItem.NoPrice {
+			return &schema.PartialResource{
+				ResourceData: d,
+				Resource: &schema.Resource{
+					Name:        d.Address,
+					IsSkipped:   true,
+					NoPrice:     true,
+					SkipMessage: "Free resource.",
+					Metadata:    d.Metadata,
+				},
+				CloudResourceIDs: registryItem.CloudResourceIDFunc(d),
+			}
+		}
+
+		// Use the CoreRFunc to generate a CoreResource if possible.  This is
+		// the new/preferred way to create provider-agnostic resources that
+		// support advanced features such as Infracost Cloud usage estimates
+		// and actual costs.
+		if registryItem.CoreRFunc != nil {
+			coreRes := registryItem.CoreRFunc(d)
+			if coreRes != nil {
+				return &schema.PartialResource{ResourceData: d, CoreResource: coreRes, CloudResourceIDs: registryItem.CloudResourceIDFunc(d)}
+			}
+		} else {
+			res := registryItem.RFunc(d, u)
+			if res != nil {
+				if u != nil {
+					res.EstimationSummary = u.CalcEstimationSummary()
+				}
+
+				return &schema.PartialResource{ResourceData: d, Resource: res, CloudResourceIDs: registryItem.CloudResourceIDFunc(d)}
+			}
+		}
+	}
+
+	return &schema.PartialResource{
+		ResourceData: d,
+		Resource: &schema.Resource{
+			Name:        d.Address,
+			IsSkipped:   true,
+			SkipMessage: "This resource is not currently supported",
+			Metadata:    d.Metadata,
+		},
+	}
+}
+
 func GetUsageOnlyResources() []string {
 	r := []string{}
 	r = append(r, aws.UsageOnlyResources...)

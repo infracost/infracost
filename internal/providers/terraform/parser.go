@@ -44,51 +44,7 @@ func (p *Parser) createPartialResource(d *schema.ResourceData, u *schema.UsageDa
 		p.ctx.ContextValues.SetValue(cKey, cValue)
 	}
 
-	if registryItem, ok := (*registryMap)[d.Type]; ok {
-		if registryItem.NoPrice {
-			return &schema.PartialResource{
-				ResourceData: d,
-				Resource: &schema.Resource{
-					Name:        d.Address,
-					IsSkipped:   true,
-					NoPrice:     true,
-					SkipMessage: "Free resource.",
-					Metadata:    d.Metadata,
-				},
-				CloudResourceIDs: registryItem.CloudResourceIDFunc(d),
-			}
-		}
-
-		// Use the CoreRFunc to generate a CoreResource if possible.  This is
-		// the new/preferred way to create provider-agnostic resources that
-		// support advanced features such as Infracost Cloud usage estimates
-		// and actual costs.
-		if registryItem.CoreRFunc != nil {
-			coreRes := registryItem.CoreRFunc(d)
-			if coreRes != nil {
-				return &schema.PartialResource{ResourceData: d, CoreResource: coreRes, CloudResourceIDs: registryItem.CloudResourceIDFunc(d)}
-			}
-		} else {
-			res := registryItem.RFunc(d, u)
-			if res != nil {
-				if u != nil {
-					res.EstimationSummary = u.CalcEstimationSummary()
-				}
-
-				return &schema.PartialResource{ResourceData: d, Resource: res, CloudResourceIDs: registryItem.CloudResourceIDFunc(d)}
-			}
-		}
-	}
-
-	return &schema.PartialResource{
-		ResourceData: d,
-		Resource: &schema.Resource{
-			Name:        d.Address,
-			IsSkipped:   true,
-			SkipMessage: "This resource is not currently supported",
-			Metadata:    d.Metadata,
-		},
-	}
+	return registryMap.CreatePartialResource(d, u)
 }
 
 func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.PartialResource, usage schema.UsageMap, confLoader *ConfLoader, parsed, providerConf, vars gjson.Result) []*schema.PartialResource {
@@ -404,24 +360,6 @@ func getSpecialContext(d *schema.ResourceData) map[string]interface{} {
 	}
 }
 
-func parseDefaultTags(providerConf, resConf gjson.Result) *map[string]string {
-	// this only works for aws, we'll need to review when other providers support default tags
-	providerKey := parseProviderKey(resConf)
-	dTagsArray := providerConf.Get(fmt.Sprintf("%s.expressions.default_tags", gjsonEscape(providerKey))).Array()
-	if len(dTagsArray) == 0 {
-		return nil
-	}
-
-	defaultTags := make(map[string]string)
-	for _, dTags := range dTagsArray {
-		for k, v := range dTags.Get("tags.constant_value").Map() {
-			defaultTags[k] = v.String()
-		}
-	}
-
-	return &defaultTags
-}
-
 func overrideRegion(addr string, resourceType string, config *config.Config) string {
 	region := ""
 	providerPrefix := getProviderPrefix(resourceType)
@@ -701,7 +639,7 @@ func (p *Parser) parseTags(data map[string]*schema.ResourceData, confLoader *Con
 		switch providerPrefix {
 		case "aws":
 			resConf := confLoader.GetResourceConfJSON(resourceData.Address)
-			defaultTags := parseDefaultTags(providerConf, resConf)
+			defaultTags := parseAWSDefaultTags(providerConf, resConf)
 
 			tags = aws.ParseTags(defaultTags, resourceData)
 		case "azurerm":
@@ -714,6 +652,23 @@ func (p *Parser) parseTags(data map[string]*schema.ResourceData, confLoader *Con
 
 		resourceData.Tags = tags
 	}
+}
+
+func parseAWSDefaultTags(providerConf, resConf gjson.Result) *map[string]string {
+	providerKey := parseProviderKey(resConf)
+	dTagsArray := providerConf.Get(fmt.Sprintf("%s.expressions.default_tags", gjsonEscape(providerKey))).Array()
+	if len(dTagsArray) == 0 {
+		return nil
+	}
+
+	defaultTags := make(map[string]string)
+	for _, dTags := range dTagsArray {
+		for k, v := range dTags.Get("tags.constant_value").Map() {
+			defaultTags[k] = v.String()
+		}
+	}
+
+	return &defaultTags
 }
 
 func isInfracostResource(res *schema.ResourceData) bool {

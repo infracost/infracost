@@ -3,6 +3,7 @@ package hcl
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	stdJson "encoding/json"
 	"fmt"
 	"os"
 	"regexp"
@@ -12,10 +13,13 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
+	jsoniter "github.com/json-iterator/go"
 	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
+	ctyJson "github.com/zclconf/go-cty/cty/json"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/hcl/funcs"
 	"github.com/infracost/infracost/internal/hcl/modules"
 )
@@ -1072,14 +1076,20 @@ func (b *Block) VerticesReferenced() []VertexReference {
 	}
 
 	for _, childBlock := range b.Children() {
-		refs = append(refs, childBlock.VerticesReferenced()...)
+		referenced := childBlock.VerticesReferenced()
+		for i, reference := range referenced {
+			referenced[i].AttributeName = fmt.Sprintf("%s.%d.%s", childBlock.Type(), i, reference.AttributeName)
+		}
+
+		refs = append(refs, referenced...)
 	}
 
 	if !hasProviderAttr && usesProviderConfiguration(b) {
 		providerName := b.Provider()
 		if providerName != "" {
 			refs = append(refs, VertexReference{
-				Key: fmt.Sprintf("provider.%s", providerName),
+				Type: "provider",
+				Key:  fmt.Sprintf("provider.%s", providerName),
 			})
 		}
 	}
@@ -1256,7 +1266,7 @@ func awsCurrentRegion(b *Block) cty.Value {
 }
 
 func awsDefaultTagValues(b *Block) cty.Value {
-	defaultTags := getFromProvider(b, "aws", "default_tags")
+	defaultTags := b.GetFromBlockProvider("aws", "default_tags")
 	if defaultTags.IsKnown() && defaultTags.CanIterateElements() {
 		tags := defaultTags.AsValueSlice()
 		if len(tags) > 0 {
@@ -1353,7 +1363,7 @@ func awsAvailabilityZonesValues(b *Block) cty.Value {
 }
 
 func getRegionFromProvider(b *Block, provider string) string {
-	val := getFromProvider(b, provider, "region")
+	val := b.GetFromBlockProvider(provider, "region")
 
 	var str string
 	err := gocty.FromCtyValue(val, &str)
@@ -1368,7 +1378,7 @@ func getRegionFromProvider(b *Block, provider string) string {
 	return str
 }
 
-func getFromProvider(b *Block, provider, key string) cty.Value {
+func (b *Block) GetFromBlockProvider(provider, key string) cty.Value {
 	val := b.context.Get(provider, key)
 
 	attr := b.GetAttribute("provider")
@@ -1387,4 +1397,115 @@ func getFromProvider(b *Block, provider, key string) cty.Value {
 
 func usesProviderConfiguration(b *Block) bool {
 	return b.Type() == "resource" || b.Type() == "data"
+}
+
+var ignoredAttrs = map[string]bool{"arn": true, "id": true, "name": true, "self_link": true}
+var checksumMarshaller = jsoniter.ConfigCompatibleWithStandardLibrary
+
+func generateChecksum(value map[string]interface{}) string {
+	filtered := make(map[string]interface{})
+	for k, v := range value {
+		if !ignoredAttrs[k] {
+			filtered[k] = v
+		}
+	}
+
+	serialized, err := checksumMarshaller.Marshal(filtered)
+	if err != nil {
+		return ""
+	}
+
+	h := sha256.New()
+	h.Write(serialized)
+
+	return hex.EncodeToString(h.Sum(nil))
+}
+
+type MarshalOutput struct {
+	Data     []byte
+	CheckSum string
+	Raw      map[string]interface{}
+}
+
+// MarshalValuesJSON marshals the attribute values of a Block to JSON format. It
+// returns a MarshalOutput struct containing the marshaled data, the raw
+// attribute values, and their checksum.
+func (b *Block) MarshalValuesJSON() (*MarshalOutput, error) {
+	jsonValues := b.marshalAttributeValues(b.Type(), b.Values())
+
+	b.marshalBlock(jsonValues)
+	checkSum := generateChecksum(jsonValues)
+
+	// if we're using the graph evaluator we need to set the region on the JSON values
+	// as we use this value in the resource functions later. This value normally is
+	// set from the Plan JSON provider, but we don't use this with the graph evaluator.
+	if config.UseGraphEvaluator() {
+		pieces := strings.Split(b.TypeLabel(), "_")
+		if len(pieces) > 0 {
+			providerName := pieces[0]
+			jsonValues["region"] = getRegionFromProvider(b, providerName)
+		}
+	}
+	data, err := jsoniter.Marshal(jsonValues)
+
+	return &MarshalOutput{
+		Data:     data,
+		Raw:      jsonValues,
+		CheckSum: checkSum,
+	}, err
+}
+
+func (b *Block) marshalBlock(jsonValues map[string]interface{}) {
+	for _, child := range b.Children() {
+		key := child.Type()
+		if key == "dynamic" || key == "depends_on" {
+			continue
+		}
+
+		childValues := b.marshalAttributeValues(key, child.Values())
+		if len(child.Children()) > 0 {
+			child.marshalBlock(childValues)
+		}
+
+		if v, ok := jsonValues[key]; ok {
+			if _, ok := v.(stdJson.RawMessage); ok {
+				b.logger.Debug().
+					Str("child_block", child.LocalName()).
+					Msgf("skipping attribute '%s' that has also been declared as a child block", key)
+
+				continue
+			}
+
+			jsonValues[key] = append(v.([]interface{}), childValues)
+			continue
+		}
+
+		jsonValues[key] = []interface{}{childValues}
+	}
+}
+
+func (b *Block) marshalAttributeValues(blockType string, value cty.Value) map[string]interface{} {
+	if value.IsNull() {
+		return nil
+	}
+	ret := make(map[string]interface{})
+
+	it := value.ElementIterator()
+	for it.Next() {
+		k, v := it.Element()
+		vJSON, _ := ctyJson.Marshal(v, v.Type())
+		var key string
+		err := gocty.FromCtyValue(k, &key)
+		if err != nil {
+			b.logger.Debug().Err(err).Msgf("could not convert block map key to string ignoring entry")
+			continue
+		}
+
+		if (blockType == "resource" || blockType == "module") && key == "count" {
+			continue
+		}
+
+		ret[key] = stdJson.RawMessage(vJSON)
+	}
+	return ret
 }

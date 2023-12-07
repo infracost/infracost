@@ -9,6 +9,8 @@ import (
 	"github.com/heimdalr/dag"
 	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 var (
@@ -60,28 +62,32 @@ type Graph struct {
 	moduleConfigs *ModuleConfigs
 }
 
+// Vertex interface represents a graph vertex with unique identifier and module
+// address. It also provides methods for visiting the vertex, retrieving
+// references, and getting the vertex ID.
 type Vertex interface {
 	ID() string
 	ModuleAddress() string
-	Visit(mutex *sync.Mutex) error
+	Visit(mutex *sync.Mutex) (interface{}, error)
 	References() []VertexReference
 }
 
+// VertexReference represents a reference to a vertex in a graph. It contains
+// information about the module address, attribute name, type, and key of the
+// referenced vertex.
 type VertexReference struct {
 	ModuleAddress string
 	AttributeName string
+	Type          string
 	Key           string
 }
 
-func NewGraphWithRoot(logger zerolog.Logger, vertexMutex *sync.Mutex) (*Graph, error) {
-	if vertexMutex == nil {
-		vertexMutex = &sync.Mutex{}
-	}
+func NewGraphWithRoot(logger zerolog.Logger) (*Graph, error) {
 	g := &Graph{
 		dag:           dag.NewDAG(),
 		logger:        logger,
 		moduleConfigs: NewModuleConfigs(),
-		vertexMutex:   vertexMutex,
+		vertexMutex:   &sync.Mutex{},
 	}
 
 	g.rootVertex = &VertexRoot{}
@@ -318,58 +324,133 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 	return nil
 }
 
-func (g *Graph) AsJSON() ([]byte, error) {
+// MarshalJSON returns the JSON encoding of the graph.
+func (g *Graph) MarshalJSON() ([]byte, error) {
 	return g.dag.MarshalJSON()
 }
 
-func (g *Graph) Walk() {
-	v := NewGraphVisitor(g.logger, g.vertexMutex)
+// Walk traverses the graph and collects the resources into a list of
+// ResourceData. It uses the DescendantsFlow method of the underlying graph to
+// visit each vertex in the graph.
+//
+// The first DescendantsFlow call executes the NewGraphEvaluateVisitFunc callback
+// function, which calls the Visit method of each vertex in the graph, evaluating
+// the resources so that they have the correct values and expansion.
+//
+// The second DescendantsFlow call executes the Visit method of
+// ResourceCollectorVisitor, which transforms each vertex of type *VertexResource
+// into a slice of schema.Resource. After all the resources have been collected,
+// we then populate the references, between each resource by checking the
+// references for each returned Resource.
+func (g *Graph) Walk() []ResourceData {
+	_, _ = g.dag.DescendantsFlow(g.rootVertex.ID(), nil, NewGraphEvaluateVisitFunc(g.logger, g.vertexMutex))
 
-	flowCallback := func(d *dag.DAG, id string, parentResults []dag.FlowResult) (interface{}, error) {
-		vertex, _ := d.GetVertex(id)
+	coll := &ResourceCollectorVisitor{mu: &sync.Mutex{}}
+	_, _ = g.dag.DescendantsFlow(g.rootVertex.ID(), nil, coll.Visit)
 
-		v.Visit(id, vertex)
-
-		return vertex, nil
-	}
-
-	_, _ = g.dag.DescendantsFlow(g.rootVertex.ID(), nil, flowCallback)
+	coll.BuildResourceReferences()
+	return coll.resources
 }
 
-func (g *Graph) Run(evaluator *Evaluator) (*Module, error) {
+// Run executes the graph evaluation process with the given evaluator and returns
+// the computed ResourceData and any error encountered during the process. It
+// populates the graph using the provided evaluator, reduces transitively, and
+// performs a graph walk to collect the graph into a list of ResourceData.
+func (g *Graph) Run(evaluator *Evaluator) ([]ResourceData, error) {
 	err := g.Populate(evaluator)
 	if err != nil {
 		return nil, err
 	}
 
 	g.ReduceTransitively()
-	g.Walk()
-
-	evaluator.module.Blocks = evaluator.filteredBlocks
-	evaluator.module = *evaluator.collectModules()
-
-	return &evaluator.module, nil
+	return g.Walk(), nil
 }
 
-type GraphVisitor struct {
-	logger      zerolog.Logger
-	vertexMutex *sync.Mutex
-}
+// NewGraphEvaluateVisitFunc returns a callback function that can be used in the
+// DescendantsFlow method of DAG to visit the graph vertices and evaluate them.
+//
+// The callback function defers Visit functionality to each Vertex. The
+// vertexMutex is used to synchronize access to the vertices. This is necessary
+// as the global Context will panic with concurrent map/read write if we don't
+// lock node visits.
+func NewGraphEvaluateVisitFunc(logger zerolog.Logger, vertexMutex *sync.Mutex) dag.FlowCallback {
+	return func(d *dag.DAG, id string, parentResults []dag.FlowResult) (interface{}, error) {
+		logger.Debug().Msgf("visiting vertex %q", id)
 
-func NewGraphVisitor(logger zerolog.Logger, vertexMutex *sync.Mutex) *GraphVisitor {
-	return &GraphVisitor{
-		logger:      logger,
-		vertexMutex: vertexMutex,
+		vertex, _ := d.GetVertex(id)
+		vert := vertex.(Vertex)
+
+		return vert.Visit(vertexMutex)
 	}
 }
 
-func (v *GraphVisitor) Visit(id string, vertex interface{}) {
-	v.logger.Debug().Msgf("visiting vertex %q", id)
+// ResourceCollectorVisitor implements a Visitor for the DAG DescendantsFlow. It
+// is designed to transform the DAG into a simple slice of resources.
+type ResourceCollectorVisitor struct {
+	resources []ResourceData
+	mu        *sync.Mutex
+}
 
-	vert := vertex.(Vertex)
-	err := vert.Visit(v.vertexMutex)
-	if err != nil {
-		v.logger.Debug().Err(err).Msgf("ignoring vertex %q because an error was encountered", id)
+// Visit implements the DescendantsFlow callback method of DAG. Visit traverses
+// the DAG and collects all the vertices into a slice ResourceData which
+// represent all the applicable terraform resources for the DAG.
+//
+// Visit should be used after the DAG has been evaluated using a
+// GraphEvaluateVisitFunc.
+func (v *ResourceCollectorVisitor) Visit(d *dag.DAG, id string, parentResults []dag.FlowResult) (interface{}, error) {
+	vertex, _ := d.GetVertex(id)
+	vert, ok := vertex.(*VertexResource)
+	if !ok {
+		return nil, nil
+	}
+
+	resources := vert.TransformToSchemaResources()
+	v.mu.Lock()
+	v.resources = append(v.resources, resources...)
+	v.mu.Unlock()
+
+	return resources, nil
+}
+
+// BuildResourceReferences iterates over the collected resources and builds the
+// references between them. It creates a map (resMap) to store the address of
+// each resource. Then, for each resource, it retrieves the vertices referenced
+// by the resource's block. If the referenced vertex is of type "resource", it
+// performs the following steps:
+//
+//   - Fetches the stored references for the
+//     attribute.
+//   - Retrieves the referenced resource from resMap. - Appends the
+//     referenced resource to the stored references.
+//   - Adds a reverse reference from
+//     the referenced resource to the current resource.
+func (v *ResourceCollectorVisitor) BuildResourceReferences() {
+	resMap := make(map[string]*schema.ResourceData)
+
+	for _, resource := range v.resources {
+		resMap[resource.Data.Address] = resource.Data
+	}
+
+	for _, resource := range v.resources {
+		refs := resource.Block.VerticesReferenced()
+		for _, ref := range refs {
+			if ref.Type != "resource" {
+				continue
+			}
+
+			// @TODO handle # and * symbols for referenes
+			storedRefs := resource.Data.ReferencesMap[ref.AttributeName]
+			referenced := resMap[ref.Key]
+			if referenced == nil {
+				continue
+			}
+
+			// alter the resource references to contain reverse references to the resource
+			// that was used in the original reference.
+			resource.Data.ReferencesMap[ref.AttributeName] = append(storedRefs, referenced)
+			reverseRefKey := resource.Data.Type + "." + ref.AttributeName
+			referenced.ReferencesMap[reverseRefKey] = append(referenced.ReferencesMap[reverseRefKey], resource.Data)
+		}
 	}
 }
 

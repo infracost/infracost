@@ -1,9 +1,7 @@
 package terraform
 
 import (
-	"crypto/sha256"
-	"encoding/hex"
-	stdJson "encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"math/big"
@@ -18,7 +16,6 @@ import (
 	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
-	ctyJson "github.com/zclconf/go-cty/cty/json"
 
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/clierror"
@@ -26,6 +23,9 @@ import (
 	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/hcl/modules"
 	"github.com/infracost/infracost/internal/logging"
+	"github.com/infracost/infracost/internal/providers/terraform/aws"
+	"github.com/infracost/infracost/internal/providers/terraform/azure"
+	"github.com/infracost/infracost/internal/providers/terraform/google"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
 )
@@ -38,10 +38,11 @@ type HCLProvider struct {
 	planJSONParser *Parser
 	logger         zerolog.Logger
 
-	schema *PlanSchema
-	ctx    *config.ProjectContext
-	cache  []HCLProject
-	config HCLProviderConfig
+	schema      *PlanSchema
+	ctx         *config.ProjectContext
+	cache       []HCLProject
+	config      HCLProviderConfig
+	registryMap ResourceRegistryMap
 }
 
 type HCLProviderConfig struct {
@@ -175,6 +176,7 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 		ctx:            ctx,
 		config:         *config,
 		logger:         logger,
+		registryMap:    *GetResourceRegistryMap(),
 	}, err
 }
 
@@ -201,6 +203,10 @@ func (p *HCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 // representation of the terraform plan JSON files from these Blocks, this is passed to the PlanJSONProvider.
 // The PlanJSONProvider uses this shallow representation to actually load Infracost resources.
 func (p *HCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, error) {
+	if config.UseGraphEvaluator() {
+		return p.loadProjectsFromGraph(usage)
+	}
+
 	jsons := p.LoadPlanJSONs()
 
 	var projects = make([]*schema.Project, len(jsons))
@@ -517,8 +523,7 @@ func (p *HCLProvider) marshalModule(module *hcl.Module) ModuleOut {
 }
 
 func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
-	jsonValues := marshalAttributeValues(block.Type(), block.Values())
-	p.marshalBlock(block, jsonValues)
+	out, _ := block.MarshalValuesJSON()
 	planned := ResourceJSON{
 		Address:       block.FullName(),
 		Mode:          "managed",
@@ -531,7 +536,7 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 			"startLine": block.StartLine,
 			"endLine":   block.EndLine,
 			"calls":     block.CallDetails(),
-			"checksum":  generateChecksum(jsonValues),
+			"checksum":  out.CheckSum,
 		},
 	}
 
@@ -547,8 +552,8 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 		},
 	}
 
-	planned.Values = jsonValues
-	changes.Change.After = jsonValues
+	planned.Values = out.Raw
+	changes.Change.After = out.Raw
 
 	providerConfigKey := strings.Split(block.TypeLabel(), "_")[0]
 
@@ -720,28 +725,6 @@ func (p *HCLProvider) countReferences(block *hcl.Block) *countExpression {
 	return nil
 }
 
-var ignoredAttrs = map[string]bool{"arn": true, "id": true, "name": true, "self_link": true}
-var checksumMarshaller = jsoniter.ConfigCompatibleWithStandardLibrary
-
-func generateChecksum(value map[string]interface{}) string {
-	filtered := make(map[string]interface{})
-	for k, v := range value {
-		if !ignoredAttrs[k] {
-			filtered[k] = v
-		}
-	}
-
-	serialized, err := checksumMarshaller.Marshal(filtered)
-	if err != nil {
-		return ""
-	}
-
-	h := sha256.New()
-	h.Write(serialized)
-
-	return hex.EncodeToString(h.Sum(nil))
-}
-
 func blockToReferences(block *hcl.Block) map[string]interface{} {
 	expressionValues := make(map[string]interface{})
 
@@ -783,60 +766,143 @@ func blockToReferences(block *hcl.Block) map[string]interface{} {
 	return expressionValues
 }
 
-func (p *HCLProvider) marshalBlock(block *hcl.Block, jsonValues map[string]interface{}) {
-	for _, b := range block.Children() {
-		key := b.Type()
-		if key == "dynamic" || key == "depends_on" {
-			continue
-		}
+// loadProjectsFromGraph loads projects directly from the HCL DAG. This
+// functionality is designed to supersede the old HCL to Plan JSON functionality.
+// Instead loadProjectsFromGraph reads a given directory and loads this into a
+// graph for evaluation. Once evaluation is finished we return the relevant
+// resource blocks as schema.Resources. This removes the necessity to convert the
+// entire module into JSON and read the dependencies in using the intermediary
+// structure.
+func (p *HCLProvider) loadProjectsFromGraph(usage schema.UsageMap) ([]*schema.Project, error) {
+	runCtx := p.ctx.RunContext
+	parallelism, _ := runCtx.GetParallelism()
 
-		childValues := marshalAttributeValues(key, b.Values())
-		if len(b.Children()) > 0 {
-			p.marshalBlock(b, childValues)
-		}
-
-		if v, ok := jsonValues[key]; ok {
-			if _, ok := v.(stdJson.RawMessage); ok {
-				p.logger.Debug().
-					Str("parent_block", block.LocalName()).
-					Str("child_block", b.LocalName()).
-					Msgf("skipping attribute '%s' that has also been declared as a child block", key)
-
-				continue
-			}
-
-			jsonValues[key] = append(v.([]interface{}), childValues)
-			continue
-		}
-
-		jsonValues[key] = []interface{}{childValues}
+	numJobs := len(p.parsers)
+	runInParallel := parallelism > 1 && numJobs > 1
+	if runInParallel && !runCtx.Config.IsLogging() {
+		// set the config level to info so that the spinners don't report to the console.
+		p.ctx.RunContext.Config.LogLevel = "info"
 	}
+
+	if numJobs < parallelism {
+		parallelism = numJobs
+	}
+
+	ch := make(chan *hcl.Parser, numJobs)
+	projects := make([]*schema.Project, 0, numJobs)
+	mu := &sync.Mutex{}
+	wg := &sync.WaitGroup{}
+
+	for _, parser := range p.parsers {
+		ch <- parser
+	}
+	close(ch)
+	wg.Add(parallelism)
+
+	for i := 0; i < parallelism; i++ {
+		go func() {
+			defer func() {
+				wg.Done()
+			}()
+
+			for parser := range ch {
+				if numJobs > 1 && !p.config.SuppressLogging {
+					fmt.Fprintf(os.Stderr, "Detected Terraform project at %s\n", ui.DisplayPath(parser.Path()))
+				}
+
+				results, modErr := parser.ParseDirectoryToResources()
+				if modErr != nil {
+					var v *clierror.PanicError
+					if errors.As(modErr, &v) {
+						err := apiclient.ReportCLIError(p.ctx.RunContext, v, false)
+						if err != nil {
+							p.logger.Debug().Err(err).Msg("error sending unexpected runtime error")
+						}
+					}
+				}
+
+				mu.Lock()
+				project := p.newProject(HCLProject{
+					Module: &hcl.Module{
+						RootPath:     parser.Path(),
+						ModuleSuffix: parser.ModuleSuffix(),
+					},
+					Error: modErr,
+				})
+				project.PartialResources = p.collectResources(results, usage)
+
+				projects = append(projects, project)
+				mu.Unlock()
+			}
+		}()
+	}
+
+	wg.Wait()
+
+	sort.Slice(projects, func(i, j int) bool {
+		if projects[i].Name != "" && projects[j].Name != "" {
+			return projects[i].Name < projects[j].Name
+		}
+
+		return projects[i].Metadata.Path < projects[j].Metadata.Path
+	})
+
+	return projects, nil
 }
 
-func marshalAttributeValues(blockType string, value cty.Value) map[string]interface{} {
-	if value.IsNull() {
-		return nil
+func (p *HCLProvider) collectResources(results []hcl.ResourceData, usage schema.UsageMap) []*schema.PartialResource {
+	var resources []*schema.PartialResource
+
+	for _, data := range results {
+		data.Data.Tags = p.parseTags(data)
+		resources = append(resources, p.registryMap.CreatePartialResource(data.Data, usage.Get(data.Data.Address)))
 	}
-	ret := make(map[string]interface{})
 
-	it := value.ElementIterator()
-	for it.Next() {
-		k, v := it.Element()
-		vJSON, _ := ctyJson.Marshal(v, v.Type())
-		var key string
-		err := gocty.FromCtyValue(k, &key)
-		if err != nil {
-			logging.Logger.Debug().Err(err).Msgf("could not convert block map key to string ignoring entry")
-			continue
+	return resources
+}
+
+func (p *HCLProvider) parseTags(resource hcl.ResourceData) *map[string]string {
+	data := resource.Data
+
+	providerPrefix := getProviderPrefix(data.Type)
+	var tags *map[string]string
+
+	switch providerPrefix {
+	case "aws":
+		rawTags := resource.Block.GetFromBlockProvider("aws", "default_tags")
+		defaultTags := map[string]string{}
+		if !rawTags.IsNull() && rawTags.IsKnown() {
+			for _, tag := range rawTags.AsValueSlice() {
+				getAttr := tag.GetAttr("tags")
+				if getAttr.IsNull() || !getAttr.CanIterateElements() {
+					continue
+				}
+
+				attr := getAttr.AsValueMap()
+				for k, value := range attr {
+					var str string
+					err := gocty.FromCtyValue(value, &str)
+					if err != nil {
+						continue
+					}
+
+					defaultTags[k] = str
+				}
+			}
+
+			tags = aws.ParseTags(&defaultTags, data)
+		} else {
+			tags = aws.ParseTags(nil, data)
 		}
-
-		if (blockType == "resource" || blockType == "module") && key == "count" {
-			continue
-		}
-
-		ret[key] = stdJson.RawMessage(vJSON)
+	case "azurerm":
+		tags = azure.ParseTags(data)
+	case "google":
+		tags = google.ParseTags(data)
+	default:
+		logging.Logger.Debug().Msgf("Unsupported provider %s", providerPrefix)
 	}
-	return ret
+
+	return tags
 }
 
 type ResourceOutput struct {

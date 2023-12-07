@@ -395,3 +395,8 @@ func loadDotEnv() error {
 
 	return nil
 }
+
+// UseGraphEvaluator checks if we should use the HCL Graph evaluator.
+func UseGraphEvaluator() bool {
+	return os.Getenv("INFRACOST_GRAPH_EVALUATOR") == "true"
+}

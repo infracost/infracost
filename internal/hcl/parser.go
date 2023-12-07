@@ -324,6 +324,10 @@ func newParser(projectRoot RootPath, moduleLoader *modules.ModuleLoader, logger 
 	return p
 }
 
+func (p *Parser) ModuleSuffix() string {
+	return p.moduleSuffix
+}
+
 // YAML returns a yaml representation of Parser, that can be used to "explain" the auto-detection functionality.
 func (p *Parser) YAML() string {
 	str := strings.Builder{}
@@ -381,6 +385,87 @@ func (p *Parser) YAML() string {
 	}
 
 	return str.String()
+}
+
+// ParseDirectoryToResources parses all the files at the given path passes them
+// as blocks to a HCL graph. The blocks are planned as a DAG, with the graph
+// visiting each node to evaluate, expand and translate the blocks into Infracost
+// resources.
+func (p *Parser) ParseDirectoryToResources() (resources []ResourceData, err error) {
+	defer func() {
+		e := recover()
+		if e != nil {
+			err = clierror.NewPanicError(fmt.Errorf("%s", e), debug.Stack())
+		}
+	}()
+
+	p.logger.Debug().Msgf("Beginning parse for directory '%s'...", p.initialPath)
+
+	// load the initial root directory into a list of hcl files
+	// at this point these files have no schema associated with them.
+	files, err := loadDirectory(p.hclParser, p.logger, p.initialPath, false)
+	if err != nil {
+		return nil, err
+	}
+
+	// load the files into given hcl block types. These are then wrapped with *Block structs.
+	blocks, err := p.parseDirectoryFiles(files)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(blocks) == 0 {
+		return nil, errors.New("No valid terraform files found given path, try a different directory")
+	}
+
+	p.logger.Debug().Msg("Loading TFVars...")
+	inputVars, err := p.loadVars(blocks, p.tfvarsPaths)
+	if err != nil {
+		return nil, err
+	}
+
+	// load the modules. This downloads any remote modules to the local file system
+	modulesManifest, err := p.moduleLoader.Load(p.initialPath)
+	if err != nil {
+		return nil, fmt.Errorf("Error loading Terraform modules: %w", err)
+	}
+
+	p.logger.Debug().Msg("Evaluating expressions...")
+	workingDir, err := os.Getwd()
+	if err != nil {
+		return nil, fmt.Errorf("Error could not evaluate current working directory %w", err)
+	}
+
+	// load an Evaluator with the top level Blocks to begin Context propagation.
+	evaluator := NewEvaluator(
+		Module{
+			Name:       "",
+			Source:     "",
+			Blocks:     blocks,
+			RawBlocks:  blocks,
+			RootPath:   p.initialPath,
+			ModulePath: p.initialPath,
+		},
+		workingDir,
+		inputVars,
+		modulesManifest,
+		nil,
+		p.workspaceName,
+		p.blockBuilder,
+		p.newSpinner,
+		p.logger,
+		nil,
+	)
+
+	// we use the base zerolog log here so that it's consistent with the spinner logs
+	log.Info().Msgf("Building project with experimental graph runner")
+
+	g, err := NewGraphWithRoot(p.logger)
+	if err != nil {
+		return nil, err
+	}
+
+	return g.Run(evaluator)
 }
 
 // ParseDirectory parses all the terraform files in the initialPath into Blocks and then passes them to an Evaluator
@@ -461,26 +546,10 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 
 	var root *Module
 
-	// Graph evaluation
-	if evaluator.isGraphEvaluator() {
-		// we use the base zerolog log here so that it's consistent with the spinner logs
-		log.Info().Msgf("Building project with experimental graph runner")
-
-		g, err := NewGraphWithRoot(p.logger, nil)
-		if err != nil {
-			return m, err
-		}
-
-		root, err = g.Run(evaluator)
-		if err != nil {
-			return m, err
-		}
-	} else {
-		// Existing evaluation
-		root, err = evaluator.Run()
-		if err != nil {
-			return m, err
-		}
+	// Existing evaluation
+	root, err = evaluator.Run()
+	if err != nil {
+		return m, err
 	}
 
 	root.HasChanges = p.hasChanges

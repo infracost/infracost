@@ -21,6 +21,7 @@ import (
 	"github.com/zclconf/go-cty/cty/function/stdlib"
 	"github.com/zclconf/go-cty/cty/gocty"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/hcl/funcs"
 	"github.com/infracost/infracost/internal/hcl/modules"
 	"github.com/infracost/infracost/internal/logging"
@@ -162,10 +163,6 @@ func NewEvaluator(
 		newSpinner:     spinFunc,
 		logger:         l,
 	}
-}
-
-func (e *Evaluator) isGraphEvaluator() bool {
-	return os.Getenv("INFRACOST_GRAPH_EVALUATOR") == "true"
 }
 
 func (e *Evaluator) AddFilteredBlocks(blocks ...*Block) {
@@ -531,7 +528,7 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 			continue
 		}
 
-		if !e.isGraphEvaluator() && (block.IsCountExpanded() || !block.IsForEachReferencedExpanded(blocks) || !shouldExpandBlock(block)) {
+		if !config.UseGraphEvaluator() && (block.IsCountExpanded() || !block.IsForEachReferencedExpanded(blocks) || !shouldExpandBlock(block)) {
 			original := block.original.GetAttribute("for_each")
 			if !original.HasChanged() {
 				expanded = append(expanded, block)
@@ -703,7 +700,7 @@ func (e *Evaluator) expandBlockCounts(blocks Blocks) Blocks {
 			continue
 		}
 
-		if !e.isGraphEvaluator() && (block.IsCountExpanded() || !shouldExpandBlock(block)) {
+		if !config.UseGraphEvaluator() && (block.IsCountExpanded() || !shouldExpandBlock(block)) {
 			original := block.original.GetAttribute("count")
 			if !original.HasChanged() {
 				expanded = append(expanded, block)

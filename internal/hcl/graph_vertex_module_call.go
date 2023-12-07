@@ -48,10 +48,10 @@ func (v *VertexModuleCall) References() []VertexReference {
 	return v.block.VerticesReferenced()
 }
 
-func (v *VertexModuleCall) Visit(mutex *sync.Mutex) error {
+func (v *VertexModuleCall) Visit(mutex *sync.Mutex) (interface{}, error) {
 	moduleInstances := v.moduleConfigs.Get(v.block.ModuleAddress())
 	if len(moduleInstances) == 0 {
-		return fmt.Errorf("no module instances found for module address %q", v.block.ModuleAddress())
+		return nil, fmt.Errorf("no module instances found for module address %q", v.block.ModuleAddress())
 	}
 
 	for _, moduleInstance := range moduleInstances {
@@ -59,23 +59,23 @@ func (v *VertexModuleCall) Visit(mutex *sync.Mutex) error {
 		blockInstance := e.module.Blocks.FindLocalName(v.block.LocalName())
 
 		if blockInstance == nil {
-			return fmt.Errorf("could not find block %q in module %q", v.ID(), moduleInstance.name)
+			return nil, fmt.Errorf("could not find block %q in module %q", v.ID(), moduleInstance.name)
 		}
 
 		err := v.evaluate(e, blockInstance, mutex)
 		if err != nil {
-			return fmt.Errorf("could not evaluate module %q", v.block.FullName())
+			return nil, fmt.Errorf("could not evaluate module %q", v.block.FullName())
 		}
 
 		expanded, err := v.expand(e, blockInstance, mutex)
 		if err != nil {
-			return fmt.Errorf("could not expand module %q", v.block.FullName())
+			return nil, fmt.Errorf("could not expand module %q", v.block.FullName())
 		}
 
 		e.AddFilteredBlocks(expanded...)
 	}
 
-	return nil
+	return nil, nil
 }
 
 func (v *VertexModuleCall) evaluate(e *Evaluator, b *Block, mutex *sync.Mutex) error {

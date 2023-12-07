@@ -26,13 +26,13 @@ func (v *VertexLocal) References() []VertexReference {
 	return v.attr.VerticesReferenced(v.block)
 }
 
-func (v *VertexLocal) Visit(mutex *sync.Mutex) error {
+func (v *VertexLocal) Visit(mutex *sync.Mutex) (interface{}, error) {
 	mutex.Lock()
 	defer mutex.Unlock()
 
 	moduleInstances := v.moduleConfigs.Get(v.block.ModuleAddress())
 	if len(moduleInstances) == 0 {
-		return fmt.Errorf("no module instances found for module address %q", v.block.ModuleAddress())
+		return nil, fmt.Errorf("no module instances found for module address %q", v.block.ModuleAddress())
 	}
 
 	for _, moduleInstance := range moduleInstances {
@@ -51,12 +51,12 @@ func (v *VertexLocal) Visit(mutex *sync.Mutex) error {
 		}
 
 		if attrInstance == nil {
-			return fmt.Errorf("could not find attribute %q in module %q", v.ID(), moduleInstance.name)
+			return nil, fmt.Errorf("could not find attribute %q in module %q", v.ID(), moduleInstance.name)
 		}
 
 		key := fmt.Sprintf("local.%s", attrInstance.Name())
 		e.ctx.SetByDot(attrInstance.Value(), key)
 	}
 
-	return nil
+	return nil, nil
 }

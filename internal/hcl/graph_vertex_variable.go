@@ -26,13 +26,13 @@ func (v *VertexVariable) References() []VertexReference {
 	return v.block.VerticesReferenced()
 }
 
-func (v *VertexVariable) Visit(mutex *sync.Mutex) error {
+func (v *VertexVariable) Visit(mutex *sync.Mutex) (interface{}, error) {
 	mutex.Lock()
 	defer mutex.Unlock()
 
 	moduleInstances := v.moduleConfigs.Get(v.block.ModuleAddress())
 	if len(moduleInstances) == 0 {
-		return fmt.Errorf("no module instances found for module address %q", v.block.ModuleAddress())
+		return nil, fmt.Errorf("no module instances found for module address %q", v.block.ModuleAddress())
 	}
 
 	for _, moduleInstance := range moduleInstances {
@@ -40,7 +40,7 @@ func (v *VertexVariable) Visit(mutex *sync.Mutex) error {
 		blockInstance := e.module.Blocks.FindLocalName(v.block.LocalName())
 
 		if blockInstance == nil {
-			return fmt.Errorf("could not find block %q in module %q", v.ID(), moduleInstance.name)
+			return nil, fmt.Errorf("could not find block %q in module %q", v.ID(), moduleInstance.name)
 		}
 
 		// Re-evaluate the matching module input variables for this variable block
@@ -59,7 +59,7 @@ func (v *VertexVariable) Visit(mutex *sync.Mutex) error {
 
 		val, err := e.evaluateVariable(blockInstance, inputVars)
 		if err != nil {
-			return fmt.Errorf("could not evaluate variable %s: %w", v.ID(), err)
+			return nil, fmt.Errorf("could not evaluate variable %s: %w", v.ID(), err)
 		}
 
 		v.logger.Debug().Msgf("adding variable %s to the evaluation context", v.ID())
@@ -69,5 +69,5 @@ func (v *VertexVariable) Visit(mutex *sync.Mutex) error {
 		e.AddFilteredBlocks(blockInstance)
 	}
 
-	return nil
+	return nil, nil
 }

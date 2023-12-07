@@ -2,16 +2,27 @@ package hcl
 
 import (
 	"fmt"
+	"strings"
 	"sync"
 
+	jsoniter "github.com/json-iterator/go"
 	"github.com/rs/zerolog"
+	"github.com/tidwall/gjson"
 	"github.com/zclconf/go-cty/cty"
+
+	"github.com/infracost/infracost/internal/schema"
 )
+
+type ResourceData struct {
+	Block *Block
+	Data  *schema.ResourceData
+}
 
 type VertexResource struct {
 	moduleConfigs *ModuleConfigs
 	logger        zerolog.Logger
 	block         *Block
+	expanded      Blocks
 }
 
 func (v *VertexResource) ID() string {
@@ -26,13 +37,13 @@ func (v *VertexResource) References() []VertexReference {
 	return v.block.VerticesReferenced()
 }
 
-func (v *VertexResource) Visit(mutex *sync.Mutex) error {
+func (v *VertexResource) Visit(mutex *sync.Mutex) (interface{}, error) {
 	mutex.Lock()
 	defer mutex.Unlock()
 
 	moduleInstances := v.moduleConfigs.Get(v.block.ModuleAddress())
 	if len(moduleInstances) == 0 {
-		return fmt.Errorf("no module instances found for module address %q", v.block.ModuleAddress())
+		return nil, fmt.Errorf("no module instances found for module address %q", v.block.ModuleAddress())
 	}
 
 	for _, moduleInstance := range moduleInstances {
@@ -40,23 +51,90 @@ func (v *VertexResource) Visit(mutex *sync.Mutex) error {
 		blockInstance := e.module.Blocks.FindLocalName(v.block.LocalName())
 
 		if blockInstance == nil {
-			return fmt.Errorf("could not find block %q in module %q", v.ID(), moduleInstance.name)
+			return nil, fmt.Errorf("could not find block %q in module %q", v.ID(), moduleInstance.name)
 		}
 
 		err := v.evaluate(e, blockInstance)
 		if err != nil {
-			return fmt.Errorf("could not evaluate resource block %q", v.ID())
+			return nil, fmt.Errorf("could not evaluate resource block %q", v.ID())
 		}
 
 		expanded, err := v.expand(e, blockInstance)
 		if err != nil {
-			return fmt.Errorf("could not expand resource block %q", v.ID())
+			return nil, fmt.Errorf("could not expand resource block %q", v.ID())
 		}
 
 		e.AddFilteredBlocks(expanded...)
+		v.expanded = append(v.expanded, expanded...)
 	}
 
-	return nil
+	return nil, nil
+}
+
+func (v *VertexResource) TransformToSchemaResources() []ResourceData {
+	var resources []ResourceData
+
+	for _, block := range v.expanded {
+		data := v.transformToSchemaResource(block)
+		if data == nil {
+			continue
+		}
+
+		resources = append(resources, ResourceData{
+			Block: block,
+			Data:  data,
+		})
+
+	}
+
+	return resources
+}
+
+func (v *VertexResource) transformToSchemaResource(b *Block) *schema.ResourceData {
+	out, err := b.MarshalValuesJSON()
+	if err != nil {
+		v.logger.Debug().Err(err).Msgf("could not marshal block values for resource %q, removing from output", b.FullName())
+		return nil
+	}
+
+	label := b.TypeLabel()
+	providerName := strings.Split(label, "_")[0]
+
+	details := b.CallDetails()
+	valDetails, _ := jsoniter.Marshal(details)
+	return &schema.ResourceData{
+		Type:         label,
+		ProviderName: providerName,
+		Address:      b.FullName(),
+		// Tags are built further up the program execution at the hcl_provider level.
+		Tags:          nil,
+		RawValues:     gjson.ParseBytes(out.Data),
+		ReferencesMap: map[string][]*schema.ResourceData{},
+		Metadata: map[string]gjson.Result{
+			"filename": {
+				Type: gjson.String,
+				Raw:  b.Filename,
+				Str:  b.Filename,
+			},
+			"startLine": {
+				Type: gjson.Number,
+				Raw:  fmt.Sprintf("%d", b.StartLine),
+				Num:  float64(b.StartLine),
+			},
+			"endLine": {
+				Type: gjson.Number,
+				Raw:  fmt.Sprintf("%d", b.EndLine),
+				Num:  float64(b.EndLine),
+			},
+			"calls": gjson.ParseBytes(valDetails),
+			"checksum": {
+				Type: gjson.String,
+				Raw:  out.CheckSum,
+				Str:  out.CheckSum,
+			},
+		},
+	}
+
 }
 
 func (v *VertexResource) evaluate(e *Evaluator, b *Block) error {

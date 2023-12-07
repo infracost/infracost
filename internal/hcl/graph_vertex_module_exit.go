@@ -24,7 +24,7 @@ func (v *VertexModuleExit) References() []VertexReference {
 	return []VertexReference{}
 }
 
-func (v *VertexModuleExit) Visit(mutex *sync.Mutex) error {
+func (v *VertexModuleExit) Visit(mutex *sync.Mutex) (interface{}, error) {
 	mutex.Lock()
 	defer mutex.Unlock()
 
@@ -42,5 +42,5 @@ func (v *VertexModuleExit) Visit(mutex *sync.Mutex) error {
 		modCall.Module = &e.module
 	}
 
-	return nil
+	return nil, nil
 }
