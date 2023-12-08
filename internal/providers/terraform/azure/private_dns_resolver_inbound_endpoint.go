@@ -12,7 +12,7 @@ func getPrivateDnsResolverInboundEndpointRegistryItem() *schema.RegistryItem {
 		Name:      "azurerm_private_dns_resolver_inbound_endpoint",
 		CoreRFunc: newPrivateDnsResolverInboundEndpoint,
 		ReferenceAttributes: []string{
-			"location",
+			"resource_group_name",
 		},
 	}
 }

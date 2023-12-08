@@ -7,17 +7,17 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func getPrivateDnsResolverOutboundEndpointRegistryItem() *schema.RegistryItem {
+func getPrivateDnsResolverDnsForwardingRulesetRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:      "azurerm_private_dns_resolver_outbound_endpoint",
-		CoreRFunc: newPrivateDnsResolverOutboundEndpoint,
+		Name:      "azurerm_private_dns_resolver_dns_forwarding_ruleset",
+		CoreRFunc: newPrivateDnsResolverDnsForwardingRuleset,
 		ReferenceAttributes: []string{
 			"resource_group_name",
 		},
 	}
 }
 
-func newPrivateDnsResolverOutboundEndpoint(d *schema.ResourceData) schema.CoreResource {
+func newPrivateDnsResolverDnsForwardingRuleset(d *schema.ResourceData) schema.CoreResource {
 	region := lookupRegion(d, []string{"resource_group_name"})
 
 	if strings.HasPrefix(strings.ToLower(region), "usgov") {
@@ -30,7 +30,7 @@ func newPrivateDnsResolverOutboundEndpoint(d *schema.ResourceData) schema.CoreRe
 		region = "Zone 1"
 	}
 
-	return &azure.PrivateDnsResolverOutboundEndpoint{
+	return &azure.PrivateDnsResolverDnsForwardingRuleset{
 		Address: d.Address,
 		Region:  region,
 	}

@@ -50,6 +50,7 @@ func (r *PrivateDnsResolverOutboundEndpoint) BuildResource() *schema.Resource {
 					Service:       strPtr("Azure DNS"),
 					ProductFamily: strPtr("Networking"),
 					AttributeFilters: []*schema.AttributeFilter{
+						{Key: "skuName", Value: strPtr("Azure DNS Private Resolver")},
 						{Key: "meterName", Value: strPtr("Azure DNS Private Resolver Outbound Endpoint")},
 					},
 				},
