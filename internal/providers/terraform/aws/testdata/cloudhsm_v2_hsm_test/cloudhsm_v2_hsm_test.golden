@@ -1,0 +1,19 @@
+
+ Name                                            Monthly Qty  Unit   Monthly Cost 
+                                                                                  
+ aws_cloudhsm_v2_hsm.cloudhsm_v2_hsm                                              
+ └─ HSM usage                                            730  hours     $1,168.00 
+                                                                                  
+ aws_cloudhsm_v2_hsm.cloudhsm_v2_hsm_with_usage                                   
+ └─ HSM usage                                            100  hours       $160.00 
+                                                                                  
+ OVERALL TOTAL                                                          $1,328.00 
+──────────────────────────────────
+2 cloud resources were detected:
+∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ TestCloudHSMv2HSM                                  ┃ $1,328       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛

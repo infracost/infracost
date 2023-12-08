@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  aws_cloudhsm_v2_hsm.cloudhsm_v2_hsm_with_usage:
+    monthly_hrs: 100

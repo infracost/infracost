@@ -114,6 +114,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getSpotInstanceRequestRegistryItem(),
 	getLambdaProvisionedConcurrencyConfigRegistryItem(),
 	getKinesisStreamRegistryItem(),
+	getCloudHSMv2HSMRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -231,6 +232,9 @@ var FreeResources = []string{
 	// AWS Cloudfront
 	"aws_cloudfront_origin_access_identity",
 	"aws_cloudfront_public_key",
+
+	// AWS CloudHSM
+	"aws_cloudhsm_v2_cluster",
 
 	// AWS Cloudwatch
 	"aws_cloudwatch_log_destination",
