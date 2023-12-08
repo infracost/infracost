@@ -7,17 +7,17 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func getPrivateDnsResolverInboundEndpointRegistryItem() *schema.RegistryItem {
+func getPrivateDnsResolverOutboundEndpointRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:      "azurerm_private_dns_resolver_inbound_endpoint",
-		CoreRFunc: newPrivateDnsResolverInboundEndpoint,
+		Name:      "azurerm_private_dns_resolver_outbound_endpoint",
+		CoreRFunc: newPrivateDnsResolverOutboundEndpoint,
 		ReferenceAttributes: []string{
 			"location",
 		},
 	}
 }
 
-func newPrivateDnsResolverInboundEndpoint(d *schema.ResourceData) schema.CoreResource {
+func newPrivateDnsResolverOutboundEndpoint(d *schema.ResourceData) schema.CoreResource {
 	region := lookupRegion(d, []string{"resource_group_name"})
 
 	if strings.HasPrefix(strings.ToLower(region), "usgov") {
@@ -30,7 +30,7 @@ func newPrivateDnsResolverInboundEndpoint(d *schema.ResourceData) schema.CoreRes
 		region = "Zone 1"
 	}
 
-	return &azure.PrivateDnsResolverInboundEndpoint{
+	return &azure.PrivateDnsResolverOutboundEndpoint{
 		Address: d.Address,
 		Region:  region,
 	}

@@ -157,6 +157,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getImageRegistryItem(),
 	getSnapshotRegistryItem(),
 	getPrivateDnsResolverInboundEndpointRegistryItem(),
+	getPrivateDnsResolverOutboundEndpointRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
