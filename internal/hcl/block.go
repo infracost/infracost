@@ -55,10 +55,21 @@ var (
 			},
 		},
 	}
-	justProviderBlocks = &hcl.BodySchema{
+	terraformAndProviderBlocks = &hcl.BodySchema{
 		Blocks: []hcl.BlockHeaderSchema{
 			{
+				Type: "terraform",
+			},
+			{
 				Type:       "provider",
+				LabelNames: []string{"name"},
+			},
+		},
+	}
+	nestedBackendBlock = &hcl.BodySchema{
+		Blocks: []hcl.BlockHeaderSchema{
+			{
+				Type:       "backend",
 				LabelNames: []string{"name"},
 			},
 		},

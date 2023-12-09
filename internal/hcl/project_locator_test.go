@@ -15,6 +15,15 @@ func TestProjectLocator_FindRootModules_WithSingleProject(t *testing.T) {
 	assert.Contains(t, mods, RootPath{Path: "./testdata/project_locator/single_project", HasChanges: false})
 }
 
+func TestProjectLocator_FindRootModules_WithMultiProjectMixed(t *testing.T) {
+	pl := NewProjectLocator(newDiscardLogger(), &ProjectLocatorConfig{})
+	mods := pl.FindRootModules("./testdata/project_locator/multi_project_mixed")
+
+	require.Len(t, mods, 2)
+	assert.Contains(t, mods, RootPath{Path: "testdata/project_locator/multi_project_mixed/with_provider"})
+	assert.Contains(t, mods, RootPath{Path: "testdata/project_locator/multi_project_mixed/with_backend"})
+}
+
 func TestProjectLocator_FindRootModules_WithMultiProject(t *testing.T) {
 	pl := NewProjectLocator(newDiscardLogger(), &ProjectLocatorConfig{})
 	mods := pl.FindRootModules("./testdata/project_locator/multi_project_with_module")

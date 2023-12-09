@@ -232,18 +232,28 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) []string {
 	}
 
 	files := hclParser.Files()
-	var providerBlocks bool
+	var hasProviderBlock bool
+	var hasTerraformBackendBlock bool
 
 	for _, file := range files {
-		body, content, diags := file.Body.PartialContent(justProviderBlocks)
+		body, content, diags := file.Body.PartialContent(terraformAndProviderBlocks)
 		if diags != nil && diags.HasErrors() {
 			p.logger.Warn().Err(diags).Msgf("skipping building module information for file %s as failed to get partial body contents", file)
 			continue
 		}
 
-		// only do this after looping through all files
-		if len(body.Blocks) > 0 {
-			providerBlocks = true
+		providerBlocks := body.Blocks.OfType("provider")
+		if len(providerBlocks) > 0 {
+			hasProviderBlock = true
+		}
+
+		terraformBlocks := body.Blocks.OfType("terraform")
+		for _, block := range terraformBlocks {
+			backend, _, _ := block.Body.PartialContent(nestedBackendBlock)
+			if len(backend.Blocks) > 0 {
+				hasTerraformBackendBlock = true
+				break
+			}
 		}
 
 		moduleBody, _, _ := content.PartialContent(justModuleBlocks)
@@ -285,7 +295,7 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) []string {
 		return []string{fullPath}
 	}
 
-	if providerBlocks {
+	if hasProviderBlock || hasTerraformBackendBlock {
 		return []string{fullPath}
 	}
 
