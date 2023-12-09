@@ -328,7 +328,14 @@ func newParser(projectRoot RootPath, moduleLoader *modules.ModuleLoader, logger 
 // YAML returns a yaml representation of Parser, that can be used to "explain" the auto-detection functionality.
 func (p *Parser) YAML() string {
 	str := strings.Builder{}
-	str.WriteString(fmt.Sprintf("  - path: %s\n    name: %s-%s\n", p.initialPath, strings.ReplaceAll(p.initialPath, "/", "-"), p.moduleSuffix))
+
+	name := strings.TrimSuffix(p.initialPath, "/")
+	name = strings.ReplaceAll(name, "/", "-")
+	if p.moduleSuffix != "" {
+		name = fmt.Sprintf("%s-%s", name, p.moduleSuffix)
+	}
+
+	str.WriteString(fmt.Sprintf("  - path: %s\n    name: %s\n", p.initialPath, name))
 	if len(p.tfvarsPaths) > 0 || len(p.defaultVarFiles) > 0 {
 		str.WriteString("    terraform_var_files:\n")
 		written := map[string]bool{}

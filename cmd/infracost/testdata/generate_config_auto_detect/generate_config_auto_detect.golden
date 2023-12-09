@@ -2,7 +2,7 @@ version: 0.1
 
 projects:
   - path: testdata/generate_config_auto_detect/apps/bar
-    name: testdata-generate_config_auto_detect-apps-bar-
+    name: testdata-generate_config_auto_detect-apps-bar
     terraform_var_files:
       - terraform.tfvars
     terraform_workspace: default
