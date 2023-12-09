@@ -257,11 +257,12 @@ func LoadParsers(ctx *config.ProjectContext, initialPath string, loader *modules
 				continue
 			}
 
+			parserOpts := options
 			if len(varFiles) == 1 || len(autoVarFiles) > 0 {
-				options = append(options, OptionWithTFVarsPaths(append(varFiles, autoVarFiles...)))
+				parserOpts = append(parserOpts, OptionWithTFVarsPaths(append(varFiles, autoVarFiles...)))
 			}
 
-			parsers = append(parsers, newParser(rootPath, loader, logger, options...))
+			parsers = append(parsers, newParser(rootPath, loader, logger, parserOpts...))
 		}
 
 		return parsers, nil
