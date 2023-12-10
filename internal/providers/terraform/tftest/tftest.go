@@ -161,6 +161,12 @@ func ResourceTestsForTerraformProject(t *testing.T, tfProject TerraformProject, 
 		resourceTestsForTfProject(t, "hcl", tfProject, usage, checks)
 	})
 
+	t.Run("HCL Graph", func(t *testing.T) {
+		t.Setenv("INFRACOST_GRAPH_EVALUATOR", "true")
+
+		resourceTestsForTfProject(t, "hcl", tfProject, usage, checks)
+	})
+
 	t.Run("Terraform CLI", func(t *testing.T) {
 		resourceTestsForTfProject(t, "terraform", tfProject, usage, checks)
 	})
@@ -200,6 +206,12 @@ func GoldenFileResourceTests(t *testing.T, testName string) {
 
 func GoldenFileResourceTestsWithOpts(t *testing.T, testName string, options *GoldenFileOptions) {
 	t.Run("HCL", func(t *testing.T) {
+		goldenFileResourceTestWithOpts(t, "hcl", testName, options)
+	})
+
+	t.Run("HCL Graph", func(t *testing.T) {
+		t.Setenv("INFRACOST_GRAPH_EVALUATOR", "true")
+
 		goldenFileResourceTestWithOpts(t, "hcl", testName, options)
 	})
 
@@ -338,6 +350,12 @@ func RunCostCalculations(runCtx *config.RunContext, projects []*schema.Project) 
 
 func GoldenFileUsageSyncTest(t *testing.T, testName string) {
 	t.Run("HCL", func(t *testing.T) {
+		goldenFileSyncTest(t, "hcl", testName)
+	})
+
+	t.Run("HCL Graph", func(t *testing.T) {
+		t.Setenv("INFRACOST_GRAPH_EVALUATOR", "true")
+
 		goldenFileSyncTest(t, "hcl", testName)
 	})
 

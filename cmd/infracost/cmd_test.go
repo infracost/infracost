@@ -38,8 +38,6 @@ type GoldenFileOptions = struct {
 	Env         map[string]string
 	// RunTerraformCLI sets the cmd test to also run the cmd with --terraform-force-cli set
 	RunTerraformCLI bool
-	// OnlyRunTerraformCLI sets the cmd test to only run cmd with --terraform-force-cli set and ignores the HCL parsing.
-	OnlyRunTerraformCLI bool
 }
 
 func DefaultOptions() *GoldenFileOptions {
@@ -51,13 +49,17 @@ func DefaultOptions() *GoldenFileOptions {
 }
 
 func GoldenFileCommandTest(t *testing.T, testName string, args []string, testOptions *GoldenFileOptions, ctxOptions ...func(ctx *config.RunContext)) {
-	if testOptions == nil || !testOptions.OnlyRunTerraformCLI {
-		t.Run("HCL", func(t *testing.T) {
-			goldenFileCommandTest(t, testName, args, testOptions, true, ctxOptions...)
-		})
-	}
+	t.Run("HCL", func(t *testing.T) {
+		goldenFileCommandTest(t, testName, args, testOptions, true, ctxOptions...)
+	})
 
-	if testOptions != nil && (testOptions.RunTerraformCLI || testOptions.OnlyRunTerraformCLI) {
+	t.Run("HCL Graph", func(t *testing.T) {
+		t.Setenv("INFRACOST_GRAPH_EVALUATOR", "true")
+
+		goldenFileCommandTest(t, testName, args, testOptions, true, ctxOptions...)
+	})
+
+	if testOptions != nil && (testOptions.RunTerraformCLI) {
 		t.Run("CLI", func(t *testing.T) {
 			tfCLIArgs := make([]string, len(args)+2)
 			copy(tfCLIArgs, args)
