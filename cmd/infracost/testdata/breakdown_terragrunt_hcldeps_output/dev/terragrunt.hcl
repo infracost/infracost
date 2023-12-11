@@ -18,11 +18,19 @@ terraform {
   source = "..//modules/example"
 }
 
+locals {
+  region = "wa"
+}
+
 inputs = {
   instance_type                 = dependency.test.outputs.aws_instance_type
   root_block_device_volume_size = 50
   block_device_volume_size      = 100
   block_device_iops             = dependency.test2.outputs.block_iops
+
+  bad  = dependency.test2.outputs.map_existing["test"][local.region].id
+  bad2 = get_env("NA")
+  bad3 = TF_VAR_foo_bar
 
   test_input = {
     input1  = dependency.test2.outputs.obj.foo
@@ -53,7 +61,9 @@ inputs = {
     input24 = dependency.test2.outputs.bad_map["test"]
     input25 = dependency.test2.outputs.bad_map["test"]["bar"].id
     input26 = [dependency.test2.outputs.map_existing["test"]["bar"].id]
-    input27 = <<EOF
+    input27 = [dependency.test2.outputs.map_existing["test"][local.region].id]
+    input28 = dependency.test2.outputs.map_existing["test"][local.region].id
+    input29 = <<EOF
     {
       "key": "${dependency.stag-dep.outputs.retrieved_secrets.0}",
       "key2": "${dependency.stag-dep.outputs.retrieved_secrets.1}"
