@@ -105,11 +105,13 @@ func TestProjectLocator_FindRootModules_WithMultiProjectWithoutProviderBlocks_Ex
 
 func TestProjectLocator_FindRootModules_WithChildTfvarsFile(t *testing.T) {
 	pl := NewProjectLocator(newDiscardLogger(), &ProjectLocatorConfig{})
-	mods := pl.FindRootModules("./testdata/project_locator/multi_project_with_child_terraform_var_files")
+	p := "./testdata/project_locator/multi_project_with_child_terraform_var_files"
+	mods := pl.FindRootModules(p)
 
 	require.Len(t, mods, 3)
 	assert.Contains(t, mods, RootPath{
-		Path: "testdata/project_locator/multi_project_with_child_terraform_var_files/app1",
+		RepoPath: p,
+		Path:     "testdata/project_locator/multi_project_with_child_terraform_var_files/app1",
 		TerraformVarFiles: []string{
 			"defaults.tfvars",
 			"env/prod.tfvars",
@@ -118,14 +120,16 @@ func TestProjectLocator_FindRootModules_WithChildTfvarsFile(t *testing.T) {
 	})
 
 	assert.Contains(t, mods, RootPath{
-		Path: "testdata/project_locator/multi_project_with_child_terraform_var_files/app1/app3",
+		RepoPath: p,
+		Path:     "testdata/project_locator/multi_project_with_child_terraform_var_files/app1/app3",
 		TerraformVarFiles: []string{
 			"qa.tfvars",
 		},
 	})
 
 	assert.Contains(t, mods, RootPath{
-		Path: "testdata/project_locator/multi_project_with_child_terraform_var_files/app2",
+		RepoPath: p,
+		Path:     "testdata/project_locator/multi_project_with_child_terraform_var_files/app2",
 		TerraformVarFiles: []string{
 			"env/defaults.tfvars",
 			"env/prod.tfvars",

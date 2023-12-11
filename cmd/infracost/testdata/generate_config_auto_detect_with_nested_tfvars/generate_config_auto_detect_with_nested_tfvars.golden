@@ -1,31 +1,31 @@
 version: 0.1
 
 projects:
-  - path: testdata/generate_config_auto_detect_with_nested_tfvars/app1
-    name: testdata-generate_config_auto_detect_with_nested_tfvars-app1-env/prod
+  - path: app1
+    name: app1-env/prod
     terraform_var_files:
       - defaults.tfvars
       - env/prod.tfvars
     terraform_workspace: default
-  - path: testdata/generate_config_auto_detect_with_nested_tfvars/app1
-    name: testdata-generate_config_auto_detect_with_nested_tfvars-app1-env/test
+  - path: app1
+    name: app1-env/test
     terraform_var_files:
       - defaults.tfvars
       - env/test.tfvars
     terraform_workspace: default
-  - path: testdata/generate_config_auto_detect_with_nested_tfvars/app1/app3
-    name: testdata-generate_config_auto_detect_with_nested_tfvars-app1-app3-
+  - path: app1/app3
+    name: app1-app3
     terraform_var_files:
       - qa.tfvars
     terraform_workspace: default
-  - path: testdata/generate_config_auto_detect_with_nested_tfvars/app2
-    name: testdata-generate_config_auto_detect_with_nested_tfvars-app2-env/prod
+  - path: app2
+    name: app2-env/prod
     terraform_var_files:
       - env/defaults.tfvars
       - env/prod.tfvars
     terraform_workspace: default
-  - path: testdata/generate_config_auto_detect_with_nested_tfvars/app2
-    name: testdata-generate_config_auto_detect_with_nested_tfvars-app2-env/staging
+  - path: app2
+    name: app2-env/staging
     terraform_var_files:
       - env/defaults.tfvars
       - env/staging.tfvars
