@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
@@ -63,6 +62,17 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 
 	var buf bytes.Buffer
 
+	parsers, err := hcl.LoadParsers(
+		config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, nil),
+		repoPath,
+		nil,
+		&hcl.ProjectLocatorConfig{},
+		logging.Logger,
+	)
+	if err != nil {
+		return err
+	}
+
 	hasTemplate := g.template != "" || g.templatePath != ""
 
 	if hasTemplate {
@@ -71,19 +81,12 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 			ui.PrintWarningf(cmd.ErrOrStderr(), "could not fetch git metadata err: %s, default template variables will be blank", err)
 		}
 
-		pl := hcl.NewProjectLocator(logging.Logger, &hcl.ProjectLocatorConfig{})
-		rootPaths := pl.FindRootModules(g.repoPath)
-
-		detectedProjects := make([]template.DetectedProject, len(rootPaths))
-		for i, rootPath := range rootPaths {
-			p, err := filepath.Rel(repoPath, rootPath.Path)
-			if err != nil {
-				continue
-			}
-
+		detectedProjects := make([]template.DetectedProject, len(parsers))
+		for i, p := range parsers {
 			detectedProjects[i] = template.DetectedProject{
-				Path:              p,
-				TerraformVarFiles: rootPath.TerraformVarFiles,
+				Name:              p.ProjectName(),
+				Path:              p.RelativePath(),
+				TerraformVarFiles: p.TerraformVarFiles(),
 			}
 		}
 
@@ -108,20 +111,9 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 			}
 		}
 	} else {
-		parsers, err := hcl.LoadParsers(
-			config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, nil),
-			repoPath,
-			nil,
-			&hcl.ProjectLocatorConfig{},
-			logging.Logger,
-		)
-		if err != nil {
-			return err
-		}
-
 		buf.WriteString("version: 0.1\n\nprojects:\n")
 		for _, p := range parsers {
-			buf.WriteString(p.YAML(&hcl.ParserYAMLOpts{BasePath: repoPath}))
+			buf.WriteString(p.YAML())
 		}
 	}
 
@@ -138,7 +130,7 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 	// save the contents of the buffer for validation since WriteTo drains the buffer
 	bufStr := buf.String()
 
-	_, err := buf.WriteTo(out)
+	_, err = buf.WriteTo(out)
 	if err != nil {
 		return fmt.Errorf("could not write file %s: %s", g.outFile, err)
 	}
