@@ -1,0 +1,21 @@
+
+ Name                                                    Monthly Qty  Unit    Monthly Cost 
+                                                                                           
+ azurerm_private_dns_resolver_outbound_endpoint.example                                    
+ └─ Outbound endpoint                                              1  months       $180.00 
+                                                                                           
+ OVERALL TOTAL                                                                     $180.00 
+──────────────────────────────────
+5 cloud resources were detected:
+∙ 1 was estimated
+∙ 4 were free:
+  ∙ 1 x azurerm_private_dns_resolver
+  ∙ 1 x azurerm_resource_group
+  ∙ 1 x azurerm_subnet
+  ∙ 1 x azurerm_virtual_network
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ TestPrivateDnsResolverOutboundEndpoint             ┃ $180         ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛

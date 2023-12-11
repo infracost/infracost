@@ -156,6 +156,9 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getLogicAppStandardRegistryItem(),
 	getImageRegistryItem(),
 	getSnapshotRegistryItem(),
+	getPrivateDnsResolverInboundEndpointRegistryItem(),
+	getPrivateDnsResolverOutboundEndpointRegistryItem(),
+	getPrivateDnsResolverDnsForwardingRulesetRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -260,6 +263,7 @@ var FreeResources = []string{
 
 	// Azure DNS
 	"azurerm_private_dns_zone_virtual_network_link",
+	"azurerm_private_dns_resolver",
 
 	// Azure Data Factory
 	"azurerm_data_factory_custom_dataset",
