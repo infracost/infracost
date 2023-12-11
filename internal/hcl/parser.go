@@ -268,15 +268,22 @@ func LoadParsers(ctx *config.ProjectContext, initialPath string, loader *modules
 					continue
 				}
 
+				global := false
+
 				for _, name := range globalTerraformVarNames {
 					// check if the var file is a "global" one, this is only applicable if we match a
 					// globalTerraformVarName and these don't have an environment prefix e.g.
 					// defaults.tfvars, global.tfvars are applicable, prod-default.tfvars,
 					// stag-globals are not.
-					if strings.HasSuffix(withoutJSONSuffix, name+".tfvars") && envPrefixRegxp.MatchString(withoutJSONSuffix) {
+					if strings.HasSuffix(withoutJSONSuffix, name+".tfvars") && !envPrefixRegxp.MatchString(withoutJSONSuffix) {
 						autoVarFiles = append(autoVarFiles, varFile)
+						global = true
 						continue
 					}
+				}
+
+				if global {
+					continue
 				}
 
 				varFiles = append(varFiles, varFile)
