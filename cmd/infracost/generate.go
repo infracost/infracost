@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"io"
 	"os"
-	"path/filepath"
 
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
@@ -68,25 +67,8 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 		ui.PrintWarningf(cmd.ErrOrStderr(), "could not fetch git metadata err: %s, default template variables will be blank", err)
 	}
 
-	pl := hcl.NewProjectLocator(logging.Logger, &hcl.ProjectLocatorConfig{})
-	rootPaths := pl.FindRootModules(g.repoPath)
-
-	detectedProjects := make([]template.DetectedProject, len(rootPaths))
-	for i, rootPath := range rootPaths {
-		p, err := filepath.Rel(repoPath, rootPath.Path)
-		if err != nil {
-			continue
-		}
-
-		detectedProjects[i] = template.DetectedProject{
-			Path:              p,
-			TerraformVarFiles: rootPath.TerraformVarFiles,
-		}
-	}
-
 	variables := template.Variables{
-		Branch:           m.Branch.Name,
-		DetectedProjects: detectedProjects,
+		Branch: m.Branch.Name,
 	}
 	if m.PullRequest != nil {
 		variables.BaseBranch = m.PullRequest.BaseBranch
