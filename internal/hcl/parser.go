@@ -28,6 +28,10 @@ var (
 	defaultTerraformWorkspaceName = "default"
 )
 
+type ParserYAMLOpts struct {
+	BasePath string
+}
+
 type Option func(p *Parser)
 
 // OptionWithTFVarsPaths takes a slice of paths and sets them on the parser relative
@@ -326,16 +330,21 @@ func newParser(projectRoot RootPath, moduleLoader *modules.ModuleLoader, logger 
 }
 
 // YAML returns a yaml representation of Parser, that can be used to "explain" the auto-detection functionality.
-func (p *Parser) YAML() string {
+func (p *Parser) YAML(opts *ParserYAMLOpts) string {
 	str := strings.Builder{}
 
-	name := strings.TrimSuffix(p.initialPath, "/")
+	projectPath := p.initialPath
+	if opts != nil && opts.BasePath != "" {
+		projectPath, _ = filepath.Rel(opts.BasePath, p.initialPath)
+	}
+
+	name := strings.TrimSuffix(projectPath, "/")
 	name = strings.ReplaceAll(name, "/", "-")
 	if p.moduleSuffix != "" {
 		name = fmt.Sprintf("%s-%s", name, p.moduleSuffix)
 	}
 
-	str.WriteString(fmt.Sprintf("  - path: %s\n    name: %s\n", p.initialPath, name))
+	str.WriteString(fmt.Sprintf("  - path: %s\n    name: %s\n", projectPath, name))
 	if len(p.tfvarsPaths) > 0 || len(p.defaultVarFiles) > 0 {
 		str.WriteString("    terraform_var_files:\n")
 		written := map[string]bool{}
