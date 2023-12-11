@@ -6,13 +6,10 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// PrivateDnsResolverDnsForwardingRuleset struct represents <TODO: cloud service short description>.
+// PrivateDnsResolverDnsForwardingRuleset struct represents Azure DNS Private Resolver Forwarding Ruleset.
 //
-// <TODO: Add any important information about the resource and links to the
-// pricing pages or documentation that might be useful to developers in the future, e.g:>
-//
-// Resource information: https://azure.microsoft.com/<PATH/TO/RESOURCE>/
-// Pricing information: https://azure.microsoft.com/<PATH/TO/PRICING>/
+// Resource information: https://learn.microsoft.com/en-us/azure/dns/dns-private-resolver-overview
+// Pricing information: https://azure.microsoft.com/en-us/pricing/details/dns/
 type PrivateDnsResolverDnsForwardingRuleset struct {
 	Address string
 	Region  string
