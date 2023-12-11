@@ -28,6 +28,10 @@ var (
 	defaultTerraformWorkspaceName = "default"
 )
 
+type ParserYAMLOpts struct {
+	BasePath string
+}
+
 type Option func(p *Parser)
 
 // OptionWithTFVarsPaths takes a slice of paths and sets them on the parser relative
@@ -198,7 +202,6 @@ func OptionWithSpinner(f ui.SpinnerFunc) Option {
 
 // Parser is a tool for parsing terraform templates at a given file system location.
 type Parser struct {
-	repoPath              string
 	initialPath           string
 	tfEnvVars             map[string]cty.Value
 	defaultVarFiles       []string
@@ -285,7 +288,6 @@ func newParser(projectRoot RootPath, moduleLoader *modules.ModuleLoader, logger 
 	hclParser := modules.NewSharedHCLParser()
 
 	p := &Parser{
-		repoPath:      projectRoot.RepoPath,
 		initialPath:   projectRoot.Path,
 		hasChanges:    projectRoot.HasChanges,
 		workspaceName: defaultTerraformWorkspaceName,
@@ -328,15 +330,47 @@ func newParser(projectRoot RootPath, moduleLoader *modules.ModuleLoader, logger 
 }
 
 // YAML returns a yaml representation of Parser, that can be used to "explain" the auto-detection functionality.
-func (p *Parser) YAML() string {
+func (p *Parser) YAML(opts *ParserYAMLOpts) string {
 	str := strings.Builder{}
 
-	str.WriteString(fmt.Sprintf("  - path: %s\n    name: %s\n", p.RelativePath(), p.ProjectName()))
-	if len(p.TerraformVarFiles()) > 0 {
-		str.WriteString("    terraform_var_files:\n")
+	projectPath := p.initialPath
+	if opts != nil && opts.BasePath != "" {
+		projectPath, _ = filepath.Rel(opts.BasePath, p.initialPath)
+	}
 
-		for _, varFile := range p.TerraformVarFiles() {
-			str.WriteString(fmt.Sprintf("      - %s\n", varFile))
+	name := strings.TrimSuffix(projectPath, "/")
+	name = strings.ReplaceAll(name, "/", "-")
+	if p.moduleSuffix != "" {
+		name = fmt.Sprintf("%s-%s", name, p.moduleSuffix)
+	}
+
+	str.WriteString(fmt.Sprintf("  - path: %s\n    name: %s\n", projectPath, name))
+	if len(p.tfvarsPaths) > 0 || len(p.defaultVarFiles) > 0 {
+		str.WriteString("    terraform_var_files:\n")
+		written := map[string]bool{}
+
+		for _, varFile := range p.defaultVarFiles {
+			p, err := filepath.Rel(p.initialPath, varFile)
+			if err != nil {
+				continue
+			}
+
+			str.WriteString(fmt.Sprintf("      - %s\n", p))
+			written[varFile] = true
+		}
+
+		for _, varFile := range p.tfvarsPaths {
+			p, err := filepath.Rel(p.initialPath, varFile)
+			if err != nil {
+				continue
+			}
+
+			if written[varFile] {
+				continue
+			}
+
+			str.WriteString(fmt.Sprintf("      - %s\n", p))
+			written[varFile] = true
 		}
 	}
 
@@ -475,58 +509,6 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 // Path returns the full path that the parser runs within.
 func (p *Parser) Path() string {
 	return p.initialPath
-}
-
-// RelativePath returns the path of the parser relative to the repo path
-func (p *Parser) RelativePath() string {
-	r, _ := filepath.Rel(p.repoPath, p.initialPath)
-	return r
-}
-
-// ProjectName generates a name for the project that can be used
-// in the Infracost config file.
-func (p *Parser) ProjectName() string {
-	r := p.RelativePath()
-	name := strings.TrimSuffix(r, "/")
-	name = strings.ReplaceAll(name, "/", "-")
-	if p.moduleSuffix != "" {
-		name = fmt.Sprintf("%s-%s", name, p.moduleSuffix)
-	}
-
-	return name
-}
-
-// TerraformVarFiles returns the list of terraform var files that the parser
-// will use to load variables from.
-func (p *Parser) TerraformVarFiles() []string {
-	varFilesMap := make(map[string]struct{}, len(p.defaultVarFiles)+len(p.tfvarsPaths))
-	varFiles := make([]string, 0, len(p.defaultVarFiles)+len(p.tfvarsPaths))
-
-	for _, varFile := range p.defaultVarFiles {
-		p, err := filepath.Rel(p.initialPath, varFile)
-		if err != nil {
-			continue
-		}
-
-		if _, ok := varFilesMap[p]; !ok {
-			varFilesMap[p] = struct{}{}
-			varFiles = append(varFiles, p)
-		}
-	}
-
-	for _, varFile := range p.tfvarsPaths {
-		p, err := filepath.Rel(p.initialPath, varFile)
-		if err != nil {
-			continue
-		}
-
-		if _, ok := varFilesMap[p]; !ok {
-			varFilesMap[p] = struct{}{}
-			varFiles = append(varFiles, p)
-		}
-	}
-
-	return varFiles
 }
 
 func (p *Parser) parseDirectoryFiles(files []file) (Blocks, error) {

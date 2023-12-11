@@ -126,8 +126,7 @@ func inProject(dir string, change string) bool {
 // RootPath holds information about the root directory of a project, this is normally the top level
 // Terraform containing provider blocks.
 type RootPath struct {
-	RepoPath string
-	Path     string
+	Path string
 	// HasChanges contains information about whether the project has git changes associated with it.
 	// This will show as true if one or more files/directories have changed in the Path, and also if
 	// and local modules that are used by this project have changes.
@@ -160,7 +159,6 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 		}
 
 		projects = append(projects, RootPath{
-			RepoPath:          fullPath,
 			Path:              dir,
 			HasChanges:        p.hasChanges(dir),
 			TerraformVarFiles: p.discoveredVarFiles[dir],
