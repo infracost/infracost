@@ -19,10 +19,16 @@ var (
 	defaultInfracostTmplName = "infracost.yml.tmpl"
 )
 
+type DetectedProject struct {
+	Path              string
+	TerraformVarFiles []string
+}
+
 // Variables hold the global variables that are passed into any template that the Parser evaluates.
 type Variables struct {
-	Branch     string
-	BaseBranch string
+	Branch           string
+	BaseBranch       string
+	DetectedProjects []DetectedProject
 }
 
 // Parser is the representation of an initialized Infracost template parser.
@@ -41,20 +47,21 @@ func NewParser(repoDir string, variables Variables) *Parser {
 	absRepoDir, _ := filepath.Abs(repoDir)
 	p := Parser{repoDir: absRepoDir, variables: variables}
 	t := template.New(defaultInfracostTmplName).Funcs(template.FuncMap{
-		"base":       p.base,
-		"stem":       p.stem,
-		"ext":        p.ext,
-		"startsWith": p.startsWith,
-		"endsWith":   p.endsWith,
-		"contains":   p.contains,
-		"pathExists": p.pathExists,
-		"matchPaths": p.matchPaths,
-		"list":       p.list,
-		"relPath":    p.relPath,
-		"isDir":      p.isDir,
-		"readFile":   p.readFile,
-		"parseJson":  p.parseJson,
-		"parseYaml":  p.parseYaml,
+		"base":        p.base,
+		"stem":        p.stem,
+		"ext":         p.ext,
+		"startsWith":  p.startsWith,
+		"endsWith":    p.endsWith,
+		"contains":    p.contains,
+		"pathExists":  p.pathExists,
+		"matchPaths":  p.matchPaths,
+		"list":        p.list,
+		"relPath":     p.relPath,
+		"isDir":       p.isDir,
+		"readFile":    p.readFile,
+		"parseJson":   p.parseJson,
+		"parseYaml":   p.parseYaml,
+		"slugifyPath": p.slugifyPath,
 	})
 	p.template = t
 
@@ -301,6 +308,14 @@ func (p *Parser) parseJson(contents string) map[string]interface{} {
 	}
 
 	return out
+}
+
+// slugifyPath returns a slugified version of the provided path. This is useful for
+// creating project names from paths.
+func (p *Parser) slugifyPath(s string) string {
+	s = strings.TrimPrefix(s, "/")
+	s = strings.TrimSuffix(s, "/")
+	return strings.ToLower(strings.ReplaceAll(s, "/", "-"))
 }
 
 func isSubdirectory(base, target string) bool {
