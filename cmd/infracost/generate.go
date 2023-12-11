@@ -69,11 +69,11 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 		&hcl.ProjectLocatorConfig{},
 		logging.Logger,
 	)
-	if err != nil {
+	hasTemplate := g.template != "" || g.templatePath != ""
+
+	if err != nil && !hasTemplate {
 		return err
 	}
-
-	hasTemplate := g.template != "" || g.templatePath != ""
 
 	if hasTemplate {
 		m, err := vcs.MetadataFetcher.Get(repoPath, nil)
