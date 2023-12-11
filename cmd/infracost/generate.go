@@ -63,54 +63,50 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 
 	var buf bytes.Buffer
 
-	hasTemplate := g.template != "" || g.templatePath != ""
+	m, err := vcs.MetadataFetcher.Get(repoPath, nil)
+	if err != nil {
+		ui.PrintWarningf(cmd.ErrOrStderr(), "could not fetch git metadata err: %s, default template variables will be blank", err)
+	}
 
-	if hasTemplate {
-		m, err := vcs.MetadataFetcher.Get(repoPath, nil)
+	pl := hcl.NewProjectLocator(logging.Logger, &hcl.ProjectLocatorConfig{})
+	rootPaths := pl.FindRootModules(g.repoPath)
+
+	detectedProjects := make([]template.DetectedProject, len(rootPaths))
+	for i, rootPath := range rootPaths {
+		p, err := filepath.Rel(repoPath, rootPath.Path)
 		if err != nil {
-			ui.PrintWarningf(cmd.ErrOrStderr(), "could not fetch git metadata err: %s, default template variables will be blank", err)
+			continue
 		}
 
-		pl := hcl.NewProjectLocator(logging.Logger, &hcl.ProjectLocatorConfig{})
-		rootPaths := pl.FindRootModules(g.repoPath)
-
-		detectedProjects := make([]template.DetectedProject, len(rootPaths))
-		for i, rootPath := range rootPaths {
-			p, err := filepath.Rel(repoPath, rootPath.Path)
-			if err != nil {
-				continue
-			}
-
-			detectedProjects[i] = template.DetectedProject{
-				Path:              p,
-				TerraformVarFiles: rootPath.TerraformVarFiles,
-			}
+		detectedProjects[i] = template.DetectedProject{
+			Path:              p,
+			TerraformVarFiles: rootPath.TerraformVarFiles,
 		}
+	}
 
-		variables := template.Variables{
-			Branch:           m.Branch.Name,
-			DetectedProjects: detectedProjects,
-		}
-		if m.PullRequest != nil {
-			variables.BaseBranch = m.PullRequest.BaseBranch
-		}
+	variables := template.Variables{
+		Branch:           m.Branch.Name,
+		DetectedProjects: detectedProjects,
+	}
+	if m.PullRequest != nil {
+		variables.BaseBranch = m.PullRequest.BaseBranch
+	}
 
-		parser := template.NewParser(repoPath, variables)
-		if g.template != "" {
-			err := parser.Compile(g.template, &buf)
-			if err != nil {
-				return err
-			}
-		} else {
-			err := parser.CompileFromFile(g.templatePath, &buf)
-			if err != nil {
-				return err
-			}
+	parser := template.NewParser(repoPath, variables)
+	if g.template != "" {
+		err := parser.Compile(g.template, &buf)
+		if err != nil {
+			return err
+		}
+	} else if g.templatePath != "" {
+		err := parser.CompileFromFile(g.templatePath, &buf)
+		if err != nil {
+			return err
 		}
 	} else {
 		parsers, err := hcl.LoadParsers(
 			config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, nil),
-			repoPath,
+			g.repoPath,
 			nil,
 			&hcl.ProjectLocatorConfig{},
 			logging.Logger,
@@ -121,7 +117,7 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 
 		buf.WriteString("version: 0.1\n\nprojects:\n")
 		for _, p := range parsers {
-			buf.WriteString(p.YAML(&hcl.ParserYAMLOpts{BasePath: repoPath}))
+			buf.WriteString(p.YAML())
 		}
 	}
 
@@ -138,7 +134,7 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 	// save the contents of the buffer for validation since WriteTo drains the buffer
 	bufStr := buf.String()
 
-	_, err := buf.WriteTo(out)
+	_, err = buf.WriteTo(out)
 	if err != nil {
 		return fmt.Errorf("could not write file %s: %s", g.outFile, err)
 	}
