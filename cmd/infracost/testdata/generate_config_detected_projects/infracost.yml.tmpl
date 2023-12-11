@@ -3,7 +3,7 @@ version: 0.1
 projects:
 {{- range $project := .DetectedProjects }}
   - path: {{ $project.Path }}
-    name: {{ $project.Name }}
+    name: {{ $project.Path | slugifyPath }}
     terraform_var_files:
     {{- range $varFile := $project.TerraformVarFiles }}
       - {{ $varFile }}
