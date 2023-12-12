@@ -349,4 +349,10 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) {
 			p.walkPaths(filepath.Join(fullPath, info.Name()), level+1)
 		}
 	}
+
+	// If it's the top level and there's Terraform files, and no other detected projects then add it as
+	// a project.
+	if level == 0 && len(files) > 0 && len(p.discoveredProjects) == 0 {
+		p.discoveredProjects = append(p.discoveredProjects, fullPath)
+	}
 }
