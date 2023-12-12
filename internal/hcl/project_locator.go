@@ -334,11 +334,7 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) {
 		}
 	}
 
-	if level == 0 && len(files) > 0 {
-		// This means we're at the top level and there are Terraform files.
-		// It's safe to assume that this is a Terraform project.
-		p.discoveredProjects = append(p.discoveredProjects, fullPath)
-	} else if p.useAllPaths && len(files) > 0 {
+	if p.useAllPaths && len(files) > 0 {
 		p.discoveredProjects = append(p.discoveredProjects, fullPath)
 	} else if hasProviderBlock || hasTerraformBackendBlock {
 		p.discoveredProjects = append(p.discoveredProjects, fullPath)
