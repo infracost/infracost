@@ -22,11 +22,10 @@ jobs:
         run: make tf_fmt_check
 
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v3.4.0
+        uses: golangci/golangci-lint-action@v3.7.0
         with:
-          # Required: the version of golangci-lint is required and must be specified without patch version: they always use the latest patch version.
-          version: v1.51.2
-          args: --timeout 5m
+          version: latest
+          args: --timeout 2m
 
       - name: Install Terragrunt v0.31.8
         run: |
