@@ -236,7 +236,8 @@ func LoadParsers(ctx *config.ProjectContext, initialPath string, loader *modules
 			var varFiles []string
 			var autoVarFiles []string
 			for _, varFile := range rootPath.TerraformVarFiles {
-				if strings.HasSuffix(strings.TrimSuffix(varFile, ".json"), ".auto.tfvars") {
+				withoutJSONSuffix := strings.TrimSuffix(varFile, ".json")
+				if strings.HasSuffix(withoutJSONSuffix, ".auto.tfvars") || withoutJSONSuffix == "terraform.tfvars" {
 					autoVarFiles = append(autoVarFiles, varFile)
 					continue
 				}

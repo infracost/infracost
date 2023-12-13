@@ -18,9 +18,4 @@ projects:
       - terraform.tfvars
       - prod.tfvars
     terraform_workspace: default
-  - path: apps/foo
-    name: apps-foo-terraform
-    terraform_var_files:
-      - terraform.tfvars
-    terraform_workspace: default
 
