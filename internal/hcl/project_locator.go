@@ -94,7 +94,7 @@ func (p *ProjectLocator) buildSkippedMatcher(fullPath string) func(string) bool 
 	}
 }
 
-func (p ProjectLocator) hasChanges(dir string) bool {
+func (p *ProjectLocator) hasChanges(dir string) bool {
 	if len(p.changedObjects) == 0 {
 		return false
 	}
@@ -172,10 +172,10 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 
 func (p *ProjectLocator) maxSearchDepth() int {
 	if p.useAllPaths {
-		return 10
+		return 14
 	}
 
-	return 5
+	return 7
 }
 
 func (p *ProjectLocator) walkPaths(fullPath string, level int) []string {
