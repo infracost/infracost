@@ -19,6 +19,19 @@ func CreateDirectoryStructure(t *testing.T, treeOutputLocation string, tmpDir st
 
 	val, _ := os.ReadFile(treeOutputLocation)
 	lines := strings.Split(string(val), "\n")
+
+	// Strip any comments
+	for i, line := range lines {
+		if strings.HasPrefix(line, "#") {
+			lines = append(lines[:i], lines[i+1:]...)
+		}
+	}
+
+	// Strip the first line if it's a dot
+	if len(lines) > 0 && lines[0] == "." {
+		lines = lines[1:]
+	}
+
 	fs := buildFileSystemTree(lines, 0, 1)
 	writeFileSystem(t, fs, tmpDir)
 }
