@@ -1,3 +1,4 @@
+.
 └── apps
     ├── bar
     │   ├── backend.tf
