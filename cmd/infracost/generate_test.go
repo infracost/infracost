@@ -89,7 +89,7 @@ func TestGenerateConfigAutoDetect(t *testing.T) {
 				tempDir,
 			}, nil)
 
-			testutil.AssertGoldenFile(t, path.Join(dir, "expected.golden"), actual)
+			testutil.AssertGoldenFile(tt, path.Join(dir, "expected.golden"), actual)
 		})
 	}
 }
