@@ -1,0 +1,17 @@
+.
+└── infra
+    ├── apps
+    │   ├── bar
+    │   │   ├── us1
+    │   │   │   └── main.tf
+    │   │   └── us2
+    │   │       └── main.tf
+    │   └── foo
+    │       ├── us1
+    │       │   └── main.tf
+    │       └── us2
+    │           └── main.tf
+    └── envs
+        ├── dev.tfvars
+        ├── prod.tfvars
+        └── default.tfvars

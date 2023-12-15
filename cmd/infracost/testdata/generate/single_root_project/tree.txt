@@ -1,0 +1,5 @@
+# If the repo has Terraform files at the root directory then this should be
+# treated as a project, even if the file doesn't contain provider or
+# Terraform backend blocks
+.
+└── test.tf
