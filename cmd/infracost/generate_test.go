@@ -93,3 +93,17 @@ func TestGenerateConfigAutoDetect(t *testing.T) {
 		})
 	}
 }
+
+func TestGenerateConfigAutoDetectWithNestedTfvars(t *testing.T) {
+	dir := testutil.CalcGoldenFileTestdataDirName()
+	GoldenFileCommandTest(
+		t,
+		dir,
+		[]string{
+			"generate",
+			"config",
+			"--repo-path",
+			path.Join("./testdata", dir),
+		},
+		nil)
+}

@@ -3,6 +3,7 @@ package hcl
 import (
 	"os"
 	"path/filepath"
+	"sort"
 	"strings"
 
 	"github.com/hashicorp/hcl/v2"
@@ -24,13 +25,15 @@ type ProjectLocator struct {
 
 	basePath           string
 	discoveredVarFiles map[string][]string
+	discoveredProjects []string
 }
 
 // ProjectLocatorConfig provides configuration options on how the locator functions.
 type ProjectLocatorConfig struct {
-	ExcludedSubDirs []string
-	ChangedObjects  []string
-	UseAllPaths     bool
+	ExcludedSubDirs   []string
+	ChangedObjects    []string
+	UseAllPaths       bool
+	SkipAutoDetection bool
 }
 
 // NewProjectLocator returns safely initialized ProjectLocator.
@@ -40,10 +43,12 @@ func NewProjectLocator(logger zerolog.Logger, config *ProjectLocatorConfig) *Pro
 			modules:            make(map[string]struct{}),
 			moduleCalls:        make(map[string][]string),
 			discoveredVarFiles: make(map[string][]string),
-			excludedDirs:       config.ExcludedSubDirs,
-			changedObjects:     config.ChangedObjects,
-			logger:             logger,
-			useAllPaths:        config.UseAllPaths,
+			// by default we always exclude the "examples" directory as these are often found in
+			// remote modules and can be valid projects, which are not used.
+			excludedDirs:   append(config.ExcludedSubDirs, "examples"),
+			changedObjects: config.ChangedObjects,
+			logger:         logger,
+			useAllPaths:    config.UseAllPaths,
 		}
 	}
 
@@ -94,7 +99,7 @@ func (p *ProjectLocator) buildSkippedMatcher(fullPath string) func(string) bool 
 	}
 }
 
-func (p ProjectLocator) hasChanges(dir string) bool {
+func (p *ProjectLocator) hasChanges(dir string) bool {
 	if len(p.changedObjects) == 0 {
 		return false
 	}
@@ -144,11 +149,11 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 	p.moduleCalls = make(map[string][]string)
 
 	isSkipped := p.buildSkippedMatcher(fullPath)
-	dirs := p.walkPaths(fullPath, 0)
-	p.logger.Debug().Msgf("walking directory at %s returned a list of possible Terraform projects: %+v", fullPath, dirs)
+	p.walkPaths(fullPath, 0)
+	p.logger.Debug().Msgf("walking directory at %s returned a list of possible Terraform projects: %+v", fullPath, p.discoveredProjects)
 
 	var projects []RootPath
-	for _, dir := range dirs {
+	for _, dir := range p.discoveredProjects {
 		if isSkipped(dir) {
 			p.logger.Debug().Msgf("skipping directory %s as it is marked as excluded by --exclude-path", dir)
 			continue
@@ -165,9 +170,46 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 			HasChanges:        p.hasChanges(dir),
 			TerraformVarFiles: p.discoveredVarFiles[dir],
 		})
+		delete(p.discoveredVarFiles, dir)
+	}
+
+	// loop through the remaining discovered var files that aren't at the same
+	// directory as an existing project. If these directories appear as children of
+	// any existing projects, and are within < 2 directories removed. Then we
+	// associated the var files with the project.
+	for dir, files := range p.discoveredVarFiles {
+		for i, project := range projects {
+			if isNestedDir(project.Path, dir, 2) {
+				rel, _ := filepath.Rel(project.Path, dir)
+
+				for _, f := range files {
+					projects[i].TerraformVarFiles = append(projects[i].TerraformVarFiles, filepath.Join(rel, f))
+				}
+			}
+		}
+	}
+
+	for i := range projects {
+		sort.Strings(projects[i].TerraformVarFiles)
 	}
 
 	return projects
+}
+
+// isNestedDir checks if the target path nested no more than 'levels' under the base path
+func isNestedDir(basePath, targetPath string, levels int) bool {
+	rel, err := filepath.Rel(basePath, targetPath)
+	if err != nil {
+		return false
+	}
+
+	if strings.HasPrefix(rel, "..") || rel == "." {
+		return false
+	}
+
+	// Count the separators in the relative path
+	sepCount := strings.Count(rel, string(filepath.Separator))
+	return sepCount <= levels
 }
 
 func (p *ProjectLocator) maxSearchDepth() int {
@@ -178,12 +220,18 @@ func (p *ProjectLocator) maxSearchDepth() int {
 	return 5
 }
 
-func (p *ProjectLocator) walkPaths(fullPath string, level int) []string {
+func (p *ProjectLocator) walkPaths(fullPath string, level int) {
+	// if the level is 0 this is the start of the directory tree.
+	// let's reset all the discovered paths, so we don't duplicate.
+	if level == 0 {
+		p.discoveredProjects = []string{}
+		p.discoveredVarFiles = make(map[string][]string)
+	}
 	p.logger.Debug().Msgf("walking path %s to discover terraform files", fullPath)
 
 	if level >= p.maxSearchDepth() {
 		p.logger.Debug().Msgf("exiting parsing directory %s as it is outside the maximum evaluation threshold", fullPath)
-		return nil
+		return
 	}
 
 	hclParser := hclparse.NewParser()
@@ -191,10 +239,9 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) []string {
 	fileInfos, err := os.ReadDir(fullPath)
 	if err != nil {
 		p.logger.Warn().Err(err).Msgf("could not get file information for path %s skipping evaluation", fullPath)
-		return nil
+		return
 	}
 
-	var dirs []string
 	for _, info := range fileInfos {
 		if info.IsDir() {
 			continue
@@ -287,18 +334,10 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) []string {
 		}
 	}
 
-	// This means we're at the top level and there are Terraform files.
-	// It's safe to assume that this is a Terraform project.
-	if level == 0 && len(files) > 0 {
-		return []string{fullPath}
-	}
-
 	if p.useAllPaths && len(files) > 0 {
-		return []string{fullPath}
-	}
-
-	if hasProviderBlock || hasTerraformBackendBlock {
-		return []string{fullPath}
+		p.discoveredProjects = append(p.discoveredProjects, fullPath)
+	} else if hasProviderBlock || hasTerraformBackendBlock {
+		p.discoveredProjects = append(p.discoveredProjects, fullPath)
 	}
 
 	for _, info := range fileInfos {
@@ -307,12 +346,13 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) []string {
 				continue
 			}
 
-			childDirs := p.walkPaths(filepath.Join(fullPath, info.Name()), level+1)
-			if len(childDirs) > 0 {
-				dirs = append(dirs, childDirs...)
-			}
+			p.walkPaths(filepath.Join(fullPath, info.Name()), level+1)
 		}
 	}
 
-	return dirs
+	// If it's the top level and there's Terraform files, and no other detected projects then add it as
+	// a project.
+	if level == 0 && len(files) > 0 && len(p.discoveredProjects) == 0 {
+		p.discoveredProjects = append(p.discoveredProjects, fullPath)
+	}
 }
