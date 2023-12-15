@@ -4,7 +4,6 @@ import (
 	"bufio"
 	"context"
 	"fmt"
-	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -25,7 +24,6 @@ import (
 	tgoptions "github.com/gruntwork-io/terragrunt/options"
 	tfsource "github.com/gruntwork-io/terragrunt/terraform"
 	"github.com/gruntwork-io/terragrunt/util"
-	"github.com/hashicorp/go-getter"
 	hcl2 "github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/gohcl"
 	"github.com/hashicorp/hcl/v2/hclparse"
@@ -40,7 +38,6 @@ import (
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/hcl"
-	"github.com/infracost/infracost/internal/hcl/modules"
 	"github.com/infracost/infracost/internal/schema"
 	infSync "github.com/infracost/infracost/internal/sync"
 	"github.com/infracost/infracost/internal/ui"
@@ -667,43 +664,14 @@ func downloadSourceOnce(sourceURL string, opts *tgoptions.TerragruntOptions, ter
 		return source.WorkingDir, nil
 	}
 
-	// first attempt to force an HTTPS download of the source, this is only applicable to
-	// SSH sources. We do this to try and make use of any git credentials stored on a
-	// host machine, rather than requiring an SSH key is added.
-	failedHttpsDownload := !forceHttpsDownload(sourceURL, opts, terragruntConfig)
-	if failedHttpsDownload {
-		_, err = tgcliterraform.DownloadTerraformSource(sourceURL, opts, terragruntConfig)
-		if err != nil {
-			return "", err
-		}
+	_, err = tgcliterraform.DownloadTerraformSource(sourceURL, opts, terragruntConfig)
+	if err != nil {
+		return "", err
 	}
 
 	terragruntDownloadedDirs.Store(dir, true)
 
 	return source.WorkingDir, nil
-}
-
-func forceHttpsDownload(sourceURL string, opts *tgoptions.TerragruntOptions, terragruntConfig *tgconfig.TerragruntConfig) bool {
-	newSource, err := getter.Detect(sourceURL, opts.WorkingDir, getter.Detectors)
-	if err != nil {
-		return false
-	}
-	u, err := url.Parse(newSource)
-	if err != nil {
-		return false
-	}
-
-	if !modules.IsGitSSHSource(u) {
-		return false
-	}
-
-	newUrl, err := modules.TransformSSHToHttps(u)
-	if err != nil {
-		return false
-	}
-
-	_, err = tgcliterraform.DownloadTerraformSource(newUrl.String(), opts, terragruntConfig)
-	return err == nil
 }
 
 func generateConfig(terragruntConfig *tgconfig.TerragruntConfig, opts *options.TerragruntOptions, workingDir string) error {
