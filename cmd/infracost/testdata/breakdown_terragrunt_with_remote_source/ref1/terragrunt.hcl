@@ -2,6 +2,16 @@ terraform {
   source = "git::https://github.com/terraform-aws-modules/terraform-aws-eks.git?ref=v19.15.2"
 }
 
+generate "provider" {
+  path      = "provider.tf"
+  if_exists = "overwrite_terragrunt"
+  contents  = <<EOF
+provider "aws" {
+  region = "us-west-2"
+}
+EOF
+}
+
 inputs = {
   cluster_name    = "my-cluster"
   cluster_version = "1.27"

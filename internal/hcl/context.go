@@ -4,17 +4,17 @@ import (
 	"strings"
 
 	"github.com/hashicorp/hcl/v2"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 )
 
 type Context struct {
 	ctx    *hcl.EvalContext
 	parent *Context
-	logger *logrus.Entry
+	logger zerolog.Logger
 }
 
-func NewContext(ctx *hcl.EvalContext, parent *Context, logger *logrus.Entry) *Context {
+func NewContext(ctx *hcl.EvalContext, parent *Context, logger zerolog.Logger) *Context {
 	if ctx.Variables == nil {
 		ctx.Variables = make(map[string]cty.Value)
 	}
@@ -104,7 +104,7 @@ func mergeVars(src cty.Value, parts []string, value cty.Value) cty.Value {
 	data := make(map[string]cty.Value)
 	if src.Type().IsObjectType() && !src.IsNull() && src.LengthInt() > 0 {
 		data = src.AsValueMap()
-		tmp, ok := src.AsValueMap()[parts[0]]
+		tmp, ok := data[parts[0]]
 		if !ok {
 			src = cty.ObjectVal(make(map[string]cty.Value))
 		} else {

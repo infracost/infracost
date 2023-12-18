@@ -58,8 +58,8 @@ func commentCmd(ctx *config.RunContext) *cobra.Command {
 		_ = subCmd.Flags().MarkHidden("show-changed")
 		subCmd.Flags().Bool("skip-no-diff", false, "Skip posting comment if there are no resource changes. Only applies to update, hide-and-new, and delete-and-new behaviors")
 		_ = subCmd.Flags().MarkHidden("skip-no-diff")
-		subCmd.Flags().String("guardrail-check-path", "", "Path to Infracost guardrail data (experimental)")
-		_ = subCmd.Flags().MarkHidden("guardrail-check-path")
+		subCmd.Flags().String("additional-comment-data-path", "", "Path to additional comment text (experimental)")
+		_ = subCmd.Flags().MarkHidden("additional-comment-data-path")
 	}
 
 	cmd.AddCommand(cmds...)
@@ -82,34 +82,44 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 
 	combined.IsCIRun = ctx.IsCIRun()
 
-	if ctx.IsCloudUploadEnabled() && ctx.Config.TagPolicyAPIEndpoint != "" {
-		tagPolicyClient := apiclient.NewTagPolicyAPIClient(ctx)
-		tagPolicies, err := tagPolicyClient.CheckTagPolicies(ctx, combined)
+	if ctx.IsCloudUploadEnabled() && ctx.Config.PolicyV2APIEndpoint != "" {
+		policyClient, err := apiclient.NewPolicyAPIClient(ctx)
 		if err != nil {
-			logging.Logger.WithError(err).Error("Failed to check tag policies")
+			logging.Logger.Err(err).Msg("Failed to initialize policies client")
+		} else {
+			policies, err := policyClient.CheckPolicies(ctx, combined, true)
+			if err != nil {
+				logging.Logger.Err(err).Msg("Failed to check policies")
+			}
+
+			combined.TagPolicies = policies.TagPolicies
+			combined.FinOpsPolicies = policies.FinOpsPolicies
 		}
-
-		combined.TagPolicies = tagPolicies
 	}
-	tagPolicyCheck := output.NewTagPolicyChecks(combined.TagPolicies)
 
-	var guardrailCheck output.GuardrailCheck
+	var additionalCommentData string
+	var governanceFailures output.GovernanceFailures
 	dryRun, _ := cmd.Flags().GetBool("dry-run")
 	if ctx.IsCloudUploadEnabled() && !dryRun {
 		if ctx.Config.IsSelfHosted() {
 			ui.PrintWarning(cmd.ErrOrStderr(), "Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
 		} else {
 			combined.Metadata.InfracostCommand = "comment"
-			result := shareCombinedRun(ctx, combined, inputs)
-			combined.RunID, combined.ShareURL, combined.CloudURL, guardrailCheck = result.RunID, result.ShareURL, result.CloudURL, result.GuardrailCheck
+			commentFormat := apiclient.CommentFormatMarkdownHTML
+			if mdOpts.BasicSyntax {
+				commentFormat = apiclient.CommentFormatMarkdown
+			}
+			result := shareCombinedRun(ctx, combined, inputs, commentFormat)
+			combined.RunID, combined.ShareURL, combined.CloudURL, governanceFailures = result.RunID, result.ShareURL, result.CloudURL, result.GovernanceFailures
+			additionalCommentData = result.GovernanceComment
 		}
 	}
 
-	guardrailCheckPath, _ := cmd.Flags().GetString("guardrail-check-path")
-	if guardrailCheckPath != "" {
-		guardrailCheck, err = output.LoadGuardrailCheck(guardrailCheckPath)
+	additionalPath, _ := cmd.Flags().GetString("additional-comment-data-path")
+	if additionalPath != "" {
+		additionalCommentData, err = output.LoadAdditionalCommentData(additionalPath)
 		if err != nil {
-			return nil, fmt.Errorf("Error loading %s used by --guardrail-check-path flag. %s", guardrailCheckPath, err)
+			return nil, fmt.Errorf("Error loading %s used by --additional-comment-data-path flag. %s", additionalPath, err)
 		}
 	}
 
@@ -128,13 +138,13 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 	opts := output.Options{
 		DashboardEndpoint: ctx.Config.DashboardEndpoint,
 		NoColor:           ctx.Config.NoColor,
-		PolicyOutput:      output.NewPolicyOutput(policyChecks, tagPolicyCheck),
-		GuardrailCheck:    guardrailCheck,
+		PolicyOutput:      output.NewPolicyOutput(policyChecks),
 	}
 	opts.ShowAllProjects, _ = cmd.Flags().GetBool("show-all-projects")
 	opts.ShowOnlyChanges, _ = cmd.Flags().GetBool("show-changed")
 	opts.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
 
+	mdOpts.Additional = additionalCommentData
 	md, err := output.ToMarkdown(combined, opts, mdOpts)
 	if err != nil {
 		return nil, err
@@ -153,11 +163,8 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 	if policyChecks.HasFailed() {
 		return out, policyChecks.Failures
 	}
-	if len(guardrailCheck.BlockingFailures()) > 0 {
-		return out, guardrailCheck.BlockingFailures()
-	}
-	if len(tagPolicyCheck.FailingTagPolicies) > 0 {
-		return out, tagPolicyCheck
+	if len(governanceFailures) > 0 {
+		return out, governanceFailures
 	}
 
 	return out, nil
@@ -256,4 +263,17 @@ func readPolicyOut(v map[string]interface{}, checks *output.PolicyCheck) {
 	}
 
 	checks.Passed = append(checks.Passed, msg)
+}
+
+func isErrorUnhandled(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	switch err.(type) {
+	case output.PolicyCheckFailures, output.GovernanceFailures:
+		return false
+	}
+
+	return true
 }

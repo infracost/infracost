@@ -8,7 +8,7 @@ import (
 	"sync"
 	"testing"
 
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/infracost/infracost/internal/config"
@@ -16,16 +16,21 @@ import (
 	sync2 "github.com/infracost/infracost/internal/sync"
 )
 
-func testLoaderE2E(t *testing.T, path string, expectedModules []*ManifestModule, sourceMap config.TerraformSourceMap, cleanup bool) {
-	if cleanup {
+type TestLoaderE2EOpts = struct {
+	SourceMap config.TerraformSourceMap
+	Cleanup   bool
+	IgnoreDir bool
+}
+
+func testLoaderE2E(t *testing.T, path string, expectedModules []*ManifestModule, opts TestLoaderE2EOpts) {
+	if opts.Cleanup {
 		err := os.RemoveAll(filepath.Join(path, config.InfracostDir))
 		assert.NoError(t, err)
 	}
 
-	logger := logrus.New()
-	logger.SetOutput(io.Discard)
+	logger := zerolog.New(io.Discard)
 
-	moduleLoader := NewModuleLoader(path, &CredentialsSource{FetchToken: credentials.FindTerraformCloudToken}, sourceMap, logrus.NewEntry(logger), &sync2.KeyMutex{})
+	moduleLoader := NewModuleLoader(path, NewSharedHCLParser(), &CredentialsSource{FetchToken: credentials.FindTerraformCloudToken}, opts.SourceMap, logger, &sync2.KeyMutex{})
 
 	manifest, err := moduleLoader.Load(path)
 	if !assert.NoError(t, err) {
@@ -36,13 +41,35 @@ func testLoaderE2E(t *testing.T, path string, expectedModules []*ManifestModule,
 		return expectedModules[i].Key < expectedModules[j].Key
 	})
 
+	expected := []*ManifestModule{}
+	for _, m := range expectedModules {
+		e := &ManifestModule{
+			Key:         m.Key,
+			Source:      m.Source,
+			Version:     m.Version,
+			DownloadURL: m.DownloadURL,
+		}
+
+		if !opts.IgnoreDir {
+			e.Dir = m.Dir
+		}
+
+		expected = append(expected, e)
+	}
+
 	actualModules := manifest.Modules
 
 	sort.Slice(actualModules, func(i, j int) bool {
 		return actualModules[i].Key < actualModules[j].Key
 	})
 
-	assert.Equal(t, expectedModules, actualModules)
+	if opts.IgnoreDir {
+		for _, m := range actualModules {
+			m.Dir = ""
+		}
+	}
+
+	assert.Equal(t, expected, actualModules)
 }
 
 func TestNestedModules(t *testing.T) {
@@ -52,16 +79,18 @@ func TestNestedModules(t *testing.T) {
 
 	testLoaderE2E(t, "./testdata/nested_modules", []*ManifestModule{
 		{
-			Key:     "registry-module",
-			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-			Version: "3.4.0",
-			Dir:     ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			Key:         "registry-module",
+			Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			Version:     "3.4.0",
+			Dir:         ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
 		},
 		{
-			Key:     "registry-module-different-name",
-			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-			Version: "3.4.0",
-			Dir:     ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			Key:         "registry-module-different-name",
+			Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			Version:     "3.4.0",
+			Dir:         ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
 		},
 		{
 			Key:    "git-module",
@@ -74,10 +103,11 @@ func TestNestedModules(t *testing.T) {
 			Dir:    ".infracost/terraform_modules/9740179dc58fea6ce4a32fdc5b4e0839",
 		},
 		{
-			Key:     "local-module.nested-registry-module",
-			Source:  "registry.terraform.io/terraform-aws-modules/sns/aws",
-			Version: "3.1.0",
-			Dir:     ".infracost/terraform_modules/b72552bcaa63a49783f9a735a697c662",
+			Key:         "local-module.nested-registry-module",
+			Source:      "registry.terraform.io/terraform-aws-modules/sns/aws",
+			Version:     "3.1.0",
+			Dir:         ".infracost/terraform_modules/b72552bcaa63a49783f9a735a697c662",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-sns?ref=v3.1.0",
 		},
 		{
 			Key:    "local-module.nested-git-module",
@@ -85,12 +115,13 @@ func TestNestedModules(t *testing.T) {
 			Dir:    ".infracost/terraform_modules/db69103dcf4b9586b710a97de31750bd",
 		},
 		{
-			Key:     "local-module.nested-registry-module-using-same-source",
-			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-			Version: "3.4.0",
-			Dir:     ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			Key:         "local-module.nested-registry-module-using-same-source",
+			Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			Version:     "3.4.0",
+			Dir:         ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
 		},
-	}, config.TerraformSourceMap{}, true)
+	}, TestLoaderE2EOpts{Cleanup: true})
 }
 
 func TestSubmodules(t *testing.T) {
@@ -100,23 +131,25 @@ func TestSubmodules(t *testing.T) {
 
 	testLoaderE2E(t, "./testdata/submodules", []*ManifestModule{
 		{
-			Key:     "registry-submodule",
-			Source:  "registry.terraform.io/terraform-aws-modules/route53/aws//modules/zones",
-			Version: "2.5.0",
-			Dir:     ".infracost/terraform_modules/d1e3bab8b33f57431ace737ccffbf67f/modules/zones",
+			Key:         "registry-submodule",
+			Source:      "registry.terraform.io/terraform-aws-modules/route53/aws//modules/zones",
+			Version:     "2.5.0",
+			Dir:         ".infracost/terraform_modules/d1e3bab8b33f57431ace737ccffbf67f/modules/zones",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-route53?ref=v2.5.0",
 		},
 		{
-			Key:     "registry-submodule-records",
-			Source:  "registry.terraform.io/terraform-aws-modules/route53/aws//modules/records",
-			Version: "2.5.0",
-			Dir:     ".infracost/terraform_modules/d1e3bab8b33f57431ace737ccffbf67f/modules/records",
+			Key:         "registry-submodule-records",
+			Source:      "registry.terraform.io/terraform-aws-modules/route53/aws//modules/records",
+			Version:     "2.5.0",
+			Dir:         ".infracost/terraform_modules/d1e3bab8b33f57431ace737ccffbf67f/modules/records",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-route53?ref=v2.5.0",
 		},
 		{
 			Key:    "git-submodule",
 			Source: "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git//modules/zones",
 			Dir:    ".infracost/terraform_modules/03c49f2fce2b8552355561b7ac4f2c94/modules/zones",
 		},
-	}, nil, true)
+	}, TestLoaderE2EOpts{Cleanup: true})
 }
 
 func TestModuleMultipleUses(t *testing.T) {
@@ -126,18 +159,20 @@ func TestModuleMultipleUses(t *testing.T) {
 
 	testLoaderE2E(t, "./testdata/module_multiple_uses", []*ManifestModule{
 		{
-			Key:     "registry-module-1",
-			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-			Version: "3.4.0",
-			Dir:     ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			Key:         "registry-module-1",
+			Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			Version:     "3.4.0",
+			Dir:         ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
 		},
 		{
-			Key:     "registry-module-2",
-			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-			Version: "3.4.0",
-			Dir:     ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			Key:         "registry-module-2",
+			Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			Version:     "3.4.0",
+			Dir:         ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
 		},
-	}, config.TerraformSourceMap{}, true)
+	}, TestLoaderE2EOpts{Cleanup: true})
 }
 
 func TestModuleMultipleUsesMissingManifest(t *testing.T) {
@@ -147,21 +182,23 @@ func TestModuleMultipleUsesMissingManifest(t *testing.T) {
 
 	expectedModules := []*ManifestModule{
 		{
-			Key:     "registry-module-1",
-			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-			Version: "3.4.0",
-			Dir:     ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			Key:         "registry-module-1",
+			Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			Version:     "3.4.0",
+			Dir:         ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
 		},
 		{
-			Key:     "registry-module-2",
-			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-			Version: "3.4.0",
-			Dir:     ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			Key:         "registry-module-2",
+			Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			Version:     "3.4.0",
+			Dir:         ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
 		},
 	}
 
 	// Run first time to download modules
-	testLoaderE2E(t, "./testdata/module_multiple_uses", expectedModules, config.TerraformSourceMap{}, true)
+	testLoaderE2E(t, "./testdata/module_multiple_uses", expectedModules, TestLoaderE2EOpts{Cleanup: false})
 
 	// Remove the manifest file to test we can still work with broken manifests
 	err := os.Remove("./testdata/module_multiple_uses/.infracost/terraform_modules/manifest.json")
@@ -170,7 +207,7 @@ func TestModuleMultipleUsesMissingManifest(t *testing.T) {
 	}
 
 	// Re-run without cleaning up the modules directory
-	testLoaderE2E(t, "./testdata/module_multiple_uses", expectedModules, config.TerraformSourceMap{}, false)
+	testLoaderE2E(t, "./testdata/module_multiple_uses", expectedModules, TestLoaderE2EOpts{Cleanup: false})
 }
 
 func TestWithCachedModules(t *testing.T) {
@@ -180,17 +217,18 @@ func TestWithCachedModules(t *testing.T) {
 
 	testLoaderE2E(t, "./testdata/with_cached_modules", []*ManifestModule{
 		{
-			Key:     "registry-module",
-			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-			Version: "3.4.0",
-			Dir:     ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			Key:         "registry-module",
+			Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			Version:     "3.4.0",
+			Dir:         ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
 		},
 		{
 			Key:    "git-module",
 			Source: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git",
 			Dir:    ".infracost/terraform_modules/9740179dc58fea6ce4a32fdc5b4e0839",
 		},
-	}, config.TerraformSourceMap{}, false)
+	}, TestLoaderE2EOpts{Cleanup: false})
 
 	// Check that the modules were not overwritten
 	regModContents, err := os.ReadFile("./testdata/with_cached_modules/.infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b/main.tf")
@@ -216,10 +254,9 @@ func TestMultiProject(t *testing.T) {
 	err := os.RemoveAll(filepath.Join(path, config.InfracostDir))
 	assert.NoError(t, err)
 
-	logger := logrus.New()
-	logger.SetOutput(io.Discard)
+	logger := zerolog.New(io.Discard)
 
-	moduleLoader := NewModuleLoader(path, &CredentialsSource{FetchToken: credentials.FindTerraformCloudToken}, config.TerraformSourceMap{}, logrus.NewEntry(logger), &sync2.KeyMutex{})
+	moduleLoader := NewModuleLoader(path, NewSharedHCLParser(), &CredentialsSource{FetchToken: credentials.FindTerraformCloudToken}, config.TerraformSourceMap{}, logger, &sync2.KeyMutex{})
 
 	wg := &sync.WaitGroup{}
 	wg.Add(3)
@@ -247,16 +284,18 @@ func TestMultiProject(t *testing.T) {
 	wg.Wait()
 	assertModulesEqual(t, moduleLoader, filepath.Join(path, "prod"), []*ManifestModule{
 		{
-			Key:     "registry-module",
-			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-			Version: "3.4.0",
-			Dir:     ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			Key:         "registry-module",
+			Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			Version:     "3.4.0",
+			Dir:         ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
 		},
 		{
-			Key:     "registry-module-different-name",
-			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-			Version: "3.4.0",
-			Dir:     ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			Key:         "registry-module-different-name",
+			Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			Version:     "3.4.0",
+			Dir:         ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
 		},
 		{
 			Key:    "git-module",
@@ -269,10 +308,11 @@ func TestMultiProject(t *testing.T) {
 			Dir:    ".infracost/terraform_modules/9740179dc58fea6ce4a32fdc5b4e0839",
 		},
 		{
-			Key:     "local-module.nested-registry-module",
-			Source:  "registry.terraform.io/terraform-aws-modules/sns/aws",
-			Version: "3.1.0",
-			Dir:     ".infracost/terraform_modules/b72552bcaa63a49783f9a735a697c662",
+			Key:         "local-module.nested-registry-module",
+			Source:      "registry.terraform.io/terraform-aws-modules/sns/aws",
+			Version:     "3.1.0",
+			Dir:         ".infracost/terraform_modules/b72552bcaa63a49783f9a735a697c662",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-sns?ref=v3.1.0",
 		},
 		{
 			Key:    "local-module.nested-git-module",
@@ -280,25 +320,28 @@ func TestMultiProject(t *testing.T) {
 			Dir:    ".infracost/terraform_modules/db69103dcf4b9586b710a97de31750bd",
 		},
 		{
-			Key:     "local-module.nested-registry-module-using-same-source",
-			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-			Version: "3.4.0",
-			Dir:     ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			Key:         "local-module.nested-registry-module-using-same-source",
+			Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			Version:     "3.4.0",
+			Dir:         ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
 		},
 	})
 
 	assertModulesEqual(t, moduleLoader, filepath.Join(path, "dev"), []*ManifestModule{
 		{
-			Key:     "registry-module",
-			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-			Version: "3.4.0",
-			Dir:     ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			Key:         "registry-module",
+			Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			Version:     "3.4.0",
+			Dir:         ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
 		},
 		{
-			Key:     "registry-module-different-name",
-			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-			Version: "3.4.0",
-			Dir:     ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			Key:         "registry-module-different-name",
+			Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			Version:     "3.4.0",
+			Dir:         ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
 		},
 		{
 			Key:    "git-module",
@@ -316,10 +359,11 @@ func TestMultiProject(t *testing.T) {
 			Dir:    ".infracost/terraform_modules/9740179dc58fea6ce4a32fdc5b4e0839",
 		},
 		{
-			Key:     "local-module.nested-registry-module",
-			Source:  "registry.terraform.io/terraform-aws-modules/sns/aws",
-			Version: "3.1.0",
-			Dir:     ".infracost/terraform_modules/b72552bcaa63a49783f9a735a697c662",
+			Key:         "local-module.nested-registry-module",
+			Source:      "registry.terraform.io/terraform-aws-modules/sns/aws",
+			Version:     "3.1.0",
+			Dir:         ".infracost/terraform_modules/b72552bcaa63a49783f9a735a697c662",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-sns?ref=v3.1.0",
 		},
 		{
 			Key:    "local-module.nested-git-module",
@@ -327,10 +371,11 @@ func TestMultiProject(t *testing.T) {
 			Dir:    ".infracost/terraform_modules/db69103dcf4b9586b710a97de31750bd",
 		},
 		{
-			Key:     "local-module.nested-registry-module-using-same-source",
-			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-			Version: "3.4.0",
-			Dir:     ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			Key:         "local-module.nested-registry-module-using-same-source",
+			Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			Version:     "3.4.0",
+			Dir:         ".infracost/terraform_modules/f8b5f5ddb85ee755b31c8b76d2801f5b",
+			DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
 		},
 	})
 
@@ -376,50 +421,376 @@ func TestMultiProject(t *testing.T) {
 	})
 }
 
-func TestWithSourceMap(t *testing.T) {
+func TestSourceMapRegistryModule(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping test in short mode")
 	}
 
-	sourceMap := config.TerraformSourceMap{
-		"terraform-aws-modules/ec2-instance/aws":                                                  "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git?ref=v4.5.0",
-		"git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git":            "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-		"git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git?ref=v4.4.0": "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git?ref=v4.3.0",
-		"terraform-aws-modules/route53/aws":                                                       "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git",
+	tests := []struct {
+		name      string
+		sourceMap config.TerraformSourceMap
+		want      []*ManifestModule
+	}{
+		{
+			name:      "empty source map",
+			sourceMap: config.TerraformSourceMap{},
+			want: []*ManifestModule{
+				{
+					Key:         "registry-module",
+					Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+					Version:     "3.4.0",
+					DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
+				},
+			},
+		},
+		{
+			name: "git without version",
+			sourceMap: config.TerraformSourceMap{
+				"terraform-aws-modules/ec2-instance/aws": "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git",
+			},
+			want: []*ManifestModule{
+				{
+					Key:    "registry-module",
+					Source: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git",
+					// We can't map the version here when going from registry to git, since we don't know which tag it should be.
+					// Some modules are prefixed with v and some aren't.
+					Version: "",
+				},
+			},
+		},
+		{
+			name: "git with version",
+			sourceMap: config.TerraformSourceMap{
+				"terraform-aws-modules/ec2-instance/aws": "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git?ref=v5.5.0",
+			},
+			want: []*ManifestModule{
+				{
+					Key:     "registry-module",
+					Source:  "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git?ref=v5.5.0",
+					Version: "",
+				},
+			},
+		},
+		// This shouldn't map since the source in the code doesn't include the registry hostname
+		{
+			name: "with registry hostname",
+			sourceMap: config.TerraformSourceMap{
+				"registry.terraform.io/terraform-aws-modules/ec2-instance/aws": "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git",
+			},
+			want: []*ManifestModule{
+				{
+					Key:         "registry-module",
+					Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+					Version:     "3.4.0",
+					DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
+				},
+			},
+		},
+		{
+			name: "with prefix",
+			sourceMap: config.TerraformSourceMap{
+				"terraform-aws-modules/": "registry.terraform.io/terraform-aws-modules/",
+			},
+			want: []*ManifestModule{
+				{
+					Key:         "registry-module",
+					Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+					Version:     "3.4.0",
+					DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
+				},
+			},
+		},
 	}
 
-	testLoaderE2E(t, "./testdata/modules_with_source_map", []*ManifestModule{
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			testLoaderE2E(t, "./testdata/sourcemap_registry_module", tt.want, TestLoaderE2EOpts{SourceMap: tt.sourceMap, Cleanup: true, IgnoreDir: true})
+		})
+	}
+}
+
+func TestSourceMapRegistrySubmodule(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping test in short mode")
+	}
+
+	tests := []struct {
+		name      string
+		sourceMap config.TerraformSourceMap
+		want      []*ManifestModule
+	}{
 		{
-			Key:     "registry-module",
-			Source:  "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git?ref=v4.5.0",
-			Version: "",
-			Dir:     ".infracost/terraform_modules/90ed96c30cb769e39bbe5a2686ca87d1",
+			name:      "empty source map",
+			sourceMap: config.TerraformSourceMap{},
+			want: []*ManifestModule{
+				{
+					Key:         "registry-submodule",
+					Source:      "registry.terraform.io/terraform-aws-modules/route53/aws//modules/zones",
+					Version:     "2.5.0",
+					DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-route53?ref=v2.5.0",
+				},
+			},
 		},
 		{
-			Key:     "git-module-with-ref",
-			Source:  "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
-			Version: "4.5.0",
-			Dir:     ".infracost/terraform_modules/571e67fb2167bf68f1bcb139b0a396cb",
+			name: "git without version",
+			sourceMap: config.TerraformSourceMap{
+				"terraform-aws-modules/route53/aws": "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git",
+			},
+			want: []*ManifestModule{
+				{
+					Key:    "registry-submodule",
+					Source: "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git//modules/zones",
+					// We can't map the version here when going from registry to git, since we don't know which tag it should be.
+					// Some modules are prefixed with v and some aren't.
+					Version: "",
+				},
+			},
 		},
 		{
-			Key:     "git-module-with-mapped-ref",
-			Source:  "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git?ref=v4.3.0",
-			Version: "",
-			Dir:     ".infracost/terraform_modules/1bef96b2e0948432531cc6631d07dee4",
+			name: "git with version",
+			sourceMap: config.TerraformSourceMap{
+				"terraform-aws-modules/route53/aws": "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git?ref=v2.10.2",
+			},
+			want: []*ManifestModule{
+				{
+					Key:     "registry-submodule",
+					Source:  "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git//modules/zones?ref=v2.10.2",
+					Version: "",
+				},
+			},
+		},
+		// This shouldn't map since the source in the code doesn't include the registry hostname
+		{
+			name: "with registry hostname",
+			sourceMap: config.TerraformSourceMap{
+				"registry.terraform.io/terraform-aws-modules/route53/aws": "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git",
+			},
+			want: []*ManifestModule{
+				{
+					Key:         "registry-submodule",
+					Source:      "registry.terraform.io/terraform-aws-modules/route53/aws//modules/zones",
+					Version:     "2.5.0",
+					DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-route53?ref=v2.5.0",
+				},
+			},
 		},
 		{
-			Key:     "git-module-not-replaced",
-			Source:  "git::https://github.com/terraform-aws-modules/terraform-aws-sns.git",
-			Version: "",
-			Dir:     ".infracost/terraform_modules/db69103dcf4b9586b710a97de31750bd",
+			name: "with prefix",
+			sourceMap: config.TerraformSourceMap{
+				"terraform-aws-modules/": "registry.terraform.io/terraform-aws-modules/",
+			},
+			want: []*ManifestModule{
+				{
+					Key:         "registry-submodule",
+					Source:      "registry.terraform.io/terraform-aws-modules/route53/aws//modules/zones",
+					Version:     "2.5.0",
+					DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-route53?ref=v2.5.0",
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			testLoaderE2E(t, "./testdata/sourcemap_registry_submodule", tt.want, TestLoaderE2EOpts{SourceMap: tt.sourceMap, Cleanup: true, IgnoreDir: true})
+		})
+	}
+}
+
+func TestSourceMapGitModule(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping test in short mode")
+	}
+
+	tests := []struct {
+		name      string
+		sourceMap config.TerraformSourceMap
+		want      []*ManifestModule
+	}{
+		{
+			name:      "empty source map",
+			sourceMap: config.TerraformSourceMap{},
+			want: []*ManifestModule{
+				{
+					Key:     "git-module",
+					Source:  "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git?ref=v3.4.0",
+					Version: "",
+				},
+			},
 		},
 		{
-			Key:     "registry-module-with-submodule",
-			Source:  "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git//modules/zones",
-			Version: "",
-			Dir:     ".infracost/terraform_modules/5a4a225178eed58c86a47cd2229ec923/modules/zones",
+			name: "git without version",
+			sourceMap: config.TerraformSourceMap{
+				"git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git": "git::https://github.com/infracost-tests/terraform-aws-ec2-instance.git",
+			},
+			want: []*ManifestModule{
+				{
+					Key:     "git-module",
+					Source:  "git::https://github.com/infracost-tests/terraform-aws-ec2-instance.git?ref=v3.4.0",
+					Version: "",
+				},
+			},
 		},
-	}, sourceMap, true)
+		{
+			name: "git with prefix",
+			sourceMap: config.TerraformSourceMap{
+				"git::https://github.com/terraform-aws-modules/": "git::https://github.com/infracost-tests/",
+			},
+			want: []*ManifestModule{
+				{
+					Key:     "git-module",
+					Source:  "git::https://github.com/infracost-tests/terraform-aws-ec2-instance.git?ref=v3.4.0",
+					Version: "",
+				},
+			},
+		},
+		{
+			name: "git with ref override",
+			sourceMap: config.TerraformSourceMap{
+				"git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git?ref=v3.4.0": "git::https://github.com/infracost-tests/terraform-aws-ec2-instance.git?ref=master",
+				"git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git":            "git::https://github.com/infracost-tests/terraform-aws-ec2-instance.git",
+			},
+			want: []*ManifestModule{
+				{
+					Key:     "git-module",
+					Source:  "git::https://github.com/infracost-tests/terraform-aws-ec2-instance.git?ref=master",
+					Version: "",
+				},
+			},
+		},
+		{
+			name: "git with repo override",
+			sourceMap: config.TerraformSourceMap{
+				"git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git": "git::https://github.com/infracost-tests/terraform-aws-ec2-instance.git",
+				"git::https://github.com/terraform-aws-modules/":                               "git::https://github.com/infracost-tests/",
+			},
+			want: []*ManifestModule{
+				{
+					Key:     "git-module",
+					Source:  "git::https://github.com/infracost-tests/terraform-aws-ec2-instance.git?ref=v3.4.0",
+					Version: "",
+				},
+			},
+		},
+		{
+			name: "git to registry",
+			sourceMap: config.TerraformSourceMap{
+				"git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance.git": "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+			},
+			want: []*ManifestModule{
+				{
+					Key:         "git-module",
+					Source:      "registry.terraform.io/terraform-aws-modules/ec2-instance/aws",
+					Version:     "3.4.0",
+					DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-ec2-instance?ref=v3.4.0",
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			testLoaderE2E(t, "./testdata/sourcemap_git_module", tt.want, TestLoaderE2EOpts{SourceMap: tt.sourceMap, Cleanup: true, IgnoreDir: true})
+		})
+	}
+}
+
+func TestSourceMapGitSubmodule(t *testing.T) {
+	if testing.Short() {
+		t.Skip("Skipping test in short mode")
+	}
+
+	tests := []struct {
+		name      string
+		sourceMap config.TerraformSourceMap
+		want      []*ManifestModule
+	}{
+		{
+			name:      "empty source map",
+			sourceMap: config.TerraformSourceMap{},
+			want: []*ManifestModule{
+				{
+					Key:     "git-submodule",
+					Source:  "git::https://github.com/terraform-aws-modules/terraform-aws-route53.git//modules/zones?ref=v2.5.0",
+					Version: "",
+				},
+			},
+		},
+		{
+			name: "git without version",
+			sourceMap: config.TerraformSourceMap{
+				"git::https://github.com/terraform-aws-modules/terraform-aws-route53.git": "git::https://github.com/infracost-tests/terraform-aws-route53.git",
+			},
+			want: []*ManifestModule{
+				{
+					Key:     "git-submodule",
+					Source:  "git::https://github.com/infracost-tests/terraform-aws-route53.git//modules/zones?ref=v2.5.0",
+					Version: "",
+				},
+			},
+		},
+		{
+			name: "git with prefix",
+			sourceMap: config.TerraformSourceMap{
+				"git::https://github.com/terraform-aws-modules/": "git::https://github.com/infracost-tests/",
+			},
+			want: []*ManifestModule{
+				{
+					Key:     "git-submodule",
+					Source:  "git::https://github.com/infracost-tests/terraform-aws-route53.git//modules/zones?ref=v2.5.0",
+					Version: "",
+				},
+			},
+		},
+		{
+			name: "git with ref override",
+			sourceMap: config.TerraformSourceMap{
+				"git::https://github.com/terraform-aws-modules/terraform-aws-route53.git?ref=v2.5.0": "git::https://github.com/infracost-tests/terraform-aws-route53.git?ref=master",
+				"git::https://github.com/terraform-aws-modules/terraform-aws-route53.git":            "git::https://github.com/infracost-tests/terraform-aws-route53.git",
+			},
+			want: []*ManifestModule{
+				{
+					Key:     "git-submodule",
+					Source:  "git::https://github.com/infracost-tests/terraform-aws-route53.git//modules/zones?ref=master",
+					Version: "",
+				},
+			},
+		},
+		{
+			name: "git with repo override",
+			sourceMap: config.TerraformSourceMap{
+				"git::https://github.com/terraform-aws-modules/terraform-aws-route53.git": "git::https://github.com/infracost-tests/terraform-aws-route53.git",
+				"git::https://github.com/terraform-aws-modules/":                          "git::https://github.com/infracost-tests/",
+			},
+			want: []*ManifestModule{
+				{
+					Key:     "git-submodule",
+					Source:  "git::https://github.com/infracost-tests/terraform-aws-route53.git//modules/zones?ref=v2.5.0",
+					Version: "",
+				},
+			},
+		},
+		{
+			name: "git to registry",
+			sourceMap: config.TerraformSourceMap{
+				"git::https://github.com/terraform-aws-modules/terraform-aws-route53.git": "registry.terraform.io/terraform-aws-modules/route53/aws",
+			},
+			want: []*ManifestModule{
+				{
+					Key:         "git-submodule",
+					Source:      "registry.terraform.io/terraform-aws-modules/route53/aws//modules/zones",
+					Version:     "2.5.0",
+					DownloadURL: "git::https://github.com/terraform-aws-modules/terraform-aws-route53?ref=v2.5.0",
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			testLoaderE2E(t, "./testdata/sourcemap_git_submodule", tt.want, TestLoaderE2EOpts{SourceMap: tt.sourceMap, Cleanup: true, IgnoreDir: true})
+		})
+	}
 }
 
 func assertModulesEqual(t *testing.T, moduleLoader *ModuleLoader, path string, expectedModules []*ManifestModule) {

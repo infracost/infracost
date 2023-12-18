@@ -118,6 +118,9 @@ func TestBreakdownFormatJsonWithTagsGoogle(t *testing.T) {
 			CaptureLogs: true,
 			IsJSON:      true,
 		},
+		func(ctx *config.RunContext) {
+			ctx.Config.TagPoliciesEnabled = true
+		},
 	)
 }
 
@@ -412,12 +415,15 @@ func TestBreakdownTerragruntWithRemoteSource(t *testing.T) {
 	dirs, err := getGitBranchesInDirs(filepath.Join(cacheDir, ".terragrunt-cache"))
 	assert.NoError(t, err)
 
-	// check that there are 4 directories in the download directory as 2 of the 6 projects use the same ref.
-	require.Len(t, dirs, 4)
-	assert.Equal(t, dirs["nY--fMGWRYoen8N6OqfdCB8CBnc"], "1f94a2fd07b3e29deea4706b5d2fdc68c1d02aad")
-	assert.Equal(t, dirs["F_iCrGgnzJEf5w4HUBrbeCRMQo0"], "b6fa04f65bdcb26869215fb840f5ee088a096bc8")
-	assert.Equal(t, dirs["KaCyCQXaN6-S634qsDqQ2wwYENc"], "74725d6e91aa91d7283642b7ed3316d12f271212")
-	assert.Equal(t, dirs["vo8pQqWUeCu_1_TBy7LGvx51SW0"], "master")
+	// check that there are 5 directories in the download directory as 3 of the 7 projects use the same ref,
+	// but one of these has a generate block.
+	require.Len(t, dirs, 5)
+
+	assert.Equal(t, "1f94a2fd07b3e29deea4706b5d2fdc68c1d02aad", dirs["nY--fMGWRYoen8N6OqfdCB8CBnc"])
+	assert.Equal(t, "b6fa04f65bdcb26869215fb840f5ee088a096bc8", dirs["F_iCrGgnzJEf5w4HUBrbeCRMQo0"])
+	assert.Equal(t, "b6fa04f65bdcb26869215fb840f5ee088a096bc8", dirs["F_iCrGgnzJEf5w4HUBrbeCRMQo0-lQzAPeXdDdx4LOk968nZQH7SIN0"])
+	assert.Equal(t, "74725d6e91aa91d7283642b7ed3316d12f271212", dirs["KaCyCQXaN6-S634qsDqQ2wwYENc"])
+	assert.Equal(t, "master", dirs["vo8pQqWUeCu_1_TBy7LGvx51SW0"])
 }
 
 func getGitRef(dir string) (string, error) {
@@ -511,6 +517,31 @@ func TestBreakdownTerragruntHCLDepsOutput(t *testing.T) {
 		testutil.CalcGoldenFileTestdataDirName(),
 		[]string{"breakdown", "--path",
 			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())},
+		&GoldenFileOptions{CaptureLogs: true},
+	)
+}
+
+func TestBreakdownTerragruntHCLModuleOutputForEach(t *testing.T) {
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{"breakdown", "--path",
+			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())},
+		&GoldenFileOptions{CaptureLogs: true},
+	)
+}
+
+func TestBreakdownTerragruntDiffProjectError(t *testing.T) {
+	projectPath := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
+
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"diff",
+			"--path", projectPath,
+			"--compare-to", path.Join(projectPath, "prior.json"),
+		},
 		&GoldenFileOptions{CaptureLogs: true},
 	)
 }
@@ -1007,4 +1038,117 @@ func TestBreakdownWithDataBlocksInSubmod(t *testing.T) {
 			"breakdown",
 			"--path", dir,
 		}, nil)
+}
+
+func TestBreakdownWithPolicyDataUploadHCL(t *testing.T) {
+	ts, uploadWriter := GraphqlTestServerWithWriter(map[string]string{
+		"policyResourceAllowList": policyResourceAllowlistGraphQLResponse,
+		"storePolicyResources":    storePolicyResourcesGraphQLResponse,
+	})
+	defer ts.Close()
+
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testName,
+		[]string{
+			"breakdown",
+			"--format", "json",
+			"--path", dir,
+		},
+		&GoldenFileOptions{
+			CaptureLogs: true,
+			IsJSON:      true,
+		}, func(ctx *config.RunContext) {
+			ctx.Config.PolicyV2APIEndpoint = ts.URL
+			ctx.Config.PoliciesEnabled = true
+		},
+	)
+
+	testutil.AssertGoldenFile(t, path.Join("./testdata", testName, testName+"-upload.golden"), uploadWriter.Bytes())
+}
+
+func TestBreakdownWithMockedMerge(t *testing.T) {
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path",
+			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+		},
+		nil,
+	)
+}
+
+func TestBreakdownWithDynamicIterator(t *testing.T) {
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path",
+			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+		},
+		nil,
+	)
+}
+
+func TestBreakdownWithPolicyDataUploadPlanJson(t *testing.T) {
+	ts, uploadWriter := GraphqlTestServerWithWriter(map[string]string{
+		"policyResourceAllowList": policyResourceAllowlistGraphQLResponse,
+		"storePolicyResources":    storePolicyResourcesGraphQLResponse,
+	})
+	defer ts.Close()
+
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName, "plan.json")
+	GoldenFileCommandTest(
+		t,
+		testName,
+		[]string{
+			"breakdown",
+			"--format", "json",
+			"--path", dir,
+		},
+		&GoldenFileOptions{
+			CaptureLogs: true,
+			IsJSON:      true,
+		}, func(ctx *config.RunContext) {
+			ctx.Config.PolicyV2APIEndpoint = ts.URL
+			ctx.Config.PoliciesEnabled = true
+		},
+	)
+
+	testutil.AssertGoldenFile(t, path.Join("./testdata", testName, testName+"-upload.golden"), uploadWriter.Bytes())
+}
+
+func TestBreakdownWithPolicyDataUploadTerragrunt(t *testing.T) {
+	ts, uploadWriter := GraphqlTestServerWithWriter(map[string]string{
+		"policyResourceAllowList": policyResourceAllowlistGraphQLResponse,
+		"storePolicyResources":    storePolicyResourcesGraphQLResponse,
+	})
+	defer ts.Close()
+
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testName,
+		[]string{
+			"breakdown",
+			"--format", "json",
+			"--path", dir,
+		},
+		&GoldenFileOptions{
+			CaptureLogs: true,
+			IsJSON:      true,
+		}, func(ctx *config.RunContext) {
+			ctx.Config.PolicyV2APIEndpoint = ts.URL
+			ctx.Config.PoliciesEnabled = true
+		},
+	)
+
+	testutil.AssertGoldenFile(t, path.Join("./testdata", testName, testName+"-upload.golden"), stripDynamicValues(uploadWriter.Bytes()))
 }

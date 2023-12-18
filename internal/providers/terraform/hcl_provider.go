@@ -15,7 +15,7 @@ import (
 	"sync"
 
 	jsoniter "github.com/json-iterator/go"
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 	ctyJson "github.com/zclconf/go-cty/cty/json"
@@ -26,8 +26,6 @@ import (
 	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/hcl/modules"
 	"github.com/infracost/infracost/internal/logging"
-	"github.com/infracost/infracost/internal/prices"
-	"github.com/infracost/infracost/internal/scan"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
 )
@@ -35,10 +33,10 @@ import (
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 type HCLProvider struct {
-	scanner        *scan.TerraformPlanScanner
+	policyClient   *apiclient.PolicyAPIClient
 	parsers        []*hcl.Parser
 	planJSONParser *Parser
-	logger         *log.Entry
+	logger         zerolog.Logger
 
 	schema *PlanSchema
 	ctx    *config.ProjectContext
@@ -135,7 +133,7 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 		hcl.OptionWithTerraformWorkspace(localWorkspace),
 	)
 
-	logger := ctx.Logger().WithFields(log.Fields{"provider": "terraform_dir"})
+	logger := ctx.Logger().With().Str("provider", "terraform_dir").Logger()
 	runCtx := ctx.RunContext
 	locatorConfig := &hcl.ProjectLocatorConfig{ExcludedSubDirs: ctx.ProjectConfig.ExcludePaths, ChangedObjects: runCtx.VCSMetadata.Commit.ChangedObjects, UseAllPaths: ctx.ProjectConfig.IncludeAllPaths}
 
@@ -144,12 +142,12 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 	if filepath.IsAbs(cachePath) {
 		abs, err := filepath.Abs(initialPath)
 		if err != nil {
-			logger.WithError(err).Warnf("could not make project path absolute to match provided --config-file/--path path absolute, this will result in module loading failures")
+			logger.Warn().Err(err).Msgf("could not make project path absolute to match provided --config-file/--path path absolute, this will result in module loading failures")
 		} else {
 			initialPath = abs
 		}
 	}
-	loader := modules.NewModuleLoader(cachePath, credsSource, ctx.RunContext.Config.TerraformSourceMap, logger, ctx.RunContext.ModuleMutex)
+	loader := modules.NewModuleLoader(cachePath, modules.NewSharedHCLParser(), credsSource, ctx.RunContext.Config.TerraformSourceMap, logger, ctx.RunContext.ModuleMutex)
 	parsers, err := hcl.LoadParsers(
 		ctx,
 		initialPath,
@@ -161,13 +159,17 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 	if err != nil {
 		return nil, err
 	}
-	var scanner *scan.TerraformPlanScanner
-	if runCtx.Config.PolicyAPIEndpoint != "" {
-		scanner = scan.NewTerraformPlanScanner(runCtx, ctx.Logger(), prices.GetPricesConcurrent)
+
+	var policyClient *apiclient.PolicyAPIClient
+	if runCtx.Config.PoliciesEnabled {
+		policyClient, err = apiclient.NewPolicyAPIClient(runCtx)
+		if err != nil {
+			logger.Err(err).Msgf("failed to initialize policy client")
+		}
 	}
 
 	return &HCLProvider{
-		scanner:        scanner,
+		policyClient:   policyClient,
 		parsers:        parsers,
 		planJSONParser: NewParser(ctx, true),
 		ctx:            ctx,
@@ -188,7 +190,7 @@ func (p *HCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 
 	modulePath, err := filepath.Rel(basePath, metadata.Path)
 	if err == nil && modulePath != "" && modulePath != "." {
-		p.logger.Debugf("calculated relative terraformModulePath for %s from %s", basePath, metadata.Path)
+		p.logger.Debug().Msgf("calculated relative terraformModulePath for %s from %s", basePath, metadata.Path)
 		metadata.TerraformModulePath = modulePath
 	}
 
@@ -210,15 +212,17 @@ func (p *HCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, e
 
 		project := p.parseResources(j, usage)
 		if p.ctx.RunContext.VCSMetadata.HasChanges() {
+			j := j
 			project.Metadata.VCSCodeChanged = &j.Module.HasChanges
 		}
 
-		if p.scanner != nil {
-			err := p.scanner.ScanPlan(project)
+		if p.policyClient != nil {
+			err := p.policyClient.UploadPolicyData(project)
 			if err != nil {
-				p.logger.WithError(err).Debugf("failed to scan Terraform project %s", project.Name)
+				p.logger.Err(err).Msgf("failed to upload policy data %s", project.Name)
 			}
 		}
+
 		projects[i] = project
 	}
 
@@ -228,17 +232,18 @@ func (p *HCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, e
 func (p *HCLProvider) parseResources(parsed HCLProject, usage schema.UsageMap) *schema.Project {
 	project := p.newProject(parsed)
 
-	partialPastResources, partialResources, providerMetadatas, err := p.planJSONParser.parseJSON(parsed.JSON, usage)
+	parsedConf, err := p.planJSONParser.parseJSON(parsed.JSON, usage)
 	if err != nil {
 		project.Metadata.AddErrorWithCode(err, schema.DiagJSONParsingFailure)
 
 		return project
 	}
 
-	project.AddProviderMetadata(providerMetadatas)
+	project.AddProviderMetadata(parsedConf.ProviderMetadata)
+	project.Metadata.RemoteModuleCalls = parsedConf.RemoteModuleCalls
 
-	project.PartialPastResources = partialPastResources
-	project.PartialResources = partialResources
+	project.PartialPastResources = parsedConf.PastResources
+	project.PartialResources = parsedConf.CurrentResources
 
 	return project
 }
@@ -263,7 +268,7 @@ func (p *HCLProvider) newProject(parsed HCLProject) *schema.Project {
 			}
 
 			if p.ctx.RunContext.Config.IsLogging() {
-				logging.Logger.Warn(warning.FriendlyMessage)
+				logging.Logger.Warn().Msg(warning.FriendlyMessage)
 			} else {
 				ui.PrintWarning(p.ctx.RunContext.ErrWriter, warning.FriendlyMessage)
 			}
@@ -301,7 +306,7 @@ func (p *HCLProvider) LoadPlanJSONs() []HCLProject {
 			if os.Getenv("INFRACOST_JSON_DUMP") == "true" {
 				err := os.WriteFile(fmt.Sprintf("%s-out.json", strings.ReplaceAll(module.Module.ModulePath, "/", "-")), module.JSON, os.ModePerm)
 				if err != nil {
-					p.logger.WithError(err).Debug("failed to write to json dump")
+					p.logger.Debug().Err(err).Msg("failed to write to json dump")
 				}
 			}
 		}
@@ -361,7 +366,7 @@ func (p *HCLProvider) Modules() []HCLProject {
 					if v, ok := modErr.(*clierror.PanicError); ok {
 						err := apiclient.ReportCLIError(p.ctx.RunContext, v, false)
 						if err != nil {
-							p.logger.WithError(err).Debug("error sending unexpected runtime error")
+							p.logger.Debug().Err(err).Msg("error sending unexpected runtime error")
 						}
 					}
 				}
@@ -499,6 +504,7 @@ func (p *HCLProvider) marshalModule(module *hcl.Module) ModuleOut {
 		moduleConfig.ModuleCalls[modKey] = ModuleCall{
 			Source:       m.Source,
 			ModuleConfig: mo.ModuleConfig,
+			SourceUrl:    m.SourceURL,
 		}
 
 		planModule.ChildModules = append(planModule.ChildModules, mo.PlanModule)
@@ -513,7 +519,6 @@ func (p *HCLProvider) marshalModule(module *hcl.Module) ModuleOut {
 func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 	jsonValues := marshalAttributeValues(block.Type(), block.Values())
 	p.marshalBlock(block, jsonValues)
-
 	planned := ResourceJSON{
 		Address:       block.FullName(),
 		Mode:          "managed",
@@ -641,7 +646,7 @@ func (p *HCLProvider) marshalDefaultTagsBlock(providerBlock *hcl.Block) map[stri
 
 	for tag, val := range value.AsValueMap() {
 		if !val.IsKnown() {
-			p.logger.Debugf("tag %s has unknown value, cannot marshal", tag)
+			p.logger.Debug().Msgf("tag %s has unknown value, cannot marshal", tag)
 			continue
 		}
 
@@ -649,7 +654,7 @@ func (p *HCLProvider) marshalDefaultTagsBlock(providerBlock *hcl.Block) map[stri
 			var tagValue bool
 			err := gocty.FromCtyValue(val, &tagValue)
 			if err != nil {
-				p.logger.WithError(err).Debugf("could not marshal tag %s to bool value", tag)
+				p.logger.Debug().Err(err).Msgf("could not marshal tag %s to bool value", tag)
 				continue
 			}
 
@@ -661,7 +666,7 @@ func (p *HCLProvider) marshalDefaultTagsBlock(providerBlock *hcl.Block) map[stri
 			var tagValue big.Float
 			err := gocty.FromCtyValue(val, &tagValue)
 			if err != nil {
-				p.logger.WithError(err).Debugf("could not marshal tag %s to number value", tag)
+				p.logger.Debug().Err(err).Msgf("could not marshal tag %s to number value", tag)
 				continue
 			}
 
@@ -672,7 +677,7 @@ func (p *HCLProvider) marshalDefaultTagsBlock(providerBlock *hcl.Block) map[stri
 		var tagValue string
 		err := gocty.FromCtyValue(val, &tagValue)
 		if err != nil {
-			p.logger.WithError(err).Debugf("could not marshal tag %s to string value", tag)
+			p.logger.Debug().Err(err).Msgf("could not marshal tag %s to string value", tag)
 			continue
 		}
 
@@ -792,10 +797,10 @@ func (p *HCLProvider) marshalBlock(block *hcl.Block, jsonValues map[string]inter
 
 		if v, ok := jsonValues[key]; ok {
 			if _, ok := v.(stdJson.RawMessage); ok {
-				p.logger.WithFields(log.Fields{
-					"parent_block": block.LocalName(),
-					"child_block":  b.LocalName(),
-				}).Debugf("skipping attribute '%s' that has also been declared as a child block", key)
+				p.logger.Debug().
+					Str("parent_block", block.LocalName()).
+					Str("child_block", b.LocalName()).
+					Msgf("skipping attribute '%s' that has also been declared as a child block", key)
 
 				continue
 			}
@@ -821,7 +826,7 @@ func marshalAttributeValues(blockType string, value cty.Value) map[string]interf
 		var key string
 		err := gocty.FromCtyValue(k, &key)
 		if err != nil {
-			logging.Logger.WithError(err).Debugf("could not convert block map key to string ignoring entry")
+			logging.Logger.Debug().Err(err).Msgf("could not convert block map key to string ignoring entry")
 			continue
 		}
 
@@ -930,6 +935,7 @@ type ResourceData struct {
 type ModuleCall struct {
 	Source       string       `json:"source"`
 	ModuleConfig ModuleConfig `json:"module"`
+	SourceUrl    string       `json:"sourceUrl,omitempty"`
 }
 
 type countExpression struct {

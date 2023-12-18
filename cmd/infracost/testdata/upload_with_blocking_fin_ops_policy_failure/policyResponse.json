@@ -1,0 +1,35 @@
+[
+  {
+    "data": {
+      "evaluatePolicies": {
+        "finOpsPolicyResults": [
+          {
+            "name": "Failing FinOps Policy",
+            "policyId": "b2bb1189-1120-4efb-925b-9728d9dd8c84",
+            "message": "This should show as a failure",
+            "blockPr": true,
+            "prComment": true,
+            "resources": [
+              {
+                "checksum": "123checksum",
+                "address": "module.hosted_cloud_pricing_api.aws_s3_bucket.cloud_pricing_api_db_data",
+                "type": "aws_s3_bucket",
+                "path": "dev/main.tf",
+                "startLine": 14,
+                "endLine:": 15,
+                "projectName": "my-prod-project",
+                "issues": [
+                  {
+                    "attribute": "attribute",
+                    "value": "value",
+                    "description": "description"
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+]

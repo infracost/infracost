@@ -13,7 +13,6 @@ import (
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/logging"
-
 	"github.com/infracost/infracost/internal/testutil"
 )
 
@@ -45,7 +44,7 @@ func TestCommentGitHubShowChangedProjects(t *testing.T) {
 		nil)
 }
 
-func TestCommentGitHubWithMissingGuardrailCheckPath(t *testing.T) {
+func TestCommentGitHubWithMissingAdditionalCommentPath(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
 		[]string{
 			"comment",
@@ -56,11 +55,11 @@ func TestCommentGitHubWithMissingGuardrailCheckPath(t *testing.T) {
 			"--show-changed",
 			"--path", "./testdata/changes.json",
 			"--dry-run",
-			"--guardrail-check-path", "./does/not/exist.json"},
+			"--additional-comment-data-path", "./does/not/exist.md"},
 		nil)
 }
 
-func TestCommentGitHubWithGuardrailCheckPath(t *testing.T) {
+func TestCommentGitHubWithAdditionalCommentPath(t *testing.T) {
 	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
 		[]string{
@@ -72,18 +71,38 @@ func TestCommentGitHubWithGuardrailCheckPath(t *testing.T) {
 			"--show-changed",
 			"--path", "./testdata/changes.json",
 			"--dry-run",
-			"--guardrail-check-path", path.Join(dir, "./guardrailCheck.json")},
+			"--additional-comment-data-path", path.Join(dir, "./additional-comment.md")},
 		nil)
 }
 
-//go:embed testdata/comment_git_hub_with_tag_policy_checks/tagPolicyResponse.json
-var commentGitHubWithTagPolicyChecksTagPolicyResponse string
+//go:embed testdata/comment_git_hub_with_fin_ops_policy_checks/policyV2Response.json
+var commentGitHubWithFinOpsPolicyChecksTagPolicyResponse string
 
-func TestCommentGitHubWithTagPolicyChecks(t *testing.T) {
-	tagPolicyApi := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, _ = fmt.Fprintln(w, commentGitHubWithTagPolicyChecksTagPolicyResponse)
-	}))
-	defer tagPolicyApi.Close()
+func TestCommentGitHubWithFinOpsPolicyChecks(t *testing.T) {
+	policyV2Api := GraphqlTestServer(map[string]string{
+		"policyResourceAllowList": policyResourceAllowlistGraphQLResponse,
+		"evaluatePolicies":        commentGitHubWithFinOpsPolicyChecksTagPolicyResponse,
+	})
+	defer policyV2Api.Close()
+
+	dashboardApi := governanceTestEndpoint(governanceAddRunResponse{
+		GovernanceComment: "❌ Finops policy failure",
+		GovernanceResults: []GovernanceResult{{
+			Type:    "finops_policy",
+			Checked: 1,
+			Failures: []string{
+				"Some finops policy warning",
+			},
+			Warnings: []string{
+				"Some finops policy warning 1",
+				"Some finops policy warning 2",
+			},
+		}},
+	})
+	defer dashboardApi.Close()
+
+	ghApi := ghTestEndpoint()
+	defer ghApi.Close()
 
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
 		[]string{
@@ -94,20 +113,50 @@ func TestCommentGitHubWithTagPolicyChecks(t *testing.T) {
 			"--commit", "5",
 			"--show-changed",
 			"--path", "./testdata/changes.json",
-			"--dry-run"},
+			"--github-api-url", ghApi.URL},
 		&GoldenFileOptions{
 			Env: map[string]string{
-				"INFRACOST_TAG_POLICY_API_ENDPOINT": tagPolicyApi.URL,
+				"INFRACOST_POLICY_V2_API_ENDPOINT": policyV2Api.URL,
 			},
+			CaptureLogs: true,
 		},
 		func(c *config.RunContext) {
+			c.Config.DashboardAPIEndpoint = dashboardApi.URL
 			t := true
 			c.Config.EnableCloudUpload = &t
 		},
 	)
 }
 
-func TestCommentGitHubWithTagPolicyCheckMerge(t *testing.T) {
+//go:embed testdata/comment_git_hub_with_tag_policy_checks/policyV2Response.json
+var commentGitHubWithTagPolicyChecksTagPolicyResponse string
+
+func TestCommentGitHubWithTagPolicyChecks(t *testing.T) {
+	policyV2Api := GraphqlTestServer(map[string]string{
+		"policyResourceAllowList": policyResourceAllowlistGraphQLResponse,
+		"evaluatePolicies":        commentGitHubWithTagPolicyChecksTagPolicyResponse,
+	})
+	defer policyV2Api.Close()
+
+	dashboardApi := governanceTestEndpoint(governanceAddRunResponse{
+		GovernanceComment: "❌ Tag policy failure",
+		GovernanceResults: []GovernanceResult{{
+			Type:    "tag_policy",
+			Checked: 1,
+			Failures: []string{
+				"Some tag policy failure",
+			},
+			Warnings: []string{
+				"Some tag policy warning 1",
+				"Some tag policy warning 2",
+			},
+		}},
+	})
+	defer dashboardApi.Close()
+
+	ghApi := ghTestEndpoint()
+	defer ghApi.Close()
+
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
 		[]string{
 			"comment",
@@ -116,11 +165,16 @@ func TestCommentGitHubWithTagPolicyCheckMerge(t *testing.T) {
 			"--repo", "test/test",
 			"--commit", "5",
 			"--show-changed",
-			"--path", "./testdata/comment_git_hub_with_tag_policy_check_merge/infracost1.json",
-			"--path", "./testdata/comment_git_hub_with_tag_policy_check_merge/infracost2.json",
-			"--dry-run"},
-		nil,
+			"--path", "./testdata/changes.json",
+			"--github-api-url", ghApi.URL},
+		&GoldenFileOptions{
+			Env: map[string]string{
+				"INFRACOST_POLICY_V2_API_ENDPOINT": policyV2Api.URL,
+			},
+			CaptureLogs: true,
+		},
 		func(c *config.RunContext) {
+			c.Config.DashboardAPIEndpoint = dashboardApi.URL
 			t := true
 			c.Config.EnableCloudUpload = &t
 		},
@@ -293,10 +347,12 @@ func TestCommentGitHubDeleteAndNewSkipNoDiffWithInitialComment(t *testing.T) {
 }
 
 func TestCommentGitHubWithNoGuardrailt(t *testing.T) {
-	ts := guardrailTestEndpoint(guardrailAddRunResponse{
-		GuardrailsChecked: 0,
-		Comment:           false,
-		Events:            []guardrailEvent{},
+	ts := governanceTestEndpoint(governanceAddRunResponse{
+		GovernanceComment: "",
+		GovernanceResults: []GovernanceResult{{
+			Type:    "guardrail",
+			Checked: 0,
+		}},
 	})
 	defer ts.Close()
 
@@ -304,10 +360,12 @@ func TestCommentGitHubWithNoGuardrailt(t *testing.T) {
 }
 
 func TestCommentGitHubGuardrailSuccessWithoutComment(t *testing.T) {
-	ts := guardrailTestEndpoint(guardrailAddRunResponse{
-		GuardrailsChecked: 1,
-		Comment:           false,
-		Events:            []guardrailEvent{},
+	ts := governanceTestEndpoint(governanceAddRunResponse{
+		GovernanceComment: "",
+		GovernanceResults: []GovernanceResult{{
+			Type:    "guardrail",
+			Checked: 1,
+		}},
 	})
 	defer ts.Close()
 
@@ -315,10 +373,12 @@ func TestCommentGitHubGuardrailSuccessWithoutComment(t *testing.T) {
 }
 
 func TestCommentGitHubGuardrailSuccessWithComment(t *testing.T) {
-	ts := guardrailTestEndpoint(guardrailAddRunResponse{
-		GuardrailsChecked: 1,
-		Comment:           true,
-		Events:            []guardrailEvent{},
+	ts := governanceTestEndpoint(governanceAddRunResponse{
+		GovernanceComment: "<p><strong>✅ Guardrails passed</strong></p>",
+		GovernanceResults: []GovernanceResult{{
+			Type:    "guardrail",
+			Checked: 1,
+		}},
 	})
 	defer ts.Close()
 
@@ -326,13 +386,18 @@ func TestCommentGitHubGuardrailSuccessWithComment(t *testing.T) {
 }
 
 func TestCommentGitHubGuardrailFailureWithComment(t *testing.T) {
-	ts := guardrailTestEndpoint(guardrailAddRunResponse{
-		GuardrailsChecked: 1,
-		Comment:           true,
-		Events: []guardrailEvent{{
-			TriggerReason: "Stand by your estimate",
-			PrComment:     true,
-			BlockPr:       false,
+	ts := governanceTestEndpoint(governanceAddRunResponse{
+		GovernanceComment: `<details>
+<summary><strong>⚠️ Guardrails triggered</strong></summary>
+				
+> - <b>Warning</b>: Stand by your estimate
+</details>`,
+		GovernanceResults: []GovernanceResult{{
+			Type:    "guardrail",
+			Checked: 1,
+			Warnings: []string{
+				"Stand by your estimate",
+			},
 		}},
 	})
 	defer ts.Close()
@@ -341,13 +406,14 @@ func TestCommentGitHubGuardrailFailureWithComment(t *testing.T) {
 }
 
 func TestCommentGitHubGuardrailFailureWithBlock(t *testing.T) {
-	ts := guardrailTestEndpoint(guardrailAddRunResponse{
-		GuardrailsChecked: 1,
-		Comment:           false,
-		Events: []guardrailEvent{{
-			TriggerReason: "Stand by your estimate",
-			PrComment:     false,
-			BlockPr:       true,
+	ts := governanceTestEndpoint(governanceAddRunResponse{
+		GovernanceComment: "",
+		GovernanceResults: []GovernanceResult{{
+			Type:      "guardrail",
+			Failures:  []string{"Stand by your estimate"},
+			Unblocked: []string{"Unblocked ge"},
+			Checked:   1,
+			// Comment:           false,
 		}},
 	})
 	defer ts.Close()
@@ -356,13 +422,19 @@ func TestCommentGitHubGuardrailFailureWithBlock(t *testing.T) {
 }
 
 func TestCommentGitHubGuardrailFailureWithCommentAndBlock(t *testing.T) {
-	ts := guardrailTestEndpoint(guardrailAddRunResponse{
-		GuardrailsChecked: 1,
-		Comment:           true,
-		Events: []guardrailEvent{{
-			TriggerReason: "Stand by your estimate",
-			PrComment:     true,
-			BlockPr:       true,
+	ts := governanceTestEndpoint(governanceAddRunResponse{
+		GovernanceComment: `<details>
+<summary><strong>❌ Guardrails triggered (needs action)</strong></summary>
+This change is blocked, either reduce the costs or wait for an admin to review and unblock it.
+				
+> - <b>Blocked</b>: Stand by your estimate
+</details>`,
+		GovernanceResults: []GovernanceResult{{
+			Type:    "guardrail",
+			Checked: 1,
+			Failures: []string{
+				"Stand by your estimate",
+			},
 		}},
 	})
 	defer ts.Close()
@@ -371,13 +443,14 @@ func TestCommentGitHubGuardrailFailureWithCommentAndBlock(t *testing.T) {
 }
 
 func TestCommentGitHubGuardrailFailureWithoutCommentOrBlock(t *testing.T) {
-	ts := guardrailTestEndpoint(guardrailAddRunResponse{
-		GuardrailsChecked: 1,
-		Comment:           false,
-		Events: []guardrailEvent{{
-			TriggerReason: "Stand by your estimate",
-			PrComment:     false,
-			BlockPr:       false,
+	ts := governanceTestEndpoint(governanceAddRunResponse{
+		GovernanceComment: "",
+		GovernanceResults: []GovernanceResult{{
+			Type:    "guardrail",
+			Checked: 1,
+			Warnings: []string{
+				"Stand by your estimate",
+			},
 		}},
 	})
 	defer ts.Close()
@@ -410,25 +483,26 @@ func GuardrailGoldenFileTest(t *testing.T, testName, guardrailEndpointUrl string
 	)
 }
 
-type guardrailAddRunResponse struct {
-	GuardrailsChecked int64            `json:"guardrailsChecked"`
-	Comment           bool             `json:"guardrailComment"`
-	Events            []guardrailEvent `json:"guardrailEvents"`
+type governanceAddRunResponse struct {
+	GovernanceComment string             `json:"governanceComment"`
+	GovernanceResults []GovernanceResult `json:"governanceResults"`
 }
 
-type guardrailEvent struct {
-	TriggerReason string `json:"triggerReason"`
-	PrComment     bool   `json:"prComment"`
-	BlockPr       bool   `json:"blockPr"`
+type GovernanceResult struct {
+	Type      string   `json:"govType"`
+	Checked   int64    `json:"checked"`
+	Warnings  []string `json:"warnings"`
+	Failures  []string `json:"failures"`
+	Unblocked []string `json:"unblocked"`
 }
 
-func guardrailTestEndpoint(gr guardrailAddRunResponse) *httptest.Server {
+func governanceTestEndpoint(garr governanceAddRunResponse) *httptest.Server {
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		bodyBytes, _ := io.ReadAll(r.Body)
 		graphqlQuery := string(bodyBytes)
 
-		if strings.Contains(graphqlQuery, "mutation($run: RunInput!)") {
-			guardrailJson, _ := json.Marshal(gr)
+		if strings.Contains(graphqlQuery, "mutation AddRun($run: RunInput!, $commentFormat: CommentFormat!)") {
+			guardrailJson, _ := json.Marshal(garr)
 
 			fmt.Fprintf(w, `[{"data": {"addRun":
 				%v
@@ -436,10 +510,21 @@ func guardrailTestEndpoint(gr guardrailAddRunResponse) *httptest.Server {
 		} else {
 			for _, s := range strings.Split(string(bodyBytes), "details") {
 				if strings.Contains(s, "Guardrail") {
-					logging.Logger.Warn(s)
+					logging.Logger.Warn().Msg(s)
 				}
 			}
 			fmt.Fprintln(w, "")
 		}
+	}))
+}
+
+func ghTestEndpoint() *httptest.Server {
+	githubGraphQLresponses := []string{
+		// show zero comments in the response for findComments
+		ghZeroCommentsResponse, "{}", "{}",
+	}
+	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, githubGraphQLresponses[0])
+		githubGraphQLresponses = githubGraphQLresponses[1:]
 	}))
 }

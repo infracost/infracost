@@ -1,5 +1,6 @@
 provider "google" {
   credentials = "{\"type\":\"service_account\"}"
+  project     = "my-project"
   region      = "us-central1"
 }
 
@@ -297,6 +298,38 @@ resource "google_compute_instance" "custom_ext" {
 resource "google_compute_instance" "e2_custom" {
   name         = "e2_custom"
   machine_type = "e2-custom-2-15360"
+  zone         = "us-central1-a"
+
+  boot_disk {
+    initialize_params {
+      image = "centos-cloud/centos-7"
+    }
+  }
+
+  network_interface {
+    network = "default"
+  }
+}
+
+resource "google_compute_instance" "sud_20_perc_with_hours" {
+  name         = "n2_standard_8"
+  machine_type = "n2-standard-8"
+  zone         = "us-central1-a"
+
+  boot_disk {
+    initialize_params {
+      image = "centos-cloud/centos-7"
+    }
+  }
+
+  network_interface {
+    network = "default"
+  }
+}
+
+resource "google_compute_instance" "sud_30_perc_with_hours" {
+  name         = "m1_ultramem_80"
+  machine_type = "m1-ultramem-80"
   zone         = "us-central1-a"
 
   boot_disk {

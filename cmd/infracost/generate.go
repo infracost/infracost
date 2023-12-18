@@ -3,14 +3,16 @@ package main
 import (
 	"bytes"
 	"fmt"
-	"github.com/infracost/infracost/internal/config"
-	"gopkg.in/yaml.v2"
 	"io"
 	"os"
 
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v2"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/config/template"
+	"github.com/infracost/infracost/internal/hcl"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/infracost/infracost/internal/vcs"
 )
@@ -47,12 +49,6 @@ func newGenerateConfigCommand() *cobra.Command {
 }
 
 func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
-	if g.templatePath == "" && g.template == "" {
-		ui.PrintErrorf(cmd.ErrOrStderr(), "Please provide an Infracost config template.\n")
-		ui.PrintUsage(cmd)
-		return nil
-	}
-
 	if _, err := os.Stat(g.templatePath); g.templatePath != "" && err != nil {
 		ui.PrintErrorf(cmd.ErrOrStderr(), "Provided template file %q does not exist\n", g.templatePath)
 		ui.PrintUsage(cmd)
@@ -66,28 +62,58 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 
 	var buf bytes.Buffer
 
-	m, err := vcs.MetadataFetcher.Get(repoPath, nil)
-	if err != nil {
-		ui.PrintWarningf(cmd.ErrOrStderr(), "could not fetch git metadata err: %s, default template variables will be blank", err)
+	parsers, err := hcl.LoadParsers(
+		config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, nil),
+		repoPath,
+		nil,
+		&hcl.ProjectLocatorConfig{},
+		logging.Logger,
+	)
+	hasTemplate := g.template != "" || g.templatePath != ""
+
+	if err != nil && !hasTemplate {
+		return err
 	}
 
-	variables := template.Variables{
-		Branch: m.Branch.Name,
-	}
-	if m.PullRequest != nil {
-		variables.BaseBranch = m.PullRequest.BaseBranch
-	}
-
-	parser := template.NewParser(repoPath, variables)
-	if g.template != "" {
-		err := parser.Compile(g.template, &buf)
+	if hasTemplate {
+		m, err := vcs.MetadataFetcher.Get(repoPath, nil)
 		if err != nil {
-			return err
+			ui.PrintWarningf(cmd.ErrOrStderr(), "could not fetch git metadata err: %s, default template variables will be blank", err)
+		}
+
+		detectedProjects := make([]template.DetectedProject, len(parsers))
+		for i, p := range parsers {
+			detectedProjects[i] = template.DetectedProject{
+				Name:              p.ProjectName(),
+				Path:              p.RelativePath(),
+				TerraformVarFiles: p.TerraformVarFiles(),
+			}
+		}
+
+		variables := template.Variables{
+			Branch:           m.Branch.Name,
+			DetectedProjects: detectedProjects,
+		}
+		if m.PullRequest != nil {
+			variables.BaseBranch = m.PullRequest.BaseBranch
+		}
+
+		parser := template.NewParser(repoPath, variables)
+		if g.template != "" {
+			err := parser.Compile(g.template, &buf)
+			if err != nil {
+				return err
+			}
+		} else {
+			err := parser.CompileFromFile(g.templatePath, &buf)
+			if err != nil {
+				return err
+			}
 		}
 	} else {
-		err := parser.CompileFromFile(g.templatePath, &buf)
-		if err != nil {
-			return err
+		buf.WriteString("version: 0.1\n\nprojects:\n")
+		for _, p := range parsers {
+			buf.WriteString(p.YAML())
 		}
 	}
 

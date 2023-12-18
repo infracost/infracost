@@ -41,7 +41,9 @@
 | {{ truncateMiddle .Name 64 "..." }}{{- range .MetadataFields }} | {{ . }} {{- end }} | {{ formatCostChange .PastCost .Cost }} | {{ formatCost .Cost }} |
 {{- end }}
 
-## Infracost estimate: **{{ formatCostChangeSentence .Root.Currency .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost false }}**
+# Infracost report #
+
+## {{ formatCostChangeSentence .Root.Currency .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost false }} ##
 {{- if displayTable }}
 
 | **Project**{{- range metadataHeaders }} | **{{ . }}** {{- end }} | **Cost change** | **New monthly cost** |
@@ -61,7 +63,7 @@
 {{- end }}
 
 {{- if displayOutput  }}
-**Infracost output:**
+### Cost details ###
 
 ```
 {{ .DiffOutput }}
@@ -82,12 +84,14 @@
 ## ✅ Policies passed ##
   {{- end }}
 {{- end}}
+{{- if .MarkdownOptions.Additional }}
 
+{{ .MarkdownOptions.Additional }}
+{{- end }}
 {{- if .MarkdownOptions.WillUpdate }}
 
-This comment will be updated when the cost estimate changes.
+This comment will be updated when code changes.
 {{- end }}
 {{- if .MarkdownOptions.WillReplace }}
-
-This comment will be replaced when the cost estimate changes
+This comment will be replaced when code changes.
 {{- end }}

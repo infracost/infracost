@@ -1,13 +1,14 @@
 package config
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"path/filepath"
 	"sync"
 
 	"github.com/go-git/go-git/v5"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
@@ -20,7 +21,7 @@ type ProjectContexter interface {
 type ProjectContext struct {
 	RunContext    *RunContext
 	ProjectConfig *Project
-	logger        *logrus.Entry
+	logger        zerolog.Logger
 	ContextValues *ContextValues
 	mu            *sync.RWMutex
 
@@ -28,8 +29,21 @@ type ProjectContext struct {
 	CacheErr   string
 }
 
-func NewProjectContext(runCtx *RunContext, projectCfg *Project, fields logrus.Fields) *ProjectContext {
-	contextLogger := logging.Logger.WithFields(fields)
+func NewProjectContext(runCtx *RunContext, projectCfg *Project, logFields interface{}) *ProjectContext {
+	ctx := logging.Logger.With().
+		Str("project_name", projectCfg.Name).
+		Str("project_path", projectCfg.Path)
+
+	if logFields != nil {
+		switch v := logFields.(type) {
+		case context.Context:
+			ctx = ctx.Ctx(v)
+		default:
+			ctx = ctx.Fields(v)
+		}
+	}
+
+	contextLogger := ctx.Logger()
 
 	return &ProjectContext{
 		RunContext:    runCtx,
@@ -40,19 +54,8 @@ func NewProjectContext(runCtx *RunContext, projectCfg *Project, fields logrus.Fi
 	}
 }
 
-func (c *ProjectContext) Logger() *logrus.Entry {
-	if c.logger == nil {
-		return logging.Logger.WithFields(c.logFields())
-	}
-
-	return c.logger.WithFields(c.logFields())
-}
-
-func (c *ProjectContext) logFields() logrus.Fields {
-	return logrus.Fields{
-		"project_name": c.ProjectConfig.Name,
-		"project_path": c.ProjectConfig.Path,
-	}
+func (c *ProjectContext) Logger() zerolog.Logger {
+	return c.logger
 }
 
 func (c *ProjectContext) SetFrom(d ProjectContexter) {
@@ -80,19 +83,19 @@ func DetectProjectMetadata(path string) *schema.ProjectMetadata {
 func gitSubPath(path string) string {
 	topLevel, err := gitToplevel(path)
 	if err != nil {
-		logging.Logger.WithError(err).Debugf("Could not get git top level directory for %s", path)
+		logging.Logger.Debug().Err(err).Msgf("Could not get git top level directory for %s", path)
 		return ""
 	}
 
 	absPath, err := filepath.Abs(path)
 	if err != nil {
-		logging.Logger.WithError(err).Debugf("Could not get absolute path for %s", path)
+		logging.Logger.Debug().Err(err).Msgf("Could not get absolute path for %s", path)
 		return ""
 	}
 
 	subPath, err := filepath.Rel(topLevel, absPath)
 	if err != nil {
-		logging.Logger.WithError(err).Debugf("Could not get relative path for %s from %s", absPath, topLevel)
+		logging.Logger.Debug().Err(err).Msgf("Could not get relative path for %s from %s", absPath, topLevel)
 		return ""
 	}
 

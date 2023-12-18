@@ -1,10 +1,10 @@
 Comment posted to GitHub
 
 Logs:
-level=info msg="Finding matching comments for tag infracost-comment"
-level=info msg="Found 1 matching comment"
-level=info msg="Deleting 1 comment"
-level=info msg="Deleting comment "
-level=warning msg="SkipNoDiff option is not supported for new comments"
-level=info msg="Creating new comment"
-level=info msg="Created new comment: "
+INF Finding matching comments for tag infracost-comment
+INF Found 1 matching comment
+INF Deleting 1 comment
+INF Deleting comment 
+WRN SkipNoDiff option is not supported for new comments
+INF Creating new comment
+INF Created new comment: 

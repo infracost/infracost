@@ -2,9 +2,10 @@ package aws
 
 import (
 	"github.com/awslabs/goformation/v4/cloudformation/dynamodb"
+	"github.com/rs/zerolog/log"
+
 	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
-	log "github.com/sirupsen/logrus"
 )
 
 func GetDynamoDBTableRegistryItem() *schema.RegistryItem {
@@ -20,7 +21,7 @@ func GetDynamoDBTableRegistryItem() *schema.RegistryItem {
 func NewDynamoDBTable(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	cfr, ok := d.CFResource.(*dynamodb.Table)
 	if !ok {
-		log.Warnf("Skipping resource %s as it did not have the expected type (got %T)", d.Address, d.CFResource)
+		log.Warn().Msgf("Skipping resource %s as it did not have the expected type (got %T)", d.Address, d.CFResource)
 		return nil
 	}
 

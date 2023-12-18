@@ -40,6 +40,7 @@ type SearchDomain struct {
 	EBSVolumeType string
 	EBSVolumeSize *float64 // if this is nil it will default to 8
 	EBSIOPS       *float64 // if this is nil it will default to 1
+	EBSThroughput *float64 // if this is nil it will default to 0
 
 	ClusterDedicatedMasterEnabled bool
 	ClusterDedicatedMasterType    string
@@ -133,6 +134,34 @@ func (r *SearchDomain) BuildResource() *schema.Resource {
 				PurchaseOption: strPtr("on_demand"),
 			},
 		})
+
+		if strings.ToLower(ebsType) == "gp3" {
+			paidThroughput := decimal.NewFromInt(0)
+			if r.EBSThroughput != nil {
+				throughput := decimal.NewFromFloat(*r.EBSThroughput)
+				paidThroughput = r.calculateBillableThroughput(throughput, gbVal)
+				paidThroughput = paidThroughput.Mul(decimal.NewFromInt(instanceCount))
+			}
+
+			costComponents = append(costComponents, &schema.CostComponent{
+				Name:            fmt.Sprintf("Throughput (%s)", ebsType),
+				Unit:            "Mbps",
+				UnitMultiplier:  decimal.NewFromInt(1),
+				MonthlyQuantity: &paidThroughput,
+				ProductFilter: &schema.ProductFilter{
+					VendorName:    strPtr("aws"),
+					Region:        strPtr(r.Region),
+					Service:       strPtr("AmazonES"),
+					ProductFamily: strPtr("Amazon OpenSearch Service Volume"),
+					AttributeFilters: []*schema.AttributeFilter{
+						{Key: "storageMedia", Value: strPtr("GP3-ThroughPut-Storage")},
+					},
+				},
+				PriceFilter: &schema.PriceFilter{
+					PurchaseOption: strPtr("on_demand"),
+				},
+			})
+		}
 
 		if strings.ToLower(ebsType) == "io1" {
 			iopsVal := decimal.NewFromInt(1)
@@ -237,4 +266,28 @@ func (r *SearchDomain) BuildResource() *schema.Resource {
 func (r *SearchDomain) opensearchifyClusterInstanceType(instanceType string) *string {
 	s := strings.Replace(instanceType, ".elasticsearch", ".search", 1)
 	return &s
+}
+
+// calculateBillableThroughput calculates billable throughput
+// - 125 MiB/s free for volumes up to 170 GB
+// - +250 MiB/s free for every 3 TB for volumes above 170 GB (storage is rounded up).
+func (r *SearchDomain) calculateBillableThroughput(throughput decimal.Decimal, storage decimal.Decimal) decimal.Decimal {
+	if storage.LessThanOrEqual(decimal.NewFromInt(170)) {
+		if throughput.GreaterThan(decimal.NewFromInt(125)) {
+			return throughput.Sub(decimal.NewFromInt(125))
+		}
+
+		return decimal.Zero
+	}
+
+	maxThroughput := decimal.NewFromInt(1000)
+
+	incFactor := storage.Div(decimal.NewFromInt(3000)).RoundUp(0)
+	freeThroughput := decimal.Min(maxThroughput, incFactor.Mul(decimal.NewFromInt(250)))
+
+	if throughput.GreaterThan(freeThroughput) {
+		return throughput.Sub(freeThroughput)
+	}
+
+	return decimal.Zero
 }

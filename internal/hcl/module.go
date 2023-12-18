@@ -37,9 +37,13 @@ type Module struct {
 	HasChanges         bool
 	TerraformVarsPaths []string
 
-	// ModuleSuffix is a unique name that can be optionally appended to the Module's project name.
-	// This is only applicable to root modules.
+	// ModuleSuffix is a unique name that can be optionally appended to the Module's
+	// project name. This is only applicable to root modules.
 	ModuleSuffix string
+
+	// SourceURL is the discovered remote url for the module. This will only be
+	// filled if the module is a remote module.
+	SourceURL string
 }
 
 // Index returns the count index of the Module using the name.

@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 // StorageQueue struct represents Azure Queue Storage.
@@ -52,12 +53,12 @@ func (r *StorageQueue) PopulateUsage(u *schema.UsageData) {
 // See providers folder for more information.
 func (r *StorageQueue) BuildResource() *schema.Resource {
 	if !r.isAccountKindSupported() {
-		logging.Logger.Warnf("Skipping resource %s. Storage Queues don't support %s accounts", r.Address, r.AccountKind)
+		logging.Logger.Warn().Msgf("Skipping resource %s. Storage Queues don't support %s accounts", r.Address, r.AccountKind)
 		return nil
 	}
 
 	if !r.isReplicationTypeSupported() {
-		logging.Logger.Warnf("Skipping resource %s. Storage Queues don't support %s redundancy", r.Address, r.AccountReplicationType)
+		logging.Logger.Warn().Msgf("Skipping resource %s. Storage Queues don't support %s redundancy", r.Address, r.AccountReplicationType)
 		return nil
 	}
 

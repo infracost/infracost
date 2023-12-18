@@ -4,11 +4,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 
+	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/config"
-	"github.com/infracost/infracost/internal/prices"
-	"github.com/infracost/infracost/internal/scan"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
 )
@@ -17,21 +17,25 @@ type PlanJSONProvider struct {
 	ctx                  *config.ProjectContext
 	Path                 string
 	includePastResources bool
-	scanner              *scan.TerraformPlanScanner
-	logger               *logrus.Entry
+	policyClient         *apiclient.PolicyAPIClient
+	logger               zerolog.Logger
 }
 
 func NewPlanJSONProvider(ctx *config.ProjectContext, includePastResources bool) *PlanJSONProvider {
-	var scanner *scan.TerraformPlanScanner
-	if ctx.RunContext.Config.PolicyAPIEndpoint != "" {
-		scanner = scan.NewTerraformPlanScanner(ctx.RunContext, ctx.Logger(), prices.GetPricesConcurrent)
+	var policyClient *apiclient.PolicyAPIClient
+	var err error
+	if ctx.RunContext.Config.PoliciesEnabled {
+		policyClient, err = apiclient.NewPolicyAPIClient(ctx.RunContext)
+		if err != nil {
+			logging.Logger.Debug().Err(err).Msgf("failed to initialize policy client")
+		}
 	}
 
 	return &PlanJSONProvider{
 		ctx:                  ctx,
 		Path:                 ctx.ProjectConfig.Path,
 		includePastResources: includePastResources,
-		scanner:              scanner,
+		policyClient:         policyClient,
 		logger:               ctx.Logger(),
 	}
 }
@@ -85,20 +89,21 @@ func (p *PlanJSONProvider) LoadResourcesFromSrc(usage schema.UsageMap, j []byte,
 	project := schema.NewProject(name, metadata)
 	parser := NewParser(p.ctx, p.includePastResources)
 
-	partialPastResources, partialResources, providerMetadatas, err := parser.parseJSON(j, usage)
+	parsedConf, err := parser.parseJSON(j, usage)
 	if err != nil {
 		return project, fmt.Errorf("Error parsing Terraform plan JSON file %w", err)
 	}
 
-	project.AddProviderMetadata(providerMetadatas)
+	project.AddProviderMetadata(parsedConf.ProviderMetadata)
 
-	project.PartialPastResources = partialPastResources
-	project.PartialResources = partialResources
+	project.PartialPastResources = parsedConf.PastResources
+	project.PartialResources = parsedConf.CurrentResources
 
-	if p.scanner != nil {
-		err := p.scanner.ScanPlan(project)
+	// use TagPolicyAPIEndpoint for Policy2 instead of creating a new config variable
+	if p.policyClient != nil {
+		err := p.policyClient.UploadPolicyData(project)
 		if err != nil {
-			p.logger.WithError(err).Debugf("Terraform project %s plan JSON scan failed", project.Name)
+			p.logger.Err(err).Msgf("Terraform project %s failed to upload policy data", project.Name)
 		}
 	}
 

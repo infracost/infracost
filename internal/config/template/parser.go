@@ -19,10 +19,17 @@ var (
 	defaultInfracostTmplName = "infracost.yml.tmpl"
 )
 
+type DetectedProject struct {
+	Name              string
+	Path              string
+	TerraformVarFiles []string
+}
+
 // Variables hold the global variables that are passed into any template that the Parser evaluates.
 type Variables struct {
-	Branch     string
-	BaseBranch string
+	Branch           string
+	BaseBranch       string
+	DetectedProjects []DetectedProject
 }
 
 // Parser is the representation of an initialized Infracost template parser.

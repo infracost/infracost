@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	log "github.com/sirupsen/logrus"
 
 	"github.com/spf13/cobra"
 
@@ -45,19 +44,26 @@ See https://infracost.io/docs/features/cli_commands/#upload-runs`,
 				return fmt.Errorf("could not load input file %s err: %w", path, err)
 			}
 
-			if ctx.Config.TagPolicyAPIEndpoint != "" {
-				tagPolicyClient := apiclient.NewTagPolicyAPIClient(ctx)
-				tagPolicies, err := tagPolicyClient.CheckTagPolicies(ctx, root)
+			if ctx.Config.PolicyV2APIEndpoint != "" {
+				policyClient, err := apiclient.NewPolicyAPIClient(ctx)
 				if err != nil {
-					log.WithError(err).Error("Failed to check tag policies")
-				}
+					logging.Logger.Err(err).Msg("Failed to initialize policies client")
+				} else {
+					// If there is a PR ID, only check policies on modified resources (onlyDiff = true). It there
+					// isn't a PR ID it must be a base branch run so all resources are checked.
+					onlyDiff := root.Metadata.VCSPullRequestID != ""
+					policies, err := policyClient.CheckPolicies(ctx, root, onlyDiff)
+					if err != nil {
+						logging.Logger.Err(err).Msg("Failed to check policies")
+					}
 
-				root.TagPolicies = tagPolicies
+					root.TagPolicies = policies.TagPolicies
+					root.FinOpsPolicies = policies.FinOpsPolicies
+				}
 			}
-			tagPolicyCheck := output.NewTagPolicyChecks(root.TagPolicies)
 
 			dashboardClient := apiclient.NewDashboardAPIClient(ctx)
-			result, err := dashboardClient.AddRun(ctx, root)
+			result, err := dashboardClient.AddRun(ctx, root, apiclient.CommentFormatMarkdownHTML)
 			if err != nil {
 				return fmt.Errorf("failed to upload to Infracost Cloud: %w", err)
 			}
@@ -68,18 +74,14 @@ See https://infracost.io/docs/features/cli_commands/#upload-runs`,
 				cmd.Println("Share this cost estimate: ", ui.LinkString(root.ShareURL))
 			}
 
-			pricingClient := apiclient.NewPricingAPIClient(ctx)
+			pricingClient := apiclient.GetPricingAPIClient(ctx)
 			err = pricingClient.AddEvent("infracost-upload", ctx.EventEnv())
 			if err != nil {
-				logging.Logger.WithError(err).Warn("could not report `infracost-upload` event")
+				logging.Logger.Warn().Err(err).Msg("could not report `infracost-upload` event")
 			}
 
-			if len(result.GuardrailCheck.BlockingFailures()) > 0 {
-				return result.GuardrailCheck.BlockingFailures()
-			}
-
-			if len(tagPolicyCheck.FailingTagPolicies) > 0 {
-				return tagPolicyCheck
+			if len(result.GovernanceFailures) > 0 {
+				return result.GovernanceFailures
 			}
 
 			return nil

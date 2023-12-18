@@ -13,7 +13,7 @@ import (
 
 	"github.com/Masterminds/sprig"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 )
 
 func ToHTML(out Root, opts Options) ([]byte, error) {
@@ -38,7 +38,7 @@ func ToHTML(out Root, opts Options) ([]byte, error) {
 				return true
 			}
 
-			log.Info(fmt.Sprintf("Hiding resource with no usage: %s", resourceName))
+			log.Info().Msgf("Hiding resource with no usage: %s", resourceName)
 			return false
 		},
 		"filterZeroValComponents": filterZeroValComponents,
@@ -64,11 +64,14 @@ func ToHTML(out Root, opts Options) ([]byte, error) {
 
 	summaryMessage := out.summaryMessage(opts.ShowSkipped)
 
+	msg, exceeded := out.Projects.IsRunQuotaExceeded()
 	err = tmpl.Execute(bufw, struct {
-		Root           Root
-		SummaryMessage string
-		Options        Options
-	}{out, summaryMessage, opts})
+		Root             Root
+		SummaryMessage   string
+		Options          Options
+		RunQuotaExceeded bool
+		RunQuotaMsg      string
+	}{out, summaryMessage, opts, exceeded, msg})
 	if err != nil {
 		return []byte{}, err
 	}

@@ -6,7 +6,7 @@ import (
 	"net/http"
 
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 
 	"github.com/infracost/infracost/internal/credentials"
 )
@@ -15,7 +15,7 @@ func cloudAPI(host string, path string, token string) ([]byte, error) {
 	client := &http.Client{}
 
 	url := fmt.Sprintf("https://%s%s", host, path)
-	log.Debugf("Calling Terraform Cloud API: %s", url)
+	log.Debug().Msgf("Calling Terraform Cloud API: %s", url)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return []byte{}, err

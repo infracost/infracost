@@ -77,24 +77,13 @@ func commentGitLabCmd(ctx *config.RunContext) *cobra.Command {
 
 			paths, _ := cmd.Flags().GetStringArray("path")
 
-			commentOut, err := buildCommentOutput(cmd, ctx, paths, output.MarkdownOptions{
+			commentOut, commentErr := buildCommentOutput(cmd, ctx, paths, output.MarkdownOptions{
 				WillUpdate:          mrNumber != 0 && behavior == "update",
 				WillReplace:         mrNumber != 0 && behavior == "delete-and-new",
 				IncludeFeedbackLink: !ctx.Config.IsSelfHosted(),
 			})
-			var policyFailure output.PolicyCheckFailures
-			var guardrailFailure output.GuardrailFailures
-			var tagPolicyFailure *output.TagPolicyCheck
-			if err != nil {
-				if v, ok := err.(output.PolicyCheckFailures); ok {
-					policyFailure = v
-				} else if v, ok := err.(output.GuardrailFailures); ok {
-					guardrailFailure = v
-				} else if v, ok := err.(output.TagPolicyCheck); ok {
-					tagPolicyFailure = &v
-				} else {
-					return err
-				}
+			if isErrorUnhandled(commentErr) {
+				return commentErr
 			}
 
 			dryRun, _ := cmd.Flags().GetBool("dry-run")
@@ -109,10 +98,10 @@ func commentGitLabCmd(ctx *config.RunContext) *cobra.Command {
 					return err
 				}
 
-				pricingClient := apiclient.NewPricingAPIClient(ctx)
+				pricingClient := apiclient.GetPricingAPIClient(ctx)
 				err = pricingClient.AddEvent("infracost-comment", ctx.EventEnv())
 				if err != nil {
-					logging.Logger.WithError(err).Error("could not report infracost-comment event")
+					logging.Logger.Err(err).Msg("could not report infracost-comment event")
 				}
 
 				if res.Posted {
@@ -129,17 +118,7 @@ func commentGitLabCmd(ctx *config.RunContext) *cobra.Command {
 				cmd.Println("Comment not posted to GitLab (--dry-run was specified)")
 			}
 
-			if policyFailure != nil {
-				return policyFailure
-			}
-			if guardrailFailure != nil {
-				return guardrailFailure
-			}
-			if tagPolicyFailure != nil {
-				return tagPolicyFailure
-			}
-
-			return nil
+			return commentErr
 		},
 	}
 

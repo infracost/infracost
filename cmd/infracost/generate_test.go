@@ -38,3 +38,33 @@ func TestGenerateConfigWarning(t *testing.T) {
 		},
 		nil)
 }
+
+func TestGenerateConfigDetectedProjects(t *testing.T) {
+	dir := testutil.CalcGoldenFileTestdataDirName()
+	GoldenFileCommandTest(
+		t,
+		dir,
+		[]string{
+			"generate",
+			"config",
+			"--template-path",
+			path.Join("./testdata", dir, "infracost.yml.tmpl"),
+			"--repo-path",
+			path.Join("./testdata", dir),
+		},
+		nil)
+}
+
+func TestGenerateConfigAutoDetect(t *testing.T) {
+	dir := testutil.CalcGoldenFileTestdataDirName()
+	GoldenFileCommandTest(
+		t,
+		dir,
+		[]string{
+			"generate",
+			"config",
+			"--repo-path",
+			path.Join("./testdata", dir),
+		},
+		nil)
+}

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 
 	"github.com/infracost/infracost/internal/apiclient"
@@ -146,7 +146,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 				if ctx.Config.IsSelfHosted() {
 					ui.PrintWarning(cmd.ErrOrStderr(), "Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
 				} else {
-					result := shareCombinedRun(ctx, combined, inputs)
+					result := shareCombinedRun(ctx, combined, inputs, apiclient.CommentFormatMarkdownHTML)
 					combined.RunID, combined.ShareURL, combined.CloudURL = result.RunID, result.ShareURL, result.CloudURL
 				}
 			}
@@ -156,10 +156,10 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 				return err
 			}
 
-			pricingClient := apiclient.NewPricingAPIClient(ctx)
+			pricingClient := apiclient.GetPricingAPIClient(ctx)
 			err = pricingClient.AddEvent("infracost-output", ctx.EventEnv())
 			if err != nil {
-				log.Errorf("Error reporting event: %s", err)
+				log.Error().Msgf("Error reporting event: %s", err)
 			}
 
 			if outFile, _ := cmd.Flags().GetString("out-file"); outFile != "" {
@@ -193,7 +193,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 	return cmd
 }
 
-func shareCombinedRun(ctx *config.RunContext, combined output.Root, inputs []output.ReportInput) apiclient.AddRunResponse {
+func shareCombinedRun(ctx *config.RunContext, combined output.Root, inputs []output.ReportInput, commentFormat apiclient.CommentFormat) apiclient.AddRunResponse {
 	combinedRunIds := []string{}
 	for _, input := range inputs {
 		if id := input.Root.RunID; id != "" {
@@ -203,9 +203,9 @@ func shareCombinedRun(ctx *config.RunContext, combined output.Root, inputs []out
 	ctx.ContextValues.SetValue("runIds", combinedRunIds)
 
 	dashboardClient := apiclient.NewDashboardAPIClient(ctx)
-	result, err := dashboardClient.AddRun(ctx, combined)
+	result, err := dashboardClient.AddRun(ctx, combined, commentFormat)
 	if err != nil {
-		log.WithError(err).Error("Failed to upload to Infracost Cloud")
+		log.Err(err).Msg("Failed to upload to Infracost Cloud")
 	}
 
 	return result

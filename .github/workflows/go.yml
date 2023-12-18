@@ -14,18 +14,18 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Set up Go 1.x
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
-          go-version: 1.19
+          go-version: 1.21
 
       - name: Check Terraform format
         run: make tf_fmt_check
 
       - name: Run golangci-lint
-        uses: golangci/golangci-lint-action@v3.4.0
+        uses: golangci/golangci-lint-action@v3.7.0
         with:
-          # Required: the version of golangci-lint is required and must be specified without patch version: they always use the latest patch version.
-          version: v1.51.2
+          version: latest
+          skip-pkg-cache: true
           args: --timeout 5m
 
       - name: Install Terragrunt v0.31.8
@@ -40,6 +40,18 @@ jobs:
           INFRACOST_API_KEY: "00000000000000000000000000000000"
           INFRACOST_LOG_LEVEL: info
           INFRACOST_TERRAFORM_CLOUD_TOKEN: ${{ secrets.TERRAFORM_CLOUD_TOKEN }}
+
+      - name: Parser benchmarks
+        run: make parser_benchmarks
+
+      - name: Upload benchmark artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: benchmarks
+          path: |
+            mem.out
+            cpu.out
+            trace.out
 
       - name: Test example works ok from CLI
         run: |
@@ -66,9 +78,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Set up Go 1.x
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
-          go-version: 1.19
+          go-version: 1.21
 
       - name: Test (AWS)
         run: make test_aws
@@ -83,9 +95,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Set up Go 1.x
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
-          go-version: 1.19
+          go-version: 1.21
 
       - name: Test (Google)
         run: make test_google
@@ -100,9 +112,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Set up Go 1.x
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
-          go-version: 1.19
+          go-version: 1.21
 
       - name: Test (Azure)
         run: make test_azure

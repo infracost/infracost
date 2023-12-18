@@ -91,7 +91,7 @@ func (p *Parser) createPartialResource(d *schema.ResourceData, u *schema.UsageDa
 	}
 }
 
-func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.PartialResource, usage schema.UsageMap, parsed, providerConf, conf, vars gjson.Result) []*schema.PartialResource {
+func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.PartialResource, usage schema.UsageMap, confLoader *ConfLoader, parsed, providerConf, vars gjson.Result) []*schema.PartialResource {
 	var resources []*schema.PartialResource
 	resources = append(resources, baseResources...)
 	var vals gjson.Result
@@ -108,10 +108,10 @@ func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.Par
 		}
 	}
 
-	resData := p.parseResourceData(isState, providerConf, vals, conf, vars)
+	resData := p.parseResourceData(isState, confLoader, providerConf, vals, vars)
 
-	p.parseReferences(resData, conf)
-	p.parseTags(resData, providerConf, conf)
+	p.parseReferences(resData, confLoader)
+	p.parseTags(resData, confLoader, providerConf)
 
 	p.stripDataResources(resData)
 	p.populateUsageData(resData, usage)
@@ -133,13 +133,24 @@ func (p *Parser) populateUsageData(resData map[string]*schema.ResourceData, usag
 	}
 }
 
-func (p *Parser) parseJSON(j []byte, usage schema.UsageMap) ([]*schema.PartialResource, []*schema.PartialResource, []schema.ProviderMetadata, error) {
+type ParsedPlanConfiguration struct {
+	PastResources     []*schema.PartialResource
+	CurrentResources  []*schema.PartialResource
+	ProviderMetadata  []schema.ProviderMetadata
+	RemoteModuleCalls []string
+}
+
+func (p *Parser) parseJSON(j []byte, usage schema.UsageMap) (*ParsedPlanConfiguration, error) {
 	baseResources := p.loadUsageFileResources(usage)
 
 	j, _ = StripSetupTerraformWrapper(j)
 
 	if !gjson.ValidBytes(j) {
-		return baseResources, baseResources, nil, errors.New("invalid JSON")
+		return &ParsedPlanConfiguration{
+			PastResources:    baseResources,
+			CurrentResources: baseResources,
+			ProviderMetadata: nil,
+		}, errors.New("invalid JSON")
 	}
 
 	parsed := gjson.ParseBytes(j)
@@ -150,27 +161,79 @@ func (p *Parser) parseJSON(j []byte, usage schema.UsageMap) ([]*schema.PartialRe
 	vars := parsed.Get("variables")
 
 	providerMetadata := parseProviderConfig(providerConf)
-
-	resources := p.parseJSONResources(false, baseResources, usage, parsed, providerConf, conf, vars)
+	confLoader := NewConfLoader(conf)
+	calledRemoteModules := collectModulesSourceUrls(conf.Get("module_calls.*").Array())
+	resources := p.parseJSONResources(false, baseResources, usage, confLoader, parsed, providerConf, vars)
 	if !p.includePastResources {
-		return nil, resources, providerMetadata, nil
+		return &ParsedPlanConfiguration{
+			PastResources:     nil,
+			CurrentResources:  resources,
+			ProviderMetadata:  providerMetadata,
+			RemoteModuleCalls: calledRemoteModules,
+		}, nil
 	}
 
 	if !parsed.Get("prior_state").Exists() {
-		return nil, resources, providerMetadata, nil
+		return &ParsedPlanConfiguration{
+			PastResources:     nil,
+			CurrentResources:  resources,
+			ProviderMetadata:  providerMetadata,
+			RemoteModuleCalls: calledRemoteModules,
+		}, nil
 	}
 
 	// Check if the prior state is the same as the planned state
 	// and if so we can just return pointers to the same resources
 	if gjsonEqual(parsed.Get("prior_state.values.root_module"), parsed.Get("planned_values.root_module")) {
-		return resources, resources, providerMetadata, nil
+		return &ParsedPlanConfiguration{
+			PastResources:     resources,
+			CurrentResources:  resources,
+			ProviderMetadata:  providerMetadata,
+			RemoteModuleCalls: calledRemoteModules,
+		}, nil
 	}
 
-	pastResources := p.parseJSONResources(true, baseResources, usage, parsed, providerConf, conf, vars)
+	pastResources := p.parseJSONResources(true, baseResources, usage, confLoader, parsed, providerConf, vars)
 	resourceChanges := parsed.Get("resource_changes").Array()
 	pastResources = stripNonTargetResources(pastResources, resources, resourceChanges)
 
-	return pastResources, resources, providerMetadata, nil
+	return &ParsedPlanConfiguration{
+		PastResources:     pastResources,
+		CurrentResources:  resources,
+		ProviderMetadata:  providerMetadata,
+		RemoteModuleCalls: calledRemoteModules,
+	}, nil
+}
+
+func collectModulesSourceUrls(moduleCalls []gjson.Result) []string {
+	remoteUrls := map[string]bool{}
+
+	for _, call := range moduleCalls {
+		source := call.Get("sourceUrl").String()
+		if ok := remoteUrls[source]; !ok && source != "" {
+			remoteUrls[source] = true
+		}
+
+		if call.Get("module.module_calls").Exists() {
+			for _, source := range collectModulesSourceUrls(call.Get("module.module_calls.*").Array()) {
+				if ok := remoteUrls[source]; !ok {
+					remoteUrls[source] = true
+				}
+			}
+		}
+
+	}
+
+	if len(remoteUrls) == 0 {
+		return nil
+	}
+
+	var urls []string
+	for source := range remoteUrls {
+		urls = append(urls, source)
+	}
+
+	return urls
 }
 
 func parseProviderConfig(providerConf gjson.Result) []schema.ProviderMetadata {
@@ -266,7 +329,7 @@ func stripNonTargetResources(pastResources []*schema.PartialResource, resources 
 	return filteredResources
 }
 
-func (p *Parser) parseResourceData(isState bool, providerConf, planVals gjson.Result, conf gjson.Result, vars gjson.Result) map[string]*schema.ResourceData {
+func (p *Parser) parseResourceData(isState bool, confLoader *ConfLoader, providerConf, planVals, vars gjson.Result) map[string]*schema.ResourceData {
 	resources := make(map[string]*schema.ResourceData)
 
 	for _, r := range planVals.Get("resources").Array() {
@@ -293,7 +356,7 @@ func (p *Parser) parseResourceData(isState bool, providerConf, planVals gjson.Re
 
 		v := r.Get("values")
 
-		resConf := getConfJSON(conf, addr)
+		resConf := confLoader.GetResourceConfJSON(addr)
 
 		// Override the region when requested
 		region := overrideRegion(addr, t, p.ctx.RunContext.Config)
@@ -317,7 +380,7 @@ func (p *Parser) parseResourceData(isState bool, providerConf, planVals gjson.Re
 
 	// Recursively add any resources for child modules
 	for _, m := range planVals.Get("child_modules").Array() {
-		for addr, d := range p.parseResourceData(isState, providerConf, m, conf, vars) {
+		for addr, d := range p.parseResourceData(isState, confLoader, providerConf, m, vars) {
 			resources[addr] = d
 		}
 	}
@@ -336,7 +399,7 @@ func getSpecialContext(d *schema.ResourceData) map[string]interface{} {
 	case "google":
 		return google.GetSpecialContext(d)
 	default:
-		logging.Logger.Debugf("Unsupported provider %s", providerPrefix)
+		logging.Logger.Debug().Msgf("Unsupported provider %s", providerPrefix)
 		return map[string]interface{}{}
 	}
 }
@@ -371,11 +434,11 @@ func overrideRegion(addr string, resourceType string, config *config.Config) str
 	case "google":
 		region = config.GoogleOverrideRegion
 	default:
-		logging.Logger.Debugf("Unsupported provider %s", providerPrefix)
+		logging.Logger.Debug().Msgf("Unsupported provider %s", providerPrefix)
 	}
 
 	if region != "" {
-		logging.Logger.Debugf("Overriding region (%s) for %s", region, addr)
+		logging.Logger.Debug().Msgf("Overriding region (%s) for %s", region, addr)
 	}
 
 	return region
@@ -392,7 +455,7 @@ func resourceRegion(resourceType string, v gjson.Result) string {
 	case "google":
 		return google.GetResourceRegion(resourceType, v)
 	default:
-		logging.Logger.Debugf("Unsupported provider %s", providerPrefix)
+		logging.Logger.Debug().Msgf("Unsupported provider %s", providerPrefix)
 		return ""
 	}
 }
@@ -427,7 +490,7 @@ func providerRegion(addr string, providerConf gjson.Result, vars gjson.Result, r
 			// Don't show this log for azurerm users since they have a different method of looking up the region.
 			// A lot of Azure resources get their region from their referenced azurerm_resource_group resource
 			if region != "" && providerPrefix != "azurerm" {
-				logging.Logger.Debugf("Falling back to default region (%s) for %s", region, addr)
+				logging.Logger.Debug().Msgf("Falling back to default region (%s) for %s", region, addr)
 			}
 		}
 	}
@@ -485,7 +548,7 @@ func (p *Parser) stripDataResources(resData map[string]*schema.ResourceData) {
 	}
 }
 
-func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf gjson.Result) {
+func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, confLoader *ConfLoader) {
 	registryMap := GetResourceRegistryMap()
 
 	// Create a map of id -> resource data so we can lookup references
@@ -515,7 +578,7 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf g
 
 	}
 
-	parseKnownModuleRefs(resData, conf)
+	parseKnownModuleRefs(resData, confLoader)
 
 	for _, d := range resData {
 		var refAttrs []string
@@ -527,7 +590,7 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf g
 		}
 
 		for _, attr := range refAttrs {
-			found := p.parseConfReferences(resData, conf, d, attr, registryMap)
+			found := p.parseConfReferences(resData, confLoader, d, attr, registryMap)
 
 			if found {
 				continue
@@ -553,9 +616,9 @@ func (p *Parser) parseReferences(resData map[string]*schema.ResourceData, conf g
 	}
 }
 
-func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, conf gjson.Result, d *schema.ResourceData, attr string, registryMap *ResourceRegistryMap) bool {
+func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, confLoader *ConfLoader, d *schema.ResourceData, attr string, registryMap *ResourceRegistryMap) bool {
 	// Check if there's a reference in the conf
-	resConf := getConfJSON(conf, d.Address)
+	resConf := confLoader.GetResourceConfJSON(d.Address)
 	exps := resConf.Get("expressions").Get(attr)
 	lookupStr := "references"
 	if exps.IsArray() {
@@ -599,14 +662,14 @@ func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, co
 				refData, ok = resData[a]
 
 				if ok {
-					logging.Logger.Debugf("reference specifies a count: using resource %s for %s.%s", a, d.Address, attr)
+					logging.Logger.Debug().Msgf("reference specifies a count: using resource %s for %s.%s", a, d.Address, attr)
 				}
 			} else if containsString(refs, "each.key") {
 				a := fmt.Sprintf("%s[\"%s\"]", refAddr, addressKey(d.Address))
 				refData, ok = resData[a]
 
 				if ok {
-					logging.Logger.Debugf("reference specifies a key: using resource %s for %s.%s", a, d.Address, attr)
+					logging.Logger.Debug().Msgf("reference specifies a key: using resource %s for %s.%s", a, d.Address, attr)
 				}
 			}
 		}
@@ -617,7 +680,7 @@ func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, co
 			refData, ok = resData[a]
 
 			if ok {
-				logging.Logger.Debugf("reference does not specify a count: using resource %s for for %s.%s", a, d.Address, attr)
+				logging.Logger.Debug().Msgf("reference does not specify a count: using resource %s for for %s.%s", a, d.Address, attr)
 			}
 		}
 
@@ -631,13 +694,13 @@ func (p *Parser) parseConfReferences(resData map[string]*schema.ResourceData, co
 	return found
 }
 
-func (p *Parser) parseTags(data map[string]*schema.ResourceData, providerConf gjson.Result, conf gjson.Result) {
+func (p *Parser) parseTags(data map[string]*schema.ResourceData, confLoader *ConfLoader, providerConf gjson.Result) {
 	for _, resourceData := range data {
 		providerPrefix := getProviderPrefix(resourceData.Type)
 		var tags *map[string]string
 		switch providerPrefix {
 		case "aws":
-			resConf := getConfJSON(conf, resourceData.Address)
+			resConf := confLoader.GetResourceConfJSON(resourceData.Address)
 			defaultTags := parseDefaultTags(providerConf, resConf)
 
 			tags = aws.ParseTags(defaultTags, resourceData)
@@ -646,36 +709,11 @@ func (p *Parser) parseTags(data map[string]*schema.ResourceData, providerConf gj
 		case "google":
 			tags = google.ParseTags(resourceData)
 		default:
-			logging.Logger.Debugf("Unsupported provider %s", providerPrefix)
+			logging.Logger.Debug().Msgf("Unsupported provider %s", providerPrefix)
 		}
 
 		resourceData.Tags = tags
 	}
-}
-
-func getConfJSON(conf gjson.Result, addr string) gjson.Result {
-	modNames := getModuleNames(addr)
-	c := getModuleConfJSON(conf, modNames)
-
-	if len(modNames) > 0 {
-		c = c.Get("module")
-	}
-
-	return c.Get(fmt.Sprintf(`resources.#(address="%s")`, removeAddressArrayPart(addressResourcePart(addr))))
-}
-
-func getModuleConfJSON(conf gjson.Result, names []string) gjson.Result {
-	if len(names) == 0 {
-		return conf
-	}
-
-	// Build up the gjson search key
-	p := make([]string, 0, len(names))
-	for _, n := range names {
-		p = append(p, fmt.Sprintf("module_calls.%s", n))
-	}
-
-	return conf.Get(strings.Join(p, ".module."))
 }
 
 func isInfracostResource(res *schema.ResourceData) bool {
@@ -807,7 +845,7 @@ func gjsonEscape(s string) string {
 // Parses known modules to create references for specific resources in that module
 // This is useful if the module uses a `dynamic` block which means the references aren't defined in the plan JSON
 // See https://github.com/hashicorp/terraform/issues/28346 for more info
-func parseKnownModuleRefs(resData map[string]*schema.ResourceData, conf gjson.Result) {
+func parseKnownModuleRefs(resData map[string]*schema.ResourceData, confLoader *ConfLoader) {
 	knownRefs := []struct {
 		SourceAddrSuffix string
 		DestAddrSuffix   string
@@ -835,9 +873,10 @@ func parseKnownModuleRefs(resData map[string]*schema.ResourceData, conf gjson.Re
 	}
 
 	for _, d := range resData {
+		modNames := getModuleNames(d.Address)
+		modSource := confLoader.GetModuleConfJSON(modNames).Get("source").String()
+
 		for _, knownRef := range knownRefs {
-			modNames := getModuleNames(d.Address)
-			modSource := getModuleConfJSON(conf, modNames).Get("source").String()
 			matches := strings.HasSuffix(removeAddressArrayPart(d.Address), knownRef.SourceAddrSuffix) && modSource == knownRef.ModuleSource
 
 			if matches {
@@ -860,16 +899,71 @@ func gjsonEqual(a, b gjson.Result) bool {
 	var aOut bytes.Buffer
 	err = stdJson.Compact(&aOut, []byte(a.Raw))
 	if err != nil {
-		logging.Logger.Debugf("error indenting JSON: %s", err)
+		logging.Logger.Debug().Msgf("error indenting JSON: %s", err)
 		return false
 	}
 
 	var bOut bytes.Buffer
 	err = stdJson.Compact(&bOut, []byte(b.Raw))
 	if err != nil {
-		logging.Logger.Debugf("error indenting JSON: %s", err)
+		logging.Logger.Debug().Msgf("error indenting JSON: %s", err)
 		return false
 	}
 
 	return aOut.String() == bOut.String()
+}
+
+type ConfLoader struct {
+	conf          gjson.Result
+	moduleCache   map[string]gjson.Result
+	resourceCache map[string]gjson.Result
+}
+
+func NewConfLoader(conf gjson.Result) *ConfLoader {
+	return &ConfLoader{
+		conf:          conf,
+		moduleCache:   make(map[string]gjson.Result),
+		resourceCache: make(map[string]gjson.Result),
+	}
+}
+
+func (l *ConfLoader) GetModuleConfJSON(names []string) gjson.Result {
+	if len(names) == 0 {
+		return l.conf
+	}
+
+	// Build up the gjson search key
+	p := make([]string, 0, len(names))
+	for _, n := range names {
+		p = append(p, fmt.Sprintf("module_calls.%s", n))
+	}
+
+	key := strings.Join(p, ".module.")
+	if c, ok := l.moduleCache[key]; ok {
+		return c
+	}
+
+	c := l.conf.Get(key)
+	l.moduleCache[key] = c
+
+	return c
+}
+
+func (l *ConfLoader) GetResourceConfJSON(addr string) gjson.Result {
+	modNames := getModuleNames(addr)
+	moduleConf := l.GetModuleConfJSON(modNames)
+
+	if len(modNames) > 0 {
+		moduleConf = moduleConf.Get("module")
+	}
+
+	key := fmt.Sprintf(`resources.#(address="%s")`, removeAddressArrayPart(addressResourcePart(addr)))
+	if c, ok := l.resourceCache[key]; ok {
+		return c
+	}
+
+	c := moduleConf.Get(key)
+	l.resourceCache[key] = c
+
+	return c
 }

@@ -1,0 +1,130 @@
+policyResourceAllowList:
+[
+  {
+    "query": "\n\t\tquery GetPolicyResourceAllowList{\n\t\t\tpolicyResourceAllowList {\n\t\t\t\tresourceType\n                allowed\n\t\t\t}\n\t\t}\n\t",
+    "variables": {}
+  }
+]
+
+storePolicyResources:
+[
+  {
+    "query": "\n\tmutation($policyResources: [PolicyResourceInput!]!) {\n\t\tstorePolicyResources(policyResources: $policyResources) {\n\t\t\tsha\n\t\t}\n\t}\n\t",
+    "variables": {
+      "policyResources": [
+        {
+          "resourceType": "aws_instance",
+          "providerName": "",
+          "address": "aws_instance.web_app",
+          "tags": [
+            {
+              "key": "DefaultNotOverride",
+              "value": "defaultnotoverride"
+            },
+            {
+              "key": "DefaultOverride",
+              "value": "defaultoverride"
+            },
+            {
+              "key": "foo",
+              "value": "bar"
+            },
+            {
+              "key": "volume_tags.baz",
+              "value": "bat"
+            }
+          ],
+          "values": {
+            "ebs_block_device": [
+              {
+                "iops": 800,
+                "volume_type": "gp2"
+              }
+            ],
+            "instance_type": "m5.4xlarge",
+            "root_block_device": [
+              {}
+            ]
+          },
+          "references": [],
+          "infracostMetadata": {
+            "calls": [
+              {
+                "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
+                "blockName": "aws_instance.web_app",
+                "startLine": 16,
+                "endLine": 37
+              }
+            ],
+            "checksum": "f5dd035ad27e97bb0e63f5e9794406f76dec425251f3ad09176905bfe8c1b6c5",
+            "endLine": 37,
+            "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
+            "startLine": 16
+          }
+        }
+      ]
+    }
+  }
+]
+
+storePolicyResources:
+[
+  {
+    "query": "\n\tmutation($policyResources: [PolicyResourceInput!]!) {\n\t\tstorePolicyResources(policyResources: $policyResources) {\n\t\t\tsha\n\t\t}\n\t}\n\t",
+    "variables": {
+      "policyResources": [
+        {
+          "resourceType": "aws_instance",
+          "providerName": "",
+          "address": "aws_instance.web_app",
+          "tags": [
+            {
+              "key": "DefaultNotOverride",
+              "value": "defaultnotoverride"
+            },
+            {
+              "key": "DefaultOverride",
+              "value": "defaultoverride"
+            },
+            {
+              "key": "foo",
+              "value": "bar"
+            },
+            {
+              "key": "volume_tags.baz",
+              "value": "bat"
+            }
+          ],
+          "values": {
+            "ebs_block_device": [
+              {
+                "iops": 800,
+                "volume_type": "gp2"
+              }
+            ],
+            "instance_type": "m5.4xlarge",
+            "root_block_device": [
+              {}
+            ]
+          },
+          "references": [],
+          "infracostMetadata": {
+            "calls": [
+              {
+                "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
+                "blockName": "aws_instance.web_app",
+                "startLine": 16,
+                "endLine": 37
+              }
+            ],
+            "checksum": "f5dd035ad27e97bb0e63f5e9794406f76dec425251f3ad09176905bfe8c1b6c5",
+            "endLine": 37,
+            "filename": "testdata/breakdown_with_policy_data_upload_hcl/main.tf",
+            "startLine": 16
+          }
+        }
+      ]
+    }
+  }
+]
+

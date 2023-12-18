@@ -1,7 +1,7 @@
 package azure
 
 import (
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 
 	"github.com/infracost/infracost/internal/resources/azure"
 	"github.com/infracost/infracost/internal/schema"
@@ -79,7 +79,7 @@ func newSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 		var err error
 		config, err = parseSKU(d.Address, sku)
 		if err != nil {
-			log.Warnf(err.Error())
+			log.Warn().Msgf(err.Error())
 			return nil
 		}
 	}

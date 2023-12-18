@@ -30,6 +30,32 @@ type ContainerNodeConfig struct {
 	GuestAccelerators []*ComputeGuestAccelerator
 }
 
+/*
+For the values initialized in the struct below, please refer to the
+
+	sustained-use-discounts section of the GCP Documentation.
+
+size_SUD is set to 4 as the Usage level (% of month) is 4
+
+	to make sure we don't overshoot the array
+*/
+const sudRateSize = 4
+
+type sudRates struct {
+	thresholds [sudRateSize]float64
+	rates      [sudRateSize]float64
+}
+
+var sudRate20 = sudRates{
+	thresholds: [sudRateSize]float64{0.25, 0.50, 0.75, 1.0},
+	rates:      [sudRateSize]float64{1.0, 0.8678, 0.733, 0.6},
+}
+
+var sudRate30 = sudRates{
+	thresholds: [sudRateSize]float64{0.25, 0.50, 0.75, 1.0},
+	rates:      [sudRateSize]float64{1.0, 0.80, 0.60, 0.40},
+}
+
 // computeCostComponent returns a cost component for Compute instance usage.
 func computeCostComponents(region, machineType string, purchaseOption string, instanceCount int64, monthlyHours *float64) ([]*schema.CostComponent, error) {
 	if strings.HasPrefix(strings.ToLower(machineType), "e2-custom") {
@@ -38,14 +64,25 @@ func computeCostComponents(region, machineType string, purchaseOption string, in
 
 	sustainedUseDiscount := 0.0
 	fixPurchaseOption := ""
+	hours, _ := schema.HourToMonthUnitMultiplier.Float64()
+
+	if monthlyHours != nil {
+		// Assume 730 hours(max) if monthly_hrs is not set
+		if *monthlyHours == 0 {
+			*monthlyHours = 730.0
+		}
+		hours = *monthlyHours
+	}
 
 	if strings.ToLower(purchaseOption) == "on_demand" {
 		fixPurchaseOption = "OnDemand"
 		switch strings.ToLower(strings.Split(machineType, "-")[0]) {
 		case "c2", "n2", "n2d":
-			sustainedUseDiscount = 0.2
+			sustainedUseDiscount = getSustainedUseDiscount(hours, sudRate20)
 		case "custom", "n1", "f1", "g1", "m1":
-			sustainedUseDiscount = 0.3
+			sustainedUseDiscount = getSustainedUseDiscount(hours, sudRate30)
+		default:
+			sustainedUseDiscount = 0.0
 		}
 	}
 
@@ -110,12 +147,12 @@ func computeCostComponents(region, machineType string, purchaseOption string, in
 
 		cores, err := strconv.ParseInt(strCPUAmount, 10, 64)
 		if err != nil {
-			return nil, fmt.Errorf("Could not parse the custom number of cores for %s", machineType)
+			return nil, fmt.Errorf("could not parse the custom number of cores for %s", machineType)
 		}
 
 		memMB, err := strconv.ParseInt(strRAMAmount, 10, 64)
 		if err != nil {
-			return nil, fmt.Errorf("Could not parse the custom amount of RAM for %s", machineType)
+			return nil, fmt.Errorf("could not parse the custom amount of RAM for %s", machineType)
 		}
 		memGB := float64(memMB) / 1024.0
 
@@ -200,6 +237,49 @@ func computeCostComponents(region, machineType string, purchaseOption string, in
 		return costComponents, nil
 	}
 
+}
+
+func getSustainedUseDiscount(hours float64, rates sudRates) float64 {
+	if hours == 0 {
+		return 0
+	}
+
+	totalHoursInMonth, _ := schema.HourToMonthUnitMultiplier.Float64()
+
+	// Keep track of how many hours we have remaining after each threshold is applied
+	remainingHours := hours
+
+	// Keep track of the total hours that are charged for
+	ratedHours := 0.0
+
+	index := 0
+	for remainingHours > 0 && index < len(rates.rates) {
+		// Calculate the percentage of the month that is covered by the current threshold
+		lastThreshold := 0.0
+		if index > 0 {
+			lastThreshold = rates.thresholds[index-1]
+		}
+
+		thresholdHours := (rates.thresholds[index] - lastThreshold) * totalHoursInMonth
+
+		// If the remaining hours are less than the threshold, add them and then we are done
+		if remainingHours <= thresholdHours {
+			ratedHours += remainingHours * rates.rates[index]
+			break
+		}
+
+		// Otherwise, add the discount for the current threshold and continue
+		ratedHours += thresholdHours * rates.rates[index]
+		remainingHours -= thresholdHours
+
+		index++
+	}
+
+	// Return the average discount over the hours the instance is running
+	avgDiscount := 1 - (ratedHours / hours)
+	// Round so the calculations match up with Google's 20% discount
+	rounded, _ := decimal.NewFromFloat(avgDiscount).Round(2).Float64()
+	return rounded
 }
 
 // bootDiskCostComponent returns a cost component for Boot Disk storage for
@@ -333,7 +413,7 @@ func guestAcceleratorCostComponent(region string, purchaseOption string, guestAc
 		name = "NVIDIA Tesla A100"
 		descPrefix = "Nvidia Tesla A100 GPU"
 	default:
-		logging.Logger.Debugf("skipping cost component because guest_accelerator.type '%s' is not supported", guestAcceleratorType)
+		logging.Logger.Debug().Msgf("skipping cost component because guest_accelerator.type '%s' is not supported", guestAcceleratorType)
 		return nil
 	}
 

@@ -3,13 +3,14 @@ package azure
 import (
 	"strings"
 
-	"github.com/infracost/infracost/internal/schema"
-	"github.com/infracost/infracost/internal/usage"
+	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
-	log "github.com/sirupsen/logrus"
 	"github.com/tidwall/gjson"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+
+	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/usage"
 )
 
 func GetAzureRMKeyVaultKeyRegistryItem() *schema.RegistryItem {
@@ -30,7 +31,7 @@ func NewAzureRMKeyVaultKey(d *schema.ResourceData, u *schema.UsageData) *schema.
 	if len(keyVault) > 0 {
 		skuName = cases.Title(language.English).String(keyVault[0].Get("sku_name").String())
 	} else {
-		log.Warnf("Skipping resource %s. Could not find its 'sku_name' property on key_vault_id.", d.Address)
+		log.Warn().Msgf("Skipping resource %s. Could not find its 'sku_name' property on key_vault_id.", d.Address)
 		return nil
 	}
 

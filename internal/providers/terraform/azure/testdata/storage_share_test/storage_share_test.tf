@@ -65,7 +65,7 @@ locals {
 resource "azurerm_storage_account" "filestorage" {
   for_each = { for entry in local.storage_account_premium_permutations : "${entry.account_replication_type}" => entry }
 
-  name                     = substr(lower("filestorage${each.value.account_replication_type}"), 0, 24)
+  name                     = substr(lower("icfilestorage${each.value.account_replication_type}"), 0, 24)
   resource_group_name      = azurerm_resource_group.example.name
   location                 = azurerm_resource_group.example.location
   account_kind             = "FileStorage"
@@ -85,7 +85,7 @@ resource "azurerm_storage_share" "premium-filestorage" {
 resource "azurerm_storage_account" "standard" {
   for_each = { for entry in local.storage_account_standard_permutations : "${entry.account_replication_type}" => entry }
 
-  name                     = substr(lower("standard${each.value.account_replication_type}"), 0, 24)
+  name                     = substr(lower("icstandard${each.value.account_replication_type}"), 0, 24)
   resource_group_name      = azurerm_resource_group.example.name
   location                 = azurerm_resource_group.example.location
   account_kind             = "StorageV2"
@@ -103,7 +103,7 @@ resource "azurerm_storage_share" "standard" {
 }
 
 resource "azurerm_storage_account" "premium" {
-  name                     = "premium"
+  name                     = "icpremium"
   resource_group_name      = azurerm_resource_group.example.name
   location                 = azurerm_resource_group.example.location
   account_kind             = "StorageV2"

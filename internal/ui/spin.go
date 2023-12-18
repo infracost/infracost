@@ -7,7 +7,7 @@ import (
 	"time"
 
 	spinnerpkg "github.com/briandowns/spinner"
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 )
 
 type SpinnerOptions struct {
@@ -38,7 +38,7 @@ func NewSpinner(msg string, opts SpinnerOptions) *Spinner {
 	}
 
 	if s.opts.EnableLogging {
-		log.Infof("Starting: %s", msg)
+		log.Info().Msgf("Starting: %s", msg)
 	} else {
 		s.spinner.Prefix = opts.Indent
 		s.spinner.Suffix = fmt.Sprintf(" %s", msg)
@@ -61,7 +61,7 @@ func (s *Spinner) Fail() {
 	}
 	s.Stop()
 	if s.opts.EnableLogging {
-		log.Errorf("Failed: %s", s.msg)
+		log.Error().Msgf("Failed: %s", s.msg)
 	} else {
 		fmt.Fprintf(os.Stderr, "%s%s %s\n",
 			s.opts.Indent,
@@ -82,7 +82,7 @@ func (s *Spinner) Success() {
 	}
 	s.Stop()
 	if s.opts.EnableLogging {
-		log.Infof("Completed: %s", s.msg)
+		log.Info().Msgf("Completed: %s", s.msg)
 	} else {
 		fmt.Fprintf(os.Stderr, "%s%s %s\n",
 			s.opts.Indent,

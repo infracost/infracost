@@ -1,5 +1,6 @@
 
-<p>💰 Infracost estimate: <b>monthly cost will increase by $1,402 📈</b></p>
+<h3>Infracost report</h3>
+<h4>💰 Monthly cost will increase by $1,402 📈</h4>
 <table>
   <thead>
     <td>Project</td>
@@ -30,7 +31,7 @@
   </tbody>
 </table>
 <details>
-<summary><strong>Infracost output</strong></summary>
+<summary>Cost details</summary>
 
 ```
 ──────────────────────────────────
@@ -222,7 +223,7 @@ Key: ~ changed, + added, - removed
 ∙ 14 were estimated, 10 of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 12 were free, rerun with --show-skipped to see details
 
-Infracost estimate: monthly cost will increase by $1,402 ↑
+Infracost estimate: Monthly cost will increase by $1,402 ↑
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
 ┃ Project                                                          ┃ Cost change  ┃ New monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━┫

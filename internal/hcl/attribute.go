@@ -7,7 +7,7 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/convert"
 	"github.com/zclconf/go-cty/cty/gocty"
@@ -43,7 +43,7 @@ type Attribute struct {
 	Ctx *Context
 	// Verbose defines if the attribute should log verbose diagnostics messages to debug.
 	Verbose bool
-	Logger  *logrus.Entry
+	Logger  zerolog.Logger
 	// newMock generates a mock value for the attribute if it's value is missing.
 	newMock       func(attr *Attribute) cty.Value
 	previousValue cty.Value
@@ -74,7 +74,7 @@ func (attr *Attribute) AsInt() int64 {
 		var err error
 		v, err = convert.Convert(v, cty.Number)
 		if err != nil {
-			attr.Logger.WithError(err).Debugf("could not return attribute value of type %s as cty.Number", v.Type())
+			attr.Logger.Debug().Err(err).Msgf("could not return attribute value of type %s as cty.Number", v.Type())
 			return 0
 		}
 	}
@@ -82,7 +82,7 @@ func (attr *Attribute) AsInt() int64 {
 	var i int64
 	err := gocty.FromCtyValue(v, &i)
 	if err != nil {
-		attr.Logger.WithError(err).Debug("could not return attribute value as int64")
+		attr.Logger.Debug().Err(err).Msg("could not return attribute value as int64")
 	}
 
 	return i
@@ -104,7 +104,7 @@ func (attr *Attribute) AsString() string {
 		var err error
 		v, err = convert.Convert(v, cty.String)
 		if err != nil {
-			attr.Logger.WithError(err).Debugf("could not return attribute value of type %s as cty.String", v.Type())
+			attr.Logger.Debug().Err(err).Msgf("could not return attribute value of type %s as cty.String", v.Type())
 			return ""
 		}
 	}
@@ -112,7 +112,7 @@ func (attr *Attribute) AsString() string {
 	var s string
 	err := gocty.FromCtyValue(v, &s)
 	if err != nil {
-		attr.Logger.WithError(err).Debug("could not return attribute value as string")
+		attr.Logger.Debug().Err(err).Msg("could not return attribute value as string")
 	}
 
 	return s
@@ -126,7 +126,7 @@ func (attr *Attribute) Value() cty.Value {
 		return cty.DynamicVal
 	}
 
-	attr.Logger.Debug("fetching attribute value")
+	attr.Logger.Debug().Msg("fetching attribute value")
 	val := attr.value(0)
 	attr.previousValue = val
 
@@ -142,7 +142,7 @@ func (attr *Attribute) HasChanged() (change bool) {
 	defer func() {
 		e := recover()
 		if e != nil {
-			attr.Logger.Debugf("HasChanged panicked with cty.Value comparison %s", e)
+			attr.Logger.Debug().Msgf("HasChanged panicked with cty.Value comparison %s", e)
 			change = true
 		}
 	}()
@@ -156,7 +156,7 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 	defer func() {
 		if err := recover(); err != nil {
 			trace := debug.Stack()
-			attr.Logger.Debugf("could not evaluate value for attr: %s. This is most likely an issue in the underlying hcl/go-cty libraries and can be ignored, but we log the stacktrace for debugging purposes. Err: %s\n%s", attr.Name(), err, trace)
+			attr.Logger.Debug().Msgf("could not evaluate value for attr: %s. This is most likely an issue in the underlying hcl/go-cty libraries and can be ignored, but we log the stacktrace for debugging purposes. Err: %s\n%s", attr.Name(), err, trace)
 		}
 	}()
 
@@ -173,7 +173,14 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 		}
 
 		ctx := attr.Ctx.Inner()
+		exp := mockFunctionCallArgs(attr.HCLAttr.Expr, diag, mockedVal)
+		val, err := exp.Value(ctx)
+		if !err.HasErrors() {
+			return val
+		}
+
 		for _, d := range diag {
+
 			// if the diagnostic summary indicates that we were the attribute we attempted to fetch is unsupported
 			// this is likely from a Terraform attribute that is built from the provider. We then try and build
 			// a mocked attribute so that the module evaluation isn't harmed.
@@ -241,11 +248,80 @@ func (attr *Attribute) value(retry int) (ctyVal cty.Value) {
 		}
 
 		if attr.Verbose {
-			attr.Logger.Debugf("error diagnostic return from evaluating %s err: %s", attr.HCLAttr.Name, diag.Error())
+			attr.Logger.Debug().Msgf("error diagnostic return from evaluating %s err: %s", attr.HCLAttr.Name, diag.Error())
 		}
 	}
 
 	return ctyVal
+}
+
+// mockFunctionCallArgs attempts to resolve remove bad expressions from hclsyntax.FunctionCallExpr args.
+// This function will be called recursively, finding all functions and checking if their args match
+// the bad Expressions listed in the diagnostics. This function, currently, only traverses FunctionCallExpr and ObjectCallExpr.
+// More complex Expressions could be added in the future is we deem this a better way of mocking out values/expressions
+// that cause evaluation to fail.
+func mockFunctionCallArgs(expr hcl.Expression, diagnostics hcl.Diagnostics, mockedVal cty.Value) hclsyntax.Expression {
+	switch t := expr.(type) {
+	case *hclsyntax.FunctionCallExpr:
+		newArgs := make([]hclsyntax.Expression, len(t.Args))
+
+		// loop through the function call args to get the bad expression once we've found
+		// the expression which has a diagnostic let's set it as a literal value so that
+		// when we evaluate the function again we don't have issues any mocked values of
+		// diagnostics.
+		for i, exp := range t.Args {
+			var found bool
+			for _, d := range diagnostics {
+				if exp == d.Expression {
+					// @TODO we can probably improve this by checking the function name and assigning
+					// a correct mockedVal for the given function. e.g. array functions will expect a
+					// list/tuple
+					newArgs[i] = &hclsyntax.LiteralValueExpr{
+						Val: mockedVal,
+					}
+
+					found = true
+					break
+				}
+			}
+
+			if !found {
+				newArgs[i] = mockFunctionCallArgs(exp, diagnostics, mockedVal)
+			}
+		}
+
+		return &hclsyntax.FunctionCallExpr{
+			Name:            t.Name,
+			Args:            newArgs,
+			ExpandFinal:     t.ExpandFinal,
+			NameRange:       t.NameRange,
+			OpenParenRange:  t.OpenParenRange,
+			CloseParenRange: t.CloseParenRange,
+		}
+	case *hclsyntax.ObjectConsExpr:
+		newItems := make([]hclsyntax.ObjectConsItem, len(t.Items))
+		for i, item := range t.Items {
+			newItems[i] = hclsyntax.ObjectConsItem{
+				KeyExpr:   item.KeyExpr,
+				ValueExpr: mockFunctionCallArgs(item.ValueExpr, diagnostics, mockedVal),
+			}
+		}
+
+		return &hclsyntax.ObjectConsExpr{
+			Items:     newItems,
+			SrcRange:  t.SrcRange,
+			OpenRange: t.OpenRange,
+		}
+
+	}
+
+	if v, ok := expr.(hclsyntax.Expression); ok {
+		return v
+	}
+
+	return &hclsyntax.LiteralValueExpr{
+		Val: mockedVal,
+	}
 }
 
 // traverseVarAndSetCtx uses the hcl traversal to build a mocked attribute on the evaluation context.
@@ -420,7 +496,7 @@ func (attr *Attribute) Equals(val interface{}) bool {
 	if attr.Value().Type() == cty.Number {
 		checkNumber, err := gocty.ToCtyValue(val, cty.Number)
 		if err != nil {
-			attr.Logger.Debugf("Error converting number for equality check. %s", err)
+			attr.Logger.Debug().Msgf("Error converting number for equality check. %s", err)
 			return false
 		}
 		return attr.Value().RawEquals(checkNumber)
@@ -454,13 +530,13 @@ func (attr *Attribute) getIndexValue(part hcl.TraverseIndex) string {
 	case cty.Number:
 		var intVal int
 		if err := gocty.FromCtyValue(part.Key, &intVal); err != nil {
-			attr.Logger.WithError(err).Warn("could not unpack int from block index attr, returning 0")
+			attr.Logger.Warn().Err(err).Msg("could not unpack int from block index attr, returning 0")
 			return "0"
 		}
 
 		return fmt.Sprintf("%d", intVal)
 	default:
-		attr.Logger.Debugf("could not get index value for unsupported cty type %s, returning 0", part.Key.Type())
+		attr.Logger.Debug().Msgf("could not get index value for unsupported cty type %s, returning 0", part.Key.Type())
 		return "0"
 	}
 }
@@ -515,12 +591,47 @@ func (attr *Attribute) AllReferences() []*Reference {
 	return attr.referencesFromExpression(attr.HCLAttr.Expr)
 }
 
+// VerticesReferenced traverses all the Expressions used by the attribute to build a
+// list of all the Blocks referenced by the Attribute.
+func (attr *Attribute) VerticesReferenced(b *Block) []VertexReference {
+	var refs []VertexReference
+
+	for _, ref := range attr.AllReferences() {
+		key := ref.String()
+
+		if shouldSkipRef(b, key) {
+			continue
+		}
+
+		if usesProviderConfiguration(b) && attr.Name() == "provider" {
+			key = fmt.Sprintf("provider.%s", key)
+		}
+
+		modAddr := b.ModuleAddress()
+		modPart, otherPart := splitModuleAddr(key)
+
+		if modPart != "" {
+			if modAddr == "" {
+				modAddr = modPart
+			} else {
+				modAddr = fmt.Sprintf("%s.%s", modAddr, modPart)
+			}
+		}
+
+		refs = append(refs, VertexReference{
+			ModuleAddress: modAddr,
+			AttributeName: attr.Name(),
+			Key:           otherPart,
+		})
+	}
+
+	return refs
+}
+
 func (attr *Attribute) referencesFromExpression(expression hcl.Expression) []*Reference {
 	if attr == nil {
 		return nil
 	}
-
-	countRef, _ := newReference([]string{"count", "index"})
 
 	var refs []*Reference
 	switch t := expression.(type) {
@@ -529,15 +640,9 @@ func (attr *Attribute) referencesFromExpression(expression hcl.Expression) []*Re
 			refs = append(refs, attr.referencesFromExpression(arg)...)
 		}
 	case *hclsyntax.ConditionalExpr:
-		if ref, err := attr.createDotReferenceFromTraversal(t.TrueResult.Variables()...); err == nil {
-			refs = append(refs, ref)
-		}
-		if ref, err := attr.createDotReferenceFromTraversal(t.FalseResult.Variables()...); err == nil {
-			refs = append(refs, ref)
-		}
-		if ref, err := attr.createDotReferenceFromTraversal(t.Condition.Variables()...); err == nil {
-			refs = append(refs, ref)
-		}
+		refs = append(refs, attr.referencesFromExpression(t.TrueResult)...)
+		refs = append(refs, attr.referencesFromExpression(t.FalseResult)...)
+		refs = append(refs, attr.referencesFromExpression(t.Condition)...)
 	case *hclsyntax.ScopeTraversalExpr:
 		if ref, err := attr.createDotReferenceFromTraversal(t.Variables()...); err == nil {
 			refs = append(refs, ref)
@@ -546,38 +651,65 @@ func (attr *Attribute) referencesFromExpression(expression hcl.Expression) []*Re
 		refs = attr.referencesFromExpression(t.Wrapped)
 	case *hclsyntax.TemplateExpr:
 		for _, part := range t.Parts {
-			ref, err := attr.createDotReferenceFromTraversal(part.Variables()...)
-			if err != nil {
-				continue
-			}
-			refs = append(refs, ref)
+			refs = append(refs, attr.referencesFromExpression(part)...)
 		}
 	case *hclsyntax.TupleConsExpr:
+		for _, item := range t.Exprs {
+			refs = append(refs, attr.referencesFromExpression(item)...)
+		}
+	case *hclsyntax.RelativeTraversalExpr:
+		refs = append(refs, attr.referencesFromExpression(t.Source)...)
+	case *hclsyntax.IndexExpr:
+		refs = append(refs, attr.referencesFromExpression(t.Collection)...)
+		refs = append(refs, attr.referencesFromExpression(t.Key)...)
+	case *hclsyntax.ForExpr:
+		refs := attr.referencesFromExpression(t.CollExpr)
+		refs = append(refs, attr.referencesFromExpression(t.KeyExpr)...)
+		refs = append(refs, attr.referencesFromExpression(t.ValExpr)...)
+
+		if t.CondExpr != nil {
+			refs = append(refs, attr.referencesFromExpression(t.CondExpr)...)
+		}
+		return refs
+	case *hclsyntax.ObjectConsExpr:
+		for _, item := range t.Items {
+			refs = append(refs, attr.referencesFromExpression(item.KeyExpr)...)
+			refs = append(refs, attr.referencesFromExpression(item.ValueExpr)...)
+		}
+		return refs
+	case *hclsyntax.ObjectConsKeyExpr:
+		refs = append(refs, attr.referencesFromExpression(t.Wrapped)...)
+		return refs
+	case *hclsyntax.SplatExpr:
+		refs = append(refs, attr.referencesFromExpression(t.Source)...)
+		return refs
+	case *hclsyntax.BinaryOpExpr:
+		refs = append(refs, attr.referencesFromExpression(t.LHS)...)
+		refs = append(refs, attr.referencesFromExpression(t.RHS)...)
+		return refs
+	case *hclsyntax.UnaryOpExpr:
+		refs = append(refs, attr.referencesFromExpression(t.Val)...)
+		return refs
+	case *hclsyntax.TemplateJoinExpr:
+		refs = append(refs, attr.referencesFromExpression(t.Tuple)...)
+	case *hclsyntax.ParenthesesExpr:
+		refs = append(refs, attr.referencesFromExpression(t.Expression)...)
+	case *hclsyntax.AnonSymbolExpr:
 		ref, err := attr.createDotReferenceFromTraversal(t.Variables()...)
 		if err == nil {
 			refs = append(refs, ref)
 		}
-	case *hclsyntax.RelativeTraversalExpr:
-		switch s := t.Source.(type) {
-		case *hclsyntax.IndexExpr:
-			if collectionRef, err := attr.createDotReferenceFromTraversal(s.Collection.Variables()...); err == nil {
-				key, _ := s.Key.Value(attr.Ctx.Inner())
-				collectionRef.SetKey(key)
-				refs = append(refs, collectionRef, countRef)
-			}
-		default:
-			if ref, err := attr.createDotReferenceFromTraversal(t.Source.Variables()...); err == nil {
-				refs = append(refs, ref)
-			}
-		}
-	case *hclsyntax.IndexExpr:
-		if collectionRef, err := attr.createDotReferenceFromTraversal(t.Collection.Variables()...); err == nil {
-			key, _ := t.Key.Value(attr.Ctx.Inner())
-			collectionRef.SetKey(key)
-			refs = append(refs, collectionRef, countRef)
-		}
+	case *hclsyntax.LiteralValueExpr:
+		attr.Logger.Debug().Msgf("cannot create references from %T as it is a literal value and will not contain refs", t)
 	default:
-		attr.Logger.Debugf("could not create references for expression type: %s", t)
+		name := fmt.Sprintf("%T", t)
+		if strings.HasPrefix(name, "*hclsyntax") {
+			// if we get here then that means we have encountered an expression type that we don't support.
+			// Adding support for newly added expressions is critical to graph evaluation, so let's log an error.
+			attr.Logger.Error().Msgf("cannot create references for unsupported expression type %q", name)
+		} else {
+			attr.Logger.Debug().Msgf("cannot create references for expression type: %q", name)
+		}
 	}
 
 	return refs
@@ -788,4 +920,24 @@ func toRelativeTraversal(traversal hcl.Traversal) hcl.Traversal {
 	}
 
 	return ret
+}
+
+func shouldSkipRef(block *Block, key string) bool {
+	if key == "count.index" || key == "each.key" || key == "each.value" || strings.HasSuffix(key, ".") {
+		return true
+	}
+
+	if block.parent != nil && block.parent.Type() == "variable" && block.Type() == "validation" {
+		return true
+	}
+
+	return false
+}
+
+func splitModuleAddr(address string) (string, string) {
+	matches := addrSplitModuleRegex.FindStringSubmatch(address)
+	if len(matches) == 3 {
+		return matches[1], matches[2]
+	}
+	return "", address
 }

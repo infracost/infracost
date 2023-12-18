@@ -16,7 +16,7 @@ func TestBlock_LocalName(t *testing.T) {
 		{
 			name: "resource Block with empty labels will return empty local name",
 			block: &Block{
-				hclBlock: &hcl.Block{
+				HCLBlock: &hcl.Block{
 					Type:   "resource",
 					Labels: nil,
 				},
@@ -27,7 +27,7 @@ func TestBlock_LocalName(t *testing.T) {
 		{
 			name: "resource Block with valid labels will return reference without resource type",
 			block: &Block{
-				hclBlock: &hcl.Block{
+				HCLBlock: &hcl.Block{
 					Type:   "resource",
 					Labels: []string{"my-resource", "my-name"},
 				},
@@ -38,7 +38,7 @@ func TestBlock_LocalName(t *testing.T) {
 		{
 			name: "data Block with valid labels will return reference with Block type",
 			block: &Block{
-				hclBlock: &hcl.Block{
+				HCLBlock: &hcl.Block{
 					Type:   "data",
 					Labels: []string{"my-block", "my-name"},
 				},

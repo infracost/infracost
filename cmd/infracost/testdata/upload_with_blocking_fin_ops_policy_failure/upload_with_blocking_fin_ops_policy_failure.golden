@@ -1,0 +1,11 @@
+
+Err:
+Error: Governance check failed:
+
+ - finops policy check failed: should show as failing
+
+
+Logs:
+INF Estimate uploaded to Infracost Cloud
+INF 2 finops policies checked
+INF finops policy check failed: should show as failing

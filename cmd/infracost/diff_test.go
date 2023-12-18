@@ -292,3 +292,31 @@ func TestDiffWithFreeResourcesChecksum(t *testing.T) {
 			ctx.Config.TagPoliciesEnabled = true
 		})
 }
+
+func TestDiffWithPolicyDataUpload(t *testing.T) {
+	ts := GraphqlTestServer(map[string]string{
+		"policyResourceAllowList": policyResourceAllowlistGraphQLResponse,
+		"storePolicyResources":    storePolicyResourcesGraphQLResponse,
+	})
+	defer ts.Close()
+
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testName,
+		[]string{
+			"diff",
+			"--compare-to", filepath.Join(dir, "baseline.json"),
+			"--path", dir,
+			"--format", "json",
+		},
+		&GoldenFileOptions{
+			CaptureLogs: true,
+			IsJSON:      true,
+		}, func(ctx *config.RunContext) {
+			ctx.Config.PolicyV2APIEndpoint = ts.URL
+			ctx.Config.PoliciesEnabled = true
+		},
+	)
+}

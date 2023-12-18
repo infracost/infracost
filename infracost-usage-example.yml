@@ -55,6 +55,9 @@ resource_usage:
     monthly_handler_operations: 10000 # Monthly number of non-free handler operations (resources outside of the AWS::*, Alexa::*, and Custom::* namespaces).
     monthly_duration_secs: 0 # Monthly duration of non-free handler operations that go above 30 seconds, in seconds.
 
+  aws_cloudhsm_v2_hsm.my_hsm:
+    monthly_hrs: 100 # Monthly number of hours the HSM ran for.
+
   aws_cloudtrail.my_cloudtrail:
     monthly_additional_management_events: 100000 # Monthly additional copies of read and write management events. The first copy of management events per region is free, so this should only be non-zero if there are multiple trails recording management events in this region.
     monthly_data_events: 200000 # Monthly data events delivered to S3, Lambda or DynamoDB
@@ -258,6 +261,19 @@ resource_usage:
 
   aws_kinesis_firehose_delivery_stream.my_kinesis:
     monthly_data_ingested_gb: 3000000 # Monthly data ingested by the Delivery Stream in GB.
+
+  aws_kinesis_stream.my_kinesis:
+    monthly_on_demand_data_in_gb: 0.20 # Monthly data ingested by the stream in GB.
+    monthly_on_demand_data_out_gb: 0.20 # Monthly data egressed by the stream in GB total, (not per consumer application).
+    monthly_on_demand_efo_data_out_gb: 2.0 # Monthly data egressed by the stream in GB to EFO consumers.
+    monthly_on_demand_extended_retention_gb: 1.0 # Monthly data stored by the stream in GB that exceeds the 24 hour retention period but is less than 7 days.
+    monthly_on_demand_long_term_retention_gb: 1.0 # Monthly data stored by the stream in GB that exceeds the 7 day retention period.
+    monthly_provisioned_put_units: 6500000 # Monthly provisioned put units for the stream.
+    monthly_provisioned_extended_retention_gb: 100 # Monthly data stored by the stream in GB that exceeds the 24 hour retention period but is less than 7 days.
+    monthly_provisioned_long_term_retention_gb: 100 # Monthly data stored by the stream in GB that exceeds the 7 day retention period.
+    monthly_provisioned_long_term_retrieval_gb: 100 # Monthly data retrieved by the stream in GB that exceeds the 7 day retention period.
+    monthly_provisioned_efo_data_out_gb: 100 # Monthly data egressed by the stream in GB to EFO consumers.
+    monthly_provisioned_efo_consumer_hours: 100 # Monthly hours of EFO consumer application usage.
 
   aws_lambda_function.my_function:
     monthly_requests: 100000 # Monthly requests to the Lambda function.

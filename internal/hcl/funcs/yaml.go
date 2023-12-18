@@ -29,7 +29,7 @@ var YAMLDecodeFunc = function.New(&function.Spec{
 			return cty.NilType, function.NewArgErrorf(0, "YAML source code cannot be null")
 		}
 		val := args[0].AsString()
-		if strings.HasPrefix(val, "mock") {
+		if strings.HasSuffix(val, "-mock") {
 			return cty.Object(map[string]cty.Type{
 				"foo": cty.String,
 			}), nil
@@ -39,7 +39,7 @@ var YAMLDecodeFunc = function.New(&function.Spec{
 	},
 	Impl: func(args []cty.Value, retType cty.Type) (cty.Value, error) {
 		val := args[0].AsString()
-		if strings.HasPrefix(val, "mock") {
+		if strings.HasSuffix(val, "-mock") {
 			return cty.ObjectVal(map[string]cty.Value{
 				"foo": cty.StringVal("bar"),
 			}), nil

@@ -36,7 +36,7 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 		RunE: func(cmd *cobra.Command, args []string) error {
 			ctx.ContextValues.SetValue("platform", "github")
 
-			var err error
+			var commentErr error
 
 			apiURL, _ := cmd.Flags().GetString("github-api-url")
 			token, _ := cmd.Flags().GetString("github-token")
@@ -79,16 +79,16 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 			if prNumber != 0 {
 				ctx.ContextValues.SetValue("targetType", "pull-request")
 
-				commentHandler, err = comment.NewGitHubPRHandler(ctx.Context(), repo, strconv.Itoa(prNumber), extra)
-				if err != nil {
-					return err
+				commentHandler, commentErr = comment.NewGitHubPRHandler(ctx.Context(), repo, strconv.Itoa(prNumber), extra)
+				if commentErr != nil {
+					return commentErr
 				}
 			} else if commit != "" {
 				ctx.ContextValues.SetValue("targetType", "commit")
 
-				commentHandler, err = comment.NewGitHubCommitHandler(ctx.Context(), repo, commit, extra)
-				if err != nil {
-					return err
+				commentHandler, commentErr = comment.NewGitHubCommitHandler(ctx.Context(), repo, commit, extra)
+				if commentErr != nil {
+					return commentErr
 				}
 			} else {
 				ui.PrintUsage(cmd)
@@ -104,25 +104,14 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 
 			paths, _ := cmd.Flags().GetStringArray("path")
 
-			commentOut, err := buildCommentOutput(cmd, ctx, paths, output.MarkdownOptions{
+			commentOut, commentErr := buildCommentOutput(cmd, ctx, paths, output.MarkdownOptions{
 				WillUpdate:          prNumber != 0 && behavior == "update",
 				WillReplace:         prNumber != 0 && behavior == "delete-and-new",
 				IncludeFeedbackLink: !ctx.Config.IsSelfHosted(),
 				MaxMessageSize:      output.GitHubMaxMessageSize,
 			})
-			var policyFailure output.PolicyCheckFailures
-			var guardrailFailure output.GuardrailFailures
-			var tagPolicyFailure *output.TagPolicyCheck
-			if err != nil {
-				if v, ok := err.(output.PolicyCheckFailures); ok {
-					policyFailure = v
-				} else if v, ok := err.(output.GuardrailFailures); ok {
-					guardrailFailure = v
-				} else if v, ok := err.(output.TagPolicyCheck); ok {
-					tagPolicyFailure = &v
-				} else {
-					return err
-				}
+			if isErrorUnhandled(commentErr) {
+				return commentErr
 			}
 
 			dryRun, _ := cmd.Flags().GetBool("dry-run")
@@ -137,10 +126,10 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 					return err
 				}
 
-				pricingClient := apiclient.NewPricingAPIClient(ctx)
+				pricingClient := apiclient.GetPricingAPIClient(ctx)
 				err = pricingClient.AddEvent("infracost-comment", ctx.EventEnv())
 				if err != nil {
-					logging.Logger.WithError(err).Error("could not report infracost-comment event")
+					logging.Logger.Err(err).Msg("could not report infracost-comment event")
 				}
 
 				if res.Posted {
@@ -157,17 +146,9 @@ func commentGitHubCmd(ctx *config.RunContext) *cobra.Command {
 				cmd.Println("Comment not posted to GitHub (--dry-run was specified)")
 			}
 
-			if policyFailure != nil {
+			if commentErr != nil {
 				cmd.Printf("\n")
-				return policyFailure
-			}
-			if guardrailFailure != nil {
-				cmd.Printf("\n")
-				return guardrailFailure
-			}
-			if tagPolicyFailure != nil {
-				cmd.Printf("\n")
-				return tagPolicyFailure
+				return commentErr
 			}
 
 			return nil

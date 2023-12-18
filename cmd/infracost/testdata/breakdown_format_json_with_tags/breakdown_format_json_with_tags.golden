@@ -163,6 +163,7 @@
                 }
               ],
               "checksum": "92d793c678fac9bf7ce08e05983f01e62665b7ea640a512f23bb3061b8c645b5",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 102,
               "filename": "testdata/breakdown_format_json_with_tags/main.tf",
               "startLine": 90
@@ -263,6 +264,7 @@
                 }
               ],
               "checksum": "13adebe4ed01fd707c54cf97a06980aecb52eab84fe379a941727cc1ead2a93f",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 88,
               "filename": "testdata/breakdown_format_json_with_tags/main.tf",
               "startLine": 67
@@ -345,6 +347,7 @@
                 }
               ],
               "checksum": "47efe9c1f904be19ea9a38623ebcb399b03026ba4c0436284a121e35b84ce286",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 202,
               "filename": "testdata/breakdown_format_json_with_tags/main.tf",
               "startLine": 181
@@ -487,6 +490,7 @@
                 }
               ],
               "checksum": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 34,
               "filename": "testdata/breakdown_format_json_with_tags/main.tf",
               "startLine": 32
@@ -521,6 +525,7 @@
                 }
               ],
               "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 43,
               "filename": "testdata/breakdown_format_json_with_tags/main.tf",
               "startLine": 36
@@ -559,6 +564,7 @@
                 }
               ],
               "checksum": "5ae555e21daf62bb42d8cfcff0473722eb04032804b064b14d474f6f8923255e",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 153,
               "filename": "testdata/breakdown_format_json_with_tags/main.tf",
               "startLine": 104
@@ -700,6 +706,7 @@
                 }
               ],
               "checksum": "92d793c678fac9bf7ce08e05983f01e62665b7ea640a512f23bb3061b8c645b5",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 102,
               "filename": "testdata/breakdown_format_json_with_tags/main.tf",
               "startLine": 90
@@ -800,6 +807,7 @@
                 }
               ],
               "checksum": "13adebe4ed01fd707c54cf97a06980aecb52eab84fe379a941727cc1ead2a93f",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 88,
               "filename": "testdata/breakdown_format_json_with_tags/main.tf",
               "startLine": 67
@@ -882,6 +890,7 @@
                 }
               ],
               "checksum": "47efe9c1f904be19ea9a38623ebcb399b03026ba4c0436284a121e35b84ce286",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 202,
               "filename": "testdata/breakdown_format_json_with_tags/main.tf",
               "startLine": 181
@@ -1024,6 +1033,7 @@
                 }
               ],
               "checksum": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 34,
               "filename": "testdata/breakdown_format_json_with_tags/main.tf",
               "startLine": 32
@@ -1058,6 +1068,7 @@
                 }
               ],
               "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 43,
               "filename": "testdata/breakdown_format_json_with_tags/main.tf",
               "startLine": 36
@@ -1096,6 +1107,7 @@
                 }
               ],
               "checksum": "5ae555e21daf62bb42d8cfcff0473722eb04032804b064b14d474f6f8923255e",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 153,
               "filename": "testdata/breakdown_format_json_with_tags/main.tf",
               "startLine": 104

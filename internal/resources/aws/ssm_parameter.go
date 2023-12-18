@@ -7,7 +7,7 @@ import (
 	"fmt"
 	"strings"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 
 	"github.com/shopspring/decimal"
 )
@@ -40,7 +40,7 @@ func (r *SSMParameter) BuildResource() *schema.Resource {
 		throughputLimit = strings.ToLower(*r.APIThroughputLimit)
 
 		if throughputLimit != "standard" && throughputLimit != "advanced" && throughputLimit != "higher" {
-			log.Warnf("Skipping resource %s. Unrecognized api_throughput_limit %s, expecting standard, advanced or higher", r.Address, *r.APIThroughputLimit)
+			log.Warn().Msgf("Skipping resource %s. Unrecognized api_throughput_limit %s, expecting standard, advanced or higher", r.Address, *r.APIThroughputLimit)
 			return nil
 		}
 	}

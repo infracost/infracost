@@ -21,7 +21,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 )
 
 var minTerraformVer = "v0.12"
@@ -120,7 +120,7 @@ func (p *DirProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 
 	modulePath, err := filepath.Rel(basePath, metadata.Path)
 	if err == nil && modulePath != "" && modulePath != "." {
-		log.Debugf("Calculated relative terraformModulePath for %s from %s", basePath, metadata.Path)
+		log.Debug().Msgf("Calculated relative terraformModulePath for %s from %s", basePath, metadata.Path)
 		metadata.TerraformModulePath = modulePath
 	}
 
@@ -133,7 +133,7 @@ func (p *DirProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 
 		out, err := cmd.Output()
 		if err != nil {
-			log.Debugf("Could not detect Terraform workspace for %s", p.Path)
+			log.Debug().Msgf("Could not detect Terraform workspace for %s", p.Path)
 		}
 		terraformWorkspace = strings.Split(string(out), "\n")[0]
 	}
@@ -182,18 +182,18 @@ func (p *DirProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, e
 		project := schema.NewProject(name, metadata)
 
 		parser := NewParser(p.ctx, p.includePastResources)
-		pastpartialResources, partialResources, providerMetadatas, err := parser.parseJSON(j, usage)
+		parsed, err := parser.parseJSON(j, usage)
 		if err != nil {
 			return projects, errors.Wrap(err, "Error parsing Terraform JSON")
 		}
 
-		project.AddProviderMetadata(providerMetadatas)
+		project.AddProviderMetadata(parsed.ProviderMetadata)
 
 		project.HasDiff = !p.UseState
 		if project.HasDiff {
-			project.PartialPastResources = pastpartialResources
+			project.PartialPastResources = parsed.PastResources
 		}
-		project.PartialResources = partialResources
+		project.PartialResources = parsed.CurrentResources
 
 		projects = append(projects, project)
 	}
@@ -335,7 +335,7 @@ func (p *DirProvider) runPlan(opts *CmdOptions, spinner *ui.Spinner, initOnFail 
 
 		// If the plan returns this error then Terraform is configured with remote execution mode
 		if isTerraformRemoteExecutionErr(extractedErr) {
-			log.Info("Continuing with Terraform Remote Execution Mode")
+			log.Info().Msg("Continuing with Terraform Remote Execution Mode")
 			p.ctx.ContextValues.SetValue("terraformRemoteExecutionModeEnabled", true)
 			planJSON, err = p.runRemotePlan(opts, args)
 		} else if initOnFail && isTerraformInitErr(extractedErr) {
@@ -467,7 +467,7 @@ func (p *DirProvider) runShow(opts *CmdOptions, spinner *ui.Spinner, planFile st
 
 		// If the plan returns this error then Terraform is configured with remote execution mode
 		if isTerraformRemoteExecutionErr(extractedErr) {
-			log.Info("Terraform expected Remote Execution Mode")
+			log.Info().Msg("Terraform expected Remote Execution Mode")
 		} else if initOnFail && isTerraformInitErr(extractedErr) {
 			spinner.Stop()
 			err = p.runInit(opts, ui.NewSpinner("Running terraform init", p.spinnerOpts))

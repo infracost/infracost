@@ -14,7 +14,7 @@ import (
 
 	"github.com/Rhymond/go-money"
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
 
@@ -87,7 +87,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	repoPath := runCtx.Config.RepoPath()
 	metadata, err := vcs.MetadataFetcher.Get(repoPath, runCtx.Config.GitDiffTarget)
 	if err != nil {
-		logging.Logger.WithError(err).Debugf("failed to fetch vcs metadata for path %s", repoPath)
+		logging.Logger.Debug().Err(err).Msgf("failed to fetch vcs metadata for path %s", repoPath)
 	}
 	runCtx.VCSMetadata = metadata
 
@@ -129,14 +129,14 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 
 	if runCtx.IsCloudUploadExplicitlyEnabled() {
 		dashboardClient := apiclient.NewDashboardAPIClient(runCtx)
-		result, err := dashboardClient.AddRun(runCtx, r)
+		result, err := dashboardClient.AddRun(runCtx, r, apiclient.CommentFormatMarkdownHTML)
 		if err != nil {
-			log.WithError(err).Error("Failed to upload to Infracost Cloud")
+			log.Err(err).Msg("Failed to upload to Infracost Cloud")
 		}
 
 		r.RunID, r.ShareURL, r.CloudURL = result.RunID, result.ShareURL, result.CloudURL
 	} else {
-		log.Debug("Skipping sending project results since Infracost Cloud upload is not enabled.")
+		log.Debug().Msg("Skipping sending project results since Infracost Cloud upload is not enabled.")
 	}
 
 	format := strings.ToLower(runCtx.Config.Format)
@@ -163,10 +163,10 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 
 	env := buildRunEnv(runCtx, projectContexts, r)
 
-	pricingClient := apiclient.NewPricingAPIClient(runCtx)
+	pricingClient := apiclient.GetPricingAPIClient(runCtx)
 	err = pricingClient.AddEvent("infracost-run", env)
 	if err != nil {
-		log.Errorf("Error reporting event: %s", err)
+		log.Error().Msgf("Error reporting event: %s", err)
 	}
 
 	if outFile, _ := cmd.Flags().GetString("out-file"); outFile != "" {
@@ -272,7 +272,7 @@ func (r *parallelRunner) run() ([]projectResult, error) {
 			}()
 
 			for job := range jobs {
-				ctx := config.NewProjectContext(r.runCtx, job.projectCfg, log.Fields{
+				ctx := config.NewProjectContext(r.runCtx, job.projectCfg, map[string]interface{}{
 					"routine": i,
 				})
 				configProjects, err := r.runProjectConfig(ctx)
@@ -359,7 +359,7 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 	}
 
 	if r.runCtx.Config.IsLogging() {
-		log.Info(m)
+		log.Info().Msg(m)
 	} else {
 		fmt.Fprintln(os.Stderr, m)
 	}
@@ -388,7 +388,7 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 
 		invalidKeys, err := usageFile.InvalidKeys()
 		if err != nil {
-			log.Errorf("Error checking usage file keys: %v", err)
+			log.Error().Msgf("Error checking usage file keys: %v", err)
 		} else if len(invalidKeys) > 0 {
 			ui.PrintWarningf(r.cmd.ErrOrStderr(),
 				"The following usage file parameters are invalid and will be ignored: %s\n",
@@ -452,24 +452,28 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 			spinner.Fail()
 			r.cmd.PrintErrln()
 
-			if e := unwrapped(err); errors.Is(e, apiclient.ErrInvalidAPIKey) {
-				return nil, fmt.Errorf("%v\n%s %s %s %s %s\n%s %s.\n%s %s %s",
-					e.Error(),
-					"Please check your",
-					ui.PrimaryString(config.CredentialsFilePath()),
-					"file or",
-					ui.PrimaryString("INFRACOST_API_KEY"),
-					"environment variable.",
-					"If you recently regenerated your API key, you can retrieve it from",
-					ui.PrimaryString(r.runCtx.Config.DashboardEndpoint),
-					"See",
-					ui.PrimaryString("https://infracost.io/support"),
-					"if you continue having issues.",
-				)
-			}
+			var apiErr *apiclient.APIError
+			if errors.As(err, &apiErr) {
+				switch apiErr.ErrorCode {
+				case apiclient.ErrorCodeExceededQuota:
+					return nil, &schema.ProjectDiag{Code: schema.DiagRunQuotaExceeded, Message: apiErr.Msg}
+				case apiclient.ErrorCodeAPIKeyInvalid:
+					return nil, fmt.Errorf("%v\n%s %s %s %s %s\n%s %s.\n%s %s %s",
+						apiErr.Msg,
+						"Please check your",
+						ui.PrimaryString(config.CredentialsFilePath()),
+						"file or",
+						ui.PrimaryString("INFRACOST_API_KEY"),
+						"environment variable.",
+						"If you recently regenerated your API key, you can retrieve it from",
+						ui.PrimaryString(r.runCtx.Config.DashboardEndpoint),
+						"See",
+						ui.PrimaryString("https://infracost.io/support"),
+						"if you continue having issues.",
+					)
+				}
 
-			if e, ok := err.(*apiclient.APIError); ok {
-				return nil, fmt.Errorf("%v\n%s", e.Error(), "We have been notified of this issue.")
+				return nil, fmt.Errorf("%v\n%s", apiErr.Error(), "We have been notified of this issue.")
 			}
 
 			return nil, err
@@ -515,7 +519,7 @@ func (r *parallelRunner) uploadCloudResourceIDs(projects []*schema.Project) erro
 
 	for _, project := range projects {
 		if err := prices.UploadCloudResourceIDs(r.runCtx, project); err != nil {
-			logging.Logger.WithError(err).Debugf("failed to upload resource IDs for project %s", project.Name)
+			logging.Logger.Debug().Err(err).Msgf("failed to upload resource IDs for project %s", project.Name)
 			return err
 		}
 	}
@@ -577,7 +581,7 @@ func (r *parallelRunner) fetchProjectUsage(projects []*schema.Project) map[*sche
 	for _, project := range projects {
 		usageMap, err := prices.FetchUsageData(r.runCtx, project)
 		if err != nil {
-			logging.Logger.WithError(err).Debugf("failed to retrieve usage data for project %s", project.Name)
+			logging.Logger.Debug().Err(err).Msgf("failed to retrieve usage data for project %s", project.Name)
 			return nil
 		}
 		r.runCtx.ContextValues.SetValue("fetchedUsageData", true)
@@ -601,7 +605,7 @@ func (r *parallelRunner) populateActualCosts(projects []*schema.Project) {
 
 		for _, project := range projects {
 			if err := prices.PopulateActualCosts(r.runCtx, project); err != nil {
-				logging.Logger.WithError(err).Debugf("failed to retrieve actual costs for project %s", project.Name)
+				logging.Logger.Debug().Err(err).Msgf("failed to retrieve actual costs for project %s", project.Name)
 				return
 			}
 		}
@@ -681,7 +685,7 @@ func (r *parallelRunner) generateUsageFile(ctx *config.ProjectContext, provider 
 		spinner.Success()
 
 		if r.runCtx.Config.IsLogging() {
-			logging.Logger.Infof("synced %d of %d resource%s", successes, resources, pluralized)
+			logging.Logger.Info().Msgf("synced %d of %d resource%s", successes, resources, pluralized)
 		} else {
 			r.cmd.PrintErrln(fmt.Sprintf("    %s Synced %d of %d resource%s",
 				ui.FaintString("└─"),
@@ -897,15 +901,6 @@ func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectCon
 	}
 
 	return env
-}
-
-func unwrapped(err error) error {
-	e := err
-	for errors.Unwrap(e) != nil {
-		e = errors.Unwrap(e)
-	}
-
-	return e
 }
 
 func newErroredProject(ctx *config.ProjectContext, err error) *projectOutput {

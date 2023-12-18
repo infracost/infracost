@@ -18,9 +18,9 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
       - name: Set up Go 1.x
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
-          go-version: 1.19
+          go-version: 1.21
       - name: Build project
         run: make ${{ matrix.target }}
       - name: Upload amd64 build artifact

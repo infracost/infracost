@@ -31,7 +31,7 @@ var Base64DecodeFunc = function.New(&function.Spec{
 			return cty.UnknownVal(cty.String), fmt.Errorf("failed to decode base64 data '%s'", s)
 		}
 		if !utf8.Valid([]byte(sDec)) {
-			logging.Logger.Debugf("the result of decoding the provided string is not valid UTF-8: %s", sDec)
+			logging.Logger.Debug().Msgf("the result of decoding the provided string is not valid UTF-8: %s", sDec)
 			return cty.UnknownVal(cty.String), fmt.Errorf("the result of decoding the provided string is not valid UTF-8")
 		}
 		return cty.StringVal(string(sDec)), nil

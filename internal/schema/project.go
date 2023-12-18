@@ -21,6 +21,7 @@ const (
 	DiagTerragruntModuleEvaluationFailure
 	DiagPrivateModuleDownloadFailure
 	DiagPrivateRegistryModuleDownloadFailure
+	DiagRunQuotaExceeded
 )
 
 // ProjectDiag holds information about all diagnostics associated with a project.
@@ -43,6 +44,8 @@ type ProjectMetadata struct {
 	Path                string             `json:"path"`
 	Type                string             `json:"type"`
 	ConfigSha           string             `json:"configSha,omitempty"`
+	PolicySha           string             `json:"policySha,omitempty"`
+	PastPolicySha       string             `json:"pastPolicySha,omitempty"`
 	TerraformModulePath string             `json:"terraformModulePath,omitempty"`
 	TerraformWorkspace  string             `json:"terraformWorkspace,omitempty"`
 	VCSSubPath          string             `json:"vcsSubPath,omitempty"`
@@ -51,6 +54,7 @@ type ProjectMetadata struct {
 	Warnings            []ProjectDiag      `json:"warnings,omitempty"`
 	Policies            Policies           `json:"policies,omitempty"`
 	Providers           []ProviderMetadata `json:"providers,omitempty"`
+	RemoteModuleCalls   []string           `json:"remoteModuleCalls,omitempty"`
 }
 
 type ProviderMetadata struct {
@@ -88,6 +92,19 @@ func (m *ProjectMetadata) HasErrors() bool {
 	return len(m.Errors) > 0
 }
 
+// IsRunQuotaExceeded checks if any of the project diags are of type "run quota
+// exceeded". If found it returns the associated message with this diag. This
+// should be used when in any output that notifies the user.
+func (m *ProjectMetadata) IsRunQuotaExceeded() (string, bool) {
+	for _, diag := range m.Errors {
+		if diag.Code == DiagRunQuotaExceeded {
+			return diag.Message, true
+		}
+	}
+
+	return "", false
+}
+
 func (m *ProjectMetadata) WorkspaceLabel() string {
 	if m.TerraformWorkspace == "default" {
 		return ""
@@ -112,7 +129,7 @@ func (m *ProjectMetadata) GenerateProjectName(remote vcs.Remote, dashboardEnable
 	if dashboardEnabled {
 		absPath, err := filepath.Abs(m.Path)
 		if err != nil {
-			logging.Logger.Debugf("Could not get absolute path for %s", m.Path)
+			logging.Logger.Debug().Msgf("Could not get absolute path for %s", m.Path)
 			absPath = m.Path
 		}
 

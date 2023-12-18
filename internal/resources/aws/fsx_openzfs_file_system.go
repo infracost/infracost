@@ -3,6 +3,7 @@ package aws
 import (
 	"fmt"
 	"math"
+	"strings"
 
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
@@ -128,20 +129,33 @@ func (r *FSxOpenZFSFileSystem) backupGBCostComponent() *schema.CostComponent {
 		backupStorage = decimalPtr(decimal.NewFromFloat(*r.BackupStorageGB))
 	}
 
+	filters := []*schema.AttributeFilter{
+		{Key: "usagetype", ValueRegex: strPtr("/BackupUsage/")},
+		{Key: "fileSystemType", Value: strPtr("OpenZFS")},
+	}
+	if strings.Contains(strings.ToLower(r.DeploymentType), "multi") {
+		filters = append(filters, &schema.AttributeFilter{
+			Key:   "deploymentOption",
+			Value: strPtr("Multi-AZ"),
+		})
+	} else {
+		filters = append(filters, &schema.AttributeFilter{
+			Key:   "deploymentOption",
+			Value: strPtr("N/A"),
+		})
+	}
+
 	return &schema.CostComponent{
 		Name:            "Backup storage",
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: backupStorage,
 		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("aws"),
-			Region:        strPtr(r.Region),
-			Service:       strPtr("AmazonFSx"),
-			ProductFamily: strPtr("Storage"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr("/BackupUsage/")},
-				{Key: "fileSystemType", Value: strPtr("OpenZFS")},
-			},
+			VendorName:       strPtr("aws"),
+			Region:           strPtr(r.Region),
+			Service:          strPtr("AmazonFSx"),
+			ProductFamily:    strPtr("Storage"),
+			AttributeFilters: filters,
 		},
 	}
 }

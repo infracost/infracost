@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/google/go-github/v41/github"
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 	"golang.org/x/oauth2"
 	"golang.org/x/sync/errgroup"
 )
@@ -20,23 +20,23 @@ func main() {
 
 	release, err := createDraftRelease(cli)
 	if err != nil {
-		log.Errorf("failed to create draft release %s", err)
+		log.Error().Msgf("failed to create draft release %s", err)
 		return
 	}
 
 	toUpload, err := findReleaseAssets()
 	if err != nil {
-		log.Errorf("failed to collect release assets %s", err)
+		log.Error().Msgf("failed to collect release assets %s", err)
 		return
 	}
 
 	err = uploadAssets(toUpload, cli, release)
 	if err != nil {
-		log.Errorf("failed to upload release assets %s", err)
+		log.Error().Msgf("failed to upload release assets %s", err)
 		return
 	}
 
-	log.Info("successfully created draft release")
+	log.Info().Msg("successfully created draft release")
 }
 
 func createDraftRelease(cli *github.Client) (*github.RepositoryRelease, error) {
@@ -126,7 +126,7 @@ func uploadAssets(toUpload []string, cli *github.Client, release *github.Reposit
 }
 
 func uploadAsset(file string, cli *github.Client, id int64) error {
-	log.Infof("uploading asset %s", file)
+	log.Info().Msgf("uploading asset %s", file)
 
 	f, err := os.Open(file)
 	if err != nil {

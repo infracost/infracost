@@ -1,0 +1,57 @@
+locals {
+    mod0toparse = [
+        for map_idx in range(0, length(local.input_maps)):
+        [{
+            path = [], 
+            value = local.input_maps[map_idx]
+        }]
+    ]
+%{ for depth in range(0, max_depth + 1) ~}
+    mod${depth} = [
+        for map_idx in range(0, length(local.input_maps)):
+        {
+            fields = concat([], [
+                for item in ${depth == 0 ? "local.mod${depth}toparse[map_idx]" : "local.mod${depth - 1}[map_idx].remaining"}:
+                [
+                    for key in keys(item["value"]):
+                    {
+                        key = jsonencode(concat(item["path"], [key])),
+                        path = concat(item["path"], [key]),
+                        value = item["value"][key],
+                        is_final = item["value"][key] == null || try(tolist(item["value"][key]), toset(item["value"][key]), tonumber(item["value"][key]), tobool(item["value"][key]), tostring(item["value"][key]), null) != null
+                    }
+                ]
+            ]...)
+            remaining = concat([], [
+                for item in ${depth == 0 ? "local.mod${depth}toparse[map_idx]" : "local.mod${depth - 1}[map_idx].remaining"}:
+                [
+                    for key in keys(item["value"]):
+                    {
+                        path = concat(item["path"], [key]),
+                        value = item["value"][key]
+                    }
+                    if item["value"][key] != null && try(tolist(item["value"][key]), toset(item["value"][key]), tonumber(item["value"][key]), tobool(item["value"][key]), tostring(item["value"][key]), null) == null
+                ]
+            ]...)
+        }
+    ]
+%{ endfor ~}
+
+    modules = [
+%{ for depth in range(0, max_depth + 1) ~}
+        local.mod${depth},
+%{ endfor ~}
+    ]
+
+    m${max_depth + 1} = {}
+%{ for depth in range(max_depth, 0, -1) ~}
+    m${depth} = {
+        for field in lookup(local.merged_fields_by_depth, ${depth - 1}, {}):
+        field.key => {final_val = field.value, sub_val = {
+            for subfield in lookup(local.merged_fields_by_depth, ${depth}, {}):
+            subfield.path[length(subfield.path) - 1] => lookup(local.m${depth + 1}, subfield.key, subfield.value)
+            if slice(subfield.path, 0, length(subfield.path) - 1) == field.path
+        }}[field.is_final ? "final_val" : "sub_val"]
+    }
+%{ endfor ~}
+}

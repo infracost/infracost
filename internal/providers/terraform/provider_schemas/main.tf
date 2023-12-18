@@ -15,4 +15,5 @@ provider "azurerm" {
 
 provider "google" {
   credentials = "{\"type\":\"service_account\"}"
+  project     = "my-project"
 }

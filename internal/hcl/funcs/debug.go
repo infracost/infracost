@@ -3,9 +3,10 @@ package funcs
 import (
 	"fmt"
 
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/function"
+	ctyJson "github.com/zclconf/go-cty/cty/json"
 )
 
 // PrintArgs prints any number of args to the std out using fmt.
@@ -46,11 +47,17 @@ var PrintArgs = function.New(&function.Spec{
 		return args[1].Type(), nil
 	},
 	Impl: func(args []cty.Value, retType cty.Type) (cty.Value, error) {
-		fmt.Printf("terraform print %q:%s\n", args[0].AsString(), args[1].GoString())
+		fmt.Printf("terraform print %q:%s\n", args[0].AsString(), string(valueToBytes(args[1])))
 
 		return args[1], nil
 	},
 })
+
+func valueToBytes(v cty.Value) []byte {
+	simple := ctyJson.SimpleJSONValue{Value: v}
+	b, _ := simple.MarshalJSON()
+	return b
+}
 
 // LogArgs is identical to PrintArgs but writes the arguments to the Infracost log.
 // This is useful to understand arguments as they change in the module evaluation.
@@ -65,7 +72,7 @@ var PrintArgs = function.New(&function.Spec{
 //
 //	time="2022-12-06T10:27:40Z" level=debug enable_cloud_org=false ... attribute_name=volume_size provider=terraform_dir block_name=root_block_device. sync_usage=false msg="fetching attribute value"
 //	time="2022-12-06T10:27:40Z" level=debug ... msg="terraform print "test":cty.StringVal(\"foo\")"
-func LogArgs(logger *logrus.Entry) function.Function {
+func LogArgs(logger zerolog.Logger) function.Function {
 	return function.New(&function.Spec{
 		Params: []function.Parameter{
 			{
@@ -85,7 +92,7 @@ func LogArgs(logger *logrus.Entry) function.Function {
 			return args[1].Type(), nil
 		},
 		Impl: func(args []cty.Value, retType cty.Type) (cty.Value, error) {
-			logger.Logger.Debugf("terraform print %q:%s", args[0], args[1].GoString())
+			logger.Debug().Msgf("terraform print %q:%s", args[0], args[1].GoString())
 
 			return args[1], nil
 		},

@@ -4,7 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 
 	"github.com/infracost/infracost/internal/resources/azure"
 	"github.com/infracost/infracost/internal/schema"
@@ -26,7 +26,7 @@ func newPostgreSQLFlexibleServer(d *schema.ResourceData, u *schema.UsageData) *s
 
 	s := strings.Split(sku, "_")
 	if len(s) < 3 || len(s) > 4 {
-		log.Warnf("Unrecognised PostgreSQL Flexible Server SKU format for resource %s: %s", d.Address, sku)
+		log.Warn().Msgf("Unrecognised PostgreSQL Flexible Server SKU format for resource %s: %s", d.Address, sku)
 		return nil
 	}
 
@@ -41,7 +41,7 @@ func newPostgreSQLFlexibleServer(d *schema.ResourceData, u *schema.UsageData) *s
 
 	supportedTiers := []string{"b", "gp", "mo"}
 	if !contains(supportedTiers, tier) {
-		log.Warnf("Unrecognised PostgreSQL Flexible Server tier prefix for resource %s: %s", d.Address, sku)
+		log.Warn().Msgf("Unrecognised PostgreSQL Flexible Server tier prefix for resource %s: %s", d.Address, sku)
 		return nil
 	}
 
@@ -49,7 +49,7 @@ func newPostgreSQLFlexibleServer(d *schema.ResourceData, u *schema.UsageData) *s
 		coreRegex := regexp.MustCompile(`(\d+)`)
 		match := coreRegex.FindStringSubmatch(size)
 		if len(match) < 1 {
-			log.Warnf("Unrecognised PostgreSQL Flexible Server size for resource %s: %s", d.Address, sku)
+			log.Warn().Msgf("Unrecognised PostgreSQL Flexible Server size for resource %s: %s", d.Address, sku)
 			return nil
 		}
 	}

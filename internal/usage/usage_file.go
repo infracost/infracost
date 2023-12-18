@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 	"golang.org/x/mod/semver"
 	yamlv3 "gopkg.in/yaml.v3"
 
@@ -41,7 +41,7 @@ func CreateUsageFile(path string) error {
 			return errors.Wrapf(err, "Error writing blank usage file to %s", path)
 		}
 	} else {
-		log.Debug("Specified usage file already exists, no overriding")
+		log.Debug().Msg("Specified usage file already exists, no overriding")
 	}
 
 	return nil
@@ -50,7 +50,7 @@ func CreateUsageFile(path string) error {
 func LoadUsageFile(path string) (*UsageFile, error) {
 	blankUsage := NewBlankUsageFile()
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		log.Debug("Specified usage file does not exist. Using a blank file")
+		log.Debug().Msg("Specified usage file does not exist. Using a blank file")
 
 		return blankUsage, nil
 	}

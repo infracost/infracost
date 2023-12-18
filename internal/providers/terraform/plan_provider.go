@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
@@ -63,15 +63,15 @@ func (p *PlanProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, 
 	project := schema.NewProject(name, metadata)
 	parser := NewParser(p.ctx, p.includePastResources)
 
-	partialPastResources, partialResources, providerMetadatas, err := parser.parseJSON(j, usage)
+	parsedConf, err := parser.parseJSON(j, usage)
 	if err != nil {
 		return []*schema.Project{project}, errors.Wrap(err, "Error parsing Terraform JSON")
 	}
 
-	project.AddProviderMetadata(providerMetadatas)
+	project.AddProviderMetadata(parsedConf.ProviderMetadata)
 
-	project.PartialPastResources = partialPastResources
-	project.PartialResources = partialResources
+	project.PartialPastResources = parsedConf.PastResources
+	project.PartialResources = parsedConf.CurrentResources
 
 	spinner.Success()
 	return []*schema.Project{project}, nil
@@ -86,7 +86,7 @@ func (p *PlanProvider) generatePlanJSON() ([]byte, error) {
 	planPath := filepath.Base(p.Path)
 
 	if !IsTerraformDir(dir) {
-		log.Debugf("%s is not a Terraform directory, checking current working directory", dir)
+		log.Debug().Msgf("%s is not a Terraform directory, checking current working directory", dir)
 		dir, err := os.Getwd()
 		if err != nil {
 			return []byte{}, err

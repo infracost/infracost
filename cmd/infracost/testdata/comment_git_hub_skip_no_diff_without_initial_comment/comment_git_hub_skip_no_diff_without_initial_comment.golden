@@ -1,6 +1,6 @@
 Comment not posted to GitHub: Not creating initial comment since there is no resource or cost difference
 
 Logs:
-level=info msg="Finding matching comments for tag infracost-comment"
-level=info msg="Found 0 matching comments"
-level=info msg="Not creating initial comment since there is no resource or cost difference"
+INF Finding matching comments for tag infracost-comment
+INF Found 0 matching comments
+INF Not creating initial comment since there is no resource or cost difference

@@ -9,7 +9,7 @@ import (
 
 	"github.com/infracost/infracost/internal/ui"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 )
 
 func ToTable(out Root, opts Options) ([]byte, error) {
@@ -185,7 +185,7 @@ func tableForBreakdown(currency string, breakdown Breakdown, fields []string, in
 		filteredComponents := filterZeroValComponents(r.CostComponents, r.Name)
 		filteredSubResources := filterZeroValResources(r.SubResources, r.Name)
 		if len(filteredComponents) == 0 && len(filteredSubResources) == 0 {
-			log.Info(fmt.Sprintf("Hiding resource with no usage: %s", r.Name))
+			log.Info().Msgf("Hiding resource with no usage: %s", r.Name)
 			continue
 		}
 
@@ -319,7 +319,7 @@ func filterZeroValComponents(costComponents []CostComponent, resourceName string
 	var filteredComponents []CostComponent
 	for _, c := range costComponents {
 		if c.MonthlyQuantity != nil && c.MonthlyQuantity.IsZero() {
-			log.Info(fmt.Sprintf("Hiding cost with no usage: %s '%s'", resourceName, c.Name))
+			log.Info().Msgf("Hiding cost with no usage: %s '%s'", resourceName, c.Name)
 			continue
 		}
 
@@ -334,7 +334,7 @@ func filterZeroValResources(resources []Resource, resourceName string) []Resourc
 		filteredComponents := filterZeroValComponents(r.CostComponents, fmt.Sprintf("%s.%s", resourceName, r.Name))
 		filteredSubResources := filterZeroValResources(r.SubResources, fmt.Sprintf("%s.%s", resourceName, r.Name))
 		if len(filteredComponents) == 0 && len(filteredSubResources) == 0 {
-			log.Info(fmt.Sprintf("Hiding resource with no usage: %s.%s", resourceName, r.Name))
+			log.Info().Msgf("Hiding resource with no usage: %s.%s", resourceName, r.Name)
 			continue
 		}
 

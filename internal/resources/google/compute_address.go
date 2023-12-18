@@ -108,7 +108,7 @@ func (r *ComputeAddress) unusedVMComputeAddress() *schema.CostComponent {
 			Service:       strPtr("Compute Engine"),
 			ProductFamily: strPtr("Network"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "description", Value: strPtr("Static Ip Charge")},
+				{Key: "description", ValueRegex: regexPtr("^Static Ip Charge.*")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

@@ -1,5 +1,6 @@
 
-<p>💰 Infracost estimate: <b>monthly cost will decrease by $2,241 📉</b></p>
+<h3>Infracost report</h3>
+<h4>💰 Monthly cost will decrease by $2,241 📉</h4>
 <table>
   <thead>
     <td>Project</td>
@@ -54,7 +55,7 @@
   </tbody>
 </table>
 <details>
-<summary><strong>Infracost output</strong></summary>
+<summary>Cost details</summary>
 
 ```
 ──────────────────────────────────
@@ -154,7 +155,7 @@ Key: ~ changed, + added, - removed
 12 cloud resources were detected:
 ∙ 12 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 
-Infracost estimate: monthly cost will decrease by $2,241 ↓
+Infracost estimate: Monthly cost will decrease by $2,241 ↓
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Cost change  ┃ New monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━┫

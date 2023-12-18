@@ -1,19 +1,25 @@
 
- Name                                 Monthly Qty  Unit              Monthly Cost 
-                                                                                  
- aws_docdb_cluster.my_docdb                                                       
- └─ Backup storage                 Monthly cost depends on usage: $0.021 per GB   
-                                                                                  
- aws_docdb_cluster.my_docdb_usage                                                 
- └─ Backup storage                         10,000  GB                     $210.00 
-                                                                                  
- OVERALL TOTAL                                                            $210.00 
+ Name                                     Monthly Qty  Unit              Monthly Cost 
+                                                                                      
+ aws_docdb_cluster.my_docdb                                                           
+ └─ Backup storage                     Monthly cost depends on usage: $0.021 per GB   
+                                                                                      
+ aws_docdb_cluster.my_docdb_ue2                                                       
+ └─ Backup storage                     Monthly cost depends on usage: $0.021 per GB   
+                                                                                      
+ aws_docdb_cluster.my_docdb_usage                                                     
+ └─ Backup storage                             10,000  GB                     $210.00 
+                                                                                      
+ aws_docdb_cluster.my_docdb_usage_ue2                                                 
+ └─ Backup storage                             10,000  GB                     $210.00 
+                                                                                      
+ OVERALL TOTAL                                                                $420.00 
 ──────────────────────────────────
-2 cloud resources were detected:
-∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+4 cloud resources were detected:
+∙ 4 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestNewDocDBClusterGoldenFile                      ┃ $210         ┃
+┃ TestNewDocDBClusterGoldenFile                      ┃ $420         ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛

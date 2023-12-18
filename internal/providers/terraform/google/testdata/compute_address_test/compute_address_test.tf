@@ -1,5 +1,6 @@
 provider "google" {
   credentials = "{\"type\":\"service_account\"}"
+  project     = "my-project"
   region      = "us-central1"
 }
 
@@ -20,6 +21,11 @@ resource "google_compute_address" "static_with_different_purpose" {
 resource "google_compute_address" "internal" {
   name         = "ipv4-address-internal"
   address_type = "INTERNAL"
+}
+
+resource "google_compute_address" "default_diff_region" {
+  name   = "ipv4-address-default"
+  region = "europe-central2"
 }
 
 resource "google_compute_global_address" "default" {

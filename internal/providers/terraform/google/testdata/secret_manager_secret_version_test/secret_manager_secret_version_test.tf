@@ -1,5 +1,6 @@
 provider "google" {
   credentials = "{\"type\":\"service_account\"}"
+  project     = "my-project"
   region      = "us-central1"
 }
 
@@ -30,7 +31,7 @@ resource "google_secret_manager_secret" "secret_automatic" {
   }
 
   replication {
-    automatic = true
+    auto {}
   }
 }
 

@@ -3,10 +3,11 @@ package main_test
 import (
 	_ "embed"
 	"fmt"
-	"github.com/infracost/infracost/internal/config"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"github.com/infracost/infracost/internal/config"
 
 	"github.com/infracost/infracost/internal/testutil"
 )
@@ -101,16 +102,13 @@ func TestUploadWithCloudDisabled(t *testing.T) {
 }
 
 func TestUploadWithGuardrailSuccess(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, `[{"data": {"addRun":{
-			"id":"d92e0196-e5b0-449b-85c9-5733f6643c2f",
-			"shareUrl":"",
-			"organization":{"id":"767", "name":"tim"},
-			"guardrailsChecked": 2,
-            "guardrailComment": false,
-            "guardrailEvents": []
-		}}}]`)
-	}))
+	ts := governanceTestEndpoint(governanceAddRunResponse{
+		GovernanceComment: "",
+		GovernanceResults: []GovernanceResult{{
+			Type:    "guardrail",
+			Checked: 2,
+		}},
+	})
 	defer ts.Close()
 
 	GoldenFileCommandTest(t,
@@ -126,20 +124,17 @@ func TestUploadWithGuardrailSuccess(t *testing.T) {
 }
 
 func TestUploadWithGuardrailFailure(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, `[{"data": {"addRun":{
-			"id":"d92e0196-e5b0-449b-85c9-5733f6643c2f",
-			"shareUrl":"",
-			"organization":{"id":"767", "name":"tim"},
-			"guardrailsChecked": 2,
-            "guardrailComment": false,
-            "guardrailEvents": [{
-              "triggerReason": "medical problems",
-              "prComment": false,
-              "blockPr": false,
-			}]
-		}}}]`)
-	}))
+	ts := governanceTestEndpoint(governanceAddRunResponse{
+		GovernanceComment: "",
+		GovernanceResults: []GovernanceResult{{
+			Type:    "guardrail",
+			Checked: 2,
+			Warnings: []string{
+				"medical problems",
+			},
+		}},
+	})
+	defer ts.Close()
 	defer ts.Close()
 
 	GoldenFileCommandTest(t,
@@ -155,20 +150,16 @@ func TestUploadWithGuardrailFailure(t *testing.T) {
 }
 
 func TestUploadWithBlockingGuardrailFailure(t *testing.T) {
-	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, `[{"data": {"addRun":{
-			"id":"d92e0196-e5b0-449b-85c9-5733f6643c2f",
-			"shareUrl":"",
-			"organization":{"id":"767", "name":"tim"},
-			"guardrailsChecked": 2,
-            "guardrailComment": false,
-            "guardrailEvents": [{
-              "triggerReason": "medical problems",
-              "prComment": false,
-              "blockPr": true,
-			}]
-		}}}]`)
-	}))
+	ts := governanceTestEndpoint(governanceAddRunResponse{
+		GovernanceComment: "",
+		GovernanceResults: []GovernanceResult{{
+			Type:    "guardrail",
+			Checked: 2,
+			Failures: []string{
+				"medical problems",
+			},
+		}},
+	})
 	defer ts.Close()
 
 	GoldenFileCommandTest(t,
@@ -183,22 +174,26 @@ func TestUploadWithBlockingGuardrailFailure(t *testing.T) {
 	)
 }
 
-//go:embed testdata/upload_with_blocking_tag_policy_failure/tagPolicyResponse.json
+//go:embed testdata/upload_with_blocking_tag_policy_failure/policyResponse.json
 var uploadWithBlockingTagPolicyFailureResponse string
 
 func TestUploadWithBlockingTagPolicyFailure(t *testing.T) {
-	tagPolicyApi := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, _ = fmt.Fprintln(w, uploadWithBlockingTagPolicyFailureResponse)
-	}))
-	defer tagPolicyApi.Close()
+	policyV2Api := GraphqlTestServer(map[string]string{
+		"policyResourceAllowList": policyResourceAllowlistGraphQLResponse,
+		"evaluatePolicies":        uploadWithBlockingTagPolicyFailureResponse,
+	})
+	defer policyV2Api.Close()
 
-	dashboardApi := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, `[{"data": {"addRun":{
-			"id":"d92e0196-e5b0-449b-85c9-5733f6643c2f",
-			"shareUrl":"",
-			"organization":{"id":"767", "name":"tim"}
-		}}}]`)
-	}))
+	dashboardApi := governanceTestEndpoint(governanceAddRunResponse{
+		GovernanceComment: "Tag policy failure",
+		GovernanceResults: []GovernanceResult{{
+			Type:    "tag_policy",
+			Checked: 2,
+			Failures: []string{
+				"should show as failing",
+			},
+		}},
+	})
 	defer dashboardApi.Close()
 
 	GoldenFileCommandTest(t,
@@ -209,19 +204,21 @@ func TestUploadWithBlockingTagPolicyFailure(t *testing.T) {
 		},
 		func(c *config.RunContext) {
 			c.Config.DashboardAPIEndpoint = dashboardApi.URL
-			c.Config.TagPolicyAPIEndpoint = tagPolicyApi.URL
+			c.Config.PolicyV2APIEndpoint = policyV2Api.URL
+			c.Config.PoliciesEnabled = true
 		},
 	)
 }
 
-//go:embed testdata/upload_with_tag_policy_warning/tagPolicyResponse.json
+//go:embed testdata/upload_with_tag_policy_warning/policyResponse.json
 var uploadWithTagPolicyWarningResponse string
 
 func TestUploadWithTagPolicyWarning(t *testing.T) {
-	tagPolicyApi := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		_, _ = fmt.Fprintln(w, uploadWithTagPolicyWarningResponse)
-	}))
-	defer tagPolicyApi.Close()
+	policyV2Api := GraphqlTestServer(map[string]string{
+		"policyResourceAllowList": policyResourceAllowlistGraphQLResponse,
+		"evaluatePolicies":        uploadWithTagPolicyWarningResponse,
+	})
+	defer policyV2Api.Close()
 
 	dashboardApi := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, `[{"data": {"addRun":{
@@ -240,7 +237,77 @@ func TestUploadWithTagPolicyWarning(t *testing.T) {
 		},
 		func(c *config.RunContext) {
 			c.Config.DashboardAPIEndpoint = dashboardApi.URL
-			c.Config.TagPolicyAPIEndpoint = tagPolicyApi.URL
+			c.Config.PolicyV2APIEndpoint = policyV2Api.URL
+			c.Config.PoliciesEnabled = true
+		},
+	)
+}
+
+//go:embed testdata/upload_with_blocking_fin_ops_policy_failure/policyResponse.json
+var uploadWithBlockingFinOpsPolicyFailureResponse string
+
+func TestUploadWithBlockingFinOpsPolicyFailure(t *testing.T) {
+	policyV2Api := GraphqlTestServer(map[string]string{
+		"policyResourceAllowList": policyResourceAllowlistGraphQLResponse,
+		"evaluatePolicies":        uploadWithBlockingFinOpsPolicyFailureResponse,
+	})
+	defer policyV2Api.Close()
+
+	dashboardApi := governanceTestEndpoint(governanceAddRunResponse{
+		GovernanceComment: "FinOPs policy failure",
+		GovernanceResults: []GovernanceResult{{
+			Type:    "finops_policy",
+			Checked: 2,
+			Failures: []string{
+				"should show as failing",
+			},
+		}},
+	})
+	defer dashboardApi.Close()
+
+	GoldenFileCommandTest(t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{"upload", "--path", "./testdata/example_out.json", "--log-level", "info"},
+		&GoldenFileOptions{
+			CaptureLogs: true,
+		},
+		func(c *config.RunContext) {
+			c.Config.DashboardAPIEndpoint = dashboardApi.URL
+			c.Config.PolicyV2APIEndpoint = policyV2Api.URL
+			c.Config.PoliciesEnabled = true
+		},
+	)
+}
+
+//go:embed testdata/upload_with_fin_ops_policy_warning/policyResponse.json
+var uploadWithFinOpsPolicyWarningResponse string
+
+func TestUploadWithFinOpsPolicyWarning(t *testing.T) {
+	policyV2Api := GraphqlTestServer(map[string]string{
+		"policyResourceAllowList": policyResourceAllowlistGraphQLResponse,
+		"evaluatePolicies":        uploadWithFinOpsPolicyWarningResponse,
+	})
+	defer policyV2Api.Close()
+
+	dashboardApi := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, `[{"data": {"addRun":{
+			"id":"d92e0196-e5b0-449b-85c9-5733f6643c2f",
+			"shareUrl":"",
+			"organization":{"id":"767", "name":"tim"}
+		}}}]`)
+	}))
+	defer dashboardApi.Close()
+
+	GoldenFileCommandTest(t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{"upload", "--path", "./testdata/example_out.json", "--log-level", "info"},
+		&GoldenFileOptions{
+			CaptureLogs: true,
+		},
+		func(c *config.RunContext) {
+			c.Config.DashboardAPIEndpoint = dashboardApi.URL
+			c.Config.PolicyV2APIEndpoint = policyV2Api.URL
+			c.Config.PoliciesEnabled = true
 		},
 	)
 }

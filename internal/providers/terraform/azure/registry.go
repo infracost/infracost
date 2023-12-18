@@ -137,6 +137,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getApplicationInsightsStandardWebTestRegistryItem(),
 	getRecoveryServicesVaultRegistryItem(),
 	getBackupProtectedVmRegistryItem(),
+	getStorageManagementPolicyRegistryItem(),
 	getStorageQueueRegistryItem(),
 	getStorageShareRegistryItem(),
 	getLogicAppIntegrationAccountRegistryItem(),
@@ -155,6 +156,9 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getLogicAppStandardRegistryItem(),
 	getImageRegistryItem(),
 	getSnapshotRegistryItem(),
+	getPrivateDnsResolverInboundEndpointRegistryItem(),
+	getPrivateDnsResolverOutboundEndpointRegistryItem(),
+	getPrivateDnsResolverDnsForwardingRulesetRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -259,6 +263,7 @@ var FreeResources = []string{
 
 	// Azure DNS
 	"azurerm_private_dns_zone_virtual_network_link",
+	"azurerm_private_dns_resolver",
 
 	// Azure Data Factory
 	"azurerm_data_factory_custom_dataset",
@@ -559,7 +564,6 @@ var FreeResources = []string{
 	"azurerm_storage_blob_inventory_policy",
 	"azurerm_storage_container",
 	"azurerm_storage_data_lake_gen2_path",
-	"azurerm_storage_management_policy",
 	"azurerm_storage_object_replication",
 	"azurerm_storage_share_directory",
 	"azurerm_storage_share_file",

@@ -12,7 +12,6 @@ import (
 
 	"github.com/pkg/errors"
 	"github.com/pkg/profile"
-	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 
@@ -39,6 +38,10 @@ func main() {
 	}
 
 	Run(nil, nil)
+	err := apiclient.GetPricingAPIClient(nil).FlushCache()
+	if err != nil {
+		logging.Logger.Debug().Err(err).Msg("could not flush pricing API cache to filesystem")
+	}
 }
 
 // Run starts the Infracost application with the configured cobra cmds.
@@ -187,7 +190,6 @@ func newRootCmd(ctx *config.RunContext) *cobra.Command {
 	rootCmd.AddCommand(configureCmd(ctx))
 	rootCmd.AddCommand(diffCmd(ctx))
 	rootCmd.AddCommand(breakdownCmd(ctx))
-	rootCmd.AddCommand(scanCommand(ctx))
 	rootCmd.AddCommand(outputCmd(ctx))
 	rootCmd.AddCommand(uploadCmd(ctx))
 	rootCmd.AddCommand(commentCmd(ctx))
@@ -239,7 +241,7 @@ func startUpdateCheck(ctx *config.RunContext, c chan *update.Info) {
 	go func() {
 		updateInfo, err := update.CheckForUpdate(ctx)
 		if err != nil {
-			logging.Logger.WithError(err).Debug("error checking for Infracost CLI update")
+			logging.Logger.Debug().Err(err).Msg("error checking for Infracost CLI update")
 		}
 		c <- updateInfo
 		close(c)
@@ -254,28 +256,35 @@ func loadCloudSettings(ctx *config.RunContext) {
 	dashboardClient := apiclient.NewDashboardAPIClient(ctx)
 	result, err := dashboardClient.QueryCLISettings()
 	if err != nil {
-		logging.Logger.WithError(err).Debug("Failed to load settings from Infracost Cloud ")
+		logging.Logger.Debug().Err(err).Msg("Failed to load settings from Infracost Cloud ")
 		// ignore the error so the command can continue without failing
 		return
 	}
-	logging.Logger.WithFields(log.Fields{"result": fmt.Sprintf("%+v", result)}).Debug("Successfully loaded settings from Infracost Cloud")
+	logging.Logger.Debug().Str("result", fmt.Sprintf("%+v", result)).Msg("Successfully loaded settings from Infracost Cloud")
 
 	ctx.Config.EnableCloudForOrganization = result.CloudEnabled
 	if result.UsageAPIEnabled && ctx.Config.UsageAPIEndpoint == "" {
 		ctx.Config.UsageAPIEndpoint = ctx.Config.DashboardAPIEndpoint
-		logging.Logger.Info("Enabled usage API")
+		logging.Logger.Info().Msg("Enabled usage API")
 	}
 	if result.ActualCostsEnabled && ctx.Config.UsageAPIEndpoint != "" {
 		ctx.Config.UsageActualCosts = true
-		logging.Logger.Info("Enabled actual costs")
+		logging.Logger.Info().Msg("Enabled actual costs")
 	}
 
-	if result.TagsAPIEnabled && ctx.Config.TagPolicyAPIEndpoint == "" {
-		ctx.Config.TagPolicyAPIEndpoint = ctx.Config.DashboardAPIEndpoint
+	if (result.PoliciesAPIEnabled || result.TagsAPIEnabled) && ctx.Config.PolicyV2APIEndpoint == "" {
+		ctx.Config.PolicyV2APIEndpoint = ctx.Config.DashboardAPIEndpoint
+		logging.Logger.Debug().Msg("Using default policies V2 endpoint")
 	}
-	if ctx.Config.TagPolicyAPIEndpoint != "" {
+
+	if result.PoliciesAPIEnabled {
+		ctx.Config.PoliciesEnabled = true
+		logging.Logger.Info().Msg("Enabled policies V2")
+	}
+
+	if result.TagsAPIEnabled {
 		ctx.Config.TagPoliciesEnabled = true
-		logging.Logger.Info("Enabled tag policies")
+		logging.Logger.Info().Msg("Enabled tag policies")
 	}
 }
 
@@ -291,9 +300,8 @@ func checkAPIKey(apiKey string, apiEndpoint string, defaultEndpoint string) erro
 }
 
 var ignoredErrors = []string{
-	"Tag policy check failed",
 	"Policy check failed",
-	"Guardrail check failed",
+	"Governance check failed",
 }
 
 func handleCLIError(ctx *config.RunContext, cliErr error) {
@@ -309,7 +317,7 @@ func handleCLIError(ctx *config.RunContext, cliErr error) {
 
 	err := apiclient.ReportCLIError(ctx, cliErr, true)
 	if err != nil {
-		logging.Logger.WithError(err).Debug("error reporting CLI error")
+		logging.Logger.Debug().Err(err).Msg("error reporting CLI error")
 	}
 }
 
@@ -318,7 +326,7 @@ func handleUnexpectedErr(ctx *config.RunContext, err error) {
 
 	err = apiclient.ReportCLIError(ctx, err, false)
 	if err != nil {
-		logging.Logger.WithError(err).Debug("error sending unexpected runtime error")
+		logging.Logger.Debug().Err(err).Msg("error sending unexpected runtime error")
 	}
 }
 
@@ -374,7 +382,7 @@ func saveOutFileWithMsg(ctx *config.RunContext, cmd *cobra.Command, outFile, suc
 	}
 
 	if ctx.Config.IsLogging() {
-		logging.Logger.Info(successMsg)
+		logging.Logger.Info().Msg(successMsg)
 	} else {
 		cmd.PrintErrf("%s\n", successMsg)
 	}

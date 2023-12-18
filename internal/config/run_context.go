@@ -17,7 +17,6 @@ import (
 	"github.com/infracost/infracost/internal/version"
 
 	"github.com/google/uuid"
-	log "github.com/sirupsen/logrus"
 )
 
 // ContextValues is a type that wraps a map with methods that safely
@@ -251,16 +250,16 @@ func (r *RunContext) IsInfracostComment() bool {
 
 func (r *RunContext) IsCloudEnabled() bool {
 	if r.Config.EnableCloud != nil {
-		logging.Logger.WithFields(log.Fields{"is_cloud_enabled": *r.Config.EnableCloud}).Debug("IsCloudEnabled explicitly set through Config.EnabledCloud")
+		logging.Logger.Debug().Str("is_cloud_enabled", fmt.Sprintf("%v", *r.Config.EnableCloud)).Msg("IsCloudEnabled explicitly set through Config.EnabledCloud")
 		return *r.Config.EnableCloud
 	}
 
 	if r.Config.EnableCloudForOrganization {
-		logging.Logger.Debug("IsCloudEnabled is true with org level setting enabled.")
+		logging.Logger.Debug().Msg("IsCloudEnabled is true with org level setting enabled.")
 		return true
 	}
 
-	logging.Logger.WithFields(log.Fields{"is_cloud_enabled": r.Config.EnableDashboard}).Debug("IsCloudEnabled inferred from Config.EnabledDashboard")
+	logging.Logger.Debug().Str("is_cloud_enabled", fmt.Sprintf("%v", r.Config.EnableDashboard)).Msg("IsCloudEnabled inferred from Config.EnabledDashboard")
 	return r.Config.EnableDashboard
 }
 
@@ -336,13 +335,14 @@ var ciMap = ciEnvMap{
 		"TS_ENV":               "terraspace",
 	},
 	prefixes: map[string]string{
-		"ATLANTIS_":  "atlantis",
-		"BITBUCKET_": "bitbucket",
-		"CONCOURSE_": "concourse",
-		"SPACELIFT_": "spacelift",
-		"HARNESS_":   "harness",
-		"TERRATEAM_": "terrateam",
-		"KEPTN_":     "keptn",
+		"ATLANTIS_":       "atlantis",
+		"BITBUCKET_":      "bitbucket",
+		"CONCOURSE_":      "concourse",
+		"SPACELIFT_":      "spacelift",
+		"HARNESS_":        "harness",
+		"TERRATEAM_":      "terrateam",
+		"KEPTN_":          "keptn",
+		"CLOUDCONCIERGE_": "cloudconcierge",
 	},
 }
 

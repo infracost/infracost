@@ -37,14 +37,29 @@ func GetResourceRegion(resourceType string, v gjson.Result) string {
 }
 
 func ParseTags(r *schema.ResourceData) *map[string]string {
-	_, supportsTags := provider_schemas.GoogleLabelsSupport[r.Type]
+	_, supportsLabels := provider_schemas.GoogleLabelsSupport[r.Type]
 	rLabels := r.Get("labels").Map()
-	if !supportsTags && len(rLabels) == 0 {
+
+	_, supportsUserLabels := provider_schemas.GoogleUserLabelsSupport[r.Type]
+	rUserLabels := r.Get("user_labels").Map()
+
+	_, supportsSettingsUserLabels := provider_schemas.GoogleSettingsUserLabelsSupport[r.Type]
+	rSettingsUserLabels := r.Get("settings.0.user_labels").Map()
+
+	if !supportsLabels && len(rLabels) == 0 &&
+		!supportsUserLabels && len(rUserLabels) == 0 &&
+		!supportsSettingsUserLabels && len(rSettingsUserLabels) == 0 {
 		return nil
 	}
 
 	tags := make(map[string]string)
 	for k, v := range rLabels {
+		tags[k] = v.String()
+	}
+	for k, v := range rUserLabels {
+		tags[k] = v.String()
+	}
+	for k, v := range rSettingsUserLabels {
 		tags[k] = v.String()
 	}
 	return &tags

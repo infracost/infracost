@@ -4,11 +4,12 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/rs/zerolog/log"
+	"github.com/shopspring/decimal"
+	"github.com/tidwall/gjson"
+
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
-	"github.com/shopspring/decimal"
-	log "github.com/sirupsen/logrus"
-	"github.com/tidwall/gjson"
 )
 
 func GetAzureRMCDNEndpointRegistryItem() *schema.RegistryItem {
@@ -34,7 +35,7 @@ func NewAzureRMCDNEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.
 	}
 
 	if len(strings.Split(sku, "_")) != 2 || strings.ToLower(sku) == "standard_chinacdn" {
-		log.Warnf("Unrecognized/unsupported CDN sku format for resource %s: %s", d.Address, sku)
+		log.Warn().Msgf("Unrecognized/unsupported CDN sku format for resource %s: %s", d.Address, sku)
 		return nil
 	}
 

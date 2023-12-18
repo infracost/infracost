@@ -167,7 +167,7 @@ func isTerraformPlanJSON(path string) bool {
 
 	b, hasWrapper := terraform.StripSetupTerraformWrapper(b)
 	if hasWrapper {
-		logging.Logger.Infof("Stripped wrapper output from %s (to make it a valid JSON file) since setup-terraform GitHub Action was used without terraform_wrapper: false", path)
+		logging.Logger.Info().Msgf("Stripped wrapper output from %s (to make it a valid JSON file) since setup-terraform GitHub Action was used without terraform_wrapper: false", path)
 	}
 
 	err = json.Unmarshal(b, &jsonFormat)
@@ -191,7 +191,7 @@ func isTerraformStateJSON(path string) bool {
 
 	b, hasWrapper := terraform.StripSetupTerraformWrapper(b)
 	if hasWrapper {
-		logging.Logger.Debugf("Stripped setup-terraform wrapper output from %s", path)
+		logging.Logger.Debug().Msgf("Stripped setup-terraform wrapper output from %s", path)
 	}
 
 	err = json.Unmarshal(b, &jsonFormat)

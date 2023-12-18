@@ -16,7 +16,7 @@ import (
 	svchost "github.com/hashicorp/terraform-svchost"
 	"github.com/hashicorp/terraform-svchost/auth"
 	"github.com/hashicorp/terraform-svchost/disco"
-	"github.com/sirupsen/logrus"
+	"github.com/rs/zerolog"
 )
 
 var defaultRegistryHost = "registry.terraform.io"
@@ -49,14 +49,14 @@ type RegistryURL struct {
 // Therefore, it is advisable to use Disco per project and pass it to all required clients.
 type Disco struct {
 	disco  *disco.Disco
-	logger *logrus.Entry
+	logger zerolog.Logger
 
 	locks sync.Map
 }
 
 // NewDisco returns a Disco with the provided credentialsSource initialising the underlying Terraform Disco.
 // If Credentials are nil then all registry requests will be unauthed.
-func NewDisco(credentialsSource auth.CredentialsSource, logger *logrus.Entry) *Disco {
+func NewDisco(credentialsSource auth.CredentialsSource, logger zerolog.Logger) *Disco {
 	return &Disco{disco: disco.NewWithCredentialsSource(credentialsSource), logger: logger}
 }
 
@@ -126,7 +126,7 @@ func (d *Disco) DownloadLocation(moduleURL RegistryURL, version string) (string,
 
 	downloadURL := serviceURL.ResolveReference(u)
 
-	d.logger.Debugf("Looking up download URL for module %s from registry URL %s", moduleURL.RawSource, downloadURL.String())
+	d.logger.Debug().Msgf("Looking up download URL for module %s from registry URL %s", moduleURL.RawSource, downloadURL.String())
 
 	httpClient := &http.Client{
 		Timeout: time.Second * 30,
@@ -146,7 +146,7 @@ func (d *Disco) DownloadLocation(moduleURL RegistryURL, version string) (string,
 	}
 
 	if strings.HasPrefix(location, "/") || strings.HasPrefix(location, "./") || strings.HasPrefix(location, "../") {
-		d.logger.Debugf("Detected relative path for location returned by download URL %s", downloadURL.String())
+		d.logger.Debug().Msgf("Detected relative path for location returned by download URL %s", downloadURL.String())
 
 		locationURL, err := url.Parse(location)
 		if err != nil {
@@ -163,11 +163,11 @@ func (d *Disco) DownloadLocation(moduleURL RegistryURL, version string) (string,
 type RegistryLoader struct {
 	packageFetcher *PackageFetcher
 	disco          *Disco
-	logger         *logrus.Entry
+	logger         zerolog.Logger
 }
 
 // NewRegistryLoader constructs a registry loader
-func NewRegistryLoader(packageFetcher *PackageFetcher, disco *Disco, logger *logrus.Entry) *RegistryLoader {
+func NewRegistryLoader(packageFetcher *PackageFetcher, disco *Disco, logger zerolog.Logger) *RegistryLoader {
 	return &RegistryLoader{
 		packageFetcher: packageFetcher,
 		disco:          disco,
@@ -180,7 +180,7 @@ func NewRegistryLoader(packageFetcher *PackageFetcher, disco *Disco, logger *log
 func (r *RegistryLoader) lookupModule(moduleAddr string, versionConstraints string) (*RegistryLookupResult, error) {
 	registrySource, err := normalizeRegistrySource(moduleAddr)
 	if err != nil {
-		r.logger.WithError(err).Debugf("module '%s' not detected as registry module", moduleAddr)
+		r.logger.Debug().Err(err).Msgf("module '%s' not detected as registry module", moduleAddr)
 		return &RegistryLookupResult{
 			OK: false,
 		}, nil
@@ -189,7 +189,7 @@ func (r *RegistryLoader) lookupModule(moduleAddr string, versionConstraints stri
 	moduleURL, ok, err := r.disco.ModuleLocation(registrySource)
 	if !ok {
 		if err != nil {
-			r.logger.WithError(err).Debugf("module '%s' not detected as registry module", moduleAddr)
+			r.logger.Debug().Err(err).Msgf("module '%s' not detected as registry module", moduleAddr)
 		}
 		return &RegistryLookupResult{
 			OK: false,
@@ -275,9 +275,18 @@ func (r *RegistryLoader) downloadModule(lookupResult *RegistryLookupResult, dest
 		return fmt.Errorf("could not find download location: %w", err)
 	}
 	// Deliberately not logging the download URL since it contains a token
-	r.logger.Debugf("Downloading module %s", lookupResult.ModuleURL.RawSource)
+	r.logger.Debug().Msgf("Downloading module %s", lookupResult.ModuleURL.RawSource)
 
 	return r.packageFetcher.fetch(downloadURL, dest)
+}
+
+func (r *RegistryLoader) DownloadLocation(moduleURL RegistryURL, version string) (string, error) {
+	downloadURL, err := r.disco.DownloadLocation(moduleURL, version)
+	if err != nil {
+		return "", fmt.Errorf("could not find download location: %w", err)
+	}
+
+	return downloadURL, nil
 }
 
 // findLatestMatchingVersion returns the latest version from a list of versions that matches the given constraint.

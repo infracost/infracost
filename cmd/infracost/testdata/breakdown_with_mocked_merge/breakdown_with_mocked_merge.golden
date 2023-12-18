@@ -1,0 +1,27 @@
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_with_mocked_merge
+
+ Name                                                   Monthly Qty  Unit   Monthly Cost 
+                                                                                         
+ aws_instance.web_app                                                                    
+ ├─ Instance usage (Linux/UNIX, on-demand, m5.4xlarge)          730  hours       $560.64 
+ └─ root_block_device                                                                    
+    └─ Storage (general purpose SSD, gp2)                         8  GB            $0.80 
+                                                                                         
+ aws_instance.web_app2                                                                   
+ ├─ Instance usage (Linux/UNIX, on-demand, m5.4xlarge)          730  hours       $560.64 
+ └─ root_block_device                                                                    
+    └─ Storage (general purpose SSD, gp2)                         8  GB            $0.80 
+                                                                                         
+ OVERALL TOTAL                                                                 $1,122.88 
+──────────────────────────────────
+2 cloud resources were detected:
+∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                                          ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infraco...ta/breakdown_with_mocked_merge ┃ $1,123       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+
+Err:
+

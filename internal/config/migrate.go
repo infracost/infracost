@@ -7,7 +7,7 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v2"
 )
 
@@ -48,7 +48,7 @@ func (c *Config) migrateCredentials() error {
 }
 
 func (c *Config) migrateV0_7_17(oldPath string, newPath string) error {
-	log.Debugf("Migrating old credentials from %s to %s", oldPath, newPath)
+	log.Debug().Msgf("Migrating old credentials from %s to %s", oldPath, newPath)
 
 	data, err := os.ReadFile(oldPath)
 	if err != nil {
@@ -78,14 +78,14 @@ func (c *Config) migrateV0_7_17(oldPath string, newPath string) error {
 			return err
 		}
 
-		log.Debug("Credentials successfully migrated")
+		log.Debug().Msg("Credentials successfully migrated")
 	}
 
 	return nil
 }
 
 func (c *Config) migrateV0_9_4(credPath string) error {
-	log.Debugf("Migrating old credentials format to v0.1")
+	log.Debug().Msgf("Migrating old credentials format to v0.1")
 
 	// Use MapSlice to keep the order of the items, so we can always use the first one
 	var oldCreds yaml.MapSlice
@@ -134,7 +134,7 @@ func (c *Config) migrateV0_9_4(credPath string) error {
 		return err
 	}
 
-	log.Debug("Credentials successfully migrated")
+	log.Debug().Msg("Credentials successfully migrated")
 
 	return nil
 }

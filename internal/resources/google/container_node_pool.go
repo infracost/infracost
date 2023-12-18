@@ -47,7 +47,7 @@ func (r *ContainerNodePool) BuildResource() *schema.Resource {
 
 	costComponents, err := computeCostComponents(r.Region, r.NodeConfig.MachineType, r.NodeConfig.PurchaseOption, poolSize, nil)
 	if err != nil {
-		logging.Logger.Warnf("Skipping resource %s. %s", r.Address, err)
+		logging.Logger.Warn().Msgf("Skipping resource %s. %s", r.Address, err)
 		return nil
 	}
 

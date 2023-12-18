@@ -1,11 +1,12 @@
 package aws
 
 import (
-	"github.com/infracost/infracost/internal/resources"
-	"github.com/infracost/infracost/internal/schema"
-	log "github.com/sirupsen/logrus"
+	"github.com/rs/zerolog/log"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+
+	"github.com/infracost/infracost/internal/resources"
+	"github.com/infracost/infracost/internal/schema"
 
 	"fmt"
 	"strings"
@@ -73,7 +74,7 @@ func (r *ElastiCacheCluster) elastiCacheCostComponent(autoscaling bool) *schema.
 		}
 		reservedFilter, err := resolver.PriceFilter()
 		if err != nil {
-			log.Warnf(err.Error())
+			log.Warn().Msgf(err.Error())
 		} else {
 			priceFilter = reservedFilter
 		}
@@ -175,7 +176,7 @@ func (r elasticacheReservationResolver) PriceFilter() (*schema.PriceFilter, erro
 	}
 	nodeType := strings.Split(r.cacheNodeType, ".")[1] // Get node type from cache node type. cache.m3.large -> m3
 	if stringInSlice(elasticacheReservedNodeLegacyTypes, nodeType) {
-		log.Warnf("No products found is possible for legacy nodes %s if provided payment option is not supported by the region.", strings.Join(elasticacheReservedNodeLegacyTypes, ", "))
+		log.Warn().Msgf("No products found is possible for legacy nodes %s if provided payment option is not supported by the region.", strings.Join(elasticacheReservedNodeLegacyTypes, ", "))
 	}
 	return &schema.PriceFilter{
 		PurchaseOption:     strPtr(purchaseOptionLabel),

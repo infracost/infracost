@@ -1,7 +1,6 @@
 package output
 
 import (
-	"bytes"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -32,6 +31,7 @@ type Root struct {
 	Currency             string           `json:"currency"`
 	Projects             Projects         `json:"projects"`
 	TagPolicies          []TagPolicy      `json:"tagPolicies,omitempty"`
+	FinOpsPolicies       []FinOpsPolicy   `json:"finOpsPolicies,omitempty"`
 	TotalHourlyCost      *decimal.Decimal `json:"totalHourlyCost"`
 	TotalMonthlyCost     *decimal.Decimal `json:"totalMonthlyCost"`
 	PastTotalHourlyCost  *decimal.Decimal `json:"pastTotalHourlyCost"`
@@ -42,6 +42,43 @@ type Root struct {
 	Summary              *Summary         `json:"summary"`
 	FullSummary          *Summary         `json:"-"`
 	IsCIRun              bool             `json:"-"`
+}
+
+type FinOpsPolicy struct {
+	Name                     string                 `json:"name"`
+	PolicyID                 string                 `json:"policyId"`
+	Message                  string                 `json:"message"`
+	PrComment                bool                   `json:"prComment"`
+	BlockPr                  bool                   `json:"blockPr"`
+	Resources                []FinOpsPolicyResource `json:"resources"`
+	TotalApplicableResources int                    `json:"totalApplicableResources"`
+}
+
+func (p *FinOpsPolicy) AllResourcesExcluded() bool {
+	for _, r := range p.Resources {
+		if r.ExclusionID == "" {
+			return false
+		}
+	}
+	return true
+}
+
+type FinOpsPolicyResource struct {
+	Checksum     string                      `json:"checksum"`
+	Address      string                      `json:"address"`
+	ResourceType string                      `json:"resourceType"`
+	Path         string                      `json:"path"`
+	StartLine    int                         `json:"startLine"`
+	EndLine      int                         `json:"endLine"`
+	ProjectName  string                      `json:"projectName"`
+	Issues       []FinOpsPolicyResourceIssue `json:"issues"`
+	ExclusionID  string                      `json:"exclusionId,omitempty"`
+}
+
+type FinOpsPolicyResourceIssue struct {
+	Attribute   string `json:"attribute"`
+	Value       string `json:"value"`
+	Description string `json:"description"`
 }
 
 // TagPolicy holds information if a given run has applicable tag policy checks.
@@ -98,9 +135,17 @@ func (p Project) ToSchemaProject() *schema.Project {
 		resources = append(convertOutputResources(p.Breakdown.Resources, false), convertOutputResources(p.Breakdown.FreeResources, true)...)
 	}
 
+	// clone the metadata to avoid unexpected effects from a shared pointer since
+	// output.CompareTo may modify Metadata.PolicySha/PastPolicySha
+	var clonedMetadata *schema.ProjectMetadata
+	if p.Metadata != nil {
+		m := *p.Metadata
+		clonedMetadata = &m
+	}
+
 	return &schema.Project{
 		Name:          p.Name,
-		Metadata:      p.Metadata,
+		Metadata:      clonedMetadata,
 		PastResources: pastResources,
 		Resources:     resources,
 	}
@@ -178,6 +223,19 @@ func convertMetadata(metadata map[string]interface{}) map[string]gjson.Result {
 }
 
 type Projects []Project
+
+// IsRunQuotaExceeded checks if any of the project metadata have errored with a
+// "run quota exceeded" error. If found it returns the associated message with
+// this diag. This should be used when in any output that notifies the user.
+func (projects Projects) IsRunQuotaExceeded() (string, bool) {
+	for _, p := range projects {
+		if msg, ok := p.Metadata.IsRunQuotaExceeded(); ok {
+			return msg, true
+		}
+	}
+
+	return "", false
+}
 
 var exampleProjectsRegex = regexp.MustCompile(`^infracost\/(infracost\/examples|example-terraform)\/`)
 
@@ -297,7 +355,6 @@ type Options struct {
 	Fields            []string
 	IncludeHTML       bool
 	PolicyOutput      PolicyOutput
-	GuardrailCheck    GuardrailCheck
 	diffMsg           string
 	originalSize      int
 	CurrencyFormat    string
@@ -334,50 +391,9 @@ type PolicyCheckViolations struct {
 	ProjectNames []string
 }
 
-// merge combines any Violations with identicals Details for two PolicyCheckResourceDetails
-func mergeViolations(violations, otherViolations []PolicyCheckViolations) []PolicyCheckViolations {
-	vMap := map[string]PolicyCheckViolations{}
-	for _, v := range violations {
-		vMap[strings.Join(v.Details, "")] = v
-	}
-
-	// merge violations with identical details
-	for _, otherV := range otherViolations {
-		key := strings.Join(otherV.Details, "")
-
-		if v, ok := vMap[key]; ok {
-			v.ProjectNames = append(v.ProjectNames, otherV.ProjectNames...)
-			sort.Strings(v.ProjectNames)
-			vMap[key] = v
-		} else {
-			vMap[key] = otherV
-		}
-	}
-
-	// preserve output order
-	var vMerged = make([]PolicyCheckViolations, 0, len(vMap))
-	for _, v := range violations {
-		key := strings.Join(v.Details, "")
-		if mergedV, ok := vMap[key]; ok {
-			vMerged = append(vMerged, mergedV)
-			delete(vMap, key)
-		}
-	}
-
-	for _, otherV := range otherViolations {
-		key := strings.Join(otherV.Details, "")
-		if mergedV, ok := vMap[key]; ok {
-			vMerged = append(vMerged, mergedV)
-			delete(vMap, key)
-		}
-	}
-
-	return vMerged
-}
-
-// NewPolicyOutput normalizes a PolicyCheck and a TagPolicyCheck into a PolicyOutput suitable
+// NewPolicyOutput normalizes a PolicyCheck suitable
 // for use in the output markdown template.
-func NewPolicyOutput(pc PolicyCheck, tpc TagPolicyCheck) PolicyOutput {
+func NewPolicyOutput(pc PolicyCheck) PolicyOutput {
 	po := PolicyOutput{}
 
 	if pc.Enabled && len(pc.Failures) > 0 {
@@ -389,20 +405,6 @@ func NewPolicyOutput(pc PolicyCheck, tpc TagPolicyCheck) PolicyOutput {
 		})
 	}
 
-	for _, tagPolicy := range tpc.FailingTagPolicies {
-		po.HasFailures = true
-		po.Checks = append(po.Checks, newTagPolicyCheckOutput(tagPolicy))
-	}
-
-	for _, tagPolicy := range tpc.WarningTagPolicies {
-		po.HasWarnings = true
-		po.Checks = append(po.Checks, newTagPolicyCheckOutput(tagPolicy))
-	}
-
-	for _, tagPolicy := range tpc.PassingTagPolicies {
-		po.Checks = append(po.Checks, newTagPolicyCheckOutput(tagPolicy))
-	}
-
 	if pc.Enabled && len(pc.Passed) > 0 {
 		po.Checks = append(po.Checks, PolicyCheckOutput{
 			Name:    "Cost policy passed",
@@ -411,66 +413,6 @@ func NewPolicyOutput(pc PolicyCheck, tpc TagPolicyCheck) PolicyOutput {
 	}
 
 	return po
-}
-
-var maxTagPolicyResourceDetails = 10
-
-func newTagPolicyCheckOutput(tp TagPolicy) PolicyCheckOutput {
-	// group resources by address so we can show a single block with all project/violation permutations.
-	rdMap := make(map[string]PolicyCheckResourceDetails, len(tp.Resources))
-
-	for _, r := range tp.Resources {
-		rd := PolicyCheckResourceDetails{
-			Address:      r.Address,
-			ResourceType: r.ResourceType,
-			Path:         r.Path,
-			Line:         r.Line,
-			Violations: []PolicyCheckViolations{{
-				ProjectNames: r.ProjectNames,
-				Details:      r.Failures(),
-			}},
-		}
-
-		if existingRd, ok := rdMap[r.Address]; ok {
-			existingRd.Violations = mergeViolations(existingRd.Violations, rd.Violations)
-			rdMap[r.Address] = existingRd
-		} else {
-			rdMap[r.Address] = rd
-		}
-	}
-
-	var failure, warning bool
-	if len(tp.Resources) > 0 {
-		warning = true
-		if tp.BlockPr {
-			failure = true
-		}
-	}
-
-	// preserve resource order
-	resourceDetails := make([]PolicyCheckResourceDetails, 0, len(rdMap))
-	for _, r := range tp.Resources {
-		if rd, ok := rdMap[r.Address]; ok {
-			resourceDetails = append(resourceDetails, rd)
-			delete(rdMap, r.Address)
-		}
-	}
-
-	tc := 0
-	if len(resourceDetails) > maxTagPolicyResourceDetails {
-		// truncate the list of resources so we don't go over the size limit of comments
-		tc = len(resourceDetails) - maxTagPolicyResourceDetails
-		resourceDetails = resourceDetails[:maxTagPolicyResourceDetails]
-	}
-
-	return PolicyCheckOutput{
-		Name:            tp.Name,
-		Message:         tp.Message,
-		Failure:         failure,
-		Warning:         warning,
-		ResourceDetails: resourceDetails,
-		TruncatedCount:  tc,
-	}
 }
 
 // PolicyCheck holds information if a given run has any policy checks enabled.
@@ -495,7 +437,8 @@ func (p PolicyCheckFailures) Error() string {
 		return ""
 	}
 
-	out := bytes.NewBuffer([]byte("Policy check failed:\n\n"))
+	out := &strings.Builder{}
+	out.WriteString("Policy check failed:\n\n")
 
 	for _, e := range p {
 		out.WriteString(" - " + e + "\n")
@@ -504,234 +447,35 @@ func (p PolicyCheckFailures) Error() string {
 	return out.String()
 }
 
-// TagPolicyCheck holds information if a given run has any tag policies enabled.
-// This struct is used in templates to create useful cost policy outputs.
-type TagPolicyCheck struct {
-	FailingTagPolicies []TagPolicy
-	WarningTagPolicies []TagPolicy
-	PassingTagPolicies []TagPolicy
-}
-
-func NewTagPolicyChecks(tps []TagPolicy) TagPolicyCheck {
-	tpc := TagPolicyCheck{}
-
-	for _, tp := range tps {
-		if !tp.PrComment {
-			continue
-		}
-
-		if len(tp.Resources) == 0 {
-			tpc.PassingTagPolicies = append(tpc.PassingTagPolicies, tp)
-			continue
-		}
-
-		if tp.BlockPr {
-			tpc.FailingTagPolicies = append(tpc.FailingTagPolicies, tp)
-		} else {
-			tpc.WarningTagPolicies = append(tpc.WarningTagPolicies, tp)
-		}
-	}
-
-	return tpc
-}
-
-func (tpc TagPolicyCheck) Error() string {
-	if len(tpc.FailingTagPolicies) == 0 {
-		return ""
-	}
-
-	out := bytes.NewBuffer([]byte("Tag policy check failed:\n"))
-
-	for _, tp := range tpc.FailingTagPolicies {
-		fmt.Fprintf(out, "\n  %s: %s\n", tp.Name, tp.Message)
-		for _, r := range tp.Resources {
-			fmt.Fprintf(out, "    %s in project(s) %s\n", r.Address, strings.Join(r.ProjectNames, ", "))
-			for _, f := range r.Failures() {
-				fmt.Fprintf(out, "    - %s\n", f)
-			}
-		}
-	}
-
-	return out.String()
-}
-
-func (r TagPolicyResource) Failures() []string {
-	var f []string
-	if len(r.MissingMandatoryTags) > 0 {
-		var tags []string
-		for _, tag := range r.MissingMandatoryTags {
-			tags = append(tags, fmt.Sprintf("`%s`", tag))
-		}
-		f = append(f, fmt.Sprintf("Missing mandatory tags: %s", strings.Join(tags, ", ")))
-	}
-
-	for _, invalidTag := range r.InvalidTags {
-		value := ""
-		if invalidTag.Value != "" {
-			value = fmt.Sprintf(" `%s`", invalidTag.Value)
-		}
-
-		if len(invalidTag.ValidValues) > 0 {
-			var validValues []string
-			for _, value := range invalidTag.ValidValues {
-				validValues = append(validValues, fmt.Sprintf("`%s`", value))
-			}
-			f = append(f, fmt.Sprintf("`%s` has invalid value%s, must be one of: %s", invalidTag.Key, value, strings.Join(validValues, ", ")))
-		}
-		if invalidTag.ValidRegex != "" {
-			f = append(f, fmt.Sprintf("`%s` has invalid value%s, must match regex `%s`", invalidTag.Key, value, invalidTag.ValidRegex))
-		}
-	}
-
-	return f
-}
-
-// GuardrailCheck holds information if a given run has applicable guardrail checks.
-// This struct is used to create guardrail outputs.
-type GuardrailCheck struct {
-	// TotalChecked is the total number of guardrails checked
-	TotalChecked int64 `json:"guardrailsChecked"`
-
-	// Comment indicates that the guardrail status should be reported in the PR
-	// comment (either as a success or as a failure depending on CommentableFailures).
-	Comment bool `json:"guardrailComment"`
-
-	// GuardrailEvents
-	GuardrailEvents []GuardrailEvent `json:"guardrailEvents"`
-}
-
-type GuardrailEvent struct {
-	// TriggerReason details the reason that the guardrail was triggered
-	TriggerReason string `json:"triggerReason"`
-
-	// PRComment indicates whether this guardrail event should be posted in th PR Comment
-	PRComment bool `json:"prComment"`
-
-	// BlockPR indicated whether this guardrail event should return a failure blocking the PR
-	BlockPR bool `json:"blockPr"`
-
-	// UnblockedAt indicates when the event was unblocked in Infracost Cloud.
-	UnblockedAt *string `json:"unblockedAt"`
-}
-
-// LoadGuardrailCheck reads the file at the path  into a GuardrailCheck struct.
-func LoadGuardrailCheck(path string) (GuardrailCheck, error) {
-	var out GuardrailCheck
+// LoadAdditionalCommentData reads the file at the path  into a string.
+func LoadAdditionalCommentData(path string) (string, error) {
 	_, err := os.Stat(path)
 	if errors.Is(err, os.ErrNotExist) {
-		return out, errors.New("guardrail-check-path does not exist ")
+		return "", errors.New("additional-comment-data-path does not exist ")
 	}
 
 	data, err := os.ReadFile(path)
 	if err != nil {
-		return out, fmt.Errorf("error reading guardrail check JSON file %w", err)
+		return "", fmt.Errorf("error reading additional comment data file %w", err)
 	}
 
-	err = json.Unmarshal(data, &out)
-	if err != nil {
-		return out, fmt.Errorf("invalid guardrail check JSON file %w", err)
-	}
-
-	return out, nil
+	return string(data), nil
 }
 
-// AllFailures are all the guardrail failures triggered by the run
-func (g GuardrailCheck) AllFailures() GuardrailFailures {
-	var failures GuardrailFailures
-	for _, event := range g.GuardrailEvents {
-		failures = append(failures, event.TriggerReason)
-	}
-	return failures
-}
-
-// CommentableFailures are the failures that should be listed in the PR comment
-func (g GuardrailCheck) CommentableFailures() GuardrailFailures {
-	var failures GuardrailFailures
-	for _, event := range g.GuardrailEvents {
-		if event.PRComment {
-			failures = append(failures, event.TriggerReason)
-		}
-	}
-	return failures
-}
-
-// BlockingFailures is the list of failures causing the CLI to return with a failing (non-zero) error code
-func (g GuardrailCheck) BlockingFailures() GuardrailFailures {
-	var failures GuardrailFailures
-	for _, event := range g.GuardrailEvents {
-		if event.BlockPR {
-			failures = append(failures, event.TriggerReason)
-		}
-	}
-	return failures
-}
-
-// WarningFailures returns a list of failures that don't block the PR but are advisory.
-func (g GuardrailCheck) WarningFailures() GuardrailFailures {
-	var failures GuardrailFailures
-	for _, event := range g.GuardrailEvents {
-		if !event.BlockPR && event.PRComment && event.UnblockedAt == nil {
-			failures = append(failures, event.TriggerReason)
-		}
-	}
-	return failures
-}
-
-// UnblockedFailures returns a list of failures that have been unblocked in infracost cloud.
-func (g GuardrailCheck) UnblockedFailures() GuardrailFailures {
-	var failures GuardrailFailures
-	for _, event := range g.GuardrailEvents {
-		if event.PRComment && event.UnblockedAt != nil {
-			failures = append(failures, event.TriggerReason)
-		}
-	}
-	return failures
-}
-
-// IsBlocking returns if the GuardrailCheck has any Blocking failures.
-func (g GuardrailCheck) IsBlocking() bool {
-	return len(g.BlockingFailures()) > 0
-}
-
-// IsUnblocked returns if the GuardrailCheck has been unblocked from Infracost Cloud.
-func (g GuardrailCheck) IsUnblocked() bool {
-	if g.IsBlocking() {
-		return false
-	}
-
-	if len(g.WarningFailures()) > 0 {
-		return false
-	}
-
-	return true
-}
-
-// Title returns a short description of the check with an emoji.
-func (g GuardrailCheck) Title() string {
-	if g.IsBlocking() {
-		return "❌ Guardrails triggered (needs action)"
-	}
-
-	if g.IsUnblocked() {
-		return "✅ Guardrails passed"
-	}
-
-	return "⚠️ Guardrails triggered"
-}
-
-// GuardrailFailures defines a list of guardrail failures that were returned from infracost cloud.
-type GuardrailFailures []string
+// GovernanceFailures defines a list of governance failures that were returned from infracost cloud.
+type GovernanceFailures []string
 
 // Error implements the Error interface returning the failures as a single message that can be used in stderr.
-func (g GuardrailFailures) Error() string {
+func (g GovernanceFailures) Error() string {
 	if len(g) == 0 {
 		return ""
 	}
 
-	out := bytes.NewBuffer([]byte("Guardrail check failed:\n\n"))
+	out := &strings.Builder{}
+	out.WriteString("Governance check failed:\n\n")
 
-	for _, e := range g {
-		out.WriteString(" - " + e + "\n")
+	for _, f := range g {
+		out.WriteString(fmt.Sprintf(" - %s\n", f))
 	}
 
 	return out.String()
@@ -744,6 +488,7 @@ type MarkdownOptions struct {
 	OmitDetails         bool
 	BasicSyntax         bool
 	MaxMessageSize      int
+	Additional          string
 }
 
 func outputBreakdown(c *config.Config, resources []*schema.Resource) *Breakdown {

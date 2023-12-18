@@ -11,6 +11,7 @@ import (
 
 	hcl2 "github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
+	"github.com/rs/zerolog"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -25,27 +26,14 @@ import (
 func setMockAttributes(blockAtts map[string]map[string]string) hcl.SetAttributesFunc {
 	count := map[string]int{}
 
-	return func(address string, moduleBlock *hcl.Block, block *hcl2.Block) {
-		if v, ok := block.Body.(*hclsyntax.Body); ok {
-			body := *v
-			nat := hclsyntax.Attributes{}
-			for k, a := range body.Attributes {
-				b := *a
-				nat[k] = &b
-			}
+	return func(b *hcl.Block) {
+		if _, ok := b.HCLBlock.Body.(*hclsyntax.Body); ok {
+			if b.Type() == "resource" || b.Type() == "data" {
+				b.UniqueAttrs = map[string]*hcl2.Attribute{}
 
-			body.Attributes = nat
-
-			if block.Type == "resource" || block.Type == "data" {
-				fullName := strings.Join(block.Labels, ".")
-				module := moduleBlock.FullName()
-				if module != "" {
-					fullName = module + "." + fullName
-				}
-
+				fullName := b.FullName()
 				if attrs, ok := blockAtts[fullName]; ok {
-					addAttrs(attrs, &body)
-					block.Body = &body
+					addAttrs(attrs, b)
 				}
 
 				withCount := fullName + "[0]"
@@ -57,17 +45,17 @@ func setMockAttributes(blockAtts map[string]map[string]string) hcl.SetAttributes
 				}
 
 				if attrs, ok := blockAtts[withCount]; ok {
-					addAttrs(attrs, &body)
-					block.Body = &body
+					addAttrs(attrs, b)
 				}
 			}
+
 		}
 	}
 }
 
-func addAttrs(attrs map[string]string, body *hclsyntax.Body) {
+func addAttrs(attrs map[string]string, b *hcl.Block) {
 	for k, v := range attrs {
-		body.Attributes[k] = &hclsyntax.Attribute{
+		b.UniqueAttrs[k] = &hcl2.Attribute{
 			Name: k,
 			Expr: &hclsyntax.LiteralValueExpr{
 				Val: cty.StringVal(v),
@@ -188,37 +176,37 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 			pathName := strings.ReplaceAll(strings.ToLower(tt.name), " ", "_")
 			testPath := path.Join("testdata/hcl_provider_test", pathName)
 
-			logger := logrus.New()
-			logger.SetOutput(io.Discard)
-			entry := logrus.NewEntry(logger)
+			logger := zerolog.New(io.Discard)
 
 			ctx := config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{})
+			parser := modules.NewSharedHCLParser()
 			parsers, err := hcl.LoadParsers(
 				ctx,
 				testPath,
-				modules.NewModuleLoader(testPath, nil, config.TerraformSourceMap{}, entry, &sync.KeyMutex{}),
+				modules.NewModuleLoader(testPath, parser, nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}),
 				nil,
-				entry,
+				logger,
 				hcl.OptionWithBlockBuilder(
 					hcl.BlockBuilder{
 						MockFunc: func(a *hcl.Attribute) cty.Value {
 							return cty.StringVal(fmt.Sprintf("mocked-%s", a.Name()))
 						},
 						SetAttributes: []hcl.SetAttributesFunc{setMockAttributes(tt.attrs)},
-						Logger:        entry,
+						Logger:        logger,
+						HCLParser:     parser,
 					},
 				))
 			require.NoError(t, err)
 
 			p := HCLProvider{
 				parsers: parsers,
-				logger:  entry,
+				logger:  logger,
 				ctx:     ctx,
 			}
 			got := p.LoadPlanJSONs()
-			require.NoError(t, err)
 
 			root := got[0]
+			require.NoError(t, root.Error)
 
 			// uncomment and run `make test` to update the expectations
 			// var prettyJSON bytes.Buffer

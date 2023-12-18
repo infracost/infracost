@@ -1,0 +1,28 @@
+version: 0.1
+resource_usage:
+  aws_kinesis_stream.test_stream_on_demand_with_usage:
+    monthly_on_demand_data_in_gb: 0.20 # Monthly data ingested by the stream in GB.
+    monthly_on_demand_data_out_gb: 0.20 # Monthly data egressed by the stream in GB total, (not per consumer application).
+    monthly_on_demand_efo_data_out_gb: 2.0 # Monthly data egressed by the stream in GB to EFO consumers.
+    monthly_on_demand_extended_retention_gb: 1.0 # Monthly data stored by the stream in GB that exceeds the 24 hour retention period but is less than 7 days.
+    monthly_on_demand_long_term_retention_gb: 1.0 # Monthly data stored by the stream in GB that exceeds the 7 day retention period.
+  aws_kinesis_stream.test_stream_provisioned_with_usage:
+    monthly_provisioned_put_units: 6500000 # Monthly provisioned put units for the stream.
+    monthly_provisioned_extended_retention_gb: 100 # Monthly data stored by the stream in GB that exceeds the 24 hour retention period but is less than 7 days.
+    monthly_provisioned_long_term_retention_gb: 100 # Monthly data stored by the stream in GB that exceeds the 7 day retention period.
+    monthly_provisioned_long_term_retrieval_gb: 100 # Monthly data retrieved by the stream in GB that exceeds the 7 day retention period.
+    monthly_provisioned_efo_data_out_gb: 100 # Monthly data egressed by the stream in GB to EFO consumers.
+    monthly_provisioned_efo_consumer_hours: 100 # Monthly hours of EFO consumer application usage.
+  aws_kinesis_stream.use2_test_stream_on_demand_with_usage:
+    monthly_on_demand_data_in_gb: 0.20 # Monthly data ingested by the stream in GB.
+    monthly_on_demand_data_out_gb: 0.20 # Monthly data egressed by the stream in GB total, (not per consumer application).
+    monthly_on_demand_efo_data_out_gb: 2.0 # Monthly data egressed by the stream in GB to EFO consumers.
+    monthly_on_demand_extended_retention_gb: 1.0 # Monthly data stored by the stream in GB that exceeds the 24 hour retention period but is less than 7 days.
+    monthly_on_demand_long_term_retention_gb: 1.0 # Monthly data stored by the stream in GB that exceeds the 7 day retention period.
+  aws_kinesis_stream.use2_test_stream_provisioned_with_usage:
+    monthly_provisioned_put_units: 6500000 # Monthly provisioned put units for the stream.
+    monthly_provisioned_extended_retention_gb: 100 # Monthly data stored by the stream in GB that exceeds the 24 hour retention period but is less than 7 days.
+    monthly_provisioned_long_term_retention_gb: 100 # Monthly data stored by the stream in GB that exceeds the 7 day retention period.
+    monthly_provisioned_long_term_retrieval_gb: 100 # Monthly data retrieved by the stream in GB that exceeds the 7 day retention period.
+    monthly_provisioned_efo_data_out_gb: 100 # Monthly data egressed by the stream in GB to EFO consumers.
+    monthly_provisioned_efo_consumer_hours: 100 # Monthly hours of EFO consumer application usage.

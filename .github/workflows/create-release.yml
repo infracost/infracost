@@ -14,9 +14,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Set up Go 1.x
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
-          go-version: 1.19
+          go-version: 1.21
 
       - name: Build project
         run: |
@@ -47,7 +47,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
 
       - name: Build and push Docker images
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: .
           platforms: linux/amd64
@@ -67,7 +67,7 @@ jobs:
             type=semver,pattern={{major}}.{{minor}}
 
       - name: Build and push Docker images (CI)
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: .
           file: Dockerfile.ci
@@ -93,18 +93,6 @@ jobs:
         with:
           token: ${{secrets.HOMEBREW_RELEASE_TOKEN}}
           formula: infracost
-
-  update-download-redirects:
-    if: ${{ !contains(github.ref, '-alpha') && !contains(github.ref, '-beta') }}
-    name: Upload Download Redirects
-    needs: build
-    uses: ./.github/workflows/update-download-redirects.yml
-    with:
-      version: ${{ github.ref_name }}
-    secrets:
-      AMPLIFY_APP_ID: ${{ secrets.AMPLIFY_APP_ID }}
-      AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-      AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
   update-fig-autocomplete-spec:
     if: ${{ !contains(github.ref, '-alpha') && !contains(github.ref, '-beta') }}
