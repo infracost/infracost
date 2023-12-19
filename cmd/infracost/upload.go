@@ -44,24 +44,6 @@ See https://infracost.io/docs/features/cli_commands/#upload-runs`,
 				return fmt.Errorf("could not load input file %s err: %w", path, err)
 			}
 
-			if ctx.Config.PolicyV2APIEndpoint != "" {
-				policyClient, err := apiclient.NewPolicyAPIClient(ctx)
-				if err != nil {
-					logging.Logger.Err(err).Msg("Failed to initialize policies client")
-				} else {
-					// If there is a PR ID, only check policies on modified resources (onlyDiff = true). It there
-					// isn't a PR ID it must be a base branch run so all resources are checked.
-					onlyDiff := root.Metadata.VCSPullRequestID != ""
-					policies, err := policyClient.CheckPolicies(ctx, root, onlyDiff)
-					if err != nil {
-						logging.Logger.Err(err).Msg("Failed to check policies")
-					}
-
-					root.TagPolicies = policies.TagPolicies
-					root.FinOpsPolicies = policies.FinOpsPolicies
-				}
-			}
-
 			dashboardClient := apiclient.NewDashboardAPIClient(ctx)
 			result, err := dashboardClient.AddRun(ctx, root, apiclient.CommentFormatMarkdownHTML)
 			if err != nil {

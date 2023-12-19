@@ -29,8 +29,6 @@ type Root struct {
 	CloudURL             string           `json:"cloudUrl,omitempty"`
 	Currency             string           `json:"currency"`
 	Projects             Projects         `json:"projects"`
-	TagPolicies          []TagPolicy      `json:"tagPolicies,omitempty"`
-	FinOpsPolicies       []FinOpsPolicy   `json:"finOpsPolicies,omitempty"`
 	TotalHourlyCost      *decimal.Decimal `json:"totalHourlyCost"`
 	TotalMonthlyCost     *decimal.Decimal `json:"totalMonthlyCost"`
 	PastTotalHourlyCost  *decimal.Decimal `json:"pastTotalHourlyCost"`
@@ -41,73 +39,6 @@ type Root struct {
 	Summary              *Summary         `json:"summary"`
 	FullSummary          *Summary         `json:"-"`
 	IsCIRun              bool             `json:"-"`
-}
-
-type FinOpsPolicy struct {
-	Name                     string                 `json:"name"`
-	PolicyID                 string                 `json:"policyId"`
-	Message                  string                 `json:"message"`
-	PrComment                bool                   `json:"prComment"`
-	BlockPr                  bool                   `json:"blockPr"`
-	Resources                []FinOpsPolicyResource `json:"resources"`
-	TotalApplicableResources int                    `json:"totalApplicableResources"`
-}
-
-func (p *FinOpsPolicy) AllResourcesExcluded() bool {
-	for _, r := range p.Resources {
-		if r.ExclusionID == "" {
-			return false
-		}
-	}
-	return true
-}
-
-type FinOpsPolicyResource struct {
-	Checksum     string                      `json:"checksum"`
-	Address      string                      `json:"address"`
-	ResourceType string                      `json:"resourceType"`
-	Path         string                      `json:"path"`
-	StartLine    int                         `json:"startLine"`
-	EndLine      int                         `json:"endLine"`
-	ProjectName  string                      `json:"projectName"`
-	Issues       []FinOpsPolicyResourceIssue `json:"issues"`
-	ExclusionID  string                      `json:"exclusionId,omitempty"`
-}
-
-type FinOpsPolicyResourceIssue struct {
-	Attribute   string `json:"attribute"`
-	Value       string `json:"value"`
-	Description string `json:"description"`
-}
-
-// TagPolicy holds information if a given run has applicable tag policy checks.
-// This struct is returned from the tag policies API and used to create tag policy outputs.
-type TagPolicy struct {
-	Name                   string              `json:"name"`
-	TagPolicyID            string              `json:"tagPolicyId"`
-	Message                string              `json:"message"`
-	PrComment              bool                `json:"prComment"`
-	BlockPr                bool                `json:"blockPr"`
-	Resources              []TagPolicyResource `json:"resources"`
-	TotalDetectedResources int                 `json:"totalDetectedResources"`
-	TotalTaggableResources int                 `json:"totalTaggableResources"`
-}
-
-type TagPolicyResource struct {
-	Address              string                `json:"address"`
-	ResourceType         string                `json:"resourceType"`
-	Path                 string                `json:"path"`
-	Line                 int                   `json:"line"`
-	ProjectNames         []string              `json:"projectNames"`
-	MissingMandatoryTags []string              `json:"missingMandatoryTags"`
-	InvalidTags          []TagPolicyInvalidTag `json:"invalidTags"`
-}
-
-type TagPolicyInvalidTag struct {
-	Key         string   `json:"key"`
-	Value       string   `json:"value"`
-	ValidValues []string `json:"validValues"`
-	ValidRegex  string   `json:"validRegex"`
 }
 
 type Project struct {

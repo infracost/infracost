@@ -8,12 +8,11 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/infracost/infracost/internal/apiclient"
-	"github.com/infracost/infracost/internal/logging"
-
 	"github.com/open-policy-agent/opa/ast"
 	"github.com/open-policy-agent/opa/rego"
 	"github.com/spf13/cobra"
+
+	"github.com/infracost/infracost/internal/apiclient"
 
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
@@ -81,21 +80,6 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 	}
 
 	combined.IsCIRun = ctx.IsCIRun()
-
-	if ctx.IsCloudUploadEnabled() && ctx.Config.PolicyV2APIEndpoint != "" {
-		policyClient, err := apiclient.NewPolicyAPIClient(ctx)
-		if err != nil {
-			logging.Logger.Err(err).Msg("Failed to initialize policies client")
-		} else {
-			policies, err := policyClient.CheckPolicies(ctx, combined, true)
-			if err != nil {
-				logging.Logger.Err(err).Msg("Failed to check policies")
-			}
-
-			combined.TagPolicies = policies.TagPolicies
-			combined.FinOpsPolicies = policies.FinOpsPolicies
-		}
-	}
 
 	var additionalCommentData string
 	var governanceFailures output.GovernanceFailures
