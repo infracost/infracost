@@ -154,7 +154,7 @@ func formatCost(d *decimal.Decimal) string {
 	return formatAmount(*d)
 }
 
-func AssertGoldenFile(t *testing.T, goldenFilePath string, actual []byte) {
+func AssertGoldenFile(t *testing.T, goldenFilePath string, actual []byte) bool {
 	// Load the snapshot result
 	expected := []byte("")
 	if _, err := os.Stat(goldenFilePath); err == nil || !os.IsNotExist(err) {
@@ -163,7 +163,8 @@ func AssertGoldenFile(t *testing.T, goldenFilePath string, actual []byte) {
 		assert.NoError(t, err)
 	}
 
-	if !bytes.Equal(expected, actual) {
+	equal := bytes.Equal(expected, actual)
+	if !equal {
 		if *update {
 			// create the golden file dir if needed
 			goldenFileDir := filepath.Dir(goldenFilePath)
@@ -192,6 +193,8 @@ func AssertGoldenFile(t *testing.T, goldenFilePath string, actual []byte) {
 			t.Errorf(fmt.Sprintf("\nOutput does not match golden file: \n\n%s\n", diff))
 		}
 	}
+
+	return equal
 }
 
 type ErrorOnAnyWriter struct {

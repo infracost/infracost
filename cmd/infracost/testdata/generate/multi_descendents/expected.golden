@@ -49,3 +49,4 @@ projects:
       - ../../envs/default.tfvars
       - envs/prod.tfvars
     terraform_workspace: default
+

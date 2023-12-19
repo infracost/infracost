@@ -11,16 +11,6 @@ projects:
     terraform_var_files:
       - ../envs/prod.tfvars
     terraform_workspace: default
-  - path: apps/foo
-    name: apps-foo-dev
-    terraform_var_files:
-      - ../envs/dev.tfvars
-    terraform_workspace: default
-  - path: apps/foo
-    name: apps-foo-staging
-    terraform_var_files:
-      - ../envs/staging.tfvars
-    terraform_workspace: default
   - path: apps/bar
     name: apps-bar-dev
     terraform_var_files:
@@ -31,6 +21,14 @@ projects:
     terraform_var_files:
       - ../envs/staging.tfvars
     terraform_workspace: default
-
-
+  - path: apps/foo
+    name: apps-foo-dev
+    terraform_var_files:
+      - ../envs/dev.tfvars
+    terraform_workspace: default
+  - path: apps/foo
+    name: apps-foo-staging
+    terraform_var_files:
+      - ../envs/staging.tfvars
+    terraform_workspace: default
 

@@ -1,8 +1,10 @@
 package hcl
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
+	"regexp"
 	"sort"
 	"strings"
 
@@ -12,6 +14,65 @@ import (
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 )
+
+var (
+	// GlobalTerraformVarFileNames is a list of var file naming convention that suggests they are applied
+	// to every project, despite changes in environment.
+	GlobalTerraformVarFileNames = []string{
+		"default",
+		"defaults",
+		"global",
+		"globals",
+		"shared",
+	}
+
+	VarFileEnvPrefixRegxp = regexp.MustCompile(`^(\w+)-`)
+)
+
+// CleanVarName removes the .tfvars or .tfvars.json suffix from the file name.
+func CleanVarName(file string) string {
+	return filepath.Base(strings.TrimSuffix(strings.TrimSuffix(file, ".json"), ".tfvars"))
+}
+
+// VarEnvName returns the environment prefix of the clean name var file, if it
+// has one.
+func VarEnvName(file string) string {
+	name := CleanVarName(file)
+	sub := VarFileEnvPrefixRegxp.FindStringSubmatch(name)
+	if len(sub) != 2 {
+		return name
+	}
+
+	return sub[1]
+}
+
+// IsGlobalVarFile checks if the var file is a "global" one, this is only
+// applicable if we match a globalTerraformVarName and these don't have an
+// environment prefix e.g. defaults.tfvars, global.tfvars are applicable,
+// prod-default.tfvars, stag-globals are not.
+func IsGlobalVarFile(file string) bool {
+	name := CleanVarName(file)
+
+	for _, global := range GlobalTerraformVarFileNames {
+		if strings.HasSuffix(name, global) && !VarFileEnvPrefixRegxp.MatchString(name) {
+			return true
+		}
+	}
+
+	return false
+}
+
+type discoveredProject struct {
+	hasProviderBlock bool
+	hasBackendBlock  bool
+	depth            int
+	files            map[string]*hcl.File
+	path             string
+}
+
+func (p discoveredProject) hasRootModuleBlocks() bool {
+	return p.hasBackendBlock || p.hasProviderBlock
+}
 
 // ProjectLocator finds Terraform projects for given paths.
 // It naively excludes folders that are imported as modules in other projects.
@@ -25,7 +86,7 @@ type ProjectLocator struct {
 
 	basePath           string
 	discoveredVarFiles map[string][]string
-	discoveredProjects []string
+	discoveredProjects []discoveredProject
 }
 
 // ProjectLocatorConfig provides configuration options on how the locator functions.
@@ -138,7 +199,43 @@ type RootPath struct {
 	// and local modules that are used by this project have changes.
 	HasChanges bool
 	// TerraformVarFiles are a list of any .tfvars or .tfvars.json files found at the root level.
-	TerraformVarFiles []string
+	TerraformVarFiles TerraformVarFiles
+}
+
+func (r *RootPath) AddVarFiles(dir string, files []string) {
+	rel, _ := filepath.Rel(r.Path, dir)
+
+	for _, f := range files {
+		r.TerraformVarFiles.Add(filepath.Join(rel, f))
+	}
+}
+
+type TerraformVarFiles []string
+
+func (vf *TerraformVarFiles) Add(file string) {
+	for _, f := range *vf {
+		if f == file {
+			return
+		}
+	}
+
+	*vf = append(*vf, file)
+}
+
+func (vf *TerraformVarFiles) HasEnvFiles() bool {
+	return len(*vf) > len(vf.GlobalFiles())
+}
+
+func (vf *TerraformVarFiles) GlobalFiles() TerraformVarFiles {
+	var globals TerraformVarFiles
+
+	for _, file := range *vf {
+		if IsGlobalVarFile(file) {
+			globals = append(globals, file)
+		}
+	}
+
+	return globals
 }
 
 // FindRootModules returns a list of all directories that contain a full Terraform project under the given fullPath.
@@ -150,41 +247,84 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 
 	isSkipped := p.buildSkippedMatcher(fullPath)
 	p.walkPaths(fullPath, 0)
-	p.logger.Debug().Msgf("walking directory at %s returned a list of possible Terraform projects: %+v", fullPath, p.discoveredProjects)
+	p.logger.Debug().Msgf("walking directory at %s returned a list of possible Terraform projects with length %d", fullPath, len(p.discoveredProjects))
 
 	var projects []RootPath
 	for _, dir := range p.discoveredProjects {
-		if isSkipped(dir) {
-			p.logger.Debug().Msgf("skipping directory %s as it is marked as excluded by --exclude-path", dir)
-			continue
-		}
+		if p.shouldUseProject(dir, isSkipped) {
+			projects = append(projects, RootPath{
+				RepoPath:          fullPath,
+				Path:              dir.path,
+				HasChanges:        p.hasChanges(dir.path),
+				TerraformVarFiles: p.discoveredVarFiles[dir.path],
+			})
 
-		if _, ok := p.modules[dir]; ok && !p.useAllPaths {
-			p.logger.Debug().Msgf("skipping directory %s as it has been called as a module", dir)
-			continue
+			delete(p.discoveredVarFiles, dir.path)
 		}
-
-		projects = append(projects, RootPath{
-			RepoPath:          fullPath,
-			Path:              dir,
-			HasChanges:        p.hasChanges(dir),
-			TerraformVarFiles: p.discoveredVarFiles[dir],
-		})
-		delete(p.discoveredVarFiles, dir)
 	}
 
 	// loop through the remaining discovered var files that aren't at the same
-	// directory as an existing project. If these directories appear as children of
-	// any existing projects, and are within < 2 directories removed. Then we
-	// associated the var files with the project.
-	for dir, files := range p.discoveredVarFiles {
-		for i, project := range projects {
-			if isNestedDir(project.Path, dir, 2) {
-				rel, _ := filepath.Rel(project.Path, dir)
+	// directory as an existing project.
 
-				for _, f := range files {
-					projects[i].TerraformVarFiles = append(projects[i].TerraformVarFiles, filepath.Join(rel, f))
-				}
+	// if the directory has var files in use that and exclude the directory
+	// if the directory has sibling folders with var files use that
+	// if the directory has child folders with var files use that
+	// if the directory has parent folders with var files use that
+
+	// loop through the remaining discovered var files that aren't at the same
+	// directory as an existing project. If the directory is a sibling of an existing
+	// project, but has not already been used as a child var file directory then we
+	// associate the var files with the project.
+	excludeVarDirectory := map[string]bool{}
+	var varFiles []string
+	for dir, _ := range p.discoveredVarFiles {
+		varFiles = append(varFiles, dir)
+	}
+
+	for dir, files := range p.filteredVarFiles(excludeVarDirectory) {
+		for i, project := range projects {
+			if isSiblingDirRec(project.Path, dir, projects, varFiles) {
+				p.logger.Debug().Msgf("found sibling directory %s to project %s", dir, project.Path)
+
+				projects[i].AddVarFiles(dir, files)
+
+				excludeVarDirectory[dir] = true
+			}
+		}
+	}
+
+	for dir, files := range p.filteredVarFiles(excludeVarDirectory) {
+		for i, project := range projects {
+			if isNestedDir(project.Path, dir, projects, 2, varFiles) {
+				p.logger.Debug().Msgf("found child directory %s to project %s", dir, project.Path)
+
+				projects[i].AddVarFiles(dir, files)
+
+				excludeVarDirectory[dir] = true
+			}
+		}
+	}
+
+	// parent directories
+	for dir, files := range p.filteredVarFiles(excludeVarDirectory) {
+		for i, project := range projects {
+			if isParentDir(dir, project.Path) {
+				p.logger.Debug().Msgf("found parent directory %s to project %s", dir, project.Path)
+
+				projects[i].AddVarFiles(dir, files)
+
+				excludeVarDirectory[dir] = true
+			}
+		}
+	}
+
+	// aunt directories
+	for dir, files := range p.filteredVarFiles(excludeVarDirectory) {
+		for i, project := range projects {
+			if isParentDir(filepath.Dir(dir), project.Path) {
+				p.logger.Debug().Msgf("found aunt directory %s to project %s", dir, project.Path)
+
+				projects[i].AddVarFiles(dir, files)
 			}
 		}
 	}
@@ -196,20 +336,161 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 	return projects
 }
 
-// isNestedDir checks if the target path nested no more than 'levels' under the base path
-func isNestedDir(basePath, targetPath string, levels int) bool {
-	rel, err := filepath.Rel(basePath, targetPath)
+func (p *ProjectLocator) filteredVarFiles(excludeVarDirectory map[string]bool) map[string][]string {
+	varFileDirs := map[string][]string{}
+
+	for dir, files := range p.discoveredVarFiles {
+		if !excludeVarDirectory[dir] {
+			varFileDirs[dir] = files
+		}
+	}
+
+	return varFileDirs
+}
+
+func isParentDir(parentDir, childDir string) bool {
+	absParentDir, err := filepath.Abs(parentDir)
 	if err != nil {
 		return false
 	}
 
-	if strings.HasPrefix(rel, "..") || rel == "." {
+	absChildDir, err := filepath.Abs(childDir)
+	if err != nil {
 		return false
 	}
 
+	if absChildDir == absParentDir {
+		return false
+	}
+
+	return strings.HasPrefix(absChildDir, absParentDir)
+}
+
+func isSiblingDir(dir1 string, dir2 string) bool {
+	return filepath.Dir(dir1) == filepath.Dir(dir2)
+}
+
+func isSiblingDirRec(projectDir string, varDir string, projects []RootPath, varDirs []string) bool {
+	if !isSiblingDir(projectDir, varDir) {
+		return false
+	}
+
+	parent := filepath.Dir(projectDir)
+	for _, dir := range varDirs {
+		if !isSiblingDirRec(parent, dir, projects, varDirs) {
+			return false
+		}
+	}
+
+	var filteredVarDirs []string
+	for _, d := range varDirs {
+		if varDir != d {
+			filteredVarDirs = append(filteredVarDirs, d)
+		}
+	}
+
+	for _, project := range projects {
+		if !isSiblingDir(project.Path, varDir) {
+			continue
+		}
+
+		for _, d := range filteredVarDirs {
+			if isNestedDir(project.Path, d, projects, 1, varDirs) {
+				return false
+			}
+		}
+	}
+
+	return true
+}
+
+func (p *ProjectLocator) shouldUseProject(dir discoveredProject, isSkipped func(string) bool) bool {
+	if isSkipped(dir.path) {
+		p.logger.Debug().Msgf("skipping directory %s as it is marked as excluded by --exclude-path", dir)
+
+		return false
+	}
+
+	if p.useAllPaths {
+		return true
+	}
+
+	if len(p.discoveredProjects) == 1 {
+		return true
+	}
+
+	if _, ok := p.modules[dir.path]; ok && !p.useAllPaths {
+		p.logger.Debug().Msgf("skipping directory %s as it has been called as a module", dir)
+
+		return false
+	}
+
+	if !dir.hasRootModuleBlocks() {
+		return false
+	}
+
+	return true
+}
+
+// isNestedDir checks if the target path nested no more than 'levels' under the
+// base path and that no other project paths are a closer parent to the
+// targetPath.
+func isNestedDir(basePath, targetPath string, projects []RootPath, levels int, varFiles []string) bool {
+	sepCount, err := getChildDepth(basePath, targetPath)
+	if err != nil {
+		return false
+	}
+
+	if sepCount > levels {
+		return false
+	}
+
+	for _, project := range projects {
+		if basePath == project.Path {
+			continue
+		}
+
+		depth, err := getChildDepth(project.Path, targetPath)
+		if err != nil {
+			continue
+		}
+
+		if depth < sepCount {
+			return false
+		}
+	}
+
+	var filteredProjects []RootPath
+	for _, project := range projects {
+		if project.Path != basePath {
+			filteredProjects = append(filteredProjects, project)
+		}
+	}
+
+	for _, project := range filteredProjects {
+		if isSiblingDirRec(project.Path, targetPath, filteredProjects, varFiles) {
+			return false
+		}
+	}
+
+	return true
+}
+
+// getChildDepth returns the number of levels targetPath is nested under
+// basePath. If targetPath is not a child of basePath getChildDepth will return
+// an error.
+func getChildDepth(basePath string, targetPath string) (int, error) {
+	rel, err := filepath.Rel(basePath, targetPath)
+	if err != nil {
+		return 0, err
+	}
+
+	if strings.HasPrefix(rel, "..") || rel == "." {
+		return 0, fmt.Errorf("%s is not a child of path %s", targetPath, basePath)
+	}
+
 	// Count the separators in the relative path
-	sepCount := strings.Count(rel, string(filepath.Separator))
-	return sepCount <= levels
+	return strings.Count(rel, string(filepath.Separator)) + 1, nil
 }
 
 func (p *ProjectLocator) maxSearchDepth() int {
@@ -224,7 +505,7 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) {
 	// if the level is 0 this is the start of the directory tree.
 	// let's reset all the discovered paths, so we don't duplicate.
 	if level == 0 {
-		p.discoveredProjects = []string{}
+		p.discoveredProjects = []discoveredProject{}
 		p.discoveredVarFiles = make(map[string][]string)
 	}
 	p.logger.Debug().Msgf("walking path %s to discover terraform files", fullPath)
@@ -334,10 +615,14 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) {
 		}
 	}
 
-	if p.useAllPaths && len(files) > 0 {
-		p.discoveredProjects = append(p.discoveredProjects, fullPath)
-	} else if hasProviderBlock || hasTerraformBackendBlock {
-		p.discoveredProjects = append(p.discoveredProjects, fullPath)
+	if len(files) > 0 {
+		p.discoveredProjects = append(p.discoveredProjects, discoveredProject{
+			path:             fullPath,
+			files:            files,
+			hasProviderBlock: hasProviderBlock,
+			hasBackendBlock:  hasTerraformBackendBlock,
+			depth:            level,
+		})
 	}
 
 	for _, info := range fileInfos {
@@ -348,11 +633,5 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) {
 
 			p.walkPaths(filepath.Join(fullPath, info.Name()), level+1)
 		}
-	}
-
-	// If it's the top level and there's Terraform files, and no other detected projects then add it as
-	// a project.
-	if level == 0 && len(files) > 0 && len(p.discoveredProjects) == 0 {
-		p.discoveredProjects = append(p.discoveredProjects, fullPath)
 	}
 }

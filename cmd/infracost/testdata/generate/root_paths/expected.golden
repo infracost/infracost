@@ -9,13 +9,13 @@ projects:
   - path: apps/foo
     name: apps-foo-dev
     terraform_var_files:
-      - terraform.tfvars
       - dev.tfvars
+      - terraform.tfvars
     terraform_workspace: default
   - path: apps/foo
     name: apps-foo-prod
     terraform_var_files:
-      - terraform.tfvars
       - prod.tfvars
+      - terraform.tfvars
     terraform_workspace: default
 

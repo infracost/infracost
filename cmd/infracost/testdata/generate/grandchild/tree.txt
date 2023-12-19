@@ -1,6 +1,6 @@
 .
 └── apps
-    ├── foo
+    ├── bar
     │   ├── main.tf
     │   └── config
     │       └── envs

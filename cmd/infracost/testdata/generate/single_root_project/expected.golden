@@ -4,3 +4,4 @@ projects:
   - path: .
     name: main
     terraform_workspace: default
+

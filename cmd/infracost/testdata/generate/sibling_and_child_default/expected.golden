@@ -11,10 +11,10 @@ projects:
     terraform_var_files:
       - envs/prod.tfvars
     terraform_workspace: default
-  - path: apps/foo
-    name: apps-foo
-    terraform_workspace: default
   - path: apps/bar
     name: apps-bar
+    terraform_workspace: default
+  - path: apps/foo
+    name: apps-foo
     terraform_workspace: default
 

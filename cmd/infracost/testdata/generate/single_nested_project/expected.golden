@@ -4,3 +4,4 @@ projects:
   - path: app/foo
     name: app-foo
     terraform_workspace: default
+

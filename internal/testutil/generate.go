@@ -6,6 +6,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/pkg/errors"
 	"github.com/stretchr/testify/require"
 )
 
@@ -18,21 +19,16 @@ func CreateDirectoryStructure(t *testing.T, treeOutputLocation string, tmpDir st
 	defer file.Close()
 
 	val, _ := os.ReadFile(treeOutputLocation)
-	lines := strings.Split(string(val), "\n")
 
+	var lines []string
 	// Strip any comments
-	for i, line := range lines {
-		if strings.HasPrefix(line, "#") {
-			lines = append(lines[:i], lines[i+1:]...)
+	for _, line := range strings.Split(string(val), "\n") {
+		if !strings.HasPrefix(line, "#") {
+			lines = append(lines, line)
 		}
 	}
 
-	// Strip the first line if it's a dot
-	if len(lines) > 0 && lines[0] == "." {
-		lines = lines[1:]
-	}
-
-	fs := buildFileSystemTree(lines, 0, 1)
+	fs, _ := buildFileSystemTree(lines, 0, 0)
 	writeFileSystem(t, fs, tmpDir)
 }
 
@@ -135,34 +131,47 @@ func writeFileSystem(t *testing.T, node *fileSystemNode, path string) {
 	require.NoError(t, err)
 }
 
-func buildFileSystemTree(lines []string, currentLine int, currentIndent int) *fileSystemNode {
+func buildFileSystemTree(lines []string, currentLine int, currentIndent int) (*fileSystemNode, error) {
 	if currentLine >= len(lines) {
-		return nil
+		return nil, errors.New("file finished")
 	}
 
 	line := lines[currentLine]
 	formattedLine := stripTreeFormatting(line)
 	indent := getDepth(formattedLine)
 
-	if indent != currentIndent {
-		return nil
+	if indent < currentIndent {
+		return nil, errors.New("branch traversed")
+	}
+
+	if currentIndent != indent {
+		return nil, nil
 	}
 
 	node := &fileSystemNode{
 		name:  strings.TrimSpace(formattedLine),
-		isDir: filepath.Ext(line) == "",
+		isDir: filepath.Ext(line) == "" || formattedLine == ".",
+	}
+
+	// files cannot have children underneath them
+	if !node.isDir {
+		return node, nil
 	}
 
 	nextIndent := indent + 1
 	for nextLine := currentLine + 1; nextLine < len(lines); nextLine++ {
-		child := buildFileSystemTree(lines, nextLine, nextIndent)
-		if child == nil {
+		child, err := buildFileSystemTree(lines, nextLine, nextIndent)
+		if err != nil {
 			break
+		}
+
+		if child == nil {
+			continue
 		}
 
 		node.children = append(node.children, child)
 		nextLine += len(child.children)
 	}
 
-	return node
+	return node, nil
 }

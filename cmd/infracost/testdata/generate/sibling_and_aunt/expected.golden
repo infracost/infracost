@@ -1,7 +1,7 @@
 version: 0.1
 
 projects:
-  - path: infra/apps/bar/us1
+  - path: apps/bar/us1
     name: apps-bar-us1-dev
     terraform_var_files:
       - ../../envs/default.tfvars
@@ -9,7 +9,7 @@ projects:
       - ../envs/default.tfvars
       - ../envs/dev.tfvars
     terraform_workspace: default
-  - path: infra/apps/bar/us1
+  - path: apps/bar/us1
     name: apps-bar-us1-prod
     terraform_var_files:
       - ../../envs/default.tfvars
@@ -17,7 +17,7 @@ projects:
       - ../envs/default.tfvars
       - ../envs/prod.tfvars
     terraform_workspace: default
-  - path: infra/apps/bar/us2
+  - path: apps/bar/us2
     name: apps-bar-us2-dev
     terraform_var_files:
       - ../../envs/default.tfvars
@@ -25,7 +25,7 @@ projects:
       - ../envs/default.tfvars
       - ../envs/dev.tfvars
     terraform_workspace: default
-  - path: infra/apps/bar/us2
+  - path: apps/bar/us2
     name: apps-bar-us2-prod
     terraform_var_files:
       - ../../envs/default.tfvars
@@ -33,7 +33,7 @@ projects:
       - ../envs/default.tfvars
       - ../envs/prod.tfvars
     terraform_workspace: default
-  - path: infra/apps/foo/us1
+  - path: apps/foo/us1
     name: apps-foo-us1-dev
     terraform_var_files:
       - ../../envs/default.tfvars
@@ -41,7 +41,7 @@ projects:
       - ../envs/default.tfvars
       - ../envs/dev.tfvars
     terraform_workspace: default
-  - path: infra/apps/foo/us1
+  - path: apps/foo/us1
     name: apps-foo-us1-prod
     terraform_var_files:
       - ../../envs/default.tfvars
@@ -49,7 +49,7 @@ projects:
       - ../envs/default.tfvars
       - ../envs/prod.tfvars
     terraform_workspace: default
-  - path: infra/apps/foo/us2
+  - path: apps/foo/us2
     name: apps-foo-us2-dev
     terraform_var_files:
       - ../../envs/default.tfvars
@@ -57,7 +57,7 @@ projects:
       - ../envs/default.tfvars
       - ../envs/dev.tfvars
     terraform_workspace: default
-  - path: infra/apps/foo/us2
+  - path: apps/foo/us2
     name: apps-foo-us2-prod
     terraform_var_files:
       - ../../envs/default.tfvars
@@ -65,3 +65,4 @@ projects:
       - ../envs/default.tfvars
       - ../envs/prod.tfvars
     terraform_workspace: default
+
