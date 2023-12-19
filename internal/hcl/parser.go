@@ -287,7 +287,7 @@ func LoadParsers(ctx *config.ProjectContext, initialPath string, loader *modules
 			}
 
 			var varEnvs []string
-			for env, _ := range varFileGrouping {
+			for env := range varFileGrouping {
 				varEnvs = append(varEnvs, env)
 			}
 			sort.Strings(varEnvs)

@@ -189,6 +189,422 @@ func inProject(dir string, change string) bool {
 	return !strings.HasPrefix(rel, "..")
 }
 
+// TreeNode represents a node in the tree of Terraform projects. A TreeNode can
+// either be a Terraform project, a directory containing Terraform var files, or
+// just a filler node to represent a directory. Callers should check the RootPath
+// and TerraformVarFiles fields to determine what type of node this is.
+type TreeNode struct {
+	Name              string
+	Level             int
+	RootPath          *RootPath
+	TerraformVarFiles *VarFiles
+	Children          []*TreeNode
+	Parent            *TreeNode
+}
+
+// VarFiles represents a directory that contains Terraform var files. HasSiblings
+// is true if the directory is within a directory that contains other directories
+// that are root Terraform projects.
+type VarFiles struct {
+	Path  string
+	Files []string
+
+	// HasSiblings is true if the directory is within a directory that contains other
+	// root Terraform projects.
+	HasSiblings bool
+	// Used is true if the var files have been used by a project.
+	Used bool
+}
+
+// CreateTreeNode creates a tree of Terraform projects and directories that
+// contain var files.
+func CreateTreeNode(basePath string, paths []RootPath, varFiles map[string][]string) *TreeNode {
+	root := &TreeNode{
+		Name: "root",
+	}
+
+	sort.Slice(paths, func(i, j int) bool {
+		return strings.Count(paths[i].Path, string(filepath.Separator)) < strings.Count(paths[j].Path, string(filepath.Separator))
+	})
+
+	for _, path := range paths {
+		root.AddPath(path)
+	}
+
+	var varFilesSorted []string
+	for dir := range varFiles {
+		varFilesSorted = append(varFilesSorted, dir)
+	}
+	sort.Slice(varFilesSorted, func(i, j int) bool {
+		return strings.Count(varFilesSorted[i], string(filepath.Separator)) < strings.Count(varFilesSorted[j], string(filepath.Separator))
+	})
+
+	for _, dir := range varFilesSorted {
+		root.AddTerraformVarFiles(basePath, dir, varFiles[dir])
+	}
+
+	return root
+}
+
+// AddPath adds a path to the tree, this will create any missing nodes in the tree.
+func (t *TreeNode) AddPath(path RootPath) {
+	dir, _ := filepath.Rel(path.RepoPath, path.Path)
+
+	pieces := strings.Split(dir, string(filepath.Separator))
+	current := t
+	for i, s := range pieces {
+		if s == "" {
+			continue
+		}
+
+		n := current.findChild(s)
+		if n != nil {
+			current = n
+			continue
+		}
+
+		if i == len(pieces)-1 {
+			break
+		}
+
+		child := &TreeNode{
+			Name:   s,
+			Level:  current.Level + 1,
+			Parent: current,
+		}
+
+		current.Children = append(current.Children, child)
+		current = child
+	}
+
+	current.Children = append(current.Children, &TreeNode{
+		Name:     pieces[len(pieces)-1],
+		Level:    current.Level + 1,
+		RootPath: &path,
+		Parent:   current,
+	})
+}
+
+// findChild finds a child node with the given name.
+func (t *TreeNode) findChild(name string) *TreeNode {
+	for _, child := range t.Children {
+		if child.Name == name {
+			return child
+		}
+	}
+
+	return nil
+}
+
+// ParentNode returns the parent node of the current node, this will skip any
+// nodes that are not Terraform projects or directories that contain var files.
+func (t *TreeNode) ParentNode() *TreeNode {
+	if t.Parent != nil {
+		if t.Parent.shouldVisitNode() {
+			return t.Parent
+		}
+
+		if t.Parent.Name == "root" {
+			return t.Parent
+		}
+
+		return t.Parent.ParentNode()
+	}
+
+	return nil
+}
+
+// UnusedParentVarFiles returns a list of any parent directories that contain var
+// files that have not been used by a project.
+func (t *TreeNode) UnusedParentVarFiles() []*VarFiles {
+	parent := t.ParentNode()
+	if parent == nil {
+		return nil
+	}
+
+	var varFiles []*VarFiles
+	if parent.TerraformVarFiles != nil && !parent.TerraformVarFiles.Used {
+		varFiles = append(varFiles, parent.TerraformVarFiles)
+	}
+
+	return append(varFiles, parent.UnusedParentVarFiles()...)
+}
+
+// UnusedAuntVarFiles returns a list of any aunt directories that contain var
+// files that have not been used by a project.
+func (t *TreeNode) UnusedAuntVarFiles() *VarFiles {
+	// if we don't have a root path, we can't have an aunt.
+	if t.RootPath == nil {
+		return nil
+	}
+
+	parent := t.Parent
+	if parent == nil {
+		return nil
+	}
+
+	// get the parent of the parent as this will be above the current node.
+	parent = t.Parent
+	for {
+		if parent == nil {
+			return nil
+		}
+
+		for _, child := range parent.Children {
+			if child.TerraformVarFiles != nil && !child.TerraformVarFiles.Used && child.RootPath == nil {
+				return child.TerraformVarFiles
+			}
+		}
+
+		parent = parent.Parent
+	}
+}
+
+// ChildNodes returns a list of child nodes that are Terraform projects or
+// directories that contain var files.
+func (t *TreeNode) ChildNodes() []*TreeNode {
+	var children []*TreeNode
+	for _, child := range t.Children {
+		if child.shouldVisitNode() {
+			children = append(children, child)
+		}
+	}
+
+	if len(children) > 0 {
+		return children
+	}
+
+	for _, child := range t.Children {
+		children = append(children, child.ChildNodes()...)
+	}
+
+	return children
+}
+
+// AddTerraformVarFiles adds a directory that contains Terraform var files to the tree.
+func (t *TreeNode) AddTerraformVarFiles(basePath, dir string, files []string) {
+	rel, _ := filepath.Rel(basePath, dir)
+	pieces := strings.Split(rel, string(filepath.Separator))
+	current := t
+	for i, s := range pieces {
+		if s == "" {
+			continue
+		}
+
+		n := current.findChild(s)
+		if n != nil {
+			current = n
+			continue
+		}
+
+		if i == len(pieces)-1 {
+			break
+		}
+
+		child := &TreeNode{
+			Name:   s,
+			Level:  current.Level + 1,
+			Parent: current,
+		}
+
+		current.Children = append(current.Children, child)
+		current = child
+	}
+
+	var hasSiblings bool
+	for _, child := range current.Children {
+		if child.RootPath != nil && current.ParentNode() != nil {
+			for _, node := range current.ParentNode().Children {
+				if node.TerraformVarFiles != nil && (node.TerraformVarFiles.HasSiblings || current.ParentNode().Name == "root") {
+					hasSiblings = true
+					break
+				}
+			}
+		}
+
+		if hasSiblings {
+			break
+		}
+	}
+
+	if current.Name == pieces[len(pieces)-1] {
+		current.TerraformVarFiles = &VarFiles{
+			Path:        dir,
+			Files:       files,
+			HasSiblings: hasSiblings,
+		}
+
+		return
+	}
+
+	current.Children = append(current.Children, &TreeNode{
+		Name: pieces[len(pieces)-1],
+		TerraformVarFiles: &VarFiles{
+			Path:        dir,
+			Files:       files,
+			HasSiblings: hasSiblings,
+		},
+		Parent: current,
+		Level:  current.Level + 1,
+	})
+}
+
+// PostOrder traverses the tree in post order, calling the given function on each
+// node. This will skip any nodes that are not Terraform projects or directories
+// that contain var files.
+func (t *TreeNode) PostOrder(visit func(t *TreeNode)) {
+	for _, child := range t.Children {
+		child.PostOrder(visit)
+	}
+
+	if t.shouldVisitNode() {
+		visit(t)
+	}
+}
+
+// Visit traverses the tree in pre order, calling the given function on each
+// node. This will skip any nodes that are not Terraform projects or directories
+func (t *TreeNode) Visit(f func(t *TreeNode)) {
+	f(t)
+
+	for _, child := range t.Children {
+		child.Visit(f)
+	}
+}
+
+func (t *TreeNode) shouldVisitNode() bool {
+	return t.RootPath != nil || t.TerraformVarFiles != nil
+}
+
+// AssociateChildVarFiles make sure that any projects have directories which
+// contain var files are associated with the project. These are only associated
+// if they are within 2 levels of the project and not if the child directory is a
+// valid sibling directory.
+func (t *TreeNode) AssociateChildVarFiles() {
+	t.PostOrder(func(t *TreeNode) {
+		if t.RootPath == nil {
+			return
+		}
+
+		for _, child := range t.ChildNodes() {
+			if child.TerraformVarFiles == nil {
+				continue
+			}
+
+			depth, err := getChildDepth(t.RootPath.Path, child.TerraformVarFiles.Path)
+			if depth > 2 || err != nil {
+				continue
+			}
+
+			if child.TerraformVarFiles.HasSiblings {
+				// visit all the children of this node and make sure that these siblings
+				// don't have any children with var files in them.
+				var hasChildVarFiles bool
+				for _, treeNode := range t.ChildNodes() {
+					if treeNode.RootPath != nil && treeNode.RootPath.HasChildVarFiles {
+						hasChildVarFiles = true
+						break
+					}
+				}
+
+				if !hasChildVarFiles {
+					return
+				}
+			}
+
+			t.RootPath.HasChildVarFiles = true
+			child.TerraformVarFiles.Used = true
+
+			t.RootPath.AddVarFiles(child.TerraformVarFiles.Path, child.TerraformVarFiles.Files)
+		}
+	})
+}
+
+// AssociateSiblingVarFiles makes sure that any sibling directories that contain
+// var files are associated with their corresponding projects.
+func (t *TreeNode) AssociateSiblingVarFiles() {
+	t.Visit(func(t *TreeNode) {
+		var rootPaths []*TreeNode
+		var varDirs []*TreeNode
+		for _, node := range t.Children {
+			if node.RootPath != nil {
+				rootPaths = append(rootPaths, node)
+			}
+
+			if node.TerraformVarFiles != nil && !node.TerraformVarFiles.Used {
+				varDirs = append(varDirs, node)
+			}
+		}
+
+		for _, path := range rootPaths {
+			if !path.RootPath.HasChildVarFiles {
+				for _, dir := range varDirs {
+					dir.TerraformVarFiles.Used = true
+
+					path.RootPath.AddVarFiles(dir.TerraformVarFiles.Path, dir.TerraformVarFiles.Files)
+				}
+			}
+		}
+	})
+}
+
+// AssociateParentVarFiles returns a list of any parent directories that contain var
+// files that have not been used by a project.
+func (t *TreeNode) AssociateParentVarFiles() {
+	t.PostOrder(func(t *TreeNode) {
+		if t.RootPath == nil {
+			return
+		}
+
+		varFiles := t.UnusedParentVarFiles()
+		for _, varFile := range varFiles {
+			t.RootPath.AddVarFiles(varFile.Path, varFile.Files)
+		}
+	})
+}
+
+// AssociateAuntVarFiles returns a list of any aunt directories that contain var
+// files that have not been used by a project.
+func (t *TreeNode) AssociateAuntVarFiles() {
+	t.PostOrder(func(t *TreeNode) {
+		if t.RootPath == nil {
+			return
+		}
+
+		varFiles := t.UnusedParentVarFiles()
+		for _, varFile := range varFiles {
+			varFile.Used = true
+		}
+	})
+
+	t.PostOrder(func(t *TreeNode) {
+		if t.RootPath == nil {
+			return
+		}
+
+		varFile := t.UnusedAuntVarFiles()
+		if varFile != nil {
+			t.RootPath.AddVarFiles(varFile.Path, varFile.Files)
+		}
+	})
+}
+
+// CollectRootPaths returns a list of all the Terraform projects found in the tree.
+func (t *TreeNode) CollectRootPaths() []RootPath {
+	var projects []RootPath
+	t.Visit(func(t *TreeNode) {
+		if t.RootPath != nil {
+			projects = append(projects, *t.RootPath)
+		}
+	})
+
+	for i := range projects {
+		sort.Strings(projects[i].TerraformVarFiles)
+	}
+
+	return projects
+}
+
 // RootPath holds information about the root directory of a project, this is normally the top level
 // Terraform containing provider blocks.
 type RootPath struct {
@@ -200,6 +616,8 @@ type RootPath struct {
 	HasChanges bool
 	// TerraformVarFiles are a list of any .tfvars or .tfvars.json files found at the root level.
 	TerraformVarFiles TerraformVarFiles
+
+	HasChildVarFiles bool
 }
 
 func (r *RootPath) AddVarFiles(dir string, files []string) {
@@ -263,150 +681,18 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 		}
 	}
 
-	// loop through the remaining discovered var files that aren't at the same
-	// directory as an existing project.
+	node := CreateTreeNode(fullPath, projects, p.discoveredVarFiles)
+	node.AssociateChildVarFiles()
+	node.AssociateSiblingVarFiles()
+	node.AssociateParentVarFiles()
+	node.AssociateAuntVarFiles()
 
-	// if the directory has var files in use that and exclude the directory
-	// if the directory has sibling folders with var files use that
-	// if the directory has child folders with var files use that
-	// if the directory has parent folders with var files use that
-
-	// loop through the remaining discovered var files that aren't at the same
-	// directory as an existing project. If the directory is a sibling of an existing
-	// project, but has not already been used as a child var file directory then we
-	// associate the var files with the project.
-	excludeVarDirectory := map[string]bool{}
-	var varFiles []string
-	for dir, _ := range p.discoveredVarFiles {
-		varFiles = append(varFiles, dir)
-	}
-
-	for dir, files := range p.filteredVarFiles(excludeVarDirectory) {
-		for i, project := range projects {
-			if isSiblingDirRec(project.Path, dir, projects, varFiles) {
-				p.logger.Debug().Msgf("found sibling directory %s to project %s", dir, project.Path)
-
-				projects[i].AddVarFiles(dir, files)
-
-				excludeVarDirectory[dir] = true
-			}
-		}
-	}
-
-	for dir, files := range p.filteredVarFiles(excludeVarDirectory) {
-		for i, project := range projects {
-			if isNestedDir(project.Path, dir, projects, 2, varFiles) {
-				p.logger.Debug().Msgf("found child directory %s to project %s", dir, project.Path)
-
-				projects[i].AddVarFiles(dir, files)
-
-				excludeVarDirectory[dir] = true
-			}
-		}
-	}
-
-	// parent directories
-	for dir, files := range p.filteredVarFiles(excludeVarDirectory) {
-		for i, project := range projects {
-			if isParentDir(dir, project.Path) {
-				p.logger.Debug().Msgf("found parent directory %s to project %s", dir, project.Path)
-
-				projects[i].AddVarFiles(dir, files)
-
-				excludeVarDirectory[dir] = true
-			}
-		}
-	}
-
-	// aunt directories
-	for dir, files := range p.filteredVarFiles(excludeVarDirectory) {
-		for i, project := range projects {
-			if isParentDir(filepath.Dir(dir), project.Path) {
-				p.logger.Debug().Msgf("found aunt directory %s to project %s", dir, project.Path)
-
-				projects[i].AddVarFiles(dir, files)
-			}
-		}
-	}
-
-	for i := range projects {
-		sort.Strings(projects[i].TerraformVarFiles)
-	}
-
-	return projects
-}
-
-func (p *ProjectLocator) filteredVarFiles(excludeVarDirectory map[string]bool) map[string][]string {
-	varFileDirs := map[string][]string{}
-
-	for dir, files := range p.discoveredVarFiles {
-		if !excludeVarDirectory[dir] {
-			varFileDirs[dir] = files
-		}
-	}
-
-	return varFileDirs
-}
-
-func isParentDir(parentDir, childDir string) bool {
-	absParentDir, err := filepath.Abs(parentDir)
-	if err != nil {
-		return false
-	}
-
-	absChildDir, err := filepath.Abs(childDir)
-	if err != nil {
-		return false
-	}
-
-	if absChildDir == absParentDir {
-		return false
-	}
-
-	return strings.HasPrefix(absChildDir, absParentDir)
-}
-
-func isSiblingDir(dir1 string, dir2 string) bool {
-	return filepath.Dir(dir1) == filepath.Dir(dir2)
-}
-
-func isSiblingDirRec(projectDir string, varDir string, projects []RootPath, varDirs []string) bool {
-	if !isSiblingDir(projectDir, varDir) {
-		return false
-	}
-
-	parent := filepath.Dir(projectDir)
-	for _, dir := range varDirs {
-		if !isSiblingDirRec(parent, dir, projects, varDirs) {
-			return false
-		}
-	}
-
-	var filteredVarDirs []string
-	for _, d := range varDirs {
-		if varDir != d {
-			filteredVarDirs = append(filteredVarDirs, d)
-		}
-	}
-
-	for _, project := range projects {
-		if !isSiblingDir(project.Path, varDir) {
-			continue
-		}
-
-		for _, d := range filteredVarDirs {
-			if isNestedDir(project.Path, d, projects, 1, varDirs) {
-				return false
-			}
-		}
-	}
-
-	return true
+	return node.CollectRootPaths()
 }
 
 func (p *ProjectLocator) shouldUseProject(dir discoveredProject, isSkipped func(string) bool) bool {
 	if isSkipped(dir.path) {
-		p.logger.Debug().Msgf("skipping directory %s as it is marked as excluded by --exclude-path", dir)
+		p.logger.Debug().Msgf("skipping directory %s as it is marked as excluded by --exclude-path", dir.path)
 
 		return false
 	}
@@ -420,57 +706,13 @@ func (p *ProjectLocator) shouldUseProject(dir discoveredProject, isSkipped func(
 	}
 
 	if _, ok := p.modules[dir.path]; ok && !p.useAllPaths {
-		p.logger.Debug().Msgf("skipping directory %s as it has been called as a module", dir)
+		p.logger.Debug().Msgf("skipping directory %s as it has been called as a module", dir.path)
 
 		return false
 	}
 
 	if !dir.hasRootModuleBlocks() {
 		return false
-	}
-
-	return true
-}
-
-// isNestedDir checks if the target path nested no more than 'levels' under the
-// base path and that no other project paths are a closer parent to the
-// targetPath.
-func isNestedDir(basePath, targetPath string, projects []RootPath, levels int, varFiles []string) bool {
-	sepCount, err := getChildDepth(basePath, targetPath)
-	if err != nil {
-		return false
-	}
-
-	if sepCount > levels {
-		return false
-	}
-
-	for _, project := range projects {
-		if basePath == project.Path {
-			continue
-		}
-
-		depth, err := getChildDepth(project.Path, targetPath)
-		if err != nil {
-			continue
-		}
-
-		if depth < sepCount {
-			return false
-		}
-	}
-
-	var filteredProjects []RootPath
-	for _, project := range projects {
-		if project.Path != basePath {
-			filteredProjects = append(filteredProjects, project)
-		}
-	}
-
-	for _, project := range filteredProjects {
-		if isSiblingDirRec(project.Path, targetPath, filteredProjects, varFiles) {
-			return false
-		}
 	}
 
 	return true

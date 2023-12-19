@@ -84,9 +84,6 @@ func TestGenerateConfigAutoDetect(t *testing.T) {
 	dirs := testutil.FindDirectoriesWithTreeFile(t, "./testdata/generate")
 	for _, dir := range dirs {
 		name := filepath.Base(dir)
-		//if name != "sibling_and_child_default" {
-		//	continue
-		//}
 
 		t.Run(name, func(tt *testing.T) {
 
@@ -103,7 +100,8 @@ func TestGenerateConfigAutoDetect(t *testing.T) {
 				ctx.Config.SetLogWriter(buf)
 				ctx.Config.LogLevel = "debug"
 
-				logging.ConfigureBaseLogger(ctx.Config)
+				err := logging.ConfigureBaseLogger(ctx.Config)
+				assert.NoError(t, err)
 			})
 
 			equal := testutil.AssertGoldenFile(tt, path.Join(dir, "expected.golden"), actual)

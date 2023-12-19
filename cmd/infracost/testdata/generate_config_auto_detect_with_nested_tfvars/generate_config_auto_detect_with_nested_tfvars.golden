@@ -2,30 +2,30 @@ version: 0.1
 
 projects:
   - path: app1
-    name: app1-env/prod
+    name: app1-prod
     terraform_var_files:
       - defaults.tfvars
       - env/prod.tfvars
     terraform_workspace: default
   - path: app1
-    name: app1-env/test
+    name: app1-test
     terraform_var_files:
       - defaults.tfvars
       - env/test.tfvars
     terraform_workspace: default
   - path: app1/app3
-    name: app1-app3
+    name: app1-app3-qa
     terraform_var_files:
       - qa.tfvars
     terraform_workspace: default
   - path: app2
-    name: app2-env/prod
+    name: app2-prod
     terraform_var_files:
       - env/defaults.tfvars
       - env/prod.tfvars
     terraform_workspace: default
   - path: app2
-    name: app2-env/staging
+    name: app2-staging
     terraform_var_files:
       - env/defaults.tfvars
       - env/staging.tfvars
