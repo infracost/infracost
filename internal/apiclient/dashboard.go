@@ -54,8 +54,6 @@ type runInput struct {
 	Currency       string                 `json:"currency"`
 	TimeGenerated  time.Time              `json:"timeGenerated"`
 	Metadata       map[string]interface{} `json:"metadata"`
-	TagPolicies    []output.TagPolicy     `json:"tagPolicies,omitempty"`
-	FinOpsPolicies []output.FinOpsPolicy  `json:"finopsPolicies,omitempty"`
 }
 
 type projectResultInput struct {
@@ -113,8 +111,6 @@ func newRunInput(ctx *config.RunContext, out output.Root) (*runInput, error) {
 		Currency:       out.Currency,
 		TimeGenerated:  out.TimeGenerated.UTC(),
 		Metadata:       ctxValues,
-		TagPolicies:    out.TagPolicies,
-		FinOpsPolicies: out.FinOpsPolicies,
 	}, nil
 }
 

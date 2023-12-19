@@ -13,7 +13,6 @@ import (
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/logging"
-	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/schema"
 )
 
@@ -41,104 +40,6 @@ func NewPolicyAPIClient(ctx *config.RunContext) (*PolicyAPIClient, error) {
 	}
 
 	return &c, nil
-}
-
-type PolicyOutput struct {
-	TagPolicies    []output.TagPolicy
-	FinOpsPolicies []output.FinOpsPolicy
-}
-
-func (c *PolicyAPIClient) CheckPolicies(ctx *config.RunContext, out output.Root, onlyDiff bool) (*PolicyOutput, error) {
-	ri, err := newRunInput(ctx, out)
-	if err != nil {
-		return nil, err
-	}
-
-	q := `
-		query EvaluatePolicies($run: RunInput!, $onlyDiff: Boolean) {
-			evaluatePolicies(run: $run, onlyDiff: $onlyDiff) {
-				tagPolicyResults {
-					name
-					tagPolicyId
-					message
-					prComment
-					blockPr
-					totalDetectedResources
-					totalTaggableResources
-					resources {
-						address
-						resourceType
-						path
-						line
-						projectNames
-						missingMandatoryTags
-						invalidTags {
-							key
-							value
-							validValues
-							validRegex
-						}
-					}
-				}
-				finopsPolicyResults {
-					name
-					policyId
-					message
-					blockPr
-					prComment
-					totalApplicableResources
-					resources {
-						checksum
-						address
-						resourceType
-						path
-						startLine
-						endLine
-						projectName
-						issues {
-							attribute
-							value
-							description
-						}
-						exclusionId
-					}
-				}
-			}
-		}
-	`
-
-	v := map[string]interface{}{
-		"run":      *ri,
-		"onlyDiff": onlyDiff,
-	}
-	results, err := c.doQueries([]GraphQLQuery{{q, v}})
-	if err != nil {
-		return nil, fmt.Errorf("query failed when checking tag policies %w", err)
-	}
-
-	if len(results) == 0 {
-		return nil, nil
-	}
-
-	if results[0].Get("errors").Exists() {
-		return nil, fmt.Errorf("query failed when checking tag policies, received graphql error: %s", results[0].Get("errors").String())
-	}
-
-	data := results[0].Get("data")
-
-	var policies = struct {
-		EvaluatePolicies struct {
-			TagPolicies    []output.TagPolicy    `json:"tagPolicyResults"`
-			FinOpsPolicies []output.FinOpsPolicy `json:"finopsPolicyResults"`
-		} `json:"evaluatePolicies"`
-	}{}
-
-	err = json.Unmarshal([]byte(data.Raw), &policies)
-	if err != nil {
-		return nil, fmt.Errorf("failed to unmarshal policies %w", err)
-	}
-
-	return &PolicyOutput{policies.EvaluatePolicies.TagPolicies, policies.EvaluatePolicies.FinOpsPolicies}, nil
 }
 
 // UploadPolicyData sends a filtered set of a project's resource information to Infracost Cloud and

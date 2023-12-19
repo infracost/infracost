@@ -246,8 +246,6 @@ func Combine(inputs []ReportInput) (Root, error) {
 
 	projects := make([]Project, 0)
 	summaries := make([]*Summary, 0, len(inputs))
-	var tagPolicies []TagPolicy
-	var finOpsPolicies []FinOpsPolicy
 	currency := ""
 
 	var metadata Metadata
@@ -266,14 +264,6 @@ func Combine(inputs []ReportInput) (Root, error) {
 
 		if input.Root.TimeGenerated.After(lastestGeneratedAt) {
 			lastestGeneratedAt = input.Root.TimeGenerated
-		}
-
-		if len(input.Root.TagPolicies) > 0 {
-			tagPolicies = append(tagPolicies, input.Root.TagPolicies...)
-		}
-
-		if len(input.Root.FinOpsPolicies) > 0 {
-			finOpsPolicies = append(finOpsPolicies, input.Root.FinOpsPolicies...)
 		}
 
 		if input.Root.TotalHourlyCost != nil {
@@ -340,8 +330,6 @@ func Combine(inputs []ReportInput) (Root, error) {
 	combined.TimeGenerated = lastestGeneratedAt
 	combined.Summary = MergeSummaries(summaries)
 	combined.Metadata = metadata
-	combined.TagPolicies = mergeTagPolicies(tagPolicies)
-	combined.FinOpsPolicies = mergeFinOpsPolicies(finOpsPolicies)
 	if len(inputs) > 0 {
 		combined.CloudURL = inputs[len(inputs)-1].Root.CloudURL
 	}
@@ -355,54 +343,6 @@ func Combine(inputs []ReportInput) (Root, error) {
 	}
 
 	return combined, nil
-}
-
-func mergeTagPolicies(tagPolicies []TagPolicy) []TagPolicy {
-	// gather and merge tag policies by name
-	tpMap := map[string]TagPolicy{}
-	for _, tp := range tagPolicies {
-		if existingTp, ok := tpMap[tp.Name]; ok {
-			tp.PrComment = existingTp.PrComment || tp.PrComment
-			tp.BlockPr = existingTp.BlockPr || tp.BlockPr
-			tp.Resources = append(existingTp.Resources, tp.Resources...)
-		}
-		tpMap[tp.Name] = tp
-	}
-
-	tpMerged := make([]TagPolicy, 0, len(tpMap))
-	// use the original tagPolicies array to iterate over the map so the order is preserved
-	for _, tp := range tagPolicies {
-		if mergedTp, ok := tpMap[tp.Name]; ok {
-			tpMerged = append(tpMerged, mergedTp)
-			delete(tpMap, tp.Name)
-		}
-	}
-
-	return tpMerged
-}
-
-func mergeFinOpsPolicies(finOpsPolicies []FinOpsPolicy) []FinOpsPolicy {
-	// gather and merge tag policies by id
-	fpMap := map[string]FinOpsPolicy{}
-	for _, fp := range finOpsPolicies {
-		if existingFp, ok := fpMap[fp.PolicyID]; ok {
-			fp.PrComment = existingFp.PrComment || fp.PrComment
-			fp.BlockPr = existingFp.BlockPr || fp.BlockPr
-			fp.Resources = append(existingFp.Resources, fp.Resources...)
-		}
-		fpMap[fp.PolicyID] = fp
-	}
-
-	fpMerged := make([]FinOpsPolicy, 0, len(fpMap))
-	// use the original tagPolicies array to iterate over the map so the order is preserved
-	for _, fp := range finOpsPolicies {
-		if mergedFp, ok := fpMap[fp.PolicyID]; ok {
-			fpMerged = append(fpMerged, mergedFp)
-			delete(fpMap, fp.PolicyID)
-		}
-	}
-
-	return fpMerged
 }
 
 func checkCurrency(inputCurrency, fileCurrency string) (string, error) {
