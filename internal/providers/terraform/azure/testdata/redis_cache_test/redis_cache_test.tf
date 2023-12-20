@@ -26,6 +26,16 @@ resource "azurerm_redis_cache" "basic_c2" {
   sku_name            = "Basic"
 }
 
+resource "azurerm_redis_cache" "premium_p1_australiacentral" {
+  name                = "example-cache"
+  location            = "australiacentral"
+  resource_group_name = azurerm_resource_group.example.name
+  capacity            = 1
+  shard_count         = 1
+  family              = "P"
+  sku_name            = "Premium"
+}
+
 resource "azurerm_redis_cache" "premium_p1" {
   name                = "example-cache"
   location            = azurerm_resource_group.example.location
