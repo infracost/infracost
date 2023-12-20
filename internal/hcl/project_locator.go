@@ -62,6 +62,15 @@ func IsGlobalVarFile(file string) bool {
 	return false
 }
 
+// IsAutoVarFile checks if the var file is an auto.tfvars or terraform.tfvars.
+// These are special Terraform var files that are applied to every project
+// automatically.
+func IsAutoVarFile(file string) bool {
+	withoutJSONSuffix := strings.TrimSuffix(file, ".json")
+
+	return strings.HasSuffix(withoutJSONSuffix, ".auto.tfvars") || withoutJSONSuffix == "terraform.tfvars"
+}
+
 type discoveredProject struct {
 	hasProviderBlock bool
 	hasBackendBlock  bool
@@ -668,7 +677,7 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 	p.logger.Debug().Msgf("walking directory at %s returned a list of possible Terraform projects with length %d", fullPath, len(p.discoveredProjects))
 
 	var projects []RootPath
-	for _, dir := range p.discoveredProjects {
+	for _, dir := range p.discoveredProjectsWithModulesFiltered() {
 		if p.shouldUseProject(dir, isSkipped) {
 			projects = append(projects, RootPath{
 				RepoPath:          fullPath,
@@ -690,6 +699,19 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 	return node.CollectRootPaths()
 }
 
+func (p *ProjectLocator) discoveredProjectsWithModulesFiltered() []discoveredProject {
+	var projects []discoveredProject
+
+	for _, dir := range p.discoveredProjects {
+		if _, ok := p.modules[dir.path]; !ok && !p.useAllPaths {
+			projects = append(projects, dir)
+		}
+	}
+
+	return projects
+
+}
+
 func (p *ProjectLocator) shouldUseProject(dir discoveredProject, isSkipped func(string) bool) bool {
 	if isSkipped(dir.path) {
 		p.logger.Debug().Msgf("skipping directory %s as it is marked as excluded by --exclude-path", dir.path)
@@ -701,7 +723,7 @@ func (p *ProjectLocator) shouldUseProject(dir discoveredProject, isSkipped func(
 		return true
 	}
 
-	if len(p.discoveredProjects) == 1 {
+	if len(p.discoveredProjectsWithModulesFiltered()) == 1 {
 		return true
 	}
 
