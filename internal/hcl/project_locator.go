@@ -703,7 +703,7 @@ func (p *ProjectLocator) discoveredProjectsWithModulesFiltered() []discoveredPro
 	var projects []discoveredProject
 
 	for _, dir := range p.discoveredProjects {
-		if _, ok := p.modules[dir.path]; !ok && !p.useAllPaths {
+		if _, ok := p.modules[dir.path]; !ok || p.useAllPaths {
 			projects = append(projects, dir)
 		}
 	}
