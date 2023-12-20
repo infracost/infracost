@@ -33,13 +33,12 @@ type Option func(p *Parser)
 // OptionWithTFVarsPaths takes a slice of paths adds them to the parser tfvar
 // files relative to the Parser initialPath. It sorts tfvar paths for precedence
 // before adding them to the parser. Paths that don't exist will be ignored.
-func OptionWithTFVarsPaths(paths []string) Option {
+func OptionWithTFVarsPaths(paths []string, autoDetected bool) Option {
 	return func(p *Parser) {
-
 		filenames := makePathsRelativeToInitial(paths, p.initialPath)
 		tfVarsPaths := p.tfvarsPaths
 		tfVarsPaths = append(tfVarsPaths, filenames...)
-		sortVarFilesByPrecedence(tfVarsPaths)
+		sortVarFilesByPrecedence(tfVarsPaths, autoDetected)
 
 		p.tfvarsPaths = tfVarsPaths
 	}
@@ -53,8 +52,11 @@ func OptionWithTFVarsPaths(paths []string) Option {
 // 2. terraform.tfvars.json
 // 3. *.auto.tfvars or *.auto.tfvars.json files, processed in lexical order of their filenames.
 // 4. all other terraform var files
-func sortVarFilesByPrecedence(paths []string) {
+func sortVarFilesByPrecedence(paths []string, autoDetected bool) {
 	sort.Slice(paths, func(i, j int) bool {
+		countI := strings.Count(paths[i], string(filepath.Separator))
+		countJ := strings.Count(paths[j], string(filepath.Separator))
+
 		getPrecedence := func(path string) int {
 			switch {
 			case strings.HasSuffix(path, "terraform.tfvars"):
@@ -63,9 +65,19 @@ func sortVarFilesByPrecedence(paths []string) {
 				return 2
 			case strings.HasSuffix(path, ".auto.tfvars"), strings.HasSuffix(path, ".auto.tfvars.json"):
 				return 3
+			case autoDetected:
+				if IsGlobalVarFile(path) {
+					return 4
+				}
+
+				return 5
 			default:
 				return 4
 			}
+		}
+
+		if autoDetected && countI != countJ {
+			return countI < countJ
 		}
 
 		// Compare the precedence of two paths
@@ -74,7 +86,7 @@ func sortVarFilesByPrecedence(paths []string) {
 
 		// If they have the same precedence, sort alphabetically
 		if precedenceI == precedenceJ {
-			return paths[i] < paths[j]
+			return paths[i] > paths[j]
 		}
 
 		// Otherwise, sort by precedence
@@ -346,7 +358,7 @@ func LoadParsers(ctx *config.ProjectContext, initialPath string, loader *modules
 				for _, env := range varEnvs {
 					parsers = append(parsers, newParser(rootPath, loader, logger, append(
 						options,
-						OptionWithTFVarsPaths(append(autoVarFiles, varFileGrouping[env]...)),
+						OptionWithTFVarsPaths(append(autoVarFiles, varFileGrouping[env]...), true),
 						OptionWithModuleSuffix(env),
 					)...))
 				}
@@ -356,7 +368,7 @@ func LoadParsers(ctx *config.ProjectContext, initialPath string, loader *modules
 
 			parserOpts := options
 			if len(autoVarFiles) > 0 {
-				parserOpts = append(parserOpts, OptionWithTFVarsPaths(append(varFiles, autoVarFiles...)))
+				parserOpts = append(parserOpts, OptionWithTFVarsPaths(append(varFiles, autoVarFiles...), true))
 			}
 
 			parsers = append(parsers, newParser(rootPath, loader, logger, parserOpts...))
@@ -379,7 +391,7 @@ func LoadParsers(ctx *config.ProjectContext, initialPath string, loader *modules
 		}
 
 		if len(autoVarFiles) > 0 {
-			options = append(options, OptionWithTFVarsPaths(autoVarFiles))
+			options = append(options, OptionWithTFVarsPaths(autoVarFiles, false))
 		}
 
 		parsers[i] = newParser(rootPath, loader, logger, options...)
@@ -591,16 +603,6 @@ func (p *Parser) ProjectName() string {
 func (p *Parser) TerraformVarFiles() []string {
 	varFilesMap := make(map[string]struct{}, len(p.tfvarsPaths))
 	varFiles := make([]string, 0, len(p.tfvarsPaths))
-
-	sort.Slice(p.tfvarsPaths, func(i, j int) bool {
-		countI := strings.Count(p.tfvarsPaths[i], string(filepath.Separator))
-		countJ := strings.Count(p.tfvarsPaths[j], string(filepath.Separator))
-		if countI == countJ {
-			return filepath.Base(p.tfvarsPaths[i]) < filepath.Base(p.tfvarsPaths[j])
-		}
-
-		return countI < countJ
-	})
 
 	for _, varFile := range p.tfvarsPaths {
 		p, err := filepath.Rel(p.initialPath, varFile)

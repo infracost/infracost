@@ -106,7 +106,7 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 
 	v.files = append(v.files, ctx.ProjectConfig.TerraformVarFiles...)
 	if len(v.files) > 0 {
-		withFiles := hcl.OptionWithTFVarsPaths(v.files)
+		withFiles := hcl.OptionWithTFVarsPaths(v.files, false)
 		options = append(options, withFiles)
 	}
 
