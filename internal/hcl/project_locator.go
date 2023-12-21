@@ -325,7 +325,7 @@ func (t *TreeNode) UnusedParentVarFiles() []*VarFiles {
 
 // UnusedAuntVarFiles returns a list of any aunt directories that contain var
 // files that have not been used by a project.
-func (t *TreeNode) UnusedAuntVarFiles() *VarFiles {
+func (t *TreeNode) UnusedAuntVarFiles() []*VarFiles {
 	// if we don't have a root path, we can't have an aunt.
 	if t.RootPath == nil {
 		return nil
@@ -338,14 +338,16 @@ func (t *TreeNode) UnusedAuntVarFiles() *VarFiles {
 
 	// get the parent of the parent as this will be above the current node.
 	parent = t.Parent
+	var varFiles []*VarFiles
+
 	for {
 		if parent == nil {
-			return nil
+			return varFiles
 		}
 
 		for _, child := range parent.Children {
 			if child.TerraformVarFiles != nil && !child.TerraformVarFiles.Used && child.RootPath == nil {
-				return child.TerraformVarFiles
+				varFiles = append(varFiles, child.TerraformVarFiles)
 			}
 		}
 
@@ -575,8 +577,8 @@ func (t *TreeNode) AssociateAuntVarFiles() {
 			return
 		}
 
-		varFile := t.UnusedAuntVarFiles()
-		if varFile != nil {
+		varFiles := t.UnusedAuntVarFiles()
+		for _, varFile := range varFiles {
 			t.RootPath.AddVarFiles(varFile.Path, varFile.Files)
 		}
 	})
