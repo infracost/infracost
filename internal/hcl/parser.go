@@ -328,7 +328,7 @@ func LoadParsers(ctx *config.ProjectContext, initialPath string, loader *modules
 			varFileGrouping := map[string][]string{}
 			for _, varFile := range varFiles {
 				if !VarFileEnvPrefixRegxp.MatchString(CleanVarName(varFile)) {
-					env := VarEnvName(varFile)
+					env := CleanVarName(varFile)
 					varFileGrouping[env] = append(varFileGrouping[env], varFile)
 				}
 			}

@@ -16,15 +16,7 @@ import (
 )
 
 var (
-	// GlobalTerraformVarFileNames is a list of var file naming convention that suggests they are applied
-	// to every project, despite changes in environment.
-	GlobalTerraformVarFileNames = []string{
-		"default",
-		"defaults",
-		"global",
-		"globals",
-		"shared",
-	}
+	EnvFileRegxp = regexp.MustCompile(`^(prd|prod|production|preprod|staging|stage|stg|development|dev|release|testing|test|tst|qa|uat|live|sandbox|demo|integration|int|experimental|experiments|trial|validation|perf|sec|dr)`)
 
 	VarFileEnvPrefixRegxp = regexp.MustCompile(`^(\w+)-`)
 )
@@ -51,15 +43,7 @@ func VarEnvName(file string) string {
 // environment prefix e.g. defaults.tfvars, global.tfvars are applicable,
 // prod-default.tfvars, stag-globals are not.
 func IsGlobalVarFile(file string) bool {
-	name := CleanVarName(file)
-
-	for _, global := range GlobalTerraformVarFileNames {
-		if strings.HasSuffix(name, global) && !VarFileEnvPrefixRegxp.MatchString(name) {
-			return true
-		}
-	}
-
-	return false
+	return !EnvFileRegxp.MatchString(filepath.Base(file))
 }
 
 // IsAutoVarFile checks if the var file is an auto.tfvars or terraform.tfvars.

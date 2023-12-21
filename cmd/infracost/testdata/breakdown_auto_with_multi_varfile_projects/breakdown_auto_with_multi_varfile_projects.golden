@@ -30,7 +30,7 @@ Module path: multi
  Project total                                                                 $1,308.28 
 
 ──────────────────────────────────
-Project: infracost/infracost/cmd/infracost/testdata/breakdown_auto_with_multi_varfile_projects/single-infra
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_auto_with_multi_varfile_projects/single
 Module path: single
 
  Name                                                   Monthly Qty  Unit   Monthly Cost 
@@ -55,7 +55,7 @@ Module path: single
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
 ┃ infracost/infracost/cmd/infraco...lti_varfile_projects/multi-dev ┃ $748         ┃
 ┃ infracost/infracost/cmd/infraco...ti_varfile_projects/multi-prod ┃ $1,308       ┃
-┃ infracost/infracost/cmd/infraco..._varfile_projects/single-infra ┃ $1,303       ┃
+┃ infracost/infracost/cmd/infraco..._multi_varfile_projects/single ┃ $1,303       ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 
 Err:
