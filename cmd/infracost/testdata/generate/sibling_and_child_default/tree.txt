@@ -1,0 +1,14 @@
+# If there is ambiguity whether to link root modules to var files in sibling
+# or child directories we should default to child. In the future we could
+# update this logic to read the var file contents and see if the vars match
+# the root module
+.
+└── apps
+    ├── main.tf
+    ├── foo
+    │   └── main.tf
+    ├── bar
+    │   └── main.tf
+    └── envs
+        ├── dev.tfvars
+        └── prod.tfvars

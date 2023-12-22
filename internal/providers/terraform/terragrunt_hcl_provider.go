@@ -611,7 +611,7 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 
 	h, err := NewHCLProvider(
 		config.NewProjectContext(p.ctx.RunContext, &pconfig, logCtx),
-		&HCLProviderConfig{CacheParsingModules: true},
+		&HCLProviderConfig{CacheParsingModules: true, SkipAutoDetection: true},
 		ops...,
 	)
 	if err != nil {

@@ -1,0 +1,52 @@
+version: 0.1
+
+projects:
+  - path: apps/bar
+    name: apps-bar-dev
+    terraform_var_files:
+      - ../envs/default.tfvars
+      - envs/dev.tfvars
+    terraform_workspace: default
+  - path: apps/bar
+    name: apps-bar-staging
+    terraform_var_files:
+      - ../envs/default.tfvars
+      - envs/staging.tfvars
+    terraform_workspace: default
+  - path: apps/bar/us1
+    name: apps-bar-us1-dev
+    terraform_var_files:
+      - ../../envs/default.tfvars
+      - envs/dev.tfvars
+    terraform_workspace: default
+  - path: apps/bar/us1
+    name: apps-bar-us1-prod
+    terraform_var_files:
+      - ../../envs/default.tfvars
+      - envs/prod.tfvars
+    terraform_workspace: default
+  - path: apps/foo
+    name: apps-foo-dev
+    terraform_var_files:
+      - ../envs/default.tfvars
+      - envs/dev.tfvars
+    terraform_workspace: default
+  - path: apps/foo
+    name: apps-foo-staging
+    terraform_var_files:
+      - ../envs/default.tfvars
+      - envs/staging.tfvars
+    terraform_workspace: default
+  - path: apps/foo/us1
+    name: apps-foo-us1-dev
+    terraform_var_files:
+      - ../../envs/default.tfvars
+      - envs/dev.tfvars
+    terraform_workspace: default
+  - path: apps/foo/us1
+    name: apps-foo-us1-prod
+    terraform_var_files:
+      - ../../envs/default.tfvars
+      - envs/prod.tfvars
+    terraform_workspace: default
+

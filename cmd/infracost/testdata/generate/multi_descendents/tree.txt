@@ -1,0 +1,26 @@
+# If a var file is a descendent of multiple root modules, it should only
+# be linked with the nearest one in the hierarchy
+.
+└── apps
+    ├── foo
+    │   ├── main.tf
+    │   ├── envs
+    │   │   ├── dev.tfvars
+    │   │   └── staging.tfvars
+    │   └── us1
+    │       ├── main.tf
+    │       └── envs
+    │           ├── dev.tfvars
+    │           └── prod.tfvars
+    ├── bar
+    │   ├── main.tf
+    │   ├── envs
+    │   │   ├── dev.tfvars
+    │   │   └── staging.tfvars
+    │   └── us1
+    │       ├── main.tf
+    │       └── envs
+    │           ├── dev.tfvars
+    │           └── prod.tfvars
+    └── envs
+        └── default.tfvars

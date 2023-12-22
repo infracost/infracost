@@ -30,23 +30,84 @@ var (
 
 type Option func(p *Parser)
 
-// OptionWithTFVarsPaths takes a slice of paths and sets them on the parser relative
-// to the Parser initialPath. Paths that don't exist will be ignored.
-func OptionWithTFVarsPaths(paths []string) Option {
+// OptionWithTFVarsPaths takes a slice of paths adds them to the parser tfvar
+// files relative to the Parser initialPath. It sorts tfvar paths for precedence
+// before adding them to the parser. Paths that don't exist will be ignored.
+func OptionWithTFVarsPaths(paths []string, autoDetected bool) Option {
 	return func(p *Parser) {
-		var filenames []string
-		for _, name := range paths {
-			if path.IsAbs(name) {
-				filenames = append(filenames, name)
-				continue
-			}
+		filenames := makePathsRelativeToInitial(paths, p.initialPath)
+		tfVarsPaths := p.tfvarsPaths
+		tfVarsPaths = append(tfVarsPaths, filenames...)
+		sortVarFilesByPrecedence(tfVarsPaths, autoDetected)
 
-			relToProject := path.Join(p.initialPath, name)
-			filenames = append(filenames, relToProject)
+		p.tfvarsPaths = tfVarsPaths
+	}
+}
+
+// sortVarFilesByPrecedence sorts the given Terraform var files by the order of precedence
+// as defined by Terraform. See https://www.terraform.io/docs/language/values/variables.html#variable-definition-precedence
+// for more information.
+//
+// 1. terraform.tfvars
+// 2. terraform.tfvars.json
+// 3. *.auto.tfvars or *.auto.tfvars.json files, processed in lexical order of their filenames.
+// 4. all other terraform var files
+func sortVarFilesByPrecedence(paths []string, autoDetected bool) {
+	sort.Slice(paths, func(i, j int) bool {
+		countI := strings.Count(paths[i], string(filepath.Separator))
+		countJ := strings.Count(paths[j], string(filepath.Separator))
+
+		getPrecedence := func(path string) int {
+			switch {
+			case strings.HasSuffix(path, "terraform.tfvars"):
+				return 1
+			case strings.HasSuffix(path, "terraform.tfvars.json"):
+				return 2
+			case strings.HasSuffix(path, ".auto.tfvars"), strings.HasSuffix(path, ".auto.tfvars.json"):
+				return 3
+			case autoDetected:
+				if IsGlobalVarFile(path) {
+					return 4
+				}
+
+				return 5
+			default:
+				return 4
+			}
 		}
 
-		p.tfvarsPaths = filenames
+		if autoDetected && countI != countJ {
+			return countI < countJ
+		}
+
+		// Compare the precedence of two paths
+		precedenceI := getPrecedence(paths[i])
+		precedenceJ := getPrecedence(paths[j])
+
+		// If they have the same precedence, sort alphabetically
+		if precedenceI == precedenceJ {
+			return paths[i] > paths[j]
+		}
+
+		// Otherwise, sort by precedence
+		return precedenceI < precedenceJ
+	})
+}
+
+func makePathsRelativeToInitial(paths []string, initialPath string) []string {
+	var filenames []string
+
+	for _, name := range paths {
+		if path.IsAbs(name) {
+			filenames = append(filenames, name)
+			continue
+		}
+
+		relToProject := path.Join(initialPath, name)
+		filenames = append(filenames, relToProject)
 	}
+
+	return filenames
 }
 
 // OptionWithModuleSuffix sets an optional module suffix which will be added to the Module after it has finished parsing
@@ -201,7 +262,6 @@ type Parser struct {
 	repoPath              string
 	initialPath           string
 	tfEnvVars             map[string]cty.Value
-	defaultVarFiles       []string
 	tfvarsPaths           []string
 	inputVars             map[string]cty.Value
 	workspaceName         string
@@ -219,8 +279,17 @@ type Parser struct {
 // in the given initialPath and returns a Parser for each directory it locates a Terraform project within. If
 // the initialPath contains Terraform files at the top level parsers will be len 1.
 func LoadParsers(ctx *config.ProjectContext, initialPath string, loader *modules.ModuleLoader, locatorConfig *ProjectLocatorConfig, logger zerolog.Logger, options ...Option) ([]*Parser, error) {
-	pl := NewProjectLocator(logger, locatorConfig)
-	rootPaths := pl.FindRootModules(initialPath)
+	var rootPaths []RootPath
+	if locatorConfig != nil && locatorConfig.SkipAutoDetection {
+		rootPaths = []RootPath{
+			{
+				Path: initialPath,
+			},
+		}
+	} else {
+		pl := NewProjectLocator(logger, locatorConfig)
+		rootPaths = pl.FindRootModules(initialPath)
+	}
 	if len(rootPaths) == 0 && len(locatorConfig.ChangedObjects) > 0 {
 		return nil, nil
 	}
@@ -235,9 +304,17 @@ func LoadParsers(ctx *config.ProjectContext, initialPath string, loader *modules
 
 			var varFiles []string
 			var autoVarFiles []string
+
+			// first remove all the "auto" tfvar files from the list of discovered var files.
+			// These files should not constitute a new "project" as they won't define an
+			// environment but defaults that should be applied across all environments.
 			for _, varFile := range rootPath.TerraformVarFiles {
-				withoutJSONSuffix := strings.TrimSuffix(varFile, ".json")
-				if strings.HasSuffix(withoutJSONSuffix, ".auto.tfvars") || withoutJSONSuffix == "terraform.tfvars" {
+				if IsAutoVarFile(varFile) {
+					autoVarFiles = append(autoVarFiles, varFile)
+					continue
+				}
+
+				if IsGlobalVarFile(varFile) {
 					autoVarFiles = append(autoVarFiles, varFile)
 					continue
 				}
@@ -245,14 +322,44 @@ func LoadParsers(ctx *config.ProjectContext, initialPath string, loader *modules
 				varFiles = append(varFiles, varFile)
 			}
 
-			if len(varFiles) > 1 {
+			// group the var files by environment. This is done by taking the base name of
+			// the var file. This is done to deduplicate var files that are for the same
+			// environment but have different file paths.
+			varFileGrouping := map[string][]string{}
+			for _, varFile := range varFiles {
+				if !VarFileEnvPrefixRegxp.MatchString(CleanVarName(varFile)) {
+					env := CleanVarName(varFile)
+					varFileGrouping[env] = append(varFileGrouping[env], varFile)
+				}
+			}
+
+			// loop through the var files again and if there are any global var files
+			// with a defaults prefix, add them to the grouping for each environment
+			// only if the environment exists.
+			for _, varFile := range varFiles {
+				if VarFileEnvPrefixRegxp.MatchString(CleanVarName(varFile)) {
+					env := VarEnvName(varFile)
+
+					if _, ok := varFileGrouping[env]; ok {
+						varFileGrouping[env] = append(varFileGrouping[env], varFile)
+					}
+				}
+			}
+
+			var varEnvs []string
+			for env := range varFileGrouping {
+				varEnvs = append(varEnvs, env)
+			}
+			sort.Strings(varEnvs)
+
+			if len(varFileGrouping) > 0 {
 				sort.Strings(rootPath.TerraformVarFiles)
 
-				for _, varFile := range varFiles {
+				for _, env := range varEnvs {
 					parsers = append(parsers, newParser(rootPath, loader, logger, append(
 						options,
-						OptionWithTFVarsPaths(append(autoVarFiles, varFile)),
-						OptionWithModuleSuffix(strings.TrimSuffix(strings.TrimSuffix(varFile, ".json"), ".tfvars")),
+						OptionWithTFVarsPaths(append(autoVarFiles, varFileGrouping[env]...), true),
+						OptionWithModuleSuffix(env),
 					)...))
 				}
 
@@ -260,8 +367,8 @@ func LoadParsers(ctx *config.ProjectContext, initialPath string, loader *modules
 			}
 
 			parserOpts := options
-			if len(varFiles) == 1 || len(autoVarFiles) > 0 {
-				parserOpts = append(parserOpts, OptionWithTFVarsPaths(append(varFiles, autoVarFiles...)))
+			if len(autoVarFiles) > 0 {
+				parserOpts = append(parserOpts, OptionWithTFVarsPaths(append(varFiles, autoVarFiles...), true))
 			}
 
 			parsers = append(parsers, newParser(rootPath, loader, logger, parserOpts...))
@@ -272,6 +379,21 @@ func LoadParsers(ctx *config.ProjectContext, initialPath string, loader *modules
 
 	var parsers = make([]*Parser, len(rootPaths))
 	for i, rootPath := range rootPaths {
+		// If we have detected any auto var files at the project level lets add them to
+		// the parser. We shouldn't add any auto var files from other directories as
+		// these projects are not auto-detected and are instead explicitly defined by the
+		// user.
+		var autoVarFiles []string
+		for _, varFile := range rootPath.TerraformVarFiles {
+			if IsAutoVarFile(varFile) && (filepath.Dir(varFile) == rootPath.Path || filepath.Dir(varFile) == ".") {
+				autoVarFiles = append(autoVarFiles, varFile)
+			}
+		}
+
+		if len(autoVarFiles) > 0 {
+			options = append(options, OptionWithTFVarsPaths(autoVarFiles, false))
+		}
+
 		parsers[i] = newParser(rootPath, loader, logger, options...)
 	}
 
@@ -295,31 +417,6 @@ func newParser(projectRoot RootPath, moduleLoader *modules.ModuleLoader, logger 
 		logger:        parserLogger,
 		moduleLoader:  moduleLoader,
 	}
-
-	var defaultVarFiles []string
-
-	defaultTfFile := path.Join(projectRoot.Path, "terraform.tfvars")
-	if _, err := os.Stat(defaultTfFile); err == nil {
-		parserLogger.Debug().Msgf("using terraform.tfvar file %s", defaultTfFile)
-		defaultVarFiles = append(defaultVarFiles, defaultTfFile)
-	}
-
-	if _, err := os.Stat(defaultTfFile + ".json"); err == nil {
-		parserLogger.Debug().Msgf("using terraform.tfvar file %s.json", defaultTfFile)
-		defaultVarFiles = append(defaultVarFiles, defaultTfFile+".json")
-	}
-
-	autoVarsSuffix := ".auto.tfvars"
-	infos, _ := os.ReadDir(projectRoot.Path)
-	for _, info := range infos {
-		name := info.Name()
-		if strings.HasSuffix(name, autoVarsSuffix) || strings.HasSuffix(name, autoVarsSuffix+".json") {
-			parserLogger.Debug().Msgf("using auto var file %s", name)
-			defaultVarFiles = append(defaultVarFiles, path.Join(projectRoot.Path, name))
-		}
-	}
-
-	p.defaultVarFiles = defaultVarFiles
 
 	for _, option := range options {
 		option(p)
@@ -494,26 +591,18 @@ func (p *Parser) ProjectName() string {
 		name = fmt.Sprintf("%s-%s", name, p.moduleSuffix)
 	}
 
+	if name == "." {
+		return "main"
+	}
+
 	return name
 }
 
 // TerraformVarFiles returns the list of terraform var files that the parser
 // will use to load variables from.
 func (p *Parser) TerraformVarFiles() []string {
-	varFilesMap := make(map[string]struct{}, len(p.defaultVarFiles)+len(p.tfvarsPaths))
-	varFiles := make([]string, 0, len(p.defaultVarFiles)+len(p.tfvarsPaths))
-
-	for _, varFile := range p.defaultVarFiles {
-		p, err := filepath.Rel(p.initialPath, varFile)
-		if err != nil {
-			continue
-		}
-
-		if _, ok := varFilesMap[p]; !ok {
-			varFilesMap[p] = struct{}{}
-			varFiles = append(varFiles, p)
-		}
-	}
+	varFilesMap := make(map[string]struct{}, len(p.tfvarsPaths))
+	varFiles := make([]string, 0, len(p.tfvarsPaths))
 
 	for _, varFile := range p.tfvarsPaths {
 		p, err := filepath.Rel(p.initialPath, varFile)
@@ -571,14 +660,6 @@ func (p *Parser) loadVars(blocks Blocks, filenames []string) (map[string]cty.Val
 
 		for k, v := range remoteVars {
 			combinedVars[k] = v
-		}
-	}
-
-	for _, name := range p.defaultVarFiles {
-		err := p.loadAndCombineVars(name, combinedVars)
-		if err != nil {
-			p.logger.Warn().Err(err).Msgf("could not load vars from auto var file %s", name)
-			continue
 		}
 	}
 

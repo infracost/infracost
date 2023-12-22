@@ -1,0 +1,16 @@
+# We should link root modules with var files in child directories if further
+# up the hierarchy there are more var files in child directories
+.
+└── apps
+    ├── main.tf
+    ├── foo
+    │   ├── main.tf
+    │   └── envs
+    │       └── dev.tfvars
+    ├── bar
+    │   ├── main.tf
+    │   └── envs
+    │       └── prod.tfvars
+    └── envs
+        ├── dev.tfvars
+        └── prod.tfvars
