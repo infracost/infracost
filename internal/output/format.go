@@ -154,7 +154,7 @@ func showProject(p Project, opts Options, showError bool) bool {
 		return true
 	}
 
-	if p.Diff == nil || len(p.Diff.Resources) == 0 { // has no diff
+	if p.Diff == nil || !p.Diff.HasResources() {
 		return false
 	}
 
