@@ -44,6 +44,12 @@ func TestCommentGitHubShowChangedProjects(t *testing.T) {
 		nil)
 }
 
+func TestCommentGitHubNoDiff(t *testing.T) {
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
+		[]string{"comment", "github", "--github-token", "abc", "--repo", "test/test", "--commit", "5", "--path", "./testdata/no_diff.json", "--dry-run"},
+		nil)
+}
+
 func TestCommentGitHubWithMissingAdditionalCommentPath(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(),
 		[]string{

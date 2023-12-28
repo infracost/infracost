@@ -1,0 +1,17 @@
+
+<h3>Infracost report</h3>
+<h4>💰 Monthly cost will not change</h4>
+<details>
+<summary>Cost details</summary>
+
+```
+──────────────────────────────────
+
+189 cloud resources were detected:
+∙ 31 were estimated, 23 of which include usage-based costs, see https://infracost.io/usage-file
+∙ 152 were free, rerun with --show-skipped to see details
+∙ 6 are not supported yet, rerun with --show-skipped to see details
+```
+</details>
+
+Comment not posted to GitHub (--dry-run was specified)

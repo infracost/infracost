@@ -200,6 +200,13 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) (MarkdownO
 				return false
 			}
 
+			// we always want to show the output if there are unsupported resources. This is
+			// because we want to show the unsupported resources in the output so that the
+			// user can see why the cost changes are different from expectations.
+			if out.HasUnsupportedResources() {
+				return true
+			}
+
 			var valid Projects
 			for _, project := range out.Projects {
 				if showProject(project, opts, true) {

@@ -41,6 +41,21 @@ type Root struct {
 	IsCIRun              bool             `json:"-"`
 }
 
+// HasUnsupportedResources returns if the summary has any unsupported resources.
+// This is used to determine if the summary should be shown in different output
+// formats.
+func (r *Root) HasUnsupportedResources() bool {
+	if r.Summary == nil {
+		return false
+	}
+
+	if r.Summary.TotalUnsupportedResources == nil {
+		return false
+	}
+
+	return *r.Summary.TotalUnsupportedResources > 0
+}
+
 type Project struct {
 	Name          string                  `json:"name"`
 	Metadata      *schema.ProjectMetadata `json:"metadata"`
@@ -222,6 +237,12 @@ type Breakdown struct {
 	FreeResources    []Resource       `json:"freeResources,omitempty"`
 	TotalHourlyCost  *decimal.Decimal `json:"totalHourlyCost"`
 	TotalMonthlyCost *decimal.Decimal `json:"totalMonthlyCost"`
+}
+
+// HasResources returns true if the breakdown has any resources or free resources.
+// This is used to determine if the breakdown should be shown in the output.
+func (b *Breakdown) HasResources() bool {
+	return len(b.Resources) > 0 || len(b.FreeResources) > 0
 }
 
 type CostComponent struct {
