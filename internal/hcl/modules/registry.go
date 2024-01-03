@@ -17,6 +17,8 @@ import (
 	svchost "github.com/hashicorp/terraform-svchost"
 	"github.com/hashicorp/terraform-svchost/auth"
 	"github.com/hashicorp/terraform-svchost/disco"
+	"github.com/infracost/infracost/internal/apiclient"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/rs/zerolog"
 )
 
@@ -161,6 +163,7 @@ func (d *Disco) DownloadLocation(moduleURL RegistryURL, version string) (string,
 
 func newRetryableClient() *retryablehttp.Client {
 	httpClient := retryablehttp.NewClient()
+	httpClient.Logger = &apiclient.LeveledLogger{Logger: logging.Logger.With().Str("library", "retryablehttp").Logger()}
 	httpClient.CheckRetry = func(ctx context.Context, resp *http.Response, err error) (bool, error) {
 		if ctx.Err() != nil {
 			return false, ctx.Err()
