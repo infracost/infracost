@@ -102,7 +102,6 @@ func gitSubPath(path string) string {
 	if subPath == "." {
 		return ""
 	}
-
 	return subPath
 }
 
