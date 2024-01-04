@@ -1116,6 +1116,7 @@ func ExpFunctions(baseDir string, logger zerolog.Logger) map[string]function.Fun
 		"dirname":          funcs.DirnameFunc,
 		"distinct":         stdlib.DistinctFunc,
 		"element":          stdlib.ElementFunc,
+		"endswith":         funcs.EndsWithFunc,
 		"chunklist":        stdlib.ChunklistFunc,
 		"file":             funcs.MakeFileFunc(baseDir, false),
 		"fileexists":       funcs.MakeFileExistsFunc(baseDir),
@@ -1171,6 +1172,8 @@ func ExpFunctions(baseDir string, logger zerolog.Logger) map[string]function.Fun
 		"slice":            stdlib.SliceFunc,
 		"sort":             stdlib.SortFunc,
 		"split":            stdlib.SplitFunc,
+		"startswith":       funcs.StartsWithFunc,
+		"strcontains":      funcs.StrContainsFunc,
 		"strrev":           stdlib.ReverseFunc,
 		"substr":           stdlib.SubstrFunc,
 		"timestamp":        funcs.MockTimestampFunc, // We want to return a deterministic value each time
