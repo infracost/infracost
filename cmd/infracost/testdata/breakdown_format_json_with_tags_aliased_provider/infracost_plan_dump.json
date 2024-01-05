@@ -1,0 +1,181 @@
+{
+  "format_version": "1.0",
+  "terraform_version": "1.1.0",
+  "prior_state": {
+    "values": {
+      "root_module": {
+        "child_modules": [
+          {
+            "resources": [
+              {
+                "address": "module.mine.aws_sqs_queue.sqs_withTags",
+                "mode": "managed",
+                "type": "aws_sqs_queue",
+                "name": "sqs_withTags",
+                "schema_version": 0,
+                "values": {
+                  "arn": "arn:aws:hcl::2bd8bbc8cc609fcc2759f0152b033ce9e76c3832480f5270f11be4f54cec73f0",
+                  "id": "hcl-2bd8bbc8cc609fcc2759f0152b033ce9e76c3832480f5270f11be4f54cec73f0",
+                  "name": "sqs_withTags",
+                  "self_link": "hcl-2bd8bbc8cc609fcc2759f0152b033ce9e76c3832480f5270f11be4f54cec73f0",
+                  "tags": {
+                    "DefaultOverride": "sqs-def",
+                    "ResourceTag": "sqs-hi"
+                  }
+                },
+                "infracost_metadata": {
+                  "calls": [
+                    {
+                      "filename": "/Users/tim/src/infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags_aliased_provider/main.tf",
+                      "blockName": "module.mine",
+                      "startLine": 18,
+                      "endLine": 24
+                    },
+                    {
+                      "filename": "/Users/tim/src/infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags_aliased_provider/mymodule/main.tf",
+                      "blockName": "aws_sqs_queue.sqs_withTags",
+                      "startLine": 11,
+                      "endLine": 18
+                    }
+                  ],
+                  "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
+                  "endLine": 18,
+                  "filename": "/Users/tim/src/infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags_aliased_provider/mymodule/main.tf",
+                  "startLine": 11
+                }
+              }
+            ],
+            "address": "module.mine"
+          }
+        ]
+      }
+    }
+  },
+  "planned_values": {
+    "root_module": {
+      "child_modules": [
+        {
+          "resources": [
+            {
+              "address": "module.mine.aws_sqs_queue.sqs_withTags",
+              "mode": "managed",
+              "type": "aws_sqs_queue",
+              "name": "sqs_withTags",
+              "schema_version": 0,
+              "values": {
+                "arn": "arn:aws:hcl::2bd8bbc8cc609fcc2759f0152b033ce9e76c3832480f5270f11be4f54cec73f0",
+                "id": "hcl-2bd8bbc8cc609fcc2759f0152b033ce9e76c3832480f5270f11be4f54cec73f0",
+                "name": "sqs_withTags",
+                "self_link": "hcl-2bd8bbc8cc609fcc2759f0152b033ce9e76c3832480f5270f11be4f54cec73f0",
+                "tags": {
+                  "DefaultOverride": "sqs-def",
+                  "ResourceTag": "sqs-hi"
+                }
+              },
+              "infracost_metadata": {
+                "calls": [
+                  {
+                    "filename": "/Users/tim/src/infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags_aliased_provider/main.tf",
+                    "blockName": "module.mine",
+                    "startLine": 18,
+                    "endLine": 24
+                  },
+                  {
+                    "filename": "/Users/tim/src/infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags_aliased_provider/mymodule/main.tf",
+                    "blockName": "aws_sqs_queue.sqs_withTags",
+                    "startLine": 11,
+                    "endLine": 18
+                  }
+                ],
+                "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
+                "endLine": 18,
+                "filename": "/Users/tim/src/infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags_aliased_provider/mymodule/main.tf",
+                "startLine": 11
+              }
+            }
+          ],
+          "address": "module.mine"
+        }
+      ]
+    }
+  },
+  "configuration": {
+    "provider_config": {
+      "aws.env": {
+        "name": "aws.env",
+        "expressions": {
+          "default_tags": [
+            {
+              "tags": {
+                "constant_value": {
+                  "DefaultNotOverride": "defaultnotoverride",
+                  "DefaultOverride": "defaultoverride"
+                }
+              }
+            }
+          ],
+          "region": {
+            "constant_value": "us-east-1"
+          }
+        },
+        "infracost_metadata": {
+          "end_line": 16,
+          "filename": "/Users/tim/src/infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags_aliased_provider/main.tf",
+          "start_line": 1
+        }
+      }
+    },
+    "root_module": {
+      "module_calls": {
+        "mine": {
+          "source": "./mymodule",
+          "module": {
+            "resources": [
+              {
+                "address": "aws_sqs_queue.sqs_withTags",
+                "mode": "managed",
+                "type": "aws_sqs_queue",
+                "name": "sqs_withTags",
+                "provider_config_key": "mine:aws",
+                "expressions": {
+                  "tags": {
+                    "references": [
+                      "DefaultOverride.",
+                      "ResourceTag."
+                    ]
+                  }
+                },
+                "schema_version": 0
+              }
+            ]
+          }
+        }
+      }
+    }
+  },
+  "infracost_resource_changes": [
+    {
+      "address": "module.mine.aws_sqs_queue.sqs_withTags",
+      "module_address": "module.mine",
+      "mode": "managed",
+      "type": "aws_sqs_queue",
+      "name": "sqs_withTags",
+      "change": {
+        "actions": [
+          "create"
+        ],
+        "before": null,
+        "after": {
+          "arn": "arn:aws:hcl::2bd8bbc8cc609fcc2759f0152b033ce9e76c3832480f5270f11be4f54cec73f0",
+          "id": "hcl-2bd8bbc8cc609fcc2759f0152b033ce9e76c3832480f5270f11be4f54cec73f0",
+          "name": "sqs_withTags",
+          "self_link": "hcl-2bd8bbc8cc609fcc2759f0152b033ce9e76c3832480f5270f11be4f54cec73f0",
+          "tags": {
+            "DefaultOverride": "sqs-def",
+            "ResourceTag": "sqs-hi"
+          }
+        }
+      }
+    }
+  ]
+}

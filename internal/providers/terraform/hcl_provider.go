@@ -580,7 +580,7 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 			Mode:              "managed",
 			Type:              block.TypeLabel(),
 			Name:              stripCountOrForEach(block.NameLabel()),
-			ProviderConfigKey: block.ModuleName() + ":" + block.Provider(),
+			ProviderConfigKey: block.ModuleName() + ":" + block.Provider(), // why aren't we using providerConfigKey here?
 			Expressions:       blockToReferences(block),
 			CountExpression:   p.countReferences(block),
 		}

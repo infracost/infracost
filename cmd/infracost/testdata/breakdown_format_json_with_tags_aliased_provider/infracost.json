@@ -1,0 +1,157 @@
+{
+  "version": "0.2",
+  "metadata": {
+    "infracostCommand": "breakdown",
+    "vcsBranch": "feat/hcl_string_helpers",
+    "vcsCommitSha": "21b1ee3260d8108dc18e1b653331e4bc15e71c5c",
+    "vcsCommitAuthorName": "tim775",
+    "vcsCommitAuthorEmail": "52185+tim775@users.noreply.github.com",
+    "vcsCommitTimestamp": "2024-01-04T02:12:09Z",
+    "vcsCommitMessage": "feat: Add hcl string functions startswith, endswith, strcontains",
+    "vcsRepositoryUrl": "https://github.com/infracost/infracost.git"
+  },
+  "currency": "USD",
+  "projects": [
+    {
+      "name": "infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags_aliased_provider",
+      "metadata": {
+        "path": "/Users/tim/src/infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags_aliased_provider",
+        "type": "terraform_dir",
+        "vcsSubPath": "cmd/infracost/testdata/breakdown_format_json_with_tags_aliased_provider",
+        "vcsCodeChanged": false,
+        "providers": [
+          {
+            "name": "aws.env",
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            },
+            "filename": "/Users/tim/src/infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags_aliased_provider/main.tf",
+            "startLine": 1,
+            "endLine": 16
+          }
+        ]
+      },
+      "pastBreakdown": {
+        "resources": [
+          {
+            "name": "module.mine.aws_sqs_queue.sqs_withTags",
+            "resourceType": "aws_sqs_queue",
+            "tags": {
+              "DefaultOverride": "sqs-def",
+              "ResourceTag": "sqs-hi"
+            },
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "module.mine",
+                  "endLine": 24,
+                  "filename": "/Users/tim/src/infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags_aliased_provider/main.tf",
+                  "startLine": 18
+                },
+                {
+                  "blockName": "aws_sqs_queue.sqs_withTags",
+                  "endLine": 18,
+                  "filename": "/Users/tim/src/infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags_aliased_provider/mymodule/main.tf",
+                  "startLine": 11
+                }
+              ],
+              "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
+              "endLine": 18,
+              "filename": "/Users/tim/src/infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags_aliased_provider/mymodule/main.tf",
+              "startLine": 11
+            },
+            "costComponents": [
+              {
+                "name": "Requests",
+                "unit": "1M requests",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.4",
+                "hourlyCost": null,
+                "monthlyCost": null
+              }
+            ]
+          }
+        ],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
+      },
+      "breakdown": {
+        "resources": [
+          {
+            "name": "module.mine.aws_sqs_queue.sqs_withTags",
+            "resourceType": "aws_sqs_queue",
+            "tags": {
+              "DefaultOverride": "sqs-def",
+              "ResourceTag": "sqs-hi"
+            },
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "module.mine",
+                  "endLine": 24,
+                  "filename": "/Users/tim/src/infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags_aliased_provider/main.tf",
+                  "startLine": 18
+                },
+                {
+                  "blockName": "aws_sqs_queue.sqs_withTags",
+                  "endLine": 18,
+                  "filename": "/Users/tim/src/infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags_aliased_provider/mymodule/main.tf",
+                  "startLine": 11
+                }
+              ],
+              "checksum": "0416b121e83d6bb05bd0b744a439e336a3bd1cfdaff221bec4577c59f2f744c8",
+              "endLine": 18,
+              "filename": "/Users/tim/src/infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags_aliased_provider/mymodule/main.tf",
+              "startLine": 11
+            },
+            "costComponents": [
+              {
+                "name": "Requests",
+                "unit": "1M requests",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.4",
+                "hourlyCost": null,
+                "monthlyCost": null
+              }
+            ]
+          }
+        ],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
+      },
+      "diff": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
+      },
+      "summary": {
+        "totalDetectedResources": 1,
+        "totalSupportedResources": 1,
+        "totalUnsupportedResources": 0,
+        "totalUsageBasedResources": 1,
+        "totalNoPriceResources": 0,
+        "unsupportedResourceCounts": {},
+        "noPriceResourceCounts": {}
+      }
+    }
+  ],
+  "totalHourlyCost": "0",
+  "totalMonthlyCost": "0",
+  "pastTotalHourlyCost": "0",
+  "pastTotalMonthlyCost": "0",
+  "diffTotalHourlyCost": "0",
+  "diffTotalMonthlyCost": "0",
+  "timeGenerated": "2024-01-04T19:43:29.069172Z",
+  "summary": {
+    "totalDetectedResources": 1,
+    "totalSupportedResources": 1,
+    "totalUnsupportedResources": 0,
+    "totalUsageBasedResources": 1,
+    "totalNoPriceResources": 0,
+    "unsupportedResourceCounts": {},
+    "noPriceResourceCounts": {}
+  }
+}
