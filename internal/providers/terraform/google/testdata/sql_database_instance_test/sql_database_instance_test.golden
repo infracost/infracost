@@ -1,93 +1,1118 @@
 
- Name                                                        Monthly Qty  Unit            Monthly Cost 
-                                                                                                       
- google_sql_database_instance.HA_custom_postgres                                                       
- ├─ vCPUs (regional)                                              11,680  hours                $964.77 
- ├─ Memory (regional)                                             43,800  GB                   $613.20 
- ├─ Storage (SSD, regional)                                           10  GB                     $3.40 
- ├─ Backups                                                Monthly cost depends on usage: $0.08 per GB 
- └─ IP address (if unused)                                           730  hours                  $7.30 
-                                                                                                       
- google_sql_database_instance.HA_small_mysql                                                           
- ├─ SQL instance (db-g1-small, regional)                             730  hours                 $51.10 
- ├─ Storage (SSD, regional)                                          100  GB                    $34.00 
- ├─ Backups                                                Monthly cost depends on usage: $0.08 per GB 
- └─ IP address (if unused)                                           730  hours                  $7.30 
-                                                                                                       
- google_sql_database_instance.custom_postgres                                                          
- ├─ vCPUs (zonal)                                                  1,460  hours                 $60.30 
- ├─ Memory (zonal)                                                 9,490  GB                    $66.43 
- ├─ Storage (SSD, zonal)                                              10  GB                     $1.70 
- ├─ Backups                                                Monthly cost depends on usage: $0.08 per GB 
- └─ IP address (if unused)                                           730  hours                  $7.30 
-                                                                                                       
- google_sql_database_instance.micro_mysql_HDD_storage                                                  
- ├─ SQL instance (db-f1-micro, zonal)                                730  hours                  $7.67 
- ├─ Storage (HDD, zonal)                                              10  GB                     $0.90 
- ├─ Backups                                                Monthly cost depends on usage: $0.08 per GB 
- └─ IP address (if unused)                                           730  hours                  $7.30 
-                                                                                                       
- google_sql_database_instance.micro_mysql_SSD_storage                                                  
- ├─ SQL instance (db-f1-micro, zonal)                                730  hours                  $7.67 
- ├─ Storage (SSD, zonal)                                              10  GB                     $1.70 
- ├─ Backups                                                Monthly cost depends on usage: $0.08 per GB 
- └─ IP address (if unused)                                           730  hours                  $7.30 
-                                                                                                       
- google_sql_database_instance.mysql_highmem                                                            
- ├─ SQL instance (db-n1-highmem-8, zonal)                            730  hours                $514.07 
- ├─ Storage (SSD, zonal)                                              10  GB                     $1.70 
- ├─ Backups                                                Monthly cost depends on usage: $0.08 per GB 
- └─ IP address (if unused)                                           730  hours                  $7.30 
-                                                                                                       
- google_sql_database_instance.mysql_standard                                                           
- ├─ SQL instance (db-n1-standard-32, zonal)                          730  hours              $1,578.26 
- ├─ Storage (SSD, zonal)                                              10  GB                     $1.70 
- ├─ Backups                                                Monthly cost depends on usage: $0.08 per GB 
- └─ IP address (if unused)                                           730  hours                  $7.30 
-                                                                                                       
- google_sql_database_instance.mysql_standard_no_public_ip                                              
- ├─ vCPUs (zonal)                                                 11,680  hours                $482.38 
- ├─ Memory (zonal)                                                43,800  GB                   $306.60 
- ├─ Storage (SSD, zonal)                                              10  GB                     $1.70 
- └─ Backups                                                Monthly cost depends on usage: $0.08 per GB 
-                                                                                                       
- google_sql_database_instance.small_mysql                                                              
- ├─ SQL instance (db-g1-small, zonal)                                730  hours                 $25.55 
- ├─ Storage (SSD, zonal)                                              10  GB                     $1.70 
- ├─ Backups                                                Monthly cost depends on usage: $0.08 per GB 
- └─ IP address (if unused)                                           730  hours                  $7.30 
-                                                                                                       
- google_sql_database_instance.sql_server                                                               
- ├─ vCPUs (zonal)                                                 11,680  hours                $482.38 
- ├─ Memory (zonal)                                                43,800  GB                   $306.60 
- ├─ Storage (SSD, zonal)                                              10  GB                     $1.70 
- ├─ Backups                                                Monthly cost depends on usage: $0.08 per GB 
- └─ IP address (if unused)                                           730  hours                  $7.30 
-                                                                                                       
- google_sql_database_instance.usage                                                                    
- ├─ SQL instance (db-g1-small, zonal)                                730  hours                 $25.55 
- ├─ Storage (SSD, zonal)                                              10  GB                     $1.70 
- ├─ Backups                                                        1,000  GB                    $80.00 
- └─ IP address (if unused)                                           730  hours                  $7.30 
-                                                                                                       
- google_sql_database_instance.with_replica                                                             
- ├─ vCPUs (regional)                                              11,680  hours                $964.77 
- ├─ Memory (regional)                                             43,800  GB                   $613.20 
- ├─ Storage (SSD, regional)                                          500  GB                   $170.00 
- ├─ Backups                                                Monthly cost depends on usage: $0.08 per GB 
- ├─ IP address (if unused)                                           730  hours                  $7.30 
- └─ Replica                                                                                            
-    ├─ vCPUs (zonal)                                              11,680  hours                $482.38 
-    ├─ Memory (zonal)                                             43,800  GB                   $306.60 
-    └─ Storage (SSD, zonal)                                          500  GB                    $85.00 
-                                                                                                       
- OVERALL TOTAL                                                                               $8,326.67 
+ Name                                                                                           Monthly Qty  Unit            Monthly Cost 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-1-3840.MYSQL_8_0.REGIONAL"]                                                          
+ ├─ vCPUs (1, regional)                                                                                 730  hours                 $60.30 
+ ├─ Memory (3.75 GB, regional)                                                                         3.75  GB                    $38.33 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-1-3840.MYSQL_8_0.ZONAL"]                                                             
+ ├─ vCPUs (1, zonal)                                                                                    730  hours                 $30.15 
+ ├─ Memory (3.75 GB, zonal)                                                                            3.75  GB                    $19.16 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-1-3840.POSTGRES_15.REGIONAL"]                                                        
+ ├─ vCPUs (1, regional)                                                                                 730  hours                 $60.30 
+ ├─ Memory (3.75 GB, regional)                                                                         3.75  GB                    $38.33 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-1-3840.POSTGRES_15.ZONAL"]                                                           
+ ├─ vCPUs (1, zonal)                                                                                    730  hours                 $30.15 
+ ├─ Memory (3.75 GB, zonal)                                                                            3.75  GB                    $19.16 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-1-3840.SQLSERVER_2019_WEB.REGIONAL"]                                                 
+ ├─ vCPUs (1, regional)                                                                                 730  hours                 $60.30 
+ ├─ Memory (3.75 GB, regional)                                                                         3.75  GB                    $38.33 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-1-3840.SQLSERVER_2019_WEB.ZONAL"]                                                    
+ ├─ vCPUs (1, zonal)                                                                                    730  hours                 $30.15 
+ ├─ Memory (3.75 GB, zonal)                                                                            3.75  GB                    $19.16 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-16-61440.MYSQL_8_0.REGIONAL"]                                                        
+ ├─ vCPUs (16, regional)                                                                             11,680  hours                $964.77 
+ ├─ Memory (60 GB, regional)                                                                             60  GB                   $613.20 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-16-61440.MYSQL_8_0.ZONAL"]                                                           
+ ├─ vCPUs (16, zonal)                                                                                11,680  hours                $482.38 
+ ├─ Memory (60 GB, zonal)                                                                                60  GB                   $306.60 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-16-61440.POSTGRES_15.REGIONAL"]                                                      
+ ├─ vCPUs (16, regional)                                                                             11,680  hours                $964.77 
+ ├─ Memory (60 GB, regional)                                                                             60  GB                   $613.20 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-16-61440.POSTGRES_15.ZONAL"]                                                         
+ ├─ vCPUs (16, zonal)                                                                                11,680  hours                $482.38 
+ ├─ Memory (60 GB, zonal)                                                                                60  GB                   $306.60 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-16-61440.SQLSERVER_2019_WEB.REGIONAL"]                                               
+ ├─ vCPUs (16, regional)                                                                             11,680  hours                $964.77 
+ ├─ Memory (60 GB, regional)                                                                             60  GB                   $613.20 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-16-61440.SQLSERVER_2019_WEB.ZONAL"]                                                  
+ ├─ vCPUs (16, zonal)                                                                                11,680  hours                $482.38 
+ ├─ Memory (60 GB, zonal)                                                                                60  GB                   $306.60 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-2-7680.MYSQL_8_0.REGIONAL"]                                                          
+ ├─ vCPUs (2, regional)                                                                               1,460  hours                $120.60 
+ ├─ Memory (7.5 GB, regional)                                                                           7.5  GB                    $76.65 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-2-7680.MYSQL_8_0.ZONAL"]                                                             
+ ├─ vCPUs (2, zonal)                                                                                  1,460  hours                 $60.30 
+ ├─ Memory (7.5 GB, zonal)                                                                              7.5  GB                    $38.33 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-2-7680.POSTGRES_15.REGIONAL"]                                                        
+ ├─ vCPUs (2, regional)                                                                               1,460  hours                $120.60 
+ ├─ Memory (7.5 GB, regional)                                                                           7.5  GB                    $76.65 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-2-7680.POSTGRES_15.ZONAL"]                                                           
+ ├─ vCPUs (2, zonal)                                                                                  1,460  hours                 $60.30 
+ ├─ Memory (7.5 GB, zonal)                                                                              7.5  GB                    $38.33 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-2-7680.SQLSERVER_2019_WEB.REGIONAL"]                                                 
+ ├─ vCPUs (2, regional)                                                                               1,460  hours                $120.60 
+ ├─ Memory (7.5 GB, regional)                                                                           7.5  GB                    $76.65 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-2-7680.SQLSERVER_2019_WEB.ZONAL"]                                                    
+ ├─ vCPUs (2, zonal)                                                                                  1,460  hours                 $60.30 
+ ├─ Memory (7.5 GB, zonal)                                                                              7.5  GB                    $38.33 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-32-122880.MYSQL_8_0.REGIONAL"]                                                       
+ ├─ vCPUs (32, regional)                                                                             23,360  hours              $1,929.54 
+ ├─ Memory (120 GB, regional)                                                                           120  GB                 $1,226.40 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-32-122880.MYSQL_8_0.ZONAL"]                                                          
+ ├─ vCPUs (32, zonal)                                                                                23,360  hours                $964.77 
+ ├─ Memory (120 GB, zonal)                                                                              120  GB                   $613.20 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-32-122880.POSTGRES_15.REGIONAL"]                                                     
+ ├─ vCPUs (32, regional)                                                                             23,360  hours              $1,929.54 
+ ├─ Memory (120 GB, regional)                                                                           120  GB                 $1,226.40 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-32-122880.POSTGRES_15.ZONAL"]                                                        
+ ├─ vCPUs (32, zonal)                                                                                23,360  hours                $964.77 
+ ├─ Memory (120 GB, zonal)                                                                              120  GB                   $613.20 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-32-122880.SQLSERVER_2019_WEB.REGIONAL"]                                              
+ ├─ vCPUs (32, regional)                                                                             23,360  hours              $1,929.54 
+ ├─ Memory (120 GB, regional)                                                                           120  GB                 $1,226.40 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-32-122880.SQLSERVER_2019_WEB.ZONAL"]                                                 
+ ├─ vCPUs (32, zonal)                                                                                23,360  hours                $964.77 
+ ├─ Memory (120 GB, zonal)                                                                              120  GB                   $613.20 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-4-15360.MYSQL_8_0.REGIONAL"]                                                         
+ ├─ vCPUs (4, regional)                                                                               2,920  hours                $241.19 
+ ├─ Memory (15 GB, regional)                                                                             15  GB                   $153.30 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-4-15360.MYSQL_8_0.ZONAL"]                                                            
+ ├─ vCPUs (4, zonal)                                                                                  2,920  hours                $120.60 
+ ├─ Memory (15 GB, zonal)                                                                                15  GB                    $76.65 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-4-15360.POSTGRES_15.REGIONAL"]                                                       
+ ├─ vCPUs (4, regional)                                                                               2,920  hours                $241.19 
+ ├─ Memory (15 GB, regional)                                                                             15  GB                   $153.30 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-4-15360.POSTGRES_15.ZONAL"]                                                          
+ ├─ vCPUs (4, zonal)                                                                                  2,920  hours                $120.60 
+ ├─ Memory (15 GB, zonal)                                                                                15  GB                    $76.65 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-4-15360.SQLSERVER_2019_WEB.REGIONAL"]                                                
+ ├─ vCPUs (4, regional)                                                                               2,920  hours                $241.19 
+ ├─ Memory (15 GB, regional)                                                                             15  GB                   $153.30 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-4-15360.SQLSERVER_2019_WEB.ZONAL"]                                                   
+ ├─ vCPUs (4, zonal)                                                                                  2,920  hours                $120.60 
+ ├─ Memory (15 GB, zonal)                                                                                15  GB                    $76.65 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-64-245760.MYSQL_8_0.REGIONAL"]                                                       
+ ├─ vCPUs (64, regional)                                                                             46,720  hours              $3,859.07 
+ ├─ Memory (240 GB, regional)                                                                           240  GB                 $2,452.80 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-64-245760.MYSQL_8_0.ZONAL"]                                                          
+ ├─ vCPUs (64, zonal)                                                                                46,720  hours              $1,929.54 
+ ├─ Memory (240 GB, zonal)                                                                              240  GB                 $1,226.40 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-64-245760.POSTGRES_15.REGIONAL"]                                                     
+ ├─ vCPUs (64, regional)                                                                             46,720  hours              $3,859.07 
+ ├─ Memory (240 GB, regional)                                                                           240  GB                 $2,452.80 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-64-245760.POSTGRES_15.ZONAL"]                                                        
+ ├─ vCPUs (64, zonal)                                                                                46,720  hours              $1,929.54 
+ ├─ Memory (240 GB, zonal)                                                                              240  GB                 $1,226.40 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-64-245760.SQLSERVER_2019_WEB.REGIONAL"]                                              
+ ├─ vCPUs (64, regional)                                                                             46,720  hours              $3,859.07 
+ ├─ Memory (240 GB, regional)                                                                           240  GB                 $2,452.80 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-64-245760.SQLSERVER_2019_WEB.ZONAL"]                                                 
+ ├─ vCPUs (64, zonal)                                                                                46,720  hours              $1,929.54 
+ ├─ Memory (240 GB, zonal)                                                                              240  GB                 $1,226.40 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-8-30720.MYSQL_8_0.REGIONAL"]                                                         
+ ├─ vCPUs (8, regional)                                                                               5,840  hours                $482.38 
+ ├─ Memory (30 GB, regional)                                                                             30  GB                   $306.60 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-8-30720.MYSQL_8_0.ZONAL"]                                                            
+ ├─ vCPUs (8, zonal)                                                                                  5,840  hours                $241.19 
+ ├─ Memory (30 GB, zonal)                                                                                30  GB                   $153.30 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-8-30720.POSTGRES_15.REGIONAL"]                                                       
+ ├─ vCPUs (8, regional)                                                                               5,840  hours                $482.38 
+ ├─ Memory (30 GB, regional)                                                                             30  GB                   $306.60 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-8-30720.POSTGRES_15.ZONAL"]                                                          
+ ├─ vCPUs (8, zonal)                                                                                  5,840  hours                $241.19 
+ ├─ Memory (30 GB, zonal)                                                                                30  GB                   $153.30 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-8-30720.SQLSERVER_2019_WEB.REGIONAL"]                                                
+ ├─ vCPUs (8, regional)                                                                               5,840  hours                $482.38 
+ ├─ Memory (30 GB, regional)                                                                             30  GB                   $306.60 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-8-30720.SQLSERVER_2019_WEB.ZONAL"]                                                   
+ ├─ vCPUs (8, zonal)                                                                                  5,840  hours                $241.19 
+ ├─ Memory (30 GB, zonal)                                                                                30  GB                   $153.30 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-96-368640.MYSQL_8_0.REGIONAL"]                                                       
+ ├─ vCPUs (96, regional)                                                                             70,080  hours              $5,788.61 
+ ├─ Memory (360 GB, regional)                                                                           360  GB                 $3,679.20 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-96-368640.MYSQL_8_0.ZONAL"]                                                          
+ ├─ vCPUs (96, zonal)                                                                                70,080  hours              $2,894.30 
+ ├─ Memory (360 GB, zonal)                                                                              360  GB                 $1,839.60 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-96-368640.POSTGRES_15.REGIONAL"]                                                     
+ ├─ vCPUs (96, regional)                                                                             70,080  hours              $5,788.61 
+ ├─ Memory (360 GB, regional)                                                                           360  GB                 $3,679.20 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-96-368640.POSTGRES_15.ZONAL"]                                                        
+ ├─ vCPUs (96, zonal)                                                                                70,080  hours              $2,894.30 
+ ├─ Memory (360 GB, zonal)                                                                              360  GB                 $1,839.60 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-96-368640.SQLSERVER_2019_WEB.REGIONAL"]                                              
+ ├─ vCPUs (96, regional)                                                                             70,080  hours              $5,788.61 
+ ├─ Memory (360 GB, regional)                                                                           360  GB                 $3,679.20 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-custom-96-368640.SQLSERVER_2019_WEB.ZONAL"]                                                 
+ ├─ vCPUs (96, zonal)                                                                                70,080  hours              $2,894.30 
+ ├─ Memory (360 GB, zonal)                                                                              360  GB                 $1,839.60 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-f1-micro.MYSQL_8_0.REGIONAL"]                                                               
+ ├─ SQL instance (db-f1-micro, regional)                                                                730  hours                 $15.33 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-f1-micro.MYSQL_8_0.ZONAL"]                                                                  
+ ├─ SQL instance (db-f1-micro, zonal)                                                                   730  hours                  $7.67 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-f1-micro.POSTGRES_15.REGIONAL"]                                                             
+ ├─ SQL instance (db-f1-micro, regional)                                                                730  hours                 $15.33 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-f1-micro.POSTGRES_15.ZONAL"]                                                                
+ ├─ SQL instance (db-f1-micro, zonal)                                                                   730  hours                  $7.67 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-g1-small.MYSQL_8_0.REGIONAL"]                                                               
+ ├─ SQL instance (db-g1-small, regional)                                                                730  hours                 $51.10 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-g1-small.MYSQL_8_0.ZONAL"]                                                                  
+ ├─ SQL instance (db-g1-small, zonal)                                                                   730  hours                 $25.55 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-g1-small.POSTGRES_15.REGIONAL"]                                                             
+ ├─ SQL instance (db-g1-small, regional)                                                                730  hours                 $51.10 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-g1-small.POSTGRES_15.ZONAL"]                                                                
+ ├─ SQL instance (db-g1-small, zonal)                                                                   730  hours                 $25.55 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-highmem-16.MYSQL_8_0.REGIONAL"]                                                             
+ ├─ vCPUs (16, regional)                                                                             11,680  hours                $964.77 
+ ├─ Memory (104 GB, regional)                                                                           104  GB                 $1,062.88 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-highmem-16.MYSQL_8_0.ZONAL"]                                                                
+ ├─ vCPUs (16, zonal)                                                                                11,680  hours                $482.38 
+ ├─ Memory (104 GB, zonal)                                                                              104  GB                   $531.44 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-highmem-16.POSTGRES_15.REGIONAL"]                                                           
+ ├─ vCPUs (16, regional)                                                                             11,680  hours                $964.77 
+ ├─ Memory (104 GB, regional)                                                                           104  GB                 $1,062.88 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-highmem-16.POSTGRES_15.ZONAL"]                                                              
+ ├─ vCPUs (16, zonal)                                                                                11,680  hours                $482.38 
+ ├─ Memory (104 GB, zonal)                                                                              104  GB                   $531.44 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-highmem-16.SQLSERVER_2019_WEB.REGIONAL"]                                                    
+ ├─ vCPUs (16, regional)                                                                             11,680  hours                $964.77 
+ ├─ Memory (104 GB, regional)                                                                           104  GB                 $1,062.88 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-highmem-16.SQLSERVER_2019_WEB.ZONAL"]                                                       
+ ├─ vCPUs (16, zonal)                                                                                11,680  hours                $482.38 
+ ├─ Memory (104 GB, zonal)                                                                              104  GB                   $531.44 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-highmem-4.MYSQL_8_0.REGIONAL"]                                                              
+ ├─ vCPUs (4, regional)                                                                               2,920  hours                $241.19 
+ ├─ Memory (26 GB, regional)                                                                             26  GB                   $265.72 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-highmem-4.MYSQL_8_0.ZONAL"]                                                                 
+ ├─ vCPUs (4, zonal)                                                                                  2,920  hours                $120.60 
+ ├─ Memory (26 GB, zonal)                                                                                26  GB                   $132.86 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-highmem-4.POSTGRES_15.REGIONAL"]                                                            
+ ├─ vCPUs (4, regional)                                                                               2,920  hours                $241.19 
+ ├─ Memory (26 GB, regional)                                                                             26  GB                   $265.72 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-highmem-4.POSTGRES_15.ZONAL"]                                                               
+ ├─ vCPUs (4, zonal)                                                                                  2,920  hours                $120.60 
+ ├─ Memory (26 GB, zonal)                                                                                26  GB                   $132.86 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-highmem-4.SQLSERVER_2019_WEB.REGIONAL"]                                                     
+ ├─ vCPUs (4, regional)                                                                               2,920  hours                $241.19 
+ ├─ Memory (26 GB, regional)                                                                             26  GB                   $265.72 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-highmem-4.SQLSERVER_2019_WEB.ZONAL"]                                                        
+ ├─ vCPUs (4, zonal)                                                                                  2,920  hours                $120.60 
+ ├─ Memory (26 GB, zonal)                                                                                26  GB                   $132.86 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-highmem-8.MYSQL_8_0.REGIONAL"]                                                              
+ ├─ vCPUs (8, regional)                                                                               5,840  hours                $482.38 
+ ├─ Memory (52 GB, regional)                                                                             52  GB                   $531.44 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-highmem-8.MYSQL_8_0.ZONAL"]                                                                 
+ ├─ vCPUs (8, zonal)                                                                                  5,840  hours                $241.19 
+ ├─ Memory (52 GB, zonal)                                                                                52  GB                   $265.72 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-highmem-8.POSTGRES_15.REGIONAL"]                                                            
+ ├─ vCPUs (8, regional)                                                                               5,840  hours                $482.38 
+ ├─ Memory (52 GB, regional)                                                                             52  GB                   $531.44 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-highmem-8.POSTGRES_15.ZONAL"]                                                               
+ ├─ vCPUs (8, zonal)                                                                                  5,840  hours                $241.19 
+ ├─ Memory (52 GB, zonal)                                                                                52  GB                   $265.72 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-highmem-8.SQLSERVER_2019_WEB.REGIONAL"]                                                     
+ ├─ vCPUs (8, regional)                                                                               5,840  hours                $482.38 
+ ├─ Memory (52 GB, regional)                                                                             52  GB                   $531.44 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-highmem-8.SQLSERVER_2019_WEB.ZONAL"]                                                        
+ ├─ vCPUs (8, zonal)                                                                                  5,840  hours                $241.19 
+ ├─ Memory (52 GB, zonal)                                                                                52  GB                   $265.72 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-lightweight-1.MYSQL_8_0.REGIONAL"]                                                          
+ ├─ vCPUs (1, regional)                                                                                 730  hours                 $60.30 
+ ├─ Memory (3.75 GB, regional)                                                                         3.75  GB                    $38.33 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-lightweight-1.MYSQL_8_0.ZONAL"]                                                             
+ ├─ vCPUs (1, zonal)                                                                                    730  hours                 $30.15 
+ ├─ Memory (3.75 GB, zonal)                                                                            3.75  GB                    $19.16 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-lightweight-1.POSTGRES_15.REGIONAL"]                                                        
+ ├─ vCPUs (1, regional)                                                                                 730  hours                 $60.30 
+ ├─ Memory (3.75 GB, regional)                                                                         3.75  GB                    $38.33 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-lightweight-1.POSTGRES_15.ZONAL"]                                                           
+ ├─ vCPUs (1, zonal)                                                                                    730  hours                 $30.15 
+ ├─ Memory (3.75 GB, zonal)                                                                            3.75  GB                    $19.16 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-lightweight-1.SQLSERVER_2019_WEB.REGIONAL"]                                                 
+ ├─ vCPUs (1, regional)                                                                                 730  hours                 $60.30 
+ ├─ Memory (3.75 GB, regional)                                                                         3.75  GB                    $38.33 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-lightweight-1.SQLSERVER_2019_WEB.ZONAL"]                                                    
+ ├─ vCPUs (1, zonal)                                                                                    730  hours                 $30.15 
+ ├─ Memory (3.75 GB, zonal)                                                                            3.75  GB                    $19.16 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-lightweight-2.MYSQL_8_0.REGIONAL"]                                                          
+ ├─ vCPUs (2, regional)                                                                               1,460  hours                $120.60 
+ ├─ Memory (3.75 GB, regional)                                                                         3.75  GB                    $38.33 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-lightweight-2.MYSQL_8_0.ZONAL"]                                                             
+ ├─ vCPUs (2, zonal)                                                                                  1,460  hours                 $60.30 
+ ├─ Memory (3.75 GB, zonal)                                                                            3.75  GB                    $19.16 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-lightweight-2.POSTGRES_15.REGIONAL"]                                                        
+ ├─ vCPUs (2, regional)                                                                               1,460  hours                $120.60 
+ ├─ Memory (3.75 GB, regional)                                                                         3.75  GB                    $38.33 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-lightweight-2.POSTGRES_15.ZONAL"]                                                           
+ ├─ vCPUs (2, zonal)                                                                                  1,460  hours                 $60.30 
+ ├─ Memory (3.75 GB, zonal)                                                                            3.75  GB                    $19.16 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-lightweight-2.SQLSERVER_2019_WEB.REGIONAL"]                                                 
+ ├─ vCPUs (2, regional)                                                                               1,460  hours                $120.60 
+ ├─ Memory (3.75 GB, regional)                                                                         3.75  GB                    $38.33 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-lightweight-2.SQLSERVER_2019_WEB.ZONAL"]                                                    
+ ├─ vCPUs (2, zonal)                                                                                  1,460  hours                 $60.30 
+ ├─ Memory (3.75 GB, zonal)                                                                            3.75  GB                    $19.16 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-lightweight-4.MYSQL_8_0.REGIONAL"]                                                          
+ ├─ vCPUs (4, regional)                                                                               2,920  hours                $241.19 
+ ├─ Memory (3.75 GB, regional)                                                                         3.75  GB                    $38.33 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-lightweight-4.MYSQL_8_0.ZONAL"]                                                             
+ ├─ vCPUs (4, zonal)                                                                                  2,920  hours                $120.60 
+ ├─ Memory (3.75 GB, zonal)                                                                            3.75  GB                    $19.16 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-lightweight-4.POSTGRES_15.REGIONAL"]                                                        
+ ├─ vCPUs (4, regional)                                                                               2,920  hours                $241.19 
+ ├─ Memory (3.75 GB, regional)                                                                         3.75  GB                    $38.33 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-lightweight-4.POSTGRES_15.ZONAL"]                                                           
+ ├─ vCPUs (4, zonal)                                                                                  2,920  hours                $120.60 
+ ├─ Memory (3.75 GB, zonal)                                                                            3.75  GB                    $19.16 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-lightweight-4.SQLSERVER_2019_WEB.REGIONAL"]                                                 
+ ├─ vCPUs (4, regional)                                                                               2,920  hours                $241.19 
+ ├─ Memory (3.75 GB, regional)                                                                         3.75  GB                    $38.33 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-lightweight-4.SQLSERVER_2019_WEB.ZONAL"]                                                    
+ ├─ vCPUs (4, zonal)                                                                                  2,920  hours                $120.60 
+ ├─ Memory (3.75 GB, zonal)                                                                            3.75  GB                    $19.16 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-1.MYSQL_8_0.REGIONAL"]                                                          
+ ├─ SQL instance (db-n1-standard-1, regional)                                                           730  hours                 $98.62 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-1.MYSQL_8_0.ZONAL"]                                                             
+ ├─ SQL instance (db-n1-standard-1, zonal)                                                              730  hours                 $49.35 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-1.POSTGRES_15.REGIONAL"]                                                        
+ ├─ vCPUs (1, regional)                                                                                 730  hours                 $60.30 
+ ├─ Memory (3.75 GB, regional)                                                                         3.75  GB                    $38.33 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-1.POSTGRES_15.ZONAL"]                                                           
+ ├─ vCPUs (1, zonal)                                                                                    730  hours                 $30.15 
+ ├─ Memory (3.75 GB, zonal)                                                                            3.75  GB                    $19.16 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-1.SQLSERVER_2019_WEB.REGIONAL"]                                                 
+ ├─ vCPUs (1, regional)                                                                                 730  hours                 $60.30 
+ ├─ Memory (3.75 GB, regional)                                                                         3.75  GB                    $38.33 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-1.SQLSERVER_2019_WEB.ZONAL"]                                                    
+ ├─ vCPUs (1, zonal)                                                                                    730  hours                 $30.15 
+ ├─ Memory (3.75 GB, zonal)                                                                            3.75  GB                    $19.16 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-16.MYSQL_8_0.REGIONAL"]                                                         
+ ├─ SQL instance (db-n1-standard-16, regional)                                                          730  hours              $1,578.48 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-16.MYSQL_8_0.ZONAL"]                                                            
+ ├─ SQL instance (db-n1-standard-16, zonal)                                                             730  hours                $789.28 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-16.POSTGRES_15.REGIONAL"]                                                       
+ ├─ vCPUs (16, regional)                                                                             11,680  hours                $964.77 
+ ├─ Memory (60 GB, regional)                                                                             60  GB                   $613.20 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-16.POSTGRES_15.ZONAL"]                                                          
+ ├─ vCPUs (16, zonal)                                                                                11,680  hours                $482.38 
+ ├─ Memory (60 GB, zonal)                                                                                60  GB                   $306.60 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-16.SQLSERVER_2019_WEB.REGIONAL"]                                                
+ ├─ vCPUs (16, regional)                                                                             11,680  hours                $964.77 
+ ├─ Memory (60 GB, regional)                                                                             60  GB                   $613.20 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-16.SQLSERVER_2019_WEB.ZONAL"]                                                   
+ ├─ vCPUs (16, zonal)                                                                                11,680  hours                $482.38 
+ ├─ Memory (60 GB, zonal)                                                                                60  GB                   $306.60 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-2.MYSQL_8_0.REGIONAL"]                                                          
+ ├─ SQL instance (db-n1-standard-2, regional)                                                           730  hours                $197.25 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-2.MYSQL_8_0.ZONAL"]                                                             
+ ├─ SQL instance (db-n1-standard-2, zonal)                                                              730  hours                 $98.62 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-2.POSTGRES_15.REGIONAL"]                                                        
+ ├─ vCPUs (2, regional)                                                                               1,460  hours                $120.60 
+ ├─ Memory (7.5 GB, regional)                                                                           7.5  GB                    $76.65 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-2.POSTGRES_15.ZONAL"]                                                           
+ ├─ vCPUs (2, zonal)                                                                                  1,460  hours                 $60.30 
+ ├─ Memory (7.5 GB, zonal)                                                                              7.5  GB                    $38.33 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-2.SQLSERVER_2019_WEB.REGIONAL"]                                                 
+ ├─ vCPUs (2, regional)                                                                               1,460  hours                $120.60 
+ ├─ Memory (7.5 GB, regional)                                                                           7.5  GB                    $76.65 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-2.SQLSERVER_2019_WEB.ZONAL"]                                                    
+ ├─ vCPUs (2, zonal)                                                                                  1,460  hours                 $60.30 
+ ├─ Memory (7.5 GB, zonal)                                                                              7.5  GB                    $38.33 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-32.MYSQL_8_0.REGIONAL"]                                                         
+ ├─ SQL instance (db-n1-standard-32, regional)                                                          730  hours              $3,156.45 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-32.MYSQL_8_0.ZONAL"]                                                            
+ ├─ SQL instance (db-n1-standard-32, zonal)                                                             730  hours              $1,578.26 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-32.POSTGRES_15.REGIONAL"]                                                       
+ ├─ vCPUs (32, regional)                                                                             23,360  hours              $1,929.54 
+ ├─ Memory (120 GB, regional)                                                                           120  GB                 $1,226.40 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-32.POSTGRES_15.ZONAL"]                                                          
+ ├─ vCPUs (32, zonal)                                                                                23,360  hours                $964.77 
+ ├─ Memory (120 GB, zonal)                                                                              120  GB                   $613.20 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-32.SQLSERVER_2019_WEB.REGIONAL"]                                                
+ ├─ vCPUs (32, regional)                                                                             23,360  hours              $1,929.54 
+ ├─ Memory (120 GB, regional)                                                                           120  GB                 $1,226.40 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-32.SQLSERVER_2019_WEB.ZONAL"]                                                   
+ ├─ vCPUs (32, zonal)                                                                                23,360  hours                $964.77 
+ ├─ Memory (120 GB, zonal)                                                                              120  GB                   $613.20 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-4.MYSQL_8_0.REGIONAL"]                                                          
+ ├─ SQL instance (db-n1-standard-4, regional)                                                           730  hours                $394.49 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-4.MYSQL_8_0.ZONAL"]                                                             
+ ├─ SQL instance (db-n1-standard-4, zonal)                                                              730  hours                $197.25 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-4.POSTGRES_15.REGIONAL"]                                                        
+ ├─ vCPUs (4, regional)                                                                               2,920  hours                $241.19 
+ ├─ Memory (15 GB, regional)                                                                             15  GB                   $153.30 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-4.POSTGRES_15.ZONAL"]                                                           
+ ├─ vCPUs (4, zonal)                                                                                  2,920  hours                $120.60 
+ ├─ Memory (15 GB, zonal)                                                                                15  GB                    $76.65 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-4.SQLSERVER_2019_WEB.REGIONAL"]                                                 
+ ├─ vCPUs (4, regional)                                                                               2,920  hours                $241.19 
+ ├─ Memory (15 GB, regional)                                                                             15  GB                   $153.30 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-4.SQLSERVER_2019_WEB.ZONAL"]                                                    
+ ├─ vCPUs (4, zonal)                                                                                  2,920  hours                $120.60 
+ ├─ Memory (15 GB, zonal)                                                                                15  GB                    $76.65 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-64.MYSQL_8_0.REGIONAL"]                                                         
+ ├─ SQL instance (db-n1-standard-64, regional)                                                          730  hours              $6,312.89 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-64.MYSQL_8_0.ZONAL"]                                                            
+ ├─ SQL instance (db-n1-standard-64, zonal)                                                             730  hours              $3,156.45 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-64.POSTGRES_15.REGIONAL"]                                                       
+ ├─ vCPUs (64, regional)                                                                             46,720  hours              $3,859.07 
+ ├─ Memory (240 GB, regional)                                                                           240  GB                 $2,452.80 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-64.POSTGRES_15.ZONAL"]                                                          
+ ├─ vCPUs (64, zonal)                                                                                46,720  hours              $1,929.54 
+ ├─ Memory (240 GB, zonal)                                                                              240  GB                 $1,226.40 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-64.SQLSERVER_2019_WEB.REGIONAL"]                                                
+ ├─ vCPUs (64, regional)                                                                             46,720  hours              $3,859.07 
+ ├─ Memory (240 GB, regional)                                                                           240  GB                 $2,452.80 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-64.SQLSERVER_2019_WEB.ZONAL"]                                                   
+ ├─ vCPUs (64, zonal)                                                                                46,720  hours              $1,929.54 
+ ├─ Memory (240 GB, zonal)                                                                              240  GB                 $1,226.40 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-8.MYSQL_8_0.REGIONAL"]                                                          
+ ├─ SQL instance (db-n1-standard-8, regional)                                                           730  hours                $788.98 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-8.MYSQL_8_0.ZONAL"]                                                             
+ ├─ SQL instance (db-n1-standard-8, zonal)                                                              730  hours                $394.49 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-8.POSTGRES_15.REGIONAL"]                                                        
+ ├─ vCPUs (8, regional)                                                                               5,840  hours                $482.38 
+ ├─ Memory (30 GB, regional)                                                                             30  GB                   $306.60 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-8.POSTGRES_15.ZONAL"]                                                           
+ ├─ vCPUs (8, zonal)                                                                                  5,840  hours                $241.19 
+ ├─ Memory (30 GB, zonal)                                                                                30  GB                   $153.30 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-8.SQLSERVER_2019_WEB.REGIONAL"]                                                 
+ ├─ vCPUs (8, regional)                                                                               5,840  hours                $482.38 
+ ├─ Memory (30 GB, regional)                                                                             30  GB                   $306.60 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-8.SQLSERVER_2019_WEB.ZONAL"]                                                    
+ ├─ vCPUs (8, zonal)                                                                                  5,840  hours                $241.19 
+ ├─ Memory (30 GB, zonal)                                                                                30  GB                   $153.30 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-96.MYSQL_8_0.REGIONAL"]                                                         
+ ├─ SQL instance (db-n1-standard-96, regional)                                                          730  hours              $9,469.34 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-96.MYSQL_8_0.ZONAL"]                                                            
+ ├─ SQL instance (db-n1-standard-96, zonal)                                                             730  hours              $4,734.71 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-96.POSTGRES_15.REGIONAL"]                                                       
+ ├─ vCPUs (96, regional)                                                                             70,080  hours              $5,788.61 
+ ├─ Memory (360 GB, regional)                                                                           360  GB                 $3,679.20 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-96.POSTGRES_15.ZONAL"]                                                          
+ ├─ vCPUs (96, zonal)                                                                                70,080  hours              $2,894.30 
+ ├─ Memory (360 GB, zonal)                                                                              360  GB                 $1,839.60 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-96.SQLSERVER_2019_WEB.REGIONAL"]                                                
+ ├─ vCPUs (96, regional)                                                                             70,080  hours              $5,788.61 
+ ├─ Memory (360 GB, regional)                                                                           360  GB                 $3,679.20 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-n1-standard-96.SQLSERVER_2019_WEB.ZONAL"]                                                   
+ ├─ vCPUs (96, zonal)                                                                                70,080  hours              $2,894.30 
+ ├─ Memory (360 GB, zonal)                                                                              360  GB                 $1,839.60 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-standard-1.MYSQL_8_0.REGIONAL"]                                                             
+ ├─ vCPUs (1, regional)                                                                                 730  hours                 $60.30 
+ ├─ Memory (3.75 GB, regional)                                                                         3.75  GB                    $38.33 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-standard-1.MYSQL_8_0.ZONAL"]                                                                
+ ├─ vCPUs (1, zonal)                                                                                    730  hours                 $30.15 
+ ├─ Memory (3.75 GB, zonal)                                                                            3.75  GB                    $19.16 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-standard-1.POSTGRES_15.REGIONAL"]                                                           
+ ├─ vCPUs (1, regional)                                                                                 730  hours                 $60.30 
+ ├─ Memory (3.75 GB, regional)                                                                         3.75  GB                    $38.33 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-standard-1.POSTGRES_15.ZONAL"]                                                              
+ ├─ vCPUs (1, zonal)                                                                                    730  hours                 $30.15 
+ ├─ Memory (3.75 GB, zonal)                                                                            3.75  GB                    $19.16 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-standard-1.SQLSERVER_2019_WEB.REGIONAL"]                                                    
+ ├─ vCPUs (1, regional)                                                                                 730  hours                 $60.30 
+ ├─ Memory (3.75 GB, regional)                                                                         3.75  GB                    $38.33 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-standard-1.SQLSERVER_2019_WEB.ZONAL"]                                                       
+ ├─ vCPUs (1, zonal)                                                                                    730  hours                 $30.15 
+ ├─ Memory (3.75 GB, zonal)                                                                            3.75  GB                    $19.16 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-standard-2.MYSQL_8_0.REGIONAL"]                                                             
+ ├─ vCPUs (2, regional)                                                                               1,460  hours                $120.60 
+ ├─ Memory (7.5 GB, regional)                                                                           7.5  GB                    $76.65 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-standard-2.MYSQL_8_0.ZONAL"]                                                                
+ ├─ vCPUs (2, zonal)                                                                                  1,460  hours                 $60.30 
+ ├─ Memory (7.5 GB, zonal)                                                                              7.5  GB                    $38.33 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-standard-2.POSTGRES_15.REGIONAL"]                                                           
+ ├─ vCPUs (2, regional)                                                                               1,460  hours                $120.60 
+ ├─ Memory (7.5 GB, regional)                                                                           7.5  GB                    $76.65 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-standard-2.POSTGRES_15.ZONAL"]                                                              
+ ├─ vCPUs (2, zonal)                                                                                  1,460  hours                 $60.30 
+ ├─ Memory (7.5 GB, zonal)                                                                              7.5  GB                    $38.33 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-standard-2.SQLSERVER_2019_WEB.REGIONAL"]                                                    
+ ├─ vCPUs (2, regional)                                                                               1,460  hours                $120.60 
+ ├─ Memory (7.5 GB, regional)                                                                           7.5  GB                    $76.65 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-standard-2.SQLSERVER_2019_WEB.ZONAL"]                                                       
+ ├─ vCPUs (2, zonal)                                                                                  1,460  hours                 $60.30 
+ ├─ Memory (7.5 GB, zonal)                                                                              7.5  GB                    $38.33 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-standard-4.MYSQL_8_0.REGIONAL"]                                                             
+ ├─ vCPUs (4, regional)                                                                               2,920  hours                $241.19 
+ ├─ Memory (15 GB, regional)                                                                             15  GB                   $153.30 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-standard-4.MYSQL_8_0.ZONAL"]                                                                
+ ├─ vCPUs (4, zonal)                                                                                  2,920  hours                $120.60 
+ ├─ Memory (15 GB, zonal)                                                                                15  GB                    $76.65 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-standard-4.POSTGRES_15.REGIONAL"]                                                           
+ ├─ vCPUs (4, regional)                                                                               2,920  hours                $241.19 
+ ├─ Memory (15 GB, regional)                                                                             15  GB                   $153.30 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-standard-4.POSTGRES_15.ZONAL"]                                                              
+ ├─ vCPUs (4, zonal)                                                                                  2,920  hours                $120.60 
+ ├─ Memory (15 GB, zonal)                                                                                15  GB                    $76.65 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-standard-4.SQLSERVER_2019_WEB.REGIONAL"]                                                    
+ ├─ vCPUs (4, regional)                                                                               2,920  hours                $241.19 
+ ├─ Memory (15 GB, regional)                                                                             15  GB                   $153.30 
+ ├─ Storage (SSD, regional)                                                                              10  GB                     $3.40 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.db_instance["db-standard-4.SQLSERVER_2019_WEB.ZONAL"]                                                       
+ ├─ vCPUs (4, zonal)                                                                                  2,920  hours                $120.60 
+ ├─ Memory (15 GB, zonal)                                                                                15  GB                    $76.65 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.no_public_ip                                                                                                
+ ├─ vCPUs (1, zonal)                                                                                    730  hours                 $30.15 
+ ├─ Memory (3.75 GB, zonal)                                                                            3.75  GB                    $19.16 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ └─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+                                                                                                                                          
+ google_sql_database_instance.usage                                                                                                       
+ ├─ SQL instance (db-g1-small, zonal)                                                                   730  hours                 $25.55 
+ ├─ Storage (SSD, zonal)                                                                                 10  GB                     $1.70 
+ ├─ Backups                                                                                           1,000  GB                    $80.00 
+ └─ IP address (if unused)                                                                              730  hours                  $7.30 
+                                                                                                                                          
+ google_sql_database_instance.with_replica                                                                                                
+ ├─ vCPUs (1, regional)                                                                                 730  hours                 $60.30 
+ ├─ Memory (3.75 GB, regional)                                                                         3.75  GB                    $38.33 
+ ├─ Storage (SSD, regional)                                                                             500  GB                   $170.00 
+ ├─ Backups                                                                                   Monthly cost depends on usage: $0.08 per GB 
+ ├─ IP address (if unused)                                                                              730  hours                  $7.30 
+ └─ Replica                                                                                                                               
+    ├─ vCPUs (1, zonal)                                                                                 730  hours                 $30.15 
+    ├─ Memory (3.75 GB, zonal)                                                                         3.75  GB                    $19.16 
+    └─ Storage (SSD, zonal)                                                                             500  GB                    $85.00 
+                                                                                                                                          
+ OVERALL TOTAL                                                                                                                $221,764.39 
 ──────────────────────────────────
-12 cloud resources were detected:
-∙ 12 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+161 cloud resources were detected:
+∙ 161 were estimated, 3 of which include usage-based costs, see https://infracost.io/usage-file
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestNewSQLInstance                                 ┃ $8,327       ┃
+┃ TestNewSQLInstance                                 ┃ $221,764     ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
