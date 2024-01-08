@@ -905,6 +905,10 @@ func (e *Evaluator) evaluateResource(b *Block, values map[string]cty.Value) cty.
 
 	blockMap, ok := values[labels[0]]
 	if !ok {
+		if values == nil {
+			values = make(map[string]cty.Value)
+		}
+
 		values[labels[0]] = cty.ObjectVal(make(map[string]cty.Value))
 		blockMap = values[labels[0]]
 	}
