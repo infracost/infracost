@@ -7,6 +7,7 @@
 | **Project** | **Cost change** | **New monthly cost** |
 | ----------- | --------------: | -------------------- |
 | infracost/infracost/cmd/infraco...data/terraform_v0.14_plan.json | +$41 (+100%) | $81 |
+
 ### Cost details ###
 
 ```
