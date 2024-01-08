@@ -1108,11 +1108,16 @@
                                                                                                                                           
  OVERALL TOTAL                                                                                                                $221,764.39 
 ──────────────────────────────────
-161 cloud resources were detected:
+162 cloud resources were detected:
 ∙ 161 were estimated, 3 of which include usage-based costs, see https://infracost.io/usage-file
+∙ 1 is not supported yet, see https://infracost.io/requested-resources:
+  ∙ 1 x google_sql_database_instance
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
 ┃ TestNewSQLInstance                                 ┃ $221,764     ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+Logs:
+
+WRN edition ENTERPRISE_PLUS of google_sql_database_instance.enterprise_plus is not yet supported

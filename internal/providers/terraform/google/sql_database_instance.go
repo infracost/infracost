@@ -19,6 +19,7 @@ func NewSQLDatabaseInstance(d *schema.ResourceData, u *schema.UsageData) *schema
 		Address:              d.Address,
 		DatabaseVersion:      d.Get("database_version").String(),
 		Tier:                 d.Get("settings.0.tier").String(),
+		Edition:              d.Get("settings.0.edition").String(),
 		Region:               d.Get("region").String(),
 		ReplicaConfiguration: d.Get("replica_configuration").String(),
 		AvailabilityType:     d.Get("settings.0.availability_type").String(),

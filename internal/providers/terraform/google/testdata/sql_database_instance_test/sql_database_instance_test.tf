@@ -67,6 +67,17 @@ resource "google_sql_database_instance" "with_replica" {
   }
 }
 
+
+resource "google_sql_database_instance" "enterprise_plus" {
+  name             = "with-replica"
+  database_version = "MYSQL_8_0"
+  settings {
+    tier              = "db-standard-1"
+    availability_type = "REGIONAL"
+    edition           = "ENTERPRISE_PLUS"
+  }
+}
+
 resource "google_sql_database_instance" "usage" {
   name             = "usage"
   database_version = "MYSQL_8_0"

@@ -18,6 +18,7 @@ type SQLDatabaseInstance struct {
 	UseIPV4              bool
 	ReplicaConfiguration string
 	Tier                 string
+	Edition              string
 	AvailabilityType     string
 	Region               string
 	DatabaseVersion      string
@@ -37,6 +38,11 @@ func (r *SQLDatabaseInstance) PopulateUsage(u *schema.UsageData) {
 
 func (r *SQLDatabaseInstance) BuildResource() *schema.Resource {
 	var resource *schema.Resource
+
+	if strings.EqualFold(r.Edition, "enterprise_plus") {
+		log.Warn().Msgf("edition %s of %s is not yet supported", r.Edition, r.Address)
+		return nil
+	}
 
 	replica := false
 	if r.ReplicaConfiguration != "" {
