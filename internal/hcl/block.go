@@ -1132,6 +1132,10 @@ func (b *Block) FullName() string {
 }
 
 func (b *Block) Type() string {
+	if b == nil || b.HCLBlock == nil {
+		return ""
+	}
+
 	return b.HCLBlock.Type
 }
 
@@ -1141,6 +1145,10 @@ func (b *Block) SetType(t string) {
 }
 
 func (b *Block) Labels() []string {
+	if b == nil || b.HCLBlock == nil {
+		return nil
+	}
+
 	return b.HCLBlock.Labels
 }
 
