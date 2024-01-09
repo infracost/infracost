@@ -761,7 +761,7 @@ func (f *metadataFetcher) getAzureReposGithubMetadata(path string, gitDiffTarget
 func (f *metadataFetcher) transformAzureDevOpsMergeCommit(path string, m *Metadata) error {
 	m.Branch.Name = strings.TrimPrefix(getEnv("SYSTEM_PULLREQUEST_SOURCEBRANCH"), "refs/heads/")
 	if m.Branch.Name == "" {
-			m.Branch.Name = getEnv("BUILD_SOURCEBRANCHNAME")
+		m.Branch.Name = getEnv("BUILD_SOURCEBRANCHNAME")
 	}
 
 	matches := mergeCommitRegxp.FindStringSubmatch(m.Commit.Message)
