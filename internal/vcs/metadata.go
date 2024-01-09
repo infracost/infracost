@@ -760,6 +760,9 @@ func (f *metadataFetcher) getAzureReposGithubMetadata(path string, gitDiffTarget
 // on a git log call that doesn't appear to be a Merge commit.
 func (f *metadataFetcher) transformAzureDevOpsMergeCommit(path string, m *Metadata) error {
 	m.Branch.Name = strings.TrimPrefix(getEnv("SYSTEM_PULLREQUEST_SOURCEBRANCH"), "refs/heads/")
+	if m.Branch.Name == "" {
+		m.Branch.Name = getEnv("BUILD_SOURCEBRANCHNAME")
+	}
 
 	matches := mergeCommitRegxp.FindStringSubmatch(m.Commit.Message)
 	if len(matches) <= 1 {
