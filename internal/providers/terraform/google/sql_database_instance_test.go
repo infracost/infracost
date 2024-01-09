@@ -7,10 +7,9 @@ import (
 )
 
 func TestNewSQLInstance(t *testing.T) {
-	t.Parallel()
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
 
-	tftest.GoldenFileResourceTests(t, "sql_database_instance_test")
+	tftest.GoldenFileResourceTestsWithOpts(t, "sql_database_instance_test", &tftest.GoldenFileOptions{CaptureLogs: true})
 }
