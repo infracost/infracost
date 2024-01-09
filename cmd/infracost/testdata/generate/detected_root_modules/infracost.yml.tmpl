@@ -1,0 +1,12 @@
+version: 0.1
+projects:
+{{- range $mod := .DetectedRootModules }}
+  {{- range $project := $mod.Projects }}
+  - path: {{ $mod.Path }}
+    name: {{ $project.Name }}
+    terraform_var_files:
+    {{- range $varFile := $project.TerraformVarFiles }}
+      - {{ $varFile }}
+    {{- end }}
+  {{- end}}
+{{- end }}
