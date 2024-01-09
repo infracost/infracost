@@ -19,6 +19,17 @@ import (
 
 const InfracostDir = ".infracost"
 
+type AutodetectConfig struct {
+	// EnvNames is the list of environment names that we should use to group
+	// terraform var files.
+	EnvNames []string `yaml:"env_names,omitempty" ignored:"true"`
+	// ExcludedDirs is a list of directories that the autodetect should ignore.
+	ExcludedDirs []string `yaml:"excluded_dirs,omitempty" ignored:"true"`
+	// IncludedDirs is a list of directories that the autodetect should append
+	// to the already detected directories.
+	IncludedDirs []string `yaml:"included_dirs,omitempty" ignored:"true"`
+}
+
 // Project defines a specific terraform project config. This can be used
 // specify per folder/project configurations so that users don't have
 // to provide flags every run. Fields are documented below. More info
@@ -71,7 +82,9 @@ type Config struct {
 	Credentials   Credentials
 	Configuration Configuration
 
-	Version         string `yaml:"version,omitempty" ignored:"true"`
+	Version    string           `yaml:"version,omitempty" ignored:"true"`
+	Autodetect AutodetectConfig `yaml:"autodetect,omitempty" ignored:"true"`
+
 	LogLevel        string `yaml:"log_level,omitempty" envconfig:"LOG_LEVEL"`
 	DebugReport     bool   `ignored:"true"`
 	NoColor         bool   `yaml:"no_color,omitempty" envconfig:"NO_COLOR"`
@@ -126,7 +139,7 @@ type Config struct {
 	// ConfigFilePath defines the raw value of the `--config-file` flag provided by the user
 	ConfigFilePath string
 
-	NoCache bool `yaml:"fields,omitempty" ignored:"true"`
+	NoCache bool `yaml:"no_cache,omitempty" ignored:"true"`
 
 	SkipErrLine bool
 

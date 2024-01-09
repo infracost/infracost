@@ -1,10 +1,12 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"fmt"
 	"io"
 	"os"
+	"strings"
 
 	"github.com/spf13/cobra"
 	"gopkg.in/yaml.v2"
@@ -62,11 +64,24 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 
 	var buf bytes.Buffer
 
+	locatorConfig := &hcl.ProjectLocatorConfig{}
+	if g.templatePath != "" {
+		partialConfig, err := unmarshalAutoDetectSection(g.templatePath)
+		if err != nil {
+			return fmt.Errorf("failed to unmarshal autodetect section: %w", err)
+		}
+
+		locatorConfig.ExcludedDirs = partialConfig.Autodetect.ExcludedDirs
+		locatorConfig.IncludedDirs = partialConfig.Autodetect.IncludedDirs
+		locatorConfig.EnvNames = partialConfig.Autodetect.EnvNames
+	}
+
+	// read the template path if provided to try and read the included/excluded dirs
 	parsers, err := hcl.LoadParsers(
 		config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, nil),
 		repoPath,
 		nil,
-		&hcl.ProjectLocatorConfig{},
+		locatorConfig,
 		logging.Logger,
 	)
 	hasTemplate := g.template != "" || g.templatePath != ""
@@ -75,7 +90,14 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
+	// If the template file has a projects section then we need to execute the template.
+	// Otherwise, this could just be a template file with autodetect config.
+	var definedProjects bool
 	if hasTemplate {
+		definedProjects = hasLineStartingWith(g.templatePath, "projects:")
+	}
+
+	if definedProjects {
 		m, err := vcs.MetadataFetcher.Get(repoPath, nil)
 		if err != nil {
 			ui.PrintWarningf(cmd.ErrOrStderr(), "could not fetch git metadata err: %s, default template variables will be blank", err)
@@ -178,4 +200,78 @@ func newGenerateCommand() *cobra.Command {
 	cmd.AddCommand(newGenerateConfigCommand())
 
 	return cmd
+}
+
+// hasLineStartingWith checks if a file contains a line starting with a specified prefix.
+func hasLineStartingWith(filePath, prefix string) bool {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return false
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		if strings.HasPrefix(scanner.Text(), prefix) {
+			return true
+		}
+	}
+
+	return false
+}
+
+// unmarshalAutoDetectSection unmarshals the autodetect section of a template
+// file. This is required because config templates are not valid YAML and thus
+// the native yaml.Unmarshal function cannot be used as it throws an error. To
+// get around this we seek the file and read the autodetect section into partial
+// config which can be unmarshalled.
+func unmarshalAutoDetectSection(filePath string) (*config.Config, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open file: %w", err)
+	}
+	defer file.Close()
+
+	reader := bufio.NewReader(file)
+	var autodetectSection bytes.Buffer
+	var recording bool
+	var autodetectIndentation int
+
+	for {
+		line, err := reader.ReadString('\n')
+		if err != nil && err != io.EOF {
+			return nil, fmt.Errorf("failed to read file: %w", err)
+		}
+
+		if line == "autodetect:\n" {
+			recording = true
+			autodetectIndentation = getIndentation(line)
+		} else if recording && getIndentation(line) <= autodetectIndentation && line != "\n" {
+			break
+		}
+
+		if recording {
+			autodetectSection.WriteString(line)
+		}
+
+		if err == io.EOF {
+			break
+		}
+	}
+
+	var partial config.Config
+	if err := yaml.Unmarshal(autodetectSection.Bytes(), &partial); err != nil {
+		return nil, fmt.Errorf("yaml unmarshal failed: %w", err)
+	}
+
+	return &partial, nil
+}
+
+func getIndentation(s string) int {
+	for i, c := range s {
+		if c != ' ' {
+			return i
+		}
+	}
+	return len(s)
 }
