@@ -3,6 +3,7 @@ package hcl
 import (
 	"fmt"
 	"os"
+	"path"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -16,7 +17,7 @@ import (
 )
 
 var (
-	EnvFileRegxp = regexp.MustCompile(`^(prd|prod|production|preprod|staging|stage|stg|development|dev|release|testing|test|tst|qa|uat|live|sandbox|demo|integration|int|experimental|experiments|trial|validation|perf|sec|dr)`)
+	defaultEnvVarNames = regexp.MustCompile(`^(prd|prod|production|preprod|staging|stage|stg|development|dev|release|testing|test|tst|qa|uat|live|sandbox|demo|integration|int|experimental|experiments|trial|validation|perf|sec|dr)`)
 
 	VarFileEnvPrefixRegxp = regexp.MustCompile(`^(\w+)-`)
 )
@@ -36,14 +37,6 @@ func VarEnvName(file string) string {
 	}
 
 	return sub[1]
-}
-
-// IsGlobalVarFile checks if the var file is a "global" one, this is only
-// applicable if we match a globalTerraformVarName and these don't have an
-// environment prefix e.g. defaults.tfvars, global.tfvars are applicable,
-// prod-default.tfvars, stag-globals are not.
-func IsGlobalVarFile(file string) bool {
-	return !EnvFileRegxp.MatchString(filepath.Base(file))
 }
 
 // IsAutoVarFile checks if the var file is an auto.tfvars or terraform.tfvars.
@@ -80,29 +73,40 @@ type ProjectLocator struct {
 	basePath           string
 	discoveredVarFiles map[string][]string
 	discoveredProjects []discoveredProject
+	includedDirs       []string
+	envNames           *regexp.Regexp
+	skip               bool
 }
 
 // ProjectLocatorConfig provides configuration options on how the locator functions.
 type ProjectLocatorConfig struct {
-	ExcludedSubDirs   []string
+	ExcludedDirs      []string
 	ChangedObjects    []string
 	UseAllPaths       bool
 	SkipAutoDetection bool
+	IncludedDirs      []string
+	EnvNames          []string
 }
 
 // NewProjectLocator returns safely initialized ProjectLocator.
 func NewProjectLocator(logger zerolog.Logger, config *ProjectLocatorConfig) *ProjectLocator {
+	envVarNames := defaultEnvVarNames
 	if config != nil {
+		if len(config.EnvNames) > 0 {
+			envVarNames = regexp.MustCompile("^" + strings.Join(config.EnvNames, "|"))
+		}
+
 		return &ProjectLocator{
 			modules:            make(map[string]struct{}),
 			moduleCalls:        make(map[string][]string),
 			discoveredVarFiles: make(map[string][]string),
-			// by default we always exclude the "examples" directory as these are often found in
-			// remote modules and can be valid projects, which are not used.
-			excludedDirs:   append(config.ExcludedSubDirs, "examples"),
-			changedObjects: config.ChangedObjects,
-			logger:         logger,
-			useAllPaths:    config.UseAllPaths,
+			excludedDirs:       config.ExcludedDirs,
+			changedObjects:     config.ChangedObjects,
+			includedDirs:       config.IncludedDirs,
+			logger:             logger,
+			envNames:           envVarNames,
+			useAllPaths:        config.UseAllPaths,
+			skip:               config.SkipAutoDetection,
 		}
 	}
 
@@ -110,7 +114,16 @@ func NewProjectLocator(logger zerolog.Logger, config *ProjectLocatorConfig) *Pro
 		modules:            make(map[string]struct{}),
 		discoveredVarFiles: make(map[string][]string),
 		logger:             logger,
+		envNames:           envVarNames,
 	}
+}
+
+// IsGlobalVarFile checks if the var file is a "global" one, this is only
+// applicable if we match a globalTerraformVarName and these don't have an
+// environment prefix e.g. defaults.tfvars, global.tfvars are applicable,
+// prod-default.tfvars, stag-globals are not.
+func (p *ProjectLocator) IsGlobalVarFile(file string) bool {
+	return !p.envNames.MatchString(filepath.Base(file))
 }
 
 func (p *ProjectLocator) buildSkippedMatcher(fullPath string) func(string) bool {
@@ -635,25 +648,17 @@ func (vf *TerraformVarFiles) Add(file string) {
 	*vf = append(*vf, file)
 }
 
-func (vf *TerraformVarFiles) HasEnvFiles() bool {
-	return len(*vf) > len(vf.GlobalFiles())
-}
-
-func (vf *TerraformVarFiles) GlobalFiles() TerraformVarFiles {
-	var globals TerraformVarFiles
-
-	for _, file := range *vf {
-		if IsGlobalVarFile(file) {
-			globals = append(globals, file)
-		}
-	}
-
-	return globals
-}
-
 // FindRootModules returns a list of all directories that contain a full Terraform project under the given fullPath.
 // This list excludes any Terraform modules that have been found (if they have been called by a Module source).
 func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
+	if p.skip {
+		return []RootPath{
+			{
+				Path: fullPath,
+			},
+		}
+	}
+
 	p.basePath, _ = filepath.Abs(fullPath)
 	p.modules = make(map[string]struct{})
 	p.moduleCalls = make(map[string][]string)
@@ -663,6 +668,7 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 	p.logger.Debug().Msgf("walking directory at %s returned a list of possible Terraform projects with length %d", fullPath, len(p.discoveredProjects))
 
 	var projects []RootPath
+	projectMap := map[string]bool{}
 	for _, dir := range p.discoveredProjectsWithModulesFiltered() {
 		if p.shouldUseProject(dir, isSkipped) {
 			projects = append(projects, RootPath{
@@ -671,10 +677,31 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 				HasChanges:        p.hasChanges(dir.path),
 				TerraformVarFiles: p.discoveredVarFiles[dir.path],
 			})
+			projectMap[dir.path] = true
 
 			delete(p.discoveredVarFiles, dir.path)
 		}
 	}
+
+	// add the user flagged included directories to the list of projects.
+	for _, dir := range p.includedDirs {
+		abs := path.Join(fullPath, dir)
+		if _, err := os.Stat(abs); err != nil {
+			continue
+		}
+
+		if !projectMap[abs] {
+			projects = append(projects, RootPath{
+				RepoPath: fullPath,
+				Path:     abs,
+			})
+			projectMap[abs] = true
+		}
+	}
+
+	sort.Slice(projects, func(i, j int) bool {
+		return projects[i].Path < projects[j].Path
+	})
 
 	node := CreateTreeNode(fullPath, projects, p.discoveredVarFiles)
 	node.AssociateChildVarFiles()
