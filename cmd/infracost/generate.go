@@ -66,8 +66,22 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 	var buf bytes.Buffer
 
 	locatorConfig := &hcl.ProjectLocatorConfig{}
-	if g.templatePath != "" {
-		partialConfig, err := unmarshalAutoDetectSection(g.templatePath)
+	hasTemplate := g.template != "" || g.templatePath != ""
+	var definedProjects bool
+	if hasTemplate {
+		var reader io.ReadSeeker
+		if g.templatePath != "" {
+			file, err := os.Open(g.templatePath)
+			if err != nil {
+				return fmt.Errorf("failed to open file: %w", err)
+			}
+			defer file.Close()
+			reader = file
+		} else {
+			reader = strings.NewReader(g.template)
+		}
+
+		partialConfig, err := unmarshalAutoDetectSection(reader)
 		if err != nil {
 			return fmt.Errorf("failed to unmarshal autodetect section: %w", err)
 		}
@@ -75,6 +89,9 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 		locatorConfig.ExcludedDirs = partialConfig.Autodetect.ExcludedDirs
 		locatorConfig.IncludedDirs = partialConfig.Autodetect.IncludedDirs
 		locatorConfig.EnvNames = partialConfig.Autodetect.EnvNames
+
+		_, _ = reader.Seek(0, io.SeekStart)
+		definedProjects = hasLineStartingWith(reader, "projects:")
 	}
 
 	// read the template path if provided to try and read the included/excluded dirs
@@ -85,20 +102,11 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 		locatorConfig,
 		logging.Logger,
 	)
-	hasTemplate := g.template != "" || g.templatePath != ""
-
 	if err != nil && !hasTemplate {
 		return err
 	}
 
-	// If the template file has a projects section then we need to execute the template.
-	// Otherwise, this could just be a template file with autodetect config.
-	var definedProjects bool
-	if hasTemplate {
-		definedProjects = hasLineStartingWith(g.templatePath, "projects:")
-	}
-
-	if (g.templatePath != "" && definedProjects) || g.template != "" {
+	if definedProjects {
 		m, err := vcs.MetadataFetcher.Get(repoPath, nil)
 		if err != nil {
 			ui.PrintWarningf(cmd.ErrOrStderr(), "could not fetch git metadata err: %s, default template variables will be blank", err)
@@ -226,16 +234,10 @@ func newGenerateCommand() *cobra.Command {
 }
 
 // hasLineStartingWith checks if a file contains a line starting with a specified prefix.
-func hasLineStartingWith(filePath, prefix string) bool {
-	file, err := os.Open(filePath)
-	if err != nil {
-		return false
-	}
-	defer file.Close()
-
-	scanner := bufio.NewScanner(file)
+func hasLineStartingWith(reader io.Reader, prefix string) bool {
+	scanner := bufio.NewScanner(reader)
 	for scanner.Scan() {
-		if strings.HasPrefix(scanner.Text(), prefix) {
+		if strings.HasPrefix(strings.TrimSpace(scanner.Text()), prefix) {
 			return true
 		}
 	}
@@ -248,20 +250,13 @@ func hasLineStartingWith(filePath, prefix string) bool {
 // the native yaml.Unmarshal function cannot be used as it throws an error. To
 // get around this we seek the file and read the autodetect section into partial
 // config which can be unmarshalled.
-func unmarshalAutoDetectSection(filePath string) (*config.Config, error) {
-	file, err := os.Open(filePath)
-	if err != nil {
-		return nil, fmt.Errorf("failed to open file: %w", err)
-	}
-	defer file.Close()
-
-	reader := bufio.NewReader(file)
+func unmarshalAutoDetectSection(reader io.Reader) (*config.Config, error) {
+	r := bufio.NewReader(reader)
 	var autodetectSection bytes.Buffer
 	var recording bool
 	var autodetectIndentation int
-
 	for {
-		line, err := reader.ReadString('\n')
+		line, err := r.ReadString('\n')
 		if err != nil && err != io.EOF {
 			return nil, fmt.Errorf("failed to read file: %w", err)
 		}

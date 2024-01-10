@@ -86,11 +86,9 @@ func TestGenerateConfigAutoDetect(t *testing.T) {
 		name := filepath.Base(dir)
 
 		t.Run(name, func(tt *testing.T) {
-
 			tempDir := tt.TempDir()
 			testutil.CreateDirectoryStructure(tt, path.Join(dir, "tree.txt"), tempDir)
 
-			buf := bytes.NewBuffer([]byte{})
 			args := []string{
 				"generate",
 				"config",
@@ -100,31 +98,46 @@ func TestGenerateConfigAutoDetect(t *testing.T) {
 
 			templatePath := path.Join(dir, "infracost.yml.tmpl")
 			if _, err := os.Stat(templatePath); err == nil {
-				args = append(args, "--template-path", templatePath)
+				tt.Run("template-path", func(tm *testing.T) {
+					assertGoldenFile(tm, append(args, "--template-path", templatePath), dir)
+				})
+
+				tt.Run("template", func(tm *testing.T) {
+					b, err := os.ReadFile(templatePath)
+					assert.NoError(tm, err)
+					assertGoldenFile(tm, append(args, "--template", string(b)), dir)
+				})
+
+				return
 			}
 
-			actual := GetCommandOutput(tt, args, nil, func(ctx *config.RunContext) {
-				ctx.Config.SetLogWriter(buf)
-				ctx.Config.LogLevel = "debug"
-
-				err := logging.ConfigureBaseLogger(ctx.Config)
-				assert.NoError(t, err)
-			})
-
-			equal := testutil.AssertGoldenFile(tt, path.Join(dir, "expected.golden"), actual)
-			// if the expected is not equal to the actual output let's write the actual to a
-			// file in the folder (this is git ignored) so that we can do easier comparisons
-			// about the missing/incorrect data.
-			if !equal {
-				out := bytes.NewBuffer(actual)
-				out.Write([]byte("\n\n"))
-				i := buf.Bytes()
-				out.Write(i)
-
-				err := os.WriteFile(path.Join(dir, "actual.txt"), out.Bytes(), os.ModePerm)
-				assert.NoError(tt, err)
-			}
+			assertGoldenFile(tt, args, dir)
 		})
+	}
+}
+
+func assertGoldenFile(tt *testing.T, args []string, dir string) {
+	buf := bytes.NewBuffer([]byte{})
+	actual := GetCommandOutput(tt, args, nil, func(ctx *config.RunContext) {
+		ctx.Config.SetLogWriter(buf)
+		ctx.Config.LogLevel = "debug"
+
+		err := logging.ConfigureBaseLogger(ctx.Config)
+		assert.NoError(tt, err)
+	})
+
+	equal := testutil.AssertGoldenFile(tt, path.Join(dir, "expected.golden"), actual)
+	// if the expected is not equal to the actual output let's write the actual to a
+	// file in the folder (this is git ignored) so that we can do easier comparisons
+	// about the missing/incorrect data.
+	if !equal {
+		out := bytes.NewBuffer(actual)
+		out.Write([]byte("\n\n"))
+		i := buf.Bytes()
+		out.Write(i)
+
+		err := os.WriteFile(path.Join(dir, "actual.txt"), out.Bytes(), os.ModePerm)
+		assert.NoError(tt, err)
 	}
 }
 
