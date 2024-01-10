@@ -98,7 +98,7 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 		definedProjects = hasLineStartingWith(g.templatePath, "projects:")
 	}
 
-	if definedProjects {
+	if (g.templatePath != "" && definedProjects) || g.template != "" {
 		m, err := vcs.MetadataFetcher.Get(repoPath, nil)
 		if err != nil {
 			ui.PrintWarningf(cmd.ErrOrStderr(), "could not fetch git metadata err: %s, default template variables will be blank", err)
