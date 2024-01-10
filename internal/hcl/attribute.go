@@ -2,6 +2,7 @@ package hcl
 
 import (
 	"fmt"
+	"os"
 	"runtime/debug"
 	"strings"
 
@@ -127,7 +128,12 @@ func (attr *Attribute) Value() cty.Value {
 	}
 
 	attr.Logger.Debug().Msg("fetching attribute value")
-	val := attr.value(0)
+	var val cty.Value
+	if os.Getenv("INFRACOST_GRAPH_EVALUATOR") == "true" {
+		val = attr.graphValue()
+	} else {
+		val = attr.value(0)
+	}
 	attr.previousValue = val
 
 	return val
@@ -148,7 +154,12 @@ func (attr *Attribute) HasChanged() (change bool) {
 	}()
 
 	previous := attr.previousValue
-	current := attr.value(0)
+	var current cty.Value
+	if os.Getenv("INFRACOST_GRAPH_EVALUATOR") == "true" {
+		current = attr.graphValue()
+	} else {
+		current = attr.value(0)
+	}
 	return !previous.RawEquals(current)
 }
 
@@ -322,6 +333,293 @@ func mockFunctionCallArgs(expr hcl.Expression, diagnostics hcl.Diagnostics, mock
 	return &hclsyntax.LiteralValueExpr{
 		Val: mockedVal,
 	}
+}
+
+func (attr *Attribute) graphValue() (ctyVal cty.Value) {
+	defer func() {
+		if err := recover(); err != nil {
+			trace := debug.Stack()
+			attr.Logger.Debug().Msgf("could not evaluate value for attr: %s. This is most likely an issue in the underlying hcl/go-cty libraries and can be ignored, but we log the stacktrace for debugging purposes. Err: %s\n%s", attr.Name(), err, trace)
+		}
+	}()
+
+	var diag hcl.Diagnostics
+	ctyVal, diag = attr.HCLAttr.Expr.Value(attr.Ctx.Inner())
+	if diag.HasErrors() {
+		mockedVal := cty.StringVal(fmt.Sprintf("%s-mock", attr.Name()))
+		if attr.newMock != nil {
+			mockedVal = attr.newMock(attr)
+		}
+
+		ctx := attr.Ctx.Inner()
+		exp := attr.HCLAttr.Expr
+		var val cty.Value
+		// call the mock function in a loop to try and resolve all the bad expressions.
+		// This is done because one bad expression replacement could cause another
+		// expression to fail.
+		for i := 0; i < 3; i++ {
+			exp = mockExpressionCalls(exp, diag, mockedVal)
+			val, diag = exp.Value(ctx)
+			if !diag.HasErrors() {
+				return val
+			}
+		}
+	}
+
+	return ctyVal
+}
+
+// LiteralBoolValueExpression is a wrapper around any hcl.Expression that returns
+// a literal bool value. This is use to evaluate mocked expressions that are used
+// in conditional expressions. It turns any non bool literal value into a bool
+// false value.
+type LiteralBoolValueExpression struct {
+	// we embed the hclsyntax.LiteralValueExpr as the hcl.Expression interface
+	// has an unexported method that we need to implement.
+	*hclsyntax.LiteralValueExpr
+
+	Expression hcl.Expression
+}
+
+// Value returns the value of the expression. If the expression is not a literal
+// bool value, this returns false.
+func (e *LiteralBoolValueExpression) Value(ctx *hcl.EvalContext) (cty.Value, hcl.Diagnostics) {
+	val, diag := e.Expression.Value(ctx)
+	if diag.HasErrors() {
+		return cty.BoolVal(false), nil
+	}
+
+	if val.Type() != cty.Bool {
+		return cty.BoolVal(false), nil
+	}
+
+	return val, nil
+}
+
+type LiteralValueCollectionExpression struct {
+	*hclsyntax.LiteralValueExpr
+	Expression  hcl.Expression
+	MockedValue cty.Value
+}
+
+func newLiteralValueCollectionExpression(mockedVal cty.Value, expr hclsyntax.Expression) *LiteralValueCollectionExpression {
+	return &LiteralValueCollectionExpression{
+		LiteralValueExpr: &hclsyntax.LiteralValueExpr{Val: cty.ListVal([]cty.Value{mockedVal})},
+		Expression:       expr,
+		MockedValue:      mockedVal,
+	}
+}
+
+func (e *LiteralValueCollectionExpression) Value(ctx *hcl.EvalContext) (cty.Value, hcl.Diagnostics) {
+	val, diag := e.Expression.Value(ctx)
+	if diag.HasErrors() {
+		return cty.ListValEmpty(cty.String), nil
+	}
+
+	if !val.CanIterateElements() {
+		return cty.ListValEmpty(cty.String), nil
+	}
+
+	return val, nil
+}
+
+// mockExpressionCalls attempts to resolve remove bad expressions for the given diagnostics.
+// This function will be called recursively, finding all Expressions and checking if
+// the expression matches the diagnostic. If the expression matches the diagnostic, we replace the expression with a mocked value.
+func mockExpressionCalls(expr hcl.Expression, diagnostics hcl.Diagnostics, mockedVal cty.Value) hclsyntax.Expression {
+	switch t := expr.(type) {
+	case nil:
+		return nil
+	case *hclsyntax.FunctionCallExpr:
+		// if the diagnostic is with the function call let's replace it with a completely mocked value.
+		for _, d := range diagnostics {
+			if t == d.Expression {
+				return &hclsyntax.LiteralValueExpr{
+					Val: mockedVal,
+				}
+			}
+		}
+
+		newArgs := make([]hclsyntax.Expression, len(t.Args))
+		for i, exp := range t.Args {
+			newArgs[i] = mockExpressionCalls(exp, diagnostics, mockedVal)
+		}
+
+		return &hclsyntax.FunctionCallExpr{
+			Name:            t.Name,
+			Args:            newArgs,
+			ExpandFinal:     t.ExpandFinal,
+			NameRange:       t.NameRange,
+			OpenParenRange:  t.OpenParenRange,
+			CloseParenRange: t.CloseParenRange,
+		}
+	case *hclsyntax.ObjectConsExpr:
+		newItems := make([]hclsyntax.ObjectConsItem, len(t.Items))
+		for i, item := range t.Items {
+			newItems[i] = hclsyntax.ObjectConsItem{
+				KeyExpr:   mockExpressionCalls(item.KeyExpr, diagnostics, mockedVal),
+				ValueExpr: mockExpressionCalls(item.ValueExpr, diagnostics, mockedVal),
+			}
+		}
+
+		return &hclsyntax.ObjectConsExpr{
+			Items:     newItems,
+			SrcRange:  t.SrcRange,
+			OpenRange: t.OpenRange,
+		}
+	case *hclsyntax.ConditionalExpr:
+		return &hclsyntax.ConditionalExpr{
+			Condition:   mockCondition(diagnostics, t.Condition, mockedVal),
+			TrueResult:  mockExpressionCalls(t.TrueResult, diagnostics, mockedVal),
+			FalseResult: mockExpressionCalls(t.FalseResult, diagnostics, mockedVal),
+			SrcRange:    t.SrcRange,
+		}
+	case *hclsyntax.TemplateWrapExpr:
+		return &hclsyntax.TemplateWrapExpr{
+			Wrapped:  mockExpressionCalls(t.Wrapped, diagnostics, mockedVal),
+			SrcRange: t.SrcRange,
+		}
+	case *hclsyntax.TemplateExpr:
+		newParts := make([]hclsyntax.Expression, len(t.Parts))
+		for i, part := range t.Parts {
+			newParts[i] = mockExpressionCalls(part, diagnostics, mockedVal)
+		}
+
+		return &hclsyntax.TemplateExpr{
+			Parts:    newParts,
+			SrcRange: t.SrcRange,
+		}
+	case *hclsyntax.TupleConsExpr:
+		newExprs := make([]hclsyntax.Expression, len(t.Exprs))
+		for i, exp := range t.Exprs {
+			newExprs[i] = mockExpressionCalls(exp, diagnostics, mockedVal)
+		}
+
+		return &hclsyntax.TupleConsExpr{
+			Exprs:     newExprs,
+			SrcRange:  t.SrcRange,
+			OpenRange: t.OpenRange,
+		}
+	case *hclsyntax.IndexExpr:
+		return &hclsyntax.IndexExpr{
+			Collection:   newLiteralValueCollectionExpression(mockedVal, mockExpressionCalls(t.Collection, diagnostics, mockedVal)),
+			Key:          mockExpressionCalls(t.Key, diagnostics, mockedVal),
+			SrcRange:     t.SrcRange,
+			OpenRange:    t.OpenRange,
+			BracketRange: t.BracketRange,
+		}
+	case *hclsyntax.ForExpr:
+		return &hclsyntax.ForExpr{
+			KeyVar:     t.KeyVar,
+			ValVar:     t.ValVar,
+			CollExpr:   newLiteralValueCollectionExpression(mockedVal, mockExpressionCalls(t.CollExpr, diagnostics, mockedVal)),
+			KeyExpr:    mockExpressionCalls(t.KeyExpr, diagnostics, mockedVal),
+			ValExpr:    mockExpressionCalls(t.ValExpr, diagnostics, mockedVal),
+			CondExpr:   mockCondition(diagnostics, t.CondExpr, mockedVal),
+			Group:      t.Group,
+			SrcRange:   t.SrcRange,
+			OpenRange:  t.OpenRange,
+			CloseRange: t.CloseRange,
+		}
+	case *hclsyntax.ObjectConsKeyExpr:
+		return &hclsyntax.ObjectConsKeyExpr{
+			Wrapped:         mockExpressionCalls(t.Wrapped, diagnostics, mockedVal),
+			ForceNonLiteral: t.ForceNonLiteral,
+		}
+	case *hclsyntax.SplatExpr:
+		return &hclsyntax.SplatExpr{
+			Source:      mockExpressionCalls(t.Source, diagnostics, mockedVal),
+			Each:        mockExpressionCalls(t.Each, diagnostics, mockedVal),
+			Item:        t.Item,
+			SrcRange:    t.SrcRange,
+			MarkerRange: t.MarkerRange,
+		}
+	case *hclsyntax.BinaryOpExpr:
+		return &hclsyntax.BinaryOpExpr{
+			LHS:      mockExpressionCalls(t.LHS, diagnostics, mockedVal),
+			Op:       t.Op,
+			RHS:      mockExpressionCalls(t.RHS, diagnostics, mockedVal),
+			SrcRange: t.SrcRange,
+		}
+	case *hclsyntax.UnaryOpExpr:
+		return &hclsyntax.UnaryOpExpr{
+			Op:          t.Op,
+			Val:         mockExpressionCalls(t.Val, diagnostics, mockedVal),
+			SrcRange:    t.SrcRange,
+			SymbolRange: t.SymbolRange,
+		}
+	case *hclsyntax.TemplateJoinExpr:
+		return &hclsyntax.TemplateJoinExpr{
+			Tuple: mockExpressionCalls(t.Tuple, diagnostics, mockedVal),
+		}
+	case *hclsyntax.ParenthesesExpr:
+		return &hclsyntax.ParenthesesExpr{
+			Expression: mockExpressionCalls(t.Expression, diagnostics, mockedVal),
+			SrcRange:   t.SrcRange,
+		}
+	case *hclsyntax.RelativeTraversalExpr:
+		for _, d := range diagnostics {
+			if t == d.Expression {
+				return &hclsyntax.LiteralValueExpr{
+					Val: mockedVal,
+				}
+			}
+		}
+
+		return &hclsyntax.RelativeTraversalExpr{
+			Source:    mockExpressionCalls(t.Source, diagnostics, mockedVal),
+			Traversal: t.Traversal,
+			SrcRange:  t.SrcRange,
+		}
+	case *hclsyntax.AnonSymbolExpr:
+	case *hclsyntax.LiteralValueExpr:
+	case *hclsyntax.ScopeTraversalExpr:
+		for _, d := range diagnostics {
+			if t == d.Expression {
+				if d.Summary == "Iteration over non-iterable value" {
+					return &hclsyntax.LiteralValueExpr{
+						Val: cty.ListValEmpty(cty.String),
+					}
+				}
+
+				return &hclsyntax.LiteralValueExpr{
+					Val: mockedVal,
+				}
+			}
+		}
+
+		return t
+	}
+
+	if v, ok := expr.(hclsyntax.Expression); ok {
+		return v
+	}
+
+	return &hclsyntax.LiteralValueExpr{
+		Val: mockedVal,
+	}
+}
+
+func mockCondition(diagnostics hcl.Diagnostics, expression hclsyntax.Expression, mockedVal cty.Value) hclsyntax.Expression {
+	if expression == nil {
+		return nil
+	}
+
+	var condition hclsyntax.Expression
+	for _, d := range diagnostics {
+		if expression == d.Expression {
+			condition = &hclsyntax.LiteralValueExpr{
+				Val: cty.BoolVal(false),
+			}
+			break
+		}
+	}
+
+	if condition == nil {
+		condition = mockExpressionCalls(expression, diagnostics, mockedVal)
+	}
+
+	return &LiteralBoolValueExpression{Expression: condition, LiteralValueExpr: &hclsyntax.LiteralValueExpr{Val: cty.BoolVal(false)}}
 }
 
 // traverseVarAndSetCtx uses the hcl traversal to build a mocked attribute on the evaluation context.

@@ -205,10 +205,10 @@ locals {
 }
 
 output "exp" {
-  value = {
-    for name in local.names :
-      name => with_unsupported_attr.test.does_not_exist
-  }
+ value = {
+   for name in local.names :
+     name => with_unsupported_attr.test.does_not_exist
+ }
 }
 
 output "exp2" {
@@ -1581,6 +1581,137 @@ resource "baz" "bat" {
 		t,
 		`{"name":"two"}`,
 		block2b.Values(),
+	)
+}
+
+func Test_ObjectLiteralIsMockedCorrectly(t *testing.T) {
+	t.Setenv("INFRACOST_GRAPH_EVALUATOR", "true")
+
+	path := createTestFileWithModule(`
+module "mod1" {
+  source = "../module"
+  config = {
+    instance_type = "m5.4xlarge"
+    tags          = data.terraform_remote_state.ground.outputs.tags
+  }
+}
+
+`,
+		`
+variable "config" {
+  type = object({
+    instance_type = string
+    tags          = map(string)
+  })
+}
+
+resource "aws_instance" "example" {
+  instance_type = var.config.instance_type
+  tags          = var.config.tags
+}
+`,
+		"module",
+	)
+
+	logger := newDiscardLogger()
+	loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
+	parsers, err := LoadParsers(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{}), path, loader, nil, logger)
+	require.NoError(t, err)
+	module, err := parsers[0].ParseDirectory()
+	require.NoError(t, err)
+
+	moduleBlock := module.Blocks.Matching(BlockMatcher{Label: "module.mod1"})
+	assertBlockEqualsJSON(
+		t,
+		`{"config":{"instance_type":"m5.4xlarge", "tags": "config-mock"}}`,
+		moduleBlock.Values(),
+		"id", "arn", "self_link", "name", "source",
+	)
+
+	require.Len(t, module.Modules, 1)
+	mod1 := module.Modules[0]
+
+	resource := mod1.Blocks.Matching(BlockMatcher{Label: "aws_instance.example"})
+	assertBlockEqualsJSON(
+		t,
+		`{"instance_type":"m5.4xlarge", "tags": "config-mock"}`,
+		resource.Values(),
+		"id", "arn", "self_link", "name",
+	)
+}
+
+func Test_ModuleTernaryWithMockedValue(t *testing.T) {
+	t.Setenv("INFRACOST_GRAPH_EVALUATOR", "true")
+
+	path := createTestFileWithModule(`
+module "mod1" {
+  source = "../mod"
+  count  = 1 
+  var1   = "don't create"
+}
+
+`,
+		`
+variable "var1" {
+  type    = string
+  default = "don't create"
+}
+
+resource "aws_instance" "example" {
+  create_instance  = var.var1 == "don't create" ? false : true
+}
+`,
+		"mod",
+	)
+
+	logger := newDiscardLogger()
+	loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
+	parsers, err := LoadParsers(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{}), path, loader, nil, logger)
+	require.NoError(t, err)
+	module, err := parsers[0].ParseDirectory()
+	require.NoError(t, err)
+
+	require.Len(t, module.Modules, 1)
+	mod1 := module.Modules[0]
+
+	resource := mod1.Blocks.Matching(BlockMatcher{Label: "aws_instance.example"})
+	assertBlockEqualsJSON(
+		t,
+		`{"create_instance":false}`,
+		resource.Values(),
+		"id", "arn", "self_link", "name",
+	)
+}
+
+func Test_VariableLengthWhenMocked(t *testing.T) {
+	t.Setenv("INFRACOST_GRAPH_EVALUATOR", "true")
+
+	path := createTestFile("main.tf", `
+variable "my_config" {
+  type    = any
+  default = {}
+}
+
+resource "aws_instance" "example" {
+  foo = length(var.my_config) > 0 ? 1 : 0
+  tags = var.my_config.tags
+}
+`,
+	)
+
+	logger := newDiscardLogger()
+	loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
+	parsers, err := LoadParsers(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{}), filepath.Dir(path), loader, nil, logger)
+	require.NoError(t, err)
+	module, err := parsers[0].ParseDirectory()
+	require.NoError(t, err)
+
+	resource := module.Blocks.Matching(BlockMatcher{Label: "aws_instance.example"})
+	assertBlockEqualsJSON(
+		t,
+		`{"foo":0, "tags":"tags-mock"}`,
+		resource.Values(),
+		"id", "arn", "self_link", "name",
 	)
 }
 

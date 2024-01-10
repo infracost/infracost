@@ -113,6 +113,8 @@ func TestAttribute_AsString(t *testing.T) {
 }
 
 func TestAttributeValueWithIncompleteContextAndConditionalShouldNotPanic(t *testing.T) {
+	t.Setenv("INFRACOST_GRAPH_EVALUATOR", "true")
+
 	p := hclparse.NewParser()
 	f, diags := p.ParseHCL([]byte(`
 locals {
@@ -172,7 +174,7 @@ locals {
 	}
 
 	v := attr.Value()
-	assert.Equal(t, cty.DynamicVal, v)
+	assert.Equal(t, cty.StringVal("transformed_tags-mock"), v)
 
 	b, err := io.ReadAll(buf)
 	require.NoError(t, err)

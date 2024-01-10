@@ -290,6 +290,7 @@ func LoadParsers(ctx *config.ProjectContext, initialPath string, loader *modules
 		pl := NewProjectLocator(logger, locatorConfig)
 		rootPaths = pl.FindRootModules(initialPath)
 	}
+
 	if len(rootPaths) == 0 && len(locatorConfig.ChangedObjects) > 0 {
 		return nil, nil
 	}
