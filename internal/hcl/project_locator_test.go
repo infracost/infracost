@@ -38,7 +38,7 @@ func TestProjectLocator_FindRootModules_WithMultiProject(t *testing.T) {
 
 func TestProjectLocator_FindRootModules_WithMultiProject_ExcludeDirs(t *testing.T) {
 	pl := NewProjectLocator(newDiscardLogger(), &ProjectLocatorConfig{
-		ExcludedSubDirs: []string{"dev"},
+		ExcludedDirs: []string{"dev"},
 	})
 	p := "./testdata/project_locator/multi_project_with_module"
 	mods := pl.FindRootModules(p)
@@ -91,7 +91,7 @@ func TestProjectLocator_FindRootModules_WithMultiProjectWithoutProviderBlocks(t 
 func TestProjectLocator_FindRootModules_WithMultiProjectWithoutProviderBlocks_ExludePaths(t *testing.T) {
 	pl := NewProjectLocator(newDiscardLogger(), &ProjectLocatorConfig{
 		UseAllPaths: true,
-		ExcludedSubDirs: []string{
+		ExcludedDirs: []string{
 			"modules/**",
 		},
 	})

@@ -25,11 +25,17 @@ type DetectedProject struct {
 	TerraformVarFiles []string
 }
 
+type DetectedRooModule struct {
+	Path     string
+	Projects []DetectedProject
+}
+
 // Variables hold the global variables that are passed into any template that the Parser evaluates.
 type Variables struct {
-	Branch           string
-	BaseBranch       string
-	DetectedProjects []DetectedProject
+	Branch              string
+	BaseBranch          string
+	DetectedProjects    []DetectedProject
+	DetectedRootModules []DetectedRooModule
 }
 
 // Parser is the representation of an initialized Infracost template parser.

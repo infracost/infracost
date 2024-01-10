@@ -138,7 +138,9 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 	runCtx := ctx.RunContext
 	locatorConfig := &hcl.ProjectLocatorConfig{
 		SkipAutoDetection: config.SkipAutoDetection,
-		ExcludedSubDirs:   ctx.ProjectConfig.ExcludePaths,
+		ExcludedDirs:      append(ctx.ProjectConfig.ExcludePaths, ctx.RunContext.Config.Autodetect.ExcludedDirs...),
+		IncludedDirs:      ctx.RunContext.Config.Autodetect.IncludedDirs,
+		EnvNames:          ctx.RunContext.Config.Autodetect.EnvNames,
 		ChangedObjects:    runCtx.VCSMetadata.Commit.ChangedObjects,
 		UseAllPaths:       ctx.ProjectConfig.IncludeAllPaths,
 	}

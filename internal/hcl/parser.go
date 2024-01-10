@@ -38,7 +38,7 @@ func OptionWithTFVarsPaths(paths []string, autoDetected bool) Option {
 		filenames := makePathsRelativeToInitial(paths, p.initialPath)
 		tfVarsPaths := p.tfvarsPaths
 		tfVarsPaths = append(tfVarsPaths, filenames...)
-		sortVarFilesByPrecedence(tfVarsPaths, autoDetected)
+		p.sortVarFilesByPrecedence(tfVarsPaths, autoDetected)
 
 		p.tfvarsPaths = tfVarsPaths
 	}
@@ -52,7 +52,7 @@ func OptionWithTFVarsPaths(paths []string, autoDetected bool) Option {
 // 2. terraform.tfvars.json
 // 3. *.auto.tfvars or *.auto.tfvars.json files, processed in lexical order of their filenames.
 // 4. all other terraform var files
-func sortVarFilesByPrecedence(paths []string, autoDetected bool) {
+func (p *Parser) sortVarFilesByPrecedence(paths []string, autoDetected bool) {
 	sort.Slice(paths, func(i, j int) bool {
 		countI := strings.Count(paths[i], string(filepath.Separator))
 		countJ := strings.Count(paths[j], string(filepath.Separator))
@@ -66,7 +66,7 @@ func sortVarFilesByPrecedence(paths []string, autoDetected bool) {
 			case strings.HasSuffix(path, ".auto.tfvars"), strings.HasSuffix(path, ".auto.tfvars.json"):
 				return 3
 			case autoDetected:
-				if IsGlobalVarFile(path) {
+				if p.projectLocator.IsGlobalVarFile(path) {
 					return 4
 				}
 
@@ -273,23 +273,15 @@ type Parser struct {
 	logger                zerolog.Logger
 	hasChanges            bool
 	moduleSuffix          string
+	projectLocator        *ProjectLocator
 }
 
 // LoadParsers inits a list of Parser with the provided option and initialPath. LoadParsers locates Terraform files
 // in the given initialPath and returns a Parser for each directory it locates a Terraform project within. If
 // the initialPath contains Terraform files at the top level parsers will be len 1.
 func LoadParsers(ctx *config.ProjectContext, initialPath string, loader *modules.ModuleLoader, locatorConfig *ProjectLocatorConfig, logger zerolog.Logger, options ...Option) ([]*Parser, error) {
-	var rootPaths []RootPath
-	if locatorConfig != nil && locatorConfig.SkipAutoDetection {
-		rootPaths = []RootPath{
-			{
-				Path: initialPath,
-			},
-		}
-	} else {
-		pl := NewProjectLocator(logger, locatorConfig)
-		rootPaths = pl.FindRootModules(initialPath)
-	}
+	pl := NewProjectLocator(logger, locatorConfig)
+	rootPaths := pl.FindRootModules(initialPath)
 
 	if len(rootPaths) == 0 && len(locatorConfig.ChangedObjects) > 0 {
 		return nil, nil
@@ -315,7 +307,7 @@ func LoadParsers(ctx *config.ProjectContext, initialPath string, loader *modules
 					continue
 				}
 
-				if IsGlobalVarFile(varFile) {
+				if pl.IsGlobalVarFile(varFile) {
 					autoVarFiles = append(autoVarFiles, varFile)
 					continue
 				}
@@ -357,7 +349,7 @@ func LoadParsers(ctx *config.ProjectContext, initialPath string, loader *modules
 				sort.Strings(rootPath.TerraformVarFiles)
 
 				for _, env := range varEnvs {
-					parsers = append(parsers, newParser(rootPath, loader, logger, append(
+					parsers = append(parsers, newParser(rootPath, pl, loader, logger, append(
 						options,
 						OptionWithTFVarsPaths(append(autoVarFiles, varFileGrouping[env]...), true),
 						OptionWithModuleSuffix(env),
@@ -372,7 +364,7 @@ func LoadParsers(ctx *config.ProjectContext, initialPath string, loader *modules
 				parserOpts = append(parserOpts, OptionWithTFVarsPaths(append(varFiles, autoVarFiles...), true))
 			}
 
-			parsers = append(parsers, newParser(rootPath, loader, logger, parserOpts...))
+			parsers = append(parsers, newParser(rootPath, pl, loader, logger, parserOpts...))
 		}
 
 		return parsers, nil
@@ -395,13 +387,13 @@ func LoadParsers(ctx *config.ProjectContext, initialPath string, loader *modules
 			options = append(options, OptionWithTFVarsPaths(autoVarFiles, false))
 		}
 
-		parsers[i] = newParser(rootPath, loader, logger, options...)
+		parsers[i] = newParser(rootPath, pl, loader, logger, options...)
 	}
 
 	return parsers, nil
 }
 
-func newParser(projectRoot RootPath, moduleLoader *modules.ModuleLoader, logger zerolog.Logger, options ...Option) *Parser {
+func newParser(projectRoot RootPath, pl *ProjectLocator, moduleLoader *modules.ModuleLoader, logger zerolog.Logger, options ...Option) *Parser {
 	parserLogger := logger.With().Str(
 		"parser_path", projectRoot.Path,
 	).Logger()
@@ -409,14 +401,15 @@ func newParser(projectRoot RootPath, moduleLoader *modules.ModuleLoader, logger 
 	hclParser := modules.NewSharedHCLParser()
 
 	p := &Parser{
-		repoPath:      projectRoot.RepoPath,
-		initialPath:   projectRoot.Path,
-		hasChanges:    projectRoot.HasChanges,
-		workspaceName: defaultTerraformWorkspaceName,
-		hclParser:     hclParser,
-		blockBuilder:  BlockBuilder{SetAttributes: []SetAttributesFunc{SetUUIDAttributes}, Logger: logger, HCLParser: hclParser},
-		logger:        parserLogger,
-		moduleLoader:  moduleLoader,
+		repoPath:       projectRoot.RepoPath,
+		initialPath:    projectRoot.Path,
+		hasChanges:     projectRoot.HasChanges,
+		workspaceName:  defaultTerraformWorkspaceName,
+		hclParser:      hclParser,
+		blockBuilder:   BlockBuilder{SetAttributes: []SetAttributesFunc{SetUUIDAttributes}, Logger: logger, HCLParser: hclParser},
+		logger:         parserLogger,
+		moduleLoader:   moduleLoader,
+		projectLocator: pl,
 	}
 
 	for _, option := range options {

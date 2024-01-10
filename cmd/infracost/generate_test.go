@@ -91,12 +91,19 @@ func TestGenerateConfigAutoDetect(t *testing.T) {
 			testutil.CreateDirectoryStructure(tt, path.Join(dir, "tree.txt"), tempDir)
 
 			buf := bytes.NewBuffer([]byte{})
-			actual := GetCommandOutput(tt, []string{
+			args := []string{
 				"generate",
 				"config",
 				"--repo-path",
 				tempDir,
-			}, nil, func(ctx *config.RunContext) {
+			}
+
+			templatePath := path.Join(dir, "infracost.yml.tmpl")
+			if _, err := os.Stat(templatePath); err == nil {
+				args = append(args, "--template-path", templatePath)
+			}
+
+			actual := GetCommandOutput(tt, args, nil, func(ctx *config.RunContext) {
 				ctx.Config.SetLogWriter(buf)
 				ctx.Config.LogLevel = "debug"
 

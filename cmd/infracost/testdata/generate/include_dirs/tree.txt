@@ -1,0 +1,13 @@
+.
+└── apps
+    ├── bar
+    │   └── main.tf
+    ├── foo
+    │   └── main.tf
+    ├── baz
+    │   └── foo.tf
+    ├── bat
+    │   └── bip.tf
+    ├── dev.tfvars
+    ├── prod.tfvars
+    └── default.tfvars
