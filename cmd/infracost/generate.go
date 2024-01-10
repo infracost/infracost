@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"sort"
 	"strings"
 
 	"github.com/spf13/cobra"
@@ -104,17 +105,39 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 		}
 
 		detectedProjects := make([]template.DetectedProject, len(parsers))
+		detectedPaths := map[string][]template.DetectedProject{}
 		for i, p := range parsers {
+			relPath := p.RelativePath()
+
 			detectedProjects[i] = template.DetectedProject{
 				Name:              p.ProjectName(),
-				Path:              p.RelativePath(),
+				Path:              relPath,
 				TerraformVarFiles: p.TerraformVarFiles(),
+			}
+
+			if v, ok := detectedPaths[relPath]; ok {
+				detectedPaths[relPath] = append(v, detectedProjects[i])
+			} else {
+				detectedPaths[relPath] = []template.DetectedProject{detectedProjects[i]}
 			}
 		}
 
+		var detectedRootModules []template.DetectedRooModule
+		for path, projects := range detectedPaths {
+			detectedRootModules = append(detectedRootModules, template.DetectedRooModule{
+				Path:     path,
+				Projects: projects,
+			})
+		}
+
+		sort.Slice(detectedRootModules, func(i, j int) bool {
+			return detectedRootModules[i].Path < detectedRootModules[j].Path
+		})
+
 		variables := template.Variables{
-			Branch:           m.Branch.Name,
-			DetectedProjects: detectedProjects,
+			Branch:              m.Branch.Name,
+			DetectedProjects:    detectedProjects,
+			DetectedRootModules: detectedRootModules,
 		}
 		if m.PullRequest != nil {
 			variables.BaseBranch = m.PullRequest.BaseBranch
