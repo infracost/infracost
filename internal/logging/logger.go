@@ -54,15 +54,5 @@ func ConfigureBaseLogger(c Config) error {
 }
 
 func setOutput(c Config) {
-	if c.LogWriter() != nil {
-		log.Logger = log.Output(c.LogWriter())
-		return
-	}
-
-	if c.WriteLevel() == "" {
-		log.Logger = log.Output(io.Discard)
-		return
-	}
-
-	log.Logger = log.Output(os.Stderr)
+	log.Logger = log.Output(c.LogWriter())
 }

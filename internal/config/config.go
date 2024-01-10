@@ -301,6 +301,8 @@ func (c *Config) LogWriter() io.Writer {
 		w.Out = os.Stderr
 		if c.logWriter != nil {
 			w.Out = c.logWriter
+		} else if c.LogLevel == "" {
+			w.Out = io.Discard
 		}
 	})
 }
