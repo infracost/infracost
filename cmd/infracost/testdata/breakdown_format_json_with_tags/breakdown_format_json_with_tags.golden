@@ -1157,3 +1157,7 @@
 
 Err:
 
+
+Logs:
+WRN Multiple products with prices found for aws_launch_template.example EC2 detailed monitoring, using the first product
+WRN Multiple products with prices found for aws_instance.launch_instance EC2 detailed monitoring, using the first product
