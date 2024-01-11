@@ -86,8 +86,8 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 			return fmt.Errorf("failed to unmarshal autodetect section: %w", err)
 		}
 
-		locatorConfig.ExcludedDirs = partialConfig.Autodetect.ExcludedDirs
-		locatorConfig.IncludedDirs = partialConfig.Autodetect.IncludedDirs
+		locatorConfig.ExcludedDirs = partialConfig.Autodetect.ExcludeDirs
+		locatorConfig.IncludedDirs = partialConfig.Autodetect.IncludeDirs
 		locatorConfig.EnvNames = partialConfig.Autodetect.EnvNames
 
 		_, _ = reader.Seek(0, io.SeekStart)
