@@ -3,7 +3,6 @@ package hcl
 import (
 	"fmt"
 	"os"
-	"path"
 	"path/filepath"
 	"regexp"
 	"sort"
@@ -76,6 +75,9 @@ type ProjectLocator struct {
 	includedDirs       []string
 	envNames           *regexp.Regexp
 	skip               bool
+
+	shouldSkipDir    func(string) bool
+	shouldIncludeDir func(string) bool
 }
 
 // ProjectLocatorConfig provides configuration options on how the locator functions.
@@ -107,6 +109,12 @@ func NewProjectLocator(logger zerolog.Logger, config *ProjectLocatorConfig) *Pro
 			envNames:           envVarNames,
 			useAllPaths:        config.UseAllPaths,
 			skip:               config.SkipAutoDetection,
+			shouldSkipDir: func(s string) bool {
+				return false
+			},
+			shouldIncludeDir: func(s string) bool {
+				return false
+			},
 		}
 	}
 
@@ -124,46 +132,6 @@ func NewProjectLocator(logger zerolog.Logger, config *ProjectLocatorConfig) *Pro
 // prod-default.tfvars, stag-globals are not.
 func (p *ProjectLocator) IsGlobalVarFile(file string) bool {
 	return !p.envNames.MatchString(filepath.Base(file))
-}
-
-func (p *ProjectLocator) buildSkippedMatcher(fullPath string) func(string) bool {
-	var excludedMatches []string
-	excludedGlobs := make(map[string]struct{})
-
-	for _, dir := range p.excludedDirs {
-		var absoluteDir string
-		if dir == filepath.Base(dir) {
-			excludedMatches = append(excludedMatches, dir)
-		}
-
-		if filepath.IsAbs(dir) {
-			absoluteDir = dir
-		} else {
-			absoluteDir = filepath.Join(fullPath, dir)
-		}
-
-		globs, err := filepath.Glob(absoluteDir)
-		if err == nil {
-			for _, m := range globs {
-				excludedGlobs[m] = struct{}{}
-			}
-		}
-	}
-
-	return func(dir string) bool {
-		if _, ok := excludedGlobs[dir]; ok {
-			return true
-		}
-
-		base := filepath.Base(dir)
-		for _, match := range excludedMatches {
-			if match == base {
-				return true
-			}
-		}
-
-		return false
-	}
 }
 
 func (p *ProjectLocator) hasChanges(dir string) bool {
@@ -663,14 +631,16 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 	p.modules = make(map[string]struct{})
 	p.moduleCalls = make(map[string][]string)
 
-	isSkipped := p.buildSkippedMatcher(fullPath)
+	p.shouldSkipDir = buildDirMatcher(p.excludedDirs, fullPath)
+	p.shouldIncludeDir = buildDirMatcher(p.includedDirs, fullPath)
+
 	p.walkPaths(fullPath, 0)
 	p.logger.Debug().Msgf("walking directory at %s returned a list of possible Terraform projects with length %d", fullPath, len(p.discoveredProjects))
 
 	var projects []RootPath
 	projectMap := map[string]bool{}
 	for _, dir := range p.discoveredProjectsWithModulesFiltered() {
-		if p.shouldUseProject(dir, isSkipped) {
+		if p.shouldUseProject(dir) {
 			projects = append(projects, RootPath{
 				RepoPath:          fullPath,
 				Path:              dir.path,
@@ -682,26 +652,6 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 			delete(p.discoveredVarFiles, dir.path)
 		}
 	}
-
-	// add the user flagged included directories to the list of projects.
-	for _, dir := range p.includedDirs {
-		abs := path.Join(fullPath, dir)
-		if _, err := os.Stat(abs); err != nil {
-			continue
-		}
-
-		if !projectMap[abs] {
-			projects = append(projects, RootPath{
-				RepoPath: fullPath,
-				Path:     abs,
-			})
-			projectMap[abs] = true
-		}
-	}
-
-	sort.Slice(projects, func(i, j int) bool {
-		return projects[i].Path < projects[j].Path
-	})
 
 	node := CreateTreeNode(fullPath, projects, p.discoveredVarFiles)
 	node.AssociateChildVarFiles()
@@ -716,7 +666,7 @@ func (p *ProjectLocator) discoveredProjectsWithModulesFiltered() []discoveredPro
 	var projects []discoveredProject
 
 	for _, dir := range p.discoveredProjects {
-		if _, ok := p.modules[dir.path]; !ok || p.useAllPaths {
+		if _, ok := p.modules[dir.path]; !ok || p.useAllPaths || p.shouldIncludeDir(dir.path) {
 			projects = append(projects, dir)
 		}
 	}
@@ -725,11 +675,15 @@ func (p *ProjectLocator) discoveredProjectsWithModulesFiltered() []discoveredPro
 
 }
 
-func (p *ProjectLocator) shouldUseProject(dir discoveredProject, isSkipped func(string) bool) bool {
-	if isSkipped(dir.path) {
+func (p *ProjectLocator) shouldUseProject(dir discoveredProject) bool {
+	if p.shouldSkipDir(dir.path) {
 		p.logger.Debug().Msgf("skipping directory %s as it is marked as excluded by --exclude-path", dir.path)
 
 		return false
+	}
+
+	if p.shouldIncludeDir(dir.path) {
+		return true
 	}
 
 	if p.useAllPaths {
@@ -910,5 +864,45 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) {
 
 			p.walkPaths(filepath.Join(fullPath, info.Name()), level+1)
 		}
+	}
+}
+
+func buildDirMatcher(dirs []string, fullPath string) func(string) bool {
+	var rawMatches []string
+	globMatches := make(map[string]struct{})
+
+	for _, dir := range dirs {
+		var absoluteDir string
+		if dir == filepath.Base(dir) {
+			rawMatches = append(rawMatches, dir)
+		}
+
+		if filepath.IsAbs(dir) {
+			absoluteDir = dir
+		} else {
+			absoluteDir = filepath.Join(fullPath, dir)
+		}
+
+		globs, err := filepath.Glob(absoluteDir)
+		if err == nil {
+			for _, m := range globs {
+				globMatches[m] = struct{}{}
+			}
+		}
+	}
+
+	return func(dir string) bool {
+		if _, ok := globMatches[dir]; ok {
+			return true
+		}
+
+		base := filepath.Base(dir)
+		for _, match := range rawMatches {
+			if match == base {
+				return true
+			}
+		}
+
+		return false
 	}
 }

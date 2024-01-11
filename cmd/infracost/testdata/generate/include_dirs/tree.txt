@@ -8,6 +8,11 @@
     │   └── foo.tf
     ├── bat
     │   └── bip.tf
+    ├── wildcard
+    │   ├── one
+    │   │   └── fip.tf
+    │   └── two
+    │       └── fip.tf
     ├── dev.tfvars
     ├── prod.tfvars
     └── default.tfvars
