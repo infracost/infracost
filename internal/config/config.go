@@ -23,11 +23,11 @@ type AutodetectConfig struct {
 	// EnvNames is the list of environment names that we should use to group
 	// terraform var files.
 	EnvNames []string `yaml:"env_names,omitempty" ignored:"true"`
-	// ExcludedDirs is a list of directories that the autodetect should ignore.
-	ExcludedDirs []string `yaml:"excluded_dirs,omitempty" ignored:"true"`
-	// IncludedDirs is a list of directories that the autodetect should append
+	// ExcludeDirs is a list of directories that the autodetect should ignore.
+	ExcludeDirs []string `yaml:"exclude_dirs,omitempty" ignored:"true"`
+	// IncludeDirs is a list of directories that the autodetect should append
 	// to the already detected directories.
-	IncludedDirs []string `yaml:"included_dirs,omitempty" ignored:"true"`
+	IncludeDirs []string `yaml:"include_dirs,omitempty" ignored:"true"`
 }
 
 // Project defines a specific terraform project config. This can be used

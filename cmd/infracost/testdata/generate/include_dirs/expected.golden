@@ -1,6 +1,6 @@
 version: 0.1
 autodetect:
-  included_dirs:
+  include_dirs:
     - apps/bat
     - apps/baz
     - apps/wildcard/**
