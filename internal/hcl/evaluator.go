@@ -762,11 +762,19 @@ func (e *Evaluator) evaluateVariable(b *Block, inputVars map[string]cty.Value) (
 
 	attrType := attributes["type"]
 	if override, exists := inputVars[b.Label()]; exists {
-		return e.convertType(b, override, attrType)
+		val, err := e.convertType(b, override, attrType)
+		if err == nil {
+			return val, nil
+		}
+
+		return override, nil
 	}
 
 	if def, exists := attributes["default"]; exists {
-		return e.convertType(b, def.Value(), attrType)
+		val, err := e.convertType(b, def.Value(), attrType)
+		if err == nil {
+			return val, nil
+		}
 	}
 
 	c, err := e.convertType(b, cty.DynamicVal, attrType)
