@@ -110,14 +110,13 @@ func NewEvaluator(
 	blockBuilder BlockBuilder,
 	spinFunc ui.SpinnerFunc,
 	logger zerolog.Logger,
-	providerContext *Context,
+	ctx *Context,
 ) *Evaluator {
-	evalCtx := &hcl.EvalContext{}
-	if providerContext != nil {
-		evalCtx = providerContext.Inner().NewChild()
+	if ctx == nil {
+		ctx = NewContext(&hcl.EvalContext{
+			Functions: ExpFunctions(module.RootPath, logger),
+		}, nil, logger)
 	}
-	evalCtx.Functions = ExpFunctions(module.RootPath, logger)
-	ctx := NewContext(evalCtx, providerContext, logger)
 
 	if visitedModules == nil {
 		visitedModules = make(map[string]map[string]cty.Value)
@@ -339,20 +338,20 @@ func (e *Evaluator) evaluateModules() {
 			moduleProviders[key] = provider
 		}
 
-		// create a parent context which will be passed to any submodules. This will only
+		// create a context which will be passed to the submodules. This will only
 		// contain the context values for the provider block as this is the only context
 		// values that should be "inherited".
-		parentContext := NewContext(&hcl.EvalContext{
+		subModuleContext := NewContext(&hcl.EvalContext{
 			Functions: ExpFunctions(e.module.RootPath, e.logger),
 		}, nil, e.logger)
 		// set the providers defined in a provider block
 		providers := e.getValuesByBlockType("provider")
 		for key, provider := range providers.AsValueMap() {
-			parentContext.Set(provider, key)
+			subModuleContext.Set(provider, key)
 		}
 		// merge in any providers from the module providers block
 		for key, provider := range moduleProviders {
-			parentContext.Set(provider, key)
+			subModuleContext.Set(provider, key)
 		}
 
 		moduleEvaluator := NewEvaluator(
@@ -376,7 +375,7 @@ func (e *Evaluator) evaluateModules() {
 			e.blockBuilder,
 			nil,
 			e.logger,
-			parentContext,
+			subModuleContext,
 		)
 
 		moduleCall.Module, _ = moduleEvaluator.Run()
