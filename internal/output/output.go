@@ -766,6 +766,10 @@ func hasSupportedTerraformProvider(rType string) bool {
 	return strings.HasPrefix(rType, "aws_") || strings.HasPrefix(rType, "google_") || strings.HasPrefix(rType, "azurerm_")
 }
 
+func hasSupportedIdemProvider(rType string) bool {
+	return strings.HasPrefix(rType, "states.aws.") || strings.HasPrefix(rType, "states.gcp.") || strings.HasPrefix(rType, "states.azure.")
+}
+
 func BuildSummary(resources []*schema.Resource, opts SummaryOptions) (*Summary, error) {
 	s := &Summary{}
 
@@ -789,7 +793,7 @@ func BuildSummary(resources []*schema.Resource, opts SummaryOptions) (*Summary, 
 	}
 
 	for _, r := range resources {
-		if !opts.IncludeUnsupportedProviders && !hasSupportedTerraformProvider(r.ResourceType) {
+		if !opts.IncludeUnsupportedProviders && !hasSupportedTerraformProvider(r.ResourceType) && !hasSupportedIdemProvider(r.ResourceType) {
 			continue
 		}
 

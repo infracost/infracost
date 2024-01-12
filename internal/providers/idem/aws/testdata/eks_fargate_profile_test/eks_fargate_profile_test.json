@@ -1,0 +1,68 @@
+{
+    "aws.eks.fargate_profile_|-fargate01-idem-cluster01_|-fargate01-idem-cluster01_|-present": {
+        "tag": "aws.eks.fargate_profile_|-fargate01-idem-cluster01_|-fargate01-idem-cluster01_|-present",
+        "name": "fargate01",
+        "__id__": "fargate01-idem-cluster01",
+        "changes": {
+            "new": {
+                "name": "fargate01",
+                "cluster_name": "idem-cluster01",
+                "pod_execution_role_arn": "arn:aws:iam::537227425989:role/eksfargateprofile-role",
+                "tags": {
+                    "fargate01": "created via code"
+                },
+                "subnets": [
+                    "subnet-006a41c410b9485dd",
+                    "subnet-01368936bb540ba1e"
+                ],
+                "selectors": [
+                    {
+                        "labels": {},
+                        "namespace": "default"
+                    }
+                ],
+                "resource_id": "resource_id_known_after_present"
+            }
+        },
+        "new_state": {
+            "name": "fargate01",
+            "cluster_name": "idem-cluster01",
+            "pod_execution_role_arn": "arn:aws:iam::537227425989:role/eksfargateprofile-role",
+            "tags": {
+                "fargate01": "created via code"
+            },
+            "subnets": [
+                "subnet-006a41c410b9485dd",
+                "subnet-01368936bb540ba1e"
+            ],
+            "selectors": [
+                {
+                    "labels": {},
+                    "namespace": "default"
+                }
+            ],
+            "resource_id": "resource_id_known_after_present"
+        },
+        "old_state": null,
+        "comment": [
+            "Would create aws.eks.fargate_profile 'fargate01'"
+        ],
+        "rerun_data": null,
+        "result": true,
+        "esm_tag": "aws.eks.fargate_profile_|-fargate01-idem-cluster01_|-fargate01-idem-cluster01_|-",
+        "__run_num": 1,
+        "start_time": "2023-05-13 16:50:45.165017",
+        "total_seconds": 2.99855,
+        "sls_meta": {
+            "SLS": {},
+            "ID_DECS": {}
+        },
+        "ref": "states.aws.eks.fargate_profile.present",
+        "acct_details": {
+            "attribute_value": "746014882121",
+            "attribute_key": "Account",
+            "provider": "AWS",
+            "region_name": "us-west-2"
+        }
+    }
+}

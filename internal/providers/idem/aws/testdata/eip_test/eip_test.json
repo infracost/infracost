@@ -1,0 +1,90 @@
+{
+    "aws.ec2.elastic_ip_|-aws_eip.nat_eip_|-aws_eip.nat_eip_|-present": {
+        "tag": "aws.ec2.elastic_ip_|-aws_eip.nat_eip_|-aws_eip.nat_eip_|-present",
+        "name": "aws_eip.nat_eip",
+        "__id__": "aws_eip.nat_eip",
+        "changes": {
+            "new": {
+                "name": "aws_eip.nat_eip",
+                "domain": "vpc",
+                "allocation_id": "allocation_id_known_after_present",
+                "tags": {
+                    "name": "ONE"
+                },
+                "resource_id": "resource_id_known_after_present"
+            }
+        },
+        "new_state": {
+            "name": "aws_eip.nat_eip",
+            "domain": "vpc",
+            "allocation_id": "allocation_id_known_after_present",
+            "tags": {
+                "name": "ONE"
+            },
+            "resource_id": "resource_id_known_after_present"
+        },
+        "old_state": null,
+        "comment": [
+            "Would create aws.ec2.elastic_ip 'aws_eip.nat_eip'"
+        ],
+        "rerun_data": null,
+        "result": true,
+        "esm_tag": "aws.ec2.elastic_ip_|-aws_eip.nat_eip_|-aws_eip.nat_eip_|-",
+        "__run_num": 1,
+        "start_time": "2023-05-12 15:02:56.139158",
+        "total_seconds": 26.797288,
+        "sls_meta": {
+            "SLS": {},
+            "ID_DECS": {}
+        },
+        "ref": "states.aws.ec2.elastic_ip.present",
+        "acct_details": {
+            "attribute_value": "fake-account-id",
+            "attribute_key": "Account",
+            "provider": "AWS",
+            "region_name": null
+        }
+    },
+    "aws.ec2.nat_gateway_|-aws_nat_gateway.nat_gateway_|-aws_nat_gateway.nat_gateway_|-present": {
+        "tag": "aws.ec2.nat_gateway_|-aws_nat_gateway.nat_gateway_|-aws_nat_gateway.nat_gateway_|-present",
+        "name": "aws_nat_gateway.nat_gateway",
+        "__id__": "aws_nat_gateway.nat_gateway",
+        "changes": {
+            "new": {
+                "allocation_id": "allocation_id_known_after_present",
+                "subnet_id": "subnet-1234",
+                "name": "aws_nat_gateway.nat_gateway",
+                "connectivity_type": "public",
+                "resource_id": "resource_id_known_after_present"
+            }
+        },
+        "new_state": {
+            "allocation_id": "allocation_id_known_after_present",
+            "subnet_id": "subnet-1234",
+            "name": "aws_nat_gateway.nat_gateway",
+            "connectivity_type": "public",
+            "resource_id": "resource_id_known_after_present"
+        },
+        "old_state": null,
+        "comment": [
+            "Would create aws.ec2.nat_gateway 'aws_nat_gateway.nat_gateway'"
+        ],
+        "rerun_data": null,
+        "result": true,
+        "esm_tag": "aws.ec2.nat_gateway_|-aws_nat_gateway.nat_gateway_|-aws_nat_gateway.nat_gateway_|-",
+        "__run_num": 2,
+        "start_time": "2023-05-12 15:03:22.939074",
+        "total_seconds": 30.424905,
+        "sls_meta": {
+            "SLS": {},
+            "ID_DECS": {}
+        },
+        "ref": "states.aws.ec2.nat_gateway.present",
+        "acct_details": {
+            "attribute_value": "fake-account-id",
+            "attribute_key": "Account",
+            "provider": "AWS",
+            "region_name": null
+        }
+    }
+}

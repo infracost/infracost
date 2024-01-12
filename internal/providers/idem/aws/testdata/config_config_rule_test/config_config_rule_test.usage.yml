@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  ec2-instance-no-public-ip:
+    monthly_rule_evaluations: 1000000

@@ -1,0 +1,7 @@
+version: 0.1
+resource_usage:
+  snapshot-123-fake:
+    monthly_list_block_requests: 1000000
+    monthly_get_block_requests: 100000
+    monthly_put_block_requests: 100000
+    fast_snapshot_restore_hours: 100

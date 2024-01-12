@@ -1,0 +1,37 @@
+
+ Name                              Monthly Qty  Unit              Monthly Cost 
+                                                                               
+ db-cluster-1                                                                  
+ ├─ Storage                                100  GB                      $10.00 
+ ├─ I/O requests                         52.56  1M requests             $10.51 
+ ├─ Backup storage              Monthly cost depends on usage: $0.021 per GB   
+ └─ Snapshot export             Monthly cost depends on usage: $0.01 per GB    
+                                                                               
+ my_sql_serverless                                                             
+ ├─ Storage                                100  GB                      $10.00 
+ ├─ I/O requests                         52.56  1M requests             $10.51 
+ ├─ Backup storage              Monthly cost depends on usage: $0.021 per GB   
+ └─ Snapshot export             Monthly cost depends on usage: $0.01 per GB    
+                                                                               
+ mysql_backtrack                                                               
+ ├─ Storage                                100  GB                      $10.00 
+ ├─ I/O requests                         52.56  1M requests             $10.51 
+ ├─ Backup storage                         600  GB                      $12.60 
+ └─ Snapshot export                        200  GB                       $2.00 
+                                                                               
+ postgres_serverlessWithBackup                                                 
+ ├─ Storage                                100  GB                      $10.00 
+ ├─ I/O requests                         52.56  1M requests             $10.51 
+ ├─ Backup storage                         600  GB                      $12.60 
+ └─ Snapshot export             Monthly cost depends on usage: $0.01 per GB    
+                                                                               
+ postgres_serverlessWithExport                                                 
+ ├─ Storage                                100  GB                      $10.00 
+ ├─ I/O requests                         52.56  1M requests             $10.51 
+ ├─ Backup storage                         600  GB                      $12.60 
+ └─ Snapshot export                        200  GB                       $2.00 
+                                                                               
+ OVERALL TOTAL                                                         $144.36 
+──────────────────────────────────
+5 cloud resources were detected:
+∙ 5 were estimated

@@ -1,0 +1,52 @@
+version: "0.1"
+resource_usage:
+  E2QWRUHAPOMQZL:
+    monthly_data_transfer_to_internet_gb:
+      us: 12340000 # United States, Mexico, Canada
+      europe: 22340000 # Europe, Israel
+      south_africa: 32340000 # South Africa, Kenya, Middle East
+      south_america: 42340000 # South America
+      japan: 52340000 # Japan
+      australia: 62340000 # Australia, New Zealand
+      asia_pacific: 62340000 # Hong Kong, Philippines, Singapore, South Korea, Taiwan, Thailand
+      india: 72340000 # India
+    monthly_data_transfer_to_origin_gb:
+      us: 1234 # United States, Mexico, Canada
+      europe: 2234 # Europe, Israel
+      south_africa: 3234 # South Africa, Kenya, Middle East
+      south_america: 4234 # South America
+      japan: 5234 # Japan
+      australia: 6234 # Australia, New Zealand
+      asia_pacific: 7234 # Hong Kong, Philippines, Singapore, South Korea, Taiwan, Thailand
+      india: 8234 # India
+    monthly_http_requests:
+      us: 123402 # United States, Mexico, Canada
+      europe: 223402 # Europe, Israel
+      south_africa: 323402 # South Africa, Kenya, Middle East
+      south_america: 423402 # South America
+      japan: 523402 # Japan
+      australia: 623402 # Australia, New Zealand
+      asia_pacific: 723402 # Hong Kong, Philippines, Singapore, South Korea, Taiwan, Thailand
+      india: 823402 # India
+    monthly_https_requests:
+      us: 123400 # United States, Mexico, Canada
+      europe: 223400 # Europe, Israel
+      south_africa: 323400 # South Africa, Kenya, Middle East
+      south_america: 423400 # South America
+      japan: 523400 # Japan
+      australia: 623400 # Australia, New Zealand
+      asia_pacific: 723400 # Hong Kong, Philippines, Singapore, South Korea, Taiwan, Thailand
+      india: 723400 # India
+    monthly_shield_requests:
+      us: 123 # United States
+      europe: 223 # Europe
+      south_america: 323 # South America
+      japan: 423 # Japan
+      australia: 523 # Australia
+      singapore: 623 # Singapore
+      south_korea: 723 # South Korea
+      india: 823 # India
+    monthly_invalidation_requests: 12340 # Monthly number of invalidation requests.
+    monthly_encryption_requests: 123400 # Monthly number of field level encryption requests.
+    monthly_log_lines: 12340000 # Monthly number of real-time log lines.
+    custom_ssl_certificates: 12 # Number of dedicated IP custom SSL certificates.

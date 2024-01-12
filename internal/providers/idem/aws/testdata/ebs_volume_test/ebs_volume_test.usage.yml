@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  volume-test2:
+    monthly_standard_io_requests: 1000000

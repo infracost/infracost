@@ -1,0 +1,618 @@
+{
+  "aws.rds.db_instance_|-aws_rds_cluster_instance.cluster_instance_t3_|-aws_rds_cluster_instance.cluster_instance_t3_|-present": {
+    "tag": "aws.rds.db_instance_|-aws_rds_cluster_instance.cluster_instance_t3_|-aws_rds_cluster_instance.cluster_instance_t3_|-present",
+    "name": "aws_rds_cluster_instance.cluster_instance_t3",
+    "__id__": "aws_rds_cluster_instance.cluster_instance_t3",
+    "changes": {
+      "new": {
+        "name": "aws_rds_cluster_instance.cluster_instance_t3",
+        "db_instance_class": "db.r5.large",
+        "engine": "aurora-postgresql",
+        "availability_zone": "us-east-2b",
+        "db_subnet_group_name": "default",
+        "preferred_maintenance_window": "sat:04:15-sat:04:45",
+        "db_parameter_group_name": "default.aurora-postgresql12",
+        "multi_az": false,
+        "engine_version": "12.7",
+        "auto_minor_version_upgrade": true,
+        "license_model": "postgresql-license",
+        "option_group_name": "default:aurora-postgresql-12",
+        "publicly_accessible": false,
+        "tags": {
+          "name": "value"
+        },
+        "db_cluster_identifier": "db-cluster-1",
+        "storage_type": "aurora",
+        "storage_encrypted": true,
+        "copy_tags_to_snapshot": false,
+        "monitoring_interval": 60,
+        "monitoring_role_arn": "fake-monitoring-role-arn",
+        "promotion_tier": 1,
+        "enable_performance_insights": true,
+        "performance_insights_kms_key_id": "fake-kms-key-id",
+        "performance_insights_retention_period": 7,
+        "backup_target": "region",
+        "resource_id": "resource_id_known_after_present"
+      }
+    },
+    "new_state": {
+      "name": "aws_rds_cluster_instance.cluster_instance_t3",
+      "db_instance_class": "db.r5.large",
+      "engine": "aurora-postgresql",
+      "availability_zone": "us-east-2b",
+      "db_subnet_group_name": "default",
+      "preferred_maintenance_window": "sat:04:15-sat:04:45",
+      "db_parameter_group_name": "default.aurora-postgresql12",
+      "multi_az": false,
+      "engine_version": "12.7",
+      "auto_minor_version_upgrade": true,
+      "license_model": "postgresql-license",
+      "option_group_name": "default:aurora-postgresql-12",
+      "publicly_accessible": false,
+      "tags": {
+        "name": "value"
+      },
+      "db_cluster_identifier": "db-cluster-1",
+      "storage_type": "aurora",
+      "storage_encrypted": true,
+      "copy_tags_to_snapshot": false,
+      "monitoring_interval": 60,
+      "monitoring_role_arn": "fake-monitoring-role-arn",
+      "promotion_tier": 1,
+      "enable_performance_insights": true,
+      "performance_insights_kms_key_id": "fake-kms-key-id",
+      "performance_insights_retention_period": 7,
+      "backup_target": "region",
+      "resource_id": "resource_id_known_after_present"
+    },
+    "old_state": null,
+    "comment": [
+      "Would create aws.rds.db_instance 'aws_rds_cluster_instance.cluster_instance_t3'"
+    ],
+    "rerun_data": null,
+    "result": true,
+    "esm_tag": "aws.rds.db_instance_|-aws_rds_cluster_instance.cluster_instance_t3_|-aws_rds_cluster_instance.cluster_instance_t3_|-",
+    "__run_num": 1,
+    "start_time": "2023-05-14 13:06:23.275591",
+    "total_seconds": 1.035751,
+    "sls_meta": {
+      "SLS": {},
+      "ID_DECS": {}
+    },
+    "ref": "states.aws.rds.db_instance.present",
+    "acct_details": {
+      "attribute_value": "123456789012",
+      "attribute_key": "Account",
+      "provider": "AWS",
+      "region_name": "us-west-2"
+    }
+  },
+  "aws.rds.db_instance_|-aws_rds_cluster_instance.cluster_instance_performance_insights_with_usage_|-aws_rds_cluster_instance.cluster_instance_performance_insights_with_usage_|-present": {
+    "tag": "aws.rds.db_instance_|-aws_rds_cluster_instance.cluster_instance_performance_insights_with_usage_|-aws_rds_cluster_instance.cluster_instance_performance_insights_with_usage_|-present",
+    "name": "aws_rds_cluster_instance.cluster_instance_performance_insights_with_usage",
+    "__id__": "aws_rds_cluster_instance.cluster_instance_performance_insights_with_usage",
+    "changes": {
+      "new": {
+        "name": "aws_rds_cluster_instance.cluster_instance_performance_insights_with_usage",
+        "db_instance_class": "db.r5.large",
+        "engine": "aurora-postgresql",
+        "availability_zone": "us-east-2b",
+        "db_subnet_group_name": "default",
+        "preferred_maintenance_window": "sat:04:15-sat:04:45",
+        "db_parameter_group_name": "default.aurora-postgresql12",
+        "multi_az": false,
+        "engine_version": "12.7",
+        "auto_minor_version_upgrade": true,
+        "license_model": "postgresql-license",
+        "option_group_name": "default:aurora-postgresql-12",
+        "publicly_accessible": false,
+        "tags": {
+          "name": "value"
+        },
+        "db_cluster_identifier": "db-cluster-1",
+        "storage_type": "aurora",
+        "storage_encrypted": true,
+        "copy_tags_to_snapshot": false,
+        "monitoring_interval": 60,
+        "monitoring_role_arn": "fake-monitoring-role-arn",
+        "promotion_tier": 1,
+        "enable_performance_insights": true,
+        "performance_insights_kms_key_id": "fake-kms-key-id",
+        "performance_insights_retention_period": 7,
+        "backup_target": "region",
+        "resource_id": "resource_id_known_after_present"
+      }
+    },
+    "new_state": {
+      "name": "aws_rds_cluster_instance.cluster_instance_performance_insights_with_usage",
+      "db_instance_class": "db.r5.large",
+      "engine": "aurora-postgresql",
+      "availability_zone": "us-east-2b",
+      "db_subnet_group_name": "default",
+      "preferred_maintenance_window": "sat:04:15-sat:04:45",
+      "db_parameter_group_name": "default.aurora-postgresql12",
+      "multi_az": false,
+      "engine_version": "12.7",
+      "auto_minor_version_upgrade": true,
+      "license_model": "postgresql-license",
+      "option_group_name": "default:aurora-postgresql-12",
+      "publicly_accessible": false,
+      "tags": {
+        "name": "value"
+      },
+      "db_cluster_identifier": "db-cluster-1",
+      "storage_type": "aurora",
+      "storage_encrypted": true,
+      "copy_tags_to_snapshot": false,
+      "monitoring_interval": 60,
+      "monitoring_role_arn": "fake-monitoring-role-arn",
+      "promotion_tier": 1,
+      "enable_performance_insights": true,
+      "performance_insights_kms_key_id": "fake-kms-key-id",
+      "performance_insights_retention_period": 7,
+      "backup_target": "region",
+      "resource_id": "resource_id_known_after_present"
+    },
+    "old_state": null,
+    "comment": [
+      "Would create aws.rds.db_instance 'aws_rds_cluster_instance.cluster_instance_performance_insights_with_usage'"
+    ],
+    "rerun_data": null,
+    "result": true,
+    "esm_tag": "aws.rds.db_instance_|-aws_rds_cluster_instance.cluster_instance_performance_insights_with_usage_|-aws_rds_cluster_instance.cluster_instance_performance_insights_with_usage_|-",
+    "__run_num": 1,
+    "start_time": "2023-05-14 13:06:23.275591",
+    "total_seconds": 1.035751,
+    "sls_meta": {
+      "SLS": {},
+      "ID_DECS": {}
+    },
+    "ref": "states.aws.rds.db_instance.present",
+    "acct_details": {
+      "attribute_value": "123456789012",
+      "attribute_key": "Account",
+      "provider": "AWS",
+      "region_name": "us-west-2"
+    }
+  },
+  "aws.rds.db_instance_|-aws_rds_cluster_instance.cluster_instance_1yr_no_upfront_|-aws_rds_cluster_instance.cluster_instance_1yr_no_upfront_|-present": {
+    "tag": "aws.rds.db_instance_|-aws_rds_cluster_instance.cluster_instance_1yr_no_upfront_|-aws_rds_cluster_instance.cluster_instance_1yr_no_upfront_|-present",
+    "name": "aws_rds_cluster_instance.cluster_instance_1yr_no_upfront",
+    "__id__": "aws_rds_cluster_instance.cluster_instance_1yr_no_upfront",
+    "changes": {
+      "new": {
+        "name": "aws_rds_cluster_instance.cluster_instance_1yr_no_upfront",
+        "db_instance_class": "db.r5.large",
+        "engine": "aurora-postgresql",
+        "availability_zone": "us-east-2b",
+        "db_subnet_group_name": "default",
+        "preferred_maintenance_window": "sat:04:15-sat:04:45",
+        "db_parameter_group_name": "default.aurora-postgresql12",
+        "multi_az": false,
+        "engine_version": "12.7",
+        "auto_minor_version_upgrade": true,
+        "license_model": "postgresql-license",
+        "option_group_name": "default:aurora-postgresql-12",
+        "publicly_accessible": false,
+        "tags": {
+          "name": "value"
+        },
+        "db_cluster_identifier": "db-cluster-1",
+        "storage_type": "aurora",
+        "storage_encrypted": true,
+        "copy_tags_to_snapshot": false,
+        "monitoring_interval": 60,
+        "monitoring_role_arn": "fake-monitoring-role-arn",
+        "promotion_tier": 1,
+        "enable_performance_insights": true,
+        "performance_insights_kms_key_id": "fake-kms-key-id",
+        "performance_insights_retention_period": 7,
+        "backup_target": "region",
+        "resource_id": "resource_id_known_after_present"
+      }
+    },
+    "new_state": {
+      "name": "aws_rds_cluster_instance.cluster_instance_1yr_no_upfront",
+      "db_instance_class": "db.r5.large",
+      "engine": "aurora-postgresql",
+      "availability_zone": "us-east-2b",
+      "db_subnet_group_name": "default",
+      "preferred_maintenance_window": "sat:04:15-sat:04:45",
+      "db_parameter_group_name": "default.aurora-postgresql12",
+      "multi_az": false,
+      "engine_version": "12.7",
+      "auto_minor_version_upgrade": true,
+      "license_model": "postgresql-license",
+      "option_group_name": "default:aurora-postgresql-12",
+      "publicly_accessible": false,
+      "tags": {
+        "name": "value"
+      },
+      "db_cluster_identifier": "db-cluster-1",
+      "storage_type": "aurora",
+      "storage_encrypted": true,
+      "copy_tags_to_snapshot": false,
+      "monitoring_interval": 60,
+      "monitoring_role_arn": "fake-monitoring-role-arn",
+      "promotion_tier": 1,
+      "enable_performance_insights": true,
+      "performance_insights_kms_key_id": "fake-kms-key-id",
+      "performance_insights_retention_period": 7,
+      "backup_target": "region",
+      "resource_id": "resource_id_known_after_present"
+    },
+    "old_state": null,
+    "comment": [
+      "Would create aws.rds.db_instance 'aws_rds_cluster_instance.cluster_instance_1yr_no_upfront'"
+    ],
+    "rerun_data": null,
+    "result": true,
+    "esm_tag": "aws.rds.db_instance_|-aws_rds_cluster_instance.cluster_instance_1yr_no_upfront_|-aws_rds_cluster_instance.cluster_instance_1yr_no_upfront_|-",
+    "__run_num": 1,
+    "start_time": "2023-05-14 13:06:23.275591",
+    "total_seconds": 1.035751,
+    "sls_meta": {
+      "SLS": {},
+      "ID_DECS": {}
+    },
+    "ref": "states.aws.rds.db_instance.present",
+    "acct_details": {
+      "attribute_value": "123456789012",
+      "attribute_key": "Account",
+      "provider": "AWS",
+      "region_name": "us-west-2"
+    }
+  },
+  "aws.rds.db_instance_|-aws_rds_cluster_instance.cluster_instance_1yr_partial_upfront_|-aws_rds_cluster_instance.cluster_instance_1yr_partial_upfront_|-present": {
+    "tag": "aws.rds.db_instance_|-aws_rds_cluster_instance.cluster_instance_1yr_partial_upfront_|-aws_rds_cluster_instance.cluster_instance_1yr_partial_upfront_|-present",
+    "name": "aws_rds_cluster_instance.cluster_instance_1yr_partial_upfront",
+    "__id__": "aws_rds_cluster_instance.cluster_instance_1yr_partial_upfront",
+    "changes": {
+      "new": {
+        "name": "aws_rds_cluster_instance.cluster_instance_1yr_partial_upfront",
+        "db_instance_class": "db.r5.large",
+        "engine": "aurora-postgresql",
+        "availability_zone": "us-east-2b",
+        "db_subnet_group_name": "default",
+        "preferred_maintenance_window": "sat:04:15-sat:04:45",
+        "db_parameter_group_name": "default.aurora-postgresql12",
+        "multi_az": false,
+        "engine_version": "12.7",
+        "auto_minor_version_upgrade": true,
+        "license_model": "postgresql-license",
+        "option_group_name": "default:aurora-postgresql-12",
+        "publicly_accessible": false,
+        "tags": {
+          "name": "value"
+        },
+        "db_cluster_identifier": "db-cluster-1",
+        "storage_type": "aurora",
+        "storage_encrypted": true,
+        "copy_tags_to_snapshot": false,
+        "monitoring_interval": 60,
+        "monitoring_role_arn": "fake-monitoring-role-arn",
+        "promotion_tier": 1,
+        "enable_performance_insights": true,
+        "performance_insights_kms_key_id": "fake-kms-key-id",
+        "performance_insights_retention_period": 7,
+        "backup_target": "region",
+        "resource_id": "resource_id_known_after_present"
+      }
+    },
+    "new_state": {
+      "name": "aws_rds_cluster_instance.cluster_instance_1yr_partial_upfront",
+      "db_instance_class": "db.r5.large",
+      "engine": "aurora-postgresql",
+      "availability_zone": "us-east-2b",
+      "db_subnet_group_name": "default",
+      "preferred_maintenance_window": "sat:04:15-sat:04:45",
+      "db_parameter_group_name": "default.aurora-postgresql12",
+      "multi_az": false,
+      "engine_version": "12.7",
+      "auto_minor_version_upgrade": true,
+      "license_model": "postgresql-license",
+      "option_group_name": "default:aurora-postgresql-12",
+      "publicly_accessible": false,
+      "tags": {
+        "name": "value"
+      },
+      "db_cluster_identifier": "db-cluster-1",
+      "storage_type": "aurora",
+      "storage_encrypted": true,
+      "copy_tags_to_snapshot": false,
+      "monitoring_interval": 60,
+      "monitoring_role_arn": "fake-monitoring-role-arn",
+      "promotion_tier": 1,
+      "enable_performance_insights": true,
+      "performance_insights_kms_key_id": "fake-kms-key-id",
+      "performance_insights_retention_period": 7,
+      "backup_target": "region",
+      "resource_id": "resource_id_known_after_present"
+    },
+    "old_state": null,
+    "comment": [
+      "Would create aws.rds.db_instance 'aws_rds_cluster_instance.cluster_instance_1yr_partial_upfront'"
+    ],
+    "rerun_data": null,
+    "result": true,
+    "esm_tag": "aws.rds.db_instance_|-aws_rds_cluster_instance.cluster_instance_1yr_partial_upfront_|-aws_rds_cluster_instance.cluster_instance_1yr_partial_upfront_|-",
+    "__run_num": 1,
+    "start_time": "2023-05-14 13:06:23.275591",
+    "total_seconds": 1.035751,
+    "sls_meta": {
+      "SLS": {},
+      "ID_DECS": {}
+    },
+    "ref": "states.aws.rds.db_instance.present",
+    "acct_details": {
+      "attribute_value": "123456789012",
+      "attribute_key": "Account",
+      "provider": "AWS",
+      "region_name": "us-west-2"
+    }
+  },
+  "aws.rds.db_instance_|-aws_rds_cluster_instance.cluster_instance_1yr_all_upfront_|-aws_rds_cluster_instance.cluster_instance_1yr_all_upfront_|-present": {
+    "tag": "aws.rds.db_instance_|-aws_rds_cluster_instance.cluster_instance_1yr_all_upfront_|-aws_rds_cluster_instance.cluster_instance_1yr_all_upfront_|-present",
+    "name": "aws_rds_cluster_instance.cluster_instance_1yr_all_upfront",
+    "__id__": "aws_rds_cluster_instance.cluster_instance_1yr_all_upfront",
+    "changes": {
+      "new": {
+        "name": "aws_rds_cluster_instance.cluster_instance_1yr_all_upfront",
+        "db_instance_class": "db.r5.large",
+        "engine": "aurora-postgresql",
+        "availability_zone": "us-east-2b",
+        "db_subnet_group_name": "default",
+        "preferred_maintenance_window": "sat:04:15-sat:04:45",
+        "db_parameter_group_name": "default.aurora-postgresql12",
+        "multi_az": false,
+        "engine_version": "12.7",
+        "auto_minor_version_upgrade": true,
+        "license_model": "postgresql-license",
+        "option_group_name": "default:aurora-postgresql-12",
+        "publicly_accessible": false,
+        "tags": {
+          "name": "value"
+        },
+        "db_cluster_identifier": "db-cluster-1",
+        "storage_type": "aurora",
+        "storage_encrypted": true,
+        "copy_tags_to_snapshot": false,
+        "monitoring_interval": 60,
+        "monitoring_role_arn": "fake-monitoring-role-arn",
+        "promotion_tier": 1,
+        "enable_performance_insights": true,
+        "performance_insights_kms_key_id": "fake-kms-key-id",
+        "performance_insights_retention_period": 7,
+        "backup_target": "region",
+        "resource_id": "resource_id_known_after_present"
+      }
+    },
+    "new_state": {
+      "name": "aws_rds_cluster_instance.cluster_instance_1yr_all_upfront",
+      "db_instance_class": "db.r5.large",
+      "engine": "aurora-postgresql",
+      "availability_zone": "us-east-2b",
+      "db_subnet_group_name": "default",
+      "preferred_maintenance_window": "sat:04:15-sat:04:45",
+      "db_parameter_group_name": "default.aurora-postgresql12",
+      "multi_az": false,
+      "engine_version": "12.7",
+      "auto_minor_version_upgrade": true,
+      "license_model": "postgresql-license",
+      "option_group_name": "default:aurora-postgresql-12",
+      "publicly_accessible": false,
+      "tags": {
+        "name": "value"
+      },
+      "db_cluster_identifier": "db-cluster-1",
+      "storage_type": "aurora",
+      "storage_encrypted": true,
+      "copy_tags_to_snapshot": false,
+      "monitoring_interval": 60,
+      "monitoring_role_arn": "fake-monitoring-role-arn",
+      "promotion_tier": 1,
+      "enable_performance_insights": true,
+      "performance_insights_kms_key_id": "fake-kms-key-id",
+      "performance_insights_retention_period": 7,
+      "backup_target": "region",
+      "resource_id": "resource_id_known_after_present"
+    },
+    "old_state": null,
+    "comment": [
+      "Would create aws.rds.db_instance 'aws_rds_cluster_instance.cluster_instance_1yr_all_upfront'"
+    ],
+    "rerun_data": null,
+    "result": true,
+    "esm_tag": "aws.rds.db_instance_|-aws_rds_cluster_instance.cluster_instance_1yr_all_upfront_|-aws_rds_cluster_instance.cluster_instance_1yr_all_upfront_|-",
+    "__run_num": 1,
+    "start_time": "2023-05-14 13:06:23.275591",
+    "total_seconds": 1.035751,
+    "sls_meta": {
+      "SLS": {},
+      "ID_DECS": {}
+    },
+    "ref": "states.aws.rds.db_instance.present",
+    "acct_details": {
+      "attribute_value": "123456789012",
+      "attribute_key": "Account",
+      "provider": "AWS",
+      "region_name": "us-west-2"
+    }
+  },
+  "aws.rds.db_instance_|-aws_rds_cluster_instance.cluster_instance_3yr_partial_upfront_|-aws_rds_cluster_instance.cluster_instance_3yr_partial_upfront_|-present": {
+    "tag": "aws.rds.db_instance_|-aws_rds_cluster_instance.cluster_instance_3yr_partial_upfront_|-aws_rds_cluster_instance.cluster_instance_3yr_partial_upfront_|-present",
+    "name": "aws_rds_cluster_instance.cluster_instance_3yr_partial_upfront",
+    "__id__": "aws_rds_cluster_instance.cluster_instance_3yr_partial_upfront",
+    "changes": {
+      "new": {
+        "name": "aws_rds_cluster_instance.cluster_instance_3yr_partial_upfront",
+        "db_instance_class": "db.r5.large",
+        "engine": "aurora-postgresql",
+        "availability_zone": "us-east-2b",
+        "db_subnet_group_name": "default",
+        "preferred_maintenance_window": "sat:04:15-sat:04:45",
+        "db_parameter_group_name": "default.aurora-postgresql12",
+        "multi_az": false,
+        "engine_version": "12.7",
+        "auto_minor_version_upgrade": true,
+        "license_model": "postgresql-license",
+        "option_group_name": "default:aurora-postgresql-12",
+        "publicly_accessible": false,
+        "tags": {
+          "name": "value"
+        },
+        "db_cluster_identifier": "db-cluster-1",
+        "storage_type": "aurora",
+        "storage_encrypted": true,
+        "copy_tags_to_snapshot": false,
+        "monitoring_interval": 60,
+        "monitoring_role_arn": "fake-monitoring-role-arn",
+        "promotion_tier": 1,
+        "enable_performance_insights": true,
+        "performance_insights_kms_key_id": "fake-kms-key-id",
+        "performance_insights_retention_period": 7,
+        "backup_target": "region",
+        "resource_id": "resource_id_known_after_present"
+      }
+    },
+    "new_state": {
+      "name": "aws_rds_cluster_instance.cluster_instance_3yr_partial_upfront",
+      "db_instance_class": "db.r5.large",
+      "engine": "aurora-postgresql",
+      "availability_zone": "us-east-2b",
+      "db_subnet_group_name": "default",
+      "preferred_maintenance_window": "sat:04:15-sat:04:45",
+      "db_parameter_group_name": "default.aurora-postgresql12",
+      "multi_az": false,
+      "engine_version": "12.7",
+      "auto_minor_version_upgrade": true,
+      "license_model": "postgresql-license",
+      "option_group_name": "default:aurora-postgresql-12",
+      "publicly_accessible": false,
+      "tags": {
+        "name": "value"
+      },
+      "db_cluster_identifier": "db-cluster-1",
+      "storage_type": "aurora",
+      "storage_encrypted": true,
+      "copy_tags_to_snapshot": false,
+      "monitoring_interval": 60,
+      "monitoring_role_arn": "fake-monitoring-role-arn",
+      "promotion_tier": 1,
+      "enable_performance_insights": true,
+      "performance_insights_kms_key_id": "fake-kms-key-id",
+      "performance_insights_retention_period": 7,
+      "backup_target": "region",
+      "resource_id": "resource_id_known_after_present"
+    },
+    "old_state": null,
+    "comment": [
+      "Would create aws.rds.db_instance 'aws_rds_cluster_instance.cluster_instance_3yr_partial_upfront'"
+    ],
+    "rerun_data": null,
+    "result": true,
+    "esm_tag": "aws.rds.db_instance_|-aws_rds_cluster_instance.cluster_instance_3yr_partial_upfront_|-aws_rds_cluster_instance.cluster_instance_3yr_partial_upfront_|-",
+    "__run_num": 1,
+    "start_time": "2023-05-14 13:06:23.275591",
+    "total_seconds": 1.035751,
+    "sls_meta": {
+      "SLS": {},
+      "ID_DECS": {}
+    },
+    "ref": "states.aws.rds.db_instance.present",
+    "acct_details": {
+      "attribute_value": "123456789012",
+      "attribute_key": "Account",
+      "provider": "AWS",
+      "region_name": "us-west-2"
+    }
+  },
+  "aws.rds.db_instance_|-aws_rds_cluster_instance.cluster_instance_3yr_all_upfront_|-aws_rds_cluster_instance.cluster_instance_3yr_all_upfront_|-present": {
+    "tag": "aws.rds.db_instance_|-aws_rds_cluster_instance.cluster_instance_3yr_all_upfront_|-aws_rds_cluster_instance.cluster_instance_3yr_all_upfront_|-present",
+    "name": "aws_rds_cluster_instance.cluster_instance_3yr_all_upfront",
+    "__id__": "aws_rds_cluster_instance.cluster_instance_3yr_all_upfront",
+    "changes": {
+      "new": {
+        "name": "aws_rds_cluster_instance.cluster_instance_3yr_all_upfront",
+        "db_instance_class": "db.r5.large",
+        "engine": "aurora-postgresql",
+        "availability_zone": "us-east-2b",
+        "db_subnet_group_name": "default",
+        "preferred_maintenance_window": "sat:04:15-sat:04:45",
+        "db_parameter_group_name": "default.aurora-postgresql12",
+        "multi_az": false,
+        "engine_version": "12.7",
+        "auto_minor_version_upgrade": true,
+        "license_model": "postgresql-license",
+        "option_group_name": "default:aurora-postgresql-12",
+        "publicly_accessible": false,
+        "tags": {
+          "name": "value"
+        },
+        "db_cluster_identifier": "db-cluster-1",
+        "storage_type": "aurora",
+        "storage_encrypted": true,
+        "copy_tags_to_snapshot": false,
+        "monitoring_interval": 60,
+        "monitoring_role_arn": "fake-monitoring-role-arn",
+        "promotion_tier": 1,
+        "enable_performance_insights": true,
+        "performance_insights_kms_key_id": "fake-kms-key-id",
+        "performance_insights_retention_period": 7,
+        "backup_target": "region",
+        "resource_id": "resource_id_known_after_present"
+      }
+    },
+    "new_state": {
+      "name": "aws_rds_cluster_instance.cluster_instance_3yr_all_upfront",
+      "db_instance_class": "db.r5.large",
+      "engine": "aurora-postgresql",
+      "availability_zone": "us-east-2b",
+      "db_subnet_group_name": "default",
+      "preferred_maintenance_window": "sat:04:15-sat:04:45",
+      "db_parameter_group_name": "default.aurora-postgresql12",
+      "multi_az": false,
+      "engine_version": "12.7",
+      "auto_minor_version_upgrade": true,
+      "license_model": "postgresql-license",
+      "option_group_name": "default:aurora-postgresql-12",
+      "publicly_accessible": false,
+      "tags": {
+        "name": "value"
+      },
+      "db_cluster_identifier": "db-cluster-1",
+      "storage_type": "aurora",
+      "storage_encrypted": true,
+      "copy_tags_to_snapshot": false,
+      "monitoring_interval": 60,
+      "monitoring_role_arn": "fake-monitoring-role-arn",
+      "promotion_tier": 1,
+      "enable_performance_insights": true,
+      "performance_insights_kms_key_id": "fake-kms-key-id",
+      "performance_insights_retention_period": 7,
+      "backup_target": "region",
+      "resource_id": "resource_id_known_after_present"
+    },
+    "old_state": null,
+    "comment": [
+      "Would create aws.rds.db_instance 'aws_rds_cluster_instance.cluster_instance_3yr_all_upfront'"
+    ],
+    "rerun_data": null,
+    "result": true,
+    "esm_tag": "aws.rds.db_instance_|-aws_rds_cluster_instance.cluster_instance_3yr_all_upfront_|-aws_rds_cluster_instance.cluster_instance_3yr_all_upfront_|-",
+    "__run_num": 1,
+    "start_time": "2023-05-14 13:06:23.275591",
+    "total_seconds": 1.035751,
+    "sls_meta": {
+      "SLS": {},
+      "ID_DECS": {}
+    },
+    "ref": "states.aws.rds.db_instance.present",
+    "acct_details": {
+      "attribute_value": "123456789012",
+      "attribute_key": "Account",
+      "provider": "AWS",
+      "region_name": "us-west-2"
+    }
+  }
+}
