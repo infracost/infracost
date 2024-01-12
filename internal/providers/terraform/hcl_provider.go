@@ -576,9 +576,10 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 	var configuration ResourceData
 	if block.HasModuleBlock() {
 		providerConfigKey = block.Provider()
-		alias := hcl.GetFromProvider(block, block.Provider(), "alias")
-		if alias.Type().Equals(cty.String) && alias.AsString() != "" {
-			providerConfigKey += "." + alias.AsString()
+		var providerAlias string
+		_ = gocty.FromCtyValue(hcl.GetFromProvider(block, block.Provider(), "alias"), &providerAlias)
+		if providerAlias != "" {
+			providerConfigKey += "." + providerAlias
 		}
 		configuration = ResourceData{
 			Address:           stripCountOrForEach(block.LocalName()),
