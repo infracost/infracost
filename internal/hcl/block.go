@@ -1275,7 +1275,7 @@ func awsCurrentRegion(b *Block) cty.Value {
 }
 
 func awsDefaultTagValues(b *Block) cty.Value {
-	defaultTags := getFromProvider(b, "aws", "default_tags")
+	defaultTags := GetFromProvider(b, "aws", "default_tags")
 	if defaultTags.IsKnown() && defaultTags.CanIterateElements() {
 		tags := defaultTags.AsValueSlice()
 		if len(tags) > 0 {
@@ -1372,7 +1372,7 @@ func awsAvailabilityZonesValues(b *Block) cty.Value {
 }
 
 func getRegionFromProvider(b *Block, provider string) string {
-	val := getFromProvider(b, provider, "region")
+	val := GetFromProvider(b, provider, "region")
 
 	var str string
 	err := gocty.FromCtyValue(val, &str)
@@ -1387,7 +1387,7 @@ func getRegionFromProvider(b *Block, provider string) string {
 	return str
 }
 
-func getFromProvider(b *Block, provider, key string) cty.Value {
+func GetFromProvider(b *Block, provider, key string) cty.Value {
 	val := b.context.Get(provider, key)
 
 	attr := b.GetAttribute("provider")

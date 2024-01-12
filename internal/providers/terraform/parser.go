@@ -702,53 +702,6 @@ func (p *Parser) parseTags(data map[string]*schema.ResourceData, confLoader *Con
 		case "aws":
 			resConf := confLoader.GetResourceConfJSON(resourceData.Address)
 			defaultTags := parseDefaultTags(providerConf, resConf)
-			fmt.Printf("\n\nTIM:::\n%v\n%v\n%v\n", providerConf, resConf, parseProviderKey(resConf))
-			// at this point in the breakdown_format_json_with_tags_aliased_provider test:
-			// providerConf = {
-			//  "aws.env": {
-			//    "name": "aws.env",
-			//    "expressions": {
-			//      "default_tags": [
-			//        {
-			//          "tags": {
-			//            "constant_value": {
-			//              "DefaultNotOverride": "defaultnotoverride",
-			//              "DefaultOverride": "defaultoverride"
-			//            }
-			//          }
-			//        }
-			//      ],
-			//      "region": {
-			//        "constant_value": "us-east-1"
-			//      }
-			//    },
-			//    "infracost_metadata": {
-			//      "end_line": 16,
-			//      "filename": "cmd/infracost/testdata/breakdown_format_json_with_tags_aliased_provider/main.tf",
-			//      "start_line": 1
-			//    }
-			//  }
-			//}
-			//
-			// resConf = {
-			//  "address": "aws_sqs_queue.sqs_withTags",
-			//  "mode": "managed",
-			//  "type": "aws_sqs_queue",
-			//  "name": "sqs_withTags",
-			//  "provider_config_key": "mine:aws",
-			//  "expressions": {
-			//    "tags": {
-			//      "references": [
-			//        "DefaultOverride.",
-			//        "ResourceTag."
-			//      ]
-			//    }
-			//  },
-			//  "schema_version": 0
-			//}
-			//
-			// and parseProviderKey(resConf) evaluates to "aws"
-			// which parseDefaultTags(providerConf, resConf) returns nil
 			tags = aws.ParseTags(defaultTags, resourceData)
 		case "azurerm":
 			tags = azure.ParseTags(resourceData)
@@ -960,16 +913,17 @@ func gjsonEqual(a, b gjson.Result) bool {
 }
 
 type ConfLoader struct {
-	conf          gjson.Result
-	moduleCache   map[string]gjson.Result
-	resourceCache map[string]gjson.Result
+	conf        gjson.Result
+	moduleCache map[string]gjson.Result
+	// Seems like we can't cache module resources because the providerConfigKey can be different.
+	// resourceCache map[string]gjson.Result
 }
 
 func NewConfLoader(conf gjson.Result) *ConfLoader {
 	return &ConfLoader{
-		conf:          conf,
-		moduleCache:   make(map[string]gjson.Result),
-		resourceCache: make(map[string]gjson.Result),
+		conf:        conf,
+		moduleCache: make(map[string]gjson.Result),
+		// resourceCache: make(map[string]gjson.Result),
 	}
 }
 
@@ -1004,12 +958,12 @@ func (l *ConfLoader) GetResourceConfJSON(addr string) gjson.Result {
 	}
 
 	key := fmt.Sprintf(`resources.#(address="%s")`, removeAddressArrayPart(addressResourcePart(addr)))
-	if c, ok := l.resourceCache[key]; ok {
-		return c
-	}
+	// if c, ok := l.resourceCache[key]; ok {
+	//	 return c
+	// }
 
 	c := moduleConf.Get(key)
-	l.resourceCache[key] = c
+	// l.resourceCache[key] = c
 
 	return c
 }

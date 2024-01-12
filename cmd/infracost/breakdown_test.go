@@ -10,6 +10,7 @@ import (
 	"os/exec"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 
@@ -99,6 +100,8 @@ func TestBreakdownFormatJsonWithTagsAliasedProvider(t *testing.T) {
 		&GoldenFileOptions{
 			CaptureLogs: true,
 			IsJSON:      true,
+			JSONInclude: regexp.MustCompile("^(defaultTags|tags|name)$"),
+			JSONExclude: regexp.MustCompile("^(costComponents|pastBreakdown)$"),
 		}, func(ctx *config.RunContext) {
 			ctx.Config.TagPoliciesEnabled = true
 		},

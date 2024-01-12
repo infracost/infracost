@@ -110,11 +110,14 @@ func NewEvaluator(
 	blockBuilder BlockBuilder,
 	spinFunc ui.SpinnerFunc,
 	logger zerolog.Logger,
-	parentContext *Context,
+	providerContext *Context,
 ) *Evaluator {
-	ctx := NewContext(&hcl.EvalContext{
-		Functions: ExpFunctions(module.RootPath, logger),
-	}, parentContext, logger)
+	evalCtx := &hcl.EvalContext{}
+	if providerContext != nil {
+		evalCtx = providerContext.Inner().NewChild()
+	}
+	evalCtx.Functions = ExpFunctions(module.RootPath, logger)
+	ctx := NewContext(evalCtx, providerContext, logger)
 
 	if visitedModules == nil {
 		visitedModules = make(map[string]map[string]cty.Value)
@@ -326,14 +329,29 @@ func (e *Evaluator) evaluateModules() {
 
 		e.visitedModules[fullName] = vars
 
+		moduleProviders := map[string]cty.Value{}
+		// inherit any providers from the providers block from the parent module
+		for key, provider := range e.module.Providers {
+			moduleProviders[key] = provider
+		}
+		// and override with any providers from the providers block for the current module
+		for key, provider := range moduleCall.Module.Providers {
+			moduleProviders[key] = provider
+		}
+
 		// create a parent context which will be passed to any submodules. This will only
 		// contain the context values for the provider block as this is the only context
 		// values that should be "inherited".
 		parentContext := NewContext(&hcl.EvalContext{
 			Functions: ExpFunctions(e.module.RootPath, e.logger),
 		}, nil, e.logger)
+		// set the providers defined in a provider block
 		providers := e.getValuesByBlockType("provider")
 		for key, provider := range providers.AsValueMap() {
+			parentContext.Set(provider, key)
+		}
+		// merge in any providers from the module providers block
+		for key, provider := range moduleProviders {
 			parentContext.Set(provider, key)
 		}
 
@@ -341,6 +359,7 @@ func (e *Evaluator) evaluateModules() {
 			Module{
 				Name:       fullName,
 				Source:     moduleCall.Module.Source,
+				Providers:  moduleProviders,
 				Blocks:     moduleCall.Module.RawBlocks,
 				RawBlocks:  moduleCall.Module.RawBlocks,
 				RootPath:   e.module.RootPath,
@@ -1002,11 +1021,14 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 	}
 
 	var source string
+	var providers map[string]cty.Value
 	attrs := b.AttributesAsMap()
 	for _, attr := range attrs {
+		if attr.Name() == "providers" {
+			providers = attr.Value().AsValueMap()
+		}
 		if attr.Name() == "source" {
 			source = attr.AsString()
-			break
 		}
 	}
 
@@ -1054,6 +1076,7 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 		Module: &Module{
 			Name:       b.TypeLabel(),
 			Source:     source,
+			Providers:  providers,
 			SourceURL:  moduleURL,
 			Blocks:     blocks,
 			RawBlocks:  blocks,

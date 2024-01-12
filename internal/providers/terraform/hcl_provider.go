@@ -575,12 +575,17 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 
 	var configuration ResourceData
 	if block.HasModuleBlock() {
+		providerConfigKey = block.Provider()
+		alias := hcl.GetFromProvider(block, block.Provider(), "alias")
+		if alias.Type().Equals(cty.String) && alias.AsString() != "" {
+			providerConfigKey += "." + alias.AsString()
+		}
 		configuration = ResourceData{
 			Address:           stripCountOrForEach(block.LocalName()),
 			Mode:              "managed",
 			Type:              block.TypeLabel(),
 			Name:              stripCountOrForEach(block.NameLabel()),
-			ProviderConfigKey: block.ModuleName() + ":" + block.Provider(), // why aren't we using providerConfigKey here?
+			ProviderConfigKey: providerConfigKey,
 			Expressions:       blockToReferences(block),
 			CountExpression:   p.countReferences(block),
 		}
