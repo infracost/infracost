@@ -1387,6 +1387,9 @@ func getRegionFromProvider(b *Block, provider string) string {
 	return str
 }
 
+// GetFromProvider returns the value of the given key from provider the block is
+// associated with. This is either the default provider or the provider
+// explicitly set on the block (e.g. if a resource has a "provider" attribute).
 func GetFromProvider(b *Block, provider, key string) cty.Value {
 	val := b.context.Get(provider, key)
 
