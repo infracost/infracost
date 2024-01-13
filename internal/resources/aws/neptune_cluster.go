@@ -61,7 +61,7 @@ func (r *NeptuneCluster) storageCostComponent() *schema.CostComponent {
 			Region:     strPtr(r.Region),
 			Service:    strPtr("AmazonNeptune"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s$/i", "StorageUsage"))},
+				{Key: "usagetype", ValueRegex: regexPtr("^([A-Z]{3}\\d-|Global-|EU-)?StorageUsage$")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
