@@ -399,7 +399,6 @@ func (g *Graph) loadBlocksForModule(evaluator *Evaluator) ([]*Block, error) {
 				evaluator.blockBuilder,
 				nil,
 				evaluator.logger,
-				nil,
 			)
 
 			modBlocks, err := g.loadBlocksForModule(moduleEvaluator)
