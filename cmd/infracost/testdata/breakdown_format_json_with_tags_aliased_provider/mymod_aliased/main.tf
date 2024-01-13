@@ -8,8 +8,8 @@ terraform {
 }
 
 
-resource "aws_sqs_queue" "sqs_withTags_mymodule" {
-  name = "sqs_withTags_mymodule"
+resource "aws_sqs_queue" "sqs_withTags_mymod_aliased" {
+  name = "sqs_withTags_mymod_aliased"
 
   tags = {
     DefaultOverride = "sqs-def"
@@ -17,14 +17,14 @@ resource "aws_sqs_queue" "sqs_withTags_mymodule" {
   }
 }
 
-module "mysub-explict-provider" {
-  source = "../mysubmodule"
+module "mysub_aliased" {
+  source = "./mysub_aliased"
 
   providers = {
     aws = aws
   }
 }
 
-module "mysub-implict-provider" {
-  source = "../mysubmodule"
+module "mysub_implicit" {
+  source = "./mysub_implicit"
 }

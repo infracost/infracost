@@ -31,15 +31,18 @@ provider "aws" {
 }
 
 
-module "mymod_provider_alias" {
-  source = "./mymodule"
+module "mymod_aliased" {
+  source = "./mymod_aliased"
 
   providers = {
     aws = aws.env
   }
 }
 
-module "mymode_implicit_providers" {
-  source = "./mymodule"
+module "mymod_implicit" {
+  source = "./mymod_implicit"
 }
 
+module "mymod_own" {
+  source = "./mymod_own"
+}

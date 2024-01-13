@@ -7,9 +7,8 @@ terraform {
   }
 }
 
-
-resource "aws_sqs_queue" "sqs_withTag_mysubmodule" {
-  name = "sqs_withTags_mysubmodule"
+resource "aws_sqs_queue" "sqs_withTag_mysubsub_aliased" {
+  name = "sqs_withTag_mysubsub_aliased"
 
   tags = {
     DefaultOverride = "sqs-def"
