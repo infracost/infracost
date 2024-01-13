@@ -57,6 +57,7 @@ func (r *DocDBClusterInstance) BuildResource() *schema.Resource {
 				ProductFamily: strPtr("Database Instance"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "instanceType", Value: strPtr(r.InstanceClass)},
+					{Key: "volumeType", Value: strPtr("General Purpose")},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
