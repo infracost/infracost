@@ -30,6 +30,26 @@ provider "aws" {
   }
 }
 
+resource "aws_sqs_queue" "sqs_withTags" {
+  name = "sqs_withTags"
+
+  tags = {
+    DefaultOverride = "sqs-def"
+    ResourceTag     = "sqs-hi"
+  }
+}
+
+resource "aws_sqs_queue" "sqs_withTags_provider" {
+  name = "sqs_withTags_provider"
+
+  tags = {
+    DefaultOverride = "sqs-def"
+    ResourceTag     = "sqs-hi"
+  }
+
+  provider = aws.env
+}
+
 
 module "mymod_aliased" {
   source = "./mymod_aliased"

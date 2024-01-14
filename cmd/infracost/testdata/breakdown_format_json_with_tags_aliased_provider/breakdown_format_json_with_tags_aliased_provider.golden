@@ -4,6 +4,22 @@
       "breakdown": {
         "resources": [
           {
+            "name": "aws_sqs_queue.sqs_withTags",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride-aws",
+              "DefaultOverride": "sqs-def",
+              "ResourceTag": "sqs-hi"
+            }
+          },
+          {
+            "name": "aws_sqs_queue.sqs_withTags_provider",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride-aws.env",
+              "DefaultOverride": "sqs-def",
+              "ResourceTag": "sqs-hi"
+            }
+          },
+          {
             "name": "module.mymod_aliased.aws_sqs_queue.sqs_withTags_mymod_aliased",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride-aws.env",
