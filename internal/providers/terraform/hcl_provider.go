@@ -558,27 +558,14 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 	planned.Values = jsonValues
 	changes.Change.After = jsonValues
 
-	var configuration ResourceData
-	if block.HasModuleBlock() {
-		configuration = ResourceData{
-			Address:           stripCountOrForEach(block.LocalName()),
-			Mode:              "managed",
-			Type:              block.TypeLabel(),
-			Name:              stripCountOrForEach(block.NameLabel()),
-			ProviderConfigKey: block.ProviderConfigKey(),
-			Expressions:       blockToReferences(block),
-			CountExpression:   p.countReferences(block),
-		}
-	} else {
-		configuration = ResourceData{
-			Address:           stripCountOrForEach(block.FullName()),
-			Mode:              "managed",
-			Type:              block.TypeLabel(),
-			Name:              stripCountOrForEach(block.NameLabel()),
-			ProviderConfigKey: block.ProviderConfigKey(),
-			Expressions:       blockToReferences(block),
-			CountExpression:   p.countReferences(block),
-		}
+	configuration := ResourceData{
+		Address:           stripCountOrForEach(block.LocalName()),
+		Mode:              "managed",
+		Type:              block.TypeLabel(),
+		Name:              stripCountOrForEach(block.NameLabel()),
+		ProviderConfigKey: block.ProviderConfigKey(),
+		Expressions:       blockToReferences(block),
+		CountExpression:   p.countReferences(block),
 	}
 
 	return ResourceOutput{
