@@ -100,6 +100,9 @@ func (r *LogicAppStandard) workflowVCoreCostComponent() *schema.CostComponent {
 				{Key: "meterName", Value: strPtr("Standard vCPU Duration")},
 			},
 		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("Consumption"),
+		},
 	}
 }
 
@@ -124,6 +127,9 @@ func (r *LogicAppStandard) workflowMemoryCostComponent() *schema.CostComponent {
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "meterName", Value: strPtr("Standard Memory Duration")},
 			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("Consumption"),
 		},
 	}
 }
