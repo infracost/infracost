@@ -123,7 +123,7 @@ func (r *CloudFunctionsFunction) BuildResource() *schema.Resource {
 					Service:       strPtr("Cloud Functions"),
 					ProductFamily: strPtr("ApplicationServices"),
 					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "description", ValueRegex: strPtr("/Network Egress/")},
+						{Key: "description", ValueRegex: regexPtr("^Network Data Transfer Out")},
 					},
 				},
 				PriceFilter: &schema.PriceFilter{

@@ -56,7 +56,7 @@ func networkEgress(region string, u *schema.UsageData, resourceName, prefixName 
 				Region:     strPtr("global"),
 				Service:    strPtr("Cloud Storage"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "description", Value: strPtr("Networking Traffic Egress GCP Inter Region within Europe")},
+					{Key: "description", Value: strPtr("Network Data Transfer GCP Inter Region within Europe")},
 				},
 			},
 		})
@@ -158,43 +158,43 @@ func getEgressRegionsData(prefixName string, egressResourceType EgressResourceTy
 			{
 				gRegion: fmt.Sprintf("%s within the same region", prefixName),
 				// There is no same region option in APIs, so we always take this price in us-central1 region.
-				apiDescription: "Network Vpn Inter Region Egress from Americas to Americas",
+				apiDescription: "Network Inter Region Data Transfer Out from Americas to Virginia",
 				usageKey:       "same_region",
 				fixedRegion:    "us-central1",
 			},
 			{
 				gRegion:        fmt.Sprintf("%s within the US or Canada", prefixName),
-				apiDescription: "Network Vpn Inter Region Egress from Americas to Montreal",
+				apiDescription: "Network Inter Region Data Transfer Out from Americas to Montreal",
 				usageKey:       "us_or_canada",
 				fixedRegion:    "us-central1",
 			},
 			{
 				gRegion:        fmt.Sprintf("%s within Europe", prefixName),
-				apiDescription: "Network Vpn Inter Region Egress from EMEA to EMEA",
+				apiDescription: "Network Inter Region Data Transfer Out from EMEA to Frankfurt",
 				usageKey:       "europe",
 				fixedRegion:    "europe-west1",
 			},
 			{
 				gRegion:        fmt.Sprintf("%s within Asia", prefixName),
-				apiDescription: "Network Vpn Inter Region Egress from Japan to Seoul",
+				apiDescription: "Network Inter Region Data Transfer Out from Japan to Seoul",
 				usageKey:       "asia",
 				fixedRegion:    "asia-northeast1",
 			},
 			{
 				gRegion:        fmt.Sprintf("%s within South America", prefixName),
-				apiDescription: "Network Vpn Inter Region Egress from Sao Paulo to Sao Paulo",
+				apiDescription: "Network Inter Region Data Transfer Out from Sao Paulo to Sao Paulo",
 				usageKey:       "south_america",
 				fixedRegion:    "southamerica-east1",
 			},
 			{
 				gRegion:        fmt.Sprintf("%s to/from Indonesia and Oceania", prefixName),
-				apiDescription: "Network Vpn Inter Region Egress from Sydney to Jakarta",
+				apiDescription: "Network Inter Region Data Transfer Out from Sydney to Jakarta",
 				usageKey:       "oceania",
 				fixedRegion:    "australia-southeast1",
 			},
 			{
 				gRegion:        fmt.Sprintf("%s between continents (excludes Oceania)", prefixName),
-				apiDescription: "Network Vpn Inter Region Egress from Finland to Singapore",
+				apiDescription: "Network Inter Region Data Transfer Out from Finland to Singapore",
 				usageKey:       "worldwide",
 				fixedRegion:    "europe-north1",
 			},
