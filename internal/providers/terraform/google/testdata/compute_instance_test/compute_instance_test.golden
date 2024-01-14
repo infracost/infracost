@@ -23,13 +23,13 @@
  └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40 
                                                                                                     
  google_compute_instance.custom_n2d                                                                 
- ├─ Custom instance CPU (Linux/UNIX, preemptible, N2D 4 vCPUs)             730  hours        $14.02 
- ├─ Custom Instance RAM (Linux/UNIX, preemptible, N2D 20 GB)               730  hours         $9.43 
+ ├─ Custom instance CPU (Linux/UNIX, preemptible, N2D 4 vCPUs)             730  hours        $16.94 
+ ├─ Custom Instance RAM (Linux/UNIX, preemptible, N2D 20 GB)               730  hours        $11.39 
  └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40 
                                                                                                     
  google_compute_instance.custom_preemptible                                                         
- ├─ Custom instance CPU (Linux/UNIX, preemptible, N1 6 vCPUs)              730  hours        $30.57 
- ├─ Custom Instance RAM (Linux/UNIX, preemptible, N1 20 GB)                730  hours        $13.72 
+ ├─ Custom instance CPU (Linux/UNIX, preemptible, N1 6 vCPUs)              730  hours        $29.04 
+ ├─ Custom Instance RAM (Linux/UNIX, preemptible, N1 20 GB)                730  hours        $13.04 
  └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40 
                                                                                                     
  google_compute_instance.gpu                                                                        
@@ -52,14 +52,14 @@
  └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40 
                                                                                                     
  google_compute_instance.preemptible_gpu                                                            
- ├─ Instance usage (Linux/UNIX, preemptible, n1-standard-16)               730  hours       $116.80 
+ ├─ Instance usage (Linux/UNIX, preemptible, n1-standard-16)               730  hours       $110.92 
  ├─ Standard provisioned storage (pd-standard)                              10  GB            $0.40 
- └─ NVIDIA Tesla K80 (preemptible)                                       2,920  hours       $525.60 
+ └─ NVIDIA Tesla K80 (preemptible)                                       2,920  hours       $446.76 
                                                                                                     
  google_compute_instance.preemptible_local_ssd                                                      
  ├─ Instance usage (Linux/UNIX, preemptible, f1-micro)                     730  hours         $2.56 
  ├─ Standard provisioned storage (pd-standard)                              10  GB            $0.40 
- └─ Local SSD provisioned storage                                          375  GB           $19.80 
+ └─ Local SSD provisioned storage                                          375  GB           $23.78 
                                                                                                     
  google_compute_instance.ssd                                                                        
  ├─ Instance usage (Linux/UNIX, on-demand, f1-micro)                       730  hours         $3.88 
@@ -81,7 +81,7 @@
  ├─ Instance usage (Linux/UNIX, on-demand, f1-micro)                       100  hours         $0.76 
  └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40 
                                                                                                     
- OVERALL TOTAL                                                                            $9,524.91 
+ OVERALL TOTAL                                                                            $9,446.82 
 ──────────────────────────────────
 18 cloud resources were detected:
 ∙ 17 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
@@ -91,7 +91,7 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestComputeInstanceGoldenFile                      ┃ $9,525       ┃
+┃ TestComputeInstanceGoldenFile                      ┃ $9,447       ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 Logs:
 
