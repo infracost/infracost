@@ -168,7 +168,7 @@ func standardPremiumDiskCostComponents(region string, diskTypePrefix string, sto
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "productName", Value: strPtr(productName)},
 					{Key: "skuName", Value: strPtr(fmt.Sprintf("%s %s", diskName, storageReplicationType))},
-					{Key: "meterName", Value: strPtr("Disk Operations")},
+					{Key: "meterName", ValueRegex: regexPtr("Disk Operations$")},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
