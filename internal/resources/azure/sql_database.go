@@ -490,15 +490,21 @@ func mssqlStorageCostComponent(region string, tier string, zoneRedundant bool, m
 
 	productNameRegex := fmt.Sprintf("/%s - Storage/", storageTier)
 
+	filters := []*schema.AttributeFilter{
+		{Key: "productName", ValueRegex: strPtr(productNameRegex)},
+		{Key: "skuName", Value: strPtr(skuName)},
+		{Key: "meterName", ValueRegex: regexPtr("Data Stored$")},
+	}
+
+	if skuName == "Hyperscale" {
+		filters = append(filters, &schema.AttributeFilter{Key: "armSkuName", Value: strPtr(skuName)})
+	}
+
 	return &schema.CostComponent{
 		Name:            "Storage",
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: storageGB,
-		ProductFilter: mssqlProductFilter(region, []*schema.AttributeFilter{
-			{Key: "productName", ValueRegex: strPtr(productNameRegex)},
-			{Key: "skuName", Value: strPtr(skuName)},
-			{Key: "meterName", ValueRegex: regexPtr("Data Stored$")},
-		}),
+		ProductFilter:   mssqlProductFilter(region, filters),
 	}
 }
