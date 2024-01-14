@@ -47,7 +47,7 @@ func (r *ConfigConfigurationRecorder) BuildResource() *schema.Resource {
 			Service:       strPtr("AWSConfig"),
 			ProductFamily: strPtr("Management Tools - AWS Config"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr("/ConfigurationItemRecorded/")},
+				{Key: "usagetype", ValueRegex: regexPtr("ConfigurationItemRecorded$")},
 			},
 		},
 	})
@@ -63,7 +63,7 @@ func (r *ConfigConfigurationRecorder) BuildResource() *schema.Resource {
 			Service:       strPtr("AWSConfig"),
 			ProductFamily: strPtr("Management Tools - AWS Config"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr("/CustomConfigItemRecorded/")},
+				{Key: "usagetype", ValueRegex: regexPtr("CustomConfigItemRecorded$")},
 			},
 		},
 	})
