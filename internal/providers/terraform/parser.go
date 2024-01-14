@@ -508,10 +508,7 @@ func getProviderPrefix(resourceType string) string {
 }
 
 func parseProviderKey(resConf gjson.Result) string {
-	v := resConf.Get("provider_config_key").String()
-	p := strings.Split(v, ":")
-
-	return p[len(p)-1]
+	return resConf.Get("provider_config_key").String()
 }
 
 func parseRegion(providerConf gjson.Result, vars gjson.Result, providerKey string) string {

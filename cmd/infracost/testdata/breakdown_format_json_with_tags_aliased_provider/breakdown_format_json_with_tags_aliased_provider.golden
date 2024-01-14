@@ -38,7 +38,7 @@
           {
             "name": "module.mymod_aliased.module.mysub_aliased.module.mysubsub_own.aws_sqs_queue.sqs_withTag_mysubsub_own",
             "tags": {
-              "DefaultNotOverride": "defaultnotoverride-aws.env",
+              "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
               "DefaultOverride": "sqs-def",
               "ResourceTag": "sqs-hi"
             }
@@ -62,7 +62,7 @@
           {
             "name": "module.mymod_aliased.module.mysub_implicit.module.mysubsub_own.aws_sqs_queue.sqs_withTag_mysubsub_own",
             "tags": {
-              "DefaultNotOverride": "defaultnotoverride-aws.env",
+              "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
               "DefaultOverride": "sqs-def",
               "ResourceTag": "sqs-hi"
             }
@@ -70,7 +70,7 @@
           {
             "name": "module.mymod_implicit.aws_sqs_queue.sqs_withTags_mymod_implicit",
             "tags": {
-              "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
+              "DefaultNotOverride": "defaultnotoverride-aws",
               "DefaultOverride": "sqs-def",
               "ResourceTag": "sqs-hi"
             }
@@ -78,7 +78,7 @@
           {
             "name": "module.mymod_implicit.module.mysub_implicit.aws_sqs_queue.sqs_withTag_mysub_implicit",
             "tags": {
-              "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
+              "DefaultNotOverride": "defaultnotoverride-aws",
               "DefaultOverride": "sqs-def",
               "ResourceTag": "sqs-hi"
             }
@@ -86,7 +86,7 @@
           {
             "name": "module.mymod_implicit.module.mysub_implicit.module.mysubsub_implict.aws_sqs_queue.sqs_withTag_mysubsub_implict",
             "tags": {
-              "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
+              "DefaultNotOverride": "defaultnotoverride-aws",
               "DefaultOverride": "sqs-def",
               "ResourceTag": "sqs-hi"
             }
@@ -102,7 +102,7 @@
           {
             "name": "module.mymod_own.aws_sqs_queue.sqs_withTags_mymod_own",
             "tags": {
-              "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
+              "DefaultNotOverride": "defaultnotoverride-own-provider",
               "DefaultOverride": "sqs-def",
               "ResourceTag": "sqs-hi"
             }
@@ -110,7 +110,7 @@
           {
             "name": "module.mymod_own.module.mysub_aliased.aws_sqs_queue.sqs_withTags_mysub_aliased",
             "tags": {
-              "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
+              "DefaultNotOverride": "defaultnotoverride-own-provider",
               "DefaultOverride": "sqs-def",
               "ResourceTag": "sqs-hi"
             }
@@ -118,7 +118,7 @@
           {
             "name": "module.mymod_own.module.mysub_aliased.module.mysubsub_aliased.aws_sqs_queue.sqs_withTag_mysubsub_aliased",
             "tags": {
-              "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
+              "DefaultNotOverride": "defaultnotoverride-own-provider",
               "DefaultOverride": "sqs-def",
               "ResourceTag": "sqs-hi"
             }
@@ -126,7 +126,7 @@
           {
             "name": "module.mymod_own.module.mysub_aliased.module.mysubsub_implict.aws_sqs_queue.sqs_withTag_mysubsub_implict",
             "tags": {
-              "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
+              "DefaultNotOverride": "defaultnotoverride-own-provider",
               "DefaultOverride": "sqs-def",
               "ResourceTag": "sqs-hi"
             }
@@ -142,7 +142,7 @@
           {
             "name": "module.mymod_own.module.mysub_implicit.aws_sqs_queue.sqs_withTag_mysub_implicit",
             "tags": {
-              "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
+              "DefaultNotOverride": "defaultnotoverride-aws",
               "DefaultOverride": "sqs-def",
               "ResourceTag": "sqs-hi"
             }
@@ -150,7 +150,7 @@
           {
             "name": "module.mymod_own.module.mysub_implicit.module.mysubsub_implict.aws_sqs_queue.sqs_withTag_mysubsub_implict",
             "tags": {
-              "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
+              "DefaultNotOverride": "defaultnotoverride-aws",
               "DefaultOverride": "sqs-def",
               "ResourceTag": "sqs-hi"
             }
@@ -167,6 +167,48 @@
       },
       "metadata": {
         "providers": [
+          {
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
+              "DefaultOverride": "defaultoverride-subsub-own-provider"
+            },
+            "name": "aws"
+          },
+          {
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
+              "DefaultOverride": "defaultoverride-subsub-own-provider"
+            },
+            "name": "aws"
+          },
+          {
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
+              "DefaultOverride": "defaultoverride-subsub-own-provider"
+            },
+            "name": "aws"
+          },
+          {
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
+              "DefaultOverride": "defaultoverride-subsub-own-provider"
+            },
+            "name": "aws"
+          },
+          {
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride-own-provider",
+              "DefaultOverride": "defaultoverride-own-provider"
+            },
+            "name": "aws"
+          },
+          {
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride-aws",
+              "DefaultOverride": "defaultoverride-aws"
+            },
+            "name": "aws"
+          },
           {
             "defaultTags": {
               "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",

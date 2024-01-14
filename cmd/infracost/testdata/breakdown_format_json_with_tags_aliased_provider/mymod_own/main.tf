@@ -7,8 +7,8 @@ provider "aws" {
 
   default_tags {
     tags = {
-      DefaultNotOverride = "defaultnotoverride-subsub-own-provider"
-      DefaultOverride    = "defaultoverride-subsub-own-provider"
+      DefaultNotOverride = "defaultnotoverride-own-provider"
+      DefaultOverride    = "defaultoverride-own-provider"
     }
   }
 }

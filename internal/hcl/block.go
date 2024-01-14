@@ -742,6 +742,13 @@ func (b *Block) Provider() string {
 	return ""
 }
 
+// ProviderConfigKey looks up the key used to reference the provider in the "configuration.providers"
+// section of the terraform plan json.  This should be used to set the "provider_config_key "
+// of the resource in the "configuration.resources" section of plan json.
+func (b *Block) ProviderConfigKey() string {
+	return getFromProvider(b, b.Provider(), "config_key").AsString()
+}
+
 // GetChildBlock is a helper method around GetChildBlocks. It returns the first non nil child block matching name.
 func (b *Block) GetChildBlock(name string) *Block {
 	blocks := b.GetChildBlocks(name)
@@ -1032,6 +1039,22 @@ func (b *Block) values() cty.Value {
 				values[key] = cty.ListVal([]cty.Value{child.values()})
 			}
 		}
+
+		// Add config_key as a value of the provider so resources can lookup the
+		// correct provider_config_key using `getFromProvider(provider, "config_key")`
+		configKey := b.Label()
+
+		var alias string
+		_ = gocty.FromCtyValue(values["alias"], &alias)
+		if alias != "" {
+			configKey = configKey + "." + alias
+		}
+
+		if b.ModuleAddress() != "" {
+			configKey = b.ModuleAddress() + ":" + configKey
+		}
+
+		values["config_key"] = cty.StringVal(configKey)
 	}
 
 	return cty.ObjectVal(values)
@@ -1275,7 +1298,7 @@ func awsCurrentRegion(b *Block) cty.Value {
 }
 
 func awsDefaultTagValues(b *Block) cty.Value {
-	defaultTags := GetFromProvider(b, "aws", "default_tags")
+	defaultTags := getFromProvider(b, "aws", "default_tags")
 	if defaultTags.IsKnown() && defaultTags.CanIterateElements() {
 		tags := defaultTags.AsValueSlice()
 		if len(tags) > 0 {
@@ -1372,7 +1395,7 @@ func awsAvailabilityZonesValues(b *Block) cty.Value {
 }
 
 func getRegionFromProvider(b *Block, provider string) string {
-	val := GetFromProvider(b, provider, "region")
+	val := getFromProvider(b, provider, "region")
 
 	var str string
 	err := gocty.FromCtyValue(val, &str)
@@ -1387,10 +1410,10 @@ func getRegionFromProvider(b *Block, provider string) string {
 	return str
 }
 
-// GetFromProvider returns the value of the given key from provider the block is
+// getFromProvider returns the value of the given key from provider the block is
 // associated with. This is either the default provider or the provider
 // explicitly set on the block (e.g. if a resource has a "provider" attribute).
-func GetFromProvider(b *Block, provider, key string) cty.Value {
+func getFromProvider(b *Block, provider, key string) cty.Value {
 	val := b.context.Get(provider, key)
 
 	attr := b.GetAttribute("provider")

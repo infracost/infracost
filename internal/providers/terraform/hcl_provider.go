@@ -558,35 +558,14 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 	planned.Values = jsonValues
 	changes.Change.After = jsonValues
 
-	providerConfigKey := strings.Split(block.TypeLabel(), "_")[0]
-
-	providerAttr := block.GetAttribute("provider")
-	if providerAttr != nil {
-		r, err := providerAttr.Reference()
-		if err == nil {
-			providerConfigKey = r.String()
-		}
-
-		value := providerAttr.AsString()
-		if err != nil && value != "" {
-			providerConfigKey = value
-		}
-	}
-
 	var configuration ResourceData
 	if block.HasModuleBlock() {
-		providerConfigKey = block.Provider()
-		var providerAlias string
-		_ = gocty.FromCtyValue(hcl.GetFromProvider(block, block.Provider(), "alias"), &providerAlias)
-		if providerAlias != "" {
-			providerConfigKey += "." + providerAlias
-		}
 		configuration = ResourceData{
 			Address:           stripCountOrForEach(block.LocalName()),
 			Mode:              "managed",
 			Type:              block.TypeLabel(),
 			Name:              stripCountOrForEach(block.NameLabel()),
-			ProviderConfigKey: block.ModuleName() + ":" + providerConfigKey,
+			ProviderConfigKey: block.ProviderConfigKey(),
 			Expressions:       blockToReferences(block),
 			CountExpression:   p.countReferences(block),
 		}
@@ -596,7 +575,7 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 			Mode:              "managed",
 			Type:              block.TypeLabel(),
 			Name:              stripCountOrForEach(block.NameLabel()),
-			ProviderConfigKey: providerConfigKey,
+			ProviderConfigKey: block.ProviderConfigKey(),
 			Expressions:       blockToReferences(block),
 			CountExpression:   p.countReferences(block),
 		}
@@ -611,6 +590,8 @@ func (p *HCLProvider) getResourceOutput(block *hcl.Block) ResourceOutput {
 }
 
 func (p *HCLProvider) marshalProviderBlock(block *hcl.Block) string {
+	providerConfigKey := block.Values().GetAttr("config_key").AsString()
+
 	name := block.TypeLabel()
 	if a := block.GetAttribute("alias"); a != nil {
 		name = name + "." + a.AsString()
@@ -618,7 +599,7 @@ func (p *HCLProvider) marshalProviderBlock(block *hcl.Block) string {
 
 	region := block.GetAttribute("region").AsString()
 
-	p.schema.Configuration.ProviderConfig[name] = ProviderConfig{
+	p.schema.Configuration.ProviderConfig[providerConfigKey] = ProviderConfig{
 		Name: name,
 		Expressions: map[string]interface{}{
 			"region": map[string]interface{}{
@@ -634,7 +615,7 @@ func (p *HCLProvider) marshalProviderBlock(block *hcl.Block) string {
 
 	defaultTags := p.marshalDefaultTagsBlock(block)
 	if defaultTags != nil {
-		p.schema.Configuration.ProviderConfig[name].Expressions["default_tags"] = []map[string]interface{}{defaultTags}
+		p.schema.Configuration.ProviderConfig[providerConfigKey].Expressions["default_tags"] = []map[string]interface{}{defaultTags}
 	}
 
 	return name
