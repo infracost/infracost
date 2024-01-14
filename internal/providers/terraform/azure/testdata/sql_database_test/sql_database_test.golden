@@ -40,7 +40,7 @@
  azurerm_sql_database.sql_database_with_edition_hyper                                                       
  ├─ Compute (provisioned, HS_Gen5_2)                                    730  hours                  $266.68 
  ├─ Read replicas                                            Monthly cost depends on usage: $0.37 per hours 
- └─ Storage                                                               5  GB                       $0.50 
+ └─ Storage                                                               5  GB                       $1.25 
                                                                                                             
  azurerm_sql_database.sql_database_with_edition_premium                                                     
  ├─ Compute (P1)                                                        730  hours                  $456.25 
@@ -64,7 +64,7 @@
  ├─ Long-term retention (RA-GRS)                             Monthly cost depends on usage: $0.05 per GB    
  └─ PITR backup storage (RA-GRS)                             Monthly cost depends on usage: $0.20 per GB    
                                                                                                             
- OVERALL TOTAL                                                                                    $7,025.12 
+ OVERALL TOTAL                                                                                    $7,025.87 
 ──────────────────────────────────
 13 cloud resources were detected:
 ∙ 11 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
@@ -75,7 +75,7 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestSQLDatabase                                    ┃ $7,025       ┃
+┃ TestSQLDatabase                                    ┃ $7,026       ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 Logs:
 

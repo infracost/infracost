@@ -78,13 +78,13 @@
  ├─ Compute (provisioned, HS_Gen5_2)                                      730  hours                      $266.68 
  ├─ Read replicas                                            Monthly cost depends on usage: $0.37 per hours       
  ├─ SQL license                                                         1,460  vCore-hours                $145.95 
- └─ Storage                                                               100  GB                          $10.00 
+ └─ Storage                                                               100  GB                          $25.00 
                                                                                                                   
  azurerm_mssql_database.hyperscale_gen_with_replicas                                                              
  ├─ Compute (provisioned, HS_Gen5_2)                                      730  hours                      $266.68 
  ├─ Read replicas                                                       1,460  hours                      $533.37 
  ├─ SQL license                                                         1,460  vCore-hours                $145.95 
- └─ Storage                                                                 5  GB                           $0.50 
+ └─ Storage                                                                 5  GB                           $1.25 
                                                                                                                   
  azurerm_mssql_database.premium6                                                                                  
  ├─ Compute (P6)                                                          730  hours                    $3,650.00 
@@ -116,7 +116,7 @@
  ├─ Long-term retention (RA-GRS)                             Monthly cost depends on usage: $0.05 per GB          
  └─ PITR backup storage (RA-GRS)                             Monthly cost depends on usage: $0.20 per GB          
                                                                                                                   
- OVERALL TOTAL                                                                                         $31,569.62 
+ OVERALL TOTAL                                                                                         $31,585.37 
 ──────────────────────────────────
 20 cloud resources were detected:
 ∙ 18 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
@@ -127,7 +127,7 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestMSSQLDatabase                                  ┃ $31,570      ┃
+┃ TestMSSQLDatabase                                  ┃ $31,585      ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 Logs:
 
