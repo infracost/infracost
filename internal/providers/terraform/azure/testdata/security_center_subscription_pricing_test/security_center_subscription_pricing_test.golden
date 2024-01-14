@@ -9,7 +9,7 @@
  └─ Defender for app service                                                                                Monthly cost depends on usage: $14.60 per node             
                                                                                                                                                                        
  azurerm_security_center_subscription_pricing.standard_example["Arm"]                                                                                                  
- └─ Defender for ARM                                                                                        Monthly cost depends on usage: $4.00 per 1M API calls      
+ └─ Defender for ARM                                                                                        Monthly cost depends on usage: $5.04 per subscription      
                                                                                                                                                                        
  azurerm_security_center_subscription_pricing.standard_example["ContainerRegistry"]                                                                                    
  └─ Defender for container registries                                                                       Monthly cost depends on usage: $0.29 per image             
@@ -24,7 +24,7 @@
  └─ Defender for DNS                                                                                        Monthly cost depends on usage: $0.70 per 1M queries        
                                                                                                                                                                        
  azurerm_security_center_subscription_pricing.standard_example["KeyVaults"]                                                                                            
- └─ Defender for Key Vault                                                                                  Monthly cost depends on usage: $0.02 per 10K transactions  
+ └─ Defender for Key Vault                                                                                  Monthly cost depends on usage: $0.25 per key vault         
                                                                                                                                                                        
  azurerm_security_center_subscription_pricing.standard_example["KubernetesService"]                                                                                    
  └─ Defender for kubernetes                                                                                 Monthly cost depends on usage: $1.96 per core              
@@ -51,7 +51,7 @@
  └─ Defender for app service                                                                                                12  node                           $175.20 
                                                                                                                                                                        
  azurerm_security_center_subscription_pricing.standard_example_with_usage["Arm"]                                                                                       
- └─ Defender for ARM                                                                                                        14  1M API calls                    $56.00 
+ └─ Defender for ARM                                                                                                        14  subscription                    $70.52 
                                                                                                                                                                        
  azurerm_security_center_subscription_pricing.standard_example_with_usage["ContainerRegistry"]                                                                         
  └─ Defender for container registries                                                                                       17  image                            $4.93 
@@ -66,7 +66,7 @@
  └─ Defender for DNS                                                                                                        15  1M queries                      $10.50 
                                                                                                                                                                        
  azurerm_security_center_subscription_pricing.standard_example_with_usage["KeyVaults"]                                                                                 
- └─ Defender for Key Vault                                                                                                  13  10K transactions                 $0.26 
+ └─ Defender for Key Vault                                                                                                  13  key vault                        $3.23 
                                                                                                                                                                        
  azurerm_security_center_subscription_pricing.standard_example_with_usage["KubernetesService"]                                                                         
  └─ Defender for kubernetes                                                                                                 16  core                            $31.30 
@@ -89,7 +89,7 @@
  ├─ Defender for servers, plan 1                                                                                             1  server                           $4.91 
  └─ Defender for servers, plan 2                                                                                             2  server                          $29.20 
                                                                                                                                                                        
- OVERALL TOTAL                                                                                                                                                 $876.11 
+ OVERALL TOTAL                                                                                                                                                 $893.59 
 ──────────────────────────────────
 30 cloud resources were detected:
 ∙ 29 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
@@ -99,7 +99,7 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestSecurityCenterSubscriptionPricing              ┃ $876         ┃
+┃ TestSecurityCenterSubscriptionPricing              ┃ $894         ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 Logs:
 

@@ -36,10 +36,10 @@ type SecurityCenterSubscriptionPricing struct {
 
 	MonthlyStorageAccounts *float64 `infracost_usage:"monthly_storage_accounts"`
 
-	MonthlyAppServiceNodes      *float64 `infracost_usage:"monthly_app_service_nodes"`
-	MonthlyKeyVaultTransactions *int64   `infracost_usage:"monthly_key_vault_transactions"`
-	MonthlyARMAPICalls          *int64   `infracost_usage:"monthly_arm_api_calls"`
-	MonthlyDNSQueries           *int64   `infracost_usage:"monthly_dns_queries"`
+	MonthlyAppServiceNodes  *float64 `infracost_usage:"monthly_app_service_nodes"`
+	MonthlyKeyVaults        *int64   `infracost_usage:"monthly_key_vaults"`
+	MonthlyARMSubscriptions *int64   `infracost_usage:"monthly_arm_subscriptions"`
+	MonthlyDNSQueries       *int64   `infracost_usage:"monthly_dns_queries"`
 
 	MonthlyKubernetesCores *float64 `infracost_usage:"monthly_kubernetes_cores"`
 }
@@ -133,7 +133,7 @@ func (r *SecurityCenterSubscriptionPricing) addServersP1CostComponent() *schema.
 			VendorName:    strPtr("azure"),
 			Region:        r.normalizedRegion(),
 			ProductFamily: strPtr("Security"),
-			Service:       strPtr("Security Center"),
+			Service:       strPtr("Microsoft Defender for Cloud"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("Microsoft Defender for Servers")},
 				{Key: "meterName", Value: strPtr("Standard P1 Node")},
@@ -157,7 +157,7 @@ func (r *SecurityCenterSubscriptionPricing) addServersP2CostComponent() *schema.
 			VendorName:    strPtr("azure"),
 			Region:        r.normalizedRegion(),
 			ProductFamily: strPtr("Security"),
-			Service:       strPtr("Security Center"),
+			Service:       strPtr("Microsoft Defender for Cloud"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("Microsoft Defender for Servers")},
 				{Key: "meterName", Value: strPtr("Standard P2 Node")},
@@ -181,7 +181,7 @@ func (r *SecurityCenterSubscriptionPricing) addContainersCostComponent() *schema
 			VendorName:    strPtr("azure"),
 			Region:        r.normalizedRegion(),
 			ProductFamily: strPtr("Security"),
-			Service:       strPtr("Azure Defender"),
+			Service:       strPtr("Microsoft Defender for Cloud"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("Microsoft Defender for Containers")},
 				{Key: "meterName", Value: strPtr("Standard vCore vCore Pack")},
@@ -205,7 +205,7 @@ func (r *SecurityCenterSubscriptionPricing) addSQLAzureConnectedCostComponent() 
 			VendorName:    strPtr("azure"),
 			Region:        r.normalizedRegion(),
 			ProductFamily: strPtr("Security"),
-			Service:       strPtr("Advanced Data Security"),
+			Service:       strPtr("Microsoft Defender for Cloud"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("Microsoft Defender for SQL")},
 				{Key: "meterName", Value: strPtr("Standard Node")},
@@ -229,7 +229,7 @@ func (r *SecurityCenterSubscriptionPricing) addSQLOutsideAzureCostComponent() *s
 			VendorName:    strPtr("azure"),
 			Region:        r.normalizedRegion(),
 			ProductFamily: strPtr("Security"),
-			Service:       strPtr("Advanced Data Security"),
+			Service:       strPtr("Microsoft Defender for Cloud"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("Microsoft Defender for SQL")},
 				{Key: "meterName", Value: strPtr("Standard vCore")},
@@ -253,7 +253,7 @@ func (r *SecurityCenterSubscriptionPricing) addMySQLCostComponent() *schema.Cost
 			VendorName:    strPtr("azure"),
 			Region:        r.normalizedRegion(),
 			ProductFamily: strPtr("Security"),
-			Service:       strPtr("Advanced Threat Protection"),
+			Service:       strPtr("Microsoft Defender for Cloud"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("Microsoft Defender for MySQL")},
 				{Key: "meterName", Value: strPtr("Standard Node")},
@@ -277,7 +277,7 @@ func (r *SecurityCenterSubscriptionPricing) addPostgreSQLCostComponent() *schema
 			VendorName:    strPtr("azure"),
 			Region:        r.normalizedRegion(),
 			ProductFamily: strPtr("Security"),
-			Service:       strPtr("Advanced Threat Protection"),
+			Service:       strPtr("Microsoft Defender for Cloud"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("Microsoft Defender for PostgreSQL")},
 				{Key: "meterName", Value: strPtr("Standard Node")},
@@ -307,7 +307,7 @@ func (r *SecurityCenterSubscriptionPricing) addMariaDBCostComponent() *schema.Co
 			VendorName:    strPtr("azure"),
 			Region:        region,
 			ProductFamily: strPtr("Security"),
-			Service:       strPtr("Azure Defender"),
+			Service:       strPtr("Microsoft Defender for Cloud"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("Microsoft Defender for MariaDB")},
 				{Key: "meterName", Value: strPtr("Standard Instance")},
@@ -331,7 +331,7 @@ func (r *SecurityCenterSubscriptionPricing) addCosmosDBCostComponent() *schema.C
 			VendorName:    strPtr("azure"),
 			Region:        r.normalizedRegion(),
 			ProductFamily: strPtr("Security"),
-			Service:       strPtr("Azure Defender"),
+			Service:       strPtr("Microsoft Defender for Cloud"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("Microsoft Defender for Azure Cosmos DB")},
 				{Key: "meterName", Value: strPtr("Standard 100 RU/s")},
@@ -355,7 +355,7 @@ func (r *SecurityCenterSubscriptionPricing) addStorageCostComponent() *schema.Co
 			VendorName:    strPtr("azure"),
 			Region:        r.normalizedRegion(),
 			ProductFamily: strPtr("Security"),
-			Service:       strPtr("Advanced Threat Protection"),
+			Service:       strPtr("Microsoft Defender for Cloud"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("Microsoft Defender for Storage")},
 				{Key: "meterName", Value: strPtr("Standard Node")},
@@ -379,7 +379,7 @@ func (r *SecurityCenterSubscriptionPricing) addAppServiceCostComponent() *schema
 			VendorName:    strPtr("azure"),
 			Region:        r.normalizedRegion(),
 			ProductFamily: strPtr("Security"),
-			Service:       strPtr("Security Center"),
+			Service:       strPtr("Microsoft Defender for Cloud"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("Microsoft Defender for App Service")},
 				{Key: "meterName", Value: strPtr("Standard Node")},
@@ -389,33 +389,9 @@ func (r *SecurityCenterSubscriptionPricing) addAppServiceCostComponent() *schema
 }
 
 func (r *SecurityCenterSubscriptionPricing) addKeyVaultCostComponent() *schema.CostComponent {
-	var transactions *decimal.Decimal
-	if r.MonthlyKeyVaultTransactions != nil {
-		transactions = decimalPtr(decimal.NewFromInt(*r.MonthlyKeyVaultTransactions).Div(decimal.NewFromInt(10000)))
-	}
-
-	return &schema.CostComponent{
-		Name:            "Defender for Key Vault",
-		Unit:            "10K transactions",
-		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: transactions,
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("azure"),
-			Region:        r.normalizedRegion(),
-			ProductFamily: strPtr("Security"),
-			Service:       strPtr("Advanced Threat Protection"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", Value: strPtr("Microsoft Defender for Key Vault")},
-				{Key: "meterName", Value: strPtr("Standard Transactions")},
-			},
-		},
-	}
-}
-
-func (r *SecurityCenterSubscriptionPricing) addARMCostComponent() *schema.CostComponent {
-	var apiCalls *decimal.Decimal
-	if r.MonthlyARMAPICalls != nil {
-		apiCalls = decimalPtr(decimal.NewFromInt(*r.MonthlyARMAPICalls).Div(decimal.NewFromInt(1000000)))
+	var keyVaults *decimal.Decimal
+	if r.MonthlyKeyVaults != nil {
+		keyVaults = decimalPtr(decimal.NewFromInt(*r.MonthlyKeyVaults))
 	}
 
 	region := r.normalizedRegion()
@@ -425,18 +401,48 @@ func (r *SecurityCenterSubscriptionPricing) addARMCostComponent() *schema.CostCo
 	}
 
 	return &schema.CostComponent{
-		Name:            "Defender for ARM",
-		Unit:            "1M API calls",
-		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: apiCalls,
+		Name:           "Defender for Key Vault",
+		Unit:           "key vault",
+		UnitMultiplier: schema.HourToMonthUnitMultiplier,
+		HourlyQuantity: keyVaults,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        region,
 			ProductFamily: strPtr("Security"),
-			Service:       strPtr("Advanced Threat Protection"),
+			Service:       strPtr("Microsoft Defender for Cloud"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "productName", Value: strPtr("Microsoft Defender for Key Vault")},
+				{Key: "meterName", Value: strPtr("Per node Std Node")},
+			},
+		},
+	}
+}
+
+func (r *SecurityCenterSubscriptionPricing) addARMCostComponent() *schema.CostComponent {
+	var subscriptions *decimal.Decimal
+	if r.MonthlyARMSubscriptions != nil {
+		subscriptions = decimalPtr(decimal.NewFromInt(*r.MonthlyARMSubscriptions))
+	}
+
+	region := r.normalizedRegion()
+	if *region == "Global" {
+		// force to west-us2 since price is not available in Global
+		region = strPtr("westus2")
+	}
+
+	return &schema.CostComponent{
+		Name:           "Defender for ARM",
+		Unit:           "subscription",
+		UnitMultiplier: schema.HourToMonthUnitMultiplier,
+		HourlyQuantity: subscriptions,
+		ProductFilter: &schema.ProductFilter{
+			VendorName:    strPtr("azure"),
+			Region:        region,
+			ProductFamily: strPtr("Security"),
+			Service:       strPtr("Microsoft Defender for Cloud"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("Microsoft Defender for Resource Manager")},
-				{Key: "meterName", Value: strPtr("Standard Events")},
+				{Key: "meterName", Value: strPtr("Per node Std Node")},
 			},
 		},
 	}
@@ -463,7 +469,7 @@ func (r *SecurityCenterSubscriptionPricing) addDNSCostComponent() *schema.CostCo
 			VendorName:    strPtr("azure"),
 			Region:        region,
 			ProductFamily: strPtr("Security"),
-			Service:       strPtr("Advanced Threat Protection"),
+			Service:       strPtr("Microsoft Defender for Cloud"),
 			AttributeFilters: []*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("Microsoft Defender for DNS")},
 				{Key: "meterName", Value: strPtr("Standard Queries")},
