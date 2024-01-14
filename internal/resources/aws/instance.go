@@ -267,6 +267,9 @@ func (a *Instance) detailedMonitoringCostComponent() *schema.CostComponent {
 			Region:        strPtr(a.Region),
 			Service:       strPtr("AmazonCloudWatch"),
 			ProductFamily: strPtr("Metric"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "group", Value: strPtr("Metric")},
+			},
 		},
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr("0"),
