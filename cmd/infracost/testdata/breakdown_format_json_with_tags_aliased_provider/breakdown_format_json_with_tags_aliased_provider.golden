@@ -169,6 +169,27 @@
         "providers": [
           {
             "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride-aws",
+              "DefaultOverride": "defaultoverride-aws"
+            },
+            "name": "aws"
+          },
+          {
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride-aws.env",
+              "DefaultOverride": "defaultoverride-aws.env"
+            },
+            "name": "aws.env"
+          },
+          {
+            "defaultTags": {
+              "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
+              "DefaultOverride": "defaultoverride-subsub-own-provider"
+            },
+            "name": "aws"
+          },
+          {
+            "defaultTags": {
               "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
               "DefaultOverride": "defaultoverride-subsub-own-provider"
             },
@@ -201,27 +222,6 @@
               "DefaultOverride": "defaultoverride-own-provider"
             },
             "name": "aws"
-          },
-          {
-            "defaultTags": {
-              "DefaultNotOverride": "defaultnotoverride-aws",
-              "DefaultOverride": "defaultoverride-aws"
-            },
-            "name": "aws"
-          },
-          {
-            "defaultTags": {
-              "DefaultNotOverride": "defaultnotoverride-subsub-own-provider",
-              "DefaultOverride": "defaultoverride-subsub-own-provider"
-            },
-            "name": "aws"
-          },
-          {
-            "defaultTags": {
-              "DefaultNotOverride": "defaultnotoverride-aws.env",
-              "DefaultOverride": "defaultoverride-aws.env"
-            },
-            "name": "aws.env"
           }
         ]
       },

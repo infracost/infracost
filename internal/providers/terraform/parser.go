@@ -239,7 +239,17 @@ func collectModulesSourceUrls(moduleCalls []gjson.Result) []string {
 func parseProviderConfig(providerConf gjson.Result) []schema.ProviderMetadata {
 	var metadatas []schema.ProviderMetadata
 
-	for _, conf := range providerConf.Map() {
+	confMap := providerConf.Map()
+
+	// Sort the metadata by configKey so any outputted JSON is deterministic
+	var keys = make([]string, 0, len(confMap))
+	for k := range confMap {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	for _, k := range keys {
+		conf := confMap[k]
 		md := schema.ProviderMetadata{
 			Name:      conf.Get("name").String(),
 			Filename:  conf.Get("infracost_metadata.filename").String(),
@@ -259,11 +269,6 @@ func parseProviderConfig(providerConf gjson.Result) []schema.ProviderMetadata {
 
 		metadatas = append(metadatas, md)
 	}
-
-	// Sort the metadata by name so any outputted JSON is deterministic
-	sort.Slice(metadatas, func(i, j int) bool {
-		return metadatas[i].Name < metadatas[j].Name
-	})
 
 	return metadatas
 }
