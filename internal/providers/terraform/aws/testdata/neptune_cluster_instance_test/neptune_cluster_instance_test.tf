@@ -38,3 +38,20 @@ resource "aws_neptune_cluster_instance" "dbT3WithoutUsage" {
   instance_class     = "db.t3.medium"
   apply_immediately  = true
 }
+
+resource "aws_neptune_cluster" "iooptimized" {
+  cluster_identifier                  = "neptune-cluster-iooptimized"
+  engine                              = "neptune"
+  preferred_backup_window             = "07:00-09:00"
+  storage_type                        = "iopt1"
+  skip_final_snapshot                 = true
+  iam_database_authentication_enabled = true
+  apply_immediately                   = true
+}
+
+resource "aws_neptune_cluster_instance" "dbT3Medium-iooptimized" {
+  cluster_identifier = aws_neptune_cluster.iooptimized.id
+  engine             = "neptune"
+  instance_class     = "db.t3.medium"
+  apply_immediately  = true
+}
