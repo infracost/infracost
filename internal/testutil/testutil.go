@@ -13,6 +13,7 @@ import (
 	"unicode"
 
 	"github.com/pmezard/go-difflib/difflib"
+	"github.com/rs/zerolog"
 	"github.com/shopspring/decimal"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -219,7 +220,7 @@ func ConfigureTestToCaptureLogs(t *testing.T, runCtx *config.RunContext) *bytes.
 	logBuf := bytes.NewBuffer([]byte{})
 	runCtx.Config.LogLevel = "warn"
 	runCtx.Config.SetLogDisableTimestamps(true)
-	runCtx.Config.SetLogWriter(io.MultiWriter(os.Stderr, logBuf))
+	runCtx.Config.SetLogWriter(zerolog.SyncWriter(io.MultiWriter(os.Stderr, logBuf)))
 
 	err := logging.ConfigureBaseLogger(runCtx.Config)
 	require.Nil(t, err)
