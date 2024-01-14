@@ -92,7 +92,7 @@ func (r *LB) applicationLBCostComponents(maxLCU *decimal.Decimal) []*schema.Cost
 				ProductFamily: strPtr("Load Balancer-Application"),
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "locationType", Value: strPtr("AWS Region")},
-					{Key: "usagetype", ValueRegex: strPtr("/LoadBalancerUsage/")},
+					{Key: "usagetype", ValueRegex: regexPtr("^([A-Z]{3}\\d-|Global-|EU-)?LoadBalancerUsage$")},
 				},
 			},
 		},
