@@ -37,7 +37,7 @@ func (r *Route53ResolverEndpoint) BuildResource() *schema.Resource {
 				Service:       strPtr("AmazonRoute53"),
 				ProductFamily: strPtr("DNS Query"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "usagetype", ValueRegex: strPtr("/ResolverNetworkInterface/")},
+					{Key: "usagetype", ValueRegex: strPtr("/ResolverNetworkInterface$/")},
 				},
 			},
 		},
