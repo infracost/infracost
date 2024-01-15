@@ -897,14 +897,12 @@ func (attr *Attribute) VerticesReferenced(b *Block) []VertexReference {
 	for _, ref := range attr.AllReferences() {
 		key := ref.String()
 
-		if shouldSkipRef(b, attr, key) {
+		if shouldSkipRef(b, key) {
 			continue
 		}
 
-		isProviderReference := (usesProviderConfiguration(b) && attr.Name() == "provider") || (b.Type() == "module" && attr.Name() == "providers")
-
-		if isProviderReference {
-			key = fmt.Sprintf("provider.%s", strings.TrimSuffix(key, "."))
+		if usesProviderConfiguration(b) && attr.Name() == "provider" {
+			key = fmt.Sprintf("provider.%s", key)
 		}
 
 		modAddr := b.ModuleAddress()
@@ -1222,14 +1220,8 @@ func toRelativeTraversal(traversal hcl.Traversal) hcl.Traversal {
 	return ret
 }
 
-func shouldSkipRef(block *Block, attr *Attribute, key string) bool {
-	if key == "count.index" || key == "each.key" || key == "each.value" {
-		return true
-	}
-
-	// Provider references can come through as `aws.`
-	isProviderReference := (usesProviderConfiguration(block) && attr.Name() == "provider") || (block.Type() == "module" && attr.Name() == "providers")
-	if !isProviderReference && strings.HasSuffix(key, ".") {
+func shouldSkipRef(block *Block, key string) bool {
+	if key == "count.index" || key == "each.key" || key == "each.value" || strings.HasSuffix(key, ".") {
 		return true
 	}
 
