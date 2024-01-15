@@ -13,6 +13,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/tidwall/gjson"
+
 	main "github.com/infracost/infracost/cmd/infracost"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/testutil"
@@ -31,6 +33,8 @@ type GoldenFileOptions = struct {
 	Currency    string
 	CaptureLogs bool
 	IsJSON      bool
+	JSONInclude *regexp.Regexp
+	JSONExclude *regexp.Regexp
 	Env         map[string]string
 	// RunTerraformCLI sets the cmd test to also run the cmd with --terraform-force-cli set
 	RunTerraformCLI bool
@@ -128,8 +132,18 @@ func GetCommandOutput(t *testing.T, args []string, testOptions *GoldenFileOption
 	}, &args)
 
 	if testOptions.IsJSON {
+		outBytes := outBuf.Bytes()
+		if testOptions.JSONInclude != nil {
+			filtered := filterJSON(gjson.ParseBytes(outBytes), testOptions.JSONInclude, testOptions.JSONExclude)
+			var err error
+			outBytes, err = json.Marshal(filtered)
+			if err != nil {
+				outBytes = outBuf.Bytes()
+			}
+		}
+
 		prettyBuf := bytes.NewBuffer([]byte{})
-		err := json.Indent(prettyBuf, outBuf.Bytes(), "", "  ")
+		err := json.Indent(prettyBuf, outBytes, "", "  ")
 		if err != nil {
 			actual = outBuf.Bytes()
 		} else {
@@ -156,6 +170,50 @@ func GetCommandOutput(t *testing.T, args []string, testOptions *GoldenFileOption
 	}
 
 	return stripDynamicValues(actual)
+}
+
+func filterJSON(r gjson.Result, include *regexp.Regexp, exclude *regexp.Regexp) map[string]interface{} {
+	values := make(map[string]interface{})
+	for k, v := range r.Map() {
+		if include.MatchString(k) {
+			values[k] = v.Value()
+			continue
+		}
+		if exclude.MatchString(k) {
+			continue
+		}
+
+		if v.IsObject() {
+			filteredV := filterJSON(v, include, exclude)
+			if len(filteredV) > 0 {
+				values[k] = filterJSON(v, include, exclude)
+			}
+		} else if v.IsArray() {
+			filteredV := filterJSONArray(v.Array(), include, exclude)
+			if len(filteredV) > 0 {
+				values[k] = filteredV
+			}
+		}
+	}
+	return values
+}
+
+func filterJSONArray(rArray []gjson.Result, include *regexp.Regexp, exclude *regexp.Regexp) []interface{} {
+	var values []interface{}
+	for _, el := range rArray {
+		if el.IsObject() {
+			filteredEl := filterJSON(el, include, exclude)
+			if len(filteredEl) > 0 {
+				values = append(values, filteredEl)
+			}
+		} else if el.IsArray() {
+			filteredEl := filterJSONArray(el.Array(), include, exclude)
+			if len(filteredEl) > 0 {
+				values = append(values, filteredEl)
+			}
+		}
+	}
+	return values
 }
 
 // stripDynamicValues strips out any values that change between test runs from the output,

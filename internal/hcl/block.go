@@ -742,6 +742,22 @@ func (b *Block) Provider() string {
 	return ""
 }
 
+// ProviderConfigKey looks up the key used to reference the provider in the "configuration.providers"
+// section of the terraform plan json.  This should be used to set the "provider_config_key "
+// of the resource in the "configuration.resources" section of plan json.
+func (b *Block) ProviderConfigKey() string {
+	provider := b.Provider()
+
+	v := getFromProvider(b, provider, "config_key")
+	var str string
+	err := gocty.FromCtyValue(v, &str)
+	if err != nil {
+		// fall back to using the provider name
+		return provider
+	}
+	return str
+}
+
 // GetChildBlock is a helper method around GetChildBlocks. It returns the first non nil child block matching name.
 func (b *Block) GetChildBlock(name string) *Block {
 	blocks := b.GetChildBlocks(name)
@@ -1032,6 +1048,22 @@ func (b *Block) values() cty.Value {
 				values[key] = cty.ListVal([]cty.Value{child.values()})
 			}
 		}
+
+		// Add config_key as a value of the provider so resources can lookup the
+		// correct provider_config_key using `getFromProvider(provider, "config_key")`
+		configKey := b.Label()
+
+		var alias string
+		_ = gocty.FromCtyValue(values["alias"], &alias)
+		if alias != "" {
+			configKey = configKey + "." + alias
+		}
+
+		if b.ModuleAddress() != "" {
+			configKey = b.ModuleAddress() + ":" + configKey
+		}
+
+		values["config_key"] = cty.StringVal(configKey)
 	}
 
 	return cty.ObjectVal(values)
@@ -1387,21 +1419,30 @@ func getRegionFromProvider(b *Block, provider string) string {
 	return str
 }
 
+// getFromProvider returns the value of the given key from provider the block is
+// associated with. This is either the default provider or the provider
+// explicitly set on the block (e.g. if a resource has a "provider" attribute).
 func getFromProvider(b *Block, provider, key string) cty.Value {
-	val := b.context.Get(provider, key)
-
 	attr := b.GetAttribute("provider")
 	if attr != nil {
 		v := attr.Value()
 		if v.Type().IsObjectType() {
 			m := v.AsValueMap()
 			if r, ok := m[key]; ok {
-				val = r
+				return r
 			}
 		}
 	}
 
-	return val
+	providerVal := b.Context().Get(provider)
+	if providerVal.Type().IsObjectType() {
+		m := providerVal.AsValueMap()
+		if r, ok := m[key]; ok {
+			return r
+		}
+	}
+
+	return cty.NilVal
 }
 
 func usesProviderConfiguration(b *Block) bool {
