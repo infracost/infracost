@@ -746,7 +746,16 @@ func (b *Block) Provider() string {
 // section of the terraform plan json.  This should be used to set the "provider_config_key "
 // of the resource in the "configuration.resources" section of plan json.
 func (b *Block) ProviderConfigKey() string {
-	return getFromProvider(b, b.Provider(), "config_key").AsString()
+	provider := b.Provider()
+
+	v := getFromProvider(b, provider, "config_key")
+	var str string
+	err := gocty.FromCtyValue(v, &str)
+	if err != nil {
+		// fall back to using the provider name
+		return provider
+	}
+	return str
 }
 
 // GetChildBlock is a helper method around GetChildBlocks. It returns the first non nil child block matching name.
