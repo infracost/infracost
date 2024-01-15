@@ -239,7 +239,17 @@ func collectModulesSourceUrls(moduleCalls []gjson.Result) []string {
 func parseProviderConfig(providerConf gjson.Result) []schema.ProviderMetadata {
 	var metadatas []schema.ProviderMetadata
 
-	for _, conf := range providerConf.Map() {
+	confMap := providerConf.Map()
+
+	// Sort the metadata by configKey so any outputted JSON is deterministic
+	var keys = make([]string, 0, len(confMap))
+	for k := range confMap {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	for _, k := range keys {
+		conf := confMap[k]
 		md := schema.ProviderMetadata{
 			Name:      conf.Get("name").String(),
 			Filename:  conf.Get("infracost_metadata.filename").String(),
@@ -259,11 +269,6 @@ func parseProviderConfig(providerConf gjson.Result) []schema.ProviderMetadata {
 
 		metadatas = append(metadatas, md)
 	}
-
-	// Sort the metadata by name so any outputted JSON is deterministic
-	sort.Slice(metadatas, func(i, j int) bool {
-		return metadatas[i].Name < metadatas[j].Name
-	})
 
 	return metadatas
 }
@@ -508,10 +513,7 @@ func getProviderPrefix(resourceType string) string {
 }
 
 func parseProviderKey(resConf gjson.Result) string {
-	v := resConf.Get("provider_config_key").String()
-	p := strings.Split(v, ":")
-
-	return p[len(p)-1]
+	return resConf.Get("provider_config_key").String()
 }
 
 func parseRegion(providerConf gjson.Result, vars gjson.Result, providerKey string) string {
@@ -702,7 +704,6 @@ func (p *Parser) parseTags(data map[string]*schema.ResourceData, confLoader *Con
 		case "aws":
 			resConf := confLoader.GetResourceConfJSON(resourceData.Address)
 			defaultTags := parseDefaultTags(providerConf, resConf)
-
 			tags = aws.ParseTags(defaultTags, resourceData)
 		case "azurerm":
 			tags = azure.ParseTags(resourceData)
@@ -914,16 +915,17 @@ func gjsonEqual(a, b gjson.Result) bool {
 }
 
 type ConfLoader struct {
-	conf          gjson.Result
-	moduleCache   map[string]gjson.Result
-	resourceCache map[string]gjson.Result
+	conf        gjson.Result
+	moduleCache map[string]gjson.Result
+	// Seems like we can't cache module resources because the providerConfigKey can be different.
+	// resourceCache map[string]gjson.Result
 }
 
 func NewConfLoader(conf gjson.Result) *ConfLoader {
 	return &ConfLoader{
-		conf:          conf,
-		moduleCache:   make(map[string]gjson.Result),
-		resourceCache: make(map[string]gjson.Result),
+		conf:        conf,
+		moduleCache: make(map[string]gjson.Result),
+		// resourceCache: make(map[string]gjson.Result),
 	}
 }
 
@@ -958,12 +960,12 @@ func (l *ConfLoader) GetResourceConfJSON(addr string) gjson.Result {
 	}
 
 	key := fmt.Sprintf(`resources.#(address="%s")`, removeAddressArrayPart(addressResourcePart(addr)))
-	if c, ok := l.resourceCache[key]; ok {
-		return c
-	}
+	// if c, ok := l.resourceCache[key]; ok {
+	//	 return c
+	// }
 
 	c := moduleConf.Get(key)
-	l.resourceCache[key] = c
+	// l.resourceCache[key] = c
 
 	return c
 }
