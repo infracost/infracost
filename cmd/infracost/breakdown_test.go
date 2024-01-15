@@ -85,6 +85,39 @@ func TestBreakdownFormatJsonWithTags(t *testing.T) {
 	)
 }
 
+func TestBreakdownFormatJsonWithTagsAftModule(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+
+	runWithEnv := func(env map[string]string) func(t *testing.T) {
+		return func(t *testing.T) {
+			GoldenFileCommandTest(
+				t,
+				testName,
+				[]string{
+					"breakdown",
+					"--format", "json",
+					"--path", dir,
+				},
+				&GoldenFileOptions{
+					CaptureLogs: true,
+					IsJSON:      true,
+					JSONInclude: regexp.MustCompile("^(defaultTags|tags|name)$"),
+					JSONExclude: regexp.MustCompile("^(costComponents|pastBreakdown)$"),
+					Env:         env,
+				}, func(ctx *config.RunContext) {
+					ctx.Config.TagPoliciesEnabled = true
+				},
+			)
+		}
+	}
+
+	t.Run("with old hcl evaluator", runWithEnv(nil))
+	t.Run("with graph evaluator", runWithEnv(map[string]string{
+		"INFRACOST_GRAPH_EVALUATOR": "true",
+	}))
+}
+
 func TestBreakdownFormatJsonWithTagsAliasedProvider(t *testing.T) {
 	testName := testutil.CalcGoldenFileTestdataDirName()
 	dir := path.Join("./testdata", testName)
