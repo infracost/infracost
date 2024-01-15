@@ -161,6 +161,15 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 		}
 	}
 
+	// Build a set of all the provider keys so we can look up
+	// provider references later
+	providerKeys := make(map[string]struct{})
+	for _, vertex := range vertexes {
+		if _, ok := vertex.(*VertexProvider); ok {
+			providerKeys[vertex.ID()] = struct{}{}
+		}
+	}
+
 	for _, vertex := range vertexes {
 		id := vertex.ID()
 
@@ -225,6 +234,23 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 				modAddress := stripCount(ref.ModuleAddress)
 
 				srcID = fmt.Sprintf("%s.%s", modAddress, srcID)
+			}
+
+			// Find the correct provider vertex by looking in for a matching provider
+			// block in the module hierarchy. If we can't find one, then we should
+			// assume the reference is to a provider in the root module.
+			if strings.HasPrefix(srcID, "provider.") {
+				modAddress := vertex.ModuleAddress()
+
+				for modAddress != "" {
+					k := fmt.Sprintf("%s.%s", modAddress, srcID)
+					if _, ok := providerKeys[k]; ok {
+						srcID = k
+						break
+					}
+
+					modAddress, _ = splitModuleAddr(modAddress)
+				}
 			}
 
 			dstID := id
@@ -399,7 +425,6 @@ func (g *Graph) loadBlocksForModule(evaluator *Evaluator) ([]*Block, error) {
 				evaluator.blockBuilder,
 				nil,
 				evaluator.logger,
-				&Context{},
 			)
 
 			modBlocks, err := g.loadBlocksForModule(moduleEvaluator)
