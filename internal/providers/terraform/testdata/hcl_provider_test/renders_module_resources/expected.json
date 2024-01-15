@@ -269,7 +269,7 @@
                 "mode": "managed",
                 "type": "aws_customer_gateway",
                 "name": "example",
-                "provider_config_key": "aws",
+                "provider_config_key": "gateway:aws",
                 "schema_version": 0
               },
               {
@@ -277,7 +277,7 @@
                 "mode": "managed",
                 "type": "aws_ec2_transit_gateway",
                 "name": "example",
-                "provider_config_key": "aws",
+                "provider_config_key": "gateway:aws",
                 "schema_version": 0
               }
             ]
