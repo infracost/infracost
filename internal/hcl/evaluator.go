@@ -110,11 +110,14 @@ func NewEvaluator(
 	blockBuilder BlockBuilder,
 	spinFunc ui.SpinnerFunc,
 	logger zerolog.Logger,
-	parentContext *Context,
 ) *Evaluator {
 	ctx := NewContext(&hcl.EvalContext{
 		Functions: ExpFunctions(module.RootPath, logger),
-	}, parentContext, logger)
+	}, nil, logger)
+
+	for key, provider := range module.Providers {
+		ctx.Set(provider, key)
+	}
 
 	if visitedModules == nil {
 		visitedModules = make(map[string]map[string]cty.Value)
@@ -326,21 +329,11 @@ func (e *Evaluator) evaluateModules() {
 
 		e.visitedModules[fullName] = vars
 
-		// create a parent context which will be passed to any submodules. This will only
-		// contain the context values for the provider block as this is the only context
-		// values that should be "inherited".
-		parentContext := NewContext(&hcl.EvalContext{
-			Functions: ExpFunctions(e.module.RootPath, e.logger),
-		}, nil, e.logger)
-		providers := e.getValuesByBlockType("provider")
-		for key, provider := range providers.AsValueMap() {
-			parentContext.Set(provider, key)
-		}
-
 		moduleEvaluator := NewEvaluator(
 			Module{
 				Name:       fullName,
 				Source:     moduleCall.Module.Source,
+				Providers:  moduleCall.Module.Providers,
 				Blocks:     moduleCall.Module.RawBlocks,
 				RawBlocks:  moduleCall.Module.RawBlocks,
 				RootPath:   e.module.RootPath,
@@ -357,7 +350,6 @@ func (e *Evaluator) evaluateModules() {
 			e.blockBuilder,
 			nil,
 			e.logger,
-			parentContext,
 		)
 
 		moduleCall.Module, _ = moduleEvaluator.Run()
@@ -1001,12 +993,28 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 		return nil, fmt.Errorf("module without label: %s", b.FullName())
 	}
 
+	providers := map[string]cty.Value{}
+	providerBlocks := e.getValuesByBlockType("provider")
+	for key, provider := range providerBlocks.AsValueMap() {
+		providers[key] = provider
+	}
+	// inherit any providers from the providers block from the parent module
+	for key, provider := range e.module.Providers {
+		providers[key] = provider
+	}
+
 	var source string
+
 	attrs := b.AttributesAsMap()
 	for _, attr := range attrs {
+		if attr.Name() == "providers" {
+			val := attr.Value()
+			if val.Type().IsObjectType() && val.IsKnown() {
+				providers = attr.Value().AsValueMap()
+			}
+		}
 		if attr.Name() == "source" {
 			source = attr.AsString()
-			break
 		}
 	}
 
@@ -1054,6 +1062,7 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 		Module: &Module{
 			Name:       b.TypeLabel(),
 			Source:     source,
+			Providers:  providers,
 			SourceURL:  moduleURL,
 			Blocks:     blocks,
 			RawBlocks:  blocks,

@@ -606,7 +606,7 @@ func TestParseResourceData(t *testing.T) {
 								"mode": "managed",
 								"type": "aws_nat_gateway",
 								"name": "nat1",
-								"provider_config_key": "module1:aws",
+								"provider_config_key": "aws",
 								"expressions": {}
 							},
               {
@@ -614,7 +614,7 @@ func TestParseResourceData(t *testing.T) {
 								"mode": "managed",
 								"type": "aws_nat_gateway",
 								"name": "nat2",
-								"provider_config_key": "module1:aws.europe",
+								"provider_config_key": "aws.europe",
 								"expressions": {}
 							}
 						]
