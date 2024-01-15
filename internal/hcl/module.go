@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-
-	"github.com/zclconf/go-cty/cty"
 )
 
 // ModuleCall represents a call to a defined Module by a parent Module.
@@ -22,9 +20,8 @@ type ModuleCall struct {
 
 // Module encapsulates all the Blocks that are part of a Module in a Terraform project.
 type Module struct {
-	Name      string
-	Source    string
-	Providers map[string]cty.Value
+	Name   string
+	Source string
 
 	Blocks Blocks
 	// RawBlocks are the Blocks that were built when the module was loaded from the filesystem.
