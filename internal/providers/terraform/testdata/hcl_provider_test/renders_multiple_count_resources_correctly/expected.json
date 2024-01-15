@@ -650,7 +650,7 @@
                 "mode": "managed",
                 "type": "aws_autoscaling_group",
                 "name": "test",
-                "provider_config_key": "autos:aws",
+                "provider_config_key": "aws",
                 "expressions": {
                   "launch_configuration": {
                     "references": [
@@ -671,7 +671,7 @@
                 "mode": "managed",
                 "type": "aws_launch_configuration",
                 "name": "test",
-                "provider_config_key": "autos:aws",
+                "provider_config_key": "aws",
                 "expressions": {
                   "instance_type": {
                     "references": [

@@ -414,7 +414,7 @@
                 "mode": "managed",
                 "type": "aws_ecs_service",
                 "name": "ecs_service",
-                "provider_config_key": "module1:aws",
+                "provider_config_key": "aws",
                 "expressions": {
                   "task_definition": {
                     "references": [
@@ -435,7 +435,7 @@
                 "mode": "managed",
                 "type": "aws_ecs_task_definition",
                 "name": "ecs_task",
-                "provider_config_key": "module1:aws",
+                "provider_config_key": "aws",
                 "schema_version": 0,
                 "count_expression": {
                   "references": [
@@ -454,7 +454,7 @@
                       "mode": "managed",
                       "type": "aws_ecs_service",
                       "name": "ecs_service",
-                      "provider_config_key": "module2:aws",
+                      "provider_config_key": "aws",
                       "expressions": {
                         "task_definition": {
                           "references": [
@@ -475,7 +475,7 @@
                       "mode": "managed",
                       "type": "aws_ecs_task_definition",
                       "name": "ecs_task",
-                      "provider_config_key": "module2:aws",
+                      "provider_config_key": "aws",
                       "schema_version": 0,
                       "count_expression": {
                         "references": [

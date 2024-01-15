@@ -5,7 +5,6 @@ import (
 	"strings"
 	"sync"
 
-	"github.com/hashicorp/hcl/v2"
 	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 )
@@ -116,14 +115,6 @@ func (v *VertexModuleCall) expand(e *Evaluator, b *Block, mutex *sync.Mutex) ([]
 
 		e.moduleCalls[name] = modCall
 
-		parentContext := NewContext(&hcl.EvalContext{
-			Functions: ExpFunctions(modCall.Module.RootPath, e.logger),
-		}, nil, e.logger)
-		providers := e.getValuesByBlockType("provider")
-		for key, provider := range providers.AsValueMap() {
-			parentContext.Set(provider, key)
-		}
-
 		vars := block.Values().AsValueMap()
 
 		moduleEvaluator := NewEvaluator(
@@ -136,7 +127,6 @@ func (v *VertexModuleCall) expand(e *Evaluator, b *Block, mutex *sync.Mutex) ([]
 			e.blockBuilder,
 			nil,
 			e.logger,
-			parentContext,
 		)
 
 		v.moduleConfigs.Add(unexpandedName, ModuleConfig{
