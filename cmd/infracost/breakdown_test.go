@@ -114,9 +114,9 @@ func TestBreakdownFormatJsonWithTagsAliasedProvider(t *testing.T) {
 	}
 
 	t.Run("with old hcl evaluator", runWithEnv(nil))
-	//t.Run("with graph evaluator", runWithEnv(map[string]string{
-	//	"INFRACOST_GRAPH_EVALUATOR": "true",
-	//}))
+	t.Run("with graph evaluator", runWithEnv(map[string]string{
+		"INFRACOST_GRAPH_EVALUATOR": "true",
+	}))
 }
 
 func TestBreakdownFormatJsonWithTagsAzure(t *testing.T) {
