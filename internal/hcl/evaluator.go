@@ -1008,7 +1008,10 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 	attrs := b.AttributesAsMap()
 	for _, attr := range attrs {
 		if attr.Name() == "providers" {
-			providers = attr.Value().AsValueMap()
+			val := attr.Value()
+			if val.Type().IsObjectType() && val.IsKnown() {
+				providers = attr.Value().AsValueMap()
+			}
 		}
 		if attr.Name() == "source" {
 			source = attr.AsString()
