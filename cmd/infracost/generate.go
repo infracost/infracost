@@ -15,7 +15,8 @@ import (
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/config/template"
 	"github.com/infracost/infracost/internal/hcl"
-	"github.com/infracost/infracost/internal/logging"
+	"github.com/infracost/infracost/internal/providers"
+	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/infracost/infracost/internal/vcs"
 )
@@ -65,7 +66,7 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 
 	var buf bytes.Buffer
 
-	locatorConfig := &hcl.ProjectLocatorConfig{}
+	ctx := config.EmptyRunContext()
 	hasTemplate := g.template != "" || g.templatePath != ""
 	var definedProjects bool
 	if hasTemplate {
@@ -86,24 +87,24 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 			return fmt.Errorf("failed to unmarshal autodetect section: %w", err)
 		}
 
-		locatorConfig.ExcludedDirs = partialConfig.Autodetect.ExcludeDirs
-		locatorConfig.IncludedDirs = partialConfig.Autodetect.IncludeDirs
-		locatorConfig.EnvNames = partialConfig.Autodetect.EnvNames
+		ctx.Config.Autodetect.ExcludeDirs = partialConfig.Autodetect.ExcludeDirs
+		ctx.Config.Autodetect.IncludeDirs = partialConfig.Autodetect.IncludeDirs
+		ctx.Config.Autodetect.EnvNames = partialConfig.Autodetect.EnvNames
 
 		_, _ = reader.Seek(0, io.SeekStart)
 		definedProjects = hasLineStartingWith(reader, "projects:")
 	}
 
-	// read the template path if provided to try and read the included/excluded dirs
-	parsers, err := hcl.LoadParsers(
-		config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, nil),
-		repoPath,
-		nil,
-		locatorConfig,
-		logging.Logger,
-	)
-	if err != nil && !hasTemplate {
-		return err
+	var parsers []*hcl.Parser
+	detected, err := providers.Detect(ctx, &config.Project{Path: repoPath}, false)
+	if err != nil {
+		return fmt.Errorf("could not detect providers %w", err)
+	}
+
+	for _, provider := range detected {
+		if v, ok := provider.(*terraform.HCLProvider); ok {
+			parsers = append(parsers, v.Parser)
+		}
 	}
 
 	if definedProjects {

@@ -611,6 +611,10 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 
 	h, err := NewHCLProvider(
 		config.NewProjectContext(p.ctx.RunContext, &pconfig, logCtx),
+		hcl.RootPath{
+			Path: pconfig.Path,
+		},
+		hcl.NewProjectLocator(p.logger, nil),
 		&HCLProviderConfig{CacheParsingModules: true, SkipAutoDetection: true},
 		ops...,
 	)
@@ -626,22 +630,20 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 		return
 	}
 
-	mods := h.Modules()
-	for _, mod := range mods {
-		if mod.Error != nil {
-			path := ""
-			if mod.Module != nil {
-				path = mod.Module.RootPath
-			}
-			info.addWarning(schema.ProjectDiag{
-				Code:    schema.DiagTerragruntModuleEvaluationFailure,
-				Message: mod.Error.Error(),
-			})
-			p.logger.Warn().Msgf("Terragrunt config path %s returned module %s with error: %s", opts.TerragruntConfigPath, path, mod.Error)
+	mod := h.Module()
+	if mod.Error != nil {
+		path := ""
+		if mod.Module != nil {
+			path = mod.Module.RootPath
 		}
-		evaluatedOutputs := mod.Module.Blocks.Outputs(true)
-		p.outputs[opts.TerragruntConfigPath] = evaluatedOutputs
+		info.addWarning(schema.ProjectDiag{
+			Code:    schema.DiagTerragruntModuleEvaluationFailure,
+			Message: mod.Error.Error(),
+		})
+		p.logger.Warn().Msgf("Terragrunt config path %s returned module %s with error: %s", opts.TerragruntConfigPath, path, mod.Error)
 	}
+	evaluatedOutputs := mod.Module.Blocks.Outputs(true)
+	p.outputs[opts.TerragruntConfigPath] = evaluatedOutputs
 
 	info.provider = h
 	return info

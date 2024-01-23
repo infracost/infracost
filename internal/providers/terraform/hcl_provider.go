@@ -4,6 +4,7 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	stdJson "encoding/json"
+	"errors"
 	"flag"
 	"fmt"
 	"math/big"
@@ -12,7 +13,6 @@ import (
 	"regexp"
 	"sort"
 	"strings"
-	"sync"
 
 	jsoniter "github.com/json-iterator/go"
 	"github.com/rs/zerolog"
@@ -34,13 +34,13 @@ var json = jsoniter.ConfigCompatibleWithStandardLibrary
 
 type HCLProvider struct {
 	policyClient   *apiclient.PolicyAPIClient
-	parsers        []*hcl.Parser
+	Parser         *hcl.Parser
 	planJSONParser *Parser
 	logger         zerolog.Logger
 
 	schema *PlanSchema
 	ctx    *config.ProjectContext
-	cache  []HCLProject
+	cache  *HCLProject
 	config HCLProviderConfig
 }
 
@@ -87,7 +87,7 @@ func varsFromPlanFlags(planFlags string) (vars, error) {
 // NewHCLProvider returns a HCLProvider with a hcl.Parser initialised using the config.ProjectContext.
 // It will use input flags from either the terraform-plan-flags or top level var and var-file flags to
 // set input vars and files on the underlying hcl.Parser.
-func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts ...hcl.Option) (*HCLProvider, error) {
+func NewHCLProvider(ctx *config.ProjectContext, rootPath hcl.RootPath, pl *hcl.ProjectLocator, config *HCLProviderConfig, opts ...hcl.Option) (*HCLProvider, error) {
 	if config == nil {
 		config = &HCLProviderConfig{}
 	}
@@ -136,37 +136,6 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 
 	logger := ctx.Logger().With().Str("provider", "terraform_dir").Logger()
 	runCtx := ctx.RunContext
-	locatorConfig := &hcl.ProjectLocatorConfig{
-		SkipAutoDetection: config.SkipAutoDetection,
-		ExcludedDirs:      append(ctx.ProjectConfig.ExcludePaths, ctx.RunContext.Config.Autodetect.ExcludeDirs...),
-		IncludedDirs:      ctx.RunContext.Config.Autodetect.IncludeDirs,
-		EnvNames:          ctx.RunContext.Config.Autodetect.EnvNames,
-		ChangedObjects:    runCtx.VCSMetadata.Commit.ChangedObjects,
-		UseAllPaths:       ctx.ProjectConfig.IncludeAllPaths,
-	}
-
-	cachePath := ctx.RunContext.Config.CachePath()
-	initialPath := ctx.ProjectConfig.Path
-	if filepath.IsAbs(cachePath) {
-		abs, err := filepath.Abs(initialPath)
-		if err != nil {
-			logger.Warn().Err(err).Msgf("could not make project path absolute to match provided --config-file/--path path absolute, this will result in module loading failures")
-		} else {
-			initialPath = abs
-		}
-	}
-	loader := modules.NewModuleLoader(cachePath, modules.NewSharedHCLParser(), credsSource, ctx.RunContext.Config.TerraformSourceMap, logger, ctx.RunContext.ModuleMutex)
-	parsers, err := hcl.LoadParsers(
-		ctx,
-		initialPath,
-		loader,
-		locatorConfig,
-		logger,
-		options...,
-	)
-	if err != nil {
-		return nil, err
-	}
 
 	var policyClient *apiclient.PolicyAPIClient
 	if runCtx.Config.PoliciesEnabled {
@@ -176,14 +145,27 @@ func NewHCLProvider(ctx *config.ProjectContext, config *HCLProviderConfig, opts 
 		}
 	}
 
+	loader := modules.NewModuleLoader(ctx.RunContext.Config.CachePath(), modules.NewSharedHCLParser(), credsSource, ctx.RunContext.Config.TerraformSourceMap, logger, ctx.RunContext.ModuleMutex)
+	cachePath := ctx.RunContext.Config.CachePath()
+	initialPath := rootPath.Path
+	if filepath.IsAbs(cachePath) {
+		abs, err := filepath.Abs(initialPath)
+		if err != nil {
+			logger.Warn().Err(err).Msgf("could not make project path absolute to match provided --config-file/--path path absolute, this will result in module loading failures")
+		} else {
+			initialPath = abs
+		}
+	}
+
+	rootPath.Path = initialPath
 	return &HCLProvider{
 		policyClient:   policyClient,
-		parsers:        parsers,
+		Parser:         hcl.NewParser(rootPath, pl, loader, logger, options...),
 		planJSONParser: NewParser(ctx, true),
 		ctx:            ctx,
 		config:         *config,
 		logger:         logger,
-	}, err
+	}, nil
 }
 
 func (p *HCLProvider) Type() string        { return "terraform_dir" }
@@ -209,32 +191,25 @@ func (p *HCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 // representation of the terraform plan JSON files from these Blocks, this is passed to the PlanJSONProvider.
 // The PlanJSONProvider uses this shallow representation to actually load Infracost resources.
 func (p *HCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, error) {
-	jsons := p.LoadPlanJSONs()
-
-	var projects = make([]*schema.Project, len(jsons))
-	for i, j := range jsons {
-		if j.Error != nil {
-			projects[i] = p.newProject(j)
-			continue
-		}
-
-		project := p.parseResources(j, usage)
-		if p.ctx.RunContext.VCSMetadata.HasChanges() {
-			j := j
-			project.Metadata.VCSCodeChanged = &j.Module.HasChanges
-		}
-
-		if p.policyClient != nil {
-			err := p.policyClient.UploadPolicyData(project)
-			if err != nil {
-				p.logger.Err(err).Msgf("failed to upload policy data %s", project.Name)
-			}
-		}
-
-		projects[i] = project
+	j := p.LoadPlanJSON()
+	if j.Error != nil {
+		return []*schema.Project{p.newProject(j)}, nil
 	}
 
-	return projects, nil
+	project := p.parseResources(j, usage)
+	if p.ctx.RunContext.VCSMetadata.HasChanges() {
+		j := j
+		project.Metadata.VCSCodeChanged = &j.Module.HasChanges
+	}
+
+	if p.policyClient != nil {
+		err := p.policyClient.UploadPolicyData(project)
+		if err != nil {
+			p.logger.Err(err).Msgf("failed to upload policy data %s", project.Name)
+		}
+	}
+
+	return []*schema.Project{project}, nil
 }
 
 func (p *HCLProvider) parseResources(parsed HCLProject, usage schema.UsageMap) *schema.Project {
@@ -303,108 +278,46 @@ type HCLProject struct {
 	Error  error
 }
 
-// LoadPlanJSONs parses the found directories and return the blocks in Terraform plan JSON format.
-func (p *HCLProvider) LoadPlanJSONs() []HCLProject {
-	var jsons = make([]HCLProject, len(p.parsers))
-	mods := p.Modules()
+// LoadPlanJSON parses the RootPath and return the blocks in Terraform plan JSON format.
+func (p *HCLProvider) LoadPlanJSON() HCLProject {
+	module := p.Module()
+	if module.Error == nil {
+		module.JSON, module.Error = p.modulesToPlanJSON(module.Module)
 
-	for i, module := range mods {
-		if module.Error == nil {
-			module.JSON, module.Error = p.modulesToPlanJSON(module.Module)
-			if os.Getenv("INFRACOST_JSON_DUMP") == "true" {
-				err := os.WriteFile(fmt.Sprintf("%s-out.json", strings.ReplaceAll(module.Module.ModulePath, "/", "-")), module.JSON, os.ModePerm)
-				if err != nil {
-					p.logger.Debug().Err(err).Msg("failed to write to json dump")
-				}
+		if os.Getenv("INFRACOST_JSON_DUMP") == "true" {
+			err := os.WriteFile(fmt.Sprintf("%s-out.json", strings.ReplaceAll(module.Module.ModulePath, "/", "-")), module.JSON, os.ModePerm)
+			if err != nil {
+				p.logger.Debug().Err(err).Msg("failed to write to json dump")
 			}
 		}
-
-		jsons[i] = module
 	}
 
-	return jsons
+	return module
 }
 
-// Modules parses the found directories into hcl modules representing a config tree of Terraform information.
-// Modules returns the raw hcl blocks associated with each found Terraform project. This can be used
-// to fetch raw information like outputs, vars, resources, e.t.c.
-func (p *HCLProvider) Modules() []HCLProject {
+// Module parses the RootPath into an hcl Module representing a config tree of
+// Terraform information. Module returns the raw hcl blocks associated with each
+// found Terraform project. This can be used to fetch raw information like
+// outputs, vars, resources, e.t.c.
+func (p *HCLProvider) Module() HCLProject {
 	if p.cache != nil {
-		return p.cache
+		return *p.cache
 	}
 
-	runCtx := p.ctx.RunContext
-	parallelism, _ := runCtx.GetParallelism()
-
-	numJobs := len(p.parsers)
-	runInParallel := parallelism > 1 && numJobs > 1
-	if runInParallel && !runCtx.Config.IsLogging() {
-		// set the config level to info so that the spinners don't report to the console.
-		p.ctx.RunContext.Config.LogLevel = "info"
+	module, modErr := p.Parser.ParseDirectory()
+	var v *clierror.PanicError
+	if errors.As(modErr, &v) {
+		err := apiclient.ReportCLIError(p.ctx.RunContext, v, false)
+		if err != nil {
+			p.logger.Debug().Err(err).Msg("error sending unexpected runtime error")
+		}
 	}
-
-	if numJobs < parallelism {
-		parallelism = numJobs
-	}
-
-	ch := make(chan *hcl.Parser, numJobs)
-	mods := make([]HCLProject, 0, numJobs)
-	mu := &sync.Mutex{}
-	wg := &sync.WaitGroup{}
-
-	for _, parser := range p.parsers {
-		ch <- parser
-	}
-	close(ch)
-	wg.Add(parallelism)
-
-	for i := 0; i < parallelism; i++ {
-		go func() {
-			defer func() {
-				wg.Done()
-			}()
-
-			for parser := range ch {
-				if numJobs > 1 && !p.config.SuppressLogging {
-					fmt.Fprintf(os.Stderr, "Detected Terraform project at %s\n", ui.DisplayPath(parser.Path()))
-				}
-
-				module, modErr := parser.ParseDirectory()
-				if modErr != nil {
-					if v, ok := modErr.(*clierror.PanicError); ok {
-						err := apiclient.ReportCLIError(p.ctx.RunContext, v, false)
-						if err != nil {
-							p.logger.Debug().Err(err).Msg("error sending unexpected runtime error")
-						}
-					}
-				}
-
-				mu.Lock()
-				mods = append(mods, HCLProject{Module: module, Error: modErr})
-				mu.Unlock()
-			}
-		}()
-	}
-
-	wg.Wait()
 
 	if p.config.CacheParsingModules {
-		p.cache = mods
+		p.cache = &HCLProject{Module: module, Error: modErr}
 	}
 
-	sort.Slice(mods, func(i, j int) bool {
-		if mods[i].Module.Name != "" && mods[j].Module.Name != "" {
-			return mods[i].Module.Name < mods[j].Module.Name
-		}
-
-		if mods[i].Module.ModulePath != mods[j].Module.ModulePath {
-			return mods[i].Module.ModulePath < mods[j].Module.ModulePath
-		}
-
-		return mods[i].Module.ModuleSuffix < mods[j].Module.ModuleSuffix
-	})
-
-	return mods
+	return HCLProject{Module: module, Error: modErr}
 }
 
 // InvalidateCache removes the module cache from the prior hcl parse.

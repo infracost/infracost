@@ -129,7 +129,7 @@ func checkDiffConfig(cfg *config.Config) error {
 		}
 
 		projectType := providers.DetectProjectType(projectConfig.Path, projectConfig.TerraformForceCLI)
-		if (projectType == "terraform_dir" || projectType == "terragrunt_dir") && cfg.CompareTo == "" {
+		if (projectType == providers.ProjectTypeAutodetect || projectType == providers.ProjectTypeTerragruntDir) && cfg.CompareTo == "" {
 			examplePath := "/code"
 			if projectConfig.Path != "" {
 				examplePath = projectConfig.Path

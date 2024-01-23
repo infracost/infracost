@@ -17,9 +17,10 @@ import (
 	svchost "github.com/hashicorp/terraform-svchost"
 	"github.com/hashicorp/terraform-svchost/auth"
 	"github.com/hashicorp/terraform-svchost/disco"
+	"github.com/rs/zerolog"
+
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/logging"
-	"github.com/rs/zerolog"
 )
 
 var defaultRegistryHost = "registry.terraform.io"

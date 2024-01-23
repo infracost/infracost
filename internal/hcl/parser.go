@@ -17,7 +17,6 @@ import (
 	"github.com/zclconf/go-cty/cty/gocty"
 
 	"github.com/infracost/infracost/internal/clierror"
-	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/extclient"
 	"github.com/infracost/infracost/internal/hcl/modules"
 	"github.com/infracost/infracost/internal/logging"
@@ -276,124 +275,8 @@ type Parser struct {
 	projectLocator        *ProjectLocator
 }
 
-// LoadParsers inits a list of Parser with the provided option and initialPath. LoadParsers locates Terraform files
-// in the given initialPath and returns a Parser for each directory it locates a Terraform project within. If
-// the initialPath contains Terraform files at the top level parsers will be len 1.
-func LoadParsers(ctx *config.ProjectContext, initialPath string, loader *modules.ModuleLoader, locatorConfig *ProjectLocatorConfig, logger zerolog.Logger, options ...Option) ([]*Parser, error) {
-	pl := NewProjectLocator(logger, locatorConfig)
-	rootPaths := pl.FindRootModules(initialPath)
-
-	if len(rootPaths) == 0 && len(locatorConfig.ChangedObjects) > 0 {
-		return nil, nil
-	}
-
-	if len(rootPaths) == 0 {
-		return nil, fmt.Errorf("No valid Terraform files found at path %s, try a different directory", initialPath)
-	}
-
-	if ctx.RunContext.Config.ConfigFilePath == "" && len(ctx.ProjectConfig.TerraformVarFiles) == 0 {
-		var parsers []*Parser
-		for _, rootPath := range rootPaths {
-
-			var varFiles []string
-			var autoVarFiles []string
-
-			// first remove all the "auto" tfvar files from the list of discovered var files.
-			// These files should not constitute a new "project" as they won't define an
-			// environment but defaults that should be applied across all environments.
-			for _, varFile := range rootPath.TerraformVarFiles {
-				if IsAutoVarFile(varFile) {
-					autoVarFiles = append(autoVarFiles, varFile)
-					continue
-				}
-
-				if pl.IsGlobalVarFile(varFile) {
-					autoVarFiles = append(autoVarFiles, varFile)
-					continue
-				}
-
-				varFiles = append(varFiles, varFile)
-			}
-
-			// group the var files by environment. This is done by taking the base name of
-			// the var file. This is done to deduplicate var files that are for the same
-			// environment but have different file paths.
-			varFileGrouping := map[string][]string{}
-			for _, varFile := range varFiles {
-				if !VarFileEnvPrefixRegxp.MatchString(CleanVarName(varFile)) {
-					env := CleanVarName(varFile)
-					varFileGrouping[env] = append(varFileGrouping[env], varFile)
-				}
-			}
-
-			// loop through the var files again and if there are any global var files
-			// with a defaults prefix, add them to the grouping for each environment
-			// only if the environment exists.
-			for _, varFile := range varFiles {
-				if VarFileEnvPrefixRegxp.MatchString(CleanVarName(varFile)) {
-					env := VarEnvName(varFile)
-
-					if _, ok := varFileGrouping[env]; ok {
-						varFileGrouping[env] = append(varFileGrouping[env], varFile)
-					}
-				}
-			}
-
-			var varEnvs []string
-			for env := range varFileGrouping {
-				varEnvs = append(varEnvs, env)
-			}
-			sort.Strings(varEnvs)
-
-			if len(varFileGrouping) > 0 {
-				sort.Strings(rootPath.TerraformVarFiles)
-
-				for _, env := range varEnvs {
-					parsers = append(parsers, newParser(rootPath, pl, loader, logger, append(
-						options,
-						OptionWithTFVarsPaths(append(autoVarFiles, varFileGrouping[env]...), true),
-						OptionWithModuleSuffix(env),
-					)...))
-				}
-
-				continue
-			}
-
-			parserOpts := options
-			if len(autoVarFiles) > 0 {
-				parserOpts = append(parserOpts, OptionWithTFVarsPaths(append(varFiles, autoVarFiles...), true))
-			}
-
-			parsers = append(parsers, newParser(rootPath, pl, loader, logger, parserOpts...))
-		}
-
-		return parsers, nil
-	}
-
-	var parsers = make([]*Parser, len(rootPaths))
-	for i, rootPath := range rootPaths {
-		// If we have detected any auto var files at the project level lets add them to
-		// the parser. We shouldn't add any auto var files from other directories as
-		// these projects are not auto-detected and are instead explicitly defined by the
-		// user.
-		var autoVarFiles []string
-		for _, varFile := range rootPath.TerraformVarFiles {
-			if IsAutoVarFile(varFile) && (filepath.Dir(varFile) == rootPath.Path || filepath.Dir(varFile) == ".") {
-				autoVarFiles = append(autoVarFiles, varFile)
-			}
-		}
-
-		if len(autoVarFiles) > 0 {
-			options = append(options, OptionWithTFVarsPaths(autoVarFiles, false))
-		}
-
-		parsers[i] = newParser(rootPath, pl, loader, logger, options...)
-	}
-
-	return parsers, nil
-}
-
-func newParser(projectRoot RootPath, pl *ProjectLocator, moduleLoader *modules.ModuleLoader, logger zerolog.Logger, options ...Option) *Parser {
+// NewParser creates a new parser for the given RootPath.
+func NewParser(projectRoot RootPath, pl *ProjectLocator, moduleLoader *modules.ModuleLoader, logger zerolog.Logger, options ...Option) *Parser {
 	parserLogger := logger.With().Str(
 		"parser_path", projectRoot.Path,
 	).Logger()

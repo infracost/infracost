@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -13,7 +14,6 @@ import (
 	"time"
 
 	"github.com/Rhymond/go-money"
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
@@ -33,8 +33,10 @@ import (
 )
 
 type projectJob struct {
-	index      int
-	projectCfg *config.Project
+	index    int
+	provider schema.Provider
+	err      error
+	ctx      *config.ProjectContext
 }
 
 type projectResult struct {
@@ -195,7 +197,6 @@ type parallelRunner struct {
 	pathMuxs    map[string]*sync.Mutex
 	prior       *output.Root
 	parallelism int
-	numJobs     int
 }
 
 func newParallelRunner(cmd *cobra.Command, runCtx *config.RunContext) (*parallelRunner, error) {
@@ -225,26 +226,8 @@ func newParallelRunner(cmd *cobra.Command, runCtx *config.RunContext) (*parallel
 	}
 	runCtx.ContextValues.SetValue("parallelism", parallelism)
 
-	numJobs := len(runCtx.Config.Projects)
-
-	runInParallel := parallelism > 1 && numJobs > 1
-	if (runInParallel || runCtx.IsCIRun()) && !runCtx.Config.IsLogging() {
-		if runInParallel {
-			cmd.PrintErrln("Running multiple projects in parallel, so log-level=info is enabled by default.")
-			cmd.PrintErrln("Run with INFRACOST_PARALLELISM=1 to disable parallelism to help debugging.")
-			cmd.PrintErrln()
-		}
-
-		runCtx.Config.LogLevel = "info"
-		err := logging.ConfigureBaseLogger(runCtx.Config)
-		if err != nil {
-			return nil, err
-		}
-	}
-
 	return &parallelRunner{
 		parallelism: parallelism,
-		numJobs:     numJobs,
 		runCtx:      runCtx,
 		cmd:         cmd,
 		pathMuxs:    pathMuxs,
@@ -253,12 +236,33 @@ func newParallelRunner(cmd *cobra.Command, runCtx *config.RunContext) (*parallel
 }
 
 func (r *parallelRunner) run() ([]projectResult, error) {
-	projectResultChan := make(chan projectResult, r.numJobs)
-	jobs := make(chan projectJob, r.numJobs)
+	var queue []projectJob
+
+	var i int
+	for _, p := range r.runCtx.Config.Projects {
+		ctx := config.NewProjectContext(r.runCtx, p, map[string]interface{}{})
+		detected, err := providers.Detect(r.runCtx, p, r.prior == nil)
+		if err != nil {
+			m := fmt.Sprintf("%s\n\n", err)
+			m += fmt.Sprintf("Try adding a config-file to configure how Infracost should run. See %s for details and examples.", ui.LinkString("https://infracost.io/config-file"))
+
+			err = clierror.NewCLIError(errors.New(m), "Could not detect path type")
+			queue = append(queue, projectJob{index: i, err: err, ctx: ctx})
+			continue
+		}
+
+		for _, provider := range detected {
+			queue = append(queue, projectJob{index: i, provider: provider, ctx: ctx})
+			i++
+		}
+	}
+	projectResultChan := make(chan projectResult, len(queue))
+	jobs := make(chan projectJob, len(queue))
+
+	r.printParallelMsg(queue)
 
 	errGroup, _ := errgroup.WithContext(context.Background())
 	for i := 0; i < r.parallelism; i++ {
-		i := i
 		errGroup.Go(func() (err error) {
 			// defer a function to recover from any panics spawned by child goroutines.
 			// This is done as recover works only in the same goroutine that it is called.
@@ -272,17 +276,19 @@ func (r *parallelRunner) run() ([]projectResult, error) {
 			}()
 
 			for job := range jobs {
-				ctx := config.NewProjectContext(r.runCtx, job.projectCfg, map[string]interface{}{
-					"routine": i,
-				})
-				configProjects, err := r.runProjectConfig(ctx)
-				if err != nil {
-					configProjects = newErroredProject(ctx, err)
+				var configProjects *projectOutput
+				if job.err != nil {
+					configProjects = newErroredProject(job.ctx, job.err)
+				} else {
+					configProjects, err = r.runProvider(job)
+					if err != nil {
+						configProjects = newErroredProject(job.ctx, err)
+					}
 				}
 
 				projectResultChan <- projectResult{
 					index:      job.index,
-					ctx:        ctx,
+					ctx:        job.ctx,
 					projectOut: configProjects,
 				}
 			}
@@ -291,9 +297,10 @@ func (r *parallelRunner) run() ([]projectResult, error) {
 		})
 	}
 
-	for i, p := range r.runCtx.Config.Projects {
-		jobs <- projectJob{index: i, projectCfg: p}
+	for _, job := range queue {
+		jobs <- job
 	}
+
 	close(jobs)
 
 	err := errGroup.Wait()
@@ -315,47 +322,37 @@ func (r *parallelRunner) run() ([]projectResult, error) {
 	return projectResults, nil
 }
 
-func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectOutput, error) {
-	mux := r.pathMuxs[ctx.ProjectConfig.Path]
+func (r *parallelRunner) printParallelMsg(queue []projectJob) {
+	runInParallel := r.parallelism > 1 && len(queue) > 1
+	if (runInParallel || r.runCtx.IsCIRun()) && !r.runCtx.Config.IsLogging() {
+		if runInParallel {
+			r.cmd.PrintErrln("Running multiple projects in parallel, so log-level=info is enabled by default.")
+			r.cmd.PrintErrln("Run with INFRACOST_PARALLELISM=1 to disable parallelism to help debugging.")
+			r.cmd.PrintErrln()
+		}
+
+		r.runCtx.Config.LogLevel = "info"
+		_ = logging.ConfigureBaseLogger(r.runCtx.Config)
+	}
+}
+
+func (r *parallelRunner) runProvider(job projectJob) (*projectOutput, error) {
+	mux := r.pathMuxs[job.ctx.ProjectConfig.Path]
 	if mux != nil {
 		mux.Lock()
 		defer mux.Unlock()
 	}
 
-	provider, err := providers.Detect(ctx, r.prior == nil)
-	var warn *string
-	if v, ok := err.(*providers.ValidationError); ok {
-		if v.Warn() == nil {
-			return nil, err
-		}
-
-		warn = v.Warn()
-	} else if err != nil {
-		m := fmt.Sprintf("%s\n\n", err)
-		m += fmt.Sprintf("Try adding a config-file to configure how Infracost should run. See %s for details and examples.", ui.LinkString("https://infracost.io/config-file"))
-
-		return nil, clierror.NewCLIError(errors.New(m), "Could not detect path type")
-	}
-
-	ctx.ContextValues.SetValue("projectType", provider.Type())
-
-	projectTypes := []interface{}{}
-	if t, ok := ctx.RunContext.ContextValues.GetValue("projectTypes"); ok {
-		projectTypes = t.([]interface{})
-	}
-	projectTypes = append(projectTypes, provider.Type())
-	ctx.RunContext.ContextValues.SetValue("projectTypes", projectTypes)
-
-	if r.cmd.Name() == "diff" && provider.Type() == "terraform_state_json" {
+	if r.cmd.Name() == "diff" && job.provider.Type() == "terraform_state_json" {
 		m := "Cannot use Terraform state JSON with the infracost diff command.\n\n"
 		m += fmt.Sprintf("Use the %s flag to specify the path to one of the following:\n", ui.PrimaryString("--path"))
 		m += fmt.Sprintf(" - Terraform/Terragrunt directory\n - Terraform plan JSON file, see %s for how to generate this.", ui.SecondaryLinkString("https://infracost.io/troubleshoot"))
 		return nil, clierror.NewCLIError(errors.New(m), "Cannot use Terraform state JSON with the infracost diff command")
 	}
 
-	m := fmt.Sprintf("Detected %s at %s", provider.DisplayType(), ui.DisplayPath(ctx.ProjectConfig.Path))
-	if provider.Type() == "terraform_dir" {
-		m = fmt.Sprintf("Evaluating %s at %s", provider.DisplayType(), ui.DisplayPath(ctx.ProjectConfig.Path))
+	m := fmt.Sprintf("Detected %s at %s", job.provider.DisplayType(), ui.DisplayPath(job.ctx.ProjectConfig.Path))
+	if job.provider.Type() == "terraform_dir" {
+		m = fmt.Sprintf("Evaluating %s at %s", job.provider.DisplayType(), ui.DisplayPath(job.ctx.ProjectConfig.Path))
 	}
 
 	if r.runCtx.Config.IsLogging() {
@@ -364,24 +361,20 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 		fmt.Fprintln(os.Stderr, m)
 	}
 
-	if warn != nil {
-		ui.PrintWarning(r.runCtx.ErrWriter, *warn)
-	}
-
 	// Generate usage file
 	if r.runCtx.Config.SyncUsageFile {
-		err := r.generateUsageFile(ctx, provider)
+		err := r.generateUsageFile(job.ctx, job.provider)
 		if err != nil {
-			return nil, errors.Wrap(err, "Error generating usage file")
+			return nil, fmt.Errorf("Error generating usage file %w", err)
 		}
 	}
 
 	// Load usage data
 	var usageFile *usage.UsageFile
 
-	if ctx.ProjectConfig.UsageFile != "" {
+	if job.ctx.ProjectConfig.UsageFile != "" {
 		var err error
-		usageFile, err = usage.LoadUsageFile(ctx.ProjectConfig.UsageFile)
+		usageFile, err = usage.LoadUsageFile(job.ctx.ProjectConfig.UsageFile)
 		if err != nil {
 			return nil, err
 		}
@@ -396,7 +389,7 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 			)
 		}
 
-		ctx.ContextValues.SetValue("hasUsageFile", true)
+		job.ctx.ContextValues.SetValue("hasUsageFile", true)
 	} else {
 		usageFile = usage.NewBlankUsageFile()
 	}
@@ -429,7 +422,7 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 	out := &projectOutput{}
 
 	t1 := time.Now()
-	projects, err := provider.LoadResources(usageData)
+	projects, err := job.provider.LoadResources(usageData)
 	if err != nil {
 		r.cmd.PrintErrln()
 		return nil, err
@@ -485,7 +478,7 @@ func (r *parallelRunner) runProjectConfig(ctx *config.ProjectContext) (*projectO
 
 	t2 := time.Now()
 	taken := t2.Sub(t1).Milliseconds()
-	ctx.ContextValues.SetValue("tfProjectRunTimeMs", taken)
+	job.ctx.ContextValues.SetValue("tfProjectRunTimeMs", taken)
 
 	spinner.Success()
 
@@ -625,18 +618,18 @@ func (r *parallelRunner) generateUsageFile(ctx *config.ProjectContext, provider 
 	usageFilePath := ctx.ProjectConfig.UsageFile
 	err := usage.CreateUsageFile(usageFilePath)
 	if err != nil {
-		return errors.Wrap(err, "Error creating usage file")
+		return fmt.Errorf("Error creating usage file %w", err)
 	}
 
 	usageFile, err = usage.LoadUsageFile(usageFilePath)
 	if err != nil {
-		return errors.Wrap(err, "Error loading usage file")
+		return fmt.Errorf("Error loading usage file %w", err)
 	}
 
 	usageData := usageFile.ToUsageDataMap()
 	providerProjects, err := provider.LoadResources(usageData)
 	if err != nil {
-		return errors.Wrap(err, "Error loading resources")
+		return fmt.Errorf("Error loading resources %w", err)
 	}
 
 	r.buildResources(providerProjects)
@@ -654,19 +647,19 @@ func (r *parallelRunner) generateUsageFile(ctx *config.ProjectContext, provider 
 
 	if err != nil {
 		spinner.Fail()
-		return errors.Wrap(err, "Error synchronizing usage data")
+		return fmt.Errorf("Error synchronizing usage data %w", err)
 	}
 
 	ctx.SetFrom(syncResult)
 	if err != nil {
 		spinner.Fail()
-		return errors.Wrap(err, "Error summarizing usage")
+		return fmt.Errorf("Error summarizing usage %w", err)
 	}
 
 	err = usageFile.WriteToPath(ctx.ProjectConfig.UsageFile)
 	if err != nil {
 		spinner.Fail()
-		return errors.Wrap(err, "Error writing usage file")
+		return fmt.Errorf("Error writing usage file %w", err)
 	}
 
 	if syncResult == nil {

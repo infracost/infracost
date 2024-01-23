@@ -179,33 +179,39 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 			logger := zerolog.New(io.Discard)
 
 			ctx := config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, logrus.Fields{})
-			parser := modules.NewSharedHCLParser()
-			parsers, err := hcl.LoadParsers(
-				ctx,
-				testPath,
-				modules.NewModuleLoader(testPath, parser, nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}),
-				nil,
-				logger,
-				hcl.OptionWithBlockBuilder(
-					hcl.BlockBuilder{
-						MockFunc: func(a *hcl.Attribute) cty.Value {
-							return cty.StringVal(fmt.Sprintf("mocked-%s", a.Name()))
-						},
-						SetAttributes: []hcl.SetAttributesFunc{setMockAttributes(tt.attrs)},
-						Logger:        logger,
-						HCLParser:     parser,
+			moduleParser := modules.NewSharedHCLParser()
+			pl := hcl.NewProjectLocator(logger, nil)
+			mods := pl.FindRootModules(testPath)
+			options := []hcl.Option{hcl.OptionWithBlockBuilder(
+				hcl.BlockBuilder{
+					MockFunc: func(a *hcl.Attribute) cty.Value {
+						return cty.StringVal(fmt.Sprintf("mocked-%s", a.Name()))
 					},
-				))
-			require.NoError(t, err)
+					SetAttributes: []hcl.SetAttributesFunc{setMockAttributes(tt.attrs)},
+					Logger:        logger,
+					HCLParser:     moduleParser,
+				},
+			)}
+
+			if mods[0].TerraformVarFiles != nil {
+				options = append(options, hcl.OptionWithTFVarsPaths(mods[0].TerraformVarFiles, true))
+			}
+
+			parser := hcl.NewParser(
+				mods[0],
+				pl,
+				modules.NewModuleLoader(testPath, moduleParser, nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}),
+				logger,
+				options...,
+			)
 
 			p := HCLProvider{
-				parsers: parsers,
-				logger:  logger,
-				ctx:     ctx,
+				Parser: parser,
+				logger: logger,
+				ctx:    ctx,
 			}
-			got := p.LoadPlanJSONs()
+			root := p.LoadPlanJSON()
 
-			root := got[0]
 			require.NoError(t, root.Error)
 
 			// uncomment and run `make test` to update the expectations

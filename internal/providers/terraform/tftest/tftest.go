@@ -5,6 +5,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
+	"io"
 	"os"
 	"path/filepath"
 	"sort"
@@ -12,8 +13,10 @@ import (
 	"sync"
 	"testing"
 
+	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/require"
 
+	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/usage"
 
@@ -401,7 +404,9 @@ func newHCLProvider(t *testing.T, runCtx *config.RunContext, tfdir string) *terr
 		Path: tfdir,
 	}, nil)
 
-	provider, err := terraform.NewHCLProvider(projectCtx, &terraform.HCLProviderConfig{SuppressLogging: true})
+	discard := zerolog.New(io.Discard)
+	pl := hcl.NewProjectLocator(discard, nil)
+	provider, err := terraform.NewHCLProvider(projectCtx, hcl.RootPath{Path: tfdir}, pl, &terraform.HCLProviderConfig{SuppressLogging: true})
 	require.NoError(t, err)
 
 	return provider
