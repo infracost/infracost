@@ -48,10 +48,6 @@ func Detect(ctx *config.RunContext, project *config.Project, includePastResource
 		return []schema.Provider{terraform.NewStateJSONProvider(projectContext, includePastResources)}, nil
 	case ProjectTypeCloudFormation:
 		return []schema.Provider{cloudformation.NewTemplateProvider(projectContext, includePastResources)}, nil
-	case ProjectTypeTerragruntDir:
-		h := terraform.NewTerragruntHCLProvider(projectContext, includePastResources)
-
-		return []schema.Provider{h}, nil
 	}
 
 	pathOverrides := make([]hcl.PathOverrideConfig, len(ctx.Config.Autodetect.PathOverrides))
@@ -81,15 +77,19 @@ func Detect(ctx *config.RunContext, project *config.Project, includePastResource
 	var autoProviders []schema.Provider
 	for _, rootPath := range rootPaths {
 		projectContext := config.NewProjectContext(ctx, project, nil)
-
-		options := []hcl.Option{hcl.OptionWithSpinner(ctx.NewSpinner)}
-		projectContext.ContextValues.SetValue("project_type", "terraform_dir")
-		if ctx.Config.ConfigFilePath == "" && len(project.TerraformVarFiles) == 0 {
-			autoProviders = append(autoProviders, autodetectedRootToProviders(pl, projectContext, rootPath, options...)...)
+		if rootPath.IsTerragrunt {
+			projectContext.ContextValues.SetValue("project_type", "terragrunt_dir")
+			autoProviders = append(autoProviders, terraform.NewTerragruntHCLProvider(rootPath, projectContext, includePastResources))
 		} else {
-			autoProviders = append(autoProviders, configFileRootToProvider(rootPath, options, projectContext, pl))
-		}
+			options := []hcl.Option{hcl.OptionWithSpinner(ctx.NewSpinner)}
+			projectContext.ContextValues.SetValue("project_type", "terraform_dir")
+			if ctx.Config.ConfigFilePath == "" && len(project.TerraformVarFiles) == 0 {
+				autoProviders = append(autoProviders, autodetectedRootToProviders(pl, projectContext, rootPath, options...)...)
+			} else {
+				autoProviders = append(autoProviders, configFileRootToProvider(rootPath, options, projectContext, pl))
+			}
 
+		}
 	}
 
 	return autoProviders, nil
@@ -183,7 +183,6 @@ var (
 	ProjectTypeTerragruntCLI       ProjectType = "terragrunt_cli"
 	ProjectTypeTerraformStateJSON  ProjectType = "terraform_state_json"
 	ProjectTypeCloudFormation      ProjectType = "cloudformation"
-	ProjectTypeTerragruntDir       ProjectType = "terragrunt_dir"
 	ProjectTypeAutodetect          ProjectType = "autodetect"
 )
 
@@ -204,15 +203,11 @@ func DetectProjectType(path string, forceCLI bool) ProjectType {
 		return ProjectTypeTerraformPlanBinary
 	}
 
-	if isTerragruntNestedDir(path, 5) {
-		if forceCLI {
+	if forceCLI {
+		if isTerragruntNestedDir(path, 5) {
 			return ProjectTypeTerragruntCLI
 		}
 
-		return ProjectTypeTerragruntDir
-	}
-
-	if forceCLI {
 		return ProjectTypeTerraformCLI
 	}
 

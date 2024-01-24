@@ -256,6 +256,13 @@ func OptionWithSpinner(f ui.SpinnerFunc) Option {
 	}
 }
 
+type DetectedProject interface {
+	ProjectName() string
+	RelativePath() string
+	TerraformVarFiles() []string
+	YAML() string
+}
+
 // Parser is a tool for parsing terraform templates at a given file system location.
 type Parser struct {
 	repoPath              string

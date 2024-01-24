@@ -65,7 +65,7 @@ func (p panicError) Error() string {
 
 type TerragruntHCLProvider struct {
 	ctx                  *config.ProjectContext
-	Path                 string
+	Path                 hcl.RootPath
 	includePastResources bool
 	outputs              map[string]cty.Value
 	stack                *tgconfigstack.Stack
@@ -77,14 +77,14 @@ type TerragruntHCLProvider struct {
 
 // NewTerragruntHCLProvider creates a new provider intialized with the configured project path (usually the terragrunt
 // root directory).
-func NewTerragruntHCLProvider(ctx *config.ProjectContext, includePastResources bool) schema.Provider {
+func NewTerragruntHCLProvider(rootPath hcl.RootPath, ctx *config.ProjectContext, includePastResources bool) schema.Provider {
 	logger := ctx.Logger().With().Str(
 		"provider", "terragrunt_dir",
 	).Logger()
 
 	return &TerragruntHCLProvider{
 		ctx:                  ctx,
-		Path:                 ctx.ProjectConfig.Path,
+		Path:                 rootPath,
 		includePastResources: includePastResources,
 		outputs:              map[string]cty.Value{},
 		excludedPaths:        ctx.ProjectConfig.ExcludePaths,
@@ -139,6 +139,30 @@ func getEnvVars(ctx *config.ProjectContext) map[string]string {
 	return environmentMap
 }
 
+func (p *TerragruntHCLProvider) ProjectName() string {
+	return ""
+}
+
+func (p *TerragruntHCLProvider) RelativePath() string {
+	r, err := filepath.Rel(p.Path.RepoPath, p.Path.Path)
+	if err != nil {
+		return p.Path.Path
+	}
+
+	return r
+}
+
+func (p *TerragruntHCLProvider) TerraformVarFiles() []string {
+	return nil
+}
+
+func (p *TerragruntHCLProvider) YAML() string {
+	str := strings.Builder{}
+
+	str.WriteString(fmt.Sprintf("  - path: %s\n", p.RelativePath()))
+
+	return str.String()
+}
 func (p *TerragruntHCLProvider) Type() string {
 	return "terragrunt_dir"
 }
@@ -335,7 +359,7 @@ func (p *TerragruntHCLProvider) initTerraformVars(tfVars map[string]string, inpu
 }
 
 func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, error) {
-	terragruntConfigPath := tgconfig.GetDefaultConfigPath(p.Path)
+	terragruntConfigPath := tgconfig.GetDefaultConfigPath(p.Path.Path)
 
 	terragruntCacheDir := filepath.Join(config.InfracostDir, ".terragrunt-cache")
 	terragruntDownloadDir := filepath.Join(p.ctx.RunContext.Config.CachePath(), terragruntCacheDir)
@@ -354,7 +378,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 		LogLevel:                   logrus.DebugLevel,
 		ErrWriter:                  tgLog.WriterLevel(logrus.DebugLevel),
 		MaxFoldersToCheck:          tgoptions.DefaultMaxFoldersToCheck,
-		WorkingDir:                 p.Path,
+		WorkingDir:                 p.Path.Path,
 		ExcludeDirs:                p.excludedPaths,
 		DownloadDir:                terragruntDownloadDir,
 		TerraformCliArgs:           []string{tgcliinfo.CommandName},
@@ -395,25 +419,10 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 		Parallelism: 1,
 	}
 
-	terragruntConfigFiles, err := tgconfig.FindConfigFilesInPath(terragruntOptions.WorkingDir, terragruntOptions)
-	if err != nil {
-		return nil, err
-	}
-
-	// Filter these config files against the exclude paths so Terragrunt doesn't even try to evaluate them
-	terragruntConfigFiles = p.filterExcludedPaths(terragruntConfigFiles)
-
-	var filtered []string
-	for _, file := range terragruntConfigFiles {
-		if !p.isParentTerragruntConfig(file, terragruntConfigFiles) {
-			filtered = append(filtered, file)
-		}
-	}
-
-	terragruntConfigFiles = filtered
-
 	howThesePathsWereFound := fmt.Sprintf("Terragrunt config file found in a subdirectory of %s", terragruntOptions.WorkingDir)
-	s, err := createStackForTerragruntConfigPaths(terragruntOptions.WorkingDir, terragruntConfigFiles, terragruntOptions, howThesePathsWereFound)
+	s, err := createStackForTerragruntConfigPaths(terragruntOptions.WorkingDir, []string{
+		terragruntConfigPath,
+	}, terragruntOptions, howThesePathsWereFound)
 	if err != nil {
 		return nil, err
 	}
@@ -434,75 +443,6 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 	p.outputs = map[string]cty.Value{}
 
 	return workingDirsToEstimate, nil
-}
-
-// isParentTerragruntConfig checks if a terragrunt config entry is a parent file that is referenced by another config
-// with a find_in_parent_folders call. The find_in_parent_folders function searches up the directory tree
-// from the file and returns the absolute path to the first terragrunt.hcl. This means if it is found
-// we can treat this file as a child terragrunt.hcl.
-func (p *TerragruntHCLProvider) isParentTerragruntConfig(parent string, configFiles []string) bool {
-	for _, name := range configFiles {
-		if !isChildDirectory(parent, name) {
-			continue
-		}
-
-		file, err := os.Open(name)
-		if err != nil {
-			continue
-		}
-
-		scanner := bufio.NewScanner(file)
-		for scanner.Scan() {
-			line := strings.TrimSpace(scanner.Text())
-			// skip any commented out lines
-			if strings.HasPrefix(line, "#") {
-				continue
-			}
-
-			if strings.Contains(line, "find_in_parent_folders()") {
-				file.Close()
-				return true
-			}
-		}
-
-		file.Close()
-	}
-
-	return false
-}
-
-func isChildDirectory(parent, child string) bool {
-	if parent == child {
-		return false
-	}
-
-	parentDir := filepath.Dir(parent)
-	childDir := filepath.Dir(child)
-	p, err := filepath.Rel(parentDir, childDir)
-	if err != nil || strings.Contains(p, "..") {
-		return false
-	}
-
-	return true
-}
-
-func (p *TerragruntHCLProvider) filterExcludedPaths(paths []string) []string {
-	excludedPaths := p.excludedPaths
-	excludedPaths = append(excludedPaths, config.InfracostDir)
-
-	isSkipped := buildExcludedPathsMatcher(p.Path, excludedPaths)
-
-	var filteredPaths []string
-
-	for _, path := range paths {
-		if !isSkipped(path) {
-			filteredPaths = append(filteredPaths, path)
-		} else {
-			p.logger.Debug().Msgf("skipping path %s as it is marked as excluded by --exclude-path", path)
-		}
-	}
-
-	return filteredPaths
 }
 
 // runTerragrunt evaluates a Terragrunt directory with the given opts. This method is called from the
@@ -718,37 +658,6 @@ func generateConfig(terragruntConfig *tgconfig.TerragruntConfig, opts *options.T
 	}
 
 	return nil
-}
-
-func buildExcludedPathsMatcher(fullPath string, excludedDirs []string) func(string) bool {
-	var excludedMatches []string
-
-	for _, dir := range excludedDirs {
-		var absoluteDir string
-
-		if filepath.IsAbs(dir) {
-			absoluteDir = dir
-		} else {
-			absoluteDir, _ = filepath.Abs(filepath.Join(fullPath, dir))
-		}
-
-		globs, err := filepath.Glob(absoluteDir)
-		if err == nil {
-			excludedMatches = append(excludedMatches, globs...)
-		}
-	}
-
-	return func(dir string) bool {
-		absoluteDir, _ := filepath.Abs(dir)
-
-		for _, match := range excludedMatches {
-			if strings.HasPrefix(absoluteDir, match) {
-				return true
-			}
-		}
-
-		return false
-	}
 }
 
 func convertToCtyWithJson(val interface{}) (cty.Value, error) {

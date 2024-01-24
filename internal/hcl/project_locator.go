@@ -1,6 +1,7 @@
 package hcl
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -8,11 +9,15 @@ import (
 	"strings"
 
 	"github.com/gobwas/glob"
+	tgconfig "github.com/gruntwork-io/terragrunt/config"
+	"github.com/gruntwork-io/terragrunt/options"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclparse"
 	"github.com/rs/zerolog"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
+
+	"github.com/infracost/infracost/internal/config"
 )
 
 var (
@@ -167,6 +172,8 @@ func cleanVarName(file string) string {
 }
 
 type discoveredProject struct {
+	isTerragrunt bool
+
 	hasProviderBlock bool
 	hasBackendBlock  bool
 	depth            int
@@ -195,9 +202,10 @@ type ProjectLocator struct {
 	envMatcher         *EnvFileMatcher
 	skip               bool
 
-	shouldSkipDir    func(string) bool
-	shouldIncludeDir func(string) bool
-	pathOverrides    []pathOverride
+	shouldSkipDir        func(string) bool
+	shouldIncludeDir     func(string) bool
+	pathOverrides        []pathOverride
+	wdContainsTerragrunt bool
 }
 
 // ProjectLocatorConfig provides configuration options on how the locator functions.
@@ -998,11 +1006,16 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 	p.basePath, _ = filepath.Abs(fullPath)
 	p.modules = make(map[string]struct{})
 	p.moduleCalls = make(map[string][]string)
+	p.wdContainsTerragrunt = false
+	p.discoveredProjects = []discoveredProject{}
+	p.discoveredVarFiles = make(map[string][]RootPathVarFile)
 
 	p.shouldSkipDir = buildDirMatcher(p.excludedDirs, fullPath)
 	p.shouldIncludeDir = buildDirMatcher(p.includedDirs, fullPath)
 
+	p.findTerragruntDirs(fullPath)
 	p.walkPaths(fullPath, 0)
+
 	p.logger.Debug().Msgf("walking directory at %s returned a list of possible Terraform projects with length %d", fullPath, len(p.discoveredProjects))
 
 	var projects []RootPath
@@ -1015,6 +1028,7 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 				HasChanges:        p.hasChanges(dir.path),
 				TerraformVarFiles: p.discoveredVarFiles[dir.path],
 				Matcher:           p.envMatcher,
+				IsTerragrunt:      dir.isTerragrunt,
 			})
 			projectMap[dir.path] = true
 
@@ -1030,6 +1044,10 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 
 	paths := node.CollectRootPaths()
 	p.excludeEnvFromPaths(paths)
+
+	sort.Slice(paths, func(i, j int) bool {
+		return paths[i].Path < paths[j].Path
+	})
 
 	return paths
 }
@@ -1105,6 +1123,17 @@ func (p *ProjectLocator) shouldUseProject(dir discoveredProject) bool {
 		return true
 	}
 
+	// we only include Terraform projects that have been found alongside Terragrunt
+	// projects if they have been forced to be included by --include-path. This is
+	// done as we sometimes get collisions with the Terragrunt modules that are
+	// incorrectly flagged as Terraform projects.
+	//
+	// @TODO in future we can read the "source" blocks of the Terragrunt projects and
+	// infer that the Terraform projects are not modules.
+	if p.wdContainsTerragrunt && !dir.isTerragrunt {
+		return false
+	}
+
 	if p.useAllPaths {
 		return true
 	}
@@ -1119,7 +1148,7 @@ func (p *ProjectLocator) shouldUseProject(dir discoveredProject) bool {
 		return false
 	}
 
-	if !dir.hasRootModuleBlocks() {
+	if !dir.hasRootModuleBlocks() && !dir.isTerragrunt {
 		return false
 	}
 
@@ -1152,12 +1181,6 @@ func (p *ProjectLocator) maxSearchDepth() int {
 }
 
 func (p *ProjectLocator) walkPaths(fullPath string, level int) {
-	// if the level is 0 this is the start of the directory tree.
-	// let's reset all the discovered paths, so we don't duplicate.
-	if level == 0 {
-		p.discoveredProjects = []discoveredProject{}
-		p.discoveredVarFiles = make(map[string][]RootPathVarFile)
-	}
 	p.logger.Debug().Msgf("walking path %s to discover terraform files", fullPath)
 
 	if level >= p.maxSearchDepth() {
@@ -1180,6 +1203,7 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) {
 
 		var parseFunc func(filename string) (*hcl.File, hcl.Diagnostics)
 		name := info.Name()
+
 		if strings.HasSuffix(name, ".tf") {
 			parseFunc = hclParser.ParseHCLFile
 		}
@@ -1224,6 +1248,35 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) {
 	}
 
 	files := hclParser.Files()
+	if len(files) > 0 {
+		blockInfo := p.shallowDecodeTerraformBlocks(fullPath, files)
+
+		p.discoveredProjects = append(p.discoveredProjects, discoveredProject{
+			path:             fullPath,
+			files:            files,
+			hasProviderBlock: blockInfo.hasProviderBlock,
+			hasBackendBlock:  blockInfo.hasTerraformBackendBlock,
+			depth:            level,
+		})
+	}
+
+	for _, info := range fileInfos {
+		if info.IsDir() {
+			if strings.HasPrefix(info.Name(), ".") {
+				continue
+			}
+
+			p.walkPaths(filepath.Join(fullPath, info.Name()), level+1)
+		}
+	}
+}
+
+type terraformDirInfo struct {
+	hasProviderBlock         bool
+	hasTerraformBackendBlock bool
+}
+
+func (p *ProjectLocator) shallowDecodeTerraformBlocks(fullPath string, files map[string]*hcl.File) terraformDirInfo {
 	var hasProviderBlock bool
 	var hasTerraformBackendBlock bool
 
@@ -1276,24 +1329,32 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) {
 			}
 		}
 	}
+	return terraformDirInfo{
+		hasProviderBlock:         hasProviderBlock,
+		hasTerraformBackendBlock: hasTerraformBackendBlock,
+	}
+}
 
-	if len(files) > 0 {
-		p.discoveredProjects = append(p.discoveredProjects, discoveredProject{
-			path:             fullPath,
-			files:            files,
-			hasProviderBlock: hasProviderBlock,
-			hasBackendBlock:  hasTerraformBackendBlock,
-			depth:            level,
-		})
+func (p *ProjectLocator) findTerragruntDirs(fullPath string) {
+	terragruntCacheDir := filepath.Join(config.InfracostDir, ".terragrunt-cache")
+	terragruntDownloadDir := filepath.Join(fullPath, terragruntCacheDir)
+	terragruntConfigFiles, err := tgconfig.FindConfigFilesInPath(fullPath, &options.TerragruntOptions{
+		DownloadDir: terragruntDownloadDir,
+	})
+	if err != nil {
+		p.logger.Debug().Err(err).Msgf("failed to find terragrunt files in path %s", fullPath)
 	}
 
-	for _, info := range fileInfos {
-		if info.IsDir() {
-			if strings.HasPrefix(info.Name(), ".") {
-				continue
-			}
+	if len(terragruntConfigFiles) > 0 {
+		p.wdContainsTerragrunt = true
+	}
 
-			p.walkPaths(filepath.Join(fullPath, info.Name()), level+1)
+	for _, configFile := range terragruntConfigFiles {
+		if !p.shouldSkipDir(filepath.Dir(configFile)) && !IsParentTerragruntConfig(configFile, terragruntConfigFiles) {
+			p.discoveredProjects = append(p.discoveredProjects, discoveredProject{
+				path:         filepath.Dir(configFile),
+				isTerragrunt: true,
+			})
 		}
 	}
 }
@@ -1336,4 +1397,54 @@ func buildDirMatcher(dirs []string, fullPath string) func(string) bool {
 
 		return false
 	}
+}
+
+// IsParentTerragruntConfig checks if a terragrunt config entry is a parent file that is referenced by another config
+// with a find_in_parent_folders call. The find_in_parent_folders function searches up the directory tree
+// from the file and returns the absolute path to the first terragrunt.hcl. This means if it is found
+// we can treat this file as a child terragrunt.hcl.
+func IsParentTerragruntConfig(parent string, configFiles []string) bool {
+	for _, name := range configFiles {
+		if !isChildDirectory(parent, name) {
+			continue
+		}
+
+		file, err := os.Open(name)
+		if err != nil {
+			continue
+		}
+
+		scanner := bufio.NewScanner(file)
+		for scanner.Scan() {
+			line := strings.TrimSpace(scanner.Text())
+			// skip any commented out lines
+			if strings.HasPrefix(line, "#") {
+				continue
+			}
+
+			if strings.Contains(line, "find_in_parent_folders()") {
+				file.Close()
+				return true
+			}
+		}
+
+		file.Close()
+	}
+
+	return false
+}
+
+func isChildDirectory(parent, child string) bool {
+	if parent == child {
+		return false
+	}
+
+	parentDir := filepath.Dir(parent)
+	childDir := filepath.Dir(child)
+	p, err := filepath.Rel(parentDir, childDir)
+	if err != nil || strings.Contains(p, "..") {
+		return false
+	}
+
+	return true
 }
