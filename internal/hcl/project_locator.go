@@ -16,10 +16,10 @@ import (
 )
 
 var (
-	defaultEnvVarNames = regexp.MustCompile(`^(.*-)?(prd|prod|production|preprod|staging|stage|stg|development|dev|release|testing|test|tst|qa|uat|live|sandbox|demo|integration|int|experimental|experiments|trial|validation|perf|sec|dr)`)
+	defaultEnvVarNames = createEnvVarNamesRegex([]string{"prd", "prod", "production", "preprod", "staging", "stage", "stg", "development", "dev", "release", "testing", "test", "tst", "qa", "uat", "live", "sandbox", "demo", "integration", "int", "experimental", "experiments", "trial", "validation", "perf", "sec", "dr"})
 
-	VarFileEnvPrefixRegxp = regexp.MustCompile(`^(\w+)-`)
-	VarFileEnvSuffixRegxp = regexp.MustCompile(`-(\w+)$`)
+	VarFileEnvPrefixRegxp = regexp.MustCompile(`^(\w+)[-_]`)
+	VarFileEnvSuffixRegxp = regexp.MustCompile(`[-_](\w+)$`)
 )
 
 // CleanVarName removes the .tfvars or .tfvars.json suffix from the file name.
@@ -59,6 +59,12 @@ func IsAutoVarFile(file string) bool {
 	withoutJSONSuffix := strings.TrimSuffix(file, ".json")
 
 	return strings.HasSuffix(withoutJSONSuffix, ".auto.tfvars") || withoutJSONSuffix == "terraform.tfvars"
+}
+
+func createEnvVarNamesRegex(names []string) *regexp.Regexp {
+	joinedNames := strings.Join(names, "|")
+	pattern := fmt.Sprintf("^(%s)([-_])?|([-_])(%s)$|^(%s)", joinedNames, joinedNames, joinedNames)
+	return regexp.MustCompile(pattern)
 }
 
 type discoveredProject struct {
@@ -109,7 +115,7 @@ func NewProjectLocator(logger zerolog.Logger, config *ProjectLocatorConfig) *Pro
 	envVarNames := defaultEnvVarNames
 	if config != nil {
 		if len(config.EnvNames) > 0 {
-			envVarNames = regexp.MustCompile("^(.*-)?(" + strings.Join(config.EnvNames, "|") + ")")
+			envVarNames = createEnvVarNamesRegex(config.EnvNames)
 		}
 
 		return &ProjectLocator{
@@ -145,7 +151,7 @@ func NewProjectLocator(logger zerolog.Logger, config *ProjectLocatorConfig) *Pro
 // environment prefix e.g. defaults.tfvars, global.tfvars are applicable,
 // prod-default.tfvars, stag-globals are not.
 func (p *ProjectLocator) IsGlobalVarFile(file string) bool {
-	return !p.IsEnvName(filepath.Base(file))
+	return !p.IsEnvName(CleanVarName(filepath.Base(file)))
 }
 
 func (p *ProjectLocator) IsEnvName(name string) bool {
