@@ -16,9 +16,10 @@ import (
 )
 
 var (
-	defaultEnvVarNames = regexp.MustCompile(`^(prd|prod|production|preprod|staging|stage|stg|development|dev|release|testing|test|tst|qa|uat|live|sandbox|demo|integration|int|experimental|experiments|trial|validation|perf|sec|dr)`)
+	defaultEnvVarNames = regexp.MustCompile(`^(.*-)?(prd|prod|production|preprod|staging|stage|stg|development|dev|release|testing|test|tst|qa|uat|live|sandbox|demo|integration|int|experimental|experiments|trial|validation|perf|sec|dr)`)
 
 	VarFileEnvPrefixRegxp = regexp.MustCompile(`^(\w+)-`)
+	VarFileEnvSuffixRegxp = regexp.MustCompile(`-(\w+)$`)
 )
 
 // CleanVarName removes the .tfvars or .tfvars.json suffix from the file name.
@@ -26,11 +27,24 @@ func CleanVarName(file string) string {
 	return filepath.Base(strings.TrimSuffix(strings.TrimSuffix(file, ".json"), ".tfvars"))
 }
 
-// VarEnvName returns the environment prefix of the clean name var file, if it
+// VarEnvNameFromPrefix returns the environment prefix of the clean name var file, if it
 // has one.
-func VarEnvName(file string) string {
+func VarEnvNameFromPrefix(file string) string {
 	name := CleanVarName(file)
 	sub := VarFileEnvPrefixRegxp.FindStringSubmatch(name)
+	if len(sub) != 2 {
+		return name
+	}
+
+	return sub[1]
+}
+
+// VarEnvNameFromSuffix returns the environment suffix of the clean name var file, if it
+// has one.
+func VarEnvNameFromSuffix(file string) string {
+	name := CleanVarName(file)
+	sub := VarFileEnvSuffixRegxp.FindStringSubmatch(name)
+
 	if len(sub) != 2 {
 		return name
 	}
@@ -95,7 +109,7 @@ func NewProjectLocator(logger zerolog.Logger, config *ProjectLocatorConfig) *Pro
 	envVarNames := defaultEnvVarNames
 	if config != nil {
 		if len(config.EnvNames) > 0 {
-			envVarNames = regexp.MustCompile("^" + strings.Join(config.EnvNames, "|"))
+			envVarNames = regexp.MustCompile("^(.*-)?(" + strings.Join(config.EnvNames, "|") + ")")
 		}
 
 		return &ProjectLocator{
@@ -131,7 +145,11 @@ func NewProjectLocator(logger zerolog.Logger, config *ProjectLocatorConfig) *Pro
 // environment prefix e.g. defaults.tfvars, global.tfvars are applicable,
 // prod-default.tfvars, stag-globals are not.
 func (p *ProjectLocator) IsGlobalVarFile(file string) bool {
-	return !p.envNames.MatchString(filepath.Base(file))
+	return !p.IsEnvName(filepath.Base(file))
+}
+
+func (p *ProjectLocator) IsEnvName(name string) bool {
+	return p.envNames.MatchString(name)
 }
 
 func (p *ProjectLocator) hasChanges(dir string) bool {
