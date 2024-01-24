@@ -144,21 +144,39 @@ func autodetectedRootToProviders(pl *hcl.ProjectLocator, projectContext *config.
 	// environment but have different file paths.
 	varFileGrouping := map[string][]string{}
 	for _, varFile := range varFiles {
-		if !hcl.VarFileEnvPrefixRegxp.MatchString(hcl.CleanVarName(varFile)) {
-			env := hcl.CleanVarName(varFile)
-			varFileGrouping[env] = append(varFileGrouping[env], varFile)
+		name := hcl.CleanVarName(varFile)
+
+		if !hcl.VarFileEnvPrefixRegxp.MatchString(name) && !hcl.VarFileEnvSuffixRegxp.MatchString(name) {
+			varFileGrouping[name] = append(varFileGrouping[name], varFile)
 		}
 	}
 
 	// loop through the var files again and if there are any global var files
-	// with a defaults prefix, add them to the grouping for each environment
-	// only if the environment exists.
-	for _, varFile := range varFiles {
-		if hcl.VarFileEnvPrefixRegxp.MatchString(hcl.CleanVarName(varFile)) {
-			env := hcl.VarEnvName(varFile)
+	// with an environment prefix or suffix, add them to the grouping for each environment
+	// only if either the environment already exists, or there is no exact var files already
+	// associated with this project.
+	hasExactVarFileMatches := len(varFileGrouping) > 0
 
-			if _, ok := varFileGrouping[env]; ok {
+	for _, varFile := range varFiles {
+		name := hcl.CleanVarName(varFile)
+
+		if hcl.VarFileEnvPrefixRegxp.MatchString(name) {
+			env := hcl.VarEnvNameFromPrefix(varFile)
+
+			_, exists := varFileGrouping[env]
+			if (!hasExactVarFileMatches && pl.IsEnvName(env)) || exists {
 				varFileGrouping[env] = append(varFileGrouping[env], varFile)
+				continue
+			}
+		}
+
+		if hcl.VarFileEnvSuffixRegxp.MatchString(name) {
+			env := hcl.VarEnvNameFromSuffix(varFile)
+
+			_, exists := varFileGrouping[env]
+			if (!hasExactVarFileMatches && pl.IsEnvName(env)) || exists {
+				varFileGrouping[env] = append(varFileGrouping[env], varFile)
+				continue
 			}
 		}
 	}

@@ -12,7 +12,6 @@ projects:
       - ../dev.tfvars
       - ../default.tfvars
       - ../network-bat.tfvars
-      - ../bat.tfvars
   - path: apps/bar
     name: apps-bar-baz
     terraform_var_files:
@@ -20,7 +19,6 @@ projects:
       - ../dev.tfvars
       - ../default.tfvars
       - ../network-baz.tfvars
-      - ../baz.tfvars
   - path: apps/foo
     name: apps-foo-bat
     terraform_var_files:
@@ -28,7 +26,6 @@ projects:
       - ../dev.tfvars
       - ../default.tfvars
       - ../network-bat.tfvars
-      - ../bat.tfvars
   - path: apps/foo
     name: apps-foo-baz
     terraform_var_files:
@@ -36,5 +33,4 @@ projects:
       - ../dev.tfvars
       - ../default.tfvars
       - ../network-baz.tfvars
-      - ../baz.tfvars
 
