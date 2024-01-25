@@ -1,0 +1,9 @@
+version: 0.1
+resource_usage:
+  ibm_database.test_db1:
+    database_ram_mb: 12288
+    database_disk_mb: 131072
+    database_core: 3
+  ibm_database.test_db2:
+    database_ram_mb: 15360
+    database_members: 4

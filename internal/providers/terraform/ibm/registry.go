@@ -19,6 +19,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getIsLbRegistryItem(),
 	getIsPublicGatewayRegistryItem(),
 	getIbmPiVolumeRegistryItem(),
+	getDatabaseRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
