@@ -54,6 +54,17 @@ func NewProjectContext(runCtx *RunContext, projectCfg *Project, logFields interf
 	}
 }
 
+func (c *ProjectContext) SetProjectType(projectType string) {
+	c.ContextValues.SetValue("project_type", projectType)
+	var projectTypes []interface{}
+	if t, ok := c.RunContext.ContextValues.GetValue("projectTypes"); ok {
+		projectTypes = t.([]interface{})
+	}
+
+	projectTypes = append(projectTypes, projectType)
+	c.RunContext.ContextValues.SetValue("projectTypes", projectTypes)
+}
+
 func (c *ProjectContext) Logger() zerolog.Logger {
 	return c.logger
 }

@@ -71,6 +71,11 @@ clean:
 test:
 	INFRACOST_LOG_LEVEL=warn go test -short $(LD_FLAGS) ./... $(or $(ARGS), -cover)
 
+# Run only short unit tests with parallelism disabled and verbosity true.
+# This is useful for pinpointing a hanging test.
+test_verbose:
+	INFRACOST_LOG_LEVEL=warn go test -p 1 -v -short $(LD_FLAGS) ./... $(or $(ARGS), -cover)
+
 # Run all tests
 test_all:
 	INFRACOST_LOG_LEVEL=warn go test -timeout 30m $(LD_FLAGS) ./... $(or $(ARGS), -cover)

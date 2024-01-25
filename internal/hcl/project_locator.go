@@ -594,6 +594,7 @@ type RootPath struct {
 	TerraformVarFiles TerraformVarFiles
 
 	HasChildVarFiles bool
+	IsTerragrunt     bool
 }
 
 func (r *RootPath) AddVarFiles(dir string, files []string) {
@@ -652,6 +653,12 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 			delete(p.discoveredVarFiles, dir.path)
 		}
 	}
+
+	// how to search for terragrunt projects
+	// 1. find all directories that contain terragrunt.hcl files
+	// 2. check that the directory does not have a child directory that contains a terragrunt.hcl file
+	// if it does, then we should not include it as a terragrunt project as this is just
+	// a parent terragrunt configuration for a child terragrunt configuration.
 
 	node := CreateTreeNode(fullPath, projects, p.discoveredVarFiles)
 	node.AssociateChildVarFiles()
