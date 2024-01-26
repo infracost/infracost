@@ -153,7 +153,7 @@ func getFlexibleServerFilterAttributes(tier, instanceType, instanceVersion strin
 	}[tier]
 
 	if tier == "b" {
-		meterName = instanceType
+		meterName = fmt.Sprintf("%s[ vcore]*", instanceType)
 		skuName = instanceType
 		series = "BS"
 	} else {
