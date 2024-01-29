@@ -16,6 +16,14 @@ resource "azurerm_mysql_flexible_server" "gp" {
   sku_name = "GP_Standard_D4ds_v4"
 }
 
+resource "azurerm_mysql_flexible_server" "gp_dXads" {
+  name                = "example-mysqlflexibleserver-d2ads"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+
+  sku_name = "GP_Standard_D2ads_v5"
+}
+
 resource "azurerm_mysql_flexible_server" "mo" {
   name                = "example-mysqlflexibleserver"
   resource_group_name = azurerm_resource_group.example.name
