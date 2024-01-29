@@ -1782,7 +1782,7 @@ func BenchmarkParserEvaluate(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		b.StopTimer()
 		logger := newDiscardLogger()
-		dir := filepath.Dir("./testdata/benchmarks/heavy")
+		dir := "./testdata/benchmarks/heavy"
 		source, _ := modules.NewTerraformCredentialsSource(modules.BaseCredentialSet{})
 		loader := modules.NewModuleLoader(dir, modules.NewSharedHCLParser(), source, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 		parser := NewParser(
