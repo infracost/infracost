@@ -31,9 +31,9 @@ func (r *LightsailInstance) BuildResource() *schema.Resource {
 	}
 
 	bundlePrefixMappings := map[string]bundleSpecs{
-		"nano":    {"1", "0.5GB"},
-		"micro":   {"1", "1GB"},
-		"small":   {"1", "2GB"},
+		"nano":    {"2", "0.5GB"},
+		"micro":   {"2", "1GB"},
+		"small":   {"2", "2GB"},
 		"medium":  {"2", "4GB"},
 		"large":   {"2", "8GB"},
 		"xlarge":  {"4", "16GB"},

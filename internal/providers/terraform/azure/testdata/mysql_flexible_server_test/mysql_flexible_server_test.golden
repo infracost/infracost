@@ -11,6 +11,11 @@
  ├─ Storage                                              20  GB                       $2.76 
  └─ Additional backup storage                         2,000  GB                     $190.00 
                                                                                             
+ azurerm_mysql_flexible_server.gp_dXads                                                     
+ ├─ Compute (GP_Standard_D2ads_v5)                      730  hours                  $142.35 
+ ├─ Storage                                              20  GB                       $2.76 
+ └─ Additional backup storage                Monthly cost depends on usage: $0.095 per GB   
+                                                                                            
  azurerm_mysql_flexible_server.mo                                                           
  ├─ Compute (MO_Standard_E4ds_v4)                       730  hours                  $382.52 
  ├─ Storage                                              20  GB                       $2.76 
@@ -22,15 +27,15 @@
  ├─ Storage                                              20  GB                       $2.76 
  └─ Additional backup storage                Monthly cost depends on usage: $0.095 per GB   
                                                                                             
- OVERALL TOTAL                                                                    $2,412.90 
+ OVERALL TOTAL                                                                    $2,558.01 
 ──────────────────────────────────
-5 cloud resources were detected:
-∙ 4 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+6 cloud resources were detected:
+∙ 5 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 1 was free:
   ∙ 1 x azurerm_resource_group
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestMySQLFlexibleServer                            ┃ $2,413       ┃
+┃ TestMySQLFlexibleServer                            ┃ $2,558       ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
