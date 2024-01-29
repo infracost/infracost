@@ -65,7 +65,7 @@ func (p *Parser) sortVarFilesByPrecedence(paths []string, autoDetected bool) {
 			case strings.HasSuffix(path, ".auto.tfvars"), strings.HasSuffix(path, ".auto.tfvars.json"):
 				return 3
 			case autoDetected:
-				if p.projectLocator.IsGlobalVarFile(path) {
+				if p.envMatcher.IsGlobalVarFile(path) {
 					return 4
 				}
 
@@ -272,11 +272,11 @@ type Parser struct {
 	logger                zerolog.Logger
 	hasChanges            bool
 	moduleSuffix          string
-	projectLocator        *ProjectLocator
+	envMatcher            *EnvFileMatcher
 }
 
 // NewParser creates a new parser for the given RootPath.
-func NewParser(projectRoot RootPath, pl *ProjectLocator, moduleLoader *modules.ModuleLoader, logger zerolog.Logger, options ...Option) *Parser {
+func NewParser(projectRoot RootPath, envMatcher *EnvFileMatcher, moduleLoader *modules.ModuleLoader, logger zerolog.Logger, options ...Option) *Parser {
 	parserLogger := logger.With().Str(
 		"parser_path", projectRoot.Path,
 	).Logger()
@@ -284,15 +284,15 @@ func NewParser(projectRoot RootPath, pl *ProjectLocator, moduleLoader *modules.M
 	hclParser := modules.NewSharedHCLParser()
 
 	p := &Parser{
-		repoPath:       projectRoot.RepoPath,
-		initialPath:    projectRoot.Path,
-		hasChanges:     projectRoot.HasChanges,
-		workspaceName:  defaultTerraformWorkspaceName,
-		hclParser:      hclParser,
-		blockBuilder:   BlockBuilder{SetAttributes: []SetAttributesFunc{SetUUIDAttributes}, Logger: logger, HCLParser: hclParser},
-		logger:         parserLogger,
-		moduleLoader:   moduleLoader,
-		projectLocator: pl,
+		repoPath:      projectRoot.RepoPath,
+		initialPath:   projectRoot.Path,
+		hasChanges:    projectRoot.HasChanges,
+		workspaceName: defaultTerraformWorkspaceName,
+		hclParser:     hclParser,
+		blockBuilder:  BlockBuilder{SetAttributes: []SetAttributesFunc{SetUUIDAttributes}, Logger: logger, HCLParser: hclParser},
+		logger:        parserLogger,
+		moduleLoader:  moduleLoader,
+		envMatcher:    envMatcher,
 	}
 
 	for _, option := range options {

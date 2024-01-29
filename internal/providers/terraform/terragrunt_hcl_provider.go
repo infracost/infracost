@@ -614,7 +614,6 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 		hcl.RootPath{
 			Path: pconfig.Path,
 		},
-		hcl.NewProjectLocator(p.logger, nil),
 		&HCLProviderConfig{CacheParsingModules: true, SkipAutoDetection: true},
 		ops...,
 	)

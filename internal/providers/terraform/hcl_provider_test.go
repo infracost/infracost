@@ -194,12 +194,12 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 			)}
 
 			if mods[0].TerraformVarFiles != nil {
-				options = append(options, hcl.OptionWithTFVarsPaths(mods[0].TerraformVarFiles, true))
+				options = append(options, hcl.OptionWithTFVarsPaths(mods[0].TerraformVarFiles.ToPaths(), true))
 			}
 
 			parser := hcl.NewParser(
 				mods[0],
-				pl,
+				hcl.CreateEnvFileMatcher([]string{}),
 				modules.NewModuleLoader(testPath, moduleParser, nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}),
 				logger,
 				options...,

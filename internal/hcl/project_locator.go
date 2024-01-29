@@ -16,7 +16,7 @@ import (
 )
 
 var (
-	defaultEnvVarNames = createEnvVarNamesRegex([]string{
+	defaultEnvs = []string{
 		"prd",
 		"prod",
 		"production",
@@ -51,40 +51,28 @@ var (
 		"management",
 		"mgmt",
 		"playground",
-	})
-
-	VarFileEnvPrefixRegxp = regexp.MustCompile(`^(\w+)[-_]`)
-	VarFileEnvSuffixRegxp = regexp.MustCompile(`[-_](\w+)$`)
+	}
 )
 
-// CleanVarName removes the .tfvars or .tfvars.json suffix from the file name.
-func CleanVarName(file string) string {
-	return filepath.Base(strings.TrimSuffix(strings.TrimSuffix(file, ".json"), ".tfvars"))
+// EnvFileMatcher is used to match environment specific var files.
+type EnvFileMatcher struct {
+	EnvNames  *regexp.Regexp
+	EnvPrefix *regexp.Regexp
+	EnvSuffix *regexp.Regexp
 }
 
-// VarEnvNameFromPrefix returns the environment prefix of the clean name var file, if it
-// has one.
-func VarEnvNameFromPrefix(file string) string {
-	name := CleanVarName(file)
-	sub := VarFileEnvPrefixRegxp.FindStringSubmatch(name)
-	if len(sub) != 2 {
-		return name
+func CreateEnvFileMatcher(names []string) *EnvFileMatcher {
+	if len(names) == 0 {
+		return CreateEnvFileMatcher(defaultEnvs)
 	}
 
-	return sub[1]
-}
+	joinedNames := strings.Join(names, "|")
 
-// VarEnvNameFromSuffix returns the environment suffix of the clean name var file, if it
-// has one.
-func VarEnvNameFromSuffix(file string) string {
-	name := CleanVarName(file)
-	sub := VarFileEnvSuffixRegxp.FindStringSubmatch(name)
-
-	if len(sub) != 2 {
-		return name
+	return &EnvFileMatcher{
+		EnvNames:  regexp.MustCompile(fmt.Sprintf("^(%s)([-_])?|([-_])(%s)$|^(%s)", joinedNames, joinedNames, joinedNames)),
+		EnvPrefix: regexp.MustCompile(fmt.Sprintf("^(%s)[-_]", joinedNames)),
+		EnvSuffix: regexp.MustCompile(fmt.Sprintf("[-_](%s)$", joinedNames)),
 	}
-
-	return sub[1]
 }
 
 // IsAutoVarFile checks if the var file is an auto.tfvars or terraform.tfvars.
@@ -96,10 +84,44 @@ func IsAutoVarFile(file string) bool {
 	return strings.HasSuffix(withoutJSONSuffix, ".auto.tfvars") || withoutJSONSuffix == "terraform.tfvars"
 }
 
-func createEnvVarNamesRegex(names []string) *regexp.Regexp {
-	joinedNames := strings.Join(names, "|")
-	pattern := fmt.Sprintf("^(%s)([-_])?|([-_])(%s)$|^(%s)", joinedNames, joinedNames, joinedNames)
-	return regexp.MustCompile(pattern)
+// IsGlobalVarFile checks if the var file is a global var file.
+func (e *EnvFileMatcher) IsGlobalVarFile(file string) bool {
+	return !e.IsEnvName(file)
+}
+
+// IsEnvName checks if the var file is an environment specific var file.
+func (e *EnvFileMatcher) IsEnvName(file string) bool {
+	return e.EnvNames.MatchString(CleanVarName(filepath.Base(file)))
+}
+
+// EnvName returns the environment name for the given var file. If the var file
+// is not an environment specific var file, this will return an empty string.
+func (e *EnvFileMatcher) EnvName(file string) string {
+	name := CleanVarName(filepath.Base(file))
+	if e.EnvSuffix.MatchString(name) {
+		sub := e.EnvSuffix.FindStringSubmatch(name)
+		if len(sub) != 2 {
+			return ""
+		}
+
+		return sub[1]
+	}
+
+	if e.EnvPrefix.MatchString(name) {
+		sub := e.EnvPrefix.FindStringSubmatch(name)
+		if len(sub) != 2 {
+			return ""
+		}
+
+		return sub[1]
+	}
+
+	return ""
+}
+
+// CleanVarName removes the .tfvars or .tfvars.json suffix from the file name.
+func CleanVarName(file string) string {
+	return filepath.Base(strings.TrimSuffix(strings.TrimSuffix(file, ".json"), ".tfvars"))
 }
 
 type discoveredProject struct {
@@ -125,10 +147,10 @@ type ProjectLocator struct {
 	logger         zerolog.Logger
 
 	basePath           string
-	discoveredVarFiles map[string][]string
+	discoveredVarFiles map[string][]RootPathVarFile
 	discoveredProjects []discoveredProject
 	includedDirs       []string
-	envNames           *regexp.Regexp
+	envMatcher         *EnvFileMatcher
 	skip               bool
 
 	shouldSkipDir    func(string) bool
@@ -147,21 +169,21 @@ type ProjectLocatorConfig struct {
 
 // NewProjectLocator returns safely initialized ProjectLocator.
 func NewProjectLocator(logger zerolog.Logger, config *ProjectLocatorConfig) *ProjectLocator {
-	envVarNames := defaultEnvVarNames
+	matcher := CreateEnvFileMatcher(defaultEnvs)
 	if config != nil {
 		if len(config.EnvNames) > 0 {
-			envVarNames = createEnvVarNamesRegex(config.EnvNames)
+			matcher = CreateEnvFileMatcher(config.EnvNames)
 		}
 
 		return &ProjectLocator{
 			modules:            make(map[string]struct{}),
 			moduleCalls:        make(map[string][]string),
-			discoveredVarFiles: make(map[string][]string),
+			discoveredVarFiles: make(map[string][]RootPathVarFile),
 			excludedDirs:       config.ExcludedDirs,
 			changedObjects:     config.ChangedObjects,
 			includedDirs:       config.IncludedDirs,
 			logger:             logger,
-			envNames:           envVarNames,
+			envMatcher:         matcher,
 			useAllPaths:        config.UseAllPaths,
 			skip:               config.SkipAutoDetection,
 			shouldSkipDir: func(s string) bool {
@@ -175,22 +197,10 @@ func NewProjectLocator(logger zerolog.Logger, config *ProjectLocatorConfig) *Pro
 
 	return &ProjectLocator{
 		modules:            make(map[string]struct{}),
-		discoveredVarFiles: make(map[string][]string),
+		discoveredVarFiles: make(map[string][]RootPathVarFile),
 		logger:             logger,
-		envNames:           envVarNames,
+		envMatcher:         matcher,
 	}
-}
-
-// IsGlobalVarFile checks if the var file is a "global" one, this is only
-// applicable if we match a globalTerraformVarName and these don't have an
-// environment prefix e.g. defaults.tfvars, global.tfvars are applicable,
-// prod-default.tfvars, stag-globals are not.
-func (p *ProjectLocator) IsGlobalVarFile(file string) bool {
-	return !p.IsEnvName(CleanVarName(filepath.Base(file)))
-}
-
-func (p *ProjectLocator) IsEnvName(name string) bool {
-	return p.envNames.MatchString(name)
 }
 
 func (p *ProjectLocator) hasChanges(dir string) bool {
@@ -240,7 +250,7 @@ type TreeNode struct {
 // that are root Terraform projects.
 type VarFiles struct {
 	Path  string
-	Files []string
+	Files []RootPathVarFile
 
 	// HasSiblings is true if the directory is within a directory that contains other
 	// root Terraform projects.
@@ -251,7 +261,7 @@ type VarFiles struct {
 
 // CreateTreeNode creates a tree of Terraform projects and directories that
 // contain var files.
-func CreateTreeNode(basePath string, paths []RootPath, varFiles map[string][]string) *TreeNode {
+func CreateTreeNode(basePath string, paths []RootPath, varFiles map[string][]RootPathVarFile, e *EnvFileMatcher) *TreeNode {
 	root := &TreeNode{
 		Name: "root",
 	}
@@ -276,7 +286,58 @@ func CreateTreeNode(basePath string, paths []RootPath, varFiles map[string][]str
 		root.AddTerraformVarFiles(basePath, dir, varFiles[dir])
 	}
 
+	buildVarFileEnvNames(root, e)
 	return root
+}
+
+// buildVarFileEnvNames builds the EnvName field for each var file. Var names
+// can be inferred from the filename or from parent directories, but only if
+// the parent directories don't contain any Terraform projects.
+func buildVarFileEnvNames(root *TreeNode, e *EnvFileMatcher) {
+	root.PostOrder(func(t *TreeNode) {
+		if t.TerraformVarFiles == nil {
+			return
+		}
+
+		parent := t.Parent
+		current := t
+		possibleEnvNames := []string{t.Name}
+	c:
+		for {
+			if parent == nil {
+				break
+			}
+
+			// only detect possible env names from directories that don't
+			// have any Terraform projects in them. This means empty folders
+			// or directories that wrap var file directories.
+			for _, node := range parent.ChildNodesExcluding(current) {
+				if node.RootPath != nil {
+					break c
+				}
+			}
+
+			possibleEnvNames = append(possibleEnvNames, parent.Name)
+			current = parent
+			parent = parent.Parent
+		}
+
+		for i, f := range t.TerraformVarFiles.Files {
+			namesToSearch := append([]string{f.Name}, possibleEnvNames...)
+			var envName string
+			for _, search := range namesToSearch {
+				if e.IsEnvName(CleanVarName(search)) {
+					envName = search
+					break
+				}
+			}
+
+			t.TerraformVarFiles.Files[i].EnvName = envName
+			if envName != "" {
+				t.TerraformVarFiles.Files[i].IsGlobal = false
+			}
+		}
+	})
 }
 
 // AddPath adds a path to the tree, this will create any missing nodes in the tree.
@@ -424,7 +485,7 @@ func (t *TreeNode) ChildNodes() []*TreeNode {
 }
 
 // AddTerraformVarFiles adds a directory that contains Terraform var files to the tree.
-func (t *TreeNode) AddTerraformVarFiles(basePath, dir string, files []string) {
+func (t *TreeNode) AddTerraformVarFiles(basePath, dir string, files []RootPathVarFile) {
 	rel, _ := filepath.Rel(basePath, dir)
 	pieces := strings.Split(rel, string(filepath.Separator))
 	current := t
@@ -557,7 +618,7 @@ func (t *TreeNode) AssociateChildVarFiles() {
 			t.RootPath.HasChildVarFiles = true
 			child.TerraformVarFiles.Used = true
 
-			t.RootPath.AddVarFiles(child.TerraformVarFiles.Path, child.TerraformVarFiles.Files)
+			t.RootPath.AddVarFiles(child.TerraformVarFiles)
 		}
 	})
 }
@@ -583,7 +644,7 @@ func (t *TreeNode) AssociateSiblingVarFiles() {
 				for _, dir := range varDirs {
 					dir.TerraformVarFiles.Used = true
 
-					path.RootPath.AddVarFiles(dir.TerraformVarFiles.Path, dir.TerraformVarFiles.Files)
+					path.RootPath.AddVarFiles(dir.TerraformVarFiles)
 				}
 			}
 		}
@@ -600,7 +661,7 @@ func (t *TreeNode) AssociateParentVarFiles() {
 
 		varFiles := t.UnusedParentVarFiles()
 		for _, varFile := range varFiles {
-			t.RootPath.AddVarFiles(varFile.Path, varFile.Files)
+			t.RootPath.AddVarFiles(varFile)
 		}
 	})
 }
@@ -631,7 +692,7 @@ func (t *TreeNode) AssociateAuntVarFiles() {
 
 		for _, node := range commonParent.ChildNodesExcluding(t) {
 			if node.RootPath != nil {
-				node.RootPath.AddVarFiles(t.TerraformVarFiles.Path, t.TerraformVarFiles.Files)
+				node.RootPath.AddVarFiles(t.TerraformVarFiles)
 			}
 		}
 
@@ -648,7 +709,9 @@ func (t *TreeNode) CollectRootPaths() []RootPath {
 	})
 
 	for i := range projects {
-		sort.Strings(projects[i].TerraformVarFiles)
+		sort.Slice(projects[i].TerraformVarFiles, func(x, y int) bool {
+			return projects[i].TerraformVarFiles[x].RelPath < projects[i].TerraformVarFiles[y].RelPath
+		})
 	}
 
 	return projects
@@ -657,6 +720,8 @@ func (t *TreeNode) CollectRootPaths() []RootPath {
 // RootPath holds information about the root directory of a project, this is normally the top level
 // Terraform containing provider blocks.
 type RootPath struct {
+	Matcher *EnvFileMatcher
+
 	RepoPath string
 	Path     string
 	// HasChanges contains information about whether the project has git changes associated with it.
@@ -664,30 +729,141 @@ type RootPath struct {
 	// and local modules that are used by this project have changes.
 	HasChanges bool
 	// TerraformVarFiles are a list of any .tfvars or .tfvars.json files found at the root level.
-	TerraformVarFiles TerraformVarFiles
+	TerraformVarFiles RootPathVarFiles
 
 	HasChildVarFiles bool
 	IsTerragrunt     bool
 }
 
-func (r *RootPath) AddVarFiles(dir string, files []string) {
-	rel, _ := filepath.Rel(r.Path, dir)
+// GlobalFiles returns a list of any global var files defined in the project.
+func (r *RootPath) GlobalFiles() RootPathVarFiles {
+	var files RootPathVarFiles
 
-	for _, f := range files {
-		r.TerraformVarFiles.Add(filepath.Join(rel, f))
-	}
-}
-
-type TerraformVarFiles []string
-
-func (vf *TerraformVarFiles) Add(file string) {
-	for _, f := range *vf {
-		if f == file {
-			return
+	for _, varFile := range r.TerraformVarFiles {
+		if varFile.IsGlobal {
+			files = append(files, varFile)
 		}
 	}
 
-	*vf = append(*vf, file)
+	return files
+}
+
+// AutoFiles returns a list of any auto.tfvars or terraform.tfvars files defined in the project.
+func (r *RootPath) AutoFiles() RootPathVarFiles {
+	var files RootPathVarFiles
+
+	for _, varFile := range r.TerraformVarFiles {
+		if IsAutoVarFile(varFile.EnvName) {
+			files = append(files, varFile)
+		}
+	}
+
+	return files
+}
+
+// EnvFiles returns a list of any environment specific var files defined in the project.
+func (r *RootPath) EnvFiles() RootPathVarFiles {
+	var files RootPathVarFiles
+
+	for _, varFile := range r.TerraformVarFiles {
+		if !IsAutoVarFile(varFile.EnvName) && !varFile.IsGlobal {
+			files = append(files, varFile)
+		}
+	}
+
+	return files
+}
+
+// VarFileGrouping defines a grouping of var files by environment.
+type VarFileGrouping struct {
+	Name              string
+	TerraformVarFiles RootPathVarFiles
+}
+
+// EnvGroupings returns a list of var file groupings by environment. This is used
+// to group and dedup var files that would otherwise create new projects.
+func (r *RootPath) EnvGroupings() []VarFileGrouping {
+	if r.Matcher == nil {
+		r.Matcher = CreateEnvFileMatcher(defaultEnvs)
+	}
+
+	varFiles := r.EnvFiles()
+	varFileGrouping := map[string]RootPathVarFiles{}
+	for _, varFile := range varFiles {
+		name := CleanVarName(varFile.EnvName)
+
+		if !r.Matcher.EnvPrefix.MatchString(name) && !r.Matcher.EnvSuffix.MatchString(name) {
+			varFileGrouping[name] = append(varFileGrouping[name], varFile)
+		}
+	}
+
+	// loop through the var files again and if there are any global var files
+	// with an environment prefix or suffix, add them to the grouping for each environment
+	// only if either the environment already exists, or there is no exact var files already
+	// associated with this project.
+	hasExactVarFileMatches := len(varFileGrouping) > 0
+
+	for _, varFile := range varFiles {
+		name := CleanVarName(varFile.EnvName)
+		env := r.Matcher.EnvName(name)
+		if env != "" {
+			_, exists := varFileGrouping[env]
+			if !hasExactVarFileMatches || exists {
+				varFileGrouping[env] = append(varFileGrouping[env], varFile)
+				continue
+			}
+		}
+	}
+
+	var envNames []string
+	for env := range varFileGrouping {
+		envNames = append(envNames, env)
+	}
+	sort.Strings(envNames)
+
+	var varEnvs []VarFileGrouping
+	for _, env := range envNames {
+		varEnvs = append(varEnvs, VarFileGrouping{
+			Name:              env,
+			TerraformVarFiles: varFileGrouping[env],
+		})
+	}
+
+	return varEnvs
+}
+
+type RootPathVarFile struct {
+	Name string
+	// RelPath is the path relative to the root of the project.
+	RelPath string
+
+	IsGlobal bool
+	EnvName  string
+}
+
+type RootPathVarFiles []RootPathVarFile
+
+func (r RootPathVarFiles) ToPaths() []string {
+	var paths = make([]string, len(r))
+
+	for i, varFile := range r {
+		paths[i] = varFile.RelPath
+	}
+
+	return paths
+}
+
+func (r *RootPath) AddVarFiles(v *VarFiles) {
+	rel, _ := filepath.Rel(r.Path, v.Path)
+
+	for _, f := range v.Files {
+		r.TerraformVarFiles = append(r.TerraformVarFiles, RootPathVarFile{
+			Name:     f.Name,
+			EnvName:  f.EnvName,
+			RelPath:  filepath.Join(rel, f.Name),
+			IsGlobal: f.IsGlobal,
+		})
+	}
 }
 
 // FindRootModules returns a list of all directories that contain a full Terraform project under the given fullPath.
@@ -720,6 +896,7 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 				Path:              dir.path,
 				HasChanges:        p.hasChanges(dir.path),
 				TerraformVarFiles: p.discoveredVarFiles[dir.path],
+				Matcher:           p.envMatcher,
 			})
 			projectMap[dir.path] = true
 
@@ -727,13 +904,7 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 		}
 	}
 
-	// how to search for terragrunt projects
-	// 1. find all directories that contain terragrunt.hcl files
-	// 2. check that the directory does not have a child directory that contains a terragrunt.hcl file
-	// if it does, then we should not include it as a terragrunt project as this is just
-	// a parent terragrunt configuration for a child terragrunt configuration.
-
-	node := CreateTreeNode(fullPath, projects, p.discoveredVarFiles)
+	node := CreateTreeNode(fullPath, projects, p.discoveredVarFiles, p.envMatcher)
 	node.AssociateChildVarFiles()
 	node.AssociateSiblingVarFiles()
 	node.AssociateParentVarFiles()
@@ -817,7 +988,7 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) {
 	// let's reset all the discovered paths, so we don't duplicate.
 	if level == 0 {
 		p.discoveredProjects = []discoveredProject{}
-		p.discoveredVarFiles = make(map[string][]string)
+		p.discoveredVarFiles = make(map[string][]RootPathVarFile)
 	}
 	p.logger.Debug().Msgf("walking path %s to discover terraform files", fullPath)
 
@@ -852,9 +1023,19 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) {
 		if strings.HasSuffix(name, ".tfvars") || strings.HasSuffix(name, ".tfvars.json") {
 			v, ok := p.discoveredVarFiles[fullPath]
 			if !ok {
-				v = []string{name}
+				v = []RootPathVarFile{{
+					Name:     name,
+					EnvName:  name,
+					RelPath:  name,
+					IsGlobal: p.envMatcher.IsGlobalVarFile(name),
+				}}
 			} else {
-				v = append(v, name)
+				v = append(v, RootPathVarFile{
+					Name:     name,
+					EnvName:  name,
+					RelPath:  name,
+					IsGlobal: p.envMatcher.IsGlobalVarFile(name),
+				})
 			}
 
 			p.discoveredVarFiles[fullPath] = v
