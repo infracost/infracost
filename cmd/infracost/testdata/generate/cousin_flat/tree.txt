@@ -1,0 +1,9 @@
+.
+├── main.tf
+└── variables
+    └── envs
+        ├── dev
+        │   └── dev.tfvars
+        ├── prod
+        │   └── prod.tfvars
+        └── defaults.tfvars

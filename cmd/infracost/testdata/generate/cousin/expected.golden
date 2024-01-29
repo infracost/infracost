@@ -1,0 +1,33 @@
+version: 0.1
+
+projects:
+  - path: infra/components/foo
+    name: infra-components-foo-dev
+    terraform_var_files:
+      - ../../variables/envs/dev/dev.tfvars
+    terraform_workspace: default
+  - path: infra/components/foo
+    name: infra-components-foo-prod
+    terraform_var_files:
+      - ../../variables/envs/prod/prod.tfvars
+    terraform_workspace: default
+  - path: infra/nested/components/baz
+    name: infra-nested-components-baz-dev
+    terraform_var_files:
+      - ../../variables/envs/defaults.tfvars
+      - ../../../variables/envs/dev/dev.tfvars
+      - ../../variables/envs/dev/dev.tfvars
+    terraform_workspace: default
+  - path: infra/nested/components/baz
+    name: infra-nested-components-baz-prod
+    terraform_var_files:
+      - ../../variables/envs/defaults.tfvars
+      - ../../../variables/envs/prod/prod.tfvars
+    terraform_workspace: default
+  - path: infra/nested/components/baz
+    name: infra-nested-components-baz-stag
+    terraform_var_files:
+      - ../../variables/envs/defaults.tfvars
+      - ../../variables/envs/stag/stag.tfvars
+    terraform_workspace: default
+

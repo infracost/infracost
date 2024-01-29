@@ -16,7 +16,42 @@ import (
 )
 
 var (
-	defaultEnvVarNames = createEnvVarNamesRegex([]string{"prd", "prod", "production", "preprod", "staging", "stage", "stg", "development", "dev", "release", "testing", "test", "tst", "qa", "uat", "live", "sandbox", "demo", "integration", "int", "experimental", "experiments", "trial", "validation", "perf", "sec", "dr"})
+	defaultEnvVarNames = createEnvVarNamesRegex([]string{
+		"prd",
+		"prod",
+		"production",
+		"preprod",
+		"staging",
+		"stage",
+		"stg",
+		"stag",
+		"development",
+		"dev",
+		"release",
+		"testing",
+		"test",
+		"tst",
+		"qa",
+		"uat",
+		"live",
+		"sandbox",
+		"sbx",
+		"sbox",
+		"demo",
+		"integration",
+		"int",
+		"experimental",
+		"experiments",
+		"trial",
+		"validation",
+		"perf",
+		"sec",
+		"dr",
+		"load",
+		"management",
+		"mgmt",
+		"playground",
+	})
 
 	VarFileEnvPrefixRegxp = regexp.MustCompile(`^(\w+)[-_]`)
 	VarFileEnvSuffixRegxp = regexp.MustCompile(`[-_](\w+)$`)
@@ -328,31 +363,19 @@ func (t *TreeNode) UnusedParentVarFiles() []*VarFiles {
 	return append(varFiles, parent.UnusedParentVarFiles()...)
 }
 
-// UnusedAuntVarFiles returns a list of any aunt directories that contain var
-// files that have not been used by a project.
-func (t *TreeNode) UnusedAuntVarFiles() []*VarFiles {
-	// if we don't have a root path, we can't have an aunt.
-	if t.RootPath == nil {
-		return nil
-	}
-
+// FindTfvarsCommonParent returns the first parent directory that has a child
+// directory with a root Terraform project.
+func (t *TreeNode) FindTfvarsCommonParent() *TreeNode {
 	parent := t.Parent
-	if parent == nil {
-		return nil
-	}
-
-	// get the parent of the parent as this will be above the current node.
-	parent = t.Parent
-	var varFiles []*VarFiles
 
 	for {
 		if parent == nil {
-			return varFiles
+			return nil
 		}
 
-		for _, child := range parent.Children {
-			if child.TerraformVarFiles != nil && !child.TerraformVarFiles.Used && child.RootPath == nil {
-				varFiles = append(varFiles, child.TerraformVarFiles)
+		for _, child := range parent.ChildNodesExcluding(t) {
+			if child.RootPath != nil {
+				return parent
 			}
 		}
 
@@ -360,7 +383,26 @@ func (t *TreeNode) UnusedAuntVarFiles() []*VarFiles {
 	}
 }
 
-// ChildNodes returns a list of child nodes that are Terraform projects or
+// ChildNodesExcluding collects all the child nodes of the current node,
+// excluding the given root node.
+func (t *TreeNode) ChildNodesExcluding(root *TreeNode) []*TreeNode {
+	var children []*TreeNode
+	for _, child := range t.Children {
+		if child.shouldVisitNode() && child != root {
+			children = append(children, child)
+		}
+	}
+
+	for _, child := range t.Children {
+		if child != root {
+			children = append(children, child.ChildNodesExcluding(root)...)
+		}
+	}
+
+	return children
+}
+
+// ChildNodes returns the first set of child nodes that are Terraform projects or
 // directories that contain var files.
 func (t *TreeNode) ChildNodes() []*TreeNode {
 	var children []*TreeNode
@@ -578,14 +620,21 @@ func (t *TreeNode) AssociateAuntVarFiles() {
 	})
 
 	t.PostOrder(func(t *TreeNode) {
-		if t.RootPath == nil {
+		if t.TerraformVarFiles == nil || t.TerraformVarFiles.Used {
 			return
 		}
 
-		varFiles := t.UnusedAuntVarFiles()
-		for _, varFile := range varFiles {
-			t.RootPath.AddVarFiles(varFile.Path, varFile.Files)
+		commonParent := t.FindTfvarsCommonParent()
+		if commonParent == nil {
+			return
 		}
+
+		for _, node := range commonParent.ChildNodesExcluding(t) {
+			if node.RootPath != nil {
+				node.RootPath.AddVarFiles(t.TerraformVarFiles.Path, t.TerraformVarFiles.Files)
+			}
+		}
+
 	})
 }
 
