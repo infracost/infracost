@@ -463,12 +463,12 @@ func (p *Parser) ProjectName() string {
 	r := p.RelativePath()
 	name := strings.TrimSuffix(r, "/")
 	name = strings.ReplaceAll(name, "/", "-")
-	if p.moduleSuffix != "" {
-		name = fmt.Sprintf("%s-%s", name, p.moduleSuffix)
+	if name == "." {
+		name = "main"
 	}
 
-	if name == "." {
-		return "main"
+	if p.moduleSuffix != "" {
+		name = fmt.Sprintf("%s-%s", name, p.moduleSuffix)
 	}
 
 	return name
