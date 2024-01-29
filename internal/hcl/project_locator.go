@@ -36,6 +36,7 @@ var (
 		"live",
 		"sandbox",
 		"sbx",
+		"sbox",
 		"demo",
 		"integration",
 		"int",
