@@ -102,7 +102,10 @@ func (d *ResourceData) References(keys ...string) []*ResourceData {
 	return data
 }
 
-func (d *ResourceData) AddReference(key string, reference *ResourceData, reverseRefAttrs []string) {
+func (d *ResourceData) AddReference(k string, reference *ResourceData, reverseRefAttrs []string) {
+	// Perf/memory leak: Copy gjson string slices that may be returned so we don't prevent
+	// the entire underlying parsed json from being garbage collected.
+	key := string([]byte(k))
 	if _, ok := d.ReferencesMap[key]; !ok {
 		d.ReferencesMap[key] = make([]*ResourceData, 0)
 	}
