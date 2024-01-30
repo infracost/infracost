@@ -60,7 +60,7 @@ func Detect(ctx *config.RunContext, project *config.Project, includePastResource
 		EnvNames:          ctx.Config.Autodetect.EnvNames,
 		ChangedObjects:    ctx.VCSMetadata.Commit.ChangedObjects,
 		UseAllPaths:       project.IncludeAllPaths,
-		SkipAutoDetection: project.SkipAutoDetection,
+		SkipAutoDetection: project.SkipAutodetect,
 	}
 	pl := hcl.NewProjectLocator(logging.Logger, locatorConfig)
 	rootPaths := pl.FindRootModules(project.Path)

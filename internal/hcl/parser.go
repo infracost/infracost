@@ -315,7 +315,7 @@ func (p *Parser) YAML() string {
 		}
 	}
 
-	str.WriteString("    skip_auto_detection: true\n")
+	str.WriteString("    skip_autodetect: true\n")
 
 	if len(p.tfEnvVars) > 0 {
 		str.WriteString("  terraform_vars:\n")

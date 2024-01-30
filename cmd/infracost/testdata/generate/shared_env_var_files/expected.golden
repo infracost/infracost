@@ -7,26 +7,26 @@ projects:
       - ../default.tfvars
       - ../dev-default.tfvars
       - dev.tfvars
-    skip_auto_detection: true
+    skip_autodetect: true
   - path: apps/bar
     name: apps-bar-staging
     terraform_var_files:
       - ../default.tfvars
       - ../staging-default.tfvars
       - staging.tfvars
-    skip_auto_detection: true
+    skip_autodetect: true
   - path: apps/foo
     name: apps-foo-dev
     terraform_var_files:
       - ../default.tfvars
       - ../dev-default.tfvars
       - dev.tfvars
-    skip_auto_detection: true
+    skip_autodetect: true
   - path: apps/foo
     name: apps-foo-prod
     terraform_var_files:
       - ../default.tfvars
       - ../prod-default.tfvars
       - prod.tfvars
-    skip_auto_detection: true
+    skip_autodetect: true
 

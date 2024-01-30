@@ -5,17 +5,17 @@ projects:
     name: apps-bar
     terraform_var_files:
       - terraform.tfvars
-    skip_auto_detection: true
+    skip_autodetect: true
   - path: apps/foo
     name: apps-foo-dev
     terraform_var_files:
       - terraform.tfvars
       - dev.tfvars
-    skip_auto_detection: true
+    skip_autodetect: true
   - path: apps/foo
     name: apps-foo-prod
     terraform_var_files:
       - terraform.tfvars
       - prod.tfvars
-    skip_auto_detection: true
+    skip_autodetect: true
 

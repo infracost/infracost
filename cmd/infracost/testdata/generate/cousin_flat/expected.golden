@@ -6,11 +6,11 @@ projects:
     terraform_var_files:
       - variables/envs/defaults.tfvars
       - variables/envs/dev/dev.tfvars
-    skip_auto_detection: true
+    skip_autodetect: true
   - path: .
     name: main-prod
     terraform_var_files:
       - variables/envs/defaults.tfvars
       - variables/envs/prod/prod.tfvars
-    skip_auto_detection: true
+    skip_autodetect: true
 
