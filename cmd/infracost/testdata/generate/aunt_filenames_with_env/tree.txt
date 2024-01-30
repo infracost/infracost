@@ -1,0 +1,27 @@
+.
+├── components
+│   ├── age
+│   │   └── main.tf
+│   ├── airflow
+│   │   └── main.tf
+│   ├── apm-events
+│   │   └── main.tf
+└── variables
+    ├── cko-dev
+    │   ├── age.tfvars
+    │   ├── airflow.tfvars
+    │   ├── dev.tfvars
+    │   └── apm-events.tfvars
+    ├── cko-mgmt
+    │   ├── age.tfvars
+    │   ├── airflow.tfvars
+    │   └── apm-events.tfvars
+    ├── cko-playground
+    │   ├── age.tfvars
+    │   ├── airflow.tfvars
+    │   └── apm-events.tfvars
+    ├── cko-prod
+    │   ├── age.tfvars
+    │   ├── airflow.tfvars
+    │   └── apm-events.tfvars
+    └── default.tfvars

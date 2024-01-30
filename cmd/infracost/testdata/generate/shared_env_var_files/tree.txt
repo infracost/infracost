@@ -2,8 +2,6 @@
 └── apps
     ├── foo
     │   ├── main.tf
-    │   ├── dev.tfvars
-    │   └── prod.tfvars
     ├── bar
     │   ├── main.tf
     │   ├── staging.tfvars

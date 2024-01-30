@@ -1,0 +1,23 @@
+version: 0.1
+
+projects:
+  - path: infra/components/bar
+    name: infra-components-bar
+    terraform_var_files:
+      - ../defaults.tfvars
+      - ../bar.tfvars
+    skip_autodetect: true
+  - path: infra/components/baz
+    name: infra-components-baz
+    terraform_var_files:
+      - ../../baz.tfvars
+      - ../defaults.tfvars
+    skip_autodetect: true
+  - path: infra/components/foo
+    name: infra-components-foo
+    terraform_var_files:
+      - ../../foo.tfvars
+      - ../foo.tfvars
+      - ../defaults.tfvars
+    skip_autodetect: true
+
