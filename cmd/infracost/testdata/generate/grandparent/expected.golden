@@ -6,47 +6,47 @@ projects:
     terraform_var_files:
       - ../../default.tfvars
       - ../../dev.tfvars
-    terraform_workspace: default
+    skip_autodetect: true
   - path: apps/bar/us1
     name: apps-bar-us1-prod
     terraform_var_files:
       - ../../default.tfvars
       - ../../prod.tfvars
-    terraform_workspace: default
+    skip_autodetect: true
   - path: apps/bar/us2
     name: apps-bar-us2-dev
     terraform_var_files:
       - ../../default.tfvars
       - ../../dev.tfvars
-    terraform_workspace: default
+    skip_autodetect: true
   - path: apps/bar/us2
     name: apps-bar-us2-prod
     terraform_var_files:
       - ../../default.tfvars
       - ../../prod.tfvars
-    terraform_workspace: default
+    skip_autodetect: true
   - path: apps/foo/us1
     name: apps-foo-us1-dev
     terraform_var_files:
       - ../../default.tfvars
       - ../../dev.tfvars
-    terraform_workspace: default
+    skip_autodetect: true
   - path: apps/foo/us1
     name: apps-foo-us1-prod
     terraform_var_files:
       - ../../default.tfvars
       - ../../prod.tfvars
-    terraform_workspace: default
+    skip_autodetect: true
   - path: apps/foo/us2
     name: apps-foo-us2-dev
     terraform_var_files:
       - ../../default.tfvars
       - ../../dev.tfvars
-    terraform_workspace: default
+    skip_autodetect: true
   - path: apps/foo/us2
     name: apps-foo-us2-prod
     terraform_var_files:
       - ../../default.tfvars
       - ../../prod.tfvars
-    terraform_workspace: default
+    skip_autodetect: true
 

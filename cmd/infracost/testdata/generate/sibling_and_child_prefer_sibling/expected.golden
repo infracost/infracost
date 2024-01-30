@@ -5,30 +5,30 @@ projects:
     name: apps-dev
     terraform_var_files:
       - ../envs/dev.tfvars
-    terraform_workspace: default
+    skip_autodetect: true
   - path: apps
     name: apps-prod
     terraform_var_files:
       - ../envs/prod.tfvars
-    terraform_workspace: default
+    skip_autodetect: true
   - path: apps/bar
     name: apps-bar-dev
     terraform_var_files:
       - ../envs/dev.tfvars
-    terraform_workspace: default
+    skip_autodetect: true
   - path: apps/bar
     name: apps-bar-staging
     terraform_var_files:
       - ../envs/staging.tfvars
-    terraform_workspace: default
+    skip_autodetect: true
   - path: apps/foo
     name: apps-foo-dev
     terraform_var_files:
       - ../envs/dev.tfvars
-    terraform_workspace: default
+    skip_autodetect: true
   - path: apps/foo
     name: apps-foo-staging
     terraform_var_files:
       - ../envs/staging.tfvars
-    terraform_workspace: default
+    skip_autodetect: true
 

@@ -3,5 +3,5 @@ version: 0.1
 projects:
   - path: app/foo
     name: app-foo
-    terraform_workspace: default
+    skip_autodetect: true
 

@@ -1,0 +1,7 @@
+version: 0.1
+
+projects:
+  - path: "./testdata/breakdown_config_file_with_skip_auto_detect/infra"
+    skip_autodetect: true
+  - path: "./testdata/breakdown_config_file_with_skip_auto_detect/infra/dev"
+    skip_autodetect: true
