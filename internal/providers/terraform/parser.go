@@ -230,7 +230,7 @@ func collectModulesSourceUrls(moduleCalls []gjson.Result) []string {
 	for source := range remoteUrls {
 		// Perf/memory leak: Copy gjson string slices that may be returned so we don't prevent
 		// the entire underlying parsed json from being garbage collected.
-		sourceCopy := string([]byte(source))
+		sourceCopy := strings.Clone(source)
 		urls = append(urls, sourceCopy)
 	}
 
@@ -254,8 +254,8 @@ func parseProviderConfig(providerConf gjson.Result) []schema.ProviderMetadata {
 		md := schema.ProviderMetadata{
 			// Perf/memory leak: Copy gjson string slices that may be returned so we don't prevent
 			// the entire underlying parsed json from being garbage collected.
-			Name:      string([]byte(conf.Get("name").String())),
-			Filename:  string([]byte(conf.Get("infracost_metadata.filename").String())),
+			Name:      strings.Clone(conf.Get("name").String()),
+			Filename:  strings.Clone(conf.Get("infracost_metadata.filename").String()),
 			StartLine: conf.Get("infracost_metadata.start_line").Int(),
 			EndLine:   conf.Get("infracost_metadata.end_line").Int(),
 		}
@@ -268,7 +268,7 @@ func parseProviderConfig(providerConf gjson.Result) []schema.ProviderMetadata {
 			for key, value := range defaultTags.Get("tags.constant_value").Map() {
 				// Perf/memory leak: Copy gjson string slices that may be returned so we don't prevent
 				// the entire underlying parsed json from being garbage collected.
-				md.DefaultTags[string([]byte(key))] = string([]byte(value.String()))
+				md.DefaultTags[strings.Clone(key)] = strings.Clone(value.String())
 			}
 		}
 
@@ -383,13 +383,13 @@ func (p *Parser) parseResourceData(isState bool, confLoader *ConfLoader, provide
 
 		// Perf/memory leak: Copy gjson string slices that may be returned so we don't prevent
 		// the entire underlying parsed json from being garbage collected.
-		v = schema.AddRawValue(v, "region", string([]byte(region)))
-		data := schema.NewResourceData(string([]byte(t)), string([]byte(provider)), string([]byte(addr)), nil, v)
+		v = schema.AddRawValue(v, "region", strings.Clone(region))
+		data := schema.NewResourceData(strings.Clone(t), strings.Clone(provider), strings.Clone(addr), nil, v)
 
 		// Perf/memory leak: Copy gjson string slices that may be returned so we don't prevent
 		// the entire underlying parsed json from being garbage collected.
 		data.Metadata = gjson.ParseBytes([]byte(r.Get("infracost_metadata").Raw)).Map()
-		resources[string([]byte(addr))] = data
+		resources[strings.Clone(addr)] = data
 	}
 
 	// Recursively add any resources for child modules
