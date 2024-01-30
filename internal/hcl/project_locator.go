@@ -94,14 +94,13 @@ func (e *EnvFileMatcher) IsEnvName(file string) bool {
 	return e.EnvNames.MatchString(CleanVarName(filepath.Base(file)))
 }
 
-// EnvName returns the environment name for the given var file. If the var file
-// is not an environment specific var file, this will return an empty string.
+// EnvName returns the environment name for the given var file.
 func (e *EnvFileMatcher) EnvName(file string) string {
 	name := CleanVarName(filepath.Base(file))
 	if e.EnvSuffix.MatchString(name) {
 		sub := e.EnvSuffix.FindStringSubmatch(name)
 		if len(sub) != 2 {
-			return ""
+			return name
 		}
 
 		return sub[1]
@@ -110,13 +109,13 @@ func (e *EnvFileMatcher) EnvName(file string) string {
 	if e.EnvPrefix.MatchString(name) {
 		sub := e.EnvPrefix.FindStringSubmatch(name)
 		if len(sub) != 2 {
-			return ""
+			return name
 		}
 
 		return sub[1]
 	}
 
-	return ""
+	return name
 }
 
 // CleanVarName removes the .tfvars or .tfvars.json suffix from the file name.
@@ -818,29 +817,28 @@ func (r *RootPath) EnvGroupings() []VarFileGrouping {
 
 	varFiles := r.EnvFiles()
 	varFileGrouping := map[string]RootPathVarFiles{}
-	for _, varFile := range varFiles {
-		name := CleanVarName(varFile.EnvName)
 
-		if !r.Matcher.EnvPrefix.MatchString(name) && !r.Matcher.EnvSuffix.MatchString(name) {
-			varFileGrouping[name] = append(varFileGrouping[name], varFile)
+	for _, varFile := range varFiles {
+		// first add only terraform var files that are children of this project.
+		if varFile.IsChildVarFile() {
+			env := r.Matcher.EnvName(varFile.EnvName)
+			varFileGrouping[env] = append(varFileGrouping[env], varFile)
 		}
 	}
 
-	// loop through the var files again and if there are any global var files
-	// with an environment prefix or suffix, add them to the grouping for each environment
-	// only if either the environment already exists, or there is no exact var files already
-	// associated with this project.
-	hasExactVarFileMatches := len(varFileGrouping) > 0
+	hasChildVarFileEnvs := len(varFileGrouping) > 0
 
 	for _, varFile := range varFiles {
-		name := CleanVarName(varFile.EnvName)
-		env := r.Matcher.EnvName(name)
-		if env != "" {
-			_, exists := varFileGrouping[env]
-			if !hasExactVarFileMatches || exists {
-				varFileGrouping[env] = append(varFileGrouping[env], varFile)
-				continue
-			}
+		if varFile.IsChildVarFile() {
+			continue
+		}
+
+		env := r.Matcher.EnvName(varFile.EnvName)
+		_, exists := varFileGrouping[env]
+		// only add the non child env var files if there are no envs defined that are
+		// closer to the project, or if the env matches one defined as a child var file.
+		if !hasChildVarFileEnvs || (hasChildVarFileEnvs && exists) {
+			varFileGrouping[env] = append(varFileGrouping[env], varFile)
 		}
 	}
 
@@ -869,6 +867,10 @@ type RootPathVarFile struct {
 	IsGlobal bool
 	EnvName  string
 	FullPath string
+}
+
+func (r RootPathVarFile) IsChildVarFile() bool {
+	return !strings.HasPrefix(r.RelPath, "..")
 }
 
 type RootPathVarFiles []RootPathVarFile
@@ -907,7 +909,6 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 			},
 		}
 	}
-
 	p.basePath, _ = filepath.Abs(fullPath)
 	p.modules = make(map[string]struct{})
 	p.moduleCalls = make(map[string][]string)
