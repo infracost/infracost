@@ -133,7 +133,8 @@ func (p *TerragruntProvider) LoadResources(usage schema.UsageMap) ([]*schema.Pro
 		project := schema.NewProject(name, metadata)
 
 		parser := NewParser(p.ctx, p.includePastResources)
-		parsedConf, err := parser.parseJSON(outs[i], usage)
+		j, _ := StripSetupTerraformWrapper(outs[i])
+		parsedConf, err := parser.parseJSON(j, usage)
 		if err != nil {
 			return projects, errors.Wrap(err, "Error parsing Terraform JSON")
 		}

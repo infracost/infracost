@@ -60,6 +60,7 @@ func (p *StateJSONProvider) LoadResources(usage schema.UsageMap) ([]*schema.Proj
 	project := schema.NewProject(name, metadata)
 	parser := NewParser(p.ctx, p.includePastResources)
 
+	j, _ = StripSetupTerraformWrapper(j)
 	parsedConf, err := parser.parseJSON(j, usage)
 	if err != nil {
 		return []*schema.Project{project}, errors.Wrap(err, "Error parsing Terraform state JSON file")

@@ -143,8 +143,6 @@ type ParsedPlanConfiguration struct {
 func (p *Parser) parseJSON(j []byte, usage schema.UsageMap) (*ParsedPlanConfiguration, error) {
 	baseResources := p.loadUsageFileResources(usage)
 
-	j, _ = StripSetupTerraformWrapper(j)
-
 	if !gjson.ValidBytes(j) {
 		return &ParsedPlanConfiguration{
 			PastResources:    baseResources,
