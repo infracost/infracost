@@ -5,7 +5,7 @@ projects:
     name: infra-components-baz-dev
     terraform_var_files:
       - ../../variables/defaults.tfvars
-      - ../../variables/dev/baz.tfvars
+      - ../../variables/dev/bla.tfvars
     skip_autodetect: true
   - path: infra/components/baz
     name: infra-components-baz-stag
@@ -17,7 +17,7 @@ projects:
     name: infra-components-foo-dev
     terraform_var_files:
       - ../../variables/defaults.tfvars
-      - ../../variables/dev/baz.tfvars
+      - ../../variables/dev/bla.tfvars
     skip_autodetect: true
   - path: infra/components/foo
     name: infra-components-foo-stag

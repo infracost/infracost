@@ -9,5 +9,5 @@
         ├── stag
         │   └── bop.tfvars
         ├── dev
-        │   └── baz.tfvars
+        │   └── bla.tfvars
         └── defaults.tfvars

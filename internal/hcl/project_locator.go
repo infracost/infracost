@@ -714,6 +714,35 @@ func (t *TreeNode) CollectRootPaths() []RootPath {
 		})
 	}
 
+	found := make(map[string]bool)
+	for _, root := range projects {
+		for _, varFile := range root.TerraformVarFiles {
+			base := filepath.Base(root.Path)
+			name := CleanVarName(varFile.Name)
+			if base == name {
+				found[varFile.FullPath] = true
+			}
+		}
+	}
+
+	// filter terraform var files from the root paths that have
+	// the same name as another root directory. This means that
+	// terraform var files that are scoped to a specific project
+	// are not added to another project.
+	for i, root := range projects {
+		var filtered RootPathVarFiles
+		for _, varFile := range root.TerraformVarFiles {
+			name := CleanVarName(varFile.Name)
+			base := filepath.Base(root.Path)
+			if found[varFile.FullPath] && base != name {
+				continue
+			}
+
+			filtered = append(filtered, varFile)
+		}
+		projects[i].TerraformVarFiles = filtered
+	}
+
 	return projects
 }
 
@@ -839,6 +868,7 @@ type RootPathVarFile struct {
 
 	IsGlobal bool
 	EnvName  string
+	FullPath string
 }
 
 type RootPathVarFiles []RootPathVarFile
@@ -858,6 +888,7 @@ func (r *RootPath) AddVarFiles(v *VarFiles) {
 
 	for _, f := range v.Files {
 		r.TerraformVarFiles = append(r.TerraformVarFiles, RootPathVarFile{
+			FullPath: filepath.Join(v.Path, f.Name),
 			Name:     f.Name,
 			EnvName:  f.EnvName,
 			RelPath:  filepath.Join(rel, f.Name),
@@ -1028,6 +1059,7 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) {
 					EnvName:  name,
 					RelPath:  name,
 					IsGlobal: p.envMatcher.IsGlobalVarFile(name),
+					FullPath: filepath.Join(fullPath, name),
 				}}
 			} else {
 				v = append(v, RootPathVarFile{
@@ -1035,6 +1067,7 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) {
 					EnvName:  name,
 					RelPath:  name,
 					IsGlobal: p.envMatcher.IsGlobalVarFile(name),
+					FullPath: filepath.Join(fullPath, name),
 				})
 			}
 
