@@ -1,9 +1,8 @@
 package schema
 
 import (
+	"encoding/json"
 	"strings"
-
-	jsoniter "github.com/json-iterator/go"
 
 	"github.com/awslabs/goformation/v4/cloudformation"
 	"github.com/tidwall/gjson"
@@ -132,14 +131,14 @@ func (d *ResourceData) Set(key string, value interface{}) {
 func AddRawValue(r gjson.Result, key string, v interface{}) gjson.Result {
 	j := make(map[string]interface{})
 
-	_ = jsoniter.Unmarshal([]byte(r.Raw), &j) // TODO: unhandled error
+	_ = json.Unmarshal([]byte(r.Raw), &j) // TODO: unhandled error
 	if j == nil {
 		j = make(map[string]interface{})
 	}
 
 	j[key] = v
 
-	mj, _ := jsoniter.Marshal(j) // TODO: unhandled error
+	mj, _ := json.Marshal(j) // TODO: unhandled error
 
 	return gjson.ParseBytes(mj)
 }
