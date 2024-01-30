@@ -3,5 +3,5 @@ version: 0.1
 projects:
   - path: .
     name: main
-    terraform_workspace: default
+    skip_auto_detection: true
 

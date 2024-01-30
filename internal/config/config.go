@@ -47,6 +47,8 @@ type Project struct {
 	DependencyPaths []string `yaml:"dependency_paths,omitempty"`
 	// IncludeAllPaths tells autodetect to use all folders with valid project files.
 	IncludeAllPaths bool `yaml:"include_all_paths,omitempty" ignored:"true"`
+	// SkipAutoDetection tells autodetect to skip this project.
+	SkipAutoDetection bool `yaml:"skip_auto_detection,omitempty" ignored:"true"`
 	// Name is a user defined name for the project
 	Name string `yaml:"name,omitempty" ignored:"true"`
 	// TerraformVarFiles is any var files that are to be used with the project.

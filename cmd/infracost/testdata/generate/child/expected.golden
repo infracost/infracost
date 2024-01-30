@@ -6,23 +6,23 @@ projects:
     terraform_var_files:
       - envs/default.tfvars
       - envs/dev.tfvars
-    terraform_workspace: default
+    skip_auto_detection: true
   - path: apps/bar
     name: apps-bar-prod
     terraform_var_files:
       - envs/default.tfvars
       - envs/prod.tfvars
-    terraform_workspace: default
+    skip_auto_detection: true
   - path: apps/foo
     name: apps-foo-dev
     terraform_var_files:
       - envs/default.tfvars
       - envs/dev.tfvars
-    terraform_workspace: default
+    skip_auto_detection: true
   - path: apps/foo
     name: apps-foo-staging
     terraform_var_files:
       - envs/default.tfvars
       - envs/staging.tfvars
-    terraform_workspace: default
+    skip_auto_detection: true
 

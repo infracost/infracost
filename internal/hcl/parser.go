@@ -315,7 +315,7 @@ func (p *Parser) YAML() string {
 		}
 	}
 
-	str.WriteString(fmt.Sprintf("    terraform_workspace: %s\n", p.workspaceName))
+	str.WriteString("    skip_auto_detection: true\n")
 
 	if len(p.tfEnvVars) > 0 {
 		str.WriteString("  terraform_vars:\n")

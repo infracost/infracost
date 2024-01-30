@@ -1171,3 +1171,19 @@ func TestBreakdownWithPolicyDataUploadTerragrunt(t *testing.T) {
 
 	testutil.AssertGoldenFile(t, path.Join("./testdata", testName, testName+"-upload.golden"), stripDynamicValues(uploadWriter.Bytes()))
 }
+
+func TestBreakdownConfigFileWithSkipAutoDetect(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--config-file", path.Join(dir, "infracost.yml"),
+		},
+		&GoldenFileOptions{
+			IsJSON: true,
+		},
+	)
+}

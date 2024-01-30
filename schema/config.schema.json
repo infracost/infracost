@@ -48,6 +48,9 @@
         "include_all_paths": {
           "type": "boolean"
         },
+        "skip_auto_detection": {
+          "type": "boolean"
+        },
         "name": {
           "type": "string"
         },
