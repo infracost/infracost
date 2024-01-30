@@ -1,0 +1,28 @@
+version: 0.1
+
+projects:
+  - path: infra/components/baz
+    name: infra-components-baz-dev
+    terraform_var_files:
+      - ../../variables/defaults.tfvars
+      - ../../variables/dev/baz.tfvars
+    terraform_workspace: default
+  - path: infra/components/baz
+    name: infra-components-baz-stag
+    terraform_var_files:
+      - ../../variables/defaults.tfvars
+      - ../../variables/stag/bop.tfvars
+    terraform_workspace: default
+  - path: infra/components/foo
+    name: infra-components-foo-dev
+    terraform_var_files:
+      - ../../variables/defaults.tfvars
+      - ../../variables/dev/baz.tfvars
+    terraform_workspace: default
+  - path: infra/components/foo
+    name: infra-components-foo-stag
+    terraform_var_files:
+      - ../../variables/defaults.tfvars
+      - ../../variables/stag/bop.tfvars
+    terraform_workspace: default
+

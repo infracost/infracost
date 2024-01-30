@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"sort"
 	"sync"
 
 	"github.com/awslabs/goformation/v4"
@@ -92,8 +91,8 @@ func Detect(ctx *config.RunContext, project *config.Project, includePastResource
 func configFileRootToProvider(rootPath hcl.RootPath, options []hcl.Option, projectContext *config.ProjectContext, pl *hcl.ProjectLocator) *terraform.HCLProvider {
 	var autoVarFiles []string
 	for _, varFile := range rootPath.TerraformVarFiles {
-		if hcl.IsAutoVarFile(varFile) && (filepath.Dir(varFile) == rootPath.Path || filepath.Dir(varFile) == ".") {
-			autoVarFiles = append(autoVarFiles, varFile)
+		if hcl.IsAutoVarFile(varFile.RelPath) && (filepath.Dir(varFile.RelPath) == rootPath.Path || filepath.Dir(varFile.RelPath) == ".") {
+			autoVarFiles = append(autoVarFiles, varFile.RelPath)
 		}
 	}
 
@@ -104,7 +103,6 @@ func configFileRootToProvider(rootPath hcl.RootPath, options []hcl.Option, proje
 	h, providerErr := terraform.NewHCLProvider(
 		projectContext,
 		rootPath,
-		pl,
 		nil,
 		options...,
 	)
@@ -119,87 +117,20 @@ func configFileRootToProvider(rootPath hcl.RootPath, options []hcl.Option, proje
 // the root module. These are defined by var file naming conventions.
 func autodetectedRootToProviders(pl *hcl.ProjectLocator, projectContext *config.ProjectContext, rootPath hcl.RootPath, options ...hcl.Option) []schema.Provider {
 	var providers []schema.Provider
-	var varFiles []string
-	var autoVarFiles []string
-
-	// first remove all the "auto" tfvar files from the list of discovered var files.
-	// These files should not constitute a new "project" as they won't define an
-	// environment but defaults that should be applied across all environments.
-	for _, varFile := range rootPath.TerraformVarFiles {
-		if hcl.IsAutoVarFile(varFile) {
-			autoVarFiles = append(autoVarFiles, varFile)
-			continue
-		}
-
-		if pl.IsGlobalVarFile(varFile) {
-			autoVarFiles = append(autoVarFiles, varFile)
-			continue
-		}
-
-		varFiles = append(varFiles, varFile)
-	}
-
-	// group the var files by environment. This is done by taking the base name of
-	// the var file. This is done to deduplicate var files that are for the same
-	// environment but have different file paths.
-	varFileGrouping := map[string][]string{}
-	for _, varFile := range varFiles {
-		name := hcl.CleanVarName(varFile)
-
-		if !hcl.VarFileEnvPrefixRegxp.MatchString(name) && !hcl.VarFileEnvSuffixRegxp.MatchString(name) {
-			varFileGrouping[name] = append(varFileGrouping[name], varFile)
-		}
-	}
-
-	// loop through the var files again and if there are any global var files
-	// with an environment prefix or suffix, add them to the grouping for each environment
-	// only if either the environment already exists, or there is no exact var files already
-	// associated with this project.
-	hasExactVarFileMatches := len(varFileGrouping) > 0
-
-	for _, varFile := range varFiles {
-		name := hcl.CleanVarName(varFile)
-
-		if hcl.VarFileEnvPrefixRegxp.MatchString(name) {
-			env := hcl.VarEnvNameFromPrefix(varFile)
-
-			_, exists := varFileGrouping[env]
-			if (!hasExactVarFileMatches && pl.IsEnvName(env)) || exists {
-				varFileGrouping[env] = append(varFileGrouping[env], varFile)
-				continue
-			}
-		}
-
-		if hcl.VarFileEnvSuffixRegxp.MatchString(name) {
-			env := hcl.VarEnvNameFromSuffix(varFile)
-
-			_, exists := varFileGrouping[env]
-			if (!hasExactVarFileMatches && pl.IsEnvName(env)) || exists {
-				varFileGrouping[env] = append(varFileGrouping[env], varFile)
-				continue
-			}
-		}
-	}
-
-	var varEnvs []string
-	for env := range varFileGrouping {
-		varEnvs = append(varEnvs, env)
-	}
-	sort.Strings(varEnvs)
+	autoVarFiles := rootPath.AutoFiles()
+	autoVarFiles = append(autoVarFiles, rootPath.GlobalFiles()...)
+	varFileGrouping := rootPath.EnvGroupings()
 
 	if len(varFileGrouping) > 0 {
-		sort.Strings(rootPath.TerraformVarFiles)
-
-		for _, env := range varEnvs {
+		for _, env := range varFileGrouping {
 			provider, err := terraform.NewHCLProvider(
 				projectContext,
 				rootPath,
-				pl,
 				nil,
 				append(
 					options,
-					hcl.OptionWithTFVarsPaths(append(autoVarFiles, varFileGrouping[env]...), true),
-					hcl.OptionWithModuleSuffix(env),
+					hcl.OptionWithTFVarsPaths(append(autoVarFiles.ToPaths(), env.TerraformVarFiles.ToPaths()...), true),
+					hcl.OptionWithModuleSuffix(env.Name),
 				)...)
 			if err != nil {
 				logging.Logger.Warn().Err(err).Msgf("could not initialize provider for path %q", rootPath.Path)
@@ -212,15 +143,15 @@ func autodetectedRootToProviders(pl *hcl.ProjectLocator, projectContext *config.
 		return providers
 	}
 
+	varFiles := rootPath.EnvFiles()
 	providerOptions := options
 	if len(autoVarFiles) > 0 {
-		providerOptions = append(providerOptions, hcl.OptionWithTFVarsPaths(append(varFiles, autoVarFiles...), true))
+		providerOptions = append(providerOptions, hcl.OptionWithTFVarsPaths(append(varFiles.ToPaths(), autoVarFiles.ToPaths()...), true))
 	}
 
 	provider, err := terraform.NewHCLProvider(
 		projectContext,
 		rootPath,
-		pl,
 		nil,
 		providerOptions...,
 	)
