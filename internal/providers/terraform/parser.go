@@ -143,8 +143,6 @@ type ParsedPlanConfiguration struct {
 func (p *Parser) parseJSON(j []byte, usage schema.UsageMap) (*ParsedPlanConfiguration, error) {
 	baseResources := p.loadUsageFileResources(usage)
 
-	j, _ = StripSetupTerraformWrapper(j)
-
 	if !gjson.ValidBytes(j) {
 		return &ParsedPlanConfiguration{
 			PastResources:    baseResources,
@@ -230,7 +228,10 @@ func collectModulesSourceUrls(moduleCalls []gjson.Result) []string {
 
 	var urls []string
 	for source := range remoteUrls {
-		urls = append(urls, source)
+		// Perf/memory leak: Copy gjson string slices that may be returned so we don't prevent
+		// the entire underlying parsed json from being garbage collected.
+		sourceCopy := strings.Clone(source)
+		urls = append(urls, sourceCopy)
 	}
 
 	return urls
@@ -251,8 +252,10 @@ func parseProviderConfig(providerConf gjson.Result) []schema.ProviderMetadata {
 	for _, k := range keys {
 		conf := confMap[k]
 		md := schema.ProviderMetadata{
-			Name:      conf.Get("name").String(),
-			Filename:  conf.Get("infracost_metadata.filename").String(),
+			// Perf/memory leak: Copy gjson string slices that may be returned so we don't prevent
+			// the entire underlying parsed json from being garbage collected.
+			Name:      strings.Clone(conf.Get("name").String()),
+			Filename:  strings.Clone(conf.Get("infracost_metadata.filename").String()),
 			StartLine: conf.Get("infracost_metadata.start_line").Int(),
 			EndLine:   conf.Get("infracost_metadata.end_line").Int(),
 		}
@@ -263,7 +266,9 @@ func parseProviderConfig(providerConf gjson.Result) []schema.ProviderMetadata {
 			}
 
 			for key, value := range defaultTags.Get("tags.constant_value").Map() {
-				md.DefaultTags[key] = value.String()
+				// Perf/memory leak: Copy gjson string slices that may be returned so we don't prevent
+				// the entire underlying parsed json from being garbage collected.
+				md.DefaultTags[strings.Clone(key)] = strings.Clone(value.String())
 			}
 		}
 
@@ -376,11 +381,15 @@ func (p *Parser) parseResourceData(isState bool, confLoader *ConfLoader, provide
 			region = providerRegion(addr, providerConf, vars, t, resConf)
 		}
 
-		v = schema.AddRawValue(v, "region", region)
+		// Perf/memory leak: Copy gjson string slices that may be returned so we don't prevent
+		// the entire underlying parsed json from being garbage collected.
+		v = schema.AddRawValue(v, "region", strings.Clone(region))
+		data := schema.NewResourceData(strings.Clone(t), strings.Clone(provider), strings.Clone(addr), nil, v)
 
-		data := schema.NewResourceData(t, provider, addr, nil, v)
-		data.Metadata = r.Get("infracost_metadata").Map()
-		resources[addr] = data
+		// Perf/memory leak: Copy gjson string slices that may be returned so we don't prevent
+		// the entire underlying parsed json from being garbage collected.
+		data.Metadata = gjson.ParseBytes([]byte(r.Get("infracost_metadata").Raw)).Map()
+		resources[strings.Clone(addr)] = data
 	}
 
 	// Recursively add any resources for child modules

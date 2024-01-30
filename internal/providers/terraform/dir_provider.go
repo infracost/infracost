@@ -182,6 +182,8 @@ func (p *DirProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, e
 		project := schema.NewProject(name, metadata)
 
 		parser := NewParser(p.ctx, p.includePastResources)
+
+		j, _ = StripSetupTerraformWrapper(j)
 		parsed, err := parser.parseJSON(j, usage)
 		if err != nil {
 			return projects, errors.Wrap(err, "Error parsing Terraform JSON")
