@@ -15,6 +15,7 @@ import (
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/config/template"
 	"github.com/infracost/infracost/internal/hcl"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/providers"
 	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/ui"
@@ -98,7 +99,11 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 	var parsers []*hcl.Parser
 	detected, err := providers.Detect(ctx, &config.Project{Path: repoPath}, false)
 	if err != nil {
-		return fmt.Errorf("could not detect providers %w", err)
+		if definedProjects {
+			logging.Logger.Debug().Err(err).Msg("could not detect providers")
+		} else {
+			return fmt.Errorf("could not detect providers %w", err)
+		}
 	}
 
 	for _, provider := range detected {
