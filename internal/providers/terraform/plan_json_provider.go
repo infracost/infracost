@@ -102,7 +102,7 @@ func (p *PlanJSONProvider) LoadResourcesFromSrc(usage schema.UsageMap, j []byte,
 
 	// use TagPolicyAPIEndpoint for Policy2 instead of creating a new config variable
 	if p.policyClient != nil {
-		err := p.policyClient.UploadPolicyData(project)
+		err := p.policyClient.UploadPolicyData(project, parsedConf.CurrentResourceDatas, parsedConf.PastResourceDatas)
 		if err != nil {
 			p.logger.Err(err).Msgf("Terraform project %s failed to upload policy data", project.Name)
 		}

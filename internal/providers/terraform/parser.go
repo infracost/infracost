@@ -37,7 +37,16 @@ func NewParser(ctx *config.ProjectContext, includePastResources bool) *Parser {
 	}
 }
 
-func (p *Parser) createPartialResource(d *schema.ResourceData, u *schema.UsageData) *schema.PartialResource {
+// parsedResource is used to collect a PartialResource with its corresponding ResourceData so the
+// ResourceData may be used internally by the parsing job, while the PartialResource can be passed
+// back up to top level functions.  This allows the ResourceData to be garbage collected once the parsing
+// job is complete.
+type parsedResource struct {
+	PartialResource *schema.PartialResource
+	ResourceData    *schema.ResourceData
+}
+
+func (p *Parser) createParsedResource(d *schema.ResourceData, u *schema.UsageData) parsedResource {
 	registryMap := GetResourceRegistryMap()
 
 	for cKey, cValue := range getSpecialContext(d) {
@@ -46,17 +55,18 @@ func (p *Parser) createPartialResource(d *schema.ResourceData, u *schema.UsageDa
 
 	if registryItem, ok := (*registryMap)[d.Type]; ok {
 		if registryItem.NoPrice {
-			return &schema.PartialResource{
-				ResourceData: d,
-				Resource: &schema.Resource{
-					Name:        d.Address,
-					IsSkipped:   true,
-					NoPrice:     true,
-					SkipMessage: "Free resource.",
-					Metadata:    d.Metadata,
-				},
-				CloudResourceIDs: registryItem.CloudResourceIDFunc(d),
+			resource := &schema.Resource{
+				Name:        d.Address,
+				IsSkipped:   true,
+				NoPrice:     true,
+				SkipMessage: "Free resource.",
+				Metadata:    d.Metadata,
 			}
+			return parsedResource{
+				PartialResource: schema.NewPartialResource(d, resource, nil, registryItem.CloudResourceIDFunc(d)),
+				ResourceData:    d,
+			}
+
 		}
 
 		// Use the CoreRFunc to generate a CoreResource if possible.  This is
@@ -66,7 +76,10 @@ func (p *Parser) createPartialResource(d *schema.ResourceData, u *schema.UsageDa
 		if registryItem.CoreRFunc != nil {
 			coreRes := registryItem.CoreRFunc(d)
 			if coreRes != nil {
-				return &schema.PartialResource{ResourceData: d, CoreResource: coreRes, CloudResourceIDs: registryItem.CloudResourceIDFunc(d)}
+				return parsedResource{
+					PartialResource: schema.NewPartialResource(d, nil, coreRes, registryItem.CloudResourceIDFunc(d)),
+					ResourceData:    d,
+				}
 			}
 		} else {
 			res := registryItem.RFunc(d, u)
@@ -75,24 +88,32 @@ func (p *Parser) createPartialResource(d *schema.ResourceData, u *schema.UsageDa
 					res.EstimationSummary = u.CalcEstimationSummary()
 				}
 
-				return &schema.PartialResource{ResourceData: d, Resource: res, CloudResourceIDs: registryItem.CloudResourceIDFunc(d)}
+				return parsedResource{
+					PartialResource: schema.NewPartialResource(d, res, nil, registryItem.CloudResourceIDFunc(d)),
+					ResourceData:    d,
+				}
 			}
 		}
 	}
 
-	return &schema.PartialResource{
+	return parsedResource{
+		PartialResource: schema.NewPartialResource(
+			d,
+			&schema.Resource{
+				Name:        d.Address,
+				IsSkipped:   true,
+				SkipMessage: "This resource is not currently supported",
+				Metadata:    d.Metadata,
+			},
+			nil,
+			[]string{},
+		),
 		ResourceData: d,
-		Resource: &schema.Resource{
-			Name:        d.Address,
-			IsSkipped:   true,
-			SkipMessage: "This resource is not currently supported",
-			Metadata:    d.Metadata,
-		},
 	}
 }
 
-func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.PartialResource, usage schema.UsageMap, confLoader *ConfLoader, parsed, providerConf, vars gjson.Result) []*schema.PartialResource {
-	var resources []*schema.PartialResource
+func (p *Parser) parseJSONResources(parsePrior bool, baseResources []parsedResource, usage schema.UsageMap, confLoader *ConfLoader, parsed, providerConf, vars gjson.Result) []parsedResource {
+	var resources []parsedResource
 	resources = append(resources, baseResources...)
 	var vals gjson.Result
 
@@ -117,9 +138,7 @@ func (p *Parser) parseJSONResources(parsePrior bool, baseResources []*schema.Par
 	p.populateUsageData(resData, usage)
 
 	for _, d := range resData {
-		if r := p.createPartialResource(d, d.UsageData); r != nil {
-			resources = append(resources, r)
-		}
+		resources = append(resources, p.createParsedResource(d, d.UsageData))
 	}
 
 	return resources
@@ -134,21 +153,47 @@ func (p *Parser) populateUsageData(resData map[string]*schema.ResourceData, usag
 }
 
 type ParsedPlanConfiguration struct {
-	PastResources     []*schema.PartialResource
-	CurrentResources  []*schema.PartialResource
-	ProviderMetadata  []schema.ProviderMetadata
-	RemoteModuleCalls []string
+	PastResources        []*schema.PartialResource
+	PastResourceDatas    []*schema.ResourceData
+	CurrentResources     []*schema.PartialResource
+	CurrentResourceDatas []*schema.ResourceData
+	ProviderMetadata     []schema.ProviderMetadata
+	RemoteModuleCalls    []string
+}
+
+func newParsedPlanConfiguration(pastResources, currentResources []parsedResource, metadatas []schema.ProviderMetadata, remoteModuleCalls []string) *ParsedPlanConfiguration {
+	ppc := ParsedPlanConfiguration{
+		PastResources:        make([]*schema.PartialResource, 0, len(pastResources)),
+		PastResourceDatas:    make([]*schema.ResourceData, 0, len(pastResources)),
+		CurrentResources:     make([]*schema.PartialResource, 0, len(currentResources)),
+		CurrentResourceDatas: make([]*schema.ResourceData, 0, len(currentResources)),
+		ProviderMetadata:     metadatas,
+		RemoteModuleCalls:    remoteModuleCalls,
+	}
+
+	for _, parsed := range pastResources {
+		ppc.PastResources = append(ppc.PastResources, parsed.PartialResource)
+		ppc.PastResourceDatas = append(ppc.PastResourceDatas, parsed.ResourceData)
+	}
+
+	for _, parsed := range currentResources {
+		ppc.CurrentResources = append(ppc.CurrentResources, parsed.PartialResource)
+		ppc.CurrentResourceDatas = append(ppc.CurrentResourceDatas, parsed.ResourceData)
+	}
+
+	return &ppc
 }
 
 func (p *Parser) parseJSON(j []byte, usage schema.UsageMap) (*ParsedPlanConfiguration, error) {
 	baseResources := p.loadUsageFileResources(usage)
 
 	if !gjson.ValidBytes(j) {
-		return &ParsedPlanConfiguration{
-			PastResources:    baseResources,
-			CurrentResources: baseResources,
-			ProviderMetadata: nil,
-		}, errors.New("invalid JSON")
+		return newParsedPlanConfiguration(
+			baseResources,
+			baseResources,
+			nil,
+			nil,
+		), errors.New("invalid JSON")
 	}
 
 	parsed := gjson.ParseBytes(j)
@@ -162,45 +207,36 @@ func (p *Parser) parseJSON(j []byte, usage schema.UsageMap) (*ParsedPlanConfigur
 	confLoader := NewConfLoader(conf)
 	calledRemoteModules := collectModulesSourceUrls(conf.Get("module_calls.*").Array())
 	resources := p.parseJSONResources(false, baseResources, usage, confLoader, parsed, providerConf, vars)
-	if !p.includePastResources {
-		return &ParsedPlanConfiguration{
-			PastResources:     nil,
-			CurrentResources:  resources,
-			ProviderMetadata:  providerMetadata,
-			RemoteModuleCalls: calledRemoteModules,
-		}, nil
-	}
-
-	if !parsed.Get("prior_state").Exists() {
-		return &ParsedPlanConfiguration{
-			PastResources:     nil,
-			CurrentResources:  resources,
-			ProviderMetadata:  providerMetadata,
-			RemoteModuleCalls: calledRemoteModules,
-		}, nil
+	if !p.includePastResources || !parsed.Get("prior_state").Exists() {
+		return newParsedPlanConfiguration(
+			nil,
+			resources,
+			providerMetadata,
+			calledRemoteModules,
+		), nil
 	}
 
 	// Check if the prior state is the same as the planned state
 	// and if so we can just return pointers to the same resources
 	if gjsonEqual(parsed.Get("prior_state.values.root_module"), parsed.Get("planned_values.root_module")) {
-		return &ParsedPlanConfiguration{
-			PastResources:     resources,
-			CurrentResources:  resources,
-			ProviderMetadata:  providerMetadata,
-			RemoteModuleCalls: calledRemoteModules,
-		}, nil
+		return newParsedPlanConfiguration(
+			resources,
+			resources,
+			providerMetadata,
+			calledRemoteModules,
+		), nil
 	}
 
 	pastResources := p.parseJSONResources(true, baseResources, usage, confLoader, parsed, providerConf, vars)
 	resourceChanges := parsed.Get("resource_changes").Array()
 	pastResources = stripNonTargetResources(pastResources, resources, resourceChanges)
 
-	return &ParsedPlanConfiguration{
-		PastResources:     pastResources,
-		CurrentResources:  resources,
-		ProviderMetadata:  providerMetadata,
-		RemoteModuleCalls: calledRemoteModules,
-	}, nil
+	return newParsedPlanConfiguration(
+		pastResources,
+		resources,
+		providerMetadata,
+		calledRemoteModules,
+	), nil
 }
 
 func collectModulesSourceUrls(moduleCalls []gjson.Result) []string {
@@ -292,8 +328,8 @@ func StripSetupTerraformWrapper(b []byte) ([]byte, bool) {
 	return stripped, len(stripped) != len(b)
 }
 
-func (p *Parser) loadUsageFileResources(u schema.UsageMap) []*schema.PartialResource {
-	resources := make([]*schema.PartialResource, 0)
+func (p *Parser) loadUsageFileResources(u schema.UsageMap) []parsedResource {
+	resources := make([]parsedResource, 0)
 
 	for k, v := range u.Data() {
 		for _, t := range GetUsageOnlyResources() {
@@ -302,9 +338,7 @@ func (p *Parser) loadUsageFileResources(u schema.UsageMap) []*schema.PartialReso
 				// set the usage data as a field on the resource data in case it is needed when
 				// processing reference attributes.
 				d.UsageData = v
-				if r := p.createPartialResource(d, v); r != nil {
-					resources = append(resources, r)
-				}
+				resources = append(resources, p.createParsedResource(d, v))
 			}
 		}
 	}
@@ -317,10 +351,10 @@ func (p *Parser) loadUsageFileResources(u schema.UsageMap) []*schema.PartialReso
 // is run with `-target` then all resources still appear in prior_state but not
 // in planned_values. This makes sure we remove any non-target resources from
 // the past resources so that we only show resources matching the target.
-func stripNonTargetResources(pastResources []*schema.PartialResource, resources []*schema.PartialResource, resourceChanges []gjson.Result) []*schema.PartialResource {
+func stripNonTargetResources(pastResources []parsedResource, resources []parsedResource, resourceChanges []gjson.Result) []parsedResource {
 	resourceAddrMap := make(map[string]bool, len(resources))
 	for _, resource := range resources {
-		resourceAddrMap[resource.ResourceData.Address] = true
+		resourceAddrMap[resource.PartialResource.Address] = true
 	}
 
 	diffAddrMap := make(map[string]bool, len(resourceChanges))
@@ -328,10 +362,10 @@ func stripNonTargetResources(pastResources []*schema.PartialResource, resources 
 		diffAddrMap[change.Get("address").String()] = true
 	}
 
-	var filteredResources []*schema.PartialResource
+	var filteredResources []parsedResource
 	for _, resource := range pastResources {
-		_, rOk := resourceAddrMap[resource.ResourceData.Address]
-		_, dOk := diffAddrMap[resource.ResourceData.Address]
+		_, rOk := resourceAddrMap[resource.PartialResource.Address]
+		_, dOk := diffAddrMap[resource.PartialResource.Address]
 		if dOk || rOk {
 			filteredResources = append(filteredResources, resource)
 		}

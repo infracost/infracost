@@ -45,14 +45,14 @@ func NewCFResourceData(resourceType string, providerName string, address string,
 }
 
 func (d *ResourceData) Get(key string) gjson.Result {
-	return d.RawValues.Get(key)
+	return gjson.Parse(strings.Clone(d.RawValues.Get(key).Raw))
 }
 
 // GetStringOrDefault returns the value of key within ResourceData as a string.
 // If the retrieved value is not set GetStringOrDefault will return def.
 func (d *ResourceData) GetStringOrDefault(key, def string) string {
 	if !d.IsEmpty(key) {
-		return d.RawValues.Get(key).String()
+		return strings.Clone(d.RawValues.Get(key).String())
 	}
 
 	return def

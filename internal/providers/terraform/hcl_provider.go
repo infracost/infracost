@@ -196,30 +196,16 @@ func (p *HCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, e
 		return []*schema.Project{p.newProject(j)}, nil
 	}
 
-	project := p.parseResources(j, usage)
-	if p.ctx.RunContext.VCSMetadata.HasChanges() {
-		j := j
-		project.Metadata.VCSCodeChanged = &j.Module.HasChanges
-	}
-
-	if p.policyClient != nil {
-		err := p.policyClient.UploadPolicyData(project)
-		if err != nil {
-			p.logger.Err(err).Msgf("failed to upload policy data %s", project.Name)
-		}
-	}
-
-	return []*schema.Project{project}, nil
-}
-
-func (p *HCLProvider) parseResources(parsed HCLProject, usage schema.UsageMap) *schema.Project {
-	project := p.newProject(parsed)
-
-	parsedConf, err := p.planJSONParser.parseJSON(parsed.JSON, usage)
+	project := p.newProject(j)
+	parsedConf, err := p.planJSONParser.parseJSON(j.JSON, usage)
 	if err != nil {
 		project.Metadata.AddErrorWithCode(err, schema.DiagJSONParsingFailure)
 
-		return project
+		return []*schema.Project{project}, nil
+	}
+	if p.ctx.RunContext.VCSMetadata.HasChanges() {
+		j := j
+		project.Metadata.VCSCodeChanged = &j.Module.HasChanges
 	}
 
 	project.AddProviderMetadata(parsedConf.ProviderMetadata)
@@ -228,7 +214,14 @@ func (p *HCLProvider) parseResources(parsed HCLProject, usage schema.UsageMap) *
 	project.PartialPastResources = parsedConf.PastResources
 	project.PartialResources = parsedConf.CurrentResources
 
-	return project
+	if p.policyClient != nil {
+		err := p.policyClient.UploadPolicyData(project, parsedConf.CurrentResourceDatas, parsedConf.PastResourceDatas)
+		if err != nil {
+			p.logger.Err(err).Msgf("failed to upload policy data %s", project.Name)
+		}
+	}
+
+	return []*schema.Project{project}, nil
 }
 
 func (p *HCLProvider) newProject(parsed HCLProject) *schema.Project {
