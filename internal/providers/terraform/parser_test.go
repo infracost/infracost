@@ -413,10 +413,10 @@ func TestParseJSONResources(t *testing.T) {
 
 	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, map[string]interface{}{}), true)
 
-	partials := p.parseJSONResources(false, nil, usage, NewConfLoader(conf), parsed, providerConf, vars)
-	actual := make([]*schema.Resource, len(partials))
-	for i, partial := range partials {
-		actual[i] = schema.BuildResource(partial, nil)
+	parsedResources := p.parseJSONResources(false, nil, usage, NewConfLoader(conf), parsed, providerConf, vars)
+	actual := make([]*schema.Resource, len(parsedResources))
+	for i, pr := range parsedResources {
+		actual[i] = schema.BuildResource(pr.PartialResource, nil)
 	}
 
 	i := 0
@@ -486,8 +486,8 @@ func TestCreateResource(t *testing.T) {
 	p := NewParser(config.NewProjectContext(config.EmptyRunContext(), &config.Project{}, map[string]interface{}{}), true)
 
 	for _, test := range tests {
-		partial := p.createPartialResource(test.data, nil)
-		actual := schema.BuildResource(partial, nil)
+		parsed := p.createParsedResource(test.data, nil)
+		actual := schema.BuildResource(parsed.PartialResource, nil)
 		assert.Equal(t, test.expected.Name, actual.Name)
 		assert.Equal(t, test.expected.ResourceType, actual.ResourceType)
 		assert.Equal(t, test.expected.IsSkipped, actual.IsSkipped)

@@ -135,7 +135,7 @@ func FetchUsageData(ctx *config.RunContext, project *schema.Project) (schema.Usa
 	coreResources := make(map[string]schema.CoreResource)
 	for _, rb := range project.AllPartialResources() {
 		if rb.CoreResource != nil {
-			coreResources[rb.ResourceData.Address] = rb.CoreResource
+			coreResources[rb.Address] = rb.CoreResource
 		}
 	}
 
@@ -184,7 +184,7 @@ func UploadCloudResourceIDs(ctx *config.RunContext, project *schema.Project) err
 	for _, partial := range project.AllPartialResources() {
 		for _, resourceID := range partial.CloudResourceIDs {
 			resourceIDs = append(resourceIDs, apiclient.ResourceIDAddress{
-				Address:    partial.ResourceData.Address,
+				Address:    partial.Address,
 				ResourceID: resourceID},
 			)
 		}

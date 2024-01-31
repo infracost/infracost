@@ -235,7 +235,7 @@ func (p *Project) BuildResources(usageMap UsageMap) {
 	seen := make(map[*PartialResource]*Resource)
 
 	for _, p := range p.PartialPastResources {
-		u := usageMap.Get(p.ResourceData.Address)
+		u := usageMap.Get(p.Address)
 		r := BuildResource(p, u)
 		seen[p] = r
 		pastResources = append(pastResources, r)
@@ -244,7 +244,7 @@ func (p *Project) BuildResources(usageMap UsageMap) {
 	for _, p := range p.PartialResources {
 		r, ok := seen[p]
 		if !ok {
-			u := usageMap.Get(p.ResourceData.Address)
+			u := usageMap.Get(p.Address)
 			r = BuildResource(p, u)
 			seen[p] = r
 		}

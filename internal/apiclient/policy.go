@@ -44,7 +44,7 @@ func NewPolicyAPIClient(ctx *config.RunContext) (*PolicyAPIClient, error) {
 
 // UploadPolicyData sends a filtered set of a project's resource information to Infracost Cloud and
 // potentially adds PolicySha and PastPolicySha to the project's metadata.
-func (c *PolicyAPIClient) UploadPolicyData(project *schema.Project) error {
+func (c *PolicyAPIClient) UploadPolicyData(project *schema.Project, rds, pastRds []*schema.ResourceData) error {
 	if project.Metadata == nil {
 		project.Metadata = &schema.ProjectMetadata{}
 	}
@@ -54,7 +54,7 @@ func (c *PolicyAPIClient) UploadPolicyData(project *schema.Project) error {
 		return err
 	}
 
-	filteredResources := c.filterResources(project.PartialResources)
+	filteredResources := c.filterResources(rds)
 	if len(filteredResources) > 0 {
 		sha, err := c.uploadProjectPolicyData(filteredResources)
 		if err != nil {
@@ -65,7 +65,7 @@ func (c *PolicyAPIClient) UploadPolicyData(project *schema.Project) error {
 		project.Metadata.PolicySha = "0" // set a fake sha so we can tell policy checks actually ran
 	}
 
-	filteredPastResources := c.filterResources(project.PartialPastResources)
+	filteredPastResources := c.filterResources(pastRds)
 	if len(filteredPastResources) > 0 {
 		sha, err := c.uploadProjectPolicyData(filteredPastResources)
 		if err != nil {
@@ -159,14 +159,11 @@ type policy2InfracostMetadataCall struct {
 	EndLine   int64  `json:"endLine"`
 }
 
-func (c *PolicyAPIClient) filterResources(partials []*schema.PartialResource) []policy2Resource {
+func (c *PolicyAPIClient) filterResources(rds []*schema.ResourceData) []policy2Resource {
 	var p2rs []policy2Resource
-	for _, partial := range partials {
-		if partial != nil && partial.ResourceData != nil {
-			rd := partial.ResourceData
-			if f, ok := c.allowLists[rd.Type]; ok {
-				p2rs = append(p2rs, filterResource(rd, f))
-			}
+	for _, rd := range rds {
+		if f, ok := c.allowLists[rd.Type]; ok {
+			p2rs = append(p2rs, filterResource(rd, f))
 		}
 	}
 
