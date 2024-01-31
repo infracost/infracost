@@ -34,7 +34,8 @@ func ParseTags(defaultTags *map[string]string, r *schema.ResourceData) *map[stri
 	_, supportsTagBlock := provider_schemas.AWSTagBlockSupport[r.Type]
 
 	rTags := r.Get("tags").Map()
-	if !supportsTags && !supportsTagBlock && len(rTags) == 0 {
+	rTagsAll := r.Get("tags_all").Map()
+	if !supportsTags && !supportsTagBlock && len(rTags) == 0 && len(rTagsAll) == 0 {
 		return nil
 	}
 
@@ -76,6 +77,11 @@ func ParseTags(defaultTags *map[string]string, r *schema.ResourceData) *map[stri
 	}
 
 	for k, v := range rTags {
+		tags[k] = v.String()
+	}
+
+	// tags_all is only set on plan.json runs, so we can prefer them over our own calculations
+	for k, v := range rTagsAll {
 		tags[k] = v.String()
 	}
 
