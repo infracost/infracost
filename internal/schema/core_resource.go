@@ -51,11 +51,9 @@ type CoreResourceWithUsageParams interface {
 // top level functions that can supply additional provider-agnostic information
 // (such as Infracost Cloud usage estimates) before the resource is built.
 type PartialResource struct {
-	Type string
-	//ProviderName  string
-	Address string
-	Tags    *map[string]string
-	//ReferencesMap map[string][]*ResourceData
+	Type      string
+	Address   string
+	Tags      *map[string]string
 	UsageData *UsageData
 	Metadata  map[string]gjson.Result
 
