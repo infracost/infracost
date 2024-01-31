@@ -54,9 +54,19 @@ func Detect(ctx *config.RunContext, project *config.Project, includePastResource
 		return []schema.Provider{h}, nil
 	}
 
+	pathOverrides := make([]hcl.PathOverrideConfig, len(ctx.Config.Autodetect.PathOverrides))
+	for i, override := range ctx.Config.Autodetect.PathOverrides {
+		pathOverrides[i] = hcl.PathOverrideConfig{
+			Path:    override.Path,
+			Only:    override.Only,
+			Exclude: override.Exclude,
+		}
+	}
+
 	locatorConfig := &hcl.ProjectLocatorConfig{
 		ExcludedDirs:      append(project.ExcludePaths, ctx.Config.Autodetect.ExcludeDirs...),
 		IncludedDirs:      ctx.Config.Autodetect.IncludeDirs,
+		PathOverrides:     pathOverrides,
 		EnvNames:          ctx.Config.Autodetect.EnvNames,
 		ChangedObjects:    ctx.VCSMetadata.Commit.ChangedObjects,
 		UseAllPaths:       project.IncludeAllPaths,

@@ -91,6 +91,7 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 		ctx.Config.Autodetect.ExcludeDirs = partialConfig.Autodetect.ExcludeDirs
 		ctx.Config.Autodetect.IncludeDirs = partialConfig.Autodetect.IncludeDirs
 		ctx.Config.Autodetect.EnvNames = partialConfig.Autodetect.EnvNames
+		ctx.Config.Autodetect.PathOverrides = partialConfig.Autodetect.PathOverrides
 
 		_, _ = reader.Seek(0, io.SeekStart)
 		definedProjects = hasLineStartingWith(reader, "projects:")

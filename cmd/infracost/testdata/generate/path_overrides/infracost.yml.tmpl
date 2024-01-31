@@ -1,0 +1,16 @@
+version: 0.1
+autodetect:
+  env_names:
+    - baz
+    - bat
+    - bip
+  path_overrides:
+    - path: "**/**"
+      exclude:
+        - baz
+    - path: infra/components/foo
+      only:
+        - baz
+    - path: infra/**/bar
+      exclude:
+        - bat

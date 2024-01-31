@@ -28,6 +28,15 @@ type AutodetectConfig struct {
 	// IncludeDirs is a list of directories that the autodetect should append
 	// to the already detected directories.
 	IncludeDirs []string `yaml:"include_dirs,omitempty" ignored:"true"`
+	// PathOverrides defines paths that should be overridden with specific
+	// environment variable grouping.
+	PathOverrides []PathOverride `yaml:"path_overrides,omitempty" ignored:"true"`
+}
+
+type PathOverride struct {
+	Path    string   `yaml:"path"`
+	Exclude []string `yaml:"exclude"`
+	Only    []string `yaml:"only"`
 }
 
 // Project defines a specific terraform project config. This can be used
