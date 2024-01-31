@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"regexp"
 	"sort"
 	"strings"
 
@@ -56,9 +55,8 @@ var (
 
 // EnvFileMatcher is used to match environment specific var files.
 type EnvFileMatcher struct {
-	EnvNames  *regexp.Regexp
-	EnvPrefix *regexp.Regexp
-	EnvSuffix *regexp.Regexp
+	envNames  []string
+	envLookup map[string]struct{}
 }
 
 func CreateEnvFileMatcher(names []string) *EnvFileMatcher {
@@ -66,12 +64,14 @@ func CreateEnvFileMatcher(names []string) *EnvFileMatcher {
 		return CreateEnvFileMatcher(defaultEnvs)
 	}
 
-	joinedNames := strings.Join(names, "|")
+	lookup := make(map[string]struct{}, len(names))
+	for _, name := range names {
+		lookup[name] = struct{}{}
+	}
 
 	return &EnvFileMatcher{
-		EnvNames:  regexp.MustCompile(fmt.Sprintf("^(%s)([-_])?|([-_])(%s)$|^(%s)", joinedNames, joinedNames, joinedNames)),
-		EnvPrefix: regexp.MustCompile(fmt.Sprintf("^(%s)[-_]", joinedNames)),
-		EnvSuffix: regexp.MustCompile(fmt.Sprintf("[-_](%s)$", joinedNames)),
+		envNames:  names,
+		envLookup: lookup,
 	}
 }
 
@@ -91,35 +91,77 @@ func (e *EnvFileMatcher) IsGlobalVarFile(file string) bool {
 
 // IsEnvName checks if the var file is an environment specific var file.
 func (e *EnvFileMatcher) IsEnvName(file string) bool {
-	return e.EnvNames.MatchString(CleanVarName(filepath.Base(file)))
+	clean := e.clean(file)
+	_, ok := e.envLookup[clean]
+	if ok {
+		return true
+	}
+
+	for _, name := range e.envNames {
+		if e.hasEnvPrefix(clean, name) || e.hasEnvSuffix(clean, name) {
+			return true
+		}
+	}
+
+	return false
+}
+
+func (e *EnvFileMatcher) clean(name string) string {
+	return cleanVarName(filepath.Base(name))
 }
 
 // EnvName returns the environment name for the given var file.
 func (e *EnvFileMatcher) EnvName(file string) string {
-	name := CleanVarName(filepath.Base(file))
-	if e.EnvSuffix.MatchString(name) {
-		sub := e.EnvSuffix.FindStringSubmatch(name)
-		if len(sub) != 2 {
-			return name
-		}
-
-		return sub[1]
+	// if we have a direct match to an env name, return it.
+	clean := e.clean(file)
+	_, ok := e.envLookup[clean]
+	if ok {
+		return clean
 	}
 
-	if e.EnvPrefix.MatchString(name) {
-		sub := e.EnvPrefix.FindStringSubmatch(name)
-		if len(sub) != 2 {
-			return name
+	// if we have a partial suffix match to an env name return the partial match
+	// which is the longest match. This is likely to be the better match. e.g: if we
+	// have both dev and legacy-dev as defined envNames, given a tfvar named
+	// legacy-dev-staging legacy-dev should be the env name returned.
+	var match string
+	for _, name := range e.envNames {
+		if e.hasEnvSuffix(clean, name) {
+			if len(name) > len(match) {
+				match = name
+			}
 		}
-
-		return sub[1]
 	}
 
-	return name
+	if match != "" {
+		return match
+	}
+
+	// repeat the same process for suffixes but with prefix matches.
+	for _, name := range e.envNames {
+		if e.hasEnvPrefix(clean, name) {
+			if len(name) > len(match) {
+				match = name
+			}
+		}
+	}
+
+	if match != "" {
+		return match
+	}
+
+	return clean
 }
 
-// CleanVarName removes the .tfvars or .tfvars.json suffix from the file name.
-func CleanVarName(file string) string {
+func (e *EnvFileMatcher) hasEnvPrefix(clean string, name string) bool {
+	return strings.HasPrefix(clean, name+"-") || strings.HasPrefix(clean, name+"_")
+}
+
+func (e *EnvFileMatcher) hasEnvSuffix(clean string, name string) bool {
+	return strings.HasSuffix(clean, "_"+name) || strings.HasSuffix(clean, "-"+name)
+}
+
+// cleanVarName removes the .tfvars or .tfvars.json suffix from the file name.
+func cleanVarName(file string) string {
 	return filepath.Base(strings.TrimSuffix(strings.TrimSuffix(file, ".json"), ".tfvars"))
 }
 
@@ -325,7 +367,7 @@ func buildVarFileEnvNames(root *TreeNode, e *EnvFileMatcher) {
 			namesToSearch := append([]string{f.Name}, possibleEnvNames...)
 			var envName string
 			for _, search := range namesToSearch {
-				if e.IsEnvName(CleanVarName(search)) {
+				if e.IsEnvName(cleanVarName(search)) {
 					envName = search
 					break
 				}
@@ -717,7 +759,7 @@ func (t *TreeNode) CollectRootPaths() []RootPath {
 	for _, root := range projects {
 		for _, varFile := range root.TerraformVarFiles {
 			base := filepath.Base(root.Path)
-			name := CleanVarName(varFile.Name)
+			name := cleanVarName(varFile.Name)
 			if base == name {
 				found[varFile.FullPath] = true
 			}
@@ -731,7 +773,7 @@ func (t *TreeNode) CollectRootPaths() []RootPath {
 	for i, root := range projects {
 		var filtered RootPathVarFiles
 		for _, varFile := range root.TerraformVarFiles {
-			name := CleanVarName(varFile.Name)
+			name := cleanVarName(varFile.Name)
 			base := filepath.Base(root.Path)
 			if found[varFile.FullPath] && base != name {
 				continue
