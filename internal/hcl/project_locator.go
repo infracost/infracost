@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/gobwas/glob"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclparse"
 	"github.com/rs/zerolog"
@@ -196,6 +197,7 @@ type ProjectLocator struct {
 
 	shouldSkipDir    func(string) bool
 	shouldIncludeDir func(string) bool
+	pathOverrides    []pathOverride
 }
 
 // ProjectLocatorConfig provides configuration options on how the locator functions.
@@ -206,6 +208,37 @@ type ProjectLocatorConfig struct {
 	SkipAutoDetection bool
 	IncludedDirs      []string
 	EnvNames          []string
+	PathOverrides     []PathOverrideConfig
+}
+
+type PathOverrideConfig struct {
+	Path    string
+	Exclude []string
+	Only    []string
+}
+
+type pathOverride struct {
+	glob glob.Glob
+
+	exclude map[string]struct{}
+	only    map[string]struct{}
+}
+
+func newPathOverride(override PathOverrideConfig) pathOverride {
+	exclude := make(map[string]struct{}, len(override.Exclude))
+	for _, s := range override.Exclude {
+		exclude[s] = struct{}{}
+	}
+	only := make(map[string]struct{}, len(override.Only))
+	for _, s := range override.Only {
+		only[s] = struct{}{}
+	}
+
+	return pathOverride{
+		glob:    glob.MustCompile(override.Path),
+		exclude: exclude,
+		only:    only,
+	}
 }
 
 // NewProjectLocator returns safely initialized ProjectLocator.
@@ -216,6 +249,11 @@ func NewProjectLocator(logger zerolog.Logger, config *ProjectLocatorConfig) *Pro
 			matcher = CreateEnvFileMatcher(config.EnvNames)
 		}
 
+		overrides := make([]pathOverride, len(config.PathOverrides))
+		for i, override := range config.PathOverrides {
+			overrides[i] = newPathOverride(override)
+		}
+
 		return &ProjectLocator{
 			modules:            make(map[string]struct{}),
 			moduleCalls:        make(map[string][]string),
@@ -223,6 +261,7 @@ func NewProjectLocator(logger zerolog.Logger, config *ProjectLocatorConfig) *Pro
 			excludedDirs:       config.ExcludedDirs,
 			changedObjects:     config.ChangedObjects,
 			includedDirs:       config.IncludedDirs,
+			pathOverrides:      overrides,
 			logger:             logger,
 			envMatcher:         matcher,
 			useAllPaths:        config.UseAllPaths,
@@ -373,7 +412,7 @@ func buildVarFileEnvNames(root *TreeNode, e *EnvFileMatcher) {
 				}
 			}
 
-			t.TerraformVarFiles.Files[i].EnvName = envName
+			t.TerraformVarFiles.Files[i].EnvName = e.EnvName(envName)
 			if envName != "" {
 				t.TerraformVarFiles.Files[i].IsGlobal = false
 			}
@@ -805,6 +844,11 @@ type RootPath struct {
 	IsTerragrunt     bool
 }
 
+func (r *RootPath) RelPath() string {
+	rel, _ := filepath.Rel(r.RepoPath, r.Path)
+	return rel
+}
+
 // GlobalFiles returns a list of any global var files defined in the project.
 func (r *RootPath) GlobalFiles() RootPathVarFiles {
 	var files RootPathVarFiles
@@ -984,7 +1028,57 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 	node.AssociateParentVarFiles()
 	node.AssociateAuntVarFiles()
 
-	return node.CollectRootPaths()
+	paths := node.CollectRootPaths()
+	p.excludeEnvFromPaths(paths)
+
+	return paths
+}
+
+// excludeEnvFromPaths filters car files from the paths based on the path overrides.
+func (p *ProjectLocator) excludeEnvFromPaths(paths []RootPath) {
+	// filter the "only" paths first. This is done as "only" rules take precedence
+	// over exclude rules. So if a env is defined in both only and exclude and
+	// matches the same path, the "only" rule is the only one to apply.
+	onlyPaths := map[string]struct{}{}
+	for _, override := range p.pathOverrides {
+		if len(override.only) > 0 {
+			for i, path := range paths {
+				relPath := path.RelPath()
+				if override.glob.Match(relPath) {
+					var filtered RootPathVarFiles
+					for _, varFile := range path.TerraformVarFiles {
+						if _, ok := override.only[varFile.EnvName]; ok {
+							onlyPaths[relPath+varFile.EnvName] = struct{}{}
+							filtered = append(filtered, varFile)
+						}
+					}
+					paths[i].TerraformVarFiles = filtered
+				}
+			}
+		}
+	}
+
+	for _, override := range p.pathOverrides {
+		if len(override.exclude) > 0 {
+			for i, path := range paths {
+				relPath := path.RelPath()
+				if override.glob.Match(relPath) {
+					var filtered RootPathVarFiles
+					for _, varFile := range path.TerraformVarFiles {
+						_, excluded := override.exclude[varFile.EnvName]
+						_, only := onlyPaths[relPath+varFile.EnvName]
+						if excluded && !only {
+							continue
+						}
+
+						filtered = append(filtered, varFile)
+					}
+
+					paths[i].TerraformVarFiles = filtered
+				}
+			}
+		}
+	}
 }
 
 func (p *ProjectLocator) discoveredProjectsWithModulesFiltered() []discoveredProject {
@@ -1099,7 +1193,7 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) {
 			if !ok {
 				v = []RootPathVarFile{{
 					Name:     name,
-					EnvName:  name,
+					EnvName:  p.envMatcher.EnvName(name),
 					RelPath:  name,
 					IsGlobal: p.envMatcher.IsGlobalVarFile(name),
 					FullPath: filepath.Join(fullPath, name),
@@ -1107,7 +1201,7 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) {
 			} else {
 				v = append(v, RootPathVarFile{
 					Name:     name,
-					EnvName:  name,
+					EnvName:  p.envMatcher.EnvName(name),
 					RelPath:  name,
 					IsGlobal: p.envMatcher.IsGlobalVarFile(name),
 					FullPath: filepath.Join(fullPath, name),
