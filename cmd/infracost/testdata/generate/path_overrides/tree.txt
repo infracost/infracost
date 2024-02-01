@@ -2,6 +2,7 @@
 └── infra
     ├── components
     │   ├── foo
+    │   │   ├── var.auto.tfvars
     │   │   └── main.tf
     │   ├── blah
     │   │   └── main.tf
@@ -12,6 +13,4 @@
     ├── bip.tfvars
     ├── network-baz.tfvars
     ├── network-bat.tfvars
-    ├── dev.tfvars
-    ├── prod.tfvars
     └── default.tfvars
