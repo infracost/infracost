@@ -48,3 +48,25 @@ resource "aws_acmpca_certificate_authority" "private_ca_more_tiered" {
     }
   }
 }
+
+resource "aws_acmpca_certificate_authority" "short_lived_ca_noUsage" {
+  usage_mode = "SHORT_LIVED_CERTIFICATE"
+  certificate_authority_configuration {
+    key_algorithm     = "RSA_4096"
+    signing_algorithm = "SHA512WITHRSA"
+    subject {
+      common_name = "short-lived-ca.com"
+    }
+  }
+}
+
+resource "aws_acmpca_certificate_authority" "short_lived_ca" {
+  usage_mode = "SHORT_LIVED_CERTIFICATE"
+  certificate_authority_configuration {
+    key_algorithm     = "RSA_4096"
+    signing_algorithm = "SHA512WITHRSA"
+    subject {
+      common_name = "short-lived-ca.com"
+    }
+  }
+}
