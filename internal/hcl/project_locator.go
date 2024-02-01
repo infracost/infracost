@@ -1037,7 +1037,7 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 // excludeEnvFromPaths filters car files from the paths based on the path overrides.
 func (p *ProjectLocator) excludeEnvFromPaths(paths []RootPath) {
 	// filter the "only" paths first. This is done as "only" rules take precedence
-	// over exclude rules. So if a env is defined in both only and exclude and
+	// over exclude rules. So if an env is defined in both only and exclude and
 	// matches the same path, the "only" rule is the only one to apply.
 	onlyPaths := map[string]struct{}{}
 	for _, override := range p.pathOverrides {
@@ -1045,8 +1045,8 @@ func (p *ProjectLocator) excludeEnvFromPaths(paths []RootPath) {
 			for i, path := range paths {
 				relPath := path.RelPath()
 				if override.glob.Match(relPath) {
-					var filtered RootPathVarFiles
-					for _, varFile := range path.TerraformVarFiles {
+					filtered := append(path.GlobalFiles(), path.AutoFiles()...)
+					for _, varFile := range path.EnvFiles() {
 						if _, ok := override.only[varFile.EnvName]; ok {
 							onlyPaths[relPath+varFile.EnvName] = struct{}{}
 							filtered = append(filtered, varFile)
