@@ -6,3 +6,5 @@ resource_usage:
     monthly_requests: 10000
   aws_acmpca_certificate_authority.private_ca_more_tiered:
     monthly_requests: 20001
+  aws_acmpca_certificate_authority.short_lived_ca:
+    monthly_requests: 20001
