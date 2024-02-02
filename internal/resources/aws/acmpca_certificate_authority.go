@@ -27,7 +27,6 @@ func (r *ACMPCACertificateAuthority) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *ACMPCACertificateAuthority) BuildResource() *schema.Resource {
-
 	costComponents := []*schema.CostComponent{
 		r.certificateAuthorityCostComponent(),
 	}
