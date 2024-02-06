@@ -1043,6 +1043,10 @@ func (b *Block) values() cty.Value {
 
 			if v, ok := values[key]; ok {
 				list := append(v.AsValueSlice(), child.values())
+				if !cty.CanListVal(list) {
+					b.logger.Debug().Msgf("ignoring child block %#v value with inconsistent list element types", key)
+					continue
+				}
 				values[key] = cty.ListVal(list)
 			} else {
 				values[key] = cty.ListVal([]cty.Value{child.values()})
