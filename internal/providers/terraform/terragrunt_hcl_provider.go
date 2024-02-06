@@ -46,14 +46,21 @@ import (
 	"github.com/infracost/infracost/internal/ui"
 )
 
-// terragruntSourceLock is the global lock which works across TerragrunHCLProviders to provide
-// concurrency safe downloading.
-var terragruntSourceLock = infSync.KeyMutex{}
+var (
+	// terragruntSourceLock is the global lock which works across TerragrunHCLProviders to provide
+	// concurrency safe downloading.
+	terragruntSourceLock = infSync.KeyMutex{}
 
-// terragruntDownloadedDirs is used to ensure sources are only downloaded once. This is needed
-// because the call to util.CopyFolderContents in tgcliterraform.DownloadTerraformSource seems to be mucking
-// up the cache directory unnecessarily.  If that is fixed we can remove this.
-var terragruntDownloadedDirs = sync.Map{}
+	// terragruntDownloadedDirs is used to ensure sources are only downloaded once. This is needed
+	// because the call to util.CopyFolderContents in tgcliterraform.DownloadTerraformSource seems to be mucking
+	// up the cache directory unnecessarily.  If that is fixed we can remove this.
+	terragruntDownloadedDirs = sync.Map{}
+
+	terragruntOutputCache = &TerragruntOutputCache{
+		cache: map[string]cty.Value{},
+		mu:    &infSync.KeyMutex{},
+	}
+)
 
 type panicError struct {
 	msg string
@@ -63,34 +70,56 @@ func (p panicError) Error() string {
 	return p.msg
 }
 
+type TerragruntOutputCache struct {
+	cache map[string]cty.Value
+	mu    *infSync.KeyMutex
+}
+
+// Set stores a value in the cache for the given key using the value returned
+// from getVal function. If the key already exists in the cache, the value is
+// returned from the cache.
+func (o *TerragruntOutputCache) Set(key string, getVal func() (cty.Value, error)) (cty.Value, error) {
+	unlock := o.mu.Lock(key)
+	defer unlock()
+
+	val, ok := o.cache[key]
+	if ok {
+		return val, nil
+	}
+
+	val, err := getVal()
+	if err != nil {
+		return cty.NilVal, err
+	}
+
+	o.cache[key] = val
+	return val, nil
+}
+
 type TerragruntHCLProvider struct {
-	ctx                  *config.ProjectContext
-	Path                 hcl.RootPath
-	includePastResources bool
-	outputs              map[string]cty.Value
-	stack                *tgconfigstack.Stack
-	excludedPaths        []string
-	env                  map[string]string
-	sourceCache          map[string]string
-	logger               zerolog.Logger
+	ctx           *config.ProjectContext
+	Path          hcl.RootPath
+	stack         *tgconfigstack.Stack
+	excludedPaths []string
+	env           map[string]string
+	sourceCache   map[string]string
+	logger        zerolog.Logger
 }
 
 // NewTerragruntHCLProvider creates a new provider intialized with the configured project path (usually the terragrunt
 // root directory).
-func NewTerragruntHCLProvider(rootPath hcl.RootPath, ctx *config.ProjectContext, includePastResources bool) schema.Provider {
+func NewTerragruntHCLProvider(rootPath hcl.RootPath, ctx *config.ProjectContext) schema.Provider {
 	logger := ctx.Logger().With().Str(
 		"provider", "terragrunt_dir",
 	).Logger()
 
 	return &TerragruntHCLProvider{
-		ctx:                  ctx,
-		Path:                 rootPath,
-		includePastResources: includePastResources,
-		outputs:              map[string]cty.Value{},
-		excludedPaths:        ctx.ProjectConfig.ExcludePaths,
-		env:                  getEnvVars(ctx),
-		sourceCache:          map[string]string{},
-		logger:               logger,
+		ctx:           ctx,
+		Path:          rootPath,
+		excludedPaths: ctx.ProjectConfig.ExcludePaths,
+		env:           getEnvVars(ctx),
+		sourceCache:   map[string]string{},
+		logger:        logger,
 	}
 }
 
@@ -189,11 +218,12 @@ func (p *TerragruntHCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 }
 
 type terragruntWorkingDirInfo struct {
-	configDir  string
-	workingDir string
-	provider   *HCLProvider
-	error      error
-	warnings   []schema.ProjectDiag
+	configDir        string
+	workingDir       string
+	provider         *HCLProvider
+	error            error
+	warnings         []schema.ProjectDiag
+	evaluatedOutputs cty.Value
 }
 
 func (i *terragruntWorkingDirInfo) addWarning(pd schema.ProjectDiag) {
@@ -400,6 +430,9 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 			}()
 
 			workingDirInfo := p.runTerragrunt(opts)
+			_, _ = terragruntOutputCache.Set(opts.TerragruntConfigPath, func() (cty.Value, error) {
+				return workingDirInfo.evaluatedOutputs, nil
+			})
 			if workingDirInfo != nil {
 				mu.Lock()
 				workingDirsToEstimate = append(workingDirsToEstimate, workingDirInfo)
@@ -440,7 +473,6 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 			fmt.Sprintf("Error parsing the Terragrunt code using the Terragrunt library: %s", err),
 		)
 	}
-	p.outputs = map[string]cty.Value{}
 
 	return workingDirsToEstimate, nil
 }
@@ -581,10 +613,9 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 		})
 		p.logger.Warn().Msgf("Terragrunt config path %s returned module %s with error: %s", opts.TerragruntConfigPath, path, mod.Error)
 	}
-	evaluatedOutputs := mod.Module.Blocks.Outputs(true)
-	p.outputs[opts.TerragruntConfigPath] = evaluatedOutputs
 
 	info.provider = h
+	info.evaluatedOutputs = mod.Module.Blocks.Outputs(true)
 	return info
 }
 
@@ -896,14 +927,16 @@ func (p *TerragruntHCLProvider) fetchModuleOutputs(opts *tgoptions.TerragruntOpt
 
 			out := map[string]cty.Value{}
 			for dir, dep := range blocks {
-				value, evaluated := p.outputs[dir]
-				if !evaluated {
+				value, depErr := terragruntOutputCache.Set(dir, func() (cty.Value, error) {
 					info := p.runTerragrunt(opts.Clone(dir))
 					if info != nil && info.error != nil {
-						return outputs, fmt.Errorf("could not evaluate dependency %s at dir %s err: %w", dep.Name, dir, err)
+						return cty.NilVal, fmt.Errorf("could not evaluate dependency %s at dir %s err: %w", dep.Name, dir, err)
 					}
 
-					value = p.outputs[dir]
+					return info.evaluatedOutputs, nil
+				})
+				if depErr != nil {
+					return outputs, depErr
 				}
 
 				out[dep.Name] = cty.MapVal(map[string]cty.Value{

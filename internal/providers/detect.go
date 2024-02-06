@@ -79,7 +79,7 @@ func Detect(ctx *config.RunContext, project *config.Project, includePastResource
 		projectContext := config.NewProjectContext(ctx, project, nil)
 		if rootPath.IsTerragrunt {
 			projectContext.ContextValues.SetValue("project_type", "terragrunt_dir")
-			autoProviders = append(autoProviders, terraform.NewTerragruntHCLProvider(rootPath, projectContext, includePastResources))
+			autoProviders = append(autoProviders, terraform.NewTerragruntHCLProvider(rootPath, projectContext))
 		} else {
 			options := []hcl.Option{hcl.OptionWithSpinner(ctx.NewSpinner)}
 			projectContext.ContextValues.SetValue("project_type", "terraform_dir")
