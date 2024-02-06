@@ -431,6 +431,10 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 
 			workingDirInfo := p.runTerragrunt(opts)
 			_, _ = terragruntOutputCache.Set(opts.TerragruntConfigPath, func() (cty.Value, error) {
+				if workingDirInfo == nil {
+					return cty.EmptyObjectVal, errors.New("nil outputs")
+				}
+
 				return workingDirInfo.evaluatedOutputs, nil
 			})
 			if workingDirInfo != nil {
@@ -931,6 +935,10 @@ func (p *TerragruntHCLProvider) fetchModuleOutputs(opts *tgoptions.TerragruntOpt
 					info := p.runTerragrunt(opts.Clone(dir))
 					if info != nil && info.error != nil {
 						return cty.NilVal, fmt.Errorf("could not evaluate dependency %s at dir %s err: %w", dep.Name, dir, err)
+					}
+
+					if info == nil {
+						return cty.EmptyObjectVal, nil
 					}
 
 					return info.evaluatedOutputs, nil
