@@ -17,7 +17,6 @@ import (
 	"github.com/infracost/infracost/internal/hcl"
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/providers"
-	"github.com/infracost/infracost/internal/providers/terraform"
 	"github.com/infracost/infracost/internal/ui"
 	"github.com/infracost/infracost/internal/vcs"
 )
@@ -97,8 +96,8 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 		definedProjects = hasLineStartingWith(reader, "projects:")
 	}
 
-	var parsers []*hcl.Parser
-	detected, err := providers.Detect(ctx, &config.Project{Path: repoPath}, false)
+	var autoProjects []hcl.DetectedProject
+	autoProviders, err := providers.Detect(ctx, &config.Project{Path: repoPath}, false)
 	if err != nil {
 		if definedProjects {
 			logging.Logger.Debug().Err(err).Msg("could not detect providers")
@@ -107,9 +106,9 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	for _, provider := range detected {
-		if v, ok := provider.(*terraform.HCLProvider); ok {
-			parsers = append(parsers, v.Parser)
+	for _, provider := range autoProviders {
+		if v, ok := provider.(hcl.DetectedProject); ok {
+			autoProjects = append(autoProjects, v)
 		}
 	}
 
@@ -119,9 +118,9 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 			ui.PrintWarningf(cmd.ErrOrStderr(), "could not fetch git metadata err: %s, default template variables will be blank", err)
 		}
 
-		detectedProjects := make([]template.DetectedProject, len(parsers))
+		detectedProjects := make([]template.DetectedProject, len(autoProjects))
 		detectedPaths := map[string][]template.DetectedProject{}
-		for i, p := range parsers {
+		for i, p := range autoProjects {
 			relPath := p.RelativePath()
 
 			detectedProjects[i] = template.DetectedProject{
@@ -172,7 +171,7 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 		}
 	} else {
 		buf.WriteString("version: 0.1\n\nprojects:\n")
-		for _, p := range parsers {
+		for _, p := range autoProjects {
 			buf.WriteString(p.YAML())
 		}
 	}

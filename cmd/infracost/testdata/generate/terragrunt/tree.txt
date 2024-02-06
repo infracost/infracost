@@ -1,0 +1,11 @@
+.
+├── apps
+│   ├── bar
+│   │   └── terragrunt.hcl
+│   ├── foo
+│   │   └── terragrunt.hcl.json
+│   └── baz
+│       ├── terragrunt.hcl
+│       └── bip
+│           └── terragrunt.hcl.json
+└── terragrunt.hcl

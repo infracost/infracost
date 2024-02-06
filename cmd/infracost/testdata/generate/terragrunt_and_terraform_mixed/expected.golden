@@ -1,0 +1,17 @@
+version: 0.1
+
+projects:
+  - path: apps/bar
+  - path: apps/baz/bip
+  - path: apps/fez
+    name: apps-fez-dev
+    terraform_var_files:
+      - ../envs/dev.tfvars
+    skip_autodetect: true
+  - path: apps/fez
+    name: apps-fez-prod
+    terraform_var_files:
+      - ../envs/prod.tfvars
+    skip_autodetect: true
+  - path: apps/foo
+

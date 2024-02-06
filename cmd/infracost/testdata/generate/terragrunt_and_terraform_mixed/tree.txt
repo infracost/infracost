@@ -1,0 +1,17 @@
+.
+└── apps
+    ├── bar
+    │   └── terragrunt.hcl
+    ├── foo
+    │   └── terragrunt.hcl
+    ├── baz
+    │   ├── terragrunt.hcl
+    │   └── bip
+    │       └── terragrunt.hcl.json
+    ├── _module
+    │   └── main.tf
+    ├── fez
+    │   └── main.tf
+    └── envs
+        ├── prod.tfvars
+        └── dev.tfvars

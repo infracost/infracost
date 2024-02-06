@@ -168,6 +168,22 @@ func NewHCLProvider(ctx *config.ProjectContext, rootPath hcl.RootPath, config *H
 	}, nil
 }
 
+func (p *HCLProvider) ProjectName() string {
+	return p.Parser.ProjectName()
+}
+
+func (p *HCLProvider) RelativePath() string {
+	return p.Parser.RelativePath()
+}
+
+func (p *HCLProvider) TerraformVarFiles() []string {
+	return p.Parser.TerraformVarFiles()
+}
+
+func (p *HCLProvider) YAML() string {
+	return p.Parser.YAML()
+}
+
 func (p *HCLProvider) Type() string        { return "terraform_dir" }
 func (p *HCLProvider) DisplayType() string { return "Terraform directory" }
 func (p *HCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {

@@ -46,14 +46,21 @@ import (
 	"github.com/infracost/infracost/internal/ui"
 )
 
-// terragruntSourceLock is the global lock which works across TerragrunHCLProviders to provide
-// concurrency safe downloading.
-var terragruntSourceLock = infSync.KeyMutex{}
+var (
+	// terragruntSourceLock is the global lock which works across TerragrunHCLProviders to provide
+	// concurrency safe downloading.
+	terragruntSourceLock = infSync.KeyMutex{}
 
-// terragruntDownloadedDirs is used to ensure sources are only downloaded once. This is needed
-// because the call to util.CopyFolderContents in tgcliterraform.DownloadTerraformSource seems to be mucking
-// up the cache directory unnecessarily.  If that is fixed we can remove this.
-var terragruntDownloadedDirs = sync.Map{}
+	// terragruntDownloadedDirs is used to ensure sources are only downloaded once. This is needed
+	// because the call to util.CopyFolderContents in tgcliterraform.DownloadTerraformSource seems to be mucking
+	// up the cache directory unnecessarily.  If that is fixed we can remove this.
+	terragruntDownloadedDirs = sync.Map{}
+
+	terragruntOutputCache = &TerragruntOutputCache{
+		cache: map[string]cty.Value{},
+		mu:    &infSync.KeyMutex{},
+	}
+)
 
 type panicError struct {
 	msg string
@@ -63,34 +70,56 @@ func (p panicError) Error() string {
 	return p.msg
 }
 
+type TerragruntOutputCache struct {
+	cache map[string]cty.Value
+	mu    *infSync.KeyMutex
+}
+
+// Set stores a value in the cache for the given key using the value returned
+// from getVal function. If the key already exists in the cache, the value is
+// returned from the cache.
+func (o *TerragruntOutputCache) Set(key string, getVal func() (cty.Value, error)) (cty.Value, error) {
+	unlock := o.mu.Lock(key)
+	defer unlock()
+
+	val, ok := o.cache[key]
+	if ok {
+		return val, nil
+	}
+
+	val, err := getVal()
+	if err != nil {
+		return cty.NilVal, err
+	}
+
+	o.cache[key] = val
+	return val, nil
+}
+
 type TerragruntHCLProvider struct {
-	ctx                  *config.ProjectContext
-	Path                 string
-	includePastResources bool
-	outputs              map[string]cty.Value
-	stack                *tgconfigstack.Stack
-	excludedPaths        []string
-	env                  map[string]string
-	sourceCache          map[string]string
-	logger               zerolog.Logger
+	ctx           *config.ProjectContext
+	Path          hcl.RootPath
+	stack         *tgconfigstack.Stack
+	excludedPaths []string
+	env           map[string]string
+	sourceCache   map[string]string
+	logger        zerolog.Logger
 }
 
 // NewTerragruntHCLProvider creates a new provider intialized with the configured project path (usually the terragrunt
 // root directory).
-func NewTerragruntHCLProvider(ctx *config.ProjectContext, includePastResources bool) schema.Provider {
+func NewTerragruntHCLProvider(rootPath hcl.RootPath, ctx *config.ProjectContext) schema.Provider {
 	logger := ctx.Logger().With().Str(
 		"provider", "terragrunt_dir",
 	).Logger()
 
 	return &TerragruntHCLProvider{
-		ctx:                  ctx,
-		Path:                 ctx.ProjectConfig.Path,
-		includePastResources: includePastResources,
-		outputs:              map[string]cty.Value{},
-		excludedPaths:        ctx.ProjectConfig.ExcludePaths,
-		env:                  getEnvVars(ctx),
-		sourceCache:          map[string]string{},
-		logger:               logger,
+		ctx:           ctx,
+		Path:          rootPath,
+		excludedPaths: ctx.ProjectConfig.ExcludePaths,
+		env:           getEnvVars(ctx),
+		sourceCache:   map[string]string{},
+		logger:        logger,
 	}
 }
 
@@ -139,6 +168,30 @@ func getEnvVars(ctx *config.ProjectContext) map[string]string {
 	return environmentMap
 }
 
+func (p *TerragruntHCLProvider) ProjectName() string {
+	return ""
+}
+
+func (p *TerragruntHCLProvider) RelativePath() string {
+	r, err := filepath.Rel(p.Path.RepoPath, p.Path.Path)
+	if err != nil {
+		return p.Path.Path
+	}
+
+	return r
+}
+
+func (p *TerragruntHCLProvider) TerraformVarFiles() []string {
+	return nil
+}
+
+func (p *TerragruntHCLProvider) YAML() string {
+	str := strings.Builder{}
+
+	str.WriteString(fmt.Sprintf("  - path: %s\n", p.RelativePath()))
+
+	return str.String()
+}
 func (p *TerragruntHCLProvider) Type() string {
 	return "terragrunt_dir"
 }
@@ -165,11 +218,12 @@ func (p *TerragruntHCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 }
 
 type terragruntWorkingDirInfo struct {
-	configDir  string
-	workingDir string
-	provider   *HCLProvider
-	error      error
-	warnings   []schema.ProjectDiag
+	configDir        string
+	workingDir       string
+	provider         *HCLProvider
+	error            error
+	warnings         []schema.ProjectDiag
+	evaluatedOutputs cty.Value
 }
 
 func (i *terragruntWorkingDirInfo) addWarning(pd schema.ProjectDiag) {
@@ -335,7 +389,7 @@ func (p *TerragruntHCLProvider) initTerraformVars(tfVars map[string]string, inpu
 }
 
 func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, error) {
-	terragruntConfigPath := tgconfig.GetDefaultConfigPath(p.Path)
+	terragruntConfigPath := tgconfig.GetDefaultConfigPath(p.Path.Path)
 
 	terragruntCacheDir := filepath.Join(config.InfracostDir, ".terragrunt-cache")
 	terragruntDownloadDir := filepath.Join(p.ctx.RunContext.Config.CachePath(), terragruntCacheDir)
@@ -354,7 +408,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 		LogLevel:                   logrus.DebugLevel,
 		ErrWriter:                  tgLog.WriterLevel(logrus.DebugLevel),
 		MaxFoldersToCheck:          tgoptions.DefaultMaxFoldersToCheck,
-		WorkingDir:                 p.Path,
+		WorkingDir:                 p.Path.Path,
 		ExcludeDirs:                p.excludedPaths,
 		DownloadDir:                terragruntDownloadDir,
 		TerraformCliArgs:           []string{tgcliinfo.CommandName},
@@ -376,6 +430,13 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 			}()
 
 			workingDirInfo := p.runTerragrunt(opts)
+			_, _ = terragruntOutputCache.Set(opts.TerragruntConfigPath, func() (cty.Value, error) {
+				if workingDirInfo == nil {
+					return cty.EmptyObjectVal, errors.New("nil outputs")
+				}
+
+				return workingDirInfo.evaluatedOutputs, nil
+			})
 			if workingDirInfo != nil {
 				mu.Lock()
 				workingDirsToEstimate = append(workingDirsToEstimate, workingDirInfo)
@@ -395,25 +456,10 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 		Parallelism: 1,
 	}
 
-	terragruntConfigFiles, err := tgconfig.FindConfigFilesInPath(terragruntOptions.WorkingDir, terragruntOptions)
-	if err != nil {
-		return nil, err
-	}
-
-	// Filter these config files against the exclude paths so Terragrunt doesn't even try to evaluate them
-	terragruntConfigFiles = p.filterExcludedPaths(terragruntConfigFiles)
-
-	var filtered []string
-	for _, file := range terragruntConfigFiles {
-		if !p.isParentTerragruntConfig(file, terragruntConfigFiles) {
-			filtered = append(filtered, file)
-		}
-	}
-
-	terragruntConfigFiles = filtered
-
 	howThesePathsWereFound := fmt.Sprintf("Terragrunt config file found in a subdirectory of %s", terragruntOptions.WorkingDir)
-	s, err := createStackForTerragruntConfigPaths(terragruntOptions.WorkingDir, terragruntConfigFiles, terragruntOptions, howThesePathsWereFound)
+	s, err := createStackForTerragruntConfigPaths(terragruntOptions.WorkingDir, []string{
+		terragruntConfigPath,
+	}, terragruntOptions, howThesePathsWereFound)
 	if err != nil {
 		return nil, err
 	}
@@ -431,78 +477,8 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 			fmt.Sprintf("Error parsing the Terragrunt code using the Terragrunt library: %s", err),
 		)
 	}
-	p.outputs = map[string]cty.Value{}
 
 	return workingDirsToEstimate, nil
-}
-
-// isParentTerragruntConfig checks if a terragrunt config entry is a parent file that is referenced by another config
-// with a find_in_parent_folders call. The find_in_parent_folders function searches up the directory tree
-// from the file and returns the absolute path to the first terragrunt.hcl. This means if it is found
-// we can treat this file as a child terragrunt.hcl.
-func (p *TerragruntHCLProvider) isParentTerragruntConfig(parent string, configFiles []string) bool {
-	for _, name := range configFiles {
-		if !isChildDirectory(parent, name) {
-			continue
-		}
-
-		file, err := os.Open(name)
-		if err != nil {
-			continue
-		}
-
-		scanner := bufio.NewScanner(file)
-		for scanner.Scan() {
-			line := strings.TrimSpace(scanner.Text())
-			// skip any commented out lines
-			if strings.HasPrefix(line, "#") {
-				continue
-			}
-
-			if strings.Contains(line, "find_in_parent_folders()") {
-				file.Close()
-				return true
-			}
-		}
-
-		file.Close()
-	}
-
-	return false
-}
-
-func isChildDirectory(parent, child string) bool {
-	if parent == child {
-		return false
-	}
-
-	parentDir := filepath.Dir(parent)
-	childDir := filepath.Dir(child)
-	p, err := filepath.Rel(parentDir, childDir)
-	if err != nil || strings.Contains(p, "..") {
-		return false
-	}
-
-	return true
-}
-
-func (p *TerragruntHCLProvider) filterExcludedPaths(paths []string) []string {
-	excludedPaths := p.excludedPaths
-	excludedPaths = append(excludedPaths, config.InfracostDir)
-
-	isSkipped := buildExcludedPathsMatcher(p.Path, excludedPaths)
-
-	var filteredPaths []string
-
-	for _, path := range paths {
-		if !isSkipped(path) {
-			filteredPaths = append(filteredPaths, path)
-		} else {
-			p.logger.Debug().Msgf("skipping path %s as it is marked as excluded by --exclude-path", path)
-		}
-	}
-
-	return filteredPaths
 }
 
 // runTerragrunt evaluates a Terragrunt directory with the given opts. This method is called from the
@@ -641,10 +617,9 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 		})
 		p.logger.Warn().Msgf("Terragrunt config path %s returned module %s with error: %s", opts.TerragruntConfigPath, path, mod.Error)
 	}
-	evaluatedOutputs := mod.Module.Blocks.Outputs(true)
-	p.outputs[opts.TerragruntConfigPath] = evaluatedOutputs
 
 	info.provider = h
+	info.evaluatedOutputs = mod.Module.Blocks.Outputs(true)
 	return info
 }
 
@@ -718,37 +693,6 @@ func generateConfig(terragruntConfig *tgconfig.TerragruntConfig, opts *options.T
 	}
 
 	return nil
-}
-
-func buildExcludedPathsMatcher(fullPath string, excludedDirs []string) func(string) bool {
-	var excludedMatches []string
-
-	for _, dir := range excludedDirs {
-		var absoluteDir string
-
-		if filepath.IsAbs(dir) {
-			absoluteDir = dir
-		} else {
-			absoluteDir, _ = filepath.Abs(filepath.Join(fullPath, dir))
-		}
-
-		globs, err := filepath.Glob(absoluteDir)
-		if err == nil {
-			excludedMatches = append(excludedMatches, globs...)
-		}
-	}
-
-	return func(dir string) bool {
-		absoluteDir, _ := filepath.Abs(dir)
-
-		for _, match := range excludedMatches {
-			if strings.HasPrefix(absoluteDir, match) {
-				return true
-			}
-		}
-
-		return false
-	}
 }
 
 func convertToCtyWithJson(val interface{}) (cty.Value, error) {
@@ -987,14 +931,20 @@ func (p *TerragruntHCLProvider) fetchModuleOutputs(opts *tgoptions.TerragruntOpt
 
 			out := map[string]cty.Value{}
 			for dir, dep := range blocks {
-				value, evaluated := p.outputs[dir]
-				if !evaluated {
+				value, depErr := terragruntOutputCache.Set(dir, func() (cty.Value, error) {
 					info := p.runTerragrunt(opts.Clone(dir))
 					if info != nil && info.error != nil {
-						return outputs, fmt.Errorf("could not evaluate dependency %s at dir %s err: %w", dep.Name, dir, err)
+						return cty.NilVal, fmt.Errorf("could not evaluate dependency %s at dir %s err: %w", dep.Name, dir, err)
 					}
 
-					value = p.outputs[dir]
+					if info == nil {
+						return cty.EmptyObjectVal, nil
+					}
+
+					return info.evaluatedOutputs, nil
+				})
+				if depErr != nil {
+					return outputs, depErr
 				}
 
 				out[dep.Name] = cty.MapVal(map[string]cty.Value{

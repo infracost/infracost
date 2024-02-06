@@ -71,6 +71,10 @@ func createFileWithContents(filePath string) error {
     }
   }
 }`
+	case "terragrunt.hcl.json":
+		content = `include {
+	path = find_in_parent_folders()		
+}`
 	default:
 		content = ""
 	}
