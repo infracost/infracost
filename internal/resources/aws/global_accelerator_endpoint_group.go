@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
-	"github.com/shopspring/decimal"
 )
 
 // GlobalacceleratorEndpointGroup struct represents a Global Accelerator endpoint group
@@ -53,6 +54,7 @@ var regionCodeMapping = map[string]string{
 	"us-west-2":       "NA",
 	"us-west-2-lax-1": "NA",
 	"ca-central-1":    "NA",
+	"ca-west-1":       "NA",
 	"cn-north-1":      "AP",
 	"cn-northwest-1":  "AP",
 	"eu-central-1":    "EU",
