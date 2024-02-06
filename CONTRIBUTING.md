@@ -17,6 +17,8 @@
 - [Adding new resources](#adding-new-resources)
   - [Azure credentials](#azure-credentials)
   - [Querying the GraphQL API](#querying-the-graphql-api)
+- [Adding new regions](#adding-new-regions)
+  - [AWS](#AWS)
 - [Code reviews](#code-reviews)
 
 ## Overview
@@ -118,6 +120,22 @@ Working on Azure resources requires Azure creds as the Azure Terraform provider 
 4. Run GraphQL queries to find the correct products. Examples can be found here: https://www.infracost.io/docs/cloud_pricing_api/overview/
 
 The GraphQL pricing API limits the number of results returned to 1000, which can limit its usefulness for exploring the data. AWS use many acronyms so be sure to search for those too, e.g. "ES" returns "AmazonES" for ElasticSearch.
+
+## Adding new regions
+
+### AWS
+
+Consult [PR #2628](https://github.com/infracost/infracost/pull/2628) as an example.
+
+1. In [internal/resources/aws/util.go](internal/resources/aws/util.go), add the new region's information to `RegionMapping`, `RegionCodeMapping`, and `RegionsUsage` as needed.
+2. In [internal/resources/aws/global_accelerator_endpoint_group.go](internal/resources/aws/global_accelerator_endpoint_group.go), update `regionCodeMapping` as needed.
+3. In [internal/resources/aws/cloudfront_distribution.go](internal/resources/aws/cloudfront_distribution.go), update `regionShieldMapping` as needed.
+4. In [internal/providers/terraform/aws/testdata/data_transfer_test/data_transfer_test.usage.yml](internal/providers/terraform/aws/testdata/data_transfer_test/data_transfer_test.usage.yml), add a usage block for data transfer.
+5. Update [internal/providers/terraform/aws/testdata/data_transfer_test/data_transfer_test.golden](internal/providers/terraform/aws/testdata/data_transfer_test/data_transfer_test.golden) by running `ARGS="-run TestDataTransferGoldenFile -v -update" make test_aws`.
+7. Update [internal/hcl/zones_aws.go]:
+   1. Use the AWS CLI to check if the region is enabled in your AWS account by running `aws ec2 describe-availability-zones --region <NEW-REGION_ID e.g. ca-west-1>` 
+   2. If needed, enable the region by running `aws account enable-region --region-name <NEW-REGION-ID>`.  This usually takes several minutes. 
+   3. From the `internal/hcl` directory, run `go run ../../tools/describezones/main.go aws`.
 
 ## Code reviews
 
