@@ -1,0 +1,13 @@
+version: 0.1
+
+projects:
+  - path: modules/bar
+    name: modules-bar
+    skip_autodetect: true
+  - path: modules/baz
+    name: modules-baz
+    skip_autodetect: true
+  - path: modules/foo
+    name: modules-foo
+    skip_autodetect: true
+
