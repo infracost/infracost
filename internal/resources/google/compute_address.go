@@ -70,7 +70,7 @@ func (r *ComputeAddress) standardVMComputeAddress() *schema.CostComponent {
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
-			StartUsageAmount: strPtr("744"),
+			StartUsageAmount: strPtr("696"),
 		},
 	}
 }
