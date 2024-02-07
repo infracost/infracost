@@ -2,24 +2,24 @@
  Name                                                              Monthly Qty  Unit   Monthly Cost 
                                                                                                     
  google_compute_instance.custom                                                                     
- ├─ Custom instance CPU (Linux/UNIX, on-demand, N1 6 vCPUs)                730  hours       $101.71 
+ ├─ Custom instance CPU (Linux/UNIX, on-demand, N1 6 vCPUs)                730  hours       $101.77 
  ├─ Custom Instance RAM (Linux/UNIX, on-demand, N1 20 GB)                  730  hours        $45.44 
  └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40 
                                                                                                     
  google_compute_instance.custom_ext                                                                 
- ├─ Custom instance CPU (Linux/UNIX, on-demand, N1 2 vCPUs)                730  hours        $33.90 
+ ├─ Custom instance CPU (Linux/UNIX, on-demand, N1 2 vCPUs)                730  hours        $33.92 
  ├─ Custom Instance RAM (Linux/UNIX, on-demand, N1 13 GB)                  730  hours        $29.53 
  ├─ Custom Instance Extended RAM (Linux/UNIX, on-demand, N1 2 GB)          730  hours         $9.76 
  └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40 
                                                                                                     
  google_compute_instance.custom_n1                                                                  
- ├─ Custom instance CPU (Linux/UNIX, on-demand, N1 6 vCPUs)                730  hours       $101.71 
+ ├─ Custom instance CPU (Linux/UNIX, on-demand, N1 6 vCPUs)                730  hours       $101.77 
  ├─ Custom Instance RAM (Linux/UNIX, on-demand, N1 20 GB)                  730  hours        $45.44 
  └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40 
                                                                                                     
  google_compute_instance.custom_n2                                                                  
- ├─ Custom instance CPU (Linux/UNIX, on-demand, N2 6 vCPUs)                730  hours       $116.24 
- ├─ Custom Instance RAM (Linux/UNIX, on-demand, N2 20 GB)                  730  hours        $51.93 
+ ├─ Custom instance CPU (Linux/UNIX, on-demand, N2 6 vCPUs)                730  hours       $116.30 
+ ├─ Custom Instance RAM (Linux/UNIX, on-demand, N2 20 GB)                  730  hours        $51.96 
  └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40 
                                                                                                     
  google_compute_instance.custom_n2d                                                                 
@@ -81,7 +81,7 @@
  ├─ Instance usage (Linux/UNIX, on-demand, f1-micro)                       100  hours         $0.76 
  └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40 
                                                                                                     
- OVERALL TOTAL                                                                            $9,446.82 
+ OVERALL TOTAL                                                                            $9,447.04 
 ──────────────────────────────────
 18 cloud resources were detected:
 ∙ 17 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
