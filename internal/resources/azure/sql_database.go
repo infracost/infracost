@@ -225,9 +225,12 @@ func (r *SQLDatabase) serverlessComputeHoursCostComponents() []*schema.CostCompo
 		vCoreHours = decimalPtr(decimal.NewFromInt(*r.MonthlyVCoreHours))
 	}
 
+	name := fmt.Sprintf("Compute (serverless, %s)", r.SKU)
+	log.Warn().Msgf("'Multiple products found' are safe to ignore for '%s' due to limitations in the Azure API.", name)
+
 	costComponents := []*schema.CostComponent{
 		{
-			Name:            fmt.Sprintf("Compute (serverless, %s)", r.SKU),
+			Name:            name,
 			Unit:            "vCore-hours",
 			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: vCoreHours,
