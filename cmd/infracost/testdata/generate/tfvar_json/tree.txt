@@ -1,0 +1,9 @@
+.
+├── terraform
+│   └── main.tf
+└── variables
+    └── env
+        ├── prod
+        │   └── tfvars.json
+        └── dev
+            └── tfvars.json

@@ -1212,7 +1212,7 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) {
 			parseFunc = hclParser.ParseJSONFile
 		}
 
-		if strings.HasSuffix(name, ".tfvars") || strings.HasSuffix(name, ".tfvars.json") {
+		if p.isTerraformVarFile(name) {
 			v, ok := p.discoveredVarFiles[fullPath]
 			if !ok {
 				v = []RootPathVarFile{{
@@ -1269,6 +1269,12 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) {
 			p.walkPaths(filepath.Join(fullPath, info.Name()), level+1)
 		}
 	}
+}
+
+func (p *ProjectLocator) isTerraformVarFile(name string) bool {
+	return strings.HasSuffix(name, ".tfvars") ||
+		strings.HasSuffix(name, ".tfvars.json") ||
+		(strings.HasPrefix(name, "tfvars") && strings.HasSuffix(name, ".json"))
 }
 
 type terraformDirInfo struct {
