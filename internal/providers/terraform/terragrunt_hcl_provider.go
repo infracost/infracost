@@ -57,7 +57,7 @@ var (
 	terragruntDownloadedDirs = sync.Map{}
 
 	terragruntOutputCache = &TerragruntOutputCache{
-		cache: map[string]cty.Value{},
+		cache: sync.Map{},
 		mu:    &infSync.KeyMutex{},
 	}
 )
@@ -71,7 +71,7 @@ func (p panicError) Error() string {
 }
 
 type TerragruntOutputCache struct {
-	cache map[string]cty.Value
+	cache sync.Map
 	mu    *infSync.KeyMutex
 }
 
@@ -82,9 +82,11 @@ func (o *TerragruntOutputCache) Set(key string, getVal func() (cty.Value, error)
 	unlock := o.mu.Lock(key)
 	defer unlock()
 
-	val, ok := o.cache[key]
-	if ok {
-		return val, nil
+	cacheVal, exists := o.cache.Load(key)
+	if exists {
+		if val, ok := cacheVal.(cty.Value); ok {
+			return val, nil
+		}
 	}
 
 	val, err := getVal()
@@ -92,7 +94,7 @@ func (o *TerragruntOutputCache) Set(key string, getVal func() (cty.Value, error)
 		return cty.NilVal, err
 	}
 
-	o.cache[key] = val
+	o.cache.Store(key, val)
 	return val, nil
 }
 
