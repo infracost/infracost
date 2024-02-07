@@ -202,21 +202,23 @@ type ProjectLocator struct {
 	envMatcher         *EnvFileMatcher
 	skip               bool
 
-	shouldSkipDir        func(string) bool
-	shouldIncludeDir     func(string) bool
-	pathOverrides        []pathOverride
-	wdContainsTerragrunt bool
+	shouldSkipDir          func(string) bool
+	shouldIncludeDir       func(string) bool
+	pathOverrides          []pathOverride
+	wdContainsTerragrunt   bool
+	fallbackToIncludePaths bool
 }
 
 // ProjectLocatorConfig provides configuration options on how the locator functions.
 type ProjectLocatorConfig struct {
-	ExcludedDirs      []string
-	ChangedObjects    []string
-	UseAllPaths       bool
-	SkipAutoDetection bool
-	IncludedDirs      []string
-	EnvNames          []string
-	PathOverrides     []PathOverrideConfig
+	ExcludedDirs           []string
+	ChangedObjects         []string
+	UseAllPaths            bool
+	SkipAutoDetection      bool
+	IncludedDirs           []string
+	EnvNames               []string
+	PathOverrides          []PathOverrideConfig
+	FallbackToIncludePaths bool
 }
 
 type PathOverrideConfig struct {
@@ -280,6 +282,7 @@ func NewProjectLocator(logger zerolog.Logger, config *ProjectLocatorConfig) *Pro
 			shouldIncludeDir: func(s string) bool {
 				return false
 			},
+			fallbackToIncludePaths: config.FallbackToIncludePaths,
 		}
 	}
 
@@ -1021,7 +1024,7 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 	var projects []RootPath
 	projectMap := map[string]bool{}
 	for _, dir := range p.discoveredProjectsWithModulesFiltered() {
-		if p.shouldUseProject(dir) {
+		if p.shouldUseProject(dir, false) {
 			projects = append(projects, RootPath{
 				RepoPath:          fullPath,
 				Path:              dir.path,
@@ -1033,6 +1036,24 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 			projectMap[dir.path] = true
 
 			delete(p.discoveredVarFiles, dir.path)
+		}
+	}
+
+	if len(projects) == 0 && p.fallbackToIncludePaths {
+		for _, dir := range p.discoveredProjectsWithModulesFiltered() {
+			if p.shouldUseProject(dir, true) {
+				projects = append(projects, RootPath{
+					RepoPath:          fullPath,
+					Path:              dir.path,
+					HasChanges:        p.hasChanges(dir.path),
+					TerraformVarFiles: p.discoveredVarFiles[dir.path],
+					Matcher:           p.envMatcher,
+					IsTerragrunt:      dir.isTerragrunt,
+				})
+				projectMap[dir.path] = true
+
+				delete(p.discoveredVarFiles, dir.path)
+			}
 		}
 	}
 
@@ -1112,11 +1133,15 @@ func (p *ProjectLocator) discoveredProjectsWithModulesFiltered() []discoveredPro
 
 }
 
-func (p *ProjectLocator) shouldUseProject(dir discoveredProject) bool {
+func (p *ProjectLocator) shouldUseProject(dir discoveredProject, force bool) bool {
 	if p.shouldSkipDir(dir.path) {
 		p.logger.Debug().Msgf("skipping directory %s as it is marked as excluded by --exclude-path", dir.path)
 
 		return false
+	}
+
+	if force {
+		return true
 	}
 
 	if p.shouldIncludeDir(dir.path) {
