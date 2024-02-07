@@ -116,6 +116,7 @@ var RegionMapping = map[string]string{
 	"us-west-2":       "US West (Oregon)",
 	"us-west-2-lax-1": "US West (Los Angeles)",
 	"ca-central-1":    "Canada (Central)",
+	"ca-west-1":       "Canada West (Calgary)",
 	"cn-north-1":      "China (Beijing)",
 	"cn-northwest-1":  "China (Ningxia)",
 	"eu-central-1":    "EU (Frankfurt)",
@@ -173,6 +174,7 @@ type RegionsUsage struct {
 	USWest2      *float64 `infracost_usage:"us_west_2"`
 	USWest2Lax1  *float64 `infracost_usage:"us_west_2_lax_1"`
 	CACentral1   *float64 `infracost_usage:"ca_central_1"`
+	CAWest1      *float64 `infracost_usage:"ca_west_1"`
 	CNNorth1     *float64 `infracost_usage:"cn_north_1"`
 	CNNorthwest1 *float64 `infracost_usage:"cn_northwest_1"`
 	EUCentral1   *float64 `infracost_usage:"eu_central_1"`
