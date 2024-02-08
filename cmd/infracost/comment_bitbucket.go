@@ -38,7 +38,7 @@ func commentBitbucketCmd(ctx *config.RunContext) *cobra.Command {
 
 			format, _ := cmd.Flags().GetString("format")
 			format = strings.ToLower(format)
-			if format != "" && !contains(validUploadOutputFormats, format) {
+			if format != "" && !contains(validCommentOutputFormats, format) {
 				ui.PrintUsage(cmd)
 				return fmt.Errorf("--format only supports %s", strings.Join(validCommentOutputFormats, ", "))
 			}
