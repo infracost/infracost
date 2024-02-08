@@ -6,7 +6,6 @@ import (
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 
-	"fmt"
 	"strings"
 
 	"github.com/shopspring/decimal"
@@ -81,7 +80,7 @@ func (r *RDSCluster) BuildResource() *schema.Resource {
 				Service:       strPtr("AmazonRDS"),
 				ProductFamily: strPtr(databaseEngineMode),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "databaseEngine", ValueRegex: strPtr(fmt.Sprintf("/%s/i", databaseEngine))},
+					{Key: "databaseEngine", ValueRegex: regexPtr(databaseEngine)},
 				},
 			},
 		})
@@ -128,8 +127,8 @@ func (r *RDSCluster) BuildResource() *schema.Resource {
 			Region:        strPtr(r.Region),
 			ProductFamily: strPtr("System Operation"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "databaseEngine", ValueRegex: strPtr(fmt.Sprintf("/%s/i", databaseEngine))},
-				{Key: "usagetype", ValueRegex: strPtr("/Aurora:SnapshotExportToS3/")},
+				{Key: "databaseEngine", ValueRegex: regexPtr(databaseEngine)},
+				{Key: "usagetype", ValueRegex: regexPtr("Aurora:SnapshotExportToS3$")},
 			},
 		},
 	})
@@ -165,8 +164,8 @@ func (r *RDSCluster) auroraStorageCostComponents(databaseEngineStorageType strin
 				Service:       strPtr("AmazonRDS"),
 				ProductFamily: strPtr("Database Storage"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "databaseEngine", ValueRegex: strPtr(fmt.Sprintf("/%s/i", databaseEngineStorageType))},
-					{Key: "usagetype", ValueRegex: strPtr("/Aurora:Storage/")},
+					{Key: "databaseEngine", ValueRegex: regexPtr(databaseEngineStorageType)},
+					{Key: "usagetype", ValueRegex: regexPtr("Aurora:StorageUsage$")},
 				},
 			},
 		},
@@ -181,8 +180,8 @@ func (r *RDSCluster) auroraStorageCostComponents(databaseEngineStorageType strin
 				Service:       strPtr("AmazonRDS"),
 				ProductFamily: strPtr("System Operation"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "databaseEngine", ValueRegex: strPtr(fmt.Sprintf("/%s/i", databaseEngineStorageType))},
-					{Key: "usagetype", ValueRegex: strPtr("/Aurora:Storage/")},
+					{Key: "databaseEngine", ValueRegex: regexPtr(databaseEngineStorageType)},
+					{Key: "usagetype", ValueRegex: regexPtr("Aurora:StorageIOUsage$")},
 				},
 			},
 		},
@@ -201,7 +200,8 @@ func (r *RDSCluster) auroraBackupStorageCostComponent(totalBackupStorageGB *deci
 			Service:       strPtr("AmazonRDS"),
 			ProductFamily: strPtr("Storage Snapshot"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "databaseEngine", ValueRegex: strPtr(fmt.Sprintf("/%s/i", databaseEngine))},
+				{Key: "databaseEngine", ValueRegex: regexPtr(databaseEngine)},
+				{Key: "usagetype", ValueRegex: regexPtr("Aurora:BackupUsage$")},
 			},
 		},
 	}
@@ -219,7 +219,7 @@ func (r *RDSCluster) auroraBacktrackCostComponent(backtrackChangeRecords *decima
 			Region:        strPtr(r.Region),
 			ProductFamily: strPtr("System Operation"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "usagetype", ValueRegex: strPtr("/Aurora:BacktrackUsage/")},
+				{Key: "usagetype", ValueRegex: regexPtr("Aurora:BacktrackUsage$")},
 			},
 		},
 	}
