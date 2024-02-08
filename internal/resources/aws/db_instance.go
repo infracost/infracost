@@ -332,8 +332,8 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 		backupStorageDBEngine := "Any"
 		attrFilters := []*schema.AttributeFilter{
 			{Key: "databaseEngine", Value: strPtr(backupStorageDBEngine)},
-			{Key: "usagetype", ValueRegex: strPtr("/BackupUsage/i")},
-			{Key: "engineCode", ValueRegex: strPtr("/[0-9]+/")},
+			{Key: "usagetype", ValueRegex: regexPtr("RDS:ChargedBackupUsage$")},
+			{Key: "engineCode", ValueRegex: regexPtr("[0-9]+")},
 			{Key: "operation", Value: strPtr("")},
 		}
 
@@ -341,8 +341,8 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 			backupStorageDBEngine = databaseEngine
 			attrFilters = []*schema.AttributeFilter{
 				{Key: "databaseEngine", Value: strPtr(backupStorageDBEngine)},
-				{Key: "usagetype", ValueRegex: strPtr("/BackupUsage/i")},
-				{Key: "engineCode", ValueRegex: strPtr("/[0-9]+/")},
+				{Key: "usagetype", ValueRegex: regexPtr("Aurora:BackupUsage$")},
+				{Key: "engineCode", ValueRegex: regexPtr("[0-9]+")},
 			}
 		}
 
