@@ -59,6 +59,58 @@ func TestUploadWithPath(t *testing.T) {
 	)
 }
 
+func TestUploadWithPathFormatJSON(t *testing.T) {
+	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintln(w, `[{"data": {"addRun":{
+		  "id": "ff050cb8-eaaa-479f-8865-3fc0fd689b9f",
+		  "shareUrl": "",
+		  "cloudUrl": "https://dashboard.infracost.io/org/tim/repos/4e936c53-6091-4836-82da-e106ff653aec/runs/ff050cb8-eaaa-479f-8865-3fc0fd689b9f",
+		  "pullRequestUrl": "https://dashboard.infracost.io/org/tim/repos/4e936c53-6091-4836-82da-e106ff653aec/pulls/null",
+		  "governanceFailures": null,
+		  "governanceComment": "\n<h4>Governance checks</h4>\n\n<details>\n<summary><strong>🔴 4 failures</strong>...",
+		  "governanceResults": [
+			{
+			  "govType": "tag_policy",
+			  "checked": 1,
+			  "warnings": [
+				"Timtags"
+			  ],
+			  "failures": [],
+			  "unblocked": []
+			},
+			{
+			  "govType": "finops_policy",
+			  "checked": 48,
+			  "warnings": [
+				"Cloudwatch - consider using a retention policy to reduce storage costs",
+				"EBS - consider upgrading gp2 volumes to gp3",
+				"S3 - consider using a lifecycle policy to reduce storage costs"
+			  ],
+			  "failures": [],
+			  "unblocked": []
+			},
+			{
+			  "govType": "guardrail",
+			  "checked": 0,
+			  "warnings": [],
+			  "failures": [],
+			  "unblocked": []
+			}
+		  ]
+		}}}]`)
+	}))
+	defer ts.Close()
+
+	GoldenFileCommandTest(t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{"upload", "--path", "./testdata/example_out.json", "--log-level", "info", "--format", "json"},
+		&GoldenFileOptions{CaptureLogs: true},
+		func(c *config.RunContext) {
+			c.Config.DashboardAPIEndpoint = ts.URL
+		},
+	)
+}
+
 func TestUploadWithShareLink(t *testing.T) {
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintln(w, `[{"data": {"addRun":{
