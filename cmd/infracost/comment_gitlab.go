@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	jsoniter "github.com/json-iterator/go"
 	"github.com/spf13/cobra"
 
 	"github.com/infracost/infracost/internal/apiclient"
@@ -34,6 +35,13 @@ func commentGitLabCmd(ctx *config.RunContext) *cobra.Command {
 			ctx.ContextValues.SetValue("platform", "gitlab")
 
 			var err error
+
+			format, _ := cmd.Flags().GetString("format")
+			format = strings.ToLower(format)
+			if format != "" && !contains(validUploadOutputFormats, format) {
+				ui.PrintUsage(cmd)
+				return fmt.Errorf("--format only supports %s", strings.Join(validCommentOutputFormats, ", "))
+			}
 
 			serverURL, _ := cmd.Flags().GetString("gitlab-server-url")
 			token, _ := cmd.Flags().GetString("gitlab-token")
@@ -104,7 +112,13 @@ func commentGitLabCmd(ctx *config.RunContext) *cobra.Command {
 					logging.Logger.Err(err).Msg("could not report infracost-comment event")
 				}
 
-				if res.Posted {
+				if format == "json" {
+					b, err := jsoniter.MarshalIndent(commentOut.AddRunResponse, "", "  ")
+					if err != nil {
+						return fmt.Errorf("failed to marshal result: %w", err)
+					}
+					cmd.Printf(string(b))
+				} else if res.Posted {
 					cmd.Println("Comment posted to GitLab")
 				} else {
 					msg := "Comment not posted to GitLab"
@@ -142,6 +156,7 @@ func commentGitLabCmd(ctx *config.RunContext) *cobra.Command {
 	_ = cmd.MarkFlagRequired("repo")
 	cmd.Flags().String("tag", "", "Customize hidden markdown tag used to detect comments posted by Infracost")
 	cmd.Flags().Bool("dry-run", false, "Generate comment without actually posting to GitLab")
+	cmd.Flags().String("format", "", "Output format: json")
 
 	return cmd
 }

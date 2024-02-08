@@ -21,10 +21,17 @@ import (
 )
 
 type CommentOutput struct {
-	Body    string
-	HasDiff bool
-	ValidAt *time.Time
+	Body           string
+	HasDiff        bool
+	ValidAt        *time.Time
+	AddRunResponse apiclient.AddRunResponse
 }
+
+var (
+	validCommentOutputFormats = []string{
+		"json",
+	}
+)
 
 func commentCmd(ctx *config.RunContext) *cobra.Command {
 	cmd := &cobra.Command{
@@ -84,6 +91,7 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 	var additionalCommentData string
 	var governanceFailures output.GovernanceFailures
 	dryRun, _ := cmd.Flags().GetBool("dry-run")
+	var result apiclient.AddRunResponse
 	if ctx.IsCloudUploadEnabled() && !dryRun {
 		if ctx.Config.IsSelfHosted() {
 			ui.PrintWarning(cmd.ErrOrStderr(), "Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
@@ -93,7 +101,7 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 			if mdOpts.BasicSyntax {
 				commentFormat = apiclient.CommentFormatMarkdown
 			}
-			result := shareCombinedRun(ctx, combined, inputs, commentFormat)
+			result = shareCombinedRun(ctx, combined, inputs, commentFormat)
 			combined.RunID, combined.ShareURL, combined.CloudURL, governanceFailures = result.RunID, result.ShareURL, result.CloudURL, result.GovernanceFailures
 			additionalCommentData = result.GovernanceComment
 		}
@@ -139,9 +147,10 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 	ctx.ContextValues.SetValue("originalLength", md.OriginalMsgSize)
 
 	out := &CommentOutput{
-		Body:    string(b),
-		HasDiff: combined.HasDiff(),
-		ValidAt: &combined.TimeGenerated,
+		Body:           string(b),
+		HasDiff:        combined.HasDiff(),
+		ValidAt:        &combined.TimeGenerated,
+		AddRunResponse: result,
 	}
 
 	if policyChecks.HasFailed() {

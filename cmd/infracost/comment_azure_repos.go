@@ -5,6 +5,7 @@ import (
 	"strconv"
 	"strings"
 
+	jsoniter "github.com/json-iterator/go"
 	"github.com/spf13/cobra"
 
 	"github.com/infracost/infracost/internal/apiclient"
@@ -30,6 +31,13 @@ func commentAzureReposCmd(ctx *config.RunContext) *cobra.Command {
 			ctx.ContextValues.SetValue("platform", "azure-repos")
 
 			var err error
+
+			format, _ := cmd.Flags().GetString("format")
+			format = strings.ToLower(format)
+			if format != "" && !contains(validUploadOutputFormats, format) {
+				ui.PrintUsage(cmd)
+				return fmt.Errorf("--format only supports %s", strings.Join(validCommentOutputFormats, ", "))
+			}
 
 			token, _ := cmd.Flags().GetString("azure-access-token")
 			tag, _ := cmd.Flags().GetString("tag")
@@ -90,7 +98,13 @@ func commentAzureReposCmd(ctx *config.RunContext) *cobra.Command {
 					logging.Logger.Err(err).Msg("could not report infracost-comment event")
 				}
 
-				if res.Posted {
+				if format == "json" {
+					b, err := jsoniter.MarshalIndent(commentOut.AddRunResponse, "", "  ")
+					if err != nil {
+						return fmt.Errorf("failed to marshal result: %w", err)
+					}
+					cmd.Printf(string(b))
+				} else if res.Posted {
 					cmd.Println("Comment posted to Azure Repos")
 				} else {
 					msg := "Comment not posted to Azure Repos"
@@ -127,6 +141,7 @@ func commentAzureReposCmd(ctx *config.RunContext) *cobra.Command {
 	_ = cmd.MarkFlagRequired("repo-url")
 	cmd.Flags().String("tag", "", "Customize hidden markdown tag used to detect comments posted by Infracost")
 	cmd.Flags().Bool("dry-run", false, "Generate comment without actually posting to Azure Repos")
+	cmd.Flags().String("format", "", "Output format: json")
 
 	return cmd
 }
