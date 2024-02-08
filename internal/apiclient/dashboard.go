@@ -25,12 +25,13 @@ type CreateAPIKeyResponse struct {
 }
 
 type AddRunResponse struct {
-	RunID              string `json:"id"`
-	ShareURL           string `json:"shareUrl"`
-	CloudURL           string `json:"cloudUrl"`
-	GovernanceFailures output.GovernanceFailures
-	GovernanceComment  string             `json:"governanceComment"`
-	GovernanceResults  []GovernanceResult `json:"governanceResults"`
+	RunID              string                    `json:"id"`
+	ShareURL           string                    `json:"shareUrl"`
+	CloudURL           string                    `json:"cloudUrl"`
+	PullRequestUrl     string                    `json:"pullRequestUrl"`
+	GovernanceFailures output.GovernanceFailures `json:"governanceFailures"`
+	GovernanceComment  string                    `json:"governanceComment"`
+	GovernanceResults  []GovernanceResult        `json:"governanceResults"`
 }
 
 type GovernanceResult struct {
@@ -140,6 +141,8 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root, com
 				id
 				shareUrl
 				cloudUrl
+				pullRequestUrl
+
 				organization {
 					id
 					name

@@ -2,6 +2,9 @@ package main
 
 import (
 	"fmt"
+	"strings"
+
+	jsoniter "github.com/json-iterator/go"
 
 	"github.com/spf13/cobra"
 
@@ -10,6 +13,12 @@ import (
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/ui"
+)
+
+var (
+	validUploadOutputFormats = []string{
+		"json",
+	}
 )
 
 func uploadCmd(ctx *config.RunContext) *cobra.Command {
@@ -33,6 +42,13 @@ See https://infracost.io/docs/features/cli_commands/#upload-runs`,
 		RunE: func(cmd *cobra.Command, args []string) error {
 			var err error
 
+			format, _ := cmd.Flags().GetString("format")
+			format = strings.ToLower(format)
+			if format != "" && !contains(validUploadOutputFormats, format) {
+				ui.PrintUsage(cmd)
+				return fmt.Errorf("--format only supports %s", strings.Join(validOutputFormats, ", "))
+			}
+
 			if ctx.Config.IsSelfHosted() {
 				return fmt.Errorf("Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
 			}
@@ -50,10 +66,14 @@ See https://infracost.io/docs/features/cli_commands/#upload-runs`,
 				return fmt.Errorf("failed to upload to Infracost Cloud: %w", err)
 			}
 
-			root.RunID, root.ShareURL, root.CloudURL = result.RunID, result.ShareURL, result.CloudURL
-
-			if root.ShareURL != "" {
-				cmd.Println("Share this cost estimate: ", ui.LinkString(root.ShareURL))
+			if format == "json" {
+				b, err := jsoniter.MarshalIndent(result, "", "  ")
+				if err != nil {
+					return fmt.Errorf("failed to marshal result: %w", err)
+				}
+				cmd.Printf(string(b))
+			} else if result.ShareURL != "" {
+				cmd.Println("Share this cost estimate: ", ui.LinkString(result.ShareURL))
 			}
 
 			pricingClient := apiclient.GetPricingAPIClient(ctx)
@@ -71,6 +91,7 @@ See https://infracost.io/docs/features/cli_commands/#upload-runs`,
 	}
 
 	cmd.Flags().String("path", "p", "Path to Infracost JSON file.")
+	cmd.Flags().String("format", "", "Output format: json")
 
 	_ = cmd.MarkFlagRequired("path")
 	_ = cmd.MarkFlagFilename("path", "json")

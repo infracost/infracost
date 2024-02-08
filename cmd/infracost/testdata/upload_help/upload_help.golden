@@ -18,8 +18,9 @@ EXAMPLES
       infracost upload --path infracost.json
 
 FLAGS
-  -h, --help          help for upload
-      --path string   Path to Infracost JSON file. (default "p")
+      --format string   Output format: json
+  -h, --help            help for upload
+      --path string     Path to Infracost JSON file. (default "p")
 
 GLOBAL FLAGS
       --debug-report       Generate a debug report file which can be sent to Infracost team
