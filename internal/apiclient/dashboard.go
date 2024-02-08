@@ -28,7 +28,7 @@ type AddRunResponse struct {
 	RunID              string                    `json:"id"`
 	ShareURL           string                    `json:"shareUrl"`
 	CloudURL           string                    `json:"cloudUrl"`
-	PullRequestUrl     string                    `json:"pullRequestUrl"`
+	PullRequestURL     string                    `json:"pullRequestUrl"`
 	GovernanceFailures output.GovernanceFailures `json:"governanceFailures"`
 	GovernanceComment  string                    `json:"governanceComment"`
 	GovernanceResults  []GovernanceResult        `json:"governanceResults"`
