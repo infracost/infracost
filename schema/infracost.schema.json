@@ -246,7 +246,8 @@
       "required": [
         "code",
         "message",
-        "data"
+        "data",
+        "isError"
       ],
       "properties": {
         "code": {
@@ -257,6 +258,9 @@
         },
         "data": {
           "additionalProperties": true
+        },
+        "isError": {
+          "type": "boolean"
         }
       },
       "additionalProperties": false,

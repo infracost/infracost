@@ -19,7 +19,6 @@ import (
 	"github.com/tidwall/gjson"
 
 	"github.com/infracost/infracost/internal/config"
-	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/testutil"
 )
 
@@ -740,9 +739,10 @@ func TestBreakdownWithPrivateSshModulePopulatesErrors(t *testing.T) {
 	msg := errs[0].Get("message").String()
 	data := errs[0].Get("data").Map()
 
-	assert.Equal(t, schema.DiagPrivateModuleDownloadFailure, int(code))
-	assert.Contains(t, msg, "Failed to download remote module \"ec2_cluster\"")
+	assert.Equal(t, 201, int(code))
+	assert.Contains(t, msg, "Failed to download module \"git@github.com:someorg/terraform_modules.git\"")
 	assert.Equal(t, data["source"].String(), "ssh")
+	assert.Equal(t, data["moduleSource"].String(), "git@github.com:someorg/terraform_modules.git")
 }
 
 func TestBreakdownWithPrivateHttpsModulePopulatesErrors(t *testing.T) {
@@ -766,9 +766,10 @@ func TestBreakdownWithPrivateHttpsModulePopulatesErrors(t *testing.T) {
 	msg := errs[0].Get("message").String()
 	data := errs[0].Get("data").Map()
 
-	assert.Equal(t, schema.DiagPrivateModuleDownloadFailure, int(code))
-	assert.Contains(t, msg, "Failed to download remote module \"ec2_cluster\"")
+	assert.Equal(t, 201, int(code))
+	assert.Contains(t, msg, "Failed to download module \"github.com/someorg/terraform_modules.git\"")
 	assert.Equal(t, data["source"].String(), "https")
+	assert.Equal(t, data["moduleSource"].String(), "github.com/someorg/terraform_modules.git")
 }
 
 func TestBreakdownWithPrivateTerraformRegistryModulePopulatesErrors(t *testing.T) {

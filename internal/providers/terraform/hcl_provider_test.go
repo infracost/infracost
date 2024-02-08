@@ -68,7 +68,7 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 	tests := []struct {
 		name     string
 		attrs    map[string]map[string]string
-		warnings []hcl.WarningCode
+		warnings []int
 	}{
 		{
 			name: "structures module expressions correctly with count",
@@ -162,7 +162,9 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 					"arn": "eip-arn",
 				},
 			},
-			warnings: []hcl.WarningCode{hcl.WarningMissingVars},
+			warnings: []int{
+				105,
+			},
 		},
 		{
 			name: "shows correct duplicate variable warning",
@@ -232,7 +234,7 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 			actual := string(root.JSON)
 			assert.JSONEq(t, expected, actual)
 
-			codes := make([]hcl.WarningCode, len(root.Module.Warnings))
+			codes := make([]int, len(root.Module.Warnings))
 			for i, w := range root.Module.Warnings {
 				codes[i] = w.Code
 			}

@@ -24,6 +24,7 @@ import (
 	"github.com/infracost/infracost/internal/hcl/funcs"
 	"github.com/infracost/infracost/internal/hcl/modules"
 	"github.com/infracost/infracost/internal/logging"
+	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
 )
 
@@ -250,9 +251,7 @@ func (e *Evaluator) collectModules() *Module {
 	}
 
 	if v := e.MissingVars(); len(v) > 0 {
-		root.Warnings = []Warning{
-			NewMissingVarsWarning(v),
-		}
+		root.Warnings = append(root.Warnings, schema.NewDiagMissingVars(v...))
 	}
 
 	return &root

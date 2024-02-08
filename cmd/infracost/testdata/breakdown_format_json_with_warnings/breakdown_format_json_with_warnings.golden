@@ -20,11 +20,12 @@
         "vcsSubPath": "cmd/infracost/testdata/breakdown_format_json_with_warnings",
         "warnings": [
           {
-            "code": 1,
+            "code": 105,
             "message": "Missing Terraform vars",
             "data": [
               "variable.not_provided"
-            ]
+            ],
+            "isError": false
           }
         ],
         "providers": [
