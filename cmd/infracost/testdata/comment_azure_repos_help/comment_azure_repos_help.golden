@@ -15,6 +15,7 @@ FLAGS
                                       new               Create a new comment
                                       delete-and-new    Delete previous matching comments and create a new comment (default "update")
       --dry-run                     Generate comment without actually posting to Azure Repos
+      --format string               Output format: json
   -h, --help                        help for azure-repos
   -p, --path stringArray            Path to Infracost JSON files, glob patterns need quotes
       --policy-path stringArray     Path to Infracost policy files, glob patterns need quotes (experimental)

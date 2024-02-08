@@ -19,6 +19,7 @@ FLAGS
                                      delete-and-new    Delete previous matching comments and create a new comment (default "update")
       --commit string              Commit SHA to post comment on, mutually exclusive with merge-request
       --dry-run                    Generate comment without actually posting to GitLab
+      --format string              Output format: json
       --gitlab-server-url string   GitLab Server URL (default "https://gitlab.com")
       --gitlab-token string        GitLab token
   -h, --help                       help for gitlab
