@@ -2,8 +2,6 @@ module github.com/infracost/infracost
 
 go 1.21
 
-toolchain go1.21.3
-
 require (
 	github.com/Masterminds/goutils v1.1.1 // indirect
 	github.com/Masterminds/semver v1.5.0 // indirect
