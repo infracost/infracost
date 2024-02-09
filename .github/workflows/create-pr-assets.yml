@@ -20,7 +20,7 @@ jobs:
       - name: Set up Go 1.x
         uses: actions/setup-go@v5
         with:
-          go-version: 1.21
+          go-version-file: go.mod
       - name: Build project
         run: make ${{ matrix.target }}
       - name: Upload amd64 build artifact
