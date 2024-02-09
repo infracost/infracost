@@ -98,7 +98,7 @@ func (v *VertexModuleCall) expand(e *Evaluator, b *Block, mutex *sync.Mutex) ([]
 	expanded = e.expandBlockForEaches(expanded)
 	expanded = e.expandBlockCounts(expanded)
 
-	unexpandedName := b.FullName()
+	unexpandedName := v.block.FullName()
 
 	for _, block := range expanded {
 		name := block.FullName()
