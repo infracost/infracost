@@ -100,6 +100,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
       - name: Get the new version
         id: version
         run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
