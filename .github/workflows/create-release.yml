@@ -14,9 +14,9 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Set up Go 1.x
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
-          go-version: 1.21
+          go-version-file: go.mod
 
       - name: Build project
         run: |
@@ -100,6 +100,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
       - name: Get the new version
         id: version
         run: echo ::set-output name=tag::${GITHUB_REF#refs/*/}
