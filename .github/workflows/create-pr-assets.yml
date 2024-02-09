@@ -18,7 +18,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
       - name: Set up Go 1.x
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: 1.21
       - name: Build project
@@ -47,4 +47,3 @@ jobs:
         with:
           name: ${{ matrix.target }}-arm64
           path: "build/infracost-arm64.exe"
-
