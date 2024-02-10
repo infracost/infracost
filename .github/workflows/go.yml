@@ -45,7 +45,7 @@ jobs:
         run: make parser_benchmarks
 
       - name: Upload benchmark artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: benchmarks
           path: |
