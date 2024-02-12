@@ -20,7 +20,7 @@
         "vcsSubPath": "examples/terraform",
         "errors": [
           {
-            "code": 2,
+            "code": 102,
             "message": "No valid terraform files found given path, try a different directory",
             "data": null
           }

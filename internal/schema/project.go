@@ -120,7 +120,7 @@ func NewFailedDownloadDiagnostic(source string, err error) *ProjectDiag {
 
 func newDiag(code int, message string, isError bool, data interface{}, err error) *ProjectDiag {
 	// if the error is already a ProjectDiag, return it rather than creating a new
-	// one. This is to avoids collision of diagnostics.
+	// one. This is to avoid collision of diagnostics.
 	var diag *ProjectDiag
 	if errors.As(err, &diag) {
 		return diag
