@@ -215,7 +215,7 @@ func (p *HCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, e
 	project := p.newProject(j)
 	parsedConf, err := p.planJSONParser.parseJSON(j.JSON, usage)
 	if err != nil {
-		project.Metadata.AddErrorWithCode(err, schema.DiagJSONParsingFailure)
+		project.Metadata.AddError(schema.NewDiagJSONParsingFailure(err))
 
 		return []*schema.Project{project}, nil
 	}
@@ -246,27 +246,15 @@ func (p *HCLProvider) newProject(parsed HCLProject) *schema.Project {
 	p.AddMetadata(metadata)
 
 	if parsed.Error != nil {
-		metadata.AddErrorWithCode(parsed.Error, schema.DiagModuleEvaluationFailure)
+		metadata.AddError(schema.NewDiagModuleEvaluationFailure(parsed.Error))
 	}
 
 	if len(parsed.Module.Warnings) > 0 {
-		warnings := make([]schema.ProjectDiag, len(parsed.Module.Warnings))
-
-		for i, warning := range parsed.Module.Warnings {
-			warnings[i] = schema.ProjectDiag{
-				Code:    int(warning.Code),
-				Message: warning.Title,
-				Data:    warning.Data,
-			}
-
-			if p.ctx.RunContext.Config.IsLogging() {
-				logging.Logger.Warn().Msg(warning.FriendlyMessage)
-			} else {
-				ui.PrintWarning(p.ctx.RunContext.ErrWriter, warning.FriendlyMessage)
-			}
+		for _, warning := range parsed.Module.Warnings {
+			p.printWarning(warning)
 		}
 
-		metadata.Warnings = warnings
+		metadata.Warnings = append(metadata.Warnings, parsed.Module.Warnings...)
 	}
 
 	name := p.ctx.ProjectConfig.Name
@@ -279,6 +267,21 @@ func (p *HCLProvider) newProject(parsed HCLProject) *schema.Project {
 	}
 
 	return schema.NewProject(name, metadata)
+}
+
+func (p *HCLProvider) printWarning(warning *schema.ProjectDiag) {
+	// skip warnings that don't have a friendly message
+	// these are not meant to be shown to the user.
+	if warning.FriendlyMessage == "" {
+		return
+	}
+
+	if p.ctx.RunContext.Config.IsLogging() {
+		logging.Logger.Warn().Msg(warning.FriendlyMessage)
+		return
+	}
+
+	ui.PrintWarning(p.ctx.RunContext.ErrWriter, warning.FriendlyMessage)
 }
 
 type HCLProject struct {

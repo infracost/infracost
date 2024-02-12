@@ -450,7 +450,7 @@ func (r *parallelRunner) runProvider(job projectJob) (*projectOutput, error) {
 			if errors.As(err, &apiErr) {
 				switch apiErr.ErrorCode {
 				case apiclient.ErrorCodeExceededQuota:
-					return nil, &schema.ProjectDiag{Code: schema.DiagRunQuotaExceeded, Message: apiErr.Msg}
+					return nil, schema.NewDiagRunQuotaExceeded(apiErr)
 				case apiclient.ErrorCodeAPIKeyInvalid:
 					return nil, fmt.Errorf("%v\n%s %s %s %s %s\n%s %s.\n%s %s %s",
 						apiErr.Msg,

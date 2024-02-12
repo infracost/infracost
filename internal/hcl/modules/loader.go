@@ -392,7 +392,7 @@ func (m *ModuleLoader) loadRegistryModule(key string, source string, version str
 
 	lookupResult, err := m.registryLoader.lookupModule(moduleAddr, version)
 	if err != nil {
-		return nil, &schema.ProjectDiag{Code: schema.DiagPrivateRegistryModuleDownloadFailure, Message: fmt.Sprintf("Failed to lookup module %q - %s", key, err)}
+		return nil, schema.NewPrivateRegistryDiag(source, nil, err)
 	}
 
 	if lookupResult.OK {
@@ -409,13 +409,17 @@ func (m *ModuleLoader) loadRegistryModule(key string, source string, version str
 
 		err = m.registryLoader.downloadModule(lookupResult, dest)
 		if err != nil {
-			return nil, &schema.ProjectDiag{Code: schema.DiagPrivateRegistryModuleDownloadFailure, Message: fmt.Sprintf("Failed to download registry module %q - %s", key, err)}
+			return nil, schema.NewPrivateRegistryDiag(source, strPtr(lookupResult.ModuleURL.Location), err)
 		}
 
 		return manifestModule, nil
 	}
 
 	return nil, nil
+}
+
+func strPtr(s string) *string {
+	return &s
 }
 
 func (m *ModuleLoader) loadRemoteModule(key string, source string) (*ManifestModule, error) {
@@ -447,7 +451,7 @@ func (m *ModuleLoader) loadRemoteModule(key string, source string) (*ManifestMod
 
 	err = m.packageFetcher.fetch(moduleAddr, dest)
 	if err != nil {
-		return nil, newFailedDownloadDiagnostic(fmt.Sprintf("Failed to download remote module %q - %s", key, err))
+		return nil, schema.NewFailedDownloadDiagnostic(source, err)
 	}
 
 	return manifestModule, nil
@@ -617,19 +621,4 @@ func getProcessCount() int {
 	}
 
 	return numWorkers
-}
-
-func newFailedDownloadDiagnostic(msg string) *schema.ProjectDiag {
-	src := "https"
-	if strings.Contains(msg, "ssh://") {
-		src = "ssh"
-	}
-
-	return &schema.ProjectDiag{
-		Code:    schema.DiagPrivateModuleDownloadFailure,
-		Message: msg,
-		Data: map[string]interface{}{
-			"source": src,
-		},
-	}
 }

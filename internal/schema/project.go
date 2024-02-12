@@ -15,13 +15,21 @@ import (
 )
 
 const (
-	DiagJSONParsingFailure = iota + 1
-	DiagModuleEvaluationFailure
-	DiagTerragruntEvaluationFailure
-	DiagTerragruntModuleEvaluationFailure
-	DiagPrivateModuleDownloadFailure
-	DiagPrivateRegistryModuleDownloadFailure
-	DiagRunQuotaExceeded
+	// Diags for local module issues
+	diagJSONParsingFailure                = 101
+	diagModuleEvaluationFailure           = 102
+	diagTerragruntEvaluationFailure       = 103
+	diagTerragruntModuleEvaluationFailure = 104
+	diagMissingVars                       = 105
+
+	// Diags for git module issues
+	diagPrivateModuleDownloadFailure = 201
+
+	// Diags for registry module issues
+	diagPrivateRegistryModuleDownloadFailure = 301
+
+	// Diags for infracost cloud issues
+	diagRunQuotaExceeded = 401
 )
 
 // ProjectDiag holds information about all diagnostics associated with a project.
@@ -30,6 +38,125 @@ type ProjectDiag struct {
 	Code    int         `json:"code"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data"`
+	IsError bool        `json:"isError"`
+
+	// FriendlyMessage should be used to display a readable message to the CLI user.
+	FriendlyMessage string `json:"-"`
+}
+
+// NewDiagRunQuotaExceeded returns a project diag for a run quota exceeded error.
+func NewDiagRunQuotaExceeded(err error) *ProjectDiag {
+	return &ProjectDiag{
+		Code:    diagRunQuotaExceeded,
+		Message: err.Error(),
+		IsError: true,
+	}
+}
+
+// NewDiagTerragruntModuleEvaluationFailure returns a project diag for a
+// terragrunt module evaluation failure. This is used when a Terraform module
+// which a Terragrunt configuration file references fails to evaluate.
+func NewDiagTerragruntModuleEvaluationFailure(err error) *ProjectDiag {
+	return newDiag(diagTerragruntModuleEvaluationFailure, err.Error(), true, nil, err)
+}
+
+// NewDiagTerragruntEvaluationFailure returns a project diag for a Terragrunt
+// evaluation failure. This is used when a Terragrunt fails to run/evaluate in
+// most cases this means that the entire project is not evaluated. It is
+// considered a critical error.
+func NewDiagTerragruntEvaluationFailure(err error) *ProjectDiag {
+	return newDiag(diagTerragruntEvaluationFailure, err.Error(), true, nil, err)
+}
+
+// NewDiagModuleEvaluationFailure returns a project diag for a module evaluation
+// failure. This is used when a Terraform module fails to evaluate. This can
+// either be a root module of a Terraform project or a child module.
+func NewDiagModuleEvaluationFailure(err error) *ProjectDiag {
+	return newDiag(diagModuleEvaluationFailure, err.Error(), true, nil, err)
+}
+
+// NewDiagJSONParsingFailure returns a project diag for a JSON parsing failure in
+// the intermediary JSON that the HCL provider generates. This is considered a
+// critical error as a project will not have any costs if this happens.
+func NewDiagJSONParsingFailure(err error) *ProjectDiag {
+	return newDiag(diagJSONParsingFailure, err.Error(), true, nil, err)
+}
+
+// NewPrivateRegistryDiag returns a project diag for a private registry module
+// download failure. This contains additional information about the module source
+// and the discovered location returned by the registry.
+func NewPrivateRegistryDiag(source string, moduleLocation *string, err error) *ProjectDiag {
+	return newDiag(
+		diagPrivateRegistryModuleDownloadFailure,
+		fmt.Sprintf("Failed to lookup module %q - %s", source, err),
+		true,
+		map[string]interface{}{
+			"moduleLocation": moduleLocation,
+			"moduleSource":   source,
+		},
+		err,
+	)
+}
+
+// NewFailedDownloadDiagnostic returns a project diag for a failed module download.
+// This contains additional information about the module source and the type of source.
+func NewFailedDownloadDiagnostic(source string, err error) *ProjectDiag {
+	sourceType := "https"
+	if strings.Contains(err.Error(), "ssh://") {
+		sourceType = "ssh"
+	}
+
+	return newDiag(
+		diagPrivateModuleDownloadFailure,
+		fmt.Sprintf("Failed to download module %q - %s", source, err),
+		true,
+		map[string]interface{}{
+			"source":       sourceType,
+			"moduleSource": source,
+		},
+		err,
+	)
+}
+
+func newDiag(code int, message string, isError bool, data interface{}, err error) *ProjectDiag {
+	// if the error is already a ProjectDiag, return it rather than creating a new
+	// one. This is to avoid collision of diagnostics.
+	var diag *ProjectDiag
+	if errors.As(err, &diag) {
+		return diag
+	}
+
+	return &ProjectDiag{
+		Code:    code,
+		Message: message,
+		IsError: isError,
+		Data:    data,
+	}
+}
+
+// NewDiagMissingVars returns a ProjectDiag for missing Terraform vars. This is
+// considered a non-critical error and is used to notify the user.
+func NewDiagMissingVars(vars ...string) *ProjectDiag {
+	return &ProjectDiag{
+		Code:    diagMissingVars,
+		Message: "Missing Terraform vars",
+		Data:    vars,
+		FriendlyMessage: fmt.Sprintf(
+			"Input values were not provided for following Terraform variables: %s. %s",
+			joinQuotes(vars),
+			"Use --terraform-var-file or --terraform-var to specify them.",
+		),
+	}
+}
+
+func joinQuotes(elems []string) string {
+
+	quoted := make([]string, len(elems))
+	for i, elem := range elems {
+		quoted[i] = fmt.Sprintf("%q", elem)
+	}
+
+	return strings.Join(quoted, ", ")
 }
 
 func (p *ProjectDiag) Error() string {
@@ -50,8 +177,8 @@ type ProjectMetadata struct {
 	TerraformWorkspace  string             `json:"terraformWorkspace,omitempty"`
 	VCSSubPath          string             `json:"vcsSubPath,omitempty"`
 	VCSCodeChanged      *bool              `json:"vcsCodeChanged,omitempty"`
-	Errors              []ProjectDiag      `json:"errors,omitempty"`
-	Warnings            []ProjectDiag      `json:"warnings,omitempty"`
+	Errors              []*ProjectDiag     `json:"errors,omitempty"`
+	Warnings            []*ProjectDiag     `json:"warnings,omitempty"`
 	Policies            Policies           `json:"policies,omitempty"`
 	Providers           []ProviderMetadata `json:"providers,omitempty"`
 	RemoteModuleCalls   []string           `json:"remoteModuleCalls,omitempty"`
@@ -65,27 +192,16 @@ type ProviderMetadata struct {
 	EndLine     int64             `json:"endLine,omitempty"`
 }
 
-// AddError pushes the provided error onto the metadata list. It does a naive conversion to ProjectDiag
-// if the error provided is not already a diagnostic.
+// AddError pushes the provided error onto the metadata list. It does a naive
+// conversion to ProjectDiag if the error provided is not already a diagnostic.
 func (m *ProjectMetadata) AddError(err error) {
 	var diag *ProjectDiag
 	if errors.As(err, &diag) {
-		m.Errors = append(m.Errors, *diag)
+		m.Errors = append(m.Errors, diag)
 		return
 	}
 
-	m.Errors = append(m.Errors, ProjectDiag{Message: err.Error()})
-}
-
-// AddErrorWithCode is the same as AddError except adds a code to the fallback diagnostic.
-func (m *ProjectMetadata) AddErrorWithCode(err error, code int) {
-	var diag *ProjectDiag
-	if errors.As(err, &diag) {
-		m.Errors = append(m.Errors, *diag)
-		return
-	}
-
-	m.Errors = append(m.Errors, ProjectDiag{Code: code, Message: err.Error()})
+	m.Errors = append(m.Errors, &ProjectDiag{Message: err.Error()})
 }
 
 func (m *ProjectMetadata) HasErrors() bool {
@@ -97,7 +213,7 @@ func (m *ProjectMetadata) HasErrors() bool {
 // should be used when in any output that notifies the user.
 func (m *ProjectMetadata) IsRunQuotaExceeded() (string, bool) {
 	for _, diag := range m.Errors {
-		if diag.Code == DiagRunQuotaExceeded {
+		if diag.Code == diagRunQuotaExceeded {
 			return diag.Message, true
 		}
 	}

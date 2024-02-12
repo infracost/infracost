@@ -19,9 +19,10 @@
         "vcsSubPath": "examples",
         "errors": [
           {
-            "code": 7,
+            "code": 401,
             "message": "Infracost free monthly run limit exceeded.",
-            "data": null
+            "data": null,
+            "isError": true
           }
         ]
       },

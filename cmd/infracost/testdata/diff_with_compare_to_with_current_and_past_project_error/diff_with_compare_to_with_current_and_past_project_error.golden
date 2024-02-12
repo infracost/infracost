@@ -21,14 +21,16 @@
         "vcsSubPath": "cmd/infracost/testdata/diff_with_compare_to_with_current_and_past_project_error/dev",
         "errors": [
           {
-            "code": 2,
+            "code": 102,
             "message": "Error loading Terraform modules: failed to parse file testdata/diff_with_compare_to_with_current_and_past_project_error/dev/mod_with_error.tf diag: testdata/diff_with_compare_to_with_current_and_past_project_error/dev/mod_with_error.tf:1,9-10: Invalid block definition; Either a quoted string block label or an opening brace (\"{\") is expected here., and 1 other diagnostic(s)",
-            "data": null
+            "data": null,
+            "isError": true
           },
           {
-            "code": 2,
+            "code": 102,
             "message": "Diff baseline error: Error loading Terraform modules: failed to inspect module path dev diag: Invalid block definition: Either a quoted string block label or an opening brace (\"{\") is expected here. (and 1 other messages)",
-            "data": null
+            "data": null,
+            "isError": false
           }
         ]
       },
