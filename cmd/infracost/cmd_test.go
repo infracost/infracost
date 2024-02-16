@@ -387,8 +387,8 @@ var policyResourceAllowlistGraphQLResponse = `[
   }
 ]`
 
-var storePolicyResourcesGraphQLResponse = `[{"data": 
-	{"storePolicyResources": 
+var storePolicyResourcesGraphQLResponse = `[{"data":
+	{"storePolicyResources":
 		{ "sha": "someshastring" }
 	}
 }]

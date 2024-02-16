@@ -12,5 +12,5 @@ INF Estimate uploaded to Infracost Cloud
 INF 1 guardrail checked
 INF guardrail check failed: Stand by your estimate
 INF Creating new comment
-WRN >\n<summary><strong>❌ Guardrails triggered (needs action)</strong></summary>\nThis change is blocked, either reduce the costs or wait for an admin to review and unblock it.\n\t\t\t\t\n> - <b>Blocked</b>: Stand by your estimate\n</
+WRN >\n<summary><strong>❌ Guardrails triggered (needs action)</strong></summary>\nThis change is blocked, either reduce the costs or wait for an admin to review and unblock it.\n\n> - <b>Blocked</b>: Stand by your estimate\n</
 INF Created new comment: 
