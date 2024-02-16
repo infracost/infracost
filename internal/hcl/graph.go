@@ -371,8 +371,8 @@ func (g *Graph) Run(evaluator *Evaluator) (*Module, error) {
 	g.ReduceTransitively()
 	g.Walk()
 
-	evaluator.module.Blocks = evaluator.filteredBlocks
 	evaluator.module = *evaluator.collectModules()
+	evaluator.module.Blocks = evaluator.filteredBlocks
 
 	return &evaluator.module, nil
 }
