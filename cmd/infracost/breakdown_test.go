@@ -1071,6 +1071,7 @@ func TestBreakdownWithDataBlocksInSubmod(t *testing.T) {
 }
 
 func TestBreakdownWithPolicyDataUploadHCL(t *testing.T) {
+	sep := []byte("===\n")
 	ts, uploadWriter := GraphqlTestServerWithWriter(map[string]string{
 		"policyResourceAllowList": policyResourceAllowlistGraphQLResponse,
 		"storePolicyResources":    storePolicyResourcesGraphQLResponse,
@@ -1093,10 +1094,14 @@ func TestBreakdownWithPolicyDataUploadHCL(t *testing.T) {
 		}, func(ctx *config.RunContext) {
 			ctx.Config.PolicyV2APIEndpoint = ts.URL
 			ctx.Config.PoliciesEnabled = true
+			uploadWriter.Write(sep)
 		},
 	)
 
-	testutil.AssertGoldenFile(t, path.Join("./testdata", testName, testName+"-upload.golden"), uploadWriter.Bytes())
+	pp := strings.Split(uploadWriter.String(), string(sep))
+	for _, p := range pp[1:] {
+		testutil.AssertGoldenFile(t, path.Join("./testdata", testName, testName+"-upload.golden"), []byte(p))
+	}
 }
 
 func TestBreakdownWithMockedMerge(t *testing.T) {
@@ -1126,6 +1131,7 @@ func TestBreakdownWithDynamicIterator(t *testing.T) {
 }
 
 func TestBreakdownWithPolicyDataUploadPlanJson(t *testing.T) {
+	sep := []byte("===\n")
 	ts, uploadWriter := GraphqlTestServerWithWriter(map[string]string{
 		"policyResourceAllowList": policyResourceAllowlistGraphQLResponse,
 		"storePolicyResources":    storePolicyResourcesGraphQLResponse,
@@ -1148,13 +1154,18 @@ func TestBreakdownWithPolicyDataUploadPlanJson(t *testing.T) {
 		}, func(ctx *config.RunContext) {
 			ctx.Config.PolicyV2APIEndpoint = ts.URL
 			ctx.Config.PoliciesEnabled = true
+			uploadWriter.Write(sep)
 		},
 	)
 
-	testutil.AssertGoldenFile(t, path.Join("./testdata", testName, testName+"-upload.golden"), uploadWriter.Bytes())
+	pp := strings.Split(uploadWriter.String(), string(sep))
+	for _, p := range pp[1:] {
+		testutil.AssertGoldenFile(t, path.Join("./testdata", testName, testName+"-upload.golden"), []byte(p))
+	}
 }
 
 func TestBreakdownWithPolicyDataUploadTerragrunt(t *testing.T) {
+	sep := []byte("===\n")
 	ts, uploadWriter := GraphqlTestServerWithWriter(map[string]string{
 		"policyResourceAllowList": policyResourceAllowlistGraphQLResponse,
 		"storePolicyResources":    storePolicyResourcesGraphQLResponse,
@@ -1177,10 +1188,14 @@ func TestBreakdownWithPolicyDataUploadTerragrunt(t *testing.T) {
 		}, func(ctx *config.RunContext) {
 			ctx.Config.PolicyV2APIEndpoint = ts.URL
 			ctx.Config.PoliciesEnabled = true
+			uploadWriter.Write(sep)
 		},
 	)
 
-	testutil.AssertGoldenFile(t, path.Join("./testdata", testName, testName+"-upload.golden"), stripDynamicValues(uploadWriter.Bytes()))
+	pp := strings.Split(uploadWriter.String(), string(sep))
+	for _, p := range pp[1:] {
+		testutil.AssertGoldenFile(t, path.Join("./testdata", testName, testName+"-upload.golden"), stripDynamicValues([]byte(p)))
+	}
 }
 
 func TestBreakdownConfigFileWithSkipAutoDetect(t *testing.T) {

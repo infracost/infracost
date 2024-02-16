@@ -11,8 +11,6 @@ import (
 )
 
 func TestUsageFile(t *testing.T) {
-	t.Parallel()
-
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -22,8 +20,6 @@ func TestUsageFile(t *testing.T) {
 }
 
 func TestUsageFileNoUsage(t *testing.T) {
-	t.Parallel()
-
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -33,8 +29,6 @@ func TestUsageFileNoUsage(t *testing.T) {
 }
 
 func TestUsageFileEmpty(t *testing.T) {
-	t.Parallel()
-
 	if testing.Short() {
 		t.Skip("skipping test in short mode")
 	}
@@ -57,9 +51,9 @@ resource_usage:
       k: 1
     array[0]:
       el: 2
-    empty_string: ""    
-    empty_array[0]: 
-    empty: 
+    empty_string: ""
+    empty_array[0]:
+    empty:
     nested:
       number: 0
       string: string

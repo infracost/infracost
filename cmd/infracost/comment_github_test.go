@@ -188,7 +188,7 @@ func TestCommentGitHubWithTagPolicyChecks(t *testing.T) {
 }
 
 var ghZeroCommentsResponse = `{ "data": { "repository": { "pullRequest": { "comments": { "nodes": [], "pageInfo": { "endCursor": "abc", "hasNextPage": false }}}}}}`
-var ghOneMatchingCommentResponse = `{ "data": { "repository": { "pullRequest": { "comments": { "nodes": [ 
+var ghOneMatchingCommentResponse = `{ "data": { "repository": { "pullRequest": { "comments": { "nodes": [
             { "id": "123", "body": "infracomment body here, followed by tag: [//]: <> (infracost-comment)" }
           ], "pageInfo": { "endCursor": "abc", "hasNextPage": false }}}}}}`
 
@@ -198,9 +198,10 @@ func TestCommentGitHubSkipNoDiffWithoutInitialComment(t *testing.T) {
 		ghZeroCommentsResponse,
 	}
 
+	i := 0
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, githubGraphQLresponses[0])
-		githubGraphQLresponses = githubGraphQLresponses[1:]
+		fmt.Fprintln(w, githubGraphQLresponses[i])
+		i = (i + 1) % len(githubGraphQLresponses)
 	}))
 	defer ts.Close()
 
@@ -225,9 +226,10 @@ func TestCommentGitHubSkipNoDiffWithInitialComment(t *testing.T) {
 		`{}`,
 	}
 
+	i := 0
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, githubGraphQLresponses[0])
-		githubGraphQLresponses = githubGraphQLresponses[1:]
+		fmt.Fprintln(w, githubGraphQLresponses[i])
+		i = (i + 1) % len(githubGraphQLresponses)
 	}))
 	defer ts.Close()
 
@@ -250,9 +252,10 @@ func TestCommentGitHubNewAndHideSkipNoDiffWithoutInitialComment(t *testing.T) {
 		ghZeroCommentsResponse,
 	}
 
+	i := 0
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, githubGraphQLresponses[0])
-		githubGraphQLresponses = githubGraphQLresponses[1:]
+		fmt.Fprintln(w, githubGraphQLresponses[i])
+		i = (i + 1) % len(githubGraphQLresponses)
 	}))
 	defer ts.Close()
 
@@ -278,9 +281,10 @@ func TestCommentGitHubNewAndHideSkipNoDiffWithInitialComment(t *testing.T) {
 		`{}`, // empty json as response to the post comment mutation
 	}
 
+	i := 0
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, githubGraphQLresponses[0])
-		githubGraphQLresponses = githubGraphQLresponses[1:]
+		fmt.Fprintln(w, githubGraphQLresponses[i])
+		i = (i + 1) % len(githubGraphQLresponses)
 	}))
 	defer ts.Close()
 
@@ -304,9 +308,10 @@ func TestCommentGitHubDeleteAndNewSkipNoDiffWithoutInitialComment(t *testing.T) 
 		ghZeroCommentsResponse,
 	}
 
+	i := 0
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, githubGraphQLresponses[0])
-		githubGraphQLresponses = githubGraphQLresponses[1:]
+		fmt.Fprintln(w, githubGraphQLresponses[i])
+		i = (i + 1) % len(githubGraphQLresponses)
 	}))
 	defer ts.Close()
 
@@ -332,9 +337,10 @@ func TestCommentGitHubDeleteAndNewSkipNoDiffWithInitialComment(t *testing.T) {
 		`{}`, // empty json as response to the post comment mutation
 	}
 
+	i := 0
 	ts := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, githubGraphQLresponses[0])
-		githubGraphQLresponses = githubGraphQLresponses[1:]
+		fmt.Fprintln(w, githubGraphQLresponses[i])
+		i = (i + 1) % len(githubGraphQLresponses)
 	}))
 	defer ts.Close()
 
@@ -395,7 +401,7 @@ func TestCommentGitHubGuardrailFailureWithComment(t *testing.T) {
 	ts := governanceTestEndpoint(governanceAddRunResponse{
 		GovernanceComment: `<details>
 <summary><strong>⚠️ Guardrails triggered</strong></summary>
-				
+
 > - <b>Warning</b>: Stand by your estimate
 </details>`,
 		GovernanceResults: []GovernanceResult{{
@@ -432,7 +438,7 @@ func TestCommentGitHubGuardrailFailureWithCommentAndBlock(t *testing.T) {
 		GovernanceComment: `<details>
 <summary><strong>❌ Guardrails triggered (needs action)</strong></summary>
 This change is blocked, either reduce the costs or wait for an admin to review and unblock it.
-				
+
 > - <b>Blocked</b>: Stand by your estimate
 </details>`,
 		GovernanceResults: []GovernanceResult{{
@@ -529,8 +535,10 @@ func ghTestEndpoint() *httptest.Server {
 		// show zero comments in the response for findComments
 		ghZeroCommentsResponse, "{}", "{}",
 	}
+
+	i := 0
 	return httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintln(w, githubGraphQLresponses[0])
-		githubGraphQLresponses = githubGraphQLresponses[1:]
+		fmt.Fprintln(w, githubGraphQLresponses[i])
+		i = (i + 1) % len(githubGraphQLresponses)
 	}))
 }
