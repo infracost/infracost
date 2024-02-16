@@ -9,6 +9,8 @@ import (
 	"strings"
 
 	"github.com/shopspring/decimal"
+	"golang.org/x/text/cases"
+	"golang.org/x/text/language"
 
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
@@ -388,34 +390,20 @@ func computeDiskIOPSCostComponent(region string, diskType string, diskSize float
 // guestAcceleratorCostComponent returns a cost component for Guest Accelerator usage for Compute resources.
 // Callers should be aware guestAcceleratorCostComponent returns nil if the provided guestAcceleratorType is not supported.
 func guestAcceleratorCostComponent(region string, purchaseOption string, guestAcceleratorType string, guestAcceleratorCount int64, instanceCount int64, monthlyHours *float64) *schema.CostComponent {
-	var (
-		name       string
-		descPrefix string
-	)
-
-	switch guestAcceleratorType {
-	case "nvidia-tesla-t4":
-		name = "NVIDIA Tesla T4"
-		descPrefix = "Nvidia Tesla T4 GPU"
-	case "nvidia-tesla-p4":
-		name = "NVIDIA Tesla P4"
-		descPrefix = "Nvidia Tesla P4 GPU"
-	case "nvidia-tesla-v100":
-		name = "NVIDIA Tesla V100"
-		descPrefix = "Nvidia Tesla V100 GPU"
-	case "nvidia-tesla-p100":
-		name = "NVIDIA Tesla P100"
-		descPrefix = "Nvidia Tesla P100 GPU"
-	case "nvidia-tesla-k80":
-		name = "NVIDIA Tesla K80"
-		descPrefix = "Nvidia Tesla K80 GPU"
-	case "nvidia-tesla-a100":
-		name = "NVIDIA Tesla A100"
-		descPrefix = "Nvidia Tesla A100 GPU"
-	default:
+	// From strings in format 'nvidia-tesla-a100' create:
+	// - name: 'NVIDIA Tesla A100'
+	// - descPrefix: 'Nvidia Tesla A100 GPU'
+	parts := strings.Split(guestAcceleratorType, "-")
+	if len(parts) < 2 {
 		logging.Logger.Debug().Msgf("skipping cost component because guest_accelerator.type '%s' is not supported", guestAcceleratorType)
 		return nil
 	}
+
+	caser := cases.Title(language.English)
+	rest := caser.String(strings.Join(parts[1:], " "))
+
+	name := fmt.Sprintf("%s %s", strings.ToUpper(parts[0]), rest)
+	descPrefix := fmt.Sprintf("%s %s GPU", caser.String(parts[0]), rest)
 
 	descRegex := fmt.Sprintf("/^%s running/", descPrefix)
 	if strings.ToLower(purchaseOption) == "preemptible" {

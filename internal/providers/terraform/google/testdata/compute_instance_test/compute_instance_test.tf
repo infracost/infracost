@@ -127,6 +127,27 @@ resource "google_compute_instance" "gpu" {
   }
 }
 
+resource "google_compute_instance" "gpu_l4" {
+  name         = "gpu_l4"
+  machine_type = "g2-standard-4"
+  zone         = "us-central1-a"
+
+  boot_disk {
+    initialize_params {
+      image = "centos-cloud/centos-7"
+    }
+  }
+
+  guest_accelerator {
+    type  = "nvidia-l4"
+    count = 1
+  }
+
+  network_interface {
+    network = "default"
+  }
+}
+
 resource "google_compute_instance" "preemptible_gpu" {
   name         = "preemptible_gpu"
   machine_type = "n1-standard-16"
