@@ -12,6 +12,7 @@ import (
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
 
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
 )
 
@@ -393,10 +394,16 @@ func guestAcceleratorCostComponent(region string, purchaseOption string, guestAc
 	// - name: 'NVIDIA Tesla A100'
 	// - descPrefix: 'Nvidia Tesla A100 GPU'
 	parts := strings.Split(guestAcceleratorType, "-")
-	rest := cases.Title(language.English).String(strings.Join(parts[1:], " "))
+	if len(parts) < 2 {
+		logging.Logger.Debug().Msgf("skipping cost component because guest_accelerator.type '%s' is not supported", guestAcceleratorType)
+		return nil
+	}
+
+	caser := cases.Title(language.English)
+	rest := caser.String(strings.Join(parts[1:], " "))
 
 	name := fmt.Sprintf("%s %s", strings.ToUpper(parts[0]), rest)
-	descPrefix := fmt.Sprintf("%s %s GPU", cases.Title(language.English).String(parts[0]), rest)
+	descPrefix := fmt.Sprintf("%s %s GPU", caser.String(parts[0]), rest)
 
 	descRegex := fmt.Sprintf("/^%s running/", descPrefix)
 	if strings.ToLower(purchaseOption) == "preemptible" {
