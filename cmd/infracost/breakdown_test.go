@@ -554,6 +554,16 @@ func TestBreakdownTerragruntHCLDepsOutput(t *testing.T) {
 	)
 }
 
+func TestBreakdownTerragruntIncludeDeps(t *testing.T) {
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{"breakdown", "--path",
+			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())},
+		&GoldenFileOptions{CaptureLogs: true},
+	)
+}
+
 func TestBreakdownTerragruntHCLModuleOutputForEach(t *testing.T) {
 	GoldenFileCommandTest(
 		t,

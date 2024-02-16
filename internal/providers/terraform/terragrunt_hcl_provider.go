@@ -3,6 +3,7 @@ package terraform
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"net/url"
 	"os"
@@ -15,6 +16,7 @@ import (
 	"sync"
 	"time"
 
+	goerrors "github.com/go-errors/errors"
 	tgerrors "github.com/gruntwork-io/go-commons/errors"
 	tgcliterraform "github.com/gruntwork-io/terragrunt/cli/commands/terraform"
 	tgcliinfo "github.com/gruntwork-io/terragrunt/cli/commands/terragrunt-info"
@@ -29,7 +31,6 @@ import (
 	hcl2 "github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/gohcl"
 	"github.com/hashicorp/hcl/v2/hclparse"
-	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
 	"github.com/sirupsen/logrus"
 	"github.com/zclconf/go-cty/cty"
@@ -456,6 +457,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 			return funcs
 		},
 		Parallelism: 1,
+		GetOutputs:  p.terragruntPathToValue,
 	}
 
 	howThesePathsWereFound := fmt.Sprintf("Terragrunt config file found in a subdirectory of %s", terragruntOptions.WorkingDir)
@@ -470,7 +472,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 	err = s.Run(terragruntOptions)
 	if err != nil {
 		return nil, clierror.NewCLIError(
-			errors.Errorf(
+			fmt.Errorf(
 				"%s\n%v%s",
 				"Failed to parse the Terragrunt code using the Terragrunt library:",
 				err.Error(),
@@ -907,7 +909,7 @@ func mergeListWithDependencyMap(valueMap map[string]cty.Value, pieces []string, 
 
 // fetchModuleOutputs returns the Terraform outputs from the dependencies of Terragrunt file provided in the opts input.
 func (p *TerragruntHCLProvider) fetchModuleOutputs(opts *tgoptions.TerragruntOptions) (cty.Value, error) {
-	outputs := cty.MapVal(map[string]cty.Value{
+	fallbackOutputs := cty.MapVal(map[string]cty.Value{
 		"outputs": cty.ObjectVal(map[string]cty.Value{
 			"mock": cty.StringVal("val"),
 		}),
@@ -923,46 +925,71 @@ func (p *TerragruntHCLProvider) fetchModuleOutputs(opts *tgoptions.TerragruntOpt
 		}
 
 		if mod != nil && len(mod.Dependencies) > 0 {
-			blocks, err := decodeDependencyBlocks(mod.TerragruntOptions.TerragruntConfigPath, opts, nil, nil)
+			value, err := p.decodeTerragruntDepsToValue(mod.TerragruntOptions.TerragruntConfigPath, opts)
 			if err != nil {
-				return cty.Value{}, fmt.Errorf("could not parse dependency blocks for Terragrunt file %s %w", mod.TerragruntOptions.TerragruntConfigPath, err)
+				return fallbackOutputs, err
 			}
 
-			out := map[string]cty.Value{}
-			for dir, dep := range blocks {
-				value, depErr := terragruntOutputCache.Set(dir, func() (cty.Value, error) {
-					info := p.runTerragrunt(opts.Clone(dir))
-					if info != nil && info.error != nil {
-						return cty.NilVal, fmt.Errorf("could not evaluate dependency %s at dir %s err: %w", dep.Name, dir, err)
-					}
-
-					if info == nil {
-						return cty.EmptyObjectVal, nil
-					}
-
-					return info.evaluatedOutputs, nil
-				})
-				if depErr != nil {
-					return outputs, depErr
-				}
-
-				out[dep.Name] = cty.MapVal(map[string]cty.Value{
-					"outputs": value,
-				})
-			}
-
-			if len(out) > 0 {
-				encoded, err := toCtyValue(out, generateTypeFromValuesMap(out))
-				if err == nil {
-					return encoded, nil
-				}
-
-				p.logger.Warn().Err(err).Msg("could not transform output blocks to cty type, using dummy output type")
-			}
+			return value, nil
 		}
 	}
 
-	return outputs, nil
+	return fallbackOutputs, nil
+}
+
+func (p *TerragruntHCLProvider) terragruntPathToValue(targetConfig string, opts *tgoptions.TerragruntOptions) (*cty.Value, bool, error) {
+	value, err := terragruntOutputCache.Set(targetConfig, func() (cty.Value, error) {
+		info := p.runTerragrunt(opts.Clone(targetConfig))
+		if info != nil && info.error != nil {
+			return cty.EmptyObjectVal, fmt.Errorf("could not run teragrunt path %s err: %w", targetConfig, info.error)
+		}
+
+		if info == nil {
+			return cty.EmptyObjectVal, nil
+		}
+
+		return info.evaluatedOutputs, nil
+	})
+
+	if err != nil {
+		return &cty.EmptyObjectVal, true, err
+	}
+
+	if value.RawEquals(cty.EmptyObjectVal) {
+		return &cty.EmptyObjectVal, true, nil
+	}
+
+	return &value, false, nil
+}
+
+func (p *TerragruntHCLProvider) decodeTerragruntDepsToValue(targetConfig string, opts *tgoptions.TerragruntOptions) (cty.Value, error) {
+	blocks, err := decodeDependencyBlocks(targetConfig, opts, nil, nil)
+	if err != nil {
+		return cty.EmptyObjectVal, fmt.Errorf("could not parse dependency blocks for Terragrunt file %s %w", targetConfig, err)
+	}
+
+	out := map[string]cty.Value{}
+	for dir, dep := range blocks {
+		value, _, depErr := p.terragruntPathToValue(dir, opts)
+		if depErr != nil {
+			return cty.EmptyObjectVal, depErr
+		}
+
+		out[dep.Name] = cty.MapVal(map[string]cty.Value{
+			"outputs": *value,
+		})
+	}
+
+	if len(out) > 0 {
+		encoded, err := toCtyValue(out, generateTypeFromValuesMap(out))
+		if err == nil {
+			return encoded, nil
+		}
+
+		p.logger.Warn().Err(err).Msg("could not transform output blocks to cty type, using dummy output type")
+	}
+
+	return cty.EmptyObjectVal, nil
 }
 
 func toCtyValue(val map[string]cty.Value, ty cty.Type) (v cty.Value, err error) {
@@ -1030,6 +1057,11 @@ func decodeDependencyBlocks(filename string, terragruntOptions *tgoptions.Terrag
 	}
 
 	localsAsCty, trackInclude, err := tgconfig.DecodeBaseBlocks(terragruntOptions, parser, file, filename, include, nil)
+	var withStack *goerrors.Error
+	if errors.As(err, &withStack) {
+		stack := withStack.ErrorStack()
+		return nil, fmt.Errorf("could not parse base hcl blocks %w", errors.New(stack))
+	}
 	if err != nil {
 		return nil, fmt.Errorf("could not parse base hcl blocks %w", err)
 	}
