@@ -95,6 +95,7 @@ type Evaluator struct {
 	blockBuilder   BlockBuilder
 	newSpinner     ui.SpinnerFunc
 	logger         zerolog.Logger
+	isGraph        bool
 	filteredBlocks []*Block
 }
 
@@ -111,6 +112,7 @@ func NewEvaluator(
 	blockBuilder BlockBuilder,
 	spinFunc ui.SpinnerFunc,
 	logger zerolog.Logger,
+	isGraph bool,
 ) *Evaluator {
 	ctx := NewContext(&hcl.EvalContext{
 		Functions: ExpFunctions(module.RootPath, logger),
@@ -165,11 +167,8 @@ func NewEvaluator(
 		blockBuilder:   blockBuilder,
 		newSpinner:     spinFunc,
 		logger:         l,
+		isGraph:        isGraph,
 	}
-}
-
-func (e *Evaluator) isGraphEvaluator() bool {
-	return os.Getenv("INFRACOST_GRAPH_EVALUATOR") == "true"
 }
 
 func (e *Evaluator) AddFilteredBlocks(blocks ...*Block) {
@@ -349,6 +348,7 @@ func (e *Evaluator) evaluateModules() {
 			e.blockBuilder,
 			nil,
 			e.logger,
+			e.isGraph,
 		)
 
 		moduleCall.Module, _ = moduleEvaluator.Run()
@@ -463,6 +463,7 @@ func (e *Evaluator) expandDynamicBlock(b *Block) *Block {
 		parent:      b.parent,
 		verbose:     b.verbose,
 		logger:      b.logger,
+		isGraph:     b.isGraph,
 		newMock:     b.newMock,
 		attributes:  b.attributes,
 		reference:   b.reference,
@@ -522,7 +523,7 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 			continue
 		}
 
-		if !e.isGraphEvaluator() && (block.IsCountExpanded() || !block.IsForEachReferencedExpanded(blocks) || !shouldExpandBlock(block)) {
+		if !e.isGraph && (block.IsCountExpanded() || !block.IsForEachReferencedExpanded(blocks) || !shouldExpandBlock(block)) {
 			original := block.original.GetAttribute("for_each")
 			if !original.HasChanged() {
 				expanded = append(expanded, block)
@@ -694,7 +695,7 @@ func (e *Evaluator) expandBlockCounts(blocks Blocks) Blocks {
 			continue
 		}
 
-		if !e.isGraphEvaluator() && (block.IsCountExpanded() || !shouldExpandBlock(block)) {
+		if !e.isGraph && (block.IsCountExpanded() || !shouldExpandBlock(block)) {
 			original := block.original.GetAttribute("count")
 			if !original.HasChanged() {
 				expanded = append(expanded, block)

@@ -256,6 +256,14 @@ func OptionWithSpinner(f ui.SpinnerFunc) Option {
 	}
 }
 
+// OptionGraphEvaluator sets the Parser to use the experimental graph evaluator.
+func OptionGraphEvaluator() Option {
+	return func(p *Parser) {
+		p.isGraph = true
+		p.blockBuilder.isGraph = true
+	}
+}
+
 type DetectedProject interface {
 	ProjectName() string
 	RelativePath() string
@@ -277,6 +285,7 @@ type Parser struct {
 	newSpinner            ui.SpinnerFunc
 	remoteVariablesLoader *RemoteVariablesLoader
 	logger                zerolog.Logger
+	isGraph               bool
 	hasChanges            bool
 	moduleSuffix          string
 	envMatcher            *EnvFileMatcher
@@ -421,12 +430,13 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 		p.blockBuilder,
 		p.newSpinner,
 		p.logger,
+		p.isGraph,
 	)
 
 	var root *Module
 
 	// Graph evaluation
-	if evaluator.isGraphEvaluator() {
+	if evaluator.isGraph {
 		// we use the base zerolog log here so that it's consistent with the spinner logs
 		log.Info().Msgf("Building project with experimental graph runner")
 

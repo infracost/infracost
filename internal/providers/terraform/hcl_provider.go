@@ -157,6 +157,10 @@ func NewHCLProvider(ctx *config.ProjectContext, rootPath hcl.RootPath, config *H
 		}
 	}
 
+	if ctx.RunContext.Config.GraphEvaluator {
+		options = append(options, hcl.OptionGraphEvaluator())
+	}
+
 	rootPath.Path = initialPath
 	return &HCLProvider{
 		policyClient:   policyClient,

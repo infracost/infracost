@@ -54,8 +54,9 @@ func GoldenFileCommandTest(t *testing.T, testName string, args []string, testOpt
 	})
 
 	t.Run("HCL Graph", func(t *testing.T) {
-		t.Setenv("INFRACOST_GRAPH_EVALUATOR", "true")
-
+		ctxOptions = append(ctxOptions, func(ctx *config.RunContext) {
+			ctx.Config.GraphEvaluator = true
+		})
 		goldenFileCommandTest(t, testName, args, testOptions, true, ctxOptions...)
 	})
 

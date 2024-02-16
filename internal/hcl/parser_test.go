@@ -1636,8 +1636,6 @@ resource "baz" "bat" {
 }
 
 func Test_ObjectLiteralIsMockedCorrectly(t *testing.T) {
-	t.Setenv("INFRACOST_GRAPH_EVALUATOR", "true")
-
 	path := createTestFileWithModule(`
 module "mod1" {
   source = "../module"
@@ -1666,11 +1664,13 @@ resource "aws_instance" "example" {
 
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
+
 	parser := NewParser(
 		RootPath{Path: path},
 		CreateEnvFileMatcher([]string{}),
 		loader,
 		logger,
+		OptionGraphEvaluator(),
 	)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
@@ -1696,12 +1696,10 @@ resource "aws_instance" "example" {
 }
 
 func Test_ModuleTernaryWithMockedValue(t *testing.T) {
-	t.Setenv("INFRACOST_GRAPH_EVALUATOR", "true")
-
 	path := createTestFileWithModule(`
 module "mod1" {
   source = "../mod"
-  count  = 1 
+  count  = 1
   var1   = "don't create"
 }
 
@@ -1726,6 +1724,7 @@ resource "aws_instance" "example" {
 		CreateEnvFileMatcher([]string{}),
 		loader,
 		logger,
+		OptionGraphEvaluator(),
 	)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
@@ -1743,8 +1742,6 @@ resource "aws_instance" "example" {
 }
 
 func Test_VariableLengthWhenMocked(t *testing.T) {
-	t.Setenv("INFRACOST_GRAPH_EVALUATOR", "true")
-
 	path := createTestFile("main.tf", `
 variable "my_config" {
  type    = any
@@ -1765,6 +1762,7 @@ resource "aws_instance" "example" {
 		CreateEnvFileMatcher([]string{}),
 		loader,
 		logger,
+		OptionGraphEvaluator(),
 	)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)

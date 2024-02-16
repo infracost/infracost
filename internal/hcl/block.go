@@ -281,8 +281,10 @@ type Block struct {
 	// parent is the parent block if this is a child block.
 	parent *Block
 	// verbose determines whether the block uses verbose debug logging.
-	verbose    bool
-	logger     zerolog.Logger
+	verbose bool
+	logger  zerolog.Logger
+	// isGraph is a flag that indicates if the attribute should be evaluated with the graph evaluation
+	isGraph    bool
 	newMock    func(attr *Attribute) cty.Value
 	attributes []*Attribute
 	reference  *Reference
@@ -298,6 +300,7 @@ type BlockBuilder struct {
 	SetAttributes []SetAttributesFunc
 	Logger        zerolog.Logger
 	HCLParser     *modules.SharedHCLParser
+	isGraph       bool
 }
 
 // NewBlock returns a Block with Context and child Blocks initialised.
@@ -319,6 +322,7 @@ func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.B
 			rootPath:    rootPath,
 			childBlocks: make(Blocks, len(body.Blocks)),
 			verbose:     isLoggingVerbose,
+			isGraph:     b.isGraph,
 			newMock:     b.MockFunc,
 			parent:      parent,
 		}
@@ -352,6 +356,7 @@ func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.B
 			moduleBlock: moduleBlock,
 			rootPath:    rootPath,
 			verbose:     isLoggingVerbose,
+			isGraph:     b.isGraph,
 			newMock:     b.MockFunc,
 		}
 		block.setLogger(b.Logger)
@@ -370,6 +375,7 @@ func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.B
 		rootPath:    rootPath,
 		childBlocks: make(Blocks, len(content.Blocks)),
 		verbose:     isLoggingVerbose,
+		isGraph:     b.isGraph,
 		newMock:     b.MockFunc,
 	}
 
@@ -858,6 +864,7 @@ func (b *Block) GetAttributes() []*Attribute {
 				Logger: b.logger.With().Str(
 					"attribute_name", k,
 				).Logger(),
+				isGraph: b.isGraph,
 			})
 			continue
 		}
@@ -870,6 +877,7 @@ func (b *Block) GetAttributes() []*Attribute {
 			Logger: b.logger.With().Str(
 				"attribute_name", hclAttributes[k].Name,
 			).Logger(),
+			isGraph: b.isGraph,
 		})
 	}
 
@@ -927,6 +935,7 @@ func (b *Block) syntheticAttribute(name string, val cty.Value) *Attribute {
 		Logger: b.logger.With().Str(
 			"attribute_name", name,
 		).Logger(),
+		isGraph: b.isGraph,
 	}
 }
 

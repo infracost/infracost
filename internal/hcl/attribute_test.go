@@ -113,8 +113,6 @@ func TestAttribute_AsString(t *testing.T) {
 }
 
 func TestAttributeValueWithIncompleteContextAndConditionalShouldNotPanic(t *testing.T) {
-	t.Setenv("INFRACOST_GRAPH_EVALUATOR", "true")
-
 	p := hclparse.NewParser()
 	f, diags := p.ParseHCL([]byte(`
 locals {
@@ -150,7 +148,8 @@ locals {
 		Ctx: &Context{ctx: &hcl.EvalContext{
 			Variables: map[string]cty.Value{},
 		}},
-		Logger: discard,
+		Logger:  discard,
+		isGraph: true,
 	}
 
 	attr := Attribute{
@@ -171,6 +170,7 @@ locals {
 		},
 		Verbose: false,
 		Logger:  logger,
+		isGraph: true,
 	}
 
 	v := attr.Value()
