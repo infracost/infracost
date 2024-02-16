@@ -2,7 +2,6 @@ package hcl
 
 import (
 	"fmt"
-	"os"
 	"runtime/debug"
 	"strings"
 
@@ -45,6 +44,8 @@ type Attribute struct {
 	// Verbose defines if the attribute should log verbose diagnostics messages to debug.
 	Verbose bool
 	Logger  zerolog.Logger
+	// isGraph is a flag that indicates if the attribute should be evaluated with the graph evaluation
+	isGraph bool
 	// newMock generates a mock value for the attribute if it's value is missing.
 	newMock       func(attr *Attribute) cty.Value
 	previousValue cty.Value
@@ -129,7 +130,7 @@ func (attr *Attribute) Value() cty.Value {
 
 	attr.Logger.Debug().Msg("fetching attribute value")
 	var val cty.Value
-	if os.Getenv("INFRACOST_GRAPH_EVALUATOR") == "true" {
+	if attr.isGraph {
 		val = attr.graphValue()
 	} else {
 		val = attr.value(0)
@@ -155,7 +156,7 @@ func (attr *Attribute) HasChanged() (change bool) {
 
 	previous := attr.previousValue
 	var current cty.Value
-	if os.Getenv("INFRACOST_GRAPH_EVALUATOR") == "true" {
+	if attr.isGraph {
 		current = attr.graphValue()
 	} else {
 		current = attr.value(0)

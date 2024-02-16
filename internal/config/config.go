@@ -118,6 +118,7 @@ type Config struct {
 	EnableCloud               *bool `yaml:"enable_cloud,omitempty" envconfig:"ENABLE_CLOUD"`
 	EnableCloudUpload         *bool `yaml:"enable_cloud_upload,omitempty" envconfig:"ENABLE_CLOUD_UPLOAD"`
 	DisableHCLParsing         bool  `yaml:"disable_hcl_parsing,omitempty" envconfig:"DISABLE_HCL_PARSING"`
+	GraphEvaluator            bool  `yaml:"graph_evaluator,omitempty" envconfig:"GRAPH_EVALUATOR"`
 
 	TLSInsecureSkipVerify *bool  `envconfig:"TLS_INSECURE_SKIP_VERIFY"`
 	TLSCACertFile         string `envconfig:"TLS_CA_CERT_FILE"`

@@ -127,6 +127,7 @@ func (v *VertexModuleCall) expand(e *Evaluator, b *Block, mutex *sync.Mutex) ([]
 			e.blockBuilder,
 			nil,
 			e.logger,
+			e.isGraph,
 		)
 
 		v.moduleConfigs.Add(unexpandedName, ModuleConfig{

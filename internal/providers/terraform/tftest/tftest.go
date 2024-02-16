@@ -156,27 +156,32 @@ func ResourceTests(t *testing.T, tf string, usage schema.UsageMap, checks []test
 	ResourceTestsForTerraformProject(t, project, usage, checks)
 }
 
-func ResourceTestsForTerraformProject(t *testing.T, tfProject TerraformProject, usage schema.UsageMap, checks []testutil.ResourceCheck) {
+func ResourceTestsForTerraformProject(t *testing.T, tfProject TerraformProject, usage schema.UsageMap, checks []testutil.ResourceCheck, ctxOptions ...func(ctx *config.RunContext)) {
 	t.Run("HCL", func(t *testing.T) {
-		resourceTestsForTfProject(t, "hcl", tfProject, usage, checks)
+		resourceTestsForTfProject(t, "hcl", tfProject, usage, checks, ctxOptions...)
 	})
 
 	t.Run("HCL Graph", func(t *testing.T) {
-		t.Setenv("INFRACOST_GRAPH_EVALUATOR", "true")
-
-		resourceTestsForTfProject(t, "hcl", tfProject, usage, checks)
+		ctxOptions = append(ctxOptions, func(ctx *config.RunContext) {
+			ctx.Config.GraphEvaluator = true
+		})
+		resourceTestsForTfProject(t, "hcl", tfProject, usage, checks, ctxOptions...)
 	})
 
 	t.Run("Terraform CLI", func(t *testing.T) {
-		resourceTestsForTfProject(t, "terraform", tfProject, usage, checks)
+		resourceTestsForTfProject(t, "terraform", tfProject, usage, checks, ctxOptions...)
 	})
 }
 
-func resourceTestsForTfProject(t *testing.T, pName string, tfProject TerraformProject, usage schema.UsageMap, checks []testutil.ResourceCheck) {
+func resourceTestsForTfProject(t *testing.T, pName string, tfProject TerraformProject, usage schema.UsageMap, checks []testutil.ResourceCheck, ctxOptions ...func(ctx *config.RunContext)) {
 	t.Helper()
 
 	runCtx, err := config.NewRunContextFromEnv(context.Background())
 	assert.NoError(t, err)
+
+	for _, ctxOption := range ctxOptions {
+		ctxOption(runCtx)
+	}
 
 	projects := loadResources(t, pName, tfProject, runCtx, usage)
 
@@ -204,15 +209,16 @@ func GoldenFileResourceTests(t *testing.T, testName string) {
 	GoldenFileResourceTestsWithOpts(t, testName, DefaultGoldenFileOptions())
 }
 
-func GoldenFileResourceTestsWithOpts(t *testing.T, testName string, options *GoldenFileOptions) {
+func GoldenFileResourceTestsWithOpts(t *testing.T, testName string, options *GoldenFileOptions, ctxOptions ...func(ctx *config.RunContext)) {
 	t.Run("HCL", func(t *testing.T) {
-		goldenFileResourceTestWithOpts(t, "hcl", testName, options)
+		goldenFileResourceTestWithOpts(t, "hcl", testName, options, ctxOptions...)
 	})
 
 	t.Run("HCL Graph", func(t *testing.T) {
-		t.Setenv("INFRACOST_GRAPH_EVALUATOR", "true")
-
-		goldenFileResourceTestWithOpts(t, "hcl", testName, options)
+		ctxOptions = append(ctxOptions, func(ctx *config.RunContext) {
+			ctx.Config.GraphEvaluator = true
+		})
+		goldenFileResourceTestWithOpts(t, "hcl", testName, options, ctxOptions...)
 	})
 
 	if options != nil && options.IgnoreCLI {
@@ -220,18 +226,23 @@ func GoldenFileResourceTestsWithOpts(t *testing.T, testName string, options *Gol
 	}
 
 	t.Run("Terraform CLI", func(t *testing.T) {
-		goldenFileResourceTestWithOpts(t, "terraform", testName, options)
+		goldenFileResourceTestWithOpts(t, "terraform", testName, options, ctxOptions...)
 	})
 }
 
-func GoldenFileHCLResourceTestsWithOpts(t *testing.T, testName string, options *GoldenFileOptions) {
-	goldenFileResourceTestWithOpts(t, "hcl", testName, options)
+func GoldenFileHCLResourceTestsWithOpts(t *testing.T, testName string, options *GoldenFileOptions, ctxOptions ...func(ctx *config.RunContext)) {
+	goldenFileResourceTestWithOpts(t, "hcl", testName, options, ctxOptions...)
 }
 
-func goldenFileResourceTestWithOpts(t *testing.T, pName string, testName string, options *GoldenFileOptions) {
+func goldenFileResourceTestWithOpts(t *testing.T, pName string, testName string, options *GoldenFileOptions, ctxOptions ...func(ctx *config.RunContext)) {
 	t.Helper()
 
 	runCtx, err := config.NewRunContextFromEnv(context.Background())
+	assert.NoError(t, err)
+
+	for _, ctxOption := range ctxOptions {
+		ctxOption(runCtx)
+	}
 
 	var logBuf *bytes.Buffer
 	if options != nil && options.CaptureLogs {
@@ -328,6 +339,7 @@ func loadResources(t *testing.T, pName string, tfProject TerraformProject, runCt
 	for _, project := range projects {
 		project.Name = strings.ReplaceAll(project.Name, tfdir, t.Name())
 		project.Name = strings.ReplaceAll(project.Name, "/Terraform_CLI", "")
+		project.Name = strings.ReplaceAll(project.Name, "/HCL_Graph", "")
 		project.Name = strings.ReplaceAll(project.Name, "/HCL", "")
 		project.BuildResources(schema.UsageMap{})
 	}
@@ -348,25 +360,30 @@ func RunCostCalculations(runCtx *config.RunContext, projects []*schema.Project) 
 	return projects, nil
 }
 
-func GoldenFileUsageSyncTest(t *testing.T, testName string) {
+func GoldenFileUsageSyncTest(t *testing.T, testName string, ctxOptions ...func(ctx *config.RunContext)) {
 	t.Run("HCL", func(t *testing.T) {
 		goldenFileSyncTest(t, "hcl", testName)
 	})
 
 	t.Run("HCL Graph", func(t *testing.T) {
-		t.Setenv("INFRACOST_GRAPH_EVALUATOR", "true")
-
-		goldenFileSyncTest(t, "hcl", testName)
+		ctxOptions = append(ctxOptions, func(ctx *config.RunContext) {
+			ctx.Config.GraphEvaluator = true
+		})
+		goldenFileSyncTest(t, "hcl", testName, ctxOptions...)
 	})
 
 	t.Run("Terraform CLI", func(t *testing.T) {
-		goldenFileSyncTest(t, "terraform", testName)
+		goldenFileSyncTest(t, "terraform", testName, ctxOptions...)
 	})
 }
 
-func goldenFileSyncTest(t *testing.T, pName, testName string) {
+func goldenFileSyncTest(t *testing.T, pName, testName string, ctxOptions ...func(ctx *config.RunContext)) {
 	runCtx, err := config.NewRunContextFromEnv(context.Background())
 	require.NoError(t, err)
+
+	for _, ctxOption := range ctxOptions {
+		ctxOption(runCtx)
+	}
 
 	tfProjectData, err := os.ReadFile(filepath.Join("testdata", testName, testName+".tf"))
 	require.NoError(t, err)
