@@ -32,8 +32,8 @@ func (v *VertexModuleExit) Visit(mutex *sync.Mutex) error {
 
 	for _, moduleInstance := range moduleInstances {
 		e := moduleInstance.evaluator
-		e.module.Blocks = e.filteredBlocks
 		e.module = *e.collectModules()
+		e.module.Blocks = e.filteredBlocks
 
 		modCall := moduleInstance.moduleCall
 		if modCall == nil {
