@@ -978,7 +978,19 @@ func (attr *Attribute) referencesFromExpression(expression hcl.Expression) []*Re
 		}
 		return refs
 	case *hclsyntax.ObjectConsKeyExpr:
-		refs = append(refs, attr.referencesFromExpression(t.Wrapped)...)
+		// If the traversal is of length one it is treated as a string by Terraform.
+		// Otherwise it could be a reference. For example:
+		//
+		// providers {
+		//   aws = aws.alias
+		// }
+		//
+		// In this case the traversal of the key expression would be of length 1 and
+		// we would treat it as a string.
+		wrapped, ok := t.Wrapped.(*hclsyntax.ScopeTraversalExpr)
+		if ok && len(wrapped.Traversal) > 1 {
+			refs = append(refs, attr.referencesFromExpression(t.Wrapped)...)
+		}
 		return refs
 	case *hclsyntax.SplatExpr:
 		refs = append(refs, attr.referencesFromExpression(t.Source)...)
