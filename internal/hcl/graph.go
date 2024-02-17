@@ -162,11 +162,49 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 	}
 
 	// Build a set of all the provider keys so we can look up
-	// provider references later
-	providerKeys := make(map[string]struct{})
+	// provider references later.
+
+	// First add a mapping for all the explicit providers
+	providerKeys := make(map[string]string)
 	for _, vertex := range vertexes {
 		if _, ok := vertex.(*VertexProvider); ok {
-			providerKeys[vertex.ID()] = struct{}{}
+			providerKeys[vertex.ID()] = vertex.ID()
+		}
+	}
+
+	// Also add a mapping for all the provider attributes in module calls
+	// so we can look up the providers based on their alias later.
+	for _, vertex := range vertexes {
+		if v, ok := vertex.(*VertexModuleCall); ok {
+			// Evaluate just the provider block
+			attr := v.block.GetAttribute("providers")
+			if attr != nil {
+				// This is too hacky, so we should find a better way to do this.
+				//
+				// attr.Value() doesn't evaluate the expression properly since it tries to mock out
+				// the provider references. We should evaluate this expression manually, to find the names
+				// of the provider mappings. In the meantime, we can just use the references to find the
+				// provider names, but this only works if the keys don't contain a '.' character.
+				refs := attr.AllReferences()
+				i := 0
+				for k := range attr.Value().AsValueMap() {
+					// We want the key to be the full address of the provider in the target module
+					key := fmt.Sprintf("%s.provider.%s", stripModuleCallPrefix(vertex.ID()), k)
+
+					// We want the value to be the full address of the referenced provider in the parent
+					// module
+					if len(refs) > i {
+						v := refs[i].String()
+						mappedVal := fmt.Sprintf("provider.%s", v)
+						if vertex.ModuleAddress() != "" {
+							mappedVal = fmt.Sprintf("%s.%s", vertex.ModuleAddress(), mappedVal)
+						}
+						providerKeys[key] = mappedVal
+					}
+
+					i += 1
+				}
+			}
 		}
 	}
 
@@ -244,8 +282,8 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 
 				for modAddress != "" {
 					k := fmt.Sprintf("%s.%s", modAddress, srcID)
-					if _, ok := providerKeys[k]; ok {
-						srcID = k
+					if v, ok := providerKeys[k]; ok {
+						srcID = v
 						break
 					}
 

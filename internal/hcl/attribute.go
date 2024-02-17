@@ -981,12 +981,16 @@ func (attr *Attribute) referencesFromExpression(expression hcl.Expression) []*Re
 		// If the traversal is of length one it is treated as a string by Terraform.
 		// Otherwise it could be a reference. For example:
 		//
-		// providers {
+		// providers = {
 		//   aws = aws.alias
 		// }
 		//
 		// In this case the traversal of the key expression would be of length 1 and
 		// we would treat it as a string.
+		//
+		// TODO: Although this helps, I think we still need some way of totally ignoring keys for
+		// the providers attribute of module calls since they can contain a '.' and therefore have
+		// a traversal, but are a special case that should be treated as strings.
 		wrapped, ok := t.Wrapped.(*hclsyntax.ScopeTraversalExpr)
 		if ok && len(wrapped.Traversal) > 1 {
 			refs = append(refs, attr.referencesFromExpression(t.Wrapped)...)
