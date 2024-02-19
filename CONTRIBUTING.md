@@ -117,7 +117,7 @@ Working on Azure resources requires Azure creds as the Azure Terraform provider 
 1. Use a browser extension like [modheader](https://bewisse.com/modheader/help/) to allow you to specify additional headers in your browser.
 2. Go to https://pricing.api.infracost.io/graphql
 3. Set your `X-API-Key` using the browser extension
-4. Run GraphQL queries to find the correct products. Examples can be found here: https://www.infracost.io/docs/cloud_pricing_api/overview/
+4. Run GraphQL queries to find the correct products. Examples can be found here: https://www.infracost.io/docs/supported_resources/cloud_pricing_api/
 
 The GraphQL pricing API limits the number of results returned to 1000, which can limit its usefulness for exploring the data. AWS use many acronyms so be sure to search for those too, e.g. "ES" returns "AmazonES" for ElasticSearch.
 
