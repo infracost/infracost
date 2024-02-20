@@ -1312,6 +1312,12 @@ func (p *ProjectLocator) shallowDecodeTerraformBlocks(fullPath string, files map
 	var hasTerraformBackendBlock bool
 
 	for _, file := range files {
+		// file can potential be nil if it could not be opened or read when loading.
+		// This can happen if the user runs against a Terraform project with invalid JSON files.
+		if file == nil {
+			continue
+		}
+
 		body, content, diags := file.Body.PartialContent(terraformAndProviderBlocks)
 		if diags != nil && diags.HasErrors() {
 			p.logger.Warn().Err(diags).Msgf("skipping building module information for file %s as failed to get partial body contents", file)
