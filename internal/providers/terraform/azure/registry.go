@@ -254,12 +254,25 @@ var FreeResources = []string{
 	// Azure CDN
 	"azurerm_cdn_profile",
 
+	// Azure Consumption
+	"azurerm_consumption_budget_management_group",
+	"azurerm_consumption_budget_resource_group",
+	"azurerm_consumption_budget_subscription",
+
 	// Azure CosmosDB
 	"azurerm_cosmosdb_account",
 	"azurerm_cosmosdb_notebook_workspace",
 	"azurerm_cosmosdb_sql_stored_procedure",
 	"azurerm_cosmosdb_sql_trigger",
 	"azurerm_cosmosdb_sql_user_defined_function",
+
+	// Azure Cost Management
+	"azurerm_cost_anomaly_alert",
+	"azurerm_cost_management_scheduled_action",
+	"azurerm_resource_group_cost_management_export",
+	"azurerm_resource_group_cost_management_view",
+	"azurerm_subscription_cost_management_export",
+	"azurerm_subscription_cost_management_view",
 
 	// Azure DNS
 	"azurerm_private_dns_zone_virtual_network_link",
@@ -489,6 +502,9 @@ var FreeResources = []string{
 	"azurerm_policy_definition",
 	"azurerm_policy_remediation",
 	"azurerm_policy_set_definition",
+	"azurerm_subscription_policy_assignment",
+	"azurerm_subscription_policy_exemption",
+	"azurerm_subscription_policy_remediation",
 
 	// Azure Portal
 	"azurerm_dashboard",
@@ -585,6 +601,10 @@ var FreeResources = []string{
 	// Azure Synapse Analytics
 	"azurerm_synapse_firewall_rule",
 	"azurerm_synapse_private_link_hub",
+
+	// Azure Virtual Hub
+	"azurerm_virtual_hub_route_table",
+	"azurerm_virtual_hub_route_table_route",
 
 	// Azure Virtual Machines
 	"azurerm_virtual_machine_data_disk_attachment",

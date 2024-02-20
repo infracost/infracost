@@ -530,6 +530,8 @@ var FreeResources = []string{
 	"aws_vpc_peering_connection",
 	"aws_vpc_peering_connection_accepter",
 	"aws_vpc_peering_connection_options",
+	"aws_vpc_security_group_ingress_rule",
+	"aws_vpc_security_group_egress_rule",
 	"aws_vpn_connection_route",
 	"aws_vpn_gateway",
 	"aws_vpn_gateway_attachment",
