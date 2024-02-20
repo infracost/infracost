@@ -427,7 +427,7 @@ func (e *Evaluator) expandDynamicBlock(b *Block) *Block {
 		// for each expanded dynamic block add the generated "content" as a
 		// new child block into the parent block.
 		expanded := e.expandBlockForEaches([]*Block{child})
-		for _, ex := range expanded {
+		for i, ex := range expanded {
 			content := ex.GetChildBlock("content")
 			if content == nil {
 				continue
@@ -439,7 +439,7 @@ func (e *Evaluator) expandDynamicBlock(b *Block) *Block {
 			content.SetType(blockName)
 
 			for attrName, attr := range content.AttributesAsMap() {
-				b.context.Root().SetByDot(attr.Value(), fmt.Sprintf("%s.%s.%s", b.Reference().String(), blockName, attrName))
+				b.context.Root().SetByDot(attr.Value(), fmt.Sprintf("%s.%s.%d.%s", b.Reference().String(), blockName, i, attrName))
 			}
 
 			newChildBlocks = append(newChildBlocks, content)

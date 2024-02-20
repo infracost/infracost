@@ -1776,6 +1776,54 @@ resource "aws_instance" "example" {
 	)
 }
 
+func Test_DynamicBlockExpandsToCorrectLength(t *testing.T) {
+	path := createTestFile("main.tf", `
+variable "my_config" {
+  default = [
+    {"location": "eu1"}, 
+    {"location": "eu2"}
+  ]
+}
+
+resource "aws_instance" "dynamic" {
+  dynamic "block" {
+    for_each = var.my_config
+    content {
+      location = block.value.location
+    }
+  }
+}
+
+resource "aws_instance" "example" {
+  tags = {
+    one = aws_instance.dynamic.block[0].location
+    two = aws_instance.dynamic.block[1].location
+  }
+}
+`,
+	)
+
+	logger := newDiscardLogger()
+	loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
+	parser := NewParser(
+		RootPath{Path: filepath.Dir(path)},
+		CreateEnvFileMatcher([]string{}),
+		loader,
+		logger,
+		OptionGraphEvaluator(),
+	)
+	module, err := parser.ParseDirectory()
+	require.NoError(t, err)
+
+	resource := module.Blocks.Matching(BlockMatcher{Label: "aws_instance.example"})
+	assertBlockEqualsJSON(
+		t,
+		`{"tags":{"one":"eu1", "two":"eu2"}}`,
+		resource.Values(),
+		"id", "arn", "self_link", "name",
+	)
+}
+
 func BenchmarkParserEvaluate(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		b.StopTimer()
