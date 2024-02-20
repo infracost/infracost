@@ -1,7 +1,6 @@
 package modules
 
 import (
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -165,17 +164,6 @@ func (d *Disco) DownloadLocation(moduleURL RegistryURL, version string) (string,
 func newRetryableClient() *retryablehttp.Client {
 	httpClient := retryablehttp.NewClient()
 	httpClient.Logger = &apiclient.LeveledLogger{Logger: logging.Logger.With().Str("library", "retryablehttp").Logger()}
-	httpClient.CheckRetry = func(ctx context.Context, resp *http.Response, err error) (bool, error) {
-		if ctx.Err() != nil {
-			return false, ctx.Err()
-		}
-
-		if resp.StatusCode == http.StatusTooManyRequests {
-			return true, nil
-		}
-
-		return false, err
-	}
 	return httpClient
 }
 
