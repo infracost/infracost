@@ -25,6 +25,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMBastionHostRegistryItem(),
 	GetAzureRMCDNEndpointRegistryItem(),
 	getContainerRegistryRegistryItem(),
+	getCosmosDBAccountRegistryItem(),
 	GetAzureRMCosmosdbCassandraKeyspaceRegistryItem(),
 	GetAzureRMCosmosdbCassandraTableRegistryItem(),
 	GetAzureRMCosmosdbGremlinDatabaseRegistryItem(),
@@ -260,7 +261,6 @@ var FreeResources = []string{
 	"azurerm_consumption_budget_subscription",
 
 	// Azure CosmosDB
-	"azurerm_cosmosdb_account",
 	"azurerm_cosmosdb_notebook_workspace",
 	"azurerm_cosmosdb_sql_stored_procedure",
 	"azurerm_cosmosdb_sql_trigger",
