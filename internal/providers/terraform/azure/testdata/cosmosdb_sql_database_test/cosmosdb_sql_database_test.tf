@@ -118,3 +118,10 @@ resource "azurerm_cosmosdb_sql_database" "serverless" {
   resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
   account_name        = azurerm_cosmosdb_account.example.name
 }
+
+resource "azurerm_cosmosdb_sql_database" "account_by_name" {
+  name                = "tfex-cosmos-account-by-name"
+  resource_group_name = azurerm_cosmosdb_account.example.resource_group_name
+  account_name        = "tfex-cosmosdb-account"
+  throughput          = 500
+}
