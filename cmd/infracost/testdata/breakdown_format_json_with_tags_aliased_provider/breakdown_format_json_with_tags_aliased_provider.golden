@@ -158,7 +158,7 @@
           {
             "name": "module.mymod_own.module.mysub_implicit.aws_sqs_queue.sqs_withTag_mysub_implicit",
             "tags": {
-              "DefaultNotOverride": "defaultnotoverride-aws",
+              "DefaultNotOverride": "defaultnotoverride-own-provider",
               "DefaultOverride": "sqs-def",
               "ResourceTag": "sqs-hi"
             }
@@ -166,7 +166,7 @@
           {
             "name": "module.mymod_own.module.mysub_implicit.module.mysubsub_implict.aws_sqs_queue.sqs_withTag_mysubsub_implict",
             "tags": {
-              "DefaultNotOverride": "defaultnotoverride-aws",
+              "DefaultNotOverride": "defaultnotoverride-own-provider",
               "DefaultOverride": "sqs-def",
               "ResourceTag": "sqs-hi"
             }
@@ -241,7 +241,7 @@
           }
         ]
       },
-      "name": "infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags_aliased_provider"
+      "name": "infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags_aliased_provider/project"
     }
   ]
 }

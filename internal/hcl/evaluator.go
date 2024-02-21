@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/hashicorp/hcl/v2"
@@ -994,25 +995,48 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 	}
 
 	providers := map[string]cty.Value{}
+	// inherit any providers from the providers from the parent module
+	for key, provider := range e.module.Providers {
+		providers[key] = provider
+	}
+
 	providerBlocks := e.getValuesByBlockType("provider")
 	for key, provider := range providerBlocks.AsValueMap() {
 		providers[key] = provider
 	}
-	// inherit any providers from the providers block from the parent module
-	for key, provider := range e.module.Providers {
-		providers[key] = provider
+
+	// adjust the providers based on the module.providers mapping
+	providerAttr := b.GetAttribute("providers")
+	if providerAttr != nil {
+		mappedProviders := providerAttr.ProvidersValue().AsValueMap()
+
+		// sort the map keys to ensure that we always populate root providers (e.g. "aws") before
+		// aliased ones ("aws.my_alias")
+		keys := make([]string, 0, len(mappedProviders))
+		for k := range mappedProviders {
+			keys = append(keys, k)
+		}
+		slices.Sort(keys)
+
+		for _, k := range keys {
+			split := strings.SplitN(k, ".", 2)
+			if len(split) == 2 {
+				parentMap := map[string]cty.Value{}
+				if parent, ok := providers[split[0]]; ok {
+					parentMap = parent.AsValueMap()
+				}
+				parentMap[split[1]] = mappedProviders[k]
+				providers[split[0]] = cty.ObjectVal(parentMap)
+			} else {
+				providers[k] = mappedProviders[k]
+			}
+		}
 	}
 
 	var source string
 
 	attrs := b.AttributesAsMap()
 	for _, attr := range attrs {
-		if attr.Name() == "providers" {
-			val := attr.Value()
-			if val.Type().IsObjectType() && val.IsKnown() {
-				providers = attr.Value().AsValueMap()
-			}
-		}
 		if attr.Name() == "source" {
 			source = attr.AsString()
 		}

@@ -1,6 +1,7 @@
 package hcl
 
 import (
+	"bytes"
 	"fmt"
 	"runtime/debug"
 	"strings"
@@ -138,6 +139,44 @@ func (attr *Attribute) Value() cty.Value {
 	attr.previousValue = val
 
 	return val
+}
+
+// ProvidersValue retrieves the value of the attribute with special handling need for module.providers
+// blocks: Keys in the providers block are converted to literal values, then the attr.Value() is returned.
+func (attr *Attribute) ProvidersValue() cty.Value {
+	if origExpr, ok := attr.HCLAttr.Expr.(*hclsyntax.ObjectConsExpr); ok {
+		newExpr := &hclsyntax.ObjectConsExpr{}
+
+		for _, item := range origExpr.Items {
+			if origKeyExpr, ok := item.KeyExpr.(*hclsyntax.ObjectConsKeyExpr); ok {
+				buf := bytes.Buffer{}
+				for _, tr := range origKeyExpr.AsTraversal() {
+					switch step := tr.(type) {
+					case hcl.TraverseRoot:
+						buf.WriteString(step.Name)
+					case hcl.TraverseAttr:
+						buf.WriteString(".")
+						buf.WriteString(step.Name)
+					}
+				}
+
+				literalKey := &hclsyntax.LiteralValueExpr{
+					Val: cty.StringVal(buf.String()),
+				}
+
+				newExpr.Items = append(newExpr.Items, hclsyntax.ObjectConsItem{
+					KeyExpr:   literalKey,
+					ValueExpr: item.ValueExpr,
+				})
+			} else {
+				newExpr.Items = append(newExpr.Items, item)
+			}
+		}
+
+		attr.HCLAttr.Expr = newExpr
+	}
+
+	return attr.Value()
 }
 
 // HasChanged returns if the Attribute Value has changed since Value was last called.
