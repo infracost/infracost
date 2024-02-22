@@ -973,6 +973,19 @@ func TestBreakdownWithDeepMergeModule(t *testing.T) {
 	)
 }
 
+func TestBreakdownWithNestedProviderAliases(t *testing.T) {
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path",
+			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+		},
+		nil,
+	)
+}
+
 func TestBreakdownWithMultipleProviders(t *testing.T) {
 	GoldenFileCommandTest(
 		t,
