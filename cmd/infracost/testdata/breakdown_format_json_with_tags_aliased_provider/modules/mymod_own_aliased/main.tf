@@ -16,7 +16,7 @@ provider "aws" {
 }
 
 resource "aws_sqs_queue" "sqs_withTags_mymod_own_aliased" {
-  name = "sqs_withTags_mymod_own_aliased"
+  name     = "sqs_withTags_mymod_own_aliased"
   provider = aws.own_aliased
 
   tags = {
