@@ -1057,21 +1057,21 @@
               }
             ],
             "tags": {
-              "Name": "aft-backend-tags-mock",
+              "Name": "aft-backend-REGEX_FILTER",
               "managed_by": "AFT"
             }
           },
           {
             "name": "module.aft.module.aft_backend.aws_kms_key.encrypt-primary-region",
             "tags": {
-              "Name": "aft-backend-tags-mock-primary-region-kms-key",
+              "Name": "aft-backend-REGEX_FILTER-primary-region-kms-key",
               "managed_by": "AFT"
             }
           },
           {
             "name": "module.aft.module.aft_backend.aws_kms_key.encrypt-secondary-region[0]",
             "tags": {
-              "Name": "aft-backend-tags-mock-secondary-region-kms-key",
+              "Name": "aft-backend-REGEX_FILTER-secondary-region-kms-key",
               "managed_by": "AFT"
             }
           },
@@ -1083,7 +1083,7 @@
               }
             ],
             "tags": {
-              "Name": "aft-backend-tags-mock-primary-region",
+              "Name": "aft-backend-REGEX_FILTER-primary-region",
               "managed_by": "AFT"
             }
           },
@@ -1095,7 +1095,7 @@
               }
             ],
             "tags": {
-              "Name": "aft-backend-tags-mock-secondary-region",
+              "Name": "aft-backend-REGEX_FILTER-secondary-region",
               "managed_by": "AFT"
             }
           },
