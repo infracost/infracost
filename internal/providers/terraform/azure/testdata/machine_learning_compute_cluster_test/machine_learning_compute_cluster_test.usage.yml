@@ -1,0 +1,11 @@
+version: 0.1
+resource_usage:
+  azurerm_machine_learning_compute_cluster.with_monthly_hrs:
+    monthly_hrs: 100
+  azurerm_machine_learning_compute_cluster.with_monthly_hrs_zero_min_node_count:
+    monthly_hrs: 100
+  azurerm_machine_learning_compute_cluster.with_instances:
+    instances: 10
+  azurerm_machine_learning_compute_cluster.with_instances_and_monthly_hrs:
+    instances: 10
+    monthly_hrs: 2

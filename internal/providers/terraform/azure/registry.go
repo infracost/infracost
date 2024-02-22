@@ -160,6 +160,8 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getPrivateDnsResolverInboundEndpointRegistryItem(),
 	getPrivateDnsResolverOutboundEndpointRegistryItem(),
 	getPrivateDnsResolverDnsForwardingRulesetRegistryItem(),
+	getMachineLearningComputeInstanceRegistryItem(),
+	getMachineLearningComputeClusterRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
@@ -419,6 +421,9 @@ var FreeResources = []string{
 	"azurerm_logic_app_trigger_http_request",
 	"azurerm_logic_app_trigger_recurrence",
 	"azurerm_logic_app_workflow",
+
+	// Azure Machine Learning
+	"azurerm_machine_learning_workspace",
 
 	// Azure Management
 	"azurerm_management_group",

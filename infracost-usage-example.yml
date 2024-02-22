@@ -1046,6 +1046,13 @@ resource_usage:
   azurerm_lb.my_lb:
     monthly_data_processed_gb: 100 # Monthly inbound and outbound data processed in GB.
 
+  azurerm_machine_learning_compute_cluster.my_cluster:
+    instances: 10    # Number of instances in the cluster.
+    monthly_hrs: 730 # Monthly number of hours each instance runs for.
+
+  azurerm_machine_learning_compute_instance.my_instances:
+    monthly_hrs: 730 # Monthly number of hours the instance runs for.
+
   azurerm_managed_disk.my_disk:
     monthly_disk_operations: 2000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB.
 
