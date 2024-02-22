@@ -587,7 +587,7 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 					if v, ok := e.moduleCalls[clone.FullName()]; ok {
 						v.Definition = clone
 					} else {
-						modCall, err := e.loadModule(clone)
+						modCall, err := e.loadModuleWithProviders(clone)
 						if err != nil {
 							e.logger.Debug().Err(err).Msgf("failed to create expanded module call, could not load module %s", clone.FullName())
 							return false
@@ -987,13 +987,15 @@ func (e *Evaluator) expandedEachBlockToValue(b *Block, existingValues map[string
 	return cty.ObjectVal(ob)
 }
 
-// loadModule takes in a module "x" {} block and loads resources etc. into e.moduleBlocks.
+// loadModuleWithProviders takes in a module "x" {} block and loads resources etc. into e.moduleBlocks.
 // Additionally, it returns variables to add to ["module.x.*"] variables
-func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
-	if b.Label() == "" {
-		return nil, fmt.Errorf("module without label: %s", b.FullName())
+func (e *Evaluator) loadModuleWithProviders(b *Block) (*ModuleCall, error) {
+	modCall, err := e.loadModule(b)
+	if err != nil {
+		return modCall, err
 	}
 
+	// now load the providers
 	providers := map[string]cty.Value{}
 	// inherit any providers from the providers from the parent module
 	for key, provider := range e.module.Providers {
@@ -1033,8 +1035,19 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 		}
 	}
 
-	var source string
+	modCall.Module.Providers = providers
 
+	return modCall, nil
+}
+
+// loadModule takes in a module "x" {} block and loads resources etc. into e.moduleBlocks.
+// Additionally, it returns variables to add to ["module.x.*"] variables
+func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
+	if b.Label() == "" {
+		return nil, fmt.Errorf("module without label: %s", b.FullName())
+	}
+
+	var source string
 	attrs := b.AttributesAsMap()
 	for _, attr := range attrs {
 		if attr.Name() == "source" {
@@ -1086,7 +1099,6 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 		Module: &Module{
 			Name:       b.TypeLabel(),
 			Source:     source,
-			Providers:  providers,
 			SourceURL:  moduleURL,
 			Blocks:     blocks,
 			RawBlocks:  blocks,
@@ -1122,7 +1134,7 @@ func (e *Evaluator) loadModules(lastContext hcl.EvalContext) {
 			continue
 		}
 
-		moduleCall, err := e.loadModule(moduleBlock)
+		moduleCall, err := e.loadModuleWithProviders(moduleBlock)
 		if err != nil {
 			e.logger.Debug().Err(err).Msgf("failed to load module %s ignoring", moduleBlock.LocalName())
 			continue

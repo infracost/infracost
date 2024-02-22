@@ -1,5 +1,0 @@
-version: 0.1
-
-projects:
-  - path: "./testdata/breakdown_format_json_with_tags_aliased_provider/fit"
-    include_all_paths: false

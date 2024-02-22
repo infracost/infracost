@@ -63,6 +63,6 @@ module "mymod_implicit" {
   source = "../modules/mymod_implicit"
 }
 
-module "mymod_own" {
-  source = "../modules/mymod_own"
+module "mymod_own_aliased" {
+  source = "../modules/mymod_own_aliased"
 }
