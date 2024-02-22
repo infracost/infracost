@@ -35,6 +35,7 @@ type GoldenFileOptions = struct {
 	IsJSON      bool
 	JSONInclude *regexp.Regexp
 	JSONExclude *regexp.Regexp
+	RegexFilter *regexp.Regexp
 	Env         map[string]string
 	// RunTerraformCLI sets the cmd test to also run the cmd with --terraform-force-cli set
 	RunTerraformCLI bool
@@ -170,6 +171,11 @@ func GetCommandOutput(t *testing.T, args []string, testOptions *GoldenFileOption
 	if logBuf != nil && logBuf.Len() > 0 {
 		actual = append(actual, "\nLogs:\n"...)
 		actual = append(actual, logBuf.Bytes()...)
+	}
+
+	if testOptions.RegexFilter != nil {
+		actual = testOptions.RegexFilter.ReplaceAll(actual, []byte("REGEX_FILTER"))
+
 	}
 
 	return stripDynamicValues(actual)

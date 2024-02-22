@@ -163,10 +163,45 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 
 	// Build a set of all the provider keys so we can look up
 	// provider references later
-	providerKeys := make(map[string]struct{})
+	providerKeys := make(map[string]string)
 	for _, vertex := range vertexes {
 		if _, ok := vertex.(*VertexProvider); ok {
-			providerKeys[vertex.ID()] = struct{}{}
+			providerKeys[vertex.ID()] = vertex.ID()
+		}
+	}
+
+	// Also add a mapping for all the provider attributes in module calls
+	// so we can look up the providers based on their alias later.
+	for _, vertex := range vertexes {
+		if v, ok := vertex.(*VertexModuleCall); ok {
+			// Decode the provider attribute to get the aliases
+			attr := v.block.GetAttribute("providers")
+			if attr == nil {
+				continue
+			}
+
+			providers := attr.DecodeProviders()
+			for alias, provider := range providers {
+				// Generate the full key and value for the provider map relative to the module
+				// For example, if the providers block is specified in a module like this:
+				//
+				// module "my_module" {
+				//   providers = {
+				//     aws = aws.my_provider
+				//   }
+				// }
+				//
+				// Then the key would be "module.my_module.provider.aws"
+				// And the value would be "aws.my_provider"
+				key := fmt.Sprintf("%s.provider.%s", stripModuleCallPrefix(vertex.ID()), alias)
+
+				val := fmt.Sprintf("provider.%s", provider)
+				if vertex.ModuleAddress() != "" {
+					val = fmt.Sprintf("%s.%s", vertex.ModuleAddress(), val)
+				}
+
+				providerKeys[key] = val
+			}
 		}
 	}
 
@@ -244,8 +279,8 @@ func (g *Graph) Populate(evaluator *Evaluator) error {
 
 				for modAddress != "" {
 					k := fmt.Sprintf("%s.%s", modAddress, srcID)
-					if _, ok := providerKeys[k]; ok {
-						srcID = k
+					if v, ok := providerKeys[k]; ok {
+						srcID = v
 						break
 					}
 

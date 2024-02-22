@@ -53,7 +53,7 @@ func (v *VertexProvider) Visit(mutex *sync.Mutex) error {
 
 		var blockInstance *Block
 		for _, b := range e.module.Blocks {
-			if b.LocalName() == v.block.LocalName() && alias == b.GetAttribute("alias") {
+			if b.LocalName() == v.block.LocalName() && alias.AsString() == b.GetAttribute("alias").AsString() {
 				blockInstance = b
 				break
 			}

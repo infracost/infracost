@@ -1,6 +1,7 @@
 package hcl
 
 import (
+	"bytes"
 	"fmt"
 	"runtime/debug"
 	"strings"
@@ -138,6 +139,63 @@ func (attr *Attribute) Value() cty.Value {
 	attr.previousValue = val
 
 	return val
+}
+
+// ProvidersValue retrieves the value of the attribute with special handling need for module.providers
+// blocks: Keys in the providers block are converted to literal values, then the attr.Value() is returned.
+func (attr *Attribute) ProvidersValue() cty.Value {
+	if origExpr, ok := attr.HCLAttr.Expr.(*hclsyntax.ObjectConsExpr); ok {
+		newExpr := &hclsyntax.ObjectConsExpr{}
+
+		for _, item := range origExpr.Items {
+			if origKeyExpr, ok := item.KeyExpr.(*hclsyntax.ObjectConsKeyExpr); ok {
+				key := traversalAsString(origKeyExpr.AsTraversal())
+
+				literalKey := &hclsyntax.LiteralValueExpr{
+					Val: cty.StringVal(key),
+				}
+
+				newExpr.Items = append(newExpr.Items, hclsyntax.ObjectConsItem{
+					KeyExpr:   literalKey,
+					ValueExpr: item.ValueExpr,
+				})
+			} else {
+				newExpr.Items = append(newExpr.Items, item)
+			}
+		}
+
+		attr.HCLAttr.Expr = newExpr
+	}
+
+	return attr.Value()
+}
+
+// DecodeProviders decodes the providers block into a map of provider names to provider aliases.
+// This is used by the graph evaluator to make sure the correct edges are created when providers are
+// inherited from parent modules.
+func (attr *Attribute) DecodeProviders() map[string]string {
+	providers := make(map[string]string)
+
+	if origExpr, ok := attr.HCLAttr.Expr.(*hclsyntax.ObjectConsExpr); ok {
+		for _, item := range origExpr.Items {
+			keyExpr, ok := item.KeyExpr.(*hclsyntax.ObjectConsKeyExpr)
+			if !ok {
+				continue
+			}
+
+			valExpr, ok := item.ValueExpr.(*hclsyntax.ScopeTraversalExpr)
+			if !ok {
+				continue
+			}
+
+			key := traversalAsString(keyExpr.AsTraversal())
+			val := traversalAsString(valExpr.AsTraversal())
+
+			providers[key] = val
+		}
+	}
+
+	return providers
 }
 
 // HasChanged returns if the Attribute Value has changed since Value was last called.
@@ -979,7 +1037,24 @@ func (attr *Attribute) referencesFromExpression(expression hcl.Expression) []*Re
 		}
 		return refs
 	case *hclsyntax.ObjectConsKeyExpr:
-		refs = append(refs, attr.referencesFromExpression(t.Wrapped)...)
+		// If the traversal is of length one it is treated as a string by Terraform.
+		// Otherwise it could be a reference. For example:
+		//
+		// providers = {
+		//   aws = aws.alias
+		// }
+		//
+		// In this case the traversal of the key expression would be of length 1 and
+		// we would treat it as a string.
+		//
+		// TODO: Although this helps, I think we still need some way of totally ignoring keys for
+		// the providers attribute of module calls since they can contain a '.' and therefore have
+		// a traversal, but are a special case that should be treated as strings.
+		wrapped, ok := t.Wrapped.(*hclsyntax.ScopeTraversalExpr)
+		if ok && len(wrapped.Traversal) > 1 {
+			refs = append(refs, attr.referencesFromExpression(t.Wrapped)...)
+		}
+
 		return refs
 	case *hclsyntax.SplatExpr:
 		refs = append(refs, attr.referencesFromExpression(t.Source)...)
@@ -1221,6 +1296,20 @@ func toRelativeTraversal(traversal hcl.Traversal) hcl.Traversal {
 	}
 
 	return ret
+}
+
+func traversalAsString(traversal hcl.Traversal) string {
+	buf := bytes.Buffer{}
+	for _, tr := range traversal {
+		switch step := tr.(type) {
+		case hcl.TraverseRoot:
+			buf.WriteString(step.Name)
+		case hcl.TraverseAttr:
+			buf.WriteString(".")
+			buf.WriteString(step.Name)
+		}
+	}
+	return buf.String()
 }
 
 func shouldSkipRef(block *Block, attr *Attribute, key string) bool {

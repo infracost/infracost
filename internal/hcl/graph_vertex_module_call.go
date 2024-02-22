@@ -103,7 +103,7 @@ func (v *VertexModuleCall) expand(e *Evaluator, b *Block, mutex *sync.Mutex) ([]
 	for _, block := range expanded {
 		name := block.FullName()
 
-		modCall, err := e.loadModule(block)
+		modCall, err := e.loadModuleWithProviders(block)
 		if err != nil {
 			return nil, fmt.Errorf("error loading module: %w", err)
 		}

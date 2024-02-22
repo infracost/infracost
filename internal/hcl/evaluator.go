@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"reflect"
 	"regexp"
+	"slices"
 	"strings"
 
 	"github.com/hashicorp/hcl/v2"
@@ -586,7 +587,7 @@ func (e *Evaluator) expandBlockForEaches(blocks Blocks) Blocks {
 					if v, ok := e.moduleCalls[clone.FullName()]; ok {
 						v.Definition = clone
 					} else {
-						modCall, err := e.loadModule(clone)
+						modCall, err := e.loadModuleWithProviders(clone)
 						if err != nil {
 							e.logger.Debug().Err(err).Msgf("failed to create expanded module call, could not load module %s", clone.FullName())
 							return false
@@ -986,6 +987,59 @@ func (e *Evaluator) expandedEachBlockToValue(b *Block, existingValues map[string
 	return cty.ObjectVal(ob)
 }
 
+// loadModuleWithProviders takes in a module "x" {} block and loads resources etc. into e.moduleBlocks.
+// Additionally, it returns variables to add to ["module.x.*"] variables
+func (e *Evaluator) loadModuleWithProviders(b *Block) (*ModuleCall, error) {
+	modCall, err := e.loadModule(b)
+	if err != nil {
+		return modCall, err
+	}
+
+	// now load the providers
+	providers := map[string]cty.Value{}
+	// inherit any providers from the providers from the parent module
+	for key, provider := range e.module.Providers {
+		providers[key] = provider
+	}
+
+	providerBlocks := e.getValuesByBlockType("provider")
+	for key, provider := range providerBlocks.AsValueMap() {
+		providers[key] = provider
+	}
+
+	// adjust the providers based on the module.providers mapping
+	providerAttr := b.GetAttribute("providers")
+	if providerAttr != nil {
+		mappedProviders := providerAttr.ProvidersValue().AsValueMap()
+
+		// sort the map keys to ensure that we always populate root providers (e.g. "aws") before
+		// aliased ones ("aws.my_alias")
+		keys := make([]string, 0, len(mappedProviders))
+		for k := range mappedProviders {
+			keys = append(keys, k)
+		}
+		slices.Sort(keys)
+
+		for _, k := range keys {
+			split := strings.SplitN(k, ".", 2)
+			if len(split) == 2 {
+				parentMap := map[string]cty.Value{}
+				if parent, ok := providers[split[0]]; ok {
+					parentMap = parent.AsValueMap()
+				}
+				parentMap[split[1]] = mappedProviders[k]
+				providers[split[0]] = cty.ObjectVal(parentMap)
+			} else {
+				providers[k] = mappedProviders[k]
+			}
+		}
+	}
+
+	modCall.Module.Providers = providers
+
+	return modCall, nil
+}
+
 // loadModule takes in a module "x" {} block and loads resources etc. into e.moduleBlocks.
 // Additionally, it returns variables to add to ["module.x.*"] variables
 func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
@@ -993,26 +1047,9 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 		return nil, fmt.Errorf("module without label: %s", b.FullName())
 	}
 
-	providers := map[string]cty.Value{}
-	providerBlocks := e.getValuesByBlockType("provider")
-	for key, provider := range providerBlocks.AsValueMap() {
-		providers[key] = provider
-	}
-	// inherit any providers from the providers block from the parent module
-	for key, provider := range e.module.Providers {
-		providers[key] = provider
-	}
-
 	var source string
-
 	attrs := b.AttributesAsMap()
 	for _, attr := range attrs {
-		if attr.Name() == "providers" {
-			val := attr.Value()
-			if val.Type().IsObjectType() && val.IsKnown() {
-				providers = attr.Value().AsValueMap()
-			}
-		}
 		if attr.Name() == "source" {
 			source = attr.AsString()
 		}
@@ -1062,7 +1099,6 @@ func (e *Evaluator) loadModule(b *Block) (*ModuleCall, error) {
 		Module: &Module{
 			Name:       b.TypeLabel(),
 			Source:     source,
-			Providers:  providers,
 			SourceURL:  moduleURL,
 			Blocks:     blocks,
 			RawBlocks:  blocks,
@@ -1098,7 +1134,7 @@ func (e *Evaluator) loadModules(lastContext hcl.EvalContext) {
 			continue
 		}
 
-		moduleCall, err := e.loadModule(moduleBlock)
+		moduleCall, err := e.loadModuleWithProviders(moduleBlock)
 		if err != nil {
 			e.logger.Debug().Err(err).Msgf("failed to load module %s ignoring", moduleBlock.LocalName())
 			continue

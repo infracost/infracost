@@ -52,7 +52,7 @@ resource "aws_sqs_queue" "sqs_withTags_provider" {
 
 
 module "mymod_aliased" {
-  source = "./mymod_aliased"
+  source = "../modules/mymod_aliased"
 
   providers = {
     aws = aws.env
@@ -60,9 +60,9 @@ module "mymod_aliased" {
 }
 
 module "mymod_implicit" {
-  source = "./mymod_implicit"
+  source = "../modules/mymod_implicit"
 }
 
-module "mymod_own" {
-  source = "./mymod_own"
+module "mymod_own_aliased" {
+  source = "../modules/mymod_own_aliased"
 }
