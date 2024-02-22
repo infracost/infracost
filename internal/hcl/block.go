@@ -1436,20 +1436,26 @@ func getRegionFromProvider(b *Block, provider string) string {
 // associated with. This is either the default provider or the provider
 // explicitly set on the block (e.g. if a resource has a "provider" attribute).
 func getFromProvider(b *Block, provider, key string) cty.Value {
-	val := b.context.Get(provider, key)
-
 	attr := b.GetAttribute("provider")
 	if attr != nil {
 		v := attr.Value()
 		if v.Type().IsObjectType() {
 			m := v.AsValueMap()
 			if r, ok := m[key]; ok {
-				val = r
+				return r
 			}
 		}
 	}
 
-	return val
+	providerVal := b.Context().Get(provider)
+	if providerVal.Type().IsObjectType() {
+		m := providerVal.AsValueMap()
+		if r, ok := m[key]; ok {
+			return r
+		}
+	}
+
+	return cty.NilVal
 }
 
 func usesProviderConfiguration(b *Block) bool {
