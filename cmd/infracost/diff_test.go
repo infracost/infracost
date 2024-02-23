@@ -320,3 +320,17 @@ func TestDiffWithPolicyDataUpload(t *testing.T) {
 		},
 	)
 }
+
+func TestDiffPriorEmptyProject(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(), []string{
+			"diff",
+			"--compare-to",
+			path.Join(dir, "base.json"),
+			"--path",
+			dir,
+		}, nil)
+}

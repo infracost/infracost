@@ -1,0 +1,72 @@
+{
+  "version": "0.2",
+  "metadata": {
+    "infracostCommand": "breakdown",
+    "vcsBranch": "master",
+    "vcsCommitSha": "71785af96bce822bd54f359d0883cfa4ca805432",
+    "vcsCommitAuthorName": "Hugo",
+    "vcsCommitAuthorEmail": "",
+    "vcsCommitTimestamp": "2024-02-23T11:04:26Z",
+    "vcsCommitMessage": "wip",
+    "vcsRepositoryUrl": "https://github.com/infracost/infracost.git"
+  },
+  "currency": "USD",
+  "projects": [
+    {
+      "name": "infracost/infracost/cmd/infracost/testdata/diff_prior_empty_project",
+      "metadata": {
+        "path": ".",
+        "type": "error",
+        "vcsSubPath": "cmd/infracost/testdata/diff_prior_empty_project",
+        "errors": [
+          {
+            "code": 106,
+            "message": "could not detect path type for '.'\n\nTry adding a config-file to configure how Infracost should run. See \u001b[4;1mhttps://infracost.io/config-file\u001b[0m for details and examples.",
+            "data": null,
+            "isError": true
+          }
+        ]
+      },
+      "pastBreakdown": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
+      },
+      "breakdown": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
+      },
+      "diff": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0"
+      },
+      "summary": {
+        "totalDetectedResources": 0,
+        "totalSupportedResources": 0,
+        "totalUnsupportedResources": 0,
+        "totalUsageBasedResources": 0,
+        "totalNoPriceResources": 0,
+        "unsupportedResourceCounts": {},
+        "noPriceResourceCounts": {}
+      }
+    }
+  ],
+  "totalHourlyCost": "0",
+  "totalMonthlyCost": "0",
+  "pastTotalHourlyCost": "0",
+  "pastTotalMonthlyCost": "0",
+  "diffTotalHourlyCost": "0",
+  "diffTotalMonthlyCost": "0",
+  "timeGenerated": "2024-02-23T12:58:15.71255Z",
+  "summary": {
+    "totalDetectedResources": 0,
+    "totalSupportedResources": 0,
+    "totalUnsupportedResources": 0,
+    "totalUsageBasedResources": 0,
+    "totalNoPriceResources": 0,
+    "unsupportedResourceCounts": {},
+    "noPriceResourceCounts": {}
+  }
+}

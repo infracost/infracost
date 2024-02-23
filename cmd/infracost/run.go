@@ -245,10 +245,9 @@ func (r *parallelRunner) run() ([]projectResult, error) {
 
 		if err != nil {
 			m := fmt.Sprintf("%s\n\n", err)
-			m += fmt.Sprintf("Try adding a config-file to configure how Infracost should run. See %s for details and examples.", ui.LinkString("https://infracost.io/config-file"))
+			m += fmt.Sprintf("  Try adding a config-file to configure how Infracost should run. See %s for details and examples.", ui.LinkString("https://infracost.io/config-file"))
 
-			err = clierror.NewCLIError(errors.New(m), "Could not detect path type")
-			queue = append(queue, projectJob{index: i, err: err, ctx: ctx})
+			queue = append(queue, projectJob{index: i, err: schema.NewEmptyPathTypeError(errors.New(m)), ctx: ctx})
 			continue
 		}
 
