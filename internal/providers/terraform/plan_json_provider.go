@@ -40,6 +40,10 @@ func NewPlanJSONProvider(ctx *config.ProjectContext, includePastResources bool) 
 	}
 }
 
+func (p *PlanJSONProvider) Context() *config.ProjectContext {
+	return p.ctx
+}
+
 func (p *PlanJSONProvider) Type() string {
 	return "terraform_plan_json"
 }
@@ -78,7 +82,7 @@ func (p *PlanJSONProvider) LoadResources(usage schema.UsageMap) ([]*schema.Proje
 }
 
 func (p *PlanJSONProvider) LoadResourcesFromSrc(usage schema.UsageMap, j []byte, spinner *ui.Spinner) (*schema.Project, error) {
-	metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
+	metadata := schema.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
 	name := p.ctx.ProjectConfig.Name

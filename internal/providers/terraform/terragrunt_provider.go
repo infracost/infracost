@@ -59,6 +59,8 @@ func NewTerragruntProvider(ctx *config.ProjectContext, includePastResources bool
 	}
 }
 
+func (p *TerragruntProvider) Context() *config.ProjectContext { return p.ctx }
+
 func (p *TerragruntProvider) Type() string {
 	return "terragrunt_cli"
 }
@@ -122,7 +124,7 @@ func (p *TerragruntProvider) LoadResources(usage schema.UsageMap) ([]*schema.Pro
 			}
 		}
 
-		metadata := config.DetectProjectMetadata(projectPath)
+		metadata := schema.DetectProjectMetadata(projectPath)
 		metadata.Type = p.Type()
 		p.AddMetadata(metadata)
 		name := p.ctx.ProjectConfig.Name

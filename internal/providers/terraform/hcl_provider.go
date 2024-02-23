@@ -171,6 +171,7 @@ func NewHCLProvider(ctx *config.ProjectContext, rootPath hcl.RootPath, config *H
 		logger:         logger,
 	}, nil
 }
+func (p *HCLProvider) Context() *config.ProjectContext { return p.ctx }
 
 func (p *HCLProvider) ProjectName() string {
 	return p.Parser.ProjectName()
@@ -245,7 +246,7 @@ func (p *HCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, e
 }
 
 func (p *HCLProvider) newProject(parsed HCLProject) *schema.Project {
-	metadata := config.DetectProjectMetadata(parsed.Module.RootPath)
+	metadata := schema.DetectProjectMetadata(parsed.Module.RootPath)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
 

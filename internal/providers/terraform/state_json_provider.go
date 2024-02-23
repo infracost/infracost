@@ -24,6 +24,8 @@ func NewStateJSONProvider(ctx *config.ProjectContext, includePastResources bool)
 	}
 }
 
+func (p *StateJSONProvider) Context() *config.ProjectContext { return p.ctx }
+
 func (p *StateJSONProvider) Type() string {
 	return "terraform_state_json"
 }
@@ -49,7 +51,7 @@ func (p *StateJSONProvider) LoadResources(usage schema.UsageMap) ([]*schema.Proj
 		return []*schema.Project{}, errors.Wrap(err, "Error reading Terraform state JSON file")
 	}
 
-	metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
+	metadata := schema.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
 	name := p.ctx.ProjectConfig.Name
