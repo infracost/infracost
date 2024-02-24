@@ -26,10 +26,8 @@ func NewWindowsVirtualMachine(d *schema.ResourceData, u *schema.UsageData) *sche
 	if len(d.Get("os_disk").Array()) > 0 {
 		diskData := d.Get("os_disk").Array()[0]
 		r.OSDiskData = &azure.ManagedDiskData{
-			DiskType:          diskData.Get("managed_disk_type").String(),
-			DiskSizeGB:        diskData.Get("disk_size_gb").Int(),
-			DiskIOPSReadWrite: diskData.Get("disk_iops_read_write").Int(),
-			DiskMBPSReadWrite: diskData.Get("disk_mbps_read_write").Int(),
+			DiskType:   diskData.Get("storage_account_type").String(),
+			DiskSizeGB: diskData.Get("disk_size_gb").Int(),
 		}
 	}
 	r.PopulateUsage(u)

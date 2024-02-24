@@ -18,7 +18,7 @@ type WindowsVirtualMachine struct {
 	LicenseType                           string
 	AdditionalCapabilitiesUltraSSDEnabled bool
 	OSDiskData                            *ManagedDiskData
-	MonthlyHours                          *float64     `infracost_usage:"montly_hrs"`
+	MonthlyHours                          *float64     `infracost_usage:"monthly_hrs"`
 	OSDisk                                *OSDiskUsage `infracost_usage:"os_disk"`
 }
 
@@ -31,7 +31,7 @@ var OSDiskUsageSchema = []*schema.UsageItem{
 }
 
 var WindowsVirtualMachineUsageSchema = []*schema.UsageItem{
-	{Key: "montly_hrs", ValueType: schema.Float64, DefaultValue: 0},
+	{Key: "monthly_hrs", ValueType: schema.Float64, DefaultValue: 0},
 	{
 		Key:          "os_disk",
 		ValueType:    schema.SubResourceUsage,

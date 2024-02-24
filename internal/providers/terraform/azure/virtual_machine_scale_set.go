@@ -40,23 +40,19 @@ func NewVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageData) *sch
 	if len(d.Get("storage_profile_os_disk").Array()) > 0 {
 		storageData := d.Get("storage_profile_os_disk").Array()[0]
 		r.StorageProfileOSDiskData = &azure.ManagedDiskData{
-			DiskType:          storageData.Get("managed_disk_type").String(),
-			DiskSizeGB:        storageData.Get("disk_size_gb").Int(),
-			DiskIOPSReadWrite: storageData.Get("disk_iops_read_write").Int(),
-			DiskMBPSReadWrite: storageData.Get("disk_mbps_read_write").Int(),
+			DiskType:   storageData.Get("managed_disk_type").String(),
+			DiskSizeGB: storageData.Get("disk_size_gb").Int(),
 		}
 	}
 
-	if len(d.Get("storage_profile_os_disk").Array()) > 0 {
-		for _, s := range d.Get("storage_profile_os_disk").Array() {
+	if len(d.Get("storage_profile_data_disk").Array()) > 0 {
+		for _, s := range d.Get("storage_profile_data_disk").Array() {
 			if s.Get("managed_disk_type").Type == gjson.Null {
 				continue
 			}
 			r.StorageProfileOSDisksData = append(r.StorageProfileOSDisksData, &azure.ManagedDiskData{
-				DiskType:          s.Get("managed_disk_type").String(),
-				DiskSizeGB:        s.Get("disk_size_gb").Int(),
-				DiskIOPSReadWrite: s.Get("disk_iops_read_write").Int(),
-				DiskMBPSReadWrite: s.Get("disk_mbps_read_write").Int(),
+				DiskType:   s.Get("managed_disk_type").String(),
+				DiskSizeGB: s.Get("disk_size_gb").Int(),
 			})
 		}
 	}

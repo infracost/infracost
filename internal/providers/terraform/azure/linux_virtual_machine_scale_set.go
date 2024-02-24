@@ -11,6 +11,7 @@ func getLinuxVirtualMachineScaleSetRegistryItem() *schema.RegistryItem {
 		RFunc: NewLinuxVirtualMachineScaleSet,
 	}
 }
+
 func NewLinuxVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	r := &azure.LinuxVirtualMachineScaleSet{
 		Address:         d.Address,
@@ -22,10 +23,8 @@ func NewLinuxVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageData)
 	if len(d.Get("os_disk").Array()) > 0 {
 		storageData := d.Get("os_disk").Array()[0]
 		r.OSDiskData = &azure.ManagedDiskData{
-			DiskType:          storageData.Get("managed_disk_type").String(),
-			DiskSizeGB:        storageData.Get("disk_size_gb").Int(),
-			DiskIOPSReadWrite: storageData.Get("disk_iops_read_write").Int(),
-			DiskMBPSReadWrite: storageData.Get("disk_mbps_read_write").Int(),
+			DiskType:   storageData.Get("storage_account_type").String(),
+			DiskSizeGB: storageData.Get("disk_size_gb").Int(),
 		}
 	}
 

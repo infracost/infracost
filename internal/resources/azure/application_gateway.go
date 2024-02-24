@@ -16,9 +16,10 @@ type ApplicationGateway struct {
 	Address                string
 	SKUName                string
 	SKUCapacity            int64
+	AutoscalingMinCapacity *int64
 	Region                 string
 	MonthlyDataProcessedGB *float64 `infracost_usage:"monthly_data_processed_gb"`
-	MonthlyV2CapacityUnits *int64   `infracost_usage:"monthly_v2_capacity_units"`
+	CapacityUnits          *int64   `infracost_usage:"capacity_units"`
 }
 
 var ApplicationGatewayUsageSchema = []*schema.UsageItem{{Key: "monthly_data_processed_gb", ValueType: schema.Float64, DefaultValue: 0}, {Key: "monthly_v2_capacity_units", ValueType: schema.Int64, DefaultValue: 0}}
@@ -42,10 +43,19 @@ func (r *ApplicationGateway) BuildResource() *schema.Resource {
 		tier = "WAF"
 	}
 
+	capacityUnits := int64(1)
+	if r.SKUCapacity > 0 {
+		capacityUnits = r.SKUCapacity
+	} else if r.CapacityUnits != nil {
+		capacityUnits = *r.CapacityUnits
+	} else if r.AutoscalingMinCapacity != nil {
+		capacityUnits = *r.AutoscalingMinCapacity
+	}
+
 	if sku == "v2" {
-		costComponents = append(costComponents, r.v2CostComponents(skuNameParts)...)
+		costComponents = append(costComponents, r.v2CostComponents(skuNameParts, capacityUnits)...)
 	} else {
-		costComponents = append(costComponents, r.v1CostComponents(tier, sku)...)
+		costComponents = append(costComponents, r.v1CostComponents(tier, sku, capacityUnits)...)
 	}
 
 	return &schema.Resource{
@@ -54,12 +64,12 @@ func (r *ApplicationGateway) BuildResource() *schema.Resource {
 	}
 }
 
-func (r *ApplicationGateway) v1CostComponents(tier, sku string) []*schema.CostComponent {
+func (r *ApplicationGateway) v1CostComponents(tier, sku string, capacityUnits int64) []*schema.CostComponent {
 	costComponents := make([]*schema.CostComponent, 0)
 	var monthlyDataProcessedGb *decimal.Decimal
 	tierLimits := []int{10240, 30720}
 
-	costComponents = append(costComponents, r.gatewayCostComponent(fmt.Sprintf("Gateway usage (%s, %s)", tier, sku), tier, sku))
+	costComponents = append(costComponents, r.gatewayCostComponent(fmt.Sprintf("Gateway usage (%s, %s)", tier, sku), tier, sku, capacityUnits))
 
 	if r.MonthlyDataProcessedGB != nil {
 		monthlyDataProcessedGb = decimalPtr(decimal.NewFromFloat(*r.MonthlyDataProcessedGB))
@@ -100,40 +110,36 @@ func (r *ApplicationGateway) v1CostComponents(tier, sku string) []*schema.CostCo
 	return costComponents
 }
 
-func (r *ApplicationGateway) v2CostComponents(skuNameParts []string) []*schema.CostComponent {
-	var monthlyCapacityUnits *decimal.Decimal
+func (r *ApplicationGateway) v2CostComponents(skuNameParts []string, capacityUnits int64) []*schema.CostComponent {
 	costComponents := make([]*schema.CostComponent, 0)
 
-	if r.MonthlyV2CapacityUnits != nil {
-		monthlyCapacityUnits = decimalPtr(decimal.NewFromInt(*r.MonthlyV2CapacityUnits))
-	}
 	var tier string
 	if len(skuNameParts) > 0 && strings.ToLower(skuNameParts[0]) == "standard" {
 		tier = "basic v2"
 		costComponents = append(costComponents, r.fixedForV2CostComponent(fmt.Sprintf("Gateway usage (%s)", tier), "standard v2"))
-		costComponents = append(costComponents, r.capacityUnitsCostComponent("basic", "standard v2", monthlyCapacityUnits))
+		costComponents = append(costComponents, r.capacityUnitsCostComponent("basic", "standard v2", capacityUnits))
 	} else {
 		tier = "WAF v2"
 		costComponents = append(costComponents, r.fixedForV2CostComponent(fmt.Sprintf("Gateway usage (%s)", tier), tier))
-		costComponents = append(costComponents, r.capacityUnitsCostComponent("WAF", tier, monthlyCapacityUnits))
+		costComponents = append(costComponents, r.capacityUnitsCostComponent("WAF", tier, capacityUnits))
 	}
 	return costComponents
 }
 
-func (r *ApplicationGateway) gatewayCostComponent(name, tier, sku string) *schema.CostComponent {
+func (r *ApplicationGateway) gatewayCostComponent(name, tier, sku string, capacityUnits int64) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           name,
 		Unit:           "hours",
 		UnitMultiplier: decimal.NewFromInt(1),
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(r.SKUCapacity)),
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(capacityUnits)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        strPtr(r.Region),
 			Service:       strPtr("Application Gateway"),
 			ProductFamily: strPtr("Networking"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", ValueRegex: strPtr(fmt.Sprintf("/%s Application Gateway/i", tier))},
-				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/%s Gateway/i", sku))},
+				{Key: "productName", ValueRegex: regexPtr(fmt.Sprintf("%s Application Gateway$", tier))},
+				{Key: "meterName", ValueRegex: regexPtr(fmt.Sprintf("%s Gateway$", sku))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -141,19 +147,19 @@ func (r *ApplicationGateway) gatewayCostComponent(name, tier, sku string) *schem
 		},
 	}
 }
-func (r *ApplicationGateway) dataProcessingCostComponent(name, sku, startUsage string, capacity *decimal.Decimal) *schema.CostComponent {
+func (r *ApplicationGateway) dataProcessingCostComponent(name, sku, startUsage string, qty *decimal.Decimal) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            name,
 		Unit:            "GB",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: capacity,
+		MonthlyQuantity: qty,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        strPtr(r.Region),
 			Service:       strPtr("Application Gateway"),
 			ProductFamily: strPtr("Networking"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "meterName", ValueRegex: strPtr(fmt.Sprintf("/%s Data Processed/i", sku))},
+				{Key: "meterName", ValueRegex: regexPtr(fmt.Sprintf("%s Data Processed", sku))},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{
@@ -162,20 +168,20 @@ func (r *ApplicationGateway) dataProcessingCostComponent(name, sku, startUsage s
 		},
 	}
 }
-func (r *ApplicationGateway) capacityUnitsCostComponent(name, tier string, capacity *decimal.Decimal) *schema.CostComponent {
+func (r *ApplicationGateway) capacityUnitsCostComponent(name, tier string, capacityUnits int64) *schema.CostComponent {
 	return &schema.CostComponent{
-		Name:            fmt.Sprintf("V2 capacity units (%s)", name),
-		Unit:            "CU",
-		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: capacity,
+		Name:           fmt.Sprintf("V2 capacity units (%s)", name),
+		Unit:           "CU",
+		UnitMultiplier: decimal.NewFromInt(1),
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(capacityUnits)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        strPtr(r.Region),
 			Service:       strPtr("Application Gateway"),
 			ProductFamily: strPtr("Networking"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "meterName", Value: strPtr("Capacity Units")},
-				{Key: "productName", ValueRegex: strPtr(fmt.Sprintf("/Application Gateway %s/i", tier))},
+				{Key: "productName", ValueRegex: regexPtr(fmt.Sprintf("Application Gateway %s$", tier))},
+				{Key: "meterName", ValueRegex: regexPtr("Capacity Units$")},
 			},
 		},
 
@@ -190,15 +196,15 @@ func (r *ApplicationGateway) fixedForV2CostComponent(name, tier string) *schema.
 		Name:           name,
 		Unit:           "hours",
 		UnitMultiplier: decimal.NewFromInt(1),
-		HourlyQuantity: decimalPtr(decimal.NewFromInt(r.SKUCapacity)),
+		HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        strPtr(r.Region),
 			Service:       strPtr("Application Gateway"),
 			ProductFamily: strPtr("Networking"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", ValueRegex: strPtr(fmt.Sprintf("/Application Gateway %s/i", tier))},
-				{Key: "meterName", Value: strPtr("Fixed Cost")},
+				{Key: "productName", ValueRegex: regexPtr(fmt.Sprintf("Application Gateway %s$", tier))},
+				{Key: "meterName", ValueRegex: regexPtr("Fixed Cost$")},
 			},
 		},
 		PriceFilter: &schema.PriceFilter{

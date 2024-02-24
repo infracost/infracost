@@ -62,6 +62,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	GetAzureRMKeyVaultKeyRegistryItem(),
 	GetAzureRMKeyVaultManagedHSMRegistryItem(),
 	getKubernetesClusterRegistryItem(),
+	getKubernetesClusterNodePoolRegistryItem(),
 	getLoadBalancerRegistryItem(),
 	GetAzureRMLoadBalancerRuleRegistryItem(),
 	GetAzureRMLoadBalancerOutboundRuleRegistryItem(),

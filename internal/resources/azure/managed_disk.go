@@ -133,7 +133,7 @@ func managedDiskCostComponents(region, diskType string, diskSizeGB, diskIOPSRead
 	}
 
 	if strings.ToLower(diskTypePrefix) == "ultrassd" {
-		return ultraDiskCostComponents(region, storageReplicationType, diskType, diskSizeGB, diskIOPSReadWrite, diskMBPSReadWrite)
+		return ultraDiskCostComponents(region, storageReplicationType, diskSizeGB, diskIOPSReadWrite, diskMBPSReadWrite)
 	}
 
 	return standardPremiumDiskCostComponents(region, diskTypePrefix, storageReplicationType, diskSizeGB, monthlyDiskOperations)
@@ -215,7 +215,7 @@ func storageCostComponent(region, diskName, storageReplicationType, productName 
 	}
 }
 
-func ultraDiskCostComponents(region string, storageReplicationType string, diskType string, diskSizeGB, diskIOPSReadWrite, diskMBPSReadWrite int64) []*schema.CostComponent {
+func ultraDiskCostComponents(region string, storageReplicationType string, diskSizeGB, diskIOPSReadWrite, diskMBPSReadWrite int64) []*schema.CostComponent {
 	requestedSize := 1024
 	iops := 2048
 	throughput := 8
@@ -228,7 +228,7 @@ func ultraDiskCostComponents(region string, storageReplicationType string, diskT
 		iops = int(diskIOPSReadWrite)
 	}
 
-	if diskMBPSReadWrite >= 0 {
+	if diskMBPSReadWrite > 0 {
 		throughput = int(diskMBPSReadWrite)
 	}
 
@@ -248,7 +248,7 @@ func ultraDiskCostComponents(region string, storageReplicationType string, diskT
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "productName", Value: strPtr("Ultra Disks")},
 					{Key: "skuName", Value: strPtr(fmt.Sprintf("Ultra %s", storageReplicationType))},
-					{Key: "meterName", Value: strPtr("Provisioned Capacity")},
+					{Key: "meterName", ValueRegex: regexPtr("Provisioned Capacity$")},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
@@ -268,7 +268,7 @@ func ultraDiskCostComponents(region string, storageReplicationType string, diskT
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "productName", Value: strPtr("Ultra Disks")},
 					{Key: "skuName", Value: strPtr(fmt.Sprintf("Ultra %s", storageReplicationType))},
-					{Key: "meterName", Value: strPtr("Provisioned IOPS")},
+					{Key: "meterName", ValueRegex: regexPtr("Provisioned IOPS$")},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{
@@ -288,7 +288,7 @@ func ultraDiskCostComponents(region string, storageReplicationType string, diskT
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "productName", Value: strPtr("Ultra Disks")},
 					{Key: "skuName", Value: strPtr(fmt.Sprintf("Ultra %s", storageReplicationType))},
-					{Key: "meterName", Value: strPtr("Provisioned Throughput (MBps)")},
+					{Key: "meterName", ValueRegex: regexPtr("Provisioned Throughput \\(MBps\\)$")},
 				},
 			},
 			PriceFilter: &schema.PriceFilter{

@@ -22,7 +22,7 @@ type LinuxVirtualMachine struct {
 }
 
 var LinuxVirtualMachineUsageSchema = []*schema.UsageItem{
-	{Key: "montly_hrs", ValueType: schema.Float64, DefaultValue: 0},
+	{Key: "monthly_hrs", ValueType: schema.Float64, DefaultValue: 0},
 	{
 		Key:          "os_disk",
 		ValueType:    schema.SubResourceUsage,

@@ -34,7 +34,6 @@ func (r *KubernetesClusterNodePool) PopulateUsage(u *schema.UsageData) {
 }
 
 func (r *KubernetesClusterNodePool) BuildResource() *schema.Resource {
-
 	nodeCount := decimal.NewFromInt(1)
 	if r.NodeCount != 0 {
 		nodeCount = decimal.NewFromInt(r.NodeCount)
