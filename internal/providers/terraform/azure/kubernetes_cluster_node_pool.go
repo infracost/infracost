@@ -1,7 +1,6 @@
 package azure
 
 import (
-	"regexp"
 	"strings"
 
 	"github.com/infracost/infracost/internal/resources/azure"
@@ -52,32 +51,4 @@ func NewKubernetesClusterNodePool(d *schema.ResourceData, u *schema.UsageData) *
 	}
 	r.PopulateUsage(u)
 	return r.BuildResource()
-}
-
-func aksGetStorageType(instanceType string) string {
-	parts := strings.Split(instanceType, "_")
-
-	subfamily := ""
-	if len(parts) > 1 {
-		subfamily = parts[1]
-	}
-
-	// Check if the subfamily is a known premium type
-	premiumPrefixes := []string{"ds", "gs", "m"}
-	for _, p := range premiumPrefixes {
-		if strings.HasPrefix(strings.ToLower(subfamily), p) {
-			return "Premium"
-		}
-	}
-
-	// Otherwise check if it contains an s as an 'Additive Feature'
-	// as per https://learn.microsoft.com/en-us/azure/virtual-machines/vm-naming-conventions
-	re := regexp.MustCompile(`\d+[A-Za-z]*(s)`)
-	matches := re.FindStringSubmatch(subfamily)
-
-	if len(matches) > 0 {
-		return "Premium"
-	}
-
-	return "Standard"
 }
