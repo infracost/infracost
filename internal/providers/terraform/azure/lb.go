@@ -18,8 +18,8 @@ func getLoadBalancerRegistryItem() *schema.RegistryItem {
 func NewLB(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	r := &azure.LB{
 		Address: d.Address,
-		Region: lookupRegion(d, []string{"resource_group_name"}),
-		SKU: d.Get("sku").String(),
+		Region:  lookupRegion(d, []string{"resource_group_name"}),
+		SKU:     d.Get("sku").String(),
 	}
 	r.PopulateUsage(u)
 	return r.BuildResource()

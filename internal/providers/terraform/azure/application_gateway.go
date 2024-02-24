@@ -14,10 +14,10 @@ func getApplicationGatewayRegistryItem() *schema.RegistryItem {
 
 func NewApplicationGateway(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	r := &azure.ApplicationGateway{
-		Address: d.Address,
-		SKUName: d.Get("sku.0.name").String(),
+		Address:     d.Address,
+		SKUName:     d.Get("sku.0.name").String(),
 		SKUCapacity: d.Get("sku.0.capacity").Int(),
-		Region: lookupRegion(d, []string{}),
+		Region:      lookupRegion(d, []string{}),
 	}
 
 	r.PopulateUsage(u)

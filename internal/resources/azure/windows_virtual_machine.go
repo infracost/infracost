@@ -58,7 +58,7 @@ func (r *WindowsVirtualMachine) BuildResource() *schema.Resource {
 	subResources := make([]*schema.Resource, 0)
 
 	var monthlyDiskOperations *decimal.Decimal
-	if r.OSDisk.MonthlyDiskOperations != nil {
+	if r.OSDisk != nil && r.OSDisk.MonthlyDiskOperations != nil {
 		monthlyDiskOperations = decimalPtr(decimal.NewFromInt(*r.OSDisk.MonthlyDiskOperations))
 	}
 	osDisk := osDiskSubResource(region, r.OSDiskData.DiskType, r.OSDiskData.DiskSizeGB, r.OSDiskData.DiskIOPSReadWrite, r.OSDiskData.DiskMBPSReadWrite, monthlyDiskOperations)

@@ -98,14 +98,14 @@ func (r *VirtualMachineScaleSet) BuildResource() *schema.Resource {
 	schema.MultiplyQuantities(res, capacity)
 
 	var storageOperations *decimal.Decimal
-	if r.StorageProfileOSDisk.MonthlyDiskOperations != nil {
+	if r.StorageProfileOSDisk != nil && r.StorageProfileOSDisk.MonthlyDiskOperations != nil {
 		storageOperations = decimalPtr(decimal.NewFromInt(*r.StorageProfileOSDisk.MonthlyDiskOperations))
 	}
 	if r.StorageProfileOSDiskData != nil {
 		res.SubResources = append(res.SubResources, legacyOSDiskSubResource(region, r.StorageProfileOSDiskData.DiskType, r.StorageProfileOSDiskData.DiskSizeGB, r.StorageProfileOSDiskData.DiskIOPSReadWrite, r.StorageProfileOSDiskData.DiskMBPSReadWrite, storageOperations))
 	}
 
-	if r.StorageProfileDataDisk.MonthlyDiskOperations != nil {
+	if r.StorageProfileDataDisk != nil && r.StorageProfileDataDisk.MonthlyDiskOperations != nil {
 		storageOperations = decimalPtr(decimal.NewFromInt(*r.StorageProfileDataDisk.MonthlyDiskOperations))
 	}
 

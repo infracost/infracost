@@ -43,7 +43,7 @@ func (r *LinuxVirtualMachineScaleSet) BuildResource() *schema.Resource {
 	}
 
 	var monthlyDiskOperations *decimal.Decimal
-	if r.OSDisk.MonthlyDiskOperations != nil {
+	if r.OSDisk != nil && r.OSDisk.MonthlyDiskOperations != nil {
 		monthlyDiskOperations = decimalPtr(decimal.NewFromInt(*r.OSDisk.MonthlyDiskOperations))
 	}
 

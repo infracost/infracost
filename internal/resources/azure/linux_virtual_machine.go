@@ -46,7 +46,7 @@ func (r *LinuxVirtualMachine) BuildResource() *schema.Resource {
 	subResources := make([]*schema.Resource, 0)
 
 	var monthlyDiskOperations *decimal.Decimal
-	if r.OSDisk.MonthlyDiskOperations != nil {
+	if r.OSDisk != nil && r.OSDisk.MonthlyDiskOperations != nil {
 		monthlyDiskOperations = decimalPtr(decimal.NewFromInt(*r.OSDisk.MonthlyDiskOperations))
 	}
 
@@ -69,7 +69,7 @@ func linuxVirtualMachineCostComponent(region string, instanceType string, monthl
 	productNameRe := "/Virtual Machines .* Series$/"
 	if strings.HasPrefix(strings.ToLower(instanceType), "basic_") {
 		productNameRe = "/Virtual Machines .* Series Basic$/"
-		} else if !strings.HasPrefix(strings.ToLower(instanceType), "standard_") {
+	} else if !strings.HasPrefix(strings.ToLower(instanceType), "standard_") {
 		instanceType = fmt.Sprintf("Standard_%s", instanceType)
 	}
 

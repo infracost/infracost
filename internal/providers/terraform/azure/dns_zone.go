@@ -19,7 +19,7 @@ func getDNSZoneRegistryItem() *schema.RegistryItem {
 func NewDNSZone(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	r := &azure.DNSZone{
 		Address: d.Address,
-		Region: lookupRegion(d, []string{"resource_group_name"}),
+		Region:  lookupRegion(d, []string{"resource_group_name"}),
 	}
 
 	r.PopulateUsage(u)

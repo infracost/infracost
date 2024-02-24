@@ -1,13 +1,15 @@
 package azure
 
 import (
+	"regexp"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 
 	"strings"
 
+	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
-	log "github.com/sirupsen/logrus"
 )
 
 type KubernetesClusterNodePool struct {
@@ -15,12 +17,17 @@ type KubernetesClusterNodePool struct {
 	Region       string
 	NodeCount    int64
 	VMSize       string
+	OS           string
 	OSDiskType   string
 	OSDiskSizeGB int64
-	Nodes        *int64 `infracost_usage:"nodes"`
+	Nodes        *int64   `infracost_usage:"nodes"`
+	MonthlyHours *float64 `infracost_usage:"monthly_hrs"`
 }
 
-var KubernetesClusterNodePoolUsageSchema = []*schema.UsageItem{{Key: "nodes", ValueType: schema.Int64, DefaultValue: 0}}
+var KubernetesClusterNodePoolUsageSchema = []*schema.UsageItem{
+	{Key: "nodes", ValueType: schema.Int64, DefaultValue: 0},
+	{Key: "monthly_hrs", ValueType: schema.Float64, DefaultValue: 0},
+}
 
 func (r *KubernetesClusterNodePool) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -36,17 +43,23 @@ func (r *KubernetesClusterNodePool) BuildResource() *schema.Resource {
 		nodeCount = decimal.NewFromInt(*r.Nodes)
 	}
 
-	return aksClusterNodePool(r.Address, r.Region, r.VMSize, r.OSDiskType, r.OSDiskSizeGB, nodeCount)
+	return aksClusterNodePool(r.Address, r.Region, r.VMSize, r.OS, r.OSDiskType, r.OSDiskSizeGB, nodeCount, r.MonthlyHours)
 }
 
-func aksClusterNodePool(name, region, instanceType, osDiskType string, osDiskSizeGB int64, nodeCount decimal.Decimal) *schema.Resource {
+func aksClusterNodePool(name, region, instanceType, os string, osDiskType string, osDiskSizeGB int64, nodeCount decimal.Decimal, monthlyHours *float64) *schema.Resource {
 	var costComponents []*schema.CostComponent
 	var subResources []*schema.Resource
 
 	mainResource := &schema.Resource{
 		Name: name,
 	}
-	costComponents = append(costComponents, linuxVirtualMachineCostComponent(region, instanceType, nil))
+
+	if strings.EqualFold(os, "windows") {
+		costComponents = append(costComponents, windowsVirtualMachineCostComponent(region, instanceType, "None", monthlyHours))
+	} else {
+		costComponents = append(costComponents, linuxVirtualMachineCostComponent(region, instanceType, monthlyHours))
+	}
+
 	mainResource.CostComponents = costComponents
 	schema.MultiplyQuantities(mainResource, nodeCount)
 
@@ -58,7 +71,7 @@ func aksClusterNodePool(name, region, instanceType, osDiskType string, osDiskSiz
 		if osDiskSizeGB > 0 {
 			diskSize = int(osDiskSizeGB)
 		}
-		osDisk := aksOSDiskSubResource(region, diskSize)
+		osDisk := aksOSDiskSubResource(region, diskSize, instanceType)
 
 		if osDisk != nil {
 			subResources = append(subResources, osDisk)
@@ -70,25 +83,54 @@ func aksClusterNodePool(name, region, instanceType, osDiskType string, osDiskSiz
 	return mainResource
 }
 
-func aksOSDiskSubResource(region string, diskSize int) *schema.Resource {
-	diskType := "Premium_LRS"
+func aksOSDiskSubResource(region string, diskSize int, instanceType string) *schema.Resource {
+	diskType := aksGetStorageType(instanceType)
+	storageReplicationType := "LRS"
 
 	diskName := mapDiskName(diskType, diskSize)
 	if diskName == "" {
-		log.Warnf("Could not map disk type %s and size %d to disk name", diskType, diskSize)
+		log.Warn().Msgf("Could not map disk type %s and size %d to disk name", diskType, diskSize)
 		return nil
 	}
 
 	productName, ok := diskProductNameMap[diskType]
 	if !ok {
-		log.Warnf("Could not map disk type %s to product name", diskType)
+		log.Warn().Msgf("Could not map disk type %s to product name", diskType)
 		return nil
 	}
 
-	costComponent := []*schema.CostComponent{storageCostComponent(region, diskName, productName)}
+	costComponent := []*schema.CostComponent{storageCostComponent(region, diskName, storageReplicationType, productName)}
 
 	return &schema.Resource{
 		Name:           "os_disk",
 		CostComponents: costComponent,
 	}
+}
+
+func aksGetStorageType(instanceType string) string {
+	parts := strings.Split(instanceType, "_")
+
+	subfamily := ""
+	if len(parts) > 1 {
+		subfamily = parts[1]
+	}
+
+	// Check if the subfamily is a known premium type
+	premiumPrefixes := []string{"ds", "gs", "m"}
+	for _, p := range premiumPrefixes {
+		if strings.HasPrefix(strings.ToLower(subfamily), p) {
+			return "Premium"
+		}
+	}
+
+	// Otherwise check if it contains an s as an 'Additive Feature'
+	// as per https://learn.microsoft.com/en-us/azure/virtual-machines/vm-naming-conventions
+	re := regexp.MustCompile(`\d+[A-Za-z]*(s)`)
+	matches := re.FindStringSubmatch(subfamily)
+
+	if len(matches) > 0 {
+		return "Premium"
+	}
+
+	return "Standard"
 }

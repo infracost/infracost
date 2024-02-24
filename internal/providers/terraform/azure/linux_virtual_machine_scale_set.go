@@ -18,6 +18,7 @@ func NewLinuxVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageData)
 		SKU:             d.Get("sku").String(),
 		UltraSSDEnabled: d.Get("additional_capabilities.0.ultra_ssd_enabled").Bool(),
 	}
+
 	if len(d.Get("os_disk").Array()) > 0 {
 		storageData := d.Get("os_disk").Array()[0]
 		r.OSDiskData = &azure.ManagedDiskData{
@@ -29,8 +30,10 @@ func NewLinuxVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageData)
 	}
 
 	r.PopulateUsage(u)
-	if u.IsEmpty("instances") {
+
+	if u == nil || u.IsEmpty("instances") {
 		r.Instances = intPtr(d.Get("instances").Int())
 	}
+
 	return r.BuildResource()
 }

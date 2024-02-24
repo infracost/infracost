@@ -16,6 +16,7 @@ type KubernetesCluster struct {
 	SKUTier                       string
 	NetworkProfileLoadBalancerSKU string
 	DefaultNodePoolNodeCount      int64
+	DefaultNodePoolOS             string
 	DefaultNodePoolOSDiskType     string
 	DefaultNodePoolVMSize         string
 	DefaultNodePoolOSDiskSizeGB   int64
@@ -25,16 +26,20 @@ type KubernetesCluster struct {
 }
 
 type KubernetesClusterLoadBalancer struct {
-	MonthlyDataProcessedGB int64 `infracost_usage:"monthly_data_processed_gb"`
+	MonthlyDataProcessedGB *int64 `infracost_usage:"monthly_data_processed_gb"`
 }
 
 type KubernetesClusterDefaultNodePool struct {
-	Nodes int64 `infracost_usage:"nodes"`
+	Nodes        *int64   `infracost_usage:"nodes"`
+	MonthlyHours *float64 `infracost_usage:"monthly_hrs"`
 }
 
 var KubernetesClusterLoadBalancerSchema = []*schema.UsageItem{{Key: "monthly_data_processed_gb", ValueType: schema.Int64, DefaultValue: 0}}
 
-var KubernetesClusterDefaultNodePoolSchema = []*schema.UsageItem{{Key: "nodes", ValueType: schema.Int64, DefaultValue: 0}}
+var KubernetesClusterDefaultNodePoolSchema = []*schema.UsageItem{
+	{Key: "nodes", ValueType: schema.Int64, DefaultValue: 0},
+	{Key: "monthly_hrs", ValueType: schema.Float64, DefaultValue: 0},
+}
 
 var KubernetesClusterUsageSchema = []*schema.UsageItem{
 	{
@@ -87,20 +92,27 @@ func (r *KubernetesCluster) BuildResource() *schema.Resource {
 	}
 
 	nodeCount := decimal.NewFromInt(1)
+	var monthlyHours *float64
 	if r.DefaultNodePoolNodeCount > 0 {
 		nodeCount = decimal.NewFromInt(r.DefaultNodePoolNodeCount)
 	}
-	if r.DefaultNodePool.Nodes > 0 {
-		nodeCount = decimal.NewFromInt(r.DefaultNodePool.Nodes)
+	if r.DefaultNodePool != nil && r.DefaultNodePool.Nodes != nil && *r.DefaultNodePool.Nodes > 0 {
+		nodeCount = decimal.NewFromInt(*r.DefaultNodePool.Nodes)
+		monthlyHours = r.DefaultNodePool.MonthlyHours
 	}
 
 	subResources = []*schema.Resource{
-		aksClusterNodePool("default_node_pool", region, r.DefaultNodePoolVMSize, r.DefaultNodePoolOSDiskType, r.DefaultNodePoolOSDiskSizeGB, nodeCount),
+		aksClusterNodePool("default_node_pool", region, r.DefaultNodePoolVMSize, r.DefaultNodePoolOS, r.DefaultNodePoolOSDiskType, r.DefaultNodePoolOSDiskSizeGB, nodeCount, monthlyHours),
 	}
 
 	if strings.ToLower(r.NetworkProfileLoadBalancerSKU) == "standard" {
 		region = convertRegion(region)
-		monthlyDataProcessedGB := decimalPtr(decimal.NewFromInt(r.LoadBalancer.MonthlyDataProcessedGB))
+
+		var monthlyDataProcessedGB *decimal.Decimal
+		if r.LoadBalancer != nil && r.LoadBalancer.MonthlyDataProcessedGB != nil {
+			monthlyDataProcessedGB = decimalPtr(decimal.NewFromInt(*r.LoadBalancer.MonthlyDataProcessedGB))
+		}
+
 		lbResource := schema.Resource{
 			Name:           "Load Balancer",
 			CostComponents: []*schema.CostComponent{lbDataProcessedCostComponent(region, monthlyDataProcessedGB)}, UsageSchema: KubernetesClusterUsageSchema,

@@ -20,7 +20,7 @@ type VirtualMachine struct {
 	StorageOSDiskData          *ManagedDiskData
 	OSDiskData                 *ManagedDiskData
 	StoragesDiskData           []*ManagedDiskData
-	MonthlyHours               *float64              `infracost_usage:"montly_hrs"`
+	MonthlyHours               *float64              `infracost_usage:"monthly_hrs"`
 	StorageOSDisk              *StorageOSDiskUsage   `infracost_usage:"storage_os_disk"`
 	StorageDataDisk            *StorageDataDiskUsage `infracost_usage:"storage_data_disk"`
 }
@@ -42,7 +42,7 @@ var StorageDataDiskUsageSchema = []*schema.UsageItem{
 }
 
 var VirtualMachineUsageSchema = []*schema.UsageItem{
-	{Key: "montly_hrs", ValueType: schema.Float64, DefaultValue: 0},
+	{Key: "monthly_hrs", ValueType: schema.Float64, DefaultValue: 0},
 	{
 		Key:          "storage_os_disk",
 		ValueType:    schema.SubResourceUsage,
@@ -86,7 +86,7 @@ func (r *VirtualMachine) BuildResource() *schema.Resource {
 	costComponents = append(costComponents, ultraSSDReservationCostComponent(region))
 
 	var storageOperations *decimal.Decimal
-	if r.StorageOSDisk.MonthlyDiskOperations != nil {
+	if r.StorageOSDisk != nil && r.StorageOSDisk.MonthlyDiskOperations != nil {
 		storageOperations = decimalPtr(decimal.NewFromInt(*r.StorageOSDisk.MonthlyDiskOperations))
 	}
 
@@ -96,7 +96,7 @@ func (r *VirtualMachine) BuildResource() *schema.Resource {
 		subResources = append(subResources, legacyOSDiskSubResource(region, r.StorageOSDiskData.DiskType, r.StorageOSDiskData.DiskSizeGB, r.StorageOSDiskData.DiskIOPSReadWrite, r.StorageOSDiskData.DiskMBPSReadWrite, storageOperations))
 	}
 
-	if r.StorageDataDisk.MonthlyDiskOperations != nil {
+	if r.StorageOSDisk != nil && r.StorageDataDisk.MonthlyDiskOperations != nil {
 		storageOperations = decimalPtr(decimal.NewFromInt(*r.StorageDataDisk.MonthlyDiskOperations))
 	}
 

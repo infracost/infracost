@@ -3,7 +3,6 @@ package azure
 import (
 	"github.com/infracost/infracost/internal/resources/azure"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/tidwall/gjson"
 )
 
 func getWindowsVirtualMachineScaleSetRegistryItem() *schema.RegistryItem {
@@ -29,9 +28,12 @@ func NewWindowsVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageDat
 			DiskMBPSReadWrite: diskData.Get("disk_mbps_read_write").Int(),
 		}
 	}
+
 	r.PopulateUsage(u)
-	if u.Get("instances").Type == gjson.Null || u.Get("instances").Int() == 0 {
+
+	if u == nil || u.IsEmpty("instances") {
 		r.Instances = intPtr(d.Get("instances").Int())
 	}
+
 	return r.BuildResource()
 }
