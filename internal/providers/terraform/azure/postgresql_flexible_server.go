@@ -10,7 +10,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func getRMPostgreSQLFlexibleServerRegistryItem() *schema.RegistryItem {
+func getPostgreSQLFlexibleServerRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_postgresql_flexible_server",
 		RFunc: newPostgreSQLFlexibleServer,

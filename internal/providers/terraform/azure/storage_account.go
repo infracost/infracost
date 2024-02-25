@@ -7,7 +7,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func getRMStorageAccountRegistryItem() *schema.RegistryItem {
+func getStorageAccountRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:      "azurerm_storage_account",
 		CoreRFunc: newAzureRMStorageAccount,

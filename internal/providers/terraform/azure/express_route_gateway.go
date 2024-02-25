@@ -5,7 +5,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func getRMExpressRouteGatewayRegistryItem() *schema.RegistryItem {
+func getExpressRouteGatewayRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_express_route_gateway",
 		RFunc: newExpressRouteGateway,

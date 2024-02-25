@@ -46,7 +46,7 @@ var (
 	}
 )
 
-func getRMSQLDatabaseRegistryItem() *schema.RegistryItem {
+func getSQLDatabaseRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_sql_database",
 		RFunc: newSQLDatabase,

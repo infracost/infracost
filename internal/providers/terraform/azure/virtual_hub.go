@@ -5,7 +5,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func getRMVirtualHubRegistryItem() *schema.RegistryItem {
+func getVirtualHubRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_virtual_hub",
 		RFunc: newVirtualHub,

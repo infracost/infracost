@@ -9,7 +9,7 @@ import (
 
 // getAzureRMFrontdoorFirewallPolicyRegistryItem returns a registry item for the
 // resource
-func getRMFrontdoorFirewallPolicyRegistryItem() *schema.RegistryItem {
+func getFrontdoorFirewallPolicyRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_frontdoor_firewall_policy",
 		RFunc: newFrontdoorFirewallPolicy,

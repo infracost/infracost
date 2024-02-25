@@ -5,7 +5,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func getRMVPNGatewayRegistryItem() *schema.RegistryItem {
+func getVPNGatewayRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_vpn_gateway",
 		RFunc: newVPNGateway,
