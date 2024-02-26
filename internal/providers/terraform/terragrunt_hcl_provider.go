@@ -171,6 +171,8 @@ func getEnvVars(ctx *config.ProjectContext) map[string]string {
 	return environmentMap
 }
 
+func (p *TerragruntHCLProvider) Context() *config.ProjectContext { return p.ctx }
+
 func (p *TerragruntHCLProvider) ProjectName() string {
 	return ""
 }
@@ -349,7 +351,7 @@ func (p *TerragruntHCLProvider) generateProjectName(metadata *schema.ProjectMeta
 }
 
 func (p *TerragruntHCLProvider) newProjectMetadata(projectPath string, originalMetadata *schema.ProjectMetadata) *schema.ProjectMetadata {
-	metadata := config.DetectProjectMetadata(projectPath)
+	metadata := schema.DetectProjectMetadata(projectPath)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
 	if originalMetadata != nil {

@@ -22,6 +22,8 @@ func NewTemplateProvider(ctx *config.ProjectContext, includePastResources bool) 
 	}
 }
 
+func (p *TemplateProvider) Context() *config.ProjectContext { return p.ctx }
+
 func (p *TemplateProvider) Type() string {
 	return "cloudformation"
 }
@@ -40,7 +42,7 @@ func (p *TemplateProvider) LoadResources(usage schema.UsageMap) ([]*schema.Proje
 		return []*schema.Project{}, errors.Wrap(err, "Error reading CloudFormation template file")
 	}
 
-	metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
+	metadata := schema.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
 	name := p.ctx.ProjectConfig.Name

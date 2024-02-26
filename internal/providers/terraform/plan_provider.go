@@ -52,7 +52,7 @@ func (p *PlanProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, 
 	})
 	defer spinner.Fail()
 
-	metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
+	metadata := schema.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
 	name := p.ctx.ProjectConfig.Name

@@ -240,19 +240,17 @@ func (r *parallelRunner) run() ([]projectResult, error) {
 
 	var i int
 	for _, p := range r.runCtx.Config.Projects {
-		ctx := config.NewProjectContext(r.runCtx, p, map[string]interface{}{})
 		detected, err := providers.Detect(r.runCtx, p, r.prior == nil)
-
 		if err != nil {
 			m := fmt.Sprintf("%s\n\n", err)
 			m += fmt.Sprintf("  Try adding a config-file to configure how Infracost should run. See %s for details and examples.", ui.LinkString("https://infracost.io/config-file"))
 
-			queue = append(queue, projectJob{index: i, err: schema.NewEmptyPathTypeError(errors.New(m)), ctx: ctx})
+			queue = append(queue, projectJob{index: i, err: schema.NewEmptyPathTypeError(errors.New(m)), ctx: config.NewProjectContext(r.runCtx, p, map[string]interface{}{})})
 			continue
 		}
 
 		for _, provider := range detected {
-			queue = append(queue, projectJob{index: i, provider: provider, ctx: ctx})
+			queue = append(queue, projectJob{index: i, provider: provider})
 			i++
 		}
 	}
@@ -277,18 +275,21 @@ func (r *parallelRunner) run() ([]projectResult, error) {
 
 			for job := range jobs {
 				var configProjects *projectOutput
+				ctx := job.ctx
 				if job.err != nil {
 					configProjects = newErroredProject(job.ctx, job.err)
 				} else {
 					configProjects, err = r.runProvider(job)
+					ctx = job.provider.Context()
 					if err != nil {
-						configProjects = newErroredProject(job.ctx, err)
+						configProjects = newErroredProject(ctx, err)
 					}
+
 				}
 
 				projectResultChan <- projectResult{
 					index:      job.index,
-					ctx:        job.ctx,
+					ctx:        ctx,
 					projectOut: configProjects,
 				}
 			}
@@ -337,7 +338,8 @@ func (r *parallelRunner) printParallelMsg(queue []projectJob) {
 }
 
 func (r *parallelRunner) runProvider(job projectJob) (*projectOutput, error) {
-	mux := r.pathMuxs[job.ctx.ProjectConfig.Path]
+	path := job.provider.Context().ProjectConfig.Path
+	mux := r.pathMuxs[path]
 	if mux != nil {
 		mux.Lock()
 		defer mux.Unlock()
@@ -350,9 +352,9 @@ func (r *parallelRunner) runProvider(job projectJob) (*projectOutput, error) {
 		return nil, clierror.NewCLIError(errors.New(m), "Cannot use Terraform state JSON with the infracost diff command")
 	}
 
-	m := fmt.Sprintf("Detected %s at %s", job.provider.DisplayType(), ui.DisplayPath(job.ctx.ProjectConfig.Path))
+	m := fmt.Sprintf("Detected %s at %s", job.provider.DisplayType(), ui.DisplayPath(path))
 	if job.provider.Type() == "terraform_dir" {
-		m = fmt.Sprintf("Evaluating %s at %s", job.provider.DisplayType(), ui.DisplayPath(job.ctx.ProjectConfig.Path))
+		m = fmt.Sprintf("Evaluating %s at %s", job.provider.DisplayType(), ui.DisplayPath(path))
 	}
 
 	if r.runCtx.Config.IsLogging() {
@@ -363,7 +365,7 @@ func (r *parallelRunner) runProvider(job projectJob) (*projectOutput, error) {
 
 	// Generate usage file
 	if r.runCtx.Config.SyncUsageFile {
-		err := r.generateUsageFile(job.ctx, job.provider)
+		err := r.generateUsageFile(job.provider)
 		if err != nil {
 			return nil, fmt.Errorf("Error generating usage file %w", err)
 		}
@@ -372,9 +374,9 @@ func (r *parallelRunner) runProvider(job projectJob) (*projectOutput, error) {
 	// Load usage data
 	var usageFile *usage.UsageFile
 
-	if job.ctx.ProjectConfig.UsageFile != "" {
+	if job.provider.Context().ProjectConfig.UsageFile != "" {
 		var err error
-		usageFile, err = usage.LoadUsageFile(job.ctx.ProjectConfig.UsageFile)
+		usageFile, err = usage.LoadUsageFile(job.provider.Context().ProjectConfig.UsageFile)
 		if err != nil {
 			return nil, err
 		}
@@ -389,7 +391,7 @@ func (r *parallelRunner) runProvider(job projectJob) (*projectOutput, error) {
 			)
 		}
 
-		job.ctx.ContextValues.SetValue("hasUsageFile", true)
+		job.provider.Context().ContextValues.SetValue("hasUsageFile", true)
 	} else {
 		usageFile = usage.NewBlankUsageFile()
 	}
@@ -478,7 +480,7 @@ func (r *parallelRunner) runProvider(job projectJob) (*projectOutput, error) {
 
 	t2 := time.Now()
 	taken := t2.Sub(t1).Milliseconds()
-	job.ctx.ContextValues.SetValue("tfProjectRunTimeMs", taken)
+	job.provider.Context().ContextValues.SetValue("tfProjectRunTimeMs", taken)
 
 	spinner.Success()
 
@@ -607,7 +609,9 @@ func (r *parallelRunner) populateActualCosts(projects []*schema.Project) {
 	}
 }
 
-func (r *parallelRunner) generateUsageFile(ctx *config.ProjectContext, provider schema.Provider) error {
+func (r *parallelRunner) generateUsageFile(provider schema.Provider) error {
+	ctx := provider.Context()
+
 	if ctx.ProjectConfig.UsageFile == "" {
 		// This should not happen as we check earlier in the code that usage-file is not empty when sync-usage-file flag is on.
 		return fmt.Errorf("Error generating usage: no usage file given")
@@ -897,7 +901,7 @@ func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectCon
 }
 
 func newErroredProject(ctx *config.ProjectContext, err error) *projectOutput {
-	metadata := config.DetectProjectMetadata(ctx.ProjectConfig.Path)
+	metadata := schema.DetectProjectMetadata(ctx.ProjectConfig.Path)
 	metadata.Type = "error"
 	metadata.AddError(err)
 

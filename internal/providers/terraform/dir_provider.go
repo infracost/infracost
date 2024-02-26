@@ -74,6 +74,8 @@ func NewDirProvider(ctx *config.ProjectContext, includePastResources bool) schem
 	}
 }
 
+func (p *DirProvider) Context() *config.ProjectContext { return p.ctx }
+
 func (p *DirProvider) Type() string {
 	return "terraform_cli"
 }
@@ -171,7 +173,7 @@ func (p *DirProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, e
 	}
 
 	for _, j := range jsons {
-		metadata := config.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
+		metadata := schema.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
 		metadata.Type = p.Type()
 		p.AddMetadata(metadata)
 		name := p.ctx.ProjectConfig.Name
