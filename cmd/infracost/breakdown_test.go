@@ -171,6 +171,29 @@ func TestBreakdownFormatJsonWithTagsGoogle(t *testing.T) {
 	)
 }
 
+func TestBreakdownFormatJsonWithTagsTerragrunt(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testName,
+		[]string{
+			"breakdown",
+			"--format", "json",
+			"--path", dir,
+		},
+		&GoldenFileOptions{
+			CaptureLogs: true,
+			IsJSON:      true,
+			JSONInclude: regexp.MustCompile("^(defaultTags|tags|name)$"),
+			JSONExclude: regexp.MustCompile("^(costComponents|pastBreakdown)$"),
+		},
+		func(ctx *config.RunContext) {
+			ctx.Config.TagPoliciesEnabled = true
+		},
+	)
+}
+
 func TestBreakdownFormatJSONShowSkipped(t *testing.T) {
 	opts := DefaultOptions()
 	opts.IsJSON = true
