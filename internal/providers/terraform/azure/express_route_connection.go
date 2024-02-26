@@ -5,7 +5,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-func getAzureRMExpressRouteConnectionRegistryItem() *schema.RegistryItem {
+func getExpressRouteConnectionRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_express_route_connection",
 		RFunc: newExpressRouteConnection,

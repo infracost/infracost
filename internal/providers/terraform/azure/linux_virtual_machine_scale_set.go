@@ -1,47 +1,38 @@
 package azure
 
 import (
+	"github.com/infracost/infracost/internal/resources/azure"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
-	"github.com/tidwall/gjson"
 )
 
-func GetAzureRMLinuxVirtualMachineScaleSetRegistryItem() *schema.RegistryItem {
+func getLinuxVirtualMachineScaleSetRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_linux_virtual_machine_scale_set",
-		RFunc: NewAzureRMLinuxVirtualMachineScaleSet,
+		RFunc: NewLinuxVirtualMachineScaleSet,
 	}
 }
 
-func NewAzureRMLinuxVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := lookupRegion(d, []string{})
-
-	instanceType := d.Get("sku").String()
-
-	costComponents := []*schema.CostComponent{linuxVirtualMachineCostComponent(region, instanceType, nil)}
-	subResources := make([]*schema.Resource, 0)
-
-	if d.Get("additional_capabilities.0.ultra_ssd_enabled").Bool() {
-		costComponents = append(costComponents, ultraSSDReservationCostComponent(region))
+func NewLinuxVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+	r := &azure.LinuxVirtualMachineScaleSet{
+		Address:         d.Address,
+		Region:          lookupRegion(d, []string{}),
+		SKU:             d.Get("sku").String(),
+		UltraSSDEnabled: d.Get("additional_capabilities.0.ultra_ssd_enabled").Bool(),
 	}
 
-	osDisk := osDiskSubResource(region, d, u)
-	if osDisk != nil {
-		subResources = append(subResources, osDisk)
+	if len(d.Get("os_disk").Array()) > 0 {
+		storageData := d.Get("os_disk").Array()[0]
+		r.OSDiskData = &azure.ManagedDiskData{
+			DiskType:   storageData.Get("storage_account_type").String(),
+			DiskSizeGB: storageData.Get("disk_size_gb").Int(),
+		}
 	}
 
-	instanceCount := decimal.NewFromInt(d.Get("instances").Int())
-	if u != nil && u.Get("instances").Type != gjson.Null {
-		instanceCount = decimal.NewFromInt(u.Get("instances").Int())
+	r.PopulateUsage(u)
+
+	if u == nil || u.IsEmpty("instances") {
+		r.Instances = intPtr(d.Get("instances").Int())
 	}
 
-	r := &schema.Resource{
-		Name:           d.Address,
-		CostComponents: costComponents,
-		SubResources:   subResources,
-	}
-
-	schema.MultiplyQuantities(r, instanceCount)
-
-	return r
+	return r.BuildResource()
 }

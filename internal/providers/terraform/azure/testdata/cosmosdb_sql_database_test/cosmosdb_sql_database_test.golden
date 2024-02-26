@@ -1,6 +1,15 @@
 
  Name                                                             Monthly Qty  Unit                      Monthly Cost 
                                                                                                                       
+ azurerm_cosmosdb_sql_database.account_by_name                                                                        
+ ├─ Provisioned throughput (provisioned, West US)                           5  RU/s x 100                      $29.20 
+ ├─ Transactional storage (West US)                        Monthly cost depends on usage: $0.25 per GB                
+ ├─ Analytical storage (West US)                           Monthly cost depends on usage: $0.03 per GB                
+ ├─ Analytical write operations (West US)                  Monthly cost depends on usage: $0.055 per 10K operations   
+ ├─ Analytical read operations (West US)                   Monthly cost depends on usage: $0.0054 per 10K operations  
+ ├─ Periodic backup (West US)                              Monthly cost depends on usage: $0.15 per GB                
+ └─ Restored data                                          Monthly cost depends on usage: $0.15 per GB                
+                                                                                                                      
  azurerm_cosmosdb_sql_database.autoscale                                                                              
  ├─ Provisioned throughput (autoscale, West US)                            45  RU/s x 100                     $262.80 
  ├─ Provisioned throughput (autoscale, Central US)                         45  RU/s x 100                     $262.80 
@@ -44,10 +53,10 @@
  ├─ Periodic backup (West US)                                           2,000  GB                             $300.00 
  └─ Restored data                                                       3,000  GB                             $450.00 
                                                                                                                       
- OVERALL TOTAL                                                                                              $5,155.73 
+ OVERALL TOTAL                                                                                              $5,184.93 
 ──────────────────────────────────
-9 cloud resources were detected:
-∙ 5 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+10 cloud resources were detected:
+∙ 6 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 4 were free:
   ∙ 3 x azurerm_cosmosdb_account
   ∙ 1 x azurerm_resource_group
@@ -55,5 +64,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMCosmosDBSQLDatabaseGoldenFile           ┃ $5,156       ┃
+┃ TestAzureRMCosmosDBSQLDatabaseGoldenFile           ┃ $5,185       ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛

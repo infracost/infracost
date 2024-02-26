@@ -46,7 +46,7 @@
  ├─ storage_data_disk                                                                                                  
  │  └─ Storage (P4, LRS)                                                     1  months                           $5.81 
  └─ storage_data_disk                                                                                                  
-    └─ Storage (P1, LRS)                                                     1  months                           $0.78 
+    └─ Storage (P4, LRS)                                                     1  months                           $5.81 
                                                                                                                        
  azurerm_virtual_machine.example["md"]                                                                                 
  ├─ Instance usage (Linux, pay as you go, Standard_DS1_v2)                 730  hours                           $49.57 
@@ -67,7 +67,7 @@
     ├─ Storage (E4, LRS)                                                     1  months                           $2.40 
     └─ Disk operations                                      Monthly cost depends on usage: $0.002 per 10k operations   
                                                                                                                        
- OVERALL TOTAL                                                                                                 $329.16 
+ OVERALL TOTAL                                                                                                 $334.19 
 ──────────────────────────────────
 20 cloud resources were detected:
 ∙ 16 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
@@ -80,5 +80,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestImage                                          ┃ $329         ┃
+┃ TestImage                                          ┃ $334         ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛

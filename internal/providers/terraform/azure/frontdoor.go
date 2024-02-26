@@ -9,8 +9,8 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-// getAzureRMFrontdoorRegistryItem returns a registry item for the resource
-func getAzureRMFrontdoorRegistryItem() *schema.RegistryItem {
+// getFrontdoorRegistryItem returns a registry item for the resource
+func getFrontdoorRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:  "azurerm_frontdoor",
 		RFunc: newFrontdoor,

@@ -16,7 +16,7 @@ var sentinelDataConnectorRefs = []string{
 	"azurerm_sentinel_data_connector_threat_intelligence.log_analytics_workspace_id",
 }
 
-func getAzureRMLogAnalyticsWorkspaceRegistryItem() *schema.RegistryItem {
+func getLogAnalyticsWorkspaceRegistryItem() *schema.RegistryItem {
 	refs := []string{
 		"resource_group_name",
 		"azurerm_log_analytics_solution.workspace_resource_id",
