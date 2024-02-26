@@ -137,7 +137,7 @@ func CompareTo(c *config.Config, current, prior Root) (Root, error) {
 				scp.Diff = schema.CalculateDiff(scp.PastResources, scp.Resources)
 			}
 
-			if !p.Metadata.HasErrors() && v.Metadata.HasErrors() {
+			if !p.Metadata.HasErrors() && !v.Metadata.IsEmptyProjectError() && v.Metadata.HasErrors() {
 				// the prior project has errors, but the current one does not
 				// The prior errors will be copied over to the current, but we
 				// also need to remove the current project costs

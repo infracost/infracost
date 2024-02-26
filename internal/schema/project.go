@@ -21,6 +21,7 @@ const (
 	diagTerragruntEvaluationFailure       = 103
 	diagTerragruntModuleEvaluationFailure = 104
 	diagMissingVars                       = 105
+	diagEmptyPathType                     = 106
 
 	// Diags for git module issues
 	diagPrivateModuleDownloadFailure = 201
@@ -42,6 +43,12 @@ type ProjectDiag struct {
 
 	// FriendlyMessage should be used to display a readable message to the CLI user.
 	FriendlyMessage string `json:"-"`
+}
+
+// NewEmptyPathTypeError returns a project diag to indicate that a path type
+// cannot be detected.
+func NewEmptyPathTypeError(err error) *ProjectDiag {
+	return newDiag(diagEmptyPathType, err.Error(), true, nil, err)
 }
 
 // NewDiagRunQuotaExceeded returns a project diag for a run quota exceeded error.
@@ -206,6 +213,14 @@ func (m *ProjectMetadata) AddError(err error) {
 
 func (m *ProjectMetadata) HasErrors() bool {
 	return len(m.Errors) > 0
+}
+
+func (m *ProjectMetadata) IsEmptyProjectError() bool {
+	if len(m.Errors) == 0 || len(m.Errors) > 1 {
+		return false
+	}
+
+	return m.Errors[0].Code == diagEmptyPathType
 }
 
 // IsRunQuotaExceeded checks if any of the project diags are of type "run quota

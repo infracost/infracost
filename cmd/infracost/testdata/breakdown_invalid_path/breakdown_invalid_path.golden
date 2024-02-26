@@ -3,7 +3,7 @@ Project: infracost/infracost/cmd/infracost/invalid
 Errors:
   No such file or directory invalid
 
-Try adding a config-file to configure how Infracost should run. See https://infracost.io/config-file for details and examples.
+  Try adding a config-file to configure how Infracost should run. See https://infracost.io/config-file for details and examples.
 
  OVERALL TOTAL       $0.00 
 ──────────────────────────────────

@@ -27,7 +27,7 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 
 	s += "──────────────────────────────────\n"
 	for _, project := range out.Projects {
-		if project.Metadata.HasErrors() {
+		if project.Metadata.HasErrors() && !project.Metadata.IsEmptyProjectError() {
 			erroredProjects = append(erroredProjects, project)
 			continue
 		}
