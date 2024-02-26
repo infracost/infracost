@@ -1025,7 +1025,12 @@ func (e *Evaluator) loadModuleWithProviders(b *Block) (*ModuleCall, error) {
 			if len(split) == 2 {
 				parentMap := map[string]cty.Value{}
 				if parent, ok := providers[split[0]]; ok {
-					parentMap = parent.AsValueMap()
+					// In some cases parent will be a mock so we can just ignore it, unfortunately
+					// sometimes ignoring it causes the non-graph evaluator to get stuck in evaluation
+					// loops, so we only ignore mocks if we are graph-evaluating.
+					if !e.isGraph || (e.isGraph && parent.Type().IsObjectType()) {
+						parentMap = parent.AsValueMap()
+					}
 				}
 				parentMap[split[1]] = mappedProviders[k]
 				providers[split[0]] = cty.ObjectVal(parentMap)
