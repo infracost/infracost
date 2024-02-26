@@ -7,7 +7,7 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-// getAzureRMFrontdoorFirewallPolicyRegistryItem returns a registry item for the
+// getFrontdoorFirewallPolicyRegistryItem returns a registry item for the
 // resource
 func getFrontdoorFirewallPolicyRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
