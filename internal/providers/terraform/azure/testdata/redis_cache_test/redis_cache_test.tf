@@ -68,3 +68,14 @@ resource "azurerm_redis_cache" "premium_p3_replicas_per_primary" {
   replicas_per_primary = 3
 }
 
+resource "azurerm_redis_cache" "premium_zero_shards" {
+  name                = "example-cache"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  capacity            = 1
+  family              = "P"
+  sku_name            = "Premium"
+  shard_count         = 0
+}
+
+

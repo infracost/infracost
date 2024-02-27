@@ -36,7 +36,9 @@ func NewAzureRMRedisCache(d *schema.ResourceData, u *schema.UsageData) *schema.R
 	shards := int64(1)
 
 	if strings.EqualFold(skuName, "premium") {
-		if d.Get("shard_count").Type != gjson.Null {
+		// If shards is set to 0 then we still want to calculate the cost for 1 shard
+		// since the cache will be in HA-mode not cluster mode.
+		if d.Get("shard_count").Int() > 0 {
 			shards = d.Get("shard_count").Int()
 		}
 
