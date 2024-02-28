@@ -552,7 +552,7 @@ func (p *HCLProvider) marshalDefaultTagsBlock(providerBlock *hcl.Block) map[stri
 	}
 
 	value := tags.Value()
-	if !value.IsKnown() || !value.CanIterateElements() {
+	if value.IsNull() || !value.IsKnown() || !value.CanIterateElements() {
 		return nil
 	}
 
