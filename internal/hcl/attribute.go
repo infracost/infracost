@@ -528,7 +528,7 @@ func mockExpressionCalls(expr hcl.Expression, diagnostics hcl.Diagnostics, mocke
 		}
 	case *hclsyntax.ConditionalExpr:
 		return &hclsyntax.ConditionalExpr{
-			Condition:   mockCondition(diagnostics, t.Condition, mockedVal),
+			Condition:   mockBoolExpressionCall(t.Condition, diagnostics, mockedVal),
 			TrueResult:  mockExpressionCalls(t.TrueResult, diagnostics, mockedVal),
 			FalseResult: mockExpressionCalls(t.FalseResult, diagnostics, mockedVal),
 			SrcRange:    t.SrcRange,
@@ -574,7 +574,7 @@ func mockExpressionCalls(expr hcl.Expression, diagnostics hcl.Diagnostics, mocke
 			CollExpr:   newLiteralValueCollectionExpression(mockedVal, mockExpressionCalls(t.CollExpr, diagnostics, mockedVal)),
 			KeyExpr:    mockExpressionCalls(t.KeyExpr, diagnostics, mockedVal),
 			ValExpr:    mockExpressionCalls(t.ValExpr, diagnostics, mockedVal),
-			CondExpr:   mockCondition(diagnostics, t.CondExpr, mockedVal),
+			CondExpr:   mockBoolExpressionCall(t.CondExpr, diagnostics, mockedVal),
 			Group:      t.Group,
 			SrcRange:   t.SrcRange,
 			OpenRange:  t.OpenRange,
@@ -594,16 +594,48 @@ func mockExpressionCalls(expr hcl.Expression, diagnostics hcl.Diagnostics, mocke
 			MarkerRange: t.MarkerRange,
 		}
 	case *hclsyntax.BinaryOpExpr:
+		// Logical operators (|| and &&) expect bools on both sides, so we need to mock the expression
+		// with a bool value.
+		impl := t.Op.Impl
+		params := impl.Params()
+
+		var lhsVal hclsyntax.Expression
+		var rhsVal hclsyntax.Expression
+
+		if len(params) > 0 && params[0].Type == cty.Bool {
+			lhsVal = mockBoolExpressionCall(t.LHS, diagnostics, mockedVal)
+		} else {
+			lhsVal = mockExpressionCalls(t.LHS, diagnostics, mockedVal)
+		}
+
+		if len(params) > 1 && params[1].Type == cty.Bool {
+			rhsVal = mockBoolExpressionCall(t.RHS, diagnostics, mockedVal)
+		} else {
+			rhsVal = mockExpressionCalls(t.RHS, diagnostics, mockedVal)
+		}
+
 		return &hclsyntax.BinaryOpExpr{
-			LHS:      mockExpressionCalls(t.LHS, diagnostics, mockedVal),
+			LHS:      lhsVal,
 			Op:       t.Op,
-			RHS:      mockExpressionCalls(t.RHS, diagnostics, mockedVal),
+			RHS:      rhsVal,
 			SrcRange: t.SrcRange,
 		}
 	case *hclsyntax.UnaryOpExpr:
+		// The ! operator expects a bool on the right side, so we need to mock the expression
+		// with a bool value.
+		impl := t.Op.Impl
+		params := impl.Params()
+
+		var val hclsyntax.Expression
+		if len(params) > 0 && params[0].Type == cty.Bool {
+			val = mockBoolExpressionCall(t.Val, diagnostics, mockedVal)
+		} else {
+			val = mockExpressionCalls(t.Val, diagnostics, mockedVal)
+		}
+
 		return &hclsyntax.UnaryOpExpr{
 			Op:          t.Op,
-			Val:         mockExpressionCalls(t.Val, diagnostics, mockedVal),
+			Val:         val,
 			SrcRange:    t.SrcRange,
 			SymbolRange: t.SymbolRange,
 		}
@@ -659,7 +691,7 @@ func mockExpressionCalls(expr hcl.Expression, diagnostics hcl.Diagnostics, mocke
 	}
 }
 
-func mockCondition(diagnostics hcl.Diagnostics, expression hclsyntax.Expression, mockedVal cty.Value) hclsyntax.Expression {
+func mockBoolExpressionCall(expression hclsyntax.Expression, diagnostics hcl.Diagnostics, mockedVal cty.Value) hclsyntax.Expression {
 	if expression == nil {
 		return nil
 	}
