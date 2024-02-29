@@ -82,10 +82,6 @@ See https://infracost.io/docs/features/cli_commands/#upload-runs`,
 				logging.Logger.Warn().Err(err).Msg("could not report `infracost-upload` event")
 			}
 
-			if len(result.GovernanceFailures) > 0 {
-				return result.GovernanceFailures
-			}
-
 			return nil
 		},
 	}
