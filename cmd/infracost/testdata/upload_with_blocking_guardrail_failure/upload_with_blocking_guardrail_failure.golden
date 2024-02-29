@@ -1,10 +1,4 @@
 
-Err:
-Error: Governance check failed:
-
- - guardrail check failed: medical problems
-
-
 Logs:
 INF Estimate uploaded to Infracost Cloud
 INF 2 guardrails checked
