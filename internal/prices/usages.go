@@ -205,16 +205,16 @@ func UploadCloudResourceIDs(ctx *config.RunContext, project *schema.Project) err
 }
 
 func flattenUsageKeys(usageSchema []*schema.UsageItem) []string {
-	usageKeys := make([]string, len(usageSchema))
-	for i, usageItem := range usageSchema {
+	usageKeys := make([]string, 0, len(usageSchema))
+	for _, usageItem := range usageSchema {
 		if usageItem.ValueType == schema.SubResourceUsage {
 			ru := usageItem.DefaultValue.(*usage.ResourceUsage)
 			// recursively flatten any nested keys, then add them to the current list
 			for _, nestedKey := range flattenUsageKeys(ru.Items) {
-				usageKeys[i] = usageItem.Key + "." + nestedKey
+				usageKeys = append(usageKeys, usageItem.Key+"."+nestedKey)
 			}
 		} else {
-			usageKeys[i] = usageItem.Key
+			usageKeys = append(usageKeys, usageItem.Key)
 		}
 	}
 
