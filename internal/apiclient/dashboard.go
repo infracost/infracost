@@ -5,12 +5,14 @@ import (
 	"strings"
 	"time"
 
+	"github.com/hashicorp/go-retryablehttp"
 	json "github.com/json-iterator/go"
 
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog/log"
 
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -67,11 +69,15 @@ type projectResultInput struct {
 }
 
 func NewDashboardAPIClient(ctx *config.RunContext) *DashboardAPIClient {
+	client := retryablehttp.NewClient()
+	client.Logger = &LeveledLogger{Logger: logging.Logger.With().Str("library", "retryablehttp").Logger()}
+
 	return &DashboardAPIClient{
 		APIClient: APIClient{
-			endpoint: ctx.Config.DashboardAPIEndpoint,
-			apiKey:   ctx.Config.APIKey,
-			uuid:     ctx.UUID(),
+			httpClient: client.StandardClient(),
+			endpoint:   ctx.Config.DashboardAPIEndpoint,
+			apiKey:     ctx.Config.APIKey,
+			uuid:       ctx.UUID(),
 		},
 	}
 }
