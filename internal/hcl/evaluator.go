@@ -711,7 +711,7 @@ func (e *Evaluator) expandBlockCounts(blocks Blocks) Blocks {
 		value := countAttr.Value()
 		if !value.IsNull() && value.IsKnown() {
 			v := countAttr.AsInt()
-			if v <= math.MaxInt32 {
+			if v >= 0 && v <= math.MaxInt32 {
 				count = int(v)
 			}
 		}
