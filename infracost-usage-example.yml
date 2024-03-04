@@ -9,17 +9,6 @@ resource_type_default_usage:
     request_duration_ms: 500 # Average duration of each request in milliseconds.
 resource_usage:
   #
-  # Cloudformation AWS resources
-  #
-  AWS::DynamoDB::Table.MyTable:
-    monthly_write_request_units: 3000000  # Monthly write request units in (used for on-demand DynamoDB).
-    monthly_read_request_units: 8000000   # Monthly read request units in (used for on-demand DynamoDB).
-    storage_gb: 230                       # Total storage for tables in GB.
-    pitr_backup_storage_gb: 2300          # Total storage for Point-In-Time Recovery (PITR) backups in GB.
-    on_demand_backup_storage_gb: 460      # Total storage for on-demand backups in GB.
-    monthly_data_restored_gb: 230         # Monthly size of restored data in GB.
-    monthly_streams_read_request_units: 2 # Monthly streams read request units.
-  #
   # Terraform AWS resources
   #
   aws_acmpca_certificate_authority.my_private_ca:
