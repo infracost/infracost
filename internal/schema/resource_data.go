@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"strings"
 
-	"github.com/awslabs/goformation/v4/cloudformation"
+	"github.com/awslabs/goformation/v7/cloudformation"
 	"github.com/tidwall/gjson"
 )
 

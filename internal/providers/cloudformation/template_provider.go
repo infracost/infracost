@@ -1,11 +1,12 @@
 package cloudformation
 
 import (
-	"github.com/awslabs/goformation/v4"
+	"github.com/awslabs/goformation/v7"
 	"github.com/pkg/errors"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/ui"
 )
 
 type TemplateProvider struct {
@@ -42,6 +43,13 @@ func (p *TemplateProvider) LoadResources(usage schema.UsageMap) ([]*schema.Proje
 		return []*schema.Project{}, errors.Wrap(err, "Error reading CloudFormation template file")
 	}
 
+	spinner := ui.NewSpinner("Extracting only cost-related params from cloudformation", ui.SpinnerOptions{
+		EnableLogging: p.ctx.RunContext.Config.IsLogging(),
+		NoColor:       p.ctx.RunContext.Config.NoColor,
+		Indent:        "  ",
+	})
+	defer spinner.Fail()
+
 	metadata := schema.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
@@ -51,18 +59,16 @@ func (p *TemplateProvider) LoadResources(usage schema.UsageMap) ([]*schema.Proje
 	}
 
 	project := schema.NewProject(name, metadata)
-	parser := NewParser(p.ctx)
-	pastResources, resources, err := parser.parseTemplate(template, usage)
+	parser := NewParser(p.ctx, p.includePastResources)
+	parsed := parser.parseTemplate(template, usage)
 	if err != nil {
 		return []*schema.Project{project}, errors.Wrap(err, "Error parsing CloudFormation template file")
 	}
 
-	project.PastResources = pastResources
-	project.Resources = resources
-
-	if !p.includePastResources {
-		project.PastResources = nil
+	for _, item := range parsed {
+		project.PartialResources = append(project.PartialResources, item.PartialResource)
 	}
 
+	spinner.Success()
 	return []*schema.Project{project}, nil
 }
