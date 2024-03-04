@@ -994,6 +994,20 @@ func TestBreakdownWithMultipleProviders(t *testing.T) {
 	)
 }
 
+func TestBreakdownWithProvidersDependingOnData(t *testing.T) {
+	// This test doesn't pass for the non-graph evaluator
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path",
+			path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName()),
+		},
+		&GoldenFileOptions{IgnoreNonGraph: true},
+	)
+}
+
 func TestBreakdownMultiProjectWithError(t *testing.T) {
 	testName := testutil.CalcGoldenFileTestdataDirName()
 	dir := path.Join("./testdata", testName)

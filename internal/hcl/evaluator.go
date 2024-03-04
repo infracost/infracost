@@ -8,7 +8,6 @@ import (
 	"path/filepath"
 	"reflect"
 	"regexp"
-	"slices"
 	"strings"
 
 	"github.com/hashicorp/hcl/v2"
@@ -119,8 +118,26 @@ func NewEvaluator(
 		Functions: ExpFunctions(module.RootPath, logger),
 	}, nil, logger)
 
-	for key, provider := range module.Providers {
-		ctx.Set(provider, key)
+	// Add any provider references from blocks in this module.
+	// We do this here instead of loadModuleWithProviders to make sure
+	// this also works with the root module
+	if module.ProviderReferences == nil {
+		module.ProviderReferences = make(map[string]*Block)
+	}
+
+	providerBlocks := module.Blocks.OfType("provider")
+	for _, block := range providerBlocks {
+		k := block.Label()
+
+		alias := block.GetAttribute("alias")
+		if alias != nil {
+			k = k + "." + alias.AsString()
+		}
+		module.ProviderReferences[k] = block
+	}
+
+	for key, provider := range module.ProviderReferences {
+		ctx.Set(provider.Values(), key)
 	}
 
 	if visitedModules == nil {
@@ -250,6 +267,14 @@ func (e *Evaluator) collectModules() *Module {
 		root.Modules = append(root.Modules, definition.Module)
 	}
 
+	// Reload the provider references for this module instance
+	// We need to do this so when we call ProviderConfigKey() we get the fully
+	// resolved provider. We might be able to improve this by only evaluating the
+	// provider block when we need it.
+	for name, providerBlock := range root.ProviderReferences {
+		e.ctx.Set(providerBlock.Values(), name)
+	}
+
 	if v := e.MissingVars(); len(v) > 0 {
 		root.Warnings = append(root.Warnings, schema.NewDiagMissingVars(v...))
 	}
@@ -330,16 +355,16 @@ func (e *Evaluator) evaluateModules() {
 
 		moduleEvaluator := NewEvaluator(
 			Module{
-				Name:       fullName,
-				Source:     moduleCall.Module.Source,
-				Providers:  moduleCall.Module.Providers,
-				Blocks:     moduleCall.Module.RawBlocks,
-				RawBlocks:  moduleCall.Module.RawBlocks,
-				RootPath:   e.module.RootPath,
-				ModulePath: moduleCall.Path,
-				Modules:    nil,
-				Parent:     &e.module,
-				SourceURL:  moduleCall.Module.SourceURL,
+				Name:               fullName,
+				Source:             moduleCall.Module.Source,
+				Blocks:             moduleCall.Module.RawBlocks,
+				RawBlocks:          moduleCall.Module.RawBlocks,
+				RootPath:           e.module.RootPath,
+				ModulePath:         moduleCall.Path,
+				Modules:            nil,
+				Parent:             &e.module,
+				SourceURL:          moduleCall.Module.SourceURL,
+				ProviderReferences: moduleCall.Module.ProviderReferences,
 			},
 			e.workingDir,
 			vars,
@@ -995,52 +1020,25 @@ func (e *Evaluator) loadModuleWithProviders(b *Block) (*ModuleCall, error) {
 		return modCall, err
 	}
 
-	// now load the providers
-	providers := map[string]cty.Value{}
-	// inherit any providers from the providers from the parent module
-	for key, provider := range e.module.Providers {
-		providers[key] = provider
+	// Pass any provider references that should be inherited by the module.
+	// This includes any implicit providers that are inherited from the parent
+	// module, as well as any explicit provider references that are passed in
+	// via the "providers" attribute.
+	providerRefs := map[string]*Block{}
+
+	for key, block := range e.module.ProviderReferences {
+		providerRefs[key] = block
 	}
 
-	providerBlocks := e.getValuesByBlockType("provider")
-	for key, provider := range providerBlocks.AsValueMap() {
-		providers[key] = provider
-	}
-
-	// adjust the providers based on the module.providers mapping
 	providerAttr := b.GetAttribute("providers")
 	if providerAttr != nil {
-		mappedProviders := providerAttr.ProvidersValue().AsValueMap()
-
-		// sort the map keys to ensure that we always populate root providers (e.g. "aws") before
-		// aliased ones ("aws.my_alias")
-		keys := make([]string, 0, len(mappedProviders))
-		for k := range mappedProviders {
-			keys = append(keys, k)
-		}
-		slices.Sort(keys)
-
-		for _, k := range keys {
-			split := strings.SplitN(k, ".", 2)
-			if len(split) == 2 {
-				parentMap := map[string]cty.Value{}
-				if parent, ok := providers[split[0]]; ok {
-					// In some cases parent will be a mock so we can just ignore it, unfortunately
-					// sometimes ignoring it causes the non-graph evaluator to get stuck in evaluation
-					// loops, so we only ignore mocks if we are graph-evaluating.
-					if !e.isGraph || (e.isGraph && parent.Type().IsObjectType()) {
-						parentMap = parent.AsValueMap()
-					}
-				}
-				parentMap[split[1]] = mappedProviders[k]
-				providers[split[0]] = cty.ObjectVal(parentMap)
-			} else {
-				providers[k] = mappedProviders[k]
-			}
+		decodedProviders := providerAttr.DecodeProviders()
+		for key, val := range decodedProviders {
+			providerRefs[key] = providerRefs[val]
 		}
 	}
 
-	modCall.Module.Providers = providers
+	modCall.Module.ProviderReferences = providerRefs
 
 	return modCall, nil
 }

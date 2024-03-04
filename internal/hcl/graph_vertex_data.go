@@ -43,6 +43,15 @@ func (v *VertexData) Visit(mutex *sync.Mutex) error {
 			return fmt.Errorf("could not find block %q in module %q", v.block.FullName(), moduleInstance.name)
 		}
 
+		// Reload the provider references for this module instance
+		// We need to do this because we might be evaluating a data block that
+		// needs to get data from a provider block, e.g. aws_default_tags.
+		// We might be able to improve this by only evaluating the
+		// provider block when we need it.
+		for name, providerBlock := range e.module.ProviderReferences {
+			e.ctx.Set(providerBlock.Values(), name)
+		}
+
 		err := v.evaluate(e, blockInstance)
 		if err != nil {
 			return fmt.Errorf("could not evaluate data block %q", v.ID())

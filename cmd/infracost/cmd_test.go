@@ -39,6 +39,7 @@ type GoldenFileOptions = struct {
 	Env         map[string]string
 	// RunTerraformCLI sets the cmd test to also run the cmd with --terraform-force-cli set
 	RunTerraformCLI bool
+	IgnoreNonGraph  bool
 }
 
 func DefaultOptions() *GoldenFileOptions {
@@ -50,9 +51,11 @@ func DefaultOptions() *GoldenFileOptions {
 }
 
 func GoldenFileCommandTest(t *testing.T, testName string, args []string, testOptions *GoldenFileOptions, ctxOptions ...func(ctx *config.RunContext)) {
-	t.Run("HCL", func(t *testing.T) {
-		goldenFileCommandTest(t, testName, args, testOptions, true, ctxOptions...)
-	})
+	if testOptions == nil || !testOptions.IgnoreNonGraph {
+		t.Run("HCL", func(t *testing.T) {
+			goldenFileCommandTest(t, testName, args, testOptions, true, ctxOptions...)
+		})
+	}
 
 	t.Run("HCL Graph", func(t *testing.T) {
 		ctxOptions = append(ctxOptions, func(ctx *config.RunContext) {
