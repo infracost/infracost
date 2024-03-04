@@ -992,8 +992,7 @@ func (attr *Attribute) VerticesReferenced(b *Block) []VertexReference {
 			continue
 		}
 
-		isProviderReference := (usesProviderConfiguration(b) && attr.Name() == "provider") || (b.Type() == "module" && attr.Name() == "providers")
-
+		isProviderReference := usesProviderConfiguration(b) && attr.Name() == "provider"
 		if isProviderReference {
 			key = fmt.Sprintf("provider.%s", strings.TrimSuffix(key, "."))
 		}
@@ -1350,7 +1349,7 @@ func shouldSkipRef(block *Block, attr *Attribute, key string) bool {
 	}
 
 	// Provider references can come through as `aws.`
-	isProviderReference := (usesProviderConfiguration(block) && attr.Name() == "provider") || (block.Type() == "module" && attr.Name() == "providers")
+	isProviderReference := usesProviderConfiguration(block) && attr.Name() == "provider"
 	if !isProviderReference && strings.HasSuffix(key, ".") {
 		return true
 	}
