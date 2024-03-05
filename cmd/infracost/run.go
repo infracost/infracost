@@ -950,7 +950,7 @@ func checkAPIKeyIsValid(ctx *config.RunContext, next runCommandFunc) runCommandF
 		if len(resp) > 0 {
 			cmd.Println(resp[0])
 		}
-		cmd.Println(err)
+		//cmd.Println(err)
 		var apiError *apiclient.APIError
 		if errors.As(err, &apiError) {
 			if apiError.ErrorCode == apiclient.ErrorCodeAPIKeyInvalid {
