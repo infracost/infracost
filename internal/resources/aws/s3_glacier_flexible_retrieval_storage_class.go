@@ -45,6 +45,14 @@ var S3GlacierFlexibleRetrievalStorageClassUsageSchema = []*schema.UsageItem{
 	{Key: "early_delete_gb", DefaultValue: 0.0, ValueType: schema.Float64},
 }
 
+func (a *S3GlacierFlexibleRetrievalStorageClass) CoreType() string {
+	return "S3GlacierFlexibleRetrievalStorageClass"
+}
+
+func (a *S3GlacierFlexibleRetrievalStorageClass) UsageSchema() []*schema.UsageItem {
+	return S3GlacierFlexibleRetrievalStorageClassUsageSchema
+}
+
 func (a *S3GlacierFlexibleRetrievalStorageClass) UsageKey() string {
 	return "glacier_flexible_retrieval"
 }
@@ -56,7 +64,7 @@ func (a *S3GlacierFlexibleRetrievalStorageClass) PopulateUsage(u *schema.UsageDa
 func (a *S3GlacierFlexibleRetrievalStorageClass) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:        "Glacier flexible retrieval",
-		UsageSchema: S3GlacierFlexibleRetrievalStorageClassUsageSchema,
+		UsageSchema: a.UsageSchema(),
 		CostComponents: []*schema.CostComponent{
 			s3StorageCostComponent("Storage", "AmazonGlacier", a.Region, "TimedStorage-ByteHrs", a.StorageGB),
 			s3ApiOperationCostComponent("PUT, COPY, POST, LIST requests", "AmazonS3", a.Region, "Requests-GLACIER-Tier1", "PostObject", a.MonthlyTier1Requests),

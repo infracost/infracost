@@ -22,6 +22,16 @@ type GlueCrawler struct {
 	MonthlyHours *float64 `infracost_usage:"monthly_hours"`
 }
 
+func (r *GlueCrawler) CoreType() string {
+	return "GlueCrawler"
+}
+
+func (r *GlueCrawler) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_hours", DefaultValue: 0, ValueType: schema.Float64},
+	}
+}
+
 // PopulateUsage parses the u schema.UsageData into the GlueCrawler.
 // It uses the `infracost_usage` struct tags to populate data into the GlueCrawler.
 func (r *GlueCrawler) PopulateUsage(u *schema.UsageData) {
@@ -41,10 +51,8 @@ func (r *GlueCrawler) BuildResource() *schema.Resource {
 	}
 
 	return &schema.Resource{
-		Name: r.Address,
-		UsageSchema: []*schema.UsageItem{
-			{Key: "monthly_hours", DefaultValue: 0, ValueType: schema.Float64},
-		},
+		Name:        r.Address,
+		UsageSchema: r.UsageSchema(),
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            "Duration",

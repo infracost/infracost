@@ -70,36 +70,42 @@ type cloudfrontDistributionShieldRequestsUsage struct {
 	India        *int64 `infracost_usage:"india"`
 }
 
-var CloudfrontDistributionUsageSchema = []*schema.UsageItem{
-	{
-		Key:          "monthly_http_requests",
-		DefaultValue: &usage.ResourceUsage{Name: "monthly_http_requests", Items: cloudfrontDistributionRegionRequestsSchema},
-		ValueType:    schema.SubResourceUsage,
-	},
-	{
-		Key:          "monthly_https_requests",
-		DefaultValue: &usage.ResourceUsage{Name: "monthly_https_requests", Items: cloudfrontDistributionRegionRequestsSchema},
-		ValueType:    schema.SubResourceUsage,
-	},
-	{
-		Key:          "monthly_shield_requests",
-		DefaultValue: &usage.ResourceUsage{Name: "monthly_shield_requests", Items: cloudfrontDistributionShieldRequestsSchema},
-		ValueType:    schema.SubResourceUsage,
-	},
-	{Key: "monthly_invalidation_requests", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "monthly_encryption_requests", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "monthly_log_lines", ValueType: schema.Int64, DefaultValue: 0},
-	{
-		Key:          "monthly_data_transfer_to_internet_gb",
-		DefaultValue: &usage.ResourceUsage{Name: "monthly_data_transfer_to_internet_gb", Items: cloudfrontDistributionRegionDataTransferSchema},
-		ValueType:    schema.SubResourceUsage,
-	},
-	{
-		Key:          "monthly_data_transfer_to_origin_gb",
-		DefaultValue: &usage.ResourceUsage{Name: "monthly_data_transfer_to_origin_gb", Items: cloudfrontDistributionRegionDataTransferSchema},
-		ValueType:    schema.SubResourceUsage,
-	},
-	{Key: "custom_ssl_certificates", ValueType: schema.Int64, DefaultValue: 0},
+func (r *CloudfrontDistribution) CoreType() string {
+	return "CloudfrontDistribution"
+}
+
+func (r *CloudfrontDistribution) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{
+			Key:          "monthly_http_requests",
+			DefaultValue: &usage.ResourceUsage{Name: "monthly_http_requests", Items: cloudfrontDistributionRegionRequestsSchema},
+			ValueType:    schema.SubResourceUsage,
+		},
+		{
+			Key:          "monthly_https_requests",
+			DefaultValue: &usage.ResourceUsage{Name: "monthly_https_requests", Items: cloudfrontDistributionRegionRequestsSchema},
+			ValueType:    schema.SubResourceUsage,
+		},
+		{
+			Key:          "monthly_shield_requests",
+			DefaultValue: &usage.ResourceUsage{Name: "monthly_shield_requests", Items: cloudfrontDistributionShieldRequestsSchema},
+			ValueType:    schema.SubResourceUsage,
+		},
+		{Key: "monthly_invalidation_requests", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_encryption_requests", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_log_lines", ValueType: schema.Int64, DefaultValue: 0},
+		{
+			Key:          "monthly_data_transfer_to_internet_gb",
+			DefaultValue: &usage.ResourceUsage{Name: "monthly_data_transfer_to_internet_gb", Items: cloudfrontDistributionRegionDataTransferSchema},
+			ValueType:    schema.SubResourceUsage,
+		},
+		{
+			Key:          "monthly_data_transfer_to_origin_gb",
+			DefaultValue: &usage.ResourceUsage{Name: "monthly_data_transfer_to_origin_gb", Items: cloudfrontDistributionRegionDataTransferSchema},
+			ValueType:    schema.SubResourceUsage,
+		},
+		{Key: "custom_ssl_certificates", ValueType: schema.Int64, DefaultValue: 0},
+	}
 }
 
 var cloudfrontDistributionRegionRequestsSchema = []*schema.UsageItem{

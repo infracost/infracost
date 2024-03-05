@@ -22,10 +22,16 @@ type MWAAEnvironment struct {
 }
 
 // If the resource requires a usage parameter
-var MWAAEnvironmentUsageSchema = []*schema.UsageItem{
-	{Key: "additional_workers", DefaultValue: 0.0, ValueType: schema.Float64},
-	{Key: "additional_schedulers", DefaultValue: 0.0, ValueType: schema.Float64},
-	{Key: "meta_database_gb", DefaultValue: 0.0, ValueType: schema.Float64},
+func (a *MWAAEnvironment) CoreType() string {
+	return "MWAAEnvironment"
+}
+
+func (a *MWAAEnvironment) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "additional_workers", DefaultValue: 0.0, ValueType: schema.Float64},
+		{Key: "additional_schedulers", DefaultValue: 0.0, ValueType: schema.Float64},
+		{Key: "meta_database_gb", DefaultValue: 0.0, ValueType: schema.Float64},
+	}
 }
 
 // If the resource requires a usage parameter
@@ -54,7 +60,7 @@ func (a *MWAAEnvironment) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           a.Address,
-		UsageSchema:    MWAAEnvironmentUsageSchema,
+		UsageSchema:    a.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }

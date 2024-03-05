@@ -26,12 +26,18 @@ type RDSClusterInstance struct {
 	ReservedInstancePaymentOption                *string `infracost_usage:"reserved_instance_payment_option"`
 }
 
-var RDSClusterInstanceUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_cpu_credit_hrs", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "vcpu_count", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "monthly_additional_performance_insights_requests", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "reserved_instance_term", DefaultValue: "", ValueType: schema.String},
-	{Key: "reserved_instance_payment_option", DefaultValue: "", ValueType: schema.String},
+func (r *RDSClusterInstance) CoreType() string {
+	return "RDSClusterInstance"
+}
+
+func (r *RDSClusterInstance) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_cpu_credit_hrs", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "vcpu_count", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_additional_performance_insights_requests", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "reserved_instance_term", DefaultValue: "", ValueType: schema.String},
+		{Key: "reserved_instance_payment_option", DefaultValue: "", ValueType: schema.String},
+	}
 }
 
 func (r *RDSClusterInstance) PopulateUsage(u *schema.UsageData) {
@@ -124,7 +130,7 @@ func (r *RDSClusterInstance) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		UsageSchema:    RDSClusterInstanceUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

@@ -13,9 +13,15 @@ type CloudFormationStackSet struct {
 	MonthlyDurationSecs      *int64 `infracost_usage:"monthly_duration_secs"`
 }
 
-var CloudFormationStackSetUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_handler_operations", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "monthly_duration_secs", ValueType: schema.Int64, DefaultValue: 0},
+func (r *CloudFormationStackSet) CoreType() string {
+	return "CloudFormationStackSet"
+}
+
+func (r *CloudFormationStackSet) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_handler_operations", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_duration_secs", ValueType: schema.Int64, DefaultValue: 0},
+	}
 }
 
 func (r *CloudFormationStackSet) PopulateUsage(u *schema.UsageData) {
@@ -35,13 +41,13 @@ func (r *CloudFormationStackSet) BuildResource() *schema.Resource {
 			Name:        r.Address,
 			NoPrice:     true,
 			IsSkipped:   true,
-			UsageSchema: CloudFormationStackSetUsageSchema,
+			UsageSchema: r.UsageSchema(),
 		}
 	}
 
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: stack.costComponents(),
-		UsageSchema:    CloudFormationStackSetUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }

@@ -17,7 +17,13 @@ type EBSSnapshot struct {
 	FastSnapshotRestoreHours *int64 `infracost_usage:"fast_snapshot_restore_hours"`
 }
 
-var EBSSnapshotUsageSchema = []*schema.UsageItem{{Key: "monthly_list_block_requests", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_get_block_requests", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_put_block_requests", ValueType: schema.Int64, DefaultValue: 0}, {Key: "fast_snapshot_restore_hours", ValueType: schema.Int64, DefaultValue: 0}}
+func (r *EBSSnapshot) CoreType() string {
+	return "EBSSnapshot"
+}
+
+func (r *EBSSnapshot) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{{Key: "monthly_list_block_requests", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_get_block_requests", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_put_block_requests", ValueType: schema.Int64, DefaultValue: 0}, {Key: "fast_snapshot_restore_hours", ValueType: schema.Int64, DefaultValue: 0}}
+}
 
 func (r *EBSSnapshot) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -121,7 +127,7 @@ func (r *EBSSnapshot) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: EBSSnapshotUsageSchema,
+		CostComponents: costComponents, UsageSchema: r.UsageSchema(),
 	}
 }
 

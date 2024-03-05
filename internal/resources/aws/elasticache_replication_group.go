@@ -23,10 +23,16 @@ type ElastiCacheReplicationGroup struct {
 	AppAutoscalingTarget []*AppAutoscalingTarget
 }
 
-var ElastiCacheReplicationGroupUsageSchema = []*schema.UsageItem{
-	{Key: "snapshot_storage_size_gb", ValueType: schema.Float64, DefaultValue: 0},
-	{Key: "reserved_instance_term", DefaultValue: "", ValueType: schema.String},
-	{Key: "reserved_instance_payment_option", DefaultValue: "", ValueType: schema.String},
+func (r *ElastiCacheReplicationGroup) CoreType() string {
+	return "ElastiCacheReplicationGroup"
+}
+
+func (r *ElastiCacheReplicationGroup) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "snapshot_storage_size_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "reserved_instance_term", DefaultValue: "", ValueType: schema.String},
+		{Key: "reserved_instance_payment_option", DefaultValue: "", ValueType: schema.String},
+	}
 }
 
 func (r *ElastiCacheReplicationGroup) PopulateUsage(u *schema.UsageData) {
@@ -89,6 +95,6 @@ func (r *ElastiCacheReplicationGroup) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		UsageSchema:    ElastiCacheReplicationGroupUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }

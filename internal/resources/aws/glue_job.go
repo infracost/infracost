@@ -25,6 +25,16 @@ type GlueJob struct {
 	MonthlyHours *float64 `infracost_usage:"monthly_hours"`
 }
 
+func (r *GlueJob) CoreType() string {
+	return "GlueJob"
+}
+
+func (r *GlueJob) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_hours", DefaultValue: 0, ValueType: schema.Float64},
+	}
+}
+
 // PopulateUsage parses the u schema.UsageData into the GlueJob.
 // It uses the `infracost_usage` struct tags to populate data into the GlueJob.
 func (r *GlueJob) PopulateUsage(u *schema.UsageData) {
@@ -56,10 +66,8 @@ func (r *GlueJob) BuildResource() *schema.Resource {
 	}
 
 	return &schema.Resource{
-		Name: r.Address,
-		UsageSchema: []*schema.UsageItem{
-			{Key: "monthly_hours", DefaultValue: 0, ValueType: schema.Float64},
-		},
+		Name:        r.Address,
+		UsageSchema: r.UsageSchema(),
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            "Duration",

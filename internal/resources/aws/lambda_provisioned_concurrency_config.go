@@ -26,12 +26,18 @@ type LambdaProvisionedConcurrencyConfig struct {
 	MemoryMB             *int64  `infracost_usage:"memory_mb"`
 }
 
-var LambdaProvisionedConcurrencyConfigUsageSchema = []*schema.UsageItem{
-	{Key: "memory_mb", ValueType: schema.Int64, DefaultValue: 512},
-	{Key: "architecture", ValueType: schema.String, DefaultValue: "x86_64"},
-	{Key: "monthly_duration_hrs", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "request_duration_ms", ValueType: schema.Int64, DefaultValue: 0},
+func (r *LambdaProvisionedConcurrencyConfig) CoreType() string {
+	return "LambdaProvisionedConcurrencyConfig"
+}
+
+func (r *LambdaProvisionedConcurrencyConfig) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "memory_mb", ValueType: schema.Int64, DefaultValue: 512},
+		{Key: "architecture", ValueType: schema.String, DefaultValue: "x86_64"},
+		{Key: "monthly_duration_hrs", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "request_duration_ms", ValueType: schema.Int64, DefaultValue: 0},
+	}
 }
 
 func (r *LambdaProvisionedConcurrencyConfig) PopulateUsage(u *schema.UsageData) {
@@ -132,7 +138,7 @@ func (r *LambdaProvisionedConcurrencyConfig) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    LambdaProvisionedConcurrencyConfigUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }

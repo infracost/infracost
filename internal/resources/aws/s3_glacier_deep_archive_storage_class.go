@@ -33,6 +33,14 @@ var S3GlacierDeepArchiveStorageClassUsageSchema = []*schema.UsageItem{
 	{Key: "early_delete_gb", DefaultValue: 0.0, ValueType: schema.Float64},
 }
 
+func (a *S3GlacierDeepArchiveStorageClass) CoreType() string {
+	return "S3GlacierDeepArchiveStorageClass"
+}
+
+func (a *S3GlacierDeepArchiveStorageClass) UsageSchema() []*schema.UsageItem {
+	return S3GlacierDeepArchiveStorageClassUsageSchema
+}
+
 func (a *S3GlacierDeepArchiveStorageClass) UsageKey() string {
 	return "glacier_deep_archive"
 }
@@ -44,7 +52,7 @@ func (a *S3GlacierDeepArchiveStorageClass) PopulateUsage(u *schema.UsageData) {
 func (a *S3GlacierDeepArchiveStorageClass) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:        "Glacier deep archive",
-		UsageSchema: S3GlacierDeepArchiveStorageClassUsageSchema,
+		UsageSchema: a.UsageSchema(),
 		CostComponents: []*schema.CostComponent{
 			s3StorageCostComponent("Storage", "AmazonS3GlacierDeepArchive", a.Region, "TimedStorage-GDA-ByteHrs", a.StorageGB),
 			s3ApiOperationCostComponent("PUT, COPY, POST, LIST requests", "AmazonS3GlacierDeepArchive", a.Region, "Requests-GDA-Tier1", "PostObject", a.MonthlyTier1Requests),

@@ -19,8 +19,14 @@ type AppAutoscalingTarget struct {
 	Capacity *int64 `infracost_usage:"capacity"` // TODO: hmmmm
 }
 
-var AppAutoscalingTargetUsageSchema = []*schema.UsageItem{
-	{Key: "capacity", ValueType: schema.Int64, DefaultValue: 0},
+func (r *AppAutoscalingTarget) CoreType() string {
+	return "AppAutoscalingTarget"
+}
+
+func (r *AppAutoscalingTarget) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "capacity", ValueType: schema.Int64, DefaultValue: 0},
+	}
 }
 
 func (r *AppAutoscalingTarget) PopulateUsage(u *schema.UsageData) {
@@ -30,6 +36,6 @@ func (r *AppAutoscalingTarget) PopulateUsage(u *schema.UsageData) {
 func (r *AppAutoscalingTarget) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:        r.Address,
-		UsageSchema: AppAutoscalingTargetUsageSchema,
+		UsageSchema: r.UsageSchema(),
 	}
 }

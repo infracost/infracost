@@ -10,7 +10,13 @@ type KMSExternalKey struct {
 	Region  string
 }
 
-var KMSExternalKeyUsageSchema = []*schema.UsageItem{}
+func (r *KMSExternalKey) CoreType() string {
+	return "KMSExternalKey"
+}
+
+func (r *KMSExternalKey) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 func (r *KMSExternalKey) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -24,6 +30,6 @@ func (r *KMSExternalKey) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: []*schema.CostComponent{kmsKey.customerMasterKeyCostComponent()},
-		UsageSchema:    KMSExternalKeyUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }

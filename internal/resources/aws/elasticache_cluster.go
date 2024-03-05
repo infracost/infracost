@@ -27,10 +27,16 @@ type ElastiCacheCluster struct {
 	ReservedInstancePaymentOption *string  `infracost_usage:"reserved_instance_payment_option"`
 }
 
-var ElastiCacheClusterUsageSchema = []*schema.UsageItem{
-	{Key: "snapshot_storage_size_gb", ValueType: schema.Float64, DefaultValue: 0},
-	{Key: "reserved_instance_term", DefaultValue: "", ValueType: schema.String},
-	{Key: "reserved_instance_payment_option", DefaultValue: "", ValueType: schema.String},
+func (r *ElastiCacheCluster) CoreType() string {
+	return "ElastiCacheCluster"
+}
+
+func (r *ElastiCacheCluster) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "snapshot_storage_size_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "reserved_instance_term", DefaultValue: "", ValueType: schema.String},
+		{Key: "reserved_instance_payment_option", DefaultValue: "", ValueType: schema.String},
+	}
 }
 
 func (r *ElastiCacheCluster) PopulateUsage(u *schema.UsageData) {
@@ -43,7 +49,7 @@ func (r *ElastiCacheCluster) BuildResource() *schema.Resource {
 			Name:        r.Address,
 			NoPrice:     true,
 			IsSkipped:   true,
-			UsageSchema: ElastiCacheClusterUsageSchema,
+			UsageSchema: r.UsageSchema(),
 		}
 	}
 

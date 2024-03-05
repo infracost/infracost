@@ -17,10 +17,16 @@ type Route53Record struct {
 	MonthlyStandardQueries     *int64 `infracost_usage:"monthly_standard_queries"`
 }
 
-var Route53RecordUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_latency_based_queries", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "monthly_geo_queries", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "monthly_standard_queries", ValueType: schema.Int64, DefaultValue: 0},
+func (r *Route53Record) CoreType() string {
+	return "Route53Record"
+}
+
+func (r *Route53Record) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_latency_based_queries", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_geo_queries", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_standard_queries", ValueType: schema.Int64, DefaultValue: 0},
+	}
 }
 
 func (r *Route53Record) PopulateUsage(u *schema.UsageData) {
@@ -33,7 +39,7 @@ func (r *Route53Record) BuildResource() *schema.Resource {
 			Name:        r.Address,
 			NoPrice:     true,
 			IsSkipped:   true,
-			UsageSchema: Route53RecordUsageSchema,
+			UsageSchema: r.UsageSchema(),
 		}
 	}
 
@@ -97,7 +103,7 @@ func (r *Route53Record) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		UsageSchema:    Route53RecordUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

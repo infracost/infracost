@@ -14,9 +14,15 @@ type ConfigConfigurationRecorder struct {
 	MonthlyCustomConfigItems *int64 `infracost_usage:"monthly_custom_config_items"`
 }
 
-var ConfigConfigurationRecorderUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_config_items", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "monthly_custom_config_items", ValueType: schema.Int64, DefaultValue: 0},
+func (r *ConfigConfigurationRecorder) CoreType() string {
+	return "ConfigConfigurationRecorder"
+}
+
+func (r *ConfigConfigurationRecorder) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_config_items", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_custom_config_items", ValueType: schema.Int64, DefaultValue: 0},
+	}
 }
 
 func (r *ConfigConfigurationRecorder) PopulateUsage(u *schema.UsageData) {
@@ -73,6 +79,6 @@ func (r *ConfigConfigurationRecorder) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		UsageSchema:    ConfigConfigurationRecorderUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }

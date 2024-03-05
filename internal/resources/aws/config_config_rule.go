@@ -15,8 +15,14 @@ type ConfigConfigRule struct {
 	MonthlyRuleEvaluations *int64 `infracost_usage:"monthly_rule_evaluations"`
 }
 
-var ConfigConfigRuleUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_rule_evaluations", ValueType: schema.Int64, DefaultValue: 0},
+func (r *ConfigConfigRule) CoreType() string {
+	return "ConfigConfigRule"
+}
+
+func (r *ConfigConfigRule) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_rule_evaluations", ValueType: schema.Int64, DefaultValue: 0},
+	}
 }
 
 func (r *ConfigConfigRule) PopulateUsage(u *schema.UsageData) {
@@ -51,7 +57,7 @@ func (r *ConfigConfigRule) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		UsageSchema:    ConfigConfigRuleUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

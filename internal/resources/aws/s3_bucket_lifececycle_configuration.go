@@ -32,14 +32,20 @@ type S3BucketLifecycleConfiguration struct {
 	allStorageClasses []S3StorageClass
 }
 
-var S3BucketLifecycleConfigurationUsageSchema = []*schema.UsageItem{
-	{Key: "object_tags", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "standard", DefaultValue: &usage.ResourceUsage{Name: "standard", Items: S3StandardStorageClassUsageSchema}, ValueType: schema.SubResourceUsage},
-	{Key: "intelligent_tiering", DefaultValue: &usage.ResourceUsage{Name: "intelligent_tiering", Items: S3IntelligentTieringStorageClassUsageSchema}, ValueType: schema.SubResourceUsage},
-	{Key: "standard_infrequent_access", DefaultValue: &usage.ResourceUsage{Name: "standard_infrequent_access", Items: S3StandardInfrequentAccessStorageClassUsageSchema}, ValueType: schema.SubResourceUsage},
-	{Key: "one_zone_infrequent_access", DefaultValue: &usage.ResourceUsage{Name: "one_zone_infrequent_access", Items: S3OneZoneInfrequentAccessStorageClassUsageSchema}, ValueType: schema.SubResourceUsage},
-	{Key: "glacier_flexible_retrieval", DefaultValue: &usage.ResourceUsage{Name: "glacier_flexible_retrieval", Items: S3GlacierFlexibleRetrievalStorageClassUsageSchema}, ValueType: schema.SubResourceUsage},
-	{Key: "glacier_deep_archive", DefaultValue: &usage.ResourceUsage{Name: "glacier_deep_archive", Items: S3GlacierDeepArchiveStorageClassUsageSchema}, ValueType: schema.SubResourceUsage},
+func (r *S3BucketLifecycleConfiguration) CoreType() string {
+	return "S3BucketLifecycleConfiguration"
+}
+
+func (r *S3BucketLifecycleConfiguration) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "object_tags", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "standard", DefaultValue: &usage.ResourceUsage{Name: "standard", Items: S3StandardStorageClassUsageSchema}, ValueType: schema.SubResourceUsage},
+		{Key: "intelligent_tiering", DefaultValue: &usage.ResourceUsage{Name: "intelligent_tiering", Items: S3IntelligentTieringStorageClassUsageSchema}, ValueType: schema.SubResourceUsage},
+		{Key: "standard_infrequent_access", DefaultValue: &usage.ResourceUsage{Name: "standard_infrequent_access", Items: S3StandardInfrequentAccessStorageClassUsageSchema}, ValueType: schema.SubResourceUsage},
+		{Key: "one_zone_infrequent_access", DefaultValue: &usage.ResourceUsage{Name: "one_zone_infrequent_access", Items: S3OneZoneInfrequentAccessStorageClassUsageSchema}, ValueType: schema.SubResourceUsage},
+		{Key: "glacier_flexible_retrieval", DefaultValue: &usage.ResourceUsage{Name: "glacier_flexible_retrieval", Items: S3GlacierFlexibleRetrievalStorageClassUsageSchema}, ValueType: schema.SubResourceUsage},
+		{Key: "glacier_deep_archive", DefaultValue: &usage.ResourceUsage{Name: "glacier_deep_archive", Items: S3GlacierDeepArchiveStorageClassUsageSchema}, ValueType: schema.SubResourceUsage},
+	}
 }
 
 func (r *S3BucketLifecycleConfiguration) AllStorageClasses() []S3StorageClass {
@@ -184,7 +190,7 @@ func (r *S3BucketLifecycleConfiguration) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    S3BucketLifecycleConfigurationUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		EstimateUsage:  estimate,
 		CostComponents: costComponents,
 		SubResources:   subResources,

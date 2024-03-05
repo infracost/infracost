@@ -15,7 +15,13 @@ type Ec2TransitGatewayVpcAttachment struct {
 	MonthlyDataProcessedGB *float64 `infracost_usage:"monthly_data_processed_gb"`
 }
 
-var Ec2TransitGatewayVpcAttachmentUsageSchema = []*schema.UsageItem{{Key: "monthly_data_processed_gb", ValueType: schema.Float64, DefaultValue: 0}}
+func (r *Ec2TransitGatewayVpcAttachment) CoreType() string {
+	return "Ec2TransitGatewayVpcAttachment"
+}
+
+func (r *Ec2TransitGatewayVpcAttachment) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{{Key: "monthly_data_processed_gb", ValueType: schema.Float64, DefaultValue: 0}}
+}
 
 func (r *Ec2TransitGatewayVpcAttachment) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -43,7 +49,7 @@ func (r *Ec2TransitGatewayVpcAttachment) BuildResource() *schema.Resource {
 		CostComponents: []*schema.CostComponent{
 			transitGatewayAttachmentCostComponent(region, "TransitGatewayVPC"),
 			transitGatewayDataProcessingCostComponent(region, "TransitGatewayVPC", gbDataProcessed),
-		}, UsageSchema: Ec2TransitGatewayVpcAttachmentUsageSchema,
+		}, UsageSchema: r.UsageSchema(),
 	}
 }
 

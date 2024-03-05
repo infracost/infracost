@@ -25,15 +25,21 @@ type DXConnection struct {
 	DXConnectionType                                *string       `infracost_usage:"dx_connection_type"`
 }
 
-var DXConnectionUsageSchema = []*schema.UsageItem{
-	{
-		Key:          "monthly_outbound_from_region_to_dx_connection_location",
-		ValueType:    schema.SubResourceUsage,
-		DefaultValue: &usage.ResourceUsage{Name: "monthly_outbound_from_region_to_dx_connection_location", Items: RegionUsageSchema},
-	},
-	{Key: "monthly_outbound_region_to_dx_location_gb", ValueType: schema.Float64, DefaultValue: 0},
-	{Key: "dx_virtual_interface_type", ValueType: schema.String, DefaultValue: "private"},
-	{Key: "dx_connection_type", ValueType: schema.String, DefaultValue: "dedicated"},
+func (r *DXConnection) CoreType() string {
+	return "DXConnection"
+}
+
+func (r *DXConnection) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{
+			Key:          "monthly_outbound_from_region_to_dx_connection_location",
+			ValueType:    schema.SubResourceUsage,
+			DefaultValue: &usage.ResourceUsage{Name: "monthly_outbound_from_region_to_dx_connection_location", Items: RegionUsageSchema},
+		},
+		{Key: "monthly_outbound_region_to_dx_location_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "dx_virtual_interface_type", ValueType: schema.String, DefaultValue: "private"},
+		{Key: "dx_connection_type", ValueType: schema.String, DefaultValue: "dedicated"},
+	}
 }
 
 func (r *DXConnection) PopulateUsage(u *schema.UsageData) {
@@ -71,7 +77,7 @@ func (r *DXConnection) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: components,
-		UsageSchema:    DXConnectionUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

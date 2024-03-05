@@ -1,8 +1,9 @@
 package aws
 
 import (
-	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 // GlobalAccelerator struct represents AWS Global Accelerator service
@@ -11,6 +12,14 @@ import (
 // Pricing information: https://aws.amazon.com/global-accelerator/pricing/
 type GlobalAccelerator struct {
 	Address string
+}
+
+func (r *GlobalAccelerator) CoreType() string {
+	return "FSxOpenZFSFileSystem"
+}
+
+func (r *GlobalAccelerator) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
 }
 
 func (r *GlobalAccelerator) BuildResource() *schema.Resource {
@@ -33,5 +42,6 @@ func (r *GlobalAccelerator) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 }

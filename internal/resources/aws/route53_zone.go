@@ -11,7 +11,13 @@ type Route53Zone struct {
 	Address string
 }
 
-var Route53ZoneUsageSchema = []*schema.UsageItem{}
+func (r *Route53Zone) CoreType() string {
+	return "Route53Zone"
+}
+
+func (r *Route53Zone) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 func (r *Route53Zone) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -39,6 +45,6 @@ func (r *Route53Zone) BuildResource() *schema.Resource {
 				},
 			},
 		},
-		UsageSchema: Route53ZoneUsageSchema,
+		UsageSchema: r.UsageSchema(),
 	}
 }

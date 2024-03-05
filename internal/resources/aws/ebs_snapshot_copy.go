@@ -13,7 +13,13 @@ type EBSSnapshotCopy struct {
 	SizeGB  *float64
 }
 
-var EBSSnapshotCopyUsageSchema = []*schema.UsageItem{}
+func (r *EBSSnapshotCopy) CoreType() string {
+	return "EBSSnapshotCopy"
+}
+
+func (r *EBSSnapshotCopy) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 func (r *EBSSnapshotCopy) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -34,6 +40,7 @@ func (r *EBSSnapshotCopy) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: EBSSnapshotCopyUsageSchema,
+		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 }

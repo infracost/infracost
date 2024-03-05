@@ -12,7 +12,13 @@ type EC2TrafficMirrorSession struct {
 	Region  string
 }
 
-var EC2TrafficMirrorSessionUsageSchema = []*schema.UsageItem{}
+func (r *EC2TrafficMirrorSession) CoreType() string {
+	return "EC2TrafficMirrorSession"
+}
+
+func (r *EC2TrafficMirrorSession) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 func (r *EC2TrafficMirrorSession) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -37,6 +43,6 @@ func (r *EC2TrafficMirrorSession) BuildResource() *schema.Resource {
 				},
 			},
 		},
-		UsageSchema: EC2TrafficMirrorSessionUsageSchema,
+		UsageSchema: r.UsageSchema(),
 	}
 }

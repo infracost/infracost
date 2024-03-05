@@ -29,6 +29,14 @@ var S3StandardInfrequentAccessStorageClassUsageSchema = []*schema.UsageItem{
 	{Key: "monthly_select_data_returned_gb", DefaultValue: 0.0, ValueType: schema.Float64},
 }
 
+func (a *S3StandardInfrequentAccessStorageClass) CoreType() string {
+	return "S3StandardInfrequentAccessStorageClass"
+}
+
+func (a *S3StandardInfrequentAccessStorageClass) UsageSchema() []*schema.UsageItem {
+	return S3StandardInfrequentAccessStorageClassUsageSchema
+}
+
 func (a *S3StandardInfrequentAccessStorageClass) UsageKey() string {
 	return "standard_infrequent_access"
 }
@@ -40,7 +48,7 @@ func (a *S3StandardInfrequentAccessStorageClass) PopulateUsage(u *schema.UsageDa
 func (a *S3StandardInfrequentAccessStorageClass) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:        "Standard - infrequent access",
-		UsageSchema: S3StandardInfrequentAccessStorageClassUsageSchema,
+		UsageSchema: a.UsageSchema(),
 		CostComponents: []*schema.CostComponent{
 			s3StorageCostComponent("Storage", "AmazonS3", a.Region, "TimedStorage-SIA-ByteHrs", a.StorageGB),
 			s3ApiCostComponent("PUT, COPY, POST, LIST requests", "AmazonS3", a.Region, "Requests-SIA-Tier1", a.MonthlyTier1Requests),

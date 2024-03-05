@@ -14,8 +14,14 @@ type NATGateway struct {
 	MonthlyDataProcessedGB *float64 `infracost_usage:"monthly_data_processed_gb"`
 }
 
-var NATGatewayUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_data_processed_gb", DefaultValue: 0.0, ValueType: schema.Float64},
+func (a *NATGateway) CoreType() string {
+	return "NATGateway"
+}
+
+func (a *NATGateway) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_data_processed_gb", DefaultValue: 0.0, ValueType: schema.Float64},
+	}
 }
 
 func (a *NATGateway) PopulateUsage(u *schema.UsageData) {
@@ -30,7 +36,7 @@ func (a *NATGateway) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:        a.Address,
-		UsageSchema: NATGatewayUsageSchema,
+		UsageSchema: a.UsageSchema(),
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:           "NAT gateway",

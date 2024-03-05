@@ -19,8 +19,14 @@ type NeptuneClusterInstance struct {
 	MonthlyCPUCreditHrs *int64 `infracost_usage:"monthly_cpu_credit_hrs"`
 }
 
-var NeptuneClusterInstanceUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_cpu_credit_hrs", ValueType: schema.Int64, DefaultValue: 0},
+func (r *NeptuneClusterInstance) CoreType() string {
+	return "NeptuneClusterInstance"
+}
+
+func (r *NeptuneClusterInstance) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_cpu_credit_hrs", ValueType: schema.Int64, DefaultValue: 0},
+	}
 }
 
 func (r *NeptuneClusterInstance) PopulateUsage(u *schema.UsageData) {
@@ -49,7 +55,7 @@ func (r *NeptuneClusterInstance) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		UsageSchema:    NeptuneClusterInstanceUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

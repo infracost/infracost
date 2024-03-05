@@ -16,9 +16,15 @@ type WAFWebACL struct {
 	MonthlyRequests *int64 `infracost_usage:"monthly_requests"`
 }
 
-var WAFWebACLUsageSchema = []*schema.UsageItem{
-	{Key: "rule_group_rules", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0},
+func (r *WAFWebACL) CoreType() string {
+	return "WAFWebACL"
+}
+
+func (r *WAFWebACL) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "rule_group_rules", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0},
+	}
 }
 
 func (r *WAFWebACL) PopulateUsage(u *schema.UsageData) {
@@ -40,7 +46,7 @@ func (r *WAFWebACL) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		UsageSchema:    WAFWebACLUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

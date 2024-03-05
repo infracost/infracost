@@ -17,9 +17,15 @@ type SNSTopicSubscription struct {
 	MonthlyRequests *int64   `infracost_usage:"monthly_requests"`
 }
 
-var SNSTopicSubscriptionUsageSchema = []*schema.UsageItem{
-	{Key: "request_size_kb", ValueType: schema.Float64, DefaultValue: 0},
-	{Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0},
+func (r *SNSTopicSubscription) CoreType() string {
+	return "SNSTopicSubscription"
+}
+
+func (r *SNSTopicSubscription) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "request_size_kb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0},
+	}
 }
 
 func (r *SNSTopicSubscription) PopulateUsage(u *schema.UsageData) {
@@ -75,7 +81,7 @@ func (r *SNSTopicSubscription) BuildResource() *schema.Resource {
 				UsageBased: true,
 			},
 		},
-		UsageSchema: SNSTopicSubscriptionUsageSchema,
+		UsageSchema: r.UsageSchema(),
 	}
 }
 

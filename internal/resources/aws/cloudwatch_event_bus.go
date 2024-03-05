@@ -17,12 +17,18 @@ type CloudwatchEventBus struct {
 	ArchiveStorageGB             *float64 `infracost_usage:"archive_storage_gb"`
 }
 
-var CloudwatchEventBusUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_schema_discovery_events", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "monthly_custom_events", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "monthly_third_party_events", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "monthly_archive_processing_gb", ValueType: schema.Float64, DefaultValue: 0},
-	{Key: "archive_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+func (r *CloudwatchEventBus) CoreType() string {
+	return "CloudwatchEventBus"
+}
+
+func (r *CloudwatchEventBus) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_schema_discovery_events", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_custom_events", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_third_party_events", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_archive_processing_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "archive_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+	}
 }
 
 func (r *CloudwatchEventBus) PopulateUsage(u *schema.UsageData) {
@@ -138,6 +144,6 @@ func (r *CloudwatchEventBus) BuildResource() *schema.Resource {
 				UsageBased: true,
 			},
 		},
-		UsageSchema: CloudwatchEventBusUsageSchema,
+		UsageSchema: r.UsageSchema(),
 	}
 }

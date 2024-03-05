@@ -25,12 +25,17 @@ type DataTransfer struct {
 	MonthlyOutboundOtherRegionsGB   *float64 `infracost_usage:"monthly_outbound_other_regions_gb"`
 }
 
-// DataTransferUsageSchema defines a list which represents the usage schema of DataTransfer.
-var DataTransferUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_intra_region_gb", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "monthly_outbound_internet_gb", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "monthly_outbound_us_east_to_us_east_gb", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "monthly_outbound_other_regions_gb", DefaultValue: 0, ValueType: schema.Float64},
+func (r *DataTransfer) CoreType() string {
+	return "DataTransfer"
+}
+
+func (r *DataTransfer) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_intra_region_gb", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "monthly_outbound_internet_gb", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "monthly_outbound_us_east_to_us_east_gb", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "monthly_outbound_other_regions_gb", DefaultValue: 0, ValueType: schema.Float64},
+	}
 }
 
 // PopulateUsage parses the u schema.UsageData into the DataTransfer.

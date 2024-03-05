@@ -21,10 +21,16 @@ type SSMParameter struct {
 	MonthlyAPIInteractions *int64  `infracost_usage:"monthly_api_interactions"`
 }
 
-var SSMParameterUsageSchema = []*schema.UsageItem{
-	{Key: "parameter_storage_hrs", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "api_throughput_limit", ValueType: schema.String, DefaultValue: "standard"},
-	{Key: "monthly_api_interactions", ValueType: schema.Int64, DefaultValue: 0},
+func (r *SSMParameter) CoreType() string {
+	return "SSMParameter"
+}
+
+func (r *SSMParameter) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "parameter_storage_hrs", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "api_throughput_limit", ValueType: schema.String, DefaultValue: "standard"},
+		{Key: "monthly_api_interactions", ValueType: schema.Int64, DefaultValue: 0},
+	}
 }
 
 func (r *SSMParameter) PopulateUsage(u *schema.UsageData) {
@@ -56,16 +62,17 @@ func (r *SSMParameter) BuildResource() *schema.Resource {
 
 	if len(costComponents) == 0 {
 		return &schema.Resource{
-			Name:      r.Address,
-			NoPrice:   true,
-			IsSkipped: true, UsageSchema: SSMParameterUsageSchema,
+			Name:        r.Address,
+			NoPrice:     true,
+			IsSkipped:   true,
+			UsageSchema: r.UsageSchema(),
 		}
 	}
 
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		UsageSchema:    SSMParameterUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

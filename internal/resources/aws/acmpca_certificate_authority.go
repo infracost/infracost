@@ -18,8 +18,14 @@ type ACMPCACertificateAuthority struct {
 	MonthlyRequests *int64 `infracost_usage:"monthly_requests"`
 }
 
-var ACMPCACertificateAuthorityUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0},
+func (r *ACMPCACertificateAuthority) CoreType() string {
+	return "ACMPCACertificateAuthority"
+}
+
+func (r *ACMPCACertificateAuthority) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0},
+	}
 }
 
 func (r *ACMPCACertificateAuthority) PopulateUsage(u *schema.UsageData) {
@@ -64,7 +70,7 @@ func (r *ACMPCACertificateAuthority) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		UsageSchema:    ACMPCACertificateAuthorityUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

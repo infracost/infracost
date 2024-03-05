@@ -21,11 +21,17 @@ type SFnStateMachine struct {
 	MonthlyTransitions *int64 `infracost_usage:"monthly_transitions"`
 }
 
-var SFnStateMachineUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "workflow_duration_ms", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "memory_mb", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "monthly_transitions", ValueType: schema.Int64, DefaultValue: 0},
+func (r *SFnStateMachine) CoreType() string {
+	return "SFnStateMachine"
+}
+
+func (r *SFnStateMachine) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "workflow_duration_ms", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "memory_mb", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_transitions", ValueType: schema.Int64, DefaultValue: 0},
+	}
 }
 
 func (r *SFnStateMachine) PopulateUsage(u *schema.UsageData) {
@@ -80,7 +86,7 @@ func (r *SFnStateMachine) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		UsageSchema:    SFnStateMachineUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

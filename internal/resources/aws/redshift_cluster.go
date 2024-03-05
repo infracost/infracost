@@ -23,11 +23,17 @@ type RedshiftCluster struct {
 	BackupStorageGB              *float64 `infracost_usage:"backup_storage_gb"`
 }
 
-var RedshiftClusterUsageSchema = []*schema.UsageItem{
-	{Key: "managed_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
-	{Key: "excess_concurrency_scaling_secs", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "spectrum_data_scanned_tb", ValueType: schema.Float64, DefaultValue: 0.0},
-	{Key: "backup_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+func (r *RedshiftCluster) CoreType() string {
+	return "RedshiftCluster"
+}
+
+func (r *RedshiftCluster) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "managed_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "excess_concurrency_scaling_secs", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "spectrum_data_scanned_tb", ValueType: schema.Float64, DefaultValue: 0.0},
+		{Key: "backup_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+	}
 }
 
 func (r *RedshiftCluster) PopulateUsage(u *schema.UsageData) {
@@ -107,7 +113,8 @@ func (r *RedshiftCluster) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: RedshiftClusterUsageSchema,
+		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

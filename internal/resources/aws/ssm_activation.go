@@ -17,9 +17,15 @@ type SSMActivation struct {
 	Instances         *int64  `infracost_usage:"instances"`
 }
 
-var SSMActivationUsageSchema = []*schema.UsageItem{
-	{Key: "instance_tier", ValueType: schema.String, DefaultValue: "standard"},
-	{Key: "instances", ValueType: schema.Int64, DefaultValue: 0},
+func (r *SSMActivation) CoreType() string {
+	return "SSMActivation"
+}
+
+func (r *SSMActivation) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "instance_tier", ValueType: schema.String, DefaultValue: "standard"},
+		{Key: "instances", ValueType: schema.Int64, DefaultValue: 0},
+	}
 }
 
 func (r *SSMActivation) PopulateUsage(u *schema.UsageData) {
@@ -59,7 +65,7 @@ func (r *SSMActivation) BuildResource() *schema.Resource {
 					},
 					UsageBased: true,
 				},
-			}, UsageSchema: SSMActivationUsageSchema,
+			}, UsageSchema: r.UsageSchema(),
 		}
 	}
 
@@ -67,6 +73,6 @@ func (r *SSMActivation) BuildResource() *schema.Resource {
 		Name:        r.Address,
 		NoPrice:     true,
 		IsSkipped:   true,
-		UsageSchema: SSMActivationUsageSchema,
+		UsageSchema: r.UsageSchema(),
 	}
 }

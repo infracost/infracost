@@ -27,8 +27,14 @@ type EBSVolume struct {
 	MonthlyStandardIORequests *int64 `infracost_usage:"monthly_standard_io_requests"`
 }
 
-var EBSVolumeSchema = []*schema.UsageItem{
-	{Key: "monthly_standard_io_requests", DefaultValue: 0, ValueType: schema.Int64},
+func (a *EBSVolume) CoreType() string {
+	return "EBSVolume"
+}
+
+func (a *EBSVolume) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_standard_io_requests", DefaultValue: 0, ValueType: schema.Int64},
+	}
 }
 
 func (a *EBSVolume) PopulateUsage(u *schema.UsageData) {
@@ -63,7 +69,7 @@ func (a *EBSVolume) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           a.Address,
-		UsageSchema:    InstanceUsageSchema,
+		UsageSchema:    a.UsageSchema(),
 		CostComponents: costComponents,
 		SubResources:   subResources,
 	}

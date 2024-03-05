@@ -16,7 +16,13 @@ type APIGatewayStage struct {
 	CacheEnabled     bool
 }
 
-var APIGatewayStageUsageSchema = []*schema.UsageItem{}
+func (r *APIGatewayStage) CoreType() string {
+	return "APIGatewayStage"
+}
+
+func (r *APIGatewayStage) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 func (r *APIGatewayStage) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -28,7 +34,7 @@ func (r *APIGatewayStage) BuildResource() *schema.Resource {
 			Name:        r.Address,
 			NoPrice:     true,
 			IsSkipped:   true,
-			UsageSchema: APIGatewayStageUsageSchema,
+			UsageSchema: r.UsageSchema(),
 		}
 	}
 
@@ -53,6 +59,6 @@ func (r *APIGatewayStage) BuildResource() *schema.Resource {
 				},
 			},
 		},
-		UsageSchema: APIGatewayStageUsageSchema,
+		UsageSchema: r.UsageSchema(),
 	}
 }

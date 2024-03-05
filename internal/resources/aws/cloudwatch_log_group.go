@@ -21,6 +21,14 @@ var CloudwatchLogGroupUsageSchema = []*schema.UsageItem{
 	{Key: "monthly_data_scanned_gb", ValueType: schema.Float64, DefaultValue: 0},
 }
 
+func (r *CloudwatchLogGroup) CoreType() string {
+	return "CloudwatchLogGroup"
+}
+
+func (r *CloudwatchLogGroup) UsageSchema() []*schema.UsageItem {
+	return CloudwatchLogGroupUsageSchema
+}
+
 func (r *CloudwatchLogGroup) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
@@ -94,6 +102,6 @@ func (r *CloudwatchLogGroup) BuildResource() *schema.Resource {
 				UsageBased: true,
 			},
 		},
-		UsageSchema: CloudwatchLogGroupUsageSchema,
+		UsageSchema: r.UsageSchema(),
 	}
 }

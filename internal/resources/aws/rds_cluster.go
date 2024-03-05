@@ -29,16 +29,22 @@ type RDSCluster struct {
 	BackupSnapshotSizeGB      *float64 `infracost_usage:"backup_snapshot_size_gb"`
 }
 
-var RDSClusterUsageSchema = []*schema.UsageItem{
-	{Key: "write_requests_per_sec", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "read_requests_per_sec", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "change_records_per_statement", ValueType: schema.Float64, DefaultValue: 0.0},
-	{Key: "storage_gb", ValueType: schema.Float64, DefaultValue: 0},
-	{Key: "average_statements_per_hr", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "backtrack_window_hrs", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "snapshot_export_size_gb", ValueType: schema.Float64, DefaultValue: 0},
-	{Key: "capacity_units_per_hr", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "backup_snapshot_size_gb", ValueType: schema.Float64, DefaultValue: 0},
+func (r *RDSCluster) CoreType() string {
+	return "RDSCluster"
+}
+
+func (r *RDSCluster) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "write_requests_per_sec", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "read_requests_per_sec", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "change_records_per_statement", ValueType: schema.Float64, DefaultValue: 0.0},
+		{Key: "storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "average_statements_per_hr", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "backtrack_window_hrs", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "snapshot_export_size_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "capacity_units_per_hr", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "backup_snapshot_size_gb", ValueType: schema.Float64, DefaultValue: 0},
+	}
 }
 
 func (r *RDSCluster) PopulateUsage(u *schema.UsageData) {
@@ -138,7 +144,8 @@ func (r *RDSCluster) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: RDSClusterUsageSchema,
+		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

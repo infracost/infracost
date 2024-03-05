@@ -41,21 +41,6 @@ var SNSTopicUsageSchema = []*schema.UsageItem{
 	{Key: "sms_notification_price", ValueType: schema.Float64, DefaultValue: 0.0075},
 }
 
-// This is an experiment to see if using an explicit structure to define the cost components
-// can enable anything interesting (e.g. list what cost components could apply to a resource
-// without having any IaAC)
-// func (r *SNSTopic) CostComponents() []*schema.CostComponent {
-//	return []*schema.CostComponent{
-//		r.apiRequestsCostComponent(nil),
-//		r.httpNotificationsCostComponent(nil, nil),
-//		r.emailNotificationsCostComponent(nil, nil),
-//		r.kinesisNotificationsCostComponent(nil, nil),
-//		r.mobilePushNotificationsCostComponent(nil, nil),
-//		r.macOSNotificationsCostComponent(nil, nil),
-//		r.smsNotificationsCostComponent(nil, nil, nil),
-//	}
-// }
-
 // apiRequestsCostComponent returns a cost component for API request costs.
 func (r *SNSTopic) apiRequestsCostComponent(requests *int64) *schema.CostComponent {
 	var q *decimal.Decimal
@@ -191,6 +176,14 @@ func (r *SNSTopic) smsNotificationsCostComponent(subscriptions, requests *int64)
 	return c
 }
 
+func (r *SNSTopic) CoreType() string {
+	return "SNSTopic"
+}
+
+func (r *SNSTopic) UsageSchema() []*schema.UsageItem {
+	return SNSTopicUsageSchema
+}
+
 // PopulateUsage parses the u schema.UsageData into the SNSTopic.
 // It uses the `infracost_usage` struct tags to populate data into the SNSTopic.
 func (r *SNSTopic) PopulateUsage(u *schema.UsageData) {
@@ -225,7 +218,7 @@ func (r *SNSTopic) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: components,
-		UsageSchema:    SNSTopicUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 
@@ -424,6 +417,14 @@ func (r *SNSFIFOTopic) notificationPayloadCostComponent(subscriptions int64, req
 		},
 		UsageBased: true,
 	}
+}
+
+func (r *SNSFIFOTopic) CoreType() string {
+	return "SNSFIFOTopic"
+}
+
+func (r *SNSFIFOTopic) UsageSchema() []*schema.UsageItem {
+	return SNSFIFOTopicUsageSchema
 }
 
 // PopulateUsage parses the u schema.UsageData into the SNSFIFOTopic.

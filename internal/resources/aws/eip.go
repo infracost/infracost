@@ -13,7 +13,13 @@ type EIP struct {
 	Allocated bool
 }
 
-var EIPUsageSchema = []*schema.UsageItem{}
+func (r *EIP) CoreType() string {
+	return "EIP"
+}
+
+func (r *EIP) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 func (r *EIP) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -27,7 +33,7 @@ func (r *EIP) BuildResource() *schema.Resource {
 			Name:        r.Address,
 			NoPrice:     true,
 			IsSkipped:   true,
-			UsageSchema: EIPUsageSchema,
+			UsageSchema: r.UsageSchema(),
 		}
 	}
 
@@ -52,6 +58,7 @@ func (r *EIP) BuildResource() *schema.Resource {
 					StartUsageAmount: strPtr("1"),
 				},
 			},
-		}, UsageSchema: EIPUsageSchema,
+		},
+		UsageSchema: r.UsageSchema(),
 	}
 }

@@ -41,6 +41,14 @@ type LaunchTemplate struct {
 
 var LaunchTemplateUsageSchema = InstanceUsageSchema
 
+func (r *LaunchTemplate) CoreType() string {
+	return "LaunchTemplate"
+}
+
+func (r *LaunchTemplate) UsageSchema() []*schema.UsageItem {
+	return LaunchTemplateUsageSchema
+}
+
 func (a *LaunchTemplate) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(a, u)
 }
@@ -86,7 +94,7 @@ func (a *LaunchTemplate) BuildResource() *schema.Resource {
 
 	r := &schema.Resource{
 		Name:           a.Address,
-		UsageSchema:    LaunchTemplateUsageSchema,
+		UsageSchema:    a.UsageSchema(),
 		CostComponents: costComponents,
 		SubResources:   instanceResource.SubResources,
 		EstimateUsage:  instanceResource.EstimateUsage,

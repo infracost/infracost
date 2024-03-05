@@ -13,8 +13,14 @@ type SecretsManagerSecret struct {
 	MonthlyRequests *int64 `infracost_usage:"monthly_requests"`
 }
 
-var SecretsManagerSecretUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0},
+func (r *SecretsManagerSecret) CoreType() string {
+	return "SecretsManagerSecret"
+}
+
+func (r *SecretsManagerSecret) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0},
+	}
 }
 
 func (r *SecretsManagerSecret) PopulateUsage(u *schema.UsageData) {
@@ -56,6 +62,6 @@ func (r *SecretsManagerSecret) BuildResource() *schema.Resource {
 				UsageBased: true,
 			},
 		},
-		UsageSchema: SecretsManagerSecretUsageSchema,
+		UsageSchema: r.UsageSchema(),
 	}
 }

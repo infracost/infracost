@@ -17,9 +17,15 @@ type KinesisAnalyticsV2Application struct {
 	DurableApplicationBackupGB *float64 `infracost_usage:"durable_application_backup_gb"`
 }
 
-var KinesisAnalyticsV2ApplicationUsageSchema = []*schema.UsageItem{
-	{Key: "kinesis_processing_units", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "durable_application_backup_gb", ValueType: schema.Float64, DefaultValue: 0},
+func (r *KinesisAnalyticsV2Application) CoreType() string {
+	return "KinesisAnalyticsV2Application"
+}
+
+func (r *KinesisAnalyticsV2Application) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "kinesis_processing_units", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "durable_application_backup_gb", ValueType: schema.Float64, DefaultValue: 0},
+	}
 }
 
 func (r *KinesisAnalyticsV2Application) PopulateUsage(u *schema.UsageData) {
@@ -54,7 +60,8 @@ func (r *KinesisAnalyticsV2Application) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: KinesisAnalyticsV2ApplicationUsageSchema,
+		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

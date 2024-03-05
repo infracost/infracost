@@ -37,6 +37,14 @@ var S3IntelligentTieringStorageClassUsageSchema = []*schema.UsageItem{
 	{Key: "early_delete_gb", DefaultValue: 0.0, ValueType: schema.Float64},
 }
 
+func (a *S3IntelligentTieringStorageClass) CoreType() string {
+	return "S3IntelligentTieringStorageClass"
+}
+
+func (a *S3IntelligentTieringStorageClass) UsageSchema() []*schema.UsageItem {
+	return S3IntelligentTieringStorageClassUsageSchema
+}
+
 func (a *S3IntelligentTieringStorageClass) UsageKey() string {
 	return "intelligent_tiering"
 }
@@ -48,7 +56,7 @@ func (a *S3IntelligentTieringStorageClass) PopulateUsage(u *schema.UsageData) {
 func (a *S3IntelligentTieringStorageClass) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:        "Intelligent tiering",
-		UsageSchema: S3IntelligentTieringStorageClassUsageSchema,
+		UsageSchema: a.UsageSchema(),
 		CostComponents: []*schema.CostComponent{
 			s3StorageCostComponent("Storage (frequent access)", "AmazonS3", a.Region, "TimedStorage-INT-FA-ByteHrs", a.FrequentAccessStorageGB),
 			s3StorageCostComponent("Storage (infrequent access)", "AmazonS3", a.Region, "TimedStorage-INT-IA-ByteHrs", a.InfrequentAccessStorageGB),
