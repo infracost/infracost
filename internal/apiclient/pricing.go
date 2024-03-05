@@ -364,7 +364,7 @@ func (c *PricingAPIClient) PerformRequest(req BatchRequest) ([]PriceQueryResult,
 	for i, query := range deduplicatedServerQueries {
 		rawQueries[i] = query.query
 	}
-	resultsFromServer, err := c.doQueries(rawQueries)
+	resultsFromServer, err := c.DoQueries(rawQueries)
 	if err != nil {
 		return []PriceQueryResult{}, err
 	}

@@ -912,3 +912,60 @@ func newErroredProject(ctx *config.ProjectContext, err error) *projectOutput {
 
 	return &projectOutput{projects: []*schema.Project{schema.NewProject(name, metadata)}}
 }
+
+// runCommandFunc is a function that runs a command and returns an error this is
+// used by cobra.RunE.
+type runCommandFunc func(cmd *cobra.Command, args []string) error
+
+// runCommandMiddleware is a function that wraps a runCommandFunc and returns a
+// new runCommandFunc. This is used to add functionality to a command without
+// modifying the command itself. Middleware can be chained together to add
+// multiple pieces of functionality.
+//
+//nolint:deadcode,unused
+type runCommandMiddleware func(ctx *config.RunContext, next runCommandFunc) runCommandFunc
+
+// checkAPIKeyIsValid is a runCommandMiddleware that checks if the API key is
+// valid before running the command.
+func checkAPIKeyIsValid(ctx *config.RunContext, next runCommandFunc) runCommandFunc {
+	return func(cmd *cobra.Command, args []string) error {
+		if ctx.Config.APIKey == "" {
+			return fmt.Errorf("%s %s %s %s %s\n%s %s.\n%s %s %s",
+				ui.PrimaryString("INFRACOST_API_KEY"),
+				"is not set but is required, check your",
+				"environment variable is named correctly or add your API key to your",
+				ui.PrimaryString(config.CredentialsFilePath()),
+				"credentials file.",
+				"If you recently regenerated your API key, you can retrieve it from",
+				ui.LinkString(ctx.Config.DashboardEndpoint),
+				"See",
+				ui.LinkString("https://infracost.io/support"),
+				"if you continue having issues.")
+		}
+
+		pricingClient := apiclient.GetPricingAPIClient(ctx)
+		_, err := pricingClient.DoQueries([]apiclient.GraphQLQuery{
+			{},
+		})
+		var apiError *apiclient.APIError
+		if errors.As(err, &apiError) {
+			if apiError.ErrorCode == apiclient.ErrorCodeAPIKeyInvalid {
+				return fmt.Errorf("%s %s %s %s %s\n%s %s.\n%s %s %s",
+					"Invalid API Key, please check your",
+					ui.PrimaryString("INFRACOST_API_KEY"),
+					"environment variable or",
+					ui.PrimaryString(config.CredentialsFilePath()),
+					"credentials file.",
+					"If you recently regenerated your API key, you can retrieve it from",
+					ui.LinkString(ctx.Config.DashboardEndpoint),
+					"See",
+					ui.LinkString("https://infracost.io/support"),
+					"if you continue having issues.",
+				)
+
+			}
+		}
+
+		return next(cmd, args)
+	}
+}

@@ -57,7 +57,7 @@ type APIErrorResponse struct {
 	ErrorCode string `json:"error_code"`
 }
 
-func (c *APIClient) doQueries(queries []GraphQLQuery) ([]gjson.Result, error) {
+func (c *APIClient) DoQueries(queries []GraphQLQuery) ([]gjson.Result, error) {
 	if len(queries) == 0 {
 		log.Debug().Msg("Skipping GraphQL request as no queries have been specified")
 		return []gjson.Result{}, nil

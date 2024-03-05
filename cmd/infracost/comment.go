@@ -57,6 +57,8 @@ func commentCmd(ctx *config.RunContext) *cobra.Command {
 
 	cmds := []*cobra.Command{commentGitHubCmd(ctx), commentGitLabCmd(ctx), commentAzureReposCmd(ctx), commentBitbucketCmd(ctx)}
 	for _, subCmd := range cmds {
+		subCmd.RunE = checkAPIKeyIsValid(ctx, subCmd.RunE)
+
 		subCmd.Flags().StringArray("policy-path", nil, "Path to Infracost policy files, glob patterns need quotes (experimental)")
 		subCmd.Flags().Bool("show-all-projects", false, "Show all projects in the table of the comment output")
 		subCmd.Flags().Bool("show-changed", false, "Show only projects in the table that have code changes")

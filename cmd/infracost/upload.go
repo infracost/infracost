@@ -39,7 +39,7 @@ See https://infracost.io/docs/features/cli_commands/#upload-runs`,
 
       infracost upload --path infracost.json`,
 		ValidArgs: []string{"--", "-"},
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: checkAPIKeyIsValid(ctx, func(cmd *cobra.Command, args []string) error {
 			var err error
 
 			format, _ := cmd.Flags().GetString("format")
@@ -83,7 +83,7 @@ See https://infracost.io/docs/features/cli_commands/#upload-runs`,
 			}
 
 			return nil
-		},
+		}),
 	}
 
 	cmd.Flags().String("path", "p", "Path to Infracost JSON file.")

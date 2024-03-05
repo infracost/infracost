@@ -166,7 +166,7 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root, com
 			}
 		}
 	`
-	results, err := c.doQueries([]GraphQLQuery{{q, v}})
+	results, err := c.DoQueries([]GraphQLQuery{{q, v}})
 	if err != nil {
 		return response, err
 	}
@@ -245,7 +245,7 @@ func (c *DashboardAPIClient) QueryCLISettings() (QueryCLISettingsResponse, error
         	}
     	}
 	`
-	results, err := c.doQueries([]GraphQLQuery{{q, map[string]interface{}{}}})
+	results, err := c.DoQueries([]GraphQLQuery{{q, map[string]interface{}{}}})
 	if err != nil {
 		return response, fmt.Errorf("query failed when requesting org settings %w", err)
 	}
