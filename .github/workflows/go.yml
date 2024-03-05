@@ -34,6 +34,13 @@ jobs:
           sudo chmod +x /usr/bin/terragrunt
           terragrunt --version
 
+      - name: Test invalid api key
+        run: make ARGS="-run TestBreakdownInvalidAPIKey -update" test
+        env:
+          INFRACOST_API_KEY: "00000000000000000000000000000000"
+          INFRACOST_LOG_LEVEL: info
+          INFRACOST_TERRAFORM_CLOUD_TOKEN: ${{ secrets.TERRAFORM_CLOUD_TOKEN }}
+
       - name: Test (unit and shared integration)
         run: make test_shared_int
         env:
