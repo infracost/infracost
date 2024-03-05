@@ -1,0 +1,5 @@
+
+Err:
+Error: Invalid API Key, please check your INFRACOST_API_KEY environment variable or REPLACED_CREDENTIALS_PATH credentials file.
+If you recently regenerated your API key, you can retrieve it from https://dashboard.infracost.io.
+See https://infracost.io/support if you continue having issues.

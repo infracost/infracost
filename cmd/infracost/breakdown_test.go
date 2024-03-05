@@ -1235,3 +1235,39 @@ func TestBreakdownConfigFileWithSkipAutoDetect(t *testing.T) {
 		},
 	)
 }
+
+func TestBreakdownInvalidAPIKey(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", dir,
+		},
+		nil,
+		func(ctx *config.RunContext) {
+			ctx.Config.APIKey = "BAD_KEY"
+			ctx.Config.Credentials.APIKey = "BAD_KEY"
+		},
+	)
+}
+
+func TestBreakdownEmptyAPIKey(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", dir,
+		},
+		nil,
+		func(ctx *config.RunContext) {
+			ctx.Config.APIKey = ""
+			ctx.Config.Credentials.APIKey = ""
+		},
+	)
+}

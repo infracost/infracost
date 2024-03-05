@@ -27,6 +27,7 @@ var (
 	versionRegex     = regexp.MustCompile(`Infracost v.*`)
 	panicRegex       = regexp.MustCompile(`runtime\serror:([\w\d\n\r\[\]\:\/\.\\(\)\+\,\{\}\*\@\s\?]*)Environment`)
 	pathRegex        = regexp.MustCompile(`(/.*/)(infracost/infracost/cmd/infracost/testdata/.*)`)
+	credsRegex       = regexp.MustCompile(`/.*/credentials\.yml`)
 )
 
 type GoldenFileOptions = struct {
@@ -234,6 +235,7 @@ func stripDynamicValues(actual []byte) []byte {
 	actual = versionRegex.ReplaceAll(actual, []byte("Infracost vREPLACED_VERSION"))
 	actual = panicRegex.ReplaceAll(actual, []byte("runtime error: REPLACED ERROR\nEnvironment"))
 	actual = pathRegex.ReplaceAll(actual, []byte("REPLACED_PROJECT_PATH/$2"))
+	actual = credsRegex.ReplaceAll(actual, []byte("REPLACED_CREDENTIALS_PATH"))
 
 	return actual
 }

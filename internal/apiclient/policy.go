@@ -92,7 +92,7 @@ func (c *PolicyAPIClient) uploadProjectPolicyData(p2rs []policy2Resource) (strin
 		"policyResources": p2rs,
 	}
 
-	results, err := c.doQueries([]GraphQLQuery{{q, v}})
+	results, err := c.DoQueries([]GraphQLQuery{{q, v}})
 	if err != nil {
 		return "", fmt.Errorf("query storePolicyResources failed  %w", err)
 	}
@@ -302,7 +302,7 @@ func (c *PolicyAPIClient) getPolicyResourceAllowList() (map[string]allowList, er
 	`
 	v := map[string]interface{}{}
 
-	results, err := c.doQueries([]GraphQLQuery{{q, v}})
+	results, err := c.DoQueries([]GraphQLQuery{{q, v}})
 	if err != nil {
 		return nil, fmt.Errorf("query policyResourceAllowList failed %w", err)
 	}

@@ -76,6 +76,22 @@ func GetPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
 		return pricingClient
 	}
 
+	c := NewPricingAPIClient(ctx)
+	if c == nil {
+		return nil
+	}
+
+	initCache(ctx, c)
+	pricingClient = c
+	return c
+}
+
+// NewPricingAPIClient creates a new instance of PricingAPIClient using the given
+// RunContext configuration. Most callers should use GetPricingAPIClient instead
+// of this function to ensure that the client cache is global across the
+// application. This function is useful for creating isolated pricing clients
+// which do not share the global cache.
+func NewPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
 	if ctx == nil {
 		return nil
 	}
@@ -129,8 +145,6 @@ func GetPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
 		EventsDisabled: ctx.Config.EventsDisabled,
 	}
 
-	initCache(ctx, c)
-	pricingClient = c
 	return c
 }
 
@@ -364,7 +378,7 @@ func (c *PricingAPIClient) PerformRequest(req BatchRequest) ([]PriceQueryResult,
 	for i, query := range deduplicatedServerQueries {
 		rawQueries[i] = query.query
 	}
-	resultsFromServer, err := c.doQueries(rawQueries)
+	resultsFromServer, err := c.DoQueries(rawQueries)
 	if err != nil {
 		return []PriceQueryResult{}, err
 	}
