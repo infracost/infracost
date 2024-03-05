@@ -23,16 +23,22 @@ type StorageBucket struct {
 	MonthlyEgressDataTransferGB *StorageBucketNetworkEgressUsage `infracost_usage:"monthly_egress_data_transfer_gb"`
 }
 
-var StorageBucketUsageSchema = []*schema.UsageItem{
-	{Key: "storage_gb", ValueType: schema.Float64, DefaultValue: 0},
-	{Key: "monthly_class_a_operations", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "monthly_class_b_operations", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "monthly_data_retrieval_gb", ValueType: schema.Float64, DefaultValue: 0},
-	{
-		Key:          "monthly_egress_data_transfer_gb",
-		ValueType:    schema.SubResourceUsage,
-		DefaultValue: &usage.ResourceUsage{Name: "monthly_egress_data_transfer_gb", Items: StorageBucketNetworkEgressUsageSchema},
-	},
+func (r *StorageBucket) CoreType() string {
+	return "StorageBucket"
+}
+
+func (r *StorageBucket) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "monthly_class_a_operations", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_class_b_operations", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_data_retrieval_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{
+			Key:          "monthly_egress_data_transfer_gb",
+			ValueType:    schema.SubResourceUsage,
+			DefaultValue: &usage.ResourceUsage{Name: "monthly_egress_data_transfer_gb", Items: StorageBucketNetworkEgressUsageSchema},
+		},
+	}
 }
 
 func (r *StorageBucket) PopulateUsage(u *schema.UsageData) {
@@ -61,7 +67,7 @@ func (r *StorageBucket) BuildResource() *schema.Resource {
 		CostComponents: components,
 		SubResources: []*schema.Resource{
 			r.MonthlyEgressDataTransferGB.BuildResource(),
-		}, UsageSchema: StorageBucketUsageSchema,
+		}, UsageSchema: r.UsageSchema(),
 	}
 }
 

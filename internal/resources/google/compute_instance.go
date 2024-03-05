@@ -23,9 +23,15 @@ type ComputeInstance struct {
 	MonthlyHours *float64 `infracost_usage:"monthly_hrs"`
 }
 
-// ComputeInstanceUsageSchema defines a list which represents the usage schema of ComputeInstance.
-var ComputeInstanceUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_hrs", DefaultValue: 730, ValueType: schema.Float64},
+func (r *ComputeInstance) CoreType() string {
+	return "ComputeInstance"
+}
+
+// UsageSchema defines a list which represents the usage schema of ComputeInstance.
+func (r *ComputeInstance) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_hrs", DefaultValue: 730, ValueType: schema.Float64},
+	}
 }
 
 // PopulateUsage parses the u schema.UsageData into the ComputeInstance.
@@ -60,7 +66,7 @@ func (r *ComputeInstance) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    ComputeInstanceUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }

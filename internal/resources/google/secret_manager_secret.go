@@ -28,11 +28,16 @@ type SecretManagerSecret struct {
 	MonthlyRotationNotifications *int64 `infracost_usage:"monthly_rotation_notifications"`
 }
 
-// SecretManagerSecretUsageSchema defines a list which represents the usage schema of SecretManagerSecret.
-var SecretManagerSecretUsageSchema = []*schema.UsageItem{
-	{Key: "active_secret_versions", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_access_operations", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_rotation_notifications", DefaultValue: 0, ValueType: schema.Int64},
+func (r *SecretManagerSecret) CoreType() string {
+	return "SecretManagerSecret"
+}
+
+func (r *SecretManagerSecret) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "active_secret_versions", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "monthly_access_operations", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "monthly_rotation_notifications", DefaultValue: 0, ValueType: schema.Int64},
+	}
 }
 
 // PopulateUsage parses the u schema.UsageData into the SecretManagerSecret.
@@ -53,7 +58,7 @@ func (r *SecretManagerSecret) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    SecretManagerSecretUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }

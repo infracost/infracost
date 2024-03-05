@@ -12,8 +12,14 @@ type PubSubTopic struct {
 	MonthlyMessageDataTB *float64 `infracost_usage:"monthly_message_data_tb"`
 }
 
-var PubSubTopicUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_message_data_tb", ValueType: schema.Float64, DefaultValue: 0.0},
+func (r *PubSubTopic) CoreType() string {
+	return "PubSubTopic"
+}
+
+func (r *PubSubTopic) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_message_data_tb", ValueType: schema.Float64, DefaultValue: 0.0},
+	}
 }
 
 func (r *PubSubTopic) PopulateUsage(u *schema.UsageData) {
@@ -50,6 +56,6 @@ func (r *PubSubTopic) BuildResource() *schema.Resource {
 				UsageBased: true,
 			},
 		},
-		UsageSchema: PubSubTopicUsageSchema,
+		UsageSchema: r.UsageSchema(),
 	}
 }

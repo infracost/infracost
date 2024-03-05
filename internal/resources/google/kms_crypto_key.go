@@ -24,7 +24,13 @@ type KMSCryptoKey struct {
 	MonthlyKeyOperations *int64 `infracost_usage:"monthly_key_operations"`
 }
 
-var KMSCryptoKeyUsageSchema = []*schema.UsageItem{{Key: "key_versions", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_key_operations", ValueType: schema.Int64, DefaultValue: 0}}
+func (r *KMSCryptoKey) CoreType() string {
+	return "KMSCryptoKey"
+}
+
+func (r *KMSCryptoKey) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{{Key: "key_versions", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_key_operations", ValueType: schema.Int64, DefaultValue: 0}}
+}
 
 func (r *KMSCryptoKey) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -151,7 +157,8 @@ func (r *KMSCryptoKey) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: KMSCryptoKeyUsageSchema,
+		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

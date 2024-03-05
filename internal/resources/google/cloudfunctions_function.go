@@ -16,10 +16,16 @@ type CloudFunctionsFunction struct {
 	MonthlyOutboundDataGB      *float64 `infracost_usage:"monthly_outbound_data_gb"`
 }
 
-var CloudFunctionsFunctionUsageSchema = []*schema.UsageItem{
-	{Key: "request_duration_ms", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "monthly_function_invocations", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "monthly_outbound_data_gb", ValueType: schema.Float64, DefaultValue: 0},
+func (r *CloudFunctionsFunction) CoreType() string {
+	return "CloudFunctionsFunction"
+}
+
+func (r *CloudFunctionsFunction) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "request_duration_ms", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_function_invocations", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_outbound_data_gb", ValueType: schema.Float64, DefaultValue: 0},
+	}
 }
 
 func (r *CloudFunctionsFunction) PopulateUsage(u *schema.UsageData) {
@@ -135,7 +141,7 @@ func (r *CloudFunctionsFunction) BuildResource() *schema.Resource {
 				UsageBased: true,
 			},
 		},
-		UsageSchema: CloudFunctionsFunctionUsageSchema,
+		UsageSchema: r.UsageSchema(),
 	}
 }
 

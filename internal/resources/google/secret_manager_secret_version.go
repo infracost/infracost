@@ -27,9 +27,14 @@ type SecretManagerSecretVersion struct {
 	MonthlyAccessOperations *int64 `infracost_usage:"monthly_access_operations"`
 }
 
-// SecretManagerSecretVersionUsageSchema defines a list which represents the usage schema of SecretManagerSecretVersion.
-var SecretManagerSecretVersionUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_access_operations", DefaultValue: 0, ValueType: schema.Int64},
+func (r *SecretManagerSecretVersion) CoreType() string {
+	return "SecretManagerSecretVersion"
+}
+
+func (r *SecretManagerSecretVersion) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_access_operations", DefaultValue: 0, ValueType: schema.Int64},
+	}
 }
 
 // PopulateUsage parses the u schema.UsageData into the SecretManagerSecretVersion.
@@ -49,7 +54,7 @@ func (r *SecretManagerSecretVersion) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    SecretManagerSecretVersionUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }

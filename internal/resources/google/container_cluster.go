@@ -25,13 +25,17 @@ type ContainerCluster struct {
 	AutopilotEphemeralStorageGB *float64 `infracost_usage:"autopilot_ephemeral_storage_gb"`
 }
 
-// ContainerClusterUsageSchema defines a list which represents the usage schema of ContainerCluster.
-// Nested wildcard node_pool usage is mapped on provider level.
-var ContainerClusterUsageSchema = []*schema.UsageItem{
-	{Key: "nodes", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "autopilot_vcpu_count", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "autopilot_memory_gb", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "autopilot_ephemeral_storage_gb", DefaultValue: 0, ValueType: schema.Float64},
+func (r *ContainerCluster) CoreType() string {
+	return "ContainerCluster"
+}
+
+func (r *ContainerCluster) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "nodes", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "autopilot_vcpu_count", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "autopilot_memory_gb", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "autopilot_ephemeral_storage_gb", DefaultValue: 0, ValueType: schema.Float64},
+	}
 }
 
 // PopulateUsage parses the u schema.UsageData into the ContainerCluster.
@@ -86,7 +90,7 @@ func (r *ContainerCluster) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    ContainerClusterUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 		SubResources:   subresources,
 	}

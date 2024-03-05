@@ -20,8 +20,14 @@ type ComputeRegionInstanceGroupManager struct {
 	GuestAccelerators []*ComputeGuestAccelerator
 }
 
-// ComputeRegionInstanceGroupManagerUsageSchema defines a list which represents the usage schema of ComputeRegionInstanceGroupManager.
-var ComputeRegionInstanceGroupManagerUsageSchema = []*schema.UsageItem{}
+func (r *ComputeRegionInstanceGroupManager) CoreType() string {
+	return "ComputeRegionInstanceGroupManager"
+}
+
+// UsageSchema defines a list which represents the usage schema of ComputeRegionInstanceGroupManager.
+func (r *ComputeRegionInstanceGroupManager) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 // PopulateUsage parses the u schema.UsageData into the ComputeRegionInstanceGroupManager.
 // It uses the `infracost_usage` struct tags to populate data into the ComputeRegionInstanceGroupManager.
@@ -55,7 +61,7 @@ func (r *ComputeRegionInstanceGroupManager) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    ComputeRegionInstanceGroupManagerUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }

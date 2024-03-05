@@ -15,9 +15,15 @@ type MonitoringMetricDescriptor struct {
 	MonthlyAPICalls         *int64 `infracost_usage:"monthly_api_calls"`
 }
 
-var MonitoringMetricDescriptorUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_monitoring_data_mb", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "monthly_api_calls", ValueType: schema.Int64, DefaultValue: 0},
+func (r *MonitoringMetricDescriptor) CoreType() string {
+	return "MonitoringMetricDescriptor"
+}
+
+func (r *MonitoringMetricDescriptor) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_monitoring_data_mb", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_api_calls", ValueType: schema.Int64, DefaultValue: 0},
+	}
 }
 
 func (r *MonitoringMetricDescriptor) PopulateUsage(u *schema.UsageData) {
@@ -58,7 +64,7 @@ func (r *MonitoringMetricDescriptor) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		UsageSchema:    MonitoringMetricDescriptorUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

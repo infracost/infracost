@@ -13,7 +13,13 @@ type ComputeForwardingRule struct {
 	MonthlyIngressDataGB *float64 `infracost_usage:"monthly_ingress_data_gb"`
 }
 
-var ComputeForwardingRuleUsageSchema = []*schema.UsageItem{{Key: "monthly_ingress_data_gb", ValueType: schema.Float64, DefaultValue: 0}}
+func (r *ComputeForwardingRule) CoreType() string {
+	return "ComputeForwardingRule"
+}
+
+func (r *ComputeForwardingRule) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{{Key: "monthly_ingress_data_gb", ValueType: schema.Float64, DefaultValue: 0}}
+}
 
 func (r *ComputeForwardingRule) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -34,7 +40,8 @@ func (r *ComputeForwardingRule) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: ComputeForwardingRuleUsageSchema,
+		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

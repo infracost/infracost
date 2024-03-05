@@ -20,12 +20,18 @@ type BigQueryTable struct {
 	MonthlyLongTermStorageGB  *float64 `infracost_usage:"monthly_long_term_storage_gb"`
 }
 
-var BigQueryTableUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_streaming_inserts_mb", ValueType: schema.Float64, DefaultValue: 0},
-	{Key: "monthly_storage_write_api_gb", ValueType: schema.Float64, DefaultValue: 0},
-	{Key: "monthly_storage_read_api_tb", ValueType: schema.Float64, DefaultValue: 0},
-	{Key: "monthly_active_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
-	{Key: "monthly_long_term_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+func (r *BigQueryTable) CoreType() string {
+	return "BigQueryTable"
+}
+
+func (r *BigQueryTable) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_streaming_inserts_mb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "monthly_storage_write_api_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "monthly_storage_read_api_tb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "monthly_active_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "monthly_long_term_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+	}
 }
 
 func (r *BigQueryTable) PopulateUsage(u *schema.UsageData) {
@@ -52,7 +58,7 @@ func (r *BigQueryTable) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		UsageSchema:    BigQueryTableUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

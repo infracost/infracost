@@ -21,9 +21,14 @@ type ContainerNodePool struct {
 	Nodes *int64 `infracost_usage:"nodes"`
 }
 
-// ContainerNodePoolUsageSchema defines a list which represents the usage schema of ContainerNodePool.
-var ContainerNodePoolUsageSchema = []*schema.UsageItem{
-	{Key: "nodes", DefaultValue: 0, ValueType: schema.Int64},
+func (r *ContainerNodePool) CoreType() string {
+	return "ContainerNodePool"
+}
+
+func (r *ContainerNodePool) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "nodes", DefaultValue: 0, ValueType: schema.Int64},
+	}
 }
 
 // PopulateUsage parses the u schema.UsageData into the ContainerNodePool.
@@ -65,7 +70,7 @@ func (r *ContainerNodePool) BuildResource() *schema.Resource {
 
 	resource := &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    ContainerNodePoolUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 

@@ -56,16 +56,22 @@ type ArtifactRegistryRepository struct {
 }
 
 // artifactRegistryRepositoryUsageSchema defines a list which represents the usage schema of ArtifactRegistryRepository.
-var artifactRegistryRepositoryUsageSchema = []*schema.UsageItem{
-	{Key: "storage_gb", DefaultValue: 0, ValueType: schema.Float64},
-	{
-		Key: "monthly_egress_data_transfer_gb",
-		DefaultValue: &usage.ResourceUsage{
-			Name:  "monthly_egress_data_transfer_gb",
-			Items: RegionUsageSchema,
+func (r *ArtifactRegistryRepository) CoreType() string {
+	return "ArtifactRegistryRepository"
+}
+
+func (r *ArtifactRegistryRepository) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "storage_gb", DefaultValue: 0, ValueType: schema.Float64},
+		{
+			Key: "monthly_egress_data_transfer_gb",
+			DefaultValue: &usage.ResourceUsage{
+				Name:  "monthly_egress_data_transfer_gb",
+				Items: RegionUsageSchema,
+			},
+			ValueType: schema.SubResourceUsage,
 		},
-		ValueType: schema.SubResourceUsage,
-	},
+	}
 }
 
 // PopulateUsage parses the u schema.UsageData into the ArtifactRegistryRepository.
@@ -105,7 +111,7 @@ func (r *ArtifactRegistryRepository) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    artifactRegistryRepositoryUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }
