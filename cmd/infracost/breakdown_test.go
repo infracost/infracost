@@ -1250,6 +1250,7 @@ func TestBreakdownInvalidAPIKey(t *testing.T) {
 		func(ctx *config.RunContext) {
 			ctx.Config.APIKey = "BAD_KEY"
 			ctx.Config.Credentials.APIKey = "BAD_KEY"
+			ctx.Config.PricingCacheDisabled = true
 		},
 	)
 }
@@ -1268,6 +1269,7 @@ func TestBreakdownEmptyAPIKey(t *testing.T) {
 		func(ctx *config.RunContext) {
 			ctx.Config.APIKey = ""
 			ctx.Config.Credentials.APIKey = ""
+			ctx.Config.PricingCacheDisabled = true
 		},
 	)
 }

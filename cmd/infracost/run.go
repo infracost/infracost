@@ -945,7 +945,10 @@ func checkAPIKeyIsValid(ctx *config.RunContext, next runCommandFunc) runCommandF
 
 		pricingClient := apiclient.GetPricingAPIClient(ctx)
 		_, err := pricingClient.DoQueries([]apiclient.GraphQLQuery{
-			{},
+			{
+				Query:     `query { apiKey {} }`,
+				Variables: nil,
+			},
 		})
 		var apiError *apiclient.APIError
 		if errors.As(err, &apiError) {
