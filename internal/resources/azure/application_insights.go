@@ -16,7 +16,13 @@ type ApplicationInsights struct {
 	MonthlyDataIngestedGB *float64 `infracost_usage:"monthly_data_ingested_gb"`
 }
 
-var ApplicationInsightsUsageSchema = []*schema.UsageItem{{Key: "monthly_data_ingested_gb", ValueType: schema.Float64, DefaultValue: 0}}
+func (r *ApplicationInsights) CoreType() string {
+	return "ApplicationInsights"
+}
+
+func (r *ApplicationInsights) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{{Key: "monthly_data_ingested_gb", ValueType: schema.Float64, DefaultValue: 0}}
+}
 
 func (r *ApplicationInsights) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -75,6 +81,7 @@ func (r *ApplicationInsights) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: ApplicationInsightsUsageSchema,
+		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 }

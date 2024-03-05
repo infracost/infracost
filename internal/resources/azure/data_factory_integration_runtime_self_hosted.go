@@ -18,10 +18,14 @@ type DataFactoryIntegrationRuntimeSelfHosted struct {
 	MonthlyOrchestrationRuns *int64 `infracost_usage:"monthly_orchestration_runs"`
 }
 
-// DataFactoryIntegrationRuntimeSelfHostedUsageSchema defines a list which represents
-// the usage schema of DataFactoryIntegrationRuntimeSelfHosted.
-var DataFactoryIntegrationRuntimeSelfHostedUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_orchestration_runs", DefaultValue: 0, ValueType: schema.Int64},
+func (r *DataFactoryIntegrationRuntimeSelfHosted) CoreType() string {
+	return "DataFactoryIntegrationRuntimeSelfHosted"
+}
+
+func (r *DataFactoryIntegrationRuntimeSelfHosted) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_orchestration_runs", DefaultValue: 0, ValueType: schema.Int64},
+	}
 }
 
 // PopulateUsage parses the u schema.UsageData into the DataFactoryIntegrationRuntimeSelfHosted.
@@ -45,7 +49,7 @@ func (r *DataFactoryIntegrationRuntimeSelfHosted) BuildResource() *schema.Resour
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    DataFactoryIntegrationRuntimeSelfHostedUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }

@@ -35,6 +35,19 @@ type MSSQLManagedInstance struct {
 	BackupStorageGB            *int64 `infracost_usage:"backup_storage_gb"`
 }
 
+// CoreType returns the name of this resource type
+func (r *MSSQLManagedInstance) CoreType() string {
+	return "MSSQLManagedInstance"
+}
+
+// UsageSchema defines a list which represents the usage schema of MSSQLManagedInstance.
+func (r *MSSQLManagedInstance) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "backup_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "long_term_retention_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
+	}
+}
+
 // PopulateUsage parses the u schema.UsageData into the MSSQLManagedInstance.
 // It uses the `infracost_usage` struct tags to populate data into the MSSQLManagedInstance.
 func (r *MSSQLManagedInstance) PopulateUsage(u *schema.UsageData) {
@@ -48,11 +61,8 @@ func (r *MSSQLManagedInstance) BuildResource() *schema.Resource {
 	costComponents := r.costComponents()
 
 	return &schema.Resource{
-		Name: r.Address,
-		UsageSchema: []*schema.UsageItem{
-			{Key: "backup_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
-			{Key: "long_term_retention_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
-		},
+		Name:           r.Address,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }

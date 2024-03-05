@@ -36,6 +36,17 @@ type SQLManagedInstance struct {
 	BackupStorageGB            *int64 `infracost_usage:"backup_storage_gb"`
 }
 
+func (r *SQLManagedInstance) CoreType() string {
+	return "SQLManagedInstance"
+}
+
+func (r *SQLManagedInstance) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "backup_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "long_term_retention_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
+	}
+}
+
 // PopulateUsage parses the u schema.UsageData into the SQLManagedInstance.
 // It uses the `infracost_usage` struct tags to populate data into the SQLManagedInstance.
 func (r *SQLManagedInstance) PopulateUsage(u *schema.UsageData) {
@@ -49,11 +60,8 @@ func (r *SQLManagedInstance) BuildResource() *schema.Resource {
 	costComponents := r.costComponents()
 
 	return &schema.Resource{
-		Name: r.Address,
-		UsageSchema: []*schema.UsageItem{
-			{Key: "backup_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
-			{Key: "long_term_retention_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
-		},
+		Name:           r.Address,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }

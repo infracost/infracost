@@ -21,13 +21,19 @@ type LinuxVirtualMachine struct {
 	MonthlyHrs      *float64     `infracost_usage:"monthly_hrs"`
 }
 
-var LinuxVirtualMachineUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_hrs", ValueType: schema.Float64, DefaultValue: 0},
-	{
-		Key:          "os_disk",
-		ValueType:    schema.SubResourceUsage,
-		DefaultValue: &usage.ResourceUsage{Name: "os_disk", Items: OSDiskUsageSchema},
-	},
+func (r *LinuxVirtualMachine) CoreType() string {
+	return "LinuxVirtualMachine"
+}
+
+func (r *LinuxVirtualMachine) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_hrs", ValueType: schema.Float64, DefaultValue: 0},
+		{
+			Key:          "os_disk",
+			ValueType:    schema.SubResourceUsage,
+			DefaultValue: &usage.ResourceUsage{Name: "os_disk", Items: OSDiskUsageSchema},
+		},
+	}
 }
 
 func (r *LinuxVirtualMachine) PopulateUsage(u *schema.UsageData) {
@@ -58,7 +64,8 @@ func (r *LinuxVirtualMachine) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		SubResources:   subResources, UsageSchema: LinuxVirtualMachineUsageSchema,
+		SubResources:   subResources,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

@@ -11,7 +11,13 @@ type PrivateDNSMXRecord struct {
 	MonthlyQueries *int64 `infracost_usage:"monthly_queries"`
 }
 
-var PrivateDNSMXRecordUsageSchema = []*schema.UsageItem{{Key: "monthly_queries", ValueType: schema.Int64, DefaultValue: 0}}
+func (r *PrivateDNSMXRecord) CoreType() string {
+	return "PrivateDNSMXRecord"
+}
+
+func (r *PrivateDNSMXRecord) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{{Key: "monthly_queries", ValueType: schema.Int64, DefaultValue: 0}}
+}
 
 func (r *PrivateDNSMXRecord) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -20,6 +26,7 @@ func (r *PrivateDNSMXRecord) PopulateUsage(u *schema.UsageData) {
 func (r *PrivateDNSMXRecord) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: dnsQueriesCostComponent(r.Region, r.MonthlyQueries), UsageSchema: PrivateDNSMXRecordUsageSchema,
+		CostComponents: dnsQueriesCostComponent(r.Region, r.MonthlyQueries),
+		UsageSchema:    r.UsageSchema(),
 	}
 }

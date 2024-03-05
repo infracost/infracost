@@ -30,7 +30,13 @@ type ManagedDiskData struct {
 	DiskMBPSReadWrite int64
 }
 
-var ManagedDiskUsageSchema = []*schema.UsageItem{{Key: "monthly_disk_operations", ValueType: schema.Int64, DefaultValue: 0}}
+func (r *ManagedDisk) CoreType() string {
+	return "ManagedDisk"
+}
+
+func (r *ManagedDisk) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{{Key: "monthly_disk_operations", ValueType: schema.Int64, DefaultValue: 0}}
+}
 
 func (r *ManagedDisk) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -50,7 +56,8 @@ func (r *ManagedDisk) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: ManagedDiskUsageSchema,
+		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

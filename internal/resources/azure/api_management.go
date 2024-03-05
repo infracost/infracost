@@ -18,7 +18,13 @@ type APIManagement struct {
 	MonthlyAPICalls        *int64 `infracost_usage:"monthly_api_calls"`
 }
 
-var APIManagementUsageSchema = []*schema.UsageItem{{Key: "self_hosted_gateway_count", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_api_calls", ValueType: schema.Int64, DefaultValue: 0}}
+func (r *APIManagement) CoreType() string {
+	return "APIManagement"
+}
+
+func (r *APIManagement) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{{Key: "self_hosted_gateway_count", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_api_calls", ValueType: schema.Int64, DefaultValue: 0}}
+}
 
 func (r *APIManagement) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -72,7 +78,8 @@ func (r *APIManagement) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: APIManagementUsageSchema,
+		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

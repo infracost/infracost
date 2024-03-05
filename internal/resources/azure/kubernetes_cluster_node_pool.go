@@ -2,11 +2,10 @@ package azure
 
 import (
 	"regexp"
+	"strings"
 
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-
-	"strings"
 
 	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
@@ -24,9 +23,15 @@ type KubernetesClusterNodePool struct {
 	MonthlyHours *float64 `infracost_usage:"monthly_hrs"`
 }
 
-var KubernetesClusterNodePoolUsageSchema = []*schema.UsageItem{
-	{Key: "nodes", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "monthly_hrs", ValueType: schema.Float64, DefaultValue: 0},
+func (r *KubernetesClusterNodePool) CoreType() string {
+	return "KubernetesClusterNodePool"
+}
+
+func (r *KubernetesClusterNodePool) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "nodes", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_hrs", ValueType: schema.Float64, DefaultValue: 0},
+	}
 }
 
 func (r *KubernetesClusterNodePool) PopulateUsage(u *schema.UsageData) {
@@ -42,7 +47,9 @@ func (r *KubernetesClusterNodePool) BuildResource() *schema.Resource {
 		nodeCount = decimal.NewFromInt(*r.Nodes)
 	}
 
-	return aksClusterNodePool(r.Address, r.Region, r.VMSize, r.OS, r.OSDiskType, r.OSDiskSizeGB, nodeCount, r.MonthlyHours)
+	pool := aksClusterNodePool(r.Address, r.Region, r.VMSize, r.OS, r.OSDiskType, r.OSDiskSizeGB, nodeCount, r.MonthlyHours)
+	pool.UsageSchema = r.UsageSchema()
+	return pool
 }
 
 func aksClusterNodePool(name, region, instanceType, os string, osDiskType string, osDiskSizeGB int64, nodeCount decimal.Decimal, monthlyHours *float64) *schema.Resource {

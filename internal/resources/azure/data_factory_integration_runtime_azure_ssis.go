@@ -3,9 +3,10 @@ package azure
 import (
 	"fmt"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 // DataFactoryIntegrationRuntimeAzureSSIS struct represents Data Factory's
@@ -23,8 +24,13 @@ type DataFactoryIntegrationRuntimeAzureSSIS struct {
 	LicenseIncluded bool
 }
 
-// DataFactoryIntegrationRuntimeAzureSSISUsageSchema defines a list which represents the usage schema of DataFactoryIntegrationRuntimeAzureSSIS.
-var DataFactoryIntegrationRuntimeAzureSSISUsageSchema = []*schema.UsageItem{}
+func (r *DataFactoryIntegrationRuntimeAzureSSIS) CoreType() string {
+	return "DataFactoryIntegrationRuntimeAzureSSIS"
+}
+
+func (r *DataFactoryIntegrationRuntimeAzureSSIS) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 // PopulateUsage parses the u schema.UsageData into the DataFactoryIntegrationRuntimeAzureSSIS.
 // It uses the `infracost_usage` struct tags to populate data into the DataFactoryIntegrationRuntimeAzureSSIS.
@@ -42,7 +48,7 @@ func (r *DataFactoryIntegrationRuntimeAzureSSIS) BuildResource() *schema.Resourc
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    DataFactoryIntegrationRuntimeAzureSSISUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }

@@ -17,7 +17,17 @@ type AutomationAccount struct {
 	MonthlyWatcherHrs       *int64 `infracost_usage:"monthly_watcher_hrs"`
 }
 
-var AutomationAccountUsageSchema = []*schema.UsageItem{{Key: "monthly_job_run_mins", ValueType: schema.Int64, DefaultValue: 0}, {Key: "non_azure_config_node_count", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_watcher_hrs", ValueType: schema.Int64, DefaultValue: 0}}
+func (r *AutomationAccount) CoreType() string {
+	return "AutomationAccount"
+}
+
+func (r *AutomationAccount) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_job_run_mins", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "non_azure_config_node_count", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_watcher_hrs", ValueType: schema.Int64, DefaultValue: 0},
+	}
+}
 
 func (r *AutomationAccount) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -50,7 +60,8 @@ func (r *AutomationAccount) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: AutomationAccountUsageSchema,
+		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

@@ -16,7 +16,13 @@ type LB struct {
 	MonthlyDataProcessedGB *float64 `infracost_usage:"monthly_data_processed_gb"`
 }
 
-var LBUsageSchema = []*schema.UsageItem{{Key: "monthly_data_processed_gb", ValueType: schema.Float64, DefaultValue: 0}}
+func (r *LB) CoreType() string {
+	return "LB"
+}
+
+func (r *LB) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{{Key: "monthly_data_processed_gb", ValueType: schema.Float64, DefaultValue: 0}}
+}
 
 func (r *LB) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -39,9 +45,10 @@ func (r *LB) BuildResource() *schema.Resource {
 
 	if strings.ToLower(sku) == "basic" {
 		return &schema.Resource{
-			Name:      r.Address,
-			NoPrice:   true,
-			IsSkipped: true, UsageSchema: LBUsageSchema,
+			Name:        r.Address,
+			NoPrice:     true,
+			IsSkipped:   true,
+			UsageSchema: r.UsageSchema(),
 		}
 	}
 
@@ -49,7 +56,8 @@ func (r *LB) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: LBUsageSchema,
+		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

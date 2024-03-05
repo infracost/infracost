@@ -19,13 +19,19 @@ type WindowsVirtualMachineScaleSet struct {
 	OSDisk                                *OSDiskUsage `infracost_usage:"os_disk"`
 }
 
-var WindowsVirtualMachineScaleSetUsageSchema = []*schema.UsageItem{
-	{Key: "instances", ValueType: schema.Int64, DefaultValue: 0},
-	{
-		Key:          "os_disk",
-		ValueType:    schema.SubResourceUsage,
-		DefaultValue: &usage.ResourceUsage{Name: "os_disk", Items: OSDiskUsageSchema},
-	},
+func (r *WindowsVirtualMachineScaleSet) CoreType() string {
+	return "WindowsVirtualMachineScaleSet"
+}
+
+func (r *WindowsVirtualMachineScaleSet) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "instances", ValueType: schema.Int64, DefaultValue: 0},
+		{
+			Key:          "os_disk",
+			ValueType:    schema.SubResourceUsage,
+			DefaultValue: &usage.ResourceUsage{Name: "os_disk", Items: OSDiskUsageSchema},
+		},
+	}
 }
 
 func (r *WindowsVirtualMachineScaleSet) PopulateUsage(u *schema.UsageData) {
@@ -63,7 +69,8 @@ func (r *WindowsVirtualMachineScaleSet) BuildResource() *schema.Resource {
 	res := &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		SubResources:   subResources, UsageSchema: WindowsVirtualMachineScaleSetUsageSchema,
+		SubResources:   subResources,
+		UsageSchema:    r.UsageSchema(),
 	}
 
 	schema.MultiplyQuantities(res, instanceCount)

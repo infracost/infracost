@@ -38,14 +38,21 @@ type frontdoorOutboundDataTransferUsage struct {
 	Zone5MonthlyTransferGB      *float64 `infracost_usage:"india"`
 }
 
-// FrontdoorUsageSchema defines a list which represents the usage schema of Frontdoor.
-var FrontdoorUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_inbound_data_transfer_gb", DefaultValue: 0, ValueType: schema.Float64},
-	{
-		Key:          "monthly_outbound_data_transfer_gb",
-		DefaultValue: &usage.ResourceUsage{Name: "monthly_outbound_data_transfer_gb", Items: frontdoorOutboundDataUsageSchema},
-		ValueType:    schema.SubResourceUsage,
-	},
+// CoreType returns the name of this resource type
+func (r *Frontdoor) CoreType() string {
+	return "Frontdoor"
+}
+
+// UsageSchema defines a list which represents the usage schema of EventGridTopic.
+func (r *Frontdoor) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_inbound_data_transfer_gb", DefaultValue: 0, ValueType: schema.Float64},
+		{
+			Key:          "monthly_outbound_data_transfer_gb",
+			DefaultValue: &usage.ResourceUsage{Name: "monthly_outbound_data_transfer_gb", Items: frontdoorOutboundDataUsageSchema},
+			ValueType:    schema.SubResourceUsage,
+		},
+	}
 }
 
 // frontdoorOutboundDataUsageSchema defines a nested list of outbound data
@@ -82,7 +89,7 @@ func (r *Frontdoor) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    FrontdoorUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 		SubResources:   []*schema.Resource{outboundTransferSubResource},
 	}

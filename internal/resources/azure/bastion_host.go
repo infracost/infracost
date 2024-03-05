@@ -17,7 +17,13 @@ type BastionHost struct {
 	MonthlyOutboundDataGB *float64 `infracost_usage:"monthly_outbound_data_gb"`
 }
 
-var BastionHostUsageSchema = []*schema.UsageItem{{Key: "monthly_outbound_data_gb", ValueType: schema.Float64, DefaultValue: 0}}
+func (r *BastionHost) CoreType() string {
+	return "BastionHost"
+}
+
+func (r *BastionHost) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{{Key: "monthly_outbound_data_gb", ValueType: schema.Float64, DefaultValue: 0}}
+}
 
 func (r *BastionHost) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -52,7 +58,8 @@ func (r *BastionHost) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: BastionHostUsageSchema,
+		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

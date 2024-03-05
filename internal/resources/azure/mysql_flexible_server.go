@@ -28,9 +28,16 @@ type MySQLFlexibleServer struct {
 	AdditionalBackupStorageGB *float64 `infracost_usage:"additional_backup_storage_gb"`
 }
 
-// MySQLFlexibleServerUsageSchema defines a list which represents the usage schema of MySQLFlexibleServer.
-var MySQLFlexibleServerUsageSchema = []*schema.UsageItem{
-	{Key: "additional_backup_storage_gb", DefaultValue: 0, ValueType: schema.Float64},
+// CoreType returns the name of this resource type
+func (r *MySQLFlexibleServer) CoreType() string {
+	return "MySQLFlexibleServer"
+}
+
+// UsageSchema defines a list which represents the usage schema of MySQLFlexibleServerUsageSchema.
+func (r *MySQLFlexibleServer) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "additional_backup_storage_gb", DefaultValue: 0, ValueType: schema.Float64},
+	}
 }
 
 // PopulateUsage parses the u schema.UsageData into the MySQLFlexibleServer.
@@ -56,7 +63,7 @@ func (r *MySQLFlexibleServer) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    MySQLFlexibleServerUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }

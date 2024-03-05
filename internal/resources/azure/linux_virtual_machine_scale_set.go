@@ -18,13 +18,19 @@ type LinuxVirtualMachineScaleSet struct {
 	OSDisk          *OSDiskUsage `infracost_usage:"os_disk"`
 }
 
-var LinuxVirtualMachineScaleSetUsageSchema = []*schema.UsageItem{
-	{Key: "instances", ValueType: schema.Int64, DefaultValue: 0},
-	{
-		Key:          "os_disk",
-		ValueType:    schema.SubResourceUsage,
-		DefaultValue: &usage.ResourceUsage{Name: "os_disk", Items: OSDiskUsageSchema},
-	},
+func (r *LinuxVirtualMachineScaleSet) CoreType() string {
+	return "LinuxVirtualMachineScaleSet"
+}
+
+func (r *LinuxVirtualMachineScaleSet) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "instances", ValueType: schema.Int64, DefaultValue: 0},
+		{
+			Key:          "os_disk",
+			ValueType:    schema.SubResourceUsage,
+			DefaultValue: &usage.ResourceUsage{Name: "os_disk", Items: OSDiskUsageSchema},
+		},
+	}
 }
 
 func (r *LinuxVirtualMachineScaleSet) PopulateUsage(u *schema.UsageData) {
@@ -57,7 +63,8 @@ func (r *LinuxVirtualMachineScaleSet) BuildResource() *schema.Resource {
 	res := &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		SubResources:   subResources, UsageSchema: LinuxVirtualMachineScaleSetUsageSchema,
+		SubResources:   subResources,
+		UsageSchema:    r.UsageSchema(),
 	}
 
 	schema.MultiplyQuantities(res, instanceCount)

@@ -26,10 +26,17 @@ type FrontdoorFirewallPolicy struct {
 	MonthlyManagedRulesetRequests *int64 `infracost_usage:"monthly_managed_ruleset_requests"`
 }
 
-// FrontdoorFirewallPolicyUsageSchema defines a list which represents the usage schema of FrontdoorFirewallPolicy.
-var FrontdoorFirewallPolicyUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_custom_rule_requests", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_managed_ruleset_requests", DefaultValue: 0, ValueType: schema.Int64},
+// CoreType returns the name of this resource type
+func (r *FrontdoorFirewallPolicy) CoreType() string {
+	return "FrontdoorFirewallPolicy"
+}
+
+// UsageSchema defines a list which represents the usage schema of EventGridTopic.
+func (r *FrontdoorFirewallPolicy) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_custom_rule_requests", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "monthly_managed_ruleset_requests", DefaultValue: 0, ValueType: schema.Int64},
+	}
 }
 
 // PopulateUsage parses the u schema.UsageData into the FrontdoorFirewallPolicy.
@@ -50,7 +57,7 @@ func (r *FrontdoorFirewallPolicy) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    FrontdoorFirewallPolicyUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }

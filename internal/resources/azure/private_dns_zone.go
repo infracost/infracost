@@ -12,7 +12,13 @@ type PrivateDNSZone struct {
 	Region  string
 }
 
-var PrivateDNSZoneUsageSchema = []*schema.UsageItem{}
+func (r *PrivateDNSZone) CoreType() string {
+	return "PrivateDNSZone"
+}
+
+func (r *PrivateDNSZone) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 func (r *PrivateDNSZone) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -39,6 +45,7 @@ func (r *PrivateDNSZone) BuildResource() *schema.Resource {
 	costComponents = append(costComponents, hostedPublicZoneCostComponent(region))
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: PrivateDNSZoneUsageSchema,
+		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 }

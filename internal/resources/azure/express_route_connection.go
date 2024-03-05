@@ -19,6 +19,15 @@ type ExpressRouteConnection struct {
 	Region string
 }
 
+func (e *ExpressRouteConnection) CoreType() string {
+	return "ExpressRouteConnection"
+}
+
+// UsageSchema defines a list which represents the usage schema of EventGridTopic.
+func (e *ExpressRouteConnection) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
+
 // PopulateUsage parses the u schema.UsageData into the ExpressRouteConnection.
 // It uses the `infracost_usage` struct tags to populate data into the ExpressRouteConnection.
 func (e *ExpressRouteConnection) PopulateUsage(u *schema.UsageData) {
@@ -33,7 +42,8 @@ func (e *ExpressRouteConnection) PopulateUsage(u *schema.UsageData) {
 // See providers folder for more information.
 func (e *ExpressRouteConnection) BuildResource() *schema.Resource {
 	return &schema.Resource{
-		Name: e.Address,
+		Name:        e.Address,
+		UsageSchema: e.UsageSchema(),
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:           "ER Connections",

@@ -20,10 +20,15 @@ type DataFactory struct {
 	MonthlyMonitoringOperationEntities *int64 `infracost_usage:"monthly_monitoring_operation_entities"`
 }
 
-// DataFactoryUsageSchema defines a list which represents the usage schema of DataFactory.
-var DataFactoryUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_read_write_operation_entities", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_monitoring_operation_entities", DefaultValue: 0, ValueType: schema.Int64},
+func (r *DataFactory) CoreType() string {
+	return "DataFactory"
+}
+
+func (r *DataFactory) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_read_write_operation_entities", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "monthly_monitoring_operation_entities", DefaultValue: 0, ValueType: schema.Int64},
+	}
 }
 
 // PopulateUsage parses the u schema.UsageData into the DataFactory.
@@ -43,7 +48,7 @@ func (r *DataFactory) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    DataFactoryUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }

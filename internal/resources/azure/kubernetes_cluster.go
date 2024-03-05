@@ -41,17 +41,23 @@ var KubernetesClusterDefaultNodePoolSchema = []*schema.UsageItem{
 	{Key: "monthly_hrs", ValueType: schema.Float64, DefaultValue: 0},
 }
 
-var KubernetesClusterUsageSchema = []*schema.UsageItem{
-	{
-		Key:          "load_balancer",
-		ValueType:    schema.SubResourceUsage,
-		DefaultValue: &usage.ResourceUsage{Name: "load_balancer", Items: KubernetesClusterLoadBalancerSchema},
-	},
-	{
-		Key:          "default_node_pool",
-		ValueType:    schema.SubResourceUsage,
-		DefaultValue: &usage.ResourceUsage{Name: "default_node_pool", Items: KubernetesClusterDefaultNodePoolSchema},
-	},
+func (r *KubernetesCluster) CoreType() string {
+	return "KubernetesCluster"
+}
+
+func (r *KubernetesCluster) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{
+			Key:          "load_balancer",
+			ValueType:    schema.SubResourceUsage,
+			DefaultValue: &usage.ResourceUsage{Name: "load_balancer", Items: KubernetesClusterLoadBalancerSchema},
+		},
+		{
+			Key:          "default_node_pool",
+			ValueType:    schema.SubResourceUsage,
+			DefaultValue: &usage.ResourceUsage{Name: "default_node_pool", Items: KubernetesClusterDefaultNodePoolSchema},
+		},
+	}
 }
 
 func (r *KubernetesCluster) PopulateUsage(u *schema.UsageData) {
@@ -115,7 +121,8 @@ func (r *KubernetesCluster) BuildResource() *schema.Resource {
 
 		lbResource := schema.Resource{
 			Name:           "Load Balancer",
-			CostComponents: []*schema.CostComponent{lbDataProcessedCostComponent(region, monthlyDataProcessedGB)}, UsageSchema: KubernetesClusterUsageSchema,
+			CostComponents: []*schema.CostComponent{lbDataProcessedCostComponent(region, monthlyDataProcessedGB)},
+			UsageSchema:    r.UsageSchema(),
 		}
 		subResources = append(subResources, &lbResource)
 	}
@@ -133,7 +140,8 @@ func (r *KubernetesCluster) BuildResource() *schema.Resource {
 
 		dnsResource := schema.Resource{
 			Name:           "DNS",
-			CostComponents: []*schema.CostComponent{hostedPublicZoneCostComponent(region)}, UsageSchema: KubernetesClusterUsageSchema,
+			CostComponents: []*schema.CostComponent{hostedPublicZoneCostComponent(region)},
+			UsageSchema:    r.UsageSchema(),
 		}
 		subResources = append(subResources, &dnsResource)
 	}
@@ -141,6 +149,7 @@ func (r *KubernetesCluster) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		SubResources:   subResources, UsageSchema: KubernetesClusterUsageSchema,
+		SubResources:   subResources,
+		UsageSchema:    r.UsageSchema(),
 	}
 }

@@ -14,7 +14,13 @@ type DNSZone struct {
 	Region  string
 }
 
-var DNSZoneUsageSchema = []*schema.UsageItem{}
+func (r *DNSZone) CoreType() string {
+	return "DNSZone"
+}
+
+func (r *DNSZone) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 func (r *DNSZone) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -38,7 +44,8 @@ func (r *DNSZone) BuildResource() *schema.Resource {
 	costComponents = append(costComponents, hostedPublicZoneCostComponent(region))
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: DNSZoneUsageSchema,
+		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

@@ -22,7 +22,13 @@ type ApplicationGateway struct {
 	CapacityUnits          *int64   `infracost_usage:"capacity_units"`
 }
 
-var ApplicationGatewayUsageSchema = []*schema.UsageItem{{Key: "monthly_data_processed_gb", ValueType: schema.Float64, DefaultValue: 0}, {Key: "monthly_v2_capacity_units", ValueType: schema.Int64, DefaultValue: 0}}
+func (r *ApplicationGateway) CoreType() string {
+	return "ApplicationGateway"
+}
+
+func (r *ApplicationGateway) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{{Key: "monthly_data_processed_gb", ValueType: schema.Float64, DefaultValue: 0}, {Key: "monthly_v2_capacity_units", ValueType: schema.Int64, DefaultValue: 0}}
+}
 
 func (r *ApplicationGateway) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -60,7 +66,8 @@ func (r *ApplicationGateway) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: ApplicationGatewayUsageSchema,
+		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

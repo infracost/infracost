@@ -20,7 +20,17 @@ type DatabricksWorkspace struct {
 	MonthlyJobsLightComputeDBUHrs  *int64 `infracost_usage:"monthly_jobs_light_compute_dbu_hrs"`
 }
 
-var DatabricksWorkspaceUsageSchema = []*schema.UsageItem{{Key: "monthly_all_purpose_compute_dbu_hrs", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_jobs_compute_dbu_hrs", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_jobs_light_compute_dbu_hrs", ValueType: schema.Int64, DefaultValue: 0}}
+func (r *DatabricksWorkspace) CoreType() string {
+	return "DatabricksWorkspace"
+}
+
+func (r *DatabricksWorkspace) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_all_purpose_compute_dbu_hrs", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_jobs_compute_dbu_hrs", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_jobs_light_compute_dbu_hrs", ValueType: schema.Int64, DefaultValue: 0},
+	}
+}
 
 func (r *DatabricksWorkspace) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -33,9 +43,10 @@ func (r *DatabricksWorkspace) BuildResource() *schema.Resource {
 
 	if sku == "Trial" {
 		return &schema.Resource{
-			Name:      r.Address,
-			NoPrice:   true,
-			IsSkipped: true, UsageSchema: DatabricksWorkspaceUsageSchema,
+			Name:        r.Address,
+			NoPrice:     true,
+			IsSkipped:   true,
+			UsageSchema: r.UsageSchema(),
 		}
 	}
 
@@ -70,7 +81,8 @@ func (r *DatabricksWorkspace) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: DatabricksWorkspaceUsageSchema,
+		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

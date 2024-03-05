@@ -80,8 +80,14 @@ type IoTHubDPS struct {
 	MonthlyOperations *int64 `infracost_usage:"monthly_operations"`
 }
 
-var OperationsUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_operations", DefaultValue: 0, ValueType: schema.Int64},
+func (r *IoTHubDPS) CoreType() string {
+	return "IoTHubDPS"
+}
+
+func (r *IoTHubDPS) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_operations", DefaultValue: 0, ValueType: schema.Int64},
+	}
 }
 
 func (r *IoTHubDPS) PopulateUsage(u *schema.UsageData) {
@@ -98,7 +104,7 @@ func (r *IoTHubDPS) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:        r.Address,
-		UsageSchema: OperationsUsageSchema,
+		UsageSchema: r.UsageSchema(),
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:            "Device provisioning",

@@ -41,18 +41,24 @@ var StorageDataDiskUsageSchema = []*schema.UsageItem{
 	{ValueType: schema.Int64, DefaultValue: 0, Key: "monthly_disk_operations"},
 }
 
-var VirtualMachineUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_hrs", ValueType: schema.Float64, DefaultValue: 0},
-	{
-		Key:          "storage_os_disk",
-		ValueType:    schema.SubResourceUsage,
-		DefaultValue: &usage.ResourceUsage{Name: "storage_os_disk", Items: StorageOSDiskUsageSchema},
-	},
-	{
-		Key:          "storage_data_disk",
-		ValueType:    schema.SubResourceUsage,
-		DefaultValue: &usage.ResourceUsage{Name: "storage_data_disk", Items: StorageDataDiskUsageSchema},
-	},
+func (r *VirtualMachine) CoreType() string {
+	return "VirtualMachine"
+}
+
+func (r *VirtualMachine) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_hrs", ValueType: schema.Float64, DefaultValue: 0},
+		{
+			Key:          "storage_os_disk",
+			ValueType:    schema.SubResourceUsage,
+			DefaultValue: &usage.ResourceUsage{Name: "storage_os_disk", Items: StorageOSDiskUsageSchema},
+		},
+		{
+			Key:          "storage_data_disk",
+			ValueType:    schema.SubResourceUsage,
+			DefaultValue: &usage.ResourceUsage{Name: "storage_data_disk", Items: StorageDataDiskUsageSchema},
+		},
+	}
 }
 
 func (r *VirtualMachine) PopulateUsage(u *schema.UsageData) {
@@ -104,14 +110,15 @@ func (r *VirtualMachine) BuildResource() *schema.Resource {
 		subResources = append(subResources, &schema.Resource{
 			Name:           "storage_data_disk",
 			CostComponents: managedDiskCostComponents(region, s.DiskType, s.DiskSizeGB, s.DiskIOPSReadWrite, s.DiskMBPSReadWrite, storageOperations),
-			UsageSchema:    VirtualMachineUsageSchema,
+			UsageSchema:    r.UsageSchema(),
 		})
 	}
 
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		SubResources:   subResources, UsageSchema: VirtualMachineUsageSchema,
+		SubResources:   subResources,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

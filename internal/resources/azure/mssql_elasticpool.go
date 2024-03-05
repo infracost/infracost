@@ -41,7 +41,13 @@ type MSSQLElasticPool struct {
 	ZoneRedundant bool
 }
 
-var MSSQLElasticPoolUsageSchema = []*schema.UsageItem{}
+func (r *MSSQLElasticPool) CoreType() string {
+	return "MSSQLElasticPool"
+}
+
+func (r *MSSQLElasticPool) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 // PopulateUsage parses the u schema.UsageData into the MSSQLElasticPool.
 func (r *MSSQLElasticPool) PopulateUsage(u *schema.UsageData) {
@@ -77,7 +83,7 @@ func (r *MSSQLElasticPool) PopulateUsage(u *schema.UsageData) {
 func (r *MSSQLElasticPool) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    MSSQLElasticPoolUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: r.costComponents(),
 	}
 }

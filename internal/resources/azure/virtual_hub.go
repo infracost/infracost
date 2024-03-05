@@ -27,9 +27,16 @@ type VirtualHub struct {
 	MonthlyDataProcessedGB *float64 `infracost_usage:"monthly_data_processed_gb"`
 }
 
-// VirtualHubUsageSchema defines a list which represents the usage schema of VirtualHub.
-var VirtualHubUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_data_processed_gb", DefaultValue: 0, ValueType: schema.Float64},
+// CoreType returns the name of this resource type
+func (v *VirtualHub) CoreType() string {
+	return "VirtualHub"
+}
+
+// UsageSchema defines a list which represents the usage schema of VirtualHubUsageSchema.
+func (v *VirtualHub) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_data_processed_gb", DefaultValue: 0, ValueType: schema.Float64},
+	}
 }
 
 // PopulateUsage parses the u schema.UsageData into the VirtualHub.
@@ -50,7 +57,7 @@ func (v *VirtualHub) BuildResource() *schema.Resource {
 	if v.SKU == "Basic" {
 		return &schema.Resource{
 			Name:        v.Address,
-			UsageSchema: VirtualHubUsageSchema,
+			UsageSchema: v.UsageSchema(),
 			NoPrice:     true,
 			IsSkipped:   true,
 		}
@@ -66,7 +73,7 @@ func (v *VirtualHub) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           v.Address,
-		UsageSchema:    VirtualHubUsageSchema,
+		UsageSchema:    v.UsageSchema(),
 		CostComponents: components,
 	}
 }

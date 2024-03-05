@@ -73,11 +73,17 @@ func (r *SQLDatabase) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-var SQLDatabaseUsageSchema = []*schema.UsageItem{
-	{Key: "extra_data_storage_gb", DefaultValue: 0.0, ValueType: schema.Float64},
-	{Key: "monthly_vcore_hours", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "long_term_retention_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "backup_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
+func (r *SQLDatabase) CoreType() string {
+	return "SQLDatabase"
+}
+
+func (r *SQLDatabase) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "extra_data_storage_gb", DefaultValue: 0.0, ValueType: schema.Float64},
+		{Key: "monthly_vcore_hours", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "long_term_retention_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "backup_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
+	}
 }
 
 // BuildResource builds a schema.Resource from a valid SQLDatabase.
@@ -110,7 +116,7 @@ var SQLDatabaseUsageSchema = []*schema.UsageItem{
 func (r *SQLDatabase) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    SQLDatabaseUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: r.costComponents(),
 	}
 }
