@@ -9,13 +9,13 @@ provider "aws" {
 }
 
 resource "aws_config_organization_custom_rule" "my_config_organization_custom_rule" {
-  lambda_function_arn = "fake"
+  lambda_function_arn = "arn:aws:lambda:us-west-2:123456789012:function:my-function"
   name                = "example"
   trigger_types       = ["ConfigurationItemChangeNotification"]
 }
 
 resource "aws_config_organization_custom_rule" "my_config_organization_custom_rule_usage" {
-  lambda_function_arn = "fake"
+  lambda_function_arn = "arn:aws:lambda:us-west-2:123456789012:function:my-function"
   name                = "example"
   trigger_types       = ["ConfigurationItemChangeNotification"]
 }
