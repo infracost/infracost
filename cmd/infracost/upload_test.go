@@ -21,12 +21,17 @@ func TestUploadHelp(t *testing.T) {
 }
 
 func TestUploadSelfHosted(t *testing.T) {
+	s := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		_, _ = w.Write([]byte(`{}`))
+	}))
+	defer s.Close()
+
 	GoldenFileCommandTest(t,
 		testutil.CalcGoldenFileTestdataDirName(),
 		[]string{"upload", "--path", "./testdata/example_out.json"},
 		&GoldenFileOptions{CaptureLogs: true},
 		func(c *config.RunContext) {
-			c.Config.PricingAPIEndpoint = "https://fake.url"
+			c.Config.PricingAPIEndpoint = s.URL
 		},
 	)
 }

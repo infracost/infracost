@@ -77,6 +77,9 @@ func GetPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
 	}
 
 	c := NewPricingAPIClient(ctx)
+	if c == nil {
+		return nil
+	}
 
 	initCache(ctx, c)
 	pricingClient = c
