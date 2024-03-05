@@ -8,8 +8,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
+
+	"github.com/infracost/infracost/internal/usage"
 )
 
 type KMSCryptoKey struct {
@@ -87,6 +88,7 @@ func (r *KMSCryptoKey) BuildResource() *schema.Resource {
 			PriceFilter: &schema.PriceFilter{
 				EndUsageAmount: strPtr("2000"),
 			},
+			UsageBased: true,
 		})
 
 		if len(tiers) > 1 && tiers[1].GreaterThan(decimal.NewFromInt(0)) {
@@ -108,6 +110,7 @@ func (r *KMSCryptoKey) BuildResource() *schema.Resource {
 				PriceFilter: &schema.PriceFilter{
 					StartUsageAmount: strPtr("2000"),
 				},
+				UsageBased: true,
 			})
 		}
 	} else {
@@ -125,6 +128,7 @@ func (r *KMSCryptoKey) BuildResource() *schema.Resource {
 					{Key: "description", ValueRegex: strPtr(fmt.Sprintf("/%s/i", keyDescript))},
 				},
 			},
+			UsageBased: true,
 		})
 	}
 
@@ -142,6 +146,7 @@ func (r *KMSCryptoKey) BuildResource() *schema.Resource {
 				{Key: "description", ValueRegex: strPtr(fmt.Sprintf("/%s/i", operationDesctipt))},
 			},
 		},
+		UsageBased: true,
 	})
 
 	return &schema.Resource{

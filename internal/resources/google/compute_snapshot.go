@@ -1,9 +1,10 @@
 package google
 
 import (
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 // ComputeSnapshot struct represents Compute Snapshot resource.
@@ -73,5 +74,6 @@ func (r *ComputeSnapshot) storageCostComponent() *schema.CostComponent {
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr("5"),
 		},
+		UsageBased: true,
 	}
 }

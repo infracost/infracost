@@ -78,6 +78,7 @@ func (r *CloudFunctionsFunction) BuildResource() *schema.Resource {
 						{Key: "description", Value: strPtr("CPU Time")},
 					},
 				},
+				UsageBased: true,
 			},
 			{
 				Name:            "Memory",
@@ -93,6 +94,7 @@ func (r *CloudFunctionsFunction) BuildResource() *schema.Resource {
 						{Key: "description", Value: strPtr("Memory Time")},
 					},
 				},
+				UsageBased: true,
 			},
 			{
 				Name:            "Invocations",
@@ -111,6 +113,7 @@ func (r *CloudFunctionsFunction) BuildResource() *schema.Resource {
 				PriceFilter: &schema.PriceFilter{
 					StartUsageAmount: strPtr("2000000"),
 				},
+				UsageBased: true,
 			},
 			{
 				Name:            "Outbound data transfer",
@@ -129,6 +132,7 @@ func (r *CloudFunctionsFunction) BuildResource() *schema.Resource {
 				PriceFilter: &schema.PriceFilter{
 					StartUsageAmount: strPtr("5"),
 				},
+				UsageBased: true,
 			},
 		},
 		UsageSchema: CloudFunctionsFunctionUsageSchema,

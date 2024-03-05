@@ -51,5 +51,6 @@ func (r *Logging) loggingDataCostComponent(quantity *decimal.Decimal) *schema.Co
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr("50"),
 		},
+		UsageBased: true,
 	}
 }

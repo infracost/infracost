@@ -84,6 +84,7 @@ func (r *SecretManagerSecretVersion) accessOperationsCostComponents() []*schema.
 			MonthlyQuantity: intPtrToDecimalPtr(r.MonthlyAccessOperations),
 			ProductFilter:   r.buildProductFilter("Secret access operations"),
 			PriceFilter:     r.buildPriceFilter(fmt.Sprint(multiplier)),
+			UsageBased:      true,
 		},
 	}
 }

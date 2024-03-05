@@ -59,6 +59,7 @@ func (r *PubSubSubscription) BuildResource() *schema.Resource {
 				PriceFilter: &schema.PriceFilter{
 					EndUsageAmount: strPtr(""),
 				},
+				UsageBased: true,
 			},
 			{
 				Name:            "Retained acknowledged message storage",
@@ -77,6 +78,7 @@ func (r *PubSubSubscription) BuildResource() *schema.Resource {
 				PriceFilter: &schema.PriceFilter{
 					EndUsageAmount: strPtr(""),
 				},
+				UsageBased: true,
 			},
 			{
 				Name:            "Snapshot message backlog storage",
@@ -95,6 +97,7 @@ func (r *PubSubSubscription) BuildResource() *schema.Resource {
 				PriceFilter: &schema.PriceFilter{
 					EndUsageAmount: strPtr(""),
 				},
+				UsageBased: true,
 			},
 		},
 		UsageSchema: PubSubSubscriptionUsageSchema,

@@ -54,6 +54,7 @@ func (r *ComputeRouterNAT) BuildResource() *schema.Resource {
 						{Key: "description", ValueRegex: strPtr("/NAT Gateway: Uptime charge/")},
 					},
 				},
+				UsageBased: true,
 			},
 			{
 				Name:            "Data processed",
@@ -69,6 +70,7 @@ func (r *ComputeRouterNAT) BuildResource() *schema.Resource {
 						{Key: "description", ValueRegex: strPtr("/NAT Gateway: Data processing charge/")},
 					},
 				},
+				UsageBased: true,
 			},
 		},
 		UsageSchema: ComputeRouterNATUsageSchema,

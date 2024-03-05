@@ -3,9 +3,10 @@ package google
 import (
 	"fmt"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 // SecretManagerSecret represents Google Secret Manager's Secret resource.
@@ -77,6 +78,7 @@ func (r *SecretManagerSecret) activeSecretVersionsCostComponents() []*schema.Cos
 			MonthlyQuantity: intPtrToDecimalPtr(quantity),
 			ProductFilter:   r.buildProductFilter("Secret version replica storage"),
 			PriceFilter:     r.buildPriceFilter("6"),
+			UsageBased:      true,
 		},
 	}
 }
@@ -94,6 +96,7 @@ func (r *SecretManagerSecret) accessOperationsCostComponents() []*schema.CostCom
 			MonthlyQuantity: intPtrToDecimalPtr(r.MonthlyAccessOperations),
 			ProductFilter:   r.buildProductFilter("Secret access operations"),
 			PriceFilter:     r.buildPriceFilter(fmt.Sprint(multiplier)),
+			UsageBased:      true,
 		},
 	}
 }
@@ -109,6 +112,7 @@ func (r *SecretManagerSecret) rotationNotificationsCostComponents() []*schema.Co
 			MonthlyQuantity: intPtrToDecimalPtr(r.MonthlyRotationNotifications),
 			ProductFilter:   r.buildProductFilter("Secret rotate operations"),
 			PriceFilter:     r.buildPriceFilter("3"),
+			UsageBased:      true,
 		},
 	}
 }

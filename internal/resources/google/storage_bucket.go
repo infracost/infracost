@@ -131,6 +131,7 @@ func dataStorageCostComponent(location, storageClass string, storageGB *float64)
 		PriceFilter: &schema.PriceFilter{
 			EndUsageAmount: strPtr(""),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -185,6 +186,7 @@ func operationsCostComponents(storageClass string, monthlyClassAOperations, mont
 			PriceFilter: &schema.PriceFilter{
 				EndUsageAmount: strPtr(""),
 			},
+			UsageBased: true,
 		},
 		{
 			Name:            "Object gets, retrieve bucket/object metadata (class B)",
@@ -202,6 +204,7 @@ func operationsCostComponents(storageClass string, monthlyClassAOperations, mont
 			PriceFilter: &schema.PriceFilter{
 				EndUsageAmount: strPtr(""),
 			},
+			UsageBased: true,
 		},
 	}
 }
@@ -241,5 +244,6 @@ func dataRetrievalCostComponent(r *StorageBucket) *schema.CostComponent {
 				{Key: "description", ValueRegex: strPtr("/Retrieval/")},
 			},
 		},
+		UsageBased: true,
 	}
 }

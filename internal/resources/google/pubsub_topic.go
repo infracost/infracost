@@ -47,6 +47,7 @@ func (r *PubSubTopic) BuildResource() *schema.Resource {
 				PriceFilter: &schema.PriceFilter{
 					EndUsageAmount: strPtr(""),
 				},
+				UsageBased: true,
 			},
 		},
 		UsageSchema: PubSubTopicUsageSchema,

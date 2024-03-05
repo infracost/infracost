@@ -94,6 +94,7 @@ func (r *StorageBucketNetworkEgressUsage) BuildResource() *schema.Resource {
 				{Key: "description", Value: strPtr("Network Data Transfer GCP Inter Region within Europe")},
 			},
 		},
+		UsageBased: true,
 	})
 
 	for _, regData := range regionsData {
@@ -199,6 +200,7 @@ func (r *ContainerRegistryNetworkEgressUsage) BuildResource() *schema.Resource {
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: startUsage,
 		},
+		UsageBased: true,
 	})
 
 	for _, regData := range regionsData {
@@ -442,6 +444,7 @@ func egressStepPricingHelper(usage float64, usageFiltersData []*egressRegionUsag
 			PriceFilter: &schema.PriceFilter{
 				EndUsageAmount: strPtr(usageFilter),
 			},
+			UsageBased: true,
 		})
 	}
 	return costComponents

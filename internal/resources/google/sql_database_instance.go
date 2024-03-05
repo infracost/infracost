@@ -360,6 +360,7 @@ func (r *SQLDatabaseInstance) backupCostComponent(quantity *decimal.Decimal) *sc
 				{Key: "description", ValueRegex: strPtr("/Cloud SQL: Backups/")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 

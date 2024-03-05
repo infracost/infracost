@@ -61,6 +61,7 @@ func (r *ComputeTargetGRPCProxy) proxyInstanceCostComponent(quantity *decimal.De
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("OnDemand"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -82,5 +83,6 @@ func dataProcessedCostComponent(region string, quantity *decimal.Decimal) *schem
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("OnDemand"),
 		},
+		UsageBased: true,
 	}
 }

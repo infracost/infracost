@@ -4,8 +4,9 @@ import (
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 
-	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
+
+	"github.com/infracost/infracost/internal/usage"
 )
 
 type MonitoringMetricDescriptor struct {
@@ -78,6 +79,7 @@ func (r *MonitoringMetricDescriptor) monitoringDataCostComponent(name string, us
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr(usageTier),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -98,5 +100,6 @@ func (r *MonitoringMetricDescriptor) apiCallsCostComponent(apiCalls *decimal.Dec
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr("1000000"),
 		},
+		UsageBased: true,
 	}
 }

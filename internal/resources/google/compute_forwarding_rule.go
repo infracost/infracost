@@ -77,5 +77,6 @@ func computeIngressDataCostComponent(region string, quantity *decimal.Decimal) *
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("OnDemand"),
 		},
+		UsageBased: true,
 	}
 }

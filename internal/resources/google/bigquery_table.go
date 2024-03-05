@@ -79,6 +79,7 @@ func (r *BigQueryTable) activeStorageCostComponent() *schema.CostComponent {
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr("10"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -105,6 +106,7 @@ func (r *BigQueryTable) longTermStorageCostComponent() *schema.CostComponent {
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr("10"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -131,6 +133,7 @@ func (r *BigQueryTable) streamingInsertsCostComponent() *schema.CostComponent {
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr("0"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -162,6 +165,7 @@ func (r *BigQueryTable) storageWriteAPICostComponent() *schema.CostComponent {
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr("2048"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -193,6 +197,7 @@ func (r *BigQueryTable) storageReadAPICostComponent() *schema.CostComponent {
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr("0"),
 		},
+		UsageBased: true,
 	}
 }
 

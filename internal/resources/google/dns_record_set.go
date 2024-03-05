@@ -47,6 +47,7 @@ func (r *DNSRecordSet) BuildResource() *schema.Resource {
 				PriceFilter: &schema.PriceFilter{
 					StartUsageAmount: strPtr("0"),
 				},
+				UsageBased: true,
 			},
 		},
 		UsageSchema: DNSRecordSetUsageSchema,

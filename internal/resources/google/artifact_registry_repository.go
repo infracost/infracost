@@ -132,6 +132,7 @@ func (r *ArtifactRegistryRepository) internalEgressComponents() []*schema.CostCo
 			PriceFilter: &schema.PriceFilter{
 				PurchaseOption: strPtr("OnDemand"),
 			},
+			UsageBased: true,
 		})
 	}
 
@@ -158,6 +159,7 @@ func (r *ArtifactRegistryRepository) storageCostComponent() *schema.CostComponen
 			// we ignore the free tier pricing and start at the paid pricing which is at 0.5.
 			StartUsageAmount: strPtr("0.5"),
 		},
+		UsageBased: true,
 	}
 }
 

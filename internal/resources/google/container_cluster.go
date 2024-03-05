@@ -151,6 +151,7 @@ func (r *ContainerCluster) autopilotCPUCostComponent() *schema.CostComponent {
 				{Key: "description", ValueRegex: regexPtr("^Autopilot Pod mCPU Requests")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -175,6 +176,7 @@ func (r *ContainerCluster) autopilotMemoryCostComponent() *schema.CostComponent 
 				{Key: "description", ValueRegex: regexPtr("^Autopilot Pod Memory Requests")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -200,5 +202,6 @@ func (r *ContainerCluster) autopilotStorageCostComponent() *schema.CostComponent
 				{Key: "description", ValueRegex: regexPtr("^Autopilot Pod Ephemeral Storage Requests")},
 			},
 		},
+		UsageBased: true,
 	}
 }

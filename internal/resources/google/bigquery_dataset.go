@@ -49,6 +49,7 @@ func (r *BigQueryDataset) BuildResource() *schema.Resource {
 				PriceFilter: &schema.PriceFilter{
 					StartUsageAmount: strPtr("1"),
 				},
+				UsageBased: true,
 			},
 		},
 		UsageSchema: BigQueryDatasetUsageSchema,
