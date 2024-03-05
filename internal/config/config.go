@@ -31,6 +31,9 @@ type AutodetectConfig struct {
 	// PathOverrides defines paths that should be overridden with specific
 	// environment variable grouping.
 	PathOverrides []PathOverride `yaml:"path_overrides,omitempty" ignored:"true"`
+	// MaxSearchDepth configures the number of folders that Infracost should
+	// traverse to detect projects.
+	MaxSearchDepth int `yaml:"max_search_depth,omitempty" ignored:"true"`
 }
 
 type PathOverride struct {

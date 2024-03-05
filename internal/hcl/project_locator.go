@@ -207,6 +207,7 @@ type ProjectLocator struct {
 	pathOverrides          []pathOverride
 	wdContainsTerragrunt   bool
 	fallbackToIncludePaths bool
+	maxConfiguredDepth     int
 }
 
 // ProjectLocatorConfig provides configuration options on how the locator functions.
@@ -219,6 +220,7 @@ type ProjectLocatorConfig struct {
 	EnvNames               []string
 	PathOverrides          []PathOverrideConfig
 	FallbackToIncludePaths bool
+	MaxSearchDepth         int
 }
 
 type PathOverrideConfig struct {
@@ -276,6 +278,7 @@ func NewProjectLocator(logger zerolog.Logger, config *ProjectLocatorConfig) *Pro
 			envMatcher:         matcher,
 			useAllPaths:        config.UseAllPaths,
 			skip:               config.SkipAutoDetection,
+			maxConfiguredDepth: config.MaxSearchDepth,
 			shouldSkipDir: func(s string) bool {
 				return false
 			},
@@ -1198,6 +1201,10 @@ func getChildDepth(basePath string, targetPath string) (int, error) {
 }
 
 func (p *ProjectLocator) maxSearchDepth() int {
+	if p.maxConfiguredDepth > 0 {
+		return p.maxConfiguredDepth
+	}
+
 	if p.useAllPaths {
 		return 14
 	}

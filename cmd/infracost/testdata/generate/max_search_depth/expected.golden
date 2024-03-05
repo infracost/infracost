@@ -1,0 +1,8 @@
+version: 0.1
+autodetect:
+  max_search_depth: 3
+
+projects:
+  - path: infra/foo
+    name: infra-foo
+

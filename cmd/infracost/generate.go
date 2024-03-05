@@ -87,10 +87,7 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 			return fmt.Errorf("failed to unmarshal autodetect section: %w", err)
 		}
 
-		ctx.Config.Autodetect.ExcludeDirs = partialConfig.Autodetect.ExcludeDirs
-		ctx.Config.Autodetect.IncludeDirs = partialConfig.Autodetect.IncludeDirs
-		ctx.Config.Autodetect.EnvNames = partialConfig.Autodetect.EnvNames
-		ctx.Config.Autodetect.PathOverrides = partialConfig.Autodetect.PathOverrides
+		ctx.Config.Autodetect = partialConfig.Autodetect
 
 		_, _ = reader.Seek(0, io.SeekStart)
 		definedProjects = hasLineStartingWith(reader, "projects:")

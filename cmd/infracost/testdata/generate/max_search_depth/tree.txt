@@ -1,0 +1,7 @@
+.
+└── infra
+    ├── foo
+    │   └── main.tf
+    └── nested
+        └── bar
+            └── main.tf

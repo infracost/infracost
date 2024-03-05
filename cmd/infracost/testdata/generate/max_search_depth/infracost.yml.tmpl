@@ -1,0 +1,9 @@
+version: 0.1
+autodetect:
+  max_search_depth: 3
+
+projects:
+{{- range $project := .DetectedProjects }}
+  - path: {{ $project.Path }}
+    name: {{ $project.Name }}
+{{- end }}
