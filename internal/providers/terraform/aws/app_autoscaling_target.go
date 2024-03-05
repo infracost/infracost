@@ -7,21 +7,20 @@ import (
 
 func getAppAutoscalingTargetRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_appautoscaling_target",
-		RFunc: NewAppAutoscalingTargetResource,
+		Name:      "aws_appautoscaling_target",
+		CoreRFunc: NewAppAutoscalingTargetResource,
 		// This reference is used by other resources (e.g. DynamoDBTable) to generate
 		// a reverse reference
 		ReferenceAttributes: []string{"resource_id"},
 	}
 }
 
-func NewAppAutoscalingTargetResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := newAppAutoscalingTarget(d, u)
-	return r.BuildResource()
+func NewAppAutoscalingTargetResource(d *schema.ResourceData) schema.CoreResource {
+	return newAppAutoscalingTarget(d)
 }
 
-func newAppAutoscalingTarget(d *schema.ResourceData, u *schema.UsageData) *aws.AppAutoscalingTarget {
-	r := &aws.AppAutoscalingTarget{
+func newAppAutoscalingTarget(d *schema.ResourceData) *aws.AppAutoscalingTarget {
+	return &aws.AppAutoscalingTarget{
 		Address:           d.Address,
 		Region:            d.Get("region").String(),
 		ResourceID:        d.Get("resource_id").String(),
@@ -29,8 +28,4 @@ func newAppAutoscalingTarget(d *schema.ResourceData, u *schema.UsageData) *aws.A
 		MinCapacity:       d.Get("min_capacity").Int(),
 		MaxCapacity:       d.Get("max_capacity").Int(),
 	}
-
-	r.PopulateUsage(u)
-
-	return r
 }

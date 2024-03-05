@@ -6,7 +6,7 @@ import (
 
 func getOpensearchDomainRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_opensearch_domain",
-		RFunc: newSearchDomain,
+		Name:      "aws_opensearch_domain",
+		CoreRFunc: newSearchDomain,
 	}
 }

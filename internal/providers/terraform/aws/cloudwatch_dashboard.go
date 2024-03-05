@@ -7,15 +7,13 @@ import (
 
 func getCloudwatchDashboardRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_cloudwatch_dashboard",
-		RFunc: NewCloudwatchDashboard,
+		Name:      "aws_cloudwatch_dashboard",
+		CoreRFunc: NewCloudwatchDashboard,
 	}
 }
-func NewCloudwatchDashboard(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewCloudwatchDashboard(d *schema.ResourceData) schema.CoreResource {
 	r := &aws.CloudwatchDashboard{
 		Address: d.Address,
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

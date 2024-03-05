@@ -7,11 +7,11 @@ import (
 
 func getEFSFileSystemRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_efs_file_system",
-		RFunc: NewEFSFileSystem,
+		Name:      "aws_efs_file_system",
+		CoreRFunc: NewEFSFileSystem,
 	}
 }
-func NewEFSFileSystem(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewEFSFileSystem(d *schema.ResourceData) schema.CoreResource {
 	r := &aws.EFSFileSystem{
 		Address:                     d.Address,
 		Region:                      d.Get("region").String(),
@@ -19,7 +19,5 @@ func NewEFSFileSystem(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 		AvailabilityZoneName:        d.Get("availability_zone_name").String(),
 		ProvisionedThroughputInMBps: d.Get("provisioned_throughput_in_mibps").Float(),
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

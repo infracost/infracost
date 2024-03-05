@@ -7,12 +7,12 @@ import (
 
 func getRedshiftClusterRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_redshift_cluster",
-		RFunc: NewRedshiftCluster,
+		Name:      "aws_redshift_cluster",
+		CoreRFunc: NewRedshiftCluster,
 	}
 }
 
-func NewRedshiftCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewRedshiftCluster(d *schema.ResourceData) schema.CoreResource {
 	r := &aws.RedshiftCluster{
 		Address:  d.Address,
 		Region:   d.Get("region").String(),
@@ -22,7 +22,5 @@ func NewRedshiftCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 	if !d.IsEmpty("number_of_nodes") {
 		r.Nodes = intPtr(d.Get("number_of_nodes").Int())
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

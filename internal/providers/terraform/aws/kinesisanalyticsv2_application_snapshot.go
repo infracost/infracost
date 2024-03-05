@@ -7,17 +7,15 @@ import (
 
 func getKinesisAnalyticsV2ApplicationSnapshotRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_kinesisanalyticsv2_application_snapshot",
-		RFunc: NewKinesisAnalyticsV2ApplicationSnapshot,
+		Name:      "aws_kinesisanalyticsv2_application_snapshot",
+		CoreRFunc: NewKinesisAnalyticsV2ApplicationSnapshot,
 	}
 }
 
-func NewKinesisAnalyticsV2ApplicationSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewKinesisAnalyticsV2ApplicationSnapshot(d *schema.ResourceData) schema.CoreResource {
 	r := &aws.KinesisAnalyticsV2ApplicationSnapshot{
 		Address: d.Address,
 		Region:  d.Get("region").String(),
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

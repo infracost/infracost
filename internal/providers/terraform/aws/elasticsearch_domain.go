@@ -7,11 +7,11 @@ import (
 
 func getElasticsearchDomainRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_elasticsearch_domain",
-		RFunc: newSearchDomain,
+		Name:      "aws_elasticsearch_domain",
+		CoreRFunc: newSearchDomain,
 	}
 }
-func newSearchDomain(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newSearchDomain(d *schema.ResourceData) schema.CoreResource {
 	r := &aws.SearchDomain{
 		Address:                       d.Address,
 		Region:                        d.Get("region").String(),
@@ -47,7 +47,5 @@ func newSearchDomain(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 	if !d.IsEmpty("cluster_config.0.warm_count") {
 		r.ClusterWarmCount = intPtr(d.Get("cluster_config.0.warm_count").Int())
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

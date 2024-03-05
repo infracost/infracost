@@ -7,11 +7,11 @@ import (
 
 func getCloudwatchMetricAlarmRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_cloudwatch_metric_alarm",
-		RFunc: newCloudwatchMetricAlarm,
+		Name:      "aws_cloudwatch_metric_alarm",
+		CoreRFunc: newCloudwatchMetricAlarm,
 	}
 }
-func newCloudwatchMetricAlarm(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newCloudwatchMetricAlarm(d *schema.ResourceData) schema.CoreResource {
 	region := d.Get("region").String()
 	comparisonOperator := d.Get("comparison_operator").String()
 
@@ -47,7 +47,5 @@ func newCloudwatchMetricAlarm(d *schema.ResourceData, u *schema.UsageData) *sche
 		Metrics:            metricCount,
 		Period:             period,
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

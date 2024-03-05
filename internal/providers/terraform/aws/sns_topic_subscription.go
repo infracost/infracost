@@ -7,8 +7,8 @@ import (
 
 func getSNSTopicSubscriptionRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_sns_topic_subscription",
-		RFunc: NewSNSTopicSubscription,
+		Name:      "aws_sns_topic_subscription",
+		CoreRFunc: NewSNSTopicSubscription,
 		Notes: []string{
 			"DEPRECATED.  Set subscription usage on aws_sns_topic instead.",
 		},
@@ -16,13 +16,11 @@ func getSNSTopicSubscriptionRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewSNSTopicSubscription(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewSNSTopicSubscription(d *schema.ResourceData) schema.CoreResource {
 	r := &aws.SNSTopicSubscription{
 		Address:  d.Address,
 		Region:   d.Get("region").String(),
 		Protocol: d.Get("protocol").String(),
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

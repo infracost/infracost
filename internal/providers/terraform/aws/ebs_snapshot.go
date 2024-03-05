@@ -8,11 +8,11 @@ import (
 func getEBSSnapshotRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:                "aws_ebs_snapshot",
-		RFunc:               NewEBSSnapshot,
+		CoreRFunc:           NewEBSSnapshot,
 		ReferenceAttributes: []string{"volume_id"},
 	}
 }
-func NewEBSSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewEBSSnapshot(d *schema.ResourceData) schema.CoreResource {
 	r := &aws.EBSSnapshot{Address: d.Address, Region: d.Get("region").String()}
 	volumeRefs := d.References("volume_id")
 	if len(volumeRefs) > 0 {
@@ -20,6 +20,5 @@ func NewEBSSnapshot(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 			r.SizeGB = floatPtr(volumeRefs[0].Get("size").Float())
 		}
 	}
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

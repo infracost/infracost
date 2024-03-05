@@ -7,15 +7,15 @@ import (
 
 func getEBSSnapshotCopyRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_ebs_snapshot_copy",
-		RFunc: NewEBSSnapshotCopy,
+		Name:      "aws_ebs_snapshot_copy",
+		CoreRFunc: NewEBSSnapshotCopy,
 		ReferenceAttributes: []string{
 			"volume_id",
 			"source_snapshot_id",
 		},
 	}
 }
-func NewEBSSnapshotCopy(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewEBSSnapshotCopy(d *schema.ResourceData) schema.CoreResource {
 	r := &aws.EBSSnapshotCopy{Address: d.Address, Region: d.Get("region").String()}
 	sourceSnapshotRefs := d.References("source_snapshot_id")
 	if len(sourceSnapshotRefs) > 0 {
@@ -26,6 +26,5 @@ func NewEBSSnapshotCopy(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 			}
 		}
 	}
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

@@ -9,12 +9,12 @@ import (
 
 func getGlueJobRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_glue_job",
-		RFunc: newGlueJob,
+		Name:      "aws_glue_job",
+		CoreRFunc: newGlueJob,
 	}
 }
 
-func newGlueJob(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newGlueJob(d *schema.ResourceData) schema.CoreResource {
 	region := d.Get("region").String()
 	dpus := d.GetFloat64OrDefault("max_capacity", 1)
 
@@ -32,7 +32,6 @@ func newGlueJob(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 		Region:  region,
 		DPUs:    dpus,
 	}
-	r.PopulateUsage(u)
 
-	return r.BuildResource()
+	return r
 }

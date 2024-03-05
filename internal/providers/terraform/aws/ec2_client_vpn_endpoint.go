@@ -7,16 +7,14 @@ import (
 
 func getEC2ClientVPNEndpointRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_ec2_client_vpn_endpoint",
-		RFunc: NewEc2ClientVpnEndpoint,
+		Name:      "aws_ec2_client_vpn_endpoint",
+		CoreRFunc: NewEc2ClientVpnEndpoint,
 	}
 }
-func NewEc2ClientVpnEndpoint(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewEc2ClientVpnEndpoint(d *schema.ResourceData) schema.CoreResource {
 	r := &aws.EC2ClientVPNEndpoint{
 		Address: d.Address,
 		Region:  d.Get("region").String(),
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

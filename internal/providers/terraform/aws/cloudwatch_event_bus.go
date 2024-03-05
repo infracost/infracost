@@ -7,16 +7,14 @@ import (
 
 func getCloudwatchEventBusItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_cloudwatch_event_bus",
-		RFunc: NewCloudwatchEventBus,
+		Name:      "aws_cloudwatch_event_bus",
+		CoreRFunc: NewCloudwatchEventBus,
 	}
 }
-func NewCloudwatchEventBus(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewCloudwatchEventBus(d *schema.ResourceData) schema.CoreResource {
 	r := &aws.CloudwatchEventBus{
 		Address: d.Address,
 		Region:  d.Get("region").String(),
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

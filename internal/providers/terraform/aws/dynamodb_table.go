@@ -37,7 +37,7 @@ func NewDynamoDBTableResource(d *schema.ResourceData) schema.CoreResource {
 
 	targets := []*aws.AppAutoscalingTarget{}
 	for _, ref := range d.References("aws_appautoscaling_target.resource_id") {
-		targets = append(targets, newAppAutoscalingTarget(ref, ref.UsageData))
+		targets = append(targets, newAppAutoscalingTarget(ref))
 	}
 
 	a := &aws.DynamoDBTable{

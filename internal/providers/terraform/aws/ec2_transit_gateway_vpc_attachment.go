@@ -9,15 +9,15 @@ import (
 
 func getEC2TransitGatewayVpcAttachmentRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_ec2_transit_gateway_vpc_attachment",
-		RFunc: NewEc2TransitGatewayVpcAttachment,
+		Name:      "aws_ec2_transit_gateway_vpc_attachment",
+		CoreRFunc: NewEc2TransitGatewayVpcAttachment,
 		ReferenceAttributes: []string{
 			"transit_gateway_id",
 			"vpc_id",
 		},
 	}
 }
-func NewEc2TransitGatewayVpcAttachment(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewEc2TransitGatewayVpcAttachment(d *schema.ResourceData) schema.CoreResource {
 	r := &aws.Ec2TransitGatewayVpcAttachment{Address: d.Address, Region: d.Get("region").String()}
 
 	// Try to get the region from the VPC
@@ -40,7 +40,5 @@ func NewEc2TransitGatewayVpcAttachment(d *schema.ResourceData, u *schema.UsageDa
 	if len(transitGatewayRefs) > 0 {
 		r.TransitGatewayRegion = transitGatewayRefs[0].Get("region").String()
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

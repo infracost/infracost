@@ -8,11 +8,11 @@ import (
 func getRoute53RecordRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:                "aws_route53_record",
-		RFunc:               NewRoute53Record,
+		CoreRFunc:           NewRoute53Record,
 		ReferenceAttributes: []string{"alias.0.name"},
 	}
 }
-func NewRoute53Record(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewRoute53Record(d *schema.ResourceData) schema.CoreResource {
 	isAlias := false
 
 	aliasRefs := d.References("alias.0.name")
@@ -24,7 +24,5 @@ func NewRoute53Record(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 		Address: d.Address,
 		IsAlias: isAlias,
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

@@ -3,6 +3,7 @@ package aws
 import (
 	"github.com/shopspring/decimal"
 
+	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 )
 
@@ -20,6 +21,10 @@ func (r *GlobalAccelerator) CoreType() string {
 
 func (r *GlobalAccelerator) UsageSchema() []*schema.UsageItem {
 	return []*schema.UsageItem{}
+}
+
+func (r *GlobalAccelerator) PopulateUsage(u *schema.UsageData) {
+	resources.PopulateArgsWithUsage(r, u)
 }
 
 func (r *GlobalAccelerator) BuildResource() *schema.Resource {

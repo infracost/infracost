@@ -7,16 +7,14 @@ import (
 
 func getELBRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_elb",
-		RFunc: NewELB,
+		Name:      "aws_elb",
+		CoreRFunc: NewELB,
 	}
 }
-func NewELB(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewELB(d *schema.ResourceData) schema.CoreResource {
 	r := &aws.ELB{
 		Address: d.Address,
 		Region:  d.Get("region").String(),
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

@@ -7,12 +7,12 @@ import (
 
 func getElasticBeanstalkEnvironmentRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_elastic_beanstalk_environment",
-		RFunc: newElasticBeanstalkEnvironment,
+		Name:      "aws_elastic_beanstalk_environment",
+		CoreRFunc: newElasticBeanstalkEnvironment,
 	}
 }
 
-func newElasticBeanstalkEnvironment(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newElasticBeanstalkEnvironment(d *schema.ResourceData) schema.CoreResource {
 	var region = d.Get("region").String()
 	var streamLogs = false
 	var dBIncluded = false
@@ -102,7 +102,5 @@ func newElasticBeanstalkEnvironment(d *schema.ResourceData, u *schema.UsageData)
 		r.LoadBalancer = lb
 	}
 
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
+	return r
 }

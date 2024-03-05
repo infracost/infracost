@@ -7,12 +7,12 @@ import (
 
 func getCloudtrailRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_cloudtrail",
-		RFunc: newCloudtrail,
+		Name:      "aws_cloudtrail",
+		CoreRFunc: newCloudtrail,
 	}
 }
 
-func newCloudtrail(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newCloudtrail(d *schema.ResourceData) schema.CoreResource {
 	region := d.Get("region").String()
 	r := &aws.Cloudtrail{
 		Address:                 d.Address,
@@ -20,7 +20,6 @@ func newCloudtrail(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 		IncludeManagementEvents: d.GetBoolOrDefault("include_global_service_events", true),
 		IncludeInsightEvents:    len(d.Get("insight_selector").Array()) > 0,
 	}
-	r.PopulateUsage(u)
 
-	return r.BuildResource()
+	return r
 }

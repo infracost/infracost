@@ -7,18 +7,17 @@ import (
 
 func getGlobalacceleratorEndpointGroupRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_globalaccelerator_endpoint_group",
-		RFunc: newGlobalacceleratorEndpointGroup,
+		Name:      "aws_globalaccelerator_endpoint_group",
+		CoreRFunc: newGlobalacceleratorEndpointGroup,
 	}
 }
 
-func newGlobalacceleratorEndpointGroup(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newGlobalacceleratorEndpointGroup(d *schema.ResourceData) schema.CoreResource {
 	region := d.Get("endpoint_group_region").String()
 	r := &aws.GlobalacceleratorEndpointGroup{
 		Address: d.Address,
 		Region:  region,
 	}
-	r.PopulateUsage(u)
 
-	return r.BuildResource()
+	return r
 }

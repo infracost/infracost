@@ -14,12 +14,12 @@ var adReg = regexp.MustCompile(`(AD)`)
 
 func getDirectoryServiceDirectory() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_directory_service_directory",
-		RFunc: newDirectoryServiceDirectory,
+		Name:      "aws_directory_service_directory",
+		CoreRFunc: newDirectoryServiceDirectory,
 	}
 }
 
-func newDirectoryServiceDirectory(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newDirectoryServiceDirectory(d *schema.ResourceData) schema.CoreResource {
 	region := d.Get("region").String()
 	regionName, ok := aws.RegionMapping[region]
 	if !ok {
@@ -34,9 +34,8 @@ func newDirectoryServiceDirectory(d *schema.ResourceData, u *schema.UsageData) *
 		Edition:    d.Get("edition").String(),
 		Size:       d.Get("size").String(),
 	}
-	a.PopulateUsage(u)
 
-	return a.BuildResource()
+	return a
 }
 
 // getType returns the terraform directory type with AD spaced, e.g:

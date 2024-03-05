@@ -7,18 +7,16 @@ import (
 
 func getSSMParameterRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_ssm_parameter",
-		RFunc: NewSSMParameter,
+		Name:      "aws_ssm_parameter",
+		CoreRFunc: NewSSMParameter,
 	}
 }
 
-func NewSSMParameter(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewSSMParameter(d *schema.ResourceData) schema.CoreResource {
 	r := &aws.SSMParameter{
 		Address: d.Address,
 		Region:  d.Get("region").String(),
 		Tier:    d.Get("tier").String(),
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }
