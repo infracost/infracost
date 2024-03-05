@@ -26,14 +26,14 @@
     └─ Disk operations                                     Monthly cost depends on usage: $0.0005 per 10k operations  
                                                                                                                       
  azurerm_linux_virtual_machine.standard_a2_ultra_enabled                                                              
- ├─ Instance usage (Linux, pay as you go, Standard_A2_v2)                 730  hours                           $66.43 
+ ├─ Instance usage (Linux, pay as you go, Standard_A2_v2)                 730  hours                           $65.92 
  ├─ Ultra disk reservation (if unattached)                 Monthly cost depends on usage: $4.38 per vCPU              
  └─ os_disk                                                                                                           
     ├─ Storage (E4, LRS)                                                    1  months                           $2.40 
     └─ Disk operations                                     Monthly cost depends on usage: $0.002 per 10k operations   
                                                                                                                       
  azurerm_linux_virtual_machine.standard_a2_v2_custom_disk                                                             
- ├─ Instance usage (Linux, pay as you go, Standard_A2_v2)                 730  hours                           $66.43 
+ ├─ Instance usage (Linux, pay as you go, Standard_A2_v2)                 730  hours                           $65.92 
  └─ os_disk                                                                                                           
     ├─ Storage (E30, LRS)                                                   1  months                          $76.80 
     └─ Disk operations                                                      2  10k operations                   $0.00 
@@ -48,7 +48,7 @@
  └─ os_disk                                                                                                           
     └─ Storage (P4, LRS)                                                    1  months                           $5.28 
                                                                                                                       
- OVERALL TOTAL                                                                                                $447.20 
+ OVERALL TOTAL                                                                                                $446.18 
 ──────────────────────────────────
 8 cloud resources were detected:
 ∙ 8 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
@@ -56,5 +56,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMLinuxVirtualMachineGoldenFile           ┃ $447         ┃
+┃ TestAzureRMLinuxVirtualMachineGoldenFile           ┃ $446         ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
