@@ -68,7 +68,8 @@
         "monthlyQuantity",
         "price",
         "hourlyCost",
-        "monthlyCost"
+        "monthlyCost",
+        "usageBased"
       ],
       "properties": {
         "name": {
@@ -91,6 +92,9 @@
         },
         "monthlyCost": {
           "type": ["string", "null"]
+        },
+        "usageBased": {
+          "type": "boolean"
         }
       },
       "additionalProperties": false,

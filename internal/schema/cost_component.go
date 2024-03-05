@@ -23,6 +23,7 @@ type CostComponent struct {
 	priceHash            string
 	HourlyCost           *decimal.Decimal
 	MonthlyCost          *decimal.Decimal
+	UsageBased           bool
 }
 
 func (c *CostComponent) CalculateCosts() {
