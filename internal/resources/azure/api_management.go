@@ -39,7 +39,8 @@ func (r *APIManagement) BuildResource() *schema.Resource {
 			fmt.Sprintf("API management (%s)", tier),
 			"units",
 			tier,
-			&capacity))
+			&capacity,
+			false))
 
 	} else {
 		var apiCalls *decimal.Decimal
@@ -65,6 +66,7 @@ func (r *APIManagement) BuildResource() *schema.Resource {
 			"gateways",
 			"Gateway",
 			selfHostedGateways,
+			true,
 		))
 	}
 
@@ -74,7 +76,7 @@ func (r *APIManagement) BuildResource() *schema.Resource {
 	}
 }
 
-func (r *APIManagement) apiManagementCostComponent(name, unit, tier string, quantity *decimal.Decimal) *schema.CostComponent {
+func (r *APIManagement) apiManagementCostComponent(name, unit, tier string, quantity *decimal.Decimal, usageBased bool) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           name,
 		Unit:           unit,
@@ -93,6 +95,7 @@ func (r *APIManagement) apiManagementCostComponent(name, unit, tier string, quan
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
+		UsageBased: usageBased,
 	}
 }
 
@@ -115,5 +118,6 @@ func (r *APIManagement) consumptionAPICostComponent(tier string, quantity *decim
 			PurchaseOption:   strPtr("Consumption"),
 			StartUsageAmount: strPtr("100"),
 		},
+		UsageBased: true,
 	}
 }

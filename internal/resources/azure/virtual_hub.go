@@ -90,6 +90,7 @@ func (v VirtualHub) dataProcessed() *schema.CostComponent {
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
+		UsageBased: true,
 	}
 }
 

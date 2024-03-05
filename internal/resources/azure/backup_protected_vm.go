@@ -118,6 +118,7 @@ func (r *BackupProtectedVM) additionalCostForSizeOfVM() *schema.CostComponent {
 			PurchaseOption:   strPtr("Consumption"),
 			StartUsageAmount: strPtr("0"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -144,6 +145,7 @@ func (r *BackupProtectedVM) storageCostsForVM() *schema.CostComponent {
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
+		UsageBased: true,
 	}
 }
 

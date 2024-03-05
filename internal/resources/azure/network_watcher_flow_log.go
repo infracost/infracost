@@ -3,9 +3,10 @@ package azure
 import (
 	"fmt"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 // NetworkWatcherFlowLog struct represents Azure Network Watcher Flow Log
@@ -93,6 +94,7 @@ func (r *NetworkWatcherFlowLog) networkLogsCollectedCostComponent() *schema.Cost
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr(freeQuantity.String()),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -123,5 +125,6 @@ func (r *NetworkWatcherFlowLog) trafficAnalyticsDataProcessedCostComponent() *sc
 				{Key: "meterName", Value: strPtr(meterName)},
 			},
 		},
+		UsageBased: true,
 	}
 }

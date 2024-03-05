@@ -323,6 +323,7 @@ func (r *StorageAccount) iterativeWriteOperationsCostComponents() []*schema.Cost
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
+		UsageBased: true,
 	})
 
 	return costComponents
@@ -390,6 +391,7 @@ func (r *StorageAccount) writeOperationsCostComponents() []*schema.CostComponent
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
+		UsageBased: true,
 	})
 
 	return costComponents
@@ -461,6 +463,7 @@ func (r *StorageAccount) listAndCreateContainerOperationsCostComponents() []*sch
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
+		UsageBased: true,
 	})
 
 	return costComponents
@@ -511,6 +514,7 @@ func (r *StorageAccount) iterativeReadOperationsCostComponents() []*schema.CostC
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
+		UsageBased: true,
 	})
 
 	return costComponents
@@ -578,6 +582,7 @@ func (r *StorageAccount) readOperationsCostComponents() []*schema.CostComponent 
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
+		UsageBased: true,
 	})
 
 	return costComponents
@@ -647,6 +652,7 @@ func (r *StorageAccount) otherOperationsCostComponents() []*schema.CostComponent
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
+		UsageBased: true,
 	})
 
 	return costComponents
@@ -708,6 +714,7 @@ func (r *StorageAccount) dataRetrievalCostComponents() []*schema.CostComponent {
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
+		UsageBased: true,
 	})
 
 	return costComponents
@@ -768,6 +775,7 @@ func (r *StorageAccount) dataWriteCostComponents() []*schema.CostComponent {
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
+		UsageBased: true,
 	})
 
 	return costComponents
@@ -834,6 +842,7 @@ func (r *StorageAccount) blobIndexTagsCostComponents() []*schema.CostComponent {
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
+		UsageBased: true,
 	})
 
 	return costComponents
@@ -882,6 +891,7 @@ func (r *StorageAccount) dataAtRestCostComponents() []*schema.CostComponent {
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
+		UsageBased: true,
 	})
 
 	return costComponents
@@ -930,6 +940,7 @@ func (r *StorageAccount) snapshotsCostComponents() []*schema.CostComponent {
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
+		UsageBased: true,
 	})
 
 	return costComponents
@@ -975,6 +986,7 @@ func (r *StorageAccount) metadataAtRestCostComponents() []*schema.CostComponent 
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
+		UsageBased: true,
 	})
 
 	return costComponents
@@ -1028,6 +1040,7 @@ func (r *StorageAccount) earlyDeletionCostComponents() []*schema.CostComponent {
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
+		UsageBased: true,
 	})
 
 	return costComponents
@@ -1048,6 +1061,7 @@ func (r *StorageAccount) buildStorageCostComponent(name string, startUsage strin
 			PurchaseOption:   strPtr("Consumption"),
 			StartUsageAmount: strPtr(startUsage),
 		},
+		UsageBased: true,
 	}
 }
 

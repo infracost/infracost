@@ -69,5 +69,6 @@ func lbDataProcessedCostComponent(region string, quantity *decimal.Decimal) *sch
 				{Key: "meterName", ValueRegex: regexPtr("Data Processed$")},
 			},
 		},
+		UsageBased: true,
 	}
 }

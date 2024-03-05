@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
-	"github.com/shopspring/decimal"
 )
 
 // Frontdoor struct represents Azure's Front Door network service.
@@ -185,6 +186,7 @@ func (r *Frontdoor) inboundDataTransferCostComponents() []*schema.CostComponent 
 			PriceFilter: &schema.PriceFilter{
 				PurchaseOption: strPtr("Consumption"),
 			},
+			UsageBased: true,
 		},
 	}
 }
@@ -297,6 +299,7 @@ func (r *Frontdoor) buildOutboundDataTransferCostComponent(name, startUsage stri
 			PurchaseOption:   strPtr("Consumption"),
 			StartUsageAmount: strPtr(startUsage),
 		},
+		UsageBased: true,
 	}
 }
 

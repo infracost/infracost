@@ -62,5 +62,6 @@ func nonautomationDSCNodesCostComponent(location, startUsage, meterName, skuName
 			PurchaseOption:   strPtr("Consumption"),
 			StartUsageAmount: strPtr(startUsage),
 		},
+		UsageBased: true,
 	}
 }

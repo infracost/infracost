@@ -59,5 +59,6 @@ func automationRunTimeCostComponent(location, startUsage, meterName, skuName str
 			PurchaseOption:   strPtr("Consumption"),
 			StartUsageAmount: strPtr(startUsage),
 		},
+		UsageBased: true,
 	}
 }

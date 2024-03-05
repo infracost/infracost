@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 const (
@@ -154,6 +155,7 @@ func (r *SQLManagedInstance) sqlMIBackupCostComponent() *schema.CostComponent {
 			}),
 		},
 		PriceFilter: priceFilterConsumption,
+		UsageBased:  true,
 	}
 }
 
@@ -200,5 +202,6 @@ func (r *SQLManagedInstance) sqlMILongTermRetentionStorageGBCostComponent() *sch
 			},
 		},
 		PriceFilter: priceFilterConsumption,
+		UsageBased:  true,
 	}
 }

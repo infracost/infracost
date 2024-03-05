@@ -1,9 +1,10 @@
 package azure
 
 import (
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 // VirtualNetworkPeering struct represents a VNET peering.
@@ -61,6 +62,7 @@ func (r *VirtualNetworkPeering) egressDataProcessedCostComponent() *schema.CostC
 			PriceFilter: &schema.PriceFilter{
 				PurchaseOption: strPtr("Consumption"),
 			},
+			UsageBased: true,
 		}
 	}
 
@@ -82,6 +84,7 @@ func (r *VirtualNetworkPeering) egressDataProcessedCostComponent() *schema.CostC
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -104,6 +107,7 @@ func (r *VirtualNetworkPeering) ingressDataProcessedCostComponent() *schema.Cost
 			PriceFilter: &schema.PriceFilter{
 				PurchaseOption: strPtr("Consumption"),
 			},
+			UsageBased: true,
 		}
 	}
 
@@ -125,5 +129,6 @@ func (r *VirtualNetworkPeering) ingressDataProcessedCostComponent() *schema.Cost
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
+		UsageBased: true,
 	}
 }

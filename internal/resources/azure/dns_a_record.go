@@ -6,8 +6,9 @@ import (
 
 	"strings"
 
-	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
+
+	"github.com/infracost/infracost/internal/usage"
 )
 
 type DNSARecord struct {
@@ -85,5 +86,6 @@ func dnsQueriesFirstCostComponent(region, name, startUsage string, monthlyQuerie
 			PurchaseOption:   strPtr("Consumption"),
 			StartUsageAmount: &startUsage,
 		},
+		UsageBased: true,
 	}
 }

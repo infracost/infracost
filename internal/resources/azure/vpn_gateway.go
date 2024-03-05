@@ -124,6 +124,7 @@ func (v *VPNGateway) connectionUnitComponent() *schema.CostComponent {
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
+		UsageBased: true,
 	}
 
 }

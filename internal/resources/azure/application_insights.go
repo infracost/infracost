@@ -44,6 +44,7 @@ func (r *ApplicationInsights) BuildResource() *schema.Resource {
 				{Key: "skuName", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", "Enterprise"))},
 			},
 		},
+		UsageBased: true,
 	})
 
 	var dataRetentionDays *decimal.Decimal

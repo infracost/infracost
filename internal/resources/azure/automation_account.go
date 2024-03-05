@@ -80,5 +80,6 @@ func (r *AutomationAccount) watchersCostComponent(startUsage, meterName, skuName
 			PurchaseOption:   strPtr("Consumption"),
 			StartUsageAmount: strPtr(startUsage),
 		},
+		UsageBased: true,
 	}
 }

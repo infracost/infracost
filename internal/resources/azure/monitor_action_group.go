@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"sort"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 // MonitorActionGroup struct represents an Azure Monitor Action Group.
@@ -116,6 +117,7 @@ func (r *MonitorActionGroup) emailCostComponent(count int, quantity *int64) *sch
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr("1000"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -138,6 +140,7 @@ func (r *MonitorActionGroup) ITSMEventCostComponent(count int, quantity *int64) 
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr("1000"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -160,6 +163,7 @@ func (r *MonitorActionGroup) pushNotificationCostComponent(count int, quantity *
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr("1000"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -182,6 +186,7 @@ func (r *MonitorActionGroup) secureWebHookCostComponent(count int, quantity *int
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr("100"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -204,6 +209,7 @@ func (r *MonitorActionGroup) webHookCostComponent(count int, quantity *int64) *s
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr("10000"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -232,6 +238,7 @@ func (r *MonitorActionGroup) smsMessageCostComponent(countryCode int, count int,
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr(startUsageAmount),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -261,6 +268,7 @@ func (r *MonitorActionGroup) voiceCallsCostComponent(countryCode int, count int,
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr("10"),
 		},
+		UsageBased: true,
 	}
 }
 

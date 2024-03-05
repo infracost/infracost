@@ -138,6 +138,7 @@ func (r *StorageQueue) dataStorageCostComponent() *schema.CostComponent {
 			PurchaseOption:   strPtr("Consumption"),
 			StartUsageAmount: strPtr("0"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -170,6 +171,7 @@ func (r *StorageQueue) operationsCostComponents() []*schema.CostComponent {
 				PurchaseOption:   strPtr("Consumption"),
 				StartUsageAmount: strPtr("0"),
 			},
+			UsageBased: true,
 		})
 	}
 
@@ -198,6 +200,7 @@ func (r *StorageQueue) operationsCostComponents() []*schema.CostComponent {
 			PurchaseOption:   strPtr("Consumption"),
 			StartUsageAmount: strPtr("0"),
 		},
+		UsageBased: true,
 	})
 
 	return costComponents
@@ -234,6 +237,7 @@ func (r *StorageQueue) geoReplicationDataTransferCostComponents() []*schema.Cost
 				PurchaseOption:   strPtr("Consumption"),
 				StartUsageAmount: strPtr("0"),
 			},
+			UsageBased: true,
 		},
 	}
 }

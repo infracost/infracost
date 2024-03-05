@@ -92,5 +92,6 @@ func (r *DatabricksWorkspace) databricksCostComponent(name, skuName string, quan
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
+		UsageBased: true,
 	}
 }

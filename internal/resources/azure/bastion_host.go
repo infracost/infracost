@@ -116,5 +116,6 @@ func (r *BastionHost) outboundDataTransferSingleComponent(name, productType, sta
 			PurchaseOption:   strPtr("Consumption"),
 			StartUsageAmount: strPtr(startUsage),
 		},
+		UsageBased: true,
 	}
 }

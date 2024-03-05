@@ -166,6 +166,7 @@ func (r *ApplicationGateway) dataProcessingCostComponent(name, sku, startUsage s
 			PurchaseOption:   strPtr("Consumption"),
 			StartUsageAmount: strPtr(startUsage),
 		},
+		UsageBased: true,
 	}
 }
 func (r *ApplicationGateway) capacityUnitsCostComponent(name, tier string, capacityUnits int64) *schema.CostComponent {
@@ -188,6 +189,7 @@ func (r *ApplicationGateway) capacityUnitsCostComponent(name, tier string, capac
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
+		UsageBased: true,
 	}
 }
 

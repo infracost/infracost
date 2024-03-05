@@ -149,6 +149,7 @@ func (r *ContainerRegistry) containerRegistryStorageCostComponent(name, sku stri
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
+		UsageBased: true,
 	}
 }
 func (r *ContainerRegistry) containerRegistryCPUCostComponent(name, sku string, monthlyBuildVCPU *decimal.Decimal) *schema.CostComponent {
@@ -173,5 +174,6 @@ func (r *ContainerRegistry) containerRegistryCPUCostComponent(name, sku string, 
 			PurchaseOption:   strPtr("Consumption"),
 			StartUsageAmount: strPtr("6000"),
 		},
+		UsageBased: true,
 	}
 }

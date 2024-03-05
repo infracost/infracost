@@ -186,6 +186,7 @@ func standardPremiumDiskCostComponents(region string, diskTypePrefix string, sto
 			PriceFilter: &schema.PriceFilter{
 				PurchaseOption: strPtr("Consumption"),
 			},
+			UsageBased: true,
 		})
 	}
 

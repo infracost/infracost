@@ -193,5 +193,6 @@ func (r *MySQLFlexibleServer) backupCostComponent() *schema.CostComponent {
 				{Key: "meterName", Value: strPtr("Backup Storage LRS Data Stored")},
 			},
 		},
+		UsageBased: true,
 	}
 }

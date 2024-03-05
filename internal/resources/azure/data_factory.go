@@ -1,9 +1,10 @@
 package azure
 
 import (
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 // DataFactory struct represents Azure Data Factory resource.
@@ -78,6 +79,7 @@ func (r *DataFactory) readWriteOperationsCostComponent() *schema.CostComponent {
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -112,5 +114,6 @@ func (r *DataFactory) monitoringOperationsCostComponent() *schema.CostComponent 
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
+		UsageBased: true,
 	}
 }

@@ -240,6 +240,7 @@ func (r *SQLDatabase) serverlessComputeHoursCostComponents() []*schema.CostCompo
 				{Key: "meterName", ValueRegex: regexPtr("^(?!.* - Free$).*$")},
 			}),
 			PriceFilter: priceFilterConsumption,
+			UsageBased:  true,
 		},
 	}
 
@@ -348,6 +349,7 @@ func (r *SQLDatabase) longTermRetentionCostComponent() *schema.CostComponent {
 			{Key: "meterName", ValueRegex: regexPtr(fmt.Sprintf("%s Data Stored", redundancyType))},
 		}),
 		PriceFilter: priceFilterConsumption,
+		UsageBased:  true,
 	}
 }
 
@@ -374,6 +376,7 @@ func (r *SQLDatabase) pitrBackupCostComponent() *schema.CostComponent {
 			{Key: "meterName", ValueRegex: regexPtr(fmt.Sprintf("%s Data Stored", redundancyType))},
 		}),
 		PriceFilter: priceFilterConsumption,
+		UsageBased:  true,
 	}
 }
 
@@ -435,6 +438,7 @@ func mssqlExtraDataStorageCostComponent(region string, tier string, extraStorage
 			{Key: "meterName", Value: strPtr("Data Stored")},
 		}),
 		PriceFilter: priceFilterConsumption,
+		UsageBased:  true,
 	}
 }
 

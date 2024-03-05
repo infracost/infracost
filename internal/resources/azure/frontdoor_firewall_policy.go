@@ -3,9 +3,10 @@ package azure
 import (
 	"fmt"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 // FrontdoorFirewallPolicy represents a policy for Web Application Firewall (WAF)
@@ -100,6 +101,7 @@ func (r *FrontdoorFirewallPolicy) customRuleRequestsCostComponents() []*schema.C
 			PriceFilter: &schema.PriceFilter{
 				PurchaseOption: strPtr("Consumption"),
 			},
+			UsageBased: true,
 		},
 	}
 }
@@ -134,6 +136,7 @@ func (r *FrontdoorFirewallPolicy) managedRulesetRequestsCostComponents() []*sche
 			PriceFilter: &schema.PriceFilter{
 				PurchaseOption: strPtr("Consumption"),
 			},
+			UsageBased: true,
 		},
 	}
 }

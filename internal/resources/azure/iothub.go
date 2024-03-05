@@ -1,9 +1,10 @@
 package azure
 
 import (
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 const (
@@ -114,6 +115,7 @@ func (r *IoTHubDPS) BuildResource() *schema.Resource {
 						{Key: "meterName", ValueRegex: regexPtr("Operations$")},
 					},
 				},
+				UsageBased: true,
 			},
 		},
 	}
