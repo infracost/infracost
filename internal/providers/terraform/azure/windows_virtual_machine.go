@@ -7,15 +7,15 @@ import (
 
 func getWindowsVirtualMachineRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_windows_virtual_machine",
-		RFunc: NewWindowsVirtualMachine,
+		Name:      "azurerm_windows_virtual_machine",
+		CoreRFunc: NewWindowsVirtualMachine,
 		Notes: []string{
 			"Low priority, Spot and Reserved instances are not supported.",
 		},
 	}
 }
 
-func NewWindowsVirtualMachine(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewWindowsVirtualMachine(d *schema.ResourceData) schema.CoreResource {
 	r := &azure.WindowsVirtualMachine{
 		Address:                               d.Address,
 		Region:                                lookupRegion(d, []string{}),
@@ -30,6 +30,5 @@ func NewWindowsVirtualMachine(d *schema.ResourceData, u *schema.UsageData) *sche
 			DiskSizeGB: diskData.Get("disk_size_gb").Int(),
 		}
 	}
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

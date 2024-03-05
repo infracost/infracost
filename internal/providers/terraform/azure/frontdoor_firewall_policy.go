@@ -11,8 +11,8 @@ import (
 // resource
 func getFrontdoorFirewallPolicyRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_frontdoor_firewall_policy",
-		RFunc: newFrontdoorFirewallPolicy,
+		Name:      "azurerm_frontdoor_firewall_policy",
+		CoreRFunc: newFrontdoorFirewallPolicy,
 		ReferenceAttributes: []string{
 			"resource_group_name",
 		},
@@ -21,7 +21,7 @@ func getFrontdoorFirewallPolicyRegistryItem() *schema.RegistryItem {
 
 // newFrontdoorFirewallPolicy parses Terraform's data and uses it to build
 // a new resource
-func newFrontdoorFirewallPolicy(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newFrontdoorFirewallPolicy(d *schema.ResourceData) schema.CoreResource {
 	region := lookupRegion(d, []string{"resource_group_name"})
 
 	if strings.HasPrefix(strings.ToLower(region), "usgov") {
@@ -46,7 +46,5 @@ func newFrontdoorFirewallPolicy(d *schema.ResourceData, u *schema.UsageData) *sc
 		CustomRules:     customRules,
 		ManagedRulesets: managedRulesets,
 	}
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
+	return r
 }

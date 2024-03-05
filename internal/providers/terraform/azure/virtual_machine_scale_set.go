@@ -3,18 +3,19 @@ package azure
 import (
 	"strings"
 
+	"github.com/tidwall/gjson"
+
 	"github.com/infracost/infracost/internal/resources/azure"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/tidwall/gjson"
 )
 
 func getVirtualMachineScaleSetRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_virtual_machine_scale_set",
-		RFunc: NewVirtualMachineScaleSet,
+		Name:      "azurerm_virtual_machine_scale_set",
+		CoreRFunc: NewVirtualMachineScaleSet,
 	}
 }
-func NewVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewVirtualMachineScaleSet(d *schema.ResourceData) schema.CoreResource {
 	r := &azure.VirtualMachineScaleSet{
 		Address:     d.Address,
 		Region:      lookupRegion(d, []string{}),
@@ -57,6 +58,5 @@ func NewVirtualMachineScaleSet(d *schema.ResourceData, u *schema.UsageData) *sch
 		}
 	}
 
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

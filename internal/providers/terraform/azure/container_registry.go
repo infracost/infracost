@@ -7,17 +7,16 @@ import (
 
 func getContainerRegistryRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_container_registry",
-		RFunc: NewContainerRegistry,
+		Name:      "azurerm_container_registry",
+		CoreRFunc: NewContainerRegistry,
 	}
 }
-func NewContainerRegistry(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewContainerRegistry(d *schema.ResourceData) schema.CoreResource {
 	r := &azure.ContainerRegistry{
 		Address:                 d.Address,
 		Region:                  lookupRegion(d, []string{}),
 		GeoReplicationLocations: len(d.Get("georeplications").Array()),
 		SKU:                     d.Get("sku").String(),
 	}
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

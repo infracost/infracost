@@ -7,15 +7,14 @@ import (
 
 func getAutomationJobScheduleRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_automation_job_schedule",
-		RFunc: NewAutomationJobSchedule,
+		Name:      "azurerm_automation_job_schedule",
+		CoreRFunc: NewAutomationJobSchedule,
 		ReferenceAttributes: []string{
 			"resource_group_name",
 		},
 	}
 }
-func NewAutomationJobSchedule(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAutomationJobSchedule(d *schema.ResourceData) schema.CoreResource {
 	r := &azure.AutomationJobSchedule{Address: d.Address, Region: lookupRegion(d, []string{"resource_group_name"})}
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

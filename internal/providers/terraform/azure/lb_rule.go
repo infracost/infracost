@@ -1,10 +1,12 @@
 package azure
 
 import (
-	"github.com/infracost/infracost/internal/schema"
+	"strings"
+
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
-	"strings"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 func GetAzureRMLoadBalancerRuleRegistryItem() *schema.RegistryItem {

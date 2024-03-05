@@ -7,15 +7,14 @@ import (
 
 func getAutomationDSCConfigurationRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_automation_dsc_configuration",
-		RFunc: NewAutomationDSCConfiguration,
+		Name:      "azurerm_automation_dsc_configuration",
+		CoreRFunc: NewAutomationDSCConfiguration,
 		ReferenceAttributes: []string{
 			"resource_group_name",
 		},
 	}
 }
-func NewAutomationDSCConfiguration(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAutomationDSCConfiguration(d *schema.ResourceData) schema.CoreResource {
 	r := &azure.AutomationDSCConfiguration{Address: d.Address, Region: lookupRegion(d, []string{"resource_group_name"})}
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

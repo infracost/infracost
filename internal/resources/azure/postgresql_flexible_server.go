@@ -27,9 +27,16 @@ type PostgreSQLFlexibleServer struct {
 	AdditionalBackupStorageGB *float64 `infracost_usage:"additional_backup_storage_gb"`
 }
 
-// PostgreSQLFlexibleServerUsageSchema defines a list which represents the usage schema of PostgreSQLFlexibleServer.
-var PostgreSQLFlexibleServerUsageSchema = []*schema.UsageItem{
-	{Key: "additional_backup_storage_gb", DefaultValue: 0, ValueType: schema.Float64},
+// CoreType returns the name of this resource type
+func (r *PostgreSQLFlexibleServer) CoreType() string {
+	return "PostgreSQLFlexibleServer"
+}
+
+// UsageSchema defines a list which represents the usage schema of PostgreSQLFlexibleServer.
+func (r *PostgreSQLFlexibleServer) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "additional_backup_storage_gb", DefaultValue: 0, ValueType: schema.Float64},
+	}
 }
 
 // PopulateUsage parses the u schema.UsageData into the PostgreSQLFlexibleServer.
@@ -50,7 +57,7 @@ func (r *PostgreSQLFlexibleServer) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    PostgreSQLFlexibleServerUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }

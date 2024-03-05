@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 func GetAzureRMEventHubsNamespaceRegistryItem() *schema.RegistryItem {

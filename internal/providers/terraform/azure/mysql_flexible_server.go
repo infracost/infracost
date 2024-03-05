@@ -12,12 +12,12 @@ import (
 
 func getMySQLFlexibleServerRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_mysql_flexible_server",
-		RFunc: newMySQLFlexibleServer,
+		Name:      "azurerm_mysql_flexible_server",
+		CoreRFunc: newMySQLFlexibleServer,
 	}
 }
 
-func newMySQLFlexibleServer(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newMySQLFlexibleServer(d *schema.ResourceData) schema.CoreResource {
 	region := lookupRegion(d, []string{})
 	sku := d.Get("sku_name").String()
 	storage := d.GetInt64OrDefault("storage.0.size_gb", 0)
@@ -65,7 +65,5 @@ func newMySQLFlexibleServer(d *schema.ResourceData, u *schema.UsageData) *schema
 		Storage:         storage,
 		IOPS:            iops,
 	}
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
+	return r
 }

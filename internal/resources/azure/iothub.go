@@ -22,6 +22,14 @@ type IoTHub struct {
 	Capacity int64
 }
 
+func (r *IoTHub) CoreType() string {
+	return "IoTHub"
+}
+
+func (r *IoTHub) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
+
 func (r *IoTHub) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }

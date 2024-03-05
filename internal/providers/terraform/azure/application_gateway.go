@@ -7,12 +7,12 @@ import (
 
 func getApplicationGatewayRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_application_gateway",
-		RFunc: NewApplicationGateway,
+		Name:      "azurerm_application_gateway",
+		CoreRFunc: NewApplicationGateway,
 	}
 }
 
-func NewApplicationGateway(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewApplicationGateway(d *schema.ResourceData) schema.CoreResource {
 	var autoscalingMinCapacity *int64
 	if d.Get("autoscale_configuration.0.min_capacity").Exists() {
 		autoscalingMinCapacity = intPtr(d.Get("autoscale_configuration.0.min_capacity").Int())
@@ -26,6 +26,5 @@ func NewApplicationGateway(d *schema.ResourceData, u *schema.UsageData) *schema.
 		Region:                 lookupRegion(d, []string{}),
 	}
 
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

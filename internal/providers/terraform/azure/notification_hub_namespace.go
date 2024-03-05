@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/infracost/infracost/internal/schema"
-	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
+
+	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/usage"
 )
 
 func GetAzureRMNotificationHubNamespaceRegistryItem() *schema.RegistryItem {

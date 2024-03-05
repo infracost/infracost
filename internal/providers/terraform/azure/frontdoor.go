@@ -12,8 +12,8 @@ import (
 // getFrontdoorRegistryItem returns a registry item for the resource
 func getFrontdoorRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_frontdoor",
-		RFunc: newFrontdoor,
+		Name:      "azurerm_frontdoor",
+		CoreRFunc: newFrontdoor,
 		ReferenceAttributes: []string{
 			"resource_group_name",
 		},
@@ -21,7 +21,7 @@ func getFrontdoorRegistryItem() *schema.RegistryItem {
 }
 
 // newFrontdoor parses Terraform's data and uses it to build a new resource
-func newFrontdoor(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newFrontdoor(d *schema.ResourceData) schema.CoreResource {
 	region := lookupRegion(d, []string{"resource_group_name"})
 
 	if strings.HasPrefix(strings.ToLower(region), "usgov") {
@@ -47,7 +47,5 @@ func newFrontdoor(d *schema.ResourceData, u *schema.UsageData) *schema.Resource 
 		FrontendHosts: len(d.Get("frontend_endpoint").Array()),
 		RoutingRules:  rulesCounter,
 	}
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
+	return r
 }

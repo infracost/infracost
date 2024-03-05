@@ -7,19 +7,18 @@ import (
 
 func getVPNGatewayRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_vpn_gateway",
-		RFunc: newVPNGateway,
+		Name:      "azurerm_vpn_gateway",
+		CoreRFunc: newVPNGateway,
 	}
 }
 
-func newVPNGateway(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newVPNGateway(d *schema.ResourceData) schema.CoreResource {
 	v := &azure.VPNGateway{
 		Address:    d.Address,
 		Region:     d.Get("region").String(),
 		ScaleUnits: d.GetInt64OrDefault("scale_unit", 1),
 		Type:       "S2S",
 	}
-	v.PopulateUsage(u)
 
-	return v.BuildResource()
+	return v
 }

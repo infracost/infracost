@@ -7,15 +7,14 @@ import (
 
 func getPrivateDNSAAAARecordRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_private_dns_aaaa_record",
-		RFunc: NewPrivateDNSAAAARecord,
+		Name:      "azurerm_private_dns_aaaa_record",
+		CoreRFunc: NewPrivateDNSAAAARecord,
 		ReferenceAttributes: []string{
 			"resource_group_name",
 		},
 	}
 }
-func NewPrivateDNSAAAARecord(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewPrivateDNSAAAARecord(d *schema.ResourceData) schema.CoreResource {
 	r := &azure.PrivateDNSAAAARecord{Address: d.Address, Region: lookupRegion(d, []string{"resource_group_name"})}
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

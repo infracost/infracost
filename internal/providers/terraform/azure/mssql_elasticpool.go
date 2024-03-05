@@ -5,14 +5,15 @@ import (
 	"strings"
 
 	"github.com/fatih/camelcase"
+
 	"github.com/infracost/infracost/internal/resources/azure"
 	"github.com/infracost/infracost/internal/schema"
 )
 
 func getMSSQLElasticPoolRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_mssql_elasticpool",
-		RFunc: newMSSQLElasticPool,
+		Name:      "azurerm_mssql_elasticpool",
+		CoreRFunc: newMSSQLElasticPool,
 		ReferenceAttributes: []string{
 			"server_name",
 			"resource_group_name",
@@ -20,7 +21,7 @@ func getMSSQLElasticPoolRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func newMSSQLElasticPool(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newMSSQLElasticPool(d *schema.ResourceData) schema.CoreResource {
 	region := lookupRegion(d, []string{"server_name", "resource_group_name"})
 
 	sku := d.Get("sku.0.name").String()
@@ -56,6 +57,5 @@ func newMSSQLElasticPool(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 		r.Cores = &capacity
 	}
 
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

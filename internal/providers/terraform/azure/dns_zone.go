@@ -7,8 +7,8 @@ import (
 
 func getDNSZoneRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_dns_zone",
-		RFunc: NewDNSZone,
+		Name:      "azurerm_dns_zone",
+		CoreRFunc: NewDNSZone,
 		ReferenceAttributes: []string{
 			"resource_group_name",
 		},
@@ -16,12 +16,11 @@ func getDNSZoneRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func NewDNSZone(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewDNSZone(d *schema.ResourceData) schema.CoreResource {
 	r := &azure.DNSZone{
 		Address: d.Address,
 		Region:  lookupRegion(d, []string{"resource_group_name"}),
 	}
 
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

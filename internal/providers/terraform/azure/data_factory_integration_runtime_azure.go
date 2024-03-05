@@ -7,12 +7,12 @@ import (
 
 func getDataFactoryIntegrationRuntimeAzureRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_data_factory_integration_runtime_azure",
-		RFunc: newDataFactoryIntegrationRuntimeAzure,
+		Name:      "azurerm_data_factory_integration_runtime_azure",
+		CoreRFunc: newDataFactoryIntegrationRuntimeAzure,
 	}
 }
 
-func newDataFactoryIntegrationRuntimeAzure(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newDataFactoryIntegrationRuntimeAzure(d *schema.ResourceData) schema.CoreResource {
 	region := lookupRegion(d, []string{})
 
 	cores := d.GetInt64OrDefault("core_count", 8)
@@ -30,7 +30,5 @@ func newDataFactoryIntegrationRuntimeAzure(d *schema.ResourceData, u *schema.Usa
 		Cores:       cores,
 		ComputeType: computeType,
 	}
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
+	return r
 }

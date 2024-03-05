@@ -7,16 +7,15 @@ import (
 
 func getApplicationInsightsRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_application_insights",
-		RFunc: NewApplicationInsights,
+		Name:      "azurerm_application_insights",
+		CoreRFunc: NewApplicationInsights,
 	}
 }
-func NewApplicationInsights(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewApplicationInsights(d *schema.ResourceData) schema.CoreResource {
 	r := &azure.ApplicationInsights{
 		Address:         d.Address,
 		Region:          lookupRegion(d, []string{}),
 		RetentionInDays: d.Get("retention_in_days").Int(),
 	}
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

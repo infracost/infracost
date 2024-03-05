@@ -7,12 +7,11 @@ import (
 
 func getBastionHostRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_bastion_host",
-		RFunc: NewBastionHost,
+		Name:      "azurerm_bastion_host",
+		CoreRFunc: NewBastionHost,
 	}
 }
-func NewBastionHost(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewBastionHost(d *schema.ResourceData) schema.CoreResource {
 	r := &azure.BastionHost{Address: d.Address, Region: lookupRegion(d, []string{})}
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

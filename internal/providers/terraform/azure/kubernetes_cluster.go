@@ -3,19 +3,20 @@ package azure
 import (
 	"strings"
 
+	"github.com/tidwall/gjson"
+
 	"github.com/infracost/infracost/internal/resources/azure"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/tidwall/gjson"
 )
 
 func getKubernetesClusterRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_kubernetes_cluster",
-		RFunc: NewKubernetesCluster,
+		Name:      "azurerm_kubernetes_cluster",
+		CoreRFunc: NewKubernetesCluster,
 	}
 }
 
-func NewKubernetesCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewKubernetesCluster(d *schema.ResourceData) schema.CoreResource {
 	nodeCount := int64(1)
 	if d.Get("default_node_pool.0.node_count").Type != gjson.Null {
 		nodeCount = d.Get("default_node_pool.0.node_count").Int()
@@ -55,6 +56,5 @@ func NewKubernetesCluster(d *schema.ResourceData, u *schema.UsageData) *schema.R
 		r.HttpApplicationRoutingEnabled = d.Get("addon_profile.0.http_application_routing.0.enabled").Bool()
 	}
 
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

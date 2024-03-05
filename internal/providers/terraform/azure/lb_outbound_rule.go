@@ -1,8 +1,9 @@
 package azure
 
 import (
-	"github.com/infracost/infracost/internal/schema"
 	"strings"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 func GetAzureRMLoadBalancerOutboundRuleRegistryItem() *schema.RegistryItem {

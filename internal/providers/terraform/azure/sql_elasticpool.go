@@ -10,8 +10,8 @@ import (
 
 func getSQLElasticPoolRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_sql_elasticpool",
-		RFunc: newSQLElasticPool,
+		Name:      "azurerm_sql_elasticpool",
+		CoreRFunc: newSQLElasticPool,
 		ReferenceAttributes: []string{
 			"server_name",
 			"resource_group_name",
@@ -19,7 +19,7 @@ func getSQLElasticPoolRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func newSQLElasticPool(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newSQLElasticPool(d *schema.ResourceData) schema.CoreResource {
 	tier := d.Get("edition").String()
 	sku := fmt.Sprintf("%sPool", strings.ToTitle(tier))
 	dtu := d.Get("dtu").Int()
@@ -41,7 +41,5 @@ func newSQLElasticPool(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 		r.MaxSizeGB = &maxSizeGB
 	}
 
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
+	return r
 }

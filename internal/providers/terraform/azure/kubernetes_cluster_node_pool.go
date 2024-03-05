@@ -3,22 +3,23 @@ package azure
 import (
 	"strings"
 
+	"github.com/tidwall/gjson"
+
 	"github.com/infracost/infracost/internal/resources/azure"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/tidwall/gjson"
 )
 
 func getKubernetesClusterNodePoolRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_kubernetes_cluster_node_pool",
-		RFunc: NewKubernetesClusterNodePool,
+		Name:      "azurerm_kubernetes_cluster_node_pool",
+		CoreRFunc: NewKubernetesClusterNodePool,
 		ReferenceAttributes: []string{
 			"kubernetes_cluster_id",
 		},
 	}
 }
 
-func NewKubernetesClusterNodePool(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewKubernetesClusterNodePool(d *schema.ResourceData) schema.CoreResource {
 	nodeCount := int64(1)
 	if d.Get("node_count").Type != gjson.Null {
 		nodeCount = d.Get("node_count").Int()
@@ -49,6 +50,5 @@ func NewKubernetesClusterNodePool(d *schema.ResourceData, u *schema.UsageData) *
 		OSDiskSizeGB: d.Get("os_disk_size_gb").Int(),
 		NodeCount:    nodeCount,
 	}
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

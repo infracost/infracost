@@ -7,15 +7,15 @@ import (
 
 func getSQLManagedInstanceRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_sql_managed_instance",
-		RFunc: newSQLManagedInstance,
+		Name:      "azurerm_sql_managed_instance",
+		CoreRFunc: newSQLManagedInstance,
 		ReferenceAttributes: []string{
 			"resource_group_name",
 		},
 	}
 }
 
-func newSQLManagedInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newSQLManagedInstance(d *schema.ResourceData) schema.CoreResource {
 	region := lookupRegion(d, []string{"resource_group_name"})
 	r := &azure.SQLManagedInstance{
 		Address: d.Address,
@@ -34,7 +34,5 @@ func newSQLManagedInstance(d *schema.ResourceData, u *schema.UsageData) *schema.
 	}
 	r.StorageSizeInGb = d.Get("storage_size_in_gb").Int()
 
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
+	return r
 }
