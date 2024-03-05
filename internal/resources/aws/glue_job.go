@@ -76,6 +76,7 @@ func (r *GlueJob) BuildResource() *schema.Resource {
 						{Key: "operation", ValueRegex: strPtr("/^jobrun$/i")},
 					},
 				},
+				UsageBased: true,
 			},
 		},
 	}

@@ -80,5 +80,6 @@ func transitGatewayDataProcessingCostComponent(region string, operation string, 
 				{Key: "operation", Value: strPtr(operation)},
 			},
 		},
+		UsageBased: true,
 	}
 }

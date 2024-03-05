@@ -1,15 +1,15 @@
 package aws
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 
-	"fmt"
-
-	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
 
-	"strings"
+	"github.com/infracost/infracost/internal/usage"
 )
 
 type RedshiftCluster struct {
@@ -127,6 +127,7 @@ func (r *RedshiftCluster) concurrencyScalingCostComponent(numberOfNodes int64, c
 				{Key: "concurrencyscalingfreeusage", Value: strPtr("No")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -142,6 +143,7 @@ func (r *RedshiftCluster) spectrumCostComponent(tbScanned *decimal.Decimal) *sch
 			Service:       strPtr("AmazonRedshift"),
 			ProductFamily: strPtr("Redshift Data Scan"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -160,6 +162,7 @@ func (r *RedshiftCluster) storageSnapshotCostComponent(displayName string, start
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr(startUsageAmount),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -178,5 +181,6 @@ func (r *RedshiftCluster) managedStorageCostComponent(managedStorage *decimal.De
 				{Key: "instanceType", ValueRegex: strPtr(fmt.Sprintf("/%s/i", r.NodeType))},
 			},
 		},
+		UsageBased: true,
 	}
 }

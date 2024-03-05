@@ -50,6 +50,7 @@ func (r *ConfigConfigurationRecorder) BuildResource() *schema.Resource {
 				{Key: "usagetype", ValueRegex: regexPtr("ConfigurationItemRecorded$")},
 			},
 		},
+		UsageBased: true,
 	})
 
 	costComponents = append(costComponents, &schema.CostComponent{
@@ -66,6 +67,7 @@ func (r *ConfigConfigurationRecorder) BuildResource() *schema.Resource {
 				{Key: "usagetype", ValueRegex: regexPtr("CustomConfigItemRecorded$")},
 			},
 		},
+		UsageBased: true,
 	})
 
 	return &schema.Resource{

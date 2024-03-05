@@ -146,6 +146,7 @@ func (r *BackupVault) backupVaultCostComponent(bd backupData) *schema.CostCompon
 			ProductFamily:    strPtr(bd.family),
 			AttributeFilters: filters,
 		},
+		UsageBased: true,
 	}
 }
 
@@ -165,5 +166,6 @@ func (r *BackupVault) additionalBackupVaultCostComponent(bd backupData) *schema.
 				{Key: bd.key, Value: strPtr(bd.value)},
 			},
 		},
+		UsageBased: true,
 	}
 }

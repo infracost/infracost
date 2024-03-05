@@ -97,6 +97,7 @@ func (r *SSMParameter) parameterStorageCostComponent() *schema.CostComponent {
 				{Key: "usagetype", ValueRegex: strPtr("/PS-Advanced-Param-Tier1/")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -120,5 +121,6 @@ func (r *SSMParameter) apiThroughputCostComponent(throughputLimit string) *schem
 				{Key: "usagetype", ValueRegex: strPtr("/PS-Param-Processed-Tier2/")},
 			},
 		},
+		UsageBased: true,
 	}
 }

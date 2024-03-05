@@ -57,6 +57,7 @@ func (r *SSMActivation) BuildResource() *schema.Resource {
 							{Key: "usagetype", ValueRegex: strPtr("/MI-AdvInstances-Hrs/")},
 						},
 					},
+					UsageBased: true,
 				},
 			}, UsageSchema: SSMActivationUsageSchema,
 		}

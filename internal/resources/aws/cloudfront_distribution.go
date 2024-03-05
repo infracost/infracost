@@ -339,6 +339,7 @@ func (r *CloudfrontDistribution) buildDataOutCostComponent(usageName, fromLocati
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr(strconv.Itoa(startUsage)),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -366,6 +367,7 @@ func (r *CloudfrontDistribution) dataOutToOriginCostComponents(regionData *cloud
 				{Key: "fromLocation", Value: strPtr(apiRegion)},
 			},
 		},
+		UsageBased: true,
 	})
 
 	return costComponents
@@ -394,6 +396,7 @@ func (r *CloudfrontDistribution) httpRequestsCostComponents(regionData *cloudfro
 				{Key: "requestType", Value: strPtr("CloudFront-Request-HTTP-Proxy")},
 			},
 		},
+		UsageBased: true,
 	})
 
 	return costComponents
@@ -422,6 +425,7 @@ func (r *CloudfrontDistribution) httpsRequestsCostComponents(regionData *cloudfr
 				{Key: "requestType", Value: strPtr("CloudFront-Request-HTTPS-Proxy")},
 			},
 		},
+		UsageBased: true,
 	})
 
 	return costComponents
@@ -517,6 +521,7 @@ func (r *CloudfrontDistribution) shieldRequestsCostComponents() []*schema.CostCo
 				{Key: "location", Value: strPtr(apiRegion)},
 			},
 		},
+		UsageBased: true,
 	})
 
 	return costComponents
@@ -552,6 +557,7 @@ func (r *CloudfrontDistribution) invalidationRequestsCostComponents() []*schema.
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr("0"),
 		},
+		UsageBased: true,
 	})
 
 	if paidQuantity != nil {
@@ -570,6 +576,7 @@ func (r *CloudfrontDistribution) invalidationRequestsCostComponents() []*schema.
 			PriceFilter: &schema.PriceFilter{
 				StartUsageAmount: strPtr("1000"),
 			},
+			UsageBased: true,
 		})
 	}
 
@@ -601,6 +608,7 @@ func (r *CloudfrontDistribution) encryptionRequestsCostComponents() []*schema.Co
 				{Key: "location", Value: strPtr("Europe")},
 			},
 		},
+		UsageBased: true,
 	})
 
 	return costComponents
@@ -630,6 +638,7 @@ func (r *CloudfrontDistribution) realtimeLogsCostComponents() []*schema.CostComp
 				{Key: "operation", Value: strPtr("RealTimeLog")},
 			},
 		},
+		UsageBased: true,
 	})
 
 	return costComponents
@@ -659,6 +668,7 @@ func (r *CloudfrontDistribution) customSSLCertificateCostComponents() []*schema.
 				{Key: "usagetype", Value: strPtr("SSL-Cert-Custom")},
 			},
 		},
+		UsageBased: true,
 	})
 
 	return costComponents

@@ -4,8 +4,9 @@ import (
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 
-	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
+
+	"github.com/infracost/infracost/internal/usage"
 )
 
 type APIGatewayRestAPI struct {
@@ -74,5 +75,6 @@ func (r *APIGatewayRestAPI) requestsCostComponent(displayName string, usageTier 
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr(usageTier),
 		},
+		UsageBased: true,
 	}
 }

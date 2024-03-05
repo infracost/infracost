@@ -72,6 +72,7 @@ func (r *SNSTopicSubscription) BuildResource() *schema.Resource {
 				PriceFilter: &schema.PriceFilter{
 					StartUsageAmount: strPtr(freeTier),
 				},
+				UsageBased: true,
 			},
 		},
 		UsageSchema: SNSTopicSubscriptionUsageSchema,

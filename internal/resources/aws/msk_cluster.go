@@ -74,6 +74,7 @@ func (r *MSKCluster) BuildResource() *schema.Resource {
 						{Key: "storageFamily", Value: strPtr("GP2")},
 					},
 				},
+				UsageBased: true,
 			},
 		},
 		UsageSchema: MSKClusterUsageSchema,

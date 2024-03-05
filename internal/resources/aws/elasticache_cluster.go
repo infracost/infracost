@@ -103,6 +103,7 @@ func (r *ElastiCacheCluster) elastiCacheCostComponent(autoscaling bool) *schema.
 			},
 		},
 		PriceFilter: priceFilter,
+		UsageBased:  autoscaling,
 	}
 }
 
@@ -127,6 +128,7 @@ func (r *ElastiCacheCluster) backupStorageCostComponent() *schema.CostComponent 
 			Service:       strPtr("AmazonElastiCache"),
 			ProductFamily: strPtr("Storage Snapshot"),
 		},
+		UsageBased: true,
 	}
 }
 

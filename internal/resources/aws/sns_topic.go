@@ -80,6 +80,7 @@ func (r *SNSTopic) apiRequestsCostComponent(requests *int64) *schema.CostCompone
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr("1000000"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -180,6 +181,7 @@ func (r *SNSTopic) smsNotificationsCostComponent(subscriptions, requests *int64)
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr(fmt.Sprintf("%d", 100)),
 		},
+		UsageBased: true,
 	}
 
 	if r.SMSNotificationPrice != nil {
@@ -274,6 +276,7 @@ func (r *SNSTopic) notificationsCostComponent(name, unit string, multiplier int6
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr(fmt.Sprintf("%d", startUsageAmount)),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -331,6 +334,7 @@ func (r *SNSFIFOTopic) publishAPIRequestsCostComponent(requests *int64) *schema.
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr("0"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -358,6 +362,7 @@ func (r *SNSFIFOTopic) publishAPIPayloadCostComponent(requests *int64, requestSi
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr("0"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -387,6 +392,7 @@ func (r *SNSFIFOTopic) notificationsCostComponent(subscriptions int64, requests 
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr("0"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -416,6 +422,7 @@ func (r *SNSFIFOTopic) notificationPayloadCostComponent(subscriptions int64, req
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr("0"),
 		},
+		UsageBased: true,
 	}
 }
 

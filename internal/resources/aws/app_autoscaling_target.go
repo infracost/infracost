@@ -16,7 +16,7 @@ type AppAutoscalingTarget struct {
 	MaxCapacity int64
 
 	// "usage" args
-	Capacity *int64 `infracost_usage:"capacity"`
+	Capacity *int64 `infracost_usage:"capacity"` // TODO: hmmmm
 }
 
 var AppAutoscalingTargetUsageSchema = []*schema.UsageItem{

@@ -67,6 +67,7 @@ func (r *NeptuneCluster) storageCostComponent() *schema.CostComponent {
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -92,6 +93,7 @@ func (r *NeptuneCluster) ioRequestsCostComponent() *schema.CostComponent {
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -117,5 +119,6 @@ func (r *NeptuneCluster) backupStorageCostComponent() *schema.CostComponent {
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }

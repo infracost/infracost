@@ -131,5 +131,6 @@ func (r *DXConnection) outboundDataTransferComponent(fromRegion string, dataProc
 				{Key: "virtualInterfaceType", ValueRegex: strPtr(fmt.Sprintf("/%s/i", virtualInterfaceType))},
 			},
 		},
+		UsageBased: true,
 	}
 }

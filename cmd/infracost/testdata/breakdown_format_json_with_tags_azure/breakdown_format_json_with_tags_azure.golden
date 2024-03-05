@@ -59,7 +59,8 @@
                 "monthlyQuantity": "2",
                 "price": "164.25",
                 "hourlyCost": "0.45",
-                "monthlyCost": "328.5"
+                "monthlyCost": "328.5",
+                "usageBased": false
               }
             ]
           },
@@ -91,7 +92,8 @@
                 "monthlyQuantity": "2",
                 "price": "164.25",
                 "hourlyCost": "0.45",
-                "monthlyCost": "328.5"
+                "monthlyCost": "328.5",
+                "usageBased": false
               }
             ]
           }
@@ -131,7 +133,8 @@
                 "monthlyQuantity": "2",
                 "price": "164.25",
                 "hourlyCost": "0.45",
-                "monthlyCost": "328.5"
+                "monthlyCost": "328.5",
+                "usageBased": false
               }
             ]
           },
@@ -163,7 +166,8 @@
                 "monthlyQuantity": "2",
                 "price": "164.25",
                 "hourlyCost": "0.45",
-                "monthlyCost": "328.5"
+                "monthlyCost": "328.5",
+                "usageBased": false
               }
             ]
           }

@@ -60,6 +60,7 @@ func (r *GlueCrawler) BuildResource() *schema.Resource {
 						{Key: "operation", ValueRegex: strPtr("/^crawlerrun$/i")},
 					},
 				},
+				UsageBased: true,
 			},
 		},
 	}

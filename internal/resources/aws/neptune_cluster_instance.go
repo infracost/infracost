@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 type NeptuneClusterInstance struct {
@@ -96,5 +97,6 @@ func (r *NeptuneClusterInstance) cpuCreditsCostComponent(quantity *decimal.Decim
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }

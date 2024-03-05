@@ -1,15 +1,15 @@
 package aws
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 
-	"fmt"
-
-	"strings"
+	"github.com/shopspring/decimal"
 
 	"github.com/infracost/infracost/internal/usage"
-	"github.com/shopspring/decimal"
 )
 
 type APIGatewayV2API struct {
@@ -152,6 +152,7 @@ func (r *APIGatewayV2API) httpCostComponent(displayName string, usageTier string
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr(usageTier),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -173,5 +174,6 @@ func (r *APIGatewayV2API) websocketCostComponent(unit string, usageType string, 
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr(usageTier),
 		},
+		UsageBased: true,
 	}
 }

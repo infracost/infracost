@@ -84,6 +84,7 @@ func (r *TransferServer) dataDownloadedCostComponent() *schema.CostComponent {
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -100,6 +101,7 @@ func (r *TransferServer) dataUploadedCostComponent() *schema.CostComponent {
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }
 

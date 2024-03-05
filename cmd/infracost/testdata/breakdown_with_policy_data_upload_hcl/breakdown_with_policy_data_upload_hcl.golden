@@ -113,7 +113,8 @@
                 "monthlyQuantity": "6",
                 "price": "0.4745",
                 "hourlyCost": "0.0039",
-                "monthlyCost": "2.847"
+                "monthlyCost": "2.847",
+                "usageBased": true
               },
               {
                 "name": "Read capacity unit (RCU)",
@@ -122,7 +123,8 @@
                 "monthlyQuantity": "30",
                 "price": "0.0949",
                 "hourlyCost": "0.0039",
-                "monthlyCost": "2.847"
+                "monthlyCost": "2.847",
+                "usageBased": false
               },
               {
                 "name": "Data storage",
@@ -131,7 +133,8 @@
                 "monthlyQuantity": null,
                 "price": "0.25",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true
               },
               {
                 "name": "Point-In-Time Recovery (PITR) backup storage",
@@ -140,7 +143,8 @@
                 "monthlyQuantity": null,
                 "price": "0.2",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true
               },
               {
                 "name": "On-demand backup storage",
@@ -149,7 +153,8 @@
                 "monthlyQuantity": null,
                 "price": "0.1",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true
               },
               {
                 "name": "Table data restored",
@@ -158,7 +163,8 @@
                 "monthlyQuantity": null,
                 "price": "0.15",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true
               },
               {
                 "name": "Streams read request unit (sRRU)",
@@ -167,7 +173,8 @@
                 "monthlyQuantity": null,
                 "price": "0.0000002",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true
               }
             ]
           },
@@ -205,7 +212,8 @@
                 "monthlyQuantity": "730",
                 "price": "0.768",
                 "hourlyCost": "0.768",
-                "monthlyCost": "560.64"
+                "monthlyCost": "560.64",
+                "usageBased": false
               }
             ],
             "subresources": [
@@ -222,7 +230,8 @@
                     "monthlyQuantity": "51",
                     "price": "0.1",
                     "hourlyCost": "0.00698630136986301",
-                    "monthlyCost": "5.1"
+                    "monthlyCost": "5.1",
+                    "usageBased": false
                   }
                 ]
               },
@@ -239,7 +248,8 @@
                     "monthlyQuantity": "1000",
                     "price": "0.1",
                     "hourlyCost": "0.13698630136986301",
-                    "monthlyCost": "100"
+                    "monthlyCost": "100",
+                    "usageBased": false
                   }
                 ]
               }
@@ -329,7 +339,8 @@
                 "monthlyQuantity": "6",
                 "price": "0.4745",
                 "hourlyCost": "0.0039",
-                "monthlyCost": "2.847"
+                "monthlyCost": "2.847",
+                "usageBased": true
               },
               {
                 "name": "Read capacity unit (RCU)",
@@ -338,7 +349,8 @@
                 "monthlyQuantity": "30",
                 "price": "0.0949",
                 "hourlyCost": "0.0039",
-                "monthlyCost": "2.847"
+                "monthlyCost": "2.847",
+                "usageBased": false
               },
               {
                 "name": "Data storage",
@@ -347,7 +359,8 @@
                 "monthlyQuantity": null,
                 "price": "0.25",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true
               },
               {
                 "name": "Point-In-Time Recovery (PITR) backup storage",
@@ -356,7 +369,8 @@
                 "monthlyQuantity": null,
                 "price": "0.2",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true
               },
               {
                 "name": "On-demand backup storage",
@@ -365,7 +379,8 @@
                 "monthlyQuantity": null,
                 "price": "0.1",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true
               },
               {
                 "name": "Table data restored",
@@ -374,7 +389,8 @@
                 "monthlyQuantity": null,
                 "price": "0.15",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true
               },
               {
                 "name": "Streams read request unit (sRRU)",
@@ -383,7 +399,8 @@
                 "monthlyQuantity": null,
                 "price": "0.0000002",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true
               }
             ]
           },
@@ -421,7 +438,8 @@
                 "monthlyQuantity": "730",
                 "price": "0.768",
                 "hourlyCost": "0.768",
-                "monthlyCost": "560.64"
+                "monthlyCost": "560.64",
+                "usageBased": false
               }
             ],
             "subresources": [
@@ -438,7 +456,8 @@
                     "monthlyQuantity": "51",
                     "price": "0.1",
                     "hourlyCost": "0.00698630136986301",
-                    "monthlyCost": "5.1"
+                    "monthlyCost": "5.1",
+                    "usageBased": false
                   }
                 ]
               },
@@ -455,7 +474,8 @@
                     "monthlyQuantity": "1000",
                     "price": "0.1",
                     "hourlyCost": "0.13698630136986301",
-                    "monthlyCost": "100"
+                    "monthlyCost": "100",
+                    "usageBased": false
                   }
                 ]
               }

@@ -49,5 +49,6 @@ func (r *KinesisAnalyticsApplication) processingStreamCostComponent(kinesisProce
 				{Key: "usagetype", ValueRegex: strPtr("/KPU-Hour-Java/i")},
 			},
 		},
+		UsageBased: true,
 	}
 }

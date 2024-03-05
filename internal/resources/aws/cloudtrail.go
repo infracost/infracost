@@ -131,5 +131,6 @@ func (r *Cloudtrail) eventCostComponent(name string, quantity *decimal.Decimal) 
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }

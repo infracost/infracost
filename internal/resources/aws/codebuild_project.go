@@ -51,6 +51,7 @@ func (r *CodeBuildProject) BuildResource() *schema.Resource {
 						{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s:%s/", r.mapEnvironmentType(), computeType))},
 					},
 				},
+				UsageBased: true,
 			},
 		},
 		UsageSchema: CodeBuildProjectUsageSchema,

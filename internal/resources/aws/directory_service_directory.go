@@ -136,6 +136,7 @@ func (d *DirectoryServiceDirectory) BuildResource() *schema.Resource {
 					{Key: "location", Value: strPtr(d.RegionName)},
 				},
 			},
+			UsageBased: true,
 		})
 	}
 
@@ -162,6 +163,7 @@ func (d DirectoryServiceDirectory) domainControllerCostComponent(amount float64,
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }
 

@@ -117,6 +117,7 @@ func (r *MQBroker) storageCostComponent() *schema.CostComponent {
 				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", usageType))},
 			},
 		},
+		UsageBased: true,
 	}
 	return costComponent
 }

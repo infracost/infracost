@@ -49,6 +49,7 @@ func (r *ECRRepository) BuildResource() *schema.Resource {
 					Service:       strPtr("AmazonECR"),
 					ProductFamily: strPtr("EC2 Container Registry"),
 				},
+				UsageBased: true,
 			},
 		},
 		UsageSchema: ECRRepositoryUsageSchema,

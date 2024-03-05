@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 var defaultVolumeSize = int64(8)
@@ -149,6 +150,7 @@ func (a *EBSVolume) ioRequestsCostComponent() *schema.CostComponent {
 				{Key: "usagetype", ValueRegex: strPtr("/EBS:VolumeIOUsage/i")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 

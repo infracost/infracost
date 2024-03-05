@@ -59,6 +59,7 @@ func (r *CloudwatchLogGroup) BuildResource() *schema.Resource {
 						{Key: "usagetype", ValueRegex: strPtr("/-DataProcessing-Bytes/")},
 					},
 				},
+				UsageBased: true,
 			},
 			{
 				Name:            "Archival Storage",
@@ -74,6 +75,7 @@ func (r *CloudwatchLogGroup) BuildResource() *schema.Resource {
 						{Key: "usagetype", ValueRegex: strPtr("/-TimedStorage-ByteHrs/")},
 					},
 				},
+				UsageBased: true,
 			},
 			{
 				Name:            "Insights queries data scanned",
@@ -89,6 +91,7 @@ func (r *CloudwatchLogGroup) BuildResource() *schema.Resource {
 						{Key: "usagetype", ValueRegex: strPtr("/-DataScanned-Bytes/")},
 					},
 				},
+				UsageBased: true,
 			},
 		},
 		UsageSchema: CloudwatchLogGroupUsageSchema,

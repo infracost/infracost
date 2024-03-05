@@ -53,6 +53,7 @@ func (r *SecretsManagerSecret) BuildResource() *schema.Resource {
 					Service:       strPtr("AWSSecretsManager"),
 					ProductFamily: strPtr("API Request"),
 				},
+				UsageBased: true,
 			},
 		},
 		UsageSchema: SecretsManagerSecretUsageSchema,

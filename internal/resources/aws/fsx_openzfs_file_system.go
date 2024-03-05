@@ -157,5 +157,6 @@ func (r *FSxOpenZFSFileSystem) backupGBCostComponent() *schema.CostComponent {
 			ProductFamily:    strPtr("Storage"),
 			AttributeFilters: filters,
 		},
+		UsageBased: true,
 	}
 }

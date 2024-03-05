@@ -4,8 +4,9 @@ import (
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 
-	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
+
+	"github.com/infracost/infracost/internal/usage"
 
 	"strings"
 )
@@ -98,6 +99,7 @@ func (r *SFnStateMachine) transistionsCostComponent(quantity *decimal.Decimal) *
 				{Key: "usagetype", ValueRegex: strPtr("/StateTransition/")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -116,6 +118,7 @@ func (r *SFnStateMachine) requestsCostComponent(quantity *decimal.Decimal) *sche
 				{Key: "usagetype", ValueRegex: strPtr("/StepFunctions-Request/")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -136,6 +139,7 @@ func (r *SFnStateMachine) durationCostComponent(name string, startUsageAmt strin
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr(startUsageAmt),
 		},
+		UsageBased: true,
 	}
 }
 

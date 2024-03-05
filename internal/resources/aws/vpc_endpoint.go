@@ -7,8 +7,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
+
+	"github.com/infracost/infracost/internal/usage"
 )
 
 type VPCEndpoint struct {
@@ -92,6 +93,7 @@ func (r *VPCEndpoint) BuildResource() *schema.Resource {
 					{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", endpointBytes))},
 				},
 			},
+			UsageBased: true,
 		})
 	}
 
@@ -135,5 +137,6 @@ func (r *VPCEndpoint) dataProcessedCostComponent(endpointBytes string, displayNa
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr(usageTier),
 		},
+		UsageBased: true,
 	}
 }

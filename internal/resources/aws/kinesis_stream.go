@@ -139,6 +139,7 @@ func (r *KinesisStream) onDemandDataIngestedCostComponent() *schema.CostComponen
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -161,6 +162,7 @@ func (r *KinesisStream) onDemandDataRetrievalCostComponent() *schema.CostCompone
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -183,6 +185,7 @@ func (r *KinesisStream) onDemandEfoDataRetrievalCostComponent() *schema.CostComp
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -205,6 +208,7 @@ func (r *KinesisStream) onDemandExtendedRetentionCostComponent() *schema.CostCom
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -227,6 +231,7 @@ func (r *KinesisStream) onDemandLongTermRetentionCostComponent() *schema.CostCom
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -271,6 +276,7 @@ func (r *KinesisStream) provisionedStreamPutUnitsCostComponent() *schema.CostCom
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -294,6 +300,7 @@ func (r *KinesisStream) provisionedExtendedRetentionCostComponent() *schema.Cost
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -313,6 +320,7 @@ func (r *KinesisStream) provisionedLongTermRetentionCostComponent() *schema.Cost
 				{Key: "operation", Value: strPtr("LongTermRetentionByteHrs")},
 			},
 		},
+		UsageBased: true,
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
@@ -338,6 +346,7 @@ func (r *KinesisStream) provisionedLongTermRetrievalCostComponent() *schema.Cost
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -360,6 +369,7 @@ func (r *KinesisStream) provisionedEfoDataRetrievalCostComponent() *schema.CostC
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -382,5 +392,6 @@ func (r *KinesisStream) provisionedEfoConsumersCostComponent() *schema.CostCompo
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }

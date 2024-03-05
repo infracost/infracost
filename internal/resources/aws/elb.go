@@ -71,5 +71,6 @@ func (r *ELB) dataProcessedCostComponent(dataProcessed *decimal.Decimal) *schema
 				{Key: "usagetype", ValueRegex: strPtr("/DataProcessing-Bytes/")},
 			},
 		},
+		UsageBased: true,
 	}
 }

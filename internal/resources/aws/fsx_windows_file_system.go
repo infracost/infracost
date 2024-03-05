@@ -124,5 +124,6 @@ func (r *FSxWindowsFileSystem) backupGBCostComponent() *schema.CostComponent {
 				{Key: "fileSystemType", Value: strPtr("Windows")},
 			},
 		},
+		UsageBased: true,
 	}
 }

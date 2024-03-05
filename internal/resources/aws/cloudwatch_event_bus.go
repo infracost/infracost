@@ -69,6 +69,7 @@ func (r *CloudwatchEventBus) BuildResource() *schema.Resource {
 						{Key: "usagetype", ValueRegex: strPtr("/Event-64K-Chunks/")},
 					},
 				},
+				UsageBased: true,
 			},
 			{
 				Name:            "Third-party events published",
@@ -85,6 +86,7 @@ func (r *CloudwatchEventBus) BuildResource() *schema.Resource {
 						{Key: "usagetype", ValueRegex: strPtr("/Event-64K-Chunks/")},
 					},
 				},
+				UsageBased: true,
 			},
 			{
 				Name:            "Archive processing",
@@ -100,6 +102,7 @@ func (r *CloudwatchEventBus) BuildResource() *schema.Resource {
 						{Key: "usagetype", ValueRegex: strPtr("/ArchivedEvents-Bytes/")},
 					},
 				},
+				UsageBased: true,
 			},
 			{
 				Name:            "Archive storage",
@@ -115,6 +118,7 @@ func (r *CloudwatchEventBus) BuildResource() *schema.Resource {
 						{Key: "usagetype", ValueRegex: strPtr("/TimedStorage-ByteHrs/")},
 					},
 				},
+				UsageBased: true,
 			},
 			{
 				Name:            "Schema discovery",
@@ -131,6 +135,7 @@ func (r *CloudwatchEventBus) BuildResource() *schema.Resource {
 						{Key: "usagetype", ValueRegex: strPtr("/Event-8K-Chunks/")},
 					},
 				},
+				UsageBased: true,
 			},
 		},
 		UsageSchema: CloudwatchEventBusUsageSchema,

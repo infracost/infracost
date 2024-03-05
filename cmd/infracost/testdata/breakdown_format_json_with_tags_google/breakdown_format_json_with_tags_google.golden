@@ -59,7 +59,8 @@
                 "monthlyQuantity": "500",
                 "price": "0.04",
                 "hourlyCost": "0.027397260273972604",
-                "monthlyCost": "20"
+                "monthlyCost": "20",
+                "usageBased": false
               }
             ]
           },
@@ -91,7 +92,8 @@
                 "monthlyQuantity": "100",
                 "price": "0.17",
                 "hourlyCost": "0.02328767123287671",
-                "monthlyCost": "17"
+                "monthlyCost": "17",
+                "usageBased": false
               }
             ]
           },
@@ -125,7 +127,8 @@
                 "monthlyQuantity": "730",
                 "price": "0.0105",
                 "hourlyCost": "0.0105",
-                "monthlyCost": "7.665"
+                "monthlyCost": "7.665",
+                "usageBased": false
               },
               {
                 "name": "Storage (SSD, zonal)",
@@ -134,7 +137,8 @@
                 "monthlyQuantity": "10",
                 "price": "0.17",
                 "hourlyCost": "0.002328767123287671",
-                "monthlyCost": "1.7"
+                "monthlyCost": "1.7",
+                "usageBased": false
               },
               {
                 "name": "Backups",
@@ -143,7 +147,8 @@
                 "monthlyQuantity": null,
                 "price": "0.08",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": false
               },
               {
                 "name": "IP address (if unused)",
@@ -152,7 +157,8 @@
                 "monthlyQuantity": "730",
                 "price": "0.01",
                 "hourlyCost": "0.01",
-                "monthlyCost": "7.3"
+                "monthlyCost": "7.3",
+                "usageBased": false
               }
             ]
           }
@@ -215,7 +221,8 @@
                 "monthlyQuantity": "500",
                 "price": "0.04",
                 "hourlyCost": "0.027397260273972604",
-                "monthlyCost": "20"
+                "monthlyCost": "20",
+                "usageBased": false
               }
             ]
           },
@@ -247,7 +254,8 @@
                 "monthlyQuantity": "100",
                 "price": "0.17",
                 "hourlyCost": "0.02328767123287671",
-                "monthlyCost": "17"
+                "monthlyCost": "17",
+                "usageBased": false
               }
             ]
           },
@@ -281,7 +289,8 @@
                 "monthlyQuantity": "730",
                 "price": "0.0105",
                 "hourlyCost": "0.0105",
-                "monthlyCost": "7.665"
+                "monthlyCost": "7.665",
+                "usageBased": false
               },
               {
                 "name": "Storage (SSD, zonal)",
@@ -290,7 +299,8 @@
                 "monthlyQuantity": "10",
                 "price": "0.17",
                 "hourlyCost": "0.002328767123287671",
-                "monthlyCost": "1.7"
+                "monthlyCost": "1.7",
+                "usageBased": false
               },
               {
                 "name": "Backups",
@@ -299,7 +309,8 @@
                 "monthlyQuantity": null,
                 "price": "0.08",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": false
               },
               {
                 "name": "IP address (if unused)",
@@ -308,7 +319,8 @@
                 "monthlyQuantity": "730",
                 "price": "0.01",
                 "hourlyCost": "0.01",
-                "monthlyCost": "7.3"
+                "monthlyCost": "7.3",
+                "usageBased": false
               }
             ]
           }

@@ -41,6 +41,7 @@ func (r *S3BucketInventory) BuildResource() *schema.Resource {
 						{Key: "usagetype", ValueRegex: strPtr("/Inventory-ObjectsListed/")},
 					},
 				},
+				UsageBased: true,
 			},
 		},
 		UsageSchema: S3BucketInventoryUsageSchema,

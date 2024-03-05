@@ -81,6 +81,7 @@ func (r *DataTransfer) intraRegionCostComponents() []*schema.CostComponent {
 			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: decimalPtr(intraRegionGb.Mul(decimal.NewFromInt(2))),
 			ProductFilter:   r.buildProductFilter("IntraRegion", nil, "DataTransfer-Regional-Bytes"),
+			UsageBased:      true,
 		})
 	}
 
@@ -181,6 +182,7 @@ func (r *DataTransfer) buildOutboundInternetCostComponent(name string, networkUs
 		PriceFilter: &schema.PriceFilter{
 			EndUsageAmount: strPtr(endUsageAmount),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -205,6 +207,7 @@ func (r *DataTransfer) outboundUsEastCostComponents() []*schema.CostComponent {
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: decimalPtr(decimal.NewFromFloat(*r.MonthlyOutboundUsEastToUsEastGB)),
 		ProductFilter:   r.buildProductFilter("InterRegion Outbound", &toRegion, ""),
+		UsageBased:      true,
 	})
 
 	return costComponents
@@ -238,6 +241,7 @@ func (r *DataTransfer) outboundOtherRegionsCostComponents() []*schema.CostCompon
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: decimalPtr(decimal.NewFromFloat(*r.MonthlyOutboundOtherRegionsGB)),
 		ProductFilter:   r.buildProductFilter("InterRegion Outbound", &toRegion, ""),
+		UsageBased:      true,
 	})
 
 	return costComponents

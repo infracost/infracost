@@ -43,6 +43,7 @@ func (r *S3BucketAnalyticsConfiguration) BuildResource() *schema.Resource {
 						{Key: "usagetype", ValueRegex: strPtr("/StorageAnalytics-ObjCount/")},
 					},
 				},
+				UsageBased: true,
 			},
 		},
 		UsageSchema: S3BucketAnalyticsConfigurationUsageSchema,

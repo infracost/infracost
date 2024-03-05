@@ -140,5 +140,6 @@ func (r *LB) capacityUnitsCostComponent(productFamily string, maxLCU *decimal.De
 				{Key: "usagetype", ValueRegex: strPtr("/LCUUsage/")},
 			},
 		},
+		UsageBased: true,
 	}
 }

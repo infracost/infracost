@@ -4,8 +4,9 @@ import (
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 
-	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
+
+	"github.com/infracost/infracost/internal/usage"
 )
 
 type ConfigConfigRule struct {
@@ -72,5 +73,6 @@ func (r *ConfigConfigRule) configRulesCostComponent(displayName string, usageTie
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr(usageTier),
 		},
+		UsageBased: true,
 	}
 }

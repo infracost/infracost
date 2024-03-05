@@ -205,5 +205,6 @@ func (r *S3BucketLifecycleConfiguration) objectTagsCostComponent() *schema.CostC
 				{Key: "usagetype", ValueRegex: regexPtr("TagStorage-TagHrs")},
 			},
 		},
+		UsageBased: true,
 	}
 }

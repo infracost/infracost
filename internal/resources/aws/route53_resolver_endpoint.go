@@ -89,5 +89,6 @@ func (r *Route53ResolverEndpoint) queriesCostComponent(displayName string, usage
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr(usageTier),
 		},
+		UsageBased: true,
 	}
 }

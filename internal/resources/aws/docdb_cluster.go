@@ -57,5 +57,6 @@ func (r *DocDBCluster) backupStorageCostComponent(backupStorage *decimal.Decimal
 				{Key: "usagetype", ValueRegex: regexPtr("(^|-)BackupUsage$")},
 			},
 		},
+		UsageBased: true,
 	}
 }

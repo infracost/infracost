@@ -238,6 +238,7 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 				ProductFamily:    strPtr("Database Storage"),
 				AttributeFilters: storageFilters,
 			},
+			UsageBased: true,
 		},
 	}
 
@@ -256,6 +257,7 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 					{Key: "usagetype", ValueRegex: strPtr("/RDS:StorageIOUsage/i")},
 				},
 			},
+			UsageBased: true,
 		})
 	}
 
@@ -358,6 +360,7 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 				ProductFamily:    strPtr("Storage Snapshot"),
 				AttributeFilters: attrFilters,
 			},
+			UsageBased: true,
 		})
 	}
 
@@ -426,5 +429,6 @@ func performanceInsightsAPIRequestCostComponent(region string, additionalRequest
 				{Key: "usagetype", ValueRegex: regexPtr("PI_API$")},
 			},
 		},
+		UsageBased: true,
 	}
 }

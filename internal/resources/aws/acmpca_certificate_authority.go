@@ -120,5 +120,6 @@ func (r *ACMPCACertificateAuthority) certificateCostComponent(displayName string
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr(usageTier),
 		},
+		UsageBased: true,
 	}
 }

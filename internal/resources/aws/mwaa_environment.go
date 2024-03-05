@@ -3,9 +3,10 @@ package aws
 import (
 	"fmt"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 type MWAAEnvironment struct {
@@ -98,5 +99,6 @@ func (a *MWAAEnvironment) newStorageCostComponent(quantity *decimal.Decimal) *sc
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }

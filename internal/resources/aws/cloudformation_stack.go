@@ -80,6 +80,7 @@ func (r *CloudFormationStack) cloudFormationCostComponent(name, unit, usagetype 
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }
 

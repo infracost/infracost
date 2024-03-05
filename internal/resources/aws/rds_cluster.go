@@ -1,10 +1,11 @@
 package aws
 
 import (
-	"github.com/infracost/infracost/internal/resources"
-	"github.com/infracost/infracost/internal/schema"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+
+	"github.com/infracost/infracost/internal/resources"
+	"github.com/infracost/infracost/internal/schema"
 
 	"strings"
 
@@ -83,6 +84,7 @@ func (r *RDSCluster) BuildResource() *schema.Resource {
 					{Key: "databaseEngine", ValueRegex: regexPtr(databaseEngine)},
 				},
 			},
+			UsageBased: true,
 		})
 	}
 
@@ -131,6 +133,7 @@ func (r *RDSCluster) BuildResource() *schema.Resource {
 				{Key: "usagetype", ValueRegex: regexPtr("Aurora:SnapshotExportToS3$")},
 			},
 		},
+		UsageBased: true,
 	})
 
 	return &schema.Resource{
@@ -168,6 +171,7 @@ func (r *RDSCluster) auroraStorageCostComponents(databaseEngineStorageType strin
 					{Key: "usagetype", ValueRegex: regexPtr("Aurora:StorageUsage$")},
 				},
 			},
+			UsageBased: true,
 		},
 		{
 			Name:            "I/O requests",
@@ -184,6 +188,7 @@ func (r *RDSCluster) auroraStorageCostComponents(databaseEngineStorageType strin
 					{Key: "usagetype", ValueRegex: regexPtr("Aurora:StorageIOUsage$")},
 				},
 			},
+			UsageBased: true,
 		},
 	}
 }
@@ -204,6 +209,7 @@ func (r *RDSCluster) auroraBackupStorageCostComponent(totalBackupStorageGB *deci
 				{Key: "usagetype", ValueRegex: regexPtr("Aurora:BackupUsage$")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -222,6 +228,7 @@ func (r *RDSCluster) auroraBacktrackCostComponent(backtrackChangeRecords *decima
 				{Key: "usagetype", ValueRegex: regexPtr("Aurora:BacktrackUsage$")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 

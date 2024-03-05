@@ -243,6 +243,7 @@ func (r *GlobalacceleratorEndpointGroup) buildRegionSubresource(regionData *glob
 						{Key: "usagetype", Value: strPtr(usageType)},
 					},
 				},
+				UsageBased: true,
 			},
 		},
 	}

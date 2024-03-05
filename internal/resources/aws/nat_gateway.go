@@ -1,9 +1,10 @@
 package aws
 
 import (
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 type NATGateway struct {
@@ -60,6 +61,7 @@ func (a *NATGateway) BuildResource() *schema.Resource {
 						{Key: "usagetype", ValueRegex: strPtr("/NatGateway-Bytes/")},
 					},
 				},
+				UsageBased: true,
 			},
 		},
 	}

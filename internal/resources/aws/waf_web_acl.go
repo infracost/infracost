@@ -104,6 +104,7 @@ func (r *WAFWebACL) ruleGroupsCostComponent(ruleGroups int64) *schema.CostCompon
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -130,5 +131,6 @@ func (r *WAFWebACL) requestsCostComponent() *schema.CostComponent {
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }

@@ -78,7 +78,8 @@
                     "monthlyQuantity": "730",
                     "price": "0.0416",
                     "hourlyCost": "0.0416",
-                    "monthlyCost": "30.368"
+                    "monthlyCost": "30.368",
+                    "usageBased": false
                   },
                   {
                     "name": "EC2 detailed monitoring",
@@ -87,7 +88,8 @@
                     "monthlyQuantity": "7",
                     "price": "0.3",
                     "hourlyCost": "0.00287671232876712",
-                    "monthlyCost": "2.1"
+                    "monthlyCost": "2.1",
+                    "usageBased": false
                   },
                   {
                     "name": "CPU credits",
@@ -96,7 +98,8 @@
                     "monthlyQuantity": "0",
                     "price": "0.05",
                     "hourlyCost": "0",
-                    "monthlyCost": "0"
+                    "monthlyCost": "0",
+                    "usageBased": false
                   }
                 ],
                 "subresources": [
@@ -113,7 +116,8 @@
                         "monthlyQuantity": "8",
                         "price": "0.1",
                         "hourlyCost": "0.0010958904109589",
-                        "monthlyCost": "0.8"
+                        "monthlyCost": "0.8",
+                        "usageBased": false
                       }
                     ]
                   }
@@ -156,7 +160,8 @@
                 "monthlyQuantity": null,
                 "price": "0.2",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true
               },
               {
                 "name": "Ephemeral storage",
@@ -165,7 +170,8 @@
                 "monthlyQuantity": null,
                 "price": "0.0000000309",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": false
               },
               {
                 "name": "Duration (first 6B)",
@@ -174,7 +180,8 @@
                 "monthlyQuantity": null,
                 "price": "0.0000166667",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true
               }
             ]
           }
@@ -225,7 +232,8 @@
                     "monthlyQuantity": "730",
                     "price": "0.0416",
                     "hourlyCost": "0.0416",
-                    "monthlyCost": "30.368"
+                    "monthlyCost": "30.368",
+                    "usageBased": false
                   },
                   {
                     "name": "EC2 detailed monitoring",
@@ -234,7 +242,8 @@
                     "monthlyQuantity": "7",
                     "price": "0.3",
                     "hourlyCost": "0.00287671232876712",
-                    "monthlyCost": "2.1"
+                    "monthlyCost": "2.1",
+                    "usageBased": false
                   },
                   {
                     "name": "CPU credits",
@@ -243,7 +252,8 @@
                     "monthlyQuantity": "0",
                     "price": "0.05",
                     "hourlyCost": "0",
-                    "monthlyCost": "0"
+                    "monthlyCost": "0",
+                    "usageBased": false
                   }
                 ],
                 "subresources": [
@@ -260,7 +270,8 @@
                         "monthlyQuantity": "8",
                         "price": "0.1",
                         "hourlyCost": "0.0010958904109589",
-                        "monthlyCost": "0.8"
+                        "monthlyCost": "0.8",
+                        "usageBased": false
                       }
                     ]
                   }
@@ -303,7 +314,8 @@
                 "monthlyQuantity": null,
                 "price": "0.2",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true
               },
               {
                 "name": "Ephemeral storage",
@@ -312,7 +324,8 @@
                 "monthlyQuantity": null,
                 "price": "0.0000000309",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": false
               },
               {
                 "name": "Duration (first 6B)",
@@ -321,7 +334,8 @@
                 "monthlyQuantity": null,
                 "price": "0.0000166667",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true
               }
             ]
           }

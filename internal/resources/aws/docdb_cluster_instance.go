@@ -81,6 +81,7 @@ func (r *DocDBClusterInstance) BuildResource() *schema.Resource {
 			PriceFilter: &schema.PriceFilter{
 				PurchaseOption: strPtr("on_demand"),
 			},
+			UsageBased: true,
 		},
 		{
 			Name:            "I/O requests",
@@ -96,6 +97,7 @@ func (r *DocDBClusterInstance) BuildResource() *schema.Resource {
 					{Key: "usagetype", ValueRegex: regexPtr("(^|-)StorageIOUsage$")},
 				},
 			},
+			UsageBased: true,
 		},
 	}
 
@@ -114,6 +116,7 @@ func (r *DocDBClusterInstance) BuildResource() *schema.Resource {
 					{Key: "usagetype", ValueRegex: regexPtr("CPUCredits:" + instanceFamily + "$")},
 				},
 			},
+			UsageBased: true,
 		})
 	}
 

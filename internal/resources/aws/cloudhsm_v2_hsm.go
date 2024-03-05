@@ -1,9 +1,10 @@
 package aws
 
 import (
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 // CloudHSMv2HSM struct represents an HSM module in a CloudHSM cluster.
@@ -82,5 +83,6 @@ func (r *CloudHSMv2HSM) hsmCostComponent() *schema.CostComponent {
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }

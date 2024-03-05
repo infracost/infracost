@@ -1,9 +1,10 @@
 package aws
 
 import (
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 // LambdaProvisionedConcurrencyConfig initializes a requested number of execution environments so that
@@ -93,6 +94,7 @@ func (r *LambdaProvisionedConcurrencyConfig) BuildResource() *schema.Resource {
 					{Key: "usagetype", ValueRegex: strPtr("/Request/")},
 				},
 			},
+			UsageBased: true,
 		},
 		{
 			Name:            "Provisioned Concurrency",
@@ -108,6 +110,7 @@ func (r *LambdaProvisionedConcurrencyConfig) BuildResource() *schema.Resource {
 					{Key: "group", Value: strPtr(concurrencyType)},
 				},
 			},
+			UsageBased: true,
 		},
 		{
 			Name:            "Duration",
@@ -123,6 +126,7 @@ func (r *LambdaProvisionedConcurrencyConfig) BuildResource() *schema.Resource {
 					{Key: "group", Value: strPtr(durationType)},
 				},
 			},
+			UsageBased: true,
 		},
 	}
 

@@ -63,6 +63,7 @@ func (r *SQSQueue) BuildResource() *schema.Resource {
 				PriceFilter: &schema.PriceFilter{
 					StartUsageAmount: strPtr("0"),
 				},
+				UsageBased: true,
 			},
 		},
 		UsageSchema: SQSQueueUsageSchema,

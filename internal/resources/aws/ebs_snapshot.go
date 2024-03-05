@@ -68,6 +68,7 @@ func (r *EBSSnapshot) BuildResource() *schema.Resource {
 					{Key: "usagetype", ValueRegex: strPtr("/EBS:FastSnapshotRestore$/")},
 				},
 			},
+			UsageBased: true,
 		},
 		{
 			Name:            "ListChangedBlocks & ListSnapshotBlocks API requests",
@@ -83,6 +84,7 @@ func (r *EBSSnapshot) BuildResource() *schema.Resource {
 					{Key: "usagetype", ValueRegex: strPtr("/EBS:directAPI.snapshot.List$/")},
 				},
 			},
+			UsageBased: true,
 		},
 		{
 			Name:            "GetSnapshotBlock API requests",
@@ -98,6 +100,7 @@ func (r *EBSSnapshot) BuildResource() *schema.Resource {
 					{Key: "usagetype", ValueRegex: strPtr("/EBS:directAPI.snapshot.Get$/")},
 				},
 			},
+			UsageBased: true,
 		},
 		{
 			Name:            "PutSnapshotBlock API requests",
@@ -113,6 +116,7 @@ func (r *EBSSnapshot) BuildResource() *schema.Resource {
 					{Key: "usagetype", ValueRegex: strPtr("/EBS:directAPI.snapshot.Put$/")},
 				},
 			},
+			UsageBased: true,
 		}}
 
 	return &schema.Resource{
@@ -136,5 +140,6 @@ func ebsSnapshotCostComponent(region string, gbVal decimal.Decimal) *schema.Cost
 				{Key: "usagetype", ValueRegex: strPtr("/EBS:SnapshotUsage$/")},
 			},
 		},
+		UsageBased: true,
 	}
 }

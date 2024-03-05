@@ -216,5 +216,6 @@ func (a *S3Bucket) objectTagsCostComponent() *schema.CostComponent {
 				{Key: "usagetype", ValueRegex: strPtr("/TagStorage-TagHrs/")},
 			},
 		},
+		UsageBased: true,
 	}
 }

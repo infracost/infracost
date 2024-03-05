@@ -1,9 +1,10 @@
 package aws
 
 import (
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 // NetworkfirewallFirewall struct represents an AWS Network Firewall Firewall resource.
@@ -77,5 +78,6 @@ func (r *NetworkfirewallFirewall) dataProcessedCostComponent() *schema.CostCompo
 				{Key: "usagetype", ValueRegex: regexPtr("^[A-Z0-9]*-Traffic-GB-Processed$")},
 			},
 		},
+		UsageBased: true,
 	}
 }

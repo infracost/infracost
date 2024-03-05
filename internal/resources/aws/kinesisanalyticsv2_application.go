@@ -96,6 +96,7 @@ func (r *KinesisAnalyticsV2Application) runningStorageCostComponent(kinesisProce
 				{Key: "usagetype", ValueRegex: strPtr("/RunningApplicationStorage$/i")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -114,5 +115,6 @@ func (r *KinesisAnalyticsV2Application) backupCostComponent(durableApplicationBa
 				{Key: "usagetype", ValueRegex: strPtr("/DurableApplicationBackups/i")},
 			},
 		},
+		UsageBased: true,
 	}
 }

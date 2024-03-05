@@ -78,6 +78,7 @@ func (r *GlueCatalogDatabase) storageObjectsCostComponent() *schema.CostComponen
 				{Key: "group", ValueRegex: strPtr("/^data catalog storage$/i")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -108,5 +109,6 @@ func (r *GlueCatalogDatabase) requestsCostComponent() *schema.CostComponent {
 				{Key: "group", ValueRegex: strPtr("/^data catalog requests$/i")},
 			},
 		},
+		UsageBased: true,
 	}
 }

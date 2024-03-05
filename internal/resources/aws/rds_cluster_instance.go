@@ -152,5 +152,6 @@ func (r *RDSClusterInstance) cpuCreditsCostComponent(databaseEngine, instanceFam
 				{Key: "usagetype", ValueRegex: regexPtr("CPUCredits:" + instanceFamily + "$")},
 			},
 		},
+		UsageBased: true,
 	}
 }

@@ -115,6 +115,7 @@ func (r *EFSFileSystem) storageCostComponent(name, usagetype string, storageGB *
 				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", usagetype))},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -133,6 +134,7 @@ func (r *EFSFileSystem) provisionedThroughputCostComponent(provisionedThroughput
 				{Key: "usagetype", ValueRegex: strPtr("/ProvisionedTP-MiBpsHrs/")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -152,5 +154,6 @@ func (r *EFSFileSystem) requestsCostComponent(name, accessType string, requestsG
 				{Key: "storageClass", Value: strPtr("Infrequent Access")},
 			},
 		},
+		UsageBased: true,
 	}
 }

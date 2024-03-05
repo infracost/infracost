@@ -6,8 +6,9 @@ import (
 
 	"fmt"
 
-	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
+
+	"github.com/infracost/infracost/internal/usage"
 )
 
 type KinesisFirehoseDeliveryStream struct {
@@ -83,6 +84,7 @@ func (r *KinesisFirehoseDeliveryStream) dataIngestedCostComponent(tier, startUsa
 			StartUsageAmount: strPtr(startUsageAmount),
 			EndUsageAmount:   strPtr(endUsageAmount),
 		},
+		UsageBased: true,
 	}
 }
 
