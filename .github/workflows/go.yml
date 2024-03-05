@@ -35,7 +35,7 @@ jobs:
           terragrunt --version
 
       - name: Test invalid api key
-        run: make ARGS="-run TestBreakdownInvalidAPIKey -update" test
+        run: make ARGS="-run TestBreakdownInvalidAPIKey" test
         env:
           INFRACOST_API_KEY: "00000000000000000000000000000000"
           INFRACOST_LOG_LEVEL: info

@@ -944,12 +944,13 @@ func checkAPIKeyIsValid(ctx *config.RunContext, next runCommandFunc) runCommandF
 		}
 
 		pricingClient := apiclient.GetPricingAPIClient(ctx)
-		_, err := pricingClient.DoQueries([]apiclient.GraphQLQuery{
-			{
-				Query:     `query { apiKey {} }`,
-				Variables: nil,
-			},
+		resp, err := pricingClient.DoQueries([]apiclient.GraphQLQuery{
+			{},
 		})
+		if len(resp) > 0 {
+			cmd.Println(resp[0])
+		}
+		cmd.Println(err)
 		var apiError *apiclient.APIError
 		if errors.As(err, &apiError) {
 			if apiError.ErrorCode == apiclient.ErrorCodeAPIKeyInvalid {
