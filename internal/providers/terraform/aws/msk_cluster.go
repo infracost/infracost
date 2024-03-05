@@ -15,7 +15,7 @@ func getMSKClusterRegistryItem() *schema.RegistryItem {
 func NewMSKCluster(d *schema.ResourceData) schema.CoreResource {
 	targets := []*aws.AppAutoscalingTarget{}
 	for _, ref := range d.References("aws_appautoscaling_target.resource_id") {
-		targets = append(targets, newAppAutoscalingTarget(ref))
+		targets = append(targets, newAppAutoscalingTarget(ref, ref.UsageData))
 	}
 
 	var brokerEBSVolumeSize int64

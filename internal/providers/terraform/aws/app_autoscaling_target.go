@@ -16,11 +16,12 @@ func getAppAutoscalingTargetRegistryItem() *schema.RegistryItem {
 }
 
 func NewAppAutoscalingTargetResource(d *schema.ResourceData) schema.CoreResource {
-	return newAppAutoscalingTarget(d)
+	return newAppAutoscalingTarget(d, nil)
+
 }
 
-func newAppAutoscalingTarget(d *schema.ResourceData) *aws.AppAutoscalingTarget {
-	return &aws.AppAutoscalingTarget{
+func newAppAutoscalingTarget(d *schema.ResourceData, u *schema.UsageData) *aws.AppAutoscalingTarget {
+	r := &aws.AppAutoscalingTarget{
 		Address:           d.Address,
 		Region:            d.Get("region").String(),
 		ResourceID:        d.Get("resource_id").String(),
@@ -28,4 +29,8 @@ func newAppAutoscalingTarget(d *schema.ResourceData) *aws.AppAutoscalingTarget {
 		MinCapacity:       d.Get("min_capacity").Int(),
 		MaxCapacity:       d.Get("max_capacity").Int(),
 	}
+
+	r.PopulateUsage(u)
+
+	return r
 }
