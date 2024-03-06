@@ -148,7 +148,7 @@
                 "price": "0.08",
                 "hourlyCost": null,
                 "monthlyCost": null,
-                "usageBased": false
+                "usageBased": true
               },
               {
                 "name": "IP address (if unused)",
@@ -310,7 +310,7 @@
                 "price": "0.08",
                 "hourlyCost": null,
                 "monthlyCost": null,
-                "usageBased": false
+                "usageBased": true
               },
               {
                 "name": "IP address (if unused)",
