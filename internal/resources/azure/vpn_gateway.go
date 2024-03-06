@@ -34,9 +34,15 @@ type VPNGateway struct {
 	MonthlyP2SConnectionHrs *float64 `infracost_usage:"monthly_p2s_connections_hrs"`
 }
 
-// P2SVPNGatewayUsageSchema defines a list which represents the usage schema of VPNGateway if of type P2S.
-var P2SVPNGatewayUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_p2s_connections_hrs", DefaultValue: 0, ValueType: schema.Float64},
+func (v *VPNGateway) CoreType() string {
+	return "VPNGateway"
+}
+
+// UsageSchema defines a list which represents the usage schema of VPNGateway if of type P2S.
+func (v *VPNGateway) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_p2s_connections_hrs", DefaultValue: 0, ValueType: schema.Float64},
+	}
 }
 
 // PopulateUsage parses the u schema.UsageData into the VPNGateway.
@@ -76,7 +82,7 @@ func (v *VPNGateway) buildP2SResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           v.Address,
 		CostComponents: costComponents,
-		UsageSchema:    P2SVPNGatewayUsageSchema,
+		UsageSchema:    v.UsageSchema(),
 	}
 }
 
@@ -124,6 +130,7 @@ func (v *VPNGateway) connectionUnitComponent() *schema.CostComponent {
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
+		UsageBased: true,
 	}
 
 }

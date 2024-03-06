@@ -88,6 +88,7 @@ func (a *LambdaFunction) BuildResource() *schema.Resource {
 				{Key: "usagetype", ValueRegex: strPtr("/Request/")},
 			},
 		},
+		UsageBased: true,
 	},
 	)
 
@@ -175,6 +176,7 @@ func (a *LambdaFunction) durationCostComponent(displayName string, usageTier str
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr(usageTier),
 		},
+		UsageBased: true,
 	}
 }
 

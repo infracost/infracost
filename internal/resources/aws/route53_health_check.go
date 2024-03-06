@@ -18,8 +18,14 @@ type Route53HealthCheck struct {
 	EndpointType    *string `infracost_usage:"endpoint_type"`
 }
 
-var Route53HealthCheckUsageSchema = []*schema.UsageItem{
-	{Key: "endpoint_type", ValueType: schema.String, DefaultValue: "aws"},
+func (r *Route53HealthCheck) CoreType() string {
+	return "Route53HealthCheck"
+}
+
+func (r *Route53HealthCheck) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "endpoint_type", ValueType: schema.String, DefaultValue: "aws"},
+	}
 }
 
 func (r *Route53HealthCheck) PopulateUsage(u *schema.UsageData) {
@@ -98,6 +104,6 @@ func (r *Route53HealthCheck) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		UsageSchema:    Route53HealthCheckUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }

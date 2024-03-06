@@ -15,9 +15,15 @@ type SQSQueue struct {
 	RequestSizeKB   *int64   `infracost_usage:"request_size_kb"`
 }
 
-var SQSQueueUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_requests", ValueType: schema.Float64, DefaultValue: 0},
-	{Key: "request_size_kb", ValueType: schema.Int64, DefaultValue: 0},
+func (r *SQSQueue) CoreType() string {
+	return "SQSQueue"
+}
+
+func (r *SQSQueue) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_requests", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "request_size_kb", ValueType: schema.Int64, DefaultValue: 0},
+	}
 }
 
 func (r *SQSQueue) PopulateUsage(u *schema.UsageData) {
@@ -63,9 +69,10 @@ func (r *SQSQueue) BuildResource() *schema.Resource {
 				PriceFilter: &schema.PriceFilter{
 					StartUsageAmount: strPtr("0"),
 				},
+				UsageBased: true,
 			},
 		},
-		UsageSchema: SQSQueueUsageSchema,
+		UsageSchema: r.UsageSchema(),
 	}
 }
 

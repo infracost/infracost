@@ -7,18 +7,16 @@ import (
 
 func getSQSQueueRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_sqs_queue",
-		RFunc: NewSQSQueue,
+		Name:      "aws_sqs_queue",
+		CoreRFunc: NewSQSQueue,
 	}
 }
 
-func NewSQSQueue(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewSQSQueue(d *schema.ResourceData) schema.CoreResource {
 	r := &aws.SQSQueue{
 		Address:   d.Address,
 		Region:    d.Get("region").String(),
 		FifoQueue: d.Get("fifo_queue").Bool(),
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

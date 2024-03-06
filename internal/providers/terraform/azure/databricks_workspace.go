@@ -7,12 +7,11 @@ import (
 
 func getDatabricksWorkspaceRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_databricks_workspace",
-		RFunc: NewDatabricksWorkspace,
+		Name:      "azurerm_databricks_workspace",
+		CoreRFunc: NewDatabricksWorkspace,
 	}
 }
-func NewDatabricksWorkspace(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewDatabricksWorkspace(d *schema.ResourceData) schema.CoreResource {
 	r := &azure.DatabricksWorkspace{Address: d.Address, Region: lookupRegion(d, []string{}), SKU: d.Get("sku").String()}
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

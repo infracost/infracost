@@ -7,16 +7,14 @@ import (
 
 func getConfigOrganizationCustomRuleItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_config_organization_custom_rule",
-		RFunc: NewConfigOrganizationCustomRule,
+		Name:      "aws_config_organization_custom_rule",
+		CoreRFunc: NewConfigOrganizationCustomRule,
 	}
 }
-func NewConfigOrganizationCustomRule(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewConfigOrganizationCustomRule(d *schema.ResourceData) schema.CoreResource {
 	r := &aws.ConfigConfigRule{
 		Address: d.Address,
 		Region:  d.Get("region").String(),
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

@@ -4,8 +4,9 @@ import (
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 
-	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
+
+	"github.com/infracost/infracost/internal/usage"
 
 	"strings"
 )
@@ -20,11 +21,17 @@ type SFnStateMachine struct {
 	MonthlyTransitions *int64 `infracost_usage:"monthly_transitions"`
 }
 
-var SFnStateMachineUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "workflow_duration_ms", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "memory_mb", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "monthly_transitions", ValueType: schema.Int64, DefaultValue: 0},
+func (r *SFnStateMachine) CoreType() string {
+	return "SFnStateMachine"
+}
+
+func (r *SFnStateMachine) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "workflow_duration_ms", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "memory_mb", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_transitions", ValueType: schema.Int64, DefaultValue: 0},
+	}
 }
 
 func (r *SFnStateMachine) PopulateUsage(u *schema.UsageData) {
@@ -79,7 +86,7 @@ func (r *SFnStateMachine) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		UsageSchema:    SFnStateMachineUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 
@@ -98,6 +105,7 @@ func (r *SFnStateMachine) transistionsCostComponent(quantity *decimal.Decimal) *
 				{Key: "usagetype", ValueRegex: strPtr("/StateTransition/")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -116,6 +124,7 @@ func (r *SFnStateMachine) requestsCostComponent(quantity *decimal.Decimal) *sche
 				{Key: "usagetype", ValueRegex: strPtr("/StepFunctions-Request/")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -136,6 +145,7 @@ func (r *SFnStateMachine) durationCostComponent(name string, startUsageAmt strin
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr(startUsageAmt),
 		},
+		UsageBased: true,
 	}
 }
 

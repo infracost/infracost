@@ -298,6 +298,7 @@ func (r *LogAnalyticsWorkspace) logDataIngestion(name string, monthlyData *float
 			PurchaseOption:   strPtr("Consumption"),
 			StartUsageAmount: strPtr("5"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -323,6 +324,7 @@ func (r *LogAnalyticsWorkspace) logDataRetention() *schema.CostComponent {
 			},
 		},
 		PriceFilter: priceFilterConsumption,
+		UsageBased:  true,
 	}
 }
 
@@ -348,6 +350,7 @@ func (r *LogAnalyticsWorkspace) logDataExport() *schema.CostComponent {
 			},
 		},
 		PriceFilter: priceFilterConsumption,
+		UsageBased:  true,
 	}
 }
 
@@ -372,6 +375,7 @@ func (r *LogAnalyticsWorkspace) basicLogIngestion() *schema.CostComponent {
 				{Key: "meterName", Value: strPtr("Basic Logs Data Ingestion")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -396,6 +400,7 @@ func (r *LogAnalyticsWorkspace) basicLogSearch() *schema.CostComponent {
 				{Key: "meterName", Value: strPtr("Search Queries Scanned")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -420,6 +425,7 @@ func (r *LogAnalyticsWorkspace) archiveData() *schema.CostComponent {
 				{Key: "meterName", Value: strPtr("Data Archive")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -444,6 +450,7 @@ func (r *LogAnalyticsWorkspace) archiveDataRestore() *schema.CostComponent {
 				{Key: "meterName", Value: strPtr("Data Restore")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -468,5 +475,6 @@ func (r *LogAnalyticsWorkspace) archiveDataSearch() *schema.CostComponent {
 				{Key: "meterName", Value: strPtr("Search Jobs Scanned")},
 			},
 		},
+		UsageBased: true,
 	}
 }

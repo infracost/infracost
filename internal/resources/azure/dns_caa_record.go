@@ -11,7 +11,13 @@ type DNSCAARecord struct {
 	MonthlyQueries *int64 `infracost_usage:"monthly_queries"`
 }
 
-var DNSCAARecordUsageSchema = []*schema.UsageItem{{Key: "monthly_queries", ValueType: schema.Int64, DefaultValue: 0}}
+func (r *DNSCAARecord) CoreType() string {
+	return "DNSCAARecord"
+}
+
+func (r *DNSCAARecord) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{{Key: "monthly_queries", ValueType: schema.Int64, DefaultValue: 0}}
+}
 
 func (r *DNSCAARecord) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -20,6 +26,7 @@ func (r *DNSCAARecord) PopulateUsage(u *schema.UsageData) {
 func (r *DNSCAARecord) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: dnsQueriesCostComponent(r.Region, r.MonthlyQueries), UsageSchema: DNSCAARecordUsageSchema,
+		CostComponents: dnsQueriesCostComponent(r.Region, r.MonthlyQueries),
+		UsageSchema:    r.UsageSchema(),
 	}
 }

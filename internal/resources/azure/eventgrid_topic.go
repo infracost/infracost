@@ -97,6 +97,7 @@ func (r *EventGridTopic) BuildResource() *schema.Resource {
 				PurchaseOption:   strPtr("Consumption"),
 				StartUsageAmount: strPtr("1"),
 			},
+			UsageBased: true,
 		},
 	}
 

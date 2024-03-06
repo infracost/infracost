@@ -1,15 +1,15 @@
 package aws
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 
-	"fmt"
-
-	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
 
-	"strings"
+	"github.com/infracost/infracost/internal/usage"
 )
 
 type RedshiftCluster struct {
@@ -23,11 +23,17 @@ type RedshiftCluster struct {
 	BackupStorageGB              *float64 `infracost_usage:"backup_storage_gb"`
 }
 
-var RedshiftClusterUsageSchema = []*schema.UsageItem{
-	{Key: "managed_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
-	{Key: "excess_concurrency_scaling_secs", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "spectrum_data_scanned_tb", ValueType: schema.Float64, DefaultValue: 0.0},
-	{Key: "backup_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+func (r *RedshiftCluster) CoreType() string {
+	return "RedshiftCluster"
+}
+
+func (r *RedshiftCluster) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "managed_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "excess_concurrency_scaling_secs", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "spectrum_data_scanned_tb", ValueType: schema.Float64, DefaultValue: 0.0},
+		{Key: "backup_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+	}
 }
 
 func (r *RedshiftCluster) PopulateUsage(u *schema.UsageData) {
@@ -107,7 +113,8 @@ func (r *RedshiftCluster) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: RedshiftClusterUsageSchema,
+		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 
@@ -127,6 +134,7 @@ func (r *RedshiftCluster) concurrencyScalingCostComponent(numberOfNodes int64, c
 				{Key: "concurrencyscalingfreeusage", Value: strPtr("No")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -142,6 +150,7 @@ func (r *RedshiftCluster) spectrumCostComponent(tbScanned *decimal.Decimal) *sch
 			Service:       strPtr("AmazonRedshift"),
 			ProductFamily: strPtr("Redshift Data Scan"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -160,6 +169,7 @@ func (r *RedshiftCluster) storageSnapshotCostComponent(displayName string, start
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr(startUsageAmount),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -178,5 +188,6 @@ func (r *RedshiftCluster) managedStorageCostComponent(managedStorage *decimal.De
 				{Key: "instanceType", ValueRegex: strPtr(fmt.Sprintf("/%s/i", r.NodeType))},
 			},
 		},
+		UsageBased: true,
 	}
 }

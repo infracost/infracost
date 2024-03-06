@@ -3,9 +3,10 @@ package azure
 import (
 	"fmt"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 // DataFactoryIntegrationRuntimeAzure struct represents Azure Data Factory's
@@ -24,9 +25,14 @@ type DataFactoryIntegrationRuntimeAzure struct {
 	MonthlyOrchestrationRuns *int64 `infracost_usage:"monthly_orchestration_runs"`
 }
 
-// DataFactoryIntegrationRuntimeAzureUsageSchema defines a list which represents the usage schema of DataFactoryIntegrationRuntimeAzure.
-var DataFactoryIntegrationRuntimeAzureUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_orchestration_runs", DefaultValue: 0, ValueType: schema.Int64},
+func (r *DataFactoryIntegrationRuntimeAzure) CoreType() string {
+	return "DataFactoryIntegrationRuntimeAzure"
+}
+
+func (r *DataFactoryIntegrationRuntimeAzure) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_orchestration_runs", DefaultValue: 0, ValueType: schema.Int64},
+	}
 }
 
 // PopulateUsage parses the u schema.UsageData into the DataFactoryIntegrationRuntimeAzure.
@@ -51,7 +57,7 @@ func (r *DataFactoryIntegrationRuntimeAzure) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    DataFactoryIntegrationRuntimeAzureUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }
@@ -116,6 +122,7 @@ func dataFactoryOrchestrationCostComponent(region string, filter string, runs *i
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
+		UsageBased: true,
 	}
 }
 

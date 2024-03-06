@@ -7,15 +7,15 @@ import (
 
 func getLinuxVirtualMachineRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_linux_virtual_machine",
-		RFunc: NewAzureLinuxVirtualMachine,
+		Name:      "azurerm_linux_virtual_machine",
+		CoreRFunc: NewAzureLinuxVirtualMachine,
 		Notes: []string{
 			"Non-standard images such as RHEL are not supported.",
 			"Low priority, Spot and Reserved instances are not supported.",
 		},
 	}
 }
-func NewAzureLinuxVirtualMachine(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAzureLinuxVirtualMachine(d *schema.ResourceData) schema.CoreResource {
 	r := &azure.LinuxVirtualMachine{
 		Address:         d.Address,
 		Region:          lookupRegion(d, []string{}),
@@ -31,6 +31,5 @@ func NewAzureLinuxVirtualMachine(d *schema.ResourceData, u *schema.UsageData) *s
 		}
 	}
 
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

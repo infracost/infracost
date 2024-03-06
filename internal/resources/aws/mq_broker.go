@@ -20,7 +20,13 @@ type MQBroker struct {
 	StorageSizeGb    *float64 `infracost_usage:"storage_size_gb"`
 }
 
-var MQBrokerUsageSchema = []*schema.UsageItem{{Key: "storage_size_gb", ValueType: schema.Float64, DefaultValue: 0}}
+func (r *MQBroker) CoreType() string {
+	return "MQBroker"
+}
+
+func (r *MQBroker) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{{Key: "storage_size_gb", ValueType: schema.Float64, DefaultValue: 0}}
+}
 
 func (r *MQBroker) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -33,7 +39,7 @@ func (r *MQBroker) BuildResource() *schema.Resource {
 			r.instanceUsageCostComponent(),
 			r.storageCostComponent(),
 		},
-		UsageSchema: MQBrokerUsageSchema,
+		UsageSchema: r.UsageSchema(),
 	}
 }
 
@@ -117,6 +123,7 @@ func (r *MQBroker) storageCostComponent() *schema.CostComponent {
 				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", usageType))},
 			},
 		},
+		UsageBased: true,
 	}
 	return costComponent
 }

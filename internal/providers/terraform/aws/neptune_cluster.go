@@ -7,18 +7,16 @@ import (
 
 func getNeptuneClusterRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_neptune_cluster",
-		RFunc: NewNeptuneCluster,
+		Name:      "aws_neptune_cluster",
+		CoreRFunc: NewNeptuneCluster,
 	}
 }
 
-func NewNeptuneCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewNeptuneCluster(d *schema.ResourceData) schema.CoreResource {
 	r := &aws.NeptuneCluster{
 		Address:               d.Address,
 		Region:                d.Get("region").String(),
 		BackupRetentionPeriod: d.Get("backup_retention_period").Int(),
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

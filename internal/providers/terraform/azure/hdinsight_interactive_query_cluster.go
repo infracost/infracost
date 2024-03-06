@@ -1,8 +1,9 @@
 package azure
 
 import (
-	"github.com/infracost/infracost/internal/schema"
 	"github.com/tidwall/gjson"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 func GetAzureRMHDInsightInteractiveQueryClusterRegistryItem() *schema.RegistryItem {

@@ -7,11 +7,11 @@ import (
 
 func getAppServicePlanRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_app_service_plan",
-		RFunc: NewAppServicePlan,
+		Name:      "azurerm_app_service_plan",
+		CoreRFunc: NewAppServicePlan,
 	}
 }
-func NewAppServicePlan(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAppServicePlan(d *schema.ResourceData) schema.CoreResource {
 	r := &azure.AppServicePlan{
 		Address:     d.Address,
 		Region:      lookupRegion(d, []string{}),
@@ -19,6 +19,5 @@ func NewAppServicePlan(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 		SKUCapacity: d.Get("sku.0.capacity").Int(),
 		Kind:        d.Get("kind").String(),
 	}
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

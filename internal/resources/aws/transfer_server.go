@@ -28,9 +28,15 @@ type TransferServer struct {
 }
 
 // TransferServerUsageSchema defines a list of usage items for TransferServer.
-var TransferServerUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_data_downloaded_gb", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "monthly_data_uploaded_gb", DefaultValue: 0, ValueType: schema.Float64},
+func (r *TransferServer) CoreType() string {
+	return "TransferServer"
+}
+
+func (r *TransferServer) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_data_downloaded_gb", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "monthly_data_uploaded_gb", DefaultValue: 0, ValueType: schema.Float64},
+	}
 }
 
 // PopulateUsage parses the u schema.UsageData into the TransferServer.
@@ -53,7 +59,7 @@ func (r *TransferServer) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    TransferServerUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }
@@ -84,6 +90,7 @@ func (r *TransferServer) dataDownloadedCostComponent() *schema.CostComponent {
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -100,6 +107,7 @@ func (r *TransferServer) dataUploadedCostComponent() *schema.CostComponent {
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }
 

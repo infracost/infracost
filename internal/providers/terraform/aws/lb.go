@@ -11,18 +11,18 @@ func getLBRegistryItem() *schema.RegistryItem {
 		ReferenceAttributes: []string{
 			"subnet_mapping.#.allocation_id",
 		},
-		RFunc: NewLB,
+		CoreRFunc: NewLB,
 	}
 }
 
 func getALBRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_alb",
-		RFunc: NewLB,
+		Name:      "aws_alb",
+		CoreRFunc: NewLB,
 	}
 }
 
-func NewLB(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewLB(d *schema.ResourceData) schema.CoreResource {
 	loadBalancerType := d.Get("load_balancer_type").String()
 	if loadBalancerType == "" {
 		// set the default load balancer type as given https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/lb
@@ -35,7 +35,5 @@ func NewLB(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 		Region:           d.Get("region").String(),
 		LoadBalancerType: loadBalancerType,
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

@@ -7,20 +7,19 @@ import (
 
 func getLoadBalancerRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_lb",
-		RFunc: NewLB,
+		Name:      "azurerm_lb",
+		CoreRFunc: NewLB,
 		ReferenceAttributes: []string{
 			"resource_group_name",
 		},
 	}
 }
 
-func NewLB(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewLB(d *schema.ResourceData) schema.CoreResource {
 	r := &azure.LB{
 		Address: d.Address,
 		Region:  lookupRegion(d, []string{"resource_group_name"}),
 		SKU:     d.Get("sku").String(),
 	}
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

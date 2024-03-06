@@ -7,12 +7,11 @@ import (
 
 func getAutomationAccountRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_automation_account",
-		RFunc: NewAutomationAccount,
+		Name:      "azurerm_automation_account",
+		CoreRFunc: NewAutomationAccount,
 	}
 }
-func NewAutomationAccount(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAutomationAccount(d *schema.ResourceData) schema.CoreResource {
 	r := &azure.AutomationAccount{Address: d.Address, Region: lookupRegion(d, []string{})}
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

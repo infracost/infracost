@@ -11,7 +11,13 @@ type PrivateDNSPTRRecord struct {
 	MonthlyQueries *int64 `infracost_usage:"monthly_queries"`
 }
 
-var PrivateDNSPTRRecordUsageSchema = []*schema.UsageItem{{Key: "monthly_queries", ValueType: schema.Int64, DefaultValue: 0}}
+func (r *PrivateDNSPTRRecord) CoreType() string {
+	return "PrivateDNSPTRRecord"
+}
+
+func (r *PrivateDNSPTRRecord) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{{Key: "monthly_queries", ValueType: schema.Int64, DefaultValue: 0}}
+}
 
 func (r *PrivateDNSPTRRecord) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -20,6 +26,7 @@ func (r *PrivateDNSPTRRecord) PopulateUsage(u *schema.UsageData) {
 func (r *PrivateDNSPTRRecord) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: dnsQueriesCostComponent(r.Region, r.MonthlyQueries), UsageSchema: PrivateDNSPTRRecordUsageSchema,
+		CostComponents: dnsQueriesCostComponent(r.Region, r.MonthlyQueries),
+		UsageSchema:    r.UsageSchema(),
 	}
 }

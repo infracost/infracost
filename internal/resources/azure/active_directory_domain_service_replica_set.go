@@ -11,7 +11,13 @@ type ActiveDirectoryDomainServiceReplicaSet struct {
 	DomainServiceIDSKU string
 }
 
-var ActiveDirectoryDomainServiceReplicaSetUsageSchema = []*schema.UsageItem{}
+func (r *ActiveDirectoryDomainServiceReplicaSet) CoreType() string {
+	return "ActiveDirectoryDomainServiceReplicaSet"
+}
+
+func (r *ActiveDirectoryDomainServiceReplicaSet) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 func (r *ActiveDirectoryDomainServiceReplicaSet) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -24,6 +30,7 @@ func (r *ActiveDirectoryDomainServiceReplicaSet) BuildResource() *schema.Resourc
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: ActiveDirectoryDomainServiceReplicaSetUsageSchema,
+		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 }

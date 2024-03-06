@@ -12,12 +12,12 @@ import (
 // additionally mentions other operations for managed runtime.
 func getDataFactoryIntegrationRuntimeManagedRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_data_factory_integration_runtime_managed",
-		RFunc: newDataFactoryIntegrationRuntimeManaged,
+		Name:      "azurerm_data_factory_integration_runtime_managed",
+		CoreRFunc: newDataFactoryIntegrationRuntimeManaged,
 	}
 }
 
-func newDataFactoryIntegrationRuntimeManaged(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newDataFactoryIntegrationRuntimeManaged(d *schema.ResourceData) schema.CoreResource {
 	region := lookupRegion(d, []string{})
 
 	licenseType := d.GetStringOrDefault("license_type", "LicenseIncluded")
@@ -40,7 +40,5 @@ func newDataFactoryIntegrationRuntimeManaged(d *schema.ResourceData, u *schema.U
 		Instances:       nodes,
 		InstanceType:    instanceType,
 	}
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
+	return r
 }

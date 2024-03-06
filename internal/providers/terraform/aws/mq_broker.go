@@ -7,11 +7,11 @@ import (
 
 func getMQBrokerRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_mq_broker",
-		RFunc: NewMQBroker,
+		Name:      "aws_mq_broker",
+		CoreRFunc: NewMQBroker,
 	}
 }
-func NewMQBroker(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewMQBroker(d *schema.ResourceData) schema.CoreResource {
 	r := &aws.MQBroker{
 		Address:          d.Address,
 		Region:           d.Get("region").String(),
@@ -20,7 +20,5 @@ func NewMQBroker(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 		StorageType:      d.Get("storage_type").String(),
 		DeploymentMode:   d.Get("deployment_mode").String(),
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

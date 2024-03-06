@@ -7,16 +7,15 @@ import (
 
 func getPubSubSubscriptionRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "google_pubsub_subscription",
-		RFunc: NewPubSubSubscription,
+		Name:      "google_pubsub_subscription",
+		CoreRFunc: NewPubSubSubscription,
 	}
 }
 
-func NewPubSubSubscription(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewPubSubSubscription(d *schema.ResourceData) schema.CoreResource {
 	r := &google.PubSubSubscription{
 		Address: d.Address,
 	}
 
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

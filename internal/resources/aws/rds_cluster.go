@@ -1,10 +1,11 @@
 package aws
 
 import (
-	"github.com/infracost/infracost/internal/resources"
-	"github.com/infracost/infracost/internal/schema"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+
+	"github.com/infracost/infracost/internal/resources"
+	"github.com/infracost/infracost/internal/schema"
 
 	"strings"
 
@@ -28,16 +29,22 @@ type RDSCluster struct {
 	BackupSnapshotSizeGB      *float64 `infracost_usage:"backup_snapshot_size_gb"`
 }
 
-var RDSClusterUsageSchema = []*schema.UsageItem{
-	{Key: "write_requests_per_sec", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "read_requests_per_sec", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "change_records_per_statement", ValueType: schema.Float64, DefaultValue: 0.0},
-	{Key: "storage_gb", ValueType: schema.Float64, DefaultValue: 0},
-	{Key: "average_statements_per_hr", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "backtrack_window_hrs", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "snapshot_export_size_gb", ValueType: schema.Float64, DefaultValue: 0},
-	{Key: "capacity_units_per_hr", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "backup_snapshot_size_gb", ValueType: schema.Float64, DefaultValue: 0},
+func (r *RDSCluster) CoreType() string {
+	return "RDSCluster"
+}
+
+func (r *RDSCluster) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "write_requests_per_sec", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "read_requests_per_sec", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "change_records_per_statement", ValueType: schema.Float64, DefaultValue: 0.0},
+		{Key: "storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "average_statements_per_hr", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "backtrack_window_hrs", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "snapshot_export_size_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "capacity_units_per_hr", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "backup_snapshot_size_gb", ValueType: schema.Float64, DefaultValue: 0},
+	}
 }
 
 func (r *RDSCluster) PopulateUsage(u *schema.UsageData) {
@@ -83,6 +90,7 @@ func (r *RDSCluster) BuildResource() *schema.Resource {
 					{Key: "databaseEngine", ValueRegex: regexPtr(databaseEngine)},
 				},
 			},
+			UsageBased: true,
 		})
 	}
 
@@ -131,11 +139,13 @@ func (r *RDSCluster) BuildResource() *schema.Resource {
 				{Key: "usagetype", ValueRegex: regexPtr("Aurora:SnapshotExportToS3$")},
 			},
 		},
+		UsageBased: true,
 	})
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: RDSClusterUsageSchema,
+		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 
@@ -168,6 +178,7 @@ func (r *RDSCluster) auroraStorageCostComponents(databaseEngineStorageType strin
 					{Key: "usagetype", ValueRegex: regexPtr("Aurora:StorageUsage$")},
 				},
 			},
+			UsageBased: true,
 		},
 		{
 			Name:            "I/O requests",
@@ -184,6 +195,7 @@ func (r *RDSCluster) auroraStorageCostComponents(databaseEngineStorageType strin
 					{Key: "usagetype", ValueRegex: regexPtr("Aurora:StorageIOUsage$")},
 				},
 			},
+			UsageBased: true,
 		},
 	}
 }
@@ -204,6 +216,7 @@ func (r *RDSCluster) auroraBackupStorageCostComponent(totalBackupStorageGB *deci
 				{Key: "usagetype", ValueRegex: regexPtr("Aurora:BackupUsage$")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -222,6 +235,7 @@ func (r *RDSCluster) auroraBacktrackCostComponent(backtrackChangeRecords *decima
 				{Key: "usagetype", ValueRegex: regexPtr("Aurora:BacktrackUsage$")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 

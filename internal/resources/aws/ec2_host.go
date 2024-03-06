@@ -27,9 +27,15 @@ type EC2Host struct {
 	ReservedInstancePaymentOption *string `infracost_usage:"reserved_instance_payment_option"`
 }
 
-var EC2HostUsageSchema = []*schema.UsageItem{
-	{Key: "reserved_instance_term", DefaultValue: "", ValueType: schema.String},
-	{Key: "reserved_instance_payment_option", DefaultValue: "", ValueType: schema.String},
+func (r *EC2Host) CoreType() string {
+	return "EC2Host"
+}
+
+func (r *EC2Host) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "reserved_instance_term", DefaultValue: "", ValueType: schema.String},
+		{Key: "reserved_instance_payment_option", DefaultValue: "", ValueType: schema.String},
+	}
 }
 
 func (r *EC2Host) PopulateUsage(u *schema.UsageData) {
@@ -96,7 +102,7 @@ func (r *EC2Host) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    EC2HostUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }

@@ -16,8 +16,14 @@ type ComputeDisk struct {
 	IOPS int64
 }
 
-// ComputeDiskUsageSchema defines a list which represents the usage schema of ComputeDisk.
-var ComputeDiskUsageSchema = []*schema.UsageItem{}
+func (r *ComputeDisk) CoreType() string {
+	return "ComputeDisk"
+}
+
+// UsageSchema defines a list which represents the usage schema of ComputeDisk.
+func (r *ComputeDisk) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 // PopulateUsage parses the u schema.UsageData into the ComputeDisk.
 // It uses the `infracost_usage` struct tags to populate data into the ComputeDisk.
@@ -39,7 +45,7 @@ func (r *ComputeDisk) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    ComputeDiskUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }

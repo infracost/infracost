@@ -7,12 +7,12 @@ import (
 
 func getEC2HostRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_ec2_host",
-		RFunc: newEC2Host,
+		Name:      "aws_ec2_host",
+		CoreRFunc: newEC2Host,
 	}
 }
 
-func newEC2Host(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newEC2Host(d *schema.ResourceData) schema.CoreResource {
 	region := d.Get("region").String()
 	r := &aws.EC2Host{
 		Address:        d.Address,
@@ -20,7 +20,5 @@ func newEC2Host(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 		InstanceType:   d.Get("instance_type").String(),
 		InstanceFamily: d.Get("instance_family").String(),
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

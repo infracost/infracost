@@ -18,7 +18,13 @@ type APIManagement struct {
 	MonthlyAPICalls        *int64 `infracost_usage:"monthly_api_calls"`
 }
 
-var APIManagementUsageSchema = []*schema.UsageItem{{Key: "self_hosted_gateway_count", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_api_calls", ValueType: schema.Int64, DefaultValue: 0}}
+func (r *APIManagement) CoreType() string {
+	return "APIManagement"
+}
+
+func (r *APIManagement) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{{Key: "self_hosted_gateway_count", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_api_calls", ValueType: schema.Int64, DefaultValue: 0}}
+}
 
 func (r *APIManagement) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -39,7 +45,8 @@ func (r *APIManagement) BuildResource() *schema.Resource {
 			fmt.Sprintf("API management (%s)", tier),
 			"units",
 			tier,
-			&capacity))
+			&capacity,
+			false))
 
 	} else {
 		var apiCalls *decimal.Decimal
@@ -65,16 +72,18 @@ func (r *APIManagement) BuildResource() *schema.Resource {
 			"gateways",
 			"Gateway",
 			selfHostedGateways,
+			true,
 		))
 	}
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: APIManagementUsageSchema,
+		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 
-func (r *APIManagement) apiManagementCostComponent(name, unit, tier string, quantity *decimal.Decimal) *schema.CostComponent {
+func (r *APIManagement) apiManagementCostComponent(name, unit, tier string, quantity *decimal.Decimal, usageBased bool) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           name,
 		Unit:           unit,
@@ -93,6 +102,7 @@ func (r *APIManagement) apiManagementCostComponent(name, unit, tier string, quan
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
+		UsageBased: usageBased,
 	}
 }
 
@@ -115,5 +125,6 @@ func (r *APIManagement) consumptionAPICostComponent(tier string, quantity *decim
 			PurchaseOption:   strPtr("Consumption"),
 			StartUsageAmount: strPtr("100"),
 		},
+		UsageBased: true,
 	}
 }

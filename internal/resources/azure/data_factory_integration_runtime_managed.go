@@ -23,10 +23,14 @@ type DataFactoryIntegrationRuntimeManaged struct {
 	MonthlyOrchestrationRuns *int64 `infracost_usage:"monthly_orchestration_runs"`
 }
 
-// DataFactoryIntegrationRuntimeManagedUsageSchema defines a list which represents
-// the usage schema of DataFactoryIntegrationRuntimeManaged.
-var DataFactoryIntegrationRuntimeManagedUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_orchestration_runs", DefaultValue: 0, ValueType: schema.Int64},
+func (r *DataFactoryIntegrationRuntimeManaged) CoreType() string {
+	return "DataFactoryIntegrationRuntimeManaged"
+}
+
+func (r *DataFactoryIntegrationRuntimeManaged) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_orchestration_runs", DefaultValue: 0, ValueType: schema.Int64},
+	}
 }
 
 // PopulateUsage parses the u schema.UsageData into the DataFactoryIntegrationRuntimeManaged.
@@ -63,7 +67,7 @@ func (r *DataFactoryIntegrationRuntimeManaged) BuildResource() *schema.Resource 
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    DataFactoryIntegrationRuntimeManagedUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }

@@ -12,7 +12,13 @@ type ComputeVPNTunnel struct {
 	Region  string
 }
 
-var ComputeVPNTunnelUsageSchema = []*schema.UsageItem{}
+func (r *ComputeVPNTunnel) CoreType() string {
+	return "ComputeVPNTunnel"
+}
+
+func (r *ComputeVPNTunnel) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 func (r *ComputeVPNTunnel) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -23,7 +29,7 @@ func (r *ComputeVPNTunnel) BuildResource() *schema.Resource {
 		Name: r.Address,
 		CostComponents: []*schema.CostComponent{
 			r.vpnTunnelCostComponent(),
-		}, UsageSchema: ComputeVPNTunnelUsageSchema,
+		}, UsageSchema: r.UsageSchema(),
 	}
 }
 

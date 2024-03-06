@@ -7,19 +7,18 @@ import (
 
 func getPointToSiteVpnGatewayRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_point_to_site_vpn_gateway",
-		RFunc: newPointToSiteVpnGateway,
+		Name:      "azurerm_point_to_site_vpn_gateway",
+		CoreRFunc: newPointToSiteVpnGateway,
 	}
 }
 
-func newPointToSiteVpnGateway(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newPointToSiteVpnGateway(d *schema.ResourceData) schema.CoreResource {
 	p := &azure.VPNGateway{
 		Address:    d.Address,
 		Region:     d.Get("region").String(),
 		ScaleUnits: d.Get("scale_unit").Int(),
 		Type:       "P2S",
 	}
-	p.PopulateUsage(u)
 
-	return p.BuildResource()
+	return p
 }

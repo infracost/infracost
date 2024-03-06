@@ -7,19 +7,19 @@ import (
 
 func getIoTHubRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_iothub",
-		RFunc: newIoTHub,
+		Name:      "azurerm_iothub",
+		CoreRFunc: newIoTHub,
 	}
 }
 
 func getIoTHubDPSRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_iothub_dps",
-		RFunc: newIoTHubDPS,
+		Name:      "azurerm_iothub_dps",
+		CoreRFunc: newIoTHubDPS,
 	}
 }
 
-func newIoTHub(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newIoTHub(d *schema.ResourceData) schema.CoreResource {
 	region := lookupRegion(d, []string{})
 
 	sku := d.Get("sku.0.name").String()
@@ -32,12 +32,10 @@ func newIoTHub(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 		Capacity: capacity,
 	}
 
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
+	return r
 }
 
-func newIoTHubDPS(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newIoTHubDPS(d *schema.ResourceData) schema.CoreResource {
 	region := lookupRegion(d, []string{})
 
 	sku := d.Get("sku.0.name").String()
@@ -48,7 +46,5 @@ func newIoTHubDPS(d *schema.ResourceData, u *schema.UsageData) *schema.Resource 
 		Sku:     sku,
 	}
 
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
+	return r
 }

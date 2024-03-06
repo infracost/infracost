@@ -20,7 +20,13 @@ type MSKCluster struct {
 	AppAutoscalingTarget []*AppAutoscalingTarget
 }
 
-var MSKClusterUsageSchema = []*schema.UsageItem{}
+func (r *MSKCluster) CoreType() string {
+	return "MSKCluster"
+}
+
+func (r *MSKCluster) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 func (r *MSKCluster) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -74,8 +80,9 @@ func (r *MSKCluster) BuildResource() *schema.Resource {
 						{Key: "storageFamily", Value: strPtr("GP2")},
 					},
 				},
+				UsageBased: true,
 			},
 		},
-		UsageSchema: MSKClusterUsageSchema,
+		UsageSchema: r.UsageSchema(),
 	}
 }

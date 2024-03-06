@@ -25,6 +25,14 @@ var S3StandardStorageClassUsageSchema = []*schema.UsageItem{
 	{Key: "monthly_select_data_returned_gb", DefaultValue: 0, ValueType: schema.Float64},
 }
 
+func (a *S3StandardStorageClass) CoreType() string {
+	return "S3StandardStorageClass"
+}
+
+func (a *S3StandardStorageClass) UsageSchema() []*schema.UsageItem {
+	return S3StandardStorageClassUsageSchema
+}
+
 func (a *S3StandardStorageClass) UsageKey() string {
 	return "standard"
 }
@@ -36,7 +44,7 @@ func (a *S3StandardStorageClass) PopulateUsage(u *schema.UsageData) {
 func (a *S3StandardStorageClass) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:        "Standard",
-		UsageSchema: S3StandardStorageClassUsageSchema,
+		UsageSchema: a.UsageSchema(),
 		CostComponents: []*schema.CostComponent{
 			s3StorageVolumeTypeCostComponent("Storage", "AmazonS3", a.Region, "TimedStorage-ByteHrs", "Standard", a.StorageGB),
 			s3ApiCostComponent("PUT, COPY, POST, LIST requests", "AmazonS3", a.Region, "Requests-Tier1", a.MonthlyTier1Requests),

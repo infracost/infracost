@@ -7,17 +7,15 @@ import (
 
 func getDocDBClusterInstanceRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_docdb_cluster_instance",
-		RFunc: NewDocDBClusterInstance,
+		Name:      "aws_docdb_cluster_instance",
+		CoreRFunc: NewDocDBClusterInstance,
 	}
 }
-func NewDocDBClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewDocDBClusterInstance(d *schema.ResourceData) schema.CoreResource {
 	r := &aws.DocDBClusterInstance{
 		Address:       d.Address,
 		Region:        d.Get("region").String(),
 		InstanceClass: d.Get("instance_class").String(),
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

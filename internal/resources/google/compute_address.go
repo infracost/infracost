@@ -17,7 +17,13 @@ type ComputeAddress struct {
 	InstancePurchaseOption string
 }
 
-var ComputeAddressUsageSchema = []*schema.UsageItem{}
+func (r *ComputeAddress) CoreType() string {
+	return "ComputeAddress"
+}
+
+func (r *ComputeAddress) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 func (r *ComputeAddress) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -32,7 +38,7 @@ func (r *ComputeAddress) BuildResource() *schema.Resource {
 			Name:        r.Address,
 			NoPrice:     true,
 			IsSkipped:   true,
-			UsageSchema: ComputeAddressUsageSchema,
+			UsageSchema: r.UsageSchema(),
 		}
 	}
 
@@ -50,7 +56,7 @@ func (r *ComputeAddress) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		UsageSchema:    ComputeAddressUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

@@ -48,12 +48,12 @@ var (
 
 func getSQLDatabaseRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_sql_database",
-		RFunc: newSQLDatabase,
+		Name:      "azurerm_sql_database",
+		CoreRFunc: newSQLDatabase,
 	}
 }
 
-func newSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newSQLDatabase(d *schema.ResourceData) schema.CoreResource {
 	region := d.Get("location").String()
 
 	config := skuConfig{
@@ -109,9 +109,7 @@ func newSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 		ZoneRedundant:     d.Get("zone_redundant").Bool(),
 		BackupStorageType: "Geo",
 	}
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
+	return r
 }
 
 func parseSKU(address, sku string) (skuConfig, error) {

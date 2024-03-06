@@ -3,9 +3,10 @@ package google
 import (
 	"fmt"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 // SecretManagerSecret represents Google Secret Manager's Secret resource.
@@ -27,11 +28,16 @@ type SecretManagerSecret struct {
 	MonthlyRotationNotifications *int64 `infracost_usage:"monthly_rotation_notifications"`
 }
 
-// SecretManagerSecretUsageSchema defines a list which represents the usage schema of SecretManagerSecret.
-var SecretManagerSecretUsageSchema = []*schema.UsageItem{
-	{Key: "active_secret_versions", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_access_operations", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "monthly_rotation_notifications", DefaultValue: 0, ValueType: schema.Int64},
+func (r *SecretManagerSecret) CoreType() string {
+	return "SecretManagerSecret"
+}
+
+func (r *SecretManagerSecret) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "active_secret_versions", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "monthly_access_operations", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "monthly_rotation_notifications", DefaultValue: 0, ValueType: schema.Int64},
+	}
 }
 
 // PopulateUsage parses the u schema.UsageData into the SecretManagerSecret.
@@ -52,7 +58,7 @@ func (r *SecretManagerSecret) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    SecretManagerSecretUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }
@@ -77,6 +83,7 @@ func (r *SecretManagerSecret) activeSecretVersionsCostComponents() []*schema.Cos
 			MonthlyQuantity: intPtrToDecimalPtr(quantity),
 			ProductFilter:   r.buildProductFilter("Secret version replica storage"),
 			PriceFilter:     r.buildPriceFilter("6"),
+			UsageBased:      true,
 		},
 	}
 }
@@ -94,6 +101,7 @@ func (r *SecretManagerSecret) accessOperationsCostComponents() []*schema.CostCom
 			MonthlyQuantity: intPtrToDecimalPtr(r.MonthlyAccessOperations),
 			ProductFilter:   r.buildProductFilter("Secret access operations"),
 			PriceFilter:     r.buildPriceFilter(fmt.Sprint(multiplier)),
+			UsageBased:      true,
 		},
 	}
 }
@@ -109,6 +117,7 @@ func (r *SecretManagerSecret) rotationNotificationsCostComponents() []*schema.Co
 			MonthlyQuantity: intPtrToDecimalPtr(r.MonthlyRotationNotifications),
 			ProductFilter:   r.buildProductFilter("Secret rotate operations"),
 			PriceFilter:     r.buildPriceFilter("3"),
+			UsageBased:      true,
 		},
 	}
 }

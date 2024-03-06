@@ -1,9 +1,10 @@
 package google
 
 import (
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 // ComputeMachineImage struct represents Compute Machine Image resource.
@@ -15,9 +16,15 @@ type ComputeMachineImage struct {
 	StorageGB *float64 `infracost_usage:"storage_gb"`
 }
 
-// ComputeMachineImageUsageSchema defines a list which represents the usage schema of ComputeMachineImage.
-var ComputeMachineImageUsageSchema = []*schema.UsageItem{
-	{Key: "storage_gb", DefaultValue: 0, ValueType: schema.Float64},
+func (r *ComputeMachineImage) CoreType() string {
+	return "ComputeMachineImage"
+}
+
+// UsageSchema defines a list which represents the usage schema of ComputeMachineImage.
+func (r *ComputeMachineImage) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "storage_gb", DefaultValue: 0, ValueType: schema.Float64},
+	}
 }
 
 // PopulateUsage parses the u schema.UsageData into the ComputeMachineImage.
@@ -41,7 +48,7 @@ func (r *ComputeMachineImage) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    ComputeImageUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }

@@ -15,7 +15,13 @@ type ActiveDirectoryDomainService struct {
 	SKU     string
 }
 
-var ActiveDirectoryDomainServiceUsageSchema = []*schema.UsageItem{}
+func (r *ActiveDirectoryDomainService) CoreType() string {
+	return "ActiveDirectoryDomainService"
+}
+
+func (r *ActiveDirectoryDomainService) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 func (r *ActiveDirectoryDomainService) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -26,7 +32,8 @@ func (r *ActiveDirectoryDomainService) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: ActiveDirectoryDomainServiceUsageSchema,
+		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

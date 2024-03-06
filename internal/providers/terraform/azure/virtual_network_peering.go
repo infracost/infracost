@@ -9,8 +9,8 @@ import (
 
 func getVirtualNetworkPeeringRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_virtual_network_peering",
-		RFunc: newVirtualNetworkPeering,
+		Name:      "azurerm_virtual_network_peering",
+		CoreRFunc: newVirtualNetworkPeering,
 		ReferenceAttributes: []string{
 			"virtual_network_name",
 			"remote_virtual_network_id",
@@ -19,7 +19,7 @@ func getVirtualNetworkPeeringRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func newVirtualNetworkPeering(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newVirtualNetworkPeering(d *schema.ResourceData) schema.CoreResource {
 	sourceRegion := lookupRegion(d, []string{"virtual_network_name"})
 	destinationRegion := lookupRegion(d, []string{"remote_virtual_network_id"})
 
@@ -33,9 +33,7 @@ func newVirtualNetworkPeering(d *schema.ResourceData, u *schema.UsageData) *sche
 		DestinationZone:   destinationZone,
 		SourceZone:        sourceZone,
 	}
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
+	return r
 }
 
 func virtualNetworkPeeringConvertRegion(region string) string {

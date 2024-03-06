@@ -7,15 +7,15 @@ import (
 
 func getDataFactoryIntegrationRuntimeSelfHostedRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_data_factory_integration_runtime_self_hosted",
-		RFunc: newDataFactoryIntegrationRuntimeSelfHosted,
+		Name:      "azurerm_data_factory_integration_runtime_self_hosted",
+		CoreRFunc: newDataFactoryIntegrationRuntimeSelfHosted,
 		ReferenceAttributes: []string{
 			"data_factory_id",
 		},
 	}
 }
 
-func newDataFactoryIntegrationRuntimeSelfHosted(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newDataFactoryIntegrationRuntimeSelfHosted(d *schema.ResourceData) schema.CoreResource {
 	dataFactoryRefs := d.References("data_factory_id")
 	var region string
 
@@ -27,7 +27,5 @@ func newDataFactoryIntegrationRuntimeSelfHosted(d *schema.ResourceData, u *schem
 		Address: d.Address,
 		Region:  region,
 	}
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
+	return r
 }

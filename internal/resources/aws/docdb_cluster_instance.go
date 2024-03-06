@@ -18,10 +18,16 @@ type DocDBClusterInstance struct {
 	MonthlyCPUCreditHrs *int64   `infracost_usage:"monthly_cpu_credit_hrs"`
 }
 
-var DocDBClusterInstanceUsageSchema = []*schema.UsageItem{
-	{Key: "data_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
-	{Key: "monthly_io_requests", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "monthly_cpu_credit_hrs", ValueType: schema.Int64, DefaultValue: 0},
+func (r *DocDBClusterInstance) CoreType() string {
+	return "DocDBClusterInstance"
+}
+
+func (r *DocDBClusterInstance) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "data_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "monthly_io_requests", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_cpu_credit_hrs", ValueType: schema.Int64, DefaultValue: 0},
+	}
 }
 
 func (r *DocDBClusterInstance) PopulateUsage(u *schema.UsageData) {
@@ -81,6 +87,7 @@ func (r *DocDBClusterInstance) BuildResource() *schema.Resource {
 			PriceFilter: &schema.PriceFilter{
 				PurchaseOption: strPtr("on_demand"),
 			},
+			UsageBased: true,
 		},
 		{
 			Name:            "I/O requests",
@@ -96,6 +103,7 @@ func (r *DocDBClusterInstance) BuildResource() *schema.Resource {
 					{Key: "usagetype", ValueRegex: regexPtr("(^|-)StorageIOUsage$")},
 				},
 			},
+			UsageBased: true,
 		},
 	}
 
@@ -114,12 +122,13 @@ func (r *DocDBClusterInstance) BuildResource() *schema.Resource {
 					{Key: "usagetype", ValueRegex: regexPtr("CPUCredits:" + instanceFamily + "$")},
 				},
 			},
+			UsageBased: true,
 		})
 	}
 
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		UsageSchema:    DocDBClusterInstanceUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }

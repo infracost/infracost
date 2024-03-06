@@ -7,17 +7,15 @@ import (
 
 func getCloudFormationStackRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_cloudformation_stack",
-		RFunc: NewCloudFormationStackSet,
+		Name:      "aws_cloudformation_stack",
+		CoreRFunc: NewCloudFormationStackSet,
 	}
 }
-func NewCloudFormationStack(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewCloudFormationStack(d *schema.ResourceData) schema.CoreResource {
 	r := &aws.CloudFormationStack{
 		Address:      d.Address,
 		Region:       d.Get("region").String(),
 		TemplateBody: d.Get("template_body").String(),
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

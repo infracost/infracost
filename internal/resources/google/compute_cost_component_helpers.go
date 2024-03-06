@@ -469,5 +469,6 @@ func storageImageCostComponent(region string, description string, storageSize *d
 				{Key: "description", ValueRegex: regexPtr(description)},
 			},
 		},
+		UsageBased: true,
 	}
 }

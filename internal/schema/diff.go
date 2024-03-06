@@ -186,6 +186,7 @@ func diffCostComponents(past *CostComponent, current *CostComponent) (bool, *Cos
 		ProductFilter:        baseCostComponent.ProductFilter,
 		PriceFilter:          baseCostComponent.PriceFilter,
 		priceHash:            baseCostComponent.priceHash,
+		UsageBased:           baseCostComponent.UsageBased,
 
 		HourlyQuantity:      diffDecimals(current.HourlyQuantity, past.HourlyQuantity),
 		MonthlyQuantity:     diffDecimals(current.MonthlyQuantity, past.MonthlyQuantity),

@@ -22,6 +22,15 @@ type ExpressRouteGateway struct {
 	ScaleUnits int64
 }
 
+func (e *ExpressRouteGateway) CoreType() string {
+	return "ExpressRouteGateway"
+}
+
+// UsageSchema defines a list which represents the usage schema of EventGridTopic.
+func (e *ExpressRouteGateway) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
+
 // PopulateUsage parses the u schema.UsageData into the ExpressRouteGateway.
 // It uses the `infracost_usage` struct tags to populate data into the ExpressRouteGateway.
 func (e *ExpressRouteGateway) PopulateUsage(u *schema.UsageData) {
@@ -36,7 +45,8 @@ func (e *ExpressRouteGateway) PopulateUsage(u *schema.UsageData) {
 // See providers folder for more information.
 func (e *ExpressRouteGateway) BuildResource() *schema.Resource {
 	return &schema.Resource{
-		Name: e.Address,
+		Name:        e.Address,
+		UsageSchema: e.UsageSchema(),
 		CostComponents: []*schema.CostComponent{
 			{
 				Name:           "ER scale units (2 Gbps)",

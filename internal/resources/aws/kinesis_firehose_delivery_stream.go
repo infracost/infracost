@@ -6,8 +6,9 @@ import (
 
 	"fmt"
 
-	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
+
+	"github.com/infracost/infracost/internal/usage"
 )
 
 type KinesisFirehoseDeliveryStream struct {
@@ -19,8 +20,14 @@ type KinesisFirehoseDeliveryStream struct {
 	MonthlyDataIngestedGB       *float64 `infracost_usage:"monthly_data_ingested_gb"`
 }
 
-var KinesisFirehoseDeliveryStreamUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_data_ingested_gb", ValueType: schema.Float64, DefaultValue: 0},
+func (r *KinesisFirehoseDeliveryStream) CoreType() string {
+	return "KinesisFirehoseDeliveryStream"
+}
+
+func (r *KinesisFirehoseDeliveryStream) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_data_ingested_gb", ValueType: schema.Float64, DefaultValue: 0},
+	}
 }
 
 func (r *KinesisFirehoseDeliveryStream) PopulateUsage(u *schema.UsageData) {
@@ -59,7 +66,8 @@ func (r *KinesisFirehoseDeliveryStream) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: KinesisFirehoseDeliveryStreamUsageSchema,
+		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 
@@ -83,6 +91,7 @@ func (r *KinesisFirehoseDeliveryStream) dataIngestedCostComponent(tier, startUsa
 			StartUsageAmount: strPtr(startUsageAmount),
 			EndUsageAmount:   strPtr(endUsageAmount),
 		},
+		UsageBased: true,
 	}
 }
 

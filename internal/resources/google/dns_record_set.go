@@ -12,8 +12,14 @@ type DNSRecordSet struct {
 	MonthlyQueries *int64 `infracost_usage:"monthly_queries"`
 }
 
-var DNSRecordSetUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_queries", ValueType: schema.Int64, DefaultValue: 0},
+func (r *DNSRecordSet) CoreType() string {
+	return "DNSRecordSet"
+}
+
+func (r *DNSRecordSet) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_queries", ValueType: schema.Int64, DefaultValue: 0},
+	}
 }
 
 func (r *DNSRecordSet) PopulateUsage(u *schema.UsageData) {
@@ -47,8 +53,9 @@ func (r *DNSRecordSet) BuildResource() *schema.Resource {
 				PriceFilter: &schema.PriceFilter{
 					StartUsageAmount: strPtr("0"),
 				},
+				UsageBased: true,
 			},
 		},
-		UsageSchema: DNSRecordSetUsageSchema,
+		UsageSchema: r.UsageSchema(),
 	}
 }

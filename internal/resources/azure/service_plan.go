@@ -44,9 +44,10 @@ func (r *ServicePlan) BuildResource() *schema.Resource {
 
 	if len(r.SKUName) < 2 || strings.ToLower(r.SKUName[:2]) == "ep" || strings.ToLower(r.SKUName[:2]) == "ws" || strings.ToLower(r.SKUName[:2]) == "y1" {
 		return &schema.Resource{
-			Name:      r.Address,
-			IsSkipped: true,
-			NoPrice:   true, UsageSchema: AppServicePlanUsageSchema,
+			Name:        r.Address,
+			IsSkipped:   true,
+			NoPrice:     true,
+			UsageSchema: r.UsageSchema(),
 		}
 	}
 

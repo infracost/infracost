@@ -436,7 +436,8 @@
                 "monthlyQuantity": null,
                 "price": "0.6",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true
               }
             ]
           },
@@ -469,7 +470,8 @@
                 "monthlyQuantity": null,
                 "price": "0.6",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true
               }
             ]
           },
@@ -503,7 +505,8 @@
                 "monthlyQuantity": null,
                 "price": "0.4",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true
               }
             ]
           },
@@ -538,7 +541,8 @@
                 "monthlyQuantity": null,
                 "price": "0.4",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true
               }
             ]
           }
@@ -979,7 +983,8 @@
                 "monthlyQuantity": null,
                 "price": "0.6",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true
               }
             ]
           },
@@ -1012,7 +1017,8 @@
                 "monthlyQuantity": null,
                 "price": "0.6",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true
               }
             ]
           },
@@ -1046,7 +1052,8 @@
                 "monthlyQuantity": null,
                 "price": "0.4",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true
               }
             ]
           },
@@ -1081,7 +1088,8 @@
                 "monthlyQuantity": null,
                 "price": "0.4",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true
               }
             ]
           }

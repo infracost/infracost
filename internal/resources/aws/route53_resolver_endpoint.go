@@ -16,8 +16,14 @@ type Route53ResolverEndpoint struct {
 	MonthlyQueries    *int64 `infracost_usage:"monthly_queries"`
 }
 
-var Route53ResolverEndpointUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_queries", ValueType: schema.Int64, DefaultValue: 0},
+func (r *Route53ResolverEndpoint) CoreType() string {
+	return "Route53ResolverEndpoint"
+}
+
+func (r *Route53ResolverEndpoint) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_queries", ValueType: schema.Int64, DefaultValue: 0},
+	}
 }
 
 func (r *Route53ResolverEndpoint) PopulateUsage(u *schema.UsageData) {
@@ -67,7 +73,7 @@ func (r *Route53ResolverEndpoint) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		UsageSchema:    Route53ResolverEndpointUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 
@@ -89,5 +95,6 @@ func (r *Route53ResolverEndpoint) queriesCostComponent(displayName string, usage
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr(usageTier),
 		},
+		UsageBased: true,
 	}
 }

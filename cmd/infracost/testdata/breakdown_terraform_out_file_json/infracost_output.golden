@@ -155,7 +155,8 @@
                 "monthlyQuantity": null,
                 "name": "Requests",
                 "price": "0.2",
-                "unit": "1M requests"
+                "unit": "1M requests",
+                "usageBased": true
               },
               {
                 "hourlyCost": null,
@@ -173,7 +174,8 @@
                 "monthlyQuantity": null,
                 "name": "Duration (first 6B)",
                 "price": "0.0000166667",
-                "unit": "GB-seconds"
+                "unit": "GB-seconds",
+                "usageBased": true
               }
             ],
             "metadata": {},
@@ -190,7 +192,8 @@
                 "monthlyQuantity": null,
                 "name": "Requests",
                 "price": "0.2",
-                "unit": "1M requests"
+                "unit": "1M requests",
+                "usageBased": true
               },
               {
                 "hourlyCost": null,
@@ -208,7 +211,8 @@
                 "monthlyQuantity": null,
                 "name": "Duration (first 6B)",
                 "price": "0.0000166667",
-                "unit": "GB-seconds"
+                "unit": "GB-seconds",
+                "usageBased": true
               }
             ],
             "metadata": {},
@@ -230,7 +234,8 @@
                     "monthlyQuantity": null,
                     "name": "Storage",
                     "price": "0.023",
-                    "unit": "GB"
+                    "unit": "GB",
+                    "usageBased": true
                   },
                   {
                     "hourlyCost": null,
@@ -239,7 +244,8 @@
                     "monthlyQuantity": null,
                     "name": "PUT, COPY, POST, LIST requests",
                     "price": "0.005",
-                    "unit": "1k requests"
+                    "unit": "1k requests",
+                    "usageBased": true
                   },
                   {
                     "hourlyCost": null,
@@ -248,7 +254,8 @@
                     "monthlyQuantity": null,
                     "name": "GET, SELECT, and all other requests",
                     "price": "0.0004",
-                    "unit": "1k requests"
+                    "unit": "1k requests",
+                    "usageBased": true
                   },
                   {
                     "hourlyCost": null,
@@ -257,7 +264,8 @@
                     "monthlyQuantity": null,
                     "name": "Select data scanned",
                     "price": "0.002",
-                    "unit": "GB"
+                    "unit": "GB",
+                    "usageBased": true
                   },
                   {
                     "hourlyCost": null,
@@ -266,7 +274,8 @@
                     "monthlyQuantity": null,
                     "name": "Select data returned",
                     "price": "0.0007",
-                    "unit": "GB"
+                    "unit": "GB",
+                    "usageBased": true
                   }
                 ],
                 "metadata": {},
@@ -418,7 +427,8 @@
                 "monthlyQuantity": "0",
                 "name": "Requests",
                 "price": "0.2",
-                "unit": "1M requests"
+                "unit": "1M requests",
+                "usageBased": true
               },
               {
                 "hourlyCost": "0",
@@ -436,7 +446,8 @@
                 "monthlyQuantity": "0",
                 "name": "Duration (first 6B)",
                 "price": "0.0000166667",
-                "unit": "GB-seconds"
+                "unit": "GB-seconds",
+                "usageBased": true
               }
             ],
             "hourlyCost": "0",
@@ -455,7 +466,8 @@
                 "monthlyQuantity": "0",
                 "name": "Requests",
                 "price": "0.2",
-                "unit": "1M requests"
+                "unit": "1M requests",
+                "usageBased": true
               },
               {
                 "hourlyCost": "0",
@@ -473,7 +485,8 @@
                 "monthlyQuantity": "0",
                 "name": "Duration (first 6B)",
                 "price": "0.0000166667",
-                "unit": "GB-seconds"
+                "unit": "GB-seconds",
+                "usageBased": true
               }
             ],
             "hourlyCost": "0",
@@ -499,7 +512,8 @@
                     "monthlyQuantity": "0",
                     "name": "Storage",
                     "price": "0.023",
-                    "unit": "GB"
+                    "unit": "GB",
+                    "usageBased": true
                   },
                   {
                     "hourlyCost": "0",
@@ -508,7 +522,8 @@
                     "monthlyQuantity": "0",
                     "name": "PUT, COPY, POST, LIST requests",
                     "price": "0.005",
-                    "unit": "1k requests"
+                    "unit": "1k requests",
+                    "usageBased": true
                   },
                   {
                     "hourlyCost": "0",
@@ -517,7 +532,8 @@
                     "monthlyQuantity": "0",
                     "name": "GET, SELECT, and all other requests",
                     "price": "0.0004",
-                    "unit": "1k requests"
+                    "unit": "1k requests",
+                    "usageBased": true
                   },
                   {
                     "hourlyCost": "0",
@@ -526,7 +542,8 @@
                     "monthlyQuantity": "0",
                     "name": "Select data scanned",
                     "price": "0.002",
-                    "unit": "GB"
+                    "unit": "GB",
+                    "usageBased": true
                   },
                   {
                     "hourlyCost": "0",
@@ -535,7 +552,8 @@
                     "monthlyQuantity": "0",
                     "name": "Select data returned",
                     "price": "0.0007",
-                    "unit": "GB"
+                    "unit": "GB",
+                    "usageBased": true
                   }
                 ],
                 "hourlyCost": "0",

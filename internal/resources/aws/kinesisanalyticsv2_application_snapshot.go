@@ -1,9 +1,10 @@
 package aws
 
 import (
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 type KinesisAnalyticsV2ApplicationSnapshot struct {
@@ -12,8 +13,14 @@ type KinesisAnalyticsV2ApplicationSnapshot struct {
 	DurableApplicationBackupGB *float64 `infracost_usage:"durable_application_backup_gb"`
 }
 
-var KinesisAnalyticsV2ApplicationSnapshotUsageSchema = []*schema.UsageItem{
-	{Key: "durable_application_backup_gb", ValueType: schema.Float64, DefaultValue: 0},
+func (r *KinesisAnalyticsV2ApplicationSnapshot) CoreType() string {
+	return "KinesisAnalyticsV2ApplicationSnapshot"
+}
+
+func (r *KinesisAnalyticsV2ApplicationSnapshot) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "durable_application_backup_gb", ValueType: schema.Float64, DefaultValue: 0},
+	}
 }
 
 func (r *KinesisAnalyticsV2ApplicationSnapshot) PopulateUsage(u *schema.UsageData) {
@@ -34,6 +41,6 @@ func (r *KinesisAnalyticsV2ApplicationSnapshot) BuildResource() *schema.Resource
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: []*schema.CostComponent{v2App.backupCostComponent(durableApplicationBackupGB)},
-		UsageSchema:    KinesisAnalyticsV2ApplicationSnapshotUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }

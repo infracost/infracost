@@ -23,18 +23,6 @@ type GlobalacceleratorEndpointGroup struct {
 	MonthlyOutboundDataTransferGB *globalAcceleratorRegionDataTransferUsage `infracost_usage:"monthly_outbound_data_transfer_gb"`
 }
 
-var GlobalacceleratorEndpointGroupUsageSchema = []*schema.UsageItem{
-	{
-		Key:          "monthly_inbound_data_transfer_gb",
-		DefaultValue: &usage.ResourceUsage{Name: "monthly_inbound_data_transfer_gb", Items: globalAcceleratorRegionDataTransferUsageSchema},
-		ValueType:    schema.SubResourceUsage,
-	},
-	{
-		Key:          "monthly_outbound_data_transfer_gb",
-		DefaultValue: &usage.ResourceUsage{Name: "monthly_outbound_data_transfer_gb", Items: globalAcceleratorRegionDataTransferUsageSchema},
-		ValueType:    schema.SubResourceUsage,
-	},
-}
 var globalAcceleratorRegionDataTransferUsageSchema = []*schema.UsageItem{
 	{Key: "us", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "europe", DefaultValue: 0, ValueType: schema.Float64},
@@ -103,6 +91,25 @@ func (g *globalAcceleratorRegionData) HasUsage() bool {
 	return g.monthlyInboundDataTransferGB != nil || g.monthlyOutboundDataTransferGB != nil
 }
 
+func (r *GlobalacceleratorEndpointGroup) CoreType() string {
+	return "GlobalacceleratorEndpointGroup"
+}
+
+func (r *GlobalacceleratorEndpointGroup) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{
+			Key:          "monthly_inbound_data_transfer_gb",
+			DefaultValue: &usage.ResourceUsage{Name: "monthly_inbound_data_transfer_gb", Items: globalAcceleratorRegionDataTransferUsageSchema},
+			ValueType:    schema.SubResourceUsage,
+		},
+		{
+			Key:          "monthly_outbound_data_transfer_gb",
+			DefaultValue: &usage.ResourceUsage{Name: "monthly_outbound_data_transfer_gb", Items: globalAcceleratorRegionDataTransferUsageSchema},
+			ValueType:    schema.SubResourceUsage,
+		},
+	}
+}
+
 func (r *GlobalacceleratorEndpointGroup) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
@@ -120,7 +127,7 @@ func (r *GlobalacceleratorEndpointGroup) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    GlobalacceleratorEndpointGroupUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: []*schema.CostComponent{},
 		SubResources:   subResources,
 	}
@@ -243,6 +250,7 @@ func (r *GlobalacceleratorEndpointGroup) buildRegionSubresource(regionData *glob
 						{Key: "usagetype", Value: strPtr(usageType)},
 					},
 				},
+				UsageBased: true,
 			},
 		},
 	}

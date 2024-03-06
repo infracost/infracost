@@ -3,10 +3,11 @@ package azure
 import (
 	"fmt"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
-	"github.com/shopspring/decimal"
 )
 
 // NetworkConnectionMonitor struct represents Azure Network Watcher Connection
@@ -127,5 +128,6 @@ func (r *NetworkConnectionMonitor) buildTestsCostComponent(suffix string, startU
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr(startUsage),
 		},
+		UsageBased: true,
 	}
 }

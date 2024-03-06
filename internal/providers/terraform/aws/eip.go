@@ -17,10 +17,10 @@ func getEIPRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:                "aws_eip",
 		ReferenceAttributes: eipReferences,
-		RFunc:               NewEIP,
+		CoreRFunc:           NewEIP,
 	}
 }
-func NewEIP(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewEIP(d *schema.ResourceData) schema.CoreResource {
 	var allocated bool
 	if len(d.References(eipReferences...)) > 0 {
 		allocated = true
@@ -35,7 +35,5 @@ func NewEIP(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 		Region:    d.Get("region").String(),
 		Allocated: allocated,
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

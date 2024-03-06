@@ -7,15 +7,15 @@ import (
 
 func getCloudfrontDistributionRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_cloudfront_distribution",
-		RFunc: newCloudfrontDistribution,
+		Name:      "aws_cloudfront_distribution",
+		CoreRFunc: newCloudfrontDistribution,
 		ReferenceAttributes: []string{
 			"origin.0.domain_name",
 			"origin.0.origin_id",
 		},
 	}
 }
-func newCloudfrontDistribution(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newCloudfrontDistribution(d *schema.ResourceData) schema.CoreResource {
 	region := d.Get("region").String()
 
 	isOriginShieldEnabled := d.Get("origin.0.origin_shield.0.enabled").Bool()
@@ -33,7 +33,5 @@ func newCloudfrontDistribution(d *schema.ResourceData, u *schema.UsageData) *sch
 		HasFieldLevelEncryptionID: hasFieldLevelEncryptionID,
 		OriginShieldRegion:        originShieldRegion,
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

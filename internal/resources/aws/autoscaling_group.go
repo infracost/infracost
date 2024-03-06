@@ -24,6 +24,14 @@ var AutoscalingGroupUsageSchema = append([]*schema.UsageItem{
 	{Key: "instances", DefaultValue: 0, ValueType: schema.Int64},
 }, InstanceUsageSchema...)
 
+func (a *AutoscalingGroup) CoreType() string {
+	return "AutoscalingGroup"
+}
+
+func (a *AutoscalingGroup) UsageSchema() []*schema.UsageItem {
+	return a.getUsageSchemaWithDefaultInstanceCount()
+}
+
 func (a *AutoscalingGroup) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(a, u)
 
@@ -108,7 +116,7 @@ func (a *AutoscalingGroup) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           a.Address,
-		UsageSchema:    a.getUsageSchemaWithDefaultInstanceCount(),
+		UsageSchema:    a.UsageSchema(),
 		CostComponents: costComponents,
 		SubResources:   subResources,
 		EstimateUsage:  estimate,

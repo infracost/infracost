@@ -12,12 +12,12 @@ import (
 
 func getPostgreSQLFlexibleServerRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_postgresql_flexible_server",
-		RFunc: newPostgreSQLFlexibleServer,
+		Name:      "azurerm_postgresql_flexible_server",
+		CoreRFunc: newPostgreSQLFlexibleServer,
 	}
 }
 
-func newPostgreSQLFlexibleServer(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newPostgreSQLFlexibleServer(d *schema.ResourceData) schema.CoreResource {
 	region := lookupRegion(d, []string{})
 	sku := d.Get("sku_name").String()
 	storage := d.Get("storage_mb").Int()
@@ -63,7 +63,5 @@ func newPostgreSQLFlexibleServer(d *schema.ResourceData, u *schema.UsageData) *s
 		InstanceVersion: version,
 		Storage:         storage,
 	}
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
+	return r
 }

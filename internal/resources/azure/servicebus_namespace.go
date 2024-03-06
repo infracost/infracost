@@ -165,6 +165,7 @@ func (r *ServiceBusNamespace) buildMessagingOperationsCostComponent(suffix, star
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr(startUsage),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -245,6 +246,7 @@ func (r *ServiceBusNamespace) buildBrokeredConnectionsCostComponent(suffix, star
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr(startUsage),
 		},
+		UsageBased: true,
 	}
 }
 

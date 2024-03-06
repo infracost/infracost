@@ -4,8 +4,9 @@ import (
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 
-	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
+
+	"github.com/infracost/infracost/internal/usage"
 )
 
 type APIGatewayRestAPI struct {
@@ -14,8 +15,14 @@ type APIGatewayRestAPI struct {
 	MonthlyRequests *int64 `infracost_usage:"monthly_requests"`
 }
 
-var APIGatewayRestAPIUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0},
+func (r *APIGatewayRestAPI) CoreType() string {
+	return "APIGatewayRestAPI"
+}
+
+func (r *APIGatewayRestAPI) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_requests", ValueType: schema.Int64, DefaultValue: 0},
+	}
 }
 
 func (r *APIGatewayRestAPI) PopulateUsage(u *schema.UsageData) {
@@ -52,7 +59,7 @@ func (r *APIGatewayRestAPI) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		UsageSchema:    APIGatewayRestAPIUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 
@@ -74,5 +81,6 @@ func (r *APIGatewayRestAPI) requestsCostComponent(displayName string, usageTier 
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr(usageTier),
 		},
+		UsageBased: true,
 	}
 }

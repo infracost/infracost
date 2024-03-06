@@ -18,7 +18,16 @@ type ContainerRegistry struct {
 	MonthlyBuildVCPUHrs     *float64 `infracost_usage:"monthly_build_vcpu_hrs"`
 }
 
-var ContainerRegistryUsageSchema = []*schema.UsageItem{{Key: "storage_gb", ValueType: schema.Float64, DefaultValue: 0}, {Key: "monthly_build_vcpu_hrs", ValueType: schema.Float64, DefaultValue: 0}}
+func (r *ContainerRegistry) CoreType() string {
+	return "ContainerRegistry"
+}
+
+func (r *ContainerRegistry) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "monthly_build_vcpu_hrs", ValueType: schema.Float64, DefaultValue: 0},
+	}
+}
 
 func (r *ContainerRegistry) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -80,7 +89,8 @@ func (r *ContainerRegistry) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: ContainerRegistryUsageSchema,
+		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 
@@ -149,6 +159,7 @@ func (r *ContainerRegistry) containerRegistryStorageCostComponent(name, sku stri
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
+		UsageBased: true,
 	}
 }
 func (r *ContainerRegistry) containerRegistryCPUCostComponent(name, sku string, monthlyBuildVCPU *decimal.Decimal) *schema.CostComponent {
@@ -173,5 +184,6 @@ func (r *ContainerRegistry) containerRegistryCPUCostComponent(name, sku string, 
 			PurchaseOption:   strPtr("Consumption"),
 			StartUsageAmount: strPtr("6000"),
 		},
+		UsageBased: true,
 	}
 }

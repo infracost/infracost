@@ -7,8 +7,8 @@ import (
 
 func getComputeAddressRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "google_compute_address",
-		RFunc: newComputeAddress,
+		Name:      "google_compute_address",
+		CoreRFunc: newComputeAddress,
 		ReferenceAttributes: []string{
 			"google_compute_instance.network_interface.0.access_config.0.nat_ip",
 		},
@@ -16,15 +16,15 @@ func getComputeAddressRegistryItem() *schema.RegistryItem {
 }
 func getComputeGlobalAddressRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "google_compute_global_address",
-		RFunc: newComputeAddress,
+		Name:      "google_compute_global_address",
+		CoreRFunc: newComputeAddress,
 		ReferenceAttributes: []string{
 			"google_compute_instance.network_interface.0.access_config.0.nat_ip",
 		},
 	}
 }
 
-func newComputeAddress(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newComputeAddress(d *schema.ResourceData) schema.CoreResource {
 	purchaseOption := ""
 	instanceRefs := d.References("google_compute_instance.network_interface.0.access_config.0.nat_ip")
 	if len(instanceRefs) > 0 {
@@ -38,7 +38,5 @@ func newComputeAddress(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 		Purpose:                d.Get("purpose").String(),
 		InstancePurchaseOption: purchaseOption,
 	}
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
+	return r
 }

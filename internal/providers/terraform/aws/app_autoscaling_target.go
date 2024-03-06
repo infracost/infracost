@@ -7,17 +7,17 @@ import (
 
 func getAppAutoscalingTargetRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_appautoscaling_target",
-		RFunc: NewAppAutoscalingTargetResource,
+		Name:      "aws_appautoscaling_target",
+		CoreRFunc: NewAppAutoscalingTargetResource,
 		// This reference is used by other resources (e.g. DynamoDBTable) to generate
 		// a reverse reference
 		ReferenceAttributes: []string{"resource_id"},
 	}
 }
 
-func NewAppAutoscalingTargetResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	r := newAppAutoscalingTarget(d, u)
-	return r.BuildResource()
+func NewAppAutoscalingTargetResource(d *schema.ResourceData) schema.CoreResource {
+	return newAppAutoscalingTarget(d, nil)
+
 }
 
 func newAppAutoscalingTarget(d *schema.ResourceData, u *schema.UsageData) *aws.AppAutoscalingTarget {

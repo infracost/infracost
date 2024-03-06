@@ -8,7 +8,7 @@ import (
 func getComputeInstanceGroupManagerRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:                "google_compute_instance_group_manager",
-		RFunc:               newComputeInstanceGroupManager,
+		CoreRFunc:           newComputeInstanceGroupManager,
 		Notes:               []string{"Multiple versions are not supported."},
 		ReferenceAttributes: []string{"version.0.instance_template", "google_compute_per_instance_config.instance_group_manager"},
 		CustomRefIDFunc: func(d *schema.ResourceData) []string {
@@ -17,7 +17,7 @@ func getComputeInstanceGroupManagerRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func newComputeInstanceGroupManager(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newComputeInstanceGroupManager(d *schema.ResourceData) schema.CoreResource {
 	var region string
 	zone := d.Get("zone").String()
 	if zone != "" {
@@ -80,7 +80,5 @@ func newComputeInstanceGroupManager(d *schema.ResourceData, u *schema.UsageData)
 		ScratchDisks:      scratchDisks,
 		GuestAccelerators: guestAccelerators,
 	}
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
+	return r
 }

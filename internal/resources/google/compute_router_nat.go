@@ -14,9 +14,15 @@ type ComputeRouterNAT struct {
 	MonthlyDataProcessedGB *float64 `infracost_usage:"monthly_data_processed_gb"`
 }
 
-var ComputeRouterNATUsageSchema = []*schema.UsageItem{
-	{Key: "assigned_vms", ValueType: schema.Int64, DefaultValue: 0},
-	{Key: "monthly_data_processed_gb", ValueType: schema.Float64, DefaultValue: 0},
+func (r *ComputeRouterNAT) CoreType() string {
+	return "ComputeRouterNAT"
+}
+
+func (r *ComputeRouterNAT) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "assigned_vms", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_data_processed_gb", ValueType: schema.Float64, DefaultValue: 0},
+	}
 }
 
 func (r *ComputeRouterNAT) PopulateUsage(u *schema.UsageData) {
@@ -54,6 +60,7 @@ func (r *ComputeRouterNAT) BuildResource() *schema.Resource {
 						{Key: "description", ValueRegex: strPtr("/NAT Gateway: Uptime charge/")},
 					},
 				},
+				UsageBased: true,
 			},
 			{
 				Name:            "Data processed",
@@ -69,8 +76,9 @@ func (r *ComputeRouterNAT) BuildResource() *schema.Resource {
 						{Key: "description", ValueRegex: strPtr("/NAT Gateway: Data processing charge/")},
 					},
 				},
+				UsageBased: true,
 			},
 		},
-		UsageSchema: ComputeRouterNATUsageSchema,
+		UsageSchema: r.UsageSchema(),
 	}
 }

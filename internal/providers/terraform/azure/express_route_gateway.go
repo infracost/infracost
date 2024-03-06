@@ -7,17 +7,17 @@ import (
 
 func getExpressRouteGatewayRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_express_route_gateway",
-		RFunc: newExpressRouteGateway,
+		Name:      "azurerm_express_route_gateway",
+		CoreRFunc: newExpressRouteGateway,
 	}
 }
 
-func newExpressRouteGateway(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newExpressRouteGateway(d *schema.ResourceData) schema.CoreResource {
 	e := &azure.ExpressRouteGateway{
 		Address:    d.Address,
 		Region:     d.Get("region").String(),
 		ScaleUnits: d.Get("scale_units").Int(),
 	}
 
-	return e.BuildResource()
+	return e
 }

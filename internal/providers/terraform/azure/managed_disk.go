@@ -7,12 +7,12 @@ import (
 
 func getManagedDiskRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_managed_disk",
-		RFunc: NewManagedDisk,
+		Name:      "azurerm_managed_disk",
+		CoreRFunc: NewManagedDisk,
 	}
 }
 
-func NewManagedDisk(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewManagedDisk(d *schema.ResourceData) schema.CoreResource {
 	r := &azure.ManagedDisk{
 		Address: d.Address,
 		Region:  lookupRegion(d, []string{}),
@@ -24,6 +24,5 @@ func NewManagedDisk(d *schema.ResourceData, u *schema.UsageData) *schema.Resourc
 		},
 	}
 
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

@@ -18,7 +18,13 @@ type LightsailInstance struct {
 	BundleID string
 }
 
-var LightsailInstanceUsageSchema = []*schema.UsageItem{}
+func (r *LightsailInstance) CoreType() string {
+	return "LightsailInstance"
+}
+
+func (r *LightsailInstance) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 func (r *LightsailInstance) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -80,6 +86,6 @@ func (r *LightsailInstance) BuildResource() *schema.Resource {
 				},
 			},
 		},
-		UsageSchema: LightsailInstanceUsageSchema,
+		UsageSchema: r.UsageSchema(),
 	}
 }

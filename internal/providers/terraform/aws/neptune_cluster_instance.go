@@ -9,15 +9,15 @@ import (
 
 func getNeptuneClusterInstanceRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_neptune_cluster_instance",
-		RFunc: NewNeptuneClusterInstance,
+		Name:      "aws_neptune_cluster_instance",
+		CoreRFunc: NewNeptuneClusterInstance,
 		ReferenceAttributes: []string{
 			"cluster_identifier",
 		},
 	}
 }
 
-func NewNeptuneClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewNeptuneClusterInstance(d *schema.ResourceData) schema.CoreResource {
 	ioOptimized := false
 
 	clusterIdentifiers := d.References("cluster_identifier")
@@ -36,7 +36,5 @@ func NewNeptuneClusterInstance(d *schema.ResourceData, u *schema.UsageData) *sch
 	if !d.IsEmpty("count") {
 		r.Count = intPtr(d.Get("count").Int())
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

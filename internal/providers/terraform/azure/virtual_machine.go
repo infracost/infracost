@@ -7,11 +7,11 @@ import (
 
 func getVirtualMachineRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_virtual_machine",
-		RFunc: NewVirtualMachine,
+		Name:      "azurerm_virtual_machine",
+		CoreRFunc: NewVirtualMachine,
 	}
 }
-func NewVirtualMachine(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewVirtualMachine(d *schema.ResourceData) schema.CoreResource {
 	r := &azure.VirtualMachine{
 		Address:                    d.Address,
 		Region:                     lookupRegion(d, []string{}),
@@ -39,6 +39,5 @@ func NewVirtualMachine(d *schema.ResourceData, u *schema.UsageData) *schema.Reso
 		}
 	}
 
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

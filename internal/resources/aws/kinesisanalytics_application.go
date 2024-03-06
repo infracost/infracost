@@ -13,8 +13,14 @@ type KinesisAnalyticsApplication struct {
 	KinesisProcessingUnits *int64 `infracost_usage:"kinesis_processing_units"`
 }
 
-var KinesisAnalyticsApplicationUsageSchema = []*schema.UsageItem{
-	{Key: "kinesis_processing_units", ValueType: schema.Int64, DefaultValue: 0},
+func (r *KinesisAnalyticsApplication) CoreType() string {
+	return "KinesisAnalyticsApplication"
+}
+
+func (r *KinesisAnalyticsApplication) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "kinesis_processing_units", ValueType: schema.Int64, DefaultValue: 0},
+	}
 }
 
 func (r *KinesisAnalyticsApplication) PopulateUsage(u *schema.UsageData) {
@@ -30,7 +36,7 @@ func (r *KinesisAnalyticsApplication) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: []*schema.CostComponent{r.processingStreamCostComponent(kinesisProcessingUnits)},
-		UsageSchema:    KinesisAnalyticsApplicationUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 
@@ -49,5 +55,6 @@ func (r *KinesisAnalyticsApplication) processingStreamCostComponent(kinesisProce
 				{Key: "usagetype", ValueRegex: strPtr("/KPU-Hour-Java/i")},
 			},
 		},
+		UsageBased: true,
 	}
 }

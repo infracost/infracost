@@ -15,19 +15,6 @@ const (
 )
 
 var (
-	directoryServiceDirectorySchema = []*schema.UsageItem{
-		{
-			Key:          "additional_domain_controllers",
-			DefaultValue: 0,
-			ValueType:    schema.Float64,
-		},
-		{
-			Key:          "shared_accounts",
-			DefaultValue: 0,
-			ValueType:    schema.Float64,
-		},
-	}
-
 	awsVendorFilter       = strPtr("aws")
 	directorySvcSvcFilter = strPtr("AWSDirectoryService")
 	productFmlyFilter     = strPtr("AWS Directory Service")
@@ -89,6 +76,17 @@ type DirectoryServiceDirectory struct {
 	SharedAccounts *float64 `infracost_usage:"shared_accounts"`
 }
 
+func (d *DirectoryServiceDirectory) CoreType() string {
+	return "DirectoryServiceDirectory"
+}
+
+func (d *DirectoryServiceDirectory) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "additional_domain_controllers", DefaultValue: 0, ValueType: schema.Float64},
+		{Key: "shared_accounts", DefaultValue: 0, ValueType: schema.Float64},
+	}
+}
+
 // PopulateUsage parses the u schema.Usage into the DirectoryServiceDirectory.
 // It uses the `infracost_usage` struct tags to populate data into the DirectoryServiceDirectory.
 func (d *DirectoryServiceDirectory) PopulateUsage(u *schema.UsageData) {
@@ -136,13 +134,14 @@ func (d *DirectoryServiceDirectory) BuildResource() *schema.Resource {
 					{Key: "location", Value: strPtr(d.RegionName)},
 				},
 			},
+			UsageBased: true,
 		})
 	}
 
 	return &schema.Resource{
 		Name:           d.Address,
 		CostComponents: costComponents,
-		UsageSchema:    directoryServiceDirectorySchema,
+		UsageSchema:    d.UsageSchema(),
 	}
 }
 
@@ -162,6 +161,7 @@ func (d DirectoryServiceDirectory) domainControllerCostComponent(amount float64,
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }
 

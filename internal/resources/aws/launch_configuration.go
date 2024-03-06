@@ -40,6 +40,14 @@ type LaunchConfiguration struct {
 
 var LaunchConfigurationUsageSchema = InstanceUsageSchema
 
+func (r *LaunchConfiguration) CoreType() string {
+	return "LaunchConfiguration"
+}
+
+func (r *LaunchConfiguration) UsageSchema() []*schema.UsageItem {
+	return LaunchConfigurationUsageSchema
+}
+
 func (a *LaunchConfiguration) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(a, u)
 }
@@ -77,7 +85,7 @@ func (a *LaunchConfiguration) BuildResource() *schema.Resource {
 
 	r := &schema.Resource{
 		Name:           a.Address,
-		UsageSchema:    LaunchConfigurationUsageSchema,
+		UsageSchema:    a.UsageSchema(),
 		CostComponents: instanceResource.CostComponents,
 		SubResources:   instanceResource.SubResources,
 		EstimateUsage:  instanceResource.EstimateUsage,

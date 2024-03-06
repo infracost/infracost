@@ -8,12 +8,12 @@ import (
 func getComputeImageRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:                "google_compute_image",
-		RFunc:               newComputeImage,
+		CoreRFunc:           newComputeImage,
 		ReferenceAttributes: []string{"source_disk", "source_image", "source_snapshot"},
 	}
 }
 
-func newComputeImage(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newComputeImage(d *schema.ResourceData) schema.CoreResource {
 	region := d.Get("region").String()
 
 	storageSize := computeImageDiskSize(d)
@@ -23,7 +23,5 @@ func newComputeImage(d *schema.ResourceData, u *schema.UsageData) *schema.Resour
 		Region:      region,
 		StorageSize: storageSize,
 	}
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
+	return r
 }

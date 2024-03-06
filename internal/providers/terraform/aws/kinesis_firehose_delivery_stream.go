@@ -9,15 +9,15 @@ import (
 
 func getKinesisFirehoseDeliveryStreamRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_kinesis_firehose_delivery_stream",
-		RFunc: NewKinesisFirehoseDeliveryStream,
+		Name:      "aws_kinesis_firehose_delivery_stream",
+		CoreRFunc: NewKinesisFirehoseDeliveryStream,
 		ReferenceAttributes: []string{
 			"elasticsearch_configuration.0.vpc_config.0.subnet_ids",
 		},
 	}
 }
 
-func NewKinesisFirehoseDeliveryStream(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewKinesisFirehoseDeliveryStream(d *schema.ResourceData) schema.CoreResource {
 	formatConversionEnabled := d.GetBoolOrDefault("extended_s3_configuration.0.data_format_conversion_configuration.0.enabled", true)
 
 	subnetIDs := len(d.Get("elasticsearch_configuration.0.vpc_config.0.subnet_ids").Array())
@@ -37,7 +37,5 @@ func NewKinesisFirehoseDeliveryStream(d *schema.ResourceData, u *schema.UsageDat
 		VPCDeliveryEnabled:          d.Get("elasticsearch_configuration.0.vpc_config").Type != gjson.Null,
 		VPCDeliveryAZs:              int64(subnetIDs),
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

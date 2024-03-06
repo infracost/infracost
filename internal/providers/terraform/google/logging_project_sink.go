@@ -7,16 +7,15 @@ import (
 
 func getLoggingProjectSinkRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "google_logging_project_sink",
-		RFunc: NewLoggingProjectSink,
+		Name:      "google_logging_project_sink",
+		CoreRFunc: NewLoggingProjectSink,
 	}
 }
 
-func NewLoggingProjectSink(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewLoggingProjectSink(d *schema.ResourceData) schema.CoreResource {
 	r := &google.Logging{
 		Address: d.Address,
 	}
 
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

@@ -1,9 +1,10 @@
 package azure
 
 import (
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 // NetworkWatcher struct represents Azure Network Watcher.
@@ -93,5 +94,6 @@ func (r *NetworkWatcher) networkDiagnosticToolCostComponent() *schema.CostCompon
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr(freeQuantity.String()),
 		},
+		UsageBased: true,
 	}
 }

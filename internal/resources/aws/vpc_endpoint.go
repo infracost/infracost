@@ -7,8 +7,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
+
+	"github.com/infracost/infracost/internal/usage"
 )
 
 type VPCEndpoint struct {
@@ -19,8 +20,14 @@ type VPCEndpoint struct {
 	MonthlyDataProcessedGb *float64 `infracost_usage:"monthly_data_processed_gb"`
 }
 
-var VPCEndpointUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_data_processed_gb", ValueType: schema.Float64, DefaultValue: 0},
+func (r *VPCEndpoint) CoreType() string {
+	return "VPCEndpoint"
+}
+
+func (r *VPCEndpoint) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_data_processed_gb", ValueType: schema.Float64, DefaultValue: 0},
+	}
 }
 
 func (r *VPCEndpoint) PopulateUsage(u *schema.UsageData) {
@@ -45,7 +52,7 @@ func (r *VPCEndpoint) BuildResource() *schema.Resource {
 			Name:        r.Address,
 			NoPrice:     true,
 			IsSkipped:   true,
-			UsageSchema: VPCEndpointUsageSchema,
+			UsageSchema: r.UsageSchema(),
 		}
 	}
 
@@ -92,6 +99,7 @@ func (r *VPCEndpoint) BuildResource() *schema.Resource {
 					{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", endpointBytes))},
 				},
 			},
+			UsageBased: true,
 		})
 	}
 
@@ -113,7 +121,8 @@ func (r *VPCEndpoint) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: VPCEndpointUsageSchema,
+		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 
@@ -135,5 +144,6 @@ func (r *VPCEndpoint) dataProcessedCostComponent(endpointBytes string, displayNa
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr(usageTier),
 		},
+		UsageBased: true,
 	}
 }

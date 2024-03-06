@@ -7,16 +7,14 @@ import (
 
 func getAPIGatewayRestAPIRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_api_gateway_rest_api",
-		RFunc: NewAPIGatewayRestAPI,
+		Name:      "aws_api_gateway_rest_api",
+		CoreRFunc: NewAPIGatewayRestAPI,
 	}
 }
-func NewAPIGatewayRestAPI(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewAPIGatewayRestAPI(d *schema.ResourceData) schema.CoreResource {
 	r := &aws.APIGatewayRestAPI{
 		Address: d.Address,
 		Region:  d.Get("region").String(),
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

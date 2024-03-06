@@ -7,16 +7,15 @@ import (
 
 func getPubSubTopicRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "google_pubsub_topic",
-		RFunc: NewPubSubTopic,
+		Name:      "google_pubsub_topic",
+		CoreRFunc: NewPubSubTopic,
 	}
 }
 
-func NewPubSubTopic(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewPubSubTopic(d *schema.ResourceData) schema.CoreResource {
 	r := &google.PubSubTopic{
 		Address: d.Address,
 	}
 
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

@@ -8,11 +8,11 @@ import (
 func getMSKClusterRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:                "aws_msk_cluster",
-		RFunc:               NewMSKCluster,
+		CoreRFunc:           NewMSKCluster,
 		ReferenceAttributes: []string{"aws_appautoscaling_target.resource_id"},
 	}
 }
-func NewMSKCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewMSKCluster(d *schema.ResourceData) schema.CoreResource {
 	targets := []*aws.AppAutoscalingTarget{}
 	for _, ref := range d.References("aws_appautoscaling_target.resource_id") {
 		targets = append(targets, newAppAutoscalingTarget(ref, ref.UsageData))
@@ -35,7 +35,5 @@ func NewMSKCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 		BrokerNodeEBSVolumeSize: brokerEBSVolumeSize,
 		AppAutoscalingTarget:    targets,
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

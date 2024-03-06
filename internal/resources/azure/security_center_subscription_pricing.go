@@ -139,6 +139,7 @@ func (r *SecurityCenterSubscriptionPricing) addServersP1CostComponent() *schema.
 				{Key: "meterName", Value: strPtr("Standard P1 Node")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -163,6 +164,7 @@ func (r *SecurityCenterSubscriptionPricing) addServersP2CostComponent() *schema.
 				{Key: "meterName", Value: strPtr("Standard P2 Node")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -187,6 +189,7 @@ func (r *SecurityCenterSubscriptionPricing) addContainersCostComponent() *schema
 				{Key: "meterName", Value: strPtr("Standard vCore vCore Pack")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -211,6 +214,7 @@ func (r *SecurityCenterSubscriptionPricing) addSQLAzureConnectedCostComponent() 
 				{Key: "meterName", Value: strPtr("Standard Node")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -235,6 +239,7 @@ func (r *SecurityCenterSubscriptionPricing) addSQLOutsideAzureCostComponent() *s
 				{Key: "meterName", Value: strPtr("Standard vCore")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -259,6 +264,7 @@ func (r *SecurityCenterSubscriptionPricing) addMySQLCostComponent() *schema.Cost
 				{Key: "meterName", Value: strPtr("Standard Node")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -283,6 +289,7 @@ func (r *SecurityCenterSubscriptionPricing) addPostgreSQLCostComponent() *schema
 				{Key: "meterName", Value: strPtr("Standard Node")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -313,6 +320,7 @@ func (r *SecurityCenterSubscriptionPricing) addMariaDBCostComponent() *schema.Co
 				{Key: "meterName", Value: strPtr("Standard Instance")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -337,6 +345,7 @@ func (r *SecurityCenterSubscriptionPricing) addCosmosDBCostComponent() *schema.C
 				{Key: "meterName", Value: strPtr("Standard 100 RU/s")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -361,6 +370,7 @@ func (r *SecurityCenterSubscriptionPricing) addStorageCostComponent() *schema.Co
 				{Key: "meterName", Value: strPtr("Standard Node")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -385,6 +395,7 @@ func (r *SecurityCenterSubscriptionPricing) addAppServiceCostComponent() *schema
 				{Key: "meterName", Value: strPtr("Standard Node")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -415,6 +426,7 @@ func (r *SecurityCenterSubscriptionPricing) addKeyVaultCostComponent() *schema.C
 				{Key: "meterName", Value: strPtr("Per node Std Node")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -445,6 +457,7 @@ func (r *SecurityCenterSubscriptionPricing) addARMCostComponent() *schema.CostCo
 				{Key: "meterName", Value: strPtr("Per node Std Node")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -475,6 +488,7 @@ func (r *SecurityCenterSubscriptionPricing) addDNSCostComponent() *schema.CostCo
 				{Key: "meterName", Value: strPtr("Standard Queries")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -499,6 +513,7 @@ func (r *SecurityCenterSubscriptionPricing) addKubernetesCostComponent() *schema
 				{Key: "meterName", Value: strPtr("Standard Cores")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -522,6 +537,7 @@ func (r *SecurityCenterSubscriptionPricing) addContainerRegistryCostComponent() 
 				{Key: "meterName", Value: strPtr("Standard Images")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 

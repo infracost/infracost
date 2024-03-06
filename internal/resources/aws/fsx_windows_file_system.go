@@ -20,8 +20,14 @@ type FSxWindowsFileSystem struct {
 	BackupStorageGB    *float64 `infracost_usage:"backup_storage_gb"`
 }
 
-var FSxWindowsFileSystemUsageSchema = []*schema.UsageItem{
-	{Key: "backup_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+func (r *FSxWindowsFileSystem) CoreType() string {
+	return "FSxWindowsFileSystem"
+}
+
+func (r *FSxWindowsFileSystem) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "backup_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+	}
 }
 
 func (r *FSxWindowsFileSystem) PopulateUsage(u *schema.UsageData) {
@@ -36,7 +42,7 @@ func (r *FSxWindowsFileSystem) BuildResource() *schema.Resource {
 			r.storageCapacityCostComponent(),
 			r.backupGBCostComponent(),
 		},
-		UsageSchema: FSxWindowsFileSystemUsageSchema,
+		UsageSchema: r.UsageSchema(),
 	}
 }
 
@@ -124,5 +130,6 @@ func (r *FSxWindowsFileSystem) backupGBCostComponent() *schema.CostComponent {
 				{Key: "fileSystemType", Value: strPtr("Windows")},
 			},
 		},
+		UsageBased: true,
 	}
 }

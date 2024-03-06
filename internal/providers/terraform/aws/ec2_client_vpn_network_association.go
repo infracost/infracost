@@ -7,16 +7,14 @@ import (
 
 func getEC2ClientVPNNetworkAssociationRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_ec2_client_vpn_network_association",
-		RFunc: NewEC2ClientVPNNetworkAssociation,
+		Name:      "aws_ec2_client_vpn_network_association",
+		CoreRFunc: NewEC2ClientVPNNetworkAssociation,
 	}
 }
-func NewEC2ClientVPNNetworkAssociation(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewEC2ClientVPNNetworkAssociation(d *schema.ResourceData) schema.CoreResource {
 	r := &aws.EC2ClientVPNNetworkAssociation{
 		Address: d.Address,
 		Region:  d.Get("region").String(),
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

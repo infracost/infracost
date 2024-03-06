@@ -41,18 +41,24 @@ var StorageProfileDataDiskUsageSchema = []*schema.UsageItem{
 	{ValueType: schema.Int64, DefaultValue: 0, Key: "monthly_disk_operations"},
 }
 
-var VirtualMachineScaleSetUsageSchema = []*schema.UsageItem{
-	{Key: "instances", ValueType: schema.Int64, DefaultValue: 0},
-	{
-		Key:          "storage_profile_os_disk",
-		ValueType:    schema.SubResourceUsage,
-		DefaultValue: &usage.ResourceUsage{Name: "storage_profile_os_disk", Items: StorageProfileOSDiskUsageSchema},
-	},
-	{
-		Key:          "storage_profile_data_disk",
-		ValueType:    schema.SubResourceUsage,
-		DefaultValue: &usage.ResourceUsage{Name: "storage_profile_data_disk", Items: StorageProfileDataDiskUsageSchema},
-	},
+func (r *VirtualMachineScaleSet) CoreType() string {
+	return "VirtualMachineScaleSet"
+}
+
+func (r *VirtualMachineScaleSet) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "instances", ValueType: schema.Int64, DefaultValue: 0},
+		{
+			Key:          "storage_profile_os_disk",
+			ValueType:    schema.SubResourceUsage,
+			DefaultValue: &usage.ResourceUsage{Name: "storage_profile_os_disk", Items: StorageProfileOSDiskUsageSchema},
+		},
+		{
+			Key:          "storage_profile_data_disk",
+			ValueType:    schema.SubResourceUsage,
+			DefaultValue: &usage.ResourceUsage{Name: "storage_profile_data_disk", Items: StorageProfileDataDiskUsageSchema},
+		},
+	}
 }
 
 func (r *VirtualMachineScaleSet) PopulateUsage(u *schema.UsageData) {
@@ -92,7 +98,8 @@ func (r *VirtualMachineScaleSet) BuildResource() *schema.Resource {
 	res := &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		SubResources:   subResources, UsageSchema: VirtualMachineScaleSetUsageSchema,
+		SubResources:   subResources,
+		UsageSchema:    r.UsageSchema(),
 	}
 
 	schema.MultiplyQuantities(res, capacity)
@@ -113,7 +120,7 @@ func (r *VirtualMachineScaleSet) BuildResource() *schema.Resource {
 		res.SubResources = append(res.SubResources, &schema.Resource{
 			Name:           "storage_data_disk",
 			CostComponents: managedDiskCostComponents(region, s.DiskType, s.DiskSizeGB, s.DiskIOPSReadWrite, s.DiskMBPSReadWrite, storageOperations),
-			UsageSchema:    VirtualMachineScaleSetUsageSchema,
+			UsageSchema:    r.UsageSchema(),
 		})
 	}
 

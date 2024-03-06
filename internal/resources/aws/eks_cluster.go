@@ -12,7 +12,13 @@ type EKSCluster struct {
 	Region  string
 }
 
-var EKSClusterUsageSchema = []*schema.UsageItem{}
+func (r *EKSCluster) CoreType() string {
+	return "EKSCluster"
+}
+
+func (r *EKSCluster) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 func (r *EKSCluster) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -22,7 +28,7 @@ func (r *EKSCluster) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: []*schema.CostComponent{r.clusterHoursCostComponent()},
-		UsageSchema:    EKSClusterUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

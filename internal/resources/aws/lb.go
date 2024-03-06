@@ -26,6 +26,14 @@ var LBUsageSchema = []*schema.UsageItem{
 	{Key: "processed_bytes_gb", ValueType: schema.Float64, DefaultValue: 0},
 }
 
+func (r *LB) CoreType() string {
+	return "LB"
+}
+
+func (r *LB) UsageSchema() []*schema.UsageItem {
+	return LBUsageSchema
+}
+
 func (r *LB) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
@@ -72,7 +80,7 @@ func (r *LB) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		UsageSchema:    LBUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 
@@ -140,5 +148,6 @@ func (r *LB) capacityUnitsCostComponent(productFamily string, maxLCU *decimal.De
 				{Key: "usagetype", ValueRegex: strPtr("/LCUUsage/")},
 			},
 		},
+		UsageBased: true,
 	}
 }

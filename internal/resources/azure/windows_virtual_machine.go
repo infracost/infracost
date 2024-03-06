@@ -30,13 +30,19 @@ var OSDiskUsageSchema = []*schema.UsageItem{
 	{ValueType: schema.Int64, DefaultValue: 0, Key: "monthly_disk_operations"},
 }
 
-var WindowsVirtualMachineUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_hrs", ValueType: schema.Float64, DefaultValue: 0},
-	{
-		Key:          "os_disk",
-		ValueType:    schema.SubResourceUsage,
-		DefaultValue: &usage.ResourceUsage{Name: "os_disk", Items: OSDiskUsageSchema},
-	},
+func (r *WindowsVirtualMachine) CoreType() string {
+	return "WindowsVirtualMachine"
+}
+
+func (r *WindowsVirtualMachine) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_hrs", ValueType: schema.Float64, DefaultValue: 0},
+		{
+			Key:          "os_disk",
+			ValueType:    schema.SubResourceUsage,
+			DefaultValue: &usage.ResourceUsage{Name: "os_disk", Items: OSDiskUsageSchema},
+		},
+	}
 }
 
 func (r *WindowsVirtualMachine) PopulateUsage(u *schema.UsageData) {
@@ -69,7 +75,8 @@ func (r *WindowsVirtualMachine) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		SubResources:   subResources, UsageSchema: WindowsVirtualMachineUsageSchema,
+		SubResources:   subResources,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 

@@ -1,9 +1,10 @@
 package google
 
 import (
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 // ComputeSnapshot struct represents Compute Snapshot resource.
@@ -16,9 +17,15 @@ type ComputeSnapshot struct {
 	StorageGB *float64 `infracost_usage:"storage_gb"`
 }
 
-// ComputeSnapshotUsageSchema defines a list which represents the usage schema of ComputeSnapshot.
-var ComputeSnapshotUsageSchema = []*schema.UsageItem{
-	{Key: "storage_gb", DefaultValue: 0, ValueType: schema.Float64},
+func (r *ComputeSnapshot) CoreType() string {
+	return "ComputeSnapshot"
+}
+
+// UsageSchema defines a list which represents the usage schema of ComputeSnapshot.
+func (r *ComputeSnapshot) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "storage_gb", DefaultValue: 0, ValueType: schema.Float64},
+	}
 }
 
 // PopulateUsage parses the u schema.UsageData into the ComputeSnapshot.
@@ -37,7 +44,7 @@ func (r *ComputeSnapshot) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    ComputeSnapshotUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }
@@ -73,5 +80,6 @@ func (r *ComputeSnapshot) storageCostComponent() *schema.CostComponent {
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr("5"),
 		},
+		UsageBased: true,
 	}
 }

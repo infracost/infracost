@@ -91,6 +91,9 @@
         },
         "monthlyCost": {
           "type": ["string", "null"]
+        },
+        "usageBased": {
+          "type": "boolean"
         }
       },
       "additionalProperties": false,

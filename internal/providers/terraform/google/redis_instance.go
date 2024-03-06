@@ -7,12 +7,12 @@ import (
 
 func getRedisInstanceRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "google_redis_instance",
-		RFunc: NewRedisInstance,
+		Name:      "google_redis_instance",
+		CoreRFunc: NewRedisInstance,
 	}
 }
 
-func NewRedisInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewRedisInstance(d *schema.ResourceData) schema.CoreResource {
 	r := &google.RedisInstance{
 		Address:      d.Address,
 		Region:       d.Get("region").String(),
@@ -20,6 +20,5 @@ func NewRedisInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resou
 		Tier:         d.Get("tier").String(),
 	}
 
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

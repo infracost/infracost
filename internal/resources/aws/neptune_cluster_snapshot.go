@@ -12,8 +12,14 @@ type NeptuneClusterSnapshot struct {
 	BackupStorageGB       *float64 `infracost_usage:"backup_storage_gb"`
 }
 
-var NeptuneClusterSnapshotUsageSchema = []*schema.UsageItem{
-	{Key: "backup_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+func (r *NeptuneClusterSnapshot) CoreType() string {
+	return "NeptuneClusterSnapshot"
+}
+
+func (r *NeptuneClusterSnapshot) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "backup_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+	}
 }
 
 func (r *NeptuneClusterSnapshot) PopulateUsage(u *schema.UsageData) {
@@ -26,7 +32,7 @@ func (r *NeptuneClusterSnapshot) BuildResource() *schema.Resource {
 			Name:        r.Address,
 			NoPrice:     true,
 			IsSkipped:   true,
-			UsageSchema: NeptuneClusterSnapshotUsageSchema,
+			UsageSchema: r.UsageSchema(),
 		}
 	}
 
@@ -38,6 +44,6 @@ func (r *NeptuneClusterSnapshot) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: []*schema.CostComponent{cluster.backupStorageCostComponent()},
-		UsageSchema:    NeptuneClusterSnapshotUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }

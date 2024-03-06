@@ -11,11 +11,11 @@ func getSpotInstanceRequestRegistryItem() *schema.RegistryItem {
 		Notes: []string{
 			"Notes",
 		},
-		RFunc: newSpotInstanceRequest,
+		CoreRFunc: newSpotInstanceRequest,
 	}
 }
 
-func newSpotInstanceRequest(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newSpotInstanceRequest(d *schema.ResourceData) schema.CoreResource {
 	region := d.Get("region").String()
 
 	var instanceType, ami string
@@ -30,7 +30,6 @@ func newSpotInstanceRequest(d *schema.ResourceData, u *schema.UsageData) *schema
 		InstanceType:   instanceType,
 		AMI:            ami,
 	}
-	r.PopulateUsage(u)
 
-	return r.BuildResource()
+	return r
 }

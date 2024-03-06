@@ -8,15 +8,15 @@ import (
 
 func getS3BucketLifecycleConfigurationRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_s3_bucket_lifecycle_configuration",
-		RFunc: newS3BucketLifecycleConfigurationResource,
+		Name:      "aws_s3_bucket_lifecycle_configuration",
+		CoreRFunc: newS3BucketLifecycleConfigurationResource,
 		ReferenceAttributes: []string{
 			"bucket",
 		},
 	}
 }
 
-func newS3BucketLifecycleConfigurationResource(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newS3BucketLifecycleConfigurationResource(d *schema.ResourceData) schema.CoreResource {
 	storageClassNames := map[string]string{
 		"STANDARD":            "standard",
 		"INTELLIGENT_TIERING": "intelligent_tiering",
@@ -69,7 +69,6 @@ func newS3BucketLifecycleConfigurationResource(d *schema.ResourceData, u *schema
 		ObjectTagsEnabled:       objTagsEnabled,
 		LifecycleStorageClasses: lifecycleStorageClasses,
 	}
-	r.PopulateUsage(u)
 
-	return r.BuildResource()
+	return r
 }

@@ -8,11 +8,11 @@ import (
 func getDXGatewayAssociationRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:                "aws_dx_gateway_association",
-		RFunc:               NewDXGatewayAssociation,
+		CoreRFunc:           NewDXGatewayAssociation,
 		ReferenceAttributes: []string{"associated_gateway_id"},
 	}
 }
-func NewDXGatewayAssociation(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewDXGatewayAssociation(d *schema.ResourceData) schema.CoreResource {
 	r := &aws.DXGatewayAssociation{Address: d.Address, Region: d.Get("region").String()}
 
 	// Try to get the region from the associated gateway
@@ -20,7 +20,5 @@ func NewDXGatewayAssociation(d *schema.ResourceData, u *schema.UsageData) *schem
 	if len(assocGateway) > 0 {
 		r.AssociatedGatewayRegion = assocGateway[0].Get("region").String()
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

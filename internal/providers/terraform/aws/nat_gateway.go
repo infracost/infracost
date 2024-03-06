@@ -11,18 +11,17 @@ func getNATGatewayRegistryItem() *schema.RegistryItem {
 		ReferenceAttributes: []string{
 			"allocation_id",
 		},
-		RFunc: NewNATGateway,
+		CoreRFunc: NewNATGateway,
 	}
 }
 
-func NewNATGateway(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewNATGateway(d *schema.ResourceData) schema.CoreResource {
 	region := d.Get("region").String()
 
 	a := &aws.NATGateway{
 		Address: d.Address,
 		Region:  region,
 	}
-	a.PopulateUsage(u)
 
-	return a.BuildResource()
+	return a
 }

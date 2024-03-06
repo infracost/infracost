@@ -174,7 +174,8 @@
                 "monthlyQuantity": "100",
                 "price": "0.2",
                 "hourlyCost": "0.02739726027397260273972",
-                "monthlyCost": "20"
+                "monthlyCost": "20",
+                "usageBased": true
               },
               {
                 "name": "Ephemeral storage",
@@ -192,7 +193,8 @@
                 "monthlyQuantity": "25000000",
                 "price": "0.0000166667",
                 "hourlyCost": "0.57077739726027397260344749",
-                "monthlyCost": "416.6675"
+                "monthlyCost": "416.6675",
+                "usageBased": true
               },
               {
                 "name": "Duration (over 15B)",
@@ -201,7 +203,8 @@
                 "monthlyQuantity": "0",
                 "price": "0.0000133334",
                 "hourlyCost": "0",
-                "monthlyCost": "0"
+                "monthlyCost": "0",
+                "usageBased": true
               }
             ]
           },
@@ -220,7 +223,8 @@
                 "monthlyQuantity": "0",
                 "price": "0.2",
                 "hourlyCost": "0",
-                "monthlyCost": "0"
+                "monthlyCost": "0",
+                "usageBased": true
               },
               {
                 "name": "Ephemeral storage",
@@ -238,7 +242,8 @@
                 "monthlyQuantity": "0",
                 "price": "0.0000166667",
                 "hourlyCost": "0",
-                "monthlyCost": "0"
+                "monthlyCost": "0",
+                "usageBased": true
               },
               {
                 "name": "Duration (over 15B)",
@@ -247,7 +252,8 @@
                 "monthlyQuantity": "0",
                 "price": "0.0000133334",
                 "hourlyCost": "0",
-                "monthlyCost": "0"
+                "monthlyCost": "0",
+                "usageBased": true
               }
             ]
           },
@@ -272,7 +278,8 @@
                     "monthlyQuantity": "0",
                     "price": "0.023",
                     "hourlyCost": "0",
-                    "monthlyCost": "0"
+                    "monthlyCost": "0",
+                    "usageBased": true
                   },
                   {
                     "name": "PUT, COPY, POST, LIST requests",
@@ -281,7 +288,8 @@
                     "monthlyQuantity": "0",
                     "price": "0.005",
                     "hourlyCost": "0",
-                    "monthlyCost": "0"
+                    "monthlyCost": "0",
+                    "usageBased": true
                   },
                   {
                     "name": "GET, SELECT, and all other requests",
@@ -290,7 +298,8 @@
                     "monthlyQuantity": "0",
                     "price": "0.0004",
                     "hourlyCost": "0",
-                    "monthlyCost": "0"
+                    "monthlyCost": "0",
+                    "usageBased": true
                   },
                   {
                     "name": "Select data scanned",
@@ -299,7 +308,8 @@
                     "monthlyQuantity": "0",
                     "price": "0.002",
                     "hourlyCost": "0",
-                    "monthlyCost": "0"
+                    "monthlyCost": "0",
+                    "usageBased": true
                   },
                   {
                     "name": "Select data returned",
@@ -308,7 +318,8 @@
                     "monthlyQuantity": "0",
                     "price": "0.0007",
                     "hourlyCost": "0",
-                    "monthlyCost": "0"
+                    "monthlyCost": "0",
+                    "usageBased": true
                   }
                 ]
               }
@@ -463,7 +474,8 @@
                 "monthlyQuantity": "100",
                 "price": "0.2",
                 "hourlyCost": "0.02739726027397260273972",
-                "monthlyCost": "20"
+                "monthlyCost": "20",
+                "usageBased": true
               },
               {
                 "name": "Ephemeral storage",
@@ -481,7 +493,8 @@
                 "monthlyQuantity": "25000000",
                 "price": "0.0000166667",
                 "hourlyCost": "0.57077739726027397260344749",
-                "monthlyCost": "416.6675"
+                "monthlyCost": "416.6675",
+                "usageBased": true
               },
               {
                 "name": "Duration (over 15B)",
@@ -490,7 +503,8 @@
                 "monthlyQuantity": "0",
                 "price": "0.0000133334",
                 "hourlyCost": "0",
-                "monthlyCost": "0"
+                "monthlyCost": "0",
+                "usageBased": true
               }
             ]
           },
@@ -509,7 +523,8 @@
                 "monthlyQuantity": "0",
                 "price": "0.2",
                 "hourlyCost": "0",
-                "monthlyCost": "0"
+                "monthlyCost": "0",
+                "usageBased": true
               },
               {
                 "name": "Ephemeral storage",
@@ -527,7 +542,8 @@
                 "monthlyQuantity": "0",
                 "price": "0.0000166667",
                 "hourlyCost": "0",
-                "monthlyCost": "0"
+                "monthlyCost": "0",
+                "usageBased": true
               },
               {
                 "name": "Duration (over 15B)",
@@ -536,7 +552,8 @@
                 "monthlyQuantity": "0",
                 "price": "0.0000133334",
                 "hourlyCost": "0",
-                "monthlyCost": "0"
+                "monthlyCost": "0",
+                "usageBased": true
               }
             ]
           },
@@ -561,7 +578,8 @@
                     "monthlyQuantity": "0",
                     "price": "0.023",
                     "hourlyCost": "0",
-                    "monthlyCost": "0"
+                    "monthlyCost": "0",
+                    "usageBased": true
                   },
                   {
                     "name": "PUT, COPY, POST, LIST requests",
@@ -570,7 +588,8 @@
                     "monthlyQuantity": "0",
                     "price": "0.005",
                     "hourlyCost": "0",
-                    "monthlyCost": "0"
+                    "monthlyCost": "0",
+                    "usageBased": true
                   },
                   {
                     "name": "GET, SELECT, and all other requests",
@@ -579,7 +598,8 @@
                     "monthlyQuantity": "0",
                     "price": "0.0004",
                     "hourlyCost": "0",
-                    "monthlyCost": "0"
+                    "monthlyCost": "0",
+                    "usageBased": true
                   },
                   {
                     "name": "Select data scanned",
@@ -588,7 +608,8 @@
                     "monthlyQuantity": "0",
                     "price": "0.002",
                     "hourlyCost": "0",
-                    "monthlyCost": "0"
+                    "monthlyCost": "0",
+                    "usageBased": true
                   },
                   {
                     "name": "Select data returned",
@@ -597,7 +618,8 @@
                     "monthlyQuantity": "0",
                     "price": "0.0007",
                     "hourlyCost": "0",
-                    "monthlyCost": "0"
+                    "monthlyCost": "0",
+                    "usageBased": true
                   }
                 ]
               }

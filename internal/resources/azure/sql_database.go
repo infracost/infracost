@@ -73,11 +73,17 @@ func (r *SQLDatabase) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-var SQLDatabaseUsageSchema = []*schema.UsageItem{
-	{Key: "extra_data_storage_gb", DefaultValue: 0.0, ValueType: schema.Float64},
-	{Key: "monthly_vcore_hours", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "long_term_retention_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
-	{Key: "backup_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
+func (r *SQLDatabase) CoreType() string {
+	return "SQLDatabase"
+}
+
+func (r *SQLDatabase) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "extra_data_storage_gb", DefaultValue: 0.0, ValueType: schema.Float64},
+		{Key: "monthly_vcore_hours", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "long_term_retention_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "backup_storage_gb", DefaultValue: 0, ValueType: schema.Int64},
+	}
 }
 
 // BuildResource builds a schema.Resource from a valid SQLDatabase.
@@ -110,7 +116,7 @@ var SQLDatabaseUsageSchema = []*schema.UsageItem{
 func (r *SQLDatabase) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    SQLDatabaseUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: r.costComponents(),
 	}
 }
@@ -240,6 +246,7 @@ func (r *SQLDatabase) serverlessComputeHoursCostComponents() []*schema.CostCompo
 				{Key: "meterName", ValueRegex: regexPtr("^(?!.* - Free$).*$")},
 			}),
 			PriceFilter: priceFilterConsumption,
+			UsageBased:  true,
 		},
 	}
 
@@ -348,6 +355,7 @@ func (r *SQLDatabase) longTermRetentionCostComponent() *schema.CostComponent {
 			{Key: "meterName", ValueRegex: regexPtr(fmt.Sprintf("%s Data Stored", redundancyType))},
 		}),
 		PriceFilter: priceFilterConsumption,
+		UsageBased:  true,
 	}
 }
 
@@ -374,6 +382,7 @@ func (r *SQLDatabase) pitrBackupCostComponent() *schema.CostComponent {
 			{Key: "meterName", ValueRegex: regexPtr(fmt.Sprintf("%s Data Stored", redundancyType))},
 		}),
 		PriceFilter: priceFilterConsumption,
+		UsageBased:  true,
 	}
 }
 
@@ -435,6 +444,7 @@ func mssqlExtraDataStorageCostComponent(region string, tier string, extraStorage
 			{Key: "meterName", Value: strPtr("Data Stored")},
 		}),
 		PriceFilter: priceFilterConsumption,
+		UsageBased:  true,
 	}
 }
 

@@ -9,12 +9,12 @@ import (
 
 func getDataFactoryIntegrationRuntimeAzureSSISRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_data_factory_integration_runtime_azure_ssis",
-		RFunc: newDataFactoryIntegrationRuntimeAzureSSIS,
+		Name:      "azurerm_data_factory_integration_runtime_azure_ssis",
+		CoreRFunc: newDataFactoryIntegrationRuntimeAzureSSIS,
 	}
 }
 
-func newDataFactoryIntegrationRuntimeAzureSSIS(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newDataFactoryIntegrationRuntimeAzureSSIS(d *schema.ResourceData) schema.CoreResource {
 	region := lookupRegion(d, []string{})
 
 	licenseType := d.GetStringOrDefault("license_type", "LicenseIncluded")
@@ -37,7 +37,5 @@ func newDataFactoryIntegrationRuntimeAzureSSIS(d *schema.ResourceData, u *schema
 		Instances:       nodes,
 		InstanceType:    instanceType,
 	}
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
+	return r
 }

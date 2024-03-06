@@ -26,7 +26,26 @@ type BackupVault struct {
 	MonthlyEBSSnapshotGB          *float64 `infracost_usage:"monthly_ebs_snapshot_gb"`
 }
 
-var BackupVaultUsageSchema = []*schema.UsageItem{{Key: "monthly_efs_warm_backup_gb", ValueType: schema.Float64, DefaultValue: 0}, {Key: "monthly_efs_cold_restore_gb", ValueType: schema.Float64, DefaultValue: 0}, {Key: "monthly_rds_snapshot_gb", ValueType: schema.Float64, DefaultValue: 0}, {Key: "monthly_aurora_snapshot_gb", ValueType: schema.Float64, DefaultValue: 0}, {Key: "monthly_dynamodb_backup_gb", ValueType: schema.Float64, DefaultValue: 0}, {Key: "monthly_dynamodb_restore_gb", ValueType: schema.Float64, DefaultValue: 0}, {Key: "monthly_fsx_windows_backup_gb", ValueType: schema.Float64, DefaultValue: 0}, {Key: "monthly_fsx_lustre_backup_gb", ValueType: schema.Float64, DefaultValue: 0}, {Key: "monthly_efs_cold_backup_gb", ValueType: schema.Float64, DefaultValue: 0}, {Key: "monthly_efs_warm_restore_gb", ValueType: schema.Float64, DefaultValue: 0}, {Key: "monthly_efs_item_restore_requests", ValueType: schema.Int64, DefaultValue: 0}, {Key: "monthly_ebs_snapshot_gb", ValueType: schema.Float64, DefaultValue: 0}}
+func (r *BackupVault) CoreType() string {
+	return "BackupVault"
+}
+
+func (r *BackupVault) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_efs_warm_backup_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "monthly_efs_cold_restore_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "monthly_rds_snapshot_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "monthly_aurora_snapshot_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "monthly_dynamodb_backup_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "monthly_dynamodb_restore_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "monthly_fsx_windows_backup_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "monthly_fsx_lustre_backup_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "monthly_efs_cold_backup_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "monthly_efs_warm_restore_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "monthly_efs_item_restore_requests", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_ebs_snapshot_gb", ValueType: schema.Float64, DefaultValue: 0},
+	}
+}
 
 func (r *BackupVault) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -109,7 +128,7 @@ func (r *BackupVault) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: BackupVaultUsageSchema,
+		CostComponents: costComponents, UsageSchema: r.UsageSchema(),
 	}
 }
 
@@ -146,6 +165,7 @@ func (r *BackupVault) backupVaultCostComponent(bd backupData) *schema.CostCompon
 			ProductFamily:    strPtr(bd.family),
 			AttributeFilters: filters,
 		},
+		UsageBased: true,
 	}
 }
 
@@ -165,5 +185,6 @@ func (r *BackupVault) additionalBackupVaultCostComponent(bd backupData) *schema.
 				{Key: bd.key, Value: strPtr(bd.value)},
 			},
 		},
+		UsageBased: true,
 	}
 }

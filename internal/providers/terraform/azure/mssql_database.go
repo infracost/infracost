@@ -52,15 +52,15 @@ func (d dtuMapping) usesDTUUnits(sku string) bool {
 
 func getMSSQLDatabaseRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "azurerm_mssql_database",
-		RFunc: newAzureRMMSSQLDatabase,
+		Name:      "azurerm_mssql_database",
+		CoreRFunc: newAzureRMMSSQLDatabase,
 		ReferenceAttributes: []string{
 			"server_id",
 		},
 	}
 }
 
-func newAzureRMMSSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newAzureRMMSSQLDatabase(d *schema.ResourceData) schema.CoreResource {
 	region := lookupRegion(d, []string{"server_id"})
 
 	sku := d.GetStringOrDefault("sku_name", "GP_S_Gen5_2")
@@ -105,8 +105,7 @@ func newAzureRMMSSQLDatabase(d *schema.ResourceData, u *schema.UsageData) *schem
 		r.Cores = c.cores
 	}
 
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }
 
 type skuConfig struct {

@@ -3,21 +3,22 @@ package aws
 import (
 	"strings"
 
-	"github.com/infracost/infracost/internal/resources/aws"
-	"github.com/infracost/infracost/internal/schema"
 	"github.com/tidwall/gjson"
 	"golang.org/x/text/cases"
 	"golang.org/x/text/language"
+
+	"github.com/infracost/infracost/internal/resources/aws"
+	"github.com/infracost/infracost/internal/schema"
 )
 
 func getMWAAEnvironmentRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_mwaa_environment",
-		RFunc: NewMWAAEnvironment,
+		Name:      "aws_mwaa_environment",
+		CoreRFunc: NewMWAAEnvironment,
 	}
 }
 
-func NewMWAAEnvironment(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewMWAAEnvironment(d *schema.ResourceData) schema.CoreResource {
 	region := d.Get("region").String()
 
 	size := "mw1.small"
@@ -34,7 +35,6 @@ func NewMWAAEnvironment(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 		Region:  region,
 		Size:    size,
 	}
-	a.PopulateUsage(u)
 
-	return a.BuildResource()
+	return a
 }

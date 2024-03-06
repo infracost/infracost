@@ -7,16 +7,15 @@ import (
 
 func getMonitoringItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "google_monitoring_metric_descriptor",
-		RFunc: NewMonitoringMetricDescriptor,
+		Name:      "google_monitoring_metric_descriptor",
+		CoreRFunc: NewMonitoringMetricDescriptor,
 	}
 }
 
-func NewMonitoringMetricDescriptor(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewMonitoringMetricDescriptor(d *schema.ResourceData) schema.CoreResource {
 	r := &google.MonitoringMetricDescriptor{
 		Address: d.Address,
 	}
 
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

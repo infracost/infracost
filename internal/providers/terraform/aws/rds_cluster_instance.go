@@ -7,12 +7,12 @@ import (
 
 func getRDSClusterInstanceRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_rds_cluster_instance",
-		RFunc: NewRDSClusterInstance,
+		Name:      "aws_rds_cluster_instance",
+		CoreRFunc: NewRDSClusterInstance,
 	}
 }
 
-func NewRDSClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewRDSClusterInstance(d *schema.ResourceData) schema.CoreResource {
 	piEnabled := d.Get("performance_insights_enabled").Bool()
 	piLongTerm := piEnabled && d.Get("performance_insights_retention_period").Int() > 7
 
@@ -25,7 +25,5 @@ func NewRDSClusterInstance(d *schema.ResourceData, u *schema.UsageData) *schema.
 		PerformanceInsightsEnabled:           piEnabled,
 		PerformanceInsightsLongTermRetention: piLongTerm,
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

@@ -1,9 +1,10 @@
 package azure
 
 import (
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 // VirtualNetworkPeering struct represents a VNET peering.
@@ -21,8 +22,14 @@ type VirtualNetworkPeering struct {
 	MonthlyDataTransferGB *float64 `infracost_usage:"monthly_data_transfer_gb"`
 }
 
-var VirtualNetworkPeeringUsageSchema = []*schema.UsageItem{
-	{Key: "monthly_data_transfer_gb", DefaultValue: 0, ValueType: schema.Float64},
+func (r *VirtualNetworkPeering) CoreType() string {
+	return "VirtualNetworkPeering"
+}
+
+func (r *VirtualNetworkPeering) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "monthly_data_transfer_gb", DefaultValue: 0, ValueType: schema.Float64},
+	}
 }
 
 func (r *VirtualNetworkPeering) PopulateUsage(u *schema.UsageData) {
@@ -37,7 +44,7 @@ func (r *VirtualNetworkPeering) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		UsageSchema:    VirtualNetworkPeeringUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 		CostComponents: costComponents,
 	}
 }
@@ -61,6 +68,7 @@ func (r *VirtualNetworkPeering) egressDataProcessedCostComponent() *schema.CostC
 			PriceFilter: &schema.PriceFilter{
 				PurchaseOption: strPtr("Consumption"),
 			},
+			UsageBased: true,
 		}
 	}
 
@@ -82,6 +90,7 @@ func (r *VirtualNetworkPeering) egressDataProcessedCostComponent() *schema.CostC
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -104,6 +113,7 @@ func (r *VirtualNetworkPeering) ingressDataProcessedCostComponent() *schema.Cost
 			PriceFilter: &schema.PriceFilter{
 				PurchaseOption: strPtr("Consumption"),
 			},
+			UsageBased: true,
 		}
 	}
 
@@ -125,5 +135,6 @@ func (r *VirtualNetworkPeering) ingressDataProcessedCostComponent() *schema.Cost
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("Consumption"),
 		},
+		UsageBased: true,
 	}
 }

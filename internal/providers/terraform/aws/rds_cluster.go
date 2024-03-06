@@ -7,12 +7,12 @@ import (
 
 func getRDSClusterRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "aws_rds_cluster",
-		RFunc: NewRDSCluster,
+		Name:      "aws_rds_cluster",
+		CoreRFunc: NewRDSCluster,
 	}
 }
 
-func NewRDSCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewRDSCluster(d *schema.ResourceData) schema.CoreResource {
 	r := &aws.RDSCluster{
 		Address:               d.Address,
 		Region:                d.Get("region").String(),
@@ -20,7 +20,5 @@ func NewRDSCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource
 		BackupRetentionPeriod: d.GetInt64OrDefault("backup_retention_period", 1),
 		EngineMode:            d.GetStringOrDefault("engine_mode", "provisioned"),
 	}
-
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

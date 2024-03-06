@@ -26,7 +26,15 @@ type SQLDatabaseInstance struct {
 	BackupStorageGB      *float64 `infracost_usage:"backup_storage_gb"`
 }
 
-var SQLDatabaseInstanceUsageSchema = []*schema.UsageItem{{Key: "backup_storage_gb", ValueType: schema.Float64, DefaultValue: 0}}
+func (r *SQLDatabaseInstance) CoreType() string {
+	return "SQLDatabaseInstance"
+}
+
+func (r *SQLDatabaseInstance) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "backup_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+	}
+}
 
 var lightweightRAM = decimal.NewFromInt(3840)
 var standardRAMRatio = decimal.NewFromInt(3840)
@@ -360,6 +368,7 @@ func (r *SQLDatabaseInstance) backupCostComponent(quantity *decimal.Decimal) *sc
 				{Key: "description", ValueRegex: strPtr("/Cloud SQL: Backups/")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 

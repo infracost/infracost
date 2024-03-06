@@ -32,6 +32,14 @@ var StorageBucketNetworkEgressUsageSchema = []*schema.UsageItem{
 	{ValueType: schema.Float64, DefaultValue: 0, Key: "australia"},
 }
 
+func (r *StorageBucketNetworkEgressUsage) CoreType() string {
+	return "StorageBucketNetworkEgressUsage"
+}
+
+func (r *StorageBucketNetworkEgressUsage) UsageSchema() []*schema.UsageItem {
+	return StorageBucketNetworkEgressUsageSchema
+}
+
 func (r *StorageBucketNetworkEgressUsage) BuildResource() *schema.Resource {
 	regionsData := []*egressRegionData{
 		{
@@ -94,6 +102,7 @@ func (r *StorageBucketNetworkEgressUsage) BuildResource() *schema.Resource {
 				{Key: "description", Value: strPtr("Network Data Transfer GCP Inter Region within Europe")},
 			},
 		},
+		UsageBased: true,
 	})
 
 	for _, regData := range regionsData {
@@ -122,6 +131,14 @@ var ContainerRegistryNetworkEgressUsageSchema = []*schema.UsageItem{
 	{ValueType: schema.Float64, DefaultValue: 0, Key: "worldwide"},
 	{ValueType: schema.Float64, DefaultValue: 0, Key: "china"},
 	{ValueType: schema.Float64, DefaultValue: 0, Key: "australia"},
+}
+
+func (r *ContainerRegistryNetworkEgressUsage) CoreType() string {
+	return "ContainerRegistryNetworkEgressUsage"
+}
+
+func (r *ContainerRegistryNetworkEgressUsage) UsageSchema() []*schema.UsageItem {
+	return ContainerRegistryNetworkEgressUsageSchema
 }
 
 func (r *ContainerRegistryNetworkEgressUsage) BuildResource() *schema.Resource {
@@ -199,6 +216,7 @@ func (r *ContainerRegistryNetworkEgressUsage) BuildResource() *schema.Resource {
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: startUsage,
 		},
+		UsageBased: true,
 	})
 
 	for _, regData := range regionsData {
@@ -231,6 +249,14 @@ var ComputeVPNGatewayNetworkEgressUsageSchema = []*schema.UsageItem{
 	{ValueType: schema.Float64, DefaultValue: 0, Key: "south_america"},
 	{ValueType: schema.Float64, DefaultValue: 0, Key: "oceania"},
 	{ValueType: schema.Float64, DefaultValue: 0, Key: "worldwide"},
+}
+
+func (r *ComputeVPNGatewayNetworkEgressUsage) CoreType() string {
+	return "ComputeVPNGatewayNetworkEgressUsage"
+}
+
+func (r *ComputeVPNGatewayNetworkEgressUsage) UsageSchema() []*schema.UsageItem {
+	return ComputeVPNGatewayNetworkEgressUsageSchema
 }
 
 func (r *ComputeVPNGatewayNetworkEgressUsage) BuildResource() *schema.Resource {
@@ -316,6 +342,14 @@ var ComputeExternalVPNGatewayNetworkEgressUsageSchema = []*schema.UsageItem{
 	{ValueType: schema.Float64, DefaultValue: 0, Key: "worldwide"},
 	{ValueType: schema.Float64, DefaultValue: 0, Key: "china"},
 	{ValueType: schema.Float64, DefaultValue: 0, Key: "australia"},
+}
+
+func (r *ComputeExternalVPNGatewayNetworkEgressUsage) CoreType() string {
+	return "ComputeExternalVPNGatewayNetworkEgressUsage"
+}
+
+func (r *ComputeExternalVPNGatewayNetworkEgressUsage) UsageSchema() []*schema.UsageItem {
+	return ComputeExternalVPNGatewayNetworkEgressUsageSchema
 }
 
 func (r *ComputeExternalVPNGatewayNetworkEgressUsage) BuildResource() *schema.Resource {
@@ -442,6 +476,7 @@ func egressStepPricingHelper(usage float64, usageFiltersData []*egressRegionUsag
 			PriceFilter: &schema.PriceFilter{
 				EndUsageAmount: strPtr(usageFilter),
 			},
+			UsageBased: true,
 		})
 	}
 	return costComponents

@@ -3,8 +3,9 @@ package aws
 import (
 	"fmt"
 
-	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
+
+	"github.com/infracost/infracost/internal/schema"
 )
 
 func s3StorageCostComponent(name string, service string, region string, usageType string, storageGB *float64) *schema.CostComponent {
@@ -24,6 +25,7 @@ func s3StorageCostComponent(name string, service string, region string, usageTyp
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr("0"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -45,6 +47,7 @@ func s3StorageVolumeTypeCostComponent(name string, service string, region string
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr("0"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -67,6 +70,7 @@ func s3ApiOperationCostComponent(name string, service string, region string, usa
 				{Key: "operation", ValueRegex: strPtr(fmt.Sprintf("/%s/i", operation))},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -87,6 +91,7 @@ func s3DataCostComponent(name string, service string, region string, usageType s
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr("0"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -108,6 +113,7 @@ func s3DataGroupCostComponent(name string, service string, region string, usageT
 		PriceFilter: &schema.PriceFilter{
 			StartUsageAmount: strPtr("0"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -126,6 +132,7 @@ func s3LifecycleTransitionsCostComponent(region string, usageType string, operat
 				{Key: "operation", ValueRegex: strPtr(fmt.Sprintf("/^%s$/i", operation))},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -143,5 +150,6 @@ func s3MonitoringCostComponent(region string, objects *int64) *schema.CostCompon
 				{Key: "usagetype", ValueRegex: strPtr("/Monitoring-Automation-INT/")},
 			},
 		},
+		UsageBased: true,
 	}
 }

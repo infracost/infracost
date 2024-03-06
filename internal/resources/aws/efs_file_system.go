@@ -21,11 +21,17 @@ type EFSFileSystem struct {
 	MonthlyInfrequentAccessWriteGB *float64 `infracost_usage:"monthly_infrequent_access_write_gb"`
 }
 
-var EFSFileSystemUsageSchema = []*schema.UsageItem{
-	{Key: "infrequent_access_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
-	{Key: "storage_gb", ValueType: schema.Float64, DefaultValue: 0},
-	{Key: "monthly_infrequent_access_read_gb", ValueType: schema.Float64, DefaultValue: 0},
-	{Key: "monthly_infrequent_access_write_gb", ValueType: schema.Float64, DefaultValue: 0},
+func (r *EFSFileSystem) CoreType() string {
+	return "EFSFileSystem"
+}
+
+func (r *EFSFileSystem) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{
+		{Key: "infrequent_access_storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "storage_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "monthly_infrequent_access_read_gb", ValueType: schema.Float64, DefaultValue: 0},
+		{Key: "monthly_infrequent_access_write_gb", ValueType: schema.Float64, DefaultValue: 0},
+	}
 }
 
 func (r *EFSFileSystem) PopulateUsage(u *schema.UsageData) {
@@ -80,7 +86,7 @@ func (r *EFSFileSystem) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
-		UsageSchema:    EFSFileSystemUsageSchema,
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 
@@ -115,6 +121,7 @@ func (r *EFSFileSystem) storageCostComponent(name, usagetype string, storageGB *
 				{Key: "usagetype", ValueRegex: strPtr(fmt.Sprintf("/%s/i", usagetype))},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -133,6 +140,7 @@ func (r *EFSFileSystem) provisionedThroughputCostComponent(provisionedThroughput
 				{Key: "usagetype", ValueRegex: strPtr("/ProvisionedTP-MiBpsHrs/")},
 			},
 		},
+		UsageBased: true,
 	}
 }
 
@@ -152,5 +160,6 @@ func (r *EFSFileSystem) requestsCostComponent(name, accessType string, requestsG
 				{Key: "storageClass", Value: strPtr("Infrequent Access")},
 			},
 		},
+		UsageBased: true,
 	}
 }

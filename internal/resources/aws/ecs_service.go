@@ -19,7 +19,13 @@ type ECSService struct {
 	InferenceAcceleratorDeviceType string
 }
 
-var ECSServiceUsageSchema = []*schema.UsageItem{}
+func (r *ECSService) CoreType() string {
+	return "ECSService"
+}
+
+func (r *ECSService) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{}
+}
 
 func (r *ECSService) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -31,7 +37,7 @@ func (r *ECSService) BuildResource() *schema.Resource {
 			Name:        r.Address,
 			IsSkipped:   true,
 			NoPrice:     true,
-			UsageSchema: ECSServiceUsageSchema,
+			UsageSchema: r.UsageSchema(),
 		}
 	}
 
@@ -88,6 +94,7 @@ func (r *ECSService) BuildResource() *schema.Resource {
 
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: costComponents, UsageSchema: ECSServiceUsageSchema,
+		CostComponents: costComponents,
+		UsageSchema:    r.UsageSchema(),
 	}
 }

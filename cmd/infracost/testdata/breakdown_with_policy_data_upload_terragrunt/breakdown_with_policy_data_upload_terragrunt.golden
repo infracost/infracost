@@ -101,7 +101,8 @@
                 "monthlyQuantity": "6",
                 "price": "0.4745",
                 "hourlyCost": "0.0039",
-                "monthlyCost": "2.847"
+                "monthlyCost": "2.847",
+                "usageBased": true
               },
               {
                 "name": "Read capacity unit (RCU)",
@@ -119,7 +120,8 @@
                 "monthlyQuantity": null,
                 "price": "0.25",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true
               },
               {
                 "name": "Point-In-Time Recovery (PITR) backup storage",
@@ -128,7 +130,8 @@
                 "monthlyQuantity": null,
                 "price": "0.2",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true
               },
               {
                 "name": "On-demand backup storage",
@@ -137,7 +140,8 @@
                 "monthlyQuantity": null,
                 "price": "0.1",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true
               },
               {
                 "name": "Table data restored",
@@ -146,7 +150,8 @@
                 "monthlyQuantity": null,
                 "price": "0.15",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true
               },
               {
                 "name": "Streams read request unit (sRRU)",
@@ -155,7 +160,8 @@
                 "monthlyQuantity": null,
                 "price": "0.0000002",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true
               }
             ]
           },
@@ -317,7 +323,8 @@
                 "monthlyQuantity": "6",
                 "price": "0.4745",
                 "hourlyCost": "0.0039",
-                "monthlyCost": "2.847"
+                "monthlyCost": "2.847",
+                "usageBased": true
               },
               {
                 "name": "Read capacity unit (RCU)",
@@ -335,7 +342,8 @@
                 "monthlyQuantity": null,
                 "price": "0.25",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true
               },
               {
                 "name": "Point-In-Time Recovery (PITR) backup storage",
@@ -344,7 +352,8 @@
                 "monthlyQuantity": null,
                 "price": "0.2",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true
               },
               {
                 "name": "On-demand backup storage",
@@ -353,7 +362,8 @@
                 "monthlyQuantity": null,
                 "price": "0.1",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true
               },
               {
                 "name": "Table data restored",
@@ -362,7 +372,8 @@
                 "monthlyQuantity": null,
                 "price": "0.15",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true
               },
               {
                 "name": "Streams read request unit (sRRU)",
@@ -371,7 +382,8 @@
                 "monthlyQuantity": null,
                 "price": "0.0000002",
                 "hourlyCost": null,
-                "monthlyCost": null
+                "monthlyCost": null,
+                "usageBased": true
               }
             ]
           },

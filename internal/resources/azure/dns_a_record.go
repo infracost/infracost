@@ -6,8 +6,9 @@ import (
 
 	"strings"
 
-	"github.com/infracost/infracost/internal/usage"
 	"github.com/shopspring/decimal"
+
+	"github.com/infracost/infracost/internal/usage"
 )
 
 type DNSARecord struct {
@@ -16,7 +17,13 @@ type DNSARecord struct {
 	MonthlyQueries *int64 `infracost_usage:"monthly_queries"`
 }
 
-var DNSARecordUsageSchema = []*schema.UsageItem{{Key: "monthly_queries", ValueType: schema.Int64, DefaultValue: 0}}
+func (r *DNSARecord) CoreType() string {
+	return "DNSARecord"
+}
+
+func (r *DNSARecord) UsageSchema() []*schema.UsageItem {
+	return []*schema.UsageItem{{Key: "monthly_queries", ValueType: schema.Int64, DefaultValue: 0}}
+}
 
 func (r *DNSARecord) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
@@ -25,7 +32,8 @@ func (r *DNSARecord) PopulateUsage(u *schema.UsageData) {
 func (r *DNSARecord) BuildResource() *schema.Resource {
 	return &schema.Resource{
 		Name:           r.Address,
-		CostComponents: dnsQueriesCostComponent(r.Region, r.MonthlyQueries), UsageSchema: DNSARecordUsageSchema,
+		CostComponents: dnsQueriesCostComponent(r.Region, r.MonthlyQueries),
+		UsageSchema:    r.UsageSchema(),
 	}
 }
 func dnsQueriesCostComponent(region string, monthlyQueries *int64) []*schema.CostComponent {
@@ -85,5 +93,6 @@ func dnsQueriesFirstCostComponent(region, name, startUsage string, monthlyQuerie
 			PurchaseOption:   strPtr("Consumption"),
 			StartUsageAmount: &startUsage,
 		},
+		UsageBased: true,
 	}
 }
