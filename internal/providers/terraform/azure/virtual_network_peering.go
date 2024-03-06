@@ -37,14 +37,8 @@ func newVirtualNetworkPeering(d *schema.ResourceData) schema.CoreResource {
 }
 
 func virtualNetworkPeeringConvertRegion(region string) string {
-	zone := regionToZone(region)
+	zone := regionToVNETZone(region)
 
-	if strings.HasPrefix(strings.ToLower(region), "usgov") {
-		zone = "US Gov Zone 1"
-	}
-	if strings.HasPrefix(strings.ToLower(region), "germany") {
-		zone = "DE Zone 1"
-	}
 	if strings.HasPrefix(strings.ToLower(region), "china") {
 		zone = "CN Zone 1"
 	}
