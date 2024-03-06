@@ -7,6 +7,7 @@ import (
 
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/rs/zerolog/log"
 )
 
 // DataFactoryIntegrationRuntimeAzure struct represents Azure Data Factory's
@@ -67,14 +68,19 @@ func (r *DataFactoryIntegrationRuntimeAzure) BuildResource() *schema.Resource {
 // CPAPI contains 2 records with the same price, but one is newer and its
 // armSkuName is not empty thus using a non-empty filter.
 func (r *DataFactoryIntegrationRuntimeAzure) computeCostComponent() *schema.CostComponent {
+
 	productType := map[string]string{
 		"general":           "General Purpose",
 		"compute_optimized": "Compute Optimized",
 		"memory_optimized":  "Memory Optimized",
 	}[r.ComputeType]
 
+	name := fmt.Sprintf("Compute (%s, %d vCores)", productType, r.Cores)
+
+	log.Warn().Msgf("'Multiple products found' are safe to ignore for '%s' due to limitations in the Azure API.", name)
+
 	return &schema.CostComponent{
-		Name:           fmt.Sprintf("Compute (%s, %d vCores)", productType, r.Cores),
+		Name:           name,
 		Unit:           "hours",
 		UnitMultiplier: decimal.NewFromInt(r.Cores),
 		HourlyQuantity: decimalPtr(decimal.NewFromInt(r.Cores)),
@@ -84,7 +90,6 @@ func (r *DataFactoryIntegrationRuntimeAzure) computeCostComponent() *schema.Cost
 			Service:       strPtr("Azure Data Factory v2"),
 			ProductFamily: strPtr("Analytics"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "armSkuName", ValueRegex: strPtr("/.+/")},
 				{Key: "skuName", ValueRegex: regexPtr("^vCore$")},
 				{Key: "productName", ValueRegex: regexPtr(fmt.Sprintf("^Azure Data Factory v2 Data Flow - %s$", productType))},
 			},
