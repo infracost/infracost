@@ -57,8 +57,7 @@
                 "monthlyQuantity": "730",
                 "price": "0.768",
                 "hourlyCost": "0.768",
-                "monthlyCost": "560.64",
-                "usageBased": false
+                "monthlyCost": "560.64"
               }
             ],
             "subresources": [
@@ -75,8 +74,7 @@
                     "monthlyQuantity": "50",
                     "price": "0.1",
                     "hourlyCost": "0.00684931506849315",
-                    "monthlyCost": "5",
-                    "usageBased": false
+                    "monthlyCost": "5"
                   }
                 ]
               },
@@ -93,8 +91,7 @@
                     "monthlyQuantity": "1000",
                     "price": "0.125",
                     "hourlyCost": "0.1712328767123287625",
-                    "monthlyCost": "125",
-                    "usageBased": false
+                    "monthlyCost": "125"
                   },
                   {
                     "name": "Provisioned IOPS",
@@ -103,8 +100,7 @@
                     "monthlyQuantity": "800",
                     "price": "0.065",
                     "hourlyCost": "0.0712328767123287665",
-                    "monthlyCost": "52",
-                    "usageBased": false
+                    "monthlyCost": "52"
                   }
                 ]
               }
@@ -165,8 +161,7 @@
                 "monthlyQuantity": "730",
                 "price": "0.768",
                 "hourlyCost": "0.768",
-                "monthlyCost": "560.64",
-                "usageBased": false
+                "monthlyCost": "560.64"
               }
             ],
             "subresources": [
@@ -183,8 +178,7 @@
                     "monthlyQuantity": "50",
                     "price": "0.1",
                     "hourlyCost": "0.00684931506849315",
-                    "monthlyCost": "5",
-                    "usageBased": false
+                    "monthlyCost": "5"
                   }
                 ]
               },
@@ -201,8 +195,7 @@
                     "monthlyQuantity": "1000",
                     "price": "0.125",
                     "hourlyCost": "0.1712328767123287625",
-                    "monthlyCost": "125",
-                    "usageBased": false
+                    "monthlyCost": "125"
                   },
                   {
                     "name": "Provisioned IOPS",
@@ -211,8 +204,7 @@
                     "monthlyQuantity": "800",
                     "price": "0.065",
                     "hourlyCost": "0.0712328767123287665",
-                    "monthlyCost": "52",
-                    "usageBased": false
+                    "monthlyCost": "52"
                   }
                 ]
               }

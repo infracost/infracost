@@ -111,8 +111,7 @@
                 "monthlyQuantity": "30",
                 "price": "0.0949",
                 "hourlyCost": "0.0039",
-                "monthlyCost": "2.847",
-                "usageBased": false
+                "monthlyCost": "2.847"
               },
               {
                 "name": "Data storage",
@@ -200,8 +199,7 @@
                 "monthlyQuantity": "730",
                 "price": "0.768",
                 "hourlyCost": "0.768",
-                "monthlyCost": "560.64",
-                "usageBased": false
+                "monthlyCost": "560.64"
               }
             ],
             "subresources": [
@@ -218,8 +216,7 @@
                     "monthlyQuantity": "51",
                     "price": "0.1",
                     "hourlyCost": "0.00698630136986301",
-                    "monthlyCost": "5.1",
-                    "usageBased": false
+                    "monthlyCost": "5.1"
                   }
                 ]
               },
@@ -236,8 +233,7 @@
                     "monthlyQuantity": "1000",
                     "price": "0.1",
                     "hourlyCost": "0.13698630136986301",
-                    "monthlyCost": "100",
-                    "usageBased": false
+                    "monthlyCost": "100"
                   }
                 ]
               }
@@ -337,8 +333,7 @@
                 "monthlyQuantity": "30",
                 "price": "0.0949",
                 "hourlyCost": "0.0039",
-                "monthlyCost": "2.847",
-                "usageBased": false
+                "monthlyCost": "2.847"
               },
               {
                 "name": "Data storage",
@@ -426,8 +421,7 @@
                 "monthlyQuantity": "730",
                 "price": "0.768",
                 "hourlyCost": "0.768",
-                "monthlyCost": "560.64",
-                "usageBased": false
+                "monthlyCost": "560.64"
               }
             ],
             "subresources": [
@@ -444,8 +438,7 @@
                     "monthlyQuantity": "51",
                     "price": "0.1",
                     "hourlyCost": "0.00698630136986301",
-                    "monthlyCost": "5.1",
-                    "usageBased": false
+                    "monthlyCost": "5.1"
                   }
                 ]
               },
@@ -462,8 +455,7 @@
                     "monthlyQuantity": "1000",
                     "price": "0.1",
                     "hourlyCost": "0.13698630136986301",
-                    "monthlyCost": "100",
-                    "usageBased": false
+                    "monthlyCost": "100"
                   }
                 ]
               }

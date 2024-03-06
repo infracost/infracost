@@ -68,8 +68,7 @@
                 "monthlyQuantity": "730",
                 "price": "0.192",
                 "hourlyCost": "0.192",
-                "monthlyCost": "140.16",
-                "usageBased": false
+                "monthlyCost": "140.16"
               }
             ],
             "subresources": [
@@ -86,8 +85,7 @@
                     "monthlyQuantity": "51",
                     "price": "0.1",
                     "hourlyCost": "0.00698630136986301",
-                    "monthlyCost": "5.1",
-                    "usageBased": false
+                    "monthlyCost": "5.1"
                   }
                 ]
               },
@@ -104,8 +102,7 @@
                     "monthlyQuantity": "1000",
                     "price": "0.1",
                     "hourlyCost": "0.13698630136986301",
-                    "monthlyCost": "100",
-                    "usageBased": false
+                    "monthlyCost": "100"
                   }
                 ]
               }
@@ -151,8 +148,7 @@
                 "monthlyQuantity": "730",
                 "price": "0.768",
                 "hourlyCost": "0.768",
-                "monthlyCost": "560.64",
-                "usageBased": false
+                "monthlyCost": "560.64"
               }
             ],
             "subresources": [
@@ -169,8 +165,7 @@
                     "monthlyQuantity": "51",
                     "price": "0.1",
                     "hourlyCost": "0.00698630136986301",
-                    "monthlyCost": "5.1",
-                    "usageBased": false
+                    "monthlyCost": "5.1"
                   }
                 ]
               },
@@ -187,8 +182,7 @@
                     "monthlyQuantity": "1000",
                     "price": "0.1",
                     "hourlyCost": "0.13698630136986301",
-                    "monthlyCost": "100",
-                    "usageBased": false
+                    "monthlyCost": "100"
                   }
                 ]
               }
@@ -220,8 +214,7 @@
                 "monthlyQuantity": "0",
                 "price": "0.576",
                 "hourlyCost": "0.576",
-                "monthlyCost": "420.48",
-                "usageBased": false
+                "monthlyCost": "420.48"
               }
             ]
           }

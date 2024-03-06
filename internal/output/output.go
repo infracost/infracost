@@ -254,7 +254,7 @@ type CostComponent struct {
 	Price           decimal.Decimal  `json:"price"`
 	HourlyCost      *decimal.Decimal `json:"hourlyCost"`
 	MonthlyCost     *decimal.Decimal `json:"monthlyCost"`
-	UsageBased      bool             `json:"usageBased"`
+	UsageBased      bool             `json:"usageBased,omitempty"`
 }
 
 type ActualCosts struct {

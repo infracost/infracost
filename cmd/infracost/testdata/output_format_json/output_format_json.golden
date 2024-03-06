@@ -41,8 +41,7 @@
                 "monthlyQuantity": "730",
                 "price": "0.768",
                 "hourlyCost": "0.768",
-                "monthlyCost": "560.64",
-                "usageBased": false
+                "monthlyCost": "560.64"
               }
             ],
             "subresources": [
@@ -60,8 +59,7 @@
                     "monthlyQuantity": "50",
                     "price": "0.1",
                     "hourlyCost": "0.00684931506849315",
-                    "monthlyCost": "5",
-                    "usageBased": false
+                    "monthlyCost": "5"
                   }
                 ]
               },
@@ -79,8 +77,7 @@
                     "monthlyQuantity": "1000",
                     "price": "0.125",
                     "hourlyCost": "0.1712328767123287625",
-                    "monthlyCost": "125",
-                    "usageBased": false
+                    "monthlyCost": "125"
                   },
                   {
                     "name": "Provisioned IOPS",
@@ -89,8 +86,7 @@
                     "monthlyQuantity": "800",
                     "price": "0.065",
                     "hourlyCost": "0.0712328767123287665",
-                    "monthlyCost": "52",
-                    "usageBased": false
+                    "monthlyCost": "52"
                   }
                 ]
               }
@@ -110,8 +106,7 @@
                 "monthlyQuantity": "730",
                 "price": "0",
                 "hourlyCost": "0",
-                "monthlyCost": "0",
-                "usageBased": false
+                "monthlyCost": "0"
               }
             ],
             "subresources": [
@@ -129,8 +124,7 @@
                     "monthlyQuantity": "50",
                     "price": "0.1",
                     "hourlyCost": "0.00684931506849315",
-                    "monthlyCost": "5",
-                    "usageBased": false
+                    "monthlyCost": "5"
                   }
                 ]
               },
@@ -148,8 +142,7 @@
                     "monthlyQuantity": "1000",
                     "price": "0.125",
                     "hourlyCost": "0.1712328767123287625",
-                    "monthlyCost": "125",
-                    "usageBased": false
+                    "monthlyCost": "125"
                   },
                   {
                     "name": "Provisioned IOPS",
@@ -158,8 +151,7 @@
                     "monthlyQuantity": "800",
                     "price": "0.065",
                     "hourlyCost": "0.0712328767123287665",
-                    "monthlyCost": "52",
-                    "usageBased": false
+                    "monthlyCost": "52"
                   }
                 ]
               }
@@ -179,8 +171,7 @@
                 "monthlyQuantity": "100",
                 "price": "0.2",
                 "hourlyCost": "0.02739726027397260273972",
-                "monthlyCost": "20",
-                "usageBased": false
+                "monthlyCost": "20"
               },
               {
                 "name": "Duration",
@@ -189,8 +180,7 @@
                 "monthlyQuantity": "25000000",
                 "price": "0.0000166667",
                 "hourlyCost": "0.57077739726027397260344749",
-                "monthlyCost": "416.6675",
-                "usageBased": false
+                "monthlyCost": "416.6675"
               }
             ]
           },
@@ -208,8 +198,7 @@
                 "monthlyQuantity": "0",
                 "price": "0.2",
                 "hourlyCost": "0",
-                "monthlyCost": "0",
-                "usageBased": false
+                "monthlyCost": "0"
               },
               {
                 "name": "Duration",
@@ -218,8 +207,7 @@
                 "monthlyQuantity": "0",
                 "price": "0.0000166667",
                 "hourlyCost": "0",
-                "monthlyCost": "0",
-                "usageBased": false
+                "monthlyCost": "0"
               }
             ]
           },
@@ -244,8 +232,7 @@
                     "monthlyQuantity": "0",
                     "price": "0.023",
                     "hourlyCost": "0",
-                    "monthlyCost": "0",
-                    "usageBased": false
+                    "monthlyCost": "0"
                   },
                   {
                     "name": "PUT, COPY, POST, LIST requests",
@@ -254,8 +241,7 @@
                     "monthlyQuantity": "0",
                     "price": "0.005",
                     "hourlyCost": "0",
-                    "monthlyCost": "0",
-                    "usageBased": false
+                    "monthlyCost": "0"
                   },
                   {
                     "name": "GET, SELECT, and all other requests",
@@ -264,8 +250,7 @@
                     "monthlyQuantity": "0",
                     "price": "0.0004",
                     "hourlyCost": "0",
-                    "monthlyCost": "0",
-                    "usageBased": false
+                    "monthlyCost": "0"
                   },
                   {
                     "name": "Select data scanned",
@@ -274,8 +259,7 @@
                     "monthlyQuantity": "0",
                     "price": "0.002",
                     "hourlyCost": "0",
-                    "monthlyCost": "0",
-                    "usageBased": false
+                    "monthlyCost": "0"
                   },
                   {
                     "name": "Select data returned",
@@ -284,8 +268,7 @@
                     "monthlyQuantity": "0",
                     "price": "0.0007",
                     "hourlyCost": "0",
-                    "monthlyCost": "0",
-                    "usageBased": false
+                    "monthlyCost": "0"
                   }
                 ]
               }
@@ -311,8 +294,7 @@
                 "monthlyQuantity": "730",
                 "price": "0.768",
                 "hourlyCost": "0.768",
-                "monthlyCost": "560.64",
-                "usageBased": false
+                "monthlyCost": "560.64"
               }
             ],
             "subresources": [
@@ -330,8 +312,7 @@
                     "monthlyQuantity": "50",
                     "price": "0.1",
                     "hourlyCost": "0.00684931506849315",
-                    "monthlyCost": "5",
-                    "usageBased": false
+                    "monthlyCost": "5"
                   }
                 ]
               },
@@ -349,8 +330,7 @@
                     "monthlyQuantity": "1000",
                     "price": "0.125",
                     "hourlyCost": "0.1712328767123287625",
-                    "monthlyCost": "125",
-                    "usageBased": false
+                    "monthlyCost": "125"
                   },
                   {
                     "name": "Provisioned IOPS",
@@ -359,8 +339,7 @@
                     "monthlyQuantity": "800",
                     "price": "0.065",
                     "hourlyCost": "0.0712328767123287665",
-                    "monthlyCost": "52",
-                    "usageBased": false
+                    "monthlyCost": "52"
                   }
                 ]
               }
@@ -380,8 +359,7 @@
                 "monthlyQuantity": "730",
                 "price": "0",
                 "hourlyCost": "0",
-                "monthlyCost": "0",
-                "usageBased": false
+                "monthlyCost": "0"
               }
             ],
             "subresources": [
@@ -399,8 +377,7 @@
                     "monthlyQuantity": "50",
                     "price": "0.1",
                     "hourlyCost": "0.00684931506849315",
-                    "monthlyCost": "5",
-                    "usageBased": false
+                    "monthlyCost": "5"
                   }
                 ]
               },
@@ -418,8 +395,7 @@
                     "monthlyQuantity": "1000",
                     "price": "0.125",
                     "hourlyCost": "0.1712328767123287625",
-                    "monthlyCost": "125",
-                    "usageBased": false
+                    "monthlyCost": "125"
                   },
                   {
                     "name": "Provisioned IOPS",
@@ -428,8 +404,7 @@
                     "monthlyQuantity": "800",
                     "price": "0.065",
                     "hourlyCost": "0.0712328767123287665",
-                    "monthlyCost": "52",
-                    "usageBased": false
+                    "monthlyCost": "52"
                   }
                 ]
               }
@@ -449,8 +424,7 @@
                 "monthlyQuantity": "100",
                 "price": "0.2",
                 "hourlyCost": "0.02739726027397260273972",
-                "monthlyCost": "20",
-                "usageBased": false
+                "monthlyCost": "20"
               },
               {
                 "name": "Duration",
@@ -459,8 +433,7 @@
                 "monthlyQuantity": "25000000",
                 "price": "0.0000166667",
                 "hourlyCost": "0.57077739726027397260344749",
-                "monthlyCost": "416.6675",
-                "usageBased": false
+                "monthlyCost": "416.6675"
               }
             ]
           },
@@ -478,8 +451,7 @@
                 "monthlyQuantity": "0",
                 "price": "0.2",
                 "hourlyCost": "0",
-                "monthlyCost": "0",
-                "usageBased": false
+                "monthlyCost": "0"
               },
               {
                 "name": "Duration",
@@ -488,8 +460,7 @@
                 "monthlyQuantity": "0",
                 "price": "0.0000166667",
                 "hourlyCost": "0",
-                "monthlyCost": "0",
-                "usageBased": false
+                "monthlyCost": "0"
               }
             ]
           },
@@ -514,8 +485,7 @@
                     "monthlyQuantity": "0",
                     "price": "0.023",
                     "hourlyCost": "0",
-                    "monthlyCost": "0",
-                    "usageBased": false
+                    "monthlyCost": "0"
                   },
                   {
                     "name": "PUT, COPY, POST, LIST requests",
@@ -524,8 +494,7 @@
                     "monthlyQuantity": "0",
                     "price": "0.005",
                     "hourlyCost": "0",
-                    "monthlyCost": "0",
-                    "usageBased": false
+                    "monthlyCost": "0"
                   },
                   {
                     "name": "GET, SELECT, and all other requests",
@@ -534,8 +503,7 @@
                     "monthlyQuantity": "0",
                     "price": "0.0004",
                     "hourlyCost": "0",
-                    "monthlyCost": "0",
-                    "usageBased": false
+                    "monthlyCost": "0"
                   },
                   {
                     "name": "Select data scanned",
@@ -544,8 +512,7 @@
                     "monthlyQuantity": "0",
                     "price": "0.002",
                     "hourlyCost": "0",
-                    "monthlyCost": "0",
-                    "usageBased": false
+                    "monthlyCost": "0"
                   },
                   {
                     "name": "Select data returned",
@@ -554,8 +521,7 @@
                     "monthlyQuantity": "0",
                     "price": "0.0007",
                     "hourlyCost": "0",
-                    "monthlyCost": "0",
-                    "usageBased": false
+                    "monthlyCost": "0"
                   }
                 ]
               }
@@ -597,8 +563,7 @@
                 "monthlyQuantity": "730",
                 "price": "1.25",
                 "hourlyCost": "1.25",
-                "monthlyCost": "912.5",
-                "usageBased": false
+                "monthlyCost": "912.5"
               },
               {
                 "name": "Data processed",
@@ -607,8 +572,7 @@
                 "monthlyQuantity": null,
                 "price": "0.016",
                 "hourlyCost": null,
-                "monthlyCost": null,
-                "usageBased": false
+                "monthlyCost": null
               }
             ]
           },
@@ -626,8 +590,7 @@
                 "monthlyQuantity": "730",
                 "price": "0.875",
                 "hourlyCost": "0.875",
-                "monthlyCost": "638.75",
-                "usageBased": false
+                "monthlyCost": "638.75"
               },
               {
                 "name": "Data processed",
@@ -636,8 +599,7 @@
                 "monthlyQuantity": null,
                 "price": "0.008",
                 "hourlyCost": null,
-                "monthlyCost": null,
-                "usageBased": false
+                "monthlyCost": null
               }
             ]
           },
@@ -655,8 +617,7 @@
                 "monthlyQuantity": "730",
                 "price": "0.875",
                 "hourlyCost": "0.875",
-                "monthlyCost": "638.75",
-                "usageBased": false
+                "monthlyCost": "638.75"
               },
               {
                 "name": "Data processed",
@@ -665,8 +626,7 @@
                 "monthlyQuantity": null,
                 "price": "0.008",
                 "hourlyCost": null,
-                "monthlyCost": null,
-                "usageBased": false
+                "monthlyCost": null
               }
             ]
           },
@@ -684,8 +644,7 @@
                 "monthlyQuantity": "730",
                 "price": "1.25",
                 "hourlyCost": "1.25",
-                "monthlyCost": "912.5",
-                "usageBased": false
+                "monthlyCost": "912.5"
               },
               {
                 "name": "Data processed",
@@ -694,8 +653,7 @@
                 "monthlyQuantity": null,
                 "price": "0.016",
                 "hourlyCost": null,
-                "monthlyCost": null,
-                "usageBased": false
+                "monthlyCost": null
               }
             ]
           },
@@ -713,8 +671,7 @@
                 "monthlyQuantity": "730",
                 "price": "1.25",
                 "hourlyCost": "1.25",
-                "monthlyCost": "912.5",
-                "usageBased": false
+                "monthlyCost": "912.5"
               },
               {
                 "name": "Data processed",
@@ -723,8 +680,7 @@
                 "monthlyQuantity": null,
                 "price": "0.016",
                 "hourlyCost": null,
-                "monthlyCost": null,
-                "usageBased": false
+                "monthlyCost": null
               }
             ]
           },
@@ -742,8 +698,7 @@
                 "monthlyQuantity": "730",
                 "price": "0.005",
                 "hourlyCost": "0.005",
-                "monthlyCost": "3.65",
-                "usageBased": false
+                "monthlyCost": "3.65"
               }
             ]
           }
@@ -767,8 +722,7 @@
                 "monthlyQuantity": "730",
                 "price": "1.25",
                 "hourlyCost": "1.25",
-                "monthlyCost": "912.5",
-                "usageBased": false
+                "monthlyCost": "912.5"
               },
               {
                 "name": "Data processed",
@@ -777,8 +731,7 @@
                 "monthlyQuantity": "0",
                 "price": "0.016",
                 "hourlyCost": "0",
-                "monthlyCost": "0",
-                "usageBased": false
+                "monthlyCost": "0"
               }
             ]
           },
@@ -796,8 +749,7 @@
                 "monthlyQuantity": "730",
                 "price": "0.875",
                 "hourlyCost": "0.875",
-                "monthlyCost": "638.75",
-                "usageBased": false
+                "monthlyCost": "638.75"
               },
               {
                 "name": "Data processed",
@@ -806,8 +758,7 @@
                 "monthlyQuantity": "0",
                 "price": "0.008",
                 "hourlyCost": "0",
-                "monthlyCost": "0",
-                "usageBased": false
+                "monthlyCost": "0"
               }
             ]
           },
@@ -825,8 +776,7 @@
                 "monthlyQuantity": "730",
                 "price": "0.875",
                 "hourlyCost": "0.875",
-                "monthlyCost": "638.75",
-                "usageBased": false
+                "monthlyCost": "638.75"
               },
               {
                 "name": "Data processed",
@@ -835,8 +785,7 @@
                 "monthlyQuantity": "0",
                 "price": "0.008",
                 "hourlyCost": "0",
-                "monthlyCost": "0",
-                "usageBased": false
+                "monthlyCost": "0"
               }
             ]
           },
@@ -854,8 +803,7 @@
                 "monthlyQuantity": "730",
                 "price": "1.25",
                 "hourlyCost": "1.25",
-                "monthlyCost": "912.5",
-                "usageBased": false
+                "monthlyCost": "912.5"
               },
               {
                 "name": "Data processed",
@@ -864,8 +812,7 @@
                 "monthlyQuantity": "0",
                 "price": "0.016",
                 "hourlyCost": "0",
-                "monthlyCost": "0",
-                "usageBased": false
+                "monthlyCost": "0"
               }
             ]
           },
@@ -883,8 +830,7 @@
                 "monthlyQuantity": "730",
                 "price": "1.25",
                 "hourlyCost": "1.25",
-                "monthlyCost": "912.5",
-                "usageBased": false
+                "monthlyCost": "912.5"
               },
               {
                 "name": "Data processed",
@@ -893,8 +839,7 @@
                 "monthlyQuantity": "0",
                 "price": "0.016",
                 "hourlyCost": "0",
-                "monthlyCost": "0",
-                "usageBased": false
+                "monthlyCost": "0"
               }
             ]
           },
@@ -912,8 +857,7 @@
                 "monthlyQuantity": "730",
                 "price": "0.005",
                 "hourlyCost": "0.005",
-                "monthlyCost": "3.65",
-                "usageBased": false
+                "monthlyCost": "3.65"
               }
             ]
           }

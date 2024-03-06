@@ -68,8 +68,7 @@
         "monthlyQuantity",
         "price",
         "hourlyCost",
-        "monthlyCost",
-        "usageBased"
+        "monthlyCost"
       ],
       "properties": {
         "name": {

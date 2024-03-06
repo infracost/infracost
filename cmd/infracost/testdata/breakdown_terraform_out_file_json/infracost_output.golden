@@ -27,8 +27,7 @@
                 "monthlyQuantity": "730",
                 "name": "Instance usage (Linux/UNIX, on-demand, m5.4xlarge)",
                 "price": "0.768",
-                "unit": "hours",
-                "usageBased": false
+                "unit": "hours"
               }
             ],
             "hourlyCost": "1.017315068493150679",
@@ -46,8 +45,7 @@
                     "monthlyQuantity": "50",
                     "name": "Storage (general purpose SSD, gp2)",
                     "price": "0.1",
-                    "unit": "GB",
-                    "usageBased": false
+                    "unit": "GB"
                   }
                 ],
                 "hourlyCost": "0.00684931506849315",
@@ -64,8 +62,7 @@
                     "monthlyQuantity": "1000",
                     "name": "Storage (provisioned IOPS SSD, io1)",
                     "price": "0.125",
-                    "unit": "GB",
-                    "usageBased": false
+                    "unit": "GB"
                   },
                   {
                     "hourlyCost": "0.0712328767123287665",
@@ -74,8 +71,7 @@
                     "monthlyQuantity": "800",
                     "name": "Provisioned IOPS",
                     "price": "0.065",
-                    "unit": "IOPS",
-                    "usageBased": false
+                    "unit": "IOPS"
                   }
                 ],
                 "hourlyCost": "0.242465753424657529",
@@ -95,8 +91,7 @@
                 "monthlyQuantity": "730",
                 "name": "Instance usage (Linux/UNIX, on-demand, m5.4xlarge)",
                 "price": "0.768",
-                "unit": "hours",
-                "usageBased": false
+                "unit": "hours"
               }
             ],
             "hourlyCost": "1.017315068493150679",
@@ -114,8 +109,7 @@
                     "monthlyQuantity": "50",
                     "name": "Storage (general purpose SSD, gp2)",
                     "price": "0.1",
-                    "unit": "GB",
-                    "usageBased": false
+                    "unit": "GB"
                   }
                 ],
                 "hourlyCost": "0.00684931506849315",
@@ -132,8 +126,7 @@
                     "monthlyQuantity": "1000",
                     "name": "Storage (provisioned IOPS SSD, io1)",
                     "price": "0.125",
-                    "unit": "GB",
-                    "usageBased": false
+                    "unit": "GB"
                   },
                   {
                     "hourlyCost": "0.0712328767123287665",
@@ -142,8 +135,7 @@
                     "monthlyQuantity": "800",
                     "name": "Provisioned IOPS",
                     "price": "0.065",
-                    "unit": "IOPS",
-                    "usageBased": false
+                    "unit": "IOPS"
                   }
                 ],
                 "hourlyCost": "0.242465753424657529",
@@ -173,8 +165,7 @@
                 "monthlyQuantity": null,
                 "name": "Ephemeral storage",
                 "price": "0.0000000309",
-                "unit": "GB-seconds",
-                "usageBased": false
+                "unit": "GB-seconds"
               },
               {
                 "hourlyCost": null,
@@ -211,8 +202,7 @@
                 "monthlyQuantity": null,
                 "name": "Ephemeral storage",
                 "price": "0.0000000309",
-                "unit": "GB-seconds",
-                "usageBased": false
+                "unit": "GB-seconds"
               },
               {
                 "hourlyCost": null,
@@ -309,8 +299,7 @@
                 "monthlyQuantity": "730",
                 "name": "Instance usage (Linux/UNIX, on-demand, m5.4xlarge)",
                 "price": "0.768",
-                "unit": "hours",
-                "usageBased": false
+                "unit": "hours"
               }
             ],
             "hourlyCost": "1.017315068493150679",
@@ -328,8 +317,7 @@
                     "monthlyQuantity": "50",
                     "name": "Storage (general purpose SSD, gp2)",
                     "price": "0.1",
-                    "unit": "GB",
-                    "usageBased": false
+                    "unit": "GB"
                   }
                 ],
                 "hourlyCost": "0.00684931506849315",
@@ -346,8 +334,7 @@
                     "monthlyQuantity": "1000",
                     "name": "Storage (provisioned IOPS SSD, io1)",
                     "price": "0.125",
-                    "unit": "GB",
-                    "usageBased": false
+                    "unit": "GB"
                   },
                   {
                     "hourlyCost": "0.0712328767123287665",
@@ -356,8 +343,7 @@
                     "monthlyQuantity": "800",
                     "name": "Provisioned IOPS",
                     "price": "0.065",
-                    "unit": "IOPS",
-                    "usageBased": false
+                    "unit": "IOPS"
                   }
                 ],
                 "hourlyCost": "0.242465753424657529",
@@ -377,8 +363,7 @@
                 "monthlyQuantity": "730",
                 "name": "Instance usage (Linux/UNIX, on-demand, m5.4xlarge)",
                 "price": "0.768",
-                "unit": "hours",
-                "usageBased": false
+                "unit": "hours"
               }
             ],
             "hourlyCost": "1.017315068493150679",
@@ -396,8 +381,7 @@
                     "monthlyQuantity": "50",
                     "name": "Storage (general purpose SSD, gp2)",
                     "price": "0.1",
-                    "unit": "GB",
-                    "usageBased": false
+                    "unit": "GB"
                   }
                 ],
                 "hourlyCost": "0.00684931506849315",
@@ -414,8 +398,7 @@
                     "monthlyQuantity": "1000",
                     "name": "Storage (provisioned IOPS SSD, io1)",
                     "price": "0.125",
-                    "unit": "GB",
-                    "usageBased": false
+                    "unit": "GB"
                   },
                   {
                     "hourlyCost": "0.0712328767123287665",
@@ -424,8 +407,7 @@
                     "monthlyQuantity": "800",
                     "name": "Provisioned IOPS",
                     "price": "0.065",
-                    "unit": "IOPS",
-                    "usageBased": false
+                    "unit": "IOPS"
                   }
                 ],
                 "hourlyCost": "0.242465753424657529",
@@ -455,8 +437,7 @@
                 "monthlyQuantity": "0",
                 "name": "Ephemeral storage",
                 "price": "0.0000000309",
-                "unit": "GB-seconds",
-                "usageBased": false
+                "unit": "GB-seconds"
               },
               {
                 "hourlyCost": "0",
@@ -495,8 +476,7 @@
                 "monthlyQuantity": "0",
                 "name": "Ephemeral storage",
                 "price": "0.0000000309",
-                "unit": "GB-seconds",
-                "usageBased": false
+                "unit": "GB-seconds"
               },
               {
                 "hourlyCost": "0",
