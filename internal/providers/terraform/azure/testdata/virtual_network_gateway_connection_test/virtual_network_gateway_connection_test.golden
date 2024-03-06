@@ -2,7 +2,7 @@
  Name                                                     Monthly Qty  Unit                Monthly Cost 
                                                                                                         
  azurerm_public_ip.example                                                                              
- └─ IP address (dynamic)                                          730  hours                      $2.92 
+ └─ IP address (dynamic, regional)                                730  hours                      $2.92 
                                                                                                         
  azurerm_virtual_network_gateway.Basic                                                                  
  ├─ VPN gateway (Basic)                                           730  hours                     $26.28 

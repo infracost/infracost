@@ -8,13 +8,13 @@
  └─ Rule usage                                         730  hours                    $7.30 
                                                                                            
  azurerm_public_ip.example_withBasicSku                                                    
- └─ IP address (static)                                730  hours                    $2.63 
+ └─ IP address (static, regional)                      730  hours                    $2.63 
                                                                                            
  azurerm_public_ip.example_withDefaultSku                                                  
- └─ IP address (static)                                730  hours                    $2.63 
+ └─ IP address (static, regional)                      730  hours                    $2.63 
                                                                                            
  azurerm_public_ip.example_withStandardSku                                                 
- └─ IP address (static)                                730  hours                    $2.63 
+ └─ IP address (static, regional)                      730  hours                    $2.63 
                                                                                            
  OVERALL TOTAL                                                                      $15.18 
 ──────────────────────────────────

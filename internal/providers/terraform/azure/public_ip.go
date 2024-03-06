@@ -28,16 +28,29 @@ func NewAzureRMPublicIP(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 		sku = d.Get("sku").String()
 	}
 
+	skuTier := "regional"
+
 	switch sku {
 	case "Basic":
 		meterName = "Basic IPv4 " + allocationMethod + " Public IP"
 	case "Standard":
-		meterName = "Standard IPv4 " + allocationMethod + " Public IP"
+		skuTierVal := d.Get("sku_tier").String()
+		if skuTierVal != "" {
+			skuTier = skuTierVal
+		}
+		if skuTier == "global" {
+			sku = "Global"
+			meterName = "Global IPv4 " + allocationMethod + " Public IP"
+		} else {
+			meterName = "Standard IPv4 " + allocationMethod + " Public IP"
+		}
 	}
+
+	name := fmt.Sprintf("IP address (%s, %s)", strings.ToLower(allocationMethod), strings.ToLower(skuTier))
 
 	costComponents := make([]*schema.CostComponent, 0)
 
-	costComponents = append(costComponents, PublicIPCostComponent(fmt.Sprintf("IP address (%s)", strings.ToLower(allocationMethod)), region, sku, meterName))
+	costComponents = append(costComponents, PublicIPCostComponent(name, region, sku, meterName))
 
 	return &schema.Resource{
 		Name:           d.Address,
