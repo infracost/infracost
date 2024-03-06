@@ -8,17 +8,17 @@ import (
 func getStorageBucketRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
 		Name:                "google_storage_bucket",
-		RFunc:               NewStorageBucket,
+		CoreRFunc:           NewStorageBucket,
 		ReferenceAttributes: []string{},
 	}
 }
-func NewStorageBucket(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+
+func NewStorageBucket(d *schema.ResourceData) schema.CoreResource {
 	r := &google.StorageBucket{
 		Address:      d.Address,
 		Region:       d.Get("region").String(),
 		Location:     d.Get("location").String(),
 		StorageClass: d.Get("storage_class").String(),
 	}
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

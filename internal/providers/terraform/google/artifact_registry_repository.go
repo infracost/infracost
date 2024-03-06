@@ -7,12 +7,12 @@ import (
 
 func getArtifactRegistryRepositoryRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "google_artifact_registry_repository",
-		RFunc: newArtifactRegistryRepository,
+		Name:      "google_artifact_registry_repository",
+		CoreRFunc: newArtifactRegistryRepository,
 	}
 }
 
-func newArtifactRegistryRepository(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newArtifactRegistryRepository(d *schema.ResourceData) schema.CoreResource {
 	region := d.Get("region").String()
 	zone := d.Get("zone").String()
 	if zone != "" {
@@ -28,7 +28,5 @@ func newArtifactRegistryRepository(d *schema.ResourceData, u *schema.UsageData) 
 		Address: d.Address,
 		Region:  region,
 	}
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
+	return r
 }

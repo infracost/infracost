@@ -7,16 +7,15 @@ import (
 
 func getLoggingOrganizationBucketConfigRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "google_logging_organization_bucket_config",
-		RFunc: NewLoggingOrganizationBucketConfig,
+		Name:      "google_logging_organization_bucket_config",
+		CoreRFunc: NewLoggingOrganizationBucketConfig,
 	}
 }
 
-func NewLoggingOrganizationBucketConfig(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewLoggingOrganizationBucketConfig(d *schema.ResourceData) schema.CoreResource {
 	r := &google.Logging{
 		Address: d.Address,
 	}
 
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

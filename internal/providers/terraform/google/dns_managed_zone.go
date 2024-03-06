@@ -7,16 +7,15 @@ import (
 
 func getDNSManagedZoneRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "google_dns_managed_zone",
-		RFunc: NewDNSManagedZone,
+		Name:      "google_dns_managed_zone",
+		CoreRFunc: NewDNSManagedZone,
 	}
 }
 
-func NewDNSManagedZone(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewDNSManagedZone(d *schema.ResourceData) schema.CoreResource {
 	r := &google.DNSManagedZone{
 		Address: d.Address,
 	}
 
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

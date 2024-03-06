@@ -10,8 +10,8 @@ import (
 
 func getContainerNodePoolRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "google_container_node_pool",
-		RFunc: newContainerNodePool,
+		Name:      "google_container_node_pool",
+		CoreRFunc: newContainerNodePool,
 		ReferenceAttributes: []string{
 			"cluster",
 		},
@@ -23,7 +23,7 @@ func getContainerNodePoolRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func newContainerNodePool(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newContainerNodePool(d *schema.ResourceData) schema.CoreResource {
 	var cluster *schema.ResourceData
 	if len(d.References("cluster")) > 0 {
 		cluster = d.References("cluster")[0]
@@ -35,9 +35,7 @@ func newContainerNodePool(d *schema.ResourceData, u *schema.UsageData) *schema.R
 		return nil
 	}
 
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
+	return r
 }
 
 func newNodePool(address string, d gjson.Result, cluster *schema.ResourceData) *google.ContainerNodePool {

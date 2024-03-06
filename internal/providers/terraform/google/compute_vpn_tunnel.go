@@ -7,17 +7,16 @@ import (
 
 func getComputeVPNTunnelRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "google_compute_vpn_tunnel",
-		RFunc: NewComputeVPNTunnel,
+		Name:      "google_compute_vpn_tunnel",
+		CoreRFunc: NewComputeVPNTunnel,
 	}
 }
 
-func NewComputeVPNTunnel(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewComputeVPNTunnel(d *schema.ResourceData) schema.CoreResource {
 	r := &google.ComputeVPNTunnel{
 		Address: d.Address,
 		Region:  d.Get("region").String(),
 	}
 
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

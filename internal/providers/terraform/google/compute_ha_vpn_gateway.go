@@ -7,12 +7,11 @@ import (
 
 func getComputeHAVPNGatewayRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "google_compute_ha_vpn_gateway",
-		RFunc: NewComputeHAVPNGateway,
+		Name:      "google_compute_ha_vpn_gateway",
+		CoreRFunc: NewComputeHAVPNGateway,
 	}
 }
-func NewComputeHAVPNGateway(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func NewComputeHAVPNGateway(d *schema.ResourceData) schema.CoreResource {
 	r := &google.ComputeVPNGateway{Address: d.Address, Region: d.Get("region").String()}
-	r.PopulateUsage(u)
-	return r.BuildResource()
+	return r
 }

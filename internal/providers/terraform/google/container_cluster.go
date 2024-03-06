@@ -12,8 +12,8 @@ import (
 
 func getContainerClusterRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:  "google_container_cluster",
-		RFunc: newContainerCluster,
+		Name:      "google_container_cluster",
+		CoreRFunc: newContainerCluster,
 		// this is a reverse reference, it depends on the container_node_pool RegistryItem
 		// defining "cluster" as a ReferenceAttribute
 		ReferenceAttributes: []string{"google_container_node_pool.cluster"},
@@ -33,7 +33,7 @@ func getContainerClusterRegistryItem() *schema.RegistryItem {
 	}
 }
 
-func newContainerCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
+func newContainerCluster(d *schema.ResourceData) schema.CoreResource {
 	region := d.Get("location").String()
 	isZone := isZone(region)
 
@@ -104,9 +104,7 @@ func newContainerCluster(d *schema.ResourceData, u *schema.UsageData) *schema.Re
 		DefaultNodePool:  defaultNodePool,
 		NodePools:        nodePools,
 	}
-	r.PopulateUsage(u)
-
-	return r.BuildResource()
+	return r
 }
 
 func zoneCount(d gjson.Result, location string) int {
