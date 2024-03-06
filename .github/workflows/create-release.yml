@@ -51,14 +51,15 @@ jobs:
 
       - name: Build and push Docker images
         uses: docker/build-push-action@v4
+        id: build_push_docker
         with:
           context: .
           platforms: linux/amd64
           tags: ${{ steps.meta.outputs.tags }}
           push: true
 
-      - name: Clean Docker images
-        run: docker rmi $(docker images -q) -f
+      - name: Clean Docker image
+        run: docker rmi ${{ steps.build_push_docker.outputs.imageid }} -f
 
       - name: Docker meta (CI)
         id: meta-ci
