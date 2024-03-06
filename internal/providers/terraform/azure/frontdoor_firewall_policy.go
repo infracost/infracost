@@ -27,7 +27,7 @@ func newFrontdoorFirewallPolicy(d *schema.ResourceData) schema.CoreResource {
 	if strings.HasPrefix(strings.ToLower(region), "usgov") {
 		region = "US Gov Zone 1"
 	} else {
-		region = regionToZone(region)
+		region = regionToCDNZone(region)
 	}
 
 	customRules := 0
