@@ -8,7 +8,7 @@
  └─ Outbound data transfer (next 100TB)       40,000  GB        $3,280.00 
                                                                           
  azurerm_public_ip.deploy                                                 
- └─ IP address (static)                          730  hours         $3.65 
+ └─ IP address (static, regional)                730  hours         $3.65 
                                                                           
  OVERALL TOTAL                                                  $8,872.35 
 ──────────────────────────────────

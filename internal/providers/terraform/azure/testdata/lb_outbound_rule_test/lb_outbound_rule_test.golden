@@ -1,16 +1,16 @@
 
- Name                               Monthly Qty  Unit              Monthly Cost 
-                                                                                
- azurerm_lb.example                                                             
- └─ Data processed               Monthly cost depends on usage: $0.005 per GB   
-                                                                                
- azurerm_lb_outbound_rule.rules                                                 
- └─ Rule usage                              730  hours                    $7.30 
-                                                                                
- azurerm_public_ip.example                                                      
- └─ IP address (static)                     730  hours                    $2.63 
-                                                                                
- OVERALL TOTAL                                                            $9.93 
+ Name                                 Monthly Qty  Unit              Monthly Cost 
+                                                                                  
+ azurerm_lb.example                                                               
+ └─ Data processed                 Monthly cost depends on usage: $0.005 per GB   
+                                                                                  
+ azurerm_lb_outbound_rule.rules                                                   
+ └─ Rule usage                                730  hours                    $7.30 
+                                                                                  
+ azurerm_public_ip.example                                                        
+ └─ IP address (static, regional)             730  hours                    $2.63 
+                                                                                  
+ OVERALL TOTAL                                                              $9.93 
 ──────────────────────────────────
 5 cloud resources were detected:
 ∙ 3 were estimated, 1 of which usage-based costs, see https://infracost.io/usage-file

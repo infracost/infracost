@@ -1,21 +1,24 @@
 
- Name                        Monthly Qty  Unit   Monthly Cost 
-                                                              
- azurerm_public_ip.example                                    
- └─ IP address (static)              730  hours         $3.65 
-                                                              
- azurerm_public_ip.example1                                   
- └─ IP address (dynamic)             730  hours         $2.92 
-                                                              
- OVERALL TOTAL                                          $6.57 
+ Name                               Monthly Qty  Unit   Monthly Cost 
+                                                                     
+ azurerm_public_ip.example                                           
+ └─ IP address (static, regional)           730  hours         $3.65 
+                                                                     
+ azurerm_public_ip.example1                                          
+ └─ IP address (dynamic, regional)          730  hours         $2.92 
+                                                                     
+ azurerm_public_ip.global                                            
+ └─ IP address (static, global)             730  hours         $3.65 
+                                                                     
+ OVERALL TOTAL                                                $10.22 
 ──────────────────────────────────
-3 cloud resources were detected:
-∙ 2 were estimated
+4 cloud resources were detected:
+∙ 3 were estimated
 ∙ 1 was free:
   ∙ 1 x azurerm_resource_group
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMPublicIP                                ┃ $7           ┃
+┃ TestAzureRMPublicIP                                ┃ $10          ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛

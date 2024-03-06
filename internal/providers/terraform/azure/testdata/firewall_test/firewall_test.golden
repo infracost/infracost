@@ -22,7 +22,7 @@
  └─ Data processed                                    20,000  GB                     $320.00 
                                                                                              
  azurerm_public_ip.example                                                                   
- └─ IP address (static)                                  730  hours                    $3.65 
+ └─ IP address (static, regional)                        730  hours                    $3.65 
                                                                                              
  OVERALL TOTAL                                                                     $6,256.15 
 ──────────────────────────────────

@@ -42,7 +42,7 @@
  └─ V2 capacity units (WAF)                                                1,460  CU                    $21.02 
                                                                                                                
  azurerm_public_ip.example                                                                                     
- └─ IP address (dynamic)                                                     730  hours                  $2.92 
+ └─ IP address (dynamic, regional)                                           730  hours                  $2.92 
                                                                                                                
  OVERALL TOTAL                                                                                       $5,914.54 
 ──────────────────────────────────
