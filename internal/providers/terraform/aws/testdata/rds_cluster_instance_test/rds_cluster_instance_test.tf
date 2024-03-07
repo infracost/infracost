@@ -101,3 +101,41 @@ resource "aws_rds_cluster_instance" "cluster_instance_3yr_all_upfront" {
   engine             = aws_rds_cluster.default.engine
   engine_version     = aws_rds_cluster.default.engine_version
 }
+
+locals {
+  extended_support_engined = {
+    aurora-mysql = [
+      "5.7",
+      "5.7.44",
+      "8.0",
+      "8.0.36",
+    ]
+    aurora-postgresql = [
+      "11",
+      "11.22",
+      "12",
+      "13",
+      "14",
+      "15",
+      "16"
+    ]
+  }
+}
+
+resource "aws_rds_cluster_instance" "extended_support" {
+  for_each = { for entry in flatten([
+    for engine, versions in local.extended_support_engined : [
+      for version in versions : {
+        engine  = engine
+        version = version
+      }
+    ]
+  ]) : "${entry.engine}-${entry.version}" => entry }
+
+  identifier         = "aurora-cluster-demo"
+  cluster_identifier = aws_rds_cluster.default.id
+
+  engine         = each.value.engine
+  engine_version = each.value.version
+  instance_class = "db.t3.large"
+}

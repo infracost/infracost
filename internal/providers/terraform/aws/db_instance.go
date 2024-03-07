@@ -37,6 +37,7 @@ func NewDBInstance(d *schema.ResourceData) schema.CoreResource {
 		Region:                               d.Get("region").String(),
 		InstanceClass:                        d.Get("instance_class").String(),
 		Engine:                               engine,
+		Version:                              d.Get("engine_version").String(),
 		MultiAZ:                              d.Get("multi_az").Bool(),
 		LicenseModel:                         d.Get("license_model").String(),
 		BackupRetentionPeriod:                d.Get("backup_retention_period").Int(),

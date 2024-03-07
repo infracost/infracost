@@ -46,13 +46,46 @@
  ├─ Database instance (on-demand, db.t3.medium)                                             730  hours                             $59.86 
  └─ CPU credits                                                                              48  vCPU-hours                         $4.32 
                                                                                                                                           
- OVERALL TOTAL                                                                                                                  $4,208.32 
+ aws_rds_cluster_instance.extended_support["aurora-mysql-5.7"]                                                                            
+ └─ Database instance (on-demand, db.t3.large)                                              730  hours                            $119.72 
+                                                                                                                                          
+ aws_rds_cluster_instance.extended_support["aurora-mysql-5.7.44"]                                                                         
+ └─ Database instance (on-demand, db.t3.large)                                              730  hours                            $119.72 
+                                                                                                                                          
+ aws_rds_cluster_instance.extended_support["aurora-mysql-8.0"]                                                                            
+ └─ Database instance (on-demand, db.t3.large)                                              730  hours                            $119.72 
+                                                                                                                                          
+ aws_rds_cluster_instance.extended_support["aurora-mysql-8.0.36"]                                                                         
+ └─ Database instance (on-demand, db.t3.large)                                              730  hours                            $119.72 
+                                                                                                                                          
+ aws_rds_cluster_instance.extended_support["aurora-postgresql-11"]                                                                        
+ └─ Database instance (on-demand, db.t3.large)                                              730  hours                            $119.72 
+                                                                                                                                          
+ aws_rds_cluster_instance.extended_support["aurora-postgresql-11.22"]                                                                     
+ └─ Database instance (on-demand, db.t3.large)                                              730  hours                            $119.72 
+                                                                                                                                          
+ aws_rds_cluster_instance.extended_support["aurora-postgresql-12"]                                                                        
+ └─ Database instance (on-demand, db.t3.large)                                              730  hours                            $119.72 
+                                                                                                                                          
+ aws_rds_cluster_instance.extended_support["aurora-postgresql-13"]                                                                        
+ └─ Database instance (on-demand, db.t3.large)                                              730  hours                            $119.72 
+                                                                                                                                          
+ aws_rds_cluster_instance.extended_support["aurora-postgresql-14"]                                                                        
+ └─ Database instance (on-demand, db.t3.large)                                              730  hours                            $119.72 
+                                                                                                                                          
+ aws_rds_cluster_instance.extended_support["aurora-postgresql-15"]                                                                        
+ └─ Database instance (on-demand, db.t3.large)                                              730  hours                            $119.72 
+                                                                                                                                          
+ aws_rds_cluster_instance.extended_support["aurora-postgresql-16"]                                                                        
+ └─ Database instance (on-demand, db.t3.large)                                              730  hours                            $119.72 
+                                                                                                                                          
+ OVERALL TOTAL                                                                                                                  $5,525.24 
 ──────────────────────────────────
-11 cloud resources were detected:
-∙ 11 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+22 cloud resources were detected:
+∙ 22 were estimated, 17 of which include usage-based costs, see https://infracost.io/usage-file
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestRDSClusterInstanceGoldenFile                   ┃ $4,208       ┃
+┃ TestRDSClusterInstanceGoldenFile                   ┃ $5,525       ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
