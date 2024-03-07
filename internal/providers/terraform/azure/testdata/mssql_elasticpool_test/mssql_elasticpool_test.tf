@@ -102,6 +102,28 @@ resource "azurerm_mssql_elasticpool" "bc_dc" {
   }
 }
 
+resource "azurerm_mssql_elasticpool" "bc_dc_zone_redundant" {
+  name                = "bc-dc-zone-redundant"
+  resource_group_name = azurerm_resource_group.example.name
+  location            = azurerm_resource_group.example.location
+  server_name         = azurerm_sql_server.example.name
+  license_type        = "LicenseIncluded"
+  max_size_gb         = 100
+  zone_redundant      = true
+
+  sku {
+    name     = "BC_DC"
+    tier     = "BusinessCritical"
+    family   = "DC"
+    capacity = 8
+  }
+
+  per_database_settings {
+    min_capacity = 0.25
+    max_capacity = 4
+  }
+}
+
 resource "azurerm_mssql_elasticpool" "basic_100" {
   name                = "basic-100"
   resource_group_name = azurerm_resource_group.example.name

@@ -12,8 +12,9 @@ import (
 )
 
 const (
-	sqlServerlessTier = "general purpose - serverless"
-	sqlHyperscaleTier = "hyperscale"
+	sqlServerlessTier     = "general purpose - serverless"
+	sqlHyperscaleTier     = "hyperscale"
+	sqlGeneralPurposeTier = "general purpose"
 )
 
 var (
@@ -250,6 +251,7 @@ func (r *SQLDatabase) serverlessComputeHoursCostComponents() []*schema.CostCompo
 		},
 	}
 
+	// Zone redundancy is free for premium and business critical tiers
 	if r.ZoneRedundant {
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:            fmt.Sprintf("Zone redundancy (serverless, %s)", r.SKU),
@@ -293,7 +295,8 @@ func (r *SQLDatabase) provisionedComputeCostComponents() []*schema.CostComponent
 		},
 	}
 
-	if r.ZoneRedundant {
+	// Zone redundancy is free for premium and business critical tiers
+	if strings.EqualFold(r.Tier, sqlGeneralPurposeTier) && r.ZoneRedundant {
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:           fmt.Sprintf("Zone redundancy (provisioned, %s)", r.SKU),
 			Unit:           "hours",
@@ -492,12 +495,12 @@ func mssqlStorageCostComponent(region string, tier string, zoneRedundant bool, m
 	}
 
 	storageTier := tier
-	if strings.ToLower(storageTier) == "general purpose - serverless" {
+	if strings.EqualFold(tier, sqlServerlessTier) {
 		storageTier = "General Purpose"
 	}
 
 	skuName := storageTier
-	if zoneRedundant {
+	if (strings.EqualFold(tier, sqlGeneralPurposeTier) || strings.EqualFold(tier, sqlServerlessTier)) && zoneRedundant {
 		skuName += " Zone Redundancy"
 	}
 
