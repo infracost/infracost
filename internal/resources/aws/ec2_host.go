@@ -80,7 +80,7 @@ func (r *EC2Host) BuildResource() *schema.Resource {
 	}
 
 	hostAttributeFilters := []*schema.AttributeFilter{
-		{Key: "usagetype", Value: strPtr(fmt.Sprintf("%s:%s", hostPurchaseType, instanceFamily))},
+		{Key: "usagetype", ValueRegex: regexPtr(fmt.Sprintf("%s:%s$", hostPurchaseType, instanceFamily))},
 	}
 
 	costComponents := []*schema.CostComponent{
