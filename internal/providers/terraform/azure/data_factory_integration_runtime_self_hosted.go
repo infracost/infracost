@@ -11,16 +11,26 @@ func getDataFactoryIntegrationRuntimeSelfHostedRegistryItem() *schema.RegistryIt
 		CoreRFunc: newDataFactoryIntegrationRuntimeSelfHosted,
 		ReferenceAttributes: []string{
 			"data_factory_id",
+			"data_factory_name",
+			"resource_group_name",
 		},
 	}
 }
 
 func newDataFactoryIntegrationRuntimeSelfHosted(d *schema.ResourceData) schema.CoreResource {
-	dataFactoryRefs := d.References("data_factory_id")
 	var region string
 
-	if len(dataFactoryRefs) > 0 {
-		region = lookupRegion(dataFactoryRefs[0], []string{"resource_group_name"})
+	region = lookupRegion(d, []string{"resource_group_name", "data_factory_id", "data_factory_name"})
+
+	dataFactoryIdRefs := d.References("data_factory_id")
+	if region == "" && len(dataFactoryIdRefs) > 0 {
+		region = lookupRegion(dataFactoryIdRefs[0], []string{"resource_group_name"})
+	}
+
+	// Old provider versions < 3 can reference data_factory_name
+	dataFactoryNameRefs := d.References("data_factory_name")
+	if region == "" && len(dataFactoryNameRefs) > 0 {
+		region = lookupRegion(dataFactoryNameRefs[0], []string{"resource_group_name"})
 	}
 
 	r := &azure.DataFactoryIntegrationRuntimeSelfHosted{

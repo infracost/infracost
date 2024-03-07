@@ -11,11 +11,29 @@ func getDataFactoryIntegrationRuntimeAzureSSISRegistryItem() *schema.RegistryIte
 	return &schema.RegistryItem{
 		Name:      "azurerm_data_factory_integration_runtime_azure_ssis",
 		CoreRFunc: newDataFactoryIntegrationRuntimeAzureSSIS,
+		ReferenceAttributes: []string{
+			"data_factory_id",
+			"data_factory_name",
+			"resource_group_name",
+		},
 	}
 }
 
 func newDataFactoryIntegrationRuntimeAzureSSIS(d *schema.ResourceData) schema.CoreResource {
-	region := lookupRegion(d, []string{})
+	var region string
+
+	region = lookupRegion(d, []string{"resource_group_name", "data_factory_id", "data_factory_name"})
+
+	dataFactoryIdRefs := d.References("data_factory_id")
+	if region == "" && len(dataFactoryIdRefs) > 0 {
+		region = lookupRegion(dataFactoryIdRefs[0], []string{"resource_group_name"})
+	}
+
+	// Old provider versions <3 can reference data_factory_name
+	dataFactoryNameRefs := d.References("data_factory_name")
+	if region == "" && len(dataFactoryNameRefs) > 0 {
+		region = lookupRegion(dataFactoryNameRefs[0], []string{"resource_group_name"})
+	}
 
 	licenseType := d.GetStringOrDefault("license_type", "LicenseIncluded")
 	licenseIncluded := strings.EqualFold(licenseType, "LicenseIncluded")
