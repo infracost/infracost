@@ -185,7 +185,8 @@ func (r *MSSQLElasticPool) computeHoursCostComponents() []*schema.CostComponent 
 		},
 	}
 
-	if r.ZoneRedundant {
+	// Zone redundancy is free for premium and business critical tiers
+	if strings.EqualFold(r.Tier, sqlGeneralPurposeTier) && r.ZoneRedundant {
 		costComponents = append(costComponents, &schema.CostComponent{
 			Name:           fmt.Sprintf("Zone redundancy (%s, %d vCore)", r.SKU, cores),
 			Unit:           "hours",
