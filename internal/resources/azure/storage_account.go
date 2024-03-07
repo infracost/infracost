@@ -402,7 +402,7 @@ func (r *StorageAccount) writeOperationsCostComponents() []*schema.CostComponent
 //
 // BlockBlobStorage:
 //
-//	Standard Hot:  cost exists
+//	Standard Hot:  no cost
 //	Standard Cool: cost exists
 //	Premium:       cost exists
 //
@@ -422,8 +422,8 @@ func (r *StorageAccount) writeOperationsCostComponents() []*schema.CostComponent
 //	Standard Hot NFSv3:  no cost
 //	Standard Cool:       cost exists
 //	Standard Cool NFSv3: no cost
-//	Premium:             cost exists
-//	Premium NFSv3:       cost exists
+//	Premium:             no cost
+//	Premium NFSv3:       no cost
 //
 // FileStorage:
 //
@@ -434,6 +434,10 @@ func (r *StorageAccount) listAndCreateContainerOperationsCostComponents() []*sch
 	costComponents := []*schema.CostComponent{}
 
 	if r.isFileStorage() && r.isPremium() {
+		return costComponents
+	}
+
+	if r.isStorageV2() && r.NFSv3 {
 		return costComponents
 	}
 
