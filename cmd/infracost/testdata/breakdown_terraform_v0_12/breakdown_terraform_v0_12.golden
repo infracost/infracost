@@ -34,11 +34,13 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.12_plan.json
                                                                                                     
  module.db.module.db_1.module.db_instance.aws_db_instance.this[0]                                   
  ├─ Database instance (on-demand, Single-AZ, db.t3.micro)                  730  hours        $12.41 
- └─ Storage (general purpose SSD, gp2)                                       5  GB            $0.58 
+ ├─ Storage (general purpose SSD, gp2)                                       5  GB            $0.58 
+ └─ Extended support (year 1)                                              730  hour         $73.00 
                                                                                                     
  module.db.module.db_2.module.db_instance.aws_db_instance.this[0]                                   
  ├─ Database instance (on-demand, Single-AZ, db.t3.micro)                  730  hours        $12.41 
- └─ Storage (general purpose SSD, gp2)                                       5  GB            $0.58 
+ ├─ Storage (general purpose SSD, gp2)                                       5  GB            $0.58 
+ └─ Extended support (year 1)                                              730  hour         $73.00 
                                                                                                     
  module.instances.aws_instance.module_instance_1                                                    
  ├─ Instance usage (Linux/UNIX, on-demand, t3.nano)                        730  hours         $3.80 
@@ -70,7 +72,7 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.12_plan.json
  └─ root_block_device                                                                               
     └─ Storage (general purpose SSD, gp2)                                    8  GB            $0.80 
                                                                                                     
- OVERALL TOTAL                                                                               $81.12 
+ OVERALL TOTAL                                                                              $227.12 
 ──────────────────────────────────
 26 cloud resources were detected:
 ∙ 14 were estimated, 10 of which include usage-based costs, see https://infracost.io/usage-file
@@ -79,7 +81,7 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.12_plan.json
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                                          ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...data/terraform_v0.12_plan.json ┃ $81          ┃
+┃ infracost/infracost/cmd/infraco...data/terraform_v0.12_plan.json ┃ $227         ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 
 Err:

@@ -16,6 +16,7 @@ type RDSClusterInstance struct {
 	Region                                       string
 	InstanceClass                                string
 	Engine                                       string
+	Version                                      string
 	IOOptimized                                  bool
 	PerformanceInsightsEnabled                   bool
 	PerformanceInsightsLongTermRetention         bool
@@ -119,6 +120,11 @@ func (r *RDSClusterInstance) BuildResource() *schema.Resource {
 			costComponents = append(costComponents,
 				performanceInsightsAPIRequestCostComponent(r.Region, r.MonthlyAdditionalPerformanceInsightsRequests))
 		}
+	}
+
+	extendedSupport := extendedSupportCostComponent(r.Version, r.Region, r.Engine)
+	if extendedSupport != nil {
+		costComponents = append(costComponents, extendedSupport)
 	}
 
 	return &schema.Resource{

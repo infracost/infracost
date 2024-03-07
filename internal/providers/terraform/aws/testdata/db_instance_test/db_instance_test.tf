@@ -240,3 +240,59 @@ resource "aws_db_instance" "postgres-3yr-partial-upfront-multi-az" {
   instance_class = "db.t3.large"
   multi_az       = true
 }
+
+locals {
+  extended_support_engined = {
+    aurora = [
+      "5.7",
+      "5.7.44",
+      "8.0",
+      "8.0.36",
+    ]
+    aurora-mysql = [
+      "5.7",
+      "5.7.44",
+      "8.0",
+      "8.0.36",
+    ]
+    aurora-postgresql = [
+      "11",
+      "11.22",
+      "12",
+      "13",
+      "14",
+      "15",
+      "16"
+    ]
+    mysql = [
+      "5.7",
+      "5.7.44",
+      "8.0",
+      "8.0.36",
+    ]
+    postgres = [
+      "16",
+      "15",
+      "14",
+      "13",
+      "12",
+      "11",
+      "11.22"
+    ]
+  }
+}
+
+resource "aws_db_instance" "extended_support" {
+  for_each = { for entry in flatten([
+    for engine, versions in local.extended_support_engined : [
+      for version in versions : {
+        engine  = engine
+        version = version
+      }
+    ]
+  ]) : "${entry.engine}-${entry.version}" => entry }
+
+  engine         = each.value.engine
+  engine_version = each.value.version
+  instance_class = "db.t3.large"
+}

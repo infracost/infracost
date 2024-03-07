@@ -1,13 +1,14 @@
 package aws
 
 import (
+	"fmt"
+	"strings"
+	"time"
+
 	"github.com/rs/zerolog/log"
 
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-
-	"fmt"
-	"strings"
 
 	"github.com/shopspring/decimal"
 )
@@ -24,6 +25,7 @@ type DBInstance struct {
 	MultiAZ                                      bool
 	InstanceClass                                string
 	Engine                                       string
+	Version                                      string
 	IOPS                                         float64
 	AllocatedStorageGB                           *float64
 	MonthlyStandardIORequests                    *int64   `infracost_usage:"monthly_standard_io_requests"`
@@ -372,13 +374,17 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 		}
 	}
 
+	extendedSupport := extendedSupportCostComponent(r.Version, r.Region, r.Engine)
+	if extendedSupport != nil {
+		costComponents = append(costComponents, extendedSupport)
+	}
+
 	return &schema.Resource{
 		Name:           r.Address,
 		CostComponents: costComponents,
 		UsageSchema:    DBInstanceUsageSchema,
 	}
 }
-
 func performanceInsightsLongTermRetentionCostComponent(region, instanceClass string) *schema.CostComponent {
 	instanceType := strings.TrimPrefix(instanceClass, "db.")
 
@@ -427,4 +433,146 @@ func performanceInsightsAPIRequestCostComponent(region string, additionalRequest
 			},
 		},
 	}
+}
+
+// ExtendedSupportDates contains the extended support dates for a specific RDS
+// engine version Year1 is the date when the extended support starts, Year 3 is
+// the date when the extended increases price.
+type ExtendedSupportDates struct {
+	Year1 time.Time
+	Year3 time.Time
+}
+
+// ExtendedSupport contains the extended support dates for a specific RDS engine.
+type ExtendedSupport struct {
+	Engine   string
+	Versions map[string]ExtendedSupportDates
+}
+
+// CostComponent returns the cost component for the extended support for the
+// given version and date. If the version is not found then it will return nil.
+func (s ExtendedSupport) CostComponent(version string, region string, d time.Time) *schema.CostComponent {
+	matchingVersion := strings.ToLower(version)
+	supportDates, ok := s.Versions[matchingVersion]
+	if !ok {
+		// if the version is not found then it is likely that the
+		// version is a minor version, we should try and match the minor
+		// version to a major version in the map. This is done by
+		// progressively removing the last part of the version until
+		// we find a match.
+		parts := strings.Split(version, ".")
+		for i := len(parts) - 1; i > 0; i-- {
+			matchingVersion = strings.Join(parts[:i], ".")
+			supportDates, ok = s.Versions[matchingVersion]
+			if ok {
+				break
+			}
+		}
+
+		if !ok {
+			return nil
+		}
+	}
+
+	if !supportDates.Year3.IsZero() && d.After(supportDates.Year3) {
+		return &schema.CostComponent{
+			Name:           "Extended support (year 3)",
+			Unit:           "hour",
+			UnitMultiplier: decimal.NewFromInt(1),
+			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+			ProductFilter: &schema.ProductFilter{
+				VendorName: strPtr("aws"),
+				Region:     strPtr(region),
+				Service:    strPtr("AmazonRDS"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "usagetype", ValueRegex: regexPtr("ExtendedSupport:Yr3:" + s.Engine + matchingVersion)},
+				},
+			},
+		}
+	}
+
+	if d.After(supportDates.Year1) {
+		return &schema.CostComponent{
+			Name:           "Extended support (year 1)",
+			Unit:           "hour",
+			UnitMultiplier: decimal.NewFromInt(1),
+			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+			ProductFilter: &schema.ProductFilter{
+				VendorName: strPtr("aws"),
+				Region:     strPtr(region),
+				Service:    strPtr("AmazonRDS"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "usagetype", ValueRegex: regexPtr("ExtendedSupport:Yr1-Yr2:" + s.Engine + matchingVersion)},
+				},
+			},
+		}
+	}
+
+	return nil
+}
+
+var (
+	// https://docs.aws.amazon.com/AmazonRDS/latest/UserGuide/MySQL.Concepts.VersionMgmt.html#MySQL.Concepts.VersionMgmt.ReleaseCalendar
+	mysqlExtendedSupport = ExtendedSupport{
+		Engine: "MySQL",
+		Versions: map[string]ExtendedSupportDates{
+			"5.7": {Year1: time.Date(2024, time.March, 1, 0, 0, 0, 0, time.UTC), Year3: time.Date(2026, time.March, 1, 0, 0, 0, 0, time.UTC)},
+			"8":   {Year1: time.Date(2026, time.August, 1, 0, 0, 0, 0, time.UTC), Year3: time.Date(2028, time.August, 1, 0, 0, 0, 0, time.UTC)},
+		},
+	}
+
+	// https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.VersionPolicy.html#Aurora.VersionPolicy.MajorVersions
+	mysqlAuroraExtendedSupport = ExtendedSupport{
+		Engine: "AuroraMySQL",
+		Versions: map[string]ExtendedSupportDates{
+			"5.7": {Year1: time.Date(2024, time.December, 1, 0, 0, 0, 0, time.UTC)}, // Year3 is zero because it's N/A
+			"8":   {Year1: time.Date(2027, time.May, 1, 0, 0, 0, 0, time.UTC)},      // Year3 is zero because it's N/A
+		},
+	}
+
+	// https://docs.aws.amazon.com/AmazonRDS/latest/PostgreSQLReleaseNotes/postgresql-release-calendar.html#Release.Calendar
+	postgresExtendedSupport = ExtendedSupport{
+		Engine: "PostgreSQL",
+		Versions: map[string]ExtendedSupportDates{
+			"11": {Year1: time.Date(2024, time.April, 1, 0, 0, 0, 0, time.UTC), Year3: time.Date(2026, time.April, 1, 0, 0, 0, 0, time.UTC)},
+			"12": {Year1: time.Date(2025, time.March, 1, 0, 0, 0, 0, time.UTC), Year3: time.Date(2027, time.March, 1, 0, 0, 0, 0, time.UTC)},
+			"13": {Year1: time.Date(2026, time.March, 1, 0, 0, 0, 0, time.UTC), Year3: time.Date(2028, time.March, 1, 0, 0, 0, 0, time.UTC)},
+			"14": {Year1: time.Date(2027, time.March, 1, 0, 0, 0, 0, time.UTC), Year3: time.Date(2029, time.March, 1, 0, 0, 0, 0, time.UTC)},
+			"15": {Year1: time.Date(2028, time.March, 1, 0, 0, 0, 0, time.UTC), Year3: time.Date(2030, time.March, 1, 0, 0, 0, 0, time.UTC)},
+			"16": {Year1: time.Date(2029, time.March, 1, 0, 0, 0, 0, time.UTC), Year3: time.Date(2031, time.March, 1, 0, 0, 0, 0, time.UTC)},
+		},
+	}
+
+	// https://docs.aws.amazon.com/AmazonRDS/latest/AuroraUserGuide/Aurora.VersionPolicy.html#Aurora.VersionPolicy.MajorVersions
+	postgresAuroraExtendedSupport = ExtendedSupport{
+		Engine: "AuroraPostgreSQL",
+		Versions: map[string]ExtendedSupportDates{
+			"11": {Year1: time.Date(2024, time.April, 1, 0, 0, 0, 0, time.UTC), Year3: time.Date(2026, time.April, 1, 0, 0, 0, 0, time.UTC)},
+			"12": {Year1: time.Date(2025, time.March, 1, 0, 0, 0, 0, time.UTC), Year3: time.Date(2027, time.March, 1, 0, 0, 0, 0, time.UTC)},
+			"13": {Year1: time.Date(2026, time.March, 1, 0, 0, 0, 0, time.UTC), Year3: time.Date(2028, time.March, 1, 0, 0, 0, 0, time.UTC)},
+			"14": {Year1: time.Date(2027, time.March, 1, 0, 0, 0, 0, time.UTC), Year3: time.Date(2029, time.March, 1, 0, 0, 0, 0, time.UTC)},
+			"15": {Year1: time.Date(2028, time.March, 1, 0, 0, 0, 0, time.UTC), Year3: time.Date(2030, time.March, 1, 0, 0, 0, 0, time.UTC)},
+		},
+	}
+
+	today = time.Now()
+)
+
+func extendedSupportCostComponent(version string, region string, engine string) *schema.CostComponent {
+	if version == "" {
+		return nil
+	}
+
+	switch engine {
+	case "postgres":
+		return postgresExtendedSupport.CostComponent(version, region, today)
+	case "mysql":
+		return mysqlExtendedSupport.CostComponent(version, region, today)
+	case "aurora-postgresql":
+		return postgresAuroraExtendedSupport.CostComponent(version, region, today)
+	case "aurora", "aurora-mysql":
+		return mysqlAuroraExtendedSupport.CostComponent(version, region, today)
+	}
+
+	return nil
 }
