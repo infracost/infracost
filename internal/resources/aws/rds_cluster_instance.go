@@ -122,7 +122,7 @@ func (r *RDSClusterInstance) BuildResource() *schema.Resource {
 		}
 	}
 
-	extendedSupport := extendedSupportCostComponent(r.Version, r.Region, r.Engine)
+	extendedSupport := extendedSupportCostComponent(r.Version, r.Region, r.Engine, r.InstanceClass)
 	if extendedSupport != nil {
 		costComponents = append(costComponents, extendedSupport)
 	}

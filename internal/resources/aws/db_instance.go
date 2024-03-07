@@ -374,7 +374,7 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 		}
 	}
 
-	extendedSupport := extendedSupportCostComponent(r.Version, r.Region, r.Engine)
+	extendedSupport := extendedSupportCostComponent(r.Version, r.Region, r.Engine, r.InstanceClass)
 	if extendedSupport != nil {
 		costComponents = append(costComponents, extendedSupport)
 	}
@@ -451,7 +451,7 @@ type ExtendedSupport struct {
 
 // CostComponent returns the cost component for the extended support for the
 // given version and date. If the version is not found then it will return nil.
-func (s ExtendedSupport) CostComponent(version string, region string, d time.Time) *schema.CostComponent {
+func (s ExtendedSupport) CostComponent(version string, region string, d time.Time, quantity decimal.Decimal) *schema.CostComponent {
 	matchingVersion := strings.ToLower(version)
 	supportDates, ok := s.Versions[matchingVersion]
 	if !ok {
@@ -477,9 +477,9 @@ func (s ExtendedSupport) CostComponent(version string, region string, d time.Tim
 	if !supportDates.Year3.IsZero() && d.After(supportDates.Year3) {
 		return &schema.CostComponent{
 			Name:           "Extended support (year 3)",
-			Unit:           "hour",
+			Unit:           "vCPU-hours",
 			UnitMultiplier: decimal.NewFromInt(1),
-			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+			HourlyQuantity: decimalPtr(quantity),
 			ProductFilter: &schema.ProductFilter{
 				VendorName: strPtr("aws"),
 				Region:     strPtr(region),
@@ -494,9 +494,9 @@ func (s ExtendedSupport) CostComponent(version string, region string, d time.Tim
 	if d.After(supportDates.Year1) {
 		return &schema.CostComponent{
 			Name:           "Extended support (year 1)",
-			Unit:           "hour",
+			Unit:           "vCPU-hours",
 			UnitMultiplier: decimal.NewFromInt(1),
-			HourlyQuantity: decimalPtr(decimal.NewFromInt(1)),
+			HourlyQuantity: decimalPtr(quantity),
 			ProductFilter: &schema.ProductFilter{
 				VendorName: strPtr("aws"),
 				Region:     strPtr(region),
@@ -558,20 +558,26 @@ var (
 	today = time.Now()
 )
 
-func extendedSupportCostComponent(version string, region string, engine string) *schema.CostComponent {
+func extendedSupportCostComponent(version string, region string, engine string, instanceType string) *schema.CostComponent {
 	if version == "" {
 		return nil
 	}
 
+	vCPUCount := decimal.NewFromInt(1)
+	if count, ok := InstanceTypeToVCPU[strings.TrimPrefix(instanceType, "db.")]; ok {
+		// We were able to lookup thing VCPU count
+		vCPUCount = decimal.NewFromInt(count)
+	}
+
 	switch engine {
 	case "postgres":
-		return postgresExtendedSupport.CostComponent(version, region, today)
+		return postgresExtendedSupport.CostComponent(version, region, today, vCPUCount)
 	case "mysql":
-		return mysqlExtendedSupport.CostComponent(version, region, today)
+		return mysqlExtendedSupport.CostComponent(version, region, today, vCPUCount)
 	case "aurora-postgresql":
-		return postgresAuroraExtendedSupport.CostComponent(version, region, today)
+		return postgresAuroraExtendedSupport.CostComponent(version, region, today, vCPUCount)
 	case "aurora", "aurora-mysql":
-		return mysqlAuroraExtendedSupport.CostComponent(version, region, today)
+		return mysqlAuroraExtendedSupport.CostComponent(version, region, today, vCPUCount)
 	}
 
 	return nil

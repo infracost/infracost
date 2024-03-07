@@ -79,12 +79,12 @@
  aws_db_instance.extended_support["mysql-5.7"]                                                                        
  ├─ Database instance (on-demand, Single-AZ, db.t3.large)                   730  hours                         $99.28 
  ├─ Storage (general purpose SSD, gp2)                                       20  GB                             $2.30 
- └─ Extended support (year 1)                                               730  hour                          $73.00 
+ └─ Extended support (year 1)                                             1,460  vCPU-hours                   $146.00 
                                                                                                                       
  aws_db_instance.extended_support["mysql-5.7.44"]                                                                     
  ├─ Database instance (on-demand, Single-AZ, db.t3.large)                   730  hours                         $99.28 
  ├─ Storage (general purpose SSD, gp2)                                       20  GB                             $2.30 
- └─ Extended support (year 1)                                               730  hour                          $73.00 
+ └─ Extended support (year 1)                                             1,460  vCPU-hours                   $146.00 
                                                                                                                       
  aws_db_instance.extended_support["mysql-8.0"]                                                                        
  ├─ Database instance (on-demand, Single-AZ, db.t3.large)                   730  hours                         $99.28 
@@ -302,7 +302,7 @@
  ├─ Storage (general purpose SSD, gp2)                                       20  GB                             $2.30 
  └─ Additional backup storage                                             1,000  GB                            $95.00 
                                                                                                                       
- OVERALL TOTAL                                                                                             $11,150.39 
+ OVERALL TOTAL                                                                                             $11,296.39 
 ──────────────────────────────────
 68 cloud resources were detected:
 ∙ 68 were estimated, 54 of which include usage-based costs, see https://infracost.io/usage-file
@@ -310,5 +310,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestDBInstanceGoldenFile                           ┃ $11,150      ┃
+┃ TestDBInstanceGoldenFile                           ┃ $11,296      ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛

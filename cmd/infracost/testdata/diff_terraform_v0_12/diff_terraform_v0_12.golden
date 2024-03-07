@@ -44,7 +44,7 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.12_plan.json
           +$0.80
 
 + module.db.module.db_2.module.db_instance.aws_db_instance.this[0]
-  +$86
+  +$159
 
     + Database instance (on-demand, Single-AZ, db.t3.micro)
       +$12
@@ -53,7 +53,7 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.12_plan.json
       +$0.58
 
     + Extended support (year 1)
-      +$73
+      +$146
 
 + module.instances.aws_instance.module_instance_2
   +$5
@@ -98,7 +98,7 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.12_plan.json
           +$0.80
 
 Monthly cost change for infracost/infracost/cmd/infracost/testdata/terraform_v0.12_plan.json
-Amount:  +$114 ($114 → $227)
+Amount:  +$187 ($187 → $373)
 Percent: +100%
 
 ──────────────────────────────────
@@ -108,11 +108,11 @@ Key: ~ changed, + added, - removed
 ∙ 14 were estimated, 10 of which include usage-based costs, see https://infracost.io/usage-file
 ∙ 12 were free, rerun with --show-skipped to see details
 
-Infracost estimate: Monthly cost will increase by $114 ↑
+Infracost estimate: Monthly cost will increase by $187 ↑
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
 ┃ Project                                                          ┃ Cost change   ┃ New monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...data/terraform_v0.12_plan.json ┃ +$114 (+100%) ┃ $227             ┃
+┃ infracost/infracost/cmd/infraco...data/terraform_v0.12_plan.json ┃ +$187 (+100%) ┃ $373             ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━┛
 
 Err:
