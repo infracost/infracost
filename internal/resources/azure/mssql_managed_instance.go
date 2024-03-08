@@ -136,6 +136,7 @@ func (r *MSSQLManagedInstance) mssqlMIStorageCostComponent() *schema.CostCompone
 			ProductFamily: strPtr(mssqlMIProductFamily),
 			AttributeFilters: ([]*schema.AttributeFilter{
 				{Key: "productName", Value: strPtr("SQL Managed Instance General Purpose - Storage")},
+				{Key: "skuName", Value: strPtr("General Purpose")},
 				{Key: "meterName", ValueRegex: regexPtr("Data Stored$")},
 			}),
 		},
