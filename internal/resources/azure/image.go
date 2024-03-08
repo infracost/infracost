@@ -89,7 +89,6 @@ func (r *Image) BuildResource() *schema.Resource {
 						{Key: "productName", Value: strPtr("Standard HDD Managed Disks")},
 					},
 				},
-				UsageBased: true,
 			},
 		},
 	}
