@@ -113,7 +113,7 @@ func (d *DirectoryServiceDirectory) BuildResource() *schema.Resource {
 	if d.AdditionalDomainControllers != nil {
 		costComponents = append(
 			costComponents,
-			d.domainControllerCostComponent(*d.AdditionalDomainControllers, "Additional domain controllers", size),
+			d.additionalDomainControllerCostComponent(*d.AdditionalDomainControllers, size),
 		)
 	}
 
@@ -148,6 +148,25 @@ func (d *DirectoryServiceDirectory) BuildResource() *schema.Resource {
 func (d DirectoryServiceDirectory) domainControllerCostComponent(amount float64, name, size string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:           name,
+		Unit:           "controllers",
+		UnitMultiplier: schema.HourToMonthUnitMultiplier,
+		HourlyQuantity: decimalPtr(decimal.NewFromFloat(amount)),
+		ProductFilter: &schema.ProductFilter{
+			VendorName:       awsVendorFilter,
+			Region:           strPtr(d.Region),
+			Service:          directorySvcSvcFilter,
+			ProductFamily:    productFmlyFilter,
+			AttributeFilters: d.getAttributeFiltersForDirectory(size),
+		},
+		PriceFilter: &schema.PriceFilter{
+			PurchaseOption: strPtr("on_demand"),
+		},
+	}
+}
+
+func (d DirectoryServiceDirectory) additionalDomainControllerCostComponent(amount float64, size string) *schema.CostComponent {
+	return &schema.CostComponent{
+		Name:           "Additional domain controllers",
 		Unit:           "controllers",
 		UnitMultiplier: schema.HourToMonthUnitMultiplier,
 		HourlyQuantity: decimalPtr(decimal.NewFromFloat(amount)),
