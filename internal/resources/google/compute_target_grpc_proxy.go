@@ -50,7 +50,13 @@ func (r *ComputeTargetGRPCProxy) BuildResource() *schema.Resource {
 	}
 }
 
-func (r *ComputeTargetGRPCProxy) proxyInstanceCostComponent(quantity *decimal.Decimal) *schema.CostComponent {
+func (r *ComputeTargetGRPCProxy) proxyInstanceCostComponent(instanceCount *decimal.Decimal) *schema.CostComponent {
+	var quantity *decimal.Decimal
+	if instanceCount != nil {
+		instanceHours := schema.HourToMonthUnitMultiplier.Mul(*instanceCount)
+		quantity = &instanceHours
+	}
+
 	return &schema.CostComponent{
 		Name:            "Proxy instance",
 		Unit:            "hours",
