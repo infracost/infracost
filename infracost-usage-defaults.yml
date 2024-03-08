@@ -945,7 +945,7 @@ resource_type_default_usage:
   google_artifact_registry_repository:
     storage_gb: 200 # Total data stored in the repository in GB
     monthly_egress_data_transfer_gb: # Monthly data delivered from the artifact registry repository in GB. You can specify any number of Google Cloud regions below, replacing - for _ e.g.:
-      europe_north1: 166 # GB of data delivered from the artifact registry to europe-north1.
+      europe_north1: 250 # GB of data delivered from the artifact registry to europe-north1.
 
   google_bigquery_dataset:
     monthly_queries_tb: 3.2 # Monthly number of bytes processed (also referred to as bytes read) in TB.
@@ -964,7 +964,9 @@ resource_type_default_usage:
 
   google_compute_external_vpn_gateway:
     monthly_egress_data_transfer_gb:  # Monthly data transfer from VPN gateway to the following, in GB:
-      worldwide: 166                # Worldwide excluding China, Australia but including Hong Kong.
+      worldwide: 166                  # to a Google Cloud region on another continent.
+      china: 89                       # China excluding Hong Kong.
+      australia: 105                  # Australia.
 
   google_compute_forwarding_rule:
     monthly_ingress_data_gb: 2500
@@ -974,13 +976,13 @@ resource_type_default_usage:
 
   google_compute_ha_vpn_gateway:
     monthly_egress_data_transfer_gb:  # Monthly VM-VM data transfer from VPN gateway to the following, in GB:
-      same_region: 0                  # VMs in the same Google Cloud region.
-      us_or_canada: 0                 # From a Google Cloud region in the US or Canada to another Google Cloud region in the US or Canada.
-      europe: 0                       # Between Google Cloud regions within Europe.
-      asia: 0                         # Between Google Cloud regions within Asia.
-      south_america: 0                # Between Google Cloud regions within South America.
-      oceania: 0                      # Indonesia and Oceania to/from any Google Cloud region.
-      worldwide: 166                  # to a Google Cloud region on another continent.
+      same_region: 1000               # VMs in the same Google Cloud region.
+      us_or_canada: 1000              # From a Google Cloud region in the US or Canada to another Google Cloud region in the US or Canada.
+      europe: 1000                    # Between Google Cloud regions within Europe.
+      asia: 250                       # Between Google Cloud regions within Asia.
+      south_america: 143              # Between Google Cloud regions within South America.
+      oceania: 200                    # Indonesia and Oceania to/from any Google Cloud region.
+      worldwide: 250                  # to a Google Cloud region on another continent.
 
   google_compute_image:
     storage_gb: 400 # Total size of image storage in GB.
@@ -1025,30 +1027,30 @@ resource_type_default_usage:
 
   google_compute_vpn_gateway:
     monthly_egress_data_transfer_gb:  # Monthly VM-VM data transfer from VPN gateway to the following, in GB:
-      same_region: 0                  # VMs in the same Google Cloud region.
-      us_or_canada: 0                 # From a Google Cloud region in the US or Canada to another Google Cloud region in the US or Canada.
-      europe: 0                       # Between Google Cloud regions within Europe.
-      asia: 0                         # Between Google Cloud regions within Asia.
-      south_america: 0                # Between Google Cloud regions within South America.
-      oceania: 0                      # Indonesia and Oceania to/from any Google Cloud region.
-      worldwide: 166                  # to a Google Cloud region on another continent.
+      same_region: 1000               # VMs in the same Google Cloud region.
+      us_or_canada: 1000              # From a Google Cloud region in the US or Canada to another Google Cloud region in the US or Canada.
+      europe: 1000                    # Between Google Cloud regions within Europe.
+      asia: 250                       # Between Google Cloud regions within Asia.
+      south_america: 143              # Between Google Cloud regions within South America.
+      oceania: 200                    # Indonesia and Oceania to/from any Google Cloud region.
+      worldwide: 250                  # to a Google Cloud region on another continent.
 
   google_container_cluster:
     autopilot_vcpu_count: 615              # Number of vCPUs used by Autopilot pods. Only relevant for Autopilot mode.
-    autopilot_memory_gb: 4000              # Total memory used by Autopilot pods. Only relevant for Autopilot mode.
-    autopilot_ephemeral_storage_gb: 365000 # Total ephemeral storage used by Autopilot pods. Only relevant for Autopilot mode.
+    autopilot_memory_gb: 5.5               # Total memory used by Autopilot pods. Only relevant for Autopilot mode.
+    autopilot_ephemeral_storage_gb: 500 # Total ephemeral storage used by Autopilot pods. Only relevant for Autopilot mode.
 
   google_container_registry:
     storage_gb: 770                          # Total size of bucket in GB.
-    monthly_class_a_operations: 40000  # Monthly number of class A operations (object adds, bucket/object list).
-    monthly_class_b_operations: 500000 # Monthly number of class B operations (object gets, retrieve bucket/object metadata).
-    monthly_data_retrieval_gb: 1000           # Monthly amount of data retrieved in GB.
+    monthly_class_a_operations: 4000000      # Monthly number of class A operations (object adds, bucket/object list).
+    monthly_class_b_operations: 50000000     # Monthly number of class B operations (object gets, retrieve bucket/object metadata).
+    monthly_data_retrieval_gb: 1000          # Monthly amount of data retrieved in GB.
     monthly_egress_data_transfer_gb:         # Monthly data transfer from Cloud Storage to the following, in GB:
-      same_continent: 0  # Same continent.
-      worldwide: 166     # Worldwide excluding Asia, Australia.
-      asia: 0            # Asia excluding China, but including Hong Kong.
-      china: 0           # China excluding Hong Kong.
-      australia: 0       # Australia.
+      same_continent: 1000  # Same continent.
+      worldwide: 167     # Worldwide excluding Asia, Australia.
+      asia: 167            # Asia excluding China, but including Hong Kong.
+      china: 87           # China excluding Hong Kong.
+      australia: 105       # Australia.
 
   google_dns_record_set:
     monthly_queries:  50000000 # Monthly DNS queries.
@@ -1103,13 +1105,13 @@ resource_type_default_usage:
 
   google_service_networking_connection:
     monthly_egress_data_transfer_gb: # Monthly VM-VM data transfer from VPN gateway to the following, in GB:
-      same_region: 0                 # VMs in the same Google Cloud region.
-      us_or_canada: 0                # From a Google Cloud region in the US or Canada to another Google Cloud region in the US or Canada.
-      europe: 0                      # Between Google Cloud regions within Europe.
-      asia: 0                        # Between Google Cloud regions within Asia.
-      south_america:  0              # Between Google Cloud regions within South America.
-      oceania: 0                     # Indonesia and Oceania to/from any Google Cloud region.
-      worldwide: 166                 # to a Google Cloud region on another continent.
+      same_region: 1000              # VMs in the same Google Cloud region.
+      us_or_canada: 1000             # From a Google Cloud region in the US or Canada to another Google Cloud region in the US or Canada.
+      europe: 1000                   # Between Google Cloud regions within Europe.
+      asia: 250                      # Between Google Cloud regions within Asia.
+      south_america:  143            # Between Google Cloud regions within South America.
+      oceania: 200                   # Indonesia and Oceania to/from any Google Cloud region.
+      worldwide: 250                 # to a Google Cloud region on another continent.
 
   google_sql_database_instance:
     backup_storage_gb: 250 # Amount of backup storage in GB.
@@ -1120,8 +1122,8 @@ resource_type_default_usage:
     monthly_class_b_operations: 50000000 # Monthly number of class B operations (object gets, retrieve bucket/object metadata).
     monthly_data_retrieval_gb: 1000       # Monthly amount of data retrieved in GB.
     monthly_egress_data_transfer_gb:     # Monthly data transfer from Cloud Storage to the following, in GB:
-      same_continent: 0   # Same continent.
-      worldwide: 166      # Worldwide excluding Asia, Australia.
-      asia: 0             # Asia excluding China, but including Hong Kong.
-      china: 0            # China excluding Hong Kong.
-      australia: 0        # Australia.
+      same_continent: 1000  # Same continent.
+      worldwide: 167        # Worldwide excluding Asia, Australia.
+      asia: 167             # Asia excluding China, but including Hong Kong.
+      china: 87             # China excluding Hong Kong.
+      australia: 105        # Australia.
