@@ -15,6 +15,7 @@ func NewEKSCluster(d *schema.ResourceData) schema.CoreResource {
 	r := &aws.EKSCluster{
 		Address: d.Address,
 		Region:  d.Get("region").String(),
+		Version: d.Get("version").String(),
 	}
 	return r
 }
