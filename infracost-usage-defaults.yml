@@ -938,3 +938,190 @@ resource_type_default_usage:
   azurerm_virtual_network_gateway:
     p2s_connection: 131 # Total number of p2s tunnels.
     monthly_data_transfer_gb: 570 # Monthly data transfer in GB.
+
+  #
+  # Terraform GCP resources
+  #
+  google_artifact_registry_repository:
+    storage_gb: 200 # Total data stored in the repository in GB
+    monthly_egress_data_transfer_gb: # Monthly data delivered from the artifact registry repository in GB. You can specify any number of Google Cloud regions below, replacing - for _ e.g.:
+      europe_north1: 166 # GB of data delivered from the artifact registry to europe-north1.
+
+  google_bigquery_dataset:
+    monthly_queries_tb: 3.2 # Monthly number of bytes processed (also referred to as bytes read) in TB.
+
+  google_bigquery_table:
+    monthly_active_storage_gb: 870       # Monthly number of active storage modifications in GB.
+    monthly_long_term_storage_gb: 1250   # Monthly number of long-term storage modifications in GB.
+    monthly_streaming_inserts_mb: 400000 # Monthly number of streaming data inserts in MB.
+    monthly_storage_write_api_gb: 800    # Monthly number of storage write api in GB.
+    monthly_storage_read_api_tb: 18      # Monthly number of storage read api in TB.
+
+  google_cloudfunctions_function:
+    request_duration_ms: 40               # Average duration of each request in milliseconds.
+    monthly_function_invocations: 50000000 # Monthly number of function invocations.
+    monthly_outbound_data_gb: 166          # Monthly data transferred from the function out to somewhere else in GB.
+
+  google_compute_external_vpn_gateway:
+    monthly_egress_data_transfer_gb:  # Monthly data transfer from VPN gateway to the following, in GB:
+      worldwide: 166                # Worldwide excluding China, Australia but including Hong Kong.
+
+  google_compute_forwarding_rule:
+    monthly_ingress_data_gb: 2500
+
+  google_compute_global_forwarding_rule:
+    monthly_ingress_data_gb: 2500
+
+  google_compute_ha_vpn_gateway:
+    monthly_egress_data_transfer_gb:  # Monthly VM-VM data transfer from VPN gateway to the following, in GB:
+      same_region: 0                  # VMs in the same Google Cloud region.
+      us_or_canada: 0                 # From a Google Cloud region in the US or Canada to another Google Cloud region in the US or Canada.
+      europe: 0                       # Between Google Cloud regions within Europe.
+      asia: 0                         # Between Google Cloud regions within Asia.
+      south_america: 0                # Between Google Cloud regions within South America.
+      oceania: 0                      # Indonesia and Oceania to/from any Google Cloud region.
+      worldwide: 166                  # to a Google Cloud region on another continent.
+
+  google_compute_image:
+    storage_gb: 400 # Total size of image storage in GB.
+
+  google_compute_machine_image:
+    storage_gb: 400 # Total size of machine image storage in GB.
+
+  google_compute_region_target_http_proxy:
+    monthly_proxy_instances: 1
+    monthly_data_processed_gb: 2500
+
+  google_compute_region_target_https_proxy:
+    monthly_proxy_instances: 1
+    monthly_data_processed_gb: 2500
+
+  google_compute_router_nat:
+    assigned_vms: 19                # Number of VM instances assigned to the NAT gateway
+    monthly_data_processed_gb: 444  # Monthly data processed (ingress and egress) by the NAT gateway in GB
+
+  google_compute_snapshot:
+    storage_gb: 770 # Total size of snapshot disk storage in GB.
+
+  google_compute_target_grpc_proxy:
+    monthly_proxy_instances: 1
+    monthly_data_processed_gb: 2500
+
+  google_compute_target_http_proxy:
+    monthly_proxy_instances: 1
+    monthly_data_processed_gb: 2500
+
+  google_compute_target_https_proxy:
+    monthly_proxy_instances: 1
+    monthly_data_processed_gb: 2500
+
+  google_compute_target_ssl_proxy:
+    monthly_proxy_instances: 1
+    monthly_data_processed_gb: 2500
+
+  google_compute_target_tcp_proxy:
+    monthly_proxy_instances: 1
+    monthly_data_processed_gb: 2500
+
+  google_compute_vpn_gateway:
+    monthly_egress_data_transfer_gb:  # Monthly VM-VM data transfer from VPN gateway to the following, in GB:
+      same_region: 0                  # VMs in the same Google Cloud region.
+      us_or_canada: 0                 # From a Google Cloud region in the US or Canada to another Google Cloud region in the US or Canada.
+      europe: 0                       # Between Google Cloud regions within Europe.
+      asia: 0                         # Between Google Cloud regions within Asia.
+      south_america: 0                # Between Google Cloud regions within South America.
+      oceania: 0                      # Indonesia and Oceania to/from any Google Cloud region.
+      worldwide: 166                  # to a Google Cloud region on another continent.
+
+  google_container_cluster:
+    autopilot_vcpu_count: 615              # Number of vCPUs used by Autopilot pods. Only relevant for Autopilot mode.
+    autopilot_memory_gb: 4000              # Total memory used by Autopilot pods. Only relevant for Autopilot mode.
+    autopilot_ephemeral_storage_gb: 365000 # Total ephemeral storage used by Autopilot pods. Only relevant for Autopilot mode.
+
+  google_container_registry:
+    storage_gb: 770                          # Total size of bucket in GB.
+    monthly_class_a_operations: 40000  # Monthly number of class A operations (object adds, bucket/object list).
+    monthly_class_b_operations: 500000 # Monthly number of class B operations (object gets, retrieve bucket/object metadata).
+    monthly_data_retrieval_gb: 1000           # Monthly amount of data retrieved in GB.
+    monthly_egress_data_transfer_gb:         # Monthly data transfer from Cloud Storage to the following, in GB:
+      same_continent: 0  # Same continent.
+      worldwide: 166     # Worldwide excluding Asia, Australia.
+      asia: 0            # Asia excluding China, but including Hong Kong.
+      china: 0           # China excluding Hong Kong.
+      australia: 0       # Australia.
+
+  google_dns_record_set:
+    monthly_queries:  50000000 # Monthly DNS queries.
+
+  google_kms_crypto_key:
+    key_versions: 333             # Number of key versions.
+    monthly_key_operations: 6666666 # Monthly number of key operations.
+
+  google_logging_billing_account_bucket_config:
+    monthly_logging_data_gb: 40  # Monthly logging data in GB.
+
+  google_logging_billing_account_sink:
+    monthly_logging_data_gb: 40  # Monthly logging data in GB.
+
+  google_logging_folder_bucket_config:
+    monthly_logging_data_gb: 40  # Monthly logging data in GB.
+
+  google_logging_folder_sink:
+    monthly_logging_data_gb: 40  # Monthly logging data in GB.
+
+  google_logging_organization_bucket_config:
+    monthly_logging_data_gb: 40  # Monthly logging data in GB.
+
+  google_logging_organization_sink:
+    monthly_logging_data_gb: 40  # Monthly logging data in GB.
+
+  google_logging_project_bucket_config:
+    monthly_logging_data_gb: 40  # Monthly logging data in GB.
+
+  google_logging_project_sink:
+    monthly_logging_data_gb: 40  # Monthly logging data in GB.
+
+  google_monitoring_metric_descriptor:
+    monthly_monitoring_data_mb: 77   # Monthly monitoring data in MB (only for chargeable metrics).
+    monthly_api_calls: 2000000       # Monthly read API calls (write calls are free).
+
+  google_pubsub_subscription:
+    monthly_message_data_tb: 0.5 # Monthly amount of message data pulled by the subscription in TB.
+    storage_gb: 74               # Storage for retaining acknowledged messages in GB.
+    snapshot_storage_gb: 74      # Snapshot storage for unacknowledged messages in GB.
+
+  google_pubsub_topic:
+    monthly_message_data_tb: 0.5 # Monthly amount of message data published to the topic in TB.
+
+  google_secret_manager_secret:
+    active_secret_versions: 333       # Number of active secret versions in each month. NOTE: this is used only when secret versions are not defined.
+    monthly_access_operations: 6666666    # Monthly number of access operations
+    monthly_rotation_notifications: 400 # Monthly number of rotation notifications
+
+  google_secret_manager_secret_version:
+    monthly_access_operations: 6666666 # Monthly number of access operations
+
+  google_service_networking_connection:
+    monthly_egress_data_transfer_gb: # Monthly VM-VM data transfer from VPN gateway to the following, in GB:
+      same_region: 0                 # VMs in the same Google Cloud region.
+      us_or_canada: 0                # From a Google Cloud region in the US or Canada to another Google Cloud region in the US or Canada.
+      europe: 0                      # Between Google Cloud regions within Europe.
+      asia: 0                        # Between Google Cloud regions within Asia.
+      south_america:  0              # Between Google Cloud regions within South America.
+      oceania: 0                     # Indonesia and Oceania to/from any Google Cloud region.
+      worldwide: 166                 # to a Google Cloud region on another continent.
+
+  google_sql_database_instance:
+    backup_storage_gb: 250 # Amount of backup storage in GB.
+
+  google_storage_bucket:
+    storage_gb: 770                      # Total size of bucket in GB.
+    monthly_class_a_operations: 4000000  # Monthly number of class A operations (object adds, bucket/object list).
+    monthly_class_b_operations: 50000000 # Monthly number of class B operations (object gets, retrieve bucket/object metadata).
+    monthly_data_retrieval_gb: 1000       # Monthly amount of data retrieved in GB.
+    monthly_egress_data_transfer_gb:     # Monthly data transfer from Cloud Storage to the following, in GB:
+      same_continent: 0   # Same continent.
+      worldwide: 166      # Worldwide excluding Asia, Australia.
+      asia: 0             # Asia excluding China, but including Hong Kong.
+      china: 0            # China excluding Hong Kong.
+      australia: 0        # Australia.
