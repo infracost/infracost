@@ -698,7 +698,7 @@ func blockToReferences(block *hcl.Block) map[string]interface{} {
 func (p *HCLProvider) marshalBlock(block *hcl.Block, jsonValues map[string]interface{}) {
 	for _, b := range block.Children() {
 		key := b.Type()
-		if key == "dynamic" || key == "depends_on" {
+		if key == "dynamic" {
 			continue
 		}
 

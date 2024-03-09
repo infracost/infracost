@@ -816,6 +816,16 @@ func (b *Block) Children() Blocks {
 		return nil
 	}
 
+	var children Blocks
+	for _, child := range b.childBlocks {
+		// Skip lifecycle meta argument blocks since it never needs to be evaluated
+		if supportsLifecycle(child) && child.Type() == "lifecycle" {
+			continue
+		}
+
+		children = append(children, child)
+	}
+
 	return b.childBlocks
 }
 
@@ -980,13 +990,22 @@ func (b *Block) AttributesAsMap() map[string]*Attribute {
 }
 
 func (b *Block) getHCLAttributes() hcl.Attributes {
+	supportsDependsOn := supportsDependsOn(b)
+
 	switch body := b.HCLBlock.Body.(type) {
 	case *hclsyntax.Body:
 		attributes := make(hcl.Attributes)
 		for _, a := range body.Attributes {
-			if _, ok := b.UniqueAttrs[a.Name]; !ok {
-				attributes[a.Name] = a.AsHCLAttribute()
+			if _, ok := b.UniqueAttrs[a.Name]; ok {
+				continue
 			}
+
+			// Ignore the depends_on meta attribute since it never needs to be evaluated
+			if supportsDependsOn && a.Name == "depends_on" {
+				continue
+			}
+
+			attributes[a.Name] = a.AsHCLAttribute()
 		}
 		return attributes
 	default:
@@ -998,8 +1017,13 @@ func (b *Block) getHCLAttributes() hcl.Attributes {
 		if diag != nil {
 			return nil
 		}
-		for k, a := range attrs {
-			if _, ok := b.UniqueAttrs[a.Name]; !ok {
+		for k := range attrs {
+			if _, ok := b.UniqueAttrs[k]; !ok {
+				delete(attrs, k)
+			}
+
+			// Ignore the depends_on meta attribute since it never needs to be evaluated
+			if supportsDependsOn && k == "depends_on" {
 				delete(attrs, k)
 			}
 		}
@@ -1046,7 +1070,7 @@ func (b *Block) values() cty.Value {
 	if b.Type() == "provider" {
 		for _, child := range b.Children() {
 			key := child.Type()
-			if key == "dynamic" || key == "depends_on" {
+			if key == "dynamic" {
 				continue
 			}
 
@@ -1459,5 +1483,13 @@ func getFromProvider(b *Block, provider, key string) cty.Value {
 }
 
 func usesProviderConfiguration(b *Block) bool {
+	return b.Type() == "resource" || b.Type() == "data"
+}
+
+func supportsDependsOn(b *Block) bool {
+	return b.Type() == "resource" || b.Type() == "data" || b.Type() == "module"
+}
+
+func supportsLifecycle(b *Block) bool {
 	return b.Type() == "resource" || b.Type() == "data"
 }
