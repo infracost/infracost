@@ -40,6 +40,7 @@ func (r *CloudRunService) PopulateUsage(u *schema.UsageData) {
 // This method is called after the resource is initialised by an IaC provider.
 // See providers folder for more information.
 func (r *CloudRunService) BuildResource() *schema.Resource {
+
 	var costComponents []*schema.CostComponent
 	if r.CpuThrottlingEnabled {
 		costComponents = []*schema.CostComponent{
@@ -58,41 +59,35 @@ func (r *CloudRunService) BuildResource() *schema.Resource {
 }
 
 func (r *CloudRunService) throttlingEnabledCostComponent() *schema.CostComponent {
-	// Instance hours are calculated as (monthly requests * average request duration) / concurrent requests per instance
-	requestDurationInSeconds := decimal.NewFromInt(*r.AverageRequestDurationMs).Div(decimal.NewFromInt(1000))
+	regionTier := getRegionTier(r.Region)
+	var cpuName string
+	if regionTier == "Tier 2" {
+		cpuName  = "CPU Allocation Time (tier 2)"
+	} else {
+		cpuName  = "CPU Allocation Time"
+	}
 	return &schema.CostComponent{
-		Name:            "CPU Allocation Time",
+		Name:            cpuName,
 		Unit:            "vCPU-seconds",
-		UnitMultiplier:  decimal.NewFromInt(1), // quantity/unitMultiplier * price
-		MonthlyQuantity: decimalPtr(decimal.NewFromInt(*r.MonthlyRequests).Mul(requestDurationInSeconds).Div(decimal.NewFromInt(*r.ConcurrentRequestsPerInstance))),
+		UnitMultiplier:  decimal.NewFromInt(1), 
+		MonthlyQuantity: decimalPtr(r.calculateCpuSeconds(true)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("gcp"),
 			Region:        strPtr(r.Region),
 			Service:       strPtr("Cloud Run"),
 			ProductFamily: strPtr("ApplicationServices"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "description", Value: strPtr("CPU Allocation Time")},
+				{Key: "description", Value: strPtr(cpuName)},
 			},
 		},
 	}
 }
 func (r *CloudRunService) throttlingDisabledCostComponent() *schema.CostComponent {
-	// Instance hours if specified, instance_hrs * CPU limit
-	// Instance hours not specified, instance_hrs = (minScale * 730) * CPU limit
-	
-	// var cpuUsage *decimal.Decimal
-	// if r.InstanceHrs != nil && *r.InstanceHrs > 0 {
-	// 	cpuUsage = decimalPtr(decimal.NewFromInt(*r.InstanceHrs).Mul(decimal.NewFromInt(r.CpuLimit)))
-	// }
-	// else {
-	// 	cpuUsage = decimalPtr(decimal.NewFromInt(r.CpuMinScale * 730))
-	// }
-
 	return &schema.CostComponent{
 		Name:            "CPU Allocation Time (Always-on)",
 		Unit:            "vCPU-seconds",
 		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: intPtrToDecimalPtr(r.MonthlyRequests),
+		MonthlyQuantity: decimalPtr(r.calculateCpuSeconds(false)),
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("gcp"),
 			Region:        strPtr(r.Region),
@@ -105,3 +100,69 @@ func (r *CloudRunService) throttlingDisabledCostComponent() *schema.CostComponen
 	}
 }
 
+func (r *CloudRunService) calculateCpuSeconds(throttlingEnabled bool) decimal.Decimal {
+	var cpuSeconds decimal.Decimal
+	if throttlingEnabled {
+		requestDurationInSeconds := decimal.NewFromInt(*r.AverageRequestDurationMs).Div(decimal.NewFromInt(1000))
+		cpuSeconds = decimal.NewFromInt(*r.MonthlyRequests).Mul(requestDurationInSeconds).Div(decimal.NewFromInt(*r.ConcurrentRequestsPerInstance)).Mul(decimal.NewFromInt(r.CpuLimit))
+	} else {
+		if r.InstanceHrs != nil && *r.InstanceHrs > 0 {
+			cpuSeconds = decimal.NewFromInt(*r.InstanceHrs * 60 * 60).Mul(decimal.NewFromInt(r.CpuLimit))
+		} else {
+			cpuSeconds = decimal.NewFromInt(r.CpuMinScale * (730 * 60 * 60)).Mul(decimal.NewFromInt(r.CpuLimit))
+		}
+	}
+	return cpuSeconds
+}
+
+func getRegionTier(region string) string {
+	tier, ok := regionTierMapping[region]
+	if !ok {
+		tier = "Tier Unknown"
+	}
+	return tier
+}
+
+var regionTierMapping = map[string]string{
+	"asia-east1": 			"Tier 1",
+	"asia-northeast1":    	"Tier 1",
+	"asia-northeast2": 		"Tier 1",
+	"europe-north1":      	"Tier 1",
+	"europe-southwest1":   	"Tier 1",
+	"europe-west1":      	"Tier 1",
+	"europe-west4":      	"Tier 1",
+	"europe-west8":      	"Tier 1",
+	"europe-west9":      	"Tier 1",
+	"me-west1":      		"Tier 1",
+	"us-central1":      	"Tier 1",
+	"us-east1":      		"Tier 1",
+	"us-east4":      		"Tier 1",
+	"us-east5":      		"Tier 1",
+	"us-south1":      		"Tier 1",
+	"us-west1":      		"Tier 1",
+
+	"africa-south1": 		"Tier 2",
+	"asia-east2": 			"Tier 2",
+	"asia-northeast3": 		"Tier 2",
+	"asia-southeast1": 		"Tier 2",
+	"asia-southeast2": 		"Tier 2",
+	"asia-south1": 			"Tier 2",
+	"asia-south2": 			"Tier 2",
+	"australia-southeast1": "Tier 2",
+	"australia-southeast2": "Tier 2",
+	"europe-central2": 		"Tier 2",
+	"europe-west10": 		"Tier 2",
+	"europe-west12": 		"Tier 2",
+	"europe-west2": 		"Tier 2",
+	"europe-west3": 		"Tier 2",
+	"europe-west6": 		"Tier 2",
+	"me-central1": 			"Tier 2",
+	"me-central2": 			"Tier 2",
+	"northamerica-northeast1": "Tier 2",
+	"northamerica-northeast2": "Tier 2",
+	"southamerica-east1": 	"Tier 2",
+	"southamerica-west1": 	"Tier 2",
+	"us-west2": 			"Tier 2",
+	"us-west3": 			"Tier 2",
+	"us-west4": 			"Tier 2",
+}

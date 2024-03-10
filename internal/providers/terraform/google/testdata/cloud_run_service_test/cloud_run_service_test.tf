@@ -1,12 +1,12 @@
 provider "google" {
   credentials = "{\"type\":\"service_account\"}"
   project     = "my-project"
-  region      = "us-central1"
+  region      = "europe-west3"
 }
 
 resource "google_cloud_run_service" "throttling_enabled" {
   name     = "cloud-run-service-test"
-  location = "us-central1"
+  location = "europe-west3"
   template {
     spec {
       containers {
