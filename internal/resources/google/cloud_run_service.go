@@ -40,11 +40,35 @@ func (r *CloudRunService) PopulateUsage(u *schema.UsageData) {
 // This method is called after the resource is initialised by an IaC provider.
 // See providers folder for more information.
 func (r *CloudRunService) BuildResource() *schema.Resource {
-
+	regionTier := getRegionTier(r.Region)
+	var cpuName string
+	if regionTier == "Tier 2" {
+		cpuName  = "CPU Allocation Time (tier 2)"
+	} else {
+		cpuName  = "CPU Allocation Time"
+	}
 	var costComponents []*schema.CostComponent
 	if r.CpuThrottlingEnabled {
 		costComponents = []*schema.CostComponent{
-			r.throttlingEnabledCostComponent(),
+			r.throttlingEnabledCostComponent(cpuName, regionTier),
+			{
+				Name:            "Number of requests",
+				Unit:            "request",
+				UnitMultiplier:  decimal.NewFromInt(1), 
+				MonthlyQuantity: decimalPtr(r.calculateNoOfRequests(*r.MonthlyRequests)),
+				ProductFilter: &schema.ProductFilter{
+					VendorName:    strPtr("gcp"),
+					Region:        strPtr("global"),
+					Service:       strPtr("Cloud Run"),
+					ProductFamily: strPtr("ApplicationServices"),
+					AttributeFilters: []*schema.AttributeFilter{
+						{Key: "description", Value: strPtr("Requests")},
+					},
+				},
+				PriceFilter: &schema.PriceFilter{
+					StartUsageAmount: strPtr("2000000"),
+				},
+			},
 		}
 	} else {
 		costComponents = []*schema.CostComponent{
@@ -58,14 +82,7 @@ func (r *CloudRunService) BuildResource() *schema.Resource {
 	}
 }
 
-func (r *CloudRunService) throttlingEnabledCostComponent() *schema.CostComponent {
-	regionTier := getRegionTier(r.Region)
-	var cpuName string
-	if regionTier == "Tier 2" {
-		cpuName  = "CPU Allocation Time (tier 2)"
-	} else {
-		cpuName  = "CPU Allocation Time"
-	}
+func (r *CloudRunService) throttlingEnabledCostComponent(cpuName string, regionTier string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            cpuName,
 		Unit:            "vCPU-seconds",
