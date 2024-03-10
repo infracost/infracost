@@ -7,15 +7,35 @@ import (
 
 func getCloudRunServiceRegistryItem() *schema.RegistryItem {
 	return &schema.RegistryItem{
-		Name:      "google_cloud_run_service",
-		CoreRFunc: newCloudRunService,
+		Name:  "google_cloud_run_service",
+		RFunc:	newCloudRunService,
 	}
 }
 
-func newCloudRunService(d *schema.ResourceData) schema.CoreResource {
+func newCloudRunService(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("region").String()
-	return &google.CloudRunService{
+	cpuThrottling := true
+	minScale := int64(0)
+	annotations := d.Get("metadata.0.annotations").Map()
+	limits := d.Get("template.0.spec.0.containers.0.resources.0.limits").Map()
+	if val, ok := annotations["run.googleapis.com/cpu-throttling"]; ok {
+		cpuThrottling = val.Bool()
+	}
+	if val, ok := annotations["autoscaling.knative.dev/minScale"]; ok {
+		minScale = int64(val.Float())
+	}
+	
+	cpu := int64(1)
+	if val, ok := limits["cpu"]; ok {
+		cpu = int64(val.Float())
+	}
+	r := &google.CloudRunService{
 		Address: d.Address,
 		Region:  region,
+		CpuLimit: cpu,
+		CpuMinScale : minScale,
+		CpuThrottlingEnabled: cpuThrottling,
 	}
+	r.PopulateUsage(u)
+	return r.BuildResource()
 }

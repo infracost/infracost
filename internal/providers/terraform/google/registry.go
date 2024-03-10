@@ -56,7 +56,6 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getComputePerInstanceConfigRegistryItem(),
 	getComputeRegionPerInstanceConfigRegistryItem(),
 	getCloudRunServiceRegistryItem(),
-	getCloudRunServiceRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
