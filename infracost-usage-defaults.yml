@@ -488,8 +488,8 @@ resource_type_default_usage:
   # Terraform AzureRM resources
   #
   azurerm_api_management:
-    monthly_api_calls: 571000000 # Monthly number of api calls (only for consumption tier).
-    self_hosted_gateway_count: 58 # Number of self-hosted gateways (only for premium tier).
+    monthly_api_calls: 5710000 # Monthly number of api calls (only for consumption tier).
+    self_hosted_gateway_count: 1 # Number of self-hosted gateways (only for premium tier).
 
   azurerm_application_gateway:
     monthly_data_processed_gb: 0 #  Monthly data processed by the Application Gateway in GB.
@@ -596,8 +596,8 @@ resource_type_default_usage:
 #    max_request_units_utilization_percentage: 50 # Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100.
 #
   azurerm_data_factory:
-    monthly_read_write_operation_entities: 200000 # Monthly entities for Read/Write operations.
-    monthly_monitoring_operation_entities: 400000 # Monthly entities for Monitoring operations.
+    monthly_read_write_operation_entities: 2000000 # Monthly entities for Read/Write operations.
+    monthly_monitoring_operation_entities: 4000000 # Monthly entities for Monitoring operations.
 
   azurerm_data_factory_integration_runtime_azure:
     monthly_orchestration_runs: 20000 # Monthly Orchestration runs for runtime.
@@ -609,13 +609,14 @@ resource_type_default_usage:
     monthly_orchestration_runs: 13333 # Monthly Orchestration runs for runtime.
 
   azurerm_databricks_workspace:
-    monthly_all_purpose_compute_dbu_hrs: 400000 # Monthly number of All-purpose Compute Databricks Units in DBU-hours.
+    monthly_all_purpose_compute_dbu_hrs: 50 # Monthly number of All-purpose Compute Databricks Units in DBU-hours.
     monthly_jobs_compute_dbu_hrs: 133 # Monthly number of Jobs Compute Databricks Units in DBU-hours.
     monthly_jobs_light_compute_dbu_hrs: 285 # Monthly number of Jobs Light Compute Databricks Units in DBU-hours.
 
   azurerm_function_app:
-    monthly_executions: 10000000 # Monthly executions to the function. Only applicable for Consumption plan.
-    execution_duration_ms: 125 # Average duration of each execution in milliseconds. Only applicable for Consumption plan.
+    monthly_executions: 100000000 # Monthly executions to the function. Only applicable for Consumption plan.
+    execution_duration_ms: 100 # Average duration of each execution in milliseconds. Only applicable for Consumption plan.
+    memory_mb: 128
 
   azurerm_dns_a_record:
     monthly_queries: 50000000  # Monthly number of DNS queries
@@ -682,8 +683,9 @@ resource_type_default_usage:
     monthly_operations: 200000 # Monthly number of device provisioning operations
 
   azurerm_linux_function_app:
-    monthly_executions: 10000000 # Monthly executions to the function. Only applicable for Consumption plan.
-    execution_duration_ms: 125 # Average duration of each execution in milliseconds. Only applicable for Consumption plan.
+    monthly_executions: 100000000 # Monthly executions to the function. Only applicable for Consumption plan.
+    execution_duration_ms: 100 # Average duration of each execution in milliseconds. Only applicable for Consumption plan.
+    memory_mb: 128
 
 #  azurerm_key_vault_certificate:
 #    monthly_certificate_renewal_requests: 100    # Monthly number of certificate renewal requests.
@@ -814,22 +816,22 @@ resource_type_default_usage:
 #    monthly_images_extracted: 1000000 # Monthly number of extracted images
 
   azurerm_security_center_subscription_pricing:
-    cosmosdb_request_units: 1666666 # Average number of RUs/hour for Microsoft Defender for Azure Cosmos DB. Applied when resource_type = CosmosDbs.
-    monthly_app_service_nodes: 1000 # Monthly number of App Service nodes for Microsoft Defender for App Service. Applied when resource_type = AppServices.
-    monthly_arm_subscriptions: 2900 # Monthly number of subscriptions for Microsoft Defender for ARM. Applied when resource_type = Arm.
+    cosmosdb_request_units: 2300 # Average number of RUs/hour for Microsoft Defender for Azure Cosmos DB. Applied when resource_type = CosmosDbs.
+    monthly_app_service_nodes: 1.4 # Monthly number of App Service nodes for Microsoft Defender for App Service. Applied when resource_type = AppServices.
+    monthly_arm_subscriptions: 4 # Monthly number of subscriptions for Microsoft Defender for ARM. Applied when resource_type = Arm.
     monthly_container_registry_images: 69 # Monthly number of images for Microsoft Defender for Container Registries. Applied when resource_type = ContainerRegistry.
-    monthly_containers_vcores: 20 # Monthly number of vCores for Microsoft Defender for Containers. Applied when resource_type = Containers.
+    monthly_containers_vcores: 3 # Monthly number of vCores for Microsoft Defender for Containers. Applied when resource_type = Containers.
     monthly_dns_queries: 29000000 # Monthly number of queries for Microsoft Defender for DNS. Applied when resource_type = Dns.
-    monthly_key_vaults: 59000 # Monthly number of key vaults for Microsoft Defender for Key Vault. Applied when resource_type = KeyVaults.
-    monthly_kubernetes_cores: 7400 # Monthly number of cores for Microsoft Defender for Kubernetes. Applied when resource_type = KubernetesService.
-    monthly_mariadb_instances: 1000 # Monthly number of instances for Microsoft Defender for MariaDB. Applied when resource_type = OpenSourceRelationalDatabases.
-    monthly_mysql_instances: 1 # Monthly number of instances for Microsoft Defender for MySQL. Applied when resource_type = OpenSourceRelationalDatabases.
-    monthly_postgresql_instances: 1 # Monthly number of instances for Microsoft Defender for PostgreSQL. Applied when resource_type = OpenSourceRelationalDatabases.
-    monthly_servers_plan_1_nodes: 3000 # Monthly number of servers for Microsoft Defender for Servers Plan 1. Applied when resource_type = VirtualMachines.
-    monthly_servers_plan_2_nodes: 1000 # Monthly number of servers for Microsoft Defender for Servers Plan 2. Applied when resource_type = VirtualMachines.
-    monthly_sql_azure_connected_instances: 1 # Monthly number of instances for Microsoft Defender for SQL on Azure-connected databases. Applied when resource_type = SqlServerVirtualMachines.
-    monthly_sql_outside_azure_vcores: 2100 # Monthly number of vCores for Microsoft Defender for SQL outside Azure. Applied when resource_type = SqlServers.
-    monthly_storage_accounts: 1500 # Monthly number of storage accounts for Microsoft Defender for Storage. Applied when resource_type = StorageAccounts.
+    monthly_key_vaults: 80 # Monthly number of key vaults for Microsoft Defender for Key Vault. Applied when resource_type = KeyVaults.
+    monthly_kubernetes_cores: 10 # Monthly number of cores for Microsoft Defender for Kubernetes. Applied when resource_type = KubernetesService.
+    monthly_mariadb_instances: 1.3 # Monthly number of instances for Microsoft Defender for MariaDB. Applied when resource_type = OpenSourceRelationalDatabases.
+    monthly_mysql_instances: 1.3 # Monthly number of instances for Microsoft Defender for MySQL. Applied when resource_type = OpenSourceRelationalDatabases.
+    monthly_postgresql_instances: 1.3 # Monthly number of instances for Microsoft Defender for PostgreSQL. Applied when resource_type = OpenSourceRelationalDatabases.
+    monthly_servers_plan_1_nodes: 4 # Monthly number of servers for Microsoft Defender for Servers Plan 1. Applied when resource_type = VirtualMachines.
+    monthly_servers_plan_2_nodes: 1.4 # Monthly number of servers for Microsoft Defender for Servers Plan 2. Applied when resource_type = VirtualMachines.
+    monthly_sql_azure_connected_instances: 1.3 # Monthly number of instances for Microsoft Defender for SQL on Azure-connected databases. Applied when resource_type = SqlServerVirtualMachines.
+    monthly_sql_outside_azure_vcores: 1.8 # Monthly number of vCores for Microsoft Defender for SQL outside Azure. Applied when resource_type = SqlServers.
+    monthly_storage_accounts: 2 # Monthly number of storage accounts for Microsoft Defender for Storage. Applied when resource_type = StorageAccounts.
 
   azurerm_servicebus_namespace:
     monthly_messaging_operations: 38000000 # Monthly number of messaging operations, used for Standard tier only
@@ -924,8 +926,9 @@ resource_type_default_usage:
       monthly_disk_operations: 100000000 # Monthly number of disk operations (writes, reads, deletes) using a unit size of 256KiB per additional disk.
 
   azurerm_windows_function_app:
-    monthly_executions: 10000000 # Monthly executions to the function. Only applicable for Consumption plan.
-    execution_duration_ms: 125 # Average duration of each execution in milliseconds. Only applicable for Consumption plan.
+    monthly_executions: 100000000 # Monthly executions to the function. Only applicable for Consumption plan.
+    execution_duration_ms: 100 # Average duration of each execution in milliseconds. Only applicable for Consumption plan.
+    memory_mb: 128
 
   azurerm_windows_virtual_machine:
     os_disk:
