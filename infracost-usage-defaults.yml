@@ -17,23 +17,23 @@ resource_type_default_usage:
     monthly_requests:  5750000 # Monthly requests to the Rest API Gateway.
 
   aws_apigatewayv2_api:
-    monthly_requests: 2000000         # Monthly requests to the HTTP API Gateway.
+    monthly_requests: 20000000        # Monthly requests to the HTTP API Gateway.
     request_size_kb: 512              # Average request size sent to the HTTP API Gateway in KB. Requests are metered in 512KB increments, maximum size is 10MB.
-    monthly_messages: 2000000         # Monthly number of messages sent to the Websocket API Gateway.
+    monthly_messages: 20000000        # Monthly number of messages sent to the Websocket API Gateway.
     message_size_kb: 32               # Average size of the messages sent to the Websocket API Gateway in KB. Messages are metered in 32 KB increments, maximum size is 128KB.
     monthly_connection_mins: 80000000 # Monthly total connection minutes to Websockets.
 
   aws_backup_vault:
-    monthly_efs_warm_restore_gb: 1000     # Monthly number of EFS warm restore in GB.
-    monthly_efs_cold_restore_gb: 675      # Monthly number of EFS cold restore in GB.
-    monthly_efs_item_restore_requests: 40 # Monthly number of EFS item-level restore requests.
-    monthly_efs_warm_backup_gb: 400       # Monthly number of EFS warm backups in GB.
-    monthly_efs_cold_backup_gb: 2000      # Monthly number of EFS cold backups in GB.
-    monthly_ebs_snapshot_gb: 400          # Monthly number of EBS snapshots in GB.
+    monthly_efs_warm_restore_gb: 833     # Monthly number of EFS warm restore in GB.
+    monthly_efs_cold_restore_gb: 555      # Monthly number of EFS cold restore in GB.
+    monthly_efs_item_restore_requests: 33 # Monthly number of EFS item-level restore requests.
+    monthly_efs_warm_backup_gb: 333       # Monthly number of EFS warm backups in GB.
+    monthly_efs_cold_backup_gb: 1666      # Monthly number of EFS cold backups in GB.
+    monthly_ebs_snapshot_gb: 363          # Monthly number of EBS snapshots in GB.
     monthly_rds_snapshot_gb: 210          # Monthly number of RDS snapshots in GB.
     monthly_aurora_snapshot_gb: 833       # Monthly number of Aurora snapshots in GB.
-    monthly_dynamodb_backup_gb: 200       # Monthly number of DynamoDB backups in GB.
-    monthly_dynamodb_restore_gb: 135      # Monthly number of DynamoDB restore in GB.
+    monthly_dynamodb_backup_gb: 178       # Monthly number of DynamoDB backups in GB.
+    monthly_dynamodb_restore_gb: 119      # Monthly number of DynamoDB restore in GB.
     monthly_fsx_windows_backup_gb: 380    # Monthly number of FSX Windows backups in GB.
     monthly_fsx_lustre_backup_gb: 380     # Monthly number of FSX Lustre backups in GB.
 
@@ -94,10 +94,10 @@ resource_type_default_usage:
     monthly_invalidation_requests: 5000   # Monthly number of invalidation requests.
     monthly_encryption_requests: 10000000 # Monthly number of field level encryption requests.
     monthly_log_lines: 2000000000         # Monthly number of real-time log lines.
-    custom_ssl_certificates: 3            # Number of dedicated IP custom SSL certificates.
+    custom_ssl_certificates: 1            # Number of dedicated IP custom SSL certificates.
 
   aws_cloudhsm_v2_hsm:
-    monthly_hrs: 100 # Monthly number of hours the HSM ran for.
+    monthly_hrs: 12.5 # Monthly number of hours the HSM ran for.
 
   aws_cloudtrail:
     monthly_additional_management_events: 1000000 # Monthly additional copies of read and write management events. The first copy of management events per region is free, so this should only be non-zero if there are multiple trails recording management events in this region.
@@ -133,13 +133,13 @@ resource_type_default_usage:
     monthly_rule_evaluations: 20000 # Monthly config rule evaluations.
 
   aws_db_instance:
-    additional_backup_storage_gb: 210                         # Amount of backup storage used that is in excess of 100% of the storage size for all databases in GB.
+    additional_backup_storage_gb: 952                         # Amount of backup storage used that is in excess of 100% of the storage size for all databases in GB.
     monthly_standard_io_requests: 200000000                   # Monthly number of input/output requests for database.
     monthly_additional_performance_insights_requests: 2000000 # Monthly Performance Insights API requests above the 1000000 requests included in the free tier.
 
   aws_directory_service_directory:
-    additional_domain_controllers: 333 # The number of domain controllers in the directory service provisioned in addition to the minimum 2 controllers
-    shared_accounts: 1111              # Number of accounts that Microsoft AD directory is shared with
+    additional_domain_controllers: 0.54 # The number of domain controllers in the directory service provisioned in addition to the minimum 2 controllers
+    shared_accounts: 1.5                # Number of accounts that Microsoft AD directory is shared with
 
   aws_docdb_cluster:
     backup_storage_gb: 952 # Amount of backup storage that is in excess of 100% of the storage size for the cluster in GB.
@@ -211,11 +211,11 @@ resource_type_default_usage:
     monthly_hours: 45 # Monthly number of hours the Glue job ran for.
 
   aws_kinesis_analytics_application:
-    kinesis_processing_units: 157      # Number of Kinesis processing units.
+    kinesis_processing_units: 0.21      # Number of Kinesis processing units.
     durable_application_backup_gb: 833 # Total amount of durable application backup in GB.
 
   aws_kinesisanalyticsv2_application:
-    kinesis_processing_units: 157      # Number of Kinesis processing units.
+    kinesis_processing_units: 0.21     # Number of Kinesis processing units.
     durable_application_backup_gb: 833 # Total amount of durable application backup in GB.
 
   aws_kinesisanalyticsv2_application_snapshot:
@@ -227,11 +227,11 @@ resource_type_default_usage:
   aws_kinesis_stream:
     monthly_on_demand_data_in_gb: 250               # Monthly data ingested by the stream in GB.
     monthly_on_demand_data_out_gb: 500              # Monthly data egressed by the stream in GB total, (not per consumer application).
-    monthly_on_demand_efo_data_out_gb: 1538         # Monthly data egressed by the stream in GB to EFO consumers.
-    monthly_on_demand_extended_retention_gb: 200    # Monthly data stored by the stream in GB that exceeds the 24 hour retention period but is less than 7 days.
+    monthly_on_demand_efo_data_out_gb: 400          # Monthly data egressed by the stream in GB to EFO consumers.
+    monthly_on_demand_extended_retention_gb: 200   # Monthly data stored by the stream in GB that exceeds the 24 hour retention period but is less than 7 days.
     monthly_on_demand_long_term_retention_gb: 869   # Monthly data stored by the stream in GB that exceeds the 7 day retention period.
     monthly_provisioned_put_units: 1428571428       # Monthly provisioned put units for the stream.
-    monthly_provisioned_extended_retention_gb: 200  # Monthly data stored by the stream in GB that exceeds the 24 hour retention period but is less than 7 days.
+    monthly_provisioned_extended_retention_gb: 1000  # Monthly data stored by the stream in GB that exceeds the 24 hour retention period but is less than 7 days.
     monthly_provisioned_long_term_retention_gb: 869 # Monthly data stored by the stream in GB that exceeds the 7 day retention period.
     monthly_provisioned_long_term_retrieval_gb: 952 # Monthly data retrieved by the stream in GB that exceeds the 7 day retention period.
     monthly_provisioned_efo_data_out_gb: 1538       # Monthly data egressed by the stream in GB to EFO consumers.
@@ -242,10 +242,10 @@ resource_type_default_usage:
     request_duration_ms: 100  # Average duration of each request in milliseconds.
 
   aws_lambda_provisioned_concurrency_config:
-    monthly_duration_hrs: 100  # Number of hours in a month that provisioned concurrency will be enabled.
-    request_duration_ms: 350   # Average duration of each request in milliseconds during the enabled period.
-    monthly_requests: 10000000 # Number of requests sent to the function during the enabled period.
-    memory_mb: 512             # Memory size of the Lambda function.
+    monthly_duration_hrs: 53  # Number of hours in a month that provisioned concurrency will be enabled.
+    request_duration_ms: 41   # Average duration of each request in milliseconds during the enabled period.
+    monthly_requests: 100000000 # Number of requests sent to the function during the enabled period.
+    memory_mb: 512              # Memory size of the Lambda function.
 
   aws_lb:
     new_connections: 10000    # Number of newly established connections per second on average.
@@ -279,14 +279,14 @@ resource_type_default_usage:
     monthly_data_processed_gb: 307 # Monthly data processed by the Network Firewall in GB.
 
   aws_rds_cluster:
-    capacity_units_per_hr: 333         # Number of aurora capacity units per hour. Only used when engine_mode is "serverless"
+    capacity_units_per_hr: 0.54        # Number of aurora capacity units per hour. Only used when engine_mode is "serverless"
     storage_gb: 200                    # Storage amount in GB allocated to the aurora cluster.
-    write_requests_per_sec: 100        # Total number of writes per second for the cluster.
-    read_requests_per_sec: 100         # Total number of reads per second for the cluster.
-    backup_snapshot_size_gb: 952       # Individual storage size for backup snapshots, used in conjunction with resource parameter "backup_retention_period".
+    write_requests_per_sec: 19         # Total number of writes per second for the cluster.
+    read_requests_per_sec: 19          # Total number of reads per second for the cluster.
+    backup_snapshot_size_gb: 238       # Individual storage size for backup snapshots, used in conjunction with resource parameter "backup_retention_period".
     average_statements_per_hr: 10000   # Number of statements generated per hour when backtrack is enabled. Only available for MySQl-compatible Aurora
     change_records_per_statement: 0.38 # Records changed per statement executed.
-    backtrack_window_hrs: 24           # The duration window for which Aurora will support rewinding the DB cluster to a specific point in time.
+    backtrack_window_hrs: 600          # The duration window for which Aurora will support rewinding the DB cluster to a specific point in time.
     snapshot_export_size_gb: 2000      # Size of snapshot that's exported to s3 in parquet format.
 
   aws_rds_cluster_instance:
