@@ -156,9 +156,9 @@ Module path: ref2
 
  OVERALL TOTAL                                                                                                        $5,290.62 
 ──────────────────────────────────
-115 cloud resources were detected:
+112 cloud resources were detected:
 ∙ 21 were estimated, 14 of which include usage-based costs, see https://infracost.io/usage-file
-∙ 93 were free, rerun with --show-skipped to see details
+∙ 90 were free, rerun with --show-skipped to see details
 ∙ 1 is not supported yet, rerun with --show-skipped to see details
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
