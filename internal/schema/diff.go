@@ -84,8 +84,9 @@ func diffResourcesByKey(resourceKey string, pastResMap, currentResMap map[string
 		ResourceType: baseResource.ResourceType,
 		Tags:         baseResource.Tags,
 
-		HourlyCost:  diffDecimals(current.HourlyCost, past.HourlyCost),
-		MonthlyCost: diffDecimals(current.MonthlyCost, past.MonthlyCost),
+		HourlyCost:       diffDecimals(current.HourlyCost, past.HourlyCost),
+		MonthlyCost:      diffDecimals(current.MonthlyCost, past.MonthlyCost),
+		MonthlyUsageCost: diffDecimals(current.MonthlyUsageCost, past.MonthlyUsageCost),
 	}
 	for _, subResource := range past.SubResources {
 		subKey := fmt.Sprintf("%v.%v", resourceKey, subResource.Name)

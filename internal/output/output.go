@@ -22,23 +22,26 @@ import (
 var outputVersion = "0.2"
 
 type Root struct {
-	Version              string           `json:"version"`
-	Metadata             Metadata         `json:"metadata"`
-	RunID                string           `json:"runId,omitempty"`
-	ShareURL             string           `json:"shareUrl,omitempty"`
-	CloudURL             string           `json:"cloudUrl,omitempty"`
-	Currency             string           `json:"currency"`
-	Projects             Projects         `json:"projects"`
-	TotalHourlyCost      *decimal.Decimal `json:"totalHourlyCost"`
-	TotalMonthlyCost     *decimal.Decimal `json:"totalMonthlyCost"`
-	PastTotalHourlyCost  *decimal.Decimal `json:"pastTotalHourlyCost"`
-	PastTotalMonthlyCost *decimal.Decimal `json:"pastTotalMonthlyCost"`
-	DiffTotalHourlyCost  *decimal.Decimal `json:"diffTotalHourlyCost"`
-	DiffTotalMonthlyCost *decimal.Decimal `json:"diffTotalMonthlyCost"`
-	TimeGenerated        time.Time        `json:"timeGenerated"`
-	Summary              *Summary         `json:"summary"`
-	FullSummary          *Summary         `json:"-"`
-	IsCIRun              bool             `json:"-"`
+	Version                   string           `json:"version"`
+	Metadata                  Metadata         `json:"metadata"`
+	RunID                     string           `json:"runId,omitempty"`
+	ShareURL                  string           `json:"shareUrl,omitempty"`
+	CloudURL                  string           `json:"cloudUrl,omitempty"`
+	Currency                  string           `json:"currency"`
+	Projects                  Projects         `json:"projects"`
+	TotalHourlyCost           *decimal.Decimal `json:"totalHourlyCost"`
+	TotalMonthlyCost          *decimal.Decimal `json:"totalMonthlyCost"`
+	TotalMonthlyUsageCost     *decimal.Decimal `json:"totalMonthlyUsageCost,omitempty"`
+	PastTotalHourlyCost       *decimal.Decimal `json:"pastTotalHourlyCost"`
+	PastTotalMonthlyCost      *decimal.Decimal `json:"pastTotalMonthlyCost"`
+	PastTotalMonthlyUsageCost *decimal.Decimal `json:"pastTotalMonthlyUsageCost,omitempty"`
+	DiffTotalHourlyCost       *decimal.Decimal `json:"diffTotalHourlyCost"`
+	DiffTotalMonthlyCost      *decimal.Decimal `json:"diffTotalMonthlyCost"`
+	DiffTotalMonthlyUsageCost *decimal.Decimal `json:"diffTotalMonthlyUsageCost,omitempty"`
+	TimeGenerated             time.Time        `json:"timeGenerated"`
+	Summary                   *Summary         `json:"summary"`
+	FullSummary               *Summary         `json:"-"`
+	IsCIRun                   bool             `json:"-"`
 }
 
 // HasUnsupportedResources returns if the summary has any unsupported resources.
@@ -101,16 +104,17 @@ func convertOutputResources(outResources []Resource, skip bool) []*schema.Resour
 
 	for i, resource := range outResources {
 		resources[i] = &schema.Resource{
-			Name:           resource.Name,
-			IsSkipped:      skip,
-			Metadata:       convertMetadata(resource.Metadata),
-			CostComponents: convertCostComponents(resource.CostComponents),
-			ActualCosts:    convertActualCosts(resource.ActualCosts),
-			SubResources:   convertOutputResources(resource.SubResources, skip),
-			Tags:           resource.Tags,
-			HourlyCost:     resource.HourlyCost,
-			MonthlyCost:    resource.MonthlyCost,
-			ResourceType:   resource.ResourceType,
+			Name:             resource.Name,
+			IsSkipped:        skip,
+			Metadata:         convertMetadata(resource.Metadata),
+			CostComponents:   convertCostComponents(resource.CostComponents),
+			ActualCosts:      convertActualCosts(resource.ActualCosts),
+			SubResources:     convertOutputResources(resource.SubResources, skip),
+			Tags:             resource.Tags,
+			HourlyCost:       resource.HourlyCost,
+			MonthlyCost:      resource.MonthlyCost,
+			MonthlyUsageCost: resource.MonthlyUsageCost,
+			ResourceType:     resource.ResourceType,
 		}
 	}
 
@@ -234,16 +238,29 @@ func (p *Project) LabelWithMetadata() string {
 }
 
 type Breakdown struct {
-	Resources        []Resource       `json:"resources"`
-	FreeResources    []Resource       `json:"freeResources,omitempty"`
-	TotalHourlyCost  *decimal.Decimal `json:"totalHourlyCost"`
-	TotalMonthlyCost *decimal.Decimal `json:"totalMonthlyCost"`
+	Resources             []Resource       `json:"resources"`
+	FreeResources         []Resource       `json:"freeResources,omitempty"`
+	TotalHourlyCost       *decimal.Decimal `json:"totalHourlyCost"`
+	TotalMonthlyCost      *decimal.Decimal `json:"totalMonthlyCost"`
+	TotalMonthlyUsageCost *decimal.Decimal `json:"totalMonthlyUsageCost"`
 }
 
 // HasResources returns true if the breakdown has any resources or free resources.
 // This is used to determine if the breakdown should be shown in the output.
 func (b *Breakdown) HasResources() bool {
 	return len(b.Resources) > 0 || len(b.FreeResources) > 0
+}
+
+func (b *Breakdown) TotalMonthlyBaselineCost() *decimal.Decimal {
+	if b.TotalMonthlyCost == nil {
+		return nil
+	}
+
+	if b.TotalMonthlyUsageCost == nil {
+		return b.TotalMonthlyCost
+	}
+
+	return decimalPtr(b.TotalMonthlyCost.Sub(*b.TotalMonthlyUsageCost))
 }
 
 type CostComponent struct {
@@ -265,15 +282,16 @@ type ActualCosts struct {
 }
 
 type Resource struct {
-	Name           string                 `json:"name"`
-	ResourceType   string                 `json:"resourceType,omitempty"`
-	Tags           *map[string]string     `json:"tags,omitempty"`
-	Metadata       map[string]interface{} `json:"metadata"`
-	HourlyCost     *decimal.Decimal       `json:"hourlyCost,omitempty"`
-	MonthlyCost    *decimal.Decimal       `json:"monthlyCost,omitempty"`
-	CostComponents []CostComponent        `json:"costComponents,omitempty"`
-	ActualCosts    []ActualCosts          `json:"actualCosts,omitempty"`
-	SubResources   []Resource             `json:"subresources,omitempty"`
+	Name             string                 `json:"name"`
+	ResourceType     string                 `json:"resourceType,omitempty"`
+	Tags             *map[string]string     `json:"tags,omitempty"`
+	Metadata         map[string]interface{} `json:"metadata"`
+	HourlyCost       *decimal.Decimal       `json:"hourlyCost,omitempty"`
+	MonthlyCost      *decimal.Decimal       `json:"monthlyCost,omitempty"`
+	MonthlyUsageCost *decimal.Decimal       `json:"monthlyUsageCost,omitempty"`
+	CostComponents   []CostComponent        `json:"costComponents,omitempty"`
+	ActualCosts      []ActualCosts          `json:"actualCosts,omitempty"`
+	SubResources     []Resource             `json:"subresources,omitempty"`
 }
 
 type Summary struct {
@@ -462,13 +480,14 @@ func outputBreakdown(c *config.Config, resources []*schema.Resource) *Breakdown 
 	sortResources(supportedResources, "")
 	sortResources(freeResources, "")
 
-	totalMonthlyCost, totalHourlyCost := calculateTotalCosts(supportedResources)
+	totalHourlyCost, totalMonthlyCost, totalMonthlyUsageCost := calculateTotalCosts(supportedResources)
 
 	return &Breakdown{
-		Resources:        supportedResources,
-		FreeResources:    freeResources,
-		TotalHourlyCost:  totalMonthlyCost,
-		TotalMonthlyCost: totalHourlyCost,
+		Resources:             supportedResources,
+		FreeResources:         freeResources,
+		TotalHourlyCost:       totalHourlyCost,
+		TotalMonthlyCost:      totalMonthlyCost,
+		TotalMonthlyUsageCost: totalMonthlyUsageCost,
 	}
 }
 func outputResource(r *schema.Resource) Resource {
@@ -491,15 +510,16 @@ func newResource(r *schema.Resource, comps []CostComponent, actualCosts []Actual
 	}
 
 	return Resource{
-		Name:           r.Name,
-		ResourceType:   r.ResourceType,
-		Metadata:       metadata,
-		Tags:           r.Tags,
-		HourlyCost:     r.HourlyCost,
-		MonthlyCost:    r.MonthlyCost,
-		CostComponents: comps,
-		ActualCosts:    actualCosts,
-		SubResources:   subresources,
+		Name:             r.Name,
+		ResourceType:     r.ResourceType,
+		Metadata:         metadata,
+		Tags:             r.Tags,
+		HourlyCost:       r.HourlyCost,
+		MonthlyCost:      r.MonthlyCost,
+		MonthlyUsageCost: r.MonthlyUsageCost,
+		CostComponents:   comps,
+		ActualCosts:      actualCosts,
+		SubResources:     subresources,
 	}
 }
 
@@ -534,9 +554,9 @@ func outputActualCosts(actualCosts []*schema.ActualCosts) []ActualCosts {
 }
 
 func ToOutputFormat(c *config.Config, projects []*schema.Project) (Root, error) {
-	var totalMonthlyCost, totalHourlyCost,
-		pastTotalMonthlyCost, pastTotalHourlyCost,
-		diffTotalMonthlyCost, diffTotalHourlyCost *decimal.Decimal
+	var totalMonthlyCost, totalHourlyCost, totalMonthlyUsageCost,
+		pastTotalMonthlyCost, pastTotalHourlyCost, pastTotalMonthlyUsageCost,
+		diffTotalMonthlyCost, diffTotalHourlyCost, diffTotalMonthlyUsageCost *decimal.Decimal
 
 	outProjects := make([]Project, 0, len(projects))
 	summaries := make([]*Summary, 0, len(projects))
@@ -561,6 +581,13 @@ func ToOutputFormat(c *config.Config, projects []*schema.Project) (Root, error) 
 				}
 				totalMonthlyCost = decimalPtr(totalMonthlyCost.Add(*breakdown.TotalMonthlyCost))
 			}
+
+			if breakdown.TotalMonthlyUsageCost != nil {
+				if totalMonthlyUsageCost == nil {
+					totalMonthlyUsageCost = decimalPtr(decimal.Zero)
+				}
+				totalMonthlyUsageCost = decimalPtr(totalMonthlyUsageCost.Add(*breakdown.TotalMonthlyUsageCost))
+			}
 		}
 
 		if project.HasDiff {
@@ -581,6 +608,13 @@ func ToOutputFormat(c *config.Config, projects []*schema.Project) (Root, error) 
 					}
 					pastTotalMonthlyCost = decimalPtr(pastTotalMonthlyCost.Add(*pastBreakdown.TotalMonthlyCost))
 				}
+
+				if pastBreakdown.TotalMonthlyUsageCost != nil {
+					if pastTotalMonthlyUsageCost == nil {
+						pastTotalMonthlyUsageCost = decimalPtr(decimal.Zero)
+					}
+					pastTotalMonthlyUsageCost = decimalPtr(pastTotalMonthlyUsageCost.Add(*pastBreakdown.TotalMonthlyUsageCost))
+				}
 			}
 
 			if diff != nil {
@@ -596,6 +630,13 @@ func ToOutputFormat(c *config.Config, projects []*schema.Project) (Root, error) 
 						diffTotalMonthlyCost = decimalPtr(decimal.Zero)
 					}
 					diffTotalMonthlyCost = decimalPtr(diffTotalMonthlyCost.Add(*diff.TotalMonthlyCost))
+				}
+
+				if diff.TotalMonthlyUsageCost != nil {
+					if diffTotalMonthlyUsageCost == nil {
+						diffTotalMonthlyUsageCost = decimalPtr(decimal.Zero)
+					}
+					diffTotalMonthlyUsageCost = decimalPtr(diffTotalMonthlyUsageCost.Add(*diff.TotalMonthlyUsageCost))
 				}
 			}
 		}
@@ -634,17 +675,20 @@ func ToOutputFormat(c *config.Config, projects []*schema.Project) (Root, error) 
 	}
 
 	out := Root{
-		Version:              outputVersion,
-		Projects:             outProjects,
-		TotalHourlyCost:      totalHourlyCost,
-		TotalMonthlyCost:     totalMonthlyCost,
-		PastTotalHourlyCost:  pastTotalHourlyCost,
-		PastTotalMonthlyCost: pastTotalMonthlyCost,
-		DiffTotalHourlyCost:  diffTotalHourlyCost,
-		DiffTotalMonthlyCost: diffTotalMonthlyCost,
-		TimeGenerated:        time.Now().UTC(),
-		Summary:              MergeSummaries(summaries),
-		FullSummary:          MergeSummaries(fullSummaries),
+		Version:                   outputVersion,
+		Projects:                  outProjects,
+		TotalHourlyCost:           totalHourlyCost,
+		TotalMonthlyCost:          totalMonthlyCost,
+		TotalMonthlyUsageCost:     totalMonthlyUsageCost,
+		PastTotalHourlyCost:       pastTotalHourlyCost,
+		PastTotalMonthlyCost:      pastTotalMonthlyCost,
+		PastTotalMonthlyUsageCost: pastTotalMonthlyUsageCost,
+		DiffTotalHourlyCost:       diffTotalHourlyCost,
+		DiffTotalMonthlyCost:      diffTotalMonthlyCost,
+		DiffTotalMonthlyUsageCost: diffTotalMonthlyUsageCost,
+		TimeGenerated:             time.Now().UTC(),
+		Summary:                   MergeSummaries(summaries),
+		FullSummary:               MergeSummaries(fullSummaries),
 	}
 
 	return out, nil
@@ -916,9 +960,10 @@ func MergeSummaries(summaries []*Summary) *Summary {
 	return merged
 }
 
-func calculateTotalCosts(resources []Resource) (*decimal.Decimal, *decimal.Decimal) {
+func calculateTotalCosts(resources []Resource) (*decimal.Decimal, *decimal.Decimal, *decimal.Decimal) {
 	totalHourlyCost := decimalPtr(decimal.Zero)
 	totalMonthlyCost := decimalPtr(decimal.Zero)
+	totalMonthlyUsageCost := decimalPtr(decimal.Zero)
 
 	for _, r := range resources {
 		if r.HourlyCost != nil {
@@ -936,9 +981,18 @@ func calculateTotalCosts(resources []Resource) (*decimal.Decimal, *decimal.Decim
 			totalMonthlyCost = decimalPtr(totalMonthlyCost.Add(*r.MonthlyCost))
 		}
 
+		if r.MonthlyUsageCost != nil {
+			if totalMonthlyUsageCost == nil {
+				totalMonthlyUsageCost = decimalPtr(decimal.Zero)
+			}
+
+			totalMonthlyUsageCost = decimalPtr(totalMonthlyUsageCost.Add(*r.MonthlyUsageCost))
+
+		}
+
 	}
 
-	return totalHourlyCost, totalMonthlyCost
+	return totalHourlyCost, totalMonthlyCost, totalMonthlyUsageCost
 }
 
 func sortResources(resources []Resource, groupKey string) {

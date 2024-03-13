@@ -20,7 +20,11 @@ import (
 var templatesFS embed.FS
 
 func formatMarkdownCostChange(currency string, pastCost, cost *decimal.Decimal, skipPlusMinus bool) string {
-	if pastCost != nil && pastCost.Equals(*cost) {
+	if pastCost == nil && cost == nil {
+		return "-"
+	}
+
+	if pastCost != nil && cost != nil && pastCost.Equals(*cost) {
 		return formatWholeDecimalCurrency(currency, decimal.Zero)
 	}
 
