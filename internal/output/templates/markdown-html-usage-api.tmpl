@@ -1,0 +1,132 @@
+{{- define "policyOutputTable" }}
+  {{- if or .Failure .Warning }}
+    {{- if .Failure }}
+      <h4>❌ <b>{{ .Name }}</b> (needs action)</h4>
+    {{- else }}
+      <h4>⚠️ <b>{{ .Name }}</b> (warning)</h4>
+    {{- end }}
+    <table>
+      {{- if .Message }}
+        <tr>
+          <td>
+            <p>{{ .Message }}</p>
+          </td>
+        </tr>
+      {{- end }}
+      {{- range .Details }}
+        <tr>
+          <td>
+            <p>{{ . }}</p>
+          </td>
+        </tr>
+      {{- end}}
+      {{- range .ResourceDetails }}
+        <tr>
+{{- /* This td and markdown need to be left aligned to work properly. */ -}}
+<td>
+
+**{{ .Address }}** {{- if .Path }} at `{{ .Path }}{{- if .Line }}:{{ .Line }}{{- end}}`{{- end}}
+{{- range .Violations }}
+  {{- range .Details }}
+* {{ . }}
+  {{- end}}
+  {{ "" }}
+  {{- if gt (len .ProjectNames) 1 }}
+in projects `{{ stringsJoin .ProjectNames "`, `" }}`
+  {{- else }}
+in project `{{ index .ProjectNames 0 }}`
+  {{- end }}
+  {{ "" }}
+{{- end }}
+</td>{{- /* This td needs to be left aligned to work properly. */ -}}
+        </tr>
+      {{- end}}
+      {{- if .TruncatedCount }}
+        <tr>
+          <td>
+            <p>... and {{ .TruncatedCount }} more. {{ if cloudURL }}<a href="{{ cloudURL }}" rel="noopener noreferrer" target="_blank">View in Infracost Cloud.</a>{{- end }}</p>
+          </td>
+        </tr>
+      {{- end}}
+    </table>
+  {{- end }}
+{{- end }}
+
+{{- define "summaryRow"}}
+    <tr>
+      <td>{{ truncateMiddle .Name 64 "..." }}</td>
+  {{- range .MetadataFields }}
+      <td>{{ truncateMiddle . 64 "..." }}</td>
+  {{- end }}
+      <td>{{ formatCostChange .PastCost .Cost }}</td>
+      <td align="right">{{ formatCost .Cost }}</td>
+    </tr>
+{{- end}}
+<h3>Infracost report</h3>
+<h4>💰 {{ formatCostChangeSentence .Root.Currency .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost true }}</h4>
+{{- if displayTable  }}
+<table>
+  <thead>
+    <td>Project</td>
+  {{- range metadataHeaders }}
+    <td>{{ . }}</td>
+  {{- end }}
+    <td>Cost change</td>
+    <td>New monthly cost</td>
+  </thead>
+  {{- if gt (len .Root.Projects) 1  }}
+  <tbody>
+    {{- range .Root.Projects }}
+      {{- if showProject . }}
+        {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
+      {{- end }}
+    {{- end }}
+  </tbody>
+</table>
+  {{- else }}
+  <tbody>
+  {{- range .Root.Projects }}
+    {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
+  {{- end }}
+  </tbody>
+</table>
+  {{- end }}
+{{- end }}
+
+{{- if displayOutput  }}
+<details>
+<summary>Cost details</summary>
+
+```
+{{ .DiffOutput }}
+```
+</details>
+{{- end }}
+
+{{- if gt (len .Options.PolicyOutput.Checks) 0 }}
+  {{- if or .Options.PolicyOutput.HasFailures .Options.PolicyOutput.HasWarnings }}
+    <details>
+      {{- if .Options.PolicyOutput.HasFailures }}
+        <summary><strong>❌ Policies failed (needs action)</strong></summary>
+      {{- else }}
+        <summary><strong>⚠️ Policies warning</strong></summary>
+      {{- end }}
+      {{- range .Options.PolicyOutput.Checks }}
+        {{- template "policyOutputTable" . }}
+      {{- end}}
+    </details>
+  {{- else }}
+    <p><strong>✅ Policies passed</strong></p>
+  {{- end }}
+{{- end}}
+
+{{- if .MarkdownOptions.Additional }}
+{{ .MarkdownOptions.Additional }}
+{{- end }}
+{{- if displaySub  }}
+<sub>
+{{- if .Root.CloudURL }}View report in <a href="{{ .Root.CloudURL }}" rel="noopener noreferrer" target="_blank">Infracost Cloud</a>. {{- end }}
+{{- if .MarkdownOptions.WillUpdate }}This comment will be updated when code changes.{{- end}}
+{{- if .MarkdownOptions.WillReplace }}This comment will be replaced when code changes.{{- end}}
+</sub>
+{{- end }}
