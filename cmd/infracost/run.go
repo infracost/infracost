@@ -782,6 +782,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	cfg.Format, _ = cmd.Flags().GetString("format")
 	cfg.ShowSkipped, _ = cmd.Flags().GetBool("show-skipped")
 	cfg.SyncUsageFile, _ = cmd.Flags().GetBool("sync-usage-file")
+	cfg.UsageFilePath, _ = cmd.Flags().GetString("usage-file")
 
 	includeAllFields := "all"
 	validFields := []string{"price", "monthlyQuantity", "unit", "hourlyCost", "monthlyCost"}

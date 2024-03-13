@@ -153,6 +153,8 @@ type Config struct {
 	RootPath string
 	// ConfigFilePath defines the raw value of the `--config-file` flag provided by the user
 	ConfigFilePath string
+	// UsageFilePath defines the raw value of the `--usage-file` flag provided by the user
+	UsageFilePath string
 
 	NoCache bool `yaml:"no_cache,omitempty" ignored:"true"`
 
