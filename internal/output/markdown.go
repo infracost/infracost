@@ -154,6 +154,11 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) (MarkdownO
 	bufw := bufio.NewWriter(&buf)
 
 	filename := "markdown-html.tmpl"
+	if out.Metadata.UsageApiEnabled {
+		// for now only show the new usage-costs-including comment if the usage api has been enabled
+		// once we have all the other usage cost stuff done this will replace the old comment template
+		filename = "markdown-html-usage-api.tmpl"
+	}
 	if markdownOpts.BasicSyntax {
 		filename = "markdown.tmpl"
 	}
