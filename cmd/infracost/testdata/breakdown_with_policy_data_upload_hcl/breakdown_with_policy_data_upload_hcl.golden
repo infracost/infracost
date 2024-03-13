@@ -105,6 +105,7 @@
             },
             "hourlyCost": "0.0078",
             "monthlyCost": "5.694",
+            "monthlyUsageCost": "2.847",
             "costComponents": [
               {
                 "name": "Write capacity unit (WCU, autoscaling)",
@@ -253,7 +254,8 @@
           }
         ],
         "totalHourlyCost": "0.91977260273972602",
-        "totalMonthlyCost": "671.434"
+        "totalMonthlyCost": "671.434",
+        "totalMonthlyUsageCost": "2.847"
       },
       "breakdown": {
         "resources": [
@@ -327,6 +329,7 @@
             },
             "hourlyCost": "0.0078",
             "monthlyCost": "5.694",
+            "monthlyUsageCost": "2.847",
             "costComponents": [
               {
                 "name": "Write capacity unit (WCU, autoscaling)",
@@ -475,12 +478,14 @@
           }
         ],
         "totalHourlyCost": "0.91977260273972602",
-        "totalMonthlyCost": "671.434"
+        "totalMonthlyCost": "671.434",
+        "totalMonthlyUsageCost": "2.847"
       },
       "diff": {
         "resources": [],
         "totalHourlyCost": "0",
-        "totalMonthlyCost": "0"
+        "totalMonthlyCost": "0",
+        "totalMonthlyUsageCost": "0"
       },
       "summary": {
         "totalDetectedResources": 4,
@@ -495,10 +500,13 @@
   ],
   "totalHourlyCost": "0.91977260273972602",
   "totalMonthlyCost": "671.434",
+  "totalMonthlyUsageCost": "2.847",
   "pastTotalHourlyCost": "0.91977260273972602",
   "pastTotalMonthlyCost": "671.434",
+  "pastTotalMonthlyUsageCost": "2.847",
   "diffTotalHourlyCost": "0",
   "diffTotalMonthlyCost": "0",
+  "diffTotalMonthlyUsageCost": "0",
   "timeGenerated": "REPLACED_TIME",
   "summary": {
     "totalDetectedResources": 4,

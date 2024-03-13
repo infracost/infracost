@@ -2,6 +2,7 @@
   "currency": "USD",
   "diffTotalHourlyCost": "2.034630136986301358",
   "diffTotalMonthlyCost": "1485.28",
+  "diffTotalMonthlyUsageCost": "0",
   "metadata": {
     "infracostCommand": "breakdown",
     "vcsBranch": "stub-branch",
@@ -14,6 +15,7 @@
   },
   "pastTotalHourlyCost": "0",
   "pastTotalMonthlyCost": "0",
+  "pastTotalMonthlyUsageCost": "0",
   "projects": [
     {
       "breakdown": {
@@ -286,7 +288,8 @@
           }
         ],
         "totalHourlyCost": "2.034630136986301358",
-        "totalMonthlyCost": "1485.28"
+        "totalMonthlyCost": "1485.28",
+        "totalMonthlyUsageCost": "0"
       },
       "diff": {
         "resources": [
@@ -305,6 +308,7 @@
             "hourlyCost": "1.017315068493150679",
             "metadata": {},
             "monthlyCost": "742.64",
+            "monthlyUsageCost": "0",
             "name": "aws_instance.web_app",
             "resourceType": "aws_instance",
             "subresources": [
@@ -323,6 +327,7 @@
                 "hourlyCost": "0.00684931506849315",
                 "metadata": {},
                 "monthlyCost": "5",
+                "monthlyUsageCost": "0",
                 "name": "root_block_device"
               },
               {
@@ -349,6 +354,7 @@
                 "hourlyCost": "0.242465753424657529",
                 "metadata": {},
                 "monthlyCost": "177",
+                "monthlyUsageCost": "0",
                 "name": "ebs_block_device[0]"
               }
             ],
@@ -369,6 +375,7 @@
             "hourlyCost": "1.017315068493150679",
             "metadata": {},
             "monthlyCost": "742.64",
+            "monthlyUsageCost": "0",
             "name": "aws_instance.zero_cost_instance",
             "resourceType": "aws_instance",
             "subresources": [
@@ -387,6 +394,7 @@
                 "hourlyCost": "0.00684931506849315",
                 "metadata": {},
                 "monthlyCost": "5",
+                "monthlyUsageCost": "0",
                 "name": "root_block_device"
               },
               {
@@ -413,6 +421,7 @@
                 "hourlyCost": "0.242465753424657529",
                 "metadata": {},
                 "monthlyCost": "177",
+                "monthlyUsageCost": "0",
                 "name": "ebs_block_device[0]"
               }
             ],
@@ -453,6 +462,7 @@
             "hourlyCost": "0",
             "metadata": {},
             "monthlyCost": "0",
+            "monthlyUsageCost": "0",
             "name": "aws_lambda_function.hello_world",
             "resourceType": "aws_lambda_function",
             "tags": {}
@@ -492,6 +502,7 @@
             "hourlyCost": "0",
             "metadata": {},
             "monthlyCost": "0",
+            "monthlyUsageCost": "0",
             "name": "aws_lambda_function.zero_cost_lambda",
             "resourceType": "aws_lambda_function",
             "tags": {}
@@ -500,6 +511,7 @@
             "hourlyCost": "0",
             "metadata": {},
             "monthlyCost": "0",
+            "monthlyUsageCost": "0",
             "name": "aws_s3_bucket.usage",
             "resourceType": "aws_s3_bucket",
             "subresources": [
@@ -559,6 +571,7 @@
                 "hourlyCost": "0",
                 "metadata": {},
                 "monthlyCost": "0",
+                "monthlyUsageCost": "0",
                 "name": "Standard"
               }
             ],
@@ -566,7 +579,8 @@
           }
         ],
         "totalHourlyCost": "2.034630136986301358",
-        "totalMonthlyCost": "1485.28"
+        "totalMonthlyCost": "1485.28",
+        "totalMonthlyUsageCost": "0"
       },
       "metadata": {
         "path": "./testdata/example_plan.json",
@@ -582,7 +596,8 @@
       "pastBreakdown": {
         "resources": [],
         "totalHourlyCost": "0",
-        "totalMonthlyCost": "0"
+        "totalMonthlyCost": "0",
+        "totalMonthlyUsageCost": "0"
       },
       "summary": {
         "noPriceResourceCounts": {},
@@ -607,5 +622,6 @@
   "timeGenerated": "REPLACED_TIME",
   "totalHourlyCost": "2.034630136986301358",
   "totalMonthlyCost": "1485.28",
+  "totalMonthlyUsageCost": "0",
   "version": "0.2"
 }

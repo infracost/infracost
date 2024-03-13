@@ -110,7 +110,8 @@
           }
         ],
         "totalHourlyCost": "0.33597260273972602",
-        "totalMonthlyCost": "245.26"
+        "totalMonthlyCost": "245.26",
+        "totalMonthlyUsageCost": "0"
       },
       "breakdown": {
         "resources": [
@@ -190,7 +191,8 @@
           }
         ],
         "totalHourlyCost": "0.91197260273972602",
-        "totalMonthlyCost": "665.74"
+        "totalMonthlyCost": "665.74",
+        "totalMonthlyUsageCost": "0"
       },
       "diff": {
         "resources": [
@@ -206,6 +208,7 @@
             "metadata": {},
             "hourlyCost": "0.576",
             "monthlyCost": "420.48",
+            "monthlyUsageCost": "0",
             "costComponents": [
               {
                 "name": "Instance usage (Linux/UNIX, on-demand, m5.xlarge → m5.4xlarge)",
@@ -220,7 +223,8 @@
           }
         ],
         "totalHourlyCost": "0.576",
-        "totalMonthlyCost": "420.48"
+        "totalMonthlyCost": "420.48",
+        "totalMonthlyUsageCost": "0"
       },
       "summary": {
         "totalDetectedResources": 1,
@@ -235,10 +239,13 @@
   ],
   "totalHourlyCost": "0.91197260273972602",
   "totalMonthlyCost": "665.74",
+  "totalMonthlyUsageCost": "0",
   "pastTotalHourlyCost": "0.33597260273972602",
   "pastTotalMonthlyCost": "245.26",
+  "pastTotalMonthlyUsageCost": "0",
   "diffTotalHourlyCost": "0.576",
   "diffTotalMonthlyCost": "420.48",
+  "diffTotalMonthlyUsageCost": "0",
   "timeGenerated": "REPLACED_TIME",
   "summary": {
     "totalDetectedResources": 1,

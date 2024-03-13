@@ -8,7 +8,8 @@
     "vcsCommitAuthorEmail": "stub@stub.com",
     "vcsCommitTimestamp": "REPLACED_TIME",
     "vcsCommitMessage": "stub-message",
-    "vcsRepositoryUrl": "https://github.com/infracost/infracost"
+    "vcsRepositoryUrl": "https://github.com/infracost/infracost",
+    "usageFilePath": "./testdata/example_usage.yml"
   },
   "currency": "USD",
   "projects": [
@@ -27,7 +28,8 @@
       "pastBreakdown": {
         "resources": [],
         "totalHourlyCost": "0",
-        "totalMonthlyCost": "0"
+        "totalMonthlyCost": "0",
+        "totalMonthlyUsageCost": "0"
       },
       "breakdown": {
         "resources": [
@@ -166,6 +168,7 @@
             "metadata": {},
             "hourlyCost": "0.59817465753424657534316749",
             "monthlyCost": "436.6675",
+            "monthlyUsageCost": "436.6675",
             "costComponents": [
               {
                 "name": "Requests",
@@ -215,6 +218,7 @@
             "metadata": {},
             "hourlyCost": "0",
             "monthlyCost": "0",
+            "monthlyUsageCost": "0",
             "costComponents": [
               {
                 "name": "Requests",
@@ -264,12 +268,14 @@
             "metadata": {},
             "hourlyCost": "0",
             "monthlyCost": "0",
+            "monthlyUsageCost": "0",
             "subresources": [
               {
                 "name": "Standard",
                 "metadata": {},
                 "hourlyCost": "0",
                 "monthlyCost": "0",
+                "monthlyUsageCost": "0",
                 "costComponents": [
                   {
                     "name": "Storage",
@@ -327,7 +333,8 @@
           }
         ],
         "totalHourlyCost": "1.86480479452054793334316749",
-        "totalMonthlyCost": "1361.3075"
+        "totalMonthlyCost": "1361.3075",
+        "totalMonthlyUsageCost": "436.6675"
       },
       "diff": {
         "resources": [
@@ -338,6 +345,7 @@
             "metadata": {},
             "hourlyCost": "1.017315068493150679",
             "monthlyCost": "742.64",
+            "monthlyUsageCost": "0",
             "costComponents": [
               {
                 "name": "Instance usage (Linux/UNIX, on-demand, m5.4xlarge)",
@@ -355,6 +363,7 @@
                 "metadata": {},
                 "hourlyCost": "0.00684931506849315",
                 "monthlyCost": "5",
+                "monthlyUsageCost": "0",
                 "costComponents": [
                   {
                     "name": "Storage (general purpose SSD, gp2)",
@@ -372,6 +381,7 @@
                 "metadata": {},
                 "hourlyCost": "0.242465753424657529",
                 "monthlyCost": "177",
+                "monthlyUsageCost": "0",
                 "costComponents": [
                   {
                     "name": "Storage (provisioned IOPS SSD, io1)",
@@ -402,6 +412,7 @@
             "metadata": {},
             "hourlyCost": "0.249315068493150679",
             "monthlyCost": "182",
+            "monthlyUsageCost": "0",
             "costComponents": [
               {
                 "name": "Instance usage (Linux/UNIX, reserved, m5.4xlarge)",
@@ -419,6 +430,7 @@
                 "metadata": {},
                 "hourlyCost": "0.00684931506849315",
                 "monthlyCost": "5",
+                "monthlyUsageCost": "0",
                 "costComponents": [
                   {
                     "name": "Storage (general purpose SSD, gp2)",
@@ -436,6 +448,7 @@
                 "metadata": {},
                 "hourlyCost": "0.242465753424657529",
                 "monthlyCost": "177",
+                "monthlyUsageCost": "0",
                 "costComponents": [
                   {
                     "name": "Storage (provisioned IOPS SSD, io1)",
@@ -466,6 +479,7 @@
             "metadata": {},
             "hourlyCost": "0.59817465753424657534316749",
             "monthlyCost": "436.6675",
+            "monthlyUsageCost": "436.6675",
             "costComponents": [
               {
                 "name": "Requests",
@@ -515,6 +529,7 @@
             "metadata": {},
             "hourlyCost": "0",
             "monthlyCost": "0",
+            "monthlyUsageCost": "0",
             "costComponents": [
               {
                 "name": "Requests",
@@ -564,12 +579,14 @@
             "metadata": {},
             "hourlyCost": "0",
             "monthlyCost": "0",
+            "monthlyUsageCost": "0",
             "subresources": [
               {
                 "name": "Standard",
                 "metadata": {},
                 "hourlyCost": "0",
                 "monthlyCost": "0",
+                "monthlyUsageCost": "0",
                 "costComponents": [
                   {
                     "name": "Storage",
@@ -627,7 +644,8 @@
           }
         ],
         "totalHourlyCost": "1.86480479452054793334316749",
-        "totalMonthlyCost": "1361.3075"
+        "totalMonthlyCost": "1361.3075",
+        "totalMonthlyUsageCost": "436.6675"
       },
       "summary": {
         "totalDetectedResources": 5,
@@ -642,10 +660,13 @@
   ],
   "totalHourlyCost": "1.86480479452054793334316749",
   "totalMonthlyCost": "1361.3075",
+  "totalMonthlyUsageCost": "436.6675",
   "pastTotalHourlyCost": "0",
   "pastTotalMonthlyCost": "0",
+  "pastTotalMonthlyUsageCost": "0",
   "diffTotalHourlyCost": "1.86480479452054793334316749",
   "diffTotalMonthlyCost": "1361.3075",
+  "diffTotalMonthlyUsageCost": "436.6675",
   "timeGenerated": "REPLACED_TIME",
   "summary": {
     "totalDetectedResources": 5,
