@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"bytes"
 	"embed"
+	"fmt"
+	"regexp"
 	"sort"
 	"strings"
 	"text/template"
@@ -124,6 +126,7 @@ type MarkdownCtx struct {
 	Options                      Options
 	MarkdownOptions              MarkdownOptions
 	RunQuotaMsg                  string
+	UsageCostsMsg                string
 }
 
 // MarkdownOutput holds the message converted to markdown with additional
@@ -299,6 +302,7 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) (MarkdownO
 		Options:                      opts,
 		MarkdownOptions:              markdownOpts,
 		RunQuotaMsg:                  runQuotaMsg,
+		UsageCostsMsg:                usageCostsMessage(out),
 	})
 	if err != nil {
 		return MarkdownOutput{}, err
@@ -331,4 +335,46 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) (MarkdownO
 
 func hasCodeChanges(options Options, project Project) bool {
 	return options.ShowOnlyChanges && project.Metadata.VCSCodeChanged != nil && *project.Metadata.VCSCodeChanged
+}
+
+var configFileDocsURL = "https://www.infracost.io/docs/features/config_file/"
+var usageFileDocsURL = "https://www.infracost.io/docs/features/usage_based_resources"
+var usageDefaultsDocsURL = "https://www.infracost.io/docs/features/usage_based_resources"
+var usageDefaultsDashboardSuffix = "settings/usage-defaults"
+var cloudURLRegex = regexp.MustCompile(`(https?://[^/]+/org/[^/]+/)`)
+
+func usageCostsMessage(out Root) string {
+	usageDefaultsURL := usageDefaultsDocsURL
+	match := cloudURLRegex.FindStringSubmatch(out.CloudURL)
+	if len(match) > 0 {
+		usageDefaultsURL = match[0] + usageDefaultsDashboardSuffix
+	}
+
+	if out.Metadata.UsageApiEnabled {
+		if out.Metadata.ConfigFilePath != "" {
+			if out.Metadata.ConfigFileHasUsageFile {
+				return fmt.Sprintf("*Usage costs were estimated by merging [usage defaults](%s) and values from the [config files](%s).", usageDefaultsURL, configFileDocsURL)
+			} else {
+				return fmt.Sprintf("*Usage costs were estimated with [usage defaults](%s), which can also be overridden in the [config files](%s).", usageDefaultsURL, configFileDocsURL)
+			}
+		} else if out.Metadata.UsageFilePath != "" {
+			return fmt.Sprintf("*Usage costs were estimated by merging [usage defaults](%s) and values from [%s](%s).", usageDefaultsURL, usageFileDocsURL, out.Metadata.UsageFilePath)
+		} else {
+			return fmt.Sprintf("*Usage costs were estimated with [usage defaults](%s), which can also be [overridden](%s) in this repo.", usageDefaultsURL, usageFileDocsURL)
+		}
+	} else {
+		if out.Metadata.ConfigFilePath != "" {
+			if out.Metadata.ConfigFileHasUsageFile {
+				return fmt.Sprintf("*Usage costs were estimated using values from the [config files](%s).", configFileDocsURL)
+			} else {
+				return fmt.Sprintf("*Usage costs can be estimated by adding [usage defaults](%s) or [usage files](%s) in the config file.", usageDefaultsURL, usageFileDocsURL)
+			}
+		} else if out.Metadata.UsageFilePath != "" {
+			return fmt.Sprintf("*Usage costs were estimated using [%s](%s).", usageFileDocsURL, out.Metadata.UsageFilePath)
+		} else {
+			return fmt.Sprintf("*Usage costs can be estimated by adding [usage defaults](%s) or an [infracost-usage.yml](%s).", usageDefaultsURL, usageFileDocsURL)
+		}
+	}
+
+	return ""
 }

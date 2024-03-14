@@ -118,6 +118,11 @@ in project `{{ index .ProjectNames 0 }}`
   </tbody>
 </table>
   {{- end }}
+  {{- if .UsageCostsMsg }}
+
+
+{{.UsageCostsMsg }}
+  {{- end }}
 {{- end }}
 
 {{- if displayOutput  }}
