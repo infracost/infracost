@@ -1,0 +1,8 @@
+version: 0.1
+
+projects:
+  - path: "./testdata/breakdown_config_file_with_usage_file/flag_usage"
+    name: "default_usage"
+  - path: "./testdata/breakdown_config_file_with_usage_file/config_usage"
+    name: "config_usage"
+    usage_file: "./testdata/breakdown_config_file_with_usage_file/config_usage/infracost-usage.yml"

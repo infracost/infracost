@@ -717,7 +717,6 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	}
 
 	hasProjectFlags := (hasPathFlag ||
-		cmd.Flags().Changed("usage-file") ||
 		cmd.Flags().Changed("project-name") ||
 		cmd.Flags().Changed("terraform-plan-flags") ||
 		cmd.Flags().Changed("terraform-var-file") ||
@@ -727,7 +726,7 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 
 	if hasConfigFile && hasProjectFlags {
 		m := "--config-file flag cannot be used with the following flags: "
-		m += "--path, --project-name, --terraform-*, --usage-file"
+		m += "--path, --project-name, --terraform-*"
 		ui.PrintUsage(cmd)
 		return errors.New(m)
 	}
@@ -774,6 +773,13 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 		if useState, _ := cmd.Flags().GetBool("terraform-use-state"); useState {
 			for _, p := range cfg.Projects {
 				p.TerraformUseState = true
+			}
+		}
+		if usageFilePath, _ := cmd.Flags().GetString("usage-file"); usageFilePath != "" {
+			for _, p := range cfg.Projects {
+				if p.UsageFile == "" {
+					p.UsageFile = usageFilePath
+				}
 			}
 		}
 	}
