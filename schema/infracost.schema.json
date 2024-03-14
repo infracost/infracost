@@ -34,7 +34,8 @@
       "required": [
         "resources",
         "totalHourlyCost",
-        "totalMonthlyCost"
+        "totalMonthlyCost",
+        "totalMonthlyUsageCost"
       ],
       "properties": {
         "resources": {
@@ -54,6 +55,9 @@
           "type": ["string", "null"]
         },
         "totalMonthlyCost": {
+          "type": ["string", "null"]
+        },
+        "totalMonthlyUsageCost": {
           "type": ["string", "null"]
         }
       },
@@ -161,6 +165,18 @@
         },
         "vcsPullRequestId": {
           "type": "string"
+        },
+        "usageApiEnabled": {
+          "type": "boolean"
+        },
+        "usageFilePath": {
+          "type": "string"
+        },
+        "configFilePath": {
+          "type": "string"
+        },
+        "configFileHasUsageFile": {
+          "type": "boolean"
         }
       },
       "additionalProperties": false,
@@ -399,6 +415,9 @@
         "monthlyCost": {
           "type": ["string", "null"]
         },
+        "monthlyUsageCost": {
+          "type": ["string", "null"]
+        },
         "costComponents": {
           "items": {
             "$schema": "http://json-schema.org/draft-04/schema#",
@@ -471,16 +490,25 @@
         "totalMonthlyCost": {
           "type": ["string", "null"]
         },
+        "totalMonthlyUsageCost": {
+          "type": ["string", "null"]
+        },
         "pastTotalHourlyCost": {
           "type": ["string", "null"]
         },
         "pastTotalMonthlyCost": {
           "type": ["string", "null"]
         },
+        "pastTotalMonthlyUsageCost": {
+          "type": ["string", "null"]
+        },
         "diffTotalHourlyCost": {
           "type": ["string", "null"]
         },
         "diffTotalMonthlyCost": {
+          "type": ["string", "null"]
+        },
+        "diffTotalMonthlyUsageCost": {
           "type": ["string", "null"]
         },
         "timeGenerated": {
@@ -526,6 +554,9 @@
           "type": ["string", "null"]
         },
         "monthlyCost": {
+          "type": ["string", "null"]
+        },
+        "monthlyUsageCost": {
           "type": ["string", "null"]
         },
         "costComponents": {
