@@ -127,7 +127,8 @@ in project `{{ index .ProjectNames 0 }}`
 
 {{- if displayOutput  }}
 <details>
-<summary>Cost details</summary>
+
+<summary>Cost details {{ .CostDetailsMsg }}</summary>
 
 ```
 {{ .DiffOutput }}

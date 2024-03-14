@@ -127,6 +127,7 @@ type MarkdownCtx struct {
 	MarkdownOptions              MarkdownOptions
 	RunQuotaMsg                  string
 	UsageCostsMsg                string
+	CostDetailsMsg               string
 }
 
 // MarkdownOutput holds the message converted to markdown with additional
@@ -308,6 +309,7 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) (MarkdownO
 		MarkdownOptions:              markdownOpts,
 		RunQuotaMsg:                  runQuotaMsg,
 		UsageCostsMsg:                usageCostsMessage(out),
+		CostDetailsMsg:               costsDetailsMessage(out),
 	})
 	if err != nil {
 		return MarkdownOutput{}, err
@@ -382,4 +384,25 @@ func usageCostsMessage(out Root) string {
 	}
 
 	return ""
+}
+
+func costsDetailsMessage(out Root) string {
+	var msgs []string
+
+	if out.Summary != nil && out.Summary.TotalUnsupportedResources != nil {
+		msgs = append(msgs, "unsupported resources")
+	}
+
+	for _, p := range out.Projects {
+		if len(p.Metadata.Errors) > 0 {
+			msgs = append(msgs, "skipped projects due to errors")
+			break
+		}
+	}
+
+	if len(msgs) == 0 {
+		return ""
+	}
+
+	return fmt.Sprintf("(includes details of %s)", strings.Join(msgs, " and "))
 }
