@@ -27,7 +27,7 @@ type Metadata struct {
 	VCSPipelineRunID     string   `json:"vcsPipelineRunId,omitempty"`
 	VCSPullRequestID     string   `json:"vcsPullRequestId,omitempty"`
 
-	UsageApiEnabled        bool   `json:"UsageApiEnabled,omitempty"`
+	UsageApiEnabled        bool   `json:"usageApiEnabled,omitempty"`
 	UsageFilePath          string `json:"usageFilePath,omitempty"`
 	ConfigFilePath         string `json:"configFilePath,omitempty"`
 	ConfigFileHasUsageFile bool   `json:"configFileHasUsageFile,omitempty"`
