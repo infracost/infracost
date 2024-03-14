@@ -1,0 +1,6 @@
+.
+└── terraform
+    ├── terragrunt.hcl
+    ├── main.tf
+    ├── prod.tfvars
+    └── dev.tfvars

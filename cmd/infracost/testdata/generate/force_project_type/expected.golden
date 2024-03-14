@@ -1,0 +1,14 @@
+version: 0.1
+
+projects:
+  - path: terraform
+    name: terraform-dev
+    terraform_var_files:
+      - dev.tfvars
+    skip_autodetect: true
+  - path: terraform
+    name: terraform-prod
+    terraform_var_files:
+      - prod.tfvars
+    skip_autodetect: true
+

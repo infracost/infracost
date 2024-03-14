@@ -34,6 +34,11 @@ type AutodetectConfig struct {
 	// MaxSearchDepth configures the number of folders that Infracost should
 	// traverse to detect projects.
 	MaxSearchDepth int `yaml:"max_search_depth,omitempty" ignored:"true"`
+	// ForceProjectType is used to force the project type to be a specific value.
+	// This is useful when autodetect collides with two project types, normally
+	// Terragrunt and Terraform and we want to force the project type to be one or
+	// the other.
+	ForceProjectType string `yaml:"force_project_type,omitempty" ignored:"true"`
 }
 
 type PathOverride struct {
