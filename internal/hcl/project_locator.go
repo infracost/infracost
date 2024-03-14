@@ -208,6 +208,7 @@ type ProjectLocator struct {
 	wdContainsTerragrunt   bool
 	fallbackToIncludePaths bool
 	maxConfiguredDepth     int
+	forceProjectType       string
 }
 
 // ProjectLocatorConfig provides configuration options on how the locator functions.
@@ -221,6 +222,7 @@ type ProjectLocatorConfig struct {
 	PathOverrides          []PathOverrideConfig
 	FallbackToIncludePaths bool
 	MaxSearchDepth         int
+	ForceProjectType       string
 }
 
 type PathOverrideConfig struct {
@@ -286,6 +288,7 @@ func NewProjectLocator(logger zerolog.Logger, config *ProjectLocatorConfig) *Pro
 				return false
 			},
 			fallbackToIncludePaths: config.FallbackToIncludePaths,
+			forceProjectType:       config.ForceProjectType,
 		}
 	}
 
@@ -1127,6 +1130,16 @@ func (p *ProjectLocator) discoveredProjectsWithModulesFiltered() []discoveredPro
 	var projects []discoveredProject
 
 	for _, dir := range p.discoveredProjects {
+		if p.forceProjectType != "" {
+			if p.forceProjectType == "terragrunt" && !dir.isTerragrunt {
+				continue
+			}
+
+			if p.forceProjectType == "terraform" && dir.isTerragrunt {
+				continue
+			}
+		}
+
 		if _, ok := p.modules[dir.path]; !ok || p.useAllPaths || p.shouldIncludeDir(dir.path) {
 			projects = append(projects, dir)
 		}
