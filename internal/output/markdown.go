@@ -164,6 +164,11 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) (MarkdownO
 	}
 	if markdownOpts.BasicSyntax {
 		filename = "markdown.tmpl"
+		if out.Metadata.UsageApiEnabled {
+			// for now only show the new usage-costs-including comment if the usage api has been enabled
+			// once we have all the other usage cost stuff done this will replace the old comment template
+			filename = "markdown-usage-api.tmpl"
+		}
 	}
 
 	runQuotaMsg, exceeded := out.Projects.IsRunQuotaExceeded()
