@@ -10,9 +10,10 @@ import (
 func TestCalculateDiff(t *testing.T) {
 	pastResources := []*Resource{
 		{
-			Name:        "rs1",
-			HourlyCost:  decimalPtr(decimal.NewFromInt(5)),
-			MonthlyCost: decimalPtr(decimal.NewFromInt(3600)),
+			Name:             "rs1",
+			HourlyCost:       decimalPtr(decimal.NewFromInt(5)),
+			MonthlyCost:      decimalPtr(decimal.NewFromInt(3600)),
+			MonthlyUsageCost: decimalPtr(decimal.NewFromInt(600)),
 			CostComponents: []*CostComponent{
 				{
 					Name:                "cc1",
@@ -45,9 +46,10 @@ func TestCalculateDiff(t *testing.T) {
 
 	currentResources := []*Resource{
 		{
-			Name:        "rs1",
-			HourlyCost:  decimalPtr(decimal.NewFromInt(2)),
-			MonthlyCost: decimalPtr(decimal.NewFromInt(1440)),
+			Name:             "rs1",
+			HourlyCost:       decimalPtr(decimal.NewFromInt(2)),
+			MonthlyCost:      decimalPtr(decimal.NewFromInt(1440)),
+			MonthlyUsageCost: decimalPtr(decimal.NewFromInt(200)),
 			CostComponents: []*CostComponent{
 				{
 					Name:                "cc1",
@@ -80,9 +82,10 @@ func TestCalculateDiff(t *testing.T) {
 
 	expectedDiff := []*Resource{
 		{
-			Name:        "rs1",
-			HourlyCost:  decimalPtr(decimal.NewFromInt(-3)),
-			MonthlyCost: decimalPtr(decimal.NewFromInt(-2160)),
+			Name:             "rs1",
+			HourlyCost:       decimalPtr(decimal.NewFromInt(-3)),
+			MonthlyCost:      decimalPtr(decimal.NewFromInt(-2160)),
+			MonthlyUsageCost: decimalPtr(decimal.NewFromInt(-400)),
 			CostComponents: []*CostComponent{
 				{
 					Name:                "cc1",
@@ -96,9 +99,10 @@ func TestCalculateDiff(t *testing.T) {
 			},
 		},
 		{
-			Name:        "rs2",
-			HourlyCost:  decimalPtr(decimal.NewFromInt(-1)),
-			MonthlyCost: decimalPtr(decimal.NewFromInt(-720)),
+			Name:             "rs2",
+			HourlyCost:       decimalPtr(decimal.NewFromInt(-1)),
+			MonthlyCost:      decimalPtr(decimal.NewFromInt(-720)),
+			MonthlyUsageCost: decimalPtr(decimal.Zero),
 			CostComponents: []*CostComponent{
 				{
 					Name:                "cc2",
@@ -112,9 +116,10 @@ func TestCalculateDiff(t *testing.T) {
 			},
 		},
 		{
-			Name:        "rs3",
-			HourlyCost:  decimalPtr(decimal.NewFromInt(3)),
-			MonthlyCost: decimalPtr(decimal.NewFromInt(2160)),
+			Name:             "rs3",
+			HourlyCost:       decimalPtr(decimal.NewFromInt(3)),
+			MonthlyCost:      decimalPtr(decimal.NewFromInt(2160)),
+			MonthlyUsageCost: decimalPtr(decimal.Zero),
 			CostComponents: []*CostComponent{
 				{
 					Name:                "cc3",
