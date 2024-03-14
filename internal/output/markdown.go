@@ -382,8 +382,6 @@ func usageCostsMessage(out Root) string {
 			return fmt.Sprintf("*Usage costs can be estimated by adding [usage defaults](%s) or an [infracost-usage.yml](%s).", usageDefaultsURL, usageFileDocsURL)
 		}
 	}
-
-	return ""
 }
 
 func costsDetailsMessage(out Root) string {

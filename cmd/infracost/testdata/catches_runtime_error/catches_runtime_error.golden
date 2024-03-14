@@ -3,7 +3,39 @@ Err:
 
 Error: An unexpected error occurred
 
-runtime error: REPLACED ERROR
+runtime error: invalid memory address or nil pointer dereference
+goroutine 28542 [running]:
+runtime/debug.Stack()
+	/Users/tim/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.22.0.darwin-arm64/src/runtime/debug/stack.go:24 +0x64
+github.com/infracost/infracost/cmd/infracost.Run.func1()
+	/Users/tim/src/infracost/infracost/cmd/infracost/main.go:78 +0xec
+panic({0x1047b59c0?, 0x106519220?})
+	/Users/tim/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.22.0.darwin-arm64/src/runtime/panic.go:770 +0x124
+github.com/infracost/infracost/cmd/infracost.loadRunFlags(0x14002304008, 0x14003923348)
+	/Users/tim/src/infracost/infracost/cmd/infracost/run.go:740 +0x760
+github.com/infracost/infracost/cmd/infracost.breakdownCmd.func1(0x14003923348, {0x0?, 0x1044dd900?, 0x14003da4130?})
+	/Users/tim/src/infracost/infracost/cmd/infracost/breakdown.go:30 +0x74
+github.com/infracost/infracost/cmd/infracost.breakdownCmd.checkAPIKeyIsValid.func2(0x14003923348, {0x1400695e740, 0x0, 0x4})
+	/Users/tim/src/infracost/infracost/cmd/infracost/run.go:971 +0x2c4
+github.com/spf13/cobra.(*Command).execute(0x14003923348, {0x1400695e700, 0x4, 0x4})
+	/Users/tim/go/pkg/mod/github.com/spf13/cobra@v1.4.0/command.go:856 +0x568
+github.com/spf13/cobra.(*Command).ExecuteC(0x14002fb5608)
+	/Users/tim/go/pkg/mod/github.com/spf13/cobra@v1.4.0/command.go:974 +0x318
+github.com/spf13/cobra.(*Command).Execute(...)
+	/Users/tim/go/pkg/mod/github.com/spf13/cobra@v1.4.0/command.go:902
+github.com/infracost/infracost/cmd/infracost.Run(0x14004ce3cf8, 0x14004ce3dd0)
+	/Users/tim/src/infracost/infracost/cmd/infracost/main.go:96 +0x1fc
+github.com/infracost/infracost/cmd/infracost_test.GetCommandOutput(0x14001c0e340, {0x14002eeb0e0, 0x5, 0x5}, 0x14000c5f900, {0x14000bfddd0, 0x2, 0x2})
+	/Users/tim/src/infracost/infracost/cmd/infracost/cmd_test.go:121 +0x1f0
+github.com/infracost/infracost/cmd/infracost_test.goldenFileCommandTest(0x14001c0e340, {0x14003f44090, 0x15}, {0x14002eeb0e0?, 0x1045a04c0?, 0x14000100908?}, 0x14003481718?, 0x1, {0x14000bfddd0?, 0x102203670?, ...})
+	/Users/tim/src/infracost/infracost/cmd/infracost/cmd_test.go:80 +0x54
+github.com/infracost/infracost/cmd/infracost_test.GoldenFileCommandTest.func2(0x14001c0e340?)
+	/Users/tim/src/infracost/infracost/cmd/infracost/cmd_test.go:65 +0x120
+testing.tRunner(0x14001c0e340, 0x1400695e2c0)
+	/Users/tim/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.22.0.darwin-arm64/src/testing/testing.go:1689 +0xec
+created by testing.(*T).Run in goroutine 28654
+	/Users/tim/go/pkg/mod/golang.org/toolchain@v0.0.1-go1.22.0.darwin-arm64/src/testing/testing.go:1742 +0x318
+
 Environment:
 Infracost vREPLACED_VERSION
 
