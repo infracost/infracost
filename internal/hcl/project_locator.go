@@ -188,12 +188,13 @@ func (p discoveredProject) hasRootModuleBlocks() bool {
 // ProjectLocator finds Terraform projects for given paths.
 // It naively excludes folders that are imported as modules in other projects.
 type ProjectLocator struct {
-	modules        map[string]struct{}
-	moduleCalls    map[string][]string
-	excludedDirs   []string
-	changedObjects []string
-	useAllPaths    bool
-	logger         zerolog.Logger
+	modules           map[string]struct{}
+	projectDuplicates map[string]bool
+	moduleCalls       map[string][]string
+	excludedDirs      []string
+	changedObjects    []string
+	useAllPaths       bool
+	logger            zerolog.Logger
 
 	basePath           string
 	discoveredVarFiles map[string][]RootPathVarFile
@@ -1014,6 +1015,7 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 	}
 	p.basePath, _ = filepath.Abs(fullPath)
 	p.modules = make(map[string]struct{})
+	p.projectDuplicates = make(map[string]bool)
 	p.moduleCalls = make(map[string][]string)
 	p.wdContainsTerragrunt = false
 	p.discoveredProjects = []discoveredProject{}
@@ -1024,6 +1026,13 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 
 	p.findTerragruntDirs(fullPath)
 	p.walkPaths(fullPath, 0)
+	for _, project := range p.discoveredProjects {
+		if _, ok := p.projectDuplicates[project.path]; ok {
+			p.projectDuplicates[project.path] = true
+		} else {
+			p.projectDuplicates[project.path] = false
+		}
+	}
 
 	p.logger.Debug().Msgf("walking directory at %s returned a list of possible Terraform projects with length %d", fullPath, len(p.discoveredProjects))
 
@@ -1040,8 +1049,6 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 				IsTerragrunt:      dir.isTerragrunt,
 			})
 			projectMap[dir.path] = true
-
-			delete(p.discoveredVarFiles, dir.path)
 		}
 	}
 
@@ -1057,10 +1064,12 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 					IsTerragrunt:      dir.isTerragrunt,
 				})
 				projectMap[dir.path] = true
-
-				delete(p.discoveredVarFiles, dir.path)
 			}
 		}
+	}
+
+	for _, dir := range projects {
+		delete(p.discoveredVarFiles, dir.Path)
 	}
 
 	node := CreateTreeNode(fullPath, projects, p.discoveredVarFiles, p.envMatcher)
@@ -1130,23 +1139,12 @@ func (p *ProjectLocator) discoveredProjectsWithModulesFiltered() []discoveredPro
 	var projects []discoveredProject
 
 	for _, dir := range p.discoveredProjects {
-		if p.forceProjectType != "" {
-			if p.forceProjectType == "terragrunt" && !dir.isTerragrunt {
-				continue
-			}
-
-			if p.forceProjectType == "terraform" && dir.isTerragrunt {
-				continue
-			}
-		}
-
 		if _, ok := p.modules[dir.path]; !ok || p.useAllPaths || p.shouldIncludeDir(dir.path) {
 			projects = append(projects, dir)
 		}
 	}
 
 	return projects
-
 }
 
 func (p *ProjectLocator) shouldUseProject(dir discoveredProject, force bool) bool {
@@ -1164,6 +1162,10 @@ func (p *ProjectLocator) shouldUseProject(dir discoveredProject, force bool) boo
 		return true
 	}
 
+	if p.shouldRemoveDuplicateProject(dir) {
+		return false
+	}
+
 	// we only include Terraform projects that have been found alongside Terragrunt
 	// projects if they have been forced to be included by --include-path. This is
 	// done as we sometimes get collisions with the Terragrunt modules that are
@@ -1171,7 +1173,8 @@ func (p *ProjectLocator) shouldUseProject(dir discoveredProject, force bool) boo
 	//
 	// @TODO in future we can read the "source" blocks of the Terragrunt projects and
 	// infer that the Terraform projects are not modules.
-	if p.wdContainsTerragrunt && !dir.isTerragrunt {
+	isForcedDupDir := p.projectDuplicates[dir.path] && p.forceProjectType != ""
+	if !isForcedDupDir && p.wdContainsTerragrunt && !dir.isTerragrunt {
 		return false
 	}
 
@@ -1194,6 +1197,31 @@ func (p *ProjectLocator) shouldUseProject(dir discoveredProject, force bool) boo
 	}
 
 	return true
+}
+
+// shouldRemoveDuplicateProject returns true if the project should be removed
+// from the list of discovered projects based on the if the directory has been
+// detected as both a terragrunt and terraform project. We only remove
+// directories that have been flagged as duplicates and have been forced to be
+// included as a specific project type.
+func (p *ProjectLocator) shouldRemoveDuplicateProject(dir discoveredProject) bool {
+	if p.forceProjectType == "" {
+		return false
+	}
+
+	if !p.projectDuplicates[dir.path] {
+		return false
+	}
+
+	if p.forceProjectType == "terragrunt" && !dir.isTerragrunt {
+		return true
+	}
+
+	if p.forceProjectType == "terraform" && dir.isTerragrunt {
+		return true
+	}
+
+	return false
 }
 
 // getChildDepth returns the number of levels targetPath is nested under
