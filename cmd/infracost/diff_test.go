@@ -334,3 +334,20 @@ func TestDiffPriorEmptyProject(t *testing.T) {
 			dir,
 		}, nil)
 }
+
+func TestDiffPriorEmptyProjectJSON(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(), []string{
+			"diff",
+			"--compare-to",
+			path.Join(dir, "base.json"),
+			"--path",
+			dir,
+			"--format", "json",
+		}, &GoldenFileOptions{
+			IsJSON: true,
+		})
+}
