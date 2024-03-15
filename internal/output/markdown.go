@@ -4,6 +4,8 @@ import (
 	"bufio"
 	"bytes"
 	"embed"
+	"fmt"
+	"regexp"
 	"sort"
 	"strings"
 	"text/template"
@@ -20,7 +22,11 @@ import (
 var templatesFS embed.FS
 
 func formatMarkdownCostChange(currency string, pastCost, cost *decimal.Decimal, skipPlusMinus bool) string {
-	if pastCost != nil && pastCost.Equals(*cost) {
+	if pastCost == nil && cost == nil {
+		return "-"
+	}
+
+	if pastCost != nil && cost != nil && pastCost.Equals(*cost) {
 		return formatWholeDecimalCurrency(currency, decimal.Zero)
 	}
 
@@ -120,6 +126,8 @@ type MarkdownCtx struct {
 	Options                      Options
 	MarkdownOptions              MarkdownOptions
 	RunQuotaMsg                  string
+	UsageCostsMsg                string
+	CostDetailsMsg               string
 }
 
 // MarkdownOutput holds the message converted to markdown with additional
@@ -150,8 +158,18 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) (MarkdownO
 	bufw := bufio.NewWriter(&buf)
 
 	filename := "markdown-html.tmpl"
+	if out.Metadata.UsageApiEnabled {
+		// for now only show the new usage-costs-including comment if the usage api has been enabled
+		// once we have all the other usage cost stuff done this will replace the old comment template
+		filename = "markdown-html-usage-api.tmpl"
+	}
 	if markdownOpts.BasicSyntax {
 		filename = "markdown.tmpl"
+		if out.Metadata.UsageApiEnabled {
+			// for now only show the new usage-costs-including comment if the usage api has been enabled
+			// once we have all the other usage cost stuff done this will replace the old comment template
+			filename = "markdown-usage-api.tmpl"
+		}
 	}
 
 	runQuotaMsg, exceeded := out.Projects.IsRunQuotaExceeded()
@@ -290,6 +308,8 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) (MarkdownO
 		Options:                      opts,
 		MarkdownOptions:              markdownOpts,
 		RunQuotaMsg:                  runQuotaMsg,
+		UsageCostsMsg:                usageCostsMessage(out),
+		CostDetailsMsg:               costsDetailsMessage(out),
 	})
 	if err != nil {
 		return MarkdownOutput{}, err
@@ -322,4 +342,87 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) (MarkdownO
 
 func hasCodeChanges(options Options, project Project) bool {
 	return options.ShowOnlyChanges && project.Metadata.VCSCodeChanged != nil && *project.Metadata.VCSCodeChanged
+}
+
+var (
+	configFileDocsURL            = "https://www.infracost.io/docs/features/config_file/"
+	usageFileDocsURL             = "https://www.infracost.io/docs/features/usage_based_resources"
+	usageDefaultsDocsURL         = "https://www.infracost.io/docs/features/usage_based_resources"
+	usageDefaultsDashboardSuffix = "settings/usage-defaults"
+	cloudURLRegex                = regexp.MustCompile(`(https?://[^/]+/org/[^/]+/)`)
+)
+
+func usageCostsMessage(out Root) string {
+	usageDefaultsURL := determineUsageDefaultsURL(out)
+
+	if !out.Metadata.UsageApiEnabled {
+		return handleUsageApiDisabledMessage(out, usageDefaultsURL)
+	}
+
+	return handleUsageApiEnabledMessage(out, usageDefaultsURL)
+}
+
+func determineUsageDefaultsURL(out Root) string {
+	usageDefaultsURL := usageDefaultsDocsURL
+	match := cloudURLRegex.FindStringSubmatch(out.CloudURL)
+	if len(match) > 0 {
+		usageDefaultsURL = match[0] + usageDefaultsDashboardSuffix
+	}
+	return usageDefaultsURL
+}
+
+func handleUsageApiEnabledMessage(out Root, usageDefaultsURL string) string {
+	if out.Metadata.ConfigFilePath != "" {
+		return constructConfigFilePathMessage(out, usageDefaultsURL)
+	}
+
+	if out.Metadata.UsageFilePath != "" {
+		return fmt.Sprintf("*Usage costs were estimated by merging [usage defaults](%s) and values from [%s](%s).", usageDefaultsURL, usageFileDocsURL, out.Metadata.UsageFilePath)
+	}
+
+	return fmt.Sprintf("*Usage costs were estimated with [usage defaults](%s), which can also be [overridden](%s) in this repo.", usageDefaultsURL, usageFileDocsURL)
+}
+
+func constructConfigFilePathMessage(out Root, usageDefaultsURL string) string {
+	if out.Metadata.ConfigFileHasUsageFile {
+		return fmt.Sprintf("*Usage costs were estimated by merging [usage defaults](%s) and values from the [config files](%s).", usageDefaultsURL, configFileDocsURL)
+	}
+
+	return fmt.Sprintf("*Usage costs were estimated with [usage defaults](%s), which can also be overridden in the [config files](%s).", usageDefaultsURL, configFileDocsURL)
+}
+
+func handleUsageApiDisabledMessage(out Root, usageDefaultsURL string) string {
+	if out.Metadata.ConfigFilePath != "" {
+		if out.Metadata.ConfigFileHasUsageFile {
+			return fmt.Sprintf("*Usage costs were estimated using values from the [config files](%s).", configFileDocsURL)
+		}
+		return fmt.Sprintf("*Usage costs can be estimated by adding [usage defaults](%s) or [usage files](%s) in the config file.", usageDefaultsURL, usageFileDocsURL)
+	}
+
+	if out.Metadata.UsageFilePath != "" {
+		return fmt.Sprintf("*Usage costs were estimated using [%s](%s).", usageFileDocsURL, out.Metadata.UsageFilePath)
+	}
+
+	return fmt.Sprintf("*Usage costs can be estimated by adding [usage defaults](%s) or an [infracost-usage.yml](%s).", usageDefaultsURL, usageFileDocsURL)
+}
+
+func costsDetailsMessage(out Root) string {
+	var msgs []string
+
+	if out.Summary != nil && out.Summary.TotalUnsupportedResources != nil {
+		msgs = append(msgs, "unsupported resources")
+	}
+
+	for _, p := range out.Projects {
+		if len(p.Metadata.Errors) > 0 {
+			msgs = append(msgs, "skipped projects due to errors")
+			break
+		}
+	}
+
+	if len(msgs) == 0 {
+		return ""
+	}
+
+	return fmt.Sprintf("(includes details of %s)", strings.Join(msgs, " and "))
 }

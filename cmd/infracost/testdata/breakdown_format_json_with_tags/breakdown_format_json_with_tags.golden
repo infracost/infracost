@@ -576,7 +576,8 @@
           }
         ],
         "totalHourlyCost": "2.323691780821917777",
-        "totalMonthlyCost": "1696.295"
+        "totalMonthlyCost": "1696.295",
+        "totalMonthlyUsageCost": "0"
       },
       "breakdown": {
         "resources": [
@@ -1123,12 +1124,14 @@
           }
         ],
         "totalHourlyCost": "2.323691780821917777",
-        "totalMonthlyCost": "1696.295"
+        "totalMonthlyCost": "1696.295",
+        "totalMonthlyUsageCost": "0"
       },
       "diff": {
         "resources": [],
         "totalHourlyCost": "0",
-        "totalMonthlyCost": "0"
+        "totalMonthlyCost": "0",
+        "totalMonthlyUsageCost": "0"
       },
       "summary": {
         "totalDetectedResources": 10,
@@ -1145,10 +1148,13 @@
   ],
   "totalHourlyCost": "2.323691780821917777",
   "totalMonthlyCost": "1696.295",
+  "totalMonthlyUsageCost": "0",
   "pastTotalHourlyCost": "2.323691780821917777",
   "pastTotalMonthlyCost": "1696.295",
+  "pastTotalMonthlyUsageCost": "0",
   "diffTotalHourlyCost": "0",
   "diffTotalMonthlyCost": "0",
+  "diffTotalMonthlyUsageCost": "0",
   "timeGenerated": "REPLACED_TIME",
   "summary": {
     "totalDetectedResources": 10,

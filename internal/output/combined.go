@@ -239,10 +239,13 @@ func Combine(inputs []ReportInput) (Root, error) {
 	var lastestGeneratedAt time.Time
 	var totalHourlyCost *decimal.Decimal
 	var totalMonthlyCost *decimal.Decimal
+	var totalMonthlyUsageCost *decimal.Decimal
 	var pastTotalHourlyCost *decimal.Decimal
 	var pastTotalMonthlyCost *decimal.Decimal
+	var pastTotalMonthlyUsageCost *decimal.Decimal
 	var diffTotalHourlyCost *decimal.Decimal
 	var diffTotalMonthlyCost *decimal.Decimal
+	var diffTotalMonthlyUsageCost *decimal.Decimal
 
 	projects := make([]Project, 0)
 	summaries := make([]*Summary, 0, len(inputs))
@@ -280,6 +283,13 @@ func Combine(inputs []ReportInput) (Root, error) {
 
 			totalMonthlyCost = decimalPtr(totalMonthlyCost.Add(*input.Root.TotalMonthlyCost))
 		}
+		if input.Root.TotalMonthlyUsageCost != nil {
+			if totalMonthlyUsageCost == nil {
+				totalMonthlyUsageCost = decimalPtr(decimal.Zero)
+			}
+
+			totalMonthlyUsageCost = decimalPtr(totalMonthlyUsageCost.Add(*input.Root.TotalMonthlyUsageCost))
+		}
 		if input.Root.PastTotalHourlyCost != nil {
 			if pastTotalHourlyCost == nil {
 				pastTotalHourlyCost = decimalPtr(decimal.Zero)
@@ -294,6 +304,13 @@ func Combine(inputs []ReportInput) (Root, error) {
 
 			pastTotalMonthlyCost = decimalPtr(pastTotalMonthlyCost.Add(*input.Root.PastTotalMonthlyCost))
 		}
+		if input.Root.PastTotalMonthlyUsageCost != nil {
+			if pastTotalMonthlyUsageCost == nil {
+				pastTotalMonthlyUsageCost = decimalPtr(decimal.Zero)
+			}
+
+			pastTotalMonthlyUsageCost = decimalPtr(pastTotalMonthlyUsageCost.Add(*input.Root.PastTotalMonthlyUsageCost))
+		}
 		if input.Root.DiffTotalMonthlyCost != nil {
 			if diffTotalMonthlyCost == nil {
 				diffTotalMonthlyCost = decimalPtr(decimal.Zero)
@@ -301,7 +318,13 @@ func Combine(inputs []ReportInput) (Root, error) {
 
 			diffTotalMonthlyCost = decimalPtr(diffTotalMonthlyCost.Add(*input.Root.DiffTotalMonthlyCost))
 		}
+		if input.Root.DiffTotalMonthlyUsageCost != nil {
+			if diffTotalMonthlyUsageCost == nil {
+				diffTotalMonthlyUsageCost = decimalPtr(decimal.Zero)
+			}
 
+			diffTotalMonthlyUsageCost = decimalPtr(diffTotalMonthlyUsageCost.Add(*input.Root.DiffTotalMonthlyUsageCost))
+		}
 		if input.Root.DiffTotalHourlyCost != nil {
 			if diffTotalHourlyCost == nil {
 				diffTotalHourlyCost = decimalPtr(decimal.Zero)
@@ -323,10 +346,13 @@ func Combine(inputs []ReportInput) (Root, error) {
 	combined.Projects = projects
 	combined.TotalHourlyCost = totalHourlyCost
 	combined.TotalMonthlyCost = totalMonthlyCost
+	combined.TotalMonthlyUsageCost = totalMonthlyUsageCost
 	combined.PastTotalHourlyCost = pastTotalHourlyCost
 	combined.PastTotalMonthlyCost = pastTotalMonthlyCost
+	combined.PastTotalMonthlyUsageCost = pastTotalMonthlyUsageCost
 	combined.DiffTotalHourlyCost = diffTotalHourlyCost
 	combined.DiffTotalMonthlyCost = diffTotalMonthlyCost
+	combined.DiffTotalMonthlyUsageCost = diffTotalMonthlyUsageCost
 	combined.TimeGenerated = lastestGeneratedAt
 	combined.Summary = MergeSummaries(summaries)
 	combined.Metadata = metadata

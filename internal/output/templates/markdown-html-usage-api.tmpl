@@ -58,27 +58,46 @@ in project `{{ index .ProjectNames 0 }}`
   {{- range .MetadataFields }}
       <td>{{ truncateMiddle . 64 "..." }}</td>
   {{- end }}
-      <td>{{ formatCostChange .PastCost .Cost }}</td>
+      <td align="right">{{ formatCostChange .PastBaselineCost .BaselineCost }}</td>
+      <td align="right">{{ formatCostChange .PastUsageCost .UsageCost }}</td>
+      <td align="right">{{ formatCostChange .PastCost .Cost }}</td>
       <td align="right">{{ formatCost .Cost }}</td>
     </tr>
 {{- end}}
-<h3>Infracost report</h3>
-<h4>💰 {{ formatCostChangeSentence .Root.Currency .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost true }}</h4>
+<h4>💰 Infracost report</h4>
+<h4>{{ formatCostChangeSentence .Root.Currency .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost true }}</h4>
 {{- if displayTable  }}
 <table>
   <thead>
-    <td>Project</td>
+    <td>Changed project</td>
   {{- range metadataHeaders }}
     <td>{{ . }}</td>
   {{- end }}
-    <td>Cost change</td>
-    <td>New monthly cost</td>
+    <td><a href="https://www.infracost.io/docs/features/usage_based_resources/"
+           title="Baseline costs are consistent charges for provisioned resources, like the
+                  hourly cost for a virtual machine, which stays constant no matter how much
+                  it is used. Infracost estimates these resources assuming they are used for
+                  the whole month (730 hours).">Baseline costs</a></td>
+    <td><a href="https://www.infracost.io/docs/features/usage_based_resources/"
+           title="Usage costs are charges based on actual usage, like the storage cost for an
+                  object storage bucket. Infracost estimates these resources using the monthly
+                  usage values in the usage-file.">Usage costs</a>*</td>
+    <td>Total change</td>
+    <td>New monthly costs</td>
   </thead>
   {{- if gt (len .Root.Projects) 1  }}
   <tbody>
     {{- range .Root.Projects }}
       {{- if showProject . }}
-        {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
+        {{- template "summaryRow" dict
+                     "Name" .Name
+                     "MetadataFields" (. | metadataFields)
+                     "PastBaselineCost" .PastBreakdown.TotalMonthlyBaselineCost
+                     "BaselineCost" .Breakdown.TotalMonthlyBaselineCost
+                     "PastUsageCost" .PastBreakdown.TotalMonthlyUsageCost
+                     "UsageCost" .Breakdown.TotalMonthlyUsageCost
+                     "PastCost" .PastBreakdown.TotalMonthlyCost
+                     "Cost" .Breakdown.TotalMonthlyCost  }}
       {{- end }}
     {{- end }}
   </tbody>
@@ -86,16 +105,30 @@ in project `{{ index .ProjectNames 0 }}`
   {{- else }}
   <tbody>
   {{- range .Root.Projects }}
-    {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
+    {{- template "summaryRow" dict
+                 "Name" .Name
+                 "MetadataFields" (. | metadataFields)
+                 "PastBaselineCost" .PastBreakdown.TotalMonthlyBaselineCost
+                 "BaselineCost" .Breakdown.TotalMonthlyBaselineCost
+                 "PastUsageCost" .PastBreakdown.TotalMonthlyUsageCost
+                 "UsageCost" .Breakdown.TotalMonthlyUsageCost
+                 "PastCost" .PastBreakdown.TotalMonthlyCost
+                 "Cost" .Breakdown.TotalMonthlyCost  }}
   {{- end }}
   </tbody>
 </table>
+  {{- end }}
+  {{- if .UsageCostsMsg }}
+
+
+{{.UsageCostsMsg }}
   {{- end }}
 {{- end }}
 
 {{- if displayOutput  }}
 <details>
-<summary>Cost details</summary>
+
+<summary>Cost details {{ .CostDetailsMsg }}</summary>
 
 ```
 {{ .DiffOutput }}

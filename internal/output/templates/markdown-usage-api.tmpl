@@ -1,0 +1,119 @@
+{{- define "policyOutputTable" }}
+  {{- if or .Failure .Warning }}
+    {{ if .Failure }}
+### ❌ {{ .Name }} (needs action) ###
+    {{ else }}
+### ⚠️ {{ .Name }} (warning) ###
+    {{ end }}
+    {{ if .Message }}
+{{ .Message }}
+    {{ end }}
+    {{- range .Details }}
+> {{ . }}
+
+    {{ end}}
+    {{- range .ResourceDetails }}
+
+> **{{ .Address }}** {{- if .Path }} at `{{ .Path }}{{- if .Line }}:{{ .Line }}{{- end}}`{{- end}}
+      {{- range .Violations }}
+        {{- range .Details }}
+>
+> * {{ . }}
+        {{- end}}
+
+        {{- if gt (len .ProjectNames) 1 }}
+>
+> in projects `{{ stringsJoin .ProjectNames "`, `" }}`
+        {{- else }}
+>
+> in project `{{ index .ProjectNames 0 }}`
+        {{- end }}
+      {{- end}}
+    {{- end}}
+    {{- if .TruncatedCount }}
+
+> ... and {{ .TruncatedCount }} more. View in Infracost Cloud.</p>
+    {{- end}}
+  {{- end }}
+{{- end }}
+
+{{- define "summaryRow"}}
+| {{ truncateMiddle .Name 64 "..." }}{{- range .MetadataFields }} | {{ . }} {{- end }} | {{ formatCostChange .PastBaselineCost .BaselineCost }} | {{ formatCostChange .PastUsageCost .UsageCost }} | {{ formatCostChange .PastCost .Cost }} | {{ formatCost .Cost }} |
+{{- end }}
+
+#### 💰 Infracost report ####
+
+#### {{ formatCostChangeSentence .Root.Currency .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost false }} ####
+{{- if displayTable }}
+
+| **Changed project**{{- range metadataHeaders }} | **{{ . }}** {{- end }} | **[Baseline costs](## "Baseline costs are consistent charges for provisioned resources, like the hourly cost for a virtual machine, which stays constant no matter how much it is used. Infracost estimates these resources assuming they are used for the whole month (730 hours).")** | **[Usage costs](## "Usage costs are charges based on actual usage, like the storage cost for an object storage bucket. Infracost estimates these resources using the monthly usage values in the usage-file.")** | **Total change** | **New monthly cost** |
+| -----------{{- range metadataHeaders }} | ---------- {{- end }} | --------------: | --------------: | --------------: | --------------: |
+
+  {{- if gt (len .Root.Projects) 1  }}
+    {{- range .Root.Projects }}
+      {{- if showProject . }}
+        {{- template "summaryRow" dict
+                     "Name" .Name
+                     "MetadataFields" (. | metadataFields)
+                     "PastBaselineCost" .PastBreakdown.TotalMonthlyBaselineCost
+                     "BaselineCost" .Breakdown.TotalMonthlyBaselineCost
+                     "PastUsageCost" .PastBreakdown.TotalMonthlyUsageCost
+                     "UsageCost" .Breakdown.TotalMonthlyUsageCost
+                     "PastCost" .PastBreakdown.TotalMonthlyCost
+                     "Cost" .Breakdown.TotalMonthlyCost  }}
+      {{- end }}
+    {{- end }}
+  {{- else }}
+    {{- range .Root.Projects }}
+      {{- template "summaryRow" dict
+                   "Name" .Name
+                   "MetadataFields" (. | metadataFields)
+                   "PastBaselineCost" .PastBreakdown.TotalMonthlyBaselineCost
+                   "BaselineCost" .Breakdown.TotalMonthlyBaselineCost
+                   "PastUsageCost" .PastBreakdown.TotalMonthlyUsageCost
+                   "UsageCost" .Breakdown.TotalMonthlyUsageCost
+                   "PastCost" .PastBreakdown.TotalMonthlyCost
+                   "Cost" .Breakdown.TotalMonthlyCost  }}
+    {{- end }}
+  {{- end }}
+  {{- if .UsageCostsMsg }}
+
+{{.UsageCostsMsg }}
+  {{- end }}
+{{- end }}
+
+
+{{- if displayOutput  }}
+
+##### Cost details {{ .CostDetailsMsg }} #####
+
+```
+{{ .DiffOutput }}
+```
+{{- end }}
+
+{{- if gt (len .Options.PolicyOutput.Checks) 0 }}
+  {{- if or .Options.PolicyOutput.HasFailures .Options.PolicyOutput.HasWarnings }}
+    {{- if .Options.PolicyOutput.HasFailures }}
+## ❌ Policies failed (needs action) ##
+    {{- else }}
+## ⚠️ Policies warning ##
+    {{- end }}
+    {{- range .Options.PolicyOutput.Checks }}
+      {{- template "policyOutputTable" . }}
+    {{- end}}
+  {{- else }}
+## ✅ Policies passed ##
+  {{- end }}
+{{- end}}
+{{- if .MarkdownOptions.Additional }}
+
+{{ .MarkdownOptions.Additional }}
+{{- end }}
+{{- if .MarkdownOptions.WillUpdate }}
+
+This comment will be updated when code changes.
+{{- end }}
+{{- if .MarkdownOptions.WillReplace }}
+This comment will be replaced when code changes.
+{{- end }}

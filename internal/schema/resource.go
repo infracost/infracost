@@ -24,6 +24,7 @@ type Resource struct {
 	SubResources      []*Resource
 	HourlyCost        *decimal.Decimal
 	MonthlyCost       *decimal.Decimal
+	MonthlyUsageCost  *decimal.Decimal
 	IsSkipped         bool
 	NoPrice           bool
 	SkipMessage       string
@@ -44,6 +45,7 @@ func CalculateCosts(project *Project) {
 func (r *Resource) CalculateCosts() {
 	h := decimal.Zero
 	m := decimal.Zero
+	var monthlyUsageCost *decimal.Decimal
 	hasCost := false
 
 	for _, c := range r.CostComponents {
@@ -56,12 +58,18 @@ func (r *Resource) CalculateCosts() {
 		}
 		if c.MonthlyCost != nil {
 			m = m.Add(*c.MonthlyCost)
+			if c.UsageBased {
+				if monthlyUsageCost == nil {
+					monthlyUsageCost = &decimal.Zero
+				}
+				monthlyUsageCost = decimalPtr(monthlyUsageCost.Add(*c.MonthlyCost))
+			}
 		}
 	}
 
 	for _, s := range r.SubResources {
 		s.CalculateCosts()
-		if s.HourlyCost != nil || s.MonthlyCost != nil {
+		if s.HourlyCost != nil || s.MonthlyCost != nil || s.MonthlyUsageCost != nil {
 			hasCost = true
 		}
 		if s.HourlyCost != nil {
@@ -70,11 +78,18 @@ func (r *Resource) CalculateCosts() {
 		if s.MonthlyCost != nil {
 			m = m.Add(*s.MonthlyCost)
 		}
+		if s.MonthlyUsageCost != nil {
+			if monthlyUsageCost == nil {
+				monthlyUsageCost = &decimal.Zero
+			}
+			monthlyUsageCost = decimalPtr(monthlyUsageCost.Add(*s.MonthlyUsageCost))
+		}
 	}
 
 	if hasCost {
 		r.HourlyCost = &h
 		r.MonthlyCost = &m
+		r.MonthlyUsageCost = monthlyUsageCost
 	}
 	if r.NoPrice {
 		log.Debug().Msgf("Skipping free resource %s", r.Name)

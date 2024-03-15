@@ -153,7 +153,8 @@
           }
         ],
         "totalHourlyCost": "2.802630136986301358",
-        "totalMonthlyCost": "2045.92"
+        "totalMonthlyCost": "2045.92",
+        "totalMonthlyUsageCost": "0"
       },
       "breakdown": {
         "resources": [
@@ -223,7 +224,8 @@
           }
         ],
         "totalHourlyCost": "1.785315068493150679",
-        "totalMonthlyCost": "1303.28"
+        "totalMonthlyCost": "1303.28",
+        "totalMonthlyUsageCost": "0"
       },
       "diff": {
         "resources": [
@@ -234,6 +236,7 @@
             "metadata": {},
             "hourlyCost": "0.768",
             "monthlyCost": "560.64",
+            "monthlyUsageCost": "0",
             "costComponents": [
               {
                 "name": "Instance usage (Linux/UNIX, on-demand, m5.4xlarge → m5.8xlarge)",
@@ -251,6 +254,7 @@
             "metadata": {},
             "hourlyCost": "-1.785315068493150679",
             "monthlyCost": "-1303.28",
+            "monthlyUsageCost": "0",
             "costComponents": [
               {
                 "name": "Instance usage (Linux/UNIX, on-demand, m5.8xlarge)",
@@ -268,6 +272,7 @@
                 "metadata": {},
                 "hourlyCost": "-0.00684931506849315",
                 "monthlyCost": "-5",
+                "monthlyUsageCost": "0",
                 "costComponents": [
                   {
                     "name": "Storage (general purpose SSD, gp2)",
@@ -285,6 +290,7 @@
                 "metadata": {},
                 "hourlyCost": "-0.242465753424657529",
                 "monthlyCost": "-177",
+                "monthlyUsageCost": "0",
                 "costComponents": [
                   {
                     "name": "Storage (provisioned IOPS SSD, io1)",
@@ -310,7 +316,8 @@
           }
         ],
         "totalHourlyCost": "-1.017315068493150679",
-        "totalMonthlyCost": "-742.64"
+        "totalMonthlyCost": "-742.64",
+        "totalMonthlyUsageCost": "0"
       },
       "summary": {
         "totalDetectedResources": 1,
@@ -325,10 +332,13 @@
   ],
   "totalHourlyCost": "1.785315068493150679",
   "totalMonthlyCost": "1303.28",
+  "totalMonthlyUsageCost": "0",
   "pastTotalHourlyCost": "2.802630136986301358",
   "pastTotalMonthlyCost": "2045.92",
+  "pastTotalMonthlyUsageCost": "0",
   "diffTotalHourlyCost": "-1.017315068493150679",
   "diffTotalMonthlyCost": "-742.64",
+  "diffTotalMonthlyUsageCost": "0",
   "timeGenerated": "REPLACED_TIME",
   "summary": {
     "totalDetectedResources": 1,
