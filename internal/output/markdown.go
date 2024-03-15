@@ -344,44 +344,66 @@ func hasCodeChanges(options Options, project Project) bool {
 	return options.ShowOnlyChanges && project.Metadata.VCSCodeChanged != nil && *project.Metadata.VCSCodeChanged
 }
 
-var configFileDocsURL = "https://www.infracost.io/docs/features/config_file/"
-var usageFileDocsURL = "https://www.infracost.io/docs/features/usage_based_resources"
-var usageDefaultsDocsURL = "https://www.infracost.io/docs/features/usage_based_resources"
-var usageDefaultsDashboardSuffix = "settings/usage-defaults"
-var cloudURLRegex = regexp.MustCompile(`(https?://[^/]+/org/[^/]+/)`)
+var (
+	configFileDocsURL            = "https://www.infracost.io/docs/features/config_file/"
+	usageFileDocsURL             = "https://www.infracost.io/docs/features/usage_based_resources"
+	usageDefaultsDocsURL         = "https://www.infracost.io/docs/features/usage_based_resources"
+	usageDefaultsDashboardSuffix = "settings/usage-defaults"
+	cloudURLRegex                = regexp.MustCompile(`(https?://[^/]+/org/[^/]+/)`)
+)
 
 func usageCostsMessage(out Root) string {
+	usageDefaultsURL := determineUsageDefaultsURL(out)
+
+	if !out.Metadata.UsageApiEnabled {
+		return handleUsageApiDisabledMessage(out, usageDefaultsURL)
+	}
+
+	return handleUsageApiEnabledMessage(out, usageDefaultsURL)
+}
+
+func determineUsageDefaultsURL(out Root) string {
 	usageDefaultsURL := usageDefaultsDocsURL
 	match := cloudURLRegex.FindStringSubmatch(out.CloudURL)
 	if len(match) > 0 {
 		usageDefaultsURL = match[0] + usageDefaultsDashboardSuffix
 	}
+	return usageDefaultsURL
+}
 
-	if out.Metadata.UsageApiEnabled {
-		if out.Metadata.ConfigFilePath != "" {
-			if out.Metadata.ConfigFileHasUsageFile {
-				return fmt.Sprintf("*Usage costs were estimated by merging [usage defaults](%s) and values from the [config files](%s).", usageDefaultsURL, configFileDocsURL)
-			} else {
-				return fmt.Sprintf("*Usage costs were estimated with [usage defaults](%s), which can also be overridden in the [config files](%s).", usageDefaultsURL, configFileDocsURL)
-			}
-		} else if out.Metadata.UsageFilePath != "" {
-			return fmt.Sprintf("*Usage costs were estimated by merging [usage defaults](%s) and values from [%s](%s).", usageDefaultsURL, usageFileDocsURL, out.Metadata.UsageFilePath)
-		} else {
-			return fmt.Sprintf("*Usage costs were estimated with [usage defaults](%s), which can also be [overridden](%s) in this repo.", usageDefaultsURL, usageFileDocsURL)
-		}
-	} else {
-		if out.Metadata.ConfigFilePath != "" {
-			if out.Metadata.ConfigFileHasUsageFile {
-				return fmt.Sprintf("*Usage costs were estimated using values from the [config files](%s).", configFileDocsURL)
-			} else {
-				return fmt.Sprintf("*Usage costs can be estimated by adding [usage defaults](%s) or [usage files](%s) in the config file.", usageDefaultsURL, usageFileDocsURL)
-			}
-		} else if out.Metadata.UsageFilePath != "" {
-			return fmt.Sprintf("*Usage costs were estimated using [%s](%s).", usageFileDocsURL, out.Metadata.UsageFilePath)
-		} else {
-			return fmt.Sprintf("*Usage costs can be estimated by adding [usage defaults](%s) or an [infracost-usage.yml](%s).", usageDefaultsURL, usageFileDocsURL)
-		}
+func handleUsageApiEnabledMessage(out Root, usageDefaultsURL string) string {
+	if out.Metadata.ConfigFilePath != "" {
+		return constructConfigFilePathMessage(out, usageDefaultsURL)
 	}
+
+	if out.Metadata.UsageFilePath != "" {
+		return fmt.Sprintf("*Usage costs were estimated by merging [usage defaults](%s) and values from [%s](%s).", usageDefaultsURL, usageFileDocsURL, out.Metadata.UsageFilePath)
+	}
+
+	return fmt.Sprintf("*Usage costs were estimated with [usage defaults](%s), which can also be [overridden](%s) in this repo.", usageDefaultsURL, usageFileDocsURL)
+}
+
+func constructConfigFilePathMessage(out Root, usageDefaultsURL string) string {
+	if out.Metadata.ConfigFileHasUsageFile {
+		return fmt.Sprintf("*Usage costs were estimated by merging [usage defaults](%s) and values from the [config files](%s).", usageDefaultsURL, configFileDocsURL)
+	}
+
+	return fmt.Sprintf("*Usage costs were estimated with [usage defaults](%s), which can also be overridden in the [config files](%s).", usageDefaultsURL, configFileDocsURL)
+}
+
+func handleUsageApiDisabledMessage(out Root, usageDefaultsURL string) string {
+	if out.Metadata.ConfigFilePath != "" {
+		if out.Metadata.ConfigFileHasUsageFile {
+			return fmt.Sprintf("*Usage costs were estimated using values from the [config files](%s).", configFileDocsURL)
+		}
+		return fmt.Sprintf("*Usage costs can be estimated by adding [usage defaults](%s) or [usage files](%s) in the config file.", usageDefaultsURL, usageFileDocsURL)
+	}
+
+	if out.Metadata.UsageFilePath != "" {
+		return fmt.Sprintf("*Usage costs were estimated using [%s](%s).", usageFileDocsURL, out.Metadata.UsageFilePath)
+	}
+
+	return fmt.Sprintf("*Usage costs can be estimated by adding [usage defaults](%s) or an [infracost-usage.yml](%s).", usageDefaultsURL, usageFileDocsURL)
 }
 
 func costsDetailsMessage(out Root) string {
