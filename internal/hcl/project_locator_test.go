@@ -92,7 +92,7 @@ func TestEnvFileMatcher_EnvName(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			e := CreateEnvFileMatcher(tt.fields.envNames)
+			e := CreateEnvFileMatcher(tt.fields.envNames, nil)
 			assert.Equalf(t, tt.want, e.EnvName(tt.args.file), "EnvName(%v)", tt.args.file)
 		})
 	}

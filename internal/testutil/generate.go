@@ -75,8 +75,30 @@ func createFileWithContents(filePath string) error {
 		content = `include {
 	path = find_in_parent_folders()		
 }`
+	case "Jenkinsfile":
+		content = `
+pipeline {
+    agent any
+    options {
+        timeout(time: 1, unit: 'SECONDS')
+    }
+    stages {
+        stage('Example') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+    }
+}
+`
 	default:
 		content = ""
+	}
+
+	if strings.HasSuffix(filename, "-custom-ext") {
+		content = `
+instance_type = "m5.4xlarge"
+`
 	}
 
 	return os.WriteFile(filePath, []byte(content), 0600)
@@ -153,13 +175,7 @@ func buildFileSystemTree(lines []string, currentLine int, currentIndent int) (*f
 	}
 
 	node := &fileSystemNode{
-		name:  strings.TrimSpace(formattedLine),
-		isDir: filepath.Ext(line) == "" || formattedLine == ".",
-	}
-
-	// files cannot have children underneath them
-	if !node.isDir {
-		return node, nil
+		name: strings.TrimSpace(formattedLine),
 	}
 
 	nextIndent := indent + 1
@@ -177,5 +193,6 @@ func buildFileSystemTree(lines []string, currentLine int, currentIndent int) (*f
 		nextLine += len(child.children)
 	}
 
+	node.isDir = len(node.children) > 0
 	return node, nil
 }
