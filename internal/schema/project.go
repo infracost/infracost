@@ -48,6 +48,16 @@ type ProjectDiag struct {
 	FriendlyMessage string `json:"-"`
 }
 
+// IsEmptyPathTypeError checks if the error is a diag for an empty path type.
+func IsEmptyPathTypeError(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	var diag *ProjectDiag
+	return errors.As(err, &diag) && diag.Code == diagEmptyPathType
+}
+
 // NewEmptyPathTypeError returns a project diag to indicate that a path type
 // cannot be detected.
 func NewEmptyPathTypeError(err error) *ProjectDiag {

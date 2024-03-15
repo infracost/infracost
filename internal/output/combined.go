@@ -147,6 +147,14 @@ func CompareTo(c *config.Config, current, prior Root) (Root, error) {
 			}
 
 			for _, pastE := range v.Metadata.Errors {
+				if schema.IsEmptyPathTypeError(pastE) {
+					// If the error is a path type error we want to remove it from the metadata as
+					// this is normally indicative of a project that has been added. Thus the project
+					// path only appears in the current branch and so the baseline error is safe to
+					// be ignored.
+					continue
+				}
+
 				pastE.Message = "Diff baseline error: " + pastE.Message
 				scp.Metadata.Errors = append(scp.Metadata.Errors, pastE)
 			}
