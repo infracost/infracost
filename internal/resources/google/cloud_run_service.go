@@ -14,7 +14,7 @@ type CloudRunService struct {
 	Address string
 	Region  string
 	CpuLimit     int64
-	CpuMinScale  int64
+	CpuMinScale  float64
 	CpuThrottlingEnabled bool
 	MemoryLimit                   int64
 	MonthlyRequests     *int64 `infracost_usage:"monthly_requests"`
@@ -44,14 +44,17 @@ func (r *CloudRunService) PopulateUsage(u *schema.UsageData) {
 func (r *CloudRunService) BuildResource() *schema.Resource {
 	regionTier := getRegionTier(r.Region)
 	var cpuName string
+	var memoryName string
 	if regionTier == "Tier 2" {
 		cpuName  = "CPU Allocation Time (tier 2)"
+		memoryName = "Memory Allocation Time (tier 2)"
 	} else {
 		cpuName  = "CPU Allocation Time"
+		memoryName = "Memory Allocation Time"
 	}
 	var costComponents []*schema.CostComponent
 	if r.CpuThrottlingEnabled {
-		costComponents = r.throttlingEnabledCostComponent(cpuName)
+		costComponents = r.throttlingEnabledCostComponent(cpuName, memoryName)
 	} else {
 		costComponents = r.throttlingDisabledCostComponent()
 	}
@@ -62,7 +65,7 @@ func (r *CloudRunService) BuildResource() *schema.Resource {
 	}
 }
 
-func (r *CloudRunService) throttlingEnabledCostComponent(cpuName string) []*schema.CostComponent {
+func (r *CloudRunService) throttlingEnabledCostComponent(cpuName string, memoryName string) []*schema.CostComponent {
 	return []*schema.CostComponent{
 		{
 			Name:            cpuName,
@@ -80,7 +83,7 @@ func (r *CloudRunService) throttlingEnabledCostComponent(cpuName string) []*sche
 			},
 		},
 		{
-			Name:            "Memory Allocation Time (tier 2)",
+			Name:            memoryName,
 			Unit:            "GB-seconds",
 			UnitMultiplier:  decimal.NewFromInt(1), 
 			MonthlyQuantity: decimalPtr(r.calculateGBSeconds(true)),
@@ -90,7 +93,7 @@ func (r *CloudRunService) throttlingEnabledCostComponent(cpuName string) []*sche
 				Service:       strPtr("Cloud Run"),
 				ProductFamily: strPtr("ApplicationServices"),
 				AttributeFilters: []*schema.AttributeFilter{
-					{Key: "description", Value: strPtr("Memory Allocation Time (tier 2)")},
+					{Key: "description", Value: strPtr(memoryName)},
 				},
 			},
 		},
@@ -132,6 +135,21 @@ func (r *CloudRunService) throttlingDisabledCostComponent() []*schema.CostCompon
 				},
 			},
 		},
+		{
+			Name:            "Memory Allocation Time (Always-on)",
+			Unit:            "GB-seconds",
+			UnitMultiplier:  decimal.NewFromInt(1), 
+			MonthlyQuantity: decimalPtr(r.calculateGBSeconds(false)),
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("gcp"),
+				Region:        strPtr(r.Region),
+				Service:       strPtr("Cloud Run"),
+				ProductFamily: strPtr("ApplicationServices"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "description", Value: strPtr(fmt.Sprintf("Memory Allocation Time (Always-on CPU) in %s", r.Region))},
+				},
+			},
+		},
 	}
 }
 
@@ -142,9 +160,9 @@ func (r *CloudRunService) calculateCpuSeconds(throttlingEnabled bool) decimal.De
 		cpuSeconds = decimal.NewFromInt(*r.MonthlyRequests).Mul(requestDurationInSeconds).Div(decimal.NewFromInt(*r.ConcurrentRequestsPerInstance)).Mul(decimal.NewFromInt(r.CpuLimit))
 	} else {
 		if r.InstanceHrs != nil && *r.InstanceHrs > 0 {
-			cpuSeconds = decimal.NewFromInt(*r.InstanceHrs * 60 * 60).Mul(decimal.NewFromInt(r.CpuLimit))
+			cpuSeconds = decimal.NewFromInt(*r.InstanceHrs * 60 * 60).Mul(decimal.NewFromInt(r.CpuLimit)).Mul(decimal.NewFromFloat(r.CpuMinScale))
 		} else {
-			cpuSeconds = decimal.NewFromInt(r.CpuMinScale * (730 * 60 * 60)).Mul(decimal.NewFromInt(r.CpuLimit))
+			cpuSeconds = decimal.NewFromFloat(r.CpuMinScale * (730 * 60 * 60)).Mul(decimal.NewFromInt(r.CpuLimit))
 		}
 	}
 	return cpuSeconds
@@ -158,9 +176,9 @@ func (r *CloudRunService) calculateGBSeconds(throttlingEnabled bool) decimal.Dec
 		seconds = decimal.NewFromInt(*r.MonthlyRequests).Mul(requestDurationInSeconds).Div(decimal.NewFromInt(*r.ConcurrentRequestsPerInstance)).Mul(gb)
 	} else {
 		if r.InstanceHrs != nil && *r.InstanceHrs > 0 {
-			seconds = decimal.NewFromInt(*r.InstanceHrs * 60 * 60).Mul(decimal.NewFromInt(r.CpuLimit))
+			seconds = decimal.NewFromInt(*r.InstanceHrs * 60 * 60).Mul(gb).Mul(decimal.NewFromFloat(r.CpuMinScale))
 		} else {
-			seconds = decimal.NewFromInt(r.CpuMinScale * (730 * 60 * 60)).Mul(gb)
+			seconds = decimal.NewFromFloat(r.CpuMinScale * (730 * 60 * 60)).Mul(gb)
 		}
 	}
 	return seconds
