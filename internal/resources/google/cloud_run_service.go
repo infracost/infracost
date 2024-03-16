@@ -16,6 +16,7 @@ type CloudRunService struct {
 	CpuLimit     int64
 	CpuMinScale  int64
 	CpuThrottlingEnabled bool
+	MemoryLimit                   int64
 	MonthlyRequests     *int64 `infracost_usage:"monthly_requests"`
 	AverageRequestDurationMs *int64 `infracost_usage:"average_request_duration_ms"`
 	ConcurrentRequestsPerInstance  *int64 `infracost_usage:"concurrent_requests_per_instance"`
@@ -50,31 +51,9 @@ func (r *CloudRunService) BuildResource() *schema.Resource {
 	}
 	var costComponents []*schema.CostComponent
 	if r.CpuThrottlingEnabled {
-		costComponents = []*schema.CostComponent{
-			r.throttlingEnabledCostComponent(cpuName),
-			{
-				Name:            "Number of requests",
-				Unit:            "request",
-				UnitMultiplier:  decimal.NewFromInt(1), 
-				MonthlyQuantity: decimalPtr(decimal.NewFromInt(*r.MonthlyRequests)),
-				ProductFilter: &schema.ProductFilter{
-					VendorName:    strPtr("gcp"),
-					Region:        strPtr("global"),
-					Service:       strPtr("Cloud Run"),
-					ProductFamily: strPtr("ApplicationServices"),
-					AttributeFilters: []*schema.AttributeFilter{
-						{Key: "description", Value: strPtr("Requests")},
-					},
-				},
-				PriceFilter: &schema.PriceFilter{
-					StartUsageAmount: strPtr("2000000"),
-				},
-			},
-		}
+		costComponents = r.throttlingEnabledCostComponent(cpuName)
 	} else {
-		costComponents = []*schema.CostComponent{
-			r.throttlingDisabledCostComponent(),
-		}
+		costComponents = r.throttlingDisabledCostComponent()
 	}
 	return &schema.Resource{
 		Name:           r.Address,
@@ -83,36 +62,74 @@ func (r *CloudRunService) BuildResource() *schema.Resource {
 	}
 }
 
-func (r *CloudRunService) throttlingEnabledCostComponent(cpuName string) *schema.CostComponent {
-	return &schema.CostComponent{
-		Name:            cpuName,
-		Unit:            "vCPU-seconds",
-		UnitMultiplier:  decimal.NewFromInt(1), 
-		MonthlyQuantity: decimalPtr(r.calculateCpuSeconds(true)),
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("gcp"),
-			Region:        strPtr(r.Region),
-			Service:       strPtr("Cloud Run"),
-			ProductFamily: strPtr("ApplicationServices"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "description", Value: strPtr(cpuName)},
+func (r *CloudRunService) throttlingEnabledCostComponent(cpuName string) []*schema.CostComponent {
+	return []*schema.CostComponent{
+		{
+			Name:            cpuName,
+			Unit:            "vCPU-seconds",
+			UnitMultiplier:  decimal.NewFromInt(1), 
+			MonthlyQuantity: decimalPtr(r.calculateCpuSeconds(true)),
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("gcp"),
+				Region:        strPtr(r.Region),
+				Service:       strPtr("Cloud Run"),
+				ProductFamily: strPtr("ApplicationServices"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "description", Value: strPtr(cpuName)},
+				},
 			},
 		},
+		{
+			Name:            "Memory Allocation Time (tier 2)",
+			Unit:            "GB-seconds",
+			UnitMultiplier:  decimal.NewFromInt(1), 
+			MonthlyQuantity: decimalPtr(r.calculateGBSeconds(true)),
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("gcp"),
+				Region:        strPtr(r.Region),
+				Service:       strPtr("Cloud Run"),
+				ProductFamily: strPtr("ApplicationServices"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "description", Value: strPtr("Memory Allocation Time (tier 2)")},
+				},
+			},
+		},
+		{
+			Name:            "Number of requests",
+			Unit:            "request",
+			UnitMultiplier:  decimal.NewFromInt(1), 
+			MonthlyQuantity: decimalPtr(decimal.NewFromInt(*r.MonthlyRequests)),
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("gcp"),
+				Region:        strPtr("global"),
+				Service:       strPtr("Cloud Run"),
+				ProductFamily: strPtr("ApplicationServices"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "description", Value: strPtr("Requests")},
+				},
+			},
+			PriceFilter: &schema.PriceFilter{
+				StartUsageAmount: strPtr("2000000"),
+			},
+		},
+		
 	}
 }
-func (r *CloudRunService) throttlingDisabledCostComponent() *schema.CostComponent {
-	return &schema.CostComponent{
-		Name:            "CPU Allocation Time (Always-on)",
-		Unit:            "vCPU-seconds",
-		UnitMultiplier:  decimal.NewFromInt(1),
-		MonthlyQuantity: decimalPtr(r.calculateCpuSeconds(false)),
-		ProductFilter: &schema.ProductFilter{
-			VendorName:    strPtr("gcp"),
-			Region:        strPtr(r.Region),
-			Service:       strPtr("Cloud Run"),
-			ProductFamily: strPtr("ApplicationServices"),
-			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "description", Value: strPtr(fmt.Sprintf("CPU Allocation Time (Always-on CPU) in %s", r.Region))},
+func (r *CloudRunService) throttlingDisabledCostComponent() []*schema.CostComponent {
+	return []*schema.CostComponent{
+		{
+			Name:            "CPU Allocation Time (Always-on)",
+			Unit:            "vCPU-seconds",
+			UnitMultiplier:  decimal.NewFromInt(1),
+			MonthlyQuantity: decimalPtr(r.calculateCpuSeconds(false)),
+			ProductFilter: &schema.ProductFilter{
+				VendorName:    strPtr("gcp"),
+				Region:        strPtr(r.Region),
+				Service:       strPtr("Cloud Run"),
+				ProductFamily: strPtr("ApplicationServices"),
+				AttributeFilters: []*schema.AttributeFilter{
+					{Key: "description", Value: strPtr(fmt.Sprintf("CPU Allocation Time (Always-on CPU) in %s", r.Region))},
+				},
 			},
 		},
 	}
@@ -131,6 +148,22 @@ func (r *CloudRunService) calculateCpuSeconds(throttlingEnabled bool) decimal.De
 		}
 	}
 	return cpuSeconds
+}
+
+func (r *CloudRunService) calculateGBSeconds(throttlingEnabled bool) decimal.Decimal {
+	var seconds decimal.Decimal
+	gb := decimal.NewFromInt(r.MemoryLimit).Div(decimal.NewFromInt(1024 * 1024 * 1024))
+	if throttlingEnabled {
+		requestDurationInSeconds := decimal.NewFromInt(*r.AverageRequestDurationMs).Div(decimal.NewFromInt(1000))
+		seconds = decimal.NewFromInt(*r.MonthlyRequests).Mul(requestDurationInSeconds).Div(decimal.NewFromInt(*r.ConcurrentRequestsPerInstance)).Mul(gb)
+	} else {
+		if r.InstanceHrs != nil && *r.InstanceHrs > 0 {
+			seconds = decimal.NewFromInt(*r.InstanceHrs * 60 * 60).Mul(decimal.NewFromInt(r.CpuLimit))
+		} else {
+			seconds = decimal.NewFromInt(r.CpuMinScale * (730 * 60 * 60)).Mul(gb)
+		}
+	}
+	return seconds
 }
 
 func getRegionTier(region string) string {

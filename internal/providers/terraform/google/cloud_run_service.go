@@ -3,6 +3,7 @@ package google
 import (
 	"github.com/infracost/infracost/internal/resources/google"
 	"github.com/infracost/infracost/internal/schema"
+	"k8s.io/apimachinery/pkg/api/resource"
 )
 
 func getCloudRunServiceRegistryItem() *schema.RegistryItem {
@@ -29,12 +30,21 @@ func newCloudRunService(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 	if val, ok := limits["cpu"]; ok {
 		cpu = int64(val.Float())
 	}
+
+	memory := int64(512)
+	if val, ok := limits["memory"]; ok {
+		parseMemory, err := resource.ParseQuantity(val.String())
+		if err == nil {
+			memory = parseMemory.Value() // bytes
+		}
+	}
 	r := &google.CloudRunService{
 		Address: d.Address,
 		Region:  region,
 		CpuLimit: cpu,
 		CpuMinScale : minScale,
 		CpuThrottlingEnabled: cpuThrottling,
+		MemoryLimit: memory,
 	}
 	r.PopulateUsage(u)
 	return r.BuildResource()
