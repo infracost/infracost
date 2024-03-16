@@ -1,10 +1,11 @@
 package google
 
 import (
+	"fmt"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/shopspring/decimal"
-	"fmt"
 )
 
 // Resource information: https://registry.terraform.io/providers/hashicorp/google/latest/docs/resources/cloud_run_service
@@ -50,12 +51,12 @@ func (r *CloudRunService) BuildResource() *schema.Resource {
 	var costComponents []*schema.CostComponent
 	if r.CpuThrottlingEnabled {
 		costComponents = []*schema.CostComponent{
-			r.throttlingEnabledCostComponent(cpuName, regionTier),
+			r.throttlingEnabledCostComponent(cpuName),
 			{
 				Name:            "Number of requests",
 				Unit:            "request",
 				UnitMultiplier:  decimal.NewFromInt(1), 
-				MonthlyQuantity: decimalPtr(r.calculateNoOfRequests(*r.MonthlyRequests)),
+				MonthlyQuantity: decimalPtr(decimal.NewFromInt(*r.MonthlyRequests)),
 				ProductFilter: &schema.ProductFilter{
 					VendorName:    strPtr("gcp"),
 					Region:        strPtr("global"),
@@ -82,7 +83,7 @@ func (r *CloudRunService) BuildResource() *schema.Resource {
 	}
 }
 
-func (r *CloudRunService) throttlingEnabledCostComponent(cpuName string, regionTier string) *schema.CostComponent {
+func (r *CloudRunService) throttlingEnabledCostComponent(cpuName string) *schema.CostComponent {
 	return &schema.CostComponent{
 		Name:            cpuName,
 		Unit:            "vCPU-seconds",

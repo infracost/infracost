@@ -27,7 +27,7 @@ resource "google_cloud_run_service" "throttling_enabled" {
 }
 resource "google_cloud_run_service" "throttling_disabled" {
   name     = "cloud-run-service-test"
-  location = "us-central1"
+  location = "europe-west3"
   template {
     spec {
       containers {
