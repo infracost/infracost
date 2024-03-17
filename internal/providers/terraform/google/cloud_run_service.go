@@ -14,7 +14,7 @@ func getCloudRunServiceRegistryItem() *schema.RegistryItem {
 }
 
 func newCloudRunService(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
-	region := d.Get("region").String()
+	region := d.Get("location").String()
 	cpuThrottling := true
 	minScale := float64(0.5)
 	annotations := d.Get("metadata.0.annotations").Map()
