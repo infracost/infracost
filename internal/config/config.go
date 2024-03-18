@@ -39,10 +39,10 @@ type AutodetectConfig struct {
 	// Terragrunt and Terraform and we want to force the project type to be one or
 	// the other.
 	ForceProjectType string `yaml:"force_project_type,omitempty" ignored:"true"`
-	// EnvVarExtensions is a list of suffixes that should be used to group terraform
+	// TerraformVarFileExtensions is a list of suffixes that should be used to group terraform
 	// var files. This is useful when there are non-standard terraform var file
 	// names which use different extensions.
-	EnvVarExtensions []string `yaml:"env_var_extensions,omitempty" ignored:"true"`
+	TerraformVarFileExtensions []string `yaml:"terraform_var_file_extensions,omitempty" ignored:"true"`
 }
 
 type PathOverride struct {

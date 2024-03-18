@@ -218,31 +218,31 @@ type ProjectLocator struct {
 	envMatcher         *EnvFileMatcher
 	skip               bool
 
-	shouldSkipDir          func(string) bool
-	shouldIncludeDir       func(string) bool
-	pathOverrides          []pathOverride
-	wdContainsTerragrunt   bool
-	fallbackToIncludePaths bool
-	maxConfiguredDepth     int
-	forceProjectType       string
-	envVarExtensions       []string
-	hclParser              *hclparse.Parser
-	hasCustomEnvExt        bool
+	shouldSkipDir             func(string) bool
+	shouldIncludeDir          func(string) bool
+	pathOverrides             []pathOverride
+	wdContainsTerragrunt      bool
+	fallbackToIncludePaths    bool
+	maxConfiguredDepth        int
+	forceProjectType          string
+	teraformVarFileExtensions []string
+	hclParser                 *hclparse.Parser
+	hasCustomEnvExt           bool
 }
 
 // ProjectLocatorConfig provides configuration options on how the locator functions.
 type ProjectLocatorConfig struct {
-	ExcludedDirs           []string
-	ChangedObjects         []string
-	UseAllPaths            bool
-	SkipAutoDetection      bool
-	IncludedDirs           []string
-	EnvNames               []string
-	PathOverrides          []PathOverrideConfig
-	FallbackToIncludePaths bool
-	MaxSearchDepth         int
-	ForceProjectType       string
-	EnvVarExtensions       []string
+	ExcludedDirs               []string
+	ChangedObjects             []string
+	UseAllPaths                bool
+	SkipAutoDetection          bool
+	IncludedDirs               []string
+	EnvNames                   []string
+	PathOverrides              []PathOverrideConfig
+	FallbackToIncludePaths     bool
+	MaxSearchDepth             int
+	ForceProjectType           string
+	TerraformVarFileExtensions []string
 }
 
 type PathOverrideConfig struct {
@@ -280,9 +280,9 @@ func NewProjectLocator(logger zerolog.Logger, config *ProjectLocatorConfig) *Pro
 	matcher := CreateEnvFileMatcher(nil, nil)
 	if config != nil {
 		extensions := defaultExtensions
-		if config.EnvVarExtensions != nil {
-			extensions = config.EnvVarExtensions
-			matcher = CreateEnvFileMatcher(config.EnvNames, config.EnvVarExtensions)
+		if config.TerraformVarFileExtensions != nil {
+			extensions = config.TerraformVarFileExtensions
+			matcher = CreateEnvFileMatcher(config.EnvNames, config.TerraformVarFileExtensions)
 		} else {
 			matcher = CreateEnvFileMatcher(config.EnvNames, nil)
 		}
@@ -311,21 +311,21 @@ func NewProjectLocator(logger zerolog.Logger, config *ProjectLocatorConfig) *Pro
 			shouldIncludeDir: func(s string) bool {
 				return false
 			},
-			fallbackToIncludePaths: config.FallbackToIncludePaths,
-			forceProjectType:       config.ForceProjectType,
-			envVarExtensions:       extensions,
-			hclParser:              hclparse.NewParser(),
-			hasCustomEnvExt:        len(config.EnvVarExtensions) > 0,
+			fallbackToIncludePaths:    config.FallbackToIncludePaths,
+			forceProjectType:          config.ForceProjectType,
+			teraformVarFileExtensions: extensions,
+			hclParser:                 hclparse.NewParser(),
+			hasCustomEnvExt:           len(config.TerraformVarFileExtensions) > 0,
 		}
 	}
 
 	return &ProjectLocator{
-		modules:            make(map[string]struct{}),
-		discoveredVarFiles: make(map[string][]RootPathVarFile),
-		logger:             logger,
-		envMatcher:         matcher,
-		envVarExtensions:   defaultExtensions,
-		hclParser:          hclparse.NewParser(),
+		modules:                   make(map[string]struct{}),
+		discoveredVarFiles:        make(map[string][]RootPathVarFile),
+		logger:                    logger,
+		envMatcher:                matcher,
+		teraformVarFileExtensions: defaultExtensions,
+		hclParser:                 hclparse.NewParser(),
 	}
 }
 
@@ -1373,7 +1373,7 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) {
 }
 
 func (p *ProjectLocator) isTerraformVarFile(name string, fullPath string) bool {
-	for _, envExt := range p.envVarExtensions {
+	for _, envExt := range p.teraformVarFileExtensions {
 		// if we have custom extensions enabled in the autodetect configuration we need
 		// to match the exact extension of the file to the custom env var extension. This
 		// is so that when we have a custom extension that specifies no extension e.g.
