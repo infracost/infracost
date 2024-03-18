@@ -123,6 +123,7 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 			detectedProjects[i] = template.DetectedProject{
 				Name:              p.ProjectName(),
 				Path:              relPath,
+				Env:               p.EnvName(),
 				TerraformVarFiles: p.TerraformVarFiles(),
 			}
 
