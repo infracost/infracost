@@ -137,19 +137,19 @@ func TestOutputFormatAzureReposCommentNoChange(t *testing.T) {
 }
 
 func TestOutputFormatSlackMessage(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--format", "slack-message", "--path", "./testdata/example_out.json", "--path", "./testdata/terraform_v0.14_breakdown.json", "--path", "./testdata/terraform_v0.14_nochange_breakdown.json"}, nil)
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--format", "slack-message", "--path", "./testdata/example_out.json", "--path", "./testdata/terraform_v0.14_breakdown.json", "--path", "./testdata/terraform_v0.14_nochange_breakdown.json"}, &GoldenFileOptions{IsJSON: true})
 }
 
 func TestOutputFormatSlackMessageMultipleSkipped(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--format", "slack-message", "--path", "./testdata/example_out.json", "--path", "./testdata/terraform_v0.14_breakdown.json", "--path", "./testdata/terraform_v0.14_nochange_breakdown.json", "--path", "./testdata/terraform_v0.14_nochange_breakdown.json"}, nil)
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--format", "slack-message", "--path", "./testdata/example_out.json", "--path", "./testdata/terraform_v0.14_breakdown.json", "--path", "./testdata/terraform_v0.14_nochange_breakdown.json", "--path", "./testdata/terraform_v0.14_nochange_breakdown.json"}, &GoldenFileOptions{IsJSON: true})
 }
 
 func TestOutputFormatSlackMessageNoChange(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--format", "slack-message", "--path", "./testdata/terraform_v0.14_nochange_breakdown.json"}, nil)
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--format", "slack-message", "--path", "./testdata/terraform_v0.14_nochange_breakdown.json"}, &GoldenFileOptions{IsJSON: true})
 }
 
 func TestOutputFormatSlackMessageMoreProjects(t *testing.T) {
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--format", "slack-message", "--path", "./testdata/example_out.json", "--path", "./testdata/example_out.json", "--path", "./testdata/example_out.json", "--path", "./testdata/example_out.json", "--path", "./testdata/example_out.json", "--path", "./testdata/example_out.json", "--path", "./testdata/example_out.json"}, nil)
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--format", "slack-message", "--path", "./testdata/example_out.json", "--path", "./testdata/example_out.json", "--path", "./testdata/example_out.json", "--path", "./testdata/example_out.json", "--path", "./testdata/example_out.json", "--path", "./testdata/example_out.json", "--path", "./testdata/example_out.json"}, &GoldenFileOptions{IsJSON: true})
 }
 
 func TestOutputFormatTable(t *testing.T) {
