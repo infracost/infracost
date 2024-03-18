@@ -60,16 +60,17 @@ func Detect(ctx *config.RunContext, project *config.Project, includePastResource
 	}
 
 	locatorConfig := &hcl.ProjectLocatorConfig{
-		ExcludedDirs:           append(project.ExcludePaths, ctx.Config.Autodetect.ExcludeDirs...),
-		IncludedDirs:           ctx.Config.Autodetect.IncludeDirs,
-		PathOverrides:          pathOverrides,
-		EnvNames:               ctx.Config.Autodetect.EnvNames,
-		ChangedObjects:         ctx.VCSMetadata.Commit.ChangedObjects,
-		UseAllPaths:            project.IncludeAllPaths,
-		SkipAutoDetection:      project.SkipAutodetect,
-		FallbackToIncludePaths: ctx.IsAutoDetect(),
-		MaxSearchDepth:         ctx.Config.Autodetect.MaxSearchDepth,
-		ForceProjectType:       ctx.Config.Autodetect.ForceProjectType,
+		ExcludedDirs:               append(project.ExcludePaths, ctx.Config.Autodetect.ExcludeDirs...),
+		IncludedDirs:               ctx.Config.Autodetect.IncludeDirs,
+		PathOverrides:              pathOverrides,
+		EnvNames:                   ctx.Config.Autodetect.EnvNames,
+		ChangedObjects:             ctx.VCSMetadata.Commit.ChangedObjects,
+		UseAllPaths:                project.IncludeAllPaths,
+		SkipAutoDetection:          project.SkipAutodetect,
+		FallbackToIncludePaths:     ctx.IsAutoDetect(),
+		MaxSearchDepth:             ctx.Config.Autodetect.MaxSearchDepth,
+		ForceProjectType:           ctx.Config.Autodetect.ForceProjectType,
+		TerraformVarFileExtensions: ctx.Config.Autodetect.TerraformVarFileExtensions,
 	}
 	pl := hcl.NewProjectLocator(logging.Logger, locatorConfig)
 	rootPaths := pl.FindRootModules(project.Path)

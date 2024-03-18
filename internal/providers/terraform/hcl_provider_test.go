@@ -201,7 +201,7 @@ func TestHCLProvider_LoadPlanJSON(t *testing.T) {
 
 			parser := hcl.NewParser(
 				mods[0],
-				hcl.CreateEnvFileMatcher([]string{}),
+				hcl.CreateEnvFileMatcher([]string{}, nil),
 				modules.NewModuleLoader(testPath, moduleParser, nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}),
 				logger,
 				options...,
