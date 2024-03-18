@@ -177,6 +177,10 @@ func (p *HCLProvider) ProjectName() string {
 	return p.Parser.ProjectName()
 }
 
+func (p *HCLProvider) EnvName() string {
+	return p.Parser.EnvName()
+}
+
 func (p *HCLProvider) RelativePath() string {
 	return p.Parser.RelativePath()
 }

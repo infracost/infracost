@@ -266,6 +266,7 @@ func OptionGraphEvaluator() Option {
 
 type DetectedProject interface {
 	ProjectName() string
+	EnvName() string
 	RelativePath() string
 	TerraformVarFiles() []string
 	YAML() string
@@ -489,6 +490,15 @@ func (p *Parser) ProjectName() string {
 	}
 
 	return name
+}
+
+// EnvName returns the module suffix of the parser (normally the environment name).
+func (p *Parser) EnvName() string {
+	if p.moduleSuffix != "" {
+		return p.moduleSuffix
+	}
+
+	return p.ProjectName()
 }
 
 // TerraformVarFiles returns the list of terraform var files that the parser

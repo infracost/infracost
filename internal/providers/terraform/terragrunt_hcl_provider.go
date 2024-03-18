@@ -177,6 +177,10 @@ func (p *TerragruntHCLProvider) ProjectName() string {
 	return ""
 }
 
+func (p *TerragruntHCLProvider) EnvName() string {
+	return ""
+}
+
 func (p *TerragruntHCLProvider) RelativePath() string {
 	r, err := filepath.Rel(p.Path.RepoPath, p.Path.Path)
 	if err != nil {
