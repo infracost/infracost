@@ -426,7 +426,7 @@ func handleUsageApiDisabledMessage(out Root, useMarkdownLinks bool) string {
 func costsDetailsMessage(out Root) string {
 	var msgs []string
 
-	if out.Summary != nil && out.Summary.TotalUnsupportedResources != nil {
+	if out.Summary != nil && out.Summary.TotalUnsupportedResources != nil && *out.Summary.TotalUnsupportedResources > 0 {
 		msgs = append(msgs, "unsupported resources")
 	}
 
