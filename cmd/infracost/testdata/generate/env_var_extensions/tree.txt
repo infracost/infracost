@@ -7,5 +7,6 @@
     ├── baz-custom-ext
     ├── Jenkinsfile
     ├── dev.tfvars
+    ├── common.tfvars.json
     ├── prod-custom-ext
     └── default.tfvars

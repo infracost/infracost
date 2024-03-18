@@ -5,36 +5,42 @@ projects:
     name: apps-bar-baz
     terraform_var_files:
       - ../default.tfvars
+      - ../common.tfvars.json
       - ../baz-custom-ext
     skip_autodetect: true
   - path: apps/bar
     name: apps-bar-dev
     terraform_var_files:
       - ../default.tfvars
+      - ../common.tfvars.json
       - ../dev.tfvars
     skip_autodetect: true
   - path: apps/bar
     name: apps-bar-prod
     terraform_var_files:
       - ../default.tfvars
+      - ../common.tfvars.json
       - ../prod-custom-ext
     skip_autodetect: true
   - path: apps/foo
     name: apps-foo-baz
     terraform_var_files:
       - ../default.tfvars
+      - ../common.tfvars.json
       - ../baz-custom-ext
     skip_autodetect: true
   - path: apps/foo
     name: apps-foo-dev
     terraform_var_files:
       - ../default.tfvars
+      - ../common.tfvars.json
       - ../dev.tfvars
     skip_autodetect: true
   - path: apps/foo
     name: apps-foo-prod
     terraform_var_files:
       - ../default.tfvars
+      - ../common.tfvars.json
       - ../prod-custom-ext
     skip_autodetect: true
 
