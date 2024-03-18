@@ -101,6 +101,14 @@ instance_type = "m5.4xlarge"
 `
 	}
 
+	if strings.HasSuffix(filename, ".tfvars.json") {
+		content = `
+{
+  "region": "us-west-2"
+}
+`
+	}
+
 	return os.WriteFile(filePath, []byte(content), 0600)
 }
 

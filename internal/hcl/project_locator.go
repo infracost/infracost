@@ -1379,6 +1379,12 @@ func (p *ProjectLocator) isTerraformVarFile(name string, fullPath string) bool {
 		// is so that when we have a custom extension that specifies no extension e.g.
 		// "", this doesn't match all files (as it would with strings.HasSuffix).
 		if p.hasCustomEnvExt {
+			// first check if the file has a default var file extension
+			// if it does we can skip the custom extension check.
+			if hasDefaultVarFileExtension(name) {
+				return true
+			}
+
 			fileExt := fullExtension(name)
 			if fileExt == envExt {
 				// if we have custom extensions enabled in the autodetect configuration we need
@@ -1409,6 +1415,16 @@ func (p *ProjectLocator) isTerraformVarFile(name string, fullPath string) bool {
 	// we also check for tfvars.json files as these are non-standard naming
 	// conventions which are used by some projects.
 	return strings.HasPrefix(name, "tfvars") && strings.HasSuffix(name, ".json")
+}
+
+func hasDefaultVarFileExtension(name string) bool {
+	for _, extension := range defaultExtensions {
+		if strings.HasSuffix(name, extension) {
+			return true
+		}
+	}
+
+	return false
 }
 
 // fullExtension returns the full extension of a file, starting from the first
