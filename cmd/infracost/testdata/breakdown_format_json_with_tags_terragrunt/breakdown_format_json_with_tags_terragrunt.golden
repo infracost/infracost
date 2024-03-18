@@ -1,0 +1,28 @@
+{
+  "projects": [
+    {
+      "breakdown": {
+        "resources": [
+          {
+            "name": "aws_sqs_queue.sqs_noTags",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
+            }
+          },
+          {
+            "name": "aws_sqs_queue.sqs_withTags",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "sqs-def",
+              "ResourceTag": "sqs-hi"
+            }
+          }
+        ]
+      },
+      "name": "infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags_terragrunt"
+    }
+  ]
+}
+Err:
+
