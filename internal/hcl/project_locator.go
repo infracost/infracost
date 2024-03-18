@@ -1374,21 +1374,34 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) {
 
 func (p *ProjectLocator) isTerraformVarFile(name string, fullPath string) bool {
 	for _, envExt := range p.envVarExtensions {
-		fileExt := fullExtension(name)
-		if fileExt == envExt {
-			// if we have custom extensions enabled in the autodetect configuration we need
-			// to make sure that this file is a valid HCL file before we add it to the list
-			// of discovered var files. This is because we can have collisions with custom
-			// env var extensions and other files that are not valid HCL files. e.g. with an
-			// empty/wildcard extension we could match a file called "tfvars" and also
-			// "Jenkinsfile", the latter being a non-HCL file.
-			if p.hasCustomEnvExt {
+		// if we have custom extensions enabled in the autodetect configuration we need
+		// to match the exact extension of the file to the custom env var extension. This
+		// is so that when we have a custom extension that specifies no extension e.g.
+		// "", this doesn't match all files (as it would with strings.HasSuffix).
+		if p.hasCustomEnvExt {
+			fileExt := fullExtension(name)
+			if fileExt == envExt {
+				// if we have custom extensions enabled in the autodetect configuration we need
+				// to make sure that this file is a valid HCL file before we add it to the list
+				// of discovered var files. This is because we can have collisions with custom
+				// env var extensions and other files that are not valid HCL files. e.g. with an
+				// empty/wildcard extension we could match a file called "tfvars" and also
+				// "Jenkinsfile", the latter being a non-HCL file.
 				_, d := p.hclParser.ParseHCLFile(fullPath)
 				if d != nil {
 					continue
 				}
+
+				return true
 			}
 
+			continue
+		}
+
+		// default back to the standard suffix matching if we don't have custom
+		// extensions this means we can flexibly match extensions that might appear
+		// outside the norm. e.g. prod.env.tfvars
+		if strings.HasSuffix(name, envExt) {
 			return true
 		}
 	}
