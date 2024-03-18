@@ -15,6 +15,18 @@ import (
 func ToTable(out Root, opts Options) ([]byte, error) {
 	var tableLen int
 
+	hasUsageFootnote := false
+	// for now only show the usage foornote if the usage api is enabled. once we have all the other usage cost
+	// stuff done this check will be removed
+	if out.Metadata.UsageApiEnabled {
+		for _, f := range opts.Fields {
+			if f == "monthlyQuantity" || f == "hourlyCost" || f == "monthlyCost" {
+				hasUsageFootnote = true
+				break
+			}
+		}
+	}
+
 	s := ""
 
 	// Don't show the project total if there's only one project result
@@ -40,11 +52,18 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 				s += "\n"
 			}
 		} else {
-			tableOut := tableForBreakdown(out.Currency, *project.Breakdown, opts.Fields, includeProjectTotals)
+			fields := opts.Fields
+			if hasUsageFootnote {
+				fields = append(fields, "usageFootnote")
+			}
+			tableOut := tableForBreakdown(out.Currency, *project.Breakdown, fields, includeProjectTotals)
 
 			// Get the last table length so we can align the overall total with it
 			if i == len(out.Projects)-1 {
 				tableLen = len(ui.StripColor(strings.SplitN(tableOut, "\n", 2)[0]))
+				if hasUsageFootnote {
+					tableLen -= 3
+				}
 			}
 
 			s += tableOut
@@ -73,6 +92,12 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 		ui.BoldString(overallTitle),
 		fmt.Sprintf("%*s ", padding, totalOut), // pad based on the last line length
 	)
+
+	if hasUsageFootnote {
+		s += "\n\n"
+		s += usageCostsMessage(out, false)
+		s += "\n"
+	}
 
 	summaryMsg := out.summaryMessage(opts.ShowSkipped)
 
@@ -172,6 +197,16 @@ func tableForBreakdown(currency string, breakdown Breakdown, fields []string, in
 			Number:      i,
 			Align:       text.AlignRight,
 			AlignHeader: text.AlignRight,
+		})
+		i++
+	}
+
+	if contains(fields, "usageFootnote") {
+		headers = append(headers, "")
+		columns = append(columns, table.ColumnConfig{
+			Number:      i,
+			Align:       text.AlignLeft,
+			AlignHeader: text.AlignLeft,
 		})
 		i++
 	}
@@ -277,6 +312,12 @@ func buildCostComponentRows(t table.Writer, currency string, costComponents []Co
 				tableRow = append(tableRow, FormatCost2DP(currency, c.MonthlyCost))
 			}
 
+			if contains(fields, "usageFootnote") {
+				if c.UsageBased {
+					tableRow = append(tableRow, "*")
+				}
+			}
+
 			t.AppendRow(tableRow)
 		}
 	}
@@ -344,6 +385,45 @@ func filterZeroValResources(resources []Resource, resourceName string) []Resourc
 }
 
 func breakdownSummaryTable(out Root, opts Options) string {
+	if out.Metadata.UsageApiEnabled {
+		// for now only show the new usage-costs in the table if the usage api has been enabled
+		// once we have all the other usage cost stuff done this will replace the old table
+		t := table.NewWriter()
+		t.SetStyle(table.StyleBold)
+		t.Style().Format.Header = text.FormatDefault
+		t.AppendHeader(table.Row{
+			"Project",
+			"Baseline cost",
+			"Usage cost",
+			"Total cost",
+		})
+
+		t.SetColumnConfigs([]table.ColumnConfig{
+			{Name: "Project", WidthMin: 50},
+			{Name: "Baseline cost", WidthMin: 10},
+			{Name: "Usage cost", WidthMin: 10},
+			{Name: "Total monthly cost", WidthMin: 10},
+		})
+
+		for _, project := range out.Projects {
+			baseline := project.Breakdown.TotalMonthlyCost
+			if baseline != nil && project.Breakdown.TotalMonthlyUsageCost != nil {
+				baseline = decimalPtr(baseline.Sub(*project.Breakdown.TotalMonthlyUsageCost))
+			}
+
+			t.AppendRow(
+				table.Row{
+					truncateMiddle(project.Name, 64, "..."),
+					formatCost(out.Currency, baseline),
+					formatCost(out.Currency, project.Breakdown.TotalMonthlyUsageCost),
+					formatCost(out.Currency, project.Breakdown.TotalMonthlyCost),
+				},
+			)
+		}
+
+		return t.Render()
+	}
+
 	t := table.NewWriter()
 	t.SetStyle(table.StyleBold)
 	t.Style().Format.Header = text.FormatDefault
