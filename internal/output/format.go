@@ -139,7 +139,7 @@ func truncateMiddle(s string, maxLen int, fill string) string {
 
 func showProject(p Project, opts Options, showError bool) bool {
 	if p.Metadata.HasErrors() && showError {
-		return false
+		return true
 	}
 
 	if opts.ShowOnlyChanges {
