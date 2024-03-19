@@ -13,6 +13,7 @@ resource "azurerm_app_service_certificate" "example" {
   resource_group_name = azurerm_resource_group.example.name
   location            = azurerm_resource_group.example.location
   password            = "terraform"
+  pfx_blob            = "someblob"
 }
 
 resource "azurerm_app_service_certificate_binding" "example" {
