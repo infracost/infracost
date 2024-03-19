@@ -9,4 +9,5 @@
     ├── dev.tfvars
     ├── common.tfvars.json
     ├── prod-custom-ext
+    ├── prod.env.tfvars
     └── default.tfvars

@@ -20,6 +20,7 @@ projects:
     terraform_var_files:
       - ../default.tfvars
       - ../common.tfvars.json
+      - ../prod.env.tfvars
       - ../prod-custom-ext
     skip_autodetect: true
   - path: apps/foo
@@ -41,6 +42,7 @@ projects:
     terraform_var_files:
       - ../default.tfvars
       - ../common.tfvars.json
+      - ../prod.env.tfvars
       - ../prod-custom-ext
     skip_autodetect: true
 

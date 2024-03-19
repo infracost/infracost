@@ -1,4 +1,4 @@
-Project: infracost/infracost/cmd/infracost/testdata/breakdown_with_optional_variables
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_with_optional_variables-dev
 
  Name                       Monthly Qty  Unit   Monthly Cost 
                                                              
@@ -34,7 +34,7 @@ Project: infracost/infracost/cmd/infracost/testdata/breakdown_with_optional_vari
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                                          ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...akdown_with_optional_variables ┃ $29          ┃
+┃ infracost/infracost/cmd/infraco...wn_with_optional_variables-dev ┃ $29          ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 
 Err:
