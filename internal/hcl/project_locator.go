@@ -83,8 +83,14 @@ func CreateEnvFileMatcher(names []string, extensions []string) *EnvFileMatcher {
 		return CreateEnvFileMatcher(defaultEnvs, extensions)
 	}
 
+	// ensure all env names to lowercase so we can match case insensitively.
+	envNames := make([]string, len(names))
+	for i, name := range names {
+		envNames[i] = strings.ToLower(name)
+	}
+
 	lookup := make(map[string]struct{}, len(names))
-	for _, name := range names {
+	for _, name := range envNames {
 		lookup[name] = struct{}{}
 	}
 
@@ -128,7 +134,7 @@ func (e *EnvFileMatcher) IsEnvName(file string) bool {
 
 func (e *EnvFileMatcher) clean(name string) string {
 	base := filepath.Base(name)
-	return strings.TrimSuffix(base, fullExtension(base))
+	return strings.ToLower(strings.TrimSuffix(base, fullExtension(base)))
 }
 
 // EnvName returns the environment name for the given var file.
