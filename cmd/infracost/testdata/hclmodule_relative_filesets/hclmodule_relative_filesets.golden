@@ -18,7 +18,7 @@ Project: infracost/infracost/cmd/infracost/testdata/hclmodule_relative_filesets
 ──────────────────────────────────
 6 cloud resources were detected:
 ∙ 3 were estimated
-∙ 3 were free, rerun with --show-skipped to see details
+∙ 3 were free
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                                          ┃ Monthly cost ┃

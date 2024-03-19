@@ -109,7 +109,7 @@ Module path: prod
 ──────────────────────────────────
 52 cloud resources were detected:
 ∙ 14 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
-∙ 38 were free, rerun with --show-skipped to see details
+∙ 38 were free
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                                          ┃ Monthly cost ┃

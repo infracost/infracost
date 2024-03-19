@@ -9,9 +9,7 @@
 ──────────────────────────────────
 3 cloud resources were detected:
 ∙ 1 was estimated
-∙ 2 were free:
-  ∙ 1 x google_compute_instance_template
-  ∙ 1 x google_compute_region_per_instance_config
+∙ 2 were free
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃

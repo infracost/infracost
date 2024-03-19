@@ -815,9 +815,7 @@
 ──────────────────────────────────
 334 cloud resources were detected:
 ∙ 270 were estimated
-∙ 64 were free:
-  ∙ 63 x azurerm_service_plan
-  ∙ 1 x azurerm_resource_group
+∙ 64 were free
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃

@@ -117,13 +117,7 @@
 ──────────────────────────────────
 22 cloud resources were detected:
 ∙ 12 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
-∙ 6 were free:
-  ∙ 1 x azurerm_log_analytics_solution
-  ∙ 1 x azurerm_log_analytics_workspace
-  ∙ 1 x azurerm_resource_group
-  ∙ 1 x azurerm_sentinel_data_connector_aws_cloud_trail
-  ∙ 1 x azurerm_sentinel_data_connector_azure_active_directory
-  ∙ 1 x azurerm_sentinel_data_connector_azure_advanced_threat_protection
+∙ 6 were free
 ∙ 4 are not supported yet, see https://infracost.io/requested-resources:
   ∙ 4 x azurerm_log_analytics_workspace
 

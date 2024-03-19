@@ -308,7 +308,7 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) (MarkdownO
 		Options:                      opts,
 		MarkdownOptions:              markdownOpts,
 		RunQuotaMsg:                  runQuotaMsg,
-		UsageCostsMsg:                usageCostsMessage(out),
+		UsageCostsMsg:                usageCostsMessage(out, true),
 		CostDetailsMsg:               costsDetailsMessage(out),
 	})
 	if err != nil {
@@ -352,64 +352,81 @@ var (
 	cloudURLRegex                = regexp.MustCompile(`(https?://[^/]+/org/[^/]+/)`)
 )
 
-func usageCostsMessage(out Root) string {
-	usageDefaultsURL := determineUsageDefaultsURL(out)
-
+func usageCostsMessage(out Root, useLinks bool) string {
 	if !out.Metadata.UsageApiEnabled {
-		return handleUsageApiDisabledMessage(out, usageDefaultsURL)
+		return handleUsageApiDisabledMessage(out, useLinks)
 	}
 
-	return handleUsageApiEnabledMessage(out, usageDefaultsURL)
+	return handleUsageApiEnabledMessage(out, useLinks)
 }
 
-func determineUsageDefaultsURL(out Root) string {
+func usageDefaultsStr(out Root, useMarkdownLinks bool) string {
+	if !useMarkdownLinks {
+		return "usage defaults"
+	}
 	usageDefaultsURL := usageDefaultsDocsURL
 	match := cloudURLRegex.FindStringSubmatch(out.CloudURL)
 	if len(match) > 0 {
 		usageDefaultsURL = match[0] + usageDefaultsDashboardSuffix
 	}
-	return usageDefaultsURL
+	return fmt.Sprintf("[usage defaults](%s)", usageDefaultsURL)
 }
 
-func handleUsageApiEnabledMessage(out Root, usageDefaultsURL string) string {
+func configFilesStr(useMarkdownLinks bool) string {
+	if !useMarkdownLinks {
+		return "config files"
+	}
+
+	return fmt.Sprintf("[config files](%s)", configFileDocsURL)
+}
+
+func usageFileStr(name string, useMarkdownLinks bool) string {
+	if !useMarkdownLinks {
+		return name
+	}
+
+	return fmt.Sprintf("[%s](%s)", name, usageFileDocsURL)
+}
+
+func handleUsageApiEnabledMessage(out Root, useMarkdownLinks bool) string {
 	if out.Metadata.ConfigFilePath != "" {
-		return constructConfigFilePathMessage(out, usageDefaultsURL)
+		return constructConfigFilePathMessage(out, useMarkdownLinks)
 	}
 
 	if out.Metadata.UsageFilePath != "" {
-		return fmt.Sprintf("*Usage costs were estimated by merging [usage defaults](%s) and values from [%s](%s).", usageDefaultsURL, usageFileDocsURL, out.Metadata.UsageFilePath)
+		return fmt.Sprintf("*Usage costs were estimated by merging %s and values from %s.", usageDefaultsStr(out, useMarkdownLinks), usageFileStr(out.Metadata.UsageFilePath, useMarkdownLinks))
 	}
 
-	return fmt.Sprintf("*Usage costs were estimated with [usage defaults](%s), which can also be [overridden](%s) in this repo.", usageDefaultsURL, usageFileDocsURL)
+	return fmt.Sprintf("*Usage costs were estimated with %s, which can also be %s in this repo.", usageDefaultsStr(out, useMarkdownLinks), usageFileStr("overridden", useMarkdownLinks))
 }
 
-func constructConfigFilePathMessage(out Root, usageDefaultsURL string) string {
+func constructConfigFilePathMessage(out Root, useMarkdownLinks bool) string {
 	if out.Metadata.ConfigFileHasUsageFile {
-		return fmt.Sprintf("*Usage costs were estimated by merging [usage defaults](%s) and values from the [config files](%s).", usageDefaultsURL, configFileDocsURL)
+		return fmt.Sprintf("*Usage costs were estimated by merging %s and values from the %s.", usageDefaultsStr(out, useMarkdownLinks), configFilesStr(useMarkdownLinks))
 	}
 
-	return fmt.Sprintf("*Usage costs were estimated with [usage defaults](%s), which can also be overridden in the [config files](%s).", usageDefaultsURL, configFileDocsURL)
+	return fmt.Sprintf("*Usage costs were estimated with %s, which can also be overridden in the %s.", usageDefaultsStr(out, useMarkdownLinks), configFilesStr(useMarkdownLinks))
 }
 
-func handleUsageApiDisabledMessage(out Root, usageDefaultsURL string) string {
+func handleUsageApiDisabledMessage(out Root, useMarkdownLinks bool) string {
 	if out.Metadata.ConfigFilePath != "" {
 		if out.Metadata.ConfigFileHasUsageFile {
-			return fmt.Sprintf("*Usage costs were estimated using values from the [config files](%s).", configFileDocsURL)
+			return fmt.Sprintf("*Usage costs were estimated using values from the %s.", configFilesStr(useMarkdownLinks))
 		}
-		return fmt.Sprintf("*Usage costs can be estimated by adding [usage defaults](%s) or [usage files](%s) in the config file.", usageDefaultsURL, usageFileDocsURL)
+		return fmt.Sprintf("*Usage costs can be estimated by adding %s or %s in the config file.", usageDefaultsStr(out, useMarkdownLinks), usageFileStr("usage files", useMarkdownLinks))
 	}
 
 	if out.Metadata.UsageFilePath != "" {
-		return fmt.Sprintf("*Usage costs were estimated using [%s](%s).", usageFileDocsURL, out.Metadata.UsageFilePath)
+		return fmt.Sprintf("*Usage costs were estimated using %s.", usageFileStr(out.Metadata.UsageFilePath, useMarkdownLinks))
 	}
 
-	return fmt.Sprintf("*Usage costs can be estimated by adding [usage defaults](%s) or an [infracost-usage.yml](%s).", usageDefaultsURL, usageFileDocsURL)
+	return fmt.Sprintf("*Usage costs can be estimated by adding %s or an %s.", usageDefaultsStr(out, useMarkdownLinks), usageFileStr("infracost-usage.yml", useMarkdownLinks))
 }
 
 func costsDetailsMessage(out Root) string {
 	var msgs []string
 
-	if out.Summary != nil && out.Summary.TotalUnsupportedResources != nil {
+	if out.Summary != nil && out.Summary.TotalUnsupportedResources != nil && *out.Summary.TotalUnsupportedResources > 0 {
 		msgs = append(msgs, "unsupported resources")
 	}
 

@@ -28,12 +28,7 @@
 ──────────────────────────────────
 11 cloud resources were detected:
 ∙ 6 were estimated, 5 of which include usage-based costs, see https://infracost.io/usage-file
-∙ 5 were free:
-  ∙ 1 x azurerm_resource_group
-  ∙ 1 x azurerm_subnet
-  ∙ 1 x azurerm_virtual_hub
-  ∙ 1 x azurerm_virtual_network
-  ∙ 1 x azurerm_virtual_wan
+∙ 5 were free
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃

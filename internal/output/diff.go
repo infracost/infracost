@@ -113,6 +113,16 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 		s += "──────────────────────────────────"
 	}
 
+	if out.Metadata.UsageApiEnabled {
+		// for now only show the new usage-costs-including comment if the usage api has been enabled
+		// once we have all the other usage cost stuff done this will replace the old comment template
+		if hasDiffProjects {
+			s += "\n"
+			s += usageCostsMessage(out, false)
+			s += "\n"
+		}
+	}
+
 	unsupportedMsg := out.summaryMessage(opts.ShowSkipped)
 	if unsupportedMsg != "" {
 		s += "\n"
@@ -266,16 +276,18 @@ func costComponentToDiff(currency string, diffComponent CostComponent, oldCompon
 		op = REMOVED
 	}
 
-	var oldCost, newCost, oldPrice, newPrice *decimal.Decimal
+	var oldCost, newCost, oldPrice, newPrice, oldQuantity, newQuantity *decimal.Decimal
 
 	if oldComponent != nil {
 		oldCost = oldComponent.MonthlyCost
 		oldPrice = &oldComponent.Price
+		oldQuantity = oldComponent.MonthlyQuantity
 	}
 
 	if newComponent != nil {
 		newCost = newComponent.MonthlyCost
 		newPrice = &newComponent.Price
+		newQuantity = newComponent.MonthlyQuantity
 	}
 
 	s += fmt.Sprintf("%s %s\n", opChar(op), colorizeDiffName(diffComponent.Name))
@@ -288,9 +300,18 @@ func costComponentToDiff(currency string, diffComponent CostComponent, oldCompon
 			formatPriceChangeDetails(currency, oldPrice, newPrice),
 		)
 	} else {
-		s += fmt.Sprintf("  %s%s\n",
+		usageQuantity := ""
+		if diffComponent.UsageBased && diffComponent.MonthlyQuantity != nil {
+			usageQuantity = fmt.Sprintf(", %s%s*",
+				formatQuantityChange(diffComponent.MonthlyQuantity, diffComponent.Unit),
+				ui.FaintString(formatQuantityChangeDetails(oldQuantity, newQuantity)),
+			)
+		}
+
+		s += fmt.Sprintf("  %s%s%s\n",
 			formatCostChange(currency, diffComponent.MonthlyCost),
 			ui.FaintString(formatCostChangeDetails(currency, oldCost, newCost)),
+			usageQuantity,
 		)
 	}
 
@@ -341,6 +362,23 @@ func findMatchingCostComponent(costComponents []CostComponent, name string) *Cos
 	}
 
 	return nil
+}
+
+func formatQuantityChange(d *decimal.Decimal, unit string) string {
+	if d == nil {
+		return ""
+	}
+
+	abs := d.Abs()
+	return fmt.Sprintf("%s%s %s", getSym(*d), formatQuantity(&abs), unit)
+}
+
+func formatQuantityChangeDetails(old *decimal.Decimal, new *decimal.Decimal) string {
+	if old == nil || new == nil {
+		return ""
+	}
+
+	return fmt.Sprintf(" (%s → %s)", formatQuantity(old), formatQuantity(new))
 }
 
 func formatCostChange(currency string, d *decimal.Decimal) string {

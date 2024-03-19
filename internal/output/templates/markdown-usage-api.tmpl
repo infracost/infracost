@@ -90,6 +90,9 @@
 ```
 {{ .DiffOutput }}
 ```
+{{- else }}
+
+Cost details were left out because expandable comment sections are not supported.{{ if .Root.CloudURL }} See [Infracost Cloud]({{.Root.CloudURL}}) for full cost details{{ if .CostDetailsMsg }} {{.CostDetailsMsg }}.{{ else }}.{{end}}{{end}}
 {{- end }}
 
 {{- if gt (len .Options.PolicyOutput.Checks) 0 }}

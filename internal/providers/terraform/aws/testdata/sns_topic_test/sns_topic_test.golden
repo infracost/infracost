@@ -67,8 +67,7 @@
 ──────────────────────────────────
 18 cloud resources were detected:
 ∙ 13 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
-∙ 5 were free:
-  ∙ 5 x aws_sns_topic_subscription
+∙ 5 were free
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃

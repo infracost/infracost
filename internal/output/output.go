@@ -747,13 +747,6 @@ func (r *Root) summaryMessage(showSkipped bool) string {
 		} else {
 			msg += fmt.Sprintf("\n∙ %d were free", *r.Summary.TotalNoPriceResources)
 		}
-
-		if showSkipped {
-			msg += ":"
-			msg += formatCounts(r.Summary.NoPriceResourceCounts)
-		} else {
-			msg += seeDetailsMessage
-		}
 	}
 
 	if r.Summary.TotalUnsupportedResources != nil && *r.Summary.TotalUnsupportedResources > 0 {
