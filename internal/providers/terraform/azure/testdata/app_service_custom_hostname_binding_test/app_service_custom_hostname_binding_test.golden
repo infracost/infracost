@@ -11,10 +11,7 @@
 ──────────────────────────────────
 6 cloud resources were detected:
 ∙ 2 were estimated
-∙ 4 were free:
-  ∙ 2 x azurerm_app_service_custom_hostname_binding
-  ∙ 1 x azurerm_app_service
-  ∙ 1 x azurerm_resource_group
+∙ 4 were free
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃

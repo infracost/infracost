@@ -21,9 +21,7 @@
 ──────────────────────────────────
 8 cloud resources were detected:
 ∙ 4 were estimated, 3 of which include usage-based costs, see https://infracost.io/usage-file
-∙ 4 were free:
-  ∙ 3 x aws_eip
-  ∙ 1 x aws_eip_association
+∙ 4 were free
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃

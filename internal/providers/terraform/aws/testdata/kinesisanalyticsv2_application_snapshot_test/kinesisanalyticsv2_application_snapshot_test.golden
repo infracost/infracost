@@ -23,8 +23,7 @@
 ──────────────────────────────────
 5 cloud resources were detected:
 ∙ 4 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
-∙ 1 was free:
-  ∙ 1 x aws_iam_role
+∙ 1 was free
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                             ┃ Monthly cost ┃

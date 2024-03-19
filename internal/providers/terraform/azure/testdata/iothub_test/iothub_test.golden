@@ -17,9 +17,7 @@
 ──────────────────────────────────
 6 cloud resources were detected:
 ∙ 4 were estimated, 2 of which include usage-based costs, see https://infracost.io/usage-file
-∙ 2 were free:
-  ∙ 1 x azurerm_iothub
-  ∙ 1 x azurerm_resource_group
+∙ 2 were free
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃

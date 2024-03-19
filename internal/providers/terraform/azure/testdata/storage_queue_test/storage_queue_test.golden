@@ -115,8 +115,7 @@
 ──────────────────────────────────
 21 cloud resources were detected:
 ∙ 18 were estimated
-∙ 1 was free:
-  ∙ 1 x azurerm_resource_group
+∙ 1 was free
 ∙ 2 are not supported yet, see https://infracost.io/requested-resources:
   ∙ 1 x azurerm_storage_account
   ∙ 1 x azurerm_storage_queue

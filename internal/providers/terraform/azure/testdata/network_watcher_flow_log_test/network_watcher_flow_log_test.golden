@@ -27,9 +27,7 @@
 ──────────────────────────────────
 9 cloud resources were detected:
 ∙ 6 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
-∙ 3 were free:
-  ∙ 2 x azurerm_network_watcher_flow_log
-  ∙ 1 x azurerm_resource_group
+∙ 3 were free
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃

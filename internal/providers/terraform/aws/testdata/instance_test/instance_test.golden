@@ -185,8 +185,7 @@
 ──────────────────────────────────
 32 cloud resources were detected:
 ∙ 30 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
-∙ 1 was free:
-  ∙ 1 x aws_launch_template
+∙ 1 was free
 ∙ 1 is not supported yet, see https://infracost.io/requested-resources:
   ∙ 1 x aws_instance
 

@@ -45,11 +45,7 @@
 ──────────────────────────────────
 22 cloud resources were detected:
 ∙ 8 were estimated
-∙ 14 were free:
-  ∙ 6 x aws_ecs_cluster
-  ∙ 5 x aws_ecs_cluster_capacity_providers
-  ∙ 2 x aws_ecs_service
-  ∙ 1 x aws_ecs_task_definition
+∙ 14 were free
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃

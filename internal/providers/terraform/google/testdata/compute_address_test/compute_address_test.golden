@@ -35,8 +35,7 @@
 ──────────────────────────────────
 12 cloud resources were detected:
 ∙ 9 were estimated, 3 of which include usage-based costs, see https://infracost.io/usage-file
-∙ 3 were free:
-  ∙ 3 x google_compute_address
+∙ 3 were free
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃
