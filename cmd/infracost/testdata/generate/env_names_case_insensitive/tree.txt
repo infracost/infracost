@@ -1,0 +1,13 @@
+.
+└── apps
+    ├── bar
+    │   └── main.tf
+    ├── foo
+    │   └── main.tf
+    ├── baz.tfvars
+    ├── bat.tfvars
+    ├── network-Baz.tfvars
+    ├── network-Bat.tfvars
+    ├── dev.tfvars
+    ├── prod.tfvars
+    └── default.tfvars
