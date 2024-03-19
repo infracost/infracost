@@ -1,4 +1,18 @@
 
 <h3>Infracost report</h3>
 <h4>💰 Monthly cost will not change</h4>
+<details>
+<summary>Cost details</summary>
+
+```
+──────────────────────────────────
+Project: infracost/infracost/examples/terraform
+Errors:
+  No valid terraform files found given path, try a different directory
+
+──────────────────────────────────
+
+No cloud resources were detected
+```
+</details>
 
