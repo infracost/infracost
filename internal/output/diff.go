@@ -116,9 +116,11 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 	if out.Metadata.UsageApiEnabled {
 		// for now only show the new usage-costs-including comment if the usage api has been enabled
 		// once we have all the other usage cost stuff done this will replace the old comment template
-		s += "\n"
-		s += usageCostsMessage(out, false)
-		s += "\n"
+		if hasDiffProjects {
+			s += "\n"
+			s += usageCostsMessage(out, false)
+			s += "\n"
+		}
 	}
 
 	unsupportedMsg := out.summaryMessage(opts.ShowSkipped)
