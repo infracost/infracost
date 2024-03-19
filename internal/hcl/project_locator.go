@@ -128,12 +128,7 @@ func (e *EnvFileMatcher) IsEnvName(file string) bool {
 
 func (e *EnvFileMatcher) clean(name string) string {
 	base := filepath.Base(name)
-
-	for _, suffix := range e.extensions {
-		base = strings.TrimSuffix(base, suffix)
-	}
-
-	return base
+	return strings.TrimSuffix(base, fullExtension(base))
 }
 
 // EnvName returns the environment name for the given var file.
