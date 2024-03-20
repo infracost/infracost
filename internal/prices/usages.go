@@ -181,7 +181,7 @@ func FetchUsageData(ctx *config.RunContext, project *schema.Project) (schema.Usa
 		}(jobs, responses)
 	}
 
-	// Feed the workers the jobs of getting prices
+	// Feed the workers the jobs
 	for _, r := range usageResourceChunks {
 		jobs <- r
 	}
