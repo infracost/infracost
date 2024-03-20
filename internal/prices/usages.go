@@ -152,43 +152,85 @@ func chunkPartialResourcesWithUsage(resources []*schema.PartialResource, chunkSi
 func FetchUsageData(ctx *config.RunContext, project *schema.Project) (schema.UsageMap, error) {
 	c := apiclient.NewUsageAPIClient(ctx)
 
+	// Set the number of workers
+	numWorkers := 4
+	numCPU := runtime.NumCPU()
+	if numCPU*4 > numWorkers {
+		numWorkers = numCPU * 4
+	}
+	if numWorkers > 16 {
+		numWorkers = 16
+	}
+
 	// gather all the CoreResource into chunks
 	usageResourceChunks := chunkPartialResourcesWithUsage(project.AllPartialResources(), 10)
 
 	usageMap := make(map[string]*schema.UsageData, len(usageResourceChunks)*10)
-	// look up the usage for each core resource.
-	for _, chunk := range usageResourceChunks {
-		// TODO: add concurrency
 
-		chunkedQueryVars := make([]*apiclient.UsageQuantitiesQueryVariables, 0, len(chunk))
-		for _, partialResource := range chunk {
-			var usageParams []schema.UsageParam
-			if crWithUsageParams, ok := partialResource.CoreResource.(schema.CoreResourceWithUsageParams); ok {
-				usageParams = crWithUsageParams.UsageEstimationParams()
-			}
+	numJobs := len(usageResourceChunks)
+	jobs := make(chan []*schema.PartialResource, numJobs)
+	responses := make(chan batchResponse, numJobs)
 
-			queryVars := apiclient.UsageQuantitiesQueryVariables{
-				RepoURL:              ctx.VCSRepositoryURL(),
-				ProjectWithWorkspace: project.NameWithWorkspace(),
-				ResourceType:         partialResource.CoreResource.CoreType(),
-				Address:              partialResource.Address,
-				UsageKeys:            flattenUsageKeys(partialResource.CoreResource.UsageSchema()),
-				UsageParams:          usageParams,
+	// Fire up the workers
+	for i := 0; i < numWorkers; i++ {
+		go func(jobs <-chan []*schema.PartialResource, responses chan<- batchResponse) {
+			for req := range jobs {
+				res := fetchUsageDataBatch(ctx, c, project, req)
+				responses <- res
 			}
-			chunkedQueryVars = append(chunkedQueryVars, &queryVars)
+		}(jobs, responses)
+	}
+
+	// Feed the workers the jobs of getting prices
+	for _, r := range usageResourceChunks {
+		jobs <- r
+	}
+
+	// Get the result of the jobs
+	for i := 0; i < numJobs; i++ {
+		res := <-responses
+		if res.Error != nil {
+			return schema.NewUsageMap(usageMap), res.Error
 		}
 
-		usageDatas, err := c.ListUsageQuantities(chunkedQueryVars)
-		if err != nil {
-			return schema.NewUsageMap(usageMap), err
-		}
-
-		for _, ud := range usageDatas {
+		for _, ud := range res.UsageData {
 			usageMap[ud.Address] = ud
 		}
 	}
 
 	return schema.NewUsageMap(usageMap), nil
+}
+
+type batchResponse struct {
+	UsageData []*schema.UsageData
+	Error     error
+}
+
+func fetchUsageDataBatch(ctx *config.RunContext, c *apiclient.UsageAPIClient, project *schema.Project, resources []*schema.PartialResource) batchResponse {
+	chunkedQueryVars := make([]*apiclient.UsageQuantitiesQueryVariables, 0, len(resources))
+	for _, partialResource := range resources {
+		var usageParams []schema.UsageParam
+		if crWithUsageParams, ok := partialResource.CoreResource.(schema.CoreResourceWithUsageParams); ok {
+			usageParams = crWithUsageParams.UsageEstimationParams()
+		}
+
+		queryVars := apiclient.UsageQuantitiesQueryVariables{
+			RepoURL:              ctx.VCSRepositoryURL(),
+			ProjectWithWorkspace: project.NameWithWorkspace(),
+			ResourceType:         partialResource.CoreResource.CoreType(),
+			Address:              partialResource.Address,
+			UsageKeys:            flattenUsageKeys(partialResource.CoreResource.UsageSchema()),
+			UsageParams:          usageParams,
+		}
+		chunkedQueryVars = append(chunkedQueryVars, &queryVars)
+	}
+
+	ud, err := c.ListUsageQuantities(chunkedQueryVars)
+
+	return batchResponse{
+		UsageData: ud,
+		Error:     err,
+	}
 }
 
 // UploadCloudResourceIDs sends the project scoped cloud resource ids to the Usage API, so they can be used
