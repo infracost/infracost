@@ -126,49 +126,65 @@ func popResourceActualCosts(ctx *config.RunContext, c *apiclient.UsageAPIClient,
 	return nil
 }
 
+// chunkPartialResourcesWithUsage collects all partiral resources with a core resource usage schema
+// into groups of the specified chunkSize
+func chunkPartialResourcesWithUsage(resources []*schema.PartialResource, chunkSize int) [][]*schema.PartialResource {
+	var usageResourceChunks [][]*schema.PartialResource
+	var currentChunk []*schema.PartialResource
+	for _, rb := range resources {
+		if rb.CoreResource != nil && len(rb.CoreResource.UsageSchema()) > 0 {
+			if len(currentChunk) >= chunkSize {
+				usageResourceChunks = append(usageResourceChunks, currentChunk)
+				currentChunk = nil
+			}
+			currentChunk = append(currentChunk, rb)
+		}
+	}
+	if len(currentChunk) > 0 {
+		usageResourceChunks = append(usageResourceChunks, currentChunk)
+	}
+
+	return usageResourceChunks
+}
+
 // FetchUsageData fetches usage estimates derived from cloud provider reported usage
 // from the Infracost Cloud Usage API for each supported resource in the project
 func FetchUsageData(ctx *config.RunContext, project *schema.Project) (schema.UsageMap, error) {
 	c := apiclient.NewUsageAPIClient(ctx)
 
-	// gather all the CoreResource
-	coreResources := make(map[string]schema.CoreResource)
-	for _, rb := range project.AllPartialResources() {
-		if rb.CoreResource != nil {
-			coreResources[rb.Address] = rb.CoreResource
-		}
-	}
+	// gather all the CoreResource into chunks
+	usageResourceChunks := chunkPartialResourcesWithUsage(project.AllPartialResources(), 10)
 
-	usageMap := make(map[string]*schema.UsageData, len(coreResources))
+	usageMap := make(map[string]*schema.UsageData, len(usageResourceChunks)*10)
 	// look up the usage for each core resource.
-	for address, cr := range coreResources {
+	for _, chunk := range usageResourceChunks {
 		// TODO: add concurrency
-		usageKeys := flattenUsageKeys(cr.UsageSchema())
 
-		if len(usageKeys) > 0 {
+		chunkedQueryVars := make([]*apiclient.UsageQuantitiesQueryVariables, 0, len(chunk))
+		for _, partialResource := range chunk {
 			var usageParams []schema.UsageParam
-			if crWithUsageParams, ok := cr.(schema.CoreResourceWithUsageParams); ok {
+			if crWithUsageParams, ok := partialResource.CoreResource.(schema.CoreResourceWithUsageParams); ok {
 				usageParams = crWithUsageParams.UsageEstimationParams()
 			}
 
-			vars := apiclient.UsageQuantitiesQueryVariables{
+			queryVars := apiclient.UsageQuantitiesQueryVariables{
 				RepoURL:              ctx.VCSRepositoryURL(),
 				ProjectWithWorkspace: project.NameWithWorkspace(),
-				ResourceType:         cr.CoreType(),
-				Address:              address,
-				UsageKeys:            usageKeys,
+				ResourceType:         partialResource.CoreResource.CoreType(),
+				Address:              partialResource.Address,
+				UsageKeys:            flattenUsageKeys(partialResource.CoreResource.UsageSchema()),
 				UsageParams:          usageParams,
 			}
+			chunkedQueryVars = append(chunkedQueryVars, &queryVars)
+		}
 
-			attributes, err := c.ListUsageQuantities(vars)
-			if err != nil {
-				return schema.NewUsageMap(usageMap), err
-			}
+		usageDatas, err := c.ListUsageQuantities(chunkedQueryVars)
+		if err != nil {
+			return schema.NewUsageMap(usageMap), err
+		}
 
-			usageMap[address] = &schema.UsageData{
-				Address:    address,
-				Attributes: attributes,
-			}
+		for _, ud := range usageDatas {
+			usageMap[ud.Address] = ud
 		}
 	}
 
