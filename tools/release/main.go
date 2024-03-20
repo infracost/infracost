@@ -18,12 +18,19 @@ import (
 func main() {
 	cli := newAuthedGithubClient()
 
-	release, err := createDraftRelease(cli)
+	releaseId := strings.TrimSpace(os.Getenv("RELEASE_ID"))
+	var release *github.RepositoryRelease
+	var err error
+	if releaseId != "" {
+		release, err = fetchExistingRelease(cli, releaseId)
+	} else {
+		release, err = createDraftRelease(cli)
+	}
+
 	if err != nil {
 		log.Error().Msgf("failed to create draft release %s", err)
 		return
 	}
-
 	toUpload, err := findReleaseAssets()
 	if err != nil {
 		log.Error().Msgf("failed to collect release assets %s", err)
@@ -37,6 +44,22 @@ func main() {
 	}
 
 	log.Info().Msg("successfully created draft release")
+}
+
+func fetchExistingRelease(cli *github.Client, releaseId string) (*github.RepositoryRelease, error) {
+	release, _, err := cli.Repositories.GetReleaseByTag(context.Background(), "infracost", "infracost", releaseId)
+
+	// delete all the assets of the release as we are going to re-upload them and
+	// GitHub does not allow name conflicts with assets
+	for _, asset := range release.Assets {
+		_, err = cli.Repositories.DeleteReleaseAsset(context.Background(), "infracost", "infracost", asset.GetID())
+		if err != nil {
+			log.Error().Msgf("failed to delete asset %s", err)
+			continue
+		}
+	}
+
+	return release, err
 }
 
 func createDraftRelease(cli *github.Client) (*github.RepositoryRelease, error) {
