@@ -1,16 +1,6 @@
 
  Name                                                        Monthly Qty  Unit            Monthly Cost 
                                                                                                        
- google_service_networking_connection.my_connection                                                    
- └─ Network egress                                                                                     
-    ├─ Traffic within the same region                      Monthly cost depends on usage: $0.02 per GB 
-    ├─ Traffic within the US or Canada                     Monthly cost depends on usage: $0.02 per GB 
-    ├─ Traffic within Europe                               Monthly cost depends on usage: $0.02 per GB 
-    ├─ Traffic within Asia                                 Monthly cost depends on usage: $0.08 per GB 
-    ├─ Traffic within South America                        Monthly cost depends on usage: $0.14 per GB 
-    ├─ Traffic to/from Indonesia and Oceania               Monthly cost depends on usage: $0.10 per GB 
-    └─ Traffic between continents (excludes Oceania)       Monthly cost depends on usage: $0.08 per GB 
-                                                                                                       
  google_service_networking_connection.my_usage_connection                                              
  └─ Network egress                                                                                     
     ├─ Traffic within the same region                                250  GB                     $5.00 
@@ -20,6 +10,16 @@
     ├─ Traffic within South America                                  100  GB                    $14.00 
     ├─ Traffic to/from Indonesia and Oceania                          50  GB                     $5.00 
     └─ Traffic between continents (excludes Oceania)                 200  GB                    $16.00 
+                                                                                                       
+ google_service_networking_connection.my_connection                                                    
+ └─ Network egress                                                                                     
+    ├─ Traffic within the same region                      Monthly cost depends on usage: $0.02 per GB 
+    ├─ Traffic within the US or Canada                     Monthly cost depends on usage: $0.02 per GB 
+    ├─ Traffic within Europe                               Monthly cost depends on usage: $0.02 per GB 
+    ├─ Traffic within Asia                                 Monthly cost depends on usage: $0.08 per GB 
+    ├─ Traffic within South America                        Monthly cost depends on usage: $0.14 per GB 
+    ├─ Traffic to/from Indonesia and Oceania               Monthly cost depends on usage: $0.10 per GB 
+    └─ Traffic between continents (excludes Oceania)       Monthly cost depends on usage: $0.08 per GB 
                                                                                                        
  OVERALL TOTAL                                                                                  $47.40 
 ──────────────────────────────────
