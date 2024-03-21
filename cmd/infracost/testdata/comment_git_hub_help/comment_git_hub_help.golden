@@ -32,7 +32,7 @@ FLAGS
       --pull-request int                  Pull request number to post comment on, mutually exclusive with commit
       --repo string                       Repository in format owner/repo
       --show-all-projects                 Show all projects in the table of the comment output
-      --show-skipped                      List unsupported and free resources
+      --show-skipped                      List unsupported resources
       --tag string                        Customize hidden markdown tag used to detect comments posted by Infracost
 
 GLOBAL FLAGS
