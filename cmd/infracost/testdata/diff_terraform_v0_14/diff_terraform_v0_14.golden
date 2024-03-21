@@ -8,7 +8,7 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
       +$12
 
     + Storage (general purpose SSD, gp2)
-      +$0.58, +5 GB*
+      +$0.58
 
     + Extended support (year 1)
       +$146
