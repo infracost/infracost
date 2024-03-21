@@ -46,8 +46,24 @@ func main() {
 	log.Info().Msg("successfully created draft release")
 }
 
-func fetchExistingRelease(cli *github.Client, releaseId string) (*github.RepositoryRelease, error) {
-	release, _, err := cli.Repositories.GetReleaseByTag(context.Background(), "infracost", "infracost", releaseId)
+func fetchExistingRelease(cli *github.Client, tag string) (*github.RepositoryRelease, error) {
+	release, _, err := cli.Repositories.GetReleaseByTag(context.Background(), "infracost", "infracost", tag)
+	if err != nil {
+		return nil, fmt.Errorf("could not fetch existing release %s %s", tag, err)
+	}
+
+	newGitSha := os.Getenv("GITHUB_SHA")
+	if newGitSha != "" {
+		_, _, err = cli.Git.UpdateRef(context.Background(), "infracost", "infracost", &github.Reference{
+			Ref: github.String("refs/tags/" + tag),
+			Object: &github.GitObject{
+				SHA: github.String(newGitSha),
+			},
+		}, true)
+		if err != nil {
+			return nil, fmt.Errorf("could not update ref %s %s", tag, err)
+		}
+	}
 
 	// delete all the assets of the release as we are going to re-upload them and
 	// GitHub does not allow name conflicts with assets

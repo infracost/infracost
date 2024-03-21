@@ -24,7 +24,7 @@ jobs:
       - name: Release
         run: go run tools/release/main.go
         env:
-          RELEASE_ID: "untagged-0017de5d992d120d6984"
+          RELEASE_ID: "preview"
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Remove build assets
