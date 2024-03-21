@@ -1,6 +1,9 @@
 
  Name                                                                   Monthly Qty  Unit                    Monthly Cost 
                                                                                                                           
+ aws_s3_bucket_analytics_configuration.bucketanalytics                                                                    
+ └─ Objects monitored                                                            10  1M objects                     $1.00 
+                                                                                                                          
  aws_s3_bucket.bucket1                                                                                                    
  └─ Standard                                                                                                              
     ├─ Storage                                                    Monthly cost depends on usage: $0.023 per GB            
@@ -16,9 +19,6 @@
     ├─ GET, SELECT, and all other requests                        Monthly cost depends on usage: $0.0004 per 1k requests  
     ├─ Select data scanned                                        Monthly cost depends on usage: $0.002 per GB            
     └─ Select data returned                                       Monthly cost depends on usage: $0.0007 per GB           
-                                                                                                                          
- aws_s3_bucket_analytics_configuration.bucketanalytics                                                                    
- └─ Objects monitored                                                            10  1M objects                     $1.00 
                                                                                                                           
  aws_s3_bucket_analytics_configuration.bucketanalytics_withUsage                                                          
  └─ Objects monitored                                             Monthly cost depends on usage: $0.10 per 1M objects     

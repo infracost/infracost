@@ -1,12 +1,12 @@
 
  Name                                                              Monthly Qty  Unit            Monthly Cost 
                                                                                                              
- aws_dx_gateway_association.my_aws_dx_gateway_association                                                    
- ├─ Data processed                                               Monthly cost depends on usage: $0.02 per GB 
- └─ Transit gateway attachment                                             730  hours                 $36.50 
-                                                                                                             
  aws_dx_gateway_association.my_aws_dx_gateway_association_usage                                              
  ├─ Data processed                                                         100  GB                     $2.00 
+ └─ Transit gateway attachment                                             730  hours                 $36.50 
+                                                                                                             
+ aws_dx_gateway_association.my_aws_dx_gateway_association                                                    
+ ├─ Data processed                                               Monthly cost depends on usage: $0.02 per GB 
  └─ Transit gateway attachment                                             730  hours                 $36.50 
                                                                                                              
  OVERALL TOTAL                                                                                        $75.00 
