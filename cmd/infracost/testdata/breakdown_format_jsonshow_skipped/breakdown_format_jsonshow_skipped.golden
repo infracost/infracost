@@ -98,6 +98,56 @@
             ]
           },
           {
+            "name": "aws_lambda_function.hello_world",
+            "resourceType": "aws_lambda_function",
+            "tags": {},
+            "metadata": {},
+            "hourlyCost": "0.59817465753424657534316749",
+            "monthlyCost": "436.6675",
+            "monthlyUsageCost": "436.6675",
+            "costComponents": [
+              {
+                "name": "Requests",
+                "unit": "1M requests",
+                "hourlyQuantity": "0.136986301369863",
+                "monthlyQuantity": "100",
+                "price": "0.2",
+                "hourlyCost": "0.02739726027397260273972",
+                "monthlyCost": "20",
+                "usageBased": true
+              },
+              {
+                "name": "Ephemeral storage",
+                "unit": "GB-seconds",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.0000000309",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              },
+              {
+                "name": "Duration (first 6B)",
+                "unit": "GB-seconds",
+                "hourlyQuantity": "34246.5753424657534247",
+                "monthlyQuantity": "25000000",
+                "price": "0.0000166667",
+                "hourlyCost": "0.57077739726027397260344749",
+                "monthlyCost": "416.6675",
+                "usageBased": true
+              },
+              {
+                "name": "Duration (over 15B)",
+                "unit": "GB-seconds",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.0000133334",
+                "hourlyCost": "0",
+                "monthlyCost": "0",
+                "usageBased": true
+              }
+            ]
+          },
+          {
             "name": "aws_instance.zero_cost_instance",
             "resourceType": "aws_instance",
             "tags": {},
@@ -158,56 +208,6 @@
                     "monthlyCost": "52"
                   }
                 ]
-              }
-            ]
-          },
-          {
-            "name": "aws_lambda_function.hello_world",
-            "resourceType": "aws_lambda_function",
-            "tags": {},
-            "metadata": {},
-            "hourlyCost": "0.59817465753424657534316749",
-            "monthlyCost": "436.6675",
-            "monthlyUsageCost": "436.6675",
-            "costComponents": [
-              {
-                "name": "Requests",
-                "unit": "1M requests",
-                "hourlyQuantity": "0.136986301369863",
-                "monthlyQuantity": "100",
-                "price": "0.2",
-                "hourlyCost": "0.02739726027397260273972",
-                "monthlyCost": "20",
-                "usageBased": true
-              },
-              {
-                "name": "Ephemeral storage",
-                "unit": "GB-seconds",
-                "hourlyQuantity": "0",
-                "monthlyQuantity": "0",
-                "price": "0.0000000309",
-                "hourlyCost": "0",
-                "monthlyCost": "0"
-              },
-              {
-                "name": "Duration (first 6B)",
-                "unit": "GB-seconds",
-                "hourlyQuantity": "34246.5753424657534247",
-                "monthlyQuantity": "25000000",
-                "price": "0.0000166667",
-                "hourlyCost": "0.57077739726027397260344749",
-                "monthlyCost": "416.6675",
-                "usageBased": true
-              },
-              {
-                "name": "Duration (over 15B)",
-                "unit": "GB-seconds",
-                "hourlyQuantity": "0",
-                "monthlyQuantity": "0",
-                "price": "0.0000133334",
-                "hourlyCost": "0",
-                "monthlyCost": "0",
-                "usageBased": true
               }
             ]
           },
@@ -406,6 +406,56 @@
             ]
           },
           {
+            "name": "aws_lambda_function.hello_world",
+            "resourceType": "aws_lambda_function",
+            "tags": {},
+            "metadata": {},
+            "hourlyCost": "0.59817465753424657534316749",
+            "monthlyCost": "436.6675",
+            "monthlyUsageCost": "436.6675",
+            "costComponents": [
+              {
+                "name": "Requests",
+                "unit": "1M requests",
+                "hourlyQuantity": "0.136986301369863",
+                "monthlyQuantity": "100",
+                "price": "0.2",
+                "hourlyCost": "0.02739726027397260273972",
+                "monthlyCost": "20",
+                "usageBased": true
+              },
+              {
+                "name": "Ephemeral storage",
+                "unit": "GB-seconds",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.0000000309",
+                "hourlyCost": "0",
+                "monthlyCost": "0"
+              },
+              {
+                "name": "Duration (first 6B)",
+                "unit": "GB-seconds",
+                "hourlyQuantity": "34246.5753424657534247",
+                "monthlyQuantity": "25000000",
+                "price": "0.0000166667",
+                "hourlyCost": "0.57077739726027397260344749",
+                "monthlyCost": "416.6675",
+                "usageBased": true
+              },
+              {
+                "name": "Duration (over 15B)",
+                "unit": "GB-seconds",
+                "hourlyQuantity": "0",
+                "monthlyQuantity": "0",
+                "price": "0.0000133334",
+                "hourlyCost": "0",
+                "monthlyCost": "0",
+                "usageBased": true
+              }
+            ]
+          },
+          {
             "name": "aws_instance.zero_cost_instance",
             "resourceType": "aws_instance",
             "tags": {},
@@ -469,56 +519,6 @@
                     "monthlyCost": "52"
                   }
                 ]
-              }
-            ]
-          },
-          {
-            "name": "aws_lambda_function.hello_world",
-            "resourceType": "aws_lambda_function",
-            "tags": {},
-            "metadata": {},
-            "hourlyCost": "0.59817465753424657534316749",
-            "monthlyCost": "436.6675",
-            "monthlyUsageCost": "436.6675",
-            "costComponents": [
-              {
-                "name": "Requests",
-                "unit": "1M requests",
-                "hourlyQuantity": "0.136986301369863",
-                "monthlyQuantity": "100",
-                "price": "0.2",
-                "hourlyCost": "0.02739726027397260273972",
-                "monthlyCost": "20",
-                "usageBased": true
-              },
-              {
-                "name": "Ephemeral storage",
-                "unit": "GB-seconds",
-                "hourlyQuantity": "0",
-                "monthlyQuantity": "0",
-                "price": "0.0000000309",
-                "hourlyCost": "0",
-                "monthlyCost": "0"
-              },
-              {
-                "name": "Duration (first 6B)",
-                "unit": "GB-seconds",
-                "hourlyQuantity": "34246.5753424657534247",
-                "monthlyQuantity": "25000000",
-                "price": "0.0000166667",
-                "hourlyCost": "0.57077739726027397260344749",
-                "monthlyCost": "416.6675",
-                "usageBased": true
-              },
-              {
-                "name": "Duration (over 15B)",
-                "unit": "GB-seconds",
-                "hourlyQuantity": "0",
-                "monthlyQuantity": "0",
-                "price": "0.0000133334",
-                "hourlyCost": "0",
-                "monthlyCost": "0",
-                "usageBased": true
               }
             ]
           },

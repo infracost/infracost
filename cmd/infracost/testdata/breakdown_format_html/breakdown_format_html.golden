@@ -359,6 +359,80 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
     <td class="name">
       
       
+      aws_lambda_function.hello_world
+    </td>
+    
+  
+    <td class="monthly-quantity"></td>
+  
+  
+    <td class="unit"></td>
+  
+  
+  
+  
+    <td class="monthly-cost"></td>
+  
+
+  </tr>
+  
+  
+  
+    
+  <tr class="cost-component">
+    <td class="name">
+      
+      <span class="arrow">&#8627;</span>
+      Requests
+    </td>
+    
+      
+        <td class="monthly-quantity">100</td>
+      
+      
+        <td class="unit">1M requests</td>
+      
+      
+      
+      
+        <td class="monthly-cost">$20.00</td>
+      
+    
+  </tr>
+
+  
+    
+  <tr class="cost-component">
+    <td class="name">
+      
+      <span class="arrow">&#8627;</span>
+      Duration (first 6B)
+    </td>
+    
+      
+        <td class="monthly-quantity">25,000,000</td>
+      
+      
+        <td class="unit">GB-seconds</td>
+      
+      
+      
+      
+        <td class="monthly-cost">$416.67</td>
+      
+    
+  </tr>
+
+  
+  
+
+      
+        
+  
+  <tr class="resource top-level">
+    <td class="name">
+      
+      
       aws_instance.zero_cost_instance
     </td>
     
@@ -526,80 +600,6 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
   
   
 
-  
-
-      
-        
-  
-  <tr class="resource top-level">
-    <td class="name">
-      
-      
-      aws_lambda_function.hello_world
-    </td>
-    
-  
-    <td class="monthly-quantity"></td>
-  
-  
-    <td class="unit"></td>
-  
-  
-  
-  
-    <td class="monthly-cost"></td>
-  
-
-  </tr>
-  
-  
-  
-    
-  <tr class="cost-component">
-    <td class="name">
-      
-      <span class="arrow">&#8627;</span>
-      Requests
-    </td>
-    
-      
-        <td class="monthly-quantity">100</td>
-      
-      
-        <td class="unit">1M requests</td>
-      
-      
-      
-      
-        <td class="monthly-cost">$20.00</td>
-      
-    
-  </tr>
-
-  
-    
-  <tr class="cost-component">
-    <td class="name">
-      
-      <span class="arrow">&#8627;</span>
-      Duration (first 6B)
-    </td>
-    
-      
-        <td class="monthly-quantity">25,000,000</td>
-      
-      
-        <td class="unit">GB-seconds</td>
-      
-      
-      
-      
-        <td class="monthly-cost">$416.67</td>
-      
-    
-  </tr>
-
-  
   
 
       

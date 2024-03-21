@@ -1,17 +1,17 @@
 ──────────────────────────────────
 Project: infracost/infracost/cmd/infracost/testdata/express_route_gateway_plan.json
 
-+ azurerm_express_route_connection.express_route_conn
-  +$37
-
-    + ER Connections
-      +$37
-
 + azurerm_express_route_gateway.express_route
   +$307
 
     + ER scale units (2 Gbps)
       +$307
+
++ azurerm_express_route_connection.express_route_conn
+  +$37
+
+    + ER Connections
+      +$37
 
 Monthly cost change for infracost/infracost/cmd/infracost/testdata/express_route_gateway_plan.json
 Amount:  +$343 ($0.00 → $343)

@@ -24,50 +24,78 @@
       "pastBreakdown": {
         "resources": [
           {
-            "name": "aws_appautoscaling_target.autoscale_dynamodb_table_read_target",
-            "resourceType": "aws_appautoscaling_target",
+            "name": "aws_instance.web_app",
+            "resourceType": "aws_instance",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride",
-              "DefaultOverride": "defaultoverride"
+              "DefaultOverride": "defaultoverride",
+              "foo": "bar",
+              "volume_tags.baz": "bat"
             },
             "metadata": {
               "calls": [
                 {
-                  "blockName": "aws_appautoscaling_target.autoscale_dynamodb_table_read_target",
-                  "endLine": 57,
+                  "blockName": "aws_instance.web_app",
+                  "endLine": 22,
                   "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-                  "startLine": 51
+                  "startLine": 1
                 }
               ],
-              "checksum": "1403df4d5fba340338063d429a834b41d778a10f9bf5641d6e8a9b754c4e479a",
+              "checksum": "f5dd035ad27e97bb0e63f5e9794406f76dec425251f3ad09176905bfe8c1b6c5",
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
-              "endLine": 57,
+              "endLine": 22,
               "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-              "startLine": 51
-            }
-          },
-          {
-            "name": "aws_appautoscaling_target.autoscale_dynamodb_table_write_target",
-            "resourceType": "aws_appautoscaling_target",
-            "tags": {
-              "DefaultNotOverride": "defaultnotoverride",
-              "DefaultOverride": "defaultoverride"
+              "startLine": 1
             },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "aws_appautoscaling_target.autoscale_dynamodb_table_write_target",
-                  "endLine": 49,
-                  "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-                  "startLine": 43
-                }
-              ],
-              "checksum": "90c5db4e165a29a3abc045e28dfea607059c1614b0c0d7a2cc60711ad2985a65",
-              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
-              "endLine": 49,
-              "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-              "startLine": 43
-            }
+            "hourlyCost": "0.91197260273972602",
+            "monthlyCost": "665.74",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, m5.4xlarge)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.768",
+                "hourlyCost": "0.768",
+                "monthlyCost": "560.64"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.00698630136986301",
+                "monthlyCost": "5.1",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.0698630136986301",
+                    "monthlyQuantity": "51",
+                    "price": "0.1",
+                    "hourlyCost": "0.00698630136986301",
+                    "monthlyCost": "5.1"
+                  }
+                ]
+              },
+              {
+                "name": "ebs_block_device[0]",
+                "metadata": {},
+                "hourlyCost": "0.13698630136986301",
+                "monthlyCost": "100",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "1.3698630136986301",
+                    "monthlyQuantity": "1000",
+                    "price": "0.1",
+                    "hourlyCost": "0.13698630136986301",
+                    "monthlyCost": "100"
+                  }
+                ]
+              }
+            ]
           },
           {
             "name": "aws_dynamodb_table.autoscale_dynamodb_table",
@@ -167,78 +195,50 @@
             ]
           },
           {
-            "name": "aws_instance.web_app",
-            "resourceType": "aws_instance",
+            "name": "aws_appautoscaling_target.autoscale_dynamodb_table_read_target",
+            "resourceType": "aws_appautoscaling_target",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride",
-              "DefaultOverride": "defaultoverride",
-              "foo": "bar",
-              "volume_tags.baz": "bat"
+              "DefaultOverride": "defaultoverride"
             },
             "metadata": {
               "calls": [
                 {
-                  "blockName": "aws_instance.web_app",
-                  "endLine": 22,
+                  "blockName": "aws_appautoscaling_target.autoscale_dynamodb_table_read_target",
+                  "endLine": 57,
                   "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-                  "startLine": 1
+                  "startLine": 51
                 }
               ],
-              "checksum": "f5dd035ad27e97bb0e63f5e9794406f76dec425251f3ad09176905bfe8c1b6c5",
+              "checksum": "1403df4d5fba340338063d429a834b41d778a10f9bf5641d6e8a9b754c4e479a",
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
-              "endLine": 22,
+              "endLine": 57,
               "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-              "startLine": 1
+              "startLine": 51
+            }
+          },
+          {
+            "name": "aws_appautoscaling_target.autoscale_dynamodb_table_write_target",
+            "resourceType": "aws_appautoscaling_target",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
             },
-            "hourlyCost": "0.91197260273972602",
-            "monthlyCost": "665.74",
-            "costComponents": [
-              {
-                "name": "Instance usage (Linux/UNIX, on-demand, m5.4xlarge)",
-                "unit": "hours",
-                "hourlyQuantity": "1",
-                "monthlyQuantity": "730",
-                "price": "0.768",
-                "hourlyCost": "0.768",
-                "monthlyCost": "560.64"
-              }
-            ],
-            "subresources": [
-              {
-                "name": "root_block_device",
-                "metadata": {},
-                "hourlyCost": "0.00698630136986301",
-                "monthlyCost": "5.1",
-                "costComponents": [
-                  {
-                    "name": "Storage (general purpose SSD, gp2)",
-                    "unit": "GB",
-                    "hourlyQuantity": "0.0698630136986301",
-                    "monthlyQuantity": "51",
-                    "price": "0.1",
-                    "hourlyCost": "0.00698630136986301",
-                    "monthlyCost": "5.1"
-                  }
-                ]
-              },
-              {
-                "name": "ebs_block_device[0]",
-                "metadata": {},
-                "hourlyCost": "0.13698630136986301",
-                "monthlyCost": "100",
-                "costComponents": [
-                  {
-                    "name": "Storage (general purpose SSD, gp2)",
-                    "unit": "GB",
-                    "hourlyQuantity": "1.3698630136986301",
-                    "monthlyQuantity": "1000",
-                    "price": "0.1",
-                    "hourlyCost": "0.13698630136986301",
-                    "monthlyCost": "100"
-                  }
-                ]
-              }
-            ]
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_appautoscaling_target.autoscale_dynamodb_table_write_target",
+                  "endLine": 49,
+                  "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
+                  "startLine": 43
+                }
+              ],
+              "checksum": "90c5db4e165a29a3abc045e28dfea607059c1614b0c0d7a2cc60711ad2985a65",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
+              "endLine": 49,
+              "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
+              "startLine": 43
+            }
           }
         ],
         "totalHourlyCost": "0.91977260273972602",
@@ -248,50 +248,78 @@
       "breakdown": {
         "resources": [
           {
-            "name": "aws_appautoscaling_target.autoscale_dynamodb_table_read_target",
-            "resourceType": "aws_appautoscaling_target",
+            "name": "aws_instance.web_app",
+            "resourceType": "aws_instance",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride",
-              "DefaultOverride": "defaultoverride"
+              "DefaultOverride": "defaultoverride",
+              "foo": "bar",
+              "volume_tags.baz": "bat"
             },
             "metadata": {
               "calls": [
                 {
-                  "blockName": "aws_appautoscaling_target.autoscale_dynamodb_table_read_target",
-                  "endLine": 57,
+                  "blockName": "aws_instance.web_app",
+                  "endLine": 22,
                   "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-                  "startLine": 51
+                  "startLine": 1
                 }
               ],
-              "checksum": "1403df4d5fba340338063d429a834b41d778a10f9bf5641d6e8a9b754c4e479a",
+              "checksum": "f5dd035ad27e97bb0e63f5e9794406f76dec425251f3ad09176905bfe8c1b6c5",
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
-              "endLine": 57,
+              "endLine": 22,
               "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-              "startLine": 51
-            }
-          },
-          {
-            "name": "aws_appautoscaling_target.autoscale_dynamodb_table_write_target",
-            "resourceType": "aws_appautoscaling_target",
-            "tags": {
-              "DefaultNotOverride": "defaultnotoverride",
-              "DefaultOverride": "defaultoverride"
+              "startLine": 1
             },
-            "metadata": {
-              "calls": [
-                {
-                  "blockName": "aws_appautoscaling_target.autoscale_dynamodb_table_write_target",
-                  "endLine": 49,
-                  "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-                  "startLine": 43
-                }
-              ],
-              "checksum": "90c5db4e165a29a3abc045e28dfea607059c1614b0c0d7a2cc60711ad2985a65",
-              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
-              "endLine": 49,
-              "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-              "startLine": 43
-            }
+            "hourlyCost": "0.91197260273972602",
+            "monthlyCost": "665.74",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, m5.4xlarge)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.768",
+                "hourlyCost": "0.768",
+                "monthlyCost": "560.64"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.00698630136986301",
+                "monthlyCost": "5.1",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.0698630136986301",
+                    "monthlyQuantity": "51",
+                    "price": "0.1",
+                    "hourlyCost": "0.00698630136986301",
+                    "monthlyCost": "5.1"
+                  }
+                ]
+              },
+              {
+                "name": "ebs_block_device[0]",
+                "metadata": {},
+                "hourlyCost": "0.13698630136986301",
+                "monthlyCost": "100",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "1.3698630136986301",
+                    "monthlyQuantity": "1000",
+                    "price": "0.1",
+                    "hourlyCost": "0.13698630136986301",
+                    "monthlyCost": "100"
+                  }
+                ]
+              }
+            ]
           },
           {
             "name": "aws_dynamodb_table.autoscale_dynamodb_table",
@@ -391,78 +419,50 @@
             ]
           },
           {
-            "name": "aws_instance.web_app",
-            "resourceType": "aws_instance",
+            "name": "aws_appautoscaling_target.autoscale_dynamodb_table_read_target",
+            "resourceType": "aws_appautoscaling_target",
             "tags": {
               "DefaultNotOverride": "defaultnotoverride",
-              "DefaultOverride": "defaultoverride",
-              "foo": "bar",
-              "volume_tags.baz": "bat"
+              "DefaultOverride": "defaultoverride"
             },
             "metadata": {
               "calls": [
                 {
-                  "blockName": "aws_instance.web_app",
-                  "endLine": 22,
+                  "blockName": "aws_appautoscaling_target.autoscale_dynamodb_table_read_target",
+                  "endLine": 57,
                   "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-                  "startLine": 1
+                  "startLine": 51
                 }
               ],
-              "checksum": "f5dd035ad27e97bb0e63f5e9794406f76dec425251f3ad09176905bfe8c1b6c5",
+              "checksum": "1403df4d5fba340338063d429a834b41d778a10f9bf5641d6e8a9b754c4e479a",
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
-              "endLine": 22,
+              "endLine": 57,
               "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
-              "startLine": 1
+              "startLine": 51
+            }
+          },
+          {
+            "name": "aws_appautoscaling_target.autoscale_dynamodb_table_write_target",
+            "resourceType": "aws_appautoscaling_target",
+            "tags": {
+              "DefaultNotOverride": "defaultnotoverride",
+              "DefaultOverride": "defaultoverride"
             },
-            "hourlyCost": "0.91197260273972602",
-            "monthlyCost": "665.74",
-            "costComponents": [
-              {
-                "name": "Instance usage (Linux/UNIX, on-demand, m5.4xlarge)",
-                "unit": "hours",
-                "hourlyQuantity": "1",
-                "monthlyQuantity": "730",
-                "price": "0.768",
-                "hourlyCost": "0.768",
-                "monthlyCost": "560.64"
-              }
-            ],
-            "subresources": [
-              {
-                "name": "root_block_device",
-                "metadata": {},
-                "hourlyCost": "0.00698630136986301",
-                "monthlyCost": "5.1",
-                "costComponents": [
-                  {
-                    "name": "Storage (general purpose SSD, gp2)",
-                    "unit": "GB",
-                    "hourlyQuantity": "0.0698630136986301",
-                    "monthlyQuantity": "51",
-                    "price": "0.1",
-                    "hourlyCost": "0.00698630136986301",
-                    "monthlyCost": "5.1"
-                  }
-                ]
-              },
-              {
-                "name": "ebs_block_device[0]",
-                "metadata": {},
-                "hourlyCost": "0.13698630136986301",
-                "monthlyCost": "100",
-                "costComponents": [
-                  {
-                    "name": "Storage (general purpose SSD, gp2)",
-                    "unit": "GB",
-                    "hourlyQuantity": "1.3698630136986301",
-                    "monthlyQuantity": "1000",
-                    "price": "0.1",
-                    "hourlyCost": "0.13698630136986301",
-                    "monthlyCost": "100"
-                  }
-                ]
-              }
-            ]
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_appautoscaling_target.autoscale_dynamodb_table_write_target",
+                  "endLine": 49,
+                  "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
+                  "startLine": 43
+                }
+              ],
+              "checksum": "90c5db4e165a29a3abc045e28dfea607059c1614b0c0d7a2cc60711ad2985a65",
+              "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
+              "endLine": 49,
+              "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
+              "startLine": 43
+            }
           }
         ],
         "totalHourlyCost": "0.91977260273972602",

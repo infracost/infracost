@@ -27,6 +27,15 @@
 ──────────────────────────────────
 Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
 
++ module.db.module.db_2.module.db_instance.aws_db_instance.this[0]
+  +$13
+
+    + Database instance (on-demand, Single-AZ, db.t3.micro)
+      +$12
+
+    + Storage (general purpose SSD, gp2)
+      +$0.58
+
 + aws_instance.instance_2
   +$5
 
@@ -68,15 +77,6 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
     
         + Storage (general purpose SSD, gp2)
           +$0.80
-
-+ module.db.module.db_2.module.db_instance.aws_db_instance.this[0]
-  +$13
-
-    + Database instance (on-demand, Single-AZ, db.t3.micro)
-      +$12
-
-    + Storage (general purpose SSD, gp2)
-      +$0.58
 
 + module.instances.aws_instance.module_instance_2
   +$5

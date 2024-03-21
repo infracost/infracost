@@ -2,13 +2,13 @@ Project: infracost/infracost/cmd/infracost/testdata/breakdown_terraform_sync_usa
 
  Name                                                   Monthly Qty  Unit              Monthly Cost 
                                                                                                     
- aws_cloudwatch_log_group.production_logs["assets"]                                                 
- ├─ Data ingested                                               100  GB                      $50.00 
+ aws_cloudwatch_log_group.production_logs["media"]                                                  
+ ├─ Data ingested                                             1,000  GB                     $500.00 
  ├─ Archival Storage                                          1,000  GB                      $30.00 
  └─ Insights queries data scanned                    Monthly cost depends on usage: $0.005 per GB   
                                                                                                     
- aws_cloudwatch_log_group.production_logs["media"]                                                  
- ├─ Data ingested                                             1,000  GB                     $500.00 
+ aws_cloudwatch_log_group.production_logs["assets"]                                                 
+ ├─ Data ingested                                               100  GB                      $50.00 
  ├─ Archival Storage                                          1,000  GB                      $30.00 
  └─ Insights queries data scanned                    Monthly cost depends on usage: $0.005 per GB   
                                                                                                     
