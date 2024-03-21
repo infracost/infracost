@@ -237,6 +237,9 @@ func tableForBreakdown(currency string, breakdown Breakdown, fields []string, in
 		var totalCostRow table.Row
 		totalCostRow = append(totalCostRow, ui.BoldString(formatTitleWithCurrency("Project total", currency)))
 		numOfFields := i - 3
+		if contains(fields, "usageFootnote") {
+			numOfFields -= 1
+		}
 		for q := 0; q < numOfFields; q++ {
 			totalCostRow = append(totalCostRow, "")
 		}
