@@ -1,9 +1,6 @@
 
  Name                                                                        Monthly Qty  Unit            Monthly Cost 
                                                                                                                        
- azurerm_application_insights.example                                                                                  
- └─ Data ingested                                                          Monthly cost depends on usage: $2.30 per GB 
-                                                                                                                       
  azurerm_application_insights_standard_web_test.example-default-frequency                                              
  └─ Standard web test (300 second frequency)                                       8,760  tests                  $5.65 
                                                                                                                        
@@ -15,6 +12,9 @@
                                                                                                                        
  azurerm_application_insights_standard_web_test.example["900"]                                                         
  └─ Standard web test (900 second frequency)                                       2,920  tests                  $1.88 
+                                                                                                                       
+ azurerm_application_insights.example                                                                                  
+ └─ Data ingested                                                          Monthly cost depends on usage: $2.30 per GB 
                                                                                                                        
  OVERALL TOTAL                                                                                                  $16.01 
 ──────────────────────────────────

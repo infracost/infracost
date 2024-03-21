@@ -1,19 +1,19 @@
 
  Name                                                                   Monthly Qty  Unit   Monthly Cost 
                                                                                                          
- azurerm_traffic_manager_external_endpoint.basic_healthcheck_example                                     
- └─ Basic health check (Global)                                                 730  hours         $0.54 
-                                                                                                         
- azurerm_traffic_manager_external_endpoint.default_healthcheck_example                                   
- └─ Basic health check (Global)                                                 730  hours         $0.54 
+ azurerm_traffic_manager_external_endpoint.germany_example                                               
+ ├─ Basic health check (Germany)                                                730  hours         $0.54 
+ └─ Fast interval health checks add-on (Germany)                                730  hours         $2.54 
                                                                                                          
  azurerm_traffic_manager_external_endpoint.fast_healthcheck_example                                      
  ├─ Basic health check (Global)                                                 730  hours         $0.54 
  └─ Fast interval health checks add-on (Global)                                 730  hours         $2.00 
                                                                                                          
- azurerm_traffic_manager_external_endpoint.germany_example                                               
- ├─ Basic health check (Germany)                                                730  hours         $0.54 
- └─ Fast interval health checks add-on (Germany)                                730  hours         $2.54 
+ azurerm_traffic_manager_external_endpoint.basic_healthcheck_example                                     
+ └─ Basic health check (Global)                                                 730  hours         $0.54 
+                                                                                                         
+ azurerm_traffic_manager_external_endpoint.default_healthcheck_example                                   
+ └─ Basic health check (Global)                                                 730  hours         $0.54 
                                                                                                          
  OVERALL TOTAL                                                                                     $6.70 
 ──────────────────────────────────

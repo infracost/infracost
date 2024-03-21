@@ -1,22 +1,6 @@
 
  Name                                                               Monthly Qty  Unit                      Monthly Cost 
                                                                                                                         
- azurerm_storage_account.example                                                                                        
- ├─ Capacity                                                 Monthly cost depends on usage: $0.01 per GB                
- ├─ Write operations                                         Monthly cost depends on usage: $0.10 per 10k operations    
- ├─ List and create container operations                     Monthly cost depends on usage: $0.054 per 10k operations   
- ├─ Read operations                                          Monthly cost depends on usage: $0.01 per 10k operations    
- ├─ All other operations                                     Monthly cost depends on usage: $0.0043 per 10k operations  
- ├─ Data retrieval                                           Monthly cost depends on usage: $0.01 per GB                
- ├─ Blob index                                               Monthly cost depends on usage: $0.039 per 10k tags         
- └─ Early deletion                                           Monthly cost depends on usage: $0.01 per GB                
-                                                                                                                        
- azurerm_synapse_spark_pool.autoscale                                                                                   
- └─ small (4 nodes)                                                         144  vCore-hours                     $22.26 
-                                                                                                                        
- azurerm_synapse_spark_pool.default                                                                                     
- └─ small (3 nodes)                                                         132  vCore-hours                     $20.40 
-                                                                                                                        
  azurerm_synapse_workspace.example                                                                                      
  ├─ Serverless SQL pool size                                                 11  TB                              $55.00 
  ├─ Data flow (basic)                                        Monthly cost depends on usage: $0.27 per vCore-hours       
@@ -29,6 +13,22 @@
  ├─ Data pipeline self hosted data movement                  Monthly cost depends on usage: $0.10 per hours             
  ├─ Data pipeline self hosted integration runtime            Monthly cost depends on usage: $0.002 per hours            
  └─ Data pipeline self hosted external integration runtime   Monthly cost depends on usage: $0.0001 per hours           
+                                                                                                                        
+ azurerm_synapse_spark_pool.autoscale                                                                                   
+ └─ small (4 nodes)                                                         144  vCore-hours                     $22.26 
+                                                                                                                        
+ azurerm_synapse_spark_pool.default                                                                                     
+ └─ small (3 nodes)                                                         132  vCore-hours                     $20.40 
+                                                                                                                        
+ azurerm_storage_account.example                                                                                        
+ ├─ Capacity                                                 Monthly cost depends on usage: $0.01 per GB                
+ ├─ Write operations                                         Monthly cost depends on usage: $0.10 per 10k operations    
+ ├─ List and create container operations                     Monthly cost depends on usage: $0.054 per 10k operations   
+ ├─ Read operations                                          Monthly cost depends on usage: $0.01 per 10k operations    
+ ├─ All other operations                                     Monthly cost depends on usage: $0.0043 per 10k operations  
+ ├─ Data retrieval                                           Monthly cost depends on usage: $0.01 per GB                
+ ├─ Blob index                                               Monthly cost depends on usage: $0.039 per 10k tags         
+ └─ Early deletion                                           Monthly cost depends on usage: $0.01 per GB                
                                                                                                                         
  OVERALL TOTAL                                                                                                   $97.66 
 ──────────────────────────────────

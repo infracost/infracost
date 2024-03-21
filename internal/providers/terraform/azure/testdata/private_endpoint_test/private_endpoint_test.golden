@@ -1,11 +1,6 @@
 
  Name                                                 Monthly Qty  Unit                      Monthly Cost 
                                                                                                           
- azurerm_private_endpoint.with_inbound                                                                    
- ├─ Private endpoint                                          730  hour                             $7.30 
- ├─ Inbound data processed (first 1PB)                        100  GB                               $1.00 
- └─ Outbound data processed (first 1PB)        Monthly cost depends on usage: $0.01 per GB                
-                                                                                                          
  azurerm_private_endpoint.with_multiple_tiers                                                             
  ├─ Private endpoint                                          730  hour                             $7.30 
  ├─ Inbound data processed (first 1PB)                  1,000,000  GB                          $10,000.00 
@@ -14,6 +9,11 @@
  ├─ Outbound data processed (first 1PB)                 1,000,000  GB                          $10,000.00 
  ├─ Outbound data processed (next 4PB)                  4,000,000  GB                          $24,000.00 
  └─ Outbound data processed (over 5PB)                    120,000  GB                             $480.00 
+                                                                                                          
+ azurerm_private_endpoint.with_inbound                                                                    
+ ├─ Private endpoint                                          730  hour                             $7.30 
+ ├─ Inbound data processed (first 1PB)                        100  GB                               $1.00 
+ └─ Outbound data processed (first 1PB)        Monthly cost depends on usage: $0.01 per GB                
                                                                                                           
  azurerm_private_endpoint.with_outbound                                                                   
  ├─ Private endpoint                                          730  hour                             $7.30 

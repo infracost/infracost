@@ -9,11 +9,11 @@
  ├─ NAT gateway                               730  hours                   $32.85 
  └─ Data processed                 Monthly cost depends on usage: $0.045 per GB   
                                                                                   
- azurerm_public_ip.example                                                        
- └─ IP address (static, regional)             730  hours                    $3.65 
-                                                                                  
  azurerm_public_ip_prefix.example                                                 
  └─ IP prefix                                 730  hours                    $4.38 
+                                                                                  
+ azurerm_public_ip.example                                                        
+ └─ IP address (static, regional)             730  hours                    $3.65 
                                                                                   
  OVERALL TOTAL                                                             $74.18 
 ──────────────────────────────────

@@ -1,9 +1,6 @@
 
  Name                                          Monthly Qty  Unit              Monthly Cost 
                                                                                            
- azurerm_lb.example_withStandardSku                                                        
- └─ Data processed                          Monthly cost depends on usage: $0.005 per GB   
-                                                                                           
  azurerm_lb_rule.rules_withStandardSku                                                     
  └─ Rule usage                                         730  hours                    $7.30 
                                                                                            
@@ -15,6 +12,9 @@
                                                                                            
  azurerm_public_ip.example_withStandardSku                                                 
  └─ IP address (static, regional)                      730  hours                    $2.63 
+                                                                                           
+ azurerm_lb.example_withStandardSku                                                        
+ └─ Data processed                          Monthly cost depends on usage: $0.005 per GB   
                                                                                            
  OVERALL TOTAL                                                                      $15.18 
 ──────────────────────────────────

@@ -4,11 +4,11 @@
  azurerm_public_ip.example                                           
  └─ IP address (static, regional)           730  hours         $3.65 
                                                                      
- azurerm_public_ip.example1                                          
- └─ IP address (dynamic, regional)          730  hours         $2.92 
-                                                                     
  azurerm_public_ip.global                                            
  └─ IP address (static, global)             730  hours         $3.65 
+                                                                     
+ azurerm_public_ip.example1                                          
+ └─ IP address (dynamic, regional)          730  hours         $2.92 
                                                                      
  OVERALL TOTAL                                                $10.22 
 ──────────────────────────────────

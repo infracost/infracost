@@ -66,10 +66,10 @@ Module path: ref1
 
  Name                                                                         Monthly Qty  Unit                    Monthly Cost 
                                                                                                                                 
- aws_cloudwatch_log_group.this[0]                                                                                               
- ├─ Data ingested                                                       Monthly cost depends on usage: $0.50 per GB             
- ├─ Archival Storage                                                    Monthly cost depends on usage: $0.03 per GB             
- └─ Insights queries data scanned                                       Monthly cost depends on usage: $0.005 per GB            
+ module.self_managed_node_group["one"].aws_autoscaling_group.this[0]                                                            
+ └─ module.self_managed_node_group["one"].aws_launch_template.this[0]                                                           
+    ├─ Instance usage (Linux/UNIX, on-demand, m5.large)                             1,460  hours                        $140.16 
+    └─ EC2 detailed monitoring                                                         14  metrics                        $4.20 
                                                                                                                                 
  aws_eks_cluster.this[0]                                                                                                        
  └─ EKS cluster                                                                       730  hours                         $73.00 
@@ -94,10 +94,10 @@ Module path: ref1
  ├─ ECC GenerateDataKeyPair requests                                    Monthly cost depends on usage: $0.10 per 10k requests   
  └─ RSA GenerateDataKeyPair requests                                    Monthly cost depends on usage: $0.10 per 10k requests   
                                                                                                                                 
- module.self_managed_node_group["one"].aws_autoscaling_group.this[0]                                                            
- └─ module.self_managed_node_group["one"].aws_launch_template.this[0]                                                           
-    ├─ Instance usage (Linux/UNIX, on-demand, m5.large)                             1,460  hours                        $140.16 
-    └─ EC2 detailed monitoring                                                         14  metrics                        $4.20 
+ aws_cloudwatch_log_group.this[0]                                                                                               
+ ├─ Data ingested                                                       Monthly cost depends on usage: $0.50 per GB             
+ ├─ Archival Storage                                                    Monthly cost depends on usage: $0.03 per GB             
+ └─ Insights queries data scanned                                       Monthly cost depends on usage: $0.005 per GB            
                                                                                                                                 
  Project total                                                                                                          $386.17 
 
@@ -119,10 +119,10 @@ Module path: ref2
 
  Name                                                                         Monthly Qty  Unit                    Monthly Cost 
                                                                                                                                 
- aws_cloudwatch_log_group.this[0]                                                                                               
- ├─ Data ingested                                                       Monthly cost depends on usage: $0.50 per GB             
- ├─ Archival Storage                                                    Monthly cost depends on usage: $0.03 per GB             
- └─ Insights queries data scanned                                       Monthly cost depends on usage: $0.005 per GB            
+ module.self_managed_node_group["one"].aws_autoscaling_group.this[0]                                                            
+ └─ module.self_managed_node_group["one"].aws_launch_template.this[0]                                                           
+    ├─ Instance usage (Linux/UNIX, on-demand, m5.large)                             1,460  hours                        $140.16 
+    └─ EC2 detailed monitoring                                                         14  metrics                        $4.20 
                                                                                                                                 
  aws_eks_cluster.this[0]                                                                                                        
  └─ EKS cluster                                                                       730  hours                         $73.00 
@@ -147,10 +147,10 @@ Module path: ref2
  ├─ ECC GenerateDataKeyPair requests                                    Monthly cost depends on usage: $0.10 per 10k requests   
  └─ RSA GenerateDataKeyPair requests                                    Monthly cost depends on usage: $0.10 per 10k requests   
                                                                                                                                 
- module.self_managed_node_group["one"].aws_autoscaling_group.this[0]                                                            
- └─ module.self_managed_node_group["one"].aws_launch_template.this[0]                                                           
-    ├─ Instance usage (Linux/UNIX, on-demand, m5.large)                             1,460  hours                        $140.16 
-    └─ EC2 detailed monitoring                                                         14  metrics                        $4.20 
+ aws_cloudwatch_log_group.this[0]                                                                                               
+ ├─ Data ingested                                                       Monthly cost depends on usage: $0.50 per GB             
+ ├─ Archival Storage                                                    Monthly cost depends on usage: $0.03 per GB             
+ └─ Insights queries data scanned                                       Monthly cost depends on usage: $0.005 per GB            
                                                                                                                                 
  Project total                                                                                                          $386.17 
 

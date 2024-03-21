@@ -1,6 +1,55 @@
 
  Name                                                                       Monthly Qty  Unit                      Monthly Cost 
                                                                                                                                 
+ azurerm_storage_queue.storagev2-queue["StorageV2.Standard.RAGZRS"]                                                             
+ ├─ Capacity                                                                      2,000  GB                             $254.00 
+ ├─ Class 2 operations                                                              400  10k operations                   $1.60 
+ └─ Geo-replication data transfer                                                 6,000  GB                             $120.00 
+                                                                                                                                
+ azurerm_storage_queue.storagev2-queue["StorageV2.Standard.GZRS"]                                                               
+ ├─ Capacity                                                                      2,000  GB                             $202.00 
+ ├─ Class 2 operations                                                              400  10k operations                   $1.60 
+ └─ Geo-replication data transfer                                                 6,000  GB                             $120.00 
+                                                                                                                                
+ azurerm_storage_queue.storagev2-queue["StorageV2.Standard.RAGRS"]                                                              
+ ├─ Capacity                                                                      2,000  GB                             $149.60 
+ ├─ Class 1 operations                                                              200  10k operations                   $1.60 
+ ├─ Class 2 operations                                                              400  10k operations                   $1.60 
+ └─ Geo-replication data transfer                                                 6,000  GB                             $120.00 
+                                                                                                                                
+ azurerm_storage_queue.storagev2-queue["StorageV2.Standard.GRS"]                                                                
+ ├─ Capacity                                                                      2,000  GB                             $119.60 
+ ├─ Class 1 operations                                                              200  10k operations                   $1.60 
+ ├─ Class 2 operations                                                              400  10k operations                   $1.60 
+ └─ Geo-replication data transfer                                                 6,000  GB                             $120.00 
+                                                                                                                                
+ azurerm_storage_queue.storagev1-queue["Storage.Standard.RAGRS"]                                                                
+ ├─ Capacity                                                                      1,000  GB                              $75.00 
+ ├─ Class 1 operations                                                              100  10k operations                   $0.04 
+ ├─ Class 2 operations                                                              300  10k operations                   $0.11 
+ └─ Geo-replication data transfer                                                 5,000  GB                             $100.00 
+                                                                                                                                
+ azurerm_storage_queue.storagev1-queue["Storage.Standard.GRS"]                                                                  
+ ├─ Capacity                                                                      1,000  GB                              $60.00 
+ ├─ Class 1 operations                                                              100  10k operations                   $0.04 
+ ├─ Class 2 operations                                                              300  10k operations                   $0.11 
+ └─ Geo-replication data transfer                                                 5,000  GB                             $100.00 
+                                                                                                                                
+ azurerm_storage_queue.storagev2-queue["StorageV2.Standard.ZRS"]                                                                
+ ├─ Capacity                                                                      2,000  GB                             $112.50 
+ ├─ Class 1 operations                                                              200  10k operations                   $0.80 
+ └─ Class 2 operations                                                              400  10k operations                   $1.60 
+                                                                                                                                
+ azurerm_storage_queue.storagev2-queue["StorageV2.Standard.LRS"]                                                                
+ ├─ Capacity                                                                      2,000  GB                              $90.00 
+ ├─ Class 1 operations                                                              200  10k operations                   $0.80 
+ └─ Class 2 operations                                                              400  10k operations                   $1.60 
+                                                                                                                                
+ azurerm_storage_queue.storagev1-queue["Storage.Standard.LRS"]                                                                  
+ ├─ Capacity                                                                      1,000  GB                              $45.00 
+ ├─ Class 1 operations                                                              100  10k operations                   $0.04 
+ └─ Class 2 operations                                                              300  10k operations                   $0.11 
+                                                                                                                                
  azurerm_storage_account.storagev1["Storage.Standard.GRS"]                                                                      
  ├─ Capacity                                                         Monthly cost depends on usage: $0.048 per GB               
  ├─ Write operations                                                 Monthly cost depends on usage: $0.00036 per 10k operations 
@@ -61,55 +110,6 @@
  ├─ Read operations                                                  Monthly cost depends on usage: $0.0044 per 10k operations  
  ├─ All other operations                                             Monthly cost depends on usage: $0.0044 per 10k operations  
  └─ Blob index                                                       Monthly cost depends on usage: $0.039 per 10k tags         
-                                                                                                                                
- azurerm_storage_queue.storagev1-queue["Storage.Standard.GRS"]                                                                  
- ├─ Capacity                                                                      1,000  GB                              $60.00 
- ├─ Class 1 operations                                                              100  10k operations                   $0.04 
- ├─ Class 2 operations                                                              300  10k operations                   $0.11 
- └─ Geo-replication data transfer                                                 5,000  GB                             $100.00 
-                                                                                                                                
- azurerm_storage_queue.storagev1-queue["Storage.Standard.LRS"]                                                                  
- ├─ Capacity                                                                      1,000  GB                              $45.00 
- ├─ Class 1 operations                                                              100  10k operations                   $0.04 
- └─ Class 2 operations                                                              300  10k operations                   $0.11 
-                                                                                                                                
- azurerm_storage_queue.storagev1-queue["Storage.Standard.RAGRS"]                                                                
- ├─ Capacity                                                                      1,000  GB                              $75.00 
- ├─ Class 1 operations                                                              100  10k operations                   $0.04 
- ├─ Class 2 operations                                                              300  10k operations                   $0.11 
- └─ Geo-replication data transfer                                                 5,000  GB                             $100.00 
-                                                                                                                                
- azurerm_storage_queue.storagev2-queue["StorageV2.Standard.GRS"]                                                                
- ├─ Capacity                                                                      2,000  GB                             $119.60 
- ├─ Class 1 operations                                                              200  10k operations                   $1.60 
- ├─ Class 2 operations                                                              400  10k operations                   $1.60 
- └─ Geo-replication data transfer                                                 6,000  GB                             $120.00 
-                                                                                                                                
- azurerm_storage_queue.storagev2-queue["StorageV2.Standard.GZRS"]                                                               
- ├─ Capacity                                                                      2,000  GB                             $202.00 
- ├─ Class 2 operations                                                              400  10k operations                   $1.60 
- └─ Geo-replication data transfer                                                 6,000  GB                             $120.00 
-                                                                                                                                
- azurerm_storage_queue.storagev2-queue["StorageV2.Standard.LRS"]                                                                
- ├─ Capacity                                                                      2,000  GB                              $90.00 
- ├─ Class 1 operations                                                              200  10k operations                   $0.80 
- └─ Class 2 operations                                                              400  10k operations                   $1.60 
-                                                                                                                                
- azurerm_storage_queue.storagev2-queue["StorageV2.Standard.RAGRS"]                                                              
- ├─ Capacity                                                                      2,000  GB                             $149.60 
- ├─ Class 1 operations                                                              200  10k operations                   $1.60 
- ├─ Class 2 operations                                                              400  10k operations                   $1.60 
- └─ Geo-replication data transfer                                                 6,000  GB                             $120.00 
-                                                                                                                                
- azurerm_storage_queue.storagev2-queue["StorageV2.Standard.RAGZRS"]                                                             
- ├─ Capacity                                                                      2,000  GB                             $254.00 
- ├─ Class 2 operations                                                              400  10k operations                   $1.60 
- └─ Geo-replication data transfer                                                 6,000  GB                             $120.00 
-                                                                                                                                
- azurerm_storage_queue.storagev2-queue["StorageV2.Standard.ZRS"]                                                                
- ├─ Capacity                                                                      2,000  GB                             $112.50 
- ├─ Class 1 operations                                                              200  10k operations                   $0.80 
- └─ Class 2 operations                                                              400  10k operations                   $1.60 
                                                                                                                                 
  OVERALL TOTAL                                                                                                        $1,802.53 
 ──────────────────────────────────

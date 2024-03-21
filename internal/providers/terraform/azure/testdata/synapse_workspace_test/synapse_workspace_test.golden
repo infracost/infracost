@@ -1,42 +1,6 @@
 
  Name                                                               Monthly Qty  Unit                      Monthly Cost 
                                                                                                                         
- azurerm_storage_account.example                                                                                        
- ├─ Capacity                                                 Monthly cost depends on usage: $0.01 per GB                
- ├─ Write operations                                         Monthly cost depends on usage: $0.10 per 10k operations    
- ├─ List and create container operations                     Monthly cost depends on usage: $0.054 per 10k operations   
- ├─ Read operations                                          Monthly cost depends on usage: $0.01 per 10k operations    
- ├─ All other operations                                     Monthly cost depends on usage: $0.0043 per 10k operations  
- ├─ Data retrieval                                           Monthly cost depends on usage: $0.01 per GB                
- ├─ Blob index                                               Monthly cost depends on usage: $0.039 per 10k tags         
- └─ Early deletion                                           Monthly cost depends on usage: $0.01 per GB                
-                                                                                                                        
- azurerm_synapse_workspace.dataflows                                                                                    
- ├─ Serverless SQL pool size                                 Monthly cost depends on usage: $5.00 per TB                
- ├─ Data flow (basic)                                                         8  vCore-hours                      $2.14 
- ├─ Data flow (standard)                                                     12  vCore-hours                      $4.14 
- ├─ Data pipeline azure hosted activity runs                 Monthly cost depends on usage: $1.00 per 1k activity runs  
- ├─ Data pipeline azure hosted data integration units        Monthly cost depends on usage: $0.25 per DIU-hours         
- ├─ Data pipeline azure hosted integration runtime           Monthly cost depends on usage: $0.005 per hours            
- ├─ Data pipeline azure hosted external integration runtime  Monthly cost depends on usage: $0.00025 per hours          
- ├─ Data pipeline self hosted activity runs                  Monthly cost depends on usage: $1.50 per 1k activity runs  
- ├─ Data pipeline self hosted data movement                  Monthly cost depends on usage: $0.10 per hours             
- ├─ Data pipeline self hosted integration runtime            Monthly cost depends on usage: $0.002 per hours            
- └─ Data pipeline self hosted external integration runtime   Monthly cost depends on usage: $0.0001 per hours           
-                                                                                                                        
- azurerm_synapse_workspace.datapipelines                                                                                
- ├─ Serverless SQL pool size                                 Monthly cost depends on usage: $5.00 per TB                
- ├─ Data flow (basic)                                        Monthly cost depends on usage: $0.27 per vCore-hours       
- ├─ Data flow (standard)                                     Monthly cost depends on usage: $0.35 per vCore-hours       
- ├─ Data pipeline azure hosted activity runs                                  3  1k activity runs                 $3.00 
- ├─ Data pipeline azure hosted data integration units                        31  DIU-hours                        $7.75 
- ├─ Data pipeline azure hosted integration runtime                          200  hours                            $1.00 
- ├─ Data pipeline azure hosted external integration runtime               4,000  hours                            $1.00 
- ├─ Data pipeline self hosted activity runs                                   1  1k activity runs                 $1.50 
- ├─ Data pipeline self hosted data movement                                  10  hours                            $1.00 
- ├─ Data pipeline self hosted integration runtime                           200  hours                            $0.40 
- └─ Data pipeline self hosted external integration runtime                4,000  hours                            $0.40 
-                                                                                                                        
  azurerm_synapse_workspace.general                                                                                      
  ├─ Serverless SQL pool size                                                 11  TB                              $55.00 
  ├─ Data flow (basic)                                        Monthly cost depends on usage: $0.27 per vCore-hours       
@@ -62,6 +26,42 @@
  ├─ Data pipeline self hosted data movement                  Monthly cost depends on usage: $0.10 per hours             
  ├─ Data pipeline self hosted integration runtime            Monthly cost depends on usage: $0.002 per hours            
  └─ Data pipeline self hosted external integration runtime   Monthly cost depends on usage: $0.0001 per hours           
+                                                                                                                        
+ azurerm_synapse_workspace.datapipelines                                                                                
+ ├─ Serverless SQL pool size                                 Monthly cost depends on usage: $5.00 per TB                
+ ├─ Data flow (basic)                                        Monthly cost depends on usage: $0.27 per vCore-hours       
+ ├─ Data flow (standard)                                     Monthly cost depends on usage: $0.35 per vCore-hours       
+ ├─ Data pipeline azure hosted activity runs                                  3  1k activity runs                 $3.00 
+ ├─ Data pipeline azure hosted data integration units                        31  DIU-hours                        $7.75 
+ ├─ Data pipeline azure hosted integration runtime                          200  hours                            $1.00 
+ ├─ Data pipeline azure hosted external integration runtime               4,000  hours                            $1.00 
+ ├─ Data pipeline self hosted activity runs                                   1  1k activity runs                 $1.50 
+ ├─ Data pipeline self hosted data movement                                  10  hours                            $1.00 
+ ├─ Data pipeline self hosted integration runtime                           200  hours                            $0.40 
+ └─ Data pipeline self hosted external integration runtime                4,000  hours                            $0.40 
+                                                                                                                        
+ azurerm_synapse_workspace.dataflows                                                                                    
+ ├─ Serverless SQL pool size                                 Monthly cost depends on usage: $5.00 per TB                
+ ├─ Data flow (basic)                                                         8  vCore-hours                      $2.14 
+ ├─ Data flow (standard)                                                     12  vCore-hours                      $4.14 
+ ├─ Data pipeline azure hosted activity runs                 Monthly cost depends on usage: $1.00 per 1k activity runs  
+ ├─ Data pipeline azure hosted data integration units        Monthly cost depends on usage: $0.25 per DIU-hours         
+ ├─ Data pipeline azure hosted integration runtime           Monthly cost depends on usage: $0.005 per hours            
+ ├─ Data pipeline azure hosted external integration runtime  Monthly cost depends on usage: $0.00025 per hours          
+ ├─ Data pipeline self hosted activity runs                  Monthly cost depends on usage: $1.50 per 1k activity runs  
+ ├─ Data pipeline self hosted data movement                  Monthly cost depends on usage: $0.10 per hours             
+ ├─ Data pipeline self hosted integration runtime            Monthly cost depends on usage: $0.002 per hours            
+ └─ Data pipeline self hosted external integration runtime   Monthly cost depends on usage: $0.0001 per hours           
+                                                                                                                        
+ azurerm_storage_account.example                                                                                        
+ ├─ Capacity                                                 Monthly cost depends on usage: $0.01 per GB                
+ ├─ Write operations                                         Monthly cost depends on usage: $0.10 per 10k operations    
+ ├─ List and create container operations                     Monthly cost depends on usage: $0.054 per 10k operations   
+ ├─ Read operations                                          Monthly cost depends on usage: $0.01 per 10k operations    
+ ├─ All other operations                                     Monthly cost depends on usage: $0.0043 per 10k operations  
+ ├─ Data retrieval                                           Monthly cost depends on usage: $0.01 per GB                
+ ├─ Blob index                                               Monthly cost depends on usage: $0.039 per 10k tags         
+ └─ Early deletion                                           Monthly cost depends on usage: $0.01 per GB                
                                                                                                                         
  OVERALL TOTAL                                                                                                  $127.33 
 ──────────────────────────────────

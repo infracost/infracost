@@ -1,11 +1,11 @@
 
  Name                                      Monthly Qty  Unit         Monthly Cost 
                                                                                   
- azurerm_vpn_gateway.default_vpn                                                  
- └─ S2S scale units (500 Mbps)                       1  scale units       $263.53 
-                                                                                  
  azurerm_vpn_gateway.vpn_with_scale_units                                         
  └─ S2S scale units (500 Mbps)                       3  scale units       $790.59 
+                                                                                  
+ azurerm_vpn_gateway.default_vpn                                                  
+ └─ S2S scale units (500 Mbps)                       1  scale units       $263.53 
                                                                                   
  OVERALL TOTAL                                                          $1,054.12 
 ──────────────────────────────────

@@ -1,6 +1,53 @@
 
  Name                                                                                    Monthly Qty  Unit                    Monthly Cost 
                                                                                                                                            
+ azurerm_log_analytics_workspace.capacity_sentinel_data_ingestion                                                                          
+ ├─ Log data ingestion                                                                            30  100 GB (per day)           $7,585.20 
+ ├─ Sentinel data ingestion                                                                       30  100 GB (per day)           $7,585.20 
+ ├─ Log data export                                                                Monthly cost depends on usage: $0.13 per GB             
+ ├─ Basic log data ingestion                                                       Monthly cost depends on usage: $0.65 per GB             
+ ├─ Basic log search queries                                                       Monthly cost depends on usage: $0.0065 per GB searched  
+ ├─ Archive data                                                                   Monthly cost depends on usage: $0.026 per GB            
+ ├─ Archive data restored                                                          Monthly cost depends on usage: $0.13 per GB             
+ └─ Archive data searched                                                          Monthly cost depends on usage: $0.0065 per GB           
+                                                                                                                                           
+ azurerm_log_analytics_workspace.capacity_gb_data_ingestion                                                                                
+ ├─ Log data ingestion                                                                            30  100 GB (per day)           $7,585.20 
+ ├─ Log data export                                                                Monthly cost depends on usage: $0.13 per GB             
+ ├─ Basic log data ingestion                                                       Monthly cost depends on usage: $0.65 per GB             
+ ├─ Basic log search queries                                                       Monthly cost depends on usage: $0.0065 per GB searched  
+ ├─ Archive data                                                                   Monthly cost depends on usage: $0.026 per GB            
+ ├─ Archive data restored                                                          Monthly cost depends on usage: $0.13 per GB             
+ └─ Archive data searched                                                          Monthly cost depends on usage: $0.0065 per GB           
+                                                                                                                                           
+ azurerm_log_analytics_workspace.per_gb_sentinel_data_ingestion_with_usage                                                                 
+ ├─ Log data ingestion                                                             Monthly cost depends on usage: $2.99 per GB             
+ ├─ Sentinel data ingestion                                                                       40  GB                           $119.60 
+ ├─ Log data export                                                                Monthly cost depends on usage: $0.13 per GB             
+ ├─ Basic log data ingestion                                                       Monthly cost depends on usage: $0.65 per GB             
+ ├─ Basic log search queries                                                       Monthly cost depends on usage: $0.0065 per GB searched  
+ ├─ Archive data                                                                   Monthly cost depends on usage: $0.026 per GB            
+ ├─ Archive data restored                                                          Monthly cost depends on usage: $0.13 per GB             
+ └─ Archive data searched                                                          Monthly cost depends on usage: $0.0065 per GB           
+                                                                                                                                           
+ azurerm_log_analytics_workspace.per_gb_data_ingestion                                                                                     
+ ├─ Log data ingestion                                                                            20  GB                            $59.80 
+ ├─ Log data export                                                                Monthly cost depends on usage: $0.13 per GB             
+ ├─ Basic log data ingestion                                                       Monthly cost depends on usage: $0.65 per GB             
+ ├─ Basic log search queries                                                       Monthly cost depends on usage: $0.0065 per GB searched  
+ ├─ Archive data                                                                   Monthly cost depends on usage: $0.026 per GB            
+ ├─ Archive data restored                                                          Monthly cost depends on usage: $0.13 per GB             
+ └─ Archive data searched                                                          Monthly cost depends on usage: $0.0065 per GB           
+                                                                                                                                           
+ azurerm_log_analytics_workspace.per_gb_basic_data_ingestion_with_usage                                                                    
+ ├─ Log data ingestion                                                             Monthly cost depends on usage: $2.99 per GB             
+ ├─ Log data export                                                                Monthly cost depends on usage: $0.13 per GB             
+ ├─ Basic log data ingestion                                                                      50  GB                            $32.50 
+ ├─ Basic log search queries                                                                      60  GB searched                    $0.39 
+ ├─ Archive data                                                                   Monthly cost depends on usage: $0.026 per GB            
+ ├─ Archive data restored                                                          Monthly cost depends on usage: $0.13 per GB             
+ └─ Archive data searched                                                          Monthly cost depends on usage: $0.0065 per GB           
+                                                                                                                                           
  azurerm_log_analytics_workspace.archive_data_with_usage                                                                                   
  ├─ Log data ingestion                                                             Monthly cost depends on usage: $2.99 per GB             
  ├─ Log data export                                                                Monthly cost depends on usage: $0.13 per GB             
@@ -10,8 +57,18 @@
  ├─ Archive data restored                                                                         80  GB                            $10.40 
  └─ Archive data searched                                                                         90  GB                             $0.59 
                                                                                                                                            
- azurerm_log_analytics_workspace.capacity_gb_data_ingestion                                                                                
- ├─ Log data ingestion                                                                            30  100 GB (per day)           $7,585.20 
+ azurerm_log_analytics_workspace.log_data_export                                                                                           
+ ├─ Log data ingestion                                                             Monthly cost depends on usage: $2.99 per GB             
+ ├─ Log data export                                                                               40  GB                             $5.20 
+ ├─ Basic log data ingestion                                                       Monthly cost depends on usage: $0.65 per GB             
+ ├─ Basic log search queries                                                       Monthly cost depends on usage: $0.0065 per GB searched  
+ ├─ Archive data                                                                   Monthly cost depends on usage: $0.026 per GB            
+ ├─ Archive data restored                                                          Monthly cost depends on usage: $0.13 per GB             
+ └─ Archive data searched                                                          Monthly cost depends on usage: $0.0065 per GB           
+                                                                                                                                           
+ azurerm_log_analytics_workspace.log_data_retention_with_usage                                                                             
+ ├─ Log data ingestion                                                             Monthly cost depends on usage: $2.99 per GB             
+ ├─ Log data retention                                                                            30  GB                             $3.90 
  ├─ Log data export                                                                Monthly cost depends on usage: $0.13 per GB             
  ├─ Basic log data ingestion                                                       Monthly cost depends on usage: $0.65 per GB             
  ├─ Basic log search queries                                                       Monthly cost depends on usage: $0.0065 per GB searched  
@@ -27,37 +84,8 @@
  ├─ Archive data restored                                                          Monthly cost depends on usage: $0.13 per GB             
  └─ Archive data searched                                                          Monthly cost depends on usage: $0.0065 per GB           
                                                                                                                                            
- azurerm_log_analytics_workspace.capacity_sentinel_data_ingestion                                                                          
- ├─ Log data ingestion                                                                            30  100 GB (per day)           $7,585.20 
- ├─ Sentinel data ingestion                                                                       30  100 GB (per day)           $7,585.20 
- ├─ Log data export                                                                Monthly cost depends on usage: $0.13 per GB             
- ├─ Basic log data ingestion                                                       Monthly cost depends on usage: $0.65 per GB             
- ├─ Basic log search queries                                                       Monthly cost depends on usage: $0.0065 per GB searched  
- ├─ Archive data                                                                   Monthly cost depends on usage: $0.026 per GB            
- ├─ Archive data restored                                                          Monthly cost depends on usage: $0.13 per GB             
- └─ Archive data searched                                                          Monthly cost depends on usage: $0.0065 per GB           
-                                                                                                                                           
- azurerm_log_analytics_workspace.log_data_export                                                                                           
- ├─ Log data ingestion                                                             Monthly cost depends on usage: $2.99 per GB             
- ├─ Log data export                                                                               40  GB                             $5.20 
- ├─ Basic log data ingestion                                                       Monthly cost depends on usage: $0.65 per GB             
- ├─ Basic log search queries                                                       Monthly cost depends on usage: $0.0065 per GB searched  
- ├─ Archive data                                                                   Monthly cost depends on usage: $0.026 per GB            
- ├─ Archive data restored                                                          Monthly cost depends on usage: $0.13 per GB             
- └─ Archive data searched                                                          Monthly cost depends on usage: $0.0065 per GB           
-                                                                                                                                           
  azurerm_log_analytics_workspace.log_data_retention_free                                                                                   
  ├─ Log data ingestion                                                             Monthly cost depends on usage: $2.99 per GB             
- ├─ Log data export                                                                Monthly cost depends on usage: $0.13 per GB             
- ├─ Basic log data ingestion                                                       Monthly cost depends on usage: $0.65 per GB             
- ├─ Basic log search queries                                                       Monthly cost depends on usage: $0.0065 per GB searched  
- ├─ Archive data                                                                   Monthly cost depends on usage: $0.026 per GB            
- ├─ Archive data restored                                                          Monthly cost depends on usage: $0.13 per GB             
- └─ Archive data searched                                                          Monthly cost depends on usage: $0.0065 per GB           
-                                                                                                                                           
- azurerm_log_analytics_workspace.log_data_retention_with_usage                                                                             
- ├─ Log data ingestion                                                             Monthly cost depends on usage: $2.99 per GB             
- ├─ Log data retention                                                                            30  GB                             $3.90 
  ├─ Log data export                                                                Monthly cost depends on usage: $0.13 per GB             
  ├─ Basic log data ingestion                                                       Monthly cost depends on usage: $0.65 per GB             
  ├─ Basic log search queries                                                       Monthly cost depends on usage: $0.0065 per GB searched  
@@ -75,37 +103,9 @@
  ├─ Archive data restored                                                          Monthly cost depends on usage: $0.13 per GB             
  └─ Archive data searched                                                          Monthly cost depends on usage: $0.0065 per GB           
                                                                                                                                            
- azurerm_log_analytics_workspace.per_gb_basic_data_ingestion_with_usage                                                                    
- ├─ Log data ingestion                                                             Monthly cost depends on usage: $2.99 per GB             
- ├─ Log data export                                                                Monthly cost depends on usage: $0.13 per GB             
- ├─ Basic log data ingestion                                                                      50  GB                            $32.50 
- ├─ Basic log search queries                                                                      60  GB searched                    $0.39 
- ├─ Archive data                                                                   Monthly cost depends on usage: $0.026 per GB            
- ├─ Archive data restored                                                          Monthly cost depends on usage: $0.13 per GB             
- └─ Archive data searched                                                          Monthly cost depends on usage: $0.0065 per GB           
-                                                                                                                                           
- azurerm_log_analytics_workspace.per_gb_data_ingestion                                                                                     
- ├─ Log data ingestion                                                                            20  GB                            $59.80 
- ├─ Log data export                                                                Monthly cost depends on usage: $0.13 per GB             
- ├─ Basic log data ingestion                                                       Monthly cost depends on usage: $0.65 per GB             
- ├─ Basic log search queries                                                       Monthly cost depends on usage: $0.0065 per GB searched  
- ├─ Archive data                                                                   Monthly cost depends on usage: $0.026 per GB            
- ├─ Archive data restored                                                          Monthly cost depends on usage: $0.13 per GB             
- └─ Archive data searched                                                          Monthly cost depends on usage: $0.0065 per GB           
-                                                                                                                                           
  azurerm_log_analytics_workspace.per_gb_sentinel_data_ingestion                                                                            
  ├─ Log data ingestion                                                             Monthly cost depends on usage: $2.99 per GB             
  ├─ Sentinel data ingestion                                                        Monthly cost depends on usage: $2.99 per GB             
- ├─ Log data export                                                                Monthly cost depends on usage: $0.13 per GB             
- ├─ Basic log data ingestion                                                       Monthly cost depends on usage: $0.65 per GB             
- ├─ Basic log search queries                                                       Monthly cost depends on usage: $0.0065 per GB searched  
- ├─ Archive data                                                                   Monthly cost depends on usage: $0.026 per GB            
- ├─ Archive data restored                                                          Monthly cost depends on usage: $0.13 per GB             
- └─ Archive data searched                                                          Monthly cost depends on usage: $0.0065 per GB           
-                                                                                                                                           
- azurerm_log_analytics_workspace.per_gb_sentinel_data_ingestion_with_usage                                                                 
- ├─ Log data ingestion                                                             Monthly cost depends on usage: $2.99 per GB             
- ├─ Sentinel data ingestion                                                                       40  GB                           $119.60 
  ├─ Log data export                                                                Monthly cost depends on usage: $0.13 per GB             
  ├─ Basic log data ingestion                                                       Monthly cost depends on usage: $0.65 per GB             
  ├─ Basic log search queries                                                       Monthly cost depends on usage: $0.0065 per GB searched  

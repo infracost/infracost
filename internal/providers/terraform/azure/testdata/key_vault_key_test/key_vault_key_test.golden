@@ -1,22 +1,6 @@
 
  Name                                          Monthly Qty  Unit                      Monthly Cost 
                                                                                                    
- azurerm_key_vault_key.no_usage                                                                    
- ├─ Secrets operations                  Monthly cost depends on usage: $0.03 per 10K transactions  
- ├─ Storage key rotations               Monthly cost depends on usage: $1.00 per renewals          
- └─ Software-protected keys             Monthly cost depends on usage: $0.15 per 10K transactions  
-                                                                                                   
- azurerm_key_vault_key.pr_ec                                                                       
- ├─ Secrets operations                                   3  10K transactions                 $0.09 
- ├─ Storage key rotations                               30  renewals                        $30.00 
- └─ Software-protected keys                            300  10K transactions                $45.00 
-                                                                                                   
- azurerm_key_vault_key.pr_hsm_rsa2048                                                              
- ├─ Secrets operations                                   4  10K transactions                 $0.12 
- ├─ Storage key rotations                               40  renewals                        $40.00 
- ├─ HSM-protected keys                               5,000  months                       $5,000.00 
- └─ HSM-protected keys                                 400  10K transactions                $60.00 
-                                                                                                   
  azurerm_key_vault_key.pr_hsm_rsa3072                                                              
  ├─ Secrets operations                                   4  10K transactions                 $0.12 
  ├─ Storage key rotations                               40  renewals                        $40.00 
@@ -26,20 +10,11 @@
  ├─ HSM-protected keys (over 4000)                   1,000  months                         $400.00 
  └─ HSM-protected keys                                 400  10K transactions                $60.00 
                                                                                                    
- azurerm_key_vault_key.pr_rsa2048                                                                  
- ├─ Secrets operations                                   1  10K transactions                 $0.03 
- ├─ Storage key rotations                               10  renewals                        $10.00 
- └─ Software-protected keys                            100  10K transactions                 $3.00 
-                                                                                                   
- azurerm_key_vault_key.pr_rsa3072                                                                  
- ├─ Secrets operations                                   2  10K transactions                 $0.06 
- ├─ Storage key rotations                               20  renewals                        $20.00 
- └─ Software-protected keys                            200  10K transactions                $30.00 
-                                                                                                   
- azurerm_key_vault_key.std_hsm_rsa3072                                                             
- ├─ Secrets operations                                   5  10K transactions                 $0.15 
- ├─ Storage key rotations                               50  renewals                        $50.00 
- └─ Software-protected keys                            500  10K transactions                $75.00 
+ azurerm_key_vault_key.pr_hsm_rsa2048                                                              
+ ├─ Secrets operations                                   4  10K transactions                 $0.12 
+ ├─ Storage key rotations                               40  renewals                        $40.00 
+ ├─ HSM-protected keys                               5,000  months                       $5,000.00 
+ └─ HSM-protected keys                                 400  10K transactions                $60.00 
                                                                                                    
  azurerm_key_vault_key.std_rsa2048                                                                 
  ├─ Secrets operations                                   7  10K transactions                 $0.21 
@@ -50,6 +25,31 @@
  ├─ Secrets operations                                   6  10K transactions                 $0.18 
  ├─ Storage key rotations                               60  renewals                        $60.00 
  └─ Software-protected keys                            600  10K transactions                $90.00 
+                                                                                                   
+ azurerm_key_vault_key.std_hsm_rsa3072                                                             
+ ├─ Secrets operations                                   5  10K transactions                 $0.15 
+ ├─ Storage key rotations                               50  renewals                        $50.00 
+ └─ Software-protected keys                            500  10K transactions                $75.00 
+                                                                                                   
+ azurerm_key_vault_key.pr_ec                                                                       
+ ├─ Secrets operations                                   3  10K transactions                 $0.09 
+ ├─ Storage key rotations                               30  renewals                        $30.00 
+ └─ Software-protected keys                            300  10K transactions                $45.00 
+                                                                                                   
+ azurerm_key_vault_key.pr_rsa3072                                                                  
+ ├─ Secrets operations                                   2  10K transactions                 $0.06 
+ ├─ Storage key rotations                               20  renewals                        $20.00 
+ └─ Software-protected keys                            200  10K transactions                $30.00 
+                                                                                                   
+ azurerm_key_vault_key.pr_rsa2048                                                                  
+ ├─ Secrets operations                                   1  10K transactions                 $0.03 
+ ├─ Storage key rotations                               10  renewals                        $10.00 
+ └─ Software-protected keys                            100  10K transactions                 $3.00 
+                                                                                                   
+ azurerm_key_vault_key.no_usage                                                                    
+ ├─ Secrets operations                  Monthly cost depends on usage: $0.03 per 10K transactions  
+ ├─ Storage key rotations               Monthly cost depends on usage: $1.00 per renewals          
+ └─ Software-protected keys             Monthly cost depends on usage: $0.15 per 10K transactions  
                                                                                                    
  OVERALL TOTAL                                                                          $12,813.96 
 ──────────────────────────────────

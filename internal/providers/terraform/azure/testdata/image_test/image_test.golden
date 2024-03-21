@@ -1,43 +1,6 @@
 
  Name                                                              Monthly Qty  Unit                      Monthly Cost 
                                                                                                                        
- azurerm_image.disk["data"]                                                                                            
- └─ Storage                                                                 60  GB                               $3.00 
-                                                                                                                       
- azurerm_image.disk["managed"]                                                                                         
- └─ Storage                                                                140  GB                               $7.00 
-                                                                                                                       
- azurerm_image.disk["spec"]                                                                                            
- └─ Storage                                                                 30  GB                               $1.50 
-                                                                                                                       
- azurerm_image.vm["data_disk"]                                                                                         
- └─ Storage                                                                158  GB                               $7.90 
-                                                                                                                       
- azurerm_image.vm["md"]                                                                                                
- └─ Storage                                                                128  GB                               $6.40 
-                                                                                                                       
- azurerm_image.vm["premium"]                                                                                           
- └─ Storage                                                                128  GB                               $6.40 
-                                                                                                                       
- azurerm_image.vm["standard"]                                                                                          
- └─ Storage                                                                128  GB                               $6.40 
-                                                                                                                       
- azurerm_image.vm_usage["data_disk"]                                                                                   
- └─ Storage                                                                300  GB                              $15.00 
-                                                                                                                       
- azurerm_image.vm_usage["md"]                                                                                          
- └─ Storage                                                                300  GB                              $15.00 
-                                                                                                                       
- azurerm_image.vm_usage["premium"]                                                                                     
- └─ Storage                                                                300  GB                              $15.00 
-                                                                                                                       
- azurerm_image.vm_usage["standard"]                                                                                    
- └─ Storage                                                                300  GB                              $15.00 
-                                                                                                                       
- azurerm_managed_disk.example                                                                                          
- ├─ Storage (S10, LRS)                                                       1  months                           $5.89 
- └─ Disk operations                                         Monthly cost depends on usage: $0.0005 per 10k operations  
-                                                                                                                       
  azurerm_virtual_machine.example["data_disk"]                                                                          
  ├─ Instance usage (Linux, pay as you go, Standard_DS1_v2)                 730  hours                           $49.57 
  ├─ Ultra disk reservation (if unattached)                  Monthly cost depends on usage: $5.69 per vCPU              
@@ -66,6 +29,43 @@
  └─ storage_os_disk                                                                                                    
     ├─ Storage (E4, LRS)                                                     1  months                           $2.40 
     └─ Disk operations                                      Monthly cost depends on usage: $0.002 per 10k operations   
+                                                                                                                       
+ azurerm_image.vm_usage["data_disk"]                                                                                   
+ └─ Storage                                                                300  GB                              $15.00 
+                                                                                                                       
+ azurerm_image.vm_usage["md"]                                                                                          
+ └─ Storage                                                                300  GB                              $15.00 
+                                                                                                                       
+ azurerm_image.vm_usage["premium"]                                                                                     
+ └─ Storage                                                                300  GB                              $15.00 
+                                                                                                                       
+ azurerm_image.vm_usage["standard"]                                                                                    
+ └─ Storage                                                                300  GB                              $15.00 
+                                                                                                                       
+ azurerm_image.vm["data_disk"]                                                                                         
+ └─ Storage                                                                158  GB                               $7.90 
+                                                                                                                       
+ azurerm_image.disk["managed"]                                                                                         
+ └─ Storage                                                                140  GB                               $7.00 
+                                                                                                                       
+ azurerm_image.vm["md"]                                                                                                
+ └─ Storage                                                                128  GB                               $6.40 
+                                                                                                                       
+ azurerm_image.vm["premium"]                                                                                           
+ └─ Storage                                                                128  GB                               $6.40 
+                                                                                                                       
+ azurerm_image.vm["standard"]                                                                                          
+ └─ Storage                                                                128  GB                               $6.40 
+                                                                                                                       
+ azurerm_managed_disk.example                                                                                          
+ ├─ Storage (S10, LRS)                                                       1  months                           $5.89 
+ └─ Disk operations                                         Monthly cost depends on usage: $0.0005 per 10k operations  
+                                                                                                                       
+ azurerm_image.disk["data"]                                                                                            
+ └─ Storage                                                                 60  GB                               $3.00 
+                                                                                                                       
+ azurerm_image.disk["spec"]                                                                                            
+ └─ Storage                                                                 30  GB                               $1.50 
                                                                                                                        
  OVERALL TOTAL                                                                                                 $334.19 
 ──────────────────────────────────

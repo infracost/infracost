@@ -1,20 +1,16 @@
 
  Name                                                                            Monthly Qty  Unit                    Monthly Cost 
                                                                                                                                    
- azurerm_data_factory.example                                                                                                      
- ├─ Read/Write operations                                                  Monthly cost depends on usage: $0.50 per 50k entities   
- └─ Monitoring operations                                                  Monthly cost depends on usage: $0.25 per 50k entities   
-                                                                                                                                   
- azurerm_data_factory_integration_runtime_managed.default_with_usage                                                               
- ├─ Compute (D8 v3, Standard, license included)                                          730  hours                      $1,414.74 
- ├─ Orchestration                                                                         10  1k runs                       $10.00 
+ azurerm_data_factory_integration_runtime_managed.enterprise_with_license                                                          
+ ├─ Compute (E64 v3, Enterprise, license included)                                       730  hours                     $25,821.56 
+ ├─ Orchestration                                                          Monthly cost depends on usage: $1.00 per 1k runs        
  ├─ Data movement activity                                                               730  hours                        $182.50 
  ├─ Pipeline activity                                                                    730  hours                        $730.00 
  └─ External pipeline activity                                                           730  hours                        $730.00 
                                                                                                                                    
- azurerm_data_factory_integration_runtime_managed.enterprise_with_license                                                          
- ├─ Compute (E64 v3, Enterprise, license included)                                       730  hours                     $25,821.56 
- ├─ Orchestration                                                          Monthly cost depends on usage: $1.00 per 1k runs        
+ azurerm_data_factory_integration_runtime_managed.default_with_usage                                                               
+ ├─ Compute (D8 v3, Standard, license included)                                          730  hours                      $1,414.74 
+ ├─ Orchestration                                                                         10  1k runs                       $10.00 
  ├─ Data movement activity                                                               730  hours                        $182.50 
  ├─ Pipeline activity                                                                    730  hours                        $730.00 
  └─ External pipeline activity                                                           730  hours                        $730.00 
@@ -25,6 +21,10 @@
  ├─ Data movement activity                                                               730  hours                        $182.50 
  ├─ Pipeline activity                                                                    730  hours                        $730.00 
  └─ External pipeline activity                                                           730  hours                        $730.00 
+                                                                                                                                   
+ azurerm_data_factory.example                                                                                                      
+ ├─ Read/Write operations                                                  Monthly cost depends on usage: $0.50 per 50k entities   
+ └─ Monitoring operations                                                  Monthly cost depends on usage: $0.25 per 50k entities   
                                                                                                                                    
  OVERALL TOTAL                                                                                                          $32,762.33 
 ──────────────────────────────────
