@@ -3,8 +3,8 @@ Project: infracost/infracost/cmd/infracost/testdata/breakdown_with_actual_costs
  Name                                                            Monthly Qty  Unit   Monthly Cost    
                                                                                                      
  aws_dynamodb_table.usage                                                                            
- ├─ Write request unit (WRU)                                         100,000  WRUs          $0.13    
- ├─ Read request unit (RRU)                                          100,001  RRUs          $0.03    
+ ├─ Write request unit (WRU)                                         100,000  WRUs          $0.13  * 
+ ├─ Read request unit (RRU)                                          100,001  RRUs          $0.03  * 
  ├─ Data storage                                                     100,002  GB       $25,000.50  * 
  ├─ Point-In-Time Recovery (PITR) backup storage                     100,003  GB       $20,000.60  * 
  ├─ On-demand backup storage                                         100,004  GB       $10,000.40  * 
@@ -27,7 +27,7 @@ Project: infracost/infracost/cmd/infracost/testdata/breakdown_with_actual_costs
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                                          ┃ Baseline cost ┃ Usage cost ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...ta/breakdown_with_actual_costs ┃ $0.15         ┃ $70,002    ┃ $70,002    ┃
+┃ infracost/infracost/cmd/infraco...ta/breakdown_with_actual_costs ┃ $0.00         ┃ $70,002    ┃ $70,002    ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:
