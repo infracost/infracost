@@ -40,7 +40,7 @@ FLAGS
   -o, --out-file string     Save output to a file, helpful with format flag
   -p, --path stringArray    Path to Infracost JSON files, glob patterns need quotes
       --show-all-projects   Show all projects in the table of the comment output
-      --show-skipped        List unsupported and free resources
+      --show-skipped        List unsupported resources
 
 GLOBAL FLAGS
       --debug-report       Generate a debug report file which can be sent to Infracost team

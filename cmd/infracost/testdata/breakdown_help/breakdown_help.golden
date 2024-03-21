@@ -26,7 +26,7 @@ FLAGS
       --out-file string              Save output to a file, helpful with format flag
   -p, --path string                  Path to the Terraform directory or JSON/plan file
       --project-name string          Name of project in the output. Defaults to path or git repo name
-      --show-skipped                 List unsupported and free resources
+      --show-skipped                 List unsupported resources
       --sync-usage-file              Sync usage-file with missing resources, needs usage-file too (experimental)
       --terraform-var strings        Set value for an input variable, similar to Terraform's -var flag
       --terraform-var-file strings   Load variable files, similar to Terraform's -var-file flag. Provided files must be relative to the --path flag

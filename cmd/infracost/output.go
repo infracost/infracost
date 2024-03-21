@@ -180,7 +180,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 
 	cmd.Flags().String("format", "table", "Output format: json, diff, table, html, github-comment, gitlab-comment, azure-repos-comment, bitbucket-comment, bitbucket-comment-summary, slack-message")
 	cmd.Flags().Bool("show-all-projects", false, "Show all projects in the table of the comment output")
-	cmd.Flags().Bool("show-skipped", false, "List unsupported and free resources")
+	cmd.Flags().Bool("show-skipped", false, "List unsupported resources")
 	cmd.Flags().StringSlice("fields", []string{"monthlyQuantity", "unit", "monthlyCost"}, "Comma separated list of output fields: all,price,monthlyQuantity,unit,hourlyCost,monthlyCost.\nSupported by table and html output formats")
 
 	_ = cmd.MarkFlagRequired("path")
