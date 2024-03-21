@@ -45,6 +45,8 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 		s += projectTitle(project)
 		s += "\n"
 
+		sortResources(project.Diff.Resources, "")
+
 		for _, diffResource := range project.Diff.Resources {
 			oldResource := findResourceByName(project.PastBreakdown.Resources, diffResource.Name)
 			newResource := findResourceByName(project.Breakdown.Resources, diffResource.Name)
