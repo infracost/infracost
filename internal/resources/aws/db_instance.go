@@ -240,7 +240,6 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 				ProductFamily:    strPtr("Database Storage"),
 				AttributeFilters: storageFilters,
 			},
-			UsageBased: true,
 		},
 	}
 
