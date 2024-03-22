@@ -1,75 +1,6 @@
 
  Name                                                                             Monthly Qty  Unit                    Monthly Cost 
                                                                                                                                     
- aws_cloudfront_distribution.s3_distribution                                                                                        
- ├─ Invalidation requests (first 1k)                                        Monthly cost depends on usage: $0.00 per paths          
- └─ US, Mexico, Canada                                                                                                              
-    ├─ Data transfer out to internet (first 10TB)                           Monthly cost depends on usage: $0.085 per GB            
-    ├─ Data transfer out to origin                                          Monthly cost depends on usage: $0.02 per GB             
-    ├─ HTTP requests                                                        Monthly cost depends on usage: $0.0075 per 10k requests 
-    └─ HTTPS requests                                                       Monthly cost depends on usage: $0.01 per 10k requests   
-                                                                                                                                    
- aws_cloudfront_distribution.s3_distribution_0_with_shield                                                                          
- ├─ Origin shield HTTP requests (South America sa-east-1)                   Monthly cost depends on usage: $0.016 per 10k requests  
- ├─ Invalidation requests (first 1k)                                        Monthly cost depends on usage: $0.00 per paths          
- └─ US, Mexico, Canada                                                                                                              
-    ├─ Data transfer out to internet (first 10TB)                           Monthly cost depends on usage: $0.085 per GB            
-    ├─ Data transfer out to origin                                          Monthly cost depends on usage: $0.02 per GB             
-    ├─ HTTP requests                                                        Monthly cost depends on usage: $0.0075 per 10k requests 
-    └─ HTTPS requests                                                       Monthly cost depends on usage: $0.01 per 10k requests   
-                                                                                                                                    
- aws_cloudfront_distribution.s3_distribution_1_with_logging                                                                         
- ├─ Real-time log requests                                                  Monthly cost depends on usage: $0.01 per 1M lines       
- ├─ Origin shield HTTP requests (South America sa-east-1)                   Monthly cost depends on usage: $0.016 per 10k requests  
- ├─ Invalidation requests (first 1k)                                        Monthly cost depends on usage: $0.00 per paths          
- └─ US, Mexico, Canada                                                                                                              
-    ├─ Data transfer out to internet (first 10TB)                           Monthly cost depends on usage: $0.085 per GB            
-    ├─ Data transfer out to origin                                          Monthly cost depends on usage: $0.02 per GB             
-    ├─ HTTP requests                                                        Monthly cost depends on usage: $0.0075 per 10k requests 
-    └─ HTTPS requests                                                       Monthly cost depends on usage: $0.01 per 10k requests   
-                                                                                                                                    
- aws_cloudfront_distribution.s3_distribution_2_with_encryption                                                                      
- ├─ Field level encryption requests                                         Monthly cost depends on usage: $0.02 per 10k requests   
- ├─ Real-time log requests                                                  Monthly cost depends on usage: $0.01 per 1M lines       
- ├─ Origin shield HTTP requests (South America sa-east-1)                   Monthly cost depends on usage: $0.016 per 10k requests  
- ├─ Invalidation requests (first 1k)                                        Monthly cost depends on usage: $0.00 per paths          
- └─ US, Mexico, Canada                                                                                                              
-    ├─ Data transfer out to internet (first 10TB)                           Monthly cost depends on usage: $0.085 per GB            
-    ├─ Data transfer out to origin                                          Monthly cost depends on usage: $0.02 per GB             
-    ├─ HTTP requests                                                        Monthly cost depends on usage: $0.0075 per 10k requests 
-    └─ HTTPS requests                                                       Monthly cost depends on usage: $0.01 per 10k requests   
-                                                                                                                                    
- aws_cloudfront_distribution.s3_distribution_3_with_ssl                                                                             
- ├─ Field level encryption requests                                         Monthly cost depends on usage: $0.02 per 10k requests   
- ├─ Real-time log requests                                                  Monthly cost depends on usage: $0.01 per 1M lines       
- ├─ Dedicated IP custom SSLs                                                                1  certificates                 $600.00 
- ├─ Origin shield HTTP requests (South America sa-east-1)                   Monthly cost depends on usage: $0.016 per 10k requests  
- ├─ Invalidation requests (first 1k)                                        Monthly cost depends on usage: $0.00 per paths          
- └─ US, Mexico, Canada                                                                                                              
-    ├─ Data transfer out to internet (first 10TB)                           Monthly cost depends on usage: $0.085 per GB            
-    ├─ Data transfer out to origin                                          Monthly cost depends on usage: $0.02 per GB             
-    ├─ HTTP requests                                                        Monthly cost depends on usage: $0.0075 per 10k requests 
-    └─ HTTPS requests                                                       Monthly cost depends on usage: $0.01 per 10k requests   
-                                                                                                                                    
- aws_cloudfront_distribution.s3_distribution_with_single_non_default_usage                                                          
- ├─ Field level encryption requests                                                     12.34  10k requests                   $0.25 
- ├─ Real-time log requests                                                              12.34  1M lines                       $0.12 
- ├─ Dedicated IP custom SSLs                                                               12  certificates               $7,200.00 
- ├─ Origin shield HTTP requests (South America sa-east-1)                   Monthly cost depends on usage: $0.016 per 10k requests  
- ├─ Invalidation requests (first 1k)                                                    1,000  paths                          $0.00 
- ├─ Invalidation requests (over 1k)                                                    11,340  paths                         $56.70 
- └─ Europe, Israel                                                                                                                  
-    ├─ Data transfer out to internet (first 10TB)                                      10,240  GB                           $870.40 
-    ├─ Data transfer out to internet (next 40TB)                                       40,960  GB                         $3,276.80 
-    ├─ Data transfer out to internet (next 100TB)                                     102,400  GB                         $6,144.00 
-    ├─ Data transfer out to internet (next 350TB)                                     358,400  GB                        $14,336.00 
-    ├─ Data transfer out to internet (next 524TB)                                     536,576  GB                        $16,097.28 
-    ├─ Data transfer out to internet (next 4PB)                                     4,194,304  GB                       $104,857.60 
-    ├─ Data transfer out to internet (over 5PB)                                    17,097,120  GB                       $341,942.40 
-    ├─ Data transfer out to origin                                                      2,234  GB                            $44.68 
-    ├─ HTTP requests                                                                  22.3402  10k requests                   $0.20 
-    └─ HTTPS requests                                                                   22.34  10k requests                   $0.27 
-                                                                                                                                    
  aws_cloudfront_distribution.s3_distribution_with_usage                                                                             
  ├─ Field level encryption requests                                                     12.34  10k requests                   $0.25 
  ├─ Real-time log requests                                                              12.34  1M lines                       $0.12 
@@ -165,6 +96,75 @@
     ├─ Data transfer out to origin                                                      8,234  GB                         $1,317.44 
     ├─ HTTP requests                                                                  82.3402  10k requests                   $0.74 
     └─ HTTPS requests                                                                   72.34  10k requests                   $0.87 
+                                                                                                                                    
+ aws_cloudfront_distribution.s3_distribution_with_single_non_default_usage                                                          
+ ├─ Field level encryption requests                                                     12.34  10k requests                   $0.25 
+ ├─ Real-time log requests                                                              12.34  1M lines                       $0.12 
+ ├─ Dedicated IP custom SSLs                                                               12  certificates               $7,200.00 
+ ├─ Origin shield HTTP requests (South America sa-east-1)                   Monthly cost depends on usage: $0.016 per 10k requests  
+ ├─ Invalidation requests (first 1k)                                                    1,000  paths                          $0.00 
+ ├─ Invalidation requests (over 1k)                                                    11,340  paths                         $56.70 
+ └─ Europe, Israel                                                                                                                  
+    ├─ Data transfer out to internet (first 10TB)                                      10,240  GB                           $870.40 
+    ├─ Data transfer out to internet (next 40TB)                                       40,960  GB                         $3,276.80 
+    ├─ Data transfer out to internet (next 100TB)                                     102,400  GB                         $6,144.00 
+    ├─ Data transfer out to internet (next 350TB)                                     358,400  GB                        $14,336.00 
+    ├─ Data transfer out to internet (next 524TB)                                     536,576  GB                        $16,097.28 
+    ├─ Data transfer out to internet (next 4PB)                                     4,194,304  GB                       $104,857.60 
+    ├─ Data transfer out to internet (over 5PB)                                    17,097,120  GB                       $341,942.40 
+    ├─ Data transfer out to origin                                                      2,234  GB                            $44.68 
+    ├─ HTTP requests                                                                  22.3402  10k requests                   $0.20 
+    └─ HTTPS requests                                                                   22.34  10k requests                   $0.27 
+                                                                                                                                    
+ aws_cloudfront_distribution.s3_distribution_3_with_ssl                                                                             
+ ├─ Field level encryption requests                                         Monthly cost depends on usage: $0.02 per 10k requests   
+ ├─ Real-time log requests                                                  Monthly cost depends on usage: $0.01 per 1M lines       
+ ├─ Dedicated IP custom SSLs                                                                1  certificates                 $600.00 
+ ├─ Origin shield HTTP requests (South America sa-east-1)                   Monthly cost depends on usage: $0.016 per 10k requests  
+ ├─ Invalidation requests (first 1k)                                        Monthly cost depends on usage: $0.00 per paths          
+ └─ US, Mexico, Canada                                                                                                              
+    ├─ Data transfer out to internet (first 10TB)                           Monthly cost depends on usage: $0.085 per GB            
+    ├─ Data transfer out to origin                                          Monthly cost depends on usage: $0.02 per GB             
+    ├─ HTTP requests                                                        Monthly cost depends on usage: $0.0075 per 10k requests 
+    └─ HTTPS requests                                                       Monthly cost depends on usage: $0.01 per 10k requests   
+                                                                                                                                    
+ aws_cloudfront_distribution.s3_distribution                                                                                        
+ ├─ Invalidation requests (first 1k)                                        Monthly cost depends on usage: $0.00 per paths          
+ └─ US, Mexico, Canada                                                                                                              
+    ├─ Data transfer out to internet (first 10TB)                           Monthly cost depends on usage: $0.085 per GB            
+    ├─ Data transfer out to origin                                          Monthly cost depends on usage: $0.02 per GB             
+    ├─ HTTP requests                                                        Monthly cost depends on usage: $0.0075 per 10k requests 
+    └─ HTTPS requests                                                       Monthly cost depends on usage: $0.01 per 10k requests   
+                                                                                                                                    
+ aws_cloudfront_distribution.s3_distribution_0_with_shield                                                                          
+ ├─ Origin shield HTTP requests (South America sa-east-1)                   Monthly cost depends on usage: $0.016 per 10k requests  
+ ├─ Invalidation requests (first 1k)                                        Monthly cost depends on usage: $0.00 per paths          
+ └─ US, Mexico, Canada                                                                                                              
+    ├─ Data transfer out to internet (first 10TB)                           Monthly cost depends on usage: $0.085 per GB            
+    ├─ Data transfer out to origin                                          Monthly cost depends on usage: $0.02 per GB             
+    ├─ HTTP requests                                                        Monthly cost depends on usage: $0.0075 per 10k requests 
+    └─ HTTPS requests                                                       Monthly cost depends on usage: $0.01 per 10k requests   
+                                                                                                                                    
+ aws_cloudfront_distribution.s3_distribution_1_with_logging                                                                         
+ ├─ Real-time log requests                                                  Monthly cost depends on usage: $0.01 per 1M lines       
+ ├─ Origin shield HTTP requests (South America sa-east-1)                   Monthly cost depends on usage: $0.016 per 10k requests  
+ ├─ Invalidation requests (first 1k)                                        Monthly cost depends on usage: $0.00 per paths          
+ └─ US, Mexico, Canada                                                                                                              
+    ├─ Data transfer out to internet (first 10TB)                           Monthly cost depends on usage: $0.085 per GB            
+    ├─ Data transfer out to origin                                          Monthly cost depends on usage: $0.02 per GB             
+    ├─ HTTP requests                                                        Monthly cost depends on usage: $0.0075 per 10k requests 
+    └─ HTTPS requests                                                       Monthly cost depends on usage: $0.01 per 10k requests   
+                                                                                                                                    
+ aws_cloudfront_distribution.s3_distribution_2_with_encryption                                                                      
+ ├─ Field level encryption requests                                         Monthly cost depends on usage: $0.02 per 10k requests   
+ ├─ Real-time log requests                                                  Monthly cost depends on usage: $0.01 per 1M lines       
+ ├─ Origin shield HTTP requests (South America sa-east-1)                   Monthly cost depends on usage: $0.016 per 10k requests  
+ ├─ Invalidation requests (first 1k)                                        Monthly cost depends on usage: $0.00 per paths          
+ └─ US, Mexico, Canada                                                                                                              
+    ├─ Data transfer out to internet (first 10TB)                           Monthly cost depends on usage: $0.085 per GB            
+    ├─ Data transfer out to origin                                          Monthly cost depends on usage: $0.02 per GB             
+    ├─ HTTP requests                                                        Monthly cost depends on usage: $0.0075 per 10k requests 
+    └─ HTTPS requests                                                       Monthly cost depends on usage: $0.01 per 10k requests   
                                                                                                                                     
  aws_s3_bucket.b                                                                                                                    
  └─ Standard                                                                                                                        

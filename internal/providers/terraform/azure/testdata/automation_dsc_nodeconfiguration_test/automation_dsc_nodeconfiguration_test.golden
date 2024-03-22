@@ -1,6 +1,9 @@
 
  Name                                                       Monthly Qty  Unit                Monthly Cost 
                                                                                                           
+ azurerm_automation_dsc_nodeconfiguration.fiveNodes                                                       
+ └─ Non-azure config nodes                                            5  nodes                     $30.00 
+                                                                                                          
  azurerm_automation_account.example                                                                       
  ├─ Job run time                                        Monthly cost depends on usage: $0.002 per minutes 
  ├─ Non-azure config nodes                              Monthly cost depends on usage: $6.00 per nodes    
@@ -8,9 +11,6 @@
                                                                                                           
  azurerm_automation_dsc_configuration.example                                                             
  └─ Non-azure config nodes                              Monthly cost depends on usage: $6.00 per nodes    
-                                                                                                          
- azurerm_automation_dsc_nodeconfiguration.fiveNodes                                                       
- └─ Non-azure config nodes                                            5  nodes                     $30.00 
                                                                                                           
  azurerm_automation_dsc_nodeconfiguration.withoutUsage                                                    
  └─ Non-azure config nodes                              Monthly cost depends on usage: $6.00 per nodes    

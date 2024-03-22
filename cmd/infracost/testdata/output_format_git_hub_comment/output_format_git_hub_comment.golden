@@ -46,6 +46,15 @@ Project: infracost/infracost/cmd/infracost/testdata
         + Provisioned IOPS
           +$52
 
++ aws_lambda_function.hello_world
+  +$437
+
+    + Requests
+      +$20
+
+    + Duration
+      +$417
+
 + aws_instance.zero_cost_instance
   +$182
 
@@ -64,15 +73,6 @@ Project: infracost/infracost/cmd/infracost/testdata
     
         + Provisioned IOPS
           +$52
-
-+ aws_lambda_function.hello_world
-  +$437
-
-    + Requests
-      +$20
-
-    + Duration
-      +$417
 
 + aws_lambda_function.zero_cost_lambda
   $0.00
@@ -108,6 +108,15 @@ Amount:  +$1,361 ($0.00 → $1,361)
 
 ──────────────────────────────────
 Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
+
++ module.db.module.db_2.module.db_instance.aws_db_instance.this[0]
+  +$13
+
+    + Database instance (on-demand, Single-AZ, db.t3.micro)
+      +$12
+
+    + Storage (general purpose SSD, gp2)
+      +$0.58
 
 + aws_instance.instance_2
   +$5
@@ -150,15 +159,6 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
     
         + Storage (general purpose SSD, gp2)
           +$0.80
-
-+ module.db.module.db_2.module.db_instance.aws_db_instance.this[0]
-  +$13
-
-    + Database instance (on-demand, Single-AZ, db.t3.micro)
-      +$12
-
-    + Storage (general purpose SSD, gp2)
-      +$0.58
 
 + module.instances.aws_instance.module_instance_2
   +$5

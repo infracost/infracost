@@ -1,6 +1,9 @@
 
  Name                                               Monthly Qty  Unit                    Monthly Cost 
                                                                                                       
+ aws_s3_bucket_inventory.inventory_withUsage                                                          
+ └─ Objects listed                                           10  1M objects                     $0.03 
+                                                                                                      
  aws_s3_bucket.bucket1                                                                                
  └─ Standard                                                                                          
     ├─ Storage                                Monthly cost depends on usage: $0.023 per GB            
@@ -35,9 +38,6 @@
                                                                                                       
  aws_s3_bucket_inventory.inventory                                                                    
  └─ Objects listed                            Monthly cost depends on usage: $0.0025 per 1M objects   
-                                                                                                      
- aws_s3_bucket_inventory.inventory_withUsage                                                          
- └─ Objects listed                                           10  1M objects                     $0.03 
                                                                                                       
  OVERALL TOTAL                                                                                  $0.03 
 ──────────────────────────────────

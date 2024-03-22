@@ -1,13 +1,13 @@
 
  Name                                                                          Monthly Qty  Unit                Monthly Cost 
                                                                                                                              
- aws_config_configuration_recorder.my_config_configuration_recorder                                                          
- ├─ Config items                                                           Monthly cost depends on usage: $0.003 per records 
- └─ Custom config items                                                    Monthly cost depends on usage: $0.003 per records 
-                                                                                                                             
  aws_config_configuration_recorder.my_config_configuration_recorder_usage                                                    
  ├─ Config items                                                                     1,000  records                    $3.00 
  └─ Custom config items                                                              2,000  records                    $6.00 
+                                                                                                                             
+ aws_config_configuration_recorder.my_config_configuration_recorder                                                          
+ ├─ Config items                                                           Monthly cost depends on usage: $0.003 per records 
+ └─ Custom config items                                                    Monthly cost depends on usage: $0.003 per records 
                                                                                                                              
  OVERALL TOTAL                                                                                                         $9.00 
 ──────────────────────────────────

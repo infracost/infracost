@@ -1,11 +1,11 @@
 
  Name                                                         Monthly Qty  Unit    Monthly Cost 
                                                                                                 
- azurerm_private_dns_resolver_dns_forwarding_ruleset.example                                    
- └─ Forwarding ruleset                                                  1  months         $2.50 
-                                                                                                
  azurerm_private_dns_resolver_outbound_endpoint.example                                         
  └─ Outbound endpoint                                                   1  months       $180.00 
+                                                                                                
+ azurerm_private_dns_resolver_dns_forwarding_ruleset.example                                    
+ └─ Forwarding ruleset                                                  1  months         $2.50 
                                                                                                 
  OVERALL TOTAL                                                                          $182.50 
 ──────────────────────────────────

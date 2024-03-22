@@ -20,6 +20,21 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
         + Provisioned IOPS
           +$52
 
++ aws_lambda_function.hello_world
+  +$437
+
+    + Requests
+      +$20, +100 1M requests*
+
+    + Ephemeral storage
+      $0.00
+
+    + Duration (first 6B)
+      +$417, +25,000,000 GB-seconds*
+
+    + Duration (over 15B)
+      $0.00, 0 GB-seconds*
+
 + aws_instance.zero_cost_instance
   +$182
 
@@ -38,21 +53,6 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
     
         + Provisioned IOPS
           +$52
-
-+ aws_lambda_function.hello_world
-  +$437
-
-    + Requests
-      +$20, +100 1M requests*
-
-    + Ephemeral storage
-      $0.00
-
-    + Duration (first 6B)
-      +$417, +25,000,000 GB-seconds*
-
-    + Duration (over 15B)
-      $0.00, 0 GB-seconds*
 
 + aws_lambda_function.zero_cost_lambda
   $0.00

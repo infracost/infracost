@@ -1,11 +1,11 @@
 
  Name                                                     Monthly Qty  Unit            Monthly Cost 
                                                                                                     
- azurerm_monitor_diagnostic_setting.example                                                         
- └─ Platform logs processed                             Monthly cost depends on usage: $0.33 per GB 
-                                                                                                    
  azurerm_monitor_diagnostic_setting.example_with_usage                                              
  └─ Platform logs processed                                     1,000  GB                   $325.00 
+                                                                                                    
+ azurerm_monitor_diagnostic_setting.example                                                         
+ └─ Platform logs processed                             Monthly cost depends on usage: $0.33 per GB 
                                                                                                     
  OVERALL TOTAL                                                                              $325.00 
 ──────────────────────────────────

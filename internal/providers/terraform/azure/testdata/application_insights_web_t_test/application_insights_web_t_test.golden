@@ -1,11 +1,11 @@
 
  Name                                              Monthly Qty  Unit            Monthly Cost 
                                                                                              
- azurerm_application_insights.example                                                        
- └─ Data ingested                                Monthly cost depends on usage: $2.30 per GB 
-                                                                                             
  azurerm_application_insights_web_test.non_free                                              
  └─ Multi-step web test                                      1  test                  $10.00 
+                                                                                             
+ azurerm_application_insights.example                                                        
+ └─ Data ingested                                Monthly cost depends on usage: $2.30 per GB 
                                                                                              
  OVERALL TOTAL                                                                        $10.00 
 ──────────────────────────────────

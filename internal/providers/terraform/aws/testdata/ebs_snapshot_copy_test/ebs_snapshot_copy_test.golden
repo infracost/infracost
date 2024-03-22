@@ -1,6 +1,9 @@
 
  Name                                                            Monthly Qty  Unit                        Monthly Cost 
                                                                                                                        
+ aws_ebs_volume.gp2                                                                                                    
+ └─ Storage (general purpose SSD, gp2)                                    10  GB                                 $1.00 
+                                                                                                                       
  aws_ebs_snapshot.gp2                                                                                                  
  ├─ EBS snapshot storage                                                  10  GB                                 $0.50 
  ├─ Fast snapshot restore                                Monthly cost depends on usage: $0.75 per DSU-hours            
@@ -10,9 +13,6 @@
                                                                                                                        
  aws_ebs_snapshot_copy.gp2                                                                                             
  └─ EBS snapshot storage                                                  10  GB                                 $0.50 
-                                                                                                                       
- aws_ebs_volume.gp2                                                                                                    
- └─ Storage (general purpose SSD, gp2)                                    10  GB                                 $1.00 
                                                                                                                        
  OVERALL TOTAL                                                                                                   $2.00 
 ──────────────────────────────────

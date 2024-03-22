@@ -1,20 +1,6 @@
 
  Name                             Monthly Qty  Unit                Monthly Cost 
                                                                                 
- aws_backup_vault.non_usage                                                     
- ├─ EFS backup (warm)         Monthly cost depends on usage: $0.06 per GB       
- ├─ EFS backup (cold)         Monthly cost depends on usage: $0.012 per GB      
- ├─ EFS restore (warm)        Monthly cost depends on usage: $0.024 per GB      
- ├─ EFS restore (cold)        Monthly cost depends on usage: $0.036 per GB      
- ├─ EFS restore (item-level)  Monthly cost depends on usage: $0.60 per requests 
- ├─ EBS snapshot              Monthly cost depends on usage: $0.055 per GB      
- ├─ RDS snapshot              Monthly cost depends on usage: $0.095 per GB      
- ├─ DynamoDB backup           Monthly cost depends on usage: $0.11 per GB       
- ├─ DynamoDB restore          Monthly cost depends on usage: $0.17 per GB       
- ├─ Aurora snapshot           Monthly cost depends on usage: $0.024 per GB      
- ├─ FSx for Windows backup    Monthly cost depends on usage: $0.055 per GB      
- └─ FSx for Lustre backup     Monthly cost depends on usage: $0.055 per GB      
-                                                                                
  aws_backup_vault.usage                                                         
  ├─ EFS backup (warm)                  10,000  GB                       $600.00 
  ├─ EFS backup (cold)                  10,000  GB                       $120.00 
@@ -28,6 +14,20 @@
  ├─ Aurora snapshot                    10,000  GB                       $240.00 
  ├─ FSx for Windows backup             10,000  GB                       $550.00 
  └─ FSx for Lustre backup              10,000  GB                       $550.00 
+                                                                                
+ aws_backup_vault.non_usage                                                     
+ ├─ EFS backup (warm)         Monthly cost depends on usage: $0.06 per GB       
+ ├─ EFS backup (cold)         Monthly cost depends on usage: $0.012 per GB      
+ ├─ EFS restore (warm)        Monthly cost depends on usage: $0.024 per GB      
+ ├─ EFS restore (cold)        Monthly cost depends on usage: $0.036 per GB      
+ ├─ EFS restore (item-level)  Monthly cost depends on usage: $0.60 per requests 
+ ├─ EBS snapshot              Monthly cost depends on usage: $0.055 per GB      
+ ├─ RDS snapshot              Monthly cost depends on usage: $0.095 per GB      
+ ├─ DynamoDB backup           Monthly cost depends on usage: $0.11 per GB       
+ ├─ DynamoDB restore          Monthly cost depends on usage: $0.17 per GB       
+ ├─ Aurora snapshot           Monthly cost depends on usage: $0.024 per GB      
+ ├─ FSx for Windows backup    Monthly cost depends on usage: $0.055 per GB      
+ └─ FSx for Lustre backup     Monthly cost depends on usage: $0.055 per GB      
                                                                                 
  OVERALL TOTAL                                                       $12,960.00 
 ──────────────────────────────────

@@ -2,13 +2,13 @@ Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_hclmodu
 
  Name                                                 Monthly Qty  Unit   Monthly Cost 
                                                                                        
- module.mod2["instance1"].aws_instance.web_app                                         
- ├─ Instance usage (Linux/UNIX, on-demand, t3.micro)          730  hours         $7.59 
+ module.mod2["instance2"].aws_instance.web_app                                         
+ ├─ Instance usage (Linux/UNIX, on-demand, t3.small)          730  hours        $15.18 
  └─ root_block_device                                                                  
     └─ Storage (general purpose SSD, gp2)                       8  GB            $0.80 
                                                                                        
- module.mod2["instance2"].aws_instance.web_app                                         
- ├─ Instance usage (Linux/UNIX, on-demand, t3.small)          730  hours        $15.18 
+ module.mod2["instance1"].aws_instance.web_app                                         
+ ├─ Instance usage (Linux/UNIX, on-demand, t3.micro)          730  hours         $7.59 
  └─ root_block_device                                                                  
     └─ Storage (general purpose SSD, gp2)                       8  GB            $0.80 
                                                                                        

@@ -764,7 +764,11 @@ func TestBreakdownWithPrivateSshModulePopulatesErrors(t *testing.T) {
 			"--format",
 			"json",
 		},
-		nil,
+		&GoldenFileOptions{
+			Env: map[string]string{
+				"GIT_TERMINAL_PROMPT": "0",
+			},
+		},
 	)
 
 	res := gjson.ParseBytes(output)

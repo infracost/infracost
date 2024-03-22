@@ -10,22 +10,6 @@
  ├─ Continuous backup (Central US)                                 1,000  GB                             $246.00 
  └─ Restored data                                                  3,000  GB                             $450.00 
                                                                                                                  
- azurerm_cosmosdb_table.mutli-master_backup2copies                                                               
- ├─ Provisioned throughput (provisioned, West US)                     10  RU/s x 100                     $116.80 
- ├─ Provisioned throughput (provisioned, Central US)                  10  RU/s x 100                     $116.80 
- ├─ Transactional storage (West US)                                1,000  GB                             $250.00 
- ├─ Transactional storage (Central US)                             1,000  GB                             $250.00 
- └─ Restored data                                     Monthly cost depends on usage: $0.15 per GB                
-                                                                                                                 
- azurerm_cosmosdb_table.non-usage_autoscale                                                                      
- ├─ Provisioned throughput (autoscale, West US)       Monthly cost depends on usage: $5.84 per RU/s x 100        
- ├─ Transactional storage (West US)                   Monthly cost depends on usage: $0.25 per GB                
- ├─ Analytical storage (West US)                      Monthly cost depends on usage: $0.03 per GB                
- ├─ Analytical write operations (West US)             Monthly cost depends on usage: $0.055 per 10K operations   
- ├─ Analytical read operations (West US)              Monthly cost depends on usage: $0.0054 per 10K operations  
- ├─ Periodic backup (West US)                         Monthly cost depends on usage: $0.15 per GB                
- └─ Restored data                                     Monthly cost depends on usage: $0.15 per GB                
-                                                                                                                 
  azurerm_cosmosdb_table.provisioned                                                                              
  ├─ Provisioned throughput (provisioned, West US)                      5  RU/s x 100                      $29.20 
  ├─ Provisioned throughput (provisioned, Central US)                6.25  RU/s x 100                      $36.50 
@@ -43,6 +27,22 @@
  ├─ Analytical read operations (West US)                             100  10K operations                   $0.54 
  ├─ Periodic backup (West US)                                      2,000  GB                             $300.00 
  └─ Restored data                                                  3,000  GB                             $450.00 
+                                                                                                                 
+ azurerm_cosmosdb_table.mutli-master_backup2copies                                                               
+ ├─ Provisioned throughput (provisioned, West US)                     10  RU/s x 100                     $116.80 
+ ├─ Provisioned throughput (provisioned, Central US)                  10  RU/s x 100                     $116.80 
+ ├─ Transactional storage (West US)                                1,000  GB                             $250.00 
+ ├─ Transactional storage (Central US)                             1,000  GB                             $250.00 
+ └─ Restored data                                     Monthly cost depends on usage: $0.15 per GB                
+                                                                                                                 
+ azurerm_cosmosdb_table.non-usage_autoscale                                                                      
+ ├─ Provisioned throughput (autoscale, West US)       Monthly cost depends on usage: $5.84 per RU/s x 100        
+ ├─ Transactional storage (West US)                   Monthly cost depends on usage: $0.25 per GB                
+ ├─ Analytical storage (West US)                      Monthly cost depends on usage: $0.03 per GB                
+ ├─ Analytical write operations (West US)             Monthly cost depends on usage: $0.055 per 10K operations   
+ ├─ Analytical read operations (West US)              Monthly cost depends on usage: $0.0054 per 10K operations  
+ ├─ Periodic backup (West US)                         Monthly cost depends on usage: $0.15 per GB                
+ └─ Restored data                                     Monthly cost depends on usage: $0.15 per GB                
                                                                                                                  
  OVERALL TOTAL                                                                                         $5,155.73 
 ──────────────────────────────────

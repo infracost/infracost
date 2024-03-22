@@ -1,20 +1,6 @@
 
  Name                                                                                        Monthly Qty  Unit                      Monthly Cost 
                                                                                                                                                  
- azurerm_recovery_services_vault.example["GeoRedundant.RS0.false"]                                                                               
- ├─ azurerm_backup_protected_vm.large["policy-GeoRedundant-RS0-false"]                                                                           
- │  ├─ Instance backup (over 500 GB)                                                                   1  month                           $20.00 
- │  └─ GRS data stored                                                                             1,128  GB                              $50.53 
- ├─ azurerm_backup_protected_vm.medium["policy-GeoRedundant-RS0-false"]                                                                          
- │  ├─ Instance backup (under 500 GB)                                                                  1  month                           $10.00 
- │  └─ GRS data stored                                                                               178  GB                               $7.97 
- ├─ azurerm_backup_protected_vm.small["policy-GeoRedundant-RS0-false"]                                                                           
- │  ├─ Instance backup (under 50 GB)                                                                   1  month                            $5.00 
- │  └─ GRS data stored                                                                                40  GB                               $1.79 
- └─ azurerm_backup_protected_vm.with_usage["policy-GeoRedundant-RS0-false"]                                                                      
-    ├─ Instance backup (under 500 GB)                                                                  1  month                           $10.00 
-    └─ GRS data stored                                                                               400  GB                              $17.92 
-                                                                                                                                                 
  azurerm_recovery_services_vault.example["GeoRedundant.RS0.true"]                                                                                
  ├─ azurerm_backup_protected_vm.large["policy-GeoRedundant-RS0-true"]                                                                            
  │  ├─ Instance backup (over 500 GB)                                                                   1  month                           $20.00 
@@ -28,20 +14,6 @@
  └─ azurerm_backup_protected_vm.with_usage["policy-GeoRedundant-RS0-true"]                                                                       
     ├─ Instance backup (under 500 GB)                                                                  1  month                           $10.00 
     └─ RA-GRS data stored                                                                            400  GB                              $22.76 
-                                                                                                                                                 
- azurerm_recovery_services_vault.example["GeoRedundant.Standard.false"]                                                                          
- ├─ azurerm_backup_protected_vm.large["policy-GeoRedundant-Standard-false"]                                                                      
- │  ├─ Instance backup (over 500 GB)                                                                   1  month                           $20.00 
- │  └─ GRS data stored                                                                             1,128  GB                              $50.53 
- ├─ azurerm_backup_protected_vm.medium["policy-GeoRedundant-Standard-false"]                                                                     
- │  ├─ Instance backup (under 500 GB)                                                                  1  month                           $10.00 
- │  └─ GRS data stored                                                                               178  GB                               $7.97 
- ├─ azurerm_backup_protected_vm.small["policy-GeoRedundant-Standard-false"]                                                                      
- │  ├─ Instance backup (under 50 GB)                                                                   1  month                            $5.00 
- │  └─ GRS data stored                                                                                40  GB                               $1.79 
- └─ azurerm_backup_protected_vm.with_usage["policy-GeoRedundant-Standard-false"]                                                                 
-    ├─ Instance backup (under 500 GB)                                                                  1  month                           $10.00 
-    └─ GRS data stored                                                                               400  GB                              $17.92 
                                                                                                                                                  
  azurerm_recovery_services_vault.example["GeoRedundant.Standard.true"]                                                                           
  ├─ azurerm_backup_protected_vm.large["policy-GeoRedundant-Standard-true"]                                                                       
@@ -57,61 +29,46 @@
     ├─ Instance backup (under 500 GB)                                                                  1  month                           $10.00 
     └─ RA-GRS data stored                                                                            400  GB                              $22.76 
                                                                                                                                                  
- azurerm_recovery_services_vault.example["LocallyRedundant.RS0.false"]                                                                           
- ├─ azurerm_backup_protected_vm.large["policy-LocallyRedundant-RS0-false"]                                                                       
- │  ├─ Instance backup (over 500 GB)                                                                   1  month                           $20.00 
- │  └─ LRS data stored                                                                             1,128  GB                              $25.27 
- ├─ azurerm_backup_protected_vm.medium["policy-LocallyRedundant-RS0-false"]                                                                      
- │  ├─ Instance backup (under 500 GB)                                                                  1  month                           $10.00 
- │  └─ LRS data stored                                                                               178  GB                               $3.99 
- ├─ azurerm_backup_protected_vm.small["policy-LocallyRedundant-RS0-false"]                                                                       
- │  ├─ Instance backup (under 50 GB)                                                                   1  month                            $5.00 
- │  └─ LRS data stored                                                                                40  GB                               $0.90 
- └─ azurerm_backup_protected_vm.with_usage["policy-LocallyRedundant-RS0-false"]                                                                  
-    ├─ Instance backup (under 500 GB)                                                                  1  month                           $10.00 
-    └─ LRS data stored                                                                               400  GB                               $8.96 
+ azurerm_virtual_machine.large                                                                                                                   
+ ├─ Instance usage (Linux, pay as you go, Standard_F2)                                               730  hours                           $83.22 
+ ├─ Ultra disk reservation (if unattached)                                            Monthly cost depends on usage: $5.69 per vCPU              
+ ├─ storage_os_disk                                                                                                                              
+ │  ├─ Storage (S4, LRS)                                                                               1  months                           $1.54 
+ │  └─ Disk operations                                                                Monthly cost depends on usage: $0.0005 per 10k operations  
+ ├─ storage_data_disk                                                                                                                            
+ │  ├─ Storage (S20, LRS)                                                                              1  months                          $21.76 
+ │  └─ Disk operations                                                                Monthly cost depends on usage: $0.0005 per 10k operations  
+ └─ storage_data_disk                                                                                                                            
+    ├─ Storage (S20, LRS)                                                                              1  months                          $21.76 
+    └─ Disk operations                                                                Monthly cost depends on usage: $0.0005 per 10k operations  
                                                                                                                                                  
- azurerm_recovery_services_vault.example["LocallyRedundant.RS0.true"]                                                                            
- ├─ azurerm_backup_protected_vm.large["policy-LocallyRedundant-RS0-true"]                                                                        
+ azurerm_recovery_services_vault.example["GeoRedundant.RS0.false"]                                                                               
+ ├─ azurerm_backup_protected_vm.large["policy-GeoRedundant-RS0-false"]                                                                           
  │  ├─ Instance backup (over 500 GB)                                                                   1  month                           $20.00 
- │  └─ LRS data stored                                                                             1,128  GB                              $25.27 
- ├─ azurerm_backup_protected_vm.medium["policy-LocallyRedundant-RS0-true"]                                                                       
+ │  └─ GRS data stored                                                                             1,128  GB                              $50.53 
+ ├─ azurerm_backup_protected_vm.medium["policy-GeoRedundant-RS0-false"]                                                                          
  │  ├─ Instance backup (under 500 GB)                                                                  1  month                           $10.00 
- │  └─ LRS data stored                                                                               178  GB                               $3.99 
- ├─ azurerm_backup_protected_vm.small["policy-LocallyRedundant-RS0-true"]                                                                        
+ │  └─ GRS data stored                                                                               178  GB                               $7.97 
+ ├─ azurerm_backup_protected_vm.small["policy-GeoRedundant-RS0-false"]                                                                           
  │  ├─ Instance backup (under 50 GB)                                                                   1  month                            $5.00 
- │  └─ LRS data stored                                                                                40  GB                               $0.90 
- └─ azurerm_backup_protected_vm.with_usage["policy-LocallyRedundant-RS0-true"]                                                                   
+ │  └─ GRS data stored                                                                                40  GB                               $1.79 
+ └─ azurerm_backup_protected_vm.with_usage["policy-GeoRedundant-RS0-false"]                                                                      
     ├─ Instance backup (under 500 GB)                                                                  1  month                           $10.00 
-    └─ LRS data stored                                                                               400  GB                               $8.96 
+    └─ GRS data stored                                                                               400  GB                              $17.92 
                                                                                                                                                  
- azurerm_recovery_services_vault.example["LocallyRedundant.Standard.false"]                                                                      
- ├─ azurerm_backup_protected_vm.large["policy-LocallyRedundant-Standard-false"]                                                                  
+ azurerm_recovery_services_vault.example["GeoRedundant.Standard.false"]                                                                          
+ ├─ azurerm_backup_protected_vm.large["policy-GeoRedundant-Standard-false"]                                                                      
  │  ├─ Instance backup (over 500 GB)                                                                   1  month                           $20.00 
- │  └─ LRS data stored                                                                             1,128  GB                              $25.27 
- ├─ azurerm_backup_protected_vm.medium["policy-LocallyRedundant-Standard-false"]                                                                 
+ │  └─ GRS data stored                                                                             1,128  GB                              $50.53 
+ ├─ azurerm_backup_protected_vm.medium["policy-GeoRedundant-Standard-false"]                                                                     
  │  ├─ Instance backup (under 500 GB)                                                                  1  month                           $10.00 
- │  └─ LRS data stored                                                                               178  GB                               $3.99 
- ├─ azurerm_backup_protected_vm.small["policy-LocallyRedundant-Standard-false"]                                                                  
+ │  └─ GRS data stored                                                                               178  GB                               $7.97 
+ ├─ azurerm_backup_protected_vm.small["policy-GeoRedundant-Standard-false"]                                                                      
  │  ├─ Instance backup (under 50 GB)                                                                   1  month                            $5.00 
- │  └─ LRS data stored                                                                                40  GB                               $0.90 
- └─ azurerm_backup_protected_vm.with_usage["policy-LocallyRedundant-Standard-false"]                                                             
+ │  └─ GRS data stored                                                                                40  GB                               $1.79 
+ └─ azurerm_backup_protected_vm.with_usage["policy-GeoRedundant-Standard-false"]                                                                 
     ├─ Instance backup (under 500 GB)                                                                  1  month                           $10.00 
-    └─ LRS data stored                                                                               400  GB                               $8.96 
-                                                                                                                                                 
- azurerm_recovery_services_vault.example["LocallyRedundant.Standard.true"]                                                                       
- ├─ azurerm_backup_protected_vm.large["policy-LocallyRedundant-Standard-true"]                                                                   
- │  ├─ Instance backup (over 500 GB)                                                                   1  month                           $20.00 
- │  └─ LRS data stored                                                                             1,128  GB                              $25.27 
- ├─ azurerm_backup_protected_vm.medium["policy-LocallyRedundant-Standard-true"]                                                                  
- │  ├─ Instance backup (under 500 GB)                                                                  1  month                           $10.00 
- │  └─ LRS data stored                                                                               178  GB                               $3.99 
- ├─ azurerm_backup_protected_vm.small["policy-LocallyRedundant-Standard-true"]                                                                   
- │  ├─ Instance backup (under 50 GB)                                                                   1  month                            $5.00 
- │  └─ LRS data stored                                                                                40  GB                               $0.90 
- └─ azurerm_backup_protected_vm.with_usage["policy-LocallyRedundant-Standard-true"]                                                              
-    ├─ Instance backup (under 500 GB)                                                                  1  month                           $10.00 
-    └─ LRS data stored                                                                               400  GB                               $8.96 
+    └─ GRS data stored                                                                               400  GB                              $17.92 
                                                                                                                                                  
  azurerm_recovery_services_vault.example["ZoneRedundant.RS0.false"]                                                                              
  ├─ azurerm_backup_protected_vm.large["policy-ZoneRedundant-RS0-false"]                                                                          
@@ -169,19 +126,6 @@
     ├─ Instance backup (under 500 GB)                                                                  1  month                           $10.00 
     └─ ZRS data stored                                                                               400  GB                              $11.20 
                                                                                                                                                  
- azurerm_virtual_machine.large                                                                                                                   
- ├─ Instance usage (Linux, pay as you go, Standard_F2)                                               730  hours                           $83.22 
- ├─ Ultra disk reservation (if unattached)                                            Monthly cost depends on usage: $5.69 per vCPU              
- ├─ storage_os_disk                                                                                                                              
- │  ├─ Storage (S4, LRS)                                                                               1  months                           $1.54 
- │  └─ Disk operations                                                                Monthly cost depends on usage: $0.0005 per 10k operations  
- ├─ storage_data_disk                                                                                                                            
- │  ├─ Storage (S20, LRS)                                                                              1  months                          $21.76 
- │  └─ Disk operations                                                                Monthly cost depends on usage: $0.0005 per 10k operations  
- └─ storage_data_disk                                                                                                                            
-    ├─ Storage (S20, LRS)                                                                              1  months                          $21.76 
-    └─ Disk operations                                                                Monthly cost depends on usage: $0.0005 per 10k operations  
-                                                                                                                                                 
  azurerm_virtual_machine.medium                                                                                                                  
  ├─ Instance usage (Linux, pay as you go, Standard_F2)                                               730  hours                           $83.22 
  ├─ Ultra disk reservation (if unattached)                                            Monthly cost depends on usage: $5.69 per vCPU              
@@ -201,6 +145,62 @@
  └─ storage_data_disk                                                                                                                            
     ├─ Storage (S4, LRS)                                                                               1  months                           $1.54 
     └─ Disk operations                                                                Monthly cost depends on usage: $0.0005 per 10k operations  
+                                                                                                                                                 
+ azurerm_recovery_services_vault.example["LocallyRedundant.RS0.false"]                                                                           
+ ├─ azurerm_backup_protected_vm.large["policy-LocallyRedundant-RS0-false"]                                                                       
+ │  ├─ Instance backup (over 500 GB)                                                                   1  month                           $20.00 
+ │  └─ LRS data stored                                                                             1,128  GB                              $25.27 
+ ├─ azurerm_backup_protected_vm.medium["policy-LocallyRedundant-RS0-false"]                                                                      
+ │  ├─ Instance backup (under 500 GB)                                                                  1  month                           $10.00 
+ │  └─ LRS data stored                                                                               178  GB                               $3.99 
+ ├─ azurerm_backup_protected_vm.small["policy-LocallyRedundant-RS0-false"]                                                                       
+ │  ├─ Instance backup (under 50 GB)                                                                   1  month                            $5.00 
+ │  └─ LRS data stored                                                                                40  GB                               $0.90 
+ └─ azurerm_backup_protected_vm.with_usage["policy-LocallyRedundant-RS0-false"]                                                                  
+    ├─ Instance backup (under 500 GB)                                                                  1  month                           $10.00 
+    └─ LRS data stored                                                                               400  GB                               $8.96 
+                                                                                                                                                 
+ azurerm_recovery_services_vault.example["LocallyRedundant.RS0.true"]                                                                            
+ ├─ azurerm_backup_protected_vm.large["policy-LocallyRedundant-RS0-true"]                                                                        
+ │  ├─ Instance backup (over 500 GB)                                                                   1  month                           $20.00 
+ │  └─ LRS data stored                                                                             1,128  GB                              $25.27 
+ ├─ azurerm_backup_protected_vm.medium["policy-LocallyRedundant-RS0-true"]                                                                       
+ │  ├─ Instance backup (under 500 GB)                                                                  1  month                           $10.00 
+ │  └─ LRS data stored                                                                               178  GB                               $3.99 
+ ├─ azurerm_backup_protected_vm.small["policy-LocallyRedundant-RS0-true"]                                                                        
+ │  ├─ Instance backup (under 50 GB)                                                                   1  month                            $5.00 
+ │  └─ LRS data stored                                                                                40  GB                               $0.90 
+ └─ azurerm_backup_protected_vm.with_usage["policy-LocallyRedundant-RS0-true"]                                                                   
+    ├─ Instance backup (under 500 GB)                                                                  1  month                           $10.00 
+    └─ LRS data stored                                                                               400  GB                               $8.96 
+                                                                                                                                                 
+ azurerm_recovery_services_vault.example["LocallyRedundant.Standard.false"]                                                                      
+ ├─ azurerm_backup_protected_vm.large["policy-LocallyRedundant-Standard-false"]                                                                  
+ │  ├─ Instance backup (over 500 GB)                                                                   1  month                           $20.00 
+ │  └─ LRS data stored                                                                             1,128  GB                              $25.27 
+ ├─ azurerm_backup_protected_vm.medium["policy-LocallyRedundant-Standard-false"]                                                                 
+ │  ├─ Instance backup (under 500 GB)                                                                  1  month                           $10.00 
+ │  └─ LRS data stored                                                                               178  GB                               $3.99 
+ ├─ azurerm_backup_protected_vm.small["policy-LocallyRedundant-Standard-false"]                                                                  
+ │  ├─ Instance backup (under 50 GB)                                                                   1  month                            $5.00 
+ │  └─ LRS data stored                                                                                40  GB                               $0.90 
+ └─ azurerm_backup_protected_vm.with_usage["policy-LocallyRedundant-Standard-false"]                                                             
+    ├─ Instance backup (under 500 GB)                                                                  1  month                           $10.00 
+    └─ LRS data stored                                                                               400  GB                               $8.96 
+                                                                                                                                                 
+ azurerm_recovery_services_vault.example["LocallyRedundant.Standard.true"]                                                                       
+ ├─ azurerm_backup_protected_vm.large["policy-LocallyRedundant-Standard-true"]                                                                   
+ │  ├─ Instance backup (over 500 GB)                                                                   1  month                           $20.00 
+ │  └─ LRS data stored                                                                             1,128  GB                              $25.27 
+ ├─ azurerm_backup_protected_vm.medium["policy-LocallyRedundant-Standard-true"]                                                                  
+ │  ├─ Instance backup (under 500 GB)                                                                  1  month                           $10.00 
+ │  └─ LRS data stored                                                                               178  GB                               $3.99 
+ ├─ azurerm_backup_protected_vm.small["policy-LocallyRedundant-Standard-true"]                                                                   
+ │  ├─ Instance backup (under 50 GB)                                                                   1  month                            $5.00 
+ │  └─ LRS data stored                                                                                40  GB                               $0.90 
+ └─ azurerm_backup_protected_vm.with_usage["policy-LocallyRedundant-Standard-true"]                                                              
+    ├─ Instance backup (under 500 GB)                                                                  1  month                           $10.00 
+    └─ LRS data stored                                                                               400  GB                               $8.96 
                                                                                                                                                  
  OVERALL TOTAL                                                                                                                         $1,549.46 
 ──────────────────────────────────

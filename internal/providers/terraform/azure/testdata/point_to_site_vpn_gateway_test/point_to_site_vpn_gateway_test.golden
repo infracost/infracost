@@ -1,12 +1,12 @@
 
  Name                                                            Monthly Qty  Unit         Monthly Cost 
                                                                                                         
- azurerm_point_to_site_vpn_gateway.point_to_site_vpn                                                    
- └─ P2S scale units (500 Mbps)                                             5  scale units     $1,317.65 
-                                                                                                        
  azurerm_point_to_site_vpn_gateway.point_to_site_vpn_with_usage                                         
  ├─ P2S scale units (500 Mbps)                                             5  scale units     $1,317.65 
  └─ P2S connections                                                        9  hours               $0.11 
+                                                                                                        
+ azurerm_point_to_site_vpn_gateway.point_to_site_vpn                                                    
+ └─ P2S scale units (500 Mbps)                                             5  scale units     $1,317.65 
                                                                                                         
  OVERALL TOTAL                                                                                $2,635.41 
 ──────────────────────────────────

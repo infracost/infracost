@@ -1,14 +1,6 @@
 
  Name                                             Monthly Qty  Unit                    Monthly Cost 
                                                                                                     
- aws_s3_bucket.bucket1                                                                              
- └─ Standard                                                                                        
-    ├─ Storage                              Monthly cost depends on usage: $0.023 per GB            
-    ├─ PUT, COPY, POST, LIST requests       Monthly cost depends on usage: $0.005 per 1k requests   
-    ├─ GET, SELECT, and all other requests  Monthly cost depends on usage: $0.0004 per 1k requests  
-    ├─ Select data scanned                  Monthly cost depends on usage: $0.002 per GB            
-    └─ Select data returned                 Monthly cost depends on usage: $0.0007 per GB           
-                                                                                                    
  aws_s3_bucket.bucket_withUsage                                                                     
  ├─ Standard                                                                                        
  │  ├─ Storage                                         10,000  GB                           $230.00 
@@ -70,6 +62,14 @@
     ├─ Retrieval requests (bulk)                           60  1k requests                    $1.50 
     ├─ Retrievals (bulk)                               60,000  GB                           $150.00 
     └─ Early delete (within 180 days)                  60,000  GB                            $59.40 
+                                                                                                    
+ aws_s3_bucket.bucket1                                                                              
+ └─ Standard                                                                                        
+    ├─ Storage                              Monthly cost depends on usage: $0.023 per GB            
+    ├─ PUT, COPY, POST, LIST requests       Monthly cost depends on usage: $0.005 per 1k requests   
+    ├─ GET, SELECT, and all other requests  Monthly cost depends on usage: $0.0004 per 1k requests  
+    ├─ Select data scanned                  Monthly cost depends on usage: $0.002 per GB            
+    └─ Select data returned                 Monthly cost depends on usage: $0.0007 per GB           
                                                                                                     
  OVERALL TOTAL                                                                           $11,811.53 
 ──────────────────────────────────

@@ -760,6 +760,154 @@
         ],
         "resources": [
           {
+            "name": "module.aft.module.aft_account_request_framework.aws_nat_gateway.aft-vpc-natgw-01[0]",
+            "tags": {
+              "Name": "aft-vpc-natgw-01",
+              "managed_by": "AFT"
+            }
+          },
+          {
+            "name": "module.aft.module.aft_account_request_framework.aws_nat_gateway.aft-vpc-natgw-02[0]",
+            "tags": {
+              "Name": "aft-vpc-natgw-02",
+              "managed_by": "AFT"
+            }
+          },
+          {
+            "name": "module.aft.module.aft_account_request_framework.aws_vpc_endpoint.codebuild[0]",
+            "tags": {
+              "managed_by": "AFT"
+            }
+          },
+          {
+            "name": "module.aft.module.aft_account_request_framework.aws_vpc_endpoint.codecommit[0]",
+            "tags": {
+              "managed_by": "AFT"
+            }
+          },
+          {
+            "name": "module.aft.module.aft_account_request_framework.aws_vpc_endpoint.codepipeline[0]",
+            "tags": {
+              "managed_by": "AFT"
+            }
+          },
+          {
+            "name": "module.aft.module.aft_account_request_framework.aws_vpc_endpoint.events[0]",
+            "tags": {
+              "managed_by": "AFT"
+            }
+          },
+          {
+            "name": "module.aft.module.aft_account_request_framework.aws_vpc_endpoint.git-codecommit[0]",
+            "tags": {
+              "managed_by": "AFT"
+            }
+          },
+          {
+            "name": "module.aft.module.aft_account_request_framework.aws_vpc_endpoint.kms[0]",
+            "tags": {
+              "managed_by": "AFT"
+            }
+          },
+          {
+            "name": "module.aft.module.aft_account_request_framework.aws_vpc_endpoint.lambda[0]",
+            "tags": {
+              "managed_by": "AFT"
+            }
+          },
+          {
+            "name": "module.aft.module.aft_account_request_framework.aws_vpc_endpoint.logs[0]",
+            "tags": {
+              "managed_by": "AFT"
+            }
+          },
+          {
+            "name": "module.aft.module.aft_account_request_framework.aws_vpc_endpoint.servicecatalog[0]",
+            "tags": {
+              "managed_by": "AFT"
+            }
+          },
+          {
+            "name": "module.aft.module.aft_account_request_framework.aws_vpc_endpoint.sns[0]",
+            "tags": {
+              "managed_by": "AFT"
+            }
+          },
+          {
+            "name": "module.aft.module.aft_account_request_framework.aws_vpc_endpoint.sqs[0]",
+            "tags": {
+              "managed_by": "AFT"
+            }
+          },
+          {
+            "name": "module.aft.module.aft_account_request_framework.aws_vpc_endpoint.ssm[0]",
+            "tags": {
+              "managed_by": "AFT"
+            }
+          },
+          {
+            "name": "module.aft.module.aft_account_request_framework.aws_vpc_endpoint.states[0]",
+            "tags": {
+              "managed_by": "AFT"
+            }
+          },
+          {
+            "name": "module.aft.module.aft_account_request_framework.aws_vpc_endpoint.sts[0]",
+            "tags": {
+              "managed_by": "AFT"
+            }
+          },
+          {
+            "name": "module.aft.module.aft_account_request_framework.aws_dynamodb_table.aft_controltower_events",
+            "tags": {
+              "managed_by": "AFT"
+            }
+          },
+          {
+            "name": "module.aft.module.aft_account_request_framework.aws_kms_key.aft",
+            "tags": {
+              "managed_by": "AFT"
+            }
+          },
+          {
+            "name": "module.aft.module.aft_backend.aws_kms_key.encrypt-primary-region",
+            "tags": {
+              "Name": "aft-backend-REGEX_FILTER-primary-region-kms-key",
+              "managed_by": "AFT"
+            }
+          },
+          {
+            "name": "module.aft.module.aft_backend.aws_kms_key.encrypt-secondary-region[0]",
+            "tags": {
+              "Name": "aft-backend-REGEX_FILTER-secondary-region-kms-key",
+              "managed_by": "AFT"
+            }
+          },
+          {
+            "name": "module.aft.module.aft_feature_options.aws_kms_key.aft_log_key",
+            "tags": {
+              "managed_by": "AFT"
+            }
+          },
+          {
+            "name": "module.aft.module.aft_account_request_framework.aws_dynamodb_table.aft_request",
+            "tags": {
+              "managed_by": "AFT"
+            }
+          },
+          {
+            "name": "module.aft.module.aft_account_request_framework.aws_dynamodb_table.aft_request_audit",
+            "tags": {
+              "managed_by": "AFT"
+            }
+          },
+          {
+            "name": "module.aft.module.aft_account_request_framework.aws_dynamodb_table.aft_request_metadata",
+            "tags": {
+              "managed_by": "AFT"
+            }
+          },
+          {
             "name": "module.aft.module.aft_account_provisioning_framework.aws_cloudwatch_log_group.account_metadata_ssm",
             "tags": {
               "managed_by": "AFT"
@@ -862,36 +1010,6 @@
             }
           },
           {
-            "name": "module.aft.module.aft_account_request_framework.aws_dynamodb_table.aft_controltower_events",
-            "tags": {
-              "managed_by": "AFT"
-            }
-          },
-          {
-            "name": "module.aft.module.aft_account_request_framework.aws_dynamodb_table.aft_request",
-            "tags": {
-              "managed_by": "AFT"
-            }
-          },
-          {
-            "name": "module.aft.module.aft_account_request_framework.aws_dynamodb_table.aft_request_audit",
-            "tags": {
-              "managed_by": "AFT"
-            }
-          },
-          {
-            "name": "module.aft.module.aft_account_request_framework.aws_dynamodb_table.aft_request_metadata",
-            "tags": {
-              "managed_by": "AFT"
-            }
-          },
-          {
-            "name": "module.aft.module.aft_account_request_framework.aws_kms_key.aft",
-            "tags": {
-              "managed_by": "AFT"
-            }
-          },
-          {
             "name": "module.aft.module.aft_account_request_framework.aws_lambda_function.aft_account_request_action_trigger",
             "tags": {
               "managed_by": "AFT"
@@ -928,20 +1046,6 @@
             }
           },
           {
-            "name": "module.aft.module.aft_account_request_framework.aws_nat_gateway.aft-vpc-natgw-01[0]",
-            "tags": {
-              "Name": "aft-vpc-natgw-01",
-              "managed_by": "AFT"
-            }
-          },
-          {
-            "name": "module.aft.module.aft_account_request_framework.aws_nat_gateway.aft-vpc-natgw-02[0]",
-            "tags": {
-              "Name": "aft-vpc-natgw-02",
-              "managed_by": "AFT"
-            }
-          },
-          {
             "name": "module.aft.module.aft_account_request_framework.aws_sns_topic.aft_failure_notifications",
             "tags": {
               "managed_by": "AFT"
@@ -966,90 +1070,6 @@
             }
           },
           {
-            "name": "module.aft.module.aft_account_request_framework.aws_vpc_endpoint.codebuild[0]",
-            "tags": {
-              "managed_by": "AFT"
-            }
-          },
-          {
-            "name": "module.aft.module.aft_account_request_framework.aws_vpc_endpoint.codecommit[0]",
-            "tags": {
-              "managed_by": "AFT"
-            }
-          },
-          {
-            "name": "module.aft.module.aft_account_request_framework.aws_vpc_endpoint.codepipeline[0]",
-            "tags": {
-              "managed_by": "AFT"
-            }
-          },
-          {
-            "name": "module.aft.module.aft_account_request_framework.aws_vpc_endpoint.events[0]",
-            "tags": {
-              "managed_by": "AFT"
-            }
-          },
-          {
-            "name": "module.aft.module.aft_account_request_framework.aws_vpc_endpoint.git-codecommit[0]",
-            "tags": {
-              "managed_by": "AFT"
-            }
-          },
-          {
-            "name": "module.aft.module.aft_account_request_framework.aws_vpc_endpoint.kms[0]",
-            "tags": {
-              "managed_by": "AFT"
-            }
-          },
-          {
-            "name": "module.aft.module.aft_account_request_framework.aws_vpc_endpoint.lambda[0]",
-            "tags": {
-              "managed_by": "AFT"
-            }
-          },
-          {
-            "name": "module.aft.module.aft_account_request_framework.aws_vpc_endpoint.logs[0]",
-            "tags": {
-              "managed_by": "AFT"
-            }
-          },
-          {
-            "name": "module.aft.module.aft_account_request_framework.aws_vpc_endpoint.servicecatalog[0]",
-            "tags": {
-              "managed_by": "AFT"
-            }
-          },
-          {
-            "name": "module.aft.module.aft_account_request_framework.aws_vpc_endpoint.sns[0]",
-            "tags": {
-              "managed_by": "AFT"
-            }
-          },
-          {
-            "name": "module.aft.module.aft_account_request_framework.aws_vpc_endpoint.sqs[0]",
-            "tags": {
-              "managed_by": "AFT"
-            }
-          },
-          {
-            "name": "module.aft.module.aft_account_request_framework.aws_vpc_endpoint.ssm[0]",
-            "tags": {
-              "managed_by": "AFT"
-            }
-          },
-          {
-            "name": "module.aft.module.aft_account_request_framework.aws_vpc_endpoint.states[0]",
-            "tags": {
-              "managed_by": "AFT"
-            }
-          },
-          {
-            "name": "module.aft.module.aft_account_request_framework.aws_vpc_endpoint.sts[0]",
-            "tags": {
-              "managed_by": "AFT"
-            }
-          },
-          {
             "name": "module.aft.module.aft_backend.aws_dynamodb_table.lock-table",
             "subresources": [
               {
@@ -1058,20 +1078,6 @@
             ],
             "tags": {
               "Name": "aft-backend-REGEX_FILTER",
-              "managed_by": "AFT"
-            }
-          },
-          {
-            "name": "module.aft.module.aft_backend.aws_kms_key.encrypt-primary-region",
-            "tags": {
-              "Name": "aft-backend-REGEX_FILTER-primary-region-kms-key",
-              "managed_by": "AFT"
-            }
-          },
-          {
-            "name": "module.aft.module.aft_backend.aws_kms_key.encrypt-secondary-region[0]",
-            "tags": {
-              "Name": "aft-backend-REGEX_FILTER-secondary-region-kms-key",
               "managed_by": "AFT"
             }
           },
@@ -1244,12 +1250,6 @@
           },
           {
             "name": "module.aft.module.aft_feature_options.aws_cloudwatch_log_group.aft_enroll_support",
-            "tags": {
-              "managed_by": "AFT"
-            }
-          },
-          {
-            "name": "module.aft.module.aft_feature_options.aws_kms_key.aft_log_key",
             "tags": {
               "managed_by": "AFT"
             }

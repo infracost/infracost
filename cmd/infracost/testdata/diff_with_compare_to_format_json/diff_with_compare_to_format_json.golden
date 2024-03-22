@@ -28,19 +28,19 @@
       "pastBreakdown": {
         "resources": [
           {
-            "name": "aws_instance.web_app",
+            "name": "aws_instance.web_app2",
             "metadata": {},
-            "hourlyCost": "1.017315068493150679",
-            "monthlyCost": "742.64",
+            "hourlyCost": "1.785315068493150679",
+            "monthlyCost": "1303.28",
             "costComponents": [
               {
-                "name": "Instance usage (Linux/UNIX, on-demand, m5.4xlarge)",
+                "name": "Instance usage (Linux/UNIX, on-demand, m5.8xlarge)",
                 "unit": "hours",
                 "hourlyQuantity": "1",
                 "monthlyQuantity": "730",
-                "price": "0.768",
-                "hourlyCost": "0.768",
-                "monthlyCost": "560.64"
+                "price": "1.536",
+                "hourlyCost": "1.536",
+                "monthlyCost": "1121.28"
               }
             ],
             "subresources": [
@@ -90,19 +90,19 @@
             ]
           },
           {
-            "name": "aws_instance.web_app2",
+            "name": "aws_instance.web_app",
             "metadata": {},
-            "hourlyCost": "1.785315068493150679",
-            "monthlyCost": "1303.28",
+            "hourlyCost": "1.017315068493150679",
+            "monthlyCost": "742.64",
             "costComponents": [
               {
-                "name": "Instance usage (Linux/UNIX, on-demand, m5.8xlarge)",
+                "name": "Instance usage (Linux/UNIX, on-demand, m5.4xlarge)",
                 "unit": "hours",
                 "hourlyQuantity": "1",
                 "monthlyQuantity": "730",
-                "price": "1.536",
-                "hourlyCost": "1.536",
-                "monthlyCost": "1121.28"
+                "price": "0.768",
+                "hourlyCost": "0.768",
+                "monthlyCost": "560.64"
               }
             ],
             "subresources": [

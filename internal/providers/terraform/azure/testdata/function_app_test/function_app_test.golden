@@ -1,25 +1,17 @@
 
  Name                                                                      Monthly Qty  Unit                      Monthly Cost 
                                                                                                                                
- azurerm_function_app.elasticFunction                                                                                          
- ├─ vCPU (EP2)                                                                       2  vCPU                           $252.58 
- └─ Memory (EP2)                                                                     7  GB                              $62.85 
-                                                                                                                               
  azurerm_function_app.elasticFunctionWithUsage                                                                                 
  ├─ vCPU (EP2)                                                                       4  vCPU                           $505.16 
  └─ Memory (EP2)                                                                    14  GB                             $125.71 
                                                                                                                                
+ azurerm_function_app.elasticFunction                                                                                          
+ ├─ vCPU (EP2)                                                                       2  vCPU                           $252.58 
+ └─ Memory (EP2)                                                                     7  GB                              $62.85 
+                                                                                                                               
  azurerm_function_app.elasticPremiumFunction                                                                                   
  ├─ vCPU (EP1)                                                                       1  vCPU                           $126.29 
  └─ Memory (EP1)                                                                   3.5  GB                              $31.43 
-                                                                                                                               
- azurerm_function_app.functionApp                                                                                              
- ├─ Execution time                                                  Monthly cost depends on usage: $0.000016 per GB-seconds    
- └─ Executions                                                      Monthly cost depends on usage: $0.20 per 1M requests       
-                                                                                                                               
- azurerm_function_app.functionAppNoAvailableServicePlan                                                                        
- ├─ Execution time                                                  Monthly cost depends on usage: $0.000016 per GB-seconds    
- └─ Executions                                                      Monthly cost depends on usage: $0.20 per 1M requests       
                                                                                                                                
  azurerm_function_app.functionAppNoAvailableServicePlanButHasUsage                                                             
  ├─ Execution time                                                        876,180.4425  GB-seconds                      $14.02 
@@ -33,13 +25,21 @@
  ├─ Execution time                                                              37,500  GB-seconds                       $0.60 
  └─ Executions                                                                       3  1M requests                      $0.60 
                                                                                                                                
- azurerm_function_app.functionAppWithMissingExecutions                                                                         
- ├─ Execution time                                                  Monthly cost depends on usage: $0.000016 per GB-seconds    
- └─ Executions                                                      Monthly cost depends on usage: $0.20 per 1M requests       
-                                                                                                                               
  azurerm_function_app.functionAppWithOnlyExecutions                                                                            
  ├─ Execution time                                                  Monthly cost depends on usage: $0.000016 per GB-seconds    
  └─ Executions                                                                     0.1  1M requests                      $0.02 
+                                                                                                                               
+ azurerm_function_app.functionApp                                                                                              
+ ├─ Execution time                                                  Monthly cost depends on usage: $0.000016 per GB-seconds    
+ └─ Executions                                                      Monthly cost depends on usage: $0.20 per 1M requests       
+                                                                                                                               
+ azurerm_function_app.functionAppNoAvailableServicePlan                                                                        
+ ├─ Execution time                                                  Monthly cost depends on usage: $0.000016 per GB-seconds    
+ └─ Executions                                                      Monthly cost depends on usage: $0.20 per 1M requests       
+                                                                                                                               
+ azurerm_function_app.functionAppWithMissingExecutions                                                                         
+ ├─ Execution time                                                  Monthly cost depends on usage: $0.000016 per GB-seconds    
+ └─ Executions                                                      Monthly cost depends on usage: $0.20 per 1M requests       
                                                                                                                                
  azurerm_storage_account.example                                                                                               
  ├─ Capacity                                                        Monthly cost depends on usage: $0.0152 per GB              

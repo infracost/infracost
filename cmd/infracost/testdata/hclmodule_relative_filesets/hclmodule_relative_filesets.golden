@@ -2,10 +2,6 @@ Project: infracost/infracost/cmd/infracost/testdata/hclmodule_relative_filesets
 
  Name                                                         Monthly Qty  Unit  Monthly Cost 
                                                                                               
- module.ecs_service.aws_ecs_service.service                                                   
- ├─ Per GB per hour                                                   0.5  GB           $1.62 
- └─ Per vCPU per hour                                                0.25  CPU          $7.39 
-                                                                                              
  module.ecs_service_with_path_cwd.aws_ecs_service.service                                     
  ├─ Per GB per hour                                                     4  GB          $12.98 
  └─ Per vCPU per hour                                                   4  CPU        $118.20 
@@ -13,6 +9,10 @@ Project: infracost/infracost/cmd/infracost/testdata/hclmodule_relative_filesets
  module.ecs_service_with_path_module.aws_ecs_service.service                                  
  ├─ Per GB per hour                                                     2  GB           $6.49 
  └─ Per vCPU per hour                                                   2  CPU         $59.10 
+                                                                                              
+ module.ecs_service.aws_ecs_service.service                                                   
+ ├─ Per GB per hour                                                   0.5  GB           $1.62 
+ └─ Per vCPU per hour                                                0.25  CPU          $7.39 
                                                                                               
  OVERALL TOTAL                                                                        $205.78 
 ──────────────────────────────────

@@ -1,8 +1,9 @@
 
  Name                                                     Monthly Qty  Unit              Monthly Cost 
                                                                                                       
- aws_eip.eip1                                                                                         
- └─ IP address (if unused)                                        730  hours                    $3.65 
+ aws_nat_gateway.nat_gw                                                                               
+ ├─ NAT gateway                                                   730  hours                   $32.85 
+ └─ Data processed                                     Monthly cost depends on usage: $0.045 per GB   
                                                                                                       
  aws_instance.instance                                                                                
  ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)             730  hours                   $30.37 
@@ -13,9 +14,8 @@
  ├─ Network load balancer                                         730  hours                   $16.43 
  └─ Load balancer capacity units                       Monthly cost depends on usage: $4.38 per LCU   
                                                                                                       
- aws_nat_gateway.nat_gw                                                                               
- ├─ NAT gateway                                                   730  hours                   $32.85 
- └─ Data processed                                     Monthly cost depends on usage: $0.045 per GB   
+ aws_eip.eip1                                                                                         
+ └─ IP address (if unused)                                        730  hours                    $3.65 
                                                                                                       
  OVERALL TOTAL                                                                                 $84.09 
 ──────────────────────────────────

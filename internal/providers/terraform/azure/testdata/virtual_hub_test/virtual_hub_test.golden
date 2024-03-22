@@ -1,12 +1,12 @@
 
  Name                                        Monthly Qty  Unit   Monthly Cost 
                                                                               
- azurerm_virtual_hub.virtual_hub                                              
- └─ Deployment                                       730  hours       $182.50 
-                                                                              
  azurerm_virtual_hub.virtual_hub_with_usage                                   
  ├─ Deployment                                       730  hours       $182.50 
  └─ Data processed                                    90  GB            $1.80 
+                                                                              
+ azurerm_virtual_hub.virtual_hub                                              
+ └─ Deployment                                       730  hours       $182.50 
                                                                               
  OVERALL TOTAL                                                        $366.80 
 ──────────────────────────────────

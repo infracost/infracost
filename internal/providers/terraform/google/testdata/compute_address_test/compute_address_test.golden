@@ -4,12 +4,6 @@
  google_compute_address.default_diff_region                                                  
  └─ IP address (unused)                                             730  hours         $8.76 
                                                                                              
- google_compute_address.preemptible_static                                                   
- └─ IP address (preemptible VM)                                     730  hours         $1.83 
-                                                                                             
- google_compute_address.standard_static                                                      
- └─ IP address (standard VM)                                        730  hours         $3.65 
-                                                                                             
  google_compute_address.static                                                               
  └─ IP address (unused)                                             730  hours         $7.30 
                                                                                              
@@ -19,10 +13,6 @@
  google_compute_global_address.default                                                       
  └─ IP address (unused)                                             730  hours         $7.30 
                                                                                              
- google_compute_instance.preemptible_instance_with_ip                                        
- ├─ Instance usage (Linux/UNIX, preemptible, f1-micro)              730  hours         $2.56 
- └─ Standard provisioned storage (pd-standard)                       10  GB            $0.40 
-                                                                                             
  google_compute_instance.standard_instance_with_ip                                           
  ├─ Instance usage (Linux/UNIX, on-demand, f1-micro)                730  hours         $3.88 
  └─ Standard provisioned storage (pd-standard)                       10  GB            $0.40 
@@ -30,6 +20,16 @@
  google_compute_instance.standard_instance_with_ip_purpose                                   
  ├─ Instance usage (Linux/UNIX, on-demand, f1-micro)                730  hours         $3.88 
  └─ Standard provisioned storage (pd-standard)                       10  GB            $0.40 
+                                                                                             
+ google_compute_address.standard_static                                                      
+ └─ IP address (standard VM)                                        730  hours         $3.65 
+                                                                                             
+ google_compute_instance.preemptible_instance_with_ip                                        
+ ├─ Instance usage (Linux/UNIX, preemptible, f1-micro)              730  hours         $2.56 
+ └─ Standard provisioned storage (pd-standard)                       10  GB            $0.40 
+                                                                                             
+ google_compute_address.preemptible_static                                                   
+ └─ IP address (preemptible VM)                                     730  hours         $1.83 
                                                                                              
  OVERALL TOTAL                                                                        $47.66 
 ──────────────────────────────────

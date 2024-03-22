@@ -1,9 +1,6 @@
 
  Name                                                       Monthly Qty  Unit   Monthly Cost 
                                                                                              
- aws_dx_connection.my_dx_connection                                                          
- └─ DX connection                                                   730  hours       $219.00 
-                                                                                             
  aws_dx_connection.my_dx_connection_usage                                                    
  ├─ DX connection                                                   730  hours       $219.00 
  ├─ Outbound data transfer (from ap-east-1, to EqDC2)             3,000  GB          $270.00 
@@ -12,6 +9,9 @@
  aws_dx_connection.my_dx_connection_usage_backwards_compat                                   
  ├─ DX connection                                                   730  hours       $219.00 
  └─ Outbound data transfer (from us-east-1, to EqDC2)               200  GB            $4.00 
+                                                                                             
+ aws_dx_connection.my_dx_connection                                                          
+ └─ DX connection                                                   730  hours       $219.00 
                                                                                              
  OVERALL TOTAL                                                                       $959.20 
 ──────────────────────────────────

@@ -1,9 +1,6 @@
 
  Name                                               Monthly Qty  Unit         Monthly Cost 
                                                                                            
- azurerm_mssql_elasticpool.basic_100                                                       
- └─ Compute (Basic, 100 DTUs)                               730  hours             $147.22 
-                                                                                           
  azurerm_mssql_elasticpool.bc_dc                                                           
  ├─ Compute (BC_DC, 8 vCore)                                730  hours           $4,622.36 
  ├─ SQL license                                           5,840  vCore-hours     $2,190.00 
@@ -14,6 +11,16 @@
  ├─ SQL license                                           5,840  vCore-hours     $2,190.00 
  └─ Storage                                                 100  GB                 $29.75 
                                                                                            
+ azurerm_mssql_elasticpool.premium_500                                                     
+ ├─ Compute (Premium, 500 DTUs)                             730  hours           $2,737.50 
+ └─ Extra data storage                                      274  GB                $121.11 
+                                                                                           
+ azurerm_mssql_elasticpool.gp_gen5_zone_redundant                                          
+ ├─ Compute (GP_Gen5, 4 vCore)                              730  hours             $488.92 
+ ├─ Zone redundancy (GP_Gen5, 4 vCore)                      730  hours             $293.35 
+ ├─ SQL license                                           2,920  vCore-hours       $291.90 
+ └─ Storage                                                 100  GB                 $27.40 
+                                                                                           
  azurerm_mssql_elasticpool.gp_gen5                                                         
  ├─ Compute (GP_Gen5, 4 vCore)                              730  hours             $488.92 
  ├─ SQL license                                           2,920  vCore-hours       $291.90 
@@ -23,19 +30,12 @@
  ├─ Compute (GP_Gen5, 4 vCore)                              730  hours             $488.92 
  └─ Storage                                                 100  GB                 $13.69 
                                                                                            
- azurerm_mssql_elasticpool.gp_gen5_zone_redundant                                          
- ├─ Compute (GP_Gen5, 4 vCore)                              730  hours             $488.92 
- ├─ Zone redundancy (GP_Gen5, 4 vCore)                      730  hours             $293.35 
- ├─ SQL license                                           2,920  vCore-hours       $291.90 
- └─ Storage                                                 100  GB                 $27.40 
-                                                                                           
- azurerm_mssql_elasticpool.premium_500                                                     
- ├─ Compute (Premium, 500 DTUs)                             730  hours           $2,737.50 
- └─ Extra data storage                                      274  GB                $121.11 
-                                                                                           
  azurerm_mssql_elasticpool.standard_200                                                    
  ├─ Compute (Standard, 200 DTUs)                            730  hours             $441.04 
  └─ Extra data storage                                      100  GB                 $22.10 
+                                                                                           
+ azurerm_mssql_elasticpool.basic_100                                                       
+ └─ Compute (Basic, 100 DTUs)                               730  hours             $147.22 
                                                                                            
  OVERALL TOTAL                                                                  $19,551.88 
 ──────────────────────────────────

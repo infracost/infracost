@@ -990,18 +990,24 @@ func calculateTotalCosts(resources []Resource) (*decimal.Decimal, *decimal.Decim
 
 func sortResources(resources []Resource, groupKey string) {
 	sort.Slice(resources, func(i, j int) bool {
-		// If an empty group key is passed just sort by name
-		if groupKey == "" {
-			return resources[i].Name < resources[j].Name
+		// if they are in different groups, sort by group name
+		if groupKey != "" && resources[i].Metadata[groupKey] != resources[j].Metadata[groupKey] {
+			return resources[i].Metadata[groupKey].(string) < resources[j].Metadata[groupKey].(string)
 		}
 
-		// If the resources are in the same group then sort by name
-		if resources[i].Metadata[groupKey] == resources[j].Metadata[groupKey] {
-			return resources[i].Name < resources[j].Name
+		// if the costs are different, sort by cost descending
+		if resources[i].MonthlyCost == nil {
+			if resources[j].MonthlyCost != nil {
+				return false
+			}
+		} else if resources[j].MonthlyCost == nil {
+			return true
+		} else if !resources[i].MonthlyCost.Equal(*resources[j].MonthlyCost) {
+			return resources[i].MonthlyCost.GreaterThan(*resources[j].MonthlyCost)
 		}
 
-		// Sort by the group key
-		return resources[i].Metadata[groupKey].(string) < resources[j].Metadata[groupKey].(string)
+		// Sort by name
+		return resources[i].Name < resources[j].Name
 	})
 }
 
