@@ -28,6 +28,10 @@ jobs:
         with:
           images: |
             ${{ secrets.DOCKER_ORG }}/${{ secrets.DOCKER_REPOSITORY }}
+          tags: |
+            type=edge
+          flavor: |
+            latest=false
 
       - name: Build and push Docker images
         uses: docker/build-push-action@v4
@@ -47,8 +51,11 @@ jobs:
         with:
           images: |
             ${{ secrets.DOCKER_ORG }}/${{ secrets.DOCKER_REPOSITORY }}
+          tags: |
+            type=edge
           flavor: |
-            prefix=ci-,onlatest=true
+            prefix=ci-
+            latest=false
 
       - name: Build and push Docker images (CI)
         uses: docker/build-push-action@v4
