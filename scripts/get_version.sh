@@ -15,16 +15,21 @@ if $(git rev-parse --is-shallow-repository); then
   git fetch --quiet --unshallow
 fi
 
-if git describe --tags --exact-match "${COMMITISH}" >/dev/null 2>&1; then
-  TAG=$(git describe --tags --exact-match "${COMMITISH}")
-elif git describe --tags "${COMMITISH}" > /dev/null 2>&1; then
-  full_tag=$(git describe --tags "${COMMITISH}")
-  commit_count=$(echo ${full_tag} | awk -F'-' '{print $2}')
-  commit_sha=$(echo ${full_tag} | awk -F'-' '{print $3}')
+# Get the latest tag with a "v" prefix
+LATEST_V_TAG=$(git tag --list 'v*' --sort=-v:refname | head -n 1)
 
-  TAG=$(echo ${full_tag} | awk -F'-' '{print $1}')
-  BUILD=$(echo +${commit_count}-${commit_sha})
+if [ -n "$LATEST_V_TAG" ]; then
+  if git describe --tags --exact-match "${COMMITISH}" 2>/dev/null | grep -q "^${LATEST_V_TAG}$"; then
+    TAG=$LATEST_V_TAG
+  elif git describe --tags "${COMMITISH}" --match 'v*' > /dev/null 2>&1; then
+    full_tag=$(git describe --tags "${COMMITISH}" --match 'v*')
+    commit_count=$(echo ${full_tag} | awk -F'-' '{print $(NF-1)}')
+    commit_sha=$(echo ${full_tag} | awk -F'-' '{print $NF}')
+
+    # Assuming the latest "v" prefixed tag is part of the description
+    TAG=$(echo ${full_tag} | grep -o '^v[^-]*')
+    BUILD=$(echo +${commit_count}-${commit_sha})
+  fi
 fi
-
 
 echo $TAG$BUILD$DIRTY_SUFFIX
