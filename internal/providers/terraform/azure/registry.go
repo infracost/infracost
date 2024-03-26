@@ -162,6 +162,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getPrivateDnsResolverDnsForwardingRulesetRegistryItem(),
 	getMachineLearningComputeInstanceRegistryItem(),
 	getMachineLearningComputeClusterRegistryItem(),
+	getCognitiveAccountRegistryItem(),
 }
 
 // FreeResources grouped alphabetically

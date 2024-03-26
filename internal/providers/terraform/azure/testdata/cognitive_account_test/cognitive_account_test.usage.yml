@@ -1,0 +1,76 @@
+version: 0.1
+resource_usage:
+  azurerm_cognitive_account.speech_with_usage[*]:
+    speech_to_text_standard_monthly_hrs: 100
+    speech_to_text_standard_batch_monthly_hrs: 100
+    speech_to_text_custom_monthly_hrs: 100
+    speech_to_text_custom_batch_monthly_hrs: 100
+    speech_to_text_custom_endpoint_monthly_hrs: 100
+    speech_to_text_custom_training_monthly_hrs: 100
+    speech_to_text_enhanced_add_ons_monthly_hrs: 100
+    speech_to_text_conversation_transcription_multi_channel_audio_monthly_hrs: 100
+    text_to_speech_neural_chars: 10_000_000
+    text_to_speech_custom_neural_training_monthly_hrs: 100
+    text_to_speech_custom_neural_chars: 20_000_000
+    text_to_speech_custom_neural_endpoint_monthly_hrs: 100
+    text_to_speech_long_audio_chars: 30_000_000
+    text_to_speech_personal_voice_profiles: 2_000
+    text_to_speech_personal_voice_chars: 1_000_000
+    speech_translation_monthly_hrs: 100
+    speaker_verification_transactions: 3000
+    speaker_identification_transactions: 4000
+    voice_profiles: 2000
+
+  azurerm_cognitive_account.speech_with_commitment["small"]:
+    speech_to_text_standard_commitment_hrs: 2000
+    speech_to_text_standard_overage_hrs: 100
+    speech_to_text_custom_commitment_hrs: 2000
+    speech_to_text_custom_overage_hrs: 100
+    speech_to_text_enhanced_add_ons_commitment_hrs: 2000
+    speech_to_text_enhanced_add_ons_overage_hrs: 100
+    text_to_speech_neural_commitment_chars: 80_000_000
+    text_to_speech_neural_overage_chars: 1_000_000
+    connected_container_speech_to_text_standard_commitment_hrs: 2000
+    connected_container_speech_to_text_standard_overage_hrs: 100
+    connected_container_speech_to_text_custom_commitment_hrs: 2000
+    connected_container_speech_to_text_custom_overage_hrs: 100
+    connected_container_speech_to_text_enhanced_add_ons_commitment_hrs: 2000
+    connected_container_speech_to_text_enhanced_add_ons_overage_hrs: 100
+    connected_container_text_to_speech_neural_commitment_chars: 80_000_000
+    connected_container_text_to_speech_neural_overage_chars: 1_000_000
+
+  azurerm_cognitive_account.speech_with_commitment["medium"]:
+    speech_to_text_standard_commitment_hrs: 10_000
+    speech_to_text_standard_overage_hrs: 100
+    speech_to_text_custom_commitment_hrs: 10_000
+    speech_to_text_custom_overage_hrs: 100
+    speech_to_text_enhanced_add_ons_commitment_hrs: 10_000
+    speech_to_text_enhanced_add_ons_overage_hrs: 100
+    text_to_speech_neural_commitment_chars: 400_000_000
+    text_to_speech_neural_overage_chars: 1_000_000
+    connected_container_speech_to_text_standard_commitment_hrs: 10_000
+    connected_container_speech_to_text_standard_overage_hrs: 100
+    connected_container_speech_to_text_custom_commitment_hrs: 10_000
+    connected_container_speech_to_text_custom_overage_hrs: 100
+    connected_container_speech_to_text_enhanced_add_ons_commitment_hrs: 10_000
+    connected_container_speech_to_text_enhanced_add_ons_overage_hrs: 100
+    connected_container_text_to_speech_neural_commitment_chars: 400_000_000
+    connected_container_text_to_speech_neural_overage_chars: 1_000_000
+
+  azurerm_cognitive_account.speech_with_commitment["large"]:
+    speech_to_text_standard_commitment_hrs: 50_000
+    speech_to_text_standard_overage_hrs: 100
+    speech_to_text_custom_commitment_hrs: 50_000
+    speech_to_text_custom_overage_hrs: 100
+    speech_to_text_enhanced_add_ons_commitment_hrs: 50_000
+    speech_to_text_enhanced_add_ons_overage_hrs: 100
+    text_to_speech_neural_commitment_chars: 2_000_000_000
+    text_to_speech_neural_overage_chars: 1_000_000
+    connected_container_speech_to_text_standard_commitment_hrs: 50_000
+    connected_container_speech_to_text_standard_overage_hrs: 100
+    connected_container_speech_to_text_custom_commitment_hrs: 50_000
+    connected_container_speech_to_text_custom_overage_hrs: 100
+    connected_container_speech_to_text_enhanced_add_ons_commitment_hrs: 50_000
+    connected_container_speech_to_text_enhanced_add_ons_overage_hrs: 100
+    connected_container_text_to_speech_neural_commitment_chars: 2_000_000_000
+    connected_container_text_to_speech_neural_overage_chars: 1_000_000
