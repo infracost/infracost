@@ -77,31 +77,8 @@ Project: infracost/infracost/cmd/infracost/testdata
 + aws_lambda_function.zero_cost_lambda
   $0.00
 
-    + Requests
-      $0.00
-
-    + Duration
-      $0.00
-
 + aws_s3_bucket.usage
   $0.00
-
-    + Standard
-    
-        + Storage
-          $0.00
-    
-        + PUT, COPY, POST, LIST requests
-          $0.00
-    
-        + GET, SELECT, and all other requests
-          $0.00
-    
-        + Select data scanned
-          $0.00
-    
-        + Select data returned
-          $0.00
 
 Monthly cost change for infracost/infracost/cmd/infracost/testdata
 Amount:  +$1,361 ($0.00 → $1,361)
@@ -124,9 +101,6 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
     + Instance usage (Linux/UNIX, on-demand, t3.nano)
       +$4
 
-    + CPU credits
-      $0.00
-
     + root_block_device
     
         + Storage (general purpose SSD, gp2)
@@ -137,9 +111,6 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
 
     + Instance usage (Linux/UNIX, on-demand, t3.nano)
       +$4
-
-    + CPU credits
-      $0.00
 
     + root_block_device
     
@@ -152,9 +123,6 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
     + Instance usage (Linux/UNIX, on-demand, t3.nano)
       +$4
 
-    + CPU credits
-      $0.00
-
     + root_block_device
     
         + Storage (general purpose SSD, gp2)
@@ -165,9 +133,6 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
 
     + Instance usage (Linux/UNIX, on-demand, t3.nano)
       +$4
-
-    + CPU credits
-      $0.00
 
     + root_block_device
     
@@ -180,9 +145,6 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
     + Instance usage (Linux/UNIX, on-demand, t3.nano)
       +$4
 
-    + CPU credits
-      $0.00
-
     + root_block_device
     
         + Storage (general purpose SSD, gp2)
@@ -193,9 +155,6 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
 
     + Instance usage (Linux/UNIX, on-demand, t3.nano)
       +$4
-
-    + CPU credits
-      $0.00
 
     + root_block_device
     

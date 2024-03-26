@@ -37,9 +37,6 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
     + Instance usage (Linux/UNIX, on-demand, t3.nano)
       +$4
 
-    + CPU credits
-      $0.00
-
     + root_block_device
     
         + Storage (general purpose SSD, gp2)
@@ -50,9 +47,6 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
 
     + Instance usage (Linux/UNIX, on-demand, t3.nano)
       +$4
-
-    + CPU credits
-      $0.00
 
     + root_block_device
     
@@ -65,9 +59,6 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
     + Instance usage (Linux/UNIX, on-demand, t3.nano)
       +$4
 
-    + CPU credits
-      $0.00
-
     + root_block_device
     
         + Storage (general purpose SSD, gp2)
@@ -78,9 +69,6 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
 
     + Instance usage (Linux/UNIX, on-demand, t3.nano)
       +$4
-
-    + CPU credits
-      $0.00
 
     + root_block_device
     
@@ -93,9 +81,6 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
     + Instance usage (Linux/UNIX, on-demand, t3.nano)
       +$4
 
-    + CPU credits
-      $0.00
-
     + root_block_device
     
         + Storage (general purpose SSD, gp2)
@@ -106,9 +91,6 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
 
     + Instance usage (Linux/UNIX, on-demand, t3.nano)
       +$4
-
-    + CPU credits
-      $0.00
 
     + root_block_device
     
