@@ -639,6 +639,9 @@ resource_type_default_usage:
     monthly_data_processed_gb: 111 # Monthly data processed by the NAT Gateway in GB.
     #  azurerm_network_connection_monitor:
     #    tests: 100000 # Overrides the number of tests done in the connection monitor
+
+  azurerm_network_ddos_protection_plan.my_plan:
+    overage_amount: 0 # Monthly number of protected resources over the plan protection limit (100).
   azurerm_network_watcher:
     monthly_diagnostic_checks: 5000 # Monthly number of diagnostic API calls.
   azurerm_network_watcher_flow_log:

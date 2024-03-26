@@ -1087,6 +1087,9 @@ resource_usage:
   azurerm_nat_gateway.my_gateway:
     monthly_data_processed_gb: 10 # Monthly data processed by the NAT Gateway in GB.
 
+  azurerm_network_ddos_protection_plan.my_plan:
+    overage_amount: 5 # Monthly number of protected resources over the plan protection limit (100).
+
   azurerm_network_watcher.my_watcher:
     monthly_diagnostic_checks: 10000 # Monthly number of diagnostic API calls.
 

@@ -1,0 +1,22 @@
+
+ Name                                                                               Monthly Qty  Unit                  Monthly Cost 
+                                                                                                                                    
+ azurerm_network_ddos_protection_plan.network_ddos_protection_plan_with_usage                                                       
+ ├─ DDoS Protection Plan                                                                    730  hours                    $2,943.55 
+ └─ Overage charges                                                                           5  resources                  $147.18 
+                                                                                                                                    
+ azurerm_network_ddos_protection_plan.network_ddos_protection_plan                                                                  
+ ├─ DDoS Protection Plan                                                                    730  hours                    $2,943.55 
+ └─ Overage charges                                                            Monthly cost depends on usage: $29.44 per resource   
+                                                                                                                                    
+ OVERALL TOTAL                                                                                                            $6,034.27 
+──────────────────────────────────
+3 cloud resources were detected:
+∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 1 was free
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ TestNetworkDdosProtectionPlan                      ┃ $6,034       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
