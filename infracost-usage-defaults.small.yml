@@ -440,6 +440,26 @@ resource_type_default_usage:
   azurerm_cdn_endpoint:
     monthly_outbound_gb: 61 # Monthly number of outbound data transfers in GB.
     monthly_rules_engine_requests: 8250000 # Monthly number of rules engine requests.
+  azurerm_cognitive_account:
+    monthly_speech_to_text_standard_hrs: 5
+    monthly_speech_to_text_standard_batch_hrs: 14
+    monthly_speech_to_text_custom_hrs: 4.3
+    monthly_speech_to_text_custom_batch_hrs: 11
+    monthly_speech_to_text_custom_endpoint_hrs: 93
+    monthly_speech_to_text_custom_training_hrs: 0.5
+    monthly_speech_to_text_enhanced_add_ons_hrs: 17
+    monthly_speech_to_text_conversation_transcription_multi_channel_audio_hrs: 2.4
+    monthly_text_to_speech_neural_chars: 333_333
+    monthly_text_to_speech_custom_neural_training_hrs: 0.1
+    monthly_text_to_speech_custom_neural_chars: 208_333
+    monthly_text_to_speech_custom_neural_endpoint_hrs: 1.3
+    monthly_text_to_speech_long_audio_chars: 50_000
+    monthly_text_to_speech_personal_voice_profiles: 8.3
+    monthly_text_to_speech_personal_voice_chars: 208_333
+    monthly_speech_translation_hrs: 2
+    monthly_speaker_verification_transactions: 1_000
+    monthly_speaker_identification_transactions: 500
+    monthly_voice_profiles: 25_000
   azurerm_container_registry:
     storage_gb: 50
     monthly_build_vcpu_hrs: 13.875
