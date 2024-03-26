@@ -721,24 +721,6 @@ func (r *Root) summaryMessage(showSkipped bool) string {
 		} else {
 			msg += fmt.Sprintf("\n∙ %d were estimated", *r.Summary.TotalSupportedResources)
 		}
-
-		allUsageBased := *r.Summary.TotalUsageBasedResources == *r.Summary.TotalSupportedResources
-
-		if r.Summary.TotalUsageBasedResources != nil && *r.Summary.TotalUsageBasedResources > 0 {
-			usageBasedCount := "1 of which"
-			if allUsageBased {
-				usageBasedCount = "it includes"
-			}
-
-			if *r.Summary.TotalUsageBasedResources > 1 {
-				usageBasedCount = fmt.Sprintf("%d of which include", *r.Summary.TotalUsageBasedResources)
-				if allUsageBased {
-					usageBasedCount = "all of which include"
-				}
-			}
-
-			msg += fmt.Sprintf(", %s usage-based costs, see %s", usageBasedCount, ui.SecondaryLinkString("https://infracost.io/usage-file"))
-		}
 	}
 
 	if r.Summary.TotalNoPriceResources != nil && *r.Summary.TotalNoPriceResources > 0 {
