@@ -10,6 +10,7 @@ import (
 	"github.com/jedib0t/go-pretty/v6/text"
 	"github.com/shopspring/decimal"
 
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/ui"
 )
 
@@ -164,6 +165,47 @@ func projectTitle(project Project) string {
 }
 
 func tableForDiff(out Root, opts Options) string {
+	if out.Metadata.UsageApiEnabled {
+		// for now only show the new usage-costs in the table if the usage api has been enabled
+		// once we have all the other usage cost stuff done this will replace the old table
+		t := table.NewWriter()
+		t.SetStyle(table.StyleBold)
+		t.Style().Format.Header = text.FormatDefault
+		t.AppendHeader(table.Row{
+			"Project",
+			"Baseline cost",
+			"Usage cost",
+			"Total change",
+			"New monthly cost",
+		})
+
+		t.SetColumnConfigs([]table.ColumnConfig{
+			{Name: "Project", WidthMin: 50},
+			{Name: "Baseline cost", WidthMin: 10, Align: text.AlignRight},
+			{Name: "Usage cost", WidthMin: 10, Align: text.AlignRight},
+			{Name: "Total change", WidthMin: 10, Align: text.AlignRight},
+			{Name: "New monthly cost", WidthMin: 10, Align: text.AlignRight},
+		})
+
+		for _, project := range out.Projects {
+			if !showProject(project, opts, false) {
+				continue
+			}
+
+			t.AppendRow(
+				table.Row{
+					truncateMiddle(project.Name, 64, "..."),
+					formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyBaselineCost(), project.Breakdown.TotalMonthlyBaselineCost(), false),
+					formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyUsageCost, project.Breakdown.TotalMonthlyUsageCost, false),
+					formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyCost, project.Breakdown.TotalMonthlyCost, false),
+					formatCost(out.Currency, project.Breakdown.TotalMonthlyCost),
+				},
+			)
+
+		}
+
+		return t.Render()
+	}
 	t := table.NewWriter()
 	t.SetStyle(table.StyleBold)
 	t.Style().Format.Header = text.FormatDefault
@@ -246,6 +288,10 @@ func resourceToDiff(currency string, diffResource Resource, oldResource *Resourc
 			newComponent = findMatchingCostComponent(newResource.CostComponents, diffComponent.Name)
 		}
 
+		if zeroDiffComponent(diffComponent, oldComponent, newComponent, diffComponent.Name) {
+			continue
+		}
+
 		s += "\n"
 		s += ui.Indent(costComponentToDiff(currency, diffComponent, oldComponent, newComponent), "    ")
 	}
@@ -261,11 +307,73 @@ func resourceToDiff(currency string, diffResource Resource, oldResource *Resourc
 			newSubResource = findResourceByName(newResource.SubResources, diffSubResource.Name)
 		}
 
+		if zeroDiffResource(diffSubResource, oldSubResource, newSubResource, diffResource.Name) {
+			continue
+		}
+
 		s += "\n"
 		s += ui.Indent(resourceToDiff(currency, diffSubResource, oldSubResource, newSubResource, false), "    ")
 	}
 
 	return s
+}
+
+func zeroDiffComponent(diff CostComponent, old, new *CostComponent, resourceName string) bool {
+	if diff.MonthlyQuantity == nil || !diff.MonthlyQuantity.IsZero() {
+		return false
+	}
+	if old != nil && (old.MonthlyQuantity == nil || !old.MonthlyQuantity.IsZero()) {
+		return false
+	}
+	if new != nil && (new.MonthlyQuantity == nil || !new.MonthlyQuantity.IsZero()) {
+		return false
+	}
+
+	logging.Logger.Debug().Msgf("Hiding diff with zero usage: %s '%s'", resourceName, diff.Name)
+	return true
+}
+
+func zeroDiffResource(diff Resource, old, new *Resource, resourceName string) bool {
+	for _, cc := range diff.CostComponents {
+		if cc.MonthlyQuantity == nil || !cc.MonthlyQuantity.IsZero() {
+			return false
+		}
+	}
+
+	if old != nil {
+		for _, cc := range old.CostComponents {
+			if cc.MonthlyQuantity == nil || !cc.MonthlyQuantity.IsZero() {
+				return false
+			}
+		}
+	}
+
+	if new != nil {
+		for _, cc := range new.CostComponents {
+			if cc.MonthlyQuantity == nil || !cc.MonthlyQuantity.IsZero() {
+				return false
+			}
+		}
+	}
+
+	for _, diffSubResource := range diff.SubResources {
+		var oldSubResource, newSubResource *Resource
+
+		if old != nil {
+			oldSubResource = findResourceByName(old.SubResources, diffSubResource.Name)
+		}
+
+		if new != nil {
+			newSubResource = findResourceByName(new.SubResources, diffSubResource.Name)
+		}
+
+		if !zeroDiffResource(diffSubResource, oldSubResource, newSubResource, diffSubResource.Name) {
+			return false
+		}
+	}
+
+	logging.Logger.Debug().Msgf("Hiding resource with no usage: %s.%s", resourceName, diff.Name)
+	return true
 }
 
 func costComponentToDiff(currency string, diffComponent CostComponent, oldComponent *CostComponent, newComponent *CostComponent) string {

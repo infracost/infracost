@@ -68,9 +68,6 @@ Module path: dev
     ~ Instance usage (Linux/UNIX, on-demand, t3.micro → t2.micro)
       +$0.88 ($8 → $8)
 
-    - CPU credits
-      $0.00
-
 Monthly cost change for my terragrunt project (Module path: dev)
 Amount:  +$0.88 ($51 → $52)
 Percent: +2%
@@ -99,9 +96,6 @@ Workspace: ws2
 
     ~ Instance usage (Linux/UNIX, on-demand, t3.micro → t2.micro)
       +$0.88 ($8 → $8)
-
-    - CPU credits
-      $0.00
 
 Monthly cost change for my terragrunt project (Module path: dev, Workspace: ws2)
 Amount:  +$0.88 ($51 → $52)

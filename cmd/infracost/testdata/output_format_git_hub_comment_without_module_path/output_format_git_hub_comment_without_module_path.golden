@@ -29,10 +29,6 @@ Project: different_name_plan
       Monthly cost depends on usage
         +$0.0052 per hours
 
-    + CPU credits
-      Monthly cost depends on usage
-        +$0.05 per vCPU-hours
-
     + root_block_device
     
         + Storage (general purpose SSD, gp2)

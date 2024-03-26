@@ -26,14 +26,8 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
     + Requests
       +$20, +100 1M requests*
 
-    + Ephemeral storage
-      $0.00
-
     + Duration (first 6B)
       +$417, +25,000,000 GB-seconds*
-
-    + Duration (over 15B)
-      $0.00, 0 GB-seconds*
 
 + aws_instance.zero_cost_instance
   +$182
@@ -57,37 +51,8 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
 + aws_lambda_function.zero_cost_lambda
   $0.00
 
-    + Requests
-      $0.00, 0 1M requests*
-
-    + Ephemeral storage
-      $0.00
-
-    + Duration (first 6B)
-      $0.00, 0 GB-seconds*
-
-    + Duration (over 15B)
-      $0.00, 0 GB-seconds*
-
 + aws_s3_bucket.usage
   $0.00
-
-    + Standard
-    
-        + Storage
-          $0.00, 0 GB*
-    
-        + PUT, COPY, POST, LIST requests
-          $0.00, 0 1k requests*
-    
-        + GET, SELECT, and all other requests
-          $0.00, 0 1k requests*
-    
-        + Select data scanned
-          $0.00, 0 GB*
-    
-        + Select data returned
-          $0.00, 0 GB*
 
 Monthly cost change for infracost/infracost/cmd/infracost/testdata/example_plan.json
 Amount:  +$1,361 ($0.00 → $1,361)
