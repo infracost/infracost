@@ -564,7 +564,7 @@ func (r *parallelRunner) fetchProjectUsage(projects []*schema.Project) map[*sche
 	}
 
 	spinnerOpts := ui.SpinnerOptions{
-		EnableLogging: r.runCtx.Config.IsLogging(),
+		EnableLogging: false,
 		NoColor:       r.runCtx.Config.NoColor,
 		Indent:        "  ",
 	}
@@ -591,7 +591,7 @@ func (r *parallelRunner) fetchProjectUsage(projects []*schema.Project) map[*sche
 func (r *parallelRunner) populateActualCosts(projects []*schema.Project) {
 	if r.runCtx.Config.UsageAPIEndpoint != "" {
 		spinnerOpts := ui.SpinnerOptions{
-			EnableLogging: r.runCtx.Config.IsLogging(),
+			EnableLogging: false,
 			NoColor:       r.runCtx.Config.NoColor,
 			Indent:        "  ",
 		}
