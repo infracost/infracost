@@ -568,7 +568,7 @@ func (r *parallelRunner) fetchProjectUsage(projects []*schema.Project) map[*sche
 		NoColor:       r.runCtx.Config.NoColor,
 		Indent:        "  ",
 	}
-	spinner := ui.NewSpinner(fmt.Sprintf("Retrieving usage estimates for %s from Infracost Cloud", resourceStr), spinnerOpts)
+	spinner := ui.NewSpinner(fmt.Sprintf("Retrieving usage defaults for %s from Infracost Cloud", resourceStr), spinnerOpts)
 	defer spinner.Fail()
 
 	projectPtrToUsageMap := make(map[*schema.Project]schema.UsageMap, len(projects))
