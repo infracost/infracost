@@ -15,12 +15,12 @@
     </tr>
     <tr>
       <td>infracost/infracost/cmd/infraco...aform_v0.14_nochange_plan.json</td>
-      <td>$0</td>
+      <td>+$0</td>
       <td align="right">$41</td>
     </tr>
     <tr>
       <td>infracost/infracost/cmd/infraco...aform_v0.14_nochange_plan.json</td>
-      <td>$0</td>
+      <td>+$0</td>
       <td align="right">$41</td>
     </tr>
     <tr>
@@ -188,8 +188,8 @@ Infracost estimate: Monthly cost will increase by $1,402 ↑
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━┫
 ┃ infracost/infracost/cmd/infracost/testdata                       ┃      +$1,361 ┃ $1,361           ┃
 ┃ infracost/infracost/cmd/infraco...data/terraform_v0.14_plan.json ┃ +$41 (+100%) ┃ $81              ┃
-┃ infracost/infracost/cmd/infraco...aform_v0.14_nochange_plan.json ┃           $0 ┃ $41              ┃
-┃ infracost/infracost/cmd/infraco...aform_v0.14_nochange_plan.json ┃           $0 ┃ $41              ┃
+┃ infracost/infracost/cmd/infraco...aform_v0.14_nochange_plan.json ┃          +$0 ┃ $41              ┃
+┃ infracost/infracost/cmd/infraco...aform_v0.14_nochange_plan.json ┃          +$0 ┃ $41              ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━┛
 ```
 </details>

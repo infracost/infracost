@@ -172,19 +172,17 @@ func tableForDiff(out Root, opts Options) string {
 		t.SetStyle(table.StyleBold)
 		t.Style().Format.Header = text.FormatDefault
 		t.AppendHeader(table.Row{
-			"Project",
+			"Changed project",
 			"Baseline cost",
 			"Usage cost",
 			"Total change",
-			"New monthly cost",
 		})
 
 		t.SetColumnConfigs([]table.ColumnConfig{
-			{Name: "Project", WidthMin: 50},
+			{Name: "Changed project", WidthMin: 50},
 			{Name: "Baseline cost", WidthMin: 10, Align: text.AlignRight},
 			{Name: "Usage cost", WidthMin: 10, Align: text.AlignRight},
 			{Name: "Total change", WidthMin: 10, Align: text.AlignRight},
-			{Name: "New monthly cost", WidthMin: 10, Align: text.AlignRight},
 		})
 
 		for _, project := range out.Projects {
@@ -198,7 +196,6 @@ func tableForDiff(out Root, opts Options) string {
 					formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyBaselineCost(), project.Breakdown.TotalMonthlyBaselineCost(), false),
 					formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyUsageCost, project.Breakdown.TotalMonthlyUsageCost, false),
 					formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyCost, project.Breakdown.TotalMonthlyCost, false),
-					formatCost(out.Currency, project.Breakdown.TotalMonthlyCost),
 				},
 			)
 

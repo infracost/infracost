@@ -26,18 +26,18 @@ func formatMarkdownCostChange(currency string, pastCost, cost *decimal.Decimal, 
 		return "-"
 	}
 
+	plusMinus := "+"
+	if skipPlusMinus {
+		plusMinus = ""
+	}
+
 	if pastCost != nil && cost != nil && pastCost.Equals(*cost) {
-		return formatWholeDecimalCurrency(currency, decimal.Zero)
+		return plusMinus + formatWholeDecimalCurrency(currency, decimal.Zero)
 	}
 
 	percentChange := formatPercentChange(pastCost, cost)
 	if len(percentChange) > 0 {
 		percentChange = " " + "(" + percentChange + ")"
-	}
-
-	plusMinus := "+"
-	if skipPlusMinus {
-		plusMinus = ""
 	}
 
 	// can't just use out.DiffTotalMonthlyCost because it isn't set if there is no past cost
