@@ -109,7 +109,7 @@ Percent: -43%
 Key: ~ changed, + added, - removed
 
 10 cloud resources were detected:
-∙ 10 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 10 were estimated
 
 Infracost estimate: Monthly cost will decrease by $2,242 ↓
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓

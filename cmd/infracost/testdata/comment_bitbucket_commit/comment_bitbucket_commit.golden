@@ -97,7 +97,7 @@ Percent: +100%
 Key: ~ changed, + added, - removed
 
 26 cloud resources were detected:
-∙ 14 were estimated, 10 of which include usage-based costs, see https://infracost.io/usage-file
+∙ 14 were estimated
 ∙ 12 were free
 
 Infracost estimate: Monthly cost will increase by $41 ↑

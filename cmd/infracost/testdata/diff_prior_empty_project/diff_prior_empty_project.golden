@@ -27,7 +27,7 @@ Amount:  +$743 ($0.00 → $743)
 Key: ~ changed, + added, - removed
 
 1 cloud resource was detected:
-∙ 1 was estimated, it includes usage-based costs, see https://infracost.io/usage-file
+∙ 1 was estimated
 
 Infracost estimate: Monthly cost will increase by $743 ↑
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓

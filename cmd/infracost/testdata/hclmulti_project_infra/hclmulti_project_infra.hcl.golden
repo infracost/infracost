@@ -108,7 +108,7 @@ Module path: prod
  OVERALL TOTAL                                                                                             $264.23 
 ──────────────────────────────────
 52 cloud resources were detected:
-∙ 14 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 14 were estimated
 ∙ 38 were free
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓

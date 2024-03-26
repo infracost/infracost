@@ -42,7 +42,7 @@ Module path: terragrunt/prod
  OVERALL TOTAL                                                                                                $799.61 
 ──────────────────────────────────
 4 cloud resources were detected:
-∙ 4 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 4 were estimated
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃

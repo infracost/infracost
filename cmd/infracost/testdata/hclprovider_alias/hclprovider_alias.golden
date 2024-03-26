@@ -13,7 +13,7 @@ Project: infracost/infracost/cmd/infracost/testdata/hclprovider_alias
  OVERALL TOTAL                                                    $100.74 
 ──────────────────────────────────
 4 cloud resources were detected:
-∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 2 were estimated
 ∙ 2 were free
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓

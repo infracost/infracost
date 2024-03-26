@@ -13,7 +13,7 @@ Project: infracost/infracost/cmd/infracost/testdata/breakdown_with_nested_foreac
  OVERALL TOTAL                                                            $65.70 
 ──────────────────────────────────
 8 cloud resources were detected:
-∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 2 were estimated
 ∙ 6 were free
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓

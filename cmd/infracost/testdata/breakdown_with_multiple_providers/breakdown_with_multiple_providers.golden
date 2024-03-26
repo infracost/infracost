@@ -29,7 +29,7 @@ Project: infracost/infracost/cmd/infracost/testdata/breakdown_with_multiple_prov
  OVERALL TOTAL                                                                 $1,683.67 
 ──────────────────────────────────
 4 cloud resources were detected:
-∙ 4 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 4 were estimated
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                                          ┃ Monthly cost ┃

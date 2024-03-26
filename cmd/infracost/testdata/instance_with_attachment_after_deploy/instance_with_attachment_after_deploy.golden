@@ -13,7 +13,7 @@ Project: infracost/infracost/cmd/infracost/testdata/instance_with_attachment_aft
  OVERALL TOTAL                                                                 $17.83 
 ──────────────────────────────────
 4 cloud resources were detected:
-∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 2 were estimated
 ∙ 2 were free
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
