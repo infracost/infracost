@@ -848,6 +848,45 @@ resource_usage:
     monthly_outbound_gb: 1000000 # Monthly number of outbound data transfers in GB.
     monthly_rules_engine_requests: 10000000 # Monthly number of rules engine requests.
 
+  azurerm_cognitive_account.my_speech_ai_account:
+    monthly_speech_to_text_standard_hrs: 100 # Monthly number of hours of Speech to Text audio hours
+    monthly_speech_to_text_standard_batch_hrs: 100 # Monthly number of hours of Speech to Text audio hours for batch processing
+    monthly_speech_to_text_custom_hrs: 100  # Monthly number of hours of Speech to Text audio hours for Custom Speech Model
+    monthly_speech_to_text_custom_batch_hrs: 100 # Monthly number of hours of Speech to Text audio hours for Custom Speech Model batch processing
+    monthly_speech_to_text_custom_endpoint_hrs: 100 # Monthly number of hours of Speech to Text audio hours for Custom Speech Model endpoint hosting
+    monthly_speech_to_text_custom_training_hrs: 100 # Monthly number of hours of Speech to Text audio hours for Custom Speech Model training
+    monthly_speech_to_text_enhanced_add_ons_hrs: 100 # Monthly number of hours of Speech to Text audio hours for enhanced add-on features
+    monthly_speech_to_text_conversation_transcription_multi_channel_audio_hrs: 100 # Monthly number of hours of Speech to Text audio hours for conversation transcription multi-channel audio
+    monthly_text_to_speech_neural_chars: 100_000 # Monthly number of characters for Text to Speech with neural voices
+    monthly_text_to_speech_custom_neural_training_hrs: 100 # Monthly number of hours of Text to Speech Customized Neural training
+    monthly_text_to_speech_custom_neural_chars: 100_000 # Monthly number of characters for Text to Speech with Custom Ceural Voices
+    monthly_text_to_speech_custom_neural_endpoint_hrs: 100 # Monthly number of hours of Text to Speech Custom Neural Voice endpoint hosting
+    monthly_text_to_speech_long_audio_chars: 100_000 # Monthly number of characters for Text to Speech with Long Audio Creation
+    monthly_text_to_speech_personal_voice_profiles: 10 # Monthly number of personal voice profiles for Text to Speech
+    monthly_text_to_speech_personal_voice_chars: 100_000 # Monthly number of characters for Text to Speech with Personal Voice Profiles
+    monthly_speech_translation_hrs: 100 # Monthly number of hours of Speech Translation audio hours
+    monthly_speaker_verification_transactions: 1_000 # Monthly number of speaker verification transactions
+    monthly_speaker_identification_transactions: 1_000 # Monthly number of speaker identification transactions
+    monthly_voice_profiles: 1_000 # Monthly number of voice profiles
+    # Standard commitment
+    monthly_commitment_speech_to_text_standard_hrs: 2000 # Monthly number of committed hours of Speech to Text audio hours (2,000, 10,000 or 50,000)
+    monthly_commitment_speech_to_text_standard_overage_hrs: 100 # Monthly number of hours of Speech to Text audio hours over the committed amount
+    monthly_commitment_speech_to_text_custom_hrs: 2000 # Monthly number of committed hours of Speech to Text audio hours for Custom Speech Model (2,000, 10,000 or 50,000)
+    monthly_commitment_speech_to_text_custom_overage_hrs: 100 # Monthly number of hours of Speech to Text audio hours for Custom Speech Model over the committed amount
+    monthly_commitment_speech_to_text_enhanced_add_ons_hrs: 2000 # Monthly number of committed hours of Speech to Text audio hours for enhanced add-on features (2,000, 10,000 or 50,000)
+    monthly_commitment_speech_to_text_enhanced_add_ons_overage_hrs: 100 # Monthly number of hours of Speech to Text audio hours for enhanced add-on features over the committed amount
+    monthly_commitment_text_to_speech_neural_commitment_chars: 80_000_000 # Monthly number of committed characters for Text to Speech with neural voices (80M, 40M or 200M)
+    monthly_commitment_text_to_speech_neural_overage_chars: 1_000_000 # Monthly number of characters for Text to Speech with neural voices over the committed amount
+    # Connected container commitment
+    monthly_connected_container_commitment_speech_to_text_standard_hrs: 2000 # Monthly number of committed hours of Speech to Text audio hours (2,000, 10,000 or 50,000)
+    monthly_connected_container_commitment_speech_to_text_standard_overage_hrs: 100 # Monthly number of hours of Speech to Text audio hours over the committed amount
+    monthly_connected_container_commitment_speech_to_text_custom_hrs: 2000 # Monthly number of committed hours of Speech to Text audio hours for Custom Speech Model (2,000, 10,000 or 50,000)
+    monthly_connected_container_commitment_speech_to_text_custom_overage_hrs: 100 # Monthly number of hours of Speech to Text audio hours for Custom Speech Model over the committed amount
+    monthly_connected_container_commitment_speech_to_text_enhanced_add_ons_hrs: 2000 # Monthly number of committed hours of Speech to Text audio hours for enhanced add-on features (2,000, 10,000 or 50,000)
+    monthly_connected_container_commitment_speech_to_text_enhanced_add_ons_overage_hrs: 100 # Monthly number of hours of Speech to Text audio hours for enhanced add-on features over the committed amount
+    monthly_connected_container_commitment_text_to_speech_neural_commitment_chars: 80_000_000 # Monthly number of committed characters for Text to Speech with neural voices (80M, 40M or 200M)
+    monthly_connected_container_commitment_text_to_speech_neural_overage_chars: 1_000_000 # Monthly number of characters for Text to Speech with neural voices over the committed amount
+
   azurerm_cosmosdb_cassandra_keyspace.my_cassandra_keyspace:
     storage_gb: 1000 # Total size of storage in GB.
     monthly_serverless_request_units: 10000000 # Monthly number of serverless request units.
