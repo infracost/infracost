@@ -53,7 +53,7 @@
  OVERALL TOTAL                                                              $18,982.32 
 ──────────────────────────────────
 15 cloud resources were detected:
-∙ 15 were estimated, 4 of which include usage-based costs, see https://infracost.io/usage-file
+∙ 15 were estimated
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃

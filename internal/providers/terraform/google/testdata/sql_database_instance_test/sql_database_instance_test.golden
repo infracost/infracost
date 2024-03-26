@@ -1109,7 +1109,7 @@
  OVERALL TOTAL                                                                                                                $221,764.39 
 ──────────────────────────────────
 162 cloud resources were detected:
-∙ 161 were estimated, 3 of which include usage-based costs, see https://infracost.io/usage-file
+∙ 161 were estimated
 ∙ 1 is not supported yet, see https://infracost.io/requested-resources:
   ∙ 1 x google_sql_database_instance
 
