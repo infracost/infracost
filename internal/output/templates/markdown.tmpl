@@ -89,10 +89,15 @@
 
 {{ .MarkdownOptions.Additional }}
 {{- end }}
+{{- if .Root.CloudURL }}
+
+View report in [Infracost Cloud]({{ .Root.CloudURL }}).
+{{- end }}
 {{- if .MarkdownOptions.WillUpdate }}
 
 This comment will be updated when code changes.
 {{- end }}
 {{- if .MarkdownOptions.WillReplace }}
+
 This comment will be replaced when code changes.
 {{- end }}
