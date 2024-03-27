@@ -38,7 +38,7 @@ func ToHTML(out Root, opts Options) ([]byte, error) {
 				return true
 			}
 
-			log.Info().Msgf("Hiding resource with no usage: %s", resourceName)
+			log.Debug().Msgf("Hiding resource with no usage: %s", resourceName)
 			return false
 		},
 		"filterZeroValComponents": filterZeroValComponents,

@@ -220,7 +220,7 @@ func tableForBreakdown(currency string, breakdown Breakdown, fields []string, in
 		filteredComponents := filterZeroValComponents(r.CostComponents, r.Name)
 		filteredSubResources := filterZeroValResources(r.SubResources, r.Name)
 		if len(filteredComponents) == 0 && len(filteredSubResources) == 0 {
-			log.Info().Msgf("Hiding resource with no usage: %s", r.Name)
+			log.Debug().Msgf("Hiding resource with no usage: %s", r.Name)
 			continue
 		}
 
