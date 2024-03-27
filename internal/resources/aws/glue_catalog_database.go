@@ -44,7 +44,7 @@ func (r *GlueCatalogDatabase) PopulateUsage(u *schema.UsageData) {
 // schema.CostComponents associated with it:
 //
 //  1. Storage - charged for every 100,000 objects stored above 1M, per month.
-//  2. Requests - charged per million requests above 1M in a month.
+//  2. MonthlyAdditionalRequests - charged per million requests above 1M in a month.
 //
 // This method is called after the resource is initialised by an IaC provider. See providers folder for more information.
 func (r *GlueCatalogDatabase) BuildResource() *schema.Resource {

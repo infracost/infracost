@@ -97,6 +97,7 @@ func (r *NetworkDdosProtectionPlan) BuildResource() *schema.Resource {
 						{Key: "meterName", Value: strPtr("Network Protection Resource")},
 					},
 				},
+				UsageBased: true,
 			},
 		},
 	}
