@@ -25,7 +25,7 @@ type AppConfiguration struct {
 	SKU      string
 	Replicas int64
 
-	Requests *int64 `infracost_usage:"requests"`
+	MonthlyAdditionalRequests *int64 `infracost_usage:"monthly_additional_requests"`
 }
 
 // CoreType returns the name of this resource type
@@ -36,7 +36,7 @@ func (r *AppConfiguration) CoreType() string {
 // UsageSchema defines a list which represents the usage schema of AppConfiguration.
 func (r *AppConfiguration) UsageSchema() []*schema.UsageItem {
 	return []*schema.UsageItem{
-		{Key: "requests", ValueType: schema.Int64, DefaultValue: 0},
+		{Key: "monthly_additional_requests", ValueType: schema.Int64, DefaultValue: 0},
 	}
 }
 
@@ -81,14 +81,15 @@ func (r *AppConfiguration) BuildResource() *schema.Resource {
 
 func (r *AppConfiguration) requestCostComponent(titledSku string) *schema.CostComponent {
 	var requestQuantity *decimal.Decimal
-	if r.Requests != nil {
-		requestQuantity = decimalPtr(decimal.NewFromInt(*r.Requests).Div(decimal.NewFromInt(10000)))
+	if r.MonthlyAdditionalRequests != nil {
+		requestQuantity = decimalPtr(decimal.NewFromInt(*r.MonthlyAdditionalRequests).Div(decimal.NewFromInt(10000)))
 	}
+
 	requestComponent := &schema.CostComponent{
-		Name:           "Requests",
-		Unit:           "10k requests",
-		UnitMultiplier: schema.HourToMonthUnitMultiplier,
-		HourlyQuantity: requestQuantity,
+		Name:            "Requests (over 200k/day per replica)",
+		Unit:            "10k requests",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: requestQuantity,
 		ProductFilter: &schema.ProductFilter{
 			VendorName:    strPtr("azure"),
 			Region:        strPtr(r.Region),
@@ -98,6 +99,7 @@ func (r *AppConfiguration) requestCostComponent(titledSku string) *schema.CostCo
 				{Key: "meterName", Value: strPtr(titledSku + " Overage Operations")},
 			},
 		},
+		UsageBased: true,
 	}
 	return requestComponent
 }
