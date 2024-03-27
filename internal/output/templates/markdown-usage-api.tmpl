@@ -46,7 +46,7 @@
 #### {{ formatCostChangeSentence .Root.Currency .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost false }} ####
 {{- if displayTable }}
 
-| **Changed project**{{- range metadataHeaders }} | **{{ . }}** {{- end }} | **[Baseline cost](## "Baseline costs are consistent charges for provisioned resources, like the hourly cost for a virtual machine, which stays constant no matter how much it is used. Infracost estimates these resources assuming they are used for the whole month (730 hours).")** | **[Usage cost](## "Usage costs are charges based on actual usage, like the storage cost for an object storage bucket. Infracost estimates these resources using the monthly usage values in the usage-file.")** | **Total change** | **New monthly cost** |
+| **Changed project**{{- range metadataHeaders }} | **{{ . }}** {{- end }} | **[Baseline cost](## "Baseline costs are consistent charges for provisioned resources, like the hourly cost for a virtual machine, which stays constant no matter how much it is used. Infracost estimates these resources assuming they are used for the whole month (730 hours).")** | **[Usage cost](## "Usage costs are charges based on actual usage, like the storage cost for an object storage bucket. Infracost estimates these resources using the monthly usage values in the usage-file.")*** | **Total change** | **New monthly cost** |
 | -----------{{- range metadataHeaders }} | ---------- {{- end }} | --------------: | --------------: | --------------: | --------------: |
 
   {{- if gt (len .Root.Projects) 1  }}
