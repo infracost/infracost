@@ -94,7 +94,7 @@ Project: infracost/infracost/cmd/infracost/testdata/breakdown_terraform_director
  OVERALL TOTAL                                                                                                             $10,383.92 
 ──────────────────────────────────
 12 cloud resources were detected:
-∙ 12 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 12 were estimated
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                                          ┃ Monthly cost ┃

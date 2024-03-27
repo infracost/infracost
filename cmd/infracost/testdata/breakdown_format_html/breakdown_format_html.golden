@@ -630,7 +630,7 @@ iVBORw0KGgoAAAANSUhEUgAAAMAAAADACAMAAABlApw1AAAABGdBTUEAALGPC/xhBQAAAAFzUkdCAK7O
     </table>
 
     <div class="warnings">
-      <p>5 cloud resources were detected:<br />∙ 5 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file</p>
+      <p>5 cloud resources were detected:<br />∙ 5 were estimated</p>
     </div>
   </body>
 </html>

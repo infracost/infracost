@@ -87,7 +87,7 @@ Project: infracost/infracost/cmd/infracost/testdata/breakdown_terraform_usage_fi
  OVERALL TOTAL                                                                                            $22,693.38 
 ──────────────────────────────────
 19 cloud resources were detected:
-∙ 19 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 19 were estimated
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                                          ┃ Monthly cost ┃

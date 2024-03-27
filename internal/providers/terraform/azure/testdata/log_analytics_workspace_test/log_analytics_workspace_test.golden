@@ -116,7 +116,7 @@
  OVERALL TOTAL                                                                                                                  $22,989.80 
 ──────────────────────────────────
 22 cloud resources were detected:
-∙ 12 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 12 were estimated
 ∙ 6 were free
 ∙ 4 are not supported yet, see https://infracost.io/requested-resources:
   ∙ 4 x azurerm_log_analytics_workspace

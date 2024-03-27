@@ -362,7 +362,7 @@ func usageCostsMessage(out Root, useLinks bool) string {
 
 func usageDefaultsStr(out Root, useMarkdownLinks bool) string {
 	if !useMarkdownLinks {
-		return "usage defaults"
+		return "usage defaults from Infracost Cloud"
 	}
 	usageDefaultsURL := usageDefaultsDocsURL
 	match := cloudURLRegex.FindStringSubmatch(out.CloudURL)

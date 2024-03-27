@@ -187,7 +187,7 @@
  OVERALL TOTAL                                                                           $3,584.96 
 ──────────────────────────────────
 53 cloud resources were detected:
-∙ 28 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 28 were estimated
 ∙ 23 were free
 ∙ 2 are not supported yet, see https://infracost.io/requested-resources:
   ∙ 2 x aws_autoscaling_group

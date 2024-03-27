@@ -31,7 +31,7 @@ Project: infracost/infracost/cmd/infracost/testdata/breakdown_terraform_sync_usa
  OVERALL TOTAL                                                                              $751.12 
 ──────────────────────────────────
 6 cloud resources were detected:
-∙ 6 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 6 were estimated
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                                          ┃ Monthly cost ┃

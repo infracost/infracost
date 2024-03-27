@@ -143,7 +143,7 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_nochange_pla
  OVERALL TOTAL                                                                            $1,482.99 
 ──────────────────────────────────
 26 cloud resources were detected:
-∙ 14 were estimated, 10 of which include usage-based costs, see https://infracost.io/usage-file
+∙ 14 were estimated
 ∙ 12 were free
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓

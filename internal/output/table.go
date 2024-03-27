@@ -220,7 +220,7 @@ func tableForBreakdown(currency string, breakdown Breakdown, fields []string, in
 		filteredComponents := filterZeroValComponents(r.CostComponents, r.Name)
 		filteredSubResources := filterZeroValResources(r.SubResources, r.Name)
 		if len(filteredComponents) == 0 && len(filteredSubResources) == 0 {
-			log.Info().Msgf("Hiding resource with no usage: %s", r.Name)
+			log.Debug().Msgf("Hiding resource with no usage: %s", r.Name)
 			continue
 		}
 
@@ -363,7 +363,7 @@ func filterZeroValComponents(costComponents []CostComponent, resourceName string
 	var filteredComponents []CostComponent
 	for _, c := range costComponents {
 		if c.MonthlyQuantity != nil && c.MonthlyQuantity.IsZero() {
-			log.Info().Msgf("Hiding cost with no usage: %s '%s'", resourceName, c.Name)
+			log.Debug().Msgf("Hiding cost with no usage: %s '%s'", resourceName, c.Name)
 			continue
 		}
 
@@ -378,7 +378,7 @@ func filterZeroValResources(resources []Resource, resourceName string) []Resourc
 		filteredComponents := filterZeroValComponents(r.CostComponents, fmt.Sprintf("%s.%s", resourceName, r.Name))
 		filteredSubResources := filterZeroValResources(r.SubResources, fmt.Sprintf("%s.%s", resourceName, r.Name))
 		if len(filteredComponents) == 0 && len(filteredSubResources) == 0 {
-			log.Info().Msgf("Hiding resource with no usage: %s.%s", resourceName, r.Name)
+			log.Debug().Msgf("Hiding resource with no usage: %s.%s", resourceName, r.Name)
 			continue
 		}
 
