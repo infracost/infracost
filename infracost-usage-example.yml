@@ -796,7 +796,7 @@ resource_usage:
   # Terraform AzureRM resources
   #
   azurerm_app_configuration.my_configuration:
-    monthly_additional_requests: 30000 # Monthly number of requests which are above the included 200,000 per day per replica.
+    monthly_additional_requests: 30000 # Monthly number of requests which are above the included 200k per replica.
 
   azurerm_api_management.my_api_management:
     monthly_api_calls: 10000000 # Monthly number of api calls (only for consumption tier).

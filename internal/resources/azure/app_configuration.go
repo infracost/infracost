@@ -52,7 +52,7 @@ func (r *AppConfiguration) PopulateUsage(u *schema.UsageData) {
 //
 // BuildResource only returns cost components if the sku is not "free".
 // "Standard" App Configuration instances are charged per instance and replica
-// and per 10k requests over a daily 200k limit. However, we cannot compute the
+// and per 10k requests over  200k limit. However, we cannot compute the
 // request count from the IaC code, so we rely on the user to provide the request
 // count as a usage parameter. This usage parameter defines all total request
 // made to the App Configuration instance and it's replicas in a month.
@@ -86,7 +86,7 @@ func (r *AppConfiguration) requestCostComponent(titledSku string) *schema.CostCo
 	}
 
 	requestComponent := &schema.CostComponent{
-		Name:            "Requests (over 200k/day per replica)",
+		Name:            "Requests (over 200k per replica)",
 		Unit:            "10k requests",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: requestQuantity,
