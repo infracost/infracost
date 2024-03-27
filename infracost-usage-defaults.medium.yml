@@ -415,6 +415,8 @@ resource_type_default_usage:
   #
   # Terraform AzureRM resources
   #
+  azurerm_app_configuration.my_configuration:
+    requests: 10000 # Monthly number of requests which are above teh 200,000 a day free tier. This is the total number of requests made to the service, including replica requests.
   azurerm_api_management:
     monthly_api_calls: 2855000 # Monthly number of api calls (only for consumption tier).
     self_hosted_gateway_count: 0 # Number of self-hosted gateways (only for premium tier).
