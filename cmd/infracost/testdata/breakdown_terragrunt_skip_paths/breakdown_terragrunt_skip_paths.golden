@@ -68,9 +68,9 @@ Module path: shown
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                                          ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...unt_skip_paths/glob/test/shown ┃ $52          ┃
-┃ infracost/infracost/cmd/infraco...nt_skip_paths/glob/test2/shown ┃ $52          ┃
-┃ infracost/infracost/cmd/infraco...wn_terragrunt_skip_paths/shown ┃ $52          ┃
+┃ ./cmd/infracost/testdata/breakd...unt_skip_paths/glob/test/shown ┃ $52          ┃
+┃ ./cmd/infracost/testdata/breakd...nt_skip_paths/glob/test2/shown ┃ $52          ┃
+┃ ./cmd/infracost/testdata/breakdown_terragrunt_skip_paths/shown   ┃ $52          ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 
 Err:

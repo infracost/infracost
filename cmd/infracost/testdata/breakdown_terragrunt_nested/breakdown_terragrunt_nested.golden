@@ -47,8 +47,8 @@ Module path: terragrunt/prod
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/examples/terragrunt/dev        ┃ $52          ┃
-┃ infracost/infracost/examples/terragrunt/prod       ┃ $748         ┃
+┃ ./examples/terragrunt/dev                          ┃ $52          ┃
+┃ ./examples/terragrunt/prod                         ┃ $748         ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 
 Err:

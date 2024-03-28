@@ -47,8 +47,8 @@ Module path: prod
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                                          ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...hclmulti_no_source/example/dev ┃ $52          ┃
-┃ infracost/infracost/cmd/infraco...clmulti_no_source/example/prod ┃ $748         ┃
+┃ ./cmd/infracost/testdata/breakd...hclmulti_no_source/example/dev ┃ $52          ┃
+┃ ./cmd/infracost/testdata/breakd...clmulti_no_source/example/prod ┃ $748         ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 
 Err:

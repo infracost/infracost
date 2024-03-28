@@ -24,8 +24,8 @@ No cloud resources were detected
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                                          ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...ti_project_with_all_errors/dev ┃ $0.00        ┃
-┃ infracost/infracost/cmd/infraco...i_project_with_all_errors/prod ┃ $0.00        ┃
+┃ ./cmd/infracost/testdata/breakd...ti_project_with_all_errors/dev ┃ $0.00        ┃
+┃ ./cmd/infracost/testdata/breakd...i_project_with_all_errors/prod ┃ $0.00        ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 
 Err:

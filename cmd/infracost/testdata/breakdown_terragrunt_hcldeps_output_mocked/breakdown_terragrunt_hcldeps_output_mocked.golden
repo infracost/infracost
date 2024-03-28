@@ -68,9 +68,9 @@ Module path: prod2
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                                          ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...runt_hcldeps_output_mocked/dev ┃ $65          ┃
-┃ infracost/infracost/cmd/infraco...unt_hcldeps_output_mocked/prod ┃ $748         ┃
-┃ infracost/infracost/cmd/infraco...nt_hcldeps_output_mocked/prod2 ┃ $748         ┃
+┃ ./cmd/infracost/testdata/breakd...runt_hcldeps_output_mocked/dev ┃ $65          ┃
+┃ ./cmd/infracost/testdata/breakd...unt_hcldeps_output_mocked/prod ┃ $748         ┃
+┃ ./cmd/infracost/testdata/breakd...nt_hcldeps_output_mocked/prod2 ┃ $748         ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 
 Err:

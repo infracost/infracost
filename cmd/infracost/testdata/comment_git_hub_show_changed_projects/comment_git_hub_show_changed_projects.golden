@@ -9,7 +9,7 @@
   </thead>
   <tbody>
     <tr>
-      <td>infracost/infracost/internal/hc.../multi_project_with_module/dev</td>
+      <td>./internal/hcl/testdata/project.../multi_project_with_module/dev</td>
       <td>+$0</td>
       <td align="right">$566</td>
     </tr>

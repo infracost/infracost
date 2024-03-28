@@ -37,8 +37,8 @@ Module path: prod
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                                          ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...ragrunt_get_env_with_whitelist ┃ $0.00        ┃
-┃ infracost/infracost/cmd/infraco...nt_get_env_with_whitelist/prod ┃ $748         ┃
+┃ ./cmd/infracost/testdata/breakd...ragrunt_get_env_with_whitelist ┃ $0.00        ┃
+┃ ./cmd/infracost/testdata/breakd...nt_get_env_with_whitelist/prod ┃ $748         ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 
 Err:

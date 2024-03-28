@@ -37,8 +37,8 @@ Module path: infra/dev
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                                          ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...le_with_skip_auto_detect/infra ┃ $1,303       ┃
-┃ infracost/infracost/cmd/infraco...ith_skip_auto_detect/infra/dev ┃ $743         ┃
+┃ ./cmd/infracost/testdata/breakd...le_with_skip_auto_detect/infra ┃ $1,303       ┃
+┃ ./cmd/infracost/testdata/breakd...ith_skip_auto_detect/infra/dev ┃ $743         ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 
 Err:

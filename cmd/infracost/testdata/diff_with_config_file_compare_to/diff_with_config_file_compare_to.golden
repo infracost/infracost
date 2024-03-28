@@ -33,12 +33,12 @@ Key: ~ changed, + added, - removed
 ∙ 2 were estimated
 
 Infracost estimate: Monthly cost will increase by $350 ↑
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
-┃ Project                                                          ┃ Cost change  ┃ New monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...ith_config_file_compare_to/dev ┃ -$210 (-45%) ┃ $252             ┃
-┃ infracost/infracost/cmd/infraco...th_config_file_compare_to/prod ┃ +$561 (+75%) ┃ $1,303           ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
+┃ Project                                                        ┃ Cost change  ┃ New monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━┫
+┃ ./cmd/infracost/testdata/diff_with_config_file_compare_to/dev  ┃ -$210 (-45%) ┃ $252             ┃
+┃ ./cmd/infracost/testdata/diff_with_config_file_compare_to/prod ┃ +$561 (+75%) ┃ $1,303           ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━┛
 
 Err:
 

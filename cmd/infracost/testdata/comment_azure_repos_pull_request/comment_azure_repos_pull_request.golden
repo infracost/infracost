@@ -9,7 +9,7 @@
   </thead>
   <tbody>
     <tr>
-      <td>infracost/infracost/cmd/infraco...data/terraform_v0.14_plan.json</td>
+      <td>./cmd/infracost/testdata/terraform_v0.14_plan.json</td>
       <td>+$41 (+100%)</td>
       <td align="right">$81</td>
     </tr>
@@ -109,11 +109,11 @@ Key: ~ changed, + added, - removed
 ∙ 12 were free
 
 Infracost estimate: Monthly cost will increase by $41 ↑
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
-┃ Project                                                          ┃ Cost change  ┃ New monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...data/terraform_v0.14_plan.json ┃ +$41 (+100%) ┃ $81              ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
+┃ Project                                            ┃ Cost change  ┃ New monthly cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━┫
+┃ ./cmd/infracost/testdata/terraform_v0.14_plan.json ┃ +$41 (+100%) ┃ $81              ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━┛
 ```
 </details>
 <sub>This comment will be updated when code changes.
