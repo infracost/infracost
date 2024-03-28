@@ -28,6 +28,13 @@ func newCognitiveAccount(d *schema.ResourceData) schema.CoreResource {
 			Region:  region,
 			Sku:     d.Get("sku_name").String(),
 		}
+	} else if strings.EqualFold(kind, "openai") {
+		// OpenAI costs are counted as part of a Cognitive Deployment so
+		// this resource is counted as free
+		return schema.BlankCoreResource{
+			Name: d.Address,
+			Type: d.Type,
+		}
 	}
 
 	logging.Logger.Warn().Msgf("Skipping resource %s. Kind '%s' is not supported", d.Address, kind)
