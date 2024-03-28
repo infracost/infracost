@@ -3,10 +3,13 @@ package output
 import (
 	"fmt"
 	"math"
+	"strings"
 
 	"github.com/Rhymond/go-money"
 	"github.com/dustin/go-humanize"
 	"github.com/shopspring/decimal"
+
+	"github.com/infracost/infracost/internal/vcs"
 )
 
 var roundCostsAbove = 1
@@ -111,6 +114,15 @@ func formatTitleWithCurrency(title, currency string) string {
 		return title
 	}
 	return fmt.Sprintf("%s (%s)", title, currency)
+}
+
+func trimRepoName(repoUrl, projectName string) string {
+	repoName := vcs.GetRepoName(repoUrl)
+	if repoName == "" || repoName == "." || !strings.HasPrefix(projectName, repoName) {
+		return projectName
+	}
+
+	return "." + strings.TrimPrefix(projectName, repoName)
 }
 
 func truncateMiddle(s string, maxLen int, fill string) string {

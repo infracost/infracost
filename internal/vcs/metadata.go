@@ -1144,3 +1144,8 @@ func inProject(dir string, change string) bool {
 	}
 	return !strings.HasPrefix(rel, "..")
 }
+
+func GetRepoName(repoURL string) string {
+	remote := urlStringToRemote(repoURL)
+	return remote.Name
+}

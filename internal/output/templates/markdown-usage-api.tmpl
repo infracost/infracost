@@ -53,7 +53,7 @@
     {{- range .Root.Projects }}
       {{- if showProject . }}
         {{- template "summaryRow" dict
-                     "Name" .Name
+                     "Name" (trimRepoName $.Root.Metadata.VCSRepositoryURL .Name)
                      "MetadataFields" (. | metadataFields)
                      "PastBaselineCost" .PastBreakdown.TotalMonthlyBaselineCost
                      "BaselineCost" .Breakdown.TotalMonthlyBaselineCost
@@ -66,7 +66,7 @@
   {{- else }}
     {{- range .Root.Projects }}
       {{- template "summaryRow" dict
-                   "Name" .Name
+                   "Name" (trimRepoName $.Root.Metadata.VCSRepositoryURL .Name)
                    "MetadataFields" (. | metadataFields)
                    "PastBaselineCost" .PastBreakdown.TotalMonthlyBaselineCost
                    "BaselineCost" .Breakdown.TotalMonthlyBaselineCost

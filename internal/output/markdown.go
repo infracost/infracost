@@ -266,6 +266,7 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) (MarkdownO
 		},
 		"stringsJoin":    strings.Join,
 		"truncateMiddle": truncateMiddle,
+		"trimRepoName":   trimRepoName,
 	})
 	_, err := tmpl.ParseFS(templatesFS, "templates/"+filename)
 	if err != nil {

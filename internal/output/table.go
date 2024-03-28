@@ -416,7 +416,7 @@ func breakdownSummaryTable(out Root, opts Options) string {
 
 			t.AppendRow(
 				table.Row{
-					truncateMiddle(project.Name, 64, "..."),
+					truncateMiddle(trimRepoName(out.Metadata.VCSRepositoryURL, project.Name), 64, "..."),
 					formatCost(out.Currency, baseline),
 					formatCost(out.Currency, project.Breakdown.TotalMonthlyUsageCost),
 					formatCost(out.Currency, project.Breakdown.TotalMonthlyCost),
@@ -443,7 +443,7 @@ func breakdownSummaryTable(out Root, opts Options) string {
 	for _, project := range out.Projects {
 		t.AppendRow(
 			table.Row{
-				truncateMiddle(project.Name, 64, "..."),
+				truncateMiddle(trimRepoName(out.Metadata.VCSRepositoryURL, project.Name), 64, "..."),
 				formatCost(out.Currency, project.Breakdown.TotalMonthlyCost),
 			},
 		)
