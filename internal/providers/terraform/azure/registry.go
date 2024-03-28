@@ -163,6 +163,7 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getMachineLearningComputeInstanceRegistryItem(),
 	getMachineLearningComputeClusterRegistryItem(),
 	getNetworkDdosProtectionPlanRegistryItem(),
+	getAppConfigurationRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
