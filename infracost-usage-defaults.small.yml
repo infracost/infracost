@@ -415,7 +415,7 @@ resource_type_default_usage:
   #
   # Terraform AzureRM resources
   #
-  azurerm_app_configuration.my_configuration:
+  azurerm_app_configuration:
     monthly_additional_requests: 833333 # Monthly number of requests which are above the included 200,000 per day per replica.
   azurerm_api_management:
     monthly_api_calls: 1427500 # Monthly number of api calls (only for consumption tier).
@@ -529,6 +529,8 @@ resource_type_default_usage:
     monthly_all_purpose_compute_dbu_hrs: 12 # Monthly number of All-purpose Compute Databricks Units in DBU-hours.
     monthly_jobs_compute_dbu_hrs: 33 # Monthly number of Jobs Compute Databricks Units in DBU-hours.
     monthly_jobs_light_compute_dbu_hrs: 71 # Monthly number of Jobs Light Compute Databricks Units in DBU-hours.
+  azurerm_federated_identity_credential:
+    monthly_active_p1_users: 51573 # Monthly number of active users if you are using the Premium P1 license.
   azurerm_function_app:
     monthly_executions: 25000000 # Monthly executions to the function. Only applicable for Consumption plan.
     execution_duration_ms: 25 # Average duration of each execution in milliseconds. Only applicable for Consumption plan.
@@ -642,7 +644,7 @@ resource_type_default_usage:
     #  azurerm_network_connection_monitor:
     #    tests: 100000 # Overrides the number of tests done in the connection monitor
 
-  azurerm_network_ddos_protection_plan.my_plan:
+  azurerm_network_ddos_protection_plan:
     overage_amount: 0 # Monthly number of protected resources over the plan protection limit (100).
   azurerm_network_watcher:
     monthly_diagnostic_checks: 5000 # Monthly number of diagnostic API calls.
