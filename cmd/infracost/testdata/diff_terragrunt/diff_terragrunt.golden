@@ -90,8 +90,8 @@ Infracost estimate: Monthly cost will increase by $800 ↑
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Cost change ┃ New monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━┫
-┃ infracost/infracost/examples/terragrunt/dev        ┃        +$52 ┃ $52              ┃
-┃ infracost/infracost/examples/terragrunt/prod       ┃       +$748 ┃ $748             ┃
+┃ ./examples/terragrunt/dev                          ┃        +$52 ┃ $52              ┃
+┃ ./examples/terragrunt/prod                         ┃       +$748 ┃ $748             ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━┛
 
 Err:

@@ -164,12 +164,12 @@ Module path: ref2
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                                          ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...with_remote_source/submod-ref1 ┃ $2,430       ┃
-┃ infracost/infracost/cmd/infraco...th_remote_source/submod-ref1-2 ┃ $748         ┃
-┃ infracost/infracost/cmd/infraco...with_remote_source/submod-ref3 ┃ $1,308       ┃
-┃ infracost/infracost/cmd/infraco...agrunt_with_remote_source/ref1 ┃ $386         ┃
-┃ infracost/infracost/cmd/infraco...with_remote_source/ref1-submod ┃ $33          ┃
-┃ infracost/infracost/cmd/infraco...agrunt_with_remote_source/ref2 ┃ $386         ┃
+┃ ./cmd/infracost/testdata/breakd...with_remote_source/submod-ref1 ┃ $2,430       ┃
+┃ ./cmd/infracost/testdata/breakd...th_remote_source/submod-ref1-2 ┃ $748         ┃
+┃ ./cmd/infracost/testdata/breakd...with_remote_source/submod-ref3 ┃ $1,308       ┃
+┃ ./cmd/infracost/testdata/breakd...agrunt_with_remote_source/ref1 ┃ $386         ┃
+┃ ./cmd/infracost/testdata/breakd...with_remote_source/ref1-submod ┃ $33          ┃
+┃ ./cmd/infracost/testdata/breakd...agrunt_with_remote_source/ref2 ┃ $386         ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 
 Err:

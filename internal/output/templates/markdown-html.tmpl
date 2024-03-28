@@ -78,7 +78,7 @@ in project `{{ index .ProjectNames 0 }}`
   <tbody>
     {{- range .Root.Projects }}
       {{- if showProject . }}
-        {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
+        {{- template "summaryRow" dict "Name" (trimRepoName $.Root.Metadata.VCSRepositoryURL .Name) "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
       {{- end }}
     {{- end }}
   </tbody>
@@ -86,7 +86,7 @@ in project `{{ index .ProjectNames 0 }}`
   {{- else }}
   <tbody>
   {{- range .Root.Projects }}
-    {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
+    {{- template "summaryRow" dict "Name" (trimRepoName $.Root.Metadata.VCSRepositoryURL .Name) "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
   {{- end }}
   </tbody>
 </table>

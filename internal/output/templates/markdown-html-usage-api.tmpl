@@ -90,7 +90,7 @@ in project `{{ index .ProjectNames 0 }}`
     {{- range .Root.Projects }}
       {{- if showProject . }}
         {{- template "summaryRow" dict
-                     "Name" .Name
+                     "Name" (trimRepoName $.Root.Metadata.VCSRepositoryURL .Name)
                      "MetadataFields" (. | metadataFields)
                      "PastBaselineCost" .PastBreakdown.TotalMonthlyBaselineCost
                      "BaselineCost" .Breakdown.TotalMonthlyBaselineCost
@@ -106,7 +106,7 @@ in project `{{ index .ProjectNames 0 }}`
   <tbody>
   {{- range .Root.Projects }}
     {{- template "summaryRow" dict
-                 "Name" .Name
+                 "Name" (trimRepoName $.Root.Metadata.VCSRepositoryURL .Name)
                  "MetadataFields" (. | metadataFields)
                  "PastBaselineCost" .PastBreakdown.TotalMonthlyBaselineCost
                  "BaselineCost" .Breakdown.TotalMonthlyBaselineCost

@@ -52,12 +52,12 @@
   {{- if gt (len .Root.Projects) 1  }}
     {{- range .Root.Projects }}
       {{- if showProject . }}
-        {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
+        {{- template "summaryRow" dict "Name" (trimRepoName $.Root.Metadata.VCSRepositoryURL .Name) "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
       {{- end }}
     {{- end }}
   {{- else }}
     {{- range .Root.Projects }}
-      {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
+      {{- template "summaryRow" dict "Name" (trimRepoName $.Root.Metadata.VCSRepositoryURL .Name) "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
     {{- end }}
   {{- end }}
 {{- end }}

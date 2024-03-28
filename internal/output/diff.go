@@ -192,7 +192,7 @@ func tableForDiff(out Root, opts Options) string {
 
 			t.AppendRow(
 				table.Row{
-					truncateMiddle(project.Name, 64, "..."),
+					truncateMiddle(trimRepoName(out.Metadata.VCSRepositoryURL, project.Name), 64, "..."),
 					formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyBaselineCost(), project.Breakdown.TotalMonthlyBaselineCost(), false),
 					formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyUsageCost, project.Breakdown.TotalMonthlyUsageCost, false),
 					formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyCost, project.Breakdown.TotalMonthlyCost, false),
@@ -225,7 +225,7 @@ func tableForDiff(out Root, opts Options) string {
 
 		t.AppendRow(
 			table.Row{
-				truncateMiddle(project.Name, 64, "..."),
+				truncateMiddle(trimRepoName(out.Metadata.VCSRepositoryURL, project.Name), 64, "..."),
 				formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyCost, project.Breakdown.TotalMonthlyCost, false),
 				formatCost(out.Currency, project.Breakdown.TotalMonthlyCost),
 			},

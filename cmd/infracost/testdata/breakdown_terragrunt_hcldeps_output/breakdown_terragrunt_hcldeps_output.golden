@@ -76,10 +76,10 @@ Module path: stag
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                                          ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco..._terragrunt_hcldeps_output/dev ┃ $65          ┃
-┃ infracost/infracost/cmd/infraco...terragrunt_hcldeps_output/prod ┃ $748         ┃
-┃ infracost/infracost/cmd/infraco...erragrunt_hcldeps_output/prod2 ┃ $748         ┃
-┃ infracost/infracost/cmd/infraco...terragrunt_hcldeps_output/stag ┃ $0.00        ┃
+┃ ./cmd/infracost/testdata/breakdown_terragrunt_hcldeps_output/dev ┃ $65          ┃
+┃ ./cmd/infracost/testdata/breakd...terragrunt_hcldeps_output/prod ┃ $748         ┃
+┃ ./cmd/infracost/testdata/breakd...erragrunt_hcldeps_output/prod2 ┃ $748         ┃
+┃ ./cmd/infracost/testdata/breakd...terragrunt_hcldeps_output/stag ┃ $0.00        ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 
 Err:

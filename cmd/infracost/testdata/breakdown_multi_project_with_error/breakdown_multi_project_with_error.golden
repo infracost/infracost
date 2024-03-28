@@ -31,8 +31,8 @@ Module path: prod
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                                          ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...n_multi_project_with_error/dev ┃ $0.00        ┃
-┃ infracost/infracost/cmd/infraco..._multi_project_with_error/prod ┃ $1,303       ┃
+┃ ./cmd/infracost/testdata/breakdown_multi_project_with_error/dev  ┃ $0.00        ┃
+┃ ./cmd/infracost/testdata/breakdown_multi_project_with_error/prod ┃ $1,303       ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 
 Err:
