@@ -461,6 +461,7 @@ resource_type_default_usage:
     monthly_speaker_identification_transactions: 1_000
     monthly_voice_profiles: 50_000
   azurerm_cognitive_deployment:
+    # SpeechServices
     monthly_language_input_tokens: 20_000_000
     monthly_language_output_tokens: 6_666_667
     monthly_code_interpreter_sessions: 333
@@ -476,6 +477,9 @@ resource_type_default_usage:
     monthly_text_embedding_tokens: 500_000_000
     monthly_text_to_speech_characters: 666_667
     monthly_text_to_speech_hours: 27.8
+    # LUIS
+    monthly_luis_text_requests: 6_667
+    monthly_luis_speech_requests: 1_818
   azurerm_container_registry:
     storage_gb: 100
     monthly_build_vcpu_hrs: 27.75

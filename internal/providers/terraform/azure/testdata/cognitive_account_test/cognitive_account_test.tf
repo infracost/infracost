@@ -11,6 +11,7 @@ resource "azurerm_resource_group" "example" {
 locals {
   kind_skus = {
     "SpeechServices" : ["F0", "S0"],
+    "LUIS" : ["F0", "S0"],
   }
 
   permutations = distinct(flatten([
@@ -23,20 +24,20 @@ locals {
   ]))
 }
 
-resource "azurerm_cognitive_account" "speech_without_usage" {
+resource "azurerm_cognitive_account" "without_usage" {
   for_each = { for perm in local.permutations : "${perm.kind}-${perm.sku}" => perm }
 
-  name                = "speech-without-usage-${each.key}"
+  name                = "without-usage-${each.key}"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   kind                = each.value.kind
   sku_name            = each.value.sku
 }
 
-resource "azurerm_cognitive_account" "speech_with_usage" {
+resource "azurerm_cognitive_account" "with_usage" {
   for_each = { for perm in local.permutations : "${perm.kind}-${perm.sku}" => perm }
 
-  name                = "speech-with-usage-${each.key}"
+  name                = "with-usage-${each.key}"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   kind                = each.value.kind
@@ -44,12 +45,22 @@ resource "azurerm_cognitive_account" "speech_with_usage" {
 }
 
 resource "azurerm_cognitive_account" "speech_with_commitment" {
-  for_each = toset(["small", "medium", "large"])
+  for_each = toset(["small", "medium", "large", "invalid"])
 
   name                = "speech-with-commitment-${each.key}"
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   kind                = "SpeechServices"
+  sku_name            = "S0"
+}
+
+resource "azurerm_cognitive_account" "luis_with_commitment" {
+  for_each = toset(["small", "medium", "large", "invalid"])
+
+  name                = "luis-with-commitment-${each.key}"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  kind                = "LUIS"
   sku_name            = "S0"
 }
 

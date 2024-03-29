@@ -28,7 +28,17 @@ func newCognitiveAccount(d *schema.ResourceData) schema.CoreResource {
 			Region:  region,
 			Sku:     d.Get("sku_name").String(),
 		}
-	} else if strings.EqualFold(kind, "openai") {
+	}
+
+	if strings.EqualFold(kind, "luis") {
+		return &azure.CognitiveAccountLUIS{
+			Address: d.Address,
+			Region:  region,
+			Sku:     d.Get("sku_name").String(),
+		}
+	}
+
+	if strings.EqualFold(kind, "openai") {
 		// OpenAI costs are counted as part of a Cognitive Deployment so
 		// this resource is counted as free
 		return schema.BlankCoreResource{
@@ -37,7 +47,7 @@ func newCognitiveAccount(d *schema.ResourceData) schema.CoreResource {
 		}
 	}
 
-	logging.Logger.Warn().Msgf("Skipping resource %s. Kind '%s' is not supported", d.Address, kind)
+	logging.Logger.Warn().Msgf("Skipping resource %s. Kind %q is not supported", d.Address, kind)
 
 	return nil
 }

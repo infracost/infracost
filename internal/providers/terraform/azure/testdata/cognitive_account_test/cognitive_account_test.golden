@@ -67,6 +67,11 @@
  ├─ Speaker identification                                            Monthly cost depends on usage: $10.00 per 1K transactions  
  └─ Voice profiles                                                    Monthly cost depends on usage: $0.20 per 1K profiles       
                                                                                                                                  
+ azurerm_cognitive_account.luis_with_commitment["large"]                                                                         
+ ├─ Text requests (commitment)                                                25,000,000  1M transactions             $21,750.00 
+ ├─ Text requests (commitment overage)                                                 1  1K transactions                  $0.87 
+ └─ Speech requests                                                   Monthly cost depends on usage: $5.50 per 1K transactions   
+                                                                                                                                 
  azurerm_cognitive_account.speech_with_commitment["small"]                                                                       
  ├─ Speech to text (commitment)                                                    2,000  hours                        $1,600.00 
  ├─ Speech to text (overage)                                                         100  hours                           $80.00 
@@ -100,7 +105,17 @@
  ├─ Speaker identification                                            Monthly cost depends on usage: $10.00 per 1K transactions  
  └─ Voice profiles                                                    Monthly cost depends on usage: $0.20 per 1K profiles       
                                                                                                                                  
- azurerm_cognitive_account.speech_with_usage["Speech-S0"]                                                                        
+ azurerm_cognitive_account.luis_with_commitment["medium"]                                                                        
+ ├─ Text requests (commitment)                                                 5,000,000  1M transactions              $5,100.00 
+ ├─ Text requests (commitment overage)                                                 1  1K transactions                  $1.02 
+ └─ Speech requests                                                   Monthly cost depends on usage: $5.50 per 1K transactions   
+                                                                                                                                 
+ azurerm_cognitive_account.luis_with_commitment["small"]                                                                         
+ ├─ Text requests (commitment)                                                 1,000,000  1M transactions              $1,200.00 
+ ├─ Text requests (commitment overage)                                                 1  1K transactions                  $1.20 
+ └─ Speech requests                                                   Monthly cost depends on usage: $5.50 per 1K transactions   
+                                                                                                                                 
+ azurerm_cognitive_account.with_usage["SpeechServices-S0"]                                                                       
  ├─ Speech to text                                                                    20  hours                           $20.00 
  ├─ Speech to text batch                                                              56  hours                           $20.16 
  ├─ Speech to text custom model                                                       17  hours                           $20.40 
@@ -121,7 +136,38 @@
  ├─ Speaker identification                                                             2  1K transactions                 $20.00 
  └─ Voice profiles                                                                   100  1K profiles                     $20.00 
                                                                                                                                  
- azurerm_cognitive_account.speech_without_usage["Speech-S0"]                                                                     
+ azurerm_cognitive_account.with_usage["LUIS-S0"]                                                                                 
+ ├─ Text requests                                                                 13.333  1K transactions                 $20.00 
+ └─ Speech requests                                                                3.636  1K transactions                 $20.00 
+                                                                                                                                 
+ azurerm_cognitive_account.luis_with_commitment["invalid"]                                                                       
+ └─ Speech requests                                                   Monthly cost depends on usage: $5.50 per 1K transactions   
+                                                                                                                                 
+ azurerm_cognitive_account.speech_with_commitment["invalid"]                                                                     
+ ├─ Speech to text batch                                              Monthly cost depends on usage: $0.36 per hours             
+ ├─ Speech to text custom model                                       Monthly cost depends on usage: $1.20 per hours             
+ ├─ Speech to text custom model batch                                 Monthly cost depends on usage: $0.45 per hours             
+ ├─ Speech to text custom endpoint hosting                            Monthly cost depends on usage: $0.05375 per hours          
+ ├─ Speech to text custom training                                    Monthly cost depends on usage: $10.00 per hours            
+ ├─ Speech to text enhanced add-ons                                   Monthly cost depends on usage: $0.30 per hours             
+ ├─ Speech to text conversation transcription multi-channel audio     Monthly cost depends on usage: $2.10 per hours             
+ ├─ Text to speech neural                                             Monthly cost depends on usage: $15.00 per 1M chars         
+ ├─ Text to speech custom neural training                             Monthly cost depends on usage: $52.00 per hours            
+ ├─ Text to speech custom neural                                      Monthly cost depends on usage: $24.00 per 1M chars         
+ ├─ Text to speech custom neural endpoint hosting                     Monthly cost depends on usage: $4.03 per hours             
+ ├─ Text to speech long audio                                         Monthly cost depends on usage: $100.00 per 1M chars        
+ ├─ Text to speech personal voice profiles                            Monthly cost depends on usage: $600.00 per 1K profiles     
+ ├─ Text to speech personal voice characters                          Monthly cost depends on usage: $24.00 per 1M chars         
+ ├─ Speech translation                                                Monthly cost depends on usage: $2.50 per hours             
+ ├─ Speaker verification                                              Monthly cost depends on usage: $5.00 per 1K transactions   
+ ├─ Speaker identification                                            Monthly cost depends on usage: $10.00 per 1K transactions  
+ └─ Voice profiles                                                    Monthly cost depends on usage: $0.20 per 1K profiles       
+                                                                                                                                 
+ azurerm_cognitive_account.without_usage["LUIS-S0"]                                                                              
+ ├─ Text requests                                                     Monthly cost depends on usage: $1.50 per 1K transactions   
+ └─ Speech requests                                                   Monthly cost depends on usage: $5.50 per 1K transactions   
+                                                                                                                                 
+ azurerm_cognitive_account.without_usage["SpeechServices-S0"]                                                                    
  ├─ Speech to text                                                    Monthly cost depends on usage: $1.00 per hours             
  ├─ Speech to text batch                                              Monthly cost depends on usage: $0.36 per hours             
  ├─ Speech to text custom model                                       Monthly cost depends on usage: $1.20 per hours             
@@ -142,19 +188,21 @@
  ├─ Speaker identification                                            Monthly cost depends on usage: $10.00 per 1K transactions  
  └─ Voice profiles                                                    Monthly cost depends on usage: $0.20 per 1K profiles       
                                                                                                                                  
- OVERALL TOTAL                                                                                                       $201,477.86 
+ OVERALL TOTAL                                                                                                       $229,570.95 
 ──────────────────────────────────
-9 cloud resources were detected:
-∙ 5 were estimated
-∙ 3 were free
+18 cloud resources were detected:
+∙ 12 were estimated
+∙ 5 were free
 ∙ 1 is not supported yet, see https://infracost.io/requested-resources:
   ∙ 1 x azurerm_cognitive_account
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestCognitiveAccount                               ┃ $201,478     ┃
+┃ TestCognitiveAccount                               ┃ $229,571     ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 Logs:
 
-WRN Skipping resource azurerm_cognitive_account.unsupported. Kind 'Academic' is not supported
+WRN Invalid commitment tier 200 for azurerm_cognitive_account.luis_with_commitment["invalid"]
+WRN Invalid commitment tier amount 100 for azurerm_cognitive_account.speech_with_commitment["invalid"]
+WRN Skipping resource azurerm_cognitive_account.unsupported. Kind "Academic" is not supported

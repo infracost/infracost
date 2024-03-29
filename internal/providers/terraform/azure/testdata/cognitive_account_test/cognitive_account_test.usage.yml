@@ -1,6 +1,7 @@
 version: 0.1
 resource_usage:
-  azurerm_cognitive_account.speech_with_usage[*]:
+  azurerm_cognitive_account.with_usage[*]:
+    # SpeechServices
     monthly_speech_to_text_standard_hrs: 20
     monthly_speech_to_text_standard_batch_hrs: 56
     monthly_speech_to_text_custom_hrs: 17
@@ -20,6 +21,9 @@ resource_usage:
     monthly_speaker_verification_transactions: 4_000
     monthly_speaker_identification_transactions: 2_000
     monthly_voice_profiles: 100_000
+    # LUIS
+    monthly_luis_text_requests: 13_333
+    monthly_luis_speech_requests: 3_636
 
   azurerm_cognitive_account.speech_with_commitment["small"]:
     monthly_commitment_speech_to_text_standard_hrs: 2000
@@ -74,3 +78,21 @@ resource_usage:
     monthly_connected_container_commitment_speech_to_text_enhanced_add_ons_overage_hrs: 100
     monthly_connected_container_commitment_text_to_speech_neural_commitment_chars: 2_000_000_000
     monthly_connected_container_commitment_text_to_speech_neural_overage_chars: 1_000_000
+
+  azurerm_cognitive_account.speech_with_commitment["invalid"]:
+    monthly_commitment_speech_to_text_standard_hrs: 100
+
+  azurerm_cognitive_account.luis_with_commitment["small"]:
+    monthly_commitment_luis_text_requests: 1_000_000
+    monthly_commitment_luis_text_overage_requests: 1_000
+
+  azurerm_cognitive_account.luis_with_commitment["medium"]:
+    monthly_commitment_luis_text_requests: 5_000_000
+    monthly_commitment_luis_text_overage_requests: 1_000
+
+  azurerm_cognitive_account.luis_with_commitment["large"]:
+    monthly_commitment_luis_text_requests: 25_000_000
+    monthly_commitment_luis_text_overage_requests: 1_000
+
+  azurerm_cognitive_account.luis_with_commitment["invalid"]:
+    monthly_commitment_luis_text_requests: 200
