@@ -848,7 +848,8 @@ resource_usage:
     monthly_outbound_gb: 1000000 # Monthly number of outbound data transfers in GB.
     monthly_rules_engine_requests: 10000000 # Monthly number of rules engine requests.
 
-  azurerm_cognitive_account.my_speech_ai_account:
+  azurerm_cognitive_account.my_cognitive_account:
+    ## SpeechServices
     monthly_speech_to_text_standard_hrs: 100 # Monthly number of hours of Speech to Text audio hours
     monthly_speech_to_text_standard_batch_hrs: 100 # Monthly number of hours of Speech to Text audio hours for batch processing
     monthly_speech_to_text_custom_hrs: 100  # Monthly number of hours of Speech to Text audio hours for Custom Speech Model
@@ -886,6 +887,12 @@ resource_usage:
     monthly_connected_container_commitment_speech_to_text_enhanced_add_ons_overage_hrs: 100 # Monthly number of hours of Speech to Text audio hours for enhanced add-on features over the committed amount
     monthly_connected_container_commitment_text_to_speech_neural_commitment_chars: 80_000_000 # Monthly number of committed characters for Text to Speech with neural voices (80M, 40M or 200M)
     monthly_connected_container_commitment_text_to_speech_neural_overage_chars: 1_000_000 # Monthly number of characters for Text to Speech with neural voices over the committed amountinfracost-usage-example.yml
+    ## LUIS
+    monthly_luis_text_requests: 1_000 # Monthly number of text requests to LUIS.
+    monthly_luis_speech_requests: 1_000 # Monthly number of speech requests to LUIS.
+    # Standard commitment
+    monthly_commitment_luis_text_requests: 1_000_000 # Monthly number of committed text requests to LUIS (1M, 5M or 25M)
+    monthly_commitment_luis_text_overage_requests: 1_000 # Monthly number of text requests to LUIS over the committed amount
 
   azurerm_cognitive_deployment.my_openai_deployment:
     monthly_language_input_tokens: 10_000_000 # Monthly number of language input tokens.

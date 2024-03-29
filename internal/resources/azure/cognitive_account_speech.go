@@ -10,8 +10,8 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-var validCommitmentTierHrs = []int64{2_000, 10_000, 50_000}
-var validCommitmentTierChars = []int64{80_000_000, 400_000_000, 2_000_000_000}
+var validSpeechCommitmentTierHrs = []int64{2_000, 10_000, 50_000}
+var validSpeechCommitmentTierChars = []int64{80_000_000, 400_000_000, 2_000_000_000}
 
 const (
 	standardCommitmentTier           = iota
@@ -226,14 +226,14 @@ func (r *CognitiveAccountSpeech) costComponents() []*schema.CostComponent {
 
 	// Text to speech
 	if r.MonthlyCommitmentTextToSpeechNeuralCommitmentChars != nil {
-		if !containsInt64(validCommitmentTierChars, *r.MonthlyCommitmentTextToSpeechNeuralCommitmentChars) {
+		if !containsInt64(validSpeechCommitmentTierChars, *r.MonthlyCommitmentTextToSpeechNeuralCommitmentChars) {
 			logging.Logger.Warn().Msgf("Invalid commitment tier amount %d for %s", *r.MonthlyCommitmentTextToSpeechNeuralCommitmentChars, r.Address)
 		} else {
 			costComponents = append(costComponents, r.commitmentTierCostComponents("Text to speech neural", standardCommitmentTier, "Commitment Tier Neural Text to Speech Azure", *r.MonthlyCommitmentTextToSpeechNeuralCommitmentChars, intPtrToDecimalPtr(r.MonthlyCommitmentTextToSpeechNeuralOverageChars), "1M chars", 1_000_000)...)
 		}
 	}
 	if r.MonthlyConnectedContainerCommitmentTextToSpeechNeuralCommitmentChars != nil {
-		if !containsInt64(validCommitmentTierChars, *r.MonthlyConnectedContainerCommitmentTextToSpeechNeuralCommitmentChars) {
+		if !containsInt64(validSpeechCommitmentTierChars, *r.MonthlyConnectedContainerCommitmentTextToSpeechNeuralCommitmentChars) {
 			logging.Logger.Warn().Msgf("Invalid commitment tier amount %d for %s", *r.MonthlyConnectedContainerCommitmentTextToSpeechNeuralCommitmentChars, r.Address)
 		} else {
 			costComponents = append(costComponents, r.commitmentTierCostComponents("Text to speech neural", connectedContainerCommitmentTier, "Commitment Tier Neural Text to Speech Connected", *r.MonthlyConnectedContainerCommitmentTextToSpeechNeuralCommitmentChars, intPtrToDecimalPtr(r.MonthlyConnectedContainerCommitmentTextToSpeechNeuralOverageChars), "1M chars", 1_000_000)...)
@@ -375,8 +375,8 @@ func (r *CognitiveAccountSpeech) commitmentTierCostComponents(namePrefix string,
 			Name: fmt.Sprintf("%s%s", namePrefix, suffix),
 			Unit: unit,
 			// Use a monthly quantity of 1 and a unit multiplier so we show the
-			// correct number of hours in the qty field, and divide the price
-			// by the number of hours in the commitment tier
+			// correct number of hours/chars in the qty field, and divide the price
+			// by the number of hours/chars in the commitment tier
 			UnitMultiplier:  decimal.NewFromInt(1).Div(qty),
 			MonthlyQuantity: decimalPtr(decimal.NewFromInt(1)),
 			ProductFilter: &schema.ProductFilter{
@@ -424,7 +424,7 @@ func (r *CognitiveAccountSpeech) commitmentTierCostComponents(namePrefix string,
 }
 
 func (r *CognitiveAccountSpeech) commitmentTierHourlyCostComponents(namePrefix string, commitmentTierType int, skuNamePrefix string, amount int64, overage *decimal.Decimal) []*schema.CostComponent {
-	if !containsInt64(validCommitmentTierHrs, amount) {
+	if !containsInt64(validSpeechCommitmentTierHrs, amount) {
 		logging.Logger.Warn().Msgf("Invalid commitment tier amount %d for %s", amount, r.Address)
 		return []*schema.CostComponent{}
 	}
