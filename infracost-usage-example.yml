@@ -834,6 +834,10 @@ resource_usage:
     monthly_jobs_compute_dbu_hrs: 1000 # Monthly number of Jobs Compute Databricks Units in DBU-hours.
     monthly_jobs_light_compute_dbu_hrs: 2000 # Monthly number of Jobs Light Compute Databricks Units in DBU-hours.
 
+  azurerm_federated_identity_credential.my_credential:
+    monthly_active_p1_users: 50100 # Monthly number of active users if you are using the Premium P1 license.
+    monthly_active_p2_users: 50100 # Monthly number of active users if you are using the Premium P2 license.
+
   azurerm_function_app.my_functions:
     monthly_executions: 100000 # Monthly executions to the function. Only applicable for Consumption plan.
     execution_duration_ms: 500 # Average duration of each execution in milliseconds. Only applicable for Consumption plan.
