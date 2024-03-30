@@ -38,6 +38,14 @@ func newCognitiveAccount(d *schema.ResourceData) schema.CoreResource {
 		}
 	}
 
+	if strings.EqualFold(kind, "textanalytics") {
+		return &azure.CognitiveAccountLanguage{
+			Address: d.Address,
+			Region:  region,
+			Sku:     d.Get("sku_name").String(),
+		}
+	}
+
 	if strings.EqualFold(kind, "openai") {
 		// OpenAI costs are counted as part of a Cognitive Deployment so
 		// this resource is counted as free

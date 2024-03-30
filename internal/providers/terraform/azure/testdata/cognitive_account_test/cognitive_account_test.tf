@@ -12,6 +12,7 @@ locals {
   kind_skus = {
     "SpeechServices" : ["F0", "S0"],
     "LUIS" : ["F0", "S0"],
+    "TextAnalytics" : ["F0", "S0"],
   }
 
   permutations = distinct(flatten([
@@ -61,6 +62,24 @@ resource "azurerm_cognitive_account" "luis_with_commitment" {
   location            = azurerm_resource_group.example.location
   resource_group_name = azurerm_resource_group.example.name
   kind                = "LUIS"
+  sku_name            = "S0"
+}
+
+resource "azurerm_cognitive_account" "textanalytics_with_commitment" {
+  for_each = toset(["small", "medium", "large", "invalid"])
+
+  name                = "textanalytics-with-commitment-${each.key}"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  kind                = "TextAnalytics"
+  sku_name            = "S0"
+}
+
+resource "azurerm_cognitive_account" "textanalytics_with_tiers" {
+  name                = "textanalytics-with-tiers"
+  location            = azurerm_resource_group.example.location
+  resource_group_name = azurerm_resource_group.example.name
+  kind                = "TextAnalytics"
   sku_name            = "S0"
 }
 
