@@ -174,7 +174,8 @@ var FreeResources = []string{
 	// Azure App Configuration
 	"azurerm_app_configuration_feature",
 	"azurerm_app_configuration_key",
-
+	// Azure AI Services
+	"azurerm_cognitive_account_customer_managed_key",
 	// Azure Api Management
 	"azurerm_api_management_api",
 	"azurerm_api_management_api_diagnostic",
