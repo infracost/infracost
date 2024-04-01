@@ -411,7 +411,7 @@ func constructConfigFilePathMessage(out Root, useMarkdownLinks bool) string {
 		return fmt.Sprintf("*Usage costs were estimated by merging %s and values from the %s.", usageDefaultsStr(out, useMarkdownLinks), configFilesStr(useMarkdownLinks))
 	}
 
-	return fmt.Sprintf("*Usage costs were estimated with %s, which can also be overridden in the %s.", usageDefaultsStr(out, useMarkdownLinks), configFilesStr(useMarkdownLinks))
+	return fmt.Sprintf("*Usage costs were estimated with %s, which can also be overridden in an %s.", usageDefaultsStr(out, useMarkdownLinks), usageFileStr("infracost-usage.yml", useMarkdownLinks))
 }
 
 func handleUsageApiDisabledMessage(out Root, useMarkdownLinks bool) string {
