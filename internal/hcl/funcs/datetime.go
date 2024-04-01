@@ -3,8 +3,10 @@ package funcs
 import (
 	"time"
 
+	"github.com/pkg/errors"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/function"
+	"github.com/zclconf/go-cty/cty/function/stdlib"
 )
 
 // MockTimestampFunc constructs a function that returns a string representation of a static timestamp.
@@ -69,3 +71,37 @@ func Timestamp() (cty.Value, error) {
 func TimeAdd(timestamp cty.Value, duration cty.Value) (cty.Value, error) {
 	return TimeAddFunc.Call([]cty.Value{timestamp, duration})
 }
+
+// FormatDateFunc is a wrapper around the stdlib.FormatDateFunc function that
+// returns the current date if the input date is invalid. This is useful in cases
+// where the date is invalid because of mocking/incomplete data because Infracost
+// cannot infer the values from the IaC.
+var FormatDateFunc = function.New(&function.Spec{
+	Description:  stdlib.FormatDateFunc.Description(),
+	Params:       stdlib.FormatDateFunc.Params(),
+	Type:         function.StaticReturnType(cty.String),
+	RefineResult: refineNonNull,
+	Impl: func(args []cty.Value, retType cty.Type) (cty.Value, error) {
+		val, err := stdlib.FormatDateFunc.Call(args)
+		var argsError function.ArgError
+		if errors.As(err, &argsError) {
+			// we have a problem with the passed in date, lets try and keep to the original
+			// formatting arg and use the current date as the second arg.
+			if argsError.Index == 1 {
+				args[1] = cty.StringVal(time.Now().UTC().Format(time.RFC3339))
+				val, err = stdlib.FormatDateFunc.Call(args)
+				if err == nil {
+					return val, nil
+				}
+			}
+		}
+
+		// if we can't infer the error then return the current date as an RFC 3339
+		// string.
+		if err != nil {
+			return cty.StringVal(time.Now().UTC().Format(time.RFC3339)), nil
+		}
+
+		return val, nil
+	},
+})
