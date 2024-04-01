@@ -1854,7 +1854,10 @@ resource "bar" "a" {
 
 func Test_TimeStaticResource(t *testing.T) {
 	path := createTestFile("main.tf", `
-resource "time_static" "example" {}
+resource "time_static" "input" {
+	rfc3339 = "2021-01-01T05:04:02Z"
+}
+resource "time_static" "default" {}
 `,
 	)
 
@@ -1870,11 +1873,39 @@ resource "time_static" "example" {}
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
-	resource := module.Blocks.Matching(BlockMatcher{Label: "time_static.example"})
+	resource := module.Blocks.Matching(BlockMatcher{Label: "time_static.default"})
 	val := resource.Values().AsValueMap()["rfc3339"].AsString()
 	current, err := time.Parse(time.RFC3339, val)
 	require.NoError(t, err)
 	assert.WithinDuration(t, time.Now(), current, 5*time.Minute)
+
+	resource = module.Blocks.Matching(BlockMatcher{Label: "time_static.input"})
+	valueMap := resource.Values().AsValueMap()
+	val = valueMap["rfc3339"].AsString()
+	current, err = time.Parse(time.RFC3339, val)
+	require.NoError(t, err)
+	assert.Equal(t, "2021-01-01T05:04:02Z", current.Format(time.RFC3339))
+	day := valueMap["day"].AsBigFloat()
+	i, _ := day.Int64()
+	assert.Equal(t, 1, int(i))
+	hour := valueMap["hour"].AsBigFloat()
+	i, _ = hour.Int64()
+	assert.Equal(t, 5, int(i))
+	minute := valueMap["minute"].AsBigFloat()
+	i, _ = minute.Int64()
+	assert.Equal(t, 4, int(i))
+	month := valueMap["month"].AsBigFloat()
+	i, _ = month.Int64()
+	assert.Equal(t, 1, int(i))
+	second := valueMap["second"].AsBigFloat()
+	i, _ = second.Int64()
+	assert.Equal(t, 2, int(i))
+	unix := valueMap["unix"].AsBigFloat()
+	i, _ = unix.Int64()
+	assert.Equal(t, int64(1609477442), i)
+	year := valueMap["year"].AsBigFloat()
+	i, _ = year.Int64()
+	assert.Equal(t, 2021, int(i))
 }
 
 func BenchmarkParserEvaluate(b *testing.B) {
