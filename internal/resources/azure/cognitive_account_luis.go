@@ -75,7 +75,7 @@ func (r *CognitiveAccountLUIS) BuildResource() *schema.Resource {
 	}
 
 	// For some reason the SKU can either be S0 or S1 but they map to the same thing
-	if !strings.EqualFold(r.Sku, "s0") && !strings.EqualFold(r.Sku, "s1") {
+	if !strings.EqualFold(r.Sku, "s0") && !strings.EqualFold(r.Sku, "s1") && !strings.EqualFold(r.Sku, "s") {
 		logging.Logger.Warn().Msgf("Unsupported SKU %s for %s", r.Sku, r.Address)
 		return nil
 	}
