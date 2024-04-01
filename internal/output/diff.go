@@ -193,9 +193,9 @@ func tableForDiff(out Root, opts Options) string {
 			t.AppendRow(
 				table.Row{
 					truncateMiddle(project.Name, 64, "..."),
-					formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyBaselineCost(), project.Breakdown.TotalMonthlyBaselineCost(), false),
-					formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyUsageCost, project.Breakdown.TotalMonthlyUsageCost, false),
-					formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyCost, project.Breakdown.TotalMonthlyCost, false),
+					formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyBaselineCost(), project.Breakdown.TotalMonthlyBaselineCost(), false, true),
+					formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyUsageCost, project.Breakdown.TotalMonthlyUsageCost, false, true),
+					formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyCost, project.Breakdown.TotalMonthlyCost, false, false),
 				},
 			)
 
@@ -226,7 +226,7 @@ func tableForDiff(out Root, opts Options) string {
 		t.AppendRow(
 			table.Row{
 				truncateMiddle(project.Name, 64, "..."),
-				formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyCost, project.Breakdown.TotalMonthlyCost, false),
+				formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyCost, project.Breakdown.TotalMonthlyCost, false, false),
 				formatCost(out.Currency, project.Breakdown.TotalMonthlyCost),
 			},
 		)

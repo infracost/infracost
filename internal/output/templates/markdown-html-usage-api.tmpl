@@ -58,8 +58,8 @@ in project `{{ index .ProjectNames 0 }}`
   {{- range .MetadataFields }}
       <td>{{ truncateMiddle . 64 "..." }}</td>
   {{- end }}
-      <td align="right">{{ formatCostChange .PastBaselineCost .BaselineCost }}</td>
-      <td align="right">{{ formatCostChange .PastUsageCost .UsageCost }}</td>
+      <td align="right">{{ formatCostChangeWithoutPercent .PastBaselineCost .BaselineCost }}</td>
+      <td align="right">{{ formatCostChangeWithoutPercent .PastUsageCost .UsageCost }}</td>
       <td align="right">{{ formatCostChange .PastCost .Cost }}</td>
       <td align="right">{{ formatCost .Cost }}</td>
     </tr>

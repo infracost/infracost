@@ -21,7 +21,7 @@ import (
 //go:embed templates/*
 var templatesFS embed.FS
 
-func formatMarkdownCostChange(currency string, pastCost, cost *decimal.Decimal, skipPlusMinus bool) string {
+func formatMarkdownCostChange(currency string, pastCost, cost *decimal.Decimal, skipPlusMinus, skipPercent bool) string {
 	if pastCost == nil && cost == nil {
 		return "-"
 	}
@@ -35,9 +35,12 @@ func formatMarkdownCostChange(currency string, pastCost, cost *decimal.Decimal, 
 		return plusMinus + formatWholeDecimalCurrency(currency, decimal.Zero)
 	}
 
-	percentChange := formatPercentChange(pastCost, cost)
-	if len(percentChange) > 0 {
-		percentChange = " " + "(" + percentChange + ")"
+	percentChange := ""
+	if !skipPercent {
+		percentChange = formatPercentChange(pastCost, cost)
+		if len(percentChange) > 0 {
+			percentChange = " " + "(" + percentChange + ")"
+		}
 	}
 
 	// can't just use out.DiffTotalMonthlyCost because it isn't set if there is no past cost
@@ -187,7 +190,10 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) (MarkdownO
 			return formatCost(out.Currency, d)
 		},
 		"formatCostChange": func(pastCost, cost *decimal.Decimal) string {
-			return formatMarkdownCostChange(out.Currency, pastCost, cost, false)
+			return formatMarkdownCostChange(out.Currency, pastCost, cost, false, false)
+		},
+		"formatCostChangeWithoutPercent": func(pastCost, cost *decimal.Decimal) string {
+			return formatMarkdownCostChange(out.Currency, pastCost, cost, false, true)
 		},
 		"formatCostChangeSentence": formatCostChangeSentence,
 		"showProject": func(p Project) bool {
