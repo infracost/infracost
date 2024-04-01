@@ -1,5 +1,5 @@
 # This predefined usage file attempts to set each usage-based cost as
-# $5/month for common configurations, helping engineers understand that
+# $10/month for common configurations, helping engineers understand that
 # these resources are not free.
 # See docs: https://infracost.io/usage-file/
 version: 0.1
@@ -493,79 +493,81 @@ resource_type_default_usage:
   azurerm_container_registry:
     storage_gb: 100
     monthly_build_vcpu_hrs: 27.75
-    #
-    #  azurerm_cosmosdb_cassandra_keyspace:
-    #    storage_gb: 1000 # Total size of storage in GB.
-    #    monthly_serverless_request_units: 10000000 # Monthly number of serverless request units.
-    #    monthly_restored_data_gb: 3000 # Monthly total amount of point-in-time restore data in GB.
-    #    monthly_analytical_storage_write_operations: 1000000 # Monthly number of write analytical storage operations.
-    #    monthly_analytical_storage_read_operations: 1000000 # Monthly number of read analytical storage operations.
-    #    max_request_units_utilization_percentage: 50 # Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100.
-    #
-    #  azurerm_cosmosdb_cassandra_table:
-    #    storage_gb: 1000 # Total size of storage in GB.
-    #    monthly_serverless_request_units: 10000000 # Monthly number of serverless request units.
-    #    monthly_restored_data_gb: 3000 # Monthly total amount of point-in-time restore data in GB.
-    #    monthly_analytical_storage_write_operations: 1000000 # Monthly number of write analytical storage operations.
-    #    monthly_analytical_storage_read_operations: 1000000 # Monthly number of read analytical storage operations.
-    #    max_request_units_utilization_percentage: 50 # Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100.
-    #
-    #  azurerm_cosmosdb_gremlin_database:
-    #    storage_gb: 1000 # Total size of storage in GB.
-    #    monthly_serverless_request_units: 10000000 # Monthly number of serverless request units.
-    #    monthly_restored_data_gb: 3000 # Monthly total amount of point-in-time restore data in GB.
-    #    monthly_analytical_storage_write_operations: 1000000 # Monthly number of write analytical storage operations.
-    #    monthly_analytical_storage_read_operations: 1000000 # Monthly number of read analytical storage operations.
-    #    max_request_units_utilization_percentage: 50 # Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100.
-    #
-    #  azurerm_cosmosdb_gremlin_graph:
-    #    storage_gb: 1000 # Total size of storage in GB.
-    #    monthly_serverless_request_units: 10000000 # Monthly number of serverless request units.
-    #    monthly_restored_data_gb: 3000 # Monthly total amount of point-in-time restore data in GB.
-    #    monthly_analytical_storage_write_operations: 1000000 # Monthly number of write analytical storage operations.
-    #    monthly_analytical_storage_read_operations: 1000000 # Monthly number of read analytical storage operations.
-    #    max_request_units_utilization_percentage: 50 # Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100.
-    #
-    #  azurerm_cosmosdb_mongo_collection:
-    #    storage_gb: 1000 # Total size of storage in GB.
-    #    monthly_serverless_request_units: 10000000 # Monthly number of serverless request units.
-    #    monthly_restored_data_gb: 3000 # Monthly total amount of point-in-time restore data in GB.
-    #    monthly_analytical_storage_write_operations: 1000000 # Monthly number of write analytical storage operations.
-    #    monthly_analytical_storage_read_operations: 1000000 # Monthly number of read analytical storage operations.
-    #    max_request_units_utilization_percentage: 50 # Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100.
-    #
-    #  azurerm_cosmosdb_mongo_database:
-    #    storage_gb: 1000 # Total size of storage in GB.
-    #    monthly_serverless_request_units: 10000000 # Monthly number of serverless request units.
-    #    monthly_restored_data_gb: 3000 # Monthly total amount of point-in-time restore data in GB.
-    #    monthly_analytical_storage_write_operations: 1000000 # Monthly number of write analytical storage operations.
-    #    monthly_analytical_storage_read_operations: 1000000 # Monthly number of read analytical storage operations.
-    #    max_request_units_utilization_percentage: 50 # Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100.
-    #
-    #  azurerm_cosmosdb_sql_container:
-    #    storage_gb: 1000 # Total size of storage in GB.
-    #    monthly_serverless_request_units: 10000000 # Monthly number of serverless request units.
-    #    monthly_restored_data_gb: 3000 # Monthly total amount of point-in-time restore data in GB.
-    #    monthly_analytical_storage_write_operations: 1000000 # Monthly number of write analytical storage operations.
-    #    monthly_analytical_storage_read_operations: 1000000 # Monthly number of read analytical storage operations.
-    #    max_request_units_utilization_percentage: 50 # Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100.
-    #
-    #  azurerm_cosmosdb_sql_database:
-    #    storage_gb: 1000 # Total size of storage in GB.
-    #    monthly_serverless_request_units: 10000000 # Monthly number of serverless request units.
-    #    monthly_restored_data_gb: 3000 # Monthly total amount of point-in-time restore data in GB.
-    #    monthly_analytical_storage_write_operations: 1000000 # Monthly number of write analytical storage operations.
-    #    monthly_analytical_storage_read_operations: 1000000 # Monthly number of read analytical storage operations.
-    #    max_request_units_utilization_percentage: 50 # Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100.
-    #
-    #  azurerm_cosmosdb_table:
-    #    storage_gb: 1000 # Total size of storage in GB.
-    #    monthly_serverless_request_units: 10000000 # Monthly number of serverless request units.
-    #    monthly_restored_data_gb: 3000 # Monthly total amount of point-in-time restore data in GB.
-    #    monthly_analytical_storage_write_operations: 1000000 # Monthly number of write analytical storage operations.
-    #    monthly_analytical_storage_read_operations: 1000000 # Monthly number of read analytical storage operations.
-    #    max_request_units_utilization_percentage: 50 # Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100.
-    #
+  #
+  #  These resources need to be converted to CoreResource before default usages are fully supported.
+  #
+  #  azurerm_cosmosdb_cassandra_keyspace:
+  #    storage_gb: 1000 # Total size of storage in GB.
+  #    monthly_serverless_request_units: 10000000 # Monthly number of serverless request units.
+  #    monthly_restored_data_gb: 3000 # Monthly total amount of point-in-time restore data in GB.
+  #    monthly_analytical_storage_write_operations: 1000000 # Monthly number of write analytical storage operations.
+  #    monthly_analytical_storage_read_operations: 1000000 # Monthly number of read analytical storage operations.
+  #    max_request_units_utilization_percentage: 50 # Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100.
+  #
+  #  azurerm_cosmosdb_cassandra_table:
+  #    storage_gb: 1000 # Total size of storage in GB.
+  #    monthly_serverless_request_units: 10000000 # Monthly number of serverless request units.
+  #    monthly_restored_data_gb: 3000 # Monthly total amount of point-in-time restore data in GB.
+  #    monthly_analytical_storage_write_operations: 1000000 # Monthly number of write analytical storage operations.
+  #    monthly_analytical_storage_read_operations: 1000000 # Monthly number of read analytical storage operations.
+  #    max_request_units_utilization_percentage: 50 # Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100.
+  #
+  #  azurerm_cosmosdb_gremlin_database:
+  #    storage_gb: 1000 # Total size of storage in GB.
+  #    monthly_serverless_request_units: 10000000 # Monthly number of serverless request units.
+  #    monthly_restored_data_gb: 3000 # Monthly total amount of point-in-time restore data in GB.
+  #    monthly_analytical_storage_write_operations: 1000000 # Monthly number of write analytical storage operations.
+  #    monthly_analytical_storage_read_operations: 1000000 # Monthly number of read analytical storage operations.
+  #    max_request_units_utilization_percentage: 50 # Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100.
+  #
+  #  azurerm_cosmosdb_gremlin_graph:
+  #    storage_gb: 1000 # Total size of storage in GB.
+  #    monthly_serverless_request_units: 10000000 # Monthly number of serverless request units.
+  #    monthly_restored_data_gb: 3000 # Monthly total amount of point-in-time restore data in GB.
+  #    monthly_analytical_storage_write_operations: 1000000 # Monthly number of write analytical storage operations.
+  #    monthly_analytical_storage_read_operations: 1000000 # Monthly number of read analytical storage operations.
+  #    max_request_units_utilization_percentage: 50 # Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100.
+  #
+  #  azurerm_cosmosdb_mongo_collection:
+  #    storage_gb: 1000 # Total size of storage in GB.
+  #    monthly_serverless_request_units: 10000000 # Monthly number of serverless request units.
+  #    monthly_restored_data_gb: 3000 # Monthly total amount of point-in-time restore data in GB.
+  #    monthly_analytical_storage_write_operations: 1000000 # Monthly number of write analytical storage operations.
+  #    monthly_analytical_storage_read_operations: 1000000 # Monthly number of read analytical storage operations.
+  #    max_request_units_utilization_percentage: 50 # Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100.
+  #
+  #  azurerm_cosmosdb_mongo_database:
+  #    storage_gb: 1000 # Total size of storage in GB.
+  #    monthly_serverless_request_units: 10000000 # Monthly number of serverless request units.
+  #    monthly_restored_data_gb: 3000 # Monthly total amount of point-in-time restore data in GB.
+  #    monthly_analytical_storage_write_operations: 1000000 # Monthly number of write analytical storage operations.
+  #    monthly_analytical_storage_read_operations: 1000000 # Monthly number of read analytical storage operations.
+  #    max_request_units_utilization_percentage: 50 # Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100.
+  #
+  #  azurerm_cosmosdb_sql_container:
+  #    storage_gb: 1000 # Total size of storage in GB.
+  #    monthly_serverless_request_units: 10000000 # Monthly number of serverless request units.
+  #    monthly_restored_data_gb: 3000 # Monthly total amount of point-in-time restore data in GB.
+  #    monthly_analytical_storage_write_operations: 1000000 # Monthly number of write analytical storage operations.
+  #    monthly_analytical_storage_read_operations: 1000000 # Monthly number of read analytical storage operations.
+  #    max_request_units_utilization_percentage: 50 # Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100.
+  #
+  #  azurerm_cosmosdb_sql_database:
+  #    storage_gb: 1000 # Total size of storage in GB.
+  #    monthly_serverless_request_units: 10000000 # Monthly number of serverless request units.
+  #    monthly_restored_data_gb: 3000 # Monthly total amount of point-in-time restore data in GB.
+  #    monthly_analytical_storage_write_operations: 1000000 # Monthly number of write analytical storage operations.
+  #    monthly_analytical_storage_read_operations: 1000000 # Monthly number of read analytical storage operations.
+  #    max_request_units_utilization_percentage: 50 # Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100.
+  #
+  #  azurerm_cosmosdb_table:
+  #    storage_gb: 1000 # Total size of storage in GB.
+  #    monthly_serverless_request_units: 10000000 # Monthly number of serverless request units.
+  #    monthly_restored_data_gb: 3000 # Monthly total amount of point-in-time restore data in GB.
+  #    monthly_analytical_storage_write_operations: 1000000 # Monthly number of write analytical storage operations.
+  #    monthly_analytical_storage_read_operations: 1000000 # Monthly number of read analytical storage operations.
+  #    max_request_units_utilization_percentage: 50 # Average utilisation of the maximum RU/s, starting at 10%. Possible values from 10 to 100.
+  #
   azurerm_data_factory:
     monthly_read_write_operation_entities: 1000000 # Monthly entities for Read/Write operations.
     monthly_monitoring_operation_entities: 2000000 # Monthly entities for Monitoring operations.
@@ -607,15 +609,17 @@ resource_type_default_usage:
     monthly_operations: 1665000 # Monthly number of operations above the free 100k operation limit.
   azurerm_eventgrid_system_topic:
     monthly_operations: 1665000 # Monthly number of operations above the free 100k operation limit.
-    #  azurerm_eventhub_namespace:
-    #    monthly_ingress_events: 100000000 # Monthly number of ingress events, only applicable for Basic and Standard namespaces.
-    #    retention_storage_gb: 10000       # Total data stored for retention in GB, used to calculate Extended Retention costs, only applicable for Dedicated namespaces.
-    #    throughput_or_capacity_units: 10  # Number of Throughput Units (for Basic and Standard) and Capacity units (for Dedicated) namespaces.
-    #    capture_enabled: false            # Defines if capture is enabled for the Event Hub Standard namespaces, can be: true, false.
-
-    #  azurerm_firewall:
-    #    monthly_data_processed_gb: 100000 # Monthly data processed by the firewall in GB.
-    #
+  #
+  #  These resources need to be converted to CoreResource before default usages are fully supported.
+  #
+  #  azurerm_eventhub_namespace:
+  #    monthly_ingress_events: 100000000 # Monthly number of ingress events, only applicable for Basic and Standard namespaces.
+  #    retention_storage_gb: 10000       # Total data stored for retention in GB, used to calculate Extended Retention costs, only applicable for Dedicated namespaces.
+  #    throughput_or_capacity_units: 10  # Number of Throughput Units (for Basic and Standard) and Capacity units (for Dedicated) namespaces.
+  #    capture_enabled: false            # Defines if capture is enabled for the Event Hub Standard namespaces, can be: true, false.
+  #  azurerm_firewall:
+  #    monthly_data_processed_gb: 100000 # Monthly data processed by the firewall in GB.
+  #
   azurerm_frontdoor:
     monthly_outbound_data_transfer_gb: # Monthly outbound data transfer from the following, in GB:
       us_gov: 0 # US Gov
@@ -628,26 +632,31 @@ resource_type_default_usage:
   azurerm_frontdoor_firewall_policy:
     monthly_custom_rule_requests: 1665000 # Monthly number of custom rule requests
     monthly_managed_ruleset_requests: 10000000 # Monthly number of managed ruleset requests
-    #
-    #  azurerm_hdinsight_kafka_cluster:
-    #    monthly_os_disk_operations: 1000000 # Average number of disk operations (writes, reads, deletes) using a unit size of 256KiB per OS disk per month.
-    #
+  #
+  #  This resource need to be converted to CoreResource before default usages are fully supported.
+  #
+  #  azurerm_hdinsight_kafka_cluster:
+  #    monthly_os_disk_operations: 1000000 # Average number of disk operations (writes, reads, deletes) using a unit size of 256KiB per OS disk per month.
+  #
   azurerm_iothub_dps:
     monthly_operations: 100000 # Monthly number of device provisioning operations
   azurerm_linux_function_app:
     monthly_executions: 50000000 # Monthly executions to the function. Only applicable for Consumption plan.
     execution_duration_ms: 50 # Average duration of each execution in milliseconds. Only applicable for Consumption plan.
     memory_mb: 64
-    #  azurerm_key_vault_certificate:
-    #    monthly_certificate_renewal_requests: 100    # Monthly number of certificate renewal requests.
-    #    monthly_certificate_other_operations: 100000 # Monthly number of non-renewal certificate operations.
-    #
-    #  azurerm_key_vault_key:
-    #    monthly_secrets_operations: 10000          # Monthly number of secrets transactions.
-    #    monthly_key_rotation_renewals: 50          # Monthly number of Managed Azure Storage account key rotation renewals.
-    #    monthly_protected_keys_operations: 1000000 # Monthly number of Software or HSM transactions.
-    #    hsm_protected_keys: 3000                   # Number of protected keys.
-    #
+  #
+  #  These resources need to be converted to CoreResource before default usages are fully supported.
+  #
+  #  azurerm_key_vault_certificate:
+  #    monthly_certificate_renewal_requests: 100    # Monthly number of certificate renewal requests.
+  #    monthly_certificate_other_operations: 100000 # Monthly number of non-renewal certificate operations.
+  #
+  #  azurerm_key_vault_key:
+  #    monthly_secrets_operations: 10000          # Monthly number of secrets transactions.
+  #    monthly_key_rotation_renewals: 50          # Monthly number of Managed Azure Storage account key rotation renewals.
+  #    monthly_protected_keys_operations: 1000000 # Monthly number of Software or HSM transactions.
+  #    hsm_protected_keys: 3000                   # Number of protected keys.
+  #
   azurerm_kubernetes_cluster:
     load_balancer:
       monthly_data_processed_gb: 20000 # Monthly inbound and outbound data processed in GB.
@@ -668,9 +677,12 @@ resource_type_default_usage:
     monthly_enterprise_connector_calls: 10000 # Monthly number of Enterprise Connector calls.
   azurerm_managed_disk:
     monthly_disk_operations: 200000000 # Number of disk operations (writes, reads, deletes) using a unit size of 256KiB.
-    #  azurerm_mariadb_server:
-    #    additional_backup_storage_gb: 2000 # Additional consumption of backup storage in GB.
-    #
+  #
+  #  This resource need to be converted to CoreResource before default usages are fully supported.
+  #
+  #  azurerm_mariadb_server:
+  #    additional_backup_storage_gb: 2000 # Additional consumption of backup storage in GB.
+  #
   azurerm_monitor_action_group:
     monthly_notifications: 500000
   azure_monitor_data_collection_rule:
@@ -691,29 +703,39 @@ resource_type_default_usage:
     additional_backup_storage_gb: 100 # Additional consumption of backup storage in GB.
   azurerm_nat_gateway:
     monthly_data_processed_gb: 222 # Monthly data processed by the NAT Gateway in GB.
-    #  azurerm_network_connection_monitor:
-    #    tests: 100000 # Overrides the number of tests done in the connection monitor
+  #
+  #  This resource need to be converted to CoreResource before default usages are fully supported.
+  #
+  #  azurerm_network_connection_monitor:
+  #    tests: 100000 # Overrides the number of tests done in the connection monitor
+  #
   azurerm_network_ddos_protection_plan:
     overage_amount: 10 # Monthly number of protected resources over the plan protection limit (100).
   azurerm_network_watcher:
     monthly_diagnostic_checks: 10000 # Monthly number of diagnostic API calls.
   azurerm_network_watcher_flow_log:
     monthly_logs_collected_gb: 22 # Monthly amount of logs collected in GB.
+  #
+  #  These resources need to be converted to CoreResource before default usages are fully supported.
+  #
   #  azurerm_network_watcher_flow_log, Traffic Analytics data processed (10 min interval), GB, 3.5, 5.71
   #  azurerm_network_watcher_flow_log, Traffic Analytics data processed (60 min interval), GB, 2.3, 8.7
   #
   #  azurerm_notification_hub_namespace:
   #    monthly_pushes: 1000000 # Monthly total number number of additional pushes.
   #
-
   azurerm_point_to_site_vpn_gateway:
     monthly_p2s_connections_hrs: 820 # Monthly connection hours to the point to site gateway
   azurerm_virtual_network_peering:
     monthly_data_transfer_gb: 285 # Monthly inbound/outbound data transferred by the VNET peering in GB.
   azurerm_postgresql_flexible_server:
     additional_backup_storage_gb: 105 # Additional backup storage in GB. If geo-redundancy is enabled, you should set this to twice the required storage capacity.
-    #  azurerm_postgresql_server:
-    #    additional_backup_storage_gb: 200 # Additional consumption of backup storage in GB.
+  #
+  #  This resource need to be converted to CoreResource before default usages are fully supported.
+  #
+  #  azurerm_postgresql_server:
+  #    additional_backup_storage_gb: 200 # Additional consumption of backup storage in GB.
+  #
   azurerm_private_dns_a_record:
     monthly_queries: 25000000 # Monthly number of DNS queries
   azurerm_private_dns_aaaa_record:
@@ -728,17 +750,23 @@ resource_type_default_usage:
     monthly_queries: 25000000 # Monthly number of DNS queries
   azurerm_private_dns_txt_record:
     monthly_queries: 25000000 # Monthly number of DNS queries
-    #  azurerm_private_endpoint:
-    #    monthly_inbound_data_processed_gb: 100 # Monthly inbound data processed in GB.
-    #    monthly_outbound_data_processed_gb: 100 # Monthly outbound data processed in GB.
-    #
-    #
+  #
+  #  This resource need to be converted to CoreResource before default usages are fully supported.
+  #
+  #  azurerm_private_endpoint:
+  #    monthly_inbound_data_processed_gb: 100 # Monthly inbound data processed in GB.
+  #    monthly_outbound_data_processed_gb: 100 # Monthly outbound data processed in GB.
+  #
   azurerm_recovery_services_vault:
     azurerm_backup_protected_vm: # Any protected VMs that come under this vault can be configured with the following
       disk_utilization_gb: 200 # Total size in GB of the data that will be backed up into the recovery service vault. Defaults to the entire storage capacity of the VM.
       additional_backup_retention_gb: 50 # Total size in GB of the additional data stored by this VM because of retention rules.
-      #  azurerm_search_service:
-      #    monthly_images_extracted: 1000000 # Monthly number of extracted images
+  #
+  #  This resource need to be converted to CoreResource before default usages are fully supported.
+  #
+  #  azurerm_search_service:
+  #    monthly_images_extracted: 1000000 # Monthly number of extracted images
+  #
   azurerm_security_center_subscription_pricing:
     cosmosdb_request_units: 1150 # Average number of RUs/hour for Microsoft Defender for Azure Cosmos DB. Applied when resource_type = CosmosDbs.
     monthly_app_service_nodes: 0.7 # Monthly number of App Service nodes for Microsoft Defender for App Service. Applied when resource_type = AppServices.
@@ -802,24 +830,27 @@ resource_type_default_usage:
     metadata_at_rest_storage_gb: 335 # Total size of Metadata in GB
   azurerm_synapse_sql_pool:
     storage_tb: 0 # Total storage size, including snapshots, in TB.
-    #  azurerm_synapse_workspace:
-    #    serverless_sql_pool_size_tb: 4 # Total storage size, including snapshots, in TB.
-    #    monthly_datapipeline_azure_hosted_activity_runs: 3 # Monthly number of Azure hosted activity runs.
-    #    monthly_datapipeline_azure_hosted_data_integration_units: 1 # Monthly number of Azure hosted data integration units.
-    #    monthly_datapipeline_azure_hosted_data_integration_hours: 31 # Monthly number of Azure hosted data integration hours.
-    #    monthly_datapipeline_azure_hosted_integration_runtime_hours: 200 # Monthly number of Azure hosted integration runtime hours.
-    #    monthly_datapipeline_azure_hosted_external_integration_runtime_hours: 4000 # Monthly number of Azure hosted external integration runtime hours.
-    #    monthly_datapipeline_self_hosted_activity_runs: 1 # Monthly number of self hosted activity runs.
-    #    monthly_datapipeline_self_hosted_data_movement_hours: 10 # Monthly number of self hosted data movement hours.
-    #    monthly_datapipeline_self_hosted_integration_runtime_hours: 200 # Monthly number of self hosted integration runtime hours.
-    #    monthly_datapipeline_self_hosted_external_integration_runtime_hours: 4000 # Monthly number of self hosted external integration runtime hours.
-    #    dataflow_basic_instances: 1 # Number of Data Flow basic instances.
-    #    dataflow_basic_vcores: 8 # Number of Data Flow basic vCores.
-    #    monthly_dataflow_basic_hours: 1 # Monthly number of Data Flow basic hours (this is multiplied by the number of instances and vCores).
-    #    dataflow_standard_instances: 1 # Number of Data Flow standard instances.
-    #    dataflow_standard_vcores: 12 # Number of Data Flow standard vCores.
-    #    monthly_dataflow_standard_hours: 1 # Monthly number of Data Flow standard hours (this is multiplied by the number of instances and vCores).
-    #
+  #
+  #  This resource need to be converted to CoreResource before default usages are fully supported.
+  #
+  #  azurerm_synapse_workspace:
+  #    serverless_sql_pool_size_tb: 4 # Total storage size, including snapshots, in TB.
+  #    monthly_datapipeline_azure_hosted_activity_runs: 3 # Monthly number of Azure hosted activity runs.
+  #    monthly_datapipeline_azure_hosted_data_integration_units: 1 # Monthly number of Azure hosted data integration units.
+  #    monthly_datapipeline_azure_hosted_data_integration_hours: 31 # Monthly number of Azure hosted data integration hours.
+  #    monthly_datapipeline_azure_hosted_integration_runtime_hours: 200 # Monthly number of Azure hosted integration runtime hours.
+  #    monthly_datapipeline_azure_hosted_external_integration_runtime_hours: 4000 # Monthly number of Azure hosted external integration runtime hours.
+  #    monthly_datapipeline_self_hosted_activity_runs: 1 # Monthly number of self hosted activity runs.
+  #    monthly_datapipeline_self_hosted_data_movement_hours: 10 # Monthly number of self hosted data movement hours.
+  #    monthly_datapipeline_self_hosted_integration_runtime_hours: 200 # Monthly number of self hosted integration runtime hours.
+  #    monthly_datapipeline_self_hosted_external_integration_runtime_hours: 4000 # Monthly number of self hosted external integration runtime hours.
+  #    dataflow_basic_instances: 1 # Number of Data Flow basic instances.
+  #    dataflow_basic_vcores: 8 # Number of Data Flow basic vCores.
+  #    monthly_dataflow_basic_hours: 1 # Monthly number of Data Flow basic hours (this is multiplied by the number of instances and vCores).
+  #    dataflow_standard_instances: 1 # Number of Data Flow standard instances.
+  #    dataflow_standard_vcores: 12 # Number of Data Flow standard vCores.
+  #    monthly_dataflow_standard_hours: 1 # Monthly number of Data Flow standard hours (this is multiplied by the number of instances and vCores).
+  #
   azurerm_traffic_manager_profile:
     monthly_dns_queries: 18500000 # Monthly number of DNS queries
     monthly_traffic_view_data_points: 5000000 # Monthly number of Traffic View data points processes
