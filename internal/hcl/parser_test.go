@@ -1828,7 +1828,7 @@ resource "aws_instance" "example" {
 func Test_FormatDateWithInvalidValue(t *testing.T) {
 	path := createTestFile("main.tf", `
 resource "bar" "a" {
-  date  = formatdate("YYYY-MM-DD-HH-mm-ss", "invalid")
+  date  = formatdate("YYYY-MM-DD-hh-mm-ss", "invalid")
 }
 `,
 	)
