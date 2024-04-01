@@ -35,25 +35,7 @@
  ├─ Fine tuning input (davinci-002)                                                         13,333.333  1K tokens                     $26.67 
  └─ Fine tuning output (davinci-002)                                                            10,000  1K tokens                     $20.00 
                                                                                                                                              
- azurerm_cognitive_deployment.eastus2_with_usage["gpt-35-turbo"]                                                                             
- ├─ Language input (gpt-35-turbo)                                                               40,000  1K tokens                     $20.00 
- ├─ Language output (gpt-35-turbo)                                                          13,333.333  1K tokens                     $20.00 
- ├─ Code interpreter sessions (gpt-35-turbo)                                                       667  sessions                      $20.01 
- ├─ Fine tuning training (gpt-35-turbo)                                                            0.4  hours                         $18.00 
- ├─ Fine tuning hosting (gpt-35-turbo)                                                             6.6  hours                         $19.80 
- ├─ Fine tuning input (gpt-35-turbo)                                                        13,333.333  1K tokens                     $20.00 
- └─ Fine tuning output (gpt-35-turbo)                                                           10,000  1K tokens                     $20.00 
-                                                                                                                                             
  azurerm_cognitive_deployment.eastus_with_usage["gpt-35-turbo"]                                                                              
- ├─ Language input (gpt-35-turbo)                                                               40,000  1K tokens                     $20.00 
- ├─ Language output (gpt-35-turbo)                                                          13,333.333  1K tokens                     $20.00 
- ├─ Code interpreter sessions (gpt-35-turbo)                                                       667  sessions                      $20.01 
- ├─ Fine tuning training (gpt-35-turbo)                                                            0.4  hours                         $18.00 
- ├─ Fine tuning hosting (gpt-35-turbo)                                                             6.6  hours                         $19.80 
- ├─ Fine tuning input (gpt-35-turbo)                                                        13,333.333  1K tokens                     $20.00 
- └─ Fine tuning output (gpt-35-turbo)                                                           10,000  1K tokens                     $20.00 
-                                                                                                                                             
- azurerm_cognitive_deployment.swedencentral_with_usage["gpt-35-turbo"]                                                                       
  ├─ Language input (gpt-35-turbo)                                                               40,000  1K tokens                     $20.00 
  ├─ Language output (gpt-35-turbo)                                                          13,333.333  1K tokens                     $20.00 
  ├─ Code interpreter sessions (gpt-35-turbo)                                                       667  sessions                      $20.01 
@@ -70,6 +52,24 @@
                                                                                                                                              
  azurerm_cognitive_deployment.swedencentral_with_usage["text-embedding-3-large"]                                                             
  └─ Text embeddings (text-embedding-3-large)                                                 1,000,000  1K tokens                    $130.00 
+                                                                                                                                             
+ azurerm_cognitive_deployment.eastus2_with_usage["gpt-35-turbo"]                                                                             
+ ├─ Language input (gpt-35-turbo)                                                               40,000  1K tokens                     $20.00 
+ ├─ Language output (gpt-35-turbo)                                                          13,333.333  1K tokens                     $20.00 
+ ├─ Code interpreter sessions (gpt-35-turbo)                                                       667  sessions                      $20.01 
+ ├─ Fine tuning training (gpt-35-turbo)                                                            0.4  hours                         $18.00 
+ ├─ Fine tuning hosting (gpt-35-turbo)                                                             6.6  hours                         $19.80 
+ ├─ Fine tuning input (gpt-35-turbo)                                                        13,333.333  1K tokens                      $6.67 
+ └─ Fine tuning output (gpt-35-turbo)                                                           10,000  1K tokens                     $15.00 
+                                                                                                                                             
+ azurerm_cognitive_deployment.swedencentral_with_usage["gpt-35-turbo"]                                                                       
+ ├─ Language input (gpt-35-turbo)                                                               40,000  1K tokens                     $20.00 
+ ├─ Language output (gpt-35-turbo)                                                          13,333.333  1K tokens                     $20.00 
+ ├─ Code interpreter sessions (gpt-35-turbo)                                                       667  sessions                      $20.01 
+ ├─ Fine tuning training (gpt-35-turbo)                                                            0.4  hours                         $18.00 
+ ├─ Fine tuning hosting (gpt-35-turbo)                                                             6.6  hours                         $19.80 
+ ├─ Fine tuning input (gpt-35-turbo)                                                        13,333.333  1K tokens                      $6.67 
+ └─ Fine tuning output (gpt-35-turbo)                                                           10,000  1K tokens                     $15.00 
                                                                                                                                              
  azurerm_cognitive_deployment.eastus2_with_usage["text-embedding-ada-002"]                                                                   
  └─ Text embeddings (text-embedding-ada-002)                                                 1,000,000  1K tokens                    $100.00 
@@ -91,6 +91,12 @@
  azurerm_cognitive_deployment.swedencentral_with_usage["gpt-35-turbo-instruct"]                                                              
  ├─ Language input (gpt-35-turbo-instruct)                                                      40,000  1K tokens                     $60.00 
  └─ Language output (gpt-35-turbo-instruct)                                                 13,333.333  1K tokens                     $26.67 
+                                                                                                                                             
+ azurerm_cognitive_deployment.eastus_with_usage["dall-e-3"]                                                                                  
+ ├─ Standard 1024x1024 images (dall-e-3)                                                             5  100 images                    $20.00 
+ ├─ Standard 1024x1792 images (dall-e-3)                                                           2.5  100 images                    $20.00 
+ ├─ HD 1024x1024 images (dall-e-3)                                                                 2.5  100 images                    $20.00 
+ └─ HD 1024x1792 images (dall-e-3)                                                                1.67  100 images                    $20.04 
                                                                                                                                              
  azurerm_cognitive_deployment.swedencentral_with_usage["dall-e-3"]                                                                           
  ├─ Standard 1024x1024 images (dall-e-3)                                                             5  100 images                    $20.00 
@@ -168,9 +174,6 @@
  azurerm_cognitive_deployment.eastus2_with_usage["text-embedding-3-small"]                                                                   
  └─ Text embeddings (text-embedding-3-small)                                                 1,000,000  1K tokens                     $20.00 
                                                                                                                                              
- azurerm_cognitive_deployment.eastus_with_usage["dall-e-3"]                                                                                  
- └─ Standard 1024x1792 images (dall-e-3)                                                           2.5  100 images                    $20.00 
-                                                                                                                                             
  azurerm_cognitive_deployment.eastus_with_usage["text-embedding-3-small"]                                                                    
  └─ Text embeddings (text-embedding-3-small)                                                 1,000,000  1K tokens                     $20.00 
                                                                                                                                              
@@ -204,8 +207,8 @@
  ├─ Code interpreter sessions (gpt-35-turbo)                                         Monthly cost depends on usage: $0.03 per sessions       
  ├─ Fine tuning training (gpt-35-turbo)                                              Monthly cost depends on usage: $45.00 per hours         
  ├─ Fine tuning hosting (gpt-35-turbo)                                               Monthly cost depends on usage: $3.00 per hours          
- ├─ Fine tuning input (gpt-35-turbo)                                                 Monthly cost depends on usage: $0.0015 per 1K tokens    
- └─ Fine tuning output (gpt-35-turbo)                                                Monthly cost depends on usage: $0.002 per 1K tokens     
+ ├─ Fine tuning input (gpt-35-turbo)                                                 Monthly cost depends on usage: $0.0005 per 1K tokens    
+ └─ Fine tuning output (gpt-35-turbo)                                                Monthly cost depends on usage: $0.0015 per 1K tokens    
                                                                                                                                              
  azurerm_cognitive_deployment.eastus2_without_usage["gpt-35-turbo-16k"]                                                                      
  ├─ Language input (gpt-35-turbo-16k)                                                Monthly cost depends on usage: $0.0005 per 1K tokens    
@@ -253,7 +256,10 @@
  └─ Standard 1024x1024 images (dall-e-2)                                             Monthly cost depends on usage: $2.00 per 100 images     
                                                                                                                                              
  azurerm_cognitive_deployment.eastus_without_usage["dall-e-3"]                                                                               
- └─ Standard 1024x1792 images (dall-e-3)                                             Monthly cost depends on usage: $8.00 per 100 images     
+ ├─ Standard 1024x1024 images (dall-e-3)                                             Monthly cost depends on usage: $4.00 per 100 images     
+ ├─ Standard 1024x1792 images (dall-e-3)                                             Monthly cost depends on usage: $8.00 per 100 images     
+ ├─ HD 1024x1024 images (dall-e-3)                                                   Monthly cost depends on usage: $8.00 per 100 images     
+ └─ HD 1024x1792 images (dall-e-3)                                                   Monthly cost depends on usage: $12.00 per 100 images    
                                                                                                                                              
  azurerm_cognitive_deployment.eastus_without_usage["davinci-002"]                                                                            
  ├─ Base model tokens (davinci-002)                                                  Monthly cost depends on usage: $85.00 per 1K tokens     
@@ -321,8 +327,8 @@
  ├─ Code interpreter sessions (gpt-35-turbo)                                         Monthly cost depends on usage: $0.03 per sessions       
  ├─ Fine tuning training (gpt-35-turbo)                                              Monthly cost depends on usage: $45.00 per hours         
  ├─ Fine tuning hosting (gpt-35-turbo)                                               Monthly cost depends on usage: $3.00 per hours          
- ├─ Fine tuning input (gpt-35-turbo)                                                 Monthly cost depends on usage: $0.0015 per 1K tokens    
- └─ Fine tuning output (gpt-35-turbo)                                                Monthly cost depends on usage: $0.002 per 1K tokens     
+ ├─ Fine tuning input (gpt-35-turbo)                                                 Monthly cost depends on usage: $0.0005 per 1K tokens    
+ └─ Fine tuning output (gpt-35-turbo)                                                Monthly cost depends on usage: $0.0015 per 1K tokens    
                                                                                                                                              
  azurerm_cognitive_deployment.swedencentral_without_usage["gpt-35-turbo-16k"]                                                                
  ├─ Language input (gpt-35-turbo-16k)                                                Monthly cost depends on usage: $0.0005 per 1K tokens    
@@ -365,7 +371,7 @@
  azurerm_cognitive_deployment.swedencentral_without_usage["tts-hd"]                                                                          
  └─ Text to speech (tts-hd)                                                          Monthly cost depends on usage: $30.00 per 1M characters 
                                                                                                                                              
- OVERALL TOTAL                                                                                                                    $20,475.57 
+ OVERALL TOTAL                                                                                                                    $20,498.94 
 ──────────────────────────────────
 116 cloud resources were detected:
 ∙ 108 were estimated
@@ -376,7 +382,7 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestCognitiveDeployment                            ┃ $20,476      ┃
+┃ TestCognitiveDeployment                            ┃ $20,499      ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 Logs:
 
