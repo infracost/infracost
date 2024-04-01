@@ -352,7 +352,7 @@ func hasCodeChanges(options Options, project Project) bool {
 
 var (
 	configFileDocsURL            = "https://www.infracost.io/docs/features/config_file/"
-	usageFileDocsURL             = "https://www.infracost.io/docs/features/usage_based_resources"
+	usageFileDocsURL             = "https://www.infracost.io/docs/features/usage_based_resources/#infracost-usageyml"
 	usageDefaultsDocsURL         = "https://www.infracost.io/docs/features/usage_based_resources"
 	usageDefaultsDashboardSuffix = "settings/usage-defaults"
 	cloudURLRegex                = regexp.MustCompile(`(https?://[^/]+/org/[^/]+/)`)
