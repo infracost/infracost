@@ -1191,7 +1191,7 @@ func ExpFunctions(baseDir string, logger zerolog.Logger) map[string]function.Fun
 		"flatten":          stdlib.FlattenFunc,
 		"floor":            stdlib.FloorFunc,
 		"format":           stdlib.FormatFunc,
-		"formatdate":       stdlib.FormatDateFunc,
+		"formatdate":       funcs.FormatDateFunc,
 		"formatlist":       stdlib.FormatListFunc,
 		"indent":           stdlib.IndentFunc,
 		"index":            funcs.IndexFunc, // stdlib.IndexFunc is not compatible

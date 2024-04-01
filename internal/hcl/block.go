@@ -9,6 +9,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
@@ -1334,8 +1335,18 @@ var (
 		"data.aws_region":             awsCurrentRegion,
 		"data.aws_default_tags":       awsDefaultTagValues,
 		"resource.random_shuffle":     randomShuffleValues,
+		"resource.time_static":        timeStaticValues,
 	}
 )
+
+// timeStaticValues mocks the values returned from resource.time_static
+// which is a resource that returns the current time in an RFC3339 format.
+// https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/static
+func timeStaticValues(b *Block) cty.Value {
+	return cty.ObjectVal(map[string]cty.Value{
+		"rfc3339": cty.StringVal(time.Now().Format(time.RFC3339)),
+	})
+}
 
 func awsCurrentRegion(b *Block) cty.Value {
 	return cty.ObjectVal(map[string]cty.Value{

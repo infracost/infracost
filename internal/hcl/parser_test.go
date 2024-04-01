@@ -7,6 +7,7 @@ import (
 	"sort"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/rs/zerolog"
 	"github.com/stretchr/testify/assert"
@@ -1822,6 +1823,58 @@ resource "aws_instance" "example" {
 		resource.Values(),
 		"id", "arn", "self_link", "name",
 	)
+}
+
+func Test_FormatDateWithInvalidValue(t *testing.T) {
+	path := createTestFile("main.tf", `
+resource "bar" "a" {
+  date  = formatdate("YYYY-MM-DD-HH-mm-ss", "invalid")
+}
+`,
+	)
+
+	logger := newDiscardLogger()
+	loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
+	parser := NewParser(
+		RootPath{Path: filepath.Dir(path)},
+		CreateEnvFileMatcher([]string{}, nil),
+		loader,
+		logger,
+		OptionGraphEvaluator(),
+	)
+	module, err := parser.ParseDirectory()
+	require.NoError(t, err)
+
+	resource := module.Blocks.Matching(BlockMatcher{Label: "bar.a"})
+	val := resource.Values().AsValueMap()["date"].AsString()
+	current, err := time.Parse("2006-01-02-15-04-05", val)
+	require.NoError(t, err)
+	assert.WithinDuration(t, time.Now(), current, 5*time.Minute)
+}
+
+func Test_TimeStaticResource(t *testing.T) {
+	path := createTestFile("main.tf", `
+resource "time_static" "example" {}
+`,
+	)
+
+	logger := newDiscardLogger()
+	loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
+	parser := NewParser(
+		RootPath{Path: filepath.Dir(path)},
+		CreateEnvFileMatcher([]string{}, nil),
+		loader,
+		logger,
+		OptionGraphEvaluator(),
+	)
+	module, err := parser.ParseDirectory()
+	require.NoError(t, err)
+
+	resource := module.Blocks.Matching(BlockMatcher{Label: "time_static.example"})
+	val := resource.Values().AsValueMap()["rfc3339"].AsString()
+	current, err := time.Parse(time.RFC3339, val)
+	require.NoError(t, err)
+	assert.WithinDuration(t, time.Now(), current, 5*time.Minute)
 }
 
 func BenchmarkParserEvaluate(b *testing.B) {
