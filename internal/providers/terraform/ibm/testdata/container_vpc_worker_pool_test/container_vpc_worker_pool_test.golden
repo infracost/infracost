@@ -2,23 +2,23 @@
  Name                                                                                              Monthly Qty  Unit      Monthly Cost 
                                                                                                                                        
  ibm_container_vpc_worker_pool.cluster_pool                                                                                            
- └─ VPC Container Work Zone flavor: (bx2.2x8) region: (us-south) name: (us-south-2) x(3) workers         2,190  hours          $272.84 
+ └─ VPC Container Work Zone flavor: (bx2.2x8) region: (us-south) name: (us-south-2) x(3) workers         2,190  hours          $293.67 
                                                                                                                                        
  ibm_container_vpc_worker_pool.cluster_pool_without_usage                                                                              
- └─ VPC Container Work Zone flavor: (bx2.2x8) region: (us-south) name: (us-south-2) x(3) workers             3  hours            $0.37 
+ └─ VPC Container Work Zone flavor: (bx2.2x8) region: (us-south) name: (us-south-2) x(3) workers             3  hours            $0.40 
                                                                                                                                        
  ibm_is_vpc.vpc1                                                                                                                       
  ├─ VPC instance                                                                                             1  Instance         $0.00 
  ├─ VPC egress free allowance (first 5GB)                                                                    5  GB               $0.00 
- └─ VPC egress us-south (first 9995 GB)                                                                  9,995  GB             $869.57 
- └─ VPC egress us-south (next 40000 GB)                                                                 40,000  GB           $3,320.00 
- └─ VPC egress us-south (next 100000 GB)                                                                   100  GB               $7.00 
+ └─ VPC egress us-south (first 9995 GB)                                                                  9,995  GB             $908.70 
+ └─ VPC egress us-south (next 40000 GB)                                                                 40,000  GB           $3,469.40 
+ └─ VPC egress us-south (next 100000 GB)                                                                   100  GB               $7.32 
  └─ VPC egress us-south (over 149995 GB)                                                                     0  GB               $0.00 
                                                                                                                                        
  mycluster                                                                                                                             
- └─ VPC Container Work Zone flavor: (bx2.4x16) region: (us-south) name: (us-south-1) x(3) workers        2,190  hours          $565.42 
+ └─ VPC Container Work Zone flavor: (bx2.4x16) region: (us-south) name: (us-south-1) x(3) workers        2,190  hours          $608.59 
                                                                                                                                        
- OVERALL TOTAL                                                                                                               $5,035.19 
+ OVERALL TOTAL                                                                                                               $5,288.07 
 ──────────────────────────────────
 6 cloud resources were detected:
 ∙ 4 were estimated, 3 of which include usage-based costs, see https://infracost.io/usage-file

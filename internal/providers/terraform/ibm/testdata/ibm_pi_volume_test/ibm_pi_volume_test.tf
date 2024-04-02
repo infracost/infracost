@@ -2,7 +2,7 @@ terraform {
   required_providers {
     ibm = {
       source  = "IBM-Cloud/ibm"
-      version = "1.58.0"
+      version = "1.63.0"
     }
   }
 }
@@ -28,6 +28,7 @@ resource "ibm_pi_volume" "pi_volume_affinity_set" {
   pi_cloud_instance_id = ibm_resource_instance.powervs_service.guid
   pi_volume_size       = 100
   pi_affinity_policy   = "affinity"
+  pi_volume_shareable  = false
 }
 
 resource "ibm_pi_volume" "pi_volume_volume_set" {
@@ -35,6 +36,15 @@ resource "ibm_pi_volume" "pi_volume_volume_set" {
   pi_cloud_instance_id = ibm_resource_instance.powervs_service.guid
   pi_volume_size       = 100
   pi_volume_pool       = "volume-pool-name"
+  pi_volume_shareable  = false
+}
+
+resource "ibm_pi_volume" "pi_volume_tier0" {
+  pi_volume_name       = "example-volume"
+  pi_cloud_instance_id = ibm_resource_instance.powervs_service.guid
+  pi_volume_size       = 100
+  pi_volume_type       = "tier0"
+  pi_volume_shareable  = false
 }
 
 resource "ibm_pi_volume" "pi_volume_tier1" {
@@ -42,13 +52,7 @@ resource "ibm_pi_volume" "pi_volume_tier1" {
   pi_cloud_instance_id = ibm_resource_instance.powervs_service.guid
   pi_volume_size       = 100
   pi_volume_type       = "tier1"
-}
-
-resource "ibm_pi_volume" "pi_volume_ssd" {
-  pi_volume_name       = "example-volume"
-  pi_cloud_instance_id = ibm_resource_instance.powervs_service.guid
-  pi_volume_size       = 100
-  pi_volume_type       = "ssd"
+  pi_volume_shareable  = false
 }
 
 resource "ibm_pi_volume" "pi_volume_tier3" {
@@ -56,13 +60,15 @@ resource "ibm_pi_volume" "pi_volume_tier3" {
   pi_cloud_instance_id = ibm_resource_instance.powervs_service.guid
   pi_volume_size       = 100
   pi_volume_type       = "tier3"
+  pi_volume_shareable  = false
 }
 
-resource "ibm_pi_volume" "pi_volume_standard" {
+resource "ibm_pi_volume" "pi_volume_tier5k" {
   pi_volume_name       = "example-volume"
   pi_cloud_instance_id = ibm_resource_instance.powervs_service.guid
   pi_volume_size       = 100
-  pi_volume_type       = "standard"
+  pi_volume_type       = "tier5k"
+  pi_volume_shareable  = false
 }
 
 resource "ibm_pi_volume" "pi_volume_tier1_no_usage" {
@@ -70,4 +76,5 @@ resource "ibm_pi_volume" "pi_volume_tier1_no_usage" {
   pi_cloud_instance_id = ibm_resource_instance.powervs_service.guid
   pi_volume_size       = 100
   pi_volume_type       = "tier1"
+  pi_volume_shareable  = false
 }

@@ -2,41 +2,41 @@
  Name                                                        Monthly Qty  Unit                        Monthly Cost 
                                                                                                                    
  ibm_is_instance.testBalancedInstance                                                                              
- ├─ CPU hours (32 CPUs, us-east-1)                                23,360  CPU hours                        $558.58 
- ├─ Memory hours (128 GB, us-east-1)                              93,440  Memory hours                     $453.19 
- └─ Storage GB hours (600 GB * 2, us-east-1)                     876,000  Storage GB hours                  $96.00 
+ ├─ CPU hours (32 CPUs, us-east-1)                                23,360  CPU hours                        $583.71 
+ ├─ Memory hours (128 GB, us-east-1)                              93,440  Memory hours                     $473.58 
+ └─ Storage GB hours (600 GB * 2, us-east-1)                     876,000  Storage GB hours                 $100.32 
                                                                                                                    
  ibm_is_instance.testBalancedInstanceWithBootVolume                                                                
- ├─ CPU hours (8 CPUs, us-east-1)                                  5,840  CPU hours                        $139.64 
- ├─ Memory hours (32 GB, us-east-1)                               23,360  Memory hours                     $113.30 
- └─ Boot volume (boot-volume-label, 150 GB)                      109,500  GB Hours                          $12.05 
+ ├─ CPU hours (8 CPUs, us-east-1)                                  5,840  CPU hours                        $145.93 
+ ├─ Memory hours (32 GB, us-east-1)                               23,360  Memory hours                     $118.40 
+ └─ Boot volume (boot-volume-label, 150 GB)                      109,500  GB Hours                          $12.59 
                                                                                                                    
  ibm_is_instance.testComputeInstance                                                                               
- ├─ CPU hours (2 CPUs, us-east-1)                                  1,460  CPU hours                         $34.91 
- └─ Memory hours (4 GB, us-east-1)                                 2,920  Memory hours                      $21.07 
+ ├─ CPU hours (2 CPUs, us-east-1)                                  1,460  CPU hours                         $36.48 
+ └─ Memory hours (4 GB, us-east-1)                                 2,920  Memory hours                      $22.02 
                                                                                                                    
  ibm_is_instance.testGpuInstance                                                                                   
- ├─ CPU hours (16 CPUs, us-east-1)                                11,680  CPU hours                        $298.39 
- ├─ Memory hours (128 GB, us-east-1)                              93,440  Memory hours                     $355.88 
- └─ Gpu hours (2 GPUs, Tesla V100, us-east-1)                      1,460  Gpu hours                      $2,920.00 
+ ├─ CPU hours (16 CPUs, us-east-1)                                11,680  CPU hours                        $311.82 
+ ├─ Memory hours (128 GB, us-east-1)                              93,440  Memory hours                     $371.90 
+ └─ Gpu hours (2 GPUs, Tesla V100, us-east-1)                      1,460  Gpu hours                      $3,051.40 
                                                                                                                    
  ibm_is_instance.testIbmZInstance                                                                                  
- ├─ CPU hours (16 CPUs, us-east-1)                                11,680  CPU hours                        $688.75 
- └─ Memory hours (64 GB, us-east-1)                               46,720  Memory hours                     $529.49 
+ ├─ CPU hours (16 CPUs, us-east-1)                                11,680  CPU hours                        $530.34 
+ └─ Memory hours (64 GB, us-east-1)                               46,720  Memory hours                     $407.71 
                                                                                                                    
  ibm_is_instance.testInstanceWithoutUsage                                                                          
- ├─ CPU hours (2 CPUs, us-east-1)                    Monthly cost depends on usage: $0.0239116112 per CPU hours    
- └─ Memory hours (4 GB, us-east-1)                   Monthly cost depends on usage: $0.0072168965 per Memory hours 
+ ├─ CPU hours (2 CPUs, us-east-1)                    Monthly cost depends on usage: $0.0249876337 per CPU hours    
+ └─ Memory hours (4 GB, us-east-1)                   Monthly cost depends on usage: $0.0075416569 per Memory hours 
                                                                                                                    
  ibm_is_vpc.testVpc                                                                                                
  ├─ VPC instance                                                       1  Instance                           $0.00 
  ├─ VPC egress free allowance (first 5GB)            Monthly cost depends on usage: $0.00 per GB                   
- └─ VPC egress us-east (first 9995 GB)               Monthly cost depends on usage: $0.087 per GB                  
- └─ VPC egress us-east (next 40000 GB)               Monthly cost depends on usage: $0.083 per GB                  
- └─ VPC egress us-east (next 100000 GB)              Monthly cost depends on usage: $0.07 per GB                   
- └─ VPC egress us-east (over 149995 GB)              Monthly cost depends on usage: $0.05 per GB                   
+ └─ VPC egress us-east (first 9995 GB)               Monthly cost depends on usage: $0.090915 per GB               
+ └─ VPC egress us-east (next 40000 GB)               Monthly cost depends on usage: $0.086735 per GB               
+ └─ VPC egress us-east (next 100000 GB)              Monthly cost depends on usage: $0.07315 per GB                
+ └─ VPC egress us-east (over 149995 GB)              Monthly cost depends on usage: $0.05225 per GB                
                                                                                                                    
- OVERALL TOTAL                                                                                           $6,221.25 
+ OVERALL TOTAL                                                                                           $6,166.19 
 ──────────────────────────────────
 9 cloud resources were detected:
 ∙ 7 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

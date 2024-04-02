@@ -42,3 +42,18 @@ resource_usage:
     monitoring_timeseries_hour: 100
   ibm_resource_instance.cd_instance_professional:
     continuousdelivery_authorized_users: 2
+  ibm_resource_instance.wml_instance_lite:
+    wml_capacity_unit_hour: 20
+    wml_class1_ru: 50
+  ibm_resource_instance.wml_instance_essentials:
+    wml_capacity_unit_hour: 20
+    wml_class1_ru: 50
+    wml_class2_ru: 50
+    wml_class3_ru: 50
+  ibm_resource_instance.wml_instance_standard:
+    wml_capacity_unit_hour: 20
+    wml_instance: 1
+    wml_class1_ru: 50
+    wml_class2_ru: 50
+    wml_class3_ru: 50
+

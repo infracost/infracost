@@ -1,99 +1,99 @@
 
- Name                                               Monthly Qty  Unit                    Monthly Cost 
-                                                                                                      
- ibm_cos_bucket.accelerated-archive-us-south                                                          
- ├─ Accelerated Archive Capacity              Monthly cost depends on usage: $0.004 per GB            
- ├─ Accelerated Archive Restore               Monthly cost depends on usage: $0.04 per GB             
- ├─ Storage Capacity (first 499999 GB)        Monthly cost depends on usage: $0.022 per GB            
- ├─ Storage Capacity (over 499999 GB)         Monthly cost depends on usage: $0.02 per GB             
- ├─ Class A requests                          Monthly cost depends on usage: $0.005 per 1k API calls  
- ├─ Class B requests                          Monthly cost depends on usage: $0.004 per 10k API calls 
- └─ Public Standard Egress (first 50000 GB)   Monthly cost depends on usage: $0.09 per GB             
- └─ Public Standard Egress (next 100000 GB)   Monthly cost depends on usage: $0.07 per GB             
- └─ Public Standard Egress (over 150000 GB)   Monthly cost depends on usage: $0.05 per GB             
-                                                                                                      
- ibm_cos_bucket.archive-us-south                                                                      
- ├─ Archive Capacity                                      1,000  GB                             $0.99 
- ├─ Archive Restore                                       1,000  GB                            $20.00 
- ├─ Storage Capacity (first 499999 GB)        Monthly cost depends on usage: $0.022 per GB            
- ├─ Storage Capacity (over 499999 GB)         Monthly cost depends on usage: $0.02 per GB             
- ├─ Class A requests                          Monthly cost depends on usage: $0.005 per 1k API calls  
- ├─ Class B requests                          Monthly cost depends on usage: $0.004 per 10k API calls 
- └─ Public Standard Egress (first 50000 GB)   Monthly cost depends on usage: $0.09 per GB             
- └─ Public Standard Egress (next 100000 GB)   Monthly cost depends on usage: $0.07 per GB             
- └─ Public Standard Egress (over 150000 GB)   Monthly cost depends on usage: $0.05 per GB             
-                                                                                                      
- ibm_cos_bucket.aspera-us                                                                             
- ├─ Aspera Egress (first 50000 GB)                        1,000  GB                            $80.00 
- ├─ Aspera Egress (next 100000 GB)                            0  GB                             $0.00 
- ├─ Aspera Egress (over 150000 GB)                            0  GB                             $0.00 
- ├─ Aspera Ingress Free                                   1,000  GB                             $0.00 
- ├─ Storage Capacity (first 499999 GB)        Monthly cost depends on usage: $0.03 per GB             
- ├─ Storage Capacity (over 499999 GB)         Monthly cost depends on usage: $0.026 per GB            
- ├─ Class A requests                          Monthly cost depends on usage: $0.005 per 1k API calls  
- ├─ Class B requests                          Monthly cost depends on usage: $0.004 per 10k API calls 
- └─ Public Standard Egress (first 50000 GB)   Monthly cost depends on usage: $0.09 per GB             
- └─ Public Standard Egress (next 100000 GB)   Monthly cost depends on usage: $0.07 per GB             
- └─ Public Standard Egress (over 150000 GB)   Monthly cost depends on usage: $0.05 per GB             
-                                                                                                      
- ibm_cos_bucket.lite-us-south                                                                         
- └─ Lite Plan Bucket                                          1  Instance                       $0.00 
-                                                                                                      
- ibm_cos_bucket.one-rate-us-south                                                                     
- ├─ Storage Capacity                          Monthly cost depends on usage: $0.04 per GB             
- ├─ Free Class A requests                     Monthly cost depends on usage: $0.00 per 1k API calls   
- ├─ Class A requests                          Monthly cost depends on usage: $0.005 per 1k API calls  
- ├─ Free Class B requests                     Monthly cost depends on usage: $0.00 per 10k API calls  
- ├─ Class B requests                          Monthly cost depends on usage: $0.004 per 10k API calls 
- ├─ Free Public Egress                        Monthly cost depends on usage: $0.00 per GB             
- └─ Public Egress                             Monthly cost depends on usage: $0.05 per GB             
-                                                                                                      
- ibm_cos_bucket.one-rate-us-south-usage                                                               
- ├─ Storage Capacity                                      1,000  GB                            $40.00 
- ├─ Free Class A requests                                   100  1k API calls                   $0.00 
- ├─ Class A requests                                        900  1k API calls                   $4.50 
- ├─ Free Class B requests                                    10  10k API calls                  $0.00 
- ├─ Class B requests                                        990  10k API calls                  $3.96 
- └─ Free Public Egress                                    1,000  GB                             $0.00 
-                                                                                                      
- ibm_cos_bucket.smart-us-south                                                                        
- ├─ Storage Capacity (first 499999 GB)                    1,000  GB                            $21.00 
- ├─ Storage Capacity (next 999500000 GB)                      0  GB                             $0.00 
- ├─ Storage Capacity (over 999999999 GB)                      0  GB                             $0.00 
- ├─ Class A requests                                         10  1k API calls                   $0.05 
- ├─ Class B requests                                         10  10k API calls                  $0.05 
- └─ Public Standard Egress (first 50000 GB)               1,000  GB                            $90.00 
- └─ Public Standard Egress (next 100000 GB)                   0  GB                             $0.00 
- └─ Public Standard Egress (over 150000 GB)                   0  GB                             $0.00 
-                                                                                                      
- ibm_cos_bucket.standard-ams03                                                                        
- ├─ Storage Capacity (first 499999 GB)                    1,000  GB                            $22.70 
- ├─ Storage Capacity (over 499999 GB)                         0  GB                             $0.00 
- ├─ Class A requests                                         10  1k API calls                   $0.05 
- ├─ Class B requests                                         10  10k API calls                  $0.04 
- └─ Public Standard Egress (first 50000 GB)               1,000  GB                            $90.00 
- └─ Public Standard Egress (next 100000 GB)                   0  GB                             $0.00 
- └─ Public Standard Egress (over 150000 GB)                   0  GB                             $0.00 
-                                                                                                      
- ibm_cos_bucket.standard-ap                                                                           
- ├─ Storage Capacity (first 499999 GB)        Monthly cost depends on usage: $0.0339 per GB           
- ├─ Storage Capacity (over 499999 GB)         Monthly cost depends on usage: $0.0294 per GB           
- ├─ Class A requests                          Monthly cost depends on usage: $0.005 per 1k API calls  
- ├─ Class B requests                          Monthly cost depends on usage: $0.004 per 10k API calls 
- └─ Public Standard Egress (first 50000 GB)   Monthly cost depends on usage: $0.14 per GB             
- └─ Public Standard Egress (next 100000 GB)   Monthly cost depends on usage: $0.11 per GB             
- └─ Public Standard Egress (over 150000 GB)   Monthly cost depends on usage: $0.08 per GB             
-                                                                                                      
- ibm_cos_bucket.standard-us-south                                                                     
- ├─ Storage Capacity (first 499999 GB)                    1,000  GB                            $22.00 
- ├─ Storage Capacity (over 499999 GB)                         0  GB                             $0.00 
- ├─ Class A requests                                         10  1k API calls                   $0.05 
- ├─ Class B requests                                         10  10k API calls                  $0.04 
- └─ Public Standard Egress (first 50000 GB)               1,000  GB                            $90.00 
- └─ Public Standard Egress (next 100000 GB)                   0  GB                             $0.00 
- └─ Public Standard Egress (over 150000 GB)                   0  GB                             $0.00 
-                                                                                                      
- OVERALL TOTAL                                                                                $485.43 
+ Name                                                Monthly Qty  Unit                      Monthly Cost 
+                                                                                                         
+ ibm_cos_bucket.accelerated-archive-us-south                                                             
+ ├─ Accelerated Archive Capacity              Monthly cost depends on usage: $0.00418 per GB             
+ ├─ Accelerated Archive Restore               Monthly cost depends on usage: $0.0418 per GB              
+ ├─ Storage Capacity (first 499999 GB)        Monthly cost depends on usage: $0.02299 per GB             
+ ├─ Storage Capacity (over 499999 GB)         Monthly cost depends on usage: $0.0209 per GB              
+ ├─ Class A requests                          Monthly cost depends on usage: $0.005225 per 1k API calls  
+ ├─ Class B requests                          Monthly cost depends on usage: $0.00418 per 10k API calls  
+ └─ Public Standard Egress (first 50000 GB)   Monthly cost depends on usage: $0.09 per GB                
+ └─ Public Standard Egress (next 100000 GB)   Monthly cost depends on usage: $0.07 per GB                
+ └─ Public Standard Egress (over 150000 GB)   Monthly cost depends on usage: $0.05 per GB                
+                                                                                                         
+ ibm_cos_bucket.archive-us-south                                                                         
+ ├─ Archive Capacity                                       1,000  GB                               $1.03 
+ ├─ Archive Restore                                        1,000  GB                              $20.90 
+ ├─ Storage Capacity (first 499999 GB)        Monthly cost depends on usage: $0.02299 per GB             
+ ├─ Storage Capacity (over 499999 GB)         Monthly cost depends on usage: $0.0209 per GB              
+ ├─ Class A requests                          Monthly cost depends on usage: $0.005225 per 1k API calls  
+ ├─ Class B requests                          Monthly cost depends on usage: $0.00418 per 10k API calls  
+ └─ Public Standard Egress (first 50000 GB)   Monthly cost depends on usage: $0.09 per GB                
+ └─ Public Standard Egress (next 100000 GB)   Monthly cost depends on usage: $0.07 per GB                
+ └─ Public Standard Egress (over 150000 GB)   Monthly cost depends on usage: $0.05 per GB                
+                                                                                                         
+ ibm_cos_bucket.aspera-us                                                                                
+ ├─ Aspera Egress (first 50000 GB)                         1,000  GB                              $83.60 
+ ├─ Aspera Egress (next 100000 GB)                             0  GB                               $0.00 
+ ├─ Aspera Egress (over 150000 GB)                             0  GB                               $0.00 
+ ├─ Aspera Ingress Free                                    1,000  GB                               $0.00 
+ ├─ Storage Capacity (first 499999 GB)        Monthly cost depends on usage: $0.03135 per GB             
+ ├─ Storage Capacity (over 499999 GB)         Monthly cost depends on usage: $0.02717 per GB             
+ ├─ Class A requests                          Monthly cost depends on usage: $0.005225 per 1k API calls  
+ ├─ Class B requests                          Monthly cost depends on usage: $0.00418 per 10k API calls  
+ └─ Public Standard Egress (first 50000 GB)   Monthly cost depends on usage: $0.09 per GB                
+ └─ Public Standard Egress (next 100000 GB)   Monthly cost depends on usage: $0.07 per GB                
+ └─ Public Standard Egress (over 150000 GB)   Monthly cost depends on usage: $0.05 per GB                
+                                                                                                         
+ ibm_cos_bucket.lite-us-south                                                                            
+ └─ Lite Plan Bucket                                           1  Instance                         $0.00 
+                                                                                                         
+ ibm_cos_bucket.one-rate-us-south                                                                        
+ ├─ Storage Capacity                          Monthly cost depends on usage: $0.0418 per GB              
+ ├─ Free Class A requests                     Monthly cost depends on usage: $0.00 per 1k API calls      
+ ├─ Class A requests                          Monthly cost depends on usage: $0.005225 per 1k API calls  
+ ├─ Free Class B requests                     Monthly cost depends on usage: $0.00 per 10k API calls     
+ ├─ Class B requests                          Monthly cost depends on usage: $0.00418 per 10k API calls  
+ ├─ Free Public Egress                        Monthly cost depends on usage: $0.00 per GB                
+ └─ Public Egress                             Monthly cost depends on usage: $0.05 per GB                
+                                                                                                         
+ ibm_cos_bucket.one-rate-us-south-usage                                                                  
+ ├─ Storage Capacity                                       1,000  GB                              $41.80 
+ ├─ Free Class A requests                                    100  1k API calls                     $0.00 
+ ├─ Class A requests                                         900  1k API calls                     $4.70 
+ ├─ Free Class B requests                                     10  10k API calls                    $0.00 
+ ├─ Class B requests                                         990  10k API calls                    $4.14 
+ └─ Free Public Egress                                     1,000  GB                               $0.00 
+                                                                                                         
+ ibm_cos_bucket.smart-us-south                                                                           
+ ├─ Storage Capacity (first 499999 GB)                     1,000  GB                              $21.95 
+ ├─ Storage Capacity (next 999500000 GB)                       0  GB                               $0.00 
+ ├─ Storage Capacity (over 999999999 GB)                       0  GB                               $0.00 
+ ├─ Class A requests                                          10  1k API calls                     $0.05 
+ ├─ Class B requests                                          10  10k API calls                    $0.05 
+ └─ Public Standard Egress (first 50000 GB)                1,000  GB                              $90.00 
+ └─ Public Standard Egress (next 100000 GB)                    0  GB                               $0.00 
+ └─ Public Standard Egress (over 150000 GB)                    0  GB                               $0.00 
+                                                                                                         
+ ibm_cos_bucket.standard-ams03                                                                           
+ ├─ Storage Capacity (first 499999 GB)                     1,000  GB                              $23.72 
+ ├─ Storage Capacity (over 499999 GB)                          0  GB                               $0.00 
+ ├─ Class A requests                                          10  1k API calls                     $0.05 
+ ├─ Class B requests                                          10  10k API calls                    $0.04 
+ └─ Public Standard Egress (first 50000 GB)                1,000  GB                              $90.00 
+ └─ Public Standard Egress (next 100000 GB)                    0  GB                               $0.00 
+ └─ Public Standard Egress (over 150000 GB)                    0  GB                               $0.00 
+                                                                                                         
+ ibm_cos_bucket.standard-ap                                                                              
+ ├─ Storage Capacity (first 499999 GB)        Monthly cost depends on usage: $0.0354255 per GB           
+ ├─ Storage Capacity (over 499999 GB)         Monthly cost depends on usage: $0.030723 per GB            
+ ├─ Class A requests                          Monthly cost depends on usage: $0.005225 per 1k API calls  
+ ├─ Class B requests                          Monthly cost depends on usage: $0.00418 per 10k API calls  
+ └─ Public Standard Egress (first 50000 GB)   Monthly cost depends on usage: $0.14 per GB                
+ └─ Public Standard Egress (next 100000 GB)   Monthly cost depends on usage: $0.11 per GB                
+ └─ Public Standard Egress (over 150000 GB)   Monthly cost depends on usage: $0.08 per GB                
+                                                                                                         
+ ibm_cos_bucket.standard-us-south                                                                        
+ ├─ Storage Capacity (first 499999 GB)                     1,000  GB                              $22.99 
+ ├─ Storage Capacity (over 499999 GB)                          0  GB                               $0.00 
+ ├─ Class A requests                                          10  1k API calls                     $0.05 
+ ├─ Class B requests                                          10  10k API calls                    $0.04 
+ └─ Public Standard Egress (first 50000 GB)                1,000  GB                              $90.00 
+ └─ Public Standard Egress (next 100000 GB)                    0  GB                               $0.00 
+ └─ Public Standard Egress (over 150000 GB)                    0  GB                               $0.00 
+                                                                                                         
+ OVERALL TOTAL                                                                                   $495.12 
 ──────────────────────────────────
 14 cloud resources were detected:
 ∙ 13 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

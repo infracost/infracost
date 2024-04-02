@@ -3,7 +3,7 @@ terraform {
   required_providers {
     ibm = {
       source  = "IBM-Cloud/ibm"
-      version = "1.61.0"
+      version = "1.63.0"
     }
   }
 }
@@ -30,6 +30,11 @@ resource "ibm_database" "test_db1" {
       allocation_count = 3
     }
   }
+  configuration = <<CONFIGURATION
+  {
+    "max_connections": 400
+  }
+  CONFIGURATION
 }
 
 resource "ibm_database" "test_db2" {
@@ -47,4 +52,9 @@ resource "ibm_database" "test_db2" {
       allocation_count = 4
     }
   }
+  configuration = <<CONFIGURATION
+  {
+    "max_connections": 400
+  }
+  CONFIGURATION
 }
