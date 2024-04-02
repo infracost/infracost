@@ -60,15 +60,15 @@
  ├─ Custom Instance RAM (Linux/UNIX, preemptible, N1 20 GB)                730  hours        $13.04 
  └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40 
                                                                                                     
- google_compute_instance.custom_n2d                                                                 
- ├─ Custom instance CPU (Linux/UNIX, preemptible, N2D 4 vCPUs)             730  hours        $16.94 
- ├─ Custom Instance RAM (Linux/UNIX, preemptible, N2D 20 GB)               730  hours        $11.39 
- └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40 
-                                                                                                    
  google_compute_instance.preemptible_local_ssd                                                      
  ├─ Instance usage (Linux/UNIX, preemptible, f1-micro)                     730  hours         $2.56 
  ├─ Standard provisioned storage (pd-standard)                              10  GB            $0.40 
- └─ Local SSD provisioned storage                                          375  GB           $23.78 
+ └─ Local SSD provisioned storage                                          375  GB           $27.34 
+                                                                                                    
+ google_compute_instance.custom_n2d                                                                 
+ ├─ Custom instance CPU (Linux/UNIX, preemptible, N2D 4 vCPUs)             730  hours        $15.27 
+ ├─ Custom Instance RAM (Linux/UNIX, preemptible, N2D 20 GB)               730  hours        $10.21 
+ └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40 
                                                                                                     
  google_compute_instance.ssd                                                                        
  ├─ Instance usage (Linux/UNIX, on-demand, f1-micro)                       730  hours         $3.88 
@@ -86,7 +86,7 @@
  ├─ Instance usage (Linux/UNIX, on-demand, f1-micro)                       100  hours         $0.76 
  └─ Standard provisioned storage (pd-standard)                              10  GB            $0.40 
                                                                                                     
- OVERALL TOTAL                                                                           $10,249.60 
+ OVERALL TOTAL                                                                           $10,250.32 
 ──────────────────────────────────
 19 cloud resources were detected:
 ∙ 18 were estimated

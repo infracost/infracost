@@ -41,10 +41,30 @@
  ├─ Storage (general purpose SSD, gp2)                                       30  GB                             $6.90 
  └─ Additional backup storage                                             1,000  GB                            $95.00 
                                                                                                                       
+ aws_db_instance.extended_support["aurora-postgresql-11"]                                                             
+ ├─ Database instance (on-demand, Single-AZ, db.t3.large)                   730  hours                        $119.72 
+ ├─ Storage (general purpose SSD, gp2)                                       20  GB                             $2.30 
+ └─ Extended support (year 1)                                             1,460  vCPU-hours                   $146.00 
+                                                                                                                      
+ aws_db_instance.extended_support["aurora-postgresql-11.22"]                                                          
+ ├─ Database instance (on-demand, Single-AZ, db.t3.large)                   730  hours                        $119.72 
+ ├─ Storage (general purpose SSD, gp2)                                       20  GB                             $2.30 
+ └─ Extended support (year 1)                                             1,460  vCPU-hours                   $146.00 
+                                                                                                                      
  aws_db_instance.sqlserver-web                                                                                        
  ├─ Database instance (on-demand, Single-AZ, db.t3.large)                   730  hours                        $169.36 
  ├─ Storage (general purpose SSD, gp2)                                       20  GB                             $2.30 
  └─ Additional backup storage                                             1,000  GB                            $95.00 
+                                                                                                                      
+ aws_db_instance.extended_support["postgres-11"]                                                                      
+ ├─ Database instance (on-demand, Single-AZ, db.t3.large)                   730  hours                        $105.85 
+ ├─ Storage (general purpose SSD, gp2)                                       20  GB                             $2.30 
+ └─ Extended support (year 1)                                             1,460  vCPU-hours                   $146.00 
+                                                                                                                      
+ aws_db_instance.extended_support["postgres-11.22"]                                                                   
+ ├─ Database instance (on-demand, Single-AZ, db.t3.large)                   730  hours                        $105.85 
+ ├─ Storage (general purpose SSD, gp2)                                       20  GB                             $2.30 
+ └─ Extended support (year 1)                                             1,460  vCPU-hours                   $146.00 
                                                                                                                       
  aws_db_instance.extended_support["mysql-5.7"]                                                                        
  ├─ Database instance (on-demand, Single-AZ, db.t3.large)                   730  hours                         $99.28 
@@ -138,14 +158,6 @@
  ├─ Database instance (on-demand, Single-AZ, db.t3.large)                   730  hours                        $119.72 
  └─ Storage (general purpose SSD, gp2)                                       20  GB                             $2.30 
                                                                                                                       
- aws_db_instance.extended_support["aurora-postgresql-11"]                                                             
- ├─ Database instance (on-demand, Single-AZ, db.t3.large)                   730  hours                        $119.72 
- └─ Storage (general purpose SSD, gp2)                                       20  GB                             $2.30 
-                                                                                                                      
- aws_db_instance.extended_support["aurora-postgresql-11.22"]                                                          
- ├─ Database instance (on-demand, Single-AZ, db.t3.large)                   730  hours                        $119.72 
- └─ Storage (general purpose SSD, gp2)                                       20  GB                             $2.30 
-                                                                                                                      
  aws_db_instance.extended_support["aurora-postgresql-12"]                                                             
  ├─ Database instance (on-demand, Single-AZ, db.t3.large)                   730  hours                        $119.72 
  └─ Storage (general purpose SSD, gp2)                                       20  GB                             $2.30 
@@ -170,14 +182,6 @@
  ├─ Database instance (on-demand, Single-AZ, db.t4g.small)                  730  hours                         $23.36 
  ├─ Storage (general purpose SSD, gp3)                                      400  GB                            $46.00 
  └─ Provisioned GP3 IOPS (above 12,000)                                   2,000  IOPS                          $40.00 
-                                                                                                                      
- aws_db_instance.extended_support["postgres-11"]                                                                      
- ├─ Database instance (on-demand, Single-AZ, db.t3.large)                   730  hours                        $105.85 
- └─ Storage (general purpose SSD, gp2)                                       20  GB                             $2.30 
-                                                                                                                      
- aws_db_instance.extended_support["postgres-11.22"]                                                                   
- ├─ Database instance (on-demand, Single-AZ, db.t3.large)                   730  hours                        $105.85 
- └─ Storage (general purpose SSD, gp2)                                       20  GB                             $2.30 
                                                                                                                       
  aws_db_instance.extended_support["postgres-12"]                                                                      
  ├─ Database instance (on-demand, Single-AZ, db.t3.large)                   730  hours                        $105.85 
@@ -302,7 +306,7 @@
  ├─ Database instance (reserved, Single-AZ, db.t3.large)                    730  hours                          $0.00 
  └─ Storage (general purpose SSD, gp2)                                       20  GB                             $2.30 
                                                                                                                       
- OVERALL TOTAL                                                                                             $11,296.39 
+ OVERALL TOTAL                                                                                             $11,880.39 
 ──────────────────────────────────
 68 cloud resources were detected:
 ∙ 68 were estimated
@@ -310,5 +314,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestDBInstanceGoldenFile                           ┃ $11,296      ┃
+┃ TestDBInstanceGoldenFile                           ┃ $11,880      ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
