@@ -51,7 +51,24 @@ func (r *SecurityCenterSubscriptionPricing) CoreType() string {
 
 // UsageSchema defines a list which represents the usage schema of SecurityCenterSubscriptionPricing.
 func (r *SecurityCenterSubscriptionPricing) UsageSchema() []*schema.UsageItem {
-	return []*schema.UsageItem{}
+	return []*schema.UsageItem{
+		{Key: "monthly_servers_plan_1_nodes", DefaultValue: 0.0, ValueType: schema.Float64},
+		{Key: "monthly_servers_plan_2_nodes", DefaultValue: 0.0, ValueType: schema.Float64},
+		{Key: "monthly_containers_vcores", DefaultValue: 0.0, ValueType: schema.Float64},
+		{Key: "monthly_container_registry_images", DefaultValue: 0.0, ValueType: schema.Float64},
+		{Key: "monthly_sql_azure_connected_instances", DefaultValue: 0.0, ValueType: schema.Float64},
+		{Key: "monthly_sql_outside_azure_vcores", DefaultValue: 0.0, ValueType: schema.Float64},
+		{Key: "monthly_mysql_instances", DefaultValue: 0.0, ValueType: schema.Float64},
+		{Key: "monthly_postgresql_instances", DefaultValue: 0.0, ValueType: schema.Float64},
+		{Key: "monthly_mariadb_instances", DefaultValue: 0.0, ValueType: schema.Float64},
+		{Key: "cosmosdb_request_units", DefaultValue: 0.0, ValueType: schema.Float64},
+		{Key: "monthly_storage_accounts", DefaultValue: 0.0, ValueType: schema.Float64},
+		{Key: "monthly_app_service_nodes", DefaultValue: 0.0, ValueType: schema.Float64},
+		{Key: "monthly_key_vaults", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "monthly_arm_subscriptions", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "monthly_dns_queries", DefaultValue: 0, ValueType: schema.Int64},
+		{Key: "monthly_kubernetes_cores", DefaultValue: 0.0, ValueType: schema.Float64},
+	}
 }
 
 // PopulateUsage parses the u schema.UsageData into the SecurityCenterSubscriptionPricing.
