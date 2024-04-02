@@ -18,6 +18,7 @@ import (
 type RemoteVariablesLoader struct {
 	client         *extclient.AuthedAPIClient
 	localWorkspace string
+	remoteConfig   *TFCRemoteConfig
 	newSpinner     ui.SpinnerFunc
 	logger         zerolog.Logger
 }
@@ -83,6 +84,15 @@ func RemoteVariablesLoaderWithSpinner(f ui.SpinnerFunc) RemoteVariablesLoaderOpt
 	}
 }
 
+// RemoteVariablesLoaderWithRemoteConfig sets a user defined configuration for
+// the RemoteVariablesLoader. This is normally done to override the configuration
+// detected from the HCL blocks.
+func RemoteVariablesLoaderWithRemoteConfig(config TFCRemoteConfig) RemoteVariablesLoaderOption {
+	return func(r *RemoteVariablesLoader) {
+		r.remoteConfig = &config
+	}
+}
+
 // NewRemoteVariablesLoader constructs a new loader for fetching remote variables.
 func NewRemoteVariablesLoader(client *extclient.AuthedAPIClient, localWorkspace string, logger zerolog.Logger, opts ...RemoteVariablesLoaderOption) *RemoteVariablesLoader {
 	if localWorkspace == "" {
@@ -108,47 +118,51 @@ func (r *RemoteVariablesLoader) Load(blocks Blocks) (map[string]cty.Value, error
 	spinnerMsg := "Downloading Terraform remote variables"
 	vars := map[string]cty.Value{}
 
-	var err error
-	config := r.getCloudOrganizationWorkspace(blocks)
-	if !config.valid() {
-		config, err = r.getBackendOrganizationWorkspace(blocks)
-
-		if err != nil {
-			var spinner *ui.Spinner
-			if r.newSpinner != nil {
-				// In case name prefix is set, but workspace flag is missing show the
-				// failed spinner message. Otherwise the remote variables loading is
-				// skipped entirely.
-				spinner = r.newSpinner(spinnerMsg)
-				spinner.Fail()
-			}
-			return vars, err
-		}
-
+	var config TFCRemoteConfig
+	if r.remoteConfig != nil {
+		config = *r.remoteConfig
+	} else {
+		var err error
+		config = r.getCloudOrganizationWorkspace(blocks)
 		if !config.valid() {
-			return vars, nil
+			config, err = r.getBackendOrganizationWorkspace(blocks)
+			if err != nil {
+				var spinner *ui.Spinner
+				if r.newSpinner != nil {
+					// In case name prefix is set, but workspace flag is missing show the
+					// failed spinner message. Otherwise the remote variables loading is
+					// skipped entirely.
+					spinner = r.newSpinner(spinnerMsg)
+					spinner.Fail()
+				}
+				return vars, err
+			}
+
+			if !config.valid() {
+				return vars, nil
+			}
 		}
 	}
 
-	if config.host != "" {
-		r.client.SetHost(config.host)
+	if config.Host != "" {
+		r.client.SetHost(config.Host)
 	}
 
-	endpoint := fmt.Sprintf("/api/v2/organizations/%s/workspaces/%s", config.organization, config.workspace)
+	endpoint := fmt.Sprintf("/api/v2/organizations/%s/workspaces/%s", config.Organization, config.Workspace)
 	body, err := r.client.Get(endpoint)
 	if err != nil {
-		r.logger.Warn().Err(err).Msgf("could not request Terraform workspace: %s for organization: %s", config.workspace, config.organization)
+		r.logger.Warn().Err(err).Msgf("could not request Terraform workspace: %s for organization: %s", config.Workspace, config.Organization)
 		return vars, nil
 	}
 
 	var workspaceResponse tfcWorkspaceResponse
 	if json.Unmarshal(body, &workspaceResponse) != nil {
-		r.logger.Warn().Err(err).Msgf("malformed Terraform API response using workspace: %s organization: %s", config.workspace, config.organization)
+		r.logger.Warn().Err(err).Msgf("malformed Terraform API response using workspace: %s organization: %s", config.Workspace, config.Organization)
 		return vars, nil
 	}
 
 	if workspaceResponse.Data.Attributes.ExecutionMode == "local" {
-		r.logger.Debug().Msgf("Terraform workspace %s does use local execution, skipping downloading remote variables", config.workspace)
+		r.logger.Debug().Msgf("Terraform workspace %s does use local execution, skipping downloading remote variables", config.Workspace)
 		return vars, nil
 	}
 
@@ -251,26 +265,26 @@ func (r *RemoteVariablesLoader) Load(blocks Blocks) (map[string]cty.Value, error
 	return vars, nil
 }
 
-type remoteConfig struct {
-	organization string
-	workspace    string
-	host         string
+type TFCRemoteConfig struct {
+	Organization string
+	Workspace    string
+	Host         string
 }
 
-func (c remoteConfig) valid() bool {
-	return c.organization != "" && c.workspace != ""
+func (c TFCRemoteConfig) valid() bool {
+	return c.Organization != "" && c.Workspace != ""
 }
 
-func (r *RemoteVariablesLoader) getCloudOrganizationWorkspace(blocks Blocks) remoteConfig {
-	var conf remoteConfig
+func (r *RemoteVariablesLoader) getCloudOrganizationWorkspace(blocks Blocks) TFCRemoteConfig {
+	var conf TFCRemoteConfig
 
 	for _, block := range blocks.OfType("terraform") {
 		for _, c := range block.childBlocks.OfType("cloud") {
-			conf.organization = getAttribute(c, "organization")
-			conf.host = getAttribute(c, "hostname")
+			conf.Organization = getAttribute(c, "organization")
+			conf.Host = getAttribute(c, "hostname")
 
 			for _, cc := range c.childBlocks.OfType("workspaces") {
-				conf.workspace = getAttribute(cc, "name")
+				conf.Workspace = getAttribute(cc, "name")
 				return conf
 			}
 		}
@@ -279,8 +293,8 @@ func (r *RemoteVariablesLoader) getCloudOrganizationWorkspace(blocks Blocks) rem
 	return conf
 }
 
-func (r *RemoteVariablesLoader) getBackendOrganizationWorkspace(blocks Blocks) (remoteConfig, error) {
-	var conf remoteConfig
+func (r *RemoteVariablesLoader) getBackendOrganizationWorkspace(blocks Blocks) (TFCRemoteConfig, error) {
+	var conf TFCRemoteConfig
 
 	for _, block := range blocks.OfType("terraform") {
 		for _, c := range block.childBlocks.OfType("backend") {
@@ -288,14 +302,14 @@ func (r *RemoteVariablesLoader) getBackendOrganizationWorkspace(blocks Blocks) (
 				continue
 			}
 
-			conf.organization = getAttribute(c, "organization")
-			conf.host = getAttribute(c, "hostname")
+			conf.Organization = getAttribute(c, "organization")
+			conf.Host = getAttribute(c, "hostname")
 
 			for _, cc := range c.childBlocks.OfType("workspaces") {
 				name := getAttribute(cc, "name")
 
 				if name != "" {
-					conf.workspace = name
+					conf.Workspace = name
 					return conf, nil
 				}
 
@@ -306,7 +320,7 @@ func (r *RemoteVariablesLoader) getBackendOrganizationWorkspace(blocks Blocks) (
 						return conf, errors.Errorf("--terraform-workspace is not specified. Unable to detect organization or workspace.")
 					}
 
-					conf.workspace = namePrefix + r.localWorkspace
+					conf.Workspace = namePrefix + r.localWorkspace
 					return conf, nil
 				}
 			}

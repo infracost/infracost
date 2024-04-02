@@ -86,6 +86,10 @@ type Project struct {
 	TerraformBinary string `yaml:"terraform_binary,omitempty" envconfig:"TERRAFORM_BINARY"`
 	// TerraformWorkspace is an optional field used to set the Terraform workspace
 	TerraformWorkspace string `yaml:"terraform_workspace,omitempty" envconfig:"TERRAFORM_WORKSPACE"`
+	// TerraformCloudWorkspace is used to override the terraform configuration blocks workspace value.
+	TerraformCloudWorkspace string `yaml:"terraform_cloud_workspace,omitempty" envconfig:"TERRAFORM_CLOUD_WORKSPACE"`
+	// TerraformCloudOrg is used to override the terraform configuration blocks organization value.
+	TerraformCloudOrg string `yaml:"terraform_cloud_org,omitempty" envconfig:"TERRAFORM_CLOUD_ORG"`
 	// TerraformCloudHost is used to override the default app.terraform.io backend host. Only applicable for
 	// terraform cloud/enterprise users.
 	TerraformCloudHost string `yaml:"terraform_cloud_host,omitempty" envconfig:"TERRAFORM_CLOUD_HOST"`
