@@ -19,6 +19,8 @@
 <summary>Cost details</summary>
 
 ```
+Key: * usage cost, ~ changed, + added, - removed
+
 ──────────────────────────────────
 Project: infracost/infracost/cmd/infracost/testdata/breakdown_multi_project_with_error/prod
 Module path: prod
@@ -55,7 +57,7 @@ Errors:
         Either a quoted string block label or an opening brace ("{") is expected here. (and 1 other messages)
 
 ──────────────────────────────────
-Key: ~ changed, + added, - removed
+Key: * usage cost, ~ changed, + added, - removed
 
 1 cloud resource was detected:
 ∙ 1 was estimated

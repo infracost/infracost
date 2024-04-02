@@ -16,6 +16,8 @@
 ### Cost details ###
 
 ```
+Key: * usage cost, ~ changed, + added, - removed
+
 ──────────────────────────────────
 Project: my first project
 
@@ -99,7 +101,7 @@ Amount:  -$561 ($1,303 → $743)
 Percent: -43%
 
 ──────────────────────────────────
-Key: ~ changed, + added, - removed
+Key: * usage cost, ~ changed, + added, - removed
 
 18 cloud resources were detected:
 ∙ 18 were estimated

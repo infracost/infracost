@@ -1,3 +1,5 @@
+Key: * usage cost, ~ changed, + added, - removed
+
 ──────────────────────────────────
 Project: infracost/infracost/cmd/infracost/testdata/diff_prior_empty_project
 
@@ -24,7 +26,7 @@ Monthly cost change for infracost/infracost/cmd/infracost/testdata/diff_prior_em
 Amount:  +$743 ($0.00 → $743)
 
 ──────────────────────────────────
-Key: ~ changed, + added, - removed
+Key: * usage cost, ~ changed, + added, - removed
 
 1 cloud resource was detected:
 ∙ 1 was estimated

@@ -1,3 +1,5 @@
+Key: * usage cost, ~ changed, + added, - removed
+
 ──────────────────────────────────
 Project: infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to/dev
 Module path: dev
@@ -27,7 +29,7 @@ Amount:  +$561 ($743 → $1,303)
 Percent: +75%
 
 ──────────────────────────────────
-Key: ~ changed, + added, - removed
+Key: * usage cost, ~ changed, + added, - removed
 
 2 cloud resources were detected:
 ∙ 2 were estimated

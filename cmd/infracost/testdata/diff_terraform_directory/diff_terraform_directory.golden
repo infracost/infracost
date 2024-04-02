@@ -1,3 +1,5 @@
+Key: * usage cost, ~ changed, + added, - removed
+
 ──────────────────────────────────
 Project: infracost/infracost/examples/terraform
 
@@ -39,7 +41,7 @@ Monthly cost change for infracost/infracost/examples/terraform
 Amount:  +$743 ($0.00 → $743)
 
 ──────────────────────────────────
-Key: ~ changed, + added, - removed
+Key: * usage cost, ~ changed, + added, - removed
 
 2 cloud resources were detected:
 ∙ 2 were estimated

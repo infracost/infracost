@@ -1,3 +1,5 @@
+Key: * usage cost, ~ changed, + added, - removed
+
 ──────────────────────────────────
 Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
 
@@ -84,7 +86,7 @@ Amount:  +$187 ($187 → $373)
 Percent: +100%
 
 ──────────────────────────────────
-Key: ~ changed, + added, - removed
+Key: * usage cost, ~ changed, + added, - removed
 
 26 cloud resources were detected:
 ∙ 14 were estimated

@@ -1,3 +1,5 @@
+Key: * usage cost, ~ changed, + added, - removed
+
 ──────────────────────────────────
 Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
 
@@ -58,7 +60,7 @@ Monthly cost change for infracost/infracost/cmd/infracost/testdata/example_plan.
 Amount:  +$1,361 ($0.00 → $1,361)
 
 ──────────────────────────────────
-Key: ~ changed, + added, - removed
+Key: * usage cost, ~ changed, + added, - removed
 
 5 cloud resources were detected:
 ∙ 5 were estimated
