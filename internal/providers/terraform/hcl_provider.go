@@ -123,10 +123,20 @@ func NewHCLProvider(ctx *config.ProjectContext, rootPath hcl.RootPath, config *H
 	})
 	localWorkspace := ctx.ProjectConfig.TerraformWorkspace
 	if err == nil {
+		var loaderOpts []hcl.RemoteVariablesLoaderOption
+		if ctx.ProjectConfig.TerraformCloudWorkspace != "" && ctx.ProjectConfig.TerraformCloudOrg != "" {
+			loaderOpts = append(loaderOpts, hcl.RemoteVariablesLoaderWithRemoteConfig(hcl.TFCRemoteConfig{
+				Organization: ctx.ProjectConfig.TerraformCloudOrg,
+				Workspace:    ctx.ProjectConfig.TerraformCloudWorkspace,
+				Host:         credsSource.BaseCredentialSet.Host,
+			}))
+		}
+
 		options = append(options, hcl.OptionWithRemoteVarLoader(
 			credsSource.BaseCredentialSet.Host,
 			credsSource.BaseCredentialSet.Token,
-			localWorkspace),
+			localWorkspace,
+			loaderOpts...),
 		)
 	}
 

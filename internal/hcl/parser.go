@@ -205,13 +205,12 @@ func OptionWithRawCtyInput(input cty.Value) (op Option) {
 
 // OptionWithRemoteVarLoader accepts Terraform Cloud/Enterprise host and token
 // values to load remote execution variables.
-func OptionWithRemoteVarLoader(host, token, localWorkspace string) Option {
+func OptionWithRemoteVarLoader(host, token, localWorkspace string, loaderOpts ...RemoteVariablesLoaderOption) Option {
 	return func(p *Parser) {
 		if host == "" || token == "" {
 			return
 		}
 
-		var loaderOpts []RemoteVariablesLoaderOption
 		if p.newSpinner != nil {
 			loaderOpts = append(loaderOpts, RemoteVariablesLoaderWithSpinner(p.newSpinner))
 		}
