@@ -6,6 +6,14 @@
  ├─ Performance Insights Long Term Retention (db.r4.8xlarge)                                 32  vCPU-month                       $165.89 
  └─ Performance Insights API                                                Monthly cost depends on usage: $0.01 per 1000 requests        
                                                                                                                                           
+ aws_rds_cluster_instance.extended_support["aurora-postgresql-11"]                                                                        
+ ├─ Database instance (on-demand, db.t3.large)                                              730  hours                            $119.72 
+ └─ Extended support (year 1)                                                             1,460  vCPU-hours                       $146.00 
+                                                                                                                                          
+ aws_rds_cluster_instance.extended_support["aurora-postgresql-11.22"]                                                                     
+ ├─ Database instance (on-demand, db.t3.large)                                              730  hours                            $119.72 
+ └─ Extended support (year 1)                                                             1,460  vCPU-hours                       $146.00 
+                                                                                                                                          
  aws_rds_cluster_instance.cluster_instance                                                                                                
  └─ Database instance (on-demand, db.r4.large)                                              730  hours                            $211.70 
                                                                                                                                           
@@ -28,12 +36,6 @@
  └─ Database instance (on-demand, db.t3.large)                                              730  hours                            $119.72 
                                                                                                                                           
  aws_rds_cluster_instance.extended_support["aurora-mysql-8.0.36"]                                                                         
- └─ Database instance (on-demand, db.t3.large)                                              730  hours                            $119.72 
-                                                                                                                                          
- aws_rds_cluster_instance.extended_support["aurora-postgresql-11"]                                                                        
- └─ Database instance (on-demand, db.t3.large)                                              730  hours                            $119.72 
-                                                                                                                                          
- aws_rds_cluster_instance.extended_support["aurora-postgresql-11.22"]                                                                     
  └─ Database instance (on-demand, db.t3.large)                                              730  hours                            $119.72 
                                                                                                                                           
  aws_rds_cluster_instance.extended_support["aurora-postgresql-12"]                                                                        
@@ -79,7 +81,7 @@
  ├─ Backtrack                                                               Monthly cost depends on usage: $0.012 per 1M change-records   
  └─ Snapshot export                                                         Monthly cost depends on usage: $0.01 per GB                   
                                                                                                                                           
- OVERALL TOTAL                                                                                                                  $5,525.24 
+ OVERALL TOTAL                                                                                                                  $5,817.24 
 ──────────────────────────────────
 22 cloud resources were detected:
 ∙ 22 were estimated
@@ -87,5 +89,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestRDSClusterInstanceGoldenFile                   ┃ $5,525       ┃
+┃ TestRDSClusterInstanceGoldenFile                   ┃ $5,817       ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
