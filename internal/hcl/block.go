@@ -1298,6 +1298,10 @@ func (b *Block) Key() *string {
 }
 
 func (b *Block) Label() string {
+	if b == nil || b.HCLBlock == nil {
+		return ""
+	}
+
 	return strings.Join(b.HCLBlock.Labels, ".")
 }
 
