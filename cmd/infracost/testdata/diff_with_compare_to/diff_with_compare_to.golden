@@ -1,3 +1,5 @@
+Key: * usage cost, ~ changed, + added, - removed
+
 ──────────────────────────────────
 Project: infracost/infracost/cmd/infracost/testdata/diff_with_compare_to
 
@@ -31,7 +33,7 @@ Amount:  -$743 ($2,046 → $1,303)
 Percent: -36%
 
 ──────────────────────────────────
-Key: ~ changed, + added, - removed
+Key: * usage cost, ~ changed, + added, - removed
 
 1 cloud resource was detected:
 ∙ 1 was estimated

@@ -1,3 +1,5 @@
+Key: * usage cost, ~ changed, + added, - removed
+
 ──────────────────────────────────
 Project: infracost/infracost/examples/terragrunt/dev
 Module path: dev
@@ -81,7 +83,7 @@ Monthly cost change for infracost/infracost/examples/terragrunt/prod (Module pat
 Amount:  +$748 ($0.00 → $748)
 
 ──────────────────────────────────
-Key: ~ changed, + added, - removed
+Key: * usage cost, ~ changed, + added, - removed
 
 4 cloud resources were detected:
 ∙ 4 were estimated

@@ -19,6 +19,8 @@
 <summary>Cost details</summary>
 
 ```
+Key: * usage cost, ~ changed, + added, - removed
+
 ──────────────────────────────────
 Project: different_name_plan
 
@@ -40,7 +42,7 @@ Amount:  $0.00 ($41 → $41)
 Percent: 0%
 
 ──────────────────────────────────
-Key: ~ changed, + added, - removed
+Key: * usage cost, ~ changed, + added, - removed
 
 ```
 </details>

@@ -1,3 +1,5 @@
+Key: * usage cost, ~ changed, + added, - removed
+
 ──────────────────────────────────
 Project: my first project
 Module path: terraform
@@ -182,7 +184,7 @@ Amount:  -$420 ($743 → $322)
 Percent: -57%
 
 ──────────────────────────────────
-Key: ~ changed, + added, - removed
+Key: * usage cost, ~ changed, + added, - removed
 
 18 cloud resources were detected:
 ∙ 18 were estimated

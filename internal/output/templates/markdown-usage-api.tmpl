@@ -38,7 +38,7 @@
 {{- end }}
 
 {{- define "summaryRow"}}
-| {{ truncateMiddle .Name 64 "..." }}{{- range .MetadataFields }} | {{ . }} {{- end }} | {{ formatCostChange .PastBaselineCost .BaselineCost }} | {{ formatCostChange .PastUsageCost .UsageCost }} | {{ formatCostChange .PastCost .Cost }} | {{ formatCost .Cost }} |
+| {{ truncateMiddle .Name 64 "..." }}{{- range .MetadataFields }} | {{ . }} {{- end }} | {{ formatCostChangeWithoutPercent .PastBaselineCost .BaselineCost }} | {{ formatCostChangeWithoutPercent .PastUsageCost .UsageCost }} | {{ formatCostChange .PastCost .Cost }} | {{ formatCost .Cost }} |
 {{- end }}
 
 #### 💰 Infracost report ####

@@ -96,12 +96,12 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 	hasDiffProjects := len(noDiffProjects)+len(erroredProjects) != len(out.Projects)
 
 	if hasDiffProjects {
-		s += fmt.Sprintf("Key: %s changed, %s added, %s removed",
+		keyStr := fmt.Sprintf("Key: * usage cost, %s changed, %s added, %s removed",
 			opChar(UPDATED),
 			opChar(ADDED),
 			opChar(REMOVED),
 		)
-		s += "\n"
+		s = keyStr + "\n\n" + s + keyStr + "\n"
 	}
 
 	if len(noDiffProjects) > 0 && opts.ShowSkipped {
@@ -193,9 +193,9 @@ func tableForDiff(out Root, opts Options) string {
 			t.AppendRow(
 				table.Row{
 					truncateMiddle(project.Name, 64, "..."),
-					formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyBaselineCost(), project.Breakdown.TotalMonthlyBaselineCost(), false),
-					formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyUsageCost, project.Breakdown.TotalMonthlyUsageCost, false),
-					formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyCost, project.Breakdown.TotalMonthlyCost, false),
+					formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyBaselineCost(), project.Breakdown.TotalMonthlyBaselineCost(), false, true),
+					formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyUsageCost, project.Breakdown.TotalMonthlyUsageCost, false, true),
+					formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyCost, project.Breakdown.TotalMonthlyCost, false, false),
 				},
 			)
 
@@ -226,7 +226,7 @@ func tableForDiff(out Root, opts Options) string {
 		t.AppendRow(
 			table.Row{
 				truncateMiddle(project.Name, 64, "..."),
-				formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyCost, project.Breakdown.TotalMonthlyCost, false),
+				formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyCost, project.Breakdown.TotalMonthlyCost, false, false),
 				formatCost(out.Currency, project.Breakdown.TotalMonthlyCost),
 			},
 		)

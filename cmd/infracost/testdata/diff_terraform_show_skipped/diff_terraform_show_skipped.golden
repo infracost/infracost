@@ -1,3 +1,5 @@
+Key: * usage cost, ~ changed, + added, - removed
+
 ──────────────────────────────────
 Project: infracost/infracost/cmd/infracost/testdata/express_route_gateway_plan.json
 
@@ -17,7 +19,7 @@ Monthly cost change for infracost/infracost/cmd/infracost/testdata/express_route
 Amount:  +$343 ($0.00 → $343)
 
 ──────────────────────────────────
-Key: ~ changed, + added, - removed
+Key: * usage cost, ~ changed, + added, - removed
 
 8 cloud resources were detected:
 ∙ 2 were estimated

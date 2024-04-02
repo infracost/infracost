@@ -397,14 +397,14 @@ func breakdownSummaryTable(out Root, opts Options) string {
 		t.AppendHeader(table.Row{
 			"Project",
 			"Baseline cost",
-			"Usage cost",
+			"Usage cost*",
 			"Total cost",
 		})
 
 		t.SetColumnConfigs([]table.ColumnConfig{
 			{Name: "Project", WidthMin: 50},
 			{Name: "Baseline cost", WidthMin: 10},
-			{Name: "Usage cost", WidthMin: 10},
+			{Name: "Usage cost*", WidthMin: 10},
 			{Name: "Total monthly cost", WidthMin: 10},
 		})
 
