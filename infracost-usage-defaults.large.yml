@@ -441,55 +441,55 @@ resource_type_default_usage:
     monthly_outbound_gb: 247 # Monthly number of outbound data transfers in GB.
     monthly_rules_engine_requests: 33000000 # Monthly number of rules engine requests.
   azurerm_cognitive_account:
-    monthly_speech_to_text_standard_hrs: 20
-    monthly_speech_to_text_standard_batch_hrs: 56
-    monthly_speech_to_text_custom_hrs: 17
-    monthly_speech_to_text_custom_batch_hrs: 44
-    monthly_speech_to_text_custom_endpoint_hrs: 372
-    monthly_speech_to_text_custom_training_hrs: 2
-    monthly_speech_to_text_enhanced_add_ons_hrs: 67
-    monthly_speech_to_text_conversation_transcription_multi_channel_audio_hrs: 9.5
-    monthly_text_to_speech_neural_chars: 1_333_333
-    monthly_text_to_speech_custom_neural_training_hrs: 0.4
-    monthly_text_to_speech_custom_neural_chars: 833_333
-    monthly_text_to_speech_custom_neural_endpoint_hrs: 5
-    monthly_text_to_speech_long_audio_chars: 200_000
-    monthly_text_to_speech_personal_voice_profiles: 33
-    monthly_text_to_speech_personal_voice_chars: 833_333
-    monthly_speech_translation_hrs: 8
-    monthly_speaker_verification_transactions: 4_000
-    monthly_speaker_identification_transactions: 2_000
-    monthly_voice_profiles: 100_000
+    monthly_speech_to_text_standard_hrs: 20 # Monthly number of hours of Speech to Text audio hours
+    monthly_speech_to_text_standard_batch_hrs: 56 # Monthly number of hours of Speech to Text audio hours for batch processing
+    monthly_speech_to_text_custom_hrs: 17 # Monthly number of hours of Speech to Text audio hours for Custom Speech Model
+    monthly_speech_to_text_custom_batch_hrs: 44 # Monthly number of hours of Speech to Text audio hours for Custom Speech Model batch processing
+    monthly_speech_to_text_custom_endpoint_hrs: 372 # Monthly number of hours of Speech to Text audio hours for Custom Speech Model endpoint hosting
+    monthly_speech_to_text_custom_training_hrs: 2 # Monthly number of hours of Speech to Text audio hours for Custom Speech Model training
+    monthly_speech_to_text_enhanced_add_ons_hrs: 67 # Monthly number of hours of Speech to Text audio hours for enhanced add-on features
+    monthly_speech_to_text_conversation_transcription_multi_channel_audio_hrs: 9.5 # Monthly number of hours of Speech to Text audio hours for conversation transcription multi-channel audio
+    monthly_text_to_speech_neural_chars: 1_333_333 # Monthly number of characters for Text to Speech with neural voices
+    monthly_text_to_speech_custom_neural_training_hrs: 0.4 # Monthly number of hours of Text to Speech Customized Neural training
+    monthly_text_to_speech_custom_neural_chars: 833_333 # Monthly number of characters for Text to Speech with Custom Ceural Voices
+    monthly_text_to_speech_custom_neural_endpoint_hrs: 5 # Monthly number of hours of Text to Speech Custom Neural Voice endpoint hosting
+    monthly_text_to_speech_long_audio_chars: 200_000 # Monthly number of characters for Text to Speech with Long Audio Creation
+    monthly_text_to_speech_personal_voice_profiles: 33 # Monthly number of personal voice profiles for Text to Speech
+    monthly_text_to_speech_personal_voice_chars: 833_333 # Monthly number of characters for Text to Speech with Personal Voice Profiles
+    monthly_speech_translation_hrs: 8 # Monthly number of hours of Speech Translation audio hours
+    monthly_speaker_verification_transactions: 4_000 # Monthly number of speaker verification transactions
+    monthly_speaker_identification_transactions: 2_000 # Monthly number of speaker identification transactions
+    monthly_voice_profiles: 100_000 # Monthly number of voice profiles
+    # LUIS
+    monthly_luis_text_requests: 13_333 # Monthly number of text requests to LUIS
+    monthly_luis_speech_requests: 3_636 # Monthly number of speech requests to LUIS
+    # TextAnalytics
+    monthly_language_text_analytics_records: 20_000 # Monthly number of Text Analytics records (Sentiment Analysis, Key Phrase Extraction, Language Detection, Named Entity Recognition, PII Detection)
+    monthly_language_summarization_records: 10_000 # Monthly number of summarization records
+    monthly_language_conversational_language_understanding_records: 10_000 # Monthly number of Conversational Language Understanding and Orchestration Workflow records.
+    monthly_language_conversational_language_understanding_advanced_training_hours: 6.7 # Monthly number of Conversational Language Understanding and Orchestration Workflow advanced training hours.
+    monthly_language_customized_text_classification_records: 4_000 # Monthly number of customized text classification records.
+    monthly_language_customized_summarization_records: 5_000 # Monthly number of customized summarization records.
+    monthly_language_customized_question_answering_records: 13_333 # Monthly number of customized question answering records.
+    monthly_language_customized_training_hours: 6.7 # Monthly number of customized training hours.
+    monthly_language_text_analytics_for_health_records: 5_800 # Monthly number of Text Analytics for health records.
   azurerm_cognitive_deployment:
     # SpeechServices
-    monthly_language_input_tokens: 40_000_000
-    monthly_language_output_tokens: 13_333_333
-    monthly_code_interpreter_sessions: 667
-    monthly_base_model_tokens: 2847
-    monthly_fine_tuning_training_hours: 0.4
-    monthly_fine_tuning_hosting_hours: 6.6
-    monthly_fine_tuning_input_tokens: 13_333_333
-    monthly_fine_tuning_output_tokens: 10_000_000
-    monthly_standard_1024_1024_images: 500
-    monthly_standard_1024_1792_images: 250
-    monthly_hd_1024_1024_images: 250
-    monthly_hd_1024_1792_images: 167
-    monthly_text_embedding_tokens: 1_000_000_000
-    monthly_text_to_speech_characters: 1_333_333
-    monthly_text_to_speech_hours: 55.6
-    # LUIS
-    monthly_luis_text_requests: 13_333
-    monthly_luis_speech_requests: 3_636
-    # TextAnalytics
-    monthly_language_text_analytics_records: 20_000
-    monthly_language_summarization_records: 10_000
-    monthly_language_conversational_language_understanding_records: 10_000
-    monthly_language_conversational_language_understanding_advanced_training_hours: 6.7
-    monthly_language_customized_text_classification_records: 4_000
-    monthly_language_customized_summarization_records: 5_000
-    monthly_language_customized_question_answering_records: 13_333
-    monthly_language_customized_training_hours: 6.7
-    monthly_language_text_analytics_for_health_records: 5_800
+    monthly_language_input_tokens: 40_000_000 # Monthly number of language input tokens.
+    monthly_language_output_tokens: 13_333_333 # Monthly number of language output tokens.
+    monthly_code_interpreter_sessions: 667 # Monthly number of code interpreter sessions.
+    monthly_base_model_tokens: 2847 # Monthly number of base model tokens.
+    monthly_fine_tuning_training_hours: 0.4 # Monthly number of fine-tuning training hours.
+    monthly_fine_tuning_hosting_hours: 6.6 # Monthly number of fine-tuning hosting hours.
+    monthly_fine_tuning_input_tokens: 13_333_333 # Monthly number of fine-tuning input tokens.
+    monthly_fine_tuning_output_tokens: 10_000_000 # Monthly number of fine-tuning output tokens.
+    monthly_standard_1024_1024_images: 500 # Monthly number of standard 1024x1024 (low res) images.
+    monthly_standard_1024_1792_images: 250 # Monthly number of standard 1024x1792 (high res) images.
+    monthly_hd_1024_1024_images: 250 # Monthly number of HD 1024x1024 (low res) images.
+    monthly_hd_1024_1792_images: 167 # Monthly number of HD 1024x1792 (high res) images.
+    monthly_text_embedding_tokens: 1_000_000_000 # Monthly number of text embedding tokens.
+    monthly_text_to_speech_characters: 1_333_333 # Monthly number of text to speech characters.
+    monthly_text_to_speech_hours: 55.6 # Monthly number of text to speech hours.
   azurerm_container_registry:
     storage_gb: 200
     monthly_build_vcpu_hrs: 55.5
