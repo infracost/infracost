@@ -3,11 +3,11 @@ package terraform
 import (
 	"os"
 
-	"github.com/infracost/infracost/internal/config"
-	"github.com/infracost/infracost/internal/schema"
-	"github.com/infracost/infracost/internal/ui"
-
 	"github.com/pkg/errors"
+
+	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/logging"
+	"github.com/infracost/infracost/internal/schema"
 )
 
 type StateJSONProvider struct {
@@ -39,12 +39,7 @@ func (p *StateJSONProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 }
 
 func (p *StateJSONProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, error) {
-	spinner := ui.NewSpinner("Extracting only cost-related params from terraform", ui.SpinnerOptions{
-		EnableLogging: p.ctx.RunContext.Config.IsLogging(),
-		NoColor:       p.ctx.RunContext.Config.NoColor,
-		Indent:        "  ",
-	})
-	defer spinner.Fail()
+	logging.Logger.Debug().Msg("Extracting only cost-related params from terraform")
 
 	j, err := os.ReadFile(p.Path)
 	if err != nil {
@@ -73,6 +68,5 @@ func (p *StateJSONProvider) LoadResources(usage schema.UsageMap) ([]*schema.Proj
 	project.PartialPastResources = parsedConf.PastResources
 	project.PartialResources = parsedConf.CurrentResources
 
-	spinner.Success()
 	return []*schema.Project{project}, nil
 }

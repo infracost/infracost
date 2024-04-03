@@ -337,8 +337,9 @@ func (r *parallelRunner) printParallelMsg(queue []projectJob) {
 	}
 }
 
-func (r *parallelRunner) runProvider(job projectJob) (*projectOutput, error) {
-	path := job.provider.Context().ProjectConfig.Path
+func (r *parallelRunner) runProvider(job projectJob) (out *projectOutput, err error) {
+	projectContext := job.provider.Context()
+	path := projectContext.ProjectConfig.Path
 	mux := r.pathMuxs[path]
 	if mux != nil {
 		mux.Lock()
@@ -351,6 +352,14 @@ func (r *parallelRunner) runProvider(job projectJob) (*projectOutput, error) {
 		m += fmt.Sprintf(" - Terraform/Terragrunt directory\n - Terraform plan JSON file, see %s for how to generate this.", ui.SecondaryLinkString("https://infracost.io/troubleshoot"))
 		return nil, clierror.NewCLIError(errors.New(m), "Cannot use Terraform state JSON with the infracost diff command")
 	}
+
+	logging.Logger.Info().Msgf("%s: Starting evaluation", projectContext.ProjectConfig.Name)
+	defer func() {
+		if err != nil {
+			logging.Logger.Info().Msgf("%s: Failed evaluation", projectContext.ProjectConfig.Name)
+		}
+		logging.Logger.Info().Msgf("%s: Finished evaluation", projectContext.ProjectConfig.Name)
+	}()
 
 	m := fmt.Sprintf("Detected %s at %s", job.provider.DisplayType(), ui.DisplayPath(path))
 	if job.provider.Type() == "terraform_dir" {
@@ -365,7 +374,7 @@ func (r *parallelRunner) runProvider(job projectJob) (*projectOutput, error) {
 
 	// Generate usage file
 	if r.runCtx.Config.SyncUsageFile {
-		err := r.generateUsageFile(job.provider)
+		err = r.generateUsageFile(job.provider)
 		if err != nil {
 			return nil, fmt.Errorf("Error generating usage file %w", err)
 		}
@@ -374,9 +383,9 @@ func (r *parallelRunner) runProvider(job projectJob) (*projectOutput, error) {
 	// Load usage data
 	var usageFile *usage.UsageFile
 
-	if job.provider.Context().ProjectConfig.UsageFile != "" {
+	if projectContext.ProjectConfig.UsageFile != "" {
 		var err error
-		usageFile, err = usage.LoadUsageFile(job.provider.Context().ProjectConfig.UsageFile)
+		usageFile, err = usage.LoadUsageFile(projectContext.ProjectConfig.UsageFile)
 		if err != nil {
 			return nil, err
 		}
@@ -391,7 +400,7 @@ func (r *parallelRunner) runProvider(job projectJob) (*projectOutput, error) {
 			)
 		}
 
-		job.provider.Context().ContextValues.SetValue("hasUsageFile", true)
+		projectContext.ContextValues.SetValue("hasUsageFile", true)
 	} else {
 		usageFile = usage.NewBlankUsageFile()
 	}
@@ -421,7 +430,7 @@ func (r *parallelRunner) runProvider(job projectJob) (*projectOutput, error) {
 	}
 
 	usageData := usageFile.ToUsageDataMap()
-	out := &projectOutput{}
+	out = &projectOutput{}
 
 	t1 := time.Now()
 	projects, err := job.provider.LoadResources(usageData)
@@ -434,17 +443,11 @@ func (r *parallelRunner) runProvider(job projectJob) (*projectOutput, error) {
 
 	r.buildResources(projects)
 
-	spinnerOpts := ui.SpinnerOptions{
-		EnableLogging: r.runCtx.Config.IsLogging(),
-		NoColor:       r.runCtx.Config.NoColor,
-		Indent:        "  ",
-	}
-	spinner := ui.NewSpinner("Retrieving cloud prices to calculate costs", spinnerOpts)
-	defer spinner.Fail()
+	logging.Logger.Debug().Msg("Retrieving cloud prices to calculate costs")
 
 	for _, project := range projects {
-		if err := prices.PopulatePrices(r.runCtx, project); err != nil {
-			spinner.Fail()
+		if err = prices.PopulatePrices(r.runCtx, project); err != nil {
+			logging.Logger.Debug().Err(err).Msgf("failed to populate prices for project %s", project.Name)
 			r.cmd.PrintErrln()
 
 			var apiErr *apiclient.APIError
@@ -480,9 +483,7 @@ func (r *parallelRunner) runProvider(job projectJob) (*projectOutput, error) {
 
 	t2 := time.Now()
 	taken := t2.Sub(t1).Milliseconds()
-	job.provider.Context().ContextValues.SetValue("tfProjectRunTimeMs", taken)
-
-	spinner.Success()
+	projectContext.ContextValues.SetValue("tfProjectRunTimeMs", taken)
 
 	if r.runCtx.Config.UsageActualCosts {
 		r.populateActualCosts(projects)
@@ -504,13 +505,7 @@ func (r *parallelRunner) uploadCloudResourceIDs(projects []*schema.Project) erro
 
 	r.runCtx.ContextValues.SetValue("uploadedResourceIds", true)
 
-	spinnerOpts := ui.SpinnerOptions{
-		EnableLogging: r.runCtx.Config.IsLogging(),
-		NoColor:       r.runCtx.Config.NoColor,
-		Indent:        "  ",
-	}
-	spinner := ui.NewSpinner("Sending resource IDs to Infracost Cloud for usage estimates", spinnerOpts)
-	defer spinner.Fail()
+	logging.Logger.Debug().Msg("Sending resource IDs to Infracost Cloud for usage estimates")
 
 	for _, project := range projects {
 		if err := prices.UploadCloudResourceIDs(r.runCtx, project); err != nil {
@@ -519,7 +514,6 @@ func (r *parallelRunner) uploadCloudResourceIDs(projects []*schema.Project) erro
 		}
 	}
 
-	spinner.Success()
 	return nil
 }
 
@@ -563,13 +557,7 @@ func (r *parallelRunner) fetchProjectUsage(projects []*schema.Project) map[*sche
 		resourceStr += "s"
 	}
 
-	spinnerOpts := ui.SpinnerOptions{
-		EnableLogging: r.runCtx.Config.IsLogging(),
-		NoColor:       r.runCtx.Config.NoColor,
-		Indent:        "  ",
-	}
-	spinner := ui.NewSpinner(fmt.Sprintf("Retrieving usage defaults for %s from Infracost Cloud", resourceStr), spinnerOpts)
-	defer spinner.Fail()
+	logging.Logger.Debug().Msgf("Retrieving usage defaults for %s from Infracost Cloud", resourceStr)
 
 	projectPtrToUsageMap := make(map[*schema.Project]schema.UsageMap, len(projects))
 
@@ -583,20 +571,12 @@ func (r *parallelRunner) fetchProjectUsage(projects []*schema.Project) map[*sche
 		projectPtrToUsageMap[project] = usageMap
 	}
 
-	spinner.Success()
-
 	return projectPtrToUsageMap
 }
 
 func (r *parallelRunner) populateActualCosts(projects []*schema.Project) {
 	if r.runCtx.Config.UsageAPIEndpoint != "" {
-		spinnerOpts := ui.SpinnerOptions{
-			EnableLogging: r.runCtx.Config.IsLogging(),
-			NoColor:       r.runCtx.Config.NoColor,
-			Indent:        "  ",
-		}
-		spinner := ui.NewSpinner("Retrieving actual costs from Infracost Cloud", spinnerOpts)
-		defer spinner.Fail()
+		logging.Logger.Debug().Msg("Retrieving actual costs from Infracost Cloud")
 
 		for _, project := range projects {
 			if err := prices.PopulateActualCosts(r.runCtx, project); err != nil {
@@ -604,12 +584,10 @@ func (r *parallelRunner) populateActualCosts(projects []*schema.Project) {
 				return
 			}
 		}
-
-		spinner.Success()
 	}
 }
 
-func (r *parallelRunner) generateUsageFile(provider schema.Provider) error {
+func (r *parallelRunner) generateUsageFile(provider schema.Provider) (err error) {
 	ctx := provider.Context()
 
 	if ctx.ProjectConfig.UsageFile == "" {
@@ -620,7 +598,7 @@ func (r *parallelRunner) generateUsageFile(provider schema.Provider) error {
 	var usageFile *usage.UsageFile
 
 	usageFilePath := ctx.ProjectConfig.UsageFile
-	err := usage.CreateUsageFile(usageFilePath)
+	err = usage.CreateUsageFile(usageFilePath)
 	if err != nil {
 		return fmt.Errorf("Error creating usage file %w", err)
 	}
@@ -638,37 +616,32 @@ func (r *parallelRunner) generateUsageFile(provider schema.Provider) error {
 
 	r.buildResources(providerProjects)
 
-	spinnerOpts := ui.SpinnerOptions{
-		EnableLogging: r.runCtx.Config.IsLogging(),
-		NoColor:       r.runCtx.Config.NoColor,
-		Indent:        "  ",
-	}
-
-	spinner := ui.NewSpinner("Syncing usage data from cloud", spinnerOpts)
-	defer spinner.Fail()
+	logging.Logger.Debug().Msg("Syncing usage data from cloud")
+	defer func() {
+		if err != nil {
+			logging.Logger.Debug().Err(err).Msg("Error syncing usage data")
+		} else {
+			logging.Logger.Debug().Msg("Finished syncing usage data")
+		}
+	}()
 
 	syncResult, err := usage.SyncUsageData(ctx, usageFile, providerProjects)
 
 	if err != nil {
-		spinner.Fail()
 		return fmt.Errorf("Error synchronizing usage data %w", err)
 	}
 
 	ctx.SetFrom(syncResult)
 	if err != nil {
-		spinner.Fail()
 		return fmt.Errorf("Error summarizing usage %w", err)
 	}
 
 	err = usageFile.WriteToPath(ctx.ProjectConfig.UsageFile)
 	if err != nil {
-		spinner.Fail()
 		return fmt.Errorf("Error writing usage file %w", err)
 	}
 
-	if syncResult == nil {
-		spinner.Fail()
-	} else {
+	if syncResult != nil {
 		resources := syncResult.ResourceCount
 		attempts := syncResult.EstimationCount
 		errors := len(syncResult.EstimationErrors)
@@ -678,8 +651,6 @@ func (r *parallelRunner) generateUsageFile(provider schema.Provider) error {
 		if resources > 1 {
 			pluralized = "s"
 		}
-
-		spinner.Success()
 
 		if r.runCtx.Config.IsLogging() {
 			logging.Logger.Info().Msgf("synced %d of %d resource%s", successes, resources, pluralized)

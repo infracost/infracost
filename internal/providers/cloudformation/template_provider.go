@@ -5,8 +5,8 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/infracost/infracost/internal/ui"
 )
 
 type TemplateProvider struct {
@@ -43,12 +43,7 @@ func (p *TemplateProvider) LoadResources(usage schema.UsageMap) ([]*schema.Proje
 		return []*schema.Project{}, errors.Wrap(err, "Error reading CloudFormation template file")
 	}
 
-	spinner := ui.NewSpinner("Extracting only cost-related params from cloudformation", ui.SpinnerOptions{
-		EnableLogging: p.ctx.RunContext.Config.IsLogging(),
-		NoColor:       p.ctx.RunContext.Config.NoColor,
-		Indent:        "  ",
-	})
-	defer spinner.Fail()
+	logging.Logger.Debug().Msg("Extracting only cost-related params from cloudformation")
 
 	metadata := schema.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
 	metadata.Type = p.Type()
@@ -69,6 +64,5 @@ func (p *TemplateProvider) LoadResources(usage schema.UsageMap) ([]*schema.Proje
 		project.PartialResources = append(project.PartialResources, item.PartialResource)
 	}
 
-	spinner.Success()
 	return []*schema.Project{project}, nil
 }
