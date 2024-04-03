@@ -85,12 +85,11 @@ func Detect(ctx *config.RunContext, project *config.Project, includePastResource
 			projectContext.ContextValues.SetValue("project_type", "terragrunt_dir")
 			autoProviders = append(autoProviders, terraform.NewTerragruntHCLProvider(rootPath, projectContext))
 		} else {
-			options := []hcl.Option{hcl.OptionWithSpinner(ctx.NewSpinner)}
 			projectContext.ContextValues.SetValue("project_type", "terraform_dir")
 			if ctx.Config.ConfigFilePath == "" && len(project.TerraformVarFiles) == 0 {
-				autoProviders = append(autoProviders, autodetectedRootToProviders(pl, projectContext, rootPath, options...)...)
+				autoProviders = append(autoProviders, autodetectedRootToProviders(pl, projectContext, rootPath)...)
 			} else {
-				autoProviders = append(autoProviders, configFileRootToProvider(rootPath, options, projectContext, pl))
+				autoProviders = append(autoProviders, configFileRootToProvider(rootPath, nil, projectContext, pl))
 			}
 
 		}

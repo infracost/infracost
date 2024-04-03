@@ -14,8 +14,8 @@ import (
 
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/infracost/infracost/internal/ui"
 )
 
 var defaultTerragruntBinary = "terragrunt"
@@ -91,7 +91,6 @@ func (p *TerragruntProvider) LoadResources(usage schema.UsageMap) ([]*schema.Pro
 	// Terragrunt internally runs Terraform in the working dirs, so we need to be aware of these
 	// so we can handle reading and cleaning up the generated plan files.
 	projectDirs, err := p.getProjectDirs()
-
 	if err != nil {
 		return []*schema.Project{}, err
 	}
@@ -109,12 +108,7 @@ func (p *TerragruntProvider) LoadResources(usage schema.UsageMap) ([]*schema.Pro
 
 	projects := make([]*schema.Project, 0, len(projectDirs))
 
-	spinner := ui.NewSpinner("Extracting only cost-related params from terragrunt plan", ui.SpinnerOptions{
-		EnableLogging: p.ctx.RunContext.Config.IsLogging(),
-		NoColor:       p.ctx.RunContext.Config.NoColor,
-		Indent:        "  ",
-	})
-	defer spinner.Fail()
+	logging.Logger.Debug().Msg("Extracting only cost-related params from terragrunt plan")
 	for i, projectDir := range projectDirs {
 		projectPath := projectDir.ConfigDir
 		// attempt to convert project path to be relative to the top level provider path
@@ -152,13 +146,11 @@ func (p *TerragruntProvider) LoadResources(usage schema.UsageMap) ([]*schema.Pro
 		projects = append(projects, project)
 	}
 
-	spinner.Success()
 	return projects, nil
 }
 
 func (p *TerragruntProvider) getProjectDirs() ([]terragruntProjectDirs, error) {
-	spinner := ui.NewSpinner("Running terragrunt run-all terragrunt-info", p.spinnerOpts)
-	defer spinner.Fail()
+	logging.Logger.Debug().Msg("Running terragrunt run-all terragrunt-info")
 
 	terragruntFlags, err := shellquote.Split(p.TerragruntFlags)
 	if err != nil {
@@ -172,7 +164,6 @@ func (p *TerragruntProvider) getProjectDirs() ([]terragruntProjectDirs, error) {
 	}
 	out, err := Cmd(opts, "run-all", "--terragrunt-ignore-external-dependencies", "terragrunt-info")
 	if err != nil {
-		spinner.Fail()
 		err = p.buildTerraformErr(err, false)
 
 		msg := "terragrunt run-all terragrunt-info failed"
@@ -197,8 +188,7 @@ func (p *TerragruntProvider) getProjectDirs() ([]terragruntProjectDirs, error) {
 		var info TerragruntInfo
 		err = json.Unmarshal(j, &info)
 		if err != nil {
-			spinner.Fail()
-			return dirs, err
+			return dirs, fmt.Errorf("error unmarshalling terragrunt-info JSON: %w", err)
 		}
 
 		dirs = append(dirs, terragruntProjectDirs{
@@ -212,8 +202,6 @@ func (p *TerragruntProvider) getProjectDirs() ([]terragruntProjectDirs, error) {
 		return dirs[i].ConfigDir < dirs[j].ConfigDir
 	})
 
-	spinner.Success()
-
 	return dirs, nil
 }
 
@@ -224,13 +212,6 @@ func (p *TerragruntProvider) generateStateJSONs(projectDirs []terragruntProjectD
 	}
 
 	outs := make([][]byte, 0, len(projectDirs))
-
-	spinnerMsg := "Running terragrunt show"
-	if len(projectDirs) > 1 {
-		spinnerMsg += " for each project"
-	}
-	spinner := ui.NewSpinner(spinnerMsg, p.spinnerOpts)
-	defer spinner.Fail()
 
 	for _, projectDir := range projectDirs {
 		opts, err := p.buildCommandOpts(projectDir.ConfigDir)
@@ -248,7 +229,7 @@ func (p *TerragruntProvider) generateStateJSONs(projectDirs []terragruntProjectD
 			defer os.Remove(opts.TerraformConfigFile)
 		}
 
-		out, err := p.runShow(opts, spinner, "", false)
+		out, err := p.runShow(opts, "", false)
 		if err != nil {
 			return outs, err
 		}
@@ -286,10 +267,9 @@ func (p *TerragruntProvider) generatePlanJSONs(projectDirs []terragruntProjectDi
 		defer os.Remove(opts.TerraformConfigFile)
 	}
 
-	spinner := ui.NewSpinner("Running terragrunt run-all plan", p.spinnerOpts)
-	defer spinner.Fail()
+	logging.Logger.Debug().Msg("Running terragrunt run-all plan")
 
-	planFile, planJSON, err := p.runPlan(opts, spinner, true)
+	planFile, planJSON, err := p.runPlan(opts, true)
 	defer func() {
 		err := cleanupPlanFiles(projectDirs, planFile)
 		if err != nil {
@@ -306,11 +286,7 @@ func (p *TerragruntProvider) generatePlanJSONs(projectDirs []terragruntProjectDi
 	}
 
 	outs := make([][]byte, 0, len(projectDirs))
-	spinnerMsg := "Running terragrunt show"
-	if len(projectDirs) > 1 {
-		spinnerMsg += " for each project"
-	}
-	spinner = ui.NewSpinner(spinnerMsg, p.spinnerOpts)
+	logging.Logger.Debug().Msg("Running terragrunt show")
 
 	for _, projectDir := range projectDirs {
 		opts, err := p.buildCommandOpts(projectDir.ConfigDir)
@@ -321,7 +297,7 @@ func (p *TerragruntProvider) generatePlanJSONs(projectDirs []terragruntProjectDi
 			defer os.Remove(opts.TerraformConfigFile)
 		}
 
-		out, err := p.runShow(opts, spinner, filepath.Join(projectDir.WorkingDir, planFile), false)
+		out, err := p.runShow(opts, filepath.Join(projectDir.WorkingDir, planFile), false)
 		if err != nil {
 			return outs, err
 		}

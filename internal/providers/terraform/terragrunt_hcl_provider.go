@@ -583,9 +583,7 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 	}
 	pconfig.TerraformVars = p.initTerraformVars(pconfig.TerraformVars, terragruntConfig.Inputs)
 
-	ops := []hcl.Option{
-		hcl.OptionWithSpinner(p.ctx.RunContext.NewSpinner),
-	}
+	var ops []hcl.Option
 	inputs, err := convertToCtyWithJson(terragruntConfig.Inputs)
 	if err != nil {
 		p.logger.Debug().Msgf("Failed to build Terragrunt inputs for: %s err: %s", info.workingDir, err)

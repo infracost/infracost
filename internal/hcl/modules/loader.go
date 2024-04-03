@@ -22,7 +22,6 @@ import (
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	intSync "github.com/infracost/infracost/internal/sync"
-	"github.com/infracost/infracost/internal/ui"
 )
 
 var (
@@ -43,8 +42,6 @@ var (
 // .infracost/terraform_modules directory. We could implement a global cache in the future, but for now have decided
 // to go with the same approach as Terraform.
 type ModuleLoader struct {
-	NewSpinner ui.SpinnerFunc
-
 	// cachePath is the path to the directory that Infracost will download modules to.
 	// This is normally the top level directory of a multi-project environment, where the
 	// Infracost config file resides or project auto-detection starts from.
@@ -116,11 +113,6 @@ func (m *ModuleLoader) Load(path string) (man *Manifest, err error) {
 			man.cachePath = m.cachePath
 		}
 	}()
-
-	if m.NewSpinner != nil {
-		spin := m.NewSpinner("Downloading Terraform modules")
-		defer spin.Success()
-	}
 
 	manifest := &Manifest{}
 	manifestFilePath := m.manifestFilePath(path)

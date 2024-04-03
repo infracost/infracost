@@ -11,7 +11,6 @@ import (
 	"github.com/zclconf/go-cty/cty"
 
 	"github.com/infracost/infracost/internal/extclient"
-	"github.com/infracost/infracost/internal/ui"
 )
 
 // RemoteVariablesLoader handles loading remote variables from Terraform Cloud.
@@ -19,7 +18,6 @@ type RemoteVariablesLoader struct {
 	client         *extclient.AuthedAPIClient
 	localWorkspace string
 	remoteConfig   *TFCRemoteConfig
-	newSpinner     ui.SpinnerFunc
 	logger         zerolog.Logger
 }
 
@@ -76,14 +74,6 @@ type tfcVarResponse struct {
 	} `json:"data"`
 }
 
-// RemoteVariablesLoaderWithSpinner enables the RemoteVariablesLoader to use an ui.Spinner to
-// show the progress of loading the remote variables.
-func RemoteVariablesLoaderWithSpinner(f ui.SpinnerFunc) RemoteVariablesLoaderOption {
-	return func(r *RemoteVariablesLoader) {
-		r.newSpinner = f
-	}
-}
-
 // RemoteVariablesLoaderWithRemoteConfig sets a user defined configuration for
 // the RemoteVariablesLoader. This is normally done to override the configuration
 // detected from the HCL blocks.
@@ -115,7 +105,7 @@ func NewRemoteVariablesLoader(client *extclient.AuthedAPIClient, localWorkspace 
 // Load fetches remote variables if terraform block contains organization and
 // workspace name.
 func (r *RemoteVariablesLoader) Load(blocks Blocks) (map[string]cty.Value, error) {
-	spinnerMsg := "Downloading Terraform remote variables"
+	r.logger.Debug().Msg("Downloading Terraform remote variables")
 	vars := map[string]cty.Value{}
 
 	var config TFCRemoteConfig
@@ -127,14 +117,6 @@ func (r *RemoteVariablesLoader) Load(blocks Blocks) (map[string]cty.Value, error
 		if !config.valid() {
 			config, err = r.getBackendOrganizationWorkspace(blocks)
 			if err != nil {
-				var spinner *ui.Spinner
-				if r.newSpinner != nil {
-					// In case name prefix is set, but workspace flag is missing show the
-					// failed spinner message. Otherwise the remote variables loading is
-					// skipped entirely.
-					spinner = r.newSpinner(spinnerMsg)
-					spinner.Fail()
-				}
 				return vars, err
 			}
 
@@ -166,12 +148,6 @@ func (r *RemoteVariablesLoader) Load(blocks Blocks) (map[string]cty.Value, error
 		return vars, nil
 	}
 
-	var spinner *ui.Spinner
-	if r.newSpinner != nil {
-		spinner = r.newSpinner(spinnerMsg)
-		defer spinner.Success()
-	}
-
 	workspaceID := workspaceResponse.Data.ID
 
 	pageNumber := 1
@@ -183,17 +159,11 @@ func (r *RemoteVariablesLoader) Load(blocks Blocks) (map[string]cty.Value, error
 		endpoint = fmt.Sprintf("/api/v2/workspaces/%s/varsets?include=vars&page[number]=%d&page[size]=50", workspaceID, pageNumber)
 		body, err = r.client.Get(endpoint)
 		if err != nil {
-			if spinner != nil {
-				spinner.Fail()
-			}
 			return vars, err
 		}
 
 		var varsetsResponse tfcVarsetResponse
 		if json.Unmarshal(body, &varsetsResponse) != nil {
-			if spinner != nil {
-				spinner.Fail()
-			}
 			return vars, errors.New("unable to parse Workspace Variable Sets response")
 		}
 
@@ -241,17 +211,11 @@ func (r *RemoteVariablesLoader) Load(blocks Blocks) (map[string]cty.Value, error
 	endpoint = fmt.Sprintf("/api/v2/workspaces/%s/vars", workspaceID)
 	body, err = r.client.Get(endpoint)
 	if err != nil {
-		if spinner != nil {
-			spinner.Fail()
-		}
 		return vars, err
 	}
 
 	var varsResponse tfcVarResponse
 	if json.Unmarshal(body, &varsResponse) != nil {
-		if spinner != nil {
-			spinner.Fail()
-		}
 		return vars, errors.New("unable to parse Workspace Variables response")
 	}
 

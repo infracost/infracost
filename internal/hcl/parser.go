@@ -12,7 +12,6 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 
@@ -20,7 +19,6 @@ import (
 	"github.com/infracost/infracost/internal/extclient"
 	"github.com/infracost/infracost/internal/hcl/modules"
 	"github.com/infracost/infracost/internal/logging"
-	"github.com/infracost/infracost/internal/ui"
 )
 
 var (
@@ -211,10 +209,6 @@ func OptionWithRemoteVarLoader(host, token, localWorkspace string, loaderOpts ..
 			return
 		}
 
-		if p.newSpinner != nil {
-			loaderOpts = append(loaderOpts, RemoteVariablesLoaderWithSpinner(p.newSpinner))
-		}
-
 		client := extclient.NewAuthedAPIClient(host, token)
 		p.remoteVariablesLoader = NewRemoteVariablesLoader(client, localWorkspace, p.logger, loaderOpts...)
 	}
@@ -238,19 +232,6 @@ func OptionWithTerraformWorkspace(name string) Option {
 			p.logger.Debug().Msgf("setting HCL parser to use user provided Terraform workspace: '%s'", name)
 
 			p.workspaceName = name
-		}
-	}
-}
-
-// OptionWithSpinner sets a SpinnerFunc onto the Parser. With this option enabled
-// the Parser will send progress to the Spinner. This is disabled by default as
-// we run the Parser concurrently underneath DirProvider and don't want to mess with its output.
-func OptionWithSpinner(f ui.SpinnerFunc) Option {
-	return func(p *Parser) {
-		p.newSpinner = f
-
-		if p.moduleLoader != nil {
-			p.moduleLoader.NewSpinner = f
 		}
 	}
 }
@@ -282,7 +263,6 @@ type Parser struct {
 	moduleLoader          *modules.ModuleLoader
 	hclParser             *modules.SharedHCLParser
 	blockBuilder          BlockBuilder
-	newSpinner            ui.SpinnerFunc
 	remoteVariablesLoader *RemoteVariablesLoader
 	logger                zerolog.Logger
 	isGraph               bool
@@ -428,7 +408,6 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 		nil,
 		p.workspaceName,
 		p.blockBuilder,
-		p.newSpinner,
 		p.logger,
 		p.isGraph,
 	)
@@ -437,8 +416,7 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 
 	// Graph evaluation
 	if evaluator.isGraph {
-		// we use the base zerolog log here so that it's consistent with the spinner logs
-		log.Info().Msgf("Building project with experimental graph runner")
+		logging.Logger.Debug().Msg("Building project with experimental graph runner")
 
 		g, err := NewGraphWithRoot(p.logger, nil)
 		if err != nil {
