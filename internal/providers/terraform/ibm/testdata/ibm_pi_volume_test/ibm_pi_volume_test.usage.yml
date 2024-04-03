@@ -4,11 +4,11 @@ resource_usage:
     monthly_instance_hours: 730
   ibm_pi_volume.pi_volume_volume_set:
     monthly_instance_hours: 730
-  ibm_pi_volume.pi_volume_tier1:
+  ibm_pi_volume.pi_volume_tier0:
     monthly_instance_hours: 730
-  ibm_pi_volume.pi_volume_ssd:
+  ibm_pi_volume.pi_volume_tier1:
     monthly_instance_hours: 730
   ibm_pi_volume.pi_volume_tier3:
     monthly_instance_hours: 730
-  ibm_pi_volume.pi_volume_standard:
+  ibm_pi_volume.pi_volume_tier5k:
     monthly_instance_hours: 730

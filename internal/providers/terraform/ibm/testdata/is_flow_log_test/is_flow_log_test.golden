@@ -2,18 +2,18 @@
  Name                                                                 Monthly Qty  Unit                        Monthly Cost 
                                                                                                                             
  ibm_cos_bucket.testCosBucket                                                                                               
- ├─ Storage Capacity (first 499999 GB)                                     10,000  GB                               $220.00 
+ ├─ Storage Capacity (first 499999 GB)                                     10,000  GB                               $229.90 
  ├─ Storage Capacity (over 499999 GB)                                           0  GB                                 $0.00 
- ├─ Class A requests                                                       10,000  1k API calls                      $50.00 
- ├─ Class B requests                                                       10,000  10k API calls                     $40.00 
+ ├─ Class A requests                                                       10,000  1k API calls                      $52.25 
+ ├─ Class B requests                                                       10,000  10k API calls                     $41.80 
  └─ Public Standard Egress (first 50000 GB)                                 1,000  GB                                $90.00 
  └─ Public Standard Egress (next 100000 GB)                                     0  GB                                 $0.00 
  └─ Public Standard Egress (over 150000 GB)                                     0  GB                                 $0.00 
                                                                                                                             
  ibm_is_flow_log.testFlowLog                                                                                                
  ├─ Flow Log Collector us-south - free allowance (first 5GB)                    5  GB                                 $0.00 
- └─ Flow Log Collector us-south (first 10000 GB)                           10,000  GB                             $1,000.00 
- └─ Flow Log Collector us-south (next 20000 GB)                            19,995  GB                             $1,999.50 
+ └─ Flow Log Collector us-south (first 10000 GB)                           10,000  GB                             $1,045.00 
+ └─ Flow Log Collector us-south (next 20000 GB)                            19,995  GB                             $2,089.48 
  └─ Flow Log Collector us-south (next 20000 GB)                                 0  GB                                 $0.00 
  └─ Flow Log Collector us-south (next 22000 GB)                                 0  GB                                 $0.00 
  └─ Flow Log Collector us-south (over 72000 GB)                                 0  GB                                 $0.00 
@@ -27,18 +27,18 @@
  └─ Flow Log Collector us-south (over 72000 GB)               Monthly cost depends on usage: $0.10 per GB                   
                                                                                                                             
  ibm_is_instance.testIsInstance                                                                                             
- ├─ CPU hours (2 CPUs, us-south-1)                            Monthly cost depends on usage: $0.0239116112 per CPU hours    
- └─ Memory hours (8 GB, us-south-1)                           Monthly cost depends on usage: $0.0048500766 per Memory hours 
+ ├─ CPU hours (2 CPUs, us-south-1)                            Monthly cost depends on usage: $0.0249876337 per CPU hours    
+ └─ Memory hours (8 GB, us-south-1)                           Monthly cost depends on usage: $0.00506833 per Memory hours   
                                                                                                                             
  ibm_is_vpc.testVpc                                                                                                         
  ├─ VPC instance                                                                1  Instance                           $0.00 
  ├─ VPC egress free allowance (first 5GB)                     Monthly cost depends on usage: $0.00 per GB                   
- └─ VPC egress us-south (first 9995 GB)                       Monthly cost depends on usage: $0.087 per GB                  
- └─ VPC egress us-south (next 40000 GB)                       Monthly cost depends on usage: $0.083 per GB                  
- └─ VPC egress us-south (next 100000 GB)                      Monthly cost depends on usage: $0.07 per GB                   
- └─ VPC egress us-south (over 149995 GB)                      Monthly cost depends on usage: $0.05 per GB                   
+ └─ VPC egress us-south (first 9995 GB)                       Monthly cost depends on usage: $0.090915 per GB               
+ └─ VPC egress us-south (next 40000 GB)                       Monthly cost depends on usage: $0.086735 per GB               
+ └─ VPC egress us-south (next 100000 GB)                      Monthly cost depends on usage: $0.07315 per GB                
+ └─ VPC egress us-south (over 149995 GB)                      Monthly cost depends on usage: $0.05225 per GB                
                                                                                                                             
- OVERALL TOTAL                                                                                                    $3,399.50 
+ OVERALL TOTAL                                                                                                    $3,548.43 
 ──────────────────────────────────
 9 cloud resources were detected:
 ∙ 6 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

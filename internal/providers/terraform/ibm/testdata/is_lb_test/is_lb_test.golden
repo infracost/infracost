@@ -2,26 +2,26 @@
  Name                                               Monthly Qty  Unit                      Monthly Cost 
                                                                                                         
  ibm_is_lb.application_lb                                                                               
- ├─ Instance hours (us-south, application)                  730  Instance hours                  $20.44 
- └─ Data processed (us-south , application)               1,000  GB months                        $8.00 
+ ├─ Instance hours (us-south, application)                  730  Instance hours                  $21.36 
+ └─ Data processed (us-south , application)               1,000  GB months                        $8.36 
                                                                                                         
  ibm_is_lb.application_lb_without_usage                                                                 
- ├─ Instance hours (us-south, application)   Monthly cost depends on usage: $0.028 per Instance hours   
- └─ Data processed (us-south , application)  Monthly cost depends on usage: $0.008 per GB months        
+ ├─ Instance hours (us-south, application)   Monthly cost depends on usage: $0.02926 per Instance hours 
+ └─ Data processed (us-south , application)  Monthly cost depends on usage: $0.00836 per GB months      
                                                                                                         
  ibm_is_lb.network_lb                                                                                   
- ├─ Instance hours (us-south, network)                      730  Instance hours                  $18.25 
- └─ Data processed (us-south , network)                   1,000  GB months                        $6.00 
+ ├─ Instance hours (us-south, network)                      730  Instance hours                  $19.07 
+ └─ Data processed (us-south , network)                   1,000  GB months                        $6.27 
                                                                                                         
  ibm_is_vpc.test_vpc                                                                                    
  ├─ VPC instance                                              1  Instance                         $0.00 
  ├─ VPC egress free allowance (first 5GB)    Monthly cost depends on usage: $0.00 per GB                
- └─ VPC egress us-south (first 9995 GB)      Monthly cost depends on usage: $0.087 per GB               
- └─ VPC egress us-south (next 40000 GB)      Monthly cost depends on usage: $0.083 per GB               
- └─ VPC egress us-south (next 100000 GB)     Monthly cost depends on usage: $0.07 per GB                
- └─ VPC egress us-south (over 149995 GB)     Monthly cost depends on usage: $0.05 per GB                
+ └─ VPC egress us-south (first 9995 GB)      Monthly cost depends on usage: $0.090915 per GB            
+ └─ VPC egress us-south (next 40000 GB)      Monthly cost depends on usage: $0.086735 per GB            
+ └─ VPC egress us-south (next 100000 GB)     Monthly cost depends on usage: $0.07315 per GB             
+ └─ VPC egress us-south (over 149995 GB)     Monthly cost depends on usage: $0.05225 per GB             
                                                                                                         
- OVERALL TOTAL                                                                                   $52.69 
+ OVERALL TOTAL                                                                                   $55.06 
 ──────────────────────────────────
 5 cloud resources were detected:
 ∙ 4 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

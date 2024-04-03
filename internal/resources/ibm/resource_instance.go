@@ -57,6 +57,13 @@ type ResourceInstance struct {
 	// Catalog https://cloud.ibm.com/catalog/services/continuous-delivery
 	// Pricing https://cloud.ibm.com/docs/ContinuousDelivery?topic=ContinuousDelivery-limitations_usage&interface=ui
 	ContinuousDelivery_AuthorizedUsers *int64 `infracost_usage:"continuousdelivery_authorized_users"`
+	// Watson Machine Learning
+	// https://dataplatform.cloud.ibm.com/docs/content/wsj/getting-started/wml-plans.html?context=cpdaas
+	WML_CUH      *float64 `infracost_usage:"wml_capacity_unit_hour"`
+	WML_Instance *float64 `infracost_usage:"wml_instance"`
+	WML_Class1RU *float64 `infracost_usage:"wml_class1_ru"`
+	WML_Class2RU *float64 `infracost_usage:"wml_class2_ru"`
+	WML_Class3RU *float64 `infracost_usage:"wml_class3_ru"`
 }
 
 type ResourceCostComponentsFunc func(*ResourceInstance) []*schema.CostComponent
@@ -85,6 +92,12 @@ var ResourceInstanceUsageSchema = []*schema.UsageItem{
 	{Key: "monitoring_container_hour", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "monitoring_api_call", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "monitoring_timeseries_hour", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "continuousdelivery_authorized_users", DefaultValue: 0, ValueType: schema.Int64},
+	{Key: "wml_capacity_unit_hour", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "wml_instance", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "wml_class1_ru", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "wml_class2_ru", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "wml_class3_ru", DefaultValue: 0, ValueType: schema.Float64},
 }
 
 var ResourceInstanceCostMap map[string]ResourceCostComponentsFunc = map[string]ResourceCostComponentsFunc{
@@ -97,6 +110,7 @@ var ResourceInstanceCostMap map[string]ResourceCostComponentsFunc = map[string]R
 	"logdnaat":            GetActivityTrackerCostComponents,
 	"sysdig-monitor":      GetSysdigCostComponenets,
 	"continuous-delivery": GetContinuousDeliveryCostComponenets,
+	"pm-20":               GetWMLCostComponents,
 }
 
 func KMSKeyVersionsFreeCostComponent(r *ResourceInstance) *schema.CostComponent {

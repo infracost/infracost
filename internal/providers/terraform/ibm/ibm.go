@@ -68,6 +68,12 @@ var globalCatalogServiceId = map[string]catalogMetadata{
 	"kms":                           {"ee41347f-b18e-4ca6-bf80-b5467c63f9a6", []string{}, nil},
 	"cloud-object-storage":          {"dff97f5c-bc5e-4455-b470-411c3edbe49c", []string{}, nil},
 	"roks":                          {"containers.kubernetes.cluster.roks", []string{}, nil},
+	"pm-20":                         {"51c53b72-918f-4869-b834-2d99eb28422a", []string{}, nil},
+	"data-science-experience":       {"39ba9d4c-b1c5-4cc3-a163-38b580121e01", []string{}, nil},
+	"discovery":                     {"76b7bf22-b443-47db-b3db-066ba2988f47", []string{}, nil},
+	"wx":                            {"51c53b72-918f-4869-b834-2d99eb28422a", []string{}, nil},
+	"conversation":                  {"7045626d-55e3-4418-be11-683a26dbc1e5", []string{}, nil},
+	"aiopenscale":                   {"2ad019f3-0fd6-4c25-966d-f3952481a870", []string{}, nil},
 }
 
 func SetCatalogMetadata(d *schema.ResourceData, resourceType string, config map[string]any) {

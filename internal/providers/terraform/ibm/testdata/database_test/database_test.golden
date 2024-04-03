@@ -1,16 +1,21 @@
 
- Name                   Monthly Qty  Unit                    Monthly Cost 
-                                                                          
- ibm_database.test_db1                                                    
- ├─ RAM                          24  GB-RAM                       $129.36 
- ├─ Disk                        256  GB-DISK                      $161.28 
- └─ Core                          6  Virtual Processor Core       $193.80 
-                                                                          
- ibm_database.test_db2                                                    
- ├─ RAM                          60  GB-RAM                       $323.40 
- └─ Disk                         20  GB-DISK                       $12.60 
-                                                                          
- OVERALL TOTAL                                                    $820.44 
+ Name                                      Monthly Qty  Unit                    Monthly Cost 
+                                                                                             
+ ibm_database.test_db1                                                                       
+ ├─ RAM (first 1 GB-RAM)                             1  GB-RAM                         $5.23 
+ ├─ RAM (over 0 GB-RAM)                              1  GB-RAM                         $5.39 
+ ├─ Disk (first 1 GB-DISK)                           1  GB-DISK                        $0.61 
+ ├─ Disk (over 0 GB-DISK)                            1  GB-DISK                        $0.63 
+ └─ Core (first 1 Virtual Processor Core)            1  Virtual Processor Core        $31.40 
+ └─ Core (over 0 Virtual Processor Core)             1  Virtual Processor Core        $32.34 
+                                                                                             
+ ibm_database.test_db2                                                                       
+ ├─ RAM (first 1 GB-RAM)                             1  GB-RAM                         $5.23 
+ ├─ RAM (over 0 GB-RAM)                              1  GB-RAM                         $5.39 
+ └─ Disk (first 1 GB-DISK)                           1  GB-DISK                        $0.61 
+ └─ Disk (over 0 GB-DISK)                            1  GB-DISK                        $0.63 
+                                                                                             
+ OVERALL TOTAL                                                                        $87.45 
 ──────────────────────────────────
 2 cloud resources were detected:
-∙ 2 were estimated
+∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

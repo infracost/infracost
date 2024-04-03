@@ -2,7 +2,7 @@ terraform {
   required_providers {
     ibm = {
       source = "IBM-Cloud/ibm"
-      version = "1.58.0"
+      version = "1.63.0"
     }
   }
 }
@@ -41,27 +41,6 @@ resource "ibm_resource_instance" "resource_instance_power_iaas" {
   plan              = "power-virtual-server-group"
   location          = "us-south"
   resource_group_id = "default"
-}
-
-resource "ibm_resource_instance" "resource_instance_appconnect_ent" {
-  name              = "appconnect-ent"
-  service           = "appconnect"
-  plan              = "appconnectplanenterprise"
-  location          = "us-south"
-}
-
-resource "ibm_resource_instance" "resource_instance_appconnect_pro" {
-  name              = "appconnect-pro"
-  service           = "appconnect"
-  plan              = "appconnectplanprofessional"
-  location          = "us-south"
-}
-
-resource "ibm_resource_instance" "resource_instance_appconnect_lite" {
-  name              = "appconnect-lite"
-  service           = "appconnect"
-  plan              = "lite"
-  location          = "us-south"
 }
 
 resource "ibm_resource_instance" "resource_instance_logdna_lite" {
@@ -146,6 +125,30 @@ resource "ibm_resource_instance" "cd_instance_lite" {
   name              = "cd_lite"
   service           = "continuous-delivery"
   plan              = "lite"
+  location          = "us-south"
+  resource_group_id = "default"
+}
+
+resource "ibm_resource_instance" "wml_instance_lite" {
+  name              = "wml_lite"
+  service           = "pm-20"
+  plan              = "lite"
+  location          = "us-south"
+  resource_group_id = "default"
+}
+
+resource "ibm_resource_instance" "wml_instance_essentials" {
+  name              = "wml_essentials"
+  service           = "pm-20"
+  plan              = "v2-standard"
+  location          = "us-south"
+  resource_group_id = "default"
+}
+
+resource "ibm_resource_instance" "wml_instance_standard" {
+  name              = "wml_standard"
+  service           = "pm-20"
+  plan              = "v2-professional"
   location          = "us-south"
   resource_group_id = "default"
 }

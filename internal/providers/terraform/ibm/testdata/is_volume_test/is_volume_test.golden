@@ -1,20 +1,20 @@
 
- Name                                        Monthly Qty  Unit                  Monthly Cost 
-                                                                                             
- ibm_is_volume.custom_volume                                                                 
- ├─ Gigabyte Hours (200 GB)                      146,000  GB Hours                    $20.00 
- └─ IOPS Hours (1000 IOPS)                       730,000  IOPS                        $70.08 
-                                                                                             
- ibm_is_volume.general_purpose_5iops                                                         
- └─ Gigabyte Hours (400 GB)                      292,000  GB Hours                    $56.06 
-                                                                                             
- ibm_is_volume.general_purpose_volume                                                        
- └─ Gigabyte Hours (200 GB)                      146,000  GB Hours                    $16.06 
-                                                                                             
- ibm_is_volume.general_purpose_volume2                                                       
- └─ Gigabyte Hours (200 GB)             Monthly cost depends on usage: $0.00011 per GB Hours 
-                                                                                             
- OVERALL TOTAL                                                                       $162.21 
+ Name                                         Monthly Qty  Unit                    Monthly Cost 
+                                                                                                
+ ibm_is_volume.custom_volume                                                                    
+ ├─ Gigabyte Hours (200 GB)                       146,000  GB Hours                      $20.90 
+ └─ IOPS Hours (1000 IOPS)                        730,000  IOPS                          $73.23 
+                                                                                                
+ ibm_is_volume.general_purpose_5iops                                                            
+ └─ Gigabyte Hours (400 GB)                       292,000  GB Hours                      $58.59 
+                                                                                                
+ ibm_is_volume.general_purpose_volume                                                           
+ └─ Gigabyte Hours (200 GB)                       146,000  GB Hours                      $16.78 
+                                                                                                
+ ibm_is_volume.general_purpose_volume2                                                          
+ └─ Gigabyte Hours (200 GB)             Monthly cost depends on usage: $0.00011495 per GB Hours 
+                                                                                                
+ OVERALL TOTAL                                                                          $169.51 
 ──────────────────────────────────
 4 cloud resources were detected:
 ∙ 4 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

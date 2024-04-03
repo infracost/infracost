@@ -8,6 +8,8 @@ import (
 	"github.com/shopspring/decimal"
 )
 
+const STANDARD_PLAN = "transit-gateway-standard-plan"
+
 // TgGateway struct represents a transit gateway between VPCs
 //
 // Resource information: https://cloud.ibm.com/docs/transit-gateway?topic=transit-gateway-getting-started
@@ -55,6 +57,9 @@ func (r *TgGateway) connectionFreeCostComponent() *schema.CostComponent {
 			Service:       strPtr("transit.gateway"),
 			ProductFamily: strPtr("service"),
 			Region:        strPtr("global"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "planName", Value: strPtr(STANDARD_PLAN)},
+			},
 		},
 	}
 	component.SetCustomPrice(decimalPtr(decimal.NewFromInt(0)))
@@ -62,6 +67,7 @@ func (r *TgGateway) connectionFreeCostComponent() *schema.CostComponent {
 }
 
 func (r *TgGateway) connectionCostComponent() *schema.CostComponent {
+
 	var q *decimal.Decimal
 	if r.Connection != nil {
 		q = decimalPtr(decimal.NewFromInt(*r.Connection))
@@ -81,6 +87,9 @@ func (r *TgGateway) connectionCostComponent() *schema.CostComponent {
 			Service:       strPtr("transit.gateway"),
 			ProductFamily: strPtr("service"),
 			Region:        strPtr("global"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "planName", Value: strPtr(STANDARD_PLAN)},
+			},
 		},
 		PriceFilter: &schema.PriceFilter{
 			Unit: strPtr("INSTANCES"),
@@ -103,6 +112,9 @@ func (r *TgGateway) dataTransferLocalCostComponent() *schema.CostComponent {
 			Service:       strPtr("transit.gateway"),
 			ProductFamily: strPtr("service"),
 			Region:        strPtr("global"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "planName", Value: strPtr(STANDARD_PLAN)},
+			},
 		},
 		PriceFilter: &schema.PriceFilter{
 			Unit: strPtr("GIGABYTE_TRANSMITTEDS_LOCAL"),
@@ -125,6 +137,9 @@ func (r *TgGateway) dataTransferGlobalCostComponent() *schema.CostComponent {
 			Service:       strPtr("transit.gateway"),
 			ProductFamily: strPtr("service"),
 			Region:        strPtr("global"),
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "planName", Value: strPtr(STANDARD_PLAN)},
+			},
 		},
 		PriceFilter: &schema.PriceFilter{
 			Unit: strPtr("GIGABYTE_TRANSMITTEDS_GLOBAL"),

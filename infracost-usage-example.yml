@@ -57,10 +57,27 @@ resource_type_default_usage:
     kms_key_versions: 10
     secretsmanager_active_secrets: 400
     secretsmanager_instance: 1
+    logdna_gigabyte_months: 1
+    activitytracker_gigabyte_months: 1
+    monitoring_node_hour: 1
+    monitoring_container_hour: 1
+    monitoring_api_call: 1
+    monitoring_timeseries_hour: 1
+    continuousdelivery_authorized_users: 1
+    wml_capacity_unit_hour: 20
+    wml_instance: 1
+    wml_class1_ru: 20
+    wml_class2_ru: 20
+    wml_class3_ru: 20
   ibm_tg_gateway: 
     connection: 3
     data_transfer_global: 1000
     data_transfer_local: 1000
+  ibm_database:
+    database_ram_mb: 12288
+    database_disk_mb: 131072
+    database_core: 3
+    database_members: 4
 
 resource_usage:
   #
@@ -1274,8 +1291,19 @@ resource_usage:
     monitoring_api_call: 100000 # Additional API calls above the base 1M/instance
     monitoring_timeseries_hour: 100 # Additional time-series cost above the base 1000/host
     continuousdelivery_authorized_users: 10 # Number of authorized users to the CD instance and its managed toolchains
-    
+    wml_capacity_unit_hour: 20 # Amount of Capacity Unit-Hours used in a month
+    wml_instance: 1 # The number of instances used per month where each instance includes 2500 CUHs
+    wml_class1_ru: 20 # The number of resource units used for inferencing with class 1 type models where each ru is 1000 tokens
+    wml_class2_ru: 20 # The number of resource units used for inferencing with class 2 type models where each ru is 1000 tokens
+    wml_class3_ru: 20 # The number of resource units used for inferencing with class 3 type models where each ru is 1000 tokens
+
   ibm_tg_gateway.tg_gateway:
     connection: 25 # Monthly number of connections to the gateway
     data_transfer_local: 2500 # Monthly local traffic through the gateway in GB
     data_transfer_global: 2500 # Monthly global traffic through the gateway in GB
+
+  ibm_database.postgres:
+    database_ram_mb: 12288 # Allocated memory in MB per-member
+    database_disk_mb: 131072 # Allocated disk in MB per-member
+    database_core: 3 # Allocated dedicated CPU per-member
+    database_members: 4 # Allocated number of members in the cluster

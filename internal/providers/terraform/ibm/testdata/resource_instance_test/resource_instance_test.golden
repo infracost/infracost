@@ -5,48 +5,37 @@
  └─ Lite plan                                                                                1                                         $0.00 
                                                                                                                                              
  ibm_resource_instance.cd_instance_professional                                                                                              
- └─ Authorized Users                                                                         2  Authorized Users                      $70.00 
+ └─ Authorized Users                                                                         2  Authorized Users                      $75.40 
                                                                                                                                              
  ibm_resource_instance.resource_instance_activity_tracker_7day                                                                               
- └─ Gigabyte Months                                                                         10  Gigabyte Months                       $15.00 
+ └─ Gigabyte Months                                                                         10  Gigabyte Months                       $16.15 
                                                                                                                                              
  ibm_resource_instance.resource_instance_activity_tracker_7day_no_usage                                                                      
- └─ Gigabyte Months                                                      Monthly cost depends on usage: $1.50 per Gigabyte Months            
+ └─ Gigabyte Months                                                      Monthly cost depends on usage: $1.61 per Gigabyte Months            
                                                                                                                                              
  ibm_resource_instance.resource_instance_activity_tracker_lite                                                                               
  └─ Lite plan                                                                                1                                         $0.00 
                                                                                                                                              
- ibm_resource_instance.resource_instance_appconnect_ent                                                                                      
- ├─ Flow runs                                                                               10  1k runs                              $400.00 
- ├─ Gigabytes transmitted outbounds                                                         10  GB                                   $200.00 
- └─ VCPU                                                                                    10  VCPU hours                            $42.50 
-                                                                                                                                             
- ibm_resource_instance.resource_instance_appconnect_lite                                                                                     
- └─ Lite plan                                                                                1                                         $0.00 
-                                                                                                                                             
- ibm_resource_instance.resource_instance_appconnect_pro                                                                                      
- ├─ Flow runs                                                                               10  1k runs                              $400.00 
- └─ Gigabytes transmitted outbounds                                                         10  GB                                   $200.00 
-                                                                                                                                             
  ibm_resource_instance.resource_instance_appid                                                                                               
  ├─ Users (first 1 Users)                                                                    1  Users                                  $0.00 
  ├─ Users (next 9 Users)                                                                     9  Users                                  $0.02 
- ├─ Users (next 90 Users)                                                                   90  Users                                  $0.14 
- ├─ Users (next 900 Users)                                                                 900  Users                                  $1.26 
+ ├─ Users (next 90 Users)                                                                   90  Users                                  $0.15 
+ ├─ Users (next 900 Users)                                                                 900  Users                                  $1.36 
  ├─ Users (next 4000 Users)                                                                  0  Users                                  $0.00 
  ├─ Users (over 5000 Users)                                                                  0  Users                                  $0.00 
  ├─ Authentications (first 1 Authentications)                                                1  Authentications                        $0.00 
- ├─ Authentications (next 9 Authentications)                                                 9  Authentications                        $0.03 
- ├─ Authentications (next 90 Authentications)                                               90  Authentications                        $0.28 
- ├─ Authentications (next 900 Authentications)                                             900  Authentications                        $2.08 
- ├─ Authentications (next 4000 Authentications)                                          4,000  Authentications                        $6.16 
- ├─ Authentications (over 5000 Authentications)                                         10,000  Authentications                        $7.70 
- └─ Advanced Authentications (first 10 Authentications)                                     10  Authentications                        $0.20 
- └─ Advanced Authentications (over 10 Authentications)                                  19,990  Authentications                      $199.90 
+ ├─ Authentications (next 9 Authentications)                                                 9  Authentications                        $0.04 
+ ├─ Authentications (next 90 Authentications)                                               90  Authentications                        $0.30 
+ ├─ Authentications (next 900 Authentications)                                             900  Authentications                        $2.24 
+ ├─ Authentications (next 4000 Authentications)                                          4,000  Authentications                        $6.64 
+ ├─ Authentications (over 5000 Authentications)                                         10,000  Authentications                        $8.29 
+ └─ Advanced Authentications (first 10 Authentications)                                     10  Authentications                        $0.22 
+ └─ Advanced Authentications (next 99990 Authentications)                               19,990  Authentications                      $429.79 
+ └─ Advanced Authentications (over 100000 Authentications)                                   0  Authentications                        $0.00 
                                                                                                                                              
  ibm_resource_instance.resource_instance_kms                                                                                                 
  ├─ Key versions free allowance (first 5 Key Versions)                                       5  Key Versions                           $0.00 
- └─ Key versions                                                                           295  Key Versions                         $295.00 
+ └─ Key versions                                                                           295  Key Versions                         $317.52 
                                                                                                                                              
  ibm_resource_instance.resource_instance_logdna_7day                                                                                         
  └─ Gigabyte Months                                                                         10  Gigabyte Months                       $15.00 
@@ -62,18 +51,18 @@
  ├─ Additional Time series (next 9000 Time series hour)                                      0  Time series hour                       $0.00 
  ├─ Additional Time series (next 90000 Time series hour)                                     0  Time series hour                       $0.00 
  ├─ Additional Time series (over 100000 Time series hour)                                    0  Time series hour                       $0.00 
- ├─ Additional Containers                                                                1,460  Container Hours                        $1.01 
- ├─ Additional API Calls                                                               100,000  API Calls                              $1.00 
- └─ Base Node Hour                                                                         730  Node Hours                            $35.04 
+ ├─ Additional Containers                                                                1,460  Container Hours                        $1.09 
+ ├─ Additional API Calls                                                               100,000  API Calls                              $1.08 
+ └─ Base Node Hour                                                                         730  Node Hours                            $37.72 
                                                                                                                                              
  ibm_resource_instance.resource_instance_monitoring_graduated_no_usage                                                                       
- ├─ Additional Time series (first 1000 Time series hour)                 Monthly cost depends on usage: $0.0001111111 per Time series hour   
- ├─ Additional Time series (next 9000 Time series hour)                  Monthly cost depends on usage: $0.0000694444 per Time series hour   
- ├─ Additional Time series (next 90000 Time series hour)                 Monthly cost depends on usage: $0.0000416667 per Time series hour   
- ├─ Additional Time series (over 100000 Time series hour)                Monthly cost depends on usage: $0.0000277778 per Time series hour   
- ├─ Additional Containers                                                Monthly cost depends on usage: $0.0006944444 per Container Hours    
- ├─ Additional API Calls                                                 Monthly cost depends on usage: $0.00001 per API Calls               
- └─ Base Node Hour                                                       Monthly cost depends on usage: $0.048 per Node Hours                
+ ├─ Additional Time series (first 1000 Time series hour)                 Monthly cost depends on usage: $0.0001195944 per Time series hour   
+ ├─ Additional Time series (next 9000 Time series hour)                  Monthly cost depends on usage: $0.0000747465 per Time series hour   
+ ├─ Additional Time series (next 90000 Time series hour)                 Monthly cost depends on usage: $0.0000448479 per Time series hour   
+ ├─ Additional Time series (over 100000 Time series hour)                Monthly cost depends on usage: $0.0000298986 per Time series hour   
+ ├─ Additional Containers                                                Monthly cost depends on usage: $0.0007474653 per Container Hours    
+ ├─ Additional API Calls                                                 Monthly cost depends on usage: $0.0000107635 per API Calls          
+ └─ Base Node Hour                                                       Monthly cost depends on usage: $0.0516648 per Node Hours            
                                                                                                                                              
  ibm_resource_instance.resource_instance_monitoring_lite                                                                                     
  └─ Lite plan                                                                                1                                         $0.00 
@@ -82,10 +71,25 @@
  └─ test                                                                                     1  Instance                               $0.00 
                                                                                                                                              
  ibm_resource_instance.resource_instance_secrets_manager                                                                                     
- ├─ Instance                                                                                 1  Instance                             $299.00 
- └─ Active Secrets                                                                         400  Secrets                               $80.00 
+ ├─ Instance                                                                                 1  Instance                             $321.00 
+ └─ Active Secrets                                                                         400  Secrets                               $86.00 
                                                                                                                                              
- OVERALL TOTAL                                                                                                                     $2,271.34 
+ ibm_resource_instance.wml_instance_essentials                                                                                               
+ ├─ Capacity Unit-Hours                                                                     20  CUH                                   $10.40 
+ ├─ Class 1 Resource Units                                                                  50  RU                                     $0.03 
+ ├─ Class 2 Resource Units                                                                  50  RU                                     $0.09 
+ └─ Class 3 Resource Units                                                                  50  RU                                     $0.25 
+                                                                                                                                             
+ ibm_resource_instance.wml_instance_lite                                                                                                     
+ └─ Lite plan                                                                                1                                         $0.00 
+                                                                                                                                             
+ ibm_resource_instance.wml_instance_standard                                                                                                 
+ ├─ Capacity Unit-Hours                                                                  2,500  CUH                                $1,050.00 
+ ├─ Class 1 Resource Units                                                                  50  RU                                     $0.03 
+ ├─ Class 2 Resource Units                                                                  50  RU                                     $0.09 
+ └─ Class 3 Resource Units                                                                  50  RU                                     $0.25 
+                                                                                                                                             
+ OVERALL TOTAL                                                                                                                     $2,381.14 
 ──────────────────────────────────
 19 cloud resources were detected:
 ∙ 19 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
