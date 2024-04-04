@@ -611,6 +611,27 @@ func (t *TreeNode) ChildNodes() []*TreeNode {
 	return children
 }
 
+// ChildTerraformVarFiles returns the first set of child nodes that contain just terraform
+// var files.
+func (t *TreeNode) ChildTerraformVarFiles() []*TreeNode {
+	var children []*TreeNode
+	for _, child := range t.Children {
+		if child.TerraformVarFiles != nil && child.RootPath == nil {
+			children = append(children, child)
+		}
+	}
+
+	if len(children) > 0 {
+		return children
+	}
+
+	for _, child := range t.Children {
+		children = append(children, child.ChildTerraformVarFiles()...)
+	}
+
+	return children
+}
+
 // AddTerraformVarFiles adds a directory that contains Terraform var files to the tree.
 func (t *TreeNode) AddTerraformVarFiles(basePath, dir string, files []RootPathVarFile) {
 	rel, _ := filepath.Rel(basePath, dir)
@@ -716,8 +737,11 @@ func (t *TreeNode) AssociateChildVarFiles() {
 			return
 		}
 
-		for _, child := range t.ChildNodes() {
-			if child.TerraformVarFiles == nil {
+		for _, child := range t.ChildTerraformVarFiles() {
+			// if the child has already been associated with a project skip it as the var
+			// directory has already been associated with a root module which is a closer
+			// relation to it than the current root path.
+			if child.TerraformVarFiles.Used {
 				continue
 			}
 
