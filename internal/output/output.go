@@ -61,6 +61,7 @@ func (r *Root) HasUnsupportedResources() bool {
 
 type Project struct {
 	Name          string                  `json:"name"`
+	DisplayName   string                  `json:"displayName"`
 	Metadata      *schema.ProjectMetadata `json:"metadata"`
 	PastBreakdown *Breakdown              `json:"pastBreakdown"`
 	Breakdown     *Breakdown              `json:"breakdown"`
@@ -72,7 +73,7 @@ type Project struct {
 // ToSchemaProject generates a schema.Project from a Project. The created schema.Project is not suitable to be
 // used outside simple schema.Project to schema.Project comparisons. It contains missing information
 // that cannot be inferred from a Project.
-func (p Project) ToSchemaProject() *schema.Project {
+func (p *Project) ToSchemaProject() *schema.Project {
 	var pastResources []*schema.Resource
 	if p.PastBreakdown != nil {
 		pastResources = append(convertOutputResources(p.PastBreakdown.Resources, false), convertOutputResources(p.PastBreakdown.FreeResources, true)...)
@@ -93,6 +94,7 @@ func (p Project) ToSchemaProject() *schema.Project {
 
 	return &schema.Project{
 		Name:          p.Name,
+		DisplayName:   p.DisplayName,
 		Metadata:      clonedMetadata,
 		PastResources: pastResources,
 		Resources:     resources,
@@ -216,6 +218,10 @@ func (r *Root) HasDiff() bool {
 
 // Label returns the display name of the project
 func (p *Project) Label() string {
+	if p.DisplayName != "" {
+		return p.DisplayName
+	}
+
 	return p.Name
 }
 
@@ -665,6 +671,7 @@ func ToOutputFormat(c *config.Config, projects []*schema.Project) (Root, error) 
 
 		outProjects = append(outProjects, Project{
 			Name:          project.Name,
+			DisplayName:   project.DisplayName,
 			Metadata:      project.Metadata,
 			PastBreakdown: pastBreakdown,
 			Breakdown:     breakdown,

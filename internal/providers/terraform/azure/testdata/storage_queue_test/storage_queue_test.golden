@@ -126,9 +126,9 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ TestStorageQueue                                   ┃ $0.00         ┃ $1,803      ┃ $1,803     ┃
+┃ main                                               ┃ $0.00         ┃ $1,803      ┃ $1,803     ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 Logs:
 
-WRN Skipping resource azurerm_storage_account.unsupported. Storage Standard doesn't support GZRS redundancy
-WRN Skipping resource azurerm_storage_queue.unsupported. Storage Queues don't support GZRS redundancy
+WARN Skipping resource azurerm_storage_account.unsupported. Storage Standard doesn't support GZRS redundancy
+WARN Skipping resource azurerm_storage_queue.unsupported. Storage Queues don't support GZRS redundancy

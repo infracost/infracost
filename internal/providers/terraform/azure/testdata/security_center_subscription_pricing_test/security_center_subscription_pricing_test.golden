@@ -101,9 +101,9 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ TestSecurityCenterSubscriptionPricing              ┃ $0.00         ┃ $894        ┃ $894       ┃
+┃ main                                               ┃ $0.00         ┃ $894        ┃ $894       ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 Logs:
 
-WRN Skipping resource azurerm_security_center_subscription_pricing.standard_example["CloudPosture"]. Unknown resource tyoe  'CloudPosture'
-WRN Skipping resource azurerm_security_center_subscription_pricing.standard_example_with_usage["CloudPosture"]. Unknown resource tyoe  'CloudPosture'
+WARN Skipping resource azurerm_security_center_subscription_pricing.standard_example["CloudPosture"]. Unknown resource tyoe  'CloudPosture'
+WARN Skipping resource azurerm_security_center_subscription_pricing.standard_example_with_usage["CloudPosture"]. Unknown resource tyoe  'CloudPosture'

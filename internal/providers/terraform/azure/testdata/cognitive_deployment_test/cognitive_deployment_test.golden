@@ -385,8 +385,8 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ TestCognitiveDeployment                            ┃ $20,499       ┃ $0.00       ┃ $20,499    ┃
+┃ main                                               ┃ $20,499       ┃ $0.00       ┃ $20,499    ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 Logs:
 
-WRN Skipping resource azurerm_cognitive_deployment.unsupported. Model 'ada' is not supported
+WARN Skipping resource azurerm_cognitive_deployment.unsupported. Model 'ada' is not supported

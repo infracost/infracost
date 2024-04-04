@@ -8,9 +8,9 @@ Error: Governance check failed:
 
 
 Logs:
-INF Estimate uploaded to Infracost Cloud
-INF 1 guardrail checked
-INF guardrail check failed: Stand by your estimate
-INF Creating new comment
-WRN >\n<summary><strong>❌ Guardrails triggered (needs action)</strong></summary>\nThis change is blocked, either reduce the costs or wait for an admin to review and unblock it.\n\n> - <b>Blocked</b>: Stand by your estimate\n</
-INF Created new comment: 
+INFO Estimate uploaded to Infracost Cloud
+INFO 1 guardrail checked
+INFO guardrail check failed: Stand by your estimate
+INFO Creating new comment
+WARN >\n<summary><strong>❌ Guardrails triggered (needs action)</strong></summary>\nThis change is blocked, either reduce the costs or wait for an admin to review and unblock it.\n\n> - <b>Blocked</b>: Stand by your estimate\n</
+INFO Created new comment: 

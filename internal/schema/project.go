@@ -357,6 +357,7 @@ type Project struct {
 	Resources            []*Resource
 	Diff                 []*Resource
 	HasDiff              bool
+	DisplayName          string
 }
 
 func (p *Project) AddProviderMetadata(metadatas []ProviderMetadata) {

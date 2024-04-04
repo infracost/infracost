@@ -14,6 +14,7 @@
   "projects": [
     {
       "name": "infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_hcl",
+      "displayName": "main",
       "metadata": {
         "path": "testdata/breakdown_with_policy_data_upload_hcl",
         "type": "terraform_dir",

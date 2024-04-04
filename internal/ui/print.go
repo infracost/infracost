@@ -4,8 +4,11 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/fatih/color"
 	"github.com/spf13/cobra"
 
+	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/version"
 )
 
@@ -13,28 +16,12 @@ import (
 // to an underlying writer.
 type WriteWarningFunc func(msg string)
 
-func PrintSuccess(w io.Writer, msg string) {
-	fmt.Fprintf(w, "%s %s\n", SuccessString("Success:"), msg)
-}
-
-func PrintSuccessf(w io.Writer, msg string, a ...interface{}) {
-	PrintSuccess(w, fmt.Sprintf(msg, a...))
-}
-
 func PrintError(w io.Writer, msg string) {
 	fmt.Fprintf(w, "%s %s\n", ErrorString("Error:"), msg)
 }
 
 func PrintErrorf(w io.Writer, msg string, a ...interface{}) {
 	PrintError(w, fmt.Sprintf(msg, a...))
-}
-
-func PrintWarning(w io.Writer, msg string) {
-	fmt.Fprintf(w, "%s %s\n", WarningString("Warning:"), msg)
-}
-
-func PrintWarningf(w io.Writer, msg string, a ...interface{}) {
-	PrintWarning(w, fmt.Sprintf(msg, a...))
 }
 
 func PrintUsage(cmd *cobra.Command) {
@@ -50,15 +37,30 @@ var (
 )
 
 // PrintUnexpectedErrorStack prints a full stack trace of a fatal error.
-func PrintUnexpectedErrorStack(out io.Writer, err error) {
-	msg := fmt.Sprintf("\n%s %s\n\n%s\nEnvironment:\n%s\n\n%s %s\n",
-		ErrorString("Error:"),
+func PrintUnexpectedErrorStack(err error) {
+	logging.Logger.Error().Msgf("%s\n\n%s\nEnvironment:\n%s\n\n%s %s\n",
 		"An unexpected error occurred",
 		err,
 		fmt.Sprintf("Infracost %s", version.Version),
 		stackErrorMsg,
 		githubIssuesLink,
 	)
+}
 
-	fmt.Fprint(out, msg)
+func ProjectDisplayName(ctx *config.RunContext, name string) string {
+	displayName := color.BlueString(BoldString(name))
+	if ctx.IsCIRun() {
+		displayName = fmt.Sprintf("%q", name)
+	}
+
+	return displayName
+}
+
+func DirectoryDisplayName(ctx *config.RunContext, name string) string {
+	displayName := UnderlineString(name)
+	if ctx.IsCIRun() {
+		displayName = fmt.Sprintf("%q", name)
+	}
+
+	return displayName
 }

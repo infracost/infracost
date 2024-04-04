@@ -39,6 +39,18 @@ func NewPlanJSONProvider(ctx *config.ProjectContext, includePastResources bool) 
 	}
 }
 
+func (p *PlanJSONProvider) ProjectName() string {
+	return config.CleanProjectName(p.ctx.ProjectConfig.Path)
+}
+
+func (p *PlanJSONProvider) VarFiles() []string {
+	return nil
+}
+
+func (p *PlanJSONProvider) RelativePath() string {
+	return p.ctx.ProjectConfig.Path
+}
+
 func (p *PlanJSONProvider) Context() *config.ProjectContext {
 	return p.ctx
 }

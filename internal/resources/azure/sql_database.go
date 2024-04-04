@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
 
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -233,7 +233,6 @@ func (r *SQLDatabase) serverlessComputeHoursCostComponents() []*schema.CostCompo
 	}
 
 	name := fmt.Sprintf("Compute (serverless, %s)", r.SKU)
-	log.Warn().Msgf("'Multiple products found' are safe to ignore for '%s' due to limitations in the Azure API.", name)
 
 	costComponents := []*schema.CostComponent{
 		{
@@ -278,8 +277,6 @@ func (r *SQLDatabase) provisionedComputeCostComponents() []*schema.CostComponent
 
 	productNameRegex := fmt.Sprintf("/%s - %s/", r.Tier, r.Family)
 	name := fmt.Sprintf("Compute (provisioned, %s)", r.SKU)
-
-	log.Warn().Msgf("'Multiple products found' are safe to ignore for '%s' due to limitations in the Azure API.", name)
 
 	costComponents := []*schema.CostComponent{
 		{
@@ -343,7 +340,7 @@ func (r *SQLDatabase) longTermRetentionCostComponent() *schema.CostComponent {
 
 	redundancyType, ok := mssqlStorageRedundancyTypeMapping[strings.ToLower(r.BackupStorageType)]
 	if !ok {
-		log.Warn().Msgf("Unrecognized backup storage type '%s'", r.BackupStorageType)
+		logging.Logger.Warn().Msgf("Unrecognized backup storage type '%s'", r.BackupStorageType)
 		redundancyType = "RA-GRS"
 	}
 
@@ -370,7 +367,7 @@ func (r *SQLDatabase) pitrBackupCostComponent() *schema.CostComponent {
 
 	redundancyType, ok := mssqlStorageRedundancyTypeMapping[strings.ToLower(r.BackupStorageType)]
 	if !ok {
-		log.Warn().Msgf("Unrecognized backup storage type '%s'", r.BackupStorageType)
+		logging.Logger.Warn().Msgf("Unrecognized backup storage type '%s'", r.BackupStorageType)
 		redundancyType = "RA-GRS"
 	}
 
@@ -396,7 +393,7 @@ func (r *SQLDatabase) extraDataStorageCostComponent(extraStorageGB float64) *sch
 		tier, ok = mssqlTierMapping[strings.ToLower(r.SKU)[:1]]
 
 		if !ok {
-			log.Warn().Msgf("Unrecognized tier for SKU '%s' for resource %s", r.SKU, r.Address)
+			logging.Logger.Warn().Msgf("Unrecognized tier for SKU '%s' for resource %s", r.SKU, r.Address)
 			return nil
 		}
 	}

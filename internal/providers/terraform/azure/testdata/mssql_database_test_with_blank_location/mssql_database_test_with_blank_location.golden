@@ -18,8 +18,8 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ TestMSSQLDatabaseWithBlankLocation                 ┃ $147          ┃ $0.00       ┃ $147       ┃
+┃ main                                               ┃ $147          ┃ $0.00       ┃ $147       ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 Logs:
 
-WRN Using eastus for resource azurerm_mssql_database.blank_server_location as its 'location' property could not be found.
+WARN Using eastus for resource azurerm_mssql_database.blank_server_location as its 'location' property could not be found.

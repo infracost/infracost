@@ -229,6 +229,7 @@
     "Project": {
       "required": [
         "name",
+        "displayName",
         "metadata",
         "pastBreakdown",
         "breakdown",
@@ -237,6 +238,9 @@
       ],
       "properties": {
         "name": {
+          "type": "string"
+        },
+        "displayName": {
           "type": "string"
         },
         "metadata": {

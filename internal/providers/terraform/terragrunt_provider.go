@@ -10,7 +10,6 @@ import (
 	"github.com/kballard/go-shellquote"
 
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
 
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
@@ -59,6 +58,18 @@ func NewTerragruntProvider(ctx *config.ProjectContext, includePastResources bool
 	}
 }
 
+func (p *TerragruntProvider) ProjectName() string {
+	return config.CleanProjectName(p.ctx.ProjectConfig.Path)
+}
+
+func (p *TerragruntProvider) VarFiles() []string {
+	return nil
+}
+
+func (p *TerragruntProvider) RelativePath() string {
+	return p.ctx.ProjectConfig.Path
+}
+
 func (p *TerragruntProvider) Context() *config.ProjectContext { return p.ctx }
 
 func (p *TerragruntProvider) Type() string {
@@ -79,7 +90,7 @@ func (p *TerragruntProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 
 	modulePath, err := filepath.Rel(basePath, metadata.Path)
 	if err == nil && modulePath != "" && modulePath != "." {
-		log.Debug().Msgf("Calculated relative terraformModulePath for %s from %s", basePath, metadata.Path)
+		logging.Logger.Debug().Msgf("Calculated relative terraformModulePath for %s from %s", basePath, metadata.Path)
 		metadata.TerraformModulePath = modulePath
 	}
 
@@ -273,7 +284,7 @@ func (p *TerragruntProvider) generatePlanJSONs(projectDirs []terragruntProjectDi
 	defer func() {
 		err := cleanupPlanFiles(projectDirs, planFile)
 		if err != nil {
-			log.Warn().Msgf("Error cleaning up plan files: %v", err)
+			logging.Logger.Warn().Msgf("Error cleaning up plan files: %v", err)
 		}
 	}()
 

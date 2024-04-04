@@ -14,6 +14,7 @@
   "projects": [
     {
       "name": "infracost/infracost/cmd/infracost/testdata/breakdown_multi_project_with_error_output_json/dev",
+      "displayName": "dev",
       "metadata": {
         "path": "testdata/breakdown_multi_project_with_error_output_json/dev",
         "type": "terraform_dir",
@@ -214,6 +215,7 @@
     },
     {
       "name": "infracost/infracost/cmd/infracost/testdata/breakdown_multi_project_with_error_output_json/prod",
+      "displayName": "prod",
       "metadata": {
         "path": "testdata/breakdown_multi_project_with_error_output_json/prod",
         "type": "terraform_dir",

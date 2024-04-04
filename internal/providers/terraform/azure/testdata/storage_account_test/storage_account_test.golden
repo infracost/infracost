@@ -405,8 +405,8 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ TestAzureStorageAccountGoldenFile                  ┃ $0.00         ┃ $7,635,981  ┃ $7,635,981 ┃
+┃ main                                               ┃ $0.00         ┃ $7,635,981  ┃ $7,635,981 ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 Logs:
 
-WRN Skipping resource azurerm_storage_account.unsupported. BlockBlobStorage Premium doesn't support GRS redundancy
+WARN Skipping resource azurerm_storage_account.unsupported. BlockBlobStorage Premium doesn't support GRS redundancy

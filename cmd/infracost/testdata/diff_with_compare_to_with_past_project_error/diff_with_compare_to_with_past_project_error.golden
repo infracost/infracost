@@ -14,6 +14,7 @@
   "projects": [
     {
       "name": "infracost/infracost/cmd/infracost/testdata/diff_with_compare_to_with_past_project_error/dev",
+      "displayName": "dev",
       "metadata": {
         "path": "testdata/diff_with_compare_to_with_past_project_error/dev",
         "type": "terraform_dir",
@@ -56,6 +57,7 @@
     },
     {
       "name": "infracost/infracost/cmd/infracost/testdata/diff_with_compare_to_with_past_project_error/prod",
+      "displayName": "prod",
       "metadata": {
         "path": "testdata/diff_with_compare_to_with_past_project_error/prod",
         "type": "terraform_dir",

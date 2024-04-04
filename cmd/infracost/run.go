@@ -6,7 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"os"
+	"path/filepath"
 	"runtime/debug"
 	"sort"
 	"strings"
@@ -14,7 +14,6 @@ import (
 	"time"
 
 	"github.com/Rhymond/go-money"
-	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
 
@@ -83,7 +82,7 @@ func addRunFlags(cmd *cobra.Command) {
 
 func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	if runCtx.Config.IsSelfHosted() && runCtx.IsCloudEnabled() {
-		ui.PrintWarning(cmd.ErrOrStderr(), "Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
+		logging.Logger.Warn().Msg("Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
 	}
 
 	repoPath := runCtx.Config.RepoPath()
@@ -133,12 +132,12 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		dashboardClient := apiclient.NewDashboardAPIClient(runCtx)
 		result, err := dashboardClient.AddRun(runCtx, r, apiclient.CommentFormatMarkdownHTML)
 		if err != nil {
-			log.Err(err).Msg("Failed to upload to Infracost Cloud")
+			logging.Logger.Err(err).Msg("Failed to upload to Infracost Cloud")
 		}
 
 		r.RunID, r.ShareURL, r.CloudURL = result.RunID, result.ShareURL, result.CloudURL
 	} else {
-		log.Debug().Msg("Skipping sending project results since Infracost Cloud upload is not enabled.")
+		logging.Logger.Debug().Msg("Skipping sending project results since Infracost Cloud upload is not enabled.")
 	}
 
 	format := strings.ToLower(runCtx.Config.Format)
@@ -168,7 +167,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 	pricingClient := apiclient.GetPricingAPIClient(runCtx)
 	err = pricingClient.AddEvent("infracost-run", env)
 	if err != nil {
-		log.Error().Msgf("Error reporting event: %s", err)
+		logging.Logger.Error().Msgf("Error reporting event: %s", err)
 	}
 
 	if outFile, _ := cmd.Flags().GetString("out-file"); outFile != "" {
@@ -178,9 +177,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		}
 	} else {
 		// Print a new line to separate the logs from the output
-		if runCtx.Config.IsLogging() {
-			cmd.PrintErrln()
-		}
+		cmd.PrintErrln()
 		cmd.Println(string(b))
 	}
 
@@ -237,27 +234,107 @@ func newParallelRunner(cmd *cobra.Command, runCtx *config.RunContext) (*parallel
 
 func (r *parallelRunner) run() ([]projectResult, error) {
 	var queue []projectJob
-
+	var totalRootModules int
 	var i int
+
+	isAuto := r.runCtx.IsAutoDetect()
 	for _, p := range r.runCtx.Config.Projects {
-		detected, err := providers.Detect(r.runCtx, p, r.prior == nil)
+		detectionOutput, err := providers.Detect(r.runCtx, p, r.prior == nil)
 		if err != nil {
 			m := fmt.Sprintf("%s\n\n", err)
 			m += fmt.Sprintf("  Try adding a config-file to configure how Infracost should run. See %s for details and examples.", ui.LinkString("https://infracost.io/config-file"))
 
 			queue = append(queue, projectJob{index: i, err: schema.NewEmptyPathTypeError(errors.New(m)), ctx: config.NewProjectContext(r.runCtx, p, map[string]interface{}{})})
+			i++
 			continue
 		}
 
-		for _, provider := range detected {
+		for _, provider := range detectionOutput.Providers {
 			queue = append(queue, projectJob{index: i, provider: provider})
 			i++
 		}
+
+		totalRootModules += detectionOutput.RootModules
 	}
+	projectCounts := make(map[string]int)
+	for _, job := range queue {
+		if job.err != nil {
+			continue
+		}
+
+		provider := job.provider
+		if v, ok := projectCounts[provider.DisplayType()]; ok {
+			projectCounts[provider.DisplayType()] = v + 1
+			continue
+		}
+
+		projectCounts[provider.DisplayType()] = 1
+	}
+
+	var order []string
+	for displayType := range projectCounts {
+		order = append(order, displayType)
+	}
+
+	var summary string
+	sort.Strings(order)
+	for i, displayType := range order {
+		count := projectCounts[displayType]
+		desc := "project"
+		if count > 1 {
+			desc = "projects"
+		}
+
+		if len(order) > 1 && i == len(order)-2 {
+			summary += fmt.Sprintf("%d %s %s and ", count, displayType, desc)
+		} else if i == len(order)-1 {
+			summary += fmt.Sprintf("%d %s %s", count, displayType, desc)
+		} else {
+			summary += fmt.Sprintf("%d %s %s, ", count, displayType, desc)
+		}
+	}
+
+	moduleDesc := "module"
+	pathDesc := "path"
+	if totalRootModules > 1 {
+		moduleDesc = "modules"
+	}
+
+	if len(r.runCtx.Config.Projects) > 1 {
+		pathDesc = "paths"
+	}
+
+	if isAuto {
+		logging.Logger.Info().Msgf("Autodetected %s across %d root %s", summary, totalRootModules, moduleDesc)
+	} else {
+		logging.Logger.Info().Msgf("Autodetected %s from %d %s in the config file", summary, len(r.runCtx.Config.Projects), pathDesc)
+	}
+
+	for _, job := range queue {
+		if job.err != nil {
+			continue
+		}
+
+		provider := job.provider
+
+		name := provider.ProjectName()
+		displayName := ui.ProjectDisplayName(r.runCtx, name)
+
+		if len(provider.VarFiles()) > 0 {
+			varString := ""
+			for _, s := range provider.VarFiles() {
+				varString += fmt.Sprintf("%s, ", ui.DirectoryDisplayName(r.runCtx, filepath.Join(provider.RelativePath(), s)))
+			}
+			varString = strings.TrimRight(varString, ", ")
+
+			logging.Logger.Info().Msgf("Found %s project %s at directory %s using %s var files %v", provider.DisplayType(), displayName, ui.DirectoryDisplayName(r.runCtx, provider.RelativePath()), provider.DisplayType(), varString)
+		} else {
+			logging.Logger.Info().Msgf("Found %s project %s at directory %s", provider.DisplayType(), displayName, ui.DirectoryDisplayName(r.runCtx, provider.RelativePath()))
+		}
+	}
+
 	projectResultChan := make(chan projectResult, len(queue))
 	jobs := make(chan projectJob, len(queue))
-
-	r.printParallelMsg(queue)
 
 	errGroup, _ := errgroup.WithContext(context.Background())
 	for i := 0; i < r.parallelism; i++ {
@@ -323,20 +400,6 @@ func (r *parallelRunner) run() ([]projectResult, error) {
 	return projectResults, nil
 }
 
-func (r *parallelRunner) printParallelMsg(queue []projectJob) {
-	runInParallel := r.parallelism > 1 && len(queue) > 1
-	if (runInParallel || r.runCtx.IsCIRun()) && !r.runCtx.Config.IsLogging() {
-		if runInParallel {
-			r.cmd.PrintErrln("Running multiple projects in parallel, so log-level=info is enabled by default.")
-			r.cmd.PrintErrln("Run with INFRACOST_PARALLELISM=1 to disable parallelism to help debugging.")
-			r.cmd.PrintErrln()
-		}
-
-		r.runCtx.Config.LogLevel = "info"
-		_ = logging.ConfigureBaseLogger(r.runCtx.Config)
-	}
-}
-
 func (r *parallelRunner) runProvider(job projectJob) (out *projectOutput, err error) {
 	projectContext := job.provider.Context()
 	path := projectContext.ProjectConfig.Path
@@ -353,24 +416,16 @@ func (r *parallelRunner) runProvider(job projectJob) (out *projectOutput, err er
 		return nil, clierror.NewCLIError(errors.New(m), "Cannot use Terraform state JSON with the infracost diff command")
 	}
 
-	logging.Logger.Info().Msgf("%s: Starting evaluation", projectContext.ProjectConfig.Name)
+	name := job.provider.ProjectName()
+	displayName := ui.ProjectDisplayName(r.runCtx, name)
+
+	logging.Logger.Info().Msgf("Starting evaluation for project %s", displayName)
 	defer func() {
 		if err != nil {
-			logging.Logger.Info().Msgf("%s: Failed evaluation", projectContext.ProjectConfig.Name)
+			logging.Logger.Info().Msgf("Failed evaluation for project %s", displayName)
 		}
-		logging.Logger.Info().Msgf("%s: Finished evaluation", projectContext.ProjectConfig.Name)
+		logging.Logger.Info().Msgf("Finished evaluation for project %s", displayName)
 	}()
-
-	m := fmt.Sprintf("Detected %s at %s", job.provider.DisplayType(), ui.DisplayPath(path))
-	if job.provider.Type() == "terraform_dir" {
-		m = fmt.Sprintf("Evaluating %s at %s", job.provider.DisplayType(), ui.DisplayPath(path))
-	}
-
-	if r.runCtx.Config.IsLogging() {
-		log.Info().Msg(m)
-	} else {
-		fmt.Fprintln(os.Stderr, m)
-	}
 
 	// Generate usage file
 	if r.runCtx.Config.SyncUsageFile {
@@ -392,9 +447,9 @@ func (r *parallelRunner) runProvider(job projectJob) (out *projectOutput, err er
 
 		invalidKeys, err := usageFile.InvalidKeys()
 		if err != nil {
-			log.Error().Msgf("Error checking usage file keys: %v", err)
+			logging.Logger.Error().Msgf("Error checking usage file keys: %v", err)
 		} else if len(invalidKeys) > 0 {
-			ui.PrintWarningf(r.cmd.ErrOrStderr(),
+			logging.Logger.Warn().Msgf(
 				"The following usage file parameters are invalid and will be ignored: %s\n",
 				strings.Join(invalidKeys, ", "),
 			)
@@ -490,10 +545,6 @@ func (r *parallelRunner) runProvider(job projectJob) (out *projectOutput, err er
 	}
 
 	out.projects = projects
-
-	if !r.runCtx.Config.IsLogging() && !r.runCtx.Config.SkipErrLine {
-		r.cmd.PrintErrln()
-	}
 
 	return out, nil
 }
@@ -652,15 +703,7 @@ func (r *parallelRunner) generateUsageFile(provider schema.Provider) (err error)
 			pluralized = "s"
 		}
 
-		if r.runCtx.Config.IsLogging() {
-			logging.Logger.Info().Msgf("synced %d of %d resource%s", successes, resources, pluralized)
-		} else {
-			r.cmd.PrintErrln(fmt.Sprintf("    %s Synced %d of %d resource%s",
-				ui.FaintString("└─"),
-				successes,
-				resources,
-				pluralized))
-		}
+		logging.Logger.Info().Msgf("Synced %d of %d resource%s", successes, resources, pluralized)
 	}
 	return nil
 }
@@ -768,16 +811,16 @@ func loadRunFlags(cfg *config.Config, cmd *cobra.Command) error {
 	if cmd.Flags().Changed("fields") {
 		fields, _ := cmd.Flags().GetStringSlice("fields")
 		if len(fields) == 0 {
-			ui.PrintWarningf(cmd.ErrOrStderr(), "fields is empty, using defaults: %s", cmd.Flag("fields").DefValue)
+			logging.Logger.Warn().Msgf("fields is empty, using defaults: %s", cmd.Flag("fields").DefValue)
 		} else if cfg.Fields != nil && !contains(validFieldsFormats, cfg.Format) {
-			ui.PrintWarning(cmd.ErrOrStderr(), "fields is only supported for table and html output formats")
+			logging.Logger.Warn().Msg("fields is only supported for table and html output formats")
 		} else if len(fields) == 1 && fields[0] == includeAllFields {
 			cfg.Fields = validFields
 		} else {
 			vf := []string{}
 			for _, f := range fields {
 				if !contains(validFields, f) {
-					ui.PrintWarningf(cmd.ErrOrStderr(), "Invalid field '%s' specified, valid fields are: %s or '%s' to include all fields", f, validFields, includeAllFields)
+					logging.Logger.Warn().Msgf("Invalid field '%s' specified, valid fields are: %s or '%s' to include all fields", f, validFields, includeAllFields)
 				} else {
 					vf = append(vf, f)
 				}
@@ -809,7 +852,7 @@ func tfVarsToMap(vars []string) map[string]string {
 
 func checkRunConfig(warningWriter io.Writer, cfg *config.Config) error {
 	if cfg.Format == "json" && cfg.ShowSkipped {
-		ui.PrintWarning(warningWriter, "show-skipped is not needed with JSON output format as that always includes them.\n")
+		logging.Logger.Warn().Msg("show-skipped is not needed with JSON output format as that always includes them.")
 	}
 
 	if cfg.SyncUsageFile {
@@ -820,16 +863,16 @@ func checkRunConfig(warningWriter io.Writer, cfg *config.Config) error {
 			}
 		}
 		if len(missingUsageFile) == 1 {
-			ui.PrintWarning(warningWriter, "Ignoring sync-usage-file as no usage-file is specified.\n")
+			logging.Logger.Warn().Msg("Ignoring sync-usage-file as no usage-file is specified.")
 		} else if len(missingUsageFile) == len(cfg.Projects) {
-			ui.PrintWarning(warningWriter, "Ignoring sync-usage-file since no projects have a usage-file specified.\n")
+			logging.Logger.Warn().Msg("Ignoring sync-usage-file since no projects have a usage-file specified.")
 		} else if len(missingUsageFile) > 1 {
-			ui.PrintWarning(warningWriter, fmt.Sprintf("Ignoring sync-usage-file for following projects as no usage-file is specified for them: %s.\n", strings.Join(missingUsageFile, ", ")))
+			logging.Logger.Warn().Msgf("Ignoring sync-usage-file for following projects as no usage-file is specified for them: %s.", strings.Join(missingUsageFile, ", "))
 		}
 	}
 
 	if money.GetCurrency(cfg.Currency) == nil {
-		ui.PrintWarning(warningWriter, fmt.Sprintf("Ignoring unknown currency '%s', using USD.\n", cfg.Currency))
+		logging.Logger.Warn().Msgf("Ignoring unknown currency '%s', using USD.\n", cfg.Currency)
 		cfg.Currency = "USD"
 	}
 

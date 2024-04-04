@@ -5,8 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/rs/zerolog/log"
-
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources/azure"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -96,7 +95,7 @@ func newAzureRMMSSQLDatabase(d *schema.ResourceData) schema.CoreResource {
 	} else if !dtuMap.usesDTUUnits(sku) {
 		c, err := parseMSSQLSku(d.Address, sku)
 		if err != nil {
-			log.Warn().Msgf(err.Error())
+			logging.Logger.Warn().Msgf(err.Error())
 			return nil
 		}
 

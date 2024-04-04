@@ -1,9 +1,9 @@
 Comment posted to GitHub
 
 Logs:
-INF Estimate uploaded to Infracost Cloud
-INF 1 guardrail checked
-INF guardrail check failed: Stand by your estimate
-INF Creating new comment
-WRN >\n<summary><strong>⚠️ Guardrails triggered</strong></summary>\n\n> - <b>Warning</b>: Stand by your estimate\n</
-INF Created new comment: 
+INFO Estimate uploaded to Infracost Cloud
+INFO 1 guardrail checked
+INFO guardrail check failed: Stand by your estimate
+INFO Creating new comment
+WARN >\n<summary><strong>⚠️ Guardrails triggered</strong></summary>\n\n> - <b>Warning</b>: Stand by your estimate\n</
+INFO Created new comment: 

@@ -9,7 +9,6 @@ import (
 	json "github.com/json-iterator/go"
 
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
 
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/logging"
@@ -185,11 +184,7 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root, com
 		}
 		successMsg := fmt.Sprintf("Estimate uploaded to %sInfracost Cloud", orgMsg)
 
-		if ctx.Config.IsLogging() {
-			log.Info().Msg(successMsg)
-		} else {
-			fmt.Fprintf(ctx.ErrWriter, "%s\n", successMsg)
-		}
+		logging.Logger.Info().Msg(successMsg)
 
 		err = json.Unmarshal([]byte(cloudRun.Raw), &response)
 		if err != nil {
@@ -224,11 +219,7 @@ func (c *DashboardAPIClient) AddRun(ctx *config.RunContext, out output.Root, com
 }
 
 func outputGovernanceMessages(ctx *config.RunContext, msg string) {
-	if ctx.Config.IsLogging() {
-		log.Info().Msg(msg)
-	} else {
-		fmt.Fprintf(ctx.ErrWriter, "%s\n", msg)
-	}
+	logging.Logger.Info().Msg(msg)
 }
 
 func (c *DashboardAPIClient) QueryCLISettings() (QueryCLISettingsResponse, error) {

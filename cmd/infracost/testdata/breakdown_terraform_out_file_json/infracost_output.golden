@@ -582,6 +582,7 @@
         "totalMonthlyCost": "1485.28",
         "totalMonthlyUsageCost": "0"
       },
+      "displayName": "",
       "metadata": {
         "path": "./testdata/example_plan.json",
         "providers": [

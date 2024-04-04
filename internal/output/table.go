@@ -7,9 +7,8 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
 
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/ui"
-
-	"github.com/rs/zerolog/log"
 )
 
 func ToTable(out Root, opts Options) ([]byte, error) {
@@ -216,7 +215,7 @@ func tableForBreakdown(currency string, breakdown Breakdown, fields []string, in
 		filteredComponents := filterZeroValComponents(r.CostComponents, r.Name)
 		filteredSubResources := filterZeroValResources(r.SubResources, r.Name)
 		if len(filteredComponents) == 0 && len(filteredSubResources) == 0 {
-			log.Debug().Msgf("Hiding resource with no usage: %s", r.Name)
+			logging.Logger.Debug().Msgf("Hiding resource with no usage: %s", r.Name)
 			continue
 		}
 
@@ -359,7 +358,7 @@ func filterZeroValComponents(costComponents []CostComponent, resourceName string
 	var filteredComponents []CostComponent
 	for _, c := range costComponents {
 		if c.MonthlyQuantity != nil && c.MonthlyQuantity.IsZero() {
-			log.Debug().Msgf("Hiding cost with no usage: %s '%s'", resourceName, c.Name)
+			logging.Logger.Debug().Msgf("Hiding cost with no usage: %s '%s'", resourceName, c.Name)
 			continue
 		}
 
@@ -374,7 +373,7 @@ func filterZeroValResources(resources []Resource, resourceName string) []Resourc
 		filteredComponents := filterZeroValComponents(r.CostComponents, fmt.Sprintf("%s.%s", resourceName, r.Name))
 		filteredSubResources := filterZeroValResources(r.SubResources, fmt.Sprintf("%s.%s", resourceName, r.Name))
 		if len(filteredComponents) == 0 && len(filteredSubResources) == 0 {
-			log.Debug().Msgf("Hiding resource with no usage: %s.%s", resourceName, r.Name)
+			logging.Logger.Debug().Msgf("Hiding resource with no usage: %s.%s", resourceName, r.Name)
 			continue
 		}
 
@@ -409,7 +408,7 @@ func breakdownSummaryTable(out Root, opts Options) string {
 
 		t.AppendRow(
 			table.Row{
-				truncateMiddle(project.Name, 64, "..."),
+				truncateMiddle(project.Label(), 64, "..."),
 				formatCost(out.Currency, baseline),
 				formatCost(out.Currency, project.Breakdown.TotalMonthlyUsageCost),
 				formatCost(out.Currency, project.Breakdown.TotalMonthlyCost),
