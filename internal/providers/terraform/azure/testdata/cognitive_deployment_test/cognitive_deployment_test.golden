@@ -193,7 +193,6 @@
  └─ Fine tuning output (babbage-002)                                                 Monthly cost depends on usage: $0.0004 per 1K tokens      
                                                                                                                                                
  azurerm_cognitive_deployment.eastus2_without_usage["dall-e-3"]                                                                                
- ├─ Standard 1024x1024 images (dall-e-3)                                             Monthly cost depends on usage: $0.00 per 100 images       
  └─ Standard 1024x1792 images (dall-e-3)                                             Monthly cost depends on usage: $8.00 per 100 images       
                                                                                                                                                
  azurerm_cognitive_deployment.eastus2_without_usage["davinci-002"]                                                                             
@@ -374,7 +373,7 @@
                                                                                                                                                
  OVERALL TOTAL                                                                                                                   $20,498.94 
 
-*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ──────────────────────────────────
 116 cloud resources were detected:

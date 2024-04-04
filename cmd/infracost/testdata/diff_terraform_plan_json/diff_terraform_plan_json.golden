@@ -62,7 +62,7 @@ Amount:  +$1,361 ($0.00 → $1,361)
 ──────────────────────────────────
 Key: * usage cost, ~ changed, + added, - removed
 
-*Usage costs were estimated using ./testdata/example_usage.yml.
+*Usage costs were estimated using infracost-usage.yml, see docs for other options.
 
 5 cloud resources were detected:
 ∙ 5 were estimated

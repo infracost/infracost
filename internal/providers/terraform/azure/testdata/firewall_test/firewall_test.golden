@@ -26,7 +26,7 @@
                                                                                                
  OVERALL TOTAL                                                                    $6,256.15 
 
-*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ──────────────────────────────────
 11 cloud resources were detected:
