@@ -104,10 +104,10 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ TestAzureRMCosmosDBCassandraTableGoldenFile        ┃ $5,455        ┃ $0.00       ┃ $5,455     ┃
+┃ main                                               ┃ $5,455        ┃ $0.00       ┃ $5,455     ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 Logs:
 
-WRN Skipping resource azurerm_cosmosdb_cassandra_keyspace.no_account as its 'account_name' property could not be found.
-WRN Skipping resource azurerm_cosmosdb_cassandra_table.noAccount as its 'cassandra_keyspace_id.account_name' property could not be found.
-WRN Skipping resource azurerm_cosmosdb_cassandra_table.noKeyspace as its 'cassandra_keyspace_id' property could not be found.
+WARN Skipping resource azurerm_cosmosdb_cassandra_keyspace.no_account as its 'account_name' property could not be found.
+WARN Skipping resource azurerm_cosmosdb_cassandra_table.noAccount as its 'cassandra_keyspace_id.account_name' property could not be found.
+WARN Skipping resource azurerm_cosmosdb_cassandra_table.noKeyspace as its 'cassandra_keyspace_id' property could not be found.

@@ -14,6 +14,7 @@
   "projects": [
     {
       "name": "infracost/infracost/cmd/infracost/testdata",
+      "displayName": "",
       "metadata": {
         "path": "./cmd/infracost/testdata/",
         "type": "terraform_dir",
@@ -540,6 +541,7 @@
     },
     {
       "name": "infracost/infracost/cmd/infracost/testdata/azure_firewall_plan.json",
+      "displayName": "",
       "metadata": {
         "path": "./cmd/infracost/testdata/azure_firewall_plan.json",
         "type": "terraform_plan_json",

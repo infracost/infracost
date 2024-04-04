@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
 
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
@@ -30,6 +29,18 @@ func NewPlanProvider(ctx *config.ProjectContext, includePastResources bool) sche
 		Path:                 ctx.ProjectConfig.Path,
 		includePastResources: includePastResources,
 	}
+}
+
+func (p *PlanProvider) ProjectName() string {
+	return config.CleanProjectName(p.ctx.ProjectConfig.Path)
+}
+
+func (p *PlanProvider) VarFiles() []string {
+	return nil
+}
+
+func (p *PlanProvider) RelativePath() string {
+	return p.ctx.ProjectConfig.Path
 }
 
 func (p *PlanProvider) Type() string {
@@ -89,7 +100,7 @@ func (p *PlanProvider) generatePlanJSON() ([]byte, error) {
 	planPath := filepath.Base(p.Path)
 
 	if !IsTerraformDir(dir) {
-		log.Debug().Msgf("%s is not a Terraform directory, checking current working directory", dir)
+		logging.Logger.Debug().Msgf("%s is not a Terraform directory, checking current working directory", dir)
 		dir, err := os.Getwd()
 		if err != nil {
 			return []byte{}, err

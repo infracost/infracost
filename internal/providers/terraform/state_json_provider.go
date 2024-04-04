@@ -24,6 +24,18 @@ func NewStateJSONProvider(ctx *config.ProjectContext, includePastResources bool)
 	}
 }
 
+func (p *StateJSONProvider) ProjectName() string {
+	return config.CleanProjectName(p.ctx.ProjectConfig.Path)
+}
+
+func (p *StateJSONProvider) VarFiles() []string {
+	return nil
+}
+
+func (p *StateJSONProvider) RelativePath() string {
+	return p.ctx.ProjectConfig.Path
+}
+
 func (p *StateJSONProvider) Context() *config.ProjectContext { return p.ctx }
 
 func (p *StateJSONProvider) Type() string {

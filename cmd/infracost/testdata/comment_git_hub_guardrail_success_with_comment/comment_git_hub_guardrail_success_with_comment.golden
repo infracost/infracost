@@ -1,9 +1,9 @@
 Comment posted to GitHub
 
 Logs:
-INF Estimate uploaded to Infracost Cloud
-INF 1 guardrail checked
-INF Creating new comment
-WRN >\n<p><strong>✅ Guardrails passed</strong></p>\n"}
+INFO Estimate uploaded to Infracost Cloud
+INFO 1 guardrail checked
+INFO Creating new comment
+WARN >\n<p><strong>✅ Guardrails passed</strong></p>\n"}
 
-INF Created new comment: 
+INFO Created new comment: 

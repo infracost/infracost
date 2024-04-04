@@ -137,10 +137,6 @@ func EmptyRunContext() *RunContext {
 	}
 }
 
-var (
-	outputIndent = "  "
-)
-
 // IsAutoDetect returns true if the command is running with auto-detect functionality.
 func (r *RunContext) IsAutoDetect() bool {
 	return len(r.Config.Projects) <= 1 && r.Config.ConfigFilePath == ""

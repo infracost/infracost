@@ -1,6 +1,7 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 
@@ -8,7 +9,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
 
 	"github.com/infracost/infracost/internal/usage"
@@ -481,7 +481,7 @@ func (r *CloudfrontDistribution) shieldRequestsCostComponents() []*schema.CostCo
 	}
 
 	if apiRegion == "" {
-		log.Warn().Msgf("Skipping Origin shield HTTP requests for resource %s. Could not find mapping for region %s", r.Address, region)
+		logging.Logger.Warn().Msgf("Skipping Origin shield HTTP requests for resource %s. Could not find mapping for region %s", r.Address, region)
 		return costComponents
 	}
 
@@ -491,7 +491,7 @@ func (r *CloudfrontDistribution) shieldRequestsCostComponents() []*schema.CostCo
 	}
 
 	if usageKey == "" {
-		log.Warn().Msgf("No usage for Origin shield HTTP requests for resource %s.  Region %s not supported in usage file.", r.Address, region)
+		logging.Logger.Warn().Msgf("No usage for Origin shield HTTP requests for resource %s.  Region %s not supported in usage file.", r.Address, region)
 	}
 
 	regionData := map[string]*int64{

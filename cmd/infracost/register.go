@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/ui"
 )
 
@@ -15,7 +16,7 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 		Short:  login.Short,
 		Long:   login.Long,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ui.PrintWarningf(cmd.ErrOrStderr(),
+			logging.Logger.Warn().Msgf(
 				"this command has been changed to %s, which does the same thing - we’ll run that for you now.\n",
 				ui.PrimaryString("infracost auth login"),
 			)
@@ -25,7 +26,7 @@ func registerCmd(ctx *config.RunContext) *cobra.Command {
 	}
 
 	cmd.SetHelpFunc(func(cmd *cobra.Command, strings []string) {
-		ui.PrintWarningf(cmd.ErrOrStderr(),
+		logging.Logger.Warn().Msgf(
 			"this command has been changed to %s, which does the same thing - showing information for that command.\n",
 			ui.PrimaryString("infracost auth login"),
 		)

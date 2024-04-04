@@ -1,4 +1,4 @@
-Project: infracost/infracost/examples/terraform
+Project: ..-..-..-examples-terraform-dev
 Module path: ../../../examples/terraform
 Workspace: dev
 
@@ -28,7 +28,7 @@ Workspace: dev
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ infracost/infracost/examples/terraform             ┃ $743          ┃ $0.00       ┃ $743       ┃
+┃ ..-..-..-examples-terraform-dev                    ┃ $743          ┃ $0.00       ┃ $743       ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:

@@ -4,7 +4,8 @@ import (
 	"context"
 
 	"github.com/aws/aws-sdk-go-v2/service/autoscaling"
-	"github.com/rs/zerolog/log"
+
+	"github.com/infracost/infracost/internal/logging"
 )
 
 func autoscalingNewClient(ctx context.Context, region string) (*autoscaling.Client, error) {
@@ -21,7 +22,7 @@ func autoscalingNewClient(ctx context.Context, region string) (*autoscaling.Clie
 //  2. Instantaneous count right now
 //  3. Mean of min-size and max-size
 func AutoscalingGetInstanceCount(ctx context.Context, region string, name string) (float64, error) {
-	log.Debug().Msgf("Querying AWS CloudWatch: AWS/AutoScaling GroupTotalInstances (region: %s, AutoScalingGroupName: %s)", region, name)
+	logging.Logger.Debug().Msgf("Querying AWS CloudWatch: AWS/AutoScaling GroupTotalInstances (region: %s, AutoScalingGroupName: %s)", region, name)
 	stats, err := cloudwatchGetMonthlyStats(ctx, statsRequest{
 		region:     region,
 		namespace:  "AWS/AutoScaling",
@@ -40,7 +41,7 @@ func AutoscalingGetInstanceCount(ctx context.Context, region string, name string
 	if err != nil {
 		return 0, err
 	}
-	log.Debug().Msgf("Querying AWS EC2 API: DescribeAutoScalingGroups(region: %s, AutoScalingGroupNames: [%s])", region, name)
+	logging.Logger.Debug().Msgf("Querying AWS EC2 API: DescribeAutoScalingGroups(region: %s, AutoScalingGroupNames: [%s])", region, name)
 	resp, err := client.DescribeAutoScalingGroups(ctx, &autoscaling.DescribeAutoScalingGroupsInput{
 		AutoScalingGroupNames: []string{name},
 	})

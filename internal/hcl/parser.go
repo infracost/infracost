@@ -16,6 +16,7 @@ import (
 	"github.com/zclconf/go-cty/cty/gocty"
 
 	"github.com/infracost/infracost/internal/clierror"
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/extclient"
 	"github.com/infracost/infracost/internal/hcl/modules"
 	"github.com/infracost/infracost/internal/logging"
@@ -248,7 +249,7 @@ type DetectedProject interface {
 	ProjectName() string
 	EnvName() string
 	RelativePath() string
-	TerraformVarFiles() []string
+	VarFiles() []string
 	YAML() string
 }
 
@@ -303,10 +304,10 @@ func (p *Parser) YAML() string {
 	str := strings.Builder{}
 
 	str.WriteString(fmt.Sprintf("  - path: %s\n    name: %s\n", p.RelativePath(), p.ProjectName()))
-	if len(p.TerraformVarFiles()) > 0 {
+	if len(p.VarFiles()) > 0 {
 		str.WriteString("    terraform_var_files:\n")
 
-		for _, varFile := range p.TerraformVarFiles() {
+		for _, varFile := range p.VarFiles() {
 			str.WriteString(fmt.Sprintf("      - %s\n", varFile))
 		}
 	}
@@ -455,12 +456,7 @@ func (p *Parser) RelativePath() string {
 // ProjectName generates a name for the project that can be used
 // in the Infracost config file.
 func (p *Parser) ProjectName() string {
-	r := p.RelativePath()
-	name := strings.TrimSuffix(r, "/")
-	name = strings.ReplaceAll(name, "/", "-")
-	if name == "." {
-		name = "main"
-	}
+	name := config.CleanProjectName(p.RelativePath())
 
 	if p.moduleSuffix != "" {
 		name = fmt.Sprintf("%s-%s", name, p.moduleSuffix)
@@ -480,7 +476,7 @@ func (p *Parser) EnvName() string {
 
 // TerraformVarFiles returns the list of terraform var files that the parser
 // will use to load variables from.
-func (p *Parser) TerraformVarFiles() []string {
+func (p *Parser) VarFiles() []string {
 	varFilesMap := make(map[string]struct{}, len(p.tfvarsPaths))
 	varFiles := make([]string, 0, len(p.tfvarsPaths))
 

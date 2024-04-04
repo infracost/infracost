@@ -23,6 +23,14 @@ func NewTemplateProvider(ctx *config.ProjectContext, includePastResources bool) 
 	}
 }
 
+func (p *TemplateProvider) ProjectName() string {
+	return config.CleanProjectName(p.ctx.ProjectConfig.Path)
+}
+
+func (p *TemplateProvider) VarFiles() []string {
+	return nil
+}
+
 func (p *TemplateProvider) Context() *config.ProjectContext { return p.ctx }
 
 func (p *TemplateProvider) Type() string {
@@ -35,6 +43,10 @@ func (p *TemplateProvider) DisplayType() string {
 
 func (p *TemplateProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 	metadata.ConfigSha = p.ctx.ProjectConfig.ConfigSha
+}
+
+func (p *TemplateProvider) RelativePath() string {
+	return p.ctx.ProjectConfig.Path
 }
 
 func (p *TemplateProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, error) {

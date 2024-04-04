@@ -14,6 +14,7 @@
   "projects": [
     {
       "name": "infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags",
+      "displayName": "main",
       "metadata": {
         "path": "testdata/breakdown_format_json_with_tags",
         "type": "terraform_dir",

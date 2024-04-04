@@ -1,4 +1,4 @@
-Project: infracost/infracost/cmd/infracost/testdata/breakdown_multi_project_with_error/dev
+Project: dev
 Module path: dev
 
 Errors:
@@ -8,7 +8,7 @@ Errors:
         Invalid block definition; Either a quoted string block label or an opening brace ("{") is expected here., and 1 other diagnostic(s)
 
 ──────────────────────────────────
-Project: infracost/infracost/cmd/infracost/testdata/breakdown_multi_project_with_error/prod
+Project: prod
 Module path: prod
 
  Name                                                   Monthly Qty  Unit   Monthly Cost   
@@ -31,12 +31,12 @@ Module path: prod
 1 cloud resource was detected:
 ∙ 1 was estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
-┃ Project                                                          ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...n_multi_project_with_error/dev ┃ $0.00         ┃ $0.00       ┃ $0.00      ┃
-┃ infracost/infracost/cmd/infraco..._multi_project_with_error/prod ┃ $1,303        ┃ $0.00       ┃ $1,303     ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ dev                                                ┃ $0.00         ┃ $0.00       ┃ $0.00      ┃
+┃ prod                                               ┃ $1,303        ┃ $0.00       ┃ $1,303     ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:
 

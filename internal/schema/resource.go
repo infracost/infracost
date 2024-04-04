@@ -3,9 +3,10 @@ package schema
 import (
 	"sort"
 
-	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
+
+	"github.com/infracost/infracost/internal/logging"
 )
 
 var (
@@ -92,7 +93,7 @@ func (r *Resource) CalculateCosts() {
 		r.MonthlyUsageCost = monthlyUsageCost
 	}
 	if r.NoPrice {
-		log.Debug().Msgf("Skipping free resource %s", r.Name)
+		logging.Logger.Debug().Msgf("Skipping free resource %s", r.Name)
 	}
 }
 

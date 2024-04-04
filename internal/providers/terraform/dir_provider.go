@@ -21,8 +21,6 @@ import (
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
-
-	"github.com/rs/zerolog/log"
 )
 
 var minTerraformVer = "v0.12"
@@ -67,6 +65,28 @@ func NewDirProvider(ctx *config.ProjectContext, includePastResources bool) schem
 		Env:                  ctx.ProjectConfig.Env,
 		includePastResources: includePastResources,
 	}
+}
+
+func (p *DirProvider) ProjectName() string {
+	if p.ctx.ProjectConfig.Name != "" {
+		return p.ctx.ProjectConfig.Name
+	}
+
+	if p.ctx.ProjectConfig.TerraformWorkspace != "" {
+		return config.CleanProjectName(p.RelativePath()) + "-" + p.ctx.ProjectConfig.TerraformWorkspace
+	}
+
+	return config.CleanProjectName(p.RelativePath())
+}
+
+func (p *DirProvider) VarFiles() []string {
+	return nil
+}
+
+func (p *DirProvider) RelativePath() string {
+	r, _ := filepath.Rel(p.ctx.RunContext.Config.RepoPath(), p.ctx.ProjectConfig.Path)
+
+	return r
 }
 
 func (p *DirProvider) Context() *config.ProjectContext { return p.ctx }
@@ -117,7 +137,7 @@ func (p *DirProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 
 	modulePath, err := filepath.Rel(basePath, metadata.Path)
 	if err == nil && modulePath != "" && modulePath != "." {
-		log.Debug().Msgf("Calculated relative terraformModulePath for %s from %s", basePath, metadata.Path)
+		logging.Logger.Debug().Msgf("Calculated relative terraformModulePath for %s from %s", basePath, metadata.Path)
 		metadata.TerraformModulePath = modulePath
 	}
 
@@ -130,7 +150,7 @@ func (p *DirProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 
 		out, err := cmd.Output()
 		if err != nil {
-			log.Debug().Msgf("Could not detect Terraform workspace for %s", p.Path)
+			logging.Logger.Debug().Msgf("Could not detect Terraform workspace for %s", p.Path)
 		}
 		terraformWorkspace = strings.Split(string(out), "\n")[0]
 	}
@@ -172,6 +192,7 @@ func (p *DirProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, e
 		}
 
 		project := schema.NewProject(name, metadata)
+		project.DisplayName = p.ProjectName()
 
 		parser := NewParser(p.ctx, p.includePastResources)
 
@@ -454,7 +475,7 @@ func (p *DirProvider) runShow(opts *CmdOptions, planFile string, initOnFail bool
 
 		// If the plan returns this error then Terraform is configured with remote execution mode
 		if isTerraformRemoteExecutionErr(extractedErr) {
-			log.Info().Msg("Terraform expected Remote Execution Mode")
+			logging.Logger.Debug().Msg("Terraform expected Remote Execution Mode")
 		} else if initOnFail && isTerraformInitErr(extractedErr) {
 			err = p.runInit(opts)
 			if err != nil {

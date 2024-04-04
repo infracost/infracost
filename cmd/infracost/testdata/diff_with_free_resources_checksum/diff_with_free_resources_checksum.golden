@@ -14,6 +14,7 @@
   "projects": [
     {
       "name": "infracost/infracost/cmd/infracost/testdata/diff_with_free_resources_checksum",
+      "displayName": "main",
       "metadata": {
         "path": "testdata/diff_with_free_resources_checksum",
         "type": "terraform_dir",

@@ -25,10 +25,3 @@ func StripColor(str string) string {
 	re := regexp.MustCompile(ansi)
 	return re.ReplaceAllString(str, "")
 }
-
-func DisplayPath(path string) string {
-	if path == "" {
-		return "current directory"
-	}
-	return path
-}
