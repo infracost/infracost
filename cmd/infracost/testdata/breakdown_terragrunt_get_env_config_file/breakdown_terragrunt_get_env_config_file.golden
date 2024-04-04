@@ -1,37 +1,40 @@
 Project: dev
 
- Name                                                 Monthly Qty  Unit   Monthly Cost 
-                                                                                       
- aws_instance.web_app                                                                  
- ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)          730  hours         $8.47 
- └─ root_block_device                                                                  
-    └─ Storage (general purpose SSD, gp2)                      50  GB            $5.00 
-                                                                                       
- Project total                                                                  $13.47 
+ Name                                                 Monthly Qty  Unit   Monthly Cost   
+                                                                                         
+ aws_instance.web_app                                                                    
+ ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)          730  hours         $8.47   
+ └─ root_block_device                                                                    
+    └─ Storage (general purpose SSD, gp2)                      50  GB            $5.00   
+                                                                                         
+ Project total                                                                  $13.47   
 
 ──────────────────────────────────
 Project: prod
 
- Name                                                  Monthly Qty  Unit   Monthly Cost 
-                                                                                        
- aws_instance.web_app                                                                   
- ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)          730  hours        $33.87 
- └─ root_block_device                                                                   
-    └─ Storage (general purpose SSD, gp2)                       50  GB            $5.00 
-                                                                                        
- Project total                                                                   $38.87 
+ Name                                                  Monthly Qty  Unit   Monthly Cost   
+                                                                                          
+ aws_instance.web_app                                                                     
+ ├─ Instance usage (Linux/UNIX, on-demand, t2.medium)          730  hours        $33.87   
+ └─ root_block_device                                                                     
+    └─ Storage (general purpose SSD, gp2)                       50  GB            $5.00   
+                                                                                          
+ Project total                                                                   $38.87   
 
- OVERALL TOTAL                                                                   $52.34 
+ OVERALL TOTAL                                                                  $52.34 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or usage files in the config file.
+
 ──────────────────────────────────
 2 cloud resources were detected:
 ∙ 2 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ dev                                                ┃ $13          ┃
-┃ prod                                               ┃ $39          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ dev                                                ┃ $13           ┃ $0.00       ┃ $13        ┃
+┃ prod                                               ┃ $39           ┃ $0.00       ┃ $39        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:
 

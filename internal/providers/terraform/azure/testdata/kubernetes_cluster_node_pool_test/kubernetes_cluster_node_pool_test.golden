@@ -1,61 +1,64 @@
 
- Name                                                                    Monthly Qty  Unit    Monthly Cost 
-                                                                                                           
- azurerm_kubernetes_cluster_node_pool.Standard_DS2_v2                                                      
- └─ Instance usage (Linux, pay as you go, Standard_DS2_v2)                     1,460  hours        $213.16 
-                                                                                                           
- azurerm_kubernetes_cluster_node_pool.with_min_count                                                       
- └─ Instance usage (Linux, pay as you go, Standard_DS2_v2)                     1,460  hours        $213.16 
-                                                                                                           
- azurerm_kubernetes_cluster_node_pool.windows_sku                                                          
- ├─ Instance usage (Windows, pay as you go, Standard_DS2_v2)                     730  hours        $183.96 
- └─ os_disk                                                                                                
-    └─ Storage (P10, LRS)                                                          1  months        $19.71 
-                                                                                                           
- azurerm_kubernetes_cluster_node_pool.example                                                              
- ├─ Instance usage (Linux, pay as you go, Standard_DS2_v2)                       730  hours        $106.58 
- └─ os_disk                                                                                                
-    └─ Storage (P10, LRS)                                                          1  months        $19.71 
-                                                                                                           
- azurerm_kubernetes_cluster_node_pool.zero_min_count_default_node_count                                    
- ├─ Instance usage (Linux, pay as you go, Standard_DS2_v2)                       730  hours        $106.58 
- └─ os_disk                                                                                                
-    └─ Storage (P10, LRS)                                                          1  months        $19.71 
-                                                                                                           
- azurerm_kubernetes_cluster.example                                                                        
- └─ default_node_pool                                                                                      
-    ├─ Instance usage (Linux, pay as you go, Standard_D2_v2)                     730  hours        $106.58 
-    └─ os_disk                                                                                             
-       └─ Storage (S10, LRS)                                                       1  months         $5.89 
-                                                                                                           
- azurerm_kubernetes_cluster_node_pool.windows                                                              
- ├─ Instance usage (Windows, pay as you go, Basic_A2)                            730  hours         $97.09 
- └─ os_disk                                                                                                
-    └─ Storage (S10, LRS)                                                          1  months         $5.89 
-                                                                                                           
- azurerm_kubernetes_cluster_node_pool.usage_basic_A2                                                       
- ├─ Instance usage (Linux, pay as you go, Basic_A2)                              900  hours         $71.10 
- └─ os_disk                                                                                                
-    └─ Storage (S10, LRS)                                                          2  months        $11.78 
-                                                                                                           
- azurerm_kubernetes_cluster_node_pool.non_premium                                                          
- ├─ Instance usage (Linux, pay as you go, Standard_D2_v3)                        730  hours         $70.08 
- └─ os_disk                                                                                                
-    └─ Storage (S10, LRS)                                                          1  months         $5.89 
-                                                                                                           
- azurerm_kubernetes_cluster_node_pool.basic_A2                                                             
- ├─ Instance usage (Linux, pay as you go, Basic_A2)                              730  hours         $57.67 
- └─ os_disk                                                                                                
-    └─ Storage (S10, LRS)                                                          1  months         $5.89 
-                                                                                                           
- OVERALL TOTAL                                                                                   $1,320.42 
+ Name                                                                    Monthly Qty  Unit    Monthly Cost   
+                                                                                                             
+ azurerm_kubernetes_cluster_node_pool.Standard_DS2_v2                                                        
+ └─ Instance usage (Linux, pay as you go, Standard_DS2_v2)                     1,460  hours        $213.16   
+                                                                                                             
+ azurerm_kubernetes_cluster_node_pool.with_min_count                                                         
+ └─ Instance usage (Linux, pay as you go, Standard_DS2_v2)                     1,460  hours        $213.16   
+                                                                                                             
+ azurerm_kubernetes_cluster_node_pool.windows_sku                                                            
+ ├─ Instance usage (Windows, pay as you go, Standard_DS2_v2)                     730  hours        $183.96   
+ └─ os_disk                                                                                                  
+    └─ Storage (P10, LRS)                                                          1  months        $19.71   
+                                                                                                             
+ azurerm_kubernetes_cluster_node_pool.example                                                                
+ ├─ Instance usage (Linux, pay as you go, Standard_DS2_v2)                       730  hours        $106.58   
+ └─ os_disk                                                                                                  
+    └─ Storage (P10, LRS)                                                          1  months        $19.71   
+                                                                                                             
+ azurerm_kubernetes_cluster_node_pool.zero_min_count_default_node_count                                      
+ ├─ Instance usage (Linux, pay as you go, Standard_DS2_v2)                       730  hours        $106.58   
+ └─ os_disk                                                                                                  
+    └─ Storage (P10, LRS)                                                          1  months        $19.71   
+                                                                                                             
+ azurerm_kubernetes_cluster.example                                                                          
+ └─ default_node_pool                                                                                        
+    ├─ Instance usage (Linux, pay as you go, Standard_D2_v2)                     730  hours        $106.58   
+    └─ os_disk                                                                                               
+       └─ Storage (S10, LRS)                                                       1  months         $5.89   
+                                                                                                             
+ azurerm_kubernetes_cluster_node_pool.windows                                                                
+ ├─ Instance usage (Windows, pay as you go, Basic_A2)                            730  hours         $97.09   
+ └─ os_disk                                                                                                  
+    └─ Storage (S10, LRS)                                                          1  months         $5.89   
+                                                                                                             
+ azurerm_kubernetes_cluster_node_pool.usage_basic_A2                                                         
+ ├─ Instance usage (Linux, pay as you go, Basic_A2)                              900  hours         $71.10   
+ └─ os_disk                                                                                                  
+    └─ Storage (S10, LRS)                                                          2  months        $11.78   
+                                                                                                             
+ azurerm_kubernetes_cluster_node_pool.non_premium                                                            
+ ├─ Instance usage (Linux, pay as you go, Standard_D2_v3)                        730  hours         $70.08   
+ └─ os_disk                                                                                                  
+    └─ Storage (S10, LRS)                                                          1  months         $5.89   
+                                                                                                             
+ azurerm_kubernetes_cluster_node_pool.basic_A2                                                               
+ ├─ Instance usage (Linux, pay as you go, Basic_A2)                              730  hours         $57.67   
+ └─ os_disk                                                                                                  
+    └─ Storage (S10, LRS)                                                          1  months         $5.89   
+                                                                                                             
+ OVERALL TOTAL                                                                                  $1,320.42 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 11 cloud resources were detected:
 ∙ 10 were estimated
 ∙ 1 was free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMKubernetesClusterNodePoolGoldenFile     ┃ $1,320       ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestAzureRMKubernetesClusterNodePoolGoldenFile     ┃ $1,320        ┃ $0.00       ┃ $1,320     ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

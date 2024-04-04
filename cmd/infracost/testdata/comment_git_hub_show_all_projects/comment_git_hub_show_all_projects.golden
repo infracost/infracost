@@ -1,27 +1,39 @@
 
-<h3>Infracost report</h3>
-<h4>💰 Monthly cost will increase by $41 📈</h4>
+<h4>💰 Infracost report</h4>
+<h4>Monthly cost will increase by $41 📈</h4>
 <table>
   <thead>
-    <td>Project</td>
-    <td>Cost change</td>
+    <td>Changed project</td>
+    <td><a href="https://www.infracost.io/docs/features/usage_based_resources/"
+           title="Baseline costs are consistent charges for provisioned resources, like the hourly cost for a virtual machine, which stays constant no matter how much it is used. Infracost estimates these resources assuming they are used for the whole month (730 hours).">Baseline cost</a></td>
+    <td><a href="https://www.infracost.io/docs/features/usage_based_resources/"
+           title="Usage costs are charges based on actual usage, like the storage cost for an object storage bucket. Infracost estimates these resources using the monthly usage values in the usage-file.">Usage cost</a>*</td>
+    <td>Total change</td>
     <td>New monthly cost</td>
   </thead>
   <tbody>
     <tr>
       <td>infracost/infracost/cmd/infraco...aform_v0.14_nochange_plan.json</td>
-      <td>+$0</td>
+      <td align="right">+$0</td>
+      <td align="right">-</td>
+      <td align="right">+$0</td>
       <td align="right">$41</td>
     </tr>
     <tr>
       <td>infracost/infracost/cmd/infraco...data/terraform_v0.14_plan.json</td>
-      <td>+$41 (+100%)</td>
+      <td align="right">+$41</td>
+      <td align="right">-</td>
+      <td align="right">+$41 (+100%)</td>
       <td align="right">$81</td>
     </tr>
   </tbody>
 </table>
+
+
+*Usage costs can be estimated by adding [usage defaults](https://www.infracost.io/docs/features/usage_based_resources) or an [infracost-usage.yml](https://www.infracost.io/docs/features/usage_based_resources/#infracost-usageyml).
 <details>
-<summary>Cost details</summary>
+
+<summary>Cost details </summary>
 
 ```
 Key: * usage cost, ~ changed, + added, - removed
@@ -111,17 +123,19 @@ Percent: +100%
 ──────────────────────────────────
 Key: * usage cost, ~ changed, + added, - removed
 
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 26 cloud resources were detected:
 ∙ 14 were estimated
 ∙ 12 were free
 
 Infracost estimate: Monthly cost will increase by $41 ↑
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
-┃ Project                                                          ┃ Cost change  ┃ New monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...data/terraform_v0.14_plan.json ┃ +$41 (+100%) ┃ $81              ┃
-┃ infracost/infracost/cmd/infraco...aform_v0.14_nochange_plan.json ┃          +$0 ┃ $41              ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Changed project                                                  ┃ Baseline cost ┃ Usage cost ┃ Total change ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infraco...data/terraform_v0.14_plan.json ┃          +$41 ┃          - ┃ +$41 (+100%) ┃
+┃ infracost/infracost/cmd/infraco...aform_v0.14_nochange_plan.json ┃           +$0 ┃          - ┃          +$0 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 ```
 </details>
 

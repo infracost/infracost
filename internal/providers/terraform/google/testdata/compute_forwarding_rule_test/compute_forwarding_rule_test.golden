@@ -1,25 +1,28 @@
 
- Name                                              Monthly Qty  Unit              Monthly Cost 
-                                                                                               
- google_compute_forwarding_rule.default                                                        
- ├─ Forwarding rules                                       730  hours                    $7.30 
- └─ Ingress data                                           100  GB                       $0.80 
-                                                                                               
- google_compute_global_forwarding_rule.default                                                 
- ├─ Forwarding rules                                       730  hours                    $7.30 
- └─ Ingress data                                           100  GB                       $0.80 
-                                                                                               
- google_compute_forwarding_rule.withoutUsage                                                   
- ├─ Forwarding rules                                       730  hours                    $7.30 
- └─ Ingress data                                Monthly cost depends on usage: $0.008 per GB   
-                                                                                               
+ Name                                              Monthly Qty  Unit              Monthly Cost    
+                                                                                                  
+ google_compute_forwarding_rule.default                                                           
+ ├─ Forwarding rules                                       730  hours                    $7.30    
+ └─ Ingress data                                           100  GB                       $0.80  * 
+                                                                                                  
+ google_compute_global_forwarding_rule.default                                                    
+ ├─ Forwarding rules                                       730  hours                    $7.30    
+ └─ Ingress data                                           100  GB                       $0.80  * 
+                                                                                                  
+ google_compute_forwarding_rule.withoutUsage                                                      
+ ├─ Forwarding rules                                       730  hours                    $7.30    
+ └─ Ingress data                                Monthly cost depends on usage: $0.008 per GB      
+                                                                                                  
  OVERALL TOTAL                                                                          $23.50 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 3 cloud resources were detected:
 ∙ 3 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestComputeForwardingRule                          ┃ $24          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestComputeForwardingRule                          ┃ $22           ┃ $2          ┃ $24        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

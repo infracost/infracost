@@ -1,18 +1,21 @@
 
- Name                                                 Monthly Qty  Unit   Monthly Cost 
-                                                                                       
- google_compute_instance_group_manager.default                                         
- ├─ Instance usage (Linux/UNIX, on-demand, f1-micro)          730  hours         $3.88 
- └─ SSD provisioned storage (pd-ssd)                          375  GB           $63.75 
-                                                                                       
- OVERALL TOTAL                                                                  $67.63 
+ Name                                                 Monthly Qty  Unit   Monthly Cost   
+                                                                                         
+ google_compute_instance_group_manager.default                                           
+ ├─ Instance usage (Linux/UNIX, on-demand, f1-micro)          730  hours         $3.88   
+ └─ SSD provisioned storage (pd-ssd)                          375  GB           $63.75   
+                                                                                         
+ OVERALL TOTAL                                                                 $67.63 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 3 cloud resources were detected:
 ∙ 1 was estimated
 ∙ 2 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestComputePerInstanceConfig                       ┃ $68          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestComputePerInstanceConfig                       ┃ $68           ┃ $0.00       ┃ $68        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

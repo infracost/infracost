@@ -1,28 +1,31 @@
 
- Name                                                                 Monthly Qty  Unit   Monthly Cost 
-                                                                                                       
- azurerm_traffic_manager_nested_endpoint.germany_example                                               
- ├─ Basic health check (Germany)                                              730  hours         $0.36 
- └─ Fast interval health checks add-on (Germany)                              730  hours         $1.36 
-                                                                                                       
- azurerm_traffic_manager_nested_endpoint.fast_healthcheck_example                                      
- ├─ Basic health check (Global)                                               730  hours         $0.36 
- └─ Fast interval health checks add-on (Global)                               730  hours         $1.00 
-                                                                                                       
- azurerm_traffic_manager_nested_endpoint.basic_healthcheck_example                                     
- └─ Basic health check (Global)                                               730  hours         $0.36 
-                                                                                                       
- azurerm_traffic_manager_nested_endpoint.default_healthcheck_example                                   
- └─ Basic health check (Global)                                               730  hours         $0.36 
-                                                                                                       
- OVERALL TOTAL                                                                                   $3.80 
+ Name                                                                 Monthly Qty  Unit   Monthly Cost   
+                                                                                                         
+ azurerm_traffic_manager_nested_endpoint.germany_example                                                 
+ ├─ Basic health check (Germany)                                              730  hours         $0.36   
+ └─ Fast interval health checks add-on (Germany)                              730  hours         $1.36   
+                                                                                                         
+ azurerm_traffic_manager_nested_endpoint.fast_healthcheck_example                                        
+ ├─ Basic health check (Global)                                               730  hours         $0.36   
+ └─ Fast interval health checks add-on (Global)                               730  hours         $1.00   
+                                                                                                         
+ azurerm_traffic_manager_nested_endpoint.basic_healthcheck_example                                       
+ └─ Basic health check (Global)                                               730  hours         $0.36   
+                                                                                                         
+ azurerm_traffic_manager_nested_endpoint.default_healthcheck_example                                     
+ └─ Basic health check (Global)                                               730  hours         $0.36   
+                                                                                                         
+ OVERALL TOTAL                                                                                  $3.80 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 12 cloud resources were detected:
 ∙ 10 were estimated
 ∙ 2 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestTrafficManagerNestedEndpoint                   ┃ $4           ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestTrafficManagerNestedEndpoint                   ┃ $4            ┃ $0.00       ┃ $4         ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

@@ -1,20 +1,23 @@
 
- Name                                                    Monthly Qty  Unit                Monthly Cost 
-                                                                                                       
- azurerm_network_watcher.network_watcher_with_usage                                                    
- └─ Network diagnostic tool (over 1,000 checks)                9,000  checks                     $9.00 
-                                                                                                       
- azurerm_network_watcher.network_watcher                                                               
- └─ Network diagnostic tool (over 1,000 checks)      Monthly cost depends on usage: $0.001 per checks  
-                                                                                                       
+ Name                                                    Monthly Qty  Unit                Monthly Cost    
+                                                                                                          
+ azurerm_network_watcher.network_watcher_with_usage                                                       
+ └─ Network diagnostic tool (over 1,000 checks)                9,000  checks                     $9.00  * 
+                                                                                                          
+ azurerm_network_watcher.network_watcher                                                                  
+ └─ Network diagnostic tool (over 1,000 checks)      Monthly cost depends on usage: $0.001 per checks     
+                                                                                                          
  OVERALL TOTAL                                                                                   $9.00 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 3 cloud resources were detected:
 ∙ 2 were estimated
 ∙ 1 was free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestNetworkWatcher                                 ┃ $9           ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestNetworkWatcher                                 ┃ $0.00         ┃ $9          ┃ $9         ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

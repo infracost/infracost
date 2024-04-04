@@ -1,19 +1,22 @@
 
- Name                                 Monthly Qty  Unit            Monthly Cost 
-                                                                                
- google_bigquery_dataset.usage                                                  
- └─ Queries (on-demand)                     100.3  TB                   $626.88 
-                                                                                
- google_bigquery_dataset.non_usage                                              
- └─ Queries (on-demand)             Monthly cost depends on usage: $6.25 per TB 
-                                                                                
+ Name                                 Monthly Qty  Unit            Monthly Cost    
+                                                                                   
+ google_bigquery_dataset.usage                                                     
+ └─ Queries (on-demand)                     100.3  TB                   $626.88  * 
+                                                                                   
+ google_bigquery_dataset.non_usage                                                 
+ └─ Queries (on-demand)             Monthly cost depends on usage: $6.25 per TB    
+                                                                                   
  OVERALL TOTAL                                                          $626.88 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 2 cloud resources were detected:
 ∙ 2 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestBigqueryDataset                                ┃ $627         ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestBigqueryDataset                                ┃ $0.00         ┃ $627        ┃ $627       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

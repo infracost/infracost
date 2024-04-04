@@ -1,21 +1,24 @@
 
- Name                              Monthly Qty  Unit              Monthly Cost 
-                                                                               
- aws_nat_gateway.nat_withUsage                                                 
- ├─ NAT gateway                            730  hours                   $32.85 
- └─ Data processed                         100  GB                       $4.50 
-                                                                               
- aws_nat_gateway.nat                                                           
- ├─ NAT gateway                            730  hours                   $32.85 
- └─ Data processed              Monthly cost depends on usage: $0.045 per GB   
-                                                                               
+ Name                              Monthly Qty  Unit              Monthly Cost    
+                                                                                  
+ aws_nat_gateway.nat_withUsage                                                    
+ ├─ NAT gateway                            730  hours                   $32.85    
+ └─ Data processed                         100  GB                       $4.50  * 
+                                                                                  
+ aws_nat_gateway.nat                                                              
+ ├─ NAT gateway                            730  hours                   $32.85    
+ └─ Data processed              Monthly cost depends on usage: $0.045 per GB      
+                                                                                  
  OVERALL TOTAL                                                          $70.20 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 2 cloud resources were detected:
 ∙ 2 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestNATGatewayGoldenFile                           ┃ $70          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestNATGatewayGoldenFile                           ┃ $66           ┃ $5          ┃ $70        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

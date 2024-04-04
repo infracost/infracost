@@ -1,20 +1,23 @@
 
- Name                           Monthly Qty  Unit   Monthly Cost 
-                                                                 
- aws_api_gateway_stage.cache_2                                   
- └─ Cache memory (237 GB)               730  hours     $2,774.00 
-                                                                 
- aws_api_gateway_stage.cache_1                                   
- └─ Cache memory (0.5 GB)               730  hours        $14.60 
-                                                                 
- OVERALL TOTAL                                         $2,788.60 
+ Name                           Monthly Qty  Unit   Monthly Cost   
+                                                                   
+ aws_api_gateway_stage.cache_2                                     
+ └─ Cache memory (237 GB)               730  hours     $2,774.00   
+                                                                   
+ aws_api_gateway_stage.cache_1                                     
+ └─ Cache memory (0.5 GB)               730  hours        $14.60   
+                                                                   
+ OVERALL TOTAL                                        $2,788.60 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 4 cloud resources were detected:
 ∙ 2 were estimated
 ∙ 2 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestApiGatewayStageGoldenFile                      ┃ $2,789       ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestApiGatewayStageGoldenFile                      ┃ $2,789        ┃ $0.00       ┃ $2,789     ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

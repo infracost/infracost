@@ -1,45 +1,48 @@
 
- Name                                               Monthly Qty  Unit                        Monthly Cost 
-                                                                                                          
- azurerm_hdinsight_kafka_cluster.standard                                                                 
- ├─ Head node (Standard_E2s_V3)                           1,460  hours                            $277.40 
- ├─ Worker node (Standard_E64is_V3)                       1,460  hours                          $8,164.32 
- ├─ Zookeeper node (Standard_G2)                          2,190  hours                          $3,232.44 
- ├─ Managed OS disks                                          4  months                           $163.84 
- └─ Disk operations                                          40  100K operations                    $0.01 
-                                                                                                          
- azurerm_hdinsight_kafka_cluster.non_usage                                                                
- ├─ Head node (Standard_NC24)                             1,460  hours                          $7,478.12 
- ├─ Worker node (Standard_D3)                               730  hours                            $215.35 
- ├─ Zookeeper node (Standard_D3)                          2,190  hours                            $646.05 
- ├─ Managed OS disks                                          3  months                           $446.04 
- └─ Disk operations                         Monthly cost depends on usage: $0.00036 per 100K operations   
-                                                                                                          
- azurerm_hdinsight_kafka_cluster.premium                                                                  
- ├─ Head node (Standard_F2s_V2)                           1,460  hours                            $197.10 
- ├─ Worker node (Standard_D3)                             2,190  hours                            $646.05 
- ├─ Zookeeper node (Standard_F32s_V2)                     2,190  hours                          $4,730.40 
- ├─ Managed OS disks                                          9  months                         $1,338.12 
- └─ Disk operations                                         180  100K operations                    $0.06 
-                                                                                                          
- azurerm_storage_account.example                                                                          
- ├─ Capacity                                Monthly cost depends on usage: $0.01 per GB                   
- ├─ Write operations                        Monthly cost depends on usage: $0.10 per 10k operations       
- ├─ List and create container operations    Monthly cost depends on usage: $0.054 per 10k operations      
- ├─ Read operations                         Monthly cost depends on usage: $0.01 per 10k operations       
- ├─ All other operations                    Monthly cost depends on usage: $0.0043 per 10k operations     
- ├─ Data retrieval                          Monthly cost depends on usage: $0.01 per GB                   
- ├─ Blob index                              Monthly cost depends on usage: $0.039 per 10k tags            
- └─ Early deletion                          Monthly cost depends on usage: $0.01 per GB                   
-                                                                                                          
- OVERALL TOTAL                                                                                 $27,535.31 
+ Name                                               Monthly Qty  Unit                        Monthly Cost   
+                                                                                                            
+ azurerm_hdinsight_kafka_cluster.standard                                                                   
+ ├─ Head node (Standard_E2s_V3)                           1,460  hours                            $277.40   
+ ├─ Worker node (Standard_E64is_V3)                       1,460  hours                          $8,164.32   
+ ├─ Zookeeper node (Standard_G2)                          2,190  hours                          $3,232.44   
+ ├─ Managed OS disks                                          4  months                           $163.84   
+ └─ Disk operations                                          40  100K operations                    $0.01   
+                                                                                                            
+ azurerm_hdinsight_kafka_cluster.non_usage                                                                  
+ ├─ Head node (Standard_NC24)                             1,460  hours                          $7,478.12   
+ ├─ Worker node (Standard_D3)                               730  hours                            $215.35   
+ ├─ Zookeeper node (Standard_D3)                          2,190  hours                            $646.05   
+ ├─ Managed OS disks                                          3  months                           $446.04   
+ └─ Disk operations                         Monthly cost depends on usage: $0.00036 per 100K operations     
+                                                                                                            
+ azurerm_hdinsight_kafka_cluster.premium                                                                    
+ ├─ Head node (Standard_F2s_V2)                           1,460  hours                            $197.10   
+ ├─ Worker node (Standard_D3)                             2,190  hours                            $646.05   
+ ├─ Zookeeper node (Standard_F32s_V2)                     2,190  hours                          $4,730.40   
+ ├─ Managed OS disks                                          9  months                         $1,338.12   
+ └─ Disk operations                                         180  100K operations                    $0.06   
+                                                                                                            
+ azurerm_storage_account.example                                                                            
+ ├─ Capacity                                Monthly cost depends on usage: $0.01 per GB                     
+ ├─ Write operations                        Monthly cost depends on usage: $0.10 per 10k operations         
+ ├─ List and create container operations    Monthly cost depends on usage: $0.054 per 10k operations        
+ ├─ Read operations                         Monthly cost depends on usage: $0.01 per 10k operations         
+ ├─ All other operations                    Monthly cost depends on usage: $0.0043 per 10k operations       
+ ├─ Data retrieval                          Monthly cost depends on usage: $0.01 per GB                     
+ ├─ Blob index                              Monthly cost depends on usage: $0.039 per 10k tags              
+ └─ Early deletion                          Monthly cost depends on usage: $0.01 per GB                     
+                                                                                                            
+ OVERALL TOTAL                                                                                $27,535.31 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 6 cloud resources were detected:
 ∙ 4 were estimated
 ∙ 2 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMHDInsightKafkaClusterGoldenFile         ┃ $27,535      ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestAzureRMHDInsightKafkaClusterGoldenFile         ┃ $27,535       ┃ $0.00       ┃ $27,535    ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

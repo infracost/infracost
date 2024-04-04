@@ -1,36 +1,39 @@
 
- Name                                                                                                     Monthly Qty  Unit            Monthly Cost 
-                                                                                                                                                    
- azurerm_network_watcher_flow_log.network_watcher_flow_log["traffic-analytics-interval-60"]                                                         
- ├─ Network logs collected (over 5GB)                                                                              25  GB                    $12.50 
- └─ Traffic Analytics data processed (60 min interval)                                                             30  GB                    $69.00 
-                                                                                                                                                    
- azurerm_network_watcher_flow_log.network_watcher_flow_log["traffic-analytics-interval-10"]                                                         
- ├─ Network logs collected (over 5GB)                                                                              15  GB                     $7.50 
- └─ Traffic Analytics data processed (10 min interval)                                                             20  GB                    $70.00 
-                                                                                                                                                    
- azurerm_network_watcher_flow_log.network_watcher_flow_log["traffic-analytics-disabled"]                                                            
- └─ Network logs collected (over 5GB)                                                                               5  GB                     $2.50 
-                                                                                                                                                    
- azurerm_network_watcher_flow_log.network_watcher_flow_log_with_usage["traffic-analytics-disabled"]                                                 
- └─ Network logs collected (over 5GB)                                                                   Monthly cost depends on usage: $0.50 per GB 
-                                                                                                                                                    
- azurerm_network_watcher_flow_log.network_watcher_flow_log_with_usage["traffic-analytics-interval-10"]                                              
- ├─ Network logs collected (over 5GB)                                                                   Monthly cost depends on usage: $0.50 per GB 
- └─ Traffic Analytics data processed (10 min interval)                                                  Monthly cost depends on usage: $3.50 per GB 
-                                                                                                                                                    
- azurerm_network_watcher_flow_log.network_watcher_flow_log_with_usage["traffic-analytics-interval-60"]                                              
- ├─ Network logs collected (over 5GB)                                                                   Monthly cost depends on usage: $0.50 per GB 
- └─ Traffic Analytics data processed (60 min interval)                                                  Monthly cost depends on usage: $2.30 per GB 
-                                                                                                                                                    
+ Name                                                                                                     Monthly Qty  Unit            Monthly Cost    
+                                                                                                                                                       
+ azurerm_network_watcher_flow_log.network_watcher_flow_log["traffic-analytics-interval-60"]                                                            
+ ├─ Network logs collected (over 5GB)                                                                              25  GB                    $12.50  * 
+ └─ Traffic Analytics data processed (60 min interval)                                                             30  GB                    $69.00  * 
+                                                                                                                                                       
+ azurerm_network_watcher_flow_log.network_watcher_flow_log["traffic-analytics-interval-10"]                                                            
+ ├─ Network logs collected (over 5GB)                                                                              15  GB                     $7.50  * 
+ └─ Traffic Analytics data processed (10 min interval)                                                             20  GB                    $70.00  * 
+                                                                                                                                                       
+ azurerm_network_watcher_flow_log.network_watcher_flow_log["traffic-analytics-disabled"]                                                               
+ └─ Network logs collected (over 5GB)                                                                               5  GB                     $2.50  * 
+                                                                                                                                                       
+ azurerm_network_watcher_flow_log.network_watcher_flow_log_with_usage["traffic-analytics-disabled"]                                                    
+ └─ Network logs collected (over 5GB)                                                                   Monthly cost depends on usage: $0.50 per GB    
+                                                                                                                                                       
+ azurerm_network_watcher_flow_log.network_watcher_flow_log_with_usage["traffic-analytics-interval-10"]                                                 
+ ├─ Network logs collected (over 5GB)                                                                   Monthly cost depends on usage: $0.50 per GB    
+ └─ Traffic Analytics data processed (10 min interval)                                                  Monthly cost depends on usage: $3.50 per GB    
+                                                                                                                                                       
+ azurerm_network_watcher_flow_log.network_watcher_flow_log_with_usage["traffic-analytics-interval-60"]                                                 
+ ├─ Network logs collected (over 5GB)                                                                   Monthly cost depends on usage: $0.50 per GB    
+ └─ Traffic Analytics data processed (60 min interval)                                                  Monthly cost depends on usage: $2.30 per GB    
+                                                                                                                                                       
  OVERALL TOTAL                                                                                                                              $161.50 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 9 cloud resources were detected:
 ∙ 6 were estimated
 ∙ 3 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestNetworkWatcherFlowLog                          ┃ $162         ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestNetworkWatcherFlowLog                          ┃ $0.00         ┃ $162        ┃ $162       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

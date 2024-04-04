@@ -1,20 +1,23 @@
 
- Name                              Monthly Qty  Unit    Monthly Cost 
-                                                                     
- azurerm_private_dns_zone.germany                                    
- └─ Hosted zone                              1  months         $0.54 
-                                                                     
- azurerm_private_dns_zone.westus                                     
- └─ Hosted zone                              1  months         $0.50 
-                                                                     
- OVERALL TOTAL                                                 $1.04 
+ Name                              Monthly Qty  Unit    Monthly Cost   
+                                                                       
+ azurerm_private_dns_zone.germany                                      
+ └─ Hosted zone                              1  months         $0.54   
+                                                                       
+ azurerm_private_dns_zone.westus                                       
+ └─ Hosted zone                              1  months         $0.50   
+                                                                       
+ OVERALL TOTAL                                                $1.04 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 4 cloud resources were detected:
 ∙ 2 were estimated
 ∙ 2 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMPrivateDNSZone                          ┃ $1           ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestAzureRMPrivateDNSZone                          ┃ $1            ┃ $0.00       ┃ $1         ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

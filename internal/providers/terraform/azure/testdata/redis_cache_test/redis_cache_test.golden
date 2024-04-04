@@ -1,35 +1,38 @@
 
- Name                                                 Monthly Qty  Unit   Monthly Cost 
-                                                                                       
- azurerm_redis_cache.premium_p3_replicas_per_primary                                   
- └─ Cache usage (Premium_P3)                                   12  nodes     $9,714.84 
-                                                                                       
- azurerm_redis_cache.premium_p2_replicas_per_master                                    
- └─ Cache usage (Premium_P2)                                    9  nodes     $3,646.35 
-                                                                                       
- azurerm_redis_cache.premium_p1                                                        
- └─ Cache usage (Premium_P1)                                    6  nodes     $1,213.26 
-                                                                                       
- azurerm_redis_cache.premium_p1_australiacentral                                       
- └─ Cache usage (Premium_P1)                                    2  nodes       $404.42 
-                                                                                       
- azurerm_redis_cache.premium_zero_shards                                               
- └─ Cache usage (Premium_P1)                                    2  nodes       $404.42 
-                                                                                       
- azurerm_redis_cache.standard_c3                                                       
- └─ Cache usage (Standard_C3)                                   2  nodes       $328.50 
-                                                                                       
- azurerm_redis_cache.basic_c2                                                          
- └─ Cache usage (Basic_C4)                                      1  nodes       $153.30 
-                                                                                       
- OVERALL TOTAL                                                              $15,865.09 
+ Name                                                 Monthly Qty  Unit   Monthly Cost   
+                                                                                         
+ azurerm_redis_cache.premium_p3_replicas_per_primary                                     
+ └─ Cache usage (Premium_P3)                                   12  nodes     $9,714.84   
+                                                                                         
+ azurerm_redis_cache.premium_p2_replicas_per_master                                      
+ └─ Cache usage (Premium_P2)                                    9  nodes     $3,646.35   
+                                                                                         
+ azurerm_redis_cache.premium_p1                                                          
+ └─ Cache usage (Premium_P1)                                    6  nodes     $1,213.26   
+                                                                                         
+ azurerm_redis_cache.premium_p1_australiacentral                                         
+ └─ Cache usage (Premium_P1)                                    2  nodes       $404.42   
+                                                                                         
+ azurerm_redis_cache.premium_zero_shards                                                 
+ └─ Cache usage (Premium_P1)                                    2  nodes       $404.42   
+                                                                                         
+ azurerm_redis_cache.standard_c3                                                         
+ └─ Cache usage (Standard_C3)                                   2  nodes       $328.50   
+                                                                                         
+ azurerm_redis_cache.basic_c2                                                            
+ └─ Cache usage (Basic_C4)                                      1  nodes       $153.30   
+                                                                                         
+ OVERALL TOTAL                                                             $15,865.09 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 8 cloud resources were detected:
 ∙ 7 were estimated
 ∙ 1 was free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRedisCacheGoldenFile                      ┃ $15,865      ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestAzureRedisCacheGoldenFile                      ┃ $15,865       ┃ $0.00       ┃ $15,865    ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

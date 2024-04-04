@@ -1,19 +1,22 @@
 
- Name                                                 Monthly Qty  Unit   Monthly Cost 
-                                                                                       
- azurerm_app_service_certificate_order.wildcard_cert                                   
- └─ SSL certificate (wildcard)                             0.0833  years        $25.00 
-                                                                                       
- azurerm_app_service_certificate_order.standard_cert                                   
- └─ SSL certificate (standard)                             0.0833  years         $5.83 
-                                                                                       
- OVERALL TOTAL                                                                  $30.83 
+ Name                                                 Monthly Qty  Unit   Monthly Cost   
+                                                                                         
+ azurerm_app_service_certificate_order.wildcard_cert                                     
+ └─ SSL certificate (wildcard)                             0.0833  years        $25.00   
+                                                                                         
+ azurerm_app_service_certificate_order.standard_cert                                     
+ └─ SSL certificate (standard)                             0.0833  years         $5.83   
+                                                                                         
+ OVERALL TOTAL                                                                 $30.83 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 2 cloud resources were detected:
 ∙ 2 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMAppServiceCertificateOrder              ┃ $31          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestAzureRMAppServiceCertificateOrder              ┃ $31           ┃ $0.00       ┃ $31        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

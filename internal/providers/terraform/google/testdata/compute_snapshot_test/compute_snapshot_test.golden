@@ -1,22 +1,25 @@
 
- Name                                           Monthly Qty  Unit  Monthly Cost 
-                                                                                
- google_compute_snapshot.usage                                                  
- └─ Storage                                           1,000  GB          $26.00 
-                                                                                
- google_compute_disk.default                                                    
- └─ Standard provisioned storage (pd-standard)          100  GB           $4.00 
-                                                                                
- google_compute_snapshot.snapshot                                               
- └─ Storage                                             100  GB           $2.60 
-                                                                                
+ Name                                           Monthly Qty  Unit  Monthly Cost    
+                                                                                   
+ google_compute_snapshot.usage                                                     
+ └─ Storage                                           1,000  GB          $26.00  * 
+                                                                                   
+ google_compute_disk.default                                                       
+ └─ Standard provisioned storage (pd-standard)          100  GB           $4.00    
+                                                                                   
+ google_compute_snapshot.snapshot                                                  
+ └─ Storage                                             100  GB           $2.60  * 
+                                                                                   
  OVERALL TOTAL                                                           $32.60 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 3 cloud resources were detected:
 ∙ 3 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestComputeSnapshotGoldenFile                      ┃ $33          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestComputeSnapshotGoldenFile                      ┃ $4            ┃ $29         ┃ $33        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

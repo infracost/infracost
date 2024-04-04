@@ -1,19 +1,22 @@
 
- Name                                       Monthly Qty  Unit                  Monthly Cost 
-                                                                                            
- google_dns_record_set.frontend_usage                                                       
- └─ Queries                                         0.1  1M queries                   $0.04 
-                                                                                            
- google_dns_record_set.frontend                                                             
- └─ Queries                            Monthly cost depends on usage: $0.40 per 1M queries  
-                                                                                            
+ Name                                       Monthly Qty  Unit                  Monthly Cost    
+                                                                                               
+ google_dns_record_set.frontend_usage                                                          
+ └─ Queries                                         0.1  1M queries                   $0.04  * 
+                                                                                               
+ google_dns_record_set.frontend                                                                
+ └─ Queries                            Monthly cost depends on usage: $0.40 per 1M queries     
+                                                                                               
  OVERALL TOTAL                                                                        $0.04 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 2 cloud resources were detected:
 ∙ 2 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestDNSRecordSetGoldenFile                         ┃ $0.04        ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestDNSRecordSetGoldenFile                         ┃ $0.00         ┃ $0.04       ┃ $0.04      ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

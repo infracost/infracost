@@ -1,23 +1,26 @@
 Project: infracost/infracost/cmd/infracost/testdata/breakdown_with_depends_upon_module
 
- Name                                            Monthly Qty  Unit   Monthly Cost 
-                                                                                  
- module.database.module.primary.aws_eip.test[0]                                   
- └─ IP address (if unused)                               730  hours         $3.65 
-                                                                                  
- module.database.module.replica.aws_eip.test[0]                                   
- └─ IP address (if unused)                               730  hours         $3.65 
-                                                                                  
- OVERALL TOTAL                                                              $7.30 
+ Name                                            Monthly Qty  Unit   Monthly Cost   
+                                                                                    
+ module.database.module.primary.aws_eip.test[0]                                     
+ └─ IP address (if unused)                               730  hours         $3.65   
+                                                                                    
+ module.database.module.replica.aws_eip.test[0]                                     
+ └─ IP address (if unused)                               730  hours         $3.65   
+                                                                                    
+ OVERALL TOTAL                                                             $7.30 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 2 cloud resources were detected:
 ∙ 2 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                                          ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...kdown_with_depends_upon_module ┃ $7           ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                                          ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infraco...kdown_with_depends_upon_module ┃ $7            ┃ $0.00       ┃ $7         ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:
 

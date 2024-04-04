@@ -1,19 +1,22 @@
 
- Name                                                                Monthly Qty  Unit                      Monthly Cost 
-                                                                                                                         
- aws_sns_topic_subscription.sns_topic_subscription_withUsage                                                             
- └─ HTTP notifications                                                         2  1M notifications                 $1.20 
-                                                                                                                         
- aws_sns_topic_subscription.sns_topic_subscription                                                                       
- └─ HTTP notifications                                        Monthly cost depends on usage: $0.60 per 1M notifications  
-                                                                                                                         
+ Name                                                                Monthly Qty  Unit                      Monthly Cost    
+                                                                                                                            
+ aws_sns_topic_subscription.sns_topic_subscription_withUsage                                                                
+ └─ HTTP notifications                                                         2  1M notifications                 $1.20  * 
+                                                                                                                            
+ aws_sns_topic_subscription.sns_topic_subscription                                                                          
+ └─ HTTP notifications                                        Monthly cost depends on usage: $0.60 per 1M notifications     
+                                                                                                                            
  OVERALL TOTAL                                                                                                     $1.20 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 2 cloud resources were detected:
 ∙ 2 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestSNSTopicSubscriptionGoldenFile                 ┃ $1           ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestSNSTopicSubscriptionGoldenFile                 ┃ $0.00         ┃ $1          ┃ $1         ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

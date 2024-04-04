@@ -1,28 +1,31 @@
 
- Name                                 Monthly Qty  Unit              Monthly Cost 
-                                                                                  
- azurerm_nat_gateway.my_gateway                                                   
- ├─ NAT gateway                               730  hours                   $32.85 
- └─ Data processed                             10  GB                       $0.45 
-                                                                                  
- azurerm_nat_gateway.my_gateway2                                                  
- ├─ NAT gateway                               730  hours                   $32.85 
- └─ Data processed                 Monthly cost depends on usage: $0.045 per GB   
-                                                                                  
- azurerm_public_ip_prefix.example                                                 
- └─ IP prefix                                 730  hours                    $4.38 
-                                                                                  
- azurerm_public_ip.example                                                        
- └─ IP address (static, regional)             730  hours                    $3.65 
-                                                                                  
- OVERALL TOTAL                                                             $74.18 
+ Name                                 Monthly Qty  Unit              Monthly Cost   
+                                                                                    
+ azurerm_nat_gateway.my_gateway                                                     
+ ├─ NAT gateway                               730  hours                   $32.85   
+ └─ Data processed                             10  GB                       $0.45   
+                                                                                    
+ azurerm_nat_gateway.my_gateway2                                                    
+ ├─ NAT gateway                               730  hours                   $32.85   
+ └─ Data processed                 Monthly cost depends on usage: $0.045 per GB     
+                                                                                    
+ azurerm_public_ip_prefix.example                                                   
+ └─ IP prefix                                 730  hours                    $4.38   
+                                                                                    
+ azurerm_public_ip.example                                                          
+ └─ IP address (static, regional)             730  hours                    $3.65   
+                                                                                    
+ OVERALL TOTAL                                                            $74.18 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 9 cloud resources were detected:
 ∙ 4 were estimated
 ∙ 5 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMNATGateway                              ┃ $74          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestAzureRMNATGateway                              ┃ $74           ┃ $0.00       ┃ $74        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

@@ -1,28 +1,31 @@
 
- Name                                                Monthly Qty  Unit         Monthly Cost 
-                                                                                            
- azurerm_monitor_metric_alert.example-dynamic-multi                                         
- ├─ Metrics monitoring                                         4  time-series         $0.40 
- └─ Dynamic threshold monitoring                               4  time-series         $0.40 
-                                                                                            
- azurerm_monitor_metric_alert.example-multi                                                 
- └─ Metrics monitoring                                         8  time-series         $0.80 
-                                                                                            
- azurerm_monitor_metric_alert.example-dynamic                                               
- ├─ Metrics monitoring                                         1  time-series         $0.10 
- └─ Dynamic threshold monitoring                               1  time-series         $0.10 
-                                                                                            
- azurerm_monitor_metric_alert.example-single                                                
- └─ Metrics monitoring                                         1  time-series         $0.10 
-                                                                                            
- OVERALL TOTAL                                                                        $1.90 
+ Name                                                Monthly Qty  Unit         Monthly Cost   
+                                                                                              
+ azurerm_monitor_metric_alert.example-dynamic-multi                                           
+ ├─ Metrics monitoring                                         4  time-series         $0.40   
+ └─ Dynamic threshold monitoring                               4  time-series         $0.40   
+                                                                                              
+ azurerm_monitor_metric_alert.example-multi                                                   
+ └─ Metrics monitoring                                         8  time-series         $0.80   
+                                                                                              
+ azurerm_monitor_metric_alert.example-dynamic                                                 
+ ├─ Metrics monitoring                                         1  time-series         $0.10   
+ └─ Dynamic threshold monitoring                               1  time-series         $0.10   
+                                                                                              
+ azurerm_monitor_metric_alert.example-single                                                  
+ └─ Metrics monitoring                                         1  time-series         $0.10   
+                                                                                              
+ OVERALL TOTAL                                                                       $1.90 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 7 cloud resources were detected:
 ∙ 6 were estimated
 ∙ 1 was free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestMonitorMetricAlert                             ┃ $2           ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestMonitorMetricAlert                             ┃ $2            ┃ $0.00       ┃ $2         ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

@@ -1,17 +1,20 @@
 
- Name                                             Monthly Qty  Unit    Monthly Cost 
-                                                                                    
- azurerm_app_service_certificate_binding.example                                    
- └─ IP SSL certificate                                      1  months        $39.00 
-                                                                                    
- OVERALL TOTAL                                                               $39.00 
+ Name                                             Monthly Qty  Unit    Monthly Cost   
+                                                                                      
+ azurerm_app_service_certificate_binding.example                                      
+ └─ IP SSL certificate                                      1  months        $39.00   
+                                                                                      
+ OVERALL TOTAL                                                              $39.00 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 4 cloud resources were detected:
 ∙ 1 was estimated
 ∙ 3 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMAppServiceCertificateBinding            ┃ $39          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestAzureRMAppServiceCertificateBinding            ┃ $39           ┃ $0.00       ┃ $39        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

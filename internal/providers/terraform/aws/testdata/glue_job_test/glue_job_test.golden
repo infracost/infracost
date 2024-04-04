@@ -1,31 +1,34 @@
 
- Name                                   Monthly Qty  Unit                          Monthly Cost 
-                                                                                                
- aws_glue_job.workers_g2x                                                                       
- └─ Duration                                     60  hours (20 DPUs)                    $528.00 
-                                                                                                
- aws_glue_job.cap_10                                                                            
- └─ Duration                                     60  hours (10 DPUs)                    $264.00 
-                                                                                                
- aws_glue_job.workers_default                                                                   
- └─ Duration                                     60  hours (10 DPUs)                    $264.00 
-                                                                                                
- aws_glue_job.workers_g1x                                                                       
- └─ Duration                                     60  hours (10 DPUs)                    $264.00 
-                                                                                                
- aws_glue_job.job_no_usage                                                                      
- └─ Duration                   Monthly cost depends on usage: $0.44 per hours (1 DPU)           
-                                                                                                
- aws_glue_job.python_shell                                                                      
- └─ Duration                   Monthly cost depends on usage: $0.0275 per hours (0.0625 DPUs)   
-                                                                                                
+ Name                                   Monthly Qty  Unit                          Monthly Cost    
+                                                                                                   
+ aws_glue_job.workers_g2x                                                                          
+ └─ Duration                                     60  hours (20 DPUs)                    $528.00  * 
+                                                                                                   
+ aws_glue_job.cap_10                                                                               
+ └─ Duration                                     60  hours (10 DPUs)                    $264.00  * 
+                                                                                                   
+ aws_glue_job.workers_default                                                                      
+ └─ Duration                                     60  hours (10 DPUs)                    $264.00  * 
+                                                                                                   
+ aws_glue_job.workers_g1x                                                                          
+ └─ Duration                                     60  hours (10 DPUs)                    $264.00  * 
+                                                                                                   
+ aws_glue_job.job_no_usage                                                                         
+ └─ Duration                   Monthly cost depends on usage: $0.44 per hours (1 DPU)              
+                                                                                                   
+ aws_glue_job.python_shell                                                                         
+ └─ Duration                   Monthly cost depends on usage: $0.0275 per hours (0.0625 DPUs)      
+                                                                                                   
  OVERALL TOTAL                                                                        $1,320.00 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 6 cloud resources were detected:
 ∙ 6 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestGlueJobGoldenFile                              ┃ $1,320       ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestGlueJobGoldenFile                              ┃ $0.00         ┃ $1,320      ┃ $1,320     ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

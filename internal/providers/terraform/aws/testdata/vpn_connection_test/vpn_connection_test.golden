@@ -1,29 +1,32 @@
 
- Name                                           Monthly Qty  Unit            Monthly Cost 
-                                                                                          
- aws_vpn_connection.transit_withUsage                                                     
- ├─ VPN connection                                      730  hours                 $36.50 
- ├─ Transit gateway attachment                          730  hours                 $36.50 
- └─ Data processed                                      100  GB                     $2.00 
-                                                                                          
- aws_vpn_connection.transit                                                               
- ├─ VPN connection                                      730  hours                 $36.50 
- ├─ Transit gateway attachment                          730  hours                 $36.50 
- └─ Data processed                            Monthly cost depends on usage: $0.02 per GB 
-                                                                                          
- aws_vpn_connection.vpn_connection                                                        
- └─ VPN connection                                      730  hours                 $36.50 
-                                                                                          
- aws_vpn_connection.vpn_connection_withUsage                                              
- └─ VPN connection                                      730  hours                 $36.50 
-                                                                                          
+ Name                                           Monthly Qty  Unit            Monthly Cost    
+                                                                                             
+ aws_vpn_connection.transit_withUsage                                                        
+ ├─ VPN connection                                      730  hours                 $36.50    
+ ├─ Transit gateway attachment                          730  hours                 $36.50    
+ └─ Data processed                                      100  GB                     $2.00  * 
+                                                                                             
+ aws_vpn_connection.transit                                                                  
+ ├─ VPN connection                                      730  hours                 $36.50    
+ ├─ Transit gateway attachment                          730  hours                 $36.50    
+ └─ Data processed                            Monthly cost depends on usage: $0.02 per GB    
+                                                                                             
+ aws_vpn_connection.vpn_connection                                                           
+ └─ VPN connection                                      730  hours                 $36.50    
+                                                                                             
+ aws_vpn_connection.vpn_connection_withUsage                                                 
+ └─ VPN connection                                      730  hours                 $36.50    
+                                                                                             
  OVERALL TOTAL                                                                    $221.00 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 4 cloud resources were detected:
 ∙ 4 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestVPNConnectionGoldenFile                        ┃ $221         ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestVPNConnectionGoldenFile                        ┃ $219          ┃ $2          ┃ $221       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

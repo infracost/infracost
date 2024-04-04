@@ -1,27 +1,30 @@
 Project: infracost/infracost/cmd/infracost/testdata/breakdown_with_providers_depending_on_data
 
- Name                                                 Monthly Qty  Unit   Monthly Cost 
-                                                                                       
- module.mod_eu1.aws_instance.instance_eu1[0]                                           
- ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)          730  hours         $9.20 
- └─ root_block_device                                                                  
-    └─ Storage (general purpose SSD, gp2)                       8  GB            $0.88 
-                                                                                       
- module.mod_us2.aws_instance.instance_us2[0]                                           
- ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)          730  hours         $8.47 
- └─ root_block_device                                                                  
-    └─ Storage (general purpose SSD, gp2)                       8  GB            $0.80 
-                                                                                       
- OVERALL TOTAL                                                                  $19.35 
+ Name                                                 Monthly Qty  Unit   Monthly Cost   
+                                                                                         
+ module.mod_eu1.aws_instance.instance_eu1[0]                                             
+ ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)          730  hours         $9.20   
+ └─ root_block_device                                                                    
+    └─ Storage (general purpose SSD, gp2)                       8  GB            $0.88   
+                                                                                         
+ module.mod_us2.aws_instance.instance_us2[0]                                             
+ ├─ Instance usage (Linux/UNIX, on-demand, t2.micro)          730  hours         $8.47   
+ └─ root_block_device                                                                    
+    └─ Storage (general purpose SSD, gp2)                       8  GB            $0.80   
+                                                                                         
+ OVERALL TOTAL                                                                 $19.35 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 2 cloud resources were detected:
 ∙ 2 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                                          ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...th_providers_depending_on_data ┃ $19          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                                          ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infraco...th_providers_depending_on_data ┃ $19           ┃ $0.00       ┃ $19        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:
 

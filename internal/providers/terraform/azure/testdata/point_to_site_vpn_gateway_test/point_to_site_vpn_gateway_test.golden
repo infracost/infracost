@@ -1,21 +1,24 @@
 
- Name                                                            Monthly Qty  Unit         Monthly Cost 
-                                                                                                        
- azurerm_point_to_site_vpn_gateway.point_to_site_vpn_with_usage                                         
- ├─ P2S scale units (500 Mbps)                                             5  scale units     $1,317.65 
- └─ P2S connections                                                        9  hours               $0.11 
-                                                                                                        
- azurerm_point_to_site_vpn_gateway.point_to_site_vpn                                                    
- └─ P2S scale units (500 Mbps)                                             5  scale units     $1,317.65 
-                                                                                                        
+ Name                                                            Monthly Qty  Unit         Monthly Cost    
+                                                                                                           
+ azurerm_point_to_site_vpn_gateway.point_to_site_vpn_with_usage                                            
+ ├─ P2S scale units (500 Mbps)                                             5  scale units     $1,317.65    
+ └─ P2S connections                                                        9  hours               $0.11  * 
+                                                                                                           
+ azurerm_point_to_site_vpn_gateway.point_to_site_vpn                                                       
+ └─ P2S scale units (500 Mbps)                                             5  scale units     $1,317.65    
+                                                                                                           
  OVERALL TOTAL                                                                                $2,635.41 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 6 cloud resources were detected:
 ∙ 2 were estimated
 ∙ 4 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestPointToSiteVpnGatewayGoldenFile                ┃ $2,635       ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestPointToSiteVpnGatewayGoldenFile                ┃ $2,635        ┃ $0.11       ┃ $2,635     ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
