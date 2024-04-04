@@ -23,7 +23,7 @@ Module path: config_usage
 
  OVERALL TOTAL                                                $13,765.36 
 
-*Usage costs were estimated using values from the config files.
+*Usage costs were estimated using infracost-usage.yml, see docs for other options.
 
 ──────────────────────────────────
 2 cloud resources were detected:

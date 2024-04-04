@@ -74,7 +74,7 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
                                                                                                            
  OVERALL TOTAL                                                                                  $373.12 
 
-*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ──────────────────────────────────
 26 cloud resources were detected:

@@ -156,7 +156,7 @@ Module path: ref2
 
  OVERALL TOTAL                                                                                                       $5,290.62 
 
-*Usage costs can be estimated by adding usage defaults from Infracost Cloud or usage files in the config file.
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ──────────────────────────────────
 115 cloud resources were detected:

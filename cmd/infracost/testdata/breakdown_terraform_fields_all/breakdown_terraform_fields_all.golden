@@ -24,7 +24,7 @@ Project: infracost/infracost/cmd/infracost/testdata/example_plan.json
                                                                                                                               
  OVERALL TOTAL                                                                                                   $1,361.31 
 
-*Usage costs were estimated using ./testdata/example_usage.yml.
+*Usage costs were estimated using infracost-usage.yml, see docs for other options.
 
 ──────────────────────────────────
 5 cloud resources were detected:

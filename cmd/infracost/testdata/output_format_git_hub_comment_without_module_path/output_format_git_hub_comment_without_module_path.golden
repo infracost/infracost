@@ -23,7 +23,7 @@
 </table>
 
 
-*Usage costs can be estimated by adding [usage defaults](https://www.infracost.io/docs/features/usage_based_resources) or an [infracost-usage.yml](https://www.infracost.io/docs/features/usage_based_resources/#infracost-usageyml).
+*Usage costs can be estimated by updating [Infracost Cloud settings](https://www.infracost.io/docs/features/usage_based_resources), see [docs](https://www.infracost.io/docs/features/usage_based_resources/#infracost-usageyml) for other options.
 <details>
 
 <summary>Cost details </summary>
@@ -54,7 +54,7 @@ Percent: 0%
 ──────────────────────────────────
 Key: * usage cost, ~ changed, + added, - removed
 
-*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ```
 </details>

@@ -31,7 +31,7 @@ Project: infracost/infracost/cmd/infracost/testdata/breakdown_with_data_blocks_i
                                                                                                 
  OVERALL TOTAL                                                                        $32.85 
 
-*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ──────────────────────────────────
 9 cloud resources were detected:
