@@ -1,8 +1,9 @@
 
-<h3>Infracost report</h3>
-<h4>💰 Monthly cost will not change</h4>
+<h4>💰 Infracost report</h4>
+<h4>Monthly cost will not change</h4>
 <details>
-<summary>Cost details</summary>
+
+<summary>Cost details (includes details of skipped projects due to errors)</summary>
 
 ```
 ──────────────────────────────────

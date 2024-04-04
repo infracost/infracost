@@ -1,20 +1,23 @@
 
- Name                                      Monthly Qty  Unit         Monthly Cost 
-                                                                                  
- azurerm_vpn_gateway.vpn_with_scale_units                                         
- └─ S2S scale units (500 Mbps)                       3  scale units       $790.59 
-                                                                                  
- azurerm_vpn_gateway.default_vpn                                                  
- └─ S2S scale units (500 Mbps)                       1  scale units       $263.53 
-                                                                                  
- OVERALL TOTAL                                                          $1,054.12 
+ Name                                      Monthly Qty  Unit         Monthly Cost   
+                                                                                    
+ azurerm_vpn_gateway.vpn_with_scale_units                                           
+ └─ S2S scale units (500 Mbps)                       3  scale units       $790.59   
+                                                                                    
+ azurerm_vpn_gateway.default_vpn                                                    
+ └─ S2S scale units (500 Mbps)                       1  scale units       $263.53   
+                                                                                    
+ OVERALL TOTAL                                                         $1,054.12 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 5 cloud resources were detected:
 ∙ 2 were estimated
 ∙ 3 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestVpnGatewayGoldenFile                           ┃ $1,054       ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestVpnGatewayGoldenFile                           ┃ $1,054        ┃ $0.00       ┃ $1,054     ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

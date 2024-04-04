@@ -43,15 +43,17 @@ Amount:  +$743 ($0.00 → $743)
 ──────────────────────────────────
 Key: * usage cost, ~ changed, + added, - removed
 
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 2 cloud resources were detected:
 ∙ 2 were estimated
 
 Infracost estimate: Monthly cost will increase by $743 ↑
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Cost change ┃ New monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━┫
-┃ infracost/infracost/examples/terraform             ┃       +$743 ┃ $743             ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Changed project                                    ┃ Baseline cost ┃ Usage cost ┃ Total change ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ infracost/infracost/examples/terraform             ┃         +$743 ┃        +$0 ┃        +$743 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 
 Err:
 

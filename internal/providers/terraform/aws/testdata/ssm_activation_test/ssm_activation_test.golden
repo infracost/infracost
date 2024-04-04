@@ -1,19 +1,22 @@
 
- Name                                             Monthly Qty  Unit                Monthly Cost 
-                                                                                                
- aws_ssm_activation.ssm_activation_withUsage                                                    
- └─ On-prem managed instances (advanced)               73,000  hours                    $507.35 
-                                                                                                
- aws_ssm_activation.ssm_activation                                                              
- └─ On-prem managed instances (advanced)      Monthly cost depends on usage: $0.00695 per hours 
-                                                                                                
+ Name                                             Monthly Qty  Unit                Monthly Cost    
+                                                                                                   
+ aws_ssm_activation.ssm_activation_withUsage                                                       
+ └─ On-prem managed instances (advanced)               73,000  hours                    $507.35  * 
+                                                                                                   
+ aws_ssm_activation.ssm_activation                                                                 
+ └─ On-prem managed instances (advanced)      Monthly cost depends on usage: $0.00695 per hours    
+                                                                                                   
  OVERALL TOTAL                                                                          $507.35 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 2 cloud resources were detected:
 ∙ 2 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAwsSSMActivationfuncGoldenFile                 ┃ $507         ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestAwsSSMActivationfuncGoldenFile                 ┃ $0.00         ┃ $507        ┃ $507       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

@@ -1,24 +1,27 @@
 
- Name                                      Monthly Qty  Unit              Monthly Cost 
-                                                                                       
- google_compute_router_nat.over_32_vms                                                 
- ├─ Assigned VMs (first 32)                     23,360  VM-hours                $32.70 
- └─ Data processed                               1,000  GB                      $45.00 
-                                                                                       
- google_compute_router_nat.nat                                                         
- ├─ Assigned VMs (first 32)                      2,920  VM-hours                 $4.09 
- └─ Data processed                               1,000  GB                      $45.00 
-                                                                                       
- google_compute_router_nat.no_usage                                                    
- └─ Data processed                      Monthly cost depends on usage: $0.045 per GB   
-                                                                                       
+ Name                                      Monthly Qty  Unit              Monthly Cost    
+                                                                                          
+ google_compute_router_nat.over_32_vms                                                    
+ ├─ Assigned VMs (first 32)                     23,360  VM-hours                $32.70  * 
+ └─ Data processed                               1,000  GB                      $45.00  * 
+                                                                                          
+ google_compute_router_nat.nat                                                            
+ ├─ Assigned VMs (first 32)                      2,920  VM-hours                 $4.09  * 
+ └─ Data processed                               1,000  GB                      $45.00  * 
+                                                                                          
+ google_compute_router_nat.no_usage                                                       
+ └─ Data processed                      Monthly cost depends on usage: $0.045 per GB      
+                                                                                          
  OVERALL TOTAL                                                                 $126.79 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 3 cloud resources were detected:
 ∙ 3 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestComputeRouterNAT                               ┃ $127         ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestComputeRouterNAT                               ┃ $0.00         ┃ $127        ┃ $127       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

@@ -1,37 +1,40 @@
 
- Name                                               Monthly Qty  Unit                  Monthly Cost 
-                                                                                                    
- azurerm_api_management.premium                                                                     
- ├─ API management (premium)                                  4  units                   $11,180.68 
- └─ Self hosted gateway                                       5  gateways                 $1,250.00 
-                                                                                                    
- azurerm_api_management.premium_non_usage                                                           
- ├─ API management (premium)                                  4  units                   $11,180.68 
- └─ Self hosted gateway                        Monthly cost depends on usage: $250.00 per gateways  
-                                                                                                    
- azurerm_api_management.std3                                                                        
- └─ API management (standard)                                 3  units                    $2,060.13 
-                                                                                                    
- azurerm_api_management.basic2                                                                      
- └─ API management (basic)                                    2  units                      $294.34 
-                                                                                                    
- azurerm_api_management.developer1                                                                  
- └─ API management (developer)                                1  units                       $48.03 
-                                                                                                    
- azurerm_api_management.consumption                                                                 
- └─ API management (consumption)                             10  1M calls                    $35.00 
-                                                                                                    
- azurerm_api_management.consumption_non_usage                                                       
- └─ API management (consumption)               Monthly cost depends on usage: $3.50 per 1M calls    
-                                                                                                    
+ Name                                               Monthly Qty  Unit                  Monthly Cost    
+                                                                                                       
+ azurerm_api_management.premium                                                                        
+ ├─ API management (premium)                                  4  units                   $11,180.68    
+ └─ Self hosted gateway                                       5  gateways                 $1,250.00  * 
+                                                                                                       
+ azurerm_api_management.premium_non_usage                                                              
+ ├─ API management (premium)                                  4  units                   $11,180.68    
+ └─ Self hosted gateway                        Monthly cost depends on usage: $250.00 per gateways     
+                                                                                                       
+ azurerm_api_management.std3                                                                           
+ └─ API management (standard)                                 3  units                    $2,060.13    
+                                                                                                       
+ azurerm_api_management.basic2                                                                         
+ └─ API management (basic)                                    2  units                      $294.34    
+                                                                                                       
+ azurerm_api_management.developer1                                                                     
+ └─ API management (developer)                                1  units                       $48.03    
+                                                                                                       
+ azurerm_api_management.consumption                                                                    
+ └─ API management (consumption)                             10  1M calls                    $35.00  * 
+                                                                                                       
+ azurerm_api_management.consumption_non_usage                                                          
+ └─ API management (consumption)               Monthly cost depends on usage: $3.50 per 1M calls       
+                                                                                                       
  OVERALL TOTAL                                                                           $26,048.86 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 8 cloud resources were detected:
 ∙ 7 were estimated
 ∙ 1 was free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMApiManagement                           ┃ $26,049      ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestAzureRMApiManagement                           ┃ $24,764       ┃ $1,285      ┃ $26,049    ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

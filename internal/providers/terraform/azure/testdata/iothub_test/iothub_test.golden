@@ -1,26 +1,29 @@
 
- Name                                       Monthly Qty  Unit                    Monthly Cost 
-                                                                                              
- azurerm_iothub.iothub_multiple                                                               
- └─ IoT Hub                                           4  units                        $100.00 
-                                                                                              
- azurerm_iothub.iothub_single                                                                 
- └─ IoT Hub                                           1  units                         $25.00 
-                                                                                              
- azurerm_iothub_dps.dps_withUsage                                                             
- └─ Device provisioning                              10  1k operations                  $1.00 
-                                                                                              
- azurerm_iothub_dps.dps_withoutUsage                                                          
- └─ Device provisioning               Monthly cost depends on usage: $0.10 per 1k operations  
-                                                                                              
+ Name                                       Monthly Qty  Unit                    Monthly Cost    
+                                                                                                 
+ azurerm_iothub.iothub_multiple                                                                  
+ └─ IoT Hub                                           4  units                        $100.00    
+                                                                                                 
+ azurerm_iothub.iothub_single                                                                    
+ └─ IoT Hub                                           1  units                         $25.00    
+                                                                                                 
+ azurerm_iothub_dps.dps_withUsage                                                                
+ └─ Device provisioning                              10  1k operations                  $1.00  * 
+                                                                                                 
+ azurerm_iothub_dps.dps_withoutUsage                                                             
+ └─ Device provisioning               Monthly cost depends on usage: $0.10 per 1k operations     
+                                                                                                 
  OVERALL TOTAL                                                                        $126.00 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 6 cloud resources were detected:
 ∙ 4 were estimated
 ∙ 2 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestIoTHub                                         ┃ $126         ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestIoTHub                                         ┃ $125          ┃ $1          ┃ $126       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

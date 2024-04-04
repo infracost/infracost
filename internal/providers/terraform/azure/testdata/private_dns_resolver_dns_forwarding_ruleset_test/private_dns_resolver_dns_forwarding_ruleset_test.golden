@@ -1,20 +1,23 @@
 
- Name                                                         Monthly Qty  Unit    Monthly Cost 
-                                                                                                
- azurerm_private_dns_resolver_outbound_endpoint.example                                         
- └─ Outbound endpoint                                                   1  months       $180.00 
-                                                                                                
- azurerm_private_dns_resolver_dns_forwarding_ruleset.example                                    
- └─ Forwarding ruleset                                                  1  months         $2.50 
-                                                                                                
- OVERALL TOTAL                                                                          $182.50 
+ Name                                                         Monthly Qty  Unit    Monthly Cost   
+                                                                                                  
+ azurerm_private_dns_resolver_outbound_endpoint.example                                           
+ └─ Outbound endpoint                                                   1  months       $180.00   
+                                                                                                  
+ azurerm_private_dns_resolver_dns_forwarding_ruleset.example                                      
+ └─ Forwarding ruleset                                                  1  months         $2.50   
+                                                                                                  
+ OVERALL TOTAL                                                                         $182.50 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 6 cloud resources were detected:
 ∙ 2 were estimated
 ∙ 4 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestPrivateDnsResolverDnsForwardingRuleset         ┃ $183         ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestPrivateDnsResolverDnsForwardingRuleset         ┃ $183          ┃ $0.00       ┃ $183       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

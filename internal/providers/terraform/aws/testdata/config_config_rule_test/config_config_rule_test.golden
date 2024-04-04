@@ -1,21 +1,24 @@
 
- Name                                              Monthly Qty  Unit                    Monthly Cost 
-                                                                                                     
- aws_config_config_rule.my_config_withUsage                                                          
- ├─ Rule evaluations (first 100K)                      100,000  evaluations                  $100.00 
- ├─ Rule evaluations (next 400K)                       400,000  evaluations                  $320.00 
- └─ Rule evaluations (over 500K)                       500,000  evaluations                  $250.00 
-                                                                                                     
- aws_config_config_rule.my_config                                                                    
- └─ Rule evaluations (first 100K)            Monthly cost depends on usage: $0.001 per evaluations   
-                                                                                                     
+ Name                                              Monthly Qty  Unit                    Monthly Cost    
+                                                                                                        
+ aws_config_config_rule.my_config_withUsage                                                             
+ ├─ Rule evaluations (first 100K)                      100,000  evaluations                  $100.00  * 
+ ├─ Rule evaluations (next 400K)                       400,000  evaluations                  $320.00  * 
+ └─ Rule evaluations (over 500K)                       500,000  evaluations                  $250.00  * 
+                                                                                                        
+ aws_config_config_rule.my_config                                                                       
+ └─ Rule evaluations (first 100K)            Monthly cost depends on usage: $0.001 per evaluations      
+                                                                                                        
  OVERALL TOTAL                                                                               $670.00 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 2 cloud resources were detected:
 ∙ 2 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestConfigConfigRule                               ┃ $670         ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestConfigConfigRule                               ┃ $0.00         ┃ $670        ┃ $670       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

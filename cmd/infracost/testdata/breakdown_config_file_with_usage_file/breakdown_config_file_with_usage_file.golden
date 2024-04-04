@@ -1,37 +1,40 @@
 Project: default_usage
 Module path: flag_usage
 
- Name                             Monthly Qty  Unit         Monthly Cost 
-                                                                         
- aws_lambda_function.hello_world                                         
- ├─ Requests                               10  1M requests         $2.00 
- └─ Duration (first 6B)             5,000,000  GB-seconds         $83.33 
-                                                                         
- Project total                                                    $85.33 
+ Name                             Monthly Qty  Unit         Monthly Cost    
+                                                                            
+ aws_lambda_function.hello_world                                            
+ ├─ Requests                               10  1M requests         $2.00  * 
+ └─ Duration (first 6B)             5,000,000  GB-seconds         $83.33  * 
+                                                                            
+ Project total                                                    $85.33    
 
 ──────────────────────────────────
 Project: config_usage
 Module path: config_usage
 
- Name                             Monthly Qty  Unit         Monthly Cost 
-                                                                         
- aws_lambda_function.hello_world                                         
- ├─ Requests                              900  1M requests       $180.00 
- └─ Duration (first 6B)           810,000,000  GB-seconds     $13,500.03 
-                                                                         
- Project total                                                $13,680.03 
+ Name                             Monthly Qty  Unit         Monthly Cost    
+                                                                            
+ aws_lambda_function.hello_world                                            
+ ├─ Requests                              900  1M requests       $180.00  * 
+ └─ Duration (first 6B)           810,000,000  GB-seconds     $13,500.03  * 
+                                                                            
+ Project total                                                $13,680.03    
 
  OVERALL TOTAL                                                $13,765.36 
+
+*Usage costs were estimated using values from the config files.
+
 ──────────────────────────────────
 2 cloud resources were detected:
 ∙ 2 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ default_usage                                      ┃ $85          ┃
-┃ config_usage                                       ┃ $13,680      ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ default_usage                                      ┃ $0.00         ┃ $85         ┃ $85        ┃
+┃ config_usage                                       ┃ $0.00         ┃ $13,680     ┃ $13,680    ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:
 

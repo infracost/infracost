@@ -1,25 +1,28 @@
 
- Name                                             Monthly Qty  Unit                  Monthly Cost 
-                                                                                                  
- aws_sqs_queue.standard_sqs_queue_withUsage                                                       
- └─ Requests                                                2  1M requests                  $0.80 
-                                                                                                  
- aws_sqs_queue.fifo_sqs_queue_withUsage                                                           
- └─ Requests                                                1  1M requests                  $0.50 
-                                                                                                  
- aws_sqs_queue.fifo_sqs_queue                                                                     
- └─ Requests                                 Monthly cost depends on usage: $0.50 per 1M requests 
-                                                                                                  
- aws_sqs_queue.standard_sqs_queue                                                                 
- └─ Requests                                 Monthly cost depends on usage: $0.40 per 1M requests 
-                                                                                                  
+ Name                                             Monthly Qty  Unit                  Monthly Cost    
+                                                                                                     
+ aws_sqs_queue.standard_sqs_queue_withUsage                                                          
+ └─ Requests                                                2  1M requests                  $0.80  * 
+                                                                                                     
+ aws_sqs_queue.fifo_sqs_queue_withUsage                                                              
+ └─ Requests                                                1  1M requests                  $0.50  * 
+                                                                                                     
+ aws_sqs_queue.fifo_sqs_queue                                                                        
+ └─ Requests                                 Monthly cost depends on usage: $0.50 per 1M requests    
+                                                                                                     
+ aws_sqs_queue.standard_sqs_queue                                                                    
+ └─ Requests                                 Monthly cost depends on usage: $0.40 per 1M requests    
+                                                                                                     
  OVERALL TOTAL                                                                              $1.30 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 4 cloud resources were detected:
 ∙ 4 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestSQSQueueGoldenFile                             ┃ $1           ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestSQSQueueGoldenFile                             ┃ $0.00         ┃ $1          ┃ $1         ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

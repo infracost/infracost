@@ -1,29 +1,32 @@
 
- Name                                          Monthly Qty  Unit              Monthly Cost 
-                                                                                           
- azurerm_lb_rule.rules_withStandardSku                                                     
- └─ Rule usage                                         730  hours                    $7.30 
-                                                                                           
- azurerm_public_ip.example_withBasicSku                                                    
- └─ IP address (static, regional)                      730  hours                    $2.63 
-                                                                                           
- azurerm_public_ip.example_withDefaultSku                                                  
- └─ IP address (static, regional)                      730  hours                    $2.63 
-                                                                                           
- azurerm_public_ip.example_withStandardSku                                                 
- └─ IP address (static, regional)                      730  hours                    $2.63 
-                                                                                           
- azurerm_lb.example_withStandardSku                                                        
- └─ Data processed                          Monthly cost depends on usage: $0.005 per GB   
-                                                                                           
- OVERALL TOTAL                                                                      $15.18 
+ Name                                          Monthly Qty  Unit              Monthly Cost   
+                                                                                             
+ azurerm_lb_rule.rules_withStandardSku                                                       
+ └─ Rule usage                                         730  hours                    $7.30   
+                                                                                             
+ azurerm_public_ip.example_withBasicSku                                                      
+ └─ IP address (static, regional)                      730  hours                    $2.63   
+                                                                                             
+ azurerm_public_ip.example_withDefaultSku                                                    
+ └─ IP address (static, regional)                      730  hours                    $2.63   
+                                                                                             
+ azurerm_public_ip.example_withStandardSku                                                   
+ └─ IP address (static, regional)                      730  hours                    $2.63   
+                                                                                             
+ azurerm_lb.example_withStandardSku                                                          
+ └─ Data processed                          Monthly cost depends on usage: $0.005 per GB     
+                                                                                             
+ OVERALL TOTAL                                                                     $15.18 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 10 cloud resources were detected:
 ∙ 5 were estimated
 ∙ 5 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMLoadBalancerRuleV2GoldenFile            ┃ $15          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestAzureRMLoadBalancerRuleV2GoldenFile            ┃ $15           ┃ $0.00       ┃ $15        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

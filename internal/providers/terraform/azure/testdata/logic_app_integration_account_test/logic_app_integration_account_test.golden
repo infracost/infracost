@@ -1,20 +1,23 @@
 
- Name                                                       Monthly Qty  Unit   Monthly Cost 
-                                                                                             
- azurerm_logic_app_integration_account.example["Standard"]                                   
- └─ Integration Account (Standard)                                  730  hours     $1,000.00 
-                                                                                             
- azurerm_logic_app_integration_account.example["Basic"]                                      
- └─ Integration Account (Basic)                                     730  hours       $300.00 
-                                                                                             
- OVERALL TOTAL                                                                     $1,300.00 
+ Name                                                       Monthly Qty  Unit   Monthly Cost   
+                                                                                               
+ azurerm_logic_app_integration_account.example["Standard"]                                     
+ └─ Integration Account (Standard)                                  730  hours     $1,000.00   
+                                                                                               
+ azurerm_logic_app_integration_account.example["Basic"]                                        
+ └─ Integration Account (Basic)                                     730  hours       $300.00   
+                                                                                               
+ OVERALL TOTAL                                                                    $1,300.00 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 4 cloud resources were detected:
 ∙ 2 were estimated
 ∙ 2 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestLogicAppIntegrationAccount                     ┃ $1,300       ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestLogicAppIntegrationAccount                     ┃ $1,300        ┃ $0.00       ┃ $1,300     ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

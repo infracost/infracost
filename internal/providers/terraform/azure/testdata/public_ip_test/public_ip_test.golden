@@ -1,23 +1,26 @@
 
- Name                               Monthly Qty  Unit   Monthly Cost 
-                                                                     
- azurerm_public_ip.example                                           
- └─ IP address (static, regional)           730  hours         $3.65 
-                                                                     
- azurerm_public_ip.global                                            
- └─ IP address (static, global)             730  hours         $3.65 
-                                                                     
- azurerm_public_ip.example1                                          
- └─ IP address (dynamic, regional)          730  hours         $2.92 
-                                                                     
- OVERALL TOTAL                                                $10.22 
+ Name                               Monthly Qty  Unit   Monthly Cost   
+                                                                       
+ azurerm_public_ip.example                                             
+ └─ IP address (static, regional)           730  hours         $3.65   
+                                                                       
+ azurerm_public_ip.global                                              
+ └─ IP address (static, global)             730  hours         $3.65   
+                                                                       
+ azurerm_public_ip.example1                                            
+ └─ IP address (dynamic, regional)          730  hours         $2.92   
+                                                                       
+ OVERALL TOTAL                                               $10.22 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 4 cloud resources were detected:
 ∙ 3 were estimated
 ∙ 1 was free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMPublicIP                                ┃ $10          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestAzureRMPublicIP                                ┃ $10           ┃ $0.00       ┃ $10        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

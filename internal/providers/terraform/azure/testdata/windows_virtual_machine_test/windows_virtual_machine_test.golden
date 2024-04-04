@@ -1,55 +1,58 @@
 
- Name                                                                    Monthly Qty  Unit                      Monthly Cost 
-                                                                                                                             
- azurerm_windows_virtual_machine.Standard_E16-8as_v4                                                                         
- ├─ Instance usage (Windows, pay as you go, Standard_E16-8as_v4)                 730  hours                        $1,273.12 
- └─ os_disk                                                                                                                  
-    ├─ Storage (S4, LRS)                                                           1  months                           $1.54 
-    └─ Disk operations                                            Monthly cost depends on usage: $0.0005 per 10k operations  
-                                                                                                                             
- azurerm_windows_virtual_machine.standard_a2_v2_custom_disk                                                                  
- ├─ Instance usage (Windows, pay as you go, Standard_A2_v2)                      730  hours                           $99.28 
- └─ os_disk                                                                                                                  
-    ├─ Storage (E30, LRS)                                                          1  months                          $76.80 
-    └─ Disk operations                                                             2  10k operations                   $0.00 
-                                                                                                                             
- azurerm_windows_virtual_machine.standard_d2_v4_hybrid_benefit                                                               
- ├─ Instance usage (Windows, hybrid benefit, Standard_D2_v4)                     730  hours                           $70.08 
- └─ os_disk                                                                                                                  
-    ├─ Storage (E30, LRS)                                                          1  months                          $76.80 
-    └─ Disk operations                                            Monthly cost depends on usage: $0.002 per 10k operations   
-                                                                                                                             
- azurerm_windows_virtual_machine.standard_f2_premium_disk                                                                    
- ├─ Instance usage (Windows, pay as you go, Standard_F2)                         730  hours                          $140.16 
- └─ os_disk                                                                                                                  
-    └─ Storage (P4, LRS)                                                           1  months                           $5.28 
-                                                                                                                             
- azurerm_windows_virtual_machine.standard_a2_ultra_enabled                                                                   
- ├─ Instance usage (Windows, pay as you go, Standard_A2_v2)                      730  hours                           $99.28 
- ├─ Ultra disk reservation (if unattached)                        Monthly cost depends on usage: $4.38 per vCPU              
- └─ os_disk                                                                                                                  
-    ├─ Storage (E4, LRS)                                                           1  months                           $2.40 
-    └─ Disk operations                                            Monthly cost depends on usage: $0.002 per 10k operations   
-                                                                                                                             
- azurerm_windows_virtual_machine.basic_a2                                                                                    
- ├─ Instance usage (Windows, pay as you go, Basic_A2)                            730  hours                           $97.09 
- └─ os_disk                                                                                                                  
-    ├─ Storage (S4, LRS)                                                           1  months                           $1.54 
-    └─ Disk operations                                            Monthly cost depends on usage: $0.0005 per 10k operations  
-                                                                                                                             
- azurerm_windows_virtual_machine.basic_a2_withMonthlyHours                                                                   
- ├─ Instance usage (Windows, pay as you go, Basic_A2)                            100  hours                           $13.30 
- └─ os_disk                                                                                                                  
-    ├─ Storage (S4, LRS)                                                           1  months                           $1.54 
-    └─ Disk operations                                            Monthly cost depends on usage: $0.0005 per 10k operations  
-                                                                                                                             
+ Name                                                                    Monthly Qty  Unit                      Monthly Cost    
+                                                                                                                                
+ azurerm_windows_virtual_machine.Standard_E16-8as_v4                                                                            
+ ├─ Instance usage (Windows, pay as you go, Standard_E16-8as_v4)                 730  hours                        $1,273.12    
+ └─ os_disk                                                                                                                     
+    ├─ Storage (S4, LRS)                                                           1  months                           $1.54    
+    └─ Disk operations                                            Monthly cost depends on usage: $0.0005 per 10k operations     
+                                                                                                                                
+ azurerm_windows_virtual_machine.standard_a2_v2_custom_disk                                                                     
+ ├─ Instance usage (Windows, pay as you go, Standard_A2_v2)                      730  hours                           $99.28    
+ └─ os_disk                                                                                                                     
+    ├─ Storage (E30, LRS)                                                          1  months                          $76.80    
+    └─ Disk operations                                                             2  10k operations                   $0.00  * 
+                                                                                                                                
+ azurerm_windows_virtual_machine.standard_d2_v4_hybrid_benefit                                                                  
+ ├─ Instance usage (Windows, hybrid benefit, Standard_D2_v4)                     730  hours                           $70.08    
+ └─ os_disk                                                                                                                     
+    ├─ Storage (E30, LRS)                                                          1  months                          $76.80    
+    └─ Disk operations                                            Monthly cost depends on usage: $0.002 per 10k operations      
+                                                                                                                                
+ azurerm_windows_virtual_machine.standard_f2_premium_disk                                                                       
+ ├─ Instance usage (Windows, pay as you go, Standard_F2)                         730  hours                          $140.16    
+ └─ os_disk                                                                                                                     
+    └─ Storage (P4, LRS)                                                           1  months                           $5.28    
+                                                                                                                                
+ azurerm_windows_virtual_machine.standard_a2_ultra_enabled                                                                      
+ ├─ Instance usage (Windows, pay as you go, Standard_A2_v2)                      730  hours                           $99.28    
+ ├─ Ultra disk reservation (if unattached)                        Monthly cost depends on usage: $4.38 per vCPU                 
+ └─ os_disk                                                                                                                     
+    ├─ Storage (E4, LRS)                                                           1  months                           $2.40    
+    └─ Disk operations                                            Monthly cost depends on usage: $0.002 per 10k operations      
+                                                                                                                                
+ azurerm_windows_virtual_machine.basic_a2                                                                                       
+ ├─ Instance usage (Windows, pay as you go, Basic_A2)                            730  hours                           $97.09    
+ └─ os_disk                                                                                                                     
+    ├─ Storage (S4, LRS)                                                           1  months                           $1.54    
+    └─ Disk operations                                            Monthly cost depends on usage: $0.0005 per 10k operations     
+                                                                                                                                
+ azurerm_windows_virtual_machine.basic_a2_withMonthlyHours                                                                      
+ ├─ Instance usage (Windows, pay as you go, Basic_A2)                            100  hours                           $13.30    
+ └─ os_disk                                                                                                                     
+    ├─ Storage (S4, LRS)                                                           1  months                           $1.54    
+    └─ Disk operations                                            Monthly cost depends on usage: $0.0005 per 10k operations     
+                                                                                                                                
  OVERALL TOTAL                                                                                                     $1,958.20 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 7 cloud resources were detected:
 ∙ 7 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMWindowsVirtualMachineGoldenFile         ┃ $1,958       ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestAzureRMWindowsVirtualMachineGoldenFile         ┃ $1,958        ┃ $0.00       ┃ $1,958     ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

@@ -1,20 +1,23 @@
 
- Name                                          Monthly Qty  Unit                      Monthly Cost 
-                                                                                                   
- azurerm_eventgrid_topic.with_usage                                                                
- └─ Operations                                           8  100k operations                  $0.48 
-                                                                                                   
- azurerm_eventgrid_topic.without_usage                                                             
- └─ Operations                          Monthly cost depends on usage: $0.06 per 100k operations   
-                                                                                                   
+ Name                                          Monthly Qty  Unit                      Monthly Cost    
+                                                                                                      
+ azurerm_eventgrid_topic.with_usage                                                                   
+ └─ Operations                                           8  100k operations                  $0.48  * 
+                                                                                                      
+ azurerm_eventgrid_topic.without_usage                                                                
+ └─ Operations                          Monthly cost depends on usage: $0.06 per 100k operations      
+                                                                                                      
  OVERALL TOTAL                                                                               $0.48 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 3 cloud resources were detected:
 ∙ 2 were estimated
 ∙ 1 was free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestEventgridTopic                                 ┃ $0.48        ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestEventgridTopic                                 ┃ $0.00         ┃ $0.48       ┃ $0.48      ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

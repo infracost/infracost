@@ -1,20 +1,23 @@
 
- Name                                                                         Monthly Qty  Unit   Monthly Cost 
-                                                                                                               
- aws_dms_replication_instance.my_dms_replication_instance_multi_high_storage                                   
- ├─ Instance (t2.micro)                                                               730  hours        $26.28 
- └─ Storage (general purpose SSD, gp2)                                                 20  GB            $4.60 
-                                                                                                               
- aws_dms_replication_instance.my_dms_replication_instance_single_low_storage                                   
- └─ Instance (t2.micro)                                                               730  hours        $13.14 
-                                                                                                               
- OVERALL TOTAL                                                                                          $44.02 
+ Name                                                                         Monthly Qty  Unit   Monthly Cost   
+                                                                                                                 
+ aws_dms_replication_instance.my_dms_replication_instance_multi_high_storage                                     
+ ├─ Instance (t2.micro)                                                               730  hours        $26.28   
+ └─ Storage (general purpose SSD, gp2)                                                 20  GB            $4.60   
+                                                                                                                 
+ aws_dms_replication_instance.my_dms_replication_instance_single_low_storage                                     
+ └─ Instance (t2.micro)                                                               730  hours        $13.14   
+                                                                                                                 
+ OVERALL TOTAL                                                                                         $44.02 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 2 cloud resources were detected:
 ∙ 2 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestNewNewDMSReplicationInstanceGoldenFile         ┃ $44          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestNewNewDMSReplicationInstanceGoldenFile         ┃ $44           ┃ $0.00       ┃ $44        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

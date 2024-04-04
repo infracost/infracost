@@ -1,16 +1,19 @@
 
- Name                          Monthly Qty  Unit    Monthly Cost 
-                                                                 
- google_dns_managed_zone.zone                                    
- └─ Managed zone                         1  months         $0.20 
-                                                                 
- OVERALL TOTAL                                             $0.20 
+ Name                          Monthly Qty  Unit    Monthly Cost   
+                                                                   
+ google_dns_managed_zone.zone                                      
+ └─ Managed zone                         1  months         $0.20   
+                                                                   
+ OVERALL TOTAL                                            $0.20 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 1 cloud resource was detected:
 ∙ 1 was estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestDNSManagedZoneGoldenFile                       ┃ $0.20        ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestDNSManagedZoneGoldenFile                       ┃ $0.20         ┃ $0.00       ┃ $0.20      ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

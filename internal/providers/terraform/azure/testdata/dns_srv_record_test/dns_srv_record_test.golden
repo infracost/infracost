@@ -1,27 +1,30 @@
 
- Name                                      Monthly Qty  Unit                  Monthly Cost 
-                                                                                           
- azurerm_dns_srv_record.over1B                                                             
- ├─ DNS queries (first 1B)                       1,000  1M queries                 $400.00 
- └─ DNS queries (over 1B)                          500  1M queries                 $100.00 
-                                                                                           
- azurerm_dns_srv_record.first1B                                                            
- └─ DNS queries (first 1B)                       1,000  1M queries                 $400.00 
-                                                                                           
- azurerm_dns_zone.example                                                                  
- └─ Hosted zone                                      1  months                       $0.50 
-                                                                                           
- azurerm_dns_srv_record.withoutUsage                                                       
- └─ DNS queries (first 1B)            Monthly cost depends on usage: $0.40 per 1M queries  
-                                                                                           
+ Name                                      Monthly Qty  Unit                  Monthly Cost    
+                                                                                              
+ azurerm_dns_srv_record.over1B                                                                
+ ├─ DNS queries (first 1B)                       1,000  1M queries                 $400.00  * 
+ └─ DNS queries (over 1B)                          500  1M queries                 $100.00  * 
+                                                                                              
+ azurerm_dns_srv_record.first1B                                                               
+ └─ DNS queries (first 1B)                       1,000  1M queries                 $400.00  * 
+                                                                                              
+ azurerm_dns_zone.example                                                                     
+ └─ Hosted zone                                      1  months                       $0.50    
+                                                                                              
+ azurerm_dns_srv_record.withoutUsage                                                          
+ └─ DNS queries (first 1B)            Monthly cost depends on usage: $0.40 per 1M queries     
+                                                                                              
  OVERALL TOTAL                                                                     $900.50 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 5 cloud resources were detected:
 ∙ 4 were estimated
 ∙ 1 was free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMDNSsrvRecord                            ┃ $901         ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestAzureRMDNSsrvRecord                            ┃ $0.50         ┃ $900        ┃ $901       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

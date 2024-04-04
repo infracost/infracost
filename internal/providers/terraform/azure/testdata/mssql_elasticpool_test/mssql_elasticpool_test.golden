@@ -1,53 +1,56 @@
 
- Name                                               Monthly Qty  Unit         Monthly Cost 
-                                                                                           
- azurerm_mssql_elasticpool.bc_dc                                                           
- ├─ Compute (BC_DC, 8 vCore)                                730  hours           $4,622.36 
- ├─ SQL license                                           5,840  vCore-hours     $2,190.00 
- └─ Storage                                                 100  GB                 $29.75 
-                                                                                           
- azurerm_mssql_elasticpool.bc_dc_zone_redundant                                            
- ├─ Compute (BC_DC, 8 vCore)                                730  hours           $4,622.36 
- ├─ SQL license                                           5,840  vCore-hours     $2,190.00 
- └─ Storage                                                 100  GB                 $29.75 
-                                                                                           
- azurerm_mssql_elasticpool.premium_500                                                     
- ├─ Compute (Premium, 500 DTUs)                             730  hours           $2,737.50 
- └─ Extra data storage                                      274  GB                $121.11 
-                                                                                           
- azurerm_mssql_elasticpool.gp_gen5_zone_redundant                                          
- ├─ Compute (GP_Gen5, 4 vCore)                              730  hours             $488.92 
- ├─ Zone redundancy (GP_Gen5, 4 vCore)                      730  hours             $293.35 
- ├─ SQL license                                           2,920  vCore-hours       $291.90 
- └─ Storage                                                 100  GB                 $27.40 
-                                                                                           
- azurerm_mssql_elasticpool.gp_gen5                                                         
- ├─ Compute (GP_Gen5, 4 vCore)                              730  hours             $488.92 
- ├─ SQL license                                           2,920  vCore-hours       $291.90 
- └─ Storage                                                 100  GB                 $13.69 
-                                                                                           
- azurerm_mssql_elasticpool.gp_gen5_zone_no_license                                         
- ├─ Compute (GP_Gen5, 4 vCore)                              730  hours             $488.92 
- └─ Storage                                                 100  GB                 $13.69 
-                                                                                           
- azurerm_mssql_elasticpool.standard_200                                                    
- ├─ Compute (Standard, 200 DTUs)                            730  hours             $441.04 
- └─ Extra data storage                                      100  GB                 $22.10 
-                                                                                           
- azurerm_mssql_elasticpool.basic_100                                                       
- └─ Compute (Basic, 100 DTUs)                               730  hours             $147.22 
-                                                                                           
+ Name                                               Monthly Qty  Unit         Monthly Cost    
+                                                                                              
+ azurerm_mssql_elasticpool.bc_dc                                                              
+ ├─ Compute (BC_DC, 8 vCore)                                730  hours           $4,622.36    
+ ├─ SQL license                                           5,840  vCore-hours     $2,190.00    
+ └─ Storage                                                 100  GB                 $29.75    
+                                                                                              
+ azurerm_mssql_elasticpool.bc_dc_zone_redundant                                               
+ ├─ Compute (BC_DC, 8 vCore)                                730  hours           $4,622.36    
+ ├─ SQL license                                           5,840  vCore-hours     $2,190.00    
+ └─ Storage                                                 100  GB                 $29.75    
+                                                                                              
+ azurerm_mssql_elasticpool.premium_500                                                        
+ ├─ Compute (Premium, 500 DTUs)                             730  hours           $2,737.50    
+ └─ Extra data storage                                      274  GB                $121.11  * 
+                                                                                              
+ azurerm_mssql_elasticpool.gp_gen5_zone_redundant                                             
+ ├─ Compute (GP_Gen5, 4 vCore)                              730  hours             $488.92    
+ ├─ Zone redundancy (GP_Gen5, 4 vCore)                      730  hours             $293.35    
+ ├─ SQL license                                           2,920  vCore-hours       $291.90    
+ └─ Storage                                                 100  GB                 $27.40    
+                                                                                              
+ azurerm_mssql_elasticpool.gp_gen5                                                            
+ ├─ Compute (GP_Gen5, 4 vCore)                              730  hours             $488.92    
+ ├─ SQL license                                           2,920  vCore-hours       $291.90    
+ └─ Storage                                                 100  GB                 $13.69    
+                                                                                              
+ azurerm_mssql_elasticpool.gp_gen5_zone_no_license                                            
+ ├─ Compute (GP_Gen5, 4 vCore)                              730  hours             $488.92    
+ └─ Storage                                                 100  GB                 $13.69    
+                                                                                              
+ azurerm_mssql_elasticpool.standard_200                                                       
+ ├─ Compute (Standard, 200 DTUs)                            730  hours             $441.04    
+ └─ Extra data storage                                      100  GB                 $22.10  * 
+                                                                                              
+ azurerm_mssql_elasticpool.basic_100                                                          
+ └─ Compute (Basic, 100 DTUs)                               730  hours             $147.22    
+                                                                                              
  OVERALL TOTAL                                                                  $19,551.88 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 10 cloud resources were detected:
 ∙ 8 were estimated
 ∙ 2 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestMSSQLElasticPool                               ┃ $19,552      ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestMSSQLElasticPool                               ┃ $19,409       ┃ $143        ┃ $19,552    ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 Logs:
 
 WRN 'Multiple products found' are safe to ignore for 'Compute (BC_DC, 8 vCore)' due to limitations in the Azure API.

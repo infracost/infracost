@@ -1,26 +1,29 @@
 
- Name                                            Monthly Qty  Unit                      Monthly Cost 
-                                                                                                     
- azurerm_key_vault_certificate.premium                                                               
- ├─ Certificate renewals                                 100  requests                       $300.00 
- └─ Certificate operations                                10  10K transactions                 $0.30 
-                                                                                                     
- azurerm_key_vault_certificate.standard                                                              
- ├─ Certificate renewals                                 100  requests                       $300.00 
- └─ Certificate operations                                10  10K transactions                 $0.30 
-                                                                                                     
- azurerm_key_vault_certificate.non-usage                                                             
- ├─ Certificate renewals                  Monthly cost depends on usage: $3.00 per requests          
- └─ Certificate operations                Monthly cost depends on usage: $0.03 per 10K transactions  
-                                                                                                     
- OVERALL TOTAL                                                                               $600.60 
+ Name                                            Monthly Qty  Unit                      Monthly Cost   
+                                                                                                       
+ azurerm_key_vault_certificate.premium                                                                 
+ ├─ Certificate renewals                                 100  requests                       $300.00   
+ └─ Certificate operations                                10  10K transactions                 $0.30   
+                                                                                                       
+ azurerm_key_vault_certificate.standard                                                                
+ ├─ Certificate renewals                                 100  requests                       $300.00   
+ └─ Certificate operations                                10  10K transactions                 $0.30   
+                                                                                                       
+ azurerm_key_vault_certificate.non-usage                                                               
+ ├─ Certificate renewals                  Monthly cost depends on usage: $3.00 per requests            
+ └─ Certificate operations                Monthly cost depends on usage: $0.03 per 10K transactions    
+                                                                                                       
+ OVERALL TOTAL                                                                              $600.60 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 6 cloud resources were detected:
 ∙ 3 were estimated
 ∙ 3 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureKeyVaultCertificate                       ┃ $601         ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestAzureKeyVaultCertificate                       ┃ $601          ┃ $0.00       ┃ $601       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

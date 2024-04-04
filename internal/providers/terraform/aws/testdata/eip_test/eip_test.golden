@@ -1,30 +1,33 @@
 
- Name                                                     Monthly Qty  Unit              Monthly Cost 
-                                                                                                      
- aws_nat_gateway.nat_gw                                                                               
- ├─ NAT gateway                                                   730  hours                   $32.85 
- └─ Data processed                                     Monthly cost depends on usage: $0.045 per GB   
-                                                                                                      
- aws_instance.instance                                                                                
- ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)             730  hours                   $30.37 
- └─ root_block_device                                                                                 
-    └─ Storage (general purpose SSD, gp2)                           8  GB                       $0.80 
-                                                                                                      
- aws_lb.example                                                                                       
- ├─ Network load balancer                                         730  hours                   $16.43 
- └─ Load balancer capacity units                       Monthly cost depends on usage: $4.38 per LCU   
-                                                                                                      
- aws_eip.eip1                                                                                         
- └─ IP address (if unused)                                        730  hours                    $3.65 
-                                                                                                      
- OVERALL TOTAL                                                                                 $84.09 
+ Name                                                     Monthly Qty  Unit              Monthly Cost   
+                                                                                                        
+ aws_nat_gateway.nat_gw                                                                                 
+ ├─ NAT gateway                                                   730  hours                   $32.85   
+ └─ Data processed                                     Monthly cost depends on usage: $0.045 per GB     
+                                                                                                        
+ aws_instance.instance                                                                                  
+ ├─ Instance usage (Linux/UNIX, on-demand, t3.medium)             730  hours                   $30.37   
+ └─ root_block_device                                                                                   
+    └─ Storage (general purpose SSD, gp2)                           8  GB                       $0.80   
+                                                                                                        
+ aws_lb.example                                                                                         
+ ├─ Network load balancer                                         730  hours                   $16.43   
+ └─ Load balancer capacity units                       Monthly cost depends on usage: $4.38 per LCU     
+                                                                                                        
+ aws_eip.eip1                                                                                           
+ └─ IP address (if unused)                                        730  hours                    $3.65   
+                                                                                                        
+ OVERALL TOTAL                                                                                $84.09 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 8 cloud resources were detected:
 ∙ 4 were estimated
 ∙ 4 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestEIP                                            ┃ $84          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestEIP                                            ┃ $84           ┃ $0.00       ┃ $84        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

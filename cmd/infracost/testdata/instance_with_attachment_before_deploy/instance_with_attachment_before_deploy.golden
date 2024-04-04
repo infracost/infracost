@@ -1,26 +1,29 @@
 Project: infracost/infracost/cmd/infracost/testdata/instance_with_attachment_before_deploy.json
 
- Name                                                Monthly Qty  Unit   Monthly Cost 
-                                                                                      
- aws_ebs_volume.storage                                                               
- └─ Storage (general purpose SSD, gp2)                       128  GB           $12.80 
-                                                                                      
- aws_instance.ec2                                                                     
- ├─ Instance usage (Linux/UNIX, on-demand, t2.nano)          730  hours         $4.23 
- └─ root_block_device                                                                 
-    └─ Storage (general purpose SSD, gp2)                      8  GB            $0.80 
-                                                                                      
- OVERALL TOTAL                                                                 $17.83 
+ Name                                                Monthly Qty  Unit   Monthly Cost   
+                                                                                        
+ aws_ebs_volume.storage                                                                 
+ └─ Storage (general purpose SSD, gp2)                       128  GB           $12.80   
+                                                                                        
+ aws_instance.ec2                                                                       
+ ├─ Instance usage (Linux/UNIX, on-demand, t2.nano)          730  hours         $4.23   
+ └─ root_block_device                                                                   
+    └─ Storage (general purpose SSD, gp2)                      8  GB            $0.80   
+                                                                                        
+ OVERALL TOTAL                                                                $17.83 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 4 cloud resources were detected:
 ∙ 2 were estimated
 ∙ 2 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                                          ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco..._attachment_before_deploy.json ┃ $18          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                                          ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infraco..._attachment_before_deploy.json ┃ $18           ┃ $0.00       ┃ $18        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:
 

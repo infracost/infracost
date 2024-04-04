@@ -1,20 +1,23 @@
 
- Name                                                                Monthly Qty  Unit                  Monthly Cost 
-                                                                                                                     
- azurerm_monitor_data_collection_rule.example["with_usage"]                                                          
- └─ Metrics ingestion                                                      10.56  10M samples                  $1.69 
-                                                                                                                     
- azurerm_monitor_data_collection_rule.example["without_usage"]                                                       
- └─ Metrics ingestion                                           Monthly cost depends on usage: $0.16 per 10M samples 
-                                                                                                                     
+ Name                                                                Monthly Qty  Unit                  Monthly Cost    
+                                                                                                                        
+ azurerm_monitor_data_collection_rule.example["with_usage"]                                                             
+ └─ Metrics ingestion                                                      10.56  10M samples                  $1.69  * 
+                                                                                                                        
+ azurerm_monitor_data_collection_rule.example["without_usage"]                                                          
+ └─ Metrics ingestion                                           Monthly cost depends on usage: $0.16 per 10M samples    
+                                                                                                                        
  OVERALL TOTAL                                                                                                 $1.69 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 3 cloud resources were detected:
 ∙ 2 were estimated
 ∙ 1 was free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestMonitorDataCollectionRule                      ┃ $2           ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestMonitorDataCollectionRule                      ┃ $0.00         ┃ $2          ┃ $2         ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

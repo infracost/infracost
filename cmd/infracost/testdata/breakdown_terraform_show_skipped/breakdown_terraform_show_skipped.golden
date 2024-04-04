@@ -1,14 +1,17 @@
 Project: infracost/infracost/cmd/infracost/testdata/express_route_gateway_plan.json
 
- Name                                                 Monthly Qty  Unit         Monthly Cost 
-                                                                                             
- azurerm_express_route_gateway.express_route                                                 
- └─ ER scale units (2 Gbps)                                     1  scale units       $306.60 
-                                                                                             
- azurerm_express_route_connection.express_route_conn                                         
- └─ ER Connections                                            730  hours              $36.50 
-                                                                                             
- OVERALL TOTAL                                                                       $343.10 
+ Name                                                 Monthly Qty  Unit         Monthly Cost   
+                                                                                               
+ azurerm_express_route_gateway.express_route                                                   
+ └─ ER scale units (2 Gbps)                                     1  scale units       $306.60   
+                                                                                               
+ azurerm_express_route_connection.express_route_conn                                           
+ └─ ER Connections                                            730  hours              $36.50   
+                                                                                               
+ OVERALL TOTAL                                                                      $343.10 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 8 cloud resources were detected:
 ∙ 2 were estimated
@@ -18,11 +21,11 @@ Project: infracost/infracost/cmd/infracost/testdata/express_route_gateway_plan.j
   ∙ 1 x azurerm_express_route_circuit_peering
   ∙ 1 x azurerm_express_route_port
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                                          ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...xpress_route_gateway_plan.json ┃ $343         ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                                          ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infraco...xpress_route_gateway_plan.json ┃ $343          ┃ $0.00       ┃ $343       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:
 

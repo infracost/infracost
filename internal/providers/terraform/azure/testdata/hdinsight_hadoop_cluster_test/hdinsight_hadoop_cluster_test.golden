@@ -1,35 +1,38 @@
 
- Name                                                  Monthly Qty  Unit                      Monthly Cost 
-                                                                                                           
- azurerm_hdinsight_hadoop_cluster.with_edge                                                                
- ├─ Head node (Standard_D3)                                  1,460  hours                          $430.70 
- ├─ Worker node (Standard_D4)                                2,190  hours                        $1,292.10 
- ├─ Zookeeper node (Standard_D3)                             2,190  hours                          $646.05 
- └─ Edge node (Standard_A5)                                  2,190  hours                          $554.07 
-                                                                                                           
- azurerm_hdinsight_hadoop_cluster.without_edge                                                             
- ├─ Head node (Standard_A4m_V2)                              1,460  hours                          $446.76 
- ├─ Worker node (Standard_A1_V2)                               730  hours                           $43.80 
- └─ Zookeeper node (Standard_A5)                             2,190  hours                          $554.07 
-                                                                                                           
- azurerm_storage_account.example                                                                           
- ├─ Capacity                                    Monthly cost depends on usage: $0.01 per GB                
- ├─ Write operations                            Monthly cost depends on usage: $0.10 per 10k operations    
- ├─ List and create container operations        Monthly cost depends on usage: $0.054 per 10k operations   
- ├─ Read operations                             Monthly cost depends on usage: $0.01 per 10k operations    
- ├─ All other operations                        Monthly cost depends on usage: $0.0043 per 10k operations  
- ├─ Data retrieval                              Monthly cost depends on usage: $0.01 per GB                
- ├─ Blob index                                  Monthly cost depends on usage: $0.039 per 10k tags         
- └─ Early deletion                              Monthly cost depends on usage: $0.01 per GB                
-                                                                                                           
- OVERALL TOTAL                                                                                   $3,967.55 
+ Name                                                  Monthly Qty  Unit                      Monthly Cost   
+                                                                                                             
+ azurerm_hdinsight_hadoop_cluster.with_edge                                                                  
+ ├─ Head node (Standard_D3)                                  1,460  hours                          $430.70   
+ ├─ Worker node (Standard_D4)                                2,190  hours                        $1,292.10   
+ ├─ Zookeeper node (Standard_D3)                             2,190  hours                          $646.05   
+ └─ Edge node (Standard_A5)                                  2,190  hours                          $554.07   
+                                                                                                             
+ azurerm_hdinsight_hadoop_cluster.without_edge                                                               
+ ├─ Head node (Standard_A4m_V2)                              1,460  hours                          $446.76   
+ ├─ Worker node (Standard_A1_V2)                               730  hours                           $43.80   
+ └─ Zookeeper node (Standard_A5)                             2,190  hours                          $554.07   
+                                                                                                             
+ azurerm_storage_account.example                                                                             
+ ├─ Capacity                                    Monthly cost depends on usage: $0.01 per GB                  
+ ├─ Write operations                            Monthly cost depends on usage: $0.10 per 10k operations      
+ ├─ List and create container operations        Monthly cost depends on usage: $0.054 per 10k operations     
+ ├─ Read operations                             Monthly cost depends on usage: $0.01 per 10k operations      
+ ├─ All other operations                        Monthly cost depends on usage: $0.0043 per 10k operations    
+ ├─ Data retrieval                              Monthly cost depends on usage: $0.01 per GB                  
+ ├─ Blob index                                  Monthly cost depends on usage: $0.039 per 10k tags           
+ └─ Early deletion                              Monthly cost depends on usage: $0.01 per GB                  
+                                                                                                             
+ OVERALL TOTAL                                                                                  $3,967.55 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 5 cloud resources were detected:
 ∙ 3 were estimated
 ∙ 2 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMHDInsightHadoopClusterGoldenFile        ┃ $3,968       ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestAzureRMHDInsightHadoopClusterGoldenFile        ┃ $3,968        ┃ $0.00       ┃ $3,968     ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

@@ -1,19 +1,22 @@
 
- Name                            Monthly Qty  Unit              Monthly Cost 
-                                                                             
- aws_glue_crawler.with_usage                                                 
- └─ Duration                              60  hours                   $26.40 
-                                                                             
- aws_glue_crawler.no_usage                                                   
- └─ Duration                  Monthly cost depends on usage: $0.44 per hours 
-                                                                             
+ Name                            Monthly Qty  Unit              Monthly Cost    
+                                                                                
+ aws_glue_crawler.with_usage                                                    
+ └─ Duration                              60  hours                   $26.40  * 
+                                                                                
+ aws_glue_crawler.no_usage                                                      
+ └─ Duration                  Monthly cost depends on usage: $0.44 per hours    
+                                                                                
  OVERALL TOTAL                                                        $26.40 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 2 cloud resources were detected:
 ∙ 2 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestGlueCrawlerGoldenFile                          ┃ $26          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestGlueCrawlerGoldenFile                          ┃ $0.00         ┃ $26         ┃ $26        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

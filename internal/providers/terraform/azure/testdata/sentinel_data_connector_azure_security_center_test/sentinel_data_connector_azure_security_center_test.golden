@@ -1,34 +1,37 @@
 
- Name                                                                                               Monthly Qty  Unit                    Monthly Cost 
-                                                                                                                                                      
- azurerm_log_analytics_workspace.sentinel_data_connector_azure_security_center                                                                        
- ├─ Log data ingestion                                                                        Monthly cost depends on usage: $2.99 per GB             
- ├─ Sentinel data ingestion                                                                   Monthly cost depends on usage: $2.99 per GB             
- ├─ Log data export                                                                           Monthly cost depends on usage: $0.13 per GB             
- ├─ Basic log data ingestion                                                                  Monthly cost depends on usage: $0.65 per GB             
- ├─ Basic log search queries                                                                  Monthly cost depends on usage: $0.0065 per GB searched  
- ├─ Archive data                                                                              Monthly cost depends on usage: $0.026 per GB            
- ├─ Archive data restored                                                                     Monthly cost depends on usage: $0.13 per GB             
- └─ Archive data searched                                                                     Monthly cost depends on usage: $0.0065 per GB           
-                                                                                                                                                      
- azurerm_log_analytics_workspace.sentinel_data_connector_azure_security_center_with_solution                                                          
- ├─ Log data ingestion                                                                        Monthly cost depends on usage: $2.99 per GB             
- ├─ Sentinel data ingestion                                                                   Monthly cost depends on usage: $2.99 per GB             
- ├─ Log data export                                                                           Monthly cost depends on usage: $0.13 per GB             
- ├─ Basic log data ingestion                                                                  Monthly cost depends on usage: $0.65 per GB             
- ├─ Basic log search queries                                                                  Monthly cost depends on usage: $0.0065 per GB searched  
- ├─ Archive data                                                                              Monthly cost depends on usage: $0.026 per GB            
- ├─ Archive data restored                                                                     Monthly cost depends on usage: $0.13 per GB             
- └─ Archive data searched                                                                     Monthly cost depends on usage: $0.0065 per GB           
-                                                                                                                                                      
- OVERALL TOTAL                                                                                                                                  $0.00 
+ Name                                                                                               Monthly Qty  Unit                    Monthly Cost   
+                                                                                                                                                        
+ azurerm_log_analytics_workspace.sentinel_data_connector_azure_security_center                                                                          
+ ├─ Log data ingestion                                                                        Monthly cost depends on usage: $2.99 per GB               
+ ├─ Sentinel data ingestion                                                                   Monthly cost depends on usage: $2.99 per GB               
+ ├─ Log data export                                                                           Monthly cost depends on usage: $0.13 per GB               
+ ├─ Basic log data ingestion                                                                  Monthly cost depends on usage: $0.65 per GB               
+ ├─ Basic log search queries                                                                  Monthly cost depends on usage: $0.0065 per GB searched    
+ ├─ Archive data                                                                              Monthly cost depends on usage: $0.026 per GB              
+ ├─ Archive data restored                                                                     Monthly cost depends on usage: $0.13 per GB               
+ └─ Archive data searched                                                                     Monthly cost depends on usage: $0.0065 per GB             
+                                                                                                                                                        
+ azurerm_log_analytics_workspace.sentinel_data_connector_azure_security_center_with_solution                                                            
+ ├─ Log data ingestion                                                                        Monthly cost depends on usage: $2.99 per GB               
+ ├─ Sentinel data ingestion                                                                   Monthly cost depends on usage: $2.99 per GB               
+ ├─ Log data export                                                                           Monthly cost depends on usage: $0.13 per GB               
+ ├─ Basic log data ingestion                                                                  Monthly cost depends on usage: $0.65 per GB               
+ ├─ Basic log search queries                                                                  Monthly cost depends on usage: $0.0065 per GB searched    
+ ├─ Archive data                                                                              Monthly cost depends on usage: $0.026 per GB              
+ ├─ Archive data restored                                                                     Monthly cost depends on usage: $0.13 per GB               
+ └─ Archive data searched                                                                     Monthly cost depends on usage: $0.0065 per GB             
+                                                                                                                                                        
+ OVERALL TOTAL                                                                                                                                 $0.00 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 6 cloud resources were detected:
 ∙ 2 were estimated
 ∙ 4 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestSentinelDataConnectorAzureSecurityCenter       ┃ $0.00        ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestSentinelDataConnectorAzureSecurityCenter       ┃ $0.00         ┃ $0.00       ┃ $0.00      ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

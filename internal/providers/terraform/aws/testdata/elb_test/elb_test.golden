@@ -1,21 +1,24 @@
 
- Name                         Monthly Qty  Unit              Monthly Cost 
-                                                                          
- aws_elb.my_elb                                                           
- ├─ Classic load balancer             730  hours                   $18.25 
- └─ Data processed                 10,000  GB                      $80.00 
-                                                                          
- aws_elb.elb1                                                             
- ├─ Classic load balancer             730  hours                   $18.25 
- └─ Data processed         Monthly cost depends on usage: $0.008 per GB   
-                                                                          
+ Name                         Monthly Qty  Unit              Monthly Cost    
+                                                                             
+ aws_elb.my_elb                                                              
+ ├─ Classic load balancer             730  hours                   $18.25    
+ └─ Data processed                 10,000  GB                      $80.00  * 
+                                                                             
+ aws_elb.elb1                                                                
+ ├─ Classic load balancer             730  hours                   $18.25    
+ └─ Data processed         Monthly cost depends on usage: $0.008 per GB      
+                                                                             
  OVERALL TOTAL                                                    $116.50 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 2 cloud resources were detected:
 ∙ 2 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestELB                                            ┃ $117         ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestELB                                            ┃ $37           ┃ $80         ┃ $117       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

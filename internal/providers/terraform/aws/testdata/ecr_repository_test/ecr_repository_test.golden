@@ -1,19 +1,22 @@
 
- Name                        Monthly Qty  Unit            Monthly Cost 
-                                                                       
- aws_ecr_repository.repo                                               
- └─ Storage                            1  GB                     $0.10 
-                                                                       
- aws_ecr_repository.repo1                                              
- └─ Storage                Monthly cost depends on usage: $0.10 per GB 
-                                                                       
+ Name                        Monthly Qty  Unit            Monthly Cost    
+                                                                          
+ aws_ecr_repository.repo                                                  
+ └─ Storage                            1  GB                     $0.10  * 
+                                                                          
+ aws_ecr_repository.repo1                                                 
+ └─ Storage                Monthly cost depends on usage: $0.10 per GB    
+                                                                          
  OVERALL TOTAL                                                   $0.10 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 2 cloud resources were detected:
 ∙ 2 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestEcrRepositoryGoldenFile                        ┃ $0.10        ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestEcrRepositoryGoldenFile                        ┃ $0.00         ┃ $0.10       ┃ $0.10      ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

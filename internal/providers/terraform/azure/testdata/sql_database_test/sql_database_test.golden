@@ -1,93 +1,96 @@
 
- Name                                                                       Monthly Qty  Unit              Monthly Cost 
-                                                                                                                        
- azurerm_sql_database.premium6                                                                                          
- ├─ Compute (P6)                                                                    730  hours                $3,650.00 
- ├─ Extra data storage                                                              500  GB                     $170.00 
- ├─ Long-term retention (RA-GRS)                                                  1,000  GB                      $50.00 
- └─ PITR backup storage (RA-GRS)                                         Monthly cost depends on usage: $0.20 per GB    
-                                                                                                                        
- azurerm_sql_database.backup                                                                                            
- ├─ Compute (provisioned, GP_Gen5_4)                                                730  hours                  $444.47 
- ├─ Storage                                                                           5  GB                       $0.58 
- ├─ Long-term retention (RA-GRS)                                                  1,000  GB                      $50.00 
- └─ PITR backup storage (RA-GRS)                                                    500  GB                     $100.00 
-                                                                                                                        
- azurerm_sql_database.sql_database_with_edition_premium                                                                 
- ├─ Compute (P1)                                                                    730  hours                  $456.25 
- ├─ Long-term retention (RA-GRS)                                         Monthly cost depends on usage: $0.05 per GB    
- └─ PITR backup storage (RA-GRS)                                         Monthly cost depends on usage: $0.20 per GB    
-                                                                                                                        
- azurerm_sql_database.sql_database_with_edition_critical                                                                
- ├─ Compute (provisioned, BC_Gen5_2)                                                730  hours                  $444.48 
- ├─ Storage                                                                           5  GB                       $1.25 
- ├─ Long-term retention (RA-GRS)                                         Monthly cost depends on usage: $0.05 per GB    
- └─ PITR backup storage (RA-GRS)                                         Monthly cost depends on usage: $0.20 per GB    
-                                                                                                                        
- azurerm_sql_database.sql_database_with_edition_critical_zone_redundant                                                 
- ├─ Compute (provisioned, BC_Gen5_2)                                                730  hours                  $444.48 
- ├─ Storage                                                                           5  GB                       $1.25 
- ├─ Long-term retention (RA-GRS)                                         Monthly cost depends on usage: $0.05 per GB    
- └─ PITR backup storage (RA-GRS)                                         Monthly cost depends on usage: $0.20 per GB    
-                                                                                                                        
- azurerm_sql_database.sql_database_with_service_object_name                                                             
- ├─ Compute (provisioned, BC_Gen5_2)                                                730  hours                  $444.48 
- ├─ Storage                                                                           5  GB                       $1.25 
- ├─ Long-term retention (RA-GRS)                                         Monthly cost depends on usage: $0.05 per GB    
- └─ PITR backup storage (RA-GRS)                                         Monthly cost depends on usage: $0.20 per GB    
-                                                                                                                        
- azurerm_sql_database.sql_database_with_edition_gen_zone_redundant                                                      
- ├─ Compute (provisioned, GP_Gen5_2)                                                730  hours                  $222.24 
- ├─ Zone redundancy (provisioned, GP_Gen5_2)                                        730  hours                  $133.34 
- ├─ Storage                                                                           5  GB                       $1.15 
- ├─ Long-term retention (RA-GRS)                                         Monthly cost depends on usage: $0.05 per GB    
- └─ PITR backup storage (RA-GRS)                                         Monthly cost depends on usage: $0.20 per GB    
-                                                                                                                        
- azurerm_sql_database.sql_database_with_edition_hyper                                                                   
- ├─ Compute (provisioned, HS_Gen5_2)                                                730  hours                  $266.68 
- ├─ Read replicas                                                        Monthly cost depends on usage: $0.37 per hours 
- └─ Storage                                                                           5  GB                       $1.25 
-                                                                                                                        
- azurerm_sql_database.serverless                                                                                        
- ├─ Compute (serverless, GP_S_Gen5_4)                                               500  vCore-hours            $260.88 
- ├─ Storage                                                                           5  GB                       $0.58 
- ├─ Long-term retention (RA-GRS)                                         Monthly cost depends on usage: $0.05 per GB    
- └─ PITR backup storage (RA-GRS)                                         Monthly cost depends on usage: $0.20 per GB    
-                                                                                                                        
- azurerm_sql_database.sql_database_with_max_size                                                                        
- ├─ Compute (provisioned, GP_Gen5_2)                                                730  hours                  $222.24 
- ├─ Storage                                                                          10  GB                       $1.15 
- ├─ Long-term retention (RA-GRS)                                         Monthly cost depends on usage: $0.05 per GB    
- └─ PITR backup storage (RA-GRS)                                         Monthly cost depends on usage: $0.20 per GB    
-                                                                                                                        
- azurerm_sql_database.default_sql_database                                                                              
- ├─ Compute (provisioned, GP_Gen5_2)                                                730  hours                  $222.24 
- ├─ Storage                                                                           5  GB                       $0.58 
- ├─ Long-term retention (RA-GRS)                                         Monthly cost depends on usage: $0.05 per GB    
- └─ PITR backup storage (RA-GRS)                                         Monthly cost depends on usage: $0.20 per GB    
-                                                                                                                        
- azurerm_sql_database.sql_database_with_edition_gen                                                                     
- ├─ Compute (provisioned, GP_Gen5_2)                                                730  hours                  $222.24 
- ├─ Storage                                                                           5  GB                       $0.58 
- ├─ Long-term retention (RA-GRS)                                         Monthly cost depends on usage: $0.05 per GB    
- └─ PITR backup storage (RA-GRS)                                         Monthly cost depends on usage: $0.20 per GB    
-                                                                                                                        
- azurerm_sql_database.sql_database_with_edition_standard                                                                
- ├─ Compute (S0)                                                                    730  hours                   $14.72 
- ├─ Long-term retention (RA-GRS)                                         Monthly cost depends on usage: $0.05 per GB    
- └─ PITR backup storage (RA-GRS)                                         Monthly cost depends on usage: $0.20 per GB    
-                                                                                                                        
+ Name                                                                       Monthly Qty  Unit              Monthly Cost    
+                                                                                                                           
+ azurerm_sql_database.premium6                                                                                             
+ ├─ Compute (P6)                                                                    730  hours                $3,650.00    
+ ├─ Extra data storage                                                              500  GB                     $170.00  * 
+ ├─ Long-term retention (RA-GRS)                                                  1,000  GB                      $50.00  * 
+ └─ PITR backup storage (RA-GRS)                                         Monthly cost depends on usage: $0.20 per GB       
+                                                                                                                           
+ azurerm_sql_database.backup                                                                                               
+ ├─ Compute (provisioned, GP_Gen5_4)                                                730  hours                  $444.47    
+ ├─ Storage                                                                           5  GB                       $0.58    
+ ├─ Long-term retention (RA-GRS)                                                  1,000  GB                      $50.00  * 
+ └─ PITR backup storage (RA-GRS)                                                    500  GB                     $100.00  * 
+                                                                                                                           
+ azurerm_sql_database.sql_database_with_edition_premium                                                                    
+ ├─ Compute (P1)                                                                    730  hours                  $456.25    
+ ├─ Long-term retention (RA-GRS)                                         Monthly cost depends on usage: $0.05 per GB       
+ └─ PITR backup storage (RA-GRS)                                         Monthly cost depends on usage: $0.20 per GB       
+                                                                                                                           
+ azurerm_sql_database.sql_database_with_edition_critical                                                                   
+ ├─ Compute (provisioned, BC_Gen5_2)                                                730  hours                  $444.48    
+ ├─ Storage                                                                           5  GB                       $1.25    
+ ├─ Long-term retention (RA-GRS)                                         Monthly cost depends on usage: $0.05 per GB       
+ └─ PITR backup storage (RA-GRS)                                         Monthly cost depends on usage: $0.20 per GB       
+                                                                                                                           
+ azurerm_sql_database.sql_database_with_edition_critical_zone_redundant                                                    
+ ├─ Compute (provisioned, BC_Gen5_2)                                                730  hours                  $444.48    
+ ├─ Storage                                                                           5  GB                       $1.25    
+ ├─ Long-term retention (RA-GRS)                                         Monthly cost depends on usage: $0.05 per GB       
+ └─ PITR backup storage (RA-GRS)                                         Monthly cost depends on usage: $0.20 per GB       
+                                                                                                                           
+ azurerm_sql_database.sql_database_with_service_object_name                                                                
+ ├─ Compute (provisioned, BC_Gen5_2)                                                730  hours                  $444.48    
+ ├─ Storage                                                                           5  GB                       $1.25    
+ ├─ Long-term retention (RA-GRS)                                         Monthly cost depends on usage: $0.05 per GB       
+ └─ PITR backup storage (RA-GRS)                                         Monthly cost depends on usage: $0.20 per GB       
+                                                                                                                           
+ azurerm_sql_database.sql_database_with_edition_gen_zone_redundant                                                         
+ ├─ Compute (provisioned, GP_Gen5_2)                                                730  hours                  $222.24    
+ ├─ Zone redundancy (provisioned, GP_Gen5_2)                                        730  hours                  $133.34    
+ ├─ Storage                                                                           5  GB                       $1.15    
+ ├─ Long-term retention (RA-GRS)                                         Monthly cost depends on usage: $0.05 per GB       
+ └─ PITR backup storage (RA-GRS)                                         Monthly cost depends on usage: $0.20 per GB       
+                                                                                                                           
+ azurerm_sql_database.sql_database_with_edition_hyper                                                                      
+ ├─ Compute (provisioned, HS_Gen5_2)                                                730  hours                  $266.68    
+ ├─ Read replicas                                                        Monthly cost depends on usage: $0.37 per hours    
+ └─ Storage                                                                           5  GB                       $1.25    
+                                                                                                                           
+ azurerm_sql_database.serverless                                                                                           
+ ├─ Compute (serverless, GP_S_Gen5_4)                                               500  vCore-hours            $260.88  * 
+ ├─ Storage                                                                           5  GB                       $0.58    
+ ├─ Long-term retention (RA-GRS)                                         Monthly cost depends on usage: $0.05 per GB       
+ └─ PITR backup storage (RA-GRS)                                         Monthly cost depends on usage: $0.20 per GB       
+                                                                                                                           
+ azurerm_sql_database.sql_database_with_max_size                                                                           
+ ├─ Compute (provisioned, GP_Gen5_2)                                                730  hours                  $222.24    
+ ├─ Storage                                                                          10  GB                       $1.15    
+ ├─ Long-term retention (RA-GRS)                                         Monthly cost depends on usage: $0.05 per GB       
+ └─ PITR backup storage (RA-GRS)                                         Monthly cost depends on usage: $0.20 per GB       
+                                                                                                                           
+ azurerm_sql_database.default_sql_database                                                                                 
+ ├─ Compute (provisioned, GP_Gen5_2)                                                730  hours                  $222.24    
+ ├─ Storage                                                                           5  GB                       $0.58    
+ ├─ Long-term retention (RA-GRS)                                         Monthly cost depends on usage: $0.05 per GB       
+ └─ PITR backup storage (RA-GRS)                                         Monthly cost depends on usage: $0.20 per GB       
+                                                                                                                           
+ azurerm_sql_database.sql_database_with_edition_gen                                                                        
+ ├─ Compute (provisioned, GP_Gen5_2)                                                730  hours                  $222.24    
+ ├─ Storage                                                                           5  GB                       $0.58    
+ ├─ Long-term retention (RA-GRS)                                         Monthly cost depends on usage: $0.05 per GB       
+ └─ PITR backup storage (RA-GRS)                                         Monthly cost depends on usage: $0.20 per GB       
+                                                                                                                           
+ azurerm_sql_database.sql_database_with_edition_standard                                                                   
+ ├─ Compute (S0)                                                                    730  hours                   $14.72    
+ ├─ Long-term retention (RA-GRS)                                         Monthly cost depends on usage: $0.05 per GB       
+ └─ PITR backup storage (RA-GRS)                                         Monthly cost depends on usage: $0.20 per GB       
+                                                                                                                           
  OVERALL TOTAL                                                                                                $7,828.32 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 15 cloud resources were detected:
 ∙ 13 were estimated
 ∙ 2 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestSQLDatabase                                    ┃ $7,828       ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestSQLDatabase                                    ┃ $7,197        ┃ $631        ┃ $7,828     ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 Logs:
 
 WRN 'Multiple products found' are safe to ignore for 'Compute (provisioned, BC_Gen5_2)' due to limitations in the Azure API.

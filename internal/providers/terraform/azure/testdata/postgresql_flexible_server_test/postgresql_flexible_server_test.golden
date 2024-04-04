@@ -1,44 +1,47 @@
 
- Name                                                         Monthly Qty  Unit              Monthly Cost 
-                                                                                                          
- azurerm_postgresql_flexible_server.non_usage_gp                                                          
- ├─ Compute (GP_Standard_D16s_v3)                                     730  hours                $1,138.80 
- ├─ Storage                                                Monthly cost depends on usage: $0.14 per GB    
- └─ Additional backup storage                              Monthly cost depends on usage: $0.095 per GB   
-                                                                                                          
- azurerm_postgresql_flexible_server.mo                                                                    
- ├─ Compute (MO_Standard_E4s_v3)                                      730  hours                  $382.52 
- ├─ Storage                                                            64  GB                       $8.83 
- └─ Additional backup storage                                       5,000  GB                     $475.00 
-                                                                                                          
- azurerm_postgresql_flexible_server.gp                                                                    
- ├─ Compute (GP_Standard_D4s_v3)                                      730  hours                  $284.70 
- ├─ Storage                                                            32  GB                       $4.42 
- └─ Additional backup storage                                       5,000  GB                     $475.00 
-                                                                                                          
- azurerm_postgresql_flexible_server.burstable                                                             
- ├─ Compute (B_Standard_B1ms)                                         730  hours                   $16.06 
- ├─ Storage                                                           128  GB                      $17.66 
- └─ Additional backup storage                                       5,000  GB                     $475.00 
-                                                                                                          
- azurerm_postgresql_flexible_server.burstable_b2ms_vcore                                                  
- ├─ Compute (B_Standard_B2ms)                                         730  hours                  $128.48 
- ├─ Storage                                                           128  GB                      $17.66 
- └─ Additional backup storage                              Monthly cost depends on usage: $0.095 per GB   
-                                                                                                          
- azurerm_postgresql_flexible_server.readable_location_set                                                 
- ├─ Compute (B_Standard_B1ms)                                         730  hours                   $12.41 
- ├─ Storage                                                Monthly cost depends on usage: $0.12 per GB    
- └─ Additional backup storage                              Monthly cost depends on usage: $0.095 per GB   
-                                                                                                          
+ Name                                                         Monthly Qty  Unit              Monthly Cost    
+                                                                                                             
+ azurerm_postgresql_flexible_server.non_usage_gp                                                             
+ ├─ Compute (GP_Standard_D16s_v3)                                     730  hours                $1,138.80    
+ ├─ Storage                                                Monthly cost depends on usage: $0.14 per GB       
+ └─ Additional backup storage                              Monthly cost depends on usage: $0.095 per GB      
+                                                                                                             
+ azurerm_postgresql_flexible_server.mo                                                                       
+ ├─ Compute (MO_Standard_E4s_v3)                                      730  hours                  $382.52    
+ ├─ Storage                                                            64  GB                       $8.83    
+ └─ Additional backup storage                                       5,000  GB                     $475.00  * 
+                                                                                                             
+ azurerm_postgresql_flexible_server.gp                                                                       
+ ├─ Compute (GP_Standard_D4s_v3)                                      730  hours                  $284.70    
+ ├─ Storage                                                            32  GB                       $4.42    
+ └─ Additional backup storage                                       5,000  GB                     $475.00  * 
+                                                                                                             
+ azurerm_postgresql_flexible_server.burstable                                                                
+ ├─ Compute (B_Standard_B1ms)                                         730  hours                   $16.06    
+ ├─ Storage                                                           128  GB                      $17.66    
+ └─ Additional backup storage                                       5,000  GB                     $475.00  * 
+                                                                                                             
+ azurerm_postgresql_flexible_server.burstable_b2ms_vcore                                                     
+ ├─ Compute (B_Standard_B2ms)                                         730  hours                  $128.48    
+ ├─ Storage                                                           128  GB                      $17.66    
+ └─ Additional backup storage                              Monthly cost depends on usage: $0.095 per GB      
+                                                                                                             
+ azurerm_postgresql_flexible_server.readable_location_set                                                    
+ ├─ Compute (B_Standard_B1ms)                                         730  hours                   $12.41    
+ ├─ Storage                                                Monthly cost depends on usage: $0.12 per GB       
+ └─ Additional backup storage                              Monthly cost depends on usage: $0.095 per GB      
+                                                                                                             
  OVERALL TOTAL                                                                                  $3,436.55 
+
+*Usage costs can be estimated by adding usage defaults from Infracost Cloud or an infracost-usage.yml.
+
 ──────────────────────────────────
 7 cloud resources were detected:
 ∙ 6 were estimated
 ∙ 1 was free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestPostgreSQLFlexibleServer                       ┃ $3,437       ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ TestPostgreSQLFlexibleServer                       ┃ $2,012        ┃ $1,425      ┃ $3,437     ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
