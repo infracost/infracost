@@ -341,7 +341,6 @@ func hasCodeChanges(options Options, project Project) bool {
 }
 
 var (
-	configFileDocsURL            = "https://www.infracost.io/docs/features/config_file/"
 	usageFileDocsURL             = "https://www.infracost.io/docs/features/usage_based_resources/#infracost-usageyml"
 	usageDefaultsDocsURL         = "https://www.infracost.io/docs/features/usage_based_resources"
 	usageDefaultsDashboardSuffix = "settings/usage-defaults"
@@ -356,67 +355,40 @@ func usageCostsMessage(out Root, useLinks bool) string {
 	return handleUsageApiEnabledMessage(out, useLinks)
 }
 
-func usageDefaultsStr(out Root, useMarkdownLinks bool) string {
+func cloudSettingsStr(out Root, useMarkdownLinks bool) string {
 	if !useMarkdownLinks {
-		return "usage defaults from Infracost Cloud"
+		return "Infracost Cloud settings"
 	}
 	usageDefaultsURL := usageDefaultsDocsURL
 	match := cloudURLRegex.FindStringSubmatch(out.CloudURL)
 	if len(match) > 0 {
 		usageDefaultsURL = match[0] + usageDefaultsDashboardSuffix
 	}
-	return fmt.Sprintf("[usage defaults](%s)", usageDefaultsURL)
+	return fmt.Sprintf("[Infracost Cloud settings](%s)", usageDefaultsURL)
 }
 
-func configFilesStr(useMarkdownLinks bool) string {
+func usageDocsStr(useMarkdownLinks bool) string {
 	if !useMarkdownLinks {
-		return "config files"
+		return "docs"
 	}
 
-	return fmt.Sprintf("[config files](%s)", configFileDocsURL)
-}
-
-func usageFileStr(name string, useMarkdownLinks bool) string {
-	if !useMarkdownLinks {
-		return name
-	}
-
-	return fmt.Sprintf("[%s](%s)", name, usageFileDocsURL)
+	return fmt.Sprintf("[docs](%s)", usageFileDocsURL)
 }
 
 func handleUsageApiEnabledMessage(out Root, useMarkdownLinks bool) string {
-	if out.Metadata.ConfigFilePath != "" {
-		return constructConfigFilePathMessage(out, useMarkdownLinks)
+	if out.Metadata.UsageFilePath != "" || out.Metadata.ConfigFileHasUsageFile {
+		return fmt.Sprintf("*Usage costs were estimated by merging infracost-usage.yml and %s.", cloudSettingsStr(out, useMarkdownLinks))
 	}
 
-	if out.Metadata.UsageFilePath != "" {
-		return fmt.Sprintf("*Usage costs were estimated by merging %s and values from %s.", usageDefaultsStr(out, useMarkdownLinks), usageFileStr(out.Metadata.UsageFilePath, useMarkdownLinks))
-	}
-
-	return fmt.Sprintf("*Usage costs were estimated with %s, which can also be %s in this repo.", usageDefaultsStr(out, useMarkdownLinks), usageFileStr("overridden", useMarkdownLinks))
-}
-
-func constructConfigFilePathMessage(out Root, useMarkdownLinks bool) string {
-	if out.Metadata.ConfigFileHasUsageFile {
-		return fmt.Sprintf("*Usage costs were estimated by merging %s and values from the %s.", usageDefaultsStr(out, useMarkdownLinks), configFilesStr(useMarkdownLinks))
-	}
-
-	return fmt.Sprintf("*Usage costs were estimated with %s, which can also be overridden in an %s.", usageDefaultsStr(out, useMarkdownLinks), usageFileStr("infracost-usage.yml", useMarkdownLinks))
+	return fmt.Sprintf("*Usage costs were estimated using %s, see %s for other options.", cloudSettingsStr(out, useMarkdownLinks), usageDocsStr(useMarkdownLinks))
 }
 
 func handleUsageApiDisabledMessage(out Root, useMarkdownLinks bool) string {
-	if out.Metadata.ConfigFilePath != "" {
-		if out.Metadata.ConfigFileHasUsageFile {
-			return fmt.Sprintf("*Usage costs were estimated using values from the %s.", configFilesStr(useMarkdownLinks))
-		}
-		return fmt.Sprintf("*Usage costs can be estimated by adding %s or %s in the config file.", usageDefaultsStr(out, useMarkdownLinks), usageFileStr("usage files", useMarkdownLinks))
+	if out.Metadata.UsageFilePath != "" || out.Metadata.ConfigFileHasUsageFile {
+		return fmt.Sprintf("*Usage costs were estimated using infracost-usage.yml, see %s for other options.", usageDocsStr(useMarkdownLinks))
 	}
 
-	if out.Metadata.UsageFilePath != "" {
-		return fmt.Sprintf("*Usage costs were estimated using %s.", usageFileStr(out.Metadata.UsageFilePath, useMarkdownLinks))
-	}
-
-	return fmt.Sprintf("*Usage costs can be estimated by adding %s or an %s.", usageDefaultsStr(out, useMarkdownLinks), usageFileStr("infracost-usage.yml", useMarkdownLinks))
+	return fmt.Sprintf("*Usage costs can be estimated by updating %s, see %s for other options.", cloudSettingsStr(out, useMarkdownLinks), usageDocsStr(useMarkdownLinks))
 }
 
 func costsDetailsMessage(out Root) string {
