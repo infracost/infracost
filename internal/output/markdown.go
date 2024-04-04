@@ -160,19 +160,9 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) (MarkdownO
 	var buf bytes.Buffer
 	bufw := bufio.NewWriter(&buf)
 
-	filename := "markdown-html.tmpl"
-	if out.Metadata.UsageApiEnabled {
-		// for now only show the new usage-costs-including comment if the usage api has been enabled
-		// once we have all the other usage cost stuff done this will replace the old comment template
-		filename = "markdown-html-usage-api.tmpl"
-	}
+	filename := "markdown-html-usage-api.tmpl"
 	if markdownOpts.BasicSyntax {
-		filename = "markdown.tmpl"
-		if out.Metadata.UsageApiEnabled {
-			// for now only show the new usage-costs-including comment if the usage api has been enabled
-			// once we have all the other usage cost stuff done this will replace the old comment template
-			filename = "markdown-usage-api.tmpl"
-		}
+		filename = "markdown-usage-api.tmpl"
 	}
 
 	runQuotaMsg, exceeded := out.Projects.IsRunQuotaExceeded()

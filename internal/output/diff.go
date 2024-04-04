@@ -116,14 +116,12 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 		s += "──────────────────────────────────"
 	}
 
-	if out.Metadata.UsageApiEnabled {
-		// for now only show the new usage-costs-including comment if the usage api has been enabled
-		// once we have all the other usage cost stuff done this will replace the old comment template
-		if hasDiffProjects {
-			s += "\n"
-			s += usageCostsMessage(out, false)
-			s += "\n"
-		}
+	// for now only show the new usage-costs-including comment if the usage api has been enabled
+	// once we have all the other usage cost stuff done this will replace the old comment template
+	if hasDiffProjects {
+		s += "\n"
+		s += usageCostsMessage(out, false)
+		s += "\n"
 	}
 
 	unsupportedMsg := out.summaryMessage(opts.ShowSkipped)
@@ -165,57 +163,23 @@ func projectTitle(project Project) string {
 }
 
 func tableForDiff(out Root, opts Options) string {
-	if out.Metadata.UsageApiEnabled {
-		// for now only show the new usage-costs in the table if the usage api has been enabled
-		// once we have all the other usage cost stuff done this will replace the old table
-		t := table.NewWriter()
-		t.SetStyle(table.StyleBold)
-		t.Style().Format.Header = text.FormatDefault
-		t.AppendHeader(table.Row{
-			"Changed project",
-			"Baseline cost",
-			"Usage cost",
-			"Total change",
-		})
-
-		t.SetColumnConfigs([]table.ColumnConfig{
-			{Name: "Changed project", WidthMin: 50},
-			{Name: "Baseline cost", WidthMin: 10, Align: text.AlignRight},
-			{Name: "Usage cost", WidthMin: 10, Align: text.AlignRight},
-			{Name: "Total change", WidthMin: 10, Align: text.AlignRight},
-		})
-
-		for _, project := range out.Projects {
-			if !showProject(project, opts, false) {
-				continue
-			}
-
-			t.AppendRow(
-				table.Row{
-					truncateMiddle(project.Name, 64, "..."),
-					formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyBaselineCost(), project.Breakdown.TotalMonthlyBaselineCost(), false, true),
-					formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyUsageCost, project.Breakdown.TotalMonthlyUsageCost, false, true),
-					formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyCost, project.Breakdown.TotalMonthlyCost, false, false),
-				},
-			)
-
-		}
-
-		return t.Render()
-	}
+	// for now only show the new usage-costs in the table if the usage api has been enabled
+	// once we have all the other usage cost stuff done this will replace the old table
 	t := table.NewWriter()
 	t.SetStyle(table.StyleBold)
 	t.Style().Format.Header = text.FormatDefault
 	t.AppendHeader(table.Row{
-		"Project",
-		"Cost change",
-		"New monthly cost",
+		"Changed project",
+		"Baseline cost",
+		"Usage cost",
+		"Total change",
 	})
 
 	t.SetColumnConfigs([]table.ColumnConfig{
-		{Name: "Project", WidthMin: 50},
-		{Name: "Cost change", WidthMin: 10, Align: text.AlignRight},
-		{Name: "New monthly cost", WidthMin: 10},
+		{Name: "Changed project", WidthMin: 50},
+		{Name: "Baseline cost", WidthMin: 10, Align: text.AlignRight},
+		{Name: "Usage cost", WidthMin: 10, Align: text.AlignRight},
+		{Name: "Total change", WidthMin: 10, Align: text.AlignRight},
 	})
 
 	for _, project := range out.Projects {
@@ -226,8 +190,9 @@ func tableForDiff(out Root, opts Options) string {
 		t.AppendRow(
 			table.Row{
 				truncateMiddle(project.Name, 64, "..."),
+				formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyBaselineCost(), project.Breakdown.TotalMonthlyBaselineCost(), false, true),
+				formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyUsageCost, project.Breakdown.TotalMonthlyUsageCost, false, true),
 				formatMarkdownCostChange(out.Currency, project.PastBreakdown.TotalMonthlyCost, project.Breakdown.TotalMonthlyCost, false, false),
-				formatCost(out.Currency, project.Breakdown.TotalMonthlyCost),
 			},
 		)
 
