@@ -4,7 +4,7 @@
 
 #### Monthly cost will increase by $41 ↑ ####
 
-| **Changed project** | **[Baseline cost](## "Baseline costs are consistent charges for provisioned resources, like the hourly cost for a virtual machine, which stays constant no matter how much it is used. Infracost estimates these resources assuming they are used for the whole month (730 hours).")** | **[Usage cost](## "Usage costs are charges based on actual usage, like the storage cost for an object storage bucket. Infracost estimates these resources using the monthly usage values in the usage-file.")*** | **Total change** | **New monthly cost** |
+| **Changed project** | **Baseline cost** | **Usage cost*** | **Total change** | **New monthly cost** |
 | ----------- | --------------: | --------------: | --------------: | --------------: |
 | infracost/infracost/cmd/infraco...data/terraform_v0.14_plan.json | +$41 | - | +$41 (+100%) | $81 |
 
