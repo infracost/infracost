@@ -116,6 +116,8 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 		s += "──────────────────────────────────"
 	}
 
+	// for now only show the new usage-costs-including comment if the usage api has been enabled
+	// once we have all the other usage cost stuff done this will replace the old comment template
 	if hasDiffProjects {
 		s += "\n"
 		s += usageCostsMessage(out, false)
@@ -161,6 +163,8 @@ func projectTitle(project Project) string {
 }
 
 func tableForDiff(out Root, opts Options) string {
+	// for now only show the new usage-costs in the table if the usage api has been enabled
+	// once we have all the other usage cost stuff done this will replace the old table
 	t := table.NewWriter()
 	t.SetStyle(table.StyleBold)
 	t.Style().Format.Header = text.FormatDefault
