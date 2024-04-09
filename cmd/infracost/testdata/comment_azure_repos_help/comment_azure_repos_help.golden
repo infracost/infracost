@@ -22,7 +22,7 @@ FLAGS
       --pull-request int            Pull request number to post comment on
       --repo-url string             Repository URL, e.g. https://dev.azure.com/my-org/my-project/_git/my-repo
       --show-all-projects           Show all projects in the table of the comment output
-      --show-skipped                List unsupported resources (default true)
+      --show-skipped                List unsupported resources
       --tag string                  Customize hidden markdown tag used to detect comments posted by Infracost
 
 GLOBAL FLAGS
