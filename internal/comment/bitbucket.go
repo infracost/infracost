@@ -772,7 +772,7 @@ func (h *bitbucketServerPRHandler) AddMarkdownTags(s string, tags []CommentTag) 
 	return bitbucketAddMarkdownTags(s, tags)
 }
 
-// fetchComment calls the Bitbucket Server API to retrieve a single comment.
+// fetchServerComment calls the Bitbucket Server API to retrieve a single comment.
 func (h *bitbucketServerPRHandler) fetchServerComment(commentURL string) (*bitbucketServerAPIComment, error) {
 	req, err := http.NewRequest("GET", commentURL, nil)
 	if err != nil {

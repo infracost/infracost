@@ -303,7 +303,7 @@ var SNSFIFOTopicUsageSchema = []*schema.UsageItem{
 //	}
 // }
 
-// publishAPIRequestCostComponent returns a cost component for Publish API request costs.
+// publishAPIRequestsCostComponent returns a cost component for Publish API request costs.
 func (r *SNSFIFOTopic) publishAPIRequestsCostComponent(requests *int64) *schema.CostComponent {
 	var q *decimal.Decimal
 	if requests != nil {
