@@ -122,10 +122,7 @@ Percent: +100%
 
 ──────────────────────────────────
 Key: * usage cost, ~ changed, + added, - removed
-The following projects have no cost estimate changes: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_nochange_plan.json
-Run the following command to see their breakdown: infracost breakdown --path=/path/to/code
 
-──────────────────────────────────
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 26 cloud resources were detected:
