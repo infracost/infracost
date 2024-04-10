@@ -1,6 +1,6 @@
 ──────────────────────────────────
-The following projects have no cost estimate changes: infracost/infracost/cmd/infracost/testdata/express_route_gateway_plan.json
-Run the following command to see their breakdown: infracost breakdown --path=/path/to/code
+1 project has no cost estimate change.
+Run the following command to see its breakdown: infracost breakdown --path=/path/to/code
 
 ──────────────────────────────────
 8 cloud resources were detected:
