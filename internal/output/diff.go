@@ -109,15 +109,18 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 			s += "──────────────────────────────────\n"
 		}
 
-		s += fmt.Sprintf("The following projects have no cost estimate changes: %s", strings.Join(noDiffProjects, ", "))
-		s += fmt.Sprintf("\nRun the following command to see their breakdown: %s", ui.PrimaryString("infracost breakdown --path=/path/to/code"))
+		if len(noDiffProjects) == 1 {
+			s += "1 project has no cost estimate change.\n"
+			s += fmt.Sprintf("Run the following command to see its breakdown: %s", ui.PrimaryString("infracost breakdown --path=/path/to/code"))
+		} else {
+			s += fmt.Sprintf("%d projects have no cost estimate changes.\n", len(noDiffProjects))
+			s += fmt.Sprintf("Run the following command to see their breakdown: %s", ui.PrimaryString("infracost breakdown --path=/path/to/code"))
+		}
 
 		s += "\n\n"
 		s += "──────────────────────────────────"
 	}
 
-	// for now only show the new usage-costs-including comment if the usage api has been enabled
-	// once we have all the other usage cost stuff done this will replace the old comment template
 	if hasDiffProjects {
 		s += "\n"
 		s += usageCostsMessage(out, false)
@@ -163,8 +166,6 @@ func projectTitle(project Project) string {
 }
 
 func tableForDiff(out Root, opts Options) string {
-	// for now only show the new usage-costs in the table if the usage api has been enabled
-	// once we have all the other usage cost stuff done this will replace the old table
 	t := table.NewWriter()
 	t.SetStyle(table.StyleBold)
 	t.Style().Format.Header = text.FormatDefault

@@ -28,7 +28,10 @@
 
 ```
 ──────────────────────────────────
+2 projects have no cost estimate changes.
+Run the following command to see their breakdown: infracost breakdown --path=/path/to/code
 
+──────────────────────────────────
 3 cloud resources were detected:
 ∙ 3 were estimated
 ```
