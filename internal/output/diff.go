@@ -109,8 +109,13 @@ func ToDiff(out Root, opts Options) ([]byte, error) {
 			s += "──────────────────────────────────\n"
 		}
 
-		s += fmt.Sprintf("The following projects have no cost estimate changes: %s", strings.Join(noDiffProjects, ", "))
-		s += fmt.Sprintf("\nRun the following command to see their breakdown: %s", ui.PrimaryString("infracost breakdown --path=/path/to/code"))
+		if len(noDiffProjects) == 1 {
+			s += fmt.Sprintf("1 project has no cost estimate change.\n")
+			s += fmt.Sprintf("Run the following command to see its breakdown: %s", ui.PrimaryString("infracost breakdown --path=/path/to/code"))
+		} else {
+			s += fmt.Sprintf("%d projects have no cost estimate changes.\n", len(noDiffProjects))
+			s += fmt.Sprintf("Run the following command to see their breakdown: %s", ui.PrimaryString("infracost breakdown --path=/path/to/code"))
+		}
 
 		s += "\n\n"
 		s += "──────────────────────────────────"
