@@ -21,6 +21,11 @@
  ├─ Storage                                                           128  GB                      $17.66    
  └─ Additional backup storage                                       5,000  GB                     $475.00  * 
                                                                                                              
+ azurerm_postgresql_flexible_server.d2ds_v5                                                                  
+ ├─ Compute (GP_Standard_D2ds_v5)                                     730  hours                  $148.19    
+ ├─ Storage                                                Monthly cost depends on usage: $0.14 per GB       
+ └─ Additional backup storage                              Monthly cost depends on usage: $0.095 per GB      
+                                                                                                             
  azurerm_postgresql_flexible_server.burstable_b2ms_vcore                                                     
  ├─ Compute (B_Standard_B2ms)                                         730  hours                  $128.48    
  ├─ Storage                                                           128  GB                      $17.66    
@@ -31,17 +36,17 @@
  ├─ Storage                                                Monthly cost depends on usage: $0.12 per GB       
  └─ Additional backup storage                              Monthly cost depends on usage: $0.095 per GB      
                                                                                                              
- OVERALL TOTAL                                                                                  $3,436.55 
+ OVERALL TOTAL                                                                                  $3,584.74 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 ──────────────────────────────────
-7 cloud resources were detected:
-∙ 6 were estimated
+8 cloud resources were detected:
+∙ 7 were estimated
 ∙ 1 was free
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ TestPostgreSQLFlexibleServer                       ┃ $2,012        ┃ $1,425      ┃ $3,437     ┃
+┃ TestPostgreSQLFlexibleServer                       ┃ $2,160        ┃ $1,425      ┃ $3,585     ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

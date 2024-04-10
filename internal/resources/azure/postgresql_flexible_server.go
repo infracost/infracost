@@ -77,7 +77,7 @@ func (r *PostgreSQLFlexibleServer) computeCostComponent() *schema.CostComponent 
 			Service:       strPtr("Azure Database for PostgreSQL"),
 			ProductFamily: strPtr("Databases"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", ValueRegex: strPtr(fmt.Sprintf("/^Azure Database for PostgreSQL Flexible Server %s %s/i", attrs.TierName, attrs.Series))},
+				{Key: "productName", ValueRegex: strPtr(fmt.Sprintf("/^Azure Database for PostgreSQL Flexible Server %s (?:-\\s)?%s/i", attrs.TierName, attrs.Series))},
 				{Key: "skuName", ValueRegex: regexPtr(fmt.Sprintf("^%s$", attrs.SKUName))},
 				{Key: "meterName", ValueRegex: regexPtr(fmt.Sprintf("^%s$", attrs.MeterName))},
 			},
