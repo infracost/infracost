@@ -62,7 +62,7 @@ func commentCmd(ctx *config.RunContext) *cobra.Command {
 		subCmd.Flags().StringArray("policy-path", nil, "Path to Infracost policy files, glob patterns need quotes (experimental)")
 		subCmd.Flags().Bool("show-all-projects", false, "Show all projects in the table of the comment output")
 		subCmd.Flags().Bool("show-changed", false, "Show only projects in the table that have code changes")
-		subCmd.Flags().Bool("show-skipped", false, "List unsupported resources")
+		subCmd.Flags().Bool("show-skipped", true, "List unsupported resources")
 		_ = subCmd.Flags().MarkHidden("show-changed")
 		subCmd.Flags().Bool("skip-no-diff", false, "Skip posting comment if there are no resource changes. Only applies to update, hide-and-new, and delete-and-new behaviors")
 		_ = subCmd.Flags().MarkHidden("skip-no-diff")
