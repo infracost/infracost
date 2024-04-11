@@ -28,6 +28,7 @@ type Metadata struct {
 	VCSPullRequestID     string   `json:"vcsPullRequestId,omitempty"`
 
 	UsageApiEnabled        bool   `json:"usageApiEnabled,omitempty"`
+	HasUsageFile           bool   `json:"hasUsageFile,omitempty"`
 	UsageFilePath          string `json:"usageFilePath,omitempty"`
 	ConfigFilePath         string `json:"configFilePath,omitempty"`
 	ConfigFileHasUsageFile bool   `json:"configFileHasUsageFile,omitempty"`
@@ -75,6 +76,8 @@ func NewMetadata(ctx *config.RunContext) Metadata {
 			}
 		}
 	}
+
+	m.HasUsageFile = ctx.Config.UsageFilePath != "" || m.ConfigFileHasUsageFile
 
 	return m
 }

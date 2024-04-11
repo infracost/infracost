@@ -9,6 +9,7 @@
     "vcsCommitTimestamp": "REPLACED_TIME",
     "vcsCommitMessage": "stub-message",
     "vcsRepositoryUrl": "https://github.com/infracost/infracost",
+    "hasUsageFile": true,
     "usageFilePath": "./testdata/example_usage.yml"
   },
   "currency": "USD",

@@ -169,6 +169,9 @@
         "usageApiEnabled": {
           "type": "boolean"
         },
+        "hasUsageFile": {
+          "type": "boolean"
+        },
         "usageFilePath": {
           "type": "string"
         },
