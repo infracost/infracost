@@ -77,7 +77,7 @@ func (r *PostgreSQLFlexibleServer) computeCostComponent() *schema.CostComponent 
 			Service:       strPtr("Azure Database for PostgreSQL"),
 			ProductFamily: strPtr("Databases"),
 			AttributeFilters: []*schema.AttributeFilter{
-				{Key: "productName", ValueRegex: strPtr(fmt.Sprintf("/^Azure Database for PostgreSQL Flexible Server %s %s/i", attrs.TierName, attrs.Series))},
+				{Key: "productName", ValueRegex: strPtr(fmt.Sprintf("/^%s %s (?:-\\s)?%s/i", attrs.ProductName, attrs.TierName, attrs.Series))},
 				{Key: "skuName", ValueRegex: regexPtr(fmt.Sprintf("^%s$", attrs.SKUName))},
 				{Key: "meterName", ValueRegex: regexPtr(fmt.Sprintf("^%s$", attrs.MeterName))},
 			},
@@ -143,10 +143,11 @@ func (r *PostgreSQLFlexibleServer) backupCostComponent() *schema.CostComponent {
 // flexibleServerFilterAttributes defines CPAPI filter attributes for compute
 // cost component derived from IaC provider's SKU.
 type flexibleServerFilterAttributes struct {
-	SKUName   string
-	TierName  string
-	MeterName string
-	Series    string
+	ProductName string
+	SKUName     string
+	TierName    string
+	MeterName   string
+	Series      string
 }
 
 // getFlexibleServerFilterAttributes returns a struct with CPAPI filter
@@ -159,6 +160,8 @@ func getFlexibleServerFilterAttributes(tier, instanceType, instanceVersion strin
 		"gp": "General Purpose",
 		"mo": "Memory Optimized",
 	}[tier]
+
+	productName := "Azure Database for PostgreSQL Flexible Server"
 
 	if tier == "b" {
 		meterName = fmt.Sprintf("%s[ vcore]*", instanceType)
@@ -173,12 +176,17 @@ func getFlexibleServerFilterAttributes(tier, instanceType, instanceVersion strin
 		skuName = fmt.Sprintf("%s vCore", cores)
 
 		series = coreRegex.ReplaceAllString(instanceType, "") + instanceVersion
+
+		if series == "Esv3" {
+			productName = "Az DB for PGSQL Flexible Server"
+		}
 	}
 
 	return flexibleServerFilterAttributes{
-		SKUName:   skuName,
-		TierName:  tierName,
-		MeterName: meterName,
-		Series:    series,
+		ProductName: productName,
+		SKUName:     skuName,
+		TierName:    tierName,
+		MeterName:   meterName,
+		Series:      series,
 	}
 }
