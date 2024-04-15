@@ -419,12 +419,12 @@ func (r *parallelRunner) runProvider(job projectJob) (out *projectOutput, err er
 	name := job.provider.ProjectName()
 	displayName := ui.ProjectDisplayName(r.runCtx, name)
 
-	logging.Logger.Info().Msgf("Starting evaluation for project %s", displayName)
+	logging.Logger.Debug().Msgf("Starting evaluation for project %s", displayName)
 	defer func() {
 		if err != nil {
-			logging.Logger.Info().Msgf("Failed evaluation for project %s", displayName)
+			logging.Logger.Debug().Msgf("Failed evaluation for project %s", displayName)
 		}
-		logging.Logger.Info().Msgf("Finished evaluation for project %s", displayName)
+		logging.Logger.Debug().Msgf("Finished evaluation for project %s", displayName)
 	}()
 
 	// Generate usage file
