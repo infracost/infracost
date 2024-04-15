@@ -63,12 +63,15 @@ func (r *ContainerVpcCluster) BuildResource() *schema.Resource {
 			useOcpPrices = true
 		}
 	}
+	// filter on the catalogRegion in the product attribute instead of the region column because
+	// some regions (like eu-de) are recorded under eu-central instead, which isn't used in provisioning
 	var attributeFilters = []*schema.AttributeFilter{
 		{Key: "provider", Value: strPtr("vpc-gen2")},
 		{Key: "flavor", Value: strPtr(r.Flavor)},
 		{Key: "serverType", Value: strPtr("virtual")},
 		{Key: "isolation", Value: strPtr("public")},
 		{Key: "operatingSystem", ValueRegex: strPtr(fmt.Sprintf("/%s/i", operatingSystem))},
+		{Key: "catalogRegion", ValueRegex: strPtr(r.Region)},
 	}
 	if useOcpPrices {
 		attributeFilters = append(attributeFilters, &schema.AttributeFilter{
@@ -98,7 +101,6 @@ func (r *ContainerVpcCluster) BuildResource() *schema.Resource {
 			ProductFilter: &schema.ProductFilter{
 				VendorName:       strPtr("ibm"),
 				Service:          strPtr("containers-kubernetes"),
-				Region:           strPtr(r.Region),
 				AttributeFilters: attributeFilters,
 			},
 		}

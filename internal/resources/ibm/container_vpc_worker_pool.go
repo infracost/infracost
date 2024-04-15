@@ -49,8 +49,14 @@ func (r *ContainerVpcWorkerPool) PopulateUsage(u *schema.UsageData) {
 func (r *ContainerVpcWorkerPool) BuildResource() *schema.Resource {
 	isOpenshift := strings.HasSuffix(strings.ToLower(r.KubeVersion), "openshift")
 	operatingSystem := "UBUNTU"
+	useOcpPrices := false
 	if isOpenshift {
 		operatingSystem = "RHEL"
+		// if an entitlement is specified, then ocp licensing is already covered. use pricing that
+		// does not include ocp charges.
+		if !r.Entitlement {
+			useOcpPrices = true
+		}
 	}
 	var attributeFilters = []*schema.AttributeFilter{
 		{Key: "provider", Value: strPtr("vpc-gen2")},
@@ -60,13 +66,9 @@ func (r *ContainerVpcWorkerPool) BuildResource() *schema.Resource {
 		{Key: "catalogRegion", Value: strPtr(r.Region)},
 		{Key: "operatingSystem", ValueRegex: strPtr(fmt.Sprintf("/%s/i", operatingSystem))},
 	}
-	if r.Entitlement {
+	if useOcpPrices {
 		attributeFilters = append(attributeFilters, &schema.AttributeFilter{
 			Key: "ocpIncluded", Value: strPtr("true"),
-		})
-	} else {
-		attributeFilters = append(attributeFilters, &schema.AttributeFilter{
-			Key: "ocpIncluded", Value: strPtr(""),
 		})
 	}
 	WorkerCount := decimalPtr(decimal.NewFromInt(1))
@@ -82,7 +84,6 @@ func (r *ContainerVpcWorkerPool) BuildResource() *schema.Resource {
 	quantity := WorkerCount.Mul(*instanceHours)
 
 	costComponents := []*schema.CostComponent{}
-
 	for _, zone := range r.Zones {
 		zoneCostComponent := &schema.CostComponent{
 			Name:            fmt.Sprintf("VPC Container Work Zone flavor: (%s) region: (%s) name: (%s) x(%d) workers", r.Flavor, r.Region, zone.Name, r.WorkerCount),
@@ -91,7 +92,6 @@ func (r *ContainerVpcWorkerPool) BuildResource() *schema.Resource {
 			MonthlyQuantity: decimalPtr(quantity),
 			ProductFilter: &schema.ProductFilter{
 				VendorName:       strPtr("ibm"),
-				Region:           strPtr("us-south"),
 				Service:          strPtr("containers-kubernetes"),
 				AttributeFilters: attributeFilters,
 			},

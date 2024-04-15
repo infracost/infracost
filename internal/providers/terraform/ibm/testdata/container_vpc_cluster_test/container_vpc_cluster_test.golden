@@ -10,18 +10,18 @@
  └─ VPC egress us-south (over 149995 GB)                                                                     0  GB               $0.00 
                                                                                                                                        
  mycluster                                                                                                                             
- ├─ VPC Container Work Zone flavor: (bx2.4x16) region: (us-south) name: (us-south-1) x(3) workers        2,190  hours          $608.59 
- └─ VPC Container Work Zone flavor: (bx2.4x16) region: (us-south) name: (us-south-2) x(3) workers        2,190  hours          $608.59 
+ ├─ VPC Container Work Zone flavor: (bx2.4x16) region: (us-south) name: (us-south-1) x(3) workers        2,190  hours          $682.31 
+ └─ VPC Container Work Zone flavor: (bx2.4x16) region: (us-south) name: (us-south-2) x(3) workers        2,190  hours          $682.31 
                                                                                                                                        
  mycluster-without-usage                                                                                                               
- ├─ VPC Container Work Zone flavor: (bx2.4x16) region: (us-south) name: (us-south-1) x(3) workers            3  hours            $0.83 
- └─ VPC Container Work Zone flavor: (bx2.4x16) region: (us-south) name: (us-south-2) x(3) workers            3  hours            $0.83 
+ ├─ VPC Container Work Zone flavor: (bx2.4x16) region: (us-south) name: (us-south-1) x(3) workers            3  hours            $0.93 
+ └─ VPC Container Work Zone flavor: (bx2.4x16) region: (us-south) name: (us-south-2) x(3) workers            3  hours            $0.93 
                                                                                                                                        
- myrokscluster-with-usage                                                                                                               
- ├─ VPC Container Work Zone flavor: (bx2.4x16) region: (us-south) name: (us-south-1) x(3) workers        2,190  hours          $983.08 
- └─ VPC Container Work Zone flavor: (bx2.4x16) region: (us-south) name: (us-south-2) x(3) workers        2,190  hours          $983.08 
+ myrokscluster-with-usage                                                                                                              
+ ├─ VPC Container Work Zone flavor: (bx2.4x16) region: (us-south) name: (us-south-1) x(3) workers        2,190  hours        $1,056.80 
+ └─ VPC Container Work Zone flavor: (bx2.4x16) region: (us-south) name: (us-south-2) x(3) workers        2,190  hours        $1,056.80 
                                                                                                                                        
- OVERALL TOTAL                                                                                                               $7,570.40 
+ OVERALL TOTAL                                                                                                               $7,865.51 
 ──────────────────────────────────
 6 cloud resources were detected:
 ∙ 4 were estimated, 1 of which usage-based costs, see https://infracost.io/usage-file
