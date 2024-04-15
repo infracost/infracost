@@ -59,10 +59,10 @@ resource_type_default_usage:
     secretsmanager_instance: 1
     logdna_gigabyte_months: 1
     activitytracker_gigabyte_months: 1
-    monitoring_node_hour: 1
-    monitoring_container_hour: 1
-    monitoring_api_call: 1
-    monitoring_timeseries_hour: 1
+    monitoring_node_hour: 700
+    monitoring_container_hour: 700
+    monitoring_api_call: 1000
+    monitoring_timeseries_hour: 1000
     continuousdelivery_authorized_users: 1
     wml_capacity_unit_hour: 20
     wml_instance: 1
@@ -1286,10 +1286,10 @@ resource_usage:
     appconnect_vcpu_hours: 10 # The number of VCPU hours used in a month
     logdna_gigabyte_months: 10 # The amount of logs in a month in GB
     activitytracker_gigabyte_months: 10 # The amount of logs in a month in GB
-    monitoring_node_hour: 730 # The amount of hours monitoring runs on a host in a month  
-    monitoring_container_hour: 1460 # Additional containers on a host above the base 50
-    monitoring_api_call: 100000 # Additional API calls above the base 1M/instance
-    monitoring_timeseries_hour: 100 # Additional time-series cost above the base 1000/host
+    monitoring_node_hour: 700 # The amount of hours monitoring runs on a host in a month  
+    monitoring_container_hour: 700 # Additional containers on a host above the base 50
+    monitoring_api_call: 1000 # Additional API calls above the base 1M/instance
+    monitoring_timeseries_hour: 1000 # Additional time-series cost above the base 1000/host
     continuousdelivery_authorized_users: 10 # Number of authorized users to the CD instance and its managed toolchains
     wml_capacity_unit_hour: 20 # Amount of Capacity Unit-Hours used in a month
     wml_instance: 1 # The number of instances used per month where each instance includes 2500 CUHs
