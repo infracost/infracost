@@ -4,3 +4,5 @@ resource_usage:
     monthly_instance_hours: 730
   ibm_is_vpc.vpc1:
     gigabyte_transmitted_outbounds: 50100
+  ibm_container_vpc_cluster.roks_cluster_with_usage:
+    monthly_instance_hours: 730

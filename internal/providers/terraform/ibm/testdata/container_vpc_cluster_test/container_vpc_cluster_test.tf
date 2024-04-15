@@ -64,7 +64,7 @@ resource "ibm_container_vpc_cluster" "cluster_without_usage" {
 }
 
 resource "ibm_container_vpc_cluster" "roks_cluster_with_usage" {
-  name              = "mycluster-without-usage"
+  name              = "myrokscluster-with-usage"
   vpc_id            = ibm_is_vpc.vpc1.id
   flavor            = "bx2.4x16"
   worker_count      = 3

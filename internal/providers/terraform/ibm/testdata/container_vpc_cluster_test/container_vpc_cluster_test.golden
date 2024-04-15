@@ -17,7 +17,7 @@
  ├─ VPC Container Work Zone flavor: (bx2.4x16) region: (us-south) name: (us-south-1) x(3) workers            3  hours            $0.83 
  └─ VPC Container Work Zone flavor: (bx2.4x16) region: (us-south) name: (us-south-2) x(3) workers            3  hours            $0.83 
                                                                                                                                        
- mycluster-without-usage                                                                                                               
+ myrokscluster-with-usage                                                                                                               
  ├─ VPC Container Work Zone flavor: (bx2.4x16) region: (us-south) name: (us-south-1) x(3) workers        2,190  hours          $983.08 
  └─ VPC Container Work Zone flavor: (bx2.4x16) region: (us-south) name: (us-south-2) x(3) workers        2,190  hours          $983.08 
                                                                                                                                        
