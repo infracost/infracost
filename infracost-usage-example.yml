@@ -1275,8 +1275,8 @@ resource_usage:
     monthly_instance_hours: 730 # Monthly number of instance hours
 
   ibm_resource_instance.resource_instance_kms: 
-    kms_key_versions: 300 # Number of key versions managed per month
-    secretsmanager_active_secrets: 400 # Number of active secrets
+    kms_key_versions: 6 # Number of key versions managed per month
+    secretsmanager_active_secrets: 1 # Number of active secrets
     secretsmanager_instance: 1 # Number of instances of secrets manager
     appid_advanced_authentications: 20000 # Number of advanced authentications in a month
     appid_authentications: 15000 # Number of simple authentications in a month
