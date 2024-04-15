@@ -133,13 +133,13 @@ func (r *RemoteVariablesLoader) Load(blocks Blocks) (map[string]cty.Value, error
 	endpoint := fmt.Sprintf("/api/v2/organizations/%s/workspaces/%s", config.Organization, config.Workspace)
 	body, err := r.client.Get(endpoint)
 	if err != nil {
-		r.logger.Warn().Err(err).Msgf("could not request Terraform workspace: %s for organization: %s", config.Workspace, config.Organization)
+		r.logger.Debug().Err(err).Msgf("could not request Terraform workspace: %s for organization: %s", config.Workspace, config.Organization)
 		return vars, nil
 	}
 
 	var workspaceResponse tfcWorkspaceResponse
 	if json.Unmarshal(body, &workspaceResponse) != nil {
-		r.logger.Warn().Err(err).Msgf("malformed Terraform API response using workspace: %s organization: %s", config.Workspace, config.Organization)
+		r.logger.Debug().Err(err).Msgf("malformed Terraform API response using workspace: %s organization: %s", config.Workspace, config.Organization)
 		return vars, nil
 	}
 
