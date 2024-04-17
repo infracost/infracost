@@ -1,0 +1,4 @@
+version: 0.1
+projects:
+      - path: ./testdata/diff_terragrunt_syntax_error/terragrunt
+        name: dems-ag1
