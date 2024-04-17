@@ -38,37 +38,61 @@
 {{- end }}
 
 {{- define "summaryRow"}}
-| {{ truncateMiddle .Name 64 "..." }}{{- range .MetadataFields }} | {{ . }} {{- end }} | {{ formatCostChange .PastCost .Cost }} | {{ formatCost .Cost }} |
+| {{ truncateMiddle .Name 64 "..." }}{{- range .MetadataFields }} | {{ . }} {{- end }} | {{ formatCostChangeWithoutPercent .PastBaselineCost .BaselineCost }} | {{ formatCostChangeWithoutPercent .PastUsageCost .UsageCost }} | {{ formatCostChange .PastCost .Cost }} | {{ formatCost .Cost }} |
 {{- end }}
 
-# Infracost report #
+#### 💰 Infracost report ####
 
-## {{ formatCostChangeSentence .Root.Currency .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost false }} ##
+#### {{ formatCostChangeSentence .Root.Currency .Root.PastTotalMonthlyCost .Root.TotalMonthlyCost false }} ####
 {{- if displayTable }}
 
-| **Project**{{- range metadataHeaders }} | **{{ . }}** {{- end }} | **Cost change** | **New monthly cost** |
-| -----------{{- range metadataHeaders }} | ---------- {{- end }} | --------------: | -------------------- |
+| **Changed project**{{- range metadataHeaders }} | **{{ . }}** {{- end }} | **Baseline cost** | **Usage cost*** | **Total change** | **New monthly cost** |
+| -----------{{- range metadataHeaders }} | ---------- {{- end }} | --------------: | --------------: | --------------: | --------------: |
 
   {{- if gt (len .Root.Projects) 1  }}
     {{- range .Root.Projects }}
       {{- if showProject . }}
-        {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
+        {{- template "summaryRow" dict
+                     "Name" .Name
+                     "MetadataFields" (. | metadataFields)
+                     "PastBaselineCost" .PastBreakdown.TotalMonthlyBaselineCost
+                     "BaselineCost" .Breakdown.TotalMonthlyBaselineCost
+                     "PastUsageCost" .PastBreakdown.TotalMonthlyUsageCost
+                     "UsageCost" .Breakdown.TotalMonthlyUsageCost
+                     "PastCost" .PastBreakdown.TotalMonthlyCost
+                     "Cost" .Breakdown.TotalMonthlyCost  }}
       {{- end }}
     {{- end }}
   {{- else }}
     {{- range .Root.Projects }}
-      {{- template "summaryRow" dict "Name" .Name "MetadataFields" (. | metadataFields) "PastCost" .PastBreakdown.TotalMonthlyCost "Cost" .Breakdown.TotalMonthlyCost  }}
+      {{- template "summaryRow" dict
+                   "Name" .Name
+                   "MetadataFields" (. | metadataFields)
+                   "PastBaselineCost" .PastBreakdown.TotalMonthlyBaselineCost
+                   "BaselineCost" .Breakdown.TotalMonthlyBaselineCost
+                   "PastUsageCost" .PastBreakdown.TotalMonthlyUsageCost
+                   "UsageCost" .Breakdown.TotalMonthlyUsageCost
+                   "PastCost" .PastBreakdown.TotalMonthlyCost
+                   "Cost" .Breakdown.TotalMonthlyCost  }}
     {{- end }}
+  {{- end }}
+  {{- if .UsageCostsMsg }}
+
+{{.UsageCostsMsg }}
   {{- end }}
 {{- end }}
 
+
 {{- if displayOutput  }}
 
-### Cost details ###
+##### Cost details {{ .CostDetailsMsg }} #####
 
 ```
 {{ .DiffOutput }}
 ```
+{{- else }}
+
+Cost details were left out because expandable comment sections are not supported.{{ if .Root.CloudURL }} See [Infracost Cloud]({{.Root.CloudURL}}) for full cost details{{ if .CostDetailsMsg }} {{.CostDetailsMsg }}.{{ else }}.{{end}}{{end}}
 {{- end }}
 
 {{- if gt (len .Options.PolicyOutput.Checks) 0 }}
