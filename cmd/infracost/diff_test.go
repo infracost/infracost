@@ -265,6 +265,21 @@ func TestDiffTerragruntNested(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"diff", "--path", "../../examples", "--terraform-force-cli"}, nil)
 }
 
+func TestDiffTerragruntSyntaxError(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"diff",
+			"--compare-to", filepath.Join(dir, "baseline.withouterror.json"),
+			"--config-file", filepath.Join(dir, "infracost.config.yml"),
+		},
+		&GoldenFileOptions{},
+	)
+}
+
 func TestDiffWithTarget(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"diff", "--path", "./testdata/plan_with_target.json"}, nil)
 }
