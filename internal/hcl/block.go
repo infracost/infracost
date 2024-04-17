@@ -1343,12 +1343,35 @@ var (
 	}
 )
 
-// timeStaticValues mocks the values returned from resource.time_static
-// which is a resource that returns the current time in an RFC3339 format.
+// timeStaticValues mocks the values returned from resource.time_static which is
+// a resource that returns the attributes of the provided rfc3339 time. If none
+// is provided, it defaults to the current time.
+//
 // https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/static
 func timeStaticValues(b *Block) cty.Value {
+	now := time.Now()
+	var inputDateStr string
+	v := b.GetAttribute("rfc3339").Value()
+	_ = gocty.FromCtyValue(v, &inputDateStr)
+	if inputDateStr == "" {
+		inputDateStr = now.Format(time.RFC3339)
+	}
+
+	inputDate, err := time.Parse(time.RFC3339, inputDateStr)
+	if err != nil {
+		inputDate = now
+	}
+
 	return cty.ObjectVal(map[string]cty.Value{
-		"rfc3339": cty.StringVal(time.Now().Format(time.RFC3339)),
+		"rfc3339": cty.StringVal(inputDateStr),
+		"day":     cty.NumberIntVal(int64(inputDate.Day())),
+		"hour":    cty.NumberIntVal(int64(inputDate.Hour())),
+		"id":      cty.StringVal(inputDate.Format(time.RFC3339)),
+		"minute":  cty.NumberIntVal(int64(inputDate.Minute())),
+		"month":   cty.NumberIntVal(int64(inputDate.Month())),
+		"second":  cty.NumberIntVal(int64(inputDate.Second())),
+		"unix":    cty.NumberIntVal(inputDate.Unix()),
+		"year":    cty.NumberIntVal(int64(inputDate.Year())),
 	})
 }
 
