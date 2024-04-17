@@ -11,7 +11,7 @@ import (
 
 var validLUISCommitmentTierRequests = []int64{1_000_000, 5_000_000, 25_000_000}
 
-// CognitiveAccountSpeech struct represents the Azure LUIS AI resource.
+// CognitiveAccountLUIS struct represents the Azure LUIS AI resource.
 // This supports the pay-as-you pricing and the standard and connected container commitment tiers.
 // This doesn't currently support the disconnected container commitment tier.
 //

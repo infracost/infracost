@@ -14,7 +14,7 @@ import (
 var validLanguageCommitmentTierTextAnalyticsRecords = []int64{1_000_000, 3_000_000, 10_000_000}
 var validLanguageCommitmentTierSummarizationRecords = []int64{3_000_000, 10_000_000}
 
-// CognitiveAccountSpeech struct represents the Azure AI Language Service.
+// CognitiveAccountLanguage struct represents the Azure AI Language Service.
 // This supports the pay-as-you pricing and the standard and connected container commitment tiers.
 // This doesn't currently support the disconnected container commitment tier.
 //
