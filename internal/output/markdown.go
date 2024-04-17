@@ -160,9 +160,9 @@ func ToMarkdown(out Root, opts Options, markdownOpts MarkdownOptions) (MarkdownO
 	var buf bytes.Buffer
 	bufw := bufio.NewWriter(&buf)
 
-	filename := "markdown-html-usage-api.tmpl"
+	filename := "markdown-html.tmpl"
 	if markdownOpts.BasicSyntax {
-		filename = "markdown-usage-api.tmpl"
+		filename = "markdown.tmpl"
 	}
 
 	runQuotaMsg, exceeded := out.Projects.IsRunQuotaExceeded()
