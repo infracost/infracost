@@ -108,7 +108,7 @@ func (r *RDSClusterInstance) BuildResource() *schema.Resource {
 			// VCPU count has been set explicitly
 			instanceVCPUCount = decimal.NewFromInt(*r.VCPUCount)
 		} else if count, ok := InstanceTypeToVCPU[strings.TrimPrefix(r.InstanceClass, "db.")]; ok {
-			// We were able to lookup thing VCPU count
+			// We were able to lookup the VCPU count
 			instanceVCPUCount = decimal.NewFromInt(count)
 		}
 
