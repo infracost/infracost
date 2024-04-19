@@ -1116,7 +1116,21 @@ func (b *Block) Reference() *Reference {
 
 	var parts []string
 
-	if b.Type() != "resource" || b.parent != nil {
+	parent := b.parent
+	for parent != nil {
+		var parentParts []string
+
+		if parent.Type() != "resource" {
+			parentParts = append(parentParts, parent.Type())
+		}
+
+		parentParts = append(parentParts, parent.Labels()...)
+
+		parts = append(parentParts, parts...)
+		parent = parent.parent
+	}
+
+	if b.Type() != "resource" {
 		parts = append(parts, b.Type())
 	}
 
