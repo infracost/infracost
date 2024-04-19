@@ -51,18 +51,18 @@
  ├─ Additional Time series (next 9000 Time series hour)                                      0  Time series hour                       $0.00 
  ├─ Additional Time series (next 90000 Time series hour)                                     0  Time series hour                       $0.00 
  ├─ Additional Time series (over 100000 Time series hour)                                    0  Time series hour                       $0.00 
- ├─ Additional Containers                                                                1,460  Container Hours                        $1.09 
+ ├─ Additional Container Hours                                                           1,460  Container Hours                        $1.09 
  ├─ Additional API Calls                                                               100,000  API Calls                              $1.08 
- └─ Base Node Hour                                                                         730  Node Hours                            $37.72 
+ └─ Node Hours                                                                             730  Node Hours                            $37.72 
                                                                                                                                              
  ibm_resource_instance.resource_instance_monitoring_graduated_no_usage                                                                       
  ├─ Additional Time series (first 1000 Time series hour)                 Monthly cost depends on usage: $0.0001195944 per Time series hour   
  ├─ Additional Time series (next 9000 Time series hour)                  Monthly cost depends on usage: $0.0000747465 per Time series hour   
  ├─ Additional Time series (next 90000 Time series hour)                 Monthly cost depends on usage: $0.0000448479 per Time series hour   
  ├─ Additional Time series (over 100000 Time series hour)                Monthly cost depends on usage: $0.0000298986 per Time series hour   
- ├─ Additional Containers                                                Monthly cost depends on usage: $0.0007474653 per Container Hours    
+ ├─ Additional Container Hours                                           Monthly cost depends on usage: $0.0007474653 per Container Hours    
  ├─ Additional API Calls                                                 Monthly cost depends on usage: $0.0000107635 per API Calls          
- └─ Base Node Hour                                                       Monthly cost depends on usage: $0.0516648 per Node Hours            
+ └─ Node Hours                                                           Monthly cost depends on usage: $0.0516648 per Node Hours            
                                                                                                                                              
  ibm_resource_instance.resource_instance_monitoring_lite                                                                                     
  └─ Lite plan                                                                                1                                         $0.00 
@@ -73,6 +73,22 @@
  ibm_resource_instance.resource_instance_secrets_manager                                                                                     
  ├─ Instance                                                                                 1  Instance                             $321.00 
  └─ Active Secrets                                                                         400  Secrets                               $86.00 
+                                                                                                                                             
+ ibm_resource_instance.wa_instance_enterprise                                                                                                
+ ├─ Instance                                                                                 1  Instance                           $6,000.00 
+ ├─ Additional Monthly Active Users                                                          1  1K MAU                               $120.00 
+ └─ Monthly Active Users using voice                                                         1  1K MAU                                $90.00 
+                                                                                                                                             
+ ibm_resource_instance.wa_instance_lite                                                                                                      
+ └─ Lite plan                                                                                1                                         $0.00 
+                                                                                                                                             
+ ibm_resource_instance.wa_instance_plus                                                                                                      
+ ├─ Instance                                                                                 1  Instance                             $140.00 
+ ├─ Additional Monthly Active Users                                                         10  100 MAU                              $140.00 
+ └─ Monthly Active Users using voice                                                         1  100 MAU                                $9.00 
+                                                                                                                                             
+ ibm_resource_instance.wa_instance_trial                                                                                                     
+ └─ Trial                                                                                    1                                         $0.00 
                                                                                                                                              
  ibm_resource_instance.wml_instance_essentials                                                                                               
  ├─ Capacity Unit-Hours                                                                     20  CUH                                   $10.40 
@@ -89,7 +105,7 @@
  ├─ Class 2 Resource Units                                                                  50  RU                                     $0.09 
  └─ Class 3 Resource Units                                                                  50  RU                                     $0.25 
                                                                                                                                              
- OVERALL TOTAL                                                                                                                     $2,381.14 
+ OVERALL TOTAL                                                                                                                     $8,880.14 
 ──────────────────────────────────
-19 cloud resources were detected:
-∙ 19 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+23 cloud resources were detected:
+∙ 23 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

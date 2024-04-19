@@ -48,4 +48,11 @@ resource_usage:
     wml_class1_ru: 50
     wml_class2_ru: 50
     wml_class3_ru: 50
-
+  ibm_resource_instance.wa_instance_plus:
+    wa_instance: 1
+    wa_monthly_active_users: 2000
+    wa_voice_users: 100
+  ibm_resource_instance.wa_instance_enterprise:
+    wa_instance: 1
+    wa_monthly_active_users: 51000
+    wa_voice_users: 1000

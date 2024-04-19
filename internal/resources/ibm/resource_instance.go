@@ -64,6 +64,10 @@ type ResourceInstance struct {
 	WML_Class1RU *float64 `infracost_usage:"wml_class1_ru"`
 	WML_Class2RU *float64 `infracost_usage:"wml_class2_ru"`
 	WML_Class3RU *float64 `infracost_usage:"wml_class3_ru"`
+	// Watson Assistant
+	WA_Instance *float64 `infracost_usage:"wa_instance"`
+	WA_mau      *float64 `infracost_usage:"wa_monthly_active_users"`
+	WA_vu       *float64 `infracost_usage:"wa_voice_users"`
 }
 
 type ResourceCostComponentsFunc func(*ResourceInstance) []*schema.CostComponent
@@ -98,6 +102,9 @@ var ResourceInstanceUsageSchema = []*schema.UsageItem{
 	{Key: "wml_class1_ru", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "wml_class2_ru", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "wml_class3_ru", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "wa_instance", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "wa_monthly_active_users", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "wa_voice_users", DefaultValue: 0, ValueType: schema.Float64},
 }
 
 var ResourceInstanceCostMap map[string]ResourceCostComponentsFunc = map[string]ResourceCostComponentsFunc{
@@ -111,6 +118,7 @@ var ResourceInstanceCostMap map[string]ResourceCostComponentsFunc = map[string]R
 	"sysdig-monitor":      GetSysdigCostComponenets,
 	"continuous-delivery": GetContinuousDeliveryCostComponenets,
 	"pm-20":               GetWMLCostComponents,
+	"conversation":        GetWACostComponents,
 }
 
 func KMSKeyVersionsFreeCostComponent(r *ResourceInstance) *schema.CostComponent {

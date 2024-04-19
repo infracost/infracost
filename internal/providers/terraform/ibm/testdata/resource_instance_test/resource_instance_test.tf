@@ -152,3 +152,35 @@ resource "ibm_resource_instance" "wml_instance_standard" {
   location          = "us-south"
   resource_group_id = "default"
 }
+
+resource "ibm_resource_instance" "wa_instance_lite" {
+  name              = "wa_lite"
+  service           = "conversation"
+  plan              = "lite"
+  location          = "us-south"
+  resource_group_id = "default"
+}
+
+resource "ibm_resource_instance" "wa_instance_trial" {
+  name              = "wa_trial"
+  service           = "conversation"
+  plan              = "plus-trial"
+  location          = "us-south"
+  resource_group_id = "default"
+}
+
+resource "ibm_resource_instance" "wa_instance_plus" {
+  name              = "wa_plus"
+  service           = "conversation"
+  plan              = "plus"
+  location          = "us-south"
+  resource_group_id = "default"
+}
+
+resource "ibm_resource_instance" "wa_instance_enterprise" {
+  name              = "wa_enterprise"
+  service           = "conversation"
+  plan              = "enterprise"
+  location          = "us-south"
+  resource_group_id = "default"
+}
