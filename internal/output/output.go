@@ -136,6 +136,7 @@ func convertCostComponents(outComponents []CostComponent) []*schema.CostComponen
 			HourlyQuantity:  c.HourlyQuantity,
 			MonthlyQuantity: c.MonthlyQuantity,
 			UsageBased:      c.UsageBased,
+			PriceNotFound:   c.PriceNotFound,
 		}
 		sc.SetPrice(c.Price)
 
@@ -278,6 +279,7 @@ type CostComponent struct {
 	HourlyCost      *decimal.Decimal `json:"hourlyCost"`
 	MonthlyCost     *decimal.Decimal `json:"monthlyCost"`
 	UsageBased      bool             `json:"usageBased,omitempty"`
+	PriceNotFound   bool             `json:"priceNotFound"`
 }
 
 type ActualCosts struct {
@@ -541,6 +543,7 @@ func outputCostComponents(costComponents []*schema.CostComponent) []CostComponen
 			HourlyCost:      c.HourlyCost,
 			MonthlyCost:     c.MonthlyCost,
 			UsageBased:      c.UsageBased,
+			PriceNotFound:   c.PriceNotFound,
 		})
 	}
 	return comps

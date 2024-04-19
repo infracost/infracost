@@ -102,6 +102,10 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		return err
 	}
 
+	// write an aggregate log line of cost components that have
+	// missing prices if any have been found.
+	prices.NotFoundComponents.Log(runCtx)
+
 	projects := make([]*schema.Project, 0)
 	projectContexts := make([]*config.ProjectContext, 0)
 

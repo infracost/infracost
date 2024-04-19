@@ -49,7 +49,8 @@
                 "monthlyQuantity": "730",
                 "price": "0.768",
                 "hourlyCost": "0.768",
-                "monthlyCost": "560.64"
+                "monthlyCost": "560.64",
+                "priceNotFound": false
               }
             ],
             "subresources": [
@@ -66,7 +67,8 @@
                     "monthlyQuantity": "50",
                     "price": "0.1",
                     "hourlyCost": "0.00684931506849315",
-                    "monthlyCost": "5"
+                    "monthlyCost": "5",
+                    "priceNotFound": false
                   }
                 ]
               },
@@ -83,7 +85,8 @@
                     "monthlyQuantity": "1000",
                     "price": "0.125",
                     "hourlyCost": "0.1712328767123287625",
-                    "monthlyCost": "125"
+                    "monthlyCost": "125",
+                    "priceNotFound": false
                   },
                   {
                     "name": "Provisioned IOPS",
@@ -92,7 +95,8 @@
                     "monthlyQuantity": "800",
                     "price": "0.065",
                     "hourlyCost": "0.0712328767123287665",
-                    "monthlyCost": "52"
+                    "monthlyCost": "52",
+                    "priceNotFound": false
                   }
                 ]
               }
@@ -115,7 +119,8 @@
                 "price": "0.2",
                 "hourlyCost": "0.02739726027397260273972",
                 "monthlyCost": "20",
-                "usageBased": true
+                "usageBased": true,
+                "priceNotFound": false
               },
               {
                 "name": "Ephemeral storage",
@@ -124,7 +129,8 @@
                 "monthlyQuantity": "0",
                 "price": "0.0000000309",
                 "hourlyCost": "0",
-                "monthlyCost": "0"
+                "monthlyCost": "0",
+                "priceNotFound": false
               },
               {
                 "name": "Duration (first 6B)",
@@ -134,7 +140,8 @@
                 "price": "0.0000166667",
                 "hourlyCost": "0.57077739726027397260344749",
                 "monthlyCost": "416.6675",
-                "usageBased": true
+                "usageBased": true,
+                "priceNotFound": false
               },
               {
                 "name": "Duration (over 15B)",
@@ -144,7 +151,8 @@
                 "price": "0.0000133334",
                 "hourlyCost": "0",
                 "monthlyCost": "0",
-                "usageBased": true
+                "usageBased": true,
+                "priceNotFound": false
               }
             ]
           },
@@ -163,7 +171,8 @@
                 "monthlyQuantity": "730",
                 "price": "0",
                 "hourlyCost": "0",
-                "monthlyCost": "0"
+                "monthlyCost": "0",
+                "priceNotFound": false
               }
             ],
             "subresources": [
@@ -180,7 +189,8 @@
                     "monthlyQuantity": "50",
                     "price": "0.1",
                     "hourlyCost": "0.00684931506849315",
-                    "monthlyCost": "5"
+                    "monthlyCost": "5",
+                    "priceNotFound": false
                   }
                 ]
               },
@@ -197,7 +207,8 @@
                     "monthlyQuantity": "1000",
                     "price": "0.125",
                     "hourlyCost": "0.1712328767123287625",
-                    "monthlyCost": "125"
+                    "monthlyCost": "125",
+                    "priceNotFound": false
                   },
                   {
                     "name": "Provisioned IOPS",
@@ -206,7 +217,8 @@
                     "monthlyQuantity": "800",
                     "price": "0.065",
                     "hourlyCost": "0.0712328767123287665",
-                    "monthlyCost": "52"
+                    "monthlyCost": "52",
+                    "priceNotFound": false
                   }
                 ]
               }
@@ -229,7 +241,8 @@
                 "price": "0.2",
                 "hourlyCost": "0",
                 "monthlyCost": "0",
-                "usageBased": true
+                "usageBased": true,
+                "priceNotFound": false
               },
               {
                 "name": "Ephemeral storage",
@@ -238,7 +251,8 @@
                 "monthlyQuantity": "0",
                 "price": "0.0000000309",
                 "hourlyCost": "0",
-                "monthlyCost": "0"
+                "monthlyCost": "0",
+                "priceNotFound": false
               },
               {
                 "name": "Duration (first 6B)",
@@ -248,7 +262,8 @@
                 "price": "0.0000166667",
                 "hourlyCost": "0",
                 "monthlyCost": "0",
-                "usageBased": true
+                "usageBased": true,
+                "priceNotFound": false
               },
               {
                 "name": "Duration (over 15B)",
@@ -258,7 +273,8 @@
                 "price": "0.0000133334",
                 "hourlyCost": "0",
                 "monthlyCost": "0",
-                "usageBased": true
+                "usageBased": true,
+                "priceNotFound": false
               }
             ]
           },
@@ -286,7 +302,8 @@
                     "price": "0.023",
                     "hourlyCost": "0",
                     "monthlyCost": "0",
-                    "usageBased": true
+                    "usageBased": true,
+                    "priceNotFound": false
                   },
                   {
                     "name": "PUT, COPY, POST, LIST requests",
@@ -296,7 +313,8 @@
                     "price": "0.005",
                     "hourlyCost": "0",
                     "monthlyCost": "0",
-                    "usageBased": true
+                    "usageBased": true,
+                    "priceNotFound": false
                   },
                   {
                     "name": "GET, SELECT, and all other requests",
@@ -306,7 +324,8 @@
                     "price": "0.0004",
                     "hourlyCost": "0",
                     "monthlyCost": "0",
-                    "usageBased": true
+                    "usageBased": true,
+                    "priceNotFound": false
                   },
                   {
                     "name": "Select data scanned",
@@ -316,7 +335,8 @@
                     "price": "0.002",
                     "hourlyCost": "0",
                     "monthlyCost": "0",
-                    "usageBased": true
+                    "usageBased": true,
+                    "priceNotFound": false
                   },
                   {
                     "name": "Select data returned",
@@ -326,7 +346,8 @@
                     "price": "0.0007",
                     "hourlyCost": "0",
                     "monthlyCost": "0",
-                    "usageBased": true
+                    "usageBased": true,
+                    "priceNotFound": false
                   }
                 ]
               }
@@ -355,7 +376,8 @@
                 "monthlyQuantity": "730",
                 "price": "0.768",
                 "hourlyCost": "0.768",
-                "monthlyCost": "560.64"
+                "monthlyCost": "560.64",
+                "priceNotFound": false
               }
             ],
             "subresources": [
@@ -373,7 +395,8 @@
                     "monthlyQuantity": "50",
                     "price": "0.1",
                     "hourlyCost": "0.00684931506849315",
-                    "monthlyCost": "5"
+                    "monthlyCost": "5",
+                    "priceNotFound": false
                   }
                 ]
               },
@@ -391,7 +414,8 @@
                     "monthlyQuantity": "1000",
                     "price": "0.125",
                     "hourlyCost": "0.1712328767123287625",
-                    "monthlyCost": "125"
+                    "monthlyCost": "125",
+                    "priceNotFound": false
                   },
                   {
                     "name": "Provisioned IOPS",
@@ -400,7 +424,8 @@
                     "monthlyQuantity": "800",
                     "price": "0.065",
                     "hourlyCost": "0.0712328767123287665",
-                    "monthlyCost": "52"
+                    "monthlyCost": "52",
+                    "priceNotFound": false
                   }
                 ]
               }
@@ -423,7 +448,8 @@
                 "price": "0.2",
                 "hourlyCost": "0.02739726027397260273972",
                 "monthlyCost": "20",
-                "usageBased": true
+                "usageBased": true,
+                "priceNotFound": false
               },
               {
                 "name": "Ephemeral storage",
@@ -432,7 +458,8 @@
                 "monthlyQuantity": "0",
                 "price": "0.0000000309",
                 "hourlyCost": "0",
-                "monthlyCost": "0"
+                "monthlyCost": "0",
+                "priceNotFound": false
               },
               {
                 "name": "Duration (first 6B)",
@@ -442,7 +469,8 @@
                 "price": "0.0000166667",
                 "hourlyCost": "0.57077739726027397260344749",
                 "monthlyCost": "416.6675",
-                "usageBased": true
+                "usageBased": true,
+                "priceNotFound": false
               },
               {
                 "name": "Duration (over 15B)",
@@ -452,7 +480,8 @@
                 "price": "0.0000133334",
                 "hourlyCost": "0",
                 "monthlyCost": "0",
-                "usageBased": true
+                "usageBased": true,
+                "priceNotFound": false
               }
             ]
           },
@@ -472,7 +501,8 @@
                 "monthlyQuantity": "730",
                 "price": "0",
                 "hourlyCost": "0",
-                "monthlyCost": "0"
+                "monthlyCost": "0",
+                "priceNotFound": false
               }
             ],
             "subresources": [
@@ -490,7 +520,8 @@
                     "monthlyQuantity": "50",
                     "price": "0.1",
                     "hourlyCost": "0.00684931506849315",
-                    "monthlyCost": "5"
+                    "monthlyCost": "5",
+                    "priceNotFound": false
                   }
                 ]
               },
@@ -508,7 +539,8 @@
                     "monthlyQuantity": "1000",
                     "price": "0.125",
                     "hourlyCost": "0.1712328767123287625",
-                    "monthlyCost": "125"
+                    "monthlyCost": "125",
+                    "priceNotFound": false
                   },
                   {
                     "name": "Provisioned IOPS",
@@ -517,7 +549,8 @@
                     "monthlyQuantity": "800",
                     "price": "0.065",
                     "hourlyCost": "0.0712328767123287665",
-                    "monthlyCost": "52"
+                    "monthlyCost": "52",
+                    "priceNotFound": false
                   }
                 ]
               }
@@ -540,7 +573,8 @@
                 "price": "0.2",
                 "hourlyCost": "0",
                 "monthlyCost": "0",
-                "usageBased": true
+                "usageBased": true,
+                "priceNotFound": false
               },
               {
                 "name": "Ephemeral storage",
@@ -549,7 +583,8 @@
                 "monthlyQuantity": "0",
                 "price": "0.0000000309",
                 "hourlyCost": "0",
-                "monthlyCost": "0"
+                "monthlyCost": "0",
+                "priceNotFound": false
               },
               {
                 "name": "Duration (first 6B)",
@@ -559,7 +594,8 @@
                 "price": "0.0000166667",
                 "hourlyCost": "0",
                 "monthlyCost": "0",
-                "usageBased": true
+                "usageBased": true,
+                "priceNotFound": false
               },
               {
                 "name": "Duration (over 15B)",
@@ -569,7 +605,8 @@
                 "price": "0.0000133334",
                 "hourlyCost": "0",
                 "monthlyCost": "0",
-                "usageBased": true
+                "usageBased": true,
+                "priceNotFound": false
               }
             ]
           },
@@ -597,7 +634,8 @@
                     "price": "0.023",
                     "hourlyCost": "0",
                     "monthlyCost": "0",
-                    "usageBased": true
+                    "usageBased": true,
+                    "priceNotFound": false
                   },
                   {
                     "name": "PUT, COPY, POST, LIST requests",
@@ -607,7 +645,8 @@
                     "price": "0.005",
                     "hourlyCost": "0",
                     "monthlyCost": "0",
-                    "usageBased": true
+                    "usageBased": true,
+                    "priceNotFound": false
                   },
                   {
                     "name": "GET, SELECT, and all other requests",
@@ -617,7 +656,8 @@
                     "price": "0.0004",
                     "hourlyCost": "0",
                     "monthlyCost": "0",
-                    "usageBased": true
+                    "usageBased": true,
+                    "priceNotFound": false
                   },
                   {
                     "name": "Select data scanned",
@@ -627,7 +667,8 @@
                     "price": "0.002",
                     "hourlyCost": "0",
                     "monthlyCost": "0",
-                    "usageBased": true
+                    "usageBased": true,
+                    "priceNotFound": false
                   },
                   {
                     "name": "Select data returned",
@@ -637,7 +678,8 @@
                     "price": "0.0007",
                     "hourlyCost": "0",
                     "monthlyCost": "0",
-                    "usageBased": true
+                    "usageBased": true,
+                    "priceNotFound": false
                   }
                 ]
               }

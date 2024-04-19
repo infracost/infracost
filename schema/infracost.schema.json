@@ -72,7 +72,8 @@
         "monthlyQuantity",
         "price",
         "hourlyCost",
-        "monthlyCost"
+        "monthlyCost",
+        "priceNotFound"
       ],
       "properties": {
         "name": {
@@ -97,6 +98,9 @@
           "type": ["string", "null"]
         },
         "usageBased": {
+          "type": "boolean"
+        },
+        "priceNotFound": {
           "type": "boolean"
         }
       },

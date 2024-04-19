@@ -129,7 +129,7 @@ func (attr *Attribute) Value() cty.Value {
 		return cty.DynamicVal
 	}
 
-	attr.Logger.Debug().Msg("fetching attribute value")
+	attr.Logger.Trace().Msg("fetching attribute value")
 	var val cty.Value
 	if attr.isGraph {
 		val = attr.graphValue()
@@ -1107,7 +1107,7 @@ func (attr *Attribute) referencesFromExpression(expression hcl.Expression) []*Re
 			refs = append(refs, ref)
 		}
 	case *hclsyntax.LiteralValueExpr:
-		attr.Logger.Debug().Msgf("cannot create references from %T as it is a literal value and will not contain refs", t)
+		attr.Logger.Trace().Msgf("cannot create references from %T as it is a literal value and will not contain refs", t)
 	default:
 		name := fmt.Sprintf("%T", t)
 		if strings.HasPrefix(name, "*hclsyntax") {
