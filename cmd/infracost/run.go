@@ -914,8 +914,8 @@ func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectCon
 	env["totalEstimatedUsages"] = summary.TotalEstimatedUsages
 	env["totalUnestimatedUsages"] = summary.TotalUnestimatedUsages
 
-	if warnings := runCtx.GetResourceWarnings(); warnings != nil {
-		env["resourceWarnings"] = warnings
+	if prices.NotFoundComponents.Len() > 0 {
+		env["pricesNotFound"] = prices.NotFoundComponents.Components()
 	}
 
 	if n := r.ExampleProjectName(); n != "" {

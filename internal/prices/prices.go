@@ -22,10 +22,10 @@ import (
 
 var (
 	batchSize          = 5
-	warningMu          = &sync.Mutex{}
 	NotFoundComponents = &notFound{
-		data: make(map[string]*notFoundData),
-		mux:  &sync.RWMutex{},
+		resources:  make(map[string]*notFoundData),
+		mux:        &sync.RWMutex{},
+		components: map[string]int{},
 	}
 )
 
@@ -40,19 +40,27 @@ type notFoundData struct {
 // data. This is used to provide a summary of missing prices at the end of a run.
 // It should be used as a singleton which is shared across the application.
 type notFound struct {
-	data map[string]*notFoundData
-	mux  *sync.RWMutex
+	resources  map[string]*notFoundData
+	components map[string]int
+	mux        *sync.RWMutex
 }
 
 // Add adds an instance of a missing price to the aggregator.
-func (p *notFound) Add(r *schema.Resource) {
+func (p *notFound) Add(result apiclient.PriceQueryResult) {
 	p.mux.Lock()
 	defer p.mux.Unlock()
 
-	key := r.BaseResourceType()
-	name := r.BaseResourceName()
+	variables := result.Query.Variables
+	b, _ := json.MarshalIndent(variables, "     ", " ")
 
-	if entry, exists := p.data[key]; exists {
+	logging.Logger.Debug().Msgf("No products found for %s %s\n     %s", result.Resource.Name, result.CostComponent.Name, string(b))
+
+	resource := result.Resource
+
+	key := resource.BaseResourceType()
+	name := resource.BaseResourceName()
+
+	if entry, exists := p.resources[key]; exists {
 		entry.Count++
 
 		var found bool
@@ -67,12 +75,41 @@ func (p *notFound) Add(r *schema.Resource) {
 			entry.ResourceNames = append(entry.ResourceNames, name)
 		}
 	} else {
-		p.data[key] = &notFoundData{
+		p.resources[key] = &notFoundData{
 			ResourceType:  key,
 			ResourceNames: []string{name},
 			Count:         1,
 		}
 	}
+
+	// build a key for the component, this is used to aggregate the number of
+	// missing prices by cost component and resource type. The key is in the
+	// format: resource_type.cost_component_name.
+	componentName := strings.ToLower(result.CostComponent.Name)
+	pieces := strings.Split(componentName, "(")
+	if len(pieces) > 1 {
+		componentName = strings.TrimSpace(pieces[0])
+	}
+	componentKey := fmt.Sprintf("%s.%s", key, strings.ReplaceAll(componentName, " ", "_"))
+
+	if entry, exists := p.components[componentKey]; exists {
+		entry++
+		p.components[componentKey] = entry
+	} else {
+		p.components[componentKey] = 1
+
+	}
+
+	result.CostComponent.SetPriceNotFound()
+}
+
+// Components returns a map of missing prices by component name, component
+// names are in the format: resource_type.cost_component_name.
+func (p *notFound) Components() map[string]int {
+	p.mux.RLock()
+	defer p.mux.RUnlock()
+
+	return p.components
 }
 
 // Len returns the number of missing prices.
@@ -80,7 +117,7 @@ func (p *notFound) Len() int {
 	p.mux.RLock()
 	defer p.mux.RUnlock()
 
-	return len(p.data)
+	return len(p.resources)
 }
 
 // Log writes the notFound prices to the application log. If the log level is
@@ -88,12 +125,12 @@ func (p *notFound) Len() int {
 func (p *notFound) Log(ctx *config.RunContext) {
 	p.mux.RLock()
 	defer p.mux.RUnlock()
-	if len(p.data) == 0 {
+	if len(p.resources) == 0 {
 		return
 	}
 
 	var keys []string
-	for k := range p.data {
+	for k := range p.resources {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
@@ -105,7 +142,7 @@ func (p *notFound) Log(ctx *config.RunContext) {
 	warningPad := strings.Repeat(" ", 5)
 	resourcePad := strings.Repeat(" ", 3)
 	for i, k := range keys {
-		v := p.data[k]
+		v := p.resources[k]
 		priceDesc := "price"
 		if v.Count > 1 {
 			priceDesc = "prices"
@@ -222,10 +259,7 @@ func setCostComponentPrice(ctx *config.RunContext, currency string, result apicl
 			return
 		}
 
-		debugNoProductsFound(result)
-		NotFoundComponents.Add(result.Resource)
-		setResourceWarningEvent(ctx, result.Resource, "No products found")
-		result.CostComponent.SetPriceNotFound()
+		NotFoundComponents.Add(result)
 		return
 	}
 
@@ -252,59 +286,27 @@ func setCostComponentPrice(ctx *config.RunContext, currency string, result apicl
 			return
 		}
 
-		debugNoProductsFound(result)
-		NotFoundComponents.Add(result.Resource)
-		setResourceWarningEvent(ctx, result.Resource, "No prices found")
-		result.CostComponent.SetPriceNotFound()
+		NotFoundComponents.Add(result)
 		return
 	}
 
 	if len(productsWithPrices) > 1 {
 		logging.Logger.Debug().Msgf("Multiple products with prices found for %s %s, using the first product", result.Resource.Name, result.CostComponent.Name)
-		setResourceWarningEvent(ctx, result.Resource, "Multiple products found")
 	}
 
 	prices := productsWithPrices[0].Get("prices").Array()
 	if len(prices) > 1 {
 		logging.Logger.Warn().Msgf("Multiple prices found for %s %s, using the first price", result.Resource.Name, result.CostComponent.Name)
-		setResourceWarningEvent(ctx, result.Resource, "Multiple prices found")
 	}
 
 	var err error
 	p, err = decimal.NewFromString(prices[0].Get(currency).String())
 	if err != nil {
 		logging.Logger.Warn().Msgf("Error converting price to '%v' (using 0.00)  '%v': %s", currency, prices[0].Get(currency).String(), err.Error())
-		setResourceWarningEvent(ctx, result.Resource, "Error converting price")
 		result.CostComponent.SetPrice(decimal.Zero)
 		return
 	}
 
 	result.CostComponent.SetPrice(p)
 	result.CostComponent.SetPriceHash(prices[0].Get("priceHash").String())
-}
-
-func debugNoProductsFound(result apiclient.PriceQueryResult) {
-	variables := result.Query.Variables
-	b, _ := json.MarshalIndent(variables, "     ", " ")
-
-	logging.Logger.Debug().Msgf("No products found for %s %s\n     %s", result.Resource.Name, result.CostComponent.Name, string(b))
-}
-
-func setResourceWarningEvent(ctx *config.RunContext, r *schema.Resource, msg string) {
-	warningMu.Lock()
-	defer warningMu.Unlock()
-
-	warnings := ctx.GetResourceWarnings()
-	if warnings == nil {
-		warnings = make(map[string]map[string]int)
-		ctx.SetResourceWarnings(warnings)
-	}
-
-	resourceWarnings := warnings[r.ResourceType]
-	if resourceWarnings == nil {
-		resourceWarnings = make(map[string]int)
-		warnings[r.ResourceType] = resourceWarnings
-	}
-
-	resourceWarnings[msg] += 1
 }

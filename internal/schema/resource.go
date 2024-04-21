@@ -1,7 +1,6 @@
 package schema
 
 import (
-	"regexp"
 	"sort"
 
 	"github.com/shopspring/decimal"
@@ -177,10 +176,4 @@ func MultiplyQuantities(resource *Resource, multiplier decimal.Decimal) {
 
 func decimalPtr(d decimal.Decimal) *decimal.Decimal {
 	return &d
-}
-
-var countRegex = regexp.MustCompile(`\[.+]$`)
-
-func stripCountOrForEach(s string) string {
-	return countRegex.ReplaceAllString(s, "")
 }
