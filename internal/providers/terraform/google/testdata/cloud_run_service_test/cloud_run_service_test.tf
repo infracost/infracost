@@ -19,11 +19,6 @@ resource "google_cloud_run_service" "throttling_enabled" {
       }
     }
   }
-  metadata {
-    annotations = {
-      "autoscaling.knative.dev/minScale": "1"
-    }
-  }
 }
 resource "google_cloud_run_service" "throttling_disabled" {
   name     = "cloudrun-service-test"
