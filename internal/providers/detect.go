@@ -60,13 +60,16 @@ func Detect(ctx *config.RunContext, project *config.Project, includePastResource
 	}
 
 	locatorConfig := &hcl.ProjectLocatorConfig{
-		ExcludedDirs:               append(project.ExcludePaths, ctx.Config.Autodetect.ExcludeDirs...),
-		IncludedDirs:               ctx.Config.Autodetect.IncludeDirs,
-		PathOverrides:              pathOverrides,
-		EnvNames:                   ctx.Config.Autodetect.EnvNames,
-		ChangedObjects:             ctx.VCSMetadata.Commit.ChangedObjects,
-		UseAllPaths:                project.IncludeAllPaths,
-		SkipAutoDetection:          project.SkipAutodetect,
+		ExcludedDirs:   append(project.ExcludePaths, ctx.Config.Autodetect.ExcludeDirs...),
+		IncludedDirs:   ctx.Config.Autodetect.IncludeDirs,
+		PathOverrides:  pathOverrides,
+		EnvNames:       ctx.Config.Autodetect.EnvNames,
+		ChangedObjects: ctx.VCSMetadata.Commit.ChangedObjects,
+		UseAllPaths:    project.IncludeAllPaths,
+		// If the user has specified terraform var files, we should skip auto-detection
+		// as terraform var files are relative to the project root, so invalid path errors
+		// will occur if any autodetect projects are outside the current project path.
+		SkipAutoDetection:          project.SkipAutodetect || len(project.TerraformVarFiles) > 0,
 		FallbackToIncludePaths:     ctx.IsAutoDetect(),
 		MaxSearchDepth:             ctx.Config.Autodetect.MaxSearchDepth,
 		ForceProjectType:           ctx.Config.Autodetect.ForceProjectType,

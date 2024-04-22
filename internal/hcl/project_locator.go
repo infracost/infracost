@@ -1059,13 +1059,6 @@ func (r *RootPath) AddVarFiles(v *VarFiles) {
 // FindRootModules returns a list of all directories that contain a full Terraform project under the given fullPath.
 // This list excludes any Terraform modules that have been found (if they have been called by a Module source).
 func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
-	if p.skip {
-		return []RootPath{
-			{
-				Path: fullPath,
-			},
-		}
-	}
 	p.basePath, _ = filepath.Abs(fullPath)
 	p.modules = make(map[string]struct{})
 	p.projectDuplicates = make(map[string]bool)
@@ -1073,12 +1066,25 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 	p.wdContainsTerragrunt = false
 	p.discoveredProjects = []discoveredProject{}
 	p.discoveredVarFiles = make(map[string][]RootPathVarFile)
-
 	p.shouldSkipDir = buildDirMatcher(p.excludedDirs, fullPath)
 	p.shouldIncludeDir = buildDirMatcher(p.includedDirs, fullPath)
 
+	if p.skip {
+		// if we are skipping auto-detection we just return the root path, but we still
+		// want to walk the paths to find any auto.tfvars or terraform.tfvars files. So
+		// let's just walk the top level directory.
+		p.walkPaths(fullPath, 0, 1)
+
+		return []RootPath{
+			{
+				Path:              fullPath,
+				TerraformVarFiles: p.discoveredVarFiles[fullPath],
+			},
+		}
+	}
+
 	p.findTerragruntDirs(fullPath)
-	p.walkPaths(fullPath, 0)
+	p.walkPaths(fullPath, 0, p.maxSearchDepth())
 	for _, project := range p.discoveredProjects {
 		if _, ok := p.projectDuplicates[project.path]; ok {
 			p.projectDuplicates[project.path] = true
@@ -1306,10 +1312,10 @@ func (p *ProjectLocator) maxSearchDepth() int {
 	return 7
 }
 
-func (p *ProjectLocator) walkPaths(fullPath string, level int) {
+func (p *ProjectLocator) walkPaths(fullPath string, level int, maxSearchDepth int) {
 	p.logger.Debug().Msgf("walking path %s to discover terraform files", fullPath)
 
-	if level >= p.maxSearchDepth() {
+	if level >= maxSearchDepth {
 		p.logger.Debug().Msgf("exiting parsing directory %s as it is outside the maximum evaluation threshold", fullPath)
 		return
 	}
@@ -1392,7 +1398,7 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int) {
 				continue
 			}
 
-			p.walkPaths(filepath.Join(fullPath, info.Name()), level+1)
+			p.walkPaths(filepath.Join(fullPath, info.Name()), level+1, maxSearchDepth)
 		}
 	}
 }

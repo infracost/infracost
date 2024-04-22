@@ -1306,3 +1306,19 @@ func TestBreakdownEmptyAPIKey(t *testing.T) {
 		},
 	)
 }
+
+func TestBreakdownSkipAutodetectionIfTerraformVarFilePassed(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", dir,
+			"--terraform-var-file",
+			"prod.tfvars",
+		},
+		nil,
+	)
+}
