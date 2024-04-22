@@ -405,7 +405,7 @@ var FreeResources = []string{
 	"azurerm_iothub_route",
 	"azurerm_iothub_shared_access_policy",
 
-	// Azure Lighthouse (Delegated Resoure Management)
+	// Azure Lighthouse (Delegated Resource Management)
 	"azurerm_lighthouse_definition",
 	"azurerm_lighthouse_assignment",
 

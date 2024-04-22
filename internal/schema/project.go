@@ -375,7 +375,7 @@ func NewProject(name string, metadata *ProjectMetadata) *Project {
 	}
 }
 
-// NameWithWorkspace returns the proect Name appended with the paranenthized workspace name
+// NameWithWorkspace returns the project Name appended with the parenthesized workspace name
 // from Metadata if one exists.
 func (p *Project) NameWithWorkspace() string {
 	if p.Metadata.WorkspaceLabel() == "" {
