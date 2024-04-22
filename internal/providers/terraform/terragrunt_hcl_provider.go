@@ -109,7 +109,7 @@ type TerragruntHCLProvider struct {
 	logger        zerolog.Logger
 }
 
-// NewTerragruntHCLProvider creates a new provider intialized with the configured project path (usually the terragrunt
+// NewTerragruntHCLProvider creates a new provider initialized with the configured project path (usually the terragrunt
 // root directory).
 func NewTerragruntHCLProvider(rootPath hcl.RootPath, ctx *config.ProjectContext) schema.Provider {
 	logger := ctx.Logger().With().Str(
