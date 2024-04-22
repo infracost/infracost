@@ -90,6 +90,18 @@
  ibm_resource_instance.wa_instance_trial                                                                                                     
  └─ Trial                                                                                    1                                         $0.00 
                                                                                                                                              
+ ibm_resource_instance.watson_discovery_enterprise                                                                                           
+ ├─ Instance                                                                                 1  Instance                           $5,000.00 
+ ├─ Additional Monthly Documents                                                         1,000  Documents                              $5.00 
+ ├─ Additional Monthly Queries                                                           1,000  Queries                                $5.00 
+ ├─ Additional Monthly Custom Models                                                         1  Custom Models                        $500.00 
+ └─ Additional Monthly Collections                                                           1  Hundred Collections                  $500.00 
+                                                                                                                                             
+ ibm_resource_instance.watson_discovery_plus                                                                                                 
+ ├─ Instance                                                                                 1  Instance                             $500.00 
+ ├─ Additional Monthly Documents                                                         1,000  Documents                             $50.00 
+ └─ Additional Monthly Queries                                                           1,000  Queries                               $20.00 
+                                                                                                                                             
  ibm_resource_instance.wml_instance_essentials                                                                                               
  ├─ Capacity Unit-Hours                                                                     20  CUH                                   $10.40 
  ├─ Class 1 Resource Units                                                                  50  RU                                     $0.03 
@@ -105,7 +117,7 @@
  ├─ Class 2 Resource Units                                                                  50  RU                                     $0.09 
  └─ Class 3 Resource Units                                                                  50  RU                                     $0.25 
                                                                                                                                              
- OVERALL TOTAL                                                                                                                     $8,880.14 
+ OVERALL TOTAL                                                                                                                    $15,460.14 
 ──────────────────────────────────
-23 cloud resources were detected:
-∙ 23 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+25 cloud resources were detected:
+∙ 25 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

@@ -56,3 +56,15 @@ resource_usage:
     wa_instance: 1
     wa_monthly_active_users: 51000
     wa_voice_users: 1000
+
+  ibm_resource_instance.watson_discovery_plus:
+    wd_instance: 1 # Number of instances used per month
+    wd_documents: 11000 # Number of monthly documents created; 10,000 included in the Plus plan; $50 for every additional 1,000 documents.
+    wd_queries: 11000 # Number of queries documents created; 10,000 included in the Plus plan; $20 for every additional 1,000 queries.
+  
+  ibm_resource_instance.watson_discovery_enterprise:
+    wd_instance: 1 # Number of instances used per month
+    wd_documents: 101000 # Number of monthly documents created; 100,000 included in the Enterprise plan; $5 for every additional 1,000 documents.
+    wd_queries: 101000 # Number of queries documents created; 100,000 included in the Enterprise plan; $5 for every additional 1,000 queries.
+    wd_custom_models: 4 # Number of monthly custom models created; 3 included in the Enterprise plan; $500 for every additional custom model.
+    wd_collections: 301 # Number of monthly collections created; 300 included in the Enterprise plan. $500 for every additional 100 collections.

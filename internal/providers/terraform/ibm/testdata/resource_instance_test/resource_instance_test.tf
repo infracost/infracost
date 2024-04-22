@@ -184,3 +184,19 @@ resource "ibm_resource_instance" "wa_instance_enterprise" {
   location          = "us-south"
   resource_group_id = "default"
 }
+
+resource "ibm_resource_instance" "watson_discovery_plus" {
+  name              = "wd_plus"
+  service           = "discovery"
+  plan              = "plus"
+  location          = "us-south"
+  resource_group_id = "default"
+}
+
+resource "ibm_resource_instance" "watson_discovery_enterprise" {
+  name              = "wd_enterprise"
+  service           = "discovery"
+  plan              = "enterprise"
+  location          = "us-south"
+  resource_group_id = "default"
+}
