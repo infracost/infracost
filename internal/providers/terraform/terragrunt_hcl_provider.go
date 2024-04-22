@@ -992,7 +992,7 @@ func (p *TerragruntHCLProvider) decodeTerragruntDepsToValue(targetConfig string,
 			return encoded, nil
 		}
 
-		p.logger.Warn().Err(err).Msg("could not transform output blocks to cty type, using dummy output type")
+		p.logger.Debug().Err(err).Msg("could not transform output blocks to cty type, using dummy output type")
 	}
 
 	return cty.EmptyObjectVal, nil

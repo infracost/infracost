@@ -298,7 +298,7 @@ func (e *Evaluator) evaluate(lastContext hcl.EvalContext) {
 	}
 
 	if i == maxContextIterations {
-		e.logger.Warn().Msgf("hit max context iterations evaluating module %s", e.module.Name)
+		e.logger.Debug().Msgf("hit max context iterations evaluating module %s", e.module.Name)
 	}
 
 }
@@ -406,7 +406,7 @@ func (e *Evaluator) expandBlocks(blocks Blocks, lastContext hcl.EvalContext) Blo
 	}
 
 	if i == maxContextIterations {
-		e.logger.Warn().Msgf("hit max context iterations expanding blocks in module %s", e.module.Name)
+		e.logger.Debug().Msgf("hit max context iterations expanding blocks in module %s", e.module.Name)
 	}
 
 	return e.expandDynamicBlocks(expanded...)

@@ -530,7 +530,7 @@ func (p *Parser) loadVars(blocks Blocks, filenames []string) (map[string]cty.Val
 		remoteVars, err := p.remoteVariablesLoader.Load(blocks)
 
 		if err != nil {
-			p.logger.Warn().Msgf("could not load vars from Terraform Cloud: %s", err)
+			p.logger.Debug().Msgf("could not load vars from Terraform Cloud: %s", err)
 			return combinedVars, err
 		}
 

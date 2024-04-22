@@ -919,7 +919,7 @@ func (attr *Attribute) getIndexValue(part hcl.TraverseIndex) string {
 	case cty.Number:
 		var intVal int
 		if err := gocty.FromCtyValue(part.Key, &intVal); err != nil {
-			attr.Logger.Warn().Err(err).Msg("could not unpack int from block index attr, returning 0")
+			attr.Logger.Debug().Err(err).Msg("could not unpack int from block index attr, returning 0")
 			return "0"
 		}
 
