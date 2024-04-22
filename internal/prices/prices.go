@@ -129,11 +129,13 @@ func (p *notFound) Log(ctx *config.RunContext) {
 		return
 	}
 
-	var keys []string
-	for k := range p.resources {
-		keys = append(keys, k)
+	var data []*notFoundData
+	for _, v := range p.resources {
+		data = append(data, v)
 	}
-	sort.Strings(keys)
+	sort.Slice(data, func(i, j int) bool {
+		return data[i].Count > data[j].Count
+	})
 
 	level, _ := zerolog.ParseLevel(ctx.Config.LogLevel)
 	includeResourceNames := level <= zerolog.DebugLevel
@@ -141,8 +143,7 @@ func (p *notFound) Log(ctx *config.RunContext) {
 	s := strings.Builder{}
 	warningPad := strings.Repeat(" ", 5)
 	resourcePad := strings.Repeat(" ", 3)
-	for i, k := range keys {
-		v := p.resources[k]
+	for i, v := range data {
 		priceDesc := "price"
 		if v.Count > 1 {
 			priceDesc = "prices"
