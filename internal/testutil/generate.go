@@ -73,7 +73,7 @@ func createFileWithContents(filePath string) error {
 }`
 	case "terragrunt.hcl.json":
 		content = `include {
-	path = find_in_parent_folders()		
+	path = find_in_parent_folders()
 }`
 	case "Jenkinsfile":
 		content = `
@@ -106,6 +106,12 @@ instance_type = "m5.4xlarge"
 {
   "region": "us-west-2"
 }
+`
+	}
+
+	if strings.HasPrefix(filename, "empty-file") {
+		content = `
+			# This is an empty file
 `
 	}
 
