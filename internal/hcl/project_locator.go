@@ -153,7 +153,9 @@ func (e *EnvFileMatcher) IsEnvName(file string) bool {
 
 func (e *EnvFileMatcher) clean(name string) string {
 	base := filepath.Base(name)
-	return strings.ToLower(strings.TrimSuffix(base, fullExtension(base)))
+
+	stem, _ := splitExtension(base, e.extensions)
+	return strings.ToLower(stem)
 }
 
 // EnvName returns the environment name for the given var file.
@@ -246,16 +248,16 @@ type ProjectLocator struct {
 	envMatcher         *EnvFileMatcher
 	skip               bool
 
-	shouldSkipDir             func(string) bool
-	shouldIncludeDir          func(string) bool
-	pathOverrides             []pathOverride
-	wdContainsTerragrunt      bool
-	fallbackToIncludePaths    bool
-	maxConfiguredDepth        int
-	forceProjectType          string
-	teraformVarFileExtensions []string
-	hclParser                 *hclparse.Parser
-	hasCustomEnvExt           bool
+	shouldSkipDir              func(string) bool
+	shouldIncludeDir           func(string) bool
+	pathOverrides              []pathOverride
+	wdContainsTerragrunt       bool
+	fallbackToIncludePaths     bool
+	maxConfiguredDepth         int
+	forceProjectType           string
+	terraformVarFileExtensions []string
+	hclParser                  *hclparse.Parser
+	hasCustomEnvExt            bool
 }
 
 // ProjectLocatorConfig provides configuration options on how the locator functions.
@@ -339,21 +341,21 @@ func NewProjectLocator(logger zerolog.Logger, config *ProjectLocatorConfig) *Pro
 			shouldIncludeDir: func(s string) bool {
 				return false
 			},
-			fallbackToIncludePaths:    config.FallbackToIncludePaths,
-			forceProjectType:          config.ForceProjectType,
-			teraformVarFileExtensions: extensions,
-			hclParser:                 hclparse.NewParser(),
-			hasCustomEnvExt:           len(config.TerraformVarFileExtensions) > 0,
+			fallbackToIncludePaths:     config.FallbackToIncludePaths,
+			forceProjectType:           config.ForceProjectType,
+			terraformVarFileExtensions: extensions,
+			hclParser:                  hclparse.NewParser(),
+			hasCustomEnvExt:            len(config.TerraformVarFileExtensions) > 0,
 		}
 	}
 
 	return &ProjectLocator{
-		modules:                   make(map[string]struct{}),
-		discoveredVarFiles:        make(map[string][]RootPathVarFile),
-		logger:                    logger,
-		envMatcher:                matcher,
-		teraformVarFileExtensions: defaultExtensions,
-		hclParser:                 hclparse.NewParser(),
+		modules:                    make(map[string]struct{}),
+		discoveredVarFiles:         make(map[string][]RootPathVarFile),
+		logger:                     logger,
+		envMatcher:                 matcher,
+		terraformVarFileExtensions: defaultExtensions,
+		hclParser:                  hclparse.NewParser(),
 	}
 }
 
@@ -1431,48 +1433,39 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int, maxSearchDepth in
 }
 
 func (p *ProjectLocator) isTerraformVarFile(name string, fullPath string) bool {
-	for _, envExt := range p.teraformVarFileExtensions {
-		// if we have custom extensions enabled in the autodetect configuration we need
-		// to match the exact extension of the file to the custom env var extension. This
-		// is so that when we have a custom extension that specifies no extension e.g.
-		// "", this doesn't match all files (as it would with strings.HasSuffix).
-		if p.hasCustomEnvExt {
-			// first check if the file has a default var file extension
-			// if it does we can skip the custom extension check.
-			if hasDefaultVarFileExtension(name) {
-				return true
-			}
-
-			fileExt := fullExtension(name)
-			if fileExt == envExt {
-				// if we have custom extensions enabled in the autodetect configuration we need
-				// to make sure that this file is a valid HCL file before we add it to the list
-				// of discovered var files. This is because we can have collisions with custom
-				// env var extensions and other files that are not valid HCL files. e.g. with an
-				// empty/wildcard extension we could match a file called "tfvars" and also
-				// "Jenkinsfile", the latter being a non-HCL file.
-				_, d := p.hclParser.ParseHCLFile(fullPath)
-				if d != nil {
-					continue
-				}
-
-				return true
-			}
-
-			continue
-		}
-
-		// default back to the standard suffix matching if we don't have custom
-		// extensions this means we can flexibly match extensions that might appear
-		// outside the norm. e.g. prod.env.tfvars
-		if strings.HasSuffix(name, envExt) {
-			return true
-		}
+	if hasDefaultVarFileExtension(name) {
+		return true
 	}
 
 	// we also check for tfvars.json files as these are non-standard naming
 	// conventions which are used by some projects.
-	return strings.HasPrefix(name, "tfvars") && strings.HasSuffix(name, ".json")
+	if strings.HasPrefix(name, "tfvars") && strings.HasSuffix(name, ".json") {
+		return true
+	}
+
+	// If there are no custom extensions we can early exit here.
+	if !p.hasCustomEnvExt {
+		return false
+	}
+
+	// if we have custom extensions enabled in the autodetect configuration we need
+	// to check the extension of the file to see if it matches any of the custom
+	if !hasVarFileExtension(name, p.terraformVarFileExtensions) {
+		return false
+	}
+
+	// if we have custom extensions enabled in the autodetect configuration we need
+	// to make sure that this file is a valid HCL file before we add it to the list
+	// of discovered var files. This is because we can have collisions with custom
+	// env var extensions and other files that are not valid HCL files. e.g. with an
+	// empty/wildcard extension we could match a file called "tfvars" and also
+	// "Jenkinsfile", the latter being a non-HCL file.
+	_, d := p.hclParser.ParseHCLFile(fullPath)
+	if d != nil {
+		return false
+	}
+
+	return true
 }
 
 func hasDefaultVarFileExtension(name string) bool {
@@ -1485,28 +1478,55 @@ func hasDefaultVarFileExtension(name string) bool {
 	return false
 }
 
-// fullExtension returns the full extension of a file, starting from the first
-// dot in the file name. For hidden file (starting with a dot), the second dot is used.
-// This is used instead of the builtin filepath.Ext function as the latter
-// only returns the last extension in the file name. For
-// example filepath.Ext("file.tfvars.json") would return ".json" instead of
-// ".tfvars.json".
-func fullExtension(fileName string) string {
+// splitExtension splits the extension from a file name. It will return the file name
+// without the extension and the extension itself. If the file name does not have an
+// extension it will return the original file name and an empty string.
+func splitExtension(fileName string, extensions []string) (string, string) {
 	if len(fileName) == 0 {
-		return ""
+		return "", ""
 	}
 
-	// Find the index of the first dot.
-	// Skip the first character as we don't want to match hidden files.
-	dotIndex := strings.Index(fileName[1:], ".") + 1
+	// Sort the extensions by length so that we can match the longest extension first.
+	sorted := make([]string, len(extensions))
+	copy(sorted, extensions)
+	sort.Slice(sorted, func(i, j int) bool {
+		return len(sorted[i]) > len(sorted[j])
+	})
 
-	if dotIndex == 0 {
-		// No dot found, return empty string.
-		return ""
+	for _, ext := range sorted {
+		if strings.HasSuffix(fileName, ext) {
+			return fileName[:len(fileName)-len(ext)], ext
+		}
 	}
 
-	// Return the substring from the first dot to the end of the string.
-	return fileName[dotIndex:]
+	return fileName, ""
+}
+
+// hasVarFileExtension checks if the file name has a valid extension.
+func hasVarFileExtension(fileName string, extensions []string) bool {
+	if len(fileName) == 0 {
+		return false
+	}
+
+	_, ext := splitExtension(fileName, extensions)
+	if ext != "" {
+		return true
+	}
+
+	blankExtensionAllowed := false
+	for _, e := range extensions {
+		if e == "" {
+			blankExtensionAllowed = true
+			break
+		}
+	}
+
+	// Check if there's a dot in the filename, but ignore the first character as we don't want to match hidden files.
+	if ext == "" && blankExtensionAllowed && !strings.Contains(fileName[1:], ".") {
+		return true
+	}
+
+	return false
 }
 
 type terraformDirInfo struct {
