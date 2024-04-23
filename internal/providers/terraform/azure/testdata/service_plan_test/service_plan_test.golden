@@ -825,11 +825,3 @@
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
 ┃ main                                               ┃ $611,321      ┃ $0.00       ┃ $611,321   ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
-Logs:
-
-WARN Multiple prices found for azurerm_service_plan.example["Windows.F1.1"] Instance usage (F1), using the first price
-WARN Multiple prices found for azurerm_service_plan.example["Windows.F1.2"] Instance usage (F1), using the first price
-WARN Multiple prices found for azurerm_service_plan.example["Windows.F1.3"] Instance usage (F1), using the first price
-WARN Multiple prices found for azurerm_service_plan.example["WindowsContainer.F1.1"] Instance usage (F1), using the first price
-WARN Multiple prices found for azurerm_service_plan.example["WindowsContainer.F1.2"] Instance usage (F1), using the first price
-WARN Multiple prices found for azurerm_service_plan.example["WindowsContainer.F1.3"] Instance usage (F1), using the first price

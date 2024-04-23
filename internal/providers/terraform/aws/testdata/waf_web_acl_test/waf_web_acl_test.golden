@@ -33,7 +33,3 @@
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
 ┃ main                                               ┃ $31           ┃ $7          ┃ $38        ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
-Logs:
-
-WARN Multiple prices found for aws_waf_web_acl.my_waf Requests, using the first price
-WARN Multiple prices found for aws_waf_web_acl.withoutUsage Requests, using the first price
