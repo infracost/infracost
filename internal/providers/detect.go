@@ -30,7 +30,7 @@ func Detect(ctx *config.RunContext, project *config.Project, includePastResource
 	path := project.Path
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return nil, fmt.Errorf("No such file or directory %s", path)
+		return &DetectionOutput{}, fmt.Errorf("No such file or directory %s", path)
 	}
 
 	forceCLI := project.TerraformForceCLI
@@ -83,7 +83,7 @@ func Detect(ctx *config.RunContext, project *config.Project, includePastResource
 	pl := hcl.NewProjectLocator(logging.Logger, locatorConfig)
 	rootPaths := pl.FindRootModules(project.Path)
 	if len(rootPaths) == 0 {
-		return nil, fmt.Errorf("could not detect path type for '%s'", path)
+		return &DetectionOutput{}, fmt.Errorf("could not detect path type for '%s'", path)
 	}
 
 	repoPath := ctx.Config.RepoPath()
