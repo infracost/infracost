@@ -186,20 +186,6 @@ func (r *RunContext) VCSRepositoryURL() string {
 	return r.VCSMetadata.Remote.URL
 }
 
-func (r *RunContext) GetResourceWarnings() map[string]map[string]int {
-	contextValues := r.ContextValues.Values()
-
-	if warnings := contextValues["resourceWarnings"]; warnings != nil {
-		return warnings.(map[string]map[string]int)
-	}
-
-	return nil
-}
-
-func (r *RunContext) SetResourceWarnings(resourceWarnings map[string]map[string]int) {
-	r.ContextValues.SetValue("resourceWarnings", resourceWarnings)
-}
-
 func (r *RunContext) EventEnv() map[string]interface{} {
 	return r.EventEnvWithProjectContexts([]*ProjectContext{})
 }

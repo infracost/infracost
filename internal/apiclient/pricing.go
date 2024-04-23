@@ -54,6 +54,7 @@ type PriceQueryKey struct {
 type PriceQueryResult struct {
 	PriceQueryKey
 	Result gjson.Result
+	Query  GraphQLQuery
 
 	filled bool
 }
@@ -351,6 +352,7 @@ func (c *PricingAPIClient) PerformRequest(req BatchRequest) ([]PriceQueryResult,
 					PriceQueryKey: req.keys[i],
 					Result:        v.Result,
 					filled:        true,
+					Query:         query.query,
 				}
 			} else {
 				serverQueries = append(serverQueries, query)

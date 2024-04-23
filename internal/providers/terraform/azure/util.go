@@ -49,7 +49,7 @@ func lookupRegion(d *schema.ResourceData, parentResourceKeys []string) string {
 
 	// When all else fails use the default region
 	defaultRegion := toAzureCLIName(d.Get("region").String())
-	logging.Logger.Warn().Msgf("Using %s for resource %s as its 'location' property could not be found.", defaultRegion, d.Address)
+	logging.Logger.Debug().Msgf("Using %s for resource %s as its 'location' property could not be found.", defaultRegion, d.Address)
 	return defaultRegion
 }
 

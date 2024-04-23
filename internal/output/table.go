@@ -295,7 +295,11 @@ func buildCostComponentRows(t table.Writer, currency string, costComponents []Co
 			tableRow = append(tableRow, label)
 
 			if contains(fields, "price") {
-				tableRow = append(tableRow, formatPrice(currency, c.Price))
+				if c.PriceNotFound {
+					tableRow = append(tableRow, "not found")
+				} else {
+					tableRow = append(tableRow, formatPrice(currency, c.Price))
+				}
 			}
 			if contains(fields, "monthlyQuantity") {
 				tableRow = append(tableRow, formatQuantity(c.MonthlyQuantity))
@@ -304,10 +308,18 @@ func buildCostComponentRows(t table.Writer, currency string, costComponents []Co
 				tableRow = append(tableRow, c.Unit)
 			}
 			if contains(fields, "hourlyCost") {
-				tableRow = append(tableRow, FormatCost2DP(currency, c.HourlyCost))
+				if c.PriceNotFound {
+					tableRow = append(tableRow, "not found")
+				} else {
+					tableRow = append(tableRow, FormatCost2DP(currency, c.HourlyCost))
+				}
 			}
 			if contains(fields, "monthlyCost") {
-				tableRow = append(tableRow, FormatCost2DP(currency, c.MonthlyCost))
+				if c.PriceNotFound {
+					tableRow = append(tableRow, "not found")
+				} else {
+					tableRow = append(tableRow, FormatCost2DP(currency, c.MonthlyCost))
+				}
 			}
 
 			if contains(fields, "usageFootnote") {

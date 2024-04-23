@@ -48,19 +48,11 @@ func PrintUnexpectedErrorStack(err error) {
 }
 
 func ProjectDisplayName(ctx *config.RunContext, name string) string {
-	displayName := color.BlueString(BoldString(name))
-	if ctx.IsCIRun() {
-		displayName = fmt.Sprintf("%q", name)
-	}
-
-	return displayName
+	return FormatIfNotCI(ctx, func(s string) string {
+		return color.BlueString(BoldString(s))
+	}, name)
 }
 
 func DirectoryDisplayName(ctx *config.RunContext, name string) string {
-	displayName := UnderlineString(name)
-	if ctx.IsCIRun() {
-		displayName = fmt.Sprintf("%q", name)
-	}
-
-	return displayName
+	return FormatIfNotCI(ctx, UnderlineString, name)
 }

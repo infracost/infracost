@@ -102,6 +102,10 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		return err
 	}
 
+	// write an aggregate log line of cost components that have
+	// missing prices if any have been found.
+	prices.NotFoundComponents.Log(runCtx)
+
 	projects := make([]*schema.Project, 0)
 	projectContexts := make([]*config.ProjectContext, 0)
 
@@ -910,8 +914,8 @@ func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectCon
 	env["totalEstimatedUsages"] = summary.TotalEstimatedUsages
 	env["totalUnestimatedUsages"] = summary.TotalUnestimatedUsages
 
-	if warnings := runCtx.GetResourceWarnings(); warnings != nil {
-		env["resourceWarnings"] = warnings
+	if prices.NotFoundComponents.Len() > 0 {
+		env["pricesNotFound"] = prices.NotFoundComponents.Components()
 	}
 
 	if n := r.ExampleProjectName(); n != "" {
