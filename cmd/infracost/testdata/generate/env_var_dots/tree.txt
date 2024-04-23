@@ -6,6 +6,8 @@
     │   └── main.tf
     ├── .network-baz.tfvars
     ├── .network-bat.tfvars
+    ├── config.dev.tfvars
+    ├── config.prod.tfvars
     ├── .dev.tfvars
     ├── .prod.tfvars
     └── default.tfvars

@@ -173,7 +173,7 @@ func NewHCLProvider(ctx *config.ProjectContext, rootPath hcl.RootPath, config *H
 	rootPath.Path = initialPath
 	return &HCLProvider{
 		policyClient:   policyClient,
-		Parser:         hcl.NewParser(rootPath, hcl.CreateEnvFileMatcher(ctx.RunContext.Config.Autodetect.EnvNames, nil), loader, logger, options...),
+		Parser:         hcl.NewParser(rootPath, hcl.CreateEnvFileMatcher(ctx.RunContext.Config.Autodetect.EnvNames, ctx.RunContext.Config.Autodetect.TerraformVarFileExtensions), loader, logger, options...),
 		planJSONParser: NewParser(ctx, true),
 		ctx:            ctx,
 		config:         *config,
