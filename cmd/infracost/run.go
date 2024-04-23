@@ -309,9 +309,17 @@ func (r *parallelRunner) run() ([]projectResult, error) {
 	}
 
 	if isAuto {
-		logging.Logger.Info().Msgf("Autodetected %s across %d root %s", summary, totalRootModules, moduleDesc)
+		if summary == "" {
+			logging.Logger.Error().Msgf("Could not autodetect any projects from path %s", ui.DirectoryDisplayName(r.runCtx, r.runCtx.Config.RootPath))
+		} else {
+			logging.Logger.Info().Msgf("Autodetected %s across %d root %s", summary, totalRootModules, moduleDesc)
+		}
 	} else {
-		logging.Logger.Info().Msgf("Autodetected %s from %d %s in the config file", summary, len(r.runCtx.Config.Projects), pathDesc)
+		if summary == "" {
+			logging.Logger.Error().Msg("All provided config file paths are invalid or do not contain any supported projects")
+		} else {
+			logging.Logger.Info().Msgf("Autodetected %s from %d %s in the config file", summary, len(r.runCtx.Config.Projects), pathDesc)
+		}
 	}
 
 	for _, job := range queue {
