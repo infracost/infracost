@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"path"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -70,6 +71,7 @@ type EnvFileMatcher struct {
 	envNames   []string
 	envLookup  map[string]struct{}
 	extensions []string
+	wildcards  []string
 }
 
 func CreateEnvFileMatcher(names []string, extensions []string) *EnvFileMatcher {
@@ -83,10 +85,20 @@ func CreateEnvFileMatcher(names []string, extensions []string) *EnvFileMatcher {
 		return CreateEnvFileMatcher(defaultEnvs, extensions)
 	}
 
-	// ensure all env names to lowercase so we can match case insensitively.
-	envNames := make([]string, len(names))
-	for i, name := range names {
-		envNames[i] = strings.ToLower(name)
+	var envNames []string
+	var wildcards []string
+	for _, name := range names {
+		// envNames can contain wildcards, we need to handle them separately. e.g: dev-*
+		// will create separate envs for dev-staging and dev-legacy. We don't want these
+		// wildcards to appear in the envNames list as this will create unwanted env
+		// grouping.
+		if strings.Contains(name, "*") {
+			wildcards = append(wildcards, name)
+			continue
+		}
+
+		// ensure all env names to lowercase, so we can match case insensitively.
+		envNames = append(envNames, strings.ToLower(name))
 	}
 
 	lookup := make(map[string]struct{}, len(names))
@@ -95,9 +107,10 @@ func CreateEnvFileMatcher(names []string, extensions []string) *EnvFileMatcher {
 	}
 
 	return &EnvFileMatcher{
-		envNames:   names,
+		envNames:   envNames,
 		envLookup:  lookup,
 		extensions: extensions,
+		wildcards:  wildcards,
 	}
 }
 
@@ -129,6 +142,12 @@ func (e *EnvFileMatcher) IsEnvName(file string) bool {
 		}
 	}
 
+	for _, wildcard := range e.wildcards {
+		if isMatch, _ := path.Match(wildcard, clean); isMatch {
+			return true
+		}
+	}
+
 	return false
 }
 
@@ -144,6 +163,14 @@ func (e *EnvFileMatcher) EnvName(file string) string {
 	_, ok := e.envLookup[clean]
 	if ok {
 		return clean
+	}
+
+	// if we have a wildcard match to an env name return the clean name now
+	// as the partial match logic can collide with wildcard matches.
+	for _, wildcard := range e.wildcards {
+		if isMatch, _ := path.Match(wildcard, clean); isMatch {
+			return clean
+		}
 	}
 
 	// if we have a partial suffix match to an env name return the partial match

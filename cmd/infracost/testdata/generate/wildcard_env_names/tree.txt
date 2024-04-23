@@ -1,0 +1,10 @@
+.
+└── terraform
+    ├── env
+    │   ├── ops-prod-foo.tfvars
+    │   ├── ops-prod-bar.tfvars
+    │   ├── ops-dev.tfvars
+    │   ├── conf-dev-foo.tfvars
+    │   ├── dev.tfvars
+    │   └── conf-prod-foo.tfvars
+    └── main.tf
