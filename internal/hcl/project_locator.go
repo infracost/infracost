@@ -85,6 +85,12 @@ func CreateEnvFileMatcher(names []string, extensions []string) *EnvFileMatcher {
 		return CreateEnvFileMatcher(defaultEnvs, extensions)
 	}
 
+	// Sort the extensions by length so that we always prefer the longest extension
+	// when matching a file.
+	sort.Slice(extensions, func(i, j int) bool {
+		return len(extensions[i]) > len(extensions[j])
+	})
+
 	var envNames []string
 	var wildcards []string
 	for _, name := range names {
@@ -154,7 +160,7 @@ func (e *EnvFileMatcher) IsEnvName(file string) bool {
 func (e *EnvFileMatcher) clean(name string) string {
 	base := filepath.Base(name)
 
-	stem, _ := splitExtension(base, e.extensions)
+	stem, _ := splitVarFileExt(base, e.extensions)
 	return strings.ToLower(stem)
 }
 
@@ -316,6 +322,12 @@ func NewProjectLocator(logger zerolog.Logger, config *ProjectLocatorConfig) *Pro
 		} else {
 			matcher = CreateEnvFileMatcher(config.EnvNames, nil)
 		}
+
+		// Sort the extensions by length so that we always prefer the longest extension
+		// when matching a file.
+		sort.Slice(extensions, func(i, j int) bool {
+			return len(extensions[i]) > len(extensions[j])
+		})
 
 		overrides := make([]pathOverride, len(config.PathOverrides))
 		for i, override := range config.PathOverrides {
@@ -1460,12 +1472,16 @@ func (p *ProjectLocator) isTerraformVarFile(name string, fullPath string) bool {
 	// env var extensions and other files that are not valid HCL files. e.g. with an
 	// empty/wildcard extension we could match a file called "tfvars" and also
 	// "Jenkinsfile", the latter being a non-HCL file.
-	_, d := p.hclParser.ParseHCLFile(fullPath)
+	f, d := p.hclParser.ParseHCLFile(fullPath)
 	if d != nil {
 		return false
 	}
 
-	return true
+	// If the file is empty or has a comment, it would still be considered a valid
+	// So we check it has at least one attribute defined.
+	attr, _ := f.Body.JustAttributes()
+
+	return len(attr) > 0
 }
 
 func hasDefaultVarFileExtension(name string) bool {
@@ -1478,22 +1494,17 @@ func hasDefaultVarFileExtension(name string) bool {
 	return false
 }
 
-// splitExtension splits the extension from a file name. It will return the file name
-// without the extension and the extension itself. If the file name does not have an
-// extension it will return the original file name and an empty string.
-func splitExtension(fileName string, extensions []string) (string, string) {
+// splitVarFileExt splits the var file extension (.tfvar, .tfvar.json, etc) from a file name.
+// It will return the file name without the extension and the extension itself. If the file name
+// does not have a valid var file extension it will return the original file name and an empty string.
+//
+// The valid extensions should be passed in by the caller sorted by preference.
+func splitVarFileExt(fileName string, sortedExts []string) (string, string) {
 	if len(fileName) == 0 {
 		return "", ""
 	}
 
-	// Sort the extensions by length so that we can match the longest extension first.
-	sorted := make([]string, len(extensions))
-	copy(sorted, extensions)
-	sort.Slice(sorted, func(i, j int) bool {
-		return len(sorted[i]) > len(sorted[j])
-	})
-
-	for _, ext := range sorted {
+	for _, ext := range sortedExts {
 		if strings.HasSuffix(fileName, ext) {
 			return fileName[:len(fileName)-len(ext)], ext
 		}
@@ -1508,11 +1519,13 @@ func hasVarFileExtension(fileName string, extensions []string) bool {
 		return false
 	}
 
-	_, ext := splitExtension(fileName, extensions)
-	if ext != "" {
+	_, varFileExt := splitVarFileExt(fileName, extensions)
+	if varFileExt != "" {
 		return true
 	}
 
+	// Check if a "" extension is allowed. This means we allowed var files to be in files
+	// without an extension such as `prod` or `dev`.
 	blankExtensionAllowed := false
 	for _, e := range extensions {
 		if e == "" {
@@ -1521,8 +1534,8 @@ func hasVarFileExtension(fileName string, extensions []string) bool {
 		}
 	}
 
-	// Check if there's a dot in the filename, but ignore the first character as we don't want to match hidden files.
-	if ext == "" && blankExtensionAllowed && !strings.Contains(fileName[1:], ".") {
+	// If the file has no extension and we allow blank extensions we return true.
+	if filepath.Ext(fileName) == "" && blankExtensionAllowed {
 		return true
 	}
 
