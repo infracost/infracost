@@ -71,7 +71,7 @@ resource_type_default_usage:
     wml_class3_ru: 20
     wa_instance: 1
     wa_monthly_active_users: 1001
-    wa_voice_users: 101
+    wa_monthly_voice_users: 101
     wd_instance: 1
     wd_documents: 11000
     wd_queries: 11000
@@ -1299,11 +1299,15 @@ resource_usage:
     monitoring_api_call: 1000 # Additional API calls above the base 1M/instance
     monitoring_timeseries_hour: 1000 # Additional time-series cost above the base 1000/host
     continuousdelivery_authorized_users: 10 # Number of authorized users to the CD instance and its managed toolchains
+
+  ibm_resource_instance.watson_machine_learning_standard:
     wml_capacity_unit_hour: 20 # Amount of Capacity Unit-Hours used in a month
-    wml_instance: 1 # The number of instances used per month where each instance includes 2500 CUHs
+    wml_instance: 1 # The number of instances per month where each instance includes 2500 CUHs
     wml_class1_ru: 20 # The number of resource units used for inferencing with class 1 type models where each ru is 1000 tokens
     wml_class2_ru: 20 # The number of resource units used for inferencing with class 2 type models where each ru is 1000 tokens
     wml_class3_ru: 20 # The number of resource units used for inferencing with class 3 type models where each ru is 1000 tokens
+
+  ibm_resource_instance.watson_assistant_plus:
     wa_instance: 1 # The number of instances used per month where each instance includes 1000 monthly active users
     wa_monthly_active_users: 1100 # The number of monthly active users
     wa_monthly_voice_users: 100 # The number of monthly active voice users

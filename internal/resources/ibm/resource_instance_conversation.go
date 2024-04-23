@@ -61,13 +61,19 @@ func GetWACostComponents(r *ResourceInstance) []*schema.CostComponent {
 
 func WAInstanceCostComponent(r *ResourceInstance) *schema.CostComponent {
 	var q *decimal.Decimal
+	var name string
 	if r.WA_Instance != nil {
 		q = decimalPtr(decimal.NewFromFloat(*r.WA_Instance))
 	} else {
 		q = decimalPtr(decimal.NewFromInt(1))
 	}
+	if r.Plan == "enterprise" {
+		name = "Instance (50000 MAU included)"
+	} else {
+		name = "Instance (1000 MAU included)"
+	}
 	return &schema.CostComponent{
-		Name:            "Instance",
+		Name:            name,
 		Unit:            "Instance",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: q,

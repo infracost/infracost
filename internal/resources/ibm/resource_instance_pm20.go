@@ -17,6 +17,7 @@ const CUH_PER_INSTANCE = 2500
 func GetWMLCostComponents(r *ResourceInstance) []*schema.CostComponent {
 	if r.Plan == "v2-professional" {
 		return []*schema.CostComponent{
+			WMLInstanceCostComponent(r),
 			WMLStandardCapacityUnitHoursCostComponent(r),
 			WMLClass1ResourceUnitsCostComponent(r),
 			WMLClass2ResourceUnitsCostComponent(r),
@@ -52,6 +53,32 @@ func GetWMLCostComponents(r *ResourceInstance) []*schema.CostComponent {
 	}
 }
 
+func WMLInstanceCostComponent(r *ResourceInstance) *schema.CostComponent {
+	var q *decimal.Decimal
+	if r.WML_Instance != nil {
+		q = decimalPtr(decimal.NewFromFloat(*r.WML_Instance))
+	} else {
+		q = decimalPtr(decimal.NewFromInt(1))
+	}
+	return &schema.CostComponent{
+		Name:            "Instance (2500 CUH included)",
+		Unit:            "Instance",
+		UnitMultiplier:  decimal.NewFromInt(1),
+		MonthlyQuantity: q,
+		ProductFilter: &schema.ProductFilter{
+			VendorName: strPtr("ibm"),
+			Region:     strPtr(r.Location),
+			Service:    &r.Service,
+			AttributeFilters: []*schema.AttributeFilter{
+				{Key: "planName", Value: &r.Plan},
+			},
+		},
+		PriceFilter: &schema.PriceFilter{
+			Unit: strPtr("INSTANCES"),
+		},
+	}
+}
+
 func WMLEssentialsCapacityUnitHoursCostComponent(r *ResourceInstance) *schema.CostComponent {
 	var q *decimal.Decimal
 	if r.WML_CUH != nil {
@@ -78,9 +105,7 @@ func WMLEssentialsCapacityUnitHoursCostComponent(r *ResourceInstance) *schema.Co
 
 func WMLStandardCapacityUnitHoursCostComponent(r *ResourceInstance) *schema.CostComponent {
 	var q *decimal.Decimal
-	var cuh float64
 	var instance float64
-	var included_cuh float64
 
 	if r.WML_Instance != nil {
 		instance = *r.WML_Instance
@@ -88,20 +113,17 @@ func WMLStandardCapacityUnitHoursCostComponent(r *ResourceInstance) *schema.Cost
 		instance = 1
 	}
 	if r.WML_CUH != nil {
-		cuh = *r.WML_CUH
 
 		// standard plan is billed a fixed amount for each instance, which includes 2500 CUH's per instance.
 		// if the used CUH exceeds the included quantity, the overage is charged at a flat rate.
-		included_cuh = instance * CUH_PER_INSTANCE
-		if cuh > included_cuh {
-			q = decimalPtr(decimal.NewFromFloat(cuh))
-		} else {
-			q = decimalPtr(decimal.NewFromFloat(included_cuh))
+		additional_cuh := *r.WML_CUH - (CUH_PER_INSTANCE * instance)
+		if additional_cuh > 0 {
+			q = decimalPtr(decimal.NewFromFloat(additional_cuh))
 		}
 	}
 
 	return &schema.CostComponent{
-		Name:            "Capacity Unit-Hours",
+		Name:            "Additional Capacity Unit-Hours",
 		Unit:            "CUH",
 		UnitMultiplier:  decimal.NewFromInt(1),
 		MonthlyQuantity: q,

@@ -75,7 +75,7 @@
  └─ Active Secrets                                                                         400  Secrets                               $86.00 
                                                                                                                                              
  ibm_resource_instance.wa_instance_enterprise                                                                                                
- ├─ Instance                                                                                 1  Instance                           $6,000.00 
+ ├─ Instance (50000 MAU included)                                                            1  Instance                           $6,000.00 
  ├─ Additional Monthly Active Users                                                          1  1K MAU                               $120.00 
  └─ Monthly Active Users using voice                                                         1  1K MAU                                $90.00 
                                                                                                                                              
@@ -83,7 +83,7 @@
  └─ Lite plan                                                                                1                                         $0.00 
                                                                                                                                              
  ibm_resource_instance.wa_instance_plus                                                                                                      
- ├─ Instance                                                                                 1  Instance                             $140.00 
+ ├─ Instance (1000 MAU included)                                                             1  Instance                             $140.00 
  ├─ Additional Monthly Active Users                                                         10  100 MAU                              $140.00 
  └─ Monthly Active Users using voice                                                         1  100 MAU                                $9.00 
                                                                                                                                              
@@ -112,7 +112,8 @@
  └─ Lite plan                                                                                1                                         $0.00 
                                                                                                                                              
  ibm_resource_instance.wml_instance_standard                                                                                                 
- ├─ Capacity Unit-Hours                                                                  2,500  CUH                                $1,050.00 
+ ├─ Instance (2500 CUH included)                                                             1  Instance                           $1,050.00 
+ ├─ Additional Capacity Unit-Hours                                       Monthly cost depends on usage: $0.42 per CUH                        
  ├─ Class 1 Resource Units                                                                  50  RU                                     $0.03 
  ├─ Class 2 Resource Units                                                                  50  RU                                     $0.09 
  └─ Class 3 Resource Units                                                                  50  RU                                     $0.25 

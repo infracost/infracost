@@ -51,11 +51,11 @@ resource_usage:
   ibm_resource_instance.wa_instance_plus:
     wa_instance: 1
     wa_monthly_active_users: 2000
-    wa_voice_users: 100
+    wa_monthly_voice_users: 100
   ibm_resource_instance.wa_instance_enterprise:
     wa_instance: 1
     wa_monthly_active_users: 51000
-    wa_voice_users: 1000
+    wa_monthly_voice_users: 1000
 
   ibm_resource_instance.watson_discovery_plus:
     wd_instance: 1 # Number of instances used per month
