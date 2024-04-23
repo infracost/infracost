@@ -51,6 +51,6 @@ Err:
 
 
 Logs:
-WARN 4 aws_instance prices missing across 2 resources
-     2 aws_db_instance prices missing across 1 resource
+WARN 2 aws_instance prices missing across 2 resources
+     1 aws_db_instance price missing across 1 resource
 

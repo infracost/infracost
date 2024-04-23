@@ -104,7 +104,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 
 	// write an aggregate log line of cost components that have
 	// missing prices if any have been found.
-	prices.NotFoundComponents.Log(runCtx)
+	pr.pricingFetcher.LogWarnings()
 
 	projects := make([]*schema.Project, 0)
 	projectContexts := make([]*config.ProjectContext, 0)
@@ -166,7 +166,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		runCtx.ContextValues.SetValue("lineCount", lines)
 	}
 
-	env := buildRunEnv(runCtx, projectContexts, r)
+	env := pr.buildRunEnv(projectContexts, r)
 
 	pricingClient := apiclient.GetPricingAPIClient(runCtx)
 	err = pricingClient.AddEvent("infracost-run", env)
@@ -193,11 +193,12 @@ type projectOutput struct {
 }
 
 type parallelRunner struct {
-	cmd         *cobra.Command
-	runCtx      *config.RunContext
-	pathMuxs    map[string]*sync.Mutex
-	prior       *output.Root
-	parallelism int
+	cmd            *cobra.Command
+	runCtx         *config.RunContext
+	pathMuxs       map[string]*sync.Mutex
+	prior          *output.Root
+	parallelism    int
+	pricingFetcher *prices.PriceFetcher
 }
 
 func newParallelRunner(cmd *cobra.Command, runCtx *config.RunContext) (*parallelRunner, error) {
@@ -228,11 +229,12 @@ func newParallelRunner(cmd *cobra.Command, runCtx *config.RunContext) (*parallel
 	runCtx.ContextValues.SetValue("parallelism", parallelism)
 
 	return &parallelRunner{
-		parallelism: parallelism,
-		runCtx:      runCtx,
-		cmd:         cmd,
-		pathMuxs:    pathMuxs,
-		prior:       prior,
+		parallelism:    parallelism,
+		runCtx:         runCtx,
+		cmd:            cmd,
+		pathMuxs:       pathMuxs,
+		prior:          prior,
+		pricingFetcher: prices.NewPriceFetcher(runCtx),
 	}, nil
 }
 
@@ -513,7 +515,7 @@ func (r *parallelRunner) runProvider(job projectJob) (out *projectOutput, err er
 	logging.Logger.Debug().Msg("Retrieving cloud prices to calculate costs")
 
 	for _, project := range projects {
-		if err = prices.PopulatePrices(r.runCtx, project); err != nil {
+		if err = r.pricingFetcher.PopulatePrices(project); err != nil {
 			logging.Logger.Debug().Err(err).Msgf("failed to populate prices for project %s", project.Name)
 			r.cmd.PrintErrln()
 
@@ -891,13 +893,13 @@ func checkRunConfig(warningWriter io.Writer, cfg *config.Config) error {
 	return nil
 }
 
-func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectContext, r output.Root) map[string]interface{} {
-	env := runCtx.EventEnvWithProjectContexts(projectContexts)
+func (r *parallelRunner) buildRunEnv(projectContexts []*config.ProjectContext, or output.Root) map[string]interface{} {
+	env := r.runCtx.EventEnvWithProjectContexts(projectContexts)
 
-	env["runId"] = r.RunID
+	env["runId"] = or.RunID
 	env["projectCount"] = len(projectContexts)
-	env["runSeconds"] = time.Now().Unix() - runCtx.StartTime
-	env["currency"] = runCtx.Config.Currency
+	env["runSeconds"] = time.Now().Unix() - r.runCtx.StartTime
+	env["currency"] = r.runCtx.Config.Currency
 
 	usingCache := make([]bool, 0, len(projectContexts))
 	cacheErrors := make([]string, 0, len(projectContexts))
@@ -908,7 +910,7 @@ func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectCon
 	env["usingCache"] = usingCache
 	env["cacheErrors"] = cacheErrors
 
-	summary := r.FullSummary
+	summary := or.FullSummary
 	env["supportedResourceCounts"] = summary.SupportedResourceCounts
 	env["unsupportedResourceCounts"] = summary.UnsupportedResourceCounts
 	env["noPriceResourceCounts"] = summary.NoPriceResourceCounts
@@ -922,11 +924,11 @@ func buildRunEnv(runCtx *config.RunContext, projectContexts []*config.ProjectCon
 	env["totalEstimatedUsages"] = summary.TotalEstimatedUsages
 	env["totalUnestimatedUsages"] = summary.TotalUnestimatedUsages
 
-	if prices.NotFoundComponents.Len() > 0 {
-		env["pricesNotFound"] = prices.NotFoundComponents.Components()
+	if r.pricingFetcher.MissingPricesLen() > 0 {
+		env["pricesNotFound"] = r.pricingFetcher.MissingPricesComponents()
 	}
 
-	if n := r.ExampleProjectName(); n != "" {
+	if n := or.ExampleProjectName(); n != "" {
 		env["exampleProjectName"] = n
 	}
 

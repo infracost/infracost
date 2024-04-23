@@ -21,12 +21,7 @@ import (
 )
 
 var (
-	batchSize          = 5
-	NotFoundComponents = &notFound{
-		resources:  make(map[string]*notFoundData),
-		mux:        &sync.RWMutex{},
-		components: map[string]int{},
-	}
+	batchSize = 5
 )
 
 // notFoundData represents a single price not found entry
@@ -36,17 +31,29 @@ type notFoundData struct {
 	Count         int
 }
 
-// notFound provides a thread-safe way to aggregate 'price not found'
+// PriceFetcher provides a thread-safe way to aggregate 'price not found'
 // data. This is used to provide a summary of missing prices at the end of a run.
 // It should be used as a singleton which is shared across the application.
-type notFound struct {
+type PriceFetcher struct {
 	resources  map[string]*notFoundData
 	components map[string]int
 	mux        *sync.RWMutex
+	client     *apiclient.PricingAPIClient
+	runCtx     *config.RunContext
 }
 
-// Add adds an instance of a missing price to the aggregator.
-func (p *notFound) Add(result apiclient.PriceQueryResult) {
+func NewPriceFetcher(ctx *config.RunContext) *PriceFetcher {
+	return &PriceFetcher{
+		resources:  make(map[string]*notFoundData),
+		components: make(map[string]int),
+		mux:        &sync.RWMutex{},
+		runCtx:     ctx,
+		client:     apiclient.NewPricingAPIClient(ctx),
+	}
+}
+
+// addNotFoundResult adds an instance of a missing price to the aggregator.
+func (p *PriceFetcher) addNotFoundResult(result apiclient.PriceQueryResult) {
 	p.mux.Lock()
 	defer p.mux.Unlock()
 
@@ -103,26 +110,26 @@ func (p *notFound) Add(result apiclient.PriceQueryResult) {
 	result.CostComponent.SetPriceNotFound()
 }
 
-// Components returns a map of missing prices by component name, component
+// MissingPricesComponents returns a map of missing prices by component name, component
 // names are in the format: resource_type.cost_component_name.
-func (p *notFound) Components() map[string]int {
+func (p *PriceFetcher) MissingPricesComponents() map[string]int {
 	p.mux.RLock()
 	defer p.mux.RUnlock()
 
 	return p.components
 }
 
-// Len returns the number of missing prices.
-func (p *notFound) Len() int {
+// MissingPricesLen returns the number of missing prices.
+func (p *PriceFetcher) MissingPricesLen() int {
 	p.mux.RLock()
 	defer p.mux.RUnlock()
 
 	return len(p.resources)
 }
 
-// Log writes the notFound prices to the application log. If the log level is
+// LogWarnings writes the PriceFetcher prices to the application log. If the log level is
 // above the debug level we also include resource names the log output.
-func (p *notFound) Log(ctx *config.RunContext) {
+func (p *PriceFetcher) LogWarnings() {
 	p.mux.RLock()
 	defer p.mux.RUnlock()
 	if len(p.resources) == 0 {
@@ -137,7 +144,7 @@ func (p *notFound) Log(ctx *config.RunContext) {
 		return data[i].Count > data[j].Count
 	})
 
-	level, _ := zerolog.ParseLevel(ctx.Config.LogLevel)
+	level, _ := zerolog.ParseLevel(p.runCtx.Config.LogLevel)
 	includeResourceNames := level <= zerolog.DebugLevel
 
 	s := strings.Builder{}
@@ -154,7 +161,7 @@ func (p *notFound) Log(ctx *config.RunContext) {
 			resourceDesc = "resources"
 		}
 
-		formattedResourceMsg := ui.FormatIfNotCI(ctx, ui.WarningString, v.ResourceType)
+		formattedResourceMsg := ui.FormatIfNotCI(p.runCtx, ui.WarningString, v.ResourceType)
 		msg := fmt.Sprintf("%d %s %s missing across %d %s\n", v.Count, formattedResourceMsg, priceDesc, len(v.ResourceNames), resourceDesc)
 
 		// pad the next warning line so that it appears inline with the last warning.
@@ -165,7 +172,7 @@ func (p *notFound) Log(ctx *config.RunContext) {
 
 		if includeResourceNames {
 			for _, resourceName := range v.ResourceNames {
-				name := ui.FormatIfNotCI(ctx, ui.UnderlineString, resourceName)
+				name := ui.FormatIfNotCI(p.runCtx, ui.UnderlineString, resourceName)
 				s.WriteString(fmt.Sprintf("%s%s- %s \n", warningPad, resourcePad, name))
 			}
 		}
@@ -174,22 +181,20 @@ func (p *notFound) Log(ctx *config.RunContext) {
 	logging.Logger.Warn().Msg(s.String())
 }
 
-func PopulatePrices(ctx *config.RunContext, project *schema.Project) error {
+func (p *PriceFetcher) PopulatePrices(project *schema.Project) error {
 	resources := project.AllResources()
 
-	c := apiclient.GetPricingAPIClient(ctx)
-
-	err := GetPricesConcurrent(ctx, c, resources)
+	err := p.getPricesConcurrent(resources)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-// GetPricesConcurrent gets the prices of all resources concurrently.
+// getPricesConcurrent gets the prices of all resources concurrently.
 // Concurrency level is calculated using the following formula:
 // max(min(4, numCPU * 4), 16)
-func GetPricesConcurrent(ctx *config.RunContext, c *apiclient.PricingAPIClient, resources []*schema.Resource) error {
+func (p *PriceFetcher) getPricesConcurrent(resources []*schema.Resource) error {
 	// Set the number of workers
 	numWorkers := 4
 	numCPU := runtime.NumCPU()
@@ -200,7 +205,7 @@ func GetPricesConcurrent(ctx *config.RunContext, c *apiclient.PricingAPIClient, 
 		numWorkers = 16
 	}
 
-	reqs := c.BatchRequests(resources, batchSize)
+	reqs := p.client.BatchRequests(resources, batchSize)
 
 	numJobs := len(reqs)
 	jobs := make(chan apiclient.BatchRequest, numJobs)
@@ -210,7 +215,7 @@ func GetPricesConcurrent(ctx *config.RunContext, c *apiclient.PricingAPIClient, 
 	for i := 0; i < numWorkers; i++ {
 		go func(jobs <-chan apiclient.BatchRequest, resultErrors chan<- error) {
 			for req := range jobs {
-				err := GetPrices(ctx, c, req)
+				err := p.getPrices(req)
 				resultErrors <- err
 			}
 		}(jobs, resultErrors)
@@ -231,21 +236,23 @@ func GetPricesConcurrent(ctx *config.RunContext, c *apiclient.PricingAPIClient, 
 	return nil
 }
 
-func GetPrices(ctx *config.RunContext, c *apiclient.PricingAPIClient, req apiclient.BatchRequest) error {
-	results, err := c.PerformRequest(req)
+func (p *PriceFetcher) getPrices(req apiclient.BatchRequest) error {
+	results, err := p.client.PerformRequest(req)
 	if err != nil {
 		return err
 	}
 
 	for _, r := range results {
-		setCostComponentPrice(ctx, c.Currency, r)
+		p.setCostComponentPrice(r)
 	}
 
 	return nil
 }
 
-func setCostComponentPrice(ctx *config.RunContext, currency string, result apiclient.PriceQueryResult) {
-	var p decimal.Decimal
+func (p *PriceFetcher) setCostComponentPrice(result apiclient.PriceQueryResult) {
+	currency := p.client.Currency
+
+	var pp decimal.Decimal
 	if result.CostComponent.CustomPrice() != nil {
 		logging.Logger.Debug().Msgf("Using user-defined custom price %v for %s %s.", *result.CostComponent.CustomPrice(), result.Resource.Name, result.CostComponent.Name)
 		result.CostComponent.SetPrice(*result.CostComponent.CustomPrice())
@@ -260,7 +267,7 @@ func setCostComponentPrice(ctx *config.RunContext, currency string, result apicl
 			return
 		}
 
-		NotFoundComponents.Add(result)
+		p.addNotFoundResult(result)
 		return
 	}
 
@@ -287,7 +294,7 @@ func setCostComponentPrice(ctx *config.RunContext, currency string, result apicl
 			return
 		}
 
-		NotFoundComponents.Add(result)
+		p.addNotFoundResult(result)
 		return
 	}
 
@@ -301,13 +308,13 @@ func setCostComponentPrice(ctx *config.RunContext, currency string, result apicl
 	}
 
 	var err error
-	p, err = decimal.NewFromString(prices[0].Get(currency).String())
+	pp, err = decimal.NewFromString(prices[0].Get(currency).String())
 	if err != nil {
 		logging.Logger.Warn().Msgf("Error converting price to '%v' (using 0.00)  '%v': %s", currency, prices[0].Get(currency).String(), err.Error())
 		result.CostComponent.SetPrice(decimal.Zero)
 		return
 	}
 
-	result.CostComponent.SetPrice(p)
+	result.CostComponent.SetPrice(pp)
 	result.CostComponent.SetPriceHash(prices[0].Get("priceHash").String())
 }

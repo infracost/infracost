@@ -46,17 +46,17 @@ func Test_notFound_Add(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p := &notFound{
+			p := &PriceFetcher{
 				resources:  make(map[string]*notFoundData),
 				components: make(map[string]int),
 				mux:        &sync.RWMutex{},
 			}
 			for _, res := range tt.args.results {
-				p.Add(res)
+				p.addNotFoundResult(res)
 
 			}
 
-			actual := p.Components()
+			actual := p.MissingPricesComponents()
 			assert.Equal(t, tt.want, actual)
 		})
 	}

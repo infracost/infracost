@@ -343,8 +343,9 @@ func loadResources(t *testing.T, pName string, tfProject TerraformProject, runCt
 }
 
 func RunCostCalculations(runCtx *config.RunContext, projects []*schema.Project) ([]*schema.Project, error) {
+	pf := prices.NewPriceFetcher(runCtx)
 	for _, project := range projects {
-		err := prices.PopulatePrices(runCtx, project)
+		err := pf.PopulatePrices(project)
 		if err != nil {
 			return projects, err
 		}
