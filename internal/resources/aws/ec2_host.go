@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
 
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -58,7 +58,7 @@ func (r *EC2Host) BuildResource() *schema.Resource {
 		priceFilter, err = resolver.PriceFilter()
 
 		if err != nil {
-			log.Warn().Msgf(err.Error())
+			logging.Logger.Warn().Msgf(err.Error())
 		}
 
 		purchaseOptionLabel = "reserved"

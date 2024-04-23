@@ -2,8 +2,8 @@ package azure
 
 import (
 	duration "github.com/channelmeter/iso8601duration"
-	"github.com/rs/zerolog/log"
 
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources/azure"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -24,7 +24,7 @@ func newMonitorScheduledQueryRulesAlertV2(d *schema.ResourceData) schema.CoreRes
 	freq := int64(1)
 	ef, err := duration.FromString(d.Get("evaluation_frequency").String())
 	if err != nil {
-		log.Warn().Str(
+		logging.Logger.Warn().Str(
 			"resource", d.Address,
 		).Msgf("failed to parse ISO8061 duration string '%s' using 1 minute frequency", d.Get("evaluation_frequency").String())
 	} else {

@@ -3,9 +3,9 @@ package google
 import (
 	"fmt"
 
-	"github.com/rs/zerolog/log"
 	"github.com/tidwall/gjson"
 
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources/google"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -58,7 +58,7 @@ func newContainerCluster(d *schema.ResourceData) schema.CoreResource {
 		nameIndex := 0
 		for _, values := range d.Get("node_pool").Array() {
 			if contains(definedNodePoolNames, values.Get("name").String()) {
-				log.Debug().Msgf("Skipping node pool with name %s since it is defined in another resource", values.Get("name").String())
+				logging.Logger.Debug().Msgf("Skipping node pool with name %s since it is defined in another resource", values.Get("name").String())
 				continue
 			}
 

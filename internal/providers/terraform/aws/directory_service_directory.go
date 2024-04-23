@@ -4,8 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/rs/zerolog/log"
-
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources/aws"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -23,7 +22,7 @@ func newDirectoryServiceDirectory(d *schema.ResourceData) schema.CoreResource {
 	region := d.Get("region").String()
 	regionName, ok := aws.RegionMapping[region]
 	if !ok {
-		log.Warn().Msgf("Could not find mapping for resource %s region %s", d.Address, region)
+		logging.Logger.Warn().Msgf("Could not find mapping for resource %s region %s", d.Address, region)
 	}
 
 	a := &aws.DirectoryServiceDirectory{

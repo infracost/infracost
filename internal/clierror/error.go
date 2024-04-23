@@ -9,7 +9,8 @@ import (
 	"strings"
 
 	"github.com/maruel/panicparse/v2/stack"
-	"github.com/rs/zerolog/log"
+
+	"github.com/infracost/infracost/internal/logging"
 )
 
 var goroutineSuffixRegex = regexp.MustCompile(`(goroutine)\s*\d+$`)
@@ -70,7 +71,7 @@ func (p *PanicError) SanitizedStack() string {
 	sanitizedStack := p.stack
 	sanitizedStack, err := processStack(sanitizedStack)
 	if err != nil {
-		log.Debug().Msgf("Could not sanitize stack: %s", err)
+		logging.Logger.Debug().Msgf("Could not sanitize stack: %s", err)
 	}
 
 	return string(sanitizedStack)

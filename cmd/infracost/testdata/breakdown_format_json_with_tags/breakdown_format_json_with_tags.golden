@@ -14,6 +14,7 @@
   "projects": [
     {
       "name": "infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags",
+      "displayName": "main",
       "metadata": {
         "path": "testdata/breakdown_format_json_with_tags",
         "type": "terraform_dir",
@@ -67,7 +68,8 @@
                 "monthlyQuantity": "730",
                 "price": "0.768",
                 "hourlyCost": "0.768",
-                "monthlyCost": "560.64"
+                "monthlyCost": "560.64",
+                "priceNotFound": false
               }
             ],
             "subresources": [
@@ -84,7 +86,8 @@
                     "monthlyQuantity": "50",
                     "price": "0.1",
                     "hourlyCost": "0.00684931506849315",
-                    "monthlyCost": "5"
+                    "monthlyCost": "5",
+                    "priceNotFound": false
                   }
                 ]
               },
@@ -101,7 +104,8 @@
                     "monthlyQuantity": "1000",
                     "price": "0.125",
                     "hourlyCost": "0.1712328767123287625",
-                    "monthlyCost": "125"
+                    "monthlyCost": "125",
+                    "priceNotFound": false
                   },
                   {
                     "name": "Provisioned IOPS",
@@ -110,7 +114,8 @@
                     "monthlyQuantity": "800",
                     "price": "0.065",
                     "hourlyCost": "0.0712328767123287665",
-                    "monthlyCost": "52"
+                    "monthlyCost": "52",
+                    "priceNotFound": false
                   }
                 ]
               }
@@ -150,7 +155,8 @@
                 "monthlyQuantity": "730",
                 "price": "0.768",
                 "hourlyCost": "0.768",
-                "monthlyCost": "560.64"
+                "monthlyCost": "560.64",
+                "priceNotFound": false
               }
             ],
             "subresources": [
@@ -167,7 +173,8 @@
                     "monthlyQuantity": "50",
                     "price": "0.1",
                     "hourlyCost": "0.00684931506849315",
-                    "monthlyCost": "5"
+                    "monthlyCost": "5",
+                    "priceNotFound": false
                   }
                 ]
               },
@@ -184,7 +191,8 @@
                     "monthlyQuantity": "1000",
                     "price": "0.125",
                     "hourlyCost": "0.1712328767123287625",
-                    "monthlyCost": "125"
+                    "monthlyCost": "125",
+                    "priceNotFound": false
                   },
                   {
                     "name": "Provisioned IOPS",
@@ -193,7 +201,8 @@
                     "monthlyQuantity": "800",
                     "price": "0.065",
                     "hourlyCost": "0.0712328767123287665",
-                    "monthlyCost": "52"
+                    "monthlyCost": "52",
+                    "priceNotFound": false
                   }
                 ]
               }
@@ -236,7 +245,8 @@
                     "monthlyQuantity": "2920",
                     "price": "0.0441",
                     "hourlyCost": "0.1764",
-                    "monthlyCost": "128.772"
+                    "monthlyCost": "128.772",
+                    "priceNotFound": false
                   },
                   {
                     "name": "EC2 detailed monitoring",
@@ -245,7 +255,8 @@
                     "monthlyQuantity": "28",
                     "price": "0.3",
                     "hourlyCost": "0.01150684931506848",
-                    "monthlyCost": "8.4"
+                    "monthlyCost": "8.4",
+                    "priceNotFound": false
                   },
                   {
                     "name": "CPU credits",
@@ -254,7 +265,8 @@
                     "monthlyQuantity": "0",
                     "price": "0.05",
                     "hourlyCost": "0",
-                    "monthlyCost": "0"
+                    "monthlyCost": "0",
+                    "priceNotFound": false
                   }
                 ],
                 "subresources": [
@@ -271,7 +283,8 @@
                         "monthlyQuantity": "40",
                         "price": "0.125",
                         "hourlyCost": "0.00684931506849315",
-                        "monthlyCost": "5"
+                        "monthlyCost": "5",
+                        "priceNotFound": false
                       },
                       {
                         "name": "Provisioned IOPS",
@@ -280,7 +293,8 @@
                         "monthlyQuantity": "400",
                         "price": "0.065",
                         "hourlyCost": "0.0356164383561643865",
-                        "monthlyCost": "26"
+                        "monthlyCost": "26",
+                        "priceNotFound": false
                       }
                     ]
                   }
@@ -323,7 +337,8 @@
                 "monthlyQuantity": "730",
                 "price": "0.0441",
                 "hourlyCost": "0.0441",
-                "monthlyCost": "32.193"
+                "monthlyCost": "32.193",
+                "priceNotFound": false
               },
               {
                 "name": "EC2 detailed monitoring",
@@ -332,7 +347,8 @@
                 "monthlyQuantity": "7",
                 "price": "0.3",
                 "hourlyCost": "0.00287671232876712",
-                "monthlyCost": "2.1"
+                "monthlyCost": "2.1",
+                "priceNotFound": false
               },
               {
                 "name": "CPU credits",
@@ -341,7 +357,8 @@
                 "monthlyQuantity": "0",
                 "price": "0.05",
                 "hourlyCost": "0",
-                "monthlyCost": "0"
+                "monthlyCost": "0",
+                "priceNotFound": false
               }
             ],
             "subresources": [
@@ -358,7 +375,8 @@
                     "monthlyQuantity": "8",
                     "price": "0.1",
                     "hourlyCost": "0.0010958904109589",
-                    "monthlyCost": "0.8"
+                    "monthlyCost": "0.8",
+                    "priceNotFound": false
                   }
                 ]
               },
@@ -375,7 +393,8 @@
                     "monthlyQuantity": "10",
                     "price": "0.125",
                     "hourlyCost": "0.0017123287671232875",
-                    "monthlyCost": "1.25"
+                    "monthlyCost": "1.25",
+                    "priceNotFound": false
                   },
                   {
                     "name": "Provisioned IOPS",
@@ -384,7 +403,8 @@
                     "monthlyQuantity": "100",
                     "price": "0.065",
                     "hourlyCost": "0.008904109589041095",
-                    "monthlyCost": "6.5"
+                    "monthlyCost": "6.5",
+                    "priceNotFound": false
                   }
                 ]
               }
@@ -437,7 +457,8 @@
                 "price": "0.6",
                 "hourlyCost": null,
                 "monthlyCost": null,
-                "usageBased": true
+                "usageBased": true,
+                "priceNotFound": false
               }
             ]
           },
@@ -471,7 +492,8 @@
                 "price": "0.6",
                 "hourlyCost": null,
                 "monthlyCost": null,
-                "usageBased": true
+                "usageBased": true,
+                "priceNotFound": false
               }
             ]
           },
@@ -506,7 +528,8 @@
                 "price": "0.4",
                 "hourlyCost": null,
                 "monthlyCost": null,
-                "usageBased": true
+                "usageBased": true,
+                "priceNotFound": false
               }
             ]
           },
@@ -542,7 +565,8 @@
                 "price": "0.4",
                 "hourlyCost": null,
                 "monthlyCost": null,
-                "usageBased": true
+                "usageBased": true,
+                "priceNotFound": false
               }
             ]
           }
@@ -615,7 +639,8 @@
                 "monthlyQuantity": "730",
                 "price": "0.768",
                 "hourlyCost": "0.768",
-                "monthlyCost": "560.64"
+                "monthlyCost": "560.64",
+                "priceNotFound": false
               }
             ],
             "subresources": [
@@ -632,7 +657,8 @@
                     "monthlyQuantity": "50",
                     "price": "0.1",
                     "hourlyCost": "0.00684931506849315",
-                    "monthlyCost": "5"
+                    "monthlyCost": "5",
+                    "priceNotFound": false
                   }
                 ]
               },
@@ -649,7 +675,8 @@
                     "monthlyQuantity": "1000",
                     "price": "0.125",
                     "hourlyCost": "0.1712328767123287625",
-                    "monthlyCost": "125"
+                    "monthlyCost": "125",
+                    "priceNotFound": false
                   },
                   {
                     "name": "Provisioned IOPS",
@@ -658,7 +685,8 @@
                     "monthlyQuantity": "800",
                     "price": "0.065",
                     "hourlyCost": "0.0712328767123287665",
-                    "monthlyCost": "52"
+                    "monthlyCost": "52",
+                    "priceNotFound": false
                   }
                 ]
               }
@@ -698,7 +726,8 @@
                 "monthlyQuantity": "730",
                 "price": "0.768",
                 "hourlyCost": "0.768",
-                "monthlyCost": "560.64"
+                "monthlyCost": "560.64",
+                "priceNotFound": false
               }
             ],
             "subresources": [
@@ -715,7 +744,8 @@
                     "monthlyQuantity": "50",
                     "price": "0.1",
                     "hourlyCost": "0.00684931506849315",
-                    "monthlyCost": "5"
+                    "monthlyCost": "5",
+                    "priceNotFound": false
                   }
                 ]
               },
@@ -732,7 +762,8 @@
                     "monthlyQuantity": "1000",
                     "price": "0.125",
                     "hourlyCost": "0.1712328767123287625",
-                    "monthlyCost": "125"
+                    "monthlyCost": "125",
+                    "priceNotFound": false
                   },
                   {
                     "name": "Provisioned IOPS",
@@ -741,7 +772,8 @@
                     "monthlyQuantity": "800",
                     "price": "0.065",
                     "hourlyCost": "0.0712328767123287665",
-                    "monthlyCost": "52"
+                    "monthlyCost": "52",
+                    "priceNotFound": false
                   }
                 ]
               }
@@ -784,7 +816,8 @@
                     "monthlyQuantity": "2920",
                     "price": "0.0441",
                     "hourlyCost": "0.1764",
-                    "monthlyCost": "128.772"
+                    "monthlyCost": "128.772",
+                    "priceNotFound": false
                   },
                   {
                     "name": "EC2 detailed monitoring",
@@ -793,7 +826,8 @@
                     "monthlyQuantity": "28",
                     "price": "0.3",
                     "hourlyCost": "0.01150684931506848",
-                    "monthlyCost": "8.4"
+                    "monthlyCost": "8.4",
+                    "priceNotFound": false
                   },
                   {
                     "name": "CPU credits",
@@ -802,7 +836,8 @@
                     "monthlyQuantity": "0",
                     "price": "0.05",
                     "hourlyCost": "0",
-                    "monthlyCost": "0"
+                    "monthlyCost": "0",
+                    "priceNotFound": false
                   }
                 ],
                 "subresources": [
@@ -819,7 +854,8 @@
                         "monthlyQuantity": "40",
                         "price": "0.125",
                         "hourlyCost": "0.00684931506849315",
-                        "monthlyCost": "5"
+                        "monthlyCost": "5",
+                        "priceNotFound": false
                       },
                       {
                         "name": "Provisioned IOPS",
@@ -828,7 +864,8 @@
                         "monthlyQuantity": "400",
                         "price": "0.065",
                         "hourlyCost": "0.0356164383561643865",
-                        "monthlyCost": "26"
+                        "monthlyCost": "26",
+                        "priceNotFound": false
                       }
                     ]
                   }
@@ -871,7 +908,8 @@
                 "monthlyQuantity": "730",
                 "price": "0.0441",
                 "hourlyCost": "0.0441",
-                "monthlyCost": "32.193"
+                "monthlyCost": "32.193",
+                "priceNotFound": false
               },
               {
                 "name": "EC2 detailed monitoring",
@@ -880,7 +918,8 @@
                 "monthlyQuantity": "7",
                 "price": "0.3",
                 "hourlyCost": "0.00287671232876712",
-                "monthlyCost": "2.1"
+                "monthlyCost": "2.1",
+                "priceNotFound": false
               },
               {
                 "name": "CPU credits",
@@ -889,7 +928,8 @@
                 "monthlyQuantity": "0",
                 "price": "0.05",
                 "hourlyCost": "0",
-                "monthlyCost": "0"
+                "monthlyCost": "0",
+                "priceNotFound": false
               }
             ],
             "subresources": [
@@ -906,7 +946,8 @@
                     "monthlyQuantity": "8",
                     "price": "0.1",
                     "hourlyCost": "0.0010958904109589",
-                    "monthlyCost": "0.8"
+                    "monthlyCost": "0.8",
+                    "priceNotFound": false
                   }
                 ]
               },
@@ -923,7 +964,8 @@
                     "monthlyQuantity": "10",
                     "price": "0.125",
                     "hourlyCost": "0.0017123287671232875",
-                    "monthlyCost": "1.25"
+                    "monthlyCost": "1.25",
+                    "priceNotFound": false
                   },
                   {
                     "name": "Provisioned IOPS",
@@ -932,7 +974,8 @@
                     "monthlyQuantity": "100",
                     "price": "0.065",
                     "hourlyCost": "0.008904109589041095",
-                    "monthlyCost": "6.5"
+                    "monthlyCost": "6.5",
+                    "priceNotFound": false
                   }
                 ]
               }
@@ -985,7 +1028,8 @@
                 "price": "0.6",
                 "hourlyCost": null,
                 "monthlyCost": null,
-                "usageBased": true
+                "usageBased": true,
+                "priceNotFound": false
               }
             ]
           },
@@ -1019,7 +1063,8 @@
                 "price": "0.6",
                 "hourlyCost": null,
                 "monthlyCost": null,
-                "usageBased": true
+                "usageBased": true,
+                "priceNotFound": false
               }
             ]
           },
@@ -1054,7 +1099,8 @@
                 "price": "0.4",
                 "hourlyCost": null,
                 "monthlyCost": null,
-                "usageBased": true
+                "usageBased": true,
+                "priceNotFound": false
               }
             ]
           },
@@ -1090,7 +1136,8 @@
                 "price": "0.4",
                 "hourlyCost": null,
                 "monthlyCost": null,
-                "usageBased": true
+                "usageBased": true,
+                "priceNotFound": false
               }
             ]
           }

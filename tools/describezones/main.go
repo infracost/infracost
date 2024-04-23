@@ -15,6 +15,8 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/ec2"
 	"github.com/zclconf/go-cty/cty"
 	"google.golang.org/api/compute/v1"
+
+	"github.com/infracost/infracost/internal/logging"
 )
 
 func main() {
@@ -31,7 +33,7 @@ func main() {
 func describeAWSZones() {
 	cfg, err := config.LoadDefaultConfig(context.Background())
 	if err != nil {
-		log.Fatalf("error loading aws config %s", err)
+		logging.Logger.Fatal().Msgf("error loading aws config %s", err)
 	}
 
 	svc := ec2.NewFromConfig(cfg)
@@ -40,7 +42,7 @@ func describeAWSZones() {
 		AllRegions: aws.Bool(true),
 	})
 	if err != nil {
-		log.Fatalf("error describing ec2 regions %s", err)
+		logging.Logger.Fatal().Msgf("error describing ec2 regions %s", err)
 	}
 	m := make(map[string]map[string]cty.Value)
 	for _, region := range resp.Regions {
@@ -49,7 +51,7 @@ func describeAWSZones() {
 			config.WithRegion(name),
 		)
 		if err != nil {
-			log.Fatal(err)
+			logging.Logger.Fatal().Msg(err.Error())
 		}
 
 		regionalSvc := ec2.NewFromConfig(regionalConf)
@@ -95,13 +97,13 @@ var awsZones = map[string]cty.Value{
 }
 	`)
 	if err != nil {
-		log.Fatalf("failed to create template: %s", err)
+		logging.Logger.Fatal().Msgf("failed to create template: %s", err)
 	}
 
 	buf := bytes.NewBuffer([]byte{})
 	err = tmpl.Execute(buf, m)
 	if err != nil {
-		log.Fatalf("error executing template: %s", err)
+		logging.Logger.Fatal().Msgf("error executing template: %s", err)
 	}
 
 	writeOutput("aws", buf.Bytes())
@@ -111,7 +113,7 @@ func describeGCPZones() {
 
 	computeService, err := compute.NewService(ctx)
 	if err != nil {
-		log.Fatalf("failed to create compute service: %s", err)
+		logging.Logger.Fatal().Msgf("failed to create compute service: %s", err)
 	}
 
 	projectID := "691877312977"
@@ -131,7 +133,7 @@ func describeGCPZones() {
 
 		return nil
 	}); err != nil {
-		log.Fatalf("Failed to list regions: %s", err)
+		logging.Logger.Fatal().Msgf("Failed to list regions: %s", err)
 	}
 
 	tmpl, err := template.New("test").Parse(`
@@ -148,13 +150,13 @@ var gcpZones = map[string]cty.Value{
 }
 	`)
 	if err != nil {
-		log.Fatalf("failed to create template: %s", err)
+		logging.Logger.Fatal().Msgf("failed to create template: %s", err)
 	}
 
 	buf := bytes.NewBuffer([]byte{})
 	err = tmpl.Execute(buf, regions)
 	if err != nil {
-		log.Fatalf("error executing template: %s", err)
+		logging.Logger.Fatal().Msgf("error executing template: %s", err)
 	}
 
 	writeOutput("gcp", buf.Bytes())
@@ -163,16 +165,16 @@ var gcpZones = map[string]cty.Value{
 func writeOutput(provider string, input []byte) {
 	f, err := os.Create("zones_" + provider + ".go")
 	if err != nil {
-		log.Fatalf("could not create output file: %s", err)
+		logging.Logger.Fatal().Msgf("could not create output file: %s", err)
 	}
 
 	formatted, err := format.Source(input)
 	if err != nil {
-		log.Fatalf("could not format output: %s", err)
+		logging.Logger.Fatal().Msgf("could not format output: %s", err)
 	}
 
 	_, err = f.Write(formatted)
 	if err != nil {
-		log.Fatalf("could not write output: %s", err)
+		logging.Logger.Fatal().Msgf("could not write output: %s", err)
 	}
 }

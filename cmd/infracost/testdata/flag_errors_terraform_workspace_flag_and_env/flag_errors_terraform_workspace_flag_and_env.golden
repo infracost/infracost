@@ -1,4 +1,4 @@
-Project: infracost/infracost/examples/terraform
+Project: main-prod
 Workspace: prod
 
  Name                                                           Monthly Qty  Unit                        Monthly Cost   
@@ -27,7 +27,7 @@ Workspace: prod
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ infracost/infracost/examples/terraform             ┃ $743          ┃ $0.00       ┃ $743       ┃
+┃ main-prod                                          ┃ $743          ┃ $0.00       ┃ $743       ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:

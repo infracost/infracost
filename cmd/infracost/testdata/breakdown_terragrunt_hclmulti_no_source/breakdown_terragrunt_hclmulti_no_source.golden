@@ -1,4 +1,4 @@
-Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_hclmulti_no_source/example/dev
+Project: dev
 Module path: dev
 
  Name                                                         Monthly Qty  Unit                        Monthly Cost   
@@ -19,7 +19,7 @@ Module path: dev
  Project total                                                                                               $51.97   
 
 ──────────────────────────────────
-Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_hclmulti_no_source/example/prod
+Project: prod
 Module path: prod
 
  Name                                                           Monthly Qty  Unit                        Monthly Cost   
@@ -47,12 +47,12 @@ Module path: prod
 4 cloud resources were detected:
 ∙ 4 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
-┃ Project                                                          ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...hclmulti_no_source/example/dev ┃ $52           ┃ $0.00       ┃ $52        ┃
-┃ infracost/infracost/cmd/infraco...clmulti_no_source/example/prod ┃ $748          ┃ $0.00       ┃ $748       ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ dev                                                ┃ $52           ┃ $0.00       ┃ $52        ┃
+┃ prod                                               ┃ $748          ┃ $0.00       ┃ $748       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:
 

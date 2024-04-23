@@ -1,4 +1,4 @@
-Project: infracost/infracost/examples/terragrunt/dev
+Project: terragrunt-dev
 Module path: terragrunt/dev
 
  Name                                                         Monthly Qty  Unit                        Monthly Cost   
@@ -19,7 +19,7 @@ Module path: terragrunt/dev
  Project total                                                                                               $51.97   
 
 ──────────────────────────────────
-Project: infracost/infracost/examples/terragrunt/prod
+Project: terragrunt-prod
 Module path: terragrunt/prod
 
  Name                                                           Monthly Qty  Unit                        Monthly Cost   
@@ -50,8 +50,8 @@ Module path: terragrunt/prod
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ infracost/infracost/examples/terragrunt/dev        ┃ $52           ┃ $0.00       ┃ $52        ┃
-┃ infracost/infracost/examples/terragrunt/prod       ┃ $748          ┃ $0.00       ┃ $748       ┃
+┃ terragrunt-dev                                     ┃ $52           ┃ $0.00       ┃ $52        ┃
+┃ terragrunt-prod                                    ┃ $748          ┃ $0.00       ┃ $748       ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:
