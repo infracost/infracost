@@ -207,11 +207,11 @@ func (e *EnvFileMatcher) EnvName(file string) string {
 }
 
 func (e *EnvFileMatcher) hasEnvPrefix(clean string, name string) bool {
-	return strings.HasPrefix(clean, name+"-") || strings.HasPrefix(clean, name+"_")
+	return strings.HasPrefix(clean, name+"-") || strings.HasPrefix(clean, name+"_") || strings.HasPrefix(clean, "."+name)
 }
 
 func (e *EnvFileMatcher) hasEnvSuffix(clean string, name string) bool {
-	return strings.HasSuffix(clean, "_"+name) || strings.HasSuffix(clean, "-"+name)
+	return strings.HasSuffix(clean, "_"+name) || strings.HasSuffix(clean, "-"+name) || strings.HasSuffix(clean, "."+name)
 }
 
 type discoveredProject struct {
@@ -1486,17 +1486,25 @@ func hasDefaultVarFileExtension(name string) bool {
 }
 
 // fullExtension returns the full extension of a file, starting from the first
-// dot in the file name. This is used instead of the builtin filepath.Ext
-// function as the latter only returns the last extension in the file name. For
+// dot in the file name. For hidden file (starting with a dot), the second dot is used.
+// This is used instead of the builtin filepath.Ext function as the latter
+// only returns the last extension in the file name. For
 // example filepath.Ext("file.tfvars.json") would return ".json" instead of
 // ".tfvars.json".
 func fullExtension(fileName string) string {
+	if len(fileName) == 0 {
+		return ""
+	}
+
 	// Find the index of the first dot.
-	dotIndex := strings.Index(fileName, ".")
-	if dotIndex == -1 {
+	// Skip the first character as we don't want to match hidden files.
+	dotIndex := strings.Index(fileName[1:], ".") + 1
+
+	if dotIndex == 0 {
 		// No dot found, return empty string.
 		return ""
 	}
+
 	// Return the substring from the first dot to the end of the string.
 	return fileName[dotIndex:]
 }
