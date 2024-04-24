@@ -1535,7 +1535,10 @@ func hasVarFileExtension(fileName string, extensions []string) bool {
 	}
 
 	// If the file has no extension and we allow blank extensions we return true.
-	if filepath.Ext(fileName) == "" && blankExtensionAllowed {
+	// When checking if the extension is blank we also remove any leading dots from
+	// the file name otherwise filepath.Ext returns the full file name as the extension
+	// for hidden files.
+	if filepath.Ext(strings.TrimPrefix(fileName, ".")) == "" && blankExtensionAllowed {
 		return true
 	}
 
