@@ -68,3 +68,9 @@ resource_usage:
     wd_queries: 101000 # Number of queries documents created; 100,000 included in the Enterprise plan; $5 for every additional 1,000 queries.
     wd_custom_models: 4 # Number of monthly custom models created; 3 included in the Enterprise plan; $500 for every additional custom model.
     wd_collections: 301 # Number of monthly collections created; 300 included in the Enterprise plan. $500 for every additional 100 collections.
+
+  ibm_resource_instance.scc_standard:
+    scc_evaluations: 1000 # Large enough to make sure all decimals are correct
+
+  ibm_resource_instance.scc_trial:
+    scc_evaluations: 1000 # Large enough to make sure any potential cost will be picked up by the test

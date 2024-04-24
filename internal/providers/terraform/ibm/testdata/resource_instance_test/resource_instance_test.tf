@@ -185,6 +185,7 @@ resource "ibm_resource_instance" "wa_instance_enterprise" {
   resource_group_id = "default"
 }
 
+# Watson Discovery
 resource "ibm_resource_instance" "watson_discovery_plus" {
   name              = "wd_plus"
   service           = "discovery"
@@ -197,6 +198,24 @@ resource "ibm_resource_instance" "watson_discovery_enterprise" {
   name              = "wd_enterprise"
   service           = "discovery"
   plan              = "enterprise"
+  location          = "us-south"
+  resource_group_id = "default"
+}
+
+# Security and Compliance Center (SCC)
+
+resource "ibm_resource_instance" "scc_standard" {
+  name              = "scc_standard"
+  service           = "compliance"
+  plan              = "security-compliance-center-standard-plan"
+  location          = "us-south"
+  resource_group_id = "default"
+}
+
+resource "ibm_resource_instance" "scc_trial" {
+  name              = "scc_trial"
+  service           = "compliance"
+  plan              = "security-compliance-center-trial-plan"
   location          = "us-south"
   resource_group_id = "default"
 }

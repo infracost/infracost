@@ -67,13 +67,15 @@ type ResourceInstance struct {
 	// Watson Assistant
 	WA_Instance *float64 `infracost_usage:"wa_instance"`
 	WA_mau      *float64 `infracost_usage:"wa_monthly_active_users"`
-	WA_vu       *float64 `infracost_usage:"wa_voice_users"`
+	WA_vu       *float64 `infracost_usage:"wa_monthly_voice_users"`
 	// Watson Discovery
 	WD_Instance     *float64 `infracost_usage:"wd_instance"`
 	WD_Documents    *float64 `infracost_usage:"wd_documents"`
 	WD_Queries      *float64 `infracost_usage:"wd_queries"`
 	WD_CustomModels *float64 `infracost_usage:"wd_custom_models"`
 	WD_Collections  *float64 `infracost_usage:"wd_collections"`
+	// Security and Compliance Center (SCC)
+	SCC_Evaluations *float64 `infracost_usage:"scc_evaluations"`
 }
 
 type ResourceCostComponentsFunc func(*ResourceInstance) []*schema.CostComponent
@@ -110,12 +112,13 @@ var ResourceInstanceUsageSchema = []*schema.UsageItem{
 	{Key: "wml_class3_ru", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "wa_instance", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "wa_monthly_active_users", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "wa_voice_users", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "wa_monthly_voice_users", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "wd_instance", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "wd_documents", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "wd_queries", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "wd_custom_models", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "wd_collections", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "scc_evaluations", DefaultValue: 0, ValueType: schema.Float64},
 }
 
 var ResourceInstanceCostMap map[string]ResourceCostComponentsFunc = map[string]ResourceCostComponentsFunc{
@@ -131,6 +134,7 @@ var ResourceInstanceCostMap map[string]ResourceCostComponentsFunc = map[string]R
 	"pm-20":               GetWMLCostComponents,
 	"conversation":        GetWACostComponents,
 	"discovery":           GetWDCostComponents,
+	"compliance":          GetSCCCostComponents,
 }
 
 func KMSKeyVersionsFreeCostComponent(r *ResourceInstance) *schema.CostComponent {

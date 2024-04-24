@@ -74,6 +74,12 @@
  ├─ Instance                                                                                 1  Instance                             $321.00 
  └─ Active Secrets                                                                         400  Secrets                               $86.00 
                                                                                                                                              
+ ibm_resource_instance.scc_standard                                                                                                          
+ └─ Evaluations                                                                          1,000  Evaluations                           $13.39 
+                                                                                                                                             
+ ibm_resource_instance.scc_trial                                                                                                             
+ └─ Trial                                                                                    1                                         $0.00 
+                                                                                                                                             
  ibm_resource_instance.wa_instance_enterprise                                                                                                
  ├─ Instance (50000 MAU included)                                                            1  Instance                           $6,000.00 
  ├─ Additional Monthly Active Users                                                          1  1K MAU                               $120.00 
@@ -118,7 +124,7 @@
  ├─ Class 2 Resource Units                                                                  50  RU                                     $0.09 
  └─ Class 3 Resource Units                                                                  50  RU                                     $0.25 
                                                                                                                                              
- OVERALL TOTAL                                                                                                                    $15,460.14 
+ OVERALL TOTAL                                                                                                                    $15,473.53 
 ──────────────────────────────────
-25 cloud resources were detected:
-∙ 25 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+27 cloud resources were detected:
+∙ 27 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
