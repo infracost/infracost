@@ -395,12 +395,35 @@ func isPathInRepo(repoDir string, path string) error {
 		}
 	}
 
+	// ensure the path resolves to the real symlink path
+	path = symlinkPath(path)
+
 	clean := filepath.Clean(repoDir)
 	if repoDir != "" && !strings.HasPrefix(path, clean) {
 		return fmt.Errorf("file %s is not within the repository directory %s", path, repoDir)
 	}
 
 	return nil
+}
+
+// symlinkPath checks the given file path and returns the real path if it is a
+// symlink.
+func symlinkPath(filepathStr string) string {
+	fileInfo, err := os.Lstat(filepathStr)
+	if err != nil {
+		return filepathStr
+	}
+
+	if fileInfo.Mode()&os.ModeSymlink != 0 {
+		realPath, err := filepath.EvalSymlinks(filepathStr)
+		if err != nil {
+			return filepathStr
+		}
+
+		return realPath
+	}
+
+	return filepathStr
 }
 
 func readFileBytes(repoDir, baseDir, path string) ([]byte, error) {

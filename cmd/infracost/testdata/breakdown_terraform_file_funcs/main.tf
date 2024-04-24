@@ -9,6 +9,7 @@ provider "aws" {
 locals {
   files = [
     { name = "cd", file = "instance.json", },
+    { name = "sym", file = "sym-instance.json", },
     { name = "pd", file = "../instance.json", },
     {
       name = "abs",

@@ -31,6 +31,7 @@ resource "aws_instance" "get_aws_caller_identity_arn" {
 locals {
   files = [
     { name = "cd", file = "instance.json", },
+    { name = "sym", file = "sym-instance.json", },
     { name = "pd", file = "../instance.json", },
     {
       name = "abs",
