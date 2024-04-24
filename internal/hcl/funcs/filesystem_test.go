@@ -15,37 +15,44 @@ func TestFile(t *testing.T) {
 	tests := []struct {
 		Path     cty.Value
 		RepoPath string
+		OSFunc   func(t *testing.T)
 		Want     cty.Value
 		Err      bool
 	}{
 		{
 			cty.StringVal("testdata/hello.txt"),
 			"",
+			func(t *testing.T) {},
 			cty.StringVal("Hello World"),
 			false,
 		},
 		{
 			cty.StringVal("testdata/icon.png"),
 			"",
+			func(t *testing.T) {},
 			cty.NilVal,
 			true, // Not valid UTF-8
 		},
 		{
 			cty.StringVal("testdata/missing"),
 			"",
+			func(t *testing.T) {},
 			cty.NilVal,
 			true, // no file exists
 		},
 		{
 			cty.StringVal("testdata/hello.txt"),
 			"/foo/bar",
+			func(t *testing.T) { t.Setenv("INFRACOST_CI_PLATFORM", "github_app") },
 			cty.NilVal,
 			true,
 		},
 	}
 
 	for _, test := range tests {
-		t.Run(fmt.Sprintf("MakeFileFunc(%s, \".\", %#v)", test.RepoPath, test.Path), func(t *testing.T) {
+		t.Run(fmt.Sprintf("MakeFileFunc(%s, \".\", %s#v)", test.RepoPath, test.Path), func(t *testing.T) {
+			test.OSFunc(t)
+
 			fn := MakeFileFunc(test.RepoPath, ".", false)
 			got, err := fn.Call([]cty.Value{test.Path})
 

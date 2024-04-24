@@ -1342,6 +1342,8 @@ func TestBreakdownTerragruntFileFuncs(t *testing.T) {
 		t.Skip("skipping as this test is only designed for GitHub Actions")
 	}
 
+	t.Setenv("INFRACOST_CI_PLATFORM", "github_app")
+
 	testName := testutil.CalcGoldenFileTestdataDirName()
 	dir := path.Join("./testdata", testName)
 	GoldenFileCommandTest(
@@ -1364,6 +1366,8 @@ func TestBreakdownTerraformFileFuncs(t *testing.T) {
 	if os.Getenv("GITHUB_ACTIONS") == "" {
 		t.Skip("skipping as this test is only designed for GitHub Actions")
 	}
+
+	t.Setenv("INFRACOST_CI_PLATFORM", "github_app")
 
 	testName := testutil.CalcGoldenFileTestdataDirName()
 	dir := path.Join("./testdata", testName)

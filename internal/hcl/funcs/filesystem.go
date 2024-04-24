@@ -388,6 +388,12 @@ func openFile(repoDir, baseDir, path string) (*os.File, error) {
 }
 
 func isPathInRepo(repoDir string, path string) error {
+	// isPathInRepo is a no-op when not running in github/gitlab app env.
+	ciPlatform := os.Getenv("INFRACOST_CI_PLATFORM")
+	if ciPlatform != "github_app" && ciPlatform != "gitlab_app" {
+		return nil
+	}
+
 	if filepath.IsAbs(path) && !filepath.IsAbs(repoDir) {
 		repoDirAbs, err := filepath.Abs(repoDir)
 		if err == nil {
