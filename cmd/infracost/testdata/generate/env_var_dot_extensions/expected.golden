@@ -1,0 +1,32 @@
+version: 0.1
+
+projects:
+  - path: apps/bar
+    name: apps-bar-dev
+    terraform_var_files:
+      - ../default.tfvars
+      - ../.dev-custom-ext
+      - ../.config.dev.env.tfvars
+    skip_autodetect: true
+  - path: apps/bar
+    name: apps-bar-prod
+    terraform_var_files:
+      - ../default.tfvars
+      - ../.prod-custom-ext
+      - ../.config.prod.env.tfvars
+    skip_autodetect: true
+  - path: apps/foo
+    name: apps-foo-dev
+    terraform_var_files:
+      - ../default.tfvars
+      - ../.dev-custom-ext
+      - ../.config.dev.env.tfvars
+    skip_autodetect: true
+  - path: apps/foo
+    name: apps-foo-prod
+    terraform_var_files:
+      - ../default.tfvars
+      - ../.prod-custom-ext
+      - ../.config.prod.env.tfvars
+    skip_autodetect: true
+
