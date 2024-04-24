@@ -1336,3 +1336,53 @@ func TestBreakdownNoPricesWarnings(t *testing.T) {
 		nil,
 	)
 }
+
+func TestBreakdownTerragruntFileFuncs(t *testing.T) {
+	if os.Getenv("GITHUB_ACTIONS") == "" {
+		t.Skip("skipping as this test is only designed for GitHub Actions")
+	}
+
+	t.Setenv("INFRACOST_CI_PLATFORM", "github_app")
+
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", dir,
+		},
+		nil,
+		// only run the graph evaluator for these tests as otherwise we can mocked values
+		// in the golden files which cause failures between the hcl/hcl graph tests
+		func(ctx *config.RunContext) {
+			ctx.Config.GraphEvaluator = true
+		},
+	)
+}
+
+func TestBreakdownTerraformFileFuncs(t *testing.T) {
+	if os.Getenv("GITHUB_ACTIONS") == "" {
+		t.Skip("skipping as this test is only designed for GitHub Actions")
+	}
+
+	t.Setenv("INFRACOST_CI_PLATFORM", "github_app")
+
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", dir,
+		},
+		nil,
+		// only run the graph evaluator for these tests as otherwise we can mocked values
+		// in the golden files which cause failures between the hcl/hcl graph tests
+		func(ctx *config.RunContext) {
+			ctx.Config.GraphEvaluator = true
+		},
+	)
+}

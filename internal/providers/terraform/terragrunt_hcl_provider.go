@@ -457,10 +457,23 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 			return
 		},
 		Functions: func(baseDir string) map[string]function.Function {
-			funcs := hcl.ExpFunctions(baseDir, p.logger)
+			repoPath := p.Path.RepoPath
+			if !filepath.IsAbs(repoPath) {
+				abs, err := filepath.Abs(repoPath)
+				if err != nil {
+					p.logger.Debug().Err(err).Msgf("Failed to transform Terragrunt repo path to absolute path for %s", repoPath)
+				} else {
+					repoPath = abs
+				}
+			}
+
+			funcs := hcl.ExpFunctions(repoPath, baseDir, p.logger)
 
 			funcs["run_cmd"] = mockSliceFuncStaticReturn(cty.StringVal("run_cmd-mock"))
 			funcs["sops_decrypt_file"] = mockSliceFuncStaticReturn(cty.StringVal("sops_decrypt_file-mock"))
+			funcs["get_aws_account_id"] = mockSliceFuncStaticReturn(cty.StringVal("account_id-mock"))
+			funcs["get_aws_caller_identity_arn"] = mockSliceFuncStaticReturn(cty.StringVal("arn:aws:iam::123456789012:user/terragrunt-mock"))
+			funcs["get_aws_caller_identity_user_id"] = mockSliceFuncStaticReturn(cty.StringVal("caller_identity_user_id-mock"))
 
 			return funcs
 		},
@@ -595,10 +608,21 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 
 	logCtx := p.logger.With().Str("parent_provider", "terragrunt_dir").Ctx(context.Background())
 
+	repoPath := p.Path.RepoPath
+	if filepath.IsAbs(pconfig.Path) && !filepath.IsAbs(repoPath) {
+		abs, err := filepath.Abs(repoPath)
+		if err != nil {
+			p.logger.Debug().Err(err).Msgf("Failed to transform Terragrunt repo path to absolute path for %s", repoPath)
+		} else {
+			repoPath = abs
+		}
+	}
+
 	h, err := NewHCLProvider(
 		config.NewProjectContext(p.ctx.RunContext, &pconfig, logCtx),
 		hcl.RootPath{
-			Path: pconfig.Path,
+			Path:     pconfig.Path,
+			RepoPath: repoPath,
 		},
 		&HCLProviderConfig{CacheParsingModules: true, SkipAutoDetection: true},
 		ops...,

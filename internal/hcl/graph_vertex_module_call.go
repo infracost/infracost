@@ -117,17 +117,7 @@ func (v *VertexModuleCall) expand(e *Evaluator, b *Block, mutex *sync.Mutex) ([]
 
 		vars := block.Values().AsValueMap()
 
-		moduleEvaluator := NewEvaluator(
-			*modCall.Module,
-			e.workingDir,
-			vars,
-			e.moduleMetadata,
-			map[string]map[string]cty.Value{},
-			e.workspace,
-			e.blockBuilder,
-			e.logger,
-			e.isGraph,
-		)
+		moduleEvaluator := NewEvaluator(e.repoPath, *modCall.Module, e.workingDir, vars, e.moduleMetadata, map[string]map[string]cty.Value{}, e.workspace, e.blockBuilder, e.logger, e.isGraph)
 
 		v.moduleConfigs.Add(unexpandedName, ModuleConfig{
 			name:            name,
