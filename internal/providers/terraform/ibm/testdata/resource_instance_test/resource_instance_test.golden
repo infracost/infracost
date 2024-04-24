@@ -108,6 +108,12 @@
  ├─ Additional Monthly Documents                                                         1,000  Documents                             $50.00 
  └─ Additional Monthly Queries                                                           1,000  Queries                               $20.00 
                                                                                                                                              
+ ibm_resource_instance.watson_studio_lite                                                                                                    
+ └─ Lite plan                                                                                1                                         $0.00 
+                                                                                                                                             
+ ibm_resource_instance.watson_studio_professional                                                                                            
+ └─ Capacity Unit-Hours                                                                      1  CUH                                    $1.02 
+                                                                                                                                             
  ibm_resource_instance.wml_instance_essentials                                                                                               
  ├─ Capacity Unit-Hours                                                                     20  CUH                                   $10.40 
  ├─ Class 1 Resource Units                                                                  50  RU                                     $0.03 
@@ -124,7 +130,7 @@
  ├─ Class 2 Resource Units                                                                  50  RU                                     $0.09 
  └─ Class 3 Resource Units                                                                  50  RU                                     $0.25 
                                                                                                                                              
- OVERALL TOTAL                                                                                                                    $15,473.53 
+ OVERALL TOTAL                                                                                                                    $15,474.55 
 ──────────────────────────────────
-27 cloud resources were detected:
-∙ 27 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+29 cloud resources were detected:
+∙ 29 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

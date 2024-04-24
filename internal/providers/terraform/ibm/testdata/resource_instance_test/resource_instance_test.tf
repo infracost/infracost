@@ -203,7 +203,6 @@ resource "ibm_resource_instance" "watson_discovery_enterprise" {
 }
 
 # Security and Compliance Center (SCC)
-
 resource "ibm_resource_instance" "scc_standard" {
   name              = "scc_standard"
   service           = "compliance"
@@ -216,6 +215,22 @@ resource "ibm_resource_instance" "scc_trial" {
   name              = "scc_trial"
   service           = "compliance"
   plan              = "security-compliance-center-trial-plan"
+  location          = "us-south"
+  resource_group_id = "default"
+}
+
+resource "ibm_resource_instance" "watson_studio_professional" {
+  name              = "ws_professional"
+  service           = "data-science-experience"
+  plan              = "professional-v1"
+  location          = "us-south"
+  resource_group_id = "default"
+}
+
+resource "ibm_resource_instance" "watson_studio_lite" {
+  name              = "ws_lie"
+  service           = "data-science-experience"
+  plan              = "free-v1"
   location          = "us-south"
   resource_group_id = "default"
 }

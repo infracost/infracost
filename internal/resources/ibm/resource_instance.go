@@ -76,6 +76,8 @@ type ResourceInstance struct {
 	WD_Collections  *float64 `infracost_usage:"wd_collections"`
 	// Security and Compliance Center (SCC)
 	SCC_Evaluations *float64 `infracost_usage:"scc_evaluations"`
+	// Watson Studio
+	WS_CUH *float64 `infracost_usage:"data-science-experience_CAPACITY_UNIT_HOURS"`
 }
 
 type ResourceCostComponentsFunc func(*ResourceInstance) []*schema.CostComponent
@@ -119,22 +121,24 @@ var ResourceInstanceUsageSchema = []*schema.UsageItem{
 	{Key: "wd_custom_models", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "wd_collections", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "scc_evaluations", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "data-science-experience_CAPACITY_UNIT_HOURS", DefaultValue: 1, ValueType: schema.Float64},
 }
 
 var ResourceInstanceCostMap map[string]ResourceCostComponentsFunc = map[string]ResourceCostComponentsFunc{
-	"kms":                 GetKMSCostComponents,
-	"secrets-manager":     GetSecretsManagerCostComponents,
-	"appid":               GetAppIDCostComponents,
-	"appconnect":          GetAppConnectCostComponents,
-	"power-iaas":          GetPowerCostComponents,
-	"logdna":              GetLogDNACostComponents,
-	"logdnaat":            GetActivityTrackerCostComponents,
-	"sysdig-monitor":      GetSysdigCostComponenets,
-	"continuous-delivery": GetContinuousDeliveryCostComponenets,
-	"pm-20":               GetWMLCostComponents,
-	"conversation":        GetWACostComponents,
-	"discovery":           GetWDCostComponents,
-	"compliance":          GetSCCCostComponents,
+	"kms":                     GetKMSCostComponents,
+	"secrets-manager":         GetSecretsManagerCostComponents,
+	"appid":                   GetAppIDCostComponents,
+	"appconnect":              GetAppConnectCostComponents,
+	"power-iaas":              GetPowerCostComponents,
+	"logdna":                  GetLogDNACostComponents,
+	"logdnaat":                GetActivityTrackerCostComponents,
+	"sysdig-monitor":          GetSysdigCostComponenets,
+	"continuous-delivery":     GetContinuousDeliveryCostComponenets,
+	"pm-20":                   GetWMLCostComponents,
+	"conversation":            GetWACostComponents,
+	"discovery":               GetWDCostComponents,
+	"compliance":              GetSCCCostComponents,
+	"data-science-experience": GetWSCostComponents,
 }
 
 func KMSKeyVersionsFreeCostComponent(r *ResourceInstance) *schema.CostComponent {
