@@ -201,7 +201,7 @@ func (p *TerragruntHCLProvider) VarFiles() []string {
 func (p *TerragruntHCLProvider) YAML() string {
 	str := strings.Builder{}
 
-	str.WriteString(fmt.Sprintf("  - path: %s\n    name: %s\n", p.RelativePath(), p.ProjectName()))
+	str.WriteString(fmt.Sprintf("  - path: %s\nname: %s\n", p.RelativePath(), p.ProjectName()))
 
 	return str.String()
 }
