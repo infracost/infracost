@@ -7,15 +7,15 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-const STANDARD_PLAN_PROGRAMMATIC_NAME string = "security-compliance-center-standard-plan"
-const TRIAL_PLAN_PROGRAMMATIC_NAME string = "security-compliance-center-trial-plan"
+const SCC_STANDARD_PLAN_PROGRAMMATIC_NAME string = "security-compliance-center-standard-plan"
+const SCC_TRIAL_PLAN_PROGRAMMATIC_NAME string = "security-compliance-center-trial-plan"
 
 func GetSCCCostComponents(r *ResourceInstance) []*schema.CostComponent {
-	if r.Plan == STANDARD_PLAN_PROGRAMMATIC_NAME {
+	if r.Plan == SCC_STANDARD_PLAN_PROGRAMMATIC_NAME {
 		return []*schema.CostComponent{
 			SCCMonthlyEvaluationsCostComponent(r),
 		}
-	} else if r.Plan == TRIAL_PLAN_PROGRAMMATIC_NAME {
+	} else if r.Plan == SCC_TRIAL_PLAN_PROGRAMMATIC_NAME {
 		costComponent := schema.CostComponent{
 			Name:            "Trial",
 			UnitMultiplier:  decimal.NewFromInt(1),
