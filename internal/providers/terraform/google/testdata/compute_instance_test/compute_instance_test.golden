@@ -99,8 +99,8 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃ $10,250       ┃ $0.00       ┃ $10,250    ┃
+┃ TestComputeInstanceGoldenFile                      ┃ $10,250       ┃ $0.00       ┃ $10,250    ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 Logs:
 
-WARN Skipping resource google_compute_instance.e2_custom. Infracost currently does not support E2 custom instances
+WRN Skipping resource google_compute_instance.e2_custom. Infracost currently does not support E2 custom instances

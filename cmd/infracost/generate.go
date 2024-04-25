@@ -94,7 +94,7 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 	}
 
 	var autoProjects []hcl.DetectedProject
-	detectionOutput, err := providers.Detect(ctx, &config.Project{Path: repoPath}, false)
+	autoProviders, err := providers.Detect(ctx, &config.Project{Path: repoPath}, false)
 	if err != nil {
 		if definedProjects {
 			logging.Logger.Debug().Err(err).Msg("could not detect providers")
@@ -103,7 +103,7 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	for _, provider := range detectionOutput.Providers {
+	for _, provider := range autoProviders {
 		if v, ok := provider.(hcl.DetectedProject); ok {
 			autoProjects = append(autoProjects, v)
 		}
@@ -112,7 +112,7 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 	if definedProjects {
 		m, err := vcs.MetadataFetcher.Get(repoPath, nil)
 		if err != nil {
-			logging.Logger.Warn().Msgf("could not fetch git metadata err: %s, default template variables will be blank", err)
+			ui.PrintWarningf(cmd.ErrOrStderr(), "could not fetch git metadata err: %s, default template variables will be blank", err)
 		}
 
 		detectedProjects := make([]template.DetectedProject, len(autoProjects))
@@ -124,7 +124,7 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 				Name:              p.ProjectName(),
 				Path:              relPath,
 				Env:               p.EnvName(),
-				TerraformVarFiles: p.VarFiles(),
+				TerraformVarFiles: p.TerraformVarFiles(),
 			}
 
 			if v, ok := detectedPaths[relPath]; ok {

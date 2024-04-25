@@ -4,6 +4,7 @@ import (
 	"context"
 	"go/parser"
 	"go/token"
+	"log"
 	"os"
 	"strings"
 
@@ -13,8 +14,6 @@ import (
 	"github.com/dave/dst"
 	"github.com/dave/dst/decorator"
 	"github.com/slack-go/slack"
-
-	"github.com/infracost/infracost/internal/logging"
 )
 
 var (
@@ -24,7 +23,7 @@ var (
 func main() {
 	cfg, err := config.LoadDefaultConfig(context.Background())
 	if err != nil {
-		logging.Logger.Fatal().Msgf("error loading aws config %s", err)
+		log.Fatalf("error loading aws config %s", err)
 	}
 
 	svc := ec2.NewFromConfig(cfg)
@@ -33,12 +32,12 @@ func main() {
 		AllRegions: aws.Bool(true),
 	})
 	if err != nil {
-		logging.Logger.Fatal().Msgf("error describing ec2 regions %s", err)
+		log.Fatalf("error describing ec2 regions %s", err)
 	}
 
 	f, err := decorator.ParseFile(token.NewFileSet(), "internal/resources/aws/util.go", nil, parser.ParseComments)
 	if err != nil {
-		logging.Logger.Fatal().Msgf("error loading aws util file %s", err)
+		log.Fatalf("error loading aws util file %s", err)
 	}
 
 	currentRegions := make(map[string]struct{})
@@ -58,7 +57,7 @@ func main() {
 	}
 
 	if len(currentRegions) == 0 {
-		logging.Logger.Fatal().Msg("error parsing aws RegionMapping from util.go, empty list found")
+		log.Fatal("error parsing aws RegionMapping from util.go, empty list found")
 	}
 
 	notFound := strings.Builder{}
@@ -87,6 +86,6 @@ func sendSlackMessage(regions string) {
 		slack.MsgOptionAsUser(true),
 	)
 	if err != nil {
-		logging.Logger.Fatal().Msgf("error sending slack notifications %s", err)
+		log.Fatalf("error sending slack notifications %s", err)
 	}
 }

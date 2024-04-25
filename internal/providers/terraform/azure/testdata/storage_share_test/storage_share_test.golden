@@ -142,8 +142,8 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃ $0.00         ┃ $946,945    ┃ $946,945   ┃
+┃ TestStorageShare                                   ┃ $0.00         ┃ $946,945    ┃ $946,945   ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 Logs:
 
-WARN Skipping resource azurerm_storage_share.unsupported. Premium access tier is only supported for FileStorage accounts
+WRN Skipping resource azurerm_storage_share.unsupported. Premium access tier is only supported for FileStorage accounts

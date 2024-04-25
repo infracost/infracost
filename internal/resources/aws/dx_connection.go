@@ -5,7 +5,8 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/infracost/infracost/internal/logging"
+	"github.com/rs/zerolog/log"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
@@ -117,7 +118,7 @@ func (r *DXConnection) outboundDataTransferComponent(fromRegion string, dataProc
 	if !ok {
 		// This shouldn't happen because we're loading the regions into the RegionsUsage struct
 		// which should have same keys as the RegionMappings map
-		logging.Logger.Warn().Msgf("Skipping resource %s usage cost: Outbound data transfer. Could not find mapping for region %s", r.Address, fromRegion)
+		log.Warn().Msgf("Skipping resource %s usage cost: Outbound data transfer. Could not find mapping for region %s", r.Address, fromRegion)
 		return nil
 	}
 

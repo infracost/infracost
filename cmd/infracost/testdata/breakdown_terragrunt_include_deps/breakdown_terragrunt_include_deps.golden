@@ -1,4 +1,4 @@
-Project: eu-baz
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_include_deps/eu/baz
 Module path: eu/baz
 
  Name                                                   Monthly Qty  Unit   Monthly Cost   
@@ -14,7 +14,7 @@ Module path: eu/baz
  Project total                                                                 $1,308.28   
 
 ──────────────────────────────────
-Project: eu-foo
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_include_deps/eu/foo
 Module path: eu/foo
 
  Name                                                   Monthly Qty  Unit   Monthly Cost   
@@ -37,12 +37,12 @@ Module path: eu/foo
 2 cloud resources were detected:
 ∙ 2 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
-┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ eu-baz                                             ┃ $1,308        ┃ $0.00       ┃ $1,308     ┃
-┃ eu-foo                                             ┃ $748          ┃ $0.00       ┃ $748       ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                                          ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infraco...terragrunt_include_deps/eu/baz ┃ $1,308        ┃ $0.00       ┃ $1,308     ┃
+┃ infracost/infracost/cmd/infraco...terragrunt_include_deps/eu/foo ┃ $748          ┃ $0.00       ┃ $748       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:
 

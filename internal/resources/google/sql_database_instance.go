@@ -1,7 +1,6 @@
 package google
 
 import (
-	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 
@@ -9,6 +8,8 @@ import (
 	"strings"
 
 	"github.com/shopspring/decimal"
+
+	"github.com/rs/zerolog/log"
 )
 
 type SQLDatabaseInstance struct {
@@ -47,7 +48,7 @@ func (r *SQLDatabaseInstance) BuildResource() *schema.Resource {
 	var resource *schema.Resource
 
 	if strings.EqualFold(r.Edition, "enterprise_plus") {
-		logging.Logger.Warn().Msgf("edition %s of %s is not yet supported", r.Edition, r.Address)
+		log.Warn().Msgf("edition %s of %s is not yet supported", r.Edition, r.Address)
 		return nil
 	}
 
@@ -127,7 +128,7 @@ func (r *SQLDatabaseInstance) sharedInstanceCostComponent() *schema.CostComponen
 	} else if strings.EqualFold(r.Tier, "db-g1-small") {
 		resourceGroup = "SQLGen2InstancesG1Small"
 	} else {
-		logging.Logger.Warn().Msgf("tier %s of %s is not supported", r.Tier, r.Address)
+		log.Warn().Msgf("tier %s of %s is not supported", r.Tier, r.Address)
 		return nil
 	}
 
@@ -160,7 +161,7 @@ func (r *SQLDatabaseInstance) legacyMySQLInstanceCostComponent() *schema.CostCom
 
 	vCPUs, err := r.vCPUs()
 	if err != nil {
-		logging.Logger.Warn().Msgf("vCPU of tier %s of %s is not parsable", r.Tier, r.Address)
+		log.Warn().Msgf("vCPU of tier %s of %s is not parsable", r.Tier, r.Address)
 		return nil
 	}
 
@@ -189,13 +190,13 @@ func (r *SQLDatabaseInstance) instanceCostComponents() []*schema.CostComponent {
 
 	vCPUs, err := r.vCPUs()
 	if err != nil {
-		logging.Logger.Warn().Msgf("vCPU of tier %s of %s is not parsable: %s", r.Tier, r.Address, err)
+		log.Warn().Msgf("vCPU of tier %s of %s is not parsable: %s", r.Tier, r.Address, err)
 		return nil
 	}
 
 	mem, err := r.memory()
 	if err != nil {
-		logging.Logger.Warn().Msgf("memory of tier %s of %s is not parsable: %s", r.Tier, r.Address, err)
+		log.Warn().Msgf("memory of tier %s of %s is not parsable: %s", r.Tier, r.Address, err)
 		return nil
 	}
 

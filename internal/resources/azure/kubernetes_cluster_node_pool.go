@@ -4,10 +4,10 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 
+	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
 )
 
@@ -95,13 +95,13 @@ func aksOSDiskSubResource(region string, diskSize int, instanceType string) *sch
 
 	diskName := mapDiskName(diskType, diskSize)
 	if diskName == "" {
-		logging.Logger.Warn().Msgf("Could not map disk type %s and size %d to disk name", diskType, diskSize)
+		log.Warn().Msgf("Could not map disk type %s and size %d to disk name", diskType, diskSize)
 		return nil
 	}
 
 	productName, ok := diskProductNameMap[diskType]
 	if !ok {
-		logging.Logger.Warn().Msgf("Could not map disk type %s to product name", diskType)
+		log.Warn().Msgf("Could not map disk type %s to product name", diskType)
 		return nil
 	}
 

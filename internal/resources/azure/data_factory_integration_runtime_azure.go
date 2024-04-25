@@ -7,6 +7,7 @@ import (
 
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/rs/zerolog/log"
 )
 
 // DataFactoryIntegrationRuntimeAzure struct represents Azure Data Factory's
@@ -75,6 +76,8 @@ func (r *DataFactoryIntegrationRuntimeAzure) computeCostComponent() *schema.Cost
 	}[r.ComputeType]
 
 	name := fmt.Sprintf("Compute (%s, %d vCores)", productType, r.Cores)
+
+	log.Warn().Msgf("'Multiple products found' are safe to ignore for '%s' due to limitations in the Azure API.", name)
 
 	return &schema.CostComponent{
 		Name:           name,

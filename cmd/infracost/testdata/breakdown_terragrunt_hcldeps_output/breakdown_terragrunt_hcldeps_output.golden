@@ -1,4 +1,4 @@
-Project: dev
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_hcldeps_output/dev
 Module path: dev
 
  Name                                                         Monthly Qty  Unit                        Monthly Cost   
@@ -19,7 +19,7 @@ Module path: dev
  Project total                                                                                               $64.97   
 
 ──────────────────────────────────
-Project: prod
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_hcldeps_output/prod
 Module path: prod
 
  Name                                                           Monthly Qty  Unit                        Monthly Cost   
@@ -40,7 +40,7 @@ Module path: prod
  Project total                                                                                                $747.64   
 
 ──────────────────────────────────
-Project: prod2
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_hcldeps_output/prod2
 Module path: prod2
 
  Name                                                           Monthly Qty  Unit                        Monthly Cost   
@@ -61,7 +61,7 @@ Module path: prod2
  Project total                                                                                                $747.64   
 
 ──────────────────────────────────
-Project: stag
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_hcldeps_output/stag
 Module path: stag
 
  Name           Monthly Qty  Unit  Monthly Cost   
@@ -76,17 +76,17 @@ Module path: stag
 6 cloud resources were detected:
 ∙ 6 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
-┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ dev                                                ┃ $65           ┃ $0.00       ┃ $65        ┃
-┃ prod                                               ┃ $748          ┃ $0.00       ┃ $748       ┃
-┃ prod2                                              ┃ $748          ┃ $0.00       ┃ $748       ┃
-┃ stag                                               ┃ $0.00         ┃ $0.00       ┃ $0.00      ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                                          ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infraco..._terragrunt_hcldeps_output/dev ┃ $65           ┃ $0.00       ┃ $65        ┃
+┃ infracost/infracost/cmd/infraco...terragrunt_hcldeps_output/prod ┃ $748          ┃ $0.00       ┃ $748       ┃
+┃ infracost/infracost/cmd/infraco...erragrunt_hcldeps_output/prod2 ┃ $748          ┃ $0.00       ┃ $748       ┃
+┃ infracost/infracost/cmd/infraco...terragrunt_hcldeps_output/stag ┃ $0.00         ┃ $0.00       ┃ $0.00      ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:
 
 
 Logs:
-WARN Input values were not provided for following Terraform variables: "variable.unspecified_variable". Use --terraform-var-file or --terraform-var to specify them.
+WRN Input values were not provided for following Terraform variables: "variable.unspecified_variable". Use --terraform-var-file or --terraform-var to specify them.

@@ -12,14 +12,15 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 
 	"github.com/infracost/infracost/internal/clierror"
-	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/extclient"
 	"github.com/infracost/infracost/internal/hcl/modules"
 	"github.com/infracost/infracost/internal/logging"
+	"github.com/infracost/infracost/internal/ui"
 )
 
 var (
@@ -210,6 +211,10 @@ func OptionWithRemoteVarLoader(host, token, localWorkspace string, loaderOpts ..
 			return
 		}
 
+		if p.newSpinner != nil {
+			loaderOpts = append(loaderOpts, RemoteVariablesLoaderWithSpinner(p.newSpinner))
+		}
+
 		client := extclient.NewAuthedAPIClient(host, token)
 		p.remoteVariablesLoader = NewRemoteVariablesLoader(client, localWorkspace, p.logger, loaderOpts...)
 	}
@@ -237,6 +242,19 @@ func OptionWithTerraformWorkspace(name string) Option {
 	}
 }
 
+// OptionWithSpinner sets a SpinnerFunc onto the Parser. With this option enabled
+// the Parser will send progress to the Spinner. This is disabled by default as
+// we run the Parser concurrently underneath DirProvider and don't want to mess with its output.
+func OptionWithSpinner(f ui.SpinnerFunc) Option {
+	return func(p *Parser) {
+		p.newSpinner = f
+
+		if p.moduleLoader != nil {
+			p.moduleLoader.NewSpinner = f
+		}
+	}
+}
+
 // OptionGraphEvaluator sets the Parser to use the experimental graph evaluator.
 func OptionGraphEvaluator() Option {
 	return func(p *Parser) {
@@ -249,7 +267,7 @@ type DetectedProject interface {
 	ProjectName() string
 	EnvName() string
 	RelativePath() string
-	VarFiles() []string
+	TerraformVarFiles() []string
 	YAML() string
 }
 
@@ -264,6 +282,7 @@ type Parser struct {
 	moduleLoader          *modules.ModuleLoader
 	hclParser             *modules.SharedHCLParser
 	blockBuilder          BlockBuilder
+	newSpinner            ui.SpinnerFunc
 	remoteVariablesLoader *RemoteVariablesLoader
 	logger                zerolog.Logger
 	isGraph               bool
@@ -304,10 +323,10 @@ func (p *Parser) YAML() string {
 	str := strings.Builder{}
 
 	str.WriteString(fmt.Sprintf("  - path: %s\n    name: %s\n", p.RelativePath(), p.ProjectName()))
-	if len(p.VarFiles()) > 0 {
+	if len(p.TerraformVarFiles()) > 0 {
 		str.WriteString("    terraform_var_files:\n")
 
-		for _, varFile := range p.VarFiles() {
+		for _, varFile := range p.TerraformVarFiles() {
 			str.WriteString(fmt.Sprintf("      - %s\n", varFile))
 		}
 	}
@@ -409,6 +428,7 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 		nil,
 		p.workspaceName,
 		p.blockBuilder,
+		p.newSpinner,
 		p.logger,
 		p.isGraph,
 	)
@@ -417,7 +437,8 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 
 	// Graph evaluation
 	if evaluator.isGraph {
-		logging.Logger.Debug().Msg("Building project with experimental graph runner")
+		// we use the base zerolog log here so that it's consistent with the spinner logs
+		log.Info().Msgf("Building project with experimental graph runner")
 
 		g, err := NewGraphWithRoot(p.logger, nil)
 		if err != nil {
@@ -456,7 +477,12 @@ func (p *Parser) RelativePath() string {
 // ProjectName generates a name for the project that can be used
 // in the Infracost config file.
 func (p *Parser) ProjectName() string {
-	name := config.CleanProjectName(p.RelativePath())
+	r := p.RelativePath()
+	name := strings.TrimSuffix(r, "/")
+	name = strings.ReplaceAll(name, "/", "-")
+	if name == "." {
+		name = "main"
+	}
 
 	if p.moduleSuffix != "" {
 		name = fmt.Sprintf("%s-%s", name, p.moduleSuffix)
@@ -476,7 +502,7 @@ func (p *Parser) EnvName() string {
 
 // TerraformVarFiles returns the list of terraform var files that the parser
 // will use to load variables from.
-func (p *Parser) VarFiles() []string {
+func (p *Parser) TerraformVarFiles() []string {
 	varFilesMap := make(map[string]struct{}, len(p.tfvarsPaths))
 	varFiles := make([]string, 0, len(p.tfvarsPaths))
 
@@ -530,7 +556,7 @@ func (p *Parser) loadVars(blocks Blocks, filenames []string) (map[string]cty.Val
 		remoteVars, err := p.remoteVariablesLoader.Load(blocks)
 
 		if err != nil {
-			p.logger.Debug().Msgf("could not load vars from Terraform Cloud: %s", err)
+			p.logger.Warn().Msgf("could not load vars from Terraform Cloud: %s", err)
 			return combinedVars, err
 		}
 

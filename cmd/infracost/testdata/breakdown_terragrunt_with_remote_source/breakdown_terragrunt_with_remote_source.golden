@@ -1,4 +1,4 @@
-Project: submod-ref1
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_with_remote_source/submod-ref1
 Module path: submod-ref1
 
  Name                                                            Monthly Qty  Unit                        Monthly Cost   
@@ -19,7 +19,7 @@ Module path: submod-ref1
  Project total                                                                                               $2,429.56   
 
 ──────────────────────────────────
-Project: submod-ref1-2
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_with_remote_source/submod-ref1-2
 Module path: submod-ref1-2
 
  Name                                                           Monthly Qty  Unit                        Monthly Cost   
@@ -40,7 +40,7 @@ Module path: submod-ref1-2
  Project total                                                                                                $747.64   
 
 ──────────────────────────────────
-Project: submod-ref3
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_with_remote_source/submod-ref3
 Module path: submod-ref3
 
  Name                                                           Monthly Qty  Unit                        Monthly Cost   
@@ -61,7 +61,7 @@ Module path: submod-ref3
  Project total                                                                                              $1,308.28   
 
 ──────────────────────────────────
-Project: ref1
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_with_remote_source/ref1
 Module path: ref1
 
  Name                                                                         Monthly Qty  Unit                    Monthly Cost   
@@ -102,7 +102,7 @@ Module path: ref1
  Project total                                                                                                          $386.17   
 
 ──────────────────────────────────
-Project: ref1-submod
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_with_remote_source/ref1-submod
 Module path: ref1-submod
 
  Name                             Monthly Qty  Unit  Monthly Cost   
@@ -114,7 +114,7 @@ Module path: ref1-submod
  Project total                                             $32.80   
 
 ──────────────────────────────────
-Project: ref2
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_with_remote_source/ref2
 Module path: ref2
 
  Name                                                                         Monthly Qty  Unit                    Monthly Cost   
@@ -164,16 +164,16 @@ Module path: ref2
 ∙ 93 were free
 ∙ 1 is not supported yet, rerun with --show-skipped to see details
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
-┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ submod-ref1                                        ┃ $2,430        ┃ $0.00       ┃ $2,430     ┃
-┃ submod-ref1-2                                      ┃ $748          ┃ $0.00       ┃ $748       ┃
-┃ submod-ref3                                        ┃ $1,308        ┃ $0.00       ┃ $1,308     ┃
-┃ ref1                                               ┃ $386          ┃ $0.00       ┃ $386       ┃
-┃ ref1-submod                                        ┃ $33           ┃ $0.00       ┃ $33        ┃
-┃ ref2                                               ┃ $386          ┃ $0.00       ┃ $386       ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                                          ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infraco...with_remote_source/submod-ref1 ┃ $2,430        ┃ $0.00       ┃ $2,430     ┃
+┃ infracost/infracost/cmd/infraco...th_remote_source/submod-ref1-2 ┃ $748          ┃ $0.00       ┃ $748       ┃
+┃ infracost/infracost/cmd/infraco...with_remote_source/submod-ref3 ┃ $1,308        ┃ $0.00       ┃ $1,308     ┃
+┃ infracost/infracost/cmd/infraco...agrunt_with_remote_source/ref1 ┃ $386          ┃ $0.00       ┃ $386       ┃
+┃ infracost/infracost/cmd/infraco...with_remote_source/ref1-submod ┃ $33           ┃ $0.00       ┃ $33        ┃
+┃ infracost/infracost/cmd/infraco...agrunt_with_remote_source/ref2 ┃ $386          ┃ $0.00       ┃ $386       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:
 

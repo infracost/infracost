@@ -6,9 +6,8 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v2"
-
-	"github.com/infracost/infracost/internal/logging"
 )
 
 var credentialsVersion = "0.1"
@@ -24,7 +23,7 @@ func loadCredentials(cfg *Config) error {
 
 	err = cfg.migrateCredentials()
 	if err != nil {
-		logging.Logger.Debug().Err(err).Msg("Error migrating credentials")
+		log.Debug().Err(err).Msg("Error migrating credentials")
 	}
 
 	cfg.Credentials, err = readCredentialsFileIfExists()

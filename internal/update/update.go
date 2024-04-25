@@ -14,10 +14,10 @@ import (
 	"time"
 
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 	"golang.org/x/mod/semver"
 
 	"github.com/infracost/infracost/internal/config"
-	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/version"
 )
 
@@ -34,7 +34,7 @@ func CheckForUpdate(ctx *config.RunContext) (*Info, error) {
 	// Check cache for the latest version
 	cachedLatestVersion, err := checkCachedLatestVersion(ctx)
 	if err != nil {
-		logging.Logger.Debug().Msgf("error getting cached latest version: %v", err)
+		log.Debug().Msgf("error getting cached latest version: %v", err)
 	}
 
 	// Nothing to do if the current version is the latest cached version
@@ -45,7 +45,7 @@ func CheckForUpdate(ctx *config.RunContext) (*Info, error) {
 	isBrew, err := isBrewInstall()
 	if err != nil {
 		// don't fail if we can't detect brew, just fallback to other update method
-		logging.Logger.Debug().Msgf("error checking if executable was installed via brew: %v", err)
+		log.Debug().Msgf("error checking if executable was installed via brew: %v", err)
 	}
 
 	var cmd string
@@ -75,7 +75,7 @@ func CheckForUpdate(ctx *config.RunContext) (*Info, error) {
 	if latestVersion != cachedLatestVersion {
 		err := setCachedLatestVersion(ctx, latestVersion)
 		if err != nil {
-			logging.Logger.Debug().Msgf("error saving cached latest version: %v", err)
+			log.Debug().Msgf("error saving cached latest version: %v", err)
 		}
 	}
 

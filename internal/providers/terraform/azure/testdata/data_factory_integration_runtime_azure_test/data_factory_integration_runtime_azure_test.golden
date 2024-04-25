@@ -45,5 +45,15 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃ $74,648       ┃ $10         ┃ $74,658    ┃
+┃ TestDataFactoryIntegrationRuntimeAzure             ┃ $74,648       ┃ $10         ┃ $74,658    ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
+Logs:
+
+WRN 'Multiple products found' are safe to ignore for 'Compute (Compute Optimized, 16 vCores)' due to limitations in the Azure API.
+WRN 'Multiple products found' are safe to ignore for 'Compute (General Purpose, 8 vCores)' due to limitations in the Azure API.
+WRN 'Multiple products found' are safe to ignore for 'Compute (General Purpose, 8 vCores)' due to limitations in the Azure API.
+WRN 'Multiple products found' are safe to ignore for 'Compute (Memory Optimized, 272 vCores)' due to limitations in the Azure API.
+WRN Multiple products with prices found for azurerm_data_factory_integration_runtime_azure.co Compute (Compute Optimized, 16 vCores), using the first product
+WRN Multiple products with prices found for azurerm_data_factory_integration_runtime_azure.default_with_usage Compute (General Purpose, 8 vCores), using the first product
+WRN Multiple products with prices found for azurerm_data_factory_integration_runtime_azure.gp Compute (General Purpose, 8 vCores), using the first product
+WRN Multiple products with prices found for azurerm_data_factory_integration_runtime_azure.mo Compute (Memory Optimized, 272 vCores), using the first product

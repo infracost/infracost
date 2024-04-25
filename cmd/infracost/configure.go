@@ -9,7 +9,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/infracost/infracost/internal/config"
-	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/ui"
 )
 
@@ -207,7 +206,7 @@ func configureGetCmd(ctx *config.RunContext) *cobra.Command {
 						config.CredentialsFilePath(),
 						ui.PrimaryString("infracost configure set pricing_api_endpoint https://cloud-pricing-api"),
 					)
-					logging.Logger.Warn().Msg(msg)
+					ui.PrintWarning(cmd.ErrOrStderr(), msg)
 				}
 			case "api_key":
 				value = ctx.Config.Credentials.APIKey
@@ -217,7 +216,7 @@ func configureGetCmd(ctx *config.RunContext) *cobra.Command {
 						config.CredentialsFilePath(),
 						ui.PrimaryString("infracost configure set api_key MY_API_KEY"),
 					)
-					logging.Logger.Warn().Msg(msg)
+					ui.PrintWarning(cmd.ErrOrStderr(), msg)
 				}
 			case "currency":
 				value = ctx.Config.Configuration.Currency
@@ -227,7 +226,7 @@ func configureGetCmd(ctx *config.RunContext) *cobra.Command {
 						config.ConfigurationFilePath(),
 						ui.PrimaryString("infracost configure set currency CURRENCY"),
 					)
-					logging.Logger.Warn().Msg(msg)
+					ui.PrintWarning(cmd.ErrOrStderr(), msg)
 				}
 			case "tls_insecure_skip_verify":
 				if ctx.Config.Configuration.TLSInsecureSkipVerify == nil {
@@ -241,7 +240,7 @@ func configureGetCmd(ctx *config.RunContext) *cobra.Command {
 						config.ConfigurationFilePath(),
 						ui.PrimaryString("infracost configure set tls_insecure_skip_verify true"),
 					)
-					logging.Logger.Warn().Msg(msg)
+					ui.PrintWarning(cmd.ErrOrStderr(), msg)
 				}
 			case "tls_ca_cert_file":
 				value = ctx.Config.Configuration.TLSCACertFile
@@ -251,7 +250,7 @@ func configureGetCmd(ctx *config.RunContext) *cobra.Command {
 						config.ConfigurationFilePath(),
 						ui.PrimaryString("infracost configure set tls_ca_cert_file /path/to/ca.crt"),
 					)
-					logging.Logger.Warn().Msg(msg)
+					ui.PrintWarning(cmd.ErrOrStderr(), msg)
 				}
 			case "enable_dashboard":
 				if ctx.Config.Configuration.EnableDashboard == nil {

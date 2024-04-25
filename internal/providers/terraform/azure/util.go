@@ -5,9 +5,9 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
 
-	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
 )
 
@@ -49,7 +49,7 @@ func lookupRegion(d *schema.ResourceData, parentResourceKeys []string) string {
 
 	// When all else fails use the default region
 	defaultRegion := toAzureCLIName(d.Get("region").String())
-	logging.Logger.Debug().Msgf("Using %s for resource %s as its 'location' property could not be found.", defaultRegion, d.Address)
+	log.Warn().Msgf("Using %s for resource %s as its 'location' property could not be found.", defaultRegion, d.Address)
 	return defaultRegion
 }
 

@@ -2,9 +2,7 @@ version: 0.1
 
 projects:
   - path: apps/bar
-name: apps-bar
   - path: apps/baz/bip
-name: apps-baz-bip
   - path: apps/fez
     name: apps-fez-dev
     terraform_var_files:
@@ -16,8 +14,4 @@ name: apps-baz-bip
       - ../envs/prod.tfvars
     skip_autodetect: true
   - path: apps/foo
-name: apps-foo
 
-
-Err:
-Error: could not validate generated config file, check file syntax: yaml: line 6: mapping values are not allowed in this context

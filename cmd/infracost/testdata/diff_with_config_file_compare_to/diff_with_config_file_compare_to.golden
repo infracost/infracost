@@ -1,7 +1,7 @@
 Key: * usage cost, ~ changed, + added, - removed
 
 ──────────────────────────────────
-Project: dev
+Project: infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to/dev
 Module path: dev
 
 ~ aws_instance.web_app
@@ -15,7 +15,7 @@ Amount:  -$210 ($462 → $252)
 Percent: -45%
 
 ──────────────────────────────────
-Project: prod
+Project: infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to/prod
 Module path: prod
 
 ~ aws_instance.web_app

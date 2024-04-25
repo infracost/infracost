@@ -18,9 +18,10 @@ import (
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/credentials"
-	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
+
+	"github.com/rs/zerolog/log"
 )
 
 var minTerraformVer = "v0.12"
@@ -28,6 +29,7 @@ var minTerraformVer = "v0.12"
 type DirProvider struct {
 	ctx                  *config.ProjectContext
 	Path                 string
+	spinnerOpts          ui.SpinnerOptions
 	IsTerragrunt         bool
 	PlanFlags            string
 	InitFlags            string
@@ -53,8 +55,13 @@ func NewDirProvider(ctx *config.ProjectContext, includePastResources bool) schem
 	}
 
 	return &DirProvider{
-		ctx:                  ctx,
-		Path:                 ctx.ProjectConfig.Path,
+		ctx:  ctx,
+		Path: ctx.ProjectConfig.Path,
+		spinnerOpts: ui.SpinnerOptions{
+			EnableLogging: ctx.RunContext.Config.IsLogging(),
+			NoColor:       ctx.RunContext.Config.NoColor,
+			Indent:        "  ",
+		},
 		PlanFlags:            ctx.ProjectConfig.TerraformPlanFlags,
 		InitFlags:            ctx.ProjectConfig.TerraformInitFlags,
 		Workspace:            ctx.ProjectConfig.TerraformWorkspace,
@@ -65,28 +72,6 @@ func NewDirProvider(ctx *config.ProjectContext, includePastResources bool) schem
 		Env:                  ctx.ProjectConfig.Env,
 		includePastResources: includePastResources,
 	}
-}
-
-func (p *DirProvider) ProjectName() string {
-	if p.ctx.ProjectConfig.Name != "" {
-		return p.ctx.ProjectConfig.Name
-	}
-
-	if p.ctx.ProjectConfig.TerraformWorkspace != "" {
-		return config.CleanProjectName(p.RelativePath()) + "-" + p.ctx.ProjectConfig.TerraformWorkspace
-	}
-
-	return config.CleanProjectName(p.RelativePath())
-}
-
-func (p *DirProvider) VarFiles() []string {
-	return nil
-}
-
-func (p *DirProvider) RelativePath() string {
-	r, _ := filepath.Rel(p.ctx.RunContext.Config.RepoPath(), p.ctx.ProjectConfig.Path)
-
-	return r
 }
 
 func (p *DirProvider) Context() *config.ProjectContext { return p.ctx }
@@ -137,7 +122,7 @@ func (p *DirProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 
 	modulePath, err := filepath.Rel(basePath, metadata.Path)
 	if err == nil && modulePath != "" && modulePath != "." {
-		logging.Logger.Debug().Msgf("Calculated relative terraformModulePath for %s from %s", basePath, metadata.Path)
+		log.Debug().Msgf("Calculated relative terraformModulePath for %s from %s", basePath, metadata.Path)
 		metadata.TerraformModulePath = modulePath
 	}
 
@@ -150,7 +135,7 @@ func (p *DirProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 
 		out, err := cmd.Output()
 		if err != nil {
-			logging.Logger.Debug().Msgf("Could not detect Terraform workspace for %s", p.Path)
+			log.Debug().Msgf("Could not detect Terraform workspace for %s", p.Path)
 		}
 		terraformWorkspace = strings.Split(string(out), "\n")[0]
 	}
@@ -172,7 +157,12 @@ func (p *DirProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, e
 		return projects, err
 	}
 
-	logging.Logger.Debug().Msg("Extracting only cost-related params from terraform")
+	spinner := ui.NewSpinner("Extracting only cost-related params from terraform", ui.SpinnerOptions{
+		EnableLogging: p.ctx.RunContext.Config.IsLogging(),
+		NoColor:       p.ctx.RunContext.Config.NoColor,
+		Indent:        "  ",
+	})
+	defer spinner.Fail()
 
 	jsons := [][]byte{out}
 	if p.IsTerragrunt {
@@ -192,7 +182,6 @@ func (p *DirProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, e
 		}
 
 		project := schema.NewProject(name, metadata)
-		project.DisplayName = p.ProjectName()
 
 		parser := NewParser(p.ctx, p.includePastResources)
 
@@ -213,6 +202,7 @@ func (p *DirProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, e
 		projects = append(projects, project)
 	}
 
+	spinner.Success()
 	return projects, nil
 }
 
@@ -222,14 +212,15 @@ func (p *DirProvider) generatePlanJSON() ([]byte, error) {
 	}
 
 	if UsePlanCache(p) {
-		logging.Logger.Debug().Msg("Checking for cached plan...")
+		spinner := ui.NewSpinner("Checking for cached plan...", p.spinnerOpts)
+		defer spinner.Fail()
 
 		cached, err := ReadPlanCache(p)
 		if err != nil {
-			logging.Logger.Debug().Msgf("Checking for cached plan... %v", err.Error())
+			spinner.SuccessWithMessage(fmt.Sprintf("Checking for cached plan... %v", err.Error()))
 		} else {
 			p.cachedPlanJSON = cached
-			logging.Logger.Debug().Msg("Checking for cached plan... found")
+			spinner.SuccessWithMessage("Checking for cached plan... found")
 			return p.cachedPlanJSON, nil
 		}
 	}
@@ -247,7 +238,10 @@ func (p *DirProvider) generatePlanJSON() ([]byte, error) {
 		defer os.Remove(opts.TerraformConfigFile)
 	}
 
-	planFile, planJSON, err := p.runPlan(opts, true)
+	spinner := ui.NewSpinner("Running terraform plan", p.spinnerOpts)
+	defer spinner.Fail()
+
+	planFile, planJSON, err := p.runPlan(opts, spinner, true)
 	defer os.Remove(planFile)
 
 	if err != nil {
@@ -258,7 +252,8 @@ func (p *DirProvider) generatePlanJSON() ([]byte, error) {
 		return planJSON, nil
 	}
 
-	j, err := p.runShow(opts, planFile, false)
+	spinner = ui.NewSpinner("Running terraform show", p.spinnerOpts)
+	j, err := p.runShow(opts, spinner, planFile, false)
 	if err == nil {
 		p.cachedPlanJSON = j
 		if UsePlanCache(p) {
@@ -287,7 +282,10 @@ func (p *DirProvider) generateStateJSON() ([]byte, error) {
 		defer os.Remove(opts.TerraformConfigFile)
 	}
 
-	j, err := p.runShow(opts, "", true)
+	spinner := ui.NewSpinner("Running terraform show", p.spinnerOpts)
+	defer spinner.Fail()
+
+	j, err := p.runShow(opts, spinner, "", true)
 	if err == nil {
 		p.cachedStateJSON = j
 	}
@@ -312,8 +310,7 @@ func (p *DirProvider) buildCommandOpts(path string) (*CmdOptions, error) {
 	return opts, nil
 }
 
-func (p *DirProvider) runPlan(opts *CmdOptions, initOnFail bool) (string, []byte, error) {
-	logging.Logger.Debug().Msg("Running terraform plan")
+func (p *DirProvider) runPlan(opts *CmdOptions, spinner *ui.Spinner, initOnFail bool) (string, []byte, error) {
 	var planJSON []byte
 
 	fileName := ".tfplan-" + uuid.New().String()
@@ -342,20 +339,21 @@ func (p *DirProvider) runPlan(opts *CmdOptions, initOnFail bool) (string, []byte
 
 		// If the plan returns this error then Terraform is configured with remote execution mode
 		if isTerraformRemoteExecutionErr(extractedErr) {
-			logging.Logger.Debug().Msg("Continuing with Terraform Remote Execution Mode")
+			log.Info().Msg("Continuing with Terraform Remote Execution Mode")
 			p.ctx.ContextValues.SetValue("terraformRemoteExecutionModeEnabled", true)
 			planJSON, err = p.runRemotePlan(opts, args)
 		} else if initOnFail && isTerraformInitErr(extractedErr) {
-			err = p.runInit(opts)
+			spinner.Stop()
+			err = p.runInit(opts, ui.NewSpinner("Running terraform init", p.spinnerOpts))
 			if err != nil {
 				return "", planJSON, err
 			}
-			return p.runPlan(opts, false)
+			return p.runPlan(opts, spinner, false)
 		}
 	}
 
 	if err != nil {
-		logging.Logger.Debug().Err(err).Msg("Failed terraform plan")
+		spinner.Fail()
 		err = p.buildTerraformErr(err, false)
 
 		cmdName := "terraform plan"
@@ -366,12 +364,12 @@ func (p *DirProvider) runPlan(opts *CmdOptions, initOnFail bool) (string, []byte
 		return "", planJSON, clierror.NewCLIError(fmt.Errorf("%s: %s", msg, err), msg)
 	}
 
+	spinner.Success()
+
 	return fileName, planJSON, nil
 }
 
-func (p *DirProvider) runInit(opts *CmdOptions) error {
-	logging.Logger.Debug().Msg("Running terraform init")
-
+func (p *DirProvider) runInit(opts *CmdOptions, spinner *ui.Spinner) error {
 	args := []string{}
 	if p.IsTerragrunt {
 		args = append(args, "run-all", "--terragrunt-ignore-external-dependencies")
@@ -392,8 +390,7 @@ func (p *DirProvider) runInit(opts *CmdOptions) error {
 
 	_, err = Cmd(opts, args...)
 	if err != nil {
-		logging.Logger.Debug().Msg("Failed terraform init")
-
+		spinner.Fail()
 		err = p.buildTerraformErr(err, true)
 
 		cmdName := "terraform init"
@@ -404,7 +401,7 @@ func (p *DirProvider) runInit(opts *CmdOptions) error {
 		return clierror.NewCLIError(fmt.Errorf("%s: %s", msg, err), msg)
 	}
 
-	logging.Logger.Debug().Msg("Finished running terraform init")
+	spinner.Success()
 	return nil
 }
 
@@ -461,8 +458,7 @@ func (p *DirProvider) runRemotePlan(opts *CmdOptions, args []string) ([]byte, er
 	return cloudAPI(host, jsonPath, token)
 }
 
-func (p *DirProvider) runShow(opts *CmdOptions, planFile string, initOnFail bool) ([]byte, error) {
-	logging.Logger.Debug().Msg("Running terraform show")
+func (p *DirProvider) runShow(opts *CmdOptions, spinner *ui.Spinner, planFile string, initOnFail bool) ([]byte, error) {
 	args := []string{"show", "-no-color", "-json"}
 	if planFile != "" {
 		args = append(args, planFile)
@@ -475,18 +471,19 @@ func (p *DirProvider) runShow(opts *CmdOptions, planFile string, initOnFail bool
 
 		// If the plan returns this error then Terraform is configured with remote execution mode
 		if isTerraformRemoteExecutionErr(extractedErr) {
-			logging.Logger.Debug().Msg("Terraform expected Remote Execution Mode")
+			log.Info().Msg("Terraform expected Remote Execution Mode")
 		} else if initOnFail && isTerraformInitErr(extractedErr) {
-			err = p.runInit(opts)
+			spinner.Stop()
+			err = p.runInit(opts, ui.NewSpinner("Running terraform init", p.spinnerOpts))
 			if err != nil {
 				return out, err
 			}
-			return p.runShow(opts, planFile, false)
+			return p.runShow(opts, spinner, planFile, false)
 		}
 	}
 
 	if err != nil {
-		logging.Logger.Debug().Msg("Failed terraform show")
+		spinner.Fail()
 		err = p.buildTerraformErr(err, false)
 
 		cmdName := "terraform show"
@@ -496,7 +493,7 @@ func (p *DirProvider) runShow(opts *CmdOptions, planFile string, initOnFail bool
 		msg := fmt.Sprintf("%s failed", cmdName)
 		return []byte{}, clierror.NewCLIError(fmt.Errorf("%s: %s", msg, err), msg)
 	}
-	logging.Logger.Debug().Msg("Finished running terraform show")
+	spinner.Success()
 
 	return out, nil
 }
