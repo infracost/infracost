@@ -63,6 +63,26 @@ resource "ibm_resource_instance" "resource_instance_logdna_7day_no_usage" {
   plan              = "7-day"
   location          = "us-south"
 }
+resource "ibm_resource_instance" "resource_instance_logdna_14day" {
+  name              = "logdna-14day"
+  service           = "logdna"
+  plan              = "14-day"
+  location          = "us-south"
+}
+
+resource "ibm_resource_instance" "resource_instance_logdna_30day" {
+  name              = "logdna-30day"
+  service           = "logdna"
+  plan              = "30-day"
+  location          = "us-south"
+}
+
+resource "ibm_resource_instance" "resource_instance_logdna_hipaa30day" {
+  name              = "logdna-hipaa30day"
+  service           = "logdna"
+  plan              = "hipaa-30-day"
+  location          = "us-south"
+}
 
 resource "ibm_resource_instance" "resource_instance_activity_tracker_lite" {
   name              = "activity-tracker-lite"

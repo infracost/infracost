@@ -10,9 +10,15 @@ resource_usage:
     appid_users: 1000
     appid_advanced_authentications: 20000
   ibm_resource_instance.resource_instance_logdna_7day:
-    logdna_gigabyte_months: 10
+    logdna_gigabyte_months: 1
   ibm_resource_instance.resource_instance_logdna_lite:
-    logdna_gigabyte_months: 10
+    logdna_gigabyte_months: 11
+  ibm_resource_instance.resource_instance_logdna_14day:
+    logdna_gigabyte_months: 1
+  ibm_resource_instance.resource_instance_logdna_30day:
+    logdna_gigabyte_months: 1
+  ibm_resource_instance.resource_instance_logdna_hipaa30day:
+    logdna_gigabyte_months: 1
   ibm_resource_instance.resource_instance_activity_tracker_7day:
     activitytracker_gigabyte_months: 10
   ibm_resource_instance.resource_instance_activity_tracker_lite:

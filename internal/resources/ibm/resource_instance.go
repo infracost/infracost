@@ -501,7 +501,7 @@ func GetLogDNACostComponents(r *ResourceInstance) []*schema.CostComponent {
 		}
 	} else {
 		return []*schema.CostComponent{{
-			Name:            "Gigabyte Months",
+			Name:            fmt.Sprintf("Gigabyte Months (%s)", r.Plan),
 			Unit:            "Gigabyte Months",
 			UnitMultiplier:  decimal.NewFromInt(1),
 			MonthlyQuantity: q,

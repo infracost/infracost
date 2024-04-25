@@ -37,11 +37,20 @@
  ├─ Key versions free allowance (first 5 Key Versions)                                       5  Key Versions                           $0.00 
  └─ Key versions                                                                           295  Key Versions                         $317.52 
                                                                                                                                              
+ ibm_resource_instance.resource_instance_logdna_14day                                                                                        
+ └─ Gigabyte Months (14-day)                                                                 1  Gigabyte Months                        $2.15 
+                                                                                                                                             
+ ibm_resource_instance.resource_instance_logdna_30day                                                                                        
+ └─ Gigabyte Months (30-day)                                                                 1  Gigabyte Months                        $3.23 
+                                                                                                                                             
  ibm_resource_instance.resource_instance_logdna_7day                                                                                         
- └─ Gigabyte Months                                                                         10  Gigabyte Months                       $15.00 
+ └─ Gigabyte Months (7-day)                                                                  1  Gigabyte Months                        $1.50 
                                                                                                                                              
  ibm_resource_instance.resource_instance_logdna_7day_no_usage                                                                                
- └─ Gigabyte Months                                                      Monthly cost depends on usage: $1.50 per Gigabyte Months            
+ └─ Gigabyte Months (7-day)                                              Monthly cost depends on usage: $1.50 per Gigabyte Months            
+                                                                                                                                             
+ ibm_resource_instance.resource_instance_logdna_hipaa30day                                                                                   
+ └─ Gigabyte Months (hipaa-30-day)                                                           1  Gigabyte Months                        $4.12 
                                                                                                                                              
  ibm_resource_instance.resource_instance_logdna_lite                                                                                         
  └─ Lite plan                                                                                1                                         $0.00 
@@ -130,7 +139,7 @@
  ├─ Class 2 Resource Units                                                                  50  RU                                     $0.09 
  └─ Class 3 Resource Units                                                                  50  RU                                     $0.25 
                                                                                                                                              
- OVERALL TOTAL                                                                                                                    $15,474.55 
+ OVERALL TOTAL                                                                                                                    $15,470.56 
 ──────────────────────────────────
-29 cloud resources were detected:
-∙ 29 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+32 cloud resources were detected:
+∙ 32 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
