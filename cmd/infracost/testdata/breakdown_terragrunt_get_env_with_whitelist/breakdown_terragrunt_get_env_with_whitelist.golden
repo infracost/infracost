@@ -9,7 +9,7 @@ Errors:
             Required environment variable UNSAFE_VAR - not found.
 
 ──────────────────────────────────
-Project: prod
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_get_env_with_whitelist/prod
 Module path: prod
 
  Name                                                           Monthly Qty  Unit                        Monthly Cost   
@@ -41,7 +41,7 @@ Module path: prod
 ┃ Project                                                          ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
 ┃ infracost/infracost/cmd/infraco...ragrunt_get_env_with_whitelist ┃ $0.00         ┃ $0.00       ┃ $0.00      ┃
-┃ prod                                                             ┃ $748          ┃ $0.00       ┃ $748       ┃
+┃ infracost/infracost/cmd/infraco...nt_get_env_with_whitelist/prod ┃ $748          ┃ $0.00       ┃ $748       ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:

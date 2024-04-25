@@ -4,7 +4,8 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/infracost/infracost/internal/logging"
+	"github.com/rs/zerolog/log"
+
 	"github.com/infracost/infracost/internal/schema"
 )
 
@@ -91,7 +92,7 @@ func PopulateArgsWithUsage(args interface{}, u *schema.UsageData) {
 				continue
 			}
 
-			logging.Logger.Error().Msgf("Unsupported field { UsageKey: %s, Type: %v }", usageKey, f.Type())
+			log.Error().Msgf("Unsupported field { UsageKey: %s, Type: %v }", usageKey, f.Type())
 		}
 	}
 }

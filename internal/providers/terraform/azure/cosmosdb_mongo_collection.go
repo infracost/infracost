@@ -1,7 +1,8 @@
 package azure
 
 import (
-	"github.com/infracost/infracost/internal/logging"
+	"github.com/rs/zerolog/log"
+
 	"github.com/infracost/infracost/internal/schema"
 )
 
@@ -27,9 +28,9 @@ func NewAzureRMCosmosdbMongoCollection(d *schema.ResourceData, u *schema.UsageDa
 				CostComponents: cosmosDBCostComponents(d, u, account),
 			}
 		}
-		logging.Logger.Warn().Msgf("Skipping resource %s as its 'database_name.account_name' property could not be found.", d.Address)
+		log.Warn().Msgf("Skipping resource %s as its 'database_name.account_name' property could not be found.", d.Address)
 		return nil
 	}
-	logging.Logger.Warn().Msgf("Skipping resource %s as its 'database_name' property could not be found.", d.Address)
+	log.Warn().Msgf("Skipping resource %s as its 'database_name' property could not be found.", d.Address)
 	return nil
 }

@@ -12,6 +12,7 @@ import (
 
 	"github.com/infracost/infracost/internal/logging"
 	intSync "github.com/infracost/infracost/internal/sync"
+	"github.com/infracost/infracost/internal/ui"
 	"github.com/infracost/infracost/internal/vcs"
 	"github.com/infracost/infracost/internal/version"
 
@@ -137,9 +138,22 @@ func EmptyRunContext() *RunContext {
 	}
 }
 
+var (
+	outputIndent = "  "
+)
+
 // IsAutoDetect returns true if the command is running with auto-detect functionality.
 func (r *RunContext) IsAutoDetect() bool {
 	return len(r.Config.Projects) <= 1 && r.Config.ConfigFilePath == ""
+}
+
+// NewSpinner returns an ui.Spinner built from the RunContext.
+func (r *RunContext) NewSpinner(msg string) *ui.Spinner {
+	return ui.NewSpinner(msg, ui.SpinnerOptions{
+		EnableLogging: r.Config.IsLogging(),
+		NoColor:       r.Config.NoColor,
+		Indent:        outputIndent,
+	})
 }
 
 func (r *RunContext) GetParallelism() (int, error) {
@@ -184,6 +198,20 @@ func (r *RunContext) UUID() uuid.UUID {
 
 func (r *RunContext) VCSRepositoryURL() string {
 	return r.VCSMetadata.Remote.URL
+}
+
+func (r *RunContext) GetResourceWarnings() map[string]map[string]int {
+	contextValues := r.ContextValues.Values()
+
+	if warnings := contextValues["resourceWarnings"]; warnings != nil {
+		return warnings.(map[string]map[string]int)
+	}
+
+	return nil
+}
+
+func (r *RunContext) SetResourceWarnings(resourceWarnings map[string]map[string]int) {
+	r.ContextValues.SetValue("resourceWarnings", resourceWarnings)
 }
 
 func (r *RunContext) EventEnv() map[string]interface{} {

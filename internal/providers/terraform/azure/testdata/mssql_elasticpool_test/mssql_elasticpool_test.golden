@@ -49,5 +49,18 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃ $19,409       ┃ $143        ┃ $19,552    ┃
+┃ TestMSSQLElasticPool                               ┃ $19,409       ┃ $143        ┃ $19,552    ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
+Logs:
+
+WRN 'Multiple products found' are safe to ignore for 'Compute (BC_DC, 8 vCore)' due to limitations in the Azure API.
+WRN 'Multiple products found' are safe to ignore for 'Compute (BC_DC, 8 vCore)' due to limitations in the Azure API.
+WRN 'Multiple products found' are safe to ignore for 'Compute (GP_Gen5, 4 vCore)' due to limitations in the Azure API.
+WRN 'Multiple products found' are safe to ignore for 'Compute (GP_Gen5, 4 vCore)' due to limitations in the Azure API.
+WRN 'Multiple products found' are safe to ignore for 'Compute (GP_Gen5, 4 vCore)' due to limitations in the Azure API.
+WRN Multiple products with prices found for azurerm_mssql_elasticpool.bc_dc Compute (BC_DC, 8 vCore), using the first product
+WRN Multiple products with prices found for azurerm_mssql_elasticpool.bc_dc_zone_redundant Compute (BC_DC, 8 vCore), using the first product
+WRN Multiple products with prices found for azurerm_mssql_elasticpool.gp_gen5 Compute (GP_Gen5, 4 vCore), using the first product
+WRN Multiple products with prices found for azurerm_mssql_elasticpool.gp_gen5_zone_no_license Compute (GP_Gen5, 4 vCore), using the first product
+WRN Multiple products with prices found for azurerm_mssql_elasticpool.gp_gen5_zone_redundant Compute (GP_Gen5, 4 vCore), using the first product
+WRN Multiple products with prices found for azurerm_mssql_elasticpool.gp_gen5_zone_redundant Zone redundancy (GP_Gen5, 4 vCore), using the first product

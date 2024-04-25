@@ -15,7 +15,6 @@
   "projects": [
     {
       "name": "infracost/infracost/cmd/infracost/testdata/breakdown_config_file/dev",
-      "displayName": "dev",
       "metadata": {
         "path": "./testdata/breakdown_config_file/dev",
         "type": "terraform_dir",

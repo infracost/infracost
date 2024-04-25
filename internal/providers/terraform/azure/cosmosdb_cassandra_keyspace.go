@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
 
-	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
 )
 
@@ -38,7 +38,7 @@ func NewAzureRMCosmosdb(d *schema.ResourceData, u *schema.UsageData) *schema.Res
 			CostComponents: cosmosDBCostComponents(d, u, account),
 		}
 	}
-	logging.Logger.Warn().Msgf("Skipping resource %s as its 'account_name' property could not be found.", d.Address)
+	log.Warn().Msgf("Skipping resource %s as its 'account_name' property could not be found.", d.Address)
 	return nil
 }
 
@@ -51,7 +51,7 @@ func cosmosDBCostComponents(d *schema.ResourceData, u *schema.UsageData, account
 	// expressions evaluating as nil, e.g. using a data block. If the geoLocations variable is empty
 	// we set it as a sane default which is using the location from the parent region.
 	if len(geoLocations) == 0 {
-		logging.Logger.Debug().Str(
+		log.Debug().Str(
 			"resource", d.Address,
 		).Msgf("empty set of geo_location attributes provided using fallback region %s", region)
 

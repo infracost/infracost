@@ -4,8 +4,6 @@ import (
 	"fmt"
 
 	"github.com/fatih/color"
-
-	"github.com/infracost/infracost/internal/config"
 )
 
 var primary = color.New(color.FgHiCyan)
@@ -90,13 +88,4 @@ func UnderlineString(msg string) string {
 
 func UnderlineStringf(msg string, a ...interface{}) string {
 	return UnderlineString(fmt.Sprintf(msg, a...))
-}
-
-// FormatIfNotCI runs the formatFunc if the current run context is not a CI run.
-func FormatIfNotCI(ctx *config.RunContext, formatFunc func(string) string, value string) string {
-	if ctx.IsCIRun() {
-		return fmt.Sprintf("%q", value)
-	}
-
-	return formatFunc(value)
 }

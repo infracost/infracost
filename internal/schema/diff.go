@@ -5,9 +5,8 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
-
-	"github.com/infracost/infracost/internal/logging"
 )
 
 // nameBracketReg matches the part of a cost component name before the brackets, and the part in the brackets
@@ -65,7 +64,7 @@ func diffResourcesByKey(resourceKey string, pastResMap, currentResMap map[string
 	past, pastOk := pastResMap[resourceKey]
 	current, currentOk := currentResMap[resourceKey]
 	if current == nil && past == nil {
-		logging.Logger.Debug().Msgf("diffResourcesByKey nil current and past with key %s", resourceKey)
+		log.Debug().Msgf("diffResourcesByKey nil current and past with key %s", resourceKey)
 		return false, nil
 	}
 	baseResource := current

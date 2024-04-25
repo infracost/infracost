@@ -3,9 +3,9 @@ package aws
 import (
 	"strings"
 
+	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
 
-	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -55,7 +55,7 @@ func (a *LaunchTemplate) PopulateUsage(u *schema.UsageData) {
 
 func (a *LaunchTemplate) BuildResource() *schema.Resource {
 	if strings.ToLower(a.Tenancy) == "host" {
-		logging.Logger.Warn().Msgf("Skipping resource %s. Infracost currently does not support host tenancy for AWS Launch Templates", a.Address)
+		log.Warn().Msgf("Skipping resource %s. Infracost currently does not support host tenancy for AWS Launch Templates", a.Address)
 		return nil
 	} else if strings.ToLower(a.Tenancy) == "dedicated" {
 		a.Tenancy = "Dedicated"

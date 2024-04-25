@@ -58,8 +58,8 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃ $5,156        ┃ $0.00       ┃ $5,156     ┃
+┃ TestAzureRMCosmosDBTableGoldenFile                 ┃ $5,156        ┃ $0.00       ┃ $5,156     ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 Logs:
 
-WARN Skipping resource azurerm_cosmosdb_table.account-in-another-module as its 'account_name' property could not be found.
+WRN Skipping resource azurerm_cosmosdb_table.account-in-another-module as its 'account_name' property could not be found.

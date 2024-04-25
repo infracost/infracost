@@ -1,4 +1,4 @@
-Project: glob-test-shown
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_skip_paths/glob/test/shown
 Module path: glob/test/shown
 
  Name                                                         Monthly Qty  Unit                        Monthly Cost   
@@ -19,7 +19,7 @@ Module path: glob/test/shown
  Project total                                                                                               $51.97   
 
 ──────────────────────────────────
-Project: glob-test2-shown
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_skip_paths/glob/test2/shown
 Module path: glob/test2/shown
 
  Name                                                         Monthly Qty  Unit                        Monthly Cost   
@@ -40,7 +40,7 @@ Module path: glob/test2/shown
  Project total                                                                                               $51.97   
 
 ──────────────────────────────────
-Project: shown
+Project: infracost/infracost/cmd/infracost/testdata/breakdown_terragrunt_skip_paths/shown
 Module path: shown
 
  Name                                                         Monthly Qty  Unit                        Monthly Cost   
@@ -68,13 +68,13 @@ Module path: shown
 6 cloud resources were detected:
 ∙ 6 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
-┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ glob-test-shown                                    ┃ $52           ┃ $0.00       ┃ $52        ┃
-┃ glob-test2-shown                                   ┃ $52           ┃ $0.00       ┃ $52        ┃
-┃ shown                                              ┃ $52           ┃ $0.00       ┃ $52        ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                                          ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infraco...unt_skip_paths/glob/test/shown ┃ $52           ┃ $0.00       ┃ $52        ┃
+┃ infracost/infracost/cmd/infraco...nt_skip_paths/glob/test2/shown ┃ $52           ┃ $0.00       ┃ $52        ┃
+┃ infracost/infracost/cmd/infraco...wn_terragrunt_skip_paths/shown ┃ $52           ┃ $0.00       ┃ $52        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:
 

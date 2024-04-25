@@ -18,19 +18,14 @@ import (
 	"github.com/infracost/infracost/internal/schema"
 )
 
-type DetectionOutput struct {
-	Providers   []schema.Provider
-	RootModules int
-}
-
 // Detect returns a list of providers for the given path. Multiple returned
 // providers are because of auto-detected root modules residing under the
 // original path.
-func Detect(ctx *config.RunContext, project *config.Project, includePastResources bool) (*DetectionOutput, error) {
+func Detect(ctx *config.RunContext, project *config.Project, includePastResources bool) ([]schema.Provider, error) {
 	path := project.Path
 
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return &DetectionOutput{}, fmt.Errorf("No such file or directory %s", path)
+		return nil, fmt.Errorf("No such file or directory %s", path)
 	}
 
 	forceCLI := project.TerraformForceCLI
@@ -42,17 +37,17 @@ func Detect(ctx *config.RunContext, project *config.Project, includePastResource
 
 	switch projectType {
 	case ProjectTypeTerraformPlanJSON:
-		return &DetectionOutput{Providers: []schema.Provider{terraform.NewPlanJSONProvider(projectContext, includePastResources)}, RootModules: 1}, nil
+		return []schema.Provider{terraform.NewPlanJSONProvider(projectContext, includePastResources)}, nil
 	case ProjectTypeTerraformPlanBinary:
-		return &DetectionOutput{Providers: []schema.Provider{terraform.NewPlanProvider(projectContext, includePastResources)}, RootModules: 1}, nil
+		return []schema.Provider{terraform.NewPlanProvider(projectContext, includePastResources)}, nil
 	case ProjectTypeTerraformCLI:
-		return &DetectionOutput{Providers: []schema.Provider{terraform.NewDirProvider(projectContext, includePastResources)}, RootModules: 1}, nil
+		return []schema.Provider{terraform.NewDirProvider(projectContext, includePastResources)}, nil
 	case ProjectTypeTerragruntCLI:
-		return &DetectionOutput{Providers: []schema.Provider{terraform.NewTerragruntProvider(projectContext, includePastResources)}, RootModules: 1}, nil
+		return []schema.Provider{terraform.NewTerragruntProvider(projectContext, includePastResources)}, nil
 	case ProjectTypeTerraformStateJSON:
-		return &DetectionOutput{Providers: []schema.Provider{terraform.NewStateJSONProvider(projectContext, includePastResources)}, RootModules: 1}, nil
+		return []schema.Provider{terraform.NewStateJSONProvider(projectContext, includePastResources)}, nil
 	case ProjectTypeCloudFormation:
-		return &DetectionOutput{Providers: []schema.Provider{cloudformation.NewTemplateProvider(projectContext, includePastResources)}, RootModules: 1}, nil
+		return []schema.Provider{cloudformation.NewTemplateProvider(projectContext, includePastResources)}, nil
 	}
 
 	pathOverrides := make([]hcl.PathOverrideConfig, len(ctx.Config.Autodetect.PathOverrides))
@@ -83,32 +78,28 @@ func Detect(ctx *config.RunContext, project *config.Project, includePastResource
 	pl := hcl.NewProjectLocator(logging.Logger, locatorConfig)
 	rootPaths := pl.FindRootModules(project.Path)
 	if len(rootPaths) == 0 {
-		return &DetectionOutput{}, fmt.Errorf("could not detect path type for '%s'", path)
+		return nil, fmt.Errorf("could not detect path type for '%s'", path)
 	}
 
-	repoPath := ctx.Config.RepoPath()
 	var autoProviders []schema.Provider
 	for _, rootPath := range rootPaths {
-		if repoPath != "" {
-			rootPath.RepoPath = repoPath
-		}
-
-		detectedProjectContext := config.NewProjectContext(ctx, project, nil)
+		projectContext := config.NewProjectContext(ctx, project, nil)
 		if rootPath.IsTerragrunt {
-			detectedProjectContext.ContextValues.SetValue("project_type", "terragrunt_dir")
-			autoProviders = append(autoProviders, terraform.NewTerragruntHCLProvider(rootPath, detectedProjectContext))
+			projectContext.ContextValues.SetValue("project_type", "terragrunt_dir")
+			autoProviders = append(autoProviders, terraform.NewTerragruntHCLProvider(rootPath, projectContext))
 		} else {
-			detectedProjectContext.ContextValues.SetValue("project_type", "terraform_dir")
+			options := []hcl.Option{hcl.OptionWithSpinner(ctx.NewSpinner)}
+			projectContext.ContextValues.SetValue("project_type", "terraform_dir")
 			if ctx.Config.ConfigFilePath == "" && len(project.TerraformVarFiles) == 0 {
-				autoProviders = append(autoProviders, autodetectedRootToProviders(pl, detectedProjectContext, rootPath)...)
+				autoProviders = append(autoProviders, autodetectedRootToProviders(pl, projectContext, rootPath, options...)...)
 			} else {
-				autoProviders = append(autoProviders, configFileRootToProvider(rootPath, nil, detectedProjectContext, pl))
+				autoProviders = append(autoProviders, configFileRootToProvider(rootPath, options, projectContext, pl))
 			}
 
 		}
 	}
 
-	return &DetectionOutput{Providers: autoProviders, RootModules: len(rootPaths)}, nil
+	return autoProviders, nil
 }
 
 // configFileRootToProvider returns a provider for the given root path which is

@@ -5,9 +5,9 @@ import (
 	"strconv"
 
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 	yamlv3 "gopkg.in/yaml.v3"
 
-	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
 )
 
@@ -108,7 +108,7 @@ func ResourceUsagesFromYAML(raw yamlv3.Node) ([]*ResourceUsage, error) {
 	if len(raw.Content)%2 != 0 {
 		// This error shouldn't really happen, the YAML lib flattens map node key and values into a single array
 		// so this means the YAML map node is invalid but to be safe we add a log here in case it does.
-		logging.Logger.Error().Msgf("YAML resource usage contents are not divisible by 2. Expected map node to have equal number of key and value nodes.")
+		log.Error().Msgf("YAML resource usage contents are not divisible by 2. Expected map node to have equal number of key and value nodes.")
 		return []*ResourceUsage{}, errors.New("unexpected YAML format")
 	}
 
@@ -121,7 +121,7 @@ func ResourceUsagesFromYAML(raw yamlv3.Node) ([]*ResourceUsage, error) {
 		if len(resourceValNode.Content)%2 != 0 {
 			// This error shouldn't really happen, the YAML lib flattens map node key and values into a single array
 			// so this means the YAML map node is invalid but to be safe we add a log here in case it does.
-			logging.Logger.Error().Msgf("YAML resource value contents are not divisible by 2. Expected map node to have equal number of key and value nodes.")
+			log.Error().Msgf("YAML resource value contents are not divisible by 2. Expected map node to have equal number of key and value nodes.")
 			return resourceUsages, errors.New("unexpected YAML format")
 		}
 
@@ -357,7 +357,7 @@ func ResourceUsagesToYAML(resourceUsages []*ResourceUsage) (yamlv3.Node, bool) {
 //		}
 func usageItemFromYAML(keyNode *yamlv3.Node, valNode *yamlv3.Node) (*schema.UsageItem, error) {
 	if keyNode == nil || valNode == nil {
-		logging.Logger.Error().Msgf("YAML contains nil key or value node")
+		log.Error().Msgf("YAML contains nil key or value node")
 		return nil, errors.New("unexpected YAML format")
 	}
 
@@ -370,7 +370,7 @@ func usageItemFromYAML(keyNode *yamlv3.Node, valNode *yamlv3.Node) (*schema.Usag
 		if len(valNode.Content)%2 != 0 {
 			// This error shouldn't really happen, the YAML lib flattens map node key and values into a single array
 			// so this means the YAML map node is invalid but to be safe we add a log here in case it does.
-			logging.Logger.Error().Msgf("YAML value map node contents are not divisible by 2. Expected map node to have equal number of key and value nodes.")
+			log.Error().Msgf("YAML value map node contents are not divisible by 2. Expected map node to have equal number of key and value nodes.")
 			return nil, errors.New("unexpected YAML format")
 		}
 
@@ -395,7 +395,7 @@ func usageItemFromYAML(keyNode *yamlv3.Node, valNode *yamlv3.Node) (*schema.Usag
 	} else {
 		err := valNode.Decode(&value)
 		if err != nil {
-			logging.Logger.Error().Msgf("Unable to decode YAML value")
+			log.Error().Msgf("Unable to decode YAML value")
 			return nil, errors.New("unexpected YAML format")
 		}
 

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
 
-	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -187,7 +187,7 @@ func (r *LogAnalyticsWorkspace) BuildResource() *schema.Resource {
 	}
 
 	if _, ok := unsupportedLegacySkus[strings.ToLower(r.SKU)]; ok {
-		logging.Logger.Warn().Msgf("skipping %s as it uses legacy pricing options", r.Address)
+		log.Warn().Msgf("skipping %s as it uses legacy pricing options", r.Address)
 
 		return &schema.Resource{
 			Name:        r.Address,

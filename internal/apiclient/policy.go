@@ -191,7 +191,7 @@ func filterResource(rd *schema.ResourceData, al allowList) policy2Resource {
 	// make sure the keys in the values json are sorted so we get consistent policyShas
 	valuesJSON, err := jsonSorted.Marshal(filterValues(rd.RawValues, al))
 	if err != nil {
-		logging.Logger.Debug().Err(err).Str("address", rd.Address).Msg("Failed to marshal filtered values")
+		logging.Logger.Warn().Err(err).Str("address", rd.Address).Msg("Failed to marshal filtered values")
 	}
 
 	references := make([]policy2Reference, 0, len(rd.ReferencesMap))
@@ -261,7 +261,7 @@ func filterValues(rd gjson.Result, allowList map[string]gjson.Result) map[string
 					values[k] = filterValues(v, nestedAllow)
 				}
 			} else {
-				logging.Logger.Debug().Str("Key", k).Str("Type", allow.Type.String()).Msg("Unknown allow type")
+				logging.Logger.Warn().Str("Key", k).Str("Type", allow.Type.String()).Msg("Unknown allow type")
 			}
 		}
 	}

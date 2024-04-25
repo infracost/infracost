@@ -25,6 +25,7 @@ import (
 	"github.com/infracost/infracost/internal/hcl/modules"
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/ui"
 )
 
 var (
@@ -92,6 +93,7 @@ type Evaluator struct {
 	workspace string
 	// blockBuilder handles generating blocks in the evaluation step.
 	blockBuilder   BlockBuilder
+	newSpinner     ui.SpinnerFunc
 	logger         zerolog.Logger
 	isGraph        bool
 	filteredBlocks []*Block
@@ -108,6 +110,7 @@ func NewEvaluator(
 	visitedModules map[string]map[string]cty.Value,
 	workspace string,
 	blockBuilder BlockBuilder,
+	spinFunc ui.SpinnerFunc,
 	logger zerolog.Logger,
 	isGraph bool,
 ) *Evaluator {
@@ -180,6 +183,7 @@ func NewEvaluator(
 		workspace:      workspace,
 		workingDir:     workingDir,
 		blockBuilder:   blockBuilder,
+		newSpinner:     spinFunc,
 		logger:         l,
 		isGraph:        isGraph,
 	}
@@ -232,6 +236,11 @@ func (e *Evaluator) MissingVars() []string {
 // parse and build up and child modules that are referenced in the Blocks and runs child Evaluator on
 // this Module.
 func (e *Evaluator) Run() (*Module, error) {
+	if e.newSpinner != nil {
+		spin := e.newSpinner("Evaluating Terraform directory")
+		defer spin.Success()
+	}
+
 	var lastContext hcl.EvalContext
 	// first we need to evaluate the top level Context - so this can be passed to any child modules that are found.
 	e.logger.Debug().Msg("evaluating top level context")
@@ -298,7 +307,7 @@ func (e *Evaluator) evaluate(lastContext hcl.EvalContext) {
 	}
 
 	if i == maxContextIterations {
-		e.logger.Debug().Msgf("hit max context iterations evaluating module %s", e.module.Name)
+		e.logger.Warn().Msgf("hit max context iterations evaluating module %s", e.module.Name)
 	}
 
 }
@@ -363,6 +372,7 @@ func (e *Evaluator) evaluateModules() {
 			map[string]map[string]cty.Value{},
 			e.workspace,
 			e.blockBuilder,
+			nil,
 			e.logger,
 			e.isGraph,
 		)
@@ -406,7 +416,7 @@ func (e *Evaluator) expandBlocks(blocks Blocks, lastContext hcl.EvalContext) Blo
 	}
 
 	if i == maxContextIterations {
-		e.logger.Debug().Msgf("hit max context iterations expanding blocks in module %s", e.module.Name)
+		e.logger.Warn().Msgf("hit max context iterations expanding blocks in module %s", e.module.Name)
 	}
 
 	return e.expandDynamicBlocks(expanded...)

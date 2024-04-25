@@ -458,6 +458,7 @@ func (g *Graph) loadBlocksForModule(evaluator *Evaluator) ([]*Block, error) {
 				map[string]map[string]cty.Value{},
 				evaluator.workspace,
 				evaluator.blockBuilder,
+				nil,
 				evaluator.logger,
 				evaluator.isGraph,
 			)

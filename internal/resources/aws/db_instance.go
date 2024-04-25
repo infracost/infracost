@@ -5,7 +5,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/infracost/infracost/internal/logging"
+	"github.com/rs/zerolog/log"
+
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 
@@ -193,7 +194,7 @@ func (r *DBInstance) BuildResource() *schema.Resource {
 		}
 		priceFilter, err = resolver.PriceFilter()
 		if err != nil {
-			logging.Logger.Warn().Msgf(err.Error())
+			log.Warn().Msgf(err.Error())
 		}
 		purchaseOptionLabel = "reserved"
 	}

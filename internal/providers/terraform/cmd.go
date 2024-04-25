@@ -11,6 +11,7 @@ import (
 	"sync"
 
 	"github.com/rs/zerolog"
+	"github.com/rs/zerolog/log"
 
 	"github.com/infracost/infracost/internal/logging"
 )
@@ -42,7 +43,7 @@ func Cmd(opts *CmdOptions, args ...string) ([]byte, error) {
 	}
 
 	cmd := exec.Command(exe, append(args, opts.Flags...)...)
-	logging.Logger.Debug().Msgf("Running command: %s", cmd.String())
+	log.Debug().Msgf("Running command: %s", cmd.String())
 	cmd.Dir = opts.Dir
 	cmd.Env = os.Environ()
 
@@ -141,27 +142,27 @@ func CreateConfigFile(dir string, terraformCloudHost string, terraformCloudToken
 		return "", nil
 	}
 
-	logging.Logger.Debug().Msg("Creating temporary config file for Terraform credentials")
+	log.Debug().Msg("Creating temporary config file for Terraform credentials")
 	tmpFile, err := os.CreateTemp("", "")
 	if err != nil {
 		return "", err
 	}
 
 	if os.Getenv("TF_CLI_CONFIG_FILE") != "" {
-		logging.Logger.Debug().Msgf("TF_CLI_CONFIG_FILE is set, copying existing config from %s to config to temporary config file %s", os.Getenv("TF_CLI_CONFIG_FILE"), tmpFile.Name())
+		log.Debug().Msgf("TF_CLI_CONFIG_FILE is set, copying existing config from %s to config to temporary config file %s", os.Getenv("TF_CLI_CONFIG_FILE"), tmpFile.Name())
 		path := os.Getenv("TF_CLI_CONFIG_FILE")
 
 		if !filepath.IsAbs(path) {
 			path, err = filepath.Abs(filepath.Join(dir, path))
 			if err != nil {
-				logging.Logger.Warn().Msgf("Unable to copy existing config from %s: %v", path, err)
+				log.Warn().Msgf("Unable to copy existing config from %s: %v", path, err)
 			}
 		}
 
 		if err == nil {
 			err = copyFile(path, tmpFile.Name())
 			if err != nil {
-				logging.Logger.Warn().Msgf("Unable to copy existing config from %s: %v", path, err)
+				log.Warn().Msgf("Unable to copy existing config from %s: %v", path, err)
 			}
 		}
 	}
@@ -182,7 +183,7 @@ func CreateConfigFile(dir string, terraformCloudHost string, terraformCloudToken
 }
 `, host, terraformCloudToken)
 
-	logging.Logger.Debug().Msgf("Writing Terraform credentials to temporary config file %s", tmpFile.Name())
+	log.Debug().Msgf("Writing Terraform credentials to temporary config file %s", tmpFile.Name())
 	if _, err := f.WriteString(contents); err != nil {
 		return tmpFile.Name(), err
 	}

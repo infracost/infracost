@@ -1,8 +1,8 @@
 package config
 
 import (
-	"fmt"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -182,7 +182,7 @@ type Config struct {
 func init() {
 	err := loadDotEnv()
 	if err != nil {
-		logging.Logger.Fatal().Msg(err.Error())
+		log.Fatal(err)
 	}
 }
 
@@ -321,45 +321,9 @@ func (c *Config) SetLogWriter(w io.Writer) {
 // LogWriter returns the writer the Logger should use to write logs to.
 // In most cases this should be stderr, but it can also be a file.
 func (c *Config) LogWriter() io.Writer {
-	isCI := ciPlatform() != "" && !IsTest()
 	return zerolog.NewConsoleWriter(func(w *zerolog.ConsoleWriter) {
-		w.PartsExclude = []string{"time"}
-		w.FormatLevel = func(i interface{}) string {
-			if i == nil {
-				return ""
-			}
-
-			if isCI {
-				return strings.ToUpper(fmt.Sprintf("%s", i))
-			}
-
-			if ll, ok := i.(string); ok {
-				upper := strings.ToUpper(ll)
-
-				switch ll {
-				case zerolog.LevelTraceValue:
-					return color.CyanString("%s", upper)
-				case zerolog.LevelDebugValue:
-					return color.MagentaString("%s", upper)
-				case zerolog.LevelWarnValue:
-					return color.YellowString("%s", upper)
-				case zerolog.LevelErrorValue, zerolog.LevelFatalValue, zerolog.LevelPanicValue:
-					return color.RedString("%s", upper)
-				case zerolog.LevelInfoValue:
-					return color.GreenString("%s", upper)
-				default:
-				}
-			}
-
-			return strings.ToUpper(fmt.Sprintf("%s", i))
-		}
-
-		if isCI {
-			w.NoColor = true
-			w.TimeFormat = time.RFC3339
-			w.PartsExclude = nil
-		}
-
+		w.NoColor = true
+		w.TimeFormat = time.RFC3339
 		if c.logDisableTimestamps {
 			w.PartsExclude = []string{"time"}
 		}
@@ -367,6 +331,8 @@ func (c *Config) LogWriter() io.Writer {
 		w.Out = os.Stderr
 		if c.logWriter != nil {
 			w.Out = c.logWriter
+		} else if c.LogLevel == "" {
+			w.Out = io.Discard
 		}
 	})
 }
@@ -436,6 +402,10 @@ func (c *Config) LoadGlobalFlags(cmd *cobra.Command) error {
 	return nil
 }
 
+func (c *Config) IsLogging() bool {
+	return c.LogLevel != ""
+}
+
 func (c *Config) IsSelfHosted() bool {
 	return c.PricingAPIEndpoint != "" && c.PricingAPIEndpoint != c.DefaultPricingAPIEndpoint
 }
@@ -469,14 +439,4 @@ func loadDotEnv() error {
 	}
 
 	return nil
-}
-
-func CleanProjectName(name string) string {
-	name = strings.TrimSuffix(name, "/")
-	name = strings.ReplaceAll(name, "/", "-")
-
-	if name == "." {
-		return "main"
-	}
-	return name
 }

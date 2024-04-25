@@ -1,4 +1,4 @@
-Project: main
+Project: infracost/infracost/examples/terraform
 
  Name                                                           Monthly Qty  Unit                        Monthly Cost   
                                                                                                                         
@@ -26,7 +26,7 @@ Project: main
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃ $743          ┃ $0.00       ┃ $743       ┃
+┃ infracost/infracost/examples/terraform             ┃ $743          ┃ $0.00       ┃ $743       ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:
