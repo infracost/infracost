@@ -450,7 +450,17 @@ func (g *Graph) loadBlocksForModule(evaluator *Evaluator) ([]*Block, error) {
 				return nil, fmt.Errorf("could not load module %q", block.FullName())
 			}
 
-			moduleEvaluator := NewEvaluator(evaluator.repoPath, *modCall.Module, evaluator.workingDir, map[string]cty.Value{}, evaluator.moduleMetadata, map[string]map[string]cty.Value{}, evaluator.workspace, evaluator.blockBuilder, evaluator.logger, evaluator.isGraph)
+			moduleEvaluator := NewEvaluator(
+				*modCall.Module,
+				evaluator.workingDir,
+				map[string]cty.Value{},
+				evaluator.moduleMetadata,
+				map[string]map[string]cty.Value{},
+				evaluator.workspace,
+				evaluator.blockBuilder,
+				evaluator.logger,
+				evaluator.isGraph,
+			)
 
 			modBlocks, err := g.loadBlocksForModule(moduleEvaluator)
 			if err != nil {

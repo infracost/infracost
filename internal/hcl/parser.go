@@ -395,7 +395,6 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 
 	// load an Evaluator with the top level Blocks to begin Context propagation.
 	evaluator := NewEvaluator(
-		p.repoPath,
 		Module{
 			Name:       "",
 			Source:     "",
