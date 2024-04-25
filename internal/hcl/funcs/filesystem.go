@@ -6,7 +6,6 @@ import (
 	"io"
 	"os"
 	"path/filepath"
-	"strings"
 	"unicode/utf8"
 
 	"github.com/bmatcuk/doublestar"
@@ -20,7 +19,7 @@ import (
 // MakeFileFunc constructs a function that takes a file path and returns the
 // contents of that file, either directly as a string (where valid UTF-8 is
 // required) or as a string containing base64 bytes.
-func MakeFileFunc(repoDir, baseDir string, encBase64 bool) function.Function {
+func MakeFileFunc(baseDir string, encBase64 bool) function.Function {
 	return function.New(&function.Spec{
 		Params: []function.Parameter{
 			{
@@ -31,7 +30,7 @@ func MakeFileFunc(repoDir, baseDir string, encBase64 bool) function.Function {
 		Type: function.StaticReturnType(cty.String),
 		Impl: func(args []cty.Value, retType cty.Type) (cty.Value, error) {
 			path := args[0].AsString()
-			src, err := readFileBytes(repoDir, baseDir, path)
+			src, err := readFileBytes(baseDir, path)
 			if err != nil {
 				err = function.NewArgError(0, err)
 				return cty.UnknownVal(cty.String), err
@@ -64,7 +63,7 @@ func MakeFileFunc(repoDir, baseDir string, encBase64 bool) function.Function {
 // As a special exception, a referenced template file may not recursively call
 // the templatefile function, since that would risk the same file being
 // included into itself indefinitely.
-func MakeTemplateFileFunc(repoDir, baseDir string, funcsCb func() map[string]function.Function) function.Function {
+func MakeTemplateFileFunc(baseDir string, funcsCb func() map[string]function.Function) function.Function {
 
 	params := []function.Parameter{
 		{
@@ -80,8 +79,7 @@ func MakeTemplateFileFunc(repoDir, baseDir string, funcsCb func() map[string]fun
 	loadTmpl := func(fn string) (hcl.Expression, error) {
 		// We re-use File here to ensure the same filename interpretation
 		// as it does, along with its other safety checks.
-		fileFn := MakeFileFunc(repoDir, baseDir, false)
-		tmplVal, err := fileFn.Call([]cty.Value{cty.StringVal(fn)})
+		tmplVal, err := File(baseDir, cty.StringVal(fn))
 		if err != nil {
 			return nil, err
 		}
@@ -184,7 +182,7 @@ func MakeTemplateFileFunc(repoDir, baseDir string, funcsCb func() map[string]fun
 
 // MakeFileExistsFunc constructs a function that takes a path
 // and determines whether a file exists at that path
-func MakeFileExistsFunc(repoDir, baseDir string) function.Function {
+func MakeFileExistsFunc(baseDir string) function.Function {
 	return function.New(&function.Spec{
 		Params: []function.Parameter{
 			{
@@ -207,11 +205,6 @@ func MakeFileExistsFunc(repoDir, baseDir string) function.Function {
 			// Ensure that the path is canonical for the host OS
 			path = filepath.Clean(path)
 
-			// Ensure that the path is within the repository directory
-			if err := isPathInRepo(repoDir, path); err != nil {
-				return cty.False, nil
-			}
-
 			fi, err := os.Stat(path)
 			if err != nil {
 				if os.IsNotExist(err) {
@@ -232,7 +225,7 @@ func MakeFileExistsFunc(repoDir, baseDir string) function.Function {
 
 // MakeFileSetFunc constructs a function that takes a glob pattern
 // and enumerates a file set from that pattern
-func MakeFileSetFunc(repoDir string, baseDir string) function.Function {
+func MakeFileSetFunc(baseDir string) function.Function {
 	return function.New(&function.Spec{
 		Params: []function.Parameter{
 			{
@@ -253,11 +246,6 @@ func MakeFileSetFunc(repoDir string, baseDir string) function.Function {
 				path = filepath.Join(baseDir, path)
 			}
 
-			err := isPathInRepo(repoDir, path)
-			if err != nil {
-				return cty.SetValEmpty(cty.String), nil
-			}
-
 			// Join the path to the glob pattern, while ensuring the full
 			// pattern is canonical for the host OS. The joined path is
 			// automatically cleaned during this operation.
@@ -270,9 +258,6 @@ func MakeFileSetFunc(repoDir string, baseDir string) function.Function {
 
 			var matchVals []cty.Value
 			for _, match := range matches {
-				if err := isPathInRepo(repoDir, match); err != nil {
-					continue
-				}
 				fi, err := os.Stat(match)
 
 				if err != nil {
@@ -367,7 +352,7 @@ var PathExpandFunc = function.New(&function.Spec{
 	},
 })
 
-func openFile(repoDir, baseDir, path string) (*os.File, error) {
+func openFile(baseDir, path string) (*os.File, error) {
 	path, err := homedir.Expand(path)
 	if err != nil {
 		return nil, fmt.Errorf("failed to expand ~: %s", err)
@@ -379,61 +364,12 @@ func openFile(repoDir, baseDir, path string) (*os.File, error) {
 
 	// Ensure that the path is canonical for the host OS
 	path = filepath.Clean(path)
-	err = isPathInRepo(repoDir, path)
-	if err != nil {
-		return nil, err
-	}
 
 	return os.Open(path)
 }
 
-func isPathInRepo(repoDir string, path string) error {
-	// isPathInRepo is a no-op when not running in github/gitlab app env.
-	ciPlatform := os.Getenv("INFRACOST_CI_PLATFORM")
-	if ciPlatform != "github_app" && ciPlatform != "gitlab_app" {
-		return nil
-	}
-
-	if filepath.IsAbs(path) && !filepath.IsAbs(repoDir) {
-		repoDirAbs, err := filepath.Abs(repoDir)
-		if err == nil {
-			repoDir = repoDirAbs
-		}
-	}
-
-	// ensure the path resolves to the real symlink path
-	path = symlinkPath(path)
-
-	clean := filepath.Clean(repoDir)
-	if repoDir != "" && !strings.HasPrefix(path, clean) {
-		return fmt.Errorf("file %s is not within the repository directory %s", path, repoDir)
-	}
-
-	return nil
-}
-
-// symlinkPath checks the given file path and returns the real path if it is a
-// symlink.
-func symlinkPath(filepathStr string) string {
-	fileInfo, err := os.Lstat(filepathStr)
-	if err != nil {
-		return filepathStr
-	}
-
-	if fileInfo.Mode()&os.ModeSymlink != 0 {
-		realPath, err := filepath.EvalSymlinks(filepathStr)
-		if err != nil {
-			return filepathStr
-		}
-
-		return realPath
-	}
-
-	return filepathStr
-}
-
-func readFileBytes(repoDir, baseDir, path string) ([]byte, error) {
-	f, err := openFile(repoDir, baseDir, path)
+func readFileBytes(baseDir, path string) ([]byte, error) {
+	f, err := openFile(baseDir, path)
 	if err != nil {
 		if os.IsNotExist(err) {
 			// An extra Terraform-specific hint for this situation
@@ -458,7 +394,7 @@ func readFileBytes(repoDir, baseDir, path string) ([]byte, error) {
 // directory, so this wrapper takes a base directory string and uses it to
 // construct the underlying function before calling it.
 func File(baseDir string, path cty.Value) (cty.Value, error) {
-	fn := MakeFileFunc("", baseDir, false)
+	fn := MakeFileFunc(baseDir, false)
 	return fn.Call([]cty.Value{path})
 }
 
@@ -468,7 +404,7 @@ func File(baseDir string, path cty.Value) (cty.Value, error) {
 // directory, so this wrapper takes a base directory string and uses it to
 // construct the underlying function before calling it.
 func FileExists(baseDir string, path cty.Value) (cty.Value, error) {
-	fn := MakeFileExistsFunc("", baseDir)
+	fn := MakeFileExistsFunc(baseDir)
 	return fn.Call([]cty.Value{path})
 }
 
@@ -478,7 +414,7 @@ func FileExists(baseDir string, path cty.Value) (cty.Value, error) {
 // directory, so this wrapper takes a base directory string and uses it to
 // construct the underlying function before calling it.
 func FileSet(baseDir string, path, pattern cty.Value) (cty.Value, error) {
-	fn := MakeFileSetFunc("", baseDir)
+	fn := MakeFileSetFunc(baseDir)
 	return fn.Call([]cty.Value{path, pattern})
 }
 
@@ -490,7 +426,7 @@ func FileSet(baseDir string, path, pattern cty.Value) (cty.Value, error) {
 // directory, so this wrapper takes a base directory string and uses it to
 // construct the underlying function before calling it.
 func FileBase64(baseDir string, path cty.Value) (cty.Value, error) {
-	fn := MakeFileFunc("", baseDir, true)
+	fn := MakeFileFunc(baseDir, true)
 	return fn.Call([]cty.Value{path})
 }
 

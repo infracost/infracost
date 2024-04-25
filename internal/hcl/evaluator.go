@@ -95,26 +95,24 @@ type Evaluator struct {
 	logger         zerolog.Logger
 	isGraph        bool
 	filteredBlocks []*Block
-	repoPath       string
 }
 
 // NewEvaluator returns an Evaluator with Context initialised with top level variables.
 // This Context is then passed to all Blocks as child Context so that variables built in Evaluation
 // are propagated to the Block Attributes.
-
 func NewEvaluator(
-	repoPath string,
 	module Module,
 	workingDir string,
 	inputVars map[string]cty.Value,
 	moduleMetadata *modules.Manifest,
 	visitedModules map[string]map[string]cty.Value,
-	workspace string, blockBuilder BlockBuilder,
+	workspace string,
+	blockBuilder BlockBuilder,
 	logger zerolog.Logger,
 	isGraph bool,
 ) *Evaluator {
 	ctx := NewContext(&hcl.EvalContext{
-		Functions: ExpFunctions(repoPath, module.RootPath, logger),
+		Functions: ExpFunctions(module.RootPath, logger),
 	}, nil, logger)
 
 	// Add any provider references from blocks in this module.
@@ -173,7 +171,6 @@ func NewEvaluator(
 		Logger()
 
 	return &Evaluator{
-		repoPath:       repoPath,
 		module:         module,
 		ctx:            ctx,
 		inputVars:      inputVars,
@@ -347,23 +344,25 @@ func (e *Evaluator) evaluateModules() {
 
 		e.visitedModules[fullName] = vars
 
-		moduleEvaluator := NewEvaluator(e.repoPath, Module{
-			Name:               fullName,
-			Source:             moduleCall.Module.Source,
-			Blocks:             moduleCall.Module.RawBlocks,
-			RawBlocks:          moduleCall.Module.RawBlocks,
-			RootPath:           e.module.RootPath,
-			ModulePath:         moduleCall.Path,
-			Modules:            nil,
-			Parent:             &e.module,
-			SourceURL:          moduleCall.Module.SourceURL,
-			ProviderReferences: moduleCall.Module.ProviderReferences,
-		},
+		moduleEvaluator := NewEvaluator(
+			Module{
+				Name:               fullName,
+				Source:             moduleCall.Module.Source,
+				Blocks:             moduleCall.Module.RawBlocks,
+				RawBlocks:          moduleCall.Module.RawBlocks,
+				RootPath:           e.module.RootPath,
+				ModulePath:         moduleCall.Path,
+				Modules:            nil,
+				Parent:             &e.module,
+				SourceURL:          moduleCall.Module.SourceURL,
+				ProviderReferences: moduleCall.Module.ProviderReferences,
+			},
 			e.workingDir,
 			vars,
 			e.moduleMetadata,
 			map[string]map[string]cty.Value{},
-			e.workspace, e.blockBuilder,
+			e.workspace,
+			e.blockBuilder,
 			e.logger,
 			e.isGraph,
 		)
@@ -1140,8 +1139,8 @@ func (e *Evaluator) loadModules(lastContext hcl.EvalContext) {
 
 // ExpFunctions returns the set of functions that should be used to when evaluating
 // expressions in the receiving scope.
-func ExpFunctions(repoDir, baseDir string, logger zerolog.Logger) map[string]function.Function {
-	fns := map[string]function.Function{
+func ExpFunctions(baseDir string, logger zerolog.Logger) map[string]function.Function {
+	return map[string]function.Function{
 		"abs":              stdlib.AbsoluteFunc,
 		"abspath":          funcs.AbsPathFunc,
 		"basename":         funcs.BasenameFunc,
@@ -1169,16 +1168,16 @@ func ExpFunctions(repoDir, baseDir string, logger zerolog.Logger) map[string]fun
 		"element":          stdlib.ElementFunc,
 		"endswith":         funcs.EndsWithFunc,
 		"chunklist":        stdlib.ChunklistFunc,
-		"file":             funcs.MakeFileFunc(repoDir, baseDir, false),
-		"filebase64":       funcs.MakeFileFunc(repoDir, baseDir, true),
-		"fileexists":       funcs.MakeFileExistsFunc(repoDir, baseDir),
-		"fileset":          funcs.MakeFileSetFunc(repoDir, baseDir),
-		"filebase64sha256": funcs.MakeFileBase64Sha256Func(repoDir, baseDir),
-		"filebase64sha512": funcs.MakeFileBase64Sha512Func(repoDir, baseDir),
-		"filemd5":          funcs.MakeFileMd5Func(repoDir, baseDir),
-		"filesha1":         funcs.MakeFileSha1Func(repoDir, baseDir),
-		"filesha256":       funcs.MakeFileSha256Func(repoDir, baseDir),
-		"filesha512":       funcs.MakeFileSha512Func(repoDir, baseDir),
+		"file":             funcs.MakeFileFunc(baseDir, false),
+		"fileexists":       funcs.MakeFileExistsFunc(baseDir),
+		"fileset":          funcs.MakeFileSetFunc(baseDir),
+		"filebase64":       funcs.MakeFileFunc(baseDir, true),
+		"filebase64sha256": funcs.MakeFileBase64Sha256Func(baseDir),
+		"filebase64sha512": funcs.MakeFileBase64Sha512Func(baseDir),
+		"filemd5":          funcs.MakeFileMd5Func(baseDir),
+		"filesha1":         funcs.MakeFileSha1Func(baseDir),
+		"filesha256":       funcs.MakeFileSha256Func(baseDir),
+		"filesha512":       funcs.MakeFileSha512Func(baseDir),
 		"flatten":          stdlib.FlattenFunc,
 		"floor":            stdlib.FloorFunc,
 		"format":           stdlib.FormatFunc,
@@ -1252,9 +1251,4 @@ func ExpFunctions(repoDir, baseDir string, logger zerolog.Logger) map[string]fun
 		"zipmap":           stdlib.ZipmapFunc,
 	}
 
-	fns["templatefile"] = funcs.MakeTemplateFileFunc(repoDir, baseDir, func() map[string]function.Function {
-		return fns
-	})
-
-	return fns
 }
