@@ -336,7 +336,7 @@ func (p *Parser) YAML() string {
 	if len(p.tfEnvVars) > 0 {
 		str.WriteString("  terraform_vars:\n")
 
-		keys := make([]string, len(p.tfEnvVars), 0)
+		keys := make([]string, 0, len(p.tfEnvVars))
 		for key := range p.tfEnvVars {
 			keys = append(keys, key)
 		}
