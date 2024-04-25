@@ -117,6 +117,15 @@
  ├─ Additional Monthly Documents                                                         1,000  Documents                             $50.00 
  └─ Additional Monthly Queries                                                           1,000  Queries                               $20.00 
                                                                                                                                              
+ ibm_resource_instance.watson_governance_essentials                                                                                          
+ └─ Resource Units                                                                         100  RU                                    $60.00 
+                                                                                                                                             
+ ibm_resource_instance.watson_governance_lite                                                                                                
+ └─ Lite plan                                                                                1                                         $0.00 
+                                                                                                                                             
+ ibm_resource_instance.watson_governance_standard_v2                                                                                         
+ └─ Deployed Models                                                                          1  Model                                $261.00 
+                                                                                                                                             
  ibm_resource_instance.watson_studio_lite                                                                                                    
  └─ Lite plan                                                                                1                                         $0.00 
                                                                                                                                              
@@ -139,7 +148,7 @@
  ├─ Class 2 Resource Units                                                                  50  RU                                     $0.09 
  └─ Class 3 Resource Units                                                                  50  RU                                     $0.25 
                                                                                                                                              
- OVERALL TOTAL                                                                                                                    $15,470.56 
+ OVERALL TOTAL                                                                                                                    $15,791.56 
 ──────────────────────────────────
-32 cloud resources were detected:
-∙ 32 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+35 cloud resources were detected:
+∙ 35 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

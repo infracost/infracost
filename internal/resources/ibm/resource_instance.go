@@ -78,6 +78,9 @@ type ResourceInstance struct {
 	SCC_Evaluations *float64 `infracost_usage:"scc_evaluations"`
 	// Watson Studio
 	WS_CUH *float64 `infracost_usage:"data-science-experience_CAPACITY_UNIT_HOURS"`
+	// Watson.governance
+	WGOV_ru     *float64 `infracost_usage:"aiopenscale_RESOURCE_UNITS"`
+	WGOV_Models *float64 `infracost_usage:"aiopenscale_MODELS_PER_MONTH"`
 }
 
 type ResourceCostComponentsFunc func(*ResourceInstance) []*schema.CostComponent
@@ -122,6 +125,8 @@ var ResourceInstanceUsageSchema = []*schema.UsageItem{
 	{Key: "wd_collections", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "scc_evaluations", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "data-science-experience_CAPACITY_UNIT_HOURS", DefaultValue: 1, ValueType: schema.Float64},
+	{Key: "aiopenscale_RESOURCE_UNITS", DefaultValue: 1, ValueType: schema.Float64},
+	{Key: "aiopenscale_MODELS_PER_MONTH", DefaultValue: 1, ValueType: schema.Float64},
 }
 
 var ResourceInstanceCostMap map[string]ResourceCostComponentsFunc = map[string]ResourceCostComponentsFunc{
@@ -139,6 +144,7 @@ var ResourceInstanceCostMap map[string]ResourceCostComponentsFunc = map[string]R
 	"discovery":               GetWDCostComponents,
 	"compliance":              GetSCCCostComponents,
 	"data-science-experience": GetWSCostComponents,
+	"aiopenscale":             GetWGOVCostComponents,
 }
 
 func KMSKeyVersionsFreeCostComponent(r *ResourceInstance) *schema.CostComponent {

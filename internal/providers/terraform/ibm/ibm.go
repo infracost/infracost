@@ -74,6 +74,9 @@ var globalCatalogServiceId = map[string]catalogMetadata{
 	"wx":                            {"51c53b72-918f-4869-b834-2d99eb28422a", []string{}, nil},
 	"conversation":                  {"7045626d-55e3-4418-be11-683a26dbc1e5", []string{}, nil},
 	"aiopenscale":                   {"2ad019f3-0fd6-4c25-966d-f3952481a870", []string{}, nil},
+	"sysdig-monitor":                {"090c2c10-8c38-11e8-bec2-493df9c49eb8", []string{}, nil},
+	"sysdig-secure":                 {"e831e900-82d6-11ec-95c5-c12c5a5d9687", []string{}, nil},
+	"logdna":                        {"e13e1860-959c-11e8-871e-ad157af61ad7", []string{}, nil},
 }
 
 func SetCatalogMetadata(d *schema.ResourceData, resourceType string, config map[string]any) {
