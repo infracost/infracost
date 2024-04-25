@@ -3,7 +3,7 @@ package ibm
 var TRIAL_PLAN_PROGRAMMATIC_NAME string = "free-trial"
 var GRADUATED_PLAN_PROGRAMMATIC_NAME string = "graduated-tier"
 
-func GetSysdigSecureCostComponents(r *ResourceInstance []*schema.CostComponent) {
+func GetSysdigSecureCostComponents(r *ResourceInstance) []*schema.CostComponent {
 	if r.Plan == TRIAL_PLAN_PROGRAMMATIC_NAME {
 		return []*schema.CostComponent{
 			// TODO
@@ -24,3 +24,5 @@ func GetSysdigSecureCostComponents(r *ResourceInstance []*schema.CostComponent) 
 		}
 	}
 }
+
+func SysdigSecure
