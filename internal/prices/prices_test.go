@@ -17,7 +17,7 @@ func Test_notFound_Add(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want []string
+		want map[string]int
 	}{
 		{
 			name: "test aggregates resource/cost component with correct keys",
@@ -41,7 +41,7 @@ func Test_notFound_Add(t *testing.T) {
 					},
 				},
 			}},
-			want: []string{"aws_instance.compute", "aws_instance.compute", "aws_instance.data_storage"},
+			want: map[string]int{"aws_instance.compute": 2, "aws_instance.data_storage": 1},
 		},
 	}
 	for _, tt := range tests {

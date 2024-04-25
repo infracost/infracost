@@ -925,7 +925,7 @@ func (r *parallelRunner) buildRunEnv(projectContexts []*config.ProjectContext, o
 	env["totalUnestimatedUsages"] = summary.TotalUnestimatedUsages
 
 	if r.pricingFetcher.MissingPricesLen() > 0 {
-		env["pricesNotFoundList"] = r.pricingFetcher.MissingPricesComponents()
+		env["pricesNotFound"] = r.pricingFetcher.MissingPricesComponents()
 	}
 
 	if n := or.ExampleProjectName(); n != "" {

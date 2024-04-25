@@ -112,18 +112,11 @@ func (p *PriceFetcher) addNotFoundResult(result apiclient.PriceQueryResult) {
 
 // MissingPricesComponents returns a map of missing prices by component name, component
 // names are in the format: resource_type.cost_component_name.
-func (p *PriceFetcher) MissingPricesComponents() []string {
+func (p *PriceFetcher) MissingPricesComponents() map[string]int {
 	p.mux.RLock()
 	defer p.mux.RUnlock()
 
-	var result []string
-	for key, count := range p.components {
-		for i := 0; i < count; i++ {
-			result = append(result, key)
-		}
-	}
-
-	return result
+	return p.components
 }
 
 // MissingPricesLen returns the number of missing prices.
