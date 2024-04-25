@@ -78,6 +78,10 @@ type ResourceInstance struct {
 	SCC_Evaluations *float64 `infracost_usage:"scc_evaluations"`
 	// Watson Studio
 	WS_CUH *float64 `infracost_usage:"data-science-experience_CAPACITY_UNIT_HOURS"`
+	// SCC Workload Protection (Sysdig Secure)
+	SCCWP_MulticloudCSPMComputeInstances *float64 `infracost_usage:"sysdig-secure_MULTI_CLOUD_CSPM_COMPUTE_INSTANCES"`
+	SCCWP_NodeHours                      *float64 `infracost_usage:"sysdig-secure_NODE_HOURS"`
+	SCCWP_VMNodeHours                    *float64 `infracost_usage:"sysdig-secure_VM_NODE_HOUR"`
 }
 
 type ResourceCostComponentsFunc func(*ResourceInstance) []*schema.CostComponent
@@ -122,6 +126,9 @@ var ResourceInstanceUsageSchema = []*schema.UsageItem{
 	{Key: "wd_collections", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "scc_evaluations", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "data-science-experience_CAPACITY_UNIT_HOURS", DefaultValue: 1, ValueType: schema.Float64},
+	{Key: "sysdig-secure_MULTI_CLOUD_CSPM_COMPUTE_INSTANCES", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "sysdig-secure_NODE_HOURS", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "sysdig-secure_VM_NODE_HOUR", DefaultValue: 0, ValueType: schema.Float64},
 }
 
 var ResourceInstanceCostMap map[string]ResourceCostComponentsFunc = map[string]ResourceCostComponentsFunc{
@@ -139,6 +146,7 @@ var ResourceInstanceCostMap map[string]ResourceCostComponentsFunc = map[string]R
 	"discovery":               GetWDCostComponents,
 	"compliance":              GetSCCCostComponents,
 	"data-science-experience": GetWSCostComponents,
+	"sysdig-secure":           GetSCCWPCostComponents,
 }
 
 func KMSKeyVersionsFreeCostComponent(r *ResourceInstance) *schema.CostComponent {
