@@ -86,3 +86,8 @@ resource_usage:
 
   ibm_resource_instance.watson_studio_lite:
     data-science-experience_CAPACITY_UNIT_HOURS: 10
+
+  ibm_resource_instance.sccwp_graduated_tier:
+    sysdig-secure_MULTI_CLOUD_CSPM_COMPUTE_INSTANCES: 501 # Tier 6: 500-999999999
+    sysdig-secure_NODE_HOURS: 51 # Tier 6: 50-999999999999999
+    sysdig-secure_VM_NODE_HOUR: 501 # Tier 6: 500-999999999
