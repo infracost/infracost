@@ -78,7 +78,11 @@ type ResourceInstance struct {
 	SCC_Evaluations *float64 `infracost_usage:"scc_evaluations"`
 	// Watson Studio
 	WS_CUH *float64 `infracost_usage:"data-science-experience_CAPACITY_UNIT_HOURS"`
-	// Watson.governance
+	// SCC Workload Protection (Sysdig Secure)
+	SCCWP_MulticloudCSPMComputeInstances *float64 `infracost_usage:"sysdig-secure_MULTI_CLOUD_CSPM_COMPUTE_INSTANCES"`
+	SCCWP_NodeHours                      *float64 `infracost_usage:"sysdig-secure_NODE_HOURS"`
+	SCCWP_VMNodeHours                    *float64 `infracost_usage:"sysdig-secure_VM_NODE_HOUR"`
+	// Watsonx.governance
 	WGOV_ru     *float64 `infracost_usage:"aiopenscale_RESOURCE_UNITS"`
 	WGOV_Models *float64 `infracost_usage:"aiopenscale_MODELS_PER_MONTH"`
 }
@@ -125,6 +129,9 @@ var ResourceInstanceUsageSchema = []*schema.UsageItem{
 	{Key: "wd_collections", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "scc_evaluations", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "data-science-experience_CAPACITY_UNIT_HOURS", DefaultValue: 1, ValueType: schema.Float64},
+	{Key: "sysdig-secure_MULTI_CLOUD_CSPM_COMPUTE_INSTANCES", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "sysdig-secure_NODE_HOURS", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "sysdig-secure_VM_NODE_HOUR", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "aiopenscale_RESOURCE_UNITS", DefaultValue: 1, ValueType: schema.Float64},
 	{Key: "aiopenscale_MODELS_PER_MONTH", DefaultValue: 1, ValueType: schema.Float64},
 }
@@ -144,6 +151,7 @@ var ResourceInstanceCostMap map[string]ResourceCostComponentsFunc = map[string]R
 	"discovery":               GetWDCostComponents,
 	"compliance":              GetSCCCostComponents,
 	"data-science-experience": GetWSCostComponents,
+	"sysdig-secure":           GetSCCWPCostComponents,
 	"aiopenscale":             GetWGOVCostComponents,
 }
 

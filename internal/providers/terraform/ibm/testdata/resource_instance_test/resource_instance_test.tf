@@ -239,6 +239,7 @@ resource "ibm_resource_instance" "scc_trial" {
   resource_group_id = "default"
 }
 
+# Watson Studio
 resource "ibm_resource_instance" "watson_studio_professional" {
   name              = "ws_professional"
   service           = "data-science-experience"
@@ -255,6 +256,16 @@ resource "ibm_resource_instance" "watson_studio_lite" {
   resource_group_id = "default"
 }
 
+# Security and Compliance Center (SCC) Workload Protection
+resource "ibm_resource_instance" "sccwp_graduated_tier" {
+  name              = "sccwp_graduated_tier"
+  service           = "sysdig-secure"
+  plan              = "graduated-tier"
+  location          = "us-south"
+  resource_group_id = "default"
+}
+
+# Watsonx.governance
 resource "ibm_resource_instance" "watson_governance_lite" {
   name              = "wgov_lite"
   service           = "aiopenscale"

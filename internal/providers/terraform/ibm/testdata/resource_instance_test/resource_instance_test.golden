@@ -89,6 +89,26 @@
  ibm_resource_instance.scc_trial                                                                                                             
  └─ Trial                                                                                    1                                         $0.00 
                                                                                                                                              
+ ibm_resource_instance.sccwp_graduated_tier                                                                                                  
+ ├─ Multi-Cloud CSPM Compute Instance Hours (first 25 Instance-Hours)                       25  Instance-Hours                       $206.00 
+ ├─ Multi-Cloud CSPM Compute Instance Hours (next 25 Instance-Hours)                        25  Instance-Hours                       $175.10 
+ ├─ Multi-Cloud CSPM Compute Instance Hours (next 50 Instance-Hours)                        50  Instance-Hours                       $309.00 
+ ├─ Multi-Cloud CSPM Compute Instance Hours (next 150 Instance-Hours)                      150  Instance-Hours                       $865.20 
+ ├─ Multi-Cloud CSPM Compute Instance Hours (next 250 Instance-Hours)                      250  Instance-Hours                     $1,236.00 
+ ├─ Multi-Cloud CSPM Compute Instance Hours (over 500 Instance-Hours)                        1  Instance-Hours                         $4.53 
+ ├─ Node Hours (first 3 Instance-Hours)                                                      3  Instance-Hours                         $0.19 
+ ├─ Node Hours (next 2 Instance-Hours)                                                       2  Instance-Hours                         $0.11 
+ ├─ Node Hours (next 5 Instance-Hours)                                                       5  Instance-Hours                         $0.24 
+ ├─ Node Hours (next 15 Instance-Hours)                                                     15  Instance-Hours                         $0.68 
+ ├─ Node Hours (next 25 Instance-Hours)                                                     25  Instance-Hours                         $0.97 
+ ├─ Node Hours (over 50 Instance-Hours)                                                      1  Instance-Hours                         $0.04 
+ └─ VM Node Hours (first 25 Instance-Hours)                                                 25  Instance-Hours                         $0.56 
+ └─ VM Node Hours (next 25 Instance-Hours)                                                  25  Instance-Hours                         $0.47 
+ └─ VM Node Hours (next 50 Instance-Hours)                                                  50  Instance-Hours                         $0.83 
+ └─ VM Node Hours (next 150 Instance-Hours)                                                150  Instance-Hours                         $2.33 
+ └─ VM Node Hours (next 250 Instance-Hours)                                                250  Instance-Hours                         $3.33 
+ └─ VM Node Hours (over 500 Instance-Hours)                                                  1  Instance-Hours                         $0.01 
+                                                                                                                                             
  ibm_resource_instance.wa_instance_enterprise                                                                                                
  ├─ Instance (50000 MAU included)                                                            1  Instance                           $6,000.00 
  ├─ Additional Monthly Active Users                                                          1  1K MAU                               $120.00 
@@ -148,7 +168,7 @@
  ├─ Class 2 Resource Units                                                                  50  RU                                     $0.09 
  └─ Class 3 Resource Units                                                                  50  RU                                     $0.25 
                                                                                                                                              
- OVERALL TOTAL                                                                                                                    $15,791.56 
+ OVERALL TOTAL                                                                                                                    $18,597.15 
 ──────────────────────────────────
-35 cloud resources were detected:
-∙ 35 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+36 cloud resources were detected:
+∙ 36 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file

@@ -79,6 +79,9 @@ resource_type_default_usage:
     wd_collections: 301
     scc_evaluations: 1
     data-science-experience_CAPACITY_UNIT_HOURS: 1
+    sysdig-secure_MULTI_CLOUD_CSPM_COMPUTE_INSTANCES: 0
+    sysdig-secure_NODE_HOURS: 0
+    sysdig-secure_VM_NODE_HOUR: 501
     aiopenscale_RESOURCE_UNITS: 1
     aiopenscale_MODELS_PER_MONTH: 1
   ibm_tg_gateway: 
@@ -1336,6 +1339,11 @@ resource_usage:
 
   ibm_resource_instance.watson_studio_professional:
     data-science-experience_CAPACITY_UNIT_HOURS: 1 # Amount of Capacity Unit-Hours used in a month
+
+  ibm_resource_instance.sccwp_graduated_tier:
+    sysdig-secure_MULTI_CLOUD_CSPM_COMPUTE_INSTANCES: 0
+    sysdig-secure_NODE_HOURS: 0
+    sysdig-secure_VM_NODE_HOUR: 501
 
   ibm_resource_instance.watson_governance_essentials:
     aiopenscale_RESOURCE_UNITS: 1
