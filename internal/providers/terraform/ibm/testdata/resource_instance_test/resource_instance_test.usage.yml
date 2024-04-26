@@ -96,4 +96,4 @@ resource_usage:
     aiopenscale_RESOURCE_UNITS: 100
 
   ibm_resource_instance.watson_governance_standard_v2:
-    aiopenscale_MODELS_PER_MONTH: 2
+    aiopenscale_MODELS_PER_MONTH: 1
