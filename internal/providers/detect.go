@@ -89,9 +89,7 @@ func Detect(ctx *config.RunContext, project *config.Project, includePastResource
 	repoPath := ctx.Config.RepoPath()
 	var autoProviders []schema.Provider
 	for _, rootPath := range rootPaths {
-		if repoPath != "" {
-			rootPath.RepoPath = repoPath
-		}
+		rootPath.RepoPath = repoPath
 
 		detectedProjectContext := config.NewProjectContext(ctx, project, nil)
 		if rootPath.IsTerragrunt {
