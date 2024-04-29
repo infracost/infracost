@@ -36,24 +36,23 @@ func (r *ContainerRegistry) PopulateUsage(u *schema.UsageData) {
 func (r *ContainerRegistry) BuildResource() *schema.Resource {
 
 	var locationsCount int
-	var storageGB, includedStorage, monthlyBuildVCPU *decimal.Decimal
+	var storageGB, monthlyBuildVCPU *decimal.Decimal
 	var overStorage decimal.Decimal
 
 	sku := "Classic"
+	includedStorage := decimal.NewFromFloat(10)
 
 	if r.SKU != "" {
 		sku = r.SKU
 	}
 
 	switch sku {
-	case "Classic":
-		includedStorage = decimalPtr(decimal.NewFromFloat(10))
 	case "Basic":
-		includedStorage = decimalPtr(decimal.NewFromFloat(10))
+		includedStorage = decimal.NewFromFloat(10)
 	case "Standard":
-		includedStorage = decimalPtr(decimal.NewFromFloat(100))
+		includedStorage = decimal.NewFromFloat(100)
 	case "Premium":
-		includedStorage = decimalPtr(decimal.NewFromFloat(500))
+		includedStorage = decimal.NewFromFloat(500)
 	}
 
 	locationsCount = r.GeoReplicationLocations
@@ -72,8 +71,8 @@ func (r *ContainerRegistry) BuildResource() *schema.Resource {
 
 	if r.StorageGB != nil {
 		storageGB = decimalPtr(decimal.NewFromFloat(*r.StorageGB))
-		if storageGB.GreaterThan(*includedStorage) {
-			overStorage = storageGB.Sub(*includedStorage)
+		if storageGB.GreaterThan(includedStorage) {
+			overStorage = storageGB.Sub(includedStorage)
 			storageGB = &overStorage
 			costComponents = append(costComponents, r.containerRegistryStorageCostComponent(fmt.Sprintf("Storage (over %sGB)", includedStorage), sku, storageGB))
 		}
