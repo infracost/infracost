@@ -213,9 +213,7 @@ projects:
 			configFilePath,
 			"--compare-to",
 			path.Join(dir, "prior.json"),
-		}, &GoldenFileOptions{
-			RunTerraformCLI: true,
-		})
+		}, nil)
 }
 
 func TestDiffWithConfigFileCompareToDeletedProject(t *testing.T) {
@@ -240,9 +238,7 @@ projects:
 			configFilePath,
 			"--compare-to",
 			path.Join(dir, "prior.json"),
-		}, &GoldenFileOptions{
-			RunTerraformCLI: true,
-		})
+		}, nil)
 }
 
 func TestDiffCompareToError(t *testing.T) {

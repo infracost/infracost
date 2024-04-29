@@ -186,9 +186,9 @@ func (p *TerragruntHCLProvider) EnvName() string {
 }
 
 func (p *TerragruntHCLProvider) RelativePath() string {
-	r, err := filepath.Rel(p.Path.RepoPath, p.Path.Path)
+	r, err := filepath.Rel(p.Path.StartingPath, p.Path.DetectedPath)
 	if err != nil {
-		return p.Path.Path
+		return p.Path.DetectedPath
 	}
 
 	return r
@@ -216,14 +216,8 @@ func (p *TerragruntHCLProvider) DisplayType() string {
 func (p *TerragruntHCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 	metadata.ConfigSha = p.ctx.ProjectConfig.ConfigSha
 
-	basePath := p.ctx.ProjectConfig.Path
-	if p.ctx.RunContext.Config.ConfigFilePath != "" {
-		basePath = filepath.Dir(p.ctx.RunContext.Config.ConfigFilePath)
-	}
-
-	modulePath, err := filepath.Rel(basePath, metadata.Path)
-	if err == nil && modulePath != "" && modulePath != "." {
-		p.logger.Debug().Msgf("Calculated relative terraformModulePath for %s from %s", basePath, metadata.Path)
+	modulePath := p.RelativePath()
+	if modulePath != "" && modulePath != "." {
 		metadata.TerraformModulePath = modulePath
 	}
 
@@ -400,7 +394,7 @@ func (p *TerragruntHCLProvider) initTerraformVars(tfVars map[string]string, inpu
 }
 
 func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, error) {
-	terragruntConfigPath := tgconfig.GetDefaultConfigPath(p.Path.Path)
+	terragruntConfigPath := tgconfig.GetDefaultConfigPath(p.Path.DetectedPath)
 
 	terragruntCacheDir := filepath.Join(config.InfracostDir, ".terragrunt-cache")
 	terragruntDownloadDir := filepath.Join(p.ctx.RunContext.Config.CachePath(), terragruntCacheDir)
@@ -419,7 +413,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 		LogLevel:                   logrus.DebugLevel,
 		ErrWriter:                  tgLog.WriterLevel(logrus.DebugLevel),
 		MaxFoldersToCheck:          tgoptions.DefaultMaxFoldersToCheck,
-		WorkingDir:                 p.Path.Path,
+		WorkingDir:                 p.Path.DetectedPath,
 		ExcludeDirs:                p.excludedPaths,
 		DownloadDir:                terragruntDownloadDir,
 		TerraformCliArgs:           []string{tgcliinfo.CommandName},
@@ -601,7 +595,7 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 	h, err := NewHCLProvider(
 		config.NewProjectContext(p.ctx.RunContext, &pconfig, logCtx),
 		hcl.RootPath{
-			Path: pconfig.Path,
+			DetectedPath: pconfig.Path,
 		},
 		&HCLProviderConfig{CacheParsingModules: true, SkipAutoDetection: true},
 		ops...,

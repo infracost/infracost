@@ -264,6 +264,7 @@ type ProjectLocator struct {
 	terraformVarFileExtensions []string
 	hclParser                  *hclparse.Parser
 	hasCustomEnvExt            bool
+	workingDirectory           string
 }
 
 // ProjectLocatorConfig provides configuration options on how the locator functions.
@@ -279,6 +280,7 @@ type ProjectLocatorConfig struct {
 	MaxSearchDepth             int
 	ForceProjectType           string
 	TerraformVarFileExtensions []string
+	WorkingDirectory           string
 }
 
 type PathOverrideConfig struct {
@@ -358,6 +360,7 @@ func NewProjectLocator(logger zerolog.Logger, config *ProjectLocatorConfig) *Pro
 			terraformVarFileExtensions: extensions,
 			hclParser:                  hclparse.NewParser(),
 			hasCustomEnvExt:            len(config.TerraformVarFileExtensions) > 0,
+			workingDirectory:           config.WorkingDirectory,
 		}
 	}
 
@@ -435,7 +438,7 @@ func CreateTreeNode(basePath string, paths []RootPath, varFiles map[string][]Roo
 	}
 
 	sort.Slice(paths, func(i, j int) bool {
-		return strings.Count(paths[i].Path, string(filepath.Separator)) < strings.Count(paths[j].Path, string(filepath.Separator))
+		return strings.Count(paths[i].DetectedPath, string(filepath.Separator)) < strings.Count(paths[j].DetectedPath, string(filepath.Separator))
 	})
 
 	for _, path := range paths {
@@ -510,7 +513,7 @@ func buildVarFileEnvNames(root *TreeNode, e *EnvFileMatcher) {
 
 // AddPath adds a path to the tree, this will create any missing nodes in the tree.
 func (t *TreeNode) AddPath(path RootPath) {
-	dir, _ := filepath.Rel(path.RepoPath, path.Path)
+	dir, _ := filepath.Rel(path.StartingPath, path.DetectedPath)
 
 	pieces := strings.Split(dir, string(filepath.Separator))
 	current := t
@@ -786,7 +789,7 @@ func (t *TreeNode) AssociateChildVarFiles() {
 				continue
 			}
 
-			depth, err := getChildDepth(t.RootPath.Path, child.TerraformVarFiles.Path)
+			depth, err := getChildDepth(t.RootPath.DetectedPath, child.TerraformVarFiles.Path)
 			if depth > 2 || err != nil {
 				continue
 			}
@@ -909,7 +912,7 @@ func (t *TreeNode) CollectRootPaths(e *EnvFileMatcher) []RootPath {
 	found := make(map[string]bool)
 	for _, root := range projects {
 		for _, varFile := range root.TerraformVarFiles {
-			base := filepath.Base(root.Path)
+			base := filepath.Base(root.DetectedPath)
 			name := e.clean(varFile.Name)
 			if base == name {
 				found[varFile.FullPath] = true
@@ -925,7 +928,7 @@ func (t *TreeNode) CollectRootPaths(e *EnvFileMatcher) []RootPath {
 		var filtered RootPathVarFiles
 		for _, varFile := range root.TerraformVarFiles {
 			name := e.clean(varFile.Name)
-			base := filepath.Base(root.Path)
+			base := filepath.Base(root.DetectedPath)
 			if found[varFile.FullPath] && base != name {
 				continue
 			}
@@ -943,8 +946,10 @@ func (t *TreeNode) CollectRootPaths(e *EnvFileMatcher) []RootPath {
 type RootPath struct {
 	Matcher *EnvFileMatcher
 
-	RepoPath string
-	Path     string
+	// StartingPath is the path to the directory where the search started.
+	StartingPath string
+	// DetectedPath is the path to the root of the project.
+	DetectedPath string
 	// HasChanges contains information about whether the project has git changes associated with it.
 	// This will show as true if one or more files/directories have changed in the Path, and also if
 	// and local modules that are used by this project have changes.
@@ -957,7 +962,7 @@ type RootPath struct {
 }
 
 func (r *RootPath) RelPath() string {
-	rel, _ := filepath.Rel(r.RepoPath, r.Path)
+	rel, _ := filepath.Rel(r.StartingPath, r.DetectedPath)
 	return rel
 }
 
@@ -1084,7 +1089,7 @@ func (r RootPathVarFiles) ToPaths() []string {
 }
 
 func (r *RootPath) AddVarFiles(v *VarFiles) {
-	rel, _ := filepath.Rel(r.Path, v.Path)
+	rel, _ := filepath.Rel(r.DetectedPath, v.Path)
 
 	for _, f := range v.Files {
 		r.TerraformVarFiles = append(r.TerraformVarFiles, RootPathVarFile{
@@ -1097,35 +1102,44 @@ func (r *RootPath) AddVarFiles(v *VarFiles) {
 	}
 }
 
-// FindRootModules returns a list of all directories that contain a full Terraform project under the given fullPath.
-// This list excludes any Terraform modules that have been found (if they have been called by a Module source).
-func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
-	p.basePath, _ = filepath.Abs(fullPath)
+// FindRootModules returns a list of all directories that contain a full
+// Terraform project under the given fullPath. This list excludes any Terraform
+// modules that have been found (if they have been called by a Module source).
+func (p *ProjectLocator) FindRootModules(startingPath string) []RootPath {
+	p.basePath, _ = filepath.Abs(startingPath)
 	p.modules = make(map[string]struct{})
 	p.projectDuplicates = make(map[string]bool)
 	p.moduleCalls = make(map[string][]string)
 	p.wdContainsTerragrunt = false
 	p.discoveredProjects = []discoveredProject{}
 	p.discoveredVarFiles = make(map[string][]RootPathVarFile)
-	p.shouldSkipDir = buildDirMatcher(p.excludedDirs, fullPath)
-	p.shouldIncludeDir = buildDirMatcher(p.includedDirs, fullPath)
+	p.shouldSkipDir = buildDirMatcher(p.excludedDirs, startingPath)
+	p.shouldIncludeDir = buildDirMatcher(p.includedDirs, startingPath)
 
 	if p.skip {
 		// if we are skipping auto-detection we just return the root path, but we still
 		// want to walk the paths to find any auto.tfvars or terraform.tfvars files. So
 		// let's just walk the top level directory.
-		p.walkPaths(fullPath, 0, 1)
+		p.walkPaths(startingPath, 0, 1)
+		p.findTerragruntDirs(startingPath)
+
+		detectedPath := startingPath
+		if p.workingDirectory != "" {
+			startingPath = p.workingDirectory
+		}
 
 		return []RootPath{
 			{
-				Path:              fullPath,
-				TerraformVarFiles: p.discoveredVarFiles[fullPath],
+				StartingPath:      startingPath,
+				DetectedPath:      detectedPath,
+				IsTerragrunt:      p.wdContainsTerragrunt,
+				TerraformVarFiles: p.discoveredVarFiles[startingPath],
 			},
 		}
 	}
 
-	p.findTerragruntDirs(fullPath)
-	p.walkPaths(fullPath, 0, p.maxSearchDepth())
+	p.findTerragruntDirs(startingPath)
+	p.walkPaths(startingPath, 0, p.maxSearchDepth())
 	for _, project := range p.discoveredProjects {
 		if _, ok := p.projectDuplicates[project.path]; ok {
 			p.projectDuplicates[project.path] = true
@@ -1134,15 +1148,15 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 		}
 	}
 
-	p.logger.Debug().Msgf("walking directory at %s returned a list of possible Terraform projects with length %d", fullPath, len(p.discoveredProjects))
+	p.logger.Debug().Msgf("walking directory at %s returned a list of possible Terraform projects with length %d", startingPath, len(p.discoveredProjects))
 
 	var projects []RootPath
 	projectMap := map[string]bool{}
 	for _, dir := range p.discoveredProjectsWithModulesFiltered() {
 		if p.shouldUseProject(dir, false) {
 			projects = append(projects, RootPath{
-				RepoPath:          fullPath,
-				Path:              dir.path,
+				StartingPath:      startingPath,
+				DetectedPath:      dir.path,
 				HasChanges:        p.hasChanges(dir.path),
 				TerraformVarFiles: p.discoveredVarFiles[dir.path],
 				Matcher:           p.envMatcher,
@@ -1156,8 +1170,8 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 		for _, dir := range p.discoveredProjectsWithModulesFiltered() {
 			if p.shouldUseProject(dir, true) {
 				projects = append(projects, RootPath{
-					RepoPath:          fullPath,
-					Path:              dir.path,
+					StartingPath:      startingPath,
+					DetectedPath:      dir.path,
 					HasChanges:        p.hasChanges(dir.path),
 					TerraformVarFiles: p.discoveredVarFiles[dir.path],
 					Matcher:           p.envMatcher,
@@ -1169,20 +1183,30 @@ func (p *ProjectLocator) FindRootModules(fullPath string) []RootPath {
 	}
 
 	for _, dir := range projects {
-		delete(p.discoveredVarFiles, dir.Path)
+		delete(p.discoveredVarFiles, dir.DetectedPath)
 	}
 
-	node := CreateTreeNode(fullPath, projects, p.discoveredVarFiles, p.envMatcher)
+	node := CreateTreeNode(startingPath, projects, p.discoveredVarFiles, p.envMatcher)
 	node.AssociateChildVarFiles()
 	node.AssociateSiblingVarFiles()
 	node.AssociateParentVarFiles()
 	node.AssociateAuntVarFiles()
 
 	paths := node.CollectRootPaths(p.envMatcher)
+	for i := range paths {
+		// if the locator has been configured with a working directory we need to change
+		// the starting path of the root paths to the working directory. This means that
+		// paths that have been defined in a config file are relative to the working
+		// directory rather than the defined paths found in the config file.
+		if p.workingDirectory != "" {
+			paths[i].StartingPath = p.workingDirectory
+		}
+	}
+
 	p.excludeEnvFromPaths(paths)
 
 	sort.Slice(paths, func(i, j int) bool {
-		return paths[i].Path < paths[j].Path
+		return paths[i].DetectedPath < paths[j].DetectedPath
 	})
 
 	return paths

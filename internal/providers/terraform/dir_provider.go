@@ -84,7 +84,7 @@ func (p *DirProvider) VarFiles() []string {
 }
 
 func (p *DirProvider) RelativePath() string {
-	r, _ := filepath.Rel(p.ctx.RunContext.Config.RepoPath(), p.ctx.ProjectConfig.Path)
+	r, _ := filepath.Rel(p.ctx.RunContext.Config.WorkingDirectory(), p.ctx.ProjectConfig.Path)
 
 	return r
 }
@@ -130,14 +130,8 @@ func (p *DirProvider) checks() error {
 func (p *DirProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 	metadata.ConfigSha = p.ctx.ProjectConfig.ConfigSha
 
-	basePath := p.ctx.ProjectConfig.Path
-	if p.ctx.RunContext.Config.ConfigFilePath != "" {
-		basePath = filepath.Dir(p.ctx.RunContext.Config.ConfigFilePath)
-	}
-
-	modulePath, err := filepath.Rel(basePath, metadata.Path)
-	if err == nil && modulePath != "" && modulePath != "." {
-		logging.Logger.Debug().Msgf("Calculated relative terraformModulePath for %s from %s", basePath, metadata.Path)
+	modulePath := p.RelativePath()
+	if modulePath != "" && modulePath != "." {
 		metadata.TerraformModulePath = modulePath
 	}
 

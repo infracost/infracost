@@ -196,6 +196,7 @@ type GoldenFileOptions = struct {
 	Currency    string
 	CaptureLogs bool
 	IgnoreCLI   bool
+	LogLevel    *string
 }
 
 func DefaultGoldenFileOptions() *GoldenFileOptions {
@@ -244,7 +245,12 @@ func goldenFileResourceTestWithOpts(t *testing.T, pName string, testName string,
 		ctxOption(runCtx)
 	}
 
-	logBuf := testutil.ConfigureTestToCaptureLogs(t, runCtx)
+	level := "warn"
+	if options.LogLevel != nil {
+		level = *options.LogLevel
+	}
+
+	logBuf := testutil.ConfigureTestToCaptureLogs(t, runCtx, level)
 
 	if options != nil && options.Currency != "" {
 		runCtx.Config.Currency = options.Currency
@@ -433,7 +439,7 @@ func newHCLProvider(t *testing.T, runCtx *config.RunContext, tfdir string) *terr
 		Path: tfdir,
 	}, nil)
 
-	provider, err := terraform.NewHCLProvider(projectCtx, hcl.RootPath{RepoPath: tfdir, Path: tfdir}, &terraform.HCLProviderConfig{SuppressLogging: true})
+	provider, err := terraform.NewHCLProvider(projectCtx, hcl.RootPath{StartingPath: tfdir, DetectedPath: tfdir}, &terraform.HCLProviderConfig{SuppressLogging: true})
 	require.NoError(t, err)
 
 	return provider

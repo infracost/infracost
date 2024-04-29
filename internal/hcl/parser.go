@@ -29,11 +29,11 @@ var (
 type Option func(p *Parser)
 
 // OptionWithTFVarsPaths takes a slice of paths adds them to the parser tfvar
-// files relative to the Parser initialPath. It sorts tfvar paths for precedence
+// files relative to the Parser detectedProjectPath. It sorts tfvar paths for precedence
 // before adding them to the parser. Paths that don't exist will be ignored.
 func OptionWithTFVarsPaths(paths []string, autoDetected bool) Option {
 	return func(p *Parser) {
-		filenames := makePathsRelativeToInitial(paths, p.initialPath)
+		filenames := makePathsRelativeToInitial(paths, p.detectedProjectPath)
 		tfVarsPaths := p.tfvarsPaths
 		tfVarsPaths = append(tfVarsPaths, filenames...)
 		p.sortVarFilesByPrecedence(tfVarsPaths, autoDetected)
@@ -255,8 +255,8 @@ type DetectedProject interface {
 
 // Parser is a tool for parsing terraform templates at a given file system location.
 type Parser struct {
-	repoPath              string
-	initialPath           string
+	startingPath          string
+	detectedProjectPath   string
 	tfEnvVars             map[string]cty.Value
 	tfvarsPaths           []string
 	inputVars             map[string]cty.Value
@@ -275,21 +275,21 @@ type Parser struct {
 // NewParser creates a new parser for the given RootPath.
 func NewParser(projectRoot RootPath, envMatcher *EnvFileMatcher, moduleLoader *modules.ModuleLoader, logger zerolog.Logger, options ...Option) *Parser {
 	parserLogger := logger.With().Str(
-		"parser_path", projectRoot.Path,
+		"parser_path", projectRoot.DetectedPath,
 	).Logger()
 
 	hclParser := modules.NewSharedHCLParser()
 
 	p := &Parser{
-		repoPath:      projectRoot.RepoPath,
-		initialPath:   projectRoot.Path,
-		hasChanges:    projectRoot.HasChanges,
-		workspaceName: defaultTerraformWorkspaceName,
-		hclParser:     hclParser,
-		blockBuilder:  BlockBuilder{SetAttributes: []SetAttributesFunc{SetUUIDAttributes}, Logger: logger, HCLParser: hclParser},
-		logger:        parserLogger,
-		moduleLoader:  moduleLoader,
-		envMatcher:    envMatcher,
+		startingPath:        projectRoot.StartingPath,
+		detectedProjectPath: projectRoot.DetectedPath,
+		hasChanges:          projectRoot.HasChanges,
+		workspaceName:       defaultTerraformWorkspaceName,
+		hclParser:           hclParser,
+		blockBuilder:        BlockBuilder{SetAttributes: []SetAttributesFunc{SetUUIDAttributes}, Logger: logger, HCLParser: hclParser},
+		logger:              parserLogger,
+		moduleLoader:        moduleLoader,
+		envMatcher:          envMatcher,
 	}
 
 	for _, option := range options {
@@ -338,15 +338,15 @@ func (p *Parser) YAML() string {
 	return str.String()
 }
 
-// ParseDirectory parses all the terraform files in the initialPath into Blocks and then passes them to an Evaluator
+// ParseDirectory parses all the terraform files in the detectedProjectPath into Blocks and then passes them to an Evaluator
 // to fill these Blocks with additional Context information. Parser does not parse any blocks outside the root Module.
 // It instead leaves ModuleLoader to fetch these Modules on demand. See ModuleLoader.Load for more information.
 //
 // ParseDirectory returns the root Module that represents the top of the Terraform Config tree.
 func (p *Parser) ParseDirectory() (m *Module, err error) {
 	m = &Module{
-		RootPath:   p.initialPath,
-		ModulePath: p.initialPath,
+		RootPath:   p.detectedProjectPath,
+		ModulePath: p.detectedProjectPath,
 	}
 
 	defer func() {
@@ -356,11 +356,11 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 		}
 	}()
 
-	p.logger.Debug().Msgf("Beginning parse for directory '%s'...", p.initialPath)
+	p.logger.Debug().Msgf("Beginning parse for directory '%s'...", p.detectedProjectPath)
 
 	// load the initial root directory into a list of hcl files
 	// at this point these files have no schema associated with them.
-	files, err := loadDirectory(p.hclParser, p.logger, p.initialPath, false)
+	files, err := loadDirectory(p.hclParser, p.logger, p.detectedProjectPath, false)
 	if err != nil {
 		return m, err
 	}
@@ -382,7 +382,7 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 	}
 
 	// load the modules. This downloads any remote modules to the local file system
-	modulesManifest, err := p.moduleLoader.Load(p.initialPath)
+	modulesManifest, err := p.moduleLoader.Load(p.detectedProjectPath)
 	if err != nil {
 		return m, fmt.Errorf("Error loading Terraform modules: %w", err)
 	}
@@ -400,8 +400,8 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 			Source:     "",
 			Blocks:     blocks,
 			RawBlocks:  blocks,
-			RootPath:   p.initialPath,
-			ModulePath: p.initialPath,
+			RootPath:   p.detectedProjectPath,
+			ModulePath: p.detectedProjectPath,
 		},
 		workingDir,
 		inputVars,
@@ -444,12 +444,12 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 
 // Path returns the full path that the parser runs within.
 func (p *Parser) Path() string {
-	return p.initialPath
+	return p.detectedProjectPath
 }
 
 // RelativePath returns the path of the parser relative to the repo path
 func (p *Parser) RelativePath() string {
-	r, _ := filepath.Rel(p.repoPath, p.initialPath)
+	r, _ := filepath.Rel(p.startingPath, p.detectedProjectPath)
 	return r
 }
 
@@ -481,7 +481,7 @@ func (p *Parser) VarFiles() []string {
 	varFiles := make([]string, 0, len(p.tfvarsPaths))
 
 	for _, varFile := range p.tfvarsPaths {
-		p, err := filepath.Rel(p.initialPath, varFile)
+		p, err := filepath.Rel(p.detectedProjectPath, varFile)
 		if err != nil {
 			continue
 		}
@@ -512,7 +512,7 @@ func (p *Parser) parseDirectoryFiles(files []file) (Blocks, error) {
 		for _, fileBlock := range fileBlocks {
 			blocks = append(
 				blocks,
-				p.blockBuilder.NewBlock(file.path, p.initialPath, fileBlock, nil, nil, nil),
+				p.blockBuilder.NewBlock(file.path, p.detectedProjectPath, fileBlock, nil, nil, nil),
 			)
 		}
 	}

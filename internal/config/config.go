@@ -206,10 +206,17 @@ func DefaultConfig() *Config {
 	}
 }
 
-// RepoPath returns the filepath to either the config-file location or initial path provided by the user.
-func (c *Config) RepoPath() string {
+// WorkingDirectory returns the filepath to either the directory specified by the --path
+// flag or the directory that the binary has been run from.
+func (c *Config) WorkingDirectory() string {
 	if c.ConfigFilePath != "" {
-		return strings.TrimRight(c.ConfigFilePath, filepath.Base(c.ConfigFilePath))
+		wd, err := os.Getwd()
+		if err != nil {
+			logging.Logger.Debug().Err(err).Msg("error getting working directory for repo path")
+			return ""
+		}
+
+		return wd
 	}
 
 	return c.RootPath
@@ -218,7 +225,7 @@ func (c *Config) RepoPath() string {
 // CachePath finds path which contains the .infracost directory. It traverses parent directories until a .infracost
 // folder is found. If no .infracost folders exist then CachePath uses the current wd.
 func (c *Config) CachePath() string {
-	dir := c.RepoPath()
+	dir := c.WorkingDirectory()
 
 	if s := c.cachePath(dir); s != "" {
 		return s

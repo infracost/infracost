@@ -15,17 +15,17 @@
   "projects": [
     {
       "name": "infracost/infracost/cmd/infracost/testdata/breakdown_config_file/dev",
-      "displayName": "dev",
+      "displayName": "testdata-breakdown_config_file-dev",
       "metadata": {
-        "path": "./testdata/breakdown_config_file/dev",
+        "path": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_config_file/dev",
         "type": "terraform_dir",
         "configSha": "1234",
-        "terraformModulePath": "dev",
+        "terraformModulePath": "testdata/breakdown_config_file/dev",
         "vcsSubPath": "cmd/infracost/testdata/breakdown_config_file/dev",
         "providers": [
           {
             "name": "aws",
-            "filename": "testdata/breakdown_config_file/dev/main.tf",
+            "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_config_file/dev/main.tf",
             "startLine": 1,
             "endLine": 7
           }

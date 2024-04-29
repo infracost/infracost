@@ -1,5 +1,5 @@
-Project: dev
-Module path: dev
+Project: testdata-hclmulti_project_infra-dev
+Module path: testdata/hclmulti_project_infra/dev
 
  Name                                                            Monthly Qty  Unit                    Monthly Cost   
                                                                                                                      
@@ -52,8 +52,8 @@ Module path: dev
  Project total                                                                                             $112.35   
 
 ──────────────────────────────────
-Project: prod
-Module path: prod
+Project: testdata-hclmulti_project_infra-prod
+Module path: testdata/hclmulti_project_infra/prod
 
  Name                                                            Monthly Qty  Unit                    Monthly Cost   
                                                                                                                      
@@ -117,8 +117,8 @@ Module path: prod
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ dev                                                ┃ $112          ┃ $0.00       ┃ $112       ┃
-┃ prod                                               ┃ $152          ┃ $0.00       ┃ $152       ┃
+┃ testdata-hclmulti_project_infra-dev                ┃ $112          ┃ $0.00       ┃ $112       ┃
+┃ testdata-hclmulti_project_infra-prod               ┃ $152          ┃ $0.00       ┃ $152       ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:

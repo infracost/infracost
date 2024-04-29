@@ -1,0 +1,8 @@
+version: 0.1
+
+projects:
+  - path: testdata/breakdown_terragrunt_autodetection_config_file_output/app1
+  - path: testdata/breakdown_terragrunt_autodetection_config_file_output/app2
+  - path: testdata/breakdown_terragrunt_autodetection_config_file_output/region1
+    name: region1-override
+

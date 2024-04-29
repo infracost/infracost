@@ -27,14 +27,12 @@ type DetectionOutput struct {
 // providers are because of auto-detected root modules residing under the
 // original path.
 func Detect(ctx *config.RunContext, project *config.Project, includePastResources bool) (*DetectionOutput, error) {
-	path := project.Path
-
-	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return &DetectionOutput{}, fmt.Errorf("No such file or directory %s", path)
+	if _, err := os.Stat(project.Path); os.IsNotExist(err) {
+		return &DetectionOutput{}, fmt.Errorf("No such file or directory %s", project.Path)
 	}
 
 	forceCLI := project.TerraformForceCLI
-	projectType := DetectProjectType(path, forceCLI)
+	projectType := DetectProjectType(project.Path, forceCLI)
 	projectContext := config.NewProjectContext(ctx, project, nil)
 	if projectType != ProjectTypeAutodetect {
 		projectContext.ContextValues.SetValue("project_type", projectType)
@@ -80,19 +78,23 @@ func Detect(ctx *config.RunContext, project *config.Project, includePastResource
 		ForceProjectType:           ctx.Config.Autodetect.ForceProjectType,
 		TerraformVarFileExtensions: ctx.Config.Autodetect.TerraformVarFileExtensions,
 	}
+
+	// if the config file path is set, we should set the project locator to use the
+	// working directory this is so that the paths of the detected RootPaths are
+	// relative to the working directory and not the paths specified in the config
+	// file.
+	if ctx.Config.ConfigFilePath != "" {
+		locatorConfig.WorkingDirectory = ctx.Config.WorkingDirectory()
+	}
+
 	pl := hcl.NewProjectLocator(logging.Logger, locatorConfig)
 	rootPaths := pl.FindRootModules(project.Path)
 	if len(rootPaths) == 0 {
-		return &DetectionOutput{}, fmt.Errorf("could not detect path type for '%s'", path)
+		return &DetectionOutput{}, fmt.Errorf("could not detect path type for '%s'", project.Path)
 	}
 
-	repoPath := ctx.Config.RepoPath()
 	var autoProviders []schema.Provider
 	for _, rootPath := range rootPaths {
-		if repoPath != "" {
-			rootPath.RepoPath = repoPath
-		}
-
 		detectedProjectContext := config.NewProjectContext(ctx, project, nil)
 		if rootPath.IsTerragrunt {
 			detectedProjectContext.ContextValues.SetValue("project_type", "terragrunt_dir")
@@ -118,7 +120,7 @@ func Detect(ctx *config.RunContext, project *config.Project, includePastResource
 func configFileRootToProvider(rootPath hcl.RootPath, options []hcl.Option, projectContext *config.ProjectContext, pl *hcl.ProjectLocator) *terraform.HCLProvider {
 	var autoVarFiles []string
 	for _, varFile := range rootPath.TerraformVarFiles {
-		if hcl.IsAutoVarFile(varFile.RelPath) && (filepath.Dir(varFile.RelPath) == rootPath.Path || filepath.Dir(varFile.RelPath) == ".") {
+		if hcl.IsAutoVarFile(varFile.RelPath) && (filepath.Dir(varFile.RelPath) == rootPath.DetectedPath || filepath.Dir(varFile.RelPath) == ".") {
 			autoVarFiles = append(autoVarFiles, varFile.RelPath)
 		}
 	}
@@ -134,7 +136,7 @@ func configFileRootToProvider(rootPath hcl.RootPath, options []hcl.Option, proje
 		options...,
 	)
 	if providerErr != nil {
-		logging.Logger.Warn().Err(providerErr).Msgf("could not initialize provider for path %q", rootPath.Path)
+		logging.Logger.Warn().Err(providerErr).Msgf("could not initialize provider for path %q", rootPath.DetectedPath)
 	}
 	return h
 }
@@ -160,7 +162,7 @@ func autodetectedRootToProviders(pl *hcl.ProjectLocator, projectContext *config.
 					hcl.OptionWithModuleSuffix(env.Name),
 				)...)
 			if err != nil {
-				logging.Logger.Warn().Err(err).Msgf("could not initialize provider for path %q", rootPath.Path)
+				logging.Logger.Warn().Err(err).Msgf("could not initialize provider for path %q", rootPath.DetectedPath)
 				continue
 			}
 
@@ -183,7 +185,7 @@ func autodetectedRootToProviders(pl *hcl.ProjectLocator, projectContext *config.
 		providerOptions...,
 	)
 	if err != nil {
-		logging.Logger.Warn().Err(err).Msgf("could not initialize provider for path %q", rootPath.Path)
+		logging.Logger.Warn().Err(err).Msgf("could not initialize provider for path %q", rootPath.DetectedPath)
 		return nil
 	}
 

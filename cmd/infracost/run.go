@@ -85,10 +85,10 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		logging.Logger.Warn().Msg("Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
 	}
 
-	repoPath := runCtx.Config.RepoPath()
-	metadata, err := vcs.MetadataFetcher.Get(repoPath, runCtx.Config.GitDiffTarget)
+	wd := runCtx.Config.WorkingDirectory()
+	metadata, err := vcs.MetadataFetcher.Get(wd, runCtx.Config.GitDiffTarget)
 	if err != nil {
-		logging.Logger.Debug().Err(err).Msgf("failed to fetch vcs metadata for path %s", repoPath)
+		logging.Logger.Debug().Err(err).Msgf("failed to fetch vcs metadata for path %s", wd)
 	}
 	runCtx.VCSMetadata = metadata
 
@@ -334,6 +334,7 @@ func (r *parallelRunner) run() ([]projectResult, error) {
 		name := provider.ProjectName()
 		displayName := ui.ProjectDisplayName(r.runCtx, name)
 
+		dirDisp := ui.DirectoryDisplayName(r.runCtx, provider.RelativePath())
 		if len(provider.VarFiles()) > 0 {
 			varString := ""
 			for _, s := range provider.VarFiles() {
@@ -341,9 +342,9 @@ func (r *parallelRunner) run() ([]projectResult, error) {
 			}
 			varString = strings.TrimRight(varString, ", ")
 
-			logging.Logger.Info().Msgf("Found %s project %s at directory %s using %s var files %v", provider.DisplayType(), displayName, ui.DirectoryDisplayName(r.runCtx, provider.RelativePath()), provider.DisplayType(), varString)
+			logging.Logger.Info().Msgf("Found %s project %s at directory %s using %s var files %v", provider.DisplayType(), displayName, dirDisp, provider.DisplayType(), varString)
 		} else {
-			logging.Logger.Info().Msgf("Found %s project %s at directory %s", provider.DisplayType(), displayName, ui.DirectoryDisplayName(r.runCtx, provider.RelativePath()))
+			logging.Logger.Info().Msgf("Found %s project %s at directory %s", provider.DisplayType(), displayName, dirDisp)
 		}
 	}
 
