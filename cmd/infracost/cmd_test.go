@@ -129,10 +129,8 @@ func GetCommandOutput(t *testing.T, args []string, testOptions *GoldenFileOption
 		c.OutWriter = outBuf
 		c.Exit = func(code int) {}
 
-		if testOptions.CaptureLogs {
+		if !testOptions.IgnoreLogs {
 			logBuf = testutil.ConfigureTestToCaptureLogs(t, c)
-		} else if !testOptions.IgnoreLogs {
-			testutil.ConfigureTestToFailOnLogs(t, c)
 		}
 
 		for _, option := range ctxOptions {

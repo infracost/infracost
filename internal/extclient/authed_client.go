@@ -11,7 +11,6 @@ import (
 	"github.com/infracost/infracost/internal/logging"
 
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
 )
 
 // AuthedAPIClient represents an API client for authorized requests.
@@ -41,7 +40,7 @@ func (a *AuthedAPIClient) SetHost(host string) {
 // Get performs a GET request to provided endpoint.
 func (a *AuthedAPIClient) Get(path string) ([]byte, error) {
 	url := fmt.Sprintf("https://%s%s", a.host, path)
-	log.Debug().Msgf("Calling Terraform Cloud API: %s", url)
+	logging.Logger.Debug().Msgf("Calling Terraform Cloud API: %s", url)
 	req, err := retryablehttp.NewRequest("GET", url, nil)
 	if err != nil {
 		return []byte{}, err

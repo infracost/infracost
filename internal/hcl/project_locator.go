@@ -1365,7 +1365,7 @@ func (p *ProjectLocator) walkPaths(fullPath string, level int, maxSearchDepth in
 
 	fileInfos, err := os.ReadDir(fullPath)
 	if err != nil {
-		p.logger.Warn().Err(err).Msgf("could not get file information for path %s skipping evaluation", fullPath)
+		p.logger.Debug().Err(err).Msgf("could not get file information for path %s skipping evaluation", fullPath)
 		return
 	}
 
@@ -1563,7 +1563,7 @@ func (p *ProjectLocator) shallowDecodeTerraformBlocks(fullPath string, files map
 
 		body, content, diags := file.Body.PartialContent(terraformAndProviderBlocks)
 		if diags != nil && diags.HasErrors() {
-			p.logger.Warn().Err(diags).Msgf("skipping building module information for file %s as failed to get partial body contents", file)
+			p.logger.Debug().Err(diags).Msgf("skipping building module information for file %s as failed to get partial body contents", file)
 			continue
 		}
 

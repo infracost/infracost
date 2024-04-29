@@ -14,6 +14,7 @@
   "projects": [
     {
       "name": "infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags_azure",
+      "displayName": "main",
       "metadata": {
         "path": "testdata/breakdown_format_json_with_tags_azure",
         "type": "terraform_dir",
@@ -59,7 +60,8 @@
                 "monthlyQuantity": "2",
                 "price": "164.25",
                 "hourlyCost": "0.45",
-                "monthlyCost": "328.5"
+                "monthlyCost": "328.5",
+                "priceNotFound": false
               }
             ]
           },
@@ -91,7 +93,8 @@
                 "monthlyQuantity": "2",
                 "price": "164.25",
                 "hourlyCost": "0.45",
-                "monthlyCost": "328.5"
+                "monthlyCost": "328.5",
+                "priceNotFound": false
               }
             ]
           }
@@ -132,7 +135,8 @@
                 "monthlyQuantity": "2",
                 "price": "164.25",
                 "hourlyCost": "0.45",
-                "monthlyCost": "328.5"
+                "monthlyCost": "328.5",
+                "priceNotFound": false
               }
             ]
           },
@@ -164,7 +168,8 @@
                 "monthlyQuantity": "2",
                 "price": "164.25",
                 "hourlyCost": "0.45",
-                "monthlyCost": "328.5"
+                "monthlyCost": "328.5",
+                "priceNotFound": false
               }
             ]
           }

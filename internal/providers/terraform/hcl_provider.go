@@ -27,7 +27,6 @@ import (
 	"github.com/infracost/infracost/internal/hcl/modules"
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/infracost/infracost/internal/ui"
 )
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
@@ -184,7 +183,19 @@ func NewHCLProvider(ctx *config.ProjectContext, rootPath hcl.RootPath, config *H
 func (p *HCLProvider) Context() *config.ProjectContext { return p.ctx }
 
 func (p *HCLProvider) ProjectName() string {
+	if p.ctx.ProjectConfig.Name != "" {
+		return p.ctx.ProjectConfig.Name
+	}
+
+	if p.ctx.ProjectConfig.TerraformWorkspace != "" {
+		return p.Parser.ProjectName() + "-" + p.ctx.ProjectConfig.TerraformWorkspace
+	}
+
 	return p.Parser.ProjectName()
+}
+
+func (p *HCLProvider) VarFiles() []string {
+	return p.Parser.VarFiles()
 }
 
 func (p *HCLProvider) EnvName() string {
@@ -195,16 +206,12 @@ func (p *HCLProvider) RelativePath() string {
 	return p.Parser.RelativePath()
 }
 
-func (p *HCLProvider) TerraformVarFiles() []string {
-	return p.Parser.TerraformVarFiles()
-}
-
 func (p *HCLProvider) YAML() string {
 	return p.Parser.YAML()
 }
 
 func (p *HCLProvider) Type() string        { return "terraform_dir" }
-func (p *HCLProvider) DisplayType() string { return "Terraform directory" }
+func (p *HCLProvider) DisplayType() string { return "Terraform" }
 func (p *HCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 	metadata.ConfigSha = p.ctx.ProjectConfig.ConfigSha
 
@@ -285,7 +292,9 @@ func (p *HCLProvider) newProject(parsed HCLProject) *schema.Project {
 		}
 	}
 
-	return schema.NewProject(name, metadata)
+	project := schema.NewProject(name, metadata)
+	project.DisplayName = p.ProjectName()
+	return project
 }
 
 func (p *HCLProvider) printWarning(warning *schema.ProjectDiag) {
@@ -295,12 +304,7 @@ func (p *HCLProvider) printWarning(warning *schema.ProjectDiag) {
 		return
 	}
 
-	if p.ctx.RunContext.Config.IsLogging() {
-		logging.Logger.Warn().Msg(warning.FriendlyMessage)
-		return
-	}
-
-	ui.PrintWarning(p.ctx.RunContext.ErrWriter, warning.FriendlyMessage)
+	logging.Logger.Warn().Msg(warning.FriendlyMessage)
 }
 
 type HCLProject struct {

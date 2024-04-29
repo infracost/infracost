@@ -36,10 +36,10 @@
   ]
 }
 Logs:
-INF Estimate uploaded to Infracost Cloud
-INF 1 tag policy checked
-INF tag policy check failed: Timtags
-INF 48 finops policies checked
-INF finops policy check failed: Cloudwatch - consider using a retention policy to reduce storage costs
-INF finops policy check failed: EBS - consider upgrading gp2 volumes to gp3
-INF finops policy check failed: S3 - consider using a lifecycle policy to reduce storage costs
+INFO Estimate uploaded to Infracost Cloud
+INFO 1 tag policy checked
+INFO tag policy check failed: Timtags
+INFO 48 finops policies checked
+INFO finops policy check failed: Cloudwatch - consider using a retention policy to reduce storage costs
+INFO finops policy check failed: EBS - consider upgrading gp2 volumes to gp3
+INFO finops policy check failed: S3 - consider using a lifecycle policy to reduce storage costs

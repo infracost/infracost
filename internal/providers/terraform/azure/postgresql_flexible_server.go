@@ -4,8 +4,7 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/rs/zerolog/log"
-
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources/azure"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -26,7 +25,7 @@ func newPostgreSQLFlexibleServer(d *schema.ResourceData) schema.CoreResource {
 
 	s := strings.Split(sku, "_")
 	if len(s) < 3 || len(s) > 4 {
-		log.Warn().Msgf("Unrecognised PostgreSQL Flexible Server SKU format for resource %s: %s", d.Address, sku)
+		logging.Logger.Warn().Msgf("Unrecognised PostgreSQL Flexible Server SKU format for resource %s: %s", d.Address, sku)
 		return nil
 	}
 
@@ -41,7 +40,7 @@ func newPostgreSQLFlexibleServer(d *schema.ResourceData) schema.CoreResource {
 
 	supportedTiers := []string{"b", "gp", "mo"}
 	if !contains(supportedTiers, tier) {
-		log.Warn().Msgf("Unrecognised PostgreSQL Flexible Server tier prefix for resource %s: %s", d.Address, sku)
+		logging.Logger.Warn().Msgf("Unrecognised PostgreSQL Flexible Server tier prefix for resource %s: %s", d.Address, sku)
 		return nil
 	}
 
@@ -49,7 +48,7 @@ func newPostgreSQLFlexibleServer(d *schema.ResourceData) schema.CoreResource {
 		coreRegex := regexp.MustCompile(`(\d+)`)
 		match := coreRegex.FindStringSubmatch(size)
 		if len(match) < 1 {
-			log.Warn().Msgf("Unrecognised PostgreSQL Flexible Server size for resource %s: %s", d.Address, sku)
+			logging.Logger.Warn().Msgf("Unrecognised PostgreSQL Flexible Server size for resource %s: %s", d.Address, sku)
 			return nil
 		}
 	}

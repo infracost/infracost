@@ -1321,7 +1321,20 @@ func TestBreakdownTerragruntFileFuncs(t *testing.T) {
 	}
 
 	t.Setenv("INFRACOST_CI_PLATFORM", "github_app")
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", dir,
+		},
+		&GoldenFileOptions{IgnoreLogs: true, IgnoreNonGraph: true},
+	)
+}
 
+func TestBreakdownNoPricesWarnings(t *testing.T) {
 	testName := testutil.CalcGoldenFileTestdataDirName()
 	dir := path.Join("./testdata", testName)
 	GoldenFileCommandTest(

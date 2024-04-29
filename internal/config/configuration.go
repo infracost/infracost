@@ -6,8 +6,9 @@ import (
 	"strings"
 
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
 	"gopkg.in/yaml.v2"
+
+	"github.com/infracost/infracost/internal/logging"
 )
 
 var configurationVersion = "0.1"
@@ -28,7 +29,7 @@ func loadConfiguration(cfg *Config) error {
 
 	err = cfg.migrateConfiguration()
 	if err != nil {
-		log.Debug().Err(err).Msg("error migrating configuration")
+		logging.Logger.Debug().Err(err).Msg("error migrating configuration")
 	}
 
 	cfg.Configuration, err = readConfigurationFileIfExists()

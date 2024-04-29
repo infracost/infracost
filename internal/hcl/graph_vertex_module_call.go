@@ -125,7 +125,6 @@ func (v *VertexModuleCall) expand(e *Evaluator, b *Block, mutex *sync.Mutex) ([]
 			map[string]map[string]cty.Value{},
 			e.workspace,
 			e.blockBuilder,
-			nil,
 			e.logger,
 			e.isGraph,
 		)

@@ -4,9 +4,9 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
 
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
 )
 
@@ -30,7 +30,7 @@ func NewAzureRMMariaDBServer(d *schema.ResourceData, u *schema.UsageData) *schem
 		family = strings.Split(sku, "_")[1]
 		cores = strings.Split(sku, "_")[2]
 	} else {
-		log.Warn().Msgf("Unrecognised MariaDB SKU format for resource %s: %s", d.Address, sku)
+		logging.Logger.Warn().Msgf("Unrecognised MariaDB SKU format for resource %s: %s", d.Address, sku)
 		return nil
 	}
 
@@ -41,7 +41,7 @@ func NewAzureRMMariaDBServer(d *schema.ResourceData, u *schema.UsageData) *schem
 	}[tier]
 
 	if tierName == "" {
-		log.Warn().Msgf("Unrecognised MariaDB tier prefix for resource %s: %s", d.Address, tierName)
+		logging.Logger.Warn().Msgf("Unrecognised MariaDB tier prefix for resource %s: %s", d.Address, tierName)
 		return nil
 	}
 
