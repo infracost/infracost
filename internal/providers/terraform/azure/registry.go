@@ -265,6 +265,7 @@ var FreeResources = []string{
 	"azurerm_blueprint_assignment",
 
 	// Azure CDN
+	"azurerm_cdn_frontdoor_custom_domain_association",
 	"azurerm_cdn_profile",
 
 	// Azure Consumption
@@ -274,6 +275,8 @@ var FreeResources = []string{
 
 	// Azure CosmosDB
 	"azurerm_cosmosdb_notebook_workspace",
+	"azurerm_cosmosdb_sql_role_assignment",
+	"azurerm_cosmosdb_sql_role_definition",
 	"azurerm_cosmosdb_sql_stored_procedure",
 	"azurerm_cosmosdb_sql_trigger",
 	"azurerm_cosmosdb_sql_user_defined_function",
@@ -560,6 +563,9 @@ var FreeResources = []string{
 	// Azure SignalR
 	"azurerm_signalr_service_network_acl",
 	"azurerm_signalr_shared_private_link",
+
+	// Azure Site Recovery
+	"azurerm_site_recovery_protection_container_mapping",
 
 	// Azure SQL
 	"azurerm_sql_failover_group",
