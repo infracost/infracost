@@ -59,18 +59,28 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 
 // FreeResources grouped alphabetically
 var FreeResources = []string{
+	"google_artifact_registry_repository_iam_binding",
+	"google_artifact_registry_repository_iam_member",
 	"google_bigquery_dataset_access",
 	"google_bigquery_dataset_iam_binding",
 	"google_bigquery_dataset_iam_member",
 	"google_bigquery_dataset_iam_policy",
+	"google_bigtable_instance_iam_member",
 	"google_bigquery_job",
 	"google_bigquery_routine",
 	"google_bigquery_table_iam_binding",
 	"google_bigquery_table_iam_member",
 	"google_bigquery_table_iam_policy",
+	"google_billing_account_iam_member",
 	"google_cloudfunctions_function_iam_binding",
 	"google_cloudfunctions_function_iam_member",
 	"google_cloudfunctions_function_iam_policy",
+	"google_cloud_run_domain_mapping",
+	"google_cloud_run_service_iam_member",
+	"google_cloud_run_service_iam_policy",
+	"google_cloud_run_v2_job_iam_member",
+	"google_cloud_run_v2_service_iam_binding",
+	"google_cloudfunctions2_function_iam_policy",
 	"google_compute_attached_disk",
 	"google_compute_backend_bucket",
 	"google_compute_backend_bucket_signed_url_key",
@@ -102,6 +112,7 @@ var FreeResources = []string{
 	"google_compute_network",
 	"google_compute_network_endpoint",
 	"google_compute_network_endpoint_group",
+	"google_compute_network_firewall_policy_association",
 	"google_compute_network_peering",
 	"google_compute_network_peering_routes_config",
 	"google_compute_organization_security_policy",
@@ -131,6 +142,20 @@ var FreeResources = []string{
 	"google_compute_subnetwork_iam_policy",
 	"google_compute_url_map",
 	"google_dns_policy",
+	"google_folder_iam_binding",
+	"google_folder_iam_member",
+	"google_folder_iam_policy",
+	"google_iam_custom_role",
+	"google_iam_workload_identity_pool",
+	"google_iam_workload_identity_pool_provider",
+	"google_iap_app_engine_service_iam_member",
+	"google_iap_web_backend_service_iam_binding",
+	"google_iap_web_backend_service_iam_member",
+	"google_iap_web_backend_service_iam_policy",
+	"google_iap_web_iam_binding",
+	"google_iap_web_iam_member",
+	"google_iap_web_iam_policy",
+	"google_iap_web_type_app_engine_iam_binding",
 	"google_kms_crypto_key_iam_binding",
 	"google_kms_crypto_key_iam_member",
 	"google_kms_crypto_key_iam_policy",
@@ -152,6 +177,10 @@ var FreeResources = []string{
 	"google_monitoring_custom_service",
 	"google_monitoring_slo",
 	"google_monitoring_uptime_check_config",
+	"google_notebooks_instance_iam_member",
+	"google_organization_iam_binding",
+	"google_organization_iam_custom_role",
+	"google_organization_iam_member",
 	"google_os_login_ssh_public_key",
 	"google_project",
 	"google_project_default_service_accounts",
@@ -177,6 +206,10 @@ var FreeResources = []string{
 	"google_service_account_iam_member",
 	"google_service_account_iam_policy",
 	"google_service_account_key",
+	"google_sourcerepo_repository_iam_binding",
+	"google_sourcerepo_repository_iam_member",
+	"google_spanner_database_iam_member",
+	"google_spanner_instance_iam_member",
 	"google_sql_database",
 	"google_sql_ssl_cert",
 	"google_sql_user",
@@ -192,55 +225,8 @@ var FreeResources = []string{
 	"google_storage_notification",
 	"google_storage_object_access_control",
 	"google_storage_object_acl",
+	"google_tags_tag_value_iam_binding",
 	"google_usage_export_bucket",
 }
 
 var UsageOnlyResources = []string{}
-
-// TODO: This is a list of all the google_compute* resources that may have prices:
-// compute_instance scratch_disk
-// VM instance (https://cloud.google.com/compute/vm-instance-pricing):
-// google_compute_instance_from_machine_image
-// google_compute_instance_from_template
-//
-// Node groups and autoscaling:
-// google_compute_autoscaler
-// google_compute_instance_template
-// google_compute_target_pool
-// google_compute_instance_group_manager
-// google_compute_per_instance_config
-// google_compute_region_autoscaler
-// google_compute_node_group
-// google_compute_node_template
-// google_compute_region_instance_group_manager
-// google_compute_region_per_instance_config
-//
-// Disk and images (https://cloud.google.com/compute/disks-image-pricing):
-// google_compute_image
-// google_compute_machine_image
-// google_compute_region_disk
-// google_compute_snapshot
-//
-// Load balancers (https://cloud.google.com/vpc/network-pricing#lb):
-// google_compute_forwarding_rule
-// google_compute_global_forwarding_rule
-// google_compute_target_grpc_proxy
-// google_compute_target_http_proxy
-// google_compute_target_https_proxy
-// google_compute_target_ssl_proxy
-// google_compute_target_tcp_proxy
-// google_compute_region_target_http_proxy
-// google_compute_region_target_https_proxy
-//
-//
-// Packet mirroring (https://cloud.google.com/vpc/network-pricing#packet-mirroring):
-// google_compute_packet_mirroring
-//
-// Cloud interconnect (https://cloud.google.com/vpc/network-pricing#interconnect-pricing):
-// google_compute_interconnect_attachment
-//
-// Others:
-// google_compute_region_disk_resource_policy_attachment
-// google_compute_reservation
-// google_compute_resource_policy
-// google_compute_security_policy
