@@ -183,6 +183,7 @@ var FreeResources = []string{
 	"aws_apigatewayv2_vpc_link",
 
 	// AWS AppConfig
+	"aws_appconfig_configuration_profile",
 	"aws_appconfig_extension",
 	"aws_appconfig_extension_association",
 	"aws_appconfig_hosted_configuration_version",
@@ -202,6 +203,12 @@ var FreeResources = []string{
 	"aws_appmesh_virtual_router",
 	"aws_appmesh_virtual_service",
 
+	// AWS AppRunner
+	"aws_apprunner_custom_domain_association",
+
+	// AWS AppStream
+	"aws_appstream_fleet_stack_association",
+
 	// AWS Backup
 	"aws_backup_global_settings",
 	"aws_backup_plan",
@@ -209,6 +216,69 @@ var FreeResources = []string{
 	"aws_backup_selection",
 	"aws_backup_vault_notifications",
 	"aws_backup_vault_policy",
+
+	// AWS Batch
+	"aws_batch_job_queue",
+
+	// AWS Budgets
+	"aws_budgets_budget",
+
+	// AWS Cloudformation
+	"aws_cloudformation_stack_set_instance",
+	"aws_cloudformation_type",
+
+	// AWS Cloudfront
+	"aws_cloudfront_cache_policy",
+	"aws_cloudfront_key_group",
+	"aws_cloudfront_origin_access_control",
+	"aws_cloudfront_origin_access_identity",
+	"aws_cloudfront_origin_request_policy",
+	"aws_cloudfront_public_key",
+	"aws_cloudfront_response_headers_policy",
+
+	// AWS CloudHSM
+	"aws_cloudhsm_v2_cluster",
+
+	// AWS Cloudwatch
+	"aws_cloudwatch_log_destination",
+	"aws_cloudwatch_log_destination_policy",
+	"aws_cloudwatch_log_metric_filter",
+	"aws_cloudwatch_log_resource_policy",
+	"aws_cloudwatch_log_stream",
+	"aws_cloudwatch_log_subscription_filter",
+
+	// AWS CodeBuild
+	"aws_codebuild_report_group",
+	"aws_codebuild_source_credential",
+	"aws_codebuild_webhook",
+
+	// AWS CodeDeploy
+	"aws_codedeploy_app",
+	"aws_codedeploy_deployment_config",
+
+	// AWS Cognito
+	"aws_cognito_identity_pool_roles_attachment",
+	"aws_cognito_resource_server",
+	"aws_cognito_user_pool_client",
+
+	// AWS Config
+	"aws_config_aggregate_authorization",
+	"aws_config_configuration_aggregator",
+	"aws_config_configuration_recorder_status",
+	"aws_config_delivery_channel",
+	"aws_config_remediation_configuration",
+
+	// AWS DMS
+	"aws_dms_certificate",
+	"aws_dms_endpoint",
+	"aws_dms_event_subscription",
+	"aws_dms_replication_subnet_group",
+	"aws_dms_replication_task",
+	"aws_dms_s3_endpoint",
+
+	// AWS DocDB
+	"aws_docdb_cluster_parameter_group",
+	"aws_docdb_subnet_group",
 
 	// AWS DX Transit.
 	"aws_dx_bgp_peer",
@@ -225,41 +295,12 @@ var FreeResources = []string{
 	"aws_dx_public_virtual_interface",
 	"aws_dx_transit_virtual_interface",
 
-	// AWS Cloudformation
-	"aws_cloudformation_stack_set_instance",
-	"aws_cloudformation_type",
+	// AWS DynamoDB
+	"aws_dynamodb_table_item",
 
-	// AWS Cloudfront
-	"aws_cloudfront_origin_access_identity",
-	"aws_cloudfront_public_key",
-
-	// AWS CloudHSM
-	"aws_cloudhsm_v2_cluster",
-
-	// AWS Cloudwatch
-	"aws_cloudwatch_log_destination",
-	"aws_cloudwatch_log_destination_policy",
-	"aws_cloudwatch_log_metric_filter",
-	"aws_cloudwatch_log_resource_policy",
-	"aws_cloudwatch_log_stream",
-	"aws_cloudwatch_log_subscription_filter",
-
-	// AWS EventBridge
-	"aws_cloudwatch_event_permission",
-	"aws_cloudwatch_event_rule",
-	"aws_cloudwatch_event_target",
-
-	// AWS CodeBuild
-	"aws_codebuild_report_group",
-	"aws_codebuild_source_credential",
-	"aws_codebuild_webhook",
-
-	// AWS Config
-	"aws_config_aggregate_authorization",
-	"aws_config_configuration_aggregator",
-	"aws_config_configuration_recorder_status",
-	"aws_config_delivery_channel",
-	"aws_config_remediation_configuration",
+	// AWS EBS
+	"aws_ebs_encryption_by_default",
+	"aws_ebs_default_kms_key",
 
 	// AWS EC2
 	"aws_autoscaling_attachment",
@@ -267,14 +308,23 @@ var FreeResources = []string{
 	"aws_autoscaling_lifecycle_hook",
 	"aws_autoscaling_notification",
 	"aws_autoscaling_policy",
+	"aws_ec2_managed_prefix_list",
+	"aws_ec2_managed_prefix_list_entry",
+	"aws_key_pair",
+	"aws_launch_configuration",
+	"aws_launch_template",
 	"aws_placement_group",
+	"aws_volume_attachment",
 
 	// AWS ECR
+	"aws_ecr_pull_through_cache_rule",
 	"aws_ecr_repository_policy",
 
 	// AWS EKS
+	"aws_eks_access_policy_association",
 	"aws_eks_addon",
 	"aws_eks_identity_provider_config",
+	"aws_eks_pod_identity_association",
 
 	// AWS Elastic Beanstalk
 	"aws_elastic_beanstalk_application",
@@ -313,6 +363,14 @@ var FreeResources = []string{
 	"aws_elasticache_user",
 	"aws_elasticache_user_group",
 	"aws_elasticache_user_group_association",
+
+	// AWS EventBridge
+	"aws_cloudwatch_event_api_destination",
+	"aws_cloudwatch_event_bus_policy",
+	"aws_cloudwatch_event_connection",
+	"aws_cloudwatch_event_permission",
+	"aws_cloudwatch_event_rule",
+	"aws_cloudwatch_event_target",
 
 	// "AWS Global Accelerator Listener
 	"aws_globalaccelerator_listener",
@@ -364,22 +422,42 @@ var FreeResources = []string{
 	"aws_iam_user_policy_attachment",
 	"aws_iam_user_ssh_key",
 
+	// AWS Image Builder
+	"aws_imagebuilder_component",
+	"aws_imagebuilder_image_pipeline",
+
 	// AWS IOT
 	"aws_iot_policy",
+	"aws_iot_role_alias",
 
 	// AWS KMS
 	"aws_kms_alias",
 	"aws_kms_ciphertext",
 	"aws_kms_grant",
+	"aws_kms_key_policy",
 
 	// AWS Lambda
 	"aws_lambda_alias",
 	"aws_lambda_code_signing_config",
 	"aws_lambda_event_source_mapping",
 	"aws_lambda_function_event_invoke_config",
+	"aws_lambda_function_url",
 	"aws_lambda_layer_version",
 	"aws_lambda_layer_version_permission",
 	"aws_lambda_permission",
+
+	// AWS Lightsail
+	"aws_lightsail_domain",
+	"aws_lightsail_key_pair",
+	"aws_lightsail_static_ip",
+	"aws_lightsail_static_ip_attachment",
+
+	// AWS MQ
+	"aws_mq_configuration",
+
+	// AWS MSK
+	"aws_msk_configuration",
+	"aws_msk_scram_secret_association",
 
 	// AWS Neptune
 	"aws_neptune_cluster_parameter_group",
@@ -392,46 +470,54 @@ var FreeResources = []string{
 	"aws_networkfirewall_firewall_policy",
 	"aws_networkfirewall_logging_configuration",
 
-	// AWS Others
-	"aws_db_instance_role_association",
-	"aws_db_option_group",
-	"aws_db_parameter_group",
-	"aws_db_subnet_group",
-	"aws_dms_replication_subnet_group",
-	"aws_dms_replication_task",
-	"aws_docdb_cluster_parameter_group",
-	"aws_docdb_subnet_group",
-	"aws_dynamodb_table_item",
-	"aws_ebs_encryption_by_default",
-	"aws_ebs_default_kms_key",
+	// AWS Opensearch
 	"aws_elasticsearch_domain_policy",
+	"aws_elasticsearch_domain_saml_options",
 	"aws_opensearch_domain_policy",
-	"aws_key_pair",
-	"aws_launch_configuration",
-	"aws_launch_template",
-	"aws_lightsail_domain",
-	"aws_lightsail_key_pair",
-	"aws_lightsail_static_ip",
-	"aws_lightsail_static_ip_attachment",
-	"aws_mq_configuration",
-	"aws_msk_configuration",
-	"aws_rds_cluster_endpoint",
-	"aws_rds_cluster_parameter_group",
-	"aws_resourcegroups_group",
-	"aws_route53_resolver_dnssec_config",
-	"aws_route53_resolver_query_log_config",
-	"aws_route53_resolver_query_log_config_association",
-	"aws_route53_resolver_rule",
-	"aws_route53_resolver_rule_association",
-	"aws_route53_zone_association",
-	"aws_sqs_queue_policy",
-	"aws_volume_attachment",
+	"aws_opensearch_domain_saml_options",
+
+	// AWS OpsWorks
+	"aws_opsworks_user_profile",
+
+	// AWS Organizations
+	"aws_organizations_account",
+	"aws_organizations_organizational_unit",
+	"aws_organizations_policy",
+	"aws_organizations_policy_attachment",
 
 	// AWS RAM
 	"aws_ram_principal_association",
 	"aws_ram_resource_association",
 	"aws_ram_resource_share",
 	"aws_ram_resource_share_accepter",
+
+	// AWS RDS
+	"aws_db_event_subscription",
+	"aws_db_instance_role_association",
+	"aws_db_option_group",
+	"aws_db_parameter_group",
+	"aws_db_proxy_default_target_group",
+	"aws_db_proxy_target",
+	"aws_db_subnet_group",
+	"aws_rds_cluster_endpoint",
+	"aws_rds_cluster_parameter_group",
+	"aws_rds_cluster_role_association",
+
+	// AWS Resource Groups
+	"aws_resourcegroups_group",
+	"aws_resourcegroups_resource",
+
+	// AWS Redshift
+	"aws_redshift_cluster_iam_roles",
+
+	// AWS Route53
+	"aws_route53_resolver_dnssec_config",
+	"aws_route53_resolver_query_log_config",
+	"aws_route53_resolver_query_log_config_association",
+	"aws_route53_resolver_rule",
+	"aws_route53_resolver_rule_association",
+	"aws_route53_vpc_association_authorization",
+	"aws_route53_zone_association",
 
 	// AWS S3
 	"aws_s3_access_point",
@@ -451,6 +537,13 @@ var FreeResources = []string{
 	"aws_s3_bucket_server_side_encryption_configuration",
 	"aws_s3_bucket_versioning",
 	"aws_s3_bucket_website_configuration",
+	"aws_s3_object", // Costs are shown at the bucket level
+
+	// AWS SageMaker
+	"aws_sagemaker_user_profile",
+
+	// AWS Scheduler
+	"aws_scheduler_schedule_group",
 
 	// AWS Secrets Manager
 	"aws_secretsmanager_secret_policy",
@@ -458,19 +551,48 @@ var FreeResources = []string{
 	"aws_secretsmanager_secret_version",
 
 	// AWS Service Discovery Service
+	"aws_service_discovery_http_namespace",
 	"aws_service_discovery_service",
 
 	// AWS SES
+	"aws_ses_configuration_set",
 	"aws_ses_domain_dkim",
 	"aws_ses_domain_identity",
+	"aws_ses_domain_identity_verification",
+	"aws_ses_domain_mail_from",
+	"aws_ses_email_identity",
+	"aws_ses_event_destination",
+	"aws_ses_identity_notification_topic",
+	"aws_ses_identity_policy",
+	"aws_ses_receipt_filter",
+	"aws_ses_receipt_rule",
+	"aws_ses_receipt_rule_set",
+	"aws_ses_template",
+	"aws_sesv2_configuration_set",
+	"aws_sesv2_configuration_set_event_destination",
+	"aws_sesv2_contact_list",
+	"aws_sesv2_email_identity",
+	"aws_sesv2_email_identity_feedback_attributes",
+	"aws_sesv2_email_identity_mail_from_attributes",
+	"aws_sesv2_email_identity_policy",
+
+	// AWS Shield
+	"aws_shield_drt_access_role_arn_association",
+	"aws_shield_protection_health_check_association",
 
 	// AWS SNS
 	"aws_sns_platform_application",
 	"aws_sns_sms_preferences",
 	"aws_sns_topic_policy",
 
+	// AWS SQS
+	"aws_sqs_queue_policy",
+	"aws_sqs_queue_redrive_allow_policy",
+	"aws_sqs_queue_redrive_policy",
+
 	// AWS SSM
 	"aws_ssm_association",
+	"aws_ssm_document",
 	"aws_ssm_maintenance_window",
 	"aws_ssm_maintenance_window_target",
 	"aws_ssm_maintenance_window_task",
@@ -478,9 +600,15 @@ var FreeResources = []string{
 	"aws_ssm_patch_group",
 	"aws_ssm_resource_data_sync",
 
+	// AWS SSO
+	"aws_ssoadmin_account_assignment",
+	"aws_ssoadmin_managed_policy_attachment",
+	"aws_ssoadmin_permission_set_inline_policy",
+
 	// AWS Transfer Family
 	"aws_transfer_access",
 	"aws_transfer_ssh_key",
+	"aws_transfer_tag",
 	"aws_transfer_user",
 
 	// AWS VPC
@@ -523,6 +651,7 @@ var FreeResources = []string{
 	"aws_vpc_dhcp_options_association",
 	"aws_vpc_endpoint_connection_notification",
 	"aws_vpc_endpoint_route_table_association",
+	"aws_vpc_endpoint_security_group_association",
 	"aws_vpc_endpoint_service",
 	"aws_vpc_endpoint_service_allowed_principal",
 	"aws_vpc_endpoint_subnet_association",
@@ -536,6 +665,29 @@ var FreeResources = []string{
 	"aws_vpn_gateway",
 	"aws_vpn_gateway_attachment",
 	"aws_vpn_gateway_route_propagation",
+
+	// WAF
+	"aws_wafv2_rule_group",
+	"aws_wafv2_ip_set",
+	"aws_wafv2_regex_pattern_set",
+	"aws_wafv2_web_acl_association",
+	"aws_wafv2_web_acl_logging_configuration",
+	"aws_waf_byte_match_set",
+	"aws_waf_geo_match_set",
+	"aws_waf_ipset",
+	"aws_waf_regex_match_set",
+	"aws_waf_regex_pattern_set",
+	"aws_waf_size_constraint_set",
+	"aws_waf_sql_injection_match_set",
+	"aws_waf_xss_match_set",
+	"aws_waf_rule",
+	"aws_waf_rate_based_rule",
+	"aws_waf_rule_group",
+	"aws_wafregional_byte_match_set",
+	"aws_wafregional_size_constraint_set",
+	"aws_wafregional_sql_injection_match_set",
+	"aws_wafregional_web_acl_association",
+	"aws_wafregional_xss_match_set",
 
 	// Hashicorp
 	"null_resource",
@@ -555,24 +707,6 @@ var FreeResources = []string{
 	"time_rotating",
 	"time_sleep",
 	"time_static",
-
-	// WAF
-	"aws_wafv2_rule_group",
-	"aws_wafv2_ip_set",
-	"aws_wafv2_regex_pattern_set",
-	"aws_wafv2_web_acl_association",
-	"aws_wafv2_web_acl_logging_configuration",
-	"aws_waf_byte_match_set",
-	"aws_waf_geo_match_set",
-	"aws_waf_ipset",
-	"aws_waf_regex_match_set",
-	"aws_waf_regex_pattern_set",
-	"aws_waf_size_constraint_set",
-	"aws_waf_sql_injection_match_set",
-	"aws_waf_xss_match_set",
-	"aws_waf_rule",
-	"aws_waf_rate_based_rule",
-	"aws_waf_rule_group",
 }
 
 var UsageOnlyResources = []string{
