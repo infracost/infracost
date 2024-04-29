@@ -102,7 +102,7 @@ type debugWriter struct {
 
 func (d debugWriter) Write(p []byte) (n int, err error) {
 	p = bytes.Trim(p, " \n\t")
-	return d.f.Write(append(p, []byte(",\n")...))
+	return d.f.Write(append(p, []byte("\n")...))
 }
 
 func newRootCmd(ctx *config.RunContext) *cobra.Command {
