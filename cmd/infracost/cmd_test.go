@@ -41,6 +41,7 @@ type GoldenFileOptions = struct {
 	// RunTerraformCLI sets the cmd test to also run the cmd with --terraform-force-cli set
 	RunTerraformCLI bool
 	IgnoreNonGraph  bool
+	IgnoreLogs      bool
 }
 
 func DefaultOptions() *GoldenFileOptions {
@@ -130,7 +131,7 @@ func GetCommandOutput(t *testing.T, args []string, testOptions *GoldenFileOption
 
 		if testOptions.CaptureLogs {
 			logBuf = testutil.ConfigureTestToCaptureLogs(t, c)
-		} else {
+		} else if !testOptions.IgnoreLogs {
 			testutil.ConfigureTestToFailOnLogs(t, c)
 		}
 

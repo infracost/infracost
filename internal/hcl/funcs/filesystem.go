@@ -1,11 +1,13 @@
 package funcs
 
 import (
+	"bytes"
 	"encoding/base64"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
+	"strings"
 	"unicode/utf8"
 
 	"github.com/bmatcuk/doublestar"
@@ -14,6 +16,8 @@ import (
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/function"
+
+	"github.com/infracost/infracost/internal/logging"
 )
 
 // MakeFileFunc constructs a function that takes a file path and returns the
@@ -204,6 +208,11 @@ func MakeFileExistsFunc(baseDir string) function.Function {
 
 			// Ensure that the path is canonical for the host OS
 			path = filepath.Clean(path)
+			if err := isPathInRepo(path); err != nil {
+				logging.Logger.Debug().Msgf("isPathInRepo error: %s returning false for filesytem func", err)
+
+				return cty.False, nil
+			}
 
 			fi, err := os.Stat(path)
 			if err != nil {
@@ -258,6 +267,11 @@ func MakeFileSetFunc(baseDir string) function.Function {
 
 			var matchVals []cty.Value
 			for _, match := range matches {
+				if err := isPathInRepo(match); err != nil {
+					logging.Logger.Debug().Msgf("isPathInRepo error: %s skipping match for filesytem func", err)
+					continue
+				}
+
 				fi, err := os.Stat(match)
 
 				if err != nil {
@@ -352,7 +366,7 @@ var PathExpandFunc = function.New(&function.Spec{
 	},
 })
 
-func openFile(baseDir, path string) (*os.File, error) {
+func openFile(baseDir, path string) (io.Reader, error) {
 	path, err := homedir.Expand(path)
 	if err != nil {
 		return nil, fmt.Errorf("failed to expand ~: %s", err)
@@ -364,6 +378,12 @@ func openFile(baseDir, path string) (*os.File, error) {
 
 	// Ensure that the path is canonical for the host OS
 	path = filepath.Clean(path)
+
+	if err := isPathInRepo(path); err != nil {
+		logging.Logger.Debug().Msgf("isPathInRepo error: %s returning a blank buffer for filesytem func", err)
+
+		return bytes.NewBuffer([]byte{}), nil
+	}
 
 	return os.Open(path)
 }
@@ -459,4 +479,51 @@ func Dirname(path cty.Value) (cty.Value, error) {
 // If the leading segment in the path is not `~` then the given path is returned unmodified.
 func Pathexpand(path cty.Value) (cty.Value, error) {
 	return PathExpandFunc.Call([]cty.Value{path})
+}
+
+func isPathInRepo(path string) error {
+	// isPathInRepo is a no-op when not running in github/gitlab app env.
+	ciPlatform := os.Getenv("INFRACOST_CI_PLATFORM")
+	if ciPlatform != "github_app" && ciPlatform != "gitlab_app" {
+		return nil
+	}
+
+	wd, err := os.Getwd()
+	if err != nil {
+		return err
+	}
+
+	if !filepath.IsAbs(path) {
+		path = filepath.Join(wd, path)
+	}
+
+	// ensure the path resolves to the real symlink path
+	path = symlinkPath(path)
+
+	clean := filepath.Clean(wd)
+	if wd != "" && !strings.HasPrefix(path, clean) {
+		return fmt.Errorf("file %s is not within the repository directory %s", path, wd)
+	}
+
+	return nil
+}
+
+// symlinkPath checks the given file path and returns the real path if it is a
+// symlink.
+func symlinkPath(filepathStr string) string {
+	fileInfo, err := os.Lstat(filepathStr)
+	if err != nil {
+		return filepathStr
+	}
+
+	if fileInfo.Mode()&os.ModeSymlink != 0 {
+		realPath, err := filepath.EvalSymlinks(filepathStr)
+		if err != nil {
+			return filepathStr
+		}
+
+		return realPath
+	}
+
+	return filepathStr
 }

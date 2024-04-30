@@ -459,6 +459,9 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 
 			funcs["run_cmd"] = mockSliceFuncStaticReturn(cty.StringVal("run_cmd-mock"))
 			funcs["sops_decrypt_file"] = mockSliceFuncStaticReturn(cty.StringVal("sops_decrypt_file-mock"))
+			funcs["get_aws_account_id"] = mockSliceFuncStaticReturn(cty.StringVal("account_id-mock"))
+			funcs["get_aws_caller_identity_arn"] = mockSliceFuncStaticReturn(cty.StringVal("arn:aws:iam::123456789012:user/terragrunt-mock"))
+			funcs["get_aws_caller_identity_user_id"] = mockSliceFuncStaticReturn(cty.StringVal("caller_identity_user_id-mock"))
 
 			return funcs
 		},

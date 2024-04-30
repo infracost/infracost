@@ -1150,7 +1150,7 @@ func (e *Evaluator) loadModules(lastContext hcl.EvalContext) {
 // ExpFunctions returns the set of functions that should be used to when evaluating
 // expressions in the receiving scope.
 func ExpFunctions(baseDir string, logger zerolog.Logger) map[string]function.Function {
-	return map[string]function.Function{
+	fns := map[string]function.Function{
 		"abs":              stdlib.AbsoluteFunc,
 		"abspath":          funcs.AbsPathFunc,
 		"basename":         funcs.BasenameFunc,
@@ -1261,4 +1261,9 @@ func ExpFunctions(baseDir string, logger zerolog.Logger) map[string]function.Fun
 		"zipmap":           stdlib.ZipmapFunc,
 	}
 
+	fns["templatefile"] = funcs.MakeTemplateFileFunc(baseDir, func() map[string]function.Function {
+		return fns
+	})
+
+	return fns
 }

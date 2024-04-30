@@ -13,30 +13,43 @@ import (
 
 func TestFile(t *testing.T) {
 	tests := []struct {
-		Path cty.Value
-		Want cty.Value
-		Err  bool
+		Path   cty.Value
+		OSFunc func(t *testing.T)
+		Want   cty.Value
+		Err    bool
 	}{
 		{
 			cty.StringVal("testdata/hello.txt"),
+			func(t *testing.T) {},
 			cty.StringVal("Hello World"),
 			false,
 		},
 		{
 			cty.StringVal("testdata/icon.png"),
+			func(t *testing.T) {},
 			cty.NilVal,
 			true, // Not valid UTF-8
 		},
 		{
 			cty.StringVal("testdata/missing"),
+			func(t *testing.T) {},
 			cty.NilVal,
 			true, // no file exists
+		},
+		{
+			cty.StringVal("testdata/hello.txt"),
+			func(t *testing.T) { t.Setenv("INFRACOST_CI_PLATFORM", "github_app") },
+			cty.StringVal("Hello World"),
+			false,
 		},
 	}
 
 	for _, test := range tests {
-		t.Run(fmt.Sprintf("File(\".\", %#v)", test.Path), func(t *testing.T) {
-			got, err := File(".", test.Path)
+		t.Run(fmt.Sprintf("MakeFileFunc(\".\", %s#v)", test.Path), func(t *testing.T) {
+			test.OSFunc(t)
+
+			fn := MakeFileFunc(".", false)
+			got, err := fn.Call([]cty.Value{test.Path})
 
 			if test.Err {
 				if err == nil {
