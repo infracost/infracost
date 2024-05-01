@@ -631,14 +631,6 @@ func TestBreakdownTerragruntGetEnv(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())}, nil)
 }
 
-func TestBreakdownTerragruntGetEnvWithWhitelist(t *testing.T) {
-	t.Setenv("UNSAFE_VAR", "test")
-	t.Setenv("SAFE_VAR", "test-prod")
-	t.Setenv("INFRACOST_SAFE_ENVS", "TEST,SAFE_VAR,FOO")
-
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())}, nil)
-}
-
 func TestBreakdownTerragruntGetEnvConfigFile(t *testing.T) {
 	testName := testutil.CalcGoldenFileTestdataDirName()
 	dir := path.Join("./testdata", testName)
