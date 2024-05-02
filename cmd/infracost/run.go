@@ -91,6 +91,7 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		logging.Logger.Debug().Err(err).Msgf("failed to fetch vcs metadata for path %s", wd)
 	}
 	runCtx.VCSMetadata = metadata
+	runCtx.VCSMetadata.BaseCommit = vcs.Commit{}
 
 	pr, err := newParallelRunner(cmd, runCtx)
 	if err != nil {
@@ -125,6 +126,13 @@ func runMain(cmd *cobra.Command, runCtx *config.RunContext) error {
 		r, err = output.CompareTo(runCtx.Config, r, *pr.prior)
 		if err != nil {
 			return err
+		}
+		runCtx.VCSMetadata.BaseCommit = vcs.Commit{
+			SHA:         pr.prior.Metadata.CommitSHA,
+			AuthorName:  pr.prior.Metadata.CommitAuthorName,
+			AuthorEmail: pr.prior.Metadata.CommitAuthorEmail,
+			Time:        pr.prior.Metadata.CommitTimestamp,
+			Message:     pr.prior.Metadata.CommitMessage,
 		}
 	}
 

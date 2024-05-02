@@ -1056,6 +1056,7 @@ type Metadata struct {
 	Remote      Remote
 	Branch      Branch
 	Commit      Commit
+	BaseCommit  Commit
 	PullRequest *PullRequest
 	Pipeline    *Pipeline
 }
