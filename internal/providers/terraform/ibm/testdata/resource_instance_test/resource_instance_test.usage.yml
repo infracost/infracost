@@ -24,20 +24,20 @@ resource_usage:
   ibm_resource_instance.resource_instance_activity_tracker_lite:
     activitytracker_gigabyte_months: 10
   ibm_resource_instance.resource_instance_monitoring_lite:
-    monitoring_node_hour: 730
-    monitoring_container_hour: 10
-    monitoring_api_call: 100000
-    monitoring_timeseries_hour: 100
+    sysdig-monitor_NODE_HOURS: 730
+    sysdig-monitor_CONTAINER_HOURS: 10
+    sysdig-monitor_API_CALL_HOURS: 100000
+    sysdig-monitor_TIME_SERIES_HOURS: 100
   ibm_resource_instance.resource_instance_monitoring_graduated:
-    monitoring_node_hour: 730
-    monitoring_container_hour: 1460
-    monitoring_api_call: 100000
-    monitoring_timeseries_hour: 100
+    sysdig-monitor_NODE_HOURS: 730
+    sysdig-monitor_CONTAINER_HOURS: 1460
+    sysdig-monitor_API_CALL_HOURS: 100000
+    sysdig-monitor_TIME_SERIES_HOURS: 100
   ibm_resource_instance.resource_instance_monitoring_graduated_secure:
-    monitoring_node_hour: 730
-    monitoring_container_hour: 1460
-    monitoring_api_call: 100000
-    monitoring_timeseries_hour: 100
+    sysdig-monitor_NODE_HOURS: 730
+    sysdig-monitor_CONTAINER_HOURS: 1460
+    sysdig-monitor_API_CALL_HOURS: 100000
+    sysdig-monitor_TIME_SERIES_HOURS: 100
   ibm_resource_instance.cd_instance_professional:
     continuousdelivery_authorized_users: 2
   ibm_resource_instance.wml_instance_lite:

@@ -49,10 +49,10 @@ type ResourceInstance struct {
 	// Monitoring (Sysdig)
 	// Catalog https://cloud.ibm.com/catalog/services/ibm-cloud-monitoring
 	// Pricing https://cloud.ibm.com/docs/monitoring?topic=monitoring-pricing_plans
-	Monitoring_NodeHour       *float64 `infracost_usage:"monitoring_node_hour"`
-	Monitoring_ContainerHour  *float64 `infracost_usage:"monitoring_container_hour"`
-	Monitoring_APICall        *float64 `infracost_usage:"monitoring_api_call"`
-	Monitoring_TimeSeriesHour *float64 `infracost_usage:"monitoring_timeseries_hour"`
+	Monitoring_NodeHour       *float64 `infracost_usage:"sysdig-monitor_NODE_HOURS"`
+	Monitoring_ContainerHour  *float64 `infracost_usage:"sysdig-monitor_CONTAINER_HOURS"`
+	Monitoring_APICall        *float64 `infracost_usage:"sysdig-monitor_API_CALL_HOURS"`
+	Monitoring_TimeSeriesHour *float64 `infracost_usage:"sysdig-monitor_TIME_SERIES_HOURS"`
 	// Continuous Delivery
 	// Catalog https://cloud.ibm.com/catalog/services/continuous-delivery
 	// Pricing https://cloud.ibm.com/docs/ContinuousDelivery?topic=ContinuousDelivery-limitations_usage&interface=ui
@@ -108,11 +108,10 @@ var ResourceInstanceUsageSchema = []*schema.UsageItem{
 	{Key: "appconnect_vcpu_hours", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "logdna_gigabyte_months", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "activitytracker_gigabyte_months", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "monitoring_node_hour", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "monitoring_node_hour_lite", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "monitoring_container_hour", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "monitoring_api_call", DefaultValue: 0, ValueType: schema.Float64},
-	{Key: "monitoring_timeseries_hour", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "sysdig-monitor_NODE_HOURS", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "sysdig-monitor_CONTAINER_HOURS", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "sysdig-monitor_API_CALL_HOURS", DefaultValue: 0, ValueType: schema.Float64},
+	{Key: "sysdig-monitor_TIME_SERIES_HOURS", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "continuousdelivery_authorized_users", DefaultValue: 0, ValueType: schema.Int64},
 	{Key: "wml_capacity_unit_hour", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "wml_instance", DefaultValue: 0, ValueType: schema.Float64},
