@@ -156,6 +156,7 @@ var FreeResources = []string{
 	"ibm_scc_template",
 	"ibm_scc_template_attachment",
 	"ibm_sm_arbitrary_secret",
+	"ibm_sm_en_registration",
 	"ibm_sm_iam_credentials_configuration",
 	"ibm_sm_imported_certificate",
 	"ibm_sm_private_certificate",
