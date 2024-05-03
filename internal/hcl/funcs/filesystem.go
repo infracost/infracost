@@ -11,6 +11,7 @@ import (
 	"unicode/utf8"
 
 	"github.com/bmatcuk/doublestar"
+	"github.com/hashicorp/go-cty-funcs/filesystem"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
 	homedir "github.com/mitchellh/go-homedir"
@@ -20,9 +21,6 @@ import (
 	"github.com/infracost/infracost/internal/logging"
 )
 
-// MakeFileFunc constructs a function that takes a file path and returns the
-// contents of that file, either directly as a string (where valid UTF-8 is
-// required) or as a string containing base64 bytes.
 func MakeFileFunc(baseDir string, encBase64 bool) function.Function {
 	return function.New(&function.Spec{
 		Params: []function.Parameter{
@@ -305,67 +303,6 @@ func MakeFileSetFunc(baseDir string) function.Function {
 	})
 }
 
-// BasenameFunc constructs a function that takes a string containing a filesystem path
-// and removes all except the last portion from it.
-var BasenameFunc = function.New(&function.Spec{
-	Params: []function.Parameter{
-		{
-			Name: "path",
-			Type: cty.String,
-		},
-	},
-	Type: function.StaticReturnType(cty.String),
-	Impl: func(args []cty.Value, retType cty.Type) (cty.Value, error) {
-		return cty.StringVal(filepath.Base(args[0].AsString())), nil
-	},
-})
-
-// DirnameFunc constructs a function that takes a string containing a filesystem path
-// and removes the last portion from it.
-var DirnameFunc = function.New(&function.Spec{
-	Params: []function.Parameter{
-		{
-			Name: "path",
-			Type: cty.String,
-		},
-	},
-	Type: function.StaticReturnType(cty.String),
-	Impl: func(args []cty.Value, retType cty.Type) (cty.Value, error) {
-		return cty.StringVal(filepath.Dir(args[0].AsString())), nil
-	},
-})
-
-// AbsPathFunc constructs a function that converts a filesystem path to an absolute path
-var AbsPathFunc = function.New(&function.Spec{
-	Params: []function.Parameter{
-		{
-			Name: "path",
-			Type: cty.String,
-		},
-	},
-	Type: function.StaticReturnType(cty.String),
-	Impl: func(args []cty.Value, retType cty.Type) (cty.Value, error) {
-		absPath, err := filepath.Abs(args[0].AsString())
-		return cty.StringVal(filepath.ToSlash(absPath)), err
-	},
-})
-
-// PathExpandFunc constructs a function that expands a leading ~ character to the current user's home directory.
-var PathExpandFunc = function.New(&function.Spec{
-	Params: []function.Parameter{
-		{
-			Name: "path",
-			Type: cty.String,
-		},
-	},
-	Type: function.StaticReturnType(cty.String),
-	Impl: func(args []cty.Value, retType cty.Type) (cty.Value, error) {
-
-		homePath, err := homedir.Expand(args[0].AsString())
-		return cty.StringVal(homePath), err
-	},
-})
-
 func openFile(baseDir, path string) (io.Reader, error) {
 	path, err := homedir.Expand(path)
 	if err != nil {
@@ -457,7 +394,7 @@ func FileBase64(baseDir string, path cty.Value) (cty.Value, error) {
 //
 // If the path is empty then the result is ".", representing the current working directory.
 func Basename(path cty.Value) (cty.Value, error) {
-	return BasenameFunc.Call([]cty.Value{path})
+	return filesystem.BasenameFunc.Call([]cty.Value{path})
 }
 
 // Dirname takes a string containing a filesystem path and removes the last portion from it.
@@ -467,7 +404,7 @@ func Basename(path cty.Value) (cty.Value, error) {
 //
 // If the path is empty then the result is ".", representing the current working directory.
 func Dirname(path cty.Value) (cty.Value, error) {
-	return DirnameFunc.Call([]cty.Value{path})
+	return filesystem.DirnameFunc.Call([]cty.Value{path})
 }
 
 // Pathexpand takes a string that might begin with a `~` segment, and if so it replaces that segment with
@@ -478,7 +415,7 @@ func Dirname(path cty.Value) (cty.Value, error) {
 //
 // If the leading segment in the path is not `~` then the given path is returned unmodified.
 func Pathexpand(path cty.Value) (cty.Value, error) {
-	return PathExpandFunc.Call([]cty.Value{path})
+	return filesystem.PathExpandFunc.Call([]cty.Value{path})
 }
 
 func isPathInRepo(path string) error {
