@@ -79,6 +79,13 @@ var globalCatalogServiceId = map[string]catalogMetadata{
 	"sysdig-secure":                 {"e831e900-82d6-11ec-95c5-c12c5a5d9687", []string{}, nil, "https://cloud.ibm.com/workload-protection/catalog/security-and-compliance-center-workload-protection"},
 	"logdna":                        {"e13e1860-959c-11e8-871e-ad157af61ad7", []string{}, nil, "https://cloud.ibm.com/catalog/services/logdna"},
 	"databases-for-postgresql":      {"databases-for-postgresql", []string{}, nil, "https://cloud.ibm.com/databases/databases-for-postgresql/create"},
+	"secrets-manager":               {"ebc0cdb0-af2a-11ea-98c7-29e5db822649", []string{}, nil, "https://cloud.ibm.com/catalog/services/secrets-manager"},
+	"appid":                         {"AdvancedMobileAccess-d6aece47-d840-45b0-8ab9-ad15354deeea", []string{}, nil, "https://cloud.ibm.com/catalog/services/appid"},
+	"appconnect":                    {"96a0ebf2-2a02-4e32-815f-7c09a1268c78", []string{}, nil, "https://www.ibm.com/products/app-connect/pricing"},
+	"power-iaas":                    {"abd259f0-9990-11e8-acc8-b9f54a8f1661", []string{}, nil, "https://cloud.ibm.com/docs/power-iaas?topic=power-iaas-pricing-virtual-server"},
+	"logdnaat":                      {"dcc46a60-e13b-11e8-a015-757410dab16b", []string{}, nil, "https://cloud.ibm.com/catalog/services/logdnaat"},
+	"continuous-delivery":           {"59b735ee-5938-4ebd-a6b2-541aef2d1f68", []string{}, nil, "https://cloud.ibm.com/catalog/services/continuous-delivery"},
+	"compliance":                    {"compliance", []string{}, nil, "https://cloud.ibm.com/catalog/services/security-and-compliance-center"},
 }
 
 func SetCatalogMetadata(d *schema.ResourceData, resourceType string, config map[string]any) {
