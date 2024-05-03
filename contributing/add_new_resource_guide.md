@@ -1098,7 +1098,7 @@ The following edge cases can be handled in the resource files:
 
   ```go
 	if d.Get("placement_tenancy").String() == "host" {
-		logging.Logger.Warn().Msgf("Skipping resource %s. Infracost currently does not support host tenancy for AWS Launch Configurations", d.Address)
+		log.Warn().Msgf("Skipping resource %s. Infracost currently does not support host tenancy for AWS Launch Configurations", d.Address)
 		return nil
 	}
   ```

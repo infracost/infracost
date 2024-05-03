@@ -128,5 +128,35 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃ $30,593       ┃ $992        ┃ $31,585    ┃
+┃ TestMSSQLDatabase                                  ┃ $30,593       ┃ $992        ┃ $31,585    ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
+Logs:
+
+WRN 'Multiple products found' are safe to ignore for 'Compute (provisioned, BC_Gen5_8)' due to limitations in the Azure API.
+WRN 'Multiple products found' are safe to ignore for 'Compute (provisioned, BC_M_8)' due to limitations in the Azure API.
+WRN 'Multiple products found' are safe to ignore for 'Compute (provisioned, GP_Gen5_4)' due to limitations in the Azure API.
+WRN 'Multiple products found' are safe to ignore for 'Compute (provisioned, GP_Gen5_4)' due to limitations in the Azure API.
+WRN 'Multiple products found' are safe to ignore for 'Compute (provisioned, GP_Gen5_4)' due to limitations in the Azure API.
+WRN 'Multiple products found' are safe to ignore for 'Compute (provisioned, GP_Gen5_4)' due to limitations in the Azure API.
+WRN 'Multiple products found' are safe to ignore for 'Compute (provisioned, GP_Gen5_4)' due to limitations in the Azure API.
+WRN 'Multiple products found' are safe to ignore for 'Compute (provisioned, GP_Gen5_4)' due to limitations in the Azure API.
+WRN 'Multiple products found' are safe to ignore for 'Compute (provisioned, GP_Gen5_4)' due to limitations in the Azure API.
+WRN 'Multiple products found' are safe to ignore for 'Compute (provisioned, HS_Gen5_2)' due to limitations in the Azure API.
+WRN 'Multiple products found' are safe to ignore for 'Compute (provisioned, HS_Gen5_2)' due to limitations in the Azure API.
+WRN 'Multiple products found' are safe to ignore for 'Compute (serverless, GP_S_Gen5_2)' due to limitations in the Azure API.
+WRN 'Multiple products found' are safe to ignore for 'Compute (serverless, GP_S_Gen5_4)' due to limitations in the Azure API.
+WRN 'Multiple products found' are safe to ignore for 'Compute (serverless, GP_S_Gen5_4)' due to limitations in the Azure API.
+WRN Multiple products with prices found for azurerm_mssql_database.backup_default Compute (provisioned, GP_Gen5_4), using the first product
+WRN Multiple products with prices found for azurerm_mssql_database.backup_geo Compute (provisioned, GP_Gen5_4), using the first product
+WRN Multiple products with prices found for azurerm_mssql_database.backup_local Compute (provisioned, GP_Gen5_4), using the first product
+WRN Multiple products with prices found for azurerm_mssql_database.backup_zone Compute (provisioned, GP_Gen5_4), using the first product
+WRN Multiple products with prices found for azurerm_mssql_database.blank_sku Compute (serverless, GP_S_Gen5_2), using the first product
+WRN Multiple products with prices found for azurerm_mssql_database.business_critical_gen Compute (provisioned, BC_Gen5_8), using the first product
+WRN Multiple products with prices found for azurerm_mssql_database.business_critical_m Compute (provisioned, BC_M_8), using the first product
+WRN Multiple products with prices found for azurerm_mssql_database.general_purpose_gen Compute (provisioned, GP_Gen5_4), using the first product
+WRN Multiple products with prices found for azurerm_mssql_database.general_purpose_gen_without_license Compute (provisioned, GP_Gen5_4), using the first product
+WRN Multiple products with prices found for azurerm_mssql_database.general_purpose_gen_zone Compute (provisioned, GP_Gen5_4), using the first product
+WRN Multiple products with prices found for azurerm_mssql_database.general_purpose_gen_zone Zone redundancy (provisioned, GP_Gen5_4), using the first product
+WRN Multiple products with prices found for azurerm_mssql_database.serverless Compute (serverless, GP_S_Gen5_4), using the first product
+WRN Multiple products with prices found for azurerm_mssql_database.serverless_zone Compute (serverless, GP_S_Gen5_4), using the first product
+WRN Multiple products with prices found for azurerm_mssql_database.serverless_zone Zone redundancy (serverless, GP_S_Gen5_4), using the first product

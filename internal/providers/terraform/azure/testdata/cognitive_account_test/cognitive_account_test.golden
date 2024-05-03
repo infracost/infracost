@@ -295,15 +295,15 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃ $314,897      ┃ $0.00       ┃ $314,897   ┃
+┃ TestCognitiveAccount                               ┃ $314,897      ┃ $0.00       ┃ $314,897   ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 Logs:
 
-WARN Invalid commitment tier 1000000 for azurerm_cognitive_account.textanalytics_with_commitment["small"]
-WARN Invalid commitment tier 200 for azurerm_cognitive_account.luis_with_commitment["invalid"]
-WARN Invalid commitment tier 200 for azurerm_cognitive_account.textanalytics_with_commitment["invalid"]
-WARN Invalid commitment tier 200 for azurerm_cognitive_account.textanalytics_with_commitment["invalid"]
-WARN Invalid commitment tier 200 for azurerm_cognitive_account.textanalytics_with_commitment["invalid"]
-WARN Invalid commitment tier 200 for azurerm_cognitive_account.textanalytics_with_commitment["invalid"]
-WARN Invalid commitment tier amount 100 for azurerm_cognitive_account.speech_with_commitment["invalid"]
-WARN Skipping resource azurerm_cognitive_account.unsupported. Kind "Academic" is not supported
+WRN Invalid commitment tier 1000000 for azurerm_cognitive_account.textanalytics_with_commitment["small"]
+WRN Invalid commitment tier 200 for azurerm_cognitive_account.luis_with_commitment["invalid"]
+WRN Invalid commitment tier 200 for azurerm_cognitive_account.textanalytics_with_commitment["invalid"]
+WRN Invalid commitment tier 200 for azurerm_cognitive_account.textanalytics_with_commitment["invalid"]
+WRN Invalid commitment tier 200 for azurerm_cognitive_account.textanalytics_with_commitment["invalid"]
+WRN Invalid commitment tier 200 for azurerm_cognitive_account.textanalytics_with_commitment["invalid"]
+WRN Invalid commitment tier amount 100 for azurerm_cognitive_account.speech_with_commitment["invalid"]
+WRN Skipping resource azurerm_cognitive_account.unsupported. Kind "Academic" is not supported

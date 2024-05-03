@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
+
+	"github.com/rs/zerolog/log"
 
 	"github.com/shopspring/decimal"
 )
@@ -57,7 +58,7 @@ func (r *LightsailInstance) BuildResource() *schema.Resource {
 
 	specs, ok := bundlePrefixMappings[bundlePrefix]
 	if !ok {
-		logging.Logger.Warn().Msgf("Skipping resource %s. Unrecognized bundle_id %s", r.Address, r.BundleID)
+		log.Warn().Msgf("Skipping resource %s. Unrecognized bundle_id %s", r.Address, r.BundleID)
 		return nil
 	}
 

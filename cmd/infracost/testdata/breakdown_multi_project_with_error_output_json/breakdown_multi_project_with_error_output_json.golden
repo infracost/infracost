@@ -14,7 +14,6 @@
   "projects": [
     {
       "name": "infracost/infracost/cmd/infracost/testdata/breakdown_multi_project_with_error_output_json/dev",
-      "displayName": "dev",
       "metadata": {
         "path": "testdata/breakdown_multi_project_with_error_output_json/dev",
         "type": "terraform_dir",
@@ -59,8 +58,7 @@
                 "monthlyQuantity": "730",
                 "price": "0.384",
                 "hourlyCost": "0.384",
-                "monthlyCost": "280.32",
-                "priceNotFound": false
+                "monthlyCost": "280.32"
               }
             ],
             "subresources": [
@@ -77,8 +75,7 @@
                     "monthlyQuantity": "50",
                     "price": "0.1",
                     "hourlyCost": "0.00684931506849315",
-                    "monthlyCost": "5",
-                    "priceNotFound": false
+                    "monthlyCost": "5"
                   }
                 ]
               },
@@ -95,8 +92,7 @@
                     "monthlyQuantity": "1000",
                     "price": "0.125",
                     "hourlyCost": "0.1712328767123287625",
-                    "monthlyCost": "125",
-                    "priceNotFound": false
+                    "monthlyCost": "125"
                   },
                   {
                     "name": "Provisioned IOPS",
@@ -105,8 +101,7 @@
                     "monthlyQuantity": "800",
                     "price": "0.065",
                     "hourlyCost": "0.0712328767123287665",
-                    "monthlyCost": "52",
-                    "priceNotFound": false
+                    "monthlyCost": "52"
                   }
                 ]
               }
@@ -147,8 +142,7 @@
                 "monthlyQuantity": "730",
                 "price": "0.384",
                 "hourlyCost": "0.384",
-                "monthlyCost": "280.32",
-                "priceNotFound": false
+                "monthlyCost": "280.32"
               }
             ],
             "subresources": [
@@ -165,8 +159,7 @@
                     "monthlyQuantity": "50",
                     "price": "0.1",
                     "hourlyCost": "0.00684931506849315",
-                    "monthlyCost": "5",
-                    "priceNotFound": false
+                    "monthlyCost": "5"
                   }
                 ]
               },
@@ -183,8 +176,7 @@
                     "monthlyQuantity": "1000",
                     "price": "0.125",
                     "hourlyCost": "0.1712328767123287625",
-                    "monthlyCost": "125",
-                    "priceNotFound": false
+                    "monthlyCost": "125"
                   },
                   {
                     "name": "Provisioned IOPS",
@@ -193,8 +185,7 @@
                     "monthlyQuantity": "800",
                     "price": "0.065",
                     "hourlyCost": "0.0712328767123287665",
-                    "monthlyCost": "52",
-                    "priceNotFound": false
+                    "monthlyCost": "52"
                   }
                 ]
               }
@@ -223,7 +214,6 @@
     },
     {
       "name": "infracost/infracost/cmd/infracost/testdata/breakdown_multi_project_with_error_output_json/prod",
-      "displayName": "prod",
       "metadata": {
         "path": "testdata/breakdown_multi_project_with_error_output_json/prod",
         "type": "terraform_dir",
@@ -268,8 +258,7 @@
                 "monthlyQuantity": "730",
                 "price": "1.536",
                 "hourlyCost": "1.536",
-                "monthlyCost": "1121.28",
-                "priceNotFound": false
+                "monthlyCost": "1121.28"
               }
             ],
             "subresources": [
@@ -286,8 +275,7 @@
                     "monthlyQuantity": "50",
                     "price": "0.1",
                     "hourlyCost": "0.00684931506849315",
-                    "monthlyCost": "5",
-                    "priceNotFound": false
+                    "monthlyCost": "5"
                   }
                 ]
               },
@@ -304,8 +292,7 @@
                     "monthlyQuantity": "1000",
                     "price": "0.125",
                     "hourlyCost": "0.1712328767123287625",
-                    "monthlyCost": "125",
-                    "priceNotFound": false
+                    "monthlyCost": "125"
                   },
                   {
                     "name": "Provisioned IOPS",
@@ -314,8 +301,7 @@
                     "monthlyQuantity": "800",
                     "price": "0.065",
                     "hourlyCost": "0.0712328767123287665",
-                    "monthlyCost": "52",
-                    "priceNotFound": false
+                    "monthlyCost": "52"
                   }
                 ]
               }
@@ -356,8 +342,7 @@
                 "monthlyQuantity": "730",
                 "price": "1.536",
                 "hourlyCost": "1.536",
-                "monthlyCost": "1121.28",
-                "priceNotFound": false
+                "monthlyCost": "1121.28"
               }
             ],
             "subresources": [
@@ -374,8 +359,7 @@
                     "monthlyQuantity": "50",
                     "price": "0.1",
                     "hourlyCost": "0.00684931506849315",
-                    "monthlyCost": "5",
-                    "priceNotFound": false
+                    "monthlyCost": "5"
                   }
                 ]
               },
@@ -392,8 +376,7 @@
                     "monthlyQuantity": "1000",
                     "price": "0.125",
                     "hourlyCost": "0.1712328767123287625",
-                    "monthlyCost": "125",
-                    "priceNotFound": false
+                    "monthlyCost": "125"
                   },
                   {
                     "name": "Provisioned IOPS",
@@ -402,8 +385,7 @@
                     "monthlyQuantity": "800",
                     "price": "0.065",
                     "hourlyCost": "0.0712328767123287665",
-                    "monthlyCost": "52",
-                    "priceNotFound": false
+                    "monthlyCost": "52"
                   }
                 ]
               }

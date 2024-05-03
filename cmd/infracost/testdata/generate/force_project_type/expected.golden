@@ -12,5 +12,4 @@ projects:
       - prod.tfvars
     skip_autodetect: true
   - path: nondup
-    name: nondup
 

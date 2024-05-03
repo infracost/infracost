@@ -1,5 +1,5 @@
 Project: default_usage
-Module path: testdata/breakdown_config_file_with_usage_file/flag_usage
+Module path: flag_usage
 
  Name                             Monthly Qty  Unit         Monthly Cost    
                                                                             
@@ -11,7 +11,7 @@ Module path: testdata/breakdown_config_file_with_usage_file/flag_usage
 
 ──────────────────────────────────
 Project: config_usage
-Module path: testdata/breakdown_config_file_with_usage_file/config_usage
+Module path: config_usage
 
  Name                             Monthly Qty  Unit         Monthly Cost    
                                                                             

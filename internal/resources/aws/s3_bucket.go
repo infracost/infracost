@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
 
-	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/usage"
@@ -160,7 +160,7 @@ func (a *S3Bucket) BuildResource() *schema.Resource {
 			if err != nil {
 				msg = fmt.Sprintf("%s: %s", msg, err)
 			}
-			logging.Logger.Debug().Msgf(msg)
+			log.Debug().Msgf(msg)
 		} else {
 			standardStorageClassUsage := u["standard"].(map[string]interface{})
 

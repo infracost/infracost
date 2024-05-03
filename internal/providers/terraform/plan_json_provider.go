@@ -10,6 +10,7 @@ import (
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
+	"github.com/infracost/infracost/internal/ui"
 )
 
 type PlanJSONProvider struct {
@@ -39,18 +40,6 @@ func NewPlanJSONProvider(ctx *config.ProjectContext, includePastResources bool) 
 	}
 }
 
-func (p *PlanJSONProvider) ProjectName() string {
-	return config.CleanProjectName(p.ctx.ProjectConfig.Path)
-}
-
-func (p *PlanJSONProvider) VarFiles() []string {
-	return nil
-}
-
-func (p *PlanJSONProvider) RelativePath() string {
-	return p.ctx.ProjectConfig.Path
-}
-
 func (p *PlanJSONProvider) Context() *config.ProjectContext {
 	return p.ctx
 }
@@ -72,12 +61,19 @@ func (p *PlanJSONProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 }
 
 func (p *PlanJSONProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, error) {
+	spinner := ui.NewSpinner("Extracting only cost-related params from terraform", ui.SpinnerOptions{
+		EnableLogging: p.ctx.RunContext.Config.IsLogging(),
+		NoColor:       p.ctx.RunContext.Config.NoColor,
+		Indent:        "  ",
+	})
+	defer spinner.Fail()
+
 	j, err := os.ReadFile(p.Path)
 	if err != nil {
 		return []*schema.Project{}, fmt.Errorf("Error reading Terraform plan JSON file %w", err)
 	}
 
-	project, err := p.LoadResourcesFromSrc(usage, j)
+	project, err := p.LoadResourcesFromSrc(usage, j, spinner)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +81,7 @@ func (p *PlanJSONProvider) LoadResources(usage schema.UsageMap) ([]*schema.Proje
 	return []*schema.Project{project}, nil
 }
 
-func (p *PlanJSONProvider) LoadResourcesFromSrc(usage schema.UsageMap, j []byte) (*schema.Project, error) {
+func (p *PlanJSONProvider) LoadResourcesFromSrc(usage schema.UsageMap, j []byte, spinner *ui.Spinner) (*schema.Project, error) {
 	metadata := schema.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
 	metadata.Type = p.Type()
 	p.AddMetadata(metadata)
@@ -114,6 +110,10 @@ func (p *PlanJSONProvider) LoadResourcesFromSrc(usage schema.UsageMap, j []byte)
 		if err != nil {
 			p.logger.Err(err).Msgf("Terraform project %s failed to upload policy data", project.Name)
 		}
+	}
+
+	if spinner != nil {
+		spinner.Success()
 	}
 
 	return project, nil

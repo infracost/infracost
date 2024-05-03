@@ -14,7 +14,6 @@
   "projects": [
     {
       "name": "infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_tags_google",
-      "displayName": "main",
       "metadata": {
         "path": "testdata/breakdown_format_json_with_tags_google",
         "type": "terraform_dir",
@@ -60,8 +59,7 @@
                 "monthlyQuantity": "500",
                 "price": "0.04",
                 "hourlyCost": "0.027397260273972604",
-                "monthlyCost": "20",
-                "priceNotFound": false
+                "monthlyCost": "20"
               }
             ]
           },
@@ -93,8 +91,7 @@
                 "monthlyQuantity": "100",
                 "price": "0.17",
                 "hourlyCost": "0.02328767123287671",
-                "monthlyCost": "17",
-                "priceNotFound": false
+                "monthlyCost": "17"
               }
             ]
           },
@@ -128,8 +125,7 @@
                 "monthlyQuantity": "730",
                 "price": "0.0105",
                 "hourlyCost": "0.0105",
-                "monthlyCost": "7.665",
-                "priceNotFound": false
+                "monthlyCost": "7.665"
               },
               {
                 "name": "Storage (SSD, zonal)",
@@ -138,8 +134,7 @@
                 "monthlyQuantity": "10",
                 "price": "0.17",
                 "hourlyCost": "0.002328767123287671",
-                "monthlyCost": "1.7",
-                "priceNotFound": false
+                "monthlyCost": "1.7"
               },
               {
                 "name": "Backups",
@@ -149,8 +144,7 @@
                 "price": "0.08",
                 "hourlyCost": null,
                 "monthlyCost": null,
-                "usageBased": true,
-                "priceNotFound": false
+                "usageBased": true
               },
               {
                 "name": "IP address (if unused)",
@@ -159,8 +153,7 @@
                 "monthlyQuantity": "730",
                 "price": "0.01",
                 "hourlyCost": "0.01",
-                "monthlyCost": "7.3",
-                "priceNotFound": false
+                "monthlyCost": "7.3"
               }
             ]
           }
@@ -224,8 +217,7 @@
                 "monthlyQuantity": "500",
                 "price": "0.04",
                 "hourlyCost": "0.027397260273972604",
-                "monthlyCost": "20",
-                "priceNotFound": false
+                "monthlyCost": "20"
               }
             ]
           },
@@ -257,8 +249,7 @@
                 "monthlyQuantity": "100",
                 "price": "0.17",
                 "hourlyCost": "0.02328767123287671",
-                "monthlyCost": "17",
-                "priceNotFound": false
+                "monthlyCost": "17"
               }
             ]
           },
@@ -292,8 +283,7 @@
                 "monthlyQuantity": "730",
                 "price": "0.0105",
                 "hourlyCost": "0.0105",
-                "monthlyCost": "7.665",
-                "priceNotFound": false
+                "monthlyCost": "7.665"
               },
               {
                 "name": "Storage (SSD, zonal)",
@@ -302,8 +292,7 @@
                 "monthlyQuantity": "10",
                 "price": "0.17",
                 "hourlyCost": "0.002328767123287671",
-                "monthlyCost": "1.7",
-                "priceNotFound": false
+                "monthlyCost": "1.7"
               },
               {
                 "name": "Backups",
@@ -313,8 +302,7 @@
                 "price": "0.08",
                 "hourlyCost": null,
                 "monthlyCost": null,
-                "usageBased": true,
-                "priceNotFound": false
+                "usageBased": true
               },
               {
                 "name": "IP address (if unused)",
@@ -323,8 +311,7 @@
                 "monthlyQuantity": "730",
                 "price": "0.01",
                 "hourlyCost": "0.01",
-                "monthlyCost": "7.3",
-                "priceNotFound": false
+                "monthlyCost": "7.3"
               }
             ]
           }

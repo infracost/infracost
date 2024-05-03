@@ -20,6 +20,7 @@ import (
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
 
+	"github.com/rs/zerolog/log"
 	"github.com/tidwall/gjson"
 )
 
@@ -54,7 +55,6 @@ type PriceQueryKey struct {
 type PriceQueryResult struct {
 	PriceQueryKey
 	Result gjson.Result
-	Query  GraphQLQuery
 
 	filled bool
 }
@@ -111,14 +111,14 @@ func NewPricingAPIClient(ctx *config.RunContext) *PricingAPIClient {
 
 		caCerts, err := os.ReadFile(ctx.Config.TLSCACertFile)
 		if err != nil {
-			logging.Logger.Error().Msgf("Error reading CA cert file %s: %v", ctx.Config.TLSCACertFile, err)
+			log.Error().Msgf("Error reading CA cert file %s: %v", ctx.Config.TLSCACertFile, err)
 		} else {
 			ok := rootCAs.AppendCertsFromPEM(caCerts)
 
 			if !ok {
-				logging.Logger.Warn().Msgf("No CA certs appended, only using system certs")
+				log.Warn().Msgf("No CA certs appended, only using system certs")
 			} else {
-				logging.Logger.Debug().Msgf("Loaded CA certs from %s", ctx.Config.TLSCACertFile)
+				log.Debug().Msgf("Loaded CA certs from %s", ctx.Config.TLSCACertFile)
 			}
 		}
 
@@ -317,7 +317,7 @@ type pricingQuery struct {
 // checking a local cache for previous results. If the results of a given query
 // are cached, they are used directly; otherwise, a request to the API is made.
 func (c *PricingAPIClient) PerformRequest(req BatchRequest) ([]PriceQueryResult, error) {
-	logging.Logger.Debug().Msgf("Getting pricing details for %d cost components from %s", len(req.queries), c.endpoint)
+	log.Debug().Msgf("Getting pricing details for %d cost components from %s", len(req.queries), c.endpoint)
 	res := make([]PriceQueryResult, len(req.keys))
 	for i, key := range req.keys {
 		res[i].PriceQueryKey = key
@@ -352,7 +352,6 @@ func (c *PricingAPIClient) PerformRequest(req BatchRequest) ([]PriceQueryResult,
 					PriceQueryKey: req.keys[i],
 					Result:        v.Result,
 					filled:        true,
-					Query:         query.query,
 				}
 			} else {
 				serverQueries = append(serverQueries, query)

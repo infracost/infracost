@@ -207,9 +207,18 @@ func (e ErrorOnAnyWriter) Write(data []byte) (n int, err error) {
 	return io.Discard.Write(data)
 }
 
-func ConfigureTestToCaptureLogs(t *testing.T, runCtx *config.RunContext, level string) *bytes.Buffer {
+func ConfigureTestToFailOnLogs(t *testing.T, runCtx *config.RunContext) {
+	runCtx.Config.LogLevel = "warn"
+	runCtx.Config.SetLogDisableTimestamps(true)
+	runCtx.Config.SetLogWriter(io.MultiWriter(os.Stderr, ErrorOnAnyWriter{t}))
+
+	err := logging.ConfigureBaseLogger(runCtx.Config)
+	require.Nil(t, err)
+}
+
+func ConfigureTestToCaptureLogs(t *testing.T, runCtx *config.RunContext) *bytes.Buffer {
 	logBuf := bytes.NewBuffer([]byte{})
-	runCtx.Config.LogLevel = level
+	runCtx.Config.LogLevel = "warn"
 	runCtx.Config.SetLogDisableTimestamps(true)
 	runCtx.Config.SetLogWriter(zerolog.SyncWriter(io.MultiWriter(os.Stderr, logBuf)))
 

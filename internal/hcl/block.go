@@ -5,7 +5,6 @@ import (
 	"encoding/hex"
 	"fmt"
 	"os"
-	"path/filepath"
 	"regexp"
 	"sort"
 	"strconv"
@@ -309,16 +308,6 @@ type BlockBuilder struct {
 func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.Block, ctx *Context, parent *Block, moduleBlock *Block) *Block {
 	if ctx == nil {
 		ctx = NewContext(&hcl.EvalContext{}, nil, b.Logger)
-	}
-
-	// if the filepath is absolute let's make it relative to the working directory so
-	// we trip any user/machine defined paths.
-	if filepath.IsAbs(filename) {
-		wd, _ := os.Getwd()
-		rel, err := filepath.Rel(wd, filename)
-		if err == nil {
-			filename = rel
-		}
 	}
 
 	isLoggingVerbose := strings.TrimSpace(os.Getenv("INFRACOST_HCL_DEBUG_VERBOSE")) == "true"

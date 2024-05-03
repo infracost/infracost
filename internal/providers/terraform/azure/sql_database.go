@@ -1,7 +1,8 @@
 package azure
 
 import (
-	"github.com/infracost/infracost/internal/logging"
+	"github.com/rs/zerolog/log"
+
 	"github.com/infracost/infracost/internal/resources/azure"
 	"github.com/infracost/infracost/internal/schema"
 )
@@ -78,7 +79,7 @@ func newSQLDatabase(d *schema.ResourceData) schema.CoreResource {
 		var err error
 		config, err = parseSKU(d.Address, sku)
 		if err != nil {
-			logging.Logger.Warn().Msgf(err.Error())
+			log.Warn().Msgf(err.Error())
 			return nil
 		}
 	}

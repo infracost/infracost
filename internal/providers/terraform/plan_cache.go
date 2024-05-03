@@ -12,7 +12,8 @@ import (
 	"github.com/hashicorp/terraform-config-inspect/tfconfig"
 
 	"github.com/infracost/infracost/internal/config"
-	"github.com/infracost/infracost/internal/logging"
+
+	"github.com/rs/zerolog/log"
 )
 
 var cacheFileVersion = "0.1"
@@ -41,68 +42,68 @@ type configState struct {
 
 func (state *configState) equivalent(otherState *configState) (bool, error) {
 	if state.Version != otherState.Version {
-		logging.Logger.Debug().Msgf("Plan cache config state not equivalent: version changed")
+		log.Debug().Msgf("Plan cache config state not equivalent: version changed")
 		return false, fmt.Errorf("version changed")
 	}
 
 	if state.TerraformPlanFlags != otherState.TerraformPlanFlags {
-		logging.Logger.Debug().Msgf("Plan cache config state not equivalent: terraform_plan_flags changed")
+		log.Debug().Msgf("Plan cache config state not equivalent: terraform_plan_flags changed")
 		return false, fmt.Errorf("terraform_plan_flags changed")
 	}
 
 	if state.TerraformUseState != otherState.TerraformUseState {
-		logging.Logger.Debug().Msgf("Plan cache config state not equivalent: terraform_use_state changed")
+		log.Debug().Msgf("Plan cache config state not equivalent: terraform_use_state changed")
 		return false, fmt.Errorf("terraform_use_state changed")
 	}
 
 	if state.TerraformWorkspace != otherState.TerraformWorkspace {
-		logging.Logger.Debug().Msgf("Plan cache config state not equivalent: terraform_workspace changed")
+		log.Debug().Msgf("Plan cache config state not equivalent: terraform_workspace changed")
 		return false, fmt.Errorf("terraform_workspace changed")
 	}
 
 	if state.TerraformBinary != otherState.TerraformBinary {
-		logging.Logger.Debug().Msgf("Plan cache config state not equivalent: terraform_binary changed")
+		log.Debug().Msgf("Plan cache config state not equivalent: terraform_binary changed")
 		return false, fmt.Errorf("terraform_binary changed")
 	}
 
 	if state.TerraformCloudToken != otherState.TerraformCloudToken {
-		logging.Logger.Debug().Msgf("Plan cache config state not equivalent: terraform_cloud_token changed")
+		log.Debug().Msgf("Plan cache config state not equivalent: terraform_cloud_token changed")
 		return false, fmt.Errorf("terraform_cloud_token changed")
 	}
 
 	if state.TerraformCloudHost != otherState.TerraformCloudHost {
-		logging.Logger.Debug().Msgf("Plan cache config state not equivalent: terraform_cloud_host changed")
+		log.Debug().Msgf("Plan cache config state not equivalent: terraform_cloud_host changed")
 		return false, fmt.Errorf("terraform_cloud_host changed")
 	}
 
 	if state.ConfigEnv != otherState.ConfigEnv {
-		logging.Logger.Debug().Msgf("Plan cache config state not equivalent: config_env changed")
+		log.Debug().Msgf("Plan cache config state not equivalent: config_env changed")
 		return false, fmt.Errorf("config_env changed")
 	}
 
 	if state.TFEnv != otherState.TFEnv {
-		logging.Logger.Debug().Msgf("Plan cache config state not equivalent: tf_env changed")
+		log.Debug().Msgf("Plan cache config state not equivalent: tf_env changed")
 		return false, fmt.Errorf("tf_env changed")
 	}
 
 	if state.TFLockFileDate != otherState.TFLockFileDate {
-		logging.Logger.Debug().Msgf("Plan cache config state not equivalent: tf_lock_file_date changed")
+		log.Debug().Msgf("Plan cache config state not equivalent: tf_lock_file_date changed")
 		return false, fmt.Errorf("tf_lock_file_date changed")
 	}
 
 	if state.TFDataDate != otherState.TFDataDate {
-		logging.Logger.Debug().Msgf("Plan cache config state not equivalent: tf_data_date changed")
+		log.Debug().Msgf("Plan cache config state not equivalent: tf_data_date changed")
 		return false, fmt.Errorf("tf_data_date changed")
 	}
 
 	if len(state.TFConfigFileStates) != len(otherState.TFConfigFileStates) {
-		logging.Logger.Debug().Msgf("Plan cache config state not equivalent: TFConfigFileStates has changed size")
+		log.Debug().Msgf("Plan cache config state not equivalent: TFConfigFileStates has changed size")
 		return false, fmt.Errorf("tf_config_file_states changed size")
 	}
 
 	for i := range state.TFConfigFileStates {
 		if state.TFConfigFileStates[i] != otherState.TFConfigFileStates[i] {
-			logging.Logger.Debug().Msgf("Plan cache config state not equivalent: %v", state.TFConfigFileStates[i])
+			log.Debug().Msgf("Plan cache config state not equivalent: %v", state.TFConfigFileStates[i])
 			return false, fmt.Errorf("tf_config_file_states changed")
 		}
 	}
@@ -143,20 +144,20 @@ func ReadPlanCache(p *DirProvider) ([]byte, error) {
 
 	info, err := os.Stat(cache)
 	if err != nil {
-		logging.Logger.Debug().Msgf("Skipping plan cache: Cache file does not exist")
+		log.Debug().Msgf("Skipping plan cache: Cache file does not exist")
 		p.ctx.CacheErr = "not found"
 		return nil, fmt.Errorf("not found")
 	}
 
 	if time.Now().Unix()-info.ModTime().Unix() > cacheMaxAgeSecs {
-		logging.Logger.Debug().Msgf("Skipping plan cache: Cache file is too old")
+		log.Debug().Msgf("Skipping plan cache: Cache file is too old")
 		p.ctx.CacheErr = "expired"
 		return nil, fmt.Errorf("expired")
 	}
 
 	data, err := os.ReadFile(cache)
 	if err != nil {
-		logging.Logger.Debug().Msgf("Skipping plan cache: Error reading cache file: %v", err)
+		log.Debug().Msgf("Skipping plan cache: Error reading cache file: %v", err)
 		p.ctx.CacheErr = "unreadable"
 		return nil, fmt.Errorf("unreadable")
 	}
@@ -164,19 +165,19 @@ func ReadPlanCache(p *DirProvider) ([]byte, error) {
 	var cf cacheFile
 	err = json.Unmarshal(data, &cf)
 	if err != nil {
-		logging.Logger.Debug().Msgf("Skipping plan cache: Error unmarshalling cache file: %v", err)
+		log.Debug().Msgf("Skipping plan cache: Error unmarshalling cache file: %v", err)
 		p.ctx.CacheErr = "bad format"
 		return nil, fmt.Errorf("bad format")
 	}
 
 	state := calcConfigState(p)
 	if _, err := cf.ConfigState.equivalent(&state); err != nil {
-		logging.Logger.Debug().Msgf("Skipping plan cache: Config state has changed")
+		log.Debug().Msgf("Skipping plan cache: Config state has changed")
 		p.ctx.CacheErr = err.Error()
 		return nil, fmt.Errorf("change detected")
 	}
 
-	logging.Logger.Debug().Msgf("Read plan JSON from %v", cacheFileName)
+	log.Debug().Msgf("Read plan JSON from %v", cacheFileName)
 	p.ctx.UsingCache = true
 	return cf.Plan, nil
 }
@@ -184,7 +185,7 @@ func ReadPlanCache(p *DirProvider) ([]byte, error) {
 func WritePlanCache(p *DirProvider, planJSON []byte) {
 	cacheJSON, err := json.Marshal(cacheFile{ConfigState: calcConfigState(p), Plan: planJSON})
 	if err != nil {
-		logging.Logger.Debug().Msgf("Failed to marshal plan cache: %v", err)
+		log.Debug().Msgf("Failed to marshal plan cache: %v", err)
 		return
 	}
 
@@ -194,7 +195,7 @@ func WritePlanCache(p *DirProvider, planJSON []byte) {
 		if os.IsNotExist(err) {
 			err := os.MkdirAll(cacheDir, 0700)
 			if err != nil {
-				logging.Logger.Debug().Msgf("Couldn't create %v directory: %v", config.InfracostDir, err)
+				log.Debug().Msgf("Couldn't create %v directory: %v", config.InfracostDir, err)
 				return
 			}
 		}
@@ -202,10 +203,10 @@ func WritePlanCache(p *DirProvider, planJSON []byte) {
 
 	err = os.WriteFile(path.Join(cacheDir, cacheFileName), cacheJSON, 0600)
 	if err != nil {
-		logging.Logger.Debug().Msgf("Failed to write plan cache: %v", err)
+		log.Debug().Msgf("Failed to write plan cache: %v", err)
 		return
 	}
-	logging.Logger.Debug().Msgf("Wrote plan JSON to %v", cacheFileName)
+	log.Debug().Msgf("Wrote plan JSON to %v", cacheFileName)
 }
 
 func calcDataDir(p *DirProvider) string {

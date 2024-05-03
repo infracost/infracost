@@ -15,12 +15,11 @@
   "projects": [
     {
       "name": "infracost/infracost/cmd/infracost/testdata/breakdown_config_file/dev",
-      "displayName": "testdata-breakdown_config_file-dev",
       "metadata": {
-        "path": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_config_file/dev",
+        "path": "./testdata/breakdown_config_file/dev",
         "type": "terraform_dir",
         "configSha": "1234",
-        "terraformModulePath": "testdata/breakdown_config_file/dev",
+        "terraformModulePath": "dev",
         "vcsSubPath": "cmd/infracost/testdata/breakdown_config_file/dev",
         "providers": [
           {

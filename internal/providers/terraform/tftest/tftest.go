@@ -15,11 +15,11 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/infracost/infracost/internal/hcl"
-	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/usage"
 
 	"github.com/pkg/errors"
+	"github.com/rs/zerolog/log"
 	"github.com/stretchr/testify/assert"
 
 	"github.com/infracost/infracost/internal/config"
@@ -116,7 +116,7 @@ func installPlugins() error {
 
 	err := os.MkdirAll(initCache, os.ModePerm)
 	if err != nil {
-		logging.Logger.Error().Msgf("Error creating init cache directory: %s", err.Error())
+		log.Error().Msgf("Error creating init cache directory: %s", err.Error())
 	}
 
 	tfdir, err := writeToTmpDir(initCache, project)
@@ -126,7 +126,7 @@ func installPlugins() error {
 
 	err = os.MkdirAll(pluginCache, os.ModePerm)
 	if err != nil {
-		logging.Logger.Error().Msgf("Error creating plugin cache directory: %s", err.Error())
+		log.Error().Msgf("Error creating plugin cache directory: %s", err.Error())
 	} else {
 		os.Setenv("TF_PLUGIN_CACHE_DIR", pluginCache)
 	}
@@ -196,7 +196,6 @@ type GoldenFileOptions = struct {
 	Currency    string
 	CaptureLogs bool
 	IgnoreCLI   bool
-	LogLevel    *string
 }
 
 func DefaultGoldenFileOptions() *GoldenFileOptions {
@@ -245,12 +244,12 @@ func goldenFileResourceTestWithOpts(t *testing.T, pName string, testName string,
 		ctxOption(runCtx)
 	}
 
-	level := "warn"
-	if options.LogLevel != nil {
-		level = *options.LogLevel
+	var logBuf *bytes.Buffer
+	if options != nil && options.CaptureLogs {
+		logBuf = testutil.ConfigureTestToCaptureLogs(t, runCtx)
+	} else {
+		testutil.ConfigureTestToFailOnLogs(t, runCtx)
 	}
-
-	logBuf := testutil.ConfigureTestToCaptureLogs(t, runCtx, level)
 
 	if options != nil && options.Currency != "" {
 		runCtx.Config.Currency = options.Currency
@@ -349,9 +348,8 @@ func loadResources(t *testing.T, pName string, tfProject TerraformProject, runCt
 }
 
 func RunCostCalculations(runCtx *config.RunContext, projects []*schema.Project) ([]*schema.Project, error) {
-	pf := prices.NewPriceFetcher(runCtx)
 	for _, project := range projects {
-		err := pf.PopulatePrices(project)
+		err := prices.PopulatePrices(runCtx, project)
 		if err != nil {
 			return projects, err
 		}
@@ -439,7 +437,7 @@ func newHCLProvider(t *testing.T, runCtx *config.RunContext, tfdir string) *terr
 		Path: tfdir,
 	}, nil)
 
-	provider, err := terraform.NewHCLProvider(projectCtx, hcl.RootPath{StartingPath: tfdir, DetectedPath: tfdir}, &terraform.HCLProviderConfig{SuppressLogging: true})
+	provider, err := terraform.NewHCLProvider(projectCtx, hcl.RootPath{Path: tfdir}, &terraform.HCLProviderConfig{SuppressLogging: true})
 	require.NoError(t, err)
 
 	return provider

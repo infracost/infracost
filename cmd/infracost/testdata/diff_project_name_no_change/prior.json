@@ -17,7 +17,7 @@
       "metadata": {
         "path": "./testdata/diff_project_name_no_change/terraform",
         "type": "terraform_dir",
-        "terraformModulePath": "testdata/diff_project_name_no_change/terraform",
+        "terraformModulePath": "terraform",
         "vcsSubPath": "cmd/infracost/testdata/diff_project_name_no_change/terraform",
         "vcsCodeChanged": false,
         "providers": [
@@ -303,7 +303,7 @@
       "metadata": {
         "path": "./testdata/diff_project_name_no_change/terraform",
         "type": "terraform_dir",
-        "terraformModulePath": "testdata/diff_project_name_no_change/terraform",
+        "terraformModulePath": "terraform",
         "vcsSubPath": "cmd/infracost/testdata/diff_project_name_no_change/terraform",
         "vcsCodeChanged": false,
         "providers": [
@@ -589,7 +589,7 @@
       "metadata": {
         "path": "testdata/diff_project_name_no_change/terragrunt-multi/dev",
         "type": "terragrunt_dir",
-        "terraformModulePath": "testdata/diff_project_name_no_change/terragrunt-multi/dev",
+        "terraformModulePath": "terragrunt-multi/dev",
         "vcsSubPath": "cmd/infracost/testdata/diff_project_name_no_change/terragrunt-multi/dev"
       },
       "pastBreakdown": {
@@ -866,7 +866,7 @@
       "metadata": {
         "path": "testdata/diff_project_name_no_change/terragrunt-multi/prod",
         "type": "terragrunt_dir",
-        "terraformModulePath": "testdata/diff_project_name_no_change/terragrunt-multi/prod",
+        "terraformModulePath": "terragrunt-multi/prod",
         "vcsSubPath": "cmd/infracost/testdata/diff_project_name_no_change/terragrunt-multi/prod"
       },
       "pastBreakdown": {
@@ -1143,7 +1143,7 @@
       "metadata": {
         "path": "testdata/diff_project_name_no_change/terragrunt/prod",
         "type": "terragrunt_dir",
-        "terraformModulePath": "testdata/diff_project_name_no_change/terragrunt/prod",
+        "terraformModulePath": "terragrunt/prod",
         "vcsSubPath": "cmd/infracost/testdata/diff_project_name_no_change/terragrunt/prod"
       },
       "pastBreakdown": {
@@ -1420,7 +1420,7 @@
       "metadata": {
         "path": "testdata/diff_project_name_no_change/terragrunt/dev",
         "type": "terragrunt_dir",
-        "terraformModulePath": "testdata/diff_project_name_no_change/terragrunt/dev",
+        "terraformModulePath": "terragrunt/dev",
         "vcsSubPath": "cmd/infracost/testdata/diff_project_name_no_change/terragrunt/dev"
       },
       "pastBreakdown": {
@@ -1697,7 +1697,7 @@
       "metadata": {
         "path": "./testdata/diff_project_name_no_change/terraform",
         "type": "terraform_dir",
-        "terraformModulePath": "testdata/diff_project_name_no_change/terraform",
+        "terraformModulePath": "terraform",
         "terraformWorkspace": "ws1",
         "vcsSubPath": "cmd/infracost/testdata/diff_project_name_no_change/terraform",
         "vcsCodeChanged": false,
@@ -1984,7 +1984,7 @@
       "metadata": {
         "path": "testdata/diff_project_name_no_change/terragrunt-multi/dev",
         "type": "terragrunt_dir",
-        "terraformModulePath": "testdata/diff_project_name_no_change/terragrunt-multi/dev",
+        "terraformModulePath": "terragrunt-multi/dev",
         "terraformWorkspace": "ws2",
         "vcsSubPath": "cmd/infracost/testdata/diff_project_name_no_change/terragrunt-multi/dev"
       },
@@ -2262,7 +2262,7 @@
       "metadata": {
         "path": "testdata/diff_project_name_no_change/terragrunt-multi/prod",
         "type": "terragrunt_dir",
-        "terraformModulePath": "testdata/diff_project_name_no_change/terragrunt-multi/prod",
+        "terraformModulePath": "terragrunt-multi/prod",
         "terraformWorkspace": "ws2",
         "vcsSubPath": "cmd/infracost/testdata/diff_project_name_no_change/terragrunt-multi/prod"
       },

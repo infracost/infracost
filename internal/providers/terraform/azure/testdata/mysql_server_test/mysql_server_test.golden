@@ -38,5 +38,12 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃ $5,042        ┃ $0.00       ┃ $5,042     ┃
+┃ TestMySQLServer_usage                              ┃ $5,042        ┃ $0.00       ┃ $5,042     ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
+Logs:
+
+WRN 'Multiple products found' are safe to ignore for 'Compute (B_Gen5_2)' due to limitations in the Azure API.
+WRN 'Multiple products found' are safe to ignore for 'Compute (GP_Gen5_4)' due to limitations in the Azure API.
+WRN 'Multiple products found' are safe to ignore for 'Compute (GP_Gen5_4)' due to limitations in the Azure API.
+WRN 'Multiple products found' are safe to ignore for 'Compute (MO_Gen5_16)' due to limitations in the Azure API.
+WRN 'Multiple products found' are safe to ignore for 'Compute (MO_Gen5_16)' due to limitations in the Azure API.

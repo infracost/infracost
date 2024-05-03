@@ -322,7 +322,7 @@ func handleCLIError(ctx *config.RunContext, cliErr error) {
 }
 
 func handleUnexpectedErr(ctx *config.RunContext, err error) {
-	ui.PrintUnexpectedErrorStack(err)
+	ui.PrintUnexpectedErrorStack(ctx.ErrWriter, err)
 
 	err = apiclient.ReportCLIError(ctx, err, false)
 	if err != nil {
@@ -381,7 +381,11 @@ func saveOutFileWithMsg(ctx *config.RunContext, cmd *cobra.Command, outFile, suc
 		return errors.Wrap(err, "Unable to save output")
 	}
 
-	logging.Logger.Info().Msg(successMsg)
+	if ctx.Config.IsLogging() {
+		logging.Logger.Info().Msg(successMsg)
+	} else {
+		cmd.PrintErrf("%s\n", successMsg)
+	}
 
 	return nil
 }
