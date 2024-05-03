@@ -27,8 +27,8 @@ Monthly cost change for infracost/infracost/cmd/infracost/testdata/diff_with_con
 Amount:  -$462 ($462 → $0.00)
 
 ──────────────────────────────────
-Project: infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to_deleted_project/prod
-Module path: prod
+Project: testdata-diff_with_config_file_compare_to_deleted_project-prod
+Module path: testdata/diff_with_config_file_compare_to_deleted_project/prod
 
 ~ aws_instance.web_app
   +$561 ($743 → $1,303)
@@ -36,7 +36,7 @@ Module path: prod
     ~ Instance usage (Linux/UNIX, on-demand, m5.4xlarge → m5.8xlarge)
       +$561 ($561 → $1,121)
 
-Monthly cost change for infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to_deleted_project/prod (Module path: prod)
+Monthly cost change for infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to_deleted_project/prod (Module path: testdata/diff_with_config_file_compare_to_deleted_project/prod)
 Amount:  +$561 ($743 → $1,303)
 Percent: +75%
 

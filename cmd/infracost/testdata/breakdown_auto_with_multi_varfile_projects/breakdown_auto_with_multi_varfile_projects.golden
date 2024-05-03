@@ -1,4 +1,4 @@
-Project: infracost/infracost/cmd/infracost/testdata/breakdown_auto_with_multi_varfile_projects/multi-dev
+Project: multi-dev
 Module path: multi
 
  Name                                                   Monthly Qty  Unit   Monthly Cost   
@@ -14,7 +14,7 @@ Module path: multi
  Project total                                                                   $747.64   
 
 ──────────────────────────────────
-Project: infracost/infracost/cmd/infracost/testdata/breakdown_auto_with_multi_varfile_projects/multi-prod
+Project: multi-prod
 Module path: multi
 
  Name                                                   Monthly Qty  Unit   Monthly Cost   
@@ -30,7 +30,7 @@ Module path: multi
  Project total                                                                 $1,308.28   
 
 ──────────────────────────────────
-Project: infracost/infracost/cmd/infracost/testdata/breakdown_auto_with_multi_varfile_projects/single
+Project: single
 Module path: single
 
  Name                                                   Monthly Qty  Unit   Monthly Cost   
@@ -53,13 +53,13 @@ Module path: single
 3 cloud resources were detected:
 ∙ 3 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
-┃ Project                                                          ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...lti_varfile_projects/multi-dev ┃ $748          ┃ $0.00       ┃ $748       ┃
-┃ infracost/infracost/cmd/infraco...ti_varfile_projects/multi-prod ┃ $1,308        ┃ $0.00       ┃ $1,308     ┃
-┃ infracost/infracost/cmd/infraco..._multi_varfile_projects/single ┃ $1,303        ┃ $0.00       ┃ $1,303     ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ multi-dev                                          ┃ $748          ┃ $0.00       ┃ $748       ┃
+┃ multi-prod                                         ┃ $1,308        ┃ $0.00       ┃ $1,308     ┃
+┃ single                                             ┃ $1,303        ┃ $0.00       ┃ $1,303     ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:
 

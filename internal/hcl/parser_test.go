@@ -55,7 +55,7 @@ data "cats_cat" "the-cats-mother" {
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 	parser := NewParser(
-		RootPath{Path: filepath.Dir(path)},
+		RootPath{DetectedPath: filepath.Dir(path)},
 		CreateEnvFileMatcher([]string{}, nil),
 		loader,
 		logger,
@@ -151,7 +151,7 @@ output "loadbalancer"  {
 `)
 
 	logger := newDiscardLogger()
-	parser := NewParser(RootPath{Path: filepath.Dir(path)}, CreateEnvFileMatcher([]string{}, nil), modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}), logger)
+	parser := NewParser(RootPath{DetectedPath: filepath.Dir(path)}, CreateEnvFileMatcher([]string{}, nil), modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -224,7 +224,7 @@ output "exp2" {
 `)
 
 	logger := newDiscardLogger()
-	parser := NewParser(RootPath{Path: filepath.Dir(path)}, CreateEnvFileMatcher([]string{}, nil), modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}), logger)
+	parser := NewParser(RootPath{DetectedPath: filepath.Dir(path)}, CreateEnvFileMatcher([]string{}, nil), modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -271,7 +271,7 @@ output "instances" {
 `)
 
 	logger := newDiscardLogger()
-	parser := NewParser(RootPath{Path: filepath.Dir(path)}, CreateEnvFileMatcher([]string{}, nil), modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}), logger)
+	parser := NewParser(RootPath{DetectedPath: filepath.Dir(path)}, CreateEnvFileMatcher([]string{}, nil), modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -310,7 +310,7 @@ resource "other_resource" "test" {
 `)
 
 	logger := newDiscardLogger()
-	parser := NewParser(RootPath{Path: filepath.Dir(path)}, CreateEnvFileMatcher([]string{}, nil), modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}), logger)
+	parser := NewParser(RootPath{DetectedPath: filepath.Dir(path)}, CreateEnvFileMatcher([]string{}, nil), modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -355,7 +355,7 @@ output "attr_not_exists" {
 `)
 
 	logger := newDiscardLogger()
-	parser := NewParser(RootPath{Path: filepath.Dir(path)}, CreateEnvFileMatcher([]string{}, nil), modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}), logger)
+	parser := NewParser(RootPath{DetectedPath: filepath.Dir(path)}, CreateEnvFileMatcher([]string{}, nil), modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -395,7 +395,7 @@ resource "other_resource" "test" {
 `)
 
 	logger := newDiscardLogger()
-	parser := NewParser(RootPath{Path: filepath.Dir(path)}, CreateEnvFileMatcher([]string{}, nil), modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}), logger)
+	parser := NewParser(RootPath{DetectedPath: filepath.Dir(path)}, CreateEnvFileMatcher([]string{}, nil), modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -447,7 +447,7 @@ output "serviceendpoint_principals" {
 `)
 
 	logger := newDiscardLogger()
-	parser := NewParser(RootPath{Path: filepath.Dir(path)}, CreateEnvFileMatcher([]string{}, nil), modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}), logger)
+	parser := NewParser(RootPath{DetectedPath: filepath.Dir(path)}, CreateEnvFileMatcher([]string{}, nil), modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -485,7 +485,7 @@ output "val" {
 `)
 
 	logger := newDiscardLogger()
-	parser := NewParser(RootPath{Path: filepath.Dir(path)}, CreateEnvFileMatcher([]string{}, nil), modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}), logger)
+	parser := NewParser(RootPath{DetectedPath: filepath.Dir(path)}, CreateEnvFileMatcher([]string{}, nil), modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -503,7 +503,7 @@ func Test_SetsHasChangesOnMod(t *testing.T) {
 	path := createTestFile("test.tf", `variable "foo" {}`)
 
 	logger := newDiscardLogger()
-	parser := NewParser(RootPath{Path: filepath.Dir(path), HasChanges: true}, CreateEnvFileMatcher([]string{}, nil), modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}), logger)
+	parser := NewParser(RootPath{DetectedPath: filepath.Dir(path), HasChanges: true}, CreateEnvFileMatcher([]string{}, nil), modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -525,7 +525,7 @@ output "val" {
 `)
 
 	logger := newDiscardLogger()
-	parser := NewParser(RootPath{Path: filepath.Dir(path)}, CreateEnvFileMatcher([]string{}, nil), modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}), logger)
+	parser := NewParser(RootPath{DetectedPath: filepath.Dir(path)}, CreateEnvFileMatcher([]string{}, nil), modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -567,7 +567,7 @@ output "mod_result" {
 	dir := filepath.Dir(path)
 	loader := modules.NewModuleLoader(dir, modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 	parser := NewParser(
-		RootPath{Path: path},
+		RootPath{DetectedPath: path},
 		CreateEnvFileMatcher([]string{}, nil),
 		loader,
 		logger,
@@ -632,7 +632,7 @@ output "mod_result" {
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 	parser := NewParser(
-		RootPath{Path: path},
+		RootPath{DetectedPath: path},
 		CreateEnvFileMatcher([]string{}, nil),
 		loader,
 		logger,
@@ -688,7 +688,7 @@ resource "aws_instance" "my_instance" {
 `)
 
 	logger := newDiscardLogger()
-	parser := NewParser(RootPath{Path: filepath.Dir(path)}, CreateEnvFileMatcher([]string{}, nil), modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}), logger)
+	parser := NewParser(RootPath{DetectedPath: filepath.Dir(path)}, CreateEnvFileMatcher([]string{}, nil), modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{}), logger)
 	module, err := parser.ParseDirectory()
 	require.NoError(t, err)
 
@@ -831,7 +831,7 @@ resource "test_resource_two" "test" {
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 	parser := NewParser(
-		RootPath{Path: filepath.Dir(path)},
+		RootPath{DetectedPath: filepath.Dir(path)},
 		CreateEnvFileMatcher([]string{}, nil),
 		loader,
 		logger,
@@ -891,7 +891,7 @@ resource "test_resource_two" "test" {
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 	parser := NewParser(
-		RootPath{Path: filepath.Dir(path)},
+		RootPath{DetectedPath: filepath.Dir(path)},
 		CreateEnvFileMatcher([]string{}, nil),
 		loader,
 		logger,
@@ -957,7 +957,7 @@ output "mod_result" {
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 	parser := NewParser(
-		RootPath{Path: path},
+		RootPath{DetectedPath: path},
 		CreateEnvFileMatcher([]string{}, nil),
 		loader,
 		logger,
@@ -1109,7 +1109,7 @@ output "mod_result" {
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 	parser := NewParser(
-		RootPath{Path: path},
+		RootPath{DetectedPath: path},
 		CreateEnvFileMatcher([]string{}, nil),
 		loader,
 		logger,
@@ -1195,7 +1195,7 @@ resource "dynamic" "resource" {
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 	parser := NewParser(
-		RootPath{Path: path},
+		RootPath{DetectedPath: path},
 		CreateEnvFileMatcher([]string{}, nil),
 		loader,
 		logger,
@@ -1261,7 +1261,7 @@ resource "azurerm_linux_function_app" "function" {
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 	parser := NewParser(
-		RootPath{Path: filepath.Dir(path)},
+		RootPath{DetectedPath: filepath.Dir(path)},
 		CreateEnvFileMatcher([]string{}, nil),
 		loader,
 		logger,
@@ -1315,7 +1315,7 @@ resource "test_resource" "second" {
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 	parser := NewParser(
-		RootPath{Path: filepath.Dir(path)},
+		RootPath{DetectedPath: filepath.Dir(path)},
 		CreateEnvFileMatcher([]string{}, nil),
 		loader,
 		logger,
@@ -1371,7 +1371,7 @@ data "google_compute_zones" "us" {
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 	parser := NewParser(
-		RootPath{Path: filepath.Dir(path)},
+		RootPath{DetectedPath: filepath.Dir(path)},
 		CreateEnvFileMatcher([]string{}, nil),
 		loader,
 		logger,
@@ -1426,7 +1426,7 @@ data "aws_availability_zones" "ne" {
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 	parser := NewParser(
-		RootPath{Path: filepath.Dir(path)},
+		RootPath{DetectedPath: filepath.Dir(path)},
 		CreateEnvFileMatcher([]string{}, nil),
 		loader,
 		logger,
@@ -1477,7 +1477,7 @@ resource "random_shuffle" "bad" {
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 	parser := NewParser(
-		RootPath{Path: filepath.Dir(path)},
+		RootPath{DetectedPath: filepath.Dir(path)},
 		CreateEnvFileMatcher([]string{}, nil),
 		loader,
 		logger,
@@ -1548,7 +1548,7 @@ locals {
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 	parser := NewParser(
-		RootPath{Path: filepath.Dir(path)},
+		RootPath{DetectedPath: filepath.Dir(path)},
 		CreateEnvFileMatcher([]string{}, nil),
 		loader,
 		logger,
@@ -1603,7 +1603,7 @@ resource "baz" "bat" {
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 	parser := NewParser(
-		RootPath{Path: filepath.Dir(path)},
+		RootPath{DetectedPath: filepath.Dir(path)},
 		CreateEnvFileMatcher([]string{}, nil),
 		loader,
 		logger,
@@ -1667,7 +1667,7 @@ resource "aws_instance" "example" {
 	loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 
 	parser := NewParser(
-		RootPath{Path: path},
+		RootPath{DetectedPath: path},
 		CreateEnvFileMatcher([]string{}, nil),
 		loader,
 		logger,
@@ -1721,7 +1721,7 @@ resource "aws_instance" "example" {
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 	parser := NewParser(
-		RootPath{Path: path},
+		RootPath{DetectedPath: path},
 		CreateEnvFileMatcher([]string{}, nil),
 		loader,
 		logger,
@@ -1759,7 +1759,7 @@ resource "aws_instance" "example" {
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 	parser := NewParser(
-		RootPath{Path: filepath.Dir(path)},
+		RootPath{DetectedPath: filepath.Dir(path)},
 		CreateEnvFileMatcher([]string{}, nil),
 		loader,
 		logger,
@@ -1807,7 +1807,7 @@ resource "aws_instance" "example" {
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 	parser := NewParser(
-		RootPath{Path: filepath.Dir(path)},
+		RootPath{DetectedPath: filepath.Dir(path)},
 		CreateEnvFileMatcher([]string{}, nil),
 		loader,
 		logger,
@@ -1836,7 +1836,7 @@ resource "bar" "a" {
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 	parser := NewParser(
-		RootPath{Path: filepath.Dir(path)},
+		RootPath{DetectedPath: filepath.Dir(path)},
 		CreateEnvFileMatcher([]string{}, nil),
 		loader,
 		logger,
@@ -1864,7 +1864,7 @@ resource "time_static" "default" {}
 	logger := newDiscardLogger()
 	loader := modules.NewModuleLoader(filepath.Dir(path), modules.NewSharedHCLParser(), nil, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 	parser := NewParser(
-		RootPath{Path: filepath.Dir(path)},
+		RootPath{DetectedPath: filepath.Dir(path)},
 		CreateEnvFileMatcher([]string{}, nil),
 		loader,
 		logger,
@@ -1916,7 +1916,7 @@ func BenchmarkParserEvaluate(b *testing.B) {
 		source, _ := modules.NewTerraformCredentialsSource(modules.BaseCredentialSet{})
 		loader := modules.NewModuleLoader(dir, modules.NewSharedHCLParser(), source, config.TerraformSourceMap{}, logger, &sync.KeyMutex{})
 		parser := NewParser(
-			RootPath{Path: dir},
+			RootPath{DetectedPath: dir},
 			CreateEnvFileMatcher([]string{}, nil),
 			loader,
 			logger,

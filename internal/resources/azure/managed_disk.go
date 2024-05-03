@@ -1,6 +1,7 @@
 package azure
 
 import (
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 
@@ -8,7 +9,6 @@ import (
 	"math"
 	"strings"
 
-	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
 )
 
@@ -135,7 +135,7 @@ func managedDiskCostComponents(region, diskType string, diskSizeGB, diskIOPSRead
 
 	validstorageReplicationType := mapStorageReplicationType(storageReplicationType)
 	if !validstorageReplicationType {
-		log.Warn().Msgf("Could not map %s to a valid storage type", storageReplicationType)
+		logging.Logger.Warn().Msgf("Could not map %s to a valid storage type", storageReplicationType)
 		return nil
 	}
 
@@ -155,13 +155,13 @@ func standardPremiumDiskCostComponents(region string, diskTypePrefix string, sto
 
 	diskName := mapDiskName(diskTypePrefix, requestedSize)
 	if diskName == "" {
-		log.Warn().Msgf("Could not map disk type %s and size %d to disk name", diskTypePrefix, requestedSize)
+		logging.Logger.Warn().Msgf("Could not map disk type %s and size %d to disk name", diskTypePrefix, requestedSize)
 		return nil
 	}
 
 	productName, ok := diskProductNameMap[diskTypePrefix]
 	if !ok {
-		log.Warn().Msgf("Could not map disk type %s to product name", diskTypePrefix)
+		logging.Logger.Warn().Msgf("Could not map disk type %s to product name", diskTypePrefix)
 		return nil
 	}
 

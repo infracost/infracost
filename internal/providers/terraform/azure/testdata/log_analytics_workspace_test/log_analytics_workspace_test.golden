@@ -127,11 +127,11 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ TestLogAnalyticsWorkspaceGoldenFile                ┃ $22,756       ┃ $234        ┃ $22,990    ┃
+┃ main                                               ┃ $22,756       ┃ $234        ┃ $22,990    ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 Logs:
 
-WRN skipping azurerm_log_analytics_workspace.unsupported_legacy_workspace["PerNode"] as it uses legacy pricing options
-WRN skipping azurerm_log_analytics_workspace.unsupported_legacy_workspace["Premium"] as it uses legacy pricing options
-WRN skipping azurerm_log_analytics_workspace.unsupported_legacy_workspace["Standard"] as it uses legacy pricing options
-WRN skipping azurerm_log_analytics_workspace.unsupported_legacy_workspace["Unlimited"] as it uses legacy pricing options
+WARN skipping azurerm_log_analytics_workspace.unsupported_legacy_workspace["PerNode"] as it uses legacy pricing options
+WARN skipping azurerm_log_analytics_workspace.unsupported_legacy_workspace["Premium"] as it uses legacy pricing options
+WARN skipping azurerm_log_analytics_workspace.unsupported_legacy_workspace["Standard"] as it uses legacy pricing options
+WARN skipping azurerm_log_analytics_workspace.unsupported_legacy_workspace["Unlimited"] as it uses legacy pricing options

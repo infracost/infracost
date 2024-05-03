@@ -18,7 +18,7 @@
       "metadata": {
         "path": "testdata/diff_terragrunt_syntax_error/terragrunt/dev",
         "type": "terragrunt_dir",
-        "terraformModulePath": "terragrunt/dev",
+        "terraformModulePath":  "testdata/diff_terragrunt_syntax_error/terragrunt/dev",
         "vcsSubPath": "cmd/infracost/testdata/diff_terragrunt_syntax_error/terragrunt/dev"
       },
       "pastBreakdown": {
@@ -310,7 +310,7 @@
       "metadata": {
         "path": "testdata/diff_terragrunt_syntax_error/terragrunt/prod",
         "type": "terragrunt_dir",
-        "terraformModulePath": "terragrunt/prod",
+        "terraformModulePath":  "testdata/diff_terragrunt_syntax_error/terragrunt/prod",
         "vcsSubPath": "cmd/infracost/testdata/diff_terragrunt_syntax_error/terragrunt/prod"
       },
       "pastBreakdown": {

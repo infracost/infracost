@@ -72,7 +72,8 @@
         "monthlyQuantity",
         "price",
         "hourlyCost",
-        "monthlyCost"
+        "monthlyCost",
+        "priceNotFound"
       ],
       "properties": {
         "name": {
@@ -97,6 +98,9 @@
           "type": ["string", "null"]
         },
         "usageBased": {
+          "type": "boolean"
+        },
+        "priceNotFound": {
           "type": "boolean"
         }
       },
@@ -229,6 +233,7 @@
     "Project": {
       "required": [
         "name",
+        "displayName",
         "metadata",
         "pastBreakdown",
         "breakdown",
@@ -237,6 +242,9 @@
       ],
       "properties": {
         "name": {
+          "type": "string"
+        },
+        "displayName": {
           "type": "string"
         },
         "metadata": {

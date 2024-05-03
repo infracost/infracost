@@ -1,7 +1,7 @@
 Key: * usage cost, ~ changed, + added, - removed
 
 ──────────────────────────────────
-Project: infracost/infracost/examples/terraform
+Project: main
 
 + aws_instance.web_app
   +$743

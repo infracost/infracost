@@ -14,6 +14,7 @@
   "projects": [
     {
       "name": "infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt",
+      "displayName": "main",
       "metadata": {
         "path": "testdata/breakdown_with_policy_data_upload_terragrunt",
         "type": "terragrunt_dir",
@@ -37,14 +38,14 @@
                 {
                   "blockName": "aws_instance.web_app",
                   "endLine": 22,
-                  "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
+                  "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
                   "startLine": 1
                 }
               ],
               "checksum": "f5dd035ad27e97bb0e63f5e9794406f76dec425251f3ad09176905bfe8c1b6c5",
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 22,
-              "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
+              "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
               "startLine": 1
             },
             "hourlyCost": "0.91197260273972602",
@@ -57,7 +58,8 @@
                 "monthlyQuantity": "730",
                 "price": "0.768",
                 "hourlyCost": "0.768",
-                "monthlyCost": "560.64"
+                "monthlyCost": "560.64",
+                "priceNotFound": false
               }
             ],
             "subresources": [
@@ -74,7 +76,8 @@
                     "monthlyQuantity": "51",
                     "price": "0.1",
                     "hourlyCost": "0.00698630136986301",
-                    "monthlyCost": "5.1"
+                    "monthlyCost": "5.1",
+                    "priceNotFound": false
                   }
                 ]
               },
@@ -91,7 +94,8 @@
                     "monthlyQuantity": "1000",
                     "price": "0.1",
                     "hourlyCost": "0.13698630136986301",
-                    "monthlyCost": "100"
+                    "monthlyCost": "100",
+                    "priceNotFound": false
                   }
                 ]
               }
@@ -109,14 +113,14 @@
                 {
                   "blockName": "aws_dynamodb_table.autoscale_dynamodb_table",
                   "endLine": 41,
-                  "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
+                  "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
                   "startLine": 24
                 }
               ],
               "checksum": "fdfe0646f29e06b7e43d6f8ea09a298ca63ab078d56654d90f2dd9c6ab28d96a",
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 41,
-              "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
+              "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
               "startLine": 24
             },
             "hourlyCost": "0.0078",
@@ -131,7 +135,8 @@
                 "price": "0.4745",
                 "hourlyCost": "0.0039",
                 "monthlyCost": "2.847",
-                "usageBased": true
+                "usageBased": true,
+                "priceNotFound": false
               },
               {
                 "name": "Read capacity unit (RCU)",
@@ -140,7 +145,8 @@
                 "monthlyQuantity": "30",
                 "price": "0.0949",
                 "hourlyCost": "0.0039",
-                "monthlyCost": "2.847"
+                "monthlyCost": "2.847",
+                "priceNotFound": false
               },
               {
                 "name": "Data storage",
@@ -150,7 +156,8 @@
                 "price": "0.25",
                 "hourlyCost": null,
                 "monthlyCost": null,
-                "usageBased": true
+                "usageBased": true,
+                "priceNotFound": false
               },
               {
                 "name": "Point-In-Time Recovery (PITR) backup storage",
@@ -160,7 +167,8 @@
                 "price": "0.2",
                 "hourlyCost": null,
                 "monthlyCost": null,
-                "usageBased": true
+                "usageBased": true,
+                "priceNotFound": false
               },
               {
                 "name": "On-demand backup storage",
@@ -170,7 +178,8 @@
                 "price": "0.1",
                 "hourlyCost": null,
                 "monthlyCost": null,
-                "usageBased": true
+                "usageBased": true,
+                "priceNotFound": false
               },
               {
                 "name": "Table data restored",
@@ -180,7 +189,8 @@
                 "price": "0.15",
                 "hourlyCost": null,
                 "monthlyCost": null,
-                "usageBased": true
+                "usageBased": true,
+                "priceNotFound": false
               },
               {
                 "name": "Streams read request unit (sRRU)",
@@ -190,7 +200,8 @@
                 "price": "0.0000002",
                 "hourlyCost": null,
                 "monthlyCost": null,
-                "usageBased": true
+                "usageBased": true,
+                "priceNotFound": false
               }
             ]
           },
@@ -206,14 +217,14 @@
                 {
                   "blockName": "aws_appautoscaling_target.autoscale_dynamodb_table_read_target",
                   "endLine": 57,
-                  "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
+                  "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
                   "startLine": 51
                 }
               ],
               "checksum": "1403df4d5fba340338063d429a834b41d778a10f9bf5641d6e8a9b754c4e479a",
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 57,
-              "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
+              "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
               "startLine": 51
             }
           },
@@ -229,14 +240,14 @@
                 {
                   "blockName": "aws_appautoscaling_target.autoscale_dynamodb_table_write_target",
                   "endLine": 49,
-                  "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
+                  "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
                   "startLine": 43
                 }
               ],
               "checksum": "90c5db4e165a29a3abc045e28dfea607059c1614b0c0d7a2cc60711ad2985a65",
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 49,
-              "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
+              "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
               "startLine": 43
             }
           }
@@ -261,14 +272,14 @@
                 {
                   "blockName": "aws_instance.web_app",
                   "endLine": 22,
-                  "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
+                  "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
                   "startLine": 1
                 }
               ],
               "checksum": "f5dd035ad27e97bb0e63f5e9794406f76dec425251f3ad09176905bfe8c1b6c5",
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 22,
-              "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
+              "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
               "startLine": 1
             },
             "hourlyCost": "0.91197260273972602",
@@ -281,7 +292,8 @@
                 "monthlyQuantity": "730",
                 "price": "0.768",
                 "hourlyCost": "0.768",
-                "monthlyCost": "560.64"
+                "monthlyCost": "560.64",
+                "priceNotFound": false
               }
             ],
             "subresources": [
@@ -298,7 +310,8 @@
                     "monthlyQuantity": "51",
                     "price": "0.1",
                     "hourlyCost": "0.00698630136986301",
-                    "monthlyCost": "5.1"
+                    "monthlyCost": "5.1",
+                    "priceNotFound": false
                   }
                 ]
               },
@@ -315,7 +328,8 @@
                     "monthlyQuantity": "1000",
                     "price": "0.1",
                     "hourlyCost": "0.13698630136986301",
-                    "monthlyCost": "100"
+                    "monthlyCost": "100",
+                    "priceNotFound": false
                   }
                 ]
               }
@@ -333,14 +347,14 @@
                 {
                   "blockName": "aws_dynamodb_table.autoscale_dynamodb_table",
                   "endLine": 41,
-                  "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
+                  "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
                   "startLine": 24
                 }
               ],
               "checksum": "fdfe0646f29e06b7e43d6f8ea09a298ca63ab078d56654d90f2dd9c6ab28d96a",
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 41,
-              "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
+              "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
               "startLine": 24
             },
             "hourlyCost": "0.0078",
@@ -355,7 +369,8 @@
                 "price": "0.4745",
                 "hourlyCost": "0.0039",
                 "monthlyCost": "2.847",
-                "usageBased": true
+                "usageBased": true,
+                "priceNotFound": false
               },
               {
                 "name": "Read capacity unit (RCU)",
@@ -364,7 +379,8 @@
                 "monthlyQuantity": "30",
                 "price": "0.0949",
                 "hourlyCost": "0.0039",
-                "monthlyCost": "2.847"
+                "monthlyCost": "2.847",
+                "priceNotFound": false
               },
               {
                 "name": "Data storage",
@@ -374,7 +390,8 @@
                 "price": "0.25",
                 "hourlyCost": null,
                 "monthlyCost": null,
-                "usageBased": true
+                "usageBased": true,
+                "priceNotFound": false
               },
               {
                 "name": "Point-In-Time Recovery (PITR) backup storage",
@@ -384,7 +401,8 @@
                 "price": "0.2",
                 "hourlyCost": null,
                 "monthlyCost": null,
-                "usageBased": true
+                "usageBased": true,
+                "priceNotFound": false
               },
               {
                 "name": "On-demand backup storage",
@@ -394,7 +412,8 @@
                 "price": "0.1",
                 "hourlyCost": null,
                 "monthlyCost": null,
-                "usageBased": true
+                "usageBased": true,
+                "priceNotFound": false
               },
               {
                 "name": "Table data restored",
@@ -404,7 +423,8 @@
                 "price": "0.15",
                 "hourlyCost": null,
                 "monthlyCost": null,
-                "usageBased": true
+                "usageBased": true,
+                "priceNotFound": false
               },
               {
                 "name": "Streams read request unit (sRRU)",
@@ -414,7 +434,8 @@
                 "price": "0.0000002",
                 "hourlyCost": null,
                 "monthlyCost": null,
-                "usageBased": true
+                "usageBased": true,
+                "priceNotFound": false
               }
             ]
           },
@@ -430,14 +451,14 @@
                 {
                   "blockName": "aws_appautoscaling_target.autoscale_dynamodb_table_read_target",
                   "endLine": 57,
-                  "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
+                  "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
                   "startLine": 51
                 }
               ],
               "checksum": "1403df4d5fba340338063d429a834b41d778a10f9bf5641d6e8a9b754c4e479a",
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 57,
-              "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
+              "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
               "startLine": 51
             }
           },
@@ -453,14 +474,14 @@
                 {
                   "blockName": "aws_appautoscaling_target.autoscale_dynamodb_table_write_target",
                   "endLine": 49,
-                  "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
+                  "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
                   "startLine": 43
                 }
               ],
               "checksum": "90c5db4e165a29a3abc045e28dfea607059c1614b0c0d7a2cc60711ad2985a65",
               "defaultTagsChecksum": "23ce253ad214e1f28d8a9f8cda886efe35a0731151efe7c37a22652c98fa2101",
               "endLine": 49,
-              "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
+              "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
               "startLine": 43
             }
           }

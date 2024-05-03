@@ -1,4 +1,5 @@
 Project: dev
+Module path: testdata/breakdown_terragrunt_get_env_config_file
 
  Name                                                 Monthly Qty  Unit   Monthly Cost   
                                                                                          
@@ -11,6 +12,7 @@ Project: dev
 
 ──────────────────────────────────
 Project: prod
+Module path: testdata/breakdown_terragrunt_get_env_config_file
 
  Name                                                  Monthly Qty  Unit   Monthly Cost   
                                                                                           

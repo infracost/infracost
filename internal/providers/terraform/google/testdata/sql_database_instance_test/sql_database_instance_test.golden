@@ -1119,8 +1119,8 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ TestNewSQLInstance                                 ┃ $221,684      ┃ $80         ┃ $221,764   ┃
+┃ main                                               ┃ $221,684      ┃ $80         ┃ $221,764   ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 Logs:
 
-WRN edition ENTERPRISE_PLUS of google_sql_database_instance.enterprise_plus is not yet supported
+WARN edition ENTERPRISE_PLUS of google_sql_database_instance.enterprise_plus is not yet supported

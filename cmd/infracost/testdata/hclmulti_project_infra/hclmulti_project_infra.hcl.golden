@@ -1,5 +1,5 @@
-Project: infracost/infracost/cmd/infracost/testdata/hclmulti_project_infra/dev
-Module path: dev
+Project: testdata-hclmulti_project_infra-dev
+Module path: testdata/hclmulti_project_infra/dev
 
  Name                                                            Monthly Qty  Unit                    Monthly Cost   
                                                                                                                      
@@ -52,8 +52,8 @@ Module path: dev
  Project total                                                                                             $112.35   
 
 ──────────────────────────────────
-Project: infracost/infracost/cmd/infracost/testdata/hclmulti_project_infra/prod
-Module path: prod
+Project: testdata-hclmulti_project_infra-prod
+Module path: testdata/hclmulti_project_infra/prod
 
  Name                                                            Monthly Qty  Unit                    Monthly Cost   
                                                                                                                      
@@ -114,12 +114,12 @@ Module path: prod
 ∙ 14 were estimated
 ∙ 38 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
-┃ Project                                                          ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...ata/hclmulti_project_infra/dev ┃ $112          ┃ $0.00       ┃ $112       ┃
-┃ infracost/infracost/cmd/infraco...ta/hclmulti_project_infra/prod ┃ $152          ┃ $0.00       ┃ $152       ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ testdata-hclmulti_project_infra-dev                ┃ $112          ┃ $0.00       ┃ $112       ┃
+┃ testdata-hclmulti_project_infra-prod               ┃ $152          ┃ $0.00       ┃ $152       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:
 

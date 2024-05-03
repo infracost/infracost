@@ -9,7 +9,7 @@
         "type": "terraform_dir",
         "vcsRepositoryUrl": "git@github.com:infracost/infracost.git",
         "vcsSubPath": "cmd/infracost/testdata/diff_with_config_file_compare_to/dev",
-        "terraformModulePath": "dev",
+        "terraformModulePath": "testdata/diff_with_config_file_compare_to/dev",
         "terraformWorkspace": "default"
       },
       "pastBreakdown": {
@@ -170,7 +170,7 @@
         "type": "terraform_dir",
         "vcsRepositoryUrl": "git@github.com:infracost/infracost.git",
         "vcsSubPath": "cmd/infracost/testdata/diff_with_config_file_compare_to/prod",
-        "terraformModulePath": "prod",
+        "terraformModulePath": "testdata/diff_with_config_file_compare_to/prod",
         "terraformWorkspace": "default"
       },
       "pastBreakdown": {

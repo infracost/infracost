@@ -1,4 +1,5 @@
-Project: infracost/infracost/cmd/infracost/testdata/hclmulti_workspace
+Project: testdata-hclmulti_workspace-blue
+Module path: testdata/hclmulti_workspace
 Workspace: blue
 
  Name                                                           Monthly Qty  Unit                        Monthly Cost   
@@ -19,7 +20,8 @@ Workspace: blue
  Project total                                                                                                $742.64   
 
 ──────────────────────────────────
-Project: infracost/infracost/cmd/infracost/testdata/hclmulti_workspace
+Project: testdata-hclmulti_workspace-yellow
+Module path: testdata/hclmulti_workspace
 Workspace: yellow
 
  Name                                                           Monthly Qty  Unit                        Monthly Cost   
@@ -47,12 +49,12 @@ Workspace: yellow
 4 cloud resources were detected:
 ∙ 4 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
-┃ Project                                                       ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infracost/testdata/hclmulti_workspace ┃ $743          ┃ $0.00       ┃ $743       ┃
-┃ infracost/infracost/cmd/infracost/testdata/hclmulti_workspace ┃ $743          ┃ $0.00       ┃ $743       ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ testdata-hclmulti_workspace-blue                   ┃ $743          ┃ $0.00       ┃ $743       ┃
+┃ testdata-hclmulti_workspace-yellow                 ┃ $743          ┃ $0.00       ┃ $743       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:
 

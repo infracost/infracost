@@ -5,8 +5,8 @@ import (
 	"github.com/pkg/errors"
 
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/infracost/infracost/internal/ui"
 )
 
 type TemplateProvider struct {
@@ -23,6 +23,14 @@ func NewTemplateProvider(ctx *config.ProjectContext, includePastResources bool) 
 	}
 }
 
+func (p *TemplateProvider) ProjectName() string {
+	return config.CleanProjectName(p.ctx.ProjectConfig.Path)
+}
+
+func (p *TemplateProvider) VarFiles() []string {
+	return nil
+}
+
 func (p *TemplateProvider) Context() *config.ProjectContext { return p.ctx }
 
 func (p *TemplateProvider) Type() string {
@@ -37,18 +45,17 @@ func (p *TemplateProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 	metadata.ConfigSha = p.ctx.ProjectConfig.ConfigSha
 }
 
+func (p *TemplateProvider) RelativePath() string {
+	return p.ctx.ProjectConfig.Path
+}
+
 func (p *TemplateProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, error) {
 	template, err := goformation.Open(p.Path)
 	if err != nil {
 		return []*schema.Project{}, errors.Wrap(err, "Error reading CloudFormation template file")
 	}
 
-	spinner := ui.NewSpinner("Extracting only cost-related params from cloudformation", ui.SpinnerOptions{
-		EnableLogging: p.ctx.RunContext.Config.IsLogging(),
-		NoColor:       p.ctx.RunContext.Config.NoColor,
-		Indent:        "  ",
-	})
-	defer spinner.Fail()
+	logging.Logger.Debug().Msg("Extracting only cost-related params from cloudformation")
 
 	metadata := schema.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
 	metadata.Type = p.Type()
@@ -69,6 +76,5 @@ func (p *TemplateProvider) LoadResources(usage schema.UsageMap) ([]*schema.Proje
 		project.PartialResources = append(project.PartialResources, item.PartialResource)
 	}
 
-	spinner.Success()
 	return []*schema.Project{project}, nil
 }
