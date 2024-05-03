@@ -3,6 +3,7 @@
   "metadata": {
     "infracostCommand": "diff",
     "vcsBranch": "stub-branch",
+    "vcsBaseCommitSha": "71785af96bce822bd54f359d0883cfa4ca805432",
     "vcsCommitSha": "stub-sha",
     "vcsCommitAuthorName": "stub-author",
     "vcsCommitAuthorEmail": "stub@stub.com",

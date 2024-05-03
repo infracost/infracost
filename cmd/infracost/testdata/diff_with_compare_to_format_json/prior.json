@@ -1,5 +1,15 @@
 {
   "version": "0.2",
+  "metadata": {
+    "infracostCommand": "breakdown",
+    "vcsBranch": "master",
+    "vcsCommitSha": "71785af96bce822bd54f359d0883cfa4ca805432",
+    "vcsCommitAuthorName": "Hugo",
+    "vcsCommitAuthorEmail": "",
+    "vcsCommitTimestamp": "2024-02-23T11:04:26Z",
+    "vcsCommitMessage": "wip",
+    "vcsRepositoryUrl": "https://github.com/infracost/infracost.git"
+  },
   "currency": "USD",
   "projects": [
     {

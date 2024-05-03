@@ -156,6 +156,26 @@ func TestDiffWithCompareToFormatJSON(t *testing.T) {
 	)
 }
 
+func TestDiffWithCompareToNoMetadataFormatJSON(t *testing.T) {
+	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"diff",
+			"--path",
+			dir,
+			"--compare-to",
+			path.Join(dir, "prior.json"),
+			"--format",
+			"json",
+		}, &GoldenFileOptions{
+			RunTerraformCLI: true,
+			IsJSON:          true,
+		},
+	)
+}
+
 func TestDiffWithCompareToPreserveSummary(t *testing.T) {
 	dir := path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())
 	GoldenFileCommandTest(
