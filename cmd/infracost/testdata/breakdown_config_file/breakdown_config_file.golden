@@ -25,7 +25,7 @@
         "providers": [
           {
             "name": "aws",
-            "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_config_file/dev/main.tf",
+            "filename": "testdata/breakdown_config_file/dev/main.tf",
             "startLine": 1,
             "endLine": 7
           }
