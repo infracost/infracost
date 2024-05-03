@@ -167,6 +167,7 @@ require (
 	github.com/gruntwork-io/gruntwork-cli v0.7.0 // indirect
 	github.com/gruntwork-io/terratest v0.41.0 // indirect
 	github.com/hashicorp/errwrap v1.1.0 // indirect
+	github.com/hashicorp/go-cty-funcs v0.0.0-20230405223818-a090f58aa992 // indirect
 	github.com/hashicorp/go-hclog v1.5.0 // indirect
 	github.com/hashicorp/go-immutable-radix v1.3.1 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
