@@ -25,6 +25,12 @@ func TestOutputFormatJSON(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--format", "json", "--path", "./testdata/example_out.json", "--path", "./testdata/azure_firewall_out.json"}, opts)
 }
 
+func TestOutputDiffFormatJSON(t *testing.T) {
+	opts := DefaultOptions()
+	opts.IsJSON = true
+	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"output", "--format", "json", "--path", "./testdata/example_diff_out.json"}, opts)
+}
+
 func TestOutputFormatBitbucketCommentWithProjectNames(t *testing.T) {
 	testName := testutil.CalcGoldenFileTestdataDirName()
 	GoldenFileCommandTest(t, testName,

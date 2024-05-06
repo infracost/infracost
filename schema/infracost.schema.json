@@ -124,6 +124,9 @@
         "vcsBranch": {
           "type": "string"
         },
+        "vcsBaseCommitSha": {
+          "type": "string"
+        },
         "vcsCommitSha": {
           "type": "string"
         },

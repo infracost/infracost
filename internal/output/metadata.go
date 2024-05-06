@@ -11,6 +11,7 @@ type Metadata struct {
 	InfracostCommand string `json:"infracostCommand"`
 
 	Branch            string    `json:"vcsBranch"`
+	BaseCommitSHA     string    `json:"vcsBaseCommitSha,omitempty"`
 	CommitSHA         string    `json:"vcsCommitSha"`
 	CommitAuthorName  string    `json:"vcsCommitAuthorName"`
 	CommitAuthorEmail string    `json:"vcsCommitAuthorEmail"`
@@ -38,6 +39,7 @@ func NewMetadata(ctx *config.RunContext) Metadata {
 	m := Metadata{
 		InfracostCommand:  ctx.CMD,
 		Branch:            ctx.VCSMetadata.Branch.Name,
+		BaseCommitSHA:     ctx.VCSMetadata.BaseCommit.SHA,
 		CommitSHA:         ctx.VCSMetadata.Commit.SHA,
 		CommitAuthorEmail: ctx.VCSMetadata.Commit.AuthorEmail,
 		CommitAuthorName:  ctx.VCSMetadata.Commit.AuthorName,
