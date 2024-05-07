@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/shopspring/decimal"
+
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/shopspring/decimal"
 )
 
 var validSpeechCommitmentTierHrs = []int64{2_000, 10_000, 50_000}
@@ -191,7 +192,7 @@ func (r *CognitiveAccountSpeech) costComponents() []*schema.CostComponent {
 	}
 
 	costComponents = append(costComponents,
-		r.s0HourlyCostComponent("Speech to text batch", "Speech to Text Batch", r.MonthlySpeechToTextBatchHrs),
+		r.s0HourlyCostComponent("Speech to text batch", "S1 Speech to Text Batch", r.MonthlySpeechToTextBatchHrs),
 	)
 
 	if r.MonthlyCommitmentSpeechToTextCustomModelHrs != nil {
@@ -205,9 +206,9 @@ func (r *CognitiveAccountSpeech) costComponents() []*schema.CostComponent {
 	}
 
 	costComponents = append(costComponents, []*schema.CostComponent{
-		r.s0HourlyCostComponent("Speech to text custom model batch", "Custom Speech to Text Batch", r.MonthlySpeechToTextCustomModelBatchHrs),
-		r.s0CostComponent("Speech to text custom endpoint hosting", "Custom Speech Model Hosting Unit", floatPtrToDecimalPtr(r.MonthlySpeechToTextCustomEndpointHrs), "hours", 1, &schema.PriceFilter{Unit: strPtr("1/Hour")}), // This uses a different unit, so we don't want to filter the price by '1 Hour'
-		r.s0HourlyCostComponent("Speech to text custom training", "Custom Speech Training", r.MonthlySpeechToTextCustomTrainingHrs),
+		r.s0HourlyCostComponent("Speech to text custom model batch", "S1 Custom Speech to Text Batch", r.MonthlySpeechToTextCustomModelBatchHrs),
+		r.s0CostComponent("Speech to text custom endpoint hosting", "S1 Custom Speech Model Hosting Unit", floatPtrToDecimalPtr(r.MonthlySpeechToTextCustomEndpointHrs), "hours", 1, &schema.PriceFilter{Unit: strPtr("1/Hour")}), // This uses a different unit, so we don't want to filter the price by '1 Hour'
+		r.s0HourlyCostComponent("Speech to text custom training", "S1 Custom Speech Training", r.MonthlySpeechToTextCustomTrainingHrs),
 	}...)
 
 	if r.MonthlyCommitmentSpeechToTextEnhancedAddOnsHrs != nil {
@@ -221,7 +222,7 @@ func (r *CognitiveAccountSpeech) costComponents() []*schema.CostComponent {
 	}
 
 	costComponents = append(costComponents,
-		r.s0HourlyCostComponent("Speech to text conversation transcription multi-channel audio", "Conversation Transcription Multichannel Audio", r.MonthlySpeechToTextConversationTranscriptionMultiChannelAudioHrs),
+		r.s0HourlyCostComponent("Speech to text conversation transcription multi-channel audio", "S1 Conversation Transcription Multichannel Audio", r.MonthlySpeechToTextConversationTranscriptionMultiChannelAudioHrs),
 	)
 
 	// Text to speech
@@ -240,14 +241,14 @@ func (r *CognitiveAccountSpeech) costComponents() []*schema.CostComponent {
 		}
 	}
 	if (r.MonthlyCommitmentTextToSpeechNeuralCommitmentChars == nil && r.MonthlyConnectedContainerCommitmentTextToSpeechNeuralCommitmentChars == nil) || r.MonthlyTextToSpeechNeuralChars != nil {
-		costComponents = append(costComponents, r.s0CostComponent("Text to speech neural", "Neural Text To Speech Characters", intPtrToDecimalPtr(r.MonthlyTextToSpeechNeuralChars), "1M chars", 1_000_000, nil))
+		costComponents = append(costComponents, r.s0CostComponent("Text to speech neural", "S1 Neural Text To Speech Characters", intPtrToDecimalPtr(r.MonthlyTextToSpeechNeuralChars), "1M chars", 1_000_000, nil))
 	}
 
 	costComponents = append(costComponents, []*schema.CostComponent{
-		r.s0HourlyCostComponent("Text to speech custom neural training", "Custom Neural Training", r.MonthlyTextToSpeechCustomNeuralTrainingHrs),
-		r.s0CostComponent("Text to speech custom neural", "Custom Neural Realtime Characters", intPtrToDecimalPtr(r.MonthlyTextToSpeechCustomNeuralChars), "1M chars", 1_000_000, nil),
-		r.s0CostComponent("Text to speech custom neural endpoint hosting", "Custom Neural Voice Model Hosting Unit", floatPtrToDecimalPtr(r.MonthlyTextToSpeechCustomNeuralEndpointHrs), "hours", 1, &schema.PriceFilter{Unit: strPtr("1/Hour")}), // This uses a different unit, so we don't want to filter the price by '1 Hour'
-		r.s0CostComponent("Text to speech long audio", "Neural Long Audio Characters", intPtrToDecimalPtr(r.MonthlyTextToSpeechLongAudioChars), "1M chars", 1_000_000, nil),
+		r.s0HourlyCostComponent("Text to speech custom neural training", "S1 Custom Neural Training", r.MonthlyTextToSpeechCustomNeuralTrainingHrs),
+		r.s0CostComponent("Text to speech custom neural", "S1 Custom Neural Realtime Characters", intPtrToDecimalPtr(r.MonthlyTextToSpeechCustomNeuralChars), "1M chars", 1_000_000, nil),
+		r.s0CostComponent("Text to speech custom neural endpoint hosting", "S1 Custom Neural Voice Model Hosting Unit", floatPtrToDecimalPtr(r.MonthlyTextToSpeechCustomNeuralEndpointHrs), "hours", 1, &schema.PriceFilter{Unit: strPtr("1/Hour")}), // This uses a different unit, so we don't want to filter the price by '1 Hour'
+		r.s0CostComponent("Text to speech long audio", "S1 Neural Long Audio Characters", intPtrToDecimalPtr(r.MonthlyTextToSpeechLongAudioChars), "1M chars", 1_000_000, nil),
 	}...)
 
 	costComponents = append(costComponents, r.personalVoiceCostComponents()...)
@@ -255,18 +256,18 @@ func (r *CognitiveAccountSpeech) costComponents() []*schema.CostComponent {
 	// Speech translation
 
 	costComponents = append(costComponents,
-		r.s0HourlyCostComponent("Speech translation", "Speech Translation", r.MonthlySpeechTranslationHrs),
+		r.s0HourlyCostComponent("Speech translation", "S1 Speech Translation", r.MonthlySpeechTranslationHrs),
 	)
 
 	// Speaker recognition
 	costComponents = append(costComponents, []*schema.CostComponent{
-		r.s0CostComponent("Speaker verification", "Speaker Verification Transactions", intPtrToDecimalPtr(r.MonthlySpeakerVerificationTransactions), "1K transactions", 1_000, nil),
-		r.s0CostComponent("Speaker identification", "Speaker Identification Transactions", intPtrToDecimalPtr(r.MonthlySpeakerIdentificationTransactions), "1K transactions", 1_000, nil),
+		r.s0CostComponent("Speaker verification", "S1 Speaker Verification Transactions", intPtrToDecimalPtr(r.MonthlySpeakerVerificationTransactions), "1K transactions", 1_000, nil),
+		r.s0CostComponent("Speaker identification", "S1 Speaker Identification Transactions", intPtrToDecimalPtr(r.MonthlySpeakerIdentificationTransactions), "1K transactions", 1_000, nil),
 	}...)
 
 	// Voice profiles
 	costComponents = append(costComponents,
-		r.s0CostComponent("Voice profiles", "Voice Storage", intPtrToDecimalPtr(r.MonthlyVoiceProfiles), "1K profiles", 1_000, nil),
+		r.s0CostComponent("Voice profiles", "S1 Voice Storage", intPtrToDecimalPtr(r.MonthlyVoiceProfiles), "1K profiles", 1_000, nil),
 	)
 
 	return costComponents
@@ -331,7 +332,7 @@ func (r *CognitiveAccountSpeech) personalVoiceCostComponents() []*schema.CostCom
 				AttributeFilters: []*schema.AttributeFilter{
 					{Key: "productName", Value: strPtr("Speech")},
 					{Key: "skuName", Value: strPtr("Text to Speech - Personal Voice")},
-					{Key: "meterName", Value: strPtr("Voice Storage")},
+					{Key: "meterName", Value: strPtr("Text to Speech - Personal Voice Voice Storage")},
 				},
 			},
 		},

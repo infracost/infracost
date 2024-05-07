@@ -283,13 +283,16 @@ func buildCostComponentRows(t table.Writer, currency string, costComponents []Co
 				c.Unit,
 			)
 
+			if c.PriceNotFound {
+				price = "not found"
+			}
+
 			t.AppendRow(table.Row{
 				label,
 				price,
 				price,
 				price,
 			}, table.RowConfig{AutoMerge: true, AlignAutoMerge: text.AlignLeft})
-
 		} else {
 			var tableRow table.Row
 			tableRow = append(tableRow, label)
