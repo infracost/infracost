@@ -1,6 +1,7 @@
 package testutil
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -113,6 +114,29 @@ instance_type = "m5.4xlarge"
 		content = `
 			# This is an empty file
 `
+	}
+
+	if strings.HasPrefix(filename, "module-call") {
+		pieces := strings.Split(filename, "|")
+		calls := pieces[1:]
+		content = `provider "aws" {
+  region                      = "us-east-1"
+  skip_credentials_validation = true
+  skip_requesting_account_id  = true
+  access_key                  = "mock_access_key"
+  secret_key                  = "mock_secret_key"
+}
+
+`
+		for i, call := range calls {
+			call = strings.TrimSuffix(call, ".tf")
+			call = strings.ReplaceAll(call, "-", "/")
+			content += `
+module "` + fmt.Sprintf("call_%d", i) + `" {
+  source = "` + call + `"
+}
+`
+		}
 	}
 
 	return os.WriteFile(filePath, []byte(content), 0600)

@@ -206,6 +206,10 @@ func (p *HCLProvider) VarFiles() []string {
 	return p.Parser.VarFiles()
 }
 
+func (p *HCLProvider) DependencyPaths() []string {
+	return p.Parser.DependencyPaths()
+}
+
 func (p *HCLProvider) EnvName() string {
 	return p.Parser.EnvName()
 }
