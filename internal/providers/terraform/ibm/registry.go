@@ -79,6 +79,7 @@ var FreeResources = []string{
 	"ibm_cd_toolchain_tool_slack",
 	"ibm_cd_toolchain_tool_sonarqube",
 	"ibm_cloud_shell_account_settings",
+	"ibm_cloudant_database",
 	"ibm_container_addons",
 	"ibm_cos_bucket_object_lock_configuration",
 	"ibm_dns_custom_resolver",
