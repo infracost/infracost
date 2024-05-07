@@ -2,12 +2,12 @@
  Name                            Monthly Qty  Unit   Monthly Cost   
                                                                     
  aws_lightsail_instance.linux1                                      
- └─ Virtual server (Linux/UNIX)          730  hours        $78.50   
+ └─ Virtual server (Linux/UNIX)          730  hours        $82.42   
                                                                     
  aws_lightsail_instance.win1                                        
  └─ Virtual server (Windows)             730  hours        $19.62   
                                                                     
- OVERALL TOTAL                                            $98.12 
+ OVERALL TOTAL                                           $102.04 
 
 *Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
@@ -18,5 +18,5 @@
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
-┃ main                                               ┃ $98           ┃ $0.00       ┃ $98        ┃
+┃ main                                               ┃ $102          ┃ $0.00       ┃ $102       ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
