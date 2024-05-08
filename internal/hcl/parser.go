@@ -251,7 +251,6 @@ type DetectedProject interface {
 	RelativePath() string
 	VarFiles() []string
 	YAML() string
-	DependencyPaths() []string
 }
 
 // Parser is a tool for parsing terraform templates at a given file system location.
@@ -271,7 +270,6 @@ type Parser struct {
 	hasChanges            bool
 	moduleSuffix          string
 	envMatcher            *EnvFileMatcher
-	moduleCalls           []string
 }
 
 // NewParser creates a new parser for the given RootPath.
@@ -286,7 +284,6 @@ func NewParser(projectRoot RootPath, envMatcher *EnvFileMatcher, moduleLoader *m
 		startingPath:        projectRoot.StartingPath,
 		detectedProjectPath: projectRoot.DetectedPath,
 		hasChanges:          projectRoot.HasChanges,
-		moduleCalls:         projectRoot.ModuleCalls,
 		workspaceName:       defaultTerraformWorkspaceName,
 		hclParser:           hclParser,
 		blockBuilder:        BlockBuilder{SetAttributes: []SetAttributesFunc{SetUUIDAttributes}, Logger: logger, HCLParser: hclParser},
@@ -338,37 +335,7 @@ func (p *Parser) YAML() string {
 		}
 	}
 
-	calls := p.DependencyPaths()
-	if len(calls) > 0 {
-		str.WriteString("    dependency_paths:\n")
-		for _, call := range calls {
-			str.WriteString(fmt.Sprintf("      - %s\n", call))
-		}
-	}
-
 	return str.String()
-}
-
-// DependencyPaths returns the list of module calls that the project depends on.
-// These are usually local module calls that have been detected in the project.
-func (p *Parser) DependencyPaths() []string {
-	if len(p.moduleCalls) == 0 {
-		return nil
-	}
-
-	sortedCalls := make([]string, len(p.moduleCalls))
-	for i, call := range p.moduleCalls {
-		relCall := call
-		dep, err := filepath.Rel(p.startingPath, call)
-		if err == nil {
-			relCall = dep
-		}
-
-		sortedCalls[i] = relCall
-	}
-	sort.Strings(sortedCalls)
-
-	return sortedCalls
 }
 
 // ParseDirectory parses all the terraform files in the detectedProjectPath into Blocks and then passes them to an Evaluator
