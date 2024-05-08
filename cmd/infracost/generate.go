@@ -123,7 +123,6 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 				Path:              p.RelativePath(),
 				Env:               p.EnvName(),
 				TerraformVarFiles: p.VarFiles(),
-				DependencyPaths:   p.DependencyPaths(),
 			}
 
 			if v, ok := detectedPaths[p.RelativePath()]; ok {

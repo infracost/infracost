@@ -198,10 +198,6 @@ func (p *TerragruntHCLProvider) VarFiles() []string {
 	return nil
 }
 
-func (p *TerragruntHCLProvider) DependencyPaths() []string {
-	return nil
-}
-
 func (p *TerragruntHCLProvider) YAML() string {
 	str := strings.Builder{}
 
@@ -209,7 +205,6 @@ func (p *TerragruntHCLProvider) YAML() string {
 
 	return str.String()
 }
-
 func (p *TerragruntHCLProvider) Type() string {
 	return "terragrunt_dir"
 }
