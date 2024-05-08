@@ -23,6 +23,7 @@ type DetectedProject struct {
 	Name              string
 	Path              string
 	TerraformVarFiles []string
+	DependencyPaths   []string
 	Env               string
 }
 
