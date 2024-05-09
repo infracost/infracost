@@ -19,6 +19,7 @@ import (
 	"github.com/zclconf/go-cty/cty/gocty"
 
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/hcl/modules"
 )
 
 var (
@@ -1623,6 +1624,12 @@ func (p *ProjectLocator) shallowDecodeTerraformBlocks(fullPath string, files map
 				err := gocty.FromCtyValue(val, &realPath)
 				if err != nil {
 					p.logger.Debug().Err(err).Str("module", strings.Join(module.Labels, ".")).Msg("could not read source value of module as string")
+					continue
+				}
+
+				// we only care about local modules for building a dependency tree
+				// so skip any remote modules here.
+				if !modules.IsLocalModule(realPath) {
 					continue
 				}
 

@@ -47,7 +47,7 @@ type ManifestModule struct {
 }
 
 func (m ManifestModule) URL() string {
-	if isLocalModule(m.Source) {
+	if IsLocalModule(m.Source) {
 		return ""
 	}
 

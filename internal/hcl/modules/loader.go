@@ -201,7 +201,7 @@ func (m *ModuleLoader) loadModules(path string, prefix string) ([]*ManifestModul
 				}
 
 				// only include non-local modules in the manifest since we don't want to cache local ones.
-				if !isLocalModule(metadata.Source) {
+				if !IsLocalModule(metadata.Source) {
 					manifestMu.Lock()
 					manifestModules = append(manifestModules, metadata)
 					manifestMu.Unlock()
@@ -272,7 +272,7 @@ func (m *ModuleLoader) loadModule(moduleCall *tfconfig.ModuleCall, parentPath st
 	} else {
 		m.logger.Debug().Msgf("module %s needs loading: %s", key, err.Error())
 	}
-	if isLocalModule(source) {
+	if IsLocalModule(source) {
 		dir, err := m.cachePathRel(filepath.Join(parentPath, source))
 		if err != nil {
 			return nil, err
@@ -478,9 +478,9 @@ func (m *ModuleLoader) cachePathRel(targetPath string) (string, error) {
 	return filepath.Rel(absCachePath, absTargetPath)
 }
 
-// isLocalModule checks if the module is a local module by checking
+// IsLocalModule checks if the module is a local module by checking
 // if the module source starts with any known local prefixes
-func isLocalModule(source string) bool {
+func IsLocalModule(source string) bool {
 	return strings.HasPrefix(source, "./") ||
 		strings.HasPrefix(source, "../") ||
 		strings.HasPrefix(source, ".\\") ||
