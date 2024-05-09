@@ -1,13 +1,22 @@
 
- Name  Monthly Qty  Unit  Monthly Cost 
-                                       
- OVERALL TOTAL                   $0.00 
+ Name                                             Monthly Qty  Unit          Monthly Cost 
+                                                                                          
+ google_cloud_run_v2_service.throttling_disabled                                          
+ ├─ CPU Allocation Time (tier 2)                    5,256,000  vCPU-seconds       $113.53 
+ └─ Memory Allocation Time (tier 2)                 2,628,000  GiB-seconds          $6.31 
+                                                                                          
+ google_cloud_run_v2_service.throttling_enabled                                           
+ ├─ CPU Allocation Time (tier 2)                    1,800,000  vCPU-seconds        $60.48 
+ ├─ Memory Allocation Time (tier 2)                   900,000  GiB-seconds          $3.15 
+ └─ Number of requests                                500,000  request              $0.20 
+                                                                                          
+ OVERALL TOTAL                                                                    $183.67 
 ──────────────────────────────────
-1 cloud resource was detected:
-∙ 1 was estimated
+2 cloud resources were detected:
+∙ 2 were estimated
 
 ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
 ┃ Project                                            ┃ Monthly cost ┃
 ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestCloudRunV2Service                              ┃ $0.00        ┃
+┃ TestCloudRunV2Service                              ┃ $184         ┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
