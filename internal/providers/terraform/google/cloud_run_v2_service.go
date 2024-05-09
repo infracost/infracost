@@ -16,7 +16,6 @@ func getCloudRunV2ServiceRegistryItem() *schema.RegistryItem {
 func newCloudRunV2Service(d *schema.ResourceData, u *schema.UsageData) *schema.Resource {
 	region := d.Get("location").String()
 	limits := d.Get("template.0.containers.0.resources.0.limits").Map()
-	autoscaling := d.Get("template.0.scaling").Map()
 	cpu := int64(1)
 	if val, ok := limits["cpu"]; ok {
 		cpu = int64(val.Float())
@@ -33,11 +32,8 @@ func newCloudRunV2Service(d *schema.ResourceData, u *schema.UsageData) *schema.R
 		isCpuIdle = d.Get("template.0.containers.0.resources.0.cpu_idle").Bool()
 	}
 	minInstanceCount := float64(0.5)
-	if !isCpuIdle {
-		minInstanceCount = float64(1)
-	}
-	if val, ok := autoscaling["min_instance_count"]; ok {
-		minInstanceCount = val.Float()
+	if !d.IsEmpty("template.0.scaling.0.min_instance_count") {
+		minInstanceCount = d.Get("template.0.scaling.0.min_instance_count").Float()
 	}
 	r := &google.CloudRunV2Service{
 		Address:          d.Address,

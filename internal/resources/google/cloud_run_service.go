@@ -32,15 +32,10 @@ func (r *CloudRunService) UsageSchema() []*schema.UsageItem {
 	}
 }
 
-// PopulateUsage parses the u schema.UsageData into the CloudRunService.
-// It uses the `infracost_usage` struct tags to populate data into the CloudRunService.
 func (r *CloudRunService) PopulateUsage(u *schema.UsageData) {
 	resources.PopulateArgsWithUsage(r, u)
 }
 
-// BuildResource builds a schema.Resource from a valid CloudRunService struct.
-// This method is called after the resource is initialised by an IaC provider.
-// See providers folder for more information.
 func (r *CloudRunService) BuildResource() *schema.Resource {
 	regionTier := GetRegionTier(r.Region)
 	var cpuName string

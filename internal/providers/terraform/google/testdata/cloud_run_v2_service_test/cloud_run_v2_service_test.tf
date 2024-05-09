@@ -1,7 +1,6 @@
 provider "google" {
   credentials = "{\"type\":\"service_account\"}"
   project     = "my-project"
-  region      = "us-central1"
 }
 
 resource "google_cloud_run_v2_service" "throttling_enabled" {
@@ -31,6 +30,9 @@ resource "google_cloud_run_v2_service" "throttling_disabled" {
         }
         cpu_idle = false
       }
+    }
+    scaling {
+      min_instance_count = 2
     }
   }
 }
