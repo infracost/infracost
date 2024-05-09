@@ -959,6 +959,7 @@ type RootPath struct {
 
 	HasChildVarFiles bool
 	IsTerragrunt     bool
+	ModuleCalls      []string
 }
 
 func (r *RootPath) RelPath() string {
@@ -1158,6 +1159,7 @@ func (p *ProjectLocator) FindRootModules(startingPath string) []RootPath {
 				StartingPath:      startingPath,
 				DetectedPath:      dir.path,
 				HasChanges:        p.hasChanges(dir.path),
+				ModuleCalls:       p.moduleCalls[dir.path],
 				TerraformVarFiles: p.discoveredVarFiles[dir.path],
 				Matcher:           p.envMatcher,
 				IsTerragrunt:      dir.isTerragrunt,
@@ -1173,6 +1175,7 @@ func (p *ProjectLocator) FindRootModules(startingPath string) []RootPath {
 					StartingPath:      startingPath,
 					DetectedPath:      dir.path,
 					HasChanges:        p.hasChanges(dir.path),
+					ModuleCalls:       p.moduleCalls[dir.path],
 					TerraformVarFiles: p.discoveredVarFiles[dir.path],
 					Matcher:           p.envMatcher,
 					IsTerragrunt:      dir.isTerragrunt,

@@ -1,0 +1,13 @@
+.
+└── infra
+    ├── modules
+    │   ├── is_called
+    │   │   └── main.tf
+    │   ├── is_also_called
+    │   │   └── main.tf
+    │   └── is_a_project
+    │       └── main.tf
+    ├── dev
+    │   └── module-call|..-modules-is_called|..-modules-is_also_called.tf
+    └── prod
+        └── module-call|..-modules-is_called.tf
