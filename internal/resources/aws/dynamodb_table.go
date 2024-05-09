@@ -306,6 +306,7 @@ func (a *DynamoDBTable) wruCostComponent(region string, monthlyWRU *int64) *sche
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }
 
@@ -331,6 +332,7 @@ func (a *DynamoDBTable) rruCostComponent(region string, monthlyRRU *int64) *sche
 		PriceFilter: &schema.PriceFilter{
 			PurchaseOption: strPtr("on_demand"),
 		},
+		UsageBased: true,
 	}
 }
 

@@ -1,21 +1,24 @@
 
- Name                                           Monthly Qty  Unit                    Monthly Cost 
-                                                                                                  
- aws_glue_catalog_database.with_usage                                                             
- ├─ Storage                                               2  100k objects                   $2.00 
- └─ Requests                                            300  1M requests                  $300.00 
-                                                                                                  
- aws_glue_catalog_database.without_usage                                                          
- ├─ Storage                               Monthly cost depends on usage: $1.00 per 100k objects   
- └─ Requests                              Monthly cost depends on usage: $1.00 per 1M requests    
-                                                                                                  
+ Name                                           Monthly Qty  Unit                    Monthly Cost    
+                                                                                                     
+ aws_glue_catalog_database.with_usage                                                                
+ ├─ Storage                                               2  100k objects                   $2.00  * 
+ └─ Requests                                            300  1M requests                  $300.00  * 
+                                                                                                     
+ aws_glue_catalog_database.without_usage                                                             
+ ├─ Storage                               Monthly cost depends on usage: $1.00 per 100k objects      
+ └─ Requests                              Monthly cost depends on usage: $1.00 per 1M requests       
+                                                                                                     
  OVERALL TOTAL                                                                            $302.00 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 3 cloud resources were detected:
-∙ 3 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 3 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestGlueCatalogDatabaseGoldenFile                  ┃ $302         ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $0.00         ┃ $302        ┃ $302       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

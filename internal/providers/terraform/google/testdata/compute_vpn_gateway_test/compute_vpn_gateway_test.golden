@@ -1,25 +1,27 @@
 
- Name                                                       Monthly Qty  Unit  Monthly Cost 
-                                                                                            
- google_compute_vpn_gateway.my_compute_vpn_gateway                                          
- └─ Network egress                                                                          
-    ├─ IPSec traffic within the same region                         250  GB           $5.00 
-    ├─ IPSec traffic within the US or Canada                        100  GB           $2.00 
-    ├─ IPSec traffic within Europe                                   70  GB           $1.40 
-    ├─ IPSec traffic within Asia                                     50  GB           $4.00 
-    ├─ IPSec traffic within South America                           100  GB          $14.00 
-    ├─ IPSec traffic to/from Indonesia and Oceania                   50  GB           $5.00 
-    └─ IPSec traffic between continents (excludes Oceania)          200  GB          $16.00 
-                                                                                            
+ Name                                                       Monthly Qty  Unit  Monthly Cost    
+                                                                                               
+ google_compute_vpn_gateway.my_compute_vpn_gateway                                             
+ └─ Network egress                                                                             
+    ├─ IPSec traffic within the same region                         250  GB           $5.00  * 
+    ├─ IPSec traffic within the US or Canada                        100  GB           $2.00  * 
+    ├─ IPSec traffic within Europe                                   70  GB           $1.40  * 
+    ├─ IPSec traffic within Asia                                     50  GB           $4.00  * 
+    ├─ IPSec traffic within South America                           100  GB          $14.00  * 
+    ├─ IPSec traffic to/from Indonesia and Oceania                   50  GB           $5.00  * 
+    └─ IPSec traffic between continents (excludes Oceania)          200  GB          $16.00  * 
+                                                                                               
  OVERALL TOTAL                                                                       $47.40 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 2 cloud resources were detected:
-∙ 1 was estimated, it includes usage-based costs, see https://infracost.io/usage-file
-∙ 1 was free:
-  ∙ 1 x google_compute_network
+∙ 1 was estimated
+∙ 1 was free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestComputeVPNGateway                              ┃ $47          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $0.00         ┃ $47         ┃ $47        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

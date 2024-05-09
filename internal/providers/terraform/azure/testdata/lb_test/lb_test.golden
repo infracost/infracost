@@ -1,22 +1,23 @@
 
- Name                        Monthly Qty  Unit              Monthly Cost 
-                                                                         
- azurerm_lb.standard                                                     
- └─ Data processed                   100  GB                       $0.50 
-                                                                         
- azurerm_lb.withoutUsage                                                 
- └─ Data processed        Monthly cost depends on usage: $0.005 per GB   
-                                                                         
+ Name                        Monthly Qty  Unit              Monthly Cost    
+                                                                            
+ azurerm_lb.standard                                                        
+ └─ Data processed                   100  GB                       $0.50  * 
+                                                                            
+ azurerm_lb.withoutUsage                                                    
+ └─ Data processed        Monthly cost depends on usage: $0.005 per GB      
+                                                                            
  OVERALL TOTAL                                                     $0.50 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 4 cloud resources were detected:
-∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
-∙ 2 were free:
-  ∙ 1 x azurerm_lb
-  ∙ 1 x azurerm_resource_group
+∙ 2 were estimated
+∙ 2 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMLoadBalancerGoldenFile                  ┃ $0.50        ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $0.00         ┃ $0.50       ┃ $0.50      ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

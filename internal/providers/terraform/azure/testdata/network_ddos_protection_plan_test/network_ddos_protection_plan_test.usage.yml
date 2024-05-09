@@ -1,0 +1,4 @@
+version: 0.1
+resource_usage:
+  azurerm_network_ddos_protection_plan.network_ddos_protection_plan_with_usage:
+    overage_amount: 5

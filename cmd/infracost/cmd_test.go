@@ -24,7 +24,7 @@ var (
 	timestampRegex   = regexp.MustCompile(`(\d{4})-(\d{2})-(\d{2})(T| )(\d{2}):(\d{2}):(\d{2}(?:\.\d*)?)(([\+-](\d{2}):(\d{2})|Z| [A-Z]+)?)`)
 	urlRegex         = regexp.MustCompile(`https://dashboard.infracost.io/share/.*`)
 	projectPathRegex = regexp.MustCompile(`(Project: .*) \(.*/infracost/examples/.*\)`)
-	versionRegex     = regexp.MustCompile(`Infracost v.*`)
+	versionRegex     = regexp.MustCompile(`Infracost (v|preview).*`)
 	panicRegex       = regexp.MustCompile(`runtime\serror:([\w\d\n\r\[\]\:\/\.\\(\)\+\,\{\}\*\@\s\?]*)Environment`)
 	pathRegex        = regexp.MustCompile(`(/.*/)(infracost/infracost/cmd/infracost/testdata/.*)`)
 	credsRegex       = regexp.MustCompile(`/.*/credentials\.yml`)
@@ -41,6 +41,8 @@ type GoldenFileOptions = struct {
 	// RunTerraformCLI sets the cmd test to also run the cmd with --terraform-force-cli set
 	RunTerraformCLI bool
 	IgnoreNonGraph  bool
+	IgnoreLogs      bool
+	LogLevel        *string
 }
 
 func DefaultOptions() *GoldenFileOptions {
@@ -128,10 +130,13 @@ func GetCommandOutput(t *testing.T, args []string, testOptions *GoldenFileOption
 		c.OutWriter = outBuf
 		c.Exit = func(code int) {}
 
-		if testOptions.CaptureLogs {
-			logBuf = testutil.ConfigureTestToCaptureLogs(t, c)
-		} else {
-			testutil.ConfigureTestToFailOnLogs(t, c)
+		level := "warn"
+		if testOptions.LogLevel != nil {
+			level = *testOptions.LogLevel
+		}
+
+		if !testOptions.IgnoreLogs {
+			logBuf = testutil.ConfigureTestToCaptureLogs(t, c, level)
 		}
 
 		for _, option := range ctxOptions {

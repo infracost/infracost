@@ -1,43 +1,43 @@
 
- Name                                        Monthly Qty  Unit              Monthly Cost 
-                                                                                         
- aws_vpc_endpoint.gateway_loadbalancer                                                   
- ├─ Data processed                        Monthly cost depends on usage: $0.0035 per GB  
- └─ Endpoint (GatewayLoadBalancer)                   730  hours                    $7.30 
-                                                                                         
- aws_vpc_endpoint.interface                                                              
- ├─ Data processed (first 1PB)            Monthly cost depends on usage: $0.01 per GB    
- └─ Endpoint (Interface)                             730  hours                    $7.30 
-                                                                                         
- aws_vpc_endpoint.interface_withBigUsage                                                 
- ├─ Data processed (first 1PB)                     1,000  GB                      $10.00 
- ├─ Data processed (next 4PB)                      4,000  GB                      $24.00 
- ├─ Data processed (over 5PB)                      2,000  GB                       $8.00 
- └─ Endpoint (Interface)                             730  hours                    $7.30 
-                                                                                         
- aws_vpc_endpoint.interface_withUsage                                                    
- ├─ Data processed (first 1PB)                     1,000  GB                      $10.00 
- └─ Endpoint (Interface)                             730  hours                    $7.30 
-                                                                                         
- aws_vpc_endpoint.multiple_interfaces                                                    
- ├─ Data processed (first 1PB)            Monthly cost depends on usage: $0.01 per GB    
- └─ Endpoint (Interface)                           1,460  hours                   $14.60 
-                                                                                         
- aws_vpc_endpoint.with_dynamic_subnet                                                    
- ├─ Data processed (first 1PB)            Monthly cost depends on usage: $0.01 per GB    
- └─ Endpoint (Interface)                           1,460  hours                   $14.60 
-                                                                                         
+ Name                                        Monthly Qty  Unit              Monthly Cost    
+                                                                                            
+ aws_vpc_endpoint.interface_withBigUsage                                                    
+ ├─ Data processed (first 1PB)                     1,000  GB                      $10.00  * 
+ ├─ Data processed (next 4PB)                      4,000  GB                      $24.00  * 
+ ├─ Data processed (over 5PB)                      2,000  GB                       $8.00  * 
+ └─ Endpoint (Interface)                             730  hours                    $7.30    
+                                                                                            
+ aws_vpc_endpoint.interface_withUsage                                                       
+ ├─ Data processed (first 1PB)                     1,000  GB                      $10.00  * 
+ └─ Endpoint (Interface)                             730  hours                    $7.30    
+                                                                                            
+ aws_vpc_endpoint.multiple_interfaces                                                       
+ ├─ Data processed (first 1PB)            Monthly cost depends on usage: $0.01 per GB       
+ └─ Endpoint (Interface)                           1,460  hours                   $14.60    
+                                                                                            
+ aws_vpc_endpoint.with_dynamic_subnet                                                       
+ ├─ Data processed (first 1PB)            Monthly cost depends on usage: $0.01 per GB       
+ └─ Endpoint (Interface)                           1,460  hours                   $14.60    
+                                                                                            
+ aws_vpc_endpoint.gateway_loadbalancer                                                      
+ ├─ Data processed                        Monthly cost depends on usage: $0.0035 per GB     
+ └─ Endpoint (GatewayLoadBalancer)                   730  hours                    $7.30    
+                                                                                            
+ aws_vpc_endpoint.interface                                                                 
+ ├─ Data processed (first 1PB)            Monthly cost depends on usage: $0.01 per GB       
+ └─ Endpoint (Interface)                             730  hours                    $7.30    
+                                                                                            
  OVERALL TOTAL                                                                   $110.40 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 10 cloud resources were detected:
-∙ 6 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
-∙ 4 were free:
-  ∙ 2 x aws_subnet
-  ∙ 1 x aws_vpc
-  ∙ 1 x aws_vpc_endpoint
+∙ 6 were estimated
+∙ 4 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestVpcEndpointGoldenFile                          ┃ $110         ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $58           ┃ $52         ┃ $110       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

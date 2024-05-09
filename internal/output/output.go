@@ -61,6 +61,7 @@ func (r *Root) HasUnsupportedResources() bool {
 
 type Project struct {
 	Name          string                  `json:"name"`
+	DisplayName   string                  `json:"displayName"`
 	Metadata      *schema.ProjectMetadata `json:"metadata"`
 	PastBreakdown *Breakdown              `json:"pastBreakdown"`
 	Breakdown     *Breakdown              `json:"breakdown"`
@@ -72,7 +73,7 @@ type Project struct {
 // ToSchemaProject generates a schema.Project from a Project. The created schema.Project is not suitable to be
 // used outside simple schema.Project to schema.Project comparisons. It contains missing information
 // that cannot be inferred from a Project.
-func (p Project) ToSchemaProject() *schema.Project {
+func (p *Project) ToSchemaProject() *schema.Project {
 	var pastResources []*schema.Resource
 	if p.PastBreakdown != nil {
 		pastResources = append(convertOutputResources(p.PastBreakdown.Resources, false), convertOutputResources(p.PastBreakdown.FreeResources, true)...)
@@ -93,6 +94,7 @@ func (p Project) ToSchemaProject() *schema.Project {
 
 	return &schema.Project{
 		Name:          p.Name,
+		DisplayName:   p.DisplayName,
 		Metadata:      clonedMetadata,
 		PastResources: pastResources,
 		Resources:     resources,
@@ -134,6 +136,7 @@ func convertCostComponents(outComponents []CostComponent) []*schema.CostComponen
 			HourlyQuantity:  c.HourlyQuantity,
 			MonthlyQuantity: c.MonthlyQuantity,
 			UsageBased:      c.UsageBased,
+			PriceNotFound:   c.PriceNotFound,
 		}
 		sc.SetPrice(c.Price)
 
@@ -216,6 +219,10 @@ func (r *Root) HasDiff() bool {
 
 // Label returns the display name of the project
 func (p *Project) Label() string {
+	if p.DisplayName != "" {
+		return p.DisplayName
+	}
+
 	return p.Name
 }
 
@@ -272,6 +279,7 @@ type CostComponent struct {
 	HourlyCost      *decimal.Decimal `json:"hourlyCost"`
 	MonthlyCost     *decimal.Decimal `json:"monthlyCost"`
 	UsageBased      bool             `json:"usageBased,omitempty"`
+	PriceNotFound   bool             `json:"priceNotFound"`
 }
 
 type ActualCosts struct {
@@ -535,6 +543,7 @@ func outputCostComponents(costComponents []*schema.CostComponent) []CostComponen
 			HourlyCost:      c.HourlyCost,
 			MonthlyCost:     c.MonthlyCost,
 			UsageBased:      c.UsageBased,
+			PriceNotFound:   c.PriceNotFound,
 		})
 	}
 	return comps
@@ -665,6 +674,7 @@ func ToOutputFormat(c *config.Config, projects []*schema.Project) (Root, error) 
 
 		outProjects = append(outProjects, Project{
 			Name:          project.Name,
+			DisplayName:   project.DisplayName,
 			Metadata:      project.Metadata,
 			PastBreakdown: pastBreakdown,
 			Breakdown:     breakdown,
@@ -721,24 +731,6 @@ func (r *Root) summaryMessage(showSkipped bool) string {
 		} else {
 			msg += fmt.Sprintf("\n∙ %d were estimated", *r.Summary.TotalSupportedResources)
 		}
-
-		allUsageBased := *r.Summary.TotalUsageBasedResources == *r.Summary.TotalSupportedResources
-
-		if r.Summary.TotalUsageBasedResources != nil && *r.Summary.TotalUsageBasedResources > 0 {
-			usageBasedCount := "1 of which"
-			if allUsageBased {
-				usageBasedCount = "it includes"
-			}
-
-			if *r.Summary.TotalUsageBasedResources > 1 {
-				usageBasedCount = fmt.Sprintf("%d of which include", *r.Summary.TotalUsageBasedResources)
-				if allUsageBased {
-					usageBasedCount = "all of which include"
-				}
-			}
-
-			msg += fmt.Sprintf(", %s usage-based costs, see %s", usageBasedCount, ui.SecondaryLinkString("https://infracost.io/usage-file"))
-		}
 	}
 
 	if r.Summary.TotalNoPriceResources != nil && *r.Summary.TotalNoPriceResources > 0 {
@@ -746,13 +738,6 @@ func (r *Root) summaryMessage(showSkipped bool) string {
 			msg += "\n∙ 1 was free"
 		} else {
 			msg += fmt.Sprintf("\n∙ %d were free", *r.Summary.TotalNoPriceResources)
-		}
-
-		if showSkipped {
-			msg += ":"
-			msg += formatCounts(r.Summary.NoPriceResourceCounts)
-		} else {
-			msg += seeDetailsMessage
 		}
 	}
 
@@ -997,18 +982,24 @@ func calculateTotalCosts(resources []Resource) (*decimal.Decimal, *decimal.Decim
 
 func sortResources(resources []Resource, groupKey string) {
 	sort.Slice(resources, func(i, j int) bool {
-		// If an empty group key is passed just sort by name
-		if groupKey == "" {
-			return resources[i].Name < resources[j].Name
+		// if they are in different groups, sort by group name
+		if groupKey != "" && resources[i].Metadata[groupKey] != resources[j].Metadata[groupKey] {
+			return resources[i].Metadata[groupKey].(string) < resources[j].Metadata[groupKey].(string)
 		}
 
-		// If the resources are in the same group then sort by name
-		if resources[i].Metadata[groupKey] == resources[j].Metadata[groupKey] {
-			return resources[i].Name < resources[j].Name
+		// if the costs are different, sort by cost descending
+		if resources[i].MonthlyCost == nil {
+			if resources[j].MonthlyCost != nil {
+				return false
+			}
+		} else if resources[j].MonthlyCost == nil {
+			return true
+		} else if !resources[i].MonthlyCost.Equal(*resources[j].MonthlyCost) {
+			return resources[i].MonthlyCost.GreaterThan(*resources[j].MonthlyCost)
 		}
 
-		// Sort by the group key
-		return resources[i].Metadata[groupKey].(string) < resources[j].Metadata[groupKey].(string)
+		// Sort by name
+		return resources[i].Name < resources[j].Name
 	})
 }
 

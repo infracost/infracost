@@ -1,7 +1,7 @@
-# You can use this file to define resource usage estimates for Infracost to use when calculating
-# the cost of usage-based resource, such as AWS S3 or Lambda.
+# This is an example usage file. It tells Infracost what usage values
+# should be used when calculating usage costs for things like AWS S3 or Lambda.
 # `infracost breakdown --usage-file infracost-usage.yml [other flags]`
-# See https://infracost.io/usage-file/ for docs
+# See docs: https://infracost.io/usage-file/
 version: 0.1
 resource_type_default_usage:
   aws_lambda_function:
@@ -815,6 +815,9 @@ resource_usage:
   #
   # Terraform AzureRM resources
   #
+  azurerm_app_configuration.my_configuration:
+    monthly_additional_requests: 30000 # Monthly number of requests which are above the included 200,000 per day per replica.
+
   azurerm_api_management.my_api_management:
     monthly_api_calls: 10000000 # Monthly number of api calls (only for consumption tier).
     self_hosted_gateway_count: 5 # Number of self-hosted gateways (only for premium tier).
@@ -851,6 +854,10 @@ resource_usage:
     monthly_jobs_compute_dbu_hrs: 1000 # Monthly number of Jobs Compute Databricks Units in DBU-hours.
     monthly_jobs_light_compute_dbu_hrs: 2000 # Monthly number of Jobs Light Compute Databricks Units in DBU-hours.
 
+  azurerm_federated_identity_credential.my_credential:
+    monthly_active_p1_users: 50100 # Monthly number of active users if you are using the Premium P1 license.
+    monthly_active_p2_users: 50100 # Monthly number of active users if you are using the Premium P2 license.
+
   azurerm_function_app.my_functions:
     monthly_executions: 100000 # Monthly executions to the function. Only applicable for Consumption plan.
     execution_duration_ms: 500 # Average duration of each execution in milliseconds. Only applicable for Consumption plan.
@@ -860,6 +867,92 @@ resource_usage:
   azurerm_cdn_endpoint.my_endpoint:
     monthly_outbound_gb: 1000000 # Monthly number of outbound data transfers in GB.
     monthly_rules_engine_requests: 10000000 # Monthly number of rules engine requests.
+
+  azurerm_cognitive_account.my_cognitive_account:
+    ## SpeechServices
+    monthly_speech_to_text_standard_hrs: 100 # Monthly number of hours of Speech to Text audio hours
+    monthly_speech_to_text_standard_batch_hrs: 100 # Monthly number of hours of Speech to Text audio hours for batch processing
+    monthly_speech_to_text_custom_hrs: 100  # Monthly number of hours of Speech to Text audio hours for Custom Speech Model
+    monthly_speech_to_text_custom_batch_hrs: 100 # Monthly number of hours of Speech to Text audio hours for Custom Speech Model batch processing
+    monthly_speech_to_text_custom_endpoint_hrs: 100 # Monthly number of hours of Speech to Text audio hours for Custom Speech Model endpoint hosting
+    monthly_speech_to_text_custom_training_hrs: 100 # Monthly number of hours of Speech to Text audio hours for Custom Speech Model training
+    monthly_speech_to_text_enhanced_add_ons_hrs: 100 # Monthly number of hours of Speech to Text audio hours for enhanced add-on features
+    monthly_speech_to_text_conversation_transcription_multi_channel_audio_hrs: 100 # Monthly number of hours of Speech to Text audio hours for conversation transcription multi-channel audio
+    monthly_text_to_speech_neural_chars: 100_000 # Monthly number of characters for Text to Speech with neural voices
+    monthly_text_to_speech_custom_neural_training_hrs: 100 # Monthly number of hours of Text to Speech Customized Neural training
+    monthly_text_to_speech_custom_neural_chars: 100_000 # Monthly number of characters for Text to Speech with Custom Ceural Voices
+    monthly_text_to_speech_custom_neural_endpoint_hrs: 100 # Monthly number of hours of Text to Speech Custom Neural Voice endpoint hosting
+    monthly_text_to_speech_long_audio_chars: 100_000 # Monthly number of characters for Text to Speech with Long Audio Creation
+    monthly_text_to_speech_personal_voice_profiles: 10 # Monthly number of personal voice profiles for Text to Speech
+    monthly_text_to_speech_personal_voice_chars: 100_000 # Monthly number of characters for Text to Speech with Personal Voice Profiles
+    monthly_speech_translation_hrs: 100 # Monthly number of hours of Speech Translation audio hours
+    monthly_speaker_verification_transactions: 1_000 # Monthly number of speaker verification transactions
+    monthly_speaker_identification_transactions: 1_000 # Monthly number of speaker identification transactions
+    monthly_voice_profiles: 1_000 # Monthly number of voice profiles
+    # Standard commitment
+    monthly_commitment_speech_to_text_standard_hrs: 2000 # Monthly number of committed hours of Speech to Text audio hours (2,000, 10,000 or 50,000)
+    monthly_commitment_speech_to_text_standard_overage_hrs: 100 # Monthly number of hours of Speech to Text audio hours over the committed amount
+    monthly_commitment_speech_to_text_custom_hrs: 2000 # Monthly number of committed hours of Speech to Text audio hours for Custom Speech Model (2,000, 10,000 or 50,000)
+    monthly_commitment_speech_to_text_custom_overage_hrs: 100 # Monthly number of hours of Speech to Text audio hours for Custom Speech Model over the committed amount
+    monthly_commitment_speech_to_text_enhanced_add_ons_hrs: 2000 # Monthly number of committed hours of Speech to Text audio hours for enhanced add-on features (2,000, 10,000 or 50,000)
+    monthly_commitment_speech_to_text_enhanced_add_ons_overage_hrs: 100 # Monthly number of hours of Speech to Text audio hours for enhanced add-on features over the committed amount
+    monthly_commitment_text_to_speech_neural_commitment_chars: 80_000_000 # Monthly number of committed characters for Text to Speech with neural voices (80M, 40M or 200M)
+    monthly_commitment_text_to_speech_neural_overage_chars: 1_000_000 # Monthly number of characters for Text to Speech with neural voices over the committed amount
+    # Connected container commitment
+    monthly_connected_container_commitment_speech_to_text_standard_hrs: 2000 # Monthly number of committed hours of Speech to Text audio hours (2,000, 10,000 or 50,000)
+    monthly_connected_container_commitment_speech_to_text_standard_overage_hrs: 100 # Monthly number of hours of Speech to Text audio hours over the committed amount
+    monthly_connected_container_commitment_speech_to_text_custom_hrs: 2000 # Monthly number of committed hours of Speech to Text audio hours for Custom Speech Model (2,000, 10,000 or 50,000)
+    monthly_connected_container_commitment_speech_to_text_custom_overage_hrs: 100 # Monthly number of hours of Speech to Text audio hours for Custom Speech Model over the committed amount
+    monthly_connected_container_commitment_speech_to_text_enhanced_add_ons_hrs: 2000 # Monthly number of committed hours of Speech to Text audio hours for enhanced add-on features (2,000, 10,000 or 50,000)
+    monthly_connected_container_commitment_speech_to_text_enhanced_add_ons_overage_hrs: 100 # Monthly number of hours of Speech to Text audio hours for enhanced add-on features over the committed amount
+    monthly_connected_container_commitment_text_to_speech_neural_commitment_chars: 80_000_000 # Monthly number of committed characters for Text to Speech with neural voices (80M, 40M or 200M)
+    monthly_connected_container_commitment_text_to_speech_neural_overage_chars: 1_000_000 # Monthly number of characters for Text to Speech with neural voices over the committed amountinfracost-usage-example.yml
+    ## LUIS
+    monthly_luis_text_requests: 1_000 # Monthly number of text requests to LUIS
+    monthly_luis_speech_requests: 1_000 # Monthly number of speech requests to LUIS
+    # Standard commitment
+    monthly_commitment_luis_text_requests: 1_000_000 # Monthly number of committed text requests to LUIS (1M, 5M or 25M)
+    monthly_commitment_luis_text_overage_requests: 1_000 # Monthly number of text requests to LUIS over the committed amount
+    # Connected container commitment
+    monthly_connected_container_commitment_luis_text_requests: 1_000_000 # Monthly number of committed text requests to LUIS (1M, 5M or 25M)
+    monthly_connected_container_commitment_luis_text_overage_requests: 1_000 # Monthly number of text requests to LUIS over the committed amount
+    ## TextAnalytics / Language
+    monthly_language_text_analytics_records: 10_000 # Monthly number of Text Analytics records (Sentiment Analysis, Key Phrase Extraction, Language Detection, Named Entity Recognition, PII Detection)
+    monthly_language_summarization_records: 10_000 # Monthly number of summarization records
+    monthly_language_conversational_language_understanding_records: 10_000 # Monthly number of Conversational Language Understanding and Orchestration Workflow records.
+    monthly_language_conversational_language_understanding_advanced_training_hours: 10 # Monthly number of Conversational Language Understanding and Orchestration Workflow advanced training hours.
+    monthly_language_customized_text_classification_records: 10_000 # Monthly number of customized text classification records.
+    monthly_language_customized_summarization_records: 10_000 # Monthly number of customized summarization records.
+    monthly_language_customized_question_answering_records: 10_000 # Monthly number of customized question answering records.
+    monthly_language_customized_training_hours: 10 # Monthly number of customized training hours.
+    monthly_language_text_analytics_for_health_records: 10_000 # Monthly number of Text Analytics for health records.
+    # Standard commitment
+    monthly_commitment_language_text_analytics_records: 1_000_000 # Monthly number of committed Text Analytics records (1M, 3M or 10M)
+    monthly_commitment_language_text_analytics_overage_records: 10_000 # Monthly number of Text Analytics records over the committed amount
+    monthly_commitment_language_summarization_records: 3_000_000 # Monthly number of committed summarization records (3M or 10M)
+    monthly_commitment_language_summarization_overage_records: 10_000 # Monthly number of summarization records over the committed amount
+    # Connected container commitment
+    monthly_connected_container_commitment_language_text_analytics_records: 1_000_000 # Monthly number of committed Text Analytics records (1M, 3M or 10M)
+    monthly_connected_container_commitment_language_text_analytics_overage_records: 10_000 # Monthly number of Text Analytics records over the committed amount
+    monthly_connected_container_commitment_language_summarization_records: 3_000_000 # Monthly number of committed summarization records (3M or 10M)
+    monthly_connected_container_commitment_language_summarization_overage_records: 10_000  # Monthly number of summarization records over the committed amount
+
+  azurerm_cognitive_deployment.my_openai_deployment:
+    monthly_language_input_tokens: 10_000_000 # Monthly number of language input tokens.
+    monthly_language_output_tokens: 10_000_000 # Monthly number of language output tokens.
+    monthly_code_interpreter_sessions: 100 # Monthly number of code interpreter sessions.
+    monthly_base_model_tokens: 1000 # Monthly number of base model tokens.
+    monthly_fine_tuning_training_hours: 1 # Monthly number of fine-tuning training hours.
+    monthly_fine_tuning_hosting_hours: 10 # Monthly number of fine-tuning hosting hours.
+    monthly_fine_tuning_input_tokens: 10_000_000 # Monthly number of fine-tuning input tokens.
+    monthly_fine_tuning_output_tokens: 10_000_000 # Monthly number of fine-tuning output tokens.
+    monthly_standard_1024_1024_images: 100 # Monthly number of standard 1024x1024 (low res) images.
+    monthly_standard_1024_1792_images: 100 # Monthly number of standard 1024x1792 (high res) images.
+    monthly_hd_1024_1024_images: 100 # Monthly number of HD 1024x1024 (low res) images.
+    monthly_hd_1024_1792_images: 100 # Monthly number of HD 1024x1792 (high res) images.
+    monthly_text_embedding_tokens: 1_000_000_000 # Monthly number of text embedding tokens.
+    monthly_text_to_speech_characters: 10_000_000 # Monthly number of text to speech characters.
+    monthly_text_to_speech_hours: 100 # Monthly number of text to speech hours.
 
   azurerm_cosmosdb_cassandra_keyspace.my_cassandra_keyspace:
     storage_gb: 1000 # Total size of storage in GB.
@@ -1106,6 +1199,9 @@ resource_usage:
 
   azurerm_nat_gateway.my_gateway:
     monthly_data_processed_gb: 10 # Monthly data processed by the NAT Gateway in GB.
+
+  azurerm_network_ddos_protection_plan.my_plan:
+    overage_amount: 5 # Monthly number of protected resources over the plan protection limit (100).
 
   azurerm_network_watcher.my_watcher:
     monthly_diagnostic_checks: 10000 # Monthly number of diagnostic API calls.

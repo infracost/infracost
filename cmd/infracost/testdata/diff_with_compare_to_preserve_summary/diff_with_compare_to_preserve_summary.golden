@@ -1,14 +1,11 @@
 ──────────────────────────────────
-The following projects have no cost estimate changes: infracost/infracost/cmd/infracost/testdata/express_route_gateway_plan.json
-Run the following command to see their breakdown: infracost breakdown --path=/path/to/code
+1 project has no cost estimate change.
+Run the following command to see its breakdown: infracost breakdown --path=/path/to/code
 
 ──────────────────────────────────
 8 cloud resources were detected:
 ∙ 2 were estimated
-∙ 3 were free:
-  ∙ 1 x azurerm_resource_group
-  ∙ 1 x azurerm_virtual_hub
-  ∙ 1 x azurerm_virtual_wan
+∙ 3 were free
 ∙ 3 are not supported yet, see https://infracost.io/requested-resources:
   ∙ 1 x azurerm_express_route_circuit
   ∙ 1 x azurerm_express_route_circuit_peering

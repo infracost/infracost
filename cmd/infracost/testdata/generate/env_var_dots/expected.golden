@@ -1,0 +1,40 @@
+version: 0.1
+
+projects:
+  - path: apps/bar
+    name: apps-bar-dev
+    terraform_var_files:
+      - ../default.tfvars
+      - ../.network-baz.tfvars
+      - ../.network-bat.tfvars
+      - ../config.dev.tfvars
+      - ../.dev.tfvars
+    skip_autodetect: true
+  - path: apps/bar
+    name: apps-bar-prod
+    terraform_var_files:
+      - ../default.tfvars
+      - ../.network-baz.tfvars
+      - ../.network-bat.tfvars
+      - ../config.prod.tfvars
+      - ../.prod.tfvars
+    skip_autodetect: true
+  - path: apps/foo
+    name: apps-foo-dev
+    terraform_var_files:
+      - ../default.tfvars
+      - ../.network-baz.tfvars
+      - ../.network-bat.tfvars
+      - ../config.dev.tfvars
+      - ../.dev.tfvars
+    skip_autodetect: true
+  - path: apps/foo
+    name: apps-foo-prod
+    terraform_var_files:
+      - ../default.tfvars
+      - ../.network-baz.tfvars
+      - ../.network-bat.tfvars
+      - ../config.prod.tfvars
+      - ../.prod.tfvars
+    skip_autodetect: true
+

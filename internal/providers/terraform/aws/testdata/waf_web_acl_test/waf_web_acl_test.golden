@@ -1,38 +1,35 @@
 
- Name                               Monthly Qty  Unit                  Monthly Cost 
-                                                                                    
- aws_waf_web_acl.my_waf                                                             
- ├─ Web ACL usage                             1  months                       $5.00 
- ├─ Rules                                     7  rules                        $7.00 
- ├─ Rule groups                               2  groups                       $2.00 
- └─ Requests                                  1  1M requests                  $0.60 
-                                                                                    
- aws_waf_web_acl.us_west_1                                                          
- ├─ Web ACL usage                             1  months                       $5.00 
- ├─ Rules                                     7  rules                        $7.00 
- ├─ Rule groups                               2  groups                       $2.00 
- └─ Requests                                  1  1M requests                  $0.60 
-                                                                                    
- aws_waf_web_acl.withoutUsage                                                       
- ├─ Web ACL usage                             1  months                       $5.00 
- ├─ Rules                                     2  rules                        $2.00 
- ├─ Rule groups                               2  groups                       $2.00 
- └─ Requests                   Monthly cost depends on usage: $0.60 per 1M requests 
-                                                                                    
+ Name                               Monthly Qty  Unit                  Monthly Cost    
+                                                                                       
+ aws_waf_web_acl.my_waf                                                                
+ ├─ Web ACL usage                             1  months                       $5.00    
+ ├─ Rules                                     7  rules                        $7.00    
+ ├─ Rule groups                               2  groups                       $2.00  * 
+ └─ Requests                                  1  1M requests                  $0.60  * 
+                                                                                       
+ aws_waf_web_acl.us_west_1                                                             
+ ├─ Web ACL usage                             1  months                       $5.00    
+ ├─ Rules                                     7  rules                        $7.00    
+ ├─ Rule groups                               2  groups                       $2.00  * 
+ └─ Requests                                  1  1M requests                  $0.60  * 
+                                                                                       
+ aws_waf_web_acl.withoutUsage                                                          
+ ├─ Web ACL usage                             1  months                       $5.00    
+ ├─ Rules                                     2  rules                        $2.00    
+ ├─ Rule groups                               2  groups                       $2.00  * 
+ └─ Requests                   Monthly cost depends on usage: $0.60 per 1M requests    
+                                                                                       
  OVERALL TOTAL                                                               $38.20 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 5 cloud resources were detected:
-∙ 3 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
-∙ 2 were free:
-  ∙ 1 x aws_waf_ipset
-  ∙ 1 x aws_waf_rule
+∙ 3 were estimated
+∙ 2 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestWAFWebACLGoldenFile                            ┃ $38          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
-Logs:
-
-WRN Multiple prices found for aws_waf_web_acl.my_waf Requests, using the first price
-WRN Multiple prices found for aws_waf_web_acl.withoutUsage Requests, using the first price
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $31           ┃ $7          ┃ $38        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

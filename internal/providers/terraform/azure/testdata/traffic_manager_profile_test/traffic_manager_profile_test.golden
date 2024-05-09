@@ -1,27 +1,29 @@
 
- Name                                                             Monthly Qty  Unit                    Monthly Cost 
-                                                                                                                    
- azurerm_traffic_manager_profile.example                                                                            
- └─ DNS queries (first 1B)                                  Monthly cost depends on usage: $0.54 per 1M queries     
-                                                                                                                    
- azurerm_traffic_manager_profile.example_with_traffic_view                                                          
- ├─ DNS queries (first 1B)                                  Monthly cost depends on usage: $0.54 per 1M queries     
- └─ Traffic view                                            Monthly cost depends on usage: $2.00 per 1M data points 
-                                                                                                                    
- azurerm_traffic_manager_profile.example_with_usage                                                                 
- ├─ DNS queries (first 1B)                                              1,000  1M queries                   $540.00 
- ├─ DNS queries (over 1B)                                            234.5678  1M queries                    $87.96 
- └─ Traffic view                                                      12.3456  1M data points                $24.69 
-                                                                                                                    
+ Name                                                             Monthly Qty  Unit                    Monthly Cost    
+                                                                                                                       
+ azurerm_traffic_manager_profile.example_with_usage                                                                    
+ ├─ DNS queries (first 1B)                                              1,000  1M queries                   $540.00  * 
+ ├─ DNS queries (over 1B)                                            234.5678  1M queries                    $87.96  * 
+ └─ Traffic view                                                      12.3456  1M data points                $24.69  * 
+                                                                                                                       
+ azurerm_traffic_manager_profile.example                                                                               
+ └─ DNS queries (first 1B)                                  Monthly cost depends on usage: $0.54 per 1M queries        
+                                                                                                                       
+ azurerm_traffic_manager_profile.example_with_traffic_view                                                             
+ ├─ DNS queries (first 1B)                                  Monthly cost depends on usage: $0.54 per 1M queries        
+ └─ Traffic view                                            Monthly cost depends on usage: $2.00 per 1M data points    
+                                                                                                                       
  OVERALL TOTAL                                                                                              $652.65 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 5 cloud resources were detected:
-∙ 4 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
-∙ 1 was free:
-  ∙ 1 x azurerm_resource_group
+∙ 4 were estimated
+∙ 1 was free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestTrafficManagerProfile                          ┃ $653         ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $0.00         ┃ $653        ┃ $653       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

@@ -10,33 +10,73 @@ import (
 	"strings"
 
 	"github.com/google/go-github/v41/github"
-	"github.com/rs/zerolog/log"
 	"golang.org/x/oauth2"
 	"golang.org/x/sync/errgroup"
+
+	"github.com/infracost/infracost/internal/logging"
 )
 
 func main() {
 	cli := newAuthedGithubClient()
 
-	release, err := createDraftRelease(cli)
-	if err != nil {
-		log.Error().Msgf("failed to create draft release %s", err)
-		return
+	releaseId := strings.TrimSpace(os.Getenv("RELEASE_ID"))
+	var release *github.RepositoryRelease
+	var err error
+	if releaseId != "" {
+		release, err = fetchExistingRelease(cli, releaseId)
+	} else {
+		release, err = createDraftRelease(cli)
 	}
 
+	if err != nil {
+		logging.Logger.Error().Msgf("failed to create draft release %s", err)
+		return
+	}
 	toUpload, err := findReleaseAssets()
 	if err != nil {
-		log.Error().Msgf("failed to collect release assets %s", err)
+		logging.Logger.Error().Msgf("failed to collect release assets %s", err)
 		return
 	}
 
 	err = uploadAssets(toUpload, cli, release)
 	if err != nil {
-		log.Error().Msgf("failed to upload release assets %s", err)
+		logging.Logger.Error().Msgf("failed to upload release assets %s", err)
 		return
 	}
 
-	log.Info().Msg("successfully created draft release")
+	logging.Logger.Info().Msg("successfully created draft release")
+}
+
+func fetchExistingRelease(cli *github.Client, tag string) (*github.RepositoryRelease, error) {
+	release, _, err := cli.Repositories.GetReleaseByTag(context.Background(), "infracost", "infracost", tag)
+	if err != nil {
+		return nil, fmt.Errorf("could not fetch existing release %s %s", tag, err)
+	}
+
+	newGitSha := os.Getenv("GITHUB_SHA")
+	if newGitSha != "" {
+		_, _, err = cli.Git.UpdateRef(context.Background(), "infracost", "infracost", &github.Reference{
+			Ref: github.String("refs/tags/" + tag),
+			Object: &github.GitObject{
+				SHA: github.String(newGitSha),
+			},
+		}, true)
+		if err != nil {
+			return nil, fmt.Errorf("could not update ref %s %s", tag, err)
+		}
+	}
+
+	// delete all the assets of the release as we are going to re-upload them and
+	// GitHub does not allow name conflicts with assets
+	for _, asset := range release.Assets {
+		_, err = cli.Repositories.DeleteReleaseAsset(context.Background(), "infracost", "infracost", asset.GetID())
+		if err != nil {
+			logging.Logger.Error().Msgf("failed to delete asset %s", err)
+			continue
+		}
+	}
+
+	return release, err
 }
 
 func createDraftRelease(cli *github.Client) (*github.RepositoryRelease, error) {
@@ -126,7 +166,7 @@ func uploadAssets(toUpload []string, cli *github.Client, release *github.Reposit
 }
 
 func uploadAsset(file string, cli *github.Client, id int64) error {
-	log.Info().Msgf("uploading asset %s", file)
+	logging.Logger.Info().Msgf("uploading asset %s", file)
 
 	f, err := os.Open(file)
 	if err != nil {

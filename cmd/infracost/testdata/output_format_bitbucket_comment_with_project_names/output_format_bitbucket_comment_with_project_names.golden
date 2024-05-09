@@ -1,21 +1,25 @@
 
 
-# Infracost report #
+#### 💰 Infracost report ####
 
-## Monthly cost will decrease by $3,364 ↓ ##
+#### Monthly cost will decrease by $3,364 ↓ ####
 
-| **Project** | **Module path** | **Cost change** | **New monthly cost** |
-| ----------- | ---------- | --------------: | -------------------- |
-| my first project |  | -$561 (-43%) | $743 |
-| my first project again |  | -$561 (-43%) | $743 |
-| my terragrunt multi project | prod | -$561 (-43%) | $748 |
-| my terragrunt prod project |  | -$561 (-43%) | $748 |
-| my terragrunt workspace | prod | -$561 (-43%) | $748 |
-| my workspace project |  | -$561 (-43%) | $743 |
+| **Changed project** | **Module path** | **Baseline cost** | **Usage cost*** | **Total change** | **New monthly cost** |
+| ----------- | ---------- | --------------: | --------------: | --------------: | --------------: |
+| my first project |  | -$561 | - | -$561 (-43%) | $743 |
+| my first project again |  | -$561 | - | -$561 (-43%) | $743 |
+| my terragrunt multi project | prod | -$561 | - | -$561 (-43%) | $748 |
+| my terragrunt prod project |  | -$561 | - | -$561 (-43%) | $748 |
+| my terragrunt workspace | prod | -$561 | - | -$561 (-43%) | $748 |
+| my workspace project |  | -$561 | - | -$561 (-43%) | $743 |
 
-### Cost details ###
+*Usage costs can be estimated by updating [Infracost Cloud settings](https://www.infracost.io/docs/features/usage_based_resources), see [docs](https://www.infracost.io/docs/features/usage_based_resources/#infracost-usageyml) for other options.
+
+##### Cost details  #####
 
 ```
+Key: * usage cost, ~ changed, + added, - removed
+
 ──────────────────────────────────
 Project: my first project
 
@@ -99,21 +103,23 @@ Amount:  -$561 ($1,303 → $743)
 Percent: -43%
 
 ──────────────────────────────────
-Key: ~ changed, + added, - removed
+Key: * usage cost, ~ changed, + added, - removed
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 18 cloud resources were detected:
-∙ 18 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 18 were estimated
 
 Infracost estimate: Monthly cost will decrease by $3,364 ↓
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Cost change  ┃ New monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━┫
-┃ my first project                                   ┃ -$561 (-43%) ┃ $743             ┃
-┃ my first project again                             ┃ -$561 (-43%) ┃ $743             ┃
-┃ my terragrunt multi project                        ┃ -$561 (-43%) ┃ $748             ┃
-┃ my terragrunt prod project                         ┃ -$561 (-43%) ┃ $748             ┃
-┃ my terragrunt workspace                            ┃ -$561 (-43%) ┃ $748             ┃
-┃ my workspace project                               ┃ -$561 (-43%) ┃ $743             ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Changed project                                    ┃ Baseline cost ┃ Usage cost ┃ Total change ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ my first project                                   ┃         -$561 ┃          - ┃ -$561 (-43%) ┃
+┃ my first project again                             ┃         -$561 ┃          - ┃ -$561 (-43%) ┃
+┃ my terragrunt multi project                        ┃         -$561 ┃          - ┃ -$561 (-43%) ┃
+┃ my terragrunt prod project                         ┃         -$561 ┃          - ┃ -$561 (-43%) ┃
+┃ my terragrunt workspace                            ┃         -$561 ┃          - ┃ -$561 (-43%) ┃
+┃ my workspace project                               ┃         -$561 ┃          - ┃ -$561 (-43%) ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 ```
 

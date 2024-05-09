@@ -1,0 +1,34 @@
+version: 0.1
+
+projects:
+  - path: terraform
+    name: terraform-conf-dev-foo
+    terraform_var_files:
+      - env/conf-dev-foo.tfvars
+    skip_autodetect: true
+  - path: terraform
+    name: terraform-conf-prod-foo
+    terraform_var_files:
+      - env/conf-prod-foo.tfvars
+    skip_autodetect: true
+  - path: terraform
+    name: terraform-dev
+    terraform_var_files:
+      - env/dev.tfvars
+    skip_autodetect: true
+  - path: terraform
+    name: terraform-ops-dev
+    terraform_var_files:
+      - env/ops-dev.tfvars
+    skip_autodetect: true
+  - path: terraform
+    name: terraform-ops-prod-bar
+    terraform_var_files:
+      - env/ops-prod-bar.tfvars
+    skip_autodetect: true
+  - path: terraform
+    name: terraform-ops-prod-foo
+    terraform_var_files:
+      - env/ops-prod-foo.tfvars
+    skip_autodetect: true
+

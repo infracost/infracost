@@ -16,10 +16,9 @@ import (
 	"github.com/shopspring/decimal"
 	"golang.org/x/mod/semver"
 
-	"github.com/rs/zerolog/log"
-
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
 )
 
@@ -112,6 +111,10 @@ func LoadPaths(paths []string) ([]ReportInput, error) {
 // in the prior Root. If we can't find a matching project then we assume that the project
 // has been newly created and will show a 100% increase in the output Root.
 func CompareTo(c *config.Config, current, prior Root) (Root, error) {
+	currentProjectLabels := make(map[string]bool, len(current.Projects))
+	for _, p := range current.Projects {
+		currentProjectLabels[p.LabelWithMetadata()] = true
+	}
 	priorProjects := make(map[string]*schema.Project)
 	for _, p := range prior.Projects {
 		if _, ok := priorProjects[p.LabelWithMetadata()]; ok {
@@ -162,6 +165,10 @@ func CompareTo(c *config.Config, current, prior Root) (Root, error) {
 			delete(priorProjects, metadata)
 		} else if children := findChildrenOfErroredProject(p, priorProjects); len(children) > 0 {
 			for _, child := range children {
+				if _, ok := currentProjectLabels[child]; ok {
+					// this child has a match in the current projects so it should not be deleted
+					continue
+				}
 				delete(priorProjects, child)
 			}
 		}
@@ -449,7 +456,7 @@ func addCurrencyFormat(currencyFormat string) {
 	m := rgx.FindStringSubmatch(currencyFormat)
 
 	if len(m) == 0 {
-		log.Warn().Msgf("Invalid currency format: %s", currencyFormat)
+		logging.Logger.Warn().Msgf("Invalid currency format: %s", currencyFormat)
 		return
 	}
 

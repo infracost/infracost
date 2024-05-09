@@ -1,29 +1,31 @@
 
- Name                                                       Monthly Qty  Unit                Monthly Cost 
-                                                                                                          
- azurerm_automation_account.example                                                                       
- ├─ Job run time                                        Monthly cost depends on usage: $0.002 per minutes 
- ├─ Non-azure config nodes                              Monthly cost depends on usage: $6.00 per nodes    
- └─ Watchers                                            Monthly cost depends on usage: $0.002 per hours   
-                                                                                                          
- azurerm_automation_dsc_configuration.example                                                             
- └─ Non-azure config nodes                              Monthly cost depends on usage: $6.00 per nodes    
-                                                                                                          
- azurerm_automation_dsc_nodeconfiguration.fiveNodes                                                       
- └─ Non-azure config nodes                                            5  nodes                     $30.00 
-                                                                                                          
- azurerm_automation_dsc_nodeconfiguration.withoutUsage                                                    
- └─ Non-azure config nodes                              Monthly cost depends on usage: $6.00 per nodes    
-                                                                                                          
+ Name                                                       Monthly Qty  Unit                Monthly Cost    
+                                                                                                             
+ azurerm_automation_dsc_nodeconfiguration.fiveNodes                                                          
+ └─ Non-azure config nodes                                            5  nodes                     $30.00  * 
+                                                                                                             
+ azurerm_automation_account.example                                                                          
+ ├─ Job run time                                        Monthly cost depends on usage: $0.002 per minutes    
+ ├─ Non-azure config nodes                              Monthly cost depends on usage: $6.00 per nodes       
+ └─ Watchers                                            Monthly cost depends on usage: $0.002 per hours      
+                                                                                                             
+ azurerm_automation_dsc_configuration.example                                                                
+ └─ Non-azure config nodes                              Monthly cost depends on usage: $6.00 per nodes       
+                                                                                                             
+ azurerm_automation_dsc_nodeconfiguration.withoutUsage                                                       
+ └─ Non-azure config nodes                              Monthly cost depends on usage: $6.00 per nodes       
+                                                                                                             
  OVERALL TOTAL                                                                                     $30.00 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 6 cloud resources were detected:
-∙ 5 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
-∙ 1 was free:
-  ∙ 1 x azurerm_resource_group
+∙ 5 were estimated
+∙ 1 was free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMAutomationDscNodeconfiguration          ┃ $30          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $0.00         ┃ $30         ┃ $30        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

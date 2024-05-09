@@ -1,0 +1,620 @@
+{
+  "version": "0.2",
+  "metadata": {
+    "infracostCommand": "breakdown",
+    "vcsBranch": "stub-branch",
+    "vcsCommitSha": "stub-sha",
+    "vcsCommitAuthorName": "stub-author",
+    "vcsCommitAuthorEmail": "stub@stub.com",
+    "vcsCommitTimestamp": "2024-04-16T11:47:36.976505Z",
+    "vcsCommitMessage": "stub-message",
+    "vcsRepositoryUrl": "https://github.com/infracost/infracost",
+    "configFilePath": "testdata/diff_terragrunt_syntax_error/infracost.config.yml"
+  },
+  "currency": "USD",
+  "projects": [
+    {
+      "name": "dems-ag1",
+      "metadata": {
+        "path": "testdata/diff_terragrunt_syntax_error/terragrunt/dev",
+        "type": "terragrunt_dir",
+        "terraformModulePath":  "testdata/diff_terragrunt_syntax_error/terragrunt/dev",
+        "vcsSubPath": "cmd/infracost/testdata/diff_terragrunt_syntax_error/terragrunt/dev"
+      },
+      "pastBreakdown": {
+        "resources": [
+          {
+            "name": "aws_instance.web_app",
+            "resourceType": "aws_instance",
+            "tags": {},
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_instance.web_app",
+                  "endLine": 40,
+                  "filename": "testdata/.infracost/.terragrunt-cache/Ry51B17-5L-TUeogwjy_Ie214sw-UE5g00fnu6Xl8bU4Czra1P4YRNg/modules/example/main.tf",
+                  "startLine": 26
+                }
+              ],
+              "checksum": "9d5686abb1504e7ea06a56c2c1997956424fb39d74039eee65d9fe33e848656e",
+              "endLine": 40,
+              "filename": "testdata/.infracost/.terragrunt-cache/Ry51B17-5L-TUeogwjy_Ie214sw-UE5g00fnu6Xl8bU4Czra1P4YRNg/modules/example/main.tf",
+              "startLine": 26
+            },
+            "hourlyCost": "0.0711890410958904115",
+            "monthlyCost": "51.968",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, t2.micro)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.0116",
+                "hourlyCost": "0.0116",
+                "monthlyCost": "8.468"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.00684931506849315",
+                "monthlyCost": "5",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.0684931506849315",
+                    "monthlyQuantity": "50",
+                    "price": "0.1",
+                    "hourlyCost": "0.00684931506849315",
+                    "monthlyCost": "5"
+                  }
+                ]
+              },
+              {
+                "name": "ebs_block_device[0]",
+                "metadata": {},
+                "hourlyCost": "0.0527397260273972615",
+                "monthlyCost": "38.5",
+                "costComponents": [
+                  {
+                    "name": "Storage (provisioned IOPS SSD, io1)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.136986301369863",
+                    "monthlyQuantity": "100",
+                    "price": "0.125",
+                    "hourlyCost": "0.017123287671232875",
+                    "monthlyCost": "12.5"
+                  },
+                  {
+                    "name": "Provisioned IOPS",
+                    "unit": "IOPS",
+                    "hourlyQuantity": "0.5479452054794521",
+                    "monthlyQuantity": "400",
+                    "price": "0.065",
+                    "hourlyCost": "0.0356164383561643865",
+                    "monthlyCost": "26"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "aws_lambda_function.hello_world",
+            "resourceType": "aws_lambda_function",
+            "tags": {},
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_lambda_function.hello_world",
+                  "endLine": 49,
+                  "filename": "testdata/.infracost/.terragrunt-cache/Ry51B17-5L-TUeogwjy_Ie214sw-UE5g00fnu6Xl8bU4Czra1P4YRNg/modules/example/main.tf",
+                  "startLine": 42
+                }
+              ],
+              "checksum": "eb537a4b85bd5ec02439f7e4c8efe78c79f0e9b92a338e9566df0595f4935344",
+              "endLine": 49,
+              "filename": "testdata/.infracost/.terragrunt-cache/Ry51B17-5L-TUeogwjy_Ie214sw-UE5g00fnu6Xl8bU4Czra1P4YRNg/modules/example/main.tf",
+              "startLine": 42
+            },
+            "costComponents": [
+              {
+                "name": "Requests",
+                "unit": "1M requests",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.2",
+                "hourlyCost": null,
+                "monthlyCost": null,
+                "usageBased": true
+              },
+              {
+                "name": "Ephemeral storage",
+                "unit": "GB-seconds",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000000309",
+                "hourlyCost": null,
+                "monthlyCost": null
+              },
+              {
+                "name": "Duration (first 6B)",
+                "unit": "GB-seconds",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000166667",
+                "hourlyCost": null,
+                "monthlyCost": null,
+                "usageBased": true
+              }
+            ]
+          }
+        ],
+        "totalHourlyCost": "0.0711890410958904115",
+        "totalMonthlyCost": "51.968",
+        "totalMonthlyUsageCost": "0"
+      },
+      "breakdown": {
+        "resources": [
+          {
+            "name": "aws_instance.web_app",
+            "resourceType": "aws_instance",
+            "tags": {},
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_instance.web_app",
+                  "endLine": 40,
+                  "filename": "testdata/.infracost/.terragrunt-cache/Ry51B17-5L-TUeogwjy_Ie214sw-UE5g00fnu6Xl8bU4Czra1P4YRNg/modules/example/main.tf",
+                  "startLine": 26
+                }
+              ],
+              "checksum": "9d5686abb1504e7ea06a56c2c1997956424fb39d74039eee65d9fe33e848656e",
+              "endLine": 40,
+              "filename": "testdata/.infracost/.terragrunt-cache/Ry51B17-5L-TUeogwjy_Ie214sw-UE5g00fnu6Xl8bU4Czra1P4YRNg/modules/example/main.tf",
+              "startLine": 26
+            },
+            "hourlyCost": "0.0711890410958904115",
+            "monthlyCost": "51.968",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, t2.micro)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.0116",
+                "hourlyCost": "0.0116",
+                "monthlyCost": "8.468"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.00684931506849315",
+                "monthlyCost": "5",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.0684931506849315",
+                    "monthlyQuantity": "50",
+                    "price": "0.1",
+                    "hourlyCost": "0.00684931506849315",
+                    "monthlyCost": "5"
+                  }
+                ]
+              },
+              {
+                "name": "ebs_block_device[0]",
+                "metadata": {},
+                "hourlyCost": "0.0527397260273972615",
+                "monthlyCost": "38.5",
+                "costComponents": [
+                  {
+                    "name": "Storage (provisioned IOPS SSD, io1)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.136986301369863",
+                    "monthlyQuantity": "100",
+                    "price": "0.125",
+                    "hourlyCost": "0.017123287671232875",
+                    "monthlyCost": "12.5"
+                  },
+                  {
+                    "name": "Provisioned IOPS",
+                    "unit": "IOPS",
+                    "hourlyQuantity": "0.5479452054794521",
+                    "monthlyQuantity": "400",
+                    "price": "0.065",
+                    "hourlyCost": "0.0356164383561643865",
+                    "monthlyCost": "26"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "aws_lambda_function.hello_world",
+            "resourceType": "aws_lambda_function",
+            "tags": {},
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_lambda_function.hello_world",
+                  "endLine": 49,
+                  "filename": "testdata/.infracost/.terragrunt-cache/Ry51B17-5L-TUeogwjy_Ie214sw-UE5g00fnu6Xl8bU4Czra1P4YRNg/modules/example/main.tf",
+                  "startLine": 42
+                }
+              ],
+              "checksum": "eb537a4b85bd5ec02439f7e4c8efe78c79f0e9b92a338e9566df0595f4935344",
+              "endLine": 49,
+              "filename": "testdata/.infracost/.terragrunt-cache/Ry51B17-5L-TUeogwjy_Ie214sw-UE5g00fnu6Xl8bU4Czra1P4YRNg/modules/example/main.tf",
+              "startLine": 42
+            },
+            "costComponents": [
+              {
+                "name": "Requests",
+                "unit": "1M requests",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.2",
+                "hourlyCost": null,
+                "monthlyCost": null,
+                "usageBased": true
+              },
+              {
+                "name": "Ephemeral storage",
+                "unit": "GB-seconds",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000000309",
+                "hourlyCost": null,
+                "monthlyCost": null
+              },
+              {
+                "name": "Duration (first 6B)",
+                "unit": "GB-seconds",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000166667",
+                "hourlyCost": null,
+                "monthlyCost": null,
+                "usageBased": true
+              }
+            ]
+          }
+        ],
+        "totalHourlyCost": "0.0711890410958904115",
+        "totalMonthlyCost": "51.968",
+        "totalMonthlyUsageCost": "0"
+      },
+      "diff": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0",
+        "totalMonthlyUsageCost": "0"
+      },
+      "summary": {
+        "totalDetectedResources": 2,
+        "totalSupportedResources": 2,
+        "totalUnsupportedResources": 0,
+        "totalUsageBasedResources": 2,
+        "totalNoPriceResources": 0,
+        "unsupportedResourceCounts": {},
+        "noPriceResourceCounts": {}
+      }
+    },
+    {
+      "name": "dems-ag1",
+      "metadata": {
+        "path": "testdata/diff_terragrunt_syntax_error/terragrunt/prod",
+        "type": "terragrunt_dir",
+        "terraformModulePath":  "testdata/diff_terragrunt_syntax_error/terragrunt/prod",
+        "vcsSubPath": "cmd/infracost/testdata/diff_terragrunt_syntax_error/terragrunt/prod"
+      },
+      "pastBreakdown": {
+        "resources": [
+          {
+            "name": "aws_instance.web_app",
+            "resourceType": "aws_instance",
+            "tags": {},
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_instance.web_app",
+                  "endLine": 40,
+                  "filename": "testdata/.infracost/.terragrunt-cache/Ry51B17-5L-TUeogwjy_Ie214sw-UE5g00fnu6Xl8bU4Czra1P4YRNg/modules/example/main.tf",
+                  "startLine": 26
+                }
+              ],
+              "checksum": "68a408f4bf19420a57d0faab69d346b9c160280a7d3c172938837f9744a288c9",
+              "endLine": 40,
+              "filename": "testdata/.infracost/.terragrunt-cache/Ry51B17-5L-TUeogwjy_Ie214sw-UE5g00fnu6Xl8bU4Czra1P4YRNg/modules/example/main.tf",
+              "startLine": 26
+            },
+            "hourlyCost": "1.024164383561643829",
+            "monthlyCost": "747.64",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, m5.4xlarge)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.768",
+                "hourlyCost": "0.768",
+                "monthlyCost": "560.64"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.0136986301369863",
+                "monthlyCost": "10",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.136986301369863",
+                    "monthlyQuantity": "100",
+                    "price": "0.1",
+                    "hourlyCost": "0.0136986301369863",
+                    "monthlyCost": "10"
+                  }
+                ]
+              },
+              {
+                "name": "ebs_block_device[0]",
+                "metadata": {},
+                "hourlyCost": "0.242465753424657529",
+                "monthlyCost": "177",
+                "costComponents": [
+                  {
+                    "name": "Storage (provisioned IOPS SSD, io1)",
+                    "unit": "GB",
+                    "hourlyQuantity": "1.3698630136986301",
+                    "monthlyQuantity": "1000",
+                    "price": "0.125",
+                    "hourlyCost": "0.1712328767123287625",
+                    "monthlyCost": "125"
+                  },
+                  {
+                    "name": "Provisioned IOPS",
+                    "unit": "IOPS",
+                    "hourlyQuantity": "1.0958904109589041",
+                    "monthlyQuantity": "800",
+                    "price": "0.065",
+                    "hourlyCost": "0.0712328767123287665",
+                    "monthlyCost": "52"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "aws_lambda_function.hello_world",
+            "resourceType": "aws_lambda_function",
+            "tags": {},
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_lambda_function.hello_world",
+                  "endLine": 49,
+                  "filename": "testdata/.infracost/.terragrunt-cache/Ry51B17-5L-TUeogwjy_Ie214sw-UE5g00fnu6Xl8bU4Czra1P4YRNg/modules/example/main.tf",
+                  "startLine": 42
+                }
+              ],
+              "checksum": "60a2f83ce9c8af13318d4885d554022ed5896a97e8c930a156f612b7274eb8cc",
+              "endLine": 49,
+              "filename": "testdata/.infracost/.terragrunt-cache/Ry51B17-5L-TUeogwjy_Ie214sw-UE5g00fnu6Xl8bU4Czra1P4YRNg/modules/example/main.tf",
+              "startLine": 42
+            },
+            "costComponents": [
+              {
+                "name": "Requests",
+                "unit": "1M requests",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.2",
+                "hourlyCost": null,
+                "monthlyCost": null,
+                "usageBased": true
+              },
+              {
+                "name": "Ephemeral storage",
+                "unit": "GB-seconds",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000000309",
+                "hourlyCost": null,
+                "monthlyCost": null
+              },
+              {
+                "name": "Duration (first 6B)",
+                "unit": "GB-seconds",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000166667",
+                "hourlyCost": null,
+                "monthlyCost": null,
+                "usageBased": true
+              }
+            ]
+          }
+        ],
+        "totalHourlyCost": "1.024164383561643829",
+        "totalMonthlyCost": "747.64",
+        "totalMonthlyUsageCost": "0"
+      },
+      "breakdown": {
+        "resources": [
+          {
+            "name": "aws_instance.web_app",
+            "resourceType": "aws_instance",
+            "tags": {},
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_instance.web_app",
+                  "endLine": 40,
+                  "filename": "testdata/.infracost/.terragrunt-cache/Ry51B17-5L-TUeogwjy_Ie214sw-UE5g00fnu6Xl8bU4Czra1P4YRNg/modules/example/main.tf",
+                  "startLine": 26
+                }
+              ],
+              "checksum": "68a408f4bf19420a57d0faab69d346b9c160280a7d3c172938837f9744a288c9",
+              "endLine": 40,
+              "filename": "testdata/.infracost/.terragrunt-cache/Ry51B17-5L-TUeogwjy_Ie214sw-UE5g00fnu6Xl8bU4Czra1P4YRNg/modules/example/main.tf",
+              "startLine": 26
+            },
+            "hourlyCost": "1.024164383561643829",
+            "monthlyCost": "747.64",
+            "costComponents": [
+              {
+                "name": "Instance usage (Linux/UNIX, on-demand, m5.4xlarge)",
+                "unit": "hours",
+                "hourlyQuantity": "1",
+                "monthlyQuantity": "730",
+                "price": "0.768",
+                "hourlyCost": "0.768",
+                "monthlyCost": "560.64"
+              }
+            ],
+            "subresources": [
+              {
+                "name": "root_block_device",
+                "metadata": {},
+                "hourlyCost": "0.0136986301369863",
+                "monthlyCost": "10",
+                "costComponents": [
+                  {
+                    "name": "Storage (general purpose SSD, gp2)",
+                    "unit": "GB",
+                    "hourlyQuantity": "0.136986301369863",
+                    "monthlyQuantity": "100",
+                    "price": "0.1",
+                    "hourlyCost": "0.0136986301369863",
+                    "monthlyCost": "10"
+                  }
+                ]
+              },
+              {
+                "name": "ebs_block_device[0]",
+                "metadata": {},
+                "hourlyCost": "0.242465753424657529",
+                "monthlyCost": "177",
+                "costComponents": [
+                  {
+                    "name": "Storage (provisioned IOPS SSD, io1)",
+                    "unit": "GB",
+                    "hourlyQuantity": "1.3698630136986301",
+                    "monthlyQuantity": "1000",
+                    "price": "0.125",
+                    "hourlyCost": "0.1712328767123287625",
+                    "monthlyCost": "125"
+                  },
+                  {
+                    "name": "Provisioned IOPS",
+                    "unit": "IOPS",
+                    "hourlyQuantity": "1.0958904109589041",
+                    "monthlyQuantity": "800",
+                    "price": "0.065",
+                    "hourlyCost": "0.0712328767123287665",
+                    "monthlyCost": "52"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "aws_lambda_function.hello_world",
+            "resourceType": "aws_lambda_function",
+            "tags": {},
+            "metadata": {
+              "calls": [
+                {
+                  "blockName": "aws_lambda_function.hello_world",
+                  "endLine": 49,
+                  "filename": "testdata/.infracost/.terragrunt-cache/Ry51B17-5L-TUeogwjy_Ie214sw-UE5g00fnu6Xl8bU4Czra1P4YRNg/modules/example/main.tf",
+                  "startLine": 42
+                }
+              ],
+              "checksum": "60a2f83ce9c8af13318d4885d554022ed5896a97e8c930a156f612b7274eb8cc",
+              "endLine": 49,
+              "filename": "testdata/.infracost/.terragrunt-cache/Ry51B17-5L-TUeogwjy_Ie214sw-UE5g00fnu6Xl8bU4Czra1P4YRNg/modules/example/main.tf",
+              "startLine": 42
+            },
+            "costComponents": [
+              {
+                "name": "Requests",
+                "unit": "1M requests",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.2",
+                "hourlyCost": null,
+                "monthlyCost": null,
+                "usageBased": true
+              },
+              {
+                "name": "Ephemeral storage",
+                "unit": "GB-seconds",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000000309",
+                "hourlyCost": null,
+                "monthlyCost": null
+              },
+              {
+                "name": "Duration (first 6B)",
+                "unit": "GB-seconds",
+                "hourlyQuantity": null,
+                "monthlyQuantity": null,
+                "price": "0.0000166667",
+                "hourlyCost": null,
+                "monthlyCost": null,
+                "usageBased": true
+              }
+            ]
+          }
+        ],
+        "totalHourlyCost": "1.024164383561643829",
+        "totalMonthlyCost": "747.64",
+        "totalMonthlyUsageCost": "0"
+      },
+      "diff": {
+        "resources": [],
+        "totalHourlyCost": "0",
+        "totalMonthlyCost": "0",
+        "totalMonthlyUsageCost": "0"
+      },
+      "summary": {
+        "totalDetectedResources": 2,
+        "totalSupportedResources": 2,
+        "totalUnsupportedResources": 0,
+        "totalUsageBasedResources": 2,
+        "totalNoPriceResources": 0,
+        "unsupportedResourceCounts": {},
+        "noPriceResourceCounts": {}
+      }
+    }
+  ],
+  "totalHourlyCost": "1.0953534246575342405",
+  "totalMonthlyCost": "799.608",
+  "totalMonthlyUsageCost": "0",
+  "pastTotalHourlyCost": "1.0953534246575342405",
+  "pastTotalMonthlyCost": "799.608",
+  "pastTotalMonthlyUsageCost": "0",
+  "diffTotalHourlyCost": "0",
+  "diffTotalMonthlyCost": "0",
+  "diffTotalMonthlyUsageCost": "0",
+  "timeGenerated": "2024-04-16T11:47:36.976505Z",
+  "summary": {
+    "totalDetectedResources": 4,
+    "totalSupportedResources": 4,
+    "totalUnsupportedResources": 0,
+    "totalUsageBasedResources": 4,
+    "totalNoPriceResources": 0,
+    "unsupportedResourceCounts": {},
+    "noPriceResourceCounts": {}
+  }
+}

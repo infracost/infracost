@@ -1,21 +1,24 @@
 
- Name                                                                          Monthly Qty  Unit                Monthly Cost 
-                                                                                                                             
- aws_config_configuration_recorder.my_config_configuration_recorder                                                          
- ├─ Config items                                                           Monthly cost depends on usage: $0.003 per records 
- └─ Custom config items                                                    Monthly cost depends on usage: $0.003 per records 
-                                                                                                                             
- aws_config_configuration_recorder.my_config_configuration_recorder_usage                                                    
- ├─ Config items                                                                     1,000  records                    $3.00 
- └─ Custom config items                                                              2,000  records                    $6.00 
-                                                                                                                             
+ Name                                                                          Monthly Qty  Unit                Monthly Cost    
+                                                                                                                                
+ aws_config_configuration_recorder.my_config_configuration_recorder_usage                                                       
+ ├─ Config items                                                                     1,000  records                    $3.00  * 
+ └─ Custom config items                                                              2,000  records                    $6.00  * 
+                                                                                                                                
+ aws_config_configuration_recorder.my_config_configuration_recorder                                                             
+ ├─ Config items                                                           Monthly cost depends on usage: $0.003 per records    
+ └─ Custom config items                                                    Monthly cost depends on usage: $0.003 per records    
+                                                                                                                                
  OVERALL TOTAL                                                                                                         $9.00 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 2 cloud resources were detected:
-∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 2 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestConfigurationGoldenFile                        ┃ $9           ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $0.00         ┃ $9          ┃ $9         ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

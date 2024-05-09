@@ -10,9 +10,14 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/hashicorp/go-cty-funcs/cidr"
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/ext/tryfunc"
 	"github.com/hashicorp/hcl/v2/ext/typeexpr"
+
+	"github.com/hashicorp/go-cty-funcs/crypto"
+	"github.com/hashicorp/go-cty-funcs/encoding"
+	"github.com/hashicorp/go-cty-funcs/filesystem"
 	"github.com/rs/zerolog"
 	yaml "github.com/zclconf/go-cty-yaml"
 	"github.com/zclconf/go-cty/cty"
@@ -25,7 +30,6 @@ import (
 	"github.com/infracost/infracost/internal/hcl/modules"
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/infracost/infracost/internal/ui"
 )
 
 var (
@@ -93,7 +97,6 @@ type Evaluator struct {
 	workspace string
 	// blockBuilder handles generating blocks in the evaluation step.
 	blockBuilder   BlockBuilder
-	newSpinner     ui.SpinnerFunc
 	logger         zerolog.Logger
 	isGraph        bool
 	filteredBlocks []*Block
@@ -110,7 +113,6 @@ func NewEvaluator(
 	visitedModules map[string]map[string]cty.Value,
 	workspace string,
 	blockBuilder BlockBuilder,
-	spinFunc ui.SpinnerFunc,
 	logger zerolog.Logger,
 	isGraph bool,
 ) *Evaluator {
@@ -183,7 +185,6 @@ func NewEvaluator(
 		workspace:      workspace,
 		workingDir:     workingDir,
 		blockBuilder:   blockBuilder,
-		newSpinner:     spinFunc,
 		logger:         l,
 		isGraph:        isGraph,
 	}
@@ -236,11 +237,6 @@ func (e *Evaluator) MissingVars() []string {
 // parse and build up and child modules that are referenced in the Blocks and runs child Evaluator on
 // this Module.
 func (e *Evaluator) Run() (*Module, error) {
-	if e.newSpinner != nil {
-		spin := e.newSpinner("Evaluating Terraform directory")
-		defer spin.Success()
-	}
-
 	var lastContext hcl.EvalContext
 	// first we need to evaluate the top level Context - so this can be passed to any child modules that are found.
 	e.logger.Debug().Msg("evaluating top level context")
@@ -307,7 +303,7 @@ func (e *Evaluator) evaluate(lastContext hcl.EvalContext) {
 	}
 
 	if i == maxContextIterations {
-		e.logger.Warn().Msgf("hit max context iterations evaluating module %s", e.module.Name)
+		e.logger.Debug().Msgf("hit max context iterations evaluating module %s", e.module.Name)
 	}
 
 }
@@ -372,7 +368,6 @@ func (e *Evaluator) evaluateModules() {
 			map[string]map[string]cty.Value{},
 			e.workspace,
 			e.blockBuilder,
-			nil,
 			e.logger,
 			e.isGraph,
 		)
@@ -416,7 +411,7 @@ func (e *Evaluator) expandBlocks(blocks Blocks, lastContext hcl.EvalContext) Blo
 	}
 
 	if i == maxContextIterations {
-		e.logger.Warn().Msgf("hit max context iterations expanding blocks in module %s", e.module.Name)
+		e.logger.Debug().Msgf("hit max context iterations expanding blocks in module %s", e.module.Name)
 	}
 
 	return e.expandDynamicBlocks(expanded...)
@@ -1150,38 +1145,38 @@ func (e *Evaluator) loadModules(lastContext hcl.EvalContext) {
 // ExpFunctions returns the set of functions that should be used to when evaluating
 // expressions in the receiving scope.
 func ExpFunctions(baseDir string, logger zerolog.Logger) map[string]function.Function {
-	return map[string]function.Function{
+	fns := map[string]function.Function{
 		"abs":              stdlib.AbsoluteFunc,
-		"abspath":          funcs.AbsPathFunc,
-		"basename":         funcs.BasenameFunc,
-		"base64decode":     funcs.Base64DecodeFunc,
-		"base64encode":     funcs.Base64EncodeFunc,
+		"abspath":          filesystem.AbsPathFunc,
+		"basename":         filesystem.BasenameFunc,
+		"base64decode":     encoding.Base64DecodeFunc,
+		"base64encode":     encoding.Base64EncodeFunc,
 		"base64gzip":       funcs.Base64GzipFunc,
 		"base64sha256":     funcs.Base64Sha256Func,
 		"base64sha512":     funcs.Base64Sha512Func,
-		"bcrypt":           funcs.BcryptFunc,
+		"bcrypt":           crypto.BcryptFunc,
 		"can":              tryfunc.CanFunc,
 		"ceil":             stdlib.CeilFunc,
 		"chomp":            stdlib.ChompFunc,
-		"cidrhost":         funcs.CidrHostFunc,
-		"cidrnetmask":      funcs.CidrNetmaskFunc,
-		"cidrsubnet":       funcs.CidrSubnetFunc,
-		"cidrsubnets":      funcs.CidrSubnetsFunc,
-		"coalesce":         funcs.CoalesceFunc,
+		"cidrhost":         funcs.CidrHostFunc, // modified hashicorp/go-cty-funcs/cidr.HostFunc that supports big.Int
+		"cidrnetmask":      cidr.NetmaskFunc,
+		"cidrsubnet":       funcs.CidrSubnetFunc, // modified hashicorp/go-cty-funcs/cidr.SubnetFunc that supports big.Int
+		"cidrsubnets":      cidr.SubnetsFunc,
+		"coalesce":         funcs.CoalesceFunc, // customized from stdlib
 		"coalescelist":     stdlib.CoalesceListFunc,
 		"compact":          stdlib.CompactFunc,
 		"concat":           stdlib.ConcatFunc,
 		"contains":         stdlib.ContainsFunc,
 		"csvdecode":        stdlib.CSVDecodeFunc,
-		"dirname":          funcs.DirnameFunc,
+		"dirname":          filesystem.DirnameFunc,
 		"distinct":         stdlib.DistinctFunc,
 		"element":          stdlib.ElementFunc,
 		"endswith":         funcs.EndsWithFunc,
 		"chunklist":        stdlib.ChunklistFunc,
-		"file":             funcs.MakeFileFunc(baseDir, false),
-		"fileexists":       funcs.MakeFileExistsFunc(baseDir),
-		"fileset":          funcs.MakeFileSetFunc(baseDir),
-		"filebase64":       funcs.MakeFileFunc(baseDir, true),
+		"file":             funcs.MakeFileFunc(baseDir, false), // modified hashicorp/go-cty-funcs/filesystem.MakeFileFunc
+		"fileexists":       funcs.MakeFileExistsFunc(baseDir),  // modified hashicorp/go-cty-funcs/filesystem.filesystem.MakeFileExistsFunc
+		"fileset":          funcs.MakeFileSetFunc(baseDir),     // modified hashicorp/go-cty-funcs/filesystem.filesystem.MakeFileSetFunc
+		"filebase64":       funcs.MakeFileFunc(baseDir, true),  // modified hashicorp/go-cty-funcs/filesystem.filesystem.MakeFileFunc
 		"filebase64sha256": funcs.MakeFileBase64Sha256Func(baseDir),
 		"filebase64sha512": funcs.MakeFileBase64Sha512Func(baseDir),
 		"filemd5":          funcs.MakeFileMd5Func(baseDir),
@@ -1191,43 +1186,43 @@ func ExpFunctions(baseDir string, logger zerolog.Logger) map[string]function.Fun
 		"flatten":          stdlib.FlattenFunc,
 		"floor":            stdlib.FloorFunc,
 		"format":           stdlib.FormatFunc,
-		"formatdate":       stdlib.FormatDateFunc,
+		"formatdate":       funcs.FormatDateFunc, // wraps stdlib.FormatDateFunc
 		"formatlist":       stdlib.FormatListFunc,
 		"indent":           stdlib.IndentFunc,
 		"index":            funcs.IndexFunc, // stdlib.IndexFunc is not compatible
 		"join":             stdlib.JoinFunc,
-		"jsondecode":       funcs.JSONDecodeFunc,
+		"jsondecode":       funcs.JSONDecodeFunc, // customized from stdlib to handle mocks
 		"jsonencode":       stdlib.JSONEncodeFunc,
 		"keys":             stdlib.KeysFunc,
 		"length":           funcs.LengthFunc,
 		"list":             funcs.ListFunc,
 		"log":              stdlib.LogFunc,
-		"lookup":           funcs.LookupFunc,
+		"lookup":           funcs.LookupFunc, // customized from stdlib
 		"lower":            stdlib.LowerFunc,
 		"map":              funcs.MapFunc,
 		"matchkeys":        funcs.MatchkeysFunc,
 		"max":              stdlib.MaxFunc,
-		"md5":              funcs.Md5Func,
-		"merge":            funcs.MergeFunc,
+		"md5":              crypto.Md5Func,
+		"merge":            funcs.MergeFunc, // customized from stdlib
 		"min":              stdlib.MinFunc,
 		"parseint":         stdlib.ParseIntFunc,
-		"pathexpand":       funcs.PathExpandFunc,
-		"infracostlog":     funcs.LogArgs(logger),
-		"infracostprint":   funcs.PrintArgs,
+		"pathexpand":       filesystem.PathExpandFunc,
+		"infracostlog":     funcs.LogArgs(logger), // custom
+		"infracostprint":   funcs.PrintArgs,       // custom
 		"pow":              stdlib.PowFunc,
 		"range":            stdlib.RangeFunc,
 		"regex":            stdlib.RegexFunc,
 		"regexall":         stdlib.RegexAllFunc,
-		"replace":          funcs.ReplaceFunc,
+		"replace":          funcs.ReplaceFunc, // customized from stdlib
 		"reverse":          stdlib.ReverseListFunc,
-		"rsadecrypt":       funcs.RsaDecryptFunc,
+		"rsadecrypt":       funcs.RsaDecryptFunc, // customized from hashicorp/go-cty-funcs/crypto
 		"setintersection":  stdlib.SetIntersectionFunc,
 		"setproduct":       stdlib.SetProductFunc,
 		"setsubtract":      stdlib.SetSubtractFunc,
 		"setunion":         stdlib.SetUnionFunc,
-		"sha1":             funcs.Sha1Func,
-		"sha256":           funcs.Sha256Func,
-		"sha512":           funcs.Sha512Func,
+		"sha1":             crypto.Sha1Func,
+		"sha256":           crypto.Sha256Func,
+		"sha512":           crypto.Sha512Func,
 		"signum":           stdlib.SignumFunc,
 		"slice":            stdlib.SliceFunc,
 		"sort":             stdlib.SortFunc,
@@ -1236,15 +1231,15 @@ func ExpFunctions(baseDir string, logger zerolog.Logger) map[string]function.Fun
 		"strcontains":      funcs.StrContainsFunc,
 		"strrev":           stdlib.ReverseFunc,
 		"substr":           stdlib.SubstrFunc,
-		"timestamp":        funcs.MockTimestampFunc, // We want to return a deterministic value each time
+		"timestamp":        funcs.MockTimestampFunc, // custom. We want to return a deterministic value each time
 		"timeadd":          stdlib.TimeAddFunc,
 		"title":            stdlib.TitleFunc,
-		"tostring":         funcs.MakeToFunc(cty.String),
-		"tonumber":         funcs.MakeToFunc(cty.Number),
-		"tobool":           funcs.MakeToFunc(cty.Bool),
-		"toset":            funcs.MakeToFunc(cty.Set(cty.DynamicPseudoType)),
-		"tolist":           funcs.MakeToFunc(cty.List(cty.DynamicPseudoType)),
-		"tomap":            funcs.MakeToFunc(cty.Map(cty.DynamicPseudoType)),
+		"tostring":         funcs.MakeToFunc(cty.String),                      // customized from stdlib
+		"tonumber":         funcs.MakeToFunc(cty.Number),                      // customized from stdlib
+		"tobool":           funcs.MakeToFunc(cty.Bool),                        // customized from stdlib
+		"toset":            funcs.MakeToFunc(cty.Set(cty.DynamicPseudoType)),  // customized from stdlib
+		"tolist":           funcs.MakeToFunc(cty.List(cty.DynamicPseudoType)), // customized from stdlib
+		"tomap":            funcs.MakeToFunc(cty.Map(cty.DynamicPseudoType)),  // customized from stdlib
 		"transpose":        funcs.TransposeFunc,
 		"trim":             stdlib.TrimFunc,
 		"trimprefix":       stdlib.TrimPrefixFunc,
@@ -1252,13 +1247,18 @@ func ExpFunctions(baseDir string, logger zerolog.Logger) map[string]function.Fun
 		"trimsuffix":       stdlib.TrimSuffixFunc,
 		"try":              tryfunc.TryFunc,
 		"upper":            stdlib.UpperFunc,
-		"urlencode":        funcs.URLEncodeFunc,
+		"urlencode":        encoding.URLEncodeFunc,
 		"uuid":             funcs.UUIDFunc,
 		"uuidv5":           funcs.UUIDV5Func,
 		"values":           stdlib.ValuesFunc,
-		"yamldecode":       funcs.YAMLDecodeFunc,
+		"yamldecode":       funcs.YAMLDecodeFunc, // customized yaml.YAMLDecodeFunc
 		"yamlencode":       yaml.YAMLEncodeFunc,
 		"zipmap":           stdlib.ZipmapFunc,
 	}
 
+	fns["templatefile"] = funcs.MakeTemplateFileFunc(baseDir, func() map[string]function.Function {
+		return fns
+	})
+
+	return fns
 }

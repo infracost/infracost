@@ -73,10 +73,46 @@ func createFileWithContents(filePath string) error {
 }`
 	case "terragrunt.hcl.json":
 		content = `include {
-	path = find_in_parent_folders()		
+	path = find_in_parent_folders()
 }`
+	case "Jenkinsfile":
+		content = `
+pipeline {
+    agent any
+    options {
+        timeout(time: 1, unit: 'SECONDS')
+    }
+    stages {
+        stage('Example') {
+            steps {
+                echo 'Hello World'
+            }
+        }
+    }
+}
+`
 	default:
 		content = ""
+	}
+
+	if strings.HasSuffix(filename, "-custom-ext") {
+		content = `
+instance_type = "m5.4xlarge"
+`
+	}
+
+	if strings.HasSuffix(filename, ".tfvars.json") {
+		content = `
+{
+  "region": "us-west-2"
+}
+`
+	}
+
+	if strings.HasPrefix(filename, "empty-file") {
+		content = `
+			# This is an empty file
+`
 	}
 
 	return os.WriteFile(filePath, []byte(content), 0600)
@@ -153,13 +189,7 @@ func buildFileSystemTree(lines []string, currentLine int, currentIndent int) (*f
 	}
 
 	node := &fileSystemNode{
-		name:  strings.TrimSpace(formattedLine),
-		isDir: filepath.Ext(line) == "" || formattedLine == ".",
-	}
-
-	// files cannot have children underneath them
-	if !node.isDir {
-		return node, nil
+		name: strings.TrimSpace(formattedLine),
 	}
 
 	nextIndent := indent + 1
@@ -177,5 +207,6 @@ func buildFileSystemTree(lines []string, currentLine int, currentIndent int) (*f
 		nextLine += len(child.children)
 	}
 
+	node.isDir = len(node.children) > 0
 	return node, nil
 }

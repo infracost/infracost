@@ -1,70 +1,73 @@
 
- Name                                                                   Monthly Qty  Unit   Monthly Cost 
-                                                                                                         
- aws_elasticsearch_domain.gp2                                                                            
- ├─ Instance (on-demand, c4.2xlarge.elasticsearch)                            2,190  hours     $1,285.53 
- ├─ Storage (gp2)                                                               400  GB           $54.00 
- ├─ Dedicated master (on-demand, c4.8xlarge.elasticsearch)                      730  hours     $1,713.31 
- └─ UltraWarm instance (on-demand, ultrawarm1.medium.elasticsearch)           1,460  hours       $347.48 
-                                                                                                         
- aws_elasticsearch_domain.gp3                                                                            
- ├─ Instance (on-demand, c4.2xlarge.elasticsearch)                            2,190  hours     $1,285.53 
- ├─ Storage (gp3)                                                               400  GB           $48.80 
- ├─ Dedicated master (on-demand, c4.8xlarge.elasticsearch)                      730  hours     $1,713.31 
- └─ UltraWarm instance (on-demand, ultrawarm1.medium.elasticsearch)           1,460  hours       $347.48 
-                                                                                                         
- aws_elasticsearch_domain.gp3_throughput["above_3TB_free"]                                               
- ├─ Instance (on-demand, c4.2xlarge.elasticsearch)                              730  hours       $428.51 
- └─ Storage (gp3)                                                             3,500  GB          $427.00 
-                                                                                                         
- aws_elasticsearch_domain.gp3_throughput["above_3TB_free_round_up"]                                      
- ├─ Instance (on-demand, c4.2xlarge.elasticsearch)                              730  hours       $428.51 
- └─ Storage (gp3)                                                             5,000  GB          $610.00 
-                                                                                                         
- aws_elasticsearch_domain.gp3_throughput["above_3TB_paid"]                                               
- ├─ Instance (on-demand, c4.2xlarge.elasticsearch)                              730  hours       $428.51 
- ├─ Storage (gp3)                                                             4,000  GB          $488.00 
- └─ Throughput (gp3)                                                            200  Mbps         $12.80 
-                                                                                                         
- aws_elasticsearch_domain.gp3_throughput["above_3TB_paid_mul"]                                           
- ├─ Instance (on-demand, c4.2xlarge.elasticsearch)                            1,460  hours       $857.02 
- ├─ Storage (gp3)                                                             4,000  GB          $488.00 
- └─ Throughput (gp3)                                                            400  Mbps         $25.60 
-                                                                                                         
- aws_elasticsearch_domain.gp3_throughput["above_min_storage_free"]                                       
- ├─ Instance (on-demand, c4.2xlarge.elasticsearch)                              730  hours       $428.51 
- └─ Storage (gp3)                                                               180  GB           $21.96 
-                                                                                                         
- aws_elasticsearch_domain.gp3_throughput["below_min_storage_free"]                                       
- ├─ Instance (on-demand, c4.2xlarge.elasticsearch)                              730  hours       $428.51 
- └─ Storage (gp3)                                                               150  GB           $18.30 
-                                                                                                         
- aws_elasticsearch_domain.gp3_throughput["below_min_storage_mul_paid"]                                   
- ├─ Instance (on-demand, c4.2xlarge.elasticsearch)                            1,460  hours       $857.02 
- ├─ Storage (gp3)                                                               150  GB           $18.30 
- └─ Throughput (gp3)                                                            150  Mbps          $9.60 
-                                                                                                         
- aws_elasticsearch_domain.gp3_throughput["below_min_storage_paid"]                                       
- ├─ Instance (on-demand, c4.2xlarge.elasticsearch)                              730  hours       $428.51 
- ├─ Storage (gp3)                                                               150  GB           $18.30 
- └─ Throughput (gp3)                                                             75  Mbps          $4.80 
-                                                                                                         
- aws_elasticsearch_domain.io1                                                                            
- ├─ Instance (on-demand, c4.2xlarge.elasticsearch)                            2,190  hours     $1,285.53 
- ├─ Storage (io1)                                                             1,000  GB          $169.00 
- └─ Storage IOPS (io1)                                                           10  IOPS          $0.88 
-                                                                                                         
- aws_elasticsearch_domain.std                                                                            
- ├─ Instance (on-demand, c4.2xlarge.elasticsearch)                            2,190  hours     $1,285.53 
- └─ Storage (standard)                                                          123  GB            $8.24 
-                                                                                                         
- OVERALL TOTAL                                                                                $15,972.38 
+ Name                                                                   Monthly Qty  Unit   Monthly Cost   
+                                                                                                           
+ aws_elasticsearch_domain.gp2                                                                              
+ ├─ Instance (on-demand, c4.2xlarge.elasticsearch)                            2,190  hours     $1,285.53   
+ ├─ Storage (gp2)                                                               400  GB           $54.00   
+ ├─ Dedicated master (on-demand, c4.8xlarge.elasticsearch)                      730  hours     $1,713.31   
+ └─ UltraWarm instance (on-demand, ultrawarm1.medium.elasticsearch)           1,460  hours       $347.48   
+                                                                                                           
+ aws_elasticsearch_domain.gp3                                                                              
+ ├─ Instance (on-demand, c4.2xlarge.elasticsearch)                            2,190  hours     $1,285.53   
+ ├─ Storage (gp3)                                                               400  GB           $48.80   
+ ├─ Dedicated master (on-demand, c4.8xlarge.elasticsearch)                      730  hours     $1,713.31   
+ └─ UltraWarm instance (on-demand, ultrawarm1.medium.elasticsearch)           1,460  hours       $347.48   
+                                                                                                           
+ aws_elasticsearch_domain.io1                                                                              
+ ├─ Instance (on-demand, c4.2xlarge.elasticsearch)                            2,190  hours     $1,285.53   
+ ├─ Storage (io1)                                                             1,000  GB          $169.00   
+ └─ Storage IOPS (io1)                                                           10  IOPS          $0.88   
+                                                                                                           
+ aws_elasticsearch_domain.gp3_throughput["above_3TB_paid_mul"]                                             
+ ├─ Instance (on-demand, c4.2xlarge.elasticsearch)                            1,460  hours       $857.02   
+ ├─ Storage (gp3)                                                             4,000  GB          $488.00   
+ └─ Throughput (gp3)                                                            400  Mbps         $25.60   
+                                                                                                           
+ aws_elasticsearch_domain.std                                                                              
+ ├─ Instance (on-demand, c4.2xlarge.elasticsearch)                            2,190  hours     $1,285.53   
+ └─ Storage (standard)                                                          123  GB            $8.24   
+                                                                                                           
+ aws_elasticsearch_domain.gp3_throughput["above_3TB_free_round_up"]                                        
+ ├─ Instance (on-demand, c4.2xlarge.elasticsearch)                              730  hours       $428.51   
+ └─ Storage (gp3)                                                             5,000  GB          $610.00   
+                                                                                                           
+ aws_elasticsearch_domain.gp3_throughput["above_3TB_paid"]                                                 
+ ├─ Instance (on-demand, c4.2xlarge.elasticsearch)                              730  hours       $428.51   
+ ├─ Storage (gp3)                                                             4,000  GB          $488.00   
+ └─ Throughput (gp3)                                                            200  Mbps         $12.80   
+                                                                                                           
+ aws_elasticsearch_domain.gp3_throughput["below_min_storage_mul_paid"]                                     
+ ├─ Instance (on-demand, c4.2xlarge.elasticsearch)                            1,460  hours       $857.02   
+ ├─ Storage (gp3)                                                               150  GB           $18.30   
+ └─ Throughput (gp3)                                                            150  Mbps          $9.60   
+                                                                                                           
+ aws_elasticsearch_domain.gp3_throughput["above_3TB_free"]                                                 
+ ├─ Instance (on-demand, c4.2xlarge.elasticsearch)                              730  hours       $428.51   
+ └─ Storage (gp3)                                                             3,500  GB          $427.00   
+                                                                                                           
+ aws_elasticsearch_domain.gp3_throughput["below_min_storage_paid"]                                         
+ ├─ Instance (on-demand, c4.2xlarge.elasticsearch)                              730  hours       $428.51   
+ ├─ Storage (gp3)                                                               150  GB           $18.30   
+ └─ Throughput (gp3)                                                             75  Mbps          $4.80   
+                                                                                                           
+ aws_elasticsearch_domain.gp3_throughput["above_min_storage_free"]                                         
+ ├─ Instance (on-demand, c4.2xlarge.elasticsearch)                              730  hours       $428.51   
+ └─ Storage (gp3)                                                               180  GB           $21.96   
+                                                                                                           
+ aws_elasticsearch_domain.gp3_throughput["below_min_storage_free"]                                         
+ ├─ Instance (on-demand, c4.2xlarge.elasticsearch)                              730  hours       $428.51   
+ └─ Storage (gp3)                                                               150  GB           $18.30   
+                                                                                                           
+ OVERALL TOTAL                                                                               $15,972.38 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 12 cloud resources were detected:
 ∙ 12 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestElasticsearchDomain                            ┃ $15,972      ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $15,972       ┃ $0.00       ┃ $15,972    ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

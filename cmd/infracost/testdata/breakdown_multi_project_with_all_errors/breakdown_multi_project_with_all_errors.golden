@@ -1,4 +1,4 @@
-Project: infracost/infracost/cmd/infracost/testdata/breakdown_multi_project_with_all_errors/dev
+Project: dev
 Module path: dev
 
 Errors:
@@ -8,7 +8,7 @@ Errors:
         Invalid block definition; Either a quoted string block label or an opening brace ("{") is expected here., and 1 other diagnostic(s)
 
 ──────────────────────────────────
-Project: infracost/infracost/cmd/infracost/testdata/breakdown_multi_project_with_all_errors/prod
+Project: prod
 Module path: prod
 
 Errors:
@@ -18,15 +18,18 @@ Errors:
         Invalid block definition; Either a quoted string block label or an opening brace ("{") is expected here., and 1 other diagnostic(s)
 
  OVERALL TOTAL       $0.00 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 No cloud resources were detected
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                                          ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...ti_project_with_all_errors/dev ┃ $0.00        ┃
-┃ infracost/infracost/cmd/infraco...i_project_with_all_errors/prod ┃ $0.00        ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ dev                                                ┃ $0.00         ┃ $0.00       ┃ $0.00      ┃
+┃ prod                                               ┃ $0.00         ┃ $0.00       ┃ $0.00      ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:
 

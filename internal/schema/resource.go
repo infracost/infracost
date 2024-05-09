@@ -3,9 +3,10 @@ package schema
 import (
 	"sort"
 
-	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
 	"github.com/tidwall/gjson"
+
+	"github.com/infracost/infracost/internal/logging"
 )
 
 var (
@@ -34,12 +35,39 @@ type Resource struct {
 	EstimateUsage     EstimateFunc
 	EstimationSummary map[string]bool
 	Metadata          map[string]gjson.Result
+
+	// parent is the parent resource of this resource, this is only
+	// applicable for sub resources. See FlattenedSubResources for more info
+	// on how this is built and used.
+	parent *Resource
 }
 
 func CalculateCosts(project *Project) {
 	for _, r := range project.AllResources() {
 		r.CalculateCosts()
 	}
+}
+
+// BaseResourceType returns the base resource type of the resource. This is the
+// resource type of the top level resource in the hierarchy. For example, if the
+// resource is a subresource of a `aws_instance` resource (e.g.
+// ebs_block_device), the base resource type will be `aws_instance`.
+func (r *Resource) BaseResourceType() string {
+	if r.parent == nil {
+		return r.ResourceType
+	}
+
+	return r.parent.BaseResourceType()
+}
+
+// BaseResourceName returns the base resource name of the resource. This is the
+// resource name of the top level resource in the hierarchy.
+func (r *Resource) BaseResourceName() string {
+	if r.parent == nil {
+		return r.Name
+	}
+
+	return r.parent.BaseResourceName()
 }
 
 func (r *Resource) CalculateCosts() {
@@ -92,14 +120,18 @@ func (r *Resource) CalculateCosts() {
 		r.MonthlyUsageCost = monthlyUsageCost
 	}
 	if r.NoPrice {
-		log.Debug().Msgf("Skipping free resource %s", r.Name)
+		logging.Logger.Debug().Msgf("Skipping free resource %s", r.Name)
 	}
 }
 
+// FlattenedSubResources returns a list of resources from the given resources,
+// flattening all sub resources recursively. It also sets the parent resource for
+// each sub resource so that the full resource can be reconstructed.
 func (r *Resource) FlattenedSubResources() []*Resource {
 	resources := make([]*Resource, 0, len(r.SubResources))
 
 	for _, s := range r.SubResources {
+		s.parent = r
 		resources = append(resources, s)
 
 		if len(s.SubResources) > 0 {

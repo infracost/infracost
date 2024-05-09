@@ -1,25 +1,28 @@
-Project: infracost/infracost/cmd/infracost/testdata/hclmodule_reevaluated_on_input_change
+Project: main
 
- Name                                                   Monthly Qty  Unit   Monthly Cost 
-                                                                                         
- module.test.aws_instance.web_app                                                        
- ├─ Instance usage (Linux/UNIX, on-demand, m5.4xlarge)          730  hours       $560.64 
- ├─ root_block_device                                                                    
- │  └─ Storage (general purpose SSD, gp2)                        50  GB            $5.00 
- └─ ebs_block_device[0]                                                                  
-    ├─ Storage (provisioned IOPS SSD, io1)                    1,000  GB          $125.00 
-    └─ Provisioned IOPS                                         800  IOPS         $52.00 
-                                                                                         
- OVERALL TOTAL                                                                   $742.64 
+ Name                                                   Monthly Qty  Unit   Monthly Cost   
+                                                                                           
+ module.test.aws_instance.web_app                                                          
+ ├─ Instance usage (Linux/UNIX, on-demand, m5.4xlarge)          730  hours       $560.64   
+ ├─ root_block_device                                                                      
+ │  └─ Storage (general purpose SSD, gp2)                        50  GB            $5.00   
+ └─ ebs_block_device[0]                                                                    
+    ├─ Storage (provisioned IOPS SSD, io1)                    1,000  GB          $125.00   
+    └─ Provisioned IOPS                                         800  IOPS         $52.00   
+                                                                                           
+ OVERALL TOTAL                                                                  $742.64 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 1 cloud resource was detected:
-∙ 1 was estimated, it includes usage-based costs, see https://infracost.io/usage-file
+∙ 1 was estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                                          ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...le_reevaluated_on_input_change ┃ $743         ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $743          ┃ $0.00       ┃ $743       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:
 

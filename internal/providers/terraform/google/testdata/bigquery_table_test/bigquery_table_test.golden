@@ -1,30 +1,33 @@
 
- Name                                Monthly Qty  Unit              Monthly Cost 
-                                                                                 
- google_bigquery_dataset.default                                                 
- └─ Queries (on-demand)           Monthly cost depends on usage: $6.25 per TB    
-                                                                                 
- google_bigquery_table.non_usage                                                 
- ├─ Active storage                Monthly cost depends on usage: $0.023 per GB   
- ├─ Long-term storage             Monthly cost depends on usage: $0.016 per GB   
- ├─ Streaming inserts             Monthly cost depends on usage: $0.00005 per MB 
- ├─ Storage write API             Monthly cost depends on usage: $0.025 per GB   
- └─ Storage read API              Monthly cost depends on usage: $1.10 per TB    
-                                                                                 
- google_bigquery_table.usage                                                     
- ├─ Active storage                         1,000  GB                      $23.00 
- ├─ Long-term storage                      1,000  GB                      $16.00 
- ├─ Streaming inserts                      1,000  MB                       $0.05 
- ├─ Storage write API                      1,000  GB                      $25.00 
- └─ Storage read API                       1,000  TB                   $1,100.00 
-                                                                                 
+ Name                                Monthly Qty  Unit              Monthly Cost    
+                                                                                    
+ google_bigquery_table.usage                                                        
+ ├─ Active storage                         1,000  GB                      $23.00  * 
+ ├─ Long-term storage                      1,000  GB                      $16.00  * 
+ ├─ Streaming inserts                      1,000  MB                       $0.05  * 
+ ├─ Storage write API                      1,000  GB                      $25.00  * 
+ └─ Storage read API                       1,000  TB                   $1,100.00  * 
+                                                                                    
+ google_bigquery_dataset.default                                                    
+ └─ Queries (on-demand)           Monthly cost depends on usage: $6.25 per TB       
+                                                                                    
+ google_bigquery_table.non_usage                                                    
+ ├─ Active storage                Monthly cost depends on usage: $0.023 per GB      
+ ├─ Long-term storage             Monthly cost depends on usage: $0.016 per GB      
+ ├─ Streaming inserts             Monthly cost depends on usage: $0.00005 per MB    
+ ├─ Storage write API             Monthly cost depends on usage: $0.025 per GB      
+ └─ Storage read API              Monthly cost depends on usage: $1.10 per TB       
+                                                                                    
  OVERALL TOTAL                                                         $1,164.05 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 3 cloud resources were detected:
-∙ 3 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 3 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestBigqueryTable                                  ┃ $1,164       ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $0.00         ┃ $1,164      ┃ $1,164     ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

@@ -162,10 +162,20 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getPrivateDnsResolverDnsForwardingRulesetRegistryItem(),
 	getMachineLearningComputeInstanceRegistryItem(),
 	getMachineLearningComputeClusterRegistryItem(),
+	getNetworkDdosProtectionPlanRegistryItem(),
+	getAppConfigurationRegistryItem(),
+	getFederatedIdentityCredentialRegistryItem(),
+	getCognitiveAccountRegistryItem(),
+	getCognitiveDeploymentRegistryItem(),
 }
 
 // FreeResources grouped alphabetically
 var FreeResources = []string{
+	// Azure App Configuration
+	"azurerm_app_configuration_feature",
+	"azurerm_app_configuration_key",
+	// Azure AI Services
+	"azurerm_cognitive_account_customer_managed_key",
 	// Azure Api Management
 	"azurerm_api_management_api",
 	"azurerm_api_management_api_diagnostic",
@@ -255,6 +265,7 @@ var FreeResources = []string{
 	"azurerm_blueprint_assignment",
 
 	// Azure CDN
+	"azurerm_cdn_frontdoor_custom_domain_association",
 	"azurerm_cdn_profile",
 
 	// Azure Consumption
@@ -264,6 +275,8 @@ var FreeResources = []string{
 
 	// Azure CosmosDB
 	"azurerm_cosmosdb_notebook_workspace",
+	"azurerm_cosmosdb_sql_role_assignment",
+	"azurerm_cosmosdb_sql_role_definition",
 	"azurerm_cosmosdb_sql_stored_procedure",
 	"azurerm_cosmosdb_sql_trigger",
 	"azurerm_cosmosdb_sql_user_defined_function",
@@ -395,7 +408,7 @@ var FreeResources = []string{
 	"azurerm_iothub_route",
 	"azurerm_iothub_shared_access_policy",
 
-	// Azure Lighthouse (Delegated Resoure Management)
+	// Azure Lighthouse (Delegated Resource Management)
 	"azurerm_lighthouse_definition",
 	"azurerm_lighthouse_assignment",
 
@@ -550,6 +563,9 @@ var FreeResources = []string{
 	// Azure SignalR
 	"azurerm_signalr_service_network_acl",
 	"azurerm_signalr_shared_private_link",
+
+	// Azure Site Recovery
+	"azurerm_site_recovery_protection_container_mapping",
 
 	// Azure SQL
 	"azurerm_sql_failover_group",

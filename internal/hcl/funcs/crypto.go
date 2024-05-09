@@ -15,11 +15,10 @@ import (
 	"strings"
 
 	uuidv5 "github.com/google/uuid"
+	"github.com/hashicorp/go-cty-funcs/crypto"
 	uuid "github.com/hashicorp/go-uuid"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/function"
-	"github.com/zclconf/go-cty/cty/gocty"
-	"golang.org/x/crypto/bcrypt"
 	"golang.org/x/crypto/ssh"
 )
 
@@ -87,44 +86,6 @@ var Base64Sha512Func = makeStringHashFunction(sha512.New, base64.StdEncoding.Enc
 func MakeFileBase64Sha512Func(baseDir string) function.Function {
 	return makeFileHashFunction(baseDir, sha512.New, base64.StdEncoding.EncodeToString)
 }
-
-// BcryptFunc constructs a function that computes a hash of the given string using the Blowfish cipher.
-var BcryptFunc = function.New(&function.Spec{
-	Params: []function.Parameter{
-		{
-			Name: "str",
-			Type: cty.String,
-		},
-	},
-	VarParam: &function.Parameter{
-		Name: "cost",
-		Type: cty.Number,
-	},
-	Type: function.StaticReturnType(cty.String),
-	Impl: func(args []cty.Value, retType cty.Type) (ret cty.Value, err error) {
-		defaultCost := 10
-
-		if len(args) > 1 {
-			var val int
-			if err := gocty.FromCtyValue(args[1], &val); err != nil {
-				return cty.UnknownVal(cty.String), err
-			}
-			defaultCost = val
-		}
-
-		if len(args) > 2 {
-			return cty.UnknownVal(cty.String), fmt.Errorf("bcrypt() takes no more than two arguments")
-		}
-
-		input := args[0].AsString()
-		out, err := bcrypt.GenerateFromPassword([]byte(input), defaultCost)
-		if err != nil {
-			return cty.UnknownVal(cty.String), fmt.Errorf("error occurred generating password %s", err.Error())
-		}
-
-		return cty.StringVal(string(out)), nil
-	},
-})
 
 // Md5Func constructs a function that computes the MD5 hash of a given string and encodes it with hexadecimal digits.
 var Md5Func = makeStringHashFunction(md5.New, hex.EncodeToString)
@@ -303,7 +264,7 @@ func Bcrypt(str cty.Value, cost ...cty.Value) (cty.Value, error) {
 	args := make([]cty.Value, len(cost)+1)
 	args[0] = str
 	copy(args[1:], cost)
-	return BcryptFunc.Call(args)
+	return crypto.BcryptFunc.Call(args)
 }
 
 // Md5 computes the MD5 hash of a given string and encodes it with hexadecimal digits.

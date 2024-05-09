@@ -5,12 +5,12 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/rs/zerolog/log"
 	"github.com/spf13/cobra"
 
 	"github.com/infracost/infracost/internal/apiclient"
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/output"
 	"github.com/infracost/infracost/internal/ui"
 )
@@ -96,7 +96,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			combined, err := output.Combine(inputs)
 			if errors.As(err, &clierror.WarningError{}) {
 				if format == "json" {
-					ui.PrintWarningf(cmd.ErrOrStderr(), err.Error())
+					logging.Logger.Warn().Msgf(err.Error())
 				}
 			} else if err != nil {
 				return err
@@ -111,14 +111,14 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			if cmd.Flags().Changed("fields") {
 				fields, _ = cmd.Flags().GetStringSlice("fields")
 				if len(fields) == 0 {
-					ui.PrintWarningf(cmd.ErrOrStderr(), "fields is empty, using defaults: %s", cmd.Flag("fields").DefValue)
+					logging.Logger.Warn().Msgf("fields is empty, using defaults: %s", cmd.Flag("fields").DefValue)
 				} else if len(fields) == 1 && fields[0] == includeAllFields {
 					fields = validFields
 				} else {
 					vf := []string{}
 					for _, f := range fields {
 						if !contains(validFields, f) {
-							ui.PrintWarningf(cmd.ErrOrStderr(), "Invalid field '%s' specified, valid fields are: %s or '%s' to include all fields", f, validFields, includeAllFields)
+							logging.Logger.Warn().Msgf("Invalid field '%s' specified, valid fields are: %s or '%s' to include all fields", f, validFields, includeAllFields)
 						} else {
 							vf = append(vf, f)
 						}
@@ -139,12 +139,12 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			validFieldsFormats := []string{"table", "html"}
 
 			if cmd.Flags().Changed("fields") && !contains(validFieldsFormats, format) {
-				ui.PrintWarning(cmd.ErrOrStderr(), "fields is only supported for table and html output formats")
+				logging.Logger.Warn().Msg("fields is only supported for table and html output formats")
 			}
 
 			if ctx.IsCloudUploadExplicitlyEnabled() {
 				if ctx.Config.IsSelfHosted() {
-					ui.PrintWarning(cmd.ErrOrStderr(), "Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
+					logging.Logger.Warn().Msg("Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
 				} else {
 					result := shareCombinedRun(ctx, combined, inputs, apiclient.CommentFormatMarkdownHTML)
 					combined.RunID, combined.ShareURL, combined.CloudURL = result.RunID, result.ShareURL, result.CloudURL
@@ -159,7 +159,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 			pricingClient := apiclient.GetPricingAPIClient(ctx)
 			err = pricingClient.AddEvent("infracost-output", ctx.EventEnv())
 			if err != nil {
-				log.Error().Msgf("Error reporting event: %s", err)
+				logging.Logger.Error().Msgf("Error reporting event: %s", err)
 			}
 
 			if outFile, _ := cmd.Flags().GetString("out-file"); outFile != "" {
@@ -180,7 +180,7 @@ func outputCmd(ctx *config.RunContext) *cobra.Command {
 
 	cmd.Flags().String("format", "table", "Output format: json, diff, table, html, github-comment, gitlab-comment, azure-repos-comment, bitbucket-comment, bitbucket-comment-summary, slack-message")
 	cmd.Flags().Bool("show-all-projects", false, "Show all projects in the table of the comment output")
-	cmd.Flags().Bool("show-skipped", false, "List unsupported and free resources")
+	cmd.Flags().Bool("show-skipped", false, "List unsupported resources")
 	cmd.Flags().StringSlice("fields", []string{"monthlyQuantity", "unit", "monthlyCost"}, "Comma separated list of output fields: all,price,monthlyQuantity,unit,hourlyCost,monthlyCost.\nSupported by table and html output formats")
 
 	_ = cmd.MarkFlagRequired("path")
@@ -205,7 +205,7 @@ func shareCombinedRun(ctx *config.RunContext, combined output.Root, inputs []out
 	dashboardClient := apiclient.NewDashboardAPIClient(ctx)
 	result, err := dashboardClient.AddRun(ctx, combined, commentFormat)
 	if err != nil {
-		log.Err(err).Msg("Failed to upload to Infracost Cloud")
+		logging.Logger.Err(err).Msg("Failed to upload to Infracost Cloud")
 	}
 
 	return result

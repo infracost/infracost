@@ -682,7 +682,7 @@ type azurePullRequestResponse struct {
 	MergeId       string    `json:"mergeId"`
 }
 
-// getAzureRepoPRInfo attempts to get the azurePullRequestResponse using Azure DevOps Pipeline variables.
+// getAzureReposPRInfo attempts to get the azurePullRequestResponse using Azure DevOps Pipeline variables.
 // This method is expected to often fail as Azure DevOps requires users to explicitly pass System.AccessToken as
 // an env var on the job step.
 func (f *metadataFetcher) getAzureReposPRInfo() azurePullRequestResponse {
@@ -1056,6 +1056,7 @@ type Metadata struct {
 	Remote      Remote
 	Branch      Branch
 	Commit      Commit
+	BaseCommit  Commit
 	PullRequest *PullRequest
 	Pipeline    *Pipeline
 }

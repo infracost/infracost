@@ -1,13 +1,12 @@
 package aws
 
 import (
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 
 	"fmt"
 	"strings"
-
-	"github.com/rs/zerolog/log"
 
 	"github.com/shopspring/decimal"
 )
@@ -46,7 +45,7 @@ func (r *SSMParameter) BuildResource() *schema.Resource {
 		throughputLimit = strings.ToLower(*r.APIThroughputLimit)
 
 		if throughputLimit != "standard" && throughputLimit != "advanced" && throughputLimit != "higher" {
-			log.Warn().Msgf("Skipping resource %s. Unrecognized api_throughput_limit %s, expecting standard, advanced or higher", r.Address, *r.APIThroughputLimit)
+			logging.Logger.Warn().Msgf("Skipping resource %s. Unrecognized api_throughput_limit %s, expecting standard, advanced or higher", r.Address, *r.APIThroughputLimit)
 			return nil
 		}
 	}

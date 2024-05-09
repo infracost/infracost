@@ -1,99 +1,102 @@
-Project: infracost/infracost/cmd/infracost/testdata/breakdown_terraform_usage_file_wildcard_module
+Project: main
 
- Name                                                          Monthly Qty  Unit                        Monthly Cost 
-                                                                                                                     
- aws_lambda_function.test                                                                                            
- ├─ Requests                                                           500  1M requests                      $100.00 
- └─ Duration (first 6B)                                        275,000,000  GB-seconds                     $4,583.34 
-                                                                                                                     
- module.mod2["test"].aws_lambda_function.test2                                                                       
- ├─ Requests                                           Monthly cost depends on usage: $0.20 per 1M requests          
- ├─ Ephemeral storage                                  Monthly cost depends on usage: $0.0000000309 per GB-seconds   
- └─ Duration (first 6B)                                Monthly cost depends on usage: $0.0000166667 per GB-seconds   
-                                                                                                                     
- module.mod2["test"].aws_lambda_function.test["baz"]                                                                 
- ├─ Requests                                           Monthly cost depends on usage: $0.20 per 1M requests          
- ├─ Ephemeral storage                                  Monthly cost depends on usage: $0.0000000309 per GB-seconds   
- └─ Duration (first 6B)                                Monthly cost depends on usage: $0.0000166667 per GB-seconds   
-                                                                                                                     
- module.mod2["test"].aws_lambda_function.test["foo"]                                                                 
- ├─ Requests                                           Monthly cost depends on usage: $0.20 per 1M requests          
- ├─ Ephemeral storage                                  Monthly cost depends on usage: $0.0000000309 per GB-seconds   
- └─ Duration (first 6B)                                Monthly cost depends on usage: $0.0000166667 per GB-seconds   
-                                                                                                                     
- module.mod2["test2"].aws_lambda_function.test2                                                                      
- ├─ Requests                                           Monthly cost depends on usage: $0.20 per 1M requests          
- ├─ Ephemeral storage                                  Monthly cost depends on usage: $0.0000000309 per GB-seconds   
- └─ Duration (first 6B)                                Monthly cost depends on usage: $0.0000166667 per GB-seconds   
-                                                                                                                     
- module.mod2["test2"].aws_lambda_function.test["baz"]                                                                
- ├─ Requests                                                           900  1M requests                      $180.00 
- └─ Duration (first 6B)                                        180,000,000  GB-seconds                     $3,000.01 
-                                                                                                                     
- module.mod2["test2"].aws_lambda_function.test["foo"]                                                                
- ├─ Requests                                                           900  1M requests                      $180.00 
- └─ Duration (first 6B)                                         90,000,000  GB-seconds                     $1,500.00 
-                                                                                                                     
- module.mod3["test"].aws_lambda_function.test2                                                                       
- ├─ Requests                                           Monthly cost depends on usage: $0.20 per 1M requests          
- ├─ Ephemeral storage                                  Monthly cost depends on usage: $0.0000000309 per GB-seconds   
- └─ Duration (first 6B)                                Monthly cost depends on usage: $0.0000166667 per GB-seconds   
-                                                                                                                     
- module.mod3["test"].aws_lambda_function.test["baz"]                                                                 
- ├─ Requests                                                           200  1M requests                       $40.00 
- └─ Duration (first 6B)                                         10,000,000  GB-seconds                       $166.67 
-                                                                                                                     
- module.mod3["test"].aws_lambda_function.test["foo"]                                                                 
- ├─ Requests                                                           200  1M requests                       $40.00 
- └─ Duration (first 6B)                                          2,000,000  GB-seconds                        $33.33 
-                                                                                                                     
- module.mod3["test2"].aws_lambda_function.test2                                                                      
- ├─ Requests                                           Monthly cost depends on usage: $0.20 per 1M requests          
- ├─ Ephemeral storage                                  Monthly cost depends on usage: $0.0000000309 per GB-seconds   
- └─ Duration (first 6B)                                Monthly cost depends on usage: $0.0000166667 per GB-seconds   
-                                                                                                                     
- module.mod3["test2"].aws_lambda_function.test["baz"]                                                                
- ├─ Requests                                                           200  1M requests                       $40.00 
- └─ Duration (first 6B)                                         10,000,000  GB-seconds                       $166.67 
-                                                                                                                     
- module.mod3["test2"].aws_lambda_function.test["foo"]                                                                
- ├─ Requests                                                           200  1M requests                       $40.00 
- └─ Duration (first 6B)                                          2,000,000  GB-seconds                        $33.33 
-                                                                                                                     
- module.mod["test"].aws_lambda_function.test2                                                                        
- ├─ Requests                                                           200  1M requests                       $40.00 
- └─ Duration (first 6B)                                         70,000,000  GB-seconds                     $1,166.67 
-                                                                                                                     
- module.mod["test"].aws_lambda_function.test["baz"]                                                                  
- ├─ Requests                                                           100  1M requests                       $20.00 
- └─ Duration (first 6B)                                         25,000,000  GB-seconds                       $416.67 
-                                                                                                                     
- module.mod["test"].aws_lambda_function.test["foo"]                                                                  
- ├─ Requests                                                           100  1M requests                       $20.00 
- └─ Duration (first 6B)                                         25,000,000  GB-seconds                       $416.67 
-                                                                                                                     
- module.mod["test2"].aws_lambda_function.test2                                                                       
- ├─ Requests                                                           200  1M requests                       $40.00 
- └─ Duration (first 6B)                                         70,000,000  GB-seconds                     $1,166.67 
-                                                                                                                     
- module.mod["test2"].aws_lambda_function.test["baz"]                                                                 
- ├─ Requests                                                           700  1M requests                      $140.00 
- └─ Duration (first 6B)                                        525,000,000  GB-seconds                     $8,750.02 
-                                                                                                                     
- module.mod["test2"].aws_lambda_function.test["foo"]                                                                 
- ├─ Requests                                                           400  1M requests                       $80.00 
- └─ Duration (first 6B)                                         20,000,000  GB-seconds                       $333.33 
-                                                                                                                     
+ Name                                                          Monthly Qty  Unit                        Monthly Cost    
+                                                                                                                        
+ module.mod["test2"].aws_lambda_function.test["baz"]                                                                    
+ ├─ Requests                                                           700  1M requests                      $140.00  * 
+ └─ Duration (first 6B)                                        525,000,000  GB-seconds                     $8,750.02  * 
+                                                                                                                        
+ aws_lambda_function.test                                                                                               
+ ├─ Requests                                                           500  1M requests                      $100.00  * 
+ └─ Duration (first 6B)                                        275,000,000  GB-seconds                     $4,583.34  * 
+                                                                                                                        
+ module.mod2["test2"].aws_lambda_function.test["baz"]                                                                   
+ ├─ Requests                                                           900  1M requests                      $180.00  * 
+ └─ Duration (first 6B)                                        180,000,000  GB-seconds                     $3,000.01  * 
+                                                                                                                        
+ module.mod2["test2"].aws_lambda_function.test["foo"]                                                                   
+ ├─ Requests                                                           900  1M requests                      $180.00  * 
+ └─ Duration (first 6B)                                         90,000,000  GB-seconds                     $1,500.00  * 
+                                                                                                                        
+ module.mod["test"].aws_lambda_function.test2                                                                           
+ ├─ Requests                                                           200  1M requests                       $40.00  * 
+ └─ Duration (first 6B)                                         70,000,000  GB-seconds                     $1,166.67  * 
+                                                                                                                        
+ module.mod["test2"].aws_lambda_function.test2                                                                          
+ ├─ Requests                                                           200  1M requests                       $40.00  * 
+ └─ Duration (first 6B)                                         70,000,000  GB-seconds                     $1,166.67  * 
+                                                                                                                        
+ module.mod["test"].aws_lambda_function.test["baz"]                                                                     
+ ├─ Requests                                                           100  1M requests                       $20.00  * 
+ └─ Duration (first 6B)                                         25,000,000  GB-seconds                       $416.67  * 
+                                                                                                                        
+ module.mod["test"].aws_lambda_function.test["foo"]                                                                     
+ ├─ Requests                                                           100  1M requests                       $20.00  * 
+ └─ Duration (first 6B)                                         25,000,000  GB-seconds                       $416.67  * 
+                                                                                                                        
+ module.mod["test2"].aws_lambda_function.test["foo"]                                                                    
+ ├─ Requests                                                           400  1M requests                       $80.00  * 
+ └─ Duration (first 6B)                                         20,000,000  GB-seconds                       $333.33  * 
+                                                                                                                        
+ module.mod3["test"].aws_lambda_function.test["baz"]                                                                    
+ ├─ Requests                                                           200  1M requests                       $40.00  * 
+ └─ Duration (first 6B)                                         10,000,000  GB-seconds                       $166.67  * 
+                                                                                                                        
+ module.mod3["test2"].aws_lambda_function.test["baz"]                                                                   
+ ├─ Requests                                                           200  1M requests                       $40.00  * 
+ └─ Duration (first 6B)                                         10,000,000  GB-seconds                       $166.67  * 
+                                                                                                                        
+ module.mod3["test"].aws_lambda_function.test["foo"]                                                                    
+ ├─ Requests                                                           200  1M requests                       $40.00  * 
+ └─ Duration (first 6B)                                          2,000,000  GB-seconds                        $33.33  * 
+                                                                                                                        
+ module.mod3["test2"].aws_lambda_function.test["foo"]                                                                   
+ ├─ Requests                                                           200  1M requests                       $40.00  * 
+ └─ Duration (first 6B)                                          2,000,000  GB-seconds                        $33.33  * 
+                                                                                                                        
+ module.mod2["test"].aws_lambda_function.test2                                                                          
+ ├─ Requests                                           Monthly cost depends on usage: $0.20 per 1M requests             
+ ├─ Ephemeral storage                                  Monthly cost depends on usage: $0.0000000309 per GB-seconds      
+ └─ Duration (first 6B)                                Monthly cost depends on usage: $0.0000166667 per GB-seconds      
+                                                                                                                        
+ module.mod2["test"].aws_lambda_function.test["baz"]                                                                    
+ ├─ Requests                                           Monthly cost depends on usage: $0.20 per 1M requests             
+ ├─ Ephemeral storage                                  Monthly cost depends on usage: $0.0000000309 per GB-seconds      
+ └─ Duration (first 6B)                                Monthly cost depends on usage: $0.0000166667 per GB-seconds      
+                                                                                                                        
+ module.mod2["test"].aws_lambda_function.test["foo"]                                                                    
+ ├─ Requests                                           Monthly cost depends on usage: $0.20 per 1M requests             
+ ├─ Ephemeral storage                                  Monthly cost depends on usage: $0.0000000309 per GB-seconds      
+ └─ Duration (first 6B)                                Monthly cost depends on usage: $0.0000166667 per GB-seconds      
+                                                                                                                        
+ module.mod2["test2"].aws_lambda_function.test2                                                                         
+ ├─ Requests                                           Monthly cost depends on usage: $0.20 per 1M requests             
+ ├─ Ephemeral storage                                  Monthly cost depends on usage: $0.0000000309 per GB-seconds      
+ └─ Duration (first 6B)                                Monthly cost depends on usage: $0.0000166667 per GB-seconds      
+                                                                                                                        
+ module.mod3["test"].aws_lambda_function.test2                                                                          
+ ├─ Requests                                           Monthly cost depends on usage: $0.20 per 1M requests             
+ ├─ Ephemeral storage                                  Monthly cost depends on usage: $0.0000000309 per GB-seconds      
+ └─ Duration (first 6B)                                Monthly cost depends on usage: $0.0000166667 per GB-seconds      
+                                                                                                                        
+ module.mod3["test2"].aws_lambda_function.test2                                                                         
+ ├─ Requests                                           Monthly cost depends on usage: $0.20 per 1M requests             
+ ├─ Ephemeral storage                                  Monthly cost depends on usage: $0.0000000309 per GB-seconds      
+ └─ Duration (first 6B)                                Monthly cost depends on usage: $0.0000166667 per GB-seconds      
+                                                                                                                        
  OVERALL TOTAL                                                                                            $22,693.38 
+
+*Usage costs were estimated using infracost-usage.yml, see docs for other options.
+
 ──────────────────────────────────
 19 cloud resources were detected:
-∙ 19 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 19 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                                          ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...orm_usage_file_wildcard_module ┃ $22,693      ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $0.00         ┃ $22,693     ┃ $22,693    ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
 
 Err:
 

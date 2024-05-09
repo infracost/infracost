@@ -3,6 +3,7 @@
   "metadata": {
     "infracostCommand": "diff",
     "vcsBranch": "stub-branch",
+    "vcsBaseCommitSha": "stub-sha",
     "vcsCommitSha": "stub-sha",
     "vcsCommitAuthorName": "stub-author",
     "vcsCommitAuthorEmail": "stub@stub.com",
@@ -14,6 +15,7 @@
   "projects": [
     {
       "name": "infracost/infracost/cmd/infracost/testdata/diff_with_policy_data_upload",
+      "displayName": "main",
       "metadata": {
         "path": "testdata/diff_with_policy_data_upload",
         "type": "terraform_dir",
@@ -68,7 +70,8 @@
                 "monthlyQuantity": "730",
                 "price": "0.192",
                 "hourlyCost": "0.192",
-                "monthlyCost": "140.16"
+                "monthlyCost": "140.16",
+                "priceNotFound": false
               }
             ],
             "subresources": [
@@ -85,7 +88,8 @@
                     "monthlyQuantity": "51",
                     "price": "0.1",
                     "hourlyCost": "0.00698630136986301",
-                    "monthlyCost": "5.1"
+                    "monthlyCost": "5.1",
+                    "priceNotFound": false
                   }
                 ]
               },
@@ -102,7 +106,8 @@
                     "monthlyQuantity": "1000",
                     "price": "0.1",
                     "hourlyCost": "0.13698630136986301",
-                    "monthlyCost": "100"
+                    "monthlyCost": "100",
+                    "priceNotFound": false
                   }
                 ]
               }
@@ -149,7 +154,8 @@
                 "monthlyQuantity": "730",
                 "price": "0.768",
                 "hourlyCost": "0.768",
-                "monthlyCost": "560.64"
+                "monthlyCost": "560.64",
+                "priceNotFound": false
               }
             ],
             "subresources": [
@@ -166,7 +172,8 @@
                     "monthlyQuantity": "51",
                     "price": "0.1",
                     "hourlyCost": "0.00698630136986301",
-                    "monthlyCost": "5.1"
+                    "monthlyCost": "5.1",
+                    "priceNotFound": false
                   }
                 ]
               },
@@ -183,7 +190,8 @@
                     "monthlyQuantity": "1000",
                     "price": "0.1",
                     "hourlyCost": "0.13698630136986301",
-                    "monthlyCost": "100"
+                    "monthlyCost": "100",
+                    "priceNotFound": false
                   }
                 ]
               }
@@ -217,7 +225,8 @@
                 "monthlyQuantity": "0",
                 "price": "0.576",
                 "hourlyCost": "0.576",
-                "monthlyCost": "420.48"
+                "monthlyCost": "420.48",
+                "priceNotFound": false
               }
             ]
           }

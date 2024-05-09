@@ -1,29 +1,31 @@
 
- Name                                          Monthly Qty  Unit                Monthly Cost 
-                                                                                             
- azurerm_automation_account.allUsageEx                                                       
- ├─ Job run time                                         5  minutes                    $0.01 
- ├─ Non-azure config nodes                               2  nodes                     $12.00 
- └─ Watchers                                            10  hours                      $0.02 
-                                                                                             
- azurerm_automation_account.someUsageEx                                                      
- ├─ Job run time                                        20  minutes                    $0.04 
- └─ Watchers                                            15  hours                      $0.03 
-                                                                                             
- azurerm_automation_account.without_usage                                                    
- ├─ Job run time                           Monthly cost depends on usage: $0.002 per minutes 
- ├─ Non-azure config nodes                 Monthly cost depends on usage: $6.00 per nodes    
- └─ Watchers                               Monthly cost depends on usage: $0.002 per hours   
-                                                                                             
+ Name                                          Monthly Qty  Unit                Monthly Cost    
+                                                                                                
+ azurerm_automation_account.allUsageEx                                                          
+ ├─ Job run time                                         5  minutes                    $0.01  * 
+ ├─ Non-azure config nodes                               2  nodes                     $12.00  * 
+ └─ Watchers                                            10  hours                      $0.02  * 
+                                                                                                
+ azurerm_automation_account.someUsageEx                                                         
+ ├─ Job run time                                        20  minutes                    $0.04  * 
+ └─ Watchers                                            15  hours                      $0.03  * 
+                                                                                                
+ azurerm_automation_account.without_usage                                                       
+ ├─ Job run time                           Monthly cost depends on usage: $0.002 per minutes    
+ ├─ Non-azure config nodes                 Monthly cost depends on usage: $6.00 per nodes       
+ └─ Watchers                               Monthly cost depends on usage: $0.002 per hours      
+                                                                                                
  OVERALL TOTAL                                                                        $12.10 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 5 cloud resources were detected:
-∙ 4 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
-∙ 1 was free:
-  ∙ 1 x azurerm_resource_group
+∙ 4 were estimated
+∙ 1 was free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMAutomationAccount                       ┃ $12          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $0.00         ┃ $12         ┃ $12        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

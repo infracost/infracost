@@ -1,0 +1,5 @@
+version: 0.1
+
+projects:
+  - path: testdata/breakdown_autodetection_config_file_output/dev
+  - path: testdata/breakdown_autodetection_config_file_output/prod

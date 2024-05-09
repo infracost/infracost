@@ -4,14 +4,14 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/rs/zerolog/log"
 	"github.com/shopspring/decimal"
 
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/resources"
 	"github.com/infracost/infracost/internal/schema"
 )
 
-// Ec2Host defines an AWS EC2 dedicated host. It suppports multiple instance families & allows
+// EC2Host defines an AWS EC2 dedicated host. It supports multiple instance families & allows
 // you to run workloads on a physical server dedicated for your use. You can use on-demand or
 // reservation pricing.
 //
@@ -58,7 +58,7 @@ func (r *EC2Host) BuildResource() *schema.Resource {
 		priceFilter, err = resolver.PriceFilter()
 
 		if err != nil {
-			log.Warn().Msgf(err.Error())
+			logging.Logger.Warn().Msgf(err.Error())
 		}
 
 		purchaseOptionLabel = "reserved"

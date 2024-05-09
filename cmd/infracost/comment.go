@@ -13,11 +13,11 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/infracost/infracost/internal/apiclient"
+	"github.com/infracost/infracost/internal/logging"
 
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/output"
-	"github.com/infracost/infracost/internal/ui"
 )
 
 type CommentOutput struct {
@@ -62,7 +62,7 @@ func commentCmd(ctx *config.RunContext) *cobra.Command {
 		subCmd.Flags().StringArray("policy-path", nil, "Path to Infracost policy files, glob patterns need quotes (experimental)")
 		subCmd.Flags().Bool("show-all-projects", false, "Show all projects in the table of the comment output")
 		subCmd.Flags().Bool("show-changed", false, "Show only projects in the table that have code changes")
-		subCmd.Flags().Bool("show-skipped", false, "List unsupported and free resources")
+		subCmd.Flags().Bool("show-skipped", true, "List unsupported resources")
 		_ = subCmd.Flags().MarkHidden("show-changed")
 		subCmd.Flags().Bool("skip-no-diff", false, "Skip posting comment if there are no resource changes. Only applies to update, hide-and-new, and delete-and-new behaviors")
 		_ = subCmd.Flags().MarkHidden("skip-no-diff")
@@ -83,7 +83,7 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 
 	combined, err := output.Combine(inputs)
 	if errors.As(err, &clierror.WarningError{}) {
-		ui.PrintWarningf(cmd.ErrOrStderr(), err.Error())
+		logging.Logger.Warn().Msgf(err.Error())
 	} else if err != nil {
 		return nil, err
 	}
@@ -96,7 +96,7 @@ func buildCommentOutput(cmd *cobra.Command, ctx *config.RunContext, paths []stri
 	var result apiclient.AddRunResponse
 	if ctx.IsCloudUploadEnabled() && !dryRun {
 		if ctx.Config.IsSelfHosted() {
-			ui.PrintWarning(cmd.ErrOrStderr(), "Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
+			logging.Logger.Warn().Msg("Infracost Cloud is part of Infracost's hosted services. Contact hello@infracost.io for help.")
 		} else {
 			combined.Metadata.InfracostCommand = "comment"
 			commentFormat := apiclient.CommentFormatMarkdownHTML

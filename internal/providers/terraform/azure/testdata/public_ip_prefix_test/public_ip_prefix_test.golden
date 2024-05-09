@@ -1,18 +1,20 @@
 
- Name                              Monthly Qty  Unit   Monthly Cost 
-                                                                    
- azurerm_public_ip_prefix.example                                   
- └─ IP prefix                              730  hours         $4.38 
-                                                                    
- OVERALL TOTAL                                                $4.38 
+ Name                              Monthly Qty  Unit   Monthly Cost   
+                                                                      
+ azurerm_public_ip_prefix.example                                     
+ └─ IP prefix                              730  hours         $4.38   
+                                                                      
+ OVERALL TOTAL                                               $4.38 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 2 cloud resources were detected:
 ∙ 1 was estimated
-∙ 1 was free:
-  ∙ 1 x azurerm_resource_group
+∙ 1 was free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMPublicIPPrefix                          ┃ $4           ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $4            ┃ $0.00       ┃ $4         ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

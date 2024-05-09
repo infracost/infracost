@@ -1,18 +1,21 @@
 
- Name                                                  Monthly Qty  Unit         Monthly Cost 
-                                                                                              
- aws_lambda_provisioned_concurrency_config.with_usage                                         
- ├─ Requests                                                    10  1M requests         $2.00 
- ├─ Provisioned Concurrency                              9,000,000  GB-seconds         $30.00 
- └─ Duration                                             1,750,000  GB-seconds         $13.61 
-                                                                                              
+ Name                                                  Monthly Qty  Unit         Monthly Cost    
+                                                                                                 
+ aws_lambda_provisioned_concurrency_config.with_usage                                            
+ ├─ Requests                                                    10  1M requests         $2.00  * 
+ ├─ Provisioned Concurrency                              9,000,000  GB-seconds         $30.00  * 
+ └─ Duration                                             1,750,000  GB-seconds         $13.61  * 
+                                                                                                 
  OVERALL TOTAL                                                                         $45.61 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 2 cloud resources were detected:
-∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 2 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestLambdaProvisionedConcurrencyConfig             ┃ $46          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $0.00         ┃ $46         ┃ $46        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

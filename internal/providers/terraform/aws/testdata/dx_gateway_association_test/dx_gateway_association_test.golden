@@ -1,21 +1,24 @@
 
- Name                                                              Monthly Qty  Unit            Monthly Cost 
-                                                                                                             
- aws_dx_gateway_association.my_aws_dx_gateway_association                                                    
- ├─ Data processed                                               Monthly cost depends on usage: $0.02 per GB 
- └─ Transit gateway attachment                                             730  hours                 $36.50 
-                                                                                                             
- aws_dx_gateway_association.my_aws_dx_gateway_association_usage                                              
- ├─ Data processed                                                         100  GB                     $2.00 
- └─ Transit gateway attachment                                             730  hours                 $36.50 
-                                                                                                             
+ Name                                                              Monthly Qty  Unit            Monthly Cost    
+                                                                                                                
+ aws_dx_gateway_association.my_aws_dx_gateway_association_usage                                                 
+ ├─ Data processed                                                         100  GB                     $2.00  * 
+ └─ Transit gateway attachment                                             730  hours                 $36.50    
+                                                                                                                
+ aws_dx_gateway_association.my_aws_dx_gateway_association                                                       
+ ├─ Data processed                                               Monthly cost depends on usage: $0.02 per GB    
+ └─ Transit gateway attachment                                             730  hours                 $36.50    
+                                                                                                                
  OVERALL TOTAL                                                                                        $75.00 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 2 cloud resources were detected:
-∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 2 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestDXGatewayAssociationGoldenFile                 ┃ $75          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $73           ┃ $2          ┃ $75        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

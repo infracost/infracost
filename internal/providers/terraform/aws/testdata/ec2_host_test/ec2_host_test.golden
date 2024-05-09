@@ -1,37 +1,40 @@
 
- Name                                     Monthly Qty  Unit   Monthly Cost 
-                                                                           
- aws_ec2_host.ec2_host                                                     
- └─ EC2 Dedicated Host (on-demand, c5)            730  hours     $2,457.18 
-                                                                           
- aws_ec2_host.host-1yr-all-upfront                                         
- └─ EC2 Dedicated Host (reserved, m5d)            730  hours         $0.00 
-                                                                           
- aws_ec2_host.host-1yr-no-upfront                                          
- └─ EC2 Dedicated Host (reserved, m5)             730  hours     $2,330.89 
-                                                                           
- aws_ec2_host.host-1yr-partial-upfront                                     
- └─ EC2 Dedicated Host (reserved, c5)             730  hours       $737.30 
-                                                                           
- aws_ec2_host.host-3yr-all-upfront                                         
- └─ EC2 Dedicated Host (reserved, m5d)            730  hours         $0.00 
-                                                                           
- aws_ec2_host.host-3yr-no-upfront                                          
- └─ EC2 Dedicated Host (reserved, m5)             730  hours     $1,598.70 
-                                                                           
- aws_ec2_host.host-3yr-partial-upfront                                     
- └─ EC2 Dedicated Host (reserved, c5)             730  hours       $476.69 
-                                                                           
- aws_ec2_host.mac                                                          
- └─ EC2 Dedicated Host (on-demand, mac1)          730  hours       $790.59 
-                                                                           
- OVERALL TOTAL                                                   $8,391.35 
+ Name                                     Monthly Qty  Unit   Monthly Cost   
+                                                                             
+ aws_ec2_host.ec2_host                                                       
+ └─ EC2 Dedicated Host (on-demand, c5)            730  hours     $2,457.18   
+                                                                             
+ aws_ec2_host.host-1yr-no-upfront                                            
+ └─ EC2 Dedicated Host (reserved, m5)             730  hours     $2,330.89   
+                                                                             
+ aws_ec2_host.host-3yr-no-upfront                                            
+ └─ EC2 Dedicated Host (reserved, m5)             730  hours     $1,598.70   
+                                                                             
+ aws_ec2_host.mac                                                            
+ └─ EC2 Dedicated Host (on-demand, mac1)          730  hours       $790.59   
+                                                                             
+ aws_ec2_host.host-1yr-partial-upfront                                       
+ └─ EC2 Dedicated Host (reserved, c5)             730  hours       $737.30   
+                                                                             
+ aws_ec2_host.host-3yr-partial-upfront                                       
+ └─ EC2 Dedicated Host (reserved, c5)             730  hours       $476.69   
+                                                                             
+ aws_ec2_host.host-1yr-all-upfront                                           
+ └─ EC2 Dedicated Host (reserved, m5d)            730  hours         $0.00   
+                                                                             
+ aws_ec2_host.host-3yr-all-upfront                                           
+ └─ EC2 Dedicated Host (reserved, m5d)            730  hours         $0.00   
+                                                                             
+ OVERALL TOTAL                                                  $8,391.35 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 8 cloud resources were detected:
-∙ 8 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 8 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestEC2Host                                        ┃ $8,391       ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $8,391        ┃ $0.00       ┃ $8,391     ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

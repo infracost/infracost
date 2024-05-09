@@ -12,15 +12,14 @@ import (
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/rs/zerolog"
-	"github.com/rs/zerolog/log"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/gocty"
 
 	"github.com/infracost/infracost/internal/clierror"
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/extclient"
 	"github.com/infracost/infracost/internal/hcl/modules"
 	"github.com/infracost/infracost/internal/logging"
-	"github.com/infracost/infracost/internal/ui"
 )
 
 var (
@@ -30,11 +29,11 @@ var (
 type Option func(p *Parser)
 
 // OptionWithTFVarsPaths takes a slice of paths adds them to the parser tfvar
-// files relative to the Parser initialPath. It sorts tfvar paths for precedence
+// files relative to the Parser detectedProjectPath. It sorts tfvar paths for precedence
 // before adding them to the parser. Paths that don't exist will be ignored.
 func OptionWithTFVarsPaths(paths []string, autoDetected bool) Option {
 	return func(p *Parser) {
-		filenames := makePathsRelativeToInitial(paths, p.initialPath)
+		filenames := makePathsRelativeToInitial(paths, p.detectedProjectPath)
 		tfVarsPaths := p.tfvarsPaths
 		tfVarsPaths = append(tfVarsPaths, filenames...)
 		p.sortVarFilesByPrecedence(tfVarsPaths, autoDetected)
@@ -205,15 +204,10 @@ func OptionWithRawCtyInput(input cty.Value) (op Option) {
 
 // OptionWithRemoteVarLoader accepts Terraform Cloud/Enterprise host and token
 // values to load remote execution variables.
-func OptionWithRemoteVarLoader(host, token, localWorkspace string) Option {
+func OptionWithRemoteVarLoader(host, token, localWorkspace string, loaderOpts ...RemoteVariablesLoaderOption) Option {
 	return func(p *Parser) {
 		if host == "" || token == "" {
 			return
-		}
-
-		var loaderOpts []RemoteVariablesLoaderOption
-		if p.newSpinner != nil {
-			loaderOpts = append(loaderOpts, RemoteVariablesLoaderWithSpinner(p.newSpinner))
 		}
 
 		client := extclient.NewAuthedAPIClient(host, token)
@@ -243,19 +237,6 @@ func OptionWithTerraformWorkspace(name string) Option {
 	}
 }
 
-// OptionWithSpinner sets a SpinnerFunc onto the Parser. With this option enabled
-// the Parser will send progress to the Spinner. This is disabled by default as
-// we run the Parser concurrently underneath DirProvider and don't want to mess with its output.
-func OptionWithSpinner(f ui.SpinnerFunc) Option {
-	return func(p *Parser) {
-		p.newSpinner = f
-
-		if p.moduleLoader != nil {
-			p.moduleLoader.NewSpinner = f
-		}
-	}
-}
-
 // OptionGraphEvaluator sets the Parser to use the experimental graph evaluator.
 func OptionGraphEvaluator() Option {
 	return func(p *Parser) {
@@ -266,15 +247,16 @@ func OptionGraphEvaluator() Option {
 
 type DetectedProject interface {
 	ProjectName() string
+	EnvName() string
 	RelativePath() string
-	TerraformVarFiles() []string
+	VarFiles() []string
 	YAML() string
 }
 
 // Parser is a tool for parsing terraform templates at a given file system location.
 type Parser struct {
-	repoPath              string
-	initialPath           string
+	startingPath          string
+	detectedProjectPath   string
 	tfEnvVars             map[string]cty.Value
 	tfvarsPaths           []string
 	inputVars             map[string]cty.Value
@@ -282,7 +264,6 @@ type Parser struct {
 	moduleLoader          *modules.ModuleLoader
 	hclParser             *modules.SharedHCLParser
 	blockBuilder          BlockBuilder
-	newSpinner            ui.SpinnerFunc
 	remoteVariablesLoader *RemoteVariablesLoader
 	logger                zerolog.Logger
 	isGraph               bool
@@ -294,21 +275,21 @@ type Parser struct {
 // NewParser creates a new parser for the given RootPath.
 func NewParser(projectRoot RootPath, envMatcher *EnvFileMatcher, moduleLoader *modules.ModuleLoader, logger zerolog.Logger, options ...Option) *Parser {
 	parserLogger := logger.With().Str(
-		"parser_path", projectRoot.Path,
+		"parser_path", projectRoot.DetectedPath,
 	).Logger()
 
 	hclParser := modules.NewSharedHCLParser()
 
 	p := &Parser{
-		repoPath:      projectRoot.RepoPath,
-		initialPath:   projectRoot.Path,
-		hasChanges:    projectRoot.HasChanges,
-		workspaceName: defaultTerraformWorkspaceName,
-		hclParser:     hclParser,
-		blockBuilder:  BlockBuilder{SetAttributes: []SetAttributesFunc{SetUUIDAttributes}, Logger: logger, HCLParser: hclParser},
-		logger:        parserLogger,
-		moduleLoader:  moduleLoader,
-		envMatcher:    envMatcher,
+		startingPath:        projectRoot.StartingPath,
+		detectedProjectPath: projectRoot.DetectedPath,
+		hasChanges:          projectRoot.HasChanges,
+		workspaceName:       defaultTerraformWorkspaceName,
+		hclParser:           hclParser,
+		blockBuilder:        BlockBuilder{SetAttributes: []SetAttributesFunc{SetUUIDAttributes}, Logger: logger, HCLParser: hclParser},
+		logger:              parserLogger,
+		moduleLoader:        moduleLoader,
+		envMatcher:          envMatcher,
 	}
 
 	for _, option := range options {
@@ -323,10 +304,10 @@ func (p *Parser) YAML() string {
 	str := strings.Builder{}
 
 	str.WriteString(fmt.Sprintf("  - path: %s\n    name: %s\n", p.RelativePath(), p.ProjectName()))
-	if len(p.TerraformVarFiles()) > 0 {
+	if len(p.VarFiles()) > 0 {
 		str.WriteString("    terraform_var_files:\n")
 
-		for _, varFile := range p.TerraformVarFiles() {
+		for _, varFile := range p.VarFiles() {
 			str.WriteString(fmt.Sprintf("      - %s\n", varFile))
 		}
 	}
@@ -336,7 +317,7 @@ func (p *Parser) YAML() string {
 	if len(p.tfEnvVars) > 0 {
 		str.WriteString("  terraform_vars:\n")
 
-		keys := make([]string, len(p.tfEnvVars), 0)
+		keys := make([]string, 0, len(p.tfEnvVars))
 		for key := range p.tfEnvVars {
 			keys = append(keys, key)
 		}
@@ -357,15 +338,15 @@ func (p *Parser) YAML() string {
 	return str.String()
 }
 
-// ParseDirectory parses all the terraform files in the initialPath into Blocks and then passes them to an Evaluator
+// ParseDirectory parses all the terraform files in the detectedProjectPath into Blocks and then passes them to an Evaluator
 // to fill these Blocks with additional Context information. Parser does not parse any blocks outside the root Module.
 // It instead leaves ModuleLoader to fetch these Modules on demand. See ModuleLoader.Load for more information.
 //
 // ParseDirectory returns the root Module that represents the top of the Terraform Config tree.
 func (p *Parser) ParseDirectory() (m *Module, err error) {
 	m = &Module{
-		RootPath:   p.initialPath,
-		ModulePath: p.initialPath,
+		RootPath:   p.detectedProjectPath,
+		ModulePath: p.detectedProjectPath,
 	}
 
 	defer func() {
@@ -375,11 +356,11 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 		}
 	}()
 
-	p.logger.Debug().Msgf("Beginning parse for directory '%s'...", p.initialPath)
+	p.logger.Debug().Msgf("Beginning parse for directory '%s'...", p.detectedProjectPath)
 
 	// load the initial root directory into a list of hcl files
 	// at this point these files have no schema associated with them.
-	files, err := loadDirectory(p.hclParser, p.logger, p.initialPath, false)
+	files, err := loadDirectory(p.hclParser, p.logger, p.detectedProjectPath, false)
 	if err != nil {
 		return m, err
 	}
@@ -401,7 +382,7 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 	}
 
 	// load the modules. This downloads any remote modules to the local file system
-	modulesManifest, err := p.moduleLoader.Load(p.initialPath)
+	modulesManifest, err := p.moduleLoader.Load(p.detectedProjectPath)
 	if err != nil {
 		return m, fmt.Errorf("Error loading Terraform modules: %w", err)
 	}
@@ -419,8 +400,8 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 			Source:     "",
 			Blocks:     blocks,
 			RawBlocks:  blocks,
-			RootPath:   p.initialPath,
-			ModulePath: p.initialPath,
+			RootPath:   p.detectedProjectPath,
+			ModulePath: p.detectedProjectPath,
 		},
 		workingDir,
 		inputVars,
@@ -428,7 +409,6 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 		nil,
 		p.workspaceName,
 		p.blockBuilder,
-		p.newSpinner,
 		p.logger,
 		p.isGraph,
 	)
@@ -437,8 +417,7 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 
 	// Graph evaluation
 	if evaluator.isGraph {
-		// we use the base zerolog log here so that it's consistent with the spinner logs
-		log.Info().Msgf("Building project with experimental graph runner")
+		logging.Logger.Debug().Msg("Building project with experimental graph runner")
 
 		g, err := NewGraphWithRoot(p.logger, nil)
 		if err != nil {
@@ -465,24 +444,19 @@ func (p *Parser) ParseDirectory() (m *Module, err error) {
 
 // Path returns the full path that the parser runs within.
 func (p *Parser) Path() string {
-	return p.initialPath
+	return p.detectedProjectPath
 }
 
 // RelativePath returns the path of the parser relative to the repo path
 func (p *Parser) RelativePath() string {
-	r, _ := filepath.Rel(p.repoPath, p.initialPath)
+	r, _ := filepath.Rel(p.startingPath, p.detectedProjectPath)
 	return r
 }
 
 // ProjectName generates a name for the project that can be used
 // in the Infracost config file.
 func (p *Parser) ProjectName() string {
-	r := p.RelativePath()
-	name := strings.TrimSuffix(r, "/")
-	name = strings.ReplaceAll(name, "/", "-")
-	if name == "." {
-		name = "main"
-	}
+	name := config.CleanProjectName(p.RelativePath())
 
 	if p.moduleSuffix != "" {
 		name = fmt.Sprintf("%s-%s", name, p.moduleSuffix)
@@ -491,14 +465,23 @@ func (p *Parser) ProjectName() string {
 	return name
 }
 
+// EnvName returns the module suffix of the parser (normally the environment name).
+func (p *Parser) EnvName() string {
+	if p.moduleSuffix != "" {
+		return p.moduleSuffix
+	}
+
+	return p.ProjectName()
+}
+
 // TerraformVarFiles returns the list of terraform var files that the parser
 // will use to load variables from.
-func (p *Parser) TerraformVarFiles() []string {
+func (p *Parser) VarFiles() []string {
 	varFilesMap := make(map[string]struct{}, len(p.tfvarsPaths))
 	varFiles := make([]string, 0, len(p.tfvarsPaths))
 
 	for _, varFile := range p.tfvarsPaths {
-		p, err := filepath.Rel(p.initialPath, varFile)
+		p, err := filepath.Rel(p.detectedProjectPath, varFile)
 		if err != nil {
 			continue
 		}
@@ -529,7 +512,7 @@ func (p *Parser) parseDirectoryFiles(files []file) (Blocks, error) {
 		for _, fileBlock := range fileBlocks {
 			blocks = append(
 				blocks,
-				p.blockBuilder.NewBlock(file.path, p.initialPath, fileBlock, nil, nil, nil),
+				p.blockBuilder.NewBlock(file.path, p.detectedProjectPath, fileBlock, nil, nil, nil),
 			)
 		}
 	}
@@ -547,7 +530,7 @@ func (p *Parser) loadVars(blocks Blocks, filenames []string) (map[string]cty.Val
 		remoteVars, err := p.remoteVariablesLoader.Load(blocks)
 
 		if err != nil {
-			p.logger.Warn().Msgf("could not load vars from Terraform Cloud: %s", err)
+			p.logger.Debug().Msgf("could not load vars from Terraform Cloud: %s", err)
 			return combinedVars, err
 		}
 

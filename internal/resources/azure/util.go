@@ -31,6 +31,13 @@ func int32Ptr(i int32) *int32 {
 	return &i
 }
 
+func intPtrToDecimalPtr(i *int64) *decimal.Decimal {
+	if i == nil {
+		return nil
+	}
+	return decimalPtr(decimal.NewFromInt(*i))
+}
+
 func floatPtrToDecimalPtr(f *float64) *decimal.Decimal {
 	if f == nil {
 		return nil
@@ -41,6 +48,15 @@ func floatPtrToDecimalPtr(f *float64) *decimal.Decimal {
 func contains(a []string, x string) bool {
 	for _, n := range a {
 		if x == n {
+			return true
+		}
+	}
+	return false
+}
+
+func containsInt64(arr []int64, val int64) bool {
+	for _, a := range arr {
+		if a == val {
 			return true
 		}
 	}

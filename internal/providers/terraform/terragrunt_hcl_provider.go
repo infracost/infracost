@@ -109,7 +109,7 @@ type TerragruntHCLProvider struct {
 	logger        zerolog.Logger
 }
 
-// NewTerragruntHCLProvider creates a new provider intialized with the configured project path (usually the terragrunt
+// NewTerragruntHCLProvider creates a new provider initialized with the configured project path (usually the terragrunt
 // root directory).
 func NewTerragruntHCLProvider(rootPath hcl.RootPath, ctx *config.ProjectContext) schema.Provider {
 	logger := ctx.Logger().With().Str(
@@ -174,26 +174,34 @@ func getEnvVars(ctx *config.ProjectContext) map[string]string {
 func (p *TerragruntHCLProvider) Context() *config.ProjectContext { return p.ctx }
 
 func (p *TerragruntHCLProvider) ProjectName() string {
+	if p.ctx.ProjectConfig.Name != "" {
+		return p.ctx.ProjectConfig.Name
+	}
+
+	return config.CleanProjectName(p.RelativePath())
+}
+
+func (p *TerragruntHCLProvider) EnvName() string {
 	return ""
 }
 
 func (p *TerragruntHCLProvider) RelativePath() string {
-	r, err := filepath.Rel(p.Path.RepoPath, p.Path.Path)
+	r, err := filepath.Rel(p.Path.StartingPath, p.Path.DetectedPath)
 	if err != nil {
-		return p.Path.Path
+		return p.Path.DetectedPath
 	}
 
 	return r
 }
 
-func (p *TerragruntHCLProvider) TerraformVarFiles() []string {
+func (p *TerragruntHCLProvider) VarFiles() []string {
 	return nil
 }
 
 func (p *TerragruntHCLProvider) YAML() string {
 	str := strings.Builder{}
 
-	str.WriteString(fmt.Sprintf("  - path: %s\n", p.RelativePath()))
+	str.WriteString(fmt.Sprintf("  - path: %s\n    name: %s\n", p.RelativePath(), p.ProjectName()))
 
 	return str.String()
 }
@@ -202,20 +210,14 @@ func (p *TerragruntHCLProvider) Type() string {
 }
 
 func (p *TerragruntHCLProvider) DisplayType() string {
-	return "Terragrunt directory"
+	return "Terragrunt"
 }
 
 func (p *TerragruntHCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 	metadata.ConfigSha = p.ctx.ProjectConfig.ConfigSha
 
-	basePath := p.ctx.ProjectConfig.Path
-	if p.ctx.RunContext.Config.ConfigFilePath != "" {
-		basePath = filepath.Dir(p.ctx.RunContext.Config.ConfigFilePath)
-	}
-
-	modulePath, err := filepath.Rel(basePath, metadata.Path)
-	if err == nil && modulePath != "" && modulePath != "." {
-		p.logger.Debug().Msgf("Calculated relative terraformModulePath for %s from %s", basePath, metadata.Path)
+	modulePath := p.RelativePath()
+	if modulePath != "" && modulePath != "." {
 		metadata.TerraformModulePath = modulePath
 	}
 
@@ -249,12 +251,6 @@ func (p *TerragruntHCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.
 	parallelism, _ := runCtx.GetParallelism()
 
 	numJobs := len(dirs)
-	runInParallel := parallelism > 1 && numJobs > 1
-	if runInParallel && !runCtx.Config.IsLogging() {
-		p.logger.Level(zerolog.InfoLevel)
-		p.ctx.RunContext.Config.LogLevel = "info"
-	}
-
 	if numJobs < parallelism {
 		parallelism = numJobs
 	}
@@ -301,6 +297,7 @@ func (p *TerragruntHCLProvider) LoadResources(usage schema.UsageMap) ([]*schema.
 					metadata.Warnings = di.warnings
 					project.Metadata = metadata
 					project.Name = p.generateProjectName(metadata)
+					project.DisplayName = p.ProjectName()
 					mu.Lock()
 					allProjects = append(allProjects, project)
 					mu.Unlock()
@@ -339,7 +336,10 @@ func (p *TerragruntHCLProvider) newErroredProject(di *terragruntWorkingDirInfo) 
 		metadata.AddError(schema.NewDiagTerragruntEvaluationFailure(di.error))
 	}
 
-	return schema.NewProject(p.generateProjectName(metadata), metadata)
+	project := schema.NewProject(p.generateProjectName(metadata), metadata)
+	project.DisplayName = p.ProjectName()
+
+	return project
 }
 
 func (p *TerragruntHCLProvider) generateProjectName(metadata *schema.ProjectMetadata) string {
@@ -394,7 +394,7 @@ func (p *TerragruntHCLProvider) initTerraformVars(tfVars map[string]string, inpu
 }
 
 func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, error) {
-	terragruntConfigPath := tgconfig.GetDefaultConfigPath(p.Path.Path)
+	terragruntConfigPath := tgconfig.GetDefaultConfigPath(p.Path.DetectedPath)
 
 	terragruntCacheDir := filepath.Join(config.InfracostDir, ".terragrunt-cache")
 	terragruntDownloadDir := filepath.Join(p.ctx.RunContext.Config.CachePath(), terragruntCacheDir)
@@ -413,7 +413,7 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 		LogLevel:                   logrus.DebugLevel,
 		ErrWriter:                  tgLog.WriterLevel(logrus.DebugLevel),
 		MaxFoldersToCheck:          tgoptions.DefaultMaxFoldersToCheck,
-		WorkingDir:                 p.Path.Path,
+		WorkingDir:                 p.Path.DetectedPath,
 		ExcludeDirs:                p.excludedPaths,
 		DownloadDir:                terragruntDownloadDir,
 		TerraformCliArgs:           []string{tgcliinfo.CommandName},
@@ -455,6 +455,9 @@ func (p *TerragruntHCLProvider) prepWorkingDirs() ([]*terragruntWorkingDirInfo, 
 
 			funcs["run_cmd"] = mockSliceFuncStaticReturn(cty.StringVal("run_cmd-mock"))
 			funcs["sops_decrypt_file"] = mockSliceFuncStaticReturn(cty.StringVal("sops_decrypt_file-mock"))
+			funcs["get_aws_account_id"] = mockSliceFuncStaticReturn(cty.StringVal("account_id-mock"))
+			funcs["get_aws_caller_identity_arn"] = mockSliceFuncStaticReturn(cty.StringVal("arn:aws:iam::123456789012:user/terragrunt-mock"))
+			funcs["get_aws_caller_identity_user_id"] = mockSliceFuncStaticReturn(cty.StringVal("caller_identity_user_id-mock"))
 
 			return funcs
 		},
@@ -579,9 +582,7 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 	}
 	pconfig.TerraformVars = p.initTerraformVars(pconfig.TerraformVars, terragruntConfig.Inputs)
 
-	ops := []hcl.Option{
-		hcl.OptionWithSpinner(p.ctx.RunContext.NewSpinner),
-	}
+	var ops []hcl.Option
 	inputs, err := convertToCtyWithJson(terragruntConfig.Inputs)
 	if err != nil {
 		p.logger.Debug().Msgf("Failed to build Terragrunt inputs for: %s err: %s", info.workingDir, err)
@@ -594,7 +595,7 @@ func (p *TerragruntHCLProvider) runTerragrunt(opts *tgoptions.TerragruntOptions)
 	h, err := NewHCLProvider(
 		config.NewProjectContext(p.ctx.RunContext, &pconfig, logCtx),
 		hcl.RootPath{
-			Path: pconfig.Path,
+			DetectedPath: pconfig.Path,
 		},
 		&HCLProviderConfig{CacheParsingModules: true, SkipAutoDetection: true},
 		ops...,
@@ -988,7 +989,7 @@ func (p *TerragruntHCLProvider) decodeTerragruntDepsToValue(targetConfig string,
 			return encoded, nil
 		}
 
-		p.logger.Warn().Err(err).Msg("could not transform output blocks to cty type, using dummy output type")
+		p.logger.Debug().Err(err).Msg("could not transform output blocks to cty type, using dummy output type")
 	}
 
 	return cty.EmptyObjectVal, nil

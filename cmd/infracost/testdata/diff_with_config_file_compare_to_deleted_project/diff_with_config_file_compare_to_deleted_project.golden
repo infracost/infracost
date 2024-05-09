@@ -1,3 +1,5 @@
+Key: * usage cost, ~ changed, + added, - removed
+
 ──────────────────────────────────
 Project: infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to_deleted_project/dev
 Module path: dev
@@ -25,8 +27,8 @@ Monthly cost change for infracost/infracost/cmd/infracost/testdata/diff_with_con
 Amount:  -$462 ($462 → $0.00)
 
 ──────────────────────────────────
-Project: infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to_deleted_project/prod
-Module path: prod
+Project: testdata-diff_with_config_file_compare_to_deleted_project-prod
+Module path: testdata/diff_with_config_file_compare_to_deleted_project/prod
 
 ~ aws_instance.web_app
   +$561 ($743 → $1,303)
@@ -34,23 +36,25 @@ Module path: prod
     ~ Instance usage (Linux/UNIX, on-demand, m5.4xlarge → m5.8xlarge)
       +$561 ($561 → $1,121)
 
-Monthly cost change for infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to_deleted_project/prod (Module path: prod)
+Monthly cost change for infracost/infracost/cmd/infracost/testdata/diff_with_config_file_compare_to_deleted_project/prod (Module path: testdata/diff_with_config_file_compare_to_deleted_project/prod)
 Amount:  +$561 ($743 → $1,303)
 Percent: +75%
 
 ──────────────────────────────────
-Key: ~ changed, + added, - removed
+Key: * usage cost, ~ changed, + added, - removed
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 1 cloud resource was detected:
-∙ 1 was estimated, it includes usage-based costs, see https://infracost.io/usage-file
+∙ 1 was estimated
 
 Infracost estimate: Monthly cost will increase by $98 ↑
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
-┃ Project                                                          ┃ Cost change  ┃ New monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...compare_to_deleted_project/dev ┃        -$462 ┃ $0.00            ┃
-┃ infracost/infracost/cmd/infraco...ompare_to_deleted_project/prod ┃ +$561 (+75%) ┃ $1,303           ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Changed project                                                  ┃ Baseline cost ┃ Usage cost ┃ Total change ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infraco...compare_to_deleted_project/dev ┃         -$462 ┃        +$0 ┃        -$462 ┃
+┃ infracost/infracost/cmd/infraco...ompare_to_deleted_project/prod ┃         +$561 ┃        +$0 ┃ +$561 (+75%) ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 
 Err:
 

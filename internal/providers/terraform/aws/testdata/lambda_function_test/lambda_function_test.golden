@@ -1,69 +1,72 @@
 
- Name                                                    Monthly Qty  Unit                        Monthly Cost 
-                                                                                                               
- aws_lambda_function.lambda                                                                                    
- ├─ Requests                                     Monthly cost depends on usage: $0.20 per 1M requests          
- ├─ Ephemeral storage                            Monthly cost depends on usage: $0.0000000309 per GB-seconds   
- └─ Duration (first 6B)                          Monthly cost depends on usage: $0.0000166667 per GB-seconds   
-                                                                                                               
- aws_lambda_function.lambda_arm                                                                                
- ├─ Requests                                     Monthly cost depends on usage: $0.20 per 1M requests          
- ├─ Ephemeral storage                            Monthly cost depends on usage: $0.0000000309 per GB-seconds   
- └─ Duration (first 7.5B)                        Monthly cost depends on usage: $0.0000133334 per GB-seconds   
-                                                                                                               
- aws_lambda_function.lambda_duration_11B_arm                                                                   
- ├─ Requests                                                  11,250  1M requests                    $2,250.00 
- ├─ Duration (first 7.5B)                              7,500,000,000  GB-seconds                   $100,000.50 
- └─ Duration (next 11.25B)                             4,020,000,000  GB-seconds                    $48,240.40 
-                                                                                                               
- aws_lambda_function.lambda_duration_15B                                                                       
- ├─ Requests                                                  15,000  1M requests                    $3,000.00 
- ├─ Duration (first 6B)                                6,000,000,000  GB-seconds                   $100,000.20 
- ├─ Duration (next 9B)                                 9,000,000,000  GB-seconds                   $135,000.00 
- └─ Duration (over 15B)                               15,000,000,000  GB-seconds                   $200,001.00 
-                                                                                                               
- aws_lambda_function.lambda_duration_18B_arm                                                                   
- ├─ Requests                                                  18,250  1M requests                    $3,650.00 
- ├─ Duration (first 7.5B)                              7,500,000,000  GB-seconds                   $100,000.50 
- ├─ Duration (next 11.25B)                            11,250,000,000  GB-seconds                   $135,001.13 
- └─ Duration (over 18.75B)                            18,750,000,000  GB-seconds                   $200,000.63 
-                                                                                                               
- aws_lambda_function.lambda_duration_6B                                                                        
- ├─ Requests                                                   6,000  1M requests                    $1,200.00 
- └─ Duration (first 6B)                                3,072,000,000  GB-seconds                    $51,200.10 
-                                                                                                               
- aws_lambda_function.lambda_duration_75B_arm                                                                   
- ├─ Requests                                                   7,500  1M requests                    $1,500.00 
- └─ Duration (first 7.5B)                              3,840,000,000  GB-seconds                    $51,200.26 
-                                                                                                               
- aws_lambda_function.lambda_duration_9B                                                                        
- ├─ Requests                                                   9,000  1M requests                    $1,800.00 
- ├─ Duration (first 6B)                                6,000,000,000  GB-seconds                   $100,000.20 
- └─ Duration (next 9B)                                 3,216,000,000  GB-seconds                    $48,240.00 
-                                                                                                               
- aws_lambda_function.lambda_withUsage                                                                          
- ├─ Requests                                                     0.1  1M requests                        $0.02 
- └─ Duration (first 6B)                                        4,375  GB-seconds                         $0.07 
-                                                                                                               
- aws_lambda_function.lambda_withUsage512Mem                                                                    
- ├─ Requests                                                     0.1  1M requests                        $0.02 
- └─ Duration (first 6B)                                       17,500  GB-seconds                         $0.29 
-                                                                                                               
- aws_lambda_function.lambda_withUsage512Mem_arm                                                                
- ├─ Requests                                                     0.1  1M requests                        $0.02 
- └─ Duration (first 7.5B)                                     17,500  GB-seconds                         $0.23 
-                                                                                                               
- aws_lambda_function.lambda_withUsage_arm                                                                      
- ├─ Requests                                                     0.1  1M requests                        $0.02 
- └─ Duration (first 7.5B)                                      4,375  GB-seconds                         $0.06 
-                                                                                                               
+ Name                                                    Monthly Qty  Unit                        Monthly Cost    
+                                                                                                                  
+ aws_lambda_function.lambda_duration_18B_arm                                                                      
+ ├─ Requests                                                  18,250  1M requests                    $3,650.00  * 
+ ├─ Duration (first 7.5B)                              7,500,000,000  GB-seconds                   $100,000.50  * 
+ ├─ Duration (next 11.25B)                            11,250,000,000  GB-seconds                   $135,001.13  * 
+ └─ Duration (over 18.75B)                            18,750,000,000  GB-seconds                   $200,000.63  * 
+                                                                                                                  
+ aws_lambda_function.lambda_duration_15B                                                                          
+ ├─ Requests                                                  15,000  1M requests                    $3,000.00  * 
+ ├─ Duration (first 6B)                                6,000,000,000  GB-seconds                   $100,000.20  * 
+ ├─ Duration (next 9B)                                 9,000,000,000  GB-seconds                   $135,000.00  * 
+ └─ Duration (over 15B)                               15,000,000,000  GB-seconds                   $200,001.00  * 
+                                                                                                                  
+ aws_lambda_function.lambda_duration_11B_arm                                                                      
+ ├─ Requests                                                  11,250  1M requests                    $2,250.00  * 
+ ├─ Duration (first 7.5B)                              7,500,000,000  GB-seconds                   $100,000.50  * 
+ └─ Duration (next 11.25B)                             4,020,000,000  GB-seconds                    $48,240.40  * 
+                                                                                                                  
+ aws_lambda_function.lambda_duration_9B                                                                           
+ ├─ Requests                                                   9,000  1M requests                    $1,800.00  * 
+ ├─ Duration (first 6B)                                6,000,000,000  GB-seconds                   $100,000.20  * 
+ └─ Duration (next 9B)                                 3,216,000,000  GB-seconds                    $48,240.00  * 
+                                                                                                                  
+ aws_lambda_function.lambda_duration_75B_arm                                                                      
+ ├─ Requests                                                   7,500  1M requests                    $1,500.00  * 
+ └─ Duration (first 7.5B)                              3,840,000,000  GB-seconds                    $51,200.26  * 
+                                                                                                                  
+ aws_lambda_function.lambda_duration_6B                                                                           
+ ├─ Requests                                                   6,000  1M requests                    $1,200.00  * 
+ └─ Duration (first 6B)                                3,072,000,000  GB-seconds                    $51,200.10  * 
+                                                                                                                  
+ aws_lambda_function.lambda_withUsage512Mem                                                                       
+ ├─ Requests                                                     0.1  1M requests                        $0.02  * 
+ └─ Duration (first 6B)                                       17,500  GB-seconds                         $0.29  * 
+                                                                                                                  
+ aws_lambda_function.lambda_withUsage512Mem_arm                                                                   
+ ├─ Requests                                                     0.1  1M requests                        $0.02  * 
+ └─ Duration (first 7.5B)                                     17,500  GB-seconds                         $0.23  * 
+                                                                                                                  
+ aws_lambda_function.lambda_withUsage                                                                             
+ ├─ Requests                                                     0.1  1M requests                        $0.02  * 
+ └─ Duration (first 6B)                                        4,375  GB-seconds                         $0.07  * 
+                                                                                                                  
+ aws_lambda_function.lambda_withUsage_arm                                                                         
+ ├─ Requests                                                     0.1  1M requests                        $0.02  * 
+ └─ Duration (first 7.5B)                                      4,375  GB-seconds                         $0.06  * 
+                                                                                                                  
+ aws_lambda_function.lambda                                                                                       
+ ├─ Requests                                     Monthly cost depends on usage: $0.20 per 1M requests             
+ ├─ Ephemeral storage                            Monthly cost depends on usage: $0.0000000309 per GB-seconds      
+ └─ Duration (first 6B)                          Monthly cost depends on usage: $0.0000166667 per GB-seconds      
+                                                                                                                  
+ aws_lambda_function.lambda_arm                                                                                   
+ ├─ Requests                                     Monthly cost depends on usage: $0.20 per 1M requests             
+ ├─ Ephemeral storage                            Monthly cost depends on usage: $0.0000000309 per GB-seconds      
+ └─ Duration (first 7.5B)                        Monthly cost depends on usage: $0.0000133334 per GB-seconds      
+                                                                                                                  
  OVERALL TOTAL                                                                                   $1,282,285.65 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 12 cloud resources were detected:
-∙ 12 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 12 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestLambdaFunctionGoldenFile                       ┃ $1,282,286   ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $0.00         ┃ $1,282,286  ┃ $1,282,286 ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

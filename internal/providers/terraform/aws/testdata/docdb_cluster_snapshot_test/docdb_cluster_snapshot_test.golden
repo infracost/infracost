@@ -1,25 +1,28 @@
 
- Name                                                                   Monthly Qty  Unit              Monthly Cost 
-                                                                                                                    
- aws_docdb_cluster_snapshot.my_aws_docdb_cluster_snapshot                                                           
- └─ Backup storage                                                   Monthly cost depends on usage: $0.021 per GB   
-                                                                                                                    
- aws_docdb_cluster_snapshot.my_aws_docdb_cluster_snapshot_ue2                                                       
- └─ Backup storage                                                   Monthly cost depends on usage: $0.021 per GB   
-                                                                                                                    
- aws_docdb_cluster_snapshot.my_aws_docdb_cluster_snapshot_usage                                                     
- └─ Backup storage                                                            1,000  GB                      $21.00 
-                                                                                                                    
- aws_docdb_cluster_snapshot.my_aws_docdb_cluster_snapshot_usage_ue2                                                 
- └─ Backup storage                                                            1,000  GB                      $21.00 
-                                                                                                                    
+ Name                                                                   Monthly Qty  Unit              Monthly Cost    
+                                                                                                                       
+ aws_docdb_cluster_snapshot.my_aws_docdb_cluster_snapshot_usage                                                        
+ └─ Backup storage                                                            1,000  GB                      $21.00  * 
+                                                                                                                       
+ aws_docdb_cluster_snapshot.my_aws_docdb_cluster_snapshot_usage_ue2                                                    
+ └─ Backup storage                                                            1,000  GB                      $21.00  * 
+                                                                                                                       
+ aws_docdb_cluster_snapshot.my_aws_docdb_cluster_snapshot                                                              
+ └─ Backup storage                                                   Monthly cost depends on usage: $0.021 per GB      
+                                                                                                                       
+ aws_docdb_cluster_snapshot.my_aws_docdb_cluster_snapshot_ue2                                                          
+ └─ Backup storage                                                   Monthly cost depends on usage: $0.021 per GB      
+                                                                                                                       
  OVERALL TOTAL                                                                                               $42.00 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 4 cloud resources were detected:
-∙ 4 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 4 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestDocDBClusterSnapshotGoldenFile                 ┃ $42          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $0.00         ┃ $42         ┃ $42        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

@@ -1,23 +1,26 @@
 
- Name                                                    Monthly Qty  Unit            Monthly Cost 
-                                                                                                   
- google_compute_instance.vm                                                                        
- ├─ Instance usage (Linux/UNIX, on-demand, e2-medium)            730  hours                 $24.46 
- └─ Standard provisioned storage (pd-standard)                    10  GB                     $0.40 
-                                                                                                   
- google_compute_machine_image.image                                                                
- └─ Storage                                            Monthly cost depends on usage: $0.05 per GB 
-                                                                                                   
- google_compute_machine_image.usage                                                                
- └─ Storage                                                    5,000  GB                   $250.00 
-                                                                                                   
+ Name                                                    Monthly Qty  Unit            Monthly Cost    
+                                                                                                      
+ google_compute_machine_image.usage                                                                   
+ └─ Storage                                                    5,000  GB                   $250.00  * 
+                                                                                                      
+ google_compute_instance.vm                                                                           
+ ├─ Instance usage (Linux/UNIX, on-demand, e2-medium)            730  hours                 $24.46    
+ └─ Standard provisioned storage (pd-standard)                    10  GB                     $0.40    
+                                                                                                      
+ google_compute_machine_image.image                                                                   
+ └─ Storage                                            Monthly cost depends on usage: $0.05 per GB    
+                                                                                                      
  OVERALL TOTAL                                                                             $274.86 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 3 cloud resources were detected:
-∙ 3 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 3 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestComputeMachineImageGoldenFile                  ┃ $275         ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $25           ┃ $250        ┃ $275       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

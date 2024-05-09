@@ -9,11 +9,10 @@ import (
 
 	"github.com/shopspring/decimal"
 
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/ui"
 
 	"github.com/Masterminds/sprig"
-
-	"github.com/rs/zerolog/log"
 )
 
 func ToHTML(out Root, opts Options) ([]byte, error) {
@@ -38,7 +37,7 @@ func ToHTML(out Root, opts Options) ([]byte, error) {
 				return true
 			}
 
-			log.Info().Msgf("Hiding resource with no usage: %s", resourceName)
+			logging.Logger.Debug().Msgf("Hiding resource with no usage: %s", resourceName)
 			return false
 		},
 		"filterZeroValComponents": filterZeroValComponents,

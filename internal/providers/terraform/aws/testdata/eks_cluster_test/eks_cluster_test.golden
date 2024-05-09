@@ -1,37 +1,40 @@
 
- Name                                      Monthly Qty  Unit   Monthly Cost 
-                                                                            
- aws_eks_cluster.extended_support["1.23"]                                   
- └─ EKS cluster (extended support)                 730  hours       $438.00 
-                                                                            
- aws_eks_cluster.extended_support["1.24"]                                   
- └─ EKS cluster (extended support)                 730  hours       $438.00 
-                                                                            
- aws_eks_cluster.extended_support["1.25"]                                   
- └─ EKS cluster                                    730  hours        $73.00 
-                                                                            
- aws_eks_cluster.extended_support["1.26"]                                   
- └─ EKS cluster                                    730  hours        $73.00 
-                                                                            
- aws_eks_cluster.extended_support["1.27"]                                   
- └─ EKS cluster                                    730  hours        $73.00 
-                                                                            
- aws_eks_cluster.extended_support["1.28"]                                   
- └─ EKS cluster                                    730  hours        $73.00 
-                                                                            
- aws_eks_cluster.extended_support["1.29"]                                   
- └─ EKS cluster                                    730  hours        $73.00 
-                                                                            
- aws_eks_cluster.my_aws_eks_cluster                                         
- └─ EKS cluster                                    730  hours        $73.00 
-                                                                            
- OVERALL TOTAL                                                    $1,314.00 
+ Name                                      Monthly Qty  Unit   Monthly Cost   
+                                                                              
+ aws_eks_cluster.extended_support["1.23"]                                     
+ └─ EKS cluster (extended support)                 730  hours       $438.00   
+                                                                              
+ aws_eks_cluster.extended_support["1.24"]                                     
+ └─ EKS cluster (extended support)                 730  hours       $438.00   
+                                                                              
+ aws_eks_cluster.extended_support["1.25"]                                     
+ └─ EKS cluster (extended support)                 730  hours       $438.00   
+                                                                              
+ aws_eks_cluster.extended_support["1.26"]                                     
+ └─ EKS cluster                                    730  hours        $73.00   
+                                                                              
+ aws_eks_cluster.extended_support["1.27"]                                     
+ └─ EKS cluster                                    730  hours        $73.00   
+                                                                              
+ aws_eks_cluster.extended_support["1.28"]                                     
+ └─ EKS cluster                                    730  hours        $73.00   
+                                                                              
+ aws_eks_cluster.extended_support["1.29"]                                     
+ └─ EKS cluster                                    730  hours        $73.00   
+                                                                              
+ aws_eks_cluster.my_aws_eks_cluster                                           
+ └─ EKS cluster                                    730  hours        $73.00   
+                                                                              
+ OVERALL TOTAL                                                   $1,679.00 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 8 cloud resources were detected:
 ∙ 8 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestEKSClusterGoldenFile                           ┃ $1,314       ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $1,679        ┃ $0.00       ┃ $1,679     ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

@@ -14,6 +14,7 @@
   "projects": [
     {
       "name": "infracost/infracost/cmd/infracost/testdata/breakdown_format_json_with_warnings",
+      "displayName": "main",
       "metadata": {
         "path": "testdata/breakdown_format_json_with_warnings",
         "type": "terraform_dir",
@@ -91,4 +92,4 @@ Err:
 
 
 Logs:
-WRN Input values were not provided for following Terraform variables: "variable.not_provided". Use --terraform-var-file or --terraform-var to specify them.
+WARN Input values were not provided for following Terraform variables: "variable.not_provided". Use --terraform-var-file or --terraform-var to specify them.

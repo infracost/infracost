@@ -1,27 +1,29 @@
 
- Name                                                              Monthly Qty  Unit  Monthly Cost 
-                                                                                                   
- azurerm_monitor_scheduled_query_rules_alert.example_freq_5["11"]                                  
- └─ Log alerts monitoring (10 minute frequency)                              1  rule         $1.00 
-                                                                                                   
- azurerm_monitor_scheduled_query_rules_alert.example_freq_5["15"]                                  
- └─ Log alerts monitoring (15 minute frequency)                              1  rule         $0.50 
-                                                                                                   
- azurerm_monitor_scheduled_query_rules_alert.example_freq_5["5"]                                   
- └─ Log alerts monitoring (5 minute frequency)                               1  rule         $1.50 
-                                                                                                   
- azurerm_monitor_scheduled_query_rules_alert.example_freq_5["60"]                                  
- └─ Log alerts monitoring (15 minute frequency)                              1  rule         $0.50 
-                                                                                                   
- OVERALL TOTAL                                                                               $3.50 
+ Name                                                              Monthly Qty  Unit  Monthly Cost   
+                                                                                                     
+ azurerm_monitor_scheduled_query_rules_alert.example_freq_5["5"]                                     
+ └─ Log alerts monitoring (5 minute frequency)                               1  rule         $1.50   
+                                                                                                     
+ azurerm_monitor_scheduled_query_rules_alert.example_freq_5["11"]                                    
+ └─ Log alerts monitoring (10 minute frequency)                              1  rule         $1.00   
+                                                                                                     
+ azurerm_monitor_scheduled_query_rules_alert.example_freq_5["15"]                                    
+ └─ Log alerts monitoring (15 minute frequency)                              1  rule         $0.50   
+                                                                                                     
+ azurerm_monitor_scheduled_query_rules_alert.example_freq_5["60"]                                    
+ └─ Log alerts monitoring (15 minute frequency)                              1  rule         $0.50   
+                                                                                                     
+ OVERALL TOTAL                                                                              $3.50 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 6 cloud resources were detected:
 ∙ 5 were estimated
-∙ 1 was free:
-  ∙ 1 x azurerm_resource_group
+∙ 1 was free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestMonitorScheduledQueryRulesAlert                ┃ $4           ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $4            ┃ $0.00       ┃ $4         ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

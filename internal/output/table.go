@@ -7,13 +7,20 @@ import (
 	"github.com/jedib0t/go-pretty/v6/table"
 	"github.com/jedib0t/go-pretty/v6/text"
 
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/ui"
-
-	"github.com/rs/zerolog/log"
 )
 
 func ToTable(out Root, opts Options) ([]byte, error) {
 	var tableLen int
+
+	hasUsageFootnote := false
+	for _, f := range opts.Fields {
+		if f == "monthlyQuantity" || f == "hourlyCost" || f == "monthlyCost" {
+			hasUsageFootnote = true
+			break
+		}
+	}
 
 	s := ""
 
@@ -40,11 +47,18 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 				s += "\n"
 			}
 		} else {
-			tableOut := tableForBreakdown(out.Currency, *project.Breakdown, opts.Fields, includeProjectTotals)
+			fields := opts.Fields
+			if hasUsageFootnote {
+				fields = append(fields, "usageFootnote")
+			}
+			tableOut := tableForBreakdown(out.Currency, *project.Breakdown, fields, includeProjectTotals)
 
 			// Get the last table length so we can align the overall total with it
 			if i == len(out.Projects)-1 {
 				tableLen = len(ui.StripColor(strings.SplitN(tableOut, "\n", 2)[0]))
+				if hasUsageFootnote {
+					tableLen -= 3
+				}
 			}
 
 			s += tableOut
@@ -73,6 +87,12 @@ func ToTable(out Root, opts Options) ([]byte, error) {
 		ui.BoldString(overallTitle),
 		fmt.Sprintf("%*s ", padding, totalOut), // pad based on the last line length
 	)
+
+	if hasUsageFootnote {
+		s += "\n\n"
+		s += usageCostsMessage(out, false)
+		s += "\n"
+	}
 
 	summaryMsg := out.summaryMessage(opts.ShowSkipped)
 
@@ -176,6 +196,16 @@ func tableForBreakdown(currency string, breakdown Breakdown, fields []string, in
 		i++
 	}
 
+	if contains(fields, "usageFootnote") {
+		headers = append(headers, "")
+		columns = append(columns, table.ColumnConfig{
+			Number:      i,
+			Align:       text.AlignLeft,
+			AlignHeader: text.AlignLeft,
+		})
+		i++
+	}
+
 	t.AppendRow(table.Row{""})
 
 	t.SetColumnConfigs(columns)
@@ -185,7 +215,7 @@ func tableForBreakdown(currency string, breakdown Breakdown, fields []string, in
 		filteredComponents := filterZeroValComponents(r.CostComponents, r.Name)
 		filteredSubResources := filterZeroValResources(r.SubResources, r.Name)
 		if len(filteredComponents) == 0 && len(filteredSubResources) == 0 {
-			log.Info().Msgf("Hiding resource with no usage: %s", r.Name)
+			logging.Logger.Debug().Msgf("Hiding resource with no usage: %s", r.Name)
 			continue
 		}
 
@@ -202,6 +232,9 @@ func tableForBreakdown(currency string, breakdown Breakdown, fields []string, in
 		var totalCostRow table.Row
 		totalCostRow = append(totalCostRow, ui.BoldString(formatTitleWithCurrency("Project total", currency)))
 		numOfFields := i - 3
+		if contains(fields, "usageFootnote") {
+			numOfFields -= 1
+		}
 		for q := 0; q < numOfFields; q++ {
 			totalCostRow = append(totalCostRow, "")
 		}
@@ -250,19 +283,26 @@ func buildCostComponentRows(t table.Writer, currency string, costComponents []Co
 				c.Unit,
 			)
 
+			if c.PriceNotFound {
+				price = "not found"
+			}
+
 			t.AppendRow(table.Row{
 				label,
 				price,
 				price,
 				price,
 			}, table.RowConfig{AutoMerge: true, AlignAutoMerge: text.AlignLeft})
-
 		} else {
 			var tableRow table.Row
 			tableRow = append(tableRow, label)
 
 			if contains(fields, "price") {
-				tableRow = append(tableRow, formatPrice(currency, c.Price))
+				if c.PriceNotFound {
+					tableRow = append(tableRow, "not found")
+				} else {
+					tableRow = append(tableRow, formatPrice(currency, c.Price))
+				}
 			}
 			if contains(fields, "monthlyQuantity") {
 				tableRow = append(tableRow, formatQuantity(c.MonthlyQuantity))
@@ -271,10 +311,24 @@ func buildCostComponentRows(t table.Writer, currency string, costComponents []Co
 				tableRow = append(tableRow, c.Unit)
 			}
 			if contains(fields, "hourlyCost") {
-				tableRow = append(tableRow, FormatCost2DP(currency, c.HourlyCost))
+				if c.PriceNotFound {
+					tableRow = append(tableRow, "not found")
+				} else {
+					tableRow = append(tableRow, FormatCost2DP(currency, c.HourlyCost))
+				}
 			}
 			if contains(fields, "monthlyCost") {
-				tableRow = append(tableRow, FormatCost2DP(currency, c.MonthlyCost))
+				if c.PriceNotFound {
+					tableRow = append(tableRow, "not found")
+				} else {
+					tableRow = append(tableRow, FormatCost2DP(currency, c.MonthlyCost))
+				}
+			}
+
+			if contains(fields, "usageFootnote") {
+				if c.UsageBased {
+					tableRow = append(tableRow, "*")
+				}
 			}
 
 			t.AppendRow(tableRow)
@@ -319,7 +373,7 @@ func filterZeroValComponents(costComponents []CostComponent, resourceName string
 	var filteredComponents []CostComponent
 	for _, c := range costComponents {
 		if c.MonthlyQuantity != nil && c.MonthlyQuantity.IsZero() {
-			log.Info().Msgf("Hiding cost with no usage: %s '%s'", resourceName, c.Name)
+			logging.Logger.Debug().Msgf("Hiding cost with no usage: %s '%s'", resourceName, c.Name)
 			continue
 		}
 
@@ -334,7 +388,7 @@ func filterZeroValResources(resources []Resource, resourceName string) []Resourc
 		filteredComponents := filterZeroValComponents(r.CostComponents, fmt.Sprintf("%s.%s", resourceName, r.Name))
 		filteredSubResources := filterZeroValResources(r.SubResources, fmt.Sprintf("%s.%s", resourceName, r.Name))
 		if len(filteredComponents) == 0 && len(filteredSubResources) == 0 {
-			log.Info().Msgf("Hiding resource with no usage: %s.%s", resourceName, r.Name)
+			logging.Logger.Debug().Msgf("Hiding resource with no usage: %s.%s", resourceName, r.Name)
 			continue
 		}
 
@@ -349,22 +403,32 @@ func breakdownSummaryTable(out Root, opts Options) string {
 	t.Style().Format.Header = text.FormatDefault
 	t.AppendHeader(table.Row{
 		"Project",
-		"Monthly cost",
+		"Baseline cost",
+		"Usage cost*",
+		"Total cost",
 	})
 
 	t.SetColumnConfigs([]table.ColumnConfig{
 		{Name: "Project", WidthMin: 50},
-		{Name: "Monthly cost", WidthMin: 10},
+		{Name: "Baseline cost", WidthMin: 10},
+		{Name: "Usage cost*", WidthMin: 10},
+		{Name: "Total monthly cost", WidthMin: 10},
 	})
 
 	for _, project := range out.Projects {
+		baseline := project.Breakdown.TotalMonthlyCost
+		if baseline != nil && project.Breakdown.TotalMonthlyUsageCost != nil {
+			baseline = decimalPtr(baseline.Sub(*project.Breakdown.TotalMonthlyUsageCost))
+		}
+
 		t.AppendRow(
 			table.Row{
-				truncateMiddle(project.Name, 64, "..."),
+				truncateMiddle(project.Label(), 64, "..."),
+				formatCost(out.Currency, baseline),
+				formatCost(out.Currency, project.Breakdown.TotalMonthlyUsageCost),
 				formatCost(out.Currency, project.Breakdown.TotalMonthlyCost),
 			},
 		)
-
 	}
 
 	return t.Render()

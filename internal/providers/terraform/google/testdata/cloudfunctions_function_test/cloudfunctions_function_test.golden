@@ -1,25 +1,28 @@
 
- Name                                               Monthly Qty  Unit                      Monthly Cost 
-                                                                                                        
- google_cloudfunctions_function.function                                                                
- ├─ CPU                                      Monthly cost depends on usage: $0.00001 per GHz-seconds    
- ├─ Memory                                   Monthly cost depends on usage: $0.0000025 per GB-seconds   
- ├─ Invocations                              Monthly cost depends on usage: $0.0000004 per invocations  
- └─ Outbound data transfer                   Monthly cost depends on usage: $0.12 per GB                
-                                                                                                        
- google_cloudfunctions_function.my_function                                                             
- ├─ CPU                                               1,200,000  GHz-seconds                     $12.00 
- ├─ Memory                                              750,000  GB-seconds                       $1.88 
- ├─ Invocations                                      10,000,000  invocations                      $4.00 
- └─ Outbound data transfer                                  100  GB                              $12.00 
-                                                                                                        
+ Name                                               Monthly Qty  Unit                      Monthly Cost    
+                                                                                                           
+ google_cloudfunctions_function.my_function                                                                
+ ├─ CPU                                               1,200,000  GHz-seconds                     $12.00  * 
+ ├─ Memory                                              750,000  GB-seconds                       $1.88  * 
+ ├─ Invocations                                      10,000,000  invocations                      $4.00  * 
+ └─ Outbound data transfer                                  100  GB                              $12.00  * 
+                                                                                                           
+ google_cloudfunctions_function.function                                                                   
+ ├─ CPU                                      Monthly cost depends on usage: $0.00001 per GHz-seconds       
+ ├─ Memory                                   Monthly cost depends on usage: $0.0000025 per GB-seconds      
+ ├─ Invocations                              Monthly cost depends on usage: $0.0000004 per invocations     
+ └─ Outbound data transfer                   Monthly cost depends on usage: $0.12 per GB                   
+                                                                                                           
  OVERALL TOTAL                                                                                   $29.88 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 2 cloud resources were detected:
-∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 2 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestCloudFunctions                                 ┃ $30          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $0.00         ┃ $30         ┃ $30        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

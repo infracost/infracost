@@ -5,10 +5,12 @@ import (
 	"encoding/hex"
 	"fmt"
 	"os"
+	"path/filepath"
 	"regexp"
 	"sort"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/hashicorp/hcl/v2"
 	"github.com/hashicorp/hcl/v2/hclsyntax"
@@ -307,6 +309,16 @@ type BlockBuilder struct {
 func (b BlockBuilder) NewBlock(filename string, rootPath string, hclBlock *hcl.Block, ctx *Context, parent *Block, moduleBlock *Block) *Block {
 	if ctx == nil {
 		ctx = NewContext(&hcl.EvalContext{}, nil, b.Logger)
+	}
+
+	// if the filepath is absolute let's make it relative to the working directory so
+	// we trip any user/machine defined paths.
+	if filepath.IsAbs(filename) {
+		wd, _ := os.Getwd()
+		rel, err := filepath.Rel(wd, filename)
+		if err == nil {
+			filename = rel
+		}
 	}
 
 	isLoggingVerbose := strings.TrimSpace(os.Getenv("INFRACOST_HCL_DEBUG_VERBOSE")) == "true"
@@ -1115,7 +1127,21 @@ func (b *Block) Reference() *Reference {
 
 	var parts []string
 
-	if b.Type() != "resource" || b.parent != nil {
+	parent := b.parent
+	for parent != nil {
+		var parentParts []string
+
+		if parent.Type() != "resource" {
+			parentParts = append(parentParts, parent.Type())
+		}
+
+		parentParts = append(parentParts, parent.Labels()...)
+
+		parts = append(parentParts, parts...)
+		parent = parent.parent
+	}
+
+	if b.Type() != "resource" {
 		parts = append(parts, b.Type())
 	}
 
@@ -1297,6 +1323,10 @@ func (b *Block) Key() *string {
 }
 
 func (b *Block) Label() string {
+	if b == nil || b.HCLBlock == nil {
+		return ""
+	}
+
 	return strings.Join(b.HCLBlock.Labels, ".")
 }
 
@@ -1334,8 +1364,41 @@ var (
 		"data.aws_region":             awsCurrentRegion,
 		"data.aws_default_tags":       awsDefaultTagValues,
 		"resource.random_shuffle":     randomShuffleValues,
+		"resource.time_static":        timeStaticValues,
 	}
 )
+
+// timeStaticValues mocks the values returned from resource.time_static which is
+// a resource that returns the attributes of the provided rfc3339 time. If none
+// is provided, it defaults to the current time.
+//
+// https://registry.terraform.io/providers/hashicorp/time/latest/docs/resources/static
+func timeStaticValues(b *Block) cty.Value {
+	now := time.Now()
+	var inputDateStr string
+	v := b.GetAttribute("rfc3339").Value()
+	_ = gocty.FromCtyValue(v, &inputDateStr)
+	if inputDateStr == "" {
+		inputDateStr = now.Format(time.RFC3339)
+	}
+
+	inputDate, err := time.Parse(time.RFC3339, inputDateStr)
+	if err != nil {
+		inputDate = now
+	}
+
+	return cty.ObjectVal(map[string]cty.Value{
+		"rfc3339": cty.StringVal(inputDateStr),
+		"day":     cty.NumberIntVal(int64(inputDate.Day())),
+		"hour":    cty.NumberIntVal(int64(inputDate.Hour())),
+		"id":      cty.StringVal(inputDate.Format(time.RFC3339)),
+		"minute":  cty.NumberIntVal(int64(inputDate.Minute())),
+		"month":   cty.NumberIntVal(int64(inputDate.Month())),
+		"second":  cty.NumberIntVal(int64(inputDate.Second())),
+		"unix":    cty.NumberIntVal(inputDate.Unix()),
+		"year":    cty.NumberIntVal(int64(inputDate.Year())),
+	})
+}
 
 func awsCurrentRegion(b *Block) cty.Value {
 	return cty.ObjectVal(map[string]cty.Value{

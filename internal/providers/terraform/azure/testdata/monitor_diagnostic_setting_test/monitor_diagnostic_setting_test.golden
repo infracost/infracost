@@ -1,22 +1,23 @@
 
- Name                                                     Monthly Qty  Unit            Monthly Cost 
-                                                                                                    
- azurerm_monitor_diagnostic_setting.example                                                         
- └─ Platform logs processed                             Monthly cost depends on usage: $0.33 per GB 
-                                                                                                    
- azurerm_monitor_diagnostic_setting.example_with_usage                                              
- └─ Platform logs processed                                     1,000  GB                   $325.00 
-                                                                                                    
+ Name                                                     Monthly Qty  Unit            Monthly Cost    
+                                                                                                       
+ azurerm_monitor_diagnostic_setting.example_with_usage                                                 
+ └─ Platform logs processed                                     1,000  GB                   $325.00  * 
+                                                                                                       
+ azurerm_monitor_diagnostic_setting.example                                                            
+ └─ Platform logs processed                             Monthly cost depends on usage: $0.33 per GB    
+                                                                                                       
  OVERALL TOTAL                                                                              $325.00 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 5 cloud resources were detected:
-∙ 3 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
-∙ 2 were free:
-  ∙ 1 x azurerm_key_vault
-  ∙ 1 x azurerm_resource_group
+∙ 3 were estimated
+∙ 2 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestMonitorDiagnosticSetting                       ┃ $325         ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $0.00         ┃ $325        ┃ $325       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

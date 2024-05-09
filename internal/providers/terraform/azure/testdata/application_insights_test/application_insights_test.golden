@@ -1,25 +1,27 @@
 
- Name                                           Monthly Qty  Unit            Monthly Cost 
-                                                                                          
- azurerm_application_insights.non_usage                                                   
- └─ Data ingested                             Monthly cost depends on usage: $2.30 per GB 
-                                                                                          
- azurerm_application_insights.usage                                                       
- └─ Data ingested                                     1,000  GB                 $2,300.00 
-                                                                                          
- azurerm_application_insights.with_retention                                              
- ├─ Data ingested                                     1,000  GB                 $2,300.00 
- └─ Data retention (120 days)                         1,000  GB                   $100.00 
-                                                                                          
+ Name                                           Monthly Qty  Unit            Monthly Cost    
+                                                                                             
+ azurerm_application_insights.with_retention                                                 
+ ├─ Data ingested                                     1,000  GB                 $2,300.00  * 
+ └─ Data retention (120 days)                         1,000  GB                   $100.00    
+                                                                                             
+ azurerm_application_insights.usage                                                          
+ └─ Data ingested                                     1,000  GB                 $2,300.00  * 
+                                                                                             
+ azurerm_application_insights.non_usage                                                      
+ └─ Data ingested                             Monthly cost depends on usage: $2.30 per GB    
+                                                                                             
  OVERALL TOTAL                                                                  $4,700.00 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 4 cloud resources were detected:
-∙ 3 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
-∙ 1 was free:
-  ∙ 1 x azurerm_resource_group
+∙ 3 were estimated
+∙ 1 was free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMApplicationInsights                     ┃ $4,700       ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $100          ┃ $4,600      ┃ $4,700     ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

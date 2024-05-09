@@ -1,32 +1,32 @@
 
- Name                                          Monthly Qty  Unit              Monthly Cost 
-                                                                                           
- azurerm_lb.example_withStandardSku                                                        
- └─ Data processed                          Monthly cost depends on usage: $0.005 per GB   
-                                                                                           
- azurerm_lb_rule.rules_withStandardSku                                                     
- └─ Rule usage                                         730  hours                    $7.30 
-                                                                                           
- azurerm_public_ip.example_withBasicSku                                                    
- └─ IP address (static, regional)                      730  hours                    $2.63 
-                                                                                           
- azurerm_public_ip.example_withDefaultSku                                                  
- └─ IP address (static, regional)                      730  hours                    $2.63 
-                                                                                           
- azurerm_public_ip.example_withStandardSku                                                 
- └─ IP address (static, regional)                      730  hours                    $2.63 
-                                                                                           
- OVERALL TOTAL                                                                      $15.18 
+ Name                                          Monthly Qty  Unit              Monthly Cost   
+                                                                                             
+ azurerm_lb_rule.rules_withStandardSku                                                       
+ └─ Rule usage                                         730  hours                    $7.30   
+                                                                                             
+ azurerm_public_ip.example_withBasicSku                                                      
+ └─ IP address (static, regional)                      730  hours                    $2.63   
+                                                                                             
+ azurerm_public_ip.example_withDefaultSku                                                    
+ └─ IP address (static, regional)                      730  hours                    $2.63   
+                                                                                             
+ azurerm_public_ip.example_withStandardSku                                                   
+ └─ IP address (static, regional)                      730  hours                    $2.63   
+                                                                                             
+ azurerm_lb.example_withStandardSku                                                          
+ └─ Data processed                          Monthly cost depends on usage: $0.005 per GB     
+                                                                                             
+ OVERALL TOTAL                                                                     $15.18 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 10 cloud resources were detected:
-∙ 5 were estimated, 1 of which usage-based costs, see https://infracost.io/usage-file
-∙ 5 were free:
-  ∙ 2 x azurerm_lb
-  ∙ 2 x azurerm_lb_rule
-  ∙ 1 x azurerm_resource_group
+∙ 5 were estimated
+∙ 5 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMLoadBalancerRuleGoldenFile              ┃ $15          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $15           ┃ $0.00       ┃ $15        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

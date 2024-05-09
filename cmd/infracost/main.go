@@ -102,7 +102,7 @@ type debugWriter struct {
 
 func (d debugWriter) Write(p []byte) (n int, err error) {
 	p = bytes.Trim(p, " \n\t")
-	return d.f.Write(append(p, []byte(",\n")...))
+	return d.f.Write(append(p, []byte("\n")...))
 }
 
 func newRootCmd(ctx *config.RunContext) *cobra.Command {
@@ -322,7 +322,7 @@ func handleCLIError(ctx *config.RunContext, cliErr error) {
 }
 
 func handleUnexpectedErr(ctx *config.RunContext, err error) {
-	ui.PrintUnexpectedErrorStack(ctx.ErrWriter, err)
+	ui.PrintUnexpectedErrorStack(err)
 
 	err = apiclient.ReportCLIError(ctx, err, false)
 	if err != nil {
@@ -381,11 +381,7 @@ func saveOutFileWithMsg(ctx *config.RunContext, cmd *cobra.Command, outFile, suc
 		return errors.Wrap(err, "Unable to save output")
 	}
 
-	if ctx.Config.IsLogging() {
-		logging.Logger.Info().Msg(successMsg)
-	} else {
-		cmd.PrintErrf("%s\n", successMsg)
-	}
+	logging.Logger.Info().Msg(successMsg)
 
 	return nil
 }

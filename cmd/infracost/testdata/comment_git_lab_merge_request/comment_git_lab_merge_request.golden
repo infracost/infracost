@@ -1,35 +1,51 @@
 
-<h3>Infracost report</h3>
-<h4>💰 Monthly cost will increase by $41 📈</h4>
+<h4>💰 Infracost report</h4>
+<h4>Monthly cost will increase by $41 📈</h4>
 <table>
   <thead>
-    <td>Project</td>
-    <td>Cost change</td>
+    <td>Changed project</td>
+    <td><span title="Baseline costs are consistent charges for provisioned resources, like the hourly cost for a virtual machine, which stays constant no matter how much it is used. Infracost estimates these resources assuming they are used for the whole month (730 hours).">Baseline cost</span></td>
+    <td><span title="Usage costs are charges based on actual usage, like the storage cost for an object storage bucket. Infracost estimates these resources using the monthly usage values in the usage-file.">Usage cost</span>*</td>
+    <td>Total change</td>
     <td>New monthly cost</td>
   </thead>
   <tbody>
     <tr>
       <td>infracost/infracost/cmd/infraco...data/terraform_v0.14_plan.json</td>
-      <td>+$41 (+100%)</td>
+      <td align="right">+$41</td>
+      <td align="right">-</td>
+      <td align="right">+$41 (+100%)</td>
       <td align="right">$81</td>
     </tr>
   </tbody>
 </table>
+
+
+*Usage costs can be estimated by updating [Infracost Cloud settings](https://www.infracost.io/docs/features/usage_based_resources), see [docs](https://www.infracost.io/docs/features/usage_based_resources/#infracost-usageyml) for other options.
 <details>
-<summary>Cost details</summary>
+
+<summary>Cost details </summary>
 
 ```
+Key: * usage cost, ~ changed, + added, - removed
+
 ──────────────────────────────────
 Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
+
++ module.db.module.db_2.module.db_instance.aws_db_instance.this[0]
+  +$13
+
+    + Database instance (on-demand, Single-AZ, db.t3.micro)
+      +$12
+
+    + Storage (general purpose SSD, gp2)
+      +$0.58
 
 + aws_instance.instance_2
   +$5
 
     + Instance usage (Linux/UNIX, on-demand, t3.nano)
       +$4
-
-    + CPU credits
-      $0.00
 
     + root_block_device
     
@@ -42,9 +58,6 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
     + Instance usage (Linux/UNIX, on-demand, t3.nano)
       +$4
 
-    + CPU credits
-      $0.00
-
     + root_block_device
     
         + Storage (general purpose SSD, gp2)
@@ -56,31 +69,16 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
     + Instance usage (Linux/UNIX, on-demand, t3.nano)
       +$4
 
-    + CPU credits
-      $0.00
-
     + root_block_device
     
         + Storage (general purpose SSD, gp2)
           +$0.80
-
-+ module.db.module.db_2.module.db_instance.aws_db_instance.this[0]
-  +$13
-
-    + Database instance (on-demand, Single-AZ, db.t3.micro)
-      +$12
-
-    + Storage (general purpose SSD, gp2)
-      +$0.58
 
 + module.instances.aws_instance.module_instance_2
   +$5
 
     + Instance usage (Linux/UNIX, on-demand, t3.nano)
       +$4
-
-    + CPU credits
-      $0.00
 
     + root_block_device
     
@@ -93,9 +91,6 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
     + Instance usage (Linux/UNIX, on-demand, t3.nano)
       +$4
 
-    + CPU credits
-      $0.00
-
     + root_block_device
     
         + Storage (general purpose SSD, gp2)
@@ -107,9 +102,6 @@ Project: infracost/infracost/cmd/infracost/testdata/terraform_v0.14_plan.json
     + Instance usage (Linux/UNIX, on-demand, t3.nano)
       +$4
 
-    + CPU credits
-      $0.00
-
     + root_block_device
     
         + Storage (general purpose SSD, gp2)
@@ -120,18 +112,20 @@ Amount:  +$41 ($41 → $81)
 Percent: +100%
 
 ──────────────────────────────────
-Key: ~ changed, + added, - removed
+Key: * usage cost, ~ changed, + added, - removed
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
 
 26 cloud resources were detected:
-∙ 14 were estimated, 10 of which include usage-based costs, see https://infracost.io/usage-file
-∙ 12 were free, rerun with --show-skipped to see details
+∙ 14 were estimated
+∙ 12 were free
 
 Infracost estimate: Monthly cost will increase by $41 ↑
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┓
-┃ Project                                                          ┃ Cost change  ┃ New monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━━━━┫
-┃ infracost/infracost/cmd/infraco...data/terraform_v0.14_plan.json ┃ +$41 (+100%) ┃ $81              ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
+┃ Changed project                                                  ┃ Baseline cost ┃ Usage cost ┃ Total change ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
+┃ infracost/infracost/cmd/infraco...data/terraform_v0.14_plan.json ┃          +$41 ┃          - ┃ +$41 (+100%) ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
 ```
 </details>
 <sub>This comment will be updated when code changes.

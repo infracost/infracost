@@ -6,7 +6,7 @@ import (
 	"github.com/shopspring/decimal"
 )
 
-// MonitorActionGroup struct represents an Azure Monitor Action Group.
+// MonitorMetricAlert struct represents an Azure Monitor Metric Group.
 //
 // Resource information: https://learn.microsoft.com/en-us/azure/azure-monitor/alerts/alerts-overview
 // Pricing information: https://azure.microsoft.com/en-us/pricing/details/monitor/

@@ -1,81 +1,84 @@
 
- Name                                                                Monthly Qty  Unit                        Monthly Cost 
-                                                                                                                           
- aws_kinesis_stream.test_stream_on_demand                                                                                  
- ├─ ON_DEMAND                                                                730  hours                             $29.20 
- ├─ Data ingested                                            Monthly cost depends on usage: $0.08 per GB                   
- ├─ Data retrieval                                           Monthly cost depends on usage: $0.04 per GB                   
- ├─ Enhanced Fan Out (EFO) Data retrieval                    Monthly cost depends on usage: $0.05 per GB                   
- ├─ Extended retention (24H to 7D)                           Monthly cost depends on usage: $0.10 per GB                   
- └─ Long term retention (7D+)                                Monthly cost depends on usage: $0.023 per GB                  
-                                                                                                                           
- aws_kinesis_stream.test_stream_on_demand_with_usage                                                                       
- ├─ ON_DEMAND                                                                730  hours                             $29.20 
- ├─ Data ingested                                                            0.2  GB                                 $0.02 
- ├─ Data retrieval                                                           0.2  GB                                 $0.01 
- ├─ Enhanced Fan Out (EFO) Data retrieval                                      2  GB                                 $0.10 
- ├─ Extended retention (24H to 7D)                                             1  GB                                 $0.10 
- └─ Long term retention (7D+)                                                  1  GB                                 $0.02 
-                                                                                                                           
- aws_kinesis_stream.test_stream_provisioned                                                                                
- ├─ PROVISIONED                                                              730  hours                             $10.95 
- ├─ Put request unit                                         Monthly cost depends on usage: $0.000000014 per units         
- ├─ Extended retention (24H to 7D)                           Monthly cost depends on usage: $0.02 per GB                   
- ├─ Long term retention (7D+)                                Monthly cost depends on usage: $0.023 per GB                  
- ├─ Extended retention retrieval (7D+)                       Monthly cost depends on usage: $0.021 per GB                  
- ├─ Enhanced Fan Out (EFO) Data retrieval                    Monthly cost depends on usage: $0.013 per GB                  
- └─ Enhanced Fan Out (EFO)                                   Monthly cost depends on usage: $0.015 per consumer-shard hour 
-                                                                                                                           
- aws_kinesis_stream.test_stream_provisioned_with_usage                                                                     
- ├─ PROVISIONED                                                            2,920  hours                             $43.80 
- ├─ Put request unit                                                   6,500,000  units                              $0.09 
- ├─ Extended retention (24H to 7D)                                           100  GB                                 $2.00 
- ├─ Long term retention (7D+)                                                100  GB                                 $2.30 
- ├─ Extended retention retrieval (7D+)                                       100  GB                                 $2.10 
- ├─ Enhanced Fan Out (EFO) Data retrieval                                    100  GB                                 $1.30 
- └─ Enhanced Fan Out (EFO)                                                   100  consumer-shard hour                $1.50 
-                                                                                                                           
- aws_kinesis_stream.use2_test_stream_on_demand                                                                             
- ├─ ON_DEMAND                                                                730  hours                             $29.20 
- ├─ Data ingested                                            Monthly cost depends on usage: $0.08 per GB                   
- ├─ Data retrieval                                           Monthly cost depends on usage: $0.04 per GB                   
- ├─ Enhanced Fan Out (EFO) Data retrieval                    Monthly cost depends on usage: $0.05 per GB                   
- ├─ Extended retention (24H to 7D)                           Monthly cost depends on usage: $0.10 per GB                   
- └─ Long term retention (7D+)                                Monthly cost depends on usage: $0.023 per GB                  
-                                                                                                                           
- aws_kinesis_stream.use2_test_stream_on_demand_with_usage                                                                  
- ├─ ON_DEMAND                                                                730  hours                             $29.20 
- ├─ Data ingested                                                            0.2  GB                                 $0.02 
- ├─ Data retrieval                                                           0.2  GB                                 $0.01 
- ├─ Enhanced Fan Out (EFO) Data retrieval                                      2  GB                                 $0.10 
- ├─ Extended retention (24H to 7D)                                             1  GB                                 $0.10 
- └─ Long term retention (7D+)                                                  1  GB                                 $0.02 
-                                                                                                                           
- aws_kinesis_stream.use2_test_stream_provisioned                                                                           
- ├─ PROVISIONED                                                              730  hours                             $10.95 
- ├─ Put request unit                                         Monthly cost depends on usage: $0.000000014 per units         
- ├─ Extended retention (24H to 7D)                           Monthly cost depends on usage: $0.02 per GB                   
- ├─ Long term retention (7D+)                                Monthly cost depends on usage: $0.023 per GB                  
- ├─ Extended retention retrieval (7D+)                       Monthly cost depends on usage: $0.021 per GB                  
- ├─ Enhanced Fan Out (EFO) Data retrieval                    Monthly cost depends on usage: $0.013 per GB                  
- └─ Enhanced Fan Out (EFO)                                   Monthly cost depends on usage: $0.015 per consumer-shard hour 
-                                                                                                                           
- aws_kinesis_stream.use2_test_stream_provisioned_with_usage                                                                
- ├─ PROVISIONED                                                            2,920  hours                             $43.80 
- ├─ Put request unit                                                   6,500,000  units                              $0.09 
- ├─ Extended retention (24H to 7D)                                           100  GB                                 $2.00 
- ├─ Long term retention (7D+)                                                100  GB                                 $2.30 
- ├─ Extended retention retrieval (7D+)                                       100  GB                                 $2.10 
- ├─ Enhanced Fan Out (EFO) Data retrieval                                    100  GB                                 $1.30 
- └─ Enhanced Fan Out (EFO)                                                   100  consumer-shard hour                $1.50 
-                                                                                                                           
+ Name                                                                Monthly Qty  Unit                        Monthly Cost    
+                                                                                                                              
+ aws_kinesis_stream.test_stream_provisioned_with_usage                                                                        
+ ├─ PROVISIONED                                                            2,920  hours                             $43.80    
+ ├─ Put request unit                                                   6,500,000  units                              $0.09  * 
+ ├─ Extended retention (24H to 7D)                                           100  GB                                 $2.00  * 
+ ├─ Long term retention (7D+)                                                100  GB                                 $2.30  * 
+ ├─ Extended retention retrieval (7D+)                                       100  GB                                 $2.10  * 
+ ├─ Enhanced Fan Out (EFO) Data retrieval                                    100  GB                                 $1.30  * 
+ └─ Enhanced Fan Out (EFO)                                                   100  consumer-shard hour                $1.50  * 
+                                                                                                                              
+ aws_kinesis_stream.use2_test_stream_provisioned_with_usage                                                                   
+ ├─ PROVISIONED                                                            2,920  hours                             $43.80    
+ ├─ Put request unit                                                   6,500,000  units                              $0.09  * 
+ ├─ Extended retention (24H to 7D)                                           100  GB                                 $2.00  * 
+ ├─ Long term retention (7D+)                                                100  GB                                 $2.30  * 
+ ├─ Extended retention retrieval (7D+)                                       100  GB                                 $2.10  * 
+ ├─ Enhanced Fan Out (EFO) Data retrieval                                    100  GB                                 $1.30  * 
+ └─ Enhanced Fan Out (EFO)                                                   100  consumer-shard hour                $1.50  * 
+                                                                                                                              
+ aws_kinesis_stream.test_stream_on_demand_with_usage                                                                          
+ ├─ ON_DEMAND                                                                730  hours                             $29.20    
+ ├─ Data ingested                                                            0.2  GB                                 $0.02  * 
+ ├─ Data retrieval                                                           0.2  GB                                 $0.01  * 
+ ├─ Enhanced Fan Out (EFO) Data retrieval                                      2  GB                                 $0.10  * 
+ ├─ Extended retention (24H to 7D)                                             1  GB                                 $0.10  * 
+ └─ Long term retention (7D+)                                                  1  GB                                 $0.02  * 
+                                                                                                                              
+ aws_kinesis_stream.use2_test_stream_on_demand_with_usage                                                                     
+ ├─ ON_DEMAND                                                                730  hours                             $29.20    
+ ├─ Data ingested                                                            0.2  GB                                 $0.02  * 
+ ├─ Data retrieval                                                           0.2  GB                                 $0.01  * 
+ ├─ Enhanced Fan Out (EFO) Data retrieval                                      2  GB                                 $0.10  * 
+ ├─ Extended retention (24H to 7D)                                             1  GB                                 $0.10  * 
+ └─ Long term retention (7D+)                                                  1  GB                                 $0.02  * 
+                                                                                                                              
+ aws_kinesis_stream.test_stream_on_demand                                                                                     
+ ├─ ON_DEMAND                                                                730  hours                             $29.20    
+ ├─ Data ingested                                            Monthly cost depends on usage: $0.08 per GB                      
+ ├─ Data retrieval                                           Monthly cost depends on usage: $0.04 per GB                      
+ ├─ Enhanced Fan Out (EFO) Data retrieval                    Monthly cost depends on usage: $0.05 per GB                      
+ ├─ Extended retention (24H to 7D)                           Monthly cost depends on usage: $0.10 per GB                      
+ └─ Long term retention (7D+)                                Monthly cost depends on usage: $0.023 per GB                     
+                                                                                                                              
+ aws_kinesis_stream.use2_test_stream_on_demand                                                                                
+ ├─ ON_DEMAND                                                                730  hours                             $29.20    
+ ├─ Data ingested                                            Monthly cost depends on usage: $0.08 per GB                      
+ ├─ Data retrieval                                           Monthly cost depends on usage: $0.04 per GB                      
+ ├─ Enhanced Fan Out (EFO) Data retrieval                    Monthly cost depends on usage: $0.05 per GB                      
+ ├─ Extended retention (24H to 7D)                           Monthly cost depends on usage: $0.10 per GB                      
+ └─ Long term retention (7D+)                                Monthly cost depends on usage: $0.023 per GB                     
+                                                                                                                              
+ aws_kinesis_stream.test_stream_provisioned                                                                                   
+ ├─ PROVISIONED                                                              730  hours                             $10.95    
+ ├─ Put request unit                                         Monthly cost depends on usage: $0.000000014 per units            
+ ├─ Extended retention (24H to 7D)                           Monthly cost depends on usage: $0.02 per GB                      
+ ├─ Long term retention (7D+)                                Monthly cost depends on usage: $0.023 per GB                     
+ ├─ Extended retention retrieval (7D+)                       Monthly cost depends on usage: $0.021 per GB                     
+ ├─ Enhanced Fan Out (EFO) Data retrieval                    Monthly cost depends on usage: $0.013 per GB                     
+ └─ Enhanced Fan Out (EFO)                                   Monthly cost depends on usage: $0.015 per consumer-shard hour    
+                                                                                                                              
+ aws_kinesis_stream.use2_test_stream_provisioned                                                                              
+ ├─ PROVISIONED                                                              730  hours                             $10.95    
+ ├─ Put request unit                                         Monthly cost depends on usage: $0.000000014 per units            
+ ├─ Extended retention (24H to 7D)                           Monthly cost depends on usage: $0.02 per GB                      
+ ├─ Long term retention (7D+)                                Monthly cost depends on usage: $0.023 per GB                     
+ ├─ Extended retention retrieval (7D+)                       Monthly cost depends on usage: $0.021 per GB                     
+ ├─ Enhanced Fan Out (EFO) Data retrieval                    Monthly cost depends on usage: $0.013 per GB                     
+ └─ Enhanced Fan Out (EFO)                                   Monthly cost depends on usage: $0.015 per consumer-shard hour    
+                                                                                                                              
  OVERALL TOTAL                                                                                                     $245.38 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 8 cloud resources were detected:
-∙ 8 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 8 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestKinesisStream                                  ┃ $245         ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $226          ┃ $19         ┃ $245       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

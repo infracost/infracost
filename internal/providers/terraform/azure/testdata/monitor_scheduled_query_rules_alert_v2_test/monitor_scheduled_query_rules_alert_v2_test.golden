@@ -1,50 +1,52 @@
 
- Name                                                                   Monthly Qty  Unit         Monthly Cost 
-                                                                                                               
- azurerm_monitor_scheduled_query_rules_alert_v2.example-multi["P1D"]                                           
- ├─ Log alerts monitoring (15 minute frequency)                                   1  rule                $0.50 
- └─ Additional time-series monitoring (15 minute frequency)                       3  time-series         $0.15 
-                                                                                                               
- azurerm_monitor_scheduled_query_rules_alert_v2.example-multi["PT10M"]                                         
- ├─ Log alerts monitoring (10 minute frequency)                                   1  rule                $1.00 
- └─ Additional time-series monitoring (10 minute frequency)                       3  time-series         $0.30 
-                                                                                                               
- azurerm_monitor_scheduled_query_rules_alert_v2.example-multi["PT15M"]                                         
- ├─ Log alerts monitoring (15 minute frequency)                                   1  rule                $0.50 
- └─ Additional time-series monitoring (15 minute frequency)                       3  time-series         $0.15 
-                                                                                                               
- azurerm_monitor_scheduled_query_rules_alert_v2.example-multi["PT1M"]                                          
- ├─ Log alerts monitoring (1 minute frequency)                                    1  rule                $3.00 
- └─ Additional time-series monitoring (1 minute frequency)                        3  time-series         $0.90 
-                                                                                                               
- azurerm_monitor_scheduled_query_rules_alert_v2.example-multi["PT5M"]                                          
- ├─ Log alerts monitoring (5 minute frequency)                                    1  rule                $1.50 
- └─ Additional time-series monitoring (5 minute frequency)                        3  time-series         $0.45 
-                                                                                                               
- azurerm_monitor_scheduled_query_rules_alert_v2.example["P1D"]                                                 
- └─ Log alerts monitoring (15 minute frequency)                                   1  rule                $0.50 
-                                                                                                               
- azurerm_monitor_scheduled_query_rules_alert_v2.example["PT10M"]                                               
- └─ Log alerts monitoring (10 minute frequency)                                   1  rule                $1.00 
-                                                                                                               
- azurerm_monitor_scheduled_query_rules_alert_v2.example["PT15M"]                                               
- └─ Log alerts monitoring (15 minute frequency)                                   1  rule                $0.50 
-                                                                                                               
- azurerm_monitor_scheduled_query_rules_alert_v2.example["PT1M"]                                                
- └─ Log alerts monitoring (1 minute frequency)                                    1  rule                $3.00 
-                                                                                                               
- azurerm_monitor_scheduled_query_rules_alert_v2.example["PT5M"]                                                
- └─ Log alerts monitoring (5 minute frequency)                                    1  rule                $1.50 
-                                                                                                               
- OVERALL TOTAL                                                                                          $14.95 
+ Name                                                                   Monthly Qty  Unit         Monthly Cost   
+                                                                                                                 
+ azurerm_monitor_scheduled_query_rules_alert_v2.example-multi["PT1M"]                                            
+ ├─ Log alerts monitoring (1 minute frequency)                                    1  rule                $3.00   
+ └─ Additional time-series monitoring (1 minute frequency)                        3  time-series         $0.90   
+                                                                                                                 
+ azurerm_monitor_scheduled_query_rules_alert_v2.example["PT1M"]                                                  
+ └─ Log alerts monitoring (1 minute frequency)                                    1  rule                $3.00   
+                                                                                                                 
+ azurerm_monitor_scheduled_query_rules_alert_v2.example-multi["PT5M"]                                            
+ ├─ Log alerts monitoring (5 minute frequency)                                    1  rule                $1.50   
+ └─ Additional time-series monitoring (5 minute frequency)                        3  time-series         $0.45   
+                                                                                                                 
+ azurerm_monitor_scheduled_query_rules_alert_v2.example["PT5M"]                                                  
+ └─ Log alerts monitoring (5 minute frequency)                                    1  rule                $1.50   
+                                                                                                                 
+ azurerm_monitor_scheduled_query_rules_alert_v2.example-multi["PT10M"]                                           
+ ├─ Log alerts monitoring (10 minute frequency)                                   1  rule                $1.00   
+ └─ Additional time-series monitoring (10 minute frequency)                       3  time-series         $0.30   
+                                                                                                                 
+ azurerm_monitor_scheduled_query_rules_alert_v2.example["PT10M"]                                                 
+ └─ Log alerts monitoring (10 minute frequency)                                   1  rule                $1.00   
+                                                                                                                 
+ azurerm_monitor_scheduled_query_rules_alert_v2.example-multi["P1D"]                                             
+ ├─ Log alerts monitoring (15 minute frequency)                                   1  rule                $0.50   
+ └─ Additional time-series monitoring (15 minute frequency)                       3  time-series         $0.15   
+                                                                                                                 
+ azurerm_monitor_scheduled_query_rules_alert_v2.example-multi["PT15M"]                                           
+ ├─ Log alerts monitoring (15 minute frequency)                                   1  rule                $0.50   
+ └─ Additional time-series monitoring (15 minute frequency)                       3  time-series         $0.15   
+                                                                                                                 
+ azurerm_monitor_scheduled_query_rules_alert_v2.example["P1D"]                                                   
+ └─ Log alerts monitoring (15 minute frequency)                                   1  rule                $0.50   
+                                                                                                                 
+ azurerm_monitor_scheduled_query_rules_alert_v2.example["PT15M"]                                                 
+ └─ Log alerts monitoring (15 minute frequency)                                   1  rule                $0.50   
+                                                                                                                 
+ OVERALL TOTAL                                                                                         $14.95 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 12 cloud resources were detected:
 ∙ 11 were estimated
-∙ 1 was free:
-  ∙ 1 x azurerm_resource_group
+∙ 1 was free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestMonitorScheduledQueryRulesAlertV2              ┃ $15          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $15           ┃ $0.00       ┃ $15        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

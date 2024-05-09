@@ -1,0 +1,309 @@
+
+ Name                                                                        Monthly Qty  Unit                      Monthly Cost   
+                                                                                                                                   
+ azurerm_cognitive_account.speech_with_commitment["large"]                                                                         
+ ├─ Speech to text (commitment)                                                   50,000  hours                       $25,000.00   
+ ├─ Speech to text (overage)                                                         100  hours                           $50.00   
+ ├─ Speech to text (connected container commitment)                               50,000  hours                       $23,750.00   
+ ├─ Speech to text (connected container overage)                                     100  hours                           $48.00   
+ ├─ Speech to text batch                                              Monthly cost depends on usage: $0.18 per hours               
+ ├─ Speech to text custom model (commitment)                                      50,000  hours                       $30,000.00   
+ ├─ Speech to text custom model (overage)                                            100  hours                           $60.00   
+ ├─ Speech to text custom model (connected container commitment)                  50,000  hours                       $28,500.00   
+ ├─ Speech to text custom model (connected container overage)                        100  hours                           $56.50   
+ ├─ Speech to text custom model batch                                 Monthly cost depends on usage: $0.23 per hours               
+ ├─ Speech to text custom endpoint hosting                            Monthly cost depends on usage: $0.05375 per hours            
+ ├─ Speech to text custom training                                    Monthly cost depends on usage: $10.00 per hours              
+ ├─ Speech to text enhanced add-ons (commitment)                                  50,000  hours                        $7,500.00   
+ ├─ Speech to text enhanced add-ons (overage)                                        100  hours                           $15.00   
+ ├─ Speech to text enhanced add-ons (connected container commitment)              50,000  hours                        $7,125.00   
+ ├─ Speech to text enhanced add-ons (connected container overage)                    100  hours                           $14.25   
+ ├─ Speech to text conversation transcription multi-channel audio     Monthly cost depends on usage: $2.10 per hours               
+ ├─ Text to speech neural (commitment)                                             2,000  1M chars                    $15,000.00   
+ ├─ Text to speech neural (overage)                                                    1  1M chars                         $7.50   
+ ├─ Text to speech neural (connected container commitment)                         2,000  1M chars                    $14,250.00   
+ ├─ Text to speech neural (connected container overage)                                1  1M chars                         $7.13   
+ ├─ Text to speech custom neural training                             Monthly cost depends on usage: $52.00 per hours              
+ ├─ Text to speech custom neural                                      Monthly cost depends on usage: $24.00 per 1M chars           
+ ├─ Text to speech custom neural endpoint hosting                     Monthly cost depends on usage: $4.03 per hours               
+ ├─ Text to speech long audio                                         Monthly cost depends on usage: $100.00 per 1M chars          
+ ├─ Text to speech personal voice profiles                            Monthly cost depends on usage: $600.00 per 1K profiles       
+ ├─ Text to speech personal voice characters                          Monthly cost depends on usage: $24.00 per 1M chars           
+ ├─ Speech translation                                                Monthly cost depends on usage: $2.50 per hours               
+ ├─ Speaker verification                                              Monthly cost depends on usage: $5.00 per 1K transactions     
+ ├─ Speaker identification                                            Monthly cost depends on usage: $10.00 per 1K transactions    
+ └─ Voice profiles                                                    Monthly cost depends on usage: $0.20 per 1K profiles         
+                                                                                                                                   
+ azurerm_cognitive_account.textanalytics_with_tiers                                                                                
+ ├─ Text analytics (first 500K)                                                      500  1K records                     $500.00   
+ ├─ Text analytics (500K-2.5M)                                                     2,000  1K records                   $1,500.00   
+ ├─ Text analytics (2.5M-10M)                                                      7,500  1K records                   $2,250.00   
+ ├─ Text analytics (over 10M)                                                      5,000  1K records                   $1,250.00   
+ ├─ Summarization                                                     Monthly cost depends on usage: $2.00 per 1K records          
+ ├─ Conversational language understanding                             Monthly cost depends on usage: $2.00 per 1K records          
+ ├─ Conversational language understanding advanced training           Monthly cost depends on usage: $3.00 per hour                
+ ├─ Customized text classification                                    Monthly cost depends on usage: $5.00 per 1K records          
+ ├─ Customized summarization                                          Monthly cost depends on usage: $4.00 per 1K records          
+ ├─ Customized question answering (first 2.5M)                                     2,500  1K records                   $3,750.00   
+ ├─ Customized question answering (over 2.5M)                                        500  1K records                     $500.03   
+ ├─ Customized training                                               Monthly cost depends on usage: $3.00 per hour                
+ ├─ Text analytics for health (5K-500K)                                              495  1K records                  $12,375.00   
+ ├─ Text analytics for health (500K-2.5M)                                          2,000  1K records                  $30,000.00   
+ └─ Text analytics for health (2.5M-10M)                                             500  1K records                   $5,000.00   
+                                                                                                                                   
+ azurerm_cognitive_account.speech_with_commitment["medium"]                                                                        
+ ├─ Speech to text (commitment)                                                   10,000  hours                        $6,500.00   
+ ├─ Speech to text (overage)                                                         100  hours                           $65.00   
+ ├─ Speech to text (connected container commitment)                               10,000  hours                        $6,175.00   
+ ├─ Speech to text (connected container overage)                                     100  hours                           $62.00   
+ ├─ Speech to text batch                                              Monthly cost depends on usage: $0.18 per hours               
+ ├─ Speech to text custom model (commitment)                                      10,000  hours                        $7,800.00   
+ ├─ Speech to text custom model (overage)                                            100  hours                           $78.00   
+ ├─ Speech to text custom model (connected container commitment)                  10,000  hours                        $7,410.00   
+ ├─ Speech to text custom model (connected container overage)                        100  hours                           $73.72   
+ ├─ Speech to text custom model batch                                 Monthly cost depends on usage: $0.23 per hours               
+ ├─ Speech to text custom endpoint hosting                            Monthly cost depends on usage: $0.05375 per hours            
+ ├─ Speech to text custom training                                    Monthly cost depends on usage: $10.00 per hours              
+ ├─ Speech to text enhanced add-ons (commitment)                                  10,000  hours                        $1,950.00   
+ ├─ Speech to text enhanced add-ons (overage)                                        100  hours                           $19.50   
+ ├─ Speech to text enhanced add-ons (connected container commitment)              10,000  hours                        $1,852.50   
+ ├─ Speech to text enhanced add-ons (connected container overage)                    100  hours                           $18.53   
+ ├─ Speech to text conversation transcription multi-channel audio     Monthly cost depends on usage: $2.10 per hours               
+ ├─ Text to speech neural (commitment)                                               400  1M chars                     $3,900.00   
+ ├─ Text to speech neural (overage)                                                    1  1M chars                         $9.75   
+ ├─ Text to speech neural (connected container commitment)                           400  1M chars                     $3,705.00   
+ ├─ Text to speech neural (connected container overage)                                1  1M chars                         $9.26   
+ ├─ Text to speech custom neural training                             Monthly cost depends on usage: $52.00 per hours              
+ ├─ Text to speech custom neural                                      Monthly cost depends on usage: $24.00 per 1M chars           
+ ├─ Text to speech custom neural endpoint hosting                     Monthly cost depends on usage: $4.03 per hours               
+ ├─ Text to speech long audio                                         Monthly cost depends on usage: $100.00 per 1M chars          
+ ├─ Text to speech personal voice profiles                            Monthly cost depends on usage: $600.00 per 1K profiles       
+ ├─ Text to speech personal voice characters                          Monthly cost depends on usage: $24.00 per 1M chars           
+ ├─ Speech translation                                                Monthly cost depends on usage: $2.50 per hours               
+ ├─ Speaker verification                                              Monthly cost depends on usage: $5.00 per 1K transactions     
+ ├─ Speaker identification                                            Monthly cost depends on usage: $10.00 per 1K transactions    
+ └─ Voice profiles                                                    Monthly cost depends on usage: $0.20 per 1K profiles         
+                                                                                                                                   
+ azurerm_cognitive_account.luis_with_commitment["large"]                                                                           
+ ├─ Text requests (commitment)                                                25,000,000  1M transactions             $21,750.00   
+ ├─ Text requests (commitment overage)                                                 1  1K transactions                  $0.87   
+ └─ Speech requests                                                   Monthly cost depends on usage: $5.50 per 1K transactions     
+                                                                                                                                   
+ azurerm_cognitive_account.textanalytics_with_commitment["large"]                                                                  
+ ├─ Text analytics (commitment)                                                   10,000  1K records                   $3,500.00   
+ ├─ Text requests (commitment overage)                                                 1  1K records                       $0.35   
+ ├─ Text analytics (connected container commitment)                               10,000  1K records                   $2,800.00   
+ ├─ Text requests (connected container commitment overage)                             1  1K records                       $0.28   
+ ├─ Summarization (commitment)                                                    10,000  1K records                   $7,000.00   
+ ├─ Summarization (commitment overage)                                                 1  1K records                       $0.70   
+ ├─ Summarization (connected container commitment)                                10,000  1K records                   $5,600.00   
+ ├─ Summarization (connected container commitment overage)                             1  1K records                       $0.56   
+ ├─ Conversational language understanding                             Monthly cost depends on usage: $2.00 per 1K records          
+ ├─ Conversational language understanding advanced training           Monthly cost depends on usage: $3.00 per hour                
+ ├─ Customized text classification                                    Monthly cost depends on usage: $5.00 per 1K records          
+ ├─ Customized summarization                                          Monthly cost depends on usage: $4.00 per 1K records          
+ ├─ Customized question answering (over 2.5M)                         Monthly cost depends on usage: $1.00 per 1K records          
+ ├─ Customized training                                               Monthly cost depends on usage: $3.00 per hour                
+ └─ Text analytics for health (5K-500K)                               Monthly cost depends on usage: $25.00 per 1K records         
+                                                                                                                                   
+ azurerm_cognitive_account.speech_with_commitment["small"]                                                                         
+ ├─ Speech to text (commitment)                                                    2,000  hours                        $1,600.00   
+ ├─ Speech to text (overage)                                                         100  hours                           $80.00   
+ ├─ Speech to text (connected container commitment)                                2,000  hours                        $1,520.00   
+ ├─ Speech to text (connected container overage)                                     100  hours                           $76.00   
+ ├─ Speech to text batch                                              Monthly cost depends on usage: $0.18 per hours               
+ ├─ Speech to text custom model (commitment)                                       2,000  hours                        $1,920.00   
+ ├─ Speech to text custom model (overage)                                            100  hours                           $96.00   
+ ├─ Speech to text custom model (connected container commitment)                   2,000  hours                        $1,824.00   
+ ├─ Speech to text custom model (connected container overage)                        100  hours                           $90.86   
+ ├─ Speech to text custom model batch                                 Monthly cost depends on usage: $0.23 per hours               
+ ├─ Speech to text custom endpoint hosting                            Monthly cost depends on usage: $0.05375 per hours            
+ ├─ Speech to text custom training                                    Monthly cost depends on usage: $10.00 per hours              
+ ├─ Speech to text enhanced add-ons (commitment)                                   2,000  hours                          $480.00   
+ ├─ Speech to text enhanced add-ons (overage)                                        100  hours                           $24.00   
+ ├─ Speech to text enhanced add-ons (connected container commitment)               2,000  hours                          $456.00   
+ ├─ Speech to text enhanced add-ons (connected container overage)                    100  hours                           $22.80   
+ ├─ Speech to text conversation transcription multi-channel audio     Monthly cost depends on usage: $2.10 per hours               
+ ├─ Text to speech neural (commitment)                                                80  1M chars                       $960.00   
+ ├─ Text to speech neural (overage)                                                    1  1M chars                        $12.00   
+ ├─ Text to speech neural (connected container commitment)                            80  1M chars                       $912.00   
+ ├─ Text to speech neural (connected container overage)                                1  1M chars                        $11.40   
+ ├─ Text to speech custom neural training                             Monthly cost depends on usage: $52.00 per hours              
+ ├─ Text to speech custom neural                                      Monthly cost depends on usage: $24.00 per 1M chars           
+ ├─ Text to speech custom neural endpoint hosting                     Monthly cost depends on usage: $4.03 per hours               
+ ├─ Text to speech long audio                                         Monthly cost depends on usage: $100.00 per 1M chars          
+ ├─ Text to speech personal voice profiles                            Monthly cost depends on usage: $600.00 per 1K profiles       
+ ├─ Text to speech personal voice characters                          Monthly cost depends on usage: $24.00 per 1M chars           
+ ├─ Speech translation                                                Monthly cost depends on usage: $2.50 per hours               
+ ├─ Speaker verification                                              Monthly cost depends on usage: $5.00 per 1K transactions     
+ ├─ Speaker identification                                            Monthly cost depends on usage: $10.00 per 1K transactions    
+ └─ Voice profiles                                                    Monthly cost depends on usage: $0.20 per 1K profiles         
+                                                                                                                                   
+ azurerm_cognitive_account.textanalytics_with_commitment["medium"]                                                                 
+ ├─ Text analytics (commitment)                                                    3,000  1K records                   $1,375.00   
+ ├─ Text requests (commitment overage)                                                 1  1K records                       $0.55   
+ ├─ Text analytics (connected container commitment)                                3,000  1K records                   $1,100.00   
+ ├─ Text requests (connected container commitment overage)                             1  1K records                       $0.44   
+ ├─ Summarization (commitment)                                                     3,000  1K records                   $3,300.00   
+ ├─ Summarization (commitment overage)                                                 1  1K records                       $1.10   
+ ├─ Summarization (connected container commitment)                                 3,000  1K records                   $2,640.00   
+ ├─ Summarization (connected container commitment overage)                             1  1K records                       $0.88   
+ ├─ Conversational language understanding                             Monthly cost depends on usage: $2.00 per 1K records          
+ ├─ Conversational language understanding advanced training           Monthly cost depends on usage: $3.00 per hour                
+ ├─ Customized text classification                                    Monthly cost depends on usage: $5.00 per 1K records          
+ ├─ Customized summarization                                          Monthly cost depends on usage: $4.00 per 1K records          
+ ├─ Customized question answering (over 2.5M)                         Monthly cost depends on usage: $1.00 per 1K records          
+ ├─ Customized training                                               Monthly cost depends on usage: $3.00 per hour                
+ └─ Text analytics for health (5K-500K)                               Monthly cost depends on usage: $25.00 per 1K records         
+                                                                                                                                   
+ azurerm_cognitive_account.luis_with_commitment["medium"]                                                                          
+ ├─ Text requests (commitment)                                                 5,000,000  1M transactions              $5,100.00   
+ ├─ Text requests (commitment overage)                                                 1  1K transactions                  $1.02   
+ └─ Speech requests                                                   Monthly cost depends on usage: $5.50 per 1K transactions     
+                                                                                                                                   
+ azurerm_cognitive_account.luis_with_commitment["small"]                                                                           
+ ├─ Text requests (commitment)                                                 1,000,000  1M transactions              $1,200.00   
+ ├─ Text requests (commitment overage)                                                 1  1K transactions                  $1.20   
+ └─ Speech requests                                                   Monthly cost depends on usage: $5.50 per 1K transactions     
+                                                                                                                                   
+ azurerm_cognitive_account.textanalytics_with_commitment["small"]                                                                  
+ ├─ Text analytics (commitment)                                                    1,000  1K records                     $700.00   
+ ├─ Text requests (commitment overage)                                                 1  1K records                       $0.70   
+ ├─ Conversational language understanding                             Monthly cost depends on usage: $2.00 per 1K records          
+ ├─ Conversational language understanding advanced training           Monthly cost depends on usage: $3.00 per hour                
+ ├─ Customized text classification                                    Monthly cost depends on usage: $5.00 per 1K records          
+ ├─ Customized summarization                                          Monthly cost depends on usage: $4.00 per 1K records          
+ ├─ Customized question answering (over 2.5M)                         Monthly cost depends on usage: $1.00 per 1K records          
+ ├─ Customized training                                               Monthly cost depends on usage: $3.00 per hour                
+ └─ Text analytics for health (5K-500K)                               Monthly cost depends on usage: $25.00 per 1K records         
+                                                                                                                                   
+ azurerm_cognitive_account.with_usage["SpeechServices-S0"]                                                                         
+ ├─ Speech to text                                                                    20  hours                           $20.00   
+ ├─ Speech to text batch                                                              56  hours                           $10.08   
+ ├─ Speech to text custom model                                                       17  hours                           $20.40   
+ ├─ Speech to text custom model batch                                                 44  hours                            $9.90   
+ ├─ Speech to text custom endpoint hosting                                           372  hours                           $20.00   
+ ├─ Speech to text custom training                                                     2  hours                           $20.00   
+ ├─ Speech to text enhanced add-ons                                                   67  hours                           $20.10   
+ ├─ Speech to text conversation transcription multi-channel audio                    9.5  hours                           $19.95   
+ ├─ Text to speech neural                                                         1.3333  1M chars                        $20.00   
+ ├─ Text to speech custom neural training                                            0.4  hours                           $20.80   
+ ├─ Text to speech custom neural                                                  0.8333  1M chars                        $20.00   
+ ├─ Text to speech custom neural endpoint hosting                                      5  hours                           $20.16   
+ ├─ Text to speech long audio                                                        0.2  1M chars                        $20.00   
+ ├─ Text to speech personal voice profiles                                         0.033  1K profiles                     $19.80   
+ ├─ Text to speech personal voice characters                                      0.8333  1M chars                        $20.00   
+ ├─ Speech translation                                                                 8  hours                           $20.00   
+ ├─ Speaker verification                                                               4  1K transactions                 $20.00   
+ ├─ Speaker identification                                                             2  1K transactions                 $20.00   
+ └─ Voice profiles                                                                   100  1K profiles                     $20.00   
+                                                                                                                                   
+ azurerm_cognitive_account.with_usage["TextAnalytics-S0"]                                                                          
+ ├─ Text analytics (first 500K)                                                       20  1K records                      $20.00   
+ ├─ Summarization                                                                     10  1K records                      $20.00   
+ ├─ Conversational language understanding                                             10  1K records                      $20.00   
+ ├─ Conversational language understanding advanced training                          6.7  hour                            $20.10   
+ ├─ Customized text classification                                                     4  1K records                      $20.00   
+ ├─ Customized summarization                                                           5  1K records                      $20.00   
+ ├─ Customized question answering (first 2.5M)                                    13.333  1K records                      $20.00   
+ ├─ Customized training                                                              6.7  hour                            $20.10   
+ └─ Text analytics for health (5K-500K)                                              0.8  1K records                      $20.00   
+                                                                                                                                   
+ azurerm_cognitive_account.with_usage["LUIS-S0"]                                                                                   
+ ├─ Text requests                                                                 13.333  1K transactions                 $20.00   
+ └─ Speech requests                                                                3.636  1K transactions                 $20.00   
+                                                                                                                                   
+ azurerm_cognitive_account.luis_with_commitment["invalid"]                                                                         
+ └─ Speech requests                                                   Monthly cost depends on usage: $5.50 per 1K transactions     
+                                                                                                                                   
+ azurerm_cognitive_account.speech_with_commitment["invalid"]                                                                       
+ ├─ Speech to text batch                                              Monthly cost depends on usage: $0.18 per hours               
+ ├─ Speech to text custom model                                       Monthly cost depends on usage: $1.20 per hours               
+ ├─ Speech to text custom model batch                                 Monthly cost depends on usage: $0.23 per hours               
+ ├─ Speech to text custom endpoint hosting                            Monthly cost depends on usage: $0.05375 per hours            
+ ├─ Speech to text custom training                                    Monthly cost depends on usage: $10.00 per hours              
+ ├─ Speech to text enhanced add-ons                                   Monthly cost depends on usage: $0.30 per hours               
+ ├─ Speech to text conversation transcription multi-channel audio     Monthly cost depends on usage: $2.10 per hours               
+ ├─ Text to speech neural                                             Monthly cost depends on usage: $15.00 per 1M chars           
+ ├─ Text to speech custom neural training                             Monthly cost depends on usage: $52.00 per hours              
+ ├─ Text to speech custom neural                                      Monthly cost depends on usage: $24.00 per 1M chars           
+ ├─ Text to speech custom neural endpoint hosting                     Monthly cost depends on usage: $4.03 per hours               
+ ├─ Text to speech long audio                                         Monthly cost depends on usage: $100.00 per 1M chars          
+ ├─ Text to speech personal voice profiles                            Monthly cost depends on usage: $600.00 per 1K profiles       
+ ├─ Text to speech personal voice characters                          Monthly cost depends on usage: $24.00 per 1M chars           
+ ├─ Speech translation                                                Monthly cost depends on usage: $2.50 per hours               
+ ├─ Speaker verification                                              Monthly cost depends on usage: $5.00 per 1K transactions     
+ ├─ Speaker identification                                            Monthly cost depends on usage: $10.00 per 1K transactions    
+ └─ Voice profiles                                                    Monthly cost depends on usage: $0.20 per 1K profiles         
+                                                                                                                                   
+ azurerm_cognitive_account.textanalytics_with_commitment["invalid"]                                                                
+ ├─ Conversational language understanding                             Monthly cost depends on usage: $2.00 per 1K records          
+ ├─ Conversational language understanding advanced training           Monthly cost depends on usage: $3.00 per hour                
+ ├─ Customized text classification                                    Monthly cost depends on usage: $5.00 per 1K records          
+ ├─ Customized summarization                                          Monthly cost depends on usage: $4.00 per 1K records          
+ ├─ Customized question answering (over 2.5M)                         Monthly cost depends on usage: $1.00 per 1K records          
+ ├─ Customized training                                               Monthly cost depends on usage: $3.00 per hour                
+ └─ Text analytics for health (5K-500K)                               Monthly cost depends on usage: $25.00 per 1K records         
+                                                                                                                                   
+ azurerm_cognitive_account.without_usage["LUIS-S0"]                                                                                
+ ├─ Text requests                                                     Monthly cost depends on usage: $1.50 per 1K transactions     
+ └─ Speech requests                                                   Monthly cost depends on usage: $5.50 per 1K transactions     
+                                                                                                                                   
+ azurerm_cognitive_account.without_usage["SpeechServices-S0"]                                                                      
+ ├─ Speech to text                                                    Monthly cost depends on usage: $1.00 per hours               
+ ├─ Speech to text batch                                              Monthly cost depends on usage: $0.18 per hours               
+ ├─ Speech to text custom model                                       Monthly cost depends on usage: $1.20 per hours               
+ ├─ Speech to text custom model batch                                 Monthly cost depends on usage: $0.23 per hours               
+ ├─ Speech to text custom endpoint hosting                            Monthly cost depends on usage: $0.05375 per hours            
+ ├─ Speech to text custom training                                    Monthly cost depends on usage: $10.00 per hours              
+ ├─ Speech to text enhanced add-ons                                   Monthly cost depends on usage: $0.30 per hours               
+ ├─ Speech to text conversation transcription multi-channel audio     Monthly cost depends on usage: $2.10 per hours               
+ ├─ Text to speech neural                                             Monthly cost depends on usage: $15.00 per 1M chars           
+ ├─ Text to speech custom neural training                             Monthly cost depends on usage: $52.00 per hours              
+ ├─ Text to speech custom neural                                      Monthly cost depends on usage: $24.00 per 1M chars           
+ ├─ Text to speech custom neural endpoint hosting                     Monthly cost depends on usage: $4.03 per hours               
+ ├─ Text to speech long audio                                         Monthly cost depends on usage: $100.00 per 1M chars          
+ ├─ Text to speech personal voice profiles                            Monthly cost depends on usage: $600.00 per 1K profiles       
+ ├─ Text to speech personal voice characters                          Monthly cost depends on usage: $24.00 per 1M chars           
+ ├─ Speech translation                                                Monthly cost depends on usage: $2.50 per hours               
+ ├─ Speaker verification                                              Monthly cost depends on usage: $5.00 per 1K transactions     
+ ├─ Speaker identification                                            Monthly cost depends on usage: $10.00 per 1K transactions    
+ └─ Voice profiles                                                    Monthly cost depends on usage: $0.20 per 1K profiles         
+                                                                                                                                   
+ azurerm_cognitive_account.without_usage["TextAnalytics-S0"]                                                                       
+ ├─ Text analytics (500K-2.5M)                                        Monthly cost depends on usage: $0.75 per 1K records          
+ ├─ Summarization                                                     Monthly cost depends on usage: $2.00 per 1K records          
+ ├─ Conversational language understanding                             Monthly cost depends on usage: $2.00 per 1K records          
+ ├─ Conversational language understanding advanced training           Monthly cost depends on usage: $3.00 per hour                
+ ├─ Customized text classification                                    Monthly cost depends on usage: $5.00 per 1K records          
+ ├─ Customized summarization                                          Monthly cost depends on usage: $4.00 per 1K records          
+ ├─ Customized question answering (over 2.5M)                         Monthly cost depends on usage: $1.00 per 1K records          
+ ├─ Customized training                                               Monthly cost depends on usage: $3.00 per hour                
+ └─ Text analytics for health (5K-500K)                               Monthly cost depends on usage: $25.00 per 1K records         
+                                                                                                                                   
+ OVERALL TOTAL                                                                                                      $314,876.75 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
+──────────────────────────────────
+27 cloud resources were detected:
+∙ 19 were estimated
+∙ 7 were free
+∙ 1 is not supported yet, see https://infracost.io/requested-resources:
+  ∙ 1 x azurerm_cognitive_account
+
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $314,877      ┃ $0.00       ┃ $314,877   ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
+Logs:
+
+WARN Invalid commitment tier 1000000 for azurerm_cognitive_account.textanalytics_with_commitment["small"]
+WARN Invalid commitment tier 200 for azurerm_cognitive_account.luis_with_commitment["invalid"]
+WARN Invalid commitment tier 200 for azurerm_cognitive_account.textanalytics_with_commitment["invalid"]
+WARN Invalid commitment tier 200 for azurerm_cognitive_account.textanalytics_with_commitment["invalid"]
+WARN Invalid commitment tier 200 for azurerm_cognitive_account.textanalytics_with_commitment["invalid"]
+WARN Invalid commitment tier 200 for azurerm_cognitive_account.textanalytics_with_commitment["invalid"]
+WARN Invalid commitment tier amount 100 for azurerm_cognitive_account.speech_with_commitment["invalid"]
+WARN Skipping resource azurerm_cognitive_account.unsupported. Kind "Academic" is not supported

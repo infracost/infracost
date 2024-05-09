@@ -27,7 +27,6 @@ import (
 	"github.com/infracost/infracost/internal/hcl/modules"
 	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
-	"github.com/infracost/infracost/internal/ui"
 )
 
 var json = jsoniter.ConfigCompatibleWithStandardLibrary
@@ -123,10 +122,20 @@ func NewHCLProvider(ctx *config.ProjectContext, rootPath hcl.RootPath, config *H
 	})
 	localWorkspace := ctx.ProjectConfig.TerraformWorkspace
 	if err == nil {
+		var loaderOpts []hcl.RemoteVariablesLoaderOption
+		if ctx.ProjectConfig.TerraformCloudWorkspace != "" && ctx.ProjectConfig.TerraformCloudOrg != "" {
+			loaderOpts = append(loaderOpts, hcl.RemoteVariablesLoaderWithRemoteConfig(hcl.TFCRemoteConfig{
+				Organization: ctx.ProjectConfig.TerraformCloudOrg,
+				Workspace:    ctx.ProjectConfig.TerraformCloudWorkspace,
+				Host:         credsSource.BaseCredentialSet.Host,
+			}))
+		}
+
 		options = append(options, hcl.OptionWithRemoteVarLoader(
 			credsSource.BaseCredentialSet.Host,
 			credsSource.BaseCredentialSet.Token,
-			localWorkspace),
+			localWorkspace,
+			loaderOpts...),
 		)
 	}
 
@@ -147,24 +156,21 @@ func NewHCLProvider(ctx *config.ProjectContext, rootPath hcl.RootPath, config *H
 
 	loader := modules.NewModuleLoader(ctx.RunContext.Config.CachePath(), modules.NewSharedHCLParser(), credsSource, ctx.RunContext.Config.TerraformSourceMap, logger, ctx.RunContext.ModuleMutex)
 	cachePath := ctx.RunContext.Config.CachePath()
-	initialPath := rootPath.Path
+	initialPath := rootPath.DetectedPath
+	rootPath.DetectedPath = initialPath
+
 	if filepath.IsAbs(cachePath) {
-		abs, err := filepath.Abs(initialPath)
-		if err != nil {
-			logger.Warn().Err(err).Msgf("could not make project path absolute to match provided --config-file/--path path absolute, this will result in module loading failures")
-		} else {
-			initialPath = abs
-		}
+		rootPath.DetectedPath = tryAbs(initialPath)
+		rootPath.StartingPath = tryAbs(rootPath.StartingPath)
 	}
 
 	if ctx.RunContext.Config.GraphEvaluator {
 		options = append(options, hcl.OptionGraphEvaluator())
 	}
 
-	rootPath.Path = initialPath
 	return &HCLProvider{
 		policyClient:   policyClient,
-		Parser:         hcl.NewParser(rootPath, hcl.CreateEnvFileMatcher(ctx.RunContext.Config.Autodetect.EnvNames), loader, logger, options...),
+		Parser:         hcl.NewParser(rootPath, hcl.CreateEnvFileMatcher(ctx.RunContext.Config.Autodetect.EnvNames, ctx.RunContext.Config.Autodetect.TerraformVarFileExtensions), loader, logger, options...),
 		planJSONParser: NewParser(ctx, true),
 		ctx:            ctx,
 		config:         *config,
@@ -174,15 +180,38 @@ func NewHCLProvider(ctx *config.ProjectContext, rootPath hcl.RootPath, config *H
 func (p *HCLProvider) Context() *config.ProjectContext { return p.ctx }
 
 func (p *HCLProvider) ProjectName() string {
+	if p.ctx.ProjectConfig.Name != "" {
+		return p.ctx.ProjectConfig.Name
+	}
+
+	if p.ctx.ProjectConfig.TerraformWorkspace != "" {
+		return p.Parser.ProjectName() + "-" + p.ctx.ProjectConfig.TerraformWorkspace
+	}
+
 	return p.Parser.ProjectName()
+}
+
+func tryAbs(initialPath string) string {
+	abs, err := filepath.Abs(initialPath)
+	if err != nil {
+		logging.Logger.Debug().Err(err).Msgf("could not make path %s absolute", initialPath)
+
+		return initialPath
+	}
+
+	return abs
+}
+
+func (p *HCLProvider) VarFiles() []string {
+	return p.Parser.VarFiles()
+}
+
+func (p *HCLProvider) EnvName() string {
+	return p.Parser.EnvName()
 }
 
 func (p *HCLProvider) RelativePath() string {
 	return p.Parser.RelativePath()
-}
-
-func (p *HCLProvider) TerraformVarFiles() []string {
-	return p.Parser.TerraformVarFiles()
 }
 
 func (p *HCLProvider) YAML() string {
@@ -190,18 +219,12 @@ func (p *HCLProvider) YAML() string {
 }
 
 func (p *HCLProvider) Type() string        { return "terraform_dir" }
-func (p *HCLProvider) DisplayType() string { return "Terraform directory" }
+func (p *HCLProvider) DisplayType() string { return "Terraform" }
 func (p *HCLProvider) AddMetadata(metadata *schema.ProjectMetadata) {
 	metadata.ConfigSha = p.ctx.ProjectConfig.ConfigSha
 
-	basePath := p.ctx.ProjectConfig.Path
-	if p.ctx.RunContext.Config.ConfigFilePath != "" {
-		basePath = filepath.Dir(p.ctx.RunContext.Config.ConfigFilePath)
-	}
-
-	modulePath, err := filepath.Rel(basePath, metadata.Path)
-	if err == nil && modulePath != "" && modulePath != "." {
-		p.logger.Debug().Msgf("calculated relative terraformModulePath for %s from %s", basePath, metadata.Path)
+	modulePath := p.RelativePath()
+	if modulePath != "" && modulePath != "." {
 		metadata.TerraformModulePath = modulePath
 	}
 
@@ -271,7 +294,9 @@ func (p *HCLProvider) newProject(parsed HCLProject) *schema.Project {
 		}
 	}
 
-	return schema.NewProject(name, metadata)
+	project := schema.NewProject(name, metadata)
+	project.DisplayName = p.ProjectName()
+	return project
 }
 
 func (p *HCLProvider) printWarning(warning *schema.ProjectDiag) {
@@ -281,12 +306,7 @@ func (p *HCLProvider) printWarning(warning *schema.ProjectDiag) {
 		return
 	}
 
-	if p.ctx.RunContext.Config.IsLogging() {
-		logging.Logger.Warn().Msg(warning.FriendlyMessage)
-		return
-	}
-
-	ui.PrintWarning(p.ctx.RunContext.ErrWriter, warning.FriendlyMessage)
+	logging.Logger.Warn().Msg(warning.FriendlyMessage)
 }
 
 type HCLProject struct {

@@ -6,10 +6,10 @@ import (
 	"path/filepath"
 
 	"github.com/pkg/errors"
-	"github.com/rs/zerolog/log"
 
 	"github.com/infracost/infracost/internal/clierror"
 	"github.com/infracost/infracost/internal/config"
+	"github.com/infracost/infracost/internal/logging"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/ui"
 )
@@ -31,6 +31,18 @@ func NewPlanProvider(ctx *config.ProjectContext, includePastResources bool) sche
 	}
 }
 
+func (p *PlanProvider) ProjectName() string {
+	return config.CleanProjectName(p.ctx.ProjectConfig.Path)
+}
+
+func (p *PlanProvider) VarFiles() []string {
+	return nil
+}
+
+func (p *PlanProvider) RelativePath() string {
+	return p.ctx.ProjectConfig.Path
+}
+
 func (p *PlanProvider) Type() string {
 	return "terraform_plan_binary"
 }
@@ -39,18 +51,20 @@ func (p *PlanProvider) DisplayType() string {
 	return "Terraform plan binary file"
 }
 
-func (p *PlanProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, error) {
+func (p *PlanProvider) LoadResources(usage schema.UsageMap) (projects []*schema.Project, err error) {
 	j, err := p.generatePlanJSON()
 	if err != nil {
 		return []*schema.Project{}, err
 	}
 
-	spinner := ui.NewSpinner("Extracting only cost-related params from terraform", ui.SpinnerOptions{
-		EnableLogging: p.ctx.RunContext.Config.IsLogging(),
-		NoColor:       p.ctx.RunContext.Config.NoColor,
-		Indent:        "  ",
-	})
-	defer spinner.Fail()
+	logging.Logger.Debug().Msg("Extracting only cost-related params from terraform")
+	defer func() {
+		if err != nil {
+			logging.Logger.Debug().Err(err).Msg("Error running plan provider")
+		} else {
+			logging.Logger.Debug().Msg("Finished running plan provider")
+		}
+	}()
 
 	metadata := schema.DetectProjectMetadata(p.ctx.ProjectConfig.Path)
 	metadata.Type = p.Type()
@@ -74,7 +88,6 @@ func (p *PlanProvider) LoadResources(usage schema.UsageMap) ([]*schema.Project, 
 	project.PartialPastResources = parsedConf.PastResources
 	project.PartialResources = parsedConf.CurrentResources
 
-	spinner.Success()
 	return []*schema.Project{project}, nil
 }
 
@@ -87,7 +100,7 @@ func (p *PlanProvider) generatePlanJSON() ([]byte, error) {
 	planPath := filepath.Base(p.Path)
 
 	if !IsTerraformDir(dir) {
-		log.Debug().Msgf("%s is not a Terraform directory, checking current working directory", dir)
+		logging.Logger.Debug().Msgf("%s is not a Terraform directory, checking current working directory", dir)
 		dir, err := os.Getwd()
 		if err != nil {
 			return []byte{}, err
@@ -121,10 +134,9 @@ func (p *PlanProvider) generatePlanJSON() ([]byte, error) {
 		defer os.Remove(opts.TerraformConfigFile)
 	}
 
-	spinner := ui.NewSpinner("Running terraform show", p.spinnerOpts)
-	defer spinner.Fail()
+	logging.Logger.Debug().Msg("Running terraform show")
 
-	j, err := p.runShow(opts, spinner, planPath, false)
+	j, err := p.runShow(opts, planPath, false)
 	if err == nil {
 		p.cachedPlanJSON = j
 	}

@@ -1,45 +1,48 @@
 
- Name                                                  Monthly Qty  Unit                Monthly Cost 
-                                                                                                     
- google_compute_region_target_http_proxy.default                                                     
- ├─ Proxy instance                                           7,446  hours                    $186.15 
- └─ Data processed                                             100  GB                         $0.80 
-                                                                                                     
- google_compute_region_target_https_proxy.default                                                    
- ├─ Proxy instance                                           7,446  hours                    $186.15 
- └─ Data processed                                             100  GB                         $0.80 
-                                                                                                     
- google_compute_target_grpc_proxy.default                                                            
- ├─ Proxy instance                                           7,446  hours                    $186.15 
- └─ Data processed                                             100  GB                         $0.80 
-                                                                                                     
- google_compute_target_grpc_proxy.withoutUsage                                                       
- ├─ Proxy instance                                 Monthly cost depends on usage: $0.025 per hours   
- └─ Data processed                                 Monthly cost depends on usage: $0.008 per GB      
-                                                                                                     
- google_compute_target_http_proxy.default                                                            
- ├─ Proxy instance                                           7,446  hours                    $186.15 
- └─ Data processed                                             100  GB                         $0.80 
-                                                                                                     
- google_compute_target_https_proxy.default                                                           
- ├─ Proxy instance                                           7,446  hours                    $186.15 
- └─ Data processed                                             100  GB                         $0.80 
-                                                                                                     
- google_compute_target_ssl_proxy.default                                                             
- ├─ Proxy instance                                           7,446  hours                    $186.15 
- └─ Data processed                                             100  GB                         $0.80 
-                                                                                                     
- google_compute_target_tcp_proxy.default                                                             
- ├─ Proxy instance                                           7,446  hours                    $186.15 
- └─ Data processed                                             100  GB                         $0.80 
-                                                                                                     
+ Name                                                  Monthly Qty  Unit                Monthly Cost    
+                                                                                                        
+ google_compute_region_target_http_proxy.default                                                        
+ ├─ Proxy instance                                           7,446  hours                    $186.15  * 
+ └─ Data processed                                             100  GB                         $0.80  * 
+                                                                                                        
+ google_compute_region_target_https_proxy.default                                                       
+ ├─ Proxy instance                                           7,446  hours                    $186.15  * 
+ └─ Data processed                                             100  GB                         $0.80  * 
+                                                                                                        
+ google_compute_target_grpc_proxy.default                                                               
+ ├─ Proxy instance                                           7,446  hours                    $186.15  * 
+ └─ Data processed                                             100  GB                         $0.80  * 
+                                                                                                        
+ google_compute_target_http_proxy.default                                                               
+ ├─ Proxy instance                                           7,446  hours                    $186.15  * 
+ └─ Data processed                                             100  GB                         $0.80  * 
+                                                                                                        
+ google_compute_target_https_proxy.default                                                              
+ ├─ Proxy instance                                           7,446  hours                    $186.15  * 
+ └─ Data processed                                             100  GB                         $0.80  * 
+                                                                                                        
+ google_compute_target_ssl_proxy.default                                                                
+ ├─ Proxy instance                                           7,446  hours                    $186.15  * 
+ └─ Data processed                                             100  GB                         $0.80  * 
+                                                                                                        
+ google_compute_target_tcp_proxy.default                                                                
+ ├─ Proxy instance                                           7,446  hours                    $186.15  * 
+ └─ Data processed                                             100  GB                         $0.80  * 
+                                                                                                        
+ google_compute_target_grpc_proxy.withoutUsage                                                          
+ ├─ Proxy instance                                 Monthly cost depends on usage: $0.025 per hours      
+ └─ Data processed                                 Monthly cost depends on usage: $0.008 per GB         
+                                                                                                        
  OVERALL TOTAL                                                                             $1,308.65 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 8 cloud resources were detected:
-∙ 8 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 8 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestСomputeTargetGrpcProxy                         ┃ $1,309       ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $0.00         ┃ $1,309      ┃ $1,309     ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

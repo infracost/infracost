@@ -1,26 +1,26 @@
 
- Name                                                Monthly Qty  Unit   Monthly Cost 
-                                                                                      
- azurerm_active_directory_domain_service.enterprise                                   
- └─ Active directory domain service (Enterprise)             730  hours       $292.00 
-                                                                                      
- azurerm_active_directory_domain_service.premium                                      
- └─ Active directory domain service (Premium)                730  hours     $1,168.00 
-                                                                                      
- azurerm_active_directory_domain_service.standard                                     
- └─ Active directory domain service (Standard)               730  hours       $109.50 
-                                                                                      
- OVERALL TOTAL                                                              $1,569.50 
+ Name                                                Monthly Qty  Unit   Monthly Cost   
+                                                                                        
+ azurerm_active_directory_domain_service.premium                                        
+ └─ Active directory domain service (Premium)                730  hours     $1,168.00   
+                                                                                        
+ azurerm_active_directory_domain_service.enterprise                                     
+ └─ Active directory domain service (Enterprise)             730  hours       $292.00   
+                                                                                        
+ azurerm_active_directory_domain_service.standard                                       
+ └─ Active directory domain service (Standard)               730  hours       $109.50   
+                                                                                        
+ OVERALL TOTAL                                                             $1,569.50 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 6 cloud resources were detected:
 ∙ 3 were estimated
-∙ 3 were free:
-  ∙ 1 x azurerm_resource_group
-  ∙ 1 x azurerm_subnet
-  ∙ 1 x azurerm_virtual_network
+∙ 3 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMActiveDirectoryDomainService            ┃ $1,570       ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $1,570        ┃ $0.00       ┃ $1,570     ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

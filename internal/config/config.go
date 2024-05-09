@@ -1,8 +1,8 @@
 package config
 
 import (
+	"fmt"
 	"io"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -39,6 +39,10 @@ type AutodetectConfig struct {
 	// Terragrunt and Terraform and we want to force the project type to be one or
 	// the other.
 	ForceProjectType string `yaml:"force_project_type,omitempty" ignored:"true"`
+	// TerraformVarFileExtensions is a list of suffixes that should be used to group terraform
+	// var files. This is useful when there are non-standard terraform var file
+	// names which use different extensions.
+	TerraformVarFileExtensions []string `yaml:"terraform_var_file_extensions,omitempty" ignored:"true"`
 }
 
 type PathOverride struct {
@@ -82,6 +86,10 @@ type Project struct {
 	TerraformBinary string `yaml:"terraform_binary,omitempty" envconfig:"TERRAFORM_BINARY"`
 	// TerraformWorkspace is an optional field used to set the Terraform workspace
 	TerraformWorkspace string `yaml:"terraform_workspace,omitempty" envconfig:"TERRAFORM_WORKSPACE"`
+	// TerraformCloudWorkspace is used to override the terraform configuration blocks workspace value.
+	TerraformCloudWorkspace string `yaml:"terraform_cloud_workspace,omitempty" envconfig:"TERRAFORM_CLOUD_WORKSPACE"`
+	// TerraformCloudOrg is used to override the terraform configuration blocks organization value.
+	TerraformCloudOrg string `yaml:"terraform_cloud_org,omitempty" envconfig:"TERRAFORM_CLOUD_ORG"`
 	// TerraformCloudHost is used to override the default app.terraform.io backend host. Only applicable for
 	// terraform cloud/enterprise users.
 	TerraformCloudHost string `yaml:"terraform_cloud_host,omitempty" envconfig:"TERRAFORM_CLOUD_HOST"`
@@ -174,7 +182,7 @@ type Config struct {
 func init() {
 	err := loadDotEnv()
 	if err != nil {
-		log.Fatal(err)
+		logging.Logger.Fatal().Msg(err.Error())
 	}
 }
 
@@ -198,10 +206,17 @@ func DefaultConfig() *Config {
 	}
 }
 
-// RepoPath returns the filepath to either the config-file location or initial path provided by the user.
-func (c *Config) RepoPath() string {
+// WorkingDirectory returns the filepath to either the directory specified by the --path
+// flag or the directory that the binary has been run from.
+func (c *Config) WorkingDirectory() string {
 	if c.ConfigFilePath != "" {
-		return strings.TrimRight(c.ConfigFilePath, filepath.Base(c.ConfigFilePath))
+		wd, err := os.Getwd()
+		if err != nil {
+			logging.Logger.Debug().Err(err).Msg("error getting working directory for repo path")
+			return ""
+		}
+
+		return wd
 	}
 
 	return c.RootPath
@@ -210,7 +225,7 @@ func (c *Config) RepoPath() string {
 // CachePath finds path which contains the .infracost directory. It traverses parent directories until a .infracost
 // folder is found. If no .infracost folders exist then CachePath uses the current wd.
 func (c *Config) CachePath() string {
-	dir := c.RepoPath()
+	dir := c.WorkingDirectory()
 
 	if s := c.cachePath(dir); s != "" {
 		return s
@@ -313,9 +328,45 @@ func (c *Config) SetLogWriter(w io.Writer) {
 // LogWriter returns the writer the Logger should use to write logs to.
 // In most cases this should be stderr, but it can also be a file.
 func (c *Config) LogWriter() io.Writer {
+	isCI := ciPlatform() != "" && !IsTest()
 	return zerolog.NewConsoleWriter(func(w *zerolog.ConsoleWriter) {
-		w.NoColor = true
-		w.TimeFormat = time.RFC3339
+		w.PartsExclude = []string{"time"}
+		w.FormatLevel = func(i interface{}) string {
+			if i == nil {
+				return ""
+			}
+
+			if isCI {
+				return strings.ToUpper(fmt.Sprintf("%s", i))
+			}
+
+			if ll, ok := i.(string); ok {
+				upper := strings.ToUpper(ll)
+
+				switch ll {
+				case zerolog.LevelTraceValue:
+					return color.CyanString("%s", upper)
+				case zerolog.LevelDebugValue:
+					return color.MagentaString("%s", upper)
+				case zerolog.LevelWarnValue:
+					return color.YellowString("%s", upper)
+				case zerolog.LevelErrorValue, zerolog.LevelFatalValue, zerolog.LevelPanicValue:
+					return color.RedString("%s", upper)
+				case zerolog.LevelInfoValue:
+					return color.GreenString("%s", upper)
+				default:
+				}
+			}
+
+			return strings.ToUpper(fmt.Sprintf("%s", i))
+		}
+
+		if isCI {
+			w.NoColor = true
+			w.TimeFormat = time.RFC3339
+			w.PartsExclude = nil
+		}
+
 		if c.logDisableTimestamps {
 			w.PartsExclude = []string{"time"}
 		}
@@ -323,8 +374,6 @@ func (c *Config) LogWriter() io.Writer {
 		w.Out = os.Stderr
 		if c.logWriter != nil {
 			w.Out = c.logWriter
-		} else if c.LogLevel == "" {
-			w.Out = io.Discard
 		}
 	})
 }
@@ -394,10 +443,6 @@ func (c *Config) LoadGlobalFlags(cmd *cobra.Command) error {
 	return nil
 }
 
-func (c *Config) IsLogging() bool {
-	return c.LogLevel != ""
-}
-
 func (c *Config) IsSelfHosted() bool {
 	return c.PricingAPIEndpoint != "" && c.PricingAPIEndpoint != c.DefaultPricingAPIEndpoint
 }
@@ -431,4 +476,14 @@ func loadDotEnv() error {
 	}
 
 	return nil
+}
+
+func CleanProjectName(name string) string {
+	name = strings.TrimSuffix(name, "/")
+	name = strings.ReplaceAll(name, "/", "-")
+
+	if name == "." {
+		return "main"
+	}
+	return name
 }

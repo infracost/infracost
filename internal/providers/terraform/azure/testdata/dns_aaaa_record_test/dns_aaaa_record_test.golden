@@ -1,28 +1,30 @@
 
- Name                                       Monthly Qty  Unit                  Monthly Cost 
-                                                                                            
- azurerm_dns_aaaa_record.first1B                                                            
- └─ DNS queries (first 1B)                        1,000  1M queries                 $400.00 
-                                                                                            
- azurerm_dns_aaaa_record.over1B                                                             
- ├─ DNS queries (first 1B)                        1,000  1M queries                 $400.00 
- └─ DNS queries (over 1B)                           500  1M queries                 $100.00 
-                                                                                            
- azurerm_dns_aaaa_record.withoutUsage                                                       
- └─ DNS queries (first 1B)             Monthly cost depends on usage: $0.40 per 1M queries  
-                                                                                            
- azurerm_dns_zone.example                                                                   
- └─ Hosted zone                                       1  months                       $0.50 
-                                                                                            
+ Name                                       Monthly Qty  Unit                  Monthly Cost    
+                                                                                               
+ azurerm_dns_aaaa_record.over1B                                                                
+ ├─ DNS queries (first 1B)                        1,000  1M queries                 $400.00  * 
+ └─ DNS queries (over 1B)                           500  1M queries                 $100.00  * 
+                                                                                               
+ azurerm_dns_aaaa_record.first1B                                                               
+ └─ DNS queries (first 1B)                        1,000  1M queries                 $400.00  * 
+                                                                                               
+ azurerm_dns_zone.example                                                                      
+ └─ Hosted zone                                       1  months                       $0.50    
+                                                                                               
+ azurerm_dns_aaaa_record.withoutUsage                                                          
+ └─ DNS queries (first 1B)             Monthly cost depends on usage: $0.40 per 1M queries     
+                                                                                               
  OVERALL TOTAL                                                                      $900.50 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 5 cloud resources were detected:
-∙ 4 were estimated, 3 of which include usage-based costs, see https://infracost.io/usage-file
-∙ 1 was free:
-  ∙ 1 x azurerm_resource_group
+∙ 4 were estimated
+∙ 1 was free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMDNSaaaaRecord                           ┃ $901         ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $0.50         ┃ $900        ┃ $901       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

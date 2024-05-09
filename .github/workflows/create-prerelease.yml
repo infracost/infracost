@@ -1,0 +1,31 @@
+name: Upload master prerelease
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build:
+    name: Upload master prerelease
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Go 1.x
+        uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+
+      - name: Build project
+        run: |
+          make release
+
+      - name: Release
+        run: go run tools/release/main.go
+        env:
+          RELEASE_ID: "preview"
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Remove build assets
+        run: rm -rf build

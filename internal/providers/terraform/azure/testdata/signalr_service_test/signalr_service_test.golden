@@ -1,32 +1,33 @@
 
- Name                                                            Monthly Qty  Unit                  Monthly Cost 
-                                                                                                                 
- azurerm_signalr_service.example["Premium_P1"]                                                                   
- ├─ Service usage (Premium)                                                1  units                       $60.83 
- └─ Additional messages (Premium)                           Monthly cost depends on usage: $1.00 per 1M messages 
-                                                                                                                 
- azurerm_signalr_service.example["Standard_S1"]                                                                  
- ├─ Service usage (Standard)                                               1  units                       $48.97 
- └─ Additional messages (Standard)                          Monthly cost depends on usage: $1.00 per 1M messages 
-                                                                                                                 
- azurerm_signalr_service.example_with_usage["Premium_P1"]                                                        
- ├─ Service usage (Premium)                                                5  units                      $304.17 
- └─ Additional messages (Premium)                                    12.3456  1M messages                 $12.35 
-                                                                                                                 
- azurerm_signalr_service.example_with_usage["Standard_S1"]                                                       
- ├─ Service usage (Standard)                                               5  units                      $244.85 
- └─ Additional messages (Standard)                                    1.2345  1M messages                  $1.23 
-                                                                                                                 
+ Name                                                            Monthly Qty  Unit                  Monthly Cost    
+                                                                                                                    
+ azurerm_signalr_service.example_with_usage["Premium_P1"]                                                           
+ ├─ Service usage (Premium)                                                5  units                      $304.17    
+ └─ Additional messages (Premium)                                    12.3456  1M messages                 $12.35  * 
+                                                                                                                    
+ azurerm_signalr_service.example_with_usage["Standard_S1"]                                                          
+ ├─ Service usage (Standard)                                               5  units                      $244.85    
+ └─ Additional messages (Standard)                                    1.2345  1M messages                  $1.23  * 
+                                                                                                                    
+ azurerm_signalr_service.example["Premium_P1"]                                                                      
+ ├─ Service usage (Premium)                                                1  units                       $60.83    
+ └─ Additional messages (Premium)                           Monthly cost depends on usage: $1.00 per 1M messages    
+                                                                                                                    
+ azurerm_signalr_service.example["Standard_S1"]                                                                     
+ ├─ Service usage (Standard)                                               1  units                       $48.97    
+ └─ Additional messages (Standard)                          Monthly cost depends on usage: $1.00 per 1M messages    
+                                                                                                                    
  OVERALL TOTAL                                                                                           $672.41 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 6 cloud resources were detected:
-∙ 4 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
-∙ 2 were free:
-  ∙ 1 x azurerm_resource_group
-  ∙ 1 x azurerm_signalr_service
+∙ 4 were estimated
+∙ 2 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestSignalRService                                 ┃ $672         ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $659          ┃ $14         ┃ $672       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

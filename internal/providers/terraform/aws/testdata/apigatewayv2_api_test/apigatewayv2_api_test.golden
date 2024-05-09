@@ -1,29 +1,32 @@
 
- Name                                       Monthly Qty  Unit                  Monthly Cost 
-                                                                                            
- aws_apigatewayv2_api.http                                                                  
- └─ Requests (first 300M)              Monthly cost depends on usage: $1.00 per 1M requests 
-                                                                                            
- aws_apigatewayv2_api.http_usage                                                            
- ├─ Requests (first 300M)                           300  1M requests                $300.00 
- └─ Requests (over 300M)                            700  1M requests                $630.00 
-                                                                                            
- aws_apigatewayv2_api.websocket                                                             
- ├─ Messages (first 1B)                Monthly cost depends on usage: $1.00 per 1M messages 
- └─ Connection duration                Monthly cost depends on usage: $0.25 per 1M minutes  
-                                                                                            
- aws_apigatewayv2_api.websocket_usage                                                       
- ├─ Messages (first 1B)                           1,000  1M messages              $1,000.00 
- ├─ Messages (over 1B)                              500  1M messages                $400.00 
- └─ Connection duration                              10  1M minutes                   $2.50 
-                                                                                            
+ Name                                       Monthly Qty  Unit                  Monthly Cost    
+                                                                                               
+ aws_apigatewayv2_api.websocket_usage                                                          
+ ├─ Messages (first 1B)                           1,000  1M messages              $1,000.00  * 
+ ├─ Messages (over 1B)                              500  1M messages                $400.00  * 
+ └─ Connection duration                              10  1M minutes                   $2.50  * 
+                                                                                               
+ aws_apigatewayv2_api.http_usage                                                               
+ ├─ Requests (first 300M)                           300  1M requests                $300.00  * 
+ └─ Requests (over 300M)                            700  1M requests                $630.00  * 
+                                                                                               
+ aws_apigatewayv2_api.http                                                                     
+ └─ Requests (first 300M)              Monthly cost depends on usage: $1.00 per 1M requests    
+                                                                                               
+ aws_apigatewayv2_api.websocket                                                                
+ ├─ Messages (first 1B)                Monthly cost depends on usage: $1.00 per 1M messages    
+ └─ Connection duration                Monthly cost depends on usage: $0.25 per 1M minutes     
+                                                                                               
  OVERALL TOTAL                                                                    $2,332.50 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 4 cloud resources were detected:
-∙ 4 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 4 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestApiGatewayv2ApiGoldenFile                      ┃ $2,333       ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $0.00         ┃ $2,333      ┃ $2,333     ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

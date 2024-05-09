@@ -1,31 +1,32 @@
 
- Name                                            Monthly Qty  Unit                      Monthly Cost 
-                                                                                                     
- azurerm_hdinsight_hbase_cluster.example                                                             
- ├─ Head node (Standard_D1)                            1,460  hours                          $107.31 
- ├─ Region node (Standard_D14)                         2,190  hours                        $3,274.49 
- └─ Zookeeper node (Standard_D4a V4)                   2,190  hours                          $525.60 
-                                                                                                     
- azurerm_storage_account.example                                                                     
- ├─ Capacity                              Monthly cost depends on usage: $0.01 per GB                
- ├─ Write operations                      Monthly cost depends on usage: $0.10 per 10k operations    
- ├─ List and create container operations  Monthly cost depends on usage: $0.054 per 10k operations   
- ├─ Read operations                       Monthly cost depends on usage: $0.01 per 10k operations    
- ├─ All other operations                  Monthly cost depends on usage: $0.0043 per 10k operations  
- ├─ Data retrieval                        Monthly cost depends on usage: $0.01 per GB                
- ├─ Blob index                            Monthly cost depends on usage: $0.039 per 10k tags         
- └─ Early deletion                        Monthly cost depends on usage: $0.01 per GB                
-                                                                                                     
- OVERALL TOTAL                                                                             $3,907.40 
+ Name                                            Monthly Qty  Unit                      Monthly Cost   
+                                                                                                       
+ azurerm_hdinsight_hbase_cluster.example                                                               
+ ├─ Head node (Standard_D1)                            1,460  hours                          $107.31   
+ ├─ Region node (Standard_D14)                         2,190  hours                        $3,274.49   
+ └─ Zookeeper node (Standard_D4a V4)                   2,190  hours                          $525.60   
+                                                                                                       
+ azurerm_storage_account.example                                                                       
+ ├─ Capacity                              Monthly cost depends on usage: $0.01 per GB                  
+ ├─ Write operations                      Monthly cost depends on usage: $0.10 per 10k operations      
+ ├─ List and create container operations  Monthly cost depends on usage: $0.054 per 10k operations     
+ ├─ Read operations                       Monthly cost depends on usage: $0.01 per 10k operations      
+ ├─ All other operations                  Monthly cost depends on usage: $0.0043 per 10k operations    
+ ├─ Data retrieval                        Monthly cost depends on usage: $0.01 per GB                  
+ ├─ Blob index                            Monthly cost depends on usage: $0.039 per 10k tags           
+ └─ Early deletion                        Monthly cost depends on usage: $0.01 per GB                  
+                                                                                                       
+ OVERALL TOTAL                                                                            $3,907.40 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 4 cloud resources were detected:
-∙ 2 were estimated, 1 of which usage-based costs, see https://infracost.io/usage-file
-∙ 2 were free:
-  ∙ 1 x azurerm_resource_group
-  ∙ 1 x azurerm_storage_container
+∙ 2 were estimated
+∙ 2 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMHDInsightHBaseClusterGoldenFile         ┃ $3,907       ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $3,907        ┃ $0.00       ┃ $3,907     ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

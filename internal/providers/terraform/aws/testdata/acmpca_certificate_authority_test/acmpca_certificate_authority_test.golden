@@ -1,40 +1,43 @@
 
- Name                                                                  Monthly Qty  Unit                  Monthly Cost 
-                                                                                                                       
- aws_acmpca_certificate_authority.private_ca                                                                           
- ├─ Private certificate authority                                                1  months                     $400.00 
- └─ Certificates (first 1K)                                                  1,000  requests                   $750.00 
-                                                                                                                       
- aws_acmpca_certificate_authority.private_ca_more_tiered                                                               
- ├─ Private certificate authority                                                1  months                     $400.00 
- ├─ Certificates (first 1K)                                                  1,000  requests                   $750.00 
- ├─ Certificates (next 9K)                                                   9,000  requests                 $3,150.00 
- └─ Certificates (over 10K)                                                 10,001  requests                    $10.00 
-                                                                                                                       
- aws_acmpca_certificate_authority.private_ca_noUsage                                                                   
- ├─ Private certificate authority                                                1  months                     $400.00 
- └─ Certificates (first 1K)                                       Monthly cost depends on usage: $0.75 per requests    
-                                                                                                                       
- aws_acmpca_certificate_authority.private_ca_tiered                                                                    
- ├─ Private certificate authority                                                1  months                     $400.00 
- ├─ Certificates (first 1K)                                                  1,000  requests                   $750.00 
- └─ Certificates (next 9K)                                                   9,000  requests                 $3,150.00 
-                                                                                                                       
- aws_acmpca_certificate_authority.short_lived_ca                                                                       
- ├─ Private certificate authority (short-lived certificate mode)                 1  months                      $50.00 
- └─ Certificates (short-lived)                                              20,001  requests                 $1,160.06 
-                                                                                                                       
- aws_acmpca_certificate_authority.short_lived_ca_noUsage                                                               
- ├─ Private certificate authority (short-lived certificate mode)                 1  months                      $50.00 
- └─ Certificates (short-lived)                                    Monthly cost depends on usage: $0.058 per requests   
-                                                                                                                       
+ Name                                                                  Monthly Qty  Unit                  Monthly Cost    
+                                                                                                                          
+ aws_acmpca_certificate_authority.private_ca_more_tiered                                                                  
+ ├─ Private certificate authority                                                1  months                     $400.00    
+ ├─ Certificates (first 1K)                                                  1,000  requests                   $750.00  * 
+ ├─ Certificates (next 9K)                                                   9,000  requests                 $3,150.00  * 
+ └─ Certificates (over 10K)                                                 10,001  requests                    $10.00  * 
+                                                                                                                          
+ aws_acmpca_certificate_authority.private_ca_tiered                                                                       
+ ├─ Private certificate authority                                                1  months                     $400.00    
+ ├─ Certificates (first 1K)                                                  1,000  requests                   $750.00  * 
+ └─ Certificates (next 9K)                                                   9,000  requests                 $3,150.00  * 
+                                                                                                                          
+ aws_acmpca_certificate_authority.short_lived_ca                                                                          
+ ├─ Private certificate authority (short-lived certificate mode)                 1  months                      $50.00    
+ └─ Certificates (short-lived)                                              20,001  requests                 $1,160.06  * 
+                                                                                                                          
+ aws_acmpca_certificate_authority.private_ca                                                                              
+ ├─ Private certificate authority                                                1  months                     $400.00    
+ └─ Certificates (first 1K)                                                  1,000  requests                   $750.00  * 
+                                                                                                                          
+ aws_acmpca_certificate_authority.private_ca_noUsage                                                                      
+ ├─ Private certificate authority                                                1  months                     $400.00    
+ └─ Certificates (first 1K)                                       Monthly cost depends on usage: $0.75 per requests       
+                                                                                                                          
+ aws_acmpca_certificate_authority.short_lived_ca_noUsage                                                                  
+ ├─ Private certificate authority (short-lived certificate mode)                 1  months                      $50.00    
+ └─ Certificates (short-lived)                                    Monthly cost depends on usage: $0.058 per requests      
+                                                                                                                          
  OVERALL TOTAL                                                                                              $11,420.06 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 6 cloud resources were detected:
-∙ 6 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 6 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestACMPCACertificateAuthorityFunction             ┃ $11,420      ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $1,700        ┃ $9,720      ┃ $11,420    ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

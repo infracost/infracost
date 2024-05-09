@@ -1,23 +1,22 @@
 
- Name                                            Monthly Qty  Unit            Monthly Cost 
-                                                                                           
- azurerm_mssql_database.blank_server_location                                              
- ├─ Compute (S3)                                         730  hours                $147.18 
- ├─ Long-term retention (RA-GRS)               Monthly cost depends on usage: $0.05 per GB 
- └─ PITR backup storage (RA-GRS)               Monthly cost depends on usage: $0.20 per GB 
-                                                                                           
- OVERALL TOTAL                                                                     $147.18 
+ Name                                            Monthly Qty  Unit            Monthly Cost   
+                                                                                             
+ azurerm_mssql_database.blank_server_location                                                
+ ├─ Compute (S3)                                         730  hours                $147.18   
+ ├─ Long-term retention (RA-GRS)               Monthly cost depends on usage: $0.05 per GB   
+ └─ PITR backup storage (RA-GRS)               Monthly cost depends on usage: $0.20 per GB   
+                                                                                             
+ OVERALL TOTAL                                                                    $147.18 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 2 cloud resources were detected:
-∙ 1 was estimated, it includes usage-based costs, see https://infracost.io/usage-file
-∙ 1 was free:
-  ∙ 1 x azurerm_mssql_server
+∙ 1 was estimated
+∙ 1 was free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestMSSQLDatabaseWithBlankLocation                 ┃ $147         ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
-Logs:
-
-WRN Using eastus for resource azurerm_mssql_database.blank_server_location as its 'location' property could not be found.
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $147          ┃ $0.00       ┃ $147       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

@@ -72,7 +72,8 @@
         "monthlyQuantity",
         "price",
         "hourlyCost",
-        "monthlyCost"
+        "monthlyCost",
+        "priceNotFound"
       ],
       "properties": {
         "name": {
@@ -98,6 +99,9 @@
         },
         "usageBased": {
           "type": "boolean"
+        },
+        "priceNotFound": {
+          "type": "boolean"
         }
       },
       "additionalProperties": false,
@@ -118,6 +122,9 @@
           "type": "string"
         },
         "vcsBranch": {
+          "type": "string"
+        },
+        "vcsBaseCommitSha": {
           "type": "string"
         },
         "vcsCommitSha": {
@@ -229,6 +236,7 @@
     "Project": {
       "required": [
         "name",
+        "displayName",
         "metadata",
         "pastBreakdown",
         "breakdown",
@@ -237,6 +245,9 @@
       ],
       "properties": {
         "name": {
+          "type": "string"
+        },
+        "displayName": {
           "type": "string"
         },
         "metadata": {

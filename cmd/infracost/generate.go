@@ -22,7 +22,7 @@ import (
 )
 
 type generateConfigCommand struct {
-	repoPath     string
+	wd           string
 	templatePath string
 	template     string
 	outFile      string
@@ -44,7 +44,7 @@ func newGenerateConfigCommand() *cobra.Command {
 		RunE:      gen.run,
 	}
 
-	cmd.Flags().StringVar(&gen.repoPath, "repo-path", ".", "Path to the Terraform repo or directory you want to run the template file on")
+	cmd.Flags().StringVar(&gen.wd, "repo-path", ".", "Path to the Terraform repo or directory you want to run the template file on")
 	cmd.Flags().StringVar(&gen.template, "template", "", "Infracost template string that will generate the config-file yaml output")
 	cmd.Flags().StringVar(&gen.templatePath, "template-path", "", "Path to the Infracost template file that will generate the config-file yaml output")
 	cmd.Flags().StringVar(&gen.outFile, "out-file", "", "Save output to a file")
@@ -59,9 +59,9 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 		return nil
 	}
 
-	repoPath, _ := os.Getwd()
-	if g.repoPath != "." && g.repoPath != "" {
-		repoPath = g.repoPath
+	wd, _ := os.Getwd()
+	if g.wd != "." && g.wd != "" {
+		wd = g.wd
 	}
 
 	var buf bytes.Buffer
@@ -94,7 +94,7 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 	}
 
 	var autoProjects []hcl.DetectedProject
-	autoProviders, err := providers.Detect(ctx, &config.Project{Path: repoPath}, false)
+	detectionOutput, err := providers.Detect(ctx, &config.Project{Path: wd}, false)
 	if err != nil {
 		if definedProjects {
 			logging.Logger.Debug().Err(err).Msg("could not detect providers")
@@ -103,33 +103,32 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	for _, provider := range autoProviders {
+	for _, provider := range detectionOutput.Providers {
 		if v, ok := provider.(hcl.DetectedProject); ok {
 			autoProjects = append(autoProjects, v)
 		}
 	}
 
 	if definedProjects {
-		m, err := vcs.MetadataFetcher.Get(repoPath, nil)
+		m, err := vcs.MetadataFetcher.Get(wd, nil)
 		if err != nil {
-			ui.PrintWarningf(cmd.ErrOrStderr(), "could not fetch git metadata err: %s, default template variables will be blank", err)
+			logging.Logger.Warn().Msgf("could not fetch git metadata err: %s, default template variables will be blank", err)
 		}
 
 		detectedProjects := make([]template.DetectedProject, len(autoProjects))
 		detectedPaths := map[string][]template.DetectedProject{}
 		for i, p := range autoProjects {
-			relPath := p.RelativePath()
-
 			detectedProjects[i] = template.DetectedProject{
 				Name:              p.ProjectName(),
-				Path:              relPath,
-				TerraformVarFiles: p.TerraformVarFiles(),
+				Path:              p.RelativePath(),
+				Env:               p.EnvName(),
+				TerraformVarFiles: p.VarFiles(),
 			}
 
-			if v, ok := detectedPaths[relPath]; ok {
-				detectedPaths[relPath] = append(v, detectedProjects[i])
+			if v, ok := detectedPaths[p.RelativePath()]; ok {
+				detectedPaths[p.RelativePath()] = append(v, detectedProjects[i])
 			} else {
-				detectedPaths[relPath] = []template.DetectedProject{detectedProjects[i]}
+				detectedPaths[p.RelativePath()] = []template.DetectedProject{detectedProjects[i]}
 			}
 		}
 
@@ -154,7 +153,7 @@ func (g *generateConfigCommand) run(cmd *cobra.Command, args []string) error {
 			variables.BaseBranch = m.PullRequest.BaseBranch
 		}
 
-		parser := template.NewParser(repoPath, variables)
+		parser := template.NewParser(wd, variables)
 		if g.template != "" {
 			err := parser.Compile(g.template, &buf)
 			if err != nil {

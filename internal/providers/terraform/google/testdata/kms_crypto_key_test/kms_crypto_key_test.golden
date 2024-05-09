@@ -1,26 +1,29 @@
 
- Name                                               Monthly Qty  Unit                    Monthly Cost 
-                                                                                                      
- google_kms_crypto_key.my_keys                                                                        
- ├─ Key versions                              Monthly cost depends on usage: $0.06 per months         
- └─ Operations                                Monthly cost depends on usage: $0.03 per 10k operations 
-                                                                                                      
- google_kms_crypto_key.my_keys_withUsage                                                              
- ├─ Key versions (first 2K)                               2,000  months                     $5,000.00 
- ├─ Key versions (over 2K)                                3,000  months                     $3,000.00 
- └─ Operations                                                1  10k operations                 $0.15 
-                                                                                                      
- google_kms_crypto_key.with_rotate_withUsage                                                          
- ├─ Key versions                                          25.92  months                         $1.56 
- └─ Operations                                                1  10k operations                 $0.03 
-                                                                                                      
+ Name                                               Monthly Qty  Unit                    Monthly Cost    
+                                                                                                         
+ google_kms_crypto_key.my_keys_withUsage                                                                 
+ ├─ Key versions (first 2K)                               2,000  months                     $5,000.00  * 
+ ├─ Key versions (over 2K)                                3,000  months                     $3,000.00  * 
+ └─ Operations                                                1  10k operations                 $0.15  * 
+                                                                                                         
+ google_kms_crypto_key.with_rotate_withUsage                                                             
+ ├─ Key versions                                          25.92  months                         $1.56  * 
+ └─ Operations                                                1  10k operations                 $0.03  * 
+                                                                                                         
+ google_kms_crypto_key.my_keys                                                                           
+ ├─ Key versions                              Monthly cost depends on usage: $0.06 per months            
+ └─ Operations                                Monthly cost depends on usage: $0.03 per 10k operations    
+                                                                                                         
  OVERALL TOTAL                                                                              $8,001.74 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 3 cloud resources were detected:
-∙ 3 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 3 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestKMSCryptoKeyGoldenFile                         ┃ $8,002       ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $0.00         ┃ $8,002      ┃ $8,002     ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

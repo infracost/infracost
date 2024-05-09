@@ -278,8 +278,7 @@ func TestBreakdownTerraformDirectoryWithDefaultVarFiles(t *testing.T) {
 				"--path", dir,
 				"--terraform-plan-flags", "-var-file=input.tfvars -var=block2_ebs_volume_size=2000 -var block2_volume_type=io1",
 				"--terraform-force-cli",
-			},
-			nil,
+			}, &GoldenFileOptions{IgnoreNonGraph: true},
 		)
 	})
 
@@ -297,7 +296,7 @@ func TestBreakdownTerraformDirectoryWithDefaultVarFiles(t *testing.T) {
 				"--terraform-var", "block2_ebs_volume_size=2000",
 				"--terraform-var", "block2_volume_type=io1",
 			},
-			nil,
+			&GoldenFileOptions{IgnoreNonGraph: true},
 		)
 	})
 
@@ -464,7 +463,9 @@ func TestBreakdownTerragrunt(t *testing.T) {
 func TestBreakdownTerragruntWithRemoteSource(t *testing.T) {
 	testName := testutil.CalcGoldenFileTestdataDirName()
 	dir := path.Join("./testdata", testName)
-	cacheDir := filepath.Join(dir, ".infracost")
+	wd, err := os.Getwd()
+	require.NoError(t, err)
+	cacheDir := filepath.Join(wd, ".infracost")
 	require.NoError(t, os.RemoveAll(cacheDir))
 
 	GoldenFileCommandTest(
@@ -477,7 +478,7 @@ func TestBreakdownTerragruntWithRemoteSource(t *testing.T) {
 		nil)
 
 	dirs, err := getGitBranchesInDirs(filepath.Join(cacheDir, ".terragrunt-cache"))
-	assert.NoError(t, err)
+	require.NoError(t, err)
 
 	// check that there are 5 directories in the download directory as 3 of the 7 projects use the same ref,
 	// but one of these has a generate block.
@@ -631,14 +632,6 @@ func TestBreakdownTerragruntGetEnv(t *testing.T) {
 	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())}, nil)
 }
 
-func TestBreakdownTerragruntGetEnvWithWhitelist(t *testing.T) {
-	t.Setenv("UNSAFE_VAR", "test")
-	t.Setenv("SAFE_VAR", "test-prod")
-	t.Setenv("INFRACOST_SAFE_ENVS", "TEST,SAFE_VAR,FOO")
-
-	GoldenFileCommandTest(t, testutil.CalcGoldenFileTestdataDirName(), []string{"breakdown", "--path", path.Join("./testdata", testutil.CalcGoldenFileTestdataDirName())}, nil)
-}
-
 func TestBreakdownTerragruntGetEnvConfigFile(t *testing.T) {
 	testName := testutil.CalcGoldenFileTestdataDirName()
 	dir := path.Join("./testdata", testName)
@@ -764,7 +757,11 @@ func TestBreakdownWithPrivateSshModulePopulatesErrors(t *testing.T) {
 			"--format",
 			"json",
 		},
-		nil,
+		&GoldenFileOptions{
+			Env: map[string]string{
+				"GIT_TERMINAL_PROMPT": "0",
+			},
+		},
 	)
 
 	res := gjson.ParseBytes(output)
@@ -1301,4 +1298,135 @@ func TestBreakdownEmptyAPIKey(t *testing.T) {
 			ctx.Config.Credentials.APIKey = ""
 		},
 	)
+}
+
+func TestBreakdownSkipAutodetectionIfTerraformVarFilePassed(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", dir,
+			"--terraform-var-file",
+			"prod.tfvars",
+		},
+		nil,
+	)
+}
+
+func TestBreakdownTerragruntFileFuncs(t *testing.T) {
+	if os.Getenv("GITHUB_ACTIONS") == "" {
+		t.Skip("skipping as this test is only designed for GitHub Actions")
+	}
+
+	t.Setenv("INFRACOST_CI_PLATFORM", "github_app")
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", dir,
+		},
+		&GoldenFileOptions{IgnoreLogs: true, IgnoreNonGraph: true},
+	)
+}
+
+func TestBreakdownNoPricesWarnings(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", dir,
+		},
+		nil,
+	)
+}
+
+func TestBreakdownTerraformFileFuncs(t *testing.T) {
+	if os.Getenv("GITHUB_ACTIONS") == "" {
+		t.Skip("skipping as this test is only designed for GitHub Actions")
+	}
+
+	t.Setenv("INFRACOST_CI_PLATFORM", "github_app")
+
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", dir,
+		},
+		&GoldenFileOptions{IgnoreLogs: true, IgnoreNonGraph: true},
+	)
+}
+
+func TestBreakdownAutodetectionOutput(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", dir,
+		},
+		&GoldenFileOptions{LogLevel: strPtr("info")},
+	)
+}
+
+func TestBreakdownAutodetectionConfigFileOutput(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--config-file", filepath.Join(dir, "infracost.yml"),
+			"--log-level", "info",
+		},
+		&GoldenFileOptions{LogLevel: strPtr("info"), IgnoreNonGraph: true},
+	)
+}
+
+func TestBreakdownTerragruntAutodetectionOutput(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--path", dir,
+		},
+		&GoldenFileOptions{LogLevel: strPtr("info")},
+	)
+}
+
+func TestBreakdownTerragruntAutodetectionConfigFileOutput(t *testing.T) {
+	testName := testutil.CalcGoldenFileTestdataDirName()
+	dir := path.Join("./testdata", testName)
+	GoldenFileCommandTest(
+		t,
+		testutil.CalcGoldenFileTestdataDirName(),
+		[]string{
+			"breakdown",
+			"--config-file", filepath.Join(dir, "infracost.yml"),
+			"--log-level", "info",
+		},
+		&GoldenFileOptions{LogLevel: strPtr("info"), IgnoreNonGraph: true},
+	)
+}
+
+func strPtr(s string) *string {
+	return &s
 }

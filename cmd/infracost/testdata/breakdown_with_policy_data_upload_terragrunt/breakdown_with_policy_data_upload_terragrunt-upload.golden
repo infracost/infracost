@@ -50,7 +50,7 @@ storePolicyResources:
           "infracostMetadata": {
             "calls": [
               {
-                "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
+                "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
                 "blockName": "aws_instance.web_app",
                 "startLine": 1,
                 "endLine": 22
@@ -58,7 +58,7 @@ storePolicyResources:
             ],
             "checksum": "f5dd035ad27e97bb0e63f5e9794406f76dec425251f3ad09176905bfe8c1b6c5",
             "endLine": 22,
-            "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
+            "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
             "startLine": 1
           }
         }
@@ -111,7 +111,7 @@ storePolicyResources:
           "infracostMetadata": {
             "calls": [
               {
-                "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
+                "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
                 "blockName": "aws_instance.web_app",
                 "startLine": 1,
                 "endLine": 22
@@ -119,7 +119,7 @@ storePolicyResources:
             ],
             "checksum": "f5dd035ad27e97bb0e63f5e9794406f76dec425251f3ad09176905bfe8c1b6c5",
             "endLine": 22,
-            "filename": "REPLACED_PROJECT_PATH/infracost/infracost/cmd/infracost/testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
+            "filename": "testdata/breakdown_with_policy_data_upload_terragrunt/main.tf",
             "startLine": 1
           }
         }

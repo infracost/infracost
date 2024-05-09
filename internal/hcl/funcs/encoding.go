@@ -6,51 +6,12 @@ import (
 	"encoding/base64"
 	"fmt"
 	"net/url"
-	"unicode/utf8"
 
+	"github.com/hashicorp/go-cty-funcs/encoding"
 	"github.com/zclconf/go-cty/cty"
 	"github.com/zclconf/go-cty/cty/function"
 	"golang.org/x/text/encoding/ianaindex"
-
-	"github.com/infracost/infracost/internal/logging"
 )
-
-// Base64DecodeFunc constructs a function that decodes a string containing a base64 sequence.
-var Base64DecodeFunc = function.New(&function.Spec{
-	Params: []function.Parameter{
-		{
-			Name: "str",
-			Type: cty.String,
-		},
-	},
-	Type: function.StaticReturnType(cty.String),
-	Impl: func(args []cty.Value, retType cty.Type) (cty.Value, error) {
-		s := args[0].AsString()
-		sDec, err := base64.StdEncoding.DecodeString(s)
-		if err != nil {
-			return cty.UnknownVal(cty.String), fmt.Errorf("failed to decode base64 data '%s'", s)
-		}
-		if !utf8.Valid([]byte(sDec)) {
-			logging.Logger.Debug().Msgf("the result of decoding the provided string is not valid UTF-8: %s", sDec)
-			return cty.UnknownVal(cty.String), fmt.Errorf("the result of decoding the provided string is not valid UTF-8")
-		}
-		return cty.StringVal(string(sDec)), nil
-	},
-})
-
-// Base64EncodeFunc constructs a function that encodes a string to a base64 sequence.
-var Base64EncodeFunc = function.New(&function.Spec{
-	Params: []function.Parameter{
-		{
-			Name: "str",
-			Type: cty.String,
-		},
-	},
-	Type: function.StaticReturnType(cty.String),
-	Impl: func(args []cty.Value, retType cty.Type) (cty.Value, error) {
-		return cty.StringVal(base64.StdEncoding.EncodeToString([]byte(args[0].AsString()))), nil
-	},
-})
 
 // TextEncodeBase64Func constructs a function that encodes a string to a target encoding and then to a base64 sequence.
 var TextEncodeBase64Func = function.New(&function.Spec{
@@ -192,7 +153,7 @@ var URLEncodeFunc = function.New(&function.Spec{
 // UTF-8. If the bytes after Base64 decoding are _not_ valid UTF-8, this function
 // produces an error.
 func Base64Decode(str cty.Value) (cty.Value, error) {
-	return Base64DecodeFunc.Call([]cty.Value{str})
+	return encoding.Base64DecodeFunc.Call([]cty.Value{str})
 }
 
 // Base64Encode applies Base64 encoding to a string.
@@ -203,7 +164,7 @@ func Base64Decode(str cty.Value) (cty.Value, error) {
 // than bytes, so this function will first encode the characters from the string
 // as UTF-8, and then apply Base64 encoding to the result.
 func Base64Encode(str cty.Value) (cty.Value, error) {
-	return Base64EncodeFunc.Call([]cty.Value{str})
+	return encoding.Base64EncodeFunc.Call([]cty.Value{str})
 }
 
 // Base64Gzip compresses a string with gzip and then encodes the result in

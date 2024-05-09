@@ -1,21 +1,23 @@
 
- Name                                                 Monthly Qty  Unit   Monthly Cost 
-                                                                                       
- google_compute_instance_group_manager.default                                         
- ├─ Instance usage (Linux/UNIX, on-demand, f1-micro)        2,920  hours        $15.53 
- ├─ SSD provisioned storage (pd-ssd)                        1,500  GB          $255.00 
- ├─ Local SSD provisioned storage                           1,500  GB          $120.00 
- └─ NVIDIA Tesla K80 (on-demand)                            5,840  hours     $1,839.60 
-                                                                                       
- OVERALL TOTAL                                                               $2,230.13 
+ Name                                                 Monthly Qty  Unit   Monthly Cost   
+                                                                                         
+ google_compute_instance_group_manager.default                                           
+ ├─ Instance usage (Linux/UNIX, on-demand, f1-micro)        2,920  hours        $15.53   
+ ├─ SSD provisioned storage (pd-ssd)                        1,500  GB          $255.00   
+ ├─ Local SSD provisioned storage                           1,500  GB          $120.00   
+ └─ NVIDIA Tesla K80 (on-demand)                            5,840  hours     $1,839.60   
+                                                                                         
+ OVERALL TOTAL                                                              $2,230.13 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 2 cloud resources were detected:
 ∙ 1 was estimated
-∙ 1 was free:
-  ∙ 1 x google_compute_instance_template
+∙ 1 was free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestComputeInstanceGroupManagerGoldenFile          ┃ $2,230       ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $2,230        ┃ $0.00       ┃ $2,230     ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

@@ -1,23 +1,26 @@
 
- Name                                         Monthly Qty  Unit              Monthly Cost 
-                                                                                          
- google_pubsub_subscription.non_usage                                                     
- ├─ Message delivery data                  Monthly cost depends on usage: $40.00 per TiB  
- ├─ Retained acknowledged message storage  Monthly cost depends on usage: $0.27 per GiB   
- └─ Snapshot message backlog storage       Monthly cost depends on usage: $0.27 per GiB   
-                                                                                          
- google_pubsub_subscription.usage                                                         
- ├─ Message delivery data                              10  TiB                    $400.00 
- ├─ Retained acknowledged message storage              20  GiB                      $5.40 
- └─ Snapshot message backlog storage                   30  GiB                      $8.10 
-                                                                                          
+ Name                                         Monthly Qty  Unit              Monthly Cost    
+                                                                                             
+ google_pubsub_subscription.usage                                                            
+ ├─ Message delivery data                              10  TiB                    $400.00  * 
+ ├─ Retained acknowledged message storage              20  GiB                      $5.40  * 
+ └─ Snapshot message backlog storage                   30  GiB                      $8.10  * 
+                                                                                             
+ google_pubsub_subscription.non_usage                                                        
+ ├─ Message delivery data                  Monthly cost depends on usage: $40.00 per TiB     
+ ├─ Retained acknowledged message storage  Monthly cost depends on usage: $0.27 per GiB      
+ └─ Snapshot message backlog storage       Monthly cost depends on usage: $0.27 per GiB      
+                                                                                             
  OVERALL TOTAL                                                                    $413.50 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 2 cloud resources were detected:
-∙ 2 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+∙ 2 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestPubSubSubscription                             ┃ $414         ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $0.00         ┃ $414        ┃ $414       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

@@ -1,0 +1,13 @@
+version: 0.1
+
+projects:
+{{- range $project := .DetectedProjects }}
+  - path: {{ $project.Path }}
+    name: {{ $project.Name }}
+    terraform_var_files:
+    {{- range $varFile := $project.TerraformVarFiles }}
+      - {{ $varFile }}
+    {{- end }}
+    terraform_vars:
+      environment: {{ $project.Env }}
+{{- end }}

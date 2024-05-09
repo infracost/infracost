@@ -11,7 +11,8 @@ import (
 	"github.com/hashicorp/hcl/v2/gohcl"
 	"github.com/hashicorp/hcl/v2/hclparse"
 	"github.com/mitchellh/go-homedir"
-	"github.com/rs/zerolog/log"
+
+	"github.com/infracost/infracost/internal/logging"
 )
 
 var (
@@ -22,10 +23,10 @@ var (
 // FindTerraformCloudToken returns a TFC Bearer token for the given host.
 func FindTerraformCloudToken(host string) string {
 	if os.Getenv("TF_CLI_CONFIG_FILE") != "" {
-		log.Debug().Msgf("TF_CLI_CONFIG_FILE is set, checking %s for Terraform Cloud credentials", os.Getenv("TF_CLI_CONFIG_FILE"))
+		logging.Logger.Debug().Msgf("TF_CLI_CONFIG_FILE is set, checking %s for Terraform Cloud credentials", os.Getenv("TF_CLI_CONFIG_FILE"))
 		token, err := credFromHCL(os.Getenv("TF_CLI_CONFIG_FILE"), host)
 		if err != nil {
-			log.Debug().Msgf("Error reading Terraform config file %s: %v", os.Getenv("TF_CLI_CONFIG_FILE"), err)
+			logging.Logger.Debug().Msgf("Error reading Terraform config file %s: %v", os.Getenv("TF_CLI_CONFIG_FILE"), err)
 		}
 		if token != "" {
 			return token
@@ -34,10 +35,10 @@ func FindTerraformCloudToken(host string) string {
 
 	credFile := defaultCredFile()
 	if _, err := os.Stat(credFile); err == nil {
-		log.Debug().Msgf("Checking %s for Terraform Cloud credentials", credFile)
+		logging.Logger.Debug().Msgf("Checking %s for Terraform Cloud credentials", credFile)
 		token, err := credFromJSON(credFile, host)
 		if err != nil {
-			log.Debug().Msgf("Error reading Terraform credentials file %s: %v", credFile, err)
+			logging.Logger.Debug().Msgf("Error reading Terraform credentials file %s: %v", credFile, err)
 		}
 		if token != "" {
 			return token
@@ -46,10 +47,10 @@ func FindTerraformCloudToken(host string) string {
 
 	confFile := defaultConfFile()
 	if _, err := os.Stat(confFile); err == nil {
-		log.Debug().Msgf("Checking %s for Terraform Cloud credentials", confFile)
+		logging.Logger.Debug().Msgf("Checking %s for Terraform Cloud credentials", confFile)
 		token, err := credFromHCL(confFile, host)
 		if err != nil {
-			log.Debug().Msgf("Error reading Terraform config file %s: %v", confFile, err)
+			logging.Logger.Debug().Msgf("Error reading Terraform config file %s: %v", confFile, err)
 		}
 		if token != "" {
 			return token

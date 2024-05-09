@@ -1,21 +1,23 @@
 
- Name                      Monthly Qty  Unit    Monthly Cost 
-                                                             
- azurerm_dns_zone.germany                                    
- └─ Hosted zone                      1  months         $0.54 
-                                                             
- azurerm_dns_zone.westus                                     
- └─ Hosted zone                      1  months         $0.50 
-                                                             
- OVERALL TOTAL                                         $1.04 
+ Name                      Monthly Qty  Unit    Monthly Cost   
+                                                               
+ azurerm_dns_zone.germany                                      
+ └─ Hosted zone                      1  months         $0.54   
+                                                               
+ azurerm_dns_zone.westus                                       
+ └─ Hosted zone                      1  months         $0.50   
+                                                               
+ OVERALL TOTAL                                        $1.04 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 4 cloud resources were detected:
 ∙ 2 were estimated
-∙ 2 were free:
-  ∙ 2 x azurerm_resource_group
+∙ 2 were free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestAzureRMDNSZone                                 ┃ $1           ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $1            ┃ $0.00       ┃ $1         ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

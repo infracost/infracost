@@ -1,26 +1,29 @@
 
- Name                                                            Monthly Qty  Unit                        Monthly Cost 
-                                                                                                                       
- aws_ebs_snapshot.gp2                                                                                                  
- ├─ EBS snapshot storage                                                  10  GB                                 $0.50 
- ├─ Fast snapshot restore                                Monthly cost depends on usage: $0.75 per DSU-hours            
- ├─ ListChangedBlocks & ListSnapshotBlocks API requests  Monthly cost depends on usage: $0.0006 per 1k requests        
- ├─ GetSnapshotBlock API requests                        Monthly cost depends on usage: $0.003 per 1k SnapshotAPIUnits 
- └─ PutSnapshotBlock API requests                        Monthly cost depends on usage: $0.006 per 1k SnapshotAPIUnits 
-                                                                                                                       
- aws_ebs_snapshot_copy.gp2                                                                                             
- └─ EBS snapshot storage                                                  10  GB                                 $0.50 
-                                                                                                                       
- aws_ebs_volume.gp2                                                                                                    
- └─ Storage (general purpose SSD, gp2)                                    10  GB                                 $1.00 
-                                                                                                                       
+ Name                                                            Monthly Qty  Unit                        Monthly Cost    
+                                                                                                                          
+ aws_ebs_volume.gp2                                                                                                       
+ └─ Storage (general purpose SSD, gp2)                                    10  GB                                 $1.00    
+                                                                                                                          
+ aws_ebs_snapshot.gp2                                                                                                     
+ ├─ EBS snapshot storage                                                  10  GB                                 $0.50  * 
+ ├─ Fast snapshot restore                                Monthly cost depends on usage: $0.75 per DSU-hours               
+ ├─ ListChangedBlocks & ListSnapshotBlocks API requests  Monthly cost depends on usage: $0.0006 per 1k requests           
+ ├─ GetSnapshotBlock API requests                        Monthly cost depends on usage: $0.003 per 1k SnapshotAPIUnits    
+ └─ PutSnapshotBlock API requests                        Monthly cost depends on usage: $0.006 per 1k SnapshotAPIUnits    
+                                                                                                                          
+ aws_ebs_snapshot_copy.gp2                                                                                                
+ └─ EBS snapshot storage                                                  10  GB                                 $0.50  * 
+                                                                                                                          
  OVERALL TOTAL                                                                                                   $2.00 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 3 cloud resources were detected:
-∙ 3 were estimated, 2 of which include usage-based costs, see https://infracost.io/usage-file
+∙ 3 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestEBSSnapshotCopyGoldenFile                      ┃ $2           ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $1            ┃ $1          ┃ $2         ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

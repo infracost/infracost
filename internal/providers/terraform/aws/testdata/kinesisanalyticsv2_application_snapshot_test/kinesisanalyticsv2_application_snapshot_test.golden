@@ -1,33 +1,35 @@
 
- Name                                                         Monthly Qty  Unit              Monthly Cost 
-                                                                                                          
- aws_kinesisanalyticsv2_application.flink                                                                 
- ├─ Processing (stream)                                    Monthly cost depends on usage: $92.71 per KPU  
- ├─ Processing (orchestration)                                          1  KPU                     $92.71 
- ├─ Running storage                                        Monthly cost depends on usage: $0.12 per GB    
- └─ Backup                                                 Monthly cost depends on usage: $0.024 per GB   
-                                                                                                          
- aws_kinesisanalyticsv2_application.withoutUsage                                                          
- ├─ Processing (stream)                                    Monthly cost depends on usage: $92.71 per KPU  
- ├─ Processing (orchestration)                                          1  KPU                     $92.71 
- ├─ Running storage                                        Monthly cost depends on usage: $0.12 per GB    
- └─ Backup                                                 Monthly cost depends on usage: $0.024 per GB   
-                                                                                                          
- aws_kinesisanalyticsv2_application_snapshot.flink                                                        
- └─ Backup                                                            100  GB                       $2.40 
-                                                                                                          
- aws_kinesisanalyticsv2_application_snapshot.withoutUsage                                                 
- └─ Backup                                                 Monthly cost depends on usage: $0.024 per GB   
-                                                                                                          
+ Name                                                         Monthly Qty  Unit              Monthly Cost    
+                                                                                                             
+ aws_kinesisanalyticsv2_application.flink                                                                    
+ ├─ Processing (stream)                                    Monthly cost depends on usage: $92.71 per KPU     
+ ├─ Processing (orchestration)                                          1  KPU                     $92.71    
+ ├─ Running storage                                        Monthly cost depends on usage: $0.12 per GB       
+ └─ Backup                                                 Monthly cost depends on usage: $0.024 per GB      
+                                                                                                             
+ aws_kinesisanalyticsv2_application.withoutUsage                                                             
+ ├─ Processing (stream)                                    Monthly cost depends on usage: $92.71 per KPU     
+ ├─ Processing (orchestration)                                          1  KPU                     $92.71    
+ ├─ Running storage                                        Monthly cost depends on usage: $0.12 per GB       
+ └─ Backup                                                 Monthly cost depends on usage: $0.024 per GB      
+                                                                                                             
+ aws_kinesisanalyticsv2_application_snapshot.flink                                                           
+ └─ Backup                                                            100  GB                       $2.40  * 
+                                                                                                             
+ aws_kinesisanalyticsv2_application_snapshot.withoutUsage                                                    
+ └─ Backup                                                 Monthly cost depends on usage: $0.024 per GB      
+                                                                                                             
  OVERALL TOTAL                                                                                    $187.82 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 5 cloud resources were detected:
-∙ 4 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
-∙ 1 was free:
-  ∙ 1 x aws_iam_role
+∙ 4 were estimated
+∙ 1 was free
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                             ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestKinesisAnalyticsV2ApplicationSnapshotGoldenFile ┃ $188         ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $185          ┃ $2          ┃ $188       ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

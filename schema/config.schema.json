@@ -83,6 +83,12 @@
         "terraform_workspace": {
           "type": "string"
         },
+        "terraform_cloud_workspace": {
+          "type": "string"
+        },
+        "terraform_cloud_org": {
+          "type": "string"
+        },
         "terraform_cloud_host": {
           "type": "string"
         },

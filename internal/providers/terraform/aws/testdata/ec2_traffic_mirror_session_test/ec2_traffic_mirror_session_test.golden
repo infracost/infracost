@@ -1,16 +1,19 @@
 
- Name                                    Monthly Qty  Unit   Monthly Cost 
-                                                                          
- aws_ec2_traffic_mirror_session.session                                   
- └─ Traffic mirror                               730  hours        $10.95 
-                                                                          
- OVERALL TOTAL                                                     $10.95 
+ Name                                    Monthly Qty  Unit   Monthly Cost   
+                                                                            
+ aws_ec2_traffic_mirror_session.session                                     
+ └─ Traffic mirror                               730  hours        $10.95   
+                                                                            
+ OVERALL TOTAL                                                    $10.95 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 1 cloud resource was detected:
 ∙ 1 was estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestEC2TrafficMirrorSessionGoldenFile              ┃ $11          ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $11           ┃ $0.00       ┃ $11        ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛

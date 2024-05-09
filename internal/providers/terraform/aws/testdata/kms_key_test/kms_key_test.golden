@@ -1,27 +1,30 @@
 
- Name                                       Monthly Qty  Unit                    Monthly Cost 
-                                                                                              
- aws_kms_key.kms                                                                              
- ├─ Customer master key                               1  months                         $1.00 
- ├─ Requests                          Monthly cost depends on usage: $0.03 per 10k requests   
- ├─ ECC GenerateDataKeyPair requests  Monthly cost depends on usage: $0.10 per 10k requests   
- └─ RSA GenerateDataKeyPair requests  Monthly cost depends on usage: $0.10 per 10k requests   
-                                                                                              
- aws_kms_key.rsa2048                                                                          
- ├─ Customer master key                               1  months                         $1.00 
- └─ Requests (RSA 2048)               Monthly cost depends on usage: $0.03 per 10k requests   
-                                                                                              
- aws_kms_key.rsa3072                                                                          
- ├─ Customer master key                               1  months                         $1.00 
- └─ Requests (asymmetric)             Monthly cost depends on usage: $0.15 per 10k requests   
-                                                                                              
- OVERALL TOTAL                                                                          $3.00 
+ Name                                       Monthly Qty  Unit                    Monthly Cost   
+                                                                                                
+ aws_kms_key.kms                                                                                
+ ├─ Customer master key                               1  months                         $1.00   
+ ├─ Requests                          Monthly cost depends on usage: $0.03 per 10k requests     
+ ├─ ECC GenerateDataKeyPair requests  Monthly cost depends on usage: $0.10 per 10k requests     
+ └─ RSA GenerateDataKeyPair requests  Monthly cost depends on usage: $0.10 per 10k requests     
+                                                                                                
+ aws_kms_key.rsa2048                                                                            
+ ├─ Customer master key                               1  months                         $1.00   
+ └─ Requests (RSA 2048)               Monthly cost depends on usage: $0.03 per 10k requests     
+                                                                                                
+ aws_kms_key.rsa3072                                                                            
+ ├─ Customer master key                               1  months                         $1.00   
+ └─ Requests (asymmetric)             Monthly cost depends on usage: $0.15 per 10k requests     
+                                                                                                
+ OVERALL TOTAL                                                                         $3.00 
+
+*Usage costs can be estimated by updating Infracost Cloud settings, see docs for other options.
+
 ──────────────────────────────────
 3 cloud resources were detected:
 ∙ 3 were estimated
 
-┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━┓
-┃ Project                                            ┃ Monthly cost ┃
-┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━┫
-┃ TestKMSKey                                         ┃ $3           ┃
-┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━┛
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━┳━━━━━━━━━━━━┓
+┃ Project                                            ┃ Baseline cost ┃ Usage cost* ┃ Total cost ┃
+┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━━━╋━━━━━━━━━━━━━╋━━━━━━━━━━━━┫
+┃ main                                               ┃ $3            ┃ $0.00       ┃ $3         ┃
+┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━━━┻━━━━━━━━━━━━━┻━━━━━━━━━━━━┛
