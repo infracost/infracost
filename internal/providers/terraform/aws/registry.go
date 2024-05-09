@@ -84,7 +84,6 @@ var ResourceRegistry []*schema.RegistryItem = []*schema.RegistryItem{
 	getRoute53ZoneRegistryItem(),
 	getS3BucketAnalyticsConfigurationRegistryItem(),
 	getS3BucketInventoryRegistryItem(),
-	getS3BucketLifecycleConfigurationRegistryItem(),
 	getS3BucketRegistryItem(),
 	getSecretsManagerSecret(),
 	getSSMActivationRegistryItem(),

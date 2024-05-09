@@ -1295,22 +1295,6 @@
             }
           },
           {
-            "name": "module.aft.module.aft_feature_options.aws_s3_bucket_lifecycle_configuration.aft_access_logs_lifecycle_configuration",
-            "subresources": [
-              {
-                "name": "Standard"
-              }
-            ]
-          },
-          {
-            "name": "module.aft.module.aft_feature_options.aws_s3_bucket_lifecycle_configuration.aft_logging_bucket_lifecycle_configuration",
-            "subresources": [
-              {
-                "name": "Standard"
-              }
-            ]
-          },
-          {
             "name": "module.aft.module.aft_feature_options.aws_sfn_state_machine.aft_features",
             "tags": {
               "managed_by": "AFT"
