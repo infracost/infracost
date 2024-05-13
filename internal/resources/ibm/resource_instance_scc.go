@@ -44,7 +44,10 @@ func GetSCCCostComponents(r *ResourceInstance) []*schema.CostComponent {
  */
 func SCCMonthlyEvaluationsCostComponent(r *ResourceInstance) *schema.CostComponent {
 
-	var quantity *decimal.Decimal = decimalPtr(decimal.NewFromFloat(*r.SCC_Evaluations)) // Quantity of current cost component (i.e. Number of evaluations performed in a month)
+	var quantity *decimal.Decimal
+	if r.SCC_Evaluations != nil {
+		quantity = decimalPtr(decimal.NewFromFloat(*r.SCC_Evaluations)) // Quantity of current cost component (i.e. Number of evaluations performed in a month)
+	}
 
 	return &schema.CostComponent{
 		Name:            "Evaluations",
