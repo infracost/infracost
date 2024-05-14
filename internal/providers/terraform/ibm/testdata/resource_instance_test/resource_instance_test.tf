@@ -289,3 +289,11 @@ resource "ibm_resource_instance" "watson_governance_standard_v2" {
   location          = "us-south"
   resource_group_id = "default"
 }
+
+resource "ibm_resource_instance" "dns_svcs_standard" {
+  name              = "dns_svcs_standard"
+  service           = "dns-svcs"
+  plan              = "standard-dns"
+  location          = "global"
+  resource_group_id = "default"
+}

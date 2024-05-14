@@ -84,6 +84,17 @@ resource_type_default_usage:
     sysdig-secure_VM_NODE_HOUR: 501
     aiopenscale_RESOURCE_UNITS: 1
     aiopenscale_MODELS_PER_MONTH: 1
+    dns-svcs_ITEMS: 2 # 1 zone included
+    dns-svcs_MILLION_ITEMS_CREXTERNALQUERIES: 11 # Tiered; 1-10, 10+
+    dns-svcs_MILLION_ITEMS: 1001 # Tiered; 1-999, 999+, 1 included
+    dns-svcs_NUMBERGLB: 1 # Number of GLB HOURS
+    dns-svcs_NUMBERHEALTHCHECK: 1
+    dns-svcs_NUMBERPOOLS: 1 # Number of pool HOURS
+    dns-svcs_RESOLVERLOCATIONS: 1 # Number of resolver location HOURS
+    dns-svcs_qty_custom_resolver_locations: 1 # Number of resolver locations
+    dns-svcs_qty_glb_instances: 1 # Number of GLBs
+    dns-svcs_qty_pools: 1 # Number of pools
+
   ibm_tg_gateway: 
     connection: 3
     data_transfer_global: 1000
@@ -1350,6 +1361,17 @@ resource_usage:
 
   ibm_resource_instance.watson_governance_standard_v2:
     aiopenscale_MODELS_PER_MONTH: 1
+
+  ibm_resource_instance.dns_services:
+    dns-svcs_MILLION_ITEMS_CREXTERNALQUERIES: 11 # Tiered; 1-10, 10+
+    dns-svcs_MILLION_ITEMS: 1001 # Tiered; 1-999, 999+, 1 included
+    dns-svcs_NUMBERGLB: 1 # Number of GLB HOURS
+    dns-svcs_NUMBERHEALTHCHECK: 1
+    dns-svcs_NUMBERPOOLS: 1 # Number of pool HOURS
+    dns-svcs_RESOLVERLOCATIONS: 1 # Number of resolver location HOURS
+    dns-svcs_qty_custom_resolver_locations: 1 # Number of resolver locations
+    dns-svcs_qty_glb_instances: 1 # Number of GLBs
+    dns-svcs_qty_pools: 1 # Number of pools
 
   ibm_tg_gateway.tg_gateway:
     connection: 25 # Monthly number of connections to the gateway

@@ -86,6 +86,7 @@ var globalCatalogServiceId = map[string]catalogMetadata{
 	"logdnaat":                      {"dcc46a60-e13b-11e8-a015-757410dab16b", []string{}, nil, "https://cloud.ibm.com/catalog/services/logdnaat"},
 	"continuous-delivery":           {"59b735ee-5938-4ebd-a6b2-541aef2d1f68", []string{}, nil, "https://cloud.ibm.com/catalog/services/continuous-delivery"},
 	"compliance":                    {"compliance", []string{}, nil, "https://cloud.ibm.com/catalog/services/security-and-compliance-center"},
+	"dns-svcs":                      {"b4ed8a30-936f-11e9-b289-1d079699cbe5", []string{}, nil, "https://cloud.ibm.com/catalog/services/dns-services"},
 }
 
 func SetCatalogMetadata(d *schema.ResourceData, resourceType string, config map[string]any) {

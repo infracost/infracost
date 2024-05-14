@@ -85,6 +85,17 @@ type ResourceInstance struct {
 	// Watsonx.governance
 	WGOV_ru     *float64 `infracost_usage:"aiopenscale_RESOURCE_UNITS"`
 	WGOV_Models *float64 `infracost_usage:"aiopenscale_MODELS_PER_MONTH"`
+	// DNS Services
+	DNSServices_CustomResolverExternalQueries *int64   `infracost_usage:"dns-svcs_MILLION_ITEMS_CREXTERNALQUERIES"`
+	DNSServices_CustomResolverLocationHours   *float64 `infracost_usage:"dns-svcs_RESOLVERLOCATIONS"`
+	DNSServices_CustomResolverLocations       *int64   `infracost_usage:"dns-svcs_qty_custom_resolver_locations"`
+	DNSServices_DNSQueries                    *int64   `infracost_usage:"dns-svcs_MILLION_ITEMS"`
+	DNSServices_GLBInstanceHours              *float64 `infracost_usage:"dns-svcs_NUMBERGLB"`
+	DNSServices_GLBInstances                  *int64   `infracost_usage:"dns-svcs_qty_glb_instances"`
+	DNSServices_HealthChecks                  *int64   `infracost_usage:"dns-svcs_NUMBERHEALTHCHECK"`
+	DNSServices_PoolHours                     *float64 `infracost_usage:"dns-svcs_NUMBERPOOLS"`
+	DNSServices_Pools                         *int64   `infracost_usage:"dns-svcs_qty_pools"`
+	DNSServices_Zones                         *int64   `infracost_usage:"dns-svcs_ITEMS"`
 }
 
 type ResourceCostComponentsFunc func(*ResourceInstance) []*schema.CostComponent
@@ -133,6 +144,16 @@ var ResourceInstanceUsageSchema = []*schema.UsageItem{
 	{Key: "sysdig-secure_VM_NODE_HOUR", DefaultValue: 0, ValueType: schema.Float64},
 	{Key: "aiopenscale_RESOURCE_UNITS", DefaultValue: 1, ValueType: schema.Float64},
 	{Key: "aiopenscale_MODELS_PER_MONTH", DefaultValue: 1, ValueType: schema.Float64},
+	{Key: "dns-svcs_ITEMS", DefaultValue: 1, ValueType: schema.Int64},
+	{Key: "dns-svcs_MILLION_ITEMS_CREXTERNALQUERIES", DefaultValue: 1, ValueType: schema.Int64},
+	{Key: "dns-svcs_MILLION_ITEMS", DefaultValue: 1, ValueType: schema.Int64},
+	{Key: "dns-svcs_NUMBERGLB", DefaultValue: 1, ValueType: schema.Float64},
+	{Key: "dns-svcs_NUMBERHEALTHCHECK", DefaultValue: 1, ValueType: schema.Int64},
+	{Key: "dns-svcs_NUMBERPOOLS", DefaultValue: 1, ValueType: schema.Float64},
+	{Key: "dns-svcs_RESOLVERLOCATIONS", DefaultValue: 1, ValueType: schema.Float64},
+	{Key: "dns-svcs_qty_custom_resolver_locations", DefaultValue: 1, ValueType: schema.Int64},
+	{Key: "dns-svcs_qty_glb_instances", DefaultValue: 1, ValueType: schema.Int64},
+	{Key: "dns-svcs_qty_pools", DefaultValue: 1, ValueType: schema.Int64},
 }
 
 var ResourceInstanceCostMap map[string]ResourceCostComponentsFunc = map[string]ResourceCostComponentsFunc{
@@ -152,6 +173,7 @@ var ResourceInstanceCostMap map[string]ResourceCostComponentsFunc = map[string]R
 	"data-science-experience": GetWSCostComponents,
 	"sysdig-secure":           GetSCCWPCostComponents,
 	"aiopenscale":             GetWGOVCostComponents,
+	"dns-svcs":                GetDNSServicesCostComponents,
 }
 
 func KMSKeyVersionsFreeCostComponent(r *ResourceInstance) *schema.CostComponent {

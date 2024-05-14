@@ -67,7 +67,7 @@ resource_usage:
     wd_instance: 1 # Number of instances used per month
     wd_documents: 11000 # Number of monthly documents created; 10,000 included in the Plus plan; $50 for every additional 1,000 documents.
     wd_queries: 11000 # Number of queries documents created; 10,000 included in the Plus plan; $20 for every additional 1,000 queries.
-  
+
   ibm_resource_instance.watson_discovery_enterprise:
     wd_instance: 1 # Number of instances used per month
     wd_documents: 101000 # Number of monthly documents created; 100,000 included in the Enterprise plan; $5 for every additional 1,000 documents.
@@ -97,3 +97,15 @@ resource_usage:
 
   ibm_resource_instance.watson_governance_standard_v2:
     aiopenscale_MODELS_PER_MONTH: 1
+
+  ibm_resource_instance.dns_svcs_standard:
+    dns-svcs_ITEMS: 2 # Linear; 1 zone included
+    dns-svcs_MILLION_ITEMS_CREXTERNALQUERIES: 11 # Tiered; 1-10, 10+
+    dns-svcs_MILLION_ITEMS: 1001 # Tiered; 1-999, 999+, 1 included
+    dns-svcs_NUMBERGLB: 1 # Linear
+    dns-svcs_NUMBERHEALTHCHECK: 1 # Linear
+    dns-svcs_NUMBERPOOLS: 1 # Linear
+    dns-svcs_RESOLVERLOCATIONS: 1 # Linear
+    dns-svcs_qty_custom_resolver_locations: 1 # Number of resolver locations
+    dns-svcs_qty_glb_instances: 1 # Number of GLBs
+    dns-svcs_qty_pools: 1 # Number of pools

@@ -7,6 +7,17 @@
  ibm_resource_instance.cd_instance_professional                                                                                              
  └─ Authorized Users                                                                         2  Authorized Users                      $75.40 
                                                                                                                                              
+ ibm_resource_instance.dns_svcs_standard                                                                                                     
+ ├─ Additional Zones                                                                         1  Zones                                  $0.54 
+ ├─ Pool Hours                                                                               1  Hours                                  $0.04 
+ ├─ GLB Instance Hours                                                                       1  Hours                                  $0.04 
+ ├─ Health Checks                                                                            1  Health Checks                          $1.08 
+ ├─ Custom Resolver Location Hours                                                           1  Hours                                  $0.13 
+ ├─ Million Custom Resolver External Queries (first 10 Million Queries)                     10  Million Queries                        $4.31 
+ ├─ Million Custom Resolver External Queries (over 10 Million Queries)                       1  Million Queries                        $0.22 
+ └─ Additional Million DNS Queries (first 999 Million Queries)                             999  Million Queries                      $645.16 
+ └─ Additional Million DNS Queries (over 999 Million Queries)                                1  Million Queries                        $0.32 
+                                                                                                                                             
  ibm_resource_instance.resource_instance_activity_tracker_7day                                                                               
  └─ Gigabyte Months                                                                         10  Gigabyte Months                       $16.15 
                                                                                                                                              
@@ -168,7 +179,7 @@
  ├─ Class 2 Resource Units                                                                  50  RU                                     $0.09 
  └─ Class 3 Resource Units                                                                  50  RU                                     $0.25 
                                                                                                                                              
- OVERALL TOTAL                                                                                                                    $18,597.15 
+ OVERALL TOTAL                                                                                                                    $19,248.98 
 ──────────────────────────────────
-36 cloud resources were detected:
-∙ 36 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
+37 cloud resources were detected:
+∙ 37 were estimated, all of which include usage-based costs, see https://infracost.io/usage-file
