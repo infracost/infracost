@@ -8,7 +8,7 @@ terraform {
 }
 provider "ibm" {
   generation = 2
-  region = "us-south"
+  region = "eu-de"
   ibmcloud_timeout = "1"
   max_retries = "1"
 }
@@ -20,14 +20,14 @@ resource "ibm_is_vpc" "vpc1" {
 resource "ibm_is_subnet" "subnet1" {
   name                     = "mysubnet1"
   vpc                      = ibm_is_vpc.vpc1.id
-  zone                     = "us-south-1"
+  zone                     = "eu-de-1"
   total_ipv4_address_count = 256
 }
 
 resource "ibm_is_subnet" "subnet2" {
   name                     = "mysubnet2"
   vpc                      = ibm_is_vpc.vpc1.id
-  zone                     = "us-south-2"
+  zone                     = "eu-de-2"
   total_ipv4_address_count = 256
 }
 
@@ -39,11 +39,11 @@ resource "ibm_container_vpc_cluster" "cluster" {
   kube_version      = "1.17.5"
   zones {
     subnet_id = ibm_is_subnet.subnet1.id
-    name      = "us-south-1"
+    name      = "eu-de-1"
   }
   zones {
     subnet_id = ibm_is_subnet.subnet1.id
-    name      = "us-south-2"
+    name      = "eu-de-2"
   }
 }
 
@@ -55,11 +55,11 @@ resource "ibm_container_vpc_cluster" "cluster_without_usage" {
   kube_version      = "1.17.5"
   zones {
     subnet_id = ibm_is_subnet.subnet1.id
-    name      = "us-south-1"
+    name      = "eu-de-1"
   }
   zones {
     subnet_id = ibm_is_subnet.subnet1.id
-    name      = "us-south-2"
+    name      = "eu-de-2"
   }
 }
 
@@ -71,10 +71,10 @@ resource "ibm_container_vpc_cluster" "roks_cluster_with_usage" {
   kube_version      = "4.13_openshift"
   zones {
     subnet_id = ibm_is_subnet.subnet1.id
-    name      = "us-south-1"
+    name      = "eu-de-1"
   }
   zones {
     subnet_id = ibm_is_subnet.subnet1.id
-    name      = "us-south-2"
+    name      = "eu-de-2"
   }
 }

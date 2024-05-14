@@ -71,7 +71,7 @@ func (r *ContainerVpcCluster) BuildResource() *schema.Resource {
 		{Key: "serverType", Value: strPtr("virtual")},
 		{Key: "isolation", Value: strPtr("public")},
 		{Key: "operatingSystem", ValueRegex: strPtr(fmt.Sprintf("/%s/i", operatingSystem))},
-		{Key: "catalogRegion", ValueRegex: strPtr(r.Region)},
+		{Key: "catalogRegion", Value: strPtr(r.Region)},
 	}
 	if useOcpPrices {
 		attributeFilters = append(attributeFilters, &schema.AttributeFilter{
