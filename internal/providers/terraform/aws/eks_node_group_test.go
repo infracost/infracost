@@ -5,6 +5,7 @@ import (
 
 	"github.com/shopspring/decimal"
 
+	"github.com/infracost/infracost/internal/config"
 	"github.com/infracost/infracost/internal/schema"
 	"github.com/infracost/infracost/internal/testutil"
 
@@ -17,7 +18,9 @@ func TestEKSNodeGroupGoldenFile(t *testing.T) {
 		t.Skip("skipping test in short mode")
 	}
 
-	tftest.GoldenFileResourceTests(t, "eks_node_group_test")
+	tftest.GoldenFileHCLResourceTestsWithOpts(t, "eks_node_group_test", tftest.DefaultGoldenFileOptions(), func(ctx *config.RunContext) {
+		ctx.Config.GraphEvaluator = true
+	})
 }
 
 func TestEKSNodeGroup_spot(t *testing.T) {

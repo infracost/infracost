@@ -1359,14 +1359,34 @@ var (
 	defaultGCPRegion = "us-central1"
 
 	blockValueFuncs = map[string]BlockValueFunc{
-		"data.aws_availability_zones": awsAvailabilityZonesValues,
-		"data.google_compute_zones":   googleComputeZonesValues,
-		"data.aws_region":             awsCurrentRegion,
-		"data.aws_default_tags":       awsDefaultTagValues,
-		"resource.random_shuffle":     randomShuffleValues,
-		"resource.time_static":        timeStaticValues,
+		"data.aws_availability_zones":  awsAvailabilityZonesValues,
+		"data.google_compute_zones":    googleComputeZonesValues,
+		"data.aws_region":              awsCurrentRegion,
+		"data.aws_default_tags":        awsDefaultTagValues,
+		"resource.random_shuffle":      randomShuffleValues,
+		"resource.time_static":         timeStaticValues,
+		"resource.aws_launch_template": launchTemplateValues,
 	}
 )
+
+// launchTemplateValues returns the values for the launch template but if the
+// name attribute is not set it will generate a unique name based on the block
+// address. This is done to ensure that we can properly reference the launch
+// template, when users uses the name-prefix attribute to set a name.
+func launchTemplateValues(b *Block) cty.Value {
+	values := b.values()
+	launchTemplateData := values.AsValueMap()
+	v, ok := launchTemplateData["name"]
+
+	if !ok || v.IsNull() {
+		h := sha256.New()
+		h.Write([]byte(b.FullName()))
+		addressSha := hex.EncodeToString(h.Sum(nil))
+		launchTemplateData["name"] = cty.StringVal("hcl-" + addressSha)
+	}
+
+	return cty.ObjectVal(launchTemplateData)
+}
 
 // timeStaticValues mocks the values returned from resource.time_static which is
 // a resource that returns the attributes of the provided rfc3339 time. If none
